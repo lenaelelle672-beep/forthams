@@ -2,6 +2,8 @@ import os
 import time
 import random
 import subprocess
+import urllib.request
+import json
 
 class EndlessAMSDaemon:
     """
@@ -30,6 +32,15 @@ class EndlessAMSDaemon:
             line = f"[{t}] 🌃 [Endless] {msgs}\n"
             f.write(line)
             print(line, end="")
+            
+        # 同步向指挥官的主屏幕推送长命百岁框的进度
+        try:
+            url = "http://127.0.0.1:8999/api/external_event"
+            data = {"task_id": "US-FOSAMS", "message": msgs[:200], "data": {"state": "running"}}
+            req = urllib.request.Request(url, data=json.dumps(data).encode('utf-8'), headers={'Content-Type': 'application/json'})
+            urllib.request.urlopen(req, timeout=2)
+        except Exception:
+            pass # 主控制台即使死掉也不影响它的孤独挂靠
 
     def invoke_aider_evolution(self, mandate: str):
         self.log(f"🔥 打爆演进核弹: {mandate}")
