@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Asset Detail: Server Rack Alpha-7</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-primary-fixed-variant": "#3b14d5",
+              "primary-container": "#5139e9",
+              "on-surface-variant": "#474556",
+              "inverse-surface": "#273044",
+              "surface-container": "#e8eeff",
+              "tertiary-fixed-dim": "#44dada",
+              "on-primary-fixed": "#150066",
+              "inverse-on-surface": "#ecf0ff",
+              "primary": "#380cd3",
+              "outline-variant": "#c8c4d9",
+              "surface-tint": "#543dec",
+              "primary-fixed": "#e4dfff",
+              "inverse-primary": "#c6c0ff",
+              "secondary-fixed": "#d9e2ff",
+              "on-tertiary": "#ffffff",
+              "surface-container-lowest": "#ffffff",
+              "on-tertiary-container": "#55e8e8",
+              "outline": "#787587",
+              "on-surface": "#111c2e",
+              "secondary-fixed-dim": "#b1c5ff",
+              "error": "#ba1a1a",
+              "tertiary-container": "#006666",
+              "on-error": "#ffffff",
+              "surface-container-low": "#f1f3ff",
+              "on-primary-container": "#d4cfff",
+              "error-container": "#ffdad6",
+              "secondary": "#0055c8",
+              "tertiary": "#004c4c",
+              "on-tertiary-fixed": "#002020",
+              "surface-dim": "#d0daf3",
+              "surface-container-highest": "#d9e2fc",
+              "on-secondary-fixed": "#001946",
+              "surface-variant": "#d9e2fc",
+              "secondary-container": "#276eec",
+              "surface-bright": "#f9f9ff",
+              "on-secondary-container": "#fefcff",
+              "surface-container-high": "#dfe8ff",
+              "on-error-container": "#93000a",
+              "tertiary-fixed": "#68f7f7",
+              "background": "#f9f9ff",
+              "on-background": "#111c2e",
+              "on-primary": "#ffffff",
+              "surface": "#f9f9ff",
+              "on-secondary": "#ffffff",
+              "primary-fixed-dim": "#c6c0ff",
+              "on-secondary-fixed-variant": "#00419d",
+              "on-tertiary-fixed-variant": "#004f50"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface">
+<!-- TopAppBar -->
+<header class="fixed top-0 left-0 w-full flex items-center justify-between px-6 py-3 bg-slate-50 dark:bg-slate-900 z-50">
+<div class="flex items-center gap-4">
+<button class="p-2 text-indigo-700 dark:text-indigo-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-colors rounded-full">
+<span class="material-symbols-outlined">close</span>
+</button>
+<h1 class="font-sans text-sm font-semibold tracking-tight text-slate-900 dark:text-slate-100 uppercase">Asset Management &gt; Workflows</h1>
+</div>
+<div class="flex items-center gap-2">
+<div class="text-lg font-bold text-indigo-700 dark:text-indigo-400">AM.SYSTEM</div>
+<button class="p-2 text-indigo-700 dark:text-indigo-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-colors rounded-full">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+</header>
+<!-- NavigationDrawer (Static version for desktop layout) -->
+<aside class="fixed right-0 top-0 h-full z-40 flex flex-col pt-16 border-l border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 w-80 hidden lg:flex">
+<div class="px-6 py-4">
+<h2 class="text-base font-semibold text-slate-900 dark:text-slate-50">Node Configuration</h2>
+</div>
+<nav class="flex-1">
+<div class="flex items-center px-6 py-3 text-indigo-600 dark:text-indigo-400 border-r-4 border-indigo-600 bg-indigo-50/50 dark:bg-indigo-900/20 font-sans text-sm font-medium">
+<span class="material-symbols-outlined mr-3">settings</span> Properties
+            </div>
+<div class="flex items-center px-6 py-3 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-200/30 dark:hover:bg-slate-800/30 transition-colors font-sans text-sm font-medium">
+<span class="material-symbols-outlined mr-3">history</span> History
+            </div>
+<div class="flex items-center px-6 py-3 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-200/30 dark:hover:bg-slate-800/30 transition-colors font-sans text-sm font-medium">
+<span class="material-symbols-outlined mr-3">attach_file</span> Attachments
+            </div>
+<div class="flex items-center px-6 py-3 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-200/30 dark:hover:bg-slate-800/30 transition-colors font-sans text-sm font-medium">
+<span class="material-symbols-outlined mr-3">bolt</span> Automation
+            </div>
+</nav>
+</aside>
+<!-- Main Content Canvas -->
+<main class="pt-16 pb-24 lg:pr-80 min-h-screen">
+<div class="max-w-6xl mx-auto px-6 py-10">
+<!-- Bento Layout Container -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
+<!-- Left Column: Identity & Actions (4/12) -->
+<div class="md:col-span-5 space-y-8">
+<!-- Asset Hero Card -->
+<div class="relative overflow-hidden rounded-xl bg-surface-container-lowest shadow-sm group">
+<div class="h-64 w-full bg-slate-200 overflow-hidden">
+<img alt="Server Rack Alpha-7" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="Modern server rack unit in a clean data center with blue and green ambient lighting, technical professional aesthetic" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCtGV0nWKzarXj4pgiMLZO240riaHFqNZ6W5BLa-dNq0vExkbM-PYH-5oNv2hyraKHmTp6_Eub9SbtahyRWsXiVjeEZraBiKNsQMU2N5Z6mczYWhGqEDIaoFXg9M6NYoN16KezFl0TafRQqmBVUG8zw8iGJtk9k7zMcNuJvyXptE24V3X1WE2muwPkjAj9_ereloCD-RpnhXXxV6e79R4jpDKPsgAhXxHZPOU8_3HuJ6z61aMsncibi1BB03-Oz5hhMZXOKswjkxeU"/>
+</div>
+<div class="p-6">
+<div class="flex items-center justify-between mb-2">
+<span class="px-2 py-1 bg-primary-fixed text-on-primary-fixed text-[10px] font-bold uppercase tracking-widest rounded">Asset ID: AR-7702</span>
+<div class="flex items-center text-tertiary">
+<span class="material-symbols-outlined text-sm mr-1" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="text-xs font-semibold">Active</span>
+</div>
+</div>
+<h2 class="text-2xl font-bold text-on-surface tracking-tight">Server Rack Alpha-7</h2>
+<p class="text-on-surface-variant text-sm mt-2">Critical infrastructure node located in Sector 4-B. Handles primary database synchronization workflows.</p>
+</div>
+</div>
+<!-- Quick Actions -->
+<div class="space-y-4">
+<button class="w-full flex items-center justify-center gap-3 py-4 px-6 bg-primary text-white rounded-lg font-semibold hover:brightness-110 active:scale-95 transition-all shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined">refresh</span>
+                            Re-trigger Check
+                        </button>
+<button class="w-full flex items-center justify-center gap-3 py-4 px-6 border border-outline-variant/30 text-on-surface rounded-lg font-semibold hover:bg-surface-container-low transition-all">
+<span class="material-symbols-outlined">edit_note</span>
+                            Edit Workflow
+                        </button>
+</div>
+</div>
+<!-- Right Column: Status Hub & History (7/12) -->
+<div class="md:col-span-7 space-y-8">
+<!-- Current Workflow Step Card (High-End Status Hub) -->
+<div class="p-8 rounded-xl bg-surface-container-lowest border-l-4 border-primary shadow-sm relative overflow-hidden">
+<div class="absolute top-0 right-0 p-4">
+<span class="material-symbols-outlined text-primary-fixed-dim text-6xl opacity-20 select-none">settings_suggest</span>
+</div>
+<div class="relative z-10">
+<h3 class="text-label-md font-medium text-on-surface-variant uppercase tracking-widest mb-6">Current Workflow Step</h3>
+<div class="flex items-start gap-4 mb-8">
+<div class="w-12 h-12 rounded-full bg-primary-container flex items-center justify-center text-white shrink-0">
+<span class="material-symbols-outlined">engineering</span>
+</div>
+<div>
+<h4 class="text-xl font-bold text-on-surface">Maintenance Check</h4>
+<p class="text-sm text-on-surface-variant">Diagnostics initiated by System Automation.</p>
+</div>
+</div>
+<!-- Progress Section -->
+<div class="space-y-3 mb-8">
+<div class="flex justify-between text-xs font-medium text-on-surface-variant">
+<span>Completion Status</span>
+<span>65%</span>
+</div>
+<div class="w-full h-2 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full transition-all" style="width: 65%;"></div>
+</div>
+</div>
+<div class="flex items-center gap-4 p-4 rounded-lg bg-surface-container-low">
+<span class="material-symbols-outlined text-primary">fast_forward</span>
+<div class="text-sm">
+<span class="text-on-surface-variant">Predicted Next Step:</span>
+<span class="font-bold text-on-surface ml-1">Final Approval</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Workflow History -->
+<div class="space-y-6">
+<div class="flex items-center justify-between">
+<h3 class="text-headline-sm font-semibold tracking-tight">Recent Activity</h3>
+<button class="text-primary text-xs font-bold uppercase tracking-widest hover:underline">View Full Log</button>
+</div>
+<div class="space-y-4">
+<!-- History Item 1 -->
+<div class="flex items-start gap-4 p-4 rounded-xl bg-surface-container-low/50 border border-transparent hover:border-outline-variant/20 transition-all">
+<div class="w-10 h-10 rounded-full bg-tertiary/10 flex items-center justify-center text-tertiary font-bold text-xs shrink-0">
+                                    JD
+                                </div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between">
+<p class="text-sm font-bold text-on-surface">Node Re-calibration</p>
+<span class="text-[10px] text-on-surface-variant font-medium uppercase">2h ago</span>
+</div>
+<p class="text-xs text-on-surface-variant mt-1 leading-relaxed">System parameters adjusted to meet high-load requirements for Q3.</p>
+</div>
+</div>
+<!-- History Item 2 -->
+<div class="flex items-start gap-4 p-4 rounded-xl bg-surface-container-low/50 border border-transparent hover:border-outline-variant/20 transition-all">
+<div class="w-10 h-10 rounded-full bg-secondary/10 flex items-center justify-center text-secondary font-bold text-xs shrink-0">
+                                    SYS
+                                </div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between">
+<p class="text-sm font-bold text-on-surface">Automated Backup</p>
+<span class="text-[10px] text-on-surface-variant font-medium uppercase">Yesterday</span>
+</div>
+<p class="text-xs text-on-surface-variant mt-1 leading-relaxed">Full system snapshot successfully stored in Secure Vault B.</p>
+</div>
+</div>
+<!-- History Item 3 -->
+<div class="flex items-start gap-4 p-4 rounded-xl bg-surface-container-low/50 border border-transparent hover:border-outline-variant/20 transition-all opacity-70">
+<div class="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center text-slate-500 font-bold text-xs shrink-0">
+                                    MK
+                                </div>
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between">
+<p class="text-sm font-bold text-on-surface">Component Replaced</p>
+<span class="text-[10px] text-on-surface-variant font-medium uppercase">Oct 12</span>
+</div>
+<p class="text-xs text-on-surface-variant mt-1 leading-relaxed">PSU Unit swapped during scheduled downtime.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar -->
+<footer class="fixed bottom-0 left-0 w-full flex justify-end items-center px-8 py-4 gap-4 bg-white dark:bg-slate-950 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] z-50">
+<button class="border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-300 rounded-lg px-6 py-2 flex items-center gap-2 font-sans text-xs font-medium uppercase tracking-widest hover:brightness-110 transition-all">
+<span class="material-symbols-outlined text-sm">arrow_back</span>
+            Previous Step
+        </button>
+<button class="bg-indigo-600 text-white rounded-lg px-6 py-2 flex items-center gap-2 shadow-sm font-sans text-xs font-medium uppercase tracking-widest hover:brightness-110 transition-all">
+<span class="material-symbols-outlined text-sm">check_circle</span>
+            Finish and Save
+        </button>
+</footer>
+</body></html>

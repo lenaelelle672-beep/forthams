@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Asset Workflow Editor</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .workflow-connector::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: -24px;
+            bottom: -24px;
+            width: 1px;
+            background-color: #c8c4d9;
+            opacity: 0.3;
+            z-index: 0;
+        }
+    </style>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-primary-fixed-variant": "#3b14d5",
+              "primary-container": "#5139e9",
+              "on-surface-variant": "#474556",
+              "inverse-surface": "#273044",
+              "surface-container": "#e8eeff",
+              "tertiary-fixed-dim": "#44dada",
+              "on-primary-fixed": "#150066",
+              "inverse-on-surface": "#ecf0ff",
+              "primary": "#380cd3",
+              "outline-variant": "#c8c4d9",
+              "surface-tint": "#543dec",
+              "primary-fixed": "#e4dfff",
+              "inverse-primary": "#c6c0ff",
+              "secondary-fixed": "#d9e2ff",
+              "on-tertiary": "#ffffff",
+              "surface-container-lowest": "#ffffff",
+              "on-tertiary-container": "#55e8e8",
+              "outline": "#787587",
+              "on-surface": "#111c2e",
+              "secondary-fixed-dim": "#b1c5ff",
+              "error": "#ba1a1a",
+              "tertiary-container": "#006666",
+              "on-error": "#ffffff",
+              "surface-container-low": "#f1f3ff",
+              "on-primary-container": "#d4cfff",
+              "error-container": "#ffdad6",
+              "secondary": "#0055c8",
+              "tertiary": "#004c4c",
+              "on-tertiary-fixed": "#002020",
+              "surface-dim": "#d0daf3",
+              "surface-container-highest": "#d9e2fc",
+              "on-secondary-fixed": "#001946",
+              "surface-variant": "#d9e2fc",
+              "secondary-container": "#276eec",
+              "surface-bright": "#f9f9ff",
+              "on-secondary-container": "#fefcff",
+              "surface-container-high": "#dfe8ff",
+              "on-error-container": "#93000a",
+              "tertiary-fixed": "#68f7f7",
+              "background": "#f9f9ff",
+              "on-background": "#111c2e",
+              "on-primary": "#ffffff",
+              "surface": "#f9f9ff",
+              "on-secondary": "#ffffff",
+              "primary-fixed-dim": "#c6c0ff",
+              "on-secondary-fixed-variant": "#00419d",
+              "on-tertiary-fixed-variant": "#004f50"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface min-h-screen flex flex-col">
+<!-- TopAppBar -->
+<header class="fixed top-0 left-0 w-full flex items-center justify-between px-6 py-3 bg-slate-50 dark:bg-slate-900 z-50">
+<div class="flex items-center gap-3">
+<button class="p-2 rounded-full hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-colors">
+<span class="material-symbols-outlined text-indigo-700 dark:text-indigo-400" data-icon="close">close</span>
+</button>
+<h1 class="font-sans text-sm font-semibold tracking-tight text-slate-900 dark:text-slate-100 uppercase">Asset Management &gt; Workflows</h1>
+</div>
+<button class="p-2 rounded-full hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-colors">
+<span class="material-symbols-outlined text-indigo-700 dark:text-indigo-400" data-icon="more_vert">more_vert</span>
+</button>
+</header>
+<!-- Canvas Area -->
+<main class="flex-grow pt-20 pb-28 px-4 flex flex-col items-center overflow-y-auto">
+<!-- Breadcrumbs / Context Header -->
+<div class="w-full max-w-md mb-8 px-2">
+<p class="text-[0.65rem] font-bold tracking-[0.2em] text-primary uppercase mb-1">New Workflow</p>
+<h2 class="text-xl font-bold tracking-tight text-on-surface">Step 2: Configure Flow</h2>
+</div>
+<!-- Workflow Engine -->
+<div class="w-full max-w-md flex flex-col items-center gap-12 relative">
+<!-- Step 1 -->
+<div class="relative w-full z-10">
+<div class="bg-surface-container-lowest rounded-xl p-5 shadow-[0_8px_32px_rgba(17,28,46,0.06)] border-l-4 border-tertiary">
+<div class="flex justify-between items-start mb-4">
+<div class="bg-tertiary-fixed-dim/20 p-2 rounded-lg">
+<span class="material-symbols-outlined text-tertiary" data-icon="inventory">inventory</span>
+</div>
+<span class="material-symbols-outlined text-tertiary" data-icon="check_circle" data-weight="fill" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<h3 class="text-on-surface font-semibold text-base mb-1">Initiate Asset Check</h3>
+<p class="text-on-surface-variant text-xs mb-4">Initial inventory validation step</p>
+<div class="flex items-center gap-2 pt-3 border-t border-outline-variant/10">
+<div class="w-6 h-6 rounded-full bg-surface-container-high flex items-center justify-center">
+<span class="material-symbols-outlined text-[14px]" data-icon="person">person</span>
+</div>
+<span class="text-xs font-medium text-on-surface-variant">System Automated</span>
+</div>
+</div>
+</div>
+<!-- Add Button -->
+<div class="relative z-10 -my-6">
+<button class="w-10 h-10 rounded-full bg-surface-container-lowest border border-outline-variant/20 shadow-lg flex items-center justify-center hover:scale-105 active:scale-95 transition-all">
+<span class="material-symbols-outlined text-primary" data-icon="add">add</span>
+</button>
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-24 w-[1px] bg-outline-variant/30 -z-10"></div>
+</div>
+<!-- Step 2 (Active) -->
+<div class="relative w-full z-10">
+<div class="bg-surface-container-lowest rounded-xl p-5 shadow-[0_12px_40px_rgba(56,12,211,0.08)] border-l-4 border-primary ring-2 ring-primary/5">
+<div class="flex justify-between items-start mb-4">
+<div class="bg-primary-fixed/30 p-2 rounded-lg">
+<span class="material-symbols-outlined text-primary" data-icon="account_tree">account_tree</span>
+</div>
+<span class="bg-primary/10 text-primary px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">In Progress</span>
+</div>
+<h3 class="text-on-surface font-semibold text-base mb-1">Direct Manager Approval</h3>
+<p class="text-on-surface-variant text-xs mb-4">Review and sign-off on asset allocation</p>
+<div class="flex items-center gap-2 pt-3 border-t border-outline-variant/10">
+<img alt="Assignee" class="w-6 h-6 rounded-full object-cover" data-alt="portrait of a professional manager with a friendly expression in a corporate setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCOJuzoXrtXE_tYQZpayacq5iF4LLuzCTHUiKOGYfdU-Fn0dihOIL4C77KtwfHbAbG1sWrjdxrR_raU6rxABhWb6nnE3keGy7upMD7L8OH39-djJQboKMrXc5lHlzRfOAaE0WNkOa8-tlG96pv1terJVxXrv4IaCmBbXgXcFuwWw9Ku2AlDO3m7hTKfN3F6O85t_Z51D_GSlKQcbqj-jvX4maTybheu-qXdGst7kXCa7js4mEATGC_BG5dnGBjI0gOeDaxY01l3ayo"/>
+<span class="text-xs font-medium text-on-surface-variant">Department Head</span>
+</div>
+</div>
+</div>
+<!-- Add Button -->
+<div class="relative z-10 -my-6">
+<button class="w-10 h-10 rounded-full bg-surface-container-lowest border border-outline-variant/20 shadow-lg flex items-center justify-center hover:scale-105 active:scale-95 transition-all">
+<span class="material-symbols-outlined text-primary" data-icon="add">add</span>
+</button>
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-24 w-[1px] bg-outline-variant/30 -z-10"></div>
+</div>
+<!-- Step 3 -->
+<div class="relative w-full z-10">
+<div class="bg-surface-container-low/50 rounded-xl p-5 border border-outline-variant/20 opacity-60 grayscale-[0.5]">
+<div class="flex justify-between items-start mb-4">
+<div class="bg-surface-container-high p-2 rounded-lg">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="archive">archive</span>
+</div>
+<span class="material-symbols-outlined text-outline-variant" data-icon="radio_button_unchecked">radio_button_unchecked</span>
+</div>
+<h3 class="text-on-surface font-semibold text-base mb-1">Asset Archiving</h3>
+<p class="text-on-surface-variant text-xs mb-4">Final categorization and database logging</p>
+<div class="flex items-center gap-2 pt-3 border-t border-outline-variant/10">
+<div class="w-6 h-6 rounded-full bg-surface-container-high flex items-center justify-center">
+<span class="material-symbols-outlined text-[14px]" data-icon="groups">groups</span>
+</div>
+<span class="text-xs font-medium text-on-surface-variant">HRBP Team</span>
+</div>
+</div>
+</div>
+<!-- Final Node Connector -->
+<div class="h-12 w-[1px] bg-gradient-to-b from-outline-variant/30 to-transparent"></div>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-end items-center px-8 py-4 gap-4 bg-white dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] z-50">
+<button class="border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-300 rounded-lg px-6 py-2 flex items-center gap-2 hover:brightness-110 transition-all active:scale-95">
+<span class="material-symbols-outlined text-sm" data-icon="arrow_back">arrow_back</span>
+<span class="font-sans text-xs font-medium uppercase tracking-widest">Previous Step</span>
+</button>
+<button class="bg-indigo-600 text-white rounded-lg px-6 py-2 flex items-center gap-2 shadow-sm hover:brightness-110 transition-all active:scale-95">
+<span class="material-symbols-outlined text-sm" data-icon="check_circle">check_circle</span>
+<span class="font-sans text-xs font-medium uppercase tracking-widest">Finish and Save</span>
+</button>
+</nav>
+<!-- NavigationDrawer (Config Panel) -->
+<aside class="fixed right-0 top-0 h-full z-40 flex flex-col pt-16 border-l border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 w-80 hidden md:flex shadow-2xl dark:shadow-none">
+<div class="p-6">
+<h2 class="text-base font-semibold text-slate-900 dark:text-slate-50 mb-6">Node Configuration</h2>
+<nav class="flex flex-col gap-1">
+<a class="flex items-center gap-3 px-4 py-3 text-indigo-600 dark:text-indigo-400 border-r-4 border-indigo-600 bg-indigo-50/50 dark:bg-indigo-900/20 font-sans text-sm font-medium" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span>Properties</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-200/30 dark:hover:bg-slate-800/30 font-sans text-sm font-medium transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+<span>History</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-200/30 dark:hover:bg-slate-800/30 font-sans text-sm font-medium transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="attach_file">attach_file</span>
+<span>Attachments</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-200/30 dark:hover:bg-slate-800/30 font-sans text-sm font-medium transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="bolt">bolt</span>
+<span>Automation</span>
+</a>
+</nav>
+<div class="mt-8 pt-8 border-t border-outline-variant/20">
+<label class="block text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-2">Step Name</label>
+<div class="bg-surface-container-high rounded-lg p-3 text-sm text-on-surface font-medium mb-4">
+                    Direct Manager Approval
+                </div>
+<label class="block text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-2">Assignee Policy</label>
+<div class="flex items-center justify-between bg-surface-container-high rounded-lg p-3">
+<span class="text-sm text-on-surface">Department Head</span>
+<span class="material-symbols-outlined text-on-surface-variant text-sm" data-icon="expand_more">expand_more</span>
+</div>
+</div>
+</div>
+</aside>
+</body></html>

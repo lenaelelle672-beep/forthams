@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Asset Management - Workflow Dashboard</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts: Inter -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-primary-fixed-variant": "#3b14d5",
+              "primary-container": "#5139e9",
+              "on-surface-variant": "#474556",
+              "inverse-surface": "#273044",
+              "surface-container": "#e8eeff",
+              "tertiary-fixed-dim": "#44dada",
+              "on-primary-fixed": "#150066",
+              "inverse-on-surface": "#ecf0ff",
+              "primary": "#380cd3",
+              "outline-variant": "#c8c4d9",
+              "surface-tint": "#543dec",
+              "primary-fixed": "#e4dfff",
+              "inverse-primary": "#c6c0ff",
+              "secondary-fixed": "#d9e2ff",
+              "on-tertiary": "#ffffff",
+              "surface-container-lowest": "#ffffff",
+              "on-tertiary-container": "#55e8e8",
+              "outline": "#787587",
+              "on-surface": "#111c2e",
+              "secondary-fixed-dim": "#b1c5ff",
+              "error": "#ba1a1a",
+              "tertiary-container": "#006666",
+              "on-error": "#ffffff",
+              "surface-container-low": "#f1f3ff",
+              "on-primary-container": "#d4cfff",
+              "error-container": "#ffdad6",
+              "secondary": "#0055c8",
+              "tertiary": "#004c4c",
+              "on-tertiary-fixed": "#002020",
+              "surface-dim": "#d0daf3",
+              "surface-container-highest": "#d9e2fc",
+              "on-secondary-fixed": "#001946",
+              "surface-variant": "#d9e2fc",
+              "secondary-container": "#276eec",
+              "surface-bright": "#f9f9ff",
+              "on-secondary-container": "#fefcff",
+              "surface-container-high": "#dfe8ff",
+              "on-error-container": "#93000a",
+              "tertiary-fixed": "#68f7f7",
+              "background": "#f9f9ff",
+              "on-background": "#111c2e",
+              "on-primary": "#ffffff",
+              "surface": "#f9f9ff",
+              "on-secondary": "#ffffff",
+              "primary-fixed-dim": "#c6c0ff",
+              "on-secondary-fixed-variant": "#00419d",
+              "on-tertiary-fixed-variant": "#004f50"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .workflow-connector::before {
+            content: '';
+            position: absolute;
+            left: 1.125rem;
+            top: 2.5rem;
+            bottom: -1rem;
+            width: 2px;
+            background-color: #c8c4d9;
+            opacity: 0.3;
+        }
+        .workflow-connector:last-child::before {
+            display: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface font-body selection:bg-primary-fixed selection:text-primary">
+<!-- TopAppBar -->
+<header class="fixed top-0 left-0 w-full flex items-center justify-between px-6 py-3 bg-slate-50 z-50">
+<div class="flex flex-col">
+<span class="font-sans text-sm font-semibold tracking-tight text-slate-900">Asset Management &gt; Workflows</span>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 rounded-full hover:bg-slate-200/50 transition-colors">
+<span class="material-symbols-outlined text-indigo-700">search</span>
+</button>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant/20">
+<img alt="User Profile" class="w-full h-full object-cover" data-alt="Close-up portrait of a professional male architect in a bright, modern office with soft daylight" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAj36fipaW5vIINkuDgzxDEuCSSYFbLE0c5Sn6UMTsObaiMA5Pm6ZsnSY3FKyyiz5f8TSqtgkuIrC4t6fUof6iEgFf_ohQH55QgweFiymGaBEuKRNrN1XCORlISajqkZJ31mWI6IXB6ZIVsUVu41mGlEGsexzCf1_OAoTSCra0tgEIhHC8N_Sm1t8kp9O4etRdmNaUS55y20dNgWSK4qpGkZEjbmYy-ErOhiIaj7f0-1Etl_HLexUliVmHNgSIggjNjTehBexMU-zs"/>
+</div>
+</div>
+</header>
+<main class="pt-16 pb-24 px-6">
+<!-- KPI Summary Cards: Asymmetric Horizontal Scroll for Mobile -->
+<section class="mt-6 mb-10 overflow-x-auto no-scrollbar -mx-6 px-6 flex gap-4">
+<!-- Card 1 -->
+<div class="min-w-[200px] flex-1 bg-surface-container-low p-5 rounded-xl border-l-4 border-primary">
+<span class="text-on-surface-variant font-label text-xs uppercase tracking-wider">Total Assets</span>
+<h2 class="text-display-sm text-on-surface font-bold mt-1">1,284</h2>
+<div class="flex items-center gap-1 mt-2 text-tertiary">
+<span class="material-symbols-outlined text-sm">trending_up</span>
+<span class="text-xs font-medium">+12% vs last month</span>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="min-w-[200px] flex-1 bg-surface-container-low p-5 rounded-xl border-l-4 border-secondary">
+<span class="text-on-surface-variant font-label text-xs uppercase tracking-wider">Ongoing</span>
+<h2 class="text-display-sm text-on-surface font-bold mt-1">42</h2>
+<div class="flex items-center gap-1 mt-2 text-primary">
+<span class="material-symbols-outlined text-sm">clock_loader_40</span>
+<span class="text-xs font-medium">8 pending approval</span>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="min-w-[200px] flex-1 bg-surface-container-low p-5 rounded-xl border-l-4 border-error">
+<span class="text-on-surface-variant font-label text-xs uppercase tracking-wider">Alerts</span>
+<h2 class="text-display-sm text-on-surface font-bold mt-1">05</h2>
+<div class="flex items-center gap-1 mt-2 text-error">
+<span class="material-symbols-outlined text-sm">warning</span>
+<span class="text-xs font-medium">Critical maintenance</span>
+</div>
+</div>
+</section>
+<!-- Workflow Feed Section -->
+<section>
+<div class="flex items-center justify-between mb-6">
+<h3 class="text-headline-sm font-semibold text-on-surface">Active Workflows</h3>
+<span class="material-symbols-outlined text-outline">filter_list</span>
+</div>
+<div class="space-y-4">
+<!-- Node 1: Completed -->
+<div class="relative workflow-connector">
+<div class="flex items-start gap-4 p-4 bg-surface-container-lowest rounded-xl shadow-[0_4px_20px_rgba(17,28,46,0.04)] border-l-4 border-tertiary">
+<div class="flex-shrink-0 w-10 h-10 rounded-full bg-tertiary/10 flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<div class="flex-grow">
+<div class="flex justify-between items-start">
+<h4 class="text-title-md font-medium text-on-surface">Asset Check</h4>
+<span class="text-label-md text-on-surface-variant">09:45 AM</span>
+</div>
+<p class="text-body-md text-on-surface-variant mt-1">Server Unit Rack-A2 verified by Engineering.</p>
+<div class="mt-3 flex items-center gap-2">
+<span class="px-2 py-0.5 rounded-full bg-tertiary/10 text-tertiary text-[10px] font-bold uppercase tracking-widest">Completed</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Node 2: Active -->
+<div class="relative workflow-connector">
+<div class="flex items-start gap-4 p-4 bg-surface-container-lowest rounded-xl shadow-[0_4px_20px_rgba(17,28,46,0.04)] border-l-4 border-primary">
+<div class="flex-shrink-0 w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">pending</span>
+</div>
+<div class="flex-grow">
+<div class="flex justify-between items-start">
+<h4 class="text-title-md font-medium text-on-surface">Budget Approval</h4>
+<span class="text-label-md text-on-surface-variant">2h ago</span>
+</div>
+<p class="text-body-md text-on-surface-variant mt-1">Awaiting financial sign-off for Q3 hardware upgrade.</p>
+<div class="mt-3 flex items-center gap-2">
+<span class="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-widest">Active</span>
+<div class="flex -space-x-2 ml-auto">
+<img alt="User" class="w-6 h-6 rounded-full border-2 border-white" data-alt="Female corporate manager portrait with professional lighting and neutral background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDi4zcbAT2VH62hMxGwjwD4q_3i7s8Rnqti5gM4nX7A8PV-mqSmtmM91rZscJYr4m7mIXzcoOwIu57NXXpXPLNnTAJ2fto4dr1cdtFdJib3XjML8yzGXhLjGoGx3bZpm_htwbd3EyRR3udN2Z6KnbVPMhSBZVgh7VHGYKvaWwhlpRmmcqyso2DJDFRpzRQTQZcb23MvBBctFFN_EoxaKTfmPdacxNMc4WiFTlOq7ZJQXwSnHTHrFj3-hJvBXx4u2jwpEF6uNvbaBi4"/>
+<img alt="User" class="w-6 h-6 rounded-full border-2 border-white" data-alt="Male engineer headshot with clinical lighting and industrial setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC1qqrtIQSX4vOU2LZYxamHY-qIRnq0IrWfcD6LA1CocDfsG8F1CbGp6mCLz0Q_s96M7vREUhAKDydcHnEXuLMGtw-BDQuaJYtHbVEb4N6vXLWZa7__WKyC7yoXCNVcvld9MbN-VY40MAVf8XBySX0FueiAX2oitNp1wfm3oRsQiTKIpI6wr633BcPK-8_sR9cHL4Sq_4Ff0fXEVllko5MqUZlkt2b44vz62_d8CnGQ0bQXd1ujlGrYgotBCkqdTdYDPuUFN7Zh4Z4"/>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Node 3: Pending -->
+<div class="relative workflow-connector">
+<div class="flex items-start gap-4 p-4 bg-surface-container-low/50 border border-outline-variant/10 rounded-xl border-l-4 border-outline-variant">
+<div class="flex-shrink-0 w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center text-outline">
+<span class="material-symbols-outlined">archive</span>
+</div>
+<div class="flex-grow">
+<div class="flex justify-between items-start">
+<h4 class="text-title-md font-medium text-on-surface/50">Archiving</h4>
+<span class="text-label-md text-on-surface-variant">Scheduled</span>
+</div>
+<p class="text-body-md text-on-surface-variant/60 mt-1">Automatic deprecation flow for legacy storage nodes.</p>
+<div class="mt-3">
+<span class="px-2 py-0.5 rounded-full bg-surface-container-highest text-on-surface-variant text-[10px] font-bold uppercase tracking-widest">Pending</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- New Section: Visual Insight (Bento Style Card) -->
+<section class="mt-10">
+<div class="bg-indigo-900 rounded-2xl p-6 relative overflow-hidden min-h-[180px] flex flex-col justify-end text-white">
+<div class="absolute inset-0 z-0 opacity-40">
+<img alt="Dashboard Analytics" class="w-full h-full object-cover" data-alt="Abstract glowing blue data visualization with digital lines and network nodes in a dark space" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCajMeEjlgwgfqElXC8HyvEPaZdM6D1L2cg83wqOUdH2vRVLAFw4AVsW2l5XS-YOPgxqjPlnwLzVz9yMYYJjOdccSb64IecQhToOCrvgiduIZlNWEWLPkflYV0KiUxx1RWZNnOirHi5Tu9Cbo0rrIj1F9kSkRpWSg8v2Md0Y_SZjnry0p8iN661Jhzsy8eBvZymblKM0i54xzcdXEqbKoSZjICMs0mVW_UG1WDbXNoeqzT52NMaN0oqDToy4xQq-a6O-PJhUdpymKo"/>
+</div>
+<div class="absolute inset-0 bg-gradient-to-t from-indigo-950 via-indigo-900/40 to-transparent z-1"></div>
+<div class="relative z-10">
+<h4 class="text-headline-sm font-bold leading-tight">System Performance</h4>
+<p class="text-primary-fixed text-body-md opacity-90 mt-1">Real-time health of managed hardware assets.</p>
+<button class="mt-4 bg-white text-indigo-900 px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2">
+                        View Report
+                        <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</div>
+</section>
+</main>
+<!-- FAB Action Button -->
+<button class="fixed bottom-24 right-6 w-14 h-14 bg-primary text-white rounded-full flex items-center justify-center shadow-[0_8px_32px_rgba(56,12,211,0.3)] active:scale-95 transition-all z-50">
+<span class="material-symbols-outlined text-3xl">add</span>
+</button>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-end items-center px-8 py-4 gap-4 bg-white shadow-[0_-4px_20px_rgba(0,0,0,0.05)] z-50">
+<button class="border border-slate-300 text-slate-600 rounded-lg px-6 py-2 flex items-center gap-2 hover:brightness-110 active:scale-98 transition-all">
+<span class="material-symbols-outlined text-sm">arrow_back</span>
+<span class="font-sans text-xs font-medium uppercase tracking-widest">Previous Step</span>
+</button>
+<button class="bg-indigo-600 text-white rounded-lg px-6 py-2 flex items-center gap-2 shadow-sm hover:brightness-110 active:scale-98 transition-all">
+<span class="material-symbols-outlined text-sm">check_circle</span>
+<span class="font-sans text-xs font-medium uppercase tracking-widest">Finish and Save</span>
+</button>
+</nav>
+<!-- Navigation Drawer (Side Mobile Overlays - Triggerable/Hidden by default) -->
+<aside class="hidden fixed right-0 top-0 h-full w-80 bg-slate-50 z-[60] flex flex-col pt-16 border-l border-slate-200 shadow-2xl transition-transform translate-x-full">
+<div class="px-6 mb-8">
+<h5 class="text-base font-semibold text-slate-900">Node Configuration</h5>
+</div>
+<nav class="flex flex-col gap-1">
+<a class="flex items-center gap-4 px-6 py-4 text-indigo-600 border-r-4 border-indigo-600 bg-indigo-50/50" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-sans text-sm font-medium">Properties</span>
+</a>
+<a class="flex items-center gap-4 px-6 py-4 text-slate-500 hover:bg-slate-200/30" href="#">
+<span class="material-symbols-outlined">history</span>
+<span class="font-sans text-sm font-medium">History</span>
+</a>
+<a class="flex items-center gap-4 px-6 py-4 text-slate-500 hover:bg-slate-200/30" href="#">
+<span class="material-symbols-outlined">attach_file</span>
+<span class="font-sans text-sm font-medium">Attachments</span>
+</a>
+<a class="flex items-center gap-4 px-6 py-4 text-slate-500 hover:bg-slate-200/30" href="#">
+<span class="material-symbols-outlined">bolt</span>
+<span class="font-sans text-sm font-medium">Automation</span>
+</a>
+</nav>
+</aside>
+</body></html>

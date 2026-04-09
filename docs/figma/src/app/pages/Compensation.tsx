@@ -1,0 +1,386 @@
+import { useState } from "react";
+import { DollarSign, Plus, AlertCircle, CheckCircle, Clock, FileText } from "lucide-react";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
+
+const compensations = [
+  {
+    id: 'CP-2024-001',
+    assetId: 'AS-2024-156',
+    assetName: 'ThinkPad X1 Carbon',
+    type: '设备损坏',
+    employee: '张三',
+    department: '研发部',
+    amount: 2500,
+    status: '待审批',
+    reason: '不慎将笔记本摔落导致屏幕破裂',
+    submitDate: '2024-03-08',
+    handler: '李经理'
+  },
+  {
+    id: 'CP-2024-002',
+    assetId: 'AS-2024-287',
+    assetName: 'iPhone 14 Pro',
+    type: '设备丢失',
+    employee: '李四',
+    department: '销售部',
+    amount: 8000,
+    status: '已批准',
+    reason: '外出拜访客户时遗失',
+    submitDate: '2024-03-05',
+    approveDate: '2024-03-07',
+    paymentStatus: '已支付',
+    handler: '王经理'
+  },
+  {
+    id: 'CP-2024-003',
+    assetId: 'AS-2024-089',
+    assetName: 'Dell 显示器',
+    type: '人为故障',
+    employee: '王五',
+    department: '设计部',
+    amount: 1200,
+    status: '已驳回',
+    reason: '显示器接口损坏',
+    submitDate: '2024-03-01',
+    rejectReason: '属于正��使用磨损,不需赔偿',
+    handler: '赵经理'
+  },
+  {
+    id: 'CP-2024-004',
+    assetId: 'AS-2024-312',
+    assetName: 'MacBook Pro',
+    type: '设备损坏',
+    employee: '赵六',
+    department: '设计部',
+    amount: 5000,
+    status: '审批中',
+    reason: '液体进入导致主板损坏',
+    submitDate: '2024-03-07',
+    handler: '孙经理'
+  },
+];
+
+const monthlyStats = [
+  { month: '1月', 赔偿金额: 12000, 赔偿次数: 5 },
+  { month: '2月', 赔偿金额: 18000, 赔偿次数: 7 },
+  { month: '3月', 赔偿金额: 16500, 赔偿次数: 4 },
+];
+
+const typeDistribution = [
+  { name: '设备损坏', value: 45, color: '#3b82f6' },
+  { name: '设备丢失', value: 30, color: '#ef4444' },
+  { name: '人为故障', value: 20, color: '#f59e0b' },
+  { name: '其他', value: 5, color: '#6b7280' },
+];
+
+const deptStats = [
+  { dept: '研发部', amount: 8500, count: 3 },
+  { dept: '销售部', amount: 12000, count: 4 },
+  { dept: '设计部', amount: 6200, count: 2 },
+  { dept: '行政部', amount: 3800, count: 2 },
+];
+
+export function Compensation() {
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [selectedType, setSelectedType] = useState('全部类型');
+
+  const filteredCompensations = selectedType === '全部类型' 
+    ? compensations 
+    : compensations.filter(c => c.type === selectedType);
+
+  return (
+    <div className="space-y-6">
+      {/* 页面标题 */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-semibold text-gray-900">资产赔偿管理</h2>
+          <p className="text-gray-600 mt-1">规范资产赔偿流程,实现损失核算与追溯</p>
+        </div>
+        <button 
+          onClick={() => setShowAddModal(true)}
+          className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors flex items-center gap-2"
+        >
+          <Plus className="w-4 h-4" />
+          新增赔偿申请
+        </button>
+      </div>
+
+      {/* 统计卡片 */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600">本月赔偿金额</p>
+              <p className="text-3xl font-semibold text-gray-900 mt-2">¥16.5K</p>
+            </div>
+            <div className="w-12 h-12 bg-red-50 rounded-lg flex items-center justify-center">
+              <DollarSign className="w-6 h-6 text-red-600" />
+            </div>
+          </div>
+        </div>
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600">待审批申请</p>
+              <p className="text-3xl font-semibold text-gray-900 mt-2">
+                {compensations.filter(c => c.status === '待审批').length}
+              </p>
+            </div>
+            <div className="w-12 h-12 bg-yellow-50 rounded-lg flex items-center justify-center">
+              <Clock className="w-6 h-6 text-yellow-600" />
+            </div>
+          </div>
+        </div>
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600">已批准申请</p>
+              <p className="text-3xl font-semibold text-gray-900 mt-2">
+                {compensations.filter(c => c.status === '已批准').length}
+              </p>
+            </div>
+            <div className="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center">
+              <CheckCircle className="w-6 h-6 text-green-600" />
+            </div>
+          </div>
+        </div>
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600">累计赔偿金额</p>
+              <p className="text-3xl font-semibold text-gray-900 mt-2">¥46.5K</p>
+            </div>
+            <div className="w-12 h-12 bg-purple-50 rounded-lg flex items-center justify-center">
+              <FileText className="w-6 h-6 text-purple-600" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* 月度赔偿趋势 */}
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">月度赔偿趋势</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={monthlyStats} isAnimationActive={false}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="month" />
+              <YAxis yAxisId="left" orientation="left" stroke="#3b82f6" />
+              <YAxis yAxisId="right" orientation="right" stroke="#10b981" />
+              <Tooltip />
+              <Legend />
+              <Bar yAxisId="left" dataKey="赔偿金额" fill="#3b82f6" name="赔偿金额 (元)" />
+              <Bar yAxisId="right" dataKey="赔偿次数" fill="#10b981" name="赔偿次数" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* 赔偿类型分布 */}
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">赔偿类型分布</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie
+                data={typeDistribution}
+                cx="50%"
+                cy="50%"
+                labelLine={false}
+                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                outerRadius={100}
+                fill="#8884d8"
+                dataKey="value"
+                isAnimationActive={false}
+              >
+                {typeDistribution.map((entry, index) => (
+                  <Cell key={`cell-compensation-${index}`} fill={entry.color} />
+                ))}
+              </Pie>
+              <Tooltip />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      {/* 部门赔偿统计 */}
+      <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">部门赔偿统计</h3>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          {deptStats.map((dept) => (
+            <div key={dept.dept} className="border border-gray-200 rounded-lg p-4">
+              <h4 className="text-sm font-medium text-gray-600 mb-2">{dept.dept}</h4>
+              <p className="text-2xl font-semibold text-gray-900">¥{dept.amount.toLocaleString()}</p>
+              <p className="text-sm text-gray-500 mt-1">{dept.count}次赔偿</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* 赔偿申请列表 */}
+      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+          <h3 className="text-lg font-semibold text-gray-900">赔偿申请列表</h3>
+          <select
+            value={selectedType}
+            onChange={(e) => setSelectedType(e.target.value)}
+            className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option>全部类型</option>
+            <option>设备损坏</option>
+            <option>设备丢失</option>
+            <option>人为故障</option>
+          </select>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-gray-50 border-b border-gray-200">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">申请编号</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">资产信息</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">类型</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">责任人</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">部门</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">赔偿金额</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">状态</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">操作</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              {filteredCompensations.map((comp) => (
+                <tr key={comp.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 text-sm font-medium text-blue-600">{comp.id}</td>
+                  <td className="px-6 py-4 text-sm">
+                    <div>
+                      <p className="font-medium text-gray-900">{comp.assetName}</p>
+                      <p className="text-xs text-gray-500">{comp.assetId}</p>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 text-sm">
+                    <span className={`px-2 py-1 text-xs font-medium rounded ${
+                      comp.type === '设备损坏' ? 'bg-blue-100 text-blue-800' :
+                      comp.type === '设备丢失' ? 'bg-red-100 text-red-800' :
+                      'bg-yellow-100 text-yellow-800'
+                    }`}>
+                      {comp.type}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-900">{comp.employee}</td>
+                  <td className="px-6 py-4 text-sm text-gray-600">{comp.department}</td>
+                  <td className="px-6 py-4 text-sm font-semibold text-red-600">¥{comp.amount.toLocaleString()}</td>
+                  <td className="px-6 py-4">
+                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                      comp.status === '待审批' ? 'bg-yellow-100 text-yellow-800' :
+                      comp.status === '已批准' ? 'bg-green-100 text-green-800' :
+                      comp.status === '审批中' ? 'bg-blue-100 text-blue-800' :
+                      'bg-red-100 text-red-800'
+                    }`}>
+                      {comp.status}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 text-sm">
+                    <div className="flex gap-2">
+                      {comp.status === '待审批' && (
+                        <>
+                          <button className="px-3 py-1 text-xs font-medium text-white bg-green-600 hover:bg-green-700 rounded transition-colors">
+                            批准
+                          </button>
+                          <button className="px-3 py-1 text-xs font-medium text-white bg-red-600 hover:bg-red-700 rounded transition-colors">
+                            驳回
+                          </button>
+                        </>
+                      )}
+                      <button className="px-3 py-1 text-xs font-medium text-blue-700 bg-blue-100 hover:bg-blue-200 rounded transition-colors">
+                        详情
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* 新增赔偿申请模态框 */}
+      {showAddModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+            <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-gray-900">新增赔偿申请</h3>
+              <button 
+                onClick={() => setShowAddModal(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="p-6 space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">资产编号 *</label>
+                  <input type="text" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="AS-2024-XXX" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">赔偿类型 *</label>
+                  <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option>设备损坏</option>
+                    <option>设备丢失</option>
+                    <option>人为故障</option>
+                    <option>其他</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">责任人 *</label>
+                  <input type="text" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">所属部门 *</label>
+                  <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option>研发部</option>
+                    <option>销售部</option>
+                    <option>设计部</option>
+                    <option>行政部</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">赔偿金额 (元) *</label>
+                  <input type="number" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">发生日期 *</label>
+                  <input type="date" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">赔偿事由 *</label>
+                <textarea rows={4} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="请详细描述损坏/丢失情况..."></textarea>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">证明材料</label>
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                  <input type="file" className="hidden" id="file-upload" multiple />
+                  <label htmlFor="file-upload" className="cursor-pointer">
+                    <div className="text-gray-600">
+                      <p className="text-sm">点击上传或拖拽文件至此</p>
+                      <p className="text-xs text-gray-500 mt-1">支持 JPG、PNG、PDF 格式</p>
+                    </div>
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div className="px-6 py-4 border-t border-gray-200 flex justify-end gap-3">
+              <button 
+                onClick={() => setShowAddModal(false)}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg transition-colors"
+              >
+                取消
+              </button>
+              <button className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors">
+                提交申请
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

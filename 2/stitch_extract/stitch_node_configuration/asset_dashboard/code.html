@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Fluid Architect | Enterprise Asset Management</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary-container": "#5d55f3",
+              "outline": "#737686",
+              "tertiary-fixed-dim": "#93ccff",
+              "surface-container-high": "#dce9ff",
+              "primary-fixed-dim": "#c3c0ff",
+              "on-secondary-fixed-variant": "#005049",
+              "secondary-fixed-dim": "#6bd8cb",
+              "error-container": "#ffdad6",
+              "surface-container-low": "#eff4ff",
+              "on-primary": "#ffffff",
+              "on-secondary-container": "#006f66",
+              "inverse-surface": "#213145",
+              "on-error": "#ffffff",
+              "surface": "#f8f9ff",
+              "outline-variant": "#c3c6d7",
+              "secondary-container": "#86f2e4",
+              "background": "#f8f9ff",
+              "on-tertiary": "#ffffff",
+              "on-primary-container": "#f2eeff",
+              "tertiary": "#005a89",
+              "inverse-primary": "#c3c0ff",
+              "primary-fixed": "#e2dfff",
+              "on-tertiary-fixed": "#001d31",
+              "tertiary-fixed": "#cce5ff",
+              "surface-container-lowest": "#ffffff",
+              "on-primary-fixed": "#0f0069",
+              "secondary": "#006a61",
+              "on-tertiary-fixed-variant": "#004b73",
+              "inverse-on-surface": "#eaf1ff",
+              "tertiary-container": "#0073ae",
+              "surface-container-highest": "#d3e4fe",
+              "on-tertiary-container": "#e7f2ff",
+              "error": "#ba1a1a",
+              "secondary-fixed": "#89f5e7",
+              "surface-container": "#e5eeff",
+              "on-primary-fixed-variant": "#3323cc",
+              "surface-dim": "#cbdbf5",
+              "primary": "#4338da",
+              "surface-bright": "#f8f9ff",
+              "on-secondary": "#ffffff",
+              "on-background": "#0b1c30",
+              "surface-tint": "#4d44e3",
+              "on-surface-variant": "#434655",
+              "on-secondary-fixed": "#00201d",
+              "on-surface": "#0b1c30",
+              "on-error-container": "#93000a",
+              "surface-variant": "#d3e4fe"
+            },
+            fontFamily: {
+              "headline": ["Manrope"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .soft-focus-shadow {
+            box-shadow: 0 24px 24px -4px rgba(11, 28, 48, 0.06);
+        }
+        .glass-panel {
+            background: rgba(248, 249, 255, 0.8);
+            backdrop-filter: blur(12px);
+        }
+        .primary-gradient {
+            background: linear-gradient(135deg, #4338da 0%, #5d55f3 100%);
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        h1, h2, h3, h4 {
+            font-family: 'Manrope', sans-serif;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface">
+<!-- Navigation Drawer (SideNav) -->
+<aside class="h-screen w-64 fixed left-0 top-0 bg-surface-container-low flex flex-col py-6 shadow-[24px_0_24px_-4px_rgba(11,28,48,0.06)] z-50">
+<div class="px-6 mb-10">
+<h1 class="text-lg font-bold text-on-background">The Fluid Architect</h1>
+</div>
+<div class="flex items-center gap-3 px-6 mb-8">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center overflow-hidden">
+<img alt="Curator Profile" class="w-full h-full object-cover" data-alt="Professional portrait of a male executive in a blue suite with soft studio lighting and neutral background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDkdKo6HndKWtaRf6A7TuplvEhvgTtVXcf0ewc2XoDmI_J2JKyEYOxLxs-5ESTP-zzk6J65dA2idlgmZtbPCjaLCYUKAMEz79PvWOHu5O0O1Mwjx5_xhENvKgIrlwfnSJFOdQGXuHUZ3kdQH5Hgm-n-_wjjMMlsKMROYnQ3R7f-Lcg_uVzUZOcHUKFodM_TifHMsVFBrBD0TVxMXYeYGbLzUD0nbJnAPtJcSngZXBI8JAT2btXSr9Lw4yd2_He2XqBCWfvVPMWDUIA"/>
+</div>
+<div>
+<p class="text-sm font-bold text-on-surface">Digital Curator</p>
+<p class="text-xs text-on-surface-variant">Enterprise Admin</p>
+</div>
+</div>
+<nav class="flex-1 px-0">
+<div class="space-y-1">
+<!-- Assets (Active) -->
+<a class="flex items-center gap-3 px-6 py-3 bg-white text-primary rounded-r-full shadow-sm transition-all duration-300 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+<span class="text-sm font-medium">Assets</span>
+</a>
+<!-- Workflows -->
+<a class="flex items-center gap-3 px-6 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-all duration-300 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="account_tree">account_tree</span>
+<span class="text-sm font-medium">Workflows</span>
+</a>
+<!-- Analytics -->
+<a class="flex items-center gap-3 px-6 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-all duration-300 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="text-sm font-medium">Analytics</span>
+</a>
+</div>
+</nav>
+</aside>
+<!-- Top App Bar -->
+<header class="w-full top-0 sticky z-40 bg-surface/80 backdrop-blur-md">
+<div class="flex justify-between items-center px-8 py-4 w-full ml-64 max-w-[calc(100%-16rem)]">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary" data-icon="grid_view">grid_view</span>
+<h2 class="font-headline font-bold text-xl tracking-tight text-on-surface">Assets</h2>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative group">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-primary transition-colors" data-icon="notifications">notifications</span>
+<span class="absolute top-0 right-0 w-2 h-2 bg-error rounded-full"></span>
+</div>
+<div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center text-on-primary font-bold text-xs">
+                    DC
+                </div>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="ml-64 p-8 min-h-screen">
+<div class="max-w-7xl mx-auto space-y-12">
+<!-- Summary Bento Grid -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Health Status Card -->
+<div class="bg-surface-container-lowest p-6 rounded-xl soft-focus-shadow flex flex-col justify-between min-h-[180px] border-l-4 border-secondary">
+<div>
+<span class="text-label-md text-on-surface-variant uppercase tracking-wider text-[10px] font-bold">System Integrity</span>
+<h3 class="text-3xl font-headline font-extrabold text-on-surface mt-2">98.2%</h3>
+</div>
+<div class="flex items-center gap-2 text-secondary font-semibold">
+<span class="material-symbols-outlined text-sm" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="text-sm">Optimal Performance</span>
+</div>
+</div>
+<!-- Total Assets Card -->
+<div class="bg-surface-container-lowest p-6 rounded-xl soft-focus-shadow flex flex-col justify-between min-h-[180px] border-l-4 border-primary">
+<div>
+<span class="text-label-md text-on-surface-variant uppercase tracking-wider text-[10px] font-bold">Managed Entities</span>
+<h3 class="text-3xl font-headline font-extrabold text-on-surface mt-2">1,248</h3>
+</div>
+<div class="flex items-center gap-2 text-primary font-semibold">
+<span class="material-symbols-outlined text-sm" data-icon="trending_up">trending_up</span>
+<span class="text-sm">+12 New this week</span>
+</div>
+</div>
+<!-- Active Workflows Card -->
+<div class="bg-surface-container-lowest p-6 rounded-xl soft-focus-shadow flex flex-col justify-between min-h-[180px] border-l-4 border-tertiary-container">
+<div>
+<span class="text-label-md text-on-surface-variant uppercase tracking-wider text-[10px] font-bold">Running Automations</span>
+<h3 class="text-3xl font-headline font-extrabold text-on-surface mt-2">42</h3>
+</div>
+<div class="flex items-center gap-2 text-tertiary font-semibold">
+<span class="material-symbols-outlined text-sm" data-icon="memory">memory</span>
+<span class="text-sm">Real-time sync active</span>
+</div>
+</div>
+</section>
+<!-- Workflow Configuration CTA (Glassmorphism Section) -->
+<section class="relative overflow-hidden rounded-2xl bg-surface-dim p-12 flex flex-col md:flex-row items-center justify-between gap-8">
+<div class="absolute top-0 right-0 -mr-20 -mt-20 w-80 h-80 bg-primary-container/10 rounded-full blur-3xl"></div>
+<div class="absolute bottom-0 left-0 -ml-20 -mb-20 w-64 h-64 bg-secondary-container/20 rounded-full blur-3xl"></div>
+<div class="z-10 max-w-lg">
+<h2 class="text-3xl font-headline font-bold text-on-surface mb-4">Orchestrate Your Assets</h2>
+<p class="text-on-surface-variant body-md leading-relaxed">
+                        Design complex asset lifecycles with our visual node-based editor. Automate compliance, health checks, and provisioning across your global infrastructure.
+                    </p>
+<div class="mt-8 flex gap-4">
+<button class="primary-gradient text-on-primary px-6 py-3 rounded-md font-bold text-sm flex items-center gap-2 shadow-lg active:scale-95 duration-200">
+                            Configure Workflow
+                            <span class="material-symbols-outlined" data-icon="arrow_forward">arrow_forward</span>
+</button>
+<button class="text-primary hover:underline px-6 py-3 font-bold text-sm duration-200">
+                            View Documentation
+                        </button>
+</div>
+</div>
+<div class="z-10 bg-white/40 backdrop-blur-md p-4 rounded-xl border border-white/20 shadow-xl hidden md:block">
+<div class="flex gap-4 items-center">
+<div class="w-12 h-12 bg-primary rounded-lg flex items-center justify-center text-white">
+<span class="material-symbols-outlined" data-icon="settings_input_component">settings_input_component</span>
+</div>
+<div class="space-y-1">
+<div class="h-2 w-32 bg-primary/20 rounded-full"></div>
+<div class="h-2 w-20 bg-primary/10 rounded-full"></div>
+</div>
+</div>
+<div class="mt-4 border-t border-white/30 pt-4 grid grid-cols-2 gap-2">
+<div class="h-8 bg-white/50 rounded-md"></div>
+<div class="h-8 bg-white/50 rounded-md"></div>
+</div>
+</div>
+</section>
+<!-- Asset List (Editorial List Pattern) -->
+<section class="space-y-6">
+<div class="flex justify-between items-end">
+<div>
+<h2 class="text-2xl font-headline font-bold text-on-surface">Recent Inventory</h2>
+<p class="text-on-surface-variant text-sm mt-1">Status overview of newly registered system nodes.</p>
+</div>
+<div class="flex gap-2">
+<button class="bg-surface-container-high px-4 py-2 rounded-full text-xs font-bold text-on-surface hover:bg-surface-container-highest transition-colors">Export CSV</button>
+<button class="bg-surface-container-high px-4 py-2 rounded-full text-xs font-bold text-on-surface hover:bg-surface-container-highest transition-colors">Filter List</button>
+</div>
+</div>
+<div class="space-y-3">
+<!-- List Item 1 -->
+<div class="group bg-surface-container-lowest p-4 rounded-xl flex items-center justify-between hover:bg-surface-bright transition-all duration-300 border-l-4 border-transparent hover:border-primary soft-focus-shadow">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-surface-container-low flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" data-icon="cloud_queue">cloud_queue</span>
+</div>
+<div>
+<h4 class="font-bold text-on-surface">AWS-East-01 Edge Node</h4>
+<p class="text-xs text-on-surface-variant font-medium">Provisioned: Oct 24, 2023</p>
+</div>
+</div>
+<div class="flex items-center gap-12">
+<div class="hidden lg:block text-right">
+<p class="text-xs text-on-surface-variant mb-1 uppercase tracking-tighter font-bold">Latency</p>
+<p class="text-sm font-semibold text-on-surface">24ms</p>
+</div>
+<span class="bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">Healthy</span>
+<button class="text-outline hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</div>
+</div>
+<!-- List Item 2 -->
+<div class="group bg-surface-container-lowest p-4 rounded-xl flex items-center justify-between hover:bg-surface-bright transition-all duration-300 border-l-4 border-transparent hover:border-primary soft-focus-shadow">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-surface-container-low flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" data-icon="database">database</span>
+</div>
+<div>
+<h4 class="font-bold text-on-surface">Core SQL Cluster Main</h4>
+<p class="text-xs text-on-surface-variant font-medium">Provisioned: Oct 22, 2023</p>
+</div>
+</div>
+<div class="flex items-center gap-12">
+<div class="hidden lg:block text-right">
+<p class="text-xs text-on-surface-variant mb-1 uppercase tracking-tighter font-bold">Uptime</p>
+<p class="text-sm font-semibold text-on-surface">99.99%</p>
+</div>
+<span class="bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">Healthy</span>
+<button class="text-outline hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</div>
+</div>
+<!-- List Item 3 -->
+<div class="group bg-surface-container-lowest p-4 rounded-xl flex items-center justify-between hover:bg-surface-bright transition-all duration-300 border-l-4 border-transparent hover:border-primary soft-focus-shadow">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-surface-container-low flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" data-icon="router">router</span>
+</div>
+<div>
+<h4 class="font-bold text-on-surface">London-B03 Gateway</h4>
+<p class="text-xs text-on-surface-variant font-medium">Provisioned: Oct 20, 2023</p>
+</div>
+</div>
+<div class="flex items-center gap-12">
+<div class="hidden lg:block text-right">
+<p class="text-xs text-on-surface-variant mb-1 uppercase tracking-tighter font-bold">Load</p>
+<p class="text-sm font-semibold text-on-surface">84%</p>
+</div>
+<span class="bg-tertiary-fixed text-on-tertiary-fixed px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">In Process</span>
+<button class="text-outline hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</div>
+</div>
+<!-- List Item 4 -->
+<div class="group bg-surface-container-lowest p-4 rounded-xl flex items-center justify-between hover:bg-surface-bright transition-all duration-300 border-l-4 border-transparent hover:border-primary soft-focus-shadow">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-surface-container-low flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" data-icon="shield_with_heart">shield_with_heart</span>
+</div>
+<div>
+<h4 class="font-bold text-on-surface">Auth-Security Sentinel</h4>
+<p class="text-xs text-on-surface-variant font-medium">Provisioned: Oct 15, 2023</p>
+</div>
+</div>
+<div class="flex items-center gap-12">
+<div class="hidden lg:block text-right">
+<p class="text-xs text-on-surface-variant mb-1 uppercase tracking-tighter font-bold">Events</p>
+<p class="text-sm font-semibold text-on-surface">0 Alerts</p>
+</div>
+<span class="bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">Healthy</span>
+<button class="text-outline hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- FAB (Contextual for Home/Assets Screen) -->
+<button class="fixed bottom-8 right-8 w-14 h-14 primary-gradient text-on-primary rounded-full shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 duration-200 z-50">
+<span class="material-symbols-outlined text-2xl" data-icon="add">add</span>
+</button>
+</body></html>
