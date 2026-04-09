@@ -34,9 +34,9 @@ class EndlessAMSDaemon:
     def invoke_aider_evolution(self, mandate: str):
         self.log(f"🔥 打爆演进核弹: {mandate}")
         
-        # 设置调用使用我们在 VIB 系统里证实能跑的高级强效模型 (可自定)
+        # 呼应系统：全域启用无审重装模型慢跑
         env = os.environ.copy()
-        env["AIDER_MODEL"] = "ollama/gemma3:4b"  # 或者是外部提供的 gpt-4 之类，此处默认给它接管
+        env["AIDER_MODEL"] = "ollama/gemma4-uncensored:latest"  # 或者是外部提供的 gpt-4 之类，此处默认给它接管
 
         # 在底层唤起 Aider 机器人接盘
         # --yes 参数让 Aider 实现零人类接触的强权覆盖
