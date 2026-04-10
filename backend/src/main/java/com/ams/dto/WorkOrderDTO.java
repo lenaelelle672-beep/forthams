@@ -1,8 +1,14 @@
+package com.ams.dto;
+
 import lombok.Data;
 
 @Data
 public class WorkOrderDTO {
-    private Long id; // Auto-Gen
+    private Long id;
+    private String status;
 
-    private String status; // DRAFT, PENDING, APPROVED, EXECUTING, CLOSED
+    public WorkOrderDTO(Long id, String status) {
+        this.id = id;
+        this.status = status;
+    }
 }
