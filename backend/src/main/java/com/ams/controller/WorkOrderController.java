@@ -14,15 +14,18 @@ public class WorkOrderController {
     private WorkOrderService workOrderService;
 
     @PostMapping
-    public WorkOrder createWorkOrder(@RequestBody WorkOrder workOrder) {
-        return workOrderService.createWorkOrder(workOrder);
+    public ResponseEntity<WorkOrderDTO> createWorkOrder(@RequestBody WorkOrderDTO workOrderDTO) {
+        WorkOrder workOrder = new WorkOrder();
+        workOrder.setStatus(workOrderDTO.getStatus());
+        WorkOrder createdWorkOrder = workOrderService.createWorkOrder(workOrder);
+        return ResponseEntity.ok(new WorkOrderDTO(createdWorkOrder.getId(), createdWorkOrder.getStatus()));
     }
 
     @PutMapping("/{id}/status")
-    public ResponseEntity<WorkOrder> updateStatus(@PathVariable Long id, @RequestParam String status) {
+    public ResponseEntity<WorkOrderDTO> updateStatus(@PathVariable Long id, @RequestParam String status) {
         try {
             WorkOrder updatedWorkOrder = workOrderService.updateStatus(id, status);
-            return ResponseEntity.ok(updatedWorkOrder);
+            return ResponseEntity.ok(new WorkOrderDTO(updatedWorkOrder.getId(), updatedWorkOrder.getStatus()));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(null);
         } catch (RuntimeException e) {
@@ -31,11 +34,11 @@ public class WorkOrderController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<WorkOrder> getWorkOrder(@PathVariable Long id) {
+    public ResponseEntity<WorkOrderDTO> getWorkOrder(@PathVariable Long id) {
         WorkOrder workOrder = workOrderService.getWorkOrder(id);
         if (workOrder == null) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(workOrder);
+        return ResponseEntity.ok(new WorkOrderDTO(workOrder.getId(), workOrder.getStatus()));
     }
 }

@@ -22,7 +22,7 @@ public class WorkOrderService {
         if (workOrder == null) {
             throw new RuntimeException("WorkOrder not found");
         }
-        
+    
         WorkOrder.Status currentStatus = WorkOrder.Status.valueOf(workOrder.getStatus());
         WorkOrder.Status newStatus = WorkOrder.Status.valueOf(newStatusStr);
 
