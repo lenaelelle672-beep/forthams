@@ -13,7 +13,6 @@ public class WorkOrder {
 
     private String status; // DRAFT, PENDING, APPROVED, EXECUTING, CLOSED
 
-    // Ensure the status field is properly defined with possible values
     public enum Status {
         DRAFT,
         PENDING,
