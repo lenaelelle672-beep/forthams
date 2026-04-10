@@ -44,6 +44,7 @@ class EndlessAMSDaemon:
         
         # 呼应系统：全域启用无审重装模型慢跑
         env = os.environ.copy()
+        env["OLLAMA_API_BASE"] = "http://10.10.10.1:11434" # [智体分离] 指定远端 M2 大脑的物理地址
         env["AIDER_MODEL"] = "ollama/qwen2.5-coder:32b"  # 切换为代码智商极高的 Qwen 2.5 Coder 32B
         env["AIDER_SHOW_MODEL_WARNINGS"] = "False" # 切断独立的子进程弹窗
         env["BROWSER"] = "echo" # 黑洞浏览器系统调用
