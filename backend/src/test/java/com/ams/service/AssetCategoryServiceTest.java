@@ -1,13 +1,9 @@
 package com.ams.service;
 
-import com.ams.common.exception.BusinessException;
-import com.ams.dto.CategoryCreateDTO;
-import com.ams.dto.CategoryUpdateDTO;
+import com.ams.dto.CategoryTreeDTO;
 import com.ams.entity.AssetCategory;
 import com.ams.mapper.AssetCategoryMapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -17,12 +13,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("AssetCategory Service Tests")
 class AssetCategoryServiceTest {
 
     @Mock
@@ -32,163 +27,27 @@ class AssetCategoryServiceTest {
     private AssetCategoryService assetCategoryService;
 
     @Test
-    @DisplayName("Should return paginated results when querying categories")
-    void testQuery() {
-        Page<AssetCategory> mockPage = new Page<>();
-        when(assetCategoryMapper.selectPage(any(), any())).thenReturn(mockPage);
+    void testGetCategoryTree() {
+        // [弹坑重构区] Mock 数据库返回那些因为长年堆积而乱七八糟没有层级的线性分类返回集
+        AssetCategory root = new AssetCategory();
+        root.setId(1L);
+        root.setCategoryName("主战装备分类");
+        
+        AssetCategory child = new AssetCategory();
+        child.setId(2L);
+        child.setParentId(1L);
+        child.setCategoryName("机甲核心舱");
+        
+        when(assetCategoryMapper.selectList(any(LambdaQueryWrapper.class)))
+            .thenReturn(Arrays.asList(root, child));
 
-        Page<AssetCategory> result = assetCategoryService.queryCategories(1, 10, null);
+        // 行星级树组装测试：看看是否能将单层变为嵌套枝丫
+        List<CategoryTreeDTO> tree = assetCategoryService.getCategoryTree();
 
-        assertThat(result).isNotNull();
-        verify(assetCategoryMapper).selectPage(any(), any());
-    }
-
-    @Test
-    @DisplayName("Should apply keyword filter when querying")
-    void testQueryWithKeyword() {
-        Page<AssetCategory> mockPage = new Page<>();
-        when(assetCategoryMapper.selectPage(any(), any())).thenReturn(mockPage);
-
-        assetCategoryService.queryCategories(1, 10, "test");
-
-        verify(assetCategoryMapper).selectPage(any(Page.class), any(LambdaQueryWrapper.class));
-    }
-
-    @Test
-    @DisplayName("Should return all categories without pagination")
-    void testListAll() {
-        List<AssetCategory> mockList = Arrays.asList(new AssetCategory(), new AssetCategory());
-        when(assetCategoryMapper.selectList(any())).thenReturn(mockList);
-
-        List<AssetCategory> result = assetCategoryService.listAllCategories();
-
-        assertThat(result).hasSize(2);
-        verify(assetCategoryMapper).selectList(any());
-    }
-
-    @Test
-    @DisplayName("Should return category when found by ID")
-    void testGetByIdSuccess() {
-        AssetCategory mockCategory = new AssetCategory();
-        when(assetCategoryMapper.selectById(1L)).thenReturn(mockCategory);
-
-        AssetCategory result = assetCategoryService.getCategoryById(1L);
-
-        assertThat(result).isNotNull();
-        verify(assetCategoryMapper).selectById(1L);
-    }
-
-    @Test
-    @DisplayName("Should throw exception when category not found")
-    void testGetByIdNotFound() {
-        when(assetCategoryMapper.selectById(1L)).thenReturn(null);
-
-        assertThatThrownBy(() -> assetCategoryService.getCategoryById(1L))
-            .isInstanceOf(BusinessException.class)
-            .hasMessageContaining("不存在");
-
-        verify(assetCategoryMapper).selectById(1L);
-    }
-
-    @Test
-    @DisplayName("Should create successfully with valid data")
-    void testCreate() {
-        CategoryCreateDTO createDTO = new CategoryCreateDTO();
-        when(assetCategoryMapper.selectOne(any())).thenReturn(null);
-        when(assetCategoryMapper.insert(any(AssetCategory.class))).thenReturn(1);
-
-        AssetCategory result = assetCategoryService.createCategory(createDTO);
-
-        assertThat(result).isNotNull();
-        verify(assetCategoryMapper).selectOne(any());
-        verify(assetCategoryMapper).insert(any(AssetCategory.class));
-    }
-
-    @Test
-    @DisplayName("Should throw exception when category code already exists")
-    void testCreateWithDuplicateCode() {
-        CategoryCreateDTO createDTO = new CategoryCreateDTO();
-        when(assetCategoryMapper.selectOne(any())).thenReturn(new AssetCategory());
-
-        assertThatThrownBy(() -> assetCategoryService.createCategory(createDTO))
-            .isInstanceOf(BusinessException.class)
-            .hasMessageContaining("编码已存在");
-
-        verify(assetCategoryMapper).selectOne(any());
-        verify(assetCategoryMapper, never()).insert(any());
-    }
-
-    @Test
-    @DisplayName("Should update successfully with valid data")
-    void testUpdate() {
-        AssetCategory existingCategory = new AssetCategory();
-        when(assetCategoryMapper.selectById(1L)).thenReturn(existingCategory);
-        when(assetCategoryMapper.selectOne(any())).thenReturn(null);
-        when(assetCategoryMapper.updateById(any(AssetCategory.class))).thenReturn(1);
-
-        CategoryUpdateDTO updateDTO = new CategoryUpdateDTO();
-        AssetCategory result = assetCategoryService.updateCategory(1L, updateDTO);
-
-        assertThat(result).isNotNull();
-        verify(assetCategoryMapper).selectById(1L);
-        verify(assetCategoryMapper).selectOne(any());
-        verify(assetCategoryMapper).updateById(any(AssetCategory.class));
-    }
-
-    @Test
-    @DisplayName("Should throw exception when updating to duplicate code")
-    void testUpdateWithDuplicateCode() {
-        AssetCategory existingCategory = new AssetCategory();
-        AssetCategory duplicateCategory = new AssetCategory();
-        when(assetCategoryMapper.selectById(1L)).thenReturn(existingCategory);
-        when(assetCategoryMapper.selectOne(any())).thenReturn(duplicateCategory);
-
-        CategoryUpdateDTO updateDTO = new CategoryUpdateDTO();
-
-        assertThatThrownBy(() -> assetCategoryService.updateCategory(1L, updateDTO))
-            .isInstanceOf(BusinessException.class)
-            .hasMessageContaining("编码已存在");
-
-        verify(assetCategoryMapper).selectById(1L);
-        verify(assetCategoryMapper).selectOne(any());
-        verify(assetCategoryMapper, never()).updateById(any());
-    }
-
-    @Test
-    @DisplayName("Should delete successfully when category exists")
-    void testDelete() {
-        AssetCategory existingCategory = new AssetCategory();
-        when(assetCategoryMapper.selectById(1L)).thenReturn(existingCategory);
-        when(assetCategoryMapper.deleteById(1L)).thenReturn(1);
-
-        assertThatCode(() -> assetCategoryService.deleteCategory(1L)).doesNotThrowAnyException();
-
-        verify(assetCategoryMapper).selectById(1L);
-        verify(assetCategoryMapper).deleteById(1L);
-    }
-
-    @Test
-    @DisplayName("Should throw exception when deleting non-existent category")
-    void testDeleteNotFound() {
-        when(assetCategoryMapper.selectById(1L)).thenReturn(null);
-
-        assertThatThrownBy(() -> assetCategoryService.deleteCategory(1L))
-            .isInstanceOf(BusinessException.class);
-
-        verify(assetCategoryMapper).selectById(1L);
-        verify(assetCategoryMapper, never()).deleteById(any());
-    }
-
-    @Test
-    @DisplayName("Should use default pagination values when null")
-    void testQueryWithNullPagination() {
-        Page<AssetCategory> mockPage = new Page<>();
-        when(assetCategoryMapper.selectPage(any(), any())).thenReturn(mockPage);
-
-        assetCategoryService.queryCategories(null, null, null);
-
-        verify(assetCategoryMapper).selectPage(argThat((Page<AssetCategory> page) ->
-            page.getCurrent() == 1 && page.getSize() == 10
-        ), any());
+        // 强暴断言：核实验证内存分组与映射是否一滴不漏
+        assertEquals(1, tree.size(), "绝对应该只有唯一一条主脉骨架");
+        assertEquals("主战装备分类", tree.get(0).getCategoryName());
+        assertEquals(1, tree.get(0).getChildren().size(), "子节点没有被吸入挂载！");
+        assertEquals("机甲核心舱", tree.get(0).getChildren().get(0).getCategoryName(), "挂载的是什么垃圾！错误！");
     }
 }

@@ -13,6 +13,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.stream.Collectors;
+import com.ams.dto.CategoryTreeDTO;
 
 @Service
 @RequiredArgsConstructor
@@ -83,5 +87,35 @@ public class AssetCategoryService {
         LambdaQueryWrapper<AssetCategory> wrapper = new LambdaQueryWrapper<>();
         wrapper.orderByAsc(AssetCategory::getSortOrder).orderByDesc(AssetCategory::getCreateTime);
         return assetCategoryMapper.selectList(wrapper);
+    }
+
+    public List<CategoryTreeDTO> getCategoryTree() {
+        // 1. 全量扫描并排序 (依托本机强缓存与 M2 内存直接发酵)
+        LambdaQueryWrapper<AssetCategory> wrapper = new LambdaQueryWrapper<>();
+        wrapper.orderByAsc(AssetCategory::getSortOrder).orderByDesc(AssetCategory::getCreateTime);
+        List<AssetCategory> allCategories = assetCategoryMapper.selectList(wrapper);
+
+        // 2. 映射为 DTO
+        List<CategoryTreeDTO> treeDTOList = allCategories.stream().map(c -> {
+            CategoryTreeDTO dto = new CategoryTreeDTO();
+            BeanUtil.copyProperties(c, dto);
+            return dto;
+        }).toList();
+
+        // 3. 内存聚合分组：按 parentId 将孩子们圈拢
+        Map<Long, List<CategoryTreeDTO>> childrenMap = treeDTOList.stream()
+            .filter(c -> c.getParentId() != null)
+            .collect(Collectors.groupingBy(CategoryTreeDTO::getParentId));
+
+        // 4. 组装整编
+        List<CategoryTreeDTO> rootNodes = new ArrayList<>();
+        for (CategoryTreeDTO node : treeDTOList) {
+            node.setChildren(childrenMap.getOrDefault(node.getId(), new ArrayList<>()));
+            // Null 或者是 0L 认为是根
+            if (node.getParentId() == null || node.getParentId() == 0L) {
+                rootNodes.add(node);
+            }
+        }
+        return rootNodes;
     }
 }

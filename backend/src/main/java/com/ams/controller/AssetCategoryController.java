@@ -34,6 +34,11 @@ public class AssetCategoryController {
         return Result.success(assetCategoryService.listAllCategories());
     }
 
+    @GetMapping("/tree")
+    public Result<List<com.ams.dto.CategoryTreeDTO>> getTree() {
+        return Result.success(assetCategoryService.getCategoryTree());
+    }
+
     @GetMapping("/{id}")
     public Result<AssetCategory> getById(@PathVariable Long id) {
         return Result.success(assetCategoryService.getCategoryById(id));
