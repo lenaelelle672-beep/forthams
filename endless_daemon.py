@@ -52,7 +52,7 @@ class EndlessAMSDaemon:
         # 在底层唤起 Aider 机器人接盘
         # --yes 参数让 Aider 实现零人类接触的强权覆盖
         command = [
-            "aider", 
+            "/usr/local/bin/aider", 
             "--message", f"【企业级强制进化铁律】根据现有架构，执行以下高阶设计迭代，不可破坏原有闭环：\n{mandate}", 
             "--yes",
             "--no-auto-commits" # 让它先在本地重写，由守护进程随后发起 git/测试
