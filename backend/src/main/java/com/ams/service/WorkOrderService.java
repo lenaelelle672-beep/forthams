@@ -25,26 +25,26 @@ public class WorkOrderService {
         switch (newStatus) {
             case "PENDING":
                 if (!"DRAFT".equals(workOrder.getStatus())) {
-                    throw new RuntimeException("Invalid status transition");
+                    throw new IllegalArgumentException("Invalid status transition from " + workOrder.getStatus() + " to PENDING");
                 }
                 break;
             case "APPROVED":
                 if (!"PENDING".equals(workOrder.getStatus())) {
-                    throw new RuntimeException("Invalid status transition");
+                    throw new IllegalArgumentException("Invalid status transition from " + workOrder.getStatus() + " to APPROVED");
                 }
                 break;
             case "EXECUTING":
                 if (!"APPROVED".equals(workOrder.getStatus())) {
-                    throw new RuntimeException("Invalid status transition");
+                    throw new IllegalArgumentException("Invalid status transition from " + workOrder.getStatus() + " to EXECUTING");
                 }
                 break;
             case "CLOSED":
                 if (!"EXECUTING".equals(workOrder.getStatus())) {
-                    throw new RuntimeException("Invalid status transition");
+                    throw new IllegalArgumentException("Invalid status transition from " + workOrder.getStatus() + " to CLOSED");
                 }
                 break;
             default:
-                throw new RuntimeException("Unknown status");
+                throw new IllegalArgumentException("Unknown status: " + newStatus);
         }
         workOrder.setStatus(newStatus);
         workOrderMapper.updateById(workOrder);

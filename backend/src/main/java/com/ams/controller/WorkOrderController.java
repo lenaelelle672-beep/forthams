@@ -18,12 +18,21 @@ public class WorkOrderController {
     }
 
     @PutMapping("/{id}/status")
-    public WorkOrder updateStatus(@PathVariable Long id, @RequestParam String status) {
-        return workOrderService.updateStatus(id, status);
+    public ResponseEntity<WorkOrder> updateStatus(@PathVariable Long id, @RequestParam String status) {
+        try {
+            WorkOrder updatedWorkOrder = workOrderService.updateStatus(id, status);
+            return ResponseEntity.ok(updatedWorkOrder);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(null);
+        }
     }
 
     @GetMapping("/{id}")
-    public WorkOrder getWorkOrder(@PathVariable Long id) {
-        return workOrderService.getWorkOrder(id);
+    public ResponseEntity<WorkOrder> getWorkOrder(@PathVariable Long id) {
+        WorkOrder workOrder = workOrderService.getWorkOrder(id);
+        if (workOrder == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(workOrder);
     }
 }
