@@ -12,4 +12,13 @@ public class WorkOrder {
     private Long id; // Auto-Gen
 
     private String status; // DRAFT, PENDING, APPROVED, EXECUTING, CLOSED
+
+    // Ensure the status field is properly defined with possible values
+    public enum Status {
+        DRAFT,
+        PENDING,
+        APPROVED,
+        EXECUTING,
+        CLOSED
+    }
 }

@@ -3,6 +3,7 @@ package com.ams.controller;
 import com.ams.entity.WorkOrder;
 import com.ams.service.WorkOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -24,6 +25,8 @@ public class WorkOrderController {
             return ResponseEntity.ok(updatedWorkOrder);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(null);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
         }
     }
 

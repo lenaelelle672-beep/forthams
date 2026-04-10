@@ -12,41 +12,46 @@ public class WorkOrderService {
     private WorkOrderMapper workOrderMapper;
 
     public WorkOrder createWorkOrder(WorkOrder workOrder) {
-        workOrder.setStatus("DRAFT");
+        workOrder.setStatus(WorkOrder.Status.DRAFT.name());
         workOrderMapper.insert(workOrder);
         return workOrder;
     }
 
-    public WorkOrder updateStatus(Long id, String newStatus) {
+    public WorkOrder updateStatus(Long id, String newStatusStr) {
         WorkOrder workOrder = workOrderMapper.selectById(id);
         if (workOrder == null) {
             throw new RuntimeException("WorkOrder not found");
         }
+        
+        WorkOrder.Status currentStatus = WorkOrder.Status.valueOf(workOrder.getStatus());
+        WorkOrder.Status newStatus = WorkOrder.Status.valueOf(newStatusStr);
+
         switch (newStatus) {
-            case "PENDING":
-                if (!"DRAFT".equals(workOrder.getStatus())) {
-                    throw new IllegalArgumentException("Invalid status transition from " + workOrder.getStatus() + " to PENDING");
+            case PENDING:
+                if (!currentStatus.equals(WorkOrder.Status.DRAFT)) {
+                    throw new IllegalArgumentException("Invalid status transition from " + currentStatus + " to " + newStatus);
                 }
                 break;
-            case "APPROVED":
-                if (!"PENDING".equals(workOrder.getStatus())) {
-                    throw new IllegalArgumentException("Invalid status transition from " + workOrder.getStatus() + " to APPROVED");
+            case APPROVED:
+                if (!currentStatus.equals(WorkOrder.Status.PENDING)) {
+                    throw new IllegalArgumentException("Invalid status transition from " + currentStatus + " to " + newStatus);
                 }
                 break;
-            case "EXECUTING":
-                if (!"APPROVED".equals(workOrder.getStatus())) {
-                    throw new IllegalArgumentException("Invalid status transition from " + workOrder.getStatus() + " to EXECUTING");
+            case EXECUTING:
+                if (!currentStatus.equals(WorkOrder.Status.APPROVED)) {
+                    throw new IllegalArgumentException("Invalid status transition from " + currentStatus + " to " + newStatus);
                 }
                 break;
-            case "CLOSED":
-                if (!"EXECUTING".equals(workOrder.getStatus())) {
-                    throw new IllegalArgumentException("Invalid status transition from " + workOrder.getStatus() + " to CLOSED");
+            case CLOSED:
+                if (!currentStatus.equals(WorkOrder.Status.EXECUTING)) {
+                    throw new IllegalArgumentException("Invalid status transition from " + currentStatus + " to " + newStatus);
                 }
                 break;
             default:
                 throw new IllegalArgumentException("Unknown status: " + newStatus);
         }
-        workOrder.setStatus(newStatus);
+
+        workOrder.setStatus(newStatus.name());
         workOrderMapper.updateById(workOrder);
         return workOrder;
     }
