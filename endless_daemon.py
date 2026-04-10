@@ -48,6 +48,8 @@ class EndlessAMSDaemon:
         # 呼应系统：全域启用无审重装模型慢跑
         env = os.environ.copy()
         env["AIDER_MODEL"] = "ollama/gemma4-uncensored:latest"  # 或者是外部提供的 gpt-4 之类，此处默认给它接管
+        env["AIDER_SHOW_MODEL_WARNINGS"] = "False" # 切断独立的子进程弹窗
+        env["BROWSER"] = "echo" # 黑洞浏览器系统调用
 
         # 在底层唤起 Aider 机器人接盘
         # --yes 参数让 Aider 实现零人类接触的强权覆盖
@@ -55,6 +57,7 @@ class EndlessAMSDaemon:
             "/usr/local/bin/aider", 
             "--message", f"【企业级强制进化铁律】根据现有架构，执行以下高阶设计迭代，不可破坏原有闭环：\n{mandate}", 
             "--yes",
+            "--no-show-model-warnings", # 直接在此处封死警告功能
             "--no-auto-commits" # 让它先在本地重写，由守护进程随后发起 git/测试
         ]
         
