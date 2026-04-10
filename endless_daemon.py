@@ -15,15 +15,12 @@ class EndlessAMSDaemon:
         self.workspace = workspace
         self.log_file = os.path.join(workspace, "daemon_evolution.log")
         
-        # 建立企业级功能演进池 (防止无头乱转，进行有的放矢的企业级重构)
+        # Team 组网级功能演进池 (按四大模块集群下发军令，替代无头重整)
         self.epic_backlog = [
-            "遍历现有 API 路由或核心类，为其所有可能产生 I/O 阻塞或奔溃的端点添加优雅的 Error Boundary (重试机制与降级策略)，使其达到真正的企业级健壮性。",
-            "在项目中接入完善的全域日志系统。要求每条主要日志都带有 Trace ID，能够横向追踪一个 Request 的整个生命周期。",
-            "排查当前储存与对象映射架构，本系统全栈重构强制依托【本地 MySQL 数据库】！请生成连接池代码（账号默认 root/空 或者自启数据库名如 forth_ams_db）并将业务切换为原汁原味的 MySQL 持久化驱动。",
-            "扫荡所有的函数接口，排查类型不安全的地方。为项目的核心骨架增加泛型支持或深度的 类型断言校验(Type Validation)，增强生产级别编译检测力。",
-            "模拟系统突然遭遇流量洪峰，因此找到访问量最高的逻辑段，为其增加基于内存或Redis的限流器 (Rate Limiter) 及熔断机制 (Circuit Breaker)。",
-            "检查现有业务逻辑中的数据并发场景。使用乐观锁或悲观锁重构那些在 MySQL 中容易发生因高并发写入导致事务回滚的地方以达到工业金融级数据安全。",
-            "运行自动化测试代码，如果现有项目覆盖率不够，就自动为还没有覆盖的业务编写完整的边界值与异常注入 (Fault Injection) 单元测试。"
+            "【Squad Location】作为基础设施建设小队，请在 forthAMS 项目中实现多级层级关系的 Location (空间字典) 的全链路打通。包括 Entity(具备树状关系的 ID, parentId 等)、MyBatis Mapper、支持树形查建改的 Service 层，以及在 LocationController 暴露完善的 REST API。确保与现有框架的实体风格保持一致，使用 Spring Boot 标准装配。",
+            "【Squad Vendor】作为供应商关系链小队，请全面建设 Vendor 的闭环体系。包含：建立完备的 Vendor 实体对象，并在 Mapper 中增加增量数据防重入扫描逻辑；同时补齐 VendorService 并在 Controller 对接。审视目前已有的 Maintenance 等依赖，如果有外设或外部指派服务属性，考虑为这些业务实体预留 vendor_id 的多键关联能力。",
+            "【Squad WorkOrder】做为工作流战队，请对维保、调拔等散乱事件统一建立更高层级的工单底盘表（WorkOrder）。该工单表需要包含单号（Auto-Gen）、状态（如DRAFT/PENDING/APPROVED/EXECUTING/CLOSED）等标准化字段。提供其对应的 Service 操作核心以实现状态机驱动（不能非法越级修改工单态），并且提供完备的 API 支持。",
+            "【Squad Audit】风险审计与可观测性打杂小队。你需要对整个系统构建通用审计跟踪表: GeneralAuditEntry。核心在于为其编写 AOP 切面代码（例如自定义一个 @Auditable 注解配合一个 AuditAspect 类拦截增删改的方法），并在关键控制器如 AssetController 等核心写操作上落上注解，使得系统可以完全自主在后台存入一条带有 trace_id, action, before_record, after_record 等的审计记录日志到 MySQL。"
         ]
         
     def log(self, msgs):
