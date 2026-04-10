@@ -44,7 +44,7 @@ class EndlessAMSDaemon:
         
         # 呼应系统：全域启用无审重装模型慢跑
         env = os.environ.copy()
-        env["AIDER_MODEL"] = "ollama/gemma4-uncensored:latest"  # 或者是外部提供的 gpt-4 之类，此处默认给它接管
+        env["AIDER_MODEL"] = "ollama/qwen2.5-coder:32b"  # 切换为代码智商极高的 Qwen 2.5 Coder 32B
         env["AIDER_SHOW_MODEL_WARNINGS"] = "False" # 切断独立的子进程弹窗
         env["BROWSER"] = "echo" # 黑洞浏览器系统调用
 
@@ -96,10 +96,9 @@ class EndlessAMSDaemon:
             self.log("🔒 为本次修改打入版本印记或执行假想测例防止劣化...")
             subprocess.run(["git", "add", "."], cwd=self.workspace, capture_output=True)
             subprocess.run(["git", "commit", "-m", f"chore(evolve): auto mutation round {round_idx} - {tactic[:20]}"], cwd=self.workspace, capture_output=True)
-            # 4. 进入赛博深眠，防止机器燃爆
-            sleep_time = random.randint(120, 300)
-            self.log(f"🛌 机体过热，让 VRAM 沉寂散热 {sleep_time} 秒...")
-            time.sleep(sleep_time)
+            # 4. 释放封印，不再做虚伪的冷却
+            self.log("🚀 VRAM 冷却机制已解除，统一内存架构直接发起下一轮无缝衔接突刺！")
+            time.sleep(2) # 仅留 2 秒作为 IO 与 Git 文件流的物理落盘缓冲
             round_idx += 1
 
 if __name__ == "__main__":
