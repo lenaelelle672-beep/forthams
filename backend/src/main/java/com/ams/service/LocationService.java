@@ -41,7 +41,7 @@ public class LocationService {
         return locationMapper.findChildrenByParentId(parentId);
     }
 
-    public List<Location> getDescendants(Long id) {
+    public List<Location> findDescendants(Long id) {
         return locationMapper.findDescendants(id);
     }
 }
