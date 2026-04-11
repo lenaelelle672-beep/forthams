@@ -1,6 +1,6 @@
 package com.ams.aop;
 
-import com.ams.common.Auditable;
+import com.ams.common.annotation.Auditable;
 import com.ams.entity.GeneralAuditEntry;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
