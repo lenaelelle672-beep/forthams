@@ -21,31 +21,37 @@ public class DeptController {
         this.deptService = deptService;
     }
 
+    @Auditable
     @GetMapping("/tree")
     public Result<List<Map<String, Object>>> tree(@RequestParam(required = false) String keyword) {
         return Result.success(deptService.queryDepts(keyword));
     }
 
+    @Auditable
     @GetMapping("/all")
     public Result<List<Dept>> all() {
         return Result.success(deptService.listAllDepts());
     }
 
+    @Auditable
     @GetMapping("/{id}")
     public Result<Dept> getById(@PathVariable Long id) {
         return Result.success(deptService.getDeptById(id));
     }
 
+    @Auditable
     @PostMapping
     public Result<Dept> create(@Valid @RequestBody DeptCreateDTO dto) {
         return Result.success("创建成功", deptService.createDept(dto));
     }
 
+    @Auditable
     @PutMapping("/{id}")
     public Result<Dept> update(@PathVariable Long id, @Valid @RequestBody DeptUpdateDTO dto) {
         return Result.success("更新成功", deptService.updateDept(id, dto));
     }
 
+    @Auditable
     @DeleteMapping("/{id}")
     public Result<String> delete(@PathVariable Long id) {
         deptService.deleteDept(id);

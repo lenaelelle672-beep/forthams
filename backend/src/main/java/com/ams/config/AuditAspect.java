@@ -32,12 +32,14 @@ public class AuditAspect {
 
         // Convert before and after records to string using JSON serialization
         ObjectMapper objectMapper = new ObjectMapper();
-        String beforeRecord = "Before Record"; // Placeholder for actual before record
-        String afterRecord = "After Record"; // Placeholder for actual after record
+        String beforeRecord = "{}";
+        String afterRecord = "{}";
 
         try {
-            Object targetObject = joinPoint.getArgs()[0];
-            beforeRecord = objectMapper.writeValueAsString(targetObject);
+            if (joinPoint.getArgs().length > 0) {
+                Object targetObject = joinPoint.getArgs()[0];
+                beforeRecord = objectMapper.writeValueAsString(targetObject);
+            }
             afterRecord = objectMapper.writeValueAsString(result);
         } catch (JsonProcessingException e) {
             log.error("Error serializing audit records", e);

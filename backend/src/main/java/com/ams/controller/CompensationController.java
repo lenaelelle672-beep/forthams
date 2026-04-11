@@ -17,6 +17,7 @@ public class CompensationController {
 
     private final CompensationService compensationService;
 
+    @Auditable
     @GetMapping("/list")
     public Result<Page<AssetCompensation>> list(
         @RequestParam(defaultValue = "1") Integer page,
@@ -27,26 +28,31 @@ public class CompensationController {
         return Result.success(compensationService.queryCompensations(page, pageSize, status, assetId));
     }
 
+    @Auditable
     @GetMapping("/{id}")
     public Result<AssetCompensation> getById(@PathVariable Long id) {
         return Result.success(compensationService.getById(id));
     }
 
+    @Auditable
     @PostMapping
     public Result<AssetCompensation> create(@Valid @RequestBody CompensationCreateDTO dto) {
         return Result.success("创建成功", compensationService.createCompensation(dto));
     }
 
+    @Auditable
     @PutMapping("/{id}")
     public Result<AssetCompensation> update(@PathVariable Long id, @RequestBody CompensationUpdateDTO dto) {
         return Result.success("更新成功", compensationService.updateCompensation(id, dto));
     }
 
+    @Auditable
     @PutMapping("/{id}/status")
     public Result<AssetCompensation> updateStatus(@PathVariable Long id, @RequestParam String status) {
         return Result.success("状态更新成功", compensationService.updateStatus(id, status));
     }
 
+    @Auditable
     @DeleteMapping("/{id}")
     public Result<String> delete(@PathVariable Long id) {
         compensationService.deleteCompensation(id);

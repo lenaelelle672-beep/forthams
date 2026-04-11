@@ -19,6 +19,7 @@ public class MaintenanceController {
 
     private final MaintenanceService maintenanceService;
 
+    @Auditable
     @GetMapping("/list")
     public Result<Page<MaintenanceRecord>> list(
         @RequestParam(defaultValue = "1") Integer page,
@@ -29,27 +30,32 @@ public class MaintenanceController {
         return Result.success(maintenanceService.queryRecords(page, pageSize, assetId, maintenanceType));
     }
 
+    @Auditable
     @GetMapping("/{id}")
     public Result<MaintenanceRecord> getById(@PathVariable Long id) {
         return Result.success(maintenanceService.getRecordById(id));
     }
 
+    @Auditable
     @PostMapping
     public Result<MaintenanceRecord> create(@Valid @RequestBody MaintenanceCreateDTO createDTO) {
         return Result.success("创建成功", maintenanceService.createRecord(createDTO));
     }
 
+    @Auditable
     @PutMapping("/{id}")
     public Result<MaintenanceRecord> update(@PathVariable Long id, @Valid @RequestBody MaintenanceUpdateDTO updateDTO) {
         return Result.success("更新成功", maintenanceService.updateRecord(id, updateDTO));
     }
 
+    @Auditable
     @DeleteMapping("/{id}")
     public Result<String> delete(@PathVariable Long id) {
         maintenanceService.deleteRecord(id);
         return Result.success("删除成功");
     }
 
+    @Auditable
     @GetMapping("/upcoming")
     public Result<List<MaintenanceRecord>> upcoming(@RequestParam(defaultValue = "30") Integer days) {
         return Result.success(maintenanceService.getUpcomingMaintenance(days));

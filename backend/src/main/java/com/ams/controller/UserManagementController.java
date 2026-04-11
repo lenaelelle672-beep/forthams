@@ -19,6 +19,7 @@ public class UserManagementController {
         this.userManagementService = userManagementService;
     }
 
+    @Auditable
     @GetMapping("/list")
     public Result<Page<User>> list(
         @RequestParam(defaultValue = "1") Integer page,
@@ -30,33 +31,39 @@ public class UserManagementController {
         return Result.success(userManagementService.queryUsers(page, pageSize, keyword, deptId, status));
     }
 
+    @Auditable
     @GetMapping("/{id}")
     public Result<User> getById(@PathVariable Long id) {
         return Result.success(userManagementService.getUserById(id));
     }
 
+    @Auditable
     @PostMapping
     public Result<User> create(@Valid @RequestBody UserCreateDTO dto) {
         return Result.success("创建成功", userManagementService.createUser(dto));
     }
 
+    @Auditable
     @PutMapping("/{id}")
     public Result<User> update(@PathVariable Long id, @Valid @RequestBody UserUpdateDTO dto) {
         return Result.success("更新成功", userManagementService.updateUser(id, dto));
     }
 
+    @Auditable
     @PutMapping("/{id}/reset-password")
     public Result<String> resetPassword(@PathVariable Long id) {
         userManagementService.resetPassword(id);
         return Result.success("重置密码成功");
     }
 
+    @Auditable
     @PutMapping("/{id}/status")
     public Result<String> updateStatus(@PathVariable Long id, @RequestParam Integer status) {
         userManagementService.updateStatus(id, status);
         return Result.success("状态更新成功");
     }
 
+    @Auditable
     @DeleteMapping("/{id}")
     public Result<String> delete(@PathVariable Long id) {
         userManagementService.deleteUser(id);

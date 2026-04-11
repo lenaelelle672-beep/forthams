@@ -21,6 +21,7 @@ public class RoleController {
         this.roleService = roleService;
     }
 
+    @Auditable
     @GetMapping("/list")
     public Result<Page<Role>> list(
         @RequestParam(defaultValue = "1") Integer page,
@@ -30,26 +31,31 @@ public class RoleController {
         return Result.success(roleService.queryRoles(page, pageSize, keyword));
     }
 
+    @Auditable
     @GetMapping("/all")
     public Result<List<Role>> all() {
         return Result.success(roleService.listAllRoles());
     }
 
+    @Auditable
     @GetMapping("/{id}")
     public Result<Role> getById(@PathVariable Long id) {
         return Result.success(roleService.getRoleById(id));
     }
 
+    @Auditable
     @PostMapping
     public Result<Role> create(@Valid @RequestBody RoleCreateDTO dto) {
         return Result.success("创建成功", roleService.createRole(dto));
     }
 
+    @Auditable
     @PutMapping("/{id}")
     public Result<Role> update(@PathVariable Long id, @Valid @RequestBody RoleUpdateDTO dto) {
         return Result.success("更新成功", roleService.updateRole(id, dto));
     }
 
+    @Auditable
     @DeleteMapping("/{id}")
     public Result<String> delete(@PathVariable Long id) {
         roleService.deleteRole(id);
