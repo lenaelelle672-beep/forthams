@@ -37,3 +37,18 @@ Thumbs.db
 *.tmp
 *.temp
 .aider*
+
+# Daemon 运行时产物
+daemon.out
+daemon_out.log
+daemon_evolution.log
+
+# Graphify 缓存
+graphify-out/
+
+# Spec 临时文件
+spec.md
+
+# 其他临时垃圾
+2/
+New File: backend/
