@@ -32,21 +32,21 @@ public class AssetController {
         return Result.success(asset);
     }
 
-    @Auditable
+    @Auditable(action="create")
     @PostMapping
     public Result<Asset> create(@Valid @RequestBody AssetCreateDTO createDTO) {
         Asset asset = assetService.createAsset(createDTO);
         return Result.success("创建成功", asset);
     }
 
-    @Auditable
+    @Auditable(action="update")
     @PutMapping("/{id}")
     public Result<Asset> update(@PathVariable Long id, @Valid @RequestBody AssetUpdateDTO updateDTO) {
         Asset asset = assetService.updateAsset(id, updateDTO);
         return Result.success("更新成功", asset);
     }
 
-    @Auditable
+    @Auditable(action="delete")
     @DeleteMapping("/{id}")
     public Result<String> delete(@PathVariable Long id) {
         assetService.deleteAsset(id);
