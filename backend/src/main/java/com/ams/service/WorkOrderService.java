@@ -13,7 +13,9 @@ public class WorkOrderService {
     private WorkOrderMapper workOrderMapper;
 
     public Result<WorkOrder> createWorkOrder(WorkOrder workOrder) {
-        workOrder.setStatus(WorkOrder.Status.DRAFT.name());
+        if (workOrder.getStatus() == null || !workOrder.getStatus().equals(WorkOrder.Status.DRAFT.name())) {
+            return Result.error("Initial status must be DRAFT");
+        }
         workOrderMapper.insert(workOrder);
         return Result.success(workOrder);
     }
@@ -37,15 +39,15 @@ public class WorkOrderService {
     }
 
     private boolean isValidTransition(WorkOrder.Status currentStatus, WorkOrder.Status newStatus) {
-        switch (newStatus) {
+        switch (currentStatus) {
+            case DRAFT:
+                return newStatus == WorkOrder.Status.PENDING;
             case PENDING:
-                return currentStatus.equals(WorkOrder.Status.DRAFT);
+                return newStatus == WorkOrder.Status.APPROVED;
             case APPROVED:
-                return currentStatus.equals(WorkOrder.Status.PENDING);
+                return newStatus == WorkOrder.Status.EXECUTING;
             case EXECUTING:
-                return currentStatus.equals(WorkOrder.Status.APPROVED);
-            case CLOSED:
-                return currentStatus.equals(WorkOrder.Status.EXECUTING);
+                return newStatus == WorkOrder.Status.CLOSED;
             default:
                 return false;
         }
@@ -59,10 +61,6 @@ public class WorkOrderService {
         return Result.success(workOrder);
     }
 }
-
-### backend/src/main/java/com/ams/controller/WorkOrderController.java
-
-package com.ams.controller;
 
 import com.ams.common.Result;
 import com.ams.dto.WorkOrderDTO;

@@ -22,4 +22,9 @@ public class WorkOrder {
     }
 
     // Additional fields can be added here if necessary
+
+    // Ensure the status is set to DRAFT by default
+    public WorkOrder() {
+        this.status = Status.DRAFT.name();
+    }
 }
