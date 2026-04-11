@@ -42,10 +42,19 @@ class EndlessAMSDaemon:
     def invoke_aider_evolution(self, mandate: str):
         self.log(f"🔥 打爆演进核弹: {mandate}")
         
+        # 在触发 Aider 之前先探活大模型接口
+        try:
+            req = urllib.request.Request("http://127.0.0.1:1234/v1/models", method='GET')
+            urllib.request.urlopen(req, timeout=3)
+        except Exception as e:
+            self.log(f"🛑 危险拦截: 检测到大模型 API 不可达 ({e})，防止 Aider 死循环超时，截断本轮请求。")
+            return
+
         # 呼应系统：全域启用无审重装模型慢跑
         env = os.environ.copy()
-        env["OLLAMA_API_BASE"] = "http://10.10.10.1:11434" # [智体分离] 指定远端 M2 大脑的物理地址
-        env["AIDER_MODEL"] = "ollama/qwen2.5-coder:32b"  # 切换为代码智商极高的 Qwen 2.5 Coder 32B
+        env["OPENAI_API_BASE"] = "http://127.0.0.1:1234/v1" # [智体分离] 切换为本地 LM Studio 接口
+        env["OPENAI_API_KEY"] = "lm-studio"
+        env["AIDER_MODEL"] = "openai/qwen25"  # 切换为代码智商极高的 Qwen 2.5 (本地当前挂载模型)
         env["AIDER_SHOW_MODEL_WARNINGS"] = "False" # 切断独立的子进程弹窗
         env["BROWSER"] = "echo" # 黑洞浏览器系统调用
 
@@ -94,9 +103,22 @@ class EndlessAMSDaemon:
             # 2. 召唤引擎推进入库
             self.invoke_aider_evolution(tactic)
             # 3. 跑一点测试或强制锁库
-            self.log("🔒 为本次修改打入版本印记或执行假想测例防止劣化...")
             subprocess.run(["git", "add", "."], cwd=self.workspace, capture_output=True)
-            subprocess.run(["git", "commit", "-m", f"chore(evolve): auto mutation round {round_idx} - {tactic[:20]}"], cwd=self.workspace, capture_output=True)
+            
+            # 使用 git diff 检查被缓存的真实改动
+            diff_proc = subprocess.run(["git", "diff", "--cached", "--name-only"], cwd=self.workspace, capture_output=True, text=True)
+            changed_files = diff_proc.stdout.strip().split('\n')
+            
+            # 过滤掉日志和Aider历史文件
+            real_changes = [f for f in changed_files if f and not f.endswith('daemon.out') and not f.endswith('daemon_evolution.log') and not f.endswith('.aider.chat.history.md') and not f.endswith('daemon_out.log')]
+            
+            if real_changes:
+                self.log(f"🔒 检测到 {len(real_changes)} 个业务文件发生真实变异！打入闭环版本印记...")
+                subprocess.run(["git", "commit", "-m", f"chore(evolve): auto mutation round {round_idx} - {tactic[:20]}"], cwd=self.workspace, capture_output=True)
+            else:
+                self.log("⚠️ 防御拦截：本轮大模型未产生任何业务代码级别变更 (可能网络崩塌或胡言乱语)，跳过提交并回退。")
+                subprocess.run(["git", "reset", "HEAD"], cwd=self.workspace, capture_output=True)
+                
             # 4. 释放封印，不再做虚伪的冷却
             self.log("🚀 VRAM 冷却机制已解除，统一内存架构直接发起下一轮无缝衔接突刺！")
             time.sleep(2) # 仅留 2 秒作为 IO 与 Git 文件流的物理落盘缓冲

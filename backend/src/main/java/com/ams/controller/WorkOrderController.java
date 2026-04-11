@@ -1,7 +1,6 @@
 package com.ams.controller;
 
 import com.ams.common.Result;
-import com.ams.dto.WorkOrderDTO;
 import com.ams.entity.WorkOrder;
 import com.ams.service.WorkOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,33 +15,30 @@ public class WorkOrderController {
     private WorkOrderService workOrderService;
 
     @PostMapping
-    public ResponseEntity<Result<WorkOrderDTO>> createWorkOrder(@RequestBody WorkOrderDTO workOrderDTO) {
-        WorkOrder workOrder = new WorkOrder();
-        // Map DTO fields to entity if necessary
-        workOrder.setName(workOrderDTO.getName()); // Assuming there is a name field in both DTO and Entity
+    public ResponseEntity<Result<WorkOrder>> createWorkOrder(@RequestBody WorkOrder workOrder) {
         Result<WorkOrder> result = workOrderService.createWorkOrder(workOrder);
         if (result.isSuccess()) {
-            return ResponseEntity.ok(Result.success(new WorkOrderDTO(result.getData().getId(), result.getData().getStatus())));
+            return ResponseEntity.ok(result);
         } else {
             return ResponseEntity.badRequest().body(Result.error(result.getMessage()));
         }
     }
 
     @PutMapping("/{id}/status")
-    public ResponseEntity<Result<WorkOrderDTO>> updateStatus(@PathVariable Long id, @RequestParam String status) {
+    public ResponseEntity<Result<WorkOrder>> updateStatus(@PathVariable Long id, @RequestParam String status) {
         Result<WorkOrder> result = workOrderService.updateStatus(id, status);
         if (result.isSuccess()) {
-            return ResponseEntity.ok(Result.success(new WorkOrderDTO(result.getData().getId(), result.getData().getStatus())));
+            return ResponseEntity.ok(result);
         } else {
             return ResponseEntity.badRequest().body(Result.error(result.getMessage()));
         }
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Result<WorkOrderDTO>> getWorkOrder(@PathVariable Long id) {
+    public ResponseEntity<Result<WorkOrder>> getWorkOrder(@PathVariable Long id) {
         Result<WorkOrder> result = workOrderService.getWorkOrder(id);
         if (result.isSuccess()) {
-            return ResponseEntity.ok(Result.success(new WorkOrderDTO(result.getData().getId(), result.getData().getStatus())));
+            return ResponseEntity.ok(result);
         } else {
             return ResponseEntity.badRequest().body(Result.error(result.getMessage()));
         }

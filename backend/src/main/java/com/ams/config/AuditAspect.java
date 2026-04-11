@@ -6,11 +6,11 @@ import com.ams.service.AuditService;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Date;
 
 @Aspect
 @Component
@@ -51,6 +51,7 @@ public class AuditAspect {
         auditEntry.setAction(methodName);
         auditEntry.setBeforeRecord(beforeRecord);
         auditEntry.setAfterRecord(afterRecord);
+        auditEntry.setTimestamp(new Date());
 
         auditService.save(auditEntry);
     }

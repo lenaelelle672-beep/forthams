@@ -2,15 +2,12 @@ package com.ams.controller;
 
 import com.ams.common.Auditable;
 import com.ams.common.Result;
-import com.ams.common.Auditable;
 import com.ams.dto.AssetCreateDTO;
 import com.ams.dto.AssetQueryDTO;
 import com.ams.dto.AssetUpdateDTO;
 import com.ams.entity.Asset;
 import com.ams.service.AssetService;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -55,5 +52,4 @@ public class AssetController {
         assetService.deleteAsset(id);
         return Result.success("删除成功");
     }
-
 }
