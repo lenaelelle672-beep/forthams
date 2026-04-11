@@ -11,4 +11,7 @@ public interface VendorMapper extends BaseMapper<Vendor> {
     default boolean isDuplicateVendor(Vendor vendor) {
         return countByNameAndContactInfo(vendor.getName(), vendor.getContactInfo()) > 0;
     }
+
+    @Select("SELECT COUNT(*) FROM vendor WHERE vendor_id = #{vendorId}")
+    int countByVendorId(Long vendorId);
 }
