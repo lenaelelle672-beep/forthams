@@ -18,6 +18,8 @@ public class WorkOrderController {
     @PostMapping
     public ResponseEntity<Result<WorkOrderDTO>> createWorkOrder(@RequestBody WorkOrderDTO workOrderDTO) {
         WorkOrder workOrder = new WorkOrder();
+        // Map DTO fields to entity if necessary
+        workOrder.setName(workOrderDTO.getName()); // Assuming there is a name field in both DTO and Entity
         Result<WorkOrder> result = workOrderService.createWorkOrder(workOrder);
         if (result.isSuccess()) {
             return ResponseEntity.ok(Result.success(new WorkOrderDTO(result.getData().getId(), result.getData().getStatus())));
