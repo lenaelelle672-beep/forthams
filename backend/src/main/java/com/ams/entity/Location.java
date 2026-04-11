@@ -8,5 +8,5 @@ import org.apache.ibatis.type.Alias;
 public class Location {
     private Long id;
     private String name;
-    private Long parentId;
+    private Long parentId; // Parent ID for hierarchical structure
 }
