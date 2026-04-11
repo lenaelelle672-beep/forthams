@@ -35,49 +35,18 @@ public class LocationController {
         locationService.deleteById(id);
     }
 
-    import java.util.List;
+    @GetMapping("/hierarchy/{id}")
+    public List<Location> getLocationHierarchy(@PathVariable Long id) {
+        return locationService.findLocationHierarchy(id);
+    }
 
-    @RestController
-    @RequestMapping("/api/locations")
-    public class LocationController {
+    @GetMapping("/roots")
+    public List<Location> getRootLocations() {
+        return locationService.findRootLocations();
+    }
 
-        @Autowired
-        private LocationService locationService;
-
-        @GetMapping("/{id}")
-        public Location getLocationById(@PathVariable Long id) {
-            return locationService.findById(id);
-        }
-
-        @PostMapping("/")
-        public void createLocation(@RequestBody Location location) {
-            locationService.insert(location);
-        }
-
-        @PutMapping("/{id}")
-        public void updateLocation(@PathVariable Long id, @RequestBody Location location) {
-            location.setId(id);
-            locationService.update(location);
-        }
-
-        @DeleteMapping("/{id}")
-        public void deleteLocation(@PathVariable Long id) {
-            locationService.deleteById(id);
-        }
-
-        @GetMapping("/hierarchy/{id}")
-        public List<Location> getLocationHierarchy(@PathVariable Long id) {
-            return locationService.findLocationHierarchy(id);
-        }
-
-        @GetMapping("/roots")
-        public List<Location> getRootLocations() {
-            return locationService.findRootLocations();
-        }
-
-        @GetMapping("/children/{parentId}")
-        public List<Location> getChildrenByParentId(@PathVariable Long parentId) {
-            return locationService.findChildrenByParentId(parentId);
-        }
+    @GetMapping("/children/{parentId}")
+    public List<Location> getChildrenByParentId(@PathVariable Long parentId) {
+        return locationService.findChildrenByParentId(parentId);
     }
 }
