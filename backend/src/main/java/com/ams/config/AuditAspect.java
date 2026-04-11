@@ -1,6 +1,6 @@
 package com.ams.config;
 
-import com.ams.common.annotation.Auditable;
+import com.ams.common.Auditable;
 import com.ams.entity.GeneralAuditEntry;
 import com.ams.service.AuditService;
 import lombok.extern.slf4j.Slf4j;
@@ -8,8 +8,6 @@ import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -47,8 +45,6 @@ public class AuditAspect {
 
         GeneralAuditEntry auditEntry = new GeneralAuditEntry();
         auditEntry.setTraceId(traceId);
-        auditEntry.setBeforeRecord(beforeRecord);
-        auditEntry.setAfterRecord(afterRecord);
         auditEntry.setAction(methodName);
         auditEntry.setBeforeRecord(beforeRecord);
         auditEntry.setAfterRecord(afterRecord);

@@ -34,13 +34,11 @@ public class DeptController {
     }
 
     @Auditable
-    @Auditable
     @GetMapping("/{id}")
     public Result<Dept> getById(@PathVariable Long id) {
         return Result.success(deptService.getDeptById(id));
     }
 
-    @Auditable
     @Auditable
     @PostMapping
     public Result<Dept> create(@Valid @RequestBody DeptCreateDTO dto) {
@@ -48,13 +46,11 @@ public class DeptController {
     }
 
     @Auditable
-    @Auditable
     @PutMapping("/{id}")
     public Result<Dept> update(@PathVariable Long id, @Valid @RequestBody DeptUpdateDTO dto) {
         return Result.success("更新成功", deptService.updateDept(id, dto));
     }
 
-    @Auditable
     @Auditable
     @DeleteMapping("/{id}")
     public Result<String> delete(@PathVariable Long id) {

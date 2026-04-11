@@ -29,13 +29,11 @@ public class CompensationController {
     }
 
     @Auditable
-    @Auditable
     @GetMapping("/{id}")
     public Result<AssetCompensation> getById(@PathVariable Long id) {
         return Result.success(compensationService.getById(id));
     }
 
-    @Auditable
     @Auditable
     @PostMapping
     public Result<AssetCompensation> create(@Valid @RequestBody CompensationCreateDTO dto) {
@@ -43,20 +41,17 @@ public class CompensationController {
     }
 
     @Auditable
-    @Auditable
     @PutMapping("/{id}")
     public Result<AssetCompensation> update(@PathVariable Long id, @RequestBody CompensationUpdateDTO dto) {
         return Result.success("更新成功", compensationService.updateCompensation(id, dto));
     }
 
     @Auditable
-    @Auditable
     @PutMapping("/{id}/status")
     public Result<AssetCompensation> updateStatus(@PathVariable Long id, @RequestParam String status) {
         return Result.success("状态更新成功", compensationService.updateStatus(id, status));
     }
 
-    @Auditable
     @Auditable
     @DeleteMapping("/{id}")
     public Result<String> delete(@PathVariable Long id) {

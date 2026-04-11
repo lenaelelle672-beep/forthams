@@ -31,13 +31,11 @@ public class MaintenanceController {
     }
 
     @Auditable
-    @Auditable
     @GetMapping("/{id}")
     public Result<MaintenanceRecord> getById(@PathVariable Long id) {
         return Result.success(maintenanceService.getRecordById(id));
     }
 
-    @Auditable
     @Auditable
     @PostMapping
     public Result<MaintenanceRecord> create(@Valid @RequestBody MaintenanceCreateDTO createDTO) {
@@ -45,13 +43,11 @@ public class MaintenanceController {
     }
 
     @Auditable
-    @Auditable
     @PutMapping("/{id}")
     public Result<MaintenanceRecord> update(@PathVariable Long id, @Valid @RequestBody MaintenanceUpdateDTO updateDTO) {
         return Result.success("更新成功", maintenanceService.updateRecord(id, updateDTO));
     }
 
-    @Auditable
     @Auditable
     @DeleteMapping("/{id}")
     public Result<String> delete(@PathVariable Long id) {

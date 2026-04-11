@@ -35,7 +35,6 @@ public class AssetController {
     }
 
     @Auditable
-    @Auditable
     @PostMapping
     public Result<Asset> create(@Valid @RequestBody AssetCreateDTO createDTO) {
         Asset asset = assetService.createAsset(createDTO);
@@ -43,14 +42,12 @@ public class AssetController {
     }
 
     @Auditable
-    @Auditable
     @PutMapping("/{id}")
     public Result<Asset> update(@PathVariable Long id, @Valid @RequestBody AssetUpdateDTO updateDTO) {
         Asset asset = assetService.updateAsset(id, updateDTO);
         return Result.success("更新成功", asset);
     }
 
-    @Auditable
     @Auditable
     @DeleteMapping("/{id}")
     public Result<String> delete(@PathVariable Long id) {
