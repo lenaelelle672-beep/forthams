@@ -29,7 +29,6 @@ public class AssetController {
     }
 
     @Auditable
-    @Auditable
     @GetMapping("/{id}")
     public Result<Asset> getById(@PathVariable Long id) {
         Asset asset = assetService.getAssetById(id);
