@@ -20,4 +20,6 @@ public class WorkOrder {
         EXECUTING,
         CLOSED
     }
+
+    // Additional fields can be added here if necessary
 }
