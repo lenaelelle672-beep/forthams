@@ -1,6 +1,7 @@
 package com.ams.service;
 
 import com.ams.common.Result;
+import com.ams.dto.WorkOrderDTO;
 import com.ams.entity.WorkOrder;
 import com.ams.mapper.WorkOrderMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,10 +13,9 @@ public class WorkOrderService {
     @Autowired
     private WorkOrderMapper workOrderMapper;
 
-    public Result<WorkOrder> createWorkOrder(WorkOrder workOrder) {
-        if (workOrder.getStatus() == null || !workOrder.getStatus().equals(WorkOrder.Status.DRAFT.name())) {
-            return Result.error("Initial status must be DRAFT");
-        }
+    public Result<WorkOrder> createWorkOrder(WorkOrderDTO workOrderDTO) {
+        WorkOrder workOrder = new WorkOrder();
+        workOrder.setStatus(WorkOrder.Status.DRAFT.name());
         workOrderMapper.insert(workOrder);
         return Result.success(workOrder);
     }
