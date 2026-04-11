@@ -1,55 +1,13 @@
-package com.ams.controller;
+package com.ams.entity;
 
-import com.ams.common.Auditable;
-import com.ams.common.Result;
-import com.ams.dto.AssetCreateDTO;
-import com.ams.dto.AssetQueryDTO;
-import com.ams.dto.AssetUpdateDTO;
-import com.ams.entity.Asset;
-import com.ams.service.AssetService;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
+import lombok.Data;
+import java.util.Date;
 
-@RestController
-@RequestMapping("/assets")
-@RequiredArgsConstructor
-public class AssetController {
-
-    private final AssetService assetService;
-
-    @Auditable
-    @GetMapping("/list")
-    public Result<Page<Asset>> list(AssetQueryDTO queryDTO) {
-        Page<Asset> page = assetService.queryAssets(queryDTO);
-        return Result.success(page);
-    }
-
-    @Auditable
-    @GetMapping("/{id}")
-    public Result<Asset> getById(@PathVariable Long id) {
-        Asset asset = assetService.getAssetById(id);
-        return Result.success(asset);
-    }
-
-    @Auditable(action="create")
-    @PostMapping
-    public Result<Asset> create(@Valid @RequestBody AssetCreateDTO createDTO) {
-        Asset asset = assetService.createAsset(createDTO);
-        return Result.success("创建成功", asset);
-    }
-
-    @Auditable(action="update")
-    @PutMapping("/{id}")
-    public Result<Asset> update(@PathVariable Long id, @Valid @RequestBody AssetUpdateDTO updateDTO) {
-        Asset asset = assetService.updateAsset(id, updateDTO);
-        return Result.success("更新成功", asset);
-    }
-
-    @Auditable(action="delete")
-    @DeleteMapping("/{id}")
-    public Result<String> delete(@PathVariable Long id) {
-        assetService.deleteAsset(id);
-        return Result.success("删除成功");
-    }
+@Data
+public class GeneralAuditEntry {
+    private String traceId;
+    private Date timestamp;
+    private String action;
+    private String beforeRecord;
+    private String afterRecord;
 }
