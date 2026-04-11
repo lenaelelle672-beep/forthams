@@ -2,10 +2,13 @@ package com.ams.mapper;
 
 import com.ams.entity.Vendor;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Select;
 
 public interface VendorMapper extends BaseMapper<Vendor> {
+    @Select("SELECT COUNT(*) FROM vendor WHERE name = #{name} AND contactInfo = #{contactInfo}")
+    int countByNameAndContactInfo(String name, String contactInfo);
+
     default boolean isDuplicateVendor(Vendor vendor) {
-        // Implement logic to check for duplicate entries based on name and contactInfo
-        return selectList(wr -> wr.eq("name", vendor.getName()).eq("contactInfo", vendor.getContactInfo())).size() > 0;
+        return countByNameAndContactInfo(vendor.getName(), vendor.getContactInfo()) > 0;
     }
 }
