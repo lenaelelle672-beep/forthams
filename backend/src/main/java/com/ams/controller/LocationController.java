@@ -37,6 +37,7 @@ public class LocationController {
 
     @GetMapping("/hierarchy/{id}")
     public List<Location> getLocationHierarchy(@PathVariable Long id) {
+        // Fetch hierarchical data
         return locationService.getLocationHierarchy(id);
     }
 
