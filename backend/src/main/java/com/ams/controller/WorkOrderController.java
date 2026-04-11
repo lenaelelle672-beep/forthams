@@ -17,7 +17,9 @@ public class WorkOrderController {
 
     @PostMapping
     public ResponseEntity<Result<WorkOrderDTO>> createWorkOrder(@RequestBody WorkOrderDTO workOrderDTO) {
-        Result<WorkOrder> result = workOrderService.createWorkOrder(new WorkOrder(workOrderDTO.getStatus()));
+        WorkOrder workOrder = new WorkOrder();
+        workOrder.setStatus(WorkOrder.Status.DRAFT.name());
+        Result<WorkOrder> result = workOrderService.createWorkOrder(workOrder);
         if (result.isSuccess()) {
             return ResponseEntity.ok(Result.success(new WorkOrderDTO(result.getData().getId(), result.getData().getStatus())));
         } else {
