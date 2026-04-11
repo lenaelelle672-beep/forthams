@@ -49,4 +49,9 @@ public class LocationController {
     public List<Location> getChildrenByParentId(@PathVariable Long parentId) {
         return locationService.getChildrenByParentId(parentId);
     }
+
+    @GetMapping("/descendants/{id}")
+    public List<Location> getDescendants(@PathVariable Long id) {
+        return locationService.findDescendants(id);
+    }
 }

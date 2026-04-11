@@ -56,4 +56,16 @@ public interface LocationMapper {
             ") " +
             "SELECT * FROM cte ORDER BY id")
     List<Location> findChildrenByParentId(@Param("parentId") Long parentId);
+
+    @Select("WITH RECURSIVE cte AS ( " +
+            "  SELECT id, name, parent_id " +
+            "  FROM location " +
+            "  WHERE id = #{id} " +
+            "  UNION ALL " +
+            "  SELECT l.id, l.name, l.parent_id " +
+            "  FROM location l " +
+            "  INNER JOIN cte ON l.parent_id = cte.id " +
+            ") " +
+            "SELECT * FROM cte ORDER BY id")
+    List<Location> findDescendants(@Param("id") Long id);
 }
