@@ -30,7 +30,6 @@ public class LocationService {
     }
 
     public List<Location> getLocationHierarchy(Long id) {
-        // Fetch hierarchical data
         return locationMapper.findLocationHierarchy(id);
     }
 

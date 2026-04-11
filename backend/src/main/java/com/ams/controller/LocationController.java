@@ -54,10 +54,4 @@ public class LocationController {
     public List<Location> getDescendants(@PathVariable Long id) {
         return locationService.getDescendants(id);
     }
-
-    // New method for casual greeting
-    @GetMapping("/greet")
-    public String greet() {
-        return "Hey there! Welcome to the Location API.";
-    }
 }

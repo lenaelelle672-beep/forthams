@@ -13,7 +13,6 @@ public interface LocationMapper {
 
     @Insert("INSERT INTO location (name, parent_id) VALUES (#{name}, #{parentId})")
     @Options(useGeneratedKeys = true, keyProperty = "id")
-    @Options(useGeneratedKeys = true, keyProperty = "id")
     void insert(Location location);
 
     @Update("UPDATE location SET name = #{name}, parent_id = #{parentId} WHERE id = #{id}")
