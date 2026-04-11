@@ -1,0 +1,59 @@
+package com.ams.config;
+
+import com.ams.common.Auditable;
+import com.ams.entity.GeneralAuditEntry;
+import com.ams.service.AuditService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
+import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.annotation.AfterReturning;
+import org.aspectj.lang.annotation.Aspect;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.util.Date;
+
+@Aspect
+@Component
+@Slf4j
+public class AuditAspect {
+
+    @Autowired
+    private AuditService auditService;
+
+    @AfterReturning(pointcut = "@annotation(auditable)", returning = "result")
+    public void logAfterReturning(JoinPoint joinPoint, Auditable auditable, Object result) {
+        String methodName = joinPoint.getSignature().getName();
+        String className = joinPoint.getTarget().getClass().getSimpleName();
+
+        // Create a trace ID (for simplicity, using method name and timestamp)
+        String traceId = className + "." + methodName + "-" + System.currentTimeMillis();
+
+        // Convert before and after records to string using JSON serialization
+        ObjectMapper objectMapper = new ObjectMapper();
+        String beforeRecord = "{}";
+        String afterRecord = "{}";
+
+        try {
+            if (joinPoint.getArgs().length > 0) {
+                Object[] args = joinPoint.getArgs();
+                for (Object arg : args) {
+                    beforeRecord = objectMapper.writeValueAsString(arg);
+                    break; // Assuming the first argument is the one we want to audit
+                }
+            }
+            afterRecord = objectMapper.writeValueAsString(result);
+        } catch (Exception e) {
+            log.error("Error serializing audit records", e);
+        }
+
+        GeneralAuditEntry auditEntry = new GeneralAuditEntry();
+        auditEntry.setTraceId(traceId);
+        auditEntry.setAction(methodName);
+        auditEntry.setBeforeRecord(beforeRecord);
+        auditEntry.setAfterRecord(afterRecord);
+        auditEntry.setTimestamp(new Date());
+
+        auditService.save(auditEntry);
+    }
+}
