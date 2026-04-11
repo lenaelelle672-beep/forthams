@@ -29,7 +29,7 @@ public class LocationService {
         locationMapper.deleteById(id);
     }
 
-    public List<Location> findLocationHierarchy(Long id) {
+    public List<Location> getLocationHierarchy(Long id) {
         return locationMapper.findLocationHierarchy(id);
     }
 
@@ -41,7 +41,7 @@ public class LocationService {
         return locationMapper.findChildrenByParentId(parentId);
     }
 
-    public List<Location> findDescendants(Long id) {
+    public List<Location> getDescendants(Long id) {
         return locationMapper.findDescendants(id);
     }
 }

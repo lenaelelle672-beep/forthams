@@ -37,7 +37,7 @@ public class LocationController {
 
     @GetMapping("/hierarchy/{id}")
     public List<Location> getLocationHierarchy(@PathVariable Long id) {
-        return locationService.findLocationHierarchy(id);
+        return locationService.getLocationHierarchy(id);
     }
 
     @GetMapping("/roots")
@@ -52,6 +52,6 @@ public class LocationController {
 
     @GetMapping("/descendants/{id}")
     public List<Location> getDescendants(@PathVariable Long id) {
-        return locationService.findDescendants(id);
+        return locationService.getDescendants(id);
     }
 }
