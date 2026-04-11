@@ -8,30 +8,29 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/locations")
+@RequestMapping("/locations")
 public class LocationController {
 
     @Autowired
     private LocationService locationService;
 
     @GetMapping("/{id}")
-    public Location getLocationById(@PathVariable Long id) {
+    public Location findById(@PathVariable Long id) {
         return locationService.findById(id);
     }
 
-    @PostMapping("/")
-    public void createLocation(@RequestBody Location location) {
+    @PostMapping
+    public void insert(@RequestBody Location location) {
         locationService.insert(location);
     }
 
-    @PutMapping("/{id}")
-    public void updateLocation(@PathVariable Long id, @RequestBody Location location) {
-        location.setId(id);
+    @PutMapping
+    public void update(@RequestBody Location location) {
         locationService.update(location);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteLocation(@PathVariable Long id) {
+    public void deleteById(@PathVariable Long id) {
         locationService.deleteById(id);
     }
 
@@ -40,7 +39,7 @@ public class LocationController {
         return locationService.getLocationHierarchy(id);
     }
 
-    @GetMapping("/roots")
+    @GetMapping("/root")
     public List<Location> getRootLocations() {
         return locationService.getRootLocations();
     }
