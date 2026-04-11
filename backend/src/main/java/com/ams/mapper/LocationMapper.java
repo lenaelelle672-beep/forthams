@@ -30,7 +30,7 @@ public interface LocationMapper {
             "  FROM location l " +
             "  INNER JOIN cte ON l.parent_id = cte.id " +
             ") " +
-            "SELECT * FROM cte")
+            "SELECT * FROM cte ORDER BY id")
     List<Location> findLocationHierarchy(@Param("id") Long id);
 
     @Select("WITH RECURSIVE cte AS ( " +
@@ -42,7 +42,7 @@ public interface LocationMapper {
             "  FROM location l " +
             "  INNER JOIN cte ON l.parent_id = cte.id " +
             ") " +
-            "SELECT * FROM cte")
+            "SELECT * FROM cte ORDER BY id")
     List<Location> findRootLocations();
 
     @Select("WITH RECURSIVE cte AS ( " +
@@ -54,6 +54,6 @@ public interface LocationMapper {
             "  FROM location l " +
             "  INNER JOIN cte ON l.parent_id = cte.id " +
             ") " +
-            "SELECT * FROM cte")
+            "SELECT * FROM cte ORDER BY id")
     List<Location> findChildrenByParentId(@Param("parentId") Long parentId);
 }

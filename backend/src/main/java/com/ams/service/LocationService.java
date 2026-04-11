@@ -33,6 +33,14 @@ public class LocationService {
         return locationMapper.findLocationHierarchy(id);
     }
 
+    public List<Location> getRootLocations() {
+        return locationMapper.findRootLocations();
+    }
+
+    public List<Location> getChildrenByParentId(Long parentId) {
+        return locationMapper.findChildrenByParentId(parentId);
+    }
+
     public List<Location> findRootLocations() {
         return locationMapper.findRootLocations();
     }

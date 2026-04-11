@@ -42,11 +42,11 @@ public class LocationController {
 
     @GetMapping("/roots")
     public List<Location> getRootLocations() {
-        return locationService.findRootLocations();
+        return locationService.getRootLocations();
     }
 
     @GetMapping("/children/{parentId}")
     public List<Location> getChildrenByParentId(@PathVariable Long parentId) {
-        return locationService.findChildrenByParentId(parentId);
+        return locationService.getChildrenByParentId(parentId);
     }
 }
