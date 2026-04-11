@@ -1,6 +1,6 @@
 package com.ams.controller;
 
-import com.ams.annotation.Auditable;
+import com.ams.common.annotation.Auditable;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
