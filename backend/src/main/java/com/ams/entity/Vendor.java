@@ -12,4 +12,5 @@ public class Vendor {
     private Long id;
     private String name;
     private String contactInfo;
+    private Long vendor_id; // Added for multi-key association
 }

@@ -24,6 +24,10 @@ public class VendorService {
 
     @Transactional(rollbackFor = Exception.class)
     public Vendor createVendor(Vendor vendor) {
+        // Check for duplicate entries
+        if (vendorMapper.isDuplicateVendor(vendor)) {
+            throw new BusinessException("供应商已存在，防止重复录入");
+        }
         vendorMapper.insert(vendor);
         return vendor;
     }
@@ -31,7 +35,7 @@ public class VendorService {
     @Transactional(rollbackFor = Exception.class)
     public Vendor updateVendor(Long id, Vendor updatedVendor) {
         Vendor existingVendor = getVendorById(id);
-        BeanUtil.copyProperties(updatedVendor, existingVendor, "id");
+        BeanUtil.copyProperties(updatedVendor, existingVendor, "id", "vendor_id");
         vendorMapper.updateById(existingVendor);
         return existingVendor;
     }
