@@ -8,6 +8,8 @@ import java.util.List;
 @Mapper
 public interface LocationMapper {
 
+    import org.apache.ibatis.annotations.Param;
+
     @Select("SELECT * FROM location WHERE id = #{id}")
     Location findById(Long id);
 
@@ -21,9 +23,77 @@ public interface LocationMapper {
     @Delete("DELETE FROM location WHERE id = #{id}")
     void deleteById(Long id);
 
-    @Select("SELECT * FROM location WHERE parent_id IS NULL")
+    @Select("WITH RECURSIVE cte AS ( " +
+            "  SELECT id, name, parent_id " +
+            "  FROM location " +
+            "  WHERE id = #{id} " +
+            "  UNION ALL " +
+            "  SELECT l.id, l.name, l.parent_id " +
+            "  FROM location l " +
+            "  INNER JOIN cte ON l.parent_id = cte.id " +
+            ") " +
+            "SELECT * FROM cte")
+    List<Location> findLocationHierarchy(@Param("id") Long id);
+
+    @Select("WITH RECURSIVE cte AS ( " +
+            "  SELECT id, name, parent_id " +
+            "  FROM location " +
+            "  WHERE parent_id IS NULL " +
+            "  UNION ALL " +
+            "  SELECT l.id, l.name, l.parent_id " +
+            "  FROM location l " +
+            "  INNER JOIN cte ON l.parent_id = cte.id " +
+            ") " +
+            "SELECT * FROM cte")
     List<Location> findRootLocations();
 
-    @Select("SELECT * FROM location WHERE parent_id = #{parentId}")
-    List<Location> findChildrenByParentId(Long parentId);
+    @Select("WITH RECURSIVE cte AS ( " +
+            "  SELECT id, name, parent_id " +
+            "  FROM location " +
+            "  WHERE parent_id = #{parentId} " +
+            "  UNION ALL " +
+            "  SELECT l.id, l.name, l.parent_id " +
+            "  FROM location l " +
+            "  INNER JOIN cte ON l.parent_id = cte.id " +
+            ") " +
+            "SELECT * FROM cte")
+    List<Location> findChildrenByParentId(@Param("parentId") Long parentId);
+
+    import org.apache.ibatis.annotations.Param;
+
+    @Select("WITH RECURSIVE cte AS ( " +
+            "  SELECT id, name, parent_id " +
+            "  FROM location " +
+            "  WHERE id = #{id} " +
+            "  UNION ALL " +
+            "  SELECT l.id, l.name, l.parent_id " +
+            "  FROM location l " +
+            "  INNER JOIN cte ON l.parent_id = cte.id " +
+            ") " +
+            "SELECT * FROM cte")
+    List<Location> findLocationHierarchy(@Param("id") Long id);
+
+    @Select("WITH RECURSIVE cte AS ( " +
+            "  SELECT id, name, parent_id " +
+            "  FROM location " +
+            "  WHERE parent_id IS NULL " +
+            "  UNION ALL " +
+            "  SELECT l.id, l.name, l.parent_id " +
+            "  FROM location l " +
+            "  INNER JOIN cte ON l.parent_id = cte.id " +
+            ") " +
+            "SELECT * FROM cte")
+    List<Location> findRootLocations();
+
+    @Select("WITH RECURSIVE cte AS ( " +
+            "  SELECT id, name, parent_id " +
+            "  FROM location " +
+            "  WHERE parent_id = #{parentId} " +
+            "  UNION ALL " +
+            "  SELECT l.id, l.name, l.parent_id " +
+            "  FROM location l " +
+            "  INNER JOIN cte ON l.parent_id = cte.id " +
+            ") " +
+            "SELECT * FROM cte")
+    List<Location> findChildrenByParentId(@Param("parentId") Long parentId);
 }
