@@ -15,22 +15,22 @@ public class LocationController {
     private LocationService locationService;
 
     @GetMapping("/{id}")
-    public Location findById(@PathVariable Long id) {
+    public Location getLocation(@PathVariable Long id) {
         return locationService.findById(id);
     }
 
     @PostMapping
-    public void insert(@RequestBody Location location) {
+    public void insertLocation(@RequestBody Location location) {
         locationService.insert(location);
     }
 
     @PutMapping
-    public void update(@RequestBody Location location) {
+    public void updateLocation(@RequestBody Location location) {
         locationService.update(location);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteById(@PathVariable Long id) {
+    public void deleteLocationById(@PathVariable Long id) {
         locationService.deleteById(id);
     }
 
