@@ -16,6 +16,7 @@ public class AuditAspect {
         // Extract necessary information from the JoinPoint and create a GeneralAuditEntry.
         String action = auditable.action();
         String traceId = "";  // Implement logic to get trace_id
+        Object[] args = joinPoint.getArgs();
         String beforeRecord = "";  // Implement logic to capture state before operation
         String afterRecord = "";   // Implement logic to capture state after operation
 
