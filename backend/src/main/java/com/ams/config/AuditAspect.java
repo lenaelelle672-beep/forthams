@@ -6,6 +6,10 @@ import com.ams.service.AuditService;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -26,12 +30,23 @@ public class AuditAspect {
         // Create a trace ID (for simplicity, using method name and timestamp)
         String traceId = className + "." + methodName + "-" + System.currentTimeMillis();
 
-        // Convert before and after records to string (this is a simple example, you might want to use JSON serialization)
-        String beforeRecord = "Before Record"; // This should be the state of the object before the method execution
-        String afterRecord = result.toString(); // This should be the state of the object after the method execution
+        // Convert before and after records to string using JSON serialization
+        ObjectMapper objectMapper = new ObjectMapper();
+        String beforeRecord = "Before Record"; // Placeholder for actual before record
+        String afterRecord = "After Record"; // Placeholder for actual after record
+
+        try {
+            Object targetObject = joinPoint.getArgs()[0];
+            beforeRecord = objectMapper.writeValueAsString(targetObject);
+            afterRecord = objectMapper.writeValueAsString(result);
+        } catch (JsonProcessingException e) {
+            log.error("Error serializing audit records", e);
+        }
 
         GeneralAuditEntry auditEntry = new GeneralAuditEntry();
         auditEntry.setTraceId(traceId);
+        auditEntry.setBeforeRecord(beforeRecord);
+        auditEntry.setAfterRecord(afterRecord);
         auditEntry.setAction(methodName);
         auditEntry.setBeforeRecord(beforeRecord);
         auditEntry.setAfterRecord(afterRecord);
