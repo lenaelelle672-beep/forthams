@@ -35,8 +35,11 @@ public class AuditAspect {
 
         try {
             if (joinPoint.getArgs().length > 0) {
-                Object targetObject = joinPoint.getArgs()[0];
-                beforeRecord = objectMapper.writeValueAsString(targetObject);
+                Object[] args = joinPoint.getArgs();
+                for (Object arg : args) {
+                    beforeRecord = objectMapper.writeValueAsString(arg);
+                    break; // Assuming the first argument is the one we want to audit
+                }
             }
             afterRecord = objectMapper.writeValueAsString(result);
         } catch (JsonProcessingException e) {
