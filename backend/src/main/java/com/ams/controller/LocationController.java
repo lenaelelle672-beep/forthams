@@ -36,17 +36,17 @@ public class LocationController {
 
     @GetMapping("/hierarchy/{id}")
     public List<Location> getLocationHierarchy(@PathVariable Long id) {
-        return locationService.getLocationHierarchy(id);
+        return locationService.findLocationHierarchy(id);
     }
 
     @GetMapping("/root")
     public List<Location> getRootLocations() {
-        return locationService.getRootLocations();
+        return locationService.findRootLocations();
     }
 
     @GetMapping("/children/{parentId}")
     public List<Location> getChildrenByParentId(@PathVariable Long parentId) {
-        return locationService.getChildrenByParentId(parentId);
+        return locationService.findChildrenByParentId(parentId);
     }
 
     @GetMapping("/descendants/{id}")

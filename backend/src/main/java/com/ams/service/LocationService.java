@@ -29,15 +29,15 @@ public class LocationService {
         locationMapper.deleteById(id);
     }
 
-    public List<Location> getLocationHierarchy(Long id) {
+    public List<Location> findLocationHierarchy(Long id) {
         return locationMapper.findLocationHierarchy(id);
     }
 
-    public List<Location> getRootLocations() {
+    public List<Location> findRootLocations() {
         return locationMapper.findRootLocations();
     }
 
-    public List<Location> getChildrenByParentId(Long parentId) {
+    public List<Location> findChildrenByParentId(Long parentId) {
         return locationMapper.findChildrenByParentId(parentId);
     }
 
