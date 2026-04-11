@@ -32,11 +32,13 @@ public class UserManagementController {
     }
 
     @Auditable
+    @Auditable
     @GetMapping("/{id}")
     public Result<User> getById(@PathVariable Long id) {
         return Result.success(userManagementService.getUserById(id));
     }
 
+    @Auditable
     @Auditable
     @PostMapping
     public Result<User> create(@Valid @RequestBody UserCreateDTO dto) {
@@ -44,11 +46,13 @@ public class UserManagementController {
     }
 
     @Auditable
+    @Auditable
     @PutMapping("/{id}")
     public Result<User> update(@PathVariable Long id, @Valid @RequestBody UserUpdateDTO dto) {
         return Result.success("更新成功", userManagementService.updateUser(id, dto));
     }
 
+    @Auditable
     @Auditable
     @PutMapping("/{id}/reset-password")
     public Result<String> resetPassword(@PathVariable Long id) {
@@ -57,12 +61,14 @@ public class UserManagementController {
     }
 
     @Auditable
+    @Auditable
     @PutMapping("/{id}/status")
     public Result<String> updateStatus(@PathVariable Long id, @RequestParam Integer status) {
         userManagementService.updateStatus(id, status);
         return Result.success("状态更新成功");
     }
 
+    @Auditable
     @Auditable
     @DeleteMapping("/{id}")
     public Result<String> delete(@PathVariable Long id) {

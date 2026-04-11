@@ -38,11 +38,13 @@ public class RoleController {
     }
 
     @Auditable
+    @Auditable
     @GetMapping("/{id}")
     public Result<Role> getById(@PathVariable Long id) {
         return Result.success(roleService.getRoleById(id));
     }
 
+    @Auditable
     @Auditable
     @PostMapping
     public Result<Role> create(@Valid @RequestBody RoleCreateDTO dto) {
@@ -50,11 +52,13 @@ public class RoleController {
     }
 
     @Auditable
+    @Auditable
     @PutMapping("/{id}")
     public Result<Role> update(@PathVariable Long id, @Valid @RequestBody RoleUpdateDTO dto) {
         return Result.success("更新成功", roleService.updateRole(id, dto));
     }
 
+    @Auditable
     @Auditable
     @DeleteMapping("/{id}")
     public Result<String> delete(@PathVariable Long id) {

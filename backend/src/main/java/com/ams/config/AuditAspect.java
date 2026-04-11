@@ -1,6 +1,6 @@
 package com.ams.config;
 
-import com.ams.common.Auditable;
+import com.ams.common.annotation.Auditable;
 import com.ams.entity.GeneralAuditEntry;
 import com.ams.service.AuditService;
 import lombok.extern.slf4j.Slf4j;
