@@ -12,3 +12,12 @@ public class WorkOrderDTO {
         this.status = status;
     }
 }
+package com.ams.dto;
+
+import lombok.Data;
+
+@Data
+public class WorkOrderDTO {
+    private Long id;
+    private String status;
+}
