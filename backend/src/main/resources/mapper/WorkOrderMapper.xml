@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ams.mapper.WorkOrderMapper">
+    <insert id="insert" parameterType="com.ams.entity.WorkOrder">
+        INSERT INTO work_order (status)
+        VALUES (#{status})
+    </insert>
+
+    <update id="updateById" parameterType="com.ams.entity.WorkOrder">
+        UPDATE work_order
+        SET status = #{status}
+        WHERE id = #{id}
+    </update>
+
+    <select id="selectById" resultType="com.ams.entity.WorkOrder">
+        SELECT * FROM work_order
+        WHERE id = #{id}
+    </select>
+</mapper>
