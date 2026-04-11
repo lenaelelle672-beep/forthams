@@ -5,10 +5,9 @@ import java.util.Date;
 
 @Data
 public class GeneralAuditEntry {
-    private Long id;
     private String traceId;
+    private Date timestamp;
     private String action;
     private String beforeRecord;
     private String afterRecord;
-    private Date timestamp;
 }
