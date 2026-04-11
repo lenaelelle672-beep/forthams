@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 public class AuditAspect {
 
     @AfterReturning(pointcut = "@annotation(auditable)", returning = "result")
-    public void audit(JoinPoint joinPoint, Auditable auditable, Object result) {
+    public void audit(JoinPoint joinPoint, Auditable auditable) {
         // Extract necessary information from the JoinPoint and create a GeneralAuditEntry.
         String action = auditable.action();
         String traceId = "";  // Implement logic to get trace_id
