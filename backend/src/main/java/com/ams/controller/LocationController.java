@@ -37,7 +37,6 @@ public class LocationController {
 
     @GetMapping("/hierarchy/{id}")
     public List<Location> getLocationHierarchy(@PathVariable Long id) {
-        // Fetch hierarchical data
         return locationService.getLocationHierarchy(id);
     }
 
@@ -54,5 +53,11 @@ public class LocationController {
     @GetMapping("/descendants/{id}")
     public List<Location> getDescendants(@PathVariable Long id) {
         return locationService.getDescendants(id);
+    }
+
+    // New method for casual greeting
+    @GetMapping("/greet")
+    public String greet() {
+        return "Hey there! Welcome to the Location API.";
     }
 }
