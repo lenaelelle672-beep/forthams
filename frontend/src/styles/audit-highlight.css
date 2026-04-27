@@ -1,0 +1,384 @@
+/**
+ * Audit Highlight Styles
+ * 
+ * Styles for highlighting audit-related UI elements in the asset management system.
+ * Includes support for asset retirement and disposal workflow visualization.
+ * 
+ * @module audit-highlight
+ * @version 1.0.0
+ */
+
+/* ==================== CSS Variables ==================== */
+
+:root {
+    /* Audit State Colors */
+    --audit-pending: #f59e0b;
+    --audit-approved: #10b981;
+    --audit-rejected: #ef4444;
+    --audit-retired: #6b7280;
+    --audit-disposed: #8b5cf6;
+    
+    /* Lifecycle Stage Colors */
+    --lifecycle-create: #3b82f6;
+    --lifecycle-submit: #8b5cf6;
+    --lifecycle-approve: #10b981;
+    --lifecycle-reject: #ef4444;
+    --lifecycle-dispose: #f59e0b;
+    --lifecycle-complete: #059669;
+    
+    /* Retirement Flow Specific */
+    --retirement-pending: #fef3c7;
+    --retirement-processing: #dbeafe;
+    --retirement-approved: #d1fae5;
+    --retirement-rejected: #fee2e2;
+    --retirement-completed: #e0e7ff;
+    
+    /* Transition Animations */
+    --audit-transition-speed: 0.3s;
+    --audit-glow-radius: 4px;
+}
+
+/* ==================== Base Audit Highlight Classes ==================== */
+
+.audit-highlight {
+    position: relative;
+    padding: 2px 4px;
+    border-radius: 4px;
+    transition: all var(--audit-transition-speed) ease;
+}
+
+.audit-highlight--pending {
+    background-color: var(--audit-pending);
+    color: white;
+}
+
+.audit-highlight--approved {
+    background-color: var(--audit-approved);
+    color: white;
+}
+
+.audit-highlight--rejected {
+    background-color: var(--audit-rejected);
+    color: white;
+}
+
+/* ==================== Retirement Flow Styles ==================== */
+
+/**
+ * Styles for retirement application status badges
+ */
+.retirement-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 16px;
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all var(--audit-transition-speed) ease;
+}
+
+.retirement-badge--pending {
+    background-color: var(--retirement-pending);
+    color: #92400e;
+    border: 1px solid #fcd34d;
+}
+
+.retirement-badge--processing {
+    background-color: var(--retirement-processing);
+    color: #1e40af;
+    border: 1px solid #93c5fd;
+}
+
+.retirement-badge--approved {
+    background-color: var(--retirement-approved);
+    color: #065f46;
+    border: 1px solid #6ee7b7;
+}
+
+.retirement-badge--rejected {
+    background-color: var(--retirement-rejected);
+    color: #991b1b;
+    border: 1px solid #fca5a5;
+}
+
+.retirement-badge--completed {
+    background-color: var(--retirement-completed);
+    color: #4338ca;
+    border: 1px solid #a5b4fc;
+}
+
+/**
+ * Styles for retirement flow progress indicator
+ */
+.retirement-progress {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 0;
+    position: relative;
+}
+
+.retirement-progress::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background-color: #e5e7eb;
+    transform: translateY(-50%);
+    z-index: 0;
+}
+
+.retirement-progress__step {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.retirement-progress__icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+    border: 3px solid #d1d5db;
+    transition: all var(--audit-transition-speed) ease;
+}
+
+.retirement-progress__icon--active {
+    border-color: var(--lifecycle-submit);
+    background-color: var(--lifecycle-submit);
+    color: white;
+}
+
+.retirement-progress__icon--completed {
+    border-color: var(--lifecycle-complete);
+    background-color: var(--lifecycle-complete);
+    color: white;
+}
+
+.retirement-progress__label {
+    font-size: 11px;
+    color: #6b7280;
+    text-align: center;
+    max-width: 80px;
+}
+
+.retirement-progress__label--active {
+    color: #1f2937;
+    font-weight: 600;
+}
+
+/**
+ * Styles for lifecycle history timeline
+ */
+.lifecycle-timeline {
+    position: relative;
+    padding-left: 24px;
+}
+
+.lifecycle-timeline::before {
+    content: '';
+    position: absolute;
+    left: 8px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--lifecycle-create), var(--lifecycle-submit), var(--lifecycle-approve), var(--lifecycle-dispose));
+}
+
+.lifecycle-timeline__item {
+    position: relative;
+    padding: 12px 0;
+    padding-left: 24px;
+}
+
+.lifecycle-timeline__item::before {
+    content: '';
+    position: absolute;
+    left: -20px;
+    top: 16px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: white;
+    border: 3px solid #d1d5db;
+}
+
+.lifecycle-timeline__item--create::before {
+    border-color: var(--lifecycle-create);
+    background-color: var(--lifecycle-create);
+}
+
+.lifecycle-timeline__item--submit::before {
+    border-color: var(--lifecycle-submit);
+    background-color: var(--lifecycle-submit);
+}
+
+.lifecycle-timeline__item--approve::before {
+    border-color: var(--lifecycle-approve);
+    background-color: var(--lifecycle-approve);
+}
+
+.lifecycle-timeline__item--reject::before {
+    border-color: var(--lifecycle-reject);
+    background-color: var(--lifecycle-reject);
+}
+
+.lifecycle-timeline__item--dispose::before {
+    border-color: var(--lifecycle-dispose);
+    background-color: var(--lifecycle-dispose);
+}
+
+.lifecycle-timeline__item--complete::before {
+    border-color: var(--lifecycle-complete);
+    background-color: var(--lifecycle-complete);
+}
+
+.lifecycle-timeline__time {
+    font-size: 11px;
+    color: #9ca3af;
+    margin-bottom: 4px;
+}
+
+.lifecycle-timeline__content {
+    font-size: 14px;
+    color: #374151;
+}
+
+.lifecycle-timeline__operator {
+    font-size: 12px;
+    color: #6b7280;
+    margin-top: 4px;
+}
+
+/**
+ * Styles for disposal method indicators
+ */
+.disposal-method {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+}
+
+.disposal-method--transfer {
+    background-color: #dbeafe;
+    color: #1e40af;
+}
+
+.disposal-method--recycle {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+.disposal-method--destroy {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+.disposal-method--donate {
+    background-color: #e0e7ff;
+    color: #4338ca;
+}
+
+/**
+ * Styles for asset status change animation
+ */
+@keyframes status-transition {
+    0% {
+        opacity: 0.5;
+        transform: scale(0.95);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.02);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.status-transition {
+    animation: status-transition var(--audit-transition-speed) ease-out;
+}
+
+/**
+ * Glow effect for active audit items
+ */
+.audit-glow {
+    box-shadow: 0 0 var(--audit-glow-radius) var(--audit-pending);
+}
+
+.audit-glow--approved {
+    box-shadow: 0 0 var(--audit-glow-radius) var(--audit-approved);
+}
+
+.audit-glow--rejected {
+    box-shadow: 0 0 var(--audit-glow-radius) var(--audit-rejected);
+}
+
+/* ==================== Field Change Diff Styles ==================== */
+
+.field-diff {
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 13px;
+}
+
+.field-diff__added {
+    background-color: #dcfce7;
+    color: #166534;
+    text-decoration: none;
+}
+
+.field-diff__removed {
+    background-color: #fee2e2;
+    color: #991b1b;
+    text-decoration: line-through;
+}
+
+.field-diff__unchanged {
+    color: #6b7280;
+}
+
+/* ==================== Responsive Adjustments ==================== */
+
+@media (max-width: 768px) {
+    .retirement-progress {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+    
+    .retirement-progress::before {
+        top: 0;
+        bottom: 0;
+        left: 16px;
+        right: auto;
+        width: 4px;
+        height: auto;
+        transform: none;
+    }
+    
+    .retirement-progress__step {
+        flex-direction: row;
+        width: 100%;
+    }
+    
+    .retirement-progress__label {
+        max-width: none;
+        text-align: left;
+    }
+}

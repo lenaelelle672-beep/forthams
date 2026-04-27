@@ -1,0 +1,313 @@
+/* frontend/src/app/pages/InventoryDetail/InventoryDetail.module.css */
+
+/**
+ * Inventory Detail Page Styles — Phase 3: Asset Inventory Execution Workbench
+ *
+ * Layout structure (top → bottom):
+ *   1. Header       — Task info, back navigation, action buttons
+ *   2. Dashboard    — Progress bar + 5 stat cards (总资产/已盘/未盘/盘盈/盘亏)
+ *   3. TableArea    — Editable asset inventory data grid with virtual scroll
+ *   4. DiffPanel    — Surplus / deficit difference summary table
+ *   5. ActionBar    — Sticky bottom bar: batch confirm & submit approval
+ */
+
+/* ──────────────── Page Container ──────────────── */
+
+.container {
+  padding: 24px;
+  background-color: #f0f2f5; /* Ant Design standard page background */
+  min-height: calc(100vh - 64px); /* offset global header ~64px */
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding-bottom: 88px; /* reserve space for sticky ActionBar */
+}
+
+/* ──────────────── Header ──────────────── */
+
+.header {
+  background: #fff;
+  padding: 16px 24px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03),
+    0 1px 6px rgba(0, 0, 0, 0.08);
+}
+
+.headerTitle {
+  font-size: 18px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.88);
+  margin: 0;
+}
+
+.headerActions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+/* ──────────────── Progress Dashboard ──────────────── */
+
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Progress bar section */
+.progressSection {
+  background: #fff;
+  padding: 20px 24px;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03),
+    0 1px 6px rgba(0, 0, 0, 0.08);
+}
+
+.progressLabel {
+  font-size: 14px;
+  color: #8c8c8c;
+  margin-bottom: 12px;
+}
+
+/* 5 core stat cards (ATB-03: 总资产数/已盘/未盘/盘盈/盘亏) */
+.statCards {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 16px;
+}
+
+.statCard {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03),
+    0 1px 6px rgba(0, 0, 0, 0.08);
+  text-align: center;
+}
+
+.statLabel {
+  font-size: 14px;
+  color: #8c8c8c;
+  margin-bottom: 8px;
+}
+
+.statValue {
+  font-size: 28px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+/* Stat card color variants */
+.statTotal .statValue {
+  color: #1890ff;
+}
+
+.statChecked .statValue {
+  color: #52c41a;
+}
+
+.statUnchecked .statValue {
+  color: #faad14;
+}
+
+.statSurplus .statValue {
+  color: #13c2c2;
+}
+
+.statDeficit .statValue {
+  color: #ff4d4f;
+}
+
+/* ──────────────── Asset Table Section ──────────────── */
+
+.tableContainer {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03),
+    0 1px 6px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.tableHeader {
+  padding: 16px 24px;
+  border-bottom: 1px solid #f0f0f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tableTitle {
+  font-size: 16px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+/* Row highlight when status changes to "已盘" (ATB-04) */
+.rowHighlighted {
+  background-color: #f6ffed !important;
+  transition: background-color 0.3s ease;
+}
+
+/* Row selected via checkbox (ATB-04 batch confirm) */
+.rowSelected {
+  background-color: #e6f7ff !important;
+}
+
+/* ──────────────── Status Badge Styles ──────────────── */
+
+.statusChecked {
+  color: #52c41a;
+  background: #f6ffed;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 500;
+  display: inline-block;
+}
+
+.statusUnchecked {
+  color: #8c8c8c;
+  background: #fafafa;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 500;
+  display: inline-block;
+}
+
+.statusSurplus {
+  color: #13c2c2;
+  background: #e6fffb;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 500;
+  display: inline-block;
+}
+
+.statusDeficit {
+  color: #ff4d4f;
+  background: #fff1f0;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 500;
+  display: inline-block;
+}
+
+/* ──────────────── Difference Summary Panel (ATB-05) ──────────────── */
+
+.diffPanel {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03),
+    0 1px 6px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.diffPanelHeader {
+  padding: 16px 24px;
+  border-bottom: 1px solid #f0f0f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.diffPanelTitle {
+  font-size: 16px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.diffBadge {
+  margin-left: 8px;
+}
+
+/* ──────────────── Sticky Action Bar ──────────────── */
+
+.actionBar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 64px;
+  background: #fff;
+  border-top: 1px solid #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.06);
+  z-index: 100;
+}
+
+.actionBarInfo {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.actionBarButtons {
+  display: flex;
+  gap: 12px;
+}
+
+/* ──────────────── Loading & Empty States ──────────────── */
+
+.loadingOverlay {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  color: #bfbfbf;
+}
+
+.emptyState {
+  padding: 64px 0;
+  text-align: center;
+  color: #bfbfbf;
+}
+
+/* ──────────────── Responsive Adjustments ──────────────── */
+
+@media (max-width: 1200px) {
+  .statCards {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 16px;
+    padding-bottom: 80px;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .statCards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .actionBar {
+    flex-direction: column;
+    height: auto;
+    padding: 12px 16px;
+    gap: 8px;
+  }
+
+  .actionBarInfo {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .statCards {
+    grid-template-columns: 1fr;
+  }
+}

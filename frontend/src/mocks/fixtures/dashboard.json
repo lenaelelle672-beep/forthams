@@ -1,0 +1,104 @@
+{
+  "_comments": "Dashboard Mock Fixtures - SWARM-003 Iteration 2",
+  "_description": "资产总览统计、分类分布图表、维保到期预警数据模拟",
+
+  "statistics": {
+    "total": 1250,
+    "inUse": 980,
+    "idle": 180,
+    "underMaintenance": 90,
+    "trends": {
+      "total": { "value": 12, "direction": "up" },
+      "inUse": { "value": 5, "direction": "up" },
+      "idle": { "value": 3, "direction": "down" },
+      "underMaintenance": { "value": 2, "direction": "down" }
+    }
+  },
+
+  "categoryDistribution": [
+    { "categoryId": "C1", "categoryName": "电子设备", "count": 420, "percentage": 33.6 },
+    { "categoryId": "C2", "categoryName": "办公家具", "count": 280, "percentage": 22.4 },
+    { "categoryId": "C3", "categoryName": "生产设备", "count": 210, "percentage": 16.8 },
+    { "categoryId": "C4", "categoryName": "运输设备", "count": 180, "percentage": 14.4 },
+    { "categoryId": "C5", "categoryName": "通讯设备", "count": 100, "percentage": 8.0 },
+    { "categoryId": "C6", "categoryName": "其他设备", "count": 60, "percentage": 4.8 }
+  ],
+
+  "maintenanceAlerts": [
+    {
+      "assetId": "A001",
+      "assetName": "服务器 DELL PowerEdge R740",
+      "assetCode": "SRV-2024-001",
+      "categoryName": "电子设备",
+      "dueDate": "2024-01-15",
+      "daysRemaining": 5,
+      "severity": "critical",
+      "maintenanceType": "年度检修",
+      "vendorName": "戴尔技术服务有限公司",
+      "contactPhone": "400-888-4567"
+    },
+    {
+      "assetId": "A002",
+      "assetName": "UPS 不间断电源",
+      "assetCode": "UPS-2023-015",
+      "categoryName": "电子设备",
+      "dueDate": "2024-01-20",
+      "daysRemaining": 10,
+      "severity": "warning",
+      "maintenanceType": "电池更换",
+      "vendorName": "施耐德电气",
+      "contactPhone": "400-890-1234"
+    },
+    {
+      "assetId": "A003",
+      "assetName": "中央空调室内机",
+      "assetCode": "AC-2023-008",
+      "categoryName": "生产设备",
+      "dueDate": "2024-02-10",
+      "daysRemaining": 31,
+      "severity": "normal",
+      "maintenanceType": "滤网清洗",
+      "vendorName": "格力空调售后",
+      "contactPhone": "400-716-8888"
+    },
+    {
+      "assetId": "A004",
+      "assetName": "打印机 HP LaserJet",
+      "assetCode": "PRT-2024-002",
+      "categoryName": "电子设备",
+      "dueDate": "2024-01-25",
+      "daysRemaining": 15,
+      "severity": "warning",
+      "maintenanceType": "墨盒更换",
+      "vendorName": "惠普售后中心",
+      "contactPhone": "800-820-2255"
+    },
+    {
+      "assetId": "A005",
+      "assetName": "投影仪 EPSON",
+      "assetCode": "PRJ-2023-003",
+      "categoryName": "电子设备",
+      "dueDate": "2024-02-05",
+      "daysRemaining": 26,
+      "severity": "normal",
+      "maintenanceType": "灯泡检查",
+      "vendorName": "爱普生中国",
+      "contactPhone": "400-810-9977"
+    }
+  ],
+
+  "summary": {
+    "totalAlerts": 5,
+    "criticalCount": 1,
+    "warningCount": 2,
+    "normalCount": 2
+  },
+
+  "pagination": {
+    "page": 1,
+    "pageSize": 5,
+    "total": 12
+  },
+
+  "timestamp": "2024-01-10T08:30:00Z"
+}

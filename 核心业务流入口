@@ -1,0 +1,103 @@
+package com.ams.controller;
+
+import com.ams.context.TenantContext;
+import com.ams.service.AssetService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.List;
+import java.util.Objects;
+
+/**
+ * 资产管理控制器 - 已根据多租户安全规格进行加固
+ */
+@RestController
+@RequestMapping("/api/v1/assets")
+public class AssetController {
+
+    @Autowired
+    private AssetService assetService;
+
+    /**
+     * 获取单个资产详情
+     * 安全约束：强制校验请求资源所属 tenantId 与当前上下文一致
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<Asset> getAsset(@PathVariable Long id) {
+        String currentTenantId = TenantContext.get();
+        if (currentTenantId == null) {
+            throw new AccessDeniedException("Missing tenant context");
+        }
+
+        // 强制校验 tenant_id 与资源归属匹配，严禁直接返回数据
+        Long resourceTenantId = assetService.getAssetTenantId(id);
+        if (!Objects.equals(String.valueOf(resourceTenantId), currentTenantId)) {
+            throw new AccessDeniedException("Cross-tenant access denied");
+        }
+
+        return ResponseEntity.ok(assetService.findById(id));
+    }
+
+    /**
+     * 获取当前租户下的资产列表
+     */
+    @GetMapping
+    public ResponseEntity<List<Asset>> listAssets() {
+        String currentTenantId = TenantContext.get();
+        if (currentTenantId == null) {
+            throw new AccessDeniedException("Missing tenant context");
+        }
+
+        // 业务层实现应基于当前租户上下文进行查询，严禁接受外部传入的 tenantId 参数
+        return ResponseEntity.ok(assetService.findAllByTenantId(currentTenantId));
+    }
+
+    /**
+     * 创建新资产
+     */
+    @PostMapping
+    @PreAuthorize("hasAuthority('ASSET_CREATE')")
+    public ResponseEntity<Asset> createAsset(@Valid @RequestBody AssetCreateRequest request) {
+        String currentTenantId = TenantContext.get();
+        if (currentTenantId == null) {
+            throw new AccessDeniedException("Missing tenant context");
+        }
+
+        // 强制覆盖请求中的租户 ID，防止通过参数注入其他租户数据
+        Asset asset = assetService.create(request, currentTenantId);
+        return ResponseEntity.status(201).body(asset);
+    }
+
+    /**
+     * 更新资产
+     */
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> updateAsset(@PathVariable Long id, @Valid @RequestBody AssetUpdateRequest request) {
+        String currentTenantId = TenantContext.get();
+        if (currentTenantId == null) {
+            throw new AccessDeniedException("Missing tenant context");
+        }
+
+        // 业务层应在更新时校验该资产是否属于当前租户
+        assetService.update(id, request, currentTenantId);
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * 删除资产
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteAsset(@PathVariable Long id) {
+        String currentTenantId = TenantContext.get();
+        if (currentTenantId == null) {
+            throw new AccessDeniedException("Missing tenant context");
+        }
+
+        assetService.delete(id, currentTenantId);
+        return ResponseEntity.noContent().build();
+    }
+}

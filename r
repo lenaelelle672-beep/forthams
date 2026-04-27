@@ -1,0 +1,3 @@
+- [ ] AC-003: AST 静态分析通过（无语法错误）
+- [ ] AC-004: 所有修改函数含 docstring
+- [ ] AC-005: import 测试通过（无 ImportError）

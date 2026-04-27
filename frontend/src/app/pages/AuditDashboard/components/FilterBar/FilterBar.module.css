@@ -1,0 +1,453 @@
+/**
+ * FilterBar.module.css
+ * 审计日志仪表板 - 筛选栏组件样式
+ *
+ * 支持多维筛选：时间范围、操作类型、操作人
+ * 包含查询/重置按钮、加载态、错误提示、响应式布局
+ */
+
+/* ========================
+   容器与布局
+   ======================== */
+
+.filterBar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 16px 20px;
+  background: var(--color-bg-elevated, #ffffff);
+  border: 1px solid var(--color-border-default, #e2e8f0);
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+/* ========================
+   筛选项组
+   ======================== */
+
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.fieldGroupTimeRange {
+  flex: 1 1 420px;
+  min-width: 280px;
+}
+
+.fieldGroupActionType {
+  flex: 0 1 200px;
+  min-width: 160px;
+}
+
+.fieldGroupOperator {
+  flex: 0 1 200px;
+  min-width: 160px;
+}
+
+/* ========================
+   标签
+   ======================== */
+
+.label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-text-secondary, #64748b);
+  line-height: 1.4;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.labelRequired::after {
+  content: " *";
+  color: var(--color-danger, #ef4444);
+}
+
+/* ========================
+   时间范围选择器
+   ======================== */
+
+.timeRangeWrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.timeRangeSeparator {
+  flex-shrink: 0;
+  color: var(--color-text-tertiary, #94a3b8);
+  font-size: 14px;
+  user-select: none;
+}
+
+.dateInput {
+  flex: 1;
+  min-width: 0;
+  height: 36px;
+  padding: 0 10px;
+  font-size: 13px;
+  color: var(--color-text-primary, #1e293b);
+  background: var(--color-bg-base, #f8fafc);
+  border: 1px solid var(--color-border-default, #e2e8f0);
+  border-radius: 6px;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  font-family: inherit;
+}
+
+.dateInput:hover {
+  border-color: var(--color-border-hover, #cbd5e1);
+}
+
+.dateInput:focus {
+  border-color: var(--color-primary, #3b82f6);
+  box-shadow: 0 0 0 3px var(--color-primary-alpha-15, rgba(59, 130, 246, 0.15));
+}
+
+.dateInput:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: var(--color-bg-disabled, #f1f5f9);
+}
+
+.dateInputError {
+  border-color: var(--color-danger, #ef4444);
+}
+
+.dateInputError:focus {
+  border-color: var(--color-danger, #ef4444);
+  box-shadow: 0 0 0 3px var(--color-danger-alpha-15, rgba(239, 68, 68, 0.15));
+}
+
+/* ========================
+   下拉选择器（操作类型）
+   ======================== */
+
+.selectInput {
+  width: 100%;
+  height: 36px;
+  padding: 0 28px 0 10px;
+  font-size: 13px;
+  color: var(--color-text-primary, #1e293b);
+  background: var(--color-bg-base, #f8fafc);
+  border: 1px solid var(--color-border-default, #e2e8f0);
+  border-radius: 6px;
+  outline: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M2.5 4.5L6 8l3.5-3.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 12px;
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  font-family: inherit;
+}
+
+.selectInput:hover {
+  border-color: var(--color-border-hover, #cbd5e1);
+}
+
+.selectInput:focus {
+  border-color: var(--color-primary, #3b82f6);
+  box-shadow: 0 0 0 3px var(--color-primary-alpha-15, rgba(59, 130, 246, 0.15));
+}
+
+.selectInput:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: var(--color-bg-disabled, #f1f5f9);
+}
+
+.selectPlaceholder {
+  color: var(--color-text-tertiary, #94a3b8);
+}
+
+/* ========================
+   操作人输入框
+   ======================== */
+
+.operatorInput {
+  width: 100%;
+  height: 36px;
+  padding: 0 10px;
+  font-size: 13px;
+  color: var(--color-text-primary, #1e293b);
+  background: var(--color-bg-base, #f8fafc);
+  border: 1px solid var(--color-border-default, #e2e8f0);
+  border-radius: 6px;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  font-family: inherit;
+}
+
+.operatorInput::placeholder {
+  color: var(--color-text-tertiary, #94a3b8);
+}
+
+.operatorInput:hover {
+  border-color: var(--color-border-hover, #cbd5e1);
+}
+
+.operatorInput:focus {
+  border-color: var(--color-primary, #3b82f6);
+  box-shadow: 0 0 0 3px var(--color-primary-alpha-15, rgba(59, 130, 246, 0.15));
+}
+
+.operatorInput:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: var(--color-bg-disabled, #f1f5f9);
+}
+
+/* ========================
+   操作按钮区
+   ======================== */
+
+.actions {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  margin-left: auto;
+  padding-top: 18px;
+}
+
+.btnQuery {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 36px;
+  min-width: 80px;
+  padding: 0 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #ffffff;
+  background: var(--color-primary, #3b82f6);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.btnQuery:hover:not(:disabled) {
+  background: var(--color-primary-hover, #2563eb);
+  box-shadow: 0 1px 4px rgba(59, 130, 246, 0.3);
+}
+
+.btnQuery:active:not(:disabled) {
+  background: var(--color-primary-active, #1d4ed8);
+}
+
+.btnQuery:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btnReset {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 36px;
+  min-width: 72px;
+  padding: 0 14px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-secondary, #64748b);
+  background: var(--color-bg-base, #f8fafc);
+  border: 1px solid var(--color-border-default, #e2e8f0);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.btnReset:hover:not(:disabled) {
+  background: var(--color-bg-hover, #f1f5f9);
+  border-color: var(--color-border-hover, #cbd5e1);
+  color: var(--color-text-primary, #1e293b);
+}
+
+.btnReset:active:not(:disabled) {
+  background: var(--color-bg-active, #e2e8f0);
+}
+
+.btnReset:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ========================
+   加载态
+   ======================== */
+
+.loadingSpinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.filterBarLoading {
+  position: relative;
+  pointer-events: none;
+}
+
+.filterBarLoading::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: 8px;
+  z-index: 1;
+}
+
+/* ========================
+   错误提示
+   ======================== */
+
+.errorMessage {
+  flex: 1 1 100%;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  font-size: 12px;
+  color: var(--color-danger, #ef4444);
+  background: var(--color-danger-bg, #fef2f2);
+  border: 1px solid var(--color-danger-border, #fecaca);
+  border-radius: 6px;
+  line-height: 1.4;
+}
+
+.errorIcon {
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+}
+
+/* ========================
+   快捷时间范围标签
+   ======================== */
+
+.quickRangeGroup {
+  display: flex;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.quickRangeBtn {
+  display: inline-flex;
+  align-items: center;
+  height: 24px;
+  padding: 0 8px;
+  font-size: 11px;
+  color: var(--color-text-secondary, #64748b);
+  background: transparent;
+  border: 1px solid var(--color-border-default, #e2e8f0);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.quickRangeBtn:hover {
+  color: var(--color-primary, #3b82f6);
+  border-color: var(--color-primary, #3b82f6);
+  background: var(--color-primary-alpha-5, rgba(59, 130, 246, 0.05));
+}
+
+.quickRangeBtnActive {
+  color: var(--color-primary, #3b82f6);
+  border-color: var(--color-primary, #3b82f6);
+  background: var(--color-primary-alpha-10, rgba(59, 130, 246, 0.1));
+  font-weight: 500;
+}
+
+/* ========================
+   时间跨度警告
+   ======================== */
+
+.rangeWarning {
+  flex: 1 1 100%;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  font-size: 12px;
+  color: var(--color-warning-text, #92400e);
+  background: var(--color-warning-bg, #fffbeb);
+  border: 1px solid var(--color-warning-border, #fde68a);
+  border-radius: 6px;
+  line-height: 1.4;
+}
+
+/* ========================
+   响应式布局
+   ======================== */
+
+@media (max-width: 768px) {
+  .filterBar {
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px 14px;
+  }
+
+  .fieldGroupTimeRange {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .fieldGroupActionType,
+  .fieldGroupOperator {
+    flex: 1 1 100%;
+    min-width: 0;
+  }
+
+  .timeRangeWrapper {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .timeRangeSeparator {
+    display: none;
+  }
+
+  .actions {
+    width: 100%;
+    margin-left: 0;
+    padding-top: 4px;
+  }
+
+  .btnQuery,
+  .btnReset {
+    flex: 1;
+  }
+}
+
+@media (max-width: 480px) {
+  .filterBar {
+    padding: 10px 12px;
+    gap: 10px;
+  }
+
+  .quickRangeGroup {
+    flex-wrap: wrap;
+  }
+}

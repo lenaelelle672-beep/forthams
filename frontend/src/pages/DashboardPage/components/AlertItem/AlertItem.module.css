@@ -1,0 +1,192 @@
+/**
+ * AlertItem 告警项样式
+ * 
+ * 规格依据：
+ * - C-002: 时间分级颜色：紧急(≤7d)红色，预警(8-30d)橙色，正常(>30d)灰色
+ * - C-007: 响应式边界：<768px 单列堆叠
+ */
+
+/* 基础告警项容器 */
+.alertItem {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  background-color: var(--color-background, #fff);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  border: 1px solid var(--color-border, #e8e8e8);
+  margin-bottom: 8px;
+}
+
+.alertItem:hover {
+  background-color: var(--color-hover-bg, #f5f5f5);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.alertItem:active {
+  transform: scale(0.995);
+}
+
+/* 状态标签样式 - 按 C-002 时间分级 */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  min-width: 60px;
+  text-align: center;
+}
+
+/* 紧急状态 - ≤7天 红色 */
+.badgeUrgent {
+  background-color: #fff1f0;
+  color: #cf1322;
+  border: 1px solid #ffccc7;
+}
+
+/* 预警状态 - 8-30天 橙色 */
+.badgeWarning {
+  background-color: #fff7e6;
+  color: #d46b08;
+  border: 1px solid #ffd591;
+}
+
+/* 正常状态 - >30天 灰色 */
+.badgeNormal {
+  background-color: #f5f5f5;
+  color: #8c8c8c;
+  border: 1px solid #d9d9d9;
+}
+
+/* 告警内容区域 */
+.alertContent {
+  flex: 1;
+  margin-left: 12px;
+  min-width: 0;
+}
+
+.alertTitle {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-primary, #262626);
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.alertMeta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+  color: var(--color-text-secondary, #8c8c8c);
+}
+
+.alertExpire {
+  font-weight: 500;
+}
+
+/* 倒计时文字颜色 */
+.expireUrgent {
+  color: #cf1322;
+}
+
+.expireWarning {
+  color: #d46b08;
+}
+
+.expireNormal {
+  color: #8c8c8c;
+}
+
+/* 操作区域 */
+.alertActions {
+  display: flex;
+  align-items: center;
+  margin-left: 12px;
+}
+
+.viewDetail {
+  color: var(--color-primary, #1677ff);
+  font-size: 12px;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.viewDetail:hover {
+  text-decoration: underline;
+}
+
+/* 响应式布局 - C-007: <768px 单列堆叠 */
+@media (max-width: 767px) {
+  .alertItem {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 12px;
+  }
+
+  .alertContent {
+    margin-left: 0;
+    margin-top: 8px;
+    width: 100%;
+  }
+
+  .alertActions {
+    margin-left: 0;
+    margin-top: 8px;
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .alertTitle {
+    font-size: 13px;
+  }
+
+  .alertMeta {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+}
+
+/* 无数据占位状态 */
+.emptyPlaceholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+  color: var(--color-text-placeholder, #bfbfbf);
+  text-align: center;
+}
+
+.emptyIcon {
+  font-size: 48px;
+  margin-bottom: 12px;
+  opacity: 0.5;
+}
+
+.emptyText {
+  font-size: 14px;
+}
+
+/* 加载状态 */
+.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* 高对比度模式支持 - WCAG 2.1 AA */
+@media (forced-colors: active) {
+  .badgeUrgent,
+  .badgeWarning,
+  .badgeNormal {
+    border: 2px solid currentColor;
+  }
+}

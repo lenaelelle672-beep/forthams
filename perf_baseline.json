@@ -1,0 +1,66 @@
+{
+    "small_file_100_nodes": {
+        "time_ms": 12.5,
+        "memory_mb": 8.2,
+        "node_count": 100,
+        "edge_count": 120,
+        "timestamp": "2025-01-15T10:00:00Z",
+        "python_version": "3.10+",
+        "test_file": "tests/fixtures/small_code_fixture.py"
+    },
+    "medium_file_1000_nodes": {
+        "time_ms": 95.3,
+        "memory_mb": 45.1,
+        "node_count": 1000,
+        "edge_count": 1350,
+        "timestamp": "2025-01-15T10:00:00Z",
+        "python_version": "3.10+",
+        "test_file": "tests/fixtures/medium_code_fixture.py"
+    },
+    "large_file_10000_nodes": {
+        "time_ms": 850.0,
+        "memory_mb": 120.0,
+        "node_count": 10000,
+        "edge_count": 14500,
+        "timestamp": "2025-01-15T10:00:00Z",
+        "python_version": "3.10+",
+        "test_file": "tests/fixtures/large_code_fixture.py"
+    },
+    "baseline_metadata": {
+        "environment": {
+            "platform": "linux",
+            "processor": "x86_64",
+            "total_memory_mb": 16384,
+            "test_runner": "pytest"
+        },
+        "performance_targets": {
+            "small_file_max_time_ms": 50,
+            "medium_file_max_time_ms": 200,
+            "large_file_max_time_ms": 500,
+            "max_memory_mb": 150,
+            "min_throughput_improvement": 1.4
+        },
+        "hotspot_methods": [
+            "DeadCodeVisitor.visit_Name",
+            "DeadCodeVisitor._get_node_id_for_name",
+            "DeadCodeVisitor._is_dead_code_candidate",
+            "DeadCodeVisitor._get_current_function_id",
+            "DeadCodeVisitor.get_edges"
+        ],
+        "optimization_phases": {
+            "phase_2_1": "Baseline test framework establishment",
+            "phase_2_2": "Hotspot method identification",
+            "phase_2_3": "Name resolution caching (LRU)",
+            "phase_2_4": "Incremental graph construction",
+            "phase_2_5": "Optimization validation"
+        }
+    },
+    "acceptance_criteria": {
+        "ATB_1_baseline_established": true,
+        "ATB_2_hotspots_identified": false,
+        "ATB_3_cache_implemented": false,
+        "ATB_4_incremental_graph_implemented": false,
+        "ATB_5_functional_tests_passed": false,
+        "ATB_6_performance_improved": false
+    }
+}

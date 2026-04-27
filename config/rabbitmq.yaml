@@ -1,0 +1,87 @@
+# RabbitMQ Configuration for Work Order Approval Notification System
+# SWARM-2025-Q2-P0-003 Iteration 6
+
+rabbitmq:
+  host: "localhost"
+  port: 5672
+  username: "guest"
+  password: "guest"
+  virtual_host: "/"
+  
+  # Connection pool settings
+  pool:
+    size: 10
+    timeout: 30
+  
+  # Heartbeat settings
+  heartbeat: 60
+
+# Exchange configuration
+exchanges:
+  notification:
+    name: "notification.exchange"
+    type: "topic"
+    durable: true
+    
+  dead_letter:
+    name: "notification.dlx"
+    type: "direct"
+    durable: true
+
+# Queue configuration
+queues:
+  approval:
+    name: "notification.approval"
+    durable: true
+    routing_key: "notification.approval.#"
+    arguments:
+      x-dead-letter-exchange: "notification.dlx"
+      x-dead-letter-routing-key: "notification.approval.dlq"
+      
+  approval_dlq:
+    name: "notification.approval.dlq"
+    durable: true
+    routing_key: "notification.approval.dlq"
+    arguments:
+      x-message-ttl: 86400000  # 24 hours retention for failed messages
+
+# Retry configuration
+retry:
+  max_attempts: 3
+  intervals:
+    - 30   # seconds
+    - 60   # seconds
+    - 120  # seconds
+  multiplier: 2.0
+  max_interval: 300
+
+# Consumer configuration
+consumer:
+  approval:
+    prefetch_count: 10
+    auto_ack: false
+    exclusive: false
+    
+# Producer configuration  
+producer:
+  notification:
+    delivery_mode: 2  # Persistent
+    content_type: "application/json"
+    timestamp: true
+    
+# Message timeout
+message:
+  timeout: 10  # seconds
+  
+# Notification templates
+templates:
+  approval_notify:
+    subject: "工单审批通知 - {{ workorder_id }}"
+    channels:
+      - email
+      -站内信
+  rejection_notify:
+    subject: "工单驳回通知 - {{ workorder_id }}"
+    channels:
+      - email
+      -站内信

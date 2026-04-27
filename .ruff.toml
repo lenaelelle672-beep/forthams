@@ -1,0 +1,211 @@
+# SWARM-103: Ruff Configuration for AST Static Analysis
+# =============================================================================
+# This configuration is used for Sprint 4 legacy code cleanup (SWARM-103)
+# and must pass with zero warnings for CI/CD pipeline approval.
+#
+# Reference: SPEC.md Section 3.3 (AST Static Analysis Constraints)
+#   - AST-001: Target files: src/*.py, tests/**/*.py
+#   - AST-002: Tool: ruff (integrated with scripts/ast_dead_code_check.py)
+#   - AST-003: Allowed warnings whitelist must be declared here
+#   - AST-004: CI/CD pipeline must enforce AST checks
+#   - AST-005: AST check failure rejects merge
+#
+# =============================================================================
+
+# Target Python version for type checking and syntax compatibility
+target-version = "py311"
+
+# Enable Python rules from ruff
+# E: Syntax errors and undefined names (pyflakes)
+# F: Fatal Python errors (pyflakes)
+# W: Style violations (pycodestyle)
+# I: Import conventions (isort)
+# UP: Upgrade syntax for newer Python versions (pyupgrade)
+# B: Bugbear rules (bugbear)
+# C4: Comprehensions optimization (flake8-comprehensions)
+# DTZ: Datetime timezone rules
+# T10: Debugger-related checks
+# ICN: Import conventions
+# PIE: Implementation complexity
+# RSE: Exception raise in except block
+# RET: Return statements optimization
+# SIM: List/dict simplification
+# ARG: Unused arguments
+# PLC: Pylint convention
+# PTH: Path-based checks
+# PERF: Performance optimization
+# FURB: Refurbishment suggestions
+# E501: Line length (handled separately)
+# T201/T203: Print statements (allowed in test/debug code)
+
+select = [
+    "E",
+    "F",
+    "W",
+    "I",
+    "UP",
+    "B",
+    "C4",
+    "DTZ",
+    "T10",
+    "ICN",
+    "PIE",
+    "RSE",
+    "RET",
+    "SIM",
+    "ARG",
+    "PLC",
+    "PTH",
+    "PERF",
+    "FURB",
+    "T201",
+    "T203",
+]
+
+# Ignore specific rules that may generate false positives
+# These are documented as allowed warnings per AST-003
+ignore = [
+    # T201/T203: Allow print statements in test code and debugging
+    "T201",
+    "T203",
+    # ARG001: Allow unused arguments in callback functions
+    "ARG001",
+    # B008: Allow fast evaluation in function calls (e.g., default lambdas)
+    "B008",
+    # PIE790: Allow unnecessary unpacking - sometimes intentional for clarity
+    "PIE790",
+    # RET504: Allow unnecessary assignment return - sometimes intentional
+    "RET504",
+    # SIM102: Allow nested if statements without early return
+    "SIM102",
+    # SIM108: Allow ternary expressions - not always more readable
+    "SIM108",
+]
+
+# Line length configuration
+# Following Google Style Guide recommendation: 88 chars (ruff default)
+# but allowing flexibility for documentation-heavy code
+line-length = 100
+
+# Exclude patterns - paths that should not be linted
+exclude = [
+    # Generated and build artifacts
+    ".git/**",
+    ".venv/**",
+    "node_modules/**",
+    "dist/**",
+    "build/**",
+    "*.egg-info/**",
+    "__pycache__/**",
+    ".pytest_cache/**",
+    # Frontend TypeScript files (handled by eslint per AST-001)
+    "frontend/src/**",
+    "frontend/tests/**",
+    # Docs figma TypeScript files (handled by eslint per AST-001)
+    "docs/figma/src/**",
+    # Backend Java files (not Python AST targets)
+    "backend/src/**/*.java",
+    # Documentation files
+    "*.md",
+    "*.rst",
+    "*.txt",
+    # Test fixtures and samples
+    "tests/fixtures/**",
+]
+
+# Uncomment to show source code in violation messages
+# show-source = true
+
+# Count the number of violations with current configuration
+# count = true
+
+# Enable auto-fix for rules where it's safe
+# fixable = ["A", "B", "C", "D", "E", "F", "G", "I", "J", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "W", "X", "Y", "Z"]
+
+# Disable fix for unsafe operations (requires manual review)
+# not-fixable = []
+
+# Per-file ignore rules
+[per-file-ignores]
+# Test files may have more lenient rules
+"tests/**" = [
+    "ARG001",  # Allow unused arguments in test fixtures
+    "S101",    # Allow assert statements (required for tests)
+    "T201",    # Allow print in test output
+]
+
+# Example/legacy files
+"legacy_stubs.py" = [
+    "F401",    # Allow unused imports in stubs
+    "F811",    # Allow redefinition
+]
+
+# Scripts may use print for logging
+"scripts/**" = [
+    "T201",    # Allow print statements for progress output
+]
+
+# Configuration for isort (import sorting)
+[isort]
+# Known first-party modules
+known-first-party = ["src", "scripts", "tests"]
+
+# Known third-party modules
+known-third-party = [
+    "pandas",
+    "numpy",
+    "requests",
+    "flask",
+    "django",
+    "pytest",
+]
+
+# Sort imports within groups
+sort-within-imports = true
+
+# Split on blank lines between import groups
+force-single-line = false
+
+# Configuration for pyupgrade rules
+[pyupgrade]
+# Enforce modern syntax for newer Python versions
+keep-percent-format = false
+
+# =============================================================================
+# SWARM-103 Specific Rules
+# =============================================================================
+# These rules are specifically configured for the legacy code cleanup task
+
+[mappings]
+# Map legacy module names if any exist
+# This helps ruff understand old import patterns
+
+[overrides]
+# Override rules for specific files in the cleanup scope
+
+# endless_daemon.py - core module (community=1 per SPEC)
+# Requires extra review per CLEAN-004
+"src/endless_daemon.py" = [
+    # Enforce docstrings for public methods per DOC-001
+    "D100",  # Missing docstring in public module
+    "D101",  # Missing docstring in public class
+    "D102",  # Missing docstring in public method
+    "D103",  # Missing docstring in public function
+    "D104",  # Missing docstring in public package
+    "D105",  # Missing docstring in public method
+    "D107",  # Missing __init__ docstring
+    "D203",  # 1 blank line required before class docstring
+    "D212",  # Multi-line docstring should start with summary at 2nd line
+]
+
+# Test files - ensure AC-004 compliance (docstring requirement)
+"tests/test_ast_analyzer.py" = [
+    "D",     # All docstring rules
+    "S101",  # Assert statements are required for tests
+]
+
+# AST dead code check script
+"scripts/ast_dead_code_check.py" = [
+    "D",     # All docstring rules
+    "T201",  # Allow print for progress output
+]

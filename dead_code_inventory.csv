@@ -1,0 +1,3 @@
+file_path,line_number,method_name,community,status
+src/endless_daemon.py,380-381,._index_properties,1,待清理
+docs/figma/src/app/components/ui/sonner.tsx,6,Toaster,38,待评估

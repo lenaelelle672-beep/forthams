@@ -1,0 +1,45 @@
+# ================================================================
+# .gsdignore — GSD 引擎扫描盲区配置
+# ================================================================
+# 本文件定义 GSD Localizer 在代码定位阶段应忽略的文件和目录。
+# 这些文件不参与任务生成、代码分析和 AST 图谱构建。
+# 格式与 .gitignore 完全一致。
+# ================================================================
+
+# ── Python 脚手架（非业务代码）──
+scripts/
+tests/*.py
+tests/sprint4/
+tests/benchmark/
+tests/fixtures/
+
+# ── 构建产物与缓存 ──
+graphify-out/
+*.csv
+*.log
+*.out
+checkpoints/
+.aider.*
+
+# ── 独立工具脚本（非业务逻辑）──
+benchmark_deadcode.py
+legacy_stubs.py
+endless_daemon.py
+dead_code_inventory.csv
+
+# ── 杂项临时文件 ──
+perf_baseline.json
+dependency_report.json
+hotspot_report.md
+optimization_report.md
+
+# ── 历史遗留的乱命名目录 ──
+New File: backend/
+Updated File: backend/
+1. Create TenantContext abstraction layer
+2/
+2. Update JwtUtil to extract tenant_id from token
+3. Update JwtAuthenticationFilter to populate TenantContext
+4. Enforce tenant isolation in AssetController
+5. Update AssetService to use TenantContext for queries
+6. Update AssetRepository with tenant-aware methods

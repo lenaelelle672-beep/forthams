@@ -1,0 +1,438 @@
+/* frontend/src/pages/DashboardPage/DashboardPage.module.css */
+
+/**
+ * Dashboard Page Styles — Asset Panorama Operations Dashboard
+ * SPEC: [SWARM-P2-007-FE] Phase 2 Iteration 1
+ *
+ * Three-section responsive grid layout:
+ *   Top    → 4 × stat cards (Total / Active / Idle / Retired)
+ *   Middle → Category pie chart + Depreciation trend line chart
+ *   Bottom → Expiring-asset warning list with auto-scroll
+ *
+ * All colours reference CSS custom properties defined in
+ * `frontend/src/styles/theme.css` for dark/light mode consistency.
+ */
+
+/* ===== Page Container ===== */
+.container {
+  padding: 24px;
+  background-color: var(--bg-primary, #f5f7fa);
+  min-height: calc(100vh - 64px);
+  max-width: 1440px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+/* ===== 12-column Responsive Grid ===== */
+.dashboardGrid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 24px;
+}
+
+/* ===================================================
+ * TOP SECTION — Stat Cards
+ * 4 cards: Total / Active / Idle / Retired
+ * =================================================== */
+.statCardsContainer {
+  grid-column: span 12;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.statCard {
+  background: var(--card-bg, #ffffff);
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: var(--shadow-sm, 0 1px 3px rgba(0, 0, 0, 0.08));
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: default;
+}
+
+.statCard:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md, 0 4px 12px rgba(0, 0, 0, 0.12));
+}
+
+.statHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.statTitle {
+  color: var(--text-secondary, #6b7280);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.statIconWrapper {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.statValue {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--text-primary, #1f2937);
+  line-height: 1.2;
+}
+
+/* Stat-card colour variants — using dedicated CSS vars for icon backgrounds */
+.cardTotal .statIconWrapper {
+  background: var(--blue-50, #eff6ff);
+  color: var(--blue-600, #2563eb);
+}
+
+.cardActive .statIconWrapper {
+  background: var(--green-50, #f0fdf4);
+  color: var(--green-600, #16a34a);
+}
+
+.cardIdle .statIconWrapper {
+  background: var(--orange-50, #fff7ed);
+  color: var(--orange-500, #f97316);
+}
+
+.cardRetired .statIconWrapper {
+  background: var(--red-50, #fef2f2);
+  color: var(--red-500, #ef4444);
+}
+
+/* ===================================================
+ * MIDDLE SECTION — Charts (Pie + Line)
+ * =================================================== */
+.chartsContainer {
+  grid-column: span 12;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+
+.chartCard {
+  background: var(--card-bg, #ffffff);
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: var(--shadow-sm, 0 1px 3px rgba(0, 0, 0, 0.08));
+  display: flex;
+  flex-direction: column;
+  min-height: 450px;
+}
+
+.chartHeader {
+  margin-bottom: 24px;
+}
+
+.chartTitle {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary, #1f2937);
+  line-height: 1.4;
+}
+
+/*
+ * ECharts / Recharts requires an explicit height container
+ * for initial render + resize-based auto-redraw.
+ */
+.chartWrapper {
+  flex: 1;
+  width: 100%;
+  min-height: 350px;
+}
+
+/* ===================================================
+ * BOTTOM SECTION — Warning / Expiring-Asset List
+ * =================================================== */
+.warningSection {
+  grid-column: span 12;
+}
+
+.warningCard {
+  background: var(--card-bg, #ffffff);
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: var(--shadow-sm, 0 1px 3px rgba(0, 0, 0, 0.08));
+}
+
+.warningCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.warningCardTitle {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary, #1f2937);
+}
+
+.warningBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  background: var(--red-50, #fef2f2);
+  color: var(--red-500, #ef4444);
+}
+
+/* Scroll viewport — shows ~10 items, hides overflow */
+.warningListContainer {
+  height: 480px;
+  overflow: hidden;
+  position: relative;
+}
+
+/*
+ * Seamless upward scroll.
+ * The React component should render the list twice (duplicated) so
+ * that translateY(-50%) loops back seamlessly.
+ */
+.warningScrollArea {
+  display: flex;
+  flex-direction: column;
+  animation: warningListScroll 30s linear infinite;
+}
+
+.warningScrollArea:hover {
+  animation-play-state: paused;
+}
+
+@keyframes warningListScroll {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-50%);
+  }
+}
+
+/* Table-like row grid: Asset Name | Department | Expiry Date | Remaining Days | Action */
+.warningListItem {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border-color, #e5e7eb);
+  transition: background-color 0.15s ease;
+}
+
+.warningListItem:hover {
+  background-color: var(--bg-hover, #f9fafb);
+}
+
+.warningListItem:last-child {
+  border-bottom: none;
+}
+
+.warningAssetName {
+  font-weight: 500;
+  color: var(--text-primary, #1f2937);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.warningExpiryDate {
+  color: var(--text-secondary, #6b7280);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Remaining-days colour thresholds */
+.statusCritical {
+  color: var(--error-color, var(--red-500, #ef4444));
+  font-weight: 600;
+}
+
+.statusWarning {
+  color: var(--warning-color, var(--orange-500, #f97316));
+  font-weight: 500;
+}
+
+.statusNormal {
+  color: var(--text-secondary, #6b7280);
+}
+
+/* ===================================================
+ * LOADING STATES — Skeleton / Spinner
+ * =================================================== */
+.skeletonCard {
+  background: linear-gradient(
+    90deg,
+    var(--skeleton-from, #e5e7eb) 25%,
+    var(--skeleton-via, #f3f4f6) 50%,
+    var(--skeleton-from, #e5e7eb) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeletonLoading 1.5s ease-in-out infinite;
+  border-radius: 8px;
+}
+
+@keyframes skeletonLoading {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+/* ===================================================
+ * ERROR STATE — "数据加载失败" fallback
+ * =================================================== */
+.errorState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 24px;
+  color: var(--text-secondary, #6b7280);
+  text-align: center;
+  gap: 12px;
+  grid-column: span 12;
+}
+
+.errorIcon {
+  font-size: 48px;
+  color: var(--error-color, var(--red-500, #ef4444));
+  margin-bottom: 8px;
+}
+
+.errorTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary, #1f2937);
+}
+
+.errorMessage {
+  font-size: 14px;
+  color: var(--text-secondary, #6b7280);
+}
+
+.retryButton {
+  margin-top: 8px;
+  padding: 8px 20px;
+  border: 1px solid var(--border-color, #d1d5db);
+  border-radius: 6px;
+  background: var(--card-bg, #ffffff);
+  color: var(--text-primary, #1f2937);
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.retryButton:hover {
+  background: var(--bg-hover, #f9fafb);
+  border-color: var(--blue-400, #60a5fa);
+}
+
+/* ===================================================
+ * EMPTY STATE — Zero-data fallback
+ * =================================================== */
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 24px;
+  color: var(--text-secondary, #6b7280);
+  text-align: center;
+  gap: 12px;
+}
+
+.emptyIcon {
+  font-size: 48px;
+  opacity: 0.4;
+  margin-bottom: 8px;
+}
+
+.emptyText {
+  font-size: 14px;
+}
+
+/* ===================================================
+ * RESPONSIVE BREAKPOINTS
+ * =================================================== */
+
+/* Tablet — stack charts, 2-column stat cards */
+@media (max-width: 1024px) {
+  .chartsContainer {
+    grid-template-columns: 1fr;
+  }
+
+  .statCardsContainer {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .warningListItem {
+    grid-template-columns: 2fr 1fr 1fr auto;
+  }
+}
+
+/* Mobile — single-column everything */
+@media (max-width: 640px) {
+  .container {
+    padding: 16px;
+  }
+
+  .dashboardGrid {
+    gap: 16px;
+  }
+
+  .statCardsContainer {
+    grid-template-columns: 1fr;
+  }
+
+  .chartsContainer {
+    grid-template-columns: 1fr;
+  }
+
+  .chartCard {
+    min-height: 350px;
+    padding: 16px;
+  }
+
+  .chartWrapper {
+    min-height: 280px;
+  }
+
+  .warningListItem {
+    grid-template-columns: 2fr 1fr auto;
+    gap: 8px;
+    padding: 12px 8px;
+  }
+
+  /* Hide department column on mobile */
+  .hideMobile {
+    display: none;
+  }
+
+  .statValue {
+    font-size: 28px;
+  }
+
+  .statCard {
+    padding: 16px;
+  }
+
+  .warningListContainer {
+    height: 360px;
+  }
+}

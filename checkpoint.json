@@ -1,0 +1,42 @@
+{
+  "task_id": "SWARM-2025-Q2-P1-003",
+  "task_name": "多租户数据隔离网关",
+  "deliverables": [
+    "migrations/versions/xxx_add_depreciation_task_log_table.py",
+    "frontend/src/pages/DashboardPage/components/ChartContainer/index.tsx",
+    "frontend/src/pages/DashboardPage/components/AssetCategoryChart/AssetCategoryChart.module.css",
+    "frontend/src/pages/WorkOrder/types/workOrder.ts",
+    "tests/e2e/test_depreciation_report.spec.ts"
+  ],
+  "ac_status": {
+    "total": 4,
+    "passed": 1,
+    "pass_rate": "25%"
+  },
+  "critical_blockers": [
+    {
+      "ac_id": "AC-001",
+      "ac_id": "AC-004",
+      "severity": "CRITICAL",
+      "type": "ModuleNotFoundError",
+      "module": "derState",
+      "description": "单元测试失败，疑似 import 链断裂",
+      "suggestion": "检查 migration/types 文件是否导致循环导入或缺失依赖"
+    }
+  ],
+  "medium_issues": [
+    {
+      "ac_id": "AC-003",
+      "severity": "MEDIUM",
+      "type": "Missing docstring",
+      "count": 4,
+      "files": ["endless_daemon.py:__init__"],
+      "suggestion": "为所有修改的函数添加 docstring"
+    }
+  ],
+  "next_attack_vectors": [
+    "AC-001 和 AC-004 错误同源 (derState + ModuleNotFoundError)",
+    "AC-002 静态分析通过 → 语法正确，错误集中在运行时/导入层面",
+    "docstring 问题可独立于主路径并行修复"
+  ]
+}

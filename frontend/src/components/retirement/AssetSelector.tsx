@@ -1,0 +1,309 @@
+/**
+ * AssetSelector Component
+ * 
+ * Asset selection component for retirement application form.
+ * Provides searchable dropdown to select assets eligible for retirement.
+ * 
+ * @description
+ * This component allows users to select an asset from a filtered list
+ * of assets that are in IN_USE status and eligible for retirement.
+ * 
+ * @example
+ * ```tsx
+ * <AssetSelector
+ *   value={selectedAssetId}
+ *   onChange={setSelectedAssetId}
+ *   error={errors.assetId}
+ * />
+ * ```
+ * 
+ * @module retirement/components
+ */
+
+import React, { useState, useMemo, useCallback } from 'react';
+import { ChevronDown, Search, X } from 'lucide-react';
+import { useAssets } from '@/hooks/useAssetById';
+import { Asset } from '@/types/asset.types';
+import { Spinner } from '@/components/ui/Spinner';
+
+export interface AssetSelectorProps {
+  /** Currently selected asset ID */
+  value: string | null;
+  /** Callback when asset selection changes */
+  onChange: (assetId: string | null) => void;
+  /** Error message to display */
+  error?: string;
+  /** Whether the selector is disabled */
+  disabled?: boolean;
+  /** Placeholder text */
+  placeholder?: string;
+  /** Additional CSS classes */
+  className?: string;
+}
+
+/**
+ * Asset option type for internal use
+ */
+interface AssetOption {
+  id: string;
+  assetCode: string;
+  name: string;
+  categoryName: string;
+  location: string;
+  status: Asset['status'];
+}
+
+/**
+ * AssetSelector Component
+ * 
+ * Provides a searchable dropdown for selecting assets eligible for retirement.
+ * Only assets with IN_USE status are shown.
+ * 
+ * @param props - Component props
+ * @returns Asset selector JSX element
+ */
+export const AssetSelector: React.FC<AssetSelectorProps> = ({
+  value,
+  onChange,
+  error,
+  disabled = false,
+  placeholder = '请选择要报废的资产',
+  className = '',
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  
+  // Fetch all assets
+  const { data: assets, isLoading, error: fetchError } = useAssets();
+  
+  // Filter assets to show only IN_USE status (BC-003)
+  const eligibleAssets = useMemo(() => {
+    if (!assets) return [];
+    return assets.filter((asset) => asset.status === 'IN_USE');
+  }, [assets]);
+  
+  // Filter by search term
+  const filteredAssets = useMemo(() => {
+    if (!searchTerm.trim()) return eligibleAssets;
+    
+    const term = searchTerm.toLowerCase();
+    return eligibleAssets.filter(
+      (asset) =>
+        asset.assetCode.toLowerCase().includes(term) ||
+        asset.name.toLowerCase().includes(term) ||
+        (asset.categoryName && asset.categoryName.toLowerCase().includes(term))
+    );
+  }, [eligibleAssets, searchTerm]);
+  
+  // Find selected asset details
+  const selectedAsset = useMemo(() => {
+    if (!value || !assets) return null;
+    return assets.find((asset) => asset.id === value);
+  }, [value, assets]);
+  
+  /**
+   * Handle selection of an asset
+   * @param asset - Selected asset object
+   */
+  const handleSelect = useCallback((asset: Asset) => {
+    onChange(asset.id);
+    setIsOpen(false);
+    setSearchTerm('');
+  }, [onChange]);
+  
+  /**
+   * Clear the current selection
+   */
+  const handleClear = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    onChange(null);
+  }, [onChange]);
+  
+  /**
+   * Toggle dropdown open/close state
+   */
+  const toggleDropdown = useCallback(() => {
+    if (!disabled) {
+      setIsOpen((prev) => !prev);
+      setSearchTerm('');
+    }
+  }, [disabled]);
+  
+  /**
+   * Handle click outside to close dropdown
+   */
+  const handleBlur = useCallback((e: React.FocusEvent) => {
+    // Delay to allow click events on dropdown items
+    setTimeout(() => {
+      setIsOpen(false);
+    }, 200);
+  }, []);
+  
+  /**
+   * Render asset option in dropdown
+   */
+  const renderAssetOption = (asset: Asset) => (
+    <div
+      key={asset.id}
+      className="px-3 py-2 cursor-pointer hover:bg-blue-50 border-b border-gray-100 last:border-b-0 transition-colors"
+      onClick={() => handleSelect(asset)}
+      role="option"
+      aria-selected={value === asset.id}
+    >
+      <div className="flex items-center justify-between">
+        <div>
+          <div className="font-medium text-gray-900">{asset.name}</div>
+          <div className="text-sm text-gray-500">
+            {asset.assetCode}
+            {asset.categoryName && ` · ${asset.categoryName}`}
+          </div>
+        </div>
+        <span className="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded">
+          {asset.status}
+        </span>
+      </div>
+      {asset.location && (
+        <div className="text-xs text-gray-400 mt-1">{asset.location}</div>
+      )}
+    </div>
+  );
+  
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className={`relative ${className}`}>
+        <div className="h-10 px-3 flex items-center border border-gray-300 rounded-md bg-gray-50">
+          <Spinner size="sm" />
+          <span className="ml-2 text-gray-500 text-sm">加载资产中...</span>
+        </div>
+      </div>
+    );
+  }
+  
+  // Error state
+  if (fetchError) {
+    return (
+      <div className={`relative ${className}`}>
+        <div className="h-10 px-3 flex items-center border border-red-300 rounded-md bg-red-50">
+          <span className="text-red-600 text-sm">加载资产失败，请重试</span>
+        </div>
+      </div>
+    );
+  }
+  
+  // Empty eligible assets state
+  if (eligibleAssets.length === 0) {
+    return (
+      <div className={`relative ${className}`}>
+        <div className="h-10 px-3 flex items-center border border-gray-300 rounded-md bg-gray-50">
+          <span className="text-gray-500 text-sm">暂无可报废的资产</span>
+        </div>
+      </div>
+    );
+  }
+  
+  return (
+    <div className={`relative ${className}`}>
+      {/* Selector trigger */}
+      <button
+        type="button"
+        onClick={toggleDropdown}
+        onBlur={handleBlur}
+        disabled={disabled}
+        className={`
+          w-full h-10 px-3 flex items-center justify-between
+          border rounded-md bg-white text-left
+          transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500
+          ${disabled ? 'bg-gray-100 cursor-not-allowed opacity-60' : 'hover:border-gray-400'}
+          ${error ? 'border-red-500' : 'border-gray-300'}
+          ${isOpen ? 'ring-2 ring-blue-500 border-blue-500' : ''}
+        `}
+        aria-haspopup="listbox"
+        aria-expanded={isOpen}
+      >
+        <div className="flex-1 min-w-0">
+          {selectedAsset ? (
+            <div className="flex items-center justify-between">
+              <div className="min-w-0">
+                <div className="font-medium text-gray-900 truncate">
+                  {selectedAsset.name}
+                </div>
+                <div className="text-xs text-gray-500 truncate">
+                  {selectedAsset.assetCode}
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={handleClear}
+                className="ml-2 p-1 hover:bg-gray-200 rounded-full"
+                tabIndex={-1}
+              >
+                <X className="w-4 h-4 text-gray-500" />
+              </button>
+            </div>
+          ) : (
+            <span className="text-gray-400">{placeholder}</span>
+          )}
+        </div>
+        <ChevronDown
+          className={`w-4 h-4 text-gray-400 ml-2 transition-transform ${
+            isOpen ? 'rotate-180' : ''
+          }`}
+        />
+      </button>
+      
+      {/* Dropdown */}
+      {isOpen && (
+        <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg">
+          {/* Search input */}
+          <div className="p-2 border-b border-gray-200">
+            <div className="relative">
+              <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="搜索资产编码或名称..."
+                className="w-full pl-8 pr-3 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                autoFocus
+              />
+            </div>
+          </div>
+          
+          {/* Options list */}
+          <div
+            className="max-h-60 overflow-y-auto"
+            role="listbox"
+          >
+            {filteredAssets.length > 0 ? (
+              filteredAssets.map(renderAssetOption)
+            ) : (
+              <div className="px-3 py-4 text-center text-gray-500 text-sm">
+                未找到匹配的资产
+              </div>
+            )}
+          </div>
+          
+          {/* Footer with count */}
+          <div className="px-3 py-2 border-t border-gray-200 bg-gray-50 text-xs text-gray-500">
+            共 {filteredAssets.length} 项可选资产
+          </div>
+        </div>
+      )}
+      
+      {/* Error message */}
+      {error && (
+        <p className="mt-1 text-sm text-red-600">{error}</p>
+      )}
+      
+      {/* Helper text */}
+      {!error && (
+        <p className="mt-1 text-sm text-gray-500">
+          仅显示状态为“在用”的资产
+        </p>
+      )}
+    </div>
+  );
+};
+
+export default AssetSelector;
