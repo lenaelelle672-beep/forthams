@@ -1,27 +1,45 @@
 package com.ams.controller;
 
-import com.ams.common.annotation.Auditable;
+import com.ams.common.Result;
+import com.ams.dto.AssetCreateDTO;
+import com.ams.dto.AssetQueryDTO;
+import com.ams.dto.AssetUpdateDTO;
+import com.ams.entity.Asset;
+import com.ams.service.AssetService;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/assets")
+@RequiredArgsConstructor
 public class AssetController {
 
-    @Auditable(action = "CREATE")
+    private final AssetService assetService;
+
+    @GetMapping("/list")
+    public Result<Page<Asset>> list(AssetQueryDTO queryDTO) {
+        return Result.success(assetService.queryAssets(queryDTO));
+    }
+
+    @GetMapping("/{id}")
+    public Result<Asset> getById(@PathVariable Long id) {
+        return Result.success(assetService.getAssetById(id));
+    }
+
     @PostMapping
-    public void createAsset(@RequestBody String asset) {
-        // Logic to create an asset
+    public Result<Asset> create(@RequestBody AssetCreateDTO createDTO) {
+        return Result.success(assetService.createAsset(createDTO));
     }
 
-    @Auditable(action = "UPDATE")
     @PutMapping("/{id}")
-    public void updateAsset(@PathVariable String id, @RequestBody String asset) {
-        // Logic to update an asset
+    public Result<Asset> update(@PathVariable Long id, @RequestBody AssetUpdateDTO updateDTO) {
+        return Result.success(assetService.updateAsset(id, updateDTO));
     }
 
-    @Auditable(action = "DELETE")
     @DeleteMapping("/{id}")
-    public void deleteAsset(@PathVariable String id) {
-        // Logic to delete an asset
+    public Result<Void> delete(@PathVariable Long id) {
+        assetService.deleteAsset(id);
+        return Result.success();
     }
 }

@@ -1,56 +1,56 @@
 package com.ams.controller;
 
+import com.ams.common.Result;
 import com.ams.entity.Location;
 import com.ams.service.LocationService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/locations")
+@RequiredArgsConstructor
 public class LocationController {
 
-    @Autowired
-    private LocationService locationService;
+    private final LocationService locationService;
+
+    @GetMapping("/list")
+    public Result<List<Location>> list() {
+        return Result.success(locationService.findRootLocations());
+    }
 
     @GetMapping("/{id}")
-    public Location findById(@PathVariable Long id) {
-        return locationService.findById(id);
+    public Result<Location> getById(@PathVariable Long id) {
+        return Result.success(locationService.findById(id));
     }
 
-    @PostMapping
-    public void insert(@RequestBody Location location) {
-        locationService.insert(location);
-    }
-
-    @PutMapping
-    public void update(@RequestBody Location location) {
-        locationService.update(location);
-    }
-
-    @DeleteMapping("/{id}")
-    public void deleteById(@PathVariable Long id) {
-        locationService.deleteById(id);
-    }
-
-    @GetMapping("/hierarchy/{id}")
-    public List<Location> findLocationHierarchy(@PathVariable Long id) {
-        return locationService.findLocationHierarchy(id);
+    @GetMapping("/{id}/children")
+    public Result<List<Location>> children(@PathVariable Long id) {
+        return Result.success(locationService.findChildrenByParentId(id));
     }
 
     @GetMapping("/root")
-    public List<Location> findRootLocations() {
-        return locationService.findRootLocations();
+    public Result<List<Location>> root() {
+        return Result.success(locationService.findRootLocations());
     }
 
-    @GetMapping("/children/{parentId}")
-    public List<Location> findChildrenByParentId(@PathVariable Long parentId) {
-        return locationService.findChildrenByParentId(parentId);
+    @PostMapping
+    public Result<Void> create(@RequestBody Location location) {
+        locationService.insert(location);
+        return Result.success();
     }
 
-    @GetMapping("/descendants/{id}")
-    public List<Location> findDescendants(@PathVariable Long id) {
-        return locationService.findDescendants(id);
+    @PutMapping("/{id}")
+    public Result<Void> update(@PathVariable Long id, @RequestBody Location location) {
+        location.setId(id);
+        locationService.update(location);
+        return Result.success();
+    }
+
+    @DeleteMapping("/{id}")
+    public Result<Void> delete(@PathVariable Long id) {
+        locationService.deleteById(id);
+        return Result.success();
     }
 }
