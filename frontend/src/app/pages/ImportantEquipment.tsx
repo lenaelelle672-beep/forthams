@@ -39,7 +39,7 @@ export function ImportantEquipment() {
         maintenanceService.list(),
         maintenanceService.getUpcoming(),
       ]);
-      const recordList = records || [];
+      const recordList = (Array.isArray(records) ? records : (records as any)?.records) || [];
       setMaintenanceRecords(recordList);
       setEquipment((recordList || []).map((item: any) => ({
         id: item.equipmentId || item.assetId || item.id,

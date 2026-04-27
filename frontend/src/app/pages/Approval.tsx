@@ -15,8 +15,8 @@ export function Approval() {
     try {
       setLoading(true);
       setError(null);
-      const result = await approvalService.list();
-      setApprovals(result || []);
+      const result = await approvalService.list() as any;
+      setApprovals(Array.isArray(result) ? result : result?.records || []);
     } catch (err) {
       console.error('Failed to load approvals:', err);
       setError('审批数据加载失败');

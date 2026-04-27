@@ -16,7 +16,7 @@ export function IdleAssets() {
       setLoading(true);
       setError(null);
       const result = await idleAssetService.list();
-      const list = result || [];
+      const list = (Array.isArray(result) ? result : (result as any)?.records) || [];
       setIdleAssets(list);
       setAnnouncements(
         list
