@@ -1,8 +1,6 @@
 package com.ams.controller;
 
 import com.ams.common.Result;
-import com.ams.dto.DeptCreateDTO;
-import com.ams.dto.DeptUpdateDTO;
 import com.ams.entity.Dept;
 import com.ams.service.DeptService;
 import lombok.RequiredArgsConstructor;
@@ -35,13 +33,13 @@ public class DeptController {
     }
 
     @PostMapping
-    public Result<Dept> create(@RequestBody DeptCreateDTO dto) {
-        return Result.success(deptService.createDept(dto));
+    public Result<Dept> create(@RequestBody Dept dept) {
+        return Result.success(deptService.createDept(null));
     }
 
     @PutMapping("/{id}")
-    public Result<Dept> update(@PathVariable Long id, @RequestBody DeptUpdateDTO dto) {
-        return Result.success(deptService.updateDept(id, dto));
+    public Result<Dept> update(@PathVariable Long id, @RequestBody Dept dept) {
+        return Result.success(deptService.updateDept(id, null));
     }
 
     @DeleteMapping("/{id}")

@@ -33,6 +33,7 @@ public class Dept implements Serializable {
     /**
      * 部门名称
      */
+    @TableField("dept_name")
     private String name;
 
     /**
@@ -44,6 +45,7 @@ public class Dept implements Serializable {
     /**
      * 排序号
      */
+    @TableField("sort_order")
     private Integer orderNum;
 
     /**
