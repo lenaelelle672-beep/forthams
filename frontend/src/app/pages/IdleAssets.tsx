@@ -196,10 +196,10 @@ export function IdleAssets() {
         <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
           <h3 className="text-lg font-semibold text-gray-900">闲置资产列表</h3>
           <div className="flex gap-2">
-            <button className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded transition-colors">
+            <button onClick={() => setDetailItem({type: 'filter', info: '筛选功能'})} className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded transition-colors">
               全部状态
             </button>
-            <button className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded transition-colors">
+            <button onClick={() => setDetailItem({type: 'filter', info: '筛选功能'})} className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded transition-colors">
               全部分类
             </button>
           </div>

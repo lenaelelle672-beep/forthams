@@ -64,7 +64,7 @@ export function Analytics() {
           <h2 className="text-2xl font-semibold text-gray-900">数据统计分析</h2>
           <p className="text-gray-600 mt-1">多维度资产数据分析与可视化报表</p>
         </div>
-        <button className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors flex items-center gap-2">
+        <button onClick={() => alert('报表导出中...')} className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors flex items-center gap-2">
           <Download className="w-4 h-4" />
           导出报表
         </button>

@@ -314,12 +314,12 @@ export function Approval() {
                       <td className="px-6 py-4 text-sm">
                         <div className="flex gap-2">
                           {order.status === '待派工' && (
-                            <button className="px-3 py-1 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded transition-colors">
+                            <button onClick={() => alert('派工功能：请先创建工单数据')} className="px-3 py-1 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded transition-colors">
                               派工
                             </button>
                           )}
                           {order.status === '处理中' && (
-                            <button className="px-3 py-1 text-xs font-medium text-white bg-green-600 hover:bg-green-700 rounded transition-colors">
+                            <button onClick={() => alert('完成功能：请先创建工单数据')} className="px-3 py-1 text-xs font-medium text-white bg-green-600 hover:bg-green-700 rounded transition-colors">
                               完成
                             </button>
                           )}

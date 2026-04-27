@@ -16,6 +16,7 @@ const usageTrend = [
 export function ImportantEquipment() {
   const [selectedEquipment, setSelectedEquipment] = useState<string | null>(null);
   const [detailItem, setDetailItem] = useState<any | null>(null);
+
   const [showMaintenanceModal, setShowMaintenanceModal] = useState(false);
   const [equipment, setEquipment] = useState<any[]>([]);
   const [maintenanceRecords, setMaintenanceRecords] = useState<any[]>([]);
@@ -169,10 +170,10 @@ export function ImportantEquipment() {
                   <p className="text-sm text-gray-600 mt-1">{alert.message}</p>
                 </div>
                 <div className="flex gap-2">
-                  <button className="px-3 py-1.5 text-sm font-medium text-blue-700 bg-blue-100 hover:bg-blue-200 rounded transition-colors">
+                  <button onClick={() => setDetailItem(alert)} className="px-3 py-1.5 text-sm font-medium text-blue-700 bg-blue-100 hover:bg-blue-200 rounded transition-colors">
                     查看详情
                   </button>
-                  <button className="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded transition-colors">
+                  <button onClick={() => { setMaintenanceForm({...maintenanceForm, assetId: alert.id || alert.assetId}); setShowMaintenanceModal(true); }} className="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded transition-colors">
                     发起保养
                   </button>
                 </div>

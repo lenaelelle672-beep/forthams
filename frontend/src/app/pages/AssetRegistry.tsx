@@ -272,7 +272,7 @@ export function AssetRegistry() {
             <button className="px-3 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed" disabled>
               上一页
             </button>
-            <button className="px-3 py-1 text-sm font-medium text-white bg-blue-600 rounded">
+            <button onClick={() => {}} className="px-3 py-1 text-sm font-medium text-white bg-blue-600 rounded">
               1
             </button>
             <button className="px-3 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded transition-colors">

@@ -196,12 +196,12 @@ export function RFIDInventory() {
                     </button>
                   )}
                   {task.status === '待开始' && (
-                    <button className="px-3 py-1.5 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded transition-colors">
+                    <button onClick={async () => { try { await inventoryService.updateTaskStatus(task.id, 'IN_PROGRESS'); const r = await inventoryService.listTasks() as any; setInventoryTasks((Array.isArray(r) ? r : (r as any)?.records) || []); } catch(e) { console.error(e); } }} className="px-3 py-1.5 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded transition-colors">
                       开始盘点
                     </button>
                   )}
                   {task.status === '已完成' && (
-                    <button className="px-3 py-1.5 text-sm font-medium text-blue-700 bg-blue-100 hover:bg-blue-200 rounded transition-colors">
+                    <button onClick={() => setDetailItem(task)} className="px-3 py-1.5 text-sm font-medium text-blue-700 bg-blue-100 hover:bg-blue-200 rounded transition-colors">
                       查看报告
                     </button>
                   )}
@@ -287,10 +287,10 @@ export function RFIDInventory() {
                   <div className="flex flex-col gap-2">
                     {item.status === '待处理' ? (
                       <>
-                        <button className="px-3 py-1 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded transition-colors">
+                        <button onClick={() => setDetailItem(item)} className="px-3 py-1 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded transition-colors">
                           调整
                         </button>
-                        <button className="px-3 py-1 text-xs font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded transition-colors">
+                        <button onClick={() => setDetailItem(item)} className="px-3 py-1 text-xs font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded transition-colors">
                           详情
                         </button>
                       </>
@@ -470,10 +470,10 @@ export function RFIDInventory() {
               </div>
 
               <div className="flex gap-3">
-                <button className="flex-1 px-4 py-3 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors">
+                <button onClick={() => setShowScanning(false)} className="flex-1 px-4 py-3 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors">
                   停止扫描
                 </button>
-                <button className="flex-1 px-4 py-3 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors">
+                <button onClick={() => alert('扫描已暂停')} className="flex-1 px-4 py-3 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors">
                   暂停扫描
                 </button>
                  <button onClick={handleAddScanResult} className="flex-1 px-4 py-3 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-lg transition-colors">

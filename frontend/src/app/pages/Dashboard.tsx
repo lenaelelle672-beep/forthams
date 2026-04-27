@@ -94,6 +94,8 @@ function formatDateLabel(value: string) {
   }).format(date);
 }
 
+import { approvalService } from '../services/approvalService';
+
 export function Dashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [valueTrends, setValueTrends] = useState<AssetValueTrend[]>([]);
@@ -347,10 +349,10 @@ export function Dashboard() {
                   )}
                 </div>
                 <div className="flex gap-2 mt-3">
-                  <button className="flex-1 px-3 py-1.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded transition-colors">
+                  <button onClick={() => handleDashApprove(approval.id, true)} className="flex-1 px-3 py-1.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded transition-colors">
                     批准
                   </button>
-                  <button className="flex-1 px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded transition-colors">
+                  <button onClick={() => handleDashApprove(approval.id, false)} className="flex-1 px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded transition-colors">
                     驳回
                   </button>
                 </div>

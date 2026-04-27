@@ -5,6 +5,17 @@ import { compensationService } from "../services/compensationService";
 
 export function Compensation() {
   const [detailItem, setDetailItem] = useState<any | null>(null);
+
+  const handleCompAction = async (id: any, action: string) => {
+    try {
+      await compensationService.updateStatus(id, action === 'approve' ? 'APPROVED' : 'REJECTED');
+      const result = await compensationService.list() as any;
+      const list = (Array.isArray(result) ? result : (result as any)?.records) || [];
+      setCompensations(list);
+    } catch (err) {
+      console.error('Failed:', err);
+    }
+  };
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedType, setSelectedType] = useState('全部类型');
   const [compensations, setCompensations] = useState<any[]>([]);
@@ -281,15 +292,15 @@ export function Compensation() {
                     <div className="flex gap-2">
                       {comp.status === '待审批' && (
                         <>
-                          <button className="px-3 py-1 text-xs font-medium text-white bg-green-600 hover:bg-green-700 rounded transition-colors">
+                          <button onClick={() => handleCompAction(comp.id, 'approve')} className="px-3 py-1 text-xs font-medium text-white bg-green-600 hover:bg-green-700 rounded transition-colors">
                             批准
                           </button>
-                          <button className="px-3 py-1 text-xs font-medium text-white bg-red-600 hover:bg-red-700 rounded transition-colors">
+                          <button onClick={() => handleCompAction(comp.id, 'reject')} className="px-3 py-1 text-xs font-medium text-white bg-red-600 hover:bg-red-700 rounded transition-colors">
                             驳回
                           </button>
                         </>
                       )}
-                      <button className="px-3 py-1 text-xs font-medium text-blue-700 bg-blue-100 hover:bg-blue-200 rounded transition-colors">
+                      <button onClick={() => setDetailItem(comp)} className="px-3 py-1 text-xs font-medium text-blue-700 bg-blue-100 hover:bg-blue-200 rounded transition-colors">
                         详情
                       </button>
                     </div>
