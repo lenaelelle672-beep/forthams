@@ -1,44 +1,34 @@
 package com.ams.dto;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.Data;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Data
 public class AssetUpdateDTO {
-
-    @NotBlank(message = "资产名称不能为空")
+    @JsonAlias({"name", "assetName"})
     private String assetName;
-
-    @NotNull(message = "资产分类不能为空")
+    @JsonAlias({"category", "categoryId"})
     private Long categoryId;
-
     private String model;
     private String brand;
     private String supplier;
     private String serialNo;
-
+    @JsonAlias({"value", "originalValue"})
     private BigDecimal originalValue;
     private BigDecimal currentValue;
     private LocalDate purchaseDate;
     private Integer warrantyPeriod;
     private BigDecimal depreciationRate;
-
-    @NotBlank(message = "资产状态不能为空")
     private String status;
-
-    @NotNull(message = "所属部门不能为空")
+    @JsonAlias({"department", "deptId"})
     private Long deptId;
+    @JsonAlias({"user", "userId"})
     private Long userId;
     private String location;
-
     private String rfidTag;
     private Integer isImportant;
-
     private String description;
     private String remark;
-
 }

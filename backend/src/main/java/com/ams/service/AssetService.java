@@ -58,12 +58,13 @@ public class AssetService {
 
     @Transactional(rollbackFor = Exception.class)
     public Asset createAsset(AssetCreateDTO createDTO) {
-        Asset existingAsset = assetMapper.selectOne(
-            new LambdaQueryWrapper<Asset>().eq(Asset::getAssetNo, createDTO.getAssetNo())
-        );
-
-        if (existingAsset != null) {
-            throw new BusinessException("资产编号已存在");
+        if (createDTO.getAssetNo() != null && !createDTO.getAssetNo().isEmpty()) {
+            Asset existingAsset = assetMapper.selectOne(
+                new LambdaQueryWrapper<Asset>().eq(Asset::getAssetNo, createDTO.getAssetNo())
+            );
+            if (existingAsset != null) {
+                throw new BusinessException("资产编号已存在");
+            }
         }
 
         Asset asset = new Asset();
