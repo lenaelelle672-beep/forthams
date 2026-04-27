@@ -1,20 +1,29 @@
 package com.ams.entity;
 
-import cn.hutool.core.bean.BeanUtil;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
+import java.time.LocalDateTime;
 
 @Data
 @TableName("vendor")
 public class Vendor {
-    @TableId
+    @TableId(type = IdType.AUTO)
     private Long id;
+    @TableField("vendor_name")
     private String name;
-    private String contactInfo;
-    private Long vendor_id; // Added for multi-key association
-
-    public boolean equals(Vendor other) {
-        return this.name.equals(other.getName()) && this.contactInfo.equals(other.getContactInfo());
-    }
+    private String vendorCode;
+    @TableField("contact_person")
+    private String contactPerson;
+    @TableField("contact_phone")
+    private String contactPhone;
+    @TableField("contact_email")
+    private String contactEmail;
+    private String address;
+    private Integer status;
+    private LocalDateTime createTime;
+    private LocalDateTime updateTime;
+    private Integer deleted;
 }

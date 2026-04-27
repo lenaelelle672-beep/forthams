@@ -1,18 +1,22 @@
 package com.ams.service;
 
-import cn.hutool.core.bean.BeanUtil;
 import com.ams.common.exception.BusinessException;
 import com.ams.entity.Vendor;
 import com.ams.mapper.VendorMapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class VendorService {
-
     private final VendorMapper vendorMapper;
+
+    public List<Vendor> list() {
+        return vendorMapper.selectList(new LambdaQueryWrapper<Vendor>());
+    }
 
     public Vendor getVendorById(Long id) {
         Vendor vendor = vendorMapper.selectById(id);
@@ -24,20 +28,15 @@ public class VendorService {
 
     @Transactional(rollbackFor = Exception.class)
     public Vendor createVendor(Vendor vendor) {
-        // Check for duplicate entries
-        if (vendorMapper.isDuplicateVendor(vendor)) {
-            throw new BusinessException("供应商已存在，防止重复录入");
-        }
         vendorMapper.insert(vendor);
         return vendor;
     }
 
     @Transactional(rollbackFor = Exception.class)
     public Vendor updateVendor(Long id, Vendor updatedVendor) {
-        Vendor existingVendor = getVendorById(id);
-        BeanUtil.copyProperties(updatedVendor, existingVendor, "id", "vendor_id");
-        vendorMapper.updateById(existingVendor);
-        return existingVendor;
+        updatedVendor.setId(id);
+        vendorMapper.updateById(updatedVendor);
+        return updatedVendor;
     }
 
     @Transactional(rollbackFor = Exception.class)

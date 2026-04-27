@@ -42,3 +42,15 @@ public class ResourceController {
 - NEVER generate duplicate class definitions
 - NEVER delete existing imports
 - NEVER overwrite: WorkOrderDTO.java, application.yml, pom.xml
+
+
+## IMPORTANT: @TableField vs Hand-written SQL
+@TableField("column_name") only affects MyBatis-Plus auto-generated methods
+(selectList, selectById, insert, etc.). It does NOT affect @Select/@Insert/@Update
+annotations with hand-written SQL. When writing @Select SQL, you MUST use the
+actual DB column name (e.g. location_name, dept_name, sort_order) and alias it
+back to the Java field name: SELECT location_name AS name FROM location.
+
+Column mapping reference:
+- Dept: name->dept_name, orderNum->sort_order
+- Location: name->location_name
