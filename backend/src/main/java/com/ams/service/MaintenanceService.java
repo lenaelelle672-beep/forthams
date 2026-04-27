@@ -48,6 +48,9 @@ public class MaintenanceService {
     public MaintenanceRecord createRecord(MaintenanceCreateDTO createDTO) {
         MaintenanceRecord record = new MaintenanceRecord();
         BeanUtil.copyProperties(createDTO, record);
+        if (record.getAssetId() == null) record.setAssetId(0L);
+        if (record.getContent() == null) record.setContent("");
+        if (record.getMaintenanceDate() == null) record.setMaintenanceDate(java.time.LocalDate.now());
         maintenanceRecordMapper.insert(record);
         return record;
     }
