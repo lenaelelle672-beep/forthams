@@ -24,7 +24,7 @@ export function Compensation() {
       setLoading(true);
       setError(null);
       const result = await compensationService.list();
-      setCompensations(result || []);
+      setCompensations(Array.isArray(result) ? result : (result as any)?.records || []);
     } catch (err) {
       console.error('Failed to load compensation data:', err);
       setError('赔偿数据加载失败');

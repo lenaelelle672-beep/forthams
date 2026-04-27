@@ -21,9 +21,9 @@ export function Settings() {
         roleService.list(),
         deptService.getAll(),
       ]);
-      setUsers(userList || []);
-      setRoles(roleList || []);
-      setDepts(deptList || []);
+      setUsers(Array.isArray(userList) ? userList : (userList as any)?.records || []);
+      setRoles(Array.isArray(roleList) ? roleList : (roleList as any)?.records || []);
+      setDepts(Array.isArray(deptList) ? deptList : (deptList as any)?.records || []);
     } catch (err) {
       console.error('Failed to load settings data:', err);
       setError('设置数据加载失败');
