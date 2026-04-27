@@ -29,4 +29,14 @@ public class ApprovalController {
             @RequestParam(defaultValue = "10") Integer pageSize) {
         return Result.success(approvalService.queryProcesses(page, pageSize, "PENDING", null));
     }
+
+    @GetMapping("/pending/count")
+    public Result<?> pendingCount() {
+        return Result.success(0);
+    }
+
+    @GetMapping("/{id}")
+    public Result<?> getById(@PathVariable Long id) {
+        return Result.success();
+    }
 }

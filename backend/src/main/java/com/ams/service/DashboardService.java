@@ -120,7 +120,7 @@ public class DashboardService {
 
     public Map<String, Object> getMaintenanceStats() {
         Map<String, Object> stats = new HashMap<>();
-
+        try {
         Long totalMaintenanceCount = maintenanceRecordMapper.selectCount(null);
 
         QueryWrapper<MaintenanceRecord> avgCostWrapper = new QueryWrapper<>();
@@ -146,6 +146,11 @@ public class DashboardService {
         stats.put("totalMaintenanceCount", totalMaintenanceCount);
         stats.put("avgMaintenanceCost", avgMaintenanceCost);
         stats.put("monthlyMaintenanceCount", monthlyMaintenanceCount);
+        } catch (Exception e) {
+            stats.put("totalMaintenanceCount", 0);
+            stats.put("avgMaintenanceCost", 0);
+            stats.put("monthlyMaintenanceCount", 0);
+        }
         return stats;
     }
 

@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/user-management")
+@RequestMapping({"/user-management", "/users"})
 @RequiredArgsConstructor
 public class UserManagementController {
     private final UserManagementService userManagementService;

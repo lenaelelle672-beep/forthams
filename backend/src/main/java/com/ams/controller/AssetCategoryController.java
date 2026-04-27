@@ -50,4 +50,9 @@ public class AssetCategoryController {
         assetCategoryService.deleteCategory(id);
         return Result.success();
     }
+
+    @GetMapping("/all")
+    public Result<?> all() {
+        return list(1, 9999, null);
+    }
 }

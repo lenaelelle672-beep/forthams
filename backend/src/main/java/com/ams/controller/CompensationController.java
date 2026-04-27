@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/compensation")
+@RequestMapping({"/compensation", "/compensations"})
 @RequiredArgsConstructor
 public class CompensationController {
     private final CompensationService compensationService;
@@ -20,5 +20,10 @@ public class CompensationController {
             @RequestParam(required = false) String status,
             @RequestParam(required = false) Long assetId) {
         return Result.success(compensationService.queryCompensations(page, pageSize, status, assetId));
+    }
+
+    @GetMapping("/{id}")
+    public Result<?> getById(@PathVariable Long id) {
+        return Result.success();
     }
 }

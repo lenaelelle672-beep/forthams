@@ -20,4 +20,14 @@ public class RoleController {
             @RequestParam(required = false) String keyword) {
         return Result.success(roleService.queryRoles(page, pageSize, keyword));
     }
+
+    @GetMapping("/all")
+    public Result<?> all() {
+        return list(1, 9999, null);
+    }
+
+    @GetMapping("/{id}")
+    public Result<?> getById(@PathVariable Long id) {
+        return Result.success();
+    }
 }

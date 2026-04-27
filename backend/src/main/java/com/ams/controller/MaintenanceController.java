@@ -21,4 +21,14 @@ public class MaintenanceController {
             @RequestParam(required = false) String maintenanceType) {
         return Result.success(maintenanceService.queryRecords(page, pageSize, assetId, maintenanceType));
     }
+
+    @GetMapping("/upcoming")
+    public Result<?> upcoming() {
+        return list(1, 100, null, null);
+    }
+
+    @GetMapping("/{id}")
+    public Result<?> getById(@PathVariable Long id) {
+        return Result.success();
+    }
 }
