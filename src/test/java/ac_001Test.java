@@ -1,259 +1,126 @@
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+
+import java.lang.reflect.Field;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.time.LocalDate;
-import java.util.List;
+class LocationEntityTest {
 
-class AssetTransferServiceTest {
+    @Nested
+    @DisplayName("AC-001: DB table is 'location' with columns: id, location_name, location_code, parent_id, sort_order, description, status, create_time, update_time, deleted")
+    class Ac001TableStructure {
 
-    private final AssetTransferService transferService = new AssetTransferService();
+        @Test
+        @DisplayName("Location class maps to table 'location'")
+        void shouldMapToLocationTable() {
+            TableName annotation = Location.class.getAnnotation(TableName.class);
+            assertNotNull(annotation, "Location must have @TableName");
+            assertEquals("location", annotation.value());
+        }
 
-    // ==================== AC-001 ====================
+        @Test
+        @DisplayName("Location entity has exactly 10 business fields matching all columns")
+        void shouldHaveTenBusinessFields() {
+            long userFields = Arrays.stream(Location.class.getDeclaredFields())
+                    .filter(f -> !f.getName().contains("$"))
+                    .count();
+            assertEquals(10, userFields, "Must have exactly 10 fields for: id, location_name, location_code, parent_id, sort_order, description, status, create_time, update_time, deleted");
+        }
 
-    @Test
-    @DisplayName("AC-001: 发起资产调拨申请成功")
-    void testAc001_createTransferRequest_success() {
-        TransferRequestDTO request = new TransferRequestDTO(
-            List.of("asset-001", "asset-002"),
-            "location-A",
-            "location-B",
-            "部门调整",
-            LocalDate.of(2025, 2, 1)
-        );
+        @Test
+        @DisplayName("Location has 'id' field with @TableId")
+        void shouldHaveIdField() throws NoSuchFieldException {
+            Field idField = Location.class.getDeclaredField("id");
+            assertNotNull(idField.getAnnotation(TableId.class), "id field must have @TableId");
+        }
 
-        TransferOrder order = transferService.createTransferRequest(request);
+        @Test
+        @DisplayName("Location has 'locationCode' field mapping to location_code column")
+        void shouldHaveLocationCodeField() throws NoSuchFieldException {
+            Field field = Location.class.getDeclaredField("locationCode");
+            assertNotNull(field, "Must have locationCode field for location_code column");
+        }
 
-        assertNotNull(order.getId());
-        assertEquals("PENDING", order.getStatus());
-        assertEquals(2, order.getAssetIds().size());
-        assertTrue(order.getAssetIds().contains("asset-001"));
-        assertTrue(order.getAssetIds().contains("asset-002"));
+        @Test
+        @DisplayName("All 10 required fields exist by name")
+        void shouldHaveAllRequiredFields() {
+            List<String> requiredFields = List.of(
+                    "id", "name", "locationCode", "parentId",
+                    "sortOrder", "description", "status",
+                    "createTime", "updateTime", "deleted"
+            );
+            List<String> actualFields = Arrays.stream(Location.class.getDeclaredFields())
+                    .map(Field::getName)
+                    .filter(n -> !n.contains("$"))
+                    .collect(Collectors.toList());
+            for (String required : requiredFields) {
+                assertTrue(actualFields.contains(required),
+                        "Missing field: " + required);
+            }
+        }
     }
 
-    @Test
-    @DisplayName("AC-001: 审批通过后资产位置自动变更到目标位置")
-    void testAc001_approveTransfer_autoChangeLocation() {
-        TransferOrder order = transferService.createTransferRequest(new TransferRequestDTO(
-            List.of("asset-001"),
-            "location-A",
-            "location-B",
-            "部门调整",
-            LocalDate.of(2025, 2, 1)
-        ));
+    @Nested
+    @DisplayName("AC-002: Location entity has @TableName('location'), @TableField('location_name') on name, @TableField('parent_id') on parentId")
+    class Ac002AnnotationMapping {
 
-        TransferOrder approved = transferService.approveTransfer(order.getId(), "admin-user");
+        @Test
+        @DisplayName("@TableName('location') on Location class")
+        void shouldHaveTableNameLocation() {
+            TableName annotation = Location.class.getAnnotation(TableName.class);
+            assertNotNull(annotation, "Location class must have @TableName");
+            assertEquals("location", annotation.value());
+        }
 
-        assertEquals("APPROVED", approved.getStatus());
-        Asset asset = transferService.getAsset("asset-001");
-        assertEquals("location-B", asset.getCurrentLocation());
+        @Test
+        @DisplayName("@TableField('location_name') on name field")
+        void nameFieldShouldMapToLocationName() throws NoSuchFieldException {
+            Field nameField = Location.class.getDeclaredField("name");
+            TableField annotation = nameField.getAnnotation(TableField.class);
+            assertNotNull(annotation, "name field must have @TableField");
+            assertEquals("location_name", annotation.value());
+        }
+
+        @Test
+        @DisplayName("@TableField('parent_id') on parentId field")
+        void parentIdFieldShouldMapToParentId() throws NoSuchFieldException {
+            Field parentIdField = Location.class.getDeclaredField("parentId");
+            TableField annotation = parentIdField.getAnnotation(TableField.class);
+            assertNotNull(annotation, "parentId field must have @TableField");
+            assertEquals("parent_id", annotation.value());
+        }
     }
 
-    @Test
-    @DisplayName("AC-001: 审批通过后记录完整转移轨迹包含源位置和目标位置")
-    void testAc001_approveTransfer_recordsCompleteTransferHistory() {
-        TransferOrder order = transferService.createTransferRequest(new TransferRequestDTO(
-            List.of("asset-001"),
-            "location-A",
-            "location-B",
-            "部门调整",
-            LocalDate.of(2025, 2, 1)
-        ));
+    @Nested
+    @DisplayName("AC-005: Module can be imported without error")
+    class Ac005Importability {
 
-        transferService.approveTransfer(order.getId(), "admin-user");
+        @Test
+        @DisplayName("Location class can be loaded without ClassNotFoundException")
+        void locationClassCanBeLoaded() {
+            assertDoesNotThrow(() -> {
+                Class<?> clazz = Class.forName("com.ams.entity.Location");
+                assertNotNull(clazz);
+                assertEquals("com.ams.entity.Location", clazz.getName());
+            }, "Location class must be importable without any error");
+        }
 
-        List<TransferHistory> history = transferService.getTransferHistory("asset-001");
-        assertFalse(history.isEmpty());
-
-        TransferHistory latest = history.get(history.size() - 1);
-        assertEquals("asset-001", latest.getAssetId());
-        assertEquals("location-A", latest.getFromLocation());
-        assertEquals("location-B", latest.getToLocation());
-        assertNotNull(latest.getTransferTime());
-        assertEquals("admin-user", latest.getApprovedBy());
-    }
-
-    // ==================== AC-002 ====================
-
-    @Test
-    @DisplayName("AC-002: 创建转移申请需包含资产ID列表、源位置、目标位置、调拨原因、期望转移日期")
-    void testAc002_createTransferRequest_allFieldsPersisted() {
-        TransferRequestDTO request = new TransferRequestDTO(
-            List.of("asset-001", "asset-003"),
-            "building-1-floor-2",
-            "building-3-floor-1",
-            "部门搬迁重组",
-            LocalDate.of(2025, 2, 15)
-        );
-
-        TransferOrder order = transferService.createTransferRequest(request);
-
-        assertNotNull(order.getId());
-        assertEquals(List.of("asset-001", "asset-003"), order.getAssetIds());
-        assertEquals("building-1-floor-2", order.getFromLocation());
-        assertEquals("building-3-floor-1", order.getToLocation());
-        assertEquals("部门搬迁重组", order.getReason());
-        assertEquals(LocalDate.of(2025, 2, 15), order.getExpectedDate());
-    }
-
-    @Test
-    @DisplayName("AC-002: 在用状态的资产可调拨")
-    void testAc002_activeAsset_canTransfer() {
-        TransferRequestDTO request = new TransferRequestDTO(
-            List.of("asset-active-001"),
-            "location-A",
-            "location-B",
-            "业务需要",
-            LocalDate.of(2025, 3, 1)
-        );
-
-        TransferOrder order = transferService.createTransferRequest(request);
-
-        assertNotNull(order);
-        assertEquals("PENDING", order.getStatus());
-    }
-
-    @Test
-    @DisplayName("AC-002: 闲置状态的资产可调拨")
-    void testAc002_idleAsset_canTransfer() {
-        TransferRequestDTO request = new TransferRequestDTO(
-            List.of("asset-idle-001"),
-            "location-A",
-            "location-B",
-            "重新分配",
-            LocalDate.of(2025, 3, 1)
-        );
-
-        TransferOrder order = transferService.createTransferRequest(request);
-
-        assertNotNull(order);
-        assertEquals("PENDING", order.getStatus());
-    }
-
-    @Test
-    @DisplayName("AC-002: 报废状态的资产不可调拨应抛出异常")
-    void testAc002_retiredAsset_cannotTransfer() {
-        TransferRequestDTO request = new TransferRequestDTO(
-            List.of("asset-retired-001"),
-            "location-A",
-            "location-B",
-            "尝试调拨",
-            LocalDate.of(2025, 3, 1)
-        );
-
-        assertThrows(AssetNotTransferableException.class,
-            () -> transferService.createTransferRequest(request));
-    }
-
-    @Test
-    @DisplayName("AC-002: 维修中状态的资产不可调拨应抛出异常")
-    void testAc002_repairingAsset_cannotTransfer() {
-        TransferRequestDTO request = new TransferRequestDTO(
-            List.of("asset-repairing-001"),
-            "location-A",
-            "location-B",
-            "尝试调拨",
-            LocalDate.of(2025, 3, 1)
-        );
-
-        assertThrows(AssetNotTransferableException.class,
-            () -> transferService.createTransferRequest(request));
-    }
-
-    @Test
-    @DisplayName("AC-002: 混合状态资产列表中有不可调拨资产时整体创建失败")
-    void testAc002_mixedAssets_withNonTransferable_fails() {
-        TransferRequestDTO request = new TransferRequestDTO(
-            List.of("asset-active-001", "asset-retired-001"),
-            "location-A",
-            "location-B",
-            "批量调拨",
-            LocalDate.of(2025, 3, 1)
-        );
-
-        assertThrows(AssetNotTransferableException.class,
-            () -> transferService.createTransferRequest(request));
-    }
-}
-
-class AssetTransferControllerTest {
-
-    private final AssetTransferController controller = new AssetTransferController();
-
-    @Test
-    @DisplayName("AC-002: Controller创建资产转移申请接口返回201状态码")
-    void testAc002_controllerCreate_returnsCreatedStatus() {
-        TransferRequestDTO request = new TransferRequestDTO(
-            List.of("asset-active-001"),
-            "location-A",
-            "location-B",
-            "业务调整",
-            LocalDate.of(2025, 3, 1)
-        );
-
-        var response = controller.createTransfer(request);
-
-        assertEquals(201, response.getStatusCodeValue());
-        assertNotNull(response.getBody());
-        assertEquals("PENDING", response.getBody().getStatus());
-    }
-
-    @Test
-    @DisplayName("AC-002: Controller校验不通过时返回400状态码")
-    void testAc002_controllerCreate_invalidAsset_returnsBadRequest() {
-        TransferRequestDTO request = new TransferRequestDTO(
-            List.of("asset-retired-001"),
-            "location-A",
-            "location-B",
-            "业务调整",
-            LocalDate.of(2025, 3, 1)
-        );
-
-        var response = controller.createTransfer(request);
-
-        assertEquals(400, response.getStatusCodeValue());
-    }
-}
-
-class ModuleImportTest {
-
-    @Test
-    @DisplayName("AC-005: AssetTransferController类可正常加载不抛出异常")
-    void testAc005_assetTransferController_importable() {
-        assertDoesNotThrow(() ->
-            Class.forName("com.swarm.controller.AssetTransferController")
-        );
-    }
-
-    @Test
-    @DisplayName("AC-005: AssetTransferService类可正常加载不抛出异常")
-    void testAc005_assetTransferService_importable() {
-        assertDoesNotThrow(() ->
-            Class.forName("com.swarm.service.AssetTransferService")
-        );
-    }
-
-    @Test
-    @DisplayName("AC-005: TransferOrder实体类可正常加载不抛出异常")
-    void testAc005_transferOrder_importable() {
-        assertDoesNotThrow(() ->
-            Class.forName("com.swarm.entity.TransferOrder")
-        );
-    }
-
-    @Test
-    @DisplayName("AC-005: TransferRequestDTO可正常加载不抛出异常")
-    void testAc005_transferRequestDTO_importable() {
-        assertDoesNotThrow(() ->
-            Class.forName("com.swarm.dto.TransferRequestDTO")
-        );
-    }
-
-    @Test
-    @DisplayName("AC-005: AssetNotTransferableException可正常加载不抛出异常")
-    void testAc005_exception_importable() {
-        assertDoesNotThrow(() ->
-            Class.forName("com.swarm.exception.AssetNotTransferableException")
-        );
+        @Test
+        @DisplayName("Location instance can be created via default constructor")
+        void locationInstanceCanBeCreated() {
+            assertDoesNotThrow(() -> {
+                Location location = Location.class.getDeclaredConstructor().newInstance();
+                assertNotNull(location);
+            }, "Location must be instantiable without error");
+        }
     }
 }
