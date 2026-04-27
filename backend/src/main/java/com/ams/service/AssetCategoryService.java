@@ -56,7 +56,11 @@ public class AssetCategoryService {
         }
 
         AssetCategory category = new AssetCategory();
-        BeanUtil.copyProperties(createDTO, category);
+        category.setCategoryName(createDTO.getCategoryName());
+        category.setCategoryCode(createDTO.getCategoryCode());
+        category.setParentId(createDTO.getParentId());
+        category.setSortOrder(createDTO.getSortOrder());
+        category.setDescription(createDTO.getDescription());
         assetCategoryMapper.insert(category);
         return category;
     }

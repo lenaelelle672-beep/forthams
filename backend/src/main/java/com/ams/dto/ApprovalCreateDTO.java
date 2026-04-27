@@ -1,20 +1,17 @@
 package com.ams.dto;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.Data;
 
 @Data
 public class ApprovalCreateDTO {
-
-    @NotBlank(message = "流程类型不能为空")
+    @JsonAlias({"processType", "type"})
     private String processType;
-
-    @NotNull(message = "业务ID不能为空")
-    private Long businessId;
-
+    private String title;
+    private String description;
+    @JsonAlias({"businessId", "assetId"})
+    private Long businessId = 0L;
+    private String businessType;
+    private Long applicantId = 1L;
     private String businessData;
-
-    @NotNull(message = "申请人不能为空")
-    private Long applicantId;
 }

@@ -51,6 +51,7 @@ public class CompensationService {
         BeanUtil.setProperty(compensation, "compensationNo", generateCompensationNo());
         BeanUtil.setProperty(compensation, "status", "PENDING");
 
+        if (compensation.getResponsibleUserId() == null) compensation.setResponsibleUserId(1L);
         assetCompensationMapper.insert(compensation);
         return compensation;
     }

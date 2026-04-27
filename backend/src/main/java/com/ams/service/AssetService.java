@@ -69,6 +69,9 @@ public class AssetService {
         Asset asset = new Asset();
         BeanUtil.copyProperties(createDTO, asset);
 
+        if (asset.getAssetNo() == null || asset.getAssetNo().isEmpty()) {
+            asset.setAssetNo("AST-" + java.time.LocalDate.now().getYear() + "-" + String.format("%04d", assetMapper.selectCount(null).intValue() + 1));
+        }
         assetMapper.insert(asset);
         return asset;
     }

@@ -1,19 +1,15 @@
 package com.ams.dto;
 
-import jakarta.validation.constraints.NotBlank;
+import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.Data;
-
 import java.time.LocalDate;
 
 @Data
 public class InventoryTaskCreateDTO {
-
-    @NotBlank(message = "盘点任务名称不能为空")
+    @JsonAlias({"name", "taskName"})
     private String taskName;
-
-    @NotBlank(message = "盘点类型不能为空")
+    @JsonAlias({"method", "taskType", "type"})
     private String inventoryType;
-
     private String deptIds;
     private LocalDate startDate;
     private LocalDate endDate;
