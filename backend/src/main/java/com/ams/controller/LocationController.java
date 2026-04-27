@@ -29,7 +29,8 @@ public class LocationController {
     }
 
     @PostMapping
-    public Result<?> create(@RequestBody java.util.Map<String, Object> data) {
-        return Result.success();
+    public Result<Location> create(@RequestBody Location location) {
+        locationService.insert(location);
+        return Result.success(location);
     }
 }
