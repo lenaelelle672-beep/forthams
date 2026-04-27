@@ -164,12 +164,19 @@ public class ApprovalService {
         return prefix + String.format("%03d", sequence);
     }
 
-    private Integer parseInteger(String value, Integer defaultValue) {
-        if (value == null || value.isEmpty()) {
+    private Integer parseInteger(Object value, Integer defaultValue) {
+        if (value == null) {
+            return defaultValue;
+        }
+        if (value instanceof Integer) {
+            return (Integer) value;
+        }
+        String str = value.toString();
+        if (str.isEmpty()) {
             return defaultValue;
         }
         try {
-            return Integer.parseInt(value);
+            return Integer.parseInt(str);
         } catch (NumberFormatException ex) {
             return defaultValue;
         }
