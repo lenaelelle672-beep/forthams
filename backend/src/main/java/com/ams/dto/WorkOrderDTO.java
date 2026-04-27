@@ -1,8 +1,10 @@
 package com.ams.dto;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 public class WorkOrderDTO {
     private Long id;
     private String status;
@@ -11,13 +13,4 @@ public class WorkOrderDTO {
         this.id = id;
         this.status = status;
     }
-}
-package com.ams.dto;
-
-import lombok.Data;
-
-@Data
-public class WorkOrderDTO {
-    private Long id;
-    private String status;
 }
