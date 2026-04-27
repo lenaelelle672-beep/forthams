@@ -24,10 +24,11 @@ public class ApprovalController {
     }
 
     @GetMapping("/pending")
-    public Result<Page<ApprovalProcess>> pending(
+    public Result<?> pending(
             @RequestParam(defaultValue = "1") Integer page,
             @RequestParam(defaultValue = "10") Integer pageSize) {
-        return Result.success(approvalService.queryProcesses(page, pageSize, "PENDING", null));
+        Page<ApprovalProcess> result = approvalService.queryProcesses(page, pageSize, "PENDING", null);
+        return Result.success(result.getRecords());
     }
 
     @GetMapping("/pending/count")
