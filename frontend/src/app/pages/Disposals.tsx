@@ -23,7 +23,7 @@ export function Disposals() {
       setLoading(true);
       setError(null);
       const result = await disposalService.getHistory();
-      setData(result || []);
+      setData(Array.isArray(result) ? result : (result as any)?.records || []);
     } catch (err) {
       console.error('Failed to load disposal history:', err);
       setError('处置历史加载失败');

@@ -27,7 +27,7 @@ export function RFIDInventory() {
       setLoading(true);
       setError(null);
       const tasks = await inventoryService.listTasks();
-      setInventoryTasks(tasks || []);
+      setInventoryTasks(Array.isArray(tasks) ? tasks : (tasks as any)?.records || []);
       const firstTask = (tasks || [])[0];
       if (firstTask?.id) {
         const details = await inventoryService.getTaskDetails(firstTask.id);
