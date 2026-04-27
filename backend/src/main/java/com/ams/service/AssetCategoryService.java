@@ -46,11 +46,13 @@ public class AssetCategoryService {
 
     @Transactional(rollbackFor = Exception.class)
     public AssetCategory createCategory(CategoryCreateDTO createDTO) {
-        AssetCategory existingCategory = assetCategoryMapper.selectOne(
-            new LambdaQueryWrapper<AssetCategory>().eq(AssetCategory::getCategoryCode, createDTO.getCategoryCode())
-        );
-        if (existingCategory != null) {
-            throw new BusinessException("分类编码已存在");
+        if (createDTO.getCategoryCode() != null && !createDTO.getCategoryCode().isEmpty()) {
+            AssetCategory existingCategory = assetCategoryMapper.selectOne(
+                new LambdaQueryWrapper<AssetCategory>().eq(AssetCategory::getCategoryCode, createDTO.getCategoryCode())
+            );
+            if (existingCategory != null) {
+                throw new BusinessException("分类编码已存在");
+            }
         }
 
         AssetCategory category = new AssetCategory();

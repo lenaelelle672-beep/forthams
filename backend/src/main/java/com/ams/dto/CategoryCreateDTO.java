@@ -2,14 +2,14 @@ package com.ams.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonAlias;
 
 @Data
 public class CategoryCreateDTO {
 
-    @NotBlank(message = "分类名称不能为空")
     private String categoryName;
+    @JsonAlias("name")
 
-    @NotBlank(message = "分类编码不能为空")
     private String categoryCode;
 
     private Long parentId;

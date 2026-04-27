@@ -54,10 +54,10 @@ public class DeptService {
         validateDeptCodeUnique(getStrProp(dto, "deptCode"), null);
 
         Dept dept = new Dept();
-        BeanUtil.setProperty(dept, "deptName", getStrProp(dto, "deptName"));
+        BeanUtil.setProperty(dept, "name", getStrProp(dto, "name"));
         BeanUtil.setProperty(dept, "parentId", getLongProp(dto, "parentId") == null ? 0L : getLongProp(dto, "parentId"));
-        BeanUtil.setProperty(dept, "sortOrder", getIntProp(dto, "sortOrder") == null ? 0 : getIntProp(dto, "sortOrder"));
-        BeanUtil.setProperty(dept, "status", 1);
+        BeanUtil.setProperty(dept, "orderNum", getIntProp(dto, "sortOrder") == null ? 0 : getIntProp(dto, "sortOrder"));
+        BeanUtil.setProperty(dept, "status", "1");
         deptMapper.insert(dept);
 
         deptMapper.update(
@@ -76,9 +76,9 @@ public class DeptService {
         Dept dept = getDeptById(id);
         validateDeptCodeUnique(getStrProp(dto, "deptCode"), id);
 
-        BeanUtil.setProperty(dept, "deptName", getStrProp(dto, "deptName"));
+        BeanUtil.setProperty(dept, "name", getStrProp(dto, "name"));
         BeanUtil.setProperty(dept, "parentId", getLongProp(dto, "parentId") == null ? 0L : getLongProp(dto, "parentId"));
-        BeanUtil.setProperty(dept, "sortOrder", getIntProp(dto, "sortOrder") == null ? 0 : getIntProp(dto, "sortOrder"));
+        BeanUtil.setProperty(dept, "orderNum", getIntProp(dto, "sortOrder") == null ? 0 : getIntProp(dto, "sortOrder"));
         deptMapper.updateById(dept);
 
         deptMapper.update(

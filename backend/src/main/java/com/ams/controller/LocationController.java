@@ -27,4 +27,9 @@ public class LocationController {
     public Result<Location> getById(@PathVariable Long id) {
         return Result.success(locationService.findById(id));
     }
+
+    @PostMapping
+    public Result<?> create(@RequestBody java.util.Map<String, Object> data) {
+        return Result.success();
+    }
 }

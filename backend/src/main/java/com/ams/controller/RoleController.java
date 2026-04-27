@@ -30,4 +30,19 @@ public class RoleController {
     public Result<?> getById(@PathVariable Long id) {
         return Result.success();
     }
+
+    @PostMapping
+    public Result<?> create(@RequestBody java.util.Map<String, Object> data) {
+        return Result.success();
+    }
+
+    @PutMapping("/{id}")
+    public Result<?> update(@PathVariable Long id, @RequestBody java.util.Map<String, Object> data) {
+        return Result.success();
+    }
+
+    @DeleteMapping("/{id}")
+    public Result<?> delete(@PathVariable Long id) {
+        return Result.success();
+    }
 }
