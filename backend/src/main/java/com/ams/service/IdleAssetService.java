@@ -45,6 +45,8 @@ public class IdleAssetService {
         BeanUtil.copyProperties(dto, notice);
         BeanUtil.setProperty(notice, "status", "PUBLISHED");
         BeanUtil.setProperty(notice, "noticeDate", LocalDate.now());
+        if (notice.getAssetId() == null && dto.getAssetId() != null) notice.setAssetId(dto.getAssetId());
+        if (notice.getAssetId() == null) notice.setAssetId(0L);
         idleAssetNoticeMapper.insert(notice);
         return notice;
     }

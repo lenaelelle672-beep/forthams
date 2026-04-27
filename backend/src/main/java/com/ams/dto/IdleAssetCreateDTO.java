@@ -1,14 +1,13 @@
 package com.ams.dto;
 
-import jakarta.validation.constraints.NotNull;
+import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.Data;
 
 @Data
 public class IdleAssetCreateDTO {
-
-    @NotNull(message = "资产ID不能为空")
+    @JsonAlias({"id", "assetId"})
     private Long assetId;
-
-    @NotNull(message = "闲置天数不能为空")
     private Integer idleDays;
+    @JsonAlias({"reason"})
+    private String reason;
 }
