@@ -104,7 +104,7 @@ public class DashboardService {
         }
 
         Map<Long, String> deptNameMap = deptMapper.selectBatchIds(deptCountMap.keySet()).stream()
-                .collect(Collectors.toMap(Dept::getId, Dept::getDeptName));
+                .collect(Collectors.toMap(Dept::getId, Dept::getName));
 
         return deptCountMap.entrySet().stream()
                 .map(entry -> {
