@@ -1,7 +1,5 @@
 package com.ams.dto;
-
 import lombok.Data;
-
 @Data
 public class DeptCreateDTO {
     private String name;
@@ -9,6 +7,5 @@ public class DeptCreateDTO {
     private Integer orderNum;
     private String leader;
     private String phone;
-    private String email;
     private String status;
 }

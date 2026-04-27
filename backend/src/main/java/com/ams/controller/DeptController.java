@@ -1,11 +1,12 @@
 package com.ams.controller;
 
 import com.ams.common.Result;
+import com.ams.dto.DeptCreateDTO;
+import com.ams.dto.DeptUpdateDTO;
 import com.ams.entity.Dept;
 import com.ams.service.DeptService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 import java.util.Map;
 
@@ -13,12 +14,10 @@ import java.util.Map;
 @RequestMapping("/depts")
 @RequiredArgsConstructor
 public class DeptController {
-
     private final DeptService deptService;
 
     @GetMapping("/list")
-    public Result<List<Map<String, Object>>> list(
-            @RequestParam(required = false) String keyword) {
+    public Result<List<Map<String, Object>>> list(@RequestParam(required = false) String keyword) {
         return Result.success(deptService.queryDepts(keyword));
     }
 
@@ -33,13 +32,13 @@ public class DeptController {
     }
 
     @PostMapping
-    public Result<Dept> create(@RequestBody Dept dept) {
-        return Result.success(deptService.createDept(null));
+    public Result<Dept> create(@RequestBody DeptCreateDTO dto) {
+        return Result.success(deptService.createDept(dto));
     }
 
     @PutMapping("/{id}")
-    public Result<Dept> update(@PathVariable Long id, @RequestBody Dept dept) {
-        return Result.success(deptService.updateDept(id, null));
+    public Result<Dept> update(@PathVariable Long id, @RequestBody DeptUpdateDTO dto) {
+        return Result.success(deptService.updateDept(id, dto));
     }
 
     @DeleteMapping("/{id}")

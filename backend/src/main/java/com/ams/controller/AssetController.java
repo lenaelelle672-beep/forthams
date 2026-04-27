@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/assets")
 @RequiredArgsConstructor
 public class AssetController {
-
     private final AssetService assetService;
 
     @GetMapping("/list")

@@ -9,14 +9,12 @@ import com.ams.service.AssetCategoryService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
 @RequestMapping("/categories")
 @RequiredArgsConstructor
 public class AssetCategoryController {
-
     private final AssetCategoryService assetCategoryService;
 
     @GetMapping("/list")
