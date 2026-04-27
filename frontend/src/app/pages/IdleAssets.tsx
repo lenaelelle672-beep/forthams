@@ -3,6 +3,7 @@ import { Archive, Plus, Send, CheckCircle, Clock } from "lucide-react";
 import { idleAssetService } from "../services/idleAssetService";
 
 export function IdleAssets() {
+  const [detailItem, setDetailItem] = useState<any | null>(null);
   const [showPublishModal, setShowPublishModal] = useState(false);
   const [showClaimModal, setShowClaimModal] = useState(false);
   const [idleAssets, setIdleAssets] = useState<any[]>([]);
@@ -180,6 +181,7 @@ export function IdleAssets() {
                       : 'text-gray-700 bg-gray-100 cursor-not-allowed'
                   }`}
                   disabled={announcement.status !== '进行中'}
+                  onClick={() => setDetailItem(announcement)}
                 >
                   {announcement.status === '进行中' ? '查看详情' : '已结束'}
                 </button>
@@ -480,6 +482,26 @@ export function IdleAssets() {
                <button onClick={handleClaim} className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors">
                  提交认领申请
                </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 详情弹窗 */}
+      {detailItem && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => setDetailItem(null)}>
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+            <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-gray-900">闲置详情</h3>
+              <button onClick={() => setDetailItem(null)} className="text-gray-400 hover:text-gray-600 text-xl">&times;</button>
+            </div>
+            <div className="p-6 space-y-3">
+              {Object.entries(detailItem).map(([key, value]) => (
+                <div key={key} className="flex items-start gap-3 text-sm">
+                  <span className="text-gray-500 min-w-[120px]">{key}:</span>
+                  <span className="text-gray-900">{value === null || value === undefined ? '-' : String(value)}</span>
+                </div>
+              ))}
             </div>
           </div>
         </div>

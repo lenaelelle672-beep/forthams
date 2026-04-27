@@ -4,6 +4,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsive
 import { compensationService } from "../services/compensationService";
 
 export function Compensation() {
+  const [detailItem, setDetailItem] = useState<any | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedType, setSelectedType] = useState('全部类型');
   const [compensations, setCompensations] = useState<any[]>([]);
@@ -377,6 +378,26 @@ export function Compensation() {
                <button onClick={handleCreateCompensation} className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors">
                  提交申请
                </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 详情弹窗 */}
+      {detailItem && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => setDetailItem(null)}>
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+            <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-gray-900">赔偿详情</h3>
+              <button onClick={() => setDetailItem(null)} className="text-gray-400 hover:text-gray-600 text-xl">&times;</button>
+            </div>
+            <div className="p-6 space-y-3">
+              {Object.entries(detailItem).map(([key, value]) => (
+                <div key={key} className="flex items-start gap-3 text-sm">
+                  <span className="text-gray-500 min-w-[120px]">{key}:</span>
+                  <span className="text-gray-900">{value === null || value === undefined ? '-' : String(value)}</span>
+                </div>
+              ))}
             </div>
           </div>
         </div>

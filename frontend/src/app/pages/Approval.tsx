@@ -10,6 +10,7 @@ export function Approval() {
   const [approvals, setApprovals] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [detailItem, setDetailItem] = useState<any | null>(null);
 
   const loadData = async () => {
     try {
@@ -219,7 +220,7 @@ export function Approval() {
                            </button>
                         </>
                       )}
-                      <button className="px-4 py-2 text-sm font-medium text-blue-700 bg-blue-100 hover:bg-blue-200 rounded-lg transition-colors">
+                      <button onClick={() => setDetailItem(approval)} className="px-4 py-2 text-sm font-medium text-blue-700 bg-blue-100 hover:bg-blue-200 rounded-lg transition-colors">
                         详情
                       </button>
                     </div>
@@ -322,7 +323,7 @@ export function Approval() {
                               完成
                             </button>
                           )}
-                          <button className="px-3 py-1 text-xs font-medium text-blue-700 bg-blue-100 hover:bg-blue-200 rounded transition-colors">
+                          <button onClick={() => setDetailItem(order)} className="px-3 py-1 text-xs font-medium text-blue-700 bg-blue-100 hover:bg-blue-200 rounded transition-colors">
                             详情
                           </button>
                         </div>
@@ -335,6 +336,26 @@ export function Approval() {
           </div>
         )}
       </div>
+
+      {/* 详情弹窗 */}
+      {detailItem && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => setDetailItem(null)}>
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+            <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-gray-900">详情</h3>
+              <button onClick={() => setDetailItem(null)} className="text-gray-400 hover:text-gray-600 text-xl">&times;</button>
+            </div>
+            <div className="p-6 space-y-3">
+              {Object.entries(detailItem).map(([key, value]) => (
+                <div key={key} className="flex items-start gap-3 text-sm">
+                  <span className="text-gray-500 min-w-[120px]">{key}:</span>
+                  <span className="text-gray-900">{value === null || value === undefined ? '-' : String(value)}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
