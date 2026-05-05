@@ -1,0 +1,1 @@
+{"nodes": [{"id": "asset_types", "label": "asset.types.ts", "file_type": "code", "source_file": "frontend/src/app/types/asset.types.ts", "source_location": "L1"}], "edges": [{"source": "asset_types", "target": "flow", "relation": "imports_from", "confidence": "EXTRACTED", "source_file": "frontend/src/app/types/asset.types.ts", "source_location": "L9", "weight": 1.0}]}

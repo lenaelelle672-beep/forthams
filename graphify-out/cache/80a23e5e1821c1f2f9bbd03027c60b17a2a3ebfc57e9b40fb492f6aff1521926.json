@@ -1,0 +1,1 @@
+{"nodes": [{"id": "flow", "label": "flow.ts", "file_type": "code", "source_file": "frontend/src/app/types/flow.ts", "source_location": "L1"}], "edges": [{"source": "flow", "target": "react", "relation": "imports_from", "confidence": "EXTRACTED", "source_file": "frontend/src/app/types/flow.ts", "source_location": "L12", "weight": 1.0}]}
