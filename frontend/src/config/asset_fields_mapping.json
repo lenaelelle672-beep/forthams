@@ -1,0 +1,325 @@
+{
+  "asset": {
+    "basic": {
+      "id": {
+        "label": "资产编号",
+        "field": "id",
+        "type": "string",
+        "auditable": true,
+        "required": true,
+        "order": 1,
+        "group": "basic",
+        "description": "资产唯一标识"
+      },
+      "name": {
+        "label": "资产名称",
+        "field": "name",
+        "type": "string",
+        "auditable": true,
+        "required": true,
+        "order": 2,
+        "group": "basic",
+        "description": "资产名称"
+      },
+      "type": {
+        "label": "资产类型",
+        "field": "type",
+        "type": "string",
+        "auditable": true,
+        "required": true,
+        "order": 3,
+        "group": "basic",
+        "description": "资产分类类型"
+      },
+      "status": {
+        "label": "当前状态",
+        "field": "status",
+        "type": "string",
+        "auditable": true,
+        "required": true,
+        "order": 4,
+        "group": "basic",
+        "description": "资产当前状态"
+      },
+      "serialNumber": {
+        "label": "序列号",
+        "field": "serialNumber",
+        "type": "string",
+        "auditable": false,
+        "required": false,
+        "order": 5,
+        "group": "basic",
+        "description": "资产序列号"
+      }
+    },
+    "acquisition": {
+      "purchaseDate": {
+        "label": "购置日期",
+        "field": "purchaseDate",
+        "type": "date",
+        "auditable": true,
+        "required": true,
+        "order": 10,
+        "group": "acquisition",
+        "description": "资产购置日期"
+      },
+      "purchasePrice": {
+        "label": "购置价格",
+        "field": "purchasePrice",
+        "type": "number",
+        "auditable": true,
+        "required": true,
+        "order": 11,
+        "group": "acquisition",
+        "sensitive": true,
+        "description": "资产购置价格"
+      },
+      "vendor": {
+        "label": "供应商",
+        "field": "vendor",
+        "type": "string",
+        "auditable": true,
+        "required": false,
+        "order": 12,
+        "group": "acquisition",
+        "description": "供应商名称"
+      },
+      "warrantyExpiry": {
+        "label": "保修截止日期",
+        "field": "warrantyExpiry",
+        "type": "date",
+        "auditable": false,
+        "required": false,
+        "order": 13,
+        "group": "acquisition",
+        "description": "保修到期日期"
+      }
+    },
+    "location": {
+      "locationId": {
+        "label": "存放位置",
+        "field": "locationId",
+        "type": "string",
+        "auditable": true,
+        "required": true,
+        "order": 20,
+        "group": "location",
+        "description": "资产存放位置ID"
+      },
+      "locationName": {
+        "label": "位置名称",
+        "field": "locationName",
+        "type": "string",
+        "auditable": false,
+        "required": false,
+        "order": 21,
+        "group": "location",
+        "description": "资产存放位置名称"
+      },
+      "department": {
+        "label": "使用部门",
+        "field": "department",
+        "type": "string",
+        "auditable": true,
+        "required": true,
+        "order": 22,
+        "group": "location",
+        "description": "资产使用部门"
+      }
+    },
+    "financial": {
+      "depreciationMethod": {
+        "label": "折旧方法",
+        "field": "depreciationMethod",
+        "type": "string",
+        "auditable": true,
+        "required": false,
+        "order": 30,
+        "group": "financial",
+        "description": "折旧计算方法"
+      },
+      "usefulLife": {
+        "label": "使用年限",
+        "field": "usefulLife",
+        "type": "number",
+        "auditable": false,
+        "required": false,
+        "order": 31,
+        "group": "financial",
+        "description": "预计使用年限（月）"
+      },
+      "salvageValue": {
+        "label": "残值",
+        "field": "salvageValue",
+        "type": "number",
+        "auditable": false,
+        "required": false,
+        "order": 32,
+        "group": "financial",
+        "sensitive": true,
+        "description": "预计残值"
+      },
+      "currentValue": {
+        "label": "当前价值",
+        "field": "currentValue",
+        "type": "number",
+        "auditable": false,
+        "required": false,
+        "order": 33,
+        "group": "financial",
+        "sensitive": true,
+        "description": "资产当前净值"
+      }
+    },
+    "management": {
+      "assignedTo": {
+        "label": "使用人",
+        "field": "assignedTo",
+        "type": "string",
+        "auditable": true,
+        "required": false,
+        "order": 40,
+        "group": "management",
+        "description": "资产当前使用人"
+      },
+      "maintenanceStatus": {
+        "label": "维护状态",
+        "field": "maintenanceStatus",
+        "type": "string",
+        "auditable": false,
+        "required": false,
+        "order": 41,
+        "group": "management",
+        "description": "维护状态"
+      },
+      "nextMaintenanceDate": {
+        "label": "下次维护日期",
+        "field": "nextMaintenanceDate",
+        "type": "date",
+        "auditable": false,
+        "required": false,
+        "order": 42,
+        "group": "management",
+        "description": "下次维护计划日期"
+      }
+    },
+    "metadata": {
+      "createdAt": {
+        "label": "创建时间",
+        "field": "createdAt",
+        "type": "datetime",
+        "auditable": false,
+        "required": false,
+        "order": 50,
+        "group": "metadata",
+        "description": "记录创建时间"
+      },
+      "updatedAt": {
+        "label": "更新时间",
+        "field": "updatedAt",
+        "type": "datetime",
+        "auditable": true,
+        "required": false,
+        "order": 51,
+        "group": "metadata",
+        "description": "最后更新时间"
+      },
+      "createdBy": {
+        "label": "创建人",
+        "field": "createdBy",
+        "type": "string",
+        "auditable": false,
+        "required": false,
+        "order": 52,
+        "group": "metadata",
+        "description": "记录创建人"
+      },
+      "version": {
+        "label": "版本号",
+        "field": "version",
+        "type": "number",
+        "auditable": false,
+        "required": false,
+        "order": 53,
+        "group": "metadata",
+        "description": "数据版本号"
+      }
+    }
+  },
+  "groups": {
+    "basic": {
+      "label": "基本信息",
+      "order": 1,
+      "collapsible": false
+    },
+    "acquisition": {
+      "label": "采购信息",
+      "order": 2,
+      "collapsible": true
+    },
+    "location": {
+      "label": "位置与部门",
+      "order": 3,
+      "collapsible": true
+    },
+    "financial": {
+      "label": "财务信息",
+      "order": 4,
+      "collapsible": true
+    },
+    "management": {
+      "label": "使用管理",
+      "order": 5,
+      "collapsible": true
+    },
+    "metadata": {
+      "label": "元数据",
+      "order": 6,
+      "collapsible": true
+    }
+  },
+  "auditableFields": [
+    "id",
+    "name",
+    "type",
+    "status",
+    "purchaseDate",
+    "purchasePrice",
+    "vendor",
+    "locationId",
+    "department",
+    "depreciationMethod",
+    "assignedTo",
+    "updatedAt"
+  ],
+  "sensitiveFields": [
+    "purchasePrice",
+    "salvageValue",
+    "currentValue"
+  ],
+  "fieldOrder": [
+    "id",
+    "name",
+    "type",
+    "status",
+    "serialNumber",
+    "purchaseDate",
+    "purchasePrice",
+    "vendor",
+    "warrantyExpiry",
+    "locationId",
+    "locationName",
+    "department",
+    "depreciationMethod",
+    "usefulLife",
+    "salvageValue",
+    "currentValue",
+    "assignedTo",
+    "maintenanceStatus",
+    "nextMaintenanceDate",
+    "createdAt",
+    "updatedAt",
+    "createdBy",
+    "version"
+  ]
+}

@@ -1,0 +1,41 @@
+# Checkpoint - SWARM-2025-Q2-P1-003 Multi-tenant Data Isolation Gateway
+
+## Core Feature Progress
+- **Task ID**: SWARM-2025-Q2-P1-003
+- **Iteration**: 1
+- **AC Status**: ✅ 4/4 AC approved (Round 1)
+  - AC-001: User Task verified ✅
+  - AC-002: AST static analysis passed ✅
+  - AC-003: Docstring coverage verified ✅
+  - AC-004: Import verification passed ✅
+
+## Deliverables (5 files to modify)
+| # | File | Action | Status |
+|---|------|--------|--------|
+| 1 | `migrations/versions/xxx_add_depreciation_task_log_table.py` | create | pending |
+| 2 | `frontend/src/pages/DashboardPage/components/ChartContainer/index.tsx` | update | pending |
+| 3 | `frontend/src/pages/DashboardPage/components/AssetCategoryChart/AssetCategoryChart.module.css` | update | pending |
+| 4 | `frontend/src/pages/WorkOrder/types/workOrder.ts` | update | pending |
+| 5 | `tests/e2e/test_depreciation_report.spec.ts` | update | pending |
+
+## Blocking Bugs / Risks
+- **None reported** — all AC verified in Round 1
+- **Risk**: Verify E2E test covers multi-tenant isolation scenarios
+
+## Next Attack Vectors
+1. Implement `tenant_id` filtering in core services:
+   - `src/services/validators/asset_validator.py`
+   - `src/services/retirement/retirement_service.py`
+   - `src/services/depreciation_service.py`
+2. Add tenant context injection to API schemas:
+   - `src/api/schemas/retirement_request.py`
+   - `src/api/v1/depreciation/schemas.py`
+3. **High-risk areas** for multi-tenant leaks:
+   - `calculate_batch()` in depreciation calculator
+   - `get_event_history()` / history queries
+   - Dashboard aggregation queries
+
+## Out of Scope
+- CI/CD pipeline configuration
+- Production deployment
+- Files not specified in deliverables

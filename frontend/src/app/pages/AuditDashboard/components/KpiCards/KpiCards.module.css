@@ -1,0 +1,226 @@
+/**
+ * KpiCards.module.css
+ *
+ * CSS Module for the KPI summary cards displayed at the top of the
+ * Audit Dashboard. Each card surfaces a single aggregated metric
+ * (e.g. total operations, today's count, active operators, top action)
+ * so that operators can assess audit activity at a glance before
+ * diving into the filter bar / table / trend chart below.
+ *
+ * Layout: responsive CSS Grid — 4 columns on wide viewports,
+ * 2 columns on tablets, 1 column on mobile.
+ */
+
+/* ── Container ─────────────────────────────────────────────────── */
+
+.kpiGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  width: 100%;
+}
+
+@media (max-width: 1024px) {
+  .kpiGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .kpiGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Individual Card ───────────────────────────────────────────── */
+
+.kpiCard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 120px;
+  padding: 20px;
+  background: var(--color-surface, #ffffff);
+  border: 1px solid var(--color-border, #e2e8f0);
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  transition: box-shadow 0.2s ease, transform 0.15s ease;
+  overflow: hidden;
+}
+
+.kpiCard:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+}
+
+/* Accent stripe on the left edge */
+.kpiCard::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: var(--kpi-accent, var(--color-primary, #3b82f6));
+  border-radius: 12px 0 0 12px;
+}
+
+/* Variant accent colours */
+.kpiCardTotal::before   { --kpi-accent: #3b82f6; }  /* blue  */
+.kpiCardToday::before   { --kpi-accent: #10b981; }  /* green */
+.kpiCardOperators::before { --kpi-accent: #f59e0b; }  /* amber */
+.kpiCardTopAction::before { --kpi-accent: #8b5cf6; }  /* violet */
+
+/* ── Card Inner Elements ───────────────────────────────────────── */
+
+.kpiLabel {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-secondary, #64748b);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.kpiValue {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--color-text-primary, #1e293b);
+  line-height: 1.1;
+  margin-bottom: 4px;
+  font-variant-numeric: tabular-nums;
+}
+
+.kpiSubtext {
+  font-size: 12px;
+  color: var(--color-text-tertiary, #94a3b8);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ── Trend Indicator ───────────────────────────────────────────── */
+
+.kpiTrend {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+  line-height: 1;
+}
+
+.kpiTrendUp {
+  color: #059669;
+  background: #ecfdf5;
+}
+
+.kpiTrendDown {
+  color: #dc2626;
+  background: #fef2f2;
+}
+
+.kpiTrendFlat {
+  color: #64748b;
+  background: #f1f5f9;
+}
+
+.kpiTrendArrow {
+  font-size: 10px;
+}
+
+/* ── Loading Skeleton ──────────────────────────────────────────── */
+
+.kpiCardLoading {
+  pointer-events: none;
+  user-select: none;
+}
+
+.kpiCardLoading .kpiLabel,
+.kpiCardLoading .kpiValue,
+.kpiCardLoading .kpiSubtext {
+  color: transparent;
+  background: linear-gradient(
+    90deg,
+    var(--color-skeleton-from, #e2e8f0) 25%,
+    var(--color-skeleton-to, #f1f5f9) 50%,
+    var(--color-skeleton-from, #e2e8f0) 75%
+  );
+  background-size: 200% 100%;
+  animation: kpiShimmer 1.5s ease-in-out infinite;
+  border-radius: 4px;
+}
+
+.kpiCardLoading .kpiLabel {
+  width: 60%;
+  height: 14px;
+}
+
+.kpiCardLoading .kpiValue {
+  width: 40%;
+  height: 32px;
+}
+
+.kpiCardLoading .kpiSubtext {
+  width: 50%;
+  height: 12px;
+}
+
+@keyframes kpiShimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ── Empty / Error State ───────────────────────────────────────── */
+
+.kpiCardEmpty {
+  opacity: 0.6;
+}
+
+.kpiCardEmpty .kpiValue {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--color-text-tertiary, #94a3b8);
+}
+
+.kpiCardError {
+  border-color: var(--color-error, #fca5a5);
+}
+
+.kpiCardError::before {
+  --kpi-accent: var(--color-error, #ef4444);
+}
+
+.kpiCardError .kpiValue {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-error, #ef4444);
+}
+
+/* ── Accessible Focus Ring ─────────────────────────────────────── */
+
+.kpiCard:focus-visible {
+  outline: 2px solid var(--color-primary, #3b82f6);
+  outline-offset: 2px;
+}
+
+/* ── Reduced Motion ────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .kpiCard {
+    transition: none;
+  }
+
+  .kpiCard:hover {
+    transform: none;
+  }
+
+  .kpiCardLoading .kpiLabel,
+  .kpiCardLoading .kpiValue,
+  .kpiCardLoading .kpiSubtext {
+    animation: none;
+  }
+}

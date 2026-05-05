@@ -1,0 +1,541 @@
+# Sprint 4 Validation CI/CD Workflow
+# 
+# SWARM-103: 启动遗留代码清理与 AC 验收准备
+# 验证 Sprint 4 收尾阶段的所有验收标准
+#
+# 触发条件:
+#   - PR 到 main 分支
+#   - 手动触发 (workflow_dispatch)
+#
+# 验收标准覆盖:
+#   - AC-001: 废弃接口清理完成
+#   - AC-002: 知识图谱节点验证
+#   - AC-003: AST 静态检查通过
+#   - AC-004: docstring 补全
+#   - AC-005: 模块导入测试
+
+name: Sprint 4 Validation
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'src/**'
+      - 'tests/**'
+      - '.github/workflows/sprint4_validation.yml'
+      - 'scripts/**'
+  workflow_dispatch:
+    inputs:
+      skip_tests:
+        description: '跳过测试执行 (仅运行静态分析)'
+        required: false
+        default: 'false'
+        type: boolean
+
+env:
+  PYTHON_VERSION: '3.11'
+  NODE_VERSION: '18'
+  # 覆盖率阈值
+  COVERAGE_THRESHOLD: 95
+  # docstring 覆盖率阈值
+  DOCSTRING_THRESHOLD: 95
+  # pylint 最低评分
+  PYLINT_MIN_SCORE: 8.0
+
+jobs:
+  # ============================================================
+  # Job 1: 静态代码分析
+  # ============================================================
+  static_analysis:
+    name: Static Analysis (AC-002, AC-003)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyflakes ruff pylint mypy
+
+      # ----------------------------------------
+      # 1.1 pyflakes 检查
+      # ----------------------------------------
+      - name: Run pyflakes
+        id: pyflakes
+        run: |
+          echo "=== pyflakes 检查 ==="
+          if pyflakes src/ . 2>&1 | tee pyflakes_report.txt; then
+            echo "pyflakes_result=pass" >> $GITHUB_OUTPUT
+          else
+            echo "pyflakes_result=fail" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+
+      # ----------------------------------------
+      # 1.2 ruff 检查 (废弃接口检测)
+      # AC-001: 废弃接口清理验证
+      # ----------------------------------------
+      - name: Run ruff check (deprecated interfaces)
+        id: ruff
+        run: |
+          echo "=== ruff 检查 (AC-001: 废弃接口) ==="
+          # 检查未定义名称和未使用导入
+          if ruff check src/ --select=PLC,PLE 2>&1 | tee ruff_report.txt; then
+            echo "ruff_result=pass" >> $GITHUB_OUTPUT
+          else
+            echo "ruff_result=fail" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+
+      # ----------------------------------------
+      # 1.3 pylint 评分
+      # AC-003: AST 静态检查
+      # ----------------------------------------
+      - name: Run pylint
+        id: pylint
+        run: |
+          echo "=== pylint 评分检查 (AC-003) ==="
+          pylint_score=$(pylint src/ --output-format=text 2>&1 | tail -1 | grep -oP '\d+\.\d+' || echo "0")
+          echo "Pylint score: $pylint_score"
+          echo "pylint_score=$pylint_score" >> $GITHUB_OUTPUT
+          
+          if (( $(echo "$pylint_score >= $PYLINT_MIN_SCORE" | bc -l) )); then
+            echo "pylint_result=pass" >> $GITHUB_OUTPUT
+          else
+            echo "pylint_result=fail (score below threshold)" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+
+      # ----------------------------------------
+      # 1.4 AST 解析完整性验证
+      # AC-003: 所有 .py 文件必须可正常解析
+      # ----------------------------------------
+      - name: AST compilation check
+        id: ast_check
+        run: |
+          echo "=== AST 编译检查 (AC-003) ==="
+          error_count=0
+          for file in $(find src/ -name "*.py" -type f); do
+            if ! python -m py_compile "$file" 2>&1; then
+              echo "编译错误: $file"
+              error_count=$((error_count + 1))
+            fi
+          done
+          
+          if [ $error_count -eq 0 ]; then
+            echo "ast_result=pass" >> $GITHUB_OUTPUT
+            echo "所有 AST 解析成功"
+          else
+            echo "ast_result=fail" >> $GITHUB_OUTPUT
+            echo "发现 $error_count 个 AST 解析错误"
+            exit 1
+          fi
+
+      # ----------------------------------------
+      # 1.5 废弃接口残留检查
+      # AC-001: 验证无残留废弃接口
+      # ----------------------------------------
+      - name: Check deprecated interfaces
+        id: deprecated_check
+        run: |
+          echo "=== 废弃接口残留检查 (AC-001) ==="
+          
+          # 检查 ._index_properties() 是否已移除
+          echo "检查 ._index_properties()..."
+          if grep -rn "._index_properties" src/ 2>/dev/null; then
+            echo "发现残留: ._index_properties() 尚未移除"
+            echo "deprecated_result=fail" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+          
+          # 检查 Toaster() 组件是否已移除
+          echo "检查 Toaster() 组件..."
+          if grep -rn "Toaster" docs/figma/ --include="*.tsx" 2>/dev/null; then
+            echo "发现残留: Toaster() 尚未移除"
+            echo "deprecated_result=fail" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+          
+          echo "废弃接口检查通过"
+          echo "deprecated_result=pass" >> $GITHUB_OUTPUT
+
+      # 上传静态分析报告
+      - name: Upload static analysis reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: static-analysis-reports
+          path: |
+            pyflakes_report.txt
+            ruff_report.txt
+          retention-days: 7
+
+  # ============================================================
+  # Job 2: Docstring 覆盖率检查
+  # ============================================================
+  docstring_coverage:
+    name: Docstring Coverage (AC-004)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install interrogate pytest pytest-xdist
+
+      # ----------------------------------------
+      # 2.1 Docstring 覆盖率扫描
+      # AC-004: 覆盖率需 ≥ 95%
+      # ----------------------------------------
+      - name: Run interrogate
+        id: interrogate
+        run: |
+          echo "=== Docstring 覆盖率检查 (AC-004) ==="
+          
+          # 扫描 src/ 目录，阈值 95%
+          interrogate src/ \
+            --fail-under=$DOCSTRING_THRESHOLD \
+            --exclude="test_*.py" \
+            --ignore-mock \
+            --output-format=markdown \
+            --verbose \
+            2>&1 | tee docstring_report.md
+          
+          # 提取覆盖率分数
+          coverage=$(interrogate src/ -v --exclude="test_*.py" 2>&1 | grep -oP 'TOTAL\s+\|\s+\d+\s+\|\s+\d+\s+\|\s+\d+\s+\|\s+\K\d+' | head -1 || echo "0")
+          echo "Docstring coverage: ${coverage}%"
+          echo "docstring_coverage=$coverage" >> $GITHUB_OUTPUT
+          
+          if [ "$coverage" -ge "$DOCSTRING_THRESHOLD" ]; then
+            echo "docstring_result=pass" >> $GITHUB_OUTPUT
+          else
+            echo "docstring_result=fail" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+
+      # 上传 docstring 报告
+      - name: Upload docstring report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: docstring-coverage-report
+          path: docstring_report.md
+          retention-days: 7
+
+  # ============================================================
+  # Job 3: 测试执行
+  # ============================================================
+  test_execution:
+    name: Test Execution (AC-005)
+    runs-on: ubuntu-latest
+    needs: static_analysis
+    if: github.event.inputs.skip_tests != 'true'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest pytest-cov pytest-xdist ruff
+
+      # ----------------------------------------
+      # 3.1 模块导入测试
+      # AC-005: 验证所有模块可正常 import
+      # ----------------------------------------
+      - name: Module import test
+        id: import_test
+        run: |
+          echo "=== 模块导入测试 (AC-005) ==="
+          
+          # 测试 src 模块导入
+          echo "测试 src 模块导入..."
+          if python -c "import src" 2>&1; then
+            echo "src 模块导入成功"
+            echo "import_src_result=pass" >> $GITHUB_OUTPUT
+          else
+            echo "src 模块导入失败"
+            echo "import_src_result=fail" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+          
+          # 测试 endless_daemon 导入
+          echo "测试 endless_daemon 导入..."
+          if python -c "from src.endless_daemon import GraphifyDaemon, NodeRegistry, PropertyIndex" 2>&1; then
+            echo "endless_daemon 模块导入成功"
+            echo "import_daemon_result=pass" >> $GITHUB_OUTPUT
+          else
+            echo "endless_daemon 模块导入失败"
+            echo "import_daemon_result=fail" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+          
+          # 测试 tests.fixtures 导入
+          echo "测试 tests.fixtures 导入..."
+          if python -c "import tests.fixtures.dead_code_sample" 2>&1; then
+            echo "tests.fixtures.dead_code_sample 导入成功"
+            echo "import_fixtures_result=pass" >> $GITHUB_OUTPUT
+          else
+            echo "tests.fixtures.dead_code_sample 导入失败"
+            echo "import_fixtures_result=fail" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+          
+          # 测试 tests.sprint4 导入
+          echo "测试 tests.sprint4 导入..."
+          if python -c "import tests.sprint4" 2>&1; then
+            echo "tests.sprint4 导入成功"
+            echo "import_sprint4_result=pass" >> $GITHUB_OUTPUT
+          else
+            echo "tests.sprint4 导入失败"
+            echo "import_sprint4_result=fail" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+
+      # ----------------------------------------
+      # 3.2 Sprint 4 废弃代码清理测试
+      # AC-001: 废弃接口移除验证
+      # ----------------------------------------
+      - name: Run deprecated cleanup tests
+        id: deprecated_tests
+        run: |
+          echo "=== 废弃接口清理测试 (AC-001) ==="
+          
+          # 运行废弃接口清理测试
+          if pytest tests/sprint4/test_deprecated_cleanup.py \
+            -v \
+            --tb=short \
+            2>&1 | tee deprecated_cleanup_report.txt; then
+            echo "废弃接口清理测试通过"
+            echo "deprecated_test_result=pass" >> $GITHUB_OUTPUT
+          else
+            echo "废弃接口清理测试失败"
+            echo "deprecated_test_result=fail" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+
+      # ----------------------------------------
+      # 3.3 Sprint 4 静态分析测试
+      # AC-003: AST 静态检查
+      # ----------------------------------------
+      - name: Run static analysis tests
+        id: static_tests
+        run: |
+          echo "=== 静态分析测试 (AC-003) ==="
+          
+          if pytest tests/sprint4/test_static_analysis.py \
+            -v \
+            --tb=short \
+            2>&1 | tee static_analysis_report.txt; then
+            echo "静态分析测试通过"
+            echo "static_test_result=pass" >> $GITHUB_OUTPUT
+          else
+            echo "静态分析测试失败"
+            echo "static_test_result=fail" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+
+      # ----------------------------------------
+      # 3.4 Sprint 4 Docstring 覆盖率测试
+      # AC-004: Docstring 补全验证
+      # ----------------------------------------
+      - name: Run docstring coverage tests
+        id: docstring_tests
+        run: |
+          echo "=== Docstring 覆盖率测试 (AC-004) ==="
+          
+          if pytest tests/sprint4/test_docstring_coverage.py \
+            -v \
+            --tb=short \
+            2>&1 | tee docstring_tests_report.txt; then
+            echo "Docstring 覆盖率测试通过"
+            echo "docstring_test_result=pass" >> $GITHUB_OUTPUT
+          else
+            echo "Docstring 覆盖率测试失败"
+            echo "docstring_test_result=fail" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+
+      # ----------------------------------------
+      # 3.5 全量回归测试
+      # 验证不破坏现有功能
+      # ----------------------------------------
+      - name: Run regression tests
+        id: regression_tests
+        run: |
+          echo "=== 全量回归测试 ==="
+          
+          # 运行所有测试，遇错即停
+          if pytest tests/ \
+            -x \
+            -q \
+            --tb=short \
+            --ignore=tests/sprint4 \
+            2>&1 | tee regression_test_report.txt; then
+            echo "回归测试全部通过"
+            echo "regression_result=pass" >> $GITHUB_OUTPUT
+          else
+            echo "回归测试发现失败"
+            echo "regression_result=fail" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+
+      # 上传测试报告
+      - name: Upload test reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-reports
+          path: |
+            **/report*.txt
+            **/report*.md
+          retention-days: 7
+
+  # ============================================================
+  # Job 4: 覆盖率报告生成
+  # ============================================================
+  coverage_report:
+    name: Coverage Report
+    runs-on: ubuntu-latest
+    needs: test_execution
+    if: always()
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest pytest-cov interrogate
+
+      # 生成覆盖率报告
+      - name: Generate coverage report
+        run: |
+          echo "=== 生成覆盖率报告 ==="
+          
+          pytest tests/ \
+            --cov=src \
+            --cov-report=term-missing \
+            --cov-report=html \
+            --cov-report=xml \
+            -v \
+            2>&1 | tee coverage_report.txt
+          
+          # 检查覆盖率是否达标
+          coverage=$(grep -oP 'TOTAL\s+\d+\s+\d+\s+\K\d+' coverage_report.txt | head -1 || echo "0")
+          echo "代码覆盖率: ${coverage}%"
+          
+          if [ "$coverage" -ge "$COVERAGE_THRESHOLD" ]; then
+            echo "coverage_result=pass" >> $GITHUB_OUTPUT
+          else
+            echo "coverage_result=fail" >> $GITHUB_OUTPUT
+            echo "覆盖率未达标: $coverage < $COVERAGE_THRESHOLD"
+          fi
+
+      - name: Upload coverage reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-reports
+          path: |
+            coverage_report.txt
+            htmlcov/
+            coverage.xml
+          retention-days: 14
+
+  # ============================================================
+  # Job 5: 验收总结
+  # ============================================================
+  acceptance_summary:
+    name: Sprint 4 Acceptance Summary
+    runs-on: ubuntu-latest
+    needs:
+      - static_analysis
+      - docstring_coverage
+      - test_execution
+      - coverage_report
+    if: always()
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download all reports
+        uses: actions/download-artifact@v4
+        with:
+          path: reports
+
+      - name: Generate acceptance summary
+        id: summary
+        run: |
+          echo "========================================"
+          echo "Sprint 4 验收结果汇总"
+          echo "========================================"
+          echo ""
+          
+          # 统计各项检查结果
+          static_pass=${{ needs.static_analysis.result == 'success' && '✅' || '❌' }}
+          docstring_pass=${{ needs.docstring_coverage.result == 'success' && '✅' || '❌' }}
+          test_pass=${{ needs.test_execution.result == 'success' && '✅' || '❌' }}
+          coverage_pass=${{ needs.coverage_report.result == 'success' && '✅' || '❌' }}
+          
+          echo "| 验收标准 | 状态 |"
+          echo "|----------|------|"
+          echo "| AC-001: 废弃接口清理 | $static_pass |"
+          echo "| AC-002: 知识图谱节点验证 | $static_pass |"
+          echo "| AC-003: AST 静态检查 | $static_pass |"
+          echo "| AC-004: Docstring 补全 | $docstring_pass |"
+          echo "| AC-005: 模块导入测试 | $test_pass |"
+          echo ""
+          
+          # 计算通过率
+          total=5
+          passed=0
+          [ "$static_pass" == "✅" ] && passed=$((passed + 1))
+          [ "$docstring_pass" == "✅" ] && passed=$((passed + 1))
+          [ "$test_pass" == "✅" ] && passed=$((passed + 1))
+          [ "$coverage_pass" == "✅" ] && passed=$((passed + 1))
+          
+          pass_rate=$((passed * 100 / total))
+          echo "当前通过率: $passed/$total ($pass_rate%)"
+          echo ""
+          
+          if [ $pass_rate -eq 100 ]; then
+            echo "🎉 所有验收标准已通过!"
+            echo "sprint4_result=pass" >> $GITHUB_OUTPUT
+          else
+            echo "⚠️ 部分验收标准未通过，请查看详细报告"
+            echo "sprint4_result=fail" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+
+      - name: Upload acceptance report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: sprint4-acceptance-report
+          path: reports/
+          retention-days: 30

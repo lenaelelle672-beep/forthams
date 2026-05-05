@@ -1,0 +1,384 @@
+/**
+ * TrendChart.module.css
+ *
+ * Styles for the AuditDashboard TrendChart component.
+ * This component renders a trend line chart visualizing audit log
+ * operation frequency over time, with adaptive granularity:
+ *   - ≤7 days  → hourly aggregation
+ *   - 8–30 days → daily aggregation
+ *   - >30 days  → weekly aggregation
+ *
+ * Supports loading, empty, and error states.
+ * Responsive layout with proper aspect ratio for chart readability.
+ */
+
+/* ── Container ─────────────────────────────────────────────── */
+
+.trendChartWrapper {
+  position: relative;
+  width: 100%;
+  min-height: 320px;
+  background: var(--color-surface, #ffffff);
+  border: 1px solid var(--color-border, #e2e8f0);
+  border-radius: 12px;
+  padding: 20px 24px 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  transition: box-shadow 0.2s ease;
+}
+
+.trendChartWrapper:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+/* ── Header ────────────────────────────────────────────────── */
+
+.chartHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.chartTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-primary, #1e293b);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.granularityBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-text-secondary, #64748b);
+  background: var(--color-bg-muted, #f1f5f9);
+  border: 1px solid var(--color-border-light, #e2e8f0);
+  border-radius: 6px;
+  padding: 2px 10px;
+  line-height: 1.6;
+  white-space: nowrap;
+}
+
+.granularityIcon {
+  width: 14px;
+  height: 14px;
+  opacity: 0.6;
+}
+
+/* ── Chart Area ────────────────────────────────────────────── */
+
+.chartContainer {
+  position: relative;
+  width: 100%;
+  height: 280px;
+}
+
+/* ECharts / Canvas / SVG container */
+.chartCanvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* ── Axis & Tooltip Overrides ──────────────────────────────── */
+
+/* Ensures time-axis labels are readable at all granularities */
+:global(.echarts-x-axis-label) {
+  font-size: 11px;
+  color: var(--color-text-tertiary, #94a3b8);
+}
+
+:global(.echarts-y-axis-label) {
+  font-size: 11px;
+  color: var(--color-text-tertiary, #94a3b8);
+}
+
+/* ── Legend ─────────────────────────────────────────────────── */
+
+.chartLegend {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+.legendItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--color-text-secondary, #64748b);
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.legendItem:hover {
+  opacity: 0.75;
+}
+
+.legendItemDisabled {
+  opacity: 0.4;
+  text-decoration: line-through;
+}
+
+.legendDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ── Loading State ─────────────────────────────────────────── */
+
+.loadingOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface, #ffffff);
+  border-radius: 12px;
+  z-index: 2;
+  gap: 12px;
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--color-border-light, #e2e8f0);
+  border-top-color: var(--color-primary, #3b82f6);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loadingText {
+  font-size: 13px;
+  color: var(--color-text-tertiary, #94a3b8);
+  margin: 0;
+}
+
+/* ── Empty State ───────────────────────────────────────────── */
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 280px;
+  gap: 12px;
+}
+
+.emptyIcon {
+  width: 48px;
+  height: 48px;
+  color: var(--color-text-quaternary, #cbd5e1);
+}
+
+.emptyTitle {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-secondary, #64748b);
+  margin: 0;
+}
+
+.emptyDescription {
+  font-size: 12px;
+  color: var(--color-text-tertiary, #94a3b8);
+  margin: 0;
+  text-align: center;
+  max-width: 260px;
+  line-height: 1.5;
+}
+
+/* ── Error State ───────────────────────────────────────────── */
+
+.errorState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 280px;
+  gap: 12px;
+}
+
+.errorIcon {
+  width: 40px;
+  height: 40px;
+  color: var(--color-error, #ef4444);
+}
+
+.errorTitle {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-error, #ef4444);
+  margin: 0;
+}
+
+.errorMessage {
+  font-size: 12px;
+  color: var(--color-text-tertiary, #94a3b8);
+  margin: 0;
+  text-align: center;
+  max-width: 280px;
+  line-height: 1.5;
+}
+
+.retryButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  padding: 6px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-primary, #3b82f6);
+  background: transparent;
+  border: 1px solid var(--color-primary, #3b82f6);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.retryButton:hover {
+  background: var(--color-primary, #3b82f6);
+  color: #ffffff;
+}
+
+.retryButton:focus-visible {
+  outline: 2px solid var(--color-primary, #3b82f6);
+  outline-offset: 2px;
+}
+
+/* ── Data Point Tooltip (custom) ───────────────────────────── */
+
+.tooltipContainer {
+  padding: 8px 12px;
+  background: var(--color-surface, #ffffff);
+  border: 1px solid var(--color-border, #e2e8f0);
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.tooltipTimestamp {
+  color: var(--color-text-secondary, #64748b);
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+
+.tooltipValue {
+  color: var(--color-text-primary, #1e293b);
+  font-weight: 600;
+}
+
+.tooltipLabel {
+  color: var(--color-text-tertiary, #94a3b8);
+  font-weight: 400;
+}
+
+/* ── Responsive ────────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  .trendChartWrapper {
+    padding: 16px 16px 12px;
+    min-height: 260px;
+  }
+
+  .chartContainer {
+    height: 220px;
+  }
+
+  .chartTitle {
+    font-size: 14px;
+  }
+
+  .chartLegend {
+    gap: 12px;
+  }
+
+  .emptyState,
+  .errorState {
+    height: 220px;
+  }
+}
+
+@media (max-width: 480px) {
+  .trendChartWrapper {
+    padding: 12px 12px 8px;
+    border-radius: 8px;
+  }
+
+  .chartContainer {
+    height: 200px;
+  }
+
+  .chartHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .emptyState,
+  .errorState {
+    height: 200px;
+  }
+}
+
+/* ── Accessibility: Reduced Motion ─────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation-duration: 2s;
+  }
+
+  .trendChartWrapper {
+    transition: none;
+  }
+
+  .legendItem,
+  .retryButton {
+    transition: none;
+  }
+}
+
+/* ── Dark Mode Support ─────────────────────────────────────── */
+
+@media (prefers-color-scheme: dark) {
+  .trendChartWrapper {
+    background: var(--color-surface-dark, #1e293b);
+    border-color: var(--color-border-dark, #334155);
+  }
+
+  .chartTitle {
+    color: var(--color-text-primary-dark, #f1f5f9);
+  }
+
+  .granularityBadge {
+    color: var(--color-text-secondary-dark, #94a3b8);
+    background: var(--color-bg-muted-dark, #334155);
+    border-color: var(--color-border-dark, #475569);
+  }
+
+  .loadingOverlay {
+    background: var(--color-surface-dark, #1e293b);
+  }
+
+  .tooltipContainer {
+    background: var(--color-surface-dark, #1e293b);
+    border-color: var(--color-border-dark, #475569);
+  }
+}

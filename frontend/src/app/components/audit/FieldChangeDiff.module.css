@@ -1,0 +1,160 @@
+/**
+ * FieldChangeDiff Module Styles
+ * 用于审批流程中的字段变更差异展示样式
+ */
+
+.container {
+  padding: 16px;
+  background: #fafafa;
+  border-radius: 8px;
+}
+
+.diffItem {
+  display: flex;
+  flex-direction: column;
+  padding: 12px 16px;
+  margin-bottom: 12px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.diffItem:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.fieldName {
+  font-weight: 600;
+  font-size: 14px;
+  color: #374151;
+  margin-bottom: 8px;
+}
+
+.valueContainer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.oldValue {
+  flex: 1;
+  padding: 8px 12px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 4px;
+  color: #dc2626;
+  font-size: 13px;
+  text-decoration: line-through;
+}
+
+.newValue {
+  flex: 1;
+  padding: 8px 12px;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 4px;
+  color: #16a34a;
+  font-size: 13px;
+}
+
+.arrow {
+  color: #6b7280;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.timestamp {
+  font-size: 12px;
+  color: #9ca3af;
+  margin-top: 8px;
+}
+
+.severityBadge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.severityLow {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.severityMedium {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.severityHigh {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.severityCritical {
+  background: #7f1d1d;
+  color: #fff;
+}
+
+/* 空状态样式 */
+.emptyState {
+  text-align: center;
+  padding: 32px;
+  color: #9ca3af;
+}
+
+.emptyIcon {
+  font-size: 48px;
+  margin-bottom: 12px;
+  opacity: 0.5;
+}
+
+.emptyText {
+  font-size: 14px;
+}
+
+/* 加载状态 */
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #e5e7eb;
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 节点样式 - Graphify 知识图谱集成 */
+.graphNode {
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.graphNode:hover {
+  transform: scale(1.05);
+}
+
+.nodeLabel {
+  font-size: 12px;
+  fill: #1e293b;
+}
+
+.edgeLabel {
+  font-size: 10px;
+  fill: #64748b;
+}

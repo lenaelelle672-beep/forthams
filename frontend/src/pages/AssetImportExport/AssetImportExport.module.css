@@ -1,0 +1,604 @@
+/* ==========================================================================
+   AssetImportExport.module.css
+   Styles for the Asset Batch Import/Export page (/assets/import-export)
+   Spec: [SWARM-P2-006-FE]
+   ========================================================================== */
+
+/* ---------------------------------------------------------------------------
+   Layout
+   --------------------------------------------------------------------------- */
+.container {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.88);
+  margin: 0;
+}
+
+/* ---------------------------------------------------------------------------
+   Tabs — "导入" / "导出" switcher
+   --------------------------------------------------------------------------- */
+.tabsContainer {
+  background: #fff;
+  padding: 4px;
+  border-radius: 8px;
+  display: inline-flex;
+  margin-bottom: 24px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.tab {
+  padding: 8px 24px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.65);
+  transition: all 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
+  user-select: none;
+}
+
+.tab:hover {
+  color: #1677ff;
+}
+
+.activeTab {
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  color: #1677ff;
+  font-weight: 500;
+}
+
+/* ---------------------------------------------------------------------------
+   Import Panel
+   --------------------------------------------------------------------------- */
+.importCard {
+  background: #fff;
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.templateDownloadRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.downloadBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #1677ff;
+  cursor: pointer;
+  font-size: 14px;
+  transition: color 0.2s;
+}
+
+.downloadBtn:hover {
+  color: #4096ff;
+}
+
+/* ---------------------------------------------------------------------------
+   Upload Area — drag-and-drop zone
+   Border: dashed default → blue dashed on dragover (spec §交互约束)
+   --------------------------------------------------------------------------- */
+.uploadArea {
+  border: 2px dashed #d9d9d9;
+  border-radius: 8px;
+  padding: 40px;
+  text-align: center;
+  transition: border-color 0.3s ease, background-color 0.3s ease;
+  background: #fafafa;
+  cursor: pointer;
+}
+
+.uploadArea:hover {
+  border-color: #4096ff;
+}
+
+.uploadAreaDragOver {
+  border-color: #1677ff;
+  background: rgba(22, 119, 255, 0.04);
+}
+
+.uploadAreaDisabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.uploadIcon {
+  font-size: 48px;
+  color: #bfbfbf;
+  margin-bottom: 16px;
+}
+
+.uploadText {
+  font-size: 16px;
+  color: rgba(0, 0, 0, 0.65);
+  margin-bottom: 8px;
+}
+
+.uploadHint {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* ---------------------------------------------------------------------------
+   Progress Bar
+   Normal: blue (#1677ff).  Error: red (#ff4d4f) + retry button (spec §交互约束)
+   --------------------------------------------------------------------------- */
+.progressContainer {
+  margin: 20px 0;
+}
+
+.progressLabel {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.progressBarWrapper {
+  height: 8px;
+  background: #f5f5f5;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progressBarFill {
+  height: 100%;
+  background: #1677ff;
+  border-radius: 4px;
+  transition: width 0.2s ease;
+}
+
+.progressError .progressBarFill {
+  background: #ff4d4f;
+}
+
+.progressError .progressLabel {
+  color: #ff4d4f;
+}
+
+.retryBtn {
+  margin-top: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #ff4d4f;
+  cursor: pointer;
+  font-size: 14px;
+  border: none;
+  background: none;
+  padding: 0;
+}
+
+.retryBtn:hover {
+  color: #ff7875;
+}
+
+/* ---------------------------------------------------------------------------
+   Parse Preview Table
+   Row backgrounds: success #F6FFED, error #FFF2F0 (spec §交互约束)
+   Pagination: pageSize=20 (spec §交互约束)
+   --------------------------------------------------------------------------- */
+.previewContainer {
+  margin-top: 24px;
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.previewHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  border-bottom: 1px solid #f0f0f0;
+  background: #fafafa;
+}
+
+.previewTitle {
+  font-size: 16px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.previewStats {
+  display: flex;
+  gap: 16px;
+  font-size: 14px;
+}
+
+.statSuccess {
+  color: #52c41a;
+}
+
+.statError {
+  color: #ff4d4f;
+}
+
+.tableWrapper {
+  max-height: 600px;
+  overflow: auto;
+}
+
+.previewTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  table-layout: fixed;
+}
+
+.previewTable th {
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.65);
+  background: #fafafa;
+  border-bottom: 1px solid #f0f0f0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.previewTable td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #f0f0f0;
+  color: rgba(0, 0, 0, 0.88);
+  vertical-align: top;
+}
+
+.previewTable tbody tr:hover td {
+  background-color: inherit;
+}
+
+/* Row status backgrounds (spec §交互约束) */
+.rowSuccess td {
+  background-color: #f6ffed;
+}
+
+.rowError td {
+  background-color: #fff2f0;
+}
+
+/* Corrected row — amber/orange indicator (spec Layer 2.5) */
+.rowCorrected td {
+  background-color: #fff7e6;
+}
+
+/* ---------------------------------------------------------------------------
+   Cell-level error & editable styling
+   Editable cells: blue underline (spec §交互约束: "可编辑单元格加蓝色下划线标识")
+   Error message: red text below cell (spec §交互约束)
+   --------------------------------------------------------------------------- */
+.cellWrapper {
+  position: relative;
+}
+
+.cellError {
+  color: #ff4d4f;
+  font-size: 12px;
+  margin-top: 4px;
+  line-height: 1.4;
+}
+
+/* Blue underline for editable cells */
+.editableCellIndicator {
+  text-decoration: underline;
+  text-decoration-color: #1677ff;
+  text-underline-offset: 3px;
+  cursor: text;
+}
+
+.editableInput {
+  width: 100%;
+  padding: 4px 8px;
+  border: 1px solid #1677ff;
+  border-radius: 4px;
+  outline: none;
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.88);
+  background: #fff;
+  box-sizing: border-box;
+}
+
+.editableInput:focus {
+  border-color: #4096ff;
+  box-shadow: 0 0 0 2px rgba(22, 119, 255, 0.15);
+}
+
+/* Corrected cell amber badge (spec Layer 2.5) */
+.cellCorrectedBadge {
+  display: inline-block;
+  font-size: 12px;
+  color: #d46b08;
+  background: #fff7e6;
+  border: 1px solid #ffd591;
+  border-radius: 4px;
+  padding: 1px 6px;
+  margin-left: 6px;
+  line-height: 1.5;
+}
+
+/* Validation status badge in table */
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  line-height: 1.5;
+}
+
+.statusBadgeSuccess {
+  color: #389e0d;
+  background: #f6ffed;
+  border: 1px solid #b7eb8f;
+}
+
+.statusBadgeError {
+  color: #cf1322;
+  background: #fff2f0;
+  border: 1px solid #ffa39e;
+}
+
+/* ---------------------------------------------------------------------------
+   Pagination
+   --------------------------------------------------------------------------- */
+.paginationContainer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 16px;
+  background: #fafafa;
+  border-top: 1px solid #f0f0f0;
+}
+
+/* ---------------------------------------------------------------------------
+   Confirm Import Button
+   Disabled when all rows error; loading state; "导入完成" final state
+   (spec §交互约束)
+   --------------------------------------------------------------------------- */
+.confirmRow {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 16px;
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.confirmBtn {
+  min-width: 120px;
+  height: 40px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid #1677ff;
+  background: #1677ff;
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.confirmBtn:hover {
+  background: #4096ff;
+  border-color: #4096ff;
+}
+
+.confirmBtn:disabled {
+  background: #f5f5f5;
+  border-color: #d9d9d9;
+  color: rgba(0, 0, 0, 0.25);
+  cursor: not-allowed;
+}
+
+.confirmBtnLoading {
+  opacity: 0.65;
+  pointer-events: none;
+}
+
+.confirmBtnComplete {
+  background: #52c41a;
+  border-color: #52c41a;
+  color: #fff;
+  pointer-events: none;
+}
+
+/* ---------------------------------------------------------------------------
+   Import Result Summary
+   Shown after successful /import/commit (spec §交互约束)
+   --------------------------------------------------------------------------- */
+.importSummary {
+  margin-top: 24px;
+  padding: 20px;
+  border-radius: 8px;
+  background: #f6ffed;
+  border: 1px solid #b7eb8f;
+}
+
+.importSummaryError {
+  background: #fff2f0;
+  border-color: #ffa39e;
+}
+
+.importSummaryTitle {
+  font-size: 16px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.88);
+  margin-bottom: 8px;
+}
+
+.importSummaryText {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.65);
+  line-height: 1.6;
+}
+
+/* ---------------------------------------------------------------------------
+   Export Panel
+   --------------------------------------------------------------------------- */
+.exportCard {
+  background: #fff;
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.filterGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.filterItem {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.filterLabel {
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.exportBtnContainer {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 24px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.exportBtn {
+  min-width: 120px;
+  height: 40px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid #1677ff;
+  background: #1677ff;
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.exportBtn:hover {
+  background: #4096ff;
+  border-color: #4096ff;
+}
+
+.exportBtn:disabled {
+  background: #f5f5f5;
+  border-color: #d9d9d9;
+  color: rgba(0, 0, 0, 0.25);
+  cursor: not-allowed;
+}
+
+/* ---------------------------------------------------------------------------
+   Empty / Loading States
+   --------------------------------------------------------------------------- */
+.emptyState {
+  text-align: center;
+  padding: 64px 32px;
+  color: rgba(0, 0, 0, 0.25);
+}
+
+.emptyStateIcon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.emptyStateText {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.loadingOverlay {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 48px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* ---------------------------------------------------------------------------
+   Responsive
+   --------------------------------------------------------------------------- */
+@media (max-width: 768px) {
+  .container {
+    padding: 16px;
+  }
+
+  .filterGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .confirmRow {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .confirmBtn,
+  .exportBtn {
+    width: 100%;
+  }
+
+  .previewHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Animation
+   --------------------------------------------------------------------------- */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animateIn {
+  animation: fadeIn 0.3s ease-out forwards;
+}

@@ -1,0 +1,64 @@
+# IDE
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+.DS_Store
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/test-results/
+frontend/playwright-report/
+frontend/coverage/
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.production.local
+
+# Backend
+backend/target/
+backend/.mvn/
+backend/mvnw
+backend/mvnw.cmd
+backend/.idea/
+backend/*.iml
+
+# Logs
+*.log
+logs/
+
+# Database
+*.db
+*.sqlite
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temp
+*.tmp
+*.temp
+.aider*
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.py[cod]
+.pytest_cache/
+
+# Daemon 运行时产物
+daemon.out
+daemon_out.log
+daemon_evolution.log
+
+# Graphify 缓存
+graphify-out/
+
+# Spec 临时文件
+spec.md
+
+# 其他临时垃圾
+2/
+New File: backend/

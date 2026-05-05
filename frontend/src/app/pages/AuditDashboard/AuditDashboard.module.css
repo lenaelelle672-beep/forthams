@@ -1,0 +1,534 @@
+/**
+ * AuditDashboard.module.css
+ *
+ * 操作日志审计仪表板主页面样式。
+ * 布局结构：页面标题区 → 筛选栏 → KPI 卡片行 → 趋势图表区 → 数据表格区。
+ * 包含加载态、空数据态、错误态等边界状态的样式处理。
+ */
+
+/* =========================================================
+   1. 页面容器
+   ========================================================= */
+
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 24px;
+  min-height: 100vh;
+  background-color: var(--bg-primary, #f5f7fa);
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   2. 页面标题区
+   ========================================================= */
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.title {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text-primary, #1a1a2e);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.subtitle {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--text-tertiary, #8c8c9a);
+  margin: 4px 0 0 0;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* =========================================================
+   3. 筛选栏区域
+   ========================================================= */
+
+.filterSection {
+  background: var(--bg-elevated, #ffffff);
+  border-radius: 10px;
+  padding: 16px 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--border-secondary, #e8e8ef);
+}
+
+/* =========================================================
+   4. KPI 卡片行
+   ========================================================= */
+
+.kpiRow {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 1200px) {
+  .kpiRow {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .kpiRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =========================================================
+   5. 趋势图表区域
+   ========================================================= */
+
+.chartSection {
+  background: var(--bg-elevated, #ffffff);
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--border-secondary, #e8e8ef);
+}
+
+.chartHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chartTitle {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary, #1a1a2e);
+  margin: 0;
+}
+
+.chartGranularity {
+  font-size: 12px;
+  color: var(--text-tertiary, #8c8c9a);
+  background: var(--bg-secondary, #f0f0f5);
+  padding: 2px 10px;
+  border-radius: 12px;
+}
+
+.chartContainer {
+  width: 100%;
+  height: 320px;
+  position: relative;
+}
+
+@media (max-width: 768px) {
+  .chartContainer {
+    height: 240px;
+  }
+}
+
+/* =========================================================
+   6. 数据表格区域
+   ========================================================= */
+
+.tableSection {
+  background: var(--bg-elevated, #ffffff);
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--border-secondary, #e8e8ef);
+}
+
+.tableHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tableTitle {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary, #1a1a2e);
+  margin: 0;
+}
+
+.tableMeta {
+  font-size: 12px;
+  color: var(--text-tertiary, #8c8c9a);
+}
+
+.tableWrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* =========================================================
+   7. 分页栏
+   ========================================================= */
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-secondary, #e8e8ef);
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.paginationInfo {
+  font-size: 13px;
+  color: var(--text-secondary, #5a5a6e);
+}
+
+.paginationControls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.pageButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
+  padding: 0 8px;
+  border: 1px solid var(--border-secondary, #e8e8ef);
+  border-radius: 6px;
+  background: var(--bg-elevated, #ffffff);
+  color: var(--text-secondary, #5a5a6e);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.pageButton:hover:not(:disabled) {
+  background: var(--bg-secondary, #f0f0f5);
+  border-color: var(--border-primary, #d0d0da);
+}
+
+.pageButton:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.pageButtonActive {
+  background: var(--color-primary, #4f6ef7);
+  color: #ffffff;
+  border-color: var(--color-primary, #4f6ef7);
+}
+
+.pageButtonActive:hover:not(:disabled) {
+  background: var(--color-primary-hover, #3b5ae0);
+  border-color: var(--color-primary-hover, #3b5ae0);
+}
+
+.pageSizeSelect {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-secondary, #5a5a6e);
+}
+
+.pageSizeSelect select {
+  padding: 4px 8px;
+  border: 1px solid var(--border-secondary, #e8e8ef);
+  border-radius: 6px;
+  background: var(--bg-elevated, #ffffff);
+  font-size: 13px;
+  color: var(--text-primary, #1a1a2e);
+  cursor: pointer;
+}
+
+/* =========================================================
+   8. 加载态
+   ========================================================= */
+
+.loadingOverlay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  gap: 12px;
+  color: var(--text-tertiary, #8c8c9a);
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--border-secondary, #e8e8ef);
+  border-top-color: var(--color-primary, #4f6ef7);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loadingText {
+  font-size: 13px;
+  color: var(--text-tertiary, #8c8c9a);
+}
+
+/* =========================================================
+   9. 空数据态
+   ========================================================= */
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  gap: 12px;
+  padding: 40px 20px;
+}
+
+.emptyIcon {
+  width: 56px;
+  height: 56px;
+  color: var(--text-quaternary, #c4c4d0);
+}
+
+.emptyTitle {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-secondary, #5a5a6e);
+  margin: 0;
+}
+
+.emptyDescription {
+  font-size: 13px;
+  color: var(--text-tertiary, #8c8c9a);
+  margin: 0;
+  text-align: center;
+  max-width: 360px;
+  line-height: 1.5;
+}
+
+/* =========================================================
+   10. 错误态
+   ========================================================= */
+
+.errorBanner {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 18px;
+  border-radius: 8px;
+  background: var(--color-error-bg, #fff2f0);
+  border: 1px solid var(--color-error-border, #ffccc7);
+}
+
+.errorIcon {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  color: var(--color-error, #f5222d);
+  margin-top: 1px;
+}
+
+.errorContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.errorTitle {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-error, #f5222d);
+  margin: 0 0 4px 0;
+}
+
+.errorMessage {
+  font-size: 13px;
+  color: var(--color-error-text, #a8071a);
+  margin: 0;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.errorDismiss {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: transparent;
+  color: var(--color-error, #f5222d);
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background 0.15s ease;
+}
+
+.errorDismiss:hover {
+  background: rgba(245, 34, 45, 0.08);
+}
+
+/* =========================================================
+   11. 权限拦截态（403）
+   ========================================================= */
+
+.forbiddenState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  gap: 16px;
+  padding: 60px 20px;
+}
+
+.forbiddenIcon {
+  width: 72px;
+  height: 72px;
+  color: var(--text-quaternary, #c4c4d0);
+}
+
+.forbiddenTitle {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary, #1a1a2e);
+  margin: 0;
+}
+
+.forbiddenDescription {
+  font-size: 14px;
+  color: var(--text-tertiary, #8c8c9a);
+  margin: 0;
+  text-align: center;
+  max-width: 400px;
+  line-height: 1.6;
+}
+
+.forbiddenAction {
+  margin-top: 8px;
+}
+
+/* =========================================================
+   12. 时间跨度越界提示
+   ========================================================= */
+
+.rangeWarning {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: var(--color-warning-bg, #fffbe6);
+  border: 1px solid var(--color-warning-border, #ffe58f);
+  font-size: 13px;
+  color: var(--color-warning-text, #ad6800);
+  line-height: 1.5;
+}
+
+.rangeWarningIcon {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  color: var(--color-warning, #faad14);
+}
+
+/* =========================================================
+   13. 工具类
+   ========================================================= */
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.fadeIn {
+  animation: fadeIn 0.25s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* =========================================================
+   14. 响应式适配
+   ========================================================= */
+
+@media (max-width: 768px) {
+  .dashboard {
+    padding: 16px;
+    gap: 16px;
+  }
+
+  .title {
+    font-size: 18px;
+  }
+
+  .filterSection,
+  .chartSection,
+  .tableSection {
+    padding: 14px;
+    border-radius: 8px;
+  }
+
+  .chartContainer {
+    height: 220px;
+  }
+
+  .pagination {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .paginationControls {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard {
+    padding: 12px;
+    gap: 12px;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .chartContainer {
+    height: 180px;
+  }
+}

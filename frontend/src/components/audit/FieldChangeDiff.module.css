@@ -1,0 +1,466 @@
+/**
+ * FieldChangeDiff.module.css
+ * 
+ * 审计日志字段变更差异视图样式模块
+ * 用于展示 @Auditable 注解字段的历史变更记录
+ * 
+ * @author SWARM-051 Frontend Team
+ * @since Iteration 10
+ */
+
+/* ==========================================================================
+   CSS 变量定义
+   ========================================================================== */
+
+.field-change-diff {
+  /* 容器基础样式 */
+  --fcd-font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --fcd-font-size-base: 14px;
+  --fcd-line-height: 1.5;
+  
+  /* 颜色系统 */
+  --fcd-color-primary: #3b82f6;
+  --fcd-color-success: #22c55e;
+  --fcd-color-warning: #f59e0b;
+  --fcd-color-danger: #ef4444;
+  --fcd-color-info: #06b6d4;
+  
+  /* 边框与间距 */
+  --fcd-border-radius: 8px;
+  --fcd-spacing-unit: 4px;
+  --fcd-padding-base: 12px;
+  
+  /* 变更类型颜色 */
+  --fcd-add-bg: rgba(34, 197, 94, 0.1);
+  --fcd-add-border: #22c55e;
+  --fcd-add-text: #166534;
+  
+  --fcd-remove-bg: rgba(239, 68, 68, 0.1);
+  --fcd-remove-border: #ef4444;
+  --fcd-remove-text: #991b1b;
+  
+  --fcd-modify-bg: rgba(245, 158, 11, 0.1);
+  --fcd-modify-border: #f59e0b;
+  --fcd-modify-text: #92400e;
+  
+  /* @Auditable 字段高亮 */
+  --fcd-auditable-bg: rgba(59, 130, 246, 0.08);
+  --fcd-auditable-border: #3b82f6;
+  --fcd-auditable-badge: #3b82f6;
+  
+  font-family: var(--fcd-font-family);
+  font-size: var(--fcd-font-size-base);
+  line-height: var(--fcd-line-height);
+  color: #374151;
+}
+
+/* ==========================================================================
+   差异容器
+   ========================================================================== */
+
+.diff-container {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--fcd-spacing-unit) * 3);
+  padding: var(--fcd-padding-base);
+  background: #ffffff;
+  border-radius: var(--fcd-border-radius);
+  border: 1px solid #e5e7eb;
+}
+
+.diff-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: calc(var(--fcd-spacing-unit) * 2);
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.diff-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+}
+
+.diff-meta {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--fcd-spacing-unit) * 2);
+  font-size: 12px;
+  color: #6b7280;
+}
+
+/* ==========================================================================
+   变更条目
+   ========================================================================== */
+
+.diff-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--fcd-spacing-unit);
+  padding: calc(var(--fcd-padding-base) - 4px);
+  border-radius: calc(var(--fcd-border-radius) - 2px);
+  border-left: 3px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.diff-item:hover {
+  background: #f9fafb;
+}
+
+.diff-item--add {
+  background: var(--fcd-add-bg);
+  border-left-color: var(--fcd-add-border);
+}
+
+.diff-item--remove {
+  background: var(--fcd-remove-bg);
+  border-left-color: var(--fcd-remove-border);
+}
+
+.diff-item--modify {
+  background: var(--fcd-modify-bg);
+  border-left-color: var(--fcd-modify-border);
+}
+
+/* ==========================================================================
+   @Auditable 字段标记
+   ========================================================================== */
+
+.diff-item--auditable {
+  background: var(--fcd-auditable-bg);
+  border: 1px dashed var(--fcd-auditable-border);
+  position: relative;
+}
+
+.auditable-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 500;
+  color: #ffffff;
+  background: var(--fcd-auditable-badge);
+  border-radius: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.auditable-badge::before {
+  content: '🔍';
+  font-size: 10px;
+}
+
+/* ==========================================================================
+   字段名称与值
+   ========================================================================== */
+
+.field-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: #374151;
+  display: flex;
+  align-items: center;
+  gap: calc(var(--fcd-spacing-unit) * 2);
+}
+
+.field-name__label {
+  min-width: 100px;
+  color: #6b7280;
+}
+
+.field-name__value {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 12px;
+}
+
+.field-values {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--fcd-spacing-unit) * 1.5);
+  padding-left: calc(var(--fcd-spacing-unit) * 6);
+}
+
+.value-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--fcd-spacing-unit);
+  font-size: 13px;
+}
+
+.value-row--old {
+  color: var(--fcd-remove-text);
+  text-decoration: line-through;
+  opacity: 0.8;
+}
+
+.value-row--new {
+  color: var(--fcd-add-text);
+}
+
+.value-row__indicator {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.value-row--old .value-row__indicator::before {
+  content: '-';
+  color: var(--fcd-remove-border);
+}
+
+.value-row--new .value-row__indicator::before {
+  content: '+';
+  color: var(--fcd-add-border);
+}
+
+.value-row__content {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  word-break: break-all;
+}
+
+.value-row__timestamp {
+  font-size: 11px;
+  color: #9ca3af;
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+/* ==========================================================================
+   变更摘要
+   ========================================================================== */
+
+.change-summary {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--fcd-spacing-unit) * 2);
+  padding: var(--fcd-spacing-unit) calc(var(--fcd-spacing-unit) * 2);
+  background: #f3f4f6;
+  border-radius: calc(var(--fcd-border-radius) - 4px);
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.change-summary__count {
+  font-weight: 600;
+  color: #374151;
+}
+
+.change-summary__types {
+  display: flex;
+  gap: calc(var(--fcd-spacing-unit) * 1.5);
+}
+
+.change-type-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.change-type-tag--add {
+  background: var(--fcd-add-bg);
+  color: var(--fcd-add-text);
+}
+
+.change-type-tag--remove {
+  background: var(--fcd-remove-bg);
+  color: var(--fcd-remove-text);
+}
+
+.change-type-tag--modify {
+  background: var(--fcd-modify-bg);
+  color: var(--fcd-modify-text);
+}
+
+/* ==========================================================================
+   Graphify 节点匹配样式（解决 AC-001）
+   ========================================================================== */
+
+.graphify-node {
+  position: relative;
+  padding: var(--fcd-padding-base);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: var(--fcd-border-radius);
+  color: #ffffff;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(102, 126, 234, 0.3);
+}
+
+.graphify-node:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 12px rgba(102, 126, 234, 0.4);
+}
+
+.graphify-node--highlighted {
+  animation: node-pulse 1.5s ease-in-out infinite;
+}
+
+.graphify-node__label {
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.graphify-node__id {
+  font-size: 11px;
+  opacity: 0.8;
+  font-family: monospace;
+}
+
+.graphify-node__badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 20px;
+  height: 20px;
+  background: var(--fcd-color-warning);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+@keyframes node-pulse {
+  0%, 100% {
+    box-shadow: 0 4px 6px rgba(102, 126, 234, 0.3);
+  }
+  50% {
+    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.6);
+  }
+}
+
+/* ==========================================================================
+   知识图谱容器
+   ========================================================================== */
+
+.knowledge-graph {
+  position: relative;
+  width: 100%;
+  min-height: 400px;
+  background: #fafafa;
+  border-radius: var(--fcd-border-radius);
+  border: 1px solid #e5e7eb;
+  overflow: hidden;
+}
+
+.knowledge-graph__canvas {
+  width: 100%;
+  height: 100%;
+}
+
+.knowledge-graph__controls {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.knowledge-graph__control-btn {
+  width: 36px;
+  height: 36px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 16px;
+}
+
+.knowledge-graph__control-btn:hover {
+  background: #f3f4f6;
+  border-color: var(--fcd-color-primary);
+}
+
+/* ==========================================================================
+   空状态
+   ========================================================================== */
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: calc(var(--fcd-padding-base) * 2);
+  text-align: center;
+  color: #9ca3af;
+}
+
+.empty-state__icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.empty-state__title {
+  font-size: 16px;
+  font-weight: 500;
+  color: #6b7280;
+  margin-bottom: 8px;
+}
+
+.empty-state__description {
+  font-size: 13px;
+  color: #9ca3af;
+  max-width: 300px;
+}
+
+/* ==========================================================================
+   响应式适配
+   ========================================================================== */
+
+@media (max-width: 768px) {
+  .diff-container {
+    padding: calc(var(--fcd-padding-base) - 4px);
+  }
+  
+  .field-values {
+    padding-left: calc(var(--fcd-spacing-unit) * 3);
+  }
+  
+  .diff-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: calc(var(--fcd-spacing-unit) * 2);
+  }
+  
+  .knowledge-graph {
+    min-height: 300px;
+  }
+}
+
+@media (max-width: 375px) {
+  .diff-item {
+    padding: var(--fcd-spacing-unit);
+  }
+  
+  .field-name {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--fcd-spacing-unit);
+  }
+  
+  .change-summary {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

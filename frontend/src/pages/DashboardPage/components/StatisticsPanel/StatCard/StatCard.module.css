@@ -1,0 +1,399 @@
+/**
+ * StatCard.module.css
+ * 资产统计卡片样式模块
+ * 
+ * 功能说明：
+ * - 用于展示单个统计数据指标（资产总量、在线数量、离线数量、总价值）
+ * - 支持多种状态变体（normal, loading, error）
+ * - 提供趋势指示器显示
+ * - 响应式设计适配桌面/平板/移动端
+ * 
+ * @version v1.0
+ * @date 2024-01-15
+ */
+
+/* ================================
+   CSS 变量定义
+   ================================ */
+.card {
+  --stat-card-bg: var(--color-surface, #ffffff);
+  --stat-card-border: var(--color-border, #e5e7eb);
+  --stat-card-shadow: var(--shadow-sm, 0 1px 2px 0 rgba(0, 0, 0, 0.05));
+  --stat-card-radius: var(--radius-lg, 12px);
+  --stat-card-padding: var(--spacing-5, 1.25rem);
+  
+  /* 主题色变量 */
+  --stat-primary-color: var(--color-primary, #3b82f6);
+  --stat-success-color: var(--color-success, #10b981);
+  --stat-warning-color: var(--color-warning, #f59e0b);
+  --stat-danger-color: var(--color-danger, #ef4444);
+  --stat-value-color: var(--color-text-primary, #111827);
+  --stat-label-color: var(--color-text-secondary, #6b7280);
+}
+
+/* ================================
+   基础卡片容器
+   ================================ */
+.card {
+  background-color: var(--stat-card-bg);
+  border: 1px solid var(--stat-card-border);
+  border-radius: var(--stat-card-radius);
+  padding: var(--stat-card-padding);
+  box-shadow: var(--stat-card-shadow);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+/* 悬停效果 - 桌面端 */
+@media (hover: hover) {
+  .card:hover {
+    box-shadow: var(--shadow-md, 0 4px 6px -1px rgba(0, 0, 0, 0.1));
+    transform: translateY(-2px);
+  }
+}
+
+/* ================================
+   卡片内容区域
+   ================================ */
+.cardHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-3, 0.75rem);
+}
+
+.cardIcon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md, 8px);
+  background-color: var(--stat-primary-color);
+  opacity: 0.1;
+  position: absolute;
+  top: var(--stat-card-padding);
+  right: var(--stat-card-padding);
+}
+
+.cardContent {
+  flex: 1;
+}
+
+.cardLabel {
+  font-size: var(--font-size-sm, 0.875rem);
+  font-weight: var(--font-weight-medium, 500);
+  color: var(--stat-label-color);
+  margin-bottom: var(--spacing-1, 0.25rem);
+  line-height: 1.4;
+}
+
+.cardValue {
+  font-size: var(--font-size-2xl, 1.5rem);
+  font-weight: var(--font-weight-bold, 700);
+  color: var(--stat-value-color);
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+}
+
+.cardUnit {
+  font-size: var(--font-size-sm, 0.875rem);
+  font-weight: var(--font-weight-normal, 400);
+  color: var(--stat-label-color);
+  margin-left: var(--spacing-1, 0.25rem);
+}
+
+/* ================================
+   趋势指示器
+   ================================ */
+.trendIndicator {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-1, 0.25rem);
+  font-size: var(--font-size-xs, 0.75rem);
+  font-weight: var(--font-weight-medium, 500);
+  padding: var(--spacing-1, 0.25rem) var(--spacing-2, 0.5rem);
+  border-radius: var(--radius-full, 9999px);
+  margin-top: var(--spacing-2, 0.5rem);
+}
+
+.trendUp {
+  color: var(--stat-success-color);
+  background-color: rgba(16, 185, 129, 0.1);
+}
+
+.trendDown {
+  color: var(--stat-danger-color);
+  background-color: rgba(239, 68, 68, 0.1);
+}
+
+.trendNeutral {
+  color: var(--stat-label-color);
+  background-color: rgba(107, 114, 128, 0.1);
+}
+
+.trendIcon {
+  width: 12px;
+  height: 12px;
+}
+
+/* ================================
+   卡片变体样式
+   ================================ */
+
+/* 总量卡片 */
+.variantTotal {
+  --stat-card-accent: var(--stat-primary-color);
+}
+
+.variantTotal .cardIcon {
+  background-color: var(--stat-primary-color);
+}
+
+/* 在线卡片 */
+.variantOnline {
+  --stat-card-accent: var(--stat-success-color);
+}
+
+.variantOnline .cardIcon {
+  background-color: var(--stat-success-color);
+}
+
+.variantOnline .cardValue {
+  color: var(--stat-success-color);
+}
+
+/* 离线卡片 */
+.variantOffline {
+  --stat-card-accent: var(--stat-warning-color);
+}
+
+.variantOffline .cardIcon {
+  background-color: var(--stat-warning-color);
+}
+
+.variantOffline .cardValue {
+  color: var(--stat-warning-color);
+}
+
+/* 价值卡片 */
+.variantValue {
+  --stat-card-accent: var(--stat-danger-color);
+}
+
+.variantValue .cardIcon {
+  background-color: var(--stat-danger-color);
+}
+
+/* ================================
+   加载状态
+   ================================ */
+.loading {
+  pointer-events: none;
+}
+
+.loading .cardValue {
+  background: linear-gradient(
+    90deg,
+    var(--stat-card-border) 25%,
+    var(--color-surface-hover, #f3f4f6) 50%,
+    var(--stat-card-border) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--radius-sm, 4px);
+  color: transparent;
+  min-width: 80px;
+  display: inline-block;
+}
+
+.loading .cardLabel {
+  background: linear-gradient(
+    90deg,
+    var(--stat-card-border) 25%,
+    var(--color-surface-hover, #f3f4f6) 50%,
+    var(--stat-card-border) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--radius-sm, 4px);
+  color: transparent;
+  min-width: 60px;
+  display: inline-block;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* ================================
+   空数据状态
+   ================================ */
+.empty {
+  opacity: 0.6;
+}
+
+.emptyValue {
+  font-size: var(--font-size-lg, 1.125rem);
+  color: var(--stat-label-color);
+  font-style: italic;
+}
+
+/* ================================
+   错误状态
+   ================================ */
+.error {
+  border-color: var(--stat-danger-color);
+}
+
+.errorMessage {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2, 0.5rem);
+  color: var(--stat-danger-color);
+  font-size: var(--font-size-sm, 0.875rem);
+  margin-top: var(--spacing-2, 0.5rem);
+}
+
+.errorIcon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+/* ================================
+   响应式设计
+   ================================ */
+
+/* 桌面端 (≥1024px) */
+@media (min-width: 1024px) {
+  .card {
+    padding: var(--stat-card-padding);
+  }
+  
+  .cardValue {
+    font-size: var(--font-size-3xl, 1.875rem);
+  }
+  
+  .cardIcon {
+    width: 48px;
+    height: 48px;
+  }
+}
+
+/* 平板端 (768px - 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .card {
+    padding: calc(var(--stat-card-padding) * 0.875);
+  }
+  
+  .cardValue {
+    font-size: var(--font-size-2xl, 1.5rem);
+  }
+  
+  .cardIcon {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+/* 移动端 (<768px) */
+@media (max-width: 767px) {
+  .card {
+    padding: var(--spacing-4, 1rem);
+    border-radius: var(--radius-md, 8px);
+  }
+  
+  .cardValue {
+    font-size: var(--font-size-xl, 1.25rem);
+  }
+  
+  .cardIcon {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .cardHeader {
+    flex-direction: column;
+    gap: var(--spacing-2, 0.5rem);
+  }
+  
+  .cardIcon {
+    position: relative;
+    top: 0;
+    right: 0;
+    margin-bottom: var(--spacing-2, 0.5rem);
+  }
+}
+
+/* ================================
+   无障碍设计
+   ================================ */
+
+/* 高对比度模式支持 */
+@media (prefers-contrast: high) {
+  .card {
+    border-width: 2px;
+  }
+  
+  .cardValue {
+    font-weight: 900;
+  }
+}
+
+/* 减少动画偏好 */
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .loading .cardValue,
+  .loading .cardLabel {
+    animation: none;
+    transition: none;
+  }
+}
+
+/* 焦点可见性（用于键盘导航） */
+.card:focus-within {
+  outline: 2px solid var(--stat-primary-color);
+  outline-offset: 2px;
+}
+
+/* ================================
+   打印样式
+   ================================ */
+@media print {
+  .card {
+    box-shadow: none;
+    border: 1px solid #000;
+    break-inside: avoid;
+  }
+  
+  .cardIcon {
+    display: none;
+  }
+  
+  .trendIndicator {
+    border: 1px solid currentColor;
+    background: none;
+  }
+}
+
+/* ================================
+   辅助功能 - 屏幕阅读器
+   ================================ */
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
