@@ -7,6 +7,7 @@ import java.time.LocalDate;
 
 @Data
 public class AssetCreateDTO {
+    @JsonAlias({"code", "assetNo"})
     private String assetNo;
     @JsonAlias({"name", "assetName"})
     private String assetName;

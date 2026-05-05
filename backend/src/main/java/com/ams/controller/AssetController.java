@@ -16,6 +16,11 @@ import org.springframework.web.bind.annotation.*;
 public class AssetController {
     private final AssetService assetService;
 
+    @GetMapping
+    public Result<Page<Asset>> listRoot(AssetQueryDTO queryDTO) {
+        return list(queryDTO);
+    }
+
     @GetMapping("/list")
     public Result<Page<Asset>> list(AssetQueryDTO queryDTO) {
         return Result.success(assetService.queryAssets(queryDTO));

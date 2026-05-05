@@ -7,6 +7,7 @@ public class AssetQueryDTO {
 
     private String assetNo;
     private String assetName;
+    private String keyword;
     private Long categoryId;
     private String status;
     private Long deptId;

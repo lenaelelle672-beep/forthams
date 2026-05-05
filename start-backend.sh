@@ -12,7 +12,7 @@ mysql -uroot -proot -e "CREATE DATABASE IF NOT EXISTS ams_db DEFAULT CHARACTER S
 if [ $? -eq 0 ]; then
     echo "✅ MySQL连接成功"
     echo "初始化数据库..."
-    mysql -uroot -proot ams_db < docs/design/database_schema.sql 2>/dev/null
+    mysql -uroot -proot ams_db < src/main/resources/schema.sql 2>/dev/null
     echo "✅ 数据库初始化完成"
 else
     echo "⚠️  MySQL连接失败,请确保MySQL已启动并配置正确"

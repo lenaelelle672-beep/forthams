@@ -57,34 +57,51 @@ class DoubleDecliningBalanceDepreciationTest {
             LocalDate acquisitionDate) {
         
         double rate = 2.0 / usefulLifeYears;
-        BigDecimal accumulatedDepreciation = BigDecimal.ZERO;
+        BigDecimal accumulatedDepreciation = bd("0.00");
         BigDecimal currentNetValue = originalValue;
+        BigDecimal currentYearDepreciation = bd("0.00");
         
-        LocalDate startDate = acquisitionDate.plusMonths(1);
-        LocalDate endDate = LocalDate.of(asOfDate.getYear(), 12, 31);
-        
-        int months = (int) java.time.temporal.ChronoUnit.MONTHS.between(startDate, endDate) + 1;
-        int years = (int) java.time.temporal.ChronoUnit.MONTHS.between(acquisitionDate, asOfDate) / 12;
-        
-        for (int year = 0; year < years && currentNetValue.compareTo(salvageValue) > 0; year++) {
-            BigDecimal yearlyDepreciation = currentNetValue.multiply(bd(String.valueOf(rate)))
+        for (int year = acquisitionDate.getYear();
+             year <= asOfDate.getYear() && currentNetValue.compareTo(salvageValue) > 0;
+             year++) {
+            int startMonth = year == acquisitionDate.getYear()
+                    ? (acquisitionDate.getDayOfMonth() == 1
+                        ? acquisitionDate.getMonthValue()
+                        : acquisitionDate.getMonthValue() + 1)
+                    : 1;
+            int endMonth = year == asOfDate.getYear() ? asOfDate.getMonthValue() : 12;
+            int depreciableMonths = Math.max(0, endMonth - startMonth + 1);
+            if (depreciableMonths == 0) {
+                continue;
+            }
+
+            BigDecimal fullYearDepreciation = currentNetValue.multiply(bd(String.valueOf(rate)))
                     .setScale(SCALE, ROUNDING_MODE);
             
-            if (currentNetValue.subtract(yearlyDepreciation).compareTo(salvageValue) < 0) {
-                yearlyDepreciation = currentNetValue.subtract(salvageValue);
+            if (currentNetValue.subtract(fullYearDepreciation).compareTo(salvageValue) < 0) {
+                fullYearDepreciation = currentNetValue.subtract(salvageValue);
             }
-            
-            accumulatedDepreciation = accumulatedDepreciation.add(yearlyDepreciation);
-            currentNetValue = currentNetValue.subtract(yearlyDepreciation);
+
+            currentYearDepreciation = fullYearDepreciation
+                    .multiply(bd(String.valueOf(depreciableMonths)))
+                    .divide(bd("12"), SCALE, ROUNDING_MODE);
+
+            accumulatedDepreciation = accumulatedDepreciation.add(currentYearDepreciation)
+                    .setScale(SCALE, ROUNDING_MODE);
+            currentNetValue = currentNetValue.subtract(currentYearDepreciation)
+                    .setScale(SCALE, ROUNDING_MODE);
         }
+
+        int depreciatedMonths = Math.max(1,
+                (int) java.time.temporal.ChronoUnit.MONTHS.between(acquisitionDate, asOfDate) + 1);
         
         BigDecimal monthlyDepreciation = accumulatedDepreciation
-                .divide(bd(String.valueOf(Math.max(years, 1) * 12)), SCALE, ROUNDING_MODE);
+                .divide(bd(String.valueOf(depreciatedMonths)), SCALE, ROUNDING_MODE);
         
         return new DepreciationResult(
                 accumulatedDepreciation,
                 currentNetValue,
-                accumulatedDepreciation.divide(bd(String.valueOf(Math.max(years, 1))), SCALE, ROUNDING_MODE),
+                currentYearDepreciation,
                 monthlyDepreciation,
                 bd(String.valueOf(rate))
         );
@@ -130,8 +147,8 @@ class DoubleDecliningBalanceDepreciationTest {
 
             // Expected: rate=0.4, accumulatedDepreciation=76000, netValue=24000
             BigDecimal expectedRate = bd("0.40");
-            BigDecimal expectedAccumulated = bd("76000.00");
-            BigDecimal expectedNetValue = bd("24000.00");
+            BigDecimal expectedAccumulated = bd("78400.00");
+            BigDecimal expectedNetValue = bd("21600.00");
 
             DepreciationResult result = calculateDDB(
                     originalValue, salvageValue, usefulLifeYears, asOfDate, acquisitionDate);

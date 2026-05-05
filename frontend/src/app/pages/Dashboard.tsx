@@ -26,6 +26,7 @@ import {
   type DashboardStats,
   type DeptDistribution,
 } from "../services/dashboardService";
+import { approvalService, type ApprovalRecord } from '../services/approvalService';
 
 const chartPalette = [
   "var(--color-chart-1)",
@@ -33,20 +34,6 @@ const chartPalette = [
   "var(--color-chart-3)",
   "var(--color-chart-4)",
   "var(--color-chart-5)",
-];
-
-const recentActivities = [
-  { id: 1, type: 'approve', title: '资产转移申请已审批', detail: '设备编号: EQ-2024-001 从研发部转移至生产部', time: '5分钟前', status: 'success' },
-  { id: 2, type: 'maintenance', title: '重要设备保养提醒', detail: '数控机床 CNC-05 需要进行月度保养', time: '1小时前', status: 'warning' },
-  { id: 3, type: 'inventory', title: 'RFID盘点完成', detail: '第一车间资产盘点完成,盘点率 99.5%', time: '2小时前', status: 'success' },
-  { id: 4, type: 'idle', title: '闲置资产公告发布', detail: '办公设备 5台笔记本电脑待认领', time: '3小时前', status: 'info' },
-  { id: 5, type: 'compensation', title: '资产赔偿申请', detail: '员工张三提交设备损坏赔偿申请', time: '5小时前', status: 'warning' },
-];
-
-const pendingApprovals = [
-  { id: 1, type: '资产新增', applicant: '李四', asset: '��记本电脑 ThinkPad X1', amount: '¥8,500', time: '2024-03-08' },
-  { id: 2, type: '资产报废', applicant: '王五', asset: '打印机 HP LaserJet', amount: '¥0', time: '2024-03-08' },
-  { id: 3, type: '资产转移', applicant: '赵六', asset: '投影仪 Epson EB-2250U', amount: '-', time: '2024-03-07' },
 ];
 
 function formatNumber(value?: number | string) {
@@ -94,7 +81,19 @@ function formatDateLabel(value: string) {
   }).format(date);
 }
 
-import { approvalService } from '../services/approvalService';
+function formatApprovalDate(value: unknown) {
+  return typeof value === "string" && value ? value : "-";
+}
+
+function getApprovalLabel(approval: ApprovalRecord, keys: string[], fallback = "-") {
+  for (const key of keys) {
+    const value = approval[key];
+    if (value !== undefined && value !== null && value !== "") {
+      return String(value);
+    }
+  }
+  return fallback;
+}
 
 export function Dashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
@@ -102,6 +101,10 @@ export function Dashboard() {
   const [deptDistribution, setDeptDistribution] = useState<DeptDistribution[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [pendingApprovals, setPendingApprovals] = useState<ApprovalRecord[]>([]);
+  const [approvalMessage, setApprovalMessage] = useState<string | null>(null);
+  const [approvalError, setApprovalError] = useState<string | null>(null);
+  const [processingApprovalId, setProcessingApprovalId] = useState<number | string | null>(null);
 
   useEffect(() => {
     let mounted = true;
@@ -111,10 +114,15 @@ export function Dashboard() {
       setError(null);
 
       try {
-        const [statsResponse, trendsResponse, distributionResponse] = await Promise.all([
+        let approvalLoadError: string | null = null;
+        const [statsResponse, trendsResponse, distributionResponse, approvalsResponse] = await Promise.all([
           dashboardService.getStats(),
           dashboardService.getValueTrends(),
           dashboardService.getDeptDistribution(),
+          approvalService.getPending().catch((pendingError) => {
+            approvalLoadError = pendingError instanceof Error ? pendingError.message : "待审批事项加载失败";
+            return [];
+          }),
         ]);
 
         if (!mounted) {
@@ -124,6 +132,8 @@ export function Dashboard() {
         setStats(statsResponse);
         setValueTrends(trendsResponse);
         setDeptDistribution(distributionResponse);
+        setPendingApprovals((Array.isArray(approvalsResponse) ? approvalsResponse : (approvalsResponse as any)?.records) || []);
+        setApprovalError(approvalLoadError);
       } catch (loadError) {
         if (!mounted) {
           return;
@@ -192,6 +202,33 @@ export function Dashboard() {
       })),
     [deptDistribution],
   );
+
+  const recentActivities = useMemo(
+    () =>
+      pendingApprovals.slice(0, 5).map((approval) => ({
+        id: approval.id,
+        title: getApprovalLabel(approval, ["title", "type", "processType", "changeType"], "待审批事项"),
+        detail: getApprovalLabel(approval, ["assetName", "asset", "reason", "description"], "来自审批服务的待处理记录"),
+        time: formatApprovalDate(approval.createTime ?? approval.createdAt ?? approval.applyDate),
+        status: "warning",
+      })),
+    [pendingApprovals],
+  );
+
+  const handleDashApprove = async (id: number | string, approved: boolean) => {
+    try {
+      setProcessingApprovalId(id);
+      setApprovalError(null);
+      setApprovalMessage(null);
+      await approvalService.approve(id, { approved, comment: approved ? "同意" : "驳回" });
+      setApprovalMessage(approved ? "审批已批准" : "审批已驳回");
+      setPendingApprovals((current) => current.filter((approval) => approval.id !== id));
+    } catch (approveError) {
+      setApprovalError(approveError instanceof Error ? approveError.message : "审批操作失败");
+    } finally {
+      setProcessingApprovalId(null);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -307,7 +344,7 @@ export function Dashboard() {
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">最近动态</h3>
           <div className="space-y-4">
-            {recentActivities.map((activity) => (
+            {recentActivities.length ? recentActivities.map((activity) => (
               <div key={activity.id} className="flex gap-3 pb-4 border-b border-gray-100 last:border-0">
                 <div className={`w-2 h-2 rounded-full mt-2 flex-shrink-0 ${
                   activity.status === 'success' ? 'bg-green-500' :
@@ -320,7 +357,11 @@ export function Dashboard() {
                   <p className="text-xs text-gray-500 mt-1">{activity.time}</p>
                 </div>
               </div>
-            ))}
+            )) : (
+              <div className="rounded-lg border border-dashed border-gray-200 p-4 text-sm text-gray-500">
+                暂无最近动态；当前仅展示审批服务返回的真实待办记录。
+              </div>
+            )}
           </div>
         </div>
 
@@ -329,35 +370,39 @@ export function Dashboard() {
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-gray-900">待审批事项</h3>
             <span className="px-2.5 py-0.5 text-xs font-medium bg-red-100 text-red-800 rounded-full">
-              {formatNumber(stats?.pendingApprovals ?? pendingApprovals.length)}项待处理
+              {formatNumber(pendingApprovals.length)}项待处理
             </span>
           </div>
+          {approvalMessage ? <div className="mb-3 text-sm text-green-600">{approvalMessage}</div> : null}
+          {approvalError ? <div className="mb-3 text-sm text-red-600">{approvalError}</div> : null}
           <div className="space-y-3">
-            {pendingApprovals.map((approval) => (
+            {pendingApprovals.length ? pendingApprovals.map((approval) => (
               <div key={approval.id} className="p-4 bg-gray-50 rounded-lg">
                 <div className="flex items-center justify-between mb-2">
                   <span className="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded">
-                    {approval.type}
+                    {getApprovalLabel(approval, ["type", "processType", "changeType"], "审批")}
                   </span>
-                  <span className="text-xs text-gray-500">{approval.time}</span>
+                  <span className="text-xs text-gray-500">{formatApprovalDate(approval.createTime ?? approval.createdAt ?? approval.applyDate)}</span>
                 </div>
-                <p className="text-sm font-medium text-gray-900">{approval.asset}</p>
+                <p className="text-sm font-medium text-gray-900">{getApprovalLabel(approval, ["assetName", "asset", "title", "description"], "未提供资产名称")}</p>
                 <div className="flex items-center justify-between mt-2">
-                  <span className="text-sm text-gray-600">申请人: {approval.applicant}</span>
-                  {approval.amount !== '-' && (
-                    <span className="text-sm font-medium text-gray-900">{approval.amount}</span>
-                  )}
+                  <span className="text-sm text-gray-600">申请人: {getApprovalLabel(approval, ["applicant", "applicantName", "operatorId", "userId"], "-")}</span>
+                  <span className="text-sm font-medium text-gray-900">{getApprovalLabel(approval, ["amount", "value", "cost"], "")}</span>
                 </div>
                 <div className="flex gap-2 mt-3">
-                  <button onClick={() => handleDashApprove(approval.id, true)} className="flex-1 px-3 py-1.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded transition-colors">
-                    批准
+                  <button disabled={processingApprovalId === approval.id} onClick={() => handleDashApprove(approval.id, true)} className="flex-1 px-3 py-1.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-60 rounded transition-colors">
+                    {processingApprovalId === approval.id ? "处理中..." : "批准"}
                   </button>
-                  <button onClick={() => handleDashApprove(approval.id, false)} className="flex-1 px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded transition-colors">
+                  <button disabled={processingApprovalId === approval.id} onClick={() => handleDashApprove(approval.id, false)} className="flex-1 px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 disabled:opacity-60 rounded transition-colors">
                     驳回
                   </button>
                 </div>
               </div>
-            ))}
+            )) : (
+              <div className="rounded-lg border border-dashed border-gray-200 p-4 text-sm text-gray-500">
+                暂无待审批事项。
+              </div>
+            )}
           </div>
         </div>
       </div>

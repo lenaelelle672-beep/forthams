@@ -1,4 +1,9 @@
-import { createMockUser, createMockApplication } from './retirementService.test';
+const createMockUser = (overrides: Record<string, unknown> = {}) => ({
+  id: 'USER-001',
+  username: 'testuser',
+  role: 'USER',
+  ...overrides,
+});
 
 describe('retirementService', () => {
   // ===========================================================

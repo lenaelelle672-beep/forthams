@@ -173,6 +173,7 @@ function createMockRecord(overrides: Partial<ApprovalRecord> = {}): ApprovalReco
     operatorName: '李四',
     action: 'APPROVE',
     comment: '',
+    createdAt: '2025-06-15T10:30:00Z',
     ...overrides,
   };
 }

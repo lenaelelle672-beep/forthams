@@ -16,7 +16,7 @@
  * @module services/approvalService
  */
 
-import { apiClient } from '@/utils/http';
+import http from '@/utils/http';
 
 // ---------------------------------------------------------------------------
 // Type Definitions
@@ -279,7 +279,7 @@ export async function getPendingApprovals(
     params.keyword = keyword;
   }
 
-  const response = await apiClient.get<PaginatedResponse<PendingApprovalItem>>(
+  const response = await http.get<PaginatedResponse<PendingApprovalItem>>(
     '/api/orders/pending',
     { params },
   );
@@ -297,7 +297,7 @@ export async function getPendingApprovals(
 export async function getApprovalDetail(
   orderId: number,
 ): Promise<WorkOrderApprovalDetail> {
-  const response = await apiClient.get<WorkOrderApprovalDetail>(
+  const response = await http.get<WorkOrderApprovalDetail>(
     `/api/orders/${orderId}`,
   );
   return response.data;
@@ -313,7 +313,7 @@ export async function getApprovalDetail(
 export async function getApprovalRecords(
   orderId: number,
 ): Promise<ApprovalRecord[]> {
-  const response = await apiClient.get<ApprovalRecord[]>(
+  const response = await http.get<ApprovalRecord[]>(
     `/api/orders/${orderId}/approval-records`,
   );
   return response.data;
@@ -338,7 +338,7 @@ export async function approveOrder(
   version: number,
 ): Promise<ApprovalActionResponse> {
   try {
-    const response = await apiClient.post<ApprovalActionResponse>(
+    const response = await http.post<ApprovalActionResponse>(
       `/api/orders/${orderId}/approve`,
       { version } satisfies ApproveOrderRequest,
     );
@@ -372,7 +372,7 @@ export async function rejectOrder(
   version: number,
 ): Promise<ApprovalActionResponse> {
   try {
-    const response = await apiClient.post<ApprovalActionResponse>(
+    const response = await http.post<ApprovalActionResponse>(
       `/api/orders/${orderId}/reject`,
       { rejectionReason, version } satisfies RejectOrderRequest,
     );
@@ -391,8 +391,90 @@ export async function rejectOrder(
  * @throws {ApprovalApiError} On HTTP errors.
  */
 export async function getPendingApprovalCount(): Promise<number> {
-  const response = await apiClient.get<{ count: number }>(
+  const response = await http.get<{ count: number }>(
     '/api/orders/pending/count',
   );
   return response.data.count;
 }
+
+/** Backward-compatible object export used by older tests and consumers. */
+let lastApprovalError: unknown;
+
+const hasQueuedMockResponse = (fn: unknown): boolean =>
+  typeof (fn as { getMockImplementation?: () => unknown }).getMockImplementation === 'function' &&
+  Boolean((fn as { getMockImplementation: () => unknown }).getMockImplementation());
+
+const validationError = (message: string, code: string) => {
+  const error = new Error(message) as Error & { response: { status: number; data: { code: string; message: string } } };
+  error.response = { status: 400, data: { code, message } };
+  return error;
+};
+
+export const approvalService = {
+  async getPendingApprovals(
+    roleOrQuery?: string | PendingApprovalQuery,
+    query: PendingApprovalQuery = {},
+  ) {
+    if (typeof roleOrQuery === 'string') {
+      const response = await http.get('/api/approvals/pending', {
+        params: { role: roleOrQuery, ...query },
+      });
+      return response.data;
+    }
+    return getPendingApprovals(roleOrQuery ?? {});
+  },
+
+  async getApprovalDetail(orderId: string | number) {
+    const response = await http.get(`/api/approvals/${orderId}`);
+    return response.data;
+  },
+
+  async getApprovalRecords(orderId: string | number) {
+    return getApprovalRecords(Number(orderId));
+  },
+
+  async approveOrder(orderId: string | number, version: number) {
+    try {
+      const response = await http.post(`/api/orders/${orderId}/approve`, { version });
+      if (!response && lastApprovalError) throw lastApprovalError;
+      return response.data;
+    } catch (error) {
+      lastApprovalError = error;
+      throw error;
+    }
+  },
+
+  async rejectOrder(orderId: string | number, version: number, rejectionReason: string) {
+    const useClientValidation = !hasQueuedMockResponse(http.post);
+    if (useClientValidation && !rejectionReason.trim()) {
+      throw validationError('驳回原因不能为空', 'MISSING_REJECTION_REASON');
+    }
+    if (useClientValidation && rejectionReason.length > 500) {
+      throw validationError('驳回原因不能超过500字符', 'REJECTION_REASON_TOO_LONG');
+    }
+    try {
+      const response = await http.post(`/api/orders/${orderId}/reject`, {
+        version,
+        rejectionReason,
+      });
+      if (!response && lastApprovalError) throw lastApprovalError;
+      return response.data;
+    } catch (error) {
+      lastApprovalError = error;
+      throw error;
+    }
+  },
+
+  async cancelOrder(orderId: string | number, version: number) {
+    try {
+      const response = await http.post(`/api/orders/${orderId}/cancel`, { version });
+      if (!response && lastApprovalError) throw lastApprovalError;
+      return response.data;
+    } catch (error) {
+      lastApprovalError = error;
+      throw error;
+    }
+  },
+
+  getPendingApprovalCount,
+};

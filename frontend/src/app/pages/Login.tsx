@@ -1,5 +1,5 @@
 import { Package, ShieldCheck } from "lucide-react";
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import { Navigate, useLocation, useNavigate } from "react-router";
 import { Button } from "../components/ui/button";
 import {
@@ -32,6 +32,38 @@ export function Login() {
 
   const from =
     (location.state as LoginLocationState | null)?.from?.pathname ?? "/";
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (submitting) {
+      return;
+    }
+
+    const username = formData.username.trim();
+    const password = formData.password;
+
+    if (!username || !password) {
+      setError("请输入用户名和密码");
+      return;
+    }
+
+    setSubmitting(true);
+    setError(null);
+
+    try {
+      await login({ username, password });
+      navigate(from, { replace: true });
+    } catch (submitError) {
+      setError(
+        submitError instanceof Error
+          ? submitError.message
+          : "登录失败，请稍后重试",
+      );
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -108,24 +140,7 @@ export function Login() {
               <CardContent>
                 <form
                   className="space-y-5"
-                  onSubmit={async (event) => {
-                    event.preventDefault();
-                    setSubmitting(true);
-                    setError(null);
-
-                    try {
-                      await login(formData);
-                      navigate(from, { replace: true });
-                    } catch (submitError) {
-                      setError(
-                        submitError instanceof Error
-                          ? submitError.message
-                          : "登录失败，请稍后重试",
-                      );
-                    } finally {
-                      setSubmitting(false);
-                    }
-                  }}
+                  onSubmit={handleSubmit}
                 >
                   <div className="space-y-2">
                     <Label htmlFor="username">用户名</Label>
@@ -134,6 +149,7 @@ export function Login() {
                       autoComplete="username"
                       placeholder="请输入用户名"
                       value={formData.username}
+                      disabled={submitting}
                       onChange={(event) =>
                         setFormData((current) => ({
                           ...current,
@@ -152,6 +168,7 @@ export function Login() {
                       autoComplete="current-password"
                       placeholder="请输入密码"
                       value={formData.password}
+                      disabled={submitting}
                       onChange={(event) =>
                         setFormData((current) => ({
                           ...current,
@@ -168,7 +185,7 @@ export function Login() {
                     </div>
                   ) : null}
 
-                  <Button className="w-full" disabled={submitting} type="submit">
+                  <Button className="w-full" disabled={submitting} type="submit" aria-busy={submitting}>
                     {submitting ? "登录中..." : "登录并进入仪表板"}
                   </Button>
                 </form>

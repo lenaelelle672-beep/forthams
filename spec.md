@@ -1,167 +1,138 @@
-# Specification: [WAVE2-001] Fix Location Entity Annotations
-
+```markdown
 ## 需求与背景
 
-`Location` 实体类当前缺少 MyBatis-Plus 的 ORM 映射注解，导致实体字段与数据库列名之间的映射关系不正确。数据库表 `location` 的列命名采用下划线风格（如 `location_name`、`parent_id`），而 Java 实体采用驼峰命名（如 `name`、`parentId`）。`name` 字段与列名 `location_name` 的差异超出默认驼峰转换规则，`parentId` 到 `parent_id` 的转换依赖全局配置但缺乏显式声明。需通过添加 `@TableName` 和 `@TableField` 注解确保映射确定性。
+forthAMS 资产折旧 MVP 当前阶段目标：在已有项目骨架上，补全折旧计算与持久化的后端能力、前端展示入口、真实业务测试。仅覆盖直线法（Straight-Line）折旧，作为唯一折旧策略实现。
 
-**数据库表结构（`location`）：**
+**前置状态假设**（基于 worktree 审计结果）：
+- 后端存在 `backend/src/main/java` 下的 Spring Boot 工程骨架，含资产（Asset）实体及相关 Repository/Service/Controller 基础结构
+- 前端存在 `frontend/src/app` 下的 Next.js 路由结构，含资产列表/详情页面基础
+- `.gsd` 状态文件记录当前迭代为折旧 MVP 的第一次实质编码迭代
+- 已有折旧相关代码/测试可能处于空壳、TODO、或不完整状态——本次任务补全而非推翻
 
-| 列名 | 类型 | 备注 |
-|---|---|---|
-| id | BIGINT | 主键 |
-| location_name | VARCHAR | 名称 |
-| location_code | VARCHAR | 编码 |
-| parent_id | BIGINT | 父级ID |
-| sort_order | INT | 排序 |
-| description | VARCHAR | 描述 |
-| status | TINYINT | 状态 |
-| create_time | DATETIME | 创建时间 |
-| update_time | DATETIME | 更新时间 |
-| deleted | TINYINT | 逻辑删除标记 |
-
-**目标文件：** `backend/src/main/java/com/ams/entity/Location.java`
-
----
-
-## 当前 Phase 对应实施目标
-
-**Phase: Entity-Layer Fix（实体层注解修正）**
-
-本 Phase 为独立原子操作，仅修改单一实体文件 `Location.java`，不涉及其他层级。
-
-**实施目标清单：**
-
-| 序号 | 目标 | 具体操作 |
-|---|---|---|
-| 1 | 绑定表名 | 在类声明上方添加 `@TableName("location")` |
-| 2 | 映射 name 字段 | 在 `name` 属性上方添加 `@TableField("location_name")` |
-| 3 | 映射 parentId 字段 | 在 `parentId` 属性上方添加 `@TableField("parent_id")` |
-| 4 | 确保导入完整 | import 中包含 `com.baomidou.mybatisplus.annotation.TableName` 和 `com.baomidou.mybatisplus.annotation.TableField` |
-
----
+**核心增量**：
+1. 后端：`DepreciationMethod` 枚举、`DepreciationRecord` 实体与 Repository、`DepreciationService`（直线法计算逻辑）、对应的 Controller 端点
+2. 前端：资产详情页内嵌折旧结果展示区域（只读），或独立折旧记录列表路由
+3. 测试：后端单元测试覆盖计算逻辑、集成测试覆盖持久化；前端组件测试覆盖渲染
 
 ## 边界约束
 
-### 2.1 IN-SCOPE（必须做）
-- 修改 `Location.java` 实体类，添加注解 `@TableName`、`@TableField`
-- 保留实体类中所有已有字段，不得删除或重命名任何属性
-- 保留所有已存在的注解（如 `@Data`、`@TableId` 等）
+### 绝对禁止
+- 不修改 `ROADMAP.md`、`SPEC.md`、`spec.md`、`README.md` 及任何根目录文档
+- 不编写任何 mock 对象替代真实数据库交互（集成测试必须走真实 H2 内存库）
+- 不引入新的折旧算法（本次仅直线法）
+- 不修改无关历史文件（非折旧相关的 Asset CRUD 代码如已稳定，不触碰）
+- 不新建与现有包结构不一致的包路径
 
-### 2.2 OUT-OF-SCOPE（禁止做）
-- **禁止**修改数据库表结构或 DDL
-- **禁止**修改 Mapper、Service、Controller 等其他层级文件
-- **禁止**修改 `application.yml` 或任何 MyBatis-Plus 全局配置
-- **禁止**在实体中添加不存在于数据库表中的字段
-- **禁止**更改字段类型、访问修饰符或已有的 getter/setter 逻辑
+### 结构约束
+- 后端实体存放于 `backend/src/main/java/com/forthams/<module>/entity/` 或等效已有 entity 目录
+- 后端 Repository 存放于对应 `repository/` 目录
+- 后端 Service 存放于对应 `service/` 目录
+- 后端 Controller 存放于对应 `controller/` 目录
+- 前端页面存放在 `frontend/src/app/` 现有路由树下
+- 前端组件若抽取，存放于 `frontend/src/components/` 已有目录
 
-### 2.3 技术约束
-- 使用 MyBatis-Plus 注解：`com.baomidou.mybatisplus.annotation.TableName`、`com.baomidou.mybatisplus.annotation.TableField`
-- 注解值必须与数据库列名**精确匹配**，区分大小写
-- `@TableField` 仅应用于 `name` 和 `parentId` 两个字段；其余字段（`id`、`locationCode`、`sortOrder`、`description`、`status`、`createTime`、`updateTime`、`deleted`）依赖 MyBatis-Plus 默认驼峰转换，无需显式注解
+### 技术约束
+- 直线法公式：`年折旧额 = (原值 - 预计残值) / 预计使用年限`；`月折旧额 = 年折旧额 / 12`
+- 折旧记录必须关联资产 ID，记录折旧期间（年月）、折旧额、累计折旧、净值
+- 折旧计算触发方式：通过 API 显式触发（POST），非定时任务
+- 数据库字段使用 `DECIMAL(18,2)` 存储金额，禁止使用浮点数类型
+- 前端展示仅读取，不提供折旧参数编辑入口（参数在资产侧维护）
 
-### 2.4 修改后的实体字段-列映射预期
-
-```java
-@Data
-@TableName("location")
-public class Location {
-    // id → id (默认映射，已有 @TableId)
-    
-    @TableField("location_name")
-    private String name;           // → location_name
-    
-    private String locationCode;   // → location_code (驼峰默认转换)
-    
-    @TableField("parent_id")
-    private Long parentId;         // → parent_id
-    
-    private Integer sortOrder;     // → sort_order (驼峰默认转换)
-    private String description;    // → description (默认映射)
-    private Integer status;        // → status (默认映射)
-    private LocalDateTime createTime;  // → create_time (驼峰默认转换)
-    private LocalDateTime updateTime;  // → update_time (驼峰默认转换)
-    private Integer deleted;       // → deleted (默认映射)
-}
-```
-
----
+### 外部调用约束
+- 遵守 Z.AI Coding Plan provider 限速，单次请求间隔不低于配置阈值
+- 遇到 429 立即停止，不重试循环读取同一文件
 
 ## 验收测试基准 (ATB)
 
-### ATB-01: 编译验证
-- **测试方式：** 执行 `mvn compile -pl backend -f backend/pom.xml`
-- **期待结果：** 编译成功，零 ERROR，无未解析的 import 警告
+### ATB-1：直线法折旧计算单元测试
+- **文件**：`backend/src/test/java/.../service/DepreciationServiceTest.java`
+- **方式**：JUnit 5 + AssertJ
+- **用例**：
+  - 原值 100000，残值 10000，年限 5 年 → 年折旧额 18000，月折旧额 1500
+  - 残值为 0 的边界情况
+  - 原值等于残值的退化情况 → 折旧额为 0
+  - 使用年限为 1 年的极短情况
+- **物理期待**：`mvn test -pl backend -Dtest=DepreciationServiceTest` 全部通过，无 mock
 
-### ATB-02: 注解存在性验证（单元测试）
-- **测试方式：** 编写 JUnit 5 + 反射测试，断言以下内容：
+### ATB-2：折旧记录持久化集成测试
+- **文件**：`backend/src/test/java/.../repository/DepreciationRecordRepositoryTest.java` 或对应集成测试类
+- **方式**：Spring Boot Test + `@DataJpaTest`，H2 内存库
+- **用例**：
+  - 插入一条折旧记录后可通过 assetId + period 查回
+  - 同一 assetId + period 不可重复插入（唯一约束）
+  - 累计折旧字段正确存储与读取
+- **物理期待**：`mvn test -pl backend -Dtest=DepreciationRecordRepositoryTest` 全部通过
 
-```java
-// ATB-02-TC1: @TableName 注解存在且值正确
-TableName tableName = Location.class.getAnnotation(TableName.class);
-assert tableName != null : "@TableName annotation missing";
-assert tableName.value().equals("location") : "Expected 'location', got '" + tableName.value() + "'";
+### ATB-3：折旧计算 API 端到端测试
+- **文件**：`backend/src/test/java/.../controller/DepreciationControllerTest.java`
+- **方式**：`@WebMvcTest` 或 `@SpringBootTest` + `MockMvc`
+- **用例**：
+  - `POST /api/depreciation/calculate` 传入 assetId，返回 200 及折旧记录列表
+  - 传入不存在的 assetId 返回 404
+  - 传入残值大于原值的资产返回 400
+- **物理期待**：`mvn test -pl backend -Dtest=DepreciationControllerTest` 全部通过
 
-// ATB-02-TC2: name 字段 @TableField 映射到 location_name
-Field nameField = Location.class.getDeclaredField("name");
-TableField nameAnnotation = nameField.getAnnotation(TableField.class);
-assert nameAnnotation != null : "@TableField missing on 'name' field";
-assert nameAnnotation.value().equals("location_name") : "Expected 'location_name'";
+### ATB-4：前端折旧展示组件渲染测试
+- **文件**：`frontend/src/__tests__/` 或 `frontend/src/app/.../__tests__/` 下对应测试文件
+- **方式**：Jest + React Testing Library
+- **用例**：
+  - 组件接收折旧记录数组 props 后，正确渲染表格行数
+  - 无折旧记录时显示空状态提示
+  - 金额格式化显示（千分位、两位小数）
+- **物理期待**：`cd frontend && npx jest --testPathPattern="depreciation"` 全部通过
 
-// ATB-02-TC3: parentId 字段 @TableField 映射到 parent_id
-Field parentIdField = Location.class.getDeclaredField("parentId");
-TableField parentIdAnnotation = parentIdField.getAnnotation(TableField.class);
-assert parentIdAnnotation != null : "@TableField missing on 'parentId' field";
-assert parentIdAnnotation.value().equals("parent_id") : "Expected 'parent_id'";
+### ATB-5：后端全量编译验证
+- **命令**：`cd backend && mvn compile -q`
+- **物理期待**：退出码 0，无 warning 以上级别输出
 
-// ATB-02-TC4: 字段总数不变（必须为 10）
-Field[] fields = Location.class.getDeclaredFields();
-assert fields.length == 10 : "Expected 10 fields, found " + fields.length;
-```
-
-- **期待结果：** 全部断言通过
-
-### ATB-03: ORM 映射集成验证（需数据库环境）
-- **测试方式：** 启动应用后，通过 MyBatis-Plus `BaseMapper.selectList(null)` 或自定义 SQL 执行全表查询
-- **期待结果：**
-  - 返回的 `Location` 对象中 `name` 属性非 null（当数据库 `location_name` 列有值时）
-  - 返回的 `Location` 对象中 `parentId` 属性正确映射数据库 `parent_id` 列值
-  - 无 `ColumnNotFound` 或映射异常
-
-### ATB-04: SQL 日志验证
-- **测试方式：** 开启 MyBatis-Plus SQL 日志（`mybatis-plus.configuration.log-impl=org.apache.ibatis.logging.stdout.StdOutImpl`），执行一次 `selectById` 查询
-- **期待结果：** 生成的 SQL 为 `SELECT id, location_name, location_code, parent_id, sort_order, description, status, create_time, update_time, deleted FROM location WHERE id=? AND deleted=0`，列名与数据库表完全对应，无字段名拼写错误
-
-### ATB-05: 回归无损验证
-- **测试方式：** 执行已有项目全量测试套件 `mvn test`
-- **期待结果：** 所有已有测试用例状态不变，无新增 FAIL 或 ERROR
-
----
+### ATB-6：前端构建验证
+- **命令**：`cd frontend && npx next build 2>&1 | tail -20`
+- **物理期待**：构建成功，无 TypeScript 错误
 
 ## 开发切入层级序列
 
+### Layer 1：后端实体与枚举定义
+- 在已有 entity 包下新建或补全 `DepreciationMethod` 枚举（仅 `STRAIGHT_LINE`）
+- 新建 `DepreciationRecord` 实体：`id`, `assetId`(Long), `period`(String, 格式 `yyyy-MM`), `depreciationAmount`(BigDecimal), `accumulatedDepreciation`(BigDecimal), `netValue`(BigDecimal), `createdAt`(LocalDateTime)
+- 确保 Asset 实体已具备折旧所需字段：`originalValue`(BigDecimal), `residualValue`(BigDecimal), `usefulLifeYears`(Integer)；若缺失则仅追加这三个字段，不改其余字段
+- 补全对应的数据库迁移脚本（如项目使用 Flyway/Liquibase）或确保 JPA `ddl-auto` 能正确生成表结构
+
+### Layer 2：后端 Repository 层
+- 新建 `DepreciationRecordRepository extends JpaRepository<DepreciationRecord, Long>`
+- 追加查询方法：`List<DepreciationRecord> findByAssetIdOrderByPeriodAsc(Long assetId)`
+- 追加唯一约束：`Optional<DepreciationRecord> findByAssetIdAndPeriod(Long assetId, String period)`
+- 编写 ATB-2 对应测试并验证通过
+
+### Layer 3：后端 Service 层（核心计算）
+- 新建 `DepreciationService`
+- 实现方法 `calculateStraightLine(Asset asset, int year, int month)`：单月折旧计算，返回 `DepreciationRecord`
+- 实现方法 `calculateForAsset(Long assetId, int periods)`：批量计算多期折旧，查询已有记录避免重复，返回 `List<DepreciationRecord>`
+- 计算逻辑必须使用 `BigDecimal`，`setScale(2, RoundingMode.HALF_UP)`
+- 参数校验：原值 < 残值抛业务异常；年限 <= 0 抛业务异常
+- 编写 ATB-1 对应测试并验证通过
+
+### Layer 4：后端 Controller 层
+- 新建 `DepreciationController`，路径 `/api/depreciation`
+- 端点 `POST /api/depreciation/calculate`：接收 `{ "assetId": Long, "periods": int }`，调用 Service，返回折旧记录列表
+- 端点 `GET /api/depreciation/records?assetId={id}`：查询已有折旧记录
+- 异常处理复用项目已有全局异常处理器，不新建
+- 编写 ATB-3 对应测试并验证通过
+
+### Layer 5：前端折旧展示组件
+- 在 `frontend/src/components/` 下新建 `DepreciationTable.tsx`
+- Props：`records: DepreciationRecord[]`
+- 表格列：期间、当期折旧额、累计折旧、净值
+- 金额列使用 `toLocaleString` 或等效格式化
+- 空状态渲染"暂无折旧记录"
+- 编写 ATB-4 对应测试并验证通过
+
+### Layer 6：前端页面集成
+- 在资产详情页（`frontend/src/app/assets/[id]/page.tsx` 或等效路径）中引入 `DepreciationTable`
+- 在页面加载时调用 `GET /api/depreciation/records?assetId={id}` 获取数据
+- 在资产详情页添加"计算折旧"按钮，点击调用 `POST /api/depreciation/calculate`，成功后刷新列表
+- 若资产详情页结构复杂，仅追加折旧区域，不改已有结构
+
+### Layer 7：全量验证
+- 依次执行 ATB-1 至 ATB-6 全部验证命令
+- 汇总结果，报告通过/失败项
 ```
-STEP 1 ── [Entity Layer] 打开 backend/src/main/java/com/ams/entity/Location.java
-         │
-         ├─ 1a. 确认 import 区块：添加或验证
-         │      import com.baomidou.mybatisplus.annotation.TableName;
-         │      import com.baomidou.mybatisplus.annotation.TableField;
-         │
-         ├─ 1b. 类级别：在 @Data（或等效 Lombok 注解）上方/下方添加
-         │      @TableName("location")
-         │
-         ├─ 1c. 字段级别 name：在 private String name; 上方添加
-         │      @TableField("location_name")
-         │
-         └─ 1d. 字段级别 parentId：在 private Long parentId; 上方添加
-                @TableField("parent_id")
-
-STEP 2 ── [验证] 执行 mvn compile，确认编译通过
-
-STEP 3 ── [验证] 执行 ATB-02 反射测试，确认注解值精确匹配
-
-STEP 4 ── [验证] 执行 ATB-04 SQL 日志检查，确认列名映射正确
-
-STEP 5 ── [验证] 执行 mvn test 全量回归，确认无破坏
-```
-
-**完成标志：** STEP 1 至 STEP 5 全部通过，本 Spec 关闭。

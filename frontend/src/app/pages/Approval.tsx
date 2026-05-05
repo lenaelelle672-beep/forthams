@@ -1,23 +1,28 @@
 import { useEffect, useState } from "react";
 import { ClipboardCheck, Clock, CheckCircle, XCircle, AlertCircle } from "lucide-react";
 import { approvalService } from "../services/approvalService";
-
-const workOrders: any[] = [];
+import { workOrderService } from "../services/workOrderService";
 
 export function Approval() {
   const [activeTab, setActiveTab] = useState<'approval' | 'workorder'>('approval');
   const [statusFilter, setStatusFilter] = useState('全部状态');
   const [approvals, setApprovals] = useState<any[]>([]);
+  const [workOrders, setWorkOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [detailItem, setDetailItem] = useState<any | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
 
   const loadData = async () => {
     try {
       setLoading(true);
       setError(null);
-      const result = await approvalService.list() as any;
+      const [result, workOrderResult] = await Promise.all([
+        approvalService.list() as any,
+        workOrderService.list({ pageSize: 50 }) as any,
+      ]);
       setApprovals(Array.isArray(result) ? result : result?.records || []);
+      setWorkOrders(Array.isArray(workOrderResult) ? workOrderResult : workOrderResult?.records || []);
     } catch (err) {
       console.error('Failed to load approvals:', err);
       setError('审批数据加载失败');
@@ -33,15 +38,58 @@ export function Approval() {
   const handleApprove = async (id: string | number, approved: boolean) => {
     try {
       await approvalService.approve(id, { approved, comment: approved ? '同意' : '驳回' });
+      setNotice(approved ? '审批已批准' : '审批已驳回');
       await loadData();
     } catch (err) {
       console.error('Failed to approve:', err);
+      setError('审批操作失败');
     }
   };
 
+  const handleWorkOrderOperation = async (order: any, operation: 'submit' | 'start' | 'complete') => {
+    try {
+      if (operation === 'submit') {
+        await workOrderService.submit(order.id);
+        setNotice('工单已提交审批');
+      } else {
+        await workOrderService.operate(order.id, operation, operation === 'complete' ? '处理完成' : undefined);
+        setNotice(operation === 'start' ? '工单已开始执行' : '工单已完成');
+      }
+      await loadData();
+    } catch (err) {
+      console.error('Failed to operate work order:', err);
+      setError('工单操作失败');
+    }
+  };
+
+  const getWorkOrderStatusLabel = (status?: string) => ({
+    DRAFT: '草稿',
+    PENDING: '待审批',
+    APPROVED: '待派工',
+    EXECUTING: '处理中',
+    COMPLETED: '已完成',
+    REJECTED: '已驳回',
+    CANCELLED: '已取消',
+  }[status || ''] || status || '-');
+
+  const getPriorityLabel = (priority?: string) => ({
+    NORMAL: '中',
+    URGENT: '高',
+    EMERGENCY: '紧急',
+  }[priority || ''] || priority || '-');
+
+  const getApprovalStatusLabel = (status?: string) => ({
+    PENDING: '待审批',
+    APPROVING: '审批中',
+    IN_PROGRESS: '审批中',
+    APPROVED: '已批准',
+    REJECTED: '已驳回',
+    CANCELLED: '已取消',
+  }[status || ''] || status || '-');
+
   const filteredApprovals = statusFilter === '全部状态' 
     ? approvals 
-    : approvals.filter(a => a.status === statusFilter);
+    : approvals.filter(a => getApprovalStatusLabel(a.status) === statusFilter);
 
   return (
     <div className="space-y-6">
@@ -54,13 +102,14 @@ export function Approval() {
       {/* 统计卡片 */}
       {loading && <div className="text-sm text-gray-500">加载中...</div>}
       {error && <div className="text-sm text-red-600">{error}</div>}
+      {notice && <div className="text-sm text-green-700 bg-green-50 border border-green-100 rounded-lg px-4 py-3">{notice}</div>}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">待审批</p>
               <p className="text-3xl font-semibold text-gray-900 mt-2">
-                {approvals.filter(a => a.status === '待审批').length}
+                {approvals.filter(a => getApprovalStatusLabel(a.status) === '待审批').length}
               </p>
             </div>
             <div className="w-12 h-12 bg-yellow-50 rounded-lg flex items-center justify-center">
@@ -73,7 +122,7 @@ export function Approval() {
             <div>
               <p className="text-sm text-gray-600">审批中</p>
               <p className="text-3xl font-semibold text-gray-900 mt-2">
-                {approvals.filter(a => a.status === '审批中').length}
+                {approvals.filter(a => getApprovalStatusLabel(a.status) === '审批中').length}
               </p>
             </div>
             <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center">
@@ -86,7 +135,7 @@ export function Approval() {
             <div>
               <p className="text-sm text-gray-600">已批准</p>
               <p className="text-3xl font-semibold text-gray-900 mt-2">
-                {approvals.filter(a => a.status === '已批准').length}
+                {approvals.filter(a => getApprovalStatusLabel(a.status) === '已批准').length}
               </p>
             </div>
             <div className="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center">
@@ -99,7 +148,7 @@ export function Approval() {
             <div>
               <p className="text-sm text-gray-600">待处理工单</p>
               <p className="text-3xl font-semibold text-gray-900 mt-2">
-                {workOrders.filter(w => w.status !== '已完成').length}
+                {workOrders.filter(w => w.status !== 'COMPLETED' && w.status !== '已完成').length}
               </p>
             </div>
             <div className="w-12 h-12 bg-purple-50 rounded-lg flex items-center justify-center">
@@ -161,12 +210,12 @@ export function Approval() {
                       <div className="flex items-center gap-3 mb-2">
                         <h4 className="text-lg font-semibold text-gray-900">{approval.title}</h4>
                         <span className={`px-2.5 py-0.5 text-xs font-medium rounded-full ${
-                          approval.status === '待审批' ? 'bg-yellow-100 text-yellow-800' :
-                          approval.status === '审批中' ? 'bg-blue-100 text-blue-800' :
-                          approval.status === '已批准' ? 'bg-green-100 text-green-800' :
+                          getApprovalStatusLabel(approval.status) === '待审批' ? 'bg-yellow-100 text-yellow-800' :
+                          getApprovalStatusLabel(approval.status) === '审批中' ? 'bg-blue-100 text-blue-800' :
+                          getApprovalStatusLabel(approval.status) === '已批准' ? 'bg-green-100 text-green-800' :
                           'bg-red-100 text-red-800'
                         }`}>
-                          {approval.status}
+                          {getApprovalStatusLabel(approval.status)}
                         </span>
                         <span className={`px-2 py-0.5 text-xs font-medium rounded ${
                           approval.urgency === '紧急' ? 'bg-red-100 text-red-800' :
@@ -175,12 +224,12 @@ export function Approval() {
                           {approval.urgency}
                         </span>
                         <span className="px-2 py-0.5 text-xs font-medium bg-purple-100 text-purple-800 rounded">
-                          {approval.type}
+                          {approval.type || approval.processType || '-'}
                         </span>
                       </div>
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-gray-600">
                         <div>
-                          <span className="text-gray-500">申请编号:</span> {approval.id}
+                          <span className="text-gray-500">申请编号:</span> {approval.processNo || approval.id}
                         </div>
                         <div>
                           <span className="text-gray-500">申请人:</span> {approval.applicant}
@@ -192,7 +241,7 @@ export function Approval() {
                           <span className="text-gray-500">金额:</span> {approval.amount}
                         </div>
                         <div>
-                          <span className="text-gray-500">提交时间:</span> {approval.submitDate}
+                          <span className="text-gray-500">提交时间:</span> {approval.submitDate || approval.applyTime || approval.createTime || '-'}
                         </div>
                         {approval.currentApprover && (
                           <div>
@@ -210,7 +259,7 @@ export function Approval() {
                       )}
                     </div>
                     <div className="flex gap-2 ml-4">
-                      {approval.status === '待审批' && (
+                      {getApprovalStatusLabel(approval.status) === '待审批' && (
                         <>
                            <button onClick={() => handleApprove(approval.id, true)} className="px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-lg transition-colors">
                              批准
@@ -287,39 +336,44 @@ export function Approval() {
                 <tbody className="divide-y divide-gray-200">
                   {workOrders.map((order) => (
                     <tr key={order.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 text-sm font-medium text-blue-600">{order.id}</td>
-                      <td className="px-6 py-4 text-sm text-gray-900">{order.type}</td>
-                      <td className="px-6 py-4 text-sm text-gray-900">{order.equipment}</td>
-                      <td className="px-6 py-4 text-sm text-gray-600">{order.reporter}</td>
+                      <td className="px-6 py-4 text-sm font-medium text-blue-600">{order.workOrderNo || order.id}</td>
+                      <td className="px-6 py-4 text-sm text-gray-900">{order.title || order.type || '-'}</td>
+                      <td className="px-6 py-4 text-sm text-gray-900">{order.assetName || order.equipment || '-'}</td>
+                      <td className="px-6 py-4 text-sm text-gray-600">{order.reporterName || order.reporter || '-'}</td>
                       <td className="px-6 py-4">
                         <span className={`px-2 py-1 text-xs font-medium rounded ${
-                          order.priority === '高' ? 'bg-red-100 text-red-800' :
-                          order.priority === '中' ? 'bg-yellow-100 text-yellow-800' :
+                          getPriorityLabel(order.priority) === '高' || getPriorityLabel(order.priority) === '紧急' ? 'bg-red-100 text-red-800' :
+                          getPriorityLabel(order.priority) === '中' ? 'bg-yellow-100 text-yellow-800' :
                           'bg-gray-100 text-gray-800'
                         }`}>
-                          {order.priority}
+                          {getPriorityLabel(order.priority)}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-600">{order.assignee}</td>
+                      <td className="px-6 py-4 text-sm text-gray-600">{order.assigneeName || order.assignee || '-'}</td>
                       <td className="px-6 py-4">
                         <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                          order.status === '处理中' ? 'bg-blue-100 text-blue-800' :
-                          order.status === '待派工' ? 'bg-yellow-100 text-yellow-800' :
+                          order.status === 'EXECUTING' || order.status === '处理中' ? 'bg-blue-100 text-blue-800' :
+                          order.status === 'APPROVED' || order.status === '待派工' ? 'bg-yellow-100 text-yellow-800' :
                           'bg-green-100 text-green-800'
                         }`}>
-                          {order.status}
+                          {getWorkOrderStatusLabel(order.status)}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-600">{order.createTime}</td>
+                      <td className="px-6 py-4 text-sm text-gray-600">{order.createTime || '-'}</td>
                       <td className="px-6 py-4 text-sm">
                         <div className="flex gap-2">
-                          {order.status === '待派工' && (
-                            <button onClick={() => alert('派工功能：请先创建工单数据')} className="px-3 py-1 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded transition-colors">
-                              派工
+                          {order.status === 'DRAFT' && (
+                            <button onClick={() => handleWorkOrderOperation(order, 'submit')} className="px-3 py-1 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded transition-colors">
+                              提交
                             </button>
                           )}
-                          {order.status === '处理中' && (
-                            <button onClick={() => alert('完成功能：请先创建工单数据')} className="px-3 py-1 text-xs font-medium text-white bg-green-600 hover:bg-green-700 rounded transition-colors">
+                          {order.status === 'APPROVED' && (
+                            <button onClick={() => handleWorkOrderOperation(order, 'start')} className="px-3 py-1 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded transition-colors">
+                              开始执行
+                            </button>
+                          )}
+                          {order.status === 'EXECUTING' && (
+                            <button onClick={() => handleWorkOrderOperation(order, 'complete')} className="px-3 py-1 text-xs font-medium text-white bg-green-600 hover:bg-green-700 rounded transition-colors">
                               完成
                             </button>
                           )}
@@ -332,6 +386,7 @@ export function Approval() {
                   ))}
                 </tbody>
               </table>
+              {workOrders.length === 0 && <div className="px-6 py-8 text-sm text-gray-500">暂无工单数据</div>}
             </div>
           </div>
         )}

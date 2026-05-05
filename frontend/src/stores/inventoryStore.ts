@@ -78,6 +78,12 @@ export interface InventoryState {
   // ─── 任务列表筛选与分页 ───────────────────────────────────
   /** 当前生效的筛选参数 */
   taskFilter: InventoryTaskFilterParams;
+  /** 兼容旧测试/调用方：null 表示全部状态 */
+  statusFilter: InventoryTaskStatus | null;
+  /** 兼容旧测试/调用方：当前页码 */
+  currentPage: number;
+  /** 兼容旧测试/调用方：每页条数 */
+  pageSize: number;
 
   // ─── 任务选择（详情页路由） ────────────────────────────────
   /** 当前选中的盘点任务 ID，用于路由导航至 `/inventory/tasks/:taskId` */
@@ -86,6 +92,8 @@ export interface InventoryState {
   // ─── 新建任务弹窗 ─────────────────────────────────────────
   /** 新建盘点任务弹窗是否可见 */
   isCreateModalOpen: boolean;
+  /** 提交中状态（用于防重复提交） */
+  isSubmitting: boolean;
 
   // ─── 盘点执行页面 UI 状态 ─────────────────────────────────
   /** 当前正在行内编辑的资产行 ID，null 表示无行处于编辑态 */
@@ -96,22 +104,36 @@ export interface InventoryState {
   // ─── Actions ─────────────────────────────────────────────
   /** 浅合并更新筛选条件，更新后自动将 page 重置为 1 */
   setTaskFilter: (patch: Partial<InventoryTaskFilterParams>) => void;
+  /** 兼容旧调用方：设置状态筛选 */
+  setStatusFilter: (status: InventoryTaskStatus | null) => void;
+  /** 兼容旧调用方：设置当前页 */
+  setCurrentPage: (page: number) => void;
   /** 重置筛选条件为默认值 */
   resetTaskFilter: () => void;
   /** 设置当前选中的任务 ID；切换任务时自动清空编辑和选中状态 */
   setSelectedTaskId: (taskId: string | null) => void;
+  /** 兼容旧调用方：设置当前选中的任务 ID */
+  selectTask: (taskId: string | null) => void;
   /** 控制新建任务弹窗的可见性 */
   setCreateModalOpen: (open: boolean) => void;
+  /** 设置提交中状态 */
+  setSubmitting: (submitting: boolean) => void;
   /** 设置当前行内编辑的资产 ID */
   setEditingAssetId: (assetId: string | null) => void;
   /** 切换某个资产在批量选中集合中的选中/取消状态 */
   toggleAssetSelection: (assetId: string) => void;
   /** 根据可见资产 ID 列表执行全选或取消全选 */
   setAllAssetSelection: (visibleAssetIds: string[], selected: boolean) => void;
+  /** 兼容旧调用方：直接替换已选资产集合 */
+  setSelectedAssetIds: (assetIds: string[]) => void;
   /** 清空批量选中集合 */
   clearAssetSelection: () => void;
+  /** 是否存在已选资产 */
+  hasSelectedAssets: () => boolean;
   /** 重置整个 store 到初始状态（用户离开盘点模块时调用） */
   resetStore: () => void;
+  /** 兼容旧调用方：重置整个 store */
+  reset: () => void;
 }
 
 // ---------------------------------------------------------------------------
@@ -136,8 +158,12 @@ const DEFAULT_FILTER: InventoryTaskFilterParams = {
  */
 const INITIAL_STATE = {
   taskFilter: { ...DEFAULT_FILTER } as InventoryTaskFilterParams,
+  statusFilter: null as InventoryTaskStatus | null,
+  currentPage: 1,
+  pageSize: 20,
   selectedTaskId: null as string | null,
   isCreateModalOpen: false,
+  isSubmitting: false,
   editingAssetId: null as string | null,
   selectedAssetIds: [] as string[],
 };
@@ -176,7 +202,25 @@ export const useInventoryStore = create<InventoryState>()((set) => ({
         // 筛选条件变化时自动回到第 1 页（仅当非显式设置 page 时）
         ...(patch.page === undefined ? { page: 1 } : {}),
       },
+      statusFilter: patch.status ?? state.statusFilter,
+      currentPage: patch.page ?? (patch.page === undefined ? 1 : state.currentPage),
+      pageSize: patch.pageSize ?? state.pageSize,
     })),
+
+  setStatusFilter: (status) =>
+    set((state) => ({
+      statusFilter: status,
+      currentPage: 1,
+      taskFilter: { ...state.taskFilter, status: status ?? undefined, page: 1 },
+    })),
+
+  setCurrentPage: (page) => {
+    const nextPage = Math.max(1, page);
+    set((state) => ({
+      currentPage: nextPage,
+      taskFilter: { ...state.taskFilter, page: nextPage },
+    }));
+  },
 
   /**
    * 重置筛选条件为默认值
@@ -184,6 +228,9 @@ export const useInventoryStore = create<InventoryState>()((set) => ({
   resetTaskFilter: () =>
     set({
       taskFilter: { ...DEFAULT_FILTER },
+      statusFilter: null,
+      currentPage: 1,
+      pageSize: DEFAULT_FILTER.pageSize,
     }),
 
   /**
@@ -194,11 +241,13 @@ export const useInventoryStore = create<InventoryState>()((set) => ({
    * @param taskId - 任务 UUID，传 null 表示取消选中
    */
   setSelectedTaskId: (taskId) =>
-    set({
+    set((state) => ({
       selectedTaskId: taskId,
-      editingAssetId: null,
-      selectedAssetIds: [],
-    }),
+      editingAssetId: state.selectedTaskId === taskId ? state.editingAssetId : null,
+      selectedAssetIds: state.selectedTaskId === taskId ? state.selectedAssetIds : [],
+    })),
+
+  selectTask: (taskId) => useInventoryStore.getState().setSelectedTaskId(taskId),
 
   /**
    * 控制新建盘点任务弹窗的可见性
@@ -206,6 +255,8 @@ export const useInventoryStore = create<InventoryState>()((set) => ({
    * @param open - true 打开弹窗，false 关闭弹窗
    */
   setCreateModalOpen: (open) => set({ isCreateModalOpen: open }),
+
+  setSubmitting: (submitting) => set({ isSubmitting: submitting }),
 
   /**
    * 设置当前行内编辑的资产行 ID
@@ -254,10 +305,15 @@ export const useInventoryStore = create<InventoryState>()((set) => ({
         : [],
     }),
 
+  setSelectedAssetIds: (assetIds) =>
+    set({ selectedAssetIds: assetIds.slice(0, BATCH_CONFIRM_LIMIT) }),
+
   /**
    * 清空批量选中集合
    */
   clearAssetSelection: () => set({ selectedAssetIds: [] }),
+
+  hasSelectedAssets: () => useInventoryStore.getState().selectedAssetIds.length > 0,
 
   /**
    * 重置整个 store 到初始状态
@@ -268,6 +324,8 @@ export const useInventoryStore = create<InventoryState>()((set) => ({
       ...INITIAL_STATE,
       taskFilter: { ...DEFAULT_FILTER },
     }),
+
+  reset: () => useInventoryStore.getState().resetStore(),
 }));
 
 // ---------------------------------------------------------------------------

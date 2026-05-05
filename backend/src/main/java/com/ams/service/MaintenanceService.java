@@ -2,6 +2,7 @@ package com.ams.service;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.ams.common.exception.BusinessException;
+import com.ams.context.TenantContext;
 import com.ams.dto.MaintenanceCreateDTO;
 import com.ams.dto.MaintenanceUpdateDTO;
 import com.ams.entity.MaintenanceRecord;
@@ -22,9 +23,11 @@ public class MaintenanceService {
     private final MaintenanceRecordMapper maintenanceRecordMapper;
 
     public Page<MaintenanceRecord> queryRecords(Integer page, Integer pageSize, Long assetId, String maintenanceType) {
+        String tenantId = TenantContext.requireTenantId();
         Page<MaintenanceRecord> pageParam = new Page<>(page == null ? 1 : page, pageSize == null ? 10 : pageSize);
 
-        LambdaQueryWrapper<MaintenanceRecord> wrapper = new LambdaQueryWrapper<>();
+        LambdaQueryWrapper<MaintenanceRecord> wrapper = new LambdaQueryWrapper<MaintenanceRecord>()
+                .eq(MaintenanceRecord::getTenantId, tenantId);
         if (assetId != null) {
             wrapper.eq(MaintenanceRecord::getAssetId, assetId);
         }
@@ -37,7 +40,10 @@ public class MaintenanceService {
     }
 
     public MaintenanceRecord getRecordById(Long id) {
-        MaintenanceRecord record = maintenanceRecordMapper.selectById(id);
+        String tenantId = TenantContext.requireTenantId();
+        MaintenanceRecord record = maintenanceRecordMapper.selectOne(new LambdaQueryWrapper<MaintenanceRecord>()
+                .eq(MaintenanceRecord::getId, id)
+                .eq(MaintenanceRecord::getTenantId, tenantId));
         if (record == null) {
             throw new BusinessException("维护记录不存在");
         }
@@ -46,8 +52,10 @@ public class MaintenanceService {
 
     @Transactional(rollbackFor = Exception.class)
     public MaintenanceRecord createRecord(MaintenanceCreateDTO createDTO) {
+        String tenantId = TenantContext.requireTenantId();
         MaintenanceRecord record = new MaintenanceRecord();
         BeanUtil.copyProperties(createDTO, record);
+        record.setTenantId(tenantId);
         if (record.getAssetId() == null) record.setAssetId(0L);
         if (record.getContent() == null) record.setContent("");
         if (record.getMaintenanceDate() == null) record.setMaintenanceDate(java.time.LocalDate.now());
@@ -74,7 +82,9 @@ public class MaintenanceService {
         LocalDate start = LocalDate.now();
         LocalDate end = start.plusDays(range);
 
-        LambdaQueryWrapper<MaintenanceRecord> wrapper = new LambdaQueryWrapper<>();
+        String tenantId = TenantContext.requireTenantId();
+        LambdaQueryWrapper<MaintenanceRecord> wrapper = new LambdaQueryWrapper<MaintenanceRecord>()
+            .eq(MaintenanceRecord::getTenantId, tenantId);
         wrapper.between(MaintenanceRecord::getNextMaintenanceDate, start, end)
             .orderByAsc(MaintenanceRecord::getNextMaintenanceDate);
 

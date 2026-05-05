@@ -2,6 +2,7 @@ package com.ams.context;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.access.AccessDeniedException;
 
 /**
  * TenantContext provides thread-local storage for the current tenant's identifier.
@@ -70,6 +71,21 @@ public final class TenantContext {
      */
     public static String getTenantId() {
         return TENANT_ID_HOLDER.get();
+    }
+
+    /**
+     * Retrieves the current tenant ID and rejects execution if tenant context is missing.
+     *
+     * @return the non-blank tenant ID bound to this thread
+     * @throws AccessDeniedException when no tenant context is present
+     */
+    public static String requireTenantId() {
+        String tenantId = TENANT_ID_HOLDER.get();
+        if (tenantId == null || tenantId.isBlank()) {
+            log.warn("tenant_context_missing action=requireTenantId");
+            throw new AccessDeniedException("Missing tenant identifier");
+        }
+        return tenantId;
     }
 
     /**

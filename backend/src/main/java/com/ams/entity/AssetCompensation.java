@@ -16,6 +16,7 @@ public class AssetCompensation implements Serializable {
     private Long id;
 
     private String compensationNo;
+    private String tenantId;
     private Long assetId;
     private String compensationType;
     private BigDecimal compensationAmount;

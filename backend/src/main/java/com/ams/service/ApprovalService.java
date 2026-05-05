@@ -2,6 +2,7 @@ package com.ams.service;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.ams.common.exception.BusinessException;
+import com.ams.context.TenantContext;
 import com.ams.dto.ApprovalCreateDTO;
 import com.ams.entity.ApprovalProcess;
 import com.ams.entity.ApprovalRecord;
@@ -30,10 +31,14 @@ public class ApprovalService {
 
     private final ApprovalProcessMapper approvalProcessMapper;
     private final ApprovalRecordMapper approvalRecordMapper;
+    private final RetirementApplicationService retirementApplicationService;
+    private final WorkOrderService workOrderService;
 
     public Page<ApprovalProcess> queryProcesses(Integer page, Integer pageSize, String status, String processType) {
+        String tenantId = TenantContext.requireTenantId();
         Page<ApprovalProcess> pageParam = new Page<>(page, pageSize);
         QueryWrapper<ApprovalProcess> wrapper = new QueryWrapper<>();
+        wrapper.eq("tenant_id", tenantId);
 
         if (status != null && !status.isEmpty()) {
             wrapper.eq("status", status);
@@ -47,7 +52,11 @@ public class ApprovalService {
     }
 
     public Map<String, Object> getProcessById(Long id) {
-        ApprovalProcess process = approvalProcessMapper.selectById(id);
+        String tenantId = TenantContext.requireTenantId();
+        ApprovalProcess process = approvalProcessMapper.selectOne(new QueryWrapper<ApprovalProcess>()
+                .eq("id", id)
+                .eq("tenant_id", tenantId)
+                .last("limit 1"));
         if (process == null) {
             throw new BusinessException("审批流程不存在");
         }
@@ -55,6 +64,7 @@ public class ApprovalService {
         List<ApprovalRecord> records = approvalRecordMapper.selectList(
             new QueryWrapper<ApprovalRecord>()
                 .eq("process_id", id)
+                .eq("tenant_id", tenantId)
                 .orderByAsc("step_no")
                 .orderByAsc("create_time")
         );
@@ -67,8 +77,10 @@ public class ApprovalService {
 
     @Transactional(rollbackFor = Exception.class)
     public ApprovalProcess createProcess(ApprovalCreateDTO dto) {
+        String tenantId = TenantContext.requireTenantId();
         ApprovalProcess process = new ApprovalProcess();
         BeanUtil.copyProperties(dto, process);
+        BeanUtil.setProperty(process, "tenantId", tenantId);
         BeanUtil.setProperty(process, "processNo", generateProcessNo());
         BeanUtil.setProperty(process, "status", "PENDING");
         BeanUtil.setProperty(process, "currentStep", 1);
@@ -80,7 +92,11 @@ public class ApprovalService {
 
     @Transactional(rollbackFor = Exception.class)
     public ApprovalProcess approve(Long processId, Long approverId, String result, String opinion) {
-        ApprovalProcess process = approvalProcessMapper.selectById(processId);
+        String tenantId = TenantContext.requireTenantId();
+        ApprovalProcess process = approvalProcessMapper.selectOne(new QueryWrapper<ApprovalProcess>()
+                .eq("id", processId)
+                .eq("tenant_id", tenantId)
+                .last("limit 1"));
         if (process == null) {
             throw new BusinessException("审批流程不存在");
         }
@@ -90,7 +106,9 @@ public class ApprovalService {
 
         ApprovalRecord record = new ApprovalRecord();
         BeanUtil.setProperty(record, "processId", processId);
+        BeanUtil.setProperty(record, "tenantId", tenantId);
         Integer currentStep = parseInteger(BeanUtil.getProperty(process, "currentStep"), 1);
+        int finalStep = resolveFinalStep(process);
         BeanUtil.setProperty(record, "stepNo", currentStep);
         BeanUtil.setProperty(record, "approverId", approverId);
         BeanUtil.setProperty(record, "approveResult", result);
@@ -101,7 +119,7 @@ public class ApprovalService {
         if ("REJECTED".equals(result)) {
             BeanUtil.setProperty(process, "status", "REJECTED");
         } else if ("APPROVED".equals(result)) {
-            if (currentStep >= FINAL_STEP) {
+            if (currentStep >= finalStep) {
                 BeanUtil.setProperty(process, "status", "APPROVED");
             } else {
                 BeanUtil.setProperty(process, "currentStep", currentStep + 1);
@@ -111,12 +129,15 @@ public class ApprovalService {
         }
 
         approvalProcessMapper.updateById(process);
+        handleBusinessOutcome(process, approverId, result, opinion);
         return process;
     }
 
     public List<ApprovalProcess> getMyPendingApprovals(Long approverId) {
+        String tenantId = TenantContext.requireTenantId();
         List<ApprovalProcess> pendingList = approvalProcessMapper.selectList(
             new QueryWrapper<ApprovalProcess>()
+                .eq("tenant_id", tenantId)
                 .eq("status", "PENDING")
                 .orderByDesc("create_time")
         );
@@ -127,6 +148,7 @@ public class ApprovalService {
 
         List<ApprovalRecord> myRecords = approvalRecordMapper.selectList(
             new QueryWrapper<ApprovalRecord>()
+                .eq("tenant_id", tenantId)
                 .eq("approver_id", approverId)
         );
 
@@ -147,17 +169,22 @@ public class ApprovalService {
     }
 
     public Long getPendingCount() {
+        String tenantId = TenantContext.requireTenantId();
         return approvalProcessMapper.selectCount(
-            new QueryWrapper<ApprovalProcess>().eq("status", "PENDING")
+            new QueryWrapper<ApprovalProcess>()
+                    .eq("tenant_id", tenantId)
+                    .eq("status", "PENDING")
         );
     }
 
     private String generateProcessNo() {
+        String tenantId = TenantContext.requireTenantId();
         String dateStr = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
         String prefix = "APR-" + dateStr + "-";
 
         Long count = approvalProcessMapper.selectCount(
             new QueryWrapper<ApprovalProcess>()
+                .eq("tenant_id", tenantId)
                 .likeRight("process_no", prefix)
         );
         long sequence = (count == null ? 0 : count) + 1;
@@ -182,14 +209,51 @@ public class ApprovalService {
         }
     }
 
-    private Long parseLong(String value, Long defaultValue) {
-        if (value == null || value.isEmpty()) {
+    private Long parseLong(Object value, Long defaultValue) {
+        if (value == null) {
+            return defaultValue;
+        }
+        if (value instanceof Number number) {
+            return number.longValue();
+        }
+
+        String text = String.valueOf(value);
+        if (text.isEmpty()) {
             return defaultValue;
         }
         try {
-            return Long.parseLong(value);
+            return Long.parseLong(text);
         } catch (NumberFormatException ex) {
             return defaultValue;
+        }
+    }
+
+    private int resolveFinalStep(ApprovalProcess process) {
+        if ("RETIREMENT".equals(process.getProcessType()) && process.getBusinessId() != null) {
+            return retirementApplicationService.getApprovalStepCount(process.getBusinessId());
+        }
+        if ("WORK_ORDER".equals(process.getProcessType())) {
+            return 1;
+        }
+        return FINAL_STEP;
+    }
+
+    private void handleBusinessOutcome(ApprovalProcess process, Long approverId, String result, String opinion) {
+        if (process.getBusinessId() == null) {
+            return;
+        }
+        if ("RETIREMENT".equals(process.getProcessType())) {
+            if ("REJECTED".equals(result)) {
+                retirementApplicationService.rejectApplication(process.getBusinessId(), approverId, opinion);
+            } else if ("APPROVED".equals(process.getStatus())) {
+                retirementApplicationService.approveApplication(process.getBusinessId(), approverId);
+            }
+        } else if ("WORK_ORDER".equals(process.getProcessType())) {
+            if ("REJECTED".equals(result)) {
+                workOrderService.applyApprovalOutcome(process.getBusinessId(), "REJECTED", opinion);
+            } else if ("APPROVED".equals(process.getStatus())) {
+                workOrderService.applyApprovalOutcome(process.getBusinessId(), "APPROVED", opinion);
+            }
         }
     }
 }

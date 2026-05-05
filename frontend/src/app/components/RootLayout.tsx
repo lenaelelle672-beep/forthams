@@ -1,4 +1,4 @@
-import { Outlet, NavLink } from "react-router";
+import { Outlet, NavLink, useNavigate } from "react-router";
 import { 
   LayoutDashboard, 
   Package, 
@@ -7,6 +7,7 @@ import {
   Archive, 
   DollarSign, 
   ClipboardCheck, 
+  Workflow,
   BarChart3, 
   Settings as SettingsIcon,
   Bell,
@@ -14,7 +15,7 @@ import {
   Search,
   LogOut,
 } from "lucide-react";
-import { useState } from "react";
+import { FormEvent, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { Button } from "./ui/button";
 
@@ -26,13 +27,29 @@ const navigation = [
   { name: '闲置资产', href: '/idle', icon: Archive },
   { name: '资产处置', href: '/disposals', icon: DollarSign },
   { name: '审批流程', href: '/approval', icon: ClipboardCheck },
+  { name: '流程管理', href: '/workflows', icon: Workflow },
   { name: '数据分析', href: '/analytics', icon: BarChart3 },
   { name: '系统设置', href: '/settings', icon: SettingsIcon },
 ];
 
 export function RootLayout() {
-  const [notifications] = useState(3);
+  const [notifications] = useState(0);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [headerMessage, setHeaderMessage] = useState<string | null>(null);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const navigate = useNavigate();
   const { user, logout } = useAuth();
+
+  const handleGlobalSearch = (event: FormEvent) => {
+    event.preventDefault();
+    const keyword = searchQuery.trim();
+    if (!keyword) {
+      setHeaderMessage('请输入资产名称或编号后再搜索');
+      return;
+    }
+    setHeaderMessage(`正在搜索“${keyword}”`);
+    navigate(`/assets?keyword=${encodeURIComponent(keyword)}`);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -47,21 +64,39 @@ export function RootLayout() {
           </div>
           
           <div className="flex items-center gap-4">
-            <div className="relative">
+            <form className="relative" onSubmit={handleGlobalSearch}>
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input 
                 type="text" 
                 placeholder="搜索资产..."
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.target.value)}
                 className="w-64 pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-            </div>
-            
-            <button className="relative p-2 hover:bg-gray-100 rounded-lg transition-colors">
-              <Bell className="w-5 h-5 text-gray-600" />
-              {notifications > 0 && (
-                <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+            </form>
+
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowNotifications((prev) => !prev);
+                  setHeaderMessage(null);
+                }}
+                className="relative p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                aria-label="查看通知"
+              >
+                <Bell className="w-5 h-5 text-gray-600" />
+                {notifications > 0 && (
+                  <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                )}
+              </button>
+              {showNotifications && (
+                <div className="absolute right-0 mt-2 w-72 bg-white border border-gray-200 rounded-lg shadow-lg p-4 z-20">
+                  <div className="font-medium text-gray-900 mb-2">通知</div>
+                  <div className="text-sm text-gray-600">暂无新的待办通知，后续消息会在这里显示。</div>
+                </div>
               )}
-            </button>
+            </div>
             
             <div className="flex items-center gap-2 pl-4 border-l border-gray-200">
               <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
@@ -79,6 +114,12 @@ export function RootLayout() {
           </div>
         </div>
       </header>
+
+      {headerMessage && (
+        <div className="fixed top-16 right-6 z-20 rounded-lg border border-blue-200 bg-blue-50 px-4 py-2 text-sm text-blue-700 shadow-sm">
+          {headerMessage}
+        </div>
+      )}
 
       {/* 侧边栏 */}
       <aside className="fixed left-0 top-16 bottom-0 w-64 bg-white border-r border-gray-200 overflow-y-auto">

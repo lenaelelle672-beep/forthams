@@ -14,6 +14,7 @@ public class ApprovalRecord implements Serializable {
     private Long id;
 
     private Long processId;
+    private String tenantId;
     private Integer stepNo;
     private Long approverId;
     private String approveResult;

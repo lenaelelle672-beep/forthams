@@ -23,6 +23,7 @@ export function ImportantEquipment() {
   const [alerts, setAlerts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
   const [maintenanceForm, setMaintenanceForm] = useState<Record<string, any>>({
     equipmentId: "",
     type: "定期保养",
@@ -72,14 +73,34 @@ export function ImportantEquipment() {
   }, []);
 
   const handleCreateMaintenance = async () => {
+    if (!maintenanceForm.equipmentId || !maintenanceForm.date || !maintenanceForm.technician || !maintenanceForm.content) {
+      setError('请填写设备、保养日期、技术员和保养内容后再保存。');
+      return;
+    }
     try {
-      await maintenanceService.create(maintenanceForm);
+      setError(null);
+      setMessage(null);
+      const { date, ...rest } = maintenanceForm;
+      await maintenanceService.create({ ...rest, maintenanceDate: date });
       setShowMaintenanceModal(false);
+      setMessage('保养记录已保存。');
       await loadData();
     } catch (err) {
       console.error('Failed to create maintenance record:', err);
+      setError(err instanceof Error ? err.message : '保存保养记录失败');
     }
   };
+
+  const averageUsage = equipment.length
+    ? Math.round(equipment.reduce((sum, item) => sum + (Number(item.usageRate) || 0), 0) / equipment.length)
+    : 0;
+  const dueMaintenanceCount = equipment.filter((item) => item.maintenanceStatus !== '正常').length || alerts.length;
+  const currentMonthMaintenanceCount = maintenanceRecords.filter((record) => {
+    const dateValue = record.maintenanceDate || record.date || record.createTime;
+    const date = new Date(dateValue);
+    const now = new Date();
+    return !Number.isNaN(date.getTime()) && date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth();
+  }).length;
 
   return (
     <div className="space-y-6">
@@ -101,6 +122,7 @@ export function ImportantEquipment() {
       {/* 统计卡片 */}
       {loading && <div className="text-sm text-gray-500">加载中...</div>}
       {error && <div className="text-sm text-red-600">{error}</div>}
+      {message && <div className="text-sm text-green-600">{message}</div>}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between">
@@ -117,7 +139,7 @@ export function ImportantEquipment() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">平均使用率</p>
-              <p className="text-3xl font-semibold text-gray-900 mt-2">80%</p>
+              <p className="text-3xl font-semibold text-gray-900 mt-2">{averageUsage}%</p>
             </div>
             <div className="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center">
               <TrendingUp className="w-6 h-6 text-green-600" />
@@ -128,7 +150,7 @@ export function ImportantEquipment() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">待保养设备</p>
-              <p className="text-3xl font-semibold text-gray-900 mt-2">2</p>
+              <p className="text-3xl font-semibold text-gray-900 mt-2">{dueMaintenanceCount}</p>
             </div>
             <div className="w-12 h-12 bg-yellow-50 rounded-lg flex items-center justify-center">
               <AlertCircle className="w-6 h-6 text-yellow-600" />
@@ -139,7 +161,7 @@ export function ImportantEquipment() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">本月保养次数</p>
-              <p className="text-3xl font-semibold text-gray-900 mt-2">8</p>
+              <p className="text-3xl font-semibold text-gray-900 mt-2">{currentMonthMaintenanceCount}</p>
             </div>
             <div className="w-12 h-12 bg-purple-50 rounded-lg flex items-center justify-center">
               <Calendar className="w-6 h-6 text-purple-600" />
@@ -155,9 +177,9 @@ export function ImportantEquipment() {
           智能提醒
         </h3>
         <div className="space-y-3">
-          {alerts.map((alert) => (
+          {alerts.map((alert, index) => (
             <div 
-              key={alert.id} 
+              key={`${alert.id ?? 'alert'}-${index}`}
               className={`p-4 rounded-lg border-l-4 ${
                 alert.type === 'danger' ? 'bg-red-50 border-red-500' :
                 alert.type === 'warning' ? 'bg-yellow-50 border-yellow-500' :
@@ -173,7 +195,7 @@ export function ImportantEquipment() {
                   <button onClick={() => setDetailItem(alert)} className="px-3 py-1.5 text-sm font-medium text-blue-700 bg-blue-100 hover:bg-blue-200 rounded transition-colors">
                     查看详情
                   </button>
-                  <button onClick={() => { setMaintenanceForm({...maintenanceForm, assetId: alert.id || alert.assetId}); setShowMaintenanceModal(true); }} className="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded transition-colors">
+                  <button onClick={() => { setMaintenanceForm({...maintenanceForm, equipmentId: alert.id || alert.assetId || alert.equipmentId || ""}); setShowMaintenanceModal(true); }} className="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded transition-colors">
                     发起保养
                   </button>
                 </div>
@@ -237,8 +259,8 @@ export function ImportantEquipment() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-               {equipment.map((eq) => (
-                <tr key={eq.id} className="hover:bg-gray-50">
+               {equipment.map((eq, index) => (
+                <tr key={`${eq.id ?? 'equipment'}-${index}`} className="hover:bg-gray-50">
                   <td className="px-6 py-4 text-sm font-medium text-blue-600">{eq.id}</td>
                   <td className="px-6 py-4 text-sm text-gray-900">{eq.name}</td>
                   <td className="px-6 py-4 text-sm">
@@ -270,10 +292,10 @@ export function ImportantEquipment() {
                   <td className="px-6 py-4 text-sm text-gray-900">{eq.maintenanceCount}</td>
                   <td className="px-6 py-4 text-sm">
                     <div className="flex items-center gap-2">
-                      <button onClick={() => setDetailItem(equipment)} className="p-1 hover:bg-gray-100 rounded transition-colors" title="查看详情">
+                      <button onClick={() => setDetailItem(eq)} className="p-1 hover:bg-gray-100 rounded transition-colors" title="查看详情">
                         <Eye className="w-4 h-4 text-gray-600" />
                       </button>
-                      <button className="p-1 hover:bg-gray-100 rounded transition-colors" title="编辑">
+                      <button disabled className="p-1 rounded cursor-not-allowed opacity-50" title="编辑接口尚未接入">
                         <Edit className="w-4 h-4 text-gray-600" />
                       </button>
                     </div>
@@ -304,8 +326,8 @@ export function ImportantEquipment() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-               {maintenanceRecords.map((record) => (
-                <tr key={record.id} className="hover:bg-gray-50">
+               {maintenanceRecords.map((record, index) => (
+                <tr key={`${record.id ?? 'maintenance'}-${index}`} className="hover:bg-gray-50">
                   <td className="px-6 py-4 text-sm font-medium text-gray-900">{record.equipment || record.equipmentName || record.assetName}</td>
                   <td className="px-6 py-4 text-sm text-gray-600">{record.date}</td>
                   <td className="px-6 py-4 text-sm text-gray-600">{record.type}</td>
@@ -343,8 +365,8 @@ export function ImportantEquipment() {
                   <label className="block text-sm font-medium text-gray-700 mb-1">选择设备 *</label>
                    <select value={maintenanceForm.equipmentId} onChange={(e) => setMaintenanceForm(prev => ({ ...prev, equipmentId: e.target.value }))} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <option>请选择设备</option>
-                    {equipment.map(eq => (
-                      <option key={eq.id} value={eq.id}>{eq.name} ({eq.id})</option>
+                    {equipment.map((eq, index) => (
+                      <option key={`${eq.id ?? 'equipment'}-${index}`} value={eq.id}>{eq.name} ({eq.id})</option>
                     ))}
                   </select>
                 </div>

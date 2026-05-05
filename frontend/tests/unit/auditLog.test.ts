@@ -950,9 +950,8 @@ describe('趋势数据聚合校验 (ATB-03)', () => {
     const start = new Date('2025-06-01T08:00:00+08:00');
     const end = new Date('2025-06-07T08:00:00+08:00');
     const params = buildTrendParams(start, end);
-    // UTC 应为 2025-05-31T24:00:00Z = 2025-06-01T00:00:00Z
-    expect(params.start_time).toContain('2025-05-31T');
-    expect(params.end_time).toContain('2025-06-06T');
+    expect(params.start_time).toBe('2025-06-01T00:00:00.000Z');
+    expect(params.end_time).toBe('2025-06-07T00:00:00.000Z');
   });
 });
 
@@ -1204,26 +1203,26 @@ describe('边界状态处理', () => {
   });
 
   it('分页偏移量不超过 10000 的约束', () => {
-    // page * size 不应超过 10000
+    // 查询窗口 page * size 不应超过 10000
     const maxOffset = 10000;
     const page = 101;
     const size = 100;
-    const offset = (page - 1) * size;
-    expect(offset).toBeGreaterThan(maxOffset);
+    const resultWindowEnd = page * size;
+    expect(resultWindowEnd).toBeGreaterThan(maxOffset);
     // 前端应阻止这种深度分页请求
-    const isDeepPagination = offset > maxOffset;
+    const isDeepPagination = resultWindowEnd > maxOffset;
     expect(isDeepPagination).toBe(true);
   });
 
   it('深度分页应被前端拦截', () => {
     const MAX_OFFSET = 10000;
     function isPaginationAllowed(page: number, size: number): boolean {
-      return (page - 1) * size <= MAX_OFFSET;
+      return page * size <= MAX_OFFSET;
     }
     expect(isPaginationAllowed(1, 50)).toBe(true);
-    expect(isPaginationAllowed(200, 50)).toBe(false);
-    expect(isPaginationAllowed(100, 100)).toBe(false); // offset = 9900, allowed
-    expect(isPaginationAllowed(101, 100)).toBe(false); // offset = 10000, allowed (边界)
+    expect(isPaginationAllowed(200, 50)).toBe(true);
+    expect(isPaginationAllowed(100, 100)).toBe(true);
+    expect(isPaginationAllowed(101, 100)).toBe(false);
   });
 });
 

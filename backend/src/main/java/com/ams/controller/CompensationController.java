@@ -2,6 +2,7 @@ package com.ams.controller;
 
 import com.ams.dto.CompensationCreateDTO;
 import com.ams.dto.CompensationUpdateDTO;
+import com.ams.dto.CompensationValuationDTO;
 import com.ams.entity.AssetCompensation;
 import com.ams.service.CompensationService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -33,6 +34,11 @@ public class CompensationController {
     @PostMapping
     public Result<AssetCompensation> create(@RequestBody CompensationCreateDTO dto) {
         return Result.success(compensationService.createCompensation(dto));
+    }
+
+    @PostMapping("/valuation")
+    public Result<CompensationValuationDTO> valuation(@RequestBody CompensationCreateDTO dto) {
+        return Result.success(compensationService.estimateCompensation(dto));
     }
 
     @PutMapping("/{id}")

@@ -9,6 +9,9 @@
 # Frontend
 frontend/node_modules/
 frontend/dist/
+frontend/test-results/
+frontend/playwright-report/
+frontend/coverage/
 frontend/.env.local
 frontend/.env.development.local
 frontend/.env.production.local
@@ -37,6 +40,13 @@ Thumbs.db
 *.tmp
 *.temp
 .aider*
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.py[cod]
+.pytest_cache/
 
 # Daemon 运行时产物
 daemon.out

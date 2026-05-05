@@ -77,7 +77,9 @@ public class UserManagementService {
 
         User user = new User();
         BeanUtil.setProperty(user, "username", getStrProp(dto, "username"));
-        BeanUtil.setProperty(user, "password", passwordEncoder.encode(getStrProp(dto, "password")));
+        String rawPassword = getStrProp(dto, "password");
+        BeanUtil.setProperty(user, "password", passwordEncoder.encode(
+                rawPassword == null || rawPassword.isBlank() ? "123456" : rawPassword));
         BeanUtil.setProperty(user, "realName", getStrProp(dto, "realName"));
         BeanUtil.setProperty(user, "email", getStrProp(dto, "email"));
         BeanUtil.setProperty(user, "phone", getStrProp(dto, "phone"));

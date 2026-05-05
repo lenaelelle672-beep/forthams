@@ -55,6 +55,33 @@ const topExpenses = [
   { name: '精密测量仪 PM-06', category: '检测设备', maintenanceCost: 8000, count: 4 },
 ];
 
+function downloadCsv(filename: string, rows: Array<Record<string, string | number>>) {
+  if (rows.length === 0) return;
+
+  const headers = Object.keys(rows[0]);
+  const csv = [
+    headers.join(","),
+    ...rows.map((row) => headers.map((header) => `"${String(row[header] ?? "").replaceAll('"', '""')}"`).join(",")),
+  ].join("\n");
+  const blob = new Blob([`\uFEFF${csv}`], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
+function exportAnalyticsReport() {
+  downloadCsv("asset-analytics-report.csv", [
+    ...assetValueTrend.map((item) => ({ section: "资产价值趋势", ...item })),
+    ...categoryDistribution.map(({ color, ...item }) => ({ section: "资产分类分布", ...item })),
+    ...departmentAssets.map((item) => ({ section: "部门资产分布", ...item })),
+    ...maintenanceTrend.map((item) => ({ section: "维护保养趋势", ...item })),
+    ...topExpenses.map((item) => ({ section: "维护费用排行", ...item })),
+  ]);
+}
+
 export function Analytics() {
   return (
     <div className="space-y-6">
@@ -62,12 +89,16 @@ export function Analytics() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-semibold text-gray-900">数据统计分析</h2>
-          <p className="text-gray-600 mt-1">多维度资产数据分析与可视化报表</p>
+          <p className="text-gray-600 mt-1">多维度资产数据分析与可视化报表（当前为静态示例数据）</p>
         </div>
-        <button onClick={() => alert('报表导出中...')} className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors flex items-center gap-2">
+        <button onClick={exportAnalyticsReport} className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors flex items-center gap-2">
           <Download className="w-4 h-4" />
           导出报表
         </button>
+      </div>
+
+      <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+        当前统计图表和导出报表使用前端内置静态示例数据，尚未接入实时统计 API，请勿作为真实经营/资产数据依据。
       </div>
 
       {/* 核心指标卡片 */}

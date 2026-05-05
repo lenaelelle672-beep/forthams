@@ -148,7 +148,7 @@
 测试环境:
   名称: swarms-test
   Python: "3.11+"
-  Node.js: "18+"
+  Node.js: "20+"
   数据库: PostgreSQL 14+
   消息队列: Redis 7+
 

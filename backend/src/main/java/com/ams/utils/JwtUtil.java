@@ -25,9 +25,14 @@ public class JwtUtil {
         return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
 
-    public String generateToken(String username, Long userId) {
+    public String generateToken(String username, Long userId, String tenantId) {
+        if (tenantId == null || tenantId.isBlank()) {
+            throw new IllegalArgumentException("tenantId must not be blank");
+        }
+
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", userId);
+        claims.put("tenant_id", tenantId);
         return createToken(claims, username);
     }
 
@@ -51,6 +56,11 @@ public class JwtUtil {
     public Long getUserIdFromToken(String token) {
         Claims claims = getClaimsFromToken(token);
         return claims.get("userId", Long.class);
+    }
+
+    public String getTenantIdFromToken(String token) {
+        Claims claims = getClaimsFromToken(token);
+        return claims.get("tenant_id", String.class);
     }
 
     public boolean validateToken(String token, String username) {

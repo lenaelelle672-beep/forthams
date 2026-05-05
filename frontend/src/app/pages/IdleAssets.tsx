@@ -11,6 +11,9 @@ export function IdleAssets() {
   const [disposalHistory, setDisposalHistory] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
+  const [selectedPublishId, setSelectedPublishId] = useState<number | string | null>(null);
+  const [selectedClaimId, setSelectedClaimId] = useState<number | string | null>(null);
 
   const loadData = async () => {
     try {
@@ -46,38 +49,65 @@ export function IdleAssets() {
     loadData();
   }, []);
 
-  const getIdleAssetId = (asset: any) => asset.id ?? asset.assetId;
+  const getNoticeId = (asset: any) => asset.id;
+  const getAssetId = (asset: any) => asset.assetId ?? asset.id;
 
   const handlePublish = async (asset?: any) => {
+    const target = asset || idleAssets.find((a) => getNoticeId(a) === selectedPublishId);
+    if (!target) {
+      setError('请先选择一项待发布闲置资产。');
+      return;
+    }
     try {
-      await idleAssetService.publish(asset ? { id: getIdleAssetId(asset) } : { type: 'announcement' });
+      setError(null);
+      setMessage(null);
+      await idleAssetService.publish({ assetId: getAssetId(target), idleDays: target.idleDays, reason: target.reason });
       setShowPublishModal(false);
+      setSelectedPublishId(null);
+      setMessage('闲置资产公告发布成功。');
       await loadData();
     } catch (err) {
       console.error('Failed to publish idle asset:', err);
+      setError(err instanceof Error ? err.message : '发布闲置资产失败');
     }
   };
 
   const handleClaim = async () => {
+    const target = idleAssets.find((a) => getNoticeId(a) === selectedClaimId);
+    if (!target) {
+      setError('请先选择一项已发布闲置资产。');
+      return;
+    }
     try {
-      const target = idleAssets.find((a) => a.status === '已发布');
-      if (!target) return;
-      await idleAssetService.claim(getIdleAssetId(target), 1);
+      setError(null);
+      setMessage(null);
+      await idleAssetService.claim(getNoticeId(target), 1);
       setShowClaimModal(false);
+      setSelectedClaimId(null);
+      setMessage('闲置资产认领申请已提交。');
       await loadData();
     } catch (err) {
       console.error('Failed to claim idle asset:', err);
+      setError(err instanceof Error ? err.message : '认领闲置资产失败');
     }
   };
 
   const handleCancelPublish = async (asset: any) => {
     try {
-      await idleAssetService.cancel(getIdleAssetId(asset));
+      setError(null);
+      setMessage(null);
+      await idleAssetService.cancel(getNoticeId(asset));
+      setMessage('已取消发布。');
       await loadData();
     } catch (err) {
       console.error('Failed to cancel idle asset publish:', err);
+      setError(err instanceof Error ? err.message : '取消发布失败');
     }
   };
+
+  const publishedCount = idleAssets.filter((asset) => asset.status === '已发布' || asset.status === '进行中').length;
+  const claimedCount = idleAssets.filter((asset) => asset.status === '已认领').length;
+  const totalValue = idleAssets.reduce((sum, asset) => sum + (Number(asset.value) || Number(asset.assetValue) || 0), 0);
 
   return (
     <div className="space-y-6">
@@ -89,7 +119,9 @@ export function IdleAssets() {
         </div>
         <button 
           onClick={() => setShowPublishModal(true)}
-          className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors flex items-center gap-2"
+          disabled={!idleAssets.some((asset) => asset.status === '待发布')}
+          title={!idleAssets.some((asset) => asset.status === '待发布') ? '没有可发布的待发布闲置资产' : undefined}
+          className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed rounded-lg transition-colors flex items-center gap-2"
         >
           <Send className="w-4 h-4" />
           发布闲置公告
@@ -99,6 +131,7 @@ export function IdleAssets() {
       {/* 统计卡片 */}
       {loading && <div className="text-sm text-gray-500">加载中...</div>}
       {error && <div className="text-sm text-red-600">{error}</div>}
+      {message && <div className="text-sm text-green-600">{message}</div>}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between">
@@ -115,7 +148,7 @@ export function IdleAssets() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">已发布公告</p>
-              <p className="text-3xl font-semibold text-gray-900 mt-2">2</p>
+              <p className="text-3xl font-semibold text-gray-900 mt-2">{publishedCount}</p>
             </div>
             <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center">
               <Send className="w-6 h-6 text-blue-600" />
@@ -126,7 +159,7 @@ export function IdleAssets() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">已认领资产</p>
-              <p className="text-3xl font-semibold text-gray-900 mt-2">1</p>
+              <p className="text-3xl font-semibold text-gray-900 mt-2">{claimedCount}</p>
             </div>
             <div className="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center">
               <CheckCircle className="w-6 h-6 text-green-600" />
@@ -137,7 +170,7 @@ export function IdleAssets() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">闲置资产价值</p>
-              <p className="text-3xl font-semibold text-gray-900 mt-2">¥73K</p>
+              <p className="text-3xl font-semibold text-gray-900 mt-2">¥{totalValue.toLocaleString('zh-CN')}</p>
             </div>
             <div className="w-12 h-12 bg-purple-50 rounded-lg flex items-center justify-center">
               <Clock className="w-6 h-6 text-purple-600" />
@@ -174,14 +207,13 @@ export function IdleAssets() {
                   </div>
                 </div>
                 <button 
-                  onClick={() => setShowClaimModal(true)}
+                  onClick={() => setDetailItem(announcement)}
                   className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
                     announcement.status === '进行中' 
                       ? 'text-white bg-blue-600 hover:bg-blue-700'
                       : 'text-gray-700 bg-gray-100 cursor-not-allowed'
                   }`}
                   disabled={announcement.status !== '进行中'}
-                  onClick={() => setDetailItem(announcement)}
                 >
                   {announcement.status === '进行中' ? '查看详情' : '已结束'}
                 </button>
@@ -261,8 +293,11 @@ export function IdleAssets() {
                       )}
                       {asset.status === '已发布' && (
                         <>
-                          <button className="px-3 py-1 text-xs font-medium text-blue-700 bg-blue-100 hover:bg-blue-200 rounded transition-colors">
+                          <button type="button" disabled className="px-3 py-1 text-xs font-medium text-blue-700 bg-blue-100 rounded cursor-not-allowed" title="查看次数来自后端统计，仅展示">
                             {asset.viewCount}次查看
+                          </button>
+                          <button onClick={() => { setSelectedClaimId(getNoticeId(asset)); setShowClaimModal(true); }} className="px-3 py-1 text-xs font-medium text-white bg-green-600 hover:bg-green-700 rounded transition-colors">
+                            认领
                           </button>
                            <button onClick={() => handleCancelPublish(asset)} className="px-3 py-1 text-xs font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded transition-colors">
                              取消发布
@@ -348,7 +383,7 @@ export function IdleAssets() {
                 <div className="border border-gray-300 rounded-lg p-3 max-h-40 overflow-y-auto">
                   {idleAssets.filter(a => a.status === '待发布').map((asset) => (
                     <label key={asset.id} className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded cursor-pointer">
-                      <input type="checkbox" className="w-4 h-4 text-blue-600" />
+                      <input type="radio" name="publishAsset" checked={selectedPublishId === getNoticeId(asset)} onChange={() => setSelectedPublishId(getNoticeId(asset))} className="w-4 h-4 text-blue-600" />
                       <span className="text-sm text-gray-900">{asset.name} - {asset.value}</span>
                     </label>
                   ))}
@@ -397,7 +432,7 @@ export function IdleAssets() {
               >
                 取消
               </button>
-               <button onClick={() => handlePublish()} className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors">
+               <button onClick={() => handlePublish()} disabled={!selectedPublishId} className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed rounded-lg transition-colors">
                  发布公告
                </button>
             </div>
@@ -429,7 +464,7 @@ export function IdleAssets() {
                 {idleAssets.filter(a => a.status === '已发布').map((asset) => (
                   <div key={asset.id} className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition-colors">
                     <label className="flex items-start gap-3 cursor-pointer">
-                      <input type="checkbox" className="w-5 h-5 text-blue-600 mt-1" />
+                       <input type="radio" name="claimAsset" checked={selectedClaimId === getNoticeId(asset)} onChange={() => setSelectedClaimId(getNoticeId(asset))} className="w-5 h-5 text-blue-600 mt-1" />
                       <div className="flex-1">
                         <div className="flex items-center justify-between mb-2">
                           <h5 className="font-medium text-gray-900">{asset.name}</h5>
@@ -479,7 +514,7 @@ export function IdleAssets() {
               >
                 取消
               </button>
-               <button onClick={handleClaim} className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors">
+               <button onClick={handleClaim} disabled={!selectedClaimId} className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed rounded-lg transition-colors">
                  提交认领申请
                </button>
             </div>

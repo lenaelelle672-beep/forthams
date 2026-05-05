@@ -17,6 +17,7 @@ public class ApprovalProcess implements Serializable {
     private String processType;
     private Long businessId;
     private String businessData;
+    private String tenantId;
     private String status;
     private Integer currentStep;
     private Long applicantId;

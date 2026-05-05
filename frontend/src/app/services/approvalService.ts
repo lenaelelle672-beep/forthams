@@ -19,7 +19,12 @@ export const approvalService = {
   },
 
   approve(id: number | string, data: Record<string, unknown>) {
-    return api.post<ApprovalRecord>(`/approvals/${id}/approve`, data);
+    const approved = data.approved !== false;
+    return api.post<ApprovalRecord>(`/approvals/${id}/approve`, {
+      ...data,
+      result: approved ? "APPROVED" : "REJECTED",
+      opinion: data.comment ?? data.opinion ?? "",
+    });
   },
 
   getPending() {

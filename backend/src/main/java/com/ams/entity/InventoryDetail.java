@@ -14,6 +14,7 @@ public class InventoryDetail implements Serializable {
     private Long id;
 
     private Long taskId;
+    private String tenantId;
     private Long assetId;
     private String rfidTag;
     private String status;

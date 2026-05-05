@@ -33,7 +33,7 @@ public class AuthService {
             new LambdaQueryWrapper<User>().eq(User::getUsername, request.getUsername())
         );
 
-        String token = jwtUtil.generateToken(user.getUsername(), user.getId());
+        String token = jwtUtil.generateToken(user.getUsername(), user.getId(), resolveTenantId(user));
 
         return new AuthResponse(token, user.getId(), user.getUsername(), user.getRealName());
     }
@@ -59,13 +59,20 @@ public class AuthService {
 
         userMapper.insert(user);
 
-        String token = jwtUtil.generateToken(user.getUsername(), user.getId());
+        String token = jwtUtil.generateToken(user.getUsername(), user.getId(), resolveTenantId(user));
 
         return new AuthResponse(token, user.getId(), user.getUsername(), user.getRealName());
     }
 
     public boolean logout() {
         return true;
+    }
+
+    private String resolveTenantId(User user) {
+        if (user.getDeptId() == null) {
+            throw new BusinessException("用户未绑定部门，无法生成租户令牌");
+        }
+        return "dept:" + user.getDeptId();
     }
 
 }

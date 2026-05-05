@@ -41,6 +41,8 @@ public class Asset implements Serializable {
     private String description;
     private String remark;
 
+    private String tenantId;
+
     private Long createBy;
 
     @TableField(fill = FieldFill.INSERT)

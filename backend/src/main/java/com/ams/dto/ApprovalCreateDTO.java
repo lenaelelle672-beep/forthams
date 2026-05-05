@@ -12,6 +12,6 @@ public class ApprovalCreateDTO {
     @JsonAlias({"businessId", "assetId"})
     private Long businessId = 0L;
     private String businessType;
-    private Long applicantId = 1L;
+    private Long applicantId;
     private String businessData;
 }

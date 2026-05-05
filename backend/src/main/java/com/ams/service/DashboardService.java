@@ -3,10 +3,12 @@ package com.ams.service;
 import com.ams.dto.AssetValueTrendDTO;
 import com.ams.dto.DashboardStatsDTO;
 import com.ams.dto.DeptAssetDistributionDTO;
+import com.ams.context.TenantContext;
 import com.ams.entity.Asset;
 import com.ams.entity.ApprovalProcess;
 import com.ams.entity.Dept;
 import com.ams.entity.MaintenanceRecord;
+import com.ams.enums.AssetStatus;
 import com.ams.mapper.ApprovalProcessMapper;
 import com.ams.mapper.AssetMapper;
 import com.ams.mapper.DeptMapper;
@@ -33,13 +35,13 @@ public class DashboardService {
     public DashboardStatsDTO getStats() {
         DashboardStatsDTO stats = new DashboardStatsDTO();
         
-        List<Asset> allAssets = assetMapper.selectList(null);
+        List<Asset> allAssets = getCurrentTenantAssets();
         
         stats.setTotalAssets((long) allAssets.size());
-        stats.setInUseAssets(allAssets.stream().filter(a -> "IN_USE".equals(a.getStatus())).count());
-        stats.setIdleAssets(allAssets.stream().filter(a -> "IDLE".equals(a.getStatus())).count());
-        stats.setMaintenanceAssets(allAssets.stream().filter(a -> "MAINTENANCE".equals(a.getStatus())).count());
-        stats.setScrapAssets(allAssets.stream().filter(a -> "SCRAP".equals(a.getStatus())).count());
+        stats.setInUseAssets(allAssets.stream().filter(a -> AssetStatus.IN_USE.matches(a.getStatus())).count());
+        stats.setIdleAssets(allAssets.stream().filter(a -> AssetStatus.IDLE.matches(a.getStatus())).count());
+        stats.setMaintenanceAssets(allAssets.stream().filter(a -> AssetStatus.MAINTENANCE.matches(a.getStatus())).count());
+        stats.setScrapAssets(allAssets.stream().filter(a -> AssetStatus.SCRAPPED.matches(a.getStatus())).count());
         
         BigDecimal totalValue = allAssets.stream()
                 .map(Asset::getOriginalValue)
@@ -68,13 +70,13 @@ public class DashboardService {
     public List<AssetValueTrendDTO> getValueTrends(Integer days) {
         List<AssetValueTrendDTO> trends = new ArrayList<>();
         LocalDate today = LocalDate.now();
+        List<Asset> allAssets = getCurrentTenantAssets();
         
         for (int i = days - 1; i >= 0; i--) {
             AssetValueTrendDTO trend = new AssetValueTrendDTO();
             LocalDate date = today.minusDays(i);
             trend.setDate(date);
             
-            List<Asset> allAssets = assetMapper.selectList(null);
             BigDecimal totalValue = allAssets.stream()
                     .map(Asset::getOriginalValue)
                     .filter(Objects::nonNull)
@@ -93,7 +95,7 @@ public class DashboardService {
     }
 
     public List<DeptAssetDistributionDTO> getDeptDistribution() {
-        List<Asset> allAssets = assetMapper.selectList(null);
+        List<Asset> allAssets = getCurrentTenantAssets();
         
         Map<Long, Long> deptCountMap = allAssets.stream()
                 .filter(a -> a.getDeptId() != null)
@@ -121,10 +123,21 @@ public class DashboardService {
     public Map<String, Object> getMaintenanceStats() {
         Map<String, Object> stats = new HashMap<>();
         try {
-        Long totalMaintenanceCount = maintenanceRecordMapper.selectCount(null);
+        List<Long> tenantAssetIds = getCurrentTenantAssetIds();
+        if (tenantAssetIds.isEmpty()) {
+            stats.put("totalMaintenanceCount", 0L);
+            stats.put("avgMaintenanceCost", BigDecimal.ZERO);
+            stats.put("monthlyMaintenanceCount", 0L);
+            return stats;
+        }
+
+        Long totalMaintenanceCount = maintenanceRecordMapper.selectCount(
+                new LambdaQueryWrapper<MaintenanceRecord>()
+                        .in(MaintenanceRecord::getAssetId, tenantAssetIds));
 
         QueryWrapper<MaintenanceRecord> avgCostWrapper = new QueryWrapper<>();
-        avgCostWrapper.select("AVG(cost) AS avgCost");
+        avgCostWrapper.select("AVG(cost) AS avgCost")
+                .in("asset_id", tenantAssetIds);
         Map<String, Object> avgCostMap = maintenanceRecordMapper.selectMaps(avgCostWrapper)
                 .stream()
                 .findFirst()
@@ -139,6 +152,7 @@ public class DashboardService {
         LocalDate monthEnd = today.withDayOfMonth(today.lengthOfMonth());
         Long monthlyMaintenanceCount = maintenanceRecordMapper.selectCount(
                 new LambdaQueryWrapper<MaintenanceRecord>()
+                        .in(MaintenanceRecord::getAssetId, tenantAssetIds)
                         .ge(MaintenanceRecord::getMaintenanceDate, monthStart)
                         .le(MaintenanceRecord::getMaintenanceDate, monthEnd)
         );
@@ -155,9 +169,24 @@ public class DashboardService {
     }
 
     public Long getPendingApprovals() {
+        String tenantId = TenantContext.requireTenantId();
         return approvalProcessMapper.selectCount(
                 new LambdaQueryWrapper<ApprovalProcess>()
+                        .eq(ApprovalProcess::getTenantId, tenantId)
                         .eq(ApprovalProcess::getStatus, "PENDING")
         );
+    }
+
+    private List<Asset> getCurrentTenantAssets() {
+        String tenantId = TenantContext.requireTenantId();
+        return assetMapper.selectList(new LambdaQueryWrapper<Asset>()
+                .eq(Asset::getTenantId, tenantId));
+    }
+
+    private List<Long> getCurrentTenantAssetIds() {
+        return getCurrentTenantAssets().stream()
+                .map(Asset::getId)
+                .filter(Objects::nonNull)
+                .toList();
     }
 }

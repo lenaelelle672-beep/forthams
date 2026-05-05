@@ -11,6 +11,8 @@ export function RFIDInventory() {
   const [recentScans, setRecentScans] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [scanFeedback, setScanFeedback] = useState<string | null>(null);
+  const [scanningPaused, setScanningPaused] = useState(false);
   const [taskForm, setTaskForm] = useState<Record<string, any>>({
     name: "",
     method: "RFID盘点",
@@ -28,8 +30,9 @@ export function RFIDInventory() {
       setLoading(true);
       setError(null);
       const tasks = await inventoryService.listTasks();
-      setInventoryTasks(Array.isArray(tasks) ? tasks : (tasks as any)?.records || []);
-      const firstTask = (tasks || [])[0];
+      const taskList = Array.isArray(tasks) ? tasks : (tasks as any)?.records || [];
+      setInventoryTasks(taskList);
+      const firstTask = taskList[0];
       if (firstTask?.id) {
         const details = await inventoryService.getTaskDetails(firstTask.id);
         setDiscrepancies(details?.discrepancies || []);
@@ -52,29 +55,82 @@ export function RFIDInventory() {
 
   const handleCreateTask = async () => {
     try {
-      await inventoryService.createTask(taskForm);
+      if (!taskForm.name || !taskForm.location || !taskForm.responsible || !taskForm.startDate || !taskForm.endDate) {
+        setError('请完整填写任务名称、位置、负责人和盘点日期');
+        return;
+      }
+      const { responsible, ...payload } = taskForm;
+      await inventoryService.createTask({ ...payload, executorId: 1, responsibleName: responsible });
+      setTaskForm({
+        name: "",
+        method: "RFID盘点",
+        scope: "按部门",
+        department: "",
+        location: "",
+        responsible: "",
+        startDate: "",
+        endDate: "",
+        description: "",
+      });
       setShowCreateTask(false);
+      setScanFeedback('盘点任务已创建');
       await loadData();
     } catch (err) {
       console.error('Failed to create inventory task:', err);
+      setError('创建盘点任务失败');
     }
   };
 
   const handleAddScanResult = async () => {
     try {
-      const runningTask = inventoryTasks.find((t) => t.status === '进行中') || inventoryTasks[0];
-      if (!runningTask?.id) return;
+      const runningTask = inventoryTasks.find((t) => t.status === '进行中' || t.status === 'IN_PROGRESS') || inventoryTasks[0];
+      if (!runningTask?.id) {
+        setScanFeedback('请先创建或选择盘点任务');
+        return;
+      }
       const payload = {
+        rfidTag: `RFID-${Date.now()}`,
+        status: 'MATCH',
         scanner: 'RFID-01',
         scanTime: new Date().toISOString(),
-        assetId: `AS-${Date.now()}`,
       };
       await inventoryService.addScanResult(runningTask.id, payload);
+      setShowScanning(false);
+      setScanningPaused(false);
+      setScanFeedback('本次扫描结果已提交');
       await loadData();
     } catch (err) {
       console.error('Failed to add scan result:', err);
+      setScanFeedback('扫描结果提交失败，请稍后重试');
     }
   };
+
+  const handleOpenScanning = () => {
+    setScanningPaused(false);
+    setScanFeedback(null);
+    setShowScanning(true);
+  };
+
+  const handleStartTask = async (task: any) => {
+    try {
+      await inventoryService.updateTaskStatus(task.id, 'IN_PROGRESS');
+      setScanFeedback('盘点任务已开始');
+      await loadData();
+    } catch (err) {
+      console.error('Failed to start inventory task:', err);
+      setError('开始盘点失败');
+    }
+  };
+
+  const getTaskStatusLabel = (status?: string) => ({
+    PENDING: '待开始',
+    IN_PROGRESS: '进行中',
+    COMPLETED: '已完成',
+    APPROVED: '已完成',
+  }[status || ''] || status || '待开始');
+
+  const runningTasks = inventoryTasks.filter((task) => getTaskStatusLabel(task.status) === '进行中').length;
+  const completedTasks = inventoryTasks.filter((task) => getTaskStatusLabel(task.status) === '已完成').length;
 
   return (
     <div className="space-y-6">
@@ -86,7 +142,7 @@ export function RFIDInventory() {
         </div>
         <div className="flex gap-3">
           <button 
-            onClick={() => setShowScanning(true)}
+            onClick={handleOpenScanning}
             className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg transition-colors flex items-center gap-2"
           >
             <Play className="w-4 h-4" />
@@ -105,12 +161,13 @@ export function RFIDInventory() {
       {/* 统计卡片 */}
       {loading && <div className="text-sm text-gray-500">加载中...</div>}
       {error && <div className="text-sm text-red-600">{error}</div>}
+      {scanFeedback && <div className="text-sm text-blue-700 bg-blue-50 border border-blue-100 rounded-lg px-4 py-3">{scanFeedback}</div>}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">进行中任务</p>
-              <p className="text-3xl font-semibold text-gray-900 mt-2">1</p>
+              <p className="text-3xl font-semibold text-gray-900 mt-2">{runningTasks}</p>
             </div>
             <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center">
               <Play className="w-6 h-6 text-blue-600" />
@@ -121,7 +178,7 @@ export function RFIDInventory() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">已完成任务</p>
-              <p className="text-3xl font-semibold text-gray-900 mt-2">1</p>
+              <p className="text-3xl font-semibold text-gray-900 mt-2">{completedTasks}</p>
             </div>
             <div className="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center">
               <CheckCircle className="w-6 h-6 text-green-600" />
@@ -165,11 +222,11 @@ export function RFIDInventory() {
                   <div className="flex items-center gap-3 mb-2">
                     <h4 className="text-lg font-semibold text-gray-900">{task.name}</h4>
                     <span className={`px-2.5 py-0.5 text-xs font-medium rounded-full ${
-                      task.status === '进行中' ? 'bg-blue-100 text-blue-800' :
-                      task.status === '已完成' ? 'bg-green-100 text-green-800' :
+                      getTaskStatusLabel(task.status) === '进行中' ? 'bg-blue-100 text-blue-800' :
+                      getTaskStatusLabel(task.status) === '已完成' ? 'bg-green-100 text-green-800' :
                       'bg-gray-100 text-gray-800'
                     }`}>
-                      {task.status}
+                      {getTaskStatusLabel(task.status)}
                     </span>
                     <span className="px-2.5 py-0.5 text-xs font-medium bg-purple-100 text-purple-800 rounded-full flex items-center gap-1">
                       <Radio className="w-3 h-3" />
@@ -181,26 +238,26 @@ export function RFIDInventory() {
                       <MapPin className="w-4 h-4" />
                       {task.location}
                     </span>
-                    <span>负责人: {task.responsible}</span>
-                    <span>部门: {task.department}</span>
-                    <span>任务编号: {task.id}</span>
+                    <span>负责人: {task.responsible || task.executorId || '-'}</span>
+                    <span>部门: {task.department || task.deptIds || '-'}</span>
+                    <span>任务编号: {task.taskNo || task.id}</span>
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  {task.status === '进行中' && (
+                  {getTaskStatusLabel(task.status) === '进行中' && (
                     <button 
-                      onClick={() => setShowScanning(true)}
+                      onClick={handleOpenScanning}
                       className="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded transition-colors"
                     >
                       继续盘点
                     </button>
                   )}
-                  {task.status === '待开始' && (
-                    <button onClick={async () => { try { await inventoryService.updateTaskStatus(task.id, 'IN_PROGRESS'); const r = await inventoryService.listTasks() as any; setInventoryTasks((Array.isArray(r) ? r : (r as any)?.records) || []); } catch(e) { console.error(e); } }} className="px-3 py-1.5 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded transition-colors">
+                  {getTaskStatusLabel(task.status) === '待开始' && (
+                    <button onClick={() => handleStartTask(task)} className="px-3 py-1.5 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded transition-colors">
                       开始盘点
                     </button>
                   )}
-                  {task.status === '已完成' && (
+                  {getTaskStatusLabel(task.status) === '已完成' && (
                     <button onClick={() => setDetailItem(task)} className="px-3 py-1.5 text-sm font-medium text-blue-700 bg-blue-100 hover:bg-blue-200 rounded transition-colors">
                       查看报告
                     </button>
@@ -425,7 +482,7 @@ export function RFIDInventory() {
                 <h3 className="text-lg font-semibold text-gray-900">RFID批量扫描</h3>
                 <span className="px-2.5 py-0.5 text-xs font-medium bg-green-100 text-green-800 rounded-full flex items-center gap-1">
                   <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                  扫描中
+                   {scanningPaused ? '已暂停' : '扫描中'}
                 </span>
               </div>
               <button 
@@ -443,7 +500,7 @@ export function RFIDInventory() {
                 </div>
                 <div className="text-center p-4 bg-green-50 rounded-lg">
                   <p className="text-sm text-gray-600">扫描速度</p>
-                  <p className="text-3xl font-semibold text-green-600 mt-2">35/分</p>
+                  <p className="text-3xl font-semibold text-green-600 mt-2">{scanningPaused ? '0/分' : '35/分'}</p>
                 </div>
                 <div className="text-center p-4 bg-purple-50 rounded-lg">
                   <p className="text-sm text-gray-600">准确率</p>
@@ -465,7 +522,7 @@ export function RFIDInventory() {
                   <p className="text-yellow-400">[14:32:24] ! AS-2024-408 资产位置异常</p>
                   <p>[14:32:25] ✓ AS-2024-409 Epson投影仪</p>
                   <p>[14:32:25] ✓ AS-2024-410 Canon相机</p>
-                  <p className="animate-pulse">[14:32:26] 扫描中...</p>
+                  <p className="animate-pulse">[14:32:26] {scanningPaused ? '扫描已暂停，等待继续...' : '扫描中...'}</p>
                 </div>
               </div>
 
@@ -473,8 +530,8 @@ export function RFIDInventory() {
                 <button onClick={() => setShowScanning(false)} className="flex-1 px-4 py-3 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors">
                   停止扫描
                 </button>
-                <button onClick={() => alert('扫描已暂停')} className="flex-1 px-4 py-3 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors">
-                  暂停扫描
+                <button onClick={() => setScanningPaused((paused) => !paused)} className="flex-1 px-4 py-3 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors">
+                  {scanningPaused ? '继续扫描' : '暂停扫描'}
                 </button>
                  <button onClick={handleAddScanResult} className="flex-1 px-4 py-3 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-lg transition-colors">
                    完成盘点

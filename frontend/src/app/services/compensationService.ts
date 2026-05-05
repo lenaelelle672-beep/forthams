@@ -18,6 +18,10 @@ export const compensationService = {
     return api.post<CompensationRecord>("/compensations", data);
   },
 
+  estimate(data: Record<string, unknown>) {
+    return api.post<Record<string, unknown>>("/compensations/valuation", data);
+  },
+
   update(id: number | string, data: Record<string, unknown>) {
     return api.put<CompensationRecord>(`/compensations/${id}`, data);
   },

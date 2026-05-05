@@ -4,7 +4,7 @@
 # Validates deployment readiness for backend (Maven/Spring Boot) & frontend (Vite/Node).
 # Covers acceptance test benchmarks ATB-01 through ATB-07.
 #
-# Prerequisites: JDK 1.8+, Maven 3.6+, Node.js 14+, npm, curl
+# Prerequisites: JDK 1.8+, Maven 3.6+, Node.js 20+, npm, curl
 # Usage:         ./scripts/smoke-test.sh
 # ==============================================================================
 

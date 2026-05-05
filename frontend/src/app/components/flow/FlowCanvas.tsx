@@ -108,7 +108,12 @@ export function FlowCanvas({
             onConnect={onConnect}
             onNodeClick={(_, node) => onNodeSelect(node)}
             onPaneClick={() => onNodeSelect(null)}
-            onSelectionChange={({ nodes: selectedNodes }) => onNodeSelect((selectedNodes[0] as FlowNode | undefined) ?? null)}
+            onSelectionChange={({ nodes: selectedNodes }) => {
+              const selectedNode = selectedNodes[0] as FlowNode | undefined;
+              if (selectedNode) {
+                onNodeSelect(selectedNode);
+              }
+            }}
             fitView
             minZoom={0.45}
             maxZoom={1.6}

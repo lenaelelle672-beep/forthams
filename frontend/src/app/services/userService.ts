@@ -26,7 +26,7 @@ export const userService = {
     return api.put<UserRecord>(`/users/${id}/reset-password`);
   },
 
-  updateStatus(id: number | string, status: string) {
+  updateStatus(id: number | string, status: number | string) {
     return api.put<UserRecord>(`/users/${id}/status`, { status });
   },
 

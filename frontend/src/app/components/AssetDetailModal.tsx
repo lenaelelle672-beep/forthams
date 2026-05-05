@@ -1,4 +1,5 @@
 import { X, MapPin, User, Calendar, DollarSign, Package, FileText, History } from "lucide-react";
+import { getAssetStatusMeta } from "../constants/assetStatus";
 
 interface AssetDetailModalProps {
   isOpen: boolean;
@@ -18,6 +19,7 @@ interface AssetDetailModalProps {
 
 export function AssetDetailModal({ isOpen, onClose, asset }: AssetDetailModalProps) {
   if (!isOpen || !asset) return null;
+  const statusMeta = getAssetStatusMeta(asset.status);
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -136,13 +138,8 @@ export function AssetDetailModal({ isOpen, onClose, asset }: AssetDetailModalPro
           <div className="mb-6">
             <h4 className="text-lg font-semibold text-gray-900 mb-4">当前状态</h4>
             <div className="flex items-center gap-4">
-              <span className={`px-4 py-2 text-sm font-medium rounded-full ${
-                asset.status === '在用' ? 'bg-green-100 text-green-800' :
-                asset.status === '闲置' ? 'bg-yellow-100 text-yellow-800' :
-                asset.status === '维修中' ? 'bg-red-100 text-red-800' :
-                'bg-gray-100 text-gray-800'
-              }`}>
-                {asset.status}
+              <span className={`px-4 py-2 text-sm font-medium rounded-full ${statusMeta.badgeClass}`}>
+                {statusMeta.label}
               </span>
               <span className="text-sm text-gray-600">最后更新: 2024-03-08 14:30</span>
             </div>

@@ -14,6 +14,7 @@ public class IdleAssetNotice implements Serializable {
     @TableId(type = IdType.AUTO)
     private Long id;
 
+    private String tenantId;
     private Long assetId;
     private Integer idleDays;
     private LocalDate noticeDate;

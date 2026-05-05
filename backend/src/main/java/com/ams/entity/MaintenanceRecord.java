@@ -15,6 +15,7 @@ public class MaintenanceRecord implements Serializable {
     @TableId(type = IdType.AUTO)
     private Long id;
 
+    private String tenantId;
     private Long assetId;
     private String maintenanceType;
     private LocalDate maintenanceDate;

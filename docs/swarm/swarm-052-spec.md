@@ -308,7 +308,7 @@ const BindingScope = {
 ```
 Layer 0: 环境与配置层
     │
-    │ 依赖: Node.js 18+, pnpm, TypeScript 5.x
+    │ 依赖: Node.js 20+, pnpm, TypeScript 5.x
     │
     ▼
 Layer 1: 基础设施层

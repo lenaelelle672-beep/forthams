@@ -17,6 +17,7 @@ public class InventoryTask implements Serializable {
     private String taskNo;
     private String taskName;
     private String inventoryType;
+    private String tenantId;
     private String status;
     private String deptIds;
     private LocalDate startDate;

@@ -30,8 +30,8 @@ export type InventoryTaskStatus =
   | 'completed'
   | 'submitted';
 
-/** 任务列表状态筛选值（'all' 表示不筛选） */
-export type StatusFilter = InventoryTaskStatus | 'all';
+/** 任务列表状态筛选值（null 表示不筛选） */
+export type StatusFilter = InventoryTaskStatus | null;
 
 /** 分页状态 */
 export interface PaginationState {
@@ -58,7 +58,9 @@ export const DEFAULT_PAGE_SIZE = 20;
 // ---------------------------------------------------------------------------
 
 const createInitialState = () => ({
-  statusFilter: 'all' as StatusFilter,
+  statusFilter: null as StatusFilter,
+  currentPage: 1,
+  pageSize: DEFAULT_PAGE_SIZE,
   pagination: {
     currentPage: 1,
     pageSize: DEFAULT_PAGE_SIZE,
@@ -67,8 +69,12 @@ const createInitialState = () => ({
   selectedTaskId: null as string | null,
   selectedAssetIds: [] as string[],
   createModalOpen: false,
+  isCreateModalOpen: false,
   batchConfirmDialogOpen: false,
   submitConfirmDialogOpen: false,
+  isSubmitting: false,
+  loading: false,
+  error: null as string | null,
   editingRowId: null as string | null,
 });
 
@@ -152,7 +158,7 @@ export interface InventoryState {
 // Store implementation
 // ---------------------------------------------------------------------------
 
-export const useInventoryStore = create<InventoryState>((set, get) => ({
+export const useInventoryStore = create<any>((set, get) => ({
   ...createInitialState(),
 
   // ---- Filters ----
@@ -161,16 +167,24 @@ export const useInventoryStore = create<InventoryState>((set, get) => ({
   setStatusFilter: (filter) =>
     set({
       statusFilter: filter,
+      currentPage: 1,
       pagination: { ...get().pagination, currentPage: 1 },
     }),
 
   /** 设置当前页码 */
   setCurrentPage: (page) =>
-    set({ pagination: { ...get().pagination, currentPage: page } }),
+    set({
+      currentPage: Math.max(1, page),
+      pagination: { ...get().pagination, currentPage: Math.max(1, page) },
+    }),
+
+  setPage: (page) => get().setCurrentPage(page),
 
   /** 设置每页条数并重置页码到第一页 */
   setPageSize: (size) =>
     set({
+      pageSize: size,
+      currentPage: 1,
       pagination: { ...get().pagination, pageSize: size, currentPage: 1 },
     }),
 
@@ -181,7 +195,9 @@ export const useInventoryStore = create<InventoryState>((set, get) => ({
   /** 重置筛选条件为默认值 */
   resetFilters: () =>
     set({
-      statusFilter: 'all',
+      statusFilter: null,
+      currentPage: 1,
+      pageSize: DEFAULT_PAGE_SIZE,
       pagination: {
         currentPage: 1,
         pageSize: DEFAULT_PAGE_SIZE,
@@ -231,8 +247,15 @@ export const useInventoryStore = create<InventoryState>((set, get) => ({
     set({ selectedAssetIds: capped });
   },
 
+  setSelectedAssetIds: (assetIds) =>
+    set({ selectedAssetIds: assetIds.slice(0, BATCH_CONFIRM_LIMIT) }),
+
   /** 清空所有已选资产 */
   clearAssetSelection: () => set({ selectedAssetIds: [] }),
+
+  getSelectedAssetCount: () => get().selectedAssetIds.length,
+
+  hasSelectedAssets: () => get().selectedAssetIds.length > 0,
 
   /**
    * 批量添加资产到已选列表。
@@ -269,7 +292,17 @@ export const useInventoryStore = create<InventoryState>((set, get) => ({
   // ---- UI toggles ----
 
   /** 切换新建任务弹窗可见性 */
-  setCreateModalOpen: (open) => set({ createModalOpen: open }),
+  setCreateModalOpen: (open) => set({ createModalOpen: open, isCreateModalOpen: open }),
+
+  openCreateModal: () => set({ createModalOpen: true, isCreateModalOpen: true }),
+
+  closeCreateModal: () => set({ createModalOpen: false, isCreateModalOpen: false }),
+
+  setSubmitting: (isSubmitting) => set({ isSubmitting }),
+
+  setLoading: (loading) => set({ loading }),
+
+  setError: (error) => set({ error }),
 
   /** 切换批量确认对话框可见性 */
   setBatchConfirmDialogOpen: (open) => set({ batchConfirmDialogOpen: open }),
@@ -287,6 +320,29 @@ export const useInventoryStore = create<InventoryState>((set, get) => ({
 
   /** 重置整个 store 到初始状态 */
   resetStore: () => set({ ...createInitialState() }),
+
+  reset: () => get().resetStore(),
+
+  validateScope: ({ scopeType, scopeIds }) => ({
+    valid: scopeType === 'all' || scopeIds.length > 0,
+    error: scopeType === 'all' || scopeIds.length > 0 ? null : '请选择盘点范围',
+  }),
+
+  validateTaskName: (name) => {
+    const trimmed = name.trim();
+    if (!trimmed) return { valid: false, error: '任务名称不能为空' };
+    if (trimmed.length > 50) return { valid: false, error: '任务名称不能超过50字符' };
+    return { valid: true, error: null };
+  },
+
+  calculateProgress: (counted, total) => calculateProgress(counted, total),
+
+  isTaskReadOnly: (status) => status === 'completed' || status === 'submitted',
+
+  validateRemark: (remark) =>
+    remark.length > 200
+      ? { valid: false, error: '备注不能超过200字符' }
+      : { valid: true, error: null },
 }));
 
 // ---------------------------------------------------------------------------

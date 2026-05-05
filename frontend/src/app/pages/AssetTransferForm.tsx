@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowLeft, Check, FileText, Save, Send } from "lucide-react";
+import { ArrowLeft, Check, FileText, Save, Send, Settings } from "lucide-react";
 import { useNavigate } from "react-router";
 import { disposalService } from "../services/disposalService";
 
@@ -75,6 +75,10 @@ export function AssetTransferForm() {
           </div>
         </div>
         <div className="flex items-center gap-3">
+          <button onClick={() => navigate('/workflow-designer?businessType=ASSET_TRANSFER')} type="button" className="px-4 py-2 text-sm font-medium text-blue-700 bg-blue-50 border border-blue-200 hover:bg-blue-100 rounded-lg transition-colors flex items-center gap-2">
+            <Settings className="w-4 h-4" />
+            配置流程
+          </button>
           <button className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg transition-colors flex items-center gap-2">
             <Save className="w-4 h-4" />
             保存草稿

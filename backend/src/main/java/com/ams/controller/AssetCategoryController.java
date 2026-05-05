@@ -7,8 +7,10 @@ import com.ams.dto.CategoryUpdateDTO;
 import com.ams.entity.AssetCategory;
 import com.ams.service.AssetCategoryService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
@@ -36,23 +38,23 @@ public class AssetCategoryController {
     }
 
     @PostMapping
-    public Result<AssetCategory> create(@RequestBody CategoryCreateDTO dto) {
-        return Result.success(assetCategoryService.createCategory(dto));
+    public Result<AssetCategory> create(@Valid @RequestBody CategoryCreateDTO dto) {
+        return Result.success("创建成功", assetCategoryService.createCategory(dto));
     }
 
     @PutMapping("/{id}")
-    public Result<AssetCategory> update(@PathVariable Long id, @RequestBody CategoryUpdateDTO dto) {
-        return Result.success(assetCategoryService.updateCategory(id, dto));
+    public Result<AssetCategory> update(@PathVariable Long id, @Valid @RequestBody CategoryUpdateDTO dto) {
+        return Result.success("更新成功", assetCategoryService.updateCategory(id, dto));
     }
 
     @DeleteMapping("/{id}")
     public Result<Void> delete(@PathVariable Long id) {
         assetCategoryService.deleteCategory(id);
-        return Result.success();
+        return Result.success("删除成功", null);
     }
 
     @GetMapping("/all")
-    public Result<?> all() {
-        return list(1, 9999, null);
+    public Result<List<AssetCategory>> all() {
+        return Result.success(assetCategoryService.listAllCategories());
     }
 }

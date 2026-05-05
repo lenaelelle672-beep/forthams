@@ -11,7 +11,6 @@ import {
   TOKEN_STORAGE_KEY,
   api,
   clearAuthStorage,
-  redirectToLogin,
 } from "../utils/api";
 
 export interface AuthUser {
@@ -105,7 +104,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     clearAuthStorage();
     setToken(null);
     setUser(null);
-    redirectToLogin();
   };
 
   const value = useMemo<AuthContextValue>(

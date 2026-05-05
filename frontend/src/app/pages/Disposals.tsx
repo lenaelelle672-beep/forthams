@@ -18,6 +18,7 @@ export function Disposals() {
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const loadData = async () => {
     try {
@@ -36,6 +37,16 @@ export function Disposals() {
   useEffect(() => {
     loadData();
   }, []);
+
+  const activeTabName = tabs.find(t => t.id === activeTab)?.name;
+  const filteredData = data.filter((item) => {
+    const type = String(item.changeType || item.type || '');
+    const matchesTab = !activeTabName || type === activeTab || type === activeTabName || type.includes(activeTabName.replace('资产', ''));
+    const keyword = searchTerm.trim().toLowerCase();
+    const matchesSearch = !keyword || [item.id, item.assetId, item.assetName, item.reason, item.operatorId, item.changeType]
+      .some((value) => String(value ?? '').toLowerCase().includes(keyword));
+    return matchesTab && matchesSearch;
+  });
 
   return (
     <div className="space-y-6">
@@ -88,10 +99,12 @@ export function Disposals() {
               <input
                 type="text"
                 placeholder="搜索申请单号或资产名称..."
+                value={searchTerm}
+                onChange={(event) => setSearchTerm(event.target.value)}
                 className="w-64 pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
-            <button className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg transition-colors flex items-center gap-2">
+            <button disabled title="高级筛选接口尚未接入；当前可使用左侧搜索框本地过滤" className="px-4 py-2 text-sm font-medium text-gray-400 bg-gray-50 border border-gray-300 rounded-lg cursor-not-allowed flex items-center gap-2">
               <Filter className="w-4 h-4" />
               筛选
             </button>
@@ -103,38 +116,30 @@ export function Disposals() {
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">申请单号</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">资产名称</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">处置类型</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">申请人</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">申请日期</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">状态</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">日志ID</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">资产ID</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">变更类型</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">操作人ID</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">创建时间</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">原因</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">操作</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {data.filter(d => tabs.find(t => t.id === activeTab)?.name === d.type || activeTab === 'all').map((item, idx) => (
+              {filteredData.map((item, idx) => (
                 <tr key={idx} className="hover:bg-gray-50">
                   <td className="px-6 py-4 text-sm font-medium text-blue-600">{item.id}</td>
-                  <td className="px-6 py-4 text-sm text-gray-900">{item.assetName}</td>
-                  <td className="px-6 py-4 text-sm text-gray-600">{item.type}</td>
-                  <td className="px-6 py-4 text-sm text-gray-900">{item.applicant}</td>
-                  <td className="px-6 py-4 text-sm text-gray-600">{item.date}</td>
-                  <td className="px-6 py-4">
-                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                      item.status === '审批中' ? 'bg-yellow-100 text-yellow-800' :
-                      item.status === '已完成' ? 'bg-green-100 text-green-800' :
-                      'bg-red-100 text-red-800'
-                    }`}>
-                      {item.status}
-                    </span>
-                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-900">{item.assetId ?? '-'}</td>
+                  <td className="px-6 py-4 text-sm text-gray-600">{item.changeType ?? item.type ?? '-'}</td>
+                  <td className="px-6 py-4 text-sm text-gray-900">{item.operatorId ?? item.applicant ?? '-'}</td>
+                  <td className="px-6 py-4 text-sm text-gray-600">{item.createTime ?? item.date ?? '-'}</td>
+                  <td className="px-6 py-4 text-sm text-gray-600">{item.reason ?? item.status ?? '-'}</td>
                   <td className="px-6 py-4 text-sm">
-                    <button onClick={() => setDetailItem(record)} className="text-blue-600 hover:text-blue-800 font-medium">查看详情</button>
+                    <button onClick={() => setDetailItem(item)} className="text-blue-600 hover:text-blue-800 font-medium">查看详情</button>
                   </td>
                 </tr>
               ))}
-              {data.filter(d => tabs.find(t => t.id === activeTab)?.name === d.type).length === 0 && (
+              {filteredData.length === 0 && (
                 <tr>
                   <td colSpan={7} className="px-6 py-8 text-center text-gray-500 text-sm">暂无数据</td>
                 </tr>

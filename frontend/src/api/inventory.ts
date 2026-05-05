@@ -129,6 +129,8 @@ export interface AssetListQuery {
   page?: number;
   /** 每页条数 */
   pageSize?: number;
+  /** 是否已确认（兼容旧调用方筛选参数） */
+  confirmed?: boolean;
 }
 
 /** 逐条确认资产请求载荷 */
@@ -266,10 +268,11 @@ export async function getInventoryTaskDetail(
  */
 export async function updateTaskStatus(
   taskId: string,
-  payload: UpdateTaskStatusPayload,
+  payload: UpdateTaskStatusPayload | TaskStatus,
 ): Promise<InventoryTask> {
+  const body = typeof payload === 'string' ? { status: payload } : payload;
   const response: AxiosResponse<InventoryTask> =
-    await http.patch(`${INVENTORY_TASKS_BASE}/${taskId}/status`, payload);
+    await http.patch(`${INVENTORY_TASKS_BASE}/${taskId}/status`, body);
   return response.data;
 }
 
@@ -296,6 +299,9 @@ export async function getTaskAssets(
     await http.get(`${INVENTORY_TASKS_BASE}/${taskId}/assets`, { params: query });
   return response.data;
 }
+
+/** Compatibility alias for older inventory API contract. */
+export const getInventoryAssets = getTaskAssets;
 
 /**
  * 逐条确认资产盘点结果
@@ -366,6 +372,9 @@ export async function getTaskSummary(
   return response.data;
 }
 
+/** Compatibility alias for older inventory API contract. */
+export const getInventorySummary = getTaskSummary;
+
 /**
  * 提交盘点结果进行核准
  *
@@ -384,3 +393,6 @@ export async function submitTask(
     await http.post(`${INVENTORY_TASKS_BASE}/${taskId}/submit`);
   return response.data;
 }
+
+/** Compatibility alias for older inventory API contract. */
+export const submitForApproval = submitTask;

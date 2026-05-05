@@ -1,12 +1,15 @@
 package com.ams.dto;
-import lombok.Data;
 import com.fasterxml.jackson.annotation.JsonAlias;
+import lombok.Data;
 @Data
 public class DeptCreateDTO {
-    private String name;
     @JsonAlias("deptName")
+    private String name;
+    @JsonAlias({"code", "deptCode"})
+    private String deptCode;
     private Long parentId;
-    private Integer orderNum;
+    @JsonAlias({"orderNum", "sortOrder"})
+    private Integer sortOrder;
     private String leader;
     private String phone;
     private String status;

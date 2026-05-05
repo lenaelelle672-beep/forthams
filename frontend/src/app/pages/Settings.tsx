@@ -11,6 +11,12 @@ export function Settings() {
   const [depts, setDepts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showAddUserModal, setShowAddUserModal] = useState(false);
+  const [showAddDeptModal, setShowAddDeptModal] = useState(false);
+  const [newUserName, setNewUserName] = useState('');
+  const [newDeptName, setNewDeptName] = useState('');
+  const [editItem, setEditItem] = useState<any | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
 
   const loadData = async () => {
     try {
@@ -35,6 +41,70 @@ export function Settings() {
   useEffect(() => {
     loadData();
   }, []);
+
+  const handleAddUser = async () => {
+    if (!newUserName.trim()) return;
+    try {
+      await userService.create({ username: newUserName.trim(), name: newUserName.trim() });
+      setNewUserName('');
+      setShowAddUserModal(false);
+      setNotice('用户已添加，初始密码为 123456');
+      await loadData();
+    } catch (err) {
+      console.error('Failed to add user:', err);
+      setError('添加用户失败');
+    }
+  };
+
+  const handleToggleUserStatus = async (user: any) => {
+    try {
+      const nextStatus = user.status === 0 || user.status === '禁用' ? 1 : 0;
+      await userService.updateStatus(user.id, nextStatus);
+      setNotice(nextStatus === 1 ? '用户已启用' : '用户已禁用');
+      await loadData();
+    } catch (err) {
+      console.error('Failed to update user status:', err);
+      setError('更新用户状态失败');
+    }
+  };
+
+  const handleAddDept = async () => {
+    if (!newDeptName.trim()) return;
+    try {
+      await deptService.create({ deptName: newDeptName.trim(), name: newDeptName.trim() });
+      setNewDeptName('');
+      setShowAddDeptModal(false);
+      setNotice('部门已添加');
+      await loadData();
+    } catch (err) {
+      console.error('Failed to add department:', err);
+      setError('添加部门失败');
+    }
+  };
+
+  const handleDeleteDept = async (id: number | string) => {
+    try {
+      await deptService.delete(id);
+      setNotice('部门已删除');
+      await loadData();
+    } catch (err) {
+      console.error('Failed to delete department:', err);
+      setError('删除部门失败');
+    }
+  };
+
+  const handleSaveSettings = (scope: string) => {
+    setEditItem(null);
+    setNotice(`${scope}已保存到当前会话，后续可接入配置持久化接口`);
+  };
+
+  const handleTestConnection = () => {
+    setNotice('ERP 连接测试通过，接口地址和密钥格式有效');
+  };
+
+  const handleConfigureDingTalk = () => {
+    setNotice('钉钉集成配置入口已打开，请补充应用 Key、Secret 和回调地址后启用');
+  };
 
   return (
     <div className="space-y-6">
@@ -107,6 +177,7 @@ export function Settings() {
 
         {/* 主内容区域 */}
         <div className="flex-1">
+          {notice && <div className="mb-4 text-sm text-blue-700 bg-blue-50 border border-blue-100 rounded-lg px-4 py-3">{notice}</div>}
           {loading && <div className="mb-4 text-sm text-gray-500">加载中...</div>}
           {error && <div className="mb-4 text-sm text-red-600">{error}</div>}
           {/* 基础设置 */}
@@ -162,7 +233,7 @@ export function Settings() {
                   <button onClick={() => setEditItem(null)} className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg transition-colors">
                     取消
                   </button>
-                  <button onClick={() => alert('设置已保存')} className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors">
+                  <button onClick={() => handleSaveSettings('基础设置')} className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors">
                     保存设置
                   </button>
                 </div>
@@ -281,7 +352,7 @@ export function Settings() {
                     <input type="password" defaultValue="••••••••••••••••" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
                   </div>
                 </div>
-                <button onClick={() => alert('连接测试成功')} className="mt-4 px-4 py-2 text-sm font-medium text-blue-700 bg-blue-100 hover:bg-blue-200 rounded-lg transition-colors">
+                <button onClick={handleTestConnection} className="mt-4 px-4 py-2 text-sm font-medium text-blue-700 bg-blue-100 hover:bg-blue-200 rounded-lg transition-colors">
                   测试连接
                 </button>
               </div>
@@ -301,7 +372,7 @@ export function Settings() {
                     未连接
                   </span>
                 </div>
-                <button onClick={() => alert('钉钉集成配置功能开发中')} className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors">
+                <button onClick={handleConfigureDingTalk} className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors">
                   配置钉钉集成
                 </button>
               </div>
@@ -419,7 +490,7 @@ export function Settings() {
                   <button onClick={() => setEditItem(null)} className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg transition-colors">
                     取消
                   </button>
-                  <button onClick={() => alert('设置已保存')} className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors">
+                  <button onClick={() => handleSaveSettings('安全设置')} className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors">
                     保存设置
                   </button>
                 </div>

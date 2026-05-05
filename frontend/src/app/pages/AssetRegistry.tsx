@@ -1,20 +1,29 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router";
 import { Plus, Search, Filter, Download, Upload, Edit, Trash2, Eye, ArrowRightLeft, ShieldAlert, LogOut, DollarSign } from "lucide-react";
 import { AssetDetailModal } from "../components/AssetDetailModal";
+import { ASSET_STATUS_OPTIONS, getAssetStatusMeta } from "../constants/assetStatus";
 import { assetService } from "../services/assetService";
 
 const categories = ['全部分类', '电子设备', '办公设备', '生产设备', '移动设备', '摄影设备'];
-const statuses = ['全部状态', '在用', '闲置', '维修中', '报废'];
 
 export function AssetRegistry() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('全部分类');
-  const [selectedStatus, setSelectedStatus] = useState('全部状态');
+  const [selectedStatus, setSelectedStatus] = useState('');
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+  const [locationFilter, setLocationFilter] = useState('');
+  const [minValueFilter, setMinValueFilter] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
   const [assets, setAssets] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [message, setMessage] = useState<{ type: 'success' | 'error' | 'info'; text: string } | null>(null);
+  const [formError, setFormError] = useState<string | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [showDisposalModal, setShowDisposalModal] = useState(false);
@@ -29,7 +38,7 @@ export function AssetRegistry() {
         keyword: searchTerm || undefined,
       };
       if (selectedCategory !== '全部分类') params.category = selectedCategory;
-      if (selectedStatus !== '全部状态') params.status = selectedStatus;
+      if (selectedStatus) params.status = selectedStatus;
       const result = await assetService.list(params);
       setAssets(result?.records || result || []);
     } catch (err) {
@@ -41,14 +50,24 @@ export function AssetRegistry() {
   };
 
   useEffect(() => {
+    const keyword = searchParams.get('keyword');
+    if (keyword !== null) setSearchTerm(keyword);
+  }, [searchParams]);
+
+  useEffect(() => {
     loadAssets();
   }, [searchTerm, selectedCategory, selectedStatus]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, selectedCategory, selectedStatus, locationFilter, minValueFilter, assets.length]);
 
   const getAssetId = (asset: any) => asset.id ?? asset.assetId ?? asset.assetNo;
 
   const openCreateModal = () => {
     setSelectedAsset(null);
     setAssetForm({});
+    setFormError(null);
     setShowAddModal(true);
   };
 
@@ -65,10 +84,38 @@ export function AssetRegistry() {
       supplier: asset.supplier || '',
       remark: asset.remark || '',
     });
+    setFormError(null);
     setShowAddModal(true);
   };
 
+  const getAssetValue = (asset: any) => Number(asset.value ?? asset.assetValue ?? 0) || 0;
+
+  const validateAssetForm = () => {
+    const requiredFields = [
+      ['name', '资产名称'],
+      ['category', '资产分类'],
+      ['department', '使用部门'],
+      ['location', '存放位置'],
+      ['value', '资产价值'],
+      ['purchaseDate', '采购日期'],
+    ];
+    const missing = requiredFields
+      .filter(([field]) => !String(assetForm[field] ?? '').trim() || String(assetForm[field]).startsWith('请选择'))
+      .map(([, label]) => label);
+    if (missing.length > 0) {
+      setFormError(`请填写必填项：${missing.join('、')}`);
+      return false;
+    }
+    if (Number(assetForm.value) <= 0) {
+      setFormError('资产价值必须大于 0');
+      return false;
+    }
+    setFormError(null);
+    return true;
+  };
+
   const handleSaveAsset = async () => {
+    if (!validateAssetForm()) return;
     try {
       if (selectedAsset) {
         await assetService.update(getAssetId(selectedAsset), assetForm);
@@ -76,22 +123,76 @@ export function AssetRegistry() {
         await assetService.create(assetForm);
       }
       setShowAddModal(false);
+      setMessage({ type: 'success', text: selectedAsset ? '资产已更新' : '资产已新增' });
       await loadAssets();
     } catch (err) {
       console.error('Failed to save asset:', err);
+      setFormError('保存资产失败，请检查网络或稍后重试');
     }
   };
 
   const handleDeleteAsset = async (asset: any) => {
+    if (!window.confirm(`确认删除资产“${asset.name || asset.assetName || getAssetId(asset)}”？`)) return;
     try {
       await assetService.delete(getAssetId(asset));
+      setMessage({ type: 'success', text: '资产已删除' });
       await loadAssets();
     } catch (err) {
       console.error('Failed to delete asset:', err);
+      setMessage({ type: 'error', text: '删除资产失败，请稍后重试' });
     }
   };
 
-  const filteredAssets = assets;
+  const handleImportClick = () => fileInputRef.current?.click();
+
+  const handleImportFile = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) {
+      setMessage({ type: 'info', text: '未选择导入文件' });
+      return;
+    }
+    setMessage({ type: 'info', text: `已选择导入文件：${file.name}。请在导入模块完成解析和提交。` });
+    event.target.value = '';
+  };
+
+  const escapeCsv = (value: unknown) => `"${String(value ?? '').replace(/"/g, '""')}"`;
+
+  const handleExportCsv = () => {
+    if (filteredAssets.length === 0) {
+      setMessage({ type: 'error', text: '当前列表为空，无法导出' });
+      return;
+    }
+    const headers = ['资产编号', '资产名称', '分类', '使用部门', '使用人', '存放位置', '状态', '资产价值'];
+    const rows = filteredAssets.map((asset) => [
+      asset.id || asset.assetNo || asset.assetId,
+      asset.name || asset.assetName,
+      asset.category,
+      asset.department,
+      asset.user || asset.userName || '',
+      asset.location || asset.storageLocation || '',
+      getAssetStatusMeta(asset.status).label,
+      asset.value || asset.assetValue || '',
+    ]);
+    const csv = [headers, ...rows].map((row) => row.map(escapeCsv).join(',')).join('\n');
+    const blob = new Blob([`\uFEFF${csv}`], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `assets-${new Date().toISOString().slice(0, 10)}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+    setMessage({ type: 'success', text: `已导出 ${filteredAssets.length} 条资产数据` });
+  };
+
+  const filteredAssets = assets.filter((asset) => {
+    const locationMatched = !locationFilter.trim() || String(asset.location || asset.storageLocation || '').includes(locationFilter.trim());
+    const minValue = Number(minValueFilter);
+    const valueMatched = !minValueFilter || getAssetValue(asset) >= minValue;
+    return locationMatched && valueMatched;
+  });
+  const totalPages = Math.max(1, Math.ceil(filteredAssets.length / pageSize));
+  const safeCurrentPage = Math.min(currentPage, totalPages);
+  const pagedAssets = filteredAssets.slice((safeCurrentPage - 1) * pageSize, safeCurrentPage * pageSize);
 
   return (
     <div className="space-y-6">
@@ -102,11 +203,12 @@ export function AssetRegistry() {
           <p className="text-gray-600 mt-1">管理企业全部资产信息与生命周期</p>
         </div>
         <div className="flex gap-3">
-          <button className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg transition-colors flex items-center gap-2">
+          <input ref={fileInputRef} type="file" accept=".csv,.xlsx,.xls" className="hidden" onChange={handleImportFile} />
+          <button onClick={handleImportClick} className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg transition-colors flex items-center gap-2">
             <Upload className="w-4 h-4" />
             批量导入
           </button>
-          <button className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg transition-colors flex items-center gap-2">
+          <button onClick={handleExportCsv} className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg transition-colors flex items-center gap-2">
             <Download className="w-4 h-4" />
             导出数据
           </button>
@@ -119,6 +221,12 @@ export function AssetRegistry() {
           </button>
         </div>
       </div>
+
+      {message && (
+        <div className={`rounded-lg border px-4 py-3 text-sm ${message.type === 'error' ? 'border-red-200 bg-red-50 text-red-700' : message.type === 'success' ? 'border-green-200 bg-green-50 text-green-700' : 'border-blue-200 bg-blue-50 text-blue-700'}`}>
+          {message.text}
+        </div>
+      )}
 
       {/* 筛选和搜索 */}
       <div className="bg-white rounded-lg border border-gray-200 p-4">
@@ -149,15 +257,24 @@ export function AssetRegistry() {
             onChange={(e) => setSelectedStatus(e.target.value)}
             className="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            {statuses.map(status => (
-              <option key={status} value={status}>{status}</option>
+            {ASSET_STATUS_OPTIONS.map(status => (
+              <option key={status.value || 'ALL'} value={status.value}>{status.label}</option>
             ))}
           </select>
-          <button className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg transition-colors flex items-center gap-2">
+          <button onClick={() => setShowAdvancedFilters((prev) => !prev)} className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg transition-colors flex items-center gap-2">
             <Filter className="w-4 h-4" />
             高级筛选
           </button>
         </div>
+        {showAdvancedFilters && (
+          <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4 border-t border-gray-100 pt-4">
+            <input value={locationFilter} onChange={(e) => setLocationFilter(e.target.value)} placeholder="按存放位置筛选" className="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <input value={minValueFilter} onChange={(e) => setMinValueFilter(e.target.value)} type="number" min="0" placeholder="最低资产价值" className="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <button onClick={() => { setLocationFilter(''); setMinValueFilter(''); }} className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg transition-colors">
+              清空高级筛选
+            </button>
+          </div>
+        )}
       </div>
 
       {/* 资产列表 */}
@@ -198,7 +315,9 @@ export function AssetRegistry() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {filteredAssets.map((asset) => (
+              {pagedAssets.map((asset) => {
+                const statusMeta = getAssetStatusMeta(asset.status);
+                return (
                 <tr key={getAssetId(asset)} className="hover:bg-gray-50 group">
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-600">
                     {asset.id || asset.assetNo || asset.assetId}
@@ -219,13 +338,8 @@ export function AssetRegistry() {
                     {asset.location || asset.storageLocation || '-'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                      asset.status === '在用' ? 'bg-green-100 text-green-800' :
-                      asset.status === '闲置' ? 'bg-yellow-100 text-yellow-800' :
-                      asset.status === '维修中' ? 'bg-red-100 text-red-800' :
-                      'bg-gray-100 text-gray-800'
-                    }`}>
-                      {asset.status}
+                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${statusMeta.badgeClass}`}>
+                      {statusMeta.label}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
@@ -258,7 +372,8 @@ export function AssetRegistry() {
                     </div>
                   </td>
                 </tr>
-              ))}
+                );
+              })}
             </tbody>
           </table>
         </div>
@@ -266,19 +381,17 @@ export function AssetRegistry() {
         {/* 分页 */}
         <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
           <div className="text-sm text-gray-600">
-            显示 <span className="font-medium">{filteredAssets.length}</span> 条结果，共 <span className="font-medium">{assets.length}</span> 条
+            显示 <span className="font-medium">{filteredAssets.length === 0 ? 0 : (safeCurrentPage - 1) * pageSize + 1}-{Math.min(safeCurrentPage * pageSize, filteredAssets.length)}</span> 条结果，共 <span className="font-medium">{filteredAssets.length}</span> 条
           </div>
-          <div className="flex gap-2">
-            <button className="px-3 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+          <div className="flex items-center gap-2">
+            <select value={pageSize} onChange={(e) => { setPageSize(Number(e.target.value)); setCurrentPage(1); }} className="px-2 py-1 text-sm border border-gray-300 rounded">
+              {[5, 10, 20, 50].map(size => <option key={size} value={size}>{size} 条/页</option>)}
+            </select>
+            <button onClick={() => setCurrentPage((page) => Math.max(1, page - 1))} className="px-3 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed" disabled={safeCurrentPage <= 1}>
               上一页
             </button>
-            <button onClick={() => {}} className="px-3 py-1 text-sm font-medium text-white bg-blue-600 rounded">
-              1
-            </button>
-            <button className="px-3 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded transition-colors">
-              2
-            </button>
-            <button className="px-3 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded transition-colors">
+            <span className="px-3 py-1 text-sm font-medium text-white bg-blue-600 rounded">{safeCurrentPage} / {totalPages}</span>
+            <button onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))} className="px-3 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed" disabled={safeCurrentPage >= totalPages}>
               下一页
             </button>
           </div>
@@ -299,15 +412,16 @@ export function AssetRegistry() {
               </button>
             </div>
             <div className="p-6 space-y-4">
+              {formError && <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{formError}</div>}
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">资产名称 *</label>
-                  <input value={assetForm.name || ''} onChange={(e) => setAssetForm(prev => ({ ...prev, name: e.target.value }))} type="text" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  <input required value={assetForm.name || ''} onChange={(e) => setAssetForm(prev => ({ ...prev, name: e.target.value }))} type="text" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">资产分类 *</label>
-                  <select value={assetForm.category || ''} onChange={(e) => setAssetForm(prev => ({ ...prev, category: e.target.value }))} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option>请选择分类</option>
+                  <select required value={assetForm.category || ''} onChange={(e) => setAssetForm(prev => ({ ...prev, category: e.target.value }))} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="">请选择分类</option>
                     <option>电子设备</option>
                     <option>办公设备</option>
                     <option>生产设备</option>
@@ -315,8 +429,8 @@ export function AssetRegistry() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">使用部门 *</label>
-                  <select value={assetForm.department || ''} onChange={(e) => setAssetForm(prev => ({ ...prev, department: e.target.value }))} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option>请选择部门</option>
+                  <select required value={assetForm.department || ''} onChange={(e) => setAssetForm(prev => ({ ...prev, department: e.target.value }))} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="">请选择部门</option>
                     <option>研发部</option>
                     <option>销售部</option>
                     <option>生产部</option>
@@ -328,15 +442,15 @@ export function AssetRegistry() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">存放位置 *</label>
-                  <input value={assetForm.location || ''} onChange={(e) => setAssetForm(prev => ({ ...prev, location: e.target.value }))} type="text" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  <input required value={assetForm.location || ''} onChange={(e) => setAssetForm(prev => ({ ...prev, location: e.target.value }))} type="text" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">资产价值 (元) *</label>
-                  <input value={assetForm.value || ''} onChange={(e) => setAssetForm(prev => ({ ...prev, value: e.target.value }))} type="number" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  <input required min="0.01" value={assetForm.value || ''} onChange={(e) => setAssetForm(prev => ({ ...prev, value: e.target.value }))} type="number" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">采购日期 *</label>
-                  <input value={assetForm.purchaseDate || ''} onChange={(e) => setAssetForm(prev => ({ ...prev, purchaseDate: e.target.value }))} type="date" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  <input required value={assetForm.purchaseDate || ''} onChange={(e) => setAssetForm(prev => ({ ...prev, purchaseDate: e.target.value }))} type="date" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">供应商</label>

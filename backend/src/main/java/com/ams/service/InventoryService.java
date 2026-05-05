@@ -2,6 +2,7 @@ package com.ams.service;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.ams.common.exception.BusinessException;
+import com.ams.context.TenantContext;
 import com.ams.dto.InventoryScanDTO;
 import com.ams.dto.InventoryTaskCreateDTO;
 import com.ams.entity.InventoryDetail;
@@ -29,9 +30,11 @@ public class InventoryService {
     private final InventoryDetailMapper inventoryDetailMapper;
 
     public Page<InventoryTask> queryTasks(Integer page, Integer pageSize, String status) {
+        String tenantId = TenantContext.requireTenantId();
         Page<InventoryTask> pageParam = new Page<>(page == null ? 1 : page, pageSize == null ? 10 : pageSize);
 
-        LambdaQueryWrapper<InventoryTask> wrapper = new LambdaQueryWrapper<>();
+        LambdaQueryWrapper<InventoryTask> wrapper = new LambdaQueryWrapper<InventoryTask>()
+                .eq(InventoryTask::getTenantId, tenantId);
         if (status != null && !status.isEmpty()) {
             wrapper.eq(InventoryTask::getStatus, status);
         }
@@ -52,8 +55,10 @@ public class InventoryService {
 
     @Transactional(rollbackFor = Exception.class)
     public InventoryTask createTask(InventoryTaskCreateDTO createDTO) {
+        String tenantId = TenantContext.requireTenantId();
         InventoryTask task = new InventoryTask();
         BeanUtil.copyProperties(createDTO, task);
+        task.setTenantId(tenantId);
 
         task.setTaskNo(generateTaskNo());
         if (task.getStatus() == null || task.getStatus().isEmpty()) {
@@ -91,6 +96,7 @@ public class InventoryService {
         InventoryDetail detail = new InventoryDetail();
         BeanUtil.copyProperties(scanDTO, detail);
         detail.setTaskId(taskId);
+        detail.setTenantId(task.getTenantId());
         if (detail.getScanTime() == null) {
             detail.setScanTime(LocalDateTime.now());
         }
@@ -114,9 +120,11 @@ public class InventoryService {
     }
 
     public List<InventoryDetail> getTaskDetails(Long taskId) {
+        String tenantId = TenantContext.requireTenantId();
         getTaskEntityById(taskId);
         return inventoryDetailMapper.selectList(
             new LambdaQueryWrapper<InventoryDetail>()
+                .eq(InventoryDetail::getTenantId, tenantId)
                 .eq(InventoryDetail::getTaskId, taskId)
                 .orderByDesc(InventoryDetail::getScanTime)
                 .orderByDesc(InventoryDetail::getCreateTime)
@@ -124,7 +132,10 @@ public class InventoryService {
     }
 
     private InventoryTask getTaskEntityById(Long id) {
-        InventoryTask task = inventoryTaskMapper.selectById(id);
+        String tenantId = TenantContext.requireTenantId();
+        InventoryTask task = inventoryTaskMapper.selectOne(new LambdaQueryWrapper<InventoryTask>()
+                .eq(InventoryTask::getId, id)
+                .eq(InventoryTask::getTenantId, tenantId));
         if (task == null) {
             throw new BusinessException("盘点任务不存在");
         }
@@ -132,11 +143,13 @@ public class InventoryService {
     }
 
     private String generateTaskNo() {
+        String tenantId = TenantContext.requireTenantId();
         String dateStr = LocalDate.now().format(DateTimeFormatter.BASIC_ISO_DATE);
         String prefix = "INV-" + dateStr + "-";
 
         List<InventoryTask> todayTasks = inventoryTaskMapper.selectList(
             new LambdaQueryWrapper<InventoryTask>()
+                .eq(InventoryTask::getTenantId, tenantId)
                 .likeRight(InventoryTask::getTaskNo, prefix)
                 .orderByDesc(InventoryTask::getTaskNo)
         );

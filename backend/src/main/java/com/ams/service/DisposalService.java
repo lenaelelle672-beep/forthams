@@ -1,15 +1,13 @@
 package com.ams.service;
 
-import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.convert.Convert;
 import com.ams.common.exception.BusinessException;
 import com.ams.dto.AssetClearanceDTO;
 import com.ams.dto.AssetScrapDTO;
 import com.ams.dto.AssetTransferDTO;
 import com.ams.entity.Asset;
 import com.ams.entity.AssetChangeLog;
+import com.ams.enums.AssetStatus;
 import com.ams.mapper.AssetChangeLogMapper;
-import com.ams.mapper.AssetMapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.stereotype.Service;
@@ -23,51 +21,37 @@ public class DisposalService {
 
     private static final List<String> DISPOSAL_TYPES = Arrays.asList("TRANSFER", "CLEARANCE", "SCRAP");
 
-    private final AssetMapper assetMapper;
+    private final AssetLifecycleService assetLifecycleService;
     private final AssetChangeLogMapper assetChangeLogMapper;
+    private final WorkflowDefinitionService workflowDefinitionService;
 
-    public DisposalService(AssetMapper assetMapper, AssetChangeLogMapper assetChangeLogMapper) {
-        this.assetMapper = assetMapper;
+    public DisposalService(AssetLifecycleService assetLifecycleService, AssetChangeLogMapper assetChangeLogMapper, WorkflowDefinitionService workflowDefinitionService) {
+        this.assetLifecycleService = assetLifecycleService;
         this.assetChangeLogMapper = assetChangeLogMapper;
+        this.workflowDefinitionService = workflowDefinitionService;
     }
 
     @Transactional(rollbackFor = Exception.class)
     public Asset transferAsset(AssetTransferDTO dto) {
-        Asset asset = getAssetOrThrow(getLongProp(dto, "assetId"));
-
-        String oldValue = buildAssetSnapshot(asset);
-        BeanUtil.setProperty(asset, "deptId", getLongProp(dto, "targetDeptId"));
-        BeanUtil.setProperty(asset, "userId", getLongProp(dto, "targetUserId"));
-        BeanUtil.setProperty(asset, "location", getStrProp(dto, "targetLocation"));
-        BeanUtil.setProperty(asset, "status", "IN_USE");
-        assetMapper.updateById(asset);
-
-        createChangeLog(getLongProp(asset, "id"), "TRANSFER", oldValue, buildAssetSnapshot(asset), getStrProp(dto, "reason"));
-        return asset;
+        workflowDefinitionService.requirePublishedDefinition("ASSET_TRANSFER");
+        return assetLifecycleService.transitionAsset(dto.getAssetId(), AssetStatus.IN_USE, "TRANSFER", dto.getReason(), null,
+                asset -> {
+                    asset.setDeptId(dto.getTargetDeptId());
+                    asset.setUserId(dto.getTargetUserId());
+                    asset.setLocation(dto.getTargetLocation());
+                });
     }
 
     @Transactional(rollbackFor = Exception.class)
     public Asset clearAsset(AssetClearanceDTO dto) {
-        Asset asset = getAssetOrThrow(getLongProp(dto, "assetId"));
-
-        String oldValue = buildAssetSnapshot(asset);
-        BeanUtil.setProperty(asset, "status", "CLEARED");
-        assetMapper.updateById(asset);
-
-        createChangeLog(getLongProp(asset, "id"), "CLEARANCE", oldValue, buildAssetSnapshot(asset), getStrProp(dto, "reason"));
-        return asset;
+        workflowDefinitionService.requirePublishedDefinition("ASSET_CLEARANCE");
+        return assetLifecycleService.transitionStatus(dto.getAssetId(), AssetStatus.CLEARED, "CLEARANCE", dto.getReason(), null);
     }
 
     @Transactional(rollbackFor = Exception.class)
     public Asset scrapAsset(AssetScrapDTO dto) {
-        Asset asset = getAssetOrThrow(getLongProp(dto, "assetId"));
-
-        String oldValue = buildAssetSnapshot(asset);
-        BeanUtil.setProperty(asset, "status", "SCRAPPED");
-        assetMapper.updateById(asset);
-
-        createChangeLog(getLongProp(asset, "id"), "SCRAP", oldValue, buildAssetSnapshot(asset), getStrProp(dto, "reason"));
-        return asset;
+        workflowDefinitionService.requirePublishedDefinition("ASSET_SCRAP");
+        return assetLifecycleService.transitionStatus(dto.getAssetId(), AssetStatus.SCRAPPED, "SCRAP", dto.getReason(), null);
     }
 
     public Page<AssetChangeLog> getDisposalHistory(Integer page, Integer pageSize, String changeType) {
@@ -85,36 +69,5 @@ public class DisposalService {
 
         wrapper.orderByDesc("create_time");
         return assetChangeLogMapper.selectPage(pager, wrapper);
-    }
-
-    private Asset getAssetOrThrow(Long assetId) {
-        Asset asset = assetMapper.selectById(assetId);
-        if (asset == null) {
-            throw new BusinessException("资产不存在");
-        }
-        return asset;
-    }
-
-    private void createChangeLog(Long assetId, String changeType, String oldValue, String newValue, String reason) {
-        AssetChangeLog changeLog = new AssetChangeLog();
-        BeanUtil.setProperty(changeLog, "assetId", assetId);
-        BeanUtil.setProperty(changeLog, "changeType", changeType);
-        BeanUtil.setProperty(changeLog, "oldValue", oldValue);
-        BeanUtil.setProperty(changeLog, "newValue", newValue);
-        BeanUtil.setProperty(changeLog, "reason", reason);
-        assetChangeLogMapper.insert(changeLog);
-    }
-
-    private String buildAssetSnapshot(Asset asset) {
-        return String.format("deptId=%s,userId=%s,location=%s,status=%s",
-            getLongProp(asset, "deptId"), getLongProp(asset, "userId"), getStrProp(asset, "location"), getStrProp(asset, "status"));
-    }
-
-    private Long getLongProp(Object bean, String fieldName) {
-        return Convert.toLong(BeanUtil.getProperty(bean, fieldName));
-    }
-
-    private String getStrProp(Object bean, String fieldName) {
-        return Convert.toStr(BeanUtil.getProperty(bean, fieldName));
     }
 }

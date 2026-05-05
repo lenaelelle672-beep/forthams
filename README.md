@@ -6,6 +6,8 @@
 
 ## 技术栈
 
+当前项目已统一为 Java Spring Boot + React/Vite。历史 Python/FastAPI/pytest 资产已移除，后续开发与自动化执行不要恢复 Python 运行链路。
+
 ### 前端
 - React 18.3.1
 - React Router 7
@@ -24,9 +26,9 @@
 
 ```
 forthAMS/
-├── frontend/          # 前端项目
-├── backend/           # 后端项目
-├── docs/             # 文档
+├── frontend/          # React/Vite 前端项目
+├── backend/           # Java Spring Boot 后端项目
+├── docs/              # 文档
 │   ├── design/       # 设计文档
 │   ├── api/          # API接口文档
 │   └── figma/        # 前端原型
@@ -83,6 +85,13 @@ forthAMS/
 
 ## 快速开始
 
+### 数据库初始化
+
+```bash
+mysql -uroot -proot -e "CREATE DATABASE IF NOT EXISTS ams_db DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+mysql -uroot -proot ams_db < backend/src/main/resources/schema.sql
+```
+
 ### 前端启动
 
 ```bash
@@ -102,21 +111,23 @@ mvn spring-boot:run
 
 访问: http://localhost:8080
 
-## 开发计划
+## 验证命令
 
-### Phase 1 (当前)
-- [x] 项目结构初始化
-- [ ] 后端基础搭建
-- [ ] 数据库设计
-- [ ] 前端集成
-- [ ] 用户认证模块
-- [ ] 资产台账核心功能
+```bash
+cd backend && mvn test
+cd backend && mvn -q -DskipTests compile
+cd frontend && npm test -- --run
+cd frontend && npm run build
+cd frontend && npm run e2e -- --reporter=line
+cd frontend && npm run e2e:real -- --reporter=line
+```
 
-### Phase 2 (计划中)
-- RFID盘点模块增强
-- 流程设计器集成
-- 高级数据分析
-- 移动端支持
+## GSD 执行
+
+- GSD 只应操作真实 `forthAMS` 工作区，不能生成 sandbox 或 Python 假测试。
+- 执行入口见 `GSD_EXECUTION.md`。
+- 业务优先级以 `ROADMAP.md` 为准。
+- 后续缺口优先补 Java 后端折旧模块，再补审计/操作日志生产链路。
 
 ## 开发者
 

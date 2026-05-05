@@ -431,7 +431,10 @@ describe('Log Dashboard - Query Builder', () => {
 
 describe('Log Dashboard - API Service (fetchAuditLogs)', () => {
   beforeEach(() => {
-    vi.restoreAllMocks();
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue({
+      ok: true,
+      json: async () => ({ items: [], next_cursor: null, has_more: false }),
+    } as Response);
   });
 
   afterEach(() => {
@@ -568,7 +571,10 @@ describe('Log Dashboard - API Service (fetchAuditLogs)', () => {
 
 describe('Log Dashboard - API Service (fetchLogTrend)', () => {
   beforeEach(() => {
-    vi.restoreAllMocks();
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue({
+      ok: true,
+      json: async () => [],
+    } as Response);
   });
 
   afterEach(() => {

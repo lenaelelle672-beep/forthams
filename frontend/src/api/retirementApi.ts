@@ -109,7 +109,7 @@ export async function submitRetirementApplication(
   params: RetirementApplyParams
 ): Promise<RetirementApplication> {
   const response = await request.post<RetirementApplication>(
-    '/api/v1/retirement/apply',
+    '/v1/retirement/apply',
     params
   );
   return response.data;
@@ -126,7 +126,7 @@ export async function getRetirementApplication(
   applicationId: string
 ): Promise<RetirementApplication> {
   const response = await request.get<RetirementApplication>(
-    `/api/v1/retirement/${applicationId}`
+    `/v1/retirement/${applicationId}`
   );
   return response.data;
 }
@@ -143,7 +143,7 @@ export async function listMyRetirementApplications(
 ): Promise<RetirementApplication[]> {
   const params = status ? { status } : {};
   const response = await request.get<RetirementApplication[]>(
-    '/api/v1/retirement/my-applications',
+    '/v1/retirement/my-applications',
     { params }
   );
   return response.data;
@@ -164,7 +164,7 @@ export async function updateRetirementApplication(
   params: RetirementUpdateParams
 ): Promise<RetirementApplication> {
   const response = await request.put<RetirementApplication>(
-    `/api/v1/retirement/${applicationId}`,
+    `/v1/retirement/${applicationId}`,
     params
   );
   return response.data;
@@ -179,7 +179,7 @@ export async function updateRetirementApplication(
 export async function cancelRetirementApplication(
   applicationId: string
 ): Promise<void> {
-  await request.delete(`/api/v1/retirement/${applicationId}`);
+  await request.delete(`/v1/retirement/${applicationId}`);
 }
 
 /**
@@ -194,7 +194,7 @@ export async function getPendingApprovals(
 ): Promise<ApprovalTask[]> {
   const params = include_types ? { include_types } : {};
   const response = await request.get<ApprovalTask[]>(
-    '/api/v1/approvals/pending',
+    '/approvals/pending',
     { params }
   );
   return response.data;
@@ -224,7 +224,7 @@ export async function processApproval(
     status: 'completed' | 'pending_next_level';
     next_approver?: string;
     completed_at?: string;
-  }>(`/api/v1/approvals/${taskId}`, params);
+  }>(`/approvals/${taskId}`, params);
   return response.data;
 }
 
@@ -236,7 +236,7 @@ export async function processApproval(
  */
 export async function getApprovalTask(taskId: string): Promise<ApprovalTask> {
   const response = await request.get<ApprovalTask>(
-    `/api/v1/approvals/tasks/${taskId}`
+    `/approvals/tasks/${taskId}`
   );
   return response.data;
 }
@@ -254,7 +254,7 @@ export async function delegateApprovalTask(
   targetUserId: string,
   reason?: string
 ): Promise<void> {
-  await request.post(`/api/v1/approvals/${taskId}/delegate`, {
+  await request.post(`/approvals/${taskId}/delegate`, {
     target_user_id: targetUserId,
     reason
   });
@@ -292,7 +292,7 @@ export async function getAssetLifecycle(
     asset_id: string;
     timeline: LifecycleEvent[];
     total: number;
-  }>(`/api/v1/assets/${params.asset_id}/lifecycle`, {
+  }>(`/assets/${params.asset_id}/lifecycle`, {
     params: {
       start_date: params.start_date,
       end_date: params.end_date,
@@ -315,7 +315,7 @@ export async function getAssetRetirementHistory(
   assetId: string
 ): Promise<RetirementApplication[]> {
   const response = await request.get<RetirementApplication[]>(
-    `/api/v1/retirement/asset/${assetId}`
+    `/v1/retirement/asset/${assetId}`
   );
   return response.data;
 }
@@ -343,7 +343,7 @@ export async function getApprovalChainConfig(): Promise<{
       approver_id?: string;
       role_code?: string;
     }>;
-  }>('/api/v1/approval/chain/config');
+  }>('/approval/chain/config');
   return response.data;
 }
 
@@ -373,6 +373,6 @@ export async function getRetirementStatistics(params: {
     pending_count: number;
     total_residual_value: number;
     by_type: Record<string, number>;
-  }>('/api/v1/retirement/statistics', { params });
+  }>('/v1/retirement/statistics', { params });
   return response.data;
 }

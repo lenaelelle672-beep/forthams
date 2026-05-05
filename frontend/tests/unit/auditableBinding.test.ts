@@ -520,6 +520,7 @@ describe('审计字段双向绑定测试套件', () => {
       const initialLog = createMockAuditLog({
         id: 'log-1',
         operation: 'CREATE',
+        changes: undefined,
       });
       
       // 生成初始节点

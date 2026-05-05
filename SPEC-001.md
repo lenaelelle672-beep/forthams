@@ -150,7 +150,7 @@ Phase 1 交付物边界
   数据库: PostgreSQL 15 (容器化)
   消息队列: Redis 7 (容器化)
   Python版本: 3.11+
-  Node.js版本: 18+
+  Node.js版本: 20+
   依赖管理: poetry (后端) / pnpm (前端)
   测试隔离: 每个测试使用独立的数据库事务回滚
 ```

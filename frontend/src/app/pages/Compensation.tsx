@@ -21,6 +21,8 @@ export function Compensation() {
   const [compensations, setCompensations] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [valuationBasis, setValuationBasis] = useState<string | null>(null);
+  const [valuationLoading, setValuationLoading] = useState(false);
   const [formData, setFormData] = useState<Record<string, any>>({
     assetId: '',
     type: '设备损坏',
@@ -56,6 +58,28 @@ export function Compensation() {
       await loadData();
     } catch (err) {
       console.error('Failed to create compensation:', err);
+    }
+  };
+
+  const handleEstimateCompensation = async () => {
+    if (!formData.assetId) {
+      setValuationBasis('请先填写资产编号');
+      return;
+    }
+    try {
+      setValuationLoading(true);
+      setValuationBasis(null);
+      const valuation = await compensationService.estimate(formData) as any;
+      setFormData(prev => ({
+        ...prev,
+        amount: String(valuation.estimatedAmount ?? prev.amount),
+      }));
+      setValuationBasis(String(valuation.valuationBasis || '已按系统规则生成估值'));
+    } catch (err) {
+      console.error('Failed to estimate compensation:', err);
+      setValuationBasis('系统估值失败，请确认资产编号存在后重试，或人工填写金额');
+    } finally {
+      setValuationLoading(false);
     }
   };
 
@@ -355,7 +379,13 @@ export function Compensation() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">赔偿金额 (元) *</label>
-                   <input value={formData.amount} onChange={(e) => setFormData(prev => ({ ...prev, amount: e.target.value }))} type="number" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  <div className="flex gap-2">
+                    <input value={formData.amount} onChange={(e) => setFormData(prev => ({ ...prev, amount: e.target.value }))} type="number" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                    <button type="button" onClick={handleEstimateCompensation} disabled={valuationLoading} className="shrink-0 px-3 py-2 text-sm font-medium text-blue-700 bg-blue-50 border border-blue-200 hover:bg-blue-100 disabled:opacity-60 rounded-lg transition-colors">
+                      {valuationLoading ? '估值中' : '系统估值'}
+                    </button>
+                  </div>
+                  {valuationBasis && <p className="mt-1 text-xs text-gray-500">{valuationBasis}</p>}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">发生日期 *</label>

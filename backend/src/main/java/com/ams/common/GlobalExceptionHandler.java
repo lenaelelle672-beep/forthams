@@ -3,6 +3,7 @@ package com.ams.common;
 import com.ams.common.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -44,6 +45,13 @@ public class GlobalExceptionHandler {
                 .collect(Collectors.joining(", "));
         log.error("Bind exception: {}", errors);
         return Result.error(400, errors);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public Result<Void> handleAccessDeniedException(AccessDeniedException e) {
+        log.warn("Access denied: {}", e.getMessage());
+        return Result.error(403, e.getMessage());
     }
 
     @ExceptionHandler(Exception.class)

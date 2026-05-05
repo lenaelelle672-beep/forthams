@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
-import { ArrowLeft, CheckCircle2, AlertCircle } from "lucide-react";
+import { ArrowLeft, CheckCircle2, AlertCircle, Settings } from "lucide-react";
 import { disposalService } from "../services/disposalService";
 
 const steps = [
@@ -75,17 +75,23 @@ export function AssetClearanceForm() {
   return (
     <div className="max-w-5xl mx-auto space-y-6 pb-12">
       {/* Header */}
-      <div className="flex items-center gap-4 mb-8">
-        <button 
-          onClick={() => navigate(-1)}
-          className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-        >
-          <ArrowLeft className="w-5 h-5 text-gray-600" />
-        </button>
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900">资产清退申请</h2>
-          <p className="text-sm text-gray-500 mt-1">请填写资产清退信息，提交后将进入对应审批流程</p>
+      <div className="flex items-center justify-between gap-4 mb-8">
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => navigate(-1)}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+          >
+            <ArrowLeft className="w-5 h-5 text-gray-600" />
+          </button>
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900">资产清退申请</h2>
+            <p className="text-sm text-gray-500 mt-1">请填写资产清退信息，提交后将进入对应审批流程</p>
+          </div>
         </div>
+        <button onClick={() => navigate('/workflow-designer?businessType=ASSET_CLEARANCE')} type="button" className="px-4 py-2 text-sm font-medium text-blue-700 bg-blue-50 border border-blue-200 hover:bg-blue-100 rounded-lg transition-colors flex items-center gap-2">
+          <Settings className="w-4 h-4" />
+          配置流程
+        </button>
       </div>
 
       {/* Progress Stepper */}

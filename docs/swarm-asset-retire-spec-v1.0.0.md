@@ -136,7 +136,7 @@
 ```
 测试环境: SWARM-TEST
 数据库: PostgreSQL 14+
-Node.js: 18+
+Node.js: 20+
 Python: 3.11+
 后端测试框架: pytest 7.0+
 前端E2E框架: Playwright 1.40+

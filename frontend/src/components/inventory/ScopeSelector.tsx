@@ -22,6 +22,8 @@ import {
 } from '@ant-design/icons';
 import type { TreeProps } from 'antd';
 
+import { TOKEN_STORAGE_KEY } from '../../app/utils/api';
+
 const { Text } = Typography;
 
 // ---------------------------------------------------------------------------
@@ -44,6 +46,16 @@ interface TreeNodeData {
   key: string;
   title: string;
   children?: TreeNodeData[];
+}
+
+interface RawTreeNodeData extends Record<string, unknown> {
+  id?: string | number;
+  key?: string | number;
+  name?: string;
+  title?: string;
+  categoryName?: string;
+  locationName?: string;
+  children?: RawTreeNodeData[];
 }
 
 // ---------------------------------------------------------------------------
@@ -77,15 +89,33 @@ function buildKeyTitleMap(nodes: TreeNodeData[]): Map<string, string> {
  * @returns 解析后的树节点数组
  * @throws 网络错误或非 200 响应
  */
+function getAuthHeaders(): HeadersInit {
+  if (typeof window === 'undefined') return {};
+
+  const token = window.localStorage.getItem(TOKEN_STORAGE_KEY);
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
+function normalizeTreeNode(node: RawTreeNodeData): TreeNodeData {
+  const key = node.key ?? node.id;
+  const title = node.title ?? node.name ?? node.locationName ?? node.categoryName ?? key ?? '未命名节点';
+
+  return {
+    key: String(key),
+    title: String(title),
+    children: Array.isArray(node.children) ? node.children.map(normalizeTreeNode) : undefined,
+  };
+}
+
 async function fetchTreeData(url: string): Promise<TreeNodeData[]> {
-  const response = await fetch(url);
+  const response = await fetch(url, { headers: getAuthHeaders() });
   if (!response.ok) {
     throw new Error(`请求失败 (HTTP ${response.status})`);
   }
   const raw = await response.json();
-  // 兼容 { data: [...] } 或直接返回数组的响应格式
-  if (Array.isArray(raw)) return raw;
-  if (Array.isArray(raw.data)) return raw.data;
+  // 兼容 { data: [...] } 或直接返回数组的响应格式，并归一化后端字段为 Ant Design Tree 需要的 key/title。
+  const nodes = Array.isArray(raw) ? raw : Array.isArray(raw.data) ? raw.data : [];
+  if (Array.isArray(nodes)) return nodes.map(normalizeTreeNode);
   return [];
 }
 
@@ -154,8 +184,8 @@ function useTreeData(url: string): {
  */
 const ScopeSelector: React.FC<ScopeSelectorProps> = ({ value, onChange }) => {
   // ---- 树数据加载 ----
-  const locationTree = useTreeData('/api/v1/locations/tree');
-  const categoryTree = useTreeData('/api/v1/categories/tree');
+  const locationTree = useTreeData('/api/locations/list');
+  const categoryTree = useTreeData('/api/categories/tree');
 
   // ---- key → title 映射 ----
   const locationKeyMap = useMemo(
