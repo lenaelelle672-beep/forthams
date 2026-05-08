@@ -1,0 +1,63 @@
+.aider*
+
+# Local secrets and environment files
+.env
+.env.*
+!.env.example
+!.env.sample
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# Logs and runtime output
+*.log
+logs/
+*.pid
+*.seed
+
+# Python caches and virtual environments
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+
+# Node/Bun caches and dependencies
+node_modules/
+.bun/
+.turbo/
+dist/
+build/
+coverage/
+
+# Browser/e2e artifacts
+test-results/
+playwright-report/
+blob-report/
+screenshots/
+videos/
+hud_test.png
+gsd_vibe_coding_presentation_v2_副本*.html
+
+# Local machine/helper scripts; keep out of commits unless explicitly sanitized.
+ssh_imac.sh
+setup-claude-models.sh
+screenshot_local.py
+
+# Local application state / generated data
+.lancedb/
+*.sqlite
+*.sqlite3
+*.db
+
+# Nested repositories are managed by their own git metadata.
+vib-coding-harness/
+vibecode/repos/opencode/
+vibecode/repos/freecode/
