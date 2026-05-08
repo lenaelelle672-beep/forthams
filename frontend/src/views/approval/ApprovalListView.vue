@@ -39,7 +39,7 @@
 
       <!-- 空状态 -->
       <el-empty
-        v-if="approvalList.length === 0"
+        v-if="filteredList.length === 0"
         class="empty-state"
         description="暂无审批记录"
       >
@@ -62,7 +62,7 @@
       </div>
 
       <!-- 分页器 -->
-      <div v-if="approvalList.length > 0" class="pagination-container">
+      <div v-if="filteredList.length > 0" class="pagination-container">
         <el-pagination
           v-model:current-page="currentPage"
           v-model:page-size="pageSize"
@@ -113,14 +113,13 @@ import { ref, computed, onMounted, watch } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { Refresh } from '@element-plus/icons-vue';
 import { useApprovalStore } from '@/stores/approvalStore';
-import { useApprovalBinding } from '@/composables/useApprovalBinding';
 import type { Approval, ApprovalStatus } from '@/types/approval';
 import ApprovalFilter from '@/components/approval/ApprovalFilter.vue';
 import ApprovalListItem from '@/components/approval/ApprovalListItem.vue';
 import ApprovalDetailView from './ApprovalDetailView.vue';
 
 // Store 实例
-const approvalStore = useApprovalBinding();
+const approvalStore = useApprovalStore();
 
 // 响应式状态
 const filterStatus = ref<ApprovalStatus | ''>('');
@@ -130,10 +129,13 @@ const pageSize = ref(10);
 const detailDrawerVisible = ref(false);
 const detailLoading = ref(false);
 
-// 双向绑定计算属性
-const isLoading = computed(() => approvalStore.loadingState.isLoading);
-const errorState = computed(() => approvalStore.errorState);
-const currentApproval = computed(() => approvalStore.currentApproval);
+// 从 store 获取完整列表
+const approvalList = computed(() => approvalStore.approvalList ?? []);
+
+// 双向绑定计算属性（空值安全）
+const isLoading = computed(() => approvalStore.loadingState?.isLoading ?? false);
+const errorState = computed(() => approvalStore.errorState ?? null);
+const currentApproval = computed(() => approvalStore.currentApproval ?? null);
 
 // 过滤后的列表
 const filteredList = computed(() => {
@@ -170,18 +172,26 @@ function isOperationPending(id: string): boolean {
 }
 
 /**
- * 刷新审批列表
- * 触发 Service 层数据获取，更新 Store 状态
+ * 加载审批列表数据（统一入口）
  */
-async function handleRefresh() {
+async function loadApprovalList() {
   try {
     await approvalStore.fetchApprovalList({
       page: currentPage.value,
       pageSize: pageSize.value
     });
-    ElMessage.success('刷新成功');
   } catch (error) {
-    console.error('刷新失败:', error);
+    console.error('加载审批列表失败:', error);
+  }
+}
+
+/**
+ * 刷新审批列表
+ */
+async function handleRefresh() {
+  await loadApprovalList();
+  if (!errorState.value) {
+    ElMessage.success('刷新成功');
   }
 }
 
@@ -258,10 +268,9 @@ async function handleApprove(item: Approval) {
     
     await approvalStore.updateApprovalStatus(item.id, 'APPROVED');
     
-    // 乐观更新后，Store 状态自动同步至 UI
     ElMessage.success('审批已通过');
+    await loadApprovalList();
     
-    // 如果详情抽屉已打开，刷新详情
     if (detailDrawerVisible.value && currentApproval.value?.id === item.id) {
       await approvalStore.getApprovalDetail(item.id);
     }

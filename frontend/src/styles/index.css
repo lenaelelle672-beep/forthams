@@ -1,3 +1,9 @@
 @import './fonts.css';
 @import './tailwind.css';
 @import './theme.css';
+
+/* Bug-4 Fix: Ensure all page containers use theme background color */
+/* Prevents black background on fixed asset detail and other pages */
+html, body, #app, main, .page-container {
+  background-color: var(--bg-primary, var(--global-bg-color, #f5f7fa)) !important;
+}

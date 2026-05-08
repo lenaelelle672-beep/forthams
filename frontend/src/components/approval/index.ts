@@ -24,6 +24,7 @@ export { ApprovalActions } from './ApprovalActions';
 export { RejectDialog } from './RejectDialog';
 export { ApprovalStatusBadge } from './ApprovalStatusBadge';
 export { ApprovalRecordTimeline } from './ApprovalRecordTimeline';
+export { default as ApprovalFlowChart } from './ApprovalFlowChart.vue';
 
 // ---------------------------------------------------------------------------
 // Composables / hooks

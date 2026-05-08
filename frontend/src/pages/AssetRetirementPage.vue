@@ -113,9 +113,12 @@
           </el-upload>
         </div>
 
-        <!-- 提交按钮 -->
+        <!-- 操作按钮 -->
         <div class="form-actions">
           <el-button @click="handleCancel">取消</el-button>
+          <el-button :loading="draftLoading" @click="handleSaveDraft">
+            保存草稿
+          </el-button>
           <el-button type="primary" :loading="submitting" @click="handleSubmit">
             提交申请
           </el-button>
@@ -154,6 +157,7 @@ const formRef = ref<FormInstance>()
 const uploadRef = ref<UploadInstance>()
 
 const submitting = ref(false)
+const draftLoading = ref(false)
 const fileList = ref<FileList>([])
 const assetId = ref<string>('')
 

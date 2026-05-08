@@ -229,6 +229,7 @@
  * @requires AuditLogTimeline 审计日志时间线
  */
 import { ref, computed, watch, onMounted } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useAuditLogs } from '@/hooks/useAuditLogs';
 import { useAssetById } from '@/hooks/useAssetById';
 

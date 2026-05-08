@@ -65,6 +65,30 @@ const InventoryDetailPage = lazy(
     })),
 );
 
+// ---------------------------------------------------------------------------
+// ITSM/ITAM Core Pages (Iteration 1 MVP)
+// ---------------------------------------------------------------------------
+const DashboardView = lazy(
+  () =>
+    import('@/views/dashboard.vue').then((mod) => ({
+      default: mod.default,
+    })),
+);
+
+const AssetListView = lazy(
+  () =>
+    import('@/views/asset-list.vue').then((mod) => ({
+      default: mod.default,
+    })),
+);
+
+const ApprovalListView = lazy(
+  () =>
+    import('@/views/approval-list.vue').then((mod) => ({
+      default: mod.default,
+    })),
+);
+
 /* -------------------------------------------------------------------------- */
 /*  Shared suspense fallback                                                  */
 /* -------------------------------------------------------------------------- */
@@ -175,6 +199,14 @@ export const router = createBrowserRouter([
         element: (
           <WithSuspense>
             <CategoryTree />
+          </WithSuspense>
+        ),
+      },
+      {
+        path: 'approvals',
+        element: (
+          <WithSuspense>
+            <ApprovalListView />
           </WithSuspense>
         ),
       },

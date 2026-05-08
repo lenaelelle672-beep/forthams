@@ -195,7 +195,7 @@ export function AssetRegistry() {
   const pagedAssets = filteredAssets.slice((safeCurrentPage - 1) * pageSize, safeCurrentPage * pageSize);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 bg-white min-h-screen">
       {/* 页面标题 */}
       <div className="flex items-center justify-between">
         <div>
