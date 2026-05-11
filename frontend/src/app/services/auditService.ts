@@ -27,6 +27,8 @@ export interface AuditLogListParams {
   operator_id?: string;
   /** 操作类型枚举值（可选），由 /api/v1/audit-log/meta 动态下发 */
   action_type?: string;
+  /** 所属模块（可选），如 ASSET / USER / APPROVAL 等 */
+  module?: string;
   /** 页码，从 1 开始 */
   page: number;
   /** 每页条数，上限 100，默认 50 */
@@ -442,6 +444,9 @@ export async function fetchAuditLogList(
   }
   if (params.action_type) {
     queryParams.action_type = params.action_type;
+  }
+  if ((params as AuditLogListParams).module) {
+    queryParams.module = (params as AuditLogListParams).module!;
   }
 
   return requestApi<AuditLogListResponse>(`${API_BASE}/list`, queryParams);
