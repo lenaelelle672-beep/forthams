@@ -14,7 +14,6 @@ import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import {
   Search,
-  Download,
   Upload,
   Loader2,
   ChevronLeft,
@@ -23,7 +22,9 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { apiClient } from '../utils/api';
-import type { AssetExportParams } from './AssetBatchImportPage';
+import { AssetExportButton } from '../components/asset/AssetExportButton';
+import { AssetBatchImportDialog } from '../components/asset/AssetBatchImportDialog';
+import type { AssetExportParams } from '../hooks/useAssetImportExport';
 
 /* ------------------------------------------------------------------ */
 /*  类型定义                                                           */
@@ -120,8 +121,8 @@ export default function AssetListPage() {
   /** 列表加载状态 */
   const [loading, setLoading] = useState(false);
 
-  /** 导出加载状态 */
-  const [exporting, setExporting] = useState(false);
+  /** 批量导入对话框状态 */
+  const [importDialogOpen, setImportDialogOpen] = useState(false);
 
   /** 错误信息 */
   const [error, setError] = useState<string | null>(null);
@@ -257,63 +258,6 @@ export default function AssetListPage() {
   );
 
   /**
-   * 处理条件导出
-   *
-   * @description 携带当前过滤参数调用后端导出 API，由后端生成文件流，
-   * 前端只负责触发浏览器下载。不允许前端本地生成文件。
-   */
-  const handleExport = useCallback(async () => {
-    if (exporting) return;
-
-    setExporting(true);
-    try {
-      const response = await apiClient.get('/assets/export', {
-        params: exportParams,
-        responseType: 'blob',
-      });
-
-      const blob = response.data instanceof Blob
-        ? response.data
-        : new Blob([response.data]);
-
-      // 解析文件名
-      const disposition = response.headers?.['content-disposition'];
-      let filename = `assets_export_${new Date().toISOString().slice(0, 10)}.xlsx`;
-      if (typeof disposition === 'string') {
-        const match = disposition.match(/filename\*?=(?:UTF-8'')?([^;\n]+)/i);
-        if (match) {
-          filename = decodeURIComponent(match[1].replace(/["']/g, ''));
-        }
-      }
-
-      // 触发浏览器下载
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', filename);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-
-      toast.success('导出成功');
-    } catch (err) {
-      const message =
-        err instanceof Error ? err.message : '导出失败，请稍后重试';
-      toast.error(message);
-    } finally {
-      setExporting(false);
-    }
-  }, [exportParams, exporting]);
-
-  /**
-   * 跳转至批量导入页面
-   */
-  const handleGoToImport = useCallback(() => {
-    window.location.href = '/assets/batch-import';
-  }, []);
-
-  /**
    * 渲染状态徽标
    *
    * @param assetStatus - 资产状态值
@@ -341,7 +285,7 @@ export default function AssetListPage() {
         <div className="flex items-center gap-3">
           <button
             type="button"
-            onClick={handleGoToImport}
+            onClick={() => setImportDialogOpen(true)}
             className="inline-flex items-center gap-1.5 px-4 py-2 text-sm
               rounded-lg border border-gray-300 bg-white text-gray-700
               hover:bg-gray-50 transition-colors"
@@ -349,24 +293,18 @@ export default function AssetListPage() {
             <Upload className="w-4 h-4" />
             批量导入
           </button>
-          <button
-            type="button"
-            onClick={handleExport}
-            disabled={exporting}
-            className="inline-flex items-center gap-1.5 px-4 py-2 text-sm
-              rounded-lg bg-blue-600 text-white hover:bg-blue-700
-              disabled:opacity-50 disabled:cursor-not-allowed
-              transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            {exporting ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
-            ) : (
-              <Download className="w-4 h-4" />
-            )}
-            {exporting ? '导出中...' : '条件导出'}
-          </button>
+          <AssetExportButton params={exportParams} />
         </div>
       </div>
+
+      {/* 批量导入对话框 */}
+      <AssetBatchImportDialog
+        open={importDialogOpen}
+        onClose={() => setImportDialogOpen(false)}
+        onSuccess={() => {
+          fetchAssets();
+        }}
+      />
 
       {/* 搜索和过滤 */}
       <div className="mb-6 flex flex-wrap items-center gap-4">
