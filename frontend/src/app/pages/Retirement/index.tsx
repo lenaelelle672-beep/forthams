@@ -14,8 +14,8 @@ import React, { useState, useCallback } from 'react';
 import { Plus, History, AlertCircle, X, Check } from 'lucide-react';
 import { useRetirementList } from '../../hooks/useRetirementList';
 import { useRetirementSubmit } from '../../hooks/useRetirementSubmit';
-import { RetirementApplication, RetirementStatus, RetirementHistoryRecord } from '../types/retirement.types';
-import { RetirementService } from '../../services/retirementService';
+import { RetirementApplication, RetirementStatus, RetirementHistoryRecord } from '../../types/retirement.types';
+import { retirementService } from '../../services/retirementService';
 
 interface RetirementFormValues {
   assetId: string;
@@ -36,11 +36,9 @@ const RETIREMENT_REASON_OPTIONS: { value: RetirementReason; label: string }[] = 
 
 /** Map status to Tailwind badge styles and display text */
 const STATUS_STYLE_MAP: Record<RetirementStatus, { bg: string; text: string; label: string }> = {
-  [RetirementStatus.DRAFT]: { bg: 'bg-gray-100 text-gray-800', text: '草稿', label: '草稿' },
-  [RetirementStatus.PENDING]: { bg: 'bg-blue-100 text-blue-800', text: '审批中', label: '审批中' },
-  [RetirementStatus.APPROVED]: { bg: 'bg-green-100 text-green-800', text: '已批准', label: '已批准' },
-  [RetirementStatus.REJECTED]: { bg: 'bg-red-100 text-red-800', text: '已驳回', label: '已驳回' },
-  [RetirementStatus.COMPLETED]: { bg: 'bg-green-100 text-green-800', text: '已完成', label: '已完成' },
+  [RetirementStatus.NORMAL]: { bg: 'bg-gray-100 text-gray-800', text: '正常', label: '正常' },
+  [RetirementStatus.RETIRING]: { bg: 'bg-blue-100 text-blue-800', text: '退役中', label: '退役中' },
+  [RetirementStatus.RETIRED]: { bg: 'bg-green-100 text-green-800', text: '已退役', label: '已退役' },
 };
 
 /**
@@ -130,7 +128,7 @@ export const RetirementPage: React.FC = () => {
   const handleViewHistory = useCallback(async (assetId: string) => {
     setSelectedAssetId(assetId);
     try {
-      const history = await RetirementService.getRetirementHistory(assetId);
+      const history = await retirementService.getRetirementHistory(assetId);
       setHistoryRecords(history);
       setIsHistoryVisible(true);
     } catch (error) {
@@ -154,7 +152,7 @@ export const RetirementPage: React.FC = () => {
    */
   const handleConfirmDelete = useCallback(async (record: RetirementApplication) => {
     try {
-      await RetirementService.deleteRetirement(record.id);
+      await retirementService.deleteRetirement(record.id);
       setNotice('删除成功');
       setConfirmDelete(null);
       refetch();
@@ -216,7 +214,7 @@ export const RetirementPage: React.FC = () => {
                 </tr>
               ) : (
                 retirementList.map((record: RetirementApplication) => {
-                  const statusInfo = STATUS_STYLE_MAP[record.status] || STATUS_STYLE_MAP[RetirementStatus.DRAFT];
+                  const statusInfo = STATUS_STYLE_MAP[record.status] || STATUS_STYLE_MAP[RetirementStatus.NORMAL];
                   return (
                     <tr key={record.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 text-sm font-medium text-blue-600">{record.retirementNo}</td>
@@ -239,7 +237,7 @@ export const RetirementPage: React.FC = () => {
                             <History className="w-3 h-3" />
                             历史
                           </button>
-                          {record.status === RetirementStatus.DRAFT && (
+                          {record.status === RetirementStatus.NORMAL && (
                             <button
                               onClick={() => setConfirmDelete(record)}
                               className="px-3 py-1 text-xs font-medium text-red-700 bg-red-100 hover:bg-red-200 rounded transition-colors"
