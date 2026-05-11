@@ -38,6 +38,7 @@ import {
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import styles from './InventoryDetail.module.css';
+import { inventoryService } from '../../services/inventoryService';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -111,77 +112,7 @@ export interface IDiffRecord {
   remark: string;
 }
 
-// ─── Mock API (replace with inventoryDetailApi calls in production) ─────────
-const mockApi = {
-  fetchTask: async (taskId: string): Promise<IInventoryTask> => {
-    await new Promise((r) => setTimeout(r, 600));
-    return {
-      id: taskId,
-      taskName: '2024 Q3 全厂资产盘点任务',
-      startTime: '2024-09-15 09:00',
-      status: 'in_progress',
-      creator: '张三（库管部）',
-      totalAssets: 128,
-      countedAssets: 76,
-      locationScope: ['生产车间A区', '研发中心B栋'],
-    };
-  },
-
-  fetchAssets: async (taskId: string): Promise<IAssetItem[]> => {
-    await new Promise((r) => setTimeout(r, 1000));
-    const names = ['服务器', '笔记本电脑', '打印机', '测试仪', '网络交换机'];
-    const categories = ['IT设备', '办公家具', '生产工具'];
-    const locations = ['车间A-01', '研发楼2F', '仓库C区'];
-    return Array.from({ length: 128 }).map((_, i) => {
-      const status: AssetCountStatus =
-        i % 7 === 0
-          ? 'missing'
-          : i % 9 === 0
-            ? 'surplus'
-            : i % 5 === 0
-              ? 'not_counted'
-              : 'matched';
-      return {
-        id: `asset-${i}`,
-        assetCode: `ASSET-2024-${String(i + 1).padStart(5, '0')}`,
-        name: `${names[i % 5]} #${i}`,
-        category: categories[i % 3],
-        location: locations[i % 3],
-        bookQuantity: 1,
-        actualQuantity:
-          status === 'missing'
-            ? 0
-            : status === 'surplus'
-              ? 2
-              : status === 'not_counted'
-                ? null
-                : 1,
-        status,
-        remark: '',
-      };
-    });
-  },
-
-  updateAssetStatus: async (
-    assetId: string,
-    status: AssetCountStatus,
-    actualQuantity: number | null,
-    remark?: string,
-  ) => {
-    await new Promise((r) => setTimeout(r, 200));
-    return true;
-  },
-
-  batchConfirm: async (assetIds: string[], status: AssetCountStatus) => {
-    await new Promise((r) => setTimeout(r, 400));
-    return true;
-  },
-
-  submitApproval: async (taskId: string) => {
-    await new Promise((r) => setTimeout(r, 1500));
-    return true;
-  },
-};
+// ─── API calls via inventoryService ─────────────────────────────────────────
 
 // ─── Status Configuration Map ──────────────────────────────────────────────
 const STATUS_CONFIG: Record<
@@ -488,11 +419,11 @@ const InventoryDetail: React.FC = () => {
     setPageLoading(true);
     try {
       const [taskData, assetsData] = await Promise.all([
-        mockApi.fetchTask(taskId),
-        mockApi.fetchAssets(taskId),
+        inventoryService.getTask(taskId) as Promise<IInventoryTask>,
+        inventoryService.getTaskDetails(taskId) as Promise<IAssetItem[]>,
       ]);
       setTask(taskData);
-      setAssets(assetsData);
+      setAssets(Array.isArray(assetsData) ? assetsData : []);
     } catch {
       message.error('加载盘点详情失败，请稍后重试');
     } finally {
@@ -588,7 +519,7 @@ const InventoryDetail: React.FC = () => {
               : record.bookQuantity;
 
       try {
-        await mockApi.updateAssetStatus(record.id, newStatus, actualQuantity, record.remark);
+        await inventoryService.addScanResult(taskId!, { assetId: record.id, status: newStatus, actualQuantity, remark: record.remark });
         setAssets((prev) =>
           prev.map((a) =>
             a.id === record.id
@@ -608,7 +539,7 @@ const InventoryDetail: React.FC = () => {
   const handleRemarkSave = useCallback(
     async (record: IAssetItem) => {
       try {
-        await mockApi.updateAssetStatus(record.id, record.status, record.actualQuantity, remarkDraft);
+        await inventoryService.addScanResult(taskId!, { assetId: record.id, status: record.status, actualQuantity: record.actualQuantity, remark: remarkDraft });
         setAssets((prev) =>
           prev.map((a) => (a.id === record.id ? { ...a, remark: remarkDraft } : a)),
         );
@@ -629,7 +560,7 @@ const InventoryDetail: React.FC = () => {
     }
     setSubmitting(true);
     try {
-      await mockApi.batchConfirm(selectedRowKeys as string[], 'matched');
+      await Promise.all((selectedRowKeys as string[]).map(id => inventoryService.addScanResult(taskId!, { assetId: id, status: 'matched', actualQuantity: null })));
       setAssets((prev) =>
         prev.map((a) =>
           selectedRowKeys.includes(a.id)
@@ -652,7 +583,7 @@ const InventoryDetail: React.FC = () => {
       if (ids.length === 0) return;
       setSubmitting(true);
       try {
-        await mockApi.batchConfirm(ids, 'matched');
+        await Promise.all(ids.map(id => inventoryService.addScanResult(taskId!, { assetId: id, status: 'matched', actualQuantity: null })));
         setAssets((prev) =>
           prev.map((a) =>
             ids.includes(a.id)
@@ -675,7 +606,7 @@ const InventoryDetail: React.FC = () => {
     if (!taskId || !task) return;
     setSubmittingApproval(true);
     try {
-      await mockApi.submitApproval(taskId);
+      await inventoryService.updateTaskStatus(taskId, 'submitted');
       message.success('盘点结果已提交核准');
       // Navigate back to task list on success
       navigate('/inventory/tasks');
