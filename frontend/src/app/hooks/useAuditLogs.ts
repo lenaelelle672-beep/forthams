@@ -20,8 +20,10 @@ export interface AuditLogItem {
   action_type: string;
   operator_id: string;
   operator_name: string;
-  target_type: string;
-  target_id: string;
+  /** 资源类型（与后端 API 字段对齐） */
+  resource_type: string;
+  /** 资源 ID（与后端 API 字段对齐） */
+  resource_id: string;
   detail: string;
   ip_address: string;
   created_at: string; // ISO 8601 UTC
@@ -256,7 +258,7 @@ async function apiGet<T>(url: string, token?: string): Promise<T> {
     headers['Authorization'] = `Bearer ${token}`;
   }
 
-  const response = await fetch(url, { method: 'GET', headers });
+  const response = await fetch(url, { method: 'GET', headers, credentials: 'include' });
 
   if (!response.ok) {
     let message = `Request failed with status ${response.status}`;
@@ -310,7 +312,7 @@ function buildListUrl(
 /**
  * 构建趋势查询 URL
  *
- * @param filters 筛选器（仅使用时间范围）
+ * @param filters 筛选器（时间范围 + 操作类型 + 操作人）
  * @returns 完整查询 URL
  */
 function buildTrendUrl(filters: AuditLogFilters): string {
@@ -321,6 +323,12 @@ function buildTrendUrl(filters: AuditLogFilters): string {
   }
   if (filters.end_time) {
     params.set('end_time', toUTCISOString(filters.end_time));
+  }
+  if (filters.action_type) {
+    params.set('action_type', filters.action_type);
+  }
+  if (filters.operator_id) {
+    params.set('operator_id', filters.operator_id);
   }
 
   return `${API_BASE}/trend?${params.toString()}`;
