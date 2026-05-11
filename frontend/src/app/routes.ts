@@ -51,6 +51,9 @@ const WorkflowDesigner = withSuspense(
 const WorkflowCenter = withSuspense(
   lazy(() => import("./pages/WorkflowCenter").then((module) => ({ default: module.WorkflowCenter }))),
 );
+const Retirement = withSuspense(
+  lazy(() => import("./pages/Retirement").then((module) => ({ default: module.default }))),
+);
 
 function PageLoadingFallback() {
   return createElement(
@@ -123,6 +126,7 @@ export const router = createBrowserRouter([
           { path: "disposals/scrap/new", Component: AssetScrapForm },
           { path: "disposals/compensation/new", Component: AssetCompensationForm },
           { path: "approval", Component: Approval },
+          { path: "retirement", Component: Retirement },
           { path: "analytics", Component: Analytics },
           { path: "settings", Component: Settings },
           { path: "workflows", Component: WorkflowCenter },
