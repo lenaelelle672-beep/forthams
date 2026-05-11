@@ -40,7 +40,7 @@ export function redirectToLogin() {
   }
 }
 
-const apiClient = axios.create({
+export const apiClient = axios.create({
   baseURL: "/api",
   timeout: 10000,
 });
