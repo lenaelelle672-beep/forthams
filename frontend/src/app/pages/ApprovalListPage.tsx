@@ -1,51 +1,32 @@
 /**
  * @module frontend/src/app/pages/ApprovalListPage
- * @description Approval List Page — real backend API data driven.
+ * @description Approval List Page — integrated with useApproval hook,
+ *              ApprovalFlowChart, and ApprovalActionPanel components.
  *
  * Features:
- * - List browsing: fetches and renders real approval process data from backend.
- * - Status filter: Tab switching triggers backend query with status parameter.
- * - Keyword search: debounced (300ms) search input triggers backend fuzzy query.
- * - Status badges: dynamic rendering based on backend status enum values.
- * - Error/loading states: proper loading skeleton and error prompt UI.
+ * - Page load: reads pending approval list via useApproval hook.
+ * - List browsing with empty state, loading skeleton, and error prompt.
+ * - Click an approval item to display detail area with flow chart and action panel.
+ * - Approve/reject actions refresh the list and clear the current selection.
+ * - Status tab filtering and debounced keyword search.
  *
- * Allowed modification target per mutation contract.
+ * Types sourced from: frontend/src/app/services/approval/types.ts
  *
- * @see frontend/src/app/services/approvalService.ts — API service layer
+ * @see frontend/src/app/hooks/useApproval.ts
+ * @see frontend/src/app/components/approval/ApprovalFlowChart.tsx
+ * @see frontend/src/app/components/approval/ApprovalActionPanel.tsx
  */
 
 import { useEffect, useState, useCallback, useRef } from "react";
-import { Search, Clock, CheckCircle, XCircle, Ban, RefreshCw } from "lucide-react";
-import { approvalService } from "../services/approvalService";
+import { Search, RefreshCw } from "lucide-react";
+import { ApprovalStoreProvider, useApprovalStore } from "../stores/approvalStore";
+import { ApprovalFlowChart } from "../components/approval/ApprovalFlowChart";
+import { ApprovalActionPanel } from "../components/approval/ApprovalActionPanel";
+import type { ApprovalItem } from "../services/approval/types";
 
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
-
-/** Query parameters for the approval list API request. */
-interface QueryParams {
-  /** Current page number (1-based). */
-  page: number;
-  /** Number of items per page. */
-  pageSize: number;
-  /** Status filter — undefined means "all". */
-  status?: string;
-  /** Keyword search string. */
-  keyword?: string;
-}
-
-/** A single approval process record from the backend. */
-interface ApprovalRecord {
-  id: number;
-  processNo?: string;
-  processType?: string;
-  status?: string;
-  applicantId?: number;
-  applyTime?: string;
-  createTime?: string;
-  updateTime?: string;
-  [key: string]: unknown;
-}
 
 /** Tab filter options. */
 type StatusTab = "ALL" | "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED";
@@ -56,12 +37,6 @@ type StatusTab = "ALL" | "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED";
 
 /**
  * Get status badge display properties from a backend status enum value.
- *
- * Maps backend status strings (PENDING, APPROVED, REJECTED, CANCELLED)
- * to human-readable Chinese labels and corresponding Tailwind color classes.
- *
- * @param status - The backend status enum string.
- * @returns An object with `text` (Chinese label) and `className` (CSS classes).
  */
 function getStatusBadgeProps(status?: string): { text: string; className: string } {
   switch (status) {
@@ -83,9 +58,6 @@ function getStatusBadgeProps(status?: string): { text: string; className: string
 
 /**
  * Get a human-readable Chinese label for a status tab value.
- *
- * @param tab - The status tab identifier.
- * @returns Chinese label string.
  */
 function getTabLabel(tab: StatusTab): string {
   switch (tab) {
@@ -105,152 +77,83 @@ function getTabLabel(tab: StatusTab): string {
 const STATUS_TABS: StatusTab[] = ["ALL", "PENDING", "APPROVED", "REJECTED", "CANCELLED"];
 
 // ---------------------------------------------------------------------------
-// Component
+// Inner component (uses store context)
 // ---------------------------------------------------------------------------
 
 /**
- * ApprovalListPage — main component for browsing approval processes.
- *
- * Data is fetched from the backend via `approvalService.list()` with
- * pagination, status filter, and debounced keyword search.
- *
- * @returns The rendered approval list page.
+ * Inner page component that consumes the ApprovalStore via context.
+ * Wrapped by ApprovalStoreProvider in the exported ApprovalListPage.
  */
-export function ApprovalListPage() {
-  // ---- Data state ----
-  const [records, setRecords] = useState<ApprovalRecord[]>([]);
-  const [total, setTotal] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+function ApprovalListPageInner() {
+  const store = useApprovalStore();
 
-  // ---- Query parameters ----
-  const [queryParams, setQueryParams] = useState<QueryParams>({
-    page: 1,
-    pageSize: 10,
-  });
+  // ---- Derived state from store ----
+  const { pendingApprovals, currentApproval, currentHistory, isLoading, error } = store;
 
-  // ---- Search input (local, before debounce) ----
+  // ---- Local UI state ----
   const [searchInput, setSearchInput] = useState("");
   const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  // ---- Active tab ----
   const [activeTab, setActiveTab] = useState<StatusTab>("ALL");
-
-  // ---- Detail modal ----
-  const [detailItem, setDetailItem] = useState<ApprovalRecord | null>(null);
-
-  // ---- Notice banner ----
+  const [filteredApprovals, setFilteredApprovals] = useState<ApprovalItem[]>([]);
+  const [selectedItemId, setSelectedItemId] = useState<number | null>(null);
+  const [actionLoading, setActionLoading] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
 
   // -----------------------------------------------------------------------
-  // Data fetching
+  // Data fetching on mount
   // -----------------------------------------------------------------------
 
-  /**
-   * Fetch approval list from the backend using current query parameters.
-   *
-   * Sets `loading` and `error` states accordingly. On success, updates
-   * `records` and `total`. On failure, sets `error` with a user-facing
-   * message and does not crash the page.
-   */
-  const fetchData = useCallback(async (params: QueryParams) => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const requestParams: Record<string, unknown> = {
-        page: params.page,
-        pageSize: params.pageSize,
-      };
-
-      if (params.status) {
-        requestParams.status = params.status;
-      }
-      if (params.keyword) {
-        requestParams.keyword = params.keyword;
-      }
-
-      const result = await approvalService.list(requestParams) as unknown as {
-        records: ApprovalRecord[];
-        total: number;
-      };
-
-      if (Array.isArray(result)) {
-        // Backend returned a plain array
-        setRecords(result);
-        setTotal(result.length);
-      } else if (result && typeof result === "object") {
-        setRecords(Array.isArray(result.records) ? result.records : []);
-        setTotal(typeof result.total === "number" ? result.total : 0);
-      } else {
-        setRecords([]);
-        setTotal(0);
-      }
-    } catch (err) {
-      console.error("Failed to load approval list:", err);
-      setError("数据加载失败，请重试");
-    } finally {
-      setLoading(false);
-    }
+  useEffect(() => {
+    store.fetchPendingApprovals();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Re-fetch when queryParams change
+  // -----------------------------------------------------------------------
+  // Client-side tab + keyword filtering
+  // -----------------------------------------------------------------------
+
   useEffect(() => {
-    fetchData(queryParams);
-  }, [queryParams, fetchData]);
+    let items = pendingApprovals;
+
+    // Status tab filter
+    if (activeTab !== "ALL") {
+      items = items.filter((item) => item.status === activeTab);
+    }
+
+    // Keyword filter
+    const keyword = searchInput.trim().toLowerCase();
+    if (keyword) {
+      items = items.filter((item) => {
+        const no = item.processNo?.toLowerCase() ?? "";
+        const type = item.type?.toLowerCase() ?? "";
+        const id = String(item.id);
+        return no.includes(keyword) || type.includes(keyword) || id.includes(keyword);
+      });
+    }
+
+    setFilteredApprovals(items);
+  }, [pendingApprovals, activeTab, searchInput]);
 
   // -----------------------------------------------------------------------
   // Tab change handler
   // -----------------------------------------------------------------------
 
-  /**
-   * Handle tab change to filter by approval status.
-   *
-   * Updates `activeTab` state and resets page to 1 with the selected
-   * status filter applied to query parameters.
-   *
-   * @param tab - The status tab to switch to.
-   */
   const handleTabChange = useCallback((tab: StatusTab) => {
     setActiveTab(tab);
-    setQueryParams((prev) => ({
-      ...prev,
-      page: 1,
-      status: tab === "ALL" ? undefined : tab,
-    }));
   }, []);
 
   // -----------------------------------------------------------------------
   // Debounced search handler
   // -----------------------------------------------------------------------
 
-  /**
-   * Handle search input change with 300ms debounce.
-   *
-   * Clears any pending debounce timer, updates local input state immediately,
-   * and schedules a `queryParams.keyword` update after 300ms of inactivity.
-   *
-   * @param value - The current search input value.
-   */
   const handleSearchChange = useCallback((value: string) => {
     setSearchInput(value);
 
-    // Clear existing timer
     if (debounceTimerRef.current) {
       clearTimeout(debounceTimerRef.current);
     }
-
-    // Schedule debounced update
-    debounceTimerRef.current = setTimeout(() => {
-      setQueryParams((prev) => ({
-        ...prev,
-        page: 1,
-        keyword: value.trim() || undefined,
-      }));
-    }, 300);
   }, []);
 
-  // Cleanup debounce timer on unmount
   useEffect(() => {
     return () => {
       if (debounceTimerRef.current) {
@@ -260,30 +163,63 @@ export function ApprovalListPage() {
   }, []);
 
   // -----------------------------------------------------------------------
+  // Select an approval item to view details
+  // -----------------------------------------------------------------------
+
+  const handleSelectItem = useCallback(
+    async (item: ApprovalItem) => {
+      setSelectedItemId(item.id);
+      await store.getApprovalHistory(item.id);
+    },
+    [store],
+  );
+
+  // -----------------------------------------------------------------------
+  // Clear selection
+  // -----------------------------------------------------------------------
+
+  const handleClearSelection = useCallback(() => {
+    setSelectedItemId(null);
+    store.clearCurrent();
+  }, [store]);
+
+  // -----------------------------------------------------------------------
+  // Approve / Reject handlers
+  // -----------------------------------------------------------------------
+
+  const handleApprove = useCallback(
+    async (payload: { approvalId: string; comment: string }) => {
+      setActionLoading(true);
+      const success = await store.approve(Number(payload.approvalId), payload.comment);
+      setActionLoading(false);
+      if (success) {
+        setNotice("审批已通过");
+        handleClearSelection();
+      }
+    },
+    [store, handleClearSelection],
+  );
+
+  const handleReject = useCallback(
+    async (payload: { approvalId: string; comment: string }) => {
+      setActionLoading(true);
+      const success = await store.reject(Number(payload.approvalId), payload.comment);
+      setActionLoading(false);
+      if (success) {
+        setNotice("审批已驳回");
+        handleClearSelection();
+      }
+    },
+    [store, handleClearSelection],
+  );
+
+  // -----------------------------------------------------------------------
   // Retry handler
   // -----------------------------------------------------------------------
 
-  /**
-   * Retry loading data with the current query parameters.
-   */
   const handleRetry = useCallback(() => {
-    fetchData(queryParams);
-  }, [fetchData, queryParams]);
-
-  // -----------------------------------------------------------------------
-  // Pagination helpers
-  // -----------------------------------------------------------------------
-
-  const totalPages = Math.max(1, Math.ceil(total / queryParams.pageSize));
-
-  /**
-   * Navigate to a specific page number.
-   *
-   * @param page - The target page number (1-based).
-   */
-  const handlePageChange = useCallback((page: number) => {
-    setQueryParams((prev) => ({ ...prev, page }));
-  }, []);
+    store.fetchPendingApprovals();
+  }, [store]);
 
   // -----------------------------------------------------------------------
   // Render
@@ -299,8 +235,17 @@ export function ApprovalListPage() {
 
       {/* Notice banner */}
       {notice && (
-        <div className="text-sm text-green-700 bg-green-50 border border-green-100 rounded-lg px-4 py-3">
-          {notice}
+        <div
+          className="text-sm text-green-700 bg-green-50 border border-green-100 rounded-lg px-4 py-3 flex items-center justify-between"
+          data-testid="notice-banner"
+        >
+          <span>{notice}</span>
+          <button
+            onClick={() => setNotice(null)}
+            className="text-green-500 hover:text-green-700"
+          >
+            &times;
+          </button>
         </div>
       )}
 
@@ -341,7 +286,7 @@ export function ApprovalListPage() {
         </div>
 
         {/* Loading state */}
-        {loading && (
+        {isLoading && !selectedItemId && (
           <div className="p-6 space-y-4" data-testid="loading-skeleton">
             {[1, 2, 3].map((i) => (
               <div key={i} className="animate-pulse border border-gray-100 rounded-lg p-5">
@@ -361,7 +306,7 @@ export function ApprovalListPage() {
         )}
 
         {/* Error state */}
-        {!loading && error && (
+        {!isLoading && error && (
           <div className="p-12 text-center" data-testid="error-prompt">
             <div className="text-red-500 mb-2 text-sm">{error}</div>
             <button
@@ -376,20 +321,25 @@ export function ApprovalListPage() {
         )}
 
         {/* Data list */}
-        {!loading && !error && (
+        {!isLoading && !error && (
           <div className="p-6 space-y-4">
-            {records.length === 0 ? (
+            {filteredApprovals.length === 0 ? (
               <div className="py-12 text-center text-sm text-gray-500" data-testid="empty-state">
                 暂无审批数据
               </div>
             ) : (
-              records.map((item) => {
+              filteredApprovals.map((item) => {
                 const badge = getStatusBadgeProps(item.status);
+                const isSelected = selectedItemId === item.id;
                 return (
                   <div
                     key={item.id}
-                    className="border border-gray-200 rounded-lg p-5 hover:border-blue-300 transition-colors cursor-pointer"
-                    onClick={() => setDetailItem(item)}
+                    className={`border rounded-lg p-5 transition-colors cursor-pointer ${
+                      isSelected
+                        ? "border-blue-500 bg-blue-50"
+                        : "border-gray-200 hover:border-blue-300"
+                    }`}
+                    onClick={() => handleSelectItem(item)}
                     data-testid="approval-list-item"
                   >
                     <div className="flex items-start justify-between mb-3">
@@ -403,16 +353,16 @@ export function ApprovalListPage() {
                         >
                           {badge.text}
                         </span>
-                        {item.processType && (
+                        {item.type && (
                           <span className="px-2 py-0.5 text-xs font-medium bg-purple-100 text-purple-800 rounded">
-                            {item.processType}
+                            {item.type}
                           </span>
                         )}
                       </div>
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          setDetailItem(item);
+                          handleSelectItem(item);
                         }}
                         className="px-4 py-2 text-sm font-medium text-blue-700 bg-blue-100 hover:bg-blue-200 rounded-lg transition-colors"
                       >
@@ -427,85 +377,120 @@ export function ApprovalListPage() {
                       </div>
                       <div>
                         <span className="text-gray-500">申请人ID:</span>{" "}
-                        {item.applicantId ?? "-"}
+                        {item.applicant ?? "-"}
                       </div>
                       <div>
                         <span className="text-gray-500">提交时间:</span>{" "}
-                        {item.applyTime || item.createTime || "-"}
+                        {item.createdAt || "-"}
                       </div>
                       <div>
                         <span className="text-gray-500">更新时间:</span>{" "}
-                        {item.updateTime || "-"}
+                        {item.updatedAt || "-"}
                       </div>
                     </div>
                   </div>
                 );
               })
             )}
-
-            {/* Pagination */}
-            {records.length > 0 && totalPages > 1 && (
-              <div className="flex items-center justify-between pt-4 border-t border-gray-200">
-                <div className="text-sm text-gray-600">
-                  共 {total} 条记录，第 {queryParams.page}/{totalPages} 页
-                </div>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => handlePageChange(queryParams.page - 1)}
-                    disabled={queryParams.page <= 1}
-                    className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
-                  >
-                    上一页
-                  </button>
-                  <button
-                    onClick={() => handlePageChange(queryParams.page + 1)}
-                    disabled={queryParams.page >= totalPages}
-                    className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
-                  >
-                    下一页
-                  </button>
-                </div>
-              </div>
-            )}
           </div>
         )}
       </div>
 
-      {/* Detail modal */}
-      {detailItem && (
-        <div
-          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
-          onClick={() => setDetailItem(null)}
-        >
-          <div
-            className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900">审批详情</h3>
-              <button
-                onClick={() => setDetailItem(null)}
-                className="text-gray-400 hover:text-gray-600 text-xl"
-              >
-                &times;
-              </button>
-            </div>
-            <div className="p-6 space-y-3">
-              {Object.entries(detailItem).map(([key, value]) => (
-                <div key={key} className="flex items-start gap-3 text-sm">
-                  <span className="text-gray-500 min-w-[120px]">{key}:</span>
-                  <span className="text-gray-900">
-                    {value === null || value === undefined
-                      ? "-"
-                      : String(value)}
-                  </span>
-                </div>
-              ))}
+      {/* ---- Detail panel: shown when an item is selected ---- */}
+      {selectedItemId && currentApproval && (
+        <div className="bg-white rounded-lg border border-blue-200 shadow-sm" data-testid="approval-detail-panel">
+          {/* Detail header */}
+          <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+            <h3 className="text-lg font-semibold text-gray-900">
+              审批详情 — {currentApproval.processNo || currentApproval.id}
+            </h3>
+            <button
+              onClick={handleClearSelection}
+              className="text-gray-400 hover:text-gray-600 text-xl"
+              data-testid="close-detail-btn"
+            >
+              &times;
+            </button>
+          </div>
+
+          {/* Process info */}
+          <div className="px-6 py-4 border-b border-gray-100">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+              <div>
+                <span className="text-gray-500">审批编号:</span>{" "}
+                <span className="text-gray-900">{currentApproval.processNo || currentApproval.id}</span>
+              </div>
+              <div>
+                <span className="text-gray-500">类型:</span>{" "}
+                <span className="text-gray-900">{currentApproval.type || "-"}</span>
+              </div>
+              <div>
+                <span className="text-gray-500">状态:</span>{" "}
+                <span className={`inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full ${getStatusBadgeProps(currentApproval.status).className}`}>
+                  {getStatusBadgeProps(currentApproval.status).text}
+                </span>
+              </div>
+              <div>
+                <span className="text-gray-500">当前步骤:</span>{" "}
+                <span className="text-gray-900">{currentApproval.currentStep}</span>
+              </div>
+              <div>
+                <span className="text-gray-500">申请人ID:</span>{" "}
+                <span className="text-gray-900">{currentApproval.applicant ?? "-"}</span>
+              </div>
+              <div>
+                <span className="text-gray-500">创建时间:</span>{" "}
+                <span className="text-gray-900">{currentApproval.createdAt || "-"}</span>
+              </div>
+              <div>
+                <span className="text-gray-500">更新时间:</span>{" "}
+                <span className="text-gray-900">{currentApproval.updatedAt || "-"}</span>
+              </div>
             </div>
           </div>
+
+          {/* Approval flow chart */}
+          <div className="px-6 py-4 border-b border-gray-100">
+            <h4 className="text-sm font-medium text-gray-700 mb-3">审批流转</h4>
+            <ApprovalFlowChart approvalHistory={currentHistory} />
+          </div>
+
+          {/* Approval action panel — only for PENDING items */}
+          {currentApproval.status === "PENDING" && (
+            <div className="px-6 py-4">
+              <h4 className="text-sm font-medium text-gray-700 mb-3">审批操作</h4>
+              <ApprovalActionPanel
+                approvalId={String(currentApproval.id)}
+                disabled={false}
+                loading={actionLoading}
+                onApprove={handleApprove}
+                onReject={handleReject}
+              />
+            </div>
+          )}
         </div>
       )}
     </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Exported component with store provider wrapper
+// ---------------------------------------------------------------------------
+
+/**
+ * ApprovalListPage — main component for browsing approval processes.
+ *
+ * Wraps the inner page with an ApprovalStoreProvider so the useApprovalStore
+ * hook (and by extension the useApproval hook) can access shared state.
+ *
+ * @returns The rendered approval list page.
+ */
+export function ApprovalListPage() {
+  return (
+    <ApprovalStoreProvider>
+      <ApprovalListPageInner />
+    </ApprovalStoreProvider>
   );
 }
 
