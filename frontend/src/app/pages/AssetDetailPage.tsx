@@ -1,28 +1,45 @@
 /**
  * AssetDetailPage Component
- * 
- * 资产详情页面 - 核心展示组件
- * 职责：展示资产完整元数据、集成审计日志、@Auditable字段变更追踪
- * 
+ *
+ * 资产详情页面 — 完整真实 API 集成
+ * 职责：展示资产完整元数据、折旧计划、关联工单、处置状态及操作历史
+ *
  * @module pages/AssetDetailPage
- * @requires react, react-router-dom, antd, @ant-design/icons
- * @requires hooks/useAssetById
- * @requires hooks/useAuditLogs
- * @requires components/flow/CustomNodes
- * @requires services/auditService
+ * @since SWARM-033
+ *
+ * outgoing: calls=[
+ *   useAssetById@frontend/src/app/hooks/useAssetById.ts;
+ *   fetchGraphifyNodes@frontend/src/app/pages/AssetDetailPage.tsx;
+ *   renderGraphifyNodes@frontend/src/app/pages/AssetDetailPage.tsx;
+ *   renderAssetDetailCard@frontend/src/app/pages/AssetDetailPage.tsx;
+ *   renderAuditLogTab@frontend/src/app/pages/AssetDetailPage.tsx
+ * ]
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Card, Row, Col, Descriptions, Tag, Spin, message, Button, Timeline, Empty, Tabs, Divider } from 'antd';
-import { ArrowLeftOutlined, AuditOutlined, HistoryOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import {
+  Card, Row, Col, Descriptions, Tag, Spin, Button, Timeline,
+  Empty, Tabs, Divider, Space,
+} from 'antd';
+import {
+  ArrowLeftOutlined, AuditOutlined, HistoryOutlined,
+  InfoCircleOutlined, DeleteOutlined, DollarOutlined,
+  ToolOutlined, FileTextOutlined,
+} from '@ant-design/icons';
 import { useAssetById } from '../hooks/useAssetById';
-import { useAuditLogs } from '../hooks/useAuditLogs';
-import { GraphifyNodeFactory } from '../components/flow/CustomNodes';
-import type { GraphifyNodeData, GraphifyNodeType } from '../types/flow';
-import type { AssetResponse } from '../types/asset.types';
-import type { AuditLogResponse, AuditChange } from '../types/audit.types';
-import { auditService } from '../services/auditService';
+import { assetService } from '../services/assetService';
+import DisposalRequestModal from '../components/disposal/DisposalRequestModal';
+import AssetDepreciationTimeline from '../components/AssetDepreciationTimeline';
+import type { DepreciationScheduleData } from '../components/AssetDepreciationTimeline';
+import AssetWorkOrderHistory from '../components/AssetWorkOrderHistory';
+import type { WorkOrderHistoryItem } from '../components/AssetWorkOrderHistory';
+import AssetOperationHistory from '../components/AssetOperationHistory';
+import type {
+  DisposalHistoryItem,
+  MaintenanceHistoryItem,
+  OperationHistoryEntry,
+} from '../components/AssetOperationHistory';
 
 /**
  * 资产状态颜色映射
@@ -33,6 +50,9 @@ const STATUS_COLORS: Record<string, string> = {
   MAINTENANCE: 'orange',
   SCRAPPED: 'red',
   TRANSFERRED: 'blue',
+  RETIRED: 'orange',
+  DISPOSED: 'red',
+  LOST: 'purple',
 };
 
 /**
@@ -47,112 +67,189 @@ const ACTION_LABELS: Record<string, string> = {
 
 /**
  * AssetDetailPage 组件主函数
- * 
+ *
  * 渲染资产详情页面，包含：
- * - 资产基本信息卡片
- * - Graphify 知识图谱节点展示
- * - 审计日志时间线
- * - @Auditable 字段变更追踪
- * 
+ * - 资产基本信息卡片 (renderAssetDetailCard)
+ * - Graphify 知识图谱节点展示 (renderGraphifyNodes)
+ * - 折旧计划时间线 (AssetDepreciationTimeline)
+ * - 关联工单历史 (AssetWorkOrderHistory)
+ * - 审计日志时间线 (renderAuditLogTab)
+ * - 操作历史 (AssetOperationHistory)
+ *
  * @returns {JSX.Element} 资产详情页面组件
  */
 const AssetDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  
-  // State for graphify nodes
-  const [graphifyNodes, setGraphifyNodes] = useState<GraphifyNodeData[]>([]);
-  const [isGraphLoading, setIsGraphLoading] = useState(false);
-  
-  // Asset data hook
+
+  // ---- useAssetById hook (AC-001) ----
   const {
-    data: asset,
-    isLoading: isAssetLoading,
+    asset,
+    auditLogs,
+    graphifyNodes,
+    loading: isAssetLoading,
+    auditLoading,
     error: assetError,
-    refetch: refetchAsset,
-  } = useAssetById(id);
-  
-  // Audit logs hook
-  const {
-    data: auditData,
-    isLoading: isAuditLoading,
-    error: auditError,
-    refetch: refetchAudit,
-  } = useAuditLogs(id || '', { page: 1, pageSize: 20 });
-  
+    refreshAsset,
+    refreshAuditLogs,
+  } = useAssetById(id || null, {
+    fetchAuditLogs: true,
+    enableGraphify: true,
+  });
+
+  // ---- Sub-data state ----
+  const [depreciationSchedule, setDepreciationSchedule] = useState<DepreciationScheduleData | null>(null);
+  const [depreciationLoading, setDepreciationLoading] = useState(false);
+
+  const [workOrders, setWorkOrders] = useState<WorkOrderHistoryItem[]>([]);
+  const [workOrderTotal, setWorkOrderTotal] = useState(0);
+  const [workOrderPage, setWorkOrderPage] = useState(1);
+  const [workOrderLoading, setWorkOrderLoading] = useState(false);
+
+  const [disposalHistory, setDisposalHistory] = useState<DisposalHistoryItem[]>([]);
+  const [maintenanceHistory, setMaintenanceHistory] = useState<MaintenanceHistoryItem[]>([]);
+  const [operationLoading, setOperationLoading] = useState(false);
+
+  // Disposal modal
+  const [disposalModalVisible, setDisposalModalVisible] = useState(false);
+
+  // ---- Data fetching ----
+
+  /**
+   * 获取折旧计划
+   */
+  const fetchDepreciationSchedule = useCallback(async (assetId: string) => {
+    if (!assetId) return;
+    setDepreciationLoading(true);
+    try {
+      const data = await assetService.getDepreciationSchedule(assetId);
+      setDepreciationSchedule(data as unknown as DepreciationScheduleData);
+    } catch {
+      // Some assets may not have depreciation data
+      setDepreciationSchedule(null);
+    } finally {
+      setDepreciationLoading(false);
+    }
+  }, []);
+
+  /**
+   * 获取关联工单列表
+   */
+  const fetchWorkOrders = useCallback(async (assetId: string, page: number = 1) => {
+    if (!assetId) return;
+    setWorkOrderLoading(true);
+    try {
+      const result = await assetService.getWorkOrders(assetId, {
+        page,
+        pageSize: 10,
+      });
+      setWorkOrders((result.records || []) as unknown as WorkOrderHistoryItem[]);
+      setWorkOrderTotal(result.total || 0);
+      setWorkOrderPage(page);
+    } catch {
+      setWorkOrders([]);
+      setWorkOrderTotal(0);
+    } finally {
+      setWorkOrderLoading(false);
+    }
+  }, []);
+
+  /**
+   * 获取处置历史
+   */
+  const fetchDisposalHistory = useCallback(async (assetId: string) => {
+    if (!assetId) return;
+    try {
+      const result = await assetService.getDisposalHistory(assetId, {
+        page: 1,
+        pageSize: 50,
+      });
+      setDisposalHistory((result.records || []) as unknown as DisposalHistoryItem[]);
+    } catch {
+      setDisposalHistory([]);
+    }
+  }, []);
+
+  /**
+   * 获取维保记录
+   */
+  const fetchMaintenanceHistory = useCallback(async (assetId: string) => {
+    if (!assetId) return;
+    try {
+      const result = await assetService.getMaintenanceRecords(assetId, {
+        page: 1,
+        pageSize: 50,
+      });
+      setMaintenanceHistory((result.records || []) as unknown as MaintenanceHistoryItem[]);
+    } catch {
+      setMaintenanceHistory([]);
+    }
+  }, []);
+
+  /**
+   * 获取全部子数据
+   */
+  const fetchAllSubData = useCallback(async (assetId: string) => {
+    setOperationLoading(true);
+    await Promise.allSettled([
+      fetchDepreciationSchedule(assetId),
+      fetchWorkOrders(assetId),
+      fetchDisposalHistory(assetId),
+      fetchMaintenanceHistory(assetId),
+    ]);
+    setOperationLoading(false);
+  }, [fetchDepreciationSchedule, fetchWorkOrders, fetchDisposalHistory, fetchMaintenanceHistory]);
+
+  // ---- Effects ----
+
+  /**
+   * Effect: 加载资产时获取子数据
+   */
+  useEffect(() => {
+    if (asset?.id) {
+      fetchAllSubData(String(asset.id));
+    }
+  }, [asset?.id, fetchAllSubData]);
+
   /**
    * 获取 Graphify 知识图谱节点数据
    * 对接 Graphify 服务，转换资产数据为图谱节点
    */
   const fetchGraphifyNodes = async (assetId: string) => {
     if (!assetId) return;
-    
-    setIsGraphLoading(true);
     try {
-      // 模拟 Graphify API 调用 - 实际应替换为真实 API
       const graphifyResponse = await fetch(`/api/graphify/nodes?assetId=${assetId}`);
       const graphifyData = await graphifyResponse.json();
-      
-      // 转换数据为 GraphifyNodeData 格式
-      const nodes: GraphifyNodeData[] = graphifyData.nodes?.map((node: any) => ({
-        id: node.id,
-        label: node.label,
-        nodeType: node.nodeType as GraphifyNodeType,
-        graphifyId: node.graphifyId,
-        position: node.position,
-        properties: node.properties,
-        relationships: node.relationships,
-        metadata: node.metadata,
-      })) || [];
-      
-      setGraphifyNodes(nodes);
+      return graphifyData.nodes || [];
     } catch (error) {
       console.error('Failed to fetch Graphify nodes:', error);
-      message.error('知识图谱加载失败');
-      // Fallback: 使用资产数据创建单节点
-      if (asset) {
-        setGraphifyNodes([{
-          id: asset.id,
-          label: asset.name,
-          nodeType: 'ASSET' as GraphifyNodeType,
-          graphifyId: `graphify-${asset.id}`,
-          position: { x: 400, y: 300 },
-          properties: asset.metadata || {},
-        }]);
-      }
-    } finally {
-      setIsGraphLoading(false);
+      return [];
     }
   };
-  
-  // Effect: 加载资产时获取图谱数据
-  useEffect(() => {
-    if (asset?.id) {
-      fetchGraphifyNodes(asset.id);
-    }
-  }, [asset?.id]);
-  
+
   /**
    * 处理 @Auditable 字段变更高亮
-   * 过滤出 isAuditable: true 的变更记录
-   * 
-   * @param {AuditChange[]} changes - 变更列表
-   * @returns {AuditChange[]} 仅包含 Auditable 字段的变更
    */
-  const filterAuditableChanges = (changes: AuditChange[]): AuditChange[] => {
+  const filterAuditableChanges = (changes: Array<{ isAuditable?: boolean; [k: string]: unknown }>) => {
     return changes.filter(change => change.isAuditable === true);
   };
-  
+
   /**
    * 渲染审计日志时间线项
-   * 
-   * @param {AuditLogResponse['items'][number]} item - 审计日志条目
-   * @returns {JSX.Element} 时间线项组件
    */
-  const renderAuditTimelineItem = (item: AuditLogResponse['items'][number]): JSX.Element => {
+  const renderAuditTimelineItem = (item: {
+    id: string;
+    action?: string;
+    userName?: string;
+    operatorName?: string;
+    timestamp: string;
+    changes?: Array<{ field: string; oldValue?: string; newValue?: string; isAuditable?: boolean }>;
+  }): JSX.Element => {
     const auditableChanges = filterAuditableChanges(item.changes || []);
     const hasAuditableFields = auditableChanges.length > 0;
-    
+    const displayName = item.userName || item.operatorName || '系统';
+    const actionLabel = ACTION_LABELS[item.action || ''] || item.action || '操作';
+
     return (
       <Timeline.Item
         key={item.id}
@@ -162,15 +259,14 @@ const AssetDetailPage: React.FC = () => {
         <div className="audit-item-content">
           <div className="audit-item-header">
             <Tag color={hasAuditableFields ? 'blue' : 'default'}>
-              {ACTION_LABELS[item.action] || item.action}
+              {actionLabel}
             </Tag>
-            <span className="audit-user">{item.userName}</span>
+            <span className="audit-user">{displayName}</span>
             <span className="audit-time">
               {new Date(item.timestamp).toLocaleString('zh-CN')}
             </span>
           </div>
-          
-          {/* 变更详情展示 */}
+
           {item.changes && item.changes.length > 0 && (
             <div className="audit-changes" data-testid="auditable-field-tracker">
               {item.changes.map((change, idx) => (
@@ -198,21 +294,20 @@ const AssetDetailPage: React.FC = () => {
       </Timeline.Item>
     );
   };
-  
+
   /**
    * 渲染 Graphify 知识图谱节点
-   * 使用 GraphifyNodeFactory 工厂创建对应类型的节点组件
    */
   const renderGraphifyNodes = (): JSX.Element => {
-    if (isGraphLoading) {
+    if (isAssetLoading) {
       return (
         <div className="graphify-loading">
           <Spin tip="知识图谱加载中..." />
         </div>
       );
     }
-    
-    if (graphifyNodes.length === 0) {
+
+    if (!graphifyNodes || graphifyNodes.length === 0) {
       return (
         <Empty
           image={Empty.PRESENTED_IMAGE_SIMPLE}
@@ -221,30 +316,37 @@ const AssetDetailPage: React.FC = () => {
         />
       );
     }
-    
+
     return (
       <div className="graphify-nodes-container" data-testid="graphify-nodes">
-        {graphifyNodes.map((node) => {
-          const NodeComponent = GraphifyNodeFactory(node.nodeType);
-          return (
-            <NodeComponent
-              key={node.id}
-              data={node}
-              data-testid={`graphify-node-${node.nodeType.toLowerCase()}`}
-            />
-          );
-        })}
+        {graphifyNodes.map((node) => (
+          <Card
+            key={node.id}
+            size="small"
+            data-testid={`graphify-node-${node.type?.toLowerCase() || 'default'}`}
+            style={{ marginBottom: 8 }}
+          >
+            <div style={{ fontWeight: 500 }}>{node.label}</div>
+            <div style={{ fontSize: 12, color: '#999' }}>
+              <Tag>{node.type || '节点'}</Tag>
+              {node.connected && <Tag color="green">已连接</Tag>}
+            </div>
+          </Card>
+        ))}
       </div>
     );
   };
-  
+
   /**
    * 渲染资产基本信息卡片
-   * 展示资产的完整元数据信息
    */
-  const renderAssetDetailCard = (): JSX.Element => {
+  const renderAssetDetailCard = (): JSX.Element | null => {
     if (!asset) return null;
-    
+
+    /** 资产状态机守卫：终态资产禁止发起报废 */
+    const terminalStatuses = ['SCRAPPED', 'RETIRED', 'DISPOSED'];
+    const isAssetActionable = !terminalStatuses.includes(asset.status);
+
     return (
       <Card
         title={
@@ -253,12 +355,25 @@ const AssetDetailPage: React.FC = () => {
           </span>
         }
         extra={
-          <Button
-            icon={<ArrowLeftOutlined />}
-            onClick={() => navigate(-1)}
-          >
-            返回
-          </Button>
+          <Space>
+            {isAssetActionable && (
+              <Button
+                type="primary"
+                danger
+                icon={<DeleteOutlined />}
+                onClick={() => setDisposalModalVisible(true)}
+                data-testid="initiate-disposal-btn"
+              >
+                发起报废
+              </Button>
+            )}
+            <Button
+              icon={<ArrowLeftOutlined />}
+              onClick={() => navigate(-1)}
+            >
+              返回
+            </Button>
+          </Space>
         }
         data-testid="asset-detail-card"
         className="asset-detail-card"
@@ -268,10 +383,10 @@ const AssetDetailPage: React.FC = () => {
             <span className="asset-name">{asset.name}</span>
           </Descriptions.Item>
           <Descriptions.Item label="资产编号">
-            {asset.assetCode || asset.id}
+            {asset.assetNumber || asset.id}
           </Descriptions.Item>
           <Descriptions.Item label="资产类型">
-            {asset.assetType}
+            {asset.type}
           </Descriptions.Item>
           <Descriptions.Item label="资产状态">
             <Tag color={STATUS_COLORS[asset.status] || 'default'} data-testid="status-badge">
@@ -282,16 +397,16 @@ const AssetDetailPage: React.FC = () => {
             {asset.department || '-'}
           </Descriptions.Item>
           <Descriptions.Item label="责任人">
-            {asset.keeper || '-'}
+            {asset.assignedTo || '-'}
           </Descriptions.Item>
           <Descriptions.Item label="购置日期">
             {asset.purchaseDate ? new Date(asset.purchaseDate).toLocaleDateString('zh-CN') : '-'}
           </Descriptions.Item>
           <Descriptions.Item label="原值">
-            {asset.originalValue ? `¥${asset.originalValue.toLocaleString()}` : '-'}
+            {asset.purchasePrice ? `¥${asset.purchasePrice.toLocaleString()}` : '-'}
           </Descriptions.Item>
           <Descriptions.Item label="净值">
-            {asset.netValue ? `¥${asset.netValue.toLocaleString()}` : '-'}
+            {asset.currentValue ? `¥${asset.currentValue.toLocaleString()}` : '-'}
           </Descriptions.Item>
           <Descriptions.Item label="存放地点">
             {asset.location || '-'}
@@ -303,15 +418,15 @@ const AssetDetailPage: React.FC = () => {
             {asset.updatedAt ? new Date(asset.updatedAt).toLocaleString('zh-CN') : '-'}
           </Descriptions.Item>
         </Descriptions>
-        
+
         {/* @Auditable 字段特殊展示 */}
-        {asset.auditableFields && Object.keys(asset.auditableFields).length > 0 && (
+        {asset.customFields && Object.keys(asset.customFields).length > 0 && (
           <>
             <Divider orientation="left" orientationMargin="0">
               <AuditOutlined /> 审计追踪字段 (@Auditable)
             </Divider>
             <Descriptions column={2} bordered size="small">
-              {Object.entries(asset.auditableFields).map(([key, value]) => (
+              {Object.entries(asset.customFields).map(([key, value]) => (
                 <Descriptions.Item key={key} label={key}>
                   <Tag color="blue">{String(value)}</Tag>
                 </Descriptions.Item>
@@ -322,32 +437,20 @@ const AssetDetailPage: React.FC = () => {
       </Card>
     );
   };
-  
+
   /**
    * 渲染审计日志标签页
-   * 包含时间线和分页控制
    */
   const renderAuditLogTab = (): JSX.Element => {
-    if (isAuditLoading) {
+    if (auditLoading) {
       return (
         <div className="audit-loading">
           <Spin tip="审计日志加载中..." />
         </div>
       );
     }
-    
-    if (auditError) {
-      return (
-        <div className="audit-error">
-          <Empty description={`加载失败: ${auditError.message}`} />
-          <Button onClick={() => refetchAudit()}>重试</Button>
-        </div>
-      );
-    }
-    
-    const items = auditData?.items || [];
-    
-    if (items.length === 0) {
+
+    if (!auditLogs || auditLogs.length === 0) {
       return (
         <Empty
           image={Empty.PRESENTED_IMAGE_SIMPLE}
@@ -356,31 +459,43 @@ const AssetDetailPage: React.FC = () => {
         />
       );
     }
-    
+
     return (
       <div className="audit-log-timeline" data-testid="audit-log-timeline">
         <Timeline mode="left">
-          {items.map(renderAuditTimelineItem)}
+          {auditLogs.map((log: any) => renderAuditTimelineItem({
+            id: log.id || '',
+            action: log.operation || log.action,
+            userName: log.operatorName || log.userName,
+            timestamp: log.timestamp || '',
+            changes: log.changes || [],
+          }))}
         </Timeline>
-        
-        {/* 分页控制 */}
-        {auditData?.pagination && auditData.pagination.total > auditData.pagination.pageSize && (
-          <div className="audit-pagination">
-            <Button
-              disabled={auditData.pagination.page <= 1}
-              onClick={() => refetchAudit()}
-            >
-              加载更多
-            </Button>
-            <span className="pagination-info">
-              共 {auditData.pagination.total} 条记录
-            </span>
-          </div>
-        )}
+        <div className="audit-pagination">
+          <span className="pagination-info">
+            共 {auditLogs.length} 条审计记录
+          </span>
+        </div>
       </div>
     );
   };
-  
+
+  /**
+   * 工单分页变更
+   */
+  const handleWorkOrderPageChange = useCallback((page: number) => {
+    if (asset?.id) {
+      fetchWorkOrders(String(asset.id), page);
+    }
+  }, [asset?.id, fetchWorkOrders]);
+
+  /**
+   * 工单行点击
+   */
+  const handleWorkOrderClick = useCallback((record: WorkOrderHistoryItem) => {
+    navigate(`/workorders/${record.id}`);
+  }, [navigate]);
+
   /**
    * 加载状态处理
    */
@@ -391,7 +506,7 @@ const AssetDetailPage: React.FC = () => {
       </div>
     );
   }
-  
+
   /**
    * 错误状态处理
    */
@@ -403,10 +518,10 @@ const AssetDetailPage: React.FC = () => {
             <span>
               资产不存在或加载失败
               {assetError && <p className="error-detail">{assetError.message}</p>}
-            </>
+            </span>
           }
         >
-          <Button type="primary" onClick={() => refetchAsset()}>
+          <Button type="primary" onClick={() => refreshAsset()}>
             重试
           </Button>
           <Button onClick={() => navigate(-1)}>返回列表</Button>
@@ -414,39 +529,85 @@ const AssetDetailPage: React.FC = () => {
       </Card>
     );
   }
-  
+
   /**
    * 主渲染
    */
   return (
     <div className="asset-detail-page" data-testid="asset-detail-page">
       <Row gutter={[16, 16]}>
-        {/* 左侧：资产详情卡片 */}
+        {/* 左侧：资产详情卡片 + 标签页 */}
         <Col xs={24} lg={16}>
           {renderAssetDetailCard()}
-          
-          {/* 审计日志区域 */}
-          <Card
-            title={
-              <span>
-                <HistoryOutlined /> 审计日志
-              </span>
-            }
-            className="audit-card"
-          >
+
+          {/* 标签页区域：折旧、工单、审计、操作历史 */}
+          <Card style={{ marginTop: 16 }}>
             <Tabs
-              defaultActiveKey="timeline"
+              defaultActiveKey="depreciation"
               items={[
                 {
-                  key: 'timeline',
-                  label: '时间线',
+                  key: 'depreciation',
+                  label: (
+                    <span>
+                      <DollarOutlined /> 折旧计划
+                    </span>
+                  ),
+                  children: (
+                    <AssetDepreciationTimeline
+                      schedule={depreciationSchedule}
+                      loading={depreciationLoading}
+                    />
+                  ),
+                },
+                {
+                  key: 'workorders',
+                  label: (
+                    <span>
+                      <ToolOutlined /> 关联工单
+                    </span>
+                  ),
+                  children: (
+                    <AssetWorkOrderHistory
+                      workOrders={workOrders}
+                      total={workOrderTotal}
+                      loading={workOrderLoading}
+                      page={workOrderPage}
+                      pageSize={10}
+                      onPageChange={handleWorkOrderPageChange}
+                      onWorkOrderClick={handleWorkOrderClick}
+                    />
+                  ),
+                },
+                {
+                  key: 'audit',
+                  label: (
+                    <span>
+                      <HistoryOutlined /> 审计日志
+                    </span>
+                  ),
                   children: renderAuditLogTab(),
+                },
+                {
+                  key: 'operations',
+                  label: (
+                    <span>
+                      <FileTextOutlined /> 操作历史
+                    </span>
+                  ),
+                  children: (
+                    <AssetOperationHistory
+                      entries={[]}
+                      loading={operationLoading}
+                      disposalHistory={disposalHistory}
+                      maintenanceHistory={maintenanceHistory}
+                    />
+                  ),
                 },
               ]}
             />
           </Card>
         </Col>
-        
+
         {/* 右侧：知识图谱 */}
         <Col xs={24} lg={8}>
           <Card
@@ -461,6 +622,19 @@ const AssetDetailPage: React.FC = () => {
           </Card>
         </Col>
       </Row>
+
+      {/* 报废申请模态框 */}
+      <DisposalRequestModal
+        visible={disposalModalVisible}
+        onClose={() => setDisposalModalVisible(false)}
+        onSuccess={() => {
+          refreshAsset();
+        }}
+        assetId={asset?.id || ''}
+        assetNo={asset?.assetNumber || asset?.id || ''}
+        assetName={asset?.name || ''}
+        assetStatus={asset?.status}
+      />
     </div>
   );
 };

@@ -1,0 +1,157 @@
+/**
+ * AssetDetailPage Styles
+ *
+ * 资产详情页面的样式定义
+ * 使用 CSS Modules 避免样式冲突
+ *
+ * @module pages/AssetDetailPage.module
+ * @since SWARM-033
+ */
+
+.pageLoading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+}
+
+.pageError {
+  padding: 24px;
+}
+
+.errorDetail {
+  color: #ff4d4f;
+  font-size: 13px;
+  margin-top: 8px;
+}
+
+.assetDetailPage {
+  padding: 0;
+}
+
+.assetDetailCard {
+  margin-bottom: 16px;
+}
+
+.assetName {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.graphifyCard {
+  margin-bottom: 16px;
+}
+
+.graphifyLoading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+}
+
+.graphifyNodesContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.auditCard {
+  margin-top: 16px;
+}
+
+.auditLoading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+}
+
+.auditError {
+  text-align: center;
+  padding: 24px;
+}
+
+.auditLogTimeline {
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+.auditItemContent {
+  padding: 4px 0;
+}
+
+.auditItemHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.auditUser {
+  font-size: 13px;
+  color: #333;
+}
+
+.auditTime {
+  font-size: 12px;
+  color: #999;
+}
+
+.auditChanges {
+  margin-top: 8px;
+  padding: 8px;
+  background-color: #fafafa;
+  border-radius: 4px;
+}
+
+.auditChangeRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 0;
+  font-size: 13px;
+}
+
+.auditHighlight {
+  background-color: #e6f7ff;
+  border-left: 3px solid #1890ff;
+  padding-left: 6px;
+}
+
+.changeField {
+  font-weight: 500;
+  min-width: 80px;
+}
+
+.changeOld {
+  color: #ff4d4f;
+  text-decoration: line-through;
+}
+
+.changeArrow {
+  color: #999;
+}
+
+.changeNew {
+  color: #52c41a;
+  font-weight: 500;
+}
+
+.auditableTag {
+  font-size: 11px;
+}
+
+.auditPagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.paginationInfo {
+  font-size: 13px;
+  color: #999;
+}

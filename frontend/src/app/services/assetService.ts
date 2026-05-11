@@ -74,13 +74,63 @@ export const assetService = {
   },
 
   /**
-   * 根据 ID 获取资产详情
+   * 根据 ID 获取资产详情（含扩展属性）
    *
    * @param id - 资产 ID
-   * @returns 资产记录
+   * @returns 资产记录（含 metadata 等扩展字段）
    */
   getById(id: number | string) {
     return api.get<AssetRecord>(`/assets/${id}`);
+  },
+
+  /**
+   * 获取指定资产的折旧计划
+   *
+   * @param id - 资产 ID
+   * @returns 折旧计划详情；若资产无折旧数据则可能返回空 details
+   */
+  getDepreciationSchedule(id: number | string) {
+    return api.get<Record<string, unknown>>(`/assets/${id}/depreciation-schedule`);
+  },
+
+  /**
+   * 获取指定资产的关联工单列表
+   *
+   * @param id - 资产 ID
+   * @param params - 分页与筛选参数
+   * @returns 分页工单结果
+   */
+  getWorkOrders(id: number | string, params?: Record<string, unknown>) {
+    return api.get<PagedResult<Record<string, unknown>>>('/workorders', {
+      params: { assetId: id, ...params },
+    });
+  },
+
+  /**
+   * 获取指定资产的处置历史
+   *
+   * @param id - 资产 ID
+   * @param params - 分页参数
+   * @returns 处置历史记录
+   */
+  getDisposalHistory(id: number | string, params?: Record<string, unknown>) {
+    return api.get<{ records: Record<string, unknown>[]; total: number }>(
+      `/assets/${id}/disposal-history`,
+      { params },
+    );
+  },
+
+  /**
+   * 获取指定资产的维保记录
+   *
+   * @param id - 资产 ID
+   * @param params - 查询参数
+   * @returns 维保记录列表
+   */
+  getMaintenanceRecords(id: number | string, params?: Record<string, unknown>) {
+    return api.get<PagedResult<Record<string, unknown>>>('/maintenance/list', {
+      params: { assetId: id, ...params },
+    });
   },
 
   /**
