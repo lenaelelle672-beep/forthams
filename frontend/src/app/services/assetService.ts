@@ -62,6 +62,110 @@ export interface AssetExportParams {
   [key: string]: unknown;
 }
 
+/* ------------------------------------------------------------------ */
+/*  批量导入相关类型                                                     */
+/* ------------------------------------------------------------------ */
+
+/**
+ * 导入解析行数据
+ *
+ * @description POST /api/assets/import/parse 返回的单行解析结果
+ */
+export interface ImportParsedRow {
+  /** 行号 */
+  rowNumber: number;
+  /** 资产名称 */
+  name: string;
+  /** 分类编码 */
+  categoryCode: string;
+  /** 状态编码 */
+  statusCode: string;
+  /** 位置编码 */
+  locationCode: string;
+  /** 购置日期 */
+  purchaseDate: string;
+  /** 原值 */
+  originalValue: number;
+  /** 分类名称（可选） */
+  categoryName?: string;
+  /** 状态名称（可选） */
+  statusName?: string;
+  /** 位置名称（可选） */
+  locationName?: string;
+}
+
+/**
+ * 导入解析错误
+ *
+ * @description 行级校验错误信息
+ */
+export interface ImportParseError {
+  /** 行号 */
+  rowNumber: number;
+  /** 出错字段 */
+  field: string;
+  /** 错误信息 */
+  message: string;
+}
+
+/**
+ * 导入解析响应
+ *
+ * @description POST /api/assets/import/parse 返回的整体结构
+ */
+export interface ImportParseResponse {
+  /** 解析会话 ID（用于 commit 阶段） */
+  parseId: string;
+  /** 解析后的行数据 */
+  rows: ImportParsedRow[];
+  /** 行级错误列表 */
+  errors: ImportParseError[];
+}
+
+/**
+ * 导入提交响应
+ *
+ * @description POST /api/assets/import/commit 返回的结果
+ */
+export interface ImportCommitResponse {
+  /** 是否成功 */
+  success: boolean;
+  /** 成功导入条数 */
+  importedCount: number;
+  /** 失败条数 */
+  failedCount: number;
+}
+
+/**
+ * 分类树节点
+ *
+ * @description GET /api/asset-categories/tree 返回的树形结构
+ */
+export interface CategoryTreeNode {
+  /** 节点键 */
+  key: string;
+  /** 节点标题 */
+  title: string;
+  /** 节点值 */
+  value: string;
+  /** 子节点 */
+  children?: CategoryTreeNode[];
+}
+
+/**
+ * 位置级联节点
+ *
+ * @description GET /api/asset-locations/cascade 返回的级联结构
+ */
+export interface LocationCascadeNode {
+  /** 节点值 */
+  value: string;
+  /** 节点标签 */
+  label: string;
+  /** 子节点 */
+  children?: LocationCascadeNode[];
+}
+
 export const assetService = {
   /**
    * 获取资产分页列表
@@ -192,5 +296,80 @@ export const assetService = {
       params,
       responseType: 'blob',
     });
+  },
+
+  /**
+   * 上传并解析导入文件
+   *
+   * @description 上传 .xlsx 文件至后端解析接口，返回行级数据与错误。
+   * 使用 apiClient 直接获取响应，绕过 api 层的 ApiResponse 解包。
+   *
+   * @param formData - 包含 file 字段的 FormData
+   * @returns 解析结果（行数据 + 错误列表 + parseId）
+   */
+  importParse(formData: FormData): Promise<ImportParseResponse> {
+    return apiClient
+      .post<ImportParseResponse>('/assets/import/parse', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      })
+      .then((res) => res.data);
+  },
+
+  /**
+   * 确认提交导入
+   *
+   * @description 携带 parseId 提交确认导入，后端执行实际写入。
+   *
+   * @param parseId - 解析阶段返回的会话 ID
+   * @param correctedRows - 用户修正后的行数据（可选）
+   * @returns 提交结果（成功/失败条数）
+   */
+  importCommit(
+    parseId: string,
+    correctedRows?: ImportParsedRow[],
+  ): Promise<ImportCommitResponse> {
+    return apiClient
+      .post<ImportCommitResponse>('/assets/import/commit', {
+        parseId,
+        correctedRows,
+      })
+      .then((res) => res.data);
+  },
+
+  /**
+   * 下载导入模板
+   *
+   * @description 调用后端模板下载接口，返回 Blob 文件流。
+   *
+   * @param format - 文件格式，默认 xlsx
+   * @returns Axios 响应（Blob 数据在 response.data 中）
+   */
+  importTemplate(format: string = 'xlsx') {
+    return apiClient.get('/assets/import/template', {
+      params: { format },
+      responseType: 'blob',
+    });
+  },
+
+  /**
+   * 获取资产分类树
+   *
+   * @description 返回树形分类结构，用于导入/导出页面的分类选择器。
+   *
+   * @returns 分类树节点列表
+   */
+  getCategoryTree(): Promise<CategoryTreeNode[]> {
+    return api.get<CategoryTreeNode[]>('/asset-categories/tree');
+  },
+
+  /**
+   * 获取位置级联数据
+   *
+   * @description 返回级联位置结构，用于导入/导出页面的位置选择器。
+   *
+   * @returns 位置级联节点列表
+   */
+  getLocationCascade(): Promise<LocationCascadeNode[]> {
+    return api.get<LocationCascadeNode[]>('/asset-locations/cascade');
   },
 };
