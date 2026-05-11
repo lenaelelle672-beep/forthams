@@ -84,6 +84,20 @@ export const assetService = {
   },
 
   /**
+   * 根据 ID 获取资产详情（别名 → getById）
+   *
+   * @description 兼容 useAssetById hook 及退役模块中通过 getAssetById 方法的调用。
+   * 返回包装后的 `{ data: AssetRecord }` 结构，与 useAssetById 消费端一致。
+   *
+   * @param id - 资产 ID
+   * @returns 包含 data 字段的资产记录
+   */
+  async getAssetById(id: number | string): Promise<{ data: AssetRecord }> {
+    const record = await api.get<AssetRecord>(`/assets/${id}`);
+    return { data: record };
+  },
+
+  /**
    * 获取指定资产的折旧计划
    *
    * @param id - 资产 ID
