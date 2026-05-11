@@ -11,11 +11,28 @@
  */
 
 import React, { useState, useCallback } from 'react';
-import { Plus, History, AlertCircle, X, Check } from 'lucide-react';
+import { Plus, History, AlertCircle, X } from 'lucide-react';
 import { useRetirementList } from '../../hooks/useRetirementList';
 import { useRetirementSubmit } from '../../hooks/useRetirementSubmit';
-import { RetirementApplication, RetirementStatus, RetirementHistoryRecord } from '../../types/retirement.types';
+import {
+  RetirementApplication,
+  RetirementStatus,
+  RetirementReason,
+  RETIREMENT_REASON_OPTIONS,
+} from '../../types/retirement.types';
 import { retirementService } from '../../services/retirementService';
+
+/** Local type for history records matching the service return shape */
+interface HistoryRecord {
+  id: string;
+  assetId: string;
+  action: string;
+  fromStatus: string;
+  toStatus: string;
+  timestamp: string;
+  operator: string;
+  reason?: string;
+}
 
 interface RetirementFormValues {
   assetId: string;
@@ -24,22 +41,20 @@ interface RetirementFormValues {
   attachmentUrls?: string[];
 }
 
-type RetirementReason = 'DAMAGE' | 'OBSOLETE' | 'UPGRADE' | 'END_OF_LIFE' | 'OTHER';
+/** Default fallback for unknown status display */
+const DEFAULT_STATUS_STYLE = { bg: 'bg-gray-100 text-gray-800', text: '未知', label: '未知' };
 
-const RETIREMENT_REASON_OPTIONS: { value: RetirementReason; label: string }[] = [
-  { value: 'DAMAGE', label: '设备损坏无法修复' },
-  { value: 'OBSOLETE', label: '技术淘汰' },
-  { value: 'UPGRADE', label: '升级换代' },
-  { value: 'END_OF_LIFE', label: '使用年限到期' },
-  { value: 'OTHER', label: '其他原因' },
-];
-
-/** Map status to Tailwind badge styles and display text */
+/** Map status to Tailwind badge styles and display text — aligned with RetirementStatus enum (NORMAL, RETIRING, RETIRED) */
 const STATUS_STYLE_MAP: Record<RetirementStatus, { bg: string; text: string; label: string }> = {
   [RetirementStatus.NORMAL]: { bg: 'bg-gray-100 text-gray-800', text: '正常', label: '正常' },
   [RetirementStatus.RETIRING]: { bg: 'bg-blue-100 text-blue-800', text: '退役中', label: '退役中' },
-  [RetirementStatus.RETIRED]: { bg: 'bg-green-100 text-green-800', text: '已退役', label: '已退役' },
+  [RetirementStatus.RETIRED]: { bg: 'bg-green-100 text-green-800', text: '已报废', label: '已报废' },
 };
+
+/** Safe lookup: returns matched style or a fallback for unknown status values */
+function getStatusStyle(status: RetirementStatus | string): { bg: string; text: string; label: string } {
+  return (STATUS_STYLE_MAP as Record<string, { bg: string; text: string; label: string }>)[status] ?? DEFAULT_STATUS_STYLE;
+}
 
 /**
  * 资产报废/退役流程主页面组件
@@ -53,7 +68,7 @@ export const RetirementPage: React.FC = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isHistoryVisible, setIsHistoryVisible] = useState(false);
   const [selectedAssetId, setSelectedAssetId] = useState<string | null>(null);
-  const [historyRecords, setHistoryRecords] = useState<RetirementHistoryRecord[]>([]);
+  const [historyRecords, setHistoryRecords] = useState<HistoryRecord[]>([]);
   const [notice, setNotice] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<RetirementApplication | null>(null);
 
@@ -214,19 +229,19 @@ export const RetirementPage: React.FC = () => {
                 </tr>
               ) : (
                 retirementList.map((record: RetirementApplication) => {
-                  const statusInfo = STATUS_STYLE_MAP[record.status] || STATUS_STYLE_MAP[RetirementStatus.NORMAL];
+                  const statusInfo = getStatusStyle(record.status);
                   return (
                     <tr key={record.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 text-sm font-medium text-blue-600">{record.retirementNo}</td>
-                      <td className="px-6 py-4 text-sm text-gray-900">{record.assetNo}</td>
-                      <td className="px-6 py-4 text-sm text-gray-900">{record.assetName}</td>
-                      <td className="px-6 py-4 text-sm text-gray-600">{record.reasonText}</td>
+                      <td className="px-6 py-4 text-sm text-gray-900">{record.assetId}</td>
+                      <td className="px-6 py-4 text-sm text-gray-900">{record.assetId}</td>
+                      <td className="px-6 py-4 text-sm text-gray-600">{record.reason}</td>
                       <td className="px-6 py-4">
                         <span className={`px-2 py-1 text-xs font-medium rounded-full ${statusInfo.bg}`}>
                           {statusInfo.text}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-600">{record.applicantName}</td>
+                      <td className="px-6 py-4 text-sm text-gray-600">{record.applicant?.name ?? '-'}</td>
                       <td className="px-6 py-4 text-sm text-gray-600">{new Date(record.createdAt).toLocaleString('zh-CN')}</td>
                       <td className="px-6 py-4 text-sm">
                         <div className="flex gap-2">
@@ -380,8 +395,8 @@ export const RetirementPage: React.FC = () => {
                       }`} />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-3 mb-1">
-                          <span className="text-sm font-semibold text-gray-900">{record.operatorName}</span>
-                          <span className="text-xs text-gray-500">{new Date(record.createdAt).toLocaleString('zh-CN')}</span>
+                          <span className="text-sm font-semibold text-gray-900">{record.operator}</span>
+                          <span className="text-xs text-gray-500">{new Date(record.timestamp).toLocaleString('zh-CN')}</span>
                         </div>
                         <div className="flex items-center gap-2">
                           <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${
@@ -389,9 +404,9 @@ export const RetirementPage: React.FC = () => {
                             record.action === 'REJECT' ? 'bg-red-100 text-red-800' :
                             'bg-blue-100 text-blue-800'
                           }`}>
-                            {record.actionText}
+                            {record.action}
                           </span>
-                          <span className="text-sm text-gray-500">{record.remark}</span>
+                          <span className="text-sm text-gray-500">{record.reason}</span>
                         </div>
                       </div>
                     </div>
