@@ -40,7 +40,8 @@ import {
   ChevronDown,
   ChevronUp,
   Filter,
-  MoreHorizontal
+  MoreHorizontal,
+  Wrench
 } from 'lucide-react';
 
 // 类型导入
@@ -50,6 +51,8 @@ import type { AuditLogEntry, AuditLogFilter, AuditLogResponse } from '../../type
 // 服务导入
 import { getAssetDetail } from '../../services/assetService';
 import { getAuditLogs } from '../../services/auditApi';
+import { workOrderService } from '../../services/workOrderService';
+import type { WorkOrderDTO } from '../../services/workOrderService';
 
 // UI 组件导入
 import { Button } from '../../components/ui/button';
@@ -71,6 +74,17 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../../components/ui/dropdown-menu';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '../../components/ui/dialog';
+import { Input } from '../../components/ui/input';
+import { Textarea } from '../../components/ui/textarea';
+import { Label } from '../../components/ui/label';
 
 /**
  * 页面状态枚举
@@ -119,6 +133,16 @@ const AssetDetailPage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const PAGE_SIZE = 20;
   const MAX_LOGS = 100;
+
+  // ============ 工单创建状态 ============
+  const [isWorkOrderModalOpen, setIsWorkOrderModalOpen] = useState<boolean>(false);
+  const [workOrderForm, setWorkOrderForm] = useState<{ title: string; description: string }>({
+    title: '',
+    description: '',
+  });
+  const [workOrderFormErrors, setWorkOrderFormErrors] = useState<{ title?: string; description?: string }>({});
+  const [workOrderSubmitting, setWorkOrderSubmitting] = useState<boolean>(false);
+  const [workOrderToast, setWorkOrderToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   // ============ 数据获取 ============
   
@@ -348,6 +372,84 @@ const AssetDetailPage: React.FC = () => {
    */
   const toggleLogDetail = (logId: string) => {
     setExpandedLogId(prev => prev === logId ? null : logId);
+  };
+
+  // ============ 工单创建操作 ============
+
+  /**
+   * 打开创建维保工单弹窗
+   * @function handleOpenWorkOrderModal
+   */
+  const handleOpenWorkOrderModal = () => {
+    setWorkOrderForm({ title: '', description: '' });
+    setWorkOrderFormErrors({});
+    setWorkOrderToast(null);
+    setIsWorkOrderModalOpen(true);
+  };
+
+  /**
+   * 关闭创建维保工单弹窗
+   * @function handleCloseWorkOrderModal
+   */
+  const handleCloseWorkOrderModal = () => {
+    setIsWorkOrderModalOpen(false);
+    setWorkOrderFormErrors({});
+  };
+
+  /**
+   * 验证工单表单必填项
+   * @function validateWorkOrderForm
+   * @returns {boolean} 表单是否通过验证
+   */
+  const validateWorkOrderForm = (): boolean => {
+    const errors: { title?: string; description?: string } = {};
+    if (!workOrderForm.title.trim()) {
+      errors.title = '请输入工单标题';
+    }
+    if (!workOrderForm.description.trim()) {
+      errors.description = '请输入工单描述';
+    }
+    setWorkOrderFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  /**
+   * 提交创建维保工单
+   * @async
+   * @function handleSubmitWorkOrder
+   */
+  const handleSubmitWorkOrder = async () => {
+    if (!validateWorkOrderForm()) {
+      return;
+    }
+
+    if (!assetDetail?.id) {
+      return;
+    }
+
+    setWorkOrderSubmitting(true);
+
+    try {
+      const payload: WorkOrderDTO = {
+        title: workOrderForm.title.trim(),
+        description: workOrderForm.description.trim(),
+        assetId: Number(assetDetail.id),
+        assetName: assetDetail.name,
+        status: 'DRAFT',
+      };
+
+      await workOrderService.create(payload);
+
+      setIsWorkOrderModalOpen(false);
+      setWorkOrderToast({ type: 'success', message: '维保工单创建成功' });
+    } catch (error) {
+      setWorkOrderToast({
+        type: 'error',
+        message: error instanceof Error ? error.message : '创建工单失败，请稍后重试',
+      });
+    } finally {
+      setWorkOrderSubmitting(false);
+    }
   };
 
   // ============ 渲染方法 ============
@@ -833,6 +935,13 @@ const AssetDetailPage: React.FC = () => {
               {/* 左侧：资产信息 + 扩展属性 */}
               <div className="lg:col-span-2 space-y-6">
                 {renderAssetInfoCard()}
+                <Button
+                  data-testid="btn-trigger-create-work-order"
+                  onClick={handleOpenWorkOrderModal}
+                >
+                  <Wrench className="mr-2 h-4 w-4" />
+                  创建维保工单
+                </Button>
                 {renderAssetMetadataPanel()}
               </div>
 
@@ -849,6 +958,100 @@ const AssetDetailPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-background">
       {renderContent()}
+
+      {/* 成功/失败 Toast 提示 */}
+      {workOrderToast && (
+        <div
+          data-testid={workOrderToast.type === 'success' ? 'toast-success' : 'toast-error'}
+          className="fixed top-4 right-4 z-50 px-4 py-3 rounded-md shadow-lg text-sm font-medium"
+          style={{
+            backgroundColor: workOrderToast.type === 'success' ? '#10b981' : '#ef4444',
+            color: '#fff',
+          }}
+        >
+          {workOrderToast.message}
+        </div>
+      )}
+
+      {/* 创建维保工单弹窗 */}
+      <Dialog open={isWorkOrderModalOpen} onOpenChange={(open) => { if (!open) handleCloseWorkOrderModal(); }}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>创建维保工单</DialogTitle>
+            <DialogDescription>
+              为当前资产创建一个新的维保工单，提交后将进入审批流程。
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="grid gap-4 py-4">
+            {/* 关联资产 ID - 禁用状态 */}
+            <div className="grid gap-2">
+              <Label htmlFor="asset-id">关联资产 ID</Label>
+              <Input
+                id="asset-id"
+                data-testid="input-asset-id"
+                value={assetDetail?.id ?? ''}
+                disabled
+              />
+            </div>
+
+            {/* 工单标题 */}
+            <div className="grid gap-2">
+              <Label htmlFor="wo-title">工单标题 *</Label>
+              <Input
+                id="wo-title"
+                data-testid="input-work-order-title"
+                placeholder="请输入工单标题"
+                value={workOrderForm.title}
+                onChange={(e) => setWorkOrderForm(prev => ({ ...prev, title: e.target.value }))}
+              />
+              {workOrderFormErrors.title && (
+                <p className="text-sm text-destructive" data-testid="error-required">
+                  {workOrderFormErrors.title}
+                </p>
+              )}
+            </div>
+
+            {/* 工单描述 */}
+            <div className="grid gap-2">
+              <Label htmlFor="wo-description">工单描述 *</Label>
+              <Textarea
+                id="wo-description"
+                data-testid="input-work-order-description"
+                placeholder="请输入工单描述"
+                rows={4}
+                value={workOrderForm.description}
+                onChange={(e) => setWorkOrderForm(prev => ({ ...prev, description: e.target.value }))}
+              />
+              {workOrderFormErrors.description && (
+                <p className="text-sm text-destructive" data-testid="error-required">
+                  {workOrderFormErrors.description}
+                </p>
+              )}
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={handleCloseWorkOrderModal} disabled={workOrderSubmitting}>
+              取消
+            </Button>
+            <Button
+              data-testid="btn-submit-work-order"
+              onClick={handleSubmitWorkOrder}
+              disabled={workOrderSubmitting}
+            >
+              {workOrderSubmitting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  提交中...
+                </>
+              ) : (
+                '提交'
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
