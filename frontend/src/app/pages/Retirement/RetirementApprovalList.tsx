@@ -13,39 +13,16 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Table,
-  Button,
-  Card,
-  Tag,
-  Space,
-  Modal,
-  Form,
-  Input,
-  Select,
-  DatePicker,
-  message,
-  Popconfirm,
-  Typography,
-  Row,
-  Col,
-  Statistic,
-  Divider,
-  Tooltip,
-  Badge,
-  Empty,
-  Spin,
-} from 'antd';
-import type { ColumnsType } from 'antd/es/table';
-import {
-  CheckCircleOutlined,
-  CloseCircleOutlined,
-  EyeOutlined,
-  SearchOutlined,
-  FilterOutlined,
-  ClockCircleOutlined,
-  ExclamationCircleOutlined,
-  DeleteOutlined,
-} from '@ant-design/icons';
+  CheckCircle,
+  XCircle,
+  Eye,
+  Search,
+  Filter,
+  Clock,
+  AlertCircle,
+  Trash2,
+  X,
+} from 'lucide-react';
 import dayjs from 'dayjs';
 
 import { useApprovalPermission } from '@/composables/useApprovalPermission';
@@ -53,11 +30,6 @@ import { useApprovalBinding } from '@/composables/useApprovalBinding';
 import { approvalService } from '@/services/approvalService';
 import { retirementService } from '@/services/retirementService';
 import type { RetirementApplication, RetirementStatus, ApprovalRecord } from '../types/retirement.types';
-import styles from './RetirementApprovalList.module.css';
-
-const { Text, Title } = Typography;
-const { TextArea } = Input;
-const { Option } = Select;
 
 // ==================== 类型定义 ====================
 
@@ -73,26 +45,26 @@ interface FilterState {
 interface ApprovalFormValues {
   action: 'approve' | 'reject';
   comment: string;
-  effectiveDate?: dayjs.Dayjs;
+  effectiveDate?: string;
 }
 
 // ==================== 常量配置 ====================
 
-/** 状态配置映射 */
+/** 状态配置映射 — Tailwind badge styles */
 const STATUS_CONFIG: Record<
   RetirementStatus,
-  { color: string; label: string; description: string }
+  { bg: string; label: string; description: string }
 > = {
-  DRAFT: { color: 'default', label: '草稿', description: '申请人正在编辑' },
+  DRAFT: { bg: 'bg-gray-100 text-gray-800', label: '草稿', description: '申请人正在编辑' },
   PENDING_APPROVAL: {
-    color: 'processing',
+    bg: 'bg-blue-100 text-blue-800',
     label: '待审批',
     description: '等待审批人审核',
   },
-  APPROVED: { color: 'success', label: '已批准', description: '审批通过，待执行' },
-  REJECTED: { color: 'error', label: '已驳回', description: '审批未通过' },
-  CANCELLED: { color: 'default', label: '已撤回', description: '申请人主动撤回' },
-  RETIRED: { color: 'success', label: '已退役', description: '资产已完成退役' },
+  APPROVED: { bg: 'bg-green-100 text-green-800', label: '已批准', description: '审批通过，待执行' },
+  REJECTED: { bg: 'bg-red-100 text-red-800', label: '已驳回', description: '审批未通过' },
+  CANCELLED: { bg: 'bg-gray-100 text-gray-800', label: '已撤回', description: '申请人主动撤回' },
+  RETIRED: { bg: 'bg-green-100 text-green-800', label: '已退役', description: '资产已完成退役' },
 };
 
 /** 状态选项 */
@@ -107,7 +79,8 @@ const STATUS_OPTIONS = Object.entries(STATUS_CONFIG).map(([value, config]) => ({
  * 资产退役审批列表组件
  * 
  * @description
- * 展示系统中所有资产退役申请，支持审批操作和状态筛选
+ * 展示系统中所有资产退役申请，支持审批操作和状态筛选。
+ * 使用 Tailwind CSS + 原生 HTML 元素替代 antd。
  * 
  * @example
  * ```tsx
@@ -124,7 +97,7 @@ export const RetirementApprovalList: React.FC = () => {
     total: 0,
   });
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
-  
+
   // 筛选状态
   const [filters, setFilters] = useState<FilterState>({
     status: 'ALL',
@@ -132,16 +105,27 @@ export const RetirementApprovalList: React.FC = () => {
     dateRange: null,
     keyword: '',
   });
-  
+
   // 详情弹窗
   const [detailModalVisible, setDetailModalVisible] = useState<boolean>(false);
   const [currentApplication, setCurrentApplication] = useState<RetirementApplication | null>(null);
-  
+
   // 审批弹窗
   const [approvalModalVisible, setApprovalModalVisible] = useState<boolean>(false);
   const [approvalLoading, setApprovalLoading] = useState<boolean>(false);
-  const [approvalForm] = Form.useForm<ApprovalFormValues>();
-  
+
+  // Simple form state (replaces antd Form)
+  const [approvalAction, setApprovalAction] = useState<'approve' | 'reject'>('approve');
+  const [approvalComment, setApprovalComment] = useState('');
+  const [approvalEffectiveDate, setApprovalEffectiveDate] = useState('');
+  const [approvalCommentError, setApprovalCommentError] = useState('');
+
+  // Notification state (replaces antd message)
+  const [notice, setNotice] = useState<string | null>(null);
+
+  // Confirm batch dialog
+  const [confirmBatchVisible, setConfirmBatchVisible] = useState(false);
+
   // ==================== Hooks ====================
   const navigate = useNavigate();
   const { canApprove, canView, userInfo } = useApprovalPermission();
@@ -164,7 +148,7 @@ export const RetirementApprovalList: React.FC = () => {
         startDate: filters.dateRange?.[0]?.format('YYYY-MM-DD'),
         endDate: filters.dateRange?.[1]?.format('YYYY-MM-DD'),
       };
-      
+
       const response = await retirementService.getApplications(params);
       setApplications(response.items || []);
       setPagination(prev => ({
@@ -172,7 +156,7 @@ export const RetirementApprovalList: React.FC = () => {
         total: response.total || 0,
       }));
     } catch (error) {
-      message.error('加载申请列表失败');
+      setNotice('加载申请列表失败');
       console.error('Load applications error:', error);
     } finally {
       setLoading(false);
@@ -193,12 +177,11 @@ export const RetirementApprovalList: React.FC = () => {
   /**
    * 处理表格分页变化
    */
-  const handleTableChange = useCallback(
-    (newPagination: { current?: number; pageSize?: number }) => {
+  const handlePageChange = useCallback(
+    (newPage: number) => {
       setPagination(prev => ({
         ...prev,
-        current: newPagination.current || prev.current,
-        pageSize: newPagination.pageSize || prev.pageSize,
+        current: newPage,
       }));
     },
     []
@@ -238,7 +221,7 @@ export const RetirementApprovalList: React.FC = () => {
       setDetailModalVisible(true);
       bindApprovalContext(record.id, 'VIEW');
     } catch (error) {
-      message.error('加载详情失败');
+      setNotice('加载详情失败');
     }
   }, [bindApprovalContext]);
 
@@ -248,11 +231,14 @@ export const RetirementApprovalList: React.FC = () => {
   const handleOpenApproval = useCallback(
     (record: RetirementApplication, action: 'approve' | 'reject') => {
       setCurrentApplication(record);
-      approvalForm.setFieldsValue({ action });
+      setApprovalAction(action);
+      setApprovalComment('');
+      setApprovalEffectiveDate('');
+      setApprovalCommentError('');
       setApprovalModalVisible(true);
       bindApprovalContext(record.id, action === 'approve' ? 'APPROVE' : 'REJECT');
     },
-    [approvalForm, bindApprovalContext]
+    [bindApprovalContext]
   );
 
   /**
@@ -260,62 +246,73 @@ export const RetirementApprovalList: React.FC = () => {
    */
   const handleCloseApproval = useCallback(() => {
     setApprovalModalVisible(false);
-    approvalForm.resetFields();
+    setApprovalComment('');
+    setApprovalEffectiveDate('');
+    setApprovalCommentError('');
     if (currentApplication) {
       unbindApprovalContext(currentApplication.id);
     }
-  }, [approvalForm, currentApplication, unbindApprovalContext]);
+  }, [currentApplication, unbindApprovalContext]);
 
   /**
    * 提交审批
    */
   const handleSubmitApproval = useCallback(async () => {
-    try {
-      const values = await approvalForm.validateFields();
-      if (!currentApplication) return;
+    // Validate
+    if (!approvalComment.trim()) {
+      setApprovalCommentError('请输入意见或原因');
+      return;
+    }
+    if (approvalComment.length > 200) {
+      setApprovalCommentError('意见不能超过200字符');
+      return;
+    }
+    if (!currentApplication) return;
 
+    try {
       setApprovalLoading(true);
-      
-      if (values.action === 'approve') {
+
+      if (approvalAction === 'approve') {
         await approvalService.approveRetirement(currentApplication.id, {
-          comment: values.comment,
-          effectiveDate: values.effectiveDate?.format('YYYY-MM-DD'),
+          comment: approvalComment,
+          effectiveDate: approvalEffectiveDate || undefined,
         });
-        message.success('审批通过');
+        setNotice('审批通过');
       } else {
         await approvalService.rejectRetirement(currentApplication.id, {
-          reason: values.comment,
+          reason: approvalComment,
         });
-        message.success('已驳回申请');
+        setNotice('已驳回申请');
       }
 
       handleCloseApproval();
       loadApplications();
     } catch (error) {
-      message.error('审批操作失败');
+      setNotice('审批操作失败');
       console.error('Approval error:', error);
     } finally {
       setApprovalLoading(false);
     }
-  }, [approvalForm, currentApplication, handleCloseApproval, loadApplications]);
+  }, [approvalAction, approvalComment, approvalEffectiveDate, currentApplication, handleCloseApproval, loadApplications]);
 
   /**
    * 批量审批
    */
   const handleBatchApprove = useCallback(async () => {
     if (selectedRowKeys.length === 0) {
-      message.warning('请先选择要审批的申请');
+      setNotice('请先选择要审批的申请');
       return;
     }
 
     try {
       setApprovalLoading(true);
       await approvalService.batchApprove(selectedRowKeys as string[]);
-      message.success(`成功审批 ${selectedRowKeys.length} 条申请`);
+      setNotice(`成功审批 ${selectedRowKeys.length} 条申请`);
       setSelectedRowKeys([]);
+      setConfirmBatchVisible(false);
       loadApplications();
     } catch (error) {
-      message.error('批量审批失败');
+      setNotice('批量审批失败');
     } finally {
       setApprovalLoading(false);
     }
@@ -328,135 +325,15 @@ export const RetirementApprovalList: React.FC = () => {
     setSelectedRowKeys([]);
   }, []);
 
-  // ==================== 表格列配置 ====================
-
   /**
-   * 表格列定义
+   * Toggle row selection
    */
-  const columns: ColumnsType<RetirementApplication> = useMemo(
-    () => [
-      {
-        title: '申请编号',
-        dataIndex: 'applicationNo',
-        key: 'applicationNo',
-        width: 150,
-        fixed: 'left',
-        render: (text: string) => (
-          <Text strong className={styles.applicationNo}>
-            {text}
-          </Text>
-        ),
-      },
-      {
-        title: '资产编号',
-        dataIndex: 'assetCode',
-        key: 'assetCode',
-        width: 120,
-      },
-      {
-        title: '资产名称',
-        dataIndex: 'assetName',
-        key: 'assetName',
-        width: 180,
-        ellipsis: true,
-      },
-      {
-        title: '申请人',
-        dataIndex: 'applicantName',
-        key: 'applicantName',
-        width: 100,
-      },
-      {
-        title: '所属部门',
-        dataIndex: 'department',
-        key: 'department',
-        width: 120,
-      },
-      {
-        title: '退役原因',
-        dataIndex: 'retirementReason',
-        key: 'retirementReason',
-        width: 200,
-        ellipsis: true,
-        render: (text: string) => (
-          <Tooltip title={text}>
-            <span>{text}</span>
-          </Tooltip>
-        ),
-      },
-      {
-        title: '计划退役日期',
-        dataIndex: 'plannedRetirementDate',
-        key: 'plannedRetirementDate',
-        width: 130,
-        render: (date: string) => dayjs(date).format('YYYY-MM-DD'),
-      },
-      {
-        title: '状态',
-        dataIndex: 'status',
-        key: 'status',
-        width: 100,
-        filters: STATUS_OPTIONS.map(opt => ({ text: opt.label, value: opt.value })),
-        render: (status: RetirementStatus) => {
-          const config = STATUS_CONFIG[status];
-          return (
-            <Tag color={config.color} icon={status === 'PENDING_APPROVAL' ? <ClockCircleOutlined /> : undefined}>
-              {config.label}
-            </Tag>
-          );
-        },
-      },
-      {
-        title: '申请时间',
-        dataIndex: 'createdAt',
-        key: 'createdAt',
-        width: 160,
-        sorter: true,
-        render: (date: string) => dayjs(date).format('YYYY-MM-DD HH:mm'),
-      },
-      {
-        title: '操作',
-        key: 'actions',
-        width: 160,
-        fixed: 'right',
-        render: (_, record) => (
-          <Space size="small">
-            <Button
-              type="link"
-              size="small"
-              icon={<EyeOutlined />}
-              onClick={() => handleViewDetail(record)}
-            >
-              详情
-            </Button>
-            {record.status === 'PENDING_APPROVAL' && canApprove && (
-              <>
-                <Button
-                  type="link"
-                  size="small"
-                  icon={<CheckCircleOutlined />}
-                  onClick={() => handleOpenApproval(record, 'approve')}
-                  className={styles.approveBtn}
-                >
-                  批准
-                </Button>
-                <Button
-                  type="link"
-                  size="small"
-                  danger
-                  icon={<CloseCircleOutlined />}
-                  onClick={() => handleOpenApproval(record, 'reject')}
-                >
-                  驳回
-                </Button>
-              </>
-            )}
-          </Space>
-        ),
-      },
-    ],
-    [canApprove, handleViewDetail, handleOpenApproval]
-  );
+  const handleToggleRow = useCallback((id: React.Key, status: string) => {
+    if (status !== 'PENDING_APPROVAL') return;
+    setSelectedRowKeys(prev =>
+      prev.includes(id) ? prev.filter(k => k !== id) : [...prev, id]
+    );
+  }, []);
 
   // ==================== 统计计算 ====================
 
@@ -471,339 +348,564 @@ export const RetirementApprovalList: React.FC = () => {
     return { pending, approved, rejected, retired };
   }, [applications]);
 
-  // ==================== 渲染逻辑 ====================
-
-  /**
-   * 渲染筛选器
-   */
-  const renderFilters = () => (
-    <Card size="small" className={styles.filterCard}>
-      <Row gutter={[16, 16]} align="middle">
-        <Col xs={24} sm={12} md={6}>
-          <Space direction="vertical" size="small" style={{ width: '100%' }}>
-            <Text type="secondary" className={styles.filterLabel}>
-              <FilterOutlined /> 状态筛选
-            </Text>
-            <Select
-              value={filters.status}
-              onChange={value => handleFilterChange('status', value)}
-              style={{ width: '100%' }}
-              allowClear
-            >
-              <Option value="ALL">全部状态</Option>
-              {STATUS_OPTIONS.map(opt => (
-                <Option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </Option>
-              ))}
-            </Select>
-          </Space>
-        </Col>
-        <Col xs={24} sm={12} md={6}>
-          <Space direction="vertical" size="small" style={{ width: '100%' }}>
-            <Text type="secondary" className={styles.filterLabel}>
-              <SearchOutlined /> 关键词搜索
-            </Text>
-            <Input
-              placeholder="搜索资产编号/名称"
-              value={filters.keyword}
-              onChange={e => handleFilterChange('keyword', e.target.value)}
-              allowClear
-              prefix={<SearchOutlined />}
-            />
-          </Space>
-        </Col>
-        <Col xs={24} sm={12} md={6}>
-          <Space direction="vertical" size="small" style={{ width: '100%' }}>
-            <Text type="secondary" className={styles.filterLabel}>
-              日期范围
-            </Text>
-            <DatePicker.RangePicker
-              value={filters.dateRange}
-              onChange={date => handleFilterChange('dateRange', date)}
-              style={{ width: '100%' }}
-            />
-          </Space>
-        </Col>
-        <Col xs={24} sm={12} md={6}>
-          <Space>
-            <Button onClick={handleResetFilters}>重置</Button>
-            <Button type="primary" onClick={() => loadApplications()}>
-              应用筛选
-            </Button>
-          </Space>
-        </Col>
-      </Row>
-    </Card>
-  );
-
-  /**
-   * 渲染统计卡片
-   */
-  const renderStatistics = () => (
-    <Row gutter={16} className={styles.statisticsRow}>
-      <Col xs={12} sm={6}>
-        <Card size="small">
-          <Statistic
-            title="待审批"
-            value={statistics.pending}
-            valueStyle={{ color: '#faad14' }}
-            prefix={<Badge status="processing" />}
-          />
-        </Card>
-      </Col>
-      <Col xs={12} sm={6}>
-        <Card size="small">
-          <Statistic
-            title="已批准"
-            value={statistics.approved}
-            valueStyle={{ color: '#52c41a' }}
-            prefix={<CheckCircleOutlined />}
-          />
-        </Card>
-      </Col>
-      <Col xs={12} sm={6}>
-        <Card size="small">
-          <Statistic
-            title="已驳回"
-            value={statistics.rejected}
-            valueStyle={{ color: '#ff4d4f' }}
-            prefix={<CloseCircleOutlined />}
-          />
-        </Card>
-      </Col>
-      <Col xs={12} sm={6}>
-        <Card size="small">
-          <Statistic
-            title="已完成退役"
-            value={statistics.retired}
-            valueStyle={{ color: '#1890ff' }}
-            prefix={<DeleteOutlined />}
-          />
-        </Card>
-      </Col>
-    </Row>
-  );
-
-  /**
-   * 渲染详情弹窗
-   */
-  const renderDetailModal = () => (
-    <Modal
-      title="退役申请详情"
-      open={detailModalVisible}
-      onCancel={() => setDetailModalVisible(false)}
-      footer={null}
-      width={700}
-      destroyOnClose
-    >
-      {currentApplication && (
-        <div className={styles.detailContent}>
-          <Row gutter={[16, 16]}>
-            <Col span={12}>
-              <Text type="secondary">申请编号：</Text>
-              <Text strong>{currentApplication.applicationNo}</Text>
-            </Col>
-            <Col span={12}>
-              <Text type="secondary">状态：</Text>
-              <Tag color={STATUS_CONFIG[currentApplication.status].color}>
-                {STATUS_CONFIG[currentApplication.status].label}
-              </Tag>
-            </Col>
-            <Col span={12}>
-              <Text type="secondary">资产编号：</Text>
-              <Text strong>{currentApplication.assetCode}</Text>
-            </Col>
-            <Col span={12}>
-              <Text type="secondary">资产名称：</Text>
-              <Text strong>{currentApplication.assetName}</Text>
-            </Col>
-            <Col span={12}>
-              <Text type="secondary">申请人：</Text>
-              <Text strong>{currentApplication.applicantName}</Text>
-            </Col>
-            <Col span={12}>
-              <Text type="secondary">所属部门：</Text>
-              <Text strong>{currentApplication.department}</Text>
-            </Col>
-            <Col span={24}>
-              <Divider orientation="left">退役原因</Divider>
-              <Text>{currentApplication.retirementReason || '未填写'}</Text>
-            </Col>
-            <Col span={12}>
-              <Text type="secondary">计划退役日期：</Text>
-              <Text>{dayjs(currentApplication.plannedRetirementDate).format('YYYY-MM-DD')}</Text>
-            </Col>
-            <Col span={12}>
-              <Text type="secondary">申请时间：</Text>
-              <Text>{dayjs(currentApplication.createdAt).format('YYYY-MM-DD HH:mm')}</Text>
-            </Col>
-            {currentApplication.actualRetirementDate && (
-              <Col span={12}>
-                <Text type="secondary">实际退役日期：</Text>
-                <Text>{dayjs(currentApplication.actualRetirementDate).format('YYYY-MM-DD')}</Text>
-              </Col>
-            )}
-          </Row>
-          
-          {currentApplication.approvalHistory && currentApplication.approvalHistory.length > 0 && (
-            <>
-              <Divider orientation="left">审批历史</Divider>
-              <div className={styles.approvalHistory}>
-                {currentApplication.approvalHistory.map((record, index) => (
-                  <div key={record.id || index} className={styles.historyItem}>
-                    <Badge status={record.action === 'APPROVE' ? 'success' : 'error'} />
-                    <Text>
-                      {record.approverName} -{' '}
-                      {record.action === 'APPROVE' ? '批准' : '驳回'}
-                      {record.comment && `：「${record.comment}」`}
-                    </Text>
-                    <Text type="secondary" className={styles.historyTime}>
-                      {dayjs(record.actionTime).format('YYYY-MM-DD HH:mm')}
-                    </Text>
-                  </div>
-                ))}
-              </div>
-            </>
-          )}
-        </div>
-      )}
-    </Modal>
-  );
-
-  /**
-   * 渲染审批弹窗
-   */
-  const renderApprovalModal = () => (
-    <Modal
-      title={
-        approvalForm.getFieldValue('action') === 'approve' ? '批准退役申请' : '驳回退役申请'
-      }
-      open={approvalModalVisible}
-      onCancel={handleCloseApproval}
-      footer={
-        <Space>
-          <Button onClick={handleCloseApproval}>取消</Button>
-          <Button
-            type="primary"
-            loading={approvalLoading}
-            onClick={handleSubmitApproval}
-          >
-            确认{approvalForm.getFieldValue('action') === 'approve' ? '批准' : '驳回'}
-          </Button>
-        </Space>
-      }
-      width={500}
-    >
-      <Form form={approvalForm} layout="vertical">
-        <Form.Item
-          name="comment"
-          label={approvalForm.getFieldValue('action') === 'approve' ? '审批意见' : '驳回原因'}
-          rules={[
-            { required: true, message: '请输入意见或原因' },
-            { max: 200, message: '意见不能超过200字符' },
-          ]}
-        >
-          <TextArea
-            rows={4}
-            placeholder={
-              approvalForm.getFieldValue('action') === 'approve'
-                ? '请输入审批意见（选填）'
-                : '请输入驳回原因（必填）'
-            }
-          />
-        </Form.Item>
-        {approvalForm.getFieldValue('action') === 'approve' && (
-          <Form.Item name="effectiveDate" label="生效日期">
-            <DatePicker style={{ width: '100%' }} />
-          </Form.Item>
-        )}
-      </Form>
-    </Modal>
-  );
-
   // ==================== 权限检查 ====================
 
   if (!canView) {
     return (
-      <Card>
-        <Empty
-          description="您没有权限查看此页面"
-          image={Empty.PRESENTED_IMAGE_SIMPLE}
-        />
-      </Card>
+      <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
+        <AlertCircle className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+        <p className="text-gray-500">您没有权限查看此页面</p>
+      </div>
     );
   }
 
   // ==================== 主渲染 ====================
 
+  /** Total pages for pagination */
+  const totalPages = Math.max(1, Math.ceil(pagination.total / pagination.pageSize));
+
   return (
-    <div className={styles.retirementApprovalList}>
-      <Title level={4} className={styles.pageTitle}>
-        资产退役审批
-      </Title>
-      
-      {renderStatistics()}
-      {renderFilters()}
-      
-      <Card className={styles.tableCard}>
-        <div className={styles.tableHeader}>
-          <Space>
-            <Text type="secondary">
+    <div className="space-y-6">
+      {/* Notification banner */}
+      {notice && (
+        <div className="text-sm text-green-700 bg-green-50 border border-green-100 rounded-lg px-4 py-3 flex items-center justify-between">
+          <span>{notice}</span>
+          <button onClick={() => setNotice(null)} className="text-green-600 hover:text-green-800">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+
+      {/* Page title */}
+      <div>
+        <h2 className="text-2xl font-semibold text-gray-900">资产退役审批</h2>
+      </div>
+
+      {/* 统计卡片 */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600">待审批</p>
+              <p className="text-3xl font-semibold text-yellow-600 mt-2">{statistics.pending}</p>
+            </div>
+            <div className="w-12 h-12 bg-yellow-50 rounded-lg flex items-center justify-center">
+              <Clock className="w-6 h-6 text-yellow-600" />
+            </div>
+          </div>
+        </div>
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600">已批准</p>
+              <p className="text-3xl font-semibold text-green-600 mt-2">{statistics.approved}</p>
+            </div>
+            <div className="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center">
+              <CheckCircle className="w-6 h-6 text-green-600" />
+            </div>
+          </div>
+        </div>
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600">已驳回</p>
+              <p className="text-3xl font-semibold text-red-600 mt-2">{statistics.rejected}</p>
+            </div>
+            <div className="w-12 h-12 bg-red-50 rounded-lg flex items-center justify-center">
+              <XCircle className="w-6 h-6 text-red-600" />
+            </div>
+          </div>
+        </div>
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600">已完成退役</p>
+              <p className="text-3xl font-semibold text-blue-600 mt-2">{statistics.retired}</p>
+            </div>
+            <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center">
+              <Trash2 className="w-6 h-6 text-blue-600" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 筛选器 */}
+      <div className="bg-white rounded-lg border border-gray-200 p-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 items-end">
+          {/* Status filter */}
+          <div>
+            <label className="block text-xs font-medium text-gray-500 mb-1">
+              <Filter className="w-3 h-3 inline mr-1" />
+              状态筛选
+            </label>
+            <select
+              value={filters.status}
+              onChange={(e) => handleFilterChange('status', e.target.value as RetirementStatus | 'ALL')}
+              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="ALL">全部状态</option>
+              {STATUS_OPTIONS.map(opt => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Keyword search */}
+          <div>
+            <label className="block text-xs font-medium text-gray-500 mb-1">
+              <Search className="w-3 h-3 inline mr-1" />
+              关键词搜索
+            </label>
+            <input
+              type="text"
+              placeholder="搜索资产编号/名称"
+              value={filters.keyword}
+              onChange={(e) => handleFilterChange('keyword', e.target.value)}
+              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          {/* Date range (simple inputs) */}
+          <div>
+            <label className="block text-xs font-medium text-gray-500 mb-1">日期范围</label>
+            <div className="flex gap-2">
+              <input
+                type="date"
+                value={filters.dateRange?.[0]?.format('YYYY-MM-DD') || ''}
+                onChange={(e) => {
+                  const start = e.target.value ? dayjs(e.target.value) : null;
+                  setFilters(prev => ({
+                    ...prev,
+                    dateRange: start ? [start, prev.dateRange?.[1] || start] : null,
+                  }));
+                }}
+                className="flex-1 px-2 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <input
+                type="date"
+                value={filters.dateRange?.[1]?.format('YYYY-MM-DD') || ''}
+                onChange={(e) => {
+                  const end = e.target.value ? dayjs(e.target.value) : null;
+                  setFilters(prev => ({
+                    ...prev,
+                    dateRange: end ? [prev.dateRange?.[0] || end, end] : null,
+                  }));
+                }}
+                className="flex-1 px-2 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+          </div>
+
+          {/* Action buttons */}
+          <div className="flex gap-2">
+            <button
+              onClick={handleResetFilters}
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              重置
+            </button>
+            <button
+              onClick={() => loadApplications()}
+              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
+            >
+              应用筛选
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* 表格区域 */}
+      <div className="bg-white rounded-lg border border-gray-200">
+        {/* Table header bar */}
+        <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <span className="text-sm text-gray-500">
               共 {pagination.total} 条申请记录
-            </Text>
+            </span>
             {selectedRowKeys.length > 0 && (
               <>
-                <Badge count={selectedRowKeys.length} />
-                <Button size="small" onClick={handleClearSelection}>
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                  {selectedRowKeys.length}
+                </span>
+                <button
+                  onClick={handleClearSelection}
+                  className="px-3 py-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors"
+                >
                   清除选择
-                </Button>
+                </button>
                 {canApprove && (
-                  <Popconfirm
-                    title={`确认批量审批 ${selectedRowKeys.length} 条申请？`}
-                    onConfirm={handleBatchApprove}
+                  <button
+                    onClick={() => setConfirmBatchVisible(true)}
+                    className="px-3 py-1 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded transition-colors disabled:opacity-50"
+                    disabled={approvalLoading}
                   >
-                    <Button type="primary" size="small" loading={approvalLoading}>
-                      批量批准
-                    </Button>
-                  </Popconfirm>
+                    {approvalLoading ? '处理中...' : '批量批准'}
+                  </button>
                 )}
               </>
             )}
-          </Space>
+          </div>
         </div>
-        
-        <Spin spinning={loading}>
-          <Table
-            columns={columns}
-            dataSource={applications}
-            rowKey="id"
-            loading={loading}
-            pagination={{
-              ...pagination,
-              showSizeChanger: true,
-              showQuickJumper: true,
-              showTotal: total => `共 ${total} 条`,
-            }}
-            onChange={handleTableChange}
-            rowSelection={
-              canApprove
-                ? {
-                    selectedRowKeys,
-                    onChange: setSelectedRowKeys,
-                    getCheckboxProps: record => ({
-                      disabled: record.status !== 'PENDING_APPROVAL',
-                    }),
+
+        {/* Loading state */}
+        {loading ? (
+          <div className="px-6 py-8 text-sm text-gray-500 text-center">加载中...</div>
+        ) : (
+          <>
+            {/* HTML Table */}
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50 border-b border-gray-200">
+                  <tr>
+                    {canApprove && (
+                      <th className="px-4 py-3 text-left w-10">
+                        <input
+                          type="checkbox"
+                          checked={selectedRowKeys.length > 0 && selectedRowKeys.length === applications.filter(a => a.status === 'PENDING_APPROVAL').length}
+                          onChange={() => {
+                            const pendingIds = applications.filter(a => a.status === 'PENDING_APPROVAL').map(a => a.id);
+                            if (selectedRowKeys.length === pendingIds.length) {
+                              setSelectedRowKeys([]);
+                            } else {
+                              setSelectedRowKeys(pendingIds);
+                            }
+                          }}
+                          className="rounded border-gray-300"
+                        />
+                      </th>
+                    )}
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">申请编号</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">资产编号</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">资产名称</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">申请人</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">所属部门</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">退役原因</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">计划退役日期</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">状态</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">申请时间</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">操作</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {applications.length === 0 ? (
+                    <tr>
+                      <td colSpan={canApprove ? 11 : 10} className="px-6 py-8 text-sm text-gray-500 text-center">暂无数据</td>
+                    </tr>
+                  ) : (
+                    applications.map((record) => {
+                      const statusConfig = STATUS_CONFIG[record.status] || STATUS_CONFIG.DRAFT;
+                      const isSelected = selectedRowKeys.includes(record.id);
+                      return (
+                        <tr
+                          key={record.id}
+                          className={`hover:bg-gray-50 ${isSelected ? 'bg-blue-50' : ''}`}
+                        >
+                          {canApprove && (
+                            <td className="px-4 py-3">
+                              <input
+                                type="checkbox"
+                                checked={isSelected}
+                                onChange={() => handleToggleRow(record.id, record.status)}
+                                disabled={record.status !== 'PENDING_APPROVAL'}
+                                className="rounded border-gray-300 disabled:opacity-50"
+                              />
+                            </td>
+                          )}
+                          <td className="px-4 py-3 text-sm font-semibold text-blue-600">{record.applicationNo}</td>
+                          <td className="px-4 py-3 text-sm text-gray-900">{record.assetCode}</td>
+                          <td className="px-4 py-3 text-sm text-gray-900 max-w-[180px] truncate">{record.assetName}</td>
+                          <td className="px-4 py-3 text-sm text-gray-900">{record.applicantName}</td>
+                          <td className="px-4 py-3 text-sm text-gray-600">{record.department}</td>
+                          <td className="px-4 py-3 text-sm text-gray-600 max-w-[200px] truncate" title={record.retirementReason}>{record.retirementReason}</td>
+                          <td className="px-4 py-3 text-sm text-gray-600">{record.plannedRetirementDate ? dayjs(record.plannedRetirementDate).format('YYYY-MM-DD') : '-'}</td>
+                          <td className="px-4 py-3">
+                            <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-full ${statusConfig.bg}`}>
+                              {record.status === 'PENDING_APPROVAL' && <Clock className="w-3 h-3" />}
+                              {statusConfig.label}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-sm text-gray-600">{dayjs(record.createdAt).format('YYYY-MM-DD HH:mm')}</td>
+                          <td className="px-4 py-3 text-sm">
+                            <div className="flex gap-1">
+                              <button
+                                onClick={() => handleViewDetail(record)}
+                                className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 rounded transition-colors"
+                              >
+                                <Eye className="w-3 h-3" />
+                                详情
+                              </button>
+                              {record.status === 'PENDING_APPROVAL' && canApprove && (
+                                <>
+                                  <button
+                                    onClick={() => handleOpenApproval(record, 'approve')}
+                                    className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-green-700 bg-green-50 hover:bg-green-100 rounded transition-colors"
+                                  >
+                                    <CheckCircle className="w-3 h-3" />
+                                    批准
+                                  </button>
+                                  <button
+                                    onClick={() => handleOpenApproval(record, 'reject')}
+                                    className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-red-700 bg-red-50 hover:bg-red-100 rounded transition-colors"
+                                  >
+                                    <XCircle className="w-3 h-3" />
+                                    驳回
+                                  </button>
+                                </>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Pagination */}
+            {pagination.total > pagination.pageSize && (
+              <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
+                <span className="text-sm text-gray-500">
+                  共 {pagination.total} 条
+                </span>
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => handlePageChange(pagination.current - 1)}
+                    disabled={pagination.current <= 1}
+                    className="px-3 py-1.5 text-sm border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    上一页
+                  </button>
+                  {Array.from({ length: totalPages }, (_, i) => i + 1)
+                    .filter(page => {
+                      // Show first, last, and pages near current
+                      return page === 1 || page === totalPages || Math.abs(page - pagination.current) <= 1;
+                    })
+                    .map((page, idx, arr) => (
+                      <React.Fragment key={page}>
+                        {idx > 0 && arr[idx - 1] !== page - 1 && (
+                          <span className="px-2 text-gray-400">...</span>
+                        )}
+                        <button
+                          onClick={() => handlePageChange(page)}
+                          className={`px-3 py-1.5 text-sm rounded transition-colors ${
+                            page === pagination.current
+                              ? 'bg-blue-600 text-white'
+                              : 'border border-gray-300 hover:bg-gray-50'
+                          }`}
+                        >
+                          {page}
+                        </button>
+                      </React.Fragment>
+                    ))}
+                  <button
+                    onClick={() => handlePageChange(pagination.current + 1)}
+                    disabled={pagination.current >= totalPages}
+                    className="px-3 py-1.5 text-sm border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    下一页
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+
+      {/* ==================== 详情弹窗 ==================== */}
+      {detailModalVisible && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => setDetailModalVisible(false)}>
+          <div className="bg-white rounded-lg shadow-xl max-w-3xl w-full mx-4 max-h-[80vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+            <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-gray-900">退役申请详情</h3>
+              <button onClick={() => setDetailModalVisible(false)} className="text-gray-400 hover:text-gray-600 text-xl">&times;</button>
+            </div>
+            <div className="p-6">
+              {currentApplication && (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <span className="text-sm text-gray-500">申请编号：</span>
+                      <span className="text-sm font-semibold text-gray-900">{currentApplication.applicationNo}</span>
+                    </div>
+                    <div>
+                      <span className="text-sm text-gray-500">状态：</span>
+                      <span className={`inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full ${(STATUS_CONFIG[currentApplication.status] || STATUS_CONFIG.DRAFT).bg}`}>
+                        {(STATUS_CONFIG[currentApplication.status] || STATUS_CONFIG.DRAFT).label}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-sm text-gray-500">资产编号：</span>
+                      <span className="text-sm font-semibold text-gray-900">{currentApplication.assetCode}</span>
+                    </div>
+                    <div>
+                      <span className="text-sm text-gray-500">资产名称：</span>
+                      <span className="text-sm font-semibold text-gray-900">{currentApplication.assetName}</span>
+                    </div>
+                    <div>
+                      <span className="text-sm text-gray-500">申请人：</span>
+                      <span className="text-sm font-semibold text-gray-900">{currentApplication.applicantName}</span>
+                    </div>
+                    <div>
+                      <span className="text-sm text-gray-500">所属部门：</span>
+                      <span className="text-sm font-semibold text-gray-900">{currentApplication.department}</span>
+                    </div>
+                  </div>
+
+                  <div className="border-t border-gray-200 pt-4">
+                    <h4 className="text-sm font-semibold text-gray-900 mb-2">退役原因</h4>
+                    <p className="text-sm text-gray-600">{currentApplication.retirementReason || '未填写'}</p>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <span className="text-sm text-gray-500">计划退役日期：</span>
+                      <span className="text-sm text-gray-900">{dayjs(currentApplication.plannedRetirementDate).format('YYYY-MM-DD')}</span>
+                    </div>
+                    <div>
+                      <span className="text-sm text-gray-500">申请时间：</span>
+                      <span className="text-sm text-gray-900">{dayjs(currentApplication.createdAt).format('YYYY-MM-DD HH:mm')}</span>
+                    </div>
+                    {currentApplication.actualRetirementDate && (
+                      <div>
+                        <span className="text-sm text-gray-500">实际退役日期：</span>
+                        <span className="text-sm text-gray-900">{dayjs(currentApplication.actualRetirementDate).format('YYYY-MM-DD')}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* 审批历史 */}
+                  {currentApplication.approvalHistory && currentApplication.approvalHistory.length > 0 && (
+                    <div className="border-t border-gray-200 pt-4">
+                      <h4 className="text-sm font-semibold text-gray-900 mb-3">审批历史</h4>
+                      <div className="space-y-3">
+                        {currentApplication.approvalHistory.map((record, index) => (
+                          <div key={record.id || index} className="flex items-start gap-3">
+                            <div className={`mt-1.5 w-3 h-3 rounded-full flex-shrink-0 ${
+                              record.action === 'APPROVE' ? 'bg-green-500' : 'bg-red-500'
+                            }`} />
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-3 mb-1">
+                                <span className="text-sm font-semibold text-gray-900">{record.approverName}</span>
+                                <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${
+                                  record.action === 'APPROVE' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                                }`}>
+                                  {record.action === 'APPROVE' ? '批准' : '驳回'}
+                                </span>
+                              </div>
+                              {record.comment && (
+                                <p className="text-sm text-gray-600">「{record.comment}」</p>
+                              )}
+                              <span className="text-xs text-gray-400">{dayjs(record.actionTime).format('YYYY-MM-DD HH:mm')}</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ==================== 审批弹窗 ==================== */}
+      {approvalModalVisible && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={handleCloseApproval}>
+          <div className="bg-white rounded-lg shadow-xl max-w-lg w-full mx-4" onClick={e => e.stopPropagation()}>
+            <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-gray-900">
+                {approvalAction === 'approve' ? '批准退役申请' : '驳回退役申请'}
+              </h3>
+              <button onClick={handleCloseApproval} className="text-gray-400 hover:text-gray-600 text-xl">&times;</button>
+            </div>
+            <div className="p-6 space-y-4">
+              {/* Comment textarea */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {approvalAction === 'approve' ? '审批意见' : '驳回原因'}
+                  <span className="text-red-500 ml-1">*</span>
+                </label>
+                <textarea
+                  rows={4}
+                  value={approvalComment}
+                  onChange={(e) => { setApprovalComment(e.target.value); setApprovalCommentError(''); }}
+                  placeholder={
+                    approvalAction === 'approve'
+                      ? '请输入审批意见（选填）'
+                      : '请输入驳回原因（必填）'
                   }
-                : undefined
-            }
-            scroll={{ x: 1300 }}
-          />
-        </Spin>
-      </Card>
-      
-      {renderDetailModal()}
-      {renderApprovalModal()}
+                  maxLength={200}
+                  className={`w-full px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none ${approvalCommentError ? 'border-red-300' : 'border-gray-300'}`}
+                />
+                {approvalCommentError && <p className="text-xs text-red-600 mt-1">{approvalCommentError}</p>}
+                <p className="text-xs text-gray-400 mt-1">{approvalComment.length}/200</p>
+              </div>
+
+              {/* Effective date (approve only) */}
+              {approvalAction === 'approve' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">生效日期</label>
+                  <input
+                    type="date"
+                    value={approvalEffectiveDate}
+                    onChange={(e) => setApprovalEffectiveDate(e.target.value)}
+                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              )}
+
+              {/* Actions */}
+              <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
+                <button
+                  onClick={handleCloseApproval}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  取消
+                </button>
+                <button
+                  onClick={handleSubmitApproval}
+                  disabled={approvalLoading}
+                  className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {approvalLoading ? '处理中...' : `确认${approvalAction === 'approve' ? '批准' : '驳回'}`}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ==================== 批量审批确认弹窗 ==================== */}
+      {confirmBatchVisible && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => setConfirmBatchVisible(false)}>
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4" onClick={e => e.stopPropagation()}>
+            <div className="p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <AlertCircle className="w-6 h-6 text-yellow-600" />
+                <h3 className="text-lg font-semibold text-gray-900">确认批量审批</h3>
+              </div>
+              <p className="text-sm text-gray-600 mb-6">确认批量审批 {selectedRowKeys.length} 条申请？</p>
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={() => setConfirmBatchVisible(false)}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  取消
+                </button>
+                <button
+                  onClick={handleBatchApprove}
+                  disabled={approvalLoading}
+                  className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {approvalLoading ? '处理中...' : '确认'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
