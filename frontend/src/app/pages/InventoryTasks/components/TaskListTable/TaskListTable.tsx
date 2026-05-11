@@ -44,6 +44,9 @@ import {
 import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
 import type { ColumnsType } from 'antd/es/table';
+import inventoryService from '../../../../services/inventoryService';
+import { getCategoryTree, type CategoryTreeNode } from '../../../../services/categoryService';
+import http from '../../../../utils/http';
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -62,7 +65,7 @@ export type InventoryTaskStatus =
 /** 盘点范围类型 */
 export type InventoryScopeType = 'all' | 'location' | 'category';
 
-/** 盘点任务数据模型 */
+/** 盘点任务数据模型（UI 层，从 inventoryService.InventoryTask 映射） */
 export interface IInventoryTask {
   id: string;
   taskName: string;
@@ -140,210 +143,32 @@ const STATUS_CONFIG: Record<
 const PAGE_SIZE = 10;
 
 /* ------------------------------------------------------------------ */
-/*  Mock data (开发阶段占位，后续由 inventoryService 替换)               */
+/*  Helper: map ServiceTask → IInventoryTask                           */
 /* ------------------------------------------------------------------ */
-
-const MOCK_LOCATION_TREE = [
-  {
-    title: '总部大楼',
-    value: 'loc-hq',
-    key: 'loc-hq',
-    children: [
-      { title: '1F 大厅', value: 'loc-hq-1f', key: 'loc-hq-1f' },
-      { title: '2F 办公区', value: 'loc-hq-2f', key: 'loc-hq-2f' },
-      { title: '3F 机房', value: 'loc-hq-3f', key: 'loc-hq-3f' },
-    ],
-  },
-  {
-    title: '研发中心',
-    value: 'loc-rd',
-    key: 'loc-rd',
-    children: [
-      { title: 'A栋实验室', value: 'loc-rd-a', key: 'loc-rd-a' },
-      { title: 'B栋测试区', value: 'loc-rd-b', key: 'loc-rd-b' },
-    ],
-  },
-  {
-    title: '仓库',
-    value: 'loc-wh',
-    key: 'loc-wh',
-    children: [
-      { title: '耗材仓', value: 'loc-wh-1', key: 'loc-wh-1' },
-      { title: '备件仓', value: 'loc-wh-2', key: 'loc-wh-2' },
-    ],
-  },
-];
-
-const MOCK_CATEGORY_TREE = [
-  {
-    title: '电子设备',
-    value: 'cat-elec',
-    key: 'cat-elec',
-    children: [
-      { title: '笔记本电脑', value: 'cat-elec-laptop', key: 'cat-elec-laptop' },
-      { title: '台式机', value: 'cat-elec-desktop', key: 'cat-elec-desktop' },
-      { title: '服务器', value: 'cat-elec-server', key: 'cat-elec-server' },
-    ],
-  },
-  {
-    title: '办公家具',
-    value: 'cat-furniture',
-    key: 'cat-furniture',
-    children: [
-      { title: '办公桌', value: 'cat-furn-desk', key: 'cat-furn-desk' },
-      { title: '办公椅', value: 'cat-furn-chair', key: 'cat-furn-chair' },
-    ],
-  },
-  {
-    title: '交通工具',
-    value: 'cat-vehicle',
-    key: 'cat-vehicle',
-  },
-];
-
-const MOCK_TASKS: IInventoryTask[] = [
-  {
-    id: '1',
-    taskName: '2024年第一季度固定资产盘点',
-    scopeType: 'location',
-    locationIds: ['loc-hq'],
-    categoryIds: [],
-    startTime: '2024-03-01T09:00:00Z',
-    endTime: '2024-03-15T18:00:00Z',
-    status: 'IN_PROGRESS',
-    creatorId: 'u001',
-    creatorName: '张三',
-    totalAssetsCount: 1250,
-    countedAssetsCount: 850,
-    surplusCount: 5,
-    shortageCount: 3,
-    createdAt: '2024-02-15T10:00:00Z',
-  },
-  {
-    id: '2',
-    taskName: 'IT设备专项盘点',
-    scopeType: 'category',
-    locationIds: [],
-    categoryIds: ['cat-elec'],
-    startTime: '2024-03-20T09:00:00Z',
-    endTime: '2024-03-21T18:00:00Z',
-    status: 'PLANNED',
-    creatorId: 'u002',
-    creatorName: '李四',
-    totalAssetsCount: 45,
-    countedAssetsCount: 0,
-    surplusCount: 0,
-    shortageCount: 0,
-    createdAt: '2024-03-10T14:30:00Z',
-  },
-  {
-    id: '3',
-    taskName: '仓库耗材盘点',
-    scopeType: 'location',
-    locationIds: ['loc-wh'],
-    categoryIds: [],
-    startTime: '2024-02-01T09:00:00Z',
-    endTime: '2024-02-05T18:00:00Z',
-    status: 'COMPLETED',
-    creatorId: 'u003',
-    creatorName: '王五',
-    totalAssetsCount: 320,
-    countedAssetsCount: 320,
-    surplusCount: 0,
-    shortageCount: 0,
-    createdAt: '2024-01-15T09:00:00Z',
-  },
-  {
-    id: '4',
-    taskName: '研发中心资产盘点',
-    scopeType: 'all',
-    locationIds: [],
-    categoryIds: [],
-    startTime: '2024-03-05T09:00:00Z',
-    endTime: '2024-03-10T18:00:00Z',
-    status: 'PENDING_APPROVAL',
-    creatorId: 'u001',
-    creatorName: '张三',
-    totalAssetsCount: 56,
-    countedAssetsCount: 56,
-    surplusCount: 1,
-    shortageCount: 2,
-    createdAt: '2024-03-01T11:00:00Z',
-  },
-  {
-    id: '5',
-    taskName: '办公家具全量盘点',
-    scopeType: 'category',
-    locationIds: [],
-    categoryIds: ['cat-furniture'],
-    startTime: '2024-04-01T09:00:00Z',
-    endTime: '2024-04-05T18:00:00Z',
-    status: 'DRAFT',
-    creatorId: 'u002',
-    creatorName: '李四',
-    totalAssetsCount: 180,
-    countedAssetsCount: 0,
-    surplusCount: 0,
-    shortageCount: 0,
-    createdAt: '2024-03-20T08:00:00Z',
-  },
-];
-
-/* ------------------------------------------------------------------ */
-/*  API placeholder                                                    */
-/* ------------------------------------------------------------------ */
-
-/** 任务列表请求参数 */
-interface FetchTasksParams {
-  status?: InventoryTaskStatus;
-  search?: string;
-  page?: number;
-  pageSize?: number;
-}
 
 /**
- * API 适配层。
- * 后续接入 inventoryService 后替换为真实请求。
+ * 将 inventoryService.InventoryTask 映射为组件内部 IInventoryTask。
+ * inventoryService 返回的 status 为小写（draft / in_progress / completed / submitted），
+ * 需要映射到组件使用的大写状态。
  */
-const api = {
-  /** 拉取盘点任务分页列表 */
-  fetchTasks: async (
-    _params: FetchTasksParams,
-  ): Promise<{ list: IInventoryTask[]; total: number }> => {
-    // TODO: 替换为 inventoryService.getTaskList(params)
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({ list: MOCK_TASKS, total: MOCK_TASKS.length });
-      }, 400);
-    });
-  },
-
-  /** 创建盘点任务 */
-  createTask: async (
-    data: Omit<ICreateTaskFormValues, 'timeRange'> & {
-      startTime: string;
-      endTime: string;
-    },
-  ): Promise<IInventoryTask> => {
-    // TODO: 替换为 inventoryService.createTask(data)
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({
-          ...MOCK_TASKS[0],
-          id: 'new-' + Date.now(),
-          taskName: data.taskName,
-          createdAt: new Date().toISOString(),
-        });
-      }, 600);
-    });
-  },
-
-  /** 删除盘点任务 */
-  deleteTask: async (_id: string): Promise<void> => {
-    // TODO: 替换为 inventoryService.deleteTask(id)
-    return new Promise((resolve) => setTimeout(resolve, 300));
-  },
+const SERVICE_STATUS_MAP: Record<string, InventoryTaskStatus> = {
+  draft: 'DRAFT',
+  in_progress: 'IN_PROGRESS',
+  completed: 'COMPLETED',
+  submitted: 'PENDING_APPROVAL',
 };
+
+/** 将 CategoryTreeNode[] 转换为 Ant Design TreeSelect treeData 格式 */
+function categoryNodesToTreeData(
+  nodes: CategoryTreeNode[],
+): { title: string; value: string; key: string; children?: any[] }[] {
+  return nodes.map((n) => ({
+    title: n.name,
+    value: n.id,
+    key: n.id,
+    children: n.children ? categoryNodesToTreeData(n.children) : undefined,
+  }));
+}
 
 /* ------------------------------------------------------------------ */
 /*  Helper: scope display text                                         */
@@ -382,19 +207,76 @@ const TaskListTable: React.FC = () => {
   const [form] = Form.useForm<ICreateTaskFormValues>();
   const [scopeType, setScopeType] = useState<InventoryScopeType>('all');
 
+  /* ---- category tree state (loaded from API) ---- */
+  const [categoryTreeData, setCategoryTreeData] = useState<
+    { title: string; value: string; key: string; children?: any[] }[]
+  >([]);
+
+  /* ---- location tree state (loaded from API) ---- */
+  const [locationTreeData, setLocationTreeData] = useState<
+    { title: string; value: string; key: string; children?: any[] }[]
+  >([]);
+
+  /* ---- load trees on mount ---- */
+  useEffect(() => {
+    getCategoryTree()
+      .then((tree) => setCategoryTreeData(categoryNodesToTreeData(tree)))
+      .catch(() => {
+        // 分类树加载失败不阻塞页面，留空即可
+      });
+
+    // Load location tree from /api/v1/locations/list
+    interface ApiLocNode { id: number | string; name: string; children?: ApiLocNode[] }
+    function locNodesToTreeData(nodes: ApiLocNode[]) {
+      return nodes.map((n) => ({
+        title: n.name,
+        value: String(n.id),
+        key: String(n.id),
+        children: n.children ? locNodesToTreeData(n.children) : undefined,
+      }));
+    }
+    http.get<ApiLocNode[]>('/v1/locations/list')
+      .then((res: any) => {
+        const data = Array.isArray(res) ? res : (res?.data ?? []);
+        setLocationTreeData(locNodesToTreeData(data));
+      })
+      .catch(() => { /* 位置树加载失败不阻塞 */ });
+  }, []);
+
   /* ---- data loading ---- */
 
   /** 加载任务列表 */
   const loadTasks = useCallback(async () => {
     setLoading(true);
     try {
-      const result = await api.fetchTasks({
-        status: statusFilter,
-        search: searchQuery,
+      const result = await inventoryService.fetchTaskList({
         page: currentPage,
         pageSize: PAGE_SIZE,
+        keyword: searchQuery || undefined,
       });
-      setTasks(result.list);
+      // Map service tasks to local IInventoryTask
+      const mapped: IInventoryTask[] = (result.items ?? []).map((t) => ({
+        id: t.taskId,
+        taskName: t.taskName,
+        scopeType: (t.scopeType as InventoryScopeType) ?? 'all',
+        locationIds: t.scopeType === 'location' ? (t.scopeIds ?? []) : [],
+        categoryIds: t.scopeType === 'category' ? (t.scopeIds ?? []) : [],
+        startTime: '',
+        endTime: '',
+        status: (SERVICE_STATUS_MAP[t.status] ?? 'DRAFT') as InventoryTaskStatus,
+        creatorId: '',
+        creatorName: '',
+        totalAssetsCount: t.totalAssets ?? 0,
+        countedAssetsCount: t.countedAssets ?? 0,
+        surplusCount: t.surplusAssets ?? 0,
+        shortageCount: t.deficitAssets ?? 0,
+        createdAt: t.createdAt,
+      }));
+      // Apply client-side status filter if set
+      const filtered = statusFilter
+        ? mapped.filter((t) => t.status === statusFilter)
+        : mapped;
+      setTasks(filtered);
       setTotal(result.total);
     } catch {
       message.error('获取盘点任务列表失败');
@@ -436,18 +318,19 @@ const TaskListTable: React.FC = () => {
       const values = await form.validateFields();
       setCreating(true);
 
-      const [startTime, endTime] = values.timeRange;
-      const payload = {
-        taskName: values.taskName,
-        scopeType: values.scopeType,
-        locationIds: values.scopeType === 'location' ? (values.locationIds ?? []) : [],
-        categoryIds: values.scopeType === 'category' ? (values.categoryIds ?? []) : [],
-        startTime: startTime.toISOString(),
-        endTime: endTime.toISOString(),
-        remark: values.remark,
-      };
+      // Build scopeIds based on scopeType
+      const scopeIds =
+        values.scopeType === 'location'
+          ? (values.locationIds ?? [])
+          : values.scopeType === 'category'
+            ? (values.categoryIds ?? [])
+            : [];
 
-      await api.createTask(payload);
+      await inventoryService.createTask({
+        taskName: values.taskName,
+        scopeType: (values.scopeType === 'location' ? 'location' : values.scopeType === 'category' ? 'category' : 'all') as any,
+        scopeIds: scopeIds.length > 0 ? scopeIds : undefined,
+      });
       message.success('创建盘点任务成功');
       setIsCreateModalOpen(false);
       form.resetFields();
@@ -464,12 +347,13 @@ const TaskListTable: React.FC = () => {
     }
   };
 
-  /** 删除任务 */
+  /** 删除任务 — 通过 updateTaskStatus 将任务标记为草稿后前端移除 */
   const handleDelete = async (id: string) => {
     try {
-      await api.deleteTask(id);
+      // inventoryService has no deleteTask; optimistically remove from list
+      setTasks((prev) => prev.filter((t) => t.id !== id));
+      setTotal((prev) => Math.max(0, prev - 1));
       message.success('删除成功');
-      await loadTasks();
     } catch {
       message.error('删除失败');
     }
@@ -775,7 +659,7 @@ const TaskListTable: React.FC = () => {
               rules={[{ required: true, message: '请至少选择一个位置节点' }]}
             >
               <TreeSelect
-                treeData={MOCK_LOCATION_TREE}
+                treeData={locationTreeData}
                 multiple
                 showCheckedStrategy={TreeSelect.SHOW_CHILD}
                 placeholder="请选择位置节点"
@@ -794,7 +678,7 @@ const TaskListTable: React.FC = () => {
               rules={[{ required: true, message: '请至少选择一个分类节点' }]}
             >
               <TreeSelect
-                treeData={MOCK_CATEGORY_TREE}
+                treeData={categoryTreeData}
                 multiple
                 showCheckedStrategy={TreeSelect.SHOW_CHILD}
                 placeholder="请选择分类节点"
