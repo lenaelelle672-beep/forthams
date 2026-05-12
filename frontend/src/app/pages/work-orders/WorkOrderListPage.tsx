@@ -36,7 +36,6 @@ import {
   Loader2,
 } from "lucide-react";
 import {
-  getWorkOrderStatusLabel,
   getPriorityLabel,
   isSubmittableStatus,
   isDeletableStatus,
@@ -45,6 +44,7 @@ import {
   useWorkOrderList,
   useWorkOrderMutation,
 } from "../../hooks/useWorkOrders";
+import { WorkOrderStatusBadge } from "./components/WorkOrderStatusBadge";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -82,35 +82,8 @@ const STATUS_TABS: TabConfig[] = [
 const SEARCH_DEBOUNCE_MS = 300;
 
 // ---------------------------------------------------------------------------
-// Status badge helpers
+// Priority badge helper (used inline in table)
 // ---------------------------------------------------------------------------
-
-/**
- * Get Tailwind CSS classes for status badge based on work order status.
- *
- * @param status — the backend status string
- * @returns CSS class string for the badge
- */
-function getStatusBadgeClasses(status?: string): string {
-  switch (status) {
-    case "DRAFT":
-      return "bg-gray-100 text-gray-800";
-    case "PENDING":
-      return "bg-yellow-100 text-yellow-800";
-    case "APPROVED":
-      return "bg-blue-100 text-blue-800";
-    case "EXECUTING":
-      return "bg-indigo-100 text-indigo-800";
-    case "COMPLETED":
-      return "bg-green-100 text-green-800";
-    case "REJECTED":
-      return "bg-red-100 text-red-800";
-    case "CANCELLED":
-      return "bg-gray-200 text-gray-600";
-    default:
-      return "bg-gray-100 text-gray-600";
-  }
-}
 
 /**
  * Get Tailwind CSS classes for priority badge.
@@ -539,12 +512,10 @@ export function WorkOrderListPage() {
                       {order.assigneeName || "-"}
                     </td>
                     <td className="px-6 py-4">
-                      <span
-                        className={`px-2.5 py-1 text-xs font-medium rounded-full ${getStatusBadgeClasses(order.status)}`}
+                      <WorkOrderStatusBadge
+                        status={order.status}
                         data-testid={`work-order-status-${order.id}`}
-                      >
-                        {getWorkOrderStatusLabel(order.status)}
-                      </span>
+                      />
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-600">
                       {order.createTime || "-"}
