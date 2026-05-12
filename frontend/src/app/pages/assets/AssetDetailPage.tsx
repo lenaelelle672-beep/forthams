@@ -2,17 +2,20 @@
  * AssetDetailPage — Unified asset detail page with retirement integration.
  *
  * SWARM-038: Displays asset details with a dynamic "Apply for Retirement" button
- * that respects terminal state constraints. Uses real API via useAssetById hook
+ * that respects terminal state constraints. Uses real API via useAssetDetail hook
  * and useAssetRetirementStatus hook for retirement eligibility checks.
+ *
+ * SWARM-049: Enhanced with edit/delete navigation buttons and useAssetDetail
+ * hook integration for real API data fetching.
  *
  * ATB-05: Terminal-state assets (SCRAPPED/RETIRED/DISPOSED) have the retirement
  * button physically disabled with both `disabled` and `aria-disabled` attributes.
  *
  * @module pages/assets/AssetDetailPage
- * @since SWARM-015, SWARM-033, SWARM-038
+ * @since SWARM-015, SWARM-033, SWARM-038, SWARM-049
  */
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import {
   Card,
@@ -29,8 +32,9 @@ import {
   RefreshCw,
   FileText,
   AlertTriangle,
+  Pencil,
 } from 'lucide-react';
-import { assetService, type AssetRecord } from '../../services/assetService';
+import { useAssetDetail } from '../../hooks/useAssets';
 import {
   useAssetRetirementStatus,
   isTerminalAssetStatus,
@@ -87,51 +91,20 @@ function formatDate(value: string | undefined | null): string {
  * and a retirement action button. The button is disabled for terminal-state
  * assets (SCRAPPED, RETIRED, DISPOSED).
  *
+ * Uses the useAssetDetail hook for real API data fetching with auto-fetch
+ * when assetId is available from URL params.
+ *
  * @returns The asset detail page JSX
  */
 export const AssetDetailPage: React.FC = () => {
   const navigate = useNavigate();
   const { id: assetId } = useParams<{ id: string }>();
 
-  // -- Asset data state -------------------------------------------------------
-  const [asset, setAsset] = useState<AssetRecord | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  // -- Asset detail hook (auto-fetches by assetId) ----------------------------
+  const { asset, loading, error, refresh } = useAssetDetail(assetId);
 
   // -- Retirement status hook -------------------------------------------------
-  const {
-    isTerminal,
-    retirementDisabled,
-  } = useAssetRetirementStatus(assetId ?? null);
-
-  /**
-   * Fetch asset data from the real API.
-   */
-  const fetchAsset = useCallback(async () => {
-    if (!assetId) {
-      setLoading(false);
-      setError('缺少资产ID');
-      return;
-    }
-
-    setLoading(true);
-    setError(null);
-
-    try {
-      const record = await assetService.getById(assetId);
-      setAsset(record);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : '获取资产详情失败';
-      setError(message);
-      setAsset(null);
-    } finally {
-      setLoading(false);
-    }
-  }, [assetId]);
-
-  useEffect(() => {
-    fetchAsset();
-  }, [fetchAsset]);
+  const { retirementDisabled } = useAssetRetirementStatus(assetId ?? null);
 
   /**
    * Navigate to the retirement application page for this asset.
@@ -178,7 +151,7 @@ export const AssetDetailPage: React.FC = () => {
                 <ArrowLeft className="w-4 h-4 mr-1" />
                 返回
               </Button>
-              <Button variant="outline" onClick={fetchAsset}>
+              <Button variant="outline" onClick={refresh}>
                 <RefreshCw className="w-4 h-4 mr-1" />
                 重试
               </Button>
@@ -219,7 +192,12 @@ export const AssetDetailPage: React.FC = () => {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="sm" onClick={fetchAsset}>
+          <Button variant="ghost" size="sm" onClick={() => navigate(`/assets/${assetId}/edit`)}
+            data-testid="btn-edit-asset" title="编辑资产"
+          >
+            <Pencil className="w-4 h-4" />
+          </Button>
+          <Button variant="ghost" size="sm" onClick={refresh} data-testid="btn-refresh-asset">
             <RefreshCw className="w-4 h-4" />
           </Button>
         </div>
