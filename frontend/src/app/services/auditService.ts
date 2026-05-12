@@ -602,6 +602,50 @@ export async function fetchAuditDashboardData(
 }
 
 // ---------------------------------------------------------------------------
+// Types: Audit Detail
+// ---------------------------------------------------------------------------
+
+/**
+ * 审计日志详情记录（含 Request/Response/Metadata 展开）
+ */
+export interface AuditLogDetail {
+  /** 日志唯一标识 */
+  id: string;
+  /** 操作人 ID */
+  operator_id: string;
+  /** 操作人姓名 */
+  operator_name: string;
+  /** 操作类型 */
+  action_type: string;
+  /** 资源类型 */
+  resource_type: string;
+  /** 资源 ID */
+  resource_id: string;
+  /** 操作详情（JSON 字符串或纯文本） */
+  detail: string;
+  /** 操作来源 IP */
+  ip_address: string;
+  /** 操作时间，ISO 8601 UTC 格式 */
+  created_at: string;
+  /** 请求载荷（可选，JSON 字符串） */
+  request_payload?: string;
+  /** 响应载荷（可选，JSON 字符串） */
+  response_payload?: string;
+  /** 扩展元数据（可选） */
+  metadata?: Record<string, unknown>;
+}
+
+/**
+ * 审计日志详情 API 响应
+ */
+export interface AuditLogDetailResponse {
+  /** 是否成功 */
+  success: boolean;
+  /** 日志详情数据 */
+  data: AuditLogDetail;
+}
+
+// ---------------------------------------------------------------------------
 // Permission Check Helper
 // ---------------------------------------------------------------------------
 
@@ -622,6 +666,42 @@ export function hasAuditPermission(userRoles: string[]): boolean {
   return userRoles.some(
     (role) => AUDIT_ALLOWED_ROLES.includes(role as typeof AUDIT_ALLOWED_ROLES[number])
   );
+}
+
+// ---------------------------------------------------------------------------
+// API: Audit Log Detail
+// ---------------------------------------------------------------------------
+
+/**
+ * 获取单条审计日志的详情数据，含 Request/Response/Metadata 展开。
+ * 通过 GET /api/v1/audit-log/:id 获取。
+ *
+ * @param id 审计日志唯一标识
+ * @returns 审计日志详情
+ * @throws 日志不存在时返回 404
+ */
+export async function fetchAuditDetail(id: string): Promise<AuditLogDetail> {
+  const response = await fetch(`${API_BASE}/${encodeURIComponent(id)}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+  });
+
+  if (!response.ok) {
+    const error = new Error(
+      response.status === 404
+        ? '审计日志未找到'
+        : `请求失败: HTTP ${response.status}`,
+    ) as Error & { status: number };
+    error.status = response.status;
+    throw error;
+  }
+
+  const result = await response.json();
+  // Support both direct object and wrapped { data: ... } response
+  return result.data ?? result;
 }
 
 // ---------------------------------------------------------------------------
