@@ -8,11 +8,14 @@
  * SWARM-049: Enhanced with edit/delete navigation buttons and useAssetDetail
  * hook integration for real API data fetching.
  *
+ * SWARM-057: Added "折旧历史" and "相关工单" tabs for viewing depreciation
+ * schedule and associated work order history inline.
+ *
  * ATB-05: Terminal-state assets (SCRAPPED/RETIRED/DISPOSED) have the retirement
  * button physically disabled with both `disabled` and `aria-disabled` attributes.
  *
  * @module pages/assets/AssetDetailPage
- * @since SWARM-015, SWARM-033, SWARM-038, SWARM-049
+ * @since SWARM-015, SWARM-033, SWARM-038, SWARM-049, SWARM-057
  */
 
 import React, { useCallback } from 'react';
@@ -26,6 +29,7 @@ import {
 import { Badge } from '../../components/ui/badge';
 import { Button } from '../../components/ui/button';
 import { Skeleton } from '../../components/ui/skeleton';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '../../components/ui/tabs';
 import {
   ArrowLeft,
   Package,
@@ -40,6 +44,8 @@ import {
   isTerminalAssetStatus,
 } from '../../hooks/useRetirement';
 import { ASSET_STATUS_CONFIG } from '../../types/asset.types';
+import { AssetDepreciationTab } from './tabs/AssetDepreciationTab';
+import { AssetWorkOrdersTab } from './tabs/AssetWorkOrdersTab';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -290,6 +296,28 @@ export const AssetDetailPage: React.FC = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* SWARM-057: Depreciation History & Related Work Orders Tabs */}
+      {assetId && (
+        <Tabs defaultValue="depreciation" className="w-full">
+          <TabsList>
+            <TabsTrigger value="depreciation">折旧历史</TabsTrigger>
+            <TabsTrigger value="work-orders">相关工单</TabsTrigger>
+          </TabsList>
+          <TabsContent value="depreciation">
+            <AssetDepreciationTab
+              assetId={assetId}
+              isTerminal={terminalState}
+            />
+          </TabsContent>
+          <TabsContent value="work-orders">
+            <AssetWorkOrdersTab
+              assetId={assetId}
+              isTerminal={terminalState}
+            />
+          </TabsContent>
+        </Tabs>
+      )}
     </div>
   );
 };
