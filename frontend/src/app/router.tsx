@@ -71,6 +71,34 @@ const LocationPage = lazy(
 );
 
 /**
+ * LocationTreePage — 位置层级树管理页面（含拖拽排序）
+ *
+ * 提供位置的交互式树视图浏览与拖拽重排功能。
+ *
+ * @since SWARM-072
+ */
+const LocationTreePage = lazy(
+  () =>
+    import("./pages/location/LocationTreePage").then((mod) => ({
+      default: mod.default,
+    })),
+);
+
+/**
+ * LocationFormPage — 位置创建/编辑表单页面
+ *
+ * 根据 URL 路由参数判断创建或编辑模式。
+ *
+ * @since SWARM-072
+ */
+const LocationFormPage = lazy(
+  () =>
+    import("./pages/location/LocationFormPage").then((mod) => ({
+      default: mod.default,
+    })),
+);
+
+/**
  * AuditLogPage — 审计日志仪表板页面
  *
  * 提供审计日志查看、多维筛选与趋势图表可视化功能。
@@ -193,7 +221,10 @@ export const vendorRoutes = [
  * ```
  *
  * Route map:
- * - `locations` → LocationPage (tree hierarchy management)
+ * - `locations`           → LocationPage (legacy tree table management)
+ * - `locations/tree`      → LocationTreePage (interactive tree with drag-and-drop)
+ * - `locations/new`       → LocationFormPage (create mode)
+ * - `locations/:id/edit`  → LocationFormPage (edit mode)
  *
  * @since SWARM-059
  */
@@ -203,6 +234,30 @@ export const locationRoutes = [
     element: (
       <WithSuspense>
         <LocationPage />
+      </WithSuspense>
+    ),
+  },
+  {
+    path: "locations/tree",
+    element: (
+      <WithSuspense>
+        <LocationTreePage />
+      </WithSuspense>
+    ),
+  },
+  {
+    path: "locations/new",
+    element: (
+      <WithSuspense>
+        <LocationFormPage />
+      </WithSuspense>
+    ),
+  },
+  {
+    path: "locations/:id/edit",
+    element: (
+      <WithSuspense>
+        <LocationFormPage />
       </WithSuspense>
     ),
   },

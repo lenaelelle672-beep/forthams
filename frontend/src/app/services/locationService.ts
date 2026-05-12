@@ -112,6 +112,23 @@ export const locationService = {
   deleteLocation(id: number | string): Promise<void> {
     return api.delete<void>(`/locations/${id}`);
   },
+
+  /**
+   * 批量更新位置排序（拖拽重排）
+   *
+   * @description 接收受影响节点的数组，每个节点包含 id、parentId 和 sortOrder。
+   * 后端逐一更新，前端负责组装完整的变更集。
+   *
+   * @param items - 需要更新的位置列表，每项包含 id、parentId、sortOrder
+   * @returns Promise<void>
+   *
+   * @since SWARM-072
+   */
+  reorderLocations(
+    items: Array<{ id: number; parentId: number | null; sortOrder: number }>,
+  ): Promise<void> {
+    return api.put<void>("/locations/reorder", items);
+  },
 };
 
 /* ------------------------------------------------------------------ */
