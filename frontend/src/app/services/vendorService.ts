@@ -134,6 +134,19 @@ export const vendorService = {
   },
 
   /**
+   * Search vendors by keyword.
+   *
+   * Maps to: GET /api/vendors?keyword=xxx
+   * Backend: VendorService.list() with optional filtering
+   *
+   * @param keyword - search keyword to filter by name, vendorCode, etc.
+   * @returns array of matching vendor records
+   */
+  searchVendors(keyword: string): Promise<VendorRecord[]> {
+    return api.get<VendorRecord[]>(`${BASE_URL}?keyword=${encodeURIComponent(keyword)}`);
+  },
+
+  /**
    * Delete a vendor by ID.
    *
    * Maps to: DELETE /api/vendors/{id}

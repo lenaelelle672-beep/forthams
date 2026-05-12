@@ -116,7 +116,7 @@ export default function VendorDetailPage() {
    */
   const handleGoEdit = useCallback(() => {
     if (id) {
-      navigate(`/vendors/edit/${id}`);
+      navigate(`/vendors/${id}/edit`);
     }
   }, [navigate, id]);
 
@@ -259,6 +259,26 @@ export default function VendorDetailPage() {
               value={vendor.updateTime}
             />
           )}
+        </div>
+      </div>
+
+      {/* Contract Info 区块 — UI 骨架预留，硬编码空状态 */}
+      <div className="mt-6 bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+        <div className="px-6 py-3 border-b border-gray-100 bg-gray-50">
+          <h3 className="text-base font-semibold text-gray-900">Contract Info</h3>
+        </div>
+        <div className="px-6 py-8 text-center text-gray-400 text-sm" data-testid="contract-empty-state">
+          暂无合同数据
+        </div>
+      </div>
+
+      {/* Audit History 区块 — UI 骨架预留，硬编码空状态 */}
+      <div className="mt-6 bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+        <div className="px-6 py-3 border-b border-gray-100 bg-gray-50">
+          <h3 className="text-base font-semibold text-gray-900">Audit History</h3>
+        </div>
+        <div className="px-6 py-8 text-center text-gray-400 text-sm" data-testid="audit-empty-state">
+          暂无审计记录
         </div>
       </div>
     </div>

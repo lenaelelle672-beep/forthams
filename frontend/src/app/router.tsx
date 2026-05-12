@@ -9,7 +9,7 @@
  *   /vendors              → VendorListPage   (browse & search vendors)
  *   /vendors/:id          → VendorDetailPage (view vendor details)
  *   /vendors/new          → VendorFormPage   (create vendor)
- *   /vendors/edit/:id     → VendorFormPage   (edit vendor)
+ *   /vendors/:id/edit     → VendorFormPage   (edit vendor)
  *
  * @since SWARM-058
  */
@@ -140,7 +140,7 @@ const WithSuspense: React.FC<{ children: React.ReactNode }> = ({
  * - `vendors`             → VendorListPage
  * - `vendors/:id`         → VendorDetailPage (must come after `new` and `edit/:id`)
  * - `vendors/new`         → VendorFormPage (create mode)
- * - `vendors/edit/:id`    → VendorFormPage (edit mode)
+ * - `vendors/:id/edit`    → VendorFormPage (edit mode)
  */
 export const vendorRoutes = [
   {
@@ -160,7 +160,7 @@ export const vendorRoutes = [
     ),
   },
   {
-    path: "vendors/edit/:id",
+    path: "vendors/:id/edit",
     element: (
       <WithSuspense>
         <VendorFormPage />

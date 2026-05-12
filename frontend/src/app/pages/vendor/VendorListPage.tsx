@@ -35,7 +35,7 @@ import type { VendorRecord } from "../../services/vendorService";
  * 数据通过 vendorService 调用真实后端 REST API 持久化。
  *
  * 搜索采用客户端模糊匹配（后端 list 接口返回全量数据后在前端过滤）。
- * 编辑操作跳转至 /vendors/edit/:id 表单页，新增跳转至 /vendors/new。
+ * 编辑操作跳转至 /vendors/:id/edit 表单页，新增跳转至 /vendors/new。
  * 删除操作在当前页面执行，带二次确认弹窗。
  *
  * @returns React 组件
@@ -162,7 +162,7 @@ export default function VendorListPage() {
    */
   const handleGoEdit = useCallback(
     (vendorId: number) => {
-      navigate(`/vendors/edit/${vendorId}`);
+      navigate(`/vendors/${vendorId}/edit`);
     },
     [navigate],
   );
