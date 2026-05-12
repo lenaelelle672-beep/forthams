@@ -4,6 +4,9 @@
  * SWARM-049: 展示资产列表，支持搜索过滤、分页、新建/编辑/删除操作。
  * 通过 useAssetList hook 与真实后端 API 对接。
  *
+ * SWARM-066: Refactored to use extracted AssetSearchBar and AssetStatusBadge
+ * components for reuse across the application.
+ *
  * @module pages/assets/AssetListPage
  * @since SWARM-049
  */
@@ -11,9 +14,7 @@
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router';
 import {
-  Search,
   Plus,
-  RefreshCw,
   Loader2,
   ChevronLeft,
   ChevronRight,
@@ -27,25 +28,14 @@ import { toast } from 'sonner';
 import { useAssetList, useAssetMutation } from '../../hooks/useAssets';
 import type { AssetListQueryParams } from '../../services/assetService';
 import type { ExportQueryParams } from '../../services/importExportApi';
+import { AssetSearchBar } from './components/AssetSearchBar';
+import { AssetStatusBadge } from './components/AssetStatusBadge';
 import AssetImportDialog from './AssetImportDialog';
 import AssetExportDialog from './AssetExportDialog';
 
 /* ------------------------------------------------------------------ */
-/*  状态映射                                                           */
+/*  Constants                                                          */
 /* ------------------------------------------------------------------ */
-
-/**
- * 资产状态映射配置
- */
-const STATUS_MAP: Record<string, { label: string; className: string }> = {
-  IN_USE: { label: '在用', className: 'bg-green-100 text-green-800' },
-  IDLE: { label: '闲置', className: 'bg-yellow-100 text-yellow-800' },
-  MAINTENANCE: { label: '维保中', className: 'bg-blue-100 text-blue-800' },
-  SCRAPPED: { label: '已报废', className: 'bg-red-100 text-red-800' },
-  RETIRED: { label: '已退役', className: 'bg-orange-100 text-orange-800' },
-  DISPOSED: { label: '已处置', className: 'bg-red-100 text-red-800' },
-  ACTIVE: { label: '在用', className: 'bg-green-100 text-green-800' },
-};
 
 /** 默认分页大小 */
 const DEFAULT_PAGE_SIZE = 20;
@@ -59,6 +49,7 @@ const DEFAULT_PAGE_SIZE = 20;
  *
  * 提供资产列表的展示、搜索过滤、新建/编辑/查看详情/删除功能。
  * 通过 useAssetList hook 与后端 API 进行真实对接。
+ * 使用 AssetSearchBar 和 AssetStatusBadge 提取组件实现复用。
  *
  * @returns React 组件
  */
@@ -111,14 +102,10 @@ export default function AssetListPage() {
   }, [loadData]);
 
   /**
-   * 处理搜索提交
-   *
-   * @param e - 表单事件
+   * 处理搜索提交 — 重置分页到第一页
    */
-  const handleSearch = useCallback((e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSearch = useCallback(() => {
     setPage(1);
-    // page change will trigger loadData via useEffect
   }, []);
 
   /**
@@ -180,26 +167,6 @@ export default function AssetListPage() {
     }
   }, [remove, refresh]);
 
-  /**
-   * 渲染状态徽标
-   *
-   * @param assetStatus - 资产状态值
-   * @returns React 节点
-   */
-  const renderStatusBadge = (assetStatus: string | undefined) => {
-    const config = STATUS_MAP[assetStatus ?? ''] ?? {
-      label: assetStatus ?? '-',
-      className: 'bg-gray-100 text-gray-800',
-    };
-    return (
-      <span
-        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${config.className}`}
-      >
-        {config.label}
-      </span>
-    );
-  };
-
   // ---- Render ------------------------------------------------------------
   return (
     <div className="max-w-7xl mx-auto px-4 py-8" data-testid="asset-list-page">
@@ -243,65 +210,16 @@ export default function AssetListPage() {
         </div>
       </div>
 
-      {/* 搜索和过滤 */}
-      <form onSubmit={handleSearch} className="mb-6 flex flex-wrap items-center gap-4">
-        {/* 搜索框 */}
-        <div className="relative flex-1 min-w-[200px] max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-          <input
-            type="text"
-            placeholder="搜索资产编号或名称..."
-            value={keyword}
-            onChange={(e) => setKeyword(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 text-sm rounded-lg border border-gray-300
-              bg-white focus:outline-none focus:ring-2 focus:ring-blue-500
-              focus:border-blue-500 transition-colors"
-            data-testid="input-search"
-          />
-        </div>
-
-        {/* 状态过滤 */}
-        <select
-          value={statusFilter}
-          onChange={(e) => handleStatusChange(e.target.value)}
-          className="px-3 py-2 text-sm rounded-lg border border-gray-300
-            bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-          data-testid="select-status"
-        >
-          <option value="">全部状态</option>
-          <option value="IN_USE">在用</option>
-          <option value="IDLE">闲置</option>
-          <option value="MAINTENANCE">维保中</option>
-          <option value="SCRAPPED">已报废</option>
-          <option value="RETIRED">已退役</option>
-        </select>
-
-        {/* 搜索按钮 */}
-        <button
-          type="submit"
-          className="inline-flex items-center gap-1.5 px-4 py-2 text-sm
-            rounded-lg bg-blue-600 text-white hover:bg-blue-700
-            transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
-          data-testid="btn-search"
-        >
-          <Search className="w-4 h-4" />
-          搜索
-        </button>
-
-        {/* 刷新 */}
-        <button
-          type="button"
-          onClick={refresh}
-          disabled={loading}
-          className="inline-flex items-center gap-1.5 px-3 py-2 text-sm
-            rounded-lg border border-gray-300 bg-white text-gray-700
-            hover:bg-gray-50 disabled:opacity-50 transition-colors"
-          data-testid="btn-refresh"
-        >
-          <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-          刷新
-        </button>
-      </form>
+      {/* 搜索和过滤 — 使用提取的 AssetSearchBar 组件 */}
+      <AssetSearchBar
+        keyword={keyword}
+        onKeywordChange={setKeyword}
+        statusFilter={statusFilter}
+        onStatusChange={handleStatusChange}
+        onSearch={handleSearch}
+        onRefresh={refresh}
+        loading={loading}
+      />
 
       {/* 错误提示 */}
       {error && (
@@ -387,7 +305,7 @@ export default function AssetListPage() {
                       : '-'}
                   </td>
                   <td className="px-4 py-3 text-sm">
-                    {renderStatusBadge(asset.status)}
+                    <AssetStatusBadge status={asset.status} />
                   </td>
                   <td className="px-4 py-3 text-sm">
                     <div className="flex items-center gap-2">
