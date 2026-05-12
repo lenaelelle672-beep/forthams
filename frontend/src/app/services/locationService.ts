@@ -4,78 +4,36 @@
  * 封装与后端 `/locations` REST API 交互的所有方法，支持树形层级结构的
  * CRUD 操作：浏览位置树、获取子节点、新增/编辑/删除位置。
  *
+ * 类型定义从 `types/location` 模块导入并重新导出，保持向后兼容。
+ *
  * @module services/locationService
  * @since SWARM-035
  */
 
 import { api } from "../utils/api";
+import type {
+  ILocation,
+  ILocationTreeNode,
+  LocationFormData,
+  LocationRecord,
+} from "../types/location";
+import { EMPTY_LOCATION_FORM } from "../types/location";
 
 /* ------------------------------------------------------------------ */
-/*  类型定义                                                           */
+/*  类型重新导出（保持向后兼容）                                        */
 /* ------------------------------------------------------------------ */
 
 /**
- * 位置实体接口 — 严格对齐后端 Location.java (L10-36) 的 6 个持久化字段
- *
- * @description 仅包含后端 Location 实体中定义的持久化字段，
- * 不包含 children、isSelected 等非持久化扩展属性。
+ * @description 从 types/location 重新导出所有类型和常量，
+ * 保持旧代码 `import { ... } from "../../services/locationService"` 继续工作。
  */
-export interface ILocation {
-  /** 位置 ID */
-  id: number;
-  /** 位置名称（后端字段 location_name，通过 SQL 别名映射为 name） */
-  name?: string;
-  /** 位置编码 */
-  locationCode?: string;
-  /** 父级位置 ID，null 或 undefined 表示顶级位置 */
-  parentId?: number | null;
-  /** 排序号（同级节点按此字段升序排列） */
-  sortOrder?: number;
-  /** 描述 */
-  description?: string;
-}
-
-/**
- * 位置树节点类型 — 用于前端树形结构渲染
- *
- * @description 扩展 ILocation，增加 children 字段以支持嵌套树形结构。
- * children 仅在前端通过 buildLocationTree 组装，后端不直接返回。
- */
-export interface ILocationTreeNode extends ILocation {
-  /** 子节点列表（前端通过 parentId 组装） */
-  children: ILocationTreeNode[];
-}
-
-/**
- * 创建/编辑位置的表单数据
- *
- * @description 用于新增和编辑位置的表单字段
- */
-export interface LocationFormData {
-  /** 位置名称 */
-  name: string;
-  /** 位置编码 */
-  locationCode: string;
-  /** 父级位置 ID */
-  parentId: number | null;
-  /** 排序号 */
-  sortOrder: number;
-  /** 描述 */
-  description: string;
-}
-
-/* ------------------------------------------------------------------ */
-/*  空表单默认值                                                       */
-/* ------------------------------------------------------------------ */
-
-/** 空表单默认值 */
-export const EMPTY_LOCATION_FORM: LocationFormData = {
-  name: "",
-  locationCode: "",
-  parentId: null,
-  sortOrder: 0,
-  description: "",
+export type {
+  ILocation,
+  ILocationTreeNode,
+  LocationFormData,
+  LocationRecord,
 };
+export { EMPTY_LOCATION_FORM };
 
 /* ------------------------------------------------------------------ */
 /*  API 方法                                                           */
@@ -239,13 +197,6 @@ export function findNodeInTree(
   }
   return undefined;
 }
-
-/**
- * 向后兼容别名 — 旧代码仍可使用 LocationRecord
- *
- * @deprecated 请使用 ILocation 代替
- */
-export type LocationRecord = ILocation;
 
 /**
  * 统计树中所有节点总数

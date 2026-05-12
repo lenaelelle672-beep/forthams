@@ -56,6 +56,20 @@ const VendorFormPage = lazy(
     })),
 );
 
+/**
+ * LocationPage — 位置层级管理页面
+ *
+ * 提供位置的树形层级管理功能，支持真实 API 数据交互。
+ *
+ * @since SWARM-059
+ */
+const LocationPage = lazy(
+  () =>
+    import("./pages/location/LocationPage").then((mod) => ({
+      default: mod.default,
+    })),
+);
+
 /* ------------------------------------------------------------------ */
 /*  Shared suspense fallback                                           */
 /* ------------------------------------------------------------------ */
@@ -144,6 +158,37 @@ export const vendorRoutes = [
     element: (
       <WithSuspense>
         <VendorDetailPage />
+      </WithSuspense>
+    ),
+  },
+];
+
+/**
+ * Location route definitions for registration in the main router.
+ *
+ * @description All location management routes, lazy-loaded with Suspense.
+ * Integrate by spreading into the main router's `children` array:
+ *
+ * @example
+ * ```tsx
+ * import { locationRoutes } from "@/app/router";
+ *
+ * children: [
+ *   ...locationRoutes,
+ * ]
+ * ```
+ *
+ * Route map:
+ * - `locations` → LocationPage (tree hierarchy management)
+ *
+ * @since SWARM-059
+ */
+export const locationRoutes = [
+  {
+    path: "locations",
+    element: (
+      <WithSuspense>
+        <LocationPage />
       </WithSuspense>
     ),
   },

@@ -12,6 +12,10 @@
  * 数据通过后端 `/locations` REST API 持久化，
  * 前端通过 buildLocationTree 将扁平数据转换为树形结构。
  *
+ * 组件拆分（SWARM-059）：
+ * - LocationTree — 递归树形展示组件
+ * - LocationFormModal — 新增/编辑弹窗组件
+ *
  * @module pages/location/LocationPage
  * @since SWARM-035
  */
@@ -19,183 +23,24 @@
 import React, { useState, useCallback, useEffect } from "react";
 import {
   Plus,
-  Pencil,
-  Trash2,
   Loader2,
   RefreshCw,
-  X,
   ChevronRight,
   ChevronDown,
-  MapPin,
-  FolderPlus,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
   locationService,
   buildLocationTree,
   countTreeNodes,
+} from "../../services/locationService";
+import {
   EMPTY_LOCATION_FORM,
   type ILocationTreeNode,
   type LocationFormData,
-} from "../../services/locationService";
-
-/* ------------------------------------------------------------------ */
-/*  树节点组件                                                         */
-/* ------------------------------------------------------------------ */
-
-/**
- * LocationTreeNode 的 props 接口
- */
-interface LocationTreeNodeProps {
-  /** 当前节点数据 */
-  node: ILocationTreeNode;
-  /** 当前展开的节点 ID 集合 */
-  expandedIds: Set<number>;
-  /** 展开/收起切换回调 */
-  onToggle: (id: number) => void;
-  /** 编辑回调 */
-  onEdit: (node: ILocationTreeNode) => void;
-  /** 新增子节点回调 */
-  onAddChild: (parent: ILocationTreeNode) => void;
-  /** 删除回调 */
-  onDelete: (node: ILocationTreeNode) => void;
-  /** 当前正在删除的节点 ID */
-  deletingId: number | null;
-  /** 缩进层级 */
-  level: number;
-}
-
-/**
- * LocationTreeNode — 递归渲染位置树节点
- *
- * @description 单个树节点，支持展开/收起、编辑、新增子节点、删除操作。
- * 子节点通过递归调用自身来渲染。同级节点按 sortOrder 升序排列。
- *
- * @param props - 组件属性
- * @returns React 节点
- */
-function LocationTreeNode({
-  node,
-  expandedIds,
-  onToggle,
-  onEdit,
-  onAddChild,
-  onDelete,
-  deletingId,
-  level,
-}: LocationTreeNodeProps) {
-  const hasChildren = node.children.length > 0;
-  const isExpanded = expandedIds.has(node.id);
-
-  return (
-    <>
-      <tr className="hover:bg-gray-50 transition-colors">
-        {/* 名称列（带缩进和展开图标） */}
-        <td className="px-4 py-3 text-sm text-gray-900 whitespace-nowrap">
-          <div
-            className="flex items-center"
-            style={{ paddingLeft: `${level * 24}px` }}
-          >
-            {/* 展开/收起图标 */}
-            <button
-              type="button"
-              onClick={() => hasChildren && onToggle(node.id)}
-              className={`mr-2 flex-shrink-0 p-0.5 rounded hover:bg-gray-200 transition-colors ${
-                hasChildren ? "cursor-pointer" : "cursor-default opacity-30"
-              }`}
-              disabled={!hasChildren}
-            >
-              {isExpanded ? (
-                <ChevronDown className="w-4 h-4 text-gray-500" />
-              ) : (
-                <ChevronRight className="w-4 h-4 text-gray-500" />
-              )}
-            </button>
-            <MapPin className="w-4 h-4 mr-1.5 flex-shrink-0 text-blue-500" />
-            <span className="font-medium">{node.name || "-"}</span>
-            {hasChildren && (
-              <span className="ml-2 text-xs text-gray-400">
-                ({node.children.length})
-              </span>
-            )}
-          </div>
-        </td>
-        {/* 编码列 */}
-        <td className="px-4 py-3 text-sm text-gray-600 font-mono">
-          {node.locationCode ?? "-"}
-        </td>
-        {/* 描述列 */}
-        <td className="px-4 py-3 text-sm text-gray-600 max-w-[200px] truncate">
-          {node.description ?? "-"}
-        </td>
-        {/* 排序列 */}
-        <td className="px-4 py-3 text-sm text-gray-600 text-center">
-          {node.sortOrder ?? 0}
-        </td>
-        {/* 操作列 */}
-        <td className="px-4 py-3 text-sm">
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => onAddChild(node)}
-              className="inline-flex items-center gap-1 px-2 py-1 text-xs
-                rounded border border-blue-300 bg-white text-blue-600
-                hover:bg-blue-50 transition-colors"
-              title="新增子位置"
-            >
-              <FolderPlus className="w-3.5 h-3.5" />
-              子位置
-            </button>
-            <button
-              type="button"
-              onClick={() => onEdit(node)}
-              className="inline-flex items-center gap-1 px-2 py-1 text-xs
-                rounded border border-gray-300 bg-white text-gray-700
-                hover:bg-gray-50 transition-colors"
-              title="编辑"
-            >
-              <Pencil className="w-3.5 h-3.5" />
-              编辑
-            </button>
-            <button
-              type="button"
-              onClick={() => onDelete(node)}
-              disabled={deletingId === node.id}
-              className="inline-flex items-center gap-1 px-2 py-1 text-xs
-                rounded border border-red-300 bg-white text-red-600
-                hover:bg-red-50 disabled:opacity-50
-                disabled:cursor-not-allowed transition-colors"
-              title="删除"
-            >
-              {deletingId === node.id ? (
-                <Loader2 className="w-3.5 h-3.5 animate-spin" />
-              ) : (
-                <Trash2 className="w-3.5 h-3.5" />
-              )}
-              删除
-            </button>
-          </div>
-        </td>
-      </tr>
-      {/* 递归渲染子节点 */}
-      {hasChildren &&
-        isExpanded &&
-        node.children.map((child) => (
-          <LocationTreeNode
-            key={child.id}
-            node={child}
-            expandedIds={expandedIds}
-            onToggle={onToggle}
-            onEdit={onEdit}
-            onAddChild={onAddChild}
-            onDelete={onDelete}
-            deletingId={deletingId}
-            level={level + 1}
-          />
-        ))}
-    </>
-  );
-}
+} from "../../types/location";
+import { LocationTree } from "./LocationTree";
+import { LocationFormModal } from "./LocationFormModal";
 
 /* ------------------------------------------------------------------ */
 /*  页面组件                                                           */
@@ -482,20 +327,6 @@ export default function LocationPage() {
   /** 树中节点总数 */
   const totalCount = countTreeNodes(treeData);
 
-  /** 查找父位置名称的辅助函数 */
-  const getParentName = (parentId: number | null): string => {
-    if (parentId == null) return "（顶级）";
-    const findName = (nodes: ILocationTreeNode[]): string => {
-      for (const n of nodes) {
-        if (n.id === parentId) return n.name ?? String(n.id);
-        const found = findName(n.children);
-        if (found) return found;
-      }
-      return "";
-    };
-    return findName(treeData) || `ID: ${parentId}`;
-  };
-
   return (
     <div className="container mx-auto px-4 py-8">
       {/* 页面标题 + 操作按钮 */}
@@ -558,76 +389,113 @@ export default function LocationPage() {
       )}
 
       {/* 位置树形表格 */}
-      <div className="overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                位置名称
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                编码
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                描述
-              </th>
-              <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                排序
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                操作
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {loading ? (
+      {loading ? (
+        <div className="rounded-lg border border-gray-200 shadow-sm">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
               <tr>
-                <td
-                  colSpan={5}
-                  className="px-4 py-12 text-center text-gray-500"
-                >
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  位置名称
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  编码
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  描述
+                </th>
+                <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  排序
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  操作
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              <tr>
+                <td colSpan={5} className="px-4 py-12 text-center text-gray-500">
                   <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2" />
                   加载中...
                 </td>
               </tr>
-            ) : error ? (
+            </tbody>
+          </table>
+        </div>
+      ) : error ? (
+        <div className="rounded-lg border border-gray-200 shadow-sm">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
               <tr>
-                <td
-                  colSpan={5}
-                  className="px-4 py-12 text-center text-red-500"
-                >
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  位置名称
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  编码
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  描述
+                </th>
+                <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  排序
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  操作
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              <tr>
+                <td colSpan={5} className="px-4 py-12 text-center text-red-500">
                   <div className="error-container">
                     加载失败：{error}
                   </div>
                 </td>
               </tr>
-            ) : treeData.length === 0 ? (
+            </tbody>
+          </table>
+        </div>
+      ) : treeData.length === 0 ? (
+        <div className="rounded-lg border border-gray-200 shadow-sm">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
               <tr>
-                <td
-                  colSpan={5}
-                  className="px-4 py-12 text-center text-gray-500"
-                >
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  位置名称
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  编码
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  描述
+                </th>
+                <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  排序
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  操作
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              <tr>
+                <td colSpan={5} className="px-4 py-12 text-center text-gray-500">
                   暂无位置数据，点击&quot;新增位置&quot;添加顶级位置
                 </td>
               </tr>
-            ) : (
-              treeData.map((rootNode) => (
-                <LocationTreeNode
-                  key={rootNode.id}
-                  node={rootNode}
-                  expandedIds={expandedIds}
-                  onToggle={handleToggle}
-                  onEdit={handleOpenEdit}
-                  onAddChild={handleOpenAddChild}
-                  onDelete={handleDelete}
-                  deletingId={deletingId}
-                  level={0}
-                />
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <LocationTree
+          treeData={treeData}
+          expandedIds={expandedIds}
+          onToggle={handleToggle}
+          onEdit={handleOpenEdit}
+          onAddChild={handleOpenAddChild}
+          onDelete={handleDelete}
+          deletingId={deletingId}
+        />
+      )}
 
       {/* 统计信息 */}
       {!loading && totalCount > 0 && (
@@ -639,149 +507,16 @@ export default function LocationPage() {
       )}
 
       {/* 新增/编辑弹窗 */}
-      {modalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
-          {/* 遮罩层 */}
-          <div
-            className="absolute inset-0 bg-black/50"
-            onClick={handleCloseModal}
-          />
-
-          {/* 弹窗内容 */}
-          <div className="relative bg-white rounded-xl shadow-xl w-full max-w-lg mx-4 p-6">
-            {/* 弹窗标题 */}
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg font-semibold text-gray-900">
-                {editingId !== null ? "编辑位置" : "新增位置"}
-              </h2>
-              <button
-                type="button"
-                onClick={handleCloseModal}
-                className="p-1 rounded-lg hover:bg-gray-100 transition-colors"
-              >
-                <X className="w-5 h-5 text-gray-500" />
-              </button>
-            </div>
-
-            {/* 表单 */}
-            <div className="space-y-4">
-              {/* 上级位置（只读展示） */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  上级位置
-                </label>
-                <div className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 bg-gray-50 text-gray-500">
-                  {getParentName(formData.parentId)}
-                </div>
-              </div>
-
-              {/* 位置名称 */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  位置名称 <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={formData.name}
-                  onChange={(e) => handleFieldChange("name", e.target.value)}
-                  placeholder="请输入位置名称"
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-gray-300
-                    bg-white focus:outline-none focus:ring-2 focus:ring-blue-500
-                    focus:border-blue-500 transition-colors"
-                />
-              </div>
-
-              {/* 位置编码 + 排序 */}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    位置编码
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.locationCode}
-                    onChange={(e) =>
-                      handleFieldChange("locationCode", e.target.value)
-                    }
-                    placeholder="请输入位置编码"
-                    className="w-full px-3 py-2 text-sm rounded-lg border border-gray-300
-                      bg-white focus:outline-none focus:ring-2 focus:ring-blue-500
-                      focus:border-blue-500 transition-colors"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    排序号
-                  </label>
-                  <input
-                    type="number"
-                    value={formData.sortOrder}
-                    onChange={(e) =>
-                      handleFieldChange("sortOrder", Number(e.target.value))
-                    }
-                    min={0}
-                    className="w-full px-3 py-2 text-sm rounded-lg border border-gray-300
-                      bg-white focus:outline-none focus:ring-2 focus:ring-blue-500
-                      focus:border-blue-500 transition-colors"
-                  />
-                </div>
-              </div>
-
-              {/* 描述 */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  描述
-                </label>
-                <textarea
-                  value={formData.description}
-                  onChange={(e) =>
-                    handleFieldChange("description", e.target.value)
-                  }
-                  placeholder="请输入位置描述"
-                  rows={3}
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-gray-300
-                    bg-white focus:outline-none focus:ring-2 focus:ring-blue-500
-                    focus:border-blue-500 transition-colors resize-none"
-                />
-              </div>
-            </div>
-
-            {/* 操作按钮 */}
-            <div className="mt-6 flex items-center justify-end gap-3">
-              <button
-                type="button"
-                onClick={handleCloseModal}
-                disabled={submitting}
-                className="px-4 py-2 text-sm rounded-lg border border-gray-300
-                  bg-white text-gray-700 hover:bg-gray-50
-                  disabled:opacity-50 transition-colors"
-              >
-                取消
-              </button>
-              <button
-                type="button"
-                onClick={handleSubmit}
-                disabled={submitting}
-                className="px-4 py-2 text-sm rounded-lg bg-blue-600 text-white
-                  hover:bg-blue-700 disabled:opacity-50
-                  disabled:cursor-not-allowed transition-colors
-                  focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                {submitting ? (
-                  <span className="inline-flex items-center gap-1.5">
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    提交中...
-                  </span>
-                ) : editingId !== null ? (
-                  "保存修改"
-                ) : (
-                  "创建位置"
-                )}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <LocationFormModal
+        open={modalOpen}
+        editingId={editingId}
+        formData={formData}
+        submitting={submitting}
+        treeData={treeData}
+        onFieldChange={handleFieldChange}
+        onSubmit={handleSubmit}
+        onClose={handleCloseModal}
+      />
     </div>
   );
 }
