@@ -6,8 +6,11 @@
  * - Bell icon button (data-testid="notification-bell") with unread badge
  *   (data-testid="unread-badge")
  * - Dropdown panel (data-testid="notification-dropdown") that toggles on click
+ * - Filter bar (NotificationFilterBar) to filter by notification type
  * - List of NotificationItem components (data-testid="notification-item-{id}")
  * - Empty state (data-testid="empty-notifications") when no pending items
+ * - Mark-as-read per item via click
+ * - Mark-all-as-read button (data-testid="mark-all-read-btn")
  * - Scrollable list with max-height to handle overflow (>20 items)
  * - Uses position:absolute to avoid layout shift (CLS prevention)
  *
@@ -15,13 +18,19 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Bell } from "lucide-react";
+import { Bell, CheckCheck } from "lucide-react";
 import {
   fetchPendingNotifications,
   fetchUnreadCount,
+  markNotificationAsRead,
+  markAllNotificationsAsRead,
 } from "../../services/notificationApi";
-import type { NotificationItem as NotificationItemType } from "../../services/notificationApi";
+import type {
+  NotificationItem as NotificationItemType,
+  NotificationType,
+} from "../../services/notificationApi";
 import { NotificationItem } from "./NotificationItem";
+import { NotificationFilterBar } from "./NotificationFilterBar";
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -39,13 +48,16 @@ const MAX_VISIBLE_ITEMS = 20;
 
 /**
  * NotificationCenter provides a bell icon with an unread count badge and a
- * dropdown panel listing pending work order and retirement approvals.
+ * dropdown panel listing pending work orders, retirement approvals,
+ * asset expiration warnings, maintenance reminders, and system alerts.
  *
- * The unread count is polled every 15 seconds via a lightweight endpoint.
- * The full item list is fetched on-demand when the dropdown is opened.
- *
- * Layout isolation: The dropdown uses position:absolute to prevent CLS.
- * Unmount cleanup clears the polling interval.
+ * Features:
+ * - 15-second polling for unread count via lightweight endpoint
+ * - On-demand full list fetch when dropdown opens
+ * - Type-based filtering via NotificationFilterBar
+ * - Mark-as-read per item (click) and mark-all-as-read (header button)
+ * - Layout isolation via position:absolute to prevent CLS
+ * - Unmount cleanup clears the polling interval
  *
  * @returns JSX element for the notification center
  */
@@ -54,6 +66,9 @@ export function NotificationCenter() {
   const [unreadCount, setUnreadCount] = useState(-1); // -1 = not loaded
   const [items, setItems] = useState<NotificationItemType[]>([]);
   const [loading, setLoading] = useState(false);
+  const [activeFilter, setActiveFilter] = useState<NotificationType | "all">(
+    "all",
+  );
   const containerRef = useRef<HTMLDivElement>(null);
 
   /**
@@ -71,12 +86,14 @@ export function NotificationCenter() {
 
   /**
    * Fetch the full notification items list.
-   * Called when the dropdown is opened.
+   * Called when the dropdown is opened or the filter changes.
    */
   const refreshItems = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await fetchPendingNotifications();
+      const response = await fetchPendingNotifications({
+        type: activeFilter !== "all" ? activeFilter : undefined,
+      });
       setItems(response.items ?? []);
       setUnreadCount(response.unread_count ?? 0);
     } catch {
@@ -85,7 +102,7 @@ export function NotificationCenter() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [activeFilter]);
 
   // Polling: refresh unread count every 15 seconds
   useEffect(() => {
@@ -131,6 +148,64 @@ export function NotificationCenter() {
     setIsOpen((prev) => !prev);
   };
 
+  /**
+   * Handle filter type change from the filter bar.
+   * Updates the active filter which triggers a re-fetch via useEffect.
+   *
+   * @param filter - the new filter type or "all"
+   */
+  const handleFilterChange = (filter: NotificationType | "all") => {
+    setActiveFilter(filter);
+  };
+
+  /**
+   * Mark a single notification as read and update local state optimistically.
+   *
+   * @param id - notification item ID to mark as read
+   */
+  const handleMarkAsRead = useCallback(
+    async (id: number) => {
+      // Optimistic update
+      setItems((prev) =>
+        prev.map((item) => (item.id === id ? { ...item, read: true } : item)),
+      );
+      setUnreadCount((prev) => Math.max(0, prev - 1));
+
+      try {
+        await markNotificationAsRead(id);
+      } catch {
+        // Revert optimistic update on failure
+        setItems((prev) =>
+          prev.map((item) =>
+            item.id === id ? { ...item, read: false } : item,
+          ),
+        );
+        setUnreadCount((prev) => prev + 1);
+      }
+    },
+    [],
+  );
+
+  /**
+   * Mark all notifications as read and update local state optimistically.
+   */
+  const handleMarkAllAsRead = useCallback(async () => {
+    // Optimistic update
+    setItems((prev) => prev.map((item) => ({ ...item, read: true })));
+    const prevCount = unreadCount;
+    setUnreadCount(0);
+
+    try {
+      await markAllNotificationsAsRead();
+    } catch {
+      // Revert optimistic update on failure
+      setItems((prev) =>
+        prev.map((item) => ({ ...item, read: false })),
+      );
+      setUnreadCount(prevCount);
+    }
+  }, [unreadCount]);
+
   /** Compute badge display text, capping at "99+" for large counts. */
   const badgeText =
     unreadCount > 99 ? "99+" : unreadCount > 0 ? String(unreadCount) : "";
@@ -140,6 +215,9 @@ export function NotificationCenter() {
 
   /** Whether the list has items to display. */
   const hasItems = items.length > 0;
+
+  /** Whether there are unread items (to show mark-all-as-read button). */
+  const hasUnread = items.some((item) => !item.read);
 
   return (
     <div ref={containerRef} className="relative">
@@ -175,14 +253,34 @@ export function NotificationCenter() {
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
             <span className="text-sm font-semibold text-gray-900">
-              待办通知
+              通知中心
             </span>
-            {badgeVisible && (
-              <span className="text-xs text-gray-400">
-                {unreadCount} 条未读
-              </span>
-            )}
+            <div className="flex items-center gap-2">
+              {badgeVisible && (
+                <span className="text-xs text-gray-400">
+                  {unreadCount} 条未读
+                </span>
+              )}
+              {hasUnread && (
+                <button
+                  type="button"
+                  data-testid="mark-all-read-btn"
+                  onClick={handleMarkAllAsRead}
+                  className="flex items-center gap-1 px-2 py-1 text-xs text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                  title="全部标记为已读"
+                >
+                  <CheckCheck className="w-3.5 h-3.5" />
+                  全部已读
+                </button>
+              )}
+            </div>
           </div>
+
+          {/* Filter bar */}
+          <NotificationFilterBar
+            activeFilter={activeFilter}
+            onFilterChange={handleFilterChange}
+          />
 
           {/* Loading state */}
           {loading && (
@@ -204,6 +302,8 @@ export function NotificationCenter() {
                   type={item.type}
                   title={item.title}
                   createdAt={item.created_at}
+                  read={item.read}
+                  onMarkAsRead={handleMarkAsRead}
                 />
               ))}
             </div>
@@ -215,7 +315,7 @@ export function NotificationCenter() {
               data-testid="empty-notifications"
               className="px-4 py-6 text-center text-sm text-gray-400"
             >
-              暂无待办通知
+              暂无通知
             </div>
           )}
         </div>
