@@ -70,6 +70,20 @@ const LocationPage = lazy(
     })),
 );
 
+/**
+ * AuditLogPage — 审计日志仪表板页面
+ *
+ * 提供审计日志查看、多维筛选与趋势图表可视化功能。
+ *
+ * @since SWARM-060
+ */
+const AuditLogPage = lazy(
+  () =>
+    import("./pages/audit/AuditLogPage").then((mod) => ({
+      default: mod.default ?? mod.AuditLogPage,
+    })),
+);
+
 /* ------------------------------------------------------------------ */
 /*  Shared suspense fallback                                           */
 /* ------------------------------------------------------------------ */
@@ -194,4 +208,36 @@ export const locationRoutes = [
   },
 ];
 
+/**
+ * Audit route definitions for registration in the main router.
+ *
+ * @description Audit log dashboard routes, lazy-loaded with Suspense.
+ * Integrate by spreading into the main router's `children` array:
+ *
+ * @example
+ * ```tsx
+ * import { auditRoutes } from "@/app/router";
+ *
+ * children: [
+ *   ...auditRoutes,
+ * ]
+ * ```
+ *
+ * Route map:
+ * - `audit-logs` → AuditLogPage (audit log dashboard with trend charts)
+ *
+ * @since SWARM-060
+ */
+export const auditRoutes = [
+  {
+    path: "audit-logs",
+    element: (
+      <WithSuspense>
+        <AuditLogPage />
+      </WithSuspense>
+    ),
+  },
+];
+
 export default vendorRoutes;
+
