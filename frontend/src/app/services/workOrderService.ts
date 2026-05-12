@@ -220,6 +220,56 @@ export function getPriorityLabel(priority?: string): string {
 }
 
 // ---------------------------------------------------------------------------
+// Approval inbox types
+// ---------------------------------------------------------------------------
+
+/**
+ * Approval status for inbox items.
+ * Maps to the current work order approval state in the inbox view.
+ */
+export type ApprovalStatus = "pending" | "approved" | "rejected";
+
+/**
+ * A single pending approval item as returned by the approval inbox API.
+ * Combines work order data with approval-specific metadata.
+ */
+export interface PendingApprovalItem {
+  /** Work order ID. */
+  id: number;
+  /** Work order number (display-friendly). */
+  workOrderNo?: string;
+  /** Work order title. */
+  title?: string;
+  /** Work order description. */
+  description?: string;
+  /** Current approval status: pending / approved / rejected. */
+  approvalStatus: ApprovalStatus;
+  /** Work order priority. */
+  priority?: string;
+  /** Associated asset name. */
+  assetName?: string;
+  /** Reporter / requester name. */
+  reporterName?: string;
+  /** Assigned approver name. */
+  assigneeName?: string;
+  /** Work order creation timestamp. */
+  createTime?: string;
+  /** Last update timestamp. */
+  updateTime?: string;
+  /** Approval level for the current approver. */
+  approvalLevel?: string;
+  [key: string]: unknown;
+}
+
+/**
+ * Request payload for approve/reject actions with comment.
+ */
+export interface ApprovalActionPayload {
+  /** Approval comment or rejection reason. */
+  comment: string;
+}
+
+// ---------------------------------------------------------------------------
 // API service methods
 // ---------------------------------------------------------------------------
 
@@ -330,5 +380,79 @@ export const workOrderService = {
       operation,
       comment,
     });
+  },
+
+  /**
+   * Approve a pending work order.
+   *
+   * Maps to: POST /api/workorders/{id}/approve
+   * Backend: WorkOrderController.approveWorkOrder → WorkOrderService.operateWorkOrder(id, "approve", comment)
+   * Transition: PENDING → APPROVED
+   *
+   * @param id — work order ID
+   * @param comment — optional approval comment
+   * @returns the updated work order record with APPROVED status
+   */
+  approve(id: number | string, comment?: string) {
+    return api.post<WorkOrderRecord>(`/workorders/${id}/approve`, {
+      comment,
+    });
+  },
+
+  /**
+   * Reject a pending work order.
+   *
+   * Maps to: POST /api/workorders/{id}/reject
+   * Backend: WorkOrderController.rejectWorkOrder → WorkOrderService.operateWorkOrder(id, "reject", comment)
+   * Transition: PENDING → REJECTED
+   *
+   * @param id — work order ID
+   * @param comment — optional rejection reason (recommended for reject)
+   * @returns the updated work order record with REJECTED status
+   */
+  reject(id: number | string, comment?: string) {
+    return api.post<WorkOrderRecord>(`/workorders/${id}/reject`, {
+      comment,
+    });
+  },
+
+  /**
+   * Fetch the list of work orders pending approval for the current user.
+   *
+   * Maps to: GET /api/work-orders/approval/pending
+   * Backend: ApprovalService.getMyPendingApprovals
+   *
+   * @returns array of pending approval items
+   */
+  getPendingApprovals() {
+    return api.get<PendingApprovalItem[]>("/work-orders/approval/pending");
+  },
+
+  /**
+   * Approve a work order with a mandatory comment.
+   *
+   * Maps to: POST /api/work-orders/{id}/approve
+   * Backend: WorkOrderController.approveWorkOrder
+   *
+   * @param id — work order ID
+   * @param payload — approval payload with comment
+   * @returns the updated work order record
+   */
+  approveWorkOrder(id: number | string, payload: ApprovalActionPayload) {
+    return api.post<WorkOrderRecord>(`/work-orders/${id}/approve`, payload);
+  },
+
+  /**
+   * Reject a work order with a mandatory comment (rejection reason).
+   *
+   * Maps to: POST /api/work-orders/{id}/reject
+   * Backend: WorkOrderController.rejectWorkOrder
+   *
+   * @param id — work order ID
+   * @param payload — rejection payload with comment
+   * @returns the updated work order record
+   */
+  rejectWorkOrder(id: number | string, payload: ApprovalActionPayload) {
+    return api.post<WorkOrderRecord>(`/work-orders/${id}/reject`, payload);
   },
 };
