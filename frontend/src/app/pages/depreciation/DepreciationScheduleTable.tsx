@@ -8,6 +8,7 @@
  * - Multi-row selection via checkboxes (rowSelection)
  * - Terminal-state asset rows have disabled checkboxes (ATB-04)
  * - Formatted currency and percentage columns
+ * - Depreciation method badge column (SWARM-067)
  * - Pagination controls
  * - Loading skeleton and empty state
  *
@@ -29,6 +30,7 @@ import { Button } from '../../components/ui/button';
 import { Skeleton } from '../../components/ui/skeleton';
 import { TrendingDown } from 'lucide-react';
 import type { DepreciationScheduleItem } from '../../services/depreciationApi';
+import { DepreciationMethodBadge } from './DepreciationMethodBadge';
 
 // ---------------------------------------------------------------------------
 // Props
@@ -246,6 +248,7 @@ export const DepreciationScheduleTable: React.FC<DepreciationScheduleTableProps>
             <TableHead className="text-right">本期折旧额</TableHead>
             <TableHead className="text-right">累计折旧</TableHead>
             <TableHead className="text-right">账面净值</TableHead>
+            <TableHead>折旧方法</TableHead>
             <TableHead>资产状态</TableHead>
           </TableRow>
         </TableHeader>
@@ -279,6 +282,9 @@ export const DepreciationScheduleTable: React.FC<DepreciationScheduleTableProps>
                 </TableCell>
                 <TableCell className="text-right font-semibold">
                   {formatCurrency(item.netValue)}
+                </TableCell>
+                <TableCell>
+                  <DepreciationMethodBadge method={item.depreciationMethod} />
                 </TableCell>
                 <TableCell>
                   {terminal ? (

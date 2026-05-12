@@ -1,5 +1,5 @@
 /**
- * DepreciationPage — Container page for the depreciation module (SWARM-055).
+ * DepreciationPage — Container page for the depreciation module (SWARM-055 / SWARM-067).
  *
  * Manages:
  * - Filter state (assetNo, period)
@@ -10,6 +10,7 @@
  * - Error state with retry capability (ATB-05)
  * - Front-end terminal-state validation before batch calc (ATB-04)
  * - Client-side YYYY-MM period format validation (ATB-03)
+ * - Depreciation method badge rendering via DepreciationMethodBadge (SWARM-067)
  *
  * All API calls happen here; child DepreciationScheduleTable is a pure
  * display component that receives data and callbacks via props.

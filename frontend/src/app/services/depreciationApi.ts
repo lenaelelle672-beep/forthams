@@ -4,6 +4,7 @@
  * Provides typed API methods for:
  * - Fetching paginated depreciation schedules with filters (assetNo, period)
  * - Triggering batch depreciation calculation for selected assets
+ * - Fetching depreciation history for a specific asset
  *
  * No mock data or interceptors. All requests go to the real backend.
  *
@@ -45,6 +46,12 @@ export interface DepreciationScheduleItem {
    * assets (RETIRED, SCRAPPED, etc.).
    */
   assetStatus?: string;
+  /**
+   * Depreciation method key (e.g. "straight_line", "double_declining").
+   * Used by DepreciationMethodBadge to render the method label.
+   * Mirrors the method stored on the asset or schedule record.
+   */
+  depreciationMethod?: string;
 }
 
 /**
@@ -156,5 +163,29 @@ export async function batchCalculateDepreciation(
   return await api.post<BatchCalculateResponse>(
     '/depreciation/calculate',
     request,
+  );
+}
+
+/**
+ * Fetch depreciation history records for a specific asset.
+ *
+ * Calls GET /api/assets/{assetId}/depreciation-schedule with pagination.
+ * Returns the full depreciation timeline (all periods) for the given asset,
+ * ordered chronologically.
+ *
+ * @param assetId - The asset ID to fetch history for
+ * @param page - 1-based page number
+ * @param pageSize - Number of rows per page
+ * @returns Paginated depreciation schedule response for the asset
+ */
+export async function getDepreciationHistory(
+  assetId: number,
+  page: number = 1,
+  pageSize: number = 20,
+): Promise<DepreciationScheduleResponse> {
+  const params: Record<string, string | number> = { page, pageSize };
+  return await api.get<DepreciationScheduleResponse>(
+    `/assets/${assetId}/depreciation-schedule`,
+    { params },
   );
 }
