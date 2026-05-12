@@ -11,14 +11,19 @@
  * SWARM-057: Added "折旧历史" and "相关工单" tabs for viewing depreciation
  * schedule and associated work order history inline.
  *
+ * SWARM-069: Added "生命周期" tab with AssetLifecycleTimeline and
+ * AssetRelatedWorkOrders components, powered by the assetDetailApi aggregated
+ * data layer. Cross-tenant 403 errors are intercepted at the page level and
+ * rendered as a "无权访问该资产" forbidden state instead of raw error codes.
+ *
  * ATB-05: Terminal-state assets (SCRAPPED/RETIRED/DISPOSED) have the retirement
  * button physically disabled with both `disabled` and `aria-disabled` attributes.
  *
  * @module pages/assets/AssetDetailPage
- * @since SWARM-015, SWARM-033, SWARM-038, SWARM-049, SWARM-057
+ * @since SWARM-015, SWARM-033, SWARM-038, SWARM-049, SWARM-057, SWARM-069
  */
 
-import React, { useCallback } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import {
   Card,
@@ -37,6 +42,7 @@ import {
   FileText,
   AlertTriangle,
   Pencil,
+  ShieldAlert,
 } from 'lucide-react';
 import { useAssetDetail } from '../../hooks/useAssets';
 import {
@@ -46,6 +52,16 @@ import {
 import { ASSET_STATUS_CONFIG } from '../../types/asset.types';
 import { AssetDepreciationTab } from './tabs/AssetDepreciationTab';
 import { AssetWorkOrdersTab } from './tabs/AssetWorkOrdersTab';
+import { RetirementHistoryList } from '../../components/retirement/RetirementHistoryList';
+import { AssetLifecycleTimeline } from './AssetLifecycleTimeline';
+import { AssetRelatedWorkOrders } from './AssetRelatedWorkOrders';
+import {
+  fetchAssetLifecycle,
+  fetchAssetWorkOrders,
+  AssetDetailApiError,
+  type LifecycleNode,
+  type RelatedWorkOrderItem,
+} from '../../services/assetDetailApi';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -100,6 +116,9 @@ function formatDate(value: string | undefined | null): string {
  * Uses the useAssetDetail hook for real API data fetching with auto-fetch
  * when assetId is available from URL params.
  *
+ * SWARM-069: Additionally loads lifecycle timeline and related work orders
+ * from assetDetailApi, intercepting cross-tenant 403 errors at the page level.
+ *
  * @returns The asset detail page JSX
  */
 export const AssetDetailPage: React.FC = () => {
@@ -111,6 +130,52 @@ export const AssetDetailPage: React.FC = () => {
 
   // -- Retirement status hook -------------------------------------------------
   const { retirementDisabled } = useAssetRetirementStatus(assetId ?? null);
+
+  // -- SWARM-069: Lifecycle & work orders from aggregated API ----------------
+  const [lifecycleNodes, setLifecycleNodes] = useState<LifecycleNode[]>([]);
+  const [relatedWorkOrders, setRelatedWorkOrders] = useState<RelatedWorkOrderItem[]>([]);
+  const [relatedWorkOrdersTotal, setRelatedWorkOrdersTotal] = useState(0);
+  const [forbidden, setForbidden] = useState(false);
+
+  /**
+   * Load SWARM-069 lifecycle and work order data in parallel.
+   * Intercepts 403 cross-tenant errors to show forbidden state.
+   */
+  const loadAggregatedData = useCallback(async () => {
+    if (!assetId) return;
+
+    setForbidden(false);
+
+    try {
+      const [lifecycleResult, workOrdersResult] = await Promise.all([
+        fetchAssetLifecycle(assetId).catch((err) => {
+          if (err instanceof AssetDetailApiError && err.isForbidden) {
+            throw err;
+          }
+          return { assetId, nodes: [] } as { assetId: string; nodes: LifecycleNode[] };
+        }),
+        fetchAssetWorkOrders(assetId).catch((err) => {
+          if (err instanceof AssetDetailApiError && err.isForbidden) {
+            throw err;
+          }
+          return { records: [], total: 0 } as { records: RelatedWorkOrderItem[]; total: number };
+        }),
+      ]);
+
+      setLifecycleNodes(lifecycleResult.nodes);
+      setRelatedWorkOrders(workOrdersResult.records);
+      setRelatedWorkOrdersTotal(workOrdersResult.total);
+    } catch (err) {
+      if (err instanceof AssetDetailApiError && err.isForbidden) {
+        setForbidden(true);
+      }
+      // Non-critical: lifecycle/work orders may fail silently
+    }
+  }, [assetId]);
+
+  useEffect(() => {
+    loadAggregatedData();
+  }, [loadAggregatedData]);
 
   /**
    * Navigate to the retirement application page for this asset.
@@ -136,6 +201,26 @@ export const AssetDetailPage: React.FC = () => {
             {[...Array(6)].map((_, i) => (
               <Skeleton key={i} className="h-10 w-full" />
             ))}
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // ---- SWARM-069: Cross-tenant forbidden state -----------------------------
+  if (forbidden) {
+    return (
+      <div className="max-w-4xl mx-auto space-y-6 pb-12" data-testid="asset-detail-forbidden">
+        <Card>
+          <CardContent className="flex flex-col items-center py-12">
+            <ShieldAlert className="h-10 w-10 text-red-500 mb-3" />
+            <p className="text-muted-foreground mb-4">
+              无权访问该资产
+            </p>
+            <Button variant="outline" onClick={() => navigate(-1)}>
+              <ArrowLeft className="w-4 h-4 mr-1" />
+              返回
+            </Button>
           </CardContent>
         </Card>
       </div>
@@ -298,11 +383,15 @@ export const AssetDetailPage: React.FC = () => {
       </Card>
 
       {/* SWARM-057: Depreciation History & Related Work Orders Tabs */}
+      {/* SWARM-062: Added retirement history tab */}
+      {/* SWARM-069: Added lifecycle timeline & aggregated work orders tab */}
       {assetId && (
         <Tabs defaultValue="depreciation" className="w-full">
           <TabsList>
             <TabsTrigger value="depreciation">折旧历史</TabsTrigger>
             <TabsTrigger value="work-orders">相关工单</TabsTrigger>
+            <TabsTrigger value="lifecycle">生命周期</TabsTrigger>
+            <TabsTrigger value="retirement-history">退役历史</TabsTrigger>
           </TabsList>
           <TabsContent value="depreciation">
             <AssetDepreciationTab
@@ -315,6 +404,20 @@ export const AssetDetailPage: React.FC = () => {
               assetId={assetId}
               isTerminal={terminalState}
             />
+          </TabsContent>
+          <TabsContent value="lifecycle">
+            <div className="space-y-6">
+              {/* SWARM-069: Lifecycle timeline from aggregated API */}
+              <AssetLifecycleTimeline nodes={lifecycleNodes} />
+              {/* SWARM-069: Related work orders from aggregated API */}
+              <AssetRelatedWorkOrders
+                workOrders={relatedWorkOrders}
+                total={relatedWorkOrdersTotal}
+              />
+            </div>
+          </TabsContent>
+          <TabsContent value="retirement-history">
+            <RetirementHistoryList assetId={assetId} />
           </TabsContent>
         </Tabs>
       )}
