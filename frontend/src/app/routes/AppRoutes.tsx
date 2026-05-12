@@ -87,6 +87,29 @@ const AssetDetailPage = withSuspense(
   )
 );
 
+/**
+ * Work order management page — centralized list, create, and lifecycle management.
+ * SWARM-063: Full lifecycle work order management with real API integration.
+ */
+const WorkOrderManagementPage = withSuspense(
+  lazy(() =>
+    import('../pages/workorders/WorkOrderManagementPage').then((module) => ({
+      default: module.WorkOrderManagementPage,
+    }))
+  )
+);
+
+/**
+ * Work order detail page — view work order details and approval history.
+ */
+const WorkOrderDetailPage = withSuspense(
+  lazy(() =>
+    import('../pages/workorders/WorkOrderDetailPage').then((module) => ({
+      default: module.default ?? module.WorkOrderDetailPage,
+    }))
+  )
+);
+
 // ---------------------------------------------------------------------------
 // Route definitions
 // ---------------------------------------------------------------------------
@@ -125,12 +148,31 @@ export const assetDetailRoute: RouteObject = {
 };
 
 /**
+ * Work order management routes.
+ *
+ * @description Defines routes for:
+ * - `/workorders` — Work order management page (list + inline create)
+ * - `/workorders/:id` — Work order detail view
+ */
+export const workOrderRoutes: RouteObject[] = [
+  {
+    path: 'workorders',
+    Component: WorkOrderManagementPage,
+  },
+  {
+    path: 'workorders/:id',
+    Component: WorkOrderDetailPage,
+  },
+];
+
+/**
  * All routes exported by this module.
  * Merge these into the main router's RootLayout children array.
  */
 export const allAppRoutes: RouteObject[] = [
   assetDetailRoute,
   ...retirementRoutes,
+  ...workOrderRoutes,
 ];
 
 export default allAppRoutes;
