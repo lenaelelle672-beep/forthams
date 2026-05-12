@@ -1,0 +1,456 @@
+/**
+ * DashboardPage.module.css
+ *
+ * 仪表板主页面栅格布局与各子组件样式。
+ * 所有 UI 表现收敛于本文件，禁止使用内联样式或引入全局 CSS 类名。
+ *
+ * @module components/dashboard/DashboardPage.module
+ */
+
+/* ── 页面根容器 ── */
+.pageContainer {
+  min-height: 100%;
+  padding: 0;
+}
+
+/* ── 页面头部（标题 + 刷新按钮） ── */
+.pageHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.pageTitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+}
+
+.pageSubtitle {
+  color: #4b5563;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+.refreshButton {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+  background-color: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.refreshButton:hover {
+  background-color: #f9fafb;
+}
+
+.refreshButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ── 全局加载态横幅 ── */
+.loadingBanner {
+  border-radius: 0.5rem;
+  border: 1px solid #bfdbfe;
+  background-color: #eff6ff;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  color: #1d4ed8;
+  margin-bottom: 1.5rem;
+}
+
+/* ── 全局错误态横幅 ── */
+.errorBanner {
+  border-radius: 0.5rem;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  background-color: rgba(239, 68, 68, 0.05);
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  color: #dc2626;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.errorText {
+  flex: 1;
+}
+
+.retryButton {
+  margin-left: 1rem;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #dc2626;
+  background-color: #ffffff;
+  border: 1px solid #fca5a5;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.retryButton:hover {
+  background-color: #fef2f2;
+}
+
+/* ── 错误降级容器（API 异常白屏防护） ── */
+.errorBoundary {
+  border-radius: 0.5rem;
+  border: 1px solid #fca5a5;
+  background-color: #fef2f2;
+  padding: 2rem;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.errorBoundaryTitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #991b1b;
+  margin-bottom: 0.5rem;
+}
+
+.errorBoundaryMessage {
+  font-size: 0.875rem;
+  color: #b91c1c;
+  margin-bottom: 1rem;
+}
+
+.errorBoundaryRetry {
+  padding: 0.5rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #ffffff;
+  background-color: #dc2626;
+  border: none;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.errorBoundaryRetry:hover {
+  background-color: #b91c1c;
+}
+
+/* ── 统计卡片行 ── */
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 1024px) {
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .statsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── 两列等宽网格 ── */
+.twoColGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 1024px) {
+  .twoColGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── AssetSummaryCard ── */
+.summaryCard {
+  background-color: #ffffff;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+  padding: 1.5rem;
+  transition: box-shadow 0.2s;
+}
+
+.summaryCard:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+}
+
+.summaryCardContent {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.summaryCardInfo {
+  flex: 1;
+}
+
+.summaryCardLabel {
+  font-size: 0.875rem;
+  color: #4b5563;
+}
+
+.summaryCardValue {
+  font-size: 1.875rem;
+  font-weight: 600;
+  color: #111827;
+  margin-top: 0.5rem;
+}
+
+.summaryCardDetail {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-top: 0.5rem;
+}
+
+.summaryCardIconWrap {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── AssetSummaryCard 骨架屏 ── */
+.summaryCardSkeleton {
+  background-color: #ffffff;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+  padding: 1.5rem;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.skeletonBar {
+  background-color: #e5e7eb;
+  border-radius: 0.25rem;
+}
+
+.skeletonBarSm {
+  height: 1rem;
+  width: 5rem;
+  margin-bottom: 0.75rem;
+}
+
+.skeletonBarLg {
+  height: 2rem;
+  width: 4rem;
+  margin-bottom: 0.5rem;
+}
+
+.skeletonBarXs {
+  height: 0.75rem;
+  width: 7rem;
+}
+
+/* ── CategoryPieChart ── */
+.chartPanel {
+  background-color: #ffffff;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+  padding: 1.5rem;
+}
+
+.chartPanelTitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #111827;
+  margin: 0 0 1rem 0;
+}
+
+.chartEmpty {
+  display: flex;
+  height: 300px;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.chartLoading {
+  display: flex;
+  height: 300px;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+/* ── ExpirationAlertList ── */
+.alertPanel {
+  background-color: #ffffff;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+  padding: 1.5rem;
+}
+
+.alertPanelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.alertPanelTitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+}
+
+.alertBadge {
+  padding: 0.125rem 0.625rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  background-color: #fee2e2;
+  color: #991b1b;
+  border-radius: 9999px;
+}
+
+.alertEmpty {
+  border-radius: 0.5rem;
+  border: 1px dashed #d1d5db;
+  padding: 1.5rem;
+  text-align: center;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.alertSkeletonWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.alertSkeletonItem {
+  padding: 1rem;
+  background-color: #f9fafb;
+  border-radius: 0.5rem;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.alertList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.alertItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem;
+  background-color: #f9fafb;
+  border-radius: 0.5rem;
+  transition: background-color 0.2s;
+}
+
+.alertItem:hover {
+  background-color: #f3f4f6;
+}
+
+.alertIconWrap {
+  flex-shrink: 0;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.alertIconUrgent {
+  color: #dc2626;
+  background-color: #fef2f2;
+}
+
+.alertIconWarning {
+  color: #d97706;
+  background-color: #fffbeb;
+}
+
+.alertIconNormal {
+  color: #4b5563;
+  background-color: #f9fafb;
+}
+
+.alertItemContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.alertItemHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.alertItemName {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #111827;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.alertItemBadge {
+  flex-shrink: 0;
+  margin-left: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.125rem 0.5rem;
+  border-radius: 0.25rem;
+}
+
+.alertItemBadgeUrgent {
+  background-color: #fee2e2;
+  color: #b91c1c;
+}
+
+.alertItemBadgeWarning {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.alertItemBadgeNormal {
+  background-color: #f3f4f6;
+  color: #4b5563;
+}
+
+.alertItemType {
+  font-size: 0.875rem;
+  color: #4b5563;
+  margin-top: 0.25rem;
+}
+
+.alertItemDate {
+  display: flex;
+  align-items: center;
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.alertItemDateIcon {
+  width: 0.75rem;
+  height: 0.75rem;
+  margin-right: 0.25rem;
+}

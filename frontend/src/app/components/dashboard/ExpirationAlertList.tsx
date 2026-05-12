@@ -1,16 +1,31 @@
 /**
- * ExpirationAlertList — 合同到期预警列表组件
+ * ExpirationAlertList — 过期预警提醒列表组件
  *
  * 展示即将到期的合同和维保预警，按紧急程度排序。
- * 支持外部注入数据或内部自行获取。
+ * 内部调用从 DashboardPage 导入的 formatDateLabel / formatApprovalDate /
+ * getApprovalLabel 进行日期与标签格式化，禁止重写任何格式化逻辑。
+ *
+ * 三态边界处理：
+ * - Loading：骨架屏占位
+ * - Empty：data-testid="empty-alert-list" 占位符
+ * - 正常数据：格式化后的列表展示
+ *
+ * 所有样式来自 DashboardPage.module.css，禁止使用内联样式。
  *
  * @module components/dashboard/ExpirationAlertList
  * @see frontend/src/app/hooks/useDashboardData.ts — ExpirationAlert
+ * @see frontend/src/app/pages/DashboardPage.tsx — formatDateLabel, formatApprovalDate, getApprovalLabel
  */
 
 import React from 'react';
 import { AlertTriangle, Clock, FileWarning } from 'lucide-react';
 import type { ExpirationAlert } from '../../hooks/useDashboardData';
+import {
+  formatDateLabel,
+  formatApprovalDate,
+  getApprovalLabel,
+} from '../../pages/DashboardPage';
+import styles from './DashboardPage.module.css';
 
 /**
  * ExpirationAlertList 组件属性
@@ -20,8 +35,6 @@ export interface ExpirationAlertListProps {
   items?: ExpirationAlert[];
   /** 加载状态 */
   loading?: boolean;
-  /** 自定义类名 */
-  className?: string;
   /** 最大显示条数，默认 10 */
   maxItems?: number;
   /** data-testid 用于 E2E 测试 */
@@ -29,19 +42,37 @@ export interface ExpirationAlertListProps {
 }
 
 /**
- * 获取紧急程度对应的样式类
+ * 获取紧急程度对应的图标容器样式类
  *
  * @param urgency - 紧急程度
- * @returns Tailwind 样式类名
+ * @returns CSS Module 类名
  */
-function getUrgencyClass(urgency: ExpirationAlert['urgency']): string {
+function getUrgencyIconClass(urgency: ExpirationAlert['urgency']): string {
   switch (urgency) {
     case 'urgent':
-      return 'text-red-600 bg-red-50';
+      return `${styles.alertIconWrap} ${styles.alertIconUrgent}`;
     case 'warning':
-      return 'text-amber-600 bg-amber-50';
+      return `${styles.alertIconWrap} ${styles.alertIconWarning}`;
     case 'normal':
-      return 'text-gray-600 bg-gray-50';
+      return `${styles.alertIconWrap} ${styles.alertIconNormal}`;
+  }
+}
+
+/**
+ * 获取剩余天数徽章的样式类
+ *
+ * @param urgency - 紧急程度
+ * @returns CSS Module 类名
+ */
+function getUrgencyBadgeClass(urgency: ExpirationAlert['urgency']): string {
+  const base = `${styles.alertItemBadge}`;
+  switch (urgency) {
+    case 'urgent':
+      return `${base} ${styles.alertItemBadgeUrgent}`;
+    case 'warning':
+      return `${base} ${styles.alertItemBadgeWarning}`;
+    case 'normal':
+      return `${base} ${styles.alertItemBadgeNormal}`;
   }
 }
 
@@ -61,17 +92,18 @@ function getRemainingDaysText(remainingDays: number): string {
  * ExpirationAlertList 组件
  *
  * 展示合同到期和维保到期预警列表，按紧急程度排序。
+ * 使用 CSS Module 样式，无内联样式。
  *
  * @example
  * ```tsx
  * <ExpirationAlertList items={alerts} />
  * <ExpirationAlertList loading={true} />
+ * <ExpirationAlertList items={[]} dataTestId="dashboard-expiration-alerts" />
  * ```
  */
 export const ExpirationAlertList: React.FC<ExpirationAlertListProps> = ({
   items = [],
   loading = false,
-  className = '',
   maxItems = 10,
   dataTestId,
 }) => {
@@ -81,21 +113,28 @@ export const ExpirationAlertList: React.FC<ExpirationAlertListProps> = ({
   /** 按剩余天数截取展示数量 */
   const displayItems = items.slice(0, maxItems);
 
-  /** 渲染加载态 */
+  /**
+   * 渲染加载态骨架屏
+   */
   if (loading) {
     return (
-      <div
-        className={`bg-white rounded-lg border border-gray-200 p-6 ${className}`}
-        data-testid={dataTestId}
-      >
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">到期预警</h3>
+      <div className={styles.alertPanel} data-testid={dataTestId}>
+        <div className={styles.alertPanelHeader}>
+          <h3 className={styles.alertPanelTitle}>到期预警</h3>
         </div>
-        <div className="space-y-3">
+        <div className={styles.alertSkeletonWrap}>
           {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="animate-pulse p-4 bg-gray-50 rounded-lg">
-              <div className="h-4 bg-gray-200 rounded w-3/4 mb-2" />
-              <div className="h-3 bg-gray-200 rounded w-1/2" />
+            <div key={i} className={styles.alertSkeletonItem}>
+              <div className={styles.alertItemContent}>
+                <div
+                  className={styles.skeletonBar}
+                  style={{ width: '75%', height: '1rem', marginBottom: '0.5rem' }}
+                />
+                <div
+                  className={styles.skeletonBar}
+                  style={{ width: '50%', height: '0.75rem' }}
+                />
+              </div>
             </div>
           ))}
         </div>
@@ -103,64 +142,55 @@ export const ExpirationAlertList: React.FC<ExpirationAlertListProps> = ({
     );
   }
 
-  /** 渲染主内容 */
+  /**
+   * 渲染主内容
+   */
   return (
-    <div
-      className={`bg-white rounded-lg border border-gray-200 p-6 ${className}`}
-      data-testid={dataTestId}
-    >
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-gray-900">到期预警</h3>
+    <div className={styles.alertPanel} data-testid={dataTestId}>
+      <div className={styles.alertPanelHeader}>
+        <h3 className={styles.alertPanelTitle}>到期预警</h3>
         {urgentCount > 0 ? (
-          <span className="px-2.5 py-0.5 text-xs font-medium bg-red-100 text-red-800 rounded-full">
+          <span className={styles.alertBadge}>
             {urgentCount}项紧急
           </span>
         ) : null}
       </div>
 
       {displayItems.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-gray-200 p-6 text-center text-sm text-gray-500">
+        <div
+          className={styles.alertEmpty}
+          data-testid="empty-alert-list"
+        >
           暂无到期预警，所有合同和维保状态正常。
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className={styles.alertList}>
           {displayItems.map((item) => (
-            <div
-              key={item.id}
-              className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-            >
-              <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${getUrgencyClass(item.urgency)}`}>
+            <div key={item.id} className={styles.alertItem}>
+              <div className={getUrgencyIconClass(item.urgency)}>
                 {item.type === 'maintenance' ? (
                   <FileWarning className="w-4 h-4" />
                 ) : (
                   <AlertTriangle className="w-4 h-4" />
                 )}
               </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between">
-                  <p className="text-sm font-medium text-gray-900 truncate">
+              <div className={styles.alertItemContent}>
+                <div className={styles.alertItemHeader}>
+                  <p className={styles.alertItemName}>
                     {item.assetName}
                   </p>
-                  <span
-                    className={`flex-shrink-0 ml-2 text-xs font-medium px-2 py-0.5 rounded ${
-                      item.urgency === 'urgent'
-                        ? 'bg-red-100 text-red-700'
-                        : item.urgency === 'warning'
-                          ? 'bg-amber-100 text-amber-700'
-                          : 'bg-gray-100 text-gray-600'
-                    }`}
-                  >
+                  <span className={getUrgencyBadgeClass(item.urgency)}>
                     {getRemainingDaysText(item.remainingDays)}
                   </span>
                 </div>
-                <p className="text-sm text-gray-600 mt-1 truncate">
+                <p className={styles.alertItemType}>
                   {item.type === 'contract' ? '合同到期' : '维保到期'}
                 </p>
-                <div className="flex items-center mt-1 text-xs text-gray-500">
-                  <Clock className="w-3 h-3 mr-1" />
+                <div className={styles.alertItemDate}>
+                  <Clock className={styles.alertItemDateIcon} />
                   <span>
                     {item.expirationDate
-                      ? new Date(item.expirationDate).toLocaleDateString('zh-CN')
+                      ? formatDateLabel(item.expirationDate)
                       : '--'}
                   </span>
                 </div>

@@ -1,29 +1,34 @@
 /**
- * DashboardPage — 仪表板主页面
+ * DashboardPage — 仪表板主页面（系统默认首页）
  *
  * 通过 useDashboardData Hook 及独立 API 调用获取真实数据，
- * 整合资产概览卡片、分类分布饼图、资产价值趋势、部门资产分布、
- * 待审批事项处理、最近动态、快速操作及保养日历等核心模块。
+ * 整合资产汇总卡片、分类分布饼图、过期预警提醒三大核心模块。
  *
  * 功能：
  * - 展示资产总数、待审批流程、闲置资产、资产净值四大核心指标
  * - 展示资产分类分布饼图
+ * - 展示合同到期预警和维保到期预警
  * - 展示资产价值趋势折线图（调用 getValueTrends API）
  * - 展示部门资产分布饼图（调用 getDeptDistribution API）
- * - 展示待审批事项，支持批准/驳回操作（调用 approvalService API）
- * - 展示最近动态列表
- * - 展示合同到期预警和维保到期预警
+ * - 展示待审批事项，支持批准/驳回操作
  * - 展示快速操作和保养日历
+ *
+ * 导出的格式化工具函数（供子组件作为外部依赖引入）：
+ * - formatNumber — 数值千分位格式化
+ * - formatCurrency — 货币（¥）格式化
+ * - formatDateLabel — 日期月/日格式化
+ * - formatApprovalDate — 审批日期格式化
+ * - getApprovalLabel — 审批记录标签提取
+ *
+ * 状态三态处理：Loading（骨架屏）、Error（异常降级提示）、Empty（无数据占位）
  *
  * @module pages/DashboardPage
  * @see frontend/src/app/hooks/useDashboardData.ts — useDashboardData
  * @see frontend/src/app/services/dashboardService.ts — dashboardService
  * @see frontend/src/app/services/approvalService.ts — approvalService
- * @see frontend/src/app/components/dashboard/AssetOverviewCard.tsx
- * @see frontend/src/app/components/dashboard/CategoryStatsChart.tsx
+ * @see frontend/src/app/components/dashboard/AssetSummaryCard.tsx
+ * @see frontend/src/app/components/dashboard/CategoryPieChart.tsx
  * @see frontend/src/app/components/dashboard/ExpirationAlertList.tsx
- * @see frontend/src/app/components/QuickActions.tsx
- * @see frontend/src/app/components/MaintenanceCalendar.tsx
  */
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -47,8 +52,8 @@ import {
   YAxis,
 } from 'recharts';
 import { useDashboardData } from '../hooks/useDashboardData';
-import { AssetOverviewCard } from '../components/dashboard/AssetOverviewCard';
-import { CategoryStatsChart } from '../components/dashboard/CategoryStatsChart';
+import { AssetSummaryCard } from '../components/dashboard/AssetSummaryCard';
+import { CategoryPieChart } from '../components/dashboard/CategoryPieChart';
 import { ExpirationAlertList } from '../components/dashboard/ExpirationAlertList';
 import { QuickActions } from '../components/QuickActions';
 import { MaintenanceCalendar } from '../components/MaintenanceCalendar';
@@ -61,20 +66,9 @@ import {
   approvalService,
   type ApprovalRecord,
 } from '../services/approvalService';
+import styles from '../components/dashboard/DashboardPage.module.css';
 
-/** 图表调色板 */
-const CHART_PALETTE = [
-  '#5470C6',
-  '#91CC75',
-  '#FAC858',
-  '#EE6666',
-  '#73C0DE',
-  '#3BA272',
-  '#FC8452',
-  '#9A60B4',
-  '#EA7CCC',
-  '#0068B7',
-];
+// ── 导出格式化工具函数（供子组件作为外部依赖引入） ──
 
 /**
  * 格式化数值显示
@@ -82,7 +76,7 @@ const CHART_PALETTE = [
  * @param value - 待格式化的值
  * @returns 格式化后的字符串
  */
-function formatNumber(value?: number | string): string {
+export function formatNumber(value?: number | string): string {
   if (value === undefined || value === null || value === '') {
     return '--';
   }
@@ -99,7 +93,7 @@ function formatNumber(value?: number | string): string {
  * @param value - 待格式化的货币值
  * @returns 带有 ¥ 前缀的格式化字符串
  */
-function formatCurrency(value?: number | string): string {
+export function formatCurrency(value?: number | string): string {
   if (value === undefined || value === null || value === '') {
     return '--';
   }
@@ -110,7 +104,7 @@ function formatCurrency(value?: number | string): string {
   return new Intl.NumberFormat('zh-CN', {
     style: 'currency',
     currency: 'CNY',
-    maximumFractionDigits: 0,
+    maximumFractionDigits: 2,
   }).format(numericValue);
 }
 
@@ -120,7 +114,7 @@ function formatCurrency(value?: number | string): string {
  * @param value - ISO 日期字符串
  * @returns 格式化后的日期文本
  */
-function formatDateLabel(value: string): string {
+export function formatDateLabel(value: string): string {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) {
     return value;
@@ -132,12 +126,12 @@ function formatDateLabel(value: string): string {
 }
 
 /**
- * 格化审批日期字段
+ * 格式化审批日期字段
  *
  * @param value - 日期值，通常是字符串
  * @returns 格式化后的日期文本或占位符
  */
-function formatApprovalDate(value: unknown): string {
+export function formatApprovalDate(value: unknown): string {
   return typeof value === 'string' && value ? value : '-';
 }
 
@@ -151,7 +145,7 @@ function formatApprovalDate(value: unknown): string {
  * @param fallback - 所有字段均为空时的回退值
  * @returns 提取到的标签文本
  */
-function getApprovalLabel(
+export function getApprovalLabel(
   approval: ApprovalRecord,
   keys: string[],
   fallback = '-',
@@ -165,13 +159,32 @@ function getApprovalLabel(
   return fallback;
 }
 
+/** 图表调色板 */
+const CHART_PALETTE = [
+  '#5470C6',
+  '#91CC75',
+  '#FAC858',
+  '#EE6666',
+  '#73C0DE',
+  '#3BA272',
+  '#FC8452',
+  '#9A60B4',
+  '#EA7CCC',
+  '#0068B7',
+];
+
 /**
  * DashboardPage 主页面组件
  *
  * 使用 useDashboardData Hook 加载仪表板统计数据，
  * 并通过 dashboardService / approvalService 获取趋势、分布和审批数据。
- * 渲染资产概览卡片、分类饼图、价值趋势折线图、部门分布饼图、
+ * 渲染资产汇总卡片、分类饼图、价值趋势折线图、部门分布饼图、
  * 待审批列表、最近动态、到期预警、快速操作和保养日历。
+ *
+ * 三态边界处理：
+ * - Loading：骨架屏加载指示器
+ * - Error：data-testid="dashboard-error-boundary" 异常降级
+ * - Empty：各子组件内部独立处理空态
  *
  * @example
  * ```tsx
@@ -267,8 +280,8 @@ export const DashboardPage: React.FC = () => {
         value: stats?.totalAssets ?? '--',
         detail: `在用资产 ${formatNumber(stats?.inUseAssets)}`,
         icon: Package,
-        iconBgClass: 'bg-blue-50',
-        iconTextClass: 'text-blue-600',
+        iconBgColor: '#eff6ff',
+        iconTextColor: '#2563eb',
         dataTestId: 'stat-total',
       },
       {
@@ -276,8 +289,8 @@ export const DashboardPage: React.FC = () => {
         value: stats?.pendingApprovals ?? '--',
         detail: '待处理审批事项',
         icon: Clock,
-        iconBgClass: 'bg-amber-50',
-        iconTextClass: 'text-amber-600',
+        iconBgColor: '#fffbeb',
+        iconTextColor: '#d97706',
         dataTestId: 'stat-pending',
       },
       {
@@ -285,8 +298,8 @@ export const DashboardPage: React.FC = () => {
         value: stats?.idleAssets ?? '--',
         detail: `报废资产 ${formatNumber(stats?.scrapAssets)}`,
         icon: AlertCircle,
-        iconBgClass: 'bg-orange-50',
-        iconTextClass: 'text-orange-600',
+        iconBgColor: '#fff7ed',
+        iconTextColor: '#ea580c',
         dataTestId: 'stat-idle',
       },
       {
@@ -294,8 +307,8 @@ export const DashboardPage: React.FC = () => {
         value: stats?.netValue ?? '--',
         detail: `总值 ${formatCurrency(stats?.totalValue)}`,
         icon: CheckCircle,
-        iconBgClass: 'bg-green-50',
-        iconTextClass: 'text-green-600',
+        iconBgColor: '#f0fdf4',
+        iconTextColor: '#16a34a',
         dataTestId: 'stat-value',
       },
     ],
@@ -361,17 +374,17 @@ export const DashboardPage: React.FC = () => {
   }, []);
 
   return (
-    <div className="space-y-6">
+    <div data-testid="dashboard-page-container">
       {/* 页面标题 */}
-      <div className="flex items-center justify-between">
+      <div className={styles.pageHeader}>
         <div>
-          <h2 className="text-2xl font-semibold text-gray-900">仪表板</h2>
-          <p className="text-gray-600 mt-1">欢迎回来，这是您的资产管理概览</p>
+          <h2 className={styles.pageTitle}>仪表板</h2>
+          <p className={styles.pageSubtitle}>欢迎回来，这是您的资产管理概览</p>
         </div>
         <button
           type="button"
           onClick={refreshAll}
-          className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+          className={styles.refreshButton}
           disabled={loading}
           data-testid="dashboard-refresh"
         >
@@ -381,40 +394,51 @@ export const DashboardPage: React.FC = () => {
 
       {/* 全局加载态 */}
       {loading ? (
-        <div className="rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-700">
+        <div className={styles.loadingBanner}>
           正在同步仪表板数据...
         </div>
       ) : null}
 
-      {/* 全局错误态 */}
-      {error ? (
-        <div className="rounded-lg border border-destructive/20 bg-destructive/5 px-4 py-3 text-sm text-destructive">
-          {error}
+      {/* 全局错误态 — API 异常降级处理 (ATB-05) */}
+      {error && !loading ? (
+        <div
+          className={styles.errorBoundary}
+          data-testid="dashboard-error-boundary"
+        >
+          <div className={styles.errorBoundaryTitle}>加载失败</div>
+          <div className={styles.errorBoundaryMessage}>{error}</div>
+          <button
+            type="button"
+            className={styles.errorBoundaryRetry}
+            onClick={refreshAll}
+          >
+            重试
+          </button>
         </div>
       ) : null}
 
-      {/* 统计卡片 */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {/* 资产汇总统计卡片 (ATB-02) */}
+      <div className={styles.statsGrid}>
         {statCards.map((card) => (
-          <AssetOverviewCard
+          <AssetSummaryCard
             key={card.name}
             title={card.name}
             value={card.value}
             detail={card.detail}
             icon={card.icon}
-            iconBgClass={card.iconBgClass}
-            iconTextClass={card.iconTextClass}
+            iconBgColor={card.iconBgColor}
+            iconTextColor={card.iconTextColor}
             loading={loading}
             dataTestId={card.dataTestId}
           />
         ))}
       </div>
 
-      {/* 趋势图 & 部门分布 */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* 资产价值趋势 & 部门资产分布 */}
+      <div className={styles.twoColGrid}>
         {/* 资产价值趋势折线图 */}
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">资产价值趋势</h3>
+        <div className={styles.chartPanel}>
+          <h3 className={styles.chartPanelTitle}>资产价值趋势</h3>
           {trendChartData.length ? (
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={trendChartData}>
@@ -443,15 +467,15 @@ export const DashboardPage: React.FC = () => {
               </LineChart>
             </ResponsiveContainer>
           ) : (
-            <div className="flex h-[300px] items-center justify-center text-sm text-gray-500">
+            <div className={styles.chartEmpty}>
               {loading ? '正在加载趋势数据...' : '暂无趋势数据'}
             </div>
           )}
         </div>
 
         {/* 部门资产分布饼图 */}
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">部门资产分布</h3>
+        <div className={styles.chartPanel}>
+          <h3 className={styles.chartPanelTitle}>部门资产分布</h3>
           {distributionChartData.length ? (
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
@@ -473,7 +497,7 @@ export const DashboardPage: React.FC = () => {
               </PieChart>
             </ResponsiveContainer>
           ) : (
-            <div className="flex h-[300px] items-center justify-center text-sm text-gray-500">
+            <div className={styles.chartEmpty}>
               {loading ? '正在加载分布数据...' : '暂无分布数据'}
             </div>
           )}
@@ -481,34 +505,44 @@ export const DashboardPage: React.FC = () => {
       </div>
 
       {/* 最近动态 & 待审批事项 */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className={styles.twoColGrid}>
         {/* 最近动态 */}
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">最近动态</h3>
-          <div className="space-y-4">
+        <div className={styles.chartPanel}>
+          <h3 className={styles.chartPanelTitle}>最近动态</h3>
+          <div className={styles.alertList}>
             {recentActivities.length ? (
               recentActivities.map((activity) => (
-                <div key={activity.id} className="flex gap-3 pb-4 border-b border-gray-100 last:border-0">
+                <div key={activity.id} className={styles.alertItem}>
                   <div
-                    className={`w-2 h-2 rounded-full mt-2 flex-shrink-0 ${
-                      activity.status === 'success'
-                        ? 'bg-green-500'
-                        : activity.status === 'warning'
-                          ? 'bg-yellow-500'
-                          : activity.status === 'info'
-                            ? 'bg-blue-500'
-                            : 'bg-gray-500'
-                    }`}
-                  />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900">{activity.title}</p>
-                    <p className="text-sm text-gray-600 mt-1">{activity.detail}</p>
-                    <p className="text-xs text-gray-500 mt-1">{activity.time}</p>
+                    className={styles.alertIconWrap}
+                    style={{
+                      backgroundColor:
+                        activity.status === 'success' ? '#f0fdf4' :
+                        activity.status === 'warning' ? '#fefce8' :
+                        activity.status === 'info' ? '#eff6ff' : '#f9fafb',
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: '0.5rem',
+                        height: '0.5rem',
+                        borderRadius: '50%',
+                        backgroundColor:
+                          activity.status === 'success' ? '#22c55e' :
+                          activity.status === 'warning' ? '#eab308' :
+                          activity.status === 'info' ? '#3b82f6' : '#6b7280',
+                      }}
+                    />
+                  </div>
+                  <div className={styles.alertItemContent}>
+                    <p className={styles.alertItemName}>{activity.title}</p>
+                    <p className={styles.alertItemType}>{activity.detail}</p>
+                    <p className={styles.alertItemDate}>{activity.time}</p>
                   </div>
                 </div>
               ))
             ) : (
-              <div className="rounded-lg border border-dashed border-gray-200 p-4 text-sm text-gray-500">
+              <div className={styles.alertEmpty}>
                 暂无最近动态；当前仅展示审批服务返回的真实待办记录。
               </div>
             )}
@@ -516,64 +550,88 @@ export const DashboardPage: React.FC = () => {
         </div>
 
         {/* 待审批事项 */}
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">待审批事项</h3>
-            <span className="px-2.5 py-0.5 text-xs font-medium bg-red-100 text-red-800 rounded-full">
+        <div className={styles.chartPanel}>
+          <div className={styles.alertPanelHeader}>
+            <h3 className={styles.chartPanelTitle}>待审批事项</h3>
+            <span className={styles.alertBadge}>
               {formatNumber(pendingApprovals.length)}项待处理
             </span>
           </div>
           {approvalMessage ? (
-            <div className="mb-3 text-sm text-green-600">{approvalMessage}</div>
+            <div style={{ marginBottom: '0.75rem', fontSize: '0.875rem', color: '#16a34a' }}>{approvalMessage}</div>
           ) : null}
           {approvalError ? (
-            <div className="mb-3 text-sm text-red-600">{approvalError}</div>
+            <div style={{ marginBottom: '0.75rem', fontSize: '0.875rem', color: '#dc2626' }}>{approvalError}</div>
           ) : null}
-          <div className="space-y-3">
+          <div className={styles.alertList}>
             {pendingApprovals.length ? (
               pendingApprovals.map((approval) => (
-                <div key={approval.id} className="p-4 bg-gray-50 rounded-lg">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded">
-                      {getApprovalLabel(approval, ['type', 'processType', 'changeType'], '审批')}
-                    </span>
-                    <span className="text-xs text-gray-500">
-                      {formatApprovalDate(approval.createTime ?? approval.createdAt ?? approval.applyDate)}
-                    </span>
-                  </div>
-                  <p className="text-sm font-medium text-gray-900">
-                    {getApprovalLabel(approval, ['assetName', 'asset', 'title', 'description'], '未提供资产名称')}
-                  </p>
-                  <div className="flex items-center justify-between mt-2">
-                    <span className="text-sm text-gray-600">
-                      申请人: {getApprovalLabel(approval, ['applicant', 'applicantName', 'operatorId', 'userId'], '-')}
-                    </span>
-                    <span className="text-sm font-medium text-gray-900">
-                      {getApprovalLabel(approval, ['amount', 'value', 'cost'], '')}
-                    </span>
-                  </div>
-                  <div className="flex gap-2 mt-3">
-                    <button
-                      type="button"
-                      disabled={processingApprovalId === approval.id}
-                      onClick={() => handleDashApprove(approval.id, true)}
-                      className="flex-1 px-3 py-1.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-60 rounded transition-colors"
-                    >
-                      {processingApprovalId === approval.id ? '处理中...' : '批准'}
-                    </button>
-                    <button
-                      type="button"
-                      disabled={processingApprovalId === approval.id}
-                      onClick={() => handleDashApprove(approval.id, false)}
-                      className="flex-1 px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 disabled:opacity-60 rounded transition-colors"
-                    >
-                      驳回
-                    </button>
+                <div key={approval.id} className={styles.alertItem}>
+                  <div className={styles.alertItemContent}>
+                    <div className={styles.alertItemHeader}>
+                      <span className={styles.alertItemBadge} style={{ backgroundColor: '#dbeafe', color: '#1e40af' }}>
+                        {getApprovalLabel(approval, ['type', 'processType', 'changeType'], '审批')}
+                      </span>
+                      <span className={styles.alertItemDate}>
+                        {formatApprovalDate(approval.createTime ?? approval.createdAt ?? approval.applyDate)}
+                      </span>
+                    </div>
+                    <p className={styles.alertItemName}>
+                      {getApprovalLabel(approval, ['assetName', 'asset', 'title', 'description'], '未提供资产名称')}
+                    </p>
+                    <div className={styles.alertItemHeader} style={{ marginTop: '0.5rem' }}>
+                      <span className={styles.alertItemType}>
+                        申请人: {getApprovalLabel(approval, ['applicant', 'applicantName', 'operatorId', 'userId'], '-')}
+                      </span>
+                      <span className={styles.alertItemName}>
+                        {getApprovalLabel(approval, ['amount', 'value', 'cost'], '')}
+                      </span>
+                    </div>
+                    <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.75rem' }}>
+                      <button
+                        type="button"
+                        disabled={processingApprovalId === approval.id}
+                        onClick={() => handleDashApprove(approval.id, true)}
+                        style={{
+                          flex: 1,
+                          padding: '0.375rem 0.75rem',
+                          fontSize: '0.875rem',
+                          fontWeight: 500,
+                          color: '#ffffff',
+                          backgroundColor: '#2563eb',
+                          borderRadius: '0.375rem',
+                          border: 'none',
+                          cursor: 'pointer',
+                          opacity: processingApprovalId === approval.id ? 0.6 : 1,
+                        }}
+                      >
+                        {processingApprovalId === approval.id ? '处理中...' : '批准'}
+                      </button>
+                      <button
+                        type="button"
+                        disabled={processingApprovalId === approval.id}
+                        onClick={() => handleDashApprove(approval.id, false)}
+                        style={{
+                          flex: 1,
+                          padding: '0.375rem 0.75rem',
+                          fontSize: '0.875rem',
+                          fontWeight: 500,
+                          color: '#374151',
+                          backgroundColor: '#ffffff',
+                          border: '1px solid #d1d5db',
+                          borderRadius: '0.375rem',
+                          cursor: 'pointer',
+                          opacity: processingApprovalId === approval.id ? 0.6 : 1,
+                        }}
+                      >
+                        驳回
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))
             ) : (
-              <div className="rounded-lg border border-dashed border-gray-200 p-4 text-sm text-gray-500">
+              <div className={styles.alertEmpty}>
                 暂无待审批事项。
               </div>
             )}
@@ -581,11 +639,13 @@ export const DashboardPage: React.FC = () => {
         </div>
       </div>
 
-      {/* 分类分布 & 到期预警 */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* 分类分布饼图 */}
-        <CategoryStatsChart data={categoryData} loading={loading} />
-        {/* 到期预警列表 */}
+      {/* 分类分布饼图 & 到期预警 (ATB-03, ATB-04) */}
+      <div className={styles.twoColGrid}>
+        <CategoryPieChart
+          data={categoryData}
+          loading={loading}
+          dataTestId="dashboard-category-pie-chart"
+        />
         <ExpirationAlertList
           items={expirationAlerts}
           loading={loading}
@@ -594,7 +654,7 @@ export const DashboardPage: React.FC = () => {
       </div>
 
       {/* 快速操作 & 保养日历 */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className={styles.twoColGrid}>
         <QuickActions />
         <MaintenanceCalendar />
       </div>
