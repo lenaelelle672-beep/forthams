@@ -247,6 +247,7 @@ export async function getApprovalList(
         page: params?.page ?? 1,
         pageSize: params?.pageSize ?? 10,
         status: params?.status,
+        processType: params?.processType,
         keyword: params?.keyword,
       },
     });

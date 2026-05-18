@@ -26,8 +26,11 @@ public class ApprovalController {
             @RequestParam(defaultValue = "1") Integer page,
             @RequestParam(defaultValue = "10") Integer pageSize,
             @RequestParam(required = false) String status,
-            @RequestParam(name = "processType", required = false) String keyword) {
-        return Result.success(approvalService.queryProcesses(page, pageSize, status, keyword));
+            @RequestParam(name = "processType", required = false) String processType,
+            @RequestParam(required = false) String keyword) {
+        // Use processType filter from the dedicated param; keyword is reserved
+        // for future full-text search and is not passed as a processType filter.
+        return Result.success(approvalService.queryProcesses(page, pageSize, status, processType));
     }
 
     @GetMapping("/{id}")
