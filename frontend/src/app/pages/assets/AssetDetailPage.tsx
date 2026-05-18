@@ -278,7 +278,7 @@ export const AssetDetailPage: React.FC = () => {
               {asset.assetName ?? `资产 #${assetId}`}
             </h2>
             <p className="text-sm text-gray-500 mt-1">
-              资产编号：{asset.assetCode ?? '-'}
+              资产编号：{asset.assetNo ?? asset.assetCode ?? '-'}
             </p>
           </div>
         </div>
@@ -320,35 +320,35 @@ export const AssetDetailPage: React.FC = () => {
             </div>
             <div>
               <span className="text-gray-500">资产编号：</span>
-              <span className="font-medium font-mono">{asset.assetCode ?? '-'}</span>
+              <span className="font-medium font-mono">{asset.assetNo ?? asset.assetCode ?? '-'}</span>
             </div>
             <div>
               <span className="text-gray-500">分类：</span>
-              <span className="font-medium">{asset.categoryName ?? '-'}</span>
+              <span className="font-medium">{asset.categoryName ?? (asset.categoryId != null ? String(asset.categoryId) : '-')}</span>
             </div>
             <div>
               <span className="text-gray-500">位置：</span>
-              <span className="font-medium">{asset.locationName ?? '-'}</span>
+              <span className="font-medium">{asset.location ?? asset.locationName ?? '-'}</span>
             </div>
             <div>
               <span className="text-gray-500">部门：</span>
-              <span className="font-medium">{asset.departmentName ?? '-'}</span>
+              <span className="font-medium">{asset.departmentName ?? (asset.deptId != null ? String(asset.deptId) : '-')}</span>
             </div>
             <div>
               <span className="text-gray-500">购置日期：</span>
               <span className="font-medium">{formatDate(asset.purchaseDate)}</span>
             </div>
-            {asset.purchasePrice != null && (
+            {(asset.originalValue ?? asset.purchasePrice) != null && (
               <div>
                 <span className="text-gray-500">采购价格：</span>
                 <span className="font-medium">
-                  ¥{asset.purchasePrice.toLocaleString('zh-CN', { minimumFractionDigits: 2 })}
+                  ¥{(asset.originalValue ?? asset.purchasePrice)!.toLocaleString('zh-CN', { minimumFractionDigits: 2 })}
                 </span>
               </div>
             )}
             <div>
               <span className="text-gray-500">创建时间：</span>
-              <span className="font-medium">{formatDate(asset.createdAt as string)}</span>
+              <span className="font-medium">{formatDate((asset.createTime ?? asset.createdAt) as string)}</span>
             </div>
           </div>
         </CardContent>

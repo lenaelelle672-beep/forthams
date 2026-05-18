@@ -2,14 +2,33 @@ import { api, apiClient } from "../utils/api";
 
 export interface AssetRecord {
   id: number;
+  /** Backend field: assetNo */
   assetCode?: string;
+  /** Alias for backend assetNo */
+  assetNo?: string;
   assetName?: string;
+  /** Backend field: categoryId (Long) */
+  categoryId?: number;
   categoryName?: string;
+  /** Backend field: location */
+  location?: string;
   locationName?: string;
+  /** Backend field: deptId (Long) */
+  deptId?: number;
+  departmentId?: string;
   departmentName?: string;
   status?: string;
   purchaseDate?: string;
+  /** Backend field: originalValue (BigDecimal) */
+  originalValue?: number;
   purchasePrice?: number;
+  /** Backend field: createTime */
+  createTime?: string;
+  createdAt?: string;
+  updateTime?: string;
+  remark?: string;
+  model?: string;
+  brand?: string;
   [key: string]: unknown;
 }
 

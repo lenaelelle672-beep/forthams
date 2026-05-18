@@ -120,13 +120,13 @@ export default function AssetFormPage() {
     if (asset && !initialized) {
       setForm({
         assetName: asset.assetName ?? '',
-        assetCode: asset.assetCode ?? '',
-        categoryId: (asset.categoryId as string) ?? '',
-        departmentId: (asset.departmentId as string) ?? '',
-        locationName: asset.locationName ?? '',
+        assetCode: asset.assetNo ?? asset.assetCode ?? '',
+        categoryId: asset.categoryId != null ? String(asset.categoryId) : '',
+        departmentId: asset.deptId != null ? String(asset.deptId) : (asset.departmentId ?? ''),
+        locationName: asset.location ?? asset.locationName ?? '',
         status: asset.status ?? 'IN_USE',
         purchaseDate: asset.purchaseDate ?? '',
-        purchasePrice: asset.purchasePrice != null ? String(asset.purchasePrice) : '',
+        purchasePrice: (asset.originalValue ?? asset.purchasePrice) != null ? String(asset.originalValue ?? asset.purchasePrice) : '',
         remark: (asset.remark as string) ?? '',
       });
       setInitialized(true);
@@ -187,13 +187,13 @@ export default function AssetFormPage() {
 
       const payload: Record<string, unknown> = {
         assetName: form.assetName.trim(),
-        assetCode: form.assetCode.trim(),
+        assetNo: form.assetCode.trim(),
         categoryId: form.categoryId,
-        departmentId: form.departmentId,
-        locationName: form.locationName.trim(),
+        deptId: form.departmentId,
+        location: form.locationName.trim(),
         status: form.status,
         purchaseDate: form.purchaseDate,
-        purchasePrice: form.purchasePrice ? Number(form.purchasePrice) : null,
+        originalValue: form.purchasePrice ? Number(form.purchasePrice) : null,
         remark: form.remark.trim(),
       };
 

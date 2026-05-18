@@ -282,26 +282,26 @@ export default function AssetListPage() {
               assets.map((asset) => (
                 <tr key={asset.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-4 py-3 text-sm text-gray-900 font-mono">
-                    {asset.assetCode ?? '-'}
+                    {asset.assetNo ?? asset.assetCode ?? '-'}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-900">
                     {asset.assetName ?? '-'}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-600">
-                    {asset.categoryName ?? '-'}
+                    {asset.categoryName ?? (asset.categoryId != null ? String(asset.categoryId) : '-')}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-600">
-                    {asset.locationName ?? '-'}
+                    {asset.location ?? asset.locationName ?? '-'}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-600">
-                    {asset.departmentName ?? '-'}
+                    {asset.departmentName ?? (asset.deptId != null ? String(asset.deptId) : '-')}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-600">
                     {asset.purchaseDate ?? '-'}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-600 text-right">
-                    {asset.purchasePrice != null
-                      ? `¥${asset.purchasePrice.toLocaleString()}`
+                    {(asset.originalValue ?? asset.purchasePrice) != null
+                      ? `¥${(asset.originalValue ?? asset.purchasePrice)!.toLocaleString()}`
                       : '-'}
                   </td>
                   <td className="px-4 py-3 text-sm">
