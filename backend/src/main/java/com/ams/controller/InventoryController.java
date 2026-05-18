@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping({"/inventory", "/v1/inventory"})
@@ -23,8 +24,9 @@ public class InventoryController {
     public Result<Page<InventoryTask>> list(
             @RequestParam(defaultValue = "1") Integer page,
             @RequestParam(defaultValue = "10") Integer pageSize,
-            @RequestParam(required = false) String status) {
-        return Result.success(inventoryService.queryTasks(page, pageSize, status));
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String search) {
+        return Result.success(inventoryService.queryTasks(page, pageSize, status, search));
     }
 
     @GetMapping("/tasks/{id}")
@@ -43,7 +45,7 @@ public class InventoryController {
     }
 
     @PutMapping("/tasks/{id}/status")
-    public Result<InventoryTask> updateStatus(@PathVariable Long id, @RequestBody java.util.Map<String, String> body) {
+    public Result<InventoryTask> updateStatus(@PathVariable Long id, @RequestBody Map<String, String> body) {
         return Result.success(inventoryService.updateTaskStatus(id, body.get("status")));
     }
 
@@ -53,7 +55,7 @@ public class InventoryController {
     }
 
     @PostMapping("/approve")
-    public Result<InventoryTask> approve(@RequestBody java.util.Map<String, String> body) {
+    public Result<InventoryTask> approve(@RequestBody Map<String, String> body) {
         String taskId = body.get("taskId");
         Long id = Long.valueOf(taskId);
         return Result.success(inventoryService.updateTaskStatus(id, "SUBMITTED"));
@@ -62,5 +64,20 @@ public class InventoryController {
     @PostMapping("/tasks/{id}/submit")
     public Result<InventoryTask> submit(@PathVariable Long id) {
         return Result.success(inventoryService.updateTaskStatus(id, "SUBMITTED"));
+    }
+
+    /**
+     * Batch update inventory detail records (status change for selected assets).
+     * Accepts a JSON body with assetIds list and optional status/remark fields.
+     */
+    @PutMapping("/assets/batch")
+    public Result<Void> batchUpdateAssets(@RequestBody Map<String, Object> body) {
+        @SuppressWarnings("unchecked")
+        List<String> assetIds = (List<String>) body.get("assetIds");
+        if (assetIds != null && !assetIds.isEmpty()) {
+            String status = (String) body.get("inventoryStatus");
+            inventoryService.batchUpdateDetails(assetIds, status);
+        }
+        return Result.success();
     }
 }

@@ -19,8 +19,10 @@ public class MaintenanceController {
     @GetMapping("/list")
     public Result<Page<MaintenanceRecord>> list(
             @RequestParam(defaultValue = "1") Integer page,
-            @RequestParam(defaultValue = "10") Integer pageSize) {
-        return Result.success(maintenanceService.queryRecords(page, pageSize, null, null));
+            @RequestParam(defaultValue = "10") Integer pageSize,
+            @RequestParam(required = false) Long assetId,
+            @RequestParam(required = false) String maintenanceType) {
+        return Result.success(maintenanceService.queryRecords(page, pageSize, assetId, maintenanceType));
     }
 
     @GetMapping("/{id}")

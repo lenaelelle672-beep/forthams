@@ -30,6 +30,10 @@ public class InventoryService {
     private final InventoryDetailMapper inventoryDetailMapper;
 
     public Page<InventoryTask> queryTasks(Integer page, Integer pageSize, String status) {
+        return queryTasks(page, pageSize, status, null);
+    }
+
+    public Page<InventoryTask> queryTasks(Integer page, Integer pageSize, String status, String search) {
         String tenantId = TenantContext.requireTenantId();
         Page<InventoryTask> pageParam = new Page<>(page == null ? 1 : page, pageSize == null ? 10 : pageSize);
 
@@ -37,6 +41,10 @@ public class InventoryService {
                 .eq(InventoryTask::getTenantId, tenantId);
         if (status != null && !status.isEmpty()) {
             wrapper.eq(InventoryTask::getStatus, status);
+        }
+        if (search != null && !search.isEmpty()) {
+            wrapper.and(w -> w.like(InventoryTask::getTaskName, search)
+                    .or().like(InventoryTask::getTaskNo, search));
         }
         wrapper.orderByDesc(InventoryTask::getCreateTime);
 
@@ -129,6 +137,33 @@ public class InventoryService {
                 .orderByDesc(InventoryDetail::getScanTime)
                 .orderByDesc(InventoryDetail::getCreateTime)
         );
+    }
+
+    /**
+     * Batch update inventory detail records by their IDs.
+     * Used for the frontend batch-confirm operation during stocktaking.
+     *
+     * @param detailIds list of detail record IDs to update
+     * @param status    the new status to apply (e.g. "MATCH")
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void batchUpdateDetails(List<String> detailIds, String status) {
+        if (detailIds == null || detailIds.isEmpty()) {
+            return;
+        }
+        String tenantId = TenantContext.requireTenantId();
+        for (String idStr : detailIds) {
+            Long detailId = Long.valueOf(idStr);
+            InventoryDetail detail = inventoryDetailMapper.selectOne(
+                new LambdaQueryWrapper<InventoryDetail>()
+                    .eq(InventoryDetail::getId, detailId)
+                    .eq(InventoryDetail::getTenantId, tenantId)
+            );
+            if (detail != null && status != null) {
+                detail.setStatus(status);
+                inventoryDetailMapper.updateById(detail);
+            }
+        }
     }
 
     private InventoryTask getTaskEntityById(Long id) {
