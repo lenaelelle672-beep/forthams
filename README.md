@@ -132,26 +132,6 @@ cd frontend && npm run e2e -- --reporter=line
 cd frontend && npm run e2e:real -- --reporter=line
 ```
 
-## GSD 执行
-
-- GSD 只应操作真实 `forthAMS` 工作区，不能生成 sandbox 或 Python 假测试。
-- 执行入口见 `GSD_EXECUTION.md`。
-- 业务优先级以 `ROADMAP.md` 为准。
-- 后续缺口优先补 Java 后端折旧模块，再补审计/操作日志生产链路。
-
-## GSD 文档导航
-
-远端 `cd68af2a` 引入了 GSD 规划与演示文档，核心文件如下：
-
-- `implementation_plan.md`
-- `gsd_architecture_for_developers.md`
-- `gsd_freecode_roadmap.md`
-- `freecode_integration_plan.md`
-- `risk_mitigation_plan.md`
-- `gsd_vibe_coding_presentation.md`
-- `gsd_vibe_coding_presentation.html`
-- `gsd_vibe_coding_presentation_v2.html`
-
 ## 开发者
 
 - OpenClaw GAI Workflow
