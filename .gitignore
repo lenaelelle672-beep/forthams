@@ -4,20 +4,46 @@
 *.iml
 *.ipr
 *.iws
-.DS_Store
 
-# Frontend
-node_modules/
-frontend/node_modules/
-frontend/dist/
-frontend-skill-lab/node_modules/
-frontend-skill-lab/dist/
-frontend/test-results/
-frontend/playwright-report/
-frontend/coverage/
+# Local secrets and environment files
+.env
+.env.*
+!.env.example
+!.env.sample
 frontend/.env.local
 frontend/.env.development.local
 frontend/.env.production.local
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# Frontend / Node
+node_modules/
+frontend/node_modules/
+frontend/dist/
+frontend/test-results/
+frontend/playwright-report/
+frontend/coverage/
+frontend-skill-lab/
+frontend-skill-lab/node_modules/
+frontend-skill-lab/dist/
+.bun/
+.turbo/
+dist/
+build/
+coverage/
+
+# Browser/e2e artifacts
+test-results/
+playwright-report/
+blob-report/
+screenshots/
+videos/
+hud_test.png
+gsd_vibe_coding_presentation_v2_副本*.html
 
 # Backend
 target/
@@ -28,50 +54,55 @@ backend/mvnw.cmd
 backend/.idea/
 backend/*.iml
 
-# Logs
+# Logs and runtime output
 *.log
 logs/
 backend/logs/
-
-# Database
-*.db
-*.sqlite
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Temp
-*.tmp
-*.temp
-.aider*
-
-# Python
-.venv/
-__pycache__/
-*.pyc
-*.py[cod]
-.pytest_cache/
-
-# Daemon 运行时产物
+*.pid
+*.seed
 daemon.out
 daemon_out.log
 daemon_evolution.log
 
-# Graphify 缓存
-graphify-out/
+# Python caches and virtual environments
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Database / local application state
+*.db
+*.sqlite
+*.sqlite3
+.lancedb/
 
 # Local automation/runtime state
 .gsd/
 .claw/
 .skills/
 
-# Local frontend experiments
-frontend-skill-lab/
-
-# Spec 临时文件
-spec.md
-
-# 其他临时垃圾
-2/
+# Graphify / GitNexus caches
+graphify-out/
 .gitnexus
+
+# Local machine/helper scripts; keep out of commits unless explicitly sanitized.
+ssh_imac.sh
+setup-claude-models.sh
+screenshot_local.py
+
+# Nested repositories are managed by their own git metadata.
+vib-coding-harness/
+vibecode/repos/opencode/
+vibecode/repos/freecode/
+
+# Spec/temp files
+spec.md
+*.tmp
+*.temp
+2/
