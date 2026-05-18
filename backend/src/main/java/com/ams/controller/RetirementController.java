@@ -161,6 +161,16 @@ public class RetirementController {
         return Result.success(retirementApplicationService.queryApplications(page, pageSize, status, null));
     }
 
+    @GetMapping("/{id}/approval-history")
+    public Result<List<Map<String, Object>>> getApprovalHistory(@PathVariable Long id) {
+        return Result.success(retirementApplicationService.getApprovalHistory(id));
+    }
+
+    @GetMapping("/assets/{assetId}/state-history")
+    public Result<Map<String, Object>> getAssetStateHistory(@PathVariable Long assetId) {
+        return Result.success(retirementApplicationService.getAssetStateHistory(assetId));
+    }
+
     @GetMapping("/statistics")
     public Result<Map<String, Object>> getStatistics() {
         return Result.success(retirementApplicationService.getStatistics());

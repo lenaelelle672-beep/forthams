@@ -5,10 +5,14 @@ import com.ams.common.exception.BusinessException;
 import com.ams.context.TenantContext;
 import com.ams.dto.RetirementApplyDTO;
 import com.ams.entity.ApprovalProcess;
+import com.ams.entity.ApprovalRecord;
 import com.ams.entity.Asset;
+import com.ams.entity.AssetChangeLog;
 import com.ams.entity.RetirementApplication;
 import com.ams.enums.AssetStatus;
 import com.ams.mapper.ApprovalProcessMapper;
+import com.ams.mapper.ApprovalRecordMapper;
+import com.ams.mapper.AssetChangeLogMapper;
 import com.ams.mapper.AssetMapper;
 import com.ams.mapper.RetirementApplicationMapper;
 import com.ams.security.TenantSecurityAudit;
@@ -24,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +41,8 @@ public class RetirementApplicationService {
 
     private final RetirementApplicationMapper retirementApplicationMapper;
     private final ApprovalProcessMapper approvalProcessMapper;
+    private final ApprovalRecordMapper approvalRecordMapper;
+    private final AssetChangeLogMapper assetChangeLogMapper;
     private final AssetMapper assetMapper;
     private final AssetLifecycleService assetLifecycleService;
 
@@ -280,6 +287,147 @@ public class RetirementApplicationService {
                 .eq(RetirementApplication::getAssetId, assetId);
         wrapper.orderByDesc(RetirementApplication::getCreateTime);
         return retirementApplicationMapper.selectList(wrapper);
+    }
+
+    /**
+     * Get approval history for a retirement application.
+     * Queries the approval_process and approval_record tables to build
+     * a timeline of approval actions for the frontend.
+     *
+     * @param id - Retirement application ID
+     * @return List of approval history records
+     */
+    public List<Map<String, Object>> getApprovalHistory(Long id) {
+        RetirementApplication application = getApplicationById(id);
+        String tenantId = TenantContext.requireTenantId();
+
+        // Find the approval process for this application
+        ApprovalProcess process = approvalProcessMapper.selectOne(
+                new LambdaQueryWrapper<ApprovalProcess>()
+                        .eq(ApprovalProcess::getTenantId, tenantId)
+                        .eq(ApprovalProcess::getProcessType, "RETIREMENT")
+                        .eq(ApprovalProcess::getBusinessId, application.getId())
+                        .last("limit 1"));
+
+        List<Map<String, Object>> result = new ArrayList<>();
+
+        if (process != null) {
+            // Query approval records for this process
+            List<ApprovalRecord> records = approvalRecordMapper.selectList(
+                    new LambdaQueryWrapper<ApprovalRecord>()
+                            .eq(ApprovalRecord::getProcessId, process.getId())
+                            .orderByAsc(ApprovalRecord::getCreateTime));
+
+            for (ApprovalRecord record : records) {
+                Map<String, Object> item = new HashMap<>();
+                item.put("id", String.valueOf(record.getId()));
+                item.put("applicationId", String.valueOf(application.getId()));
+                item.put("action", record.getApproveResult() != null ? record.getApproveResult() : "PENDING");
+                item.put("comment", record.getApproveOpinion());
+                item.put("operator", record.getApproverId() != null ? String.valueOf(record.getApproverId()) : null);
+                item.put("createdAt", record.getApproveTime() != null ? record.getApproveTime().toString() : null);
+                result.add(item);
+            }
+        }
+
+        // If no approval records yet, synthesize from application status
+        if (result.isEmpty()) {
+            Map<String, Object> submitItem = new HashMap<>();
+            submitItem.put("id", "submit-" + application.getId());
+            submitItem.put("applicationId", String.valueOf(application.getId()));
+            submitItem.put("action", "SUBMIT");
+            submitItem.put("comment", application.getReason());
+            submitItem.put("operator", application.getApplicantName());
+            submitItem.put("createdAt", application.getCreateTime() != null ? application.getCreateTime().toString() : null);
+            result.add(submitItem);
+
+            // Add status transition if beyond PENDING
+            String status = application.getStatus();
+            if ("APPROVED".equals(status) || "COMPLETED".equals(status)) {
+                Map<String, Object> approveItem = new HashMap<>();
+                approveItem.put("id", "approve-" + application.getId());
+                approveItem.put("applicationId", String.valueOf(application.getId()));
+                approveItem.put("action", "APPROVE");
+                approveItem.put("comment", null);
+                approveItem.put("operator", null);
+                approveItem.put("createdAt", application.getUpdateTime() != null ? application.getUpdateTime().toString() : null);
+                result.add(approveItem);
+            }
+            if ("COMPLETED".equals(status)) {
+                Map<String, Object> completeItem = new HashMap<>();
+                completeItem.put("id", "complete-" + application.getId());
+                completeItem.put("applicationId", String.valueOf(application.getId()));
+                completeItem.put("action", "COMPLETE");
+                completeItem.put("comment", null);
+                completeItem.put("operator", null);
+                completeItem.put("createdAt", application.getUpdateTime() != null ? application.getUpdateTime().toString() : null);
+                result.add(completeItem);
+            }
+            if ("REJECTED".equals(status)) {
+                Map<String, Object> rejectItem = new HashMap<>();
+                rejectItem.put("id", "reject-" + application.getId());
+                rejectItem.put("applicationId", String.valueOf(application.getId()));
+                rejectItem.put("action", "REJECT");
+                rejectItem.put("comment", application.getRemark());
+                rejectItem.put("operator", null);
+                rejectItem.put("createdAt", application.getUpdateTime() != null ? application.getUpdateTime().toString() : null);
+                result.add(rejectItem);
+            }
+            if ("CANCELLED".equals(status)) {
+                Map<String, Object> cancelItem = new HashMap<>();
+                cancelItem.put("id", "cancel-" + application.getId());
+                cancelItem.put("applicationId", String.valueOf(application.getId()));
+                cancelItem.put("action", "CANCEL");
+                cancelItem.put("comment", null);
+                cancelItem.put("operator", null);
+                cancelItem.put("createdAt", application.getUpdateTime() != null ? application.getUpdateTime().toString() : null);
+                result.add(cancelItem);
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * Get asset state change history from the asset_change_log table.
+     * Extracts status transitions from snapshot strings for the frontend timeline.
+     *
+     * @param assetId - Asset ID
+     * @return Map with assetId and history array
+     */
+    public Map<String, Object> getAssetStateHistory(Long assetId) {
+        loadAssetForCurrentTenant(assetId, "getAssetStateHistory");
+
+        List<AssetChangeLog> changeLogs = assetChangeLogMapper.selectList(
+                new LambdaQueryWrapper<AssetChangeLog>()
+                        .eq(AssetChangeLog::getAssetId, assetId)
+                        .orderByAsc(AssetChangeLog::getCreateTime));
+
+        List<Map<String, String>> history = new ArrayList<>();
+        java.util.regex.Pattern statusPattern = java.util.regex.Pattern.compile("status=([^,]*)");
+
+        for (AssetChangeLog logEntry : changeLogs) {
+            String oldStatus = extractStatusFromSnapshot(logEntry.getOldValue(), statusPattern);
+            String newStatus = extractStatusFromSnapshot(logEntry.getNewValue(), statusPattern);
+
+            Map<String, String> entry = new HashMap<>();
+            entry.put("fromStatus", oldStatus != null ? oldStatus : "");
+            entry.put("toStatus", newStatus != null ? newStatus : "");
+            entry.put("timestamp", logEntry.getCreateTime() != null ? logEntry.getCreateTime().toString() : "");
+            entry.put("operator", logEntry.getOperatorId() != null ? String.valueOf(logEntry.getOperatorId()) : "");
+            history.add(entry);
+        }
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("assetId", String.valueOf(assetId));
+        result.put("history", history);
+        return result;
+    }
+
+    private String extractStatusFromSnapshot(String snapshot, java.util.regex.Pattern pattern) {
+        if (snapshot == null || snapshot.isBlank()) return null;
+        java.util.regex.Matcher matcher = pattern.matcher(snapshot);
+        return matcher.find() ? matcher.group(1) : null;
     }
 
     public Map<String, Object> getStatistics() {
