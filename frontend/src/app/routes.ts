@@ -37,7 +37,7 @@ const AssetCompensationForm = withSuspense(
   ),
 );
 const Approval = withSuspense(
-  lazy(() => import("./pages/Approval").then((module) => ({ default: module.Approval }))),
+  lazy(() => import("./pages/ApprovalListPage").then((module) => ({ default: module.ApprovalListPage }))),
 );
 const Analytics = withSuspense(
   lazy(() => import("./pages/Analytics").then((module) => ({ default: module.Analytics }))),
@@ -116,6 +116,7 @@ export const router = createBrowserRouter([
         Component: RootLayout,
         children: [
           { index: true, Component: Dashboard },
+          { path: "dashboard", Component: Dashboard },
           { path: "assets", Component: AssetRegistry },
           { path: "equipment", Component: ImportantEquipment },
           { path: "inventory", Component: RFIDInventory },

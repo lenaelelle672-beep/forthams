@@ -16,10 +16,6 @@ public class AssetManagementApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(AssetManagementApplication.class, args);
-        System.out.println("\n========================================");
-        System.out.println("  Asset Management System Started!");
-        System.out.println("  API Base URL: http://localhost:8080/api");
-        System.out.println("========================================\n");
     }
 
 }

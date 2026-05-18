@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/inventory")
+@RequestMapping({"/inventory", "/v1/inventory"})
 @RequiredArgsConstructor
 public class InventoryController {
 
@@ -50,5 +50,17 @@ public class InventoryController {
     @PostMapping("/tasks/{id}/scan")
     public Result<InventoryDetail> scan(@PathVariable Long id, @RequestBody InventoryScanDTO dto) {
         return Result.success(inventoryService.addScanResult(id, dto));
+    }
+
+    @PostMapping("/approve")
+    public Result<InventoryTask> approve(@RequestBody java.util.Map<String, String> body) {
+        String taskId = body.get("taskId");
+        Long id = Long.valueOf(taskId);
+        return Result.success(inventoryService.updateTaskStatus(id, "SUBMITTED"));
+    }
+
+    @PostMapping("/tasks/{id}/submit")
+    public Result<InventoryTask> submit(@PathVariable Long id) {
+        return Result.success(inventoryService.updateTaskStatus(id, "SUBMITTED"));
     }
 }

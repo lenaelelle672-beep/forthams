@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { http } from '../utils/api';
+import { api } from '../utils/api';
 
 // ─── Type Definitions ────────────────────────────────────────────────────────
 
@@ -8,6 +8,29 @@ export type InventoryTaskStatus = 'draft' | 'in_progress' | 'completed' | 'appro
 
 /** Real-time physical check status for an individual asset line item */
 export type InventoryCheckStatus = 'not_counted' | 'surplus' | 'deficit' | 'matched';
+
+/** Raw task shape returned by backend Page.records */
+interface IInventoryTaskRaw {
+  id: number;
+  taskNo: string;
+  taskName: string;
+  status: string;
+  totalCount: number | null;
+  scannedCount: number | null;
+  matchCount: number | null;
+  lossCount: number | null;
+  createTime: string;
+  updateTime: string;
+}
+
+/** Page shape returned by MyBatis-Plus selectPage */
+interface IPageResponse<T> {
+  records: T[];
+  total: number;
+  size: number;
+  current: number;
+  pages: number;
+}
 
 /**
  * Represents a single inventory (stocktaking) task.
@@ -102,21 +125,51 @@ export interface IUseInventoryTasksReturn {
   clearError: () => void;
 }
 
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+/**
+ * Map backend status string to frontend InventoryTaskStatus.
+ */
+function mapStatus(raw: string): InventoryTaskStatus {
+  const normalized = raw?.toLowerCase() ?? 'draft';
+  switch (normalized) {
+    case 'in_progress':
+      return 'in_progress';
+    case 'completed':
+      return 'completed';
+    case 'approved':
+    case 'submitted':
+      return 'approved';
+    default:
+      return 'draft';
+  }
+}
+
+/**
+ * Transform a raw backend InventoryTask into the frontend IInventoryTask shape.
+ */
+function transformTask(raw: IInventoryTaskRaw): IInventoryTask {
+  return {
+    id: String(raw.id),
+    title: raw.taskName ?? '',
+    status: mapStatus(raw.status),
+    totalAssetsCount: raw.totalCount ?? 0,
+    countedAssetsCount: (raw.scannedCount ?? 0) + (raw.matchCount ?? 0),
+    createdAt: raw.createTime ?? '',
+    updatedAt: raw.updateTime ?? '',
+  };
+}
+
 // ─── Hook Implementation ─────────────────────────────────────────────────────
 
 /**
  * useInventoryTasks
  *
  * Custom hook that manages the full lifecycle of inventory (stocktaking) tasks.
- * Implements Phase 3 core requirements:
- *   - Task list fetching with pagination and status filtering (ATB-01)
- *   - Task creation with scope selection data (ATB-02)
- *   - Asset detail fetching and summary computation for the execution workbench (ATB-03)
- *   - Single and batch status updates with reactive summary recalculation (ATB-04)
- *   - Submit-for-approval flow targeting POST /api/inventory/approve (ATB-05)
+ * All API calls go through the shared `api` utility which unwraps the
+ * backend `Result<T>` envelope and injects the auth token.
  *
- * All "create" and "submit" operations go through backend APIs; the hook only
- * computes intermediate derived state (progress, surplus/deficit stats) locally.
+ * State triad enforced: loading / error / data for every async operation.
  */
 export function useInventoryTasks(): IUseInventoryTasksReturn {
   // ── Task list state ─────────────────────────────────────────────────────
@@ -137,20 +190,24 @@ export function useInventoryTasks(): IUseInventoryTasksReturn {
 
   /**
    * Fetches the paginated, filtered inventory task list from the backend.
-   * The API contract: GET /api/inventory/tasks?page=&pageSize=&status=&search=
+   * GET /api/inventory/tasks?page=&pageSize=&status=&search=
+   *
+   * The backend returns Result<Page<InventoryTask>> which the `api` util
+   * unwraps to a MyBatis-Plus Page object containing `records` and `total`.
    */
   const fetchTasks = useCallback(async (params: ITaskQueryParams = {}) => {
     setLoadingTasks(true);
     setError(null);
     try {
-      const response = await http.get<{ items: IInventoryTask[]; total: number }>(
-        '/api/inventory/tasks',
-        { params }
+      const page = await api.get<IPageResponse<IInventoryTaskRaw>>(
+        '/inventory/tasks',
+        { params },
       );
-      setTasks(response.data.items ?? []);
+      const mapped = (page.records ?? []).map(transformTask);
+      setTasks(mapped);
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Failed to fetch inventory tasks';
-      setError(message);
+      const msg = err instanceof Error ? err.message : 'Failed to fetch inventory tasks';
+      setError(msg);
     } finally {
       setLoadingTasks(false);
     }
@@ -165,34 +222,57 @@ export function useInventoryTasks(): IUseInventoryTasksReturn {
   const createTask = useCallback(async (payload: ICreateTaskPayload): Promise<IInventoryTask> => {
     setError(null);
     try {
-      const response = await http.post<IInventoryTask>('/api/inventory/tasks', payload);
+      const created = await api.post<IInventoryTaskRaw>(
+        '/inventory/tasks',
+        { taskName: payload.title },
+      );
       // Refresh the list so the newly created task is visible
       await fetchTasks();
-      return response.data;
+      return transformTask(created);
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Failed to create inventory task';
-      setError(message);
-      throw new Error(message);
+      const msg = err instanceof Error ? err.message : 'Failed to create inventory task';
+      setError(msg);
+      throw new Error(msg);
     }
   }, [fetchTasks]);
 
   // ── Fetch task detail (asset list) ──────────────────────────────────────
 
   /**
-   * Loads the full asset item list for a given inventory task.
-   * The API contract: GET /api/inventory/tasks/:taskId/assets
+   * Loads the full asset detail list for a given inventory task.
+   * GET /api/inventory/tasks/:taskId/details
+   *
+   * The backend returns Result<List<InventoryDetail>> which the `api` util
+   * unwraps to an array of detail records.
    */
   const fetchTaskDetails = useCallback(async (taskId: string) => {
     setLoadingAssets(true);
     setError(null);
     try {
-      const response = await http.get<IAssetItem[]>(
-        `/api/inventory/tasks/${taskId}/assets`
+      const details = await api.get<Array<Record<string, unknown>>>(
+        `/inventory/tasks/${taskId}/details`,
       );
-      setAssets(response.data ?? []);
+      // Map raw detail records to IAssetItem
+      const mapped = (details ?? []).map((d): IAssetItem => ({
+        id: String(d.id ?? ''),
+        assetCode: String(d.rfidTag ?? d.assetId ?? ''),
+        name: String(d.remark ?? ''),
+        currentStatus: 'in_use',
+        inventoryStatus: (d.status === 'MATCH' || d.status === 'match')
+          ? 'matched'
+          : (d.status === 'LOSS' || d.status === 'loss')
+            ? 'deficit'
+            : (d.status === 'SURPLUS' || d.status === 'surplus')
+              ? 'surplus'
+              : 'not_counted',
+        actualQuantity: 1,
+        expectedQuantity: 1,
+        remark: typeof d.remark === 'string' ? d.remark : '',
+      }));
+      setAssets(mapped);
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Failed to fetch task assets';
-      setError(message);
+      const msg = err instanceof Error ? err.message : 'Failed to fetch task assets';
+      setError(msg);
       setAssets([]);
     } finally {
       setLoadingAssets(false);
@@ -242,10 +322,10 @@ export function useInventoryTasks(): IUseInventoryTasksReturn {
       )
     );
     try {
-      await http.patch('/api/inventory/assets/batch', { assetIds, ...updates });
+      await api.put('/inventory/assets/batch', { assetIds, ...updates });
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Failed to batch update assets';
-      setError(message);
+      const msg = err instanceof Error ? err.message : 'Failed to batch update assets';
+      setError(msg);
       // Re-fetch to restore server truth on failure
       if (selectedTaskId) {
         await fetchTaskDetails(selectedTaskId);
@@ -257,17 +337,17 @@ export function useInventoryTasks(): IUseInventoryTasksReturn {
 
   /**
    * Submits the inventory task results for managerial approval.
-   * API contract: POST /api/inventory/approve  { taskId }
+   * POST /api/inventory/approve  { taskId }
    * On success, navigates back to the task list (handled by the consuming component).
    */
   const submitForApproval = useCallback(async (taskId: string) => {
     setError(null);
     try {
-      await http.post('/api/inventory/approve', { taskId });
+      await api.post('/inventory/approve', { taskId });
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Failed to submit for approval';
-      setError(message);
-      throw new Error(message);
+      const msg = err instanceof Error ? err.message : 'Failed to submit for approval';
+      setError(msg);
+      throw new Error(msg);
     }
   }, []);
 
@@ -276,7 +356,6 @@ export function useInventoryTasks(): IUseInventoryTasksReturn {
   /**
    * Derives inventory summary statistics from the current asset list.
    * Recalculated reactively whenever assets change (e.g., after batch update).
-   * Provides the five KPI cards: 总资产数 / 已盘 / 未盘 / 盘盈 / 盘亏
    */
   const inventorySummary = useMemo<IInventorySummary>(() => {
     const totalCount = assets.length;

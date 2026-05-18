@@ -98,17 +98,17 @@ const LocationFormPage = lazy(
     })),
 );
 
-/**
- * AuditLogPage — 审计日志仪表板页面
- *
- * 提供审计日志查看、多维筛选与趋势图表可视化功能。
- *
- * @since SWARM-060
- */
-const AuditLogPage = lazy(
+const AuditDashboardPage = lazy(
   () =>
-    import("./pages/audit/AuditLogPage").then((mod) => ({
-      default: mod.default ?? mod.AuditLogPage,
+    import("./pages/audit/AuditDashboardPage").then((mod) => ({
+      default: mod.default ?? mod.AuditDashboardPage,
+    })),
+);
+
+const AuditDetailPage = lazy(
+  () =>
+    import("./pages/audit/AuditDetailPage").then((mod) => ({
+      default: mod.default ?? mod.AuditDetailPage,
     })),
 );
 
@@ -279,20 +279,28 @@ export const locationRoutes = [
  * ```
  *
  * Route map:
- * - `audit-logs` → AuditLogPage (audit log dashboard with trend charts)
+ * - `audit` → AuditDashboardPage (audit log dashboard with trend charts)
+ * - `audit/:id` → AuditDetailPage (audit log detail drill-down)
  *
  * @since SWARM-060
  */
 export const auditRoutes = [
   {
-    path: "audit-logs",
+    path: "audit",
     element: (
       <WithSuspense>
-        <AuditLogPage />
+        <AuditDashboardPage />
+      </WithSuspense>
+    ),
+  },
+  {
+    path: "audit/:id",
+    element: (
+      <WithSuspense>
+        <AuditDetailPage />
       </WithSuspense>
     ),
   },
 ];
 
 export default vendorRoutes;
-

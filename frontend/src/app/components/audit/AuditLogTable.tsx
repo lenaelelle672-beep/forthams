@@ -9,6 +9,7 @@
  */
 
 import React from 'react';
+import { useNavigate } from 'react-router';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
@@ -102,6 +103,7 @@ const AuditLogTable: React.FC<AuditLogTableProps> = ({
   isLoading,
   onPageChange,
 }) => {
+  const navigate = useNavigate();
   /** 总页数 */
   const totalPages = Math.max(1, Math.ceil(pagination.total / pagination.size));
 
@@ -145,11 +147,12 @@ const AuditLogTable: React.FC<AuditLogTableProps> = ({
                     <TableHead className="w-[130px]">资源 ID</TableHead>
                     <TableHead>详情</TableHead>
                     <TableHead className="w-[120px]">IP 地址</TableHead>
+                    <TableHead className="w-[90px]">操作</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody data-testid="audit-log-table-body">
                   {logs.map((item) => (
-                    <TableRow key={item.id} data-testid="audit-table-row">
+                    <TableRow key={item.id} className="audit-table-row" data-testid="audit-table-row">
                       <TableCell
                         className="text-xs text-muted-foreground whitespace-nowrap"
                         data-testid="audit-table-cell-timestamp"
@@ -181,6 +184,15 @@ const AuditLogTable: React.FC<AuditLogTableProps> = ({
                       </TableCell>
                       <TableCell className="text-xs text-muted-foreground font-mono">
                         {item.ip_address}
+                      </TableCell>
+                      <TableCell>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => navigate(`/audit/${encodeURIComponent(item.id)}`)}
+                        >
+                          详情
+                        </Button>
                       </TableCell>
                     </TableRow>
                   ))}

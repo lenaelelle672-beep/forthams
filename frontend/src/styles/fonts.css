@@ -1,0 +1,17 @@
+/*
+ * 全局中文字体 fallback。
+ * 优先使用系统字体，避免中文在不同平台出现方块、替换符或乱码观感。
+ */
+:root {
+  --font-family-sans: "Inter", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", "Source Han Sans SC", "Helvetica Neue", Arial, sans-serif;
+  --font-family-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+}
+
+html,
+body,
+button,
+input,
+textarea,
+select {
+  font-family: var(--font-family-sans);
+}

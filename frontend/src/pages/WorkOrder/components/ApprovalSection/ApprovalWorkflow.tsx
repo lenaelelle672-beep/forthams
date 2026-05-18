@@ -408,17 +408,9 @@ const ApprovalWorkflow: React.FC<ApprovalWorkflowProps> = ({
   /**
    * 处理审批操作
    * 
-   * Iteration 1: 暂不实现实际逻辑，仅输出日志
-   * 
    * @param {ApprovalAction} action - 审批操作类型
    */
   const handleApprove = (action: ApprovalAction): void => {
-    // Iteration 1: 操作逻辑 Phase 2 实现
-    // eslint-disable-next-line no-console
-    console.log(`[ApprovalWorkflow] ${action} action triggered`, {
-      workOrderId,
-      comment: localComment,
-    });
     onApprove?.(action, localComment);
   };
 

@@ -7,8 +7,11 @@
 .DS_Store
 
 # Frontend
+node_modules/
 frontend/node_modules/
 frontend/dist/
+frontend-skill-lab/node_modules/
+frontend-skill-lab/dist/
 frontend/test-results/
 frontend/playwright-report/
 frontend/coverage/
@@ -17,6 +20,7 @@ frontend/.env.development.local
 frontend/.env.production.local
 
 # Backend
+target/
 backend/target/
 backend/.mvn/
 backend/mvnw
@@ -27,6 +31,7 @@ backend/*.iml
 # Logs
 *.log
 logs/
+backend/logs/
 
 # Database
 *.db
@@ -56,10 +61,17 @@ daemon_evolution.log
 # Graphify 缓存
 graphify-out/
 
+# Local automation/runtime state
+.gsd/
+.claw/
+.skills/
+
+# Local frontend experiments
+frontend-skill-lab/
+
 # Spec 临时文件
 spec.md
 
 # 其他临时垃圾
 2/
-New File: backend/
 .gitnexus

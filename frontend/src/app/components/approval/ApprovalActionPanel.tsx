@@ -3,8 +3,8 @@
  * @description Provides an action panel for submitting approval decisions.
  *
  * Renders a comment textarea together with Approve and Reject buttons.
- * Validates that a comment is provided before invoking the corresponding
- * callback. Supports disabled and loading states.
+ * Validates that a rejection reason is provided before invoking the
+ * corresponding callback. Supports disabled and loading states.
  */
 
 import React, { useState, useCallback } from 'react';
@@ -28,6 +28,8 @@ export interface ApprovalActionPanelProps {
   disabled?: boolean;
   /** Whether an action is currently in progress. */
   loading?: boolean;
+  /** Server-side error message to display to the user. */
+  errorMessage?: string | null;
   /** Called when the user clicks Approve. */
   onApprove: (payload: ApprovalActionPayload) => void;
   /** Called when the user clicks Reject. */
@@ -44,7 +46,7 @@ export interface ApprovalActionPanelProps {
  * Features:
  * - Textarea for entering an approval comment
  * - Approve button (green) and Reject button (red)
- * - Front-end validation: empty comment shows a warning message
+ * - Front-end validation: rejection requires a non-empty reason
  * - Supports `disabled` and `loading` states
  * - Does NOT call Axios directly; delegates action through callbacks
  */
@@ -52,6 +54,7 @@ export const ApprovalActionPanel: React.FC<ApprovalActionPanelProps> = ({
   approvalId,
   disabled = false,
   loading = false,
+  errorMessage,
   onApprove,
   onReject,
 }) => {
@@ -70,10 +73,6 @@ export const ApprovalActionPanel: React.FC<ApprovalActionPanelProps> = ({
   );
 
   const handleApprove = useCallback(() => {
-    if (!comment.trim()) {
-      setValidationError('请输入审批意见后再进行操作');
-      return;
-    }
     setValidationError(null);
     onApprove({ approvalId, comment: comment.trim() });
   }, [approvalId, comment, onApprove]);
@@ -120,6 +119,16 @@ export const ApprovalActionPanel: React.FC<ApprovalActionPanelProps> = ({
       {/* ---- Validation message ---- */}
       {validationError && (
         <p className="text-sm text-red-600">{validationError}</p>
+      )}
+
+      {/* ---- Server error message ---- */}
+      {errorMessage && (
+        <div
+          className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700"
+          data-testid="approval-server-error"
+        >
+          {errorMessage}
+        </div>
       )}
 
       {/* ---- Action buttons ---- */}

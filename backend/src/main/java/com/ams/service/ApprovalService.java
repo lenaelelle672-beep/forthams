@@ -7,11 +7,16 @@ import com.ams.dto.ApprovalCreateDTO;
 import com.ams.dto.AssetClearanceDTO;
 import com.ams.dto.AssetScrapDTO;
 import com.ams.dto.AssetTransferDTO;
+import com.ams.dto.CompensationCreateDTO;
+import com.ams.entity.AssetCompensation;
 import com.ams.entity.ApprovalProcess;
 import com.ams.entity.ApprovalRecord;
+import com.ams.entity.WorkflowDefinition;
 import com.ams.mapper.ApprovalProcessMapper;
 import com.ams.mapper.ApprovalRecordMapper;
+import com.ams.mapper.UserRoleMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -48,12 +53,25 @@ import java.util.stream.Collectors;
 public class ApprovalService {
 
     private static final int FINAL_STEP = 3;
+    private static final String WORKFLOW_PAYLOAD_KEY = "_approvalPayload";
+    private static final String WORKFLOW_DEFINITION_KEY = "_workflowDefinition";
+    private static final String WORKFLOW_DEFINITION_ID_KEY = "_workflowDefinitionId";
+    private static final String WORKFLOW_VERSION_KEY = "_workflowVersion";
+    private static final Set<String> WORKFLOW_MANAGED_PROCESS_TYPES = Set.of(
+            "ASSET_TRANSFER",
+            "ASSET_CLEARANCE",
+            "ASSET_SCRAP",
+            "ASSET_COMPENSATION"
+    );
 
     private final ApprovalProcessMapper approvalProcessMapper;
     private final ApprovalRecordMapper approvalRecordMapper;
     private final RetirementApplicationService retirementApplicationService;
     private final WorkOrderService workOrderService;
     private final DisposalService disposalService;
+    private final CompensationService compensationService;
+    private final WorkflowDefinitionService workflowDefinitionService;
+    private final UserRoleMapper userRoleMapper;
     private final ObjectMapper objectMapper;
 
     /**
@@ -125,6 +143,16 @@ public class ApprovalService {
     @Transactional(rollbackFor = Exception.class)
     public ApprovalProcess createProcess(ApprovalCreateDTO dto) {
         String tenantId = TenantContext.requireTenantId();
+        if (dto.getProcessType() != null && WORKFLOW_MANAGED_PROCESS_TYPES.contains(dto.getProcessType())) {
+            if (dto.getBusinessType() != null && !dto.getBusinessType().isBlank()
+                    && !dto.getProcessType().equals(dto.getBusinessType())) {
+                throw new BusinessException("业务流程类型与审批流程类型不一致");
+            }
+            WorkflowDefinition definition = workflowDefinitionService.requirePublishedDefinition(dto.getProcessType());
+            dto.setBusinessType(dto.getProcessType());
+            dto.setBusinessData(bindWorkflowSnapshot(dto.getBusinessData(), definition));
+        }
+
         ApprovalProcess process = new ApprovalProcess();
         BeanUtil.copyProperties(dto, process);
         BeanUtil.setProperty(process, "tenantId", tenantId);
@@ -168,15 +196,36 @@ public class ApprovalService {
         if (process == null) {
             throw new BusinessException("审批流程不存在");
         }
-        if (!"PENDING".equals(BeanUtil.getProperty(process, "status"))) {
-            throw new BusinessException("当前流程不可审批");
+        String processStatus = BeanUtil.getProperty(process, "status") instanceof String s ? s : String.valueOf(BeanUtil.getProperty(process, "status"));
+        if (!"PENDING".equals(processStatus)) {
+            switch (processStatus) {
+                case "APPROVED":
+                    throw new BusinessException("审批流程已通过，不可重复审批");
+                case "REJECTED":
+                    throw new BusinessException("审批流程已驳回，不可再次审批");
+                case "CANCELLED":
+                    throw new BusinessException("审批流程已取消，不可审批");
+                default:
+                    throw new BusinessException("当前流程状态[" + processStatus + "]不可审批");
+            }
+        }
+        if (!"APPROVED".equals(result) && !"REJECTED".equals(result)) {
+            throw new BusinessException("审批结果无效");
+        }
+
+        Integer currentStep = parseInteger(BeanUtil.getProperty(process, "currentStep"), 1);
+        WorkflowDefinitionService.WorkflowRuntimePlan workflowPlan = resolveWorkflowRuntimePlan(process);
+        WorkflowDefinitionService.WorkflowApprovalNode currentWorkflowNode = workflowPlan == null ? null : workflowPlan.nodeAtStep(currentStep);
+        ensureWorkflowApproverAllowed(currentWorkflowNode, approverId);
+        List<ApprovalRecord> currentStepRecords = selectCurrentStepRecords(processId, tenantId, currentStep);
+        if (hasApprovedCurrentStep(currentStepRecords, approverId)) {
+            throw new BusinessException("当前步骤已审批");
         }
 
         ApprovalRecord record = new ApprovalRecord();
         BeanUtil.setProperty(record, "processId", processId);
         BeanUtil.setProperty(record, "tenantId", tenantId);
-        Integer currentStep = parseInteger(BeanUtil.getProperty(process, "currentStep"), 1);
-        int finalStep = resolveFinalStep(process);
+        int finalStep = resolveFinalStep(process, workflowPlan);
         BeanUtil.setProperty(record, "stepNo", currentStep);
         BeanUtil.setProperty(record, "approverId", approverId);
         BeanUtil.setProperty(record, "approveResult", result);
@@ -187,13 +236,13 @@ public class ApprovalService {
         if ("REJECTED".equals(result)) {
             BeanUtil.setProperty(process, "status", "REJECTED");
         } else if ("APPROVED".equals(result)) {
-            if (currentStep >= finalStep) {
-                BeanUtil.setProperty(process, "status", "APPROVED");
-            } else {
-                BeanUtil.setProperty(process, "currentStep", currentStep + 1);
+            if (isApprovalStepComplete(currentWorkflowNode, currentStepRecords, approverId)) {
+                if (currentStep >= finalStep) {
+                    BeanUtil.setProperty(process, "status", "APPROVED");
+                } else {
+                    BeanUtil.setProperty(process, "currentStep", currentStep + 1);
+                }
             }
-        } else {
-            throw new BusinessException("审批结果无效");
         }
 
         approvalProcessMapper.updateById(process);
@@ -228,19 +277,19 @@ public class ApprovalService {
                 .eq("approver_id", approverId)
         );
 
-        if (myRecords.isEmpty()) {
-            return pendingList;
-        }
-
-        Set<Long> processedIds = myRecords.stream()
-            .map(item -> parseLong(BeanUtil.getProperty(item, "processId"), null))
-            .filter(id -> id != null)
+        Set<String> processedStepKeys = (myRecords == null ? List.<ApprovalRecord>of() : myRecords).stream()
+            .map(item -> stepKey(
+                    parseLong(BeanUtil.getProperty(item, "processId"), null),
+                    parseInteger(BeanUtil.getProperty(item, "stepNo"), null)))
+            .filter(key -> key != null)
             .collect(Collectors.toSet());
         return pendingList.stream()
             .filter(item -> {
                 Long id = parseLong(BeanUtil.getProperty(item, "id"), null);
-                return id == null || !processedIds.contains(id);
+                Integer currentStep = parseInteger(BeanUtil.getProperty(item, "currentStep"), 1);
+                return id == null || !processedStepKeys.contains(stepKey(id, currentStep));
             })
+            .filter(item -> canApproveCurrentWorkflowNode(item, approverId))
             .collect(Collectors.toList());
     }
 
@@ -256,6 +305,43 @@ public class ApprovalService {
                     .eq("tenant_id", tenantId)
                     .eq("status", "PENDING")
         );
+    }
+
+    /**
+     * Cancel a PENDING approval process.
+     *
+     * <p>Only processes in PENDING status can be cancelled. Cancellation
+     * updates the process status to CANCELLED and triggers the
+     * appropriate business rejection callbacks so downstream state
+     * stays consistent.
+     *
+     * @param processId  the approval process ID
+     * @param operatorId the user performing the cancellation
+     * @return the updated process
+     * @throws BusinessException if the process does not exist or is not PENDING
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public ApprovalProcess cancelProcess(Long processId, Long operatorId) {
+        String tenantId = TenantContext.requireTenantId();
+        ApprovalProcess process = approvalProcessMapper.selectOne(new QueryWrapper<ApprovalProcess>()
+                .eq("id", processId)
+                .eq("tenant_id", tenantId)
+                .last("limit 1"));
+        if (process == null) {
+            throw new BusinessException("审批流程不存在");
+        }
+        String processStatus = BeanUtil.getProperty(process, "status") instanceof String s ? s : String.valueOf(BeanUtil.getProperty(process, "status"));
+        if (!"PENDING".equals(processStatus)) {
+            throw new BusinessException("仅PENDING状态的流程可取消");
+        }
+
+        BeanUtil.setProperty(process, "status", "CANCELLED");
+        approvalProcessMapper.updateById(process);
+
+        // Trigger business-side cancellation via the rejection handler
+        handleRejection(process, operatorId, "流程已取消");
+
+        return process;
     }
 
     private String generateProcessNo() {
@@ -309,14 +395,191 @@ public class ApprovalService {
         }
     }
 
+    private String stepKey(Long processId, Integer stepNo) {
+        if (processId == null || stepNo == null) {
+            return null;
+        }
+        return processId + ":" + stepNo;
+    }
+
+    private boolean isWorkflowManaged(ApprovalProcess process) {
+        return process.getProcessType() != null && WORKFLOW_MANAGED_PROCESS_TYPES.contains(process.getProcessType());
+    }
+
+    private WorkflowDefinitionService.WorkflowRuntimePlan resolveWorkflowRuntimePlan(ApprovalProcess process) {
+        if (!isWorkflowManaged(process)) {
+            return null;
+        }
+        String businessPayload = extractWorkflowPayloadJson(process.getBusinessData());
+        String workflowDefinitionJson = extractWorkflowDefinitionJson(process.getBusinessData());
+        if (workflowDefinitionJson != null) {
+            return workflowDefinitionService.requireRuntimePlan(workflowDefinitionJson, businessPayload);
+        }
+        return workflowDefinitionService.requirePublishedRuntimePlan(process.getProcessType(), businessPayload);
+    }
+
     private int resolveFinalStep(ApprovalProcess process) {
+        return resolveFinalStep(process, resolveWorkflowRuntimePlan(process));
+    }
+
+    private int resolveFinalStep(ApprovalProcess process, WorkflowDefinitionService.WorkflowRuntimePlan workflowPlan) {
         if ("RETIREMENT".equals(process.getProcessType()) && process.getBusinessId() != null) {
             return retirementApplicationService.getApprovalStepCount(process.getBusinessId());
         }
         if ("WORK_ORDER".equals(process.getProcessType())) {
             return 1;
         }
+        if (isWorkflowManaged(process)) {
+            WorkflowDefinitionService.WorkflowRuntimePlan plan = workflowPlan == null ? resolveWorkflowRuntimePlan(process) : workflowPlan;
+            return plan == null ? FINAL_STEP : plan.finalStep(FINAL_STEP);
+        }
         return FINAL_STEP;
+    }
+
+    private List<ApprovalRecord> selectCurrentStepRecords(Long processId, String tenantId, Integer currentStep) {
+        List<ApprovalRecord> records = approvalRecordMapper.selectList(
+            new QueryWrapper<ApprovalRecord>()
+                .eq("process_id", processId)
+                .eq("tenant_id", tenantId)
+                .eq("step_no", currentStep)
+        );
+        return records == null ? List.of() : records;
+    }
+
+    private boolean hasApprovedCurrentStep(List<ApprovalRecord> currentStepRecords, Long approverId) {
+        if (approverId == null) {
+            return false;
+        }
+        return currentStepRecords.stream()
+                .anyMatch(record -> approverId.equals(parseLong(BeanUtil.getProperty(record, "approverId"), null)));
+    }
+
+    private boolean canApproveCurrentWorkflowNode(ApprovalProcess process, Long approverId) {
+        try {
+            WorkflowDefinitionService.WorkflowRuntimePlan plan = resolveWorkflowRuntimePlan(process);
+            if (plan == null) {
+                return true;
+            }
+            Integer currentStep = parseInteger(BeanUtil.getProperty(process, "currentStep"), 1);
+            return isApproverAllowedForNode(plan.nodeAtStep(currentStep), approverId);
+        } catch (BusinessException ex) {
+            return false;
+        }
+    }
+
+    private boolean isApproverAllowedForNode(WorkflowDefinitionService.WorkflowApprovalNode node, Long approverId) {
+        if (node == null || approverId == null) {
+            return true;
+        }
+        if (node.approverRole() == null || node.approverRole().isBlank()) {
+            return true;
+        }
+        List<Long> roleApproverIds = resolveRoleApproverIds(node.approverRole());
+        return !roleApproverIds.isEmpty() && roleApproverIds.contains(approverId);
+    }
+
+    private boolean isApprovalStepComplete(WorkflowDefinitionService.WorkflowApprovalNode node,
+                                           List<ApprovalRecord> currentStepRecords,
+                                           Long approverId) {
+        if (node == null || !"all".equals(node.approvalMode())) {
+            return true;
+        }
+
+        List<Long> requiredApproverIds = resolveRoleApproverIds(node.approverRole());
+        if (requiredApproverIds.isEmpty()) {
+            throw new BusinessException("审批角色未配置审批人");
+        }
+
+        Set<Long> approvedApproverIds = currentStepRecords.stream()
+                .filter(record -> "APPROVED".equals(BeanUtil.getProperty(record, "approveResult")))
+                .map(record -> parseLong(BeanUtil.getProperty(record, "approverId"), null))
+                .filter(id -> id != null)
+                .collect(Collectors.toSet());
+        if (approverId != null) {
+            approvedApproverIds.add(approverId);
+        }
+        return approvedApproverIds.containsAll(requiredApproverIds);
+    }
+
+    private List<Long> resolveRoleApproverIds(String approverRole) {
+        if (approverRole == null || approverRole.isBlank() || userRoleMapper == null) {
+            return List.of();
+        }
+        List<Long> approverIds = userRoleMapper.selectActiveUserIdsByRole(approverRole);
+        if (approverIds == null || approverIds.isEmpty()) {
+            return List.of();
+        }
+        return approverIds.stream()
+                .filter(id -> id != null)
+                .distinct()
+                .toList();
+    }
+
+    private void ensureWorkflowApproverAllowed(WorkflowDefinitionService.WorkflowApprovalNode node, Long approverId) {
+        if (node == null || approverId == null) {
+            return;
+        }
+        if (node.approverRole() == null || node.approverRole().isBlank()) {
+            return;
+        }
+        List<Long> roleApproverIds = resolveRoleApproverIds(node.approverRole());
+        if (roleApproverIds.isEmpty()) {
+            throw new BusinessException("审批角色未配置审批人");
+        }
+        if (!roleApproverIds.contains(approverId)) {
+            throw new BusinessException("当前用户不属于节点审批角色");
+        }
+    }
+
+    private String bindWorkflowSnapshot(String businessData, WorkflowDefinition definition) {
+        Map<String, Object> wrapped = new HashMap<>();
+        wrapped.put(WORKFLOW_PAYLOAD_KEY, parseJsonValue(firstJson(businessData), "审批业务数据解析失败"));
+        wrapped.put(WORKFLOW_DEFINITION_ID_KEY, definition.getId());
+        wrapped.put(WORKFLOW_VERSION_KEY, definition.getVersion());
+        wrapped.put(WORKFLOW_DEFINITION_KEY, parseJsonValue(definition.getDefinitionJson(), "流程定义解析失败"));
+        return toJson(wrapped, "审批业务数据序列化失败");
+    }
+
+    private String extractWorkflowPayloadJson(String businessData) {
+        if (businessData == null || businessData.isBlank()) {
+            return "{}";
+        }
+        Object parsed = parseJsonValue(businessData, "审批业务数据解析失败");
+        if (parsed instanceof Map<?, ?> data && data.containsKey(WORKFLOW_PAYLOAD_KEY)) {
+            return toJson(data.get(WORKFLOW_PAYLOAD_KEY), "审批业务数据序列化失败");
+        }
+        return businessData;
+    }
+
+    private String extractWorkflowDefinitionJson(String businessData) {
+        if (businessData == null || businessData.isBlank()) {
+            return null;
+        }
+        Object parsed = parseJsonValue(businessData, "审批业务数据解析失败");
+        if (parsed instanceof Map<?, ?> data && data.containsKey(WORKFLOW_DEFINITION_KEY)) {
+            return toJson(data.get(WORKFLOW_DEFINITION_KEY), "流程定义序列化失败");
+        }
+        return null;
+    }
+
+    private String firstJson(String json) {
+        return json == null || json.isBlank() ? "{}" : json;
+    }
+
+    private Object parseJsonValue(String json, String message) {
+        try {
+            return objectMapper.readValue(json, Object.class);
+        } catch (JsonProcessingException e) {
+            throw new BusinessException(message + ": " + e.getMessage());
+        }
+    }
+
+    private String toJson(Object value, String message) {
+        try {
+            return objectMapper.writeValueAsString(value);
+        } catch (JsonProcessingException e) {
+            throw new BusinessException(message + ": " + e.getMessage());
+        }
     }
 
     private void handleBusinessOutcome(ApprovalProcess process, Long approverId, String result, String opinion) {
@@ -346,6 +609,12 @@ public class ApprovalService {
             case "ASSET_SCRAP":
                 handleDisposalOutcome(process, AssetScrapDTO.class, dto -> disposalService.scrapAsset((AssetScrapDTO) dto));
                 break;
+            case "ASSET_COMPENSATION":
+                handleDisposalOutcome(process, CompensationCreateDTO.class, dto -> {
+                    AssetCompensation compensation = compensationService.createCompensation((CompensationCreateDTO) dto);
+                    compensationService.updateStatus(compensation.getId(), "APPROVED");
+                });
+                break;
             default:
                 break;
         }
@@ -370,7 +639,9 @@ public class ApprovalService {
             throw new BusinessException("处置业务数据为空，无法执行处置操作");
         }
         try {
-            T dto = objectMapper.readValue(businessData, dtoClass);
+            T dto = objectMapper.readerFor(dtoClass)
+                    .without(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+                    .readValue(extractWorkflowPayloadJson(businessData));
             action.accept(dto);
         } catch (JsonProcessingException e) {
             throw new BusinessException("处置业务数据解析失败: " + e.getMessage());

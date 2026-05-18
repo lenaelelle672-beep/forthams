@@ -19,7 +19,8 @@ export type ApprovalStatus =
   | 'PENDING'
   | 'APPROVED'
   | 'REJECTED'
-  | 'CANCELLED';
+  | 'CANCELLED'
+  | 'COMPLETED';
 
 /** Supported approval process types. */
 export type ApprovalType =
@@ -27,7 +28,8 @@ export type ApprovalType =
   | 'WORK_ORDER'
   | 'ASSET_TRANSFER'
   | 'ASSET_CLEARANCE'
-  | 'ASSET_SCRAP';
+  | 'ASSET_SCRAP'
+  | 'ASSET_COMPENSATION';
 
 /** Approval decision result values. */
 export type ApprovalResult = 'APPROVED' | 'REJECTED';
@@ -70,6 +72,12 @@ export interface ApprovalItem {
   processNo: string;
   /** Type of the approval process */
   type: ApprovalType;
+  /** Business record ID associated with the process */
+  businessId?: number | null;
+  /** Short description parsed from business payload */
+  businessSummary?: string;
+  /** Raw business payload JSON for detail rendering */
+  businessData?: string | null;
   /** ID of the user who submitted the approval request */
   applicant: number;
   /** Current status of the approval */

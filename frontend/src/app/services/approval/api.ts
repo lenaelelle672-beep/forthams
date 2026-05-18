@@ -50,6 +50,23 @@ interface RawApprovalProcess {
   updateTime: string;
 }
 
+function parseBusinessSummary(businessData: string | null): string | undefined {
+  if (!businessData) {
+    return undefined;
+  }
+
+  try {
+    const parsed = JSON.parse(businessData) as Record<string, unknown>;
+    const payload = (parsed._approvalPayload && typeof parsed._approvalPayload === 'object')
+      ? parsed._approvalPayload as Record<string, unknown>
+      : parsed;
+    const summary = payload.reason ?? payload.description ?? payload.lossDescription;
+    return typeof summary === 'string' && summary.trim() ? summary : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 /**
  * Raw approval record shape returned by the backend.
  * Uses snake_case fields matching the Java entity ApprovalRecord.
@@ -94,6 +111,9 @@ function mapProcess(raw: RawApprovalProcess, history?: ApprovalHistoryItem[]): A
     id: raw.id,
     processNo: raw.processNo,
     type: raw.processType as ApprovalItem['type'],
+    businessId: raw.businessId,
+    businessData: raw.businessData,
+    businessSummary: parseBusinessSummary(raw.businessData),
     applicant: raw.applicantId,
     status: raw.status as ApprovalItem['status'],
     currentStep: raw.currentStep,
@@ -256,6 +276,25 @@ export async function getApprovalList(
 export async function getPendingCount(): Promise<number> {
   try {
     return await api.get<number>('/approvals/pending/count');
+  } catch (err) {
+    throw err instanceof ApprovalServiceError
+      ? err
+      : createNetworkError(err);
+  }
+}
+
+/**
+ * Cancel an approval process.
+ *
+ * Calls POST /approvals/{processId}/cancel.
+ *
+ * @param processId - The approval process ID to cancel
+ * @returns The updated ApprovalItem with CANCELLED status
+ */
+export async function cancelProcess(processId: number): Promise<ApprovalItem> {
+  try {
+    const raw = await api.post<RawApprovalProcess>(`/approvals/${processId}/cancel`);
+    return mapProcess(raw);
   } catch (err) {
     throw err instanceof ApprovalServiceError
       ? err

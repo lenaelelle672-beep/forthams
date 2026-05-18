@@ -67,6 +67,9 @@ import type { TableRowSelection } from 'antd/es/table/interface';
 import { useNavigate, useParams } from 'react-router-dom';
 import dayjs from 'dayjs';
 import styles from './InventoryTasks.module.css';
+import { inventoryService } from '../../services/inventoryService';
+import { getCategoryTree, type CategoryTreeNode } from '../../../services/categoryService';
+import http from '../../../utils/http';
 
 const { Header, Sider, Content } = Layout;
 const { Title, Text } = Typography;
@@ -158,208 +161,123 @@ const CHECK_STATUS_CONFIG: Record<CheckStatus, { label: string; color: string }>
   SHORTAGE:  { label: '盘亏', color: 'error' },
 };
 
-/** 位置树数据（用于 TreeSelect） */
-const LOCATION_TREE_DATA = [
-  {
-    title: '总部大楼',
-    value: 'loc-hq',
-    key: 'loc-hq',
-    children: [
-      { title: '1楼 - 办公区', value: 'loc-hq-1f', key: 'loc-hq-1f' },
-      { title: '2楼 - 研发区', value: 'loc-hq-2f', key: 'loc-hq-2f' },
-      { title: '3楼 - 管理层', value: 'loc-hq-3f', key: 'loc-hq-3f' },
-    ],
-  },
-  {
-    title: '仓储中心',
-    value: 'loc-wh',
-    key: 'loc-wh',
-    children: [
-      { title: 'A区仓库', value: 'loc-wh-a', key: 'loc-wh-a' },
-      { title: 'B区仓库', value: 'loc-wh-b', key: 'loc-wh-b' },
-    ],
-  },
-  {
-    title: '分公司',
-    value: 'loc-branch',
-    key: 'loc-branch',
-    children: [
-      { title: '上海分公司', value: 'loc-sh', key: 'loc-sh' },
-      { title: '北京分公司', value: 'loc-bj', key: 'loc-bj' },
-    ],
-  },
-];
+/** 位置树数据加载辅助 — 从 /api/v1/locations/list 加载并转换为 TreeSelect 格式 */
+interface ApiLocationNode {
+  id: number | string;
+  name: string;
+  locationCode?: string;
+  parentId?: number | string | null;
+  children?: ApiLocationNode[];
+}
 
-/** 分类树数据（用于 TreeSelect） */
-const CATEGORY_TREE_DATA = [
-  {
-    title: 'IT设备',
-    value: 'cat-it',
-    key: 'cat-it',
-    children: [
-      { title: '电脑', value: 'cat-it-pc', key: 'cat-it-pc' },
-      { title: '显示器', value: 'cat-it-monitor', key: 'cat-it-monitor' },
-      { title: '打印机', value: 'cat-it-printer', key: 'cat-it-printer' },
-    ],
-  },
-  {
-    title: '办公家具',
-    value: 'cat-furniture',
-    key: 'cat-furniture',
-    children: [
-      { title: '办公桌', value: 'cat-furniture-desk', key: 'cat-furniture-desk' },
-      { title: '椅子', value: 'cat-furniture-chair', key: 'cat-furniture-chair' },
-    ],
-  },
-  { title: '车辆', value: 'cat-vehicle', key: 'cat-vehicle' },
-];
+function locationNodesToTreeData(
+  nodes: ApiLocationNode[],
+): { title: string; value: string; key: string; children?: any[] }[] {
+  return nodes.map((n) => ({
+    title: n.name,
+    value: String(n.id),
+    key: String(n.id),
+    children: n.children ? locationNodesToTreeData(n.children) : undefined,
+  }));
+}
+
+function categoryNodesToTreeSelectData(
+  nodes: CategoryTreeNode[],
+): { title: string; value: string; key: string; children?: any[] }[] {
+  return nodes.map((n) => ({
+    title: n.name,
+    value: n.id,
+    key: n.id,
+    children: n.children ? categoryNodesToTreeSelectData(n.children) : undefined,
+  }));
+}
 
 /** 表格默认分页大小 */
 const DEFAULT_PAGE_SIZE = 20;
 
 /* ══════════════════════════════════════════════════════════════
- * API Service Layer
- *
- * 封装所有后端交互。生产环境下替换为真实 Axios 调用，
- * 当前使用 mock 数据以满足前端独立开发与 E2E 测试。
+ * API Service Layer — Real API via inventoryService
  * ══════════════════════════════════════════════════════════════ */
 
+/** Map backend status strings to component-level uppercase */
+const SERVICE_STATUS_TO_UI: Record<string, TaskStatus> = {
+  PENDING: 'DRAFT',
+  DRAFT: 'DRAFT',
+  IN_PROGRESS: 'IN_PROGRESS',
+  COMPLETED: 'COMPLETED',
+  SUBMITTED: 'PENDING_APPROVAL',
+  PENDING_APPROVAL: 'PENDING_APPROVAL',
+  APPROVED: 'APPROVED',
+  CLOSED: 'CLOSED',
+};
+
 const inventoryApi = {
-  /** GET /api/inventory/tasks — 获取盘点任务列表 */
+  /** Fetch inventory task list via app/services/inventoryService */
   fetchTasks: async (): Promise<ITask[]> => {
-    await new Promise((r) => setTimeout(r, 500));
-    return [
-      {
-        id: 'INV-2024-001',
-        name: 'Q1 IT设备盘点',
-        scope: '总部大楼 / 1楼,2楼',
-        scopeIds: ['loc-hq-1f', 'loc-hq-2f'],
-        status: 'IN_PROGRESS',
-        createdAt: '2024-03-15T09:00:00Z',
-        totalAssets: 156,
-        checkedAssets: 89,
-        progress: 57,
-      },
-      {
-        id: 'INV-2024-002',
-        name: '年度固定资产全面盘点',
-        scope: '全部位置',
-        scopeIds: ['loc-hq', 'loc-wh', 'loc-branch'],
-        status: 'DRAFT',
-        createdAt: '2024-03-20T10:30:00Z',
-        totalAssets: 890,
-        checkedAssets: 0,
-        progress: 0,
-      },
-      {
-        id: 'INV-2023-047',
-        name: '办公家具清查',
-        scope: '仓储中心 / A区',
-        scopeIds: ['loc-wh-a'],
-        status: 'COMPLETED',
-        createdAt: '2023-12-01T08:00:00Z',
-        totalAssets: 42,
-        checkedAssets: 42,
-        progress: 100,
-      },
-      {
-        id: 'INV-2024-003',
-        name: 'Q2 IT外设盘点',
-        scope: '总部大楼 / 3楼',
-        scopeIds: ['loc-hq-3f'],
-        status: 'PENDING_APPROVAL',
-        createdAt: '2024-04-01T14:00:00Z',
-        totalAssets: 78,
-        checkedAssets: 78,
-        progress: 100,
-      },
-      {
-        id: 'INV-2024-004',
-        name: '上海分公司资产盘点',
-        scope: '上海分公司',
-        scopeIds: ['loc-sh'],
-        status: 'APPROVED',
-        createdAt: '2024-02-10T11:00:00Z',
-        totalAssets: 210,
-        checkedAssets: 210,
-        progress: 100,
-      },
-    ];
+    const page = await inventoryService.listTasks();
+    return (page.records ?? []).map((t) => ({
+      id: String(t.id),
+      name: t.taskName ?? '',
+      scope: '盘点任务',
+      scopeIds: [],
+      status: (SERVICE_STATUS_TO_UI[t.status] ?? 'DRAFT') as TaskStatus,
+      createdAt: t.createTime ?? '',
+      totalAssets: t.totalCount ?? 0,
+      checkedAssets: (t.scannedCount ?? 0) + (t.matchCount ?? 0),
+      progress: t.totalCount != null && t.totalCount > 0
+        ? Math.round(((t.scannedCount ?? 0) / t.totalCount) * 100)
+        : 0,
+    }));
   },
 
-  /** GET /api/inventory/tasks/:id/assets — 获取资产明细 */
-  fetchAssets: async (_taskId: string): Promise<IAssetItem[]> => {
-    await new Promise((r) => setTimeout(r, 400));
-    const assetNames = [
-      'MacBook Pro 16"',
-      'Dell U2723QE 显示器',
-      'Herman Miller Aeron 座椅',
-      '升降办公桌',
-      'ThinkPad X1 Carbon',
-    ];
-    const categories = ['IT设备', '办公家具', '办公设备'];
-    const locations = ['1楼-办公区A', '2楼-研发区', '3楼-会议室', 'A区仓库'];
-
-    return Array.from({ length: 25 }, (_, i) => {
-      const bookQty = (i % 5) + 1;
-      let actualQty: number | null = bookQty;
-      let checkStatus: CheckStatus = 'CHECKED';
-      let remark = '';
-
-      /* 模拟盘亏（i===3）：账面有，实盘无 */
-      if (i === 3) {
-        actualQty = 0;
-        checkStatus = 'SHORTAGE';
-        remark = '账面有，实盘无';
-      } else if (i === 7) {
-        /* 模拟盘盈（i===7）：账面无，实盘有 */
-        actualQty = bookQty + 2;
-        checkStatus = 'SURPLUS';
-        remark = '账面无，实盘有';
-      } else if (i >= 15) {
-        /* 未盘条目 */
-        actualQty = null;
-        checkStatus = 'UNCHECKED';
-      }
-
-      return {
-        id: `ASSET-${i.toString().padStart(3, '0')}`,
-        assetCode: `AST-${(2024000 + i).toString()}`,
-        assetName: assetNames[i % assetNames.length],
-        category: categories[i % categories.length],
-        location: locations[i % locations.length],
-        bookQty,
-        actualQty,
-        discrepancy: actualQty !== null ? actualQty - bookQty : 0,
-        checkStatus,
-        remark,
-      };
-    });
+  /** Fetch asset list for a given task via app/services/inventoryService */
+  fetchAssets: async (taskId: string): Promise<IAssetItem[]> => {
+    const details = await inventoryService.getTaskDetails(taskId);
+    return (details ?? []).map((d) => ({
+      id: String(d.id),
+      assetCode: d.rfidTag ?? String(d.assetId),
+      assetName: d.remark ?? '',
+      category: '',
+      location: d.expectedLocation ?? '',
+      bookQty: 1,
+      actualQty: d.status != null ? 1 : null,
+      discrepancy: 0,
+      checkStatus: (d.status === 'MATCH' || d.status === 'match'
+        ? 'CHECKED'
+        : d.status === 'LOSS' || d.status === 'loss'
+          ? 'SHORTAGE'
+          : d.status === 'SURPLUS' || d.status === 'surplus'
+            ? 'SURPLUS'
+            : 'UNCHECKED') as CheckStatus,
+      remark: d.remark ?? '',
+    }));
   },
 
-  /** POST /api/inventory/tasks — 创建盘点任务 */
+  /** Create a new inventory task via app/services/inventoryService */
   createTask: async (payload: {
     name: string;
     scopeMode: ScopeMode;
     scopeIds: string[];
   }): Promise<ITask> => {
-    await new Promise((r) => setTimeout(r, 800));
+    const created = await inventoryService.createTask({
+      taskName: payload.name,
+    });
     return {
-      id: `INV-${Date.now()}`,
-      name: payload.name,
-      scope: payload.scopeIds.join(', '),
+      id: String(created.id),
+      name: created.taskName ?? payload.name,
+      scope: payload.scopeIds.length > 0 ? payload.scopeIds.join(', ') : '全部资产',
       scopeIds: payload.scopeIds,
-      status: 'DRAFT',
-      createdAt: new Date().toISOString(),
-      totalAssets: 0,
+      status: 'DRAFT' as TaskStatus,
+      createdAt: created.createTime ?? '',
+      totalAssets: created.totalCount ?? 0,
       checkedAssets: 0,
       progress: 0,
     };
   },
 
-  /** POST /api/inventory/approve — 提交核准 */
-  submitForApproval: async (_taskId: string): Promise<void> => {
-    await new Promise((r) => setTimeout(r, 1000));
+  /** Submit task for approval via app/services/inventoryService */
+  submitForApproval: async (taskId: string): Promise<void> => {
+    await inventoryService.updateTaskStatus(taskId, 'SUBMITTED');
   },
 };
 
@@ -421,10 +339,31 @@ export interface InventoryScopeSelectorProps {
   onChange: (value: ScopeValue) => void;
 }
 
+/** TreeSelect 格式的树节点 */
+type TreeSelectNode = { title: string; value: string; key: string; children?: TreeSelectNode[] };
+
 export const InventoryScopeSelector: React.FC<InventoryScopeSelectorProps> = ({
   value,
   onChange,
 }) => {
+  /** 动态加载的树数据 */
+  const [locationTree, setLocationTree] = useState<TreeSelectNode[]>([]);
+  const [categoryTree, setCategoryTree] = useState<TreeSelectNode[]>([]);
+
+  /** 从 API 加载位置树和分类树 */
+  useEffect(() => {
+    http.get<ApiLocationNode[]>('/v1/locations/list')
+      .then((res: any) => {
+        const data = Array.isArray(res) ? res : (res?.data ?? []);
+        setLocationTree(locationNodesToTreeData(data));
+      })
+      .catch(() => { /* 位置树加载失败不阻塞 */ });
+
+    getCategoryTree()
+      .then((tree) => setCategoryTree(categoryNodesToTreeSelectData(tree)))
+      .catch(() => { /* 分类树加载失败不阻塞 */ });
+  }, []);
+
   /** 切换范围模式时清空已选节点 */
   const handleModeChange = useCallback(
     (mode: ScopeMode) => {
@@ -441,7 +380,7 @@ export const InventoryScopeSelector: React.FC<InventoryScopeSelectorProps> = ({
   );
 
   const treeData =
-    value.mode === 'LOCATION' ? LOCATION_TREE_DATA : CATEGORY_TREE_DATA;
+    value.mode === 'LOCATION' ? locationTree : categoryTree;
 
   return (
     <div data-testid="inventory-scope-selector">

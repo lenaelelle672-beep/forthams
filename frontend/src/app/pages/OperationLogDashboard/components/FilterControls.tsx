@@ -18,7 +18,6 @@ import { FilterOutlined, ReloadOutlined } from '@ant-design/icons';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 
-import { useAuditData } from '../../AuditDashboard/hooks/useAuditData';
 import type { AuditLog, OperationType } from '../../types/audit.types';
 
 const { RangePicker } = DatePicker;
@@ -47,13 +46,9 @@ const OPERATION_TYPE_OPTIONS = [
   { label: '批量操作 (BULK)', value: 'BULK' },
 ];
 
-/** 用户列表选项（模拟数据，实际应从 API 获取） */
+/** 用户筛选默认选项；具体用户通过日志数据筛选结果呈现，不再保留假用户。 */
 const USER_OPTIONS = [
   { label: '全部用户', value: 'ALL' },
-  { label: '管理员 (admin)', value: 'admin' },
-  { label: '运维人员 (operator)', value: 'operator' },
-  { label: '审计员 (auditor)', value: 'auditor' },
-  { label: '普通用户 (user)', value: 'user' },
 ];
 
 /** 筛选器状态接口 */

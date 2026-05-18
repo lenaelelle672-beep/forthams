@@ -28,6 +28,19 @@ import {
 } from "../services/dashboardService";
 import { approvalService, type ApprovalRecord } from '../services/approvalService';
 
+const CHINESE_FONT_FAMILY =
+  '"PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", "Source Han Sans SC", "Heiti SC", "Arial Unicode MS", sans-serif';
+const chartTextStyle = { fontFamily: CHINESE_FONT_FAMILY };
+const MOJIBAKE_SIGNAL = /(?:Ã.|Â.|[\u00c2-\u00f4][\u0080-\u00bf\u00a0-\u00bf]|[€‚ƒ„…†‡ˆ‰Š‹ŒŽ‘’“”•–—˜™š›œžŸ]|�)/;
+const LATIN1_MOJIBAKE_RUN = /[\u0080-\u00ff]{2,}/g;
+const UNRECOVERABLE_GARBLED_SIGNAL = /(?:[�□?]{2,}|锟斤拷|锟)/;
+const WINDOWS_1252_BYTES = new Map<string, number>([
+  ["€", 0x80], ["‚", 0x82], ["ƒ", 0x83], ["„", 0x84], ["…", 0x85], ["†", 0x86], ["‡", 0x87],
+  ["ˆ", 0x88], ["‰", 0x89], ["Š", 0x8a], ["‹", 0x8b], ["Œ", 0x8c], ["Ž", 0x8e], ["‘", 0x91],
+  ["’", 0x92], ["“", 0x93], ["”", 0x94], ["•", 0x95], ["–", 0x96], ["—", 0x97], ["˜", 0x98],
+  ["™", 0x99], ["š", 0x9a], ["›", 0x9b], ["œ", 0x9c], ["ž", 0x9e], ["Ÿ", 0x9f],
+]);
+
 const chartPalette = [
   "var(--color-chart-1)",
   "var(--color-chart-2)",
@@ -35,6 +48,129 @@ const chartPalette = [
   "var(--color-chart-4)",
   "var(--color-chart-5)",
 ];
+
+function countChineseCharacters(value: string) {
+  return (value.match(/[\u4e00-\u9fff]/g) ?? []).length;
+}
+
+function repairMojibake(value: string) {
+  if (!value || !MOJIBAKE_SIGNAL.test(value)) {
+    return value;
+  }
+
+  if (typeof TextDecoder === "undefined") {
+    return value;
+  }
+
+  const decodeBytes = (bytes: number[]) => {
+    try {
+      const decoded = new TextDecoder("utf-8", { fatal: true }).decode(new Uint8Array(bytes));
+      return countChineseCharacters(decoded) > countChineseCharacters(value) ? decoded : value;
+    } catch {
+      return value;
+    }
+  };
+
+  const windows1252Bytes: number[] = [];
+  let hasWindows1252OnlyByte = false;
+  for (const char of value) {
+    const mappedByte = WINDOWS_1252_BYTES.get(char);
+    if (mappedByte !== undefined) {
+      windows1252Bytes.push(mappedByte);
+      hasWindows1252OnlyByte = true;
+      continue;
+    }
+
+    const code = char.charCodeAt(0);
+    if (code > 255) {
+      windows1252Bytes.length = 0;
+      break;
+    }
+    windows1252Bytes.push(code);
+  }
+
+  if (hasWindows1252OnlyByte && windows1252Bytes.length === value.length) {
+    const decoded = decodeBytes(windows1252Bytes);
+    if (decoded !== value) return decoded;
+  }
+
+  const decodeLatin1Run = (run: string) => {
+    const bytes = Array.from(run, (char) => char.charCodeAt(0));
+    try {
+      const decoded = new TextDecoder("utf-8", { fatal: true }).decode(new Uint8Array(bytes));
+      return countChineseCharacters(decoded) > countChineseCharacters(run) ? decoded : run;
+    } catch {
+      return run;
+    }
+  };
+
+  const partiallyDecoded = value.replace(LATIN1_MOJIBAKE_RUN, decodeLatin1Run);
+  if (partiallyDecoded !== value) {
+    return partiallyDecoded;
+  }
+
+  const bytes: number[] = [];
+  for (const char of value) {
+    const code = char.charCodeAt(0);
+    if (code > 255) {
+      return value;
+    }
+    bytes.push(code);
+  }
+
+  return decodeBytes(bytes);
+}
+
+function cleanDisplayText(value: unknown, fallback = "-") {
+  if (value === undefined || value === null) {
+    return fallback;
+  }
+
+  const text = String(value).trim();
+  if (!text) {
+    return fallback;
+  }
+
+  const repaired = repairMojibake(text);
+  return UNRECOVERABLE_GARBLED_SIGNAL.test(repaired) ? fallback : repaired;
+}
+
+function renderDeptPieLabel({
+  cx = 0,
+  cy = 0,
+  midAngle = 0,
+  outerRadius = 0,
+  percent = 0,
+  name,
+}: {
+  cx?: number | string;
+  cy?: number | string;
+  midAngle?: number;
+  outerRadius?: number | string;
+  percent?: number;
+  name?: unknown;
+}) {
+  const radius = Number(outerRadius) + 24;
+  const centerX = Number(cx);
+  const centerY = Number(cy);
+  const angle = -midAngle * (Math.PI / 180);
+  const x = centerX + radius * Math.cos(angle);
+  const y = centerY + radius * Math.sin(angle);
+  const label = `${cleanDisplayText(name, "部门")} ${((percent ?? 0) * 100).toFixed(0)}%`;
+
+  return (
+    <text
+      x={x}
+      y={y}
+      fill="#374151"
+      textAnchor={x > centerX ? "start" : "end"}
+      dominantBaseline="central"
+      style={chartTextStyle}
+    >
+      {label}
+    </text>
+  );
+}
 
 function formatNumber(value?: number | string) {
   if (value === undefined || value === null || value === "") {
@@ -44,7 +180,7 @@ function formatNumber(value?: number | string) {
   const numericValue = Number(value);
 
   if (Number.isNaN(numericValue)) {
-    return String(value);
+    return cleanDisplayText(value);
   }
 
   return new Intl.NumberFormat("zh-CN").format(numericValue);
@@ -58,7 +194,7 @@ function formatCurrency(value?: number | string) {
   const numericValue = Number(value);
 
   if (Number.isNaN(numericValue)) {
-    return String(value);
+    return cleanDisplayText(value);
   }
 
   return new Intl.NumberFormat("zh-CN", {
@@ -72,7 +208,7 @@ function formatDateLabel(value: string) {
   const date = new Date(value);
 
   if (Number.isNaN(date.getTime())) {
-    return value;
+    return cleanDisplayText(value, value);
   }
 
   return new Intl.DateTimeFormat("zh-CN", {
@@ -82,14 +218,14 @@ function formatDateLabel(value: string) {
 }
 
 function formatApprovalDate(value: unknown) {
-  return typeof value === "string" && value ? value : "-";
+  return cleanDisplayText(value, "-");
 }
 
 function getApprovalLabel(approval: ApprovalRecord, keys: string[], fallback = "-") {
   for (const key of keys) {
     const value = approval[key];
     if (value !== undefined && value !== null && value !== "") {
-      return String(value);
+      return cleanDisplayText(value, fallback);
     }
   }
   return fallback;
@@ -120,7 +256,7 @@ export function Dashboard() {
           dashboardService.getValueTrends(),
           dashboardService.getDeptDistribution(),
           approvalService.getPending().catch((pendingError) => {
-            approvalLoadError = pendingError instanceof Error ? pendingError.message : "待审批事项加载失败";
+            approvalLoadError = pendingError instanceof Error ? cleanDisplayText(pendingError.message, "待审批事项加载失败") : "待审批事项加载失败";
             return [];
           }),
         ]);
@@ -139,7 +275,7 @@ export function Dashboard() {
           return;
         }
 
-        setError(loadError instanceof Error ? loadError.message : "仪表板数据加载失败");
+        setError(loadError instanceof Error ? cleanDisplayText(loadError.message, "仪表板数据加载失败") : "仪表板数据加载失败");
       } finally {
         if (mounted) {
           setLoading(false);
@@ -198,6 +334,7 @@ export function Dashboard() {
     () =>
       deptDistribution.map((item, index) => ({
         ...item,
+        deptName: cleanDisplayText(item.deptName, `部门${item.deptId}`),
         fill: chartPalette[index % chartPalette.length],
       })),
     [deptDistribution],
@@ -224,7 +361,7 @@ export function Dashboard() {
       setApprovalMessage(approved ? "审批已批准" : "审批已驳回");
       setPendingApprovals((current) => current.filter((approval) => approval.id !== id));
     } catch (approveError) {
-      setApprovalError(approveError instanceof Error ? approveError.message : "审批操作失败");
+      setApprovalError(approveError instanceof Error ? cleanDisplayText(approveError.message, "审批操作失败") : "审批操作失败");
     } finally {
       setProcessingApprovalId(null);
     }
@@ -235,7 +372,7 @@ export function Dashboard() {
       {/* 页面标题 */}
       <div>
         <h2 className="text-2xl font-semibold text-gray-900">仪表板</h2>
-        <p className="text-gray-600 mt-1">欢迎回来,这是您的资产管理概览</p>
+        <p className="text-gray-600 mt-1">欢迎回来，这是您的资产管理概览</p>
       </div>
 
       {loading ? (
@@ -270,19 +407,26 @@ export function Dashboard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* 资产趋势图 */}
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <div
+          className="bg-white rounded-lg border border-gray-200 p-6"
+          data-testid="asset-value-trend-chart"
+          style={chartTextStyle}
+        >
           <h3 className="text-lg font-semibold text-gray-900 mb-4">资产价值趋势</h3>
           {trendChartData.length ? (
             <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={trendChartData}>
+              <LineChart data={trendChartData} style={chartTextStyle}>
                 <CartesianGrid stroke="var(--color-border)" strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
-                <YAxis tickFormatter={(value) => formatNumber(value)} />
+                <XAxis dataKey="date" tick={chartTextStyle} />
+                <YAxis tick={chartTextStyle} tickFormatter={(value) => formatNumber(value)} />
                 <Tooltip
-                  formatter={(value) => formatCurrency(value as number)}
-                  labelFormatter={(label) => `日期：${label}`}
+                  contentStyle={chartTextStyle}
+                  itemStyle={chartTextStyle}
+                  labelStyle={chartTextStyle}
+                  formatter={(value, name) => [formatCurrency(value as number), cleanDisplayText(name)]}
+                  labelFormatter={(label) => `日期：${cleanDisplayText(label)}`}
                 />
-                <Legend />
+                <Legend wrapperStyle={chartTextStyle} formatter={(value) => cleanDisplayText(value)} />
                 <Line
                   dataKey="totalValue"
                   name="资产总值"
@@ -307,18 +451,22 @@ export function Dashboard() {
         </div>
 
         {/* 设备使用率分布 */}
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <div
+          className="bg-white rounded-lg border border-gray-200 p-6 dept-distribution-chart"
+          data-testid="dept-distribution-chart"
+          style={chartTextStyle}
+        >
           <h3 className="text-lg font-semibold text-gray-900 mb-4">部门资产分布</h3>
           <div className="flex items-center justify-center">
             {distributionChartData.length ? (
               <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
+                <PieChart style={chartTextStyle}>
                   <Pie
                     cx="50%"
                     cy="50%"
                     data={distributionChartData}
                     dataKey="assetCount"
-                    label={({ name, percent }) => `${name} ${((percent ?? 0) * 100).toFixed(0)}%`}
+                    label={renderDeptPieLabel}
                     labelLine={false}
                     nameKey="deptName"
                     outerRadius={100}
@@ -327,7 +475,13 @@ export function Dashboard() {
                       <Cell key={`cell-dashboard-${entry.deptId}`} fill={entry.fill} />
                     ))}
                   </Pie>
-                  <Tooltip formatter={(value) => `${formatNumber(value as number)} 件`} />
+                  <Tooltip
+                    contentStyle={chartTextStyle}
+                    itemStyle={chartTextStyle}
+                    labelStyle={chartTextStyle}
+                    formatter={(value, name) => [`${formatNumber(value as number)} 件`, cleanDisplayText(name)]}
+                  />
+                  <Legend wrapperStyle={chartTextStyle} formatter={(value) => cleanDisplayText(value)} />
                 </PieChart>
               </ResponsiveContainer>
             ) : (

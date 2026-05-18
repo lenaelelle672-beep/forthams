@@ -1,4 +1,5 @@
-import { FileCode2, GitBranch, Trash2 } from "lucide-react";
+import { FileCode2, GitBranch, Search, Trash2, UserCheck, Users } from "lucide-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
@@ -7,6 +8,7 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Separator } from "../ui/separator";
 import { Textarea } from "../ui/textarea";
+import { userService, type UserRecord } from "../../services/userService";
 import { FLOW_NODE_CATALOG, type FlowEdge, type FlowNode, type FlowNodeData } from "../../types/flow";
 
 const typeBadgeClasses = {
@@ -19,14 +21,75 @@ const typeBadgeClasses = {
 const nativeFieldClassName =
   "flex h-9 w-full rounded-md border border-input bg-input-background px-3 text-sm text-foreground outline-none transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50";
 
+interface RoleOption {
+  roleCode: string;
+  roleName: string;
+}
+
 interface NodeConfigPanelProps {
   selectedNode: FlowNode | null;
   edges: FlowEdge[];
-  onUpdateNode: (nodeId: string, patch: Partial<FlowNodeData>) => void;
+  approverRoles?: string[];
+  roleDetails?: RoleOption[];
+  onUpdateNode: (nodeId: string, patch: Partial<FlowNodeData> & Record<string, unknown>) => void;
   onDeleteNode: (nodeId: string) => void;
 }
 
-export function NodeConfigPanel({ selectedNode, edges, onUpdateNode, onDeleteNode }: NodeConfigPanelProps) {
+export function NodeConfigPanel({ selectedNode, edges, approverRoles = [], roleDetails = [], onUpdateNode, onDeleteNode }: NodeConfigPanelProps) {
+  const [userSearchKeyword, setUserSearchKeyword] = useState("");
+  const [userSearchResults, setUserSearchResults] = useState<UserRecord[]>([]);
+  const [userSearchLoading, setUserSearchLoading] = useState(false);
+  const [showUserSearch, setShowUserSearch] = useState(false);
+
+  // Read dynamic approverType/approverId from the node data (FlowNodeData extends Record<string, unknown>)
+  const approverType: "role" | "user" = useMemo(() => {
+    if (!selectedNode) return "role";
+    const raw = (selectedNode.data as Record<string, unknown>).approverType;
+    return raw === "user" ? "user" : "role";
+  }, [selectedNode]);
+
+  const approverId: string = useMemo(() => {
+    if (!selectedNode) return "";
+    const raw = (selectedNode.data as Record<string, unknown>).approverId;
+    return typeof raw === "string" ? raw : "";
+  }, [selectedNode]);
+
+  const selectedUserName = useMemo(() => {
+    if (!approverId || approverType !== "user") return "";
+    const found = userSearchResults.find(u => String(u.id) === String(approverId));
+    return found?.realName || found?.username || approverId;
+  }, [approverId, approverType, userSearchResults]);
+
+  /** Search users via real userService */
+  const handleUserSearch = useCallback(async (keyword: string) => {
+    setUserSearchKeyword(keyword);
+    if (!keyword.trim()) {
+      setUserSearchResults([]);
+      return;
+    }
+    setUserSearchLoading(true);
+    try {
+      const results = await userService.search(keyword);
+      const list = Array.isArray(results) ? results : [];
+      setUserSearchResults(list);
+    } catch {
+      setUserSearchResults([]);
+    } finally {
+      setUserSearchLoading(false);
+    }
+  }, []);
+
+  /** Load initial user info when approverId is set */
+  useEffect(() => {
+    if (!approverId || approverType !== "user") return;
+    const alreadyLoaded = userSearchResults.some(u => String(u.id) === String(approverId));
+    if (!alreadyLoaded) {
+      userService.getById(approverId).then((user) => {
+        if (user) setUserSearchResults(prev => [user, ...prev.filter(u => String(u.id) !== String(approverId))]);
+      }).catch(() => { /* ignore */ });
+    }
+  }, [approverId, approverType, userSearchResults]);
+
   if (!selectedNode) {
     return (
       <div className="flex h-full flex-col gap-4 rounded-[1.5rem] bg-[var(--workflow-panel)] p-4">
@@ -138,13 +201,138 @@ export function NodeConfigPanel({ selectedNode, edges, onUpdateNode, onDeleteNod
           {currentType === "approval" && (
             <>
               <div className="space-y-2">
-                <Label htmlFor="approver-role">审批角色</Label>
-                <Input
-                  id="approver-role"
-                  value={selectedNode.data.approverRole}
-                  onChange={(event) => onUpdateNode(selectedNode.id, { approverRole: event.target.value })}
-                />
+                <Label>审批人类型</Label>
+                <div className="flex gap-3">
+                  <label className="flex items-center gap-2 text-sm text-foreground cursor-pointer">
+                    <input
+                      type="radio"
+                      name={`approverType-${selectedNode.id}`}
+                      checked={approverType === "role"}
+                      onChange={() => {
+                        onUpdateNode(selectedNode.id, { approverType: "role", approverId: "", approverRole: "" });
+                      }}
+                      className="text-primary"
+                    />
+                    按角色审批
+                  </label>
+                  <label className="flex items-center gap-2 text-sm text-foreground cursor-pointer">
+                    <input
+                      type="radio"
+                      name={`approverType-${selectedNode.id}`}
+                      checked={approverType === "user"}
+                      onChange={() => {
+                        onUpdateNode(selectedNode.id, { approverType: "user", approverId: "", approverRole: "" });
+                      }}
+                      className="text-primary"
+                    />
+                    指定用户
+                  </label>
+                </div>
               </div>
+
+              {approverType === "role" ? (
+                <div className="space-y-2">
+                  <Label htmlFor="approver-role">审批角色</Label>
+                  <select
+                    id="approver-role"
+                    className={nativeFieldClassName}
+                    value={approverRoles.includes(selectedNode.data.approverRole) ? selectedNode.data.approverRole : ""}
+                    onChange={(event) => {
+                      if (event.target.value) {
+                        onUpdateNode(selectedNode.id, { approverRole: event.target.value });
+                      }
+                    }}
+                  >
+                    <option value="">从系统角色中选择</option>
+                    {roleDetails.length > 0
+                      ? roleDetails.map((role) => (
+                          <option key={role.roleCode} value={role.roleCode}>
+                            {role.roleName}（{role.roleCode}）
+                          </option>
+                        ))
+                      : approverRoles.map((role) => (
+                          <option key={role} value={role}>{role}</option>
+                        ))
+                    }
+                  </select>
+                  <p className="text-xs text-muted-foreground">
+                    角色列表来自系统角色管理，该角色下至少需有一个启用用户才能发布。
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <Label htmlFor="approver-user">指定审批用户</Label>
+                  {approverId && selectedUserName ? (
+                    <div className="flex items-center gap-2 rounded-md border border-input bg-input-background px-3 py-2">
+                      <UserCheck className="size-4 text-primary" />
+                      <span className="text-sm text-foreground">{selectedUserName}</span>
+                      <span className="text-xs text-muted-foreground">（ID: {approverId}）</span>
+                      <button
+                        type="button"
+                        className="ml-auto text-xs text-muted-foreground hover:text-foreground"
+                        onClick={() => onUpdateNode(selectedNode.id, { approverId: "" })}
+                      >
+                        清除
+                      </button>
+                    </div>
+                  ) : null}
+                  <div className="relative">
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder="输入姓名/用户名搜索用户..."
+                        value={userSearchKeyword}
+                        onChange={(e) => handleUserSearch(e.target.value)}
+                        onFocus={() => setShowUserSearch(true)}
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleUserSearch(userSearchKeyword)}
+                      >
+                        <Search className="size-4" />
+                      </Button>
+                    </div>
+                    {showUserSearch && (userSearchResults.length > 0 || userSearchLoading) && (
+                      <div className="absolute z-50 mt-1 w-full max-h-48 overflow-y-auto rounded-md border border-border bg-white shadow-lg">
+                        {userSearchLoading ? (
+                          <div className="px-3 py-2 text-xs text-muted-foreground">搜索中...</div>
+                        ) : (
+                          userSearchResults.map((user) => (
+                            <button
+                              key={user.id}
+                              type="button"
+                              className={`w-full px-3 py-2 text-left text-sm hover:bg-accent flex items-center gap-2 ${
+                                String(user.id) === approverId ? "bg-accent" : ""
+                              }`}
+                              onClick={() => {
+                                onUpdateNode(selectedNode.id, {
+                                  approverId: String(user.id),
+                                  approverRole: "",
+                                });
+                                setShowUserSearch(false);
+                                setUserSearchKeyword("");
+                              }}
+                            >
+                              <UserCheck className="size-3.5 text-primary shrink-0" />
+                              <span className="font-medium">{user.realName || user.username}</span>
+                              <span className="text-xs text-muted-foreground">ID:{user.id}</span>
+                              {user.phone && <span className="text-xs text-muted-foreground">{user.phone}</span>}
+                            </button>
+                          ))
+                        )}
+                      </div>
+                    )}
+                    {/* Click outside to close search */}
+                    {showUserSearch && (
+                      <div className="fixed inset-0 z-40" onClick={() => setShowUserSearch(false)} />
+                    )}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    用户列表来自系统用户管理，仅显示启用状态的用户。
+                  </p>
+                </div>
+              )}
 
               <div className="space-y-2">
                 <Label htmlFor="approval-mode">审批模式</Label>

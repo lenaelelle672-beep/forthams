@@ -37,9 +37,8 @@ import type {
 } from '@/app/types/audit.types';
 import type { AssetDetailForGraphify } from '@/app/types/flow';
 
-// 服务导入
-import { getAssetAuditLogs } from '@/mocks/assetDetail.mock';
 import auditService from '@/app/services/auditService';
+import { assetService } from '@/app/services/assetService';
 
 // 子组件导入
 import { AssetInfoCard } from './AssetInfoCard';
@@ -197,29 +196,24 @@ export const AssetDetailView: React.FC<AssetDetailViewProps> = ({
     setError(null);
     
     try {
-      // 使用 mock 数据 (实际应调用 assetService.getAssetById)
-      const mockAsset: AssetDetailForGraphify = {
-        id,
-        name: `资产 ${id}`,
-        type: 'SERVER',
-        status: 'ACTIVE',
-        department: 'IT Infrastructure',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        graphifyId: `GF-${id}`,
+      const assetRecord = await assetService.getById(id);
+      const assetDetail: AssetDetailForGraphify = {
+        id: String(assetRecord.id ?? id),
+        name: String(assetRecord.assetName ?? assetRecord.name ?? `资产 ${id}`),
+        type: String(assetRecord.categoryName ?? assetRecord.category ?? 'ASSET'),
+        status: String(assetRecord.status ?? 'UNKNOWN'),
+        department: String(assetRecord.departmentName ?? assetRecord.department ?? ''),
+        createdAt: String(assetRecord.createTime ?? assetRecord.createdAt ?? ''),
+        updatedAt: String(assetRecord.updateTime ?? assetRecord.updatedAt ?? ''),
+        graphifyId: String(assetRecord.graphifyId ?? `ASSET-${assetRecord.id ?? id}`),
         position: { x: 100, y: 200 },
-        properties: {
-          status: 'ACTIVE',
-          category: 'Server',
-          serialNumber: `SN-${id}`
-        },
+        properties: { ...assetRecord },
         metadata: {
-          createdBy: 'admin',
-          lastModifiedBy: 'admin'
-        }
+          source: 'assetService.getById',
+        },
       };
-      
-      setAsset(mockAsset);
+
+      setAsset(assetDetail);
       
       // 加载审计日志
       if (enableAuditLog) {

@@ -1,1 +1,0 @@
-import{a as r}from"./index-D082etuY.js";const t={transfer(s){return r.post("/disposals/transfer",s)},clearance(s){return r.post("/disposals/clearance",s)},scrap(s){return r.post("/disposals/scrap",s)},getHistory(s){return r.get("/disposals/history",{params:s})}};export{t as d};

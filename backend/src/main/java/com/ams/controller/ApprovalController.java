@@ -26,7 +26,7 @@ public class ApprovalController {
             @RequestParam(defaultValue = "1") Integer page,
             @RequestParam(defaultValue = "10") Integer pageSize,
             @RequestParam(required = false) String status,
-            @RequestParam(required = false) String keyword) {
+            @RequestParam(name = "processType", required = false) String keyword) {
         return Result.success(approvalService.queryProcesses(page, pageSize, status, keyword));
     }
 
@@ -47,6 +47,11 @@ public class ApprovalController {
         String result = (String) body.getOrDefault("result", "APPROVED");
         String opinion = (String) body.getOrDefault("opinion", "");
         return Result.success(approvalService.approve(id, getCurrentUserId(request), result, opinion));
+    }
+
+    @PostMapping("/{id}/cancel")
+    public Result<ApprovalProcess> cancel(@PathVariable Long id, HttpServletRequest request) {
+        return Result.success(approvalService.cancelProcess(id, getCurrentUserId(request)));
     }
 
     @GetMapping("/pending")

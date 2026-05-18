@@ -1,5 +1,6 @@
 package com.ams.controller;
 
+import com.ams.common.exception.BusinessException;
 import com.ams.dto.CompensationCreateDTO;
 import com.ams.dto.CompensationUpdateDTO;
 import com.ams.dto.CompensationValuationDTO;
@@ -33,7 +34,7 @@ public class CompensationController {
 
     @PostMapping
     public Result<AssetCompensation> create(@RequestBody CompensationCreateDTO dto) {
-        return Result.success(compensationService.createCompensation(dto));
+        throw new BusinessException("资产赔偿必须通过审批流程提交");
     }
 
     @PostMapping("/valuation")
@@ -48,7 +49,7 @@ public class CompensationController {
 
     @PutMapping("/{id}/status")
     public Result<AssetCompensation> updateStatus(@PathVariable Long id, @RequestBody Map<String, String> body) {
-        return Result.success(compensationService.updateStatus(id, body.get("status")));
+        throw new BusinessException("赔偿状态必须由审批流程回写");
     }
 
     @DeleteMapping("/{id}")

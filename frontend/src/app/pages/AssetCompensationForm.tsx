@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useNavigate } from "react-router";
 import { ArrowLeft, CheckCircle2, Search, Paperclip, Settings } from "lucide-react";
-import { compensationService } from "../services/compensationService";
+import { toast } from "sonner";
+import { approvalService } from "../services/approvalService";
+import { assetService, type AssetRecord } from "../services/assetService";
 
 const steps = [
   { id: 1, name: "填写资产信息", status: "current" },
@@ -14,17 +16,36 @@ const steps = [
   { id: 8, name: "库房接收资产", status: "upcoming" },
 ];
 
+function parseRequiredId(value: string, label: string): number {
+  const parsed = Number(value.trim());
+  if (!Number.isInteger(parsed) || parsed <= 0) {
+    throw new Error(`${label}必须填写正整数 ID`);
+  }
+  return parsed;
+}
+
+function parseOptionalId(value: string): number | undefined {
+  if (!value.trim()) return undefined;
+  const parsed = Number(value.trim());
+  return Number.isInteger(parsed) && parsed > 0 ? parsed : undefined;
+}
+
 export function AssetCompensationForm() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showAssetPicker, setShowAssetPicker] = useState(false);
+  const [assetSearchKeyword, setAssetSearchKeyword] = useState('');
+  const [assetSearchResults, setAssetSearchResults] = useState<AssetRecord[]>([]);
+  const [assetSearchLoading, setAssetSearchLoading] = useState(false);
+  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   
   const now = new Date();
   const defaultDate = `${now.getFullYear()}/${String(now.getMonth() + 1).padStart(2, '0')}/${String(now.getDate()).padStart(2, '0')}`;
 
   const [formData, setFormData] = useState({
     // Header Info
-    operatorId: "chenchaojie 03361/uniview",
+    operatorId: "",
     applyDate: defaultDate,
     attachmentCount: "0",
     
@@ -73,20 +94,87 @@ export function AssetCompensationForm() {
     }));
   };
 
+  const handleSaveDraft = () => {
+    try {
+      window.localStorage.setItem("ams_draft_compensation", JSON.stringify(formData));
+      toast.success("草稿保存成功");
+    } catch {
+      toast.error("草稿保存失败，请检查浏览器存储空间");
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       setLoading(true);
       setError(null);
-      await compensationService.create(formData);
-      navigate("/disposals");
+      const compensationPayload = {
+        assetId: parseRequiredId(formData.assetId, "资产ID"),
+        responsibleUserId: parseRequiredId(formData.responsibleId, "赔偿责任人ID"),
+        responsibleDeptId: parseOptionalId(formData.deptCode),
+        compensationType: "ASSET_LOSS",
+        description: formData.lossDescription,
+        incidentDate: formData.lossDate,
+      };
+      const businessData = {
+        ...formData,
+        ...compensationPayload,
+      };
+
+      await approvalService.create({
+        processType: "ASSET_COMPENSATION",
+        businessType: "ASSET_COMPENSATION",
+        businessId: compensationPayload.assetId,
+        title: `资产赔偿申请 ${formData.assetId}`,
+        description: compensationPayload.description,
+        businessData: JSON.stringify(businessData),
+      });
+      window.localStorage.removeItem("ams_draft_compensation");
+      navigate("/approval");
     } catch (err) {
       console.error('Failed to submit compensation:', err);
-      setError('提交资产赔偿失败');
+      setError(err instanceof Error ? err.message : '提交资产赔偿失败');
     } finally {
       setLoading(false);
     }
   };
+
+  const handleAssetSearch = useCallback(async () => {
+    setAssetSearchLoading(true);
+    try {
+      const result = await assetService.searchPaged(assetSearchKeyword, 1, 10);
+      setAssetSearchResults(result?.records ?? []);
+    } catch {
+      setAssetSearchResults([]);
+    } finally {
+      setAssetSearchLoading(false);
+    }
+  }, [assetSearchKeyword]);
+
+  const handleSelectAsset = useCallback((asset: AssetRecord) => {
+    setFormData(prev => ({
+      ...prev,
+      assetId: String(asset.id),
+      assetName: asset.assetName ?? '',
+      modelSpec: (asset as Record<string, unknown>).modelSpec as string ?? '',
+      deptName: asset.departmentName ?? '',
+    }));
+    setShowAssetPicker(false);
+    setAssetSearchKeyword('');
+    setAssetSearchResults([]);
+  }, []);
+
+  const handleFileUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+    const newFiles = Array.from(files);
+    setUploadedFiles(prev => [...prev, ...newFiles]);
+    setFormData(prev => ({
+      ...prev,
+      attachmentCount: String(Number(prev.attachmentCount) + newFiles.length),
+    }));
+    toast.success(`已添加 ${newFiles.length} 个附件`);
+  }, []);
 
   return (
     <div className="max-w-6xl mx-auto space-y-6 pb-12">
@@ -183,10 +271,10 @@ export function AssetCompensationForm() {
           </div>
           <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">资产编号 <span className="text-red-500">*</span></label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">资产ID <span className="text-red-500">*</span></label>
               <div className="flex gap-2">
                 <input type="text" name="assetId" required value={formData.assetId} onChange={handleChange} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-yellow-500" />
-                <button type="button" className="shrink-0 px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 text-gray-600">
+                <button type="button" onClick={() => setShowAssetPicker(true)} className="shrink-0 px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 text-gray-600">
                   <Search className="w-4 h-4" />
                 </button>
               </div>
@@ -343,10 +431,27 @@ export function AssetCompensationForm() {
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
           <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">附加文件</label>
-              <button type="button" className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-gray-50 hover:bg-gray-100 flex items-center gap-2 transition-colors">
-                <Paperclip className="w-4 h-4" /> 上传附件
-              </button>
+              <label className="block text-sm font-medium text-gray-700 mb-2">附加文件 ({uploadedFiles.length} 个)</label>
+              <div className="flex items-center gap-4">
+                <label className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-gray-50 hover:bg-gray-100 flex items-center gap-2 transition-colors cursor-pointer">
+                  <Paperclip className="w-4 h-4" /> 上传附件
+                  <input type="file" multiple className="hidden" onChange={handleFileUpload} accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.png,.zip" />
+                </label>
+                {uploadedFiles.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {uploadedFiles.map((file, idx) => (
+                      <span key={idx} className="inline-flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-700 rounded text-xs">
+                        <Paperclip className="w-3 h-3" />
+                        {file.name}
+                        <button type="button" onClick={() => {
+                          setUploadedFiles(prev => prev.filter((_, i) => i !== idx));
+                          setFormData(prev => ({ ...prev, attachmentCount: String(Math.max(0, Number(prev.attachmentCount) - 1)) }));
+                        }} className="text-blue-400 hover:text-red-500">×</button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
 
             <div>
@@ -382,6 +487,7 @@ export function AssetCompensationForm() {
           </button>
           <button 
             type="button"
+            onClick={handleSaveDraft}
             className="px-6 py-2 text-sm font-medium text-yellow-700 bg-yellow-50 border border-yellow-200 hover:bg-yellow-100 rounded-lg transition-colors"
           >
             保存草稿
@@ -411,6 +517,62 @@ export function AssetCompensationForm() {
           background: #94a3b8;
         }
       `}</style>
+
+      {showAssetPicker && (
+        <div className="fixed inset-0 bg-slate-900/20 backdrop-blur-[1px] flex items-center justify-center z-50 p-4" onClick={() => setShowAssetPicker(false)}>
+          <div className="bg-white rounded-2xl w-full max-w-2xl shadow-2xl border border-gray-100" onClick={e => e.stopPropagation()}>
+            <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-gray-900">选择资产</h3>
+              <button onClick={() => setShowAssetPicker(false)} className="text-gray-400 hover:text-gray-600 text-xl leading-none">×</button>
+            </div>
+            <div className="p-4">
+              <div className="flex gap-2 mb-4">
+                <input
+                  type="text"
+                  placeholder="输入资产名称或编码搜索..."
+                  value={assetSearchKeyword}
+                  onChange={e => setAssetSearchKeyword(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && handleAssetSearch()}
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
+                />
+                <button onClick={handleAssetSearch} disabled={assetSearchLoading} className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg disabled:opacity-50">
+                  {assetSearchLoading ? '搜索中...' : '搜索'}
+                </button>
+              </div>
+              <div className="max-h-[300px] overflow-y-auto border border-gray-200 rounded-lg">
+                {assetSearchResults.length === 0 ? (
+                  <div className="px-4 py-8 text-center text-gray-500 text-sm">请输入关键词搜索资产</div>
+                ) : (
+                  <table className="w-full">
+                    <thead className="bg-gray-50 border-b">
+                      <tr>
+                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">ID</th>
+                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">资产名称</th>
+                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">分类</th>
+                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">部门</th>
+                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500">操作</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200">
+                      {assetSearchResults.map(asset => (
+                        <tr key={asset.id} className="hover:bg-gray-50">
+                          <td className="px-4 py-2 text-sm">{asset.id}</td>
+                          <td className="px-4 py-2 text-sm font-medium">{asset.assetName ?? '-'}</td>
+                          <td className="px-4 py-2 text-sm">{asset.categoryName ?? '-'}</td>
+                          <td className="px-4 py-2 text-sm">{asset.departmentName ?? '-'}</td>
+                          <td className="px-4 py-2 text-sm">
+                            <button onClick={() => handleSelectAsset(asset)} className="text-blue-600 hover:text-blue-800 font-medium">选择</button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

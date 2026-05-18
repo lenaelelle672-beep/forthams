@@ -52,6 +52,7 @@ import {
 } from 'recharts';
 import dayjs, { Dayjs } from 'dayjs';
 import type { ColumnsType } from 'antd/es/table';
+import auditService, { type AuditLogItem, type TrendDataPoint } from '@/app/services/auditService';
 import './AuditDashboard.css';
 
 // ============================================================================
@@ -63,7 +64,7 @@ interface AuditRecord {
   id: string;
   operatorId: string;
   operatorName: string;
-  actionType: 'CREATE' | 'UPDATE' | 'DELETE' | 'QUERY';
+  actionType: string;
   resourceType: string;
   resourceId: string;
   detail: string;
@@ -111,154 +112,6 @@ interface KpiData {
 }
 
 // ============================================================================
-// Mock Data - Phase 1 骨架交付使用
-// ============================================================================
-
-const MOCK_TREND_DATA = [
-  { date: '2025-01-13', count: 156 },
-  { date: '2025-01-14', count: 203 },
-  { date: '2025-01-15', count: 178 },
-  { date: '2025-01-16', count: 245 },
-  { date: '2025-01-17', count: 189 },
-  { date: '2025-01-18', count: 167 },
-  { date: '2025-01-19', count: 221 },
-];
-
-const MOCK_ACTION_TYPE_DATA = [
-  { name: 'QUERY', value: 45, color: '#1890ff' },
-  { name: 'UPDATE', value: 30, color: '#52c41a' },
-  { name: 'CREATE', value: 15, color: '#faad14' },
-  { name: 'DELETE', value: 10, color: '#f5222d' },
-];
-
-const MOCK_AUDIT_RECORDS: AuditRecord[] = [
-  {
-    id: 'audit-001',
-    operatorId: 'user-101',
-    operatorName: '张三',
-    actionType: 'CREATE',
-    resourceType: 'User',
-    resourceId: 'user-201',
-    detail: '{"action": "create_user", "username": "newuser@example.com"}',
-    ipAddress: '192.168.1.100',
-    userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
-    timestamp: '2025-01-19T10:30:00Z',
-    status: 'SUCCESS',
-  },
-  {
-    id: 'audit-002',
-    operatorId: 'user-102',
-    operatorName: '李四',
-    actionType: 'UPDATE',
-    resourceType: 'Policy',
-    resourceId: 'policy-001',
-    detail: '{"action": "update_policy", "field": "permissions", "old": "read", "new": "write"}',
-    ipAddress: '192.168.1.101',
-    userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)',
-    timestamp: '2025-01-19T10:15:00Z',
-    status: 'SUCCESS',
-  },
-  {
-    id: 'audit-003',
-    operatorId: 'user-103',
-    operatorName: '王五',
-    actionType: 'DELETE',
-    resourceType: 'Asset',
-    resourceId: 'asset-500',
-    detail: '{"action": "delete_asset", "assetId": "asset-500", "reason": "disposed"}',
-    ipAddress: '192.168.1.102',
-    userAgent: 'Mozilla/5.0 (X11; Linux x86_64)',
-    timestamp: '2025-01-19T09:45:00Z',
-    status: 'FAILURE',
-  },
-  {
-    id: 'audit-004',
-    operatorId: 'user-101',
-    operatorName: '张三',
-    actionType: 'QUERY',
-    resourceType: 'Asset',
-    resourceId: 'asset-*',
-    detail: '{"action": "query_assets", "filters": {"status": "ACTIVE"}}',
-    ipAddress: '192.168.1.100',
-    userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
-    timestamp: '2025-01-19T09:30:00Z',
-    status: 'SUCCESS',
-  },
-  {
-    id: 'audit-005',
-    operatorId: 'user-104',
-    operatorName: '赵六',
-    actionType: 'UPDATE',
-    resourceType: 'Config',
-    resourceId: 'config-system',
-    detail: '{"action": "update_config", "field": "maxUploadSize", "old": "10MB", "new": "50MB"}',
-    ipAddress: '192.168.1.103',
-    userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X)',
-    timestamp: '2025-01-19T09:15:00Z',
-    status: 'SUCCESS',
-  },
-  {
-    id: 'audit-006',
-    operatorId: 'user-105',
-    operatorName: '孙七',
-    actionType: 'CREATE',
-    resourceType: 'Role',
-    resourceId: 'role-admin',
-    detail: '{"action": "create_role", "name": "Admin", "permissions": ["*"]}',
-    ipAddress: '192.168.1.104',
-    userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0',
-    timestamp: '2025-01-19T08:50:00Z',
-    status: 'SUCCESS',
-  },
-  {
-    id: 'audit-007',
-    operatorId: 'user-102',
-    operatorName: '李四',
-    actionType: 'DELETE',
-    resourceType: 'User',
-    resourceId: 'user-300',
-    detail: '{"action": "delete_user", "userId": "user-300", "reason": "deactivated"}',
-    ipAddress: '192.168.1.101',
-    userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)',
-    timestamp: '2025-01-19T08:30:00Z',
-    status: 'FAILURE',
-  },
-  {
-    id: 'audit-008',
-    operatorId: 'user-106',
-    operatorName: '周八',
-    actionType: 'QUERY',
-    resourceType: 'AuditLog',
-    resourceId: 'audit-*',
-    detail: '{"action": "query_audit_logs", "filters": {"dateRange": "7d"}}',
-    ipAddress: '192.168.1.105',
-    userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
-    timestamp: '2025-01-19T08:15:00Z',
-    status: 'SUCCESS',
-  },
-];
-
-const MOCK_TREND_STATS: TrendStats = {
-  totalCount: 1359,
-  successRate: 0.92,
-  byActionType: {
-    QUERY: 612,
-    UPDATE: 407,
-    CREATE: 204,
-    DELETE: 136,
-  },
-  byDay: {
-    '2025-01-13': 156,
-    '2025-01-14': 203,
-    '2025-01-15': 178,
-    '2025-01-16': 245,
-    '2025-01-17': 189,
-    '2025-01-18': 167,
-    '2025-01-19': 221,
-  },
-};
-
-// ============================================================================
 // Utility Functions
 // ============================================================================
 
@@ -286,6 +139,43 @@ const getStatusColor = (status: string): 'success' | 'error' => {
   return status === 'SUCCESS' ? 'success' : 'error';
 };
 
+const toAuditRecord = (item: AuditLogItem): AuditRecord => {
+  const rawStatus = (item as AuditLogItem & { status?: string }).status;
+
+  return {
+    id: item.id,
+    operatorId: item.operator_id,
+    operatorName: item.operator_name || item.operator_id,
+    actionType: item.action_type,
+    resourceType: item.resource_type,
+    resourceId: item.resource_id,
+    detail: item.detail,
+    ipAddress: item.ip_address,
+    userAgent: String((item as AuditLogItem & { user_agent?: string }).user_agent ?? ''),
+    timestamp: item.created_at,
+    status: rawStatus === 'FAILURE' ? 'FAILURE' : 'SUCCESS',
+  };
+};
+
+const buildStats = (records: AuditRecord[], trendPoints: TrendDataPoint[], total: number): TrendStats => {
+  const byActionType = records.reduce<Record<string, number>>((acc, record) => {
+    acc[record.actionType] = (acc[record.actionType] ?? 0) + 1;
+    return acc;
+  }, {});
+  const byDay = trendPoints.reduce<Record<string, number>>((acc, point) => {
+    acc[dayjs(point.timestamp).format('YYYY-MM-DD')] = point.count;
+    return acc;
+  }, {});
+  const successful = records.filter((record) => record.status === 'SUCCESS').length;
+
+  return {
+    totalCount: total,
+    successRate: records.length > 0 ? successful / records.length : 0,
+    byActionType,
+    byDay,
+  };
+};
+
 // ============================================================================
 // API Service
 // ============================================================================
@@ -300,43 +190,22 @@ const getStatusColor = (status: string): 'success' | 'error' => {
  * @since 1.0.0
  */
 const fetchAuditData = async (params: FilterParams): Promise<AuditApiResponse> => {
-  // Phase 1: 使用 Mock 数据
-  // Phase 2: 接入真实 API
-  // const response = await fetch('/api/audit/query', {
-  //   method: 'POST',
-  //   headers: { 'Content-Type': 'application/json' },
-  //   body: JSON.stringify(params),
-  // });
-  // return response.json();
-  
-  // 模拟 API 延迟
-  await new Promise(resolve => setTimeout(resolve, 500));
-  
-  // 简单的筛选逻辑模拟
-  let filteredRecords = [...MOCK_AUDIT_RECORDS];
-  
-  if (params.actionType && params.actionType.length > 0) {
-    filteredRecords = filteredRecords.filter(record =>
-      params.actionType!.includes(record.actionType)
-    );
-  }
-  
-  if (params.operatorId) {
-    filteredRecords = filteredRecords.filter(record =>
-      record.operatorId.includes(params.operatorId!) ||
-      record.operatorName.includes(params.operatorId!)
-    );
-  }
-  
-  const startIndex = (params.page - 1) * params.pageSize;
-  const paginatedRecords = filteredRecords.slice(startIndex, startIndex + params.pageSize);
-  
+  const dashboardData = await auditService.fetchAuditDashboardData({
+    start_time: params.startTime,
+    end_time: params.endTime,
+    action_type: params.actionType?.[0],
+    operator_id: params.operatorId,
+    page: params.page,
+    size: params.pageSize,
+  });
+  const records = dashboardData.list.items.map(toAuditRecord);
+
   return {
     code: 0,
     data: {
-      records: paginatedRecords,
-      total: filteredRecords.length,
-      statistics: MOCK_TREND_STATS,
+      records,
+      total: dashboardData.list.total,
+      statistics: buildStats(records, dashboardData.trend.data_points, dashboardData.list.total),
     },
   };
 };

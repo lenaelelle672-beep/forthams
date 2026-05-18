@@ -1,7 +1,96 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router";
-import { ArrowLeft, CheckCircle2, AlertCircle, Settings } from "lucide-react";
-import { disposalService } from "../services/disposalService";
+import { ArrowLeft, CheckCircle2, AlertCircle, Settings, Save } from "lucide-react";
+import { toast } from "sonner";
+import { approvalService } from "../services/approvalService";
+import { type AssetRecord } from "../services/assetService";
+import { AssetDisposalPickerModal } from "../components/disposal/AssetDisposalPicker";
+
+/** Sanitize form data: strip File/Blob/function/symbol/undefined values */
+function sanitizeFormData(data: Record<string, unknown>): Record<string, unknown> {
+  const clean: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(data)) {
+    if (value instanceof File || value instanceof Blob) continue;
+    if (typeof value === "function") continue;
+    if (typeof value === "symbol") continue;
+    if (typeof value === "undefined") continue;
+    clean[key] = value;
+  }
+  return clean;
+}
+
+/** Save form data as a draft to localStorage. Data key: ams_draft_{formType}_{timestamp}, Index key: ams_draft_latest_{formType} */
+function saveDraftToStorage(formType: string, data: Record<string, unknown>): boolean {
+  try {
+    const sanitized = sanitizeFormData(data);
+    const timestamp = Date.now();
+    const dataKey = `ams_draft_${formType}_${timestamp}`;
+    const indexKey = `ams_draft_latest_${formType}`;
+    localStorage.setItem(dataKey, JSON.stringify(sanitized));
+    localStorage.setItem(indexKey, dataKey);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/** Load the latest draft for a given formType using the index key */
+function loadLatestDraftFromStorage(formType: string): Record<string, unknown> | null {
+  try {
+    const indexKey = `ams_draft_latest_${formType}`;
+    const dataKey = localStorage.getItem(indexKey);
+    if (!dataKey) return null;
+    const raw = localStorage.getItem(dataKey);
+    if (!raw) return null;
+    return JSON.parse(raw) as Record<string, unknown>;
+  } catch {
+    return null;
+  }
+}
+
+/** Clear draft data key and index key for a given formType */
+function clearDraftFromStorage(formType: string): void {
+  try {
+    const indexKey = `ams_draft_latest_${formType}`;
+    const dataKey = localStorage.getItem(indexKey);
+    if (dataKey) {
+      localStorage.removeItem(dataKey);
+    }
+    localStorage.removeItem(indexKey);
+  } catch {
+    // silently ignore
+  }
+}
+
+function parseRequiredId(value: string, label: string): number {
+  const parsed = Number(value.trim());
+  if (!Number.isInteger(parsed) || parsed <= 0) {
+    throw new Error(`${label}必须填写正整数 ID`);
+  }
+  return parsed;
+}
+
+function readRecordField(record: Record<string, unknown>, keys: string[]): string {
+  for (const key of keys) {
+    const value = record[key];
+    if (value !== undefined && value !== null && value !== "") {
+      return String(value);
+    }
+  }
+  return "";
+}
+
+function readAssetField(asset: AssetRecord, keys: string[]): string {
+  return readRecordField(asset, keys);
+}
+
+function getAssetId(asset: AssetRecord): string {
+  return readAssetField(asset, ["id", "assetId", "asset_id"]);
+}
+
+function getAssetDisplayName(asset: AssetRecord): string {
+  return readAssetField(asset, ["assetName", "name", "asset_name", "title"]);
+}
 
 const steps = [
   { id: 1, name: "申请人填写", status: "current" },
@@ -30,25 +119,87 @@ export function AssetClearanceForm() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [draftData, setDraftData] = useState<Record<string, unknown> | null>(null);
+  const [selectedAssetId, setSelectedAssetId] = useState<string | null>(null);
+  const [assetPickerOpen, setAssetPickerOpen] = useState(false);
   const [formData, setFormData] = useState({
-    applicant: "张三",
+    applicant: "",
     processId: "CL-" + new Date().getFullYear() + String(new Date().getMonth() + 1).padStart(2, '0') + String(new Date().getDate()).padStart(2, '0') + "-001",
     applyDate: new Date().toISOString().split("T")[0],
     assetId: "",
     assetName: "",
-    missingAccessories: "无",
-    attachedItems: "电源适配器、鼠标",
-    user: "张三",
+    missingAccessories: "",
+    attachedItems: "",
+    user: "",
     firstUsageDate: "",
-    deptCode: "DEPT-RD-01",
-    department: "研发部",
-    directManager: "李四",
-    level1Admin: "王五",
+    deptCode: "",
+    department: "",
+    directManager: "",
+    level1Admin: "",
     idleAssetType: "",
     clearanceReason: "",
     storageLocation: "",
-    assetLedger: "深圳总部账套"
+    assetLedger: ""
   });
+
+  const applyAssetRecord = useCallback((asset: AssetRecord) => {
+    const assetId = getAssetId(asset);
+    const assetName = getAssetDisplayName(asset);
+    const departmentCode = readAssetField(asset, ["departmentCode", "deptCode", "departmentId", "deptId", "useDepartmentId"]);
+    const departmentName = readAssetField(asset, ["departmentName", "deptName", "department", "dept", "useDepartmentName"]);
+    const location = readAssetField(asset, ["locationName", "location", "areaName", "area", "storageLocation", "storeLocation"]);
+    const user = readAssetField(asset, ["custodianName", "keeperName", "userName", "ownerName", "responsibleName", "userId", "user_id"]);
+    const ledger = readAssetField(asset, ["ledgerName", "ledger", "accountBook", "bookName"]);
+    const firstUsageDate = readAssetField(asset, ["firstUsageDate", "startUseTime", "startTime", "purchaseDate"]);
+
+    setFormData((prev) => ({
+      ...prev,
+      assetId: assetId || prev.assetId,
+      assetName: assetName || prev.assetName,
+      deptCode: departmentCode || prev.deptCode,
+      department: departmentName || prev.department,
+      storageLocation: location || prev.storageLocation,
+      user: user || prev.user,
+      assetLedger: ledger || prev.assetLedger,
+      firstUsageDate: firstUsageDate || prev.firstUsageDate,
+    }));
+  }, []);
+
+  /** Detect and offer to restore draft on mount */
+  useEffect(() => {
+    const latestDraft = loadLatestDraftFromStorage("clearance");
+    if (latestDraft) {
+      setDraftData(latestDraft);
+    }
+  }, []);
+
+  /** Restore draft data into form state */
+  const handleRestoreDraft = useCallback(() => {
+    if (draftData) {
+      setFormData(prev => ({ ...prev, ...(draftData as Partial<typeof prev>) }));
+      const restoredAssetId = String(draftData.assetId ?? "").trim();
+      if (restoredAssetId) {
+        setSelectedAssetId(restoredAssetId);
+      }
+      setDraftData(null);
+    }
+  }, [draftData]);
+
+  /** Dismiss draft without restoring — clears from localStorage */
+  const handleDismissDraft = useCallback(() => {
+    clearDraftFromStorage("clearance");
+    setDraftData(null);
+  }, []);
+
+  /** Save current form data as draft */
+  const handleSaveDraft = useCallback(() => {
+    const success = saveDraftToStorage("clearance", formData as unknown as Record<string, unknown>);
+    if (success) {
+      toast.success("草稿保存成功");
+    } else {
+      toast.error("草稿保存失败，请检查浏览器存储空间");
+    }
+  }, [formData]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     setFormData(prev => ({
@@ -57,16 +208,44 @@ export function AssetClearanceForm() {
     }));
   };
 
+  /** Handle asset selection from AssetDisposalPicker */
+  const handlePickerSelect = useCallback((asset: AssetRecord) => {
+    const assetId = getAssetId(asset);
+    setSelectedAssetId(assetId);
+    applyAssetRecord(asset);
+    setAssetPickerOpen(false);
+  }, [applyAssetRecord]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       setLoading(true);
       setError(null);
-      await disposalService.clearance(formData);
-      navigate("/disposals");
+      if (!selectedAssetId) {
+        throw new Error("请先从资产台账选择资产");
+      }
+      const clearancePayload = {
+        assetId: parseRequiredId(formData.assetId, "资产ID"),
+        reason: formData.clearanceReason,
+      };
+      const businessData = {
+        ...formData,
+        ...clearancePayload,
+      };
+
+      await approvalService.create({
+        processType: "ASSET_CLEARANCE",
+        businessType: "ASSET_CLEARANCE",
+        businessId: clearancePayload.assetId,
+        title: `资产清退申请 ${formData.processId}`,
+        description: clearancePayload.reason,
+        businessData: JSON.stringify(businessData),
+      });
+      clearDraftFromStorage("clearance");
+      navigate("/approval");
     } catch (err) {
       console.error('Failed to submit clearance:', err);
-      setError('提交资产清退失败');
+      setError(err instanceof Error ? err.message : '提交资产清退失败');
     } finally {
       setLoading(false);
     }
@@ -88,11 +267,57 @@ export function AssetClearanceForm() {
             <p className="text-sm text-gray-500 mt-1">请填写资产清退信息，提交后将进入对应审批流程</p>
           </div>
         </div>
-        <button onClick={() => navigate('/workflow-designer?businessType=ASSET_CLEARANCE')} type="button" className="px-4 py-2 text-sm font-medium text-blue-700 bg-blue-50 border border-blue-200 hover:bg-blue-100 rounded-lg transition-colors flex items-center gap-2">
-          <Settings className="w-4 h-4" />
-          配置流程
-        </button>
+        <div className="flex items-center gap-3">
+          <button onClick={() => navigate('/workflow-designer?businessType=ASSET_CLEARANCE')} type="button" className="px-4 py-2 text-sm font-medium text-blue-700 bg-blue-50 border border-blue-200 hover:bg-blue-100 rounded-lg transition-colors flex items-center gap-2">
+            <Settings className="w-4 h-4" />
+            配置流程
+          </button>
+          <button onClick={handleSaveDraft} type="button" className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg transition-colors flex items-center gap-2">
+            <Save className="w-4 h-4" />
+            保存草稿
+          </button>
+        </div>
       </div>
+
+      {/* Draft Restore Blocking Modal */}
+      {draftData && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" data-testid="draft-restore-prompt">
+          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4 p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center text-amber-600 text-lg font-bold shrink-0">!</div>
+              <div>
+                <h3 className="text-base font-semibold text-gray-900">检测到未完成的草稿</h3>
+                <p className="text-sm text-gray-500 mt-0.5">是否恢复上次编辑的表单数据？</p>
+              </div>
+            </div>
+            <div className="flex items-center justify-end gap-3 mt-6">
+              <button
+                onClick={handleRestoreDraft}
+                className="px-5 py-2 text-sm font-medium text-white bg-amber-500 hover:bg-amber-600 rounded-lg transition-colors"
+                data-testid="draft-restore-btn"
+              >
+                恢复
+              </button>
+              <button
+                onClick={handleDismissDraft}
+                className="px-5 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg transition-colors"
+                data-testid="draft-dismiss-btn"
+              >
+                放弃
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <AssetDisposalPickerModal
+        open={assetPickerOpen}
+        title="选择清退资产"
+        onClose={() => setAssetPickerOpen(false)}
+        onSelect={handlePickerSelect}
+        selectedAssetId={selectedAssetId}
+        label="搜索并选择要清退的资产"
+      />
 
       {/* Progress Stepper */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8 overflow-hidden">
@@ -171,23 +396,51 @@ export function AssetClearanceForm() {
           </div>
         </div>
 
-        {/* Section 2: 资产明细 */}
+        {/* Section 2: 资产选择 */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200 bg-gray-50/50 flex justify-between items-center">
+          <div className="px-6 py-4 border-b border-gray-200 bg-gray-50/50">
+            <h3 className="text-lg font-semibold text-gray-900">从资产台账选择资产</h3>
+          </div>
+          <div className="p-6">
+            <div className="rounded-xl border border-blue-100 bg-blue-50/50 p-4 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-900">
+                  {selectedAssetId ? `${formData.assetName || '未命名资产'}（ID ${formData.assetId}）` : '尚未选择资产'}
+                </p>
+                <p className="mt-1 text-sm text-gray-500">
+                  {selectedAssetId
+                    ? `部门：${formData.department || '-'}；存放地点：${formData.storageLocation || '-'}`
+                    : '点击按钮打开资产台账，按关键词和分页选择真实资产。'}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setAssetPickerOpen(true)}
+                className="shrink-0 px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
+                data-testid="open-clearance-asset-picker"
+              >
+                {selectedAssetId ? '重新选择资产' : '选择资产'}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Section 2b: 资产明细（回填） */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-200 bg-gray-50/50">
             <h3 className="text-lg font-semibold text-gray-900">清退资产明细</h3>
-            <button type="button" className="text-sm text-blue-600 hover:text-blue-800 font-medium">从台账选择资产</button>
           </div>
           <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">资产编号 <span className="text-red-500">*</span></label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">资产ID <span className="text-red-500">*</span></label>
               <input 
                 type="text" 
                 name="assetId"
-                required
-                placeholder="例如: AS-2024-001"
                 value={formData.assetId}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm bg-gray-50"
+                readOnly
+                data-testid="clearance-asset-id-input"
               />
             </div>
             <div>
@@ -195,11 +448,10 @@ export function AssetClearanceForm() {
               <input 
                 type="text" 
                 name="assetName"
-                required
-                placeholder="例如: ThinkPad X1 Carbon"
                 value={formData.assetName}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm bg-gray-50"
+                readOnly
               />
             </div>
             
@@ -387,6 +639,7 @@ export function AssetClearanceForm() {
           </button>
           <button 
             type="button"
+            onClick={handleSaveDraft}
             className="px-6 py-2 text-sm font-medium text-blue-600 bg-blue-50 border border-blue-200 hover:bg-blue-100 rounded-lg transition-colors"
           >
             保存草稿

@@ -7,20 +7,24 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.Map;
 
 /**
- * 默认分配策略实现。采用简单的轮询算法（Round Robin）模拟资源分配逻辑。
- * 在生产环境中应替换为基于负载、技能匹配或权重计算的复杂引擎。
+ * 默认分配策略实现。
+ * 优先从业务上下文的显式处理人字段中解析分配对象；无法解析时返回空结果，交由上层策略链处理。
  */
 @Service
 public class DefaultAssignmentStrategy implements AssignmentStrategy {
 
     private static final Logger log = LoggerFactory.getLogger(DefaultAssignmentStrategy.class);
-
-    // 模拟可用处理人池（实际应用中从数据库/Redis动态获取）
-    private static final String[] MOCK_ASSIGNEES = {"user-001", "user-002", "user-003"};
-    private final AtomicInteger counter = new AtomicInteger(0);
+    private static final String[] ASSIGNEE_KEYS = {
+            "assigneeId",
+            "handlerId",
+            "ownerId",
+            "approverId",
+            "executorId",
+            "userId"
+    };
 
     @Override
     public boolean supports(String entityType) {
@@ -35,12 +39,37 @@ public class DefaultAssignmentStrategy implements AssignmentStrategy {
                 context.getStrategyType(),
                 context.getTargetId());
 
-        // 模拟分配逻辑：轮询选择下一个处理人
-        int index = Math.abs(counter.getAndIncrement() % MOCK_ASSIGNEES.length);
-        String assigneeId = MOCK_ASSIGNEES[index];
+        Optional<String> assigneeId = resolveAssignee(context);
+        assigneeId.ifPresentOrElse(
+                value -> log.info("Assignment successful: {} -> {}", context.getTargetId(), value),
+                () -> log.warn("No assignment candidate found for {}#{} (ID: {})",
+                        context.getEntityType(), context.getStrategyType(), context.getTargetId())
+        );
+        return assigneeId;
+    }
 
-        log.info("Assignment successful: {} -> {}", context.getTargetId(), assigneeId);
-        return Optional.of(assigneeId);
+    private Optional<String> resolveAssignee(AssignmentContext context) {
+        Optional<String> fromArgs = resolveFromMap(context.getMethodArgs());
+        if (fromArgs.isPresent()) {
+            return fromArgs;
+        }
+        if (context.getResultSnapshot() instanceof Map<?, ?> resultMap) {
+            return resolveFromMap(resultMap);
+        }
+        return Optional.empty();
+    }
+
+    private Optional<String> resolveFromMap(Map<?, ?> values) {
+        if (values == null || values.isEmpty()) {
+            return Optional.empty();
+        }
+        for (String key : ASSIGNEE_KEYS) {
+            Object value = values.get(key);
+            if (value != null && !String.valueOf(value).isBlank()) {
+                return Optional.of(String.valueOf(value));
+            }
+        }
+        return Optional.empty();
     }
 
     @Override

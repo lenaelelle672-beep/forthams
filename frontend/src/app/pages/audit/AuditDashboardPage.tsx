@@ -213,7 +213,7 @@ const AuditDashboardPage: React.FC<AuditDashboardPageProps> = ({
     fetchList,
     computedGranularity,
     isTimeRangeExceeded,
-  } = useAuditLogs(authToken);
+  } = useAuditLogs();
 
   /** 页面初次加载时自动查询 */
   useEffect(() => {
@@ -262,7 +262,7 @@ const AuditDashboardPage: React.FC<AuditDashboardPageProps> = ({
   const isAnyLoading = listLoading || trendLoading || metaLoading;
 
   return (
-    <div data-testid="audit-dashboard" className="space-y-6 p-6">
+    <div data-testid="audit-dashboard" className="audit-dashboard-container space-y-6 p-6">
       {/* 页面标题 */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">

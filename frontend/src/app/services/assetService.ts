@@ -178,6 +178,27 @@ export const assetService = {
   },
 
   /**
+   * 类型化分页查询 — 供 AssetDisposalPicker 及处置表单使用。
+   * 调用 GET /assets/list，参数至少包含 keyword / page / pageSize。
+   *
+   * @param keyword  - 搜索关键词（可选）
+   * @param page     - 页码（从 1 开始）
+   * @param pageSize - 每页条数（建议 10-20）
+   * @param extra   - 额外过滤参数（status, categoryId 等）
+   * @returns 分页结果
+   */
+  searchPaged(keyword: string | undefined, page: number, pageSize: number, extra?: Record<string, unknown>) {
+    return api.get<PagedResult<AssetRecord>>("/assets/list", {
+      params: {
+        keyword: keyword || undefined,
+        page,
+        pageSize,
+        ...extra,
+      },
+    });
+  },
+
+  /**
    * 根据 ID 获取资产详情（含扩展属性）
    *
    * @param id - 资产 ID

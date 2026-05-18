@@ -1,6 +1,7 @@
 package com.ams.controller;
 
 import com.ams.common.Result;
+import com.ams.common.exception.BusinessException;
 import com.ams.dto.AssetClearanceDTO;
 import com.ams.dto.AssetScrapDTO;
 import com.ams.dto.AssetTransferDTO;
@@ -23,17 +24,17 @@ public class DisposalController {
 
     @PostMapping("/transfer")
     public Result<Asset> transfer(@Valid @RequestBody AssetTransferDTO dto) {
-        return Result.success("转移成功", disposalService.transferAsset(dto));
+        throw new BusinessException("资产转移必须通过审批流程提交");
     }
 
     @PostMapping("/clearance")
     public Result<Asset> clearance(@Valid @RequestBody AssetClearanceDTO dto) {
-        return Result.success("清退成功", disposalService.clearAsset(dto));
+        throw new BusinessException("资产清退必须通过审批流程提交");
     }
 
     @PostMapping("/scrap")
     public Result<Asset> scrap(@Valid @RequestBody AssetScrapDTO dto) {
-        return Result.success("报废成功", disposalService.scrapAsset(dto));
+        throw new BusinessException("资产报废必须通过审批流程提交");
     }
 
     @GetMapping("/history")

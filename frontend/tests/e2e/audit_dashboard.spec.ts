@@ -19,7 +19,7 @@ import { test, expect, Page, Request } from '@playwright/test';
 // Constants
 // ---------------------------------------------------------------------------
 
-const AUDIT_DASHBOARD_ROUTE = '/dashboard/audit-log';
+const AUDIT_DASHBOARD_ROUTE = '/audit';
 const API_LIST = '**/api/v1/audit-log/list*';
 const API_TREND = '**/api/v1/audit-log/trend*';
 const API_META = '**/api/v1/audit-log/meta*';
@@ -164,9 +164,9 @@ test.describe('Audit Dashboard – E2E', () => {
       await queryButton.click();
       const listResponse = await listResponsePromise;
 
-      // Verify the request URL contains action_type=DELETE
+      // Verify the request URL contains operation_type=DELETE
       const requestUrl = listResponse.url();
-      expect(requestUrl).toContain('action_type=DELETE');
+      expect(requestUrl).toContain('operation_type=DELETE');
 
       // Verify table rows all display DELETE in the action-type column
       const rows = page.locator('[data-testid="audit-table-row"]');
@@ -304,9 +304,9 @@ test.describe('Audit Dashboard – E2E', () => {
       const chartContainer = page.locator('[data-testid="trend-chart-container"]');
       await expect(chartContainer).toBeVisible();
 
-      // Verify the granularity indicator shows "hourly"
+      // Verify the granularity indicator shows hourly aggregation.
       const granularityLabel = page.locator('[data-testid="trend-chart-granularity"]');
-      await expect(granularityLabel).toContainText(/hour/i);
+      await expect(granularityLabel).toContainText(/小时|hour/i);
     });
 
     test('60-day range renders chart with weekly granularity', async ({ page }) => {
@@ -327,9 +327,9 @@ test.describe('Audit Dashboard – E2E', () => {
       const chartContainer = page.locator('[data-testid="trend-chart-container"]');
       await expect(chartContainer).toBeVisible();
 
-      // Verify the granularity indicator shows "weekly"
+      // Verify the granularity indicator shows weekly aggregation.
       const granularityLabel = page.locator('[data-testid="trend-chart-granularity"]');
-      await expect(granularityLabel).toContainText(/week/i);
+      await expect(granularityLabel).toContainText(/周|week/i);
     });
   });
 

@@ -29,8 +29,8 @@ public class MaintenanceController {
     }
 
     @GetMapping("/upcoming")
-    public Result<?> upcoming() {
-        return Result.success(maintenanceService.getUpcomingMaintenance(30));
+    public Result<?> upcoming(@RequestParam(defaultValue = "30") Integer days) {
+        return Result.success(maintenanceService.getUpcomingMaintenance(days));
     }
 
     @PostMapping

@@ -64,6 +64,14 @@ const DepreciationPage = withSuspense(
   lazy(() => import("./pages/depreciation/DepreciationPage").then((module) => ({ default: module.DepreciationPage }))),
 );
 
+const AuditDashboardPage = withSuspense(
+  lazy(() => import("./pages/audit/AuditDashboardPage").then((module) => ({ default: module.AuditDashboardPage }))),
+);
+
+const AuditDetailPage = withSuspense(
+  lazy(() => import("./pages/audit/AuditDetailPage").then((module) => ({ default: module.AuditDetailPage }))),
+);
+
 // ---------------------------------------------------------------------------
 // Shared utilities
 // ---------------------------------------------------------------------------
@@ -133,6 +141,7 @@ const router = createBrowserRouter([
         Component: RootLayout,
         children: [
           { index: true, Component: Dashboard },
+          { path: "dashboard", Component: Dashboard },
           { path: "assets", Component: AssetRegistry },
           { path: "equipment", Component: ImportantEquipment },
           { path: "inventory", Component: RFIDInventory },
@@ -145,6 +154,8 @@ const router = createBrowserRouter([
           { path: "approval", Component: Approval },
           { path: "retirement", Component: Retirement },
           { path: "depreciation", Component: DepreciationPage },
+          { path: "audit", Component: AuditDashboardPage },
+          { path: "audit/:id", Component: AuditDetailPage },
           { path: "analytics", Component: Analytics },
           { path: "settings", Component: Settings },
           { path: "workflows", Component: WorkflowCenter },

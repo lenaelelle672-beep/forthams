@@ -37,6 +37,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String authHeader = request.getHeader("Authorization");
         
         try {
+            if (!isTenantProtectedRequest(request)) {
+                filterChain.doFilter(request, response);
+                return;
+            }
+
             if (authHeader == null || !authHeader.startsWith("Bearer ")) {
                 filterChain.doFilter(request, response);
                 return;
@@ -60,7 +65,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 return;
             }
 
-            if (isTenantProtectedRequest(request) && (tenantId == null || tenantId.isBlank())) {
+            if (tenantId == null || tenantId.isBlank()) {
                 log.warn("tenant_missing_on_protected_request clientIp={} method={} path={}",
                         request.getRemoteAddr(), request.getMethod(), request.getRequestURI());
                 response.sendError(HttpServletResponse.SC_FORBIDDEN, "Missing tenant identifier");

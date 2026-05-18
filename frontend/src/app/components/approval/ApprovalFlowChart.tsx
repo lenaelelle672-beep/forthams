@@ -8,7 +8,7 @@
  */
 
 import React from 'react';
-import type { ApprovalHistoryItem } from '../../services/approval/types';
+import type { ApprovalHistoryItem, ApprovalItem } from '../../services/approval/types';
 import { cn } from '../ui/utils';
 
 // ---------------------------------------------------------------------------
@@ -16,6 +16,8 @@ import { cn } from '../ui/utils';
 // ---------------------------------------------------------------------------
 
 export interface ApprovalFlowChartProps {
+  /** Current approval process returned by the backend detail API. */
+  approval?: ApprovalItem | null;
   /** Ordered list of approval history records (oldest → newest). */
   approvalHistory: ApprovalHistoryItem[];
 }
@@ -42,13 +44,49 @@ function formatTime(iso: string): string {
 /** Map ApprovalResult to a display label. */
 function statusLabel(status: string): string {
   switch (status) {
+    case 'PENDING':
+      return '待审批';
     case 'APPROVED':
       return '已通过';
     case 'REJECTED':
       return '已驳回';
+    case 'COMPLETED':
+      return '已完成';
+    case 'CANCELLED':
+      return '已取消';
     default:
       return status;
   }
+}
+
+function statusClasses(status: string, isCurrent: boolean): string {
+  if (status === 'APPROVED' || status === 'COMPLETED') {
+    return isCurrent ? 'bg-green-500 text-white' : 'border-2 border-green-500 text-green-600';
+  }
+  if (status === 'REJECTED' || status === 'CANCELLED') {
+    return isCurrent ? 'bg-red-500 text-white' : 'border-2 border-red-500 text-red-600';
+  }
+  if (status === 'PENDING') {
+    return isCurrent ? 'bg-blue-500 text-white' : 'border-2 border-blue-300 text-blue-600';
+  }
+  return isCurrent ? 'bg-gray-500 text-white' : 'border-2 border-gray-300 text-gray-500';
+}
+
+function makeTimeline(approval: ApprovalItem | null | undefined, history: ApprovalHistoryItem[]) {
+  const records = [...(history || [])].sort((left, right) => left.stepNo - right.stepNo);
+  if (!approval) {
+    return records.map((record) => ({ kind: 'record' as const, stepNo: record.stepNo, status: record.status, record }));
+  }
+
+  const timeline = records.map((record) => ({ kind: 'record' as const, stepNo: record.stepNo, status: record.status, record }));
+  const hasCurrentRecord = records.some((record) => record.stepNo === approval.currentStep);
+  if (approval.status === 'PENDING' && !hasCurrentRecord) {
+    timeline.push({ kind: 'current' as const, stepNo: approval.currentStep, status: 'PENDING' as const, record: null });
+  }
+  if (timeline.length === 0) {
+    timeline.push({ kind: 'current' as const, stepNo: approval.currentStep || 1, status: approval.status, record: null });
+  }
+  return timeline.sort((left, right) => left.stepNo - right.stepNo);
 }
 
 // ---------------------------------------------------------------------------
@@ -70,10 +108,13 @@ function statusLabel(status: string): string {
  * message is displayed instead.
  */
 export const ApprovalFlowChart: React.FC<ApprovalFlowChartProps> = ({
+  approval,
   approvalHistory,
 }) => {
+  const timeline = makeTimeline(approval, approvalHistory);
+
   // ---- Empty state --------------------------------------------------------
-  if (!approvalHistory || approvalHistory.length === 0) {
+  if (timeline.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-10 text-gray-400">
         <svg
@@ -89,37 +130,32 @@ export const ApprovalFlowChart: React.FC<ApprovalFlowChartProps> = ({
             d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
           />
         </svg>
-        <span className="text-sm">暂无审批记录</span>
+        <span className="text-sm">暂无审批流转数据</span>
       </div>
     );
   }
 
-  const lastStepIndex = approvalHistory.length - 1;
+  const lastStepIndex = timeline.length - 1;
 
   return (
     <div className="flex flex-col">
-      {approvalHistory.map((record, idx) => {
+      {timeline.map((item, idx) => {
         const isLast = idx === lastStepIndex;
-        const isApproved = record.status === 'APPROVED';
-        const isRejected = record.status === 'REJECTED';
+        const record = item.record;
+        const key = record?.id ? `record-${record.id}` : `current-${item.stepNo}`;
 
         return (
-          <div key={record.id} className="flex items-start">
+          <div key={key} className="flex items-start">
             {/* ---- Left: step indicator ---- */}
             <div className="flex flex-col items-center">
               {/* Step badge */}
               <div
                 className={cn(
                   'flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold',
-                  isLast && isApproved && 'bg-green-500 text-white',
-                  isLast && isRejected && 'bg-red-500 text-white',
-                  isLast && !isApproved && !isRejected && 'bg-blue-500 text-white',
-                  !isLast && isApproved && 'border-2 border-green-500 text-green-600',
-                  !isLast && isRejected && 'border-2 border-red-500 text-red-600',
-                  !isLast && !isApproved && !isRejected && 'border-2 border-gray-300 text-gray-500',
+                  statusClasses(item.status, isLast),
                 )}
               >
-                {record.stepNo}
+                {item.stepNo}
               </div>
 
               {/* Connector line */}
@@ -136,36 +172,44 @@ export const ApprovalFlowChart: React.FC<ApprovalFlowChartProps> = ({
                   'text-sm font-medium',
                   isLast ? 'text-gray-900' : 'text-gray-700',
                 )}>
-                  操作人 #{record.operator}
+                  {record ? `操作人 #${record.operator}` : '当前待处理节点'}
                 </span>
 
                 {/* Status badge */}
                 <span
                   className={cn(
                     'inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium',
-                    isApproved && 'bg-green-50 text-green-700',
-                    isRejected && 'bg-red-50 text-red-700',
-                    !isApproved && !isRejected && 'bg-gray-100 text-gray-600',
+                    (item.status === 'APPROVED' || item.status === 'COMPLETED') && 'bg-green-50 text-green-700',
+                    (item.status === 'REJECTED' || item.status === 'CANCELLED') && 'bg-red-50 text-red-700',
+                    item.status === 'PENDING' && 'bg-blue-50 text-blue-700',
+                    !['APPROVED', 'COMPLETED', 'REJECTED', 'CANCELLED', 'PENDING'].includes(item.status) && 'bg-gray-100 text-gray-600',
                   )}
                 >
-                  {statusLabel(record.status)}
+                  {statusLabel(item.status)}
                 </span>
 
                 {/* Timestamp */}
-                <span className="text-xs text-gray-400">
-                  {formatTime(record.operatedAt)}
-                </span>
+                {record?.operatedAt ? (
+                  <span className="text-xs text-gray-400">
+                    {formatTime(record.operatedAt)}
+                  </span>
+                ) : null}
               </div>
 
               {/* Comment */}
-              {record.comment && (
+              {record?.comment ? (
                 <p className={cn(
                   'mt-1 text-sm',
                   isLast ? 'text-gray-700' : 'text-gray-500',
                 )}>
                   {record.comment}
                 </p>
-              )}
+              ) : null}
+              {!record && approval ? (
+                <p className="mt-1 text-sm text-gray-500">
+                  流程 {approval.processNo || approval.id} 正在等待第 {item.stepNo} 步审批。
+                </p>
+              ) : null}
             </div>
           </div>
         );

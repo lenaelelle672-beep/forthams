@@ -161,11 +161,10 @@ export function WorkflowCenter() {
                 </button>
                 <button
                   type="button"
-                  disabled={!flow.server || flow.server.status === "UNCONFIGURED"}
                   onClick={() => handlePublish(flow.businessType, flow.name)}
                   className="inline-flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 px-4 py-2 text-sm font-medium text-green-700 hover:bg-green-100 disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  发布流程
+                  {flow.server ? "发布流程" : "创建并发布默认流程"}
                 </button>
                 <button
                   type="button"

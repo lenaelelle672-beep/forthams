@@ -20,7 +20,6 @@ import {
 } from '@/types/workorder.types';
 import { useApprovalStore } from '@/stores/approvalStore';
 import { useApprovalPermission } from '@/composables/useApprovalPermission';
-import { getCurrentUser } from '@/mocks/workOrderHandlers';
 
 // ============================================================================
 // 类型定义
@@ -122,6 +121,18 @@ function generateId(): string {
   return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 }
 
+function getCurrentUserId(): string {
+  const raw = localStorage.getItem('ams_auth_user') || localStorage.getItem('auth_user');
+  if (!raw) return '';
+
+  try {
+    const user = JSON.parse(raw) as { id?: string | number; userId?: string | number };
+    return String(user.id ?? user.userId ?? '');
+  } catch {
+    return '';
+  }
+}
+
 // ============================================================================
 // 核心业务组件
 // ============================================================================
@@ -177,7 +188,7 @@ export const ApprovalPanel: React.FC<ApprovalPanelProps> = React.memo(({
     checkPermission 
   } = useApprovalPermission();
 
-  const currentUserId = useMemo(() => getCurrentUser(), []);
+  const currentUserId = useMemo(() => getCurrentUserId(), []);
 
   // ---------------------------------------------------------------------------
   // 副作用处理
@@ -208,24 +219,8 @@ export const ApprovalPanel: React.FC<ApprovalPanelProps> = React.memo(({
    * @param ticketId 工单ID
    */
   const loadStatusHistory = useCallback(async (ticketId: string) => {
-    // 模拟从后端获取状态历史
-    const mockHistory: StatusHistoryItem[] = [
-      {
-        id: generateId(),
-        status: WorkOrderStatus.DRAFT,
-        timestamp: new Date(Date.now() - 86400000 * 2),
-        operator: 'requester-001',
-        comment: '创建工单',
-      },
-      {
-        id: generateId(),
-        status: WorkOrderStatus.PENDING,
-        timestamp: new Date(Date.now() - 86400000),
-        operator: 'requester-001',
-        comment: '提交审批',
-      },
-    ];
-    setStatusHistory(mockHistory);
+    void ticketId;
+    setStatusHistory([]);
   }, []);
 
   /**

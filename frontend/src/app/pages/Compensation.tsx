@@ -1,21 +1,12 @@
 import { useEffect, useState } from "react";
 import { DollarSign, Plus, AlertCircle, CheckCircle, Clock, FileText } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
+import { useNavigate } from "react-router";
 import { compensationService } from "../services/compensationService";
 
 export function Compensation() {
+  const navigate = useNavigate();
   const [detailItem, setDetailItem] = useState<any | null>(null);
-
-  const handleCompAction = async (id: any, action: string) => {
-    try {
-      await compensationService.updateStatus(id, action === 'approve' ? 'APPROVED' : 'REJECTED');
-      const result = await compensationService.list() as any;
-      const list = (Array.isArray(result) ? result : (result as any)?.records) || [];
-      setCompensations(list);
-    } catch (err) {
-      console.error('Failed:', err);
-    }
-  };
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedType, setSelectedType] = useState('全部类型');
   const [compensations, setCompensations] = useState<any[]>([]);
@@ -51,14 +42,9 @@ export function Compensation() {
     loadData();
   }, []);
 
-  const handleCreateCompensation = async () => {
-    try {
-      await compensationService.create(formData);
-      setShowAddModal(false);
-      await loadData();
-    } catch (err) {
-      console.error('Failed to create compensation:', err);
-    }
+  const handleCreateCompensation = () => {
+    setShowAddModal(false);
+    navigate('/disposals/compensation/new');
   };
 
   const handleEstimateCompensation = async () => {
@@ -131,7 +117,7 @@ export function Compensation() {
           <p className="text-gray-600 mt-1">规范资产赔偿流程,实现损失核算与追溯</p>
         </div>
         <button 
-          onClick={() => setShowAddModal(true)}
+          onClick={() => navigate('/disposals/compensation/new')}
           className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors flex items-center gap-2"
         >
           <Plus className="w-4 h-4" />
@@ -315,14 +301,9 @@ export function Compensation() {
                   <td className="px-6 py-4 text-sm">
                     <div className="flex gap-2">
                       {comp.status === '待审批' && (
-                        <>
-                          <button onClick={() => handleCompAction(comp.id, 'approve')} className="px-3 py-1 text-xs font-medium text-white bg-green-600 hover:bg-green-700 rounded transition-colors">
-                            批准
-                          </button>
-                          <button onClick={() => handleCompAction(comp.id, 'reject')} className="px-3 py-1 text-xs font-medium text-white bg-red-600 hover:bg-red-700 rounded transition-colors">
-                            驳回
-                          </button>
-                        </>
+                        <button onClick={() => navigate('/approval')} className="px-3 py-1 text-xs font-medium text-blue-700 bg-blue-100 hover:bg-blue-200 rounded transition-colors">
+                          去审批中心
+                        </button>
                       )}
                       <button onClick={() => setDetailItem(comp)} className="px-3 py-1 text-xs font-medium text-blue-700 bg-blue-100 hover:bg-blue-200 rounded transition-colors">
                         详情

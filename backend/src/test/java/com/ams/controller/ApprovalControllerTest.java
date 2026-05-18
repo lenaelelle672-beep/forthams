@@ -16,6 +16,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -93,5 +94,63 @@ class ApprovalControllerTest {
                 .andExpect(jsonPath("$.code").value(200));
 
         verify(approvalService).getMyPendingApprovals(42L);
+    }
+
+    @Test
+    @DisplayName("Should list approvals with processType filter")
+    void listWithProcessTypeFilter() throws Exception {
+        when(approvalService.queryProcesses(eq(1), eq(10), eq(null), eq("WORK_ORDER")))
+                .thenReturn(new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>());
+
+        mockMvc.perform(get("/api/approvals/list")
+                        .contextPath("/api")
+                        .param("processType", "WORK_ORDER"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200));
+
+        verify(approvalService).queryProcesses(1, 10, null, "WORK_ORDER");
+    }
+
+    @Test
+    @DisplayName("Should get approval detail by id")
+    void getByIdReturnsProcessDetail() throws Exception {
+        when(approvalService.getProcessById(eq(7L))).thenReturn(Map.of("process", new ApprovalProcess(), "records", List.of()));
+
+        mockMvc.perform(get("/api/approvals/{id}", 7L)
+                        .contextPath("/api"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200));
+
+        verify(approvalService).getProcessById(7L);
+    }
+
+    @Test
+    @DisplayName("Should get pending count")
+    void pendingCountReturnsCount() throws Exception {
+        when(approvalService.getPendingCount()).thenReturn(5L);
+
+        mockMvc.perform(get("/api/approvals/pending/count")
+                        .contextPath("/api"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200))
+                .andExpect(jsonPath("$.data").value(5));
+
+        verify(approvalService).getPendingCount();
+    }
+
+    @Test
+    @DisplayName("Should cancel approval with user id from JWT")
+    void cancelUsesJwtUserId() throws Exception {
+        ApprovalProcess process = new ApprovalProcess();
+        when(jwtUtil.getUserIdFromToken("test-token")).thenReturn(42L);
+        when(approvalService.cancelProcess(eq(7L), eq(42L))).thenReturn(process);
+
+        mockMvc.perform(post("/api/approvals/{id}/cancel", 7L)
+                        .contextPath("/api")
+                        .header("Authorization", "Bearer test-token"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200));
+
+        verify(approvalService).cancelProcess(7L, 42L);
     }
 }

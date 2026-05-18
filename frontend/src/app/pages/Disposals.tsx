@@ -1,52 +1,100 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router";
-import { ArrowRightLeft, LogOut, Trash2, DollarSign, Plus, Filter, Search } from "lucide-react";
-import { disposalService } from "../services/disposalService";
+import { ArrowRightLeft, LogOut, Trash2, DollarSign, Plus, Search } from "lucide-react";
+import { api } from "../utils/api";
 
 const tabs = [
-  { id: 'transfer', name: '资产转移', icon: ArrowRightLeft },
-  { id: 'clearance', name: '资产清退', icon: LogOut },
-  { id: 'scrap', name: '资产报废转让', icon: Trash2 },
-  { id: 'compensation', name: '资产赔偿', icon: DollarSign },
+  { id: 'transfer', name: '资产转移', icon: ArrowRightLeft, changeType: 'TRANSFER' },
+  { id: 'clearance', name: '资产清退', icon: LogOut, changeType: 'CLEARANCE' },
+  { id: 'scrap', name: '资产报废转让', icon: Trash2, changeType: 'SCRAP' },
+  { id: 'compensation', name: '资产赔偿', icon: DollarSign, changeType: undefined },
 ];
 
+const changeTypeLabels: Record<string, string> = {
+  TRANSFER: '资产转移',
+  CLEARANCE: '资产清退',
+  SCRAP: '资产报废转让',
+};
+
+interface DisposalRecord {
+  id: number;
+  assetId: number;
+  changeType: string;
+  operatorId: number;
+  oldValue: string;
+  newValue: string;
+  reason: string;
+  createTime: string;
+}
+
+interface PageResult<T> {
+  records: T[];
+  total: number;
+  current: number;
+  size: number;
+  pages: number;
+}
+
 export function Disposals() {
-  const [detailItem, setDetailItem] = useState<any | null>(null);
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('transfer');
-  const [showModal, setShowModal] = useState(false);
-  const [data, setData] = useState<any[]>([]);
+  const [data, setData] = useState<DisposalRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
 
-  const loadData = async () => {
+  const pageSize = 20;
+  const activeTabConfig = tabs.find(t => t.id === activeTab);
+
+  const loadData = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
-      const result = await disposalService.getHistory();
-      setData(Array.isArray(result) ? result : (result as any)?.records || []);
+      const params = new URLSearchParams();
+      params.set('page', String(page));
+      params.set('pageSize', String(pageSize));
+      if (activeTabConfig?.changeType) {
+        params.set('changeType', activeTabConfig.changeType);
+      }
+      const result = await api.get<PageResult<DisposalRecord>>(
+        `/disposals/history?${params.toString()}`
+      );
+      setData(result?.records ?? []);
+      setTotalPages(result?.pages ?? 1);
+      setTotalCount(result?.total ?? 0);
     } catch (err) {
       console.error('Failed to load disposal history:', err);
       setError('处置历史加载失败');
     } finally {
       setLoading(false);
     }
-  };
+  }, [page, activeTabConfig?.changeType]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [activeTab]);
 
   useEffect(() => {
     loadData();
-  }, []);
+  }, [loadData]);
 
-  const activeTabName = tabs.find(t => t.id === activeTab)?.name;
-  const filteredData = data.filter((item) => {
-    const type = String(item.changeType || item.type || '');
-    const matchesTab = !activeTabName || type === activeTab || type === activeTabName || type.includes(activeTabName.replace('资产', ''));
-    const keyword = searchTerm.trim().toLowerCase();
-    const matchesSearch = !keyword || [item.id, item.assetId, item.assetName, item.reason, item.operatorId, item.changeType]
-      .some((value) => String(value ?? '').toLowerCase().includes(keyword));
-    return matchesTab && matchesSearch;
-  });
+  const filteredData = searchTerm.trim()
+    ? data.filter((item) => {
+        const keyword = searchTerm.trim().toLowerCase();
+        return [String(item.id), String(item.assetId), item.reason, item.changeType]
+          .some((v) => v?.toLowerCase().includes(keyword));
+      })
+    : data;
+
+  const routeMap: Record<string, string> = {
+    transfer: '/disposals/transfer/new',
+    clearance: '/disposals/clearance/new',
+    scrap: '/disposals/scrap/new',
+    compensation: '/disposals/compensation/new',
+  };
 
   return (
     <div className="space-y-6">
@@ -55,16 +103,18 @@ export function Disposals() {
           <h2 className="text-2xl font-semibold text-gray-900">资产处置管理</h2>
           <p className="text-gray-600 mt-1">管理资产转移、清退、报废转让及赔偿等全生命周期处置流程</p>
         </div>
-        <button 
-          onClick={() => setShowModal(true)}
+        <button
+          onClick={() => {
+            const route = routeMap[activeTab];
+            if (route) navigate(route);
+          }}
           className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors flex items-center gap-2"
         >
           <Plus className="w-4 h-4" />
-          发起处置申请
+          发起{activeTabConfig?.name ?? '处置'}申请
         </button>
       </div>
 
-      {/* Tabs */}
       <div className="bg-white border-b border-gray-200 rounded-t-lg">
         <nav className="flex -mb-px" aria-label="Tabs">
           {tabs.map((tab) => {
@@ -88,7 +138,6 @@ export function Disposals() {
         </nav>
       </div>
 
-      {/* Content Area */}
       <div className="bg-white rounded-b-lg border border-gray-200 border-t-0 p-6">
         {loading && <div className="mb-4 text-sm text-gray-500">加载中...</div>}
         {error && <div className="mb-4 text-sm text-red-600">{error}</div>}
@@ -98,20 +147,18 @@ export function Disposals() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input
                 type="text"
-                placeholder="搜索申请单号或资产名称..."
+                placeholder="搜索申请单号或资产ID..."
                 value={searchTerm}
                 onChange={(event) => setSearchTerm(event.target.value)}
                 className="w-64 pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
-            <button disabled title="高级筛选接口尚未接入；当前可使用左侧搜索框本地过滤" className="px-4 py-2 text-sm font-medium text-gray-400 bg-gray-50 border border-gray-300 rounded-lg cursor-not-allowed flex items-center gap-2">
-              <Filter className="w-4 h-4" />
-              筛选
-            </button>
+          </div>
+          <div className="text-sm text-gray-500">
+            共 {totalCount} 条记录，第 {page} / {totalPages} 页
           </div>
         </div>
 
-        {/* Table */}
         <div className="overflow-x-auto border border-gray-200 rounded-lg">
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
@@ -122,91 +169,61 @@ export function Disposals() {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">操作人ID</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">创建时间</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">原因</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">操作</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {filteredData.map((item, idx) => (
-                <tr key={idx} className="hover:bg-gray-50">
+              {filteredData.map((item) => (
+                <tr key={item.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 text-sm font-medium text-blue-600">{item.id}</td>
                   <td className="px-6 py-4 text-sm text-gray-900">{item.assetId ?? '-'}</td>
-                  <td className="px-6 py-4 text-sm text-gray-600">{item.changeType ?? item.type ?? '-'}</td>
-                  <td className="px-6 py-4 text-sm text-gray-900">{item.operatorId ?? item.applicant ?? '-'}</td>
-                  <td className="px-6 py-4 text-sm text-gray-600">{item.createTime ?? item.date ?? '-'}</td>
-                  <td className="px-6 py-4 text-sm text-gray-600">{item.reason ?? item.status ?? '-'}</td>
-                  <td className="px-6 py-4 text-sm">
-                    <button onClick={() => setDetailItem(item)} className="text-blue-600 hover:text-blue-800 font-medium">查看详情</button>
-                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-600">{changeTypeLabels[item.changeType ?? ''] ?? item.changeType ?? '-'}</td>
+                  <td className="px-6 py-4 text-sm text-gray-900">{item.operatorId ?? '-'}</td>
+                  <td className="px-6 py-4 text-sm text-gray-600">{item.createTime ?? '-'}</td>
+                  <td className="px-6 py-4 text-sm text-gray-600">{item.reason ?? '-'}</td>
                 </tr>
               ))}
               {filteredData.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="px-6 py-8 text-center text-gray-500 text-sm">暂无数据</td>
+                  <td colSpan={6} className="px-6 py-8 text-center text-gray-500 text-sm">暂无数据</td>
                 </tr>
               )}
             </tbody>
           </table>
         </div>
+
+        {totalPages > 1 && (
+          <div className="flex items-center justify-center gap-2 mt-4 pt-4 border-t border-gray-200">
+            <button
+              onClick={() => setPage(Math.max(1, page - 1))}
+              disabled={page <= 1}
+              className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              上一页
+            </button>
+            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+              const start = Math.max(1, Math.min(page - 2, totalPages - 4));
+              const p = start + i;
+              if (p > totalPages) return null;
+              return (
+                <button
+                  key={p}
+                  onClick={() => setPage(p)}
+                  className={`px-3 py-1.5 text-sm rounded-lg ${p === page ? 'bg-blue-600 text-white' : 'border border-gray-300 hover:bg-gray-50'}`}
+                >
+                  {p}
+                </button>
+              );
+            })}
+            <button
+              onClick={() => setPage(Math.min(totalPages, page + 1))}
+              disabled={page >= totalPages}
+              className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              下一页
+            </button>
+          </div>
+        )}
       </div>
-
-      {/* 处置申请模态框占位 */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg w-full max-w-lg mx-4">
-            <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900">发起资产处置</h3>
-              <button onClick={() => setShowModal(false)} className="text-gray-400 hover:text-gray-600">✕</button>
-            </div>
-            <div className="p-6">
-              <p className="text-sm text-gray-500 mb-4">请选择您要进行的处置类型，具体表单流程将在后续版本中细化。</p>
-              <div className="grid grid-cols-2 gap-4">
-                {tabs.map(tab => (
-                  <button 
-                    key={tab.id} 
-                    onClick={() => {
-                      if (tab.id === 'transfer') {
-                        navigate('/disposals/transfer/new');
-                      } else if (tab.id === 'clearance') {
-                        navigate('/disposals/clearance/new');
-                      } else if (tab.id === 'scrap') {
-                        navigate('/disposals/scrap/new');
-                      } else if (tab.id === 'compensation') {
-                        navigate('/disposals/compensation/new');
-                      } else {
-                        // Other forms placeholder
-                      }
-                    }}
-                    className="p-4 border border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors flex flex-col items-center justify-center gap-2"
-                  >
-                    <tab.icon className="w-8 h-8 text-blue-600" />
-                    <span className="font-medium text-gray-900">{tab.name}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* 详情弹窗 */}
-      {detailItem && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => setDetailItem(null)}>
-          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
-            <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900">处置详情</h3>
-              <button onClick={() => setDetailItem(null)} className="text-gray-400 hover:text-gray-600 text-xl">&times;</button>
-            </div>
-            <div className="p-6 space-y-3">
-              {Object.entries(detailItem).map(([key, value]) => (
-                <div key={key} className="flex items-start gap-3 text-sm">
-                  <span className="text-gray-500 min-w-[120px]">{key}:</span>
-                  <span className="text-gray-900">{value === null || value === undefined ? '-' : String(value)}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

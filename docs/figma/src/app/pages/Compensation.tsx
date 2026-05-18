@@ -42,7 +42,7 @@ const compensations = [
     status: '已驳回',
     reason: '显示器接口损坏',
     submitDate: '2024-03-01',
-    rejectReason: '属于正��使用磨损,不需赔偿',
+    rejectReason: '属于正常使用磨损,不需赔偿',
     handler: '赵经理'
   },
   {

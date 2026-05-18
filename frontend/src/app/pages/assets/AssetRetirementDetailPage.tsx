@@ -1,13 +1,20 @@
 /**
  * AssetRetirementDetailPage — Detail view for a retirement application with
- * approval chain tracking, process number display, and cancel action.
+ * approval chain tracking, process number display, and workflow actions.
  *
- * SWARM-038: Displays the retirement application status, processNo,
- * approval history timeline, and provides a cancel button for PENDING
- * applications. Terminal states physically disable all action buttons.
+ * SWARM-053: Enhances the existing SWARM-038 detail page with:
+ * - Approve / Reject / Complete action buttons per state machine rules
+ * - RetirementTimeline integration for approval history
+ * - Cross-tenant error interception with user-facing banners
+ * - Terminal state locking (all buttons disabled when SCRAPPED)
+ *
+ * State machine mirror:
+ *   - PENDING → [Approve] / [Reject] / [Cancel] enabled
+ *   - APPROVED → [Complete] enabled, [Approve] / [Reject] / [Cancel] disabled
+ *   - SCRAPPED / COMPLETED / CANCELLED → all buttons disabled
  *
  * @module pages/assets/AssetRetirementDetailPage
- * @since SWARM-038
+ * @since SWARM-038, SWARM-053
  */
 
 import React, { useState, useCallback, useEffect } from 'react';
@@ -27,14 +34,17 @@ import {
   RefreshCw,
   XCircle,
   CheckCircle,
-  Clock,
   Loader2,
+  Ban,
+  ShieldAlert,
 } from 'lucide-react';
 import {
   useRetirementDetail,
   RETIREMENT_STATUS_MAP,
 } from '../../hooks/useRetirement';
 import { retirementService } from '../../services/retirementService';
+import { RetirementTimeline } from './components/RetirementTimeline';
+import type { TimelineNode } from './components/RetirementTimeline';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -106,6 +116,41 @@ function formatDateTime(value: string | undefined | null): string {
   }
 }
 
+/**
+ * Check if an error represents a cross-tenant rejection.
+ *
+ * @param err - The thrown error
+ * @returns true when the backend rejected due to tenant mismatch or 403
+ */
+function isCrossTenantError(err: unknown): boolean {
+  if (err instanceof Error) {
+    const msg = err.message ?? '';
+    return (
+      msg.includes('无权操作该资产') ||
+      msg.includes('跨租户') ||
+      msg.includes('403') ||
+      msg.includes('权限不足')
+    );
+  }
+  return false;
+}
+
+/**
+ * Convert approval history items to TimelineNode format.
+ *
+ * @param history - Raw approval history from backend
+ * @returns TimelineNode array for the RetirementTimeline component
+ */
+function historyToTimelineNodes(history: ApprovalHistoryItem[]): TimelineNode[] {
+  return history.map((item, idx) => ({
+    id: item.id ?? `node-${idx}`,
+    action: item.action,
+    operator: item.operator,
+    comment: item.comment,
+    timestamp: item.createdAt,
+  }));
+}
+
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
@@ -113,8 +158,11 @@ function formatDateTime(value: string | undefined | null): string {
 /**
  * AssetRetirementDetailPage component
  *
- * Renders the retirement application detail with approval chain timeline,
- * process number, status badge, and conditional cancel button.
+ * Renders the retirement application detail with:
+ * - Process number and status display
+ * - RetirementTimeline for approval chain visualization
+ * - Action buttons (Approve, Reject, Cancel, Complete) per state machine
+ * - Cross-tenant error banner
  *
  * @returns The retirement detail page JSX
  */
@@ -127,7 +175,7 @@ export const AssetRetirementDetailPage: React.FC = () => {
     application,
     asset,
     loading,
-    error,
+    error: hookError,
     isTerminal,
     canCancel,
     refresh,
@@ -138,7 +186,37 @@ export const AssetRetirementDetailPage: React.FC = () => {
   // -- Approval history state --------------------------------------------------
   const [approvalHistory, setApprovalHistory] = useState<ApprovalHistoryItem[]>([]);
   const [historyLoading, setHistoryLoading] = useState(false);
+
+  // -- Action states -----------------------------------------------------------
   const [cancelling, setCancelling] = useState(false);
+  const [approving, setApproving] = useState(false);
+  const [rejecting, setRejecting] = useState(false);
+  const [completing, setCompleting] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
+  const [rejectReason, setRejectReason] = useState('');
+
+  // -- Derived state -----------------------------------------------------------
+  const statusStr = (application?.status as string) ?? '';
+  const isPending = statusStr === 'PENDING';
+  const isApproved = statusStr === 'APPROVED';
+
+  /**
+   * Whether Approve/Reject buttons should be enabled.
+   * Per state machine: only PENDING allows Approve/Reject.
+   */
+  const canApproveOrReject = isPending && !isTerminal;
+
+  /**
+   * Whether Complete button should be enabled.
+   * Per state machine: only APPROVED allows Complete.
+   */
+  const canComplete = isApproved && !isTerminal;
+
+  /**
+   * Whether Cancel button should be enabled.
+   * Per state machine: only PENDING allows Cancel.
+   */
+  const canCancelApplication = canCancel && !isTerminal;
 
   /**
    * Load approval history for the application.
@@ -162,21 +240,96 @@ export const AssetRetirementDetailPage: React.FC = () => {
   }, [loadHistory]);
 
   /**
-   * Handle the cancel retirement action.
+   * Handle cross-tenant and generic errors from mutation actions.
    *
-   * On success, navigates back to the asset detail page where the
-   * asset status should have rolled back to the original state.
+   * @param err - The thrown error
+   */
+  const handleActionError = useCallback((err: unknown) => {
+    if (isCrossTenantError(err)) {
+      setActionError('权限不足，无法操作此资产');
+    } else {
+      const message = err instanceof Error ? err.message : '操作失败';
+      setActionError(message);
+    }
+  }, []);
+
+  /**
+   * Handle the Approve retirement action.
+   */
+  const handleApprove = useCallback(async () => {
+    if (!applicationId) return;
+    setApproving(true);
+    setActionError(null);
+    try {
+      await retirementService.approveApplication(applicationId);
+      await refresh();
+      await loadHistory();
+    } catch (err) {
+      handleActionError(err);
+    } finally {
+      setApproving(false);
+    }
+  }, [applicationId, refresh, loadHistory, handleActionError]);
+
+  /**
+   * Handle the Reject retirement action.
+   */
+  const handleReject = useCallback(async () => {
+    if (!applicationId) return;
+    if (!rejectReason.trim()) {
+      setActionError('请填写驳回原因');
+      return;
+    }
+    setRejecting(true);
+    setActionError(null);
+    try {
+      await retirementService.rejectApplication(applicationId, rejectReason.trim());
+      setRejectReason('');
+      await refresh();
+      await loadHistory();
+    } catch (err) {
+      handleActionError(err);
+    } finally {
+      setRejecting(false);
+    }
+  }, [applicationId, rejectReason, refresh, loadHistory, handleActionError]);
+
+  /**
+   * Handle the Cancel retirement action.
    */
   const handleCancel = useCallback(async () => {
     setCancelling(true);
+    setActionError(null);
     const success = await cancelRetirement();
     setCancelling(false);
 
-    if (success && asset?.id) {
-      // Navigate back to asset detail after successful cancellation
-      navigate(`/assets?highlight=${asset.id}`);
+    if (!success) {
+      // cancelRetirement handles its own error display via hookError
+    } else if (asset?.id) {
+      await loadHistory();
     }
-  }, [cancelRetirement, asset?.id, navigate]);
+  }, [cancelRetirement, asset?.id, loadHistory]);
+
+  /**
+   * Handle the Complete retirement action.
+   */
+  const handleComplete = useCallback(async () => {
+    if (!applicationId) return;
+    setCompleting(true);
+    setActionError(null);
+    try {
+      await retirementService.completeRetirement(applicationId);
+      await refresh();
+      await loadHistory();
+    } catch (err) {
+      handleActionError(err);
+    } finally {
+      setCompleting(false);
+    }
+  }, [applicationId, refresh, loadHistory, handleActionError]);
+
+  // Build timeline nodes from approval history
+  const timelineNodes = historyToTimelineNodes(approvalHistory);
 
   // ---- Loading state --------------------------------------------------------
   if (loading && !application) {
@@ -201,12 +354,12 @@ export const AssetRetirementDetailPage: React.FC = () => {
   }
 
   // ---- Error state ----------------------------------------------------------
-  if (error && !application) {
+  if (hookError && !application) {
     return (
       <div className="max-w-4xl mx-auto space-y-6 pb-12" data-testid="retirement-detail-error">
         <Card>
           <CardContent className="flex flex-col items-center py-12">
-            <p className="text-muted-foreground mb-4">加载退役申请详情失败：{error}</p>
+            <p className="text-muted-foreground mb-4">加载退役申请详情失败：{hookError}</p>
             <div className="flex gap-3">
               <Button variant="outline" onClick={() => navigate(-1)}>
                 <ArrowLeft className="w-4 h-4 mr-1" />
@@ -222,8 +375,6 @@ export const AssetRetirementDetailPage: React.FC = () => {
       </div>
     );
   }
-
-  const statusStr = (application?.status as string) ?? '';
 
   // ---- Main render ----------------------------------------------------------
   return (
@@ -257,14 +408,27 @@ export const AssetRetirementDetailPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Error toast */}
-      {error && application && (
+      {/* Cross-tenant / action error banner */}
+      {actionError && (
         <div
-          className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-800 text-sm"
+          className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-800 text-sm flex items-center gap-2"
+          data-testid="error-banner"
+          role="alert"
+        >
+          <ShieldAlert className="w-4 h-4 flex-shrink-0" />
+          {actionError}
+        </div>
+      )}
+
+      {/* Hook-level error toast */}
+      {hookError && application && (
+        <div
+          className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-800 text-sm flex items-center gap-2"
           data-testid="error-toast"
           role="alert"
         >
-          {error}
+          <ShieldAlert className="w-4 h-4 flex-shrink-0" />
+          {hookError}
         </div>
       )}
 
@@ -304,6 +468,12 @@ export const AssetRetirementDetailPage: React.FC = () => {
               </span>
             </div>
             <div>
+              <span className="text-gray-500">资产状态：</span>
+              <span className="font-medium" data-testid="asset-status-label">
+                {asset?.status ?? '-'}
+              </span>
+            </div>
+            <div>
               <span className="text-gray-500">申请时间：</span>
               <span className="font-medium">
                 {formatDateTime(application?.createdAt)}
@@ -334,105 +504,121 @@ export const AssetRetirementDetailPage: React.FC = () => {
           <CardTitle className="text-lg font-semibold">审批链路</CardTitle>
         </CardHeader>
         <CardContent>
-          <div data-testid="approval-chain" className="space-y-4">
-            {historyLoading ? (
-              <div className="space-y-3">
-                {[...Array(3)].map((_, i) => (
-                  <Skeleton key={i} className="h-12 w-full" />
-                ))}
-              </div>
-            ) : approvalHistory.length > 0 ? (
-              approvalHistory.map((item, idx) => {
-                const isSuccess = item.action === 'APPROVE' || item.action === 'approve';
-                const isReject = item.action === 'REJECT' || item.action === 'reject';
-                const isCancel = item.action === 'CANCEL' || item.action === 'cancel';
-
-                return (
-                  <div
-                    key={item.id ?? idx}
-                    className="flex items-start gap-3 pb-4 border-b last:border-b-0"
-                    data-testid="approval-chain-item"
-                  >
-                    {/* Status icon */}
-                    <div className="mt-0.5">
-                      {isSuccess ? (
-                        <CheckCircle className="w-5 h-5 text-green-500" />
-                      ) : isReject || isCancel ? (
-                        <XCircle className="w-5 h-5 text-red-500" />
-                      ) : (
-                        <Clock className="w-5 h-5 text-yellow-500" />
-                      )}
-                    </div>
-
-                    {/* Content */}
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between">
-                        <span className="font-medium text-sm">
-                          {item.operator ?? `审批节点 ${idx + 1}`}
-                        </span>
-                        <Badge
-                          variant={
-                            isSuccess
-                              ? 'secondary'
-                              : isReject || isCancel
-                                ? 'destructive'
-                                : 'outline'
-                          }
-                          className="text-xs"
-                        >
-                          {isSuccess
-                            ? '已通过'
-                            : isReject
-                              ? '已驳回'
-                              : isCancel
-                                ? '已取消'
-                                : '待审批'}
-                        </Badge>
-                      </div>
-                      {item.comment && (
-                        <p className="text-sm text-gray-500 mt-1">
-                          {item.comment}
-                        </p>
-                      )}
-                      <p className="text-xs text-gray-400 mt-1">
-                        {formatDateTime(item.createdAt)}
-                      </p>
-                    </div>
-                  </div>
-                );
-              })
-            ) : (
-              <div className="flex items-center gap-2 text-gray-400 text-sm py-4">
-                <Clock className="w-4 h-4" />
-                <span>暂无审批记录</span>
-              </div>
-            )}
-          </div>
+          {historyLoading ? (
+            <div className="space-y-3">
+              {[...Array(3)].map((_, i) => (
+                <Skeleton key={i} className="h-12 w-full" />
+              ))}
+            </div>
+          ) : (
+            <RetirementTimeline nodes={timelineNodes} />
+          )}
         </CardContent>
       </Card>
 
+      {/* Reject reason input (shown only when PENDING and user wants to reject) */}
+      {isPending && (
+        <Card data-testid="reject-reason-card">
+          <CardHeader>
+            <CardTitle className="text-sm font-semibold text-gray-700">
+              驳回原因（驳回时必填）
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <textarea
+              value={rejectReason}
+              onChange={(e) => setRejectReason(e.target.value)}
+              rows={2}
+              maxLength={500}
+              placeholder="请输入驳回原因..."
+              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              data-testid="reject-reason-input"
+            />
+          </CardContent>
+        </Card>
+      )}
+
       {/* Action buttons */}
-      <div className="flex items-center justify-end gap-3">
-        {canCancel && !isTerminal && (
-          <Button
-            variant="destructive"
-            onClick={handleCancel}
-            disabled={cancelling}
-            data-testid="cancel-retirement-btn"
-          >
-            {cancelling ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                撤销中...
-              </>
-            ) : (
-              <>
-                <XCircle className="w-4 h-4 mr-1" />
-                撤销申请
-              </>
-            )}
-          </Button>
-        )}
+      <div className="flex items-center justify-end gap-3" data-testid="action-buttons">
+        {/* Cancel button — PENDING only */}
+        <Button
+          variant="destructive"
+          onClick={handleCancel}
+          disabled={!canCancelApplication || cancelling}
+          data-testid="cancel-retirement-btn"
+        >
+          {cancelling ? (
+            <>
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              撤销中...
+            </>
+          ) : (
+            <>
+              <XCircle className="w-4 h-4 mr-1" />
+              撤销申请
+            </>
+          )}
+        </Button>
+
+        {/* Reject button — PENDING only */}
+        <Button
+          variant="destructive"
+          onClick={handleReject}
+          disabled={!canApproveOrReject || rejecting}
+          data-testid="reject-retirement-btn"
+        >
+          {rejecting ? (
+            <>
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              驳回中...
+            </>
+          ) : (
+            <>
+              <Ban className="w-4 h-4 mr-1" />
+              驳回
+            </>
+          )}
+        </Button>
+
+        {/* Approve button — PENDING only */}
+        <Button
+          variant="default"
+          onClick={handleApprove}
+          disabled={!canApproveOrReject || approving}
+          data-testid="approve-retirement-btn"
+        >
+          {approving ? (
+            <>
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              审批中...
+            </>
+          ) : (
+            <>
+              <CheckCircle className="w-4 h-4 mr-1" />
+              审批通过
+            </>
+          )}
+        </Button>
+
+        {/* Complete button — APPROVED only */}
+        <Button
+          variant="default"
+          onClick={handleComplete}
+          disabled={!canComplete || completing}
+          data-testid="complete-retirement-btn"
+        >
+          {completing ? (
+            <>
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              完成中...
+            </>
+          ) : (
+            <>
+              <CheckCircle className="w-4 h-4 mr-1" />
+              确认完成
+            </>
+          )}
+        </Button>
       </div>
     </div>
   );

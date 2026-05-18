@@ -409,10 +409,6 @@ const TrendChart: React.FC<TrendChartProps> = ({
    * 处理鼠标释放 - 完成区域选择
    */
   const handleMouseUp = () => {
-    if (refAreaLeft && refAreaRight && refAreaLeft !== refAreaRight) {
-      // 可以触发筛选更新或其他操作
-      console.log(`选中区间: ${refAreaLeft} ~ ${refAreaRight}`);
-    }
     setRefAreaLeft(null);
     setRefAreaRight(null);
     setIsSelecting(false);

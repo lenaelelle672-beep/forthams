@@ -217,9 +217,9 @@ const AuditLogFilterBar: React.FC<AuditLogFilterBarProps> = ({
             <div className="flex flex-col gap-1.5">
               <label className="text-xs text-muted-foreground">所属模块</label>
               <Select
-                value={(filters as Record<string, unknown>).module as string || '__all__'}
+                value={filters.module || '__all__'}
                 onValueChange={(val) => {
-                  onUpdateFilters({ module: val === '__all__' ? '' : val } as Partial<AuditLogFilters>);
+                  onUpdateFilters({ module: val === '__all__' ? '' : val });
                 }}
               >
                 <SelectTrigger

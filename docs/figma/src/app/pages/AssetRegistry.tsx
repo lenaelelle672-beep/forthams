@@ -4,7 +4,7 @@ import { Plus, Search, Filter, Download, Upload, Edit, Trash2, Eye, MoreHorizont
 import { AssetDetailModal } from "../components/AssetDetailModal";
 
 const assets = [
-  { id: 'AS-2024-001', name: 'ThinkPad X1 Carbon', category: '电子���备', department: '研发部', user: '张三', location: 'A栋3楼', status: '在用', value: '¥8,500', purchaseDate: '2023-05-15' },
+  { id: 'AS-2024-001', name: 'ThinkPad X1 Carbon', category: '电子设备', department: '研发部', user: '张三', location: 'A栋3楼', status: '在用', value: '¥8,500', purchaseDate: '2023-05-15' },
   { id: 'AS-2024-002', name: 'HP LaserJet Pro', category: '办公设备', department: '行政部', user: '李四', location: 'B栋1楼', status: '在用', value: '¥3,200', purchaseDate: '2023-06-20' },
   { id: 'AS-2024-003', name: 'Dell OptiPlex 7090', category: '电子设备', department: '财务部', user: '王五', location: 'A栋2楼', status: '在用', value: '¥6,800', purchaseDate: '2023-07-10' },
   { id: 'AS-2024-004', name: 'iPhone 14 Pro', category: '移动设备', department: '销售部', user: '赵六', location: 'C栋2楼', status: '在用', value: '¥9,999', purchaseDate: '2023-08-05' },

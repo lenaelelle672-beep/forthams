@@ -13,12 +13,15 @@
  * - Mark-all-as-read button (data-testid="mark-all-read-btn")
  * - Scrollable list with max-height to handle overflow (>20 items)
  * - Uses position:absolute to avoid layout shift (CLS prevention)
+ * - Error state with retry button (data-testid="notification-error-retry")
+ *
+ * State triad: loading (skeleton) / error (message + retry) / data (list)
  *
  * @see frontend/src/app/services/notificationApi.ts
  */
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Bell, CheckCheck } from "lucide-react";
+import { Bell, CheckCheck, RefreshCw, AlertCircle } from "lucide-react";
 import {
   fetchPendingNotifications,
   fetchUnreadCount,
@@ -56,6 +59,8 @@ const MAX_VISIBLE_ITEMS = 20;
  * - On-demand full list fetch when dropdown opens
  * - Type-based filtering via NotificationFilterBar
  * - Mark-as-read per item (click) and mark-all-as-read (header button)
+ * - Error state with error message and retry/refresh button
+ * - Loading skeleton state while fetching
  * - Layout isolation via position:absolute to prevent CLS
  * - Unmount cleanup clears the polling interval
  *
@@ -66,6 +71,8 @@ export function NotificationCenter() {
   const [unreadCount, setUnreadCount] = useState(-1); // -1 = not loaded
   const [items, setItems] = useState<NotificationItemType[]>([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [markingAllRead, setMarkingAllRead] = useState(false);
   const [activeFilter, setActiveFilter] = useState<NotificationType | "all">(
     "all",
   );
@@ -87,17 +94,20 @@ export function NotificationCenter() {
   /**
    * Fetch the full notification items list.
    * Called when the dropdown is opened or the filter changes.
+   * Implements loading / error / data state triad.
    */
   const refreshItems = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
       const response = await fetchPendingNotifications({
         type: activeFilter !== "all" ? activeFilter : undefined,
       });
       setItems(response.items ?? []);
       setUnreadCount(response.unread_count ?? 0);
-    } catch {
-      // On error, keep existing items or show empty
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "加载通知失败";
+      setError(msg);
       setItems([]);
     } finally {
       setLoading(false);
@@ -188,12 +198,14 @@ export function NotificationCenter() {
 
   /**
    * Mark all notifications as read and update local state optimistically.
+   * Shows loading state on the button during the API call.
    */
   const handleMarkAllAsRead = useCallback(async () => {
     // Optimistic update
     setItems((prev) => prev.map((item) => ({ ...item, read: true })));
     const prevCount = unreadCount;
     setUnreadCount(0);
+    setMarkingAllRead(true);
 
     try {
       await markAllNotificationsAsRead();
@@ -203,8 +215,17 @@ export function NotificationCenter() {
         prev.map((item) => ({ ...item, read: false })),
       );
       setUnreadCount(prevCount);
+    } finally {
+      setMarkingAllRead(false);
     }
   }, [unreadCount]);
+
+  /**
+   * Retry fetching items after an error.
+   */
+  const handleRetry = () => {
+    refreshItems();
+  };
 
   /** Compute badge display text, capping at "99+" for large counts. */
   const badgeText =
@@ -266,11 +287,12 @@ export function NotificationCenter() {
                   type="button"
                   data-testid="mark-all-read-btn"
                   onClick={handleMarkAllAsRead}
-                  className="flex items-center gap-1 px-2 py-1 text-xs text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                  disabled={markingAllRead}
+                  className="flex items-center gap-1 px-2 py-1 text-xs text-blue-600 hover:bg-blue-50 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   title="全部标记为已读"
                 >
                   <CheckCheck className="w-3.5 h-3.5" />
-                  全部已读
+                  {markingAllRead ? "处理中..." : "全部已读"}
                 </button>
               )}
             </div>
@@ -282,15 +304,36 @@ export function NotificationCenter() {
             onFilterChange={handleFilterChange}
           />
 
-          {/* Loading state */}
+          {/* Loading state — skeleton */}
           {loading && (
             <div className="px-4 py-6 text-center text-sm text-gray-400">
               加载中...
             </div>
           )}
 
+          {/* Error state with retry */}
+          {!loading && error && (
+            <div
+              data-testid="notification-error-retry"
+              className="px-4 py-6 text-center"
+            >
+              <div className="flex items-center justify-center gap-2 text-red-500 mb-3">
+                <AlertCircle className="w-4 h-4" />
+                <span className="text-sm">{error}</span>
+              </div>
+              <button
+                type="button"
+                onClick={handleRetry}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-full transition-colors"
+              >
+                <RefreshCw className="w-3 h-3" />
+                重试
+              </button>
+            </div>
+          )}
+
           {/* Notification items list */}
-          {!loading && hasItems && (
+          {!loading && !error && hasItems && (
             <div
               className="overflow-y-auto"
               style={{ maxHeight: `${MAX_VISIBLE_ITEMS * 72}px` }}
@@ -310,7 +353,7 @@ export function NotificationCenter() {
           )}
 
           {/* Empty state */}
-          {!loading && !hasItems && (
+          {!loading && !error && !hasItems && (
             <div
               data-testid="empty-notifications"
               className="px-4 py-6 text-center text-sm text-gray-400"

@@ -9,6 +9,7 @@
  */
 
 import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
+import { api } from '../utils/api';
 
 // ---------------------------------------------------------------------------
 // 类型定义
@@ -66,6 +67,7 @@ export interface AuditLogFilters {
   end_time: Date | null;
   action_type: string;
   operator_id: string;
+  module: string;
 }
 
 /** 分页参数 */
@@ -131,7 +133,7 @@ const MAX_PAGE_SIZE = 100;
 const MAX_OFFSET = 10000;
 
 /** API 基础路径 */
-const API_BASE = '/api/v1/audit-log';
+const AUDIT_API_BASE = '/v1/audit-log';
 
 // ---------------------------------------------------------------------------
 // 默认筛选器
@@ -142,6 +144,7 @@ const DEFAULT_FILTERS: AuditLogFilters = {
   end_time: null,
   action_type: '',
   operator_id: '',
+  module: '',
 };
 
 // ---------------------------------------------------------------------------
@@ -250,45 +253,47 @@ export function normalizePagination(
  * @returns 解析后的 JSON 响应
  * @throws 当响应非 2xx 时抛出包含状态码与消息的错误
  */
-async function apiGet<T>(url: string, token?: string): Promise<T> {
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-  };
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-  }
-
-  const response = await fetch(url, { method: 'GET', headers, credentials: 'include' });
-
-  if (!response.ok) {
-    let message = `Request failed with status ${response.status}`;
-    try {
-      const body = await response.json();
-      if (body?.detail || body?.message) {
-        message = body.detail || body.message;
-      }
-    } catch {
-      // 响应体非 JSON，使用默认消息
-    }
-    throw new Error(message);
-  }
-
-  return response.json() as Promise<T>;
+async function apiGet<T>(url: string): Promise<T> {
+  return api.get<T>(url);
 }
 
-/**
- * 构建审计日志列表查询 URL
- *
- * @param filters 筛选器
- * @param pagination 分页参数
- * @returns 完整查询 URL
- */
+interface BackendPageResponse {
+  records: Record<string, unknown>[];
+  total: number;
+  current: number;
+  size: number;
+}
+
+function mapRecordToItem(r: Record<string, unknown>): AuditLogItem {
+  return {
+    id: String(r.id ?? ''),
+    action_type: String(r.operationType ?? ''),
+    operator_id: String(r.operatorId ?? ''),
+    operator_name: String(r.operatorName ?? ''),
+    resource_type: String(r.resourceType ?? ''),
+    resource_id: String(r.resourceId ?? ''),
+    detail: String(r.action ?? ''),
+    ip_address: String(r.ipAddress ?? ''),
+    created_at: r.timestamp ? new Date(r.timestamp as string).toISOString() : '',
+  };
+}
+
+interface BackendTrendResponse {
+  granularity: string;
+  startDate: string;
+  endDate: string;
+  data: Array<{ date: string; count: number }>;
+}
+
 function buildListUrl(
   filters: AuditLogFilters,
   pagination: PaginationParams
 ): string {
   const params = new URLSearchParams();
 
+  const normalized = normalizePagination(pagination.page, pagination.size);
+  params.set('page', String(normalized.page - 1));
+  params.set('size', String(normalized.size));
   if (filters.start_time) {
     params.set('start_time', toUTCISOString(filters.start_time));
   }
@@ -296,42 +301,41 @@ function buildListUrl(
     params.set('end_time', toUTCISOString(filters.end_time));
   }
   if (filters.action_type) {
-    params.set('action_type', filters.action_type);
+    params.set('operation_type', filters.action_type);
   }
   if (filters.operator_id) {
     params.set('operator_id', filters.operator_id);
   }
+  if (filters.module) {
+    params.set('module', filters.module);
+  }
 
-  const normalized = normalizePagination(pagination.page, pagination.size);
-  params.set('page', String(normalized.page));
-  params.set('size', String(normalized.size));
-
-  return `${API_BASE}/list?${params.toString()}`;
+  return `${AUDIT_API_BASE}/list?${params.toString()}`;
 }
 
-/**
- * 构建趋势查询 URL
- *
- * @param filters 筛选器（时间范围 + 操作类型 + 操作人）
- * @returns 完整查询 URL
- */
 function buildTrendUrl(filters: AuditLogFilters): string {
   const params = new URLSearchParams();
 
   if (filters.start_time) {
+    params.set('startDate', toUTCISOString(filters.start_time).split('T')[0]);
     params.set('start_time', toUTCISOString(filters.start_time));
   }
   if (filters.end_time) {
+    params.set('endDate', toUTCISOString(filters.end_time).split('T')[0]);
     params.set('end_time', toUTCISOString(filters.end_time));
   }
+  const granularity = computeGranularity(filters.start_time, filters.end_time);
+  params.set('granularity', granularity === 'hour' ? 'hourly' : granularity === 'week' ? 'weekly' : 'daily');
+
   if (filters.action_type) {
-    params.set('action_type', filters.action_type);
+    params.set('operation_type', filters.action_type);
   }
   if (filters.operator_id) {
     params.set('operator_id', filters.operator_id);
   }
+  if (filters.module) params.set('module', filters.module);
 
-  return `${API_BASE}/trend?${params.toString()}`;
+  return `${AUDIT_API_BASE}/trend?${params.toString()}`;
 }
 
 // ---------------------------------------------------------------------------
@@ -366,7 +370,7 @@ function buildTrendUrl(filters: AuditLogFilters): string {
  * await fetchAll();
  * ```
  */
-export function useAuditLogs(authToken?: string): UseAuditLogsReturn {
+export function useAuditLogs(): UseAuditLogsReturn {
   // ---- 筛选器状态 ----
   const [filters, setFilters] = useState<AuditLogFilters>({
     ...DEFAULT_FILTERS,
@@ -442,13 +446,13 @@ export function useAuditLogs(authToken?: string): UseAuditLogsReturn {
     async function loadMeta() {
       setMetaLoading(true);
       try {
-        const url = `${API_BASE}/meta`;
-        const meta = await apiGet<AuditLogMetaResponse>(url, authToken);
+        const url = `${AUDIT_API_BASE}/meta`;
+        const types = await apiGet<string[]>(url);
         if (!cancelled && mountedRef.current) {
-          setActionTypeOptions(meta.action_types ?? []);
+          const options = (types ?? []).map((type) => ({ value: type, label: type }));
+          setActionTypeOptions(options);
         }
       } catch (err) {
-        // 元数据加载失败不阻塞主流程，仅记录空选项
         if (!cancelled && mountedRef.current) {
           setActionTypeOptions([]);
         }
@@ -464,12 +468,11 @@ export function useAuditLogs(authToken?: string): UseAuditLogsReturn {
     return () => {
       cancelled = true;
     };
-  }, [authToken]);
+  }, []);
 
   // ---- 列表查询 ----
   /** 触发审计日志列表分页查询 */
   const fetchList = useCallback(async () => {
-    // 时间跨度越界拦截
     if (isTimeRangeExceeded(filters.start_time, filters.end_time)) {
       setListError(
         `查询时间跨度不得超过 ${MAX_TIME_SPAN_DAYS} 天，请缩小时间范围`
@@ -477,7 +480,6 @@ export function useAuditLogs(authToken?: string): UseAuditLogsReturn {
       return;
     }
 
-    // 深度分页越界拦截
     if (isOffsetExceeded(pagination.page, pagination.size)) {
       setListError(
         `分页偏移量超过 ${MAX_OFFSET} 条限制，请使用更精确的筛选条件`
@@ -490,9 +492,15 @@ export function useAuditLogs(authToken?: string): UseAuditLogsReturn {
 
     try {
       const url = buildListUrl(filters, pagination);
-      const data = await apiGet<AuditLogListResponse>(url, authToken);
+      const backendPage = await apiGet<BackendPageResponse>(url);
       if (mountedRef.current) {
-        setListData(data);
+        const items = (backendPage.records ?? []).map((r: Record<string, unknown>) => mapRecordToItem(r));
+        setListData({
+          total: backendPage.total,
+          items,
+          page: backendPage.current,
+          size: backendPage.size,
+        });
       }
     } catch (err) {
       if (mountedRef.current) {
@@ -506,12 +514,11 @@ export function useAuditLogs(authToken?: string): UseAuditLogsReturn {
         setListLoading(false);
       }
     }
-  }, [filters, pagination, authToken]);
+  }, [filters, pagination]);
 
   // ---- 趋势查询 ----
   /** 触发审计日志趋势聚合查询 */
   const fetchTrend = useCallback(async () => {
-    // 时间跨度越界拦截
     if (isTimeRangeExceeded(filters.start_time, filters.end_time)) {
       setTrendError(
         `查询时间跨度不得超过 ${MAX_TIME_SPAN_DAYS} 天，请缩小时间范围`
@@ -524,9 +531,16 @@ export function useAuditLogs(authToken?: string): UseAuditLogsReturn {
 
     try {
       const url = buildTrendUrl(filters);
-      const data = await apiGet<AuditLogTrendResponse>(url, authToken);
+      const backendTrend = await apiGet<BackendTrendResponse>(url);
       if (mountedRef.current) {
-        setTrendData(data);
+        const computed = computeGranularity(filters.start_time, filters.end_time);
+        setTrendData({
+          granularity: computed,
+          data_points: (backendTrend.data ?? []).map((p) => ({
+            timestamp: p.date,
+            count: p.count,
+          })),
+        });
       }
     } catch (err) {
       if (mountedRef.current) {
@@ -540,7 +554,7 @@ export function useAuditLogs(authToken?: string): UseAuditLogsReturn {
         setTrendLoading(false);
       }
     }
-  }, [filters, authToken]);
+  }, [filters]);
 
   // ---- 同时查询列表 + 趋势 ----
   /** 同时触发列表与趋势查询 */

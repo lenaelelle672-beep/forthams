@@ -35,7 +35,7 @@ const recentActivities = [
 ];
 
 const pendingApprovals = [
-  { id: 1, type: '资产新增', applicant: '李四', asset: '��记本电脑 ThinkPad X1', amount: '¥8,500', time: '2024-03-08' },
+  { id: 1, type: '资产新增', applicant: '李四', asset: '笔记本电脑 ThinkPad X1', amount: '¥8,500', time: '2024-03-08' },
   { id: 2, type: '资产报废', applicant: '王五', asset: '打印机 HP LaserJet', amount: '¥0', time: '2024-03-08' },
   { id: 3, type: '资产转移', applicant: '赵六', asset: '投影仪 Epson EB-2250U', amount: '-', time: '2024-03-07' },
 ];

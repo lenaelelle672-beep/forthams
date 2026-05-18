@@ -177,7 +177,7 @@ const AuditDetailPage: React.FC = () => {
   if (isNotFound) {
     return (
       <div
-        className="flex flex-col items-center justify-center min-h-[400px] p-6"
+        className="audit-detail-panel flex flex-col items-center justify-center min-h-[400px] p-6"
         data-testid="audit-detail-panel"
       >
         <FileText className="size-16 text-muted-foreground/40 mb-4" />
@@ -211,7 +211,7 @@ const AuditDetailPage: React.FC = () => {
   if (error) {
     return (
       <div
-        className="flex flex-col items-center justify-center min-h-[400px] p-6"
+        className="audit-detail-panel flex flex-col items-center justify-center min-h-[400px] p-6"
         data-testid="audit-detail-panel"
       >
         <div className="text-destructive text-center">
@@ -235,7 +235,7 @@ const AuditDetailPage: React.FC = () => {
   if (!detail) {
     return (
       <div
-        className="flex flex-col items-center justify-center min-h-[400px] p-6"
+        className="audit-detail-panel flex flex-col items-center justify-center min-h-[400px] p-6"
         data-testid="audit-detail-panel"
       >
         <p className="text-muted-foreground mb-4">暂无数据</p>
@@ -249,7 +249,7 @@ const AuditDetailPage: React.FC = () => {
 
   // ---- 正常渲染详情 ----
   return (
-    <div className="space-y-6 p-6" data-testid="audit-detail-panel">
+    <div className="audit-detail-panel space-y-6 p-6" data-testid="audit-detail-panel">
       {/* 页面标题与返回按钮 */}
       <div className="flex items-center gap-4">
         <Button variant="outline" size="sm" onClick={handleGoBack}>

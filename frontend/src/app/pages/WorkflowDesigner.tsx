@@ -11,7 +11,10 @@ import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import { Card, CardContent } from "../components/ui/card";
 import { businessFlowOptions, getDraftStorageKey, isBusinessType, type BusinessType } from "../constants/workflowBusiness";
+import { roleService, type RoleRecord } from "../services/roleService";
+import { userService, type UserRecord } from "../services/userService";
 import { workflowDefinitionService } from "../services/workflowDefinitionService";
+import { normalizeWorkflowDefinition, validateWorkflowDefinition } from "../utils/workflowDefinition";
 import {
   createFlowEdge,
   createFlowNode,
@@ -40,15 +43,17 @@ function readDraftFromStorage(businessType: BusinessType): Pick<FlowDefinition, 
     const parsed = JSON.parse(rawDraft) as Partial<FlowDefinition>;
     if (!Array.isArray(parsed.nodes) || !Array.isArray(parsed.edges)) return null;
 
-    return { nodes: parsed.nodes as FlowNode[], edges: parsed.edges as FlowEdge[] };
+    const normalized = normalizeWorkflowDefinition(parsed as FlowDefinition, businessType);
+    return { nodes: normalized.nodes, edges: normalized.edges };
   } catch {
     return null;
   }
 }
 
-function definitionFromApi(value: Record<string, unknown> | undefined): Pick<FlowDefinition, "nodes" | "edges"> | null {
+function definitionFromApi(value: Record<string, unknown> | undefined, businessType: BusinessType): Pick<FlowDefinition, "nodes" | "edges"> | null {
   if (!value || !Array.isArray(value.nodes) || value.nodes.length === 0 || !Array.isArray(value.edges)) return null;
-  return { nodes: value.nodes as FlowNode[], edges: value.edges as FlowEdge[] };
+  const normalized = normalizeWorkflowDefinition(value as unknown as FlowDefinition, businessType);
+  return { nodes: normalized.nodes, edges: normalized.edges };
 }
 
 function getAutoPosition(index: number) {
@@ -59,6 +64,31 @@ function getAutoPosition(index: number) {
     x: 220 + column * 220,
     y: 120 + row * 160,
   };
+}
+
+function normalizeRecordList<T>(response: unknown): T[] {
+  if (Array.isArray(response)) return response as T[];
+  if (response && typeof response === "object") {
+    const record = response as Record<string, unknown>;
+    if (Array.isArray(record.records)) return record.records as T[];
+    if (record.data) return normalizeRecordList<T>(record.data);
+  }
+  return [];
+}
+
+function readRoleField(role: RoleRecord, keys: string[]) {
+  for (const key of keys) {
+    const value = role[key];
+    if (value !== undefined && value !== null && value !== "") return String(value);
+  }
+  return "";
+}
+
+function normalizeApproverRoles(response: unknown) {
+  const roles = normalizeRecordList<RoleRecord>(response)
+    .map((role) => readRoleField(role, ["roleCode", "role_code", "code", "value"]) || readRoleField(role, ["roleName", "role_name", "name", "label"]))
+    .filter(Boolean);
+  return Array.from(new Set(["SUPER_ADMIN", ...roles]));
 }
 
 const designerTokens = {
@@ -89,6 +119,8 @@ export function WorkflowDesigner() {
   const [saveError, setSaveError] = useState<string | null>(null);
   const [serverStatus, setServerStatus] = useState<string>("UNCONFIGURED");
   const [serverVersion, setServerVersion] = useState(0);
+  const [approverRoleOptions, setApproverRoleOptions] = useState<string[]>(["SUPER_ADMIN"]);
+  const [roleDetailOptions, setRoleDetailOptions] = useState<Array<{ roleCode: string; roleName: string }>>([]);
 
   useEffect(() => {
     if (!isBusinessType(requestedBusinessType)) {
@@ -104,7 +136,7 @@ export function WorkflowDesigner() {
       try {
         const serverDefinition = await workflowDefinitionService.get(businessType);
         if (cancelled) return;
-        const parsedDefinition = definitionFromApi(serverDefinition.definition);
+        const parsedDefinition = definitionFromApi(serverDefinition.definition, businessType);
         const nextNodes = parsedDefinition?.nodes ?? cloneInitialNodes();
         const nextEdges = parsedDefinition?.edges ?? cloneInitialEdges();
         setNodes(nextNodes);
@@ -133,6 +165,37 @@ export function WorkflowDesigner() {
     };
   }, [businessType, setEdges, setNodes]);
 
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadApproverRoles() {
+      try {
+        const rawRoles = normalizeRecordList<RoleRecord>(await roleService.getAll());
+        const roleCodes = rawRoles
+          .map((role) => readRoleField(role, ["roleCode", "role_code", "code", "value"]) || readRoleField(role, ["roleName", "role_name", "name", "label"]))
+          .filter(Boolean);
+        const uniqueCodes = Array.from(new Set(["SUPER_ADMIN", ...roleCodes]));
+        if (!cancelled && uniqueCodes.length > 0) {
+          setApproverRoleOptions(uniqueCodes);
+          setRoleDetailOptions(rawRoles.map((role) => ({
+            roleCode: readRoleField(role, ["roleCode", "role_code", "code", "value"]),
+            roleName: readRoleField(role, ["roleName", "role_name", "name", "label"]),
+          })).filter((r) => r.roleCode));
+        }
+      } catch {
+        if (!cancelled) {
+          setApproverRoleOptions(["SUPER_ADMIN"]);
+          setRoleDetailOptions([]);
+        }
+      }
+    }
+
+    loadApproverRoles();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const selectedNode = useMemo(
     () => nodes.find((node) => node.id === selectedNodeId) ?? null,
     [nodes, selectedNodeId],
@@ -147,6 +210,26 @@ export function WorkflowDesigner() {
       edges,
     }),
     [businessFlow.description, businessFlow.name, businessType, edges, nodes],
+  );
+
+  const normalizedFlowDefinition = useMemo(
+    () => normalizeWorkflowDefinition(flowDefinition, businessType),
+    [businessType, flowDefinition],
+  );
+
+  const validationErrors = useMemo(
+    () => validateWorkflowDefinition(normalizedFlowDefinition),
+    [normalizedFlowDefinition],
+  );
+
+  const ensureValidDefinition = useCallback(
+    (action: string) => {
+      if (validationErrors.length === 0) return true;
+      setSaveMessage(null);
+      setSaveError(`${action}前请先补全流程设计：${validationErrors.join("；")}`);
+      return false;
+    },
+    [validationErrors],
   );
 
   const handleBusinessTypeChange = useCallback(
@@ -215,35 +298,22 @@ export function WorkflowDesigner() {
   );
 
   const handleSaveDraft = useCallback(async () => {
-    const invalidApprovalNodes = flowDefinition.nodes.filter(
-      (node) => node.type === "approval" && !node.data.approverRole.trim(),
-    );
-
-    if (invalidApprovalNodes.length > 0) {
-      setSelectedNodeId(invalidApprovalNodes[0].id);
-      setSaveMessage(null);
-      setSaveError(
-        `保存前请先配置审批节点的审批角色：${invalidApprovalNodes
-          .map((node) => node.data.label || node.id)
-          .join("、")}`,
-      );
-      return;
-    }
-
     try {
       const savedDefinition = await workflowDefinitionService.saveDraft(businessType, {
-        name: flowDefinition.name,
-        description: flowDefinition.description,
-        definition: { ...flowDefinition, businessType },
+        name: normalizedFlowDefinition.name,
+        description: normalizedFlowDefinition.description,
+        definition: normalizedFlowDefinition,
       });
-      localStorage.setItem(getDraftStorageKey(businessType), JSON.stringify({ ...flowDefinition, businessType, savedAt: new Date().toISOString() }));
+      localStorage.setItem(getDraftStorageKey(businessType), JSON.stringify({ ...normalizedFlowDefinition, savedAt: new Date().toISOString() }));
       setServerStatus(savedDefinition.status);
       setServerVersion(savedDefinition.version);
       setSaveError(null);
-      setSaveMessage(`${businessFlow.name}已保存到后端流程定义草稿。`);
+      setSaveMessage(validationErrors.length > 0
+        ? `${businessFlow.name}已保存到后端流程定义草稿，发布前仍需补全校验项。`
+        : `${businessFlow.name}已保存到后端流程定义草稿。`);
     } catch (error) {
       try {
-        localStorage.setItem(getDraftStorageKey(businessType), JSON.stringify({ ...flowDefinition, businessType, savedAt: new Date().toISOString() }));
+        localStorage.setItem(getDraftStorageKey(businessType), JSON.stringify({ ...normalizedFlowDefinition, savedAt: new Date().toISOString() }));
         setSaveMessage(`${businessFlow.name}已保存为本地流程定义草稿，后端保存失败后可稍后重试。`);
         setSaveError(error instanceof Error ? error.message : "后端保存流程草稿失败");
       } catch (storageError) {
@@ -251,7 +321,35 @@ export function WorkflowDesigner() {
         setSaveError(storageError instanceof Error ? storageError.message : "保存流程草稿失败");
       }
     }
-  }, [businessFlow.name, businessType, flowDefinition]);
+  }, [businessFlow.name, businessType, normalizedFlowDefinition, validationErrors.length]);
+
+  const handlePublish = useCallback(async () => {
+    if (!ensureValidDefinition("发布")) {
+      return;
+    }
+
+    try {
+      await workflowDefinitionService.saveDraft(businessType, {
+        name: normalizedFlowDefinition.name,
+        description: normalizedFlowDefinition.description,
+        definition: normalizedFlowDefinition,
+      });
+      localStorage.setItem(getDraftStorageKey(businessType), JSON.stringify({ ...normalizedFlowDefinition, savedAt: new Date().toISOString() }));
+      const publishedDefinition = await workflowDefinitionService.publish(businessType);
+      setServerStatus(publishedDefinition.status);
+      setServerVersion(publishedDefinition.version);
+      setSaveError(null);
+      setSaveMessage(`${businessFlow.name}已发布为 v${publishedDefinition.version}，业务表单将按该流程进入审批。`);
+    } catch (error) {
+      setSaveMessage(null);
+      const message = error instanceof Error ? error.message : "发布流程失败";
+      setSaveError(message);
+      // 提示用户检查审批节点配置是否合法（角色需存在且至少有一个启用用户）
+      if (message.includes("审批角色") || message.includes("审批人")) {
+        console.warn("[WorkflowDesigner] 发布校验失败，请检查审批节点配置:", message);
+      }
+    }
+  }, [businessFlow.name, businessType, ensureValidDefinition, normalizedFlowDefinition]);
 
   return (
     <div className="space-y-6" style={designerTokens}>
@@ -296,11 +394,21 @@ export function WorkflowDesigner() {
             <Sparkles className="size-4" />
             保存流程草稿
           </Button>
+          <Button onClick={handlePublish} variant="outline" className="border-green-200 bg-green-50 text-green-700 hover:bg-green-100">
+            <Workflow className="size-4" />
+            发布并启用
+          </Button>
         </div>
       </div>
 
       {saveMessage ? <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">{saveMessage}</div> : null}
       {saveError ? <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{saveError}</div> : null}
+      {validationErrors.length > 0 ? (
+        <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-800">
+          <div className="font-semibold">流程设计待补全</div>
+          <div>{validationErrors.join("；")}</div>
+        </div>
+      ) : null}
 
       <Card className="border-0 bg-[var(--workflow-surface)] shadow-none">
         <CardContent className="space-y-4 p-5">
@@ -348,6 +456,8 @@ export function WorkflowDesigner() {
             <NodeConfigPanel
               selectedNode={selectedNode}
               edges={edges}
+              approverRoles={approverRoleOptions}
+              roleDetails={roleDetailOptions}
               onUpdateNode={handleUpdateNode}
               onDeleteNode={handleDeleteNode}
             />

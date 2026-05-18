@@ -33,10 +33,11 @@ import type {
   ApprovalHistoryItem,
 } from '../services/approval/types';
 import {
-  fetchPendingApprovals as apiFetchPending,
+  getApprovalList as apiGetApprovalList,
   approve as apiApprove,
   reject as apiReject,
   getApprovalHistory as apiGetHistory,
+  cancelProcess as apiCancelProcess,
 } from '../services/approval/api';
 import { ApprovalServiceError, createValidationError } from '../services/approval/errors';
 
@@ -144,21 +145,21 @@ export function ApprovalStoreProvider({ children }: { children: ReactNode }) {
     }));
   }, []);
 
-  /** Fetch pending approvals from the API */
+  /** Fetch approval processes from the API. */
   const fetchPendingApprovals = useCallback(async () => {
     setState((prev) => ({ ...prev, isLoading: true, error: null }));
     try {
-      const items = await apiFetchPending();
+      const result = await apiGetApprovalList({ page: 1, pageSize: 100 });
       setState((prev) => ({
         ...prev,
-        pendingApprovals: items,
+        pendingApprovals: result.records,
         isLoading: false,
       }));
     } catch (err) {
       const message =
         err instanceof ApprovalServiceError
           ? err.message
-          : '获取待审批列表失败';
+          : '获取审批列表失败';
       setState((prev) => ({
         ...prev,
         pendingApprovals: [],
@@ -174,11 +175,11 @@ export function ApprovalStoreProvider({ children }: { children: ReactNode }) {
       setState((prev) => ({ ...prev, isLoading: true, error: null }));
       try {
         await apiApprove(processId, opinion);
-        // Refresh the pending list after approval
-        const items = await apiFetchPending();
+        // Refresh the visible approval list after approval.
+        const result = await apiGetApprovalList({ page: 1, pageSize: 100 });
         setState((prev) => ({
           ...prev,
-          pendingApprovals: items,
+          pendingApprovals: result.records,
           isLoading: false,
         }));
         return true;
@@ -214,11 +215,11 @@ export function ApprovalStoreProvider({ children }: { children: ReactNode }) {
       setState((prev) => ({ ...prev, isLoading: true, error: null }));
       try {
         await apiReject(processId, opinion);
-        // Refresh the pending list after rejection
-        const items = await apiFetchPending();
+        // Refresh the visible approval list after rejection.
+        const result = await apiGetApprovalList({ page: 1, pageSize: 100 });
         setState((prev) => ({
           ...prev,
-          pendingApprovals: items,
+          pendingApprovals: result.records,
           isLoading: false,
         }));
         return true;

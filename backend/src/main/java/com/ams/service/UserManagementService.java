@@ -17,6 +17,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 @Service
 public class UserManagementService {
 
@@ -57,6 +62,34 @@ public class UserManagementService {
         return result;
     }
 
+    /** 关键词搜索用户（用于流程设计器审批人选择） */
+    public List<User> searchUsers(String keyword) {
+        QueryWrapper<User> wrapper = new QueryWrapper<>();
+        wrapper.eq("status", 1);
+        if (keyword != null && !keyword.isBlank()) {
+            wrapper.and(w -> w.like("username", keyword)
+                .or()
+                .like("real_name", keyword)
+                .or()
+                .like("phone", keyword));
+        }
+        wrapper.select("id", "username", "real_name", "email", "phone", "dept_id", "status")
+               .last("limit 50");
+        List<User> users = userMapper.selectList(wrapper);
+        users.forEach(user -> BeanUtil.setProperty(user, "password", null));
+        return users;
+    }
+
+    /** 获取用户的角色ID列表 */
+    public List<Long> getUserRoleIds(Long userId) {
+        return userRoleMapper.selectRoleIdsByUserId(userId);
+    }
+
+    /** 获取用户的角色编码列表 */
+    public List<String> getUserRoleCodes(Long userId) {
+        return userRoleMapper.selectRoleCodesByUserId(userId);
+    }
+
     public User getUserById(Long id) {
         User user = userMapper.selectById(id);
         if (user == null) {
@@ -64,6 +97,38 @@ public class UserManagementService {
         }
         BeanUtil.setProperty(user, "password", null);
         return user;
+    }
+
+    /** 获取用户详情（附带角色信息） */
+    public Map<String, Object> getUserDetailWithRoles(Long id) {
+        User user = getUserById(id);
+        List<Long> roleIds = getUserRoleIds(id);
+        List<String> roleCodes = getUserRoleCodes(id);
+
+        List<Map<String, Object>> roles = new ArrayList<>();
+        for (Long roleId : roleIds) {
+            Role role = roleMapper.selectById(roleId);
+            if (role != null) {
+                Map<String, Object> roleMap = new HashMap<>();
+                roleMap.put("id", role.getId());
+                roleMap.put("roleCode", role.getRoleCode());
+                roleMap.put("roleName", role.getRoleName());
+                roles.add(roleMap);
+            }
+        }
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("id", user.getId());
+        result.put("username", user.getUsername());
+        result.put("realName", user.getRealName());
+        result.put("email", user.getEmail());
+        result.put("phone", user.getPhone());
+        result.put("deptId", user.getDeptId());
+        result.put("status", user.getStatus());
+        result.put("roleIds", roleIds);
+        result.put("roles", roles);
+        result.put("roleCodes", roleCodes);
+        return result;
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -87,17 +152,23 @@ public class UserManagementService {
         BeanUtil.setProperty(user, "status", 1);
         userMapper.insert(user);
 
-        Role defaultRole = roleMapper.selectOne(
-            new QueryWrapper<Role>().eq("role_code", "USER").last("limit 1")
-        );
-        if (defaultRole == null) {
-            throw new BusinessException("默认角色USER不存在");
+        // 处理角色分配
+        List<Long> roleIds = dto.getRoleIds();
+        if (roleIds != null && !roleIds.isEmpty()) {
+            assignRolesToUser(user.getId(), roleIds);
+        } else {
+            // 默认分配 USER 角色
+            Role defaultRole = roleMapper.selectOne(
+                new QueryWrapper<Role>().eq("role_code", "USER").last("limit 1")
+            );
+            if (defaultRole == null) {
+                throw new BusinessException("默认角色USER不存在");
+            }
+            UserRole userRole = new UserRole();
+            BeanUtil.setProperty(userRole, "userId", user.getId());
+            BeanUtil.setProperty(userRole, "roleId", defaultRole.getId());
+            userRoleMapper.insert(userRole);
         }
-
-        UserRole userRole = new UserRole();
-        BeanUtil.setProperty(userRole, "userId", getLongProp(user, "id"));
-        BeanUtil.setProperty(userRole, "roleId", getLongProp(defaultRole, "id"));
-        userRoleMapper.insert(userRole);
 
         BeanUtil.setProperty(user, "password", null);
         return user;
@@ -112,8 +183,31 @@ public class UserManagementService {
         BeanUtil.setProperty(user, "deptId", getLongProp(dto, "deptId"));
         userMapper.updateById(user);
 
+        // 处理角色更新：先删旧关联，再写入新关联
+        List<Long> roleIds = dto.getRoleIds();
+        if (roleIds != null) {
+            userRoleMapper.deleteByUserId(id);
+            if (!roleIds.isEmpty()) {
+                assignRolesToUser(id, roleIds);
+            }
+        }
+
         BeanUtil.setProperty(user, "password", null);
         return user;
+    }
+
+    /** 为用户批量分配角色 */
+    private void assignRolesToUser(Long userId, List<Long> roleIds) {
+        for (Long roleId : roleIds) {
+            Role role = roleMapper.selectById(roleId);
+            if (role == null || role.getStatus() == null || role.getStatus() != 1) {
+                throw new BusinessException("角色不存在或已禁用: roleId=" + roleId);
+            }
+            UserRole userRole = new UserRole();
+            BeanUtil.setProperty(userRole, "userId", userId);
+            BeanUtil.setProperty(userRole, "roleId", roleId);
+            userRoleMapper.insert(userRole);
+        }
     }
 
     @Transactional(rollbackFor = Exception.class)
