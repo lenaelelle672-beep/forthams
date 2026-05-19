@@ -213,7 +213,7 @@ export function AssetRegistry() {
             导出数据
           </button>
           <button 
-            onClick={openCreateModal}
+            onClick={() => navigate('/assets/new')}
             className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors flex items-center gap-2"
           >
             <Plus className="w-4 h-4" />
@@ -348,21 +348,15 @@ export function AssetRegistry() {
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 sticky right-0 bg-white group-hover:bg-gray-50 z-10 shadow-[-1px_0_0_0_#e5e7eb]">
                     <div className="flex items-center gap-2">
                       <button 
-                        onClick={() => {
-                          setSelectedAsset(asset);
-                          setShowDetailModal(true);
-                        }}
+                        onClick={() => navigate(`/assets/${getAssetId(asset)}`)}
                         className="p-1 hover:bg-gray-100 rounded transition-colors" title="查看详情">
                         <Eye className="w-4 h-4 text-gray-600" />
                       </button>
-                      <button onClick={() => openEditModal(asset)} className="p-1 hover:bg-gray-100 rounded transition-colors" title="编辑">
+                      <button onClick={() => navigate(`/assets/${getAssetId(asset)}/edit`)} className="p-1 hover:bg-gray-100 rounded transition-colors" title="编辑">
                         <Edit className="w-4 h-4 text-gray-600" />
                       </button>
                       <button 
-                        onClick={() => {
-                          setSelectedAsset(asset);
-                          setShowDisposalModal(true);
-                        }}
+                        onClick={() => navigate(`/disposals?assetId=${encodeURIComponent(String(getAssetId(asset)))}`)}
                         className="p-1 hover:bg-red-50 text-red-600 rounded transition-colors" title="资产处置">
                         <ShieldAlert className="w-4 h-4" />
                       </button>

@@ -10,6 +10,12 @@ const Dashboard = withSuspense(
 const AssetRegistry = withSuspense(
   lazy(() => import("./pages/AssetRegistry").then((module) => ({ default: module.AssetRegistry }))),
 );
+const AssetFormPage = withSuspense(
+  lazy(() => import("./pages/assets/AssetFormPage").then((module) => ({ default: module.default }))),
+);
+const AssetDetailPage = withSuspense(
+  lazy(() => import("./pages/assets/AssetDetailPage").then((module) => ({ default: module.AssetDetailPage }))),
+);
 const ImportantEquipment = withSuspense(
   lazy(() => import("./pages/ImportantEquipment").then((module) => ({ default: module.ImportantEquipment }))),
 );
@@ -118,6 +124,9 @@ export const router = createBrowserRouter([
           { index: true, Component: Dashboard },
           { path: "dashboard", Component: Dashboard },
           { path: "assets", Component: AssetRegistry },
+          { path: "assets/new", Component: AssetFormPage },
+          { path: "assets/:id/edit", Component: AssetFormPage },
+          { path: "assets/:id", Component: AssetDetailPage },
           { path: "equipment", Component: ImportantEquipment },
           { path: "inventory", Component: RFIDInventory },
           { path: "idle", Component: IdleAssets },

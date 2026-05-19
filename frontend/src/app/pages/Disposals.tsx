@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
-import { useNavigate } from "react-router";
-import { ArrowRightLeft, LogOut, Trash2, DollarSign, Plus, Search } from "lucide-react";
+import { useNavigate, useSearchParams } from "react-router";
+import { ArrowRightLeft, LogOut, Trash2, DollarSign, Plus, Search, Eye } from "lucide-react";
 import { api } from "../utils/api";
 
 const tabs = [
@@ -37,11 +37,13 @@ interface PageResult<T> {
 
 export function Disposals() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState('transfer');
   const [data, setData] = useState<DisposalRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedRecord, setSelectedRecord] = useState<DisposalRecord | null>(null);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
@@ -106,7 +108,8 @@ export function Disposals() {
         <button
           onClick={() => {
             const route = routeMap[activeTab];
-            if (route) navigate(route);
+            const assetId = searchParams.get('assetId');
+            if (route) navigate(assetId ? `${route}?assetId=${encodeURIComponent(assetId)}` : route);
           }}
           className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors flex items-center gap-2"
         >
@@ -169,6 +172,7 @@ export function Disposals() {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">操作人ID</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">创建时间</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">原因</th>
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">操作</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
@@ -180,11 +184,20 @@ export function Disposals() {
                   <td className="px-6 py-4 text-sm text-gray-900">{item.operatorId ?? '-'}</td>
                   <td className="px-6 py-4 text-sm text-gray-600">{item.createTime ?? '-'}</td>
                   <td className="px-6 py-4 text-sm text-gray-600">{item.reason ?? '-'}</td>
+                  <td className="px-6 py-4 text-center">
+                    <button
+                      onClick={() => setSelectedRecord(item)}
+                      className="inline-flex items-center justify-center p-1 rounded transition-colors hover:bg-gray-100"
+                      title="查看详情"
+                    >
+                      <Eye className="w-4 h-4 text-gray-600" />
+                    </button>
+                  </td>
                 </tr>
               ))}
               {filteredData.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-6 py-8 text-center text-gray-500 text-sm">暂无数据</td>
+                  <td colSpan={7} className="px-6 py-8 text-center text-gray-500 text-sm">暂无数据</td>
                 </tr>
               )}
             </tbody>
@@ -224,6 +237,30 @@ export function Disposals() {
           </div>
         )}
       </div>
+
+      {selectedRecord && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => setSelectedRecord(null)}>
+          <div className="w-full max-w-xl rounded-lg bg-white shadow-xl mx-4" onClick={(event) => event.stopPropagation()}>
+            <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-gray-900">处置记录详情</h3>
+              <button onClick={() => setSelectedRecord(null)} className="text-gray-400 hover:text-gray-600">✕</button>
+            </div>
+            <div className="p-6 grid grid-cols-2 gap-4 text-sm">
+              <div><span className="text-gray-500">日志ID：</span><span className="font-medium">{selectedRecord.id}</span></div>
+              <div><span className="text-gray-500">资产ID：</span><span className="font-medium">{selectedRecord.assetId ?? '-'}</span></div>
+              <div><span className="text-gray-500">变更类型：</span><span className="font-medium">{changeTypeLabels[selectedRecord.changeType ?? ''] ?? selectedRecord.changeType ?? '-'}</span></div>
+              <div><span className="text-gray-500">操作人ID：</span><span className="font-medium">{selectedRecord.operatorId ?? '-'}</span></div>
+              <div className="col-span-2"><span className="text-gray-500">创建时间：</span><span className="font-medium">{selectedRecord.createTime ?? '-'}</span></div>
+              <div className="col-span-2"><span className="text-gray-500">变更前：</span><p className="mt-1 rounded bg-gray-50 p-3 text-gray-700">{selectedRecord.oldValue || '-'}</p></div>
+              <div className="col-span-2"><span className="text-gray-500">变更后：</span><p className="mt-1 rounded bg-gray-50 p-3 text-gray-700">{selectedRecord.newValue || '-'}</p></div>
+              <div className="col-span-2"><span className="text-gray-500">原因：</span><p className="mt-1 rounded bg-gray-50 p-3 text-gray-700">{selectedRecord.reason || '-'}</p></div>
+            </div>
+            <div className="px-6 py-4 border-t border-gray-200 flex justify-end">
+              <button onClick={() => setSelectedRecord(null)} className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg transition-colors">关闭</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
