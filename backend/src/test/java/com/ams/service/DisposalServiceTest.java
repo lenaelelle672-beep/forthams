@@ -7,6 +7,7 @@ import com.ams.dto.AssetTransferDTO;
 import com.ams.entity.Asset;
 import com.ams.enums.AssetStatus;
 import com.ams.mapper.AssetChangeLogMapper;
+import com.ams.mapper.AssetMapper;
 import com.ams.service.DisposalService;
 import com.ams.service.AssetLifecycleService;
 import com.ams.service.WorkflowDefinitionService;
@@ -31,13 +32,16 @@ class DisposalServiceTest {
     private AssetChangeLogMapper assetChangeLogMapper;
 
     @Mock
+    private AssetMapper assetMapper;
+
+    @Mock
     private WorkflowDefinitionService workflowDefinitionService;
 
     private DisposalService disposalService;
 
     @BeforeEach
     void setUp() {
-        disposalService = new DisposalService(assetLifecycleService, assetChangeLogMapper, workflowDefinitionService);
+        disposalService = new DisposalService(assetLifecycleService, assetChangeLogMapper, assetMapper, workflowDefinitionService);
     }
 
     // ── transferAsset tests ──────────────────────────────────────────────

@@ -14,7 +14,7 @@
     "test:coverage": "vitest --coverage",
     "test:coverage:full": "vitest --coverage --coverage.all=true --coverage.include='src/**/*.{ts,tsx}'",
     "e2e": "playwright test",
-    "e2e:real": "AMS_E2E_REAL_BACKEND=true playwright test src/e2e/real-backend-smoke.spec.ts",
+    "e2e:real": "AMS_E2E_REAL_BACKEND=true playwright test --project=real-backend-smoke",
     "e2e:ui": "playwright test --ui"
   },
   "dependencies": {

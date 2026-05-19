@@ -8,7 +8,9 @@ export interface FlowNodeData extends Record<string, unknown> {
   description: string;
   nodeCode: string;
   triggerType: string;
+  approverType: "role" | "user";
   approverRole: string;
+  approverId: string;
   approvalMode: "any" | "all" | "sequence";
   conditionExpression: string;
   trueLabel: string;
@@ -62,7 +64,9 @@ const NODE_DEFAULTS: Record<FlowNodeType, Omit<FlowNodeData, "type">> = {
     description: "从资产申请单提交开始",
     nodeCode: "START-001",
     triggerType: "表单提交",
+    approverType: "role",
     approverRole: "",
+    approverId: "",
     approvalMode: "sequence",
     conditionExpression: "",
     trueLabel: "",
@@ -74,7 +78,9 @@ const NODE_DEFAULTS: Record<FlowNodeType, Omit<FlowNodeData, "type">> = {
     description: "由部门负责人审核资产申请",
     nodeCode: "APP-001",
     triggerType: "",
+    approverType: "role",
     approverRole: "SUPER_ADMIN",
+    approverId: "",
     approvalMode: "sequence",
     conditionExpression: "",
     trueLabel: "",
@@ -86,7 +92,9 @@ const NODE_DEFAULTS: Record<FlowNodeType, Omit<FlowNodeData, "type">> = {
     description: "根据金额或字段命中不同路径",
     nodeCode: "COND-001",
     triggerType: "",
+    approverType: "role",
     approverRole: "",
+    approverId: "",
     approvalMode: "sequence",
     conditionExpression: "申请金额 >= 5000",
     trueLabel: "满足条件",
@@ -98,7 +106,9 @@ const NODE_DEFAULTS: Record<FlowNodeType, Omit<FlowNodeData, "type">> = {
     description: "流程结束并同步审批结果",
     nodeCode: "END-001",
     triggerType: "",
+    approverType: "role",
     approverRole: "",
+    approverId: "",
     approvalMode: "sequence",
     conditionExpression: "",
     trueLabel: "",
@@ -181,6 +191,7 @@ export const initialFlowNodes: FlowNode[] = [
       label: "部门负责人审批",
       description: "确认必要性、预算归属与领用部门",
       nodeCode: "APP-DEPT",
+      approverType: "role",
       approverRole: "SUPER_ADMIN",
       approvalMode: "sequence",
     },
@@ -202,6 +213,7 @@ export const initialFlowNodes: FlowNode[] = [
       label: "财务复核",
       description: "确认预算科目与付款计划",
       nodeCode: "APP-FINANCE",
+      approverType: "role",
       approverRole: "SUPER_ADMIN",
       approvalMode: "all",
     },

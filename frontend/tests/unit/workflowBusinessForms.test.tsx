@@ -66,6 +66,16 @@ function input(container: HTMLElement, name: string) {
   return element as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
 }
 
+async function selectAssetFromPicker(openButtonTestId: string, assetId: number | string) {
+  fireEvent.click(screen.getByTestId(openButtonTestId));
+  await waitFor(() => expect(assetService.list).toHaveBeenLastCalledWith({
+    keyword: undefined,
+    page: 1,
+    pageSize: 20,
+  }));
+  fireEvent.click(await screen.findByTestId(`asset-row-${assetId}`));
+}
+
 async function submitApprovalForm(container: HTMLElement) {
   fireEvent.click(screen.getByRole('button', { name: /提交审批/ }));
   await waitFor(() => expect(approvalService.create).toHaveBeenCalledTimes(1));
@@ -116,9 +126,7 @@ describe('workflow business forms', () => {
 
   it('submits asset transfer as an approval process with complete business data', async () => {
     const { container } = render(<AssetTransferForm />);
-    await waitFor(() => expect(assetService.list).toHaveBeenCalledWith({ page: 1, pageSize: 50 }));
-
-    fireEvent.change(screen.getByTestId('asset-select'), { target: { value: '1001' } });
+    await selectAssetFromPicker('open-transfer-asset-picker', 1001);
 
     await waitFor(() => expect(input(container, 'assetName')).toHaveValue('研发示波器'));
     expect(input(container, 'transferDeptCode')).toHaveValue('2001');
@@ -157,20 +165,24 @@ describe('workflow business forms', () => {
     expect(toast.success).toHaveBeenCalledWith('资产转移申请已提交');
   });
 
-  it('fills asset transfer fields by asset ID blur and submits numeric DTO payload', async () => {
-    vi.mocked(assetService.getById).mockResolvedValueOnce({
+  it('fills asset transfer fields from picker and submits numeric DTO payload', async () => {
+    vi.mocked(assetService.list).mockResolvedValueOnce({
+      records: [{
       id: 1005,
       name: '机房服务器',
       deptName: '运维部',
       deptId: 4001,
       location: '数据中心 A 区',
+      }],
+      total: 1,
+      size: 20,
+      current: 1,
+      pages: 1,
     });
 
     const { container } = render(<AssetTransferForm />);
-    fireEvent.change(input(container, 'assetIds'), { target: { value: '1005' } });
-    fireEvent.blur(input(container, 'assetIds'));
+    await selectAssetFromPicker('open-transfer-asset-picker', 1005);
 
-    await waitFor(() => expect(assetService.getById).toHaveBeenCalledWith('1005'));
     await waitFor(() => expect(input(container, 'assetName')).toHaveValue('机房服务器'));
     expect(input(container, 'transferDeptCode')).toHaveValue('4001');
     expect(input(container, 'transferDept')).toHaveValue('运维部');
@@ -230,39 +242,26 @@ describe('workflow business forms', () => {
     expect(input(secondRender.container, 'transferReason')).toHaveValue('待补充附件后提交');
   });
 
-  it('keeps manual asset transfer submission available when asset lookup fails', async () => {
-    vi.mocked(assetService.getById).mockRejectedValueOnce(new Error('not found'));
-
+  it('keeps transfer submission blocked until a real ledger asset is selected', async () => {
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
     const { container } = render(<AssetTransferForm />);
-    fireEvent.change(input(container, 'assetIds'), { target: { value: '1006' } });
-    fireEvent.blur(input(container, 'assetIds'));
-
-    await waitFor(() => expect(assetService.getById).toHaveBeenCalledWith('1006'));
-    expect(await screen.findByTestId('asset-lookup-message')).toHaveTextContent('可继续手工填写后提交');
 
     fireEvent.change(input(container, 'receiveDeptCode'), { target: { value: '3003' } });
     fireEvent.change(input(container, 'receiver'), { target: { value: '44' } });
     fireEvent.change(input(container, 'receiveArea'), { target: { value: '临港园区' } });
     fireEvent.change(input(container, 'transferReason'), { target: { value: '手工录入资产转移' } });
 
-    const { businessData } = await submitApprovalForm(container);
+    fireEvent.click(screen.getByRole('button', { name: /提交审批/ }));
 
-    expect(businessData).toMatchObject({
-      assetId: 1006,
-      assetIds: '1006',
-      targetDeptId: 3003,
-      targetUserId: 44,
-      targetLocation: '临港园区',
-      reason: '手工录入资产转移',
-      transferReason: '手工录入资产转移',
-    });
+    await waitFor(() => expect(approvalService.create).not.toHaveBeenCalled());
+    expect(await screen.findByText('请先从资产台账选择资产')).toBeInTheDocument();
+    consoleErrorSpy.mockRestore();
   });
 
   it('submits asset clearance as an approval process with clearance payload', async () => {
     const { container } = render(<AssetClearanceForm />);
     const clearanceReason = '资产状态良好，已发布闲置公告满三个月';
-    fireEvent.change(input(container, 'assetId'), { target: { value: '1002' } });
-    fireEvent.change(input(container, 'assetName'), { target: { value: '闲置笔记本' } });
+    await selectAssetFromPicker('open-clearance-asset-picker', 1001);
     fireEvent.change(input(container, 'idleAssetType'), { target: { value: '便携机' } });
     fireEvent.change(input(container, 'clearanceReason'), { target: { value: clearanceReason } });
     fireEvent.change(input(container, 'storageLocation'), { target: { value: 'A 库房' } });
@@ -272,12 +271,12 @@ describe('workflow business forms', () => {
     expect(approvalPayload).toMatchObject({
       processType: 'ASSET_CLEARANCE',
       businessType: 'ASSET_CLEARANCE',
-      businessId: 1002,
+      businessId: 1001,
       description: clearanceReason,
     });
     expect(businessData).toMatchObject({
-      assetId: 1002,
-      assetName: '闲置笔记本',
+      assetId: 1001,
+      assetName: '研发示波器',
       idleAssetType: '便携机',
       clearanceReason,
       storageLocation: 'A 库房',
@@ -289,10 +288,7 @@ describe('workflow business forms', () => {
     const { container } = render(<AssetClearanceForm />);
     const clearanceReason = '闲置资产性能不佳，尚有利用价值，集中清退库房后期利用（一般为IT建议）';
 
-    fireEvent.click(screen.getByTestId('clearance-load-assets-btn'));
-    await waitFor(() => expect(assetService.list).toHaveBeenCalledWith({ page: 1, pageSize: 50 }));
-
-    fireEvent.change(screen.getByTestId('clearance-asset-select'), { target: { value: '1001' } });
+    await selectAssetFromPicker('open-clearance-asset-picker', 1001);
 
     expect(input(container, 'assetId')).toHaveValue('1001');
     expect(input(container, 'assetName')).toHaveValue('研发示波器');
@@ -321,8 +317,7 @@ describe('workflow business forms', () => {
 
   it('submits asset scrap as an approval process with scrap payload', async () => {
     const { container } = render(<AssetScrapForm />);
-    fireEvent.change(input(container, 'assetId'), { target: { value: '1003' } });
-    fireEvent.change(input(container, 'assetName'), { target: { value: '老旧台式机' } });
+    await selectAssetFromPicker('open-scrap-asset-picker', 1001);
     fireEvent.change(input(container, 'scrapReason'), { target: { value: '设备报废' } });
 
     const { approvalPayload, businessData } = await submitApprovalForm(container);
@@ -330,12 +325,12 @@ describe('workflow business forms', () => {
     expect(approvalPayload).toMatchObject({
       processType: 'ASSET_SCRAP',
       businessType: 'ASSET_SCRAP',
-      businessId: 1003,
+      businessId: 1001,
       description: '设备报废',
     });
     expect(businessData).toMatchObject({
-      assetId: 1003,
-      assetName: '老旧台式机',
+      assetId: 1001,
+      assetName: '研发示波器',
       scrapReason: '设备报废',
       reason: '设备报废',
     });

@@ -19,7 +19,9 @@ function validDefinition(): FlowDefinition {
           description: '表单提交后开始',
           nodeCode: 'START-001',
           triggerType: '表单提交',
+          approverType: 'role',
           approverRole: '',
+          approverId: '',
           approvalMode: 'sequence',
           conditionExpression: '',
           trueLabel: '',
@@ -37,7 +39,9 @@ function validDefinition(): FlowDefinition {
           description: '部门负责人审批',
           nodeCode: 'APP-001',
           triggerType: '',
+          approverType: 'role',
           approverRole: 'DEPARTMENT_MANAGER',
+          approverId: '',
           approvalMode: 'sequence',
           conditionExpression: '',
           trueLabel: '',
@@ -55,7 +59,9 @@ function validDefinition(): FlowDefinition {
           description: '按金额走不同路径',
           nodeCode: 'COND-001',
           triggerType: '',
+          approverType: 'role',
           approverRole: '',
+          approverId: '',
           approvalMode: 'sequence',
           conditionExpression: 'amount >= 5000',
           trueLabel: '大额',
@@ -73,7 +79,9 @@ function validDefinition(): FlowDefinition {
           description: '同步业务结果',
           nodeCode: 'END-001',
           triggerType: '',
+          approverType: 'role',
           approverRole: '',
+          approverId: '',
           approvalMode: 'sequence',
           conditionExpression: '',
           trueLabel: '',
@@ -190,11 +198,8 @@ describe('workflow definition validation', () => {
     const normalized = normalizeWorkflowDefinition(validDefinition(), 'ASSET_TRANSFER');
     const approvalNode = normalized.nodes.find(n => n.type === 'approval' && n.id === 'approval-1');
     expect(approvalNode).toBeDefined();
-    // When no approverType is set, the node still has a valid approverRole
     expect(approvalNode!.data.approverRole).toBe('DEPARTMENT_MANAGER');
-    // approverType should be undefined/falsy when not explicitly set
-    const approverType = (approvalNode!.data as Record<string, unknown>).approverType;
-    expect(!approverType || approverType === '').toBe(true);
+    expect(approvalNode!.data.approverType).toBe('role');
   });
 
   it('allows switching approverType from role to user', () => {
@@ -219,9 +224,34 @@ describe('workflow definition validation', () => {
     );
     const approvalNode = switched.nodes.find(n => n.type === 'approval' && n.id === 'approval-1');
     expect(approvalNode).toBeDefined();
-    expect((approvalNode!.data as Record<string, unknown>).approverType).toBe('user');
-    expect((approvalNode!.data as Record<string, unknown>).approverId).toBe('99');
-    // When approverType is user, approverRole can be empty
+    expect(approvalNode!.data.approverType).toBe('user');
+    expect(approvalNode!.data.approverId).toBe('99');
     expect(approvalNode!.data.approverRole).toBe('');
+    const errors = validateWorkflowDefinition(switched);
+    expect(errors).not.toContain('审批节点approval-1审批角色不能为空');
+  });
+
+  it('rejects user-type approval node without approverId', () => {
+    const noUser = normalizeWorkflowDefinition(
+      {
+        ...validDefinition(),
+        nodes: validDefinition().nodes.map((node) =>
+          node.id === 'approval-1'
+            ? {
+                ...node,
+                data: {
+                  ...node.data,
+                  approverType: 'user',
+                  approverId: '',
+                  approverRole: '',
+                },
+              }
+            : node,
+        ),
+      },
+      'ASSET_TRANSFER',
+    );
+    const errors = validateWorkflowDefinition(noUser);
+    expect(errors).toContain('审批节点approval-1指定用户审批时审批人不能为空');
   });
 });

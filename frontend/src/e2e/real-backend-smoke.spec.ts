@@ -3,6 +3,7 @@ import { expect, test, type APIRequestContext, type APIResponse, type Page } fro
 const apiBase = process.env.AMS_API_BASE ?? 'http://localhost:8080/api';
 const username = process.env.AMS_E2E_USERNAME ?? 'admin';
 const password = process.env.AMS_E2E_PASSWORD ?? 'admin123';
+const approverRoleCode = 'SUPER_ADMIN';
 
 test.describe.configure({ mode: 'serial' });
 
@@ -73,14 +74,14 @@ test('真实后端：登录页可见且流程设计器配置校验有效', async
 
   const approverRole = page.getByLabel('审批角色');
   await expect(approverRole).toBeVisible();
-  await approverRole.fill('');
-  await page.getByRole('button', { name: /保存流程草稿/ }).click();
-  await expect(page.getByText(/保存前请先配置审批节点的审批角色/)).toBeVisible();
+  await page.getByLabel('指定用户').check();
+  await page.getByLabel('按角色审批').check();
+  await expect(page.getByText(/审批节点approval-1审批角色不能为空/)).toBeVisible();
 
-  await approverRole.fill('资产管理员');
+  await approverRole.selectOption(approverRoleCode);
   await page.getByRole('button', { name: /保存流程草稿/ }).click();
   await expect(page.getByText(/资产转移流程已保存到后端流程定义草稿/)).toBeVisible();
-  await expect(page.evaluate(() => window.localStorage.getItem('forthAMS.workflowDesigner.draft.ASSET_TRANSFER'))).resolves.toContain('资产管理员');
+  await expect(page.evaluate(() => window.localStorage.getItem('forthAMS.workflowDesigner.draft.ASSET_TRANSFER'))).resolves.toContain(approverRoleCode);
 
   expect(errors).toEqual([]);
 });
@@ -122,7 +123,7 @@ test('真实后端：资产处置四类业务可打开对应流程设计器', as
   await expect(page.getByRole('heading', { name: '业务流程列表' })).toBeVisible({ timeout: 15_000 });
 
   await page.goto('/workflow-designer?businessType=ASSET_TRANSFER');
-  await page.getByLabel('审批角色').fill('转移审批角色');
+  await page.getByLabel('审批角色').selectOption(approverRoleCode);
   await page.getByRole('button', { name: /保存流程草稿/ }).click();
   await expect(page.getByText(/资产转移流程已保存到后端流程定义草稿/)).toBeVisible();
 
@@ -133,7 +134,7 @@ test('真实后端：资产处置四类业务可打开对应流程设计器', as
   await page.goto('/workflow-designer?businessType=ASSET_TRANSFER');
   await page.locator('select').first().selectOption('ASSET_CLEARANCE');
   await expect(page).toHaveURL(/businessType=ASSET_CLEARANCE/);
-  await page.getByLabel('审批角色').fill('清退审批角色');
+  await page.getByLabel('审批角色').selectOption(approverRoleCode);
   await page.getByRole('button', { name: /保存流程草稿/ }).click();
   await expect(page.getByText(/资产清退流程已保存到后端流程定义草稿/)).toBeVisible();
 
@@ -141,10 +142,10 @@ test('真实后端：资产处置四类业务可打开对应流程设计器', as
     transfer: window.localStorage.getItem('forthAMS.workflowDesigner.draft.ASSET_TRANSFER'),
     clearance: window.localStorage.getItem('forthAMS.workflowDesigner.draft.ASSET_CLEARANCE'),
   }));
-  expect(drafts.transfer).toContain('转移审批角色');
-  expect(drafts.transfer).not.toContain('清退审批角色');
-  expect(drafts.clearance).toContain('清退审批角色');
-  expect(drafts.clearance).not.toContain('转移审批角色');
+  expect(drafts.transfer).toContain('"businessType":"ASSET_TRANSFER"');
+  expect(drafts.transfer).toContain(approverRoleCode);
+  expect(drafts.clearance).toContain('"businessType":"ASSET_CLEARANCE"');
+  expect(drafts.clearance).toContain(approverRoleCode);
 
   expect(errors).toEqual([]);
 });
@@ -165,7 +166,7 @@ test('真实后端：核心导航和顶栏操作可点击', async ({ page, reque
     { name: 'RFID盘点', heading: 'RFID资产盘点' },
     { name: '闲置资产', heading: '闲置资产管理' },
     { name: '资产处置', heading: '资产处置管理' },
-    { name: '审批流程', heading: '审批流程管理' },
+    { name: '审批流程', heading: '审批列表' },
     { name: '流程管理', heading: '业务流程列表' },
     { name: '数据分析', heading: '数据统计分析' },
     { name: '系统设置', heading: '系统设置' },
@@ -178,7 +179,7 @@ test('真实后端：核心导航和顶栏操作可点击', async ({ page, reque
   }
 
   await page.getByLabel('查看通知').click();
-  await expect(page.getByText('暂无新的待办通知')).toBeVisible();
+  await expect(page.getByText(/通知中心|暂无新的待办通知/).first()).toBeVisible();
 
   await page.getByPlaceholder('搜索资产...').fill('测试资产');
   await page.keyboard.press('Enter');

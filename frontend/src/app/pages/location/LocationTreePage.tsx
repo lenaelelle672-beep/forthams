@@ -30,6 +30,7 @@ import { toast } from "sonner";
 import { useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { DndProvider } from "react-dnd";
+import type { BackendFactory } from "dnd-core";
 import {
   locationService,
   buildLocationTree,
@@ -44,6 +45,25 @@ import type { ILocationTreeNode } from "../../types/location";
 
 /** 拖拽项类型标识 */
 const LOCATION_NODE = "LOCATION_NODE";
+
+const noopDndBackend: BackendFactory = () => ({
+  setup() {},
+  teardown() {},
+  connectDragSource: () => () => undefined,
+  connectDragPreview: () => () => undefined,
+  connectDropTarget: () => () => undefined,
+});
+
+function getDndBackend(): BackendFactory {
+  if (
+    typeof window !== "undefined" &&
+    "DragEvent" in window &&
+    "DataTransfer" in window
+  ) {
+    return HTML5Backend;
+  }
+  return noopDndBackend;
+}
 
 /** 拖拽项数据结构 */
 interface DragItem {
@@ -753,7 +773,7 @@ function LocationTreePageInner() {
  */
 export default function LocationTreePage() {
   return (
-    <DndProvider backend={HTML5Backend}>
+    <DndProvider backend={getDndBackend()}>
       <LocationTreePageInner />
     </DndProvider>
   );

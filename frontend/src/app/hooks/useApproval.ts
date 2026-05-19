@@ -15,7 +15,7 @@
  */
 
 import { useCallback, useEffect, useRef } from 'react';
-import { useApprovalStore } from '../stores/approvalStore';
+import { useApprovalStore, type ApprovalActionResult } from '../stores/approvalStore';
 
 /** Default polling interval in milliseconds. */
 const DEFAULT_POLL_INTERVAL = 15_000;
@@ -59,10 +59,10 @@ export function useApproval() {
    *
    * @param processId - The approval process ID to approve
    * @param opinion   - Optional approval comment
-   * @returns true if approval succeeded, false otherwise
+   * @returns {success: boolean, approvalId?: number} result shape
    */
   const approve = useCallback(
-    async (processId: number, opinion: string = ''): Promise<boolean> => {
+    async (processId: number, opinion: string = ''): Promise<ApprovalActionResult> => {
       return await store.approve(processId, opinion);
     },
     [store.approve],
@@ -73,10 +73,10 @@ export function useApproval() {
    *
    * @param processId - The approval process ID to reject
    * @param opinion   - Mandatory rejection reason
-   * @returns true if rejection succeeded, false otherwise
+   * @returns {success: boolean, approvalId?: number} result shape
    */
   const reject = useCallback(
-    async (processId: number, opinion: string): Promise<boolean> => {
+    async (processId: number, opinion: string): Promise<ApprovalActionResult> => {
       return await store.reject(processId, opinion);
     },
     [store.reject],
@@ -99,6 +99,7 @@ export function useApproval() {
    *
    * Fetches immediately on first call, then at regular intervals.
    * Returns a cleanup function to stop polling.
+   * Automatically cleans up on component unmount.
    *
    * @param intervalMs - Polling interval in milliseconds (default 15s)
    * @returns Cleanup function to stop polling
@@ -108,10 +109,13 @@ export function useApproval() {
       // Start the store's polling
       store.subscribe(intervalMs);
 
-      // Return a cleanup function
-      return () => {
+      // Store cleanup for auto-unsubscribe on unmount
+      const cleanup = () => {
         store.unsubscribe();
       };
+      unsubscribeRef.current = cleanup;
+
+      return cleanup;
     },
     [store.subscribe, store.unsubscribe],
   );
@@ -121,6 +125,7 @@ export function useApproval() {
    */
   const unsubscribe = useCallback(() => {
     store.unsubscribe();
+    unsubscribeRef.current = null;
   }, [store.unsubscribe]);
 
   // Auto-unsubscribe on unmount

@@ -151,6 +151,7 @@ export const AssetRetirementPage: React.FC = () => {
         <Card>
           <CardContent className="flex flex-col items-center py-12">
             <AlertTriangle className="h-10 w-10 text-yellow-500 mb-3" />
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">申请退役</h2>
             <p className="text-muted-foreground">{assetError}</p>
             <Button
               variant="outline"

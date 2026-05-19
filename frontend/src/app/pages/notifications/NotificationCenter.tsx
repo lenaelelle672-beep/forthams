@@ -251,6 +251,7 @@ export function NotificationCenter() {
         aria-label="查看通知"
       >
         <Bell className="w-5 h-5 text-gray-600" />
+        <span className="sr-only">通知</span>
         {/* Unread badge — always mounted to prevent CLS */}
         <span
           data-testid="unread-badge"

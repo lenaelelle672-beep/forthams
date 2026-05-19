@@ -1,8 +1,10 @@
 /**
- * AppRoutes — Centralized application route configuration for retirement module.
+ * AppRoutes — Centralized application route configuration.
  *
- * SWARM-062: Provides route definitions for the asset retirement/decommission
- * module, including the retirement application form page and detail page.
+ * SWARM-062 / SWARM-501: Provides route definitions for the asset
+ * retirement/decommission module, approval workflow, workflow center,
+ * workflow designer, and disposal management (transfer, clearance,
+ * scrap, compensation). All pages use lazy loading + Suspense.
  * Intended to be integrated into the main router in routes.ts.
  *
  * @module routes/AppRoutes
@@ -70,8 +72,8 @@ const AssetRetirementPage = withSuspense(
  */
 const RetirementDetail = withSuspense(
   lazy(() =>
-    import('../pages/Retirement/RetirementDetail').then((module) => ({
-      default: module.default ?? module.RetirementDetail,
+    import('../pages/assets/AssetRetirementDetailPage').then((module) => ({
+      default: module.AssetRetirementDetailPage,
     }))
   )
 );
@@ -95,6 +97,95 @@ const WorkOrderManagementPage = withSuspense(
   lazy(() =>
     import('../pages/workorders/WorkOrderManagementPage').then((module) => ({
       default: module.WorkOrderManagementPage,
+    }))
+  )
+);
+
+/**
+ * Approval list page — browse and act on approval processes.
+ * SWARM-501: Centralized approval workflow list.
+ */
+const ApprovalListPage = withSuspense(
+  lazy(() =>
+    import('../pages/ApprovalListPage').then((module) => ({
+      default: module.ApprovalListPage,
+    }))
+  )
+);
+
+/**
+ * Workflow center page — manage workflow definitions and instances.
+ */
+const WorkflowCenter = withSuspense(
+  lazy(() =>
+    import('../pages/WorkflowCenter').then((module) => ({
+      default: module.WorkflowCenter,
+    }))
+  )
+);
+
+/**
+ * Workflow designer page — visual workflow definition editor.
+ */
+const WorkflowDesigner = withSuspense(
+  lazy(() =>
+    import('../pages/WorkflowDesigner').then((module) => ({
+      default: module.WorkflowDesigner,
+    }))
+  )
+);
+
+/**
+ * Disposals page — asset disposal management (transfer, clearance, scrap, compensation).
+ */
+const Disposals = withSuspense(
+  lazy(() =>
+    import('../pages/Disposals').then((module) => ({
+      default: module.Disposals,
+    }))
+  )
+);
+
+/**
+ * Asset transfer form — create a new transfer disposal.
+ */
+const AssetTransferForm = withSuspense(
+  lazy(() =>
+    import('../pages/AssetTransferForm').then((module) => ({
+      default: module.AssetTransferForm,
+    }))
+  )
+);
+
+/**
+ * Asset clearance form — create a new clearance disposal.
+ */
+const AssetClearanceForm = withSuspense(
+  lazy(() =>
+    import('../pages/AssetClearanceForm').then((module) => ({
+      default: module.AssetClearanceForm,
+    }))
+  )
+);
+
+/**
+ * Asset scrap form — create a new scrap disposal.
+ */
+const AssetScrapForm = withSuspense(
+  lazy(() =>
+    import('../pages/AssetScrapForm').then((module) => ({
+      default: module.AssetScrapForm,
+    }))
+  )
+);
+
+/**
+ * Asset compensation form — create a new compensation disposal.
+ */
+const AssetCompensationForm = withSuspense(
+  lazy(() =>
+    import('../pages/AssetCompensationForm').then((module) => ({
+      default: module.AssetCompensationForm,
     }))
   )
 );
@@ -166,6 +257,64 @@ export const workOrderRoutes: RouteObject[] = [
 ];
 
 /**
+ * Approval workflow routes.
+ *
+ * @description Defines routes for:
+ * - `/approvals` → ApprovalListPage (browse and act on approval processes)
+ * - `/workflows` → WorkflowCenter (manage workflow definitions)
+ * - `/workflow-designer` → WorkflowDesigner (visual workflow editor)
+ *
+ * SWARM-501: Full approval workflow route registration with lazy loading.
+ */
+export const approvalRoutes: RouteObject[] = [
+  {
+    path: 'approvals',
+    Component: ApprovalListPage,
+  },
+  {
+    path: 'workflows',
+    Component: WorkflowCenter,
+  },
+  {
+    path: 'workflow-designer',
+    Component: WorkflowDesigner,
+  },
+];
+
+/**
+ * Disposal management routes.
+ *
+ * @description Defines routes for:
+ * - `/disposals` → Disposals (main disposal list with tabs)
+ * - `/disposals/transfer/new` → AssetTransferForm
+ * - `/disposals/clearance/new` → AssetClearanceForm
+ * - `/disposals/scrap/new` → AssetScrapForm
+ * - `/disposals/compensation/new` → AssetCompensationForm
+ */
+export const disposalRoutes: RouteObject[] = [
+  {
+    path: 'disposals',
+    Component: Disposals,
+  },
+  {
+    path: 'disposals/transfer/new',
+    Component: AssetTransferForm,
+  },
+  {
+    path: 'disposals/clearance/new',
+    Component: AssetClearanceForm,
+  },
+  {
+    path: 'disposals/scrap/new',
+    Component: AssetScrapForm,
+  },
+  {
+    path: 'disposals/compensation/new',
+    Component: AssetCompensationForm,
+  },
+];
+
+/**
  * All routes exported by this module.
  * Merge these into the main router's RootLayout children array.
  */
@@ -173,6 +322,8 @@ export const allAppRoutes: RouteObject[] = [
   assetDetailRoute,
   ...retirementRoutes,
   ...workOrderRoutes,
+  ...approvalRoutes,
+  ...disposalRoutes,
 ];
 
 export default allAppRoutes;

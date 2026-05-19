@@ -200,6 +200,7 @@ export function AssetTransferForm() {
   const [deptOptions, setDeptOptions] = useState<DeptRecord[]>([]);
   const [peopleLookupMessage, setPeopleLookupMessage] = useState<string | null>(null);
   const [selectedAssetId, setSelectedAssetId] = useState<string | null>(null);
+  const [selectedAssetStatus, setSelectedAssetStatus] = useState<string | null>(null);
   const [assetPickerOpen, setAssetPickerOpen] = useState(false);
   const [formData, setFormData] = useState({
     applicant: "",
@@ -353,6 +354,7 @@ export function AssetTransferForm() {
   const handlePickerSelect = useCallback((asset: AssetRecord) => {
     const assetId = getAssetId(asset);
     setSelectedAssetId(assetId);
+    setSelectedAssetStatus(readAssetField(asset, ["status"]) || null);
     applyAssetRecord(asset);
     setAssetPickerOpen(false);
   }, [applyAssetRecord]);
@@ -363,6 +365,10 @@ export function AssetTransferForm() {
       setError(null);
       if (!selectedAssetId) {
         throw new Error("请先从资产台账选择资产");
+      }
+      const BLOCKED_TRANSFER_STATUSES = new Set(["CLEARED", "RETIRED", "SCRAPPED"]);
+      if (selectedAssetStatus && BLOCKED_TRANSFER_STATUSES.has(selectedAssetStatus.toUpperCase())) {
+        throw new Error(`资产当前状态为${selectedAssetStatus}，不允许转移。仅闲置、使用中、维修中的资产可转移`);
       }
       const reason = parseRequiredText(formData.transferReason, "转移原因");
       const transferPayload = {

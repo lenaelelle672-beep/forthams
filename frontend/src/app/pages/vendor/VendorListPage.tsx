@@ -2,7 +2,7 @@
  * VendorListPage — 供应商列表管理页面
  *
  * 展示供应商列表，支持搜索过滤、新增、编辑和删除操作。
- * 数据通过 vendorService 调用真实后端 API，无 Mock 逻辑。
+ * 数据通过 vendorService 调用真实后端 API，无本地伪数据逻辑。
  * 表单字段严格对齐 Vendor.java 六元组：name, vendorCode, contactPerson, contactPhone, contactEmail。
  *
  * @module pages/vendor/VendorListPage

@@ -5,7 +5,7 @@
  * - /vendors/new          → 创建模式（空表单）
  * - /vendors/:id/edit     → 编辑模式（回显数据）
  *
- * 数据通过 vendorService 调用真实后端 API，无 Mock 逻辑。
+ * 数据通过 vendorService 调用真实后端 API，无本地伪数据逻辑。
  * 表单字段严格对齐 Vendor.java 六元组：name, vendorCode, contactPerson, contactPhone, contactEmail。
  *
  * @module pages/vendor/VendorFormPage

@@ -11,6 +11,11 @@ import {
   BarChart3,
   Settings as SettingsIcon,
   ArchiveRestore,
+  TrendingDown,
+  MapPin,
+  Truck,
+  FileText,
+  ScrollText,
 } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
 import { approvalService } from "../services/approvalService";
@@ -30,7 +35,11 @@ const navigation: NavItem[] = [
   { name: "闲置资产", href: "/idle", icon: Archive },
   { name: "资产处置", href: "/disposals", icon: DollarSign },
   { name: "审批流程", href: "/approval", icon: ClipboardCheck },
-  { name: "退休申请", href: "/retirement", icon: ArchiveRestore },
+  { name: "折旧管理", href: "/depreciation", icon: TrendingDown },
+  { name: "工单管理", href: "/workorders", icon: FileText },
+  { name: "供应商管理", href: "/vendors", icon: Truck },
+  { name: "位置管理", href: "/locations", icon: MapPin },
+  { name: "审计日志", href: "/audit", icon: ScrollText },
   { name: "流程管理", href: "/workflows", icon: Workflow },
   { name: "数据分析", href: "/analytics", icon: BarChart3 },
   { name: "系统设置", href: "/settings", icon: SettingsIcon },

@@ -127,6 +127,26 @@ CREATE TABLE IF NOT EXISTS asset_change_log (
     INDEX idx_change_asset (asset_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+CREATE TABLE IF NOT EXISTS general_audit_entry (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    trace_id VARCHAR(64),
+    timestamp DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    action VARCHAR(512),
+    before_record LONGTEXT,
+    after_record LONGTEXT,
+    operation_type VARCHAR(64),
+    operator_id VARCHAR(64),
+    operator_name VARCHAR(128),
+    resource_type VARCHAR(64),
+    resource_id VARCHAR(128),
+    detail TEXT,
+    ip_address VARCHAR(64),
+    INDEX idx_general_audit_timestamp (timestamp),
+    INDEX idx_general_audit_operation_type (operation_type),
+    INDEX idx_general_audit_operator (operator_id),
+    INDEX idx_general_audit_resource (resource_type, resource_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 CREATE TABLE IF NOT EXISTS work_order (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     work_order_no VARCHAR(128) NOT NULL,

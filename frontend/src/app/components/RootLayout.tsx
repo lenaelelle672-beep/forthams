@@ -14,6 +14,7 @@ import {
   User,
   Search,
   LogOut,
+  Monitor,
 } from "lucide-react";
 import { FormEvent, useState } from "react";
 import { useAuth } from "../context/AuthContext";
@@ -29,6 +30,7 @@ const navigation = [
   { name: '审批流程', href: '/approval', icon: ClipboardCheck },
   { name: '流程管理', href: '/workflows', icon: Workflow },
   { name: '数据分析', href: '/analytics', icon: BarChart3 },
+  { name: '资产大屏', href: '/situation', icon: Monitor },
   { name: '系统设置', href: '/settings', icon: SettingsIcon },
 ];
 

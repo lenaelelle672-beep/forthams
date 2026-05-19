@@ -15,6 +15,12 @@ export default defineConfig({
   },
   projects: [
     {
+      name: 'real-backend-smoke',
+      testDir: './src/e2e',
+      testMatch: /real-backend-smoke\.spec\.ts/,
+      use: { ...devices['Desktop Chrome'] },
+    },
+    {
       name: 'e2e-setup',
       testMatch: /auth\.setup\.ts/,
       use: { ...devices['Desktop Chrome'] },

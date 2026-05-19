@@ -3,6 +3,9 @@ import { Navigate, Outlet, createBrowserRouter, useLocation } from "react-router
 import { RootLayout } from "./components/RootLayout";
 import { useAuth } from "./context/AuthContext";
 import { Login } from "./pages/Login";
+import { vendorRoutes, locationRoutes, auditRoutes } from "./router";
+import { assetImportExportRoutes } from "./router/AppRouter";
+import { retirementRoutes, assetDetailRoute, workOrderRoutes } from "./routes/AppRoutes";
 
 const Dashboard = withSuspense(
   lazy(() => import("./pages/Dashboard").then((module) => ({ default: module.Dashboard }))),
@@ -12,9 +15,6 @@ const AssetRegistry = withSuspense(
 );
 const AssetFormPage = withSuspense(
   lazy(() => import("./pages/assets/AssetFormPage").then((module) => ({ default: module.default }))),
-);
-const AssetDetailPage = withSuspense(
-  lazy(() => import("./pages/assets/AssetDetailPage").then((module) => ({ default: module.AssetDetailPage }))),
 );
 const ImportantEquipment = withSuspense(
   lazy(() => import("./pages/ImportantEquipment").then((module) => ({ default: module.ImportantEquipment }))),
@@ -56,6 +56,13 @@ const WorkflowDesigner = withSuspense(
 );
 const WorkflowCenter = withSuspense(
   lazy(() => import("./pages/WorkflowCenter").then((module) => ({ default: module.WorkflowCenter }))),
+);
+const AssetSituationDashboard = withSuspense(
+  lazy(() =>
+    import("./pages/AssetSituationDashboard").then((module) => ({
+      default: module.AssetSituationDashboard,
+    })),
+  ),
 );
 const Retirement = withSuspense(
   lazy(() => import("./pages/Retirement").then((module) => ({ default: module.default }))),
@@ -126,7 +133,6 @@ export const router = createBrowserRouter([
           { path: "assets", Component: AssetRegistry },
           { path: "assets/new", Component: AssetFormPage },
           { path: "assets/:id/edit", Component: AssetFormPage },
-          { path: "assets/:id", Component: AssetDetailPage },
           { path: "equipment", Component: ImportantEquipment },
           { path: "inventory", Component: RFIDInventory },
           { path: "idle", Component: IdleAssets },
@@ -138,9 +144,18 @@ export const router = createBrowserRouter([
           { path: "approval", Component: Approval },
           { path: "retirement", Component: Retirement },
           { path: "analytics", Component: Analytics },
+          { path: "situation", Component: AssetSituationDashboard },
           { path: "settings", Component: Settings },
           { path: "workflows", Component: WorkflowCenter },
           { path: "workflow-designer", Component: WorkflowDesigner },
+          // Modular route modules
+          ...vendorRoutes,
+          ...locationRoutes,
+          ...auditRoutes,
+          ...assetImportExportRoutes,
+          ...retirementRoutes,
+          assetDetailRoute,
+          ...workOrderRoutes,
         ],
       },
     ],

@@ -16,7 +16,9 @@ const defaultNodeData: FlowNodeData = {
   description: "",
   nodeCode: "",
   triggerType: "",
+  approverType: "role",
   approverRole: "",
+  approverId: "",
   approvalMode: "sequence",
   conditionExpression: "",
   trueLabel: "",
@@ -111,7 +113,14 @@ export function validateWorkflowDefinition(definition: WorkflowDefinitionPayload
       errors.push("开始节点触发方式不能为空");
     }
     if (node.type === "approval") {
-      if (!text(node.data.approverRole)) errors.push(`审批节点${node.id}审批角色不能为空`);
+      const approverType = (node.data as Record<string, unknown>).approverType;
+      if (approverType === "user") {
+        if (!text((node.data as Record<string, unknown>).approverId)) {
+          errors.push(`审批节点${node.id}指定用户审批时审批人不能为空`);
+        }
+      } else {
+        if (!text(node.data.approverRole)) errors.push(`审批节点${node.id}审批角色不能为空`);
+      }
       if (!["sequence", "all", "any"].includes(node.data.approvalMode)) {
         errors.push(`审批节点${node.id}审批模式无效`);
       }

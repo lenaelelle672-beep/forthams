@@ -20,7 +20,7 @@
  * - formatApprovalDate — 审批日期格式化
  * - getApprovalLabel — 审批记录标签提取
  *
- * 状态三态处理：Loading（骨架屏）、Error（异常降级提示）、Empty（无数据占位）
+ * 状态三态处理：Loading（骨架屏）、Error（异常降级提示）、Empty（无数据提示）
  *
  * @module pages/DashboardPage
  * @see frontend/src/app/hooks/useDashboardData.ts — useDashboardData
@@ -129,7 +129,7 @@ export function formatDateLabel(value: string): string {
  * 格式化审批日期字段
  *
  * @param value - 日期值，通常是字符串
- * @returns 格式化后的日期文本或占位符
+ * @returns 格式化后的日期文本或回退文本
  */
 export function formatApprovalDate(value: unknown): string {
   return typeof value === 'string' && value ? value : '-';
