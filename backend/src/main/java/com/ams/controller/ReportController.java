@@ -1,6 +1,8 @@
 package com.ams.controller;
 
 import com.ams.common.Result;
+import com.ams.dto.CategoryReportDTO;
+import com.ams.dto.ReportSummaryDTO;
 import com.ams.service.ReportService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -8,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * 资产报表控制器
@@ -32,7 +33,7 @@ public class ReportController {
      * @return 汇总数据（totalAssets, activeAssets, pendingApproval, recentlyRetired）
      */
     @GetMapping("/summary")
-    public Result<Map<String, Object>> getSummary() {
+    public Result<ReportSummaryDTO> getSummary() {
         return Result.success(reportService.getSummary());
     }
 
@@ -42,7 +43,7 @@ public class ReportController {
      * @return 分类统计列表
      */
     @GetMapping("/by-category")
-    public Result<List<Object>> getByCategory() {
+    public Result<List<CategoryReportDTO>> getByCategory() {
         return Result.success(reportService.getByCategory());
     }
 }

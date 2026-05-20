@@ -1,5 +1,7 @@
 package com.ams.service;
 
+import com.ams.dto.CategoryReportDTO;
+import com.ams.dto.ReportSummaryDTO;
 import com.ams.entity.Asset;
 import com.ams.mapper.AssetMapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -13,7 +15,7 @@ import java.util.*;
  * 资产报表服务
  *
  * <p>提供资产汇总统计和分类统计查询能力。
- * 当 AssetMapper 不可用时，返回空统计（零值/空数组）以保证系统可用性。
+ * 当 AssetMapper 不可用时，返回空统计（零值/空列表）以保证系统可用性。
  */
 @Slf4j
 @Service
@@ -33,40 +35,40 @@ public class ReportService {
      *   <li>recentlyRetired — 近期退役数（status = RETIRED）</li>
      * </ul>
      *
-     * @return 汇总统计 Map
+     * @return 汇总统计 DTO
      */
-    public Map<String, Object> getSummary() {
-        Map<String, Object> summary = new LinkedHashMap<>();
-        summary.put("totalAssets", 0);
-        summary.put("activeAssets", 0);
-        summary.put("pendingApproval", 0);
-        summary.put("recentlyRetired", 0);
+    public ReportSummaryDTO getSummary() {
+        ReportSummaryDTO.ReportSummaryDTOBuilder builder = ReportSummaryDTO.builder()
+                .totalAssets(0)
+                .activeAssets(0)
+                .pendingApproval(0)
+                .recentlyRetired(0);
 
         if (assetMapper == null) {
             log.warn("AssetMapper not available, returning zeroed summary");
-            return summary;
+            return builder.build();
         }
 
         try {
-            summary.put("totalAssets", countByCondition(null));
-            summary.put("activeAssets", countByCondition("IN_USE"));
-            summary.put("pendingApproval", countByCondition("PENDING_APPROVAL"));
-            summary.put("recentlyRetired", countByCondition("RETIRED"));
+            builder.totalAssets(countByCondition(null));
+            builder.activeAssets(countByCondition("IN_USE"));
+            builder.pendingApproval(countByCondition("PENDING_APPROVAL"));
+            builder.recentlyRetired(countByCondition("RETIRED"));
         } catch (Exception e) {
             log.error("Failed to query asset summary, returning zeroed values", e);
         }
 
-        return summary;
+        return builder.build();
     }
 
     /**
      * 获取按分类统计的资产列表。
      *
-     * <p>返回按资产分类分组的统计数据。当前迭代返回空数组。
+     * <p>返回按资产分类分组的统计数据。当前迭代返回空列表。
      *
      * @return 分类统计列表
      */
-    public List<Object> getByCategory() {
+    public List<CategoryReportDTO> getByCategory() {
         if (assetMapper == null) {
             log.warn("AssetMapper not available, returning empty category list");
             return Collections.emptyList();
@@ -81,6 +83,12 @@ public class ReportService {
         }
     }
 
+    /**
+     * 根据状态条件查询资产数量。
+     *
+     * @param status 资产状态，为 null 时查询全部
+     * @return 符合条件的资产数量
+     */
     private Long countByCondition(String status) {
         QueryWrapper<Asset> wrapper = new QueryWrapper<>();
         if (status != null && !status.isEmpty()) {
