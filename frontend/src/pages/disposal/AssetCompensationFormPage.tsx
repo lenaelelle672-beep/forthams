@@ -1,14 +1,17 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useNavigate } from 'react-router';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Select, SelectItem } from '@/components/ui/Select';
+import { getAssetList } from '@/api/asset';
+import { createCompensation } from '@/api/disposal';
+import type { AssetListItem } from '@/types/asset';
 
 const schema = z.object({
   applyDate: z.string().min(1, '请选择申请日期'),
@@ -35,27 +38,6 @@ interface AssetRow {
   damageLevel: string;
   compensationAmount: number;
 }
-
-const MOCK_ASSETS: AssetRow[] = [
-  {
-    id: '1',
-    assetNo: 'AST-2023-0892',
-    assetName: 'Precision Lathe X1',
-    category: '工业设备',
-    originalValue: 45000,
-    damageLevel: 'medium',
-    compensationAmount: 12500,
-  },
-  {
-    id: '2',
-    assetNo: 'AST-2024-0012',
-    assetName: 'MacBook Pro 16"',
-    category: '电子办公',
-    originalValue: 18999,
-    damageLevel: 'severe',
-    compensationAmount: 5400,
-  },
-];
 
 const DAMAGE_LEVEL_OPTIONS = [
   { value: 'minor', label: '轻微' },
@@ -89,12 +71,48 @@ function formatCurrency(n: number): string {
   return n.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
+/** Map an API AssetListItem to the local AssetRow used in the table */
+function toAssetRow(a: AssetListItem): AssetRow {
+  return {
+    id: String(a.id),
+    assetNo: a.assetNo ?? '',
+    assetName: a.assetName ?? '',
+    category: a.categoryName ?? '',
+    originalValue: a.originalValue ?? 0,
+    damageLevel: 'medium',
+    compensationAmount: 0,
+  };
+}
+
 export default function AssetCompensationFormPage() {
   const navigate = useNavigate();
   const qc = useQueryClient();
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(() => new Set(MOCK_ASSETS.map((a) => a.id)));
-  const [assetData, setAssetData] = useState<AssetRow[]>(MOCK_ASSETS);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [assetData, setAssetData] = useState<AssetRow[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
+
+  // Fetch assets from real API
+  const { data: assetListData } = useQuery({
+    queryKey: ['assets', 'list', { pageSize: 200 }],
+    queryFn: () => getAssetList({ pageSize: 200 }),
+  });
+
+  // Derive the full asset list from API response
+  const apiAssets: AssetRow[] = useMemo(
+    () => ((assetListData as any)?.records ?? []).map(toAssetRow),
+    [assetListData],
+  );
+
+  // Keep assetData in sync with the API list; preserve user edits
+  const syncedAssetData = useMemo(() => {
+    if (apiAssets.length === 0) return assetData;
+    // Merge: keep user-edited rows, add new API rows
+    const existingMap = new Map(assetData.map((a) => [a.id, a]));
+    return apiAssets.map((api) => existingMap.get(api.id) ?? api);
+  }, [apiAssets, assetData]);
+
+  // Use the synced data for display
+  const displayAssets = syncedAssetData;
 
   const {
     register,
@@ -114,18 +132,18 @@ export default function AssetCompensationFormPage() {
   });
 
   const filteredAssets = useMemo(() => {
-    if (!searchTerm) return assetData;
+    if (!searchTerm) return displayAssets;
     const lower = searchTerm.toLowerCase();
-    return assetData.filter(
+    return displayAssets.filter(
       (a) => a.assetNo.toLowerCase().includes(lower) || a.assetName.toLowerCase().includes(lower),
     );
-  }, [assetData, searchTerm]);
+  }, [displayAssets, searchTerm]);
 
   const totalCompensation = useMemo(() => {
-    return assetData
+    return displayAssets
       .filter((a) => selectedIds.has(a.id))
       .reduce((sum, a) => sum + a.compensationAmount, 0);
-  }, [assetData, selectedIds]);
+  }, [displayAssets, selectedIds]);
 
   const toggleAsset = (id: string) => {
     setSelectedIds((prev) => {
@@ -145,16 +163,57 @@ export default function AssetCompensationFormPage() {
   };
 
   const updateAsset = (id: string, field: keyof AssetRow, value: string | number) => {
-    setAssetData((prev) =>
-      prev.map((a) => (a.id === id ? { ...a, [field]: value } : a)),
-    );
+    setAssetData((prev) => {
+      const map = new Map(prev.map((a) => [a.id, a]));
+      const existing = map.get(id);
+      if (existing) {
+        map.set(id, { ...existing, [field]: value });
+      } else {
+        // Find from apiAssets and apply edit
+        const apiRow = apiAssets.find((a) => a.id === id);
+        if (apiRow) {
+          map.set(id, { ...apiRow, [field]: value });
+        }
+      }
+      return Array.from(map.values());
+    });
   };
+
+  // Add selected assets from search results to the working set
+  const addSelectedAssets = useCallback(() => {
+    const filtered = filteredAssets;
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      filtered.forEach((a) => next.add(a.id));
+      return next;
+    });
+    // Ensure these assets are in assetData
+    setAssetData((prev) => {
+      const map = new Map(prev.map((a) => [a.id, a]));
+      filtered.forEach((a) => {
+        if (!map.has(a.id)) {
+          map.set(a.id, a);
+        }
+      });
+      return Array.from(map.values());
+    });
+  }, [filteredAssets]);
 
   const mutation = useMutation({
     mutationFn: async (data: FormValues & { assets: AssetRow[]; totalCompensation: number }) => {
-      // TODO: 替换为实际 API 调用
-      // return api.post('/compensation', data);
-      return new Promise((resolve) => setTimeout(resolve, 1000));
+      // Submit each selected asset as a compensation request via the approval flow
+      const results = await Promise.all(
+        data.assets.map((asset) =>
+          createCompensation({
+            assetId: Number(asset.id),
+            compensationType: data.compensationType,
+            compensationAmount: asset.compensationAmount,
+            description: data.damageDesc,
+            incidentDate: data.damageDate,
+          }),
+        ),
+      );
+      return results;
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['compensation'] });
@@ -163,7 +222,7 @@ export default function AssetCompensationFormPage() {
   });
 
   const onSubmit = (values: FormValues) => {
-    const selectedAssets = assetData.filter((a) => selectedIds.has(a.id));
+    const selectedAssets = displayAssets.filter((a) => selectedIds.has(a.id));
     mutation.mutate({
       ...values,
       assets: selectedAssets,
@@ -341,7 +400,7 @@ export default function AssetCompensationFormPage() {
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
-              <Button variant="primary" size="md" type="button">
+              <Button variant="primary" size="md" type="button" onClick={addSelectedAssets}>
                 添加资产
               </Button>
             </div>

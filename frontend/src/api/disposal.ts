@@ -70,6 +70,42 @@ export const getCompensationList = (params?: CompensationListQuery) =>
 export const getCompensationDetail = (id: number) =>
   http.get<ApiResponse<Compensation>>(`/compensation/${id}`);
 
+/** 赔偿创建 DTO（对应后端 CompensationCreateDTO） */
+export interface CompensationCreatePayload {
+  assetId?: number;
+  compensationType?: string;
+  compensationAmount?: number;
+  description?: string;
+  incidentDate?: string;
+  responsibleUserId?: number;
+  responsibleDeptId?: number;
+}
+
+/** 赔偿更新 DTO（对应后端 CompensationUpdateDTO） */
+export interface CompensationUpdatePayload extends CompensationCreatePayload {}
+
+/**
+ * 提交赔偿申请（通过审批流程 POST /approvals）。
+ * 后端 POST /compensation 被封门，必须走审批流。
+ */
+export const createCompensation = (data: CompensationCreatePayload) =>
+  http.post<ApiResponse<unknown>>('/approvals', {
+    processType: 'ASSET_COMPENSATION',
+    businessType: 'ASSET_COMPENSATION',
+    businessId: data.assetId ?? 0,
+    title: `资产赔偿申请 - ${data.incidentDate ?? new Date().toISOString().split('T')[0]}`,
+    description: [
+      data.description ? `赔偿原因：${data.description}` : null,
+      data.compensationType ? `赔偿方式：${data.compensationType}` : null,
+      data.compensationAmount ? `赔偿金额：¥${data.compensationAmount}` : null,
+    ].filter(Boolean).join('；'),
+    businessData: JSON.stringify(data),
+  });
+
+/** 更新赔偿记录（PUT /compensation/{id}） */
+export const updateCompensation = (id: number, data: CompensationUpdatePayload) =>
+  http.put<ApiResponse<Compensation>>(`/compensation/${id}`, data);
+
 // ── 报废申请 ────────────────────────────────────────────────────────────────
 
 export interface ScrapApplicationPayload {
