@@ -3,77 +3,32 @@
  * @description 位置管理页面 — Design System 重构版
  *
  * 功能：树形层级位置管理，支持展开/折叠、新增顶级/子级、编辑、删除
- * API: GET /api/locations/tree, POST /api/locations, PUT /api/locations/:id, DELETE /api/locations/:id
+ * API: getLocationTree / createLocation / updateLocation / deleteLocation (from @/api/base)
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { Plus, ChevronRight, ChevronDown, Pencil, Trash2, FolderTree, RefreshCw } from 'lucide-react';
+import { toast } from 'sonner';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
+import {
+  getLocationTree,
+  createLocation as apiCreateLocation,
+  updateLocation as apiUpdateLocation,
+  deleteLocation as apiDeleteLocation,
+} from '@/api/base';
+import type { Location } from '@/types/common';
 
 // ─── 类型定义 ───────────────────────────────────────────────────────────────
 
-interface LocationNode {
-  id: number;
-  name: string;
-  code: string;
-  parentId: number | null;
-  children?: LocationNode[];
-}
+type LocationNode = Location;
 
-type LocationFormData = Omit<LocationNode, 'id' | 'children'>;
-
-// ─── Mock 数据（API 失败时兜底）─────────────────────────────────────────────
-
-const MOCK_TREE: LocationNode[] = [
-  {
-    id: 1, name: '研发大楼', code: 'RD', parentId: null,
-    children: [
-      { id: 3, name: 'A栋', code: 'RD-A', parentId: 1, children: [] },
-      { id: 4, name: 'B栋', code: 'RD-B', parentId: 1, children: [] },
-    ],
-  },
-  {
-    id: 2, name: '生产车间', code: 'MFG', parentId: null,
-    children: [
-      { id: 5, name: '1号线', code: 'MFG-L1', parentId: 2, children: [] },
-      { id: 6, name: '2号线', code: 'MFG-L2', parentId: 2, children: [] },
-    ],
-  },
-];
-
-// ─── API 函数 ────────────────────────────────────────────────────────────────
-
-async function fetchLocationTree(): Promise<LocationNode[]> {
-  const res = await fetch('/api/locations/tree');
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  const data = await res.json();
-  return Array.isArray(data) ? data : (data.data ?? data.records ?? []);
-}
-
-async function createLocation(body: LocationFormData): Promise<void> {
-  const res = await fetch('/api/locations', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  });
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-}
-
-async function updateLocation(id: number, body: LocationFormData): Promise<void> {
-  const res = await fetch(`/api/locations/${id}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  });
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-}
-
-async function deleteLocation(id: number): Promise<void> {
-  const res = await fetch(`/api/locations/${id}`, { method: 'DELETE' });
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+interface LocationFormData {
+  locationName: string;
+  locationCode?: string;
+  parentId?: number | null;
 }
 
 // ─── 工具：在树中更新节点 ────────────────────────────────────────────────────
@@ -121,8 +76,8 @@ function LocationFormDialog({ open, mode, node, parentId, parentName, submitting
 
   useEffect(() => {
     if (open) {
-      setName(mode === 'edit' && node ? node.name : '');
-      setCode(mode === 'edit' && node ? node.code : '');
+      setName(mode === 'edit' && node ? node.locationName : '');
+      setCode(mode === 'edit' && node ? (node.locationCode ?? '') : '');
     }
   }, [open, mode, node]);
 
@@ -131,7 +86,11 @@ function LocationFormDialog({ open, mode, node, parentId, parentName, submitting
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
-    onSubmit({ name: name.trim(), code: code.trim(), parentId: mode === 'edit' ? (node?.parentId ?? null) : parentId });
+    onSubmit({
+      locationName: name.trim(),
+      locationCode: code.trim() || undefined,
+      parentId: mode === 'edit' ? (node?.parentId ?? null) : parentId,
+    });
   };
 
   return (
@@ -209,9 +168,9 @@ function TreeNodeRow({ node, depth, expanded, onToggle, onAddChild, onEdit, onDe
         <FolderTree className="w-4 h-4 text-[#3b82f6] flex-shrink-0" />
 
         {/* 名称 + 编码 */}
-        <span className="flex-1 text-sm font-medium text-[#374151]">{node.name}</span>
-        {node.code && (
-          <span className="text-xs text-[#94a3b8] bg-[#f1f5f9] px-2 py-0.5 rounded font-mono">{node.code}</span>
+        <span className="flex-1 text-sm font-medium text-[#374151]">{node.locationName}</span>
+        {node.locationCode && (
+          <span className="text-xs text-[#94a3b8] bg-[#f1f5f9] px-2 py-0.5 rounded font-mono">{node.locationCode}</span>
         )}
 
         {/* 操作按钮（悬浮显示） */}
@@ -262,7 +221,7 @@ function TreeNodeRow({ node, depth, expanded, onToggle, onAddChild, onEdit, onDe
 export default function LocationsPage() {
   const [tree, setTree] = useState<LocationNode[]>([]);
   const [loading, setLoading] = useState(true);
-  const [expanded, setExpanded] = useState<Set<number>>(new Set([1, 2]));
+  const [expanded, setExpanded] = useState<Set<number>>(new Set());
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogMode, setDialogMode] = useState<'create' | 'edit'>('create');
@@ -276,11 +235,12 @@ export default function LocationsPage() {
   const loadTree = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await fetchLocationTree();
-      setTree(data);
-    } catch {
-      console.warn('API 不可用，使用 Mock 数据');
-      setTree(MOCK_TREE);
+      const res = await getLocationTree();
+      const data = res.data?.data ?? res.data ?? [];
+      setTree(Array.isArray(data) ? data : []);
+    } catch (err) {
+      toast.error('加载位置树失败，请稍后重试');
+      setTree([]);
     } finally {
       setLoading(false);
     }
@@ -313,22 +273,27 @@ export default function LocationsPage() {
     setDialogMode('create');
     setEditingNode(null);
     setParentId(parent?.id ?? null);
-    setParentName(parent ? parent.name : '顶级');
+    setParentName(parent ? parent.locationName : '顶级');
     setDialogOpen(true);
   };
 
   const handleOpenEdit = (node: LocationNode) => {
     setDialogMode('edit');
     setEditingNode(node);
-    setParentId(node.parentId);
+    setParentId(node.parentId ?? null);
     setParentName('');
     setDialogOpen(true);
   };
 
-  const handleDelete = (node: LocationNode) => {
-    if (!window.confirm(`确定要删除位置「${node.name}」吗？子位置也将一并删除。`)) return;
-    deleteLocation(node.id).catch(() => {});
-    setTree(prev => deleteNodeFromTree(prev, node.id));
+  const handleDelete = async (node: LocationNode) => {
+    if (!window.confirm(`确定要删除位置「${node.locationName}」吗？子位置也将一并删除。`)) return;
+    try {
+      await apiDeleteLocation(node.id);
+      setTree(prev => deleteNodeFromTree(prev, node.id));
+      toast.success(`位置「${node.locationName}」已删除`);
+    } catch (err) {
+      toast.error('删除位置失败，请稍后重试');
+    }
   };
 
   // ── 表单提交 ──────────────────────────────────────────────────────────────
@@ -337,29 +302,18 @@ export default function LocationsPage() {
     setSubmitting(true);
     try {
       if (dialogMode === 'edit' && editingNode) {
-        try {
-          await updateLocation(editingNode.id, data);
-        } catch {
-          // Mock 模式
-        }
-        setTree(prev => updateNodeInTree(prev, editingNode.id, { name: data.name, code: data.code }));
+        await apiUpdateLocation(editingNode.id, data);
+        toast.success('位置更新成功');
+        await loadTree();
       } else {
-        const newNode: LocationNode = { id: Date.now(), ...data, children: [] };
-        try {
-          await createLocation(data);
-          await loadTree();
-        } catch {
-          // Mock 模式：本地追加
-          if (data.parentId) {
-            setTree(prev => addChildToTree(prev, data.parentId!, newNode));
-            setExpanded(prev => new Set([...prev, data.parentId!]));
-          } else {
-            setTree(prev => [...prev, newNode]);
-          }
-        }
+        await apiCreateLocation(data);
+        toast.success('位置创建成功');
+        await loadTree();
       }
       setDialogOpen(false);
       setEditingNode(null);
+    } catch (err) {
+      toast.error(dialogMode === 'edit' ? '更新位置失败，请稍后重试' : '创建位置失败，请稍后重试');
     } finally {
       setSubmitting(false);
     }

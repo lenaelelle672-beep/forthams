@@ -44,6 +44,18 @@ export const getLocationTree = () =>
 export const getLocationCascade = () =>
   http.get<ApiResponse<Location[]>>('/locations/cascade');
 
+/** 创建位置 */
+export const createLocation = (data: { locationName: string; locationCode?: string; parentId?: number | null }) =>
+  http.post<ApiResponse<Location>>('/locations', data);
+
+/** 更新位置 */
+export const updateLocation = (id: number, data: { locationName: string; locationCode?: string; parentId?: number | null }) =>
+  http.put<ApiResponse<Location>>(`/locations/${id}`, data);
+
+/** 删除位置 */
+export const deleteLocation = (id: number) =>
+  http.delete<ApiResponse<void>>(`/locations/${id}`);
+
 // ── 用户管理 ──────────────────────────────────────────────────────────────────
 
 export interface UserItem {
