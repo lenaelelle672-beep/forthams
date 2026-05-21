@@ -178,7 +178,7 @@ const AuditFilter: React.FC<AuditFilterProps> = ({
    * 筛选标签样式
    */
   const filterTagStyle = useMemo(() => ({
-    backgroundColor: '#f6ffed',
+    backgroundColor: '#1a2e1a',
     borderColor: '#52c41a',
     color: '#52c41a',
   }), []);

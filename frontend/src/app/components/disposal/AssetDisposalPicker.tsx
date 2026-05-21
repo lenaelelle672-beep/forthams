@@ -114,7 +114,7 @@ export function AssetDisposalPicker({ onSelect, selectedAssetId, label = "选择
           onChange={(e) => setKeyword(e.target.value)}
           onKeyDown={(e) => { if (e.key === "Enter") handleSearch(); }}
           placeholder="输入关键词搜索资产..."
-          className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500"
+          className="flex-1 px-3 py-2 border border-gray-200 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500"
           data-testid="asset-search-input"
           aria-label={label}
         />
@@ -140,12 +140,12 @@ export function AssetDisposalPicker({ onSelect, selectedAssetId, label = "选择
           <table className="w-full text-sm">
             <thead className="bg-gray-50 sticky top-0">
               <tr>
-                <th className="px-3 py-2 text-left font-medium text-gray-600">选择</th>
-                <th className="px-3 py-2 text-left font-medium text-gray-600">资产ID</th>
-                <th className="px-3 py-2 text-left font-medium text-gray-600">资产名称</th>
-                <th className="px-3 py-2 text-left font-medium text-gray-600">分类</th>
-                <th className="px-3 py-2 text-left font-medium text-gray-600">部门</th>
-                <th className="px-3 py-2 text-left font-medium text-gray-600">状态</th>
+                <th className="px-3 py-2 text-left font-medium text-gray-500">选择</th>
+                <th className="px-3 py-2 text-left font-medium text-gray-500">资产ID</th>
+                <th className="px-3 py-2 text-left font-medium text-gray-500">资产名称</th>
+                <th className="px-3 py-2 text-left font-medium text-gray-500">分类</th>
+                <th className="px-3 py-2 text-left font-medium text-gray-500">部门</th>
+                <th className="px-3 py-2 text-left font-medium text-gray-500">状态</th>
               </tr>
             </thead>
             <tbody>
@@ -155,7 +155,7 @@ export function AssetDisposalPicker({ onSelect, selectedAssetId, label = "选择
                 return (
                   <tr
                     key={id}
-                    className={`border-t border-gray-100 cursor-pointer hover:bg-blue-50 ${isSelected ? "bg-blue-100" : ""}`}
+                    className={`border-t border-gray-200 cursor-pointer hover:bg-blue-50 ${isSelected ? "bg-blue-100" : ""}`}
                     onClick={() => handleSelect(asset)}
                     data-testid={`asset-row-${id}`}
                   >
@@ -171,9 +171,9 @@ export function AssetDisposalPicker({ onSelect, selectedAssetId, label = "选择
                     </td>
                     <td className="px-3 py-2 text-gray-900">{id}</td>
                     <td className="px-3 py-2 text-gray-900">{getAssetName(asset)}</td>
-                    <td className="px-3 py-2 text-gray-600">{asset.categoryName ?? ""}</td>
-                    <td className="px-3 py-2 text-gray-600">{asset.departmentName ?? ""}</td>
-                    <td className="px-3 py-2 text-gray-600">{asset.status ?? ""}</td>
+                    <td className="px-3 py-2 text-gray-500">{asset.categoryName ?? ""}</td>
+                    <td className="px-3 py-2 text-gray-500">{asset.departmentName ?? ""}</td>
+                    <td className="px-3 py-2 text-gray-500">{asset.status ?? ""}</td>
                   </tr>
                 );
               })}
@@ -184,7 +184,7 @@ export function AssetDisposalPicker({ onSelect, selectedAssetId, label = "选择
 
       {/* Pagination */}
       {total > 0 && (
-        <div className="flex items-center justify-between text-xs text-gray-500">
+        <div className="flex items-center justify-between text-xs text-gray-400">
           <span data-testid="asset-picker-page-info">
             第 {page} / {totalPages} 页，共 {total} 条
           </span>
@@ -193,7 +193,7 @@ export function AssetDisposalPicker({ onSelect, selectedAssetId, label = "选择
               type="button"
               onClick={handlePrevPage}
               disabled={page <= 1 || loading}
-              className="px-3 py-1 border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+              className="px-3 py-1 border border-gray-200 rounded hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
               data-testid="asset-picker-prev"
             >
               上一页
@@ -202,7 +202,7 @@ export function AssetDisposalPicker({ onSelect, selectedAssetId, label = "选择
               type="button"
               onClick={handleNextPage}
               disabled={page >= totalPages || loading}
-              className="px-3 py-1 border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+              className="px-3 py-1 border border-gray-200 rounded hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
               data-testid="asset-picker-next"
             >
               下一页
@@ -226,14 +226,14 @@ export function AssetDisposalPickerModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/25 backdrop-blur-[1px] p-4" onClick={onClose}>
-      <div className="w-full max-w-4xl rounded-2xl border border-gray-100 bg-white shadow-2xl" onClick={(event) => event.stopPropagation()}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-50/25 backdrop-blur-[1px] p-4" onClick={onClose}>
+      <div className="w-full max-w-4xl rounded-2xl border border-gray-200 bg-white shadow-2xl" onClick={(event) => event.stopPropagation()}>
         <div className="flex items-start justify-between gap-4 border-b border-gray-200 px-6 py-4">
           <div>
             <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
-            <p className="mt-1 text-sm text-gray-500">{description}</p>
+            <p className="mt-1 text-sm text-gray-400">{description}</p>
           </div>
-          <button type="button" onClick={onClose} className="text-xl leading-none text-gray-400 hover:text-gray-600" aria-label="关闭资产选择弹窗">
+          <button type="button" onClick={onClose} className="text-xl leading-none text-gray-400 hover:text-gray-500" aria-label="关闭资产选择弹窗">
             ×
           </button>
         </div>

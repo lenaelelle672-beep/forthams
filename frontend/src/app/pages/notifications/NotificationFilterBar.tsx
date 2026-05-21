@@ -62,7 +62,7 @@ export function NotificationFilterBar({
   return (
     <div
       data-testid="notification-filter-bar"
-      className="flex items-center gap-1 px-4 py-2 border-b border-gray-100 overflow-x-auto"
+      className="flex items-center gap-1 px-4 py-2 border-b border-gray-200 overflow-x-auto"
     >
       {FILTER_OPTIONS.map((option) => {
         const isActive = activeFilter === option.value;
@@ -76,7 +76,7 @@ export function NotificationFilterBar({
             className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${
               isActive
                 ? "bg-blue-600 text-white"
-                : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                : "bg-blue-50 text-gray-500 hover:bg-blue-50"
             }`}
           >
             {option.label}

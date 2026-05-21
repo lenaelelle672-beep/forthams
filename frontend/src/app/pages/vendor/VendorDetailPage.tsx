@@ -129,7 +129,7 @@ export default function VendorDetailPage() {
       <div className="container mx-auto px-4 py-8 flex items-center justify-center min-h-[400px]">
         <div className="text-center">
           <Loader2 className="w-8 h-8 animate-spin mx-auto mb-3 text-blue-600" />
-          <p className="text-gray-500 text-sm">加载供应商详情...</p>
+          <p className="text-gray-400 text-sm">加载供应商详情...</p>
         </div>
       </div>
     );
@@ -142,10 +142,10 @@ export default function VendorDetailPage() {
           <button
             type="button"
             onClick={handleGoBack}
-            className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+            className="p-2 rounded-lg hover:bg-blue-50 transition-colors"
             title="返回列表"
           >
-            <ArrowLeft className="w-5 h-5 text-gray-600" />
+            <ArrowLeft className="w-5 h-5 text-gray-500" />
           </button>
           <h1 className="text-2xl font-bold text-gray-900">供应商详情</h1>
         </div>
@@ -164,10 +164,10 @@ export default function VendorDetailPage() {
           <button
             type="button"
             onClick={handleGoBack}
-            className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+            className="p-2 rounded-lg hover:bg-blue-50 transition-colors"
             title="返回列表"
           >
-            <ArrowLeft className="w-5 h-5 text-gray-600" />
+            <ArrowLeft className="w-5 h-5 text-gray-500" />
           </button>
           <h1 className="text-2xl font-bold text-gray-900">供应商详情</h1>
         </div>
@@ -186,7 +186,7 @@ export default function VendorDetailPage() {
       {/* 详情卡片 */}
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
         {/* 供应商名称 */}
-        <div className="px-6 py-4 border-b border-gray-100 bg-gray-50">
+        <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
           <h2 className="text-lg font-semibold text-gray-900">
             {vendor.name || "未命名供应商"}
           </h2>
@@ -195,7 +195,7 @@ export default function VendorDetailPage() {
               className={`mt-1 inline-block text-xs px-2 py-0.5 rounded-full ${
                 vendor.status === 1
                   ? "bg-green-100 text-green-700"
-                  : "bg-gray-100 text-gray-500"
+                  : "bg-blue-50 text-gray-400"
               }`}
             >
               {vendor.status === 1 ? "启用" : "禁用"}
@@ -264,7 +264,7 @@ export default function VendorDetailPage() {
 
       {/* Contract Info 区块 — UI 骨架预留，硬编码空状态 */}
       <div className="mt-6 bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-        <div className="px-6 py-3 border-b border-gray-100 bg-gray-50">
+        <div className="px-6 py-3 border-b border-gray-200 bg-gray-50">
           <h3 className="text-base font-semibold text-gray-900">Contract Info</h3>
         </div>
         <div className="px-6 py-8 text-center text-gray-400 text-sm" data-testid="contract-empty-state">
@@ -274,7 +274,7 @@ export default function VendorDetailPage() {
 
       {/* Audit History 区块 — UI 骨架预留，硬编码空状态 */}
       <div className="mt-6 bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-        <div className="px-6 py-3 border-b border-gray-100 bg-gray-50">
+        <div className="px-6 py-3 border-b border-gray-200 bg-gray-50">
           <h3 className="text-base font-semibold text-gray-900">Audit History</h3>
         </div>
         <div className="px-6 py-8 text-center text-gray-400 text-sm" data-testid="audit-empty-state">
@@ -312,7 +312,7 @@ function DetailRow({
     <div className="flex items-center px-6 py-3">
       <div className="flex items-center gap-2 w-32 shrink-0">
         {icon}
-        <span className="text-sm text-gray-500">{label}</span>
+        <span className="text-sm text-gray-400">{label}</span>
       </div>
       <span className="text-sm text-gray-900">{value || "-"}</span>
     </div>

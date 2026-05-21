@@ -1,32 +1,34 @@
 /**
  * @module frontend/src/app/components/approval/ApprovalFlowChart
  * @description Renders a visual flow chart of the approval history chain.
- *
- * Displays each ApprovalHistoryItem as a node showing the operator, status,
- * timestamp, and comment. The current / last node is highlighted. Shows an
- * empty-state prompt when the history array is empty.
  */
 
 import React from 'react';
-import type { ApprovalHistoryItem, ApprovalItem } from '../../services/approval/types';
+import type { ApprovalHistoryItem, ApprovalItem, ApprovalRuntimePathStep } from '../../services/approval/types';
 import { cn } from '../ui/utils';
 
-// ---------------------------------------------------------------------------
-// Props
-// ---------------------------------------------------------------------------
+type RuntimeStep = {
+  kind: 'runtime';
+  stepNo: number;
+  status: string;
+  records: ApprovalHistoryItem[];
+  runtime: ApprovalRuntimePathStep;
+};
+
+type TimelineStep = RuntimeStep | {
+  kind: 'record' | 'current';
+  stepNo: number;
+  status: string;
+  records: ApprovalHistoryItem[];
+};
 
 export interface ApprovalFlowChartProps {
   /** Current approval process returned by the backend detail API. */
   approval?: ApprovalItem | null;
-  /** Ordered list of approval history records (oldest → newest). */
+  /** Ordered list of approval history records (oldest -> newest). */
   approvalHistory: ApprovalHistoryItem[];
 }
 
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-/** Format an ISO timestamp into a readable locale string. */
 function formatTime(iso: string): string {
   try {
     return new Date(iso).toLocaleString('zh-CN', {
@@ -41,11 +43,12 @@ function formatTime(iso: string): string {
   }
 }
 
-/** Map ApprovalResult to a display label. */
 function statusLabel(status: string): string {
   switch (status) {
     case 'PENDING':
       return '待审批';
+    case 'UPCOMING':
+      return '未开始';
     case 'APPROVED':
       return '已通过';
     case 'REJECTED':
@@ -69,51 +72,85 @@ function statusClasses(status: string, isCurrent: boolean): string {
   if (status === 'PENDING') {
     return isCurrent ? 'bg-blue-500 text-white' : 'border-2 border-blue-300 text-blue-600';
   }
-  return isCurrent ? 'bg-gray-500 text-white' : 'border-2 border-gray-300 text-gray-500';
+  if (status === 'UPCOMING') {
+    return 'border-2 border-dashed border-gray-300 text-gray-400';
+  }
+  return isCurrent ? 'bg-gray-500 text-white' : 'border-2 border-gray-200 text-gray-400';
 }
 
-function makeTimeline(approval: ApprovalItem | null | undefined, history: ApprovalHistoryItem[]) {
+function groupRecordsByStep(history: ApprovalHistoryItem[]) {
+  const grouped = new Map<number, ApprovalHistoryItem[]>();
+  for (const record of [...(history || [])].sort((left, right) => left.stepNo - right.stepNo)) {
+    grouped.set(record.stepNo, [...(grouped.get(record.stepNo) ?? []), record]);
+  }
+  return grouped;
+}
+
+function runtimeStepStatus(records: ApprovalHistoryItem[], approval: ApprovalItem, stepNo: number) {
+  if (records.some((record) => record.status === 'REJECTED')) return 'REJECTED';
+  if (approval.status === 'PENDING' && approval.currentStep === stepNo) return 'PENDING';
+  if (records.length > 0 && records.every((record) => record.status === 'APPROVED')) return 'APPROVED';
+  return 'UPCOMING';
+}
+
+function makeRuntimeTimeline(approval: ApprovalItem | null | undefined, history: ApprovalHistoryItem[]): TimelineStep[] | null {
+  const runtimePath = approval?.workflowRuntimePath;
+  if (!approval || !Array.isArray(runtimePath) || runtimePath.length === 0) return null;
+
+  const recordsByStep = groupRecordsByStep(history);
+  return [...runtimePath]
+    .sort((left, right) => left.stepNo - right.stepNo)
+    .map((runtime) => {
+      const records = recordsByStep.get(runtime.stepNo) ?? [];
+      return {
+        kind: 'runtime' as const,
+        stepNo: runtime.stepNo,
+        status: runtimeStepStatus(records, approval, runtime.stepNo),
+        records,
+        runtime,
+      };
+    });
+}
+
+function makeTimeline(approval: ApprovalItem | null | undefined, history: ApprovalHistoryItem[]): TimelineStep[] {
+  const runtimeTimeline = makeRuntimeTimeline(approval, history);
+  if (runtimeTimeline) return runtimeTimeline;
   const records = [...(history || [])].sort((left, right) => left.stepNo - right.stepNo);
   if (!approval) {
-    return records.map((record) => ({ kind: 'record' as const, stepNo: record.stepNo, status: record.status, record }));
+    return records.map((record) => ({ kind: 'record' as const, stepNo: record.stepNo, status: record.status, records: [record] }));
   }
 
-  const timeline = records.map((record) => ({ kind: 'record' as const, stepNo: record.stepNo, status: record.status, record }));
+  const timeline: TimelineStep[] = records.map((record) => ({ kind: 'record' as const, stepNo: record.stepNo, status: record.status, records: [record] }));
   const hasCurrentRecord = records.some((record) => record.stepNo === approval.currentStep);
   if (approval.status === 'PENDING' && !hasCurrentRecord) {
-    timeline.push({ kind: 'current' as const, stepNo: approval.currentStep, status: 'PENDING' as const, record: null });
+    timeline.push({ kind: 'current' as const, stepNo: approval.currentStep, status: 'PENDING', records: [] });
   }
   if (timeline.length === 0) {
-    timeline.push({ kind: 'current' as const, stepNo: approval.currentStep || 1, status: approval.status, record: null });
+    timeline.push({ kind: 'current' as const, stepNo: approval.currentStep || 1, status: approval.status, records: [] });
   }
   return timeline.sort((left, right) => left.stepNo - right.stepNo);
 }
 
-// ---------------------------------------------------------------------------
-// Component
-// ---------------------------------------------------------------------------
+function highlightedIndex(timeline: TimelineStep[]) {
+  const pendingIndex = timeline.findIndex((item) => item.status === 'PENDING');
+  if (pendingIndex >= 0) return pendingIndex;
+  const rejectedIndex = timeline.findIndex((item) => item.status === 'REJECTED' || item.status === 'CANCELLED');
+  return rejectedIndex >= 0 ? rejectedIndex : timeline.length - 1;
+}
 
-/**
- * ApprovalFlowChart — renders a vertical timeline of approval steps.
- *
- * Each step shows:
- * - Step number badge
- * - Operator ID
- * - Status with colour coding
- * - Timestamp
- * - Comment (if present)
- *
- * The last node in the list is visually highlighted to indicate the current
- * state of the approval chain. When the history array is empty a placeholder
- * message is displayed instead.
- */
+function stepTitle(item: TimelineStep) {
+  if (item.kind === 'runtime') {
+    return item.runtime.label || `第${item.stepNo}级审批`;
+  }
+  return item.records[0] ? `第${item.stepNo}步审批` : '当前待处理节点';
+}
+
 export const ApprovalFlowChart: React.FC<ApprovalFlowChartProps> = ({
   approval,
   approvalHistory,
 }) => {
   const timeline = makeTimeline(approval, approvalHistory);
 
-  // ---- Empty state --------------------------------------------------------
   if (timeline.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-10 text-gray-400">
@@ -135,79 +172,85 @@ export const ApprovalFlowChart: React.FC<ApprovalFlowChartProps> = ({
     );
   }
 
-  const lastStepIndex = timeline.length - 1;
+  const activeStepIndex = highlightedIndex(timeline);
 
   return (
     <div className="flex flex-col">
       {timeline.map((item, idx) => {
-        const isLast = idx === lastStepIndex;
-        const record = item.record;
-        const key = record?.id ? `record-${record.id}` : `current-${item.stepNo}`;
+        const isLast = idx === timeline.length - 1;
+        const isActive = idx === activeStepIndex;
+        const records = item.records;
+        const key = records[0]?.id ? `record-${records[0].id}-step-${item.stepNo}` : `current-${item.stepNo}`;
 
         return (
           <div key={key} className="flex items-start">
-            {/* ---- Left: step indicator ---- */}
             <div className="flex flex-col items-center">
-              {/* Step badge */}
               <div
                 className={cn(
                   'flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold',
-                  statusClasses(item.status, isLast),
+                  statusClasses(item.status, isActive),
                 )}
               >
                 {item.stepNo}
               </div>
 
-              {/* Connector line */}
               {!isLast && (
-                <div className="h-full w-0.5 bg-gray-200" />
+                <div className="h-full w-0.5 bg-blue-50" />
               )}
             </div>
 
-            {/* ---- Right: step details ---- */}
             <div className={cn('ml-4 pb-6', isLast && 'pb-0')}>
               <div className="flex flex-wrap items-center gap-2">
-                {/* Operator */}
                 <span className={cn(
                   'text-sm font-medium',
-                  isLast ? 'text-gray-900' : 'text-gray-700',
+                  isActive ? 'text-gray-900' : 'text-gray-700',
                 )}>
-                  {record ? `操作人 #${record.operator}` : '当前待处理节点'}
+                  {stepTitle(item)}
                 </span>
 
-                {/* Status badge */}
                 <span
                   className={cn(
                     'inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium',
                     (item.status === 'APPROVED' || item.status === 'COMPLETED') && 'bg-green-50 text-green-700',
                     (item.status === 'REJECTED' || item.status === 'CANCELLED') && 'bg-red-50 text-red-700',
                     item.status === 'PENDING' && 'bg-blue-50 text-blue-700',
-                    !['APPROVED', 'COMPLETED', 'REJECTED', 'CANCELLED', 'PENDING'].includes(item.status) && 'bg-gray-100 text-gray-600',
+                    item.status === 'UPCOMING' && 'bg-gray-50 text-gray-500',
+                    !['APPROVED', 'COMPLETED', 'REJECTED', 'CANCELLED', 'PENDING', 'UPCOMING'].includes(item.status) && 'bg-blue-50 text-gray-500',
                   )}
                 >
                   {statusLabel(item.status)}
                 </span>
-
-                {/* Timestamp */}
-                {record?.operatedAt ? (
-                  <span className="text-xs text-gray-400">
-                    {formatTime(record.operatedAt)}
-                  </span>
-                ) : null}
               </div>
 
-              {/* Comment */}
-              {record?.comment ? (
-                <p className={cn(
-                  'mt-1 text-sm',
-                  isLast ? 'text-gray-700' : 'text-gray-500',
-                )}>
-                  {record.comment}
+              {records.length > 0 ? (
+                <div className="mt-2 space-y-1">
+                  {records.map((record) => (
+                    <div key={record.id} className="rounded-md bg-gray-50 px-3 py-2 text-xs text-gray-500">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="font-medium text-gray-700">操作人 #{record.operator}</span>
+                        <span>{statusLabel(record.status)}</span>
+                        {record.operatedAt ? <span>{formatTime(record.operatedAt)}</span> : null}
+                      </div>
+                      {record.comment ? <p className="mt-1 text-gray-500">{record.comment}</p> : null}
+                    </div>
+                  ))}
+                </div>
+              ) : null}
+
+              {records.length === 0 && approval ? (
+                <p className="mt-1 text-sm text-gray-400">
+                  {item.status === 'UPCOMING'
+                    ? `第 ${item.stepNo} 步尚未开始。`
+                    : `流程 ${approval.processNo || approval.id} 正在等待第 ${item.stepNo} 步审批。`}
                 </p>
               ) : null}
-              {!record && approval ? (
-                <p className="mt-1 text-sm text-gray-500">
-                  流程 {approval.processNo || approval.id} 正在等待第 {item.stepNo} 步审批。
+
+              {item.kind === 'runtime' ? (
+                <p className="mt-1 text-xs text-gray-400">
+                  {item.runtime.nodeCode ? `节点 ${item.runtime.nodeCode}` : '运行路径节点'}
+                  {item.runtime.approverType === 'user' && item.runtime.approverId ? ` · 指定用户 #${item.runtime.approverId}` : ''}
+                  {item.runtime.approverRole ? ` · 角色 ${item.runtime.approverRole}` : ''}
+                  {item.runtime.approvalMode ? ` · ${item.runtime.approvalMode}` : ''}
                 </p>
               ) : null}
             </div>

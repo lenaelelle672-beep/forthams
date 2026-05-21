@@ -88,11 +88,11 @@ export function StatisticsPanel() {
           {[1, 2, 3, 4].map((index) => (
             <div
               key={index}
-              className="stat-card bg-white rounded-lg p-6 shadow-sm animate-pulse"
+              className="stat-card bg-[#1e293b] rounded-lg p-6 shadow-sm animate-pulse"
               data-testid={`stat-card-skeleton-${index}`}
             >
-              <div className="h-4 bg-gray-200 rounded w-24 mb-4"></div>
-              <div className="h-8 bg-gray-200 rounded w-16"></div>
+              <div className="h-4 bg-[#1e3a5f] rounded w-24 mb-4"></div>
+              <div className="h-8 bg-[#1e3a5f] rounded w-16"></div>
             </div>
           ))}
         </div>
@@ -103,8 +103,8 @@ export function StatisticsPanel() {
   if (error || !statistics) {
     return (
       <div className="statistics-panel" data-testid="statistics-panel">
-        <div className="bg-white rounded-lg p-6 shadow-sm">
-          <div className="text-center text-gray-500">
+        <div className="bg-[#1e293b] rounded-lg p-6 shadow-sm">
+          <div className="text-center text-slate-500">
             <span className="stat-empty-state">暂无统计数据</span>
           </div>
         </div>
@@ -149,19 +149,19 @@ export function StatisticsPanel() {
         {statCards.map((card) => (
           <div
             key={card.id}
-            className={`${card.className} bg-white rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow duration-200`}
+            className={`${card.className} bg-[#1e293b] rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow duration-200`}
             data-testid={`stat-card-${card.id}`}
             role="region"
             aria-label={card.label}
           >
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-gray-600">{card.label}</span>
+              <span className="text-sm font-medium text-slate-400">{card.label}</span>
               <span className="text-xl" role="img" aria-hidden="true">
                 {card.icon}
               </span>
             </div>
             <div
-              className="stat-value text-2xl font-bold text-gray-900"
+              className="stat-value text-2xl font-bold text-slate-100"
               data-value={card.value}
             >
               {card.value}

@@ -39,7 +39,7 @@
   justify-content: space-between;
   margin-bottom: var(--spacing-md, 16px);
   padding-bottom: var(--spacing-sm, 8px);
-  border-bottom: 1px solid var(--border-color, #e5e7eb);
+  border-bottom: 1px solid var(--border-color, #f8fafc);
 }
 
 .title {
@@ -62,7 +62,7 @@
   gap: var(--spacing-md, 16px);
   margin-top: var(--spacing-md, 16px);
   padding-top: var(--spacing-sm, 8px);
-  border-top: 1px solid var(--border-color, #e5e7eb);
+  border-top: 1px solid var(--border-color, #f8fafc);
 }
 
 .legendItem {
@@ -93,7 +93,7 @@
   background: linear-gradient(
     90deg,
     var(--bg-skeleton, #f3f4f6) 25%,
-    var(--bg-skeleton-light, #e5e7eb) 50%,
+    var(--bg-skeleton-light, #334155) 50%,
     var(--bg-skeleton, #f3f4f6) 75%
   );
   background-size: 200% 100%;
@@ -170,7 +170,7 @@
 
 .retryButton:hover {
   background-color: var(--color-primary, #3b82f6);
-  color: #ffffff;
+  color: #f8fafc;
 }
 
 /* 响应式布局 */
@@ -233,7 +233,7 @@
   }
 
   .title {
-    color: var(--text-primary-dark, #f9fafb);
+    color: var(--text-primary-dark, #f8fafc);
   }
 
   .subtitle,

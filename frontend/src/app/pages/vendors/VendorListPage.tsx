@@ -371,7 +371,7 @@ export default function VendorListPage() {
       );
     }
     return (
-      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-gray-800">
         禁用
       </span>
     );
@@ -410,7 +410,7 @@ export default function VendorListPage() {
             placeholder="搜索供应商名称、编码、联系人或电话..."
             value={searchInput}
             onChange={(e) => handleSearchInput(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 text-sm rounded-lg border border-gray-300
+            className="w-full pl-10 pr-4 py-2 text-sm rounded-lg border border-gray-200
               bg-white focus:outline-none focus:ring-2 focus:ring-blue-500
               focus:border-blue-500 transition-colors"
           />
@@ -422,7 +422,7 @@ export default function VendorListPage() {
           onClick={fetchVendors}
           disabled={loading}
           className="inline-flex items-center gap-1.5 px-3 py-2 text-sm
-            rounded-lg border border-gray-300 bg-white text-gray-700
+            rounded-lg border border-gray-200 bg-white text-gray-700
             hover:bg-gray-50 disabled:opacity-50 transition-colors"
         >
           <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
@@ -439,41 +439,41 @@ export default function VendorListPage() {
 
       {/* 供应商列表表格 */}
       <div className="overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
-        <table className="min-w-full divide-y divide-gray-200">
+        <table className="min-w-full divide-y divide-[#1e3a5f]">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                 供应商编码
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                 供应商名称
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                 联系人
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                 联系电话
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                 联系邮箱
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                 地址
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                 状态
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                 操作
               </th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="bg-white divide-y divide-[#1e3a5f]">
             {loading ? (
               <tr>
                 <td
                   colSpan={8}
-                  className="px-4 py-12 text-center text-gray-500"
+                  className="px-4 py-12 text-center text-gray-400"
                 >
                   <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2" />
                   加载中...
@@ -483,7 +483,7 @@ export default function VendorListPage() {
               <tr>
                 <td
                   colSpan={8}
-                  className="px-4 py-12 text-center text-gray-500"
+                  className="px-4 py-12 text-center text-gray-400"
                 >
                   {keyword ? "未找到匹配的供应商" : "暂无供应商数据"}
                 </td>
@@ -500,17 +500,17 @@ export default function VendorListPage() {
                   <td className="px-4 py-3 text-sm text-gray-900">
                     {vendor.name ?? "-"}
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-600">
+                  <td className="px-4 py-3 text-sm text-gray-500">
                     {vendor.contactPerson ?? "-"}
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-600">
+                  <td className="px-4 py-3 text-sm text-gray-500">
                     {vendor.contactPhone ?? "-"}
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-600">
+                  <td className="px-4 py-3 text-sm text-gray-500">
                     {vendor.contactEmail ?? "-"}
                   </td>
                   <td
-                    className="px-4 py-3 text-sm text-gray-600 max-w-[200px] truncate"
+                    className="px-4 py-3 text-sm text-gray-500 max-w-[200px] truncate"
                     title={vendor.address}
                   >
                     {vendor.address ?? "-"}
@@ -524,7 +524,7 @@ export default function VendorListPage() {
                         type="button"
                         onClick={() => handleOpenEdit(vendor)}
                         className="inline-flex items-center gap-1 px-2 py-1 text-xs
-                          rounded border border-gray-300 bg-white text-gray-700
+                          rounded border border-gray-200 bg-white text-gray-700
                           hover:bg-gray-50 transition-colors"
                         title="编辑"
                       >
@@ -560,7 +560,7 @@ export default function VendorListPage() {
       {/* 统计信息 */}
       {!loading && filteredVendors.length > 0 && (
         <div className="mt-4">
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-gray-500">
             共 {filteredVendors.length} 条记录
             {keyword && ` (搜索: "${keyword}")`}
           </p>
@@ -586,9 +586,9 @@ export default function VendorListPage() {
               <button
                 type="button"
                 onClick={handleCloseModal}
-                className="p-1 rounded-lg hover:bg-gray-100 transition-colors"
+                className="p-1 rounded-lg hover:bg-blue-50 transition-colors"
               >
-                <X className="w-5 h-5 text-gray-500" />
+                <X className="w-5 h-5 text-gray-400" />
               </button>
             </div>
 
@@ -604,7 +604,7 @@ export default function VendorListPage() {
                   value={formData.name}
                   onChange={(e) => handleFieldChange("name", e.target.value)}
                   placeholder="请输入供应商名称"
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-gray-300
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200
                     bg-white focus:outline-none focus:ring-2 focus:ring-blue-500
                     focus:border-blue-500 transition-colors"
                 />
@@ -622,7 +622,7 @@ export default function VendorListPage() {
                     handleFieldChange("vendorCode", e.target.value)
                   }
                   placeholder="请输入供应商编码"
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-gray-300
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200
                     bg-white focus:outline-none focus:ring-2 focus:ring-blue-500
                     focus:border-blue-500 transition-colors"
                 />
@@ -641,7 +641,7 @@ export default function VendorListPage() {
                       handleFieldChange("contactPerson", e.target.value)
                     }
                     placeholder="请输入联系人"
-                    className="w-full px-3 py-2 text-sm rounded-lg border border-gray-300
+                    className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200
                       bg-white focus:outline-none focus:ring-2 focus:ring-blue-500
                       focus:border-blue-500 transition-colors"
                   />
@@ -657,7 +657,7 @@ export default function VendorListPage() {
                       handleFieldChange("contactPhone", e.target.value)
                     }
                     placeholder="请输入联系电话"
-                    className="w-full px-3 py-2 text-sm rounded-lg border border-gray-300
+                    className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200
                       bg-white focus:outline-none focus:ring-2 focus:ring-blue-500
                       focus:border-blue-500 transition-colors"
                   />
@@ -676,7 +676,7 @@ export default function VendorListPage() {
                     handleFieldChange("contactEmail", e.target.value)
                   }
                   placeholder="请输入联系邮箱"
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-gray-300
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200
                     bg-white focus:outline-none focus:ring-2 focus:ring-blue-500
                     focus:border-blue-500 transition-colors"
                 />
@@ -694,7 +694,7 @@ export default function VendorListPage() {
                     handleFieldChange("address", e.target.value)
                   }
                   placeholder="请输入地址"
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-gray-300
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200
                     bg-white focus:outline-none focus:ring-2 focus:ring-blue-500
                     focus:border-blue-500 transition-colors"
                 />
@@ -710,7 +710,7 @@ export default function VendorListPage() {
                   onChange={(e) =>
                     handleFieldChange("status", Number(e.target.value))
                   }
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-gray-300
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200
                     bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value={1}>启用</option>
@@ -725,7 +725,7 @@ export default function VendorListPage() {
                 type="button"
                 onClick={handleCloseModal}
                 disabled={submitting}
-                className="px-4 py-2 text-sm rounded-lg border border-gray-300
+                className="px-4 py-2 text-sm rounded-lg border border-gray-200
                   bg-white text-gray-700 hover:bg-gray-50
                   disabled:opacity-50 transition-colors"
               >

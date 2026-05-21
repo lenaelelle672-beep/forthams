@@ -374,7 +374,7 @@ const VirtualPreviewList: React.FC<VirtualPreviewListProps> = ({
         style={{
           display: 'flex',
           alignItems: 'center',
-          backgroundColor: '#fafafa',
+          backgroundColor: '#f8fafc',
           borderBottom: '2px solid #e8e8e8',
           fontWeight: 600,
           fontSize: 13,

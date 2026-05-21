@@ -185,7 +185,7 @@ const ProgressBar: React.FC<IInventoryProgressProps> = ({
           style={{
             marginTop: 24,
             padding: '12px 16px',
-            backgroundColor: '#fff7e6',
+            backgroundColor: '#1e3a5f',
             borderRadius: 6,
             borderLeft: '4px solid #ffa940',
           }}

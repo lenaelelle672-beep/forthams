@@ -34,7 +34,7 @@ const T = {
   warn: "#ff6b6b",
   gold: "#ffd93d",
   purple: "#a78bfa",
-  text: "#ffffff",
+  text: "#e2e8f0",
   sub: "#8899aa",
   grid: "#1a2540",
 } as const;
@@ -103,14 +103,6 @@ const OS_DATA = [
   { name: "MacOS", value: 220 },
   { name: "Linux", value: 150 },
   { name: "未知", value: 80 },
-];
-
-const ARCH_LAYERS = [
-  { label: "现场设备层", desc: "数控机床 · 机械臂 · 变频器", highlight: false },
-  { label: "现场控制层", desc: "PLC · RTU · HMI", highlight: false },
-  { label: "过程控制层", desc: "DCS · SCADA · 工程师站", highlight: false },
-  { label: "生产执行层", desc: "MES · 操作员站 · 历史数据库", highlight: false },
-  { label: "办公管理层", desc: "ERP · CRM · OA", highlight: true },
 ];
 
 /* ─── Panel Wrapper ──────────────────────────────────────────────────────── */
@@ -228,178 +220,170 @@ function HBar({ name, value, max, idx }: { name: string; value: number; max: num
   );
 }
 
-/* ─── 3D Architecture SVG ────────────────────────────────────────────────── */
+/* ─── Tech Point Network SVG ──────────────────────────────────────────────── */
 function ArchDiagram() {
-  const cx = 210;
-  const baseY = 330;
-  const spacingY = 54;
-  const baseRx = 145;
-  const baseRy = 36;
-  const shrink = 0.81;
+  const cx = 255;
+  const cy = 204;
+  const nodes = [
+    { id: "core", label: "资产中枢", x: cx, y: cy, r: 15, level: "核心", color: T.accent },
+    { id: "asset", label: "资产台账", x: 254, y: 74, r: 9, level: "主数据", color: T.accent },
+    { id: "rfid", label: "RFID盘点", x: 368, y: 115, r: 8, level: "采集", color: T.accent3 },
+    { id: "audit", label: "审计日志", x: 415, y: 218, r: 8, level: "追踪", color: T.purple },
+    { id: "approval", label: "审批流程", x: 334, y: 318, r: 8, level: "流转", color: T.gold },
+    { id: "warning", label: "预警监控", x: 176, y: 315, r: 8, level: "告警", color: T.warn },
+    { id: "warehouse", label: "位置资产", x: 98, y: 205, r: 8, level: "空间", color: T.accent3 },
+    { id: "supplier", label: "供应商", x: 151, y: 111, r: 7, level: "外部", color: T.purple },
+  ];
+
+  const links = [
+    ["core", "asset"],
+    ["core", "rfid"],
+    ["core", "audit"],
+    ["core", "approval"],
+    ["core", "warning"],
+    ["core", "warehouse"],
+    ["core", "supplier"],
+    ["asset", "rfid"],
+    ["rfid", "audit"],
+    ["approval", "warning"],
+    ["warehouse", "supplier"],
+  ];
+
+  const nodeById = new Map(nodes.map((node) => [node.id, node]));
 
   return (
     <svg
       viewBox="0 0 510 400"
       style={{ width: "100%", height: "100%" }}
-      aria-label="工业资产架构分层图"
+      aria-label="资产科技节点态势动画"
     >
       <defs>
-        <radialGradient id="archBgGlow" cx="50%" cy="70%" r="50%">
+        <radialGradient id="techCoreGlow" cx="50%" cy="50%" r="55%">
           <stop offset="0%" stopColor={T.accent} stopOpacity="0.18" />
+          <stop offset="45%" stopColor={T.accent} stopOpacity="0.08" />
           <stop offset="100%" stopColor={T.accent} stopOpacity="0" />
         </radialGradient>
-        <filter id="archGlow">
-          <feGaussianBlur stdDeviation="2.5" result="blur" />
+        <radialGradient id="techNodeGlow" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="#ffffff" stopOpacity="0.92" />
+          <stop offset="38%" stopColor={T.accent} stopOpacity="0.86" />
+          <stop offset="100%" stopColor={T.accent} stopOpacity="0" />
+        </radialGradient>
+        <linearGradient id="techBeam" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor={T.accent} stopOpacity="0" />
+          <stop offset="50%" stopColor={T.accent} stopOpacity="0.78" />
+          <stop offset="100%" stopColor={T.accent} stopOpacity="0" />
+        </linearGradient>
+        <filter id="techGlow" x="-80%" y="-80%" width="260%" height="260%">
+          <feGaussianBlur stdDeviation="3.2" result="blur" />
           <feMerge>
             <feMergeNode in="blur" />
             <feMergeNode in="SourceGraphic" />
           </feMerge>
         </filter>
-        <filter id="softBlur">
-          <feGaussianBlur stdDeviation="4" />
-        </filter>
-        <linearGradient id="colGrad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor={T.accent} stopOpacity="0.6" />
-          <stop offset="100%" stopColor={T.accent} stopOpacity="0.05" />
-        </linearGradient>
+        <pattern id="techGrid" width="28" height="28" patternUnits="userSpaceOnUse">
+          <path d="M28 0H0v28" fill="none" stroke={T.accent} strokeOpacity="0.06" strokeWidth="1" />
+          <circle cx="0" cy="0" r="1" fill={T.accent} fillOpacity="0.13" />
+        </pattern>
       </defs>
 
-      {/* Ambient glow */}
-      <ellipse cx={cx} cy={baseY - 80} rx={200} ry={110} fill="url(#archBgGlow)" />
+      <style>{`
+        .tech-orbit { transform-box: fill-box; transform-origin: center; animation: techSpin 18s linear infinite; }
+        .tech-orbit.fast { animation-duration: 11s; animation-direction: reverse; }
+        .tech-orbit.slow { animation-duration: 28s; }
+        .tech-node { animation: techNodePulse 2.8s ease-in-out infinite; }
+        .tech-node:nth-of-type(2n) { animation-delay: .45s; }
+        .tech-link { stroke-dasharray: 8 10; animation: techDash 2.6s linear infinite; }
+        .tech-scan { transform-box: fill-box; transform-origin: center; animation: techScan 5s linear infinite; }
+        .tech-float { animation: techFloat 4.2s ease-in-out infinite; }
+        .tech-packet { filter: url(#techGlow); }
+        @keyframes techSpin { to { transform: rotate(360deg); } }
+        @keyframes techDash { to { stroke-dashoffset: -72; } }
+        @keyframes techNodePulse { 0%,100% { opacity: .74; } 50% { opacity: 1; } }
+        @keyframes techScan { to { transform: rotate(360deg); } }
+        @keyframes techFloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+      `}</style>
 
-      {/* Central light column (blurred background) */}
-      <rect
-        x={cx - 3}
-        y={55}
-        width={6}
-        height={baseY - 55}
-        fill={T.accent}
-        opacity={0.15}
-        filter="url(#softBlur)"
-      />
-      {/* Central dashed line */}
-      <line
-        x1={cx}
-        y1={70}
-        x2={cx}
-        y2={baseY - 5}
-        stroke={T.accent}
-        strokeWidth={1}
-        strokeDasharray="5,5"
-        opacity={0.45}
-      />
+      <rect width="510" height="400" fill="url(#techGrid)" opacity={0.9} />
+      <circle cx={cx} cy={cy} r="178" fill="url(#techCoreGlow)" />
+      <ellipse cx={cx} cy={330} rx="185" ry="36" fill={T.accent} opacity="0.05" />
 
-      {/* Layers — rendered bottom-to-top (i=0 is the largest base) */}
-      {ARCH_LAYERS.map((layer, i) => {
-        const rx = baseRx * Math.pow(shrink, i);
-        const ry = baseRy * Math.pow(shrink, i);
-        const y = baseY - i * spacingY;
-        const isTop = i === ARCH_LAYERS.length - 1;
-        const fillColor = isTop ? "#ff9632" : T.accent;
-        const fillOpacity = isTop ? 0.32 : 0.18 + i * 0.02;
-        const strokeOpacity = isTop ? 0.9 : 0.65;
+      <g className="tech-orbit slow" opacity="0.75">
+        <ellipse cx={cx} cy={cy} rx="172" ry="112" fill="none" stroke={T.accent} strokeWidth="1" strokeOpacity="0.35" />
+        <ellipse cx={cx} cy={cy} rx="112" ry="172" fill="none" stroke={T.purple} strokeWidth="0.7" strokeOpacity="0.18" />
+      </g>
+      <g className="tech-orbit fast" opacity="0.9">
+        <ellipse cx={cx} cy={cy} rx="128" ry="78" fill="none" stroke={T.accent3} strokeWidth="1" strokeOpacity="0.4" />
+        <circle cx={cx + 128} cy={cy} r="3.2" fill={T.accent3} filter="url(#techGlow)" />
+        <circle cx={cx - 128} cy={cy} r="2.4" fill={T.accent} filter="url(#techGlow)" />
+      </g>
+      <g className="tech-orbit" opacity="0.86">
+        <ellipse cx={cx} cy={cy} rx="72" ry="72" fill="none" stroke={T.accent} strokeWidth="0.8" strokeOpacity="0.34" />
+        <circle cx={cx} cy={cy - 72} r="3" fill={T.accent} filter="url(#techGlow)" />
+      </g>
 
+      <g className="tech-scan" opacity="0.46">
+        <path d={`M${cx} ${cy} L${cx + 168} ${cy - 44} A174 174 0 0 1 ${cx + 124} ${cy + 122} Z`} fill={T.accent} opacity="0.12" />
+      </g>
+
+      {links.map(([fromId, toId]) => {
+        const from = nodeById.get(fromId)!;
+        const to = nodeById.get(toId)!;
+        const pathId = `tech-path-${fromId}-${toId}`;
         return (
-          <g key={layer.label}>
-            {/* Shadow rim below disc for 3D depth */}
-            <ellipse
-              cx={cx}
-              cy={y + 7}
-              rx={rx * 0.95}
-              ry={ry * 0.55}
-              fill="rgba(0,0,0,0.25)"
-            />
-
-            {/* Main disc */}
-            <ellipse
-              cx={cx}
-              cy={y}
-              rx={rx}
-              ry={ry}
-              fill={fillColor}
-              fillOpacity={fillOpacity}
-              stroke={fillColor}
-              strokeWidth={isTop ? 2 : 1.5}
-              strokeOpacity={strokeOpacity}
-              filter={isTop ? "url(#archGlow)" : undefined}
-            />
-
-            {/* Inner concentric ring */}
-            <ellipse
-              cx={cx}
-              cy={y}
-              rx={rx * 0.52}
-              ry={ry * 0.52}
+          <g key={pathId}>
+            <path
+              id={pathId}
+              className="tech-link"
+              d={`M${from.x} ${from.y} C${(from.x + to.x) / 2} ${from.y}, ${(from.x + to.x) / 2} ${to.y}, ${to.x} ${to.y}`}
               fill="none"
-              stroke={fillColor}
-              strokeWidth={0.6}
-              opacity={0.35}
+              stroke="url(#techBeam)"
+              strokeWidth="1.2"
+              strokeOpacity="0.72"
             />
-
-            {/* Device dots on disc surface */}
-            {[-0.55, -0.1, 0.35].map((offset, di) => (
-              <circle
-                key={di}
-                cx={cx + rx * offset}
-                cy={y - ry * 0.2}
-                r={2.5}
-                fill={fillColor}
-                opacity={0.75}
-              />
-            ))}
-
-            {/* Connector line to label */}
-            <line
-              x1={cx + rx + 2}
-              y1={y}
-              x2={cx + rx + 20}
-              y2={y}
-              stroke={T.sub}
-              strokeWidth={0.8}
-              opacity={0.6}
-            />
-            <circle cx={cx + rx + 2} cy={y} r={2} fill={T.sub} opacity={0.5} />
-
-            {/* Layer label */}
-            <text
-              x={cx + rx + 24}
-              y={y - 5}
-              fill={isTop ? "#ff9632" : T.text}
-              fontSize={isTop ? 12 : 11}
-              fontWeight={isTop ? 700 : 400}
-              fontFamily="'PingFang SC', 'Source Han Sans CN', sans-serif"
-            >
-              {layer.label}
-            </text>
-            <text
-              x={cx + rx + 24}
-              y={y + 9}
-              fill={T.sub}
-              fontSize={9.5}
-              fontFamily="'PingFang SC', 'Source Han Sans CN', sans-serif"
-            >
-              {layer.desc}
-            </text>
+            {fromId === "core" ? (
+              <circle className="tech-packet" r="2.7" fill={to.color}>
+                <animateMotion dur={`${2.6 + to.x / 260}s`} repeatCount="indefinite" path={`M${from.x} ${from.y} C${(from.x + to.x) / 2} ${from.y}, ${(from.x + to.x) / 2} ${to.y}, ${to.x} ${to.y}`} />
+              </circle>
+            ) : null}
           </g>
         );
       })}
 
-      {/* Crown marker at top */}
-      <circle
-        cx={cx}
-        cy={baseY - (ARCH_LAYERS.length - 1) * spacingY - 24}
-        r={10}
-        fill={T.accent}
-        opacity={0.45}
-        filter="url(#archGlow)"
-      />
-      <circle
-        cx={cx}
-        cy={baseY - (ARCH_LAYERS.length - 1) * spacingY - 24}
-        r={4}
-        fill={T.text}
-        opacity={0.9}
-      />
+      <g className="tech-float">
+        <circle cx={cx} cy={cy} r="42" fill={T.accent} opacity="0.08" />
+        <circle cx={cx} cy={cy} r="25" fill="none" stroke={T.accent} strokeWidth="1.2" strokeOpacity="0.6" filter="url(#techGlow)" />
+        <circle cx={cx} cy={cy} r="13" fill="url(#techNodeGlow)" filter="url(#techGlow)" />
+        <text x={cx} y={cy + 38} fill={T.text} fontSize="12" fontWeight="700" textAnchor="middle">
+          资产智能中枢
+        </text>
+        <text x={cx} y={cy + 54} fill={T.sub} fontSize="9" textAnchor="middle">
+          DATA · FLOW · RISK · CONTROL
+        </text>
+      </g>
+
+      {nodes.filter((node) => node.id !== "core").map((node, index) => (
+        <g key={node.id} className="tech-node" style={{ animationDelay: `${index * 0.16}s` }}>
+          <circle cx={node.x} cy={node.y} r={node.r + 10} fill={node.color} opacity="0.08" />
+          <circle cx={node.x} cy={node.y} r={node.r + 4} fill="none" stroke={node.color} strokeWidth="1" strokeOpacity="0.38" />
+          <circle cx={node.x} cy={node.y} r={node.r} fill={node.color} opacity="0.78" filter="url(#techGlow)" />
+          <circle cx={node.x - 2} cy={node.y - 2} r="2.3" fill="#fff" opacity="0.8" />
+          <text x={node.x} y={node.y + 25} fill={T.text} fontSize="10" fontWeight="650" textAnchor="middle">
+            {node.label}
+          </text>
+          <text x={node.x} y={node.y + 38} fill={T.sub} fontSize="8" textAnchor="middle">
+            {node.level}
+          </text>
+        </g>
+      ))}
+
+      <g opacity="0.82">
+        <text x="24" y="34" fill={T.accent} fontSize="11" fontWeight="700">
+          ASSET NODE MAP
+        </text>
+        <text x="24" y="51" fill={T.sub} fontSize="8.5">
+          资产数据链路 / 实时拓扑 / 风险态势
+        </text>
+      </g>
     </svg>
   );
 }
@@ -722,7 +706,7 @@ export function AssetSituationDashboard() {
                 flexShrink: 0,
               }}
             >
-              工业资产架构分层视图
+              资产科技节点态势图
             </div>
             <div style={{ flex: 1, padding: "6px 0 0", minHeight: 0 }}>
               <ArchDiagram />

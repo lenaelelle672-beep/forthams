@@ -59,7 +59,7 @@ const STATUS_CLASS_MAP: Record<string, string> = {
 };
 
 /** Fallback classes for unrecognized status values. */
-const FALLBACK_CLASSES = "bg-gray-100 text-gray-600";
+const FALLBACK_CLASSES = "bg-blue-50 text-gray-500";
 
 // ---------------------------------------------------------------------------
 // Component

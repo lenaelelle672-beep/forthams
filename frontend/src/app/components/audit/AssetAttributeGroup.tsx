@@ -428,7 +428,7 @@ const AssetAttributeGroup: React.FC<AssetAttributeGroupProps> = ({
                   key={index}
                   size="small"
                   bordered={false}
-                  style={{ background: '#fffbe6' }}
+                  style={{ background: '#1e3a5f' }}
                 >
                   <Space split={<ArrowRightOutlined style={{ color: '#faad14', fontSize: 10 }} />}>
                     <Text type="secondary" style={{ fontSize: 12 }}>

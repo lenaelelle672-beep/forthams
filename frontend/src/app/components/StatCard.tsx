@@ -23,7 +23,7 @@ export function StatCard({ title, value, change, trend, icon: Icon, color = 'blu
     <div className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-md transition-shadow">
       <div className="flex items-center justify-between">
         <div className="flex-1">
-          <p className="text-sm text-gray-600">{title}</p>
+          <p className="text-sm text-gray-500">{title}</p>
           <p className="text-3xl font-semibold text-gray-900 mt-2">{value}</p>
           {(change || subtitle) && (
             <div className="flex items-center gap-1 mt-2">
@@ -44,7 +44,7 @@ export function StatCard({ title, value, change, trend, icon: Icon, color = 'blu
                 </>
               )}
               {subtitle && (
-                <span className="text-sm text-gray-500">{subtitle}</span>
+                <span className="text-sm text-gray-400">{subtitle}</span>
               )}
             </div>
           )}

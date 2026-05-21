@@ -24,6 +24,7 @@ import { toast } from 'sonner';
 import { apiClient } from '../utils/api';
 import { AssetExportButton } from '../components/asset/AssetExportButton';
 import { AssetBatchImportDialog } from '../components/asset/AssetBatchImportDialog';
+import { getAssetStatusMeta } from '../constants/assetStatus';
 import type { AssetExportParams } from '../hooks/useAssetImportExport';
 
 /* ------------------------------------------------------------------ */
@@ -80,19 +81,6 @@ interface PagedResult<T> {
   current: number;
   pages: number;
 }
-
-/**
- * 资产状态映射配置
- */
-const STATUS_MAP: Record<
-  string,
-  { label: string; className: string }
-> = {
-  ACTIVE: { label: '在用', className: 'bg-green-100 text-green-800' },
-  IDLE: { label: '闲置', className: 'bg-yellow-100 text-yellow-800' },
-  MAINTENANCE: { label: '维保中', className: 'bg-blue-100 text-blue-800' },
-  SCRAPPED: { label: '已报废', className: 'bg-red-100 text-red-800' },
-};
 
 /** 默认分页大小 */
 const DEFAULT_PAGE_SIZE = 20;
@@ -264,13 +252,10 @@ export default function AssetListPage() {
    * @returns React 节点
    */
   const renderStatusBadge = (assetStatus: string | undefined) => {
-    const config = STATUS_MAP[assetStatus ?? ''] ?? {
-      label: assetStatus ?? '-',
-      className: 'bg-gray-100 text-gray-800',
-    };
+    const config = getAssetStatusMeta(assetStatus);
     return (
       <span
-        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${config.className}`}
+        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${config.badgeClass}`}
       >
         {config.label}
       </span>
@@ -287,7 +272,7 @@ export default function AssetListPage() {
             type="button"
             onClick={() => setImportDialogOpen(true)}
             className="inline-flex items-center gap-1.5 px-4 py-2 text-sm
-              rounded-lg border border-gray-300 bg-white text-gray-700
+              rounded-lg border border-gray-200 bg-white text-gray-700
               hover:bg-gray-50 transition-colors"
           >
             <Upload className="w-4 h-4" />
@@ -316,7 +301,7 @@ export default function AssetListPage() {
             placeholder="搜索资产编号或名称..."
             value={keyword}
             onChange={(e) => handleSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 text-sm rounded-lg border border-gray-300
+            className="w-full pl-10 pr-4 py-2 text-sm rounded-lg border border-gray-200
               bg-white focus:outline-none focus:ring-2 focus:ring-blue-500
               focus:border-blue-500 transition-colors"
           />
@@ -326,7 +311,7 @@ export default function AssetListPage() {
         <select
           value={status}
           onChange={(e) => handleStatusFilter(e.target.value)}
-          className="px-3 py-2 text-sm rounded-lg border border-gray-300
+          className="px-3 py-2 text-sm rounded-lg border border-gray-200
             bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="">全部状态</option>
@@ -342,7 +327,7 @@ export default function AssetListPage() {
           onClick={fetchAssets}
           disabled={loading}
           className="inline-flex items-center gap-1.5 px-3 py-2 text-sm
-            rounded-lg border border-gray-300 bg-white text-gray-700
+            rounded-lg border border-gray-200 bg-white text-gray-700
             hover:bg-gray-50 disabled:opacity-50 transition-colors"
         >
           <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
@@ -359,46 +344,46 @@ export default function AssetListPage() {
 
       {/* 资产列表表格 */}
       <div className="overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
-        <table className="min-w-full divide-y divide-gray-200">
+        <table className="min-w-full divide-y divide-[#1e3a5f]">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                 资产编号
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                 资产名称
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                 分类
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                 位置
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                 部门
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                 购置日期
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                 购置价格
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                 状态
               </th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="bg-white divide-y divide-[#1e3a5f]">
             {loading ? (
               <tr>
-                <td colSpan={8} className="px-4 py-12 text-center text-gray-500">
+                <td colSpan={8} className="px-4 py-12 text-center text-gray-400">
                   <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2" />
                   加载中...
                 </td>
               </tr>
             ) : assets.length === 0 ? (
               <tr>
-                <td colSpan={8} className="px-4 py-12 text-center text-gray-500">
+                <td colSpan={8} className="px-4 py-12 text-center text-gray-400">
                   暂无数据
                 </td>
               </tr>
@@ -411,19 +396,19 @@ export default function AssetListPage() {
                   <td className="px-4 py-3 text-sm text-gray-900">
                     {asset.assetName ?? '-'}
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-600">
+                  <td className="px-4 py-3 text-sm text-gray-500">
                     {asset.categoryName ?? '-'}
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-600">
+                  <td className="px-4 py-3 text-sm text-gray-500">
                     {asset.locationName ?? '-'}
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-600">
+                  <td className="px-4 py-3 text-sm text-gray-500">
                     {asset.departmentName ?? '-'}
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-600">
+                  <td className="px-4 py-3 text-sm text-gray-500">
                     {asset.purchaseDate ?? '-'}
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-600 text-right">
+                  <td className="px-4 py-3 text-sm text-gray-500 text-right">
                     {asset.purchasePrice != null
                       ? `¥${asset.purchasePrice.toLocaleString()}`
                       : '-'}
@@ -441,7 +426,7 @@ export default function AssetListPage() {
       {/* 分页 */}
       {total > 0 && (
         <div className="mt-4 flex items-center justify-between">
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-gray-500">
             共 {total} 条记录，第 {page}/{totalPages} 页
           </p>
           <div className="flex items-center gap-2">
@@ -450,7 +435,7 @@ export default function AssetListPage() {
               onClick={() => handlePageChange(page - 1)}
               disabled={page <= 1}
               className="inline-flex items-center gap-1 px-3 py-1.5 text-sm
-                rounded border border-gray-300 bg-white hover:bg-gray-50
+                rounded border border-gray-200 bg-white hover:bg-gray-50
                 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               <ChevronLeft className="w-4 h-4" />
@@ -461,7 +446,7 @@ export default function AssetListPage() {
               onClick={() => handlePageChange(page + 1)}
               disabled={page >= totalPages}
               className="inline-flex items-center gap-1 px-3 py-1.5 text-sm
-                rounded border border-gray-300 bg-white hover:bg-gray-50
+                rounded border border-gray-200 bg-white hover:bg-gray-50
                 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               下一页

@@ -92,15 +92,15 @@ function getStateBadgeClasses(state: string): string {
     case "rejected":
       return "bg-red-100 text-red-800";
     case "draft":
-      return "bg-gray-100 text-gray-800";
+      return "bg-blue-50 text-gray-800";
     case "executing":
       return "bg-blue-100 text-blue-800";
     case "completed":
       return "bg-green-200 text-green-900";
     case "cancelled":
-      return "bg-gray-200 text-gray-600";
+      return "bg-blue-50 text-gray-500";
     default:
-      return "bg-gray-100 text-gray-600";
+      return "bg-blue-50 text-gray-500";
   }
 }
 
@@ -209,7 +209,7 @@ export function WorkOrderApprovalPage() {
           <h2 className="text-2xl font-semibold text-gray-900">
             Work Order Approvals
           </h2>
-          <p className="mt-1 text-gray-600">
+          <p className="mt-1 text-gray-500">
             Review and approve or reject pending work orders
           </p>
         </div>
@@ -236,7 +236,7 @@ export function WorkOrderApprovalPage() {
       {/* Table Card */}
       <div className="rounded-lg border border-gray-200 bg-white">
         {/* Search Bar */}
-        <div className="flex items-center gap-4 border-b border-gray-100 px-6 py-4">
+        <div className="flex items-center gap-4 border-b border-gray-200 px-6 py-4">
           <div className="relative max-w-md flex-1">
             <input
               type="text"
@@ -246,7 +246,7 @@ export function WorkOrderApprovalPage() {
                 setPage(1);
               }}
               placeholder="Search work orders..."
-              className="w-full rounded-lg border border-gray-300 py-2 pl-4 pr-4 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-lg border border-gray-200 py-2 pl-4 pr-4 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
               data-testid="approval-search-input"
             />
           </div>
@@ -260,7 +260,7 @@ export function WorkOrderApprovalPage() {
             ))}
           </div>
         ) : records.length === 0 ? (
-          <div className="px-6 py-12 text-center text-sm text-gray-500">
+          <div className="px-6 py-12 text-center text-sm text-gray-400">
             No work orders found
           </div>
         ) : (
@@ -268,27 +268,27 @@ export function WorkOrderApprovalPage() {
             <table className="w-full">
               <thead className="border-b border-gray-200 bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500">
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase text-gray-400">
                     ID
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500">
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase text-gray-400">
                     Title
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500">
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase text-gray-400">
                     Asset
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500">
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase text-gray-400">
                     Reporter
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500">
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase text-gray-400">
                     Status
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500">
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase text-gray-400">
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200">
+              <tbody className="divide-y divide-[#1e3a5f]">
                 {records.map((row) => (
                   <tr key={row.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 text-sm font-medium text-blue-600">
@@ -297,10 +297,10 @@ export function WorkOrderApprovalPage() {
                     <td className="max-w-[200px] truncate px-6 py-4 text-sm text-gray-900">
                       {row.title}
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-600">
+                    <td className="px-6 py-4 text-sm text-gray-500">
                       {row.assetName ?? "-"}
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-600">
+                    <td className="px-6 py-4 text-sm text-gray-500">
                       {row.reporterName ?? "-"}
                     </td>
                     <td className="px-6 py-4">
@@ -343,21 +343,21 @@ export function WorkOrderApprovalPage() {
         {/* Pagination */}
         {totalPages > 1 && (
           <div className="flex items-center justify-between border-t border-gray-200 px-6 py-4">
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-gray-500">
               Total {total}, Page {page}/{totalPages}
             </p>
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page <= 1}
-                className="rounded-lg border border-gray-300 p-2 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+                className="rounded-lg border border-gray-200 p-2 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 ‹
               </button>
               <button
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                 disabled={page >= totalPages}
-                className="rounded-lg border border-gray-300 p-2 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+                className="rounded-lg border border-gray-200 p-2 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 ›
               </button>

@@ -519,7 +519,7 @@ export const DashboardPage: React.FC = () => {
                       backgroundColor:
                         activity.status === 'success' ? '#f0fdf4' :
                         activity.status === 'warning' ? '#fefce8' :
-                        activity.status === 'info' ? '#eff6ff' : '#f9fafb',
+                        activity.status === 'info' ? '#eff6ff' : '#0f172a',
                     }}
                   >
                     <div
@@ -597,7 +597,7 @@ export const DashboardPage: React.FC = () => {
                           padding: '0.375rem 0.75rem',
                           fontSize: '0.875rem',
                           fontWeight: 500,
-                          color: '#ffffff',
+                          color: '#e2e8f0',
                           backgroundColor: '#2563eb',
                           borderRadius: '0.375rem',
                           border: 'none',

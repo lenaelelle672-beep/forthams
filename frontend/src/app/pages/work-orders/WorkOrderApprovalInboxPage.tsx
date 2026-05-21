@@ -246,7 +246,7 @@ export function WorkOrderApprovalInboxPage() {
   /** Render empty state when no pending approvals. */
   const renderEmpty = () => (
     <div
-      className="px-6 py-12 text-center text-sm text-gray-500"
+      className="px-6 py-12 text-center text-sm text-gray-400"
       data-testid="approval-inbox-empty"
     >
       暂无待审批工单
@@ -263,7 +263,7 @@ export function WorkOrderApprovalInboxPage() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-semibold text-gray-900">审批收件箱</h2>
-          <p className="mt-1 text-gray-600">
+          <p className="mt-1 text-gray-500">
             查看待您审批的工单，执行通过或驳回操作
           </p>
         </div>
@@ -294,33 +294,33 @@ export function WorkOrderApprovalInboxPage() {
             <table className="w-full">
               <thead className="border-b border-gray-200 bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500">
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase text-gray-400">
                     工单编号
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500">
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase text-gray-400">
                     标题
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500">
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase text-gray-400">
                     关联资产
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500">
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase text-gray-400">
                     报修人
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500">
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase text-gray-400">
                     优先级
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500">
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase text-gray-400">
                     审批状态
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500">
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase text-gray-400">
                     创建时间
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500">
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase text-gray-400">
                     操作
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200">
+              <tbody className="divide-y divide-[#1e3a5f]">
                 {items.map((item, index) => (
                   <tr key={item.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 text-sm font-medium text-blue-600">
@@ -329,10 +329,10 @@ export function WorkOrderApprovalInboxPage() {
                     <td className="max-w-[200px] truncate px-6 py-4 text-sm text-gray-900">
                       {item.title ?? "-"}
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-600">
+                    <td className="px-6 py-4 text-sm text-gray-500">
                       {item.assetName ?? "-"}
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-600">
+                    <td className="px-6 py-4 text-sm text-gray-500">
                       {item.reporterName ?? "-"}
                     </td>
                     <td className="px-6 py-4">
@@ -348,7 +348,7 @@ export function WorkOrderApprovalInboxPage() {
                         data-testid={`approval-status-${item.id}`}
                       />
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-600">
+                    <td className="px-6 py-4 text-sm text-gray-500">
                       {item.createTime ?? "-"}
                     </td>
                     <td className="px-6 py-4 text-sm">

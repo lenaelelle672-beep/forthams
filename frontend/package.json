@@ -15,13 +15,16 @@
     "test:coverage:full": "vitest --coverage --coverage.all=true --coverage.include='src/**/*.{ts,tsx}'",
     "e2e": "playwright test",
     "e2e:real": "AMS_E2E_REAL_BACKEND=true playwright test --project=real-backend-smoke",
-    "e2e:ui": "playwright test --ui"
+    "e2e:ui": "playwright test --ui",
+    "stitch": "node --input-type=module ../scripts/stitch-cli.js",
+    "stitch:projects": "node --input-type=module ../scripts/stitch-cli.js projects",
+    "stitch:generate": "node --input-type=module ../scripts/stitch-cli.js generate",
+    "stitch:screens": "node --input-type=module ../scripts/stitch-cli.js screens",
+    "stitch:export": "node --input-type=module ../scripts/stitch-cli.js export"
   },
   "dependencies": {
-    "@emotion/react": "11.14.0",
-    "@emotion/styled": "11.14.1",
-    "@mui/icons-material": "7.3.5",
-    "@mui/material": "7.3.5",
+    "@google/stitch-sdk": "^0.3.5",
+    "@hookform/resolvers": "^5.2.2",
     "@popperjs/core": "2.11.8",
     "@radix-ui/react-accordion": "1.2.3",
     "@radix-ui/react-alert-dialog": "1.1.6",
@@ -49,12 +52,15 @@
     "@radix-ui/react-toggle": "1.1.2",
     "@radix-ui/react-toggle-group": "1.1.2",
     "@radix-ui/react-tooltip": "1.1.8",
+    "@tanstack/react-query": "^5.100.11",
     "@xyflow/react": "^12.10.2",
     "axios": "^1.14.0",
     "class-variance-authority": "0.7.1",
     "clsx": "2.1.1",
     "cmdk": "1.1.1",
     "date-fns": "3.6.0",
+    "echarts": "^6.1.0",
+    "echarts-for-react": "^3.0.6",
     "embla-carousel-react": "8.6.0",
     "input-otp": "1.4.2",
     "lucide-react": "0.487.0",
@@ -75,7 +81,8 @@
     "sonner": "2.0.3",
     "tailwind-merge": "3.2.0",
     "tw-animate-css": "1.3.8",
-    "vaul": "1.1.2"
+    "vaul": "1.1.2",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@playwright/test": "^1.49.1",

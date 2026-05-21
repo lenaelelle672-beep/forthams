@@ -204,7 +204,7 @@ const GraphifyKnowledgeGraph: React.FC<GraphifyKnowledgeGraphProps> = ({
     ctx.fill();
 
     // 绘制边框
-    ctx.strokeStyle = hoveredNode?.id === node.id ? '#FFFFFF' : 'rgba(255,255,255,0.5)';
+    ctx.strokeStyle = hoveredNode?.id === node.id ? '#e2e8f0' : 'rgba(255,255,255,0.5)';
     ctx.lineWidth = hoveredNode?.id === node.id ? 2 / globalScale : 1 / globalScale;
     ctx.stroke();
 
@@ -445,7 +445,7 @@ const GraphifyKnowledgeGraph: React.FC<GraphifyKnowledgeGraphProps> = ({
         <CardContent>
           <div
             ref={containerRef}
-            className="graphify-container relative bg-slate-50 rounded-lg overflow-hidden"
+            className="graphify-container relative bg-gray-50 rounded-lg overflow-hidden"
             style={{ height: dimensions.height - 80 }}
           >
             <ForceGraph2D<GraphifyNode, GraphifyEdge>

@@ -292,7 +292,7 @@ export default function AssetBatchImportPage() {
       {/* 页面标题 */}
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-gray-900">资产批量导入</h1>
-        <p className="mt-2 text-sm text-gray-500">
+        <p className="mt-2 text-sm text-gray-400">
           上传标准 Excel/CSV 文件批量创建资产，支持 .xlsx 和 .csv 格式，单文件最大 10MB
         </p>
       </div>
@@ -311,7 +311,7 @@ export default function AssetBatchImportPage() {
             ${
               isBusy
                 ? 'border-gray-200 bg-gray-50 cursor-not-allowed'
-                : 'border-gray-300 bg-white hover:border-blue-400 hover:bg-blue-50'
+                : 'border-gray-200 bg-white hover:border-blue-400 hover:bg-blue-50'
             }
             ${validationError ? 'border-red-300 bg-red-50' : ''}
           `}
@@ -322,7 +322,7 @@ export default function AssetBatchImportPage() {
             ) : (
               <Upload className="w-10 h-10 text-gray-400 mb-3" />
             )}
-            <p className="mb-1 text-sm text-gray-500">
+            <p className="mb-1 text-sm text-gray-400">
               {isBusy
                 ? importStatus === ImportStatus.UPLOADING
                   ? '正在上传...'
@@ -358,12 +358,12 @@ export default function AssetBatchImportPage() {
         <div className="mb-6 p-4 bg-white rounded-lg border border-gray-200 shadow-sm">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <FileText className="w-5 h-5 text-gray-500" />
+              <FileText className="w-5 h-5 text-gray-400" />
               <div>
                 <p className="text-sm font-medium text-gray-900">
                   {selectedFile.name}
                 </p>
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-gray-400">
                   {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
                 </p>
               </div>
@@ -374,7 +374,7 @@ export default function AssetBatchImportPage() {
                 onClick={handleReset}
                 disabled={isBusy}
                 className="inline-flex items-center gap-1.5 px-4 py-2 text-sm
-                  rounded-lg border border-gray-300 bg-white text-gray-700
+                  rounded-lg border border-gray-200 bg-white text-gray-700
                   hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed
                   transition-colors"
               >
@@ -423,7 +423,7 @@ export default function AssetBatchImportPage() {
               type="button"
               onClick={handleReset}
               className="inline-flex items-center gap-1.5 px-4 py-2 text-sm
-                rounded-lg border border-gray-300 bg-white text-gray-700
+                rounded-lg border border-gray-200 bg-white text-gray-700
                 hover:bg-gray-50 transition-colors"
             >
               <RotateCcw className="w-4 h-4" />

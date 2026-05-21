@@ -250,7 +250,7 @@ const TaskListItem: React.FC<TaskListItemProps> = ({
       style={{
         cursor: 'pointer',
         padding: '12px 16px',
-        background: isSelected ? '#e6f4ff' : '#ffffff',
+        background: isSelected ? '#1e3a5f' : '#1e293b',
         borderLeft: isSelected
           ? '3px solid #1677ff'
           : '3px solid transparent',
@@ -398,7 +398,7 @@ export const TaskList: React.FC<TaskListProps> = ({
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
-        background: '#fafafa',
+        background: '#f8fafc',
         borderRight: '1px solid #f0f0f0',
       }}
       aria-label="盘点任务列表面板"

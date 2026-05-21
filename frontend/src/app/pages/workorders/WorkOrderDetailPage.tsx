@@ -78,7 +78,7 @@ import {
 function getStatusBadgeClasses(status?: string): string {
   switch (status) {
     case "DRAFT":
-      return "bg-gray-100 text-gray-800";
+      return "bg-blue-50 text-gray-800";
     case "PENDING":
       return "bg-yellow-100 text-yellow-800";
     case "APPROVED":
@@ -90,9 +90,9 @@ function getStatusBadgeClasses(status?: string): string {
     case "REJECTED":
       return "bg-red-100 text-red-800";
     case "CANCELLED":
-      return "bg-gray-200 text-gray-600";
+      return "bg-blue-50 text-gray-500";
     default:
-      return "bg-gray-100 text-gray-600";
+      return "bg-blue-50 text-gray-500";
   }
 }
 
@@ -180,7 +180,7 @@ function ApprovalCommentModal({
             <button
               type="button"
               onClick={onCancel}
-              className="text-gray-400 hover:text-gray-600 text-xl"
+              className="text-gray-400 hover:text-gray-500 text-xl"
               disabled={submitting}
             >
               &times;
@@ -203,7 +203,7 @@ function ApprovalCommentModal({
             <textarea
               id="wo-approval-comment"
               data-testid="wo-approval-comment-input"
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               rows={4}
               maxLength={1000}
               placeholder={
@@ -227,7 +227,7 @@ function ApprovalCommentModal({
               type="button"
               onClick={onCancel}
               disabled={submitting}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
             >
               取消
             </button>
@@ -317,7 +317,7 @@ function ApprovalTimeline({
                   )}
                 </div>
                 {!isLast && (
-                  <div className="w-px h-full bg-gray-200 min-h-[24px]" />
+                  <div className="w-px h-full bg-blue-50 min-h-[24px]" />
                 )}
               </div>
 
@@ -340,7 +340,7 @@ function ApprovalTimeline({
                   <span className="text-xs text-gray-400">第 {entry.stepNo} 步</span>
                 </div>
                 {entry.comment && (
-                  <p className="mt-1 text-sm text-gray-600 bg-gray-50 rounded-lg px-3 py-2">
+                  <p className="mt-1 text-sm text-gray-500 bg-gray-50 rounded-lg px-3 py-2">
                     {entry.comment}
                   </p>
                 )}
@@ -520,9 +520,9 @@ export function WorkOrderDetailPage() {
     return (
       <div className="max-w-4xl mx-auto space-y-6 pb-12">
         <div className="flex items-center gap-4 mb-8">
-          <div className="w-10 h-10 bg-gray-100 rounded-lg animate-pulse" />
+          <div className="w-10 h-10 bg-blue-50 rounded-lg animate-pulse" />
           <div className="space-y-2">
-            <div className="h-6 w-48 bg-gray-100 rounded animate-pulse" />
+            <div className="h-6 w-48 bg-blue-50 rounded animate-pulse" />
             <div className="h-4 w-32 bg-gray-50 rounded animate-pulse" />
           </div>
         </div>
@@ -542,10 +542,10 @@ export function WorkOrderDetailPage() {
         <div className="flex items-center gap-4 mb-8">
           <button
             onClick={() => navigate("/workorders")}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 hover:bg-blue-50 rounded-lg transition-colors"
             type="button"
           >
-            <ArrowLeft className="w-5 h-5 text-gray-600" />
+            <ArrowLeft className="w-5 h-5 text-gray-500" />
           </button>
           <h2 className="text-2xl font-bold text-gray-900">工单详情</h2>
         </div>
@@ -579,15 +579,15 @@ export function WorkOrderDetailPage() {
         <div className="flex items-center gap-4">
           <button
             onClick={() => navigate("/workorders")}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 hover:bg-blue-50 rounded-lg transition-colors"
             type="button"
             data-testid="work-order-back-btn"
           >
-            <ArrowLeft className="w-5 h-5 text-gray-600" />
+            <ArrowLeft className="w-5 h-5 text-gray-500" />
           </button>
           <div>
             <h2 className="text-2xl font-bold text-gray-900">工单详情</h2>
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-gray-400 mt-1">
               工单编号：{order.workOrderNo || order.id}
             </p>
           </div>
@@ -600,7 +600,7 @@ export function WorkOrderDetailPage() {
             className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
               canEdit
                 ? "text-blue-700 bg-blue-50 hover:bg-blue-100"
-                : "text-gray-400 bg-gray-100 cursor-not-allowed"
+                : "text-gray-400 bg-blue-50 cursor-not-allowed"
             }`}
             title={canEdit ? "编辑工单" : "当前状态不允许编辑"}
             data-testid="work-order-edit-btn"
@@ -612,7 +612,7 @@ export function WorkOrderDetailPage() {
           {/* Refresh */}
           <button
             onClick={() => refetch()}
-            className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 text-gray-400 hover:text-gray-700 hover:bg-blue-50 rounded-lg transition-colors"
             title="刷新"
           >
             <RefreshCw className="w-4 h-4" />
@@ -671,13 +671,13 @@ export function WorkOrderDetailPage() {
         <div className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
-              <p className="text-sm text-gray-500 mb-1">工单编号</p>
+              <p className="text-sm text-gray-400 mb-1">工单编号</p>
               <p className="text-lg font-semibold text-gray-900">
                 {order.workOrderNo || order.id}
               </p>
             </div>
             <div>
-              <p className="text-sm text-gray-500 mb-1">状态</p>
+              <p className="text-sm text-gray-400 mb-1">状态</p>
               <span
                 className={`inline-block px-3 py-1 text-sm font-medium rounded-full ${getStatusBadgeClasses(order.status)}`}
                 data-testid="work-order-detail-status"
@@ -686,7 +686,7 @@ export function WorkOrderDetailPage() {
               </span>
             </div>
             <div>
-              <p className="text-sm text-gray-500 mb-1">优先级</p>
+              <p className="text-sm text-gray-400 mb-1">优先级</p>
               <span
                 className={`inline-block px-3 py-1 text-sm font-medium rounded ${getPriorityBadgeClasses(order.priority)}`}
               >
@@ -700,32 +700,32 @@ export function WorkOrderDetailPage() {
       {/* Section: Basic Info */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200 bg-gray-50/50 flex items-center gap-2">
-          <FileText className="w-5 h-5 text-gray-500" />
+          <FileText className="w-5 h-5 text-gray-400" />
           <h3 className="text-lg font-semibold text-gray-900">基本信息</h3>
         </div>
         <div className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="md:col-span-2">
-              <p className="text-sm text-gray-500 mb-1">标题</p>
+              <p className="text-sm text-gray-400 mb-1">标题</p>
               <p className="text-base font-medium text-gray-900">
                 {order.title || "-"}
               </p>
             </div>
             <div className="md:col-span-2">
-              <p className="text-sm text-gray-500 mb-1">描述</p>
+              <p className="text-sm text-gray-400 mb-1">描述</p>
               <p className="text-base text-gray-700 whitespace-pre-wrap">
                 {order.description || "-"}
               </p>
             </div>
             <div>
-              <p className="text-sm text-gray-500 mb-1">报修人</p>
+              <p className="text-sm text-gray-400 mb-1">报修人</p>
               <p className="text-base text-gray-900 flex items-center gap-2">
                 <User className="w-4 h-4 text-gray-400" />
                 {order.reporterName || "-"}
               </p>
             </div>
             <div>
-              <p className="text-sm text-gray-500 mb-1">创建时间</p>
+              <p className="text-sm text-gray-400 mb-1">创建时间</p>
               <p className="text-base text-gray-900 flex items-center gap-2">
                 <Clock className="w-4 h-4 text-gray-400" />
                 {order.createTime || "-"}
@@ -744,25 +744,25 @@ export function WorkOrderDetailPage() {
         <div className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <p className="text-sm text-gray-500 mb-1">资产ID</p>
+              <p className="text-sm text-gray-400 mb-1">资产ID</p>
               <p className="text-base text-gray-900">
                 {order.assetId ?? "-"}
               </p>
             </div>
             <div>
-              <p className="text-sm text-gray-500 mb-1">资产名称</p>
+              <p className="text-sm text-gray-400 mb-1">资产名称</p>
               <p className="text-base text-gray-900">
                 {order.assetName || "-"}
               </p>
             </div>
             <div>
-              <p className="text-sm text-gray-500 mb-1">资产编码</p>
+              <p className="text-sm text-gray-400 mb-1">资产编码</p>
               <p className="text-base text-gray-900">
                 {order.assetCode || "-"}
               </p>
             </div>
             <div>
-              <p className="text-sm text-gray-500 mb-1">所属部门</p>
+              <p className="text-sm text-gray-400 mb-1">所属部门</p>
               <p className="text-base text-gray-900">
                 {order.deptName || "-"}
               </p>
@@ -780,46 +780,46 @@ export function WorkOrderDetailPage() {
         <div className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <p className="text-sm text-gray-500 mb-1">指派给</p>
+              <p className="text-sm text-gray-400 mb-1">指派给</p>
               <p className="text-base text-gray-900 flex items-center gap-2">
                 <User className="w-4 h-4 text-gray-400" />
                 {order.assigneeName || "-"}
               </p>
             </div>
             <div>
-              <p className="text-sm text-gray-500 mb-1">预估费用</p>
+              <p className="text-sm text-gray-400 mb-1">预估费用</p>
               <p className="text-base text-gray-900 flex items-center gap-2">
                 <DollarSign className="w-4 h-4 text-gray-400" />
                 {order.estimatedCost != null ? `¥${order.estimatedCost}` : "-"}
               </p>
             </div>
             <div>
-              <p className="text-sm text-gray-500 mb-1">计划开始日期</p>
+              <p className="text-sm text-gray-400 mb-1">计划开始日期</p>
               <p className="text-base text-gray-900">
                 {order.plannedStartDate || "-"}
               </p>
             </div>
             <div>
-              <p className="text-sm text-gray-500 mb-1">计划结束日期</p>
+              <p className="text-sm text-gray-400 mb-1">计划结束日期</p>
               <p className="text-base text-gray-900">
                 {order.plannedEndDate || "-"}
               </p>
             </div>
             {order.actualStartDate && (
               <div>
-                <p className="text-sm text-gray-500 mb-1">实际开始日期</p>
+                <p className="text-sm text-gray-400 mb-1">实际开始日期</p>
                 <p className="text-base text-gray-900">{order.actualStartDate}</p>
               </div>
             )}
             {order.actualEndDate && (
               <div>
-                <p className="text-sm text-gray-500 mb-1">实际结束日期</p>
+                <p className="text-sm text-gray-400 mb-1">实际结束日期</p>
                 <p className="text-base text-gray-900">{order.actualEndDate}</p>
               </div>
             )}
             {order.actualCost != null && (
               <div>
-                <p className="text-sm text-gray-500 mb-1">实际费用</p>
+                <p className="text-sm text-gray-400 mb-1">实际费用</p>
                 <p className="text-base text-gray-900">¥{order.actualCost}</p>
               </div>
             )}
@@ -841,7 +841,7 @@ export function WorkOrderDetailPage() {
         <button
           type="button"
           onClick={() => navigate("/workorders")}
-          className="px-6 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg transition-colors"
+          className="px-6 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 rounded-lg transition-colors"
         >
           返回列表
         </button>
@@ -851,7 +851,7 @@ export function WorkOrderDetailPage() {
           <button
             onClick={handleCancel}
             disabled={operating}
-            className="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 text-sm font-medium text-gray-500 bg-blue-50 hover:bg-blue-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             取消工单
           </button>

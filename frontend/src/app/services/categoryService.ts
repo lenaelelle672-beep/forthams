@@ -2,7 +2,19 @@ import { api } from "../utils/api";
 
 export interface CategoryRecord {
   id: number;
+  name?: string;
+  code?: string;
+  parentId?: number | null;
+  children?: CategoryRecord[];
   [key: string]: unknown;
+}
+
+/** 后端树接口节点（GET /categories/tree） */
+export interface CategoryTreeNode {
+  code: string;
+  name: string;
+  id?: number;
+  children?: CategoryTreeNode[];
 }
 
 export const categoryService = {
@@ -12,6 +24,11 @@ export const categoryService = {
 
   getAll() {
     return api.get<CategoryRecord[]>("/categories/all");
+  },
+
+  /** 获取分类树（含层级 children） */
+  getTree() {
+    return api.get<CategoryTreeNode[]>("/categories/tree");
   },
 
   getById(id: number | string) {

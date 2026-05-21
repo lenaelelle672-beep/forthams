@@ -187,11 +187,11 @@ export const DataPreview: React.FC<DataPreviewProps> = ({
         <Table stickyHeader size="small">
           <TableHead>
             <TableRow>
-              <TableCell sx={{ fontWeight: 'bold', backgroundColor: '#f5f5f5', minWidth: 60 }}>
+              <TableCell sx={{ fontWeight: 'bold', backgroundColor: '#ffffff', minWidth: 60 }}>
                 行号
               </TableCell>
               {headers.map((header) => (
-                <TableCell key={header} sx={{ fontWeight: 'bold', backgroundColor: '#f5f5f5', minWidth: 100 }}>
+                <TableCell key={header} sx={{ fontWeight: 'bold', backgroundColor: '#ffffff', minWidth: 100 }}>
                   {getFieldLabel(header)}
                 </TableCell>
               ))}

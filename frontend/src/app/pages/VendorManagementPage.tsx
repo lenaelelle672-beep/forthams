@@ -299,7 +299,7 @@ export default function VendorManagementPage() {
             placeholder="搜索供应商名称、编码、联系人或电话..."
             value={searchInput}
             onChange={(e) => handleSearchInput(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 text-sm rounded-lg border border-gray-300
+            className="w-full pl-10 pr-4 py-2 text-sm rounded-lg border border-gray-200
               bg-white focus:outline-none focus:ring-2 focus:ring-blue-500
               focus:border-blue-500 transition-colors"
           />
@@ -310,7 +310,7 @@ export default function VendorManagementPage() {
           onClick={fetchVendorList}
           disabled={loading}
           className="inline-flex items-center gap-1.5 px-3 py-2 text-sm
-            rounded-lg border border-gray-300 bg-white text-gray-700
+            rounded-lg border border-gray-200 bg-white text-gray-700
             hover:bg-gray-50 disabled:opacity-50 transition-colors"
         >
           <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
@@ -330,7 +330,7 @@ export default function VendorManagementPage() {
       {/* 统计信息 */}
       {!loading && filteredVendors.length > 0 && (
         <div className="mt-4">
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-gray-500">
             共 {filteredVendors.length} 条记录
             {searchTerm && ` (搜索: "${searchTerm}")`}
           </p>
@@ -354,14 +354,14 @@ export default function VendorManagementPage() {
             <h3 className="text-lg font-semibold text-gray-900 mb-2">
               确认删除
             </h3>
-            <p className="text-sm text-gray-600 mb-6">
+            <p className="text-sm text-gray-500 mb-6">
               确定要删除该供应商吗？此操作不可撤销。
             </p>
             <div className="flex items-center justify-end gap-3">
               <button
                 type="button"
                 onClick={handleCancelDelete}
-                className="px-4 py-2 text-sm rounded-lg border border-gray-300
+                className="px-4 py-2 text-sm rounded-lg border border-gray-200
                   bg-white text-gray-700 hover:bg-gray-50 transition-colors"
               >
                 取消

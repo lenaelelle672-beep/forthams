@@ -236,7 +236,7 @@ function ChartSkeleton({ height }: { height: number }) {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#fafafa',
+        backgroundColor: '#f8fafc',
         borderRadius: '8px',
       }}
     >

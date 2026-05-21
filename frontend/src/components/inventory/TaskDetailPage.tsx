@@ -275,7 +275,7 @@ export default function TaskDetailPage() {
             type="text"
             icon={<ArrowLeftOutlined />}
             onClick={() => navigate('/inventory')}
-            className="mb-1 -ml-2 text-gray-500 hover:text-blue-600"
+            className="mb-1 -ml-2 text-gray-400 hover:text-blue-600"
             aria-label={t('backToList')}
           >
             {t('backToList')}

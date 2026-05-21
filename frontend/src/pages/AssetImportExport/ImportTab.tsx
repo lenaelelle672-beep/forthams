@@ -209,7 +209,7 @@ const VirtualPreviewTable: React.FC<VirtualTableProps> = ({
           display: 'flex',
           height: VIRTUAL_ROW_HEIGHT,
           lineHeight: `${VIRTUAL_ROW_HEIGHT}px`,
-          background: '#fafafa',
+          background: '#f8fafc',
           borderBottom: '1px solid #f0f0f0',
           fontWeight: 600,
           fontSize: 14,
@@ -997,13 +997,13 @@ const ImportTab: React.FC = () => {
       {/* 全局样式 —— 错误行高亮 */}
       <style>{`
         .row-error {
-          background-color: #fff2f0 !important;
+          background-color: #3b1c1c !important;
         }
         .ant-table .row-error:hover > td {
           background-color: #fff1f0 !important;
         }
         .ant-table .row-error td {
-          border-bottom-color: #ffccc7 !important;
+          border-bottom-color: #7f1d1d !important;
         }
         .asset-import-export-page {
           min-height: calc(100vh - 160px);

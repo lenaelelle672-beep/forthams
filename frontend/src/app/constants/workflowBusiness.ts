@@ -25,7 +25,7 @@ export const businessFlowOptions = [
     description: "用于资产报废转让多级审批、收款确认与核算归档的本地流程定义草稿。",
     businessName: "资产报废转让",
     formPath: "/disposals/scrap/new",
-    stepCount: 10,
+    stepCount: 5,
     accentClass: "from-orange-500 to-rose-500",
   },
   {
@@ -34,7 +34,7 @@ export const businessFlowOptions = [
     description: "用于资产损失赔偿、信息安全审批、财务审批与库房接收的本地流程定义草稿。",
     businessName: "资产赔偿",
     formPath: "/disposals/compensation/new",
-    stepCount: 8,
+    stepCount: 5,
     accentClass: "from-amber-500 to-yellow-500",
   },
 ] as const;

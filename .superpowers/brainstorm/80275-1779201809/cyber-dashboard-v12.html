@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>forthAMS v12 炫酷科技大屏</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0b0e14;color:#c8d6e5;font-family:"Inter","PingFang SC","Microsoft YaHei",sans-serif;overflow:hidden;height:100vh}
+.screen{width:100vw;height:100vh;position:relative;overflow:hidden;background:linear-gradient(135deg,#0b0e14 0%,#0d1321 30%,#111827 60%,#0f1623 100%)}
+.screen::before{content:"";position:absolute;inset:0;background:linear-gradient(rgba(60,160,220,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(60,160,220,.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none}
+
+.particles{position:absolute;inset:0;pointer-events:none;z-index:1}
+.particle{position:absolute;width:2px;height:2px;border-radius:50%;background:rgba(80,200,230,.6);box-shadow:0 0 6px rgba(80,200,230,.4);animation:pFloat linear infinite}
+@keyframes pFloat{0%{transform:translateY(0) translateX(0);opacity:0}10%{opacity:1}90%{opacity:1}100%{transform:translateY(-100vh) translateX(30px);opacity:0}}
+
+.layout{position:relative;z-index:2;width:100%;height:100%;display:grid;grid-template-columns:280px 1fr 280px;grid-template-rows:64px 1fr 220px;gap:12px;padding:12px}
+
+.header{grid-column:1/-1;display:flex;align-items:center;justify-content:center;position:relative}
+.header-line{flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(60,180,220,.4),transparent)}
+.header-title{padding:0 32px;font-size:26px;font-weight:800;color:#e8f4f8;letter-spacing:6px;text-shadow:0 0 20px rgba(60,180,220,.5),0 0 40px rgba(60,180,220,.2);white-space:nowrap}
+.header-meta{position:absolute;right:16px;top:50%;transform:translateY(-50%);display:flex;gap:16px;font:600 12px "SF Mono","JetBrains Mono",monospace;color:#5a7a8a}
+.header-meta-left{position:absolute;left:16px;top:50%;transform:translateY(-50%);display:flex;gap:16px;font:600 12px "SF Mono","JetBrains Mono",monospace;color:#5a7a8a}
+
+.panel{border:1px solid rgba(60,180,220,.15);border-radius:4px;background:rgba(15,25,40,.6);position:relative;overflow:hidden;backdrop-filter:blur(2px)}
+.panel::before{content:"";position:absolute;left:0;right:0;top:0;height:20px;background:linear-gradient(90deg,rgba(60,180,220,.12),transparent 60%);clip-path:polygon(0 0,100% 0,95% 100%,5% 100%);opacity:.7}
+.panel::after{content:"";position:absolute;left:-40%;top:0;width:30%;height:100%;background:linear-gradient(90deg,transparent,rgba(80,200,230,.06),transparent);transform:skewX(-15deg);animation:panelSweep 8s ease-in-out infinite;pointer-events:none}
+@keyframes panelSweep{0%,40%{left:-40%;opacity:0}55%{opacity:1}100%{left:140%;opacity:0}}
+
+.panel-title{padding:10px 14px 6px;font-size:13px;font-weight:700;color:#a8d8ea;letter-spacing:1px;display:flex;align-items:center;gap:8px}
+.panel-title::before{content:"";width:14px;height:10px;background:linear-gradient(135deg,#4ecdc4 0 40%,transparent 40% 60%,#45b7aa 60%);transform:skewX(-12deg);box-shadow:0 0 8px rgba(78,205,196,.3)}
+.panel-body{padding:6px 14px 10px}
+
+.big-num{font:900 28px "SF Mono","JetBrains Mono",monospace;color:#e8f4f8;text-shadow:0 0 14px rgba(60,180,220,.4);letter-spacing:2px}
+.num-unit{font-size:11px;color:#5a8a9a;font-weight:700;margin-left:4px}
+
+.bar-chart{display:flex;align-items:flex-end;gap:8px;height:100px;padding:0 4px 10px;border-bottom:1px solid rgba(60,180,220,.1);background:linear-gradient(rgba(60,180,220,.04) 1px,transparent 1px);background-size:100% 25%}
+.bar-chart i{flex:1;border-radius:3px 3px 0 0;background:linear-gradient(180deg,#4ecdc4,rgba(78,205,196,.15));box-shadow:0 0 10px rgba(78,205,196,.2);position:relative;animation:barGrow .8s ease-out both}
+@keyframes barGrow{from{transform:scaleY(0);transform-origin:bottom}}
+
+.donut-wrap{display:flex;justify-content:center;padding:8px 0}
+.donut{width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,#0f1923 0 42%,transparent 43%),conic-gradient(#4ecdc4 0 35%,#45b7aa 35% 60%,#e8a838 60% 78%,rgba(60,180,220,.15) 78%);position:relative;box-shadow:0 0 20px rgba(78,205,196,.15);animation:donutSpin 15s linear infinite}
+.donut::after{content:"5,234";position:absolute;inset:0;display:grid;place-items:center;color:#e8f4f8;font:900 18px "SF Mono","JetBrains Mono",monospace;text-shadow:0 0 12px rgba(60,180,220,.4);animation:donutCounter 15s linear infinite}
+@keyframes donutSpin{to{transform:rotate(360deg)}}
+@keyframes donutCounter{to{transform:rotate(-360deg)}}
+
+.legend-row{display:flex;align-items:center;gap:6px;margin:4px 0;font-size:11px;color:#7a9aaa;font-weight:700}
+.legend-row i{display:inline-block;width:8px;height:8px;border-radius:2px}
+
+.progress-row{display:grid;grid-template-columns:50px 1fr 36px;align-items:center;gap:6px;margin:6px 0;font-size:11px;color:#7a9aaa;font-weight:700}
+.prog-bar{height:4px;border-radius:99px;background:rgba(60,180,220,.1);overflow:hidden}
+.prog-bar i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#4ecdc4,#45b7aa);box-shadow:0 0 8px rgba(78,205,196,.3)}
+
+.center-area{position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.center-bg{position:absolute;inset:30px 60px 40px;border:1px solid rgba(60,180,220,.12);background:linear-gradient(rgba(60,180,220,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(60,180,220,.04) 1px,transparent 1px);background-size:50px 50px;transform:perspective(800px) rotateX(62deg);box-shadow:0 0 50px rgba(60,180,220,.08);pointer-events:none}
+.center-beam{position:absolute;left:20%;right:20%;top:15%;height:35%;background:linear-gradient(180deg,rgba(78,205,196,.18),rgba(60,180,220,.06),transparent);clip-path:polygon(48% 0,52% 0,100% 100%,0 100%);filter:blur(.5px);animation:beamPulse 4s ease-in-out infinite alternate;pointer-events:none}
+@keyframes beamPulse{to{opacity:.4;transform:translateY(6px) scaleX(1.06)}}
+
+.center-surface{position:absolute;left:50%;top:46%;width:520px;height:260px;transform:translate(-50%,-50%) perspective(800px) rotateX(58deg) rotateZ(-2deg);border:1px solid rgba(78,205,196,.2);background:linear-gradient(rgba(78,205,196,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(78,205,196,.06) 1px,transparent 1px);background-size:100% 20%,12% 100%;box-shadow:0 0 60px rgba(78,205,196,.1);animation:surfaceFloat 7s ease-in-out infinite alternate}
+@keyframes surfaceFloat{to{transform:translate(-50%,-52%) perspective(800px) rotateX(58deg) rotateZ(-2deg)}}
+
+.center-wave{position:absolute;left:50%;top:46%;width:480px;height:180px;transform:translate(-50%,-50%) perspective(800px) rotateX(58deg) rotateZ(-2deg);background:linear-gradient(180deg,rgba(78,205,196,.55),rgba(60,180,220,.3) 45%,rgba(60,180,220,.02) 80%);clip-path:polygon(0 76%,8% 52%,18% 46%,28% 56%,38% 38%,48% 34%,58% 22%,68% 26%,78% 14%,88% 22%,100% 12%,100% 54%,88% 60%,78% 70%,68% 68%,58% 76%,48% 80%,38% 84%,28% 92%,18% 82%,8% 86%,0 100%);filter:drop-shadow(0 0 16px rgba(78,205,196,.45));background-size:200% 100%;animation:waveFlow 5s ease-in-out infinite alternate}
+.center-wave.gold{width:460px;height:160px;top:52%;background:linear-gradient(180deg,rgba(232,168,56,.6),rgba(200,140,40,.3),rgba(200,140,40,.02));clip-path:polygon(0 80%,10% 62%,20% 56%,30% 60%,40% 50%,50% 46%,60% 38%,70% 46%,80% 34%,100% 40%,100% 74%,80% 70%,70% 78%,60% 74%,50% 82%,40% 80%,30% 90%,20% 82%,10% 86%,0 100%);opacity:.75;animation-delay:-1.2s}
+@keyframes waveFlow{to{transform:translate(-50%,-54%) perspective(800px) rotateX(58deg) rotateZ(-2deg);background-position:100% 0}}
+
+.scan-line{position:absolute;left:12%;right:12%;height:3px;background:linear-gradient(90deg,transparent,#4ecdc4,#45b7aa,#4ecdc4,transparent);box-shadow:0 0 16px rgba(78,205,196,.5);transform:perspective(800px) rotateX(58deg) rotateZ(-2deg);animation:scanDown 3.5s ease-in-out infinite;pointer-events:none}
+@keyframes scanDown{0%{top:32%;opacity:0}15%,75%{opacity:1}100%{top:70%;opacity:0}}
+
+.glow-dot{position:absolute;width:8px;height:8px;border-radius:50%;background:#4ecdc4;box-shadow:0 0 18px #4ecdc4,0 0 0 6px rgba(78,205,196,.08);animation:dotBounce 4s ease-in-out infinite alternate}
+.glow-dot.a{left:22%;top:50%}.glow-dot.b{left:64%;top:32%;animation-delay:-1s}.glow-dot.c{left:76%;top:48%;background:#e8a838;box-shadow:0 0 18px #e8a838,0 0 0 6px rgba(232,168,56,.08);animation-delay:-2s}
+@keyframes dotBounce{to{transform:translateY(-10px) scale(1.15)}}
+
+.center-label{position:absolute;bottom:40px;width:100%;text-align:center;font-size:18px;font-weight:900;color:#d8eef6;letter-spacing:4px;text-shadow:0 0 18px rgba(60,180,220,.45)}
+.center-axis{position:absolute;left:14%;right:14%;bottom:100px;display:flex;justify-content:space-between;color:#6a8a9a;font:700 11px "SF Mono","JetBrains Mono",monospace}
+
+.peak-row{display:flex;align-items:flex-end;justify-content:space-around;height:90px;padding:0 8px 8px;border-bottom:1px solid rgba(60,180,220,.1);background:linear-gradient(rgba(60,180,220,.04) 1px,transparent 1px);background-size:100% 25%}
+.peak{width:28px;background:linear-gradient(180deg,#4ecdc4,rgba(78,205,196,.15));clip-path:polygon(50% 0,85% 100%,15% 100%);filter:drop-shadow(0 0 6px rgba(78,205,196,.4));animation:peakGlow 3s ease-in-out infinite alternate}
+.peak:nth-child(2){animation-delay:-.6s}.peak:nth-child(3){animation-delay:-1.2s}.peak:nth-child(4){animation-delay:-1.8s}.peak:nth-child(5){animation-delay:-2.4s}
+@keyframes peakGlow{to{filter:drop-shadow(0 0 12px rgba(78,205,196,.6));transform:translateY(-4px)}}
+
+.line-chart{height:100px;position:relative;border-bottom:1px solid rgba(60,180,220,.1);overflow:hidden}
+.line-chart .curve{position:absolute;left:8px;right:8px;height:60px;bottom:16px;border-bottom:2px solid rgba(78,205,196,.65);border-radius:50% 50% 0 0;transform:skewX(-6deg);box-shadow:0 0 12px rgba(78,205,196,.25)}
+.line-chart .curve.gold{height:40px;bottom:8px;border-bottom-color:rgba(232,168,56,.65);transform:skewX(10deg)}
+
+.left-col,.right-col{display:flex;flex-direction:column;gap:12px}
+.bottom-row{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+
+.ring-wrap{display:flex;align-items:center;gap:12px;justify-content:center}
+.ring{width:100px;height:100px;border-radius:50%;background:radial-gradient(circle,#0f1923 0 42%,transparent 43%),conic-gradient(#4ecdc4 0 40%,#45b7aa 40% 65%,#e8a838 65% 82%,rgba(60,180,220,.15) 82%);box-shadow:0 0 18px rgba(78,205,196,.15);animation:donutSpin 16s linear infinite;flex-shrink:0}
+.ring::after{content:"8426";position:absolute;inset:0;display:grid;place-items:center;color:#e8f4f8;font:900 16px "SF Mono","JetBrains Mono",monospace;text-shadow:0 0 10px rgba(60,180,220,.4);animation:donutCounter 16s linear infinite}
+
+.icon-metric{display:grid;place-items:center;text-align:center;padding:6px;border:1px solid rgba(60,180,220,.1);background:rgba(60,180,220,.03);border-radius:4px}
+.icon-metric b{color:#e8f4f8;font:900 18px "SF Mono","JetBrains Mono",monospace;text-shadow:0 0 10px rgba(60,180,220,.3);letter-spacing:1px}
+.icon-metric span{color:#6a8a9a;font-size:10px;font-weight:700;line-height:1.4}
+.icon-metrics-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:6px}
+
+.date-bar{position:absolute;bottom:0;left:0;right:0;height:28px;display:flex;align-items:center;justify-content:center;background:rgba(10,14,20,.8);border-top:1px solid rgba(60,180,220,.08);font:600 11px "SF Mono","JetBrains Mono",monospace;color:#4a6a7a;gap:24px;z-index:10}
+</style>
+</head>
+<body>
+<div class="screen">
+<div class="particles" id="particles"></div>
+
+<div class="layout">
+<div class="header">
+<div class="header-meta-left"><span>FORTHAMS</span><span>杭州</span><span>2026/05/20</span></div>
+<div class="header-line"></div>
+<div class="header-title">企业资产态势监控中心</div>
+<div class="header-line"></div>
+<div class="header-meta"><span>星期三</span><span id="clock">00:00:00</span></div>
+</div>
+
+<div class="left-col">
+<div class="panel">
+<div class="panel-title">资产类型分布</div>
+<div class="panel-body">
+<div><span class="big-num">5,234.56</span><span class="num-unit">台/套</span></div>
+<div class="peak-row" style="margin-top:8px">
+<i class="peak" style="height:48px"></i><i class="peak" style="height:72px"></i><i class="peak" style="height:36px"></i><i class="peak" style="height:56px"></i><i class="peak" style="height:64px"></i>
+</div>
+</div>
+</div>
+
+<div class="panel">
+<div class="panel-title">资产负载分布</div>
+<div class="panel-body">
+<div class="donut-wrap"><div class="donut"></div></div>
+<div style="margin-top:6px">
+<div class="legend-row"><i style="background:#4ecdc4"></i>设备类 42%</div>
+<div class="legend-row"><i style="background:#45b7aa"></i>电子类 25%</div>
+<div class="legend-row"><i style="background:#e8a838"></i>家具类 15%</div>
+<div class="legend-row"><i style="background:rgba(60,180,220,.3)"></i>其他 18%</div>
+</div>
+</div>
+</div>
+
+<div class="panel">
+<div class="panel-title">资产风险趋势</div>
+<div class="panel-body">
+<div class="line-chart"><i class="curve"></i><i class="curve gold"></i></div>
+</div>
+</div>
+</div>
+
+<div class="center-area">
+<div class="center-bg"></div>
+<div class="center-beam"></div>
+<div class="center-surface"></div>
+<div class="center-wave"></div>
+<div class="center-wave gold"></div>
+<div class="scan-line"></div>
+<i class="glow-dot a"></i><i class="glow-dot b"></i><i class="glow-dot c"></i>
+<div class="center-axis"><span>2017</span><span>2019</span><span>2021</span><span>2023</span><span>2025</span></div>
+<div class="center-label">近十年资产价值与纳管趋势</div>
+</div>
+
+<div class="right-col">
+<div class="panel">
+<div class="panel-title">本年度盘点执行率</div>
+<div class="panel-body">
+<div><span class="big-num">96.20</span><span class="num-unit">%</span></div>
+<div class="progress-row"><span>No.1</span><div class="prog-bar"><i style="width:98%"></i></div><span>98%</span></div>
+<div class="progress-row"><span>No.2</span><div class="prog-bar"><i style="width:90%"></i></div><span>90%</span></div>
+<div class="progress-row"><span>No.3</span><div class="prog-bar"><i style="width:87%"></i></div><span>87%</span></div>
+</div>
+</div>
+
+<div class="panel">
+<div class="panel-title">跨部门流转执行率</div>
+<div class="panel-body">
+<div><span class="big-num">89.50</span><span class="num-unit">%</span></div>
+<div class="progress-row"><span>部门一</span><div class="prog-bar"><i style="width:95%"></i></div><span>95%</span></div>
+<div class="progress-row"><span>部门二</span><div class="prog-bar"><i style="width:88%"></i></div><span>88%</span></div>
+<div class="progress-row"><span>部门三</span><div class="prog-bar"><i style="width:82%"></i></div><span>82%</span></div>
+</div>
+</div>
+
+<div class="panel">
+<div class="panel-title">项目级资产利用率</div>
+<div class="panel-body">
+<div class="icon-metrics-grid">
+<div class="icon-metric"><div><b>56.9%</b><span>整体资产<br>利用率</span></div></div>
+<div class="icon-metric"><div><b>67.4%</b><span>维保处置<br>进度</span></div></div>
+<div class="icon-metric"><div><b>79.2%</b><span>财资回收<br>入账率</span></div></div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="bottom-row">
+<div class="panel">
+<div class="panel-title">入库 / 领用趋势</div>
+<div class="panel-body">
+<div class="bar-chart"><i style="height:34%"></i><i style="height:58%"></i><i style="height:46%"></i><i style="height:78%"></i><i style="height:62%"></i><i style="height:92%"></i><i style="height:72%"></i><i style="height:86%"></i></div>
+</div>
+</div>
+<div class="panel">
+<div class="panel-title">资产状态分布</div>
+<div class="panel-body">
+<div class="ring-wrap">
+<div class="ring" style="position:relative"></div>
+<div>
+<div class="legend-row"><i style="background:#4ecdc4"></i>业务活动 20%</div>
+<div class="legend-row"><i style="background:#45b7aa"></i>单位管控 45%</div>
+<div class="legend-row"><i style="background:#e8a838"></i>资产处置 24%</div>
+<div class="legend-row"><i style="background:rgba(60,180,220,.3)"></i>其他费用 11%</div>
+</div>
+</div>
+</div>
+</div>
+<div class="panel">
+<div class="panel-title">支出 / 维保分布</div>
+<div class="panel-body">
+<div class="bar-chart"><i style="height:68%"></i><i style="height:44%"></i><i style="height:80%"></i><i style="height:52%"></i><i style="height:74%"></i><i style="height:60%"></i><i style="height:88%"></i><i style="height:66%"></i></div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="date-bar">
+<span>本年预算执行 32,457.78 万元</span>
+<span>同比 +6.03%</span>
+<span>纳管资产 8,426 台/套</span>
+<span>RFID 同步率 98%</span>
+</div>
+</div>
+
+<script>
+// 粒子背景
+(function(){
+  var c=document.getElementById('particles');
+  for(var i=0;i<40;i++){
+    var p=document.createElement('div');
+    p.className='particle';
+    p.style.left=Math.random()*100+'%';
+    p.style.top=Math.random()*100+'%';
+    p.style.animationDuration=(8+Math.random()*12)+'s';
+    p.style.animationDelay=(Math.random()*6)+'s';
+    p.style.width=p.style.height=(1+Math.random()*2)+'px';
+    c.appendChild(p);
+  }
+})();
+
+// 时钟
+(function(){
+  function tick(){
+    var d=new Date();
+    var s=[d.getHours(),d.getMinutes(),d.getSeconds()].map(function(v){return v<10?'0'+v:v}).join(':');
+    document.getElementById('clock').textContent=s;
+  }
+  tick();setInterval(tick,1000);
+})();
+
+// 数字滚动
+(function(){
+  var nums=document.querySelectorAll('.big-num');
+  nums.forEach(function(el){
+    var raw=el.textContent.replace(/,/g,'');
+    var final=parseFloat(raw);
+    var isDec=raw.indexOf('.')>-1;
+    var cur=0,inc=final/50;
+    var timer=setInterval(function(){
+      cur+=inc;
+      if(cur>=final){cur=final;clearInterval(timer)}
+      el.textContent=isDec?cur.toFixed(2):Math.floor(cur).toLocaleString();
+    },20);
+  });
+})();
+</script>
+</body>
+</html>

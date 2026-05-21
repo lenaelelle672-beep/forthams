@@ -157,7 +157,7 @@ export const RetirementRequestForm: React.FC<RetirementRequestFormProps> = ({
       <Card data-testid="retirement-request-form-blocked">
         <CardContent className="flex flex-col items-center py-8">
           <AlertTriangle className="h-8 w-8 text-yellow-500 mb-3" />
-          <p className="text-sm text-gray-600 font-medium">
+          <p className="text-sm text-gray-500 font-medium">
             该资产已处于终结状态（已报废），无法发起新的退役申请
           </p>
           {onCancel && (

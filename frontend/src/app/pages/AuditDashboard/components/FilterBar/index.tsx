@@ -242,7 +242,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
         gap: '12px',
         alignItems: 'center',
         padding: '16px',
-        backgroundColor: '#fafafa',
+        backgroundColor: '#f8fafc',
         borderRadius: '8px',
         marginBottom: '16px',
       }}

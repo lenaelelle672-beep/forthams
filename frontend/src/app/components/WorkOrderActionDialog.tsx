@@ -135,7 +135,7 @@ export function WorkOrderActionDialog({
 
         {/* Body */}
         <div className="mt-4">
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-gray-500">
             {type === "approve"
               ? `Are you sure you want to approve work order ${workOrderId}?`
               : `Please provide a reason for rejecting work order ${workOrderId}:`}
@@ -155,7 +155,7 @@ export function WorkOrderActionDialog({
                 name="reason"
                 aria-label="Reason"
                 role="textbox"
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="mt-1 block w-full rounded-md border border-gray-200 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 rows={3}
                 placeholder="Enter reject reason"
                 value={reason}
@@ -180,7 +180,7 @@ export function WorkOrderActionDialog({
             type="button"
             onClick={onClose}
             disabled={isLoading}
-            className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:opacity-50"
+            className="rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:opacity-50"
           >
             Cancel
           </button>

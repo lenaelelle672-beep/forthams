@@ -40,6 +40,7 @@ import type {
   MaintenanceHistoryItem,
   OperationHistoryEntry,
 } from '../components/AssetOperationHistory';
+import { getAssetStatusMeta } from '../constants/assetStatus';
 
 /**
  * 资产状态颜色映射
@@ -390,7 +391,7 @@ const AssetDetailPage: React.FC = () => {
           </Descriptions.Item>
           <Descriptions.Item label="资产状态">
             <Tag color={STATUS_COLORS[asset.status] || 'default'} data-testid="status-badge">
-              {asset.status}
+              {getAssetStatusMeta(asset.status).label}
             </Tag>
           </Descriptions.Item>
           <Descriptions.Item label="所属部门">

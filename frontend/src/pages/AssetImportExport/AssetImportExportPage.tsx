@@ -1,928 +1,368 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import { useState, useRef, useCallback } from 'react';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import {
-  Tabs,
-  Button,
+  Download,
   Upload,
-  Card,
-  Table,
-  Tag,
-  Alert,
-  Progress,
-  Modal,
-  Select,
-  TreeSelect,
-  Cascader,
-  Space,
-  message,
-  Typography,
-  Input,
-  Result,
-  Divider,
-} from 'antd';
-import {
-  InboxOutlined,
-  DownloadOutlined,
-  CheckCircleOutlined,
-  CloseCircleOutlined,
-  WarningOutlined,
-  ReloadOutlined,
-  ExclamationCircleOutlined,
-} from '@ant-design/icons';
-import type { TableColumnsType } from 'antd';
-import axios from 'axios';
-import dayjs from 'dayjs';
+  FileText,
+  X,
+  Table2,
+  FileSpreadsheet,
+  ArrowUpFromLine,
+  CheckCircle,
+  AlertTriangle,
+  XCircle,
+} from 'lucide-react';
+import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
+import { Input } from '@/components/ui/Input';
+import { PageHeader } from '@/components/ui/PageHeader';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/Tabs';
 
-const { Title, Text } = Typography;
-const { Dragger } = Upload;
-
-// ==================== 类型定义 ====================
-
-/** 资产行数据（对应后端解析返回的行结构） */
 interface AssetRow {
-  rowNumber: number;
+  id: string;
   name: string;
-  categoryCode: string;
-  statusCode: string;
-  locationCode: string;
-  purchaseDate: string;
-  originalValue: number;
-  [key: string]: unknown;
+  category: string;
+  serialNumber: string;
+  status: string;
+  validation: 'success' | 'warning' | 'error';
 }
 
-/** 行级校验错误 */
-interface RowError {
-  rowNumber: number;
-  field: string;
-  message: string;
-}
-
-/** 解析结果（POST /import/parse 返回） */
-interface ParseResult {
-  parseId: string;
-  rows: AssetRow[];
-  errors: RowError[];
-}
-
-/** 提交结果（POST /import/commit 返回） */
-interface CommitResult {
-  success: boolean;
-  importedCount: number;
-  failedCount: number;
-}
-
-/** 导出筛选条件（POST /export 请求体） */
-interface ExportFilters {
-  categoryCodes: string[];
-  statusCodes: string[];
-  locationCodes: string[];
-}
-
-/** 级联选项（存放位置） */
-interface CascaderOption {
-  value: string;
-  label: string;
-  children?: CascaderOption[];
-  isLeaf?: boolean;
-}
-
-/** 导入面板阶段状态机 */
-type ImportPhase =
-  | 'idle'           // 等待上传
-  | 'uploading'      // 上传中（显示进度）
-  | 'parsing'        // 上传完成，等待后端解析
-  | 'preview'        // 解析完成，显示预览表格
-  | 'uploadFailed'   // 上传/解析失败，可重试
-  | 'submitting'     // 提交中
-  | 'completed';     // 提交完成，显示结果摘要
-
-// ==================== 常量 ====================
-
-/** 单文件大小上限 10MB */
-const MAX_FILE_SIZE = 10 * 1024 * 1024;
-
-/** 资产状态选项（导出筛选面板硬编码） */
-const STATUS_OPTIONS = [
-  { label: '在用', value: 'IN_USE' },
-  { label: '闲置', value: 'IDLE' },
-  { label: '维修中', value: 'MAINTAINING' },
-  { label: '报废', value: 'SCRAPPED' },
+const MOCK_PREVIEW: AssetRow[] = [
+  { id: '1', name: '卡特彼勒 320 GC 挖掘机', category: '挖掘机械', serialNumber: 'CAT320-99823', status: '在用', validation: 'success' },
+  { id: '2', name: '吉尼 Z-45/25J DC 高空作业平台', category: '高空作业设备', serialNumber: 'GENZ45-11022', status: '维修中', validation: 'warning' },
+  { id: '3', name: '海斯特 H50XT 叉车', category: '叉车', serialNumber: 'INVALID_SN', status: '在用', validation: 'error' },
+  { id: '4', name: '麦克 Granite GU813 自卸车', category: '自卸车', serialNumber: 'MACK-883921', status: '在途', validation: 'success' },
+  { id: '5', name: '山猫 S76 滑移装载机', category: '滑移装载机', serialNumber: 'BOB-S76-4402', status: '在用', validation: 'success' },
 ];
 
-/** 校验失败行背景色 */
-const ROW_ERROR_BG = '#FFF2F0';
-/** 校验通过行背景色 */
-const ROW_VALID_BG = '#F6FFED';
-/** 可编辑单元格下划线色 */
-const EDITABLE_UNDERLINE_COLOR = '#1890ff';
+const VALIDATION_STYLES = {
+  success: { bg: '#dcfce7', text: '#16a34a', border: '#16a34a1a', label: '成功', Icon: CheckCircle },
+  warning: { bg: '#fef3c7', text: '#d97706', border: '#d977061a', label: '警告', Icon: AlertTriangle },
+  error: { bg: '#ffdad6', text: '#ba1a1a', border: '#ba1a1a1a', label: '错误', Icon: XCircle },
+} as const;
 
-// ==================== 工具函数 ====================
+const CATEGORY_OPTIONS = ['全部分类', '重型设备', '车辆', '工业工具'];
+const STATUS_OPTIONS_EXPORT = ['全部状态', '在用', '维修中', '已退役'];
 
-/**
- * 使用 Blob + URL.createObjectURL 触发浏览器文件下载。
- * 下载完成后调用 URL.revokeObjectURL() 释放内存。
- */
-function downloadBlob(blob: Blob, filename: string): void {
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  setTimeout(() => URL.revokeObjectURL(url), 100);
-}
-
-/**
- * 校验上传文件：仅允许 .xlsx 格式，大小不超过 10MB。
- * 返回 { valid: boolean, message: string }。
- */
-function validateUploadFile(file: File): { valid: boolean; message: string } {
-  const ext = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
-  if (ext !== '.xlsx') {
-    return { valid: false, message: '仅支持 .xlsx 格式文件' };
-  }
-  if (file.size > MAX_FILE_SIZE) {
-    return { valid: false, message: '文件大小不能超过 10MB' };
-  }
-  return { valid: true, message: '' };
-}
-
-// ==================== Axios 实例（含 401 拦截） ====================
-
-const apiClient = axios.create({
-  baseURL: '/api/v1',
-  timeout: 120000,
-});
-
-/** 响应拦截器：Token 过期时展示 Toast 并跳转登录页 */
-apiClient.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      message.error('登录已过期');
-      setTimeout(() => {
-        window.location.href = '/login';
-      }, 1500);
-    }
-    return Promise.reject(error);
-  }
-);
-
-// ==================== 注入行级背景色样式 ====================
-
-const rowStyles = `
-  .import-row-error td { background-color: ${ROW_ERROR_BG} !important; }
-  .import-row-valid td { background-color: ${ROW_VALID_BG} !important; }
-  .import-row-error:hover > td { background-color: #fff1f0 !important; }
-  .import-row-valid:hover > td { background-color: #f0ffe6 !important; }
-`;
-
-// ==================== 主组件 ====================
-
-const AssetImportExportPage: React.FC = () => {
-  // ---------- Tab 状态 ----------
-  const [activeTab, setActiveTab] = useState<string>('import');
-
-  // ---------- 导入状态 ----------
-  const [importPhase, setImportPhase] = useState<ImportPhase>('idle');
+export default function AssetImportExportPage() {
+  const [activeTab, setActiveTab] = useState('import');
   const [uploadProgress, setUploadProgress] = useState(0);
-  const [parseId, setParseId] = useState('');
-  const [rows, setRows] = useState<AssetRow[]>([]);
-  const [originalErrors, setOriginalErrors] = useState<RowError[]>([]);
-  /** 记录用户编辑过的 `${rowNumber}-${field}` 组合，编辑后移除对应错误提示 */
-  const [editedFields, setEditedFields] = useState<Set<string>>(new Set());
-  const [commitResult, setCommitResult] = useState<CommitResult | null>(null);
-  const [currentFile, setCurrentFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadedFile, setUploadedFile] = useState<string | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // ---------- 导出状态 ----------
-  const [categoryTree, setCategoryTree] = useState<Array<{ value: string; title: string; children?: unknown[] }>>([]);
-  const [locationCascade, setLocationCascade] = useState<CascaderOption[]>([]);
-  const [exportCategoryCodes, setExportCategoryCodes] = useState<string[]>([]);
-  const [exportStatusCodes, setExportStatusCodes] = useState<string[]>([]);
-  /** Cascader 多选值为 string[][]，每项为路径数组 */
-  const [exportLocationValues, setExportLocationValues] = useState<string[][]>([]);
-  const [exportLoading, setExportLoading] = useState(false);
+  const [exportFormat, setExportFormat] = useState<'xlsx' | 'csv'>('xlsx');
+  const [exportCategory, setExportCategory] = useState('');
+  const [exportStatus, setExportStatus] = useState('');
 
-  // ---------- 派生状态 ----------
+  useQuery({
+    queryKey: ['import-preview'],
+    queryFn: async () => {
+      return { data: MOCK_PREVIEW };
+    },
+    enabled: false,
+  });
 
-  /**
-   * 当前仍有错误的字段映射（排除已被用户编辑清除的）。
-   * key = rowNumber, value = 未清除的 RowError[]
-   */
-  const errorsMap = useMemo(() => {
-    const map = new Map<number, RowError[]>();
-    originalErrors.forEach((err) => {
-      const key = `${err.rowNumber}-${err.field}`;
-      if (!editedFields.has(key)) {
-        const list = map.get(err.rowNumber) || [];
-        list.push(err);
-        map.set(err.rowNumber, list);
-      }
-    });
-    return map;
-  }, [originalErrors, editedFields]);
-
-  /** 初始就存在错误的行号集合 */
-  const originalErrorRowNumbers = useMemo(() => {
-    const s = new Set<number>();
-    originalErrors.forEach((e) => s.add(e.rowNumber));
-    return s;
-  }, [originalErrors]);
-
-  /** 用户编辑过的行号集合 */
-  const editedRowNumbers = useMemo(() => {
-    const s = new Set<number>();
-    editedFields.forEach((key) => {
-      const rn = parseInt(key.split('-')[0], 10);
-      s.add(rn);
-    });
-    return s;
-  }, [editedFields]);
-
-  /** 当前无剩余错误的行号（可作为有效数据提交） */
-  const validRowNumbers = useMemo(() => {
-    return new Set(
-      rows.filter((r) => !errorsMap.has(r.rowNumber)).map((r) => r.rowNumber)
-    );
-  }, [rows, errorsMap]);
-
-  /** 是否存在至少一行有效数据 */
-  const hasAnyValidRow = validRowNumbers.size > 0;
-
-  // ---------- 导入处理函数 ----------
-
-  /** 下载导入模板：GET /api/v1/assets/import/template → Blob 下载 */
-  const handleDownloadTemplate = async () => {
-    try {
-      const res = await apiClient.get('/assets/import/template', {
-        responseType: 'blob',
+  const exportMutation = useMutation({
+    mutationFn: async (filters: { categories: string[]; statuses: string[]; format: string }) => {
+      const res = await fetch('/api/v1/assets/export', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(filters),
       });
-      downloadBlob(res.data, 'asset_import_template.xlsx');
-    } catch {
-      message.error('下载模板失败，请稍后重试');
-    }
-  };
+      if (!res.ok) throw new Error('导出失败');
+      return res.blob();
+    },
+  });
 
-  /**
-   * 执行文件上传与解析：POST /api/v1/assets/import/parse
-   * 使用 XMLHttpRequest 以获取上传进度。
-   */
-  const doUpload = (file: File) => {
-    setImportPhase('uploading');
-    setUploadProgress(0);
-    setCurrentFile(file);
-
-    const formData = new FormData();
-    formData.append('file', file);
-
-    const xhr = new XMLHttpRequest();
-
-    xhr.upload.onprogress = (e) => {
-      if (e.lengthComputable) {
-        const pct = Math.round((e.loaded / e.total) * 100);
-        setUploadProgress(pct);
-        if (pct >= 100) {
-          setImportPhase('parsing');
-        }
-      }
-    };
-
-    xhr.onload = () => {
-      if (xhr.status === 200) {
-        try {
-          const result: ParseResult = JSON.parse(xhr.responseText);
-          setParseId(result.parseId);
-          setRows(result.rows);
-          setOriginalErrors(result.errors || []);
-          setEditedFields(new Set());
-          setCommitResult(null);
-          setImportPhase('preview');
-        } catch {
-          setImportPhase('uploadFailed');
-          message.error('解析返回数据格式异常');
-        }
-      } else if (xhr.status === 401) {
-        // 由拦截器处理
-      } else {
-        setImportPhase('uploadFailed');
-        try {
-          const errBody = JSON.parse(xhr.responseText);
-          message.error(errBody.message || '上传解析失败，请重试');
-        } catch {
-          message.error('上传解析失败，请重试');
-        }
-      }
-    };
-
-    xhr.onerror = () => {
-      setImportPhase('uploadFailed');
-      message.error('网络错误，请检查网络连接后重试');
-    };
-
-    xhr.open('POST', '/api/v1/assets/import/parse');
-    xhr.send(formData);
-  };
-
-  /**
-   * Dragger beforeUpload 回调：
-   * 1. 并发上传防护
-   * 2. 文件类型校验
-   * 3. 文件大小校验
-   * 返回 false 阻止 Ant Design 默认上传行为。
-   */
-  const handleBeforeUpload = (file: File) => {
-    // ATB-019: 并发上传防护
-    if (importPhase === 'uploading' || importPhase === 'parsing') {
-      message.warning('当前有文件正在上传，请等待完成');
-      return false;
-    }
-    const validation = validateUploadFile(file);
-    if (!validation.valid) {
-      message.error(validation.message);
-      return false;
-    }
-    doUpload(file);
-    return false;
-  };
-
-  /** 重试上传（使用上次上传的文件） */
-  const handleRetry = () => {
-    if (currentFile) {
-      doUpload(currentFile);
-    }
-  };
-
-  /**
-   * 可编辑单元格值变更：
-   * 更新行数据，并标记该字段为已编辑以移除错误提示。
-   */
-  const handleCellEdit = (rowNumber: number, field: string, value: string) => {
-    setRows((prev) =>
-      prev.map((r) => (r.rowNumber === rowNumber ? { ...r, [field]: value } : r))
-    );
-    setEditedFields((prev) => {
-      const next = new Set(prev);
-      next.add(`${rowNumber}-${field}`);
-      return next;
-    });
-  };
-
-  /**
-   * 确认提交导入：POST /api/v1/assets/import/commit
-   * 发送 parseId + 用户修正后的全部 rows。
-   */
-  const handleCommit = async () => {
-    if (!parseId) return;
-    setImportPhase('submitting');
-    try {
-      const res = await apiClient.post<CommitResult>('/assets/import/commit', {
-        parseId,
-        rows,
-      });
-      setCommitResult(res.data);
-      setImportPhase('completed');
-    } catch {
-      message.error('提交失败，请稍后重试');
-      setImportPhase('preview');
-    }
-  };
-
-  /** 重置导入流程回到初始状态 */
-  const handleResetImport = () => {
-    setImportPhase('idle');
-    setUploadProgress(0);
-    setParseId('');
-    setRows([]);
-    setOriginalErrors([]);
-    setEditedFields(new Set());
-    setCommitResult(null);
-    setCurrentFile(null);
-  };
-
-  // ---------- 导出处理函数 ----------
-
-  /** 页面加载时获取分类树和位置级联数据 */
-  useEffect(() => {
-    apiClient
-      .get('/asset-categories/tree')
-      .then((res) => setCategoryTree(res.data || []))
-      .catch(() => {});
-    apiClient
-      .get('/asset-locations/cascade')
-      .then((res) => setLocationCascade(res.data || []))
-      .catch(() => {});
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files[0];
+    if (file) simulateUpload(file);
   }, []);
 
-  /**
-   * 执行导出：POST /api/v1/assets/export
-   * 返回文件流，使用 Blob + downloadBlob 触发下载。
-   */
-  const doExport = async (filters: ExportFilters) => {
-    setExportLoading(true);
-    try {
-      const res = await apiClient.post('/assets/export', filters, {
-        responseType: 'blob',
-      });
-      const timestamp = dayjs().format('YYYYMMDD_HHmmss');
-      downloadBlob(res.data, `资产台账_${timestamp}.xlsx`);
-      message.success('导出成功');
-    } catch {
-      message.error('导出失败，请稍后重试');
-    } finally {
-      setExportLoading(false);
-    }
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  }, []);
+
+  const handleDragLeave = useCallback(() => {
+    setIsDragging(false);
+  }, []);
+
+  const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) simulateUpload(file);
+  }, []);
+
+  const simulateUpload = (file: File) => {
+    setIsUploading(true);
+    setUploadProgress(0);
+    setUploadedFile(file.name);
+    let progress = 0;
+    const interval = setInterval(() => {
+      progress += Math.random() * 15 + 5;
+      if (progress >= 100) {
+        progress = 100;
+        clearInterval(interval);
+        setTimeout(() => setIsUploading(false), 500);
+      }
+      setUploadProgress(Math.min(Math.round(progress), 100));
+    }, 300);
   };
 
-  /**
-   * 导出按钮点击：
-   * - 有筛选条件时直接导出
-   * - 无筛选条件时弹出确认对话框（ATB-015）
-   */
+  const handleCancelUpload = () => {
+    setIsUploading(false);
+    setUploadProgress(0);
+    setUploadedFile(null);
+  };
+
   const handleExport = () => {
-    const hasFilters =
-      exportCategoryCodes.length > 0 ||
-      exportStatusCodes.length > 0 ||
-      exportLocationValues.length > 0;
-
-    if (!hasFilters) {
-      Modal.confirm({
-        title: '导出确认',
-        icon: <ExclamationCircleOutlined />,
-        content: '未设置筛选条件，将导出全部资产，是否继续？',
-        okText: '确定',
-        cancelText: '取消',
-        onOk: () => doExport({ categoryCodes: [], statusCodes: [], locationCodes: [] }),
-      });
-    } else {
-      // 从级联选择值中提取叶子节点作为 locationCodes
-      const locationCodes = exportLocationValues.map((path) => path[path.length - 1]);
-      doExport({
-        categoryCodes: exportCategoryCodes,
-        statusCodes: exportStatusCodes,
-        locationCodes,
-      });
-    }
+    exportMutation.mutate({
+      categories: exportCategory && exportCategory !== '全部分类' ? [exportCategory] : [],
+      statuses: exportStatus && exportStatus !== '全部状态' ? [exportStatus] : [],
+      format: exportFormat,
+    });
   };
-
-  // ---------- 表格辅助函数 ----------
-
-  /** 获取某行某字段当前剩余的错误信息列表 */
-  const getFieldErrors = (rowNumber: number, field: string): string[] => {
-    const errs = errorsMap.get(rowNumber);
-    if (!errs) return [];
-    return errs.filter((e) => e.field === field).map((e) => e.message);
-  };
-
-  /** 判断行是否属于"可编辑行"（该行初始就有校验错误） */
-  const isRowEditable = (rowNumber: number): boolean => {
-    return originalErrorRowNumbers.has(rowNumber);
-  };
-
-  /**
-   * 渲染可编辑/只读单元格。
-   * - 仅校验失败行允许编辑（ATB-010）
-   * - 可编辑单元格加蓝色下划线标识
-   * - 有错误的单元格显示红色错误提示
-   */
-  const renderEditableCell = (
-    rowNumber: number,
-    field: string,
-    value: unknown,
-    editable: boolean,
-    type: 'text' | 'number' = 'text',
-  ) => {
-    const fieldErrors = getFieldErrors(rowNumber, field);
-
-    if (!editable) {
-      return (
-        <span>
-          {String(value ?? '')}
-          {fieldErrors.length > 0 && (
-            <div style={{ color: '#ff4d4f', fontSize: 12, marginTop: 2 }}>
-              {fieldErrors.map((msg, i) => (
-                <div key={i}>{msg}</div>
-              ))}
-            </div>
-          )}
-        </span>
-      );
-    }
-
-    return (
-      <div>
-        <Input
-          value={value != null ? String(value) : ''}
-          onChange={(e) => handleCellEdit(rowNumber, field, e.target.value)}
-          type={type}
-          size="small"
-          status={fieldErrors.length > 0 ? 'error' : undefined}
-          style={{
-            borderBottom: `2px solid ${EDITABLE_UNDERLINE_COLOR}`,
-            borderRadius: '2px 2px 0 0',
-          }}
-        />
-        {fieldErrors.length > 0 && (
-          <div style={{ color: '#ff4d4f', fontSize: 12, marginTop: 2 }}>
-            {fieldErrors.map((msg, i) => (
-              <div key={i}>{msg}</div>
-            ))}
-          </div>
-        )}
-      </div>
-    );
-  };
-
-  /** 判断某行是否仍存在剩余错误 */
-  const hasRemainingErrors = (rowNumber: number): boolean => {
-    return errorsMap.has(rowNumber);
-  };
-
-  // ---------- 表格列定义 ----------
-
-  const columns: TableColumnsType<AssetRow> = [
-    {
-      title: '序号',
-      dataIndex: 'rowNumber',
-      key: 'rowNumber',
-      width: 70,
-      fixed: 'left',
-    },
-    {
-      title: '资产名称',
-      dataIndex: 'name',
-      key: 'name',
-      width: 160,
-      render: (val: unknown, record) =>
-        renderEditableCell(record.rowNumber, 'name', val, isRowEditable(record.rowNumber)),
-    },
-    {
-      title: '分类',
-      dataIndex: 'categoryCode',
-      key: 'categoryCode',
-      width: 120,
-      render: (val: unknown, record) =>
-        renderEditableCell(record.rowNumber, 'categoryCode', val, isRowEditable(record.rowNumber)),
-    },
-    {
-      title: '状态',
-      dataIndex: 'statusCode',
-      key: 'statusCode',
-      width: 100,
-      render: (val: unknown, record) =>
-        renderEditableCell(record.rowNumber, 'statusCode', val, isRowEditable(record.rowNumber)),
-    },
-    {
-      title: '位置',
-      dataIndex: 'locationCode',
-      key: 'locationCode',
-      width: 120,
-      render: (val: unknown, record) =>
-        renderEditableCell(record.rowNumber, 'locationCode', val, isRowEditable(record.rowNumber)),
-    },
-    {
-      title: '购置日期',
-      dataIndex: 'purchaseDate',
-      key: 'purchaseDate',
-      width: 140,
-      render: (val: unknown, record) =>
-        renderEditableCell(record.rowNumber, 'purchaseDate', val, isRowEditable(record.rowNumber)),
-    },
-    {
-      title: '原值',
-      dataIndex: 'originalValue',
-      key: 'originalValue',
-      width: 120,
-      render: (val: unknown, record) =>
-        renderEditableCell(
-          record.rowNumber,
-          'originalValue',
-          val,
-          isRowEditable(record.rowNumber),
-          'number'
-        ),
-    },
-    {
-      title: '校验状态',
-      key: 'validationStatus',
-      width: 100,
-      fixed: 'right',
-      render: (_: unknown, record: AssetRow) => {
-        const originallyFailed = originalErrorRowNumbers.has(record.rowNumber);
-        const wasEdited = editedRowNumbers.has(record.rowNumber);
-        const stillHasErrors = hasRemainingErrors(record.rowNumber);
-
-        if (!originallyFailed) {
-          // 从未有过错误 → 绿色「校验通过」
-          return (
-            <Tag color="success" icon={<CheckCircleOutlined />}>
-              校验通过
-            </Tag>
-          );
-        }
-        if (wasEdited) {
-          // 有过错误且用户已编辑 → 橙色「已修正」
-          return (
-            <Tag color="warning" icon={<WarningOutlined />}>
-              已修正
-            </Tag>
-          );
-        }
-        // 有错误但用户未编辑 → 红色「校验失败」
-        return (
-          <Tag color="error" icon={<CloseCircleOutlined />}>
-            校验失败
-          </Tag>
-        );
-      },
-    },
-  ];
-
-  // ---------- 导入面板渲染 ----------
-
-  const renderImportPanel = () => {
-    // ---- 提交完成：展示结果摘要 ----
-    if (importPhase === 'completed' && commitResult) {
-      return (
-        <Card>
-          <Result
-            status={
-              commitResult.failedCount === 0
-                ? 'success'
-                : commitResult.importedCount === 0
-                  ? 'error'
-                  : 'warning'
-            }
-            title={
-              commitResult.failedCount === 0
-                ? '全部导入成功'
-                : `成功导入 ${commitResult.importedCount} 条资产，${commitResult.failedCount} 条失败`
-            }
-            subTitle="导入任务已完成"
-            extra={[
-              <Button key="again" type="primary" onClick={handleResetImport}>
-                继续导入
-              </Button>,
-            ]}
-          />
-        </Card>
-      );
-    }
-
-    return (
-      <div>
-        {/* ---- 下载导入模板按钮（导入 Tab 内始终可见） ---- */}
-        <div style={{ marginBottom: 16 }}>
-          <Button
-            icon={<DownloadOutlined />}
-            onClick={handleDownloadTemplate}
-            disabled={importPhase === 'submitting'}
-          >
-            下载导入模板
-          </Button>
-        </div>
-
-        {/* ---- 拖拽上传区域（idle / uploading / parsing / uploadFailed 阶段可见） ---- */}
-        {!['preview', 'submitting', 'completed'].includes(importPhase) && (
-          <Dragger
-            accept=".xlsx"
-            showUploadList={false}
-            beforeUpload={handleBeforeUpload}
-            multiple={false}
-            style={{ padding: importPhase === 'uploadFailed' ? '24px 0' : '40px 0' }}
-          >
-            {/* 空闲状态 */}
-            {importPhase === 'idle' && (
-              <>
-                <p className="ant-upload-drag-icon">
-                  <InboxOutlined style={{ fontSize: 48, color: '#1890ff' }} />
-                </p>
-                <p className="ant-upload-text" style={{ fontSize: 16 }}>
-                  将 .xlsx 文件拖到此处，或点击选择文件
-                </p>
-                <p className="ant-upload-hint" style={{ color: '#999' }}>
-                  支持 .xlsx 格式，文件大小不超过 10MB
-                </p>
-              </>
-            )}
-
-            {/* 上传中 */}
-            {importPhase === 'uploading' && (
-              <div style={{ textAlign: 'center', padding: '16px 0' }}>
-                <Title level={5} style={{ margin: '0 0 12px 0' }}>
-                  上传中 {uploadProgress}%
-                </Title>
-                <Progress
-                  percent={uploadProgress}
-                  status="active"
-                  strokeColor="#1890ff"
-                  style={{ maxWidth: 400 }}
-                />
-              </div>
-            )}
-
-            {/* 解析中 */}
-            {importPhase === 'parsing' && (
-              <div style={{ textAlign: 'center', padding: '16px 0' }}>
-                <Title level={5} style={{ margin: '0 0 12px 0' }}>
-                  解析中...
-                </Title>
-                <Progress
-                  percent={100}
-                  status="active"
-                  strokeColor="#1890ff"
-                  style={{ maxWidth: 400 }}
-                />
-              </div>
-            )}
-
-            {/* 上传失败 */}
-            {importPhase === 'uploadFailed' && (
-              <div style={{ textAlign: 'center', padding: '16px 0' }}>
-                <Title level={5} style={{ margin: '0 0 12px 0', color: '#ff4d4f' }}>
-                  上传失败
-                </Title>
-                <Progress
-                  percent={uploadProgress}
-                  status="exception"
-                  style={{ maxWidth: 400, marginBottom: 16 }}
-                />
-                <Button icon={<ReloadOutlined />} type="primary" onClick={handleRetry}>
-                  重试
-                </Button>
-              </div>
-            )}
-          </Dragger>
-        )}
-
-        {/* ---- 解析结果预览表格（preview / submitting 阶段） ---- */}
-        {(importPhase === 'preview' || importPhase === 'submitting') && (
-          <>
-            {/* 操作栏 */}
-            <div
-              style={{
-                marginBottom: 16,
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-              }}
-            >
-              <Space>
-                <Text strong>预览数据（共 {rows.length} 行）</Text>
-                {errorsMap.size > 0 && (
-                  <Tag color="error">{errorsMap.size} 行存在校验错误</Tag>
-                )}
-                {validRowNumbers.size > 0 && (
-                  <Tag color="success">{validRowNumbers.size} 行校验通过</Tag>
-                )}
-              </Space>
-              <Space>
-                <Button onClick={handleResetImport}>取消</Button>
-                <Button
-                  type="primary"
-                  loading={importPhase === 'submitting'}
-                  disabled={!hasAnyValidRow || importPhase === 'submitting'}
-                  onClick={handleCommit}
-                >
-                  {importPhase === 'submitting' ? '提交中...' : '确认导入'}
-                </Button>
-              </Space>
-            </div>
-
-            {/* 全部行均无效时的警告 */}
-            {!hasAnyValidRow && rows.length > 0 && (
-              <Alert
-                message="所有行均存在校验错误，请修正后提交"
-                type="warning"
-                showIcon
-                style={{ marginBottom: 16 }}
-              />
-            )}
-
-            {/* 预览表格 */}
-            <Table<AssetRow>
-              dataSource={rows}
-              columns={columns}
-              rowKey="rowNumber"
-              pagination={{
-                pageSize: 20,
-                showSizeChanger: false,
-                showTotal: (total) => `共 ${total} 行`,
-              }}
-              scroll={{ x: 930 }}
-              size="small"
-              rowClassName={(record) =>
-                errorsMap.has(record.rowNumber) ? 'import-row-error' : 'import-row-valid'
-              }
-            />
-
-            {/* 行级背景色样式注入 */}
-            <style>{rowStyles}</style>
-          </>
-        )}
-      </div>
-    );
-  };
-
-  // ---------- 导出面板渲染 ----------
-
-  const renderExportPanel = () => (
-    <Card title="导出条件筛选">
-      <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-        {/* 资产分类 — TreeSelect（树形选择） */}
-        <div>
-          <Text strong style={{ display: 'block', marginBottom: 8 }}>
-            资产分类
-          </Text>
-          <TreeSelect
-            treeData={categoryTree}
-            value={exportCategoryCodes.length > 0 ? exportCategoryCodes : undefined}
-            onChange={(val) => setExportCategoryCodes(val as string[])}
-            treeCheck
-            showCheckedStrategy={TreeSelect.SHOW_CHILD}
-            placeholder="请选择资产分类"
-            allowClear
-            treeDefaultExpandAll
-            style={{ width: '100%' }}
-            dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
-          />
-        </div>
-
-        {/* 资产状态 — Select（多选） */}
-        <div>
-          <Text strong style={{ display: 'block', marginBottom: 8 }}>
-            资产状态
-          </Text>
-          <Select
-            mode="multiple"
-            value={exportStatusCodes.length > 0 ? exportStatusCodes : undefined}
-            onChange={(val) => setExportStatusCodes(val)}
-            options={STATUS_OPTIONS}
-            placeholder="请选择资产状态（可多选）"
-            allowClear
-            style={{ width: '100%' }}
-          />
-        </div>
-
-        {/* 存放位置 — Cascader（级联选择） */}
-        <div>
-          <Text strong style={{ display: 'block', marginBottom: 8 }}>
-            存放位置
-          </Text>
-          <Cascader
-            options={locationCascade}
-            value={exportLocationValues.length > 0 ? exportLocationValues : undefined}
-            onChange={(val) => setExportLocationValues(val as string[][])}
-            placeholder="请选择存放位置"
-            changeOnSelect
-            multiple
-            allowClear
-            style={{ width: '100%' }}
-          />
-        </div>
-
-        <Divider />
-
-        {/* 导出按钮 */}
-        <Button
-          type="primary"
-          icon={<DownloadOutlined />}
-          loading={exportLoading}
-          onClick={handleExport}
-          size="large"
-          disabled={exportLoading}
-        >
-          导出
-        </Button>
-      </Space>
-    </Card>
-  );
-
-  // ---------- 主渲染 ----------
 
   return (
-    <div style={{ padding: 24 }}>
-      <Title level={2} style={{ marginBottom: 24 }}>
-        资产批量导入导出
-      </Title>
-
-      <Tabs
-        activeKey={activeTab}
-        onChange={setActiveTab}
-        items={[
-          {
-            key: 'import',
-            label: '导入',
-            children: renderImportPanel(),
-          },
-          {
-            key: 'export',
-            label: '导出',
-            children: renderExportPanel(),
-          },
-        ]}
+    <div className="min-h-screen bg-[#f9f9ff]">
+      <PageHeader
+        title="资产导入导出"
+        breadcrumbs={[{ label: '资产管理' }, { label: '导入导出' }]}
+        actions={
+          <Button variant="primary" size="md">
+            创建请求
+          </Button>
+        }
       />
+
+      <div className="px-6">
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="mb-6">
+            <TabsTrigger value="import">导入资产</TabsTrigger>
+            <TabsTrigger value="export">导出资产</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="import">
+            <div className="space-y-6 max-w-[1200px] mx-auto">
+              <div className="flex justify-end">
+                <Button variant="outline" size="md">
+                  <Download className="w-4 h-4" />
+                  下载 Excel 模板
+                </Button>
+              </div>
+
+              <div
+                className={`bg-white p-12 rounded-xl flex flex-col items-center justify-center text-center space-y-4 group cursor-pointer transition-all ${
+                  isDragging ? 'bg-[#f1f3ff] border-[#004191]' : ''
+                }`}
+                style={{
+                  backgroundImage: !isDragging
+                    ? "url(\"data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' stroke='%23004191' stroke-width='2' stroke-dasharray='8%2c 8' stroke-dashoffset='0' stroke-linecap='square'/%3e%3c/svg%3e\")"
+                    : undefined,
+                  border: isDragging ? '2px solid #004191' : undefined,
+                }}
+                onDrop={handleDrop}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <input ref={fileInputRef} type="file" accept=".xlsx,.csv,.xml" className="hidden" onChange={handleFileSelect} />
+                <div className="w-16 h-16 bg-[#d8e2ff] rounded-full flex items-center justify-center text-[#004191] group-hover:scale-110 transition-transform">
+                  <Upload className="w-8 h-8" />
+                </div>
+                <div>
+                  <p className="text-base font-semibold text-[#161c27]">拖拽文件到此处或点击浏览</p>
+                  <p className="text-xs text-[#424753] mt-1">支持 XLSX、CSV 和 XML 格式（最大 50MB）</p>
+                </div>
+              </div>
+
+              {uploadedFile && (
+                <div className="bg-white p-4 rounded-xl border border-[#e5e7eb] flex items-center gap-4">
+                  <div className="w-10 h-10 bg-[#e3e8f8] rounded flex items-center justify-center">
+                    <FileText className="w-5 h-5 text-[#004191]" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-sm font-semibold text-[#161c27]">{uploadedFile}</span>
+                      <span className="text-sm font-semibold text-[#004191]">{uploadProgress}%</span>
+                    </div>
+                    <div className="w-full bg-[#dee2f2] h-2 rounded-full overflow-hidden">
+                      <div
+                        className="bg-[#004191] h-full rounded-full transition-all duration-500"
+                        style={{ width: `${uploadProgress}%` }}
+                      />
+                    </div>
+                  </div>
+                  <button className="p-2 text-[#424753] hover:text-[#ba1a1a] transition-colors" onClick={handleCancelUpload}>
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+              )}
+
+              <Card>
+                <div className="px-4 py-4 border-b border-[#e5e7eb] flex justify-between items-center">
+                  <h3 className="text-base font-semibold text-[#161c27]">数据校验预览</h3>
+                  <div className="flex gap-2">
+                    <span className="text-xs text-[#424753] flex items-center gap-1">
+                      <span className="w-2 h-2 rounded-full bg-[#16a34a]" /> 1,240 条有效
+                    </span>
+                    <span className="text-xs text-[#424753] flex items-center gap-1">
+                      <span className="w-2 h-2 rounded-full bg-[#d97706]" /> 12 条警告
+                    </span>
+                    <span className="text-xs text-[#424753] flex items-center gap-1">
+                      <span className="w-2 h-2 rounded-full bg-[#ba1a1a]" /> 3 条错误
+                    </span>
+                  </div>
+                </div>
+                <table className="w-full text-left border-collapse">
+                  <thead className="bg-[#f1f3ff]">
+                    <tr>
+                      {['资产名称', '分类', '序列号', '状态', '校验'].map((h) => (
+                        <th key={h} className="px-4 py-3 text-[10px] font-semibold text-[#424753] uppercase tracking-wider">
+                          {h}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#e5e7eb]">
+                    {MOCK_PREVIEW.map((row) => {
+                      const v = VALIDATION_STYLES[row.validation];
+                      const VIcon = v.Icon;
+                      return (
+                        <tr key={row.id} className="hover:bg-[#f1f3ff] transition-colors">
+                          <td className="px-4 py-4 text-sm font-semibold text-[#161c27]">{row.name}</td>
+                          <td className="px-4 py-4 text-sm text-[#161c27]">{row.category}</td>
+                          <td className={`px-4 py-4 text-xs font-mono ${row.validation === 'error' ? 'text-[#ba1a1a]' : 'text-[#424753]'}`}>
+                            {row.serialNumber}
+                          </td>
+                          <td className="px-4 py-4 text-sm text-[#161c27]">{row.status}</td>
+                          <td className="px-4 py-4">
+                            <span
+                              className="px-3 py-1 text-[10px] font-semibold uppercase tracking-wider rounded-full inline-flex items-center gap-1"
+                              style={{ background: v.bg, color: v.text, border: `1px solid ${v.border}` }}
+                            >
+                              <VIcon className="w-3 h-3" />
+                              {v.label}
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </Card>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="export">
+            <div className="space-y-6 max-w-[800px] mx-auto">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <Card className="p-6 space-y-4">
+                  <h3 className="text-base font-semibold text-[#161c27]">数据筛选</h3>
+                  <div className="space-y-3">
+                    <label className="block text-xs font-semibold text-[#424753] uppercase tracking-wider">
+                      资产分类
+                    </label>
+                    <div className="space-y-2">
+                      {CATEGORY_OPTIONS.map((cat) => (
+                        <label key={cat} className="flex items-center gap-3 cursor-pointer group">
+                          <input
+                            type="checkbox"
+                            checked={exportCategory === cat || (!exportCategory && cat === '全部分类')}
+                            onChange={() => setExportCategory(cat)}
+                            className="w-4 h-4 rounded border-[#727784] text-[#004191] focus:ring-[#004191]"
+                          />
+                          <span className="text-sm group-hover:text-[#004191] transition-colors">{cat}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-xs font-semibold text-[#424753] uppercase tracking-wider">
+                      资产状态
+                    </label>
+                    <select
+                      value={exportStatus}
+                      onChange={(e) => setExportStatus(e.target.value)}
+                      className="w-full bg-[#f1f3ff] border-0 rounded-lg p-3 text-sm focus:ring-2 focus:ring-[#004191]/20 appearance-none"
+                    >
+                      {STATUS_OPTIONS_EXPORT.map((s) => (
+                        <option key={s}>{s}</option>
+                      ))}
+                    </select>
+                  </div>
+                </Card>
+
+                <Card className="p-6 space-y-6 flex flex-col">
+                  <h3 className="text-base font-semibold text-[#161c27]">导出配置</h3>
+                  <div className="space-y-4 flex-1">
+                    <label className="block text-xs font-semibold text-[#424753] uppercase tracking-wider">
+                      文件格式
+                    </label>
+                    <div className="flex gap-4">
+                      {([
+                        { value: 'xlsx' as const, label: 'XLSX', Icon: Table2 },
+                        { value: 'csv' as const, label: 'CSV', Icon: FileSpreadsheet },
+                      ]).map(({ value, label, Icon }) => (
+                        <label
+                          key={value}
+                          className={`flex-1 flex items-center justify-center gap-3 p-4 border rounded-xl cursor-pointer hover:border-[#004191] transition-all ${
+                            exportFormat === value ? 'bg-[#d8e2ff] border-[#004191]' : 'border-[#e5e7eb]'
+                          }`}
+                        >
+                          <input
+                            type="radio"
+                            name="format"
+                            value={value}
+                            checked={exportFormat === value}
+                            onChange={() => setExportFormat(value)}
+                            className="hidden"
+                          />
+                          <Icon className="w-5 h-5 text-[#004191]" />
+                          <span className="text-sm font-semibold text-[#161c27]">{label}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                  <Button
+                    variant="primary"
+                    size="lg"
+                    className="w-full !py-4 !rounded-xl !font-bold !text-base"
+                    loading={exportMutation.isPending}
+                    onClick={handleExport}
+                  >
+                    <ArrowUpFromLine className="w-5 h-5" />
+                    导出数据
+                  </Button>
+                </Card>
+              </div>
+
+              <Card className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-base font-semibold text-[#161c27]">导出摘要</h3>
+                  <span className="text-xs text-[#424753]">预览 2,450 条记录</span>
+                </div>
+                <div className="relative h-48 w-full bg-[#f1f3ff] rounded-lg flex items-center justify-center overflow-hidden">
+                  <div className="absolute inset-0 flex items-end justify-between px-12 pb-6 gap-4">
+                    {[60, 85, 45, 70, 55].map((h, i) => (
+                      <div
+                        key={i}
+                        className={`w-16 rounded-t-lg transition-all duration-1000 ${i % 2 === 0 ? 'bg-[#004191]' : 'bg-[#0058be]'}`}
+                        style={{ height: `${h}%` }}
+                      />
+                    ))}
+                  </div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#f1f3ff] to-transparent pointer-events-none opacity-50" />
+                </div>
+              </Card>
+            </div>
+          </TabsContent>
+        </Tabs>
+      </div>
     </div>
   );
-};
-
-export default AssetImportExportPage;
+}

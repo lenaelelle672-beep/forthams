@@ -206,7 +206,7 @@ export default function AssetEditPage() {
       <div className="max-w-3xl mx-auto px-4 py-8" data-testid="asset-edit-loading">
         <div className="flex items-center justify-center py-16">
           <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
-          <span className="ml-3 text-gray-500">加载资产信息...</span>
+          <span className="ml-3 text-gray-400">加载资产信息...</span>
         </div>
       </div>
     );
@@ -218,12 +218,12 @@ export default function AssetEditPage() {
       <div className="max-w-3xl mx-auto px-4 py-8" data-testid="asset-edit-error">
         <div className="flex flex-col items-center py-16">
           <AlertCircle className="w-10 h-10 text-red-500 mb-3" />
-          <p className="text-gray-600 mb-4">{detailError}</p>
+          <p className="text-gray-500 mb-4">{detailError}</p>
           <div className="flex gap-3">
             <button
               type="button"
               onClick={handleCancel}
-              className="px-4 py-2 text-sm rounded-lg border border-gray-300 bg-white text-gray-700
+              className="px-4 py-2 text-sm rounded-lg border border-gray-200 bg-white text-gray-700
                 hover:bg-gray-50 transition-colors"
             >
               返回
@@ -253,14 +253,14 @@ export default function AssetEditPage() {
         <button
           type="button"
           onClick={handleCancel}
-          className="text-gray-500 hover:text-gray-700 transition-colors"
+          className="text-gray-400 hover:text-gray-700 transition-colors"
           data-testid="btn-back"
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
         <h1 className="text-2xl font-bold text-gray-900">编辑资产</h1>
         {asset && (
-          <span className="text-sm text-gray-500">
+          <span className="text-sm text-gray-400">
             #{asset.assetCode ?? assetId}
           </span>
         )}
@@ -291,7 +291,7 @@ export default function AssetEditPage() {
               value={form.assetName}
               onChange={(e) => handleChange('assetName', e.target.value)}
               className={`w-full px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                errors.assetName ? 'border-red-300' : 'border-gray-300'
+                errors.assetName ? 'border-red-300' : 'border-gray-200'
               }`}
               placeholder="请输入资产名称"
               data-testid="input-assetName"
@@ -312,7 +312,7 @@ export default function AssetEditPage() {
               value={form.assetCode}
               onChange={(e) => handleChange('assetCode', e.target.value)}
               className={`w-full px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                errors.assetCode ? 'border-red-300' : 'border-gray-300'
+                errors.assetCode ? 'border-red-300' : 'border-gray-200'
               }`}
               placeholder="请输入资产编号"
               data-testid="input-assetCode"
@@ -333,7 +333,7 @@ export default function AssetEditPage() {
               value={form.categoryId}
               onChange={(e) => handleChange('categoryId', e.target.value)}
               className={`w-full px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                errors.categoryId ? 'border-red-300' : 'border-gray-300'
+                errors.categoryId ? 'border-red-300' : 'border-gray-200'
               }`}
               placeholder="请输入分类 ID"
               data-testid="input-categoryId"
@@ -354,7 +354,7 @@ export default function AssetEditPage() {
               value={form.departmentId}
               onChange={(e) => handleChange('departmentId', e.target.value)}
               className={`w-full px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                errors.departmentId ? 'border-red-300' : 'border-gray-300'
+                errors.departmentId ? 'border-red-300' : 'border-gray-200'
               }`}
               placeholder="请输入部门 ID"
               data-testid="input-departmentId"
@@ -374,7 +374,7 @@ export default function AssetEditPage() {
               type="text"
               value={form.locationName}
               onChange={(e) => handleChange('locationName', e.target.value)}
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="请输入存放位置"
               data-testid="input-locationName"
             />
@@ -389,7 +389,7 @@ export default function AssetEditPage() {
               id="edit-status"
               value={form.status}
               onChange={(e) => handleChange('status', e.target.value)}
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               data-testid="input-status"
             >
               <option value="IN_USE">在用</option>
@@ -416,7 +416,7 @@ export default function AssetEditPage() {
               value={form.purchaseDate}
               onChange={(e) => handleChange('purchaseDate', e.target.value)}
               className={`w-full px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                errors.purchaseDate ? 'border-red-300' : 'border-gray-300'
+                errors.purchaseDate ? 'border-red-300' : 'border-gray-200'
               }`}
               data-testid="input-purchaseDate"
             />
@@ -438,7 +438,7 @@ export default function AssetEditPage() {
               value={form.purchasePrice}
               onChange={(e) => handleChange('purchasePrice', e.target.value)}
               className={`w-full px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                errors.purchasePrice ? 'border-red-300' : 'border-gray-300'
+                errors.purchasePrice ? 'border-red-300' : 'border-gray-200'
               }`}
               placeholder="请输入购置价格"
               data-testid="input-purchasePrice"
@@ -462,7 +462,7 @@ export default function AssetEditPage() {
               value={form.remark}
               onChange={(e) => handleChange('remark', e.target.value)}
               rows={4}
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="请输入备注信息"
               data-testid="input-remark"
             />
@@ -474,7 +474,7 @@ export default function AssetEditPage() {
           <button
             type="button"
             onClick={handleCancel}
-            className="px-4 py-2 text-sm rounded-lg border border-gray-300 bg-white text-gray-700
+            className="px-4 py-2 text-sm rounded-lg border border-gray-200 bg-white text-gray-700
               hover:bg-gray-50 transition-colors"
             data-testid="btn-cancel"
           >

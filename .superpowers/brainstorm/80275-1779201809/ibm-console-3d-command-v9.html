@@ -1,0 +1,1605 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>forthAMS v9 IBM console 3D command screen</title>
+  <style>
+    :root {
+      --page: #f4f4f4;
+      --card: #ffffff;
+      --ink: #161616;
+      --muted: #525252;
+      --soft: #6f6f6f;
+      --line: #e0e0e0;
+      --line-strong: #c6c6c6;
+      --blue: #0f62fe;
+      --blue-strong: #0043ce;
+      --blue-soft: #edf5ff;
+      --green: #24a148;
+      --green-soft: #defbe6;
+      --orange: #ff8a00;
+      --red: #ff2d55;
+      --rail: #0a2342;
+      --rail-hover: #0f2d52;
+      --rail-active: #163a66;
+      --rail-text: #c8d8e8;
+      --rail-text-active: #71dfff;
+      --screen: #061429;
+      --screen-2: #0a2348;
+      --ice: #dff7ff;
+      --cyan: #71dfff;
+      --gold: #e6c275;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "IBM Plex Sans", Inter, "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+      color: var(--ink);
+      background: var(--page);
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    .wrap {
+      width: min(1660px, calc(100vw - 40px));
+      margin: 0 auto;
+      padding: 28px 0 48px;
+    }
+
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 24px;
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 30px;
+      line-height: 1.18;
+      font-weight: 850;
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      margin: 0;
+      max-width: 860px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .note {
+      max-width: 580px;
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+      color: #405064;
+      font-size: 12px;
+      line-height: 1.7;
+      box-shadow: 0 14px 30px rgba(17, 25, 54, 0.07);
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+      box-shadow: 0 18px 44px rgba(17, 25, 54, 0.08);
+      overflow: hidden;
+      margin-bottom: 18px;
+    }
+
+    .panel-head {
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 18px;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(180deg, #fff, #fbfdff);
+    }
+
+    .panel-head h2 {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 850;
+      letter-spacing: 0;
+    }
+
+    .pill {
+      padding: 5px 10px;
+      border-radius: 999px;
+      border: 1px solid #cfe0ff;
+      background: var(--blue-soft);
+      color: var(--blue);
+      font-size: 11px;
+      font-weight: 850;
+    }
+
+    .panel-body { padding: 16px; }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .detail-card {
+      min-height: 84px;
+      padding: 13px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+      box-shadow: 0 9px 22px rgba(15, 23, 42, 0.045);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .detail-card::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: var(--blue);
+    }
+
+    .detail-card.green::before { background: var(--green); }
+    .detail-card.gold::before { background: var(--orange); }
+    .detail-card.red::before { background: var(--red); }
+
+    .detail-card span {
+      color: var(--soft);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .detail-card b {
+      display: block;
+      margin-top: 7px;
+      color: var(--ink);
+      font-size: 24px;
+      line-height: 1.1;
+      font-weight: 900;
+      letter-spacing: 0;
+    }
+
+    .detail-card small {
+      display: block;
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .app {
+      height: 640px;
+      border: 1px solid var(--line-strong);
+      border-radius: 8px;
+      display: grid;
+      grid-template-columns: 58px 170px 1fr;
+      background: #fff;
+      overflow: hidden;
+    }
+
+    .rail {
+      background: linear-gradient(180deg, #0d2b4e 0%, #0a2342 100%);
+      color: var(--rail-text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 12px 0;
+      gap: 9px;
+      box-shadow: inset -1px 0 0 rgba(113, 223, 255, 0.08);
+    }
+
+    .avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: rgba(113, 223, 255, 0.15);
+      border: 1px solid rgba(113, 223, 255, 0.25);
+      margin-bottom: 10px;
+      position: relative;
+    }
+
+    .avatar::before {
+      content: "";
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--rail-text);
+      left: 14px;
+      top: 9px;
+    }
+
+    .avatar::after {
+      content: "";
+      position: absolute;
+      width: 20px;
+      height: 8px;
+      border-radius: 10px 10px 2px 2px;
+      background: var(--rail-text);
+      left: 9px;
+      bottom: 8px;
+    }
+
+    .rail-item {
+      width: 50px;
+      min-height: 50px;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      font-size: 11px;
+      font-weight: 750;
+      letter-spacing: 0;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .rail-item:hover {
+      background: var(--rail-hover);
+      color: #e0ecf6;
+    }
+
+    .rail-item.active {
+      background: var(--rail-active);
+      color: var(--rail-text-active);
+      box-shadow: inset 3px 0 0 #71dfff, 0 0 16px rgba(113, 223, 255, 0.15);
+    }
+
+    .rail-icon {
+      width: 17px;
+      height: 17px;
+      border: 2px solid currentColor;
+      border-radius: 5px;
+    }
+
+    .rail-spacer { flex: 1; }
+
+    .plus {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #1a5fa0, #0f62fe);
+      position: relative;
+      box-shadow: 0 10px 20px rgba(15, 98, 254, 0.4), 0 0 12px rgba(113, 223, 255, 0.2);
+      transition: all 0.2s ease;
+    }
+
+    .plus:hover {
+      transform: scale(1.1);
+      box-shadow: 0 12px 24px rgba(15, 98, 254, 0.5), 0 0 18px rgba(113, 223, 255, 0.3);
+    }
+
+    .plus::before,
+    .plus::after {
+      content: "";
+      position: absolute;
+      background: #fff;
+      left: 10px;
+      right: 10px;
+      top: 15px;
+      height: 2px;
+    }
+
+    .plus::after {
+      top: 10px;
+      bottom: 10px;
+      left: 15px;
+      right: auto;
+      width: 2px;
+      height: auto;
+    }
+
+    .subnav {
+      border-right: 1px solid var(--line-strong);
+      background: #f4f4f4;
+      padding: 16px 11px;
+    }
+
+    .subnav h3 {
+      margin: 0 0 14px;
+      color: #161616;
+      font-size: 15px;
+      font-weight: 800;
+    }
+
+    .subitem {
+      height: 36px;
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+      border-radius: 8px;
+      color: #393939;
+      font-size: 13px;
+      font-weight: 750;
+      letter-spacing: 0;
+      margin-bottom: 4px;
+    }
+
+    .subitem.active {
+      color: var(--blue);
+      background: var(--blue-soft);
+      border: 1px solid var(--blue);
+      box-shadow: inset 3px 0 0 var(--blue);
+    }
+
+    .subsection {
+      margin: 14px 0 7px;
+      padding: 0 10px;
+      color: #8d8d8d;
+      font-size: 11px;
+      font-weight: 850;
+      letter-spacing: 1.4px;
+    }
+
+    .main {
+      min-width: 0;
+      background: #f4f4f4;
+      display: grid;
+      grid-template-rows: 48px 1fr;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      background: #fff;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .project-title {
+      color: #161616;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .top-icons {
+      display: flex;
+      gap: 8px;
+    }
+
+    .top-icons span {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: #fff;
+    }
+
+    .content { padding: 14px; }
+
+    .workbench {
+      height: 100%;
+      border: 1px solid var(--line-strong);
+      border-radius: 8px;
+      background: #fff;
+      overflow: hidden;
+      box-shadow: 0 12px 28px rgba(15, 23, 42, 0.06);
+    }
+
+    .toolbar {
+      min-height: 58px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--line);
+      background: #fff;
+    }
+
+    .tool {
+      height: 34px;
+      border: 1px solid var(--line-strong);
+      border-radius: 4px;
+      padding: 0 12px;
+      background: #fff;
+      color: #393939;
+      font-size: 12px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .tool.primary {
+      color: #fff;
+      border-color: var(--blue);
+      background: var(--blue);
+      box-shadow: 0 9px 18px rgba(31,100,255,0.2);
+    }
+
+    .tool.green {
+      color: #02764e;
+      border-color: #b7f1d2;
+      background: var(--green-soft);
+    }
+
+    .tool.spacer {
+      flex: 1;
+      height: 1px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+    }
+
+    .search {
+      width: 210px;
+      height: 34px;
+      border: 1px solid var(--line-strong);
+      border-radius: 4px;
+      background:
+        linear-gradient(90deg, transparent 0 34px, #8793a5 34px 86px, transparent 86px),
+        #f8fafc;
+      opacity: 0.9;
+    }
+
+    .summary {
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 14px;
+      border-bottom: 1px solid var(--line);
+      background: #ffffff;
+      color: #393939;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .summary .right {
+      color: var(--blue);
+      font-weight: 850;
+    }
+
+    .table {
+      padding: 0 10px;
+      font-size: 12px;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 44px 88px 1.2fr 112px 116px 126px 126px 112px 94px;
+      min-height: 42px;
+      align-items: center;
+      border-bottom: 1px solid #edf2f8;
+    }
+
+    .row.head {
+      min-height: 38px;
+      color: #525252;
+      font-size: 11px;
+      font-weight: 850;
+      background: #f4f4f4;
+      border-bottom-color: var(--line-strong);
+    }
+
+    .row.selected {
+      margin: 0 -10px;
+      padding: 0 10px;
+      border-left: 3px solid var(--blue);
+      background: var(--blue-soft);
+      box-shadow: inset 0 0 0 1px #b8d3ff;
+    }
+
+    .td {
+      min-width: 0;
+      padding: 0 7px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: #393939;
+      font-weight: 700;
+    }
+
+    .checkbox {
+      display: inline-block;
+      width: 15px;
+      height: 15px;
+      border: 1px solid #c6d2e2;
+      border-radius: 4px;
+      background: #fff;
+    }
+
+    .link {
+      color: var(--blue);
+      font-weight: 900;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      height: 23px;
+      padding: 0 9px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 900;
+    }
+
+    .badge.active {
+      color: #007148;
+      background: var(--green-soft);
+      border: 1px solid #baf0d4;
+    }
+
+    .badge.idle {
+      color: #2447a8;
+      background: var(--blue-soft);
+      border: 1px solid #cfe0ff;
+    }
+
+    .badge.risk {
+      color: #9d213d;
+      background: #fff0f4;
+      border: 1px solid #ffd0db;
+    }
+
+    .footer {
+      height: 44px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 14px;
+      color: #687588;
+      border-top: 1px solid var(--line);
+      background: #fbfdff;
+      font-size: 12px;
+      font-weight: 750;
+    }
+
+    .pager {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .pager span {
+      min-width: 25px;
+      height: 25px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #fff;
+    }
+
+    .pager .page {
+      color: #fff;
+      border-color: var(--blue);
+      background: var(--blue);
+    }
+
+    .flow-cards {
+      margin-top: 14px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .flow-card {
+      position: relative;
+      overflow: hidden;
+      min-height: 150px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+      padding: 18px 16px 14px;
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
+    }
+
+    .flow-card::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      height: 5px;
+      background: linear-gradient(90deg, var(--blue), #6b6cff);
+    }
+
+    .flow-card.green::before { background: linear-gradient(90deg, var(--green), #0fbfb4); }
+    .flow-card.red::before { background: linear-gradient(90deg, var(--orange), var(--red)); }
+    .flow-card.orange::before { background: linear-gradient(90deg, var(--orange), #ffb020); }
+
+    .flow-code {
+      color: #9aa6b6;
+      font-size: 11px;
+      font-weight: 850;
+      letter-spacing: 3px;
+    }
+
+    .flow-card h3 {
+      margin: 8px 0 7px;
+      font-size: 18px;
+      font-weight: 900;
+    }
+
+    .flow-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.65;
+    }
+
+    .flow-actions {
+      display: flex;
+      gap: 7px;
+      margin-top: 14px;
+    }
+
+    .flow-actions button {
+      height: 30px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: #26344a;
+      padding: 0 10px;
+      font-size: 12px;
+      font-weight: 850;
+    }
+
+    .flow-actions .primary {
+      color: #fff;
+      border-color: var(--blue);
+      background: var(--blue);
+    }
+
+    .flow-actions .ok {
+      color: #00774e;
+      border-color: #b9efcf;
+      background: var(--green-soft);
+    }
+
+    .caption {
+      margin: 11px 0 0;
+      color: #526173;
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    .screen {
+      position: relative;
+      min-height: 900px;
+      border-radius: 14px;
+      overflow: hidden;
+      background:
+        radial-gradient(ellipse at 50% 0%, rgba(0, 123, 255, 0.28) 0%, transparent 50%),
+        radial-gradient(circle at 30% 50%, rgba(0, 180, 255, 0.12) 0%, transparent 40%),
+        radial-gradient(circle at 70% 60%, rgba(100, 200, 255, 0.1) 0%, transparent 35%),
+        linear-gradient(180deg, #040d1f 0%, #061530 40%, #0a1a3a 70%, #050e22 100%);
+      border: 1px solid rgba(0, 150, 255, 0.35);
+      box-shadow:
+        inset 0 0 120px rgba(0, 120, 255, 0.12),
+        inset 0 0 60px rgba(0, 180, 255, 0.06),
+        0 0 80px rgba(0, 100, 255, 0.18),
+        0 24px 54px rgba(2, 9, 21, 0.35);
+      padding: 18px;
+      color: #d9efff;
+    }
+
+    .screen::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(rgba(0, 180, 255, 0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 180, 255, 0.06) 1px, transparent 1px);
+      background-size: 32px 32px;
+      mask-image: radial-gradient(ellipse at 50% 50%, rgba(0,0,0,0.8) 30%, rgba(0,0,0,0.3) 80%, transparent 100%);
+      animation: gridDrift 18s linear infinite;
+      pointer-events: none;
+    }
+
+    .screen::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(112deg, transparent 0 44%, rgba(0, 180, 255, 0.15) 47%, transparent 51%),
+        linear-gradient(68deg, transparent 0 61%, rgba(0, 140, 255, 0.15) 64%, transparent 69%),
+        radial-gradient(circle at 50% 52%, rgba(0, 150, 255, 0.12), transparent 20%);
+      animation: sweep 6s ease-in-out infinite alternate;
+      pointer-events: none;
+    }
+
+    @keyframes gridDrift {
+      to { background-position: 0 32px, 32px 0; }
+    }
+
+    @keyframes sweep {
+      from { transform: translateX(-2%) translateY(-1%); }
+      to { transform: translateX(2%) translateY(1%); }
+    }
+
+    .screen-inner {
+      position: relative;
+      z-index: 2;
+      min-height: 864px;
+      display: grid;
+      grid-template-columns: 0.84fr 1.58fr 0.84fr;
+      grid-template-rows: 70px 62px 1fr 190px;
+      gap: 13px;
+    }
+
+    .screen-title {
+      grid-column: 1 / -1;
+      position: relative;
+      display: grid;
+      grid-template-columns: 1fr minmax(430px, auto) 1fr;
+      align-items: start;
+      gap: 18px;
+    }
+
+    .screen-title::before,
+    .screen-title::after {
+      content: "";
+      height: 36px;
+      margin-top: 8px;
+      border-top: 1px solid rgba(0, 150, 255, 0.45);
+      background: linear-gradient(90deg, transparent, rgba(0, 150, 255, 0.2), transparent);
+      clip-path: polygon(0 0, 96% 0, 100% 28%, 92% 100%, 0 100%);
+    }
+
+    .screen-title::after {
+      transform: scaleX(-1);
+    }
+
+    .title-shell {
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #f0f8ff;
+      text-shadow: 0 0 24px rgba(0, 150, 255, 0.8), 0 0 48px rgba(0, 120, 255, 0.4);
+      font-size: 28px;
+      font-weight: 950;
+      letter-spacing: 8px;
+      background:
+        linear-gradient(180deg, rgba(0, 100, 200, 0.35) 0%, rgba(0, 50, 120, 0.55) 50%, rgba(0, 30, 80, 0.7) 100%),
+        linear-gradient(90deg, transparent, rgba(0, 150, 255, 0.15), transparent);
+      border: 1px solid rgba(0, 150, 255, 0.45);
+      clip-path: polygon(7% 0, 93% 0, 100% 48%, 92% 100%, 8% 100%, 0 48%);
+      box-shadow:
+        inset 0 0 40px rgba(0, 120, 255, 0.2),
+        inset 0 2px 0 rgba(100, 200, 255, 0.25),
+        0 0 30px rgba(0, 100, 255, 0.25),
+        0 4px 20px rgba(0, 0, 0, 0.4);
+      position: relative;
+    }
+
+    .title-shell::before {
+      content: "";
+      position: absolute;
+      inset: 2px;
+      clip-path: polygon(7% 0, 93% 0, 100% 48%, 92% 100%, 8% 100%, 0 48%);
+      border-top: 1px solid rgba(100, 200, 255, 0.3);
+      pointer-events: none;
+    }
+
+    .screen-meta {
+      position: absolute;
+      top: 3px;
+      display: flex;
+      gap: 18px;
+      color: #b7cee2;
+      font: 700 12px "SF Mono", "JetBrains Mono", monospace;
+    }
+
+    .screen-meta.left { left: 8px; }
+    .screen-meta.right { right: 8px; }
+
+    .year-total {
+      grid-column: 1 / -1;
+      text-align: center;
+      color: #bcd2e8;
+      font-size: 13px;
+      letter-spacing: 1px;
+    }
+
+    .year-total b {
+      display: inline-block;
+      margin: 0 10px;
+      color: var(--gold);
+      font: 950 28px "SF Mono", "JetBrains Mono", monospace;
+      letter-spacing: 4px;
+      text-shadow: 0 0 18px rgba(230, 194, 117, 0.55);
+    }
+
+    .year-total span {
+      color: #f35b65;
+      font-weight: 900;
+      text-shadow: 0 0 10px rgba(243,91,101,0.5);
+    }
+
+    .screen-col {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-height: 0;
+    }
+
+    .hud {
+      position: relative;
+      min-height: 0;
+      padding: 13px 13px 12px;
+      border: 1px solid rgba(0, 140, 255, 0.25);
+      background:
+        linear-gradient(135deg, rgba(0, 80, 180, 0.2) 0%, rgba(0, 40, 100, 0.15) 50%, rgba(0, 20, 60, 0.25) 100%),
+        linear-gradient(90deg, rgba(0, 120, 255, 0.1), transparent 30%);
+      box-shadow:
+        inset 0 0 30px rgba(0, 120, 255, 0.08),
+        inset 0 1px 0 rgba(100, 200, 255, 0.15),
+        0 4px 20px rgba(0, 0, 0, 0.3),
+        0 0 28px rgba(0, 80, 200, 0.15);
+      overflow: hidden;
+      border-radius: 4px;
+    }
+
+    .hud::after {
+      content: "";
+      position: absolute;
+      left: -40%;
+      right: auto;
+      top: 0;
+      width: 34%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0, 180, 255, 0.15), transparent);
+      transform: skewX(-18deg);
+      animation: hudSweep 5.5s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    @keyframes hudSweep {
+      0%, 38% { left: -44%; opacity: 0; }
+      52% { opacity: 1; }
+      100% { left: 112%; opacity: 0; }
+    }
+
+    .hud::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      height: 24px;
+      background: linear-gradient(90deg, rgba(0, 150, 255, 0.3), transparent 68%);
+      clip-path: polygon(0 0, 100% 0, 92% 100%, 8% 100%);
+      opacity: 0.8;
+    }
+
+    .hud h3 {
+      position: relative;
+      margin: 0 0 13px;
+      padding-left: 26px;
+      color: #e8f6ff;
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      text-shadow: 0 0 14px rgba(0, 150, 255, 0.5);
+    }
+
+    .hud h3::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 1px;
+      width: 18px;
+      height: 14px;
+      background: linear-gradient(135deg, #00b4ff 0 35%, transparent 36% 58%, #0078ff 59%);
+      transform: skewX(-18deg);
+      box-shadow: 0 0 16px rgba(0, 120, 255, 0.45);
+    }
+
+    .hud-num {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      margin: 3px 0 8px 40px;
+    }
+
+    .hud-num b {
+      color: #e8f6ff;
+      font: 950 25px "SF Mono", "JetBrains Mono", monospace;
+      letter-spacing: 3px;
+      text-shadow: 0 0 20px rgba(0, 150, 255, 0.7), 0 0 40px rgba(0, 100, 220, 0.35);
+    }
+
+    .hud-num span {
+      color: #a0c8e8;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .peak-chart {
+      height: 116px;
+      position: relative;
+      border-bottom: 1px solid rgba(0, 140, 255, 0.18);
+      background:
+        linear-gradient(rgba(0, 140, 255, 0.08) 1px, transparent 1px);
+      background-size: 100% 28px;
+      display: flex;
+      align-items: end;
+      justify-content: space-around;
+      padding: 0 12px 14px;
+    }
+
+    .peak {
+      width: 34px;
+      height: var(--h);
+      background: linear-gradient(180deg, #00d4ff, #0078ff 54%, transparent);
+      clip-path: polygon(50% 0, 88% 100%, 12% 100%);
+      filter: drop-shadow(0 0 10px rgba(0, 150, 255, 0.6));
+      position: relative;
+      animation: peakPulse 3.2s ease-in-out infinite alternate;
+    }
+
+    .peak:nth-child(2) { animation-delay: -0.7s; }
+    .peak:nth-child(3) { animation-delay: -1.4s; }
+    .peak:nth-child(4) { animation-delay: -2.1s; }
+    .peak:nth-child(5) { animation-delay: -2.8s; }
+
+    @keyframes peakPulse {
+      to { filter: drop-shadow(0 0 18px rgba(0, 150, 255, 0.8)); transform: translateY(-5px); }
+    }
+
+    .donut {
+      width: 142px;
+      height: 142px;
+      margin: 8px auto 2px;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at center, #040d1f 0 45%, transparent 46%),
+        conic-gradient(#00b4ff 0 42%, #0078ff 42% 67%, #00d4ff 67% 82%, rgba(0, 100, 200, 0.25) 82%);
+      box-shadow: 0 0 32px rgba(0, 120, 255, 0.25), inset 0 0 30px rgba(0, 150, 255, 0.18);
+      position: relative;
+      animation: ringRotate 12s linear infinite;
+    }
+
+    .donut::after {
+      content: "6.7%";
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      color: #e8f6ff;
+      font: 950 24px "SF Mono", "JetBrains Mono", monospace;
+      text-shadow: 0 0 18px rgba(0, 150, 255, 0.6);
+      animation: ringCounter 12s linear infinite;
+    }
+
+    @keyframes ringRotate { to { transform: rotate(360deg); } }
+    @keyframes ringCounter { to { transform: rotate(-360deg); } }
+
+    .axis-chart {
+      height: 128px;
+      position: relative;
+      border-bottom: 1px solid rgba(0, 140, 255, 0.18);
+      background:
+        linear-gradient(rgba(0, 140, 255, 0.08) 1px, transparent 1px);
+      background-size: 100% 25%;
+      overflow: hidden;
+    }
+
+    .axis-chart .line {
+      position: absolute;
+      left: 10px;
+      right: 10px;
+      height: 70px;
+      bottom: 18px;
+      border-bottom: 3px solid rgba(0, 150, 255, 0.8);
+      border-radius: 50% 50% 0 0;
+      transform: skewX(-8deg);
+      box-shadow: 0 0 20px rgba(0, 120, 255, 0.4);
+    }
+
+    .axis-chart .line.gold {
+      height: 48px;
+      bottom: 10px;
+      border-bottom-color: rgba(230,194,117,0.85);
+      transform: skewX(12deg);
+    }
+
+    .center-stage {
+      grid-column: 2;
+      grid-row: 3;
+      position: relative;
+      min-height: 508px;
+      border: 1px solid rgba(0, 140, 255, 0.22);
+      background:
+        radial-gradient(ellipse at 50% 50%, rgba(0, 100, 220, 0.18) 0%, transparent 50%),
+        radial-gradient(circle at 50% 48%, rgba(0, 180, 255, 0.1), transparent 40%),
+        linear-gradient(180deg, rgba(0, 30, 80, 0.35), rgba(0, 15, 45, 0.4));
+      box-shadow:
+        inset 0 0 80px rgba(0, 100, 220, 0.1),
+        inset 0 0 40px rgba(0, 150, 255, 0.06),
+        0 0 40px rgba(0, 80, 200, 0.12);
+      overflow: hidden;
+      border-radius: 4px;
+    }
+
+    .center-stage::before {
+      content: "";
+      position: absolute;
+      inset: 34px 42px 58px;
+      border: 1px solid rgba(0, 150, 255, 0.2);
+      background:
+        linear-gradient(rgba(0, 150, 255, 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 150, 255, 0.1) 1px, transparent 1px);
+      background-size: 52px 52px;
+      transform: perspective(900px) rotateX(64deg);
+      box-shadow: 0 0 60px rgba(0, 120, 255, 0.15);
+      pointer-events: none;
+    }
+
+    .center-stage::after {
+      content: "";
+      position: absolute;
+      left: 14%;
+      right: 14%;
+      top: 14%;
+      height: 38%;
+      background: linear-gradient(180deg, rgba(0, 180, 255, 0.25), rgba(0, 100, 220, 0.12), transparent);
+      clip-path: polygon(46% 0, 54% 0, 100% 100%, 0 100%);
+      filter: blur(0.6px);
+      animation: beamBreathe 4s ease-in-out infinite alternate;
+      pointer-events: none;
+    }
+
+    @keyframes beamBreathe {
+      to { opacity: 0.45; transform: translateY(8px) scaleX(1.08); }
+    }
+
+    .value-cube {
+      position: absolute;
+      left: 50%;
+      top: 48%;
+      width: 600px;
+      height: 300px;
+      transform: translate(-50%, -50%) perspective(900px) rotateX(58deg) rotateZ(-3deg);
+      transform-style: preserve-3d;
+      border: 1px solid rgba(0, 150, 255, 0.28);
+      background:
+        linear-gradient(rgba(0, 150, 255, 0.15) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 150, 255, 0.12) 1px, transparent 1px),
+        radial-gradient(ellipse at 50% 50%, rgba(0, 100, 220, 0.08), transparent 70%);
+      background-size: 100% 20%, 12.5% 100%, 100% 100%;
+      box-shadow:
+        0 0 80px rgba(0, 120, 255, 0.2),
+        0 0 40px rgba(0, 150, 255, 0.12),
+        inset 0 0 30px rgba(0, 100, 200, 0.08);
+      animation: cubeFloat 6.5s ease-in-out infinite alternate;
+    }
+
+    .value-cube::before,
+    .value-cube::after {
+      content: "";
+      position: absolute;
+      background: linear-gradient(180deg, rgba(0, 120, 255, 0.15), rgba(0, 60, 150, 0.05));
+      border: 1px solid rgba(0, 150, 255, 0.15);
+      pointer-events: none;
+    }
+
+    .value-cube::before {
+      left: -1px;
+      right: -1px;
+      bottom: -56px;
+      height: 56px;
+      transform-origin: top;
+      transform: rotateX(-68deg);
+    }
+
+    .value-cube::after {
+      top: -1px;
+      bottom: -1px;
+      right: -58px;
+      width: 58px;
+      transform-origin: left;
+      transform: rotateY(68deg);
+    }
+
+    @keyframes cubeFloat {
+      to { transform: translate(-50%, -52%) perspective(900px) rotateX(58deg) rotateZ(-3deg); }
+    }
+
+    .ribbon {
+      position: absolute;
+      left: 50%;
+      top: 48%;
+      width: 560px;
+      height: 210px;
+      transform: translate(-50%, -52%) perspective(900px) rotateX(58deg) rotateZ(-3deg);
+      background:
+        linear-gradient(180deg, rgba(0, 180, 255, 0.7), rgba(0, 100, 220, 0.45) 40%, rgba(0, 60, 180, 0.08) 74%),
+        linear-gradient(90deg, transparent, rgba(100, 200, 255, 0.4), transparent);
+      clip-path: polygon(0 78%, 10% 54%, 20% 48%, 30% 58%, 41% 39%, 53% 34%, 64% 22%, 74% 27%, 86% 13%, 100% 10%, 100% 56%, 86% 61%, 74% 71%, 64% 69%, 53% 78%, 41% 83%, 30% 92%, 20% 82%, 10% 87%, 0 100%);
+      filter: drop-shadow(0 0 24px rgba(0, 150, 255, 0.6));
+      background-size: 220% 100%;
+      animation: ribbonFlow 5.4s ease-in-out infinite alternate;
+    }
+
+    .ribbon::before {
+      content: "";
+      position: absolute;
+      inset: 7% 0 42%;
+      background: linear-gradient(90deg, transparent, rgba(150, 220, 255, 0.6), transparent);
+      transform: translateX(-70%);
+      animation: ribbonSpark 3.8s linear infinite;
+    }
+
+    .ribbon.gold {
+      width: 540px;
+      height: 190px;
+      top: 56%;
+      background: linear-gradient(180deg, rgba(239,214,143,0.84), rgba(190,155,77,0.48), rgba(190,155,77,0.02));
+      clip-path: polygon(0 84%, 12% 66%, 23% 59%, 33% 62%, 44% 51%, 55% 48%, 65% 39%, 75% 49%, 88% 36%, 100% 42%, 100% 76%, 88% 72%, 75% 82%, 65% 76%, 55% 83%, 44% 82%, 33% 92%, 23% 84%, 12% 88%, 0 100%);
+      opacity: 0.84;
+      animation-delay: -1.4s;
+    }
+
+    @keyframes ribbonFlow {
+      to { transform: translate(-50%, -55%) perspective(900px) rotateX(58deg) rotateZ(-3deg); background-position: 100% 0; }
+    }
+
+    @keyframes ribbonSpark {
+      to { transform: translateX(82%); }
+    }
+
+    .scan-plane {
+      position: absolute;
+      left: 9%;
+      right: 9%;
+      top: 54%;
+      height: 4px;
+      background: linear-gradient(90deg, transparent, #00b4ff, #0078ff, #00b4ff, transparent);
+      box-shadow: 0 0 24px rgba(0, 150, 255, 0.7), 0 0 48px rgba(0, 120, 255, 0.3);
+      transform: perspective(900px) rotateX(58deg) rotateZ(-3deg);
+      animation: scanPlane 3.4s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    @keyframes scanPlane {
+      0% { top: 35%; opacity: 0; }
+      20%, 72% { opacity: 1; }
+      100% { top: 72%; opacity: 0; }
+    }
+
+    .stage-label {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 48px;
+      width: 100%;
+      text-align: center;
+      white-space: nowrap;
+      color: #f0f8ff;
+      font-size: 20px;
+      font-weight: 950;
+      letter-spacing: 4px;
+      text-shadow: 0 0 24px rgba(0, 150, 255, 0.7), 0 0 48px rgba(0, 100, 220, 0.35);
+    }
+
+    .stage-axis {
+      position: absolute;
+      left: 12%;
+      right: 12%;
+      bottom: 112px;
+      display: flex;
+      justify-content: space-between;
+      color: #a0c8e8;
+      font: 700 11px "SF Mono", "JetBrains Mono", monospace;
+    }
+
+    .scan-dot {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #00b4ff;
+      box-shadow: 0 0 24px #0078ff, 0 0 0 8px rgba(0, 120, 255, 0.12);
+      animation: dot 3.8s ease-in-out infinite alternate;
+    }
+
+    .scan-dot.one { left: 24%; top: 52%; }
+    .scan-dot.two { left: 66%; top: 33%; animation-delay: -1.1s; }
+    .scan-dot.three { left: 78%; top: 49%; background: #00d4ff; box-shadow: 0 0 24px rgba(0, 180, 255, 0.8), 0 0 0 8px rgba(0, 180, 255, 0.12); animation-delay: -2.2s; }
+
+    @keyframes dot {
+      to { transform: translateY(-12px) scale(1.2); }
+    }
+
+    .progress-row {
+      display: grid;
+      grid-template-columns: 58px 1fr 42px;
+      align-items: center;
+      gap: 8px;
+      margin: 9px 0;
+      color: #c0e0ff;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .bar {
+      height: 5px;
+      border-radius: 999px;
+      background: rgba(0, 100, 200, 0.18);
+      overflow: hidden;
+    }
+
+    .bar i {
+      display: block;
+      width: var(--w);
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #00b4ff, #0078ff);
+      box-shadow: 0 0 16px rgba(0, 120, 255, 0.5);
+    }
+
+    .bar.gold i { background: linear-gradient(90deg, #e6c275, #fff1b5); }
+
+    .icon-metrics {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .icon-metric {
+      min-height: 112px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      border: 1px solid rgba(0, 140, 255, 0.2);
+      background: rgba(0, 80, 180, 0.08);
+    }
+
+    .icon {
+      width: 46px;
+      height: 32px;
+      border: 1px solid rgba(0, 150, 255, 0.4);
+      transform: perspective(220px) rotateX(52deg) rotateZ(-10deg);
+      box-shadow: 0 0 24px rgba(0, 120, 255, 0.2);
+      position: relative;
+    }
+
+    .icon::after {
+      content: "";
+      position: absolute;
+      left: 15px;
+      top: -20px;
+      width: 17px;
+      height: 24px;
+      background: linear-gradient(180deg, #00b4ff, rgba(0, 120, 255, 0.2));
+      clip-path: polygon(50% 0, 100% 100%, 0 100%);
+      filter: drop-shadow(0 0 10px rgba(0, 150, 255, 0.6));
+    }
+
+    .icon-metric b {
+      display: block;
+      margin-top: 7px;
+      color: #e8f6ff;
+      font: 950 22px "SF Mono", "JetBrains Mono", monospace;
+      letter-spacing: 2px;
+      text-shadow: 0 0 16px rgba(0, 150, 255, 0.55);
+    }
+
+    .icon-metric span {
+      color: #a0c8e8;
+      font-size: 11px;
+      line-height: 1.45;
+      font-weight: 800;
+    }
+
+    .bottom-grid {
+      grid-column: 1 / -1;
+      grid-row: 4;
+      display: grid;
+      grid-template-columns: 1fr 0.98fr 1fr;
+      gap: 13px;
+    }
+
+    .bars {
+      height: 114px;
+      display: flex;
+      align-items: end;
+      gap: 12px;
+      padding: 0 16px 12px;
+      border-bottom: 1px solid rgba(0, 140, 255, 0.18);
+      background: linear-gradient(rgba(0, 140, 255, 0.08) 1px, transparent 1px);
+      background-size: 100% 24px;
+    }
+
+    .bars i {
+      flex: 1;
+      height: var(--h);
+      border-radius: 999px 999px 0 0;
+      background: linear-gradient(180deg, #00d4ff, rgba(0, 120, 255, 0.3));
+      box-shadow: 0 0 18px rgba(0, 120, 255, 0.25);
+    }
+
+    .ring-status {
+      display: grid;
+      grid-template-columns: 150px 1fr;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .ring {
+      width: 128px;
+      height: 128px;
+      border-radius: 50%;
+      margin: 0 auto;
+      background:
+        radial-gradient(circle at center, #040d1f 0 44%, transparent 45%),
+        conic-gradient(#00b4ff 0 49%, #0078ff 49% 72%, #00d4ff 72% 88%, rgba(0, 100, 200, 0.25) 88%);
+      position: relative;
+      box-shadow: 0 0 28px rgba(0, 120, 255, 0.25);
+      animation: ringRotate 14s linear infinite;
+    }
+
+    .ring::after {
+      content: "5234";
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      color: #e8f6ff;
+      font: 950 25px "SF Mono", "JetBrains Mono", monospace;
+      text-shadow: 0 0 18px rgba(0, 150, 255, 0.6);
+      animation: ringCounter 14s linear infinite;
+    }
+
+    .legend {
+      color: #c0e0ff;
+      font-size: 11px;
+      font-weight: 800;
+      line-height: 2;
+    }
+
+    .legend i {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      margin-right: 7px;
+      background: #00b4ff;
+    }
+
+    .legend .cyan { background: #00d4ff; }
+    .legend .gold { background: #0078ff; }
+    .legend .dim { background: rgba(0, 100, 200, 0.35); }
+
+    @media (max-width: 860px) {
+      .detail-grid, .flow-cards { grid-template-columns: repeat(2, 1fr); }
+      .app { grid-template-columns: 58px 150px 1fr; }
+      .row { grid-template-columns: 40px 82px 1fr 100px 108px 112px 112px 100px 86px; }
+      .screen { min-height: auto; }
+      .screen-inner { grid-template-columns: 1fr; grid-template-rows: auto; }
+      .screen-title, .year-total, .center-stage, .bottom-grid { grid-column: auto; grid-row: auto; }
+      .bottom-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="top">
+      <div>
+        <h1>v10：企业深蓝导航 + 科技蓝 3D 指挥舱大屏</h1>
+        <p class="subtitle">左侧导航采用企业深蓝 `#0a2342` 底色，搭配亮蓝高亮条和发光边框，视觉更明亮专业。大屏全面升级为科技蓝主题，强化 3D 立体感、多层辉光、发光扫描线和流光曲面效果。</p>
+      </div>
+      <div class="note">v10 升级：导航从深灰改为企业深蓝 `#0a2342`，视觉更明亮；大屏采用科技蓝配色，增强 3D 立体效果、多层辉光和动态扫描线，更接近现代化指挥舱风格。</div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <h2>后台界面：企业深蓝导航</h2>
+        <span class="pill">Enterprise Blue v10</span>
+      </div>
+      <div class="panel-body">
+        <div class="detail-grid">
+          <div class="detail-card"><span>纳管资产</span><b>8,426</b><small>较昨日 +128，RFID 同步 98%</small></div>
+          <div class="detail-card green"><span>在用资产</span><b>6,318</b><small>绿色仅表达正常/完成状态</small></div>
+          <div class="detail-card gold"><span>待审批流程</span><b>42</b><small>需要业务负责人确认</small></div>
+          <div class="detail-card red"><span>风险资产</span><b>27</b><small>异常、逾期、外联风险集中展示</small></div>
+        </div>
+
+        <div class="app">
+          <aside class="rail">
+            <div class="avatar"></div>
+            <div class="rail-item"><span class="rail-icon"></span><span>待办</span></div>
+            <div class="rail-item active"><span class="rail-icon"></span><span>设备</span></div>
+            <div class="rail-item"><span class="rail-icon"></span><span>资产</span></div>
+            <div class="rail-item"><span class="rail-icon"></span><span>库存</span></div>
+            <div class="rail-item"><span class="rail-icon"></span><span>采购</span></div>
+            <div class="rail-item"><span class="rail-icon"></span><span>财务</span></div>
+            <div class="rail-spacer"></div>
+            <div class="plus"></div>
+          </aside>
+
+          <aside class="subnav">
+            <h3>设备管理</h3>
+            <div class="subitem">首页</div>
+            <div class="subitem active">设备列表</div>
+            <div class="subitem">设备入库</div>
+            <div class="subitem">附属资产变更</div>
+            <div class="subitem">配件出库</div>
+            <div class="subitem">分析报表</div>
+            <div class="subsection">保养维护</div>
+            <div class="subitem">保养方案</div>
+            <div class="subitem">保养任务</div>
+            <div class="subitem">保养执行</div>
+            <div class="subitem">保养评价</div>
+          </aside>
+
+          <section class="main">
+            <div class="topbar">
+              <div class="project-title">资产管理系统 / 设备列表 / 资产台账</div>
+              <div class="top-icons"><span></span><span></span><span></span><span></span></div>
+            </div>
+
+            <div class="content">
+              <div class="workbench">
+                <div class="toolbar">
+                  <button class="tool">切换视图&nbsp;&nbsp;<b style="color:#1f64ff">标准</b></button>
+                  <button class="tool primary">快速处理</button>
+                  <button class="tool primary">+ 新建</button>
+                  <button class="tool green">发布流程</button>
+                  <button class="tool">编辑</button>
+                  <button class="tool">导入/导出</button>
+                  <button class="tool">打印</button>
+                  <button class="tool">RFID 管理</button>
+                  <span class="tool spacer"></span>
+                  <span class="search"></span>
+                  <button class="tool">编辑表单</button>
+                </div>
+
+                <div class="summary">
+                  <span>金额合计：69,873.00　|　已选：1　|　风险资产：27</span>
+                  <span class="right">高级搜索　|　列设置　|　刷新</span>
+                </div>
+
+                <div class="table">
+                  <div class="row head"><div class="td"><span class="checkbox"></span></div><div class="td">状态</div><div class="td">资产名称</div><div class="td">资产编码</div><div class="td">主附状态</div><div class="td">资产类别</div><div class="td">RFID</div><div class="td">部门</div><div class="td">风险</div></div>
+                  <div class="row"><div class="td"><span class="checkbox"></span></div><div class="td"><span class="badge idle">闲置</span></div><div class="td"><span class="link">人体工学椅</span></div><div class="td">01608110</div><div class="td">主资产</div><div class="td">家具用具</div><div class="td">RFID-9310</div><div class="td">行政部</div><div class="td">低</div></div>
+                  <div class="row selected"><div class="td"><span class="checkbox"></span></div><div class="td"><span class="badge idle">闲置</span></div><div class="td"><span class="link">人体工学椅</span></div><div class="td">01608109</div><div class="td">主资产</div><div class="td">家具用具</div><div class="td">RFID-9309</div><div class="td">行政部</div><div class="td">低</div></div>
+                  <div class="row"><div class="td"><span class="checkbox"></span></div><div class="td"><span class="badge active">在用</span></div><div class="td"><span class="link">办公桌</span></div><div class="td">01608108</div><div class="td">附属资产</div><div class="td">家具用具</div><div class="td">RFID-9308</div><div class="td">财务部</div><div class="td">低</div></div>
+                  <div class="row"><div class="td"><span class="checkbox"></span></div><div class="td"><span class="badge risk">异常</span></div><div class="td"><span class="link">核心交换机</span></div><div class="td">01608104</div><div class="td">主资产</div><div class="td">网络设备</div><div class="td">RFID-9304</div><div class="td">信息部</div><div class="td">高</div></div>
+                  <div class="row"><div class="td"><span class="checkbox"></span></div><div class="td"><span class="badge active">在用</span></div><div class="td"><span class="link">iPhone 13 Pro</span></div><div class="td">01608107</div><div class="td">主资产</div><div class="td">电子产品</div><div class="td">RFID-9307</div><div class="td">市场部</div><div class="td">低</div></div>
+                  <div class="row"><div class="td"><span class="checkbox"></span></div><div class="td"><span class="badge active">在用</span></div><div class="td"><span class="link">CISCO 路由器</span></div><div class="td">01608103</div><div class="td">主资产</div><div class="td">网络设备</div><div class="td">RFID-9303</div><div class="td">信息部</div><div class="td">中</div></div>
+                  <div class="row"><div class="td"><span class="checkbox"></span></div><div class="td"><span class="badge idle">闲置</span></div><div class="td"><span class="link">Dell 笔记本</span></div><div class="td">01608102</div><div class="td">主资产</div><div class="td">电子产品</div><div class="td">RFID-9302</div><div class="td">研发部</div><div class="td">低</div></div>
+                </div>
+
+                <div class="footer">
+                  <div class="pager"><span>‹</span><span class="page">1</span><span>›</span><span style="margin-left:12px">50 / 页</span></div>
+                  <span>1 - 10 条，共 10 条数据</span>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <div class="flow-cards">
+          <div class="flow-card"><div class="flow-code">ASSET_TRANSFER</div><h3>资产转移流程</h3><p>用于资产转出、转入确认及双方部门资产管理员审批。</p><div class="flow-actions"><button class="primary">打开设计器</button><button>查看表单</button><button class="ok">发布</button></div></div>
+          <div class="flow-card green"><div class="flow-code">ASSET_CLEARANCE</div><h3>资产清退流程</h3><p>用于闲置资产清退、部门审批、库房确认及 IT 审核。</p><div class="flow-actions"><button class="primary">打开设计器</button><button>查看表单</button><button class="ok">发布</button></div></div>
+          <div class="flow-card red"><div class="flow-code">ASSET_SCRAP</div><h3>资产报废转让流程</h3><p>用于资产报废转让多级审批、收款确认与核算归档。</p><div class="flow-actions"><button class="primary">打开设计器</button><button>查看表单</button><button class="ok">发布</button></div></div>
+          <div class="flow-card orange"><div class="flow-code">ASSET_COMPENSATION</div><h3>资产赔偿流程</h3><p>用于资产损失赔偿、信息安全审批、财务审批与库房接收。</p><div class="flow-actions"><button class="primary">打开设计器</button><button>查看表单</button><button class="ok">发布</button></div></div>
+        </div>
+
+        <p class="caption">细节增强点：左侧导航改为企业深蓝 `#0a2342` 底色，选中态使用亮蓝 `#71dfff` 高亮条和发光边框；大屏全面升级为科技蓝主题，增强 3D 立体网格、发光扫描线、流光曲面和多层辉光效果。</p>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <h2>资产态势大屏：科技蓝 3D 立体指挥舱</h2>
+        <span class="pill">Tech Blue 3D Screen v10</span>
+      </div>
+      <div class="panel-body">
+        <div class="screen">
+          <div class="screen-inner">
+            <div class="screen-title">
+              <div class="screen-meta left"><span>FORTHAMS</span><span>杭州</span><span>2026/05/19</span></div>
+              <div class="title-shell">企业资产态势大屏</div>
+              <div class="screen-meta right"><span>星期二</span><span>10:52:23</span></div>
+            </div>
+
+            <div class="year-total">本年资产预算执行金额 <b>32,457.78</b> 万元　同比 <span>+06.03%</span></div>
+
+            <div class="screen-col">
+              <div class="hud">
+                <h3>资产类型分布</h3>
+                <div class="hud-num"><b>5,234.56</b><span>台/套</span></div>
+                <div class="peak-chart">
+                  <i class="peak" style="--h:58px"></i>
+                  <i class="peak" style="--h:82px"></i>
+                  <i class="peak" style="--h:43px"></i>
+                  <i class="peak" style="--h:66px"></i>
+                  <i class="peak" style="--h:76px"></i>
+                </div>
+              </div>
+
+              <div class="hud">
+                <h3>资产负载分布</h3>
+                <div class="hud-num"><b>234.56</b><span>万元</span></div>
+                <div class="donut"></div>
+              </div>
+
+              <div class="hud">
+                <h3>资产风险趋势</h3>
+                <div class="axis-chart"><i class="line"></i><i class="line gold"></i></div>
+              </div>
+            </div>
+
+            <div class="center-stage">
+              <div class="value-cube"></div>
+              <div class="ribbon"></div>
+              <div class="ribbon gold"></div>
+              <div class="scan-plane"></div>
+              <i class="scan-dot one"></i>
+              <i class="scan-dot two"></i>
+              <i class="scan-dot three"></i>
+              <div class="stage-axis"><span>2016</span><span>2018</span><span>2020</span><span>2022</span><span>2024</span><span>2026</span></div>
+              <div class="stage-label">近十年资产价值与纳管数据</div>
+            </div>
+
+            <div class="screen-col">
+              <div class="hud">
+                <h3>本年度盘点执行率</h3>
+                <div class="hud-num"><b>96.20</b><span>%</span></div>
+                <div class="progress-row"><span>No.1</span><div class="bar" style="--w:98%"><i></i></div><span>98%</span></div>
+                <div class="progress-row"><span>No.2</span><div class="bar" style="--w:90%"><i></i></div><span>90%</span></div>
+                <div class="progress-row"><span>No.3</span><div class="bar gold" style="--w:87%"><i></i></div><span>87%</span></div>
+              </div>
+
+              <div class="hud">
+                <h3>跨部门流转执行率</h3>
+                <div class="hud-num"><b>89.50</b><span>%</span></div>
+                <div class="progress-row"><span>部门一</span><div class="bar" style="--w:98%"><i></i></div><span>98%</span></div>
+                <div class="progress-row"><span>部门二</span><div class="bar" style="--w:90%"><i></i></div><span>90%</span></div>
+                <div class="progress-row"><span>部门三</span><div class="bar gold" style="--w:87%"><i></i></div><span>87%</span></div>
+              </div>
+
+              <div class="hud">
+                <h3>项目级资产利用率</h3>
+                <div class="icon-metrics">
+                  <div class="icon-metric"><div><div class="icon"></div><b>56.9%</b><span>整体资产<br>利用率</span></div></div>
+                  <div class="icon-metric"><div><div class="icon"></div><b>67.4%</b><span>维保处置<br>进度</span></div></div>
+                  <div class="icon-metric"><div><div class="icon"></div><b>79.2%</b><span>财资回收<br>入账率</span></div></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="bottom-grid">
+              <div class="hud">
+                <h3>入库 / 领用趋势</h3>
+                <div class="bars"><i style="--h:34%"></i><i style="--h:58%"></i><i style="--h:46%"></i><i style="--h:78%"></i><i style="--h:62%"></i><i style="--h:92%"></i><i style="--h:72%"></i><i style="--h:86%"></i></div>
+              </div>
+              <div class="hud">
+                <h3>资产状态分布</h3>
+                <div class="ring-status">
+                  <div class="ring"></div>
+                  <div class="legend"><div><i></i>业务活动 20%</div><div><i class="cyan"></i>单位管控 45%</div><div><i class="gold"></i>资产处置 24%</div><div><i class="dim"></i>其他费用 11%</div></div>
+                </div>
+              </div>
+              <div class="hud">
+                <h3>支出 / 维保分布</h3>
+                <div class="bars"><i style="--h:68%"></i><i style="--h:44%"></i><i style="--h:80%"></i><i style="--h:52%"></i><i style="--h:74%"></i><i style="--h:60%"></i><i style="--h:88%"></i><i style="--h:66%"></i></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="caption">v10 升级：科技蓝主题全面替换，更亮的 `#00b4ff` / `#0078ff` 色系，强化 3D 立体网格厚度、多层辉光边框、发光扫描线、流光曲面和环形指标旋转，整体更接近现代化指挥舱风格。</p>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

@@ -53,6 +53,7 @@ import { getAssetDetail } from '../../services/assetService';
 import { getAuditLogs } from '../../services/auditApi';
 import { workOrderService } from '../../services/workOrderService';
 import type { WorkOrderDTO } from '../../services/workOrderService';
+import { formatStatusLabel } from '../../constants/assetStatus';
 
 // UI 组件导入
 import { Button } from '../../components/ui/button';
@@ -611,7 +612,7 @@ const AssetDetailPage: React.FC = () => {
               <p className="text-sm text-muted-foreground">资产状态</p>
               <p className="font-semibold">
                 <Badge variant={assetDetail.status === 'ACTIVE' ? 'default' : 'secondary'}>
-                  {assetDetail.status}
+                  {formatStatusLabel(assetDetail.status)}
                 </Badge>
               </p>
             </div>

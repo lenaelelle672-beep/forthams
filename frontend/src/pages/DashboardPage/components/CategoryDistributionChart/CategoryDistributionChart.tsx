@@ -137,7 +137,7 @@ export const CategoryDistributionChart: React.FC<CategoryDistributionChartProps>
           avoidLabelOverlap: true,
           itemStyle: {
             borderRadius: 6,
-            borderColor: '#ffffff',
+            borderColor: '#e2e8f0',
             borderWidth: 2,
           },
           label: {
@@ -197,7 +197,7 @@ export const CategoryDistributionChart: React.FC<CategoryDistributionChartProps>
    */
   const renderEmptyState = () => (
     <div 
-      className={`flex flex-col items-center justify-center h-64 text-gray-400 ${className}`}
+      className={`flex flex-col items-center justify-center h-64 text-slate-500 ${className}`}
       role="status"
       aria-label={t('dashboard.category.noData')}
     >
@@ -232,7 +232,7 @@ export const CategoryDistributionChart: React.FC<CategoryDistributionChartProps>
       aria-label={t('dashboard.loading')}
     >
       <div className="w-10 h-10 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin" />
-      <p className="mt-4 text-sm text-gray-500">{t('dashboard.loading')}</p>
+      <p className="mt-4 text-sm text-slate-500">{t('dashboard.loading')}</p>
     </div>
   );
 

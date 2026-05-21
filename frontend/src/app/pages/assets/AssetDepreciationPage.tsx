@@ -211,9 +211,9 @@ export const AssetDepreciationPage: React.FC = () => {
     return (
       <div className="max-w-7xl mx-auto space-y-6 pb-12" data-testid="depreciation-page-loading">
         <div className="flex items-center gap-4 mb-8">
-          <div className="w-10 h-10 bg-gray-100 rounded-lg animate-pulse" />
+          <div className="w-10 h-10 bg-blue-50 rounded-lg animate-pulse" />
           <div className="space-y-2">
-            <div className="h-6 w-56 bg-gray-100 rounded animate-pulse" />
+            <div className="h-6 w-56 bg-blue-50 rounded animate-pulse" />
             <div className="h-4 w-40 bg-gray-50 rounded animate-pulse" />
           </div>
         </div>
@@ -256,7 +256,7 @@ export const AssetDepreciationPage: React.FC = () => {
           </div>
           <div>
             <h2 className="text-2xl font-bold text-gray-900">资产折旧计划</h2>
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-gray-400 mt-1">
               查看资产折旧计算结果与历史折旧记录
             </p>
           </div>
@@ -318,13 +318,13 @@ export const AssetDepreciationPage: React.FC = () => {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card>
           <CardContent className="p-4">
-            <p className="text-sm text-gray-500">资产总数</p>
+            <p className="text-sm text-gray-400">资产总数</p>
             <p className="text-xl font-bold">{total}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4">
-            <p className="text-sm text-gray-500">当前页</p>
+            <p className="text-sm text-gray-400">当前页</p>
             <p className="text-xl font-bold">
               {page} / {totalPages}
             </p>
@@ -366,9 +366,9 @@ export const AssetDepreciationPage: React.FC = () => {
                       >
                         <TableCell>
                           {isExpanded ? (
-                            <ChevronDown className="w-4 h-4 text-gray-500" />
+                            <ChevronDown className="w-4 h-4 text-gray-400" />
                           ) : (
-                            <ChevronRight className="w-4 h-4 text-gray-500" />
+                            <ChevronRight className="w-4 h-4 text-gray-400" />
                           )}
                         </TableCell>
                         <TableCell className="font-mono text-sm">
@@ -418,32 +418,32 @@ export const AssetDepreciationPage: React.FC = () => {
                                   {/* Detail parameter summary */}
                                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
                                     <div>
-                                      <span className="text-gray-500">折旧方法：</span>
+                                      <span className="text-gray-400">折旧方法：</span>
                                       <span className="font-medium">
                                         {METHOD_LABELS[detailSchedule.method] || detailSchedule.methodName}
                                       </span>
                                     </div>
                                     <div>
-                                      <span className="text-gray-500">资产原值：</span>
+                                      <span className="text-gray-400">资产原值：</span>
                                       <span className="font-medium">
                                         {formatCurrency(detailSchedule.originalValue)}
                                       </span>
                                     </div>
                                     <div>
-                                      <span className="text-gray-500">预计残值：</span>
+                                      <span className="text-gray-400">预计残值：</span>
                                       <span className="font-medium">
                                         {formatCurrency(detailSchedule.salvageValue)}
                                       </span>
                                     </div>
                                     <div>
-                                      <span className="text-gray-500">折旧年限：</span>
+                                      <span className="text-gray-400">折旧年限：</span>
                                       <span className="font-medium">
                                         {detailSchedule.usefulLifeYears} 年
                                       </span>
                                     </div>
                                     {detailSchedule.salvageRate !== undefined && (
                                       <div>
-                                        <span className="text-gray-500">残值率：</span>
+                                        <span className="text-gray-400">残值率：</span>
                                         <span className="font-medium">
                                           {formatRate(detailSchedule.salvageRate)}
                                         </span>
@@ -451,7 +451,7 @@ export const AssetDepreciationPage: React.FC = () => {
                                     )}
                                     {detailSchedule.startDate && (
                                       <div>
-                                        <span className="text-gray-500">折旧开始日期：</span>
+                                        <span className="text-gray-400">折旧开始日期：</span>
                                         <span className="font-medium">
                                           {detailSchedule.startDate}
                                         </span>
@@ -541,7 +541,7 @@ export const AssetDepreciationPage: React.FC = () => {
           {/* Pagination controls */}
           {total > PAGE_SIZE && (
             <div className="flex items-center justify-between mt-4 pt-4 border-t">
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-gray-400">
                 共 {total} 条记录，第 {page} / {totalPages} 页
               </p>
               <div className="flex items-center gap-2">

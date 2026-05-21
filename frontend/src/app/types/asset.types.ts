@@ -636,7 +636,7 @@ export const ASSET_TYPE_LABELS: Record<AssetType, string> = {
  */
 export const ASSET_STATUS_CONFIG: Record<AssetStatus, { label: string; color: string; bgColor: string }> = {
   ACTIVE: { label: '在用', color: 'text-green-700', bgColor: 'bg-green-100' },
-  INACTIVE: { label: '闲置', color: 'text-gray-700', bgColor: 'bg-gray-100' },
+  INACTIVE: { label: '闲置', color: 'text-gray-700', bgColor: 'bg-blue-50' },
   MAINTENANCE: { label: '维护中', color: 'text-yellow-700', bgColor: 'bg-yellow-100' },
   RETIRED: { label: '已退役', color: 'text-orange-700', bgColor: 'bg-orange-100' },
   DISPOSED: { label: '已处置', color: 'text-red-700', bgColor: 'bg-red-100' },

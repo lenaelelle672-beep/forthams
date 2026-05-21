@@ -42,7 +42,7 @@
   min-height: 120px;
   padding: 20px;
   background: var(--color-surface, #ffffff);
-  border: 1px solid var(--color-border, #e2e8f0);
+  border: 1px solid var(--color-border, #f8fafc);
   border-radius: 12px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
   transition: box-shadow 0.2s ease, transform 0.15s ease;
@@ -86,7 +86,7 @@
 .kpiValue {
   font-size: 32px;
   font-weight: 700;
-  color: var(--color-text-primary, #1e293b);
+  color: var(--color-text-primary, #ffffff);
   line-height: 1.1;
   margin-bottom: 4px;
   font-variant-numeric: tabular-nums;
@@ -125,7 +125,7 @@
 
 .kpiTrendFlat {
   color: #64748b;
-  background: #f1f5f9;
+  background: #ffffff;
 }
 
 .kpiTrendArrow {
@@ -145,9 +145,9 @@
   color: transparent;
   background: linear-gradient(
     90deg,
-    var(--color-skeleton-from, #e2e8f0) 25%,
-    var(--color-skeleton-to, #f1f5f9) 50%,
-    var(--color-skeleton-from, #e2e8f0) 75%
+    var(--color-skeleton-from, #f8fafc) 25%,
+    var(--color-skeleton-to, #475569) 50%,
+    var(--color-skeleton-from, #f8fafc) 75%
   );
   background-size: 200% 100%;
   animation: kpiShimmer 1.5s ease-in-out infinite;

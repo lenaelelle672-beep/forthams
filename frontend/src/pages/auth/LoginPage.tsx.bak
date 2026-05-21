@@ -1,0 +1,356 @@
+import { useState, useRef, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { useMutation } from '@tanstack/react-query';
+import { Eye, EyeOff, Shield, User, Lock, ShieldCheck, Package, Building2, Wrench } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
+
+const loginSchema = z.object({
+  username: z.string().min(1, '请输入用户名'),
+  password: z.string().min(1, '请输入密码'),
+});
+
+type LoginForm = z.infer<typeof loginSchema>;
+
+interface Particle {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  size: number;
+  opacity: number;
+  hue: number;
+  life: number;
+  maxLife: number;
+}
+
+const DEMO_ACCOUNTS = [
+  { label: 'Administrator', desc: 'Full System Access', username: 'admin', password: 'admin123', Icon: ShieldCheck },
+  { label: 'Asset Manager', desc: 'Lifecycle Tracking', username: 'asset', password: 'asset123', Icon: Package },
+  { label: 'Dept. Head', desc: 'Resource Auditing', username: 'manager', password: 'manager123', Icon: Building2 },
+  { label: 'Operations', desc: 'Maintenance Tools', username: 'staff', password: 'staff123', Icon: Wrench },
+] as const;
+
+function useParticleCanvas(canvasRef: React.RefObject<HTMLCanvasElement | null>) {
+  const particlesRef = useRef<Particle[]>([]);
+  const animRef = useRef<number>(0);
+  const mouseRef = useRef({ x: -1000, y: -1000 });
+  const timeRef = useRef(0);
+
+  const initParticles = useCallback((width: number, height: number) => {
+    const count = Math.min(Math.floor((width * height) / 6000), 120);
+    particlesRef.current = Array.from({ length: count }, () => ({
+      x: Math.random() * width,
+      y: Math.random() * height,
+      vx: (Math.random() - 0.5) * 0.25,
+      vy: (Math.random() - 0.5) * 0.25,
+      size: Math.random() * 2 + 0.5,
+      opacity: Math.random() * 0.4 + 0.15,
+      hue: Math.random() * 60 + 200,
+      life: 0,
+      maxLife: Math.random() * 500 + 300,
+    }));
+  }, []);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const resize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      if (particlesRef.current.length === 0) initParticles(canvas.width, canvas.height);
+    };
+    resize();
+    window.addEventListener('resize', resize);
+    window.addEventListener('mousemove', (e) => {
+      mouseRef.current = { x: e.clientX, y: e.clientY };
+    });
+
+    const CONNECTION_DIST = 120;
+    const MOUSE_DIST = 200;
+
+    const animate = () => {
+      timeRef.current++;
+      ctx.fillStyle = 'rgba(11, 19, 38, 0.15)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      const particles = particlesRef.current;
+      const mouse = mouseRef.current;
+
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
+        p.life++;
+        const lifeRatio = p.life / p.maxLife;
+        const fadeIn = Math.min(p.life / 60, 1);
+        const fadeOut = lifeRatio > 0.8 ? 1 - (lifeRatio - 0.8) / 0.2 : 1;
+        const alpha = p.opacity * fadeIn * fadeOut;
+
+        if (p.life >= p.maxLife) {
+          p.x = Math.random() * canvas.width;
+          p.y = Math.random() * canvas.height;
+          p.life = 0;
+          p.maxLife = Math.random() * 500 + 300;
+        }
+
+        const dx = mouse.x - p.x;
+        const dy = mouse.y - p.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < MOUSE_DIST) {
+          const force = (MOUSE_DIST - dist) / MOUSE_DIST * 0.006;
+          p.vx += dx * force;
+          p.vy += dy * force;
+        }
+
+        p.vx *= 0.988;
+        p.vy *= 0.988;
+        p.x += p.vx;
+        p.y += p.vy;
+
+        if (p.x < 0) { p.x = 0; p.vx *= -1; }
+        if (p.x > canvas.width) { p.x = canvas.width; p.vx *= -1; }
+        if (p.y < 0) { p.y = 0; p.vy *= -1; }
+        if (p.y > canvas.height) { p.y = canvas.height; p.vy *= -1; }
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fillStyle = `hsla(${p.hue}, 80%, 75%, ${alpha})`;
+        ctx.fill();
+
+        for (let j = i + 1; j < particles.length; j++) {
+          const p2 = particles[j];
+          const ddx = p.x - p2.x;
+          const ddy = p.y - p2.y;
+          const d = Math.sqrt(ddx * ddx + ddy * ddy);
+          if (d < CONNECTION_DIST) {
+            const lineAlpha = (1 - d / CONNECTION_DIST) * 0.15 * fadeIn * fadeOut;
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.strokeStyle = `hsla(${p.hue}, 70%, 65%, ${lineAlpha})`;
+            ctx.lineWidth = 0.6;
+            ctx.stroke();
+          }
+        }
+      }
+
+      animRef.current = requestAnimationFrame(animate);
+    };
+
+    animate();
+    return () => {
+      window.removeEventListener('resize', resize);
+      cancelAnimationFrame(animRef.current);
+    };
+  }, [canvasRef, initParticles]);
+}
+
+export default function LoginPage() {
+  const navigate = useNavigate();
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  useParticleCanvas(canvasRef);
+
+  const { register, handleSubmit, setValue, formState: { errors } } = useForm<LoginForm>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: { username: '', password: '' },
+  });
+
+  const loginMutation = useMutation({
+    mutationFn: async (data: LoginForm) => {
+      // TODO: replace with real API call
+      const res = await fetch('/api/v1/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      if (!res.ok) throw new Error('用户名或密码错误');
+      return res.json();
+    },
+    onSuccess: (data) => {
+      const token = data?.data?.token ?? data?.token;
+      const userInfo = data?.data?.userInfo ?? data?.userInfo;
+      if (!token) throw new Error('登录响应缺少 token');
+      localStorage.setItem('auth_token', token);
+      localStorage.setItem('user_info', JSON.stringify(userInfo));
+      navigate('/dashboard', { replace: true });
+    },
+    onError: (err: any) => {
+      setErrorMsg(err?.message || '登录失败，请重试');
+    },
+  });
+
+  const onSubmit = (data: LoginForm) => {
+    setErrorMsg(null);
+    loginMutation.mutate(data);
+  };
+
+  const fillAndLogin = (username: string, password: string) => {
+    setValue('username', username);
+    setValue('password', password);
+    setErrorMsg(null);
+    setTimeout(() => {
+      loginMutation.mutate({ username, password });
+    }, 200);
+  };
+
+  return (
+    <main
+      className="relative flex h-screen w-full overflow-hidden font-sans"
+      style={{ background: 'radial-gradient(circle at top left, #131b2e 0%, #0b1326 100%)' }}
+    >
+      <canvas ref={canvasRef} className="absolute inset-0 z-0" />
+
+      <div className="fixed inset-0 pointer-events-none" style={{
+        backgroundImage: `
+          linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
+          linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px)
+        `,
+        backgroundSize: '32px 32px',
+      }} />
+
+      <div className="w-full max-w-[480px] relative z-10 flex flex-col items-center m-auto px-6">
+        <div
+          className="glass-card w-full rounded-xl p-8 mb-8"
+          style={{
+            background: 'rgba(23, 31, 51, 0.6)',
+            backdropFilter: 'blur(24px)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+          }}
+        >
+          <header className="flex flex-col items-center mb-10 text-center">
+            <div className="w-14 h-14 rounded-xl flex items-center justify-center mb-4 border border-[#2563eb]/20" style={{ background: 'rgba(37, 99, 235, 0.12)' }}>
+              <Shield className="w-7 h-7 text-[#b4c5ff]" />
+            </div>
+            <h1 className="text-[28px] font-semibold text-[#dae2fd] tracking-tight leading-9">
+              Enterprise Asset Control
+            </h1>
+            <p className="text-sm font-medium text-[#c3c6d7] mt-2 uppercase tracking-[0.2em]">
+              Secure Infrastructure Gateway
+            </p>
+          </header>
+
+          <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
+            <div className="space-y-2">
+              <label className="text-xs font-semibold text-[#c3c6d7] uppercase tracking-wider ml-1" htmlFor="username">
+                Username
+              </label>
+              <div className="relative flex items-center border border-white/10 rounded-lg bg-[#060e20]/50 group transition-all duration-200 focus-within:shadow-[0_0_15px_rgba(37,99,235,0.3)] focus-within:border-[#2563eb]">
+                <User className="absolute left-4 w-5 h-5 text-[#8d90a0] group-focus-within:text-[#b4c5ff]" />
+                <input
+                  {...register('username')}
+                  id="username"
+                  type="text"
+                  placeholder="Enter your identifier"
+                  className="w-full bg-transparent border-none py-3.5 pl-12 pr-4 text-[#dae2fd] placeholder:text-[#434655] focus:ring-0 text-base outline-none"
+                />
+              </div>
+              {errors.username && <p className="text-xs text-[#ffb4ab] ml-1">{errors.username.message}</p>}
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-semibold text-[#c3c6d7] uppercase tracking-wider ml-1" htmlFor="password">
+                Password
+              </label>
+              <div className="relative flex items-center border border-white/10 rounded-lg bg-[#060e20]/50 group transition-all duration-200 focus-within:shadow-[0_0_15px_rgba(37,99,235,0.3)] focus-within:border-[#2563eb]">
+                <Lock className="absolute left-4 w-5 h-5 text-[#8d90a0] group-focus-within:text-[#b4c5ff]" />
+                <input
+                  {...register('password')}
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="••••••••"
+                  className="w-full bg-transparent border-none py-3.5 pl-12 pr-12 text-[#dae2fd] placeholder:text-[#434655] focus:ring-0 text-base outline-none"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((v) => !v)}
+                  className="absolute right-4 text-[#8d90a0] hover:text-[#dae2fd] transition-colors"
+                >
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
+              {errors.password && <p className="text-xs text-[#ffb4ab] ml-1">{errors.password.message}</p>}
+            </div>
+
+            <div className="flex items-center justify-between">
+              <label className="flex items-center gap-3 cursor-pointer group">
+                <input
+                  type="checkbox"
+                  className="h-5 w-5 rounded border-[#434655] bg-[#2d3449] text-[#2563eb] focus:ring-offset-[#0b1326] focus:ring-[#2563eb]"
+                />
+                <span className="text-sm font-medium text-[#c3c6d7] group-hover:text-[#dae2fd] transition-colors">
+                  Remember Me
+                </span>
+              </label>
+              <a className="text-sm font-medium text-[#b4c5ff] hover:text-[#adc6ff] transition-colors underline-offset-4 hover:underline" href="#">
+                Forgot Password?
+              </a>
+            </div>
+
+            {errorMsg && (
+              <div className="p-3 rounded-lg text-sm text-center border" style={{ background: 'rgba(147,0,10,0.2)', borderColor: 'rgba(255,180,171,0.2)', color: '#ffb4ab' }}>
+                {errorMsg}
+              </div>
+            )}
+
+            <Button
+              type="submit"
+              variant="primary"
+              size="lg"
+              loading={loginMutation.isPending}
+              className="w-full !py-4 !text-base !font-semibold !rounded-lg !shadow-lg !shadow-[#2563eb]/20"
+              style={{ background: '#2563eb' }}
+            >
+              Sign In
+            </Button>
+          </form>
+        </div>
+
+        <section className="w-full">
+          <div className="flex items-center gap-4 mb-6">
+            <div className="h-px flex-grow bg-white/10" />
+            <h2 className="text-xs font-semibold text-[#8d90a0] tracking-[0.15em] uppercase whitespace-nowrap">
+              Demo Accounts
+            </h2>
+            <div className="h-px flex-grow bg-white/10" />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            {DEMO_ACCOUNTS.map(({ label, desc, username, password, Icon }) => (
+              <button
+                key={username}
+                type="button"
+                onClick={() => fillAndLogin(username, password)}
+                disabled={loginMutation.isPending}
+                className="p-4 rounded-xl flex flex-col items-center text-center group hover:-translate-y-1 transition-all disabled:opacity-40"
+                style={{
+                  background: 'rgba(23, 31, 51, 0.6)',
+                  backdropFilter: 'blur(24px)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                }}
+              >
+                <Icon className="w-6 h-6 text-[#8d90a0] group-hover:text-[#b4c5ff] mb-2 transition-colors" />
+                <span className="text-sm font-medium text-[#dae2fd]">{label}</span>
+                <span className="text-[10px] text-[#434655] mt-1">{desc}</span>
+              </button>
+            ))}
+          </div>
+        </section>
+
+        <footer className="mt-12 text-center">
+          <p className="text-xs text-[#434655]">© 2024 AssetCore Technologies. All rights reserved.</p>
+          <div className="mt-2 flex justify-center gap-4">
+            <a className="text-[10px] text-[#434655] hover:text-[#8d90a0]" href="#">Privacy Policy</a>
+            <a className="text-[10px] text-[#434655] hover:text-[#8d90a0]" href="#">Terms of Service</a>
+          </div>
+        </footer>
+      </div>
+    </main>
+  );
+}

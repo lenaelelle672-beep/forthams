@@ -104,15 +104,15 @@ function LocationTreeNode({
             <button
               type="button"
               onClick={() => hasChildren && onToggle(node.id)}
-              className={`mr-2 flex-shrink-0 p-0.5 rounded hover:bg-gray-200 transition-colors ${
+              className={`mr-2 flex-shrink-0 p-0.5 rounded hover:bg-blue-50 transition-colors ${
                 hasChildren ? "cursor-pointer" : "cursor-default opacity-30"
               }`}
               disabled={!hasChildren}
             >
               {isExpanded ? (
-                <ChevronDown className="w-4 h-4 text-gray-500" />
+                <ChevronDown className="w-4 h-4 text-gray-400" />
               ) : (
-                <ChevronRight className="w-4 h-4 text-gray-500" />
+                <ChevronRight className="w-4 h-4 text-gray-400" />
               )}
             </button>
             <MapPin className="w-4 h-4 mr-1.5 flex-shrink-0 text-blue-500" />
@@ -125,15 +125,15 @@ function LocationTreeNode({
           </div>
         </td>
         {/* 编码列 */}
-        <td className="px-4 py-3 text-sm text-gray-600 font-mono">
+        <td className="px-4 py-3 text-sm text-gray-500 font-mono">
           {node.locationCode ?? "-"}
         </td>
         {/* 描述列 */}
-        <td className="px-4 py-3 text-sm text-gray-600 max-w-[200px] truncate">
+        <td className="px-4 py-3 text-sm text-gray-500 max-w-[200px] truncate">
           {node.description ?? "-"}
         </td>
         {/* 排序列 */}
-        <td className="px-4 py-3 text-sm text-gray-600 text-center">
+        <td className="px-4 py-3 text-sm text-gray-500 text-center">
           {node.sortOrder ?? 0}
         </td>
         {/* 操作列 */}
@@ -154,7 +154,7 @@ function LocationTreeNode({
               type="button"
               onClick={() => onEdit(node)}
               className="inline-flex items-center gap-1 px-2 py-1 text-xs
-                rounded border border-gray-300 bg-white text-gray-700
+                rounded border border-gray-200 bg-white text-gray-700
                 hover:bg-gray-50 transition-colors"
               title="编辑"
             >
@@ -237,27 +237,27 @@ export function LocationTree({
 }: LocationTreeProps) {
   return (
     <div className="overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
-      <table className="min-w-full divide-y divide-gray-200">
+      <table className="min-w-full divide-y divide-[#1e3a5f]">
         <thead className="bg-gray-50">
           <tr>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
               位置名称
             </th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
               编码
             </th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
               描述
             </th>
-            <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th className="px-4 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">
               排序
             </th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
               操作
             </th>
           </tr>
         </thead>
-        <tbody className="bg-white divide-y divide-gray-200">
+        <tbody className="bg-white divide-y divide-[#1e3a5f]">
           {treeData.map((rootNode) => (
             <LocationTreeNode
               key={rootNode.id}

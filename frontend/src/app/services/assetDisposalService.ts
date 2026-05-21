@@ -244,3 +244,34 @@ export async function fetchAssetDisposalHistory(
 ): Promise<DisposalApplication[]> {
   return api.get<DisposalApplication[]>(`/v1/retirement/asset/${assetId}`);
 }
+
+export interface DisposalApprovalRecord {
+  id: number;
+  applicationId: number;
+  stepNo: number;
+  operatorId: number;
+  operatorName?: string;
+  result: string;
+  comment?: string;
+  operatedAt: string;
+}
+
+export async function fetchDisposalApprovalHistory(
+  id: number,
+): Promise<DisposalApprovalRecord[]> {
+  return api.get<DisposalApprovalRecord[]>(`/v1/retirement/${id}/approval-history`);
+}
+
+export async function approveDisposalWithComment(
+  id: number,
+  comment?: string,
+): Promise<DisposalApplication> {
+  return api.post<DisposalApplication>(`/v1/retirement/${id}/approve`, { comment });
+}
+
+export async function rejectDisposalWithReason(
+  id: number,
+  reason: string,
+): Promise<DisposalApplication> {
+  return api.post<DisposalApplication>(`/v1/retirement/${id}/reject`, { reason });
+}

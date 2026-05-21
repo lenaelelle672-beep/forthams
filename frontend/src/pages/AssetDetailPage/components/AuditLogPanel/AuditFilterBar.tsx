@@ -481,7 +481,7 @@ export const AuditFilterBar: React.FC<AuditFilterBarProps> = ({
           font-size: 14px;
           font-family: inherit;
           color: #1e293b;
-          background-color: #ffffff;
+          background-color: #1e293b;
           transition: all 0.2s ease;
           cursor: pointer;
         }
@@ -544,7 +544,7 @@ export const AuditFilterBar: React.FC<AuditFilterBarProps> = ({
           padding: 6px 12px;
           border: 1px solid #e2e8f0;
           border-radius: 6px;
-          background-color: #ffffff;
+          background-color: #1e293b;
           font-size: 13px;
           font-family: inherit;
           color: #475569;
@@ -558,7 +558,7 @@ export const AuditFilterBar: React.FC<AuditFilterBarProps> = ({
         }
 
         .quick-select-btn:active:not(:disabled) {
-          background-color: #e2e8f0;
+          background-color: #1e293b;
         }
 
         .quick-select-btn:disabled {
@@ -578,7 +578,7 @@ export const AuditFilterBar: React.FC<AuditFilterBarProps> = ({
           font-size: 14px;
           font-family: inherit;
           color: #1e293b;
-          background-color: #ffffff;
+          background-color: #1e293b;
           background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
           background-repeat: no-repeat;
           background-position: right 8px center;
@@ -627,7 +627,7 @@ export const AuditFilterBar: React.FC<AuditFilterBarProps> = ({
 
         .apply-btn {
           background-color: #3b82f6;
-          color: #ffffff;
+          color: #e2e8f0;
           border: none;
         }
 
@@ -645,7 +645,7 @@ export const AuditFilterBar: React.FC<AuditFilterBarProps> = ({
         }
 
         .reset-btn {
-          background-color: #ffffff;
+          background-color: #1e293b;
           color: #475569;
           border: 1px solid #d1d5db;
         }

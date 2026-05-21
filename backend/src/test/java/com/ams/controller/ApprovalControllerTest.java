@@ -114,12 +114,18 @@ class ApprovalControllerTest {
     @Test
     @DisplayName("Should get approval detail by id")
     void getByIdReturnsProcessDetail() throws Exception {
-        when(approvalService.getProcessById(eq(7L))).thenReturn(Map.of("process", new ApprovalProcess(), "records", List.of()));
+        when(approvalService.getProcessById(eq(7L))).thenReturn(Map.of(
+                "process", new ApprovalProcess(),
+                "records", List.of(),
+                "workflowRuntimePath", List.of(Map.of("stepNo", 1, "nodeId", "approval-1")),
+                "workflowResultAction", "审批完成并归档"));
 
         mockMvc.perform(get("/api/approvals/{id}", 7L)
                         .contextPath("/api"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value(200));
+                .andExpect(jsonPath("$.code").value(200))
+                .andExpect(jsonPath("$.data.workflowRuntimePath[0].nodeId").value("approval-1"))
+                .andExpect(jsonPath("$.data.workflowResultAction").value("审批完成并归档"));
 
         verify(approvalService).getProcessById(7L);
     }

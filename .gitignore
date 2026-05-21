@@ -28,6 +28,7 @@ frontend/test-results/
 frontend/playwright-report/
 frontend/coverage/
 frontend-skill-lab/
+.stitch/exports/
 frontend-skill-lab/node_modules/
 frontend-skill-lab/dist/
 .bun/

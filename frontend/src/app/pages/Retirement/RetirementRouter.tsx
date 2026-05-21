@@ -114,8 +114,8 @@ export const STATUS_DISPLAY_CONFIG: Record<RetirementStatus, {
 }> = {
   [RetirementStatus.DRAFT]: {
     labelKey: 'retirement.status.draft',
-    color: 'text-gray-600',
-    bgColor: 'bg-gray-100',
+    color: 'text-gray-500',
+    bgColor: 'bg-blue-50',
     icon: 'edit',
   },
   [RetirementStatus.PENDING_APPROVAL]: {
@@ -138,8 +138,8 @@ export const STATUS_DISPLAY_CONFIG: Record<RetirementStatus, {
   },
   [RetirementStatus.CANCELLED]: {
     labelKey: 'retirement.status.cancelled',
-    color: 'text-gray-500',
-    bgColor: 'bg-gray-100',
+    color: 'text-gray-400',
+    bgColor: 'bg-blue-50',
     icon: 'minus',
   },
   [RetirementStatus.RETIRED]: {

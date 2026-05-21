@@ -484,7 +484,7 @@ const AssetDataTable: React.FC<AssetDataTableProps> = ({
       {/* ------------------------------------------------------------------ */}
       <Card
         size="small"
-        style={{ marginTop: 24, backgroundColor: '#fafafa' }}
+        style={{ marginTop: 24, backgroundColor: '#f8fafc' }}
         title={
           <Space>
             <Text strong>盘盈盘亏差异汇总</Text>
@@ -533,12 +533,12 @@ const AssetDataTable: React.FC<AssetDataTableProps> = ({
       {/* 行高亮样式（已盘=绿底 / 盘盈=黄底 / 盘亏=红底）                        */}
       {/* ------------------------------------------------------------------ */}
       <style>{`
-        .inventory-row-counted { background-color: #f6ffed !important; }
+        .inventory-row-counted { background-color: #1a2e1a !important; }
         .inventory-row-counted:hover > td { background-color: #d9f7be !important; }
-        .inventory-row-surplus { background-color: #fffbe6 !important; }
+        .inventory-row-surplus { background-color: #1e3a5f !important; }
         .inventory-row-surplus:hover > td { background-color: #fff1b8 !important; }
-        .inventory-row-deficit { background-color: #fff2f0 !important; }
-        .inventory-row-deficit:hover > td { background-color: #ffccc7 !important; }
+        .inventory-row-deficit { background-color: #3b1c1c !important; }
+        .inventory-row-deficit:hover > td { background-color: #7f1d1d !important; }
       `}</style>
     </div>
   );

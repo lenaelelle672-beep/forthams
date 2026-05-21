@@ -109,7 +109,7 @@ function getActionIcon(action: string): React.ReactNode {
       return <XCircle className="w-4 h-4 text-red-500" />;
     case 'CANCEL':
     case 'CANCELLED':
-      return <AlertCircle className="w-4 h-4 text-gray-500" />;
+      return <AlertCircle className="w-4 h-4 text-gray-400" />;
     default:
       return <Clock className="w-4 h-4 text-blue-500" />;
   }
@@ -211,8 +211,8 @@ export const RetirementHistoryList: React.FC<RetirementHistoryListProps> = ({
           <CardContent className="p-6 space-y-3">
             {[...Array(3)].map((_, i) => (
               <div key={i} className="flex items-center gap-3">
-                <div className="w-4 h-4 bg-gray-100 rounded-full animate-pulse" />
-                <div className="h-4 w-48 bg-gray-100 rounded animate-pulse" />
+                <div className="w-4 h-4 bg-blue-50 rounded-full animate-pulse" />
+                <div className="h-4 w-48 bg-blue-50 rounded animate-pulse" />
               </div>
             ))}
           </CardContent>
@@ -272,7 +272,7 @@ export const RetirementHistoryList: React.FC<RetirementHistoryListProps> = ({
               {applications!.map((app) => (
                 <div
                   key={app.id}
-                  className="flex items-center justify-between p-3 rounded-lg border border-gray-100 hover:bg-gray-50"
+                  className="flex items-center justify-between p-3 rounded-lg border border-gray-200 hover:bg-gray-50"
                 >
                   <div className="flex items-center gap-3">
                     {getActionIcon(app.status)}
@@ -280,7 +280,7 @@ export const RetirementHistoryList: React.FC<RetirementHistoryListProps> = ({
                       <p className="text-sm font-medium">
                         {app.retirementNo ?? app.id}
                       </p>
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-gray-400">
                         {formatTimestamp(app.createdAt)}
                         {app.applicant?.name && ` · ${app.applicant.name}`}
                       </p>
@@ -313,7 +313,7 @@ export const RetirementHistoryList: React.FC<RetirementHistoryListProps> = ({
                   <div className="flex flex-col items-center">
                     <div className="w-3 h-3 rounded-full bg-blue-400 border-2 border-white ring-2 ring-blue-100 mt-1.5 flex-shrink-0" />
                     {index < historyRecords.length - 1 && (
-                      <div className="w-px h-full bg-gray-200 min-h-[24px]" />
+                      <div className="w-px h-full bg-blue-50 min-h-[24px]" />
                     )}
                   </div>
                   {/* Content */}
@@ -322,7 +322,7 @@ export const RetirementHistoryList: React.FC<RetirementHistoryListProps> = ({
                       <span className="text-sm font-medium text-gray-900">
                         {record.operator}
                       </span>
-                      <span className="text-xs text-gray-500">
+                      <span className="text-xs text-gray-400">
                         {formatTimestamp(record.timestamp)}
                       </span>
                     </div>
@@ -336,7 +336,7 @@ export const RetirementHistoryList: React.FC<RetirementHistoryListProps> = ({
                       </Badge>
                     </div>
                     {record.reason && (
-                      <p className="text-xs text-gray-500 mt-1">{record.reason}</p>
+                      <p className="text-xs text-gray-400 mt-1">{record.reason}</p>
                     )}
                   </div>
                 </div>

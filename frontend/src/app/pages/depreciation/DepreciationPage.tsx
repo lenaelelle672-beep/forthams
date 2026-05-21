@@ -337,7 +337,7 @@ export const DepreciationPage: React.FC = () => {
           </div>
           <div>
             <h1 className="text-2xl font-bold text-gray-900">资产折旧计算</h1>
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-gray-400 mt-1">
               查看资产折旧明细计划表，按资产编号与会计期间筛选，触发批量折旧计算
             </p>
           </div>
@@ -431,7 +431,7 @@ export const DepreciationPage: React.FC = () => {
           )}
         </Button>
         {selectedRowKeys.length > 0 && (
-          <span className="text-sm text-gray-500">
+          <span className="text-sm text-gray-400">
             已选择 {selectedRowKeys.length} 条记录
           </span>
         )}

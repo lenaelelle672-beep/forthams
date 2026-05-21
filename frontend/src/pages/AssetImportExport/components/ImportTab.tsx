@@ -970,8 +970,8 @@ const ImportTab: React.FC<ImportTabProps> = ({ columns = DEFAULT_COLUMNS }) => {
           gap: 8px;
           padding: 12px 16px;
           margin-bottom: 16px;
-          background: #fff2f0;
-          border: 1px solid #ffccc7;
+          background: #3b1c1c;
+          border: 1px solid #7f1d1d;
           border-radius: 6px;
           color: #cf1322;
           font-size: 14px;
@@ -997,7 +997,7 @@ const ImportTab: React.FC<ImportTabProps> = ({ columns = DEFAULT_COLUMNS }) => {
           border-radius: 8px;
           padding: 48px 24px;
           text-align: center;
-          background: #fafafa;
+          background: #0f172a;
           cursor: pointer;
           transition: all 0.3s ease;
           user-select: none;
@@ -1034,7 +1034,7 @@ const ImportTab: React.FC<ImportTabProps> = ({ columns = DEFAULT_COLUMNS }) => {
         .selected-file-info {
           margin-top: 16px;
           padding: 8px 16px;
-          background: #f6ffed;
+          background: #1a2e1a;
           border: 1px solid #b7eb8f;
           border-radius: 4px;
           display: inline-flex;
@@ -1097,7 +1097,7 @@ const ImportTab: React.FC<ImportTabProps> = ({ columns = DEFAULT_COLUMNS }) => {
         .btn-primary {
           background: #1890ff;
           border-color: #1890ff;
-          color: #fff;
+          color: #1e293b;
         }
         .btn-primary:not(:disabled):hover {
           background: #40a9ff;
@@ -1105,7 +1105,7 @@ const ImportTab: React.FC<ImportTabProps> = ({ columns = DEFAULT_COLUMNS }) => {
         }
 
         .btn-secondary {
-          background: #fff;
+          background: #1e293b;
           color: #595959;
         }
         .btn-secondary:not(:disabled):hover {
@@ -1116,7 +1116,7 @@ const ImportTab: React.FC<ImportTabProps> = ({ columns = DEFAULT_COLUMNS }) => {
         .btn-warning {
           background: #fa8c16;
           border-color: #fa8c16;
-          color: #fff;
+          color: #1e293b;
         }
         .btn-warning:not(:disabled):hover {
           background: #ffa940;
@@ -1161,8 +1161,8 @@ const ImportTab: React.FC<ImportTabProps> = ({ columns = DEFAULT_COLUMNS }) => {
         .error-summary-alert {
           padding: 12px 16px;
           margin-bottom: 16px;
-          background: #fff2f0;
-          border: 1px solid #ffccc7;
+          background: #3b1c1c;
+          border: 1px solid #7f1d1d;
           border-radius: 6px;
           color: #cf1322;
           font-size: 14px;
@@ -1171,7 +1171,7 @@ const ImportTab: React.FC<ImportTabProps> = ({ columns = DEFAULT_COLUMNS }) => {
         .success-summary-alert {
           padding: 12px 16px;
           margin-bottom: 16px;
-          background: #f6ffed;
+          background: #1a2e1a;
           border: 1px solid #b7eb8f;
           border-radius: 6px;
           color: #389e0d;
@@ -1192,12 +1192,12 @@ const ImportTab: React.FC<ImportTabProps> = ({ columns = DEFAULT_COLUMNS }) => {
         }
 
         .preview-table-header {
-          background: #fafafa;
+          background: #0f172a;
           border-bottom: 2px solid #f0f0f0;
         }
 
         .preview-table-body {
-          background: #fff;
+          background: #1e293b;
         }
 
         .preview-table {
@@ -1220,7 +1220,7 @@ const ImportTab: React.FC<ImportTabProps> = ({ columns = DEFAULT_COLUMNS }) => {
         .preview-cell {
           padding: 6px 8px;
           font-size: 13px;
-          border-bottom: 1px solid #f5f5f5;
+          border-bottom: 1px solid #1e293b;
           vertical-align: top;
         }
 
@@ -1239,14 +1239,14 @@ const ImportTab: React.FC<ImportTabProps> = ({ columns = DEFAULT_COLUMNS }) => {
 
         /* ---- Error Row & Cell ---- */
         tr.row-error {
-          background-color: #fff2f0 !important;
+          background-color: #3b1c1c !important;
         }
         tr.row-error:hover {
           background-color: #fff1f0 !important;
         }
 
         tr.row-ok:hover {
-          background-color: #fafafa;
+          background-color: #0f172a;
         }
 
         td.cell-error {
@@ -1262,7 +1262,7 @@ const ImportTab: React.FC<ImportTabProps> = ({ columns = DEFAULT_COLUMNS }) => {
           font-size: 13px;
           font-family: inherit;
           color: #262626;
-          background: #fff;
+          background: #1e293b;
           outline: none;
           box-sizing: border-box;
         }
@@ -1281,7 +1281,7 @@ const ImportTab: React.FC<ImportTabProps> = ({ columns = DEFAULT_COLUMNS }) => {
 
         .btn-remove-row {
           background: none;
-          border: 1px solid #ffccc7;
+          border: 1px solid #7f1d1d;
           color: #ff4d4f;
           border-radius: 3px;
           padding: 2px 8px;
@@ -1300,7 +1300,7 @@ const ImportTab: React.FC<ImportTabProps> = ({ columns = DEFAULT_COLUMNS }) => {
           font-size: 12px;
           color: #8c8c8c;
           text-align: center;
-          background: #fafafa;
+          background: #0f172a;
           border-top: 1px solid #f0f0f0;
         }
       `}</style>

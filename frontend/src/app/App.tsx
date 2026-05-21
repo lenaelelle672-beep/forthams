@@ -19,6 +19,9 @@ const Dashboard = withSuspense(
 const AssetRegistry = withSuspense(
   lazy(() => import("./pages/AssetRegistry").then((module) => ({ default: module.AssetRegistry }))),
 );
+const AssetListPage = withSuspense(
+  lazy(() => import("./pages/asset/AssetListPage")),
+);
 const AssetFormPage = withSuspense(
   lazy(() => import("./pages/assets/AssetFormPage").then((module) => ({ default: module.default }))),
 );
@@ -75,6 +78,14 @@ const AssetSituationDashboard = withSuspense(
   ),
 );
 
+const CyberDashboardV12 = withSuspense(
+  lazy(() => import("./pages/CyberDashboardV12").then((module) => ({ default: module.CyberDashboardV12 }))),
+);
+
+const IndustrialDashboardV13 = withSuspense(
+  lazy(() => import("./pages/IndustrialDashboardV13").then((module) => ({ default: module.IndustrialDashboardV13 }))),
+);
+
 // SWARM-055: Depreciation management page
 const DepreciationPage = withSuspense(
   lazy(() => import("./pages/depreciation/DepreciationPage").then((module) => ({ default: module.DepreciationPage }))),
@@ -117,12 +128,12 @@ function ProtectedRoute() {
   if (loading) {
     return createElement(
       "div",
-      { className: "flex min-h-screen items-center justify-center bg-muted/40 px-6" },
+      { className: "flex min-h-screen items-center justify-center bg-gray-50 px-6" },
       createElement(
         "div",
         {
           className:
-            "rounded-xl border border-border bg-card px-5 py-4 text-sm text-muted-foreground shadow-sm",
+            "rounded-xl border border-gray-200 bg-white px-5 py-4 text-sm text-gray-500 shadow-sm",
         },
         "正在验证登录状态...",
       ),
@@ -158,7 +169,7 @@ const router = createBrowserRouter([
         children: [
           { index: true, Component: Dashboard },
           { path: "dashboard", Component: Dashboard },
-          { path: "assets", Component: AssetRegistry },
+          { path: "assets", Component: AssetListPage },
           { path: "assets/new", Component: AssetFormPage },
           { path: "assets/:id/edit", Component: AssetFormPage },
           { path: "equipment", Component: ImportantEquipment },
@@ -176,6 +187,8 @@ const router = createBrowserRouter([
           { path: "audit/:id", Component: AuditDetailPage },
           { path: "analytics", Component: Analytics },
           { path: "situation", Component: AssetSituationDashboard },
+          { path: "cyber-v12", Component: CyberDashboardV12 },
+          { path: "industrial-v13", Component: IndustrialDashboardV13 },
           { path: "settings", Component: Settings },
           { path: "workflows", Component: WorkflowCenter },
           { path: "workflow-designer", Component: WorkflowDesigner },

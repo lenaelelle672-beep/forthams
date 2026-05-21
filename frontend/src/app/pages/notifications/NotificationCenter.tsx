@@ -247,10 +247,10 @@ export function NotificationCenter() {
         type="button"
         data-testid="notification-bell"
         onClick={handleToggle}
-        className="relative p-2 hover:bg-gray-100 rounded-lg transition-colors"
+        className="relative p-2 hover:bg-blue-50 rounded-lg transition-colors"
         aria-label="查看通知"
       >
-        <Bell className="w-5 h-5 text-gray-600" />
+        <Bell className="w-5 h-5 text-gray-500" />
         <span className="sr-only">通知</span>
         {/* Unread badge — always mounted to prevent CLS */}
         <span
@@ -273,7 +273,7 @@ export function NotificationCenter() {
           className="absolute right-0 mt-2 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-50 overflow-hidden"
         >
           {/* Header */}
-          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
             <span className="text-sm font-semibold text-gray-900">
               通知中心
             </span>

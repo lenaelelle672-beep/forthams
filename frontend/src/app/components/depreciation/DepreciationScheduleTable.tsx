@@ -245,7 +245,7 @@ export const DepreciationScheduleTable: React.FC<DepreciationScheduleTableProps>
           {/* Server-side pagination controls */}
           {total > pageSize && (
             <div className="flex items-center justify-between mt-4 pt-4 border-t">
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-gray-400">
                 共 {total} 条记录，第 {page} / {totalPages} 页
               </p>
               <div className="flex items-center gap-2">

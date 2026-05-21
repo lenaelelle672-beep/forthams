@@ -164,8 +164,8 @@ export function AssetBatchImportDialog({
           <button
             type="button"
             onClick={handleClose}
-            className="p-1 rounded-lg text-gray-400 hover:text-gray-600
-              hover:bg-gray-100 transition-colors"
+            className="p-1 rounded-lg text-gray-400 hover:text-gray-500
+              hover:bg-blue-50 transition-colors"
             aria-label="关闭"
           >
             <X className="w-5 h-5" />
@@ -175,7 +175,7 @@ export function AssetBatchImportDialog({
         {/* 内容区 */}
         <div className="px-6 py-4 space-y-4">
           {/* 说明文字 */}
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-gray-400">
             上传标准 Excel/CSV 文件批量创建资产，支持 .xlsx 和 .csv 格式，单文件最大 10MB
           </p>
 
@@ -189,7 +189,7 @@ export function AssetBatchImportDialog({
                   ${
                     importing
                       ? 'border-gray-200 bg-gray-50 cursor-not-allowed'
-                      : 'border-gray-300 bg-white hover:border-blue-400 hover:bg-blue-50'
+                      : 'border-gray-200 bg-white hover:border-blue-400 hover:bg-blue-50'
                   }
                   ${validationError ? 'border-red-300 bg-red-50' : ''}
                 `}
@@ -200,7 +200,7 @@ export function AssetBatchImportDialog({
                   ) : (
                     <Upload className="w-8 h-8 text-gray-400 mb-2" />
                   )}
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-gray-400">
                     {importing ? '正在导入...' : '点击选择文件或拖拽至此处'}
                   </p>
                   <p className="text-xs text-gray-400">支持 .xlsx 和 .csv 格式，最大 10MB</p>
@@ -228,12 +228,12 @@ export function AssetBatchImportDialog({
               {selectedFile && (
                 <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
                   <div className="flex items-center gap-3">
-                    <FileText className="w-5 h-5 text-gray-500" />
+                    <FileText className="w-5 h-5 text-gray-400" />
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-gray-900 truncate">
                         {selectedFile.name}
                       </p>
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-gray-400">
                         {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
                       </p>
                     </div>
@@ -288,16 +288,16 @@ export function AssetBatchImportDialog({
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="border-b border-gray-200">
-                        <th className="py-2 text-left text-gray-600 font-medium">行号</th>
-                        <th className="py-2 text-left text-gray-600 font-medium">资产名称</th>
-                        <th className="py-2 text-left text-gray-600 font-medium">状态</th>
-                        <th className="py-2 text-left text-gray-600 font-medium">错误原因</th>
+                        <th className="py-2 text-left text-gray-500 font-medium">行号</th>
+                        <th className="py-2 text-left text-gray-500 font-medium">资产名称</th>
+                        <th className="py-2 text-left text-gray-500 font-medium">状态</th>
+                        <th className="py-2 text-left text-gray-500 font-medium">错误原因</th>
                       </tr>
                     </thead>
                     <tbody>
                       {importResult.details.map((item, idx) => (
-                        <tr key={idx} className="border-b border-gray-100">
-                          <td className="py-1.5 text-gray-600">{item.row ?? '-'}</td>
+                        <tr key={idx} className="border-b border-gray-200">
+                          <td className="py-1.5 text-gray-500">{item.row ?? '-'}</td>
                           <td className="py-1.5 text-gray-900">{item.assetName ?? '-'}</td>
                           <td className="py-1.5">
                             <span
@@ -330,7 +330,7 @@ export function AssetBatchImportDialog({
               <button
                 type="button"
                 onClick={handleReset}
-                className="px-4 py-2 text-sm rounded-lg border border-gray-300
+                className="px-4 py-2 text-sm rounded-lg border border-gray-200
                   bg-white text-gray-700 hover:bg-gray-50 transition-colors"
               >
                 重新导入
@@ -350,7 +350,7 @@ export function AssetBatchImportDialog({
                 type="button"
                 onClick={handleClose}
                 disabled={importing}
-                className="px-4 py-2 text-sm rounded-lg border border-gray-300
+                className="px-4 py-2 text-sm rounded-lg border border-gray-200
                   bg-white text-gray-700 hover:bg-gray-50
                   disabled:opacity-50 transition-colors"
               >

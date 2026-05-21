@@ -5,6 +5,7 @@ import com.ams.context.TenantContext;
 import com.ams.dto.WorkflowDefinitionDTO;
 import com.ams.dto.WorkflowDefinitionSaveDTO;
 import com.ams.dto.WorkflowStatusUpdateDTO;
+import com.ams.entity.User;
 import com.ams.entity.WorkflowDefinition;
 import com.ams.mapper.UserMapper;
 import com.ams.mapper.UserRoleMapper;
@@ -131,8 +132,8 @@ class WorkflowDefinitionServiceTest {
 
         assertDefaultTemplate(definitions.get(0), "ASSET_TRANSFER", "资产转移流程", 4);
         assertDefaultTemplate(definitions.get(1), "ASSET_CLEARANCE", "资产清退流程", 4);
-        assertDefaultTemplate(definitions.get(2), "ASSET_SCRAP", "资产报废转让流程", 9);
-        assertDefaultTemplate(definitions.get(3), "ASSET_COMPENSATION", "资产赔偿流程", 7);
+        assertDefaultTemplate(definitions.get(2), "ASSET_SCRAP", "资产报废转让流程", 4);
+        assertDefaultTemplate(definitions.get(3), "ASSET_COMPENSATION", "资产赔偿流程", 4);
     }
 
     @Test
@@ -355,6 +356,30 @@ class WorkflowDefinitionServiceTest {
                 () -> workflowDefinitionService.publish("ASSET_TRANSFER", 11L));
 
         assertEquals("审批节点审批角色不能为空", exception.getMessage());
+    }
+
+    @Test
+    void shouldRejectPublishWhenUserApproverApprovalModeIsInvalid() throws Exception {
+        WorkflowDefinition definition = definition("DRAFT", 0);
+        Map<String, Object> invalid = fullWorkflowDefinition();
+        @SuppressWarnings("unchecked")
+        List<Map<String, Object>> nodes = (List<Map<String, Object>>) invalid.get("nodes");
+        @SuppressWarnings("unchecked")
+        Map<String, Object> data = (Map<String, Object>) nodes.get(1).get("data");
+        data.put("approverType", "user");
+        data.put("approverId", "7");
+        data.put("approvalMode", "parallel");
+        definition.setDefinitionJson(objectMapper.writeValueAsString(invalid));
+        User activeUser = new User();
+        activeUser.setId(7L);
+        activeUser.setStatus(1);
+        when(workflowDefinitionMapper.selectOne(any(LambdaQueryWrapper.class))).thenReturn(definition);
+        when(userMapper.selectById(7L)).thenReturn(activeUser);
+
+        BusinessException exception = assertThrows(BusinessException.class,
+                () -> workflowDefinitionService.publish("ASSET_TRANSFER", 11L));
+
+        assertEquals("审批节点审批模式仅支持 sequence/all/any", exception.getMessage());
     }
 
     private WorkflowDefinition definition(String status, Integer version) {

@@ -61,35 +61,35 @@ export default function VendorTable({
 }: VendorTableProps) {
   return (
     <div className="overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
-      <table className="min-w-full divide-y divide-gray-200">
+      <table className="min-w-full divide-y divide-[#1e3a5f]">
         <thead className="bg-gray-50">
           <tr>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
               供应商名称
             </th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
               编码
             </th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
               联系人
             </th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
               电话
             </th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
               邮箱
             </th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
               操作
             </th>
           </tr>
         </thead>
-        <tbody className="bg-white divide-y divide-gray-200">
+        <tbody className="bg-white divide-y divide-[#1e3a5f]">
           {loading ? (
             <tr>
               <td
                 colSpan={6}
-                className="px-4 py-12 text-center text-gray-500"
+                className="px-4 py-12 text-center text-gray-400"
               >
                 <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2" />
                 加载中...
@@ -99,7 +99,7 @@ export default function VendorTable({
             <tr>
               <td
                 colSpan={6}
-                className="px-4 py-12 text-center text-gray-500"
+                className="px-4 py-12 text-center text-gray-400"
               >
                 暂无供应商数据
               </td>
@@ -116,13 +116,13 @@ export default function VendorTable({
                 <td className="px-4 py-3 text-sm text-gray-900 font-mono">
                   {vendor.vendorCode || "-"}
                 </td>
-                <td className="px-4 py-3 text-sm text-gray-600">
+                <td className="px-4 py-3 text-sm text-gray-500">
                   {vendor.contactPerson || "-"}
                 </td>
-                <td className="px-4 py-3 text-sm text-gray-600">
+                <td className="px-4 py-3 text-sm text-gray-500">
                   {vendor.contactPhone || "-"}
                 </td>
-                <td className="px-4 py-3 text-sm text-gray-600">
+                <td className="px-4 py-3 text-sm text-gray-500">
                   {vendor.contactEmail || "-"}
                 </td>
                 <td className="px-4 py-3 text-sm">
@@ -132,7 +132,7 @@ export default function VendorTable({
                       data-testid="btn-edit-vendor"
                       onClick={() => onEdit(vendor)}
                       className="inline-flex items-center gap-1 px-2 py-1 text-xs
-                        rounded border border-gray-300 bg-white text-gray-700
+                        rounded border border-gray-200 bg-white text-gray-700
                         hover:bg-gray-50 transition-colors"
                       title="编辑"
                     >

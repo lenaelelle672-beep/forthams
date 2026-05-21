@@ -15,7 +15,7 @@
   height: 100%;
   display: flex;
   flex-direction: column;
-  background-color: var(--color-bg-base, #f5f7fa);
+  background-color: var(--color-bg-base, #f8fafc);
   padding: var(--spacing-4, 16px);
   gap: var(--spacing-4, 16px);
 }
@@ -220,7 +220,7 @@
 .table th {
   position: sticky;
   top: 0;
-  background-color: var(--color-bg-secondary, #fafafa);
+  background-color: var(--color-bg-secondary, #f8fafc);
   color: var(--color-text-secondary, #909399);
   font-weight: var(--font-weight-medium, 500);
   text-align: left;
@@ -237,7 +237,7 @@
 }
 
 .table tbody tr:hover {
-  background-color: var(--color-bg-hover, #f5f7fa);
+  background-color: var(--color-bg-hover, #f1f5f9);
 }
 
 .table tbody tr.clickable {
@@ -555,10 +555,10 @@
   --color-border-light: #e4e7ed;
   --color-border-lighter: #ebeef5;
 
-  --color-bg-base: #f5f7fa;
+  --color-bg-base: #f8fafc;
   --color-bg-white: #ffffff;
-  --color-bg-secondary: #fafafa;
-  --color-bg-hover: #f5f7fa;
+  --color-bg-secondary: #f8fafc;
+  --color-bg-hover: #f8fafc;
   --color-bg-active: #ecf5ff;
 
   /* 间距 */

@@ -35,6 +35,7 @@ import { AuditFilter } from '../audit/AuditFilter';
 import { AuditTable } from '../audit/AuditTable';
 import { AuditDetailDrawer } from '../audit/AuditDetailDrawer';
 import type { AuditLog, AuditFilterParams, FieldChange } from '../../types/audit.types';
+import { formatStatusLabel } from '../../constants/assetStatus';
 
 const { Text, Title } = Typography;
 
@@ -313,7 +314,7 @@ export const AssetMetadataPanel: React.FC<AssetMetadataPanelProps> = ({
             status={asset.status === AssetStatus.ACTIVE ? 'success' : 'default'} 
             text={
               <Tag color={statusColorMap[asset.status]}>
-                {asset.status}
+                {formatStatusLabel(asset.status)}
               </Tag>
             }
           />
@@ -392,7 +393,7 @@ export const AssetMetadataPanel: React.FC<AssetMetadataPanelProps> = ({
           <Tag color={statusColorMap[asset.status]}>
             {operationIconMap[asset.status === AssetStatus.ACTIVE ? OperationType.CREATE : OperationType.UPDATE]}
             {' '}
-            {asset.status}
+            {formatStatusLabel(asset.status)}
           </Tag>
         }
       >

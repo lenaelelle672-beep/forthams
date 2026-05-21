@@ -397,7 +397,7 @@ const DiffSummaryPanel: React.FC<DiffSummaryPanelProps> = ({
           onRow={(record) => ({
             style: {
               backgroundColor:
-                record.diffType === 'deficit' ? '#fff2f0' : '#f6ffed',
+                record.diffType === 'deficit' ? '#3b1c1c' : '#1a2e1a',
             },
           })}
         />

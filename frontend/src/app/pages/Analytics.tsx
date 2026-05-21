@@ -105,7 +105,7 @@ export function Analytics() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-gray-500">加载统计数据中...</div>
+        <div className="text-gray-400">加载统计数据中...</div>
       </div>
     );
   }
@@ -115,10 +115,10 @@ export function Analytics() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-semibold text-gray-900">数据统计分析</h2>
-          <p className="text-gray-600 mt-1">多维度资产数据分析与可视化报表</p>
+          <p className="text-gray-500 mt-1">多维度资产数据分析与可视化报表</p>
         </div>
         <div className="flex gap-2">
-          <button onClick={fetchData} className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg transition-colors flex items-center gap-2">
+          <button onClick={fetchData} className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 rounded-lg transition-colors flex items-center gap-2">
             <RefreshCw className="w-4 h-4" />
             刷新
           </button>
@@ -135,12 +135,12 @@ export function Analytics() {
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">资产总价值</p>
+              <p className="text-sm text-gray-500">资产总价值</p>
               <p className="text-3xl font-semibold text-gray-900 mt-2">
                 ¥{stats?.totalValue ? Number(stats.totalValue).toLocaleString() : '-'}
               </p>
               <div className="flex items-center gap-1 mt-2">
-                <span className="text-sm text-gray-500">净值 ¥{stats?.netValue ? Number(stats.netValue).toLocaleString() : '-'}</span>
+                <span className="text-sm text-gray-400">净值 ¥{stats?.netValue ? Number(stats.netValue).toLocaleString() : '-'}</span>
               </div>
             </div>
             <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center">
@@ -151,7 +151,7 @@ export function Analytics() {
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">资产总数</p>
+              <p className="text-sm text-gray-500">资产总数</p>
               <p className="text-3xl font-semibold text-gray-900 mt-2">{(stats?.totalAssets ?? 0).toLocaleString()}</p>
               <div className="flex items-center gap-1 mt-2">
                 <span className="text-sm text-green-600">{stats?.inUseAssets ?? 0} 在用</span>
@@ -165,10 +165,10 @@ export function Analytics() {
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">使用率</p>
+              <p className="text-sm text-gray-500">使用率</p>
               <p className="text-3xl font-semibold text-gray-900 mt-2">{utilizationRate}%</p>
               <div className="flex items-center gap-1 mt-2">
-                <span className="text-sm text-gray-500">{stats?.idleAssets ?? 0} 闲置</span>
+                <span className="text-sm text-gray-400">{stats?.idleAssets ?? 0} 闲置</span>
               </div>
             </div>
             <div className="w-12 h-12 bg-purple-50 rounded-lg flex items-center justify-center">
@@ -179,10 +179,10 @@ export function Analytics() {
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">待审批</p>
+              <p className="text-sm text-gray-500">待审批</p>
               <p className="text-3xl font-semibold text-gray-900 mt-2">{stats?.pendingApprovals ?? 0}</p>
               <div className="flex items-center gap-1 mt-2">
-                <span className="text-sm text-gray-500">{stats?.scrapAssets ?? 0} 已报废</span>
+                <span className="text-sm text-gray-400">{stats?.scrapAssets ?? 0} 已报废</span>
               </div>
             </div>
             <div className="w-12 h-12 bg-yellow-50 rounded-lg flex items-center justify-center">

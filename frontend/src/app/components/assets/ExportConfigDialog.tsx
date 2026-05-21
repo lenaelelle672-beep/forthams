@@ -290,7 +290,7 @@ export function ExportConfigDialog({ className }: ExportConfigDialogProps) {
     return (
       <div className="flex items-center justify-center py-12" data-testid="export-config-dialog">
         <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
-        <span className="ml-3 text-sm text-gray-500">加载筛选数据...</span>
+        <span className="ml-3 text-sm text-gray-400">加载筛选数据...</span>
       </div>
     );
   }
@@ -306,7 +306,7 @@ export function ExportConfigDialog({ className }: ExportConfigDialogProps) {
           type="button"
           onClick={handleRetryMeta}
           className="inline-flex items-center gap-1.5 px-4 py-2 text-sm
-            rounded-lg border border-gray-300 bg-white text-gray-700
+            rounded-lg border border-gray-200 bg-white text-gray-700
             hover:bg-gray-50 transition-colors"
         >
           <RefreshCw className="w-4 h-4" />
@@ -332,7 +332,7 @@ export function ExportConfigDialog({ className }: ExportConfigDialogProps) {
             id="export-category"
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-            className="w-full px-3 py-2 text-sm rounded-lg border border-gray-300
+            className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200
               bg-white focus:outline-none focus:ring-2 focus:ring-blue-500
               focus:border-blue-500 transition-colors ant-select"
           >
@@ -355,7 +355,7 @@ export function ExportConfigDialog({ className }: ExportConfigDialogProps) {
                   ${
                     selectedStatuses.includes(opt.value)
                       ? 'bg-blue-50 border-blue-300 text-blue-700'
-                      : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
+                      : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'
                   }`}
               >
                 <input
@@ -382,7 +382,7 @@ export function ExportConfigDialog({ className }: ExportConfigDialogProps) {
             id="export-location"
             value={selectedLocation}
             onChange={(e) => setSelectedLocation(e.target.value)}
-            className="w-full px-3 py-2 text-sm rounded-lg border border-gray-300
+            className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200
               bg-white focus:outline-none focus:ring-2 focus:ring-blue-500
               focus:border-blue-500 transition-colors ant-cascader"
           >
@@ -398,7 +398,7 @@ export function ExportConfigDialog({ className }: ExportConfigDialogProps) {
           type="button"
           onClick={handleReset}
           disabled={!hasActiveFilters}
-          className="text-sm text-gray-500 hover:text-gray-700
+          className="text-sm text-gray-400 hover:text-gray-700
             disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           重置筛选条件
@@ -445,7 +445,7 @@ export function ExportConfigDialog({ className }: ExportConfigDialogProps) {
               <AlertTriangle className="w-6 h-6 text-yellow-500 flex-shrink-0 mt-0.5" />
               <div>
                 <h3 className="text-lg font-semibold text-gray-900">确认导出</h3>
-                <p className="mt-2 text-sm text-gray-600">
+                <p className="mt-2 text-sm text-gray-500">
                   未设置筛选条件，将导出全部资产，是否继续？
                 </p>
               </div>
@@ -454,7 +454,7 @@ export function ExportConfigDialog({ className }: ExportConfigDialogProps) {
               <button
                 type="button"
                 onClick={handleCancelExport}
-                className="px-4 py-2 text-sm rounded-lg border border-gray-300
+                className="px-4 py-2 text-sm rounded-lg border border-gray-200
                   bg-white text-gray-700 hover:bg-gray-50 transition-colors"
               >
                 取消

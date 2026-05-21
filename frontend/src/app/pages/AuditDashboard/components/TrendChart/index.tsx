@@ -98,7 +98,7 @@ const TrendChart: React.FC<TrendChartProps> = ({
           display: 'flex', 
           alignItems: 'center', 
           justifyContent: 'center',
-          backgroundColor: '#fafafa',
+          backgroundColor: '#f8fafc',
           borderRadius: '8px',
           border: '1px solid #f0f0f0',
         }}
@@ -116,7 +116,7 @@ const TrendChart: React.FC<TrendChartProps> = ({
           display: 'flex', 
           alignItems: 'center', 
           justifyContent: 'center',
-          backgroundColor: '#fafafa',
+          backgroundColor: '#f8fafc',
           borderRadius: '8px',
           border: '1px solid #f0f0f0',
         }}

@@ -455,7 +455,7 @@ const DifferenceSummaryPanel: React.FC<DifferenceSummaryPanelProps> = ({
           </Text>
           <div
             style={{
-              background: '#fafafa',
+              background: '#f8fafc',
               padding: '12px 16px',
               borderRadius: 6,
             }}

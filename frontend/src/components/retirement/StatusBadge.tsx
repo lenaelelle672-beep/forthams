@@ -39,9 +39,9 @@ interface StatusConfig {
 
 const STATUS_CONFIG: Record<RetirementStatus, StatusConfig> = {
   DRAFT: {
-    backgroundColor: 'bg-gray-100',
+    backgroundColor: 'bg-blue-50',
     textColor: 'text-gray-700',
-    borderColor: 'border-gray-300',
+    borderColor: 'border-gray-200',
   },
   PENDING: {
     backgroundColor: 'bg-amber-50',

@@ -142,7 +142,7 @@ export function ApprovalActionDialog({
             name="comment"
             aria-label="审批意见"
             role="textbox"
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="mt-1 block w-full rounded-md border border-gray-200 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
             rows={3}
             placeholder={isReject ? "请输入驳回原因（必填）" : "请输入审批意见（选填）"}
             value={comment}
@@ -168,7 +168,7 @@ export function ApprovalActionDialog({
             type="button"
             onClick={onClose}
             disabled={isSubmitting}
-            className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:opacity-50"
+            className="rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:opacity-50"
           >
             取消
           </button>

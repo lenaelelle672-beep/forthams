@@ -31,6 +31,7 @@ import { Skeleton } from '../../components/ui/skeleton';
 import { TrendingDown } from 'lucide-react';
 import type { DepreciationScheduleItem } from '../../services/depreciationApi';
 import { DepreciationMethodBadge } from './DepreciationMethodBadge';
+import { formatStatusLabel } from '../../constants/assetStatus';
 
 // ---------------------------------------------------------------------------
 // Props
@@ -212,8 +213,8 @@ export const DepreciationScheduleTable: React.FC<DepreciationScheduleTableProps>
         data-testid="depreciation-table-empty"
         className="flex flex-col items-center py-12"
       >
-        <TrendingDown className="h-10 w-10 text-gray-300 mb-3" />
-        <p className="text-gray-500 empty-state">暂无折旧数据</p>
+        <TrendingDown className="h-10 w-10 text-slate-600 mb-3" />
+        <p className="text-gray-400 empty-state">暂无折旧数据</p>
       </div>
     );
   }
@@ -289,7 +290,7 @@ export const DepreciationScheduleTable: React.FC<DepreciationScheduleTableProps>
                 <TableCell>
                   {terminal ? (
                     <span className="text-xs px-2 py-0.5 rounded-full bg-red-100 text-red-700">
-                      {item.assetStatus}
+                      {formatStatusLabel(item.assetStatus)}
                     </span>
                   ) : (
                     <span className="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700">
@@ -306,7 +307,7 @@ export const DepreciationScheduleTable: React.FC<DepreciationScheduleTableProps>
       {/* Pagination controls */}
       {pagination.total > pagination.pageSize && (
         <div className="flex items-center justify-between mt-4 pt-4 border-t">
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-gray-400">
             共 {pagination.total} 条记录，第 {pagination.current} / {totalPages} 页
           </p>
           <div className="flex items-center gap-2">

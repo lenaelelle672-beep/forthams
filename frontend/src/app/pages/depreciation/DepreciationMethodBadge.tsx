@@ -75,8 +75,8 @@ const METHOD_CONFIG: Record<
  */
 const FALLBACK_CONFIG = {
   label: '未知方法',
-  bgClass: 'bg-gray-100',
-  textClass: 'text-gray-600',
+  bgClass: 'bg-blue-50',
+  textClass: 'text-gray-500',
 };
 
 // ---------------------------------------------------------------------------

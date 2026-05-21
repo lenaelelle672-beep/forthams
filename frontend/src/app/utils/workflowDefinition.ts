@@ -67,14 +67,20 @@ export function normalizeWorkflowDefinition(
   definition: FlowDefinition,
   businessType: BusinessType,
 ): WorkflowDefinitionPayload {
+  const nodes = (Array.isArray(definition.nodes) ? definition.nodes : []).map(normalizeNode);
+  const nodeIds = new Set(nodes.map((node) => node.id).filter(Boolean));
+  const edges = (Array.isArray(definition.edges) ? definition.edges : [])
+    .map(normalizeEdge)
+    .filter((edge) => nodeIds.has(edge.source) && nodeIds.has(edge.target) && edge.source !== edge.target);
+
   return {
     ...definition,
     businessType,
     id: definition.id || `WF-${businessType}`,
     name: definition.name,
     description: definition.description,
-    nodes: definition.nodes.map(normalizeNode),
-    edges: definition.edges.map(normalizeEdge),
+    nodes,
+    edges,
   };
 }
 

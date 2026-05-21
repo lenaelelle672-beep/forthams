@@ -54,7 +54,7 @@ export default function AssetImportExportPage() {
         >
           资产批量导入导出
         </h1>
-        <p className="mt-2 text-sm text-gray-500">
+        <p className="mt-2 text-sm text-gray-400">
           上传标准 Excel 文件批量创建资产，或按条件导出资产列表
         </p>
       </div>
@@ -70,7 +70,7 @@ export default function AssetImportExportPage() {
             ${
               activeTab === 'import'
                 ? 'border-blue-600 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700'
+                : 'border-transparent text-gray-400 hover:text-gray-700'
             }`}
         >
           导入
@@ -84,7 +84,7 @@ export default function AssetImportExportPage() {
             ${
               activeTab === 'export'
                 ? 'border-blue-600 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700'
+                : 'border-transparent text-gray-400 hover:text-gray-700'
             }`}
         >
           导出

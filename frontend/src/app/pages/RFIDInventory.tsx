@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Radio, Plus, Play, CheckCircle, AlertTriangle, MapPin, BarChart } from "lucide-react";
 import { inventoryService } from "../services/inventoryService";
+import { formatStatusLabel } from "../constants/assetStatus";
 
 export function RFIDInventory() {
   const [detailItem, setDetailItem] = useState<any | null>(null);
@@ -138,12 +139,12 @@ export function RFIDInventory() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-semibold text-gray-900">RFID资产盘点</h2>
-          <p className="text-gray-600 mt-1">使用RFID技术实现高效批量盘点</p>
+          <p className="text-gray-500 mt-1">使用RFID技术实现高效批量盘点</p>
         </div>
         <div className="flex gap-3">
           <button 
             onClick={handleOpenScanning}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg transition-colors flex items-center gap-2"
+            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 rounded-lg transition-colors flex items-center gap-2"
           >
             <Play className="w-4 h-4" />
             开始RFID扫描
@@ -159,14 +160,14 @@ export function RFIDInventory() {
       </div>
 
       {/* 统计卡片 */}
-      {loading && <div className="text-sm text-gray-500">加载中...</div>}
+      {loading && <div className="text-sm text-gray-400">加载中...</div>}
       {error && <div className="text-sm text-red-600">{error}</div>}
       {scanFeedback && <div className="text-sm text-blue-700 bg-blue-50 border border-blue-100 rounded-lg px-4 py-3">{scanFeedback}</div>}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">进行中任务</p>
+              <p className="text-sm text-gray-500">进行中任务</p>
               <p className="text-3xl font-semibold text-gray-900 mt-2">{runningTasks}</p>
             </div>
             <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center">
@@ -177,7 +178,7 @@ export function RFIDInventory() {
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">已完成任务</p>
+              <p className="text-sm text-gray-500">已完成任务</p>
               <p className="text-3xl font-semibold text-gray-900 mt-2">{completedTasks}</p>
             </div>
             <div className="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center">
@@ -188,7 +189,7 @@ export function RFIDInventory() {
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">账实差异</p>
+              <p className="text-sm text-gray-500">账实差异</p>
               <p className="text-3xl font-semibold text-gray-900 mt-2">{discrepancies.length}</p>
             </div>
             <div className="w-12 h-12 bg-yellow-50 rounded-lg flex items-center justify-center">
@@ -199,7 +200,7 @@ export function RFIDInventory() {
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">平均盘点率</p>
+              <p className="text-sm text-gray-500">平均盘点率</p>
               <p className="text-3xl font-semibold text-gray-900 mt-2">99.8%</p>
             </div>
             <div className="w-12 h-12 bg-purple-50 rounded-lg flex items-center justify-center">
@@ -224,7 +225,7 @@ export function RFIDInventory() {
                     <span className={`px-2.5 py-0.5 text-xs font-medium rounded-full ${
                       getTaskStatusLabel(task.status) === '进行中' ? 'bg-blue-100 text-blue-800' :
                       getTaskStatusLabel(task.status) === '已完成' ? 'bg-green-100 text-green-800' :
-                      'bg-gray-100 text-gray-800'
+                      'bg-blue-50 text-gray-800'
                     }`}>
                       {getTaskStatusLabel(task.status)}
                     </span>
@@ -233,7 +234,7 @@ export function RFIDInventory() {
                       {task.method}
                     </span>
                   </div>
-                  <div className="flex items-center gap-6 text-sm text-gray-600">
+                  <div className="flex items-center gap-6 text-sm text-gray-500">
                     <span className="flex items-center gap-1">
                       <MapPin className="w-4 h-4" />
                       {task.location}
@@ -267,29 +268,29 @@ export function RFIDInventory() {
 
               <div className="grid grid-cols-4 gap-4 mb-4">
                 <div className="text-center p-3 bg-gray-50 rounded-lg">
-                  <p className="text-sm text-gray-600">资产总数</p>
+                  <p className="text-sm text-gray-500">资产总数</p>
                   <p className="text-2xl font-semibold text-gray-900 mt-1">{task.totalAssets || 0}</p>
                 </div>
                 <div className="text-center p-3 bg-gray-50 rounded-lg">
-                  <p className="text-sm text-gray-600">已盘点</p>
+                  <p className="text-sm text-gray-500">已盘点</p>
                   <p className="text-2xl font-semibold text-blue-600 mt-1">{task.scanned || 0}</p>
                 </div>
                 <div className="text-center p-3 bg-gray-50 rounded-lg">
-                  <p className="text-sm text-gray-600">未盘点</p>
+                  <p className="text-sm text-gray-500">未盘点</p>
                   <p className="text-2xl font-semibold text-gray-900 mt-1">{(task.totalAssets || 0) - (task.scanned || 0)}</p>
                 </div>
                 <div className="text-center p-3 bg-gray-50 rounded-lg">
-                  <p className="text-sm text-gray-600">盘点率</p>
+                  <p className="text-sm text-gray-500">盘点率</p>
                   <p className="text-2xl font-semibold text-green-600 mt-1">{task.progress || 0}%</p>
                 </div>
               </div>
 
               <div>
-                <div className="flex items-center justify-between text-sm text-gray-600 mb-2">
+                <div className="flex items-center justify-between text-sm text-gray-500 mb-2">
                   <span>盘点进度</span>
                    <span>{task.scanned || 0} / {task.totalAssets || 0}</span>
                 </div>
-                <div className="w-full h-3 bg-gray-200 rounded-full overflow-hidden">
+                <div className="w-full h-3 bg-blue-50 rounded-full overflow-hidden">
                   <div 
                     className={`h-full transition-all ${
                       task.progress === 100 ? 'bg-green-500' :
@@ -302,7 +303,7 @@ export function RFIDInventory() {
               </div>
 
               <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-200">
-                <div className="text-sm text-gray-600">
+                <div className="text-sm text-gray-500">
                   <span>开始: {task.startDate}</span>
                   <span className="mx-2">|</span>
                   <span>结束: {task.endDate}</span>
@@ -322,7 +323,7 @@ export function RFIDInventory() {
               {discrepancies.filter(d => d.status === '待处理').length}项待处理
             </span>
           </div>
-          <div className="divide-y divide-gray-200">
+          <div className="divide-y divide-[#1e3a5f]">
             {discrepancies.map((item) => (
               <div key={item.id} className="p-4 hover:bg-gray-50">
                 <div className="flex items-start justify-between mb-2">
@@ -337,9 +338,9 @@ export function RFIDInventory() {
                         {item.type}
                       </span>
                     </div>
-                     <p className="text-sm text-gray-600">资产编号: {item.assetId}</p>
-                    <p className="text-sm text-gray-600">位置: {item.location}</p>
-                    <p className="text-sm text-gray-600">原使用人: {item.originalUser}</p>
+                     <p className="text-sm text-gray-500">资产编号: {item.assetId}</p>
+                    <p className="text-sm text-gray-500">位置: {item.location}</p>
+                    <p className="text-sm text-gray-500">原使用人: {item.originalUser}</p>
                   </div>
                   <div className="flex flex-col gap-2">
                     {item.status === '待处理' ? (
@@ -347,13 +348,13 @@ export function RFIDInventory() {
                         <button onClick={() => setDetailItem(item)} className="px-3 py-1 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded transition-colors">
                           调整
                         </button>
-                        <button onClick={() => setDetailItem(item)} className="px-3 py-1 text-xs font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded transition-colors">
+                        <button onClick={() => setDetailItem(item)} className="px-3 py-1 text-xs font-medium text-gray-700 bg-blue-50 hover:bg-blue-50 rounded transition-colors">
                           详情
                         </button>
                       </>
                     ) : (
                       <span className="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded">
-                        {item.status}
+                        {formatStatusLabel(item.status)}
                       </span>
                     )}
                   </div>
@@ -369,10 +370,10 @@ export function RFIDInventory() {
             <h3 className="text-lg font-semibold text-gray-900">最近扫描记录</h3>
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-              <span className="text-sm text-gray-600">实时更新</span>
+              <span className="text-sm text-gray-500">实时更新</span>
             </div>
           </div>
-          <div className="divide-y divide-gray-200 max-h-[400px] overflow-y-auto">
+          <div className="divide-y divide-[#1e3a5f] max-h-[400px] overflow-y-auto">
             {recentScans.map((scan) => (
               <div key={scan.id} className="p-4 hover:bg-gray-50 flex items-center justify-between">
                 <div>
@@ -380,8 +381,8 @@ export function RFIDInventory() {
                     <CheckCircle className="w-4 h-4 text-green-500" />
                     <span className="font-medium text-gray-900">{scan.name}</span>
                   </div>
-                  <p className="text-sm text-gray-600">编号: {scan.assetId}</p>
-                  <p className="text-xs text-gray-500">扫描器: {scan.scanner}</p>
+                  <p className="text-sm text-gray-500">编号: {scan.assetId}</p>
+                  <p className="text-xs text-gray-400">扫描器: {scan.scanner}</p>
                 </div>
                 <div className="text-right">
                   <p className="text-sm font-medium text-gray-900">{scan.time}</p>
@@ -400,7 +401,7 @@ export function RFIDInventory() {
               <h3 className="text-lg font-semibold text-gray-900">创建盘点任务</h3>
               <button 
                 onClick={() => setShowCreateTask(false)}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-gray-400 hover:text-gray-500"
               >
                 ✕
               </button>
@@ -409,11 +410,11 @@ export function RFIDInventory() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-1">任务名称 *</label>
-                 <input value={taskForm.name} onChange={(e) => setTaskForm(prev => ({ ...prev, name: e.target.value }))} type="text" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="例: 第二车间季度盘点" />
+                 <input value={taskForm.name} onChange={(e) => setTaskForm(prev => ({ ...prev, name: e.target.value }))} type="text" className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="例: 第二车间季度盘点" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">盘点方式 *</label>
-                   <select value={taskForm.method} onChange={(e) => setTaskForm(prev => ({ ...prev, method: e.target.value }))} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                   <select value={taskForm.method} onChange={(e) => setTaskForm(prev => ({ ...prev, method: e.target.value }))} className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <option>RFID盘点</option>
                     <option>扫码盘点</option>
                     <option>混合盘点</option>
@@ -421,7 +422,7 @@ export function RFIDInventory() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">盘点范围 *</label>
-                   <select value={taskForm.scope} onChange={(e) => setTaskForm(prev => ({ ...prev, scope: e.target.value }))} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                   <select value={taskForm.scope} onChange={(e) => setTaskForm(prev => ({ ...prev, scope: e.target.value }))} className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <option>按部门</option>
                     <option>按地点</option>
                     <option>按资产类型</option>
@@ -429,7 +430,7 @@ export function RFIDInventory() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">所属部门 *</label>
-                   <select value={taskForm.department} onChange={(e) => setTaskForm(prev => ({ ...prev, department: e.target.value }))} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                   <select value={taskForm.department} onChange={(e) => setTaskForm(prev => ({ ...prev, department: e.target.value }))} className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <option>生产部</option>
                     <option>研发部</option>
                     <option>行政部</option>
@@ -437,30 +438,30 @@ export function RFIDInventory() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">盘点位置 *</label>
-                   <input value={taskForm.location} onChange={(e) => setTaskForm(prev => ({ ...prev, location: e.target.value }))} type="text" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="例: 第一车间" />
+                   <input value={taskForm.location} onChange={(e) => setTaskForm(prev => ({ ...prev, location: e.target.value }))} type="text" className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="例: 第一车间" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">负责人 *</label>
-                   <input value={taskForm.responsible} onChange={(e) => setTaskForm(prev => ({ ...prev, responsible: e.target.value }))} type="text" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                   <input value={taskForm.responsible} onChange={(e) => setTaskForm(prev => ({ ...prev, responsible: e.target.value }))} type="text" className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">开始日期 *</label>
-                   <input value={taskForm.startDate} onChange={(e) => setTaskForm(prev => ({ ...prev, startDate: e.target.value }))} type="date" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                   <input value={taskForm.startDate} onChange={(e) => setTaskForm(prev => ({ ...prev, startDate: e.target.value }))} type="date" className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">结束日期 *</label>
-                   <input value={taskForm.endDate} onChange={(e) => setTaskForm(prev => ({ ...prev, endDate: e.target.value }))} type="date" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                   <input value={taskForm.endDate} onChange={(e) => setTaskForm(prev => ({ ...prev, endDate: e.target.value }))} type="date" className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
                 </div>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">任务说明</label>
-                 <textarea value={taskForm.description} onChange={(e) => setTaskForm(prev => ({ ...prev, description: e.target.value }))} rows={3} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="请输入任务说明..."></textarea>
+                 <textarea value={taskForm.description} onChange={(e) => setTaskForm(prev => ({ ...prev, description: e.target.value }))} rows={3} className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="请输入任务说明..."></textarea>
               </div>
             </div>
             <div className="px-6 py-4 border-t border-gray-200 flex justify-end gap-3">
               <button 
                 onClick={() => setShowCreateTask(false)}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg transition-colors"
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 rounded-lg transition-colors"
               >
                 取消
               </button>
@@ -487,7 +488,7 @@ export function RFIDInventory() {
               </div>
               <button 
                 onClick={() => setShowScanning(false)}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-gray-400 hover:text-gray-500"
               >
                 ✕
               </button>
@@ -495,15 +496,15 @@ export function RFIDInventory() {
             <div className="p-6 space-y-6">
               <div className="grid grid-cols-3 gap-4">
                 <div className="text-center p-4 bg-blue-50 rounded-lg">
-                  <p className="text-sm text-gray-600">已扫描</p>
+                  <p className="text-sm text-gray-500">已扫描</p>
                   <p className="text-3xl font-semibold text-blue-600 mt-2">448</p>
                 </div>
                 <div className="text-center p-4 bg-green-50 rounded-lg">
-                  <p className="text-sm text-gray-600">扫描速度</p>
+                  <p className="text-sm text-gray-500">扫描速度</p>
                   <p className="text-3xl font-semibold text-green-600 mt-2">{scanningPaused ? '0/分' : '35/分'}</p>
                 </div>
                 <div className="text-center p-4 bg-purple-50 rounded-lg">
-                  <p className="text-sm text-gray-600">准确率</p>
+                  <p className="text-sm text-gray-500">准确率</p>
                   <p className="text-3xl font-semibold text-purple-600 mt-2">99.5%</p>
                 </div>
               </div>
@@ -548,12 +549,12 @@ export function RFIDInventory() {
           <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
             <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
               <h3 className="text-lg font-semibold text-gray-900">盘点详情</h3>
-              <button onClick={() => setDetailItem(null)} className="text-gray-400 hover:text-gray-600 text-xl">&times;</button>
+              <button onClick={() => setDetailItem(null)} className="text-gray-400 hover:text-gray-500 text-xl">&times;</button>
             </div>
             <div className="p-6 space-y-3">
               {Object.entries(detailItem).map(([key, value]) => (
                 <div key={key} className="flex items-start gap-3 text-sm">
-                  <span className="text-gray-500 min-w-[120px]">{key}:</span>
+                  <span className="text-gray-400 min-w-[120px]">{key}:</span>
                   <span className="text-gray-900">{value === null || value === undefined ? '-' : String(value)}</span>
                 </div>
               ))}

@@ -105,11 +105,11 @@ export const DashboardStatCard: React.FC<DashboardStatCardProps> = ({
       >
         <div className="flex items-center justify-between">
           <div className="flex-1">
-            <div className="h-4 bg-gray-200 rounded w-20 mb-3" />
-            <div className="h-8 bg-gray-200 rounded w-16 mb-2" />
-            <div className="h-3 bg-gray-200 rounded w-28" />
+            <div className="h-4 bg-blue-50 rounded w-20 mb-3" />
+            <div className="h-8 bg-blue-50 rounded w-16 mb-2" />
+            <div className="h-3 bg-blue-50 rounded w-28" />
           </div>
-          <div className="w-12 h-12 bg-gray-200 rounded-lg" />
+          <div className="w-12 h-12 bg-blue-50 rounded-lg" />
         </div>
       </div>
     );
@@ -132,9 +132,9 @@ export const DashboardStatCard: React.FC<DashboardStatCardProps> = ({
     >
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-sm text-gray-600">{title}</p>
+          <p className="text-sm text-gray-500">{title}</p>
           <p className="text-3xl font-semibold text-gray-900 mt-2">{displayValue}</p>
-          {detail ? <p className="mt-2 text-sm text-gray-500">{detail}</p> : null}
+          {detail ? <p className="mt-2 text-sm text-gray-400">{detail}</p> : null}
         </div>
         <div className={`w-12 h-12 ${iconBgClass} rounded-lg flex items-center justify-center`}>
           <Icon className={`w-6 h-6 ${iconTextClass}`} />

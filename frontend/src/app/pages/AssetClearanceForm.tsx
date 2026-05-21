@@ -258,13 +258,13 @@ export function AssetClearanceForm() {
         <div className="flex items-center gap-4">
           <button
             onClick={() => navigate(-1)}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 hover:bg-blue-50 rounded-lg transition-colors"
           >
-            <ArrowLeft className="w-5 h-5 text-gray-600" />
+            <ArrowLeft className="w-5 h-5 text-gray-500" />
           </button>
           <div>
             <h2 className="text-2xl font-bold text-gray-900">资产清退申请</h2>
-            <p className="text-sm text-gray-500 mt-1">请填写资产清退信息，提交后将进入对应审批流程</p>
+            <p className="text-sm text-gray-400 mt-1">请填写资产清退信息，提交后将进入对应审批流程</p>
           </div>
         </div>
         <div className="flex items-center gap-3">
@@ -272,7 +272,7 @@ export function AssetClearanceForm() {
             <Settings className="w-4 h-4" />
             配置流程
           </button>
-          <button onClick={handleSaveDraft} type="button" className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg transition-colors flex items-center gap-2">
+          <button onClick={handleSaveDraft} type="button" className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 rounded-lg transition-colors flex items-center gap-2">
             <Save className="w-4 h-4" />
             保存草稿
           </button>
@@ -287,7 +287,7 @@ export function AssetClearanceForm() {
               <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center text-amber-600 text-lg font-bold shrink-0">!</div>
               <div>
                 <h3 className="text-base font-semibold text-gray-900">检测到未完成的草稿</h3>
-                <p className="text-sm text-gray-500 mt-0.5">是否恢复上次编辑的表单数据？</p>
+                <p className="text-sm text-gray-400 mt-0.5">是否恢复上次编辑的表单数据？</p>
               </div>
             </div>
             <div className="flex items-center justify-end gap-3 mt-6">
@@ -300,7 +300,7 @@ export function AssetClearanceForm() {
               </button>
               <button
                 onClick={handleDismissDraft}
-                className="px-5 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg transition-colors"
+                className="px-5 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 rounded-lg transition-colors"
                 data-testid="draft-dismiss-btn"
               >
                 放弃
@@ -331,7 +331,7 @@ export function AssetClearanceForm() {
                       <span className={`w-8 h-8 flex items-center justify-center rounded-full border-2 shrink-0
                         ${step.status === 'complete' ? 'bg-blue-600 border-blue-600' : 
                           step.status === 'current' ? 'border-blue-600 text-blue-600 bg-blue-50' : 
-                          'border-gray-300 text-gray-500 bg-white'}`}>
+                          'border-gray-200 text-gray-400 bg-white'}`}>
                         {step.status === 'complete' ? (
                           <CheckCircle2 className="w-5 h-5 text-white" />
                         ) : (
@@ -340,12 +340,12 @@ export function AssetClearanceForm() {
                       </span>
                       <span className={`text-xs font-medium whitespace-nowrap
                         ${step.status === 'current' ? 'text-blue-600' : 
-                          step.status === 'complete' ? 'text-gray-900' : 'text-gray-500'}`}>
+                          step.status === 'complete' ? 'text-gray-900' : 'text-gray-400'}`}>
                         {step.name}
                       </span>
                     </span>
                     {stepIdx !== steps.length - 1 && (
-                      <div className="absolute top-4 left-[50%] w-full h-0.5 ml-4 bg-gray-200" />
+                      <div className="absolute top-4 left-[50%] w-full h-0.5 ml-4 bg-blue-50" />
                     )}
                   </div>
                 </li>
@@ -370,7 +370,7 @@ export function AssetClearanceForm() {
                 name="processId"
                 value={formData.processId}
                 disabled
-                className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm text-gray-500"
+                className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-400"
               />
             </div>
             <div>
@@ -380,7 +380,7 @@ export function AssetClearanceForm() {
                 name="applicant"
                 value={formData.applicant}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
             <div>
@@ -390,7 +390,7 @@ export function AssetClearanceForm() {
                 name="applyDate"
                 value={formData.applyDate}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
           </div>
@@ -407,7 +407,7 @@ export function AssetClearanceForm() {
                 <p className="text-sm font-medium text-gray-900">
                   {selectedAssetId ? `${formData.assetName || '未命名资产'}（ID ${formData.assetId}）` : '尚未选择资产'}
                 </p>
-                <p className="mt-1 text-sm text-gray-500">
+                <p className="mt-1 text-sm text-gray-400">
                   {selectedAssetId
                     ? `部门：${formData.department || '-'}；存放地点：${formData.storageLocation || '-'}`
                     : '点击按钮打开资产台账，按关键词和分页选择真实资产。'}
@@ -438,7 +438,7 @@ export function AssetClearanceForm() {
                 name="assetId"
                 value={formData.assetId}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm bg-gray-50"
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm bg-gray-50"
                 readOnly
                 data-testid="clearance-asset-id-input"
               />
@@ -450,7 +450,7 @@ export function AssetClearanceForm() {
                 name="assetName"
                 value={formData.assetName}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm bg-gray-50"
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm bg-gray-50"
                 readOnly
               />
             </div>
@@ -462,7 +462,7 @@ export function AssetClearanceForm() {
                 name="assetLedger"
                 value={formData.assetLedger}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
             <div>
@@ -472,7 +472,7 @@ export function AssetClearanceForm() {
                 name="firstUsageDate"
                 value={formData.firstUsageDate}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
 
@@ -484,7 +484,7 @@ export function AssetClearanceForm() {
                 placeholder="电源适配器、说明书等"
                 value={formData.attachedItems}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
             
@@ -496,7 +496,7 @@ export function AssetClearanceForm() {
                 placeholder="如无所缺配件，请填无"
                 value={formData.missingAccessories}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
           </div>
@@ -515,7 +515,7 @@ export function AssetClearanceForm() {
                 name="user"
                 value={formData.user}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
             <div>
@@ -525,7 +525,7 @@ export function AssetClearanceForm() {
                 name="department"
                 value={formData.department}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
             <div>
@@ -535,7 +535,7 @@ export function AssetClearanceForm() {
                 name="deptCode"
                 value={formData.deptCode}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
             <div>
@@ -545,7 +545,7 @@ export function AssetClearanceForm() {
                 name="directManager"
                 value={formData.directManager}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
             <div>
@@ -555,7 +555,7 @@ export function AssetClearanceForm() {
                 name="level1Admin"
                 value={formData.level1Admin}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
           </div>
@@ -575,7 +575,7 @@ export function AssetClearanceForm() {
                   required
                   value={formData.idleAssetType}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
                 >
                   <option value="" disabled>请选择闲置资产类型</option>
                   {idleAssetTypes.map((type, idx) => (
@@ -591,7 +591,7 @@ export function AssetClearanceForm() {
                   required
                   value={formData.clearanceReason}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
                 >
                   <option value="" disabled>请选择清退原因</option>
                   {clearanceReasons.map((reason, idx) => (
@@ -610,7 +610,7 @@ export function AssetClearanceForm() {
                 placeholder="请详细描述待清退资产当前的存放位置"
                 value={formData.storageLocation}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
             
@@ -633,7 +633,7 @@ export function AssetClearanceForm() {
           <button 
             type="button"
             onClick={() => navigate(-1)}
-            className="px-6 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg transition-colors"
+            className="px-6 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 rounded-lg transition-colors"
           >
             取消申请
           </button>

@@ -89,7 +89,7 @@ const thStyle: React.CSSProperties = {
   whiteSpace: 'nowrap',
   position: 'sticky',
   top: 0,
-  background: '#fafafa',
+  background: '#f8fafc',
   zIndex: 2,
 };
 
@@ -111,7 +111,7 @@ const errorInputStyle: React.CSSProperties = {
 };
 
 const alertBoxStyle: React.CSSProperties = {
-  backgroundColor: '#fff7e6',
+  backgroundColor: '#1e3a5f',
   border: '1px solid #ffd591',
   borderRadius: 4,
   padding: '10px 16px',

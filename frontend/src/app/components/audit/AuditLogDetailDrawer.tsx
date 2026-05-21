@@ -358,7 +358,7 @@ const AuditLogDetailDrawer: React.FC<AuditLogDetailDrawerProps> = ({
               </Title>
               <Paragraph
                 style={{
-                  backgroundColor: '#f5f5f5',
+                  backgroundColor: '#ffffff',
                   padding: 12,
                   borderRadius: 6,
                   marginBottom: 24,

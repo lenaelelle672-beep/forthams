@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>forthAMS v5 enterprise sober and cinematic command screen</title>
+  <style>
+    :root {
+      --ink: #18202d;
+      --muted: #697586;
+      --line: #d7dde7;
+      --paper: #f4f6f9;
+      --navy: #11182a;
+      --navy-2: #182238;
+      --steel: #4d627d;
+      --steel-2: #607794;
+      --blue-gray: #e9eef5;
+      --active: #2f4f75;
+      --screen-bg: #020510;
+      --obsidian: #050a16;
+      --deep-blue: #08162f;
+      --royal: #142c5c;
+      --ice: #9defff;
+      --ice-soft: #5bd3f2;
+      --platinum: #d9e7f2;
+      --champagne: #c7a96b;
+      --violet: #6b6bd6;
+      --green: #58dca6;
+      --red: #e85d75;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 10% 0%, #fff 0, transparent 34%),
+        linear-gradient(180deg, #f8fafc, #edf1f6);
+    }
+
+    .wrap {
+      width: min(1600px, calc(100vw - 44px));
+      margin: 0 auto;
+      padding: 28px 0 44px;
+    }
+
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 24px;
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 28px;
+      line-height: 1.2;
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    .note {
+      max-width: 560px;
+      padding: 12px 15px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: rgba(255,255,255,0.92);
+      color: #475467;
+      font-size: 12px;
+      line-height: 1.65;
+      box-shadow: 0 12px 30px rgba(20, 30, 55, 0.08);
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: rgba(255,255,255,0.94);
+      box-shadow: 0 16px 38px rgba(20, 30, 55, 0.08);
+      overflow: hidden;
+      margin-bottom: 18px;
+    }
+
+    .panel-head {
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      border-bottom: 1px solid #e5e9f0;
+    }
+
+    .panel-head h2 {
+      margin: 0;
+      font-size: 15px;
+      letter-spacing: 0;
+    }
+
+    .pill {
+      border-radius: 999px;
+      padding: 4px 9px;
+      background: #1f2937;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .panel-body { padding: 16px; }
+
+    .ref-app {
+      height: 620px;
+      border: 1px solid #d8dee9;
+      border-radius: 14px;
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: 62px 168px 1fr;
+      background: #fff;
+    }
+
+    .icon-rail {
+      background: linear-gradient(180deg, #101729, #0e1424);
+      color: rgba(255,255,255,0.72);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 14px 0;
+      gap: 14px;
+    }
+
+    .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.18);
+      margin-bottom: 12px;
+      position: relative;
+    }
+
+    .avatar::before {
+      content: "";
+      position: absolute;
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: #fff;
+      left: 14.5px;
+      top: 10px;
+    }
+
+    .avatar::after {
+      content: "";
+      position: absolute;
+      width: 21px;
+      height: 8px;
+      border-radius: 10px 10px 2px 2px;
+      background: #fff;
+      left: 9.5px;
+      bottom: 8px;
+    }
+
+    .rail-item {
+      width: 52px;
+      min-height: 54px;
+      border-radius: 7px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      font-size: 11px;
+    }
+
+    .rail-item.active {
+      background: rgba(255,255,255,0.78);
+      color: var(--active);
+    }
+
+    .rail-icon {
+      width: 17px;
+      height: 17px;
+      border-radius: 5px;
+      border: 2px solid currentColor;
+      position: relative;
+    }
+
+    .rail-spacer { flex: 1; }
+
+    .plus {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #425c80;
+      position: relative;
+      box-shadow: 0 10px 20px rgba(25, 38, 60, 0.3);
+    }
+
+    .plus::before,
+    .plus::after {
+      content: "";
+      position: absolute;
+      background: #fff;
+      left: 10px;
+      right: 10px;
+      top: 15px;
+      height: 2px;
+    }
+
+    .plus::after {
+      top: 10px;
+      bottom: 10px;
+      left: 15px;
+      right: auto;
+      width: 2px;
+      height: auto;
+    }
+
+    .subnav {
+      border-right: 1px solid #e7ebf2;
+      background: #fff;
+      padding: 20px 12px;
+      overflow: hidden;
+    }
+
+    .subnav h3 {
+      margin: 0 0 20px;
+      font-size: 19px;
+      color: #4b5565;
+      font-weight: 700;
+    }
+
+    .subitem {
+      height: 38px;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 0 10px;
+      margin-bottom: 7px;
+      border-radius: 7px;
+      color: #535d6d;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .subitem::before {
+      content: "";
+      width: 15px;
+      height: 15px;
+      border: 2px solid currentColor;
+      border-radius: 4px;
+      opacity: 0.82;
+    }
+
+    .subitem.active {
+      background: linear-gradient(135deg, #344968, #587191);
+      color: #fff;
+      box-shadow: 0 10px 22px rgba(47, 79, 117, 0.26);
+    }
+
+    .subsection {
+      margin: 22px 0 9px;
+      padding-left: 10px;
+      color: #a1a8b5;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .main {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      background: #f4f5f7;
+    }
+
+    .topbar {
+      height: 58px;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 18px;
+      border-bottom: 1px solid #eef1f5;
+    }
+
+    .project-title {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      color: #525b69;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .project-title::before {
+      content: "";
+      width: 15px;
+      height: 12px;
+      border: 2px solid #667085;
+      border-radius: 2px;
+    }
+
+    .top-icons {
+      display: flex;
+      gap: 10px;
+    }
+
+    .top-icons span {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: #eef2f6;
+      border: 1px solid #e1e6ee;
+      position: relative;
+    }
+
+    .content {
+      padding: 18px;
+      flex: 1;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .workbench {
+      height: 100%;
+      border-radius: 12px;
+      background: #fff;
+      box-shadow: 0 16px 38px rgba(28, 38, 62, 0.08);
+      padding: 16px;
+      display: grid;
+      grid-template-rows: 42px 44px 1fr 48px;
+      gap: 10px;
+      min-height: 0;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      min-width: 0;
+    }
+
+    .tool {
+      height: 36px;
+      border-radius: 7px;
+      border: 1px solid #d3dae5;
+      background: #fff;
+      color: #566173;
+      padding: 0 11px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .tool.primary {
+      background: linear-gradient(135deg, #344968, #587191);
+      border-color: #405875;
+      color: #fff;
+      box-shadow: 0 8px 16px rgba(47, 79, 117, 0.18);
+    }
+
+    .tool.outline {
+      border-color: #9aa9bd;
+      color: #405875;
+    }
+
+    .tool.spacer {
+      flex: 1;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .search {
+      width: 210px;
+      height: 34px;
+      border-radius: 7px;
+      border: 1px solid #cfd6e2;
+      background: #fff;
+      position: relative;
+    }
+
+    .search::after {
+      content: "";
+      position: absolute;
+      right: 10px;
+      top: 9px;
+      width: 11px;
+      height: 11px;
+      border: 2px solid #667085;
+      border-radius: 50%;
+    }
+
+    .summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border: 1px solid #e5e9f0;
+      background: #f8fafc;
+      color: #575f6d;
+      padding: 0 12px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .summary .right {
+      color: #405875;
+    }
+
+    .table {
+      min-height: 0;
+      border: 1px solid #e0e5ec;
+      overflow: hidden;
+      display: grid;
+      grid-template-rows: 40px repeat(8, 42px);
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 44px 100px 1fr 110px 130px 150px 160px 130px;
+      align-items: center;
+      border-bottom: 1px solid #e7ebf1;
+      min-width: 1120px;
+    }
+
+    .row.head {
+      background: #f0f2f5;
+      color: #596273;
+      font-weight: 800;
+      font-size: 12px;
+    }
+
+    .row.selected {
+      background: #dfe7f2;
+      box-shadow: inset 3px 0 0 #405875;
+    }
+
+    .td {
+      height: 100%;
+      border-right: 1px solid #e7ebf1;
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      color: #56606e;
+      font-size: 13px;
+      overflow: hidden;
+    }
+
+    .checkbox {
+      width: 16px;
+      height: 16px;
+      border: 1px solid #d5dce8;
+      border-radius: 3px;
+      background: #fff;
+    }
+
+    .selected .checkbox {
+      background: #405875;
+      border-color: #405875;
+    }
+
+    .badge {
+      min-width: 58px;
+      height: 24px;
+      border-radius: 5px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+    }
+
+    .badge.idle {
+      background: #d9eacb;
+      color: #3f6b2f;
+    }
+
+    .badge.active {
+      background: #dce5f2;
+      color: #365273;
+    }
+
+    .link {
+      color: #365273;
+      font-weight: 800;
+    }
+
+    .footer {
+      border: 1px solid #e5e9f0;
+      background: #f8fafc;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 14px;
+      color: #667085;
+      font-size: 12px;
+    }
+
+    .pager {
+      display: flex;
+      gap: 7px;
+      align-items: center;
+    }
+
+    .page {
+      width: 32px;
+      height: 32px;
+      display: grid;
+      place-items: center;
+      background: #405875;
+      color: #fff;
+      font-weight: 800;
+    }
+
+    .screen {
+      position: relative;
+      min-height: 840px;
+      border-radius: 18px;
+      overflow: hidden;
+      border: 1px solid rgba(157, 239, 255, 0.18);
+      background:
+        radial-gradient(circle at 50% 42%, rgba(157,239,255,0.15), transparent 24%),
+        radial-gradient(circle at 78% 16%, rgba(107,107,214,0.14), transparent 18%),
+        radial-gradient(circle at 18% 76%, rgba(199,169,107,0.1), transparent 18%),
+        linear-gradient(135deg, #020510 0%, #07142b 48%, #01040b 100%);
+      box-shadow: 0 34px 96px rgba(1, 5, 16, 0.5);
+      color: #edf8fc;
+      padding: 22px;
+    }
+
+    .screen::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(157,239,255,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(157,239,255,0.04) 1px, transparent 1px);
+      background-size: 48px 48px;
+      mask-image: radial-gradient(circle at 50% 44%, #000 0%, transparent 72%);
+    }
+
+    .screen::after {
+      content: "";
+      position: absolute;
+      inset: -25%;
+      background:
+        linear-gradient(112deg, transparent 0 46%, rgba(157,239,255,0.055) 48%, transparent 52%),
+        linear-gradient(66deg, transparent 0 60%, rgba(199,169,107,0.055) 62%, transparent 66%);
+      animation: beam 8s ease-in-out infinite alternate;
+      pointer-events: none;
+    }
+
+    @keyframes beam {
+      from { transform: translateX(-3%) translateY(-1%); }
+      to { transform: translateX(3%) translateY(1%); }
+    }
+
+    .screen-frame {
+      position: absolute;
+      inset: 14px;
+      border: 1px solid rgba(157,239,255,0.16);
+      clip-path: polygon(0 18px, 18px 0, calc(100% - 18px) 0, 100% 18px, 100% calc(100% - 18px), calc(100% - 18px) 100%, 18px 100%, 0 calc(100% - 18px));
+      box-shadow: inset 0 0 40px rgba(157,239,255,0.055);
+    }
+
+    .screen-grid {
+      position: relative;
+      z-index: 2;
+      min-height: 796px;
+      display: grid;
+      grid-template-columns: 0.84fr 1.48fr 0.84fr;
+      grid-template-rows: 60px 76px 1fr 150px;
+      gap: 14px;
+    }
+
+    .screen-title {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .screen-title::before,
+    .screen-title::after {
+      content: "";
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(157,239,255,0.48), rgba(199,169,107,0.34), transparent);
+    }
+
+    .screen-title h2 {
+      margin: 0;
+      color: #dff9ff;
+      font-size: 26px;
+      letter-spacing: 7px;
+      font-weight: 850;
+      text-shadow: 0 0 16px rgba(157,239,255,0.35);
+    }
+
+    .clock {
+      position: absolute;
+      top: 25px;
+      right: 30px;
+      color: #aee9f7;
+      font: 12px "SF Mono", "JetBrains Mono", monospace;
+      opacity: 0.86;
+    }
+
+    .metric-strip {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 10px;
+    }
+
+    .metric {
+      border: 1px solid rgba(157,239,255,0.13);
+      border-radius: 10px;
+      background: linear-gradient(180deg, rgba(12,32,66,0.66), rgba(4,11,28,0.66));
+      padding: 11px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .metric::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(157,239,255,0.55), rgba(199,169,107,0.38), transparent);
+    }
+
+    .metric b {
+      display: block;
+      color: #fff;
+      font: 700 22px "SF Mono", "JetBrains Mono", monospace;
+      text-shadow: 0 0 10px rgba(157,239,255,0.22);
+    }
+
+    .metric span {
+      display: block;
+      margin-top: 6px;
+      color: #8ea2bb;
+      font-size: 11px;
+    }
+
+    .screen-col {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-height: 0;
+    }
+
+    .hud {
+      border: 1px solid rgba(157,239,255,0.13);
+      border-radius: 12px;
+      background: linear-gradient(180deg, rgba(10,29,61,0.72), rgba(3,10,25,0.66));
+      box-shadow: inset 0 0 24px rgba(157,239,255,0.035), 0 0 28px rgba(0,28,64,0.13);
+      padding: 12px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hud::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 4px;
+      height: 34px;
+      background: linear-gradient(180deg, var(--ice), var(--champagne));
+      opacity: 0.78;
+      box-shadow: 0 0 13px rgba(157,239,255,0.38);
+    }
+
+    .hud h3 {
+      margin: 0 0 11px;
+      padding-left: 9px;
+      color: #f7fcff;
+      font-size: 13px;
+      letter-spacing: 1px;
+    }
+
+    .quick {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+
+    .quick button {
+      height: 34px;
+      border: 1px solid rgba(157,239,255,0.15);
+      border-radius: 8px;
+      background: rgba(157,239,255,0.045);
+      color: #e0f8ff;
+      font-size: 11px;
+    }
+
+    .quick button.hot {
+      border-color: rgba(199,169,107,0.34);
+      background: rgba(199,169,107,0.09);
+      color: #fff0c7;
+    }
+
+    .hrow {
+      display: grid;
+      grid-template-columns: 76px 1fr 38px;
+      align-items: center;
+      gap: 8px;
+      margin: 8px 0;
+      color: #a2b3ca;
+      font-size: 10px;
+    }
+
+    .hbar {
+      height: 7px;
+      border-radius: 999px;
+      background: rgba(24,49,86,0.74);
+      overflow: hidden;
+    }
+
+    .hbar i {
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #9defff, #5bd3f2 58%, #6b6bd6);
+      box-shadow: 0 0 10px rgba(157,239,255,0.26);
+    }
+
+    .event {
+      display: grid;
+      grid-template-columns: 44px 1fr auto;
+      gap: 8px;
+      align-items: center;
+      min-height: 32px;
+      border-bottom: 1px solid rgba(157,239,255,0.065);
+      color: #a8bad0;
+      font-size: 10px;
+    }
+
+    .tag {
+      border-radius: 999px;
+      padding: 3px 6px;
+      text-align: center;
+      color: #061426;
+      background: var(--ice);
+      font-weight: 850;
+    }
+
+    .tag.red { background: var(--red); color: #fff; }
+    .tag.gold { background: var(--champagne); }
+
+    .traffic-map {
+      grid-column: 2;
+      grid-row: 3;
+      min-height: 470px;
+      position: relative;
+      border: 1px solid rgba(157,239,255,0.11);
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at 50% 50%, rgba(157,239,255,0.09), transparent 33%),
+        rgba(5,18,40,0.22);
+      overflow: hidden;
+    }
+
+    .perspective-grid {
+      position: absolute;
+      inset: 40px 58px;
+      transform: perspective(800px) rotateX(58deg) rotateZ(-13deg);
+      transform-origin: 50% 50%;
+      border: 1px solid rgba(157,239,255,0.08);
+      background:
+        linear-gradient(90deg, rgba(157,239,255,0.05) 1px, transparent 1px),
+        linear-gradient(rgba(157,239,255,0.05) 1px, transparent 1px);
+      background-size: 42px 42px;
+      box-shadow: 0 0 70px rgba(157,239,255,0.06);
+    }
+
+    .route {
+      position: absolute;
+      height: 4px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, transparent, #9defff, #c7a96b, transparent);
+      box-shadow: 0 0 15px rgba(157,239,255,0.3);
+      overflow: hidden;
+    }
+
+    .route::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -28%;
+      width: 22%;
+      height: 100%;
+      background: rgba(255,255,255,0.9);
+      filter: blur(1px);
+      animation: flow 2.8s linear infinite;
+    }
+
+    @keyframes flow { to { left: 106%; } }
+
+    .r1 { width: 540px; left: 62px; top: 214px; transform: rotate(-11deg); }
+    .r2 { width: 426px; left: 132px; top: 282px; transform: rotate(18deg); }
+    .r3 { width: 370px; left: 170px; top: 152px; transform: rotate(43deg); background: linear-gradient(90deg, transparent, #58dca6, #9defff, transparent); }
+    .r4 { width: 300px; left: 228px; top: 340px; transform: rotate(-38deg); background: linear-gradient(90deg, transparent, #6b6bd6, #9defff, transparent); }
+
+    .zone {
+      position: absolute;
+      border: 1px solid rgba(157,239,255,0.16);
+      border-radius: 14px;
+      background: rgba(157,239,255,0.035);
+      box-shadow: inset 0 0 24px rgba(157,239,255,0.035);
+      color: #c4edf5;
+      font-size: 11px;
+      line-height: 1.45;
+      padding: 9px;
+    }
+
+    .z1 { left: 80px; top: 88px; width: 124px; height: 72px; }
+    .z2 { right: 78px; top: 80px; width: 132px; height: 78px; border-color: rgba(107,107,214,0.2); }
+    .z3 { left: 94px; bottom: 92px; width: 150px; height: 82px; border-color: rgba(88,220,166,0.18); }
+    .z4 { right: 102px; bottom: 86px; width: 144px; height: 82px; border-color: rgba(199,169,107,0.24); }
+
+    .node {
+      position: absolute;
+      width: 17px;
+      height: 17px;
+      border-radius: 50%;
+      background: var(--ice);
+      box-shadow: 0 0 0 7px rgba(157,239,255,0.065), 0 0 18px rgba(157,239,255,0.36);
+    }
+
+    .node.green { background: var(--green); box-shadow: 0 0 0 7px rgba(88,220,166,0.08), 0 0 18px rgba(88,220,166,0.32); }
+    .node.red { background: var(--red); box-shadow: 0 0 0 8px rgba(232,93,117,0.08), 0 0 22px rgba(232,93,117,0.42); animation: pulse 1.15s ease-in-out infinite; }
+
+    @keyframes pulse { 50% { transform: scale(1.18); } }
+
+    .n1 { left: 170px; top: 196px; }
+    .n2 { left: 410px; top: 164px; }
+    .n3 { left: 310px; top: 286px; }
+    .n4 { right: 180px; bottom: 146px; }
+    .n5 { left: 232px; bottom: 162px; }
+    .n6 { right: 118px; top: 218px; }
+
+    .core {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 158px;
+      height: 158px;
+      transform: translate(-50%, -50%);
+      border: 1px solid rgba(157,239,255,0.36);
+      border-radius: 50%;
+      background:
+        radial-gradient(circle, rgba(157,239,255,0.16), rgba(157,239,255,0.035) 58%, transparent);
+      box-shadow: 0 0 48px rgba(157,239,255,0.18), inset 0 0 28px rgba(157,239,255,0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 850;
+      line-height: 1.45;
+      letter-spacing: 1px;
+    }
+
+    .ring,
+    .ring2,
+    .ring3 {
+      position: absolute;
+      border-radius: 50%;
+      border: 1px dashed rgba(157,239,255,0.22);
+      animation: spin 28s linear infinite;
+    }
+
+    .ring { inset: -30px; }
+    .ring2 {
+      inset: -62px;
+      border-color: rgba(199,169,107,0.18);
+      animation-duration: 38s;
+      animation-direction: reverse;
+    }
+
+    .ring3 {
+      inset: -96px;
+      border-color: rgba(107,107,214,0.16);
+      animation-duration: 52s;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .legend {
+      position: absolute;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 8px;
+    }
+
+    .legend span {
+      border: 1px solid rgba(157,239,255,0.13);
+      border-radius: 999px;
+      padding: 5px 9px;
+      color: #c5edf6;
+      background: rgba(157,239,255,0.04);
+      font-size: 10px;
+    }
+
+    .bottom {
+      grid-column: 1 / -1;
+      grid-row: 4;
+      display: grid;
+      grid-template-columns: 1fr 1.35fr 1fr;
+      gap: 14px;
+    }
+
+    .trend {
+      height: 84px;
+      display: flex;
+      align-items: end;
+      gap: 8px;
+      padding: 0 8px 8px;
+      border-bottom: 1px solid rgba(157,239,255,0.11);
+      background: linear-gradient(rgba(157,239,255,0.04) 1px, transparent 1px);
+      background-size: 100% 18px;
+    }
+
+    .trend i {
+      flex: 1;
+      border-radius: 999px 999px 0 0;
+      background: linear-gradient(180deg, #9defff, rgba(157,239,255,0.1));
+      box-shadow: 0 0 10px rgba(157,239,255,0.16);
+    }
+
+    .trend i:nth-child(1) { height: 34%; }
+    .trend i:nth-child(2) { height: 58%; }
+    .trend i:nth-child(3) { height: 46%; }
+    .trend i:nth-child(4) { height: 78%; }
+    .trend i:nth-child(5) { height: 62%; }
+    .trend i:nth-child(6) { height: 92%; }
+    .trend i:nth-child(7) { height: 72%; }
+    .trend i:nth-child(8) { height: 86%; }
+
+    .caption {
+      margin-top: 11px;
+      color: #5b6678;
+      font-size: 12px;
+      line-height: 1.65;
+    }
+
+    @media (max-width: 1260px) {
+      .ref-app { grid-template-columns: 62px 150px 1fr; }
+      .row { grid-template-columns: 44px 90px 1fr 100px 115px 135px 145px 120px; }
+      .screen-grid { grid-template-columns: 1fr; grid-template-rows: auto; }
+      .metric-strip, .traffic-map, .bottom { grid-column: auto; grid-row: auto; }
+      .metric-strip, .bottom { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="top">
+      <div>
+        <h1>v5：企业稳重后台 + 高级深空资产态势图</h1>
+        <p class="subtitle">保留参考图交互，但把后台颜色收敛到深海军蓝、钢蓝、冷灰；大屏改成更克制的深空黑、冰蓝、铂金和少量电紫。</p>
+      </div>
+      <div class="note">
+        这版减少彩色按钮和高饱和紫色。后台更像企业资产系统，不像互联网产品；大屏减少“亮蓝塑料感”，用暗部层次、精细线框、低饱和发光营造高级科幻。
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <h2>后台：参考图结构，企业版稳重配色</h2>
+        <span class="pill">Sober Enterprise</span>
+      </div>
+      <div class="panel-body">
+        <div class="ref-app">
+          <aside class="icon-rail">
+            <div class="avatar"></div>
+            <div class="rail-item"><span class="rail-icon"></span><span>待办</span></div>
+            <div class="rail-item active"><span class="rail-icon"></span><span>设备</span></div>
+            <div class="rail-item"><span class="rail-icon"></span><span>资产</span></div>
+            <div class="rail-item"><span class="rail-icon"></span><span>库存</span></div>
+            <div class="rail-item"><span class="rail-icon"></span><span>采购</span></div>
+            <div class="rail-item"><span class="rail-icon"></span><span>财务</span></div>
+            <div class="rail-item"><span class="rail-icon"></span><span>更多</span></div>
+            <div class="rail-spacer"></div>
+            <div class="plus"></div>
+            <div class="rail-item"><span class="rail-icon"></span></div>
+          </aside>
+
+          <aside class="subnav">
+            <h3>设备管理</h3>
+            <div class="subitem">首页</div>
+            <div class="subitem active">设备列表</div>
+            <div class="subitem">设备入库</div>
+            <div class="subitem">附属资产变更</div>
+            <div class="subitem">配件出库</div>
+            <div class="subitem">分析报表</div>
+            <div class="subsection">保养维护</div>
+            <div class="subitem">保养方案</div>
+            <div class="subitem">保养任务</div>
+            <div class="subitem">保养执行</div>
+            <div class="subitem">保养评价</div>
+          </aside>
+
+          <section class="main">
+            <div class="topbar">
+              <div class="project-title">资产管理系统 / 设备列表</div>
+              <div class="top-icons"><span></span><span></span><span></span><span></span></div>
+            </div>
+            <div class="content">
+              <div class="workbench">
+                <div class="toolbar">
+                  <button class="tool">切换视图&nbsp;&nbsp;<b style="color:#405875">标准</b></button>
+                  <button class="tool primary">快速处理</button>
+                  <button class="tool primary">+ 新建</button>
+                  <button class="tool outline">编辑</button>
+                  <button class="tool outline">导入/导出</button>
+                  <button class="tool outline">打印</button>
+                  <button class="tool outline">RFID 管理</button>
+                  <span class="tool spacer"></span>
+                  <span class="search"></span>
+                  <button class="tool outline">编辑表单</button>
+                </div>
+                <div class="summary">
+                  <span>金额合计：69,873.00</span>
+                  <span class="right">高级搜索&nbsp;&nbsp;|&nbsp;&nbsp;列设置&nbsp;&nbsp;|&nbsp;&nbsp;刷新</span>
+                </div>
+                <div class="table">
+                  <div class="row head"><div class="td"><span class="checkbox"></span></div><div class="td">状态</div><div class="td">资产名称</div><div class="td">资产编码</div><div class="td">主附状态</div><div class="td">资产类别</div><div class="td">RFID</div><div class="td">部门</div></div>
+                  <div class="row"><div class="td"><span class="checkbox"></span></div><div class="td"><span class="badge idle">闲置</span></div><div class="td"><span class="link">人体工学椅</span></div><div class="td">01608110</div><div class="td">主资产</div><div class="td">家具用具</div><div class="td"></div><div class="td">行政部</div></div>
+                  <div class="row selected"><div class="td"><span class="checkbox"></span></div><div class="td"><span class="badge idle">闲置</span></div><div class="td"><span class="link">人体工学椅</span></div><div class="td">01608109</div><div class="td">主资产</div><div class="td">家具用具</div><div class="td"></div><div class="td">行政部</div></div>
+                  <div class="row"><div class="td"><span class="checkbox"></span></div><div class="td"><span class="badge active">在用</span></div><div class="td"><span class="link">办公桌</span></div><div class="td">01608108</div><div class="td">附属资产</div><div class="td">家具用具</div><div class="td"></div><div class="td">财务部</div></div>
+                  <div class="row"><div class="td"><span class="checkbox"></span></div><div class="td"><span class="badge idle">闲置</span></div><div class="td"><span class="link">惠普显示器</span></div><div class="td">01608103</div><div class="td">主资产</div><div class="td">电子产品</div><div class="td"></div><div class="td">研发部</div></div>
+                  <div class="row"><div class="td"><span class="checkbox"></span></div><div class="td"><span class="badge active">在用</span></div><div class="td"><span class="link">iPhone 13 Pro</span></div><div class="td">01608107</div><div class="td">主资产</div><div class="td">电子产品</div><div class="td"></div><div class="td">市场部</div></div>
+                  <div class="row"><div class="td"><span class="checkbox"></span></div><div class="td"><span class="badge active">在用</span></div><div class="td"><span class="link">CISCO 路由器</span></div><div class="td">01608104</div><div class="td">主资产</div><div class="td">网络设备</div><div class="td"></div><div class="td">信息部</div></div>
+                  <div class="row"><div class="td"><span class="checkbox"></span></div><div class="td"><span class="badge idle">闲置</span></div><div class="td"><span class="link">Dell 笔记本</span></div><div class="td">01608102</div><div class="td">主资产</div><div class="td">电子产品</div><div class="td"></div><div class="td">研发部</div></div>
+                  <div class="row"><div class="td"><span class="checkbox"></span></div><div class="td"><span class="badge active">在用</span></div><div class="td"><span class="link">核心交换机</span></div><div class="td">01608101</div><div class="td">主资产</div><div class="td">网络设备</div><div class="td"></div><div class="td">信息部</div></div>
+                </div>
+                <div class="footer">
+                  <div class="pager"><span>‹</span><span class="page">1</span><span>›</span><span style="margin-left:12px">50 / 页</span></div>
+                  <span>1 - 10 条，共 10 条数据</span>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+        <p class="caption">这一版把紫蓝活泼感降下来了：主色换成钢蓝/海军蓝，选中态、按钮和链接都更克制，适合企业员工长时间使用。</p>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <h2>资产态势大屏：低饱和高级科幻版</h2>
+        <span class="pill">Cinematic Command</span>
+      </div>
+      <div class="panel-body">
+        <div class="screen">
+          <div class="screen-frame"></div>
+          <div class="clock">2026-05-19 23:32:18 CST</div>
+          <div class="screen-grid">
+            <div class="screen-title"><h2>资产态势指挥中心</h2></div>
+
+            <div class="metric-strip">
+              <div class="metric"><b>8,426</b><span>纳管资产</span></div>
+              <div class="metric"><b>1,143</b><span>实时活跃</span></div>
+              <div class="metric"><b>27</b><span>异常事件</span></div>
+              <div class="metric"><b>96.8%</b><span>在线率</span></div>
+              <div class="metric"><b>12ms</b><span>平均响应</span></div>
+              <div class="metric"><b>4</b><span>待处置高危</span></div>
+            </div>
+
+            <div class="screen-col">
+              <div class="hud">
+                <h3>快捷处置</h3>
+                <div class="quick">
+                  <button>一键定位</button>
+                  <button>派发工单</button>
+                  <button class="hot">隔离资产</button>
+                  <button>导出处置单</button>
+                </div>
+              </div>
+              <div class="hud">
+                <h3>区域资产流量</h3>
+                <div class="hrow"><span>A 区产线</span><div class="hbar"><i style="width:96%"></i></div><span>96%</span></div>
+                <div class="hrow"><span>B 区机房</span><div class="hbar"><i style="width:82%"></i></div><span>82%</span></div>
+                <div class="hrow"><span>C 区办公</span><div class="hbar"><i style="width:64%"></i></div><span>64%</span></div>
+                <div class="hrow"><span>D 区仓储</span><div class="hbar"><i style="width:48%"></i></div><span>48%</span></div>
+              </div>
+              <div class="hud">
+                <h3>处置队列</h3>
+                <div class="event"><span class="tag red">高危</span><span>核心网关异常外联</span><span>1m</span></div>
+                <div class="event"><span class="tag gold">预警</span><span>PLC 离线抖动</span><span>4m</span></div>
+                <div class="event"><span class="tag">正常</span><span>批量盘点完成</span><span>8m</span></div>
+              </div>
+            </div>
+
+            <div class="traffic-map">
+              <div class="perspective-grid"></div>
+              <div class="route r1"></div>
+              <div class="route r2"></div>
+              <div class="route r3"></div>
+              <div class="route r4"></div>
+              <div class="zone z1">A 区产线<br>设备 1,240</div>
+              <div class="zone z2">核心机房<br>设备 486</div>
+              <div class="zone z3">办公区域<br>设备 2,180</div>
+              <div class="zone z4">仓储物流<br>设备 913</div>
+              <span class="node n1"></span>
+              <span class="node green n2"></span>
+              <span class="node red n3"></span>
+              <span class="node n4"></span>
+              <span class="node green n5"></span>
+              <span class="node red n6"></span>
+              <div class="core"><span class="ring"></span><span class="ring2"></span><span class="ring3"></span>资产<br>调度核心</div>
+              <div class="legend"><span>冰蓝：正常链路</span><span>绿色：高效运行</span><span>红色：异常阻断</span><span>铂金：重点通道</span></div>
+            </div>
+
+            <div class="screen-col">
+              <div class="hud">
+                <h3>风险热力 TOP5</h3>
+                <div class="hrow"><span>外联异常</span><div class="hbar"><i style="width:100%;background:linear-gradient(90deg,#e85d75,#c7a96b)"></i></div><span>27</span></div>
+                <div class="hrow"><span>离线资产</span><div class="hbar"><i style="width:74%"></i></div><span>20</span></div>
+                <div class="hrow"><span>审批超时</span><div class="hbar"><i style="width:52%"></i></div><span>14</span></div>
+                <div class="hrow"><span>维保逾期</span><div class="hbar"><i style="width:44%"></i></div><span>12</span></div>
+              </div>
+              <div class="hud">
+                <h3>资产类型态势</h3>
+                <div class="hrow"><span>终端设备</span><div class="hbar"><i style="width:92%"></i></div><span>3,820</span></div>
+                <div class="hrow"><span>工控设备</span><div class="hbar"><i style="width:70%"></i></div><span>1,450</span></div>
+                <div class="hrow"><span>网络设备</span><div class="hbar"><i style="width:54%"></i></div><span>940</span></div>
+                <div class="hrow"><span>安全设备</span><div class="hbar"><i style="width:39%"></i></div><span>620</span></div>
+              </div>
+              <div class="hud">
+                <h3>效率指标</h3>
+                <div class="event"><span class="tag">SLA</span><span>告警平均确认</span><span>38s</span></div>
+                <div class="event"><span class="tag">工单</span><span>自动派发成功率</span><span>91%</span></div>
+                <div class="event"><span class="tag">盘点</span><span>RFID 同步效率</span><span>98%</span></div>
+              </div>
+            </div>
+
+            <div class="bottom">
+              <div class="hud"><h3>区域通行效率</h3><div class="trend"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+              <div class="hud"><h3>资产活跃度趋势</h3><div class="trend"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+              <div class="hud">
+                <h3>联动处置闭环</h3>
+                <div class="event"><span class="tag">01</span><span>发现异常资产</span><span>自动</span></div>
+                <div class="event"><span class="tag">02</span><span>匹配责任部门</span><span>2s</span></div>
+                <div class="event"><span class="tag">03</span><span>生成处置工单</span><span>完成</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="caption">这版大屏的高级感主要来自“少色、高暗部、精细线框、低饱和发光”。如果还要更电影化，可以下一版进一步加入 3D 地图底座/城市轮廓/流动光轨。</p>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

@@ -96,18 +96,18 @@ export function Approval() {
       {/* 页面标题 */}
       <div>
         <h2 className="text-2xl font-semibold text-gray-900">审批流程管理</h2>
-        <p className="text-gray-600 mt-1">管理资产相关审批流程与工单</p>
+        <p className="text-gray-500 mt-1">管理资产相关审批流程与工单</p>
       </div>
 
       {/* 统计卡片 */}
-      {loading && <div className="text-sm text-gray-500">加载中...</div>}
+      {loading && <div className="text-sm text-gray-400">加载中...</div>}
       {error && <div className="text-sm text-red-600">{error}</div>}
       {notice && <div className="text-sm text-green-700 bg-green-50 border border-green-100 rounded-lg px-4 py-3">{notice}</div>}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">待审批</p>
+              <p className="text-sm text-gray-500">待审批</p>
               <p className="text-3xl font-semibold text-gray-900 mt-2">
                 {approvals.filter(a => getApprovalStatusLabel(a.status) === '待审批').length}
               </p>
@@ -120,7 +120,7 @@ export function Approval() {
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">审批中</p>
+              <p className="text-sm text-gray-500">审批中</p>
               <p className="text-3xl font-semibold text-gray-900 mt-2">
                 {approvals.filter(a => getApprovalStatusLabel(a.status) === '审批中').length}
               </p>
@@ -133,7 +133,7 @@ export function Approval() {
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">已批准</p>
+              <p className="text-sm text-gray-500">已批准</p>
               <p className="text-3xl font-semibold text-gray-900 mt-2">
                 {approvals.filter(a => getApprovalStatusLabel(a.status) === '已批准').length}
               </p>
@@ -146,7 +146,7 @@ export function Approval() {
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">待处理工单</p>
+              <p className="text-sm text-gray-500">待处理工单</p>
               <p className="text-3xl font-semibold text-gray-900 mt-2">
                 {workOrders.filter(w => w.status !== 'COMPLETED' && w.status !== '已完成').length}
               </p>
@@ -167,7 +167,7 @@ export function Approval() {
               className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
                 activeTab === 'approval'
                   ? 'border-blue-600 text-blue-600'
-                  : 'border-transparent text-gray-600 hover:text-gray-900'
+                  : 'border-transparent text-gray-500 hover:text-gray-900'
               }`}
             >
               审批流程
@@ -177,7 +177,7 @@ export function Approval() {
               className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
                 activeTab === 'workorder'
                   ? 'border-blue-600 text-blue-600'
-                  : 'border-transparent text-gray-600 hover:text-gray-900'
+                  : 'border-transparent text-gray-500 hover:text-gray-900'
               }`}
             >
               工单管理
@@ -193,7 +193,7 @@ export function Approval() {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option>全部状态</option>
                 <option>待审批</option>
@@ -219,7 +219,7 @@ export function Approval() {
                         </span>
                         <span className={`px-2 py-0.5 text-xs font-medium rounded ${
                           approval.urgency === '紧急' ? 'bg-red-100 text-red-800' :
-                          'bg-gray-100 text-gray-800'
+                          'bg-blue-50 text-gray-800'
                         }`}>
                           {approval.urgency}
                         </span>
@@ -227,35 +227,35 @@ export function Approval() {
                           {approval.type || approval.processType || '-'}
                         </span>
                       </div>
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-gray-600">
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-gray-500">
                         <div>
-                          <span className="text-gray-500">申请编号:</span> {approval.processNo || approval.id}
+                          <span className="text-gray-400">申请编号:</span> {approval.processNo || approval.id}
                         </div>
                         <div>
-                          <span className="text-gray-500">申请人:</span> {approval.applicant}
+                          <span className="text-gray-400">申请人:</span> {approval.applicant}
                         </div>
                         <div>
-                          <span className="text-gray-500">部门:</span> {approval.department}
+                          <span className="text-gray-400">部门:</span> {approval.department}
                         </div>
                         <div>
-                          <span className="text-gray-500">金额:</span> {approval.amount}
+                          <span className="text-gray-400">金额:</span> {approval.amount}
                         </div>
                         <div>
-                          <span className="text-gray-500">提交时间:</span> {approval.submitDate || approval.applyTime || approval.createTime || '-'}
+                          <span className="text-gray-400">提交时间:</span> {approval.submitDate || approval.applyTime || approval.createTime || '-'}
                         </div>
                         {approval.currentApprover && (
                           <div>
-                            <span className="text-gray-500">当前审批人:</span> {approval.currentApprover}
+                            <span className="text-gray-400">当前审批人:</span> {approval.currentApprover}
                           </div>
                         )}
                         {approval.completeDate && (
                           <div>
-                            <span className="text-gray-500">完成时间:</span> {approval.completeDate}
+                            <span className="text-gray-400">完成时间:</span> {approval.completeDate}
                           </div>
                         )}
                       </div>
                       {approval.details && (
-                        <p className="text-sm text-gray-600 mt-2">{approval.details}</p>
+                        <p className="text-sm text-gray-500 mt-2">{approval.details}</p>
                       )}
                     </div>
                     <div className="flex gap-2 ml-4">
@@ -295,10 +295,10 @@ export function Approval() {
                                 }`}>
                                   {history.result}
                                 </span>
-                                <span className="text-xs text-gray-500">{history.time}</span>
+                                <span className="text-xs text-gray-400">{history.time}</span>
                               </div>
                               {history.comment && (
-                                <p className="text-gray-600 mt-1">{history.comment}</p>
+                                <p className="text-gray-500 mt-1">{history.comment}</p>
                               )}
                             </div>
                           </div>
@@ -322,34 +322,34 @@ export function Approval() {
               <table className="w-full">
                 <thead className="bg-gray-50 border-b border-gray-200">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">工单编号</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">类型</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">设备</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">报修人</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">优先级</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">指派给</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">状态</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">创建时间</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">操作</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">工单编号</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">类型</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">设备</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">报修人</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">优先级</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">指派给</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">状态</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">创建时间</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">操作</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-200">
+                <tbody className="divide-y divide-[#1e3a5f]">
                   {workOrders.map((order) => (
                     <tr key={order.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 text-sm font-medium text-blue-600">{order.workOrderNo || order.id}</td>
                       <td className="px-6 py-4 text-sm text-gray-900">{order.title || order.type || '-'}</td>
                       <td className="px-6 py-4 text-sm text-gray-900">{order.assetName || order.equipment || '-'}</td>
-                      <td className="px-6 py-4 text-sm text-gray-600">{order.reporterName || order.reporter || '-'}</td>
+                      <td className="px-6 py-4 text-sm text-gray-500">{order.reporterName || order.reporter || '-'}</td>
                       <td className="px-6 py-4">
                         <span className={`px-2 py-1 text-xs font-medium rounded ${
                           getPriorityLabel(order.priority) === '高' || getPriorityLabel(order.priority) === '紧急' ? 'bg-red-100 text-red-800' :
                           getPriorityLabel(order.priority) === '中' ? 'bg-yellow-100 text-yellow-800' :
-                          'bg-gray-100 text-gray-800'
+                          'bg-blue-50 text-gray-800'
                         }`}>
                           {getPriorityLabel(order.priority)}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-600">{order.assigneeName || order.assignee || '-'}</td>
+                      <td className="px-6 py-4 text-sm text-gray-500">{order.assigneeName || order.assignee || '-'}</td>
                       <td className="px-6 py-4">
                         <span className={`px-2 py-1 text-xs font-medium rounded-full ${
                           order.status === 'EXECUTING' || order.status === '处理中' ? 'bg-blue-100 text-blue-800' :
@@ -359,7 +359,7 @@ export function Approval() {
                           {getWorkOrderStatusLabel(order.status)}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-600">{order.createTime || '-'}</td>
+                      <td className="px-6 py-4 text-sm text-gray-500">{order.createTime || '-'}</td>
                       <td className="px-6 py-4 text-sm">
                         <div className="flex gap-2">
                           {order.status === 'DRAFT' && (
@@ -386,7 +386,7 @@ export function Approval() {
                   ))}
                 </tbody>
               </table>
-              {workOrders.length === 0 && <div className="px-6 py-8 text-sm text-gray-500">暂无工单数据</div>}
+              {workOrders.length === 0 && <div className="px-6 py-8 text-sm text-gray-400">暂无工单数据</div>}
             </div>
           </div>
         )}
@@ -398,12 +398,12 @@ export function Approval() {
           <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
             <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
               <h3 className="text-lg font-semibold text-gray-900">详情</h3>
-              <button onClick={() => setDetailItem(null)} className="text-gray-400 hover:text-gray-600 text-xl">&times;</button>
+              <button onClick={() => setDetailItem(null)} className="text-gray-400 hover:text-gray-500 text-xl">&times;</button>
             </div>
             <div className="p-6 space-y-3">
               {Object.entries(detailItem).map(([key, value]) => (
                 <div key={key} className="flex items-start gap-3 text-sm">
-                  <span className="text-gray-500 min-w-[120px]">{key}:</span>
+                  <span className="text-gray-400 min-w-[120px]">{key}:</span>
                   <span className="text-gray-900">{value === null || value === undefined ? '-' : String(value)}</span>
                 </div>
               ))}

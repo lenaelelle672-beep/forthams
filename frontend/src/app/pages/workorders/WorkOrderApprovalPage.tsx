@@ -59,7 +59,7 @@ const SEARCH_DEBOUNCE_MS = 300;
 function getStatusBadgeClasses(status?: string): string {
   switch (status) {
     case "DRAFT":
-      return "bg-gray-100 text-gray-800";
+      return "bg-blue-50 text-gray-800";
     case "PENDING":
       return "bg-yellow-100 text-yellow-800";
     case "APPROVED":
@@ -71,9 +71,9 @@ function getStatusBadgeClasses(status?: string): string {
     case "REJECTED":
       return "bg-red-100 text-red-800";
     case "CANCELLED":
-      return "bg-gray-200 text-gray-600";
+      return "bg-blue-50 text-gray-500";
     default:
-      return "bg-gray-100 text-gray-600";
+      return "bg-blue-50 text-gray-500";
   }
 }
 
@@ -159,7 +159,7 @@ function ApprovalCommentModal({
             <button
               type="button"
               onClick={onCancel}
-              className="text-gray-400 hover:text-gray-600 text-xl"
+              className="text-gray-400 hover:text-gray-500 text-xl"
               disabled={submitting}
             >
               &times;
@@ -167,12 +167,12 @@ function ApprovalCommentModal({
           </div>
 
           {/* Work order summary */}
-          <div className="px-6 py-3 bg-gray-50 border-b border-gray-100">
-            <p className="text-sm text-gray-500">工单信息</p>
+          <div className="px-6 py-3 bg-gray-50 border-b border-gray-200">
+            <p className="text-sm text-gray-400">工单信息</p>
             <p className="text-sm font-medium text-gray-900 mt-1">
               {order.workOrderNo || order.id} — {order.title || "-"}
             </p>
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-gray-400 mt-1">
               关联资产: {order.assetName || "-"} | 报修人:{" "}
               {order.reporterName || "-"}
             </p>
@@ -192,7 +192,7 @@ function ApprovalCommentModal({
             <textarea
               id="approval-action-comment"
               data-testid="approval-action-comment-input"
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-800 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               rows={4}
               maxLength={1000}
               placeholder={
@@ -214,7 +214,7 @@ function ApprovalCommentModal({
               type="button"
               onClick={onCancel}
               disabled={submitting}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
             >
               取消
             </button>
@@ -413,7 +413,7 @@ export function WorkOrderApprovalPage() {
   );
 
   const renderEmpty = () => (
-    <div className="px-6 py-12 text-center text-gray-500 text-sm">
+    <div className="px-6 py-12 text-center text-gray-400 text-sm">
       暂无待审批工单
     </div>
   );
@@ -423,14 +423,14 @@ export function WorkOrderApprovalPage() {
 
     return (
       <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
-        <p className="text-sm text-gray-600">
+        <p className="text-sm text-gray-500">
           共 {total} 条待审批，第 {page}/{totalPages} 页
         </p>
         <div className="flex items-center gap-2">
           <button
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page <= 1}
-            className="p-2 rounded-lg border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="p-2 rounded-lg border border-gray-200 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
@@ -449,7 +449,7 @@ export function WorkOrderApprovalPage() {
                     className={`min-w-[32px] h-8 rounded-lg text-sm font-medium transition-colors ${
                       p === page
                         ? "bg-blue-600 text-white"
-                        : "border border-gray-300 text-gray-700 hover:bg-gray-50"
+                        : "border border-gray-200 text-gray-700 hover:bg-gray-50"
                     }`}
                   >
                     {p}
@@ -460,7 +460,7 @@ export function WorkOrderApprovalPage() {
           <button
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={page >= totalPages}
-            className="p-2 rounded-lg border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="p-2 rounded-lg border border-gray-200 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             <ChevronRight className="w-4 h-4" />
           </button>
@@ -476,7 +476,7 @@ export function WorkOrderApprovalPage() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-semibold text-gray-900">工单审批</h2>
-          <p className="text-gray-600 mt-1">
+          <p className="text-gray-500 mt-1">
             查看待审批工单并进行审批操作
           </p>
         </div>
@@ -516,7 +516,7 @@ export function WorkOrderApprovalPage() {
       {/* Table Card */}
       <div className="bg-white rounded-lg border border-gray-200">
         {/* Search Bar */}
-        <div className="px-6 py-4 border-b border-gray-100 flex items-center gap-4">
+        <div className="px-6 py-4 border-b border-gray-200 flex items-center gap-4">
           <div className="relative flex-1 max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
@@ -524,13 +524,13 @@ export function WorkOrderApprovalPage() {
               value={keyword}
               onChange={handleKeywordChange}
               placeholder="搜索工单标题或编号..."
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               data-testid="approval-search-input"
             />
           </div>
           <button
             onClick={() => fetchData()}
-            className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 text-gray-400 hover:text-gray-700 hover:bg-blue-50 rounded-lg transition-colors"
             title="刷新"
           >
             <RefreshCw className="w-4 h-4" />
@@ -547,33 +547,33 @@ export function WorkOrderApprovalPage() {
             <table className="w-full">
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">
                     工单编号
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">
                     标题
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">
                     关联资产
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">
                     报修人
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">
                     优先级
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">
                     状态
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">
                     提交时间
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">
                     操作
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200">
+              <tbody className="divide-y divide-[#1e3a5f]">
                 {records.map((order) => (
                   <tr key={order.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 text-sm font-medium text-blue-600">
@@ -582,10 +582,10 @@ export function WorkOrderApprovalPage() {
                     <td className="px-6 py-4 text-sm text-gray-900 max-w-[200px] truncate">
                       {order.title || "-"}
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-600">
+                    <td className="px-6 py-4 text-sm text-gray-500">
                       {order.assetName || "-"}
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-600">
+                    <td className="px-6 py-4 text-sm text-gray-500">
                       {order.reporterName || "-"}
                     </td>
                     <td className="px-6 py-4">
@@ -603,7 +603,7 @@ export function WorkOrderApprovalPage() {
                         {getWorkOrderStatusLabel(order.status)}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-600">
+                    <td className="px-6 py-4 text-sm text-gray-500">
                       {order.updateTime || order.createTime || "-"}
                     </td>
                     <td className="px-6 py-4 text-sm">

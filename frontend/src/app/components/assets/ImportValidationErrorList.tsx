@@ -137,7 +137,7 @@ export function ImportValidationErrorList({
       {/* 分页控制 */}
       {totalPages > 1 && (
         <div className="flex items-center justify-between">
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-gray-500">
             共 {errors.length} 条错误，第 {currentPage}/{totalPages} 页
           </p>
           <div className="flex items-center gap-2">
@@ -146,7 +146,7 @@ export function ImportValidationErrorList({
               onClick={() => handlePageChange('prev')}
               disabled={currentPage <= 1}
               className="inline-flex items-center gap-1 px-3 py-1.5 text-sm
-                rounded border border-gray-300 bg-white hover:bg-gray-50
+                rounded border border-gray-200 bg-white hover:bg-gray-50
                 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               <ChevronLeft className="w-4 h-4" />
@@ -157,7 +157,7 @@ export function ImportValidationErrorList({
               onClick={() => handlePageChange('next')}
               disabled={currentPage >= totalPages}
               className="inline-flex items-center gap-1 px-3 py-1.5 text-sm
-                rounded border border-gray-300 bg-white hover:bg-gray-50
+                rounded border border-gray-200 bg-white hover:bg-gray-50
                 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               下一页

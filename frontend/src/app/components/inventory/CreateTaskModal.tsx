@@ -412,7 +412,7 @@ export const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
           style={{
             marginTop: 16,
             padding: '8px 12px',
-            background: '#f6f6f6',
+            background: '#ffffff',
             borderRadius: 6,
             border: '1px solid #f0f0f0',
           }}

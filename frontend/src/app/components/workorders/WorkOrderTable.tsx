@@ -107,7 +107,7 @@ const STATUS_TABS: TabConfig[] = [
 function getStatusBadgeClasses(status?: string): string {
   switch (status) {
     case "DRAFT":
-      return "bg-gray-100 text-gray-800";
+      return "bg-blue-50 text-gray-800";
     case "PENDING":
       return "bg-yellow-100 text-yellow-800";
     case "APPROVED":
@@ -119,9 +119,9 @@ function getStatusBadgeClasses(status?: string): string {
     case "REJECTED":
       return "bg-red-100 text-red-800";
     case "CANCELLED":
-      return "bg-gray-200 text-gray-600";
+      return "bg-blue-50 text-gray-500";
     default:
-      return "bg-gray-100 text-gray-600";
+      return "bg-blue-50 text-gray-500";
   }
 }
 
@@ -186,7 +186,7 @@ export function WorkOrderTable({
 
   // -- render: empty state -------------------------------------------------
   const renderEmpty = () => (
-    <div className="px-6 py-12 text-center text-gray-500 text-sm">
+    <div className="px-6 py-12 text-center text-gray-400 text-sm">
       暂无工单数据
     </div>
   );
@@ -197,14 +197,14 @@ export function WorkOrderTable({
 
     return (
       <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
-        <p className="text-sm text-gray-600">
+        <p className="text-sm text-gray-500">
           共 {total} 条记录，第 {page}/{totalPages} 页
         </p>
         <div className="flex items-center gap-2">
           <button
             onClick={() => onPageChange(Math.max(1, page - 1))}
             disabled={page <= 1}
-            className="p-2 rounded-lg border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="p-2 rounded-lg border border-gray-200 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
@@ -223,7 +223,7 @@ export function WorkOrderTable({
                     className={`min-w-[32px] h-8 rounded-lg text-sm font-medium transition-colors ${
                       p === page
                         ? "bg-blue-600 text-white"
-                        : "border border-gray-300 text-gray-700 hover:bg-gray-50"
+                        : "border border-gray-200 text-gray-700 hover:bg-gray-50"
                     }`}
                   >
                     {p}
@@ -234,7 +234,7 @@ export function WorkOrderTable({
           <button
             onClick={() => onPageChange(Math.min(totalPages, page + 1))}
             disabled={page >= totalPages}
-            className="p-2 rounded-lg border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="p-2 rounded-lg border border-gray-200 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             <ChevronRight className="w-4 h-4" />
           </button>
@@ -255,7 +255,7 @@ export function WorkOrderTable({
               className={`px-4 py-2.5 text-sm font-medium rounded-t-lg transition-colors whitespace-nowrap ${
                 activeTab === tab.key
                   ? "bg-blue-50 text-blue-700 border-b-2 border-blue-600"
-                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                  : "text-gray-500 hover:text-gray-900 hover:bg-gray-50"
               }`}
             >
               {tab.label}
@@ -265,7 +265,7 @@ export function WorkOrderTable({
       </div>
 
       {/* Search Bar */}
-      <div className="px-6 py-4 border-b border-gray-100 flex items-center gap-4">
+      <div className="px-6 py-4 border-b border-gray-200 flex items-center gap-4">
         <div className="relative flex-1 max-w-md">
           <svg
             className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"
@@ -286,13 +286,13 @@ export function WorkOrderTable({
             value={keyword}
             onChange={(e) => onKeywordChange(e.target.value)}
             placeholder="搜索工单标题或编号..."
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             data-testid="work-order-search-input"
           />
         </div>
         <button
           onClick={onRefresh}
-          className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+          className="p-2 text-gray-400 hover:text-gray-700 hover:bg-blue-50 rounded-lg transition-colors"
           title="刷新"
         >
           <svg
@@ -322,36 +322,36 @@ export function WorkOrderTable({
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">
                   工单编号
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">
                   标题
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">
                   关联资产
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">
                   报修人
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">
                   优先级
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">
                   指派给
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">
                   状态
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">
                   创建时间
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">
                   操作
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200">
+            <tbody className="divide-y divide-[#1e3a5f]">
               {records.map((order) => (
                 <tr key={order.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 text-sm font-medium text-blue-600">
@@ -360,10 +360,10 @@ export function WorkOrderTable({
                   <td className="px-6 py-4 text-sm text-gray-900 max-w-[200px] truncate">
                     {order.title || "-"}
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-600">
+                  <td className="px-6 py-4 text-sm text-gray-500">
                     {order.assetName || "-"}
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-600">
+                  <td className="px-6 py-4 text-sm text-gray-500">
                     {order.reporterName || "-"}
                   </td>
                   <td className="px-6 py-4">
@@ -373,7 +373,7 @@ export function WorkOrderTable({
                       {getPriorityLabel(order.priority)}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-600">
+                  <td className="px-6 py-4 text-sm text-gray-500">
                     {order.assigneeName || "-"}
                   </td>
                   <td className="px-6 py-4">
@@ -384,7 +384,7 @@ export function WorkOrderTable({
                       {getWorkOrderStatusLabel(order.status)}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-600">
+                  <td className="px-6 py-4 text-sm text-gray-500">
                     {order.createTime || "-"}
                   </td>
                   <td className="px-6 py-4 text-sm">

@@ -3,6 +3,7 @@ import { DollarSign, Plus, AlertCircle, CheckCircle, Clock, FileText } from "luc
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import { useNavigate } from "react-router";
 import { compensationService } from "../services/compensationService";
+import { formatStatusLabel } from "../constants/assetStatus";
 
 export function Compensation() {
   const navigate = useNavigate();
@@ -114,7 +115,7 @@ export function Compensation() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-semibold text-gray-900">资产赔偿管理</h2>
-          <p className="text-gray-600 mt-1">规范资产赔偿流程,实现损失核算与追溯</p>
+          <p className="text-gray-500 mt-1">规范资产赔偿流程,实现损失核算与追溯</p>
         </div>
         <button 
           onClick={() => navigate('/disposals/compensation/new')}
@@ -126,13 +127,13 @@ export function Compensation() {
       </div>
 
       {/* 统计卡片 */}
-      {loading && <div className="text-sm text-gray-500">加载中...</div>}
+      {loading && <div className="text-sm text-gray-400">加载中...</div>}
       {error && <div className="text-sm text-red-600">{error}</div>}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">本月赔偿金额</p>
+              <p className="text-sm text-gray-500">本月赔偿金额</p>
               <p className="text-3xl font-semibold text-gray-900 mt-2">¥16.5K</p>
             </div>
             <div className="w-12 h-12 bg-red-50 rounded-lg flex items-center justify-center">
@@ -143,7 +144,7 @@ export function Compensation() {
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">待审批申请</p>
+              <p className="text-sm text-gray-500">待审批申请</p>
               <p className="text-3xl font-semibold text-gray-900 mt-2">
                 {compensations.filter(c => c.status === '待审批').length}
               </p>
@@ -156,7 +157,7 @@ export function Compensation() {
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">已批准申请</p>
+              <p className="text-sm text-gray-500">已批准申请</p>
               <p className="text-3xl font-semibold text-gray-900 mt-2">
                 {compensations.filter(c => c.status === '已批准').length}
               </p>
@@ -169,7 +170,7 @@ export function Compensation() {
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">累计赔偿金额</p>
+              <p className="text-sm text-gray-500">累计赔偿金额</p>
               <p className="text-3xl font-semibold text-gray-900 mt-2">¥46.5K</p>
             </div>
             <div className="w-12 h-12 bg-purple-50 rounded-lg flex items-center justify-center">
@@ -229,9 +230,9 @@ export function Compensation() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           {deptStats.map((dept) => (
             <div key={dept.dept} className="border border-gray-200 rounded-lg p-4">
-              <h4 className="text-sm font-medium text-gray-600 mb-2">{dept.dept}</h4>
+              <h4 className="text-sm font-medium text-gray-500 mb-2">{dept.dept}</h4>
               <p className="text-2xl font-semibold text-gray-900">¥{dept.amount.toLocaleString()}</p>
-              <p className="text-sm text-gray-500 mt-1">{dept.count}次赔偿</p>
+              <p className="text-sm text-gray-400 mt-1">{dept.count}次赔偿</p>
             </div>
           ))}
         </div>
@@ -244,7 +245,7 @@ export function Compensation() {
           <select
             value={selectedType}
             onChange={(e) => setSelectedType(e.target.value)}
-            className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option>全部类型</option>
             <option>设备损坏</option>
@@ -256,24 +257,24 @@ export function Compensation() {
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">申请编号</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">资产信息</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">类型</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">责任人</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">部门</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">赔偿金额</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">状态</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">操作</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">申请编号</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">资产信息</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">类型</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">责任人</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">部门</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">赔偿金额</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">状态</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">操作</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200">
+            <tbody className="divide-y divide-[#1e3a5f]">
               {filteredCompensations.map((comp) => (
                 <tr key={comp.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 text-sm font-medium text-blue-600">{comp.id || comp.compensationNo}</td>
                   <td className="px-6 py-4 text-sm">
                     <div>
                       <p className="font-medium text-gray-900">{comp.assetName || '-'}</p>
-                      <p className="text-xs text-gray-500">{comp.assetId || '-'}</p>
+                      <p className="text-xs text-gray-400">{comp.assetId || '-'}</p>
                     </div>
                   </td>
                   <td className="px-6 py-4 text-sm">
@@ -286,7 +287,7 @@ export function Compensation() {
                     </span>
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-900">{comp.employee}</td>
-                  <td className="px-6 py-4 text-sm text-gray-600">{comp.department}</td>
+                  <td className="px-6 py-4 text-sm text-gray-500">{comp.department}</td>
                    <td className="px-6 py-4 text-sm font-semibold text-red-600">¥{Number(comp.amount || 0).toLocaleString()}</td>
                   <td className="px-6 py-4">
                     <span className={`px-2 py-1 text-xs font-medium rounded-full ${
@@ -295,7 +296,7 @@ export function Compensation() {
                       comp.status === '审批中' ? 'bg-blue-100 text-blue-800' :
                       'bg-red-100 text-red-800'
                     }`}>
-                      {comp.status}
+                      {formatStatusLabel(comp.status)}
                     </span>
                   </td>
                   <td className="px-6 py-4 text-sm">
@@ -325,7 +326,7 @@ export function Compensation() {
               <h3 className="text-lg font-semibold text-gray-900">新增赔偿申请</h3>
               <button 
                 onClick={() => setShowAddModal(false)}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-gray-400 hover:text-gray-500"
               >
                 ✕
               </button>
@@ -334,11 +335,11 @@ export function Compensation() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">资产编号 *</label>
-                   <input value={formData.assetId} onChange={(e) => setFormData(prev => ({ ...prev, assetId: e.target.value }))} type="text" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="AS-2024-XXX" />
+                   <input value={formData.assetId} onChange={(e) => setFormData(prev => ({ ...prev, assetId: e.target.value }))} type="text" className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="AS-2024-XXX" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">赔偿类型 *</label>
-                   <select value={formData.type} onChange={(e) => setFormData(prev => ({ ...prev, type: e.target.value }))} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                   <select value={formData.type} onChange={(e) => setFormData(prev => ({ ...prev, type: e.target.value }))} className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <option>设备损坏</option>
                     <option>设备丢失</option>
                     <option>人为故障</option>
@@ -347,11 +348,11 @@ export function Compensation() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">责任人 *</label>
-                   <input value={formData.employee} onChange={(e) => setFormData(prev => ({ ...prev, employee: e.target.value }))} type="text" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                   <input value={formData.employee} onChange={(e) => setFormData(prev => ({ ...prev, employee: e.target.value }))} type="text" className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">所属部门 *</label>
-                   <select value={formData.department} onChange={(e) => setFormData(prev => ({ ...prev, department: e.target.value }))} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                   <select value={formData.department} onChange={(e) => setFormData(prev => ({ ...prev, department: e.target.value }))} className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <option>研发部</option>
                     <option>销售部</option>
                     <option>设计部</option>
@@ -361,30 +362,30 @@ export function Compensation() {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">赔偿金额 (元) *</label>
                   <div className="flex gap-2">
-                    <input value={formData.amount} onChange={(e) => setFormData(prev => ({ ...prev, amount: e.target.value }))} type="number" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                    <input value={formData.amount} onChange={(e) => setFormData(prev => ({ ...prev, amount: e.target.value }))} type="number" className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
                     <button type="button" onClick={handleEstimateCompensation} disabled={valuationLoading} className="shrink-0 px-3 py-2 text-sm font-medium text-blue-700 bg-blue-50 border border-blue-200 hover:bg-blue-100 disabled:opacity-60 rounded-lg transition-colors">
                       {valuationLoading ? '估值中' : '系统估值'}
                     </button>
                   </div>
-                  {valuationBasis && <p className="mt-1 text-xs text-gray-500">{valuationBasis}</p>}
+                  {valuationBasis && <p className="mt-1 text-xs text-gray-400">{valuationBasis}</p>}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">发生日期 *</label>
-                   <input value={formData.date} onChange={(e) => setFormData(prev => ({ ...prev, date: e.target.value }))} type="date" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                   <input value={formData.date} onChange={(e) => setFormData(prev => ({ ...prev, date: e.target.value }))} type="date" className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
                 </div>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">赔偿事由 *</label>
-                 <textarea value={formData.reason} onChange={(e) => setFormData(prev => ({ ...prev, reason: e.target.value }))} rows={4} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="请详细描述损坏/丢失情况..."></textarea>
+                 <textarea value={formData.reason} onChange={(e) => setFormData(prev => ({ ...prev, reason: e.target.value }))} rows={4} className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="请详细描述损坏/丢失情况..."></textarea>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">证明材料</label>
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                <div className="border-2 border-dashed border-gray-200 rounded-lg p-6 text-center">
                   <input type="file" className="hidden" id="file-upload" multiple />
                   <label htmlFor="file-upload" className="cursor-pointer">
-                    <div className="text-gray-600">
+                    <div className="text-gray-500">
                       <p className="text-sm">点击上传或拖拽文件至此</p>
-                      <p className="text-xs text-gray-500 mt-1">支持 JPG、PNG、PDF 格式</p>
+                      <p className="text-xs text-gray-400 mt-1">支持 JPG、PNG、PDF 格式</p>
                     </div>
                   </label>
                 </div>
@@ -393,7 +394,7 @@ export function Compensation() {
             <div className="px-6 py-4 border-t border-gray-200 flex justify-end gap-3">
               <button 
                 onClick={() => setShowAddModal(false)}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg transition-colors"
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 rounded-lg transition-colors"
               >
                 取消
               </button>
@@ -411,12 +412,12 @@ export function Compensation() {
           <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
             <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
               <h3 className="text-lg font-semibold text-gray-900">赔偿详情</h3>
-              <button onClick={() => setDetailItem(null)} className="text-gray-400 hover:text-gray-600 text-xl">&times;</button>
+              <button onClick={() => setDetailItem(null)} className="text-gray-400 hover:text-gray-500 text-xl">&times;</button>
             </div>
             <div className="p-6 space-y-3">
               {Object.entries(detailItem).map(([key, value]) => (
                 <div key={key} className="flex items-start gap-3 text-sm">
-                  <span className="text-gray-500 min-w-[120px]">{key}:</span>
+                  <span className="text-gray-400 min-w-[120px]">{key}:</span>
                   <span className="text-gray-900">{value === null || value === undefined ? '-' : String(value)}</span>
                 </div>
               ))}

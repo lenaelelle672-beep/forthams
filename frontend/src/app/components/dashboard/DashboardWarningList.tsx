@@ -135,7 +135,7 @@ function getUrgencyClass(urgency: WarningItem['urgency']): string {
     case 'warning':
       return 'text-amber-600 bg-amber-50';
     case 'normal':
-      return 'text-gray-600 bg-gray-50';
+      return 'text-gray-500 bg-gray-50';
   }
 }
 
@@ -236,8 +236,8 @@ export const DashboardWarningList: React.FC<DashboardWarningListProps> = ({
         <div className="space-y-3">
           {Array.from({ length: 3 }).map((_, i) => (
             <div key={i} className="animate-pulse p-4 bg-gray-50 rounded-lg">
-              <div className="h-4 bg-gray-200 rounded w-3/4 mb-2" />
-              <div className="h-3 bg-gray-200 rounded w-1/2" />
+              <div className="h-4 bg-blue-50 rounded w-3/4 mb-2" />
+              <div className="h-3 bg-blue-50 rounded w-1/2" />
             </div>
           ))}
         </div>
@@ -278,7 +278,7 @@ export const DashboardWarningList: React.FC<DashboardWarningListProps> = ({
       </div>
 
       {items.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-gray-200 p-6 text-center text-sm text-gray-500">
+        <div className="rounded-lg border border-dashed border-gray-200 p-6 text-center text-sm text-gray-400">
           暂无预警事项，所有资产状态正常。
         </div>
       ) : (
@@ -286,7 +286,7 @@ export const DashboardWarningList: React.FC<DashboardWarningListProps> = ({
           {items.map((item) => (
             <div
               key={item.id}
-              className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+              className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg hover:bg-blue-50 transition-colors"
             >
               <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${getUrgencyClass(item.urgency)}`}>
                 {item.type === 'maintenance' ? (
@@ -306,16 +306,16 @@ export const DashboardWarningList: React.FC<DashboardWarningListProps> = ({
                         ? 'bg-red-100 text-red-700'
                         : item.urgency === 'warning'
                           ? 'bg-amber-100 text-amber-700'
-                          : 'bg-gray-100 text-gray-600'
+                          : 'bg-blue-50 text-gray-500'
                     }`}
                   >
                     {getRemainingDaysText(item.remainingDays)}
                   </span>
                 </div>
-                <p className="text-sm text-gray-600 mt-1 truncate">
+                <p className="text-sm text-gray-500 mt-1 truncate">
                   {item.description}
                 </p>
-                <div className="flex items-center mt-1 text-xs text-gray-500">
+                <div className="flex items-center mt-1 text-xs text-gray-400">
                   <Clock className="w-3 h-3 mr-1" />
                   <span>
                     {item.dueDate

@@ -55,7 +55,7 @@ const STATUS_CONFIG: Record<
   RetirementStatus,
   { bg: string; label: string; description: string }
 > = {
-  DRAFT: { bg: 'bg-gray-100 text-gray-800', label: '草稿', description: '申请人正在编辑' },
+  DRAFT: { bg: 'bg-blue-50 text-gray-800', label: '草稿', description: '申请人正在编辑' },
   PENDING_APPROVAL: {
     bg: 'bg-blue-100 text-blue-800',
     label: '待审批',
@@ -63,7 +63,7 @@ const STATUS_CONFIG: Record<
   },
   APPROVED: { bg: 'bg-green-100 text-green-800', label: '已批准', description: '审批通过，待执行' },
   REJECTED: { bg: 'bg-red-100 text-red-800', label: '已驳回', description: '审批未通过' },
-  CANCELLED: { bg: 'bg-gray-100 text-gray-800', label: '已撤回', description: '申请人主动撤回' },
+  CANCELLED: { bg: 'bg-blue-50 text-gray-800', label: '已撤回', description: '申请人主动撤回' },
   RETIRED: { bg: 'bg-green-100 text-green-800', label: '已退役', description: '资产已完成退役' },
 };
 
@@ -353,8 +353,8 @@ export const RetirementApprovalList: React.FC = () => {
   if (!canView) {
     return (
       <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
-        <AlertCircle className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-        <p className="text-gray-500">您没有权限查看此页面</p>
+        <AlertCircle className="w-12 h-12 text-slate-600 mx-auto mb-4" />
+        <p className="text-gray-400">您没有权限查看此页面</p>
       </div>
     );
   }
@@ -386,7 +386,7 @@ export const RetirementApprovalList: React.FC = () => {
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">待审批</p>
+              <p className="text-sm text-gray-500">待审批</p>
               <p className="text-3xl font-semibold text-yellow-600 mt-2">{statistics.pending}</p>
             </div>
             <div className="w-12 h-12 bg-yellow-50 rounded-lg flex items-center justify-center">
@@ -397,7 +397,7 @@ export const RetirementApprovalList: React.FC = () => {
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">已批准</p>
+              <p className="text-sm text-gray-500">已批准</p>
               <p className="text-3xl font-semibold text-green-600 mt-2">{statistics.approved}</p>
             </div>
             <div className="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center">
@@ -408,7 +408,7 @@ export const RetirementApprovalList: React.FC = () => {
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">已驳回</p>
+              <p className="text-sm text-gray-500">已驳回</p>
               <p className="text-3xl font-semibold text-red-600 mt-2">{statistics.rejected}</p>
             </div>
             <div className="w-12 h-12 bg-red-50 rounded-lg flex items-center justify-center">
@@ -419,7 +419,7 @@ export const RetirementApprovalList: React.FC = () => {
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">已完成退役</p>
+              <p className="text-sm text-gray-500">已完成退役</p>
               <p className="text-3xl font-semibold text-blue-600 mt-2">{statistics.retired}</p>
             </div>
             <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center">
@@ -434,14 +434,14 @@ export const RetirementApprovalList: React.FC = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 items-end">
           {/* Status filter */}
           <div>
-            <label className="block text-xs font-medium text-gray-500 mb-1">
+            <label className="block text-xs font-medium text-gray-400 mb-1">
               <Filter className="w-3 h-3 inline mr-1" />
               状态筛选
             </label>
             <select
               value={filters.status}
               onChange={(e) => handleFilterChange('status', e.target.value as RetirementStatus | 'ALL')}
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="ALL">全部状态</option>
               {STATUS_OPTIONS.map(opt => (
@@ -452,7 +452,7 @@ export const RetirementApprovalList: React.FC = () => {
 
           {/* Keyword search */}
           <div>
-            <label className="block text-xs font-medium text-gray-500 mb-1">
+            <label className="block text-xs font-medium text-gray-400 mb-1">
               <Search className="w-3 h-3 inline mr-1" />
               关键词搜索
             </label>
@@ -461,13 +461,13 @@ export const RetirementApprovalList: React.FC = () => {
               placeholder="搜索资产编号/名称"
               value={filters.keyword}
               onChange={(e) => handleFilterChange('keyword', e.target.value)}
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
           {/* Date range (simple inputs) */}
           <div>
-            <label className="block text-xs font-medium text-gray-500 mb-1">日期范围</label>
+            <label className="block text-xs font-medium text-gray-400 mb-1">日期范围</label>
             <div className="flex gap-2">
               <input
                 type="date"
@@ -479,7 +479,7 @@ export const RetirementApprovalList: React.FC = () => {
                     dateRange: start ? [start, prev.dateRange?.[1] || start] : null,
                   }));
                 }}
-                className="flex-1 px-2 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="flex-1 px-2 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <input
                 type="date"
@@ -491,7 +491,7 @@ export const RetirementApprovalList: React.FC = () => {
                     dateRange: end ? [prev.dateRange?.[0] || end, end] : null,
                   }));
                 }}
-                className="flex-1 px-2 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="flex-1 px-2 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
           </div>
@@ -500,7 +500,7 @@ export const RetirementApprovalList: React.FC = () => {
           <div className="flex gap-2">
             <button
               onClick={handleResetFilters}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
             >
               重置
             </button>
@@ -519,7 +519,7 @@ export const RetirementApprovalList: React.FC = () => {
         {/* Table header bar */}
         <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <span className="text-sm text-gray-500">
+            <span className="text-sm text-gray-400">
               共 {pagination.total} 条申请记录
             </span>
             {selectedRowKeys.length > 0 && (
@@ -529,7 +529,7 @@ export const RetirementApprovalList: React.FC = () => {
                 </span>
                 <button
                   onClick={handleClearSelection}
-                  className="px-3 py-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors"
+                  className="px-3 py-1 text-xs font-medium text-gray-700 bg-white border border-gray-200 rounded hover:bg-gray-50 transition-colors"
                 >
                   清除选择
                 </button>
@@ -549,7 +549,7 @@ export const RetirementApprovalList: React.FC = () => {
 
         {/* Loading state */}
         {loading ? (
-          <div className="px-6 py-8 text-sm text-gray-500 text-center">加载中...</div>
+          <div className="px-6 py-8 text-sm text-gray-400 text-center">加载中...</div>
         ) : (
           <>
             {/* HTML Table */}
@@ -570,26 +570,26 @@ export const RetirementApprovalList: React.FC = () => {
                               setSelectedRowKeys(pendingIds);
                             }
                           }}
-                          className="rounded border-gray-300"
+                          className="rounded border-gray-200"
                         />
                       </th>
                     )}
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">申请编号</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">资产编号</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">资产名称</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">申请人</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">所属部门</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">退役原因</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">计划退役日期</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">状态</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">申请时间</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">操作</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase">申请编号</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase">资产编号</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase">资产名称</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase">申请人</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase">所属部门</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase">退役原因</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase">计划退役日期</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase">状态</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase">申请时间</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase">操作</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-200">
+                <tbody className="divide-y divide-[#1e3a5f]">
                   {applications.length === 0 ? (
                     <tr>
-                      <td colSpan={canApprove ? 11 : 10} className="px-6 py-8 text-sm text-gray-500 text-center">暂无数据</td>
+                      <td colSpan={canApprove ? 11 : 10} className="px-6 py-8 text-sm text-gray-400 text-center">暂无数据</td>
                     </tr>
                   ) : (
                     applications.map((record) => {
@@ -607,7 +607,7 @@ export const RetirementApprovalList: React.FC = () => {
                                 checked={isSelected}
                                 onChange={() => handleToggleRow(record.id, record.status)}
                                 disabled={record.status !== 'PENDING_APPROVAL'}
-                                className="rounded border-gray-300 disabled:opacity-50"
+                                className="rounded border-gray-200 disabled:opacity-50"
                               />
                             </td>
                           )}
@@ -615,16 +615,16 @@ export const RetirementApprovalList: React.FC = () => {
                           <td className="px-4 py-3 text-sm text-gray-900">{record.assetCode}</td>
                           <td className="px-4 py-3 text-sm text-gray-900 max-w-[180px] truncate">{record.assetName}</td>
                           <td className="px-4 py-3 text-sm text-gray-900">{record.applicantName}</td>
-                          <td className="px-4 py-3 text-sm text-gray-600">{record.department}</td>
-                          <td className="px-4 py-3 text-sm text-gray-600 max-w-[200px] truncate" title={record.retirementReason}>{record.retirementReason}</td>
-                          <td className="px-4 py-3 text-sm text-gray-600">{record.plannedRetirementDate ? dayjs(record.plannedRetirementDate).format('YYYY-MM-DD') : '-'}</td>
+                          <td className="px-4 py-3 text-sm text-gray-500">{record.department}</td>
+                          <td className="px-4 py-3 text-sm text-gray-500 max-w-[200px] truncate" title={record.retirementReason}>{record.retirementReason}</td>
+                          <td className="px-4 py-3 text-sm text-gray-500">{record.plannedRetirementDate ? dayjs(record.plannedRetirementDate).format('YYYY-MM-DD') : '-'}</td>
                           <td className="px-4 py-3">
                             <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-full ${statusConfig.bg}`}>
                               {record.status === 'PENDING_APPROVAL' && <Clock className="w-3 h-3" />}
                               {statusConfig.label}
                             </span>
                           </td>
-                          <td className="px-4 py-3 text-sm text-gray-600">{dayjs(record.createdAt).format('YYYY-MM-DD HH:mm')}</td>
+                          <td className="px-4 py-3 text-sm text-gray-500">{dayjs(record.createdAt).format('YYYY-MM-DD HH:mm')}</td>
                           <td className="px-4 py-3 text-sm">
                             <div className="flex gap-1">
                               <button
@@ -665,14 +665,14 @@ export const RetirementApprovalList: React.FC = () => {
             {/* Pagination */}
             {pagination.total > pagination.pageSize && (
               <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
-                <span className="text-sm text-gray-500">
+                <span className="text-sm text-gray-400">
                   共 {pagination.total} 条
                 </span>
                 <div className="flex items-center gap-1">
                   <button
                     onClick={() => handlePageChange(pagination.current - 1)}
                     disabled={pagination.current <= 1}
-                    className="px-3 py-1.5 text-sm border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="px-3 py-1.5 text-sm border border-gray-200 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
                     上一页
                   </button>
@@ -691,7 +691,7 @@ export const RetirementApprovalList: React.FC = () => {
                           className={`px-3 py-1.5 text-sm rounded transition-colors ${
                             page === pagination.current
                               ? 'bg-blue-600 text-white'
-                              : 'border border-gray-300 hover:bg-gray-50'
+                              : 'border border-gray-200 hover:bg-gray-50'
                           }`}
                         >
                           {page}
@@ -701,7 +701,7 @@ export const RetirementApprovalList: React.FC = () => {
                   <button
                     onClick={() => handlePageChange(pagination.current + 1)}
                     disabled={pagination.current >= totalPages}
-                    className="px-3 py-1.5 text-sm border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="px-3 py-1.5 text-sm border border-gray-200 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
                     下一页
                   </button>
@@ -718,57 +718,57 @@ export const RetirementApprovalList: React.FC = () => {
           <div className="bg-white rounded-lg shadow-xl max-w-3xl w-full mx-4 max-h-[80vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
             <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
               <h3 className="text-lg font-semibold text-gray-900">退役申请详情</h3>
-              <button onClick={() => setDetailModalVisible(false)} className="text-gray-400 hover:text-gray-600 text-xl">&times;</button>
+              <button onClick={() => setDetailModalVisible(false)} className="text-gray-400 hover:text-gray-500 text-xl">&times;</button>
             </div>
             <div className="p-6">
               {currentApplication && (
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <span className="text-sm text-gray-500">申请编号：</span>
+                      <span className="text-sm text-gray-400">申请编号：</span>
                       <span className="text-sm font-semibold text-gray-900">{currentApplication.applicationNo}</span>
                     </div>
                     <div>
-                      <span className="text-sm text-gray-500">状态：</span>
+                      <span className="text-sm text-gray-400">状态：</span>
                       <span className={`inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full ${(STATUS_CONFIG[currentApplication.status] || STATUS_CONFIG.DRAFT).bg}`}>
                         {(STATUS_CONFIG[currentApplication.status] || STATUS_CONFIG.DRAFT).label}
                       </span>
                     </div>
                     <div>
-                      <span className="text-sm text-gray-500">资产编号：</span>
+                      <span className="text-sm text-gray-400">资产编号：</span>
                       <span className="text-sm font-semibold text-gray-900">{currentApplication.assetCode}</span>
                     </div>
                     <div>
-                      <span className="text-sm text-gray-500">资产名称：</span>
+                      <span className="text-sm text-gray-400">资产名称：</span>
                       <span className="text-sm font-semibold text-gray-900">{currentApplication.assetName}</span>
                     </div>
                     <div>
-                      <span className="text-sm text-gray-500">申请人：</span>
+                      <span className="text-sm text-gray-400">申请人：</span>
                       <span className="text-sm font-semibold text-gray-900">{currentApplication.applicantName}</span>
                     </div>
                     <div>
-                      <span className="text-sm text-gray-500">所属部门：</span>
+                      <span className="text-sm text-gray-400">所属部门：</span>
                       <span className="text-sm font-semibold text-gray-900">{currentApplication.department}</span>
                     </div>
                   </div>
 
                   <div className="border-t border-gray-200 pt-4">
                     <h4 className="text-sm font-semibold text-gray-900 mb-2">退役原因</h4>
-                    <p className="text-sm text-gray-600">{currentApplication.retirementReason || '未填写'}</p>
+                    <p className="text-sm text-gray-500">{currentApplication.retirementReason || '未填写'}</p>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <span className="text-sm text-gray-500">计划退役日期：</span>
+                      <span className="text-sm text-gray-400">计划退役日期：</span>
                       <span className="text-sm text-gray-900">{dayjs(currentApplication.plannedRetirementDate).format('YYYY-MM-DD')}</span>
                     </div>
                     <div>
-                      <span className="text-sm text-gray-500">申请时间：</span>
+                      <span className="text-sm text-gray-400">申请时间：</span>
                       <span className="text-sm text-gray-900">{dayjs(currentApplication.createdAt).format('YYYY-MM-DD HH:mm')}</span>
                     </div>
                     {currentApplication.actualRetirementDate && (
                       <div>
-                        <span className="text-sm text-gray-500">实际退役日期：</span>
+                        <span className="text-sm text-gray-400">实际退役日期：</span>
                         <span className="text-sm text-gray-900">{dayjs(currentApplication.actualRetirementDate).format('YYYY-MM-DD')}</span>
                       </div>
                     )}
@@ -794,7 +794,7 @@ export const RetirementApprovalList: React.FC = () => {
                                 </span>
                               </div>
                               {record.comment && (
-                                <p className="text-sm text-gray-600">「{record.comment}」</p>
+                                <p className="text-sm text-gray-500">「{record.comment}」</p>
                               )}
                               <span className="text-xs text-gray-400">{dayjs(record.actionTime).format('YYYY-MM-DD HH:mm')}</span>
                             </div>
@@ -818,7 +818,7 @@ export const RetirementApprovalList: React.FC = () => {
               <h3 className="text-lg font-semibold text-gray-900">
                 {approvalAction === 'approve' ? '批准退役申请' : '驳回退役申请'}
               </h3>
-              <button onClick={handleCloseApproval} className="text-gray-400 hover:text-gray-600 text-xl">&times;</button>
+              <button onClick={handleCloseApproval} className="text-gray-400 hover:text-gray-500 text-xl">&times;</button>
             </div>
             <div className="p-6 space-y-4">
               {/* Comment textarea */}
@@ -837,7 +837,7 @@ export const RetirementApprovalList: React.FC = () => {
                       : '请输入驳回原因（必填）'
                   }
                   maxLength={200}
-                  className={`w-full px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none ${approvalCommentError ? 'border-red-300' : 'border-gray-300'}`}
+                  className={`w-full px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none ${approvalCommentError ? 'border-red-300' : 'border-gray-200'}`}
                 />
                 {approvalCommentError && <p className="text-xs text-red-600 mt-1">{approvalCommentError}</p>}
                 <p className="text-xs text-gray-400 mt-1">{approvalComment.length}/200</p>
@@ -851,7 +851,7 @@ export const RetirementApprovalList: React.FC = () => {
                     type="date"
                     value={approvalEffectiveDate}
                     onChange={(e) => setApprovalEffectiveDate(e.target.value)}
-                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
               )}
@@ -860,7 +860,7 @@ export const RetirementApprovalList: React.FC = () => {
               <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
                 <button
                   onClick={handleCloseApproval}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
                 >
                   取消
                 </button>
@@ -886,11 +886,11 @@ export const RetirementApprovalList: React.FC = () => {
                 <AlertCircle className="w-6 h-6 text-yellow-600" />
                 <h3 className="text-lg font-semibold text-gray-900">确认批量审批</h3>
               </div>
-              <p className="text-sm text-gray-600 mb-6">确认批量审批 {selectedRowKeys.length} 条申请？</p>
+              <p className="text-sm text-gray-500 mb-6">确认批量审批 {selectedRowKeys.length} 条申请？</p>
               <div className="flex justify-end gap-3">
                 <button
                   onClick={() => setConfirmBatchVisible(false)}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
                 >
                   取消
                 </button>

@@ -182,7 +182,7 @@ export default function AssetCreatePage() {
         <button
           type="button"
           onClick={handleCancel}
-          className="text-gray-500 hover:text-gray-700 transition-colors"
+          className="text-gray-400 hover:text-gray-700 transition-colors"
           data-testid="btn-back"
         >
           <ArrowLeft className="w-5 h-5" />
@@ -215,7 +215,7 @@ export default function AssetCreatePage() {
               value={form.assetName}
               onChange={(e) => handleChange('assetName', e.target.value)}
               className={`w-full px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                errors.assetName ? 'border-red-300' : 'border-gray-300'
+                errors.assetName ? 'border-red-300' : 'border-gray-200'
               }`}
               placeholder="请输入资产名称"
               data-testid="input-assetName"
@@ -236,7 +236,7 @@ export default function AssetCreatePage() {
               value={form.assetCode}
               onChange={(e) => handleChange('assetCode', e.target.value)}
               className={`w-full px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                errors.assetCode ? 'border-red-300' : 'border-gray-300'
+                errors.assetCode ? 'border-red-300' : 'border-gray-200'
               }`}
               placeholder="请输入资产编号"
               data-testid="input-assetCode"
@@ -257,7 +257,7 @@ export default function AssetCreatePage() {
               value={form.categoryId}
               onChange={(e) => handleChange('categoryId', e.target.value)}
               className={`w-full px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                errors.categoryId ? 'border-red-300' : 'border-gray-300'
+                errors.categoryId ? 'border-red-300' : 'border-gray-200'
               }`}
               placeholder="请输入分类 ID"
               data-testid="input-categoryId"
@@ -278,7 +278,7 @@ export default function AssetCreatePage() {
               value={form.departmentId}
               onChange={(e) => handleChange('departmentId', e.target.value)}
               className={`w-full px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                errors.departmentId ? 'border-red-300' : 'border-gray-300'
+                errors.departmentId ? 'border-red-300' : 'border-gray-200'
               }`}
               placeholder="请输入部门 ID"
               data-testid="input-departmentId"
@@ -298,7 +298,7 @@ export default function AssetCreatePage() {
               type="text"
               value={form.locationName}
               onChange={(e) => handleChange('locationName', e.target.value)}
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="请输入存放位置"
               data-testid="input-locationName"
             />
@@ -320,7 +320,7 @@ export default function AssetCreatePage() {
               value={form.purchaseDate}
               onChange={(e) => handleChange('purchaseDate', e.target.value)}
               className={`w-full px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                errors.purchaseDate ? 'border-red-300' : 'border-gray-300'
+                errors.purchaseDate ? 'border-red-300' : 'border-gray-200'
               }`}
               data-testid="input-purchaseDate"
             />
@@ -342,7 +342,7 @@ export default function AssetCreatePage() {
               value={form.purchasePrice}
               onChange={(e) => handleChange('purchasePrice', e.target.value)}
               className={`w-full px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                errors.purchasePrice ? 'border-red-300' : 'border-gray-300'
+                errors.purchasePrice ? 'border-red-300' : 'border-gray-200'
               }`}
               placeholder="请输入购置价格"
               data-testid="input-purchasePrice"
@@ -366,7 +366,7 @@ export default function AssetCreatePage() {
               value={form.remark}
               onChange={(e) => handleChange('remark', e.target.value)}
               rows={4}
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="请输入备注信息"
               data-testid="input-remark"
             />
@@ -378,7 +378,7 @@ export default function AssetCreatePage() {
           <button
             type="button"
             onClick={handleCancel}
-            className="px-4 py-2 text-sm rounded-lg border border-gray-300 bg-white text-gray-700
+            className="px-4 py-2 text-sm rounded-lg border border-gray-200 bg-white text-gray-700
               hover:bg-gray-50 transition-colors"
             data-testid="btn-cancel"
           >

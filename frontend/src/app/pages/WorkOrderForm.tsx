@@ -193,9 +193,9 @@ export function WorkOrderForm() {
     return (
       <div className="max-w-4xl mx-auto space-y-6 pb-12">
         <div className="flex items-center gap-4 mb-8">
-          <div className="w-10 h-10 bg-gray-100 rounded-lg animate-pulse" />
+          <div className="w-10 h-10 bg-blue-50 rounded-lg animate-pulse" />
           <div className="space-y-2">
-            <div className="h-6 w-48 bg-gray-100 rounded animate-pulse" />
+            <div className="h-6 w-48 bg-blue-50 rounded animate-pulse" />
             <div className="h-4 w-32 bg-gray-50 rounded animate-pulse" />
           </div>
         </div>
@@ -216,17 +216,17 @@ export function WorkOrderForm() {
         <div className="flex items-center gap-4">
           <button
             onClick={() => navigate(-1)}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 hover:bg-blue-50 rounded-lg transition-colors"
             type="button"
           >
-            <ArrowLeft className="w-5 h-5 text-gray-600" />
+            <ArrowLeft className="w-5 h-5 text-gray-500" />
           </button>
           <div>
             <h2 className="text-2xl font-bold text-gray-900">
               {isEditMode ? "编辑工单" : "新建工单"}
             </h2>
             {isEditMode && id && (
-              <p className="text-sm text-gray-500 mt-1">工单编号：{id}</p>
+              <p className="text-sm text-gray-400 mt-1">工单编号：{id}</p>
             )}
           </div>
         </div>
@@ -276,7 +276,7 @@ export function WorkOrderForm() {
                   value={formData.title}
                   onChange={handleChange}
                   disabled={isLoading}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-blue-50 disabled:cursor-not-allowed"
                   placeholder="请输入工单标题"
                 />
               </div>
@@ -292,7 +292,7 @@ export function WorkOrderForm() {
                   value={formData.priority}
                   onChange={handleChange}
                   disabled={isLoading}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-blue-50 disabled:cursor-not-allowed"
                 >
                   <option value="NORMAL">中</option>
                   <option value="URGENT">高</option>
@@ -311,7 +311,7 @@ export function WorkOrderForm() {
                   value={formData.reporterName}
                   onChange={handleChange}
                   disabled={isLoading}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-blue-50 disabled:cursor-not-allowed"
                   placeholder="报修人姓名"
                 />
               </div>
@@ -328,7 +328,7 @@ export function WorkOrderForm() {
                 value={formData.description}
                 onChange={handleChange}
                 disabled={isLoading}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-blue-50 disabled:cursor-not-allowed"
                 placeholder="请详细描述工单内容..."
               />
             </div>
@@ -352,7 +352,7 @@ export function WorkOrderForm() {
                 value={formData.assetId}
                 onChange={handleChange}
                 disabled={isLoading}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-blue-50 disabled:cursor-not-allowed"
                 placeholder="关联资产ID"
               />
             </div>
@@ -368,7 +368,7 @@ export function WorkOrderForm() {
                 value={formData.assetName}
                 onChange={handleChange}
                 disabled={isLoading}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-blue-50 disabled:cursor-not-allowed"
                 placeholder="资产名称"
               />
             </div>
@@ -384,7 +384,7 @@ export function WorkOrderForm() {
                 value={formData.assetCode}
                 onChange={handleChange}
                 disabled={isLoading}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-blue-50 disabled:cursor-not-allowed"
                 placeholder="资产编码"
               />
             </div>
@@ -400,7 +400,7 @@ export function WorkOrderForm() {
                 value={formData.deptName}
                 onChange={handleChange}
                 disabled={isLoading}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-blue-50 disabled:cursor-not-allowed"
                 placeholder="部门名称"
               />
             </div>
@@ -424,7 +424,7 @@ export function WorkOrderForm() {
                 value={formData.assigneeName}
                 onChange={handleChange}
                 disabled={isLoading}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-blue-50 disabled:cursor-not-allowed"
                 placeholder="执行人姓名"
               />
             </div>
@@ -442,7 +442,7 @@ export function WorkOrderForm() {
                 value={formData.estimatedCost}
                 onChange={handleChange}
                 disabled={isLoading}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-blue-50 disabled:cursor-not-allowed"
                 placeholder="0.00"
               />
             </div>
@@ -458,7 +458,7 @@ export function WorkOrderForm() {
                 value={formData.plannedStartDate}
                 onChange={handleChange}
                 disabled={isLoading}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-blue-50 disabled:cursor-not-allowed"
               />
             </div>
 
@@ -473,7 +473,7 @@ export function WorkOrderForm() {
                 value={formData.plannedEndDate}
                 onChange={handleChange}
                 disabled={isLoading}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-blue-50 disabled:cursor-not-allowed"
               />
             </div>
           </div>
@@ -485,7 +485,7 @@ export function WorkOrderForm() {
             type="button"
             onClick={() => navigate(-1)}
             disabled={isLoading}
-            className="px-6 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-6 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             取消
           </button>

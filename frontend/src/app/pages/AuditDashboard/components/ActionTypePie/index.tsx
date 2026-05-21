@@ -162,7 +162,7 @@ export const ActionTypePie: React.FC<ActionTypePieProps> = ({
           display: 'flex', 
           alignItems: 'center', 
           justifyContent: 'center',
-          background: '#fafafa',
+          background: '#f8fafc',
           borderRadius: 8,
           border: '1px solid #f0f0f0',
         }}
@@ -182,7 +182,7 @@ export const ActionTypePie: React.FC<ActionTypePieProps> = ({
           display: 'flex', 
           alignItems: 'center', 
           justifyContent: 'center',
-          background: '#fafafa',
+          background: '#f8fafc',
           borderRadius: 8,
           border: '1px solid #f0f0f0',
           color: '#8c8c8c',

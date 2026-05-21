@@ -190,9 +190,9 @@ export const AssetDetailPage: React.FC = () => {
     return (
       <div className="max-w-4xl mx-auto space-y-6 pb-12" data-testid="asset-detail-loading">
         <div className="flex items-center gap-4 mb-8">
-          <div className="w-10 h-10 bg-gray-100 rounded-lg animate-pulse" />
+          <div className="w-10 h-10 bg-blue-50 rounded-lg animate-pulse" />
           <div className="space-y-2">
-            <div className="h-6 w-56 bg-gray-100 rounded animate-pulse" />
+            <div className="h-6 w-56 bg-blue-50 rounded animate-pulse" />
             <div className="h-4 w-40 bg-gray-50 rounded animate-pulse" />
           </div>
         </div>
@@ -277,7 +277,7 @@ export const AssetDetailPage: React.FC = () => {
             <h2 className="text-2xl font-bold text-gray-900">
               {asset.assetName ?? `资产 #${assetId}`}
             </h2>
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-gray-400 mt-1">
               资产编号：{asset.assetNo ?? asset.assetCode ?? '-'}
             </p>
           </div>
@@ -302,7 +302,7 @@ export const AssetDetailPage: React.FC = () => {
         <CardContent>
           <div className="flex items-center justify-between mb-6">
             <div>
-              <p className="text-sm text-gray-500">资产状态</p>
+              <p className="text-sm text-gray-400">资产状态</p>
               <Badge
                 variant={terminalState ? 'destructive' : 'secondary'}
                 className="text-sm px-3 py-1"
@@ -315,39 +315,39 @@ export const AssetDetailPage: React.FC = () => {
 
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
-              <span className="text-gray-500">资产名称：</span>
+              <span className="text-gray-400">资产名称：</span>
               <span className="font-medium">{asset.assetName ?? '-'}</span>
             </div>
             <div>
-              <span className="text-gray-500">资产编号：</span>
+              <span className="text-gray-400">资产编号：</span>
               <span className="font-medium font-mono">{asset.assetNo ?? asset.assetCode ?? '-'}</span>
             </div>
             <div>
-              <span className="text-gray-500">分类：</span>
+              <span className="text-gray-400">分类：</span>
               <span className="font-medium">{asset.categoryName ?? (asset.categoryId != null ? String(asset.categoryId) : '-')}</span>
             </div>
             <div>
-              <span className="text-gray-500">位置：</span>
+              <span className="text-gray-400">位置：</span>
               <span className="font-medium">{asset.location ?? asset.locationName ?? '-'}</span>
             </div>
             <div>
-              <span className="text-gray-500">部门：</span>
+              <span className="text-gray-400">部门：</span>
               <span className="font-medium">{asset.departmentName ?? (asset.deptId != null ? String(asset.deptId) : '-')}</span>
             </div>
             <div>
-              <span className="text-gray-500">购置日期：</span>
+              <span className="text-gray-400">购置日期：</span>
               <span className="font-medium">{formatDate(asset.purchaseDate)}</span>
             </div>
             {(asset.originalValue ?? asset.purchasePrice) != null && (
               <div>
-                <span className="text-gray-500">采购价格：</span>
+                <span className="text-gray-400">采购价格：</span>
                 <span className="font-medium">
                   ¥{(asset.originalValue ?? asset.purchasePrice)!.toLocaleString('zh-CN', { minimumFractionDigits: 2 })}
                 </span>
               </div>
             )}
             <div>
-              <span className="text-gray-500">创建时间：</span>
+              <span className="text-gray-400">创建时间：</span>
               <span className="font-medium">{formatDate((asset.createTime ?? asset.createdAt) as string)}</span>
             </div>
           </div>
@@ -362,7 +362,7 @@ export const AssetDetailPage: React.FC = () => {
               <FileText className="w-5 h-5 text-orange-500" />
               <div>
                 <p className="font-medium text-sm">资产退役</p>
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-gray-400">
                   {terminalState
                     ? '该资产已处于终结状态，无法申请退役'
                     : '发起退役申请，提交审批流程'}

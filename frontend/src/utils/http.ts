@@ -1,88 +1,30 @@
+/**
+ * @file utils/http.ts
+ * @description 统一 HTTP 客户端 — 全项目唯一 Axios 实例
+ *
+ * 规则：
+ * - 所有 API 调用必须使用此实例，禁止在其他文件中 axios.create()
+ * - 禁止在此文件中定义业务类型（业务类型在 types/ 目录）
+ * - Token 从 localStorage 读取，key: 'auth_token'
+ * - 401 → 清除 token，跳转 /login
+ * - 响应拦截器直接返回 response.data（解包一层）
+ */
+
 import axios, {
-  AxiosInstance,
-  InternalAxiosRequestConfig,
-  AxiosResponse,
+  type AxiosInstance,
+  type InternalAxiosRequestConfig,
+  type AxiosResponse,
 } from 'axios';
 
-/**
- * 基础数据模型 - TypeScript Interfaces
- * 根据 SPEC Phase 3 第1阶段要求定义，支撑盘点任务列表、执行详情、差异汇总的数据流转。
- */
-
-/** 盘点任务 — 对应 ATB-01 表格列：任务名称 / 盘点范围 / 状态 / 创建时间 / 完成进度 */
-export interface ITask {
-  id: string;
-  name: string;
-  scope: string;
-  status: 'draft' | 'in_progress' | 'completed' | 'approved';
-  progress: number; // 0-100 完成进度百分比
-  createdAt: string; // 创建时间（ISO 格式）
-  creatorId: string;
-  locationIds: string[];
-  categoryIds?: string[];
-  startTime?: string;
-  endTime?: string;
-}
-
-/**
- * 盘点资产明细行 — 对应 ATB-04 表格可编辑行
- * inventoryStatus 为实盘状态，由前端 StatusDropdown 组件控制变更
- */
-export interface IAssetItem {
-  id: string;
-  assetCode: string;
-  name: string;
-  category: string;
-  currentLocation: string;
-  bookStatus: 'in_stock' | 'damaged' | 'lost'; // 账面状态
-  inventoryStatus: 'pending' | 'scanned' | 'surplus' | 'shortage'; // 实盘状态
-  remark?: string; // 备注列
-}
-
-/**
- * 盘点汇总统计 — 对应 ATB-03 顶部看板五个统计卡片
- * progressPercentage 可由前端根据 scannedCount / totalAssets 聚合计算
- */
-export interface IInventorySummary {
-  totalAssets: number; // 总资产数
-  scannedCount: number; // 已盘
-  unscannedCount: number; // 未盘
-  surplusCount: number; // 盘盈
-  shortageCount: number; // 盘亏
-  progressPercentage: number; // 进度百分比
-}
-
-/** 通用分页响应结构 */
-export interface IPaginatedResponse<T> {
-  data: T[];
-  total: number;
-}
-
-/** 批量状态更新请求体 — 对应 ATB-04 批量确认交互 */
-export interface IBatchStatusUpdate {
-  assetIds: string[];
-  inventoryStatus: IAssetItem['inventoryStatus'];
-  remark?: string;
-}
-
-/** 提交核准请求体 — 对应 ATB-05 一键提交核准 */
-export interface IApproveRequest {
-  taskId: string;
-  summary: IInventorySummary;
-}
-
-/**
- * Axios 实例配置与拦截器封装
- * - baseURL 读取环境变量，默认 /api 前缀
- * - 请求拦截器注入 Bearer Token
- * - 响应拦截器统一解包 data 并处理 401/5xx 错误
- */
 const http: AxiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || '/api',
   timeout: 15000,
+  headers: {
+    'Content-Type': 'application/json',
+  },
 });
 
-// 请求拦截器：注入认证 Token（符合 SPEC 权限控制规范）
+// ── 请求拦截器：注入 Bearer Token ────────────────────────────────────────────
 http.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     const token = localStorage.getItem('auth_token');
@@ -91,63 +33,30 @@ http.interceptors.request.use(
     }
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => Promise.reject(error),
 );
 
-// 响应拦截器：统一错误处理与数据解包，简化业务代码调用逻辑
+// ── 响应拦截器：解包 data，统一错误处理 ─────────────────────────────────────
 http.interceptors.response.use(
+  // 成功响应：直接返回 response.data（即 ApiResponse<T>）
   (response: AxiosResponse) => response.data,
   (error) => {
     const status = error.response?.status;
-    console.error(`[HTTP Error] ${status}:`, error.response?.data || error.message);
+    const message = error.response?.data?.message || error.message;
 
     if (status === 401) {
+      // Token 失效或未登录 → 清除本地状态，跳转登录页
       localStorage.removeItem('auth_token');
+      localStorage.removeItem('user_info');
       window.location.href = '/login';
-    } else if (status && status >= 500) {
-      console.error('Server error, please try again later.');
+    } else if (status === 403) {
+      console.warn('[HTTP 403] 无权限访问:', error.config?.url);
+    } else if (status >= 500) {
+      console.error('[HTTP 5xx] 服务端错误:', status, message);
     }
 
     return Promise.reject(error);
-  }
+  },
 );
-
-/**
- * API 请求函数封装 — SPEC 第1阶段「基础数据模型与 API 对接层」
- *
- * 覆盖：任务列表拉取、任务创建、资产明细获取（分页）、批量状态变更、盘点结果提交、核准提交
- */
-export const inventoryApi = {
-  /** 获取盘点任务列表（支持分页、状态筛选） */
-  getTasks: (params?: Record<string, unknown>) =>
-    http.get<IPaginatedResponse<ITask>>('/inventory/tasks', { params }),
-
-  /** 创建新盘点任务（前端不持久化主数据，必须走后端） */
-  createTask: (data: Partial<ITask>) =>
-    http.post<ITask>('/inventory/tasks', data),
-
-  /** 获取特定任务详情及汇总统计 */
-  getTaskDetails: (taskId: string) =>
-    http.get<{ task: ITask; summary: IInventorySummary }>(`/inventory/tasks/${taskId}`),
-
-  /**
-   * 获取盘点资产明细列表（支持分页参数，满足 SPEC 对虚拟滚动 / 分页加载的性能要求）
-   * 单次超过 200 条时前端应启用虚拟滚动
-   */
-  getAssetItems: (taskId: string, params?: Record<string, unknown>) =>
-    http.get<IPaginatedResponse<IAssetItem>>(`/inventory/tasks/${taskId}/assets`, { params }),
-
-  /** 批量更新资产实盘状态 — 对应 ATB-04 批量确认 */
-  batchUpdateStatus: (taskId: string, payload: IBatchStatusUpdate) =>
-    http.put<{ updated: number }>(`/inventory/tasks/${taskId}/assets/status`, payload),
-
-  /** 提交盘点结果（单条或多条资产确认） */
-  submitInventoryResult: (taskId: string, items: Partial<IAssetItem>[]) =>
-    http.post<ITask>(`/inventory/tasks/${taskId}/submit`, { items }),
-
-  /** 提交核准 — 对应 ATB-05 一键提交核准，触发 POST /api/inventory/approve */
-  submitApproval: (payload: IApproveRequest) =>
-    http.post<{ approved: boolean }>('/inventory/approve', payload),
-};
 
 export default http;

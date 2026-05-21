@@ -16,6 +16,7 @@
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router';
 import {
   Card,
   CardContent,
@@ -48,7 +49,6 @@ import {
 } from 'lucide-react';
 import {
   fetchDisposalList,
-  fetchDisposalDetail,
   approveDisposal,
   rejectDisposal,
   fetchDisposalStatistics,
@@ -162,14 +162,10 @@ export const AssetDisposalPage: React.FC = () => {
   // -- Statistics ----------------------------------------------------------
   const [stats, setStats] = useState<DisposalStatistics | null>(null);
 
-  // -- Detail modal --------------------------------------------------------
-  const [detailRecord, setDetailRecord] = useState<DisposalApplication | null>(null);
-  const [detailLoading, setDetailLoading] = useState(false);
-
-  // -- Approve / reject action state ---------------------------------------
   const [actionLoading, setActionLoading] = useState<number | null>(null);
   const [rejectingId, setRejectingId] = useState<number | null>(null);
   const [rejectReason, setRejectReason] = useState('');
+  const navigate = useNavigate();
 
   /**
    * Load disposal statistics summary.
@@ -230,18 +226,12 @@ export const AssetDisposalPage: React.FC = () => {
    *
    * @param app - The application to view
    */
-  const handleViewDetail = useCallback(async (app: DisposalApplication) => {
-    setDetailRecord(app);
-    setDetailLoading(true);
-    try {
-      const fresh = await fetchDisposalDetail(app.id);
-      setDetailRecord(fresh);
-    } catch {
-      // Use the list data as fallback
-    } finally {
-      setDetailLoading(false);
-    }
-  }, []);
+  const handleViewDetail = useCallback(
+    (app: DisposalApplication) => {
+      navigate(`/disposals/${app.id}`);
+    },
+    [navigate],
+  );
 
   /**
    * Handle approve action for a pending application.
@@ -317,9 +307,9 @@ export const AssetDisposalPage: React.FC = () => {
         data-testid="disposal-page-loading"
       >
         <div className="flex items-center gap-4 mb-8">
-          <div className="w-10 h-10 bg-gray-100 rounded-lg animate-pulse" />
+          <div className="w-10 h-10 bg-blue-50 rounded-lg animate-pulse" />
           <div className="space-y-2">
-            <div className="h-6 w-56 bg-gray-100 rounded animate-pulse" />
+            <div className="h-6 w-56 bg-blue-50 rounded animate-pulse" />
             <div className="h-4 w-40 bg-gray-50 rounded animate-pulse" />
           </div>
         </div>
@@ -367,7 +357,7 @@ export const AssetDisposalPage: React.FC = () => {
           </div>
           <div>
             <h2 className="text-2xl font-bold text-gray-900">资产处置管理</h2>
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-gray-400 mt-1">
               浏览所有处置申请、查看详情并审批或驳回处置流程
             </p>
           </div>
@@ -378,13 +368,13 @@ export const AssetDisposalPage: React.FC = () => {
       <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
         <Card>
           <CardContent className="p-4">
-            <p className="text-sm text-gray-500">全部</p>
+            <p className="text-sm text-gray-400">全部</p>
             <p className="text-xl font-bold">{stats?.total ?? total}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4">
-            <p className="text-sm text-gray-500">待审批</p>
+            <p className="text-sm text-gray-400">待审批</p>
             <p className="text-xl font-bold text-yellow-600">
               {stats?.pending ?? '-'}
             </p>
@@ -392,7 +382,7 @@ export const AssetDisposalPage: React.FC = () => {
         </Card>
         <Card>
           <CardContent className="p-4">
-            <p className="text-sm text-gray-500">已通过</p>
+            <p className="text-sm text-gray-400">已通过</p>
             <p className="text-xl font-bold text-green-600">
               {stats?.approved ?? '-'}
             </p>
@@ -400,7 +390,7 @@ export const AssetDisposalPage: React.FC = () => {
         </Card>
         <Card>
           <CardContent className="p-4">
-            <p className="text-sm text-gray-500">已完成</p>
+            <p className="text-sm text-gray-400">已完成</p>
             <p className="text-xl font-bold text-blue-600">
               {stats?.completed ?? '-'}
             </p>
@@ -408,7 +398,7 @@ export const AssetDisposalPage: React.FC = () => {
         </Card>
         <Card>
           <CardContent className="p-4">
-            <p className="text-sm text-gray-500">已驳回</p>
+            <p className="text-sm text-gray-400">已驳回</p>
             <p className="text-xl font-bold text-red-600">
               {stats?.rejected ?? '-'}
             </p>
@@ -416,7 +406,7 @@ export const AssetDisposalPage: React.FC = () => {
         </Card>
         <Card>
           <CardContent className="p-4">
-            <p className="text-sm text-gray-500">已取消</p>
+            <p className="text-sm text-gray-400">已取消</p>
             <p className="text-xl font-bold text-gray-400">
               {stats?.cancelled ?? '-'}
             </p>
@@ -524,7 +514,7 @@ export const AssetDisposalPage: React.FC = () => {
                         >
                           {record.reason ?? '-'}
                         </TableCell>
-                        <TableCell className="text-sm text-gray-500">
+                        <TableCell className="text-sm text-gray-400">
                           {formatDateTime(record.createTime)}
                         </TableCell>
                         <TableCell>
@@ -643,7 +633,7 @@ export const AssetDisposalPage: React.FC = () => {
           {/* Pagination controls */}
           {total > PAGE_SIZE && (
             <div className="flex items-center justify-between mt-4 pt-4 border-t">
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-gray-400">
                 共 {total} 条记录，第 {page} / {totalPages} 页
               </p>
               <div className="flex items-center gap-2">
@@ -671,170 +661,6 @@ export const AssetDisposalPage: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* Detail modal */}
-      {detailRecord && (
-        <div
-          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
-          onClick={() => setDetailRecord(null)}
-          data-testid="disposal-detail-modal"
-        >
-          <div
-            className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Modal header */}
-            <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900">
-                处置申请详情
-              </h3>
-              <button
-                onClick={() => setDetailRecord(null)}
-                className="text-gray-400 hover:text-gray-600 text-xl"
-              >
-                &times;
-              </button>
-            </div>
-
-            {/* Modal body */}
-            <div className="p-6 space-y-4">
-              {detailLoading ? (
-                <div className="space-y-3">
-                  {[...Array(6)].map((_, i) => (
-                    <Skeleton key={i} className="h-6 w-full" />
-                  ))}
-                </div>
-              ) : (
-                <>
-                  {/* Status badge */}
-                  <div className="flex items-center gap-3">
-                    <Badge
-                      variant={STATUS_BADGE_VARIANT[detailRecord.status] ?? 'outline'}
-                      className="text-sm px-3 py-1"
-                    >
-                      {STATUS_LABELS[detailRecord.status] ?? detailRecord.status}
-                    </Badge>
-                    <Badge variant="secondary" className="text-sm">
-                      {TYPE_LABELS[detailRecord.retirementType ?? ''] ?? detailRecord.retirementType ?? '-'}
-                    </Badge>
-                  </div>
-
-                  {/* Detail fields */}
-                  <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div>
-                      <span className="text-gray-500">申请编号：</span>
-                      <span className="font-medium">
-                        {detailRecord.applicationNo ?? detailRecord.id}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-gray-500">资产名称：</span>
-                      <span className="font-medium">
-                        {detailRecord.assetName ?? '-'}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-gray-500">资产编号：</span>
-                      <span className="font-medium font-mono">
-                        {detailRecord.assetCode ?? detailRecord.assetId}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-gray-500">申请人：</span>
-                      <span className="font-medium">
-                        {detailRecord.applicantName ?? '-'}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-gray-500">所属部门：</span>
-                      <span className="font-medium">
-                        {detailRecord.deptName ?? '-'}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-gray-500">申请时间：</span>
-                      <span className="font-medium">
-                        {formatDateTime(detailRecord.createTime)}
-                      </span>
-                    </div>
-                    {detailRecord.estimatedResidualValue != null && (
-                      <div>
-                        <span className="text-gray-500">预估残值：</span>
-                        <span className="font-medium">
-                          ¥{detailRecord.estimatedResidualValue.toLocaleString('zh-CN', { minimumFractionDigits: 2 })}
-                        </span>
-                      </div>
-                    )}
-                    {detailRecord.totalApprovalSteps != null && (
-                      <div>
-                        <span className="text-gray-500">审批进度：</span>
-                        <span className="font-medium">
-                          {detailRecord.currentApprovalStep ?? 0} / {detailRecord.totalApprovalSteps}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Reason */}
-                  {detailRecord.reason && (
-                    <div className="text-sm">
-                      <span className="text-gray-500">处置原因：</span>
-                      <p className="mt-1 p-3 bg-gray-50 rounded-md text-gray-700">
-                        {detailRecord.reason}
-                      </p>
-                    </div>
-                  )}
-
-                  {/* Remark */}
-                  {detailRecord.remark && (
-                    <div className="text-sm">
-                      <span className="text-gray-500">备注：</span>
-                      <p className="mt-1 p-3 bg-gray-50 rounded-md text-gray-700">
-                        {detailRecord.remark}
-                      </p>
-                    </div>
-                  )}
-
-                  {/* Update time */}
-                  {detailRecord.updateTime && (
-                    <div className="text-xs text-gray-400 text-right">
-                      最后更新：{formatDateTime(detailRecord.updateTime)}
-                    </div>
-                  )}
-
-                  {/* Action buttons in modal */}
-                  {(detailRecord.status === 'PENDING' || detailRecord.status === 'APPROVING') && (
-                    <div className="flex items-center justify-end gap-3 pt-4 border-t">
-                      <Button
-                        variant="outline"
-                        className="text-green-600 border-green-300 hover:bg-green-50"
-                        disabled={actionLoading === detailRecord.id}
-                        onClick={async () => {
-                          await handleApprove(detailRecord.id);
-                          setDetailRecord(null);
-                        }}
-                      >
-                        <CheckCircle className="w-4 h-4 mr-1" />
-                        审批通过
-                      </Button>
-                      <Button
-                        variant="destructive"
-                        disabled={actionLoading === detailRecord.id}
-                        onClick={() => {
-                          setRejectingId(detailRecord.id);
-                          setDetailRecord(null);
-                        }}
-                      >
-                        <XCircle className="w-4 h-4 mr-1" />
-                        驳回
-                      </Button>
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

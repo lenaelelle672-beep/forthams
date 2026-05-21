@@ -372,7 +372,7 @@ export function Dashboard() {
       {/* 页面标题 */}
       <div>
         <h2 className="text-2xl font-semibold text-gray-900">仪表板</h2>
-        <p className="text-gray-600 mt-1">欢迎回来，这是您的资产管理概览</p>
+        <p className="text-gray-500 mt-1">欢迎回来，这是您的资产管理概览</p>
       </div>
 
       {loading ? (
@@ -393,9 +393,9 @@ export function Dashboard() {
           <div key={stat.name} className="bg-white rounded-lg border border-gray-200 p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">{stat.name}</p>
+                <p className="text-sm text-gray-500">{stat.name}</p>
                 <p className="text-3xl font-semibold text-gray-900 mt-2">{stat.value}</p>
-                <p className="mt-2 text-sm text-gray-500">{stat.detail}</p>
+                <p className="mt-2 text-sm text-gray-400">{stat.detail}</p>
               </div>
               <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center">
                 <stat.icon className="w-6 h-6 text-blue-600" />
@@ -444,7 +444,7 @@ export function Dashboard() {
               </LineChart>
             </ResponsiveContainer>
           ) : (
-            <div className="flex h-[300px] items-center justify-center text-sm text-gray-500">
+            <div className="flex h-[300px] items-center justify-center text-sm text-gray-400">
               {loading ? "正在加载趋势数据..." : "暂无趋势数据"}
             </div>
           )}
@@ -485,7 +485,7 @@ export function Dashboard() {
                 </PieChart>
               </ResponsiveContainer>
             ) : (
-              <div className="flex h-[300px] items-center justify-center text-sm text-gray-500">
+              <div className="flex h-[300px] items-center justify-center text-sm text-gray-400">
                 {loading ? "正在加载分布数据..." : "暂无分布数据"}
               </div>
             )}
@@ -499,7 +499,7 @@ export function Dashboard() {
           <h3 className="text-lg font-semibold text-gray-900 mb-4">最近动态</h3>
           <div className="space-y-4">
             {recentActivities.length ? recentActivities.map((activity) => (
-              <div key={activity.id} className="flex gap-3 pb-4 border-b border-gray-100 last:border-0">
+              <div key={activity.id} className="flex gap-3 pb-4 border-b border-gray-200 last:border-0">
                 <div className={`w-2 h-2 rounded-full mt-2 flex-shrink-0 ${
                   activity.status === 'success' ? 'bg-green-500' :
                   activity.status === 'warning' ? 'bg-yellow-500' :
@@ -507,12 +507,12 @@ export function Dashboard() {
                 }`}></div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-gray-900">{activity.title}</p>
-                  <p className="text-sm text-gray-600 mt-1">{activity.detail}</p>
-                  <p className="text-xs text-gray-500 mt-1">{activity.time}</p>
+                  <p className="text-sm text-gray-500 mt-1">{activity.detail}</p>
+                  <p className="text-xs text-gray-400 mt-1">{activity.time}</p>
                 </div>
               </div>
             )) : (
-              <div className="rounded-lg border border-dashed border-gray-200 p-4 text-sm text-gray-500">
+              <div className="rounded-lg border border-dashed border-gray-200 p-4 text-sm text-gray-400">
                 暂无最近动态；当前仅展示审批服务返回的真实待办记录。
               </div>
             )}
@@ -536,24 +536,24 @@ export function Dashboard() {
                   <span className="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded">
                     {getApprovalLabel(approval, ["type", "processType", "changeType"], "审批")}
                   </span>
-                  <span className="text-xs text-gray-500">{formatApprovalDate(approval.createTime ?? approval.createdAt ?? approval.applyDate)}</span>
+                  <span className="text-xs text-gray-400">{formatApprovalDate(approval.createTime ?? approval.createdAt ?? approval.applyDate)}</span>
                 </div>
                 <p className="text-sm font-medium text-gray-900">{getApprovalLabel(approval, ["assetName", "asset", "title", "description"], "未提供资产名称")}</p>
                 <div className="flex items-center justify-between mt-2">
-                  <span className="text-sm text-gray-600">申请人: {getApprovalLabel(approval, ["applicant", "applicantName", "operatorId", "userId"], "-")}</span>
+                  <span className="text-sm text-gray-500">申请人: {getApprovalLabel(approval, ["applicant", "applicantName", "operatorId", "userId"], "-")}</span>
                   <span className="text-sm font-medium text-gray-900">{getApprovalLabel(approval, ["amount", "value", "cost"], "")}</span>
                 </div>
                 <div className="flex gap-2 mt-3">
                   <button disabled={processingApprovalId === approval.id} onClick={() => handleDashApprove(approval.id, true)} className="flex-1 px-3 py-1.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-60 rounded transition-colors">
                     {processingApprovalId === approval.id ? "处理中..." : "批准"}
                   </button>
-                  <button disabled={processingApprovalId === approval.id} onClick={() => handleDashApprove(approval.id, false)} className="flex-1 px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 disabled:opacity-60 rounded transition-colors">
+                  <button disabled={processingApprovalId === approval.id} onClick={() => handleDashApprove(approval.id, false)} className="flex-1 px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 disabled:opacity-60 rounded transition-colors">
                     驳回
                   </button>
                 </div>
               </div>
             )) : (
-              <div className="rounded-lg border border-dashed border-gray-200 p-4 text-sm text-gray-500">
+              <div className="rounded-lg border border-dashed border-gray-200 p-4 text-sm text-gray-400">
                 暂无待审批事项。
               </div>
             )}

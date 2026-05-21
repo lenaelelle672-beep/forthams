@@ -26,7 +26,7 @@
 /* ──────────────── Header ──────────────── */
 
 .header {
-  background: #fff;
+  background: #ffffff;
   padding: 16px 24px;
   border-radius: 8px;
   display: flex;
@@ -59,7 +59,7 @@
 
 /* Progress bar section */
 .progressSection {
-  background: #fff;
+  background: #ffffff;
   padding: 20px 24px;
   border-radius: 8px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03),
@@ -80,7 +80,7 @@
 }
 
 .statCard {
-  background: #fff;
+  background: #ffffff;
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03),
@@ -124,7 +124,7 @@
 /* ──────────────── Asset Table Section ──────────────── */
 
 .tableContainer {
-  background: #fff;
+  background: #ffffff;
   border-radius: 8px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03),
     0 1px 6px rgba(0, 0, 0, 0.08);
@@ -133,7 +133,7 @@
 
 .tableHeader {
   padding: 16px 24px;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid #f8fafc;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -147,7 +147,7 @@
 
 /* Row highlight when status changes to "已盘" (ATB-04) */
 .rowHighlighted {
-  background-color: #f6ffed !important;
+  background-color: #1a2e1a !important;
   transition: background-color 0.3s ease;
 }
 
@@ -160,7 +160,7 @@
 
 .statusChecked {
   color: #52c41a;
-  background: #f6ffed;
+  background: #1a2e1a;
   padding: 2px 8px;
   border-radius: 4px;
   font-weight: 500;
@@ -169,7 +169,7 @@
 
 .statusUnchecked {
   color: #8c8c8c;
-  background: #fafafa;
+  background: #f8fafc;
   padding: 2px 8px;
   border-radius: 4px;
   font-weight: 500;
@@ -197,7 +197,7 @@
 /* ──────────────── Difference Summary Panel (ATB-05) ──────────────── */
 
 .diffPanel {
-  background: #fff;
+  background: #ffffff;
   border-radius: 8px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03),
     0 1px 6px rgba(0, 0, 0, 0.08);
@@ -206,7 +206,7 @@
 
 .diffPanelHeader {
   padding: 16px 24px;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid #f8fafc;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -230,8 +230,8 @@
   left: 0;
   right: 0;
   height: 64px;
-  background: #fff;
-  border-top: 1px solid #f0f0f0;
+  background: #ffffff;
+  border-top: 1px solid #f8fafc;
   display: flex;
   align-items: center;
   justify-content: space-between;

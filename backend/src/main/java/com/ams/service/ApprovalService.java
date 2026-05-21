@@ -128,6 +128,9 @@ public class ApprovalService {
         Map<String, Object> result = new HashMap<>();
         result.put("process", process);
         result.put("records", records);
+        WorkflowDefinitionService.WorkflowRuntimePlan workflowPlan = safeResolveWorkflowRuntimePlan(process);
+        result.put("workflowRuntimePath", workflowPlan == null ? List.of() : toWorkflowRuntimePath(workflowPlan));
+        result.put("workflowResultAction", workflowPlan == null ? "" : workflowPlan.resultAction());
         return result;
     }
 
@@ -418,6 +421,31 @@ public class ApprovalService {
         return workflowDefinitionService.requirePublishedRuntimePlan(process.getProcessType(), businessPayload);
     }
 
+    private WorkflowDefinitionService.WorkflowRuntimePlan safeResolveWorkflowRuntimePlan(ApprovalProcess process) {
+        try {
+            return resolveWorkflowRuntimePlan(process);
+        } catch (BusinessException ex) {
+            return null;
+        }
+    }
+
+    private List<Map<String, Object>> toWorkflowRuntimePath(WorkflowDefinitionService.WorkflowRuntimePlan workflowPlan) {
+        return workflowPlan.approvalNodes().stream()
+                .map(node -> {
+                    Map<String, Object> item = new HashMap<>();
+                    item.put("stepNo", node.stepNo());
+                    item.put("nodeId", node.nodeId());
+                    item.put("nodeCode", node.nodeCode());
+                    item.put("label", node.label());
+                    item.put("approverRole", node.approverRole());
+                    item.put("approvalMode", node.approvalMode());
+                    item.put("approverType", node.approverType());
+                    item.put("approverId", node.approverId());
+                    return item;
+                })
+                .toList();
+    }
+
     private int resolveFinalStep(ApprovalProcess process) {
         return resolveFinalStep(process, resolveWorkflowRuntimePlan(process));
     }
@@ -471,6 +499,10 @@ public class ApprovalService {
         if (node == null || approverId == null) {
             return true;
         }
+        if ("user".equals(node.approverType())) {
+            Long configuredApproverId = parseLong(node.approverId(), null);
+            return configuredApproverId != null && configuredApproverId.equals(approverId);
+        }
         if (node.approverRole() == null || node.approverRole().isBlank()) {
             return true;
         }
@@ -483,6 +515,10 @@ public class ApprovalService {
                                            Long approverId) {
         if (node == null || !"all".equals(node.approvalMode())) {
             return true;
+        }
+        if ("user".equals(node.approverType())) {
+            Long configuredApproverId = parseLong(node.approverId(), null);
+            return configuredApproverId != null && configuredApproverId.equals(approverId);
         }
 
         List<Long> requiredApproverIds = resolveRoleApproverIds(node.approverRole());
@@ -517,6 +553,16 @@ public class ApprovalService {
 
     private void ensureWorkflowApproverAllowed(WorkflowDefinitionService.WorkflowApprovalNode node, Long approverId) {
         if (node == null || approverId == null) {
+            return;
+        }
+        if ("user".equals(node.approverType())) {
+            Long configuredApproverId = parseLong(node.approverId(), null);
+            if (configuredApproverId == null) {
+                throw new BusinessException("节点指定审批人无效");
+            }
+            if (!configuredApproverId.equals(approverId)) {
+                throw new BusinessException("当前用户不是节点指定审批人");
+            }
             return;
         }
         if (node.approverRole() == null || node.approverRole().isBlank()) {
