@@ -33,7 +33,6 @@ vi.mock('../../src/utils/http', () => ({
 }));
 
 import http from '../../src/utils/http';
-import type { AxiosResponse } from 'axios';
 import * as inventoryApi from '../../src/api/inventory';
 
 // Typed mock references
@@ -45,16 +44,19 @@ const mockedPatch = vi.mocked(http.patch);
 // Helpers
 // ---------------------------------------------------------------------------
 
-/** Shorthand to build a fake AxiosResponse whose `.data` is the given value. */
-function axiosOk<T>(data: T): AxiosResponse<T> {
-  return { data, status: 200, statusText: 'OK', headers: {}, config: {} as any };
+/**
+ * Returns raw data, matching what utils/http.ts interceptor does
+ * (response interceptor returns response.data directly).
+ */
+function axiosOk<T>(data: T): T {
+  return data;
 }
 
 // ---------------------------------------------------------------------------
 // Constants
 // ---------------------------------------------------------------------------
 
-const API_BASE = '/api/v1/inventory/tasks';
+const API_BASE = '/inventory/tasks';
 
 // ---------------------------------------------------------------------------
 // Tests
@@ -287,7 +289,7 @@ describe('inventoryApi', () => {
 
       mockedPatch.mockResolvedValueOnce(axiosOk(updated));
 
-      const result = await inventoryApi.updateTaskStatus('task-001', 'in_progress');
+      const result = await inventoryApi.updateTaskStatus('task-001', { status: 'in_progress' });
 
       expect(result.status).toBe('in_progress');
       expect(mockedPatch).toHaveBeenCalledWith(`${API_BASE}/task-001/status`, {
@@ -303,7 +305,7 @@ describe('inventoryApi', () => {
 
       mockedPatch.mockResolvedValueOnce(axiosOk(updated));
 
-      const result = await inventoryApi.updateTaskStatus('task-001', 'completed');
+      const result = await inventoryApi.updateTaskStatus('task-001', { status: 'completed' });
 
       expect(result.status).toBe('completed');
       expect(mockedPatch).toHaveBeenCalledWith(`${API_BASE}/task-001/status`, {
@@ -345,7 +347,7 @@ describe('inventoryApi', () => {
 
       mockedGet.mockResolvedValueOnce(axiosOk(mockAssets));
 
-      const result = await inventoryApi.getInventoryAssets('task-001', {
+      const result = await inventoryApi.getTaskAssets('task-001', {
         page: 1,
         pageSize: 20,
       });
@@ -361,7 +363,7 @@ describe('inventoryApi', () => {
         axiosOk({ data: [], total: 0, page: 1, pageSize: 20 }),
       );
 
-      await inventoryApi.getInventoryAssets('task-001', {
+      await inventoryApi.getTaskAssets('task-001', {
         page: 1,
         pageSize: 20,
         confirmed: false,
@@ -598,7 +600,7 @@ describe('inventoryApi', () => {
 
       mockedGet.mockResolvedValueOnce(axiosOk(mockSummary));
 
-      const result = await inventoryApi.getInventorySummary('task-001');
+      const result = await inventoryApi.getTaskSummary('task-001');
 
       expect(result).toEqual(mockSummary);
       expect(result.surplusAssets).toBe(2);
@@ -622,7 +624,7 @@ describe('inventoryApi', () => {
 
       mockedGet.mockResolvedValueOnce(axiosOk(mockSummary));
 
-      const result = await inventoryApi.getInventorySummary('task-002');
+      const result = await inventoryApi.getTaskSummary('task-002');
 
       expect(result.surplusAssets).toBe(0);
       expect(result.deficitAssets).toBe(0);
@@ -643,7 +645,7 @@ describe('inventoryApi', () => {
 
       mockedPost.mockResolvedValueOnce(axiosOk(submitted));
 
-      const result = await inventoryApi.submitForApproval('task-001');
+      const result = await inventoryApi.submitTask('task-001');
 
       expect(result.status).toBe('submitted');
       expect(mockedPost).toHaveBeenCalledWith(`${API_BASE}/task-001/submit`);
@@ -655,7 +657,7 @@ describe('inventoryApi', () => {
       );
 
       await expect(
-        inventoryApi.submitForApproval('task-draft'),
+        inventoryApi.submitTask('task-draft'),
       ).rejects.toThrow('Task must be completed before submission');
     });
   });
@@ -787,7 +789,7 @@ describe('inventoryApi', () => {
           axiosOk({ taskId: 't1', status }),
         );
 
-        const result = await inventoryApi.updateTaskStatus('t1', status);
+        const result = await inventoryApi.updateTaskStatus('t1', { status });
 
         expect(result.status).toBe(status);
         expect(mockedPatch).toHaveBeenCalledWith(`${API_BASE}/t1/status`, {
