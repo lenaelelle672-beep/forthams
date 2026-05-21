@@ -1,75 +1,25 @@
 import { useParams, useNavigate } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, Undo2, ArrowRight, Info, MapPin, User, Lightbulb } from 'lucide-react';
+import { ArrowLeft, Undo2, Info, MapPin, User, Lightbulb } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
+import { Card, CardContent } from '@/components/ui/Card';
 import { PageHeader } from '@/components/ui/PageHeader';
+import { getDisposalDetail, type DisposalType, type DisposalStatus } from '@/api/disposal';
 
-interface DisposalAsset {
-  assetNo: string;
-  assetName: string;
-  category: string;
-  brandModel: string;
-  originalValue: number;
-  netValue: number;
-  disposalStatus: string;
-}
+/** 处置类型中文映射 */
+const DISPOSAL_TYPE_LABEL: Record<DisposalType, string> = {
+  TRANSFER: '调拨',
+  CLEARANCE: '清退',
+  SCRAP: '报废',
+};
 
-interface ApprovalStep {
-  label: string;
-  time: string;
-  operator: string;
-  comment?: string;
-  status: 'done' | 'active' | 'pending';
-}
-
-interface DisposalDetail {
-  disposalNo: string;
-  disposalType: string;
-  applyDate: string;
-  applicant: string;
-  currentStatus: string;
-  createdTime: string;
-  assets: DisposalAsset[];
-  transferTarget: string;
-  custodian: string;
-  reason: string;
-  approvalSteps: ApprovalStep[];
-  lastUpdated: string;
-  overallStatus: string;
-}
-
-async function fetchDisposalDetail(id: string): Promise<DisposalDetail> {
-  // TODO: Replace with actual API call — GET /api/disposals/:id
-  return {
-    disposalNo: `DISP-2024-${String(Number(id)).padStart(4, '0')}`,
-    disposalType: '调拨',
-    applyDate: '2024-05-20',
-    applicant: '张三',
-    currentStatus: '财务审批中',
-    createdTime: '2024-05-20 09:30',
-    assets: [
-      { assetNo: 'AST-9921', assetName: 'Precision Lathe X1', category: '生产设备', brandModel: 'Siemens S2000', originalValue: 125000, netValue: 45000, disposalStatus: '待移交' },
-      { assetNo: 'AST-4402', assetName: 'Server Cluster', category: 'IT基础设施', brandModel: 'Dell PowerEdge R740', originalValue: 88000, netValue: 22000, disposalStatus: '待移交' },
-      { assetNo: 'AST-1088', assetName: 'Workstation Pro', category: '办公设备', brandModel: 'HP Z6 G4', originalValue: 12500, netValue: 5200, disposalStatus: '待移交' },
-    ],
-    transferTarget: '研发中心 (上海分公司)',
-    custodian: '赵六',
-    reason: '资源优化：分公司研发项目启动，总部相关闲置生产及计算设备调至分公司用于初期测试与生产环境搭建。',
-    approvalSteps: [
-      { label: '申请提交', time: '2024-05-20 09:30', operator: '张三', comment: '资产已达使用年限，申请调拨至分公司。', status: 'done' },
-      { label: '部门审批', time: '2024-05-20 11:20', operator: '李四 (部门经理)', comment: '审批通过，请财务核算价值。', status: 'done' },
-      { label: '财务审批', time: '', operator: '王五 (财务主管)', status: 'active' },
-      { label: '执行完成', time: '', operator: '', status: 'pending' },
-    ],
-    lastUpdated: '2024-05-20 11:20:45',
-    overallStatus: '待审批',
-  };
-}
-
-function formatCurrency(value: number) {
-  return value.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-}
+/** 处置状态中文映射 */
+const STATUS_LABEL: Record<DisposalStatus, string> = {
+  PENDING: '待审批',
+  APPROVED: '已审批',
+  REJECTED: '已拒绝',
+  COMPLETED: '已完成',
+};
 
 function StatusBadge({ status }: { status: string }) {
   if (status === '待审批') {
@@ -96,7 +46,7 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
-function ApprovalTimeline({ steps }: { steps: ApprovalStep[] }) {
+function ApprovalTimeline({ steps }: { steps: { label: string; time: string; operator: string; comment?: string; status: 'done' | 'active' | 'pending' }[] }) {
   return (
     <div className="relative space-y-8 before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-[2px] before:bg-[#c2c6d5]">
       {steps.map((step) => (
@@ -145,13 +95,46 @@ function ApprovalTimeline({ steps }: { steps: ApprovalStep[] }) {
   );
 }
 
+/**
+ * 根据处置状态推导审批步骤时间线
+ */
+function buildApprovalSteps(status: DisposalStatus) {
+  const steps = [
+    { label: '申请提交', time: '', operator: '', status: 'pending' as const },
+    { label: '部门审批', time: '', operator: '', status: 'pending' as const },
+    { label: '财务审批', time: '', operator: '', status: 'pending' as const },
+    { label: '执行完成', time: '', operator: '', status: 'pending' as const },
+  ];
+
+  if (status === 'PENDING') {
+    steps[0].status = 'done';
+    steps[1].status = 'active';
+  } else if (status === 'APPROVED') {
+    steps[0].status = 'done';
+    steps[1].status = 'done';
+    steps[2].status = 'done';
+    steps[3].status = 'active';
+  } else if (status === 'COMPLETED') {
+    steps.forEach((s) => { s.status = 'done'; });
+  } else if (status === 'REJECTED') {
+    steps[0].status = 'done';
+    steps[1].status = 'done';
+    steps[2].status = 'done';
+  }
+
+  return steps;
+}
+
 export default function DisposalDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
   const { data: detail, isLoading, isError } = useQuery({
     queryKey: ['disposal', id],
-    queryFn: () => fetchDisposalDetail(id!),
+    queryFn: async () => {
+      const res = await getDisposalDetail(Number(id));
+      return res.data.data;
+    },
     enabled: !!id,
   });
 
@@ -179,6 +162,10 @@ export default function DisposalDetailPage() {
     );
   }
 
+  const statusLabel = STATUS_LABEL[detail.status] ?? detail.status;
+  const typeLabel = DISPOSAL_TYPE_LABEL[detail.type] ?? detail.type;
+  const approvalSteps = buildApprovalSteps(detail.status);
+
   return (
     <div className="p-6 min-h-screen pb-24">
       <PageHeader
@@ -199,7 +186,7 @@ export default function DisposalDetailPage() {
           </button>
           <div className="flex items-baseline gap-3">
             <h2 className="text-2xl font-bold text-[#161c27] leading-8">资产处置详情</h2>
-            <StatusBadge status={detail.overallStatus} />
+            <StatusBadge status={statusLabel} />
           </div>
         </div>
       </div>
@@ -211,69 +198,30 @@ export default function DisposalDetailPage() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="space-y-1">
                   <p className="text-[10px] text-[#424753] uppercase tracking-wider font-semibold">处置编号</p>
-                  <p className="text-sm font-semibold text-[#161c27]">{detail.disposalNo}</p>
+                  <p className="text-sm font-semibold text-[#161c27]">DISP-{detail.id}</p>
                 </div>
                 <div className="space-y-1">
                   <p className="text-[10px] text-[#424753] uppercase tracking-wider font-semibold">处置类型</p>
-                  <span className="px-2 py-0.5 bg-[#d4e0f9] text-[#38485d] text-xs rounded border border-[#38485d]/10">{detail.disposalType}</span>
+                  <span className="px-2 py-0.5 bg-[#d4e0f9] text-[#38485d] text-xs rounded border border-[#38485d]/10">{typeLabel}</span>
                 </div>
                 <div className="space-y-1">
                   <p className="text-[10px] text-[#424753] uppercase tracking-wider font-semibold">申请日期</p>
-                  <p className="text-sm font-semibold text-[#161c27]">{detail.applyDate}</p>
+                  <p className="text-sm font-semibold text-[#161c27]">{detail.createdAt}</p>
                 </div>
                 <div className="space-y-1">
                   <p className="text-[10px] text-[#424753] uppercase tracking-wider font-semibold">申请人</p>
-                  <p className="text-sm font-semibold text-[#161c27]">{detail.applicant}</p>
+                  <p className="text-sm font-semibold text-[#161c27]">{detail.applicantName ?? '-'}</p>
                 </div>
                 <div className="space-y-1">
                   <p className="text-[10px] text-[#424753] uppercase tracking-wider font-semibold">当前状态</p>
-                  <p className="text-sm font-semibold text-[#2563eb]">{detail.currentStatus}</p>
+                  <p className="text-sm font-semibold text-[#2563eb]">{statusLabel}</p>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-[10px] text-[#424753] uppercase tracking-wider font-semibold">创建时间</p>
-                  <p className="text-sm font-semibold text-[#161c27]">{detail.createdTime}</p>
+                  <p className="text-[10px] text-[#424753] uppercase tracking-wider font-semibold">资产编号</p>
+                  <p className="text-sm font-semibold text-[#161c27]">{detail.assetNo ?? '-'}</p>
                 </div>
               </div>
             </CardContent>
-          </Card>
-
-          <Card className="overflow-hidden">
-            <CardHeader className="bg-[#f1f3ff]/30">
-              <CardTitle className="text-[#004191]">处置资产列表</CardTitle>
-              <span className="text-[10px] text-[#424753] uppercase tracking-wider font-semibold">共 {detail.assets.length} 项资产</span>
-            </CardHeader>
-            <div className="overflow-x-auto">
-              <table className="w-full text-left">
-                <thead>
-                  <tr className="bg-[#f1f3ff] text-[10px] text-[#424753] uppercase tracking-wider">
-                    <th className="px-6 py-3 font-semibold">资产编号</th>
-                    <th className="px-6 py-3 font-semibold">资产名称</th>
-                    <th className="px-6 py-3 font-semibold">分类</th>
-                    <th className="px-6 py-3 font-semibold">品牌/型号</th>
-                    <th className="px-6 py-3 font-semibold text-right">原值 (¥)</th>
-                    <th className="px-6 py-3 font-semibold text-right">净值 (¥)</th>
-                    <th className="px-6 py-3 font-semibold text-center">处置状态</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-[#e5e7eb]">
-                  {detail.assets.map((asset) => (
-                    <tr key={asset.assetNo} className="hover:bg-[#f1f3ff]/50 transition-colors">
-                      <td className="px-6 py-4 text-sm font-semibold text-[#004191]">{asset.assetNo}</td>
-                      <td className="px-6 py-4 text-sm">{asset.assetName}</td>
-                      <td className="px-6 py-4 text-sm">{asset.category}</td>
-                      <td className="px-6 py-4 text-sm text-[#424753]">{asset.brandModel}</td>
-                      <td className="px-6 py-4 text-sm text-right">{formatCurrency(asset.originalValue)}</td>
-                      <td className="px-6 py-4 text-sm text-right">{formatCurrency(asset.netValue)}</td>
-                      <td className="px-6 py-4 text-center">
-                        <span className="px-2 py-0.5 bg-[#dbeafe] text-[#2563eb] text-xs rounded border border-[#2563eb]/10">
-                          {asset.disposalStatus}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
           </Card>
 
           <Card>
@@ -286,22 +234,22 @@ export default function DisposalDetailPage() {
                 <div className="flex items-start p-4 bg-[#f1f3ff]/20 rounded-lg">
                   <MapPin className="w-5 h-5 text-[#004191] mr-4 mt-0.5 flex-shrink-0" />
                   <div>
-                    <p className="text-[10px] text-[#424753] uppercase tracking-wider font-semibold">调拨目标</p>
-                    <p className="text-sm font-semibold">{detail.transferTarget}</p>
+                    <p className="text-[10px] text-[#424753] uppercase tracking-wider font-semibold">处置类型</p>
+                    <p className="text-sm font-semibold">{typeLabel}</p>
                   </div>
                 </div>
                 <div className="flex items-start p-4 bg-[#f1f3ff]/20 rounded-lg">
                   <User className="w-5 h-5 text-[#004191] mr-4 mt-0.5 flex-shrink-0" />
                   <div>
-                    <p className="text-[10px] text-[#424753] uppercase tracking-wider font-semibold">资产保管人</p>
-                    <p className="text-sm font-semibold">{detail.custodian}</p>
+                    <p className="text-[10px] text-[#424753] uppercase tracking-wider font-semibold">申请人</p>
+                    <p className="text-sm font-semibold">{detail.applicantName ?? '-'}</p>
                   </div>
                 </div>
                 <div className="col-span-full flex items-start p-4 bg-[#f1f3ff]/20 rounded-lg">
                   <Lightbulb className="w-5 h-5 text-[#004191] mr-4 mt-0.5 flex-shrink-0" />
                   <div>
-                    <p className="text-[10px] text-[#424753] uppercase tracking-wider font-semibold">调拨原因</p>
-                    <p className="text-sm font-semibold">{detail.reason}</p>
+                    <p className="text-[10px] text-[#424753] uppercase tracking-wider font-semibold">处置原因</p>
+                    <p className="text-sm font-semibold">{detail.reason ?? '-'}</p>
                   </div>
                 </div>
               </div>
@@ -313,7 +261,7 @@ export default function DisposalDetailPage() {
           <Card>
             <CardContent className="p-6 sticky top-[5.5rem]">
               <h3 className="text-base font-semibold text-[#004191] mb-6">审批流程</h3>
-              <ApprovalTimeline steps={detail.approvalSteps} />
+              <ApprovalTimeline steps={approvalSteps} />
             </CardContent>
           </Card>
         </div>
@@ -322,7 +270,7 @@ export default function DisposalDetailPage() {
       <div className="fixed bottom-0 right-0 left-0 bg-white border-t border-[#e5e7eb] p-4 z-40 shadow-lg" style={{ marginLeft: '16rem' }}>
         <div className="max-w-7xl mx-auto flex items-center justify-between px-4">
           <div className="flex items-center gap-2 text-[#424753]">
-            <span className="text-xs">最后更新于 {detail.lastUpdated}</span>
+            <span className="text-xs">创建于 {detail.createdAt}</span>
           </div>
           <div className="flex items-center gap-4">
             <Button variant="secondary" size="md" onClick={() => navigate('/disposals')}>
