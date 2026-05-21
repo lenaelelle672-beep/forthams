@@ -75,7 +75,7 @@ export function QuickActions() {
               <p className="font-medium text-gray-900 group-hover:text-blue-600 transition-colors">
                 {action.label}
               </p>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-gray-400 mt-1">
                 {action.description}
               </p>
             </div>

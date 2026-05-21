@@ -416,13 +416,13 @@ export function AssetTransferForm() {
         <div className="flex items-center gap-4">
           <button 
             onClick={() => navigate('/disposals')}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-500"
+            className="p-2 hover:bg-blue-50 rounded-full transition-colors text-gray-400"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div>
             <h2 className="text-2xl font-semibold text-gray-900">新建资产转移申请</h2>
-            <p className="text-gray-600 mt-1">请填写以下资产转移信息，并提交审批流程</p>
+            <p className="text-gray-500 mt-1">请填写以下资产转移信息，并提交审批流程</p>
           </div>
         </div>
         <div className="flex items-center gap-3">
@@ -430,7 +430,7 @@ export function AssetTransferForm() {
             <Settings className="w-4 h-4" />
             配置流程
           </button>
-          <button type="button" onClick={handleSaveDraft} className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg transition-colors flex items-center gap-2">
+          <button type="button" onClick={handleSaveDraft} className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 rounded-lg transition-colors flex items-center gap-2">
             <Save className="w-4 h-4" />
             保存草稿
           </button>
@@ -450,7 +450,7 @@ export function AssetTransferForm() {
               <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center text-amber-600 text-lg font-bold shrink-0">!</div>
               <div>
                 <h3 className="text-base font-semibold text-gray-900">检测到未完成的草稿</h3>
-                <p className="text-sm text-gray-500 mt-0.5">是否恢复上次编辑的表单数据？</p>
+                <p className="text-sm text-gray-400 mt-0.5">是否恢复上次编辑的表单数据？</p>
               </div>
             </div>
             <div className="flex items-center justify-end gap-3 mt-6">
@@ -463,7 +463,7 @@ export function AssetTransferForm() {
               </button>
               <button
                 onClick={handleDismissDraft}
-                className="px-5 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg transition-colors"
+                className="px-5 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 rounded-lg transition-colors"
                 data-testid="draft-dismiss-btn"
               >
                 放弃
@@ -498,7 +498,7 @@ export function AssetTransferForm() {
                       <span className={`w-8 h-8 flex items-center justify-center rounded-full border-2 shrink-0
                         ${step.status === 'complete' ? 'bg-blue-600 border-blue-600' : 
                           step.status === 'current' ? 'border-blue-600 text-blue-600 bg-blue-50' : 
-                          'border-gray-300 text-gray-500 bg-white'}`}>
+                          'border-gray-200 text-gray-400 bg-white'}`}>
                         {step.status === 'complete' ? (
                           <Check className="w-5 h-5 text-white" aria-hidden="true" />
                         ) : (
@@ -507,12 +507,12 @@ export function AssetTransferForm() {
                       </span>
                       <span className={`text-xs font-medium whitespace-nowrap
                         ${step.status === 'current' ? 'text-blue-600' : 
-                          step.status === 'complete' ? 'text-gray-900' : 'text-gray-500'}`}>
+                          step.status === 'complete' ? 'text-gray-900' : 'text-gray-400'}`}>
                         {step.name}
                       </span>
                     </span>
                     {stepIdx !== workflowSteps.length - 1 && (
-                      <div className="absolute top-4 left-[50%] w-full h-0.5 ml-4 bg-gray-200" />
+                      <div className="absolute top-4 left-[50%] w-full h-0.5 ml-4 bg-blue-50" />
                     )}
                   </div>
                 </li>
@@ -531,22 +531,22 @@ export function AssetTransferForm() {
           {/* Basic Info */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">流程编号</label>
-            <input type="text" disabled value={formData.processId} className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-500 text-sm" />
+            <input type="text" disabled value={formData.processId} className="w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-50 text-gray-400 text-sm" />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">申请人 <span className="text-red-500">*</span></label>
-            <input type="text" name="applicant" value={formData.applicant} onChange={handleChange} className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500" />
+            <input type="text" name="applicant" value={formData.applicant} onChange={handleChange} className="w-full px-3 py-2 border border-gray-200 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500" />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">申请日期 <span className="text-red-500">*</span></label>
-            <input type="date" name="applyDate" value={formData.applyDate} onChange={handleChange} className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500" />
+            <input type="date" name="applyDate" value={formData.applyDate} onChange={handleChange} className="w-full px-3 py-2 border border-gray-200 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500" />
           </div>
 
-          <div className="md:col-span-3 border-t border-gray-100 pt-6 mt-2">
+          <div className="md:col-span-3 border-t border-gray-200 pt-6 mt-2">
             <div className="rounded-xl border border-blue-100 bg-blue-50/50 p-4 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
               <div>
                 <h4 className="text-base font-medium text-gray-900">从资产台账选择资产</h4>
-                <p className="mt-1 text-sm text-gray-500">
+                <p className="mt-1 text-sm text-gray-400">
                   {selectedAssetId
                     ? `已选择：${formData.assetName || '未命名资产'}（ID ${formData.assetIds}）`
                     : '先从真实资产台账选择资产，系统会自动回填转出部门、地点和使用人。'}
@@ -563,7 +563,7 @@ export function AssetTransferForm() {
             </div>
           </div>
 
-          <div className="md:col-span-3 border-t border-gray-100 pt-6 mt-2">
+          <div className="md:col-span-3 border-t border-gray-200 pt-6 mt-2">
             <h4 className="text-base font-medium text-gray-900 mb-4">资产信息</h4>
           </div>
 
@@ -574,54 +574,54 @@ export function AssetTransferForm() {
               name="assetIds"
               value={formData.assetIds}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-gray-50"
+              className="w-full px-3 py-2 border border-gray-200 rounded-md text-sm bg-gray-50"
               readOnly
               data-testid="transfer-asset-id-input"
             />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">资产名称</label>
-            <input type="text" name="assetName" value={formData.assetName} onChange={handleChange} className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500 bg-gray-50" readOnly />
+            <input type="text" name="assetName" value={formData.assetName} onChange={handleChange} className="w-full px-3 py-2 border border-gray-200 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500 bg-gray-50" readOnly />
           </div>
           
           <div className="md:col-span-2">
             <label className="block text-sm font-medium text-gray-700 mb-1">所缺配件</label>
-            <input type="text" name="missingAccessories" placeholder="如无缺失可不填" value={formData.missingAccessories} onChange={handleChange} className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500" />
+            <input type="text" name="missingAccessories" placeholder="如无缺失可不填" value={formData.missingAccessories} onChange={handleChange} className="w-full px-3 py-2 border border-gray-200 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500" />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">关联公司 (IC段)</label>
-            <input type="text" name="associatedCompany" value={formData.associatedCompany} onChange={handleChange} className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500" />
+            <input type="text" name="associatedCompany" value={formData.associatedCompany} onChange={handleChange} className="w-full px-3 py-2 border border-gray-200 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500" />
           </div>
 
-          <div className="md:col-span-3 border-t border-gray-100 pt-6 mt-2">
+          <div className="md:col-span-3 border-t border-gray-200 pt-6 mt-2">
             <h4 className="text-base font-medium text-gray-900 mb-4">转移明细</h4>
           </div>
 
           {/* Transferor details */}
-          <div className="p-4 bg-gray-50 rounded-lg md:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-4 border border-gray-100">
+          <div className="p-4 bg-gray-50 rounded-lg md:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-4 border border-gray-200">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">转出人 <span className="text-red-500">*</span></label>
-              <input type="text" name="transferor" value={formData.transferor} onChange={handleChange} className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-white" />
+              <input type="text" name="transferor" value={formData.transferor} onChange={handleChange} className="w-full px-3 py-2 border border-gray-200 rounded-md text-sm bg-white" />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">转出部门编码</label>
-              <input type="text" name="transferDeptCode" value={formData.transferDeptCode} onChange={handleChange} className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-gray-100 text-gray-600" readOnly />
+              <input type="text" name="transferDeptCode" value={formData.transferDeptCode} onChange={handleChange} className="w-full px-3 py-2 border border-gray-200 rounded-md text-sm bg-blue-50 text-gray-500" readOnly />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">转出部门</label>
-              <input type="text" name="transferDept" value={formData.transferDept} onChange={handleChange} className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-gray-100 text-gray-600" readOnly />
+              <input type="text" name="transferDept" value={formData.transferDept} onChange={handleChange} className="w-full px-3 py-2 border border-gray-200 rounded-md text-sm bg-blue-50 text-gray-500" readOnly />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">转出账套</label>
-              <input type="text" name="transferLedger" value={formData.transferLedger} onChange={handleChange} className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-white" />
+              <input type="text" name="transferLedger" value={formData.transferLedger} onChange={handleChange} className="w-full px-3 py-2 border border-gray-200 rounded-md text-sm bg-white" />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">转出区域</label>
-              <input type="text" name="transferArea" value={formData.transferArea} onChange={handleChange} className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-white" />
+              <input type="text" name="transferArea" value={formData.transferArea} onChange={handleChange} className="w-full px-3 py-2 border border-gray-200 rounded-md text-sm bg-white" />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">转出部门资产管理员</label>
-              <input type="text" name="transferDeptAdmin" value={formData.transferDeptAdmin} onChange={handleChange} className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-white" />
+              <input type="text" name="transferDeptAdmin" value={formData.transferDeptAdmin} onChange={handleChange} className="w-full px-3 py-2 border border-gray-200 rounded-md text-sm bg-white" />
             </div>
           </div>
 
@@ -702,13 +702,13 @@ export function AssetTransferForm() {
             </div>
           </div>
 
-          <div className="md:col-span-3 border-t border-gray-100 pt-6 mt-2">
+          <div className="md:col-span-3 border-t border-gray-200 pt-6 mt-2">
             <h4 className="text-base font-medium text-gray-900 mb-4">转移原因</h4>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">转移类型 <span className="text-red-500">*</span></label>
-            <select name="transferType" value={formData.transferType} onChange={handleChange} className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500 bg-white">
+            <select name="transferType" value={formData.transferType} onChange={handleChange} className="w-full px-3 py-2 border border-gray-200 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500 bg-white">
               <option value="其他资产转移">其他资产转移</option>
               <option value="员工离职交接">员工离职交接</option>
               <option value="员工换岗交接">员工换岗交接</option>
@@ -723,7 +723,7 @@ export function AssetTransferForm() {
               value={formData.transferReason} 
               onChange={handleChange} 
               placeholder="请详细描述资产转移的原因..."
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500 resize-none"
+              className="w-full px-3 py-2 border border-gray-200 rounded-md text-sm focus:ring-blue-500 focus:border-blue-500 resize-none"
             />
           </div>
 

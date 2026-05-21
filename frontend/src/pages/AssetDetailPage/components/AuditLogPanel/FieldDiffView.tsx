@@ -86,13 +86,13 @@ const FieldDiffItem: React.FC<{
 
   return (
     <div 
-      className="field-diff-item mb-3 p-3 rounded-md bg-gray-50 border border-gray-200"
+      className="field-diff-item mb-3 p-3 rounded-md bg-[#0f172a] border border-[#1e3a5f]"
       data-testid="field-diff-item"
     >
       {showFieldName && (
-        <div className="field-diff-label text-sm font-medium text-gray-700 mb-2">
+        <div className="field-diff-label text-sm font-medium text-slate-300 mb-2">
           {field.displayName}
-          <span className="ml-2 text-xs text-gray-400">({field.field})</span>
+          <span className="ml-2 text-xs text-slate-500">({field.field})</span>
         </div>
       )}
       
@@ -128,7 +128,7 @@ const FieldDiffItem: React.FC<{
 
       {/* 无变化指示器 */}
       {!hasChange && (
-        <div className="mt-2 text-xs text-gray-500 italic">
+        <div className="mt-2 text-xs text-slate-500 italic">
           (值未变化)
         </div>
       )}
@@ -153,7 +153,7 @@ const FieldDiffView: React.FC<FieldDiffViewProps> = ({
   if (!changedFields || changedFields.length === 0) {
     return (
       <div 
-        className={`field-diff-view-empty text-gray-500 text-sm ${className}`}
+        className={`field-diff-view-empty text-slate-500 text-sm ${className}`}
         data-testid="field-diff-empty"
       >
         暂无字段变更
@@ -167,9 +167,9 @@ const FieldDiffView: React.FC<FieldDiffViewProps> = ({
       data-testid="field-diff-view"
     >
       <div className="field-diff-header mb-3">
-        <h4 className="text-sm font-semibold text-gray-700">
+        <h4 className="text-sm font-semibold text-slate-300">
           字段变更详情
-          <span className="ml-2 text-xs text-gray-400">
+          <span className="ml-2 text-xs text-slate-500">
             ({changedFields.length} 项)
           </span>
         </h4>

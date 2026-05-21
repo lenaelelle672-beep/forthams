@@ -78,6 +78,10 @@ export interface ApprovalItem {
   businessSummary?: string;
   /** Raw business payload JSON for detail rendering */
   businessData?: string | null;
+  /** Resolved workflow runtime path returned by the approval detail API. */
+  workflowRuntimePath?: ApprovalRuntimePathStep[];
+  /** Business action executed after final approval. */
+  workflowResultAction?: string;
   /** ID of the user who submitted the approval request */
   applicant: number;
   /** Current status of the approval */
@@ -90,6 +94,17 @@ export interface ApprovalItem {
   updatedAt: string;
   /** Full approval history for this process */
   history: ApprovalHistoryItem[];
+}
+
+export interface ApprovalRuntimePathStep {
+  stepNo: number;
+  nodeId: string;
+  nodeCode?: string;
+  label: string;
+  approverRole?: string;
+  approverType?: 'role' | 'user' | string;
+  approverId?: string;
+  approvalMode?: 'any' | 'all' | 'sequence' | string;
 }
 
 /**

@@ -311,7 +311,7 @@ export default function LocationFormPage() {
       <div className="container mx-auto px-4 py-8 flex items-center justify-center min-h-[400px]">
         <div className="text-center">
           <Loader2 className="w-8 h-8 animate-spin mx-auto mb-3 text-blue-600" />
-          <p className="text-gray-500 text-sm">加载位置信息...</p>
+          <p className="text-gray-400 text-sm">加载位置信息...</p>
         </div>
       </div>
     );
@@ -324,10 +324,10 @@ export default function LocationFormPage() {
         <button
           type="button"
           onClick={handleGoBack}
-          className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+          className="p-2 rounded-lg hover:bg-blue-50 transition-colors"
           title="返回列表"
         >
-          <ArrowLeft className="w-5 h-5 text-gray-600" />
+          <ArrowLeft className="w-5 h-5 text-gray-500" />
         </button>
         <h1 className="text-2xl font-bold text-gray-900">
           {isEditMode ? "编辑位置" : "新增位置"}
@@ -354,7 +354,7 @@ export default function LocationFormPage() {
             onChange={(e) => handleChange("name", e.target.value)}
             placeholder="请输入位置名称"
             required
-            className="w-full px-3 py-2 text-sm rounded-lg border border-gray-300
+            className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200
               bg-white focus:outline-none focus:ring-2 focus:ring-blue-500
               focus:border-blue-500 transition-colors"
           />
@@ -371,7 +371,7 @@ export default function LocationFormPage() {
             onChange={(e) => handleChange("locationCode", e.target.value)}
             placeholder="请输入位置编码（如 LOC-001）"
             required
-            className="w-full px-3 py-2 text-sm rounded-lg border border-gray-300
+            className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200
               bg-white focus:outline-none focus:ring-2 focus:ring-blue-500
               focus:border-blue-500 transition-colors font-mono"
           />
@@ -388,7 +388,7 @@ export default function LocationFormPage() {
               const val = e.target.value;
               handleChange("parentId", val === "" ? null : Number(val));
             }}
-            className="w-full px-3 py-2 text-sm rounded-lg border border-gray-300
+            className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200
               bg-white focus:outline-none focus:ring-2 focus:ring-blue-500
               focus:border-blue-500 transition-colors"
           >
@@ -400,7 +400,7 @@ export default function LocationFormPage() {
             ))}
           </select>
           {form.parentId != null && (
-            <p className="mt-1 text-xs text-gray-500">
+            <p className="mt-1 text-xs text-gray-400">
               当前父位置：{selectedParentName}
             </p>
           )}
@@ -416,7 +416,7 @@ export default function LocationFormPage() {
             value={form.sortOrder}
             onChange={(e) => handleChange("sortOrder", Number(e.target.value))}
             min={0}
-            className="w-full px-3 py-2 text-sm rounded-lg border border-gray-300
+            className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200
               bg-white focus:outline-none focus:ring-2 focus:ring-blue-500
               focus:border-blue-500 transition-colors"
           />
@@ -432,7 +432,7 @@ export default function LocationFormPage() {
             onChange={(e) => handleChange("description", e.target.value)}
             placeholder="请输入位置描述"
             rows={3}
-            className="w-full px-3 py-2 text-sm rounded-lg border border-gray-300
+            className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200
               bg-white focus:outline-none focus:ring-2 focus:ring-blue-500
               focus:border-blue-500 transition-colors resize-y"
           />
@@ -444,7 +444,7 @@ export default function LocationFormPage() {
             type="button"
             onClick={handleGoBack}
             disabled={submitting}
-            className="px-4 py-2 text-sm rounded-lg border border-gray-300
+            className="px-4 py-2 text-sm rounded-lg border border-gray-200
               bg-white text-gray-700 hover:bg-gray-50
               disabled:opacity-50 transition-colors"
           >

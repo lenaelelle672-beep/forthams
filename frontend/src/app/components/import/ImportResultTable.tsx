@@ -216,7 +216,7 @@ export function ImportResultTable({
           <span>{badge.text}</span>
         </div>
         {status === 'COMPLETED' && (
-          <p className="text-sm text-gray-500">所有数据导入成功，无错误行。</p>
+          <p className="text-sm text-gray-400">所有数据导入成功，无错误行。</p>
         )}
       </div>
     );
@@ -232,21 +232,21 @@ export function ImportResultTable({
 
       {/* 错误表格 */}
       <div className="overflow-x-auto rounded-lg border border-gray-200">
-        <table className="min-w-full divide-y divide-gray-200">
+        <table className="min-w-full divide-y divide-[#1e3a5f]">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                 行号
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                 资产名称
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                 错误信息
               </th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="bg-white divide-y divide-[#1e3a5f]">
             {pageData.map((item) => (
               <tr
                 key={item.rowIndex}
@@ -268,7 +268,7 @@ export function ImportResultTable({
               <tr>
                 <td
                   colSpan={3}
-                  className="px-4 py-8 text-center text-sm text-gray-500"
+                  className="px-4 py-8 text-center text-sm text-gray-400"
                 >
                   无错误数据
                 </td>
@@ -281,7 +281,7 @@ export function ImportResultTable({
       {/* 分页控制 */}
       {totalPages > 1 && (
         <div className="flex items-center justify-between">
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-gray-500">
             共 {failedDetails.length} 条错误，
             第 {currentPage}/{totalPages} 页
             {details.length > MAX_ROWS && `（仅显示前 ${MAX_ROWS} 条）`}
@@ -292,7 +292,7 @@ export function ImportResultTable({
               onClick={() => handlePageChange('prev')}
               disabled={currentPage <= 1}
               className="inline-flex items-center gap-1 px-3 py-1.5 text-sm
-                rounded border border-gray-300 bg-white hover:bg-gray-50
+                rounded border border-gray-200 bg-white hover:bg-gray-50
                 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               <ChevronLeft className="w-4 h-4" />
@@ -320,7 +320,7 @@ export function ImportResultTable({
                     ${
                       currentPage === pageNum
                         ? 'bg-blue-600 text-white border-blue-600'
-                        : 'border-gray-300 bg-white hover:bg-gray-50'
+                        : 'border-gray-200 bg-white hover:bg-gray-50'
                     }`}
                 >
                   {pageNum}
@@ -333,7 +333,7 @@ export function ImportResultTable({
               onClick={() => handlePageChange('next')}
               disabled={currentPage >= totalPages}
               className="inline-flex items-center gap-1 px-3 py-1.5 text-sm
-                rounded border border-gray-300 bg-white hover:bg-gray-50
+                rounded border border-gray-200 bg-white hover:bg-gray-50
                 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               下一页

@@ -4,6 +4,7 @@ import { useNavigate } from "react-router";
 
 import { businessFlowOptions, getDraftStorageKey } from "../constants/workflowBusiness";
 import { workflowDefinitionService, type WorkflowDefinitionDTO } from "../services/workflowDefinitionService";
+import { formatStatusLabel } from "../constants/assetStatus";
 
 function readDraftStatus(businessType: (typeof businessFlowOptions)[number]["businessType"]) {
   if (typeof window === "undefined") {
@@ -82,7 +83,7 @@ export function WorkflowCenter() {
     try {
       setError(null);
       const result = await workflowDefinitionService.updateStatus(businessType, disabled ? "ENABLED" : "DISABLED");
-      setMessage(`${name}状态已更新为 ${result.status}`);
+      setMessage(`${name}状态已更新为 ${formatStatusLabel(result.status)}`);
       await loadDefinitions();
     } catch (statusError) {
       setError(statusError instanceof Error ? statusError.message : "更新流程状态失败");
@@ -98,7 +99,7 @@ export function WorkflowCenter() {
             流程管理中心
           </div>
           <h2 className="mt-4 text-3xl font-semibold tracking-tight text-gray-900">业务流程列表</h2>
-          <p className="mt-2 max-w-3xl text-sm leading-6 text-gray-600">
+          <p className="mt-2 max-w-3xl text-sm leading-6 text-gray-500">
             资产处置当前包含 4 条业务流程。先在这里找到对应业务流程，再进入可视化流程设计器修改节点、审批角色和分支条件。
           </p>
         </div>
@@ -112,7 +113,7 @@ export function WorkflowCenter() {
         </button>
       </div>
 
-      {loading ? <div className="rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm text-gray-600">正在加载后端流程定义...</div> : null}
+      {loading ? <div className="rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm text-gray-500">正在加载后端流程定义...</div> : null}
       {message ? <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">{message}</div> : null}
       {error ? <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">{error}；页面仍展示本地草稿状态。</div> : null}
 
@@ -125,20 +126,20 @@ export function WorkflowCenter() {
                 <div>
                   <div className="text-xs font-semibold uppercase tracking-[0.2em] text-gray-400">{flow.businessType}</div>
                   <h3 className="mt-2 text-xl font-semibold text-gray-900">{flow.name}</h3>
-                  <p className="mt-2 text-sm leading-6 text-gray-600">{flow.description}</p>
+                  <p className="mt-2 text-sm leading-6 text-gray-500">{flow.description}</p>
                 </div>
-                <div className="rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-700">{flow.stepCount} 步</div>
+                <div className="rounded-full bg-blue-50 px-3 py-1 text-sm font-medium text-gray-700">{flow.stepCount} 步</div>
               </div>
 
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                 <div className="rounded-xl bg-gray-50 p-3">
-                  <div className="text-xs text-gray-500">关联业务</div>
+                  <div className="text-xs text-gray-400">关联业务</div>
                   <div className="mt-1 text-sm font-semibold text-gray-900">{flow.businessName}</div>
                 </div>
                 <div className="rounded-xl bg-gray-50 p-3 sm:col-span-2">
-                  <div className="text-xs text-gray-500">流程状态</div>
+                  <div className="text-xs text-gray-400">流程状态</div>
                   <div className="mt-1 text-sm font-semibold text-gray-900">
-                    {flow.server ? `${flow.server.status} · v${flow.server.version}` : formatSavedAt(flow.draft.savedAt)}
+                    {flow.server ? `${formatStatusLabel(flow.server.status)} · v${flow.server.version}` : formatSavedAt(flow.draft.savedAt)}
                   </div>
                 </div>
               </div>

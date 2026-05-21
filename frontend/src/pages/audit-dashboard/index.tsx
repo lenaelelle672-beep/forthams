@@ -190,12 +190,12 @@ const auditApi = {
         .format('YYYY-MM-DD HH:mm:ss'),
       operator: ['admin', 'sys_monitor', 'dev_user_1'][Math.floor(Math.random() * 3)],
       actionType: ['CREATE', 'UPDATE', 'DELETE', 'LOGIN'][Math.floor(Math.random() * 4)],
-      module: ['Auth', 'User Management', 'System Config', 'Data Export'][
+      module: ['认证', '用户管理', '系统配置', '数据导出'][
         Math.floor(Math.random() * 4)
       ],
-      description: `Performed ${
-        ['create user', 'update config', 'delete record', 'login'][Math.floor(Math.random() * 4)]
-      } operation`,
+      description: ['创建用户操作', '更新配置操作', '删除记录操作', '登录系统操作'][
+        Math.floor(Math.random() * 4)
+      ],
       ipAddress: `192.168.1.${Math.floor(Math.random() * 254) + 1}`,
       status: Math.random() > 0.1 ? 'success' : 'failure',
     }));
@@ -608,12 +608,12 @@ const ACTION_TYPE_COLORS: Record<string, string> = {
 
 /** Available operation type options (in production, fetched from API) */
 const TYPE_OPTIONS = [
-  { label: 'CREATE', value: 'CREATE' },
-  { label: 'UPDATE', value: 'UPDATE' },
-  { label: 'DELETE', value: 'DELETE' },
-  { label: 'LOGIN', value: 'LOGIN' },
-  { label: 'EXPORT', value: 'EXPORT' },
-  { label: 'CONFIG_CHANGE', value: 'CONFIG_CHANGE' },
+  { label: '创建', value: 'CREATE' },
+  { label: '更新', value: 'UPDATE' },
+  { label: '删除', value: 'DELETE' },
+  { label: '登录', value: 'LOGIN' },
+  { label: '导出', value: 'EXPORT' },
+  { label: '配置变更', value: 'CONFIG_CHANGE' },
 ];
 
 /** Available operator options (in production, fetched from API) */
@@ -628,11 +628,20 @@ const OPERATOR_OPTIONS = [
 
 /** Available module options (in production, fetched from API) */
 const MODULE_OPTIONS = [
-  { label: 'Auth', value: 'Auth' },
-  { label: 'User Management', value: 'User Management' },
-  { label: 'System Config', value: 'System Config' },
-  { label: 'Data Export', value: 'Data Export' },
+  { label: '认证', value: '认证' },
+  { label: '用户管理', value: '用户管理' },
+  { label: '系统配置', value: '系统配置' },
+  { label: '数据导出', value: '数据导出' },
 ];
+
+const ACTION_TYPE_LABELS: Record<string, string> = {
+  CREATE: '创建',
+  UPDATE: '更新',
+  DELETE: '删除',
+  LOGIN: '登录',
+  EXPORT: '导出',
+  CONFIG_CHANGE: '配置变更',
+};
 
 interface TableFilters {
   type?: string;
@@ -686,7 +695,7 @@ const AuditLogTable: React.FC<AuditLogTableProps> = ({
       key: 'actionType',
       width: 130,
       render: (type: string) => (
-        <Tag color={ACTION_TYPE_COLORS[type] ?? 'default'}>{type}</Tag>
+        <Tag color={ACTION_TYPE_COLORS[type] ?? 'default'}>{ACTION_TYPE_LABELS[type] ?? type}</Tag>
       ),
     },
     {
@@ -1107,7 +1116,7 @@ export default function AuditDashboardPage() {
 
   return (
     <ErrorBoundary>
-      <div style={{ padding: 24, background: '#f5f7fa', minHeight: '100vh' }}>
+      <div style={{ padding: 24, background: '#ffffff', minHeight: '100vh' }}>
         {/* Page header — ATB-01 step 03 */}
         <div style={{ marginBottom: 24 }}>
           <Title level={2} style={{ margin: 0 }}>

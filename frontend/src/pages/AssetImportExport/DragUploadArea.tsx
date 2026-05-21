@@ -1085,7 +1085,7 @@ export default function DragUploadArea() {
 
         {/* Success message */}
         {phase === 'success' && (
-          <div className="flex items-center gap-2 text-green-600 bg-green-50 dark:bg-green-950/20 p-4 rounded-lg border border-green-200 dark:border-green-800">
+          <div className="flex items-center gap-2 text-green-600 bg-green-950 dark:bg-green-950/20 p-4 rounded-lg border border-green-200 dark:border-green-800">
             <CheckCircle2 className="w-5 h-5" />
             <span className="text-sm font-medium">
               导入成功！共处理 {parsedRows.length} 条资产记录。

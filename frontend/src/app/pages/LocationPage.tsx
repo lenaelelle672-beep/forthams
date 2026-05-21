@@ -261,7 +261,7 @@ export default function LocationPage() {
             onClick={loadLocations}
             disabled={loading}
             className="inline-flex items-center gap-1.5 px-3 py-2 text-sm
-              rounded-lg border border-gray-300 bg-white text-gray-700
+              rounded-lg border border-gray-200 bg-white text-gray-700
               hover:bg-gray-50 disabled:opacity-50 transition-colors"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
@@ -314,14 +314,14 @@ export default function LocationPage() {
                 确认删除
               </h3>
             </div>
-            <p className="text-sm text-gray-600 mb-6">
+            <p className="text-sm text-gray-500 mb-6">
               确定要删除位置「{deleteConfirm.node?.name}」吗？此操作不可撤销。
             </p>
             <div className="flex items-center justify-end gap-3">
               <button
                 type="button"
                 onClick={handleCancelDelete}
-                className="px-4 py-2 text-sm rounded-lg border border-gray-300
+                className="px-4 py-2 text-sm rounded-lg border border-gray-200
                   bg-white text-gray-700 hover:bg-gray-50 transition-colors"
               >
                 取消

@@ -200,15 +200,15 @@ export function AssetRegistry() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-semibold text-gray-900">资产台账管理</h2>
-          <p className="text-gray-600 mt-1">管理企业全部资产信息与生命周期</p>
+          <p className="text-gray-500 mt-1">管理企业全部资产信息与生命周期</p>
         </div>
         <div className="flex gap-3">
           <input ref={fileInputRef} type="file" accept=".csv,.xlsx,.xls" className="hidden" onChange={handleImportFile} />
-          <button onClick={handleImportClick} className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg transition-colors flex items-center gap-2">
+          <button onClick={handleImportClick} className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 rounded-lg transition-colors flex items-center gap-2">
             <Upload className="w-4 h-4" />
             批量导入
           </button>
-          <button onClick={handleExportCsv} className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg transition-colors flex items-center gap-2">
+          <button onClick={handleExportCsv} className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 rounded-lg transition-colors flex items-center gap-2">
             <Download className="w-4 h-4" />
             导出数据
           </button>
@@ -239,14 +239,14 @@ export function AssetRegistry() {
                 placeholder="搜索资产名称或编号..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
           </div>
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             {categories.map(cat => (
               <option key={cat} value={cat}>{cat}</option>
@@ -255,22 +255,22 @@ export function AssetRegistry() {
           <select
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             {ASSET_STATUS_OPTIONS.map(status => (
               <option key={status.value || 'ALL'} value={status.value}>{status.label}</option>
             ))}
           </select>
-          <button onClick={() => setShowAdvancedFilters((prev) => !prev)} className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg transition-colors flex items-center gap-2">
+          <button onClick={() => setShowAdvancedFilters((prev) => !prev)} className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 rounded-lg transition-colors flex items-center gap-2">
             <Filter className="w-4 h-4" />
             高级筛选
           </button>
         </div>
         {showAdvancedFilters && (
-          <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4 border-t border-gray-100 pt-4">
-            <input value={locationFilter} onChange={(e) => setLocationFilter(e.target.value)} placeholder="按存放位置筛选" className="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
-            <input value={minValueFilter} onChange={(e) => setMinValueFilter(e.target.value)} type="number" min="0" placeholder="最低资产价值" className="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
-            <button onClick={() => { setLocationFilter(''); setMinValueFilter(''); }} className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg transition-colors">
+          <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4 border-t border-gray-200 pt-4">
+            <input value={locationFilter} onChange={(e) => setLocationFilter(e.target.value)} placeholder="按存放位置筛选" className="px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <input value={minValueFilter} onChange={(e) => setMinValueFilter(e.target.value)} type="number" min="0" placeholder="最低资产价值" className="px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <button onClick={() => { setLocationFilter(''); setMinValueFilter(''); }} className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 rounded-lg transition-colors">
               清空高级筛选
             </button>
           </div>
@@ -279,42 +279,42 @@ export function AssetRegistry() {
 
       {/* 资产列表 */}
       <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-        {loading && <div className="px-6 py-4 text-sm text-gray-500">加载中...</div>}
+        {loading && <div className="px-6 py-4 text-sm text-gray-400">加载中...</div>}
         {error && <div className="px-6 py-4 text-sm text-red-600">{error}</div>}
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                   资产编号
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                   资产名称
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                   分类
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                   使用部门
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                   使用人
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                   存放位置
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                   状态
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                   资产价值
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sticky right-0 bg-gray-50 z-10 shadow-[-1px_0_0_0_#e5e7eb]">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider sticky right-0 bg-gray-50 z-10 shadow-[-1px_0_0_0_#e5e7eb]">
                   操作
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-white divide-y divide-[#1e3a5f]">
               {pagedAssets.map((asset) => {
                 const statusMeta = getAssetStatusMeta(asset.status);
                 return (
@@ -325,16 +325,16 @@ export function AssetRegistry() {
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {asset.name || asset.assetName}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {asset.category}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {asset.department}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {asset.user || asset.userName || '-'}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {asset.location || asset.storageLocation || '-'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -345,15 +345,15 @@ export function AssetRegistry() {
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                     {asset.value || asset.assetValue || '-'}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 sticky right-0 bg-white group-hover:bg-gray-50 z-10 shadow-[-1px_0_0_0_#e5e7eb]">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 sticky right-0 bg-white group-hover:bg-gray-50 z-10 shadow-[-1px_0_0_0_#e5e7eb]">
                     <div className="flex items-center gap-2">
                       <button 
                         onClick={() => navigate(`/assets/${getAssetId(asset)}`)}
-                        className="p-1 hover:bg-gray-100 rounded transition-colors" title="查看详情">
-                        <Eye className="w-4 h-4 text-gray-600" />
+                        className="p-1 hover:bg-blue-50 rounded transition-colors" title="查看详情">
+                        <Eye className="w-4 h-4 text-gray-500" />
                       </button>
-                      <button onClick={() => navigate(`/assets/${getAssetId(asset)}/edit`)} className="p-1 hover:bg-gray-100 rounded transition-colors" title="编辑">
-                        <Edit className="w-4 h-4 text-gray-600" />
+                      <button onClick={() => navigate(`/assets/${getAssetId(asset)}/edit`)} className="p-1 hover:bg-blue-50 rounded transition-colors" title="编辑">
+                        <Edit className="w-4 h-4 text-gray-500" />
                       </button>
                       <button 
                         onClick={() => navigate(`/disposals?assetId=${encodeURIComponent(String(getAssetId(asset)))}`)}
@@ -374,18 +374,18 @@ export function AssetRegistry() {
         
         {/* 分页 */}
         <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
-          <div className="text-sm text-gray-600">
+          <div className="text-sm text-gray-500">
             显示 <span className="font-medium">{filteredAssets.length === 0 ? 0 : (safeCurrentPage - 1) * pageSize + 1}-{Math.min(safeCurrentPage * pageSize, filteredAssets.length)}</span> 条结果，共 <span className="font-medium">{filteredAssets.length}</span> 条
           </div>
           <div className="flex items-center gap-2">
-            <select value={pageSize} onChange={(e) => { setPageSize(Number(e.target.value)); setCurrentPage(1); }} className="px-2 py-1 text-sm border border-gray-300 rounded">
+            <select value={pageSize} onChange={(e) => { setPageSize(Number(e.target.value)); setCurrentPage(1); }} className="px-2 py-1 text-sm border border-gray-200 rounded">
               {[5, 10, 20, 50].map(size => <option key={size} value={size}>{size} 条/页</option>)}
             </select>
-            <button onClick={() => setCurrentPage((page) => Math.max(1, page - 1))} className="px-3 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed" disabled={safeCurrentPage <= 1}>
+            <button onClick={() => setCurrentPage((page) => Math.max(1, page - 1))} className="px-3 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed" disabled={safeCurrentPage <= 1}>
               上一页
             </button>
             <span className="px-3 py-1 text-sm font-medium text-white bg-blue-600 rounded">{safeCurrentPage} / {totalPages}</span>
-            <button onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))} className="px-3 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed" disabled={safeCurrentPage >= totalPages}>
+            <button onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))} className="px-3 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed" disabled={safeCurrentPage >= totalPages}>
               下一页
             </button>
           </div>
@@ -400,7 +400,7 @@ export function AssetRegistry() {
               <h3 className="text-lg font-semibold text-gray-900">{selectedAsset ? '编辑资产' : '新增资产'}</h3>
               <button 
                 onClick={() => setShowAddModal(false)}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-gray-400 hover:text-gray-500"
               >
                 ✕
               </button>
@@ -410,11 +410,11 @@ export function AssetRegistry() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">资产名称 *</label>
-                  <input required value={assetForm.name || ''} onChange={(e) => setAssetForm(prev => ({ ...prev, name: e.target.value }))} type="text" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  <input required value={assetForm.name || ''} onChange={(e) => setAssetForm(prev => ({ ...prev, name: e.target.value }))} type="text" className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">资产分类 *</label>
-                  <select required value={assetForm.category || ''} onChange={(e) => setAssetForm(prev => ({ ...prev, category: e.target.value }))} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  <select required value={assetForm.category || ''} onChange={(e) => setAssetForm(prev => ({ ...prev, category: e.target.value }))} className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <option value="">请选择分类</option>
                     <option>电子设备</option>
                     <option>办公设备</option>
@@ -423,7 +423,7 @@ export function AssetRegistry() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">使用部门 *</label>
-                  <select required value={assetForm.department || ''} onChange={(e) => setAssetForm(prev => ({ ...prev, department: e.target.value }))} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  <select required value={assetForm.department || ''} onChange={(e) => setAssetForm(prev => ({ ...prev, department: e.target.value }))} className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <option value="">请选择部门</option>
                     <option>研发部</option>
                     <option>销售部</option>
@@ -432,34 +432,34 @@ export function AssetRegistry() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">使用人</label>
-                  <input value={assetForm.user || ''} onChange={(e) => setAssetForm(prev => ({ ...prev, user: e.target.value }))} type="text" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  <input value={assetForm.user || ''} onChange={(e) => setAssetForm(prev => ({ ...prev, user: e.target.value }))} type="text" className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">存放位置 *</label>
-                  <input required value={assetForm.location || ''} onChange={(e) => setAssetForm(prev => ({ ...prev, location: e.target.value }))} type="text" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  <input required value={assetForm.location || ''} onChange={(e) => setAssetForm(prev => ({ ...prev, location: e.target.value }))} type="text" className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">资产价值 (元) *</label>
-                  <input required min="0.01" value={assetForm.value || ''} onChange={(e) => setAssetForm(prev => ({ ...prev, value: e.target.value }))} type="number" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  <input required min="0.01" value={assetForm.value || ''} onChange={(e) => setAssetForm(prev => ({ ...prev, value: e.target.value }))} type="number" className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">采购日期 *</label>
-                  <input required value={assetForm.purchaseDate || ''} onChange={(e) => setAssetForm(prev => ({ ...prev, purchaseDate: e.target.value }))} type="date" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  <input required value={assetForm.purchaseDate || ''} onChange={(e) => setAssetForm(prev => ({ ...prev, purchaseDate: e.target.value }))} type="date" className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">供应商</label>
-                  <input value={assetForm.supplier || ''} onChange={(e) => setAssetForm(prev => ({ ...prev, supplier: e.target.value }))} type="text" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  <input value={assetForm.supplier || ''} onChange={(e) => setAssetForm(prev => ({ ...prev, supplier: e.target.value }))} type="text" className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
                 </div>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">备注</label>
-                <textarea value={assetForm.remark || ''} onChange={(e) => setAssetForm(prev => ({ ...prev, remark: e.target.value }))} rows={3} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                <textarea value={assetForm.remark || ''} onChange={(e) => setAssetForm(prev => ({ ...prev, remark: e.target.value }))} rows={3} className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
               </div>
             </div>
             <div className="px-6 py-4 border-t border-gray-200 flex justify-end gap-3">
               <button 
                 onClick={() => setShowAddModal(false)}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg transition-colors"
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 rounded-lg transition-colors"
               >
                 取消
               </button>
@@ -486,17 +486,17 @@ export function AssetRegistry() {
               <h3 className="text-lg font-semibold text-gray-900">资产处置快捷入口</h3>
               <button 
                 onClick={() => setShowDisposalModal(false)}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-gray-400 hover:text-gray-500"
               >
                 ✕
               </button>
             </div>
             <div className="p-6">
               <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-                <p className="text-sm text-gray-500 mb-1">当前选择资产：</p>
+                <p className="text-sm text-gray-400 mb-1">当前选择资产：</p>
                 <p className="font-medium text-gray-900">{selectedAsset.id} - {selectedAsset.name}</p>
               </div>
-              <p className="text-sm text-gray-600 mb-4">请选择对该资产要进行的处置操作：</p>
+              <p className="text-sm text-gray-500 mb-4">请选择对该资产要进行的处置操作：</p>
               <div className="grid grid-cols-2 gap-4">
                 <button 
                   onClick={() => {

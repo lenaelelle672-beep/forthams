@@ -7,6 +7,14 @@ import { vendorRoutes, locationRoutes, auditRoutes } from "./router";
 import { assetImportExportRoutes } from "./router/AppRouter";
 import { retirementRoutes, assetDetailRoute, workOrderRoutes } from "./routes/AppRoutes";
 
+const DisposalDetailPage = withSuspense(
+  lazy(() =>
+    import("./pages/assets/DisposalDetailPage").then((module) => ({
+      default: module.DisposalDetailPage,
+    })),
+  ),
+);
+
 const Dashboard = withSuspense(
   lazy(() => import("./pages/Dashboard").then((module) => ({ default: module.Dashboard }))),
 );
@@ -66,6 +74,12 @@ const AssetSituationDashboard = withSuspense(
 );
 const Retirement = withSuspense(
   lazy(() => import("./pages/Retirement").then((module) => ({ default: module.default }))),
+);
+const CyberDashboardV12 = withSuspense(
+  lazy(() => import("./pages/CyberDashboardV12").then((module) => ({ default: module.CyberDashboardV12 }))),
+);
+const IndustrialDashboardV13 = withSuspense(
+  lazy(() => import("./pages/IndustrialDashboardV13").then((module) => ({ default: module.IndustrialDashboardV13 }))),
 );
 
 function PageLoadingFallback() {
@@ -137,6 +151,7 @@ export const router = createBrowserRouter([
           { path: "inventory", Component: RFIDInventory },
           { path: "idle", Component: IdleAssets },
           { path: "disposals", Component: Disposals },
+          { path: "disposals/:id", Component: DisposalDetailPage },
           { path: "disposals/transfer/new", Component: AssetTransferForm },
           { path: "disposals/clearance/new", Component: AssetClearanceForm },
           { path: "disposals/scrap/new", Component: AssetScrapForm },
@@ -145,6 +160,8 @@ export const router = createBrowserRouter([
           { path: "retirement", Component: Retirement },
           { path: "analytics", Component: Analytics },
           { path: "situation", Component: AssetSituationDashboard },
+          { path: "cyber-v12", Component: CyberDashboardV12 },
+          { path: "industrial-v13", Component: IndustrialDashboardV13 },
           { path: "settings", Component: Settings },
           { path: "workflows", Component: WorkflowCenter },
           { path: "workflow-designer", Component: WorkflowDesigner },

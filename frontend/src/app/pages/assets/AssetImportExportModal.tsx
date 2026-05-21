@@ -511,7 +511,7 @@ export default function AssetImportExportModal() {
         <h1 className="text-2xl font-bold text-gray-900" role="heading" aria-level={1}>
           资产批量导入导出
         </h1>
-        <p className="mt-2 text-sm text-gray-500">
+        <p className="mt-2 text-sm text-gray-400">
           上传标准 Excel 文件批量创建资产，或按条件导出资产列表
         </p>
       </div>
@@ -527,7 +527,7 @@ export default function AssetImportExportModal() {
             ${
               activeTab === 'import'
                 ? 'border-blue-600 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700'
+                : 'border-transparent text-gray-400 hover:text-gray-700'
             }`}
         >
           导入
@@ -541,7 +541,7 @@ export default function AssetImportExportModal() {
             ${
               activeTab === 'export'
                 ? 'border-blue-600 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700'
+                : 'border-transparent text-gray-400 hover:text-gray-700'
             }`}
         >
           导出
@@ -558,7 +558,7 @@ export default function AssetImportExportModal() {
                 type="button"
                 onClick={handleDownloadTemplate}
                 className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium
-                  rounded-lg border border-gray-300 bg-white text-gray-700
+                  rounded-lg border border-gray-200 bg-white text-gray-700
                   hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500
                   transition-colors"
               >
@@ -578,14 +578,14 @@ export default function AssetImportExportModal() {
                   ${
                     importPhase === ImportPhase.UPLOADING
                       ? 'border-gray-200 bg-gray-50 cursor-not-allowed'
-                      : 'border-gray-300 bg-white hover:border-blue-400 hover:bg-blue-50'
+                      : 'border-gray-200 bg-white hover:border-blue-400 hover:bg-blue-50'
                   }
                   ${validationError ? 'border-red-300 bg-red-50' : ''}
                 `}
               >
                 <div className="flex flex-col items-center justify-center pt-5 pb-6">
                   <Upload className="w-10 h-10 text-gray-400 mb-3" />
-                  <p className="mb-1 text-sm text-gray-500">
+                  <p className="mb-1 text-sm text-gray-400">
                     将 .xlsx 文件拖到此处，或点击选择文件
                   </p>
                   <p className="text-xs text-gray-400">
@@ -616,12 +616,12 @@ export default function AssetImportExportModal() {
                 <div className="p-4 bg-white rounded-lg border border-gray-200 shadow-sm">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <FileText className="w-5 h-5 text-gray-500" />
+                      <FileText className="w-5 h-5 text-gray-400" />
                       <div>
                         <p className="text-sm font-medium text-gray-900">
                           {selectedFile.name}
                         </p>
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs text-gray-400">
                           {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
                         </p>
                       </div>
@@ -632,7 +632,7 @@ export default function AssetImportExportModal() {
                         onClick={handleReset}
                         disabled={isImportBusy}
                         className="inline-flex items-center gap-1.5 px-4 py-2 text-sm
-                          rounded-lg border border-gray-300 bg-white text-gray-700
+                          rounded-lg border border-gray-200 bg-white text-gray-700
                           hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed
                           transition-colors"
                       >
@@ -687,7 +687,7 @@ export default function AssetImportExportModal() {
           {importPhase === ImportPhase.UPLOADING && (
             <div className="flex flex-col items-center justify-center py-12">
               <Loader2 className="w-12 h-12 text-blue-500 animate-spin mb-4" />
-              <p className="text-sm text-gray-500">正在上传并解析文件...</p>
+              <p className="text-sm text-gray-400">正在上传并解析文件...</p>
             </div>
           )}
 
@@ -697,8 +697,8 @@ export default function AssetImportExportModal() {
               {/* 解析摘要 */}
               <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
                 <div className="flex items-center gap-2 text-sm">
-                  <FileText className="w-4 h-4 text-gray-500" />
-                  <span className="text-gray-600">
+                  <FileText className="w-4 h-4 text-gray-400" />
+                  <span className="text-gray-500">
                     共 {parseResult.rows.length} 行数据
                   </span>
                 </div>
@@ -715,36 +715,36 @@ export default function AssetImportExportModal() {
 
               {/* 预览表格 */}
               <div className="overflow-x-auto rounded-lg border border-gray-200">
-                <table className="min-w-full divide-y divide-gray-200">
+                <table className="min-w-full divide-y divide-[#1e3a5f]">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase">
                         序号
                       </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase">
                         资产名称
                       </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase">
                         分类
                       </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase">
                         状态
                       </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase">
                         位置
                       </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase">
                         购置日期
                       </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase">
                         原值
                       </th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase">
                         校验状态
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
+                  <tbody className="bg-white divide-y divide-[#1e3a5f]">
                     {previewPageData.map((row) => {
                       const hasError = errorRowNumbers.has(row.rowNumber);
                       const rowErrors = errorByRow.get(row.rowNumber);
@@ -813,7 +813,7 @@ export default function AssetImportExportModal() {
               {/* 预览分页 */}
               {previewTotalPages > 1 && (
                 <div className="flex items-center justify-between">
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-gray-500">
                     共 {displayRows.length} 行，第 {previewPage}/{previewTotalPages} 页
                   </p>
                   <div className="flex items-center gap-2">
@@ -822,7 +822,7 @@ export default function AssetImportExportModal() {
                       onClick={() => setPreviewPage((p) => Math.max(1, p - 1))}
                       disabled={previewPage <= 1}
                       className="inline-flex items-center gap-1 px-3 py-1.5 text-sm
-                        rounded border border-gray-300 bg-white hover:bg-gray-50
+                        rounded border border-gray-200 bg-white hover:bg-gray-50
                         disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
                       <ChevronLeft className="w-4 h-4" />
@@ -849,7 +849,7 @@ export default function AssetImportExportModal() {
                             ${
                               previewPage === pageNum
                                 ? 'bg-blue-600 text-white border-blue-600'
-                                : 'border-gray-300 bg-white hover:bg-gray-50'
+                                : 'border-gray-200 bg-white hover:bg-gray-50'
                             }`}
                         >
                           {pageNum}
@@ -863,7 +863,7 @@ export default function AssetImportExportModal() {
                       }
                       disabled={previewPage >= previewTotalPages}
                       className="inline-flex items-center gap-1 px-3 py-1.5 text-sm
-                        rounded border border-gray-300 bg-white hover:bg-gray-50
+                        rounded border border-gray-200 bg-white hover:bg-gray-50
                         disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
                       下一页
@@ -878,7 +878,7 @@ export default function AssetImportExportModal() {
                 <button
                   type="button"
                   onClick={handleReset}
-                  className="px-4 py-2 text-sm rounded-lg border border-gray-300
+                  className="px-4 py-2 text-sm rounded-lg border border-gray-200
                     bg-white text-gray-700 hover:bg-gray-50 transition-colors"
                 >
                   取消
@@ -942,7 +942,7 @@ export default function AssetImportExportModal() {
                 <button
                   type="button"
                   onClick={handleReset}
-                  className="px-4 py-2 text-sm rounded-lg border border-gray-300
+                  className="px-4 py-2 text-sm rounded-lg border border-gray-200
                     bg-white text-gray-700 hover:bg-gray-50 transition-colors"
                 >
                   重新导入
@@ -959,7 +959,7 @@ export default function AssetImportExportModal() {
           {metaLoading ? (
             <div className="flex items-center justify-center py-12">
               <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
-              <span className="ml-3 text-sm text-gray-500">加载筛选数据...</span>
+              <span className="ml-3 text-sm text-gray-400">加载筛选数据...</span>
             </div>
           ) : metaError ? (
             <div className="p-6 bg-red-50 rounded-lg border border-red-200">

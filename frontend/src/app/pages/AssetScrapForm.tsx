@@ -279,13 +279,13 @@ export function AssetScrapForm() {
         <div className="flex items-center gap-4">
           <button
             onClick={() => navigate(-1)}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 hover:bg-blue-50 rounded-lg transition-colors"
           >
-            <ArrowLeft className="w-5 h-5 text-gray-600" />
+            <ArrowLeft className="w-5 h-5 text-gray-500" />
           </button>
           <div>
             <h2 className="text-2xl font-bold text-gray-900">资产报废转让电子流</h2>
-            <p className="text-sm text-gray-500 mt-1">当前状态：草稿 &nbsp;|&nbsp; 流水号：{formData.processId}</p>
+            <p className="text-sm text-gray-400 mt-1">当前状态：草稿 &nbsp;|&nbsp; 流水号：{formData.processId}</p>
           </div>
         </div>
         <div className="flex items-center gap-3">
@@ -293,7 +293,7 @@ export function AssetScrapForm() {
             <Settings className="w-4 h-4" />
             配置流程
           </button>
-          <button onClick={handleSaveDraft} type="button" className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg transition-colors flex items-center gap-2">
+          <button onClick={handleSaveDraft} type="button" className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 rounded-lg transition-colors flex items-center gap-2">
             <Save className="w-4 h-4" />
             保存草稿
           </button>
@@ -308,7 +308,7 @@ export function AssetScrapForm() {
               <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center text-amber-600 text-lg font-bold shrink-0">!</div>
               <div>
                 <h3 className="text-base font-semibold text-gray-900">检测到未完成的草稿</h3>
-                <p className="text-sm text-gray-500 mt-0.5">是否恢复上次编辑的表单数据？</p>
+                <p className="text-sm text-gray-400 mt-0.5">是否恢复上次编辑的表单数据？</p>
               </div>
             </div>
             <div className="flex items-center justify-end gap-3 mt-6">
@@ -321,7 +321,7 @@ export function AssetScrapForm() {
               </button>
               <button
                 onClick={handleDismissDraft}
-                className="px-5 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg transition-colors"
+                className="px-5 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 rounded-lg transition-colors"
                 data-testid="draft-dismiss-btn"
               >
                 放弃
@@ -352,7 +352,7 @@ export function AssetScrapForm() {
                       <span className={`w-8 h-8 flex items-center justify-center rounded-full border-2 shrink-0
                         ${step.status === 'complete' ? 'bg-blue-600 border-blue-600' : 
                           step.status === 'current' ? 'border-blue-600 text-blue-600 bg-blue-50' : 
-                          'border-gray-300 text-gray-500 bg-white'}`}>
+                          'border-gray-200 text-gray-400 bg-white'}`}>
                         {step.status === 'complete' ? (
                           <CheckCircle2 className="w-5 h-5 text-white" />
                         ) : (
@@ -361,12 +361,12 @@ export function AssetScrapForm() {
                       </span>
                       <span className={`text-xs font-medium whitespace-nowrap
                         ${step.status === 'current' ? 'text-blue-600' : 
-                          step.status === 'complete' ? 'text-gray-900' : 'text-gray-500'}`}>
+                          step.status === 'complete' ? 'text-gray-900' : 'text-gray-400'}`}>
                         {step.name}
                       </span>
                     </span>
                     {stepIdx !== steps.length - 1 && (
-                      <div className={`absolute top-4 left-[50%] w-full h-0.5 ml-4 bg-gray-200`} />
+                      <div className={`absolute top-4 left-[50%] w-full h-0.5 ml-4 bg-blue-50`} />
                     )}
                   </div>
                 </li>
@@ -392,7 +392,7 @@ export function AssetScrapForm() {
                 name="applicantId"
                 value={formData.applicantId}
                 onChange={handleChange}
-                className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm text-gray-700"
+                className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-700"
               />
             </div>
             <div className="col-span-1 md:col-span-2">
@@ -402,7 +402,7 @@ export function AssetScrapForm() {
                 name="applyDate"
                 value={formData.applyDate}
                 readOnly
-                className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm text-gray-500"
+                className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-400"
               />
             </div>
             <div className="col-span-1 md:col-span-2">
@@ -412,7 +412,7 @@ export function AssetScrapForm() {
                 name="applicantName"
                 value={formData.applicantName}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
             <div className="col-span-1 md:col-span-2">
@@ -422,7 +422,7 @@ export function AssetScrapForm() {
                 name="contactPhone"
                 value={formData.contactPhone}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
           </div>
@@ -439,7 +439,7 @@ export function AssetScrapForm() {
                 <p className="text-sm font-medium text-gray-900">
                   {selectedAssetId ? `${formData.assetName || '未命名资产'}（ID ${formData.assetId}）` : '尚未选择资产'}
                 </p>
-                <p className="mt-1 text-sm text-gray-500">
+                <p className="mt-1 text-sm text-gray-400">
                   {selectedAssetId
                     ? `部门：${formData.deptName || '-'}；存放地点：${formData.assetLocation || '-'}`
                     : '点击按钮打开资产台账，选择后自动回填报废资产信息。'}
@@ -470,7 +470,7 @@ export function AssetScrapForm() {
                 required
                 value={formData.assetId}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm bg-gray-50"
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm bg-gray-50"
                 readOnly
                 data-testid="scrap-asset-id-input"
               />
@@ -483,7 +483,7 @@ export function AssetScrapForm() {
                 required
                 value={formData.assetName}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
             <div>
@@ -493,7 +493,7 @@ export function AssetScrapForm() {
                 name="modelSpec"
                 value={formData.modelSpec}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
 
@@ -504,7 +504,7 @@ export function AssetScrapForm() {
                 name="attachedItems"
                 value={formData.attachedItems}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
             <div>
@@ -514,7 +514,7 @@ export function AssetScrapForm() {
                 name="userId"
                 value={formData.userId}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
             <div>
@@ -524,7 +524,7 @@ export function AssetScrapForm() {
                 name="productCode"
                 value={formData.productCode}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
 
@@ -535,7 +535,7 @@ export function AssetScrapForm() {
                 name="deptCode"
                 value={formData.deptCode}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
             <div>
@@ -545,7 +545,7 @@ export function AssetScrapForm() {
                 name="deptName"
                 value={formData.deptName}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
             <div>
@@ -555,7 +555,7 @@ export function AssetScrapForm() {
                 name="startUseTime"
                 value={formData.startUseTime}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
 
@@ -566,7 +566,7 @@ export function AssetScrapForm() {
                 name="userChineseName"
                 value={formData.userChineseName}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
             <div>
@@ -576,7 +576,7 @@ export function AssetScrapForm() {
                 name="assetLocation"
                 value={formData.assetLocation}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
             <div>
@@ -586,7 +586,7 @@ export function AssetScrapForm() {
                 name="assetLedger"
                 value={formData.assetLedger}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
 
@@ -597,7 +597,7 @@ export function AssetScrapForm() {
                 name="foreignTradeContract"
                 value={formData.foreignTradeContract}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
             <div>
@@ -607,7 +607,7 @@ export function AssetScrapForm() {
                 name="supervisionDate"
                 value={formData.supervisionDate}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
           </div>
@@ -662,7 +662,7 @@ export function AssetScrapForm() {
                 name="isRnD"
                 value={formData.isRnD}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="是">是</option>
                 <option value="否">否</option>
@@ -685,7 +685,7 @@ export function AssetScrapForm() {
                 required
                 value={formData.scrapReason}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="请详细描述报废原因..."
               />
             </div>
@@ -700,10 +700,10 @@ export function AssetScrapForm() {
                   rows={2}
                   value={formData.attachmentLinks}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 mb-2"
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 mb-2"
                   placeholder="在此粘贴文档链接..."
                 />
-                <button type="button" className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 flex items-center gap-2">
+                <button type="button" className="px-4 py-2 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 flex items-center gap-2">
                   <Upload className="w-4 h-4" /> 上传附件资料
                 </button>
               </div>
@@ -725,10 +725,10 @@ export function AssetScrapForm() {
                   name="directManagerId"
                   value={formData.directManagerId}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
-                <button type="button" className="shrink-0 px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200">
-                  <Search className="w-4 h-4 text-gray-600" />
+                <button type="button" className="shrink-0 px-3 py-2 bg-blue-50 border border-gray-200 rounded-lg hover:bg-blue-50">
+                  <Search className="w-4 h-4 text-gray-500" />
                 </button>
               </div>
             </div>
@@ -740,10 +740,10 @@ export function AssetScrapForm() {
                   name="level1ResourceDeptId"
                   value={formData.level1ResourceDeptId}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
-                <button type="button" className="shrink-0 px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200">
-                  <Search className="w-4 h-4 text-gray-600" />
+                <button type="button" className="shrink-0 px-3 py-2 bg-blue-50 border border-gray-200 rounded-lg hover:bg-blue-50">
+                  <Search className="w-4 h-4 text-gray-500" />
                 </button>
               </div>
             </div>
@@ -755,10 +755,10 @@ export function AssetScrapForm() {
                   name="officeAssetAdmin"
                   value={formData.officeAssetAdmin}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
-                <button type="button" className="shrink-0 px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200">
-                  <Search className="w-4 h-4 text-gray-600" />
+                <button type="button" className="shrink-0 px-3 py-2 bg-blue-50 border border-gray-200 rounded-lg hover:bg-blue-50">
+                  <Search className="w-4 h-4 text-gray-500" />
                 </button>
               </div>
             </div>
@@ -770,10 +770,10 @@ export function AssetScrapForm() {
                   name="mgmtOfficeSupport"
                   value={formData.mgmtOfficeSupport}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
-                <button type="button" className="shrink-0 px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200">
-                  <Search className="w-4 h-4 text-gray-600" />
+                <button type="button" className="shrink-0 px-3 py-2 bg-blue-50 border border-gray-200 rounded-lg hover:bg-blue-50">
+                  <Search className="w-4 h-4 text-gray-500" />
                 </button>
               </div>
             </div>
@@ -785,7 +785,7 @@ export function AssetScrapForm() {
           <button 
             type="button"
             onClick={() => navigate(-1)}
-            className="px-6 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg transition-colors"
+            className="px-6 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 rounded-lg transition-colors"
           >
             取消申请
           </button>

@@ -135,8 +135,8 @@ const AlertItem: React.FC<AlertItemProps> = React.memo(({ alert, onNavigate }) =
         transition-all duration-200
         hover:shadow-md hover:scale-[1.02]
         ${isUrgent 
-          ? 'bg-red-50 border-red-200 hover:bg-red-100' 
-          : 'bg-amber-50 border-amber-200 hover:bg-amber-100'
+          ? 'bg-red-950 border-red-200 hover:bg-red-100' 
+          : 'bg-amber-950 border-amber-200 hover:bg-amber-100'
         }
       `}
       onClick={() => onNavigate(alert.assetId, alert.id)}
@@ -153,11 +153,11 @@ const AlertItem: React.FC<AlertItemProps> = React.memo(({ alert, onNavigate }) =
           {isUrgent && (
             <AlertTriangle className="w-4 h-4 text-red-500 flex-shrink-0" />
           )}
-          <span className="font-medium text-gray-900 truncate">
+          <span className="font-medium text-slate-100 truncate">
             {alert.assetName}
           </span>
         </div>
-        <div className="flex items-center gap-2 mt-1 text-sm text-gray-500">
+        <div className="flex items-center gap-2 mt-1 text-sm text-slate-500">
           <span className={`
             px-1.5 py-0.5 rounded text-xs
             ${isUrgent ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'}
@@ -170,12 +170,12 @@ const AlertItem: React.FC<AlertItemProps> = React.memo(({ alert, onNavigate }) =
       <div className="flex items-center gap-2 ml-3">
         <div className={`
           flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium
-          ${isUrgent ? 'bg-red-500 text-white' : 'bg-amber-500 text-white'}
+          ${isUrgent ? 'bg-red-9500 text-white' : 'bg-amber-9500 text-white'}
         `}>
           <Clock className="w-3 h-3" />
           <span>{alert.remainingDays}天</span>
         </div>
-        <ChevronRight className="w-4 h-4 text-gray-400" />
+        <ChevronRight className="w-4 h-4 text-slate-500" />
       </div>
     </div>
   );
@@ -191,8 +191,8 @@ interface EmptyStateProps {
 }
 
 const EmptyState: React.FC<EmptyStateProps> = ({ type }) => (
-  <div className="flex flex-col items-center justify-center py-8 text-gray-400">
-    <div className="w-12 h-12 mb-3 rounded-full bg-gray-100 flex items-center justify-center">
+  <div className="flex flex-col items-center justify-center py-8 text-slate-500">
+    <div className="w-12 h-12 mb-3 rounded-full bg-[#162033] flex items-center justify-center">
       {type === 'no-data' ? (
         <Clock className="w-6 h-6" />
       ) : (
@@ -227,13 +227,13 @@ export const MaintenanceAlertCard: React.FC<MaintenanceAlertCardProps> = ({
   // 处理加载状态
   if (loading) {
     return (
-      <div className={`bg-white rounded-xl shadow-sm border border-gray-200 p-6 ${className}`}>
+      <div className={`bg-[#1e293b] rounded-xl shadow-sm border border-[#1e3a5f] p-6 ${className}`}>
         <div className="animate-pulse">
-          <div className="h-6 w-32 bg-gray-200 rounded mb-4" />
+          <div className="h-6 w-32 bg-[#1e3a5f] rounded mb-4" />
           <div className="space-y-3">
-            <div className="h-20 bg-gray-100 rounded-lg" />
-            <div className="h-20 bg-gray-100 rounded-lg" />
-            <div className="h-20 bg-gray-100 rounded-lg" />
+            <div className="h-20 bg-[#162033] rounded-lg" />
+            <div className="h-20 bg-[#162033] rounded-lg" />
+            <div className="h-20 bg-[#162033] rounded-lg" />
           </div>
         </div>
       </div>
@@ -243,8 +243,8 @@ export const MaintenanceAlertCard: React.FC<MaintenanceAlertCardProps> = ({
   // 处理空数据状态
   if (!data) {
     return (
-      <div className={`bg-white rounded-xl shadow-sm border border-gray-200 p-6 ${className}`}>
-        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+      <div className={`bg-[#1e293b] rounded-xl shadow-sm border border-[#1e3a5f] p-6 ${className}`}>
+        <h3 className="text-lg font-semibold text-slate-100 mb-4 flex items-center gap-2">
           <AlertTriangle className="w-5 h-5 text-amber-500" />
           维保到期预警
         </h3>
@@ -265,7 +265,7 @@ export const MaintenanceAlertCard: React.FC<MaintenanceAlertCardProps> = ({
   // 渲染预警汇总区
   const renderSummary = () => (
     <div className="flex items-center justify-between mb-4">
-      <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+      <h3 className="text-lg font-semibold text-slate-100 flex items-center gap-2">
         <AlertTriangle className="w-5 h-5 text-amber-500" />
         维保到期预警
       </h3>
@@ -287,7 +287,7 @@ export const MaintenanceAlertCard: React.FC<MaintenanceAlertCardProps> = ({
           </div>
         )}
         {data.totalCount === 0 && (
-          <span className="text-sm text-gray-400">暂无预警</span>
+          <span className="text-sm text-slate-500">暂无预警</span>
         )}
       </div>
     </div>
@@ -304,8 +304,8 @@ export const MaintenanceAlertCard: React.FC<MaintenanceAlertCardProps> = ({
     }
 
     const borderColor = type === 'urgent' ? 'border-red-200' : 'border-amber-200';
-    const bgColor = type === 'urgent' ? 'bg-red-50' : 'bg-amber-50';
-    const headerBg = type === 'urgent' ? 'bg-red-500' : 'bg-amber-500';
+    const bgColor = type === 'urgent' ? 'bg-red-950' : 'bg-amber-950';
+    const headerBg = type === 'urgent' ? 'bg-red-9500' : 'bg-amber-9500';
 
     return (
       <div className={`border rounded-xl overflow-hidden mb-4 ${borderColor}`}>
@@ -349,7 +349,7 @@ export const MaintenanceAlertCard: React.FC<MaintenanceAlertCardProps> = ({
   // 无预警状态
   if (data.totalCount === 0) {
     return (
-      <div className={`bg-white rounded-xl shadow-sm border border-gray-200 p-6 ${className}`}>
+      <div className={`bg-[#1e293b] rounded-xl shadow-sm border border-[#1e3a5f] p-6 ${className}`}>
         {renderSummary()}
         <EmptyState type="no-alerts" />
       </div>
@@ -357,15 +357,15 @@ export const MaintenanceAlertCard: React.FC<MaintenanceAlertCardProps> = ({
   }
 
   return (
-    <div className={`bg-white rounded-xl shadow-sm border border-gray-200 p-6 ${className}`}>
+    <div className={`bg-[#1e293b] rounded-xl shadow-sm border border-[#1e3a5f] p-6 ${className}`}>
       {renderSummary()}
       
       {renderAlertSection('7天内即将到期', data.urgentAlerts, 'urgent')}
       {renderAlertSection('30天内即将到期', data.warningAlerts, 'warning')}
       
-      <div className="mt-4 pt-4 border-t border-gray-100">
+      <div className="mt-4 pt-4 border-t border-[#1e3a5f]">
         <button 
-          className="w-full py-2 px-4 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
+          className="w-full py-2 px-4 bg-[#162033] hover:bg-[#1e3a5f] text-slate-300 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
           onClick={() => navigate('/maintenance')}
         >
           查看全部维保记录

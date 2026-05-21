@@ -131,7 +131,7 @@ function getIconColorClass(type: NotificationType): string {
     case "system_alert":
       return "bg-red-100 text-red-600";
     default:
-      return "bg-gray-100 text-gray-600";
+      return "bg-blue-50 text-gray-500";
   }
 }
 
@@ -176,7 +176,7 @@ export function NotificationItem({
   return (
     <div
       data-testid={`notification-item-${id}`}
-      className={`flex items-start gap-3 px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors border-b border-gray-100 last:border-b-0 ${
+      className={`flex items-start gap-3 px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors border-b border-gray-200 last:border-b-0 ${
         !read ? "bg-blue-50/40" : ""
       }`}
       onClick={handleClick}

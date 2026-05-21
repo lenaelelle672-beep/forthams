@@ -16,7 +16,7 @@
 .auditTableWrapper {
   width: 100%;
   background: var(--color-bg-primary, #ffffff);
-  border: 1px solid var(--color-border-secondary, #e5e7eb);
+  border: 1px solid var(--color-border-secondary, #f8fafc);
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
@@ -39,8 +39,8 @@
    ============================================================ */
 
 .auditTable thead {
-  background: var(--color-bg-tertiary, #f9fafb);
-  border-bottom: 2px solid var(--color-border-secondary, #e5e7eb);
+  background: var(--color-bg-tertiary, #ffffff);
+  border-bottom: 2px solid var(--color-border-secondary, #f8fafc);
 }
 
 .auditTable th {
@@ -67,7 +67,7 @@
 }
 
 .sortableHeader:active {
-  background-color: var(--color-bg-active, #e5e7eb);
+  background-color: var(--color-bg-active, #f8fafc);
 }
 
 /* 排序指示器 */
@@ -123,7 +123,7 @@
 }
 
 .auditTable tbody tr:hover {
-  background-color: var(--color-bg-hover, #f9fafb);
+  background-color: var(--color-bg-hover, #f1f5f9);
 }
 
 .auditTable td {
@@ -136,7 +136,7 @@
 
 /* 斑马纹（可选，通过 prop 激活） */
 .stripedRow:nth-child(even) {
-  background-color: var(--color-bg-tertiary, #f9fafb);
+  background-color: var(--color-bg-tertiary, #ffffff);
 }
 
 .stripedRow:nth-child(even):hover {
@@ -274,8 +274,8 @@
   align-items: center;
   justify-content: space-between;
   padding: 12px 16px;
-  border-top: 1px solid var(--color-border-secondary, #e5e7eb);
-  background-color: var(--color-bg-tertiary, #f9fafb);
+  border-top: 1px solid var(--color-border-secondary, #f8fafc);
+  background-color: var(--color-bg-tertiary, #ffffff);
   flex-wrap: wrap;
   gap: 8px;
 }
@@ -303,7 +303,7 @@
   min-width: 32px;
   height: 32px;
   padding: 0 8px;
-  border: 1px solid var(--color-border-secondary, #e5e7eb);
+  border: 1px solid var(--color-border-secondary, #f8fafc);
   border-radius: 6px;
   background: var(--color-bg-primary, #ffffff);
   color: var(--color-text-primary, #111827);
@@ -319,7 +319,7 @@
 }
 
 .pageButton:active:not(:disabled) {
-  background-color: var(--color-bg-active, #e5e7eb);
+  background-color: var(--color-bg-active, #f8fafc);
 }
 
 .pageButton:disabled {
@@ -330,7 +330,7 @@
 .pageButtonActive {
   background-color: var(--color-primary, #3b82f6);
   border-color: var(--color-primary, #3b82f6);
-  color: #ffffff;
+  color: #f8fafc;
 }
 
 .pageButtonActive:hover:not(:disabled) {
@@ -360,7 +360,7 @@
 
 .pageSizeSelect {
   padding: 4px 8px;
-  border: 1px solid var(--color-border-secondary, #e5e7eb);
+  border: 1px solid var(--color-border-secondary, #f8fafc);
   border-radius: 6px;
   background: var(--color-bg-primary, #ffffff);
   font-size: 0.8125rem;
@@ -400,7 +400,7 @@
   z-index: 2;
   width: 32px;
   height: 32px;
-  border: 3px solid var(--color-border-secondary, #e5e7eb);
+  border: 3px solid var(--color-border-secondary, #f8fafc);
   border-top-color: var(--color-primary, #3b82f6);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
@@ -423,7 +423,7 @@
   background: linear-gradient(
     90deg,
     var(--color-bg-tertiary, #f3f4f6) 25%,
-    var(--color-bg-hover, #e5e7eb) 50%,
+    var(--color-bg-hover, #f1f5f9) 50%,
     var(--color-bg-tertiary, #f3f4f6) 75%
   );
   background-size: 200% 100%;
@@ -511,7 +511,7 @@
   align-items: center;
   gap: 6px;
   padding: 8px 16px;
-  border: 1px solid var(--color-border-secondary, #e5e7eb);
+  border: 1px solid var(--color-border-secondary, #f8fafc);
   border-radius: 6px;
   background: var(--color-bg-primary, #ffffff);
   color: var(--color-text-primary, #111827);
@@ -553,7 +553,7 @@
 
 .detailRow td {
   padding: 0;
-  background-color: var(--color-bg-tertiary, #f9fafb);
+  background-color: var(--color-bg-tertiary, #ffffff);
 }
 
 .detailContent {
@@ -574,7 +574,7 @@
    ============================================================ */
 
 .activeRow {
-  background-color: var(--color-primary-light, #eff6ff) !important;
+  background-color: var(--color-primary-light, #f8fafc) !important;
 }
 
 .activeRow:hover {

@@ -49,20 +49,20 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
   const barColorClass = (): string => {
     switch (status) {
       case 'uploading':
-        return 'bg-blue-500';
+        return 'bg-blue-9500';
       case 'parsing':
-        return 'bg-amber-500 animate-pulse';
+        return 'bg-amber-9500 animate-pulse';
       case 'preview':
         return 'bg-indigo-500';
       case 'submitting':
-        return 'bg-blue-500 animate-pulse';
+        return 'bg-blue-9500 animate-pulse';
       case 'completed':
-        return 'bg-green-500';
+        return 'bg-green-9500';
       case 'error':
-        return 'bg-red-500';
+        return 'bg-red-9500';
       case 'idle':
       default:
-        return 'bg-gray-200';
+        return 'bg-[#1e3a5f]';
     }
   };
 
@@ -101,7 +101,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
       case 'error':
         return 'text-red-600';
       default:
-        return 'text-gray-500';
+        return 'text-slate-500';
     }
   };
 
@@ -115,7 +115,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
         return (
           <span className="relative flex h-3 w-3">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75" />
-            <span className="relative inline-flex rounded-full h-3 w-3 bg-blue-500" />
+            <span className="relative inline-flex rounded-full h-3 w-3 bg-blue-9500" />
           </span>
         );
       case 'parsing':
@@ -139,7 +139,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
   const clampedProgress = Math.min(100, Math.max(0, Math.round(progress)));
 
   return (
-    <div className="w-full space-y-3 p-4 bg-white rounded-lg border border-slate-200 shadow-sm">
+    <div className="w-full space-y-3 p-4 bg-[#1e293b] rounded-lg border border-[#1e3a5f] shadow-sm">
       {/* ---- Status header row ---- */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
@@ -162,7 +162,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
 
       {/* ---- Progress track ---- */}
       <div
-        className="relative h-3 w-full bg-slate-100 rounded-full overflow-hidden"
+        className="relative h-3 w-full bg-slate-800 rounded-full overflow-hidden"
         role="progressbar"
         aria-valuenow={clampedProgress}
         aria-valuemin={0}
@@ -177,7 +177,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
 
       {/* ---- Parsing wait hint (SPEC: interaction-state constraint) ---- */}
       {status === 'parsing' && clampedProgress >= 100 && (
-        <div className="flex items-center gap-2 mt-3 p-2 bg-amber-50 rounded border border-amber-100">
+        <div className="flex items-center gap-2 mt-3 p-2 bg-amber-950 rounded border border-amber-100">
           <span className="text-[11px] text-amber-700 font-medium uppercase tracking-wider">
             Server is validating data rows — please wait
           </span>
@@ -191,7 +191,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
 
       {/* ---- Error details ---- */}
       {status === 'error' && errorMessage && (
-        <div className="mt-3 p-2 bg-red-50 rounded border border-red-100">
+        <div className="mt-3 p-2 bg-red-950 rounded border border-red-100">
           <p className="text-[11px] text-red-700 font-medium mb-1">
             Error Details:
           </p>

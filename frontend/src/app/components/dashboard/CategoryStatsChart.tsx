@@ -131,7 +131,7 @@ export const CategoryStatsChart: React.FC<CategoryStatsChartProps> = ({
     return (
       <div className={`bg-white rounded-lg border border-gray-200 p-6 ${className}`}>
         <h3 className="text-lg font-semibold text-gray-900 mb-4">资产分类分布</h3>
-        <div className="flex h-[300px] items-center justify-center text-sm text-gray-500">
+        <div className="flex h-[300px] items-center justify-center text-sm text-gray-400">
           正在加载分类分布数据...
         </div>
       </div>
@@ -155,7 +155,7 @@ export const CategoryStatsChart: React.FC<CategoryStatsChartProps> = ({
     return (
       <div className={`bg-white rounded-lg border border-gray-200 p-6 ${className}`}>
         <h3 className="text-lg font-semibold text-gray-900 mb-4">资产分类分布</h3>
-        <div className="flex h-[300px] items-center justify-center text-sm text-gray-500">
+        <div className="flex h-[300px] items-center justify-center text-sm text-gray-400">
           暂无分类分布数据
         </div>
       </div>

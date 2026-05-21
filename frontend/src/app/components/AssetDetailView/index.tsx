@@ -39,6 +39,7 @@ import type { AssetDetailForGraphify } from '@/app/types/flow';
 
 import auditService from '@/app/services/auditService';
 import { assetService } from '@/app/services/assetService';
+import { formatStatusLabel } from '@/app/constants/assetStatus';
 
 // 子组件导入
 import { AssetInfoCard } from './AssetInfoCard';
@@ -444,10 +445,10 @@ export const AssetDetailView: React.FC<AssetDetailViewProps> = ({
         <div className="flex justify-between items-center">
           <div>
             <h2 className="m-0 text-xl font-semibold">{asset.name}</h2>
-            <p className="m-0 text-gray-500">
+            <p className="m-0 text-gray-400">
               资产编号: {asset.id} | 类型: {asset.type} | 状态: 
               <Tag color={asset.status === 'ACTIVE' ? 'green' : 'default'} className="ml-1">
-                {asset.status}
+                {formatStatusLabel(asset.status)}
               </Tag>
             </p>
           </div>
@@ -522,7 +523,7 @@ export const AssetInfoCard: React.FC<AssetInfoCardProps> = ({
         <Descriptions.Item label="资产类型">{asset.type}</Descriptions.Item>
         <Descriptions.Item label="资产状态">
           <Tag color={asset.status === 'ACTIVE' ? 'success' : 'default'}>
-            {asset.status}
+            {formatStatusLabel(asset.status)}
           </Tag>
         </Descriptions.Item>
         <Descriptions.Item label="归属部门">{asset.department}</Descriptions.Item>
@@ -590,10 +591,10 @@ export const AuditableFieldHighlight: React.FC<AuditableFieldHighlightProps> = (
             <span className="font-medium">{change.field}</span>
           </div>
           <div className="text-sm">
-            <span className="text-gray-500">原值: </span>
+            <span className="text-gray-400">原值: </span>
             <span className="line-through text-red-500">{change.oldValue || '(空)'}</span>
             <span className="mx-2">→</span>
-            <span className="text-gray-500">新值: </span>
+            <span className="text-gray-400">新值: </span>
             <span className="text-green-600">{change.newValue || '(空)'}</span>
           </div>
         </div>

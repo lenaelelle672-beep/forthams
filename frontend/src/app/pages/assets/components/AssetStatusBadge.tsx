@@ -9,28 +9,7 @@
  */
 
 import React from 'react';
-
-/* ------------------------------------------------------------------ */
-/*  Status configuration                                               */
-/* ------------------------------------------------------------------ */
-
-/**
- * Status display configuration mapping status codes to labels and styles.
- *
- * @constant STATUS_MAP
- */
-const STATUS_MAP: Record<string, { label: string; className: string }> = {
-  IN_USE: { label: '在用', className: 'bg-green-100 text-green-800' },
-  ACTIVE: { label: '在用', className: 'bg-green-100 text-green-800' },
-  IDLE: { label: '闲置', className: 'bg-yellow-100 text-yellow-800' },
-  INACTIVE: { label: '闲置', className: 'bg-gray-100 text-gray-800' },
-  MAINTENANCE: { label: '维保中', className: 'bg-blue-100 text-blue-800' },
-  SCRAPPED: { label: '已报废', className: 'bg-red-100 text-red-800' },
-  RETIRED: { label: '已退役', className: 'bg-orange-100 text-orange-800' },
-  DISPOSED: { label: '已处置', className: 'bg-red-100 text-red-800' },
-  LOST: { label: '已丢失', className: 'bg-purple-100 text-purple-800' },
-  TRANSFERRED: { label: '已转移', className: 'bg-blue-100 text-blue-800' },
-};
+import { getAssetStatusMeta } from '../../../constants/assetStatus';
 
 /* ------------------------------------------------------------------ */
 /*  Props                                                              */
@@ -73,14 +52,11 @@ export const AssetStatusBadge: React.FC<AssetStatusBadgeProps> = ({
   status,
   className = '',
 }) => {
-  const config = STATUS_MAP[status ?? ''] ?? {
-    label: status ?? '-',
-    className: 'bg-gray-100 text-gray-800',
-  };
+  const config = getAssetStatusMeta(status);
 
   return (
     <span
-      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${config.className} ${className}`}
+      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${config.badgeClass} ${className}`}
       data-testid={`status-badge-${status ?? 'unknown'}`}
     >
       {config.label}

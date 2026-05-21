@@ -119,7 +119,7 @@ const TrendIndicator: React.FC<TrendIndicatorProps> = ({ value, direction, suffi
     } else if (normalizedDirection === TrendDirection.DOWN) {
       return `${baseStyles} text-red-600`;
     }
-    return `${baseStyles} text-gray-500`;
+    return `${baseStyles} text-slate-500`;
   }, [normalizedDirection]);
   
   const arrowIcon = useMemo(() => {
@@ -160,34 +160,34 @@ const TrendIndicator: React.FC<TrendIndicatorProps> = ({ value, direction, suffi
  */
 const colorConfig: Record<StatCardColor | string, { bg: string; icon: string; border: string }> = {
   [StatCardColor.BLUE]: {
-    bg: 'bg-blue-50',
+    bg: 'bg-blue-950',
     icon: 'text-blue-600',
     border: 'border-blue-100',
   },
   [StatCardColor.GREEN]: {
-    bg: 'bg-green-50',
+    bg: 'bg-green-950',
     icon: 'text-green-600',
     border: 'border-green-100',
   },
   [StatCardColor.ORANGE]: {
-    bg: 'bg-orange-50',
+    bg: 'bg-orange-950',
     icon: 'text-orange-600',
     border: 'border-orange-100',
   },
   [StatCardColor.RED]: {
-    bg: 'bg-red-50',
+    bg: 'bg-red-950',
     icon: 'text-red-600',
     border: 'border-red-100',
   },
   [StatCardColor.PURPLE]: {
-    bg: 'bg-purple-50',
+    bg: 'bg-purple-950',
     icon: 'text-purple-600',
     border: 'border-purple-100',
   },
   [StatCardColor.GRAY]: {
-    bg: 'bg-gray-50',
-    icon: 'text-gray-600',
-    border: 'border-gray-100',
+    bg: 'bg-[#0f172a]',
+    icon: 'text-slate-400',
+    border: 'border-[#1e3a5f]',
   },
 };
 
@@ -279,15 +279,15 @@ const StatCard: React.FC<StatCardProps> = ({
   if (loading) {
     return (
       <div
-        className={`bg-white rounded-xl p-6 border border-gray-100 shadow-sm ${className}`}
+        className={`bg-[#1e293b] rounded-xl p-6 border border-[#1e3a5f] shadow-sm ${className}`}
         role="status"
         aria-busy="true"
         aria-live="polite"
       >
         <div className="animate-pulse">
-          <div className="h-4 bg-gray-200 rounded w-1/3 mb-4" />
-          <div className="h-8 bg-gray-200 rounded w-2/3 mb-4" />
-          <div className="h-3 bg-gray-200 rounded w-1/4" />
+          <div className="h-4 bg-[#1e3a5f] rounded w-1/3 mb-4" />
+          <div className="h-8 bg-[#1e3a5f] rounded w-2/3 mb-4" />
+          <div className="h-3 bg-[#1e3a5f] rounded w-1/4" />
         </div>
         <span className="sr-only">加载中...</span>
       </div>
@@ -297,7 +297,7 @@ const StatCard: React.FC<StatCardProps> = ({
   return (
     <div
       className={`
-        bg-white rounded-xl p-6 border ${colorClasses.border} shadow-sm
+        bg-[#1e293b] rounded-xl p-6 border ${colorClasses.border} shadow-sm
         hover:shadow-md transition-shadow duration-200
         ${className}
       `}
@@ -314,7 +314,7 @@ const StatCard: React.FC<StatCardProps> = ({
               </span>
             </div>
           )}
-          <h3 className="text-sm font-medium text-gray-600">
+          <h3 className="text-sm font-medium text-slate-400">
             {title}
           </h3>
         </div>
@@ -322,7 +322,7 @@ const StatCard: React.FC<StatCardProps> = ({
       
       {/* Value display */}
       <div className="mb-2" data-testid="stat-card-value">
-        <span className="text-3xl font-bold text-gray-900">
+        <span className="text-3xl font-bold text-slate-100">
           {formattedValue}
         </span>
       </div>

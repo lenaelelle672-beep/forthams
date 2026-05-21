@@ -40,6 +40,7 @@ import {
   DownOutlined,
 } from '@ant-design/icons';
 import { StatusDropdown } from '../StatusDropdown';
+import { formatStatusLabel } from '@/app/constants/assetStatus';
 
 // ---------------------------------------------------------------------------
 // Public Types
@@ -141,7 +142,7 @@ const renderReadOnlyTag = (status: InventoryScanStatus): React.ReactNode => {
  * @returns Ant Design Tag 节点
  */
 const renderBookStatusTag = (status: string): React.ReactNode => {
-  return <Tag>{status}</Tag>;
+  return <Tag>{formatStatusLabel(status)}</Tag>;
 };
 
 /**
@@ -473,7 +474,7 @@ const AssetTable: React.FC<AssetTableProps> = ({
           align-items: center;
           margin-bottom: 16px;
           padding: 8px 12px;
-          background: #fafafa;
+          background: #0f172a;
           border-radius: 6px;
           border: 1px solid #f0f0f0;
         }

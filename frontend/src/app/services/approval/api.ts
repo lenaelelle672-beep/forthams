@@ -208,14 +208,19 @@ export async function getApprovalHistory(processId: number): Promise<ApprovalDet
     const raw = await api.get<{
       process: RawApprovalProcess;
       records: RawApprovalRecord[];
+      workflowRuntimePath?: ApprovalItem['workflowRuntimePath'];
+      workflowResultAction?: string;
     }>(`/approvals/${processId}`);
 
     const history: ApprovalHistoryItem[] = Array.isArray(raw.records)
       ? raw.records.map(mapRecord)
       : [];
+    const process = mapProcess(raw.process, history);
+    process.workflowRuntimePath = Array.isArray(raw.workflowRuntimePath) ? raw.workflowRuntimePath : [];
+    process.workflowResultAction = raw.workflowResultAction ?? '';
 
     return {
-      process: mapProcess(raw.process, history),
+      process,
       records: history,
     };
   } catch (err) {

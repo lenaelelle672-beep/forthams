@@ -10,6 +10,7 @@
 
 import React from 'react';
 import { Timeline, Empty, Spin, Tag, Space } from 'antd';
+import { formatStatusLabel } from '../constants/assetStatus';
 
 /**
  * 处置历史记录项
@@ -197,7 +198,7 @@ const AssetOperationHistory: React.FC<AssetOperationHistoryProps> = ({
                     {entry.operationLabel}
                   </Tag>
                   {entry.status && (
-                    <Tag>{entry.status}</Tag>
+                    <Tag>{formatStatusLabel(entry.status)}</Tag>
                   )}
                 </Space>
               </div>

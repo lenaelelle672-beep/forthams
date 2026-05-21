@@ -395,7 +395,7 @@ const ApprovalChain: React.FC<ApprovalChainProps> = React.memo(({
           </div>
 
           {step.comment && (
-            <div style={{ marginTop: 8, padding: 8, backgroundColor: '#f5f5f5', borderRadius: 4, fontSize: 12 }}>
+            <div style={{ marginTop: 8, padding: 8, backgroundColor: '#ffffff', borderRadius: 4, fontSize: 12 }}>
               <strong>审批意见:</strong> {step.comment}
             </div>
           )}
@@ -483,7 +483,7 @@ const ApprovalChain: React.FC<ApprovalChainProps> = React.memo(({
       </div>
 
       {/* 状态流转说明 */}
-      <div style={{ marginTop: 24, padding: 12, backgroundColor: '#fafafa', borderRadius: 4 }}>
+      <div style={{ marginTop: 24, padding: 12, backgroundColor: '#f8fafc', borderRadius: 4 }}>
         <div style={{ fontSize: 12, color: '#666', marginBottom: 8 }}>
           <strong>状态流转规则:</strong>
         </div>

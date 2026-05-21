@@ -145,7 +145,7 @@ export const AssetSelector: React.FC<AssetSelectorProps> = ({
   const renderAssetOption = (asset: Asset) => (
     <div
       key={asset.id}
-      className="px-3 py-2 cursor-pointer hover:bg-blue-50 border-b border-gray-100 last:border-b-0 transition-colors"
+      className="px-3 py-2 cursor-pointer hover:bg-blue-50 border-b border-gray-200 last:border-b-0 transition-colors"
       onClick={() => handleSelect(asset)}
       role="option"
       aria-selected={value === asset.id}
@@ -153,7 +153,7 @@ export const AssetSelector: React.FC<AssetSelectorProps> = ({
       <div className="flex items-center justify-between">
         <div>
           <div className="font-medium text-gray-900">{asset.name}</div>
-          <div className="text-sm text-gray-500">
+          <div className="text-sm text-gray-400">
             {asset.assetCode}
             {asset.categoryName && ` · ${asset.categoryName}`}
           </div>
@@ -172,9 +172,9 @@ export const AssetSelector: React.FC<AssetSelectorProps> = ({
   if (isLoading) {
     return (
       <div className={`relative ${className}`}>
-        <div className="h-10 px-3 flex items-center border border-gray-300 rounded-md bg-gray-50">
+        <div className="h-10 px-3 flex items-center border border-gray-200 rounded-md bg-gray-50">
           <Spinner size="sm" />
-          <span className="ml-2 text-gray-500 text-sm">加载资产中...</span>
+          <span className="ml-2 text-gray-400 text-sm">加载资产中...</span>
         </div>
       </div>
     );
@@ -195,8 +195,8 @@ export const AssetSelector: React.FC<AssetSelectorProps> = ({
   if (eligibleAssets.length === 0) {
     return (
       <div className={`relative ${className}`}>
-        <div className="h-10 px-3 flex items-center border border-gray-300 rounded-md bg-gray-50">
-          <span className="text-gray-500 text-sm">暂无可报废的资产</span>
+        <div className="h-10 px-3 flex items-center border border-gray-200 rounded-md bg-gray-50">
+          <span className="text-gray-400 text-sm">暂无可报废的资产</span>
         </div>
       </div>
     );
@@ -214,8 +214,8 @@ export const AssetSelector: React.FC<AssetSelectorProps> = ({
           w-full h-10 px-3 flex items-center justify-between
           border rounded-md bg-white text-left
           transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500
-          ${disabled ? 'bg-gray-100 cursor-not-allowed opacity-60' : 'hover:border-gray-400'}
-          ${error ? 'border-red-500' : 'border-gray-300'}
+          ${disabled ? 'bg-blue-50 cursor-not-allowed opacity-60' : 'hover:border-gray-400'}
+          ${error ? 'border-red-500' : 'border-gray-200'}
           ${isOpen ? 'ring-2 ring-blue-500 border-blue-500' : ''}
         `}
         aria-haspopup="listbox"
@@ -228,17 +228,17 @@ export const AssetSelector: React.FC<AssetSelectorProps> = ({
                 <div className="font-medium text-gray-900 truncate">
                   {selectedAsset.name}
                 </div>
-                <div className="text-xs text-gray-500 truncate">
+                <div className="text-xs text-gray-400 truncate">
                   {selectedAsset.assetCode}
                 </div>
               </div>
               <button
                 type="button"
                 onClick={handleClear}
-                className="ml-2 p-1 hover:bg-gray-200 rounded-full"
+                className="ml-2 p-1 hover:bg-blue-50 rounded-full"
                 tabIndex={-1}
               >
-                <X className="w-4 h-4 text-gray-500" />
+                <X className="w-4 h-4 text-gray-400" />
               </button>
             </div>
           ) : (
@@ -254,7 +254,7 @@ export const AssetSelector: React.FC<AssetSelectorProps> = ({
       
       {/* Dropdown */}
       {isOpen && (
-        <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg">
+        <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg">
           {/* Search input */}
           <div className="p-2 border-b border-gray-200">
             <div className="relative">
@@ -264,7 +264,7 @@ export const AssetSelector: React.FC<AssetSelectorProps> = ({
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="搜索资产编码或名称..."
-                className="w-full pl-8 pr-3 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full pl-8 pr-3 py-1.5 text-sm border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
                 autoFocus
               />
             </div>
@@ -278,14 +278,14 @@ export const AssetSelector: React.FC<AssetSelectorProps> = ({
             {filteredAssets.length > 0 ? (
               filteredAssets.map(renderAssetOption)
             ) : (
-              <div className="px-3 py-4 text-center text-gray-500 text-sm">
+              <div className="px-3 py-4 text-center text-gray-400 text-sm">
                 未找到匹配的资产
               </div>
             )}
           </div>
           
           {/* Footer with count */}
-          <div className="px-3 py-2 border-t border-gray-200 bg-gray-50 text-xs text-gray-500">
+          <div className="px-3 py-2 border-t border-gray-200 bg-gray-50 text-xs text-gray-400">
             共 {filteredAssets.length} 项可选资产
           </div>
         </div>
@@ -298,7 +298,7 @@ export const AssetSelector: React.FC<AssetSelectorProps> = ({
       
       {/* Helper text */}
       {!error && (
-        <p className="mt-1 text-sm text-gray-500">
+        <p className="mt-1 text-sm text-gray-400">
           仅显示状态为“在用”的资产
         </p>
       )}

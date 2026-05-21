@@ -493,7 +493,7 @@ const TaskListTable: React.FC = () => {
 
   /* ---- render ---- */
   return (
-    <div style={{ padding: 24, background: '#f5f5f5', minHeight: '100vh' }}>
+    <div style={{ padding: 24, background: '#ffffff', minHeight: '100vh' }}>
       {/* ====== 顶部标题栏 ====== */}
       <Row justify="space-between" align="middle" style={{ marginBottom: 24 }}>
         <div>

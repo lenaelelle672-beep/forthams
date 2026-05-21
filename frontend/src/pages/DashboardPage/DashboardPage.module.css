@@ -16,7 +16,7 @@
 /* ===== Page Container ===== */
 .container {
   padding: 24px;
-  background-color: var(--bg-primary, #f5f7fa);
+  background-color: var(--bg-primary, #f8fafc);
   min-height: calc(100vh - 64px);
   max-width: 1440px;
   margin: 0 auto;
@@ -230,12 +230,12 @@
   align-items: center;
   gap: 12px;
   padding: 14px 16px;
-  border-bottom: 1px solid var(--border-color, #e5e7eb);
+  border-bottom: 1px solid var(--border-color, #f8fafc);
   transition: background-color 0.15s ease;
 }
 
 .warningListItem:hover {
-  background-color: var(--bg-hover, #f9fafb);
+  background-color: var(--bg-hover, #f1f5f9);
 }
 
 .warningListItem:last-child {
@@ -276,9 +276,9 @@
 .skeletonCard {
   background: linear-gradient(
     90deg,
-    var(--skeleton-from, #e5e7eb) 25%,
+    var(--skeleton-from, #334155) 25%,
     var(--skeleton-via, #f3f4f6) 50%,
-    var(--skeleton-from, #e5e7eb) 75%
+    var(--skeleton-from, #334155) 75%
   );
   background-size: 200% 100%;
   animation: skeletonLoading 1.5s ease-in-out infinite;
@@ -339,7 +339,7 @@
 }
 
 .retryButton:hover {
-  background: var(--bg-hover, #f9fafb);
+  background: var(--bg-hover, #f1f5f9);
   border-color: var(--blue-400, #60a5fa);
 }
 

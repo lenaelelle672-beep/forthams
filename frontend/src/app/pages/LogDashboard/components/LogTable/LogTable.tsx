@@ -194,7 +194,7 @@ export const LogTable: React.FC<LogTableProps> = ({
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-gray-500">加载中...</div>
+        <div className="text-gray-400">加载中...</div>
       </div>
     );
   }
@@ -207,7 +207,7 @@ export const LogTable: React.FC<LogTableProps> = ({
       <div className="flex items-center justify-center h-64">
         <div className="text-red-500 text-center">
           <p className="font-semibold">加载失败</p>
-          <p className="text-sm text-gray-500 mt-1">{error}</p>
+          <p className="text-sm text-gray-400 mt-1">{error}</p>
         </div>
       </div>
     );
@@ -220,7 +220,7 @@ export const LogTable: React.FC<LogTableProps> = ({
     return (
       <div className="flex flex-col items-center justify-center h-64 bg-gray-50 rounded-lg border border-gray-200">
         <svg
-          className="w-16 h-16 text-gray-300 mb-4"
+          className="w-16 h-16 text-slate-600 mb-4"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -232,7 +232,7 @@ export const LogTable: React.FC<LogTableProps> = ({
             d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
           />
         </svg>
-        <p className="text-gray-500 text-center">暂无日志记录</p>
+        <p className="text-gray-400 text-center">暂无日志记录</p>
         <p className="text-gray-400 text-sm mt-1">尝试调整筛选条件</p>
       </div>
     );
@@ -241,64 +241,64 @@ export const LogTable: React.FC<LogTableProps> = ({
   return (
     <div className="log-table-container">
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
+        <table className="min-w-full divide-y divide-[#1e3a5f]">
           <thead className="bg-gray-50">
             <tr>
               <th
                 scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-blue-50"
                 onClick={() => handleSort('timestamp')}
               >
                 时间 {renderSortIcon('timestamp')}
               </th>
               <th
                 scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-blue-50"
                 onClick={() => handleSort('action')}
               >
                 操作类型 {renderSortIcon('action')}
               </th>
               <th
                 scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider"
               >
                 操作描述
               </th>
               <th
                 scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-blue-50"
                 onClick={() => handleSort('operator_name')}
               >
                 操作人 {renderSortIcon('operator_name')}
               </th>
               <th
                 scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-blue-50"
                 onClick={() => handleSort('status')}
               >
                 状态 {renderSortIcon('status')}
               </th>
               <th
                 scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider"
               >
                 资源类型
               </th>
               <th
                 scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider"
               >
                 资源ID
               </th>
               <th
                 scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider"
               >
                 IP 地址
               </th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="bg-white divide-y divide-[#1e3a5f]">
             {sortedLogs.map((log) => (
               <tr key={log.id} className="hover:bg-gray-50">
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -313,7 +313,7 @@ export const LogTable: React.FC<LogTableProps> = ({
                         ? 'bg-yellow-100 text-yellow-800'
                         : log.action === 'DELETE'
                         ? 'bg-red-100 text-red-800'
-                        : 'bg-gray-100 text-gray-800'
+                        : 'bg-blue-50 text-gray-800'
                     }`}
                   >
                     {getActionLabel(log.action)}
@@ -334,13 +334,13 @@ export const LogTable: React.FC<LogTableProps> = ({
                     {log.status === 'SUCCESS' ? '成功' : '失败'}
                   </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
                   {log.resource_type}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400 font-mono">
                   {log.resource_id}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400 font-mono">
                   {log.ip_address}
                 </td>
               </tr>
@@ -351,7 +351,7 @@ export const LogTable: React.FC<LogTableProps> = ({
 
       {/* 分页控件 */}
       <div className="flex items-center justify-between px-4 py-3 bg-white border-t border-gray-200 sm:px-6">
-        <div className="flex items-center text-sm text-gray-500">
+        <div className="flex items-center text-sm text-gray-400">
           <span>显示 {(page - 1) * pageSize + 1} 至 </span>
           <span>{Math.min(page * pageSize, total)} </span>
           <span>条，共 {total} 条</span>
@@ -361,7 +361,7 @@ export const LogTable: React.FC<LogTableProps> = ({
           <select
             value={pageSize}
             onChange={(e) => onPageSizeChange(Number(e.target.value))}
-            className="border border-gray-300 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="border border-gray-200 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value={20}>20 条/页</option>
             <option value={50}>50 条/页</option>
@@ -372,17 +372,17 @@ export const LogTable: React.FC<LogTableProps> = ({
             <button
               onClick={() => handlePageChange(page - 1)}
               disabled={page === 1}
-              className="px-3 py-1 border border-gray-300 rounded-l-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-3 py-1 border border-gray-200 rounded-l-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               上一页
             </button>
-            <span className="px-3 py-1 border-t border-b border-gray-300 text-sm font-medium text-gray-700 bg-white">
+            <span className="px-3 py-1 border-t border-b border-gray-200 text-sm font-medium text-gray-700 bg-white">
               第 {page} 页，共 {totalPages} 页
             </span>
             <button
               onClick={() => handlePageChange(page + 1)}
               disabled={page === totalPages}
-              className="px-3 py-1 border border-l-0 border-gray-300 rounded-r-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-3 py-1 border border-l-0 border-gray-200 rounded-r-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               下一页
             </button>

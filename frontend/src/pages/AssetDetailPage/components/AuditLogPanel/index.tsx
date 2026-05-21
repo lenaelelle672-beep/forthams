@@ -146,26 +146,26 @@ const FieldDiffView: React.FC<FieldDiffViewProps> = ({ changedFields }) => {
   }
 
   return (
-    <div className="space-y-3 mt-4 pt-4 border-t border-gray-100">
-      <div className="text-sm font-medium text-gray-700 mb-3">字段变更详情</div>
+    <div className="space-y-3 mt-4 pt-4 border-t border-[#1e3a5f]">
+      <div className="text-sm font-medium text-slate-300 mb-3">字段变更详情</div>
       <div className="grid gap-3">
         {changedFields.map((field, index) => (
           <div
             key={`${field.field}-${index}`}
             className="grid grid-cols-12 gap-2 items-center text-sm"
           >
-            <div className="col-span-3 font-medium text-gray-700 truncate" title={field.displayName || field.field}>
+            <div className="col-span-3 font-medium text-slate-300 truncate" title={field.displayName || field.field}>
               {field.displayName || field.field}
             </div>
-            <div className="col-span-4 p-2 rounded bg-red-50 text-red-700 border border-red-100 diff-old-value overflow-hidden text-ellipsis" title={String(field.oldValue ?? '-')}>
+            <div className="col-span-4 p-2 rounded bg-red-950 text-red-700 border border-red-100 diff-old-value overflow-hidden text-ellipsis" title={String(field.oldValue ?? '-')}>
               {field.oldValue !== undefined ? String(field.oldValue) : '-'}
             </div>
-            <div className="col-span-1 flex justify-center text-gray-400">
+            <div className="col-span-1 flex justify-center text-slate-500">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>
             </div>
-            <div className="col-span-4 p-2 rounded bg-green-50 text-green-700 border border-green-100 diff-new-value overflow-hidden text-ellipsis" title={String(field.newValue ?? '-')}>
+            <div className="col-span-4 p-2 rounded bg-green-950 text-green-700 border border-green-100 diff-new-value overflow-hidden text-ellipsis" title={String(field.newValue ?? '-')}>
               {field.newValue !== undefined ? String(field.newValue) : '-'}
             </div>
           </div>
@@ -199,7 +199,7 @@ const AuditLogEntryCard: React.FC<AuditLogEntryCardProps> = ({ log, isNew, onTog
   return (
     <div
       className={cn(
-        'border rounded-lg p-4 bg-white hover:shadow-md transition-all duration-200 cursor-pointer',
+        'border rounded-lg p-4 bg-[#1e293b] hover:shadow-md transition-all duration-200 cursor-pointer',
         isNew && 'ring-2 ring-blue-400 animate-pulse'
       )}
       onClick={hasChanges ? handleToggle : undefined}
@@ -209,18 +209,18 @@ const AuditLogEntryCard: React.FC<AuditLogEntryCardProps> = ({ log, isNew, onTog
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3 flex-wrap">
           {/* Operation Badge */}
-          <Badge className={OPERATION_COLORS[log.operation] || 'bg-gray-100 text-gray-800'}>
+          <Badge className={OPERATION_COLORS[log.operation] || 'bg-[#162033] text-slate-200'}>
             {OPERATION_LABELS[log.operation] || log.operation}
           </Badge>
           
           {/* Operator */}
-          <div className="flex items-center gap-1 text-sm text-gray-600">
+          <div className="flex items-center gap-1 text-sm text-slate-400">
             <User className="w-4 h-4" />
             <span className="font-medium">{log.operator}</span>
           </div>
           
           {/* Timestamp */}
-          <div className="flex items-center gap-1 text-sm text-gray-500">
+          <div className="flex items-center gap-1 text-sm text-slate-500">
             <Clock className="w-4 h-4" />
             <span title={format(parseISO(log.timestamp), 'yyyy-MM-dd HH:mm:ss', { locale: zhCN })}>
               {formatRelativeTime(log.timestamp)}
@@ -254,7 +254,7 @@ const AuditLogEntryCard: React.FC<AuditLogEntryCardProps> = ({ log, isNew, onTog
       </div>
 
       {/* Event ID (collapsed view) */}
-      <div className="mt-2 text-xs text-gray-400">
+      <div className="mt-2 text-xs text-slate-500">
         事件ID: {log.eventId}
       </div>
 
@@ -292,12 +292,12 @@ const AuditFilterBar: React.FC<AuditFilterBarProps> = ({ timeRange, onTimeRangeC
   };
 
   return (
-    <div className="flex items-end gap-4 p-4 bg-gray-50 rounded-lg">
-      <Filter className="w-5 h-5 text-gray-500 mb-3" />
+    <div className="flex items-end gap-4 p-4 bg-[#0f172a] rounded-lg">
+      <Filter className="w-5 h-5 text-slate-500 mb-3" />
       
       {/* Start Date */}
       <div className="flex-1">
-        <label className="text-sm font-medium text-gray-700 mb-1 block" htmlFor="start-date-input">
+        <label className="text-sm font-medium text-slate-300 mb-1 block" htmlFor="start-date-input">
           开始时间
         </label>
         <Input
@@ -309,11 +309,11 @@ const AuditFilterBar: React.FC<AuditFilterBarProps> = ({ timeRange, onTimeRangeC
         />
       </div>
       
-      <span className="text-gray-400 mb-3">至</span>
+      <span className="text-slate-500 mb-3">至</span>
       
       {/* End Date */}
       <div className="flex-1">
-        <label className="text-sm font-medium text-gray-700 mb-1 block" htmlFor="end-date-input">
+        <label className="text-sm font-medium text-slate-300 mb-1 block" htmlFor="end-date-input">
           结束时间
         </label>
         <Input
@@ -352,7 +352,7 @@ interface ErrorBannerProps {
 const ErrorBanner: React.FC<ErrorBannerProps> = ({ message = '加载审计日志失败', onRetry }) => {
   return (
     <div
-      className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-center justify-between"
+      className="bg-red-950 border border-red-200 rounded-lg p-4 flex items-center justify-between"
       data-testid="error-banner"
     >
       <div className="flex items-center gap-2 text-red-700">
@@ -496,10 +496,10 @@ export const AuditLogPanel: React.FC<AuditLogPanelProps> = ({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Activity className="w-5 h-5 text-blue-600" />
-          <h3 className="text-lg font-semibold text-gray-900">审计日志</h3>
+          <h3 className="text-lg font-semibold text-slate-100">审计日志</h3>
         </div>
         {pagination && (
-          <span className="text-sm text-gray-500">
+          <span className="text-sm text-slate-500">
             共 {pagination.total} 条记录
           </span>
         )}
@@ -521,7 +521,7 @@ export const AuditLogPanel: React.FC<AuditLogPanelProps> = ({
       {isLoading && (
         <div className="flex items-center justify-center py-12">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-          <span className="ml-3 text-gray-600">加载审计日志...</span>
+          <span className="ml-3 text-slate-400">加载审计日志...</span>
         </div>
       )}
 
@@ -530,7 +530,7 @@ export const AuditLogPanel: React.FC<AuditLogPanelProps> = ({
         <ScrollArea className="h-[400px] pr-4">
           <div className="audit-log-timeline space-y-3">
             {/* Timeline indicator */}
-            <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-gray-200" />
+            <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-[#1e3a5f]" />
             
             {logs.map((log) => (
               <AuditLogEntryCard
@@ -543,7 +543,7 @@ export const AuditLogPanel: React.FC<AuditLogPanelProps> = ({
 
             {/* Empty State */}
             {logs.length === 0 && (
-              <div className="text-center py-12 text-gray-500">
+              <div className="text-center py-12 text-slate-500">
                 <Calendar className="w-12 h-12 mx-auto mb-3 opacity-50" />
                 <p>暂无审计日志记录</p>
                 <p className="text-sm mt-1">在时间范围内没有资产变更记录</p>
@@ -556,7 +556,7 @@ export const AuditLogPanel: React.FC<AuditLogPanelProps> = ({
       {/* Pagination Controls */}
       {pagination && pagination.total > pagination.pageSize && (
         <div className="flex items-center justify-between pt-4 border-t">
-          <span className="text-sm text-gray-600">
+          <span className="text-sm text-slate-400">
             第 {pagination.page} / {Math.ceil(pagination.total / pagination.pageSize)} 页
           </span>
           <div className="flex gap-2">
@@ -591,7 +591,7 @@ export const AuditLogPanel: React.FC<AuditLogPanelProps> = ({
       {/* Real-time indicator */}
       {lastEvent && (
         <div className="flex items-center gap-2 text-xs text-green-600">
-          <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+          <div className="w-2 h-2 rounded-full bg-green-9500 animate-pulse" />
           <span>实时同步中</span>
         </div>
       )}

@@ -201,7 +201,7 @@ const AssetCategoryChart: React.FC<AssetCategoryChartProps> = ({
           center: ['50%', '45%'],
           avoidLabelOverlap: true,
           itemStyle: {
-            borderColor: '#FFFFFF',
+            borderColor: '#e2e8f0',
             borderWidth: 2,
             borderRadius: 4,
           },

@@ -109,7 +109,7 @@ const OPERATION_CONFIG = {
   },
   [AuditOperationType.VIEW]: {
     icon: Eye,
-    color: 'text-gray-600 bg-gray-50 border-gray-200',
+    color: 'text-gray-500 bg-gray-50 border-gray-200',
     label: '查看',
     description: '查看资产详情'
   }

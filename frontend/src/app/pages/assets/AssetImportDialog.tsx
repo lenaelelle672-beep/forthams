@@ -318,7 +318,7 @@ export default function AssetImportDialog({
             type="button"
             onClick={handleClose}
             disabled={isBusy}
-            className="text-gray-400 hover:text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="text-gray-400 hover:text-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             data-testid="import-btn-close"
           >
             <X className="w-5 h-5" />
@@ -374,7 +374,7 @@ export default function AssetImportDialog({
                   ? 'border-red-300 bg-red-50'
                   : selectedFile
                     ? 'border-green-300 bg-green-50'
-                    : 'border-gray-300 bg-gray-50 hover:border-blue-400 hover:bg-blue-50'
+                    : 'border-gray-200 bg-gray-50 hover:border-blue-400 hover:bg-blue-50'
               }`}
             data-testid="import-drop-zone"
           >
@@ -393,7 +393,7 @@ export default function AssetImportDialog({
                   <p className="text-sm font-medium text-gray-900" data-testid="import-file-name">
                     {selectedFile.name}
                   </p>
-                  <p className="text-xs text-gray-500" data-testid="import-file-size">
+                  <p className="text-xs text-gray-400" data-testid="import-file-size">
                     {formatFileSize(selectedFile.size)}
                   </p>
                 </div>
@@ -401,7 +401,7 @@ export default function AssetImportDialog({
             ) : (
               <div>
                 <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-gray-500">
                   点击或拖拽文件到此处上传
                 </p>
                 <p className="text-xs text-gray-400 mt-1">
@@ -416,7 +416,7 @@ export default function AssetImportDialog({
         {state === 'PARSING' && (
           <div className="mb-4 p-6 text-center" data-testid="import-parsing">
             <Loader2 className="w-8 h-8 animate-spin mx-auto mb-2 text-blue-600" />
-            <p className="text-sm text-gray-600">正在解析文件...</p>
+            <p className="text-sm text-gray-500">正在解析文件...</p>
           </div>
         )}
 
@@ -440,14 +440,14 @@ export default function AssetImportDialog({
                 <table className="w-full text-xs border border-gray-200 rounded">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="px-2 py-1 text-left text-gray-600">行号</th>
-                      <th className="px-2 py-1 text-left text-gray-600">字段</th>
-                      <th className="px-2 py-1 text-left text-gray-600">错误信息</th>
+                      <th className="px-2 py-1 text-left text-gray-500">行号</th>
+                      <th className="px-2 py-1 text-left text-gray-500">字段</th>
+                      <th className="px-2 py-1 text-left text-gray-500">错误信息</th>
                     </tr>
                   </thead>
                   <tbody>
                     {parseResponse.errors.map((err: ImportParseError, idx: number) => (
-                      <tr key={idx} className="border-t border-gray-100">
+                      <tr key={idx} className="border-t border-gray-200">
                         <td className="px-2 py-1 text-red-600">{err.rowNumber}</td>
                         <td className="px-2 py-1 text-gray-700">{err.field}</td>
                         <td className="px-2 py-1 text-red-600">{err.message}</td>
@@ -464,7 +464,7 @@ export default function AssetImportDialog({
         {state === 'COMMITTING' && (
           <div className="mb-4 p-6 text-center" data-testid="import-committing">
             <Loader2 className="w-8 h-8 animate-spin mx-auto mb-2 text-blue-600" />
-            <p className="text-sm text-gray-600">正在导入数据...</p>
+            <p className="text-sm text-gray-500">正在导入数据...</p>
           </div>
         )}
 
@@ -492,13 +492,13 @@ export default function AssetImportDialog({
                 <table className="w-full text-xs border border-gray-200 rounded">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="px-2 py-1 text-left text-gray-600">行号</th>
-                      <th className="px-2 py-1 text-left text-gray-600">错误信息</th>
+                      <th className="px-2 py-1 text-left text-gray-500">行号</th>
+                      <th className="px-2 py-1 text-left text-gray-500">错误信息</th>
                     </tr>
                   </thead>
                   <tbody>
                     {commitErrors.map((err, idx) => (
-                      <tr key={idx} className="border-t border-gray-100">
+                      <tr key={idx} className="border-t border-gray-200">
                         <td className="px-2 py-1 text-red-600">第 {err.rowNumber} 行</td>
                         <td className="px-2 py-1 text-red-600">{err.message}</td>
                       </tr>
@@ -516,7 +516,7 @@ export default function AssetImportDialog({
             type="button"
             onClick={handleClose}
             disabled={isBusy}
-            className="px-4 py-2 text-sm rounded-lg border border-gray-300
+            className="px-4 py-2 text-sm rounded-lg border border-gray-200
               bg-white text-gray-700 hover:bg-gray-50
               disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             data-testid="import-btn-cancel"

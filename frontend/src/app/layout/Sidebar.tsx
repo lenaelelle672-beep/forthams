@@ -10,7 +10,6 @@ import {
   Workflow,
   BarChart3,
   Settings as SettingsIcon,
-  ArchiveRestore,
   TrendingDown,
   MapPin,
   Truck,

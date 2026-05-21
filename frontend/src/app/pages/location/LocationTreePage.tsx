@@ -280,7 +280,7 @@ function TreeNode({
       >
         {/* 拖拽手柄 */}
         <span
-          className={`mr-1.5 cursor-grab text-gray-400 hover:text-gray-600 ${
+          className={`mr-1.5 cursor-grab text-gray-400 hover:text-gray-500 ${
             isReordering ? "pointer-events-none" : ""
           }`}
           title="拖拽排序"
@@ -292,15 +292,15 @@ function TreeNode({
         <button
           type="button"
           onClick={() => hasChildren && onToggle(node.id)}
-          className={`mr-2 flex-shrink-0 p-0.5 rounded hover:bg-gray-200 transition-colors ${
+          className={`mr-2 flex-shrink-0 p-0.5 rounded hover:bg-blue-50 transition-colors ${
             hasChildren ? "cursor-pointer" : "cursor-default opacity-30"
           }`}
           disabled={!hasChildren}
         >
           {isExpanded ? (
-            <ChevronDown className="w-4 h-4 text-gray-500" />
+            <ChevronDown className="w-4 h-4 text-gray-400" />
           ) : (
-            <ChevronRight className="w-4 h-4 text-gray-500" />
+            <ChevronRight className="w-4 h-4 text-gray-400" />
           )}
         </button>
 
@@ -311,7 +311,7 @@ function TreeNode({
         </span>
 
         {/* 编码 */}
-        <span className="text-xs text-gray-500 font-mono mr-3 hidden sm:inline">
+        <span className="text-xs text-gray-400 font-mono mr-3 hidden sm:inline">
           {node.locationCode ?? ""}
         </span>
 
@@ -336,7 +336,7 @@ function TreeNode({
           <button
             type="button"
             onClick={() => onEdit(node.id)}
-            className="p-1 rounded hover:bg-gray-100 text-gray-500 transition-colors"
+            className="p-1 rounded hover:bg-blue-50 text-gray-400 transition-colors"
             title="编辑"
             disabled={isReordering}
           >
@@ -665,7 +665,7 @@ function LocationTreePageInner() {
           onClick={handleExpandAll}
           disabled={isReordering}
           className="inline-flex items-center gap-1.5 px-3 py-2 text-sm
-            rounded-lg border border-gray-300 bg-white text-gray-700
+            rounded-lg border border-gray-200 bg-white text-gray-700
             hover:bg-gray-50 disabled:opacity-50 transition-colors"
         >
           <ChevronDown className="w-4 h-4" />
@@ -676,7 +676,7 @@ function LocationTreePageInner() {
           onClick={handleCollapseAll}
           disabled={isReordering}
           className="inline-flex items-center gap-1.5 px-3 py-2 text-sm
-            rounded-lg border border-gray-300 bg-white text-gray-700
+            rounded-lg border border-gray-200 bg-white text-gray-700
             hover:bg-gray-50 disabled:opacity-50 transition-colors"
         >
           <ChevronRight className="w-4 h-4" />
@@ -687,7 +687,7 @@ function LocationTreePageInner() {
           onClick={fetchLocations}
           disabled={loading || isReordering}
           className="inline-flex items-center gap-1.5 px-3 py-2 text-sm
-            rounded-lg border border-gray-300 bg-white text-gray-700
+            rounded-lg border border-gray-200 bg-white text-gray-700
             hover:bg-gray-50 disabled:opacity-50 transition-colors"
         >
           <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
@@ -712,11 +712,11 @@ function LocationTreePageInner() {
       {loading ? (
         <div className="flex items-center justify-center py-16">
           <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
-          <span className="ml-3 text-gray-500">加载位置数据...</span>
+          <span className="ml-3 text-gray-400">加载位置数据...</span>
         </div>
       ) : treeData.length === 0 ? (
-        <div className="text-center py-16 text-gray-500">
-          <MapPin className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+        <div className="text-center py-16 text-gray-400">
+          <MapPin className="w-12 h-12 mx-auto mb-3 text-slate-600" />
           <p>暂无位置数据</p>
           <p className="text-sm mt-1">点击"新增位置"添加顶级位置</p>
         </div>
@@ -744,7 +744,7 @@ function LocationTreePageInner() {
       {/* 统计信息 */}
       {!loading && totalCount > 0 && (
         <div className="mt-4">
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-gray-500">
             共 {totalCount} 个位置节点
           </p>
         </div>

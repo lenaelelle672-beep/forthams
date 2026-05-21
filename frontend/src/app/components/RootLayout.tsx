@@ -15,6 +15,7 @@ import {
   Search,
   LogOut,
   Monitor,
+  Sparkles,
 } from "lucide-react";
 import { FormEvent, useState } from "react";
 import { useAuth } from "../context/AuthContext";
@@ -31,6 +32,8 @@ const navigation = [
   { name: '流程管理', href: '/workflows', icon: Workflow },
   { name: '数据分析', href: '/analytics', icon: BarChart3 },
   { name: '资产大屏', href: '/situation', icon: Monitor },
+  { name: '科技大屏V12', href: '/cyber-v12', icon: Sparkles },
+  { name: '工业大屏V13', href: '/industrial-v13', icon: Monitor },
   { name: '系统设置', href: '/settings', icon: SettingsIcon },
 ];
 
@@ -62,7 +65,7 @@ export function RootLayout() {
             <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
               <Package className="w-5 h-5 text-white" />
             </div>
-            <h1 className="text-xl font-semibold text-gray-900">企业资产管理系统</h1>
+            <h1 className="text-xl font-semibold text-gray-900">资产管理平台</h1>
           </div>
           
           <div className="flex items-center gap-4">
@@ -73,7 +76,7 @@ export function RootLayout() {
                 placeholder="搜索资产..."
                 value={searchQuery}
                 onChange={(event) => setSearchQuery(event.target.value)}
-                className="w-64 pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-64 pl-10 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </form>
 
@@ -84,10 +87,10 @@ export function RootLayout() {
                   setShowNotifications((prev) => !prev);
                   setHeaderMessage(null);
                 }}
-                className="relative p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                className="relative p-2 hover:bg-blue-50 rounded-lg transition-colors"
                 aria-label="查看通知"
               >
-                <Bell className="w-5 h-5 text-gray-600" />
+                <Bell className="w-5 h-5 text-gray-500" />
                 {notifications > 0 && (
                   <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
                 )}
@@ -95,7 +98,7 @@ export function RootLayout() {
               {showNotifications && (
                 <div className="absolute right-0 mt-2 w-72 bg-white border border-gray-200 rounded-lg shadow-lg p-4 z-20">
                   <div className="font-medium text-gray-900 mb-2">通知</div>
-                  <div className="text-sm text-gray-600">暂无新的待办通知，后续消息会在这里显示。</div>
+                  <div className="text-sm text-gray-500">暂无新的待办通知，后续消息会在这里显示。</div>
                 </div>
               )}
             </div>
@@ -106,9 +109,9 @@ export function RootLayout() {
               </div>
               <div className="text-sm">
                 <div className="font-medium text-gray-900">{user?.realName ?? user?.username ?? "管理员"}</div>
-                <div className="text-gray-500">{user?.username ?? "admin"}</div>
+                <div className="text-gray-400">{user?.username ?? "admin"}</div>
               </div>
-              <Button className="h-8 px-3 text-gray-600" onClick={logout} size="sm" variant="ghost">
+              <Button className="h-8 px-3 text-gray-500" onClick={logout} size="sm" variant="ghost">
                 <LogOut className="w-4 h-4" />
                 退出
               </Button>

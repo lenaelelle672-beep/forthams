@@ -86,7 +86,7 @@ const STATUS_CONFIG: Record<RetirementStatus, {
     label: '草稿',
     color: 'default',
     icon: '📝',
-    bgClass: 'bg-gray-100',
+    bgClass: 'bg-blue-50',
     textClass: 'text-gray-700',
   },
   SUBMITTED: {
@@ -269,14 +269,14 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
 
       {/* ATB-005-02: 进度可视化数据结构 */}
       {showProgress && isValidProgress && progressInfo && (
-        <div className="flex items-center gap-2 text-xs text-gray-500">
+        <div className="flex items-center gap-2 text-xs text-gray-400">
           {/* 当前步骤指示 */}
           <span className="font-medium">
             {progressInfo.current_step}/{progressInfo.total_steps}
           </span>
           
           {/* 进度条 */}
-          <div className="flex-1 h-1.5 bg-gray-200 rounded-full overflow-hidden min-w-16">
+          <div className="flex-1 h-1.5 bg-blue-50 rounded-full overflow-hidden min-w-16">
             <div
               className={cn(
                 'h-full transition-all duration-300',

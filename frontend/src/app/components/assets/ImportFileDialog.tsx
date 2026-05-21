@@ -318,7 +318,7 @@ export function ImportFileDialog({ className }: ImportFileDialogProps) {
             type="button"
             onClick={downloadTemplate}
             className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium
-              rounded-lg border border-gray-300 bg-white text-gray-700
+              rounded-lg border border-gray-200 bg-white text-gray-700
               hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500
               transition-colors"
           >
@@ -336,7 +336,7 @@ export function ImportFileDialog({ className }: ImportFileDialogProps) {
             className={`flex flex-col items-center justify-center w-full h-48
               border-2 border-dashed rounded-xl cursor-pointer transition-colors
               ant-upload-drag
-              ${validationError ? 'border-red-300 bg-red-50' : 'border-gray-300 bg-white hover:border-blue-400 hover:bg-blue-50'}
+              ${validationError ? 'border-red-300 bg-red-50' : 'border-gray-200 bg-white hover:border-blue-400 hover:bg-blue-50'}
               ${isBusy ? 'pointer-events-none opacity-50' : ''}
             `}
             onDrop={handleDrop}
@@ -344,7 +344,7 @@ export function ImportFileDialog({ className }: ImportFileDialogProps) {
           >
             <div className="ant-upload-drag-icon flex flex-col items-center justify-center pt-5 pb-6">
               <Upload className="w-10 h-10 text-gray-400 mb-3" />
-              <p className="mb-1 text-sm text-gray-500">
+              <p className="mb-1 text-sm text-gray-400">
                 将 .xlsx 文件拖到此处，或点击选择文件
               </p>
               <p className="text-xs text-gray-400">
@@ -376,8 +376,8 @@ export function ImportFileDialog({ className }: ImportFileDialogProps) {
       {isUploading && (
         <div className="flex flex-col items-center justify-center py-12" data-testid="upload-progress">
           <Loader2 className="w-12 h-12 text-blue-500 animate-spin mb-4" />
-          <p className="text-sm text-gray-500">正在上传并解析文件...</p>
-          <div className="w-full max-w-md mt-4 bg-gray-200 rounded-full h-2 ant-progress">
+          <p className="text-sm text-gray-400">正在上传并解析文件...</p>
+          <div className="w-full max-w-md mt-4 bg-blue-50 rounded-full h-2 ant-progress">
             <div
               className="bg-blue-500 h-2 rounded-full ant-progress-bg animate-pulse"
               style={{ width: '60%' }}
@@ -392,7 +392,7 @@ export function ImportFileDialog({ className }: ImportFileDialogProps) {
           <div className="flex items-center gap-2 text-red-600 text-sm">
             <AlertCircle className="w-4 h-4 flex-shrink-0" />
             <span>上传失败</span>
-            {error && <span className="text-gray-500">: {error}</span>}
+            {error && <span className="text-gray-400">: {error}</span>}
           </div>
           <div className="flex items-center gap-3">
             <button
@@ -415,8 +415,8 @@ export function ImportFileDialog({ className }: ImportFileDialogProps) {
           {/* 解析摘要 */}
           <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
             <div className="flex items-center gap-2 text-sm">
-              <FileText className="w-4 h-4 text-gray-500" />
-              <span className="text-gray-600">
+              <FileText className="w-4 h-4 text-gray-400" />
+              <span className="text-gray-500">
                 共 {parseResult.rows.length} 行数据
               </span>
             </div>
@@ -462,20 +462,20 @@ export function ImportFileDialog({ className }: ImportFileDialogProps) {
 
           {/* 预览表格 */}
           <div className="overflow-x-auto rounded-lg border border-gray-200 ant-table">
-            <table className="min-w-full divide-y divide-gray-200">
+            <table className="min-w-full divide-y divide-[#1e3a5f]">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">序号</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">资产名称</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">分类</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">状态</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">位置</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">购置日期</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">原值</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">校验状态</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase">序号</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase">资产名称</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase">分类</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase">状态</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase">位置</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase">购置日期</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase">原值</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase">校验状态</th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-white divide-y divide-[#1e3a5f]">
                 {previewPageData.map((row) => {
                   const hasError = errorRowNumbers.has(row.rowNumber);
                   const rowErrors = errorByRow.get(row.rowNumber);
@@ -544,7 +544,7 @@ export function ImportFileDialog({ className }: ImportFileDialogProps) {
           {/* 预览分页 */}
           {previewTotalPages > 1 && (
             <div className="flex items-center justify-between">
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-500">
                 共 {displayRows.length} 行，第 {previewPage}/{previewTotalPages} 页
               </p>
               <div className="flex items-center gap-2 ant-pagination">
@@ -553,7 +553,7 @@ export function ImportFileDialog({ className }: ImportFileDialogProps) {
                   onClick={() => setPreviewPage((p) => Math.max(1, p - 1))}
                   disabled={previewPage <= 1}
                   className="inline-flex items-center gap-1 px-3 py-1.5 text-sm
-                    rounded border border-gray-300 bg-white hover:bg-gray-50
+                    rounded border border-gray-200 bg-white hover:bg-gray-50
                     disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   <ChevronLeft className="w-4 h-4" />
@@ -578,7 +578,7 @@ export function ImportFileDialog({ className }: ImportFileDialogProps) {
                       className={`px-3 py-1.5 text-sm rounded border transition-colors
                         ${previewPage === pageNum
                           ? 'bg-blue-600 text-white border-blue-600'
-                          : 'border-gray-300 bg-white hover:bg-gray-50'
+                          : 'border-gray-200 bg-white hover:bg-gray-50'
                         }`}
                     >
                       {pageNum}
@@ -590,7 +590,7 @@ export function ImportFileDialog({ className }: ImportFileDialogProps) {
                   onClick={() => setPreviewPage((p) => Math.min(previewTotalPages, p + 1))}
                   disabled={previewPage >= previewTotalPages}
                   className="inline-flex items-center gap-1 px-3 py-1.5 text-sm
-                    rounded border border-gray-300 bg-white hover:bg-gray-50
+                    rounded border border-gray-200 bg-white hover:bg-gray-50
                     disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   下一页
@@ -605,7 +605,7 @@ export function ImportFileDialog({ className }: ImportFileDialogProps) {
             <button
               type="button"
               onClick={handleFullReset}
-              className="px-4 py-2 text-sm rounded-lg border border-gray-300
+              className="px-4 py-2 text-sm rounded-lg border border-gray-200
                 bg-white text-gray-700 hover:bg-gray-50 transition-colors"
             >
               取消
@@ -636,7 +636,7 @@ export function ImportFileDialog({ className }: ImportFileDialogProps) {
       {isCommitting && !isPreview && (
         <div className="flex flex-col items-center justify-center py-12">
           <Loader2 className="w-12 h-12 text-blue-500 animate-spin mb-4" />
-          <p className="text-sm text-gray-500">正在导入数据...</p>
+          <p className="text-sm text-gray-400">正在导入数据...</p>
         </div>
       )}
 
@@ -677,7 +677,7 @@ export function ImportFileDialog({ className }: ImportFileDialogProps) {
             <button
               type="button"
               disabled
-              className="px-4 py-2 text-sm rounded-lg bg-gray-100 text-gray-400
+              className="px-4 py-2 text-sm rounded-lg bg-blue-50 text-gray-400
                 cursor-not-allowed transition-colors"
             >
               导入完成
@@ -685,7 +685,7 @@ export function ImportFileDialog({ className }: ImportFileDialogProps) {
             <button
               type="button"
               onClick={handleFullReset}
-              className="px-4 py-2 text-sm rounded-lg border border-gray-300
+              className="px-4 py-2 text-sm rounded-lg border border-gray-200
                 bg-white text-gray-700 hover:bg-gray-50 transition-colors"
             >
               重新导入

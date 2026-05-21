@@ -191,6 +191,17 @@ const AssetCompensationForm = withSuspense(
 );
 
 /**
+ * Disposal detail page — view disposal application details with approval history.
+ */
+const DisposalDetailPage = withSuspense(
+  lazy(() =>
+    import('../pages/assets/DisposalDetailPage').then((module) => ({
+      default: module.DisposalDetailPage,
+    }))
+  )
+);
+
+/**
  * Work order detail page — view work order details and approval history.
  */
 const WorkOrderDetailPage = withSuspense(
@@ -295,6 +306,10 @@ export const disposalRoutes: RouteObject[] = [
   {
     path: 'disposals',
     Component: Disposals,
+  },
+  {
+    path: 'disposals/:id',
+    Component: DisposalDetailPage,
   },
   {
     path: 'disposals/transfer/new',

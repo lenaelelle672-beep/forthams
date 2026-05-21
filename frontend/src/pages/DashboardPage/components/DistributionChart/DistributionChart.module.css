@@ -5,7 +5,7 @@
  */
 
 .chartContainer {
-  background: #fff;
+  background: #ffffff;
   border-radius: 8px;
   padding: 16px;
   height: 100%;
@@ -37,8 +37,8 @@
 .chartToggle {
   padding: 4px 12px;
   font-size: 12px;
-  border: 1px solid #d9d9d9;
-  background: #fff;
+  border: 1px solid #f8fafc;
+  background: #ffffff;
   border-radius: 4px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -53,7 +53,7 @@
 .chartToggle.active {
   background: #1890ff;
   border-color: #1890ff;
-  color: #fff;
+  color: #ffffff;
 }
 
 .chartWrapper {
@@ -138,7 +138,7 @@
   border-radius: 4px;
   padding: 8px 12px;
   font-size: 12px;
-  color: #fff;
+  color: #ffffff;
 }
 
 .tooltipTitle {
@@ -197,7 +197,7 @@
 .loadingSpinner {
   width: 32px;
   height: 32px;
-  border: 3px solid #f0f0f0;
+  border: 3px solid #f8fafc;
   border-top-color: #1890ff;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;

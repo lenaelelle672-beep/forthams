@@ -105,7 +105,7 @@ export const ApprovalActionPanel: React.FC<ApprovalActionPanelProps> = ({
             'focus:outline-none focus:ring-2 focus:ring-blue-500',
             validationError
               ? 'border-red-300 focus:border-red-500 focus:ring-red-500'
-              : 'border-gray-300 focus:border-blue-500',
+              : 'border-gray-200 focus:border-blue-500',
             isDisabled && 'cursor-not-allowed bg-gray-50 text-gray-400',
           )}
           rows={3}

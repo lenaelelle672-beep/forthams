@@ -204,7 +204,7 @@ const ExcelDropZone: React.FC<ExcelDropZoneProps> = ({
         padding: '40px 20px',
         textAlign: 'center',
         cursor: disabled ? 'not-allowed' : 'pointer',
-        backgroundColor: isDragging ? '#e6f4ff' : '#fafafa',
+        backgroundColor: isDragging ? '#e6f4ff' : '#0f172a',
         transition: 'border-color 0.3s, background-color 0.3s',
         opacity: disabled ? 0.5 : 1,
         userSelect: 'none',

@@ -152,7 +152,7 @@ const getStatusText = (status: ImportTaskStatus, t: (key: string) => string): st
  */
 const getStatusColor = (status: ImportTaskStatus): string => {
   const colorMap: Record<ImportTaskStatus, string> = {
-    [ImportTaskStatus.PENDING]: 'text-gray-500',
+    [ImportTaskStatus.PENDING]: 'text-gray-400',
     [ImportTaskStatus.UPLOADING]: 'text-blue-500',
     [ImportTaskStatus.PARSING]: 'text-blue-500',
     [ImportTaskStatus.VALIDATING]: 'text-blue-500',
@@ -161,7 +161,7 @@ const getStatusColor = (status: ImportTaskStatus): string => {
     [ImportTaskStatus.FAILED]: 'text-red-500',
     [ImportTaskStatus.PARTIAL_SUCCESS]: 'text-yellow-500',
   };
-  return colorMap[status] || 'text-gray-500';
+  return colorMap[status] || 'text-gray-400';
 };
 
 /**
@@ -337,7 +337,7 @@ const ImportProgress: React.FC<ImportProgressProps> = ({
           {t('import.progress.title')}
         </h2>
         {taskResult?.fileName && (
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-gray-400">
             {t('import.progress.file')}: {taskResult.fileName}
           </p>
         )}
@@ -363,7 +363,7 @@ const ImportProgress: React.FC<ImportProgressProps> = ({
           </span>
         </div>
         {taskResult && (
-          <span className="text-sm text-gray-500">
+          <span className="text-sm text-gray-400">
             {formatDuration(taskResult.startTime, taskResult.endTime)}
           </span>
         )}
@@ -371,13 +371,13 @@ const ImportProgress: React.FC<ImportProgressProps> = ({
 
       {/* 进度条 */}
       <div className="mb-6">
-        <div className="flex justify-between text-sm text-gray-600 mb-2">
+        <div className="flex justify-between text-sm text-gray-500 mb-2">
           <span>
             {taskResult?.processedRows || 0} / {taskResult?.totalRows || 0} {t('import.progress.rows')}
           </span>
           <span>{progressPercentage}%</span>
         </div>
-        <div className="w-full bg-gray-200 rounded-full h-2.5 overflow-hidden">
+        <div className="w-full bg-blue-50 rounded-full h-2.5 overflow-hidden">
           <div
             className={`h-full rounded-full transition-all duration-300 ${getProgressBarColor(
               (taskResult?.status as ImportTaskStatus) || ImportTaskStatus.PENDING
@@ -394,17 +394,17 @@ const ImportProgress: React.FC<ImportProgressProps> = ({
             <div className="text-2xl font-bold text-green-600">
               {taskResult.successCount}
             </div>
-            <div className="text-sm text-gray-500">{t('import.progress.success')}</div>
+            <div className="text-sm text-gray-400">{t('import.progress.success')}</div>
           </div>
           <div className="bg-red-50 rounded-lg p-4 text-center">
             <div className="text-2xl font-bold text-red-600">
               {taskResult.failedCount}
             </div>
-            <div className="text-sm text-gray-500">{t('import.progress.failed')}</div>
+            <div className="text-sm text-gray-400">{t('import.progress.failed')}</div>
           </div>
           <div className="bg-blue-50 rounded-lg p-4 text-center">
             <div className="text-2xl font-bold text-blue-600">{successRate}%</div>
-            <div className="text-sm text-gray-500">{t('import.progress.successRate')}</div>
+            <div className="text-sm text-gray-400">{t('import.progress.successRate')}</div>
           </div>
         </div>
       )}
@@ -427,29 +427,29 @@ const ImportProgress: React.FC<ImportProgressProps> = ({
             <table className="w-full text-sm">
               <thead className="bg-gray-50 sticky top-0">
                 <tr>
-                  <th className="px-4 py-2 text-left text-gray-500 font-medium">
+                  <th className="px-4 py-2 text-left text-gray-400 font-medium">
                     {t('import.progress.table.row')}
                   </th>
-                  <th className="px-4 py-2 text-left text-gray-500 font-medium">
+                  <th className="px-4 py-2 text-left text-gray-400 font-medium">
                     {t('import.progress.table.field')}
                   </th>
-                  <th className="px-4 py-2 text-left text-gray-500 font-medium">
+                  <th className="px-4 py-2 text-left text-gray-400 font-medium">
                     {t('import.progress.table.message')}
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200">
+              <tbody className="divide-y divide-[#1e3a5f]">
                 {taskResult.errors.slice(0, 50).map((error, index) => (
                   <tr key={index} className="hover:bg-gray-50">
-                    <td className="px-4 py-2 text-gray-600">{error.rowNumber}</td>
-                    <td className="px-4 py-2 text-gray-600">{error.field}</td>
+                    <td className="px-4 py-2 text-gray-500">{error.rowNumber}</td>
+                    <td className="px-4 py-2 text-gray-500">{error.field}</td>
                     <td className="px-4 py-2 text-red-500">{error.message}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
             {taskResult.errors.length > 50 && (
-              <div className="p-2 text-center text-sm text-gray-500 bg-gray-50">
+              <div className="p-2 text-center text-sm text-gray-400 bg-gray-50">
                 {t('import.progress.table.moreErrors', { count: taskResult.errors.length - 50 })}
               </div>
             )}
@@ -462,7 +462,7 @@ const ImportProgress: React.FC<ImportProgressProps> = ({
         {showCancelButton && (
           <button
             onClick={handleCancel}
-            className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+            className="px-4 py-2 border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
           >
             {t('import.progress.cancel')}
           </button>

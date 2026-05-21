@@ -242,16 +242,17 @@ export function WorkflowDesigner() {
 
   const handleAddNodeAtPosition = useCallback(
     (type: FlowNodeType, position?: { x: number; y: number }) => {
-      const newNode = createFlowNode(type, position ?? getAutoPosition(nodes.length), {
-        data: {
-          nodeCode: `${type.toUpperCase()}-${String(nodes.length + 1).padStart(3, "0")}`,
-        },
+      setNodes((currentNodes) => {
+        const newNode = createFlowNode(type, position ?? getAutoPosition(currentNodes.length), {
+          data: {
+            nodeCode: `${type.toUpperCase()}-${String(currentNodes.length + 1).padStart(3, "0")}`,
+          },
+        });
+        setSelectedNodeId(newNode.id);
+        return [...currentNodes, newNode];
       });
-
-      setNodes((currentNodes) => [...currentNodes, newNode]);
-      setSelectedNodeId(newNode.id);
     },
-    [nodes.length, setNodes],
+    [setNodes],
   );
 
   const handleConnect = useCallback(
@@ -261,7 +262,20 @@ export function WorkflowDesigner() {
         return;
       }
 
-      setEdges((currentEdges) => addEdge(edge, currentEdges));
+      if (edge.source === edge.target) {
+        setSaveMessage(null);
+        setSaveError("同一节点不能连接到自身");
+        return;
+      }
+
+      setEdges((currentEdges) => {
+        const duplicated = currentEdges.some((currentEdge) =>
+          currentEdge.source === edge.source
+          && currentEdge.target === edge.target
+          && currentEdge.sourceHandle === edge.sourceHandle,
+        );
+        return duplicated ? currentEdges : addEdge(edge, currentEdges);
+      });
     },
     [setEdges],
   );
@@ -292,9 +306,12 @@ export function WorkflowDesigner() {
         currentEdges.filter((edge) => edge.source !== nodeId && edge.target !== nodeId),
       );
 
-      setSelectedNodeId((currentSelected) => (currentSelected === nodeId ? null : currentSelected));
+      setSelectedNodeId((currentSelected) => {
+        if (currentSelected !== nodeId) return currentSelected;
+        return nodes.find((node) => node.id !== nodeId)?.id ?? null;
+      });
     },
-    [setEdges, setNodes],
+    [nodes, setEdges, setNodes],
   );
 
   const handleSaveDraft = useCallback(async () => {

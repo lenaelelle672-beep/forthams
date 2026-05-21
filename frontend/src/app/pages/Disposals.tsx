@@ -91,6 +91,21 @@ export function Disposals() {
       })
     : data;
 
+  const handleViewDetail = useCallback(async (item: DisposalRecord) => {
+    try {
+      const applications = await api.get<Array<{ id: number; assetId: number }>>(
+        `/v1/retirement/asset/${item.assetId}`,
+      );
+      if (applications && applications.length > 0) {
+        navigate(`/retirement/${applications[0].id}`);
+        return;
+      }
+    } catch {
+      // fallback to modal
+    }
+    setSelectedRecord(item);
+  }, [navigate]);
+
   const routeMap: Record<string, string> = {
     transfer: '/disposals/transfer/new',
     clearance: '/disposals/clearance/new',
@@ -103,7 +118,7 @@ export function Disposals() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-semibold text-gray-900">资产处置管理</h2>
-          <p className="text-gray-600 mt-1">管理资产转移、清退、报废转让及赔偿等全生命周期处置流程</p>
+          <p className="text-gray-500 mt-1">管理资产转移、清退、报废转让及赔偿等全生命周期处置流程</p>
         </div>
         <button
           onClick={() => {
@@ -130,10 +145,10 @@ export function Disposals() {
                 className={`w-1/4 group inline-flex items-center justify-center py-4 px-1 border-b-2 font-medium text-sm ${
                   isActive
                     ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    : 'border-transparent text-gray-400 hover:text-gray-700 hover:border-gray-200'
                 }`}
               >
-                <Icon className={`w-5 h-5 mr-2 ${isActive ? 'text-blue-500' : 'text-gray-400 group-hover:text-gray-500'}`} />
+                <Icon className={`w-5 h-5 mr-2 ${isActive ? 'text-blue-500' : 'text-gray-400 group-hover:text-gray-400'}`} />
                 {tab.name}
               </button>
             );
@@ -142,7 +157,7 @@ export function Disposals() {
       </div>
 
       <div className="bg-white rounded-b-lg border border-gray-200 border-t-0 p-6">
-        {loading && <div className="mb-4 text-sm text-gray-500">加载中...</div>}
+        {loading && <div className="mb-4 text-sm text-gray-400">加载中...</div>}
         {error && <div className="mb-4 text-sm text-red-600">{error}</div>}
         <div className="flex items-center justify-between mb-6">
           <div className="flex gap-4">
@@ -153,11 +168,11 @@ export function Disposals() {
                 placeholder="搜索申请单号或资产ID..."
                 value={searchTerm}
                 onChange={(event) => setSearchTerm(event.target.value)}
-                className="w-64 pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-64 pl-10 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
           </div>
-          <div className="text-sm text-gray-500">
+          <div className="text-sm text-gray-400">
             共 {totalCount} 条记录，第 {page} / {totalPages} 页
           </div>
         </div>
@@ -166,38 +181,38 @@ export function Disposals() {
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">日志ID</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">资产ID</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">变更类型</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">操作人ID</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">创建时间</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">原因</th>
-                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">操作</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">日志ID</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">资产ID</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">变更类型</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">操作人ID</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">创建时间</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">原因</th>
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase">操作</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200">
+            <tbody className="divide-y divide-[#1e3a5f]">
               {filteredData.map((item) => (
                 <tr key={item.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 text-sm font-medium text-blue-600">{item.id}</td>
                   <td className="px-6 py-4 text-sm text-gray-900">{item.assetId ?? '-'}</td>
-                  <td className="px-6 py-4 text-sm text-gray-600">{changeTypeLabels[item.changeType ?? ''] ?? item.changeType ?? '-'}</td>
+                  <td className="px-6 py-4 text-sm text-gray-500">{changeTypeLabels[item.changeType ?? ''] ?? item.changeType ?? '-'}</td>
                   <td className="px-6 py-4 text-sm text-gray-900">{item.operatorId ?? '-'}</td>
-                  <td className="px-6 py-4 text-sm text-gray-600">{item.createTime ?? '-'}</td>
-                  <td className="px-6 py-4 text-sm text-gray-600">{item.reason ?? '-'}</td>
-                  <td className="px-6 py-4 text-center">
-                    <button
-                      onClick={() => setSelectedRecord(item)}
-                      className="inline-flex items-center justify-center p-1 rounded transition-colors hover:bg-gray-100"
-                      title="查看详情"
-                    >
-                      <Eye className="w-4 h-4 text-gray-600" />
-                    </button>
-                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-500">{item.createTime ?? '-'}</td>
+                  <td className="px-6 py-4 text-sm text-gray-500">{item.reason ?? '-'}</td>
+                    <td className="px-6 py-4 text-center">
+                      <button
+                        onClick={() => handleViewDetail(item)}
+                        className="inline-flex items-center justify-center p-1 rounded transition-colors hover:bg-blue-50"
+                        title="查看详情"
+                      >
+                        <Eye className="w-4 h-4 text-gray-500" />
+                      </button>
+                    </td>
                 </tr>
               ))}
               {filteredData.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="px-6 py-8 text-center text-gray-500 text-sm">暂无数据</td>
+                  <td colSpan={7} className="px-6 py-8 text-center text-gray-400 text-sm">暂无数据</td>
                 </tr>
               )}
             </tbody>
@@ -209,7 +224,7 @@ export function Disposals() {
             <button
               onClick={() => setPage(Math.max(1, page - 1))}
               disabled={page <= 1}
-              className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-3 py-1.5 text-sm border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               上一页
             </button>
@@ -221,7 +236,7 @@ export function Disposals() {
                 <button
                   key={p}
                   onClick={() => setPage(p)}
-                  className={`px-3 py-1.5 text-sm rounded-lg ${p === page ? 'bg-blue-600 text-white' : 'border border-gray-300 hover:bg-gray-50'}`}
+                  className={`px-3 py-1.5 text-sm rounded-lg ${p === page ? 'bg-blue-600 text-white' : 'border border-gray-200 hover:bg-gray-50'}`}
                 >
                   {p}
                 </button>
@@ -230,7 +245,7 @@ export function Disposals() {
             <button
               onClick={() => setPage(Math.min(totalPages, page + 1))}
               disabled={page >= totalPages}
-              className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-3 py-1.5 text-sm border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               下一页
             </button>
@@ -240,23 +255,74 @@ export function Disposals() {
 
       {selectedRecord && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => setSelectedRecord(null)}>
-          <div className="w-full max-w-xl rounded-lg bg-white shadow-xl mx-4" onClick={(event) => event.stopPropagation()}>
-            <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900">处置记录详情</h3>
-              <button onClick={() => setSelectedRecord(null)} className="text-gray-400 hover:text-gray-600">✕</button>
+          <div className="w-full max-w-2xl rounded-xl bg-white shadow-xl mx-4 max-h-[85vh] overflow-y-auto" onClick={(event) => event.stopPropagation()}>
+            {/* Header */}
+            <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between bg-gray-50/50">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-blue-50 rounded-lg">
+                  <Eye className="w-5 h-5 text-blue-600" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">处置记录详情</h3>
+                  <p className="text-sm text-gray-400">日志ID：{selectedRecord.id}</p>
+                </div>
+              </div>
+              <button onClick={() => setSelectedRecord(null)} className="text-gray-400 hover:text-gray-500 text-xl">&times;</button>
             </div>
-            <div className="p-6 grid grid-cols-2 gap-4 text-sm">
-              <div><span className="text-gray-500">日志ID：</span><span className="font-medium">{selectedRecord.id}</span></div>
-              <div><span className="text-gray-500">资产ID：</span><span className="font-medium">{selectedRecord.assetId ?? '-'}</span></div>
-              <div><span className="text-gray-500">变更类型：</span><span className="font-medium">{changeTypeLabels[selectedRecord.changeType ?? ''] ?? selectedRecord.changeType ?? '-'}</span></div>
-              <div><span className="text-gray-500">操作人ID：</span><span className="font-medium">{selectedRecord.operatorId ?? '-'}</span></div>
-              <div className="col-span-2"><span className="text-gray-500">创建时间：</span><span className="font-medium">{selectedRecord.createTime ?? '-'}</span></div>
-              <div className="col-span-2"><span className="text-gray-500">变更前：</span><p className="mt-1 rounded bg-gray-50 p-3 text-gray-700">{selectedRecord.oldValue || '-'}</p></div>
-              <div className="col-span-2"><span className="text-gray-500">变更后：</span><p className="mt-1 rounded bg-gray-50 p-3 text-gray-700">{selectedRecord.newValue || '-'}</p></div>
-              <div className="col-span-2"><span className="text-gray-500">原因：</span><p className="mt-1 rounded bg-gray-50 p-3 text-gray-700">{selectedRecord.reason || '-'}</p></div>
+
+            {/* Status Overview */}
+            <div className="px-6 py-5 border-b border-gray-200">
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <p className="text-sm text-gray-400 mb-1">变更类型</p>
+                  <span className="inline-block px-3 py-1 text-sm font-medium rounded-full bg-blue-50 text-blue-700">
+                    {changeTypeLabels[selectedRecord.changeType ?? ''] ?? selectedRecord.changeType ?? '-'}
+                  </span>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-400 mb-1">资产ID</p>
+                  <p className="text-base font-semibold text-gray-900">{selectedRecord.assetId ?? '-'}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-400 mb-1">操作人</p>
+                  <p className="text-base text-gray-900">操作人 #{selectedRecord.operatorId ?? '-'}</p>
+                </div>
+              </div>
             </div>
-            <div className="px-6 py-4 border-t border-gray-200 flex justify-end">
-              <button onClick={() => setSelectedRecord(null)} className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg transition-colors">关闭</button>
+
+            {/* Change Details */}
+            <div className="px-6 py-5 border-b border-gray-200">
+              <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                <span className="w-1 h-4 bg-blue-500 rounded-full"></span>
+                变更详情
+              </h4>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-red-50/50 rounded-lg p-4">
+                  <p className="text-sm text-gray-400 mb-1">变更前</p>
+                  <p className="text-sm text-gray-700 whitespace-pre-wrap">{selectedRecord.oldValue || '-'}</p>
+                </div>
+                <div className="bg-green-50/50 rounded-lg p-4">
+                  <p className="text-sm text-gray-400 mb-1">变更后</p>
+                  <p className="text-sm text-gray-700 whitespace-pre-wrap">{selectedRecord.newValue || '-'}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Reason */}
+            <div className="px-6 py-5 border-b border-gray-200">
+              <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                <span className="w-1 h-4 bg-blue-500 rounded-full"></span>
+                处置原因
+              </h4>
+              <p className="text-sm text-gray-700 whitespace-pre-wrap p-3 bg-gray-50 rounded-md">
+                {selectedRecord.reason || '-'}
+              </p>
+            </div>
+
+            {/* Footer */}
+            <div className="px-6 py-4 flex items-center justify-between bg-gray-50/50">
+              <p className="text-xs text-gray-400">创建时间：{selectedRecord.createTime ?? '-'}</p>
+              <button onClick={() => setSelectedRecord(null)} className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 rounded-lg transition-colors">关闭</button>
             </div>
           </div>
         </div>

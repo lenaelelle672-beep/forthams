@@ -214,7 +214,7 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({
         ref={buttonRef}
         type="button"
         onClick={toggleDropdown}
-        className="relative p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors duration-200"
+        className="relative p-2 text-gray-500 hover:text-gray-900 hover:bg-blue-50 rounded-full transition-colors duration-200"
         aria-label="查看通知"
         aria-expanded={isOpen}
         aria-haspopup="true"
@@ -259,7 +259,7 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-semibold text-gray-900">通知中心</h3>
               {unreadCount > 0 && (
-                <span className="text-xs text-gray-500">
+                <span className="text-xs text-gray-400">
                   {unreadCount}条未读
                 </span>
               )}
@@ -268,7 +268,7 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({
 
           {/* Loading State */}
           {isLoading && (
-            <div className="px-4 py-8 text-center text-sm text-gray-500">
+            <div className="px-4 py-8 text-center text-sm text-gray-400">
               <svg className="animate-spin h-5 w-5 mx-auto mb-2 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -281,8 +281,8 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({
           {!isLoading && (
             <div className="max-h-96 overflow-y-auto">
               {notifications.length === 0 ? (
-                <div className="px-4 py-8 text-center text-sm text-gray-500">
-                  <svg className="h-10 w-10 mx-auto mb-2 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="px-4 py-8 text-center text-sm text-gray-400">
+                  <svg className="h-10 w-10 mx-auto mb-2 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
                   </svg>
                   暂无通知
@@ -315,7 +315,7 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({
                         </div>
 
                         {/* Notification Content */}
-                        <p className="mt-1 text-sm text-gray-500 line-clamp-2">
+                        <p className="mt-1 text-sm text-gray-400 line-clamp-2">
                           {notification.content}
                         </p>
 

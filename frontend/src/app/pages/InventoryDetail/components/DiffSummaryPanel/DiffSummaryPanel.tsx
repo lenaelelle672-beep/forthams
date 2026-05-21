@@ -91,7 +91,7 @@ interface StatCardProps {
  * StatCard —— 单个统计指标卡片，封装 Ant Design Statistic。
  */
 const StatCard: React.FC<StatCardProps> = ({ title, value, prefix, valueStyle }) => (
-  <Card size="small" bordered={false} style={{ background: '#fafafa', borderRadius: 8 }}>
+  <Card size="small" bordered={false} style={{ background: '#f8fafc', borderRadius: 8 }}>
     <Statistic title={title} value={value} prefix={prefix} valueStyle={valueStyle} />
   </Card>
 );
@@ -386,8 +386,8 @@ const DiffSummaryPanel: React.FC<IDiffSummaryPanelProps> = ({
           style={{
             marginTop: 16,
             padding: '8px 12px',
-            background: '#fff2f0',
-            border: '1px solid #ffccc7',
+            background: '#fef2f2',
+            border: '1px solid #7f1d1d',
             borderRadius: 4,
           }}
         >

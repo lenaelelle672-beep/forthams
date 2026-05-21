@@ -52,6 +52,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { formatStatusLabel } from '@/app/constants/assetStatus';
 import {
   Select,
   SelectContent,
@@ -84,9 +85,9 @@ const STATUS_CONFIG: Record<
 > = {
   DRAFT: {
     label: '草稿',
-    color: 'text-gray-500',
+    color: 'text-gray-400',
     icon: <Edit2 className="h-4 w-4" />,
-    bgColor: 'bg-gray-100',
+    bgColor: 'bg-blue-50',
   },
   PENDING_APPROVAL: {
     label: '待审批',
@@ -108,9 +109,9 @@ const STATUS_CONFIG: Record<
   },
   CANCELLED: {
     label: '已撤回',
-    color: 'text-gray-600',
+    color: 'text-gray-500',
     icon: <RotateCcw className="h-4 w-4" />,
-    bgColor: 'bg-gray-100',
+    bgColor: 'bg-blue-50',
   },
   RETIRED: {
     label: '已退役',
@@ -581,7 +582,7 @@ export const RetirementDetail: React.FC<RetirementDetailProps> = ({
                         w-10 h-10 rounded-full flex items-center justify-center
                         ${isCompleted ? 'bg-green-500 text-white' : ''}
                         ${isCurrent ? `${config.bgColor} ${config.color} border-2 border-current` : ''}
-                        ${!isCompleted && !isCurrent ? 'bg-gray-100 text-gray-400' : ''}
+                        ${!isCompleted && !isCurrent ? 'bg-blue-50 text-gray-400' : ''}
                         ${isRejected || isCancelled ? 'bg-red-100 text-red-600' : ''}
                       `}
                     >
@@ -605,7 +606,7 @@ export const RetirementDetail: React.FC<RetirementDetailProps> = ({
                     <div
                       className={`
                         w-16 h-0.5 mx-2
-                        ${isCompleted ? 'bg-green-500' : 'bg-gray-200'}
+                        ${isCompleted ? 'bg-green-500' : 'bg-blue-50'}
                       `}
                     />
                   )}
@@ -672,7 +673,7 @@ export const RetirementDetail: React.FC<RetirementDetailProps> = ({
                       <div>
                         <Label className="text-muted-foreground">当前状态</Label>
                         <p className="font-medium">
-                          <Badge variant="outline">{assetInfo.status}</Badge>
+                          <Badge variant="outline">{formatStatusLabel(assetInfo.status)}</Badge>
                         </p>
                       </div>
                       <div>

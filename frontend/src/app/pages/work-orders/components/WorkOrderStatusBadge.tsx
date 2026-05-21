@@ -44,17 +44,17 @@ interface WorkOrderStatusBadgeProps {
  *   - CANCELLED   → gray-200 (voided)
  */
 const STATUS_CLASS_MAP: Record<string, string> = {
-  DRAFT: "bg-gray-100 text-gray-800",
+  DRAFT: "bg-blue-50 text-gray-800",
   PENDING: "bg-yellow-100 text-yellow-800",
   APPROVED: "bg-blue-100 text-blue-800",
   EXECUTING: "bg-indigo-100 text-indigo-800",
   COMPLETED: "bg-green-100 text-green-800",
   REJECTED: "bg-red-100 text-red-800",
-  CANCELLED: "bg-gray-200 text-gray-600",
+  CANCELLED: "bg-blue-50 text-gray-500",
 };
 
 /** Fallback classes for unrecognized status values. */
-const FALLBACK_CLASSES = "bg-gray-100 text-gray-600";
+const FALLBACK_CLASSES = "bg-blue-50 text-gray-500";
 
 // ---------------------------------------------------------------------------
 // Component

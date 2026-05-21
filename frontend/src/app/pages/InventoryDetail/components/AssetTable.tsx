@@ -188,7 +188,7 @@ export const StatusDropdown: React.FC<StatusDropdownProps> = ({
         fontSize: size === 'small' ? 12 : 14,
         lineHeight: 1.5,
         width: '100%',
-        background: disabled ? '#f5f5f5' : '#fff',
+        background: disabled ? '#1e293b' : '#fff',
         color: '#333',
         cursor: disabled ? 'not-allowed' : 'pointer',
         outline: 'none',
@@ -661,10 +661,10 @@ const AssetTable: React.FC<AssetTableProps> = ({
           transition: background-color 0.6s ease;
         }
         .inventory-row-surplus td {
-          background-color: #fffbe6 !important;
+          background-color: #1e3a5f !important;
         }
         .inventory-row-deficit td {
-          background-color: #fff2f0 !important;
+          background-color: #3b1c1c !important;
         }
       `}</style>
 

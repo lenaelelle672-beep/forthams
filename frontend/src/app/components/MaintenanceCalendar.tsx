@@ -36,21 +36,21 @@ export function MaintenanceCalendar() {
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold text-gray-900">保养日历</h3>
         <div className="flex items-center gap-2">
-          <button className="p-1 hover:bg-gray-100 rounded transition-colors">
-            <ChevronLeft className="w-5 h-5 text-gray-600" />
+          <button className="p-1 hover:bg-blue-50 rounded transition-colors">
+            <ChevronLeft className="w-5 h-5 text-gray-500" />
           </button>
           <span className="text-sm font-medium text-gray-900 min-w-[100px] text-center">
             2024年3月
           </span>
-          <button className="p-1 hover:bg-gray-100 rounded transition-colors">
-            <ChevronRight className="w-5 h-5 text-gray-600" />
+          <button className="p-1 hover:bg-blue-50 rounded transition-colors">
+            <ChevronRight className="w-5 h-5 text-gray-500" />
           </button>
         </div>
       </div>
 
       <div className="grid grid-cols-7 gap-1">
         {['日', '一', '二', '三', '四', '五', '六'].map((day) => (
-          <div key={day} className="text-center text-xs font-medium text-gray-600 py-2">
+          <div key={day} className="text-center text-xs font-medium text-gray-500 py-2">
             {day}
           </div>
         ))}
@@ -96,15 +96,15 @@ export function MaintenanceCalendar() {
       <div className="mt-4 flex items-center gap-4 text-xs">
         <div className="flex items-center gap-1">
           <div className="w-3 h-3 bg-red-100 rounded"></div>
-          <span className="text-gray-600">已逾期</span>
+          <span className="text-gray-500">已逾期</span>
         </div>
         <div className="flex items-center gap-1">
           <div className="w-3 h-3 bg-yellow-100 rounded"></div>
-          <span className="text-gray-600">即将到期</span>
+          <span className="text-gray-500">即将到期</span>
         </div>
         <div className="flex items-center gap-1">
           <div className="w-3 h-3 bg-green-100 rounded"></div>
-          <span className="text-gray-600">已完成</span>
+          <span className="text-gray-500">已完成</span>
         </div>
       </div>
     </div>

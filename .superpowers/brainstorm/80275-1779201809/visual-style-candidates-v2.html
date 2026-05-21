@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>forthAMS Airtable + Sci-Fi Dashboard Direction</title>
+  <style>
+    :root {
+      --paper: #f4f6f8;
+      --ink: #171d26;
+      --muted: #657083;
+      --line: #d9dee8;
+      --blue: #2563eb;
+      --air-black: #181d26;
+      --air-coral: #aa2d00;
+      --air-forest: #0a2e0e;
+      --air-gold: #d9a441;
+      --cyan: #00d4ff;
+      --violet: #a78bfa;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+      background: radial-gradient(circle at 12% 0%, #ffffff 0, #f4f6f8 38%, #eef2f7 100%);
+      color: var(--ink);
+    }
+
+    .wrap {
+      width: min(1500px, calc(100vw - 48px));
+      margin: 0 auto;
+      padding: 28px 0 40px;
+    }
+
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 28px;
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 28px;
+      line-height: 1.2;
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    .verdict {
+      max-width: 470px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: rgba(255,255,255,0.86);
+      padding: 13px 15px;
+      font-size: 12px;
+      color: #4a5568;
+      line-height: 1.65;
+      box-shadow: 0 10px 26px rgba(24, 35, 55, 0.08);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 0.95fr 1.05fr;
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(255,255,255,0.92);
+      box-shadow: 0 12px 30px rgba(24, 35, 55, 0.08);
+      overflow: hidden;
+    }
+
+    .panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 13px 15px;
+      border-bottom: 1px solid #e6ebf2;
+    }
+
+    .panel-head h2 {
+      margin: 0;
+      font-size: 15px;
+      letter-spacing: 0;
+    }
+
+    .status {
+      font-size: 11px;
+      color: #fff;
+      background: var(--air-black);
+      border-radius: 999px;
+      padding: 4px 8px;
+      font-weight: 600;
+    }
+
+    .body { padding: 16px; }
+
+    .airtable-app {
+      height: 440px;
+      border: 1px solid #d9dee8;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #fff;
+      display: grid;
+      grid-template-columns: 212px 1fr;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.8);
+    }
+
+    .sidebar {
+      border-right: 1px solid #e4e8f0;
+      background: #fbfcfe;
+      padding: 14px 12px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 14px;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .mark {
+      width: 22px;
+      height: 22px;
+      border-radius: 7px;
+      background:
+        linear-gradient(135deg, var(--air-coral), transparent 50%),
+        linear-gradient(225deg, var(--air-forest), transparent 50%),
+        linear-gradient(45deg, var(--air-gold), #f7e4b2);
+    }
+
+    .side-title {
+      margin: 16px 0 8px;
+      color: #7a8494;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .nav-item {
+      height: 32px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 9px;
+      border-radius: 8px;
+      color: #4e5969;
+      font-size: 12px;
+      margin-bottom: 4px;
+    }
+
+    .nav-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 2px;
+      background: #c4ccd8;
+    }
+
+    .nav-item.active {
+      background: #eef4ff;
+      color: #1d4ed8;
+      font-weight: 700;
+    }
+
+    .nav-item.active .nav-dot { background: #2563eb; }
+
+    .main {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      background: #f8fafc;
+    }
+
+    .toolbar {
+      height: 58px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      border-bottom: 1px solid #e4e8f0;
+      background: #fff;
+    }
+
+    .titleline b { display: block; font-size: 15px; }
+    .titleline span { color: #7a8494; font-size: 11px; }
+
+    .actions {
+      display: flex;
+      gap: 7px;
+      align-items: center;
+    }
+
+    .btn {
+      height: 30px;
+      border: 1px solid #d5dce8;
+      border-radius: 7px;
+      background: #fff;
+      padding: 0 10px;
+      font-size: 12px;
+      color: #465266;
+    }
+
+    .btn.primary {
+      color: #fff;
+      border-color: var(--air-black);
+      background: var(--air-black);
+      font-weight: 700;
+    }
+
+    .dashboard-body {
+      padding: 14px;
+      display: grid;
+      grid-template-rows: 74px 44px 1fr;
+      gap: 12px;
+      min-height: 0;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    .metric {
+      border: 1px solid #dfe5ee;
+      border-radius: 10px;
+      background: #fff;
+      padding: 10px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .metric::after {
+      content: "";
+      position: absolute;
+      right: 8px;
+      top: 8px;
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      background: #eef2f7;
+    }
+
+    .metric:nth-child(1)::after { background: #f8dfd5; }
+    .metric:nth-child(2)::after { background: #d9eadc; }
+    .metric:nth-child(3)::after { background: #e3edff; }
+    .metric:nth-child(4)::after { background: #f9edcf; }
+
+    .metric b {
+      display: block;
+      font-size: 21px;
+      line-height: 1;
+      margin-bottom: 8px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .metric span {
+      font-size: 11px;
+      color: #748095;
+    }
+
+    .filterbar {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .filter {
+      height: 32px;
+      border: 1px solid #dfe5ee;
+      border-radius: 8px;
+      background: #fff;
+      min-width: 92px;
+    }
+
+    .filter.search { flex: 1; }
+
+    .work {
+      display: grid;
+      grid-template-columns: 165px 1fr;
+      gap: 12px;
+      min-height: 0;
+    }
+
+    .tree {
+      border: 1px solid #dfe5ee;
+      border-radius: 10px;
+      background: #fff;
+      padding: 10px;
+      overflow: hidden;
+    }
+
+    .branch {
+      height: 24px;
+      border-radius: 7px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 0 7px;
+      margin-bottom: 6px;
+      color: #596579;
+      font-size: 11px;
+    }
+
+    .branch::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 2px;
+      background: #c8d0dc;
+    }
+
+    .branch.active {
+      background: #eef4ff;
+      color: #1d4ed8;
+      font-weight: 700;
+    }
+
+    .branch.active::before { background: #2563eb; }
+
+    .table {
+      border: 1px solid #dfe5ee;
+      border-radius: 10px;
+      background: #fff;
+      overflow: hidden;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1.1fr 1.3fr 0.8fr 0.9fr 0.75fr;
+      gap: 10px;
+      min-height: 34px;
+      align-items: center;
+      padding: 0 10px;
+      border-bottom: 1px solid #eef1f6;
+    }
+
+    .row.head {
+      background: #f2f5f9;
+      min-height: 32px;
+    }
+
+    .cell {
+      height: 8px;
+      border-radius: 999px;
+      background: #cfd7e4;
+    }
+
+    .cell.strong { background: #7b8799; }
+    .cell.blue { background: #2563eb; }
+    .cell.coral { background: #aa2d00; }
+    .cell.green { background: #0a2e0e; }
+
+    .nuxt-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .choice {
+      border: 2px solid #dfe5ee;
+      border-radius: 12px;
+      padding: 14px;
+      background: #fff;
+      cursor: pointer;
+      min-height: 180px;
+      transition: all 160ms ease;
+    }
+
+    .choice:hover,
+    .choice.selected {
+      border-color: var(--blue);
+      background: #f4f8ff;
+      box-shadow: 0 0 0 4px rgba(37,99,235,0.12);
+    }
+
+    .choice h3 {
+      margin: 0 0 10px;
+      font-size: 14px;
+    }
+
+    .choice p,
+    .choice li {
+      color: #596579;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .choice ul {
+      padding-left: 18px;
+      margin: 0;
+    }
+
+    .score {
+      display: grid;
+      grid-template-columns: 68px 1fr;
+      gap: 7px 10px;
+      align-items: center;
+      margin-top: 12px;
+      font-size: 11px;
+      color: #697589;
+    }
+
+    .bar {
+      height: 7px;
+      border-radius: 999px;
+      background: #e7ecf3;
+      overflow: hidden;
+    }
+
+    .bar i {
+      display: block;
+      height: 100%;
+      background: linear-gradient(90deg, #2563eb, #4f8cff);
+      border-radius: inherit;
+    }
+
+    .bigscreen-panel {
+      margin-top: 18px;
+      border-radius: 18px;
+      overflow: hidden;
+      border: 1px solid rgba(0,212,255,0.32);
+      box-shadow: 0 24px 60px rgba(3, 9, 24, 0.32);
+      background: #050915;
+    }
+
+    .bigscreen {
+      position: relative;
+      min-height: 680px;
+      padding: 22px;
+      color: #eaf9ff;
+      background:
+        radial-gradient(circle at 50% 42%, rgba(0, 212, 255, 0.24), transparent 24%),
+        radial-gradient(circle at 72% 18%, rgba(167, 139, 250, 0.22), transparent 18%),
+        radial-gradient(circle at 18% 78%, rgba(0, 153, 204, 0.2), transparent 18%),
+        linear-gradient(135deg, #050915 0%, #07152a 44%, #030713 100%);
+      overflow: hidden;
+    }
+
+    .bigscreen::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0, 212, 255, 0.09) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 212, 255, 0.09) 1px, transparent 1px);
+      background-size: 42px 42px;
+      mask-image: radial-gradient(circle at 50% 44%, #000 0%, transparent 73%);
+    }
+
+    .bigscreen::after {
+      content: "";
+      position: absolute;
+      inset: -20%;
+      background:
+        linear-gradient(115deg, transparent 0 46%, rgba(0,212,255,0.08) 48%, transparent 52%),
+        linear-gradient(65deg, transparent 0 58%, rgba(167,139,250,0.08) 60%, transparent 64%);
+      animation: sweep 6s linear infinite;
+      pointer-events: none;
+    }
+
+    @keyframes sweep {
+      from { transform: translateX(-6%); }
+      to { transform: translateX(6%); }
+    }
+
+    .screen-chrome {
+      position: absolute;
+      inset: 14px;
+      border: 1px solid rgba(0, 212, 255, 0.25);
+      clip-path: polygon(0 16px, 16px 0, calc(100% - 16px) 0, 100% 16px, 100% calc(100% - 16px), calc(100% - 16px) 100%, 16px 100%, 0 calc(100% - 16px));
+      pointer-events: none;
+      box-shadow: inset 0 0 30px rgba(0, 212, 255, 0.08);
+    }
+
+    .screen-content {
+      position: relative;
+      z-index: 2;
+      display: grid;
+      grid-template-columns: 1fr 1.54fr 1fr;
+      grid-template-rows: 58px 1fr 138px;
+      gap: 14px;
+      min-height: 636px;
+    }
+
+    .screen-title {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .screen-title::before,
+    .screen-title::after {
+      content: "";
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(0,212,255,0.75), transparent);
+    }
+
+    .screen-title h2 {
+      margin: 0;
+      color: var(--cyan);
+      text-shadow: 0 0 18px rgba(0, 212, 255, 0.72);
+      letter-spacing: 7px;
+      font-size: 25px;
+      font-weight: 800;
+    }
+
+    .time {
+      position: absolute;
+      right: 26px;
+      top: 24px;
+      color: #83dfff;
+      font-family: "SF Mono", "JetBrains Mono", monospace;
+      font-size: 12px;
+    }
+
+    .screen-col {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .hud {
+      border: 1px solid rgba(0,212,255,0.28);
+      background: linear-gradient(180deg, rgba(13, 31, 58, 0.78), rgba(4, 12, 28, 0.72));
+      border-radius: 10px;
+      padding: 11px;
+      box-shadow: inset 0 0 22px rgba(0,212,255,0.06), 0 0 24px rgba(0, 38, 70, 0.18);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hud::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 4px;
+      height: 30px;
+      background: var(--cyan);
+      box-shadow: 0 0 14px rgba(0,212,255,0.85);
+    }
+
+    .hud h3 {
+      margin: 0 0 10px;
+      padding-left: 9px;
+      font-size: 13px;
+      color: #f7fcff;
+      letter-spacing: 1px;
+    }
+
+    .kpis {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+
+    .kpi {
+      min-height: 56px;
+      border: 1px solid rgba(0,212,255,0.18);
+      border-radius: 7px;
+      padding: 8px;
+      background: rgba(0, 212, 255, 0.055);
+    }
+
+    .kpi b {
+      display: block;
+      color: var(--cyan);
+      font-size: 22px;
+      line-height: 1;
+      font-family: "SF Mono", "JetBrains Mono", monospace;
+      text-shadow: 0 0 10px rgba(0,212,255,0.48);
+    }
+
+    .kpi span {
+      display: block;
+      margin-top: 7px;
+      color: #8ea4bd;
+      font-size: 11px;
+    }
+
+    .hbars .hrow {
+      display: grid;
+      grid-template-columns: 76px 1fr 36px;
+      align-items: center;
+      gap: 8px;
+      margin: 8px 0;
+      font-size: 10px;
+      color: #9fb4c8;
+    }
+
+    .hbar {
+      height: 7px;
+      border-radius: 999px;
+      background: rgba(26,48,80,0.9);
+      overflow: hidden;
+    }
+
+    .hbar i {
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #00d4ff, #0077ff 55%, #a78bfa);
+      box-shadow: 0 0 12px rgba(0,212,255,0.5);
+    }
+
+    .center-stage {
+      grid-column: 2;
+      grid-row: 2;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 430px;
+    }
+
+    .orbital {
+      position: absolute;
+      width: 420px;
+      height: 420px;
+      border-radius: 50%;
+      border: 1px dashed rgba(0,212,255,0.36);
+      animation: rotate 28s linear infinite;
+    }
+
+    .orbital.o2 {
+      width: 330px;
+      height: 330px;
+      border-color: rgba(167,139,250,0.35);
+      animation-duration: 20s;
+      animation-direction: reverse;
+    }
+
+    @keyframes rotate {
+      to { transform: rotate(360deg); }
+    }
+
+    .tower {
+      position: relative;
+      width: 420px;
+      height: 360px;
+      perspective: 700px;
+    }
+
+    .disc {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%) rotateX(62deg);
+      border-radius: 50%;
+      border: 2px solid rgba(0,212,255,0.82);
+      background: radial-gradient(circle, rgba(0,212,255,0.18), rgba(0,119,170,0.06) 58%, rgba(0,212,255,0.14));
+      box-shadow: 0 0 26px rgba(0,212,255,0.4), inset 0 0 20px rgba(0,212,255,0.25);
+    }
+
+    .d1 { width: 390px; height: 148px; bottom: 10px; }
+    .d2 { width: 318px; height: 120px; bottom: 68px; border-color: rgba(0,212,255,0.72); }
+    .d3 { width: 246px; height: 94px; bottom: 122px; border-color: rgba(96,205,255,0.72); }
+    .d4 { width: 174px; height: 66px; bottom: 172px; border-color: rgba(167,139,250,0.78); }
+    .d5 { width: 102px; height: 40px; bottom: 212px; border-color: rgba(255,217,61,0.92); box-shadow: 0 0 24px rgba(255,217,61,0.35); }
+
+    .beam {
+      position: absolute;
+      left: 50%;
+      bottom: 40px;
+      width: 38px;
+      height: 245px;
+      transform: translateX(-50%);
+      background: linear-gradient(180deg, rgba(255,217,61,0.16), rgba(0,212,255,0.28), transparent);
+      filter: blur(1px);
+      clip-path: polygon(42% 0, 58% 0, 100% 100%, 0 100%);
+    }
+
+    .node {
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      border: 1px solid rgba(0,212,255,0.72);
+      background: rgba(234,249,255,0.88);
+      transform: rotate(45deg);
+      box-shadow: 0 0 12px rgba(0,212,255,0.75);
+    }
+
+    .n1 { left: 92px; bottom: 88px; }
+    .n2 { left: 295px; bottom: 114px; }
+    .n3 { left: 160px; bottom: 172px; }
+    .n4 { left: 234px; bottom: 222px; border-color: rgba(255,217,61,0.9); }
+
+    .labels {
+      position: absolute;
+      right: 4px;
+      top: 72px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      font-size: 11px;
+      color: #9fdff0;
+    }
+
+    .labels span {
+      display: block;
+      padding: 4px 7px;
+      border: 1px solid rgba(0,212,255,0.24);
+      border-radius: 999px;
+      background: rgba(0,212,255,0.06);
+    }
+
+    .bottom-wide {
+      grid-column: 1 / -1;
+      grid-row: 3;
+      display: grid;
+      grid-template-columns: 1.1fr 1.6fr 1fr;
+      gap: 14px;
+    }
+
+    .trend {
+      height: 82px;
+      display: flex;
+      align-items: end;
+      gap: 8px;
+      border-bottom: 1px solid rgba(0,212,255,0.2);
+      padding: 0 8px 8px;
+      background:
+        linear-gradient(rgba(0,212,255,0.08) 1px, transparent 1px);
+      background-size: 100% 18px;
+    }
+
+    .trend i {
+      flex: 1;
+      min-width: 5px;
+      border-radius: 999px 999px 0 0;
+      background: linear-gradient(180deg, #00d4ff, rgba(0,212,255,0.14));
+      box-shadow: 0 0 14px rgba(0,212,255,0.38);
+    }
+
+    .trend i:nth-child(1) { height: 35%; }
+    .trend i:nth-child(2) { height: 55%; }
+    .trend i:nth-child(3) { height: 42%; }
+    .trend i:nth-child(4) { height: 78%; }
+    .trend i:nth-child(5) { height: 62%; }
+    .trend i:nth-child(6) { height: 86%; }
+    .trend i:nth-child(7) { height: 68%; }
+    .trend i:nth-child(8) { height: 92%; }
+
+    .donut {
+      width: 104px;
+      height: 104px;
+      border-radius: 50%;
+      margin: 0 auto;
+      background: conic-gradient(#00d4ff 0 55%, #ff6b6b 55% 70%, #ffd93d 70% 84%, #4ecdc4 84% 94%, #a78bfa 94% 100%);
+      position: relative;
+      box-shadow: 0 0 24px rgba(0,212,255,0.22);
+    }
+
+    .donut::after {
+      content: "55%";
+      position: absolute;
+      inset: 22px;
+      border-radius: 50%;
+      background: #07152a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-family: "SF Mono", "JetBrains Mono", monospace;
+      font-weight: 800;
+    }
+
+    .footer-note {
+      margin-top: 12px;
+      color: #5e6b80;
+      font-size: 12px;
+      line-height: 1.65;
+    }
+
+    @media (max-width: 1180px) {
+      .grid { grid-template-columns: 1fr; }
+      .screen-content { grid-template-columns: 1fr; grid-template-rows: auto; }
+      .center-stage, .bottom-wide { grid-column: auto; grid-row: auto; }
+      .screen-col { display: grid; grid-template-columns: repeat(2, 1fr); }
+      .bottom-wide { grid-template-columns: 1fr; }
+    }
+  </style>
+  <script>
+    function sendChoice(el) {
+      document.querySelectorAll('[data-choice]').forEach((item) => {
+        if (item.closest('.choice-group') === el.closest('.choice-group')) {
+          item.classList.remove('selected');
+        }
+      });
+      el.classList.add('selected');
+      if (window.brainstorm) {
+        window.brainstorm.choice(el.dataset.choice, { text: el.innerText });
+      }
+    }
+  </script>
+</head>
+<body>
+  <main class="wrap">
+    <section class="top">
+      <div>
+        <h1>Airtable 方向确认 + 大屏 V2</h1>
+        <p class="subtitle">日常后台走“台账协作 + 企业化约束”；大屏走独立深色科幻驾驶舱。两套视觉共用资产语义，不共用页面风格。</p>
+      </div>
+      <div class="verdict">
+        结论先说：Nuxt 不会天然更好看，视觉上真正决定效果的是 DESIGN.md 和组件规范。Nuxt 可能让“新建 Vue/Nuxt 中后台”更快，但对当前 React/Vite 老项目，直接迁移通常更慢、风险更高。
+      </div>
+    </section>
+
+    <section class="grid">
+      <article class="panel">
+        <div class="panel-head">
+          <h2>Airtable 企业台账版后台</h2>
+          <span class="status">Selected Direction</span>
+        </div>
+        <div class="body">
+          <div class="airtable-app">
+            <aside class="sidebar">
+              <div class="brand"><span class="mark"></span>forthAMS</div>
+              <div class="side-title">资产运营</div>
+              <div class="nav-item active"><span class="nav-dot"></span>资产台账</div>
+              <div class="nav-item"><span class="nav-dot"></span>RFID 盘点</div>
+              <div class="nav-item"><span class="nav-dot"></span>闲置资产</div>
+              <div class="nav-item"><span class="nav-dot"></span>折旧管理</div>
+              <div class="side-title">流程与审计</div>
+              <div class="nav-item"><span class="nav-dot"></span>审批流程</div>
+              <div class="nav-item"><span class="nav-dot"></span>工单管理</div>
+              <div class="nav-item"><span class="nav-dot"></span>审计日志</div>
+            </aside>
+            <section class="main">
+              <div class="toolbar">
+                <div class="titleline"><b>资产台账</b><span>共 8,426 条资产记录</span></div>
+                <div class="actions">
+                  <button class="btn">批量处理</button>
+                  <button class="btn">导入/导出</button>
+                  <button class="btn primary">新建资产</button>
+                </div>
+              </div>
+              <div class="dashboard-body">
+                <div class="metrics">
+                  <div class="metric"><b>8,426</b><span>资产总数</span></div>
+                  <div class="metric"><b>1,143</b><span>在用资产</span></div>
+                  <div class="metric"><b>243</b><span>重要设备</span></div>
+                  <div class="metric"><b>113</b><span>待审批</span></div>
+                </div>
+                <div class="filterbar">
+                  <div class="filter search"></div><div class="filter"></div><div class="filter"></div><div class="filter"></div>
+                </div>
+                <div class="work">
+                  <div class="tree">
+                    <div class="branch active">全部分类</div>
+                    <div class="branch">办公设备</div>
+                    <div class="branch">工控设备</div>
+                    <div class="branch">网络设备</div>
+                    <div class="branch">安全设备</div>
+                    <div class="branch">生产设备</div>
+                  </div>
+                  <div class="table">
+                    <div class="row head"><div class="cell strong"></div><div class="cell strong"></div><div class="cell strong"></div><div class="cell strong"></div><div class="cell strong"></div></div>
+                    <div class="row"><div class="cell strong"></div><div class="cell"></div><div class="cell blue"></div><div class="cell"></div><div class="cell green"></div></div>
+                    <div class="row"><div class="cell strong"></div><div class="cell"></div><div class="cell coral"></div><div class="cell"></div><div class="cell"></div></div>
+                    <div class="row"><div class="cell strong"></div><div class="cell"></div><div class="cell blue"></div><div class="cell"></div><div class="cell green"></div></div>
+                    <div class="row"><div class="cell strong"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div></div>
+                    <div class="row"><div class="cell strong"></div><div class="cell"></div><div class="cell coral"></div><div class="cell"></div><div class="cell green"></div></div>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </div>
+          <p class="footer-note">Airtable 不是照搬彩色协作产品，而是借它的“记录管理、视图切换、批量操作、轻量卡片”语言，再用企业资产系统的低彩度、权限、审批和审计约束压住。</p>
+        </div>
+      </article>
+
+      <article class="panel">
+        <div class="panel-head">
+          <h2>Nuxt 取舍：好看 vs 高效</h2>
+          <span class="status">Decision</span>
+        </div>
+        <div class="body">
+          <div class="nuxt-grid choice-group">
+            <div class="choice selected" data-choice="react-airtable-with-nuxt-checklist" onclick="sendChoice(this)">
+              <h3>推荐：React/Vite + Airtable DESIGN.md + Nuxt checklist</h3>
+              <ul>
+                <li>视觉可以一样高级，跟 Nuxt 无直接绑定。</li>
+                <li>保留现有 React、Vite、Tailwind v4、Radix/shadcn、测试和路由资产。</li>
+                <li>借鉴 Nuxt Pro 的表格、表单弹窗、API 封装、DTO、权限、导出、i18n、a11y。</li>
+              </ul>
+              <div class="score">
+                <span>视觉上限</span><div class="bar"><i style="width:92%"></i></div>
+                <span>交付效率</span><div class="bar"><i style="width:82%"></i></div>
+                <span>迁移风险</span><div class="bar"><i style="width:24%"></i></div>
+              </div>
+            </div>
+            <div class="choice" data-choice="full-nuxt-parallel-rewrite" onclick="sendChoice(this)">
+              <h3>可选：Nuxt 新前端并行重写</h3>
+              <ul>
+                <li>如果目标是彻底重开新前端，Nuxt UI / shadcn-vue / Pinia 会很顺。</li>
+                <li>但需要重写路由、状态、组件、测试、权限守卫、API 层。</li>
+                <li>适合另起 `frontend-nuxt` 试点，不适合直接替换现有 React 主线。</li>
+              </ul>
+              <div class="score">
+                <span>视觉上限</span><div class="bar"><i style="width:92%"></i></div>
+                <span>交付效率</span><div class="bar"><i style="width:54%"></i></div>
+                <span>迁移风险</span><div class="bar"><i style="width:88%;background:linear-gradient(90deg,#f97316,#ef4444)"></i></div>
+              </div>
+            </div>
+          </div>
+          <p class="footer-note">更高效的分界线是：如果“从零建 Vue/Nuxt 项目”，Nuxt Pro 更高效；如果“改造当前 forthAMS”，React/Vite 留栈更高效。好不好看，则由设计系统和执行质量决定。</p>
+        </div>
+      </article>
+    </section>
+
+    <section class="bigscreen-panel">
+      <div class="bigscreen">
+        <div class="screen-chrome"></div>
+        <div class="time">2026-05-19 22:52:08</div>
+        <div class="screen-content">
+          <div class="screen-title"><h2>资产态势大屏</h2></div>
+
+          <div class="screen-col">
+            <div class="hud">
+              <h3>资产统计概览</h3>
+              <div class="kpis">
+                <div class="kpi"><b>1,143</b><span>活跃资产</span></div>
+                <div class="kpi"><b>113</b><span>异常消失</span></div>
+                <div class="kpi"><b>243</b><span>重要资产</span></div>
+                <div class="kpi"><b>1,243</b><span>允许外联</span></div>
+              </div>
+            </div>
+            <div class="hud hbars">
+              <h3>重点资产访问 TOP5</h3>
+              <div class="hrow"><span>核心服务器</span><div class="hbar"><i style="width:100%"></i></div><span>1000</span></div>
+              <div class="hrow"><span>工控网关</span><div class="hbar"><i style="width:80%"></i></div><span>800</span></div>
+              <div class="hrow"><span>PLC 集群</span><div class="hbar"><i style="width:54%"></i></div><span>540</span></div>
+              <div class="hrow"><span>审计节点</span><div class="hbar"><i style="width:40%"></i></div><span>400</span></div>
+              <div class="hrow"><span>边缘终端</span><div class="hbar"><i style="width:30%"></i></div><span>300</span></div>
+            </div>
+          </div>
+
+          <div class="center-stage">
+            <div class="orbital"></div>
+            <div class="orbital o2"></div>
+            <div class="tower">
+              <div class="beam"></div>
+              <div class="disc d1"></div>
+              <div class="disc d2"></div>
+              <div class="disc d3"></div>
+              <div class="disc d4"></div>
+              <div class="disc d5"></div>
+              <span class="node n1"></span>
+              <span class="node n2"></span>
+              <span class="node n3"></span>
+              <span class="node n4"></span>
+              <div class="labels">
+                <span>办公管理层 ERP / OA</span>
+                <span>生产执行层 MES / DB</span>
+                <span>过程控制层 SCADA</span>
+                <span>现场控制层 PLC / RTU</span>
+                <span>现场设备层 Sensor</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="screen-col">
+            <div class="hud hbars">
+              <h3>资产类型 TOP5</h3>
+              <div class="hrow"><span>终端设备</span><div class="hbar"><i style="width:100%"></i></div><span>1000</span></div>
+              <div class="hrow"><span>安全设备</span><div class="hbar"><i style="width:80%"></i></div><span>800</span></div>
+              <div class="hrow"><span>工控设备</span><div class="hbar"><i style="width:54%"></i></div><span>540</span></div>
+              <div class="hrow"><span>网络设备</span><div class="hbar"><i style="width:40%"></i></div><span>400</span></div>
+              <div class="hrow"><span>重点资产</span><div class="hbar"><i style="width:30%"></i></div><span>300</span></div>
+            </div>
+            <div class="hud">
+              <h3>资产品牌分布</h3>
+              <div class="donut"></div>
+            </div>
+          </div>
+
+          <div class="bottom-wide">
+            <div class="hud">
+              <h3>分区资产热度</h3>
+              <div class="trend"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+            </div>
+            <div class="hud">
+              <h3>资产活跃度趋势</h3>
+              <div class="trend"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+            </div>
+            <div class="hud">
+              <h3>风险信号</h3>
+              <div class="kpis">
+                <div class="kpi"><b style="color:#ff6b6b">27</b><span>异常访问</span></div>
+                <div class="kpi"><b style="color:#ffd93d">09</b><span>高危资产</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

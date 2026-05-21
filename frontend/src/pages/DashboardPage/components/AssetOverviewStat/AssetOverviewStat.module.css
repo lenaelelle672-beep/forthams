@@ -86,7 +86,7 @@
 .progressBar {
   margin-top: var(--spacing-sm, 8px);
   height: 6px;
-  background-color: var(--bg-muted, #e5e7eb);
+  background-color: var(--bg-muted, #334155);
   border-radius: var(--radius-full, 9999px);
   overflow: hidden;
 }
@@ -133,7 +133,7 @@
   align-items: center;
   margin-top: var(--spacing-sm, 8px);
   padding-top: var(--spacing-sm, 8px);
-  border-top: 1px solid var(--border-color, #e5e7eb);
+  border-top: 1px solid var(--border-color, #f8fafc);
 }
 
 .periodLabel {
@@ -153,7 +153,7 @@
   gap: var(--spacing-sm, 8px);
   margin-top: var(--spacing-md, 12px);
   padding: var(--spacing-md, 12px);
-  background-color: var(--bg-muted, #f9fafb);
+  background-color: var(--bg-muted, #ffffff);
   border-radius: var(--radius-sm, 6px);
 }
 
@@ -199,7 +199,7 @@
 
 .actionButton:hover {
   background-color: var(--color-primary, #3b82f6);
-  color: var(--text-on-primary, #ffffff);
+  color: var(--text-on-primary, #f8fafc);
 }
 
 @media (max-width: 768px) {

@@ -279,7 +279,7 @@ export const AssetRetirementListPage: React.FC = () => {
           </div>
           <div>
             <h2 className="text-2xl font-bold text-gray-900">退役申请列表</h2>
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-gray-400 mt-1">
               管理资产退役与报废申请
             </p>
           </div>
@@ -323,7 +323,7 @@ export const AssetRetirementListPage: React.FC = () => {
             <CardHeader>
               <CardTitle className="text-base font-semibold">
                 退役申请记录
-                <span className="ml-2 text-sm font-normal text-gray-500">
+                <span className="ml-2 text-sm font-normal text-gray-400">
                   共 {total} 条
                 </span>
               </CardTitle>
@@ -375,10 +375,10 @@ export const AssetRetirementListPage: React.FC = () => {
                                 {getStatusLabel(statusStr)}
                               </Badge>
                             </TableCell>
-                            <TableCell className="text-sm text-gray-500">
+                            <TableCell className="text-sm text-gray-400">
                               {formatDateTime(app.createdAt)}
                             </TableCell>
-                            <TableCell className="text-sm text-gray-500">
+                            <TableCell className="text-sm text-gray-400">
                               {formatDateTime(app.updatedAt)}
                             </TableCell>
                             <TableCell className="text-right">
@@ -401,7 +401,7 @@ export const AssetRetirementListPage: React.FC = () => {
                   {/* Pagination */}
                   {totalPages > 1 && (
                     <div className="flex items-center justify-between mt-4 pt-4 border-t">
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-gray-400">
                         第 {page} / {totalPages} 页，共 {total} 条
                       </p>
                       <div className="flex items-center gap-2">

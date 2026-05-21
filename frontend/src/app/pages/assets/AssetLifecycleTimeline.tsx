@@ -78,7 +78,7 @@ function formatTimestamp(value: string): string {
 function getNodeIcon(nodeStatus: LifecycleNode['nodeStatus']): React.ReactNode {
   switch (nodeStatus) {
     case 'terminal':
-      return <CheckCircle2 className="w-4 h-4 text-gray-500" />;
+      return <CheckCircle2 className="w-4 h-4 text-gray-400" />;
     case 'warning':
       return <AlertTriangle className="w-4 h-4 text-yellow-500" />;
     case 'normal':
@@ -96,7 +96,7 @@ function getNodeIcon(nodeStatus: LifecycleNode['nodeStatus']): React.ReactNode {
 function getDotClasses(nodeStatus: LifecycleNode['nodeStatus']): string {
   switch (nodeStatus) {
     case 'terminal':
-      return 'w-3 h-3 rounded-full bg-gray-400 border-2 border-white ring-2 ring-gray-200 flex-shrink-0';
+      return 'w-3 h-3 rounded-full bg-gray-400 border-2 border-white ring-2 ring-[#1e3a5f] flex-shrink-0';
     case 'warning':
       return 'w-3 h-3 rounded-full bg-yellow-400 border-2 border-white ring-2 ring-yellow-100 flex-shrink-0';
     case 'normal':
@@ -183,7 +183,7 @@ export const AssetLifecycleTimeline: React.FC<AssetLifecycleTimelineProps> = ({
                 <div className="flex flex-col items-center">
                   <div className={`${getDotClasses(node.nodeStatus)} mt-1.5`} />
                   {index < nodes.length - 1 && (
-                    <div className="w-px h-full bg-gray-200 min-h-[24px]" />
+                    <div className="w-px h-full bg-blue-50 min-h-[24px]" />
                   )}
                 </div>
                 {/* Content */}
@@ -193,12 +193,12 @@ export const AssetLifecycleTimeline: React.FC<AssetLifecycleTimelineProps> = ({
                     <span className="text-sm font-medium text-gray-900">
                       {node.eventLabel}
                     </span>
-                    <span className="text-xs text-gray-500">
+                    <span className="text-xs text-gray-400">
                       {formatTimestamp(node.timestamp)}
                     </span>
                   </div>
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="text-xs text-gray-500">
+                    <span className="text-xs text-gray-400">
                       操作人: {node.operator}
                     </span>
                   </div>
@@ -212,7 +212,7 @@ export const AssetLifecycleTimeline: React.FC<AssetLifecycleTimelineProps> = ({
                     </Badge>
                   </div>
                   {node.reason && (
-                    <p className="text-xs text-gray-500 mt-1">{node.reason}</p>
+                    <p className="text-xs text-gray-400 mt-1">{node.reason}</p>
                   )}
                 </div>
               </div>

@@ -219,8 +219,8 @@ export default function AssetFormPage() {
     return (
       <div className="max-w-3xl mx-auto px-4 py-8" data-testid="asset-form-loading">
         <div className="animate-pulse space-y-6">
-          <div className="h-8 w-64 bg-gray-200 rounded" />
-          <div className="h-96 bg-gray-100 rounded-lg" />
+          <div className="h-8 w-64 bg-blue-50 rounded" />
+          <div className="h-96 bg-blue-50 rounded-lg" />
         </div>
       </div>
     );
@@ -232,12 +232,12 @@ export default function AssetFormPage() {
       <div className="max-w-3xl mx-auto px-4 py-8" data-testid="asset-form-error">
         <div className="text-center py-12">
           <AlertCircle className="w-10 h-10 text-yellow-500 mx-auto mb-3" />
-          <p className="text-gray-600 mb-4">{detailError ?? '未找到资产信息'}</p>
+          <p className="text-gray-500 mb-4">{detailError ?? '未找到资产信息'}</p>
           <div className="flex gap-3 justify-center">
             <button
               type="button"
               onClick={() => navigate(-1)}
-              className="px-4 py-2 text-sm rounded-lg border border-gray-300
+              className="px-4 py-2 text-sm rounded-lg border border-gray-200
                 bg-white hover:bg-gray-50 transition-colors"
             >
               <ArrowLeft className="w-4 h-4 inline mr-1" />
@@ -246,7 +246,7 @@ export default function AssetFormPage() {
             <button
               type="button"
               onClick={refresh}
-              className="px-4 py-2 text-sm rounded-lg border border-gray-300
+              className="px-4 py-2 text-sm rounded-lg border border-gray-200
                 bg-white hover:bg-gray-50 transition-colors"
             >
               <RefreshCw className="w-4 h-4 inline mr-1" />
@@ -266,10 +266,10 @@ export default function AssetFormPage() {
         <button
           type="button"
           onClick={() => navigate(-1)}
-          className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+          className="p-2 rounded-lg hover:bg-blue-50 transition-colors"
           data-testid="btn-back"
         >
-          <ArrowLeft className="w-5 h-5 text-gray-600" />
+          <ArrowLeft className="w-5 h-5 text-gray-500" />
         </button>
         <h1 className="text-2xl font-bold text-gray-900">
           {isEditMode ? '编辑资产' : '新建资产'}
@@ -298,7 +298,7 @@ export default function AssetFormPage() {
               value={form.assetName}
               onChange={(e) => handleChange('assetName', e.target.value)}
               className={`w-full px-3 py-2 text-sm rounded-lg border
-                ${errors.assetName ? 'border-red-300 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'}
+                ${errors.assetName ? 'border-red-300 focus:ring-red-500' : 'border-gray-200 focus:ring-blue-500'}
                 focus:outline-none focus:ring-2 transition-colors`}
               placeholder="请输入资产名称"
               data-testid="input-asset-name"
@@ -318,7 +318,7 @@ export default function AssetFormPage() {
               value={form.assetCode}
               onChange={(e) => handleChange('assetCode', e.target.value)}
               className={`w-full px-3 py-2 text-sm rounded-lg border
-                ${errors.assetCode ? 'border-red-300 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'}
+                ${errors.assetCode ? 'border-red-300 focus:ring-red-500' : 'border-gray-200 focus:ring-blue-500'}
                 focus:outline-none focus:ring-2 transition-colors`}
               placeholder="请输入资产编号"
               data-testid="input-asset-code"
@@ -339,7 +339,7 @@ export default function AssetFormPage() {
                 value={form.categoryId}
                 onChange={(e) => handleChange('categoryId', e.target.value)}
                 className={`w-full px-3 py-2 text-sm rounded-lg border
-                  ${errors.categoryId ? 'border-red-300 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'}
+                  ${errors.categoryId ? 'border-red-300 focus:ring-red-500' : 'border-gray-200 focus:ring-blue-500'}
                   focus:outline-none focus:ring-2 transition-colors`}
                 placeholder="请输入分类 ID"
                 data-testid="input-category-id"
@@ -357,7 +357,7 @@ export default function AssetFormPage() {
                 value={form.departmentId}
                 onChange={(e) => handleChange('departmentId', e.target.value)}
                 className={`w-full px-3 py-2 text-sm rounded-lg border
-                  ${errors.departmentId ? 'border-red-300 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'}
+                  ${errors.departmentId ? 'border-red-300 focus:ring-red-500' : 'border-gray-200 focus:ring-blue-500'}
                   focus:outline-none focus:ring-2 transition-colors`}
                 placeholder="请输入部门 ID"
                 data-testid="input-department-id"
@@ -377,7 +377,7 @@ export default function AssetFormPage() {
               type="text"
               value={form.locationName}
               onChange={(e) => handleChange('locationName', e.target.value)}
-              className="w-full px-3 py-2 text-sm rounded-lg border border-gray-300
+              className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200
                 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
               placeholder="请输入存放位置"
               data-testid="input-location-name"
@@ -392,7 +392,7 @@ export default function AssetFormPage() {
             <select
               value={form.status}
               onChange={(e) => handleChange('status', e.target.value)}
-              className="w-full px-3 py-2 text-sm rounded-lg border border-gray-300
+              className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200
                 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
               data-testid="select-status"
             >
@@ -415,7 +415,7 @@ export default function AssetFormPage() {
                 value={form.purchaseDate}
                 onChange={(e) => handleChange('purchaseDate', e.target.value)}
                 className={`w-full px-3 py-2 text-sm rounded-lg border
-                  ${errors.purchaseDate ? 'border-red-300 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'}
+                  ${errors.purchaseDate ? 'border-red-300 focus:ring-red-500' : 'border-gray-200 focus:ring-blue-500'}
                   focus:outline-none focus:ring-2 transition-colors`}
                 data-testid="input-purchase-date"
               />
@@ -432,7 +432,7 @@ export default function AssetFormPage() {
                 value={form.purchasePrice}
                 onChange={(e) => handleChange('purchasePrice', e.target.value)}
                 className={`w-full px-3 py-2 text-sm rounded-lg border
-                  ${errors.purchasePrice ? 'border-red-300 focus:ring-red-500' : 'border-gray-300 focus:ring-blue-500'}
+                  ${errors.purchasePrice ? 'border-red-300 focus:ring-red-500' : 'border-gray-200 focus:ring-blue-500'}
                   focus:outline-none focus:ring-2 transition-colors`}
                 placeholder="请输入采购价格"
                 data-testid="input-purchase-price"
@@ -452,7 +452,7 @@ export default function AssetFormPage() {
               value={form.remark}
               onChange={(e) => handleChange('remark', e.target.value)}
               rows={3}
-              className="w-full px-3 py-2 text-sm rounded-lg border border-gray-300
+              className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200
                 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors resize-y"
               placeholder="请输入备注信息"
               data-testid="input-remark"
@@ -481,7 +481,7 @@ export default function AssetFormPage() {
           <button
             type="button"
             onClick={() => navigate(-1)}
-            className="px-6 py-2.5 text-sm rounded-lg border border-gray-300
+            className="px-6 py-2.5 text-sm rounded-lg border border-gray-200
               bg-white text-gray-700 hover:bg-gray-50 transition-colors"
             data-testid="btn-cancel"
           >

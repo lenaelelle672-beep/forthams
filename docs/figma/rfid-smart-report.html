@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RFID 盘点 · 智能报告 — forthAMS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary:      #2563eb;
+      --primary-dark: #1d4ed8;
+      --bg:           #f8fafc;
+      --card:         #ffffff;
+      --border:       #e2e8f0;
+      --success:      #10b981;
+      --danger:       #ef4444;
+      --warning:      #f59e0b;
+      --sidebar:      #0a1628;
+      --sidebar-active:#1e3a5f;
+      --text-primary: #0f172a;
+      --text-secondary:#64748b;
+      --c1: #3b82f6;
+      --c2: #06b6d4;
+      --c3: #8b5cf6;
+      --c4: #f59e0b;
+      --c5: #10b981;
+    }
+
+    html, body {
+      font-family: 'Inter', 'PingFang SC', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text-primary);
+      font-size: 14px;
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+
+    /* ── Layout ── */
+    .app { display: flex; min-height: 100vh; }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      width: 240px;
+      min-height: 100vh;
+      background: var(--sidebar);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      z-index: 100;
+    }
+    .sidebar-logo {
+      padding: 20px 20px 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .sidebar-logo-icon {
+      width: 34px; height: 34px;
+      background: var(--primary);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .sidebar-logo-icon svg { color: white; }
+    .sidebar-logo-text { color: #fff; font-weight: 700; font-size: 15px; letter-spacing: -0.2px; }
+    .sidebar-logo-sub { color: rgba(255,255,255,0.4); font-size: 11px; }
+
+    .sidebar-section { padding: 16px 12px 4px; }
+    .sidebar-section-label {
+      color: rgba(255,255,255,0.3);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      padding: 0 8px 6px;
+    }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 10px;
+      border-radius: 8px;
+      color: rgba(255,255,255,0.55);
+      font-size: 13.5px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+      margin-bottom: 2px;
+      text-decoration: none;
+    }
+    .nav-item:hover { background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.85); }
+    .nav-item.active { background: var(--sidebar-active); color: #fff; }
+    .nav-item svg { flex-shrink: 0; opacity: 0.8; }
+    .nav-item.active svg { opacity: 1; }
+    .nav-badge {
+      margin-left: auto;
+      background: var(--danger);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 10px;
+    }
+
+    .sidebar-divider { height: 1px; background: rgba(255,255,255,0.07); margin: 8px 12px; }
+
+    .sidebar-user {
+      margin-top: auto;
+      padding: 14px 16px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .avatar {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: var(--primary);
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 12px; font-weight: 700;
+      flex-shrink: 0;
+    }
+    .sidebar-user-info { flex: 1; min-width: 0; }
+    .sidebar-user-name { color: #fff; font-size: 13px; font-weight: 600; }
+    .sidebar-user-role { color: rgba(255,255,255,0.4); font-size: 11px; }
+
+    /* ── Main area ── */
+    .main { margin-left: 240px; flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+
+    /* ── Header ── */
+    .header {
+      height: 64px;
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center;
+      padding: 0 28px;
+      gap: 16px;
+      position: sticky; top: 0; z-index: 50;
+    }
+    .btn-back {
+      display: flex; align-items: center; gap: 6px;
+      padding: 7px 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: 13px;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .btn-back:hover { background: var(--bg); border-color: #cbd5e1; color: var(--text-primary); }
+    .breadcrumb {
+      display: flex; align-items: center; gap: 6px;
+      color: var(--text-secondary);
+      font-size: 13.5px;
+    }
+    .breadcrumb a { color: var(--text-secondary); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--primary); }
+    .breadcrumb .sep { opacity: 0.4; }
+    .breadcrumb .current { color: var(--text-primary); font-weight: 600; }
+    .header-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+    .header-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--success);
+    }
+    .header-status { color: var(--text-secondary); font-size: 13px; }
+
+    /* ── Content ── */
+    .content { padding: 28px; flex: 1; }
+
+    /* ── Page title area ── */
+    .page-title-row {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      margin-bottom: 24px;
+    }
+    .page-title-left {}
+    .page-title {
+      font-size: 22px; font-weight: 700;
+      color: var(--text-primary);
+      display: flex; align-items: center; gap: 10px;
+      line-height: 1.3;
+    }
+    .page-title-badge {
+      font-size: 12px; font-weight: 600;
+      background: #dbeafe; color: var(--primary);
+      padding: 2px 8px; border-radius: 20px;
+    }
+    .page-subtitle { color: var(--text-secondary); font-size: 13.5px; margin-top: 5px; display: flex; align-items: center; gap: 6px; }
+    .status-dot-done { display: inline-flex; align-items: center; gap: 4px; color: var(--success); font-weight: 600; }
+    .btn-primary {
+      display: flex; align-items: center; gap: 7px;
+      padding: 9px 18px;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+      box-shadow: 0 1px 3px rgba(37,99,235,0.3);
+    }
+    .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
+    .btn-outline-white {
+      display: flex; align-items: center; gap: 7px;
+      padding: 8px 16px;
+      background: transparent;
+      color: #fff;
+      border: 1.5px solid rgba(255,255,255,0.5);
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .btn-outline-white:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.8); }
+
+    /* ── Grid ── */
+    .grid { display: grid; gap: 20px; }
+    .grid-4 { grid-template-columns: repeat(4, 1fr); }
+    .grid-7-5 { grid-template-columns: 7fr 5fr; }
+    .grid-5-7 { grid-template-columns: 5fr 7fr; }
+
+    /* ── KPI Card ── */
+    .kpi-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px 22px;
+      display: flex; flex-direction: column; gap: 12px;
+      position: relative;
+      overflow: hidden;
+      transition: box-shadow 0.2s;
+    }
+    .kpi-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      border-radius: 12px 12px 0 0;
+    }
+    .kpi-card.blue::before { background: var(--primary); }
+    .kpi-card.green::before { background: var(--success); }
+    .kpi-card.red::before { background: var(--danger); }
+    .kpi-card.purple::before { background: var(--c3); }
+
+    .kpi-top { display: flex; align-items: flex-start; justify-content: space-between; }
+    .kpi-icon {
+      width: 42px; height: 42px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .kpi-icon.blue { background: #dbeafe; color: var(--primary); }
+    .kpi-icon.green { background: #d1fae5; color: var(--success); }
+    .kpi-icon.red { background: #fee2e2; color: var(--danger); }
+    .kpi-icon.purple { background: #ede9fe; color: var(--c3); }
+
+    .kpi-trend {
+      font-size: 11.5px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 20px;
+      display: flex; align-items: center; gap: 3px;
+    }
+    .kpi-trend.up { background: #d1fae5; color: #059669; }
+    .kpi-trend.neutral { background: #f1f5f9; color: var(--text-secondary); }
+
+    .kpi-value {
+      font-size: 30px;
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -0.5px;
+    }
+    .kpi-value.blue { color: var(--primary); }
+    .kpi-value.green { color: var(--success); }
+    .kpi-value.red { color: var(--danger); }
+    .kpi-value.default { color: var(--text-primary); }
+
+    .kpi-label { font-size: 13px; color: var(--text-secondary); font-weight: 500; margin-top: 2px; }
+    .kpi-sublabel { font-size: 12px; color: var(--text-secondary); }
+
+    /* ── Chart Card ── */
+    .chart-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 22px 24px;
+      display: flex; flex-direction: column; gap: 16px;
+    }
+    .chart-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
+    .chart-header { display: flex; align-items: center; justify-content: space-between; }
+    .chart-title { font-size: 14.5px; font-weight: 700; color: var(--text-primary); }
+    .chart-subtitle { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+    .chart-legend { display: flex; align-items: center; gap: 14px; }
+    .legend-item { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--text-secondary); }
+    .legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .chart-area { position: relative; }
+
+    /* ── Donut center ── */
+    .donut-wrap { position: relative; display: flex; align-items: center; justify-content: center; }
+    .donut-center {
+      position: absolute;
+      text-align: center;
+      pointer-events: none;
+    }
+    .donut-center-value { font-size: 26px; font-weight: 800; color: var(--text-primary); line-height: 1; }
+    .donut-center-label { font-size: 12px; color: var(--text-secondary); margin-top: 3px; }
+
+    .donut-legend { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
+    .donut-legend-item {
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: 13px;
+    }
+    .donut-legend-left { display: flex; align-items: center; gap: 8px; }
+    .donut-legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .donut-legend-name { color: var(--text-primary); font-weight: 500; }
+    .donut-legend-right { display: flex; align-items: center; gap: 10px; }
+    .donut-legend-count { font-weight: 700; color: var(--text-primary); }
+    .donut-legend-pct { color: var(--text-secondary); font-size: 12px; min-width: 36px; text-align: right; }
+
+    /* ── Department bar chart ── */
+    .dept-list { display: flex; flex-direction: column; gap: 13px; margin-top: 4px; }
+    .dept-row { display: flex; align-items: center; gap: 10px; }
+    .dept-name { width: 52px; font-size: 13px; color: var(--text-primary); font-weight: 500; flex-shrink: 0; }
+    .dept-bar-wrap { flex: 1; background: #f1f5f9; border-radius: 4px; height: 8px; overflow: hidden; }
+    .dept-bar { height: 100%; border-radius: 4px; transition: width 0.6s ease; }
+    .dept-pct { width: 36px; text-align: right; font-size: 13px; font-weight: 700; color: var(--text-primary); flex-shrink: 0; }
+
+    /* ── Diff table ── */
+    .diff-table-wrap { overflow-x: auto; margin-top: 4px; }
+    table { width: 100%; border-collapse: collapse; }
+    thead th {
+      padding: 8px 12px;
+      text-align: left;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      border-bottom: 1px solid var(--border);
+      background: #f8fafc;
+      white-space: nowrap;
+    }
+    thead th:first-child { border-radius: 8px 0 0 0; }
+    thead th:last-child { border-radius: 0 8px 0 0; }
+    tbody tr { border-bottom: 1px solid #f1f5f9; transition: background 0.12s; }
+    tbody tr:hover { background: #f8fafc; }
+    tbody td { padding: 10px 12px; font-size: 13px; color: var(--text-primary); white-space: nowrap; }
+    .cell-asset-id { font-family: 'Inter', monospace; color: var(--primary); font-weight: 600; font-size: 12px; }
+    .cell-secondary { color: var(--text-secondary); font-size: 12px; }
+    .table-footer { padding-top: 14px; display: flex; align-items: center; justify-content: space-between; }
+    .link-all {
+      color: var(--primary); font-size: 13px; font-weight: 600;
+      text-decoration: none; display: flex; align-items: center; gap: 4px;
+    }
+    .link-all:hover { text-decoration: underline; }
+    .table-count { font-size: 12px; color: var(--text-secondary); }
+
+    /* ── Badge ── */
+    .badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 2px 8px; border-radius: 20px;
+      font-size: 11.5px; font-weight: 600;
+    }
+    .badge.red { background: #fee2e2; color: var(--danger); }
+    .badge.green { background: #d1fae5; color: #059669; }
+    .badge.orange { background: #fff7ed; color: #ea580c; }
+    .badge.blue { background: #dbeafe; color: var(--primary); }
+
+    /* ── AI Insight card ── */
+    .ai-card {
+      background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%);
+      border-radius: 14px;
+      padding: 26px 28px;
+      display: flex; align-items: flex-start; gap: 32px;
+      position: relative;
+      overflow: hidden;
+    }
+    .ai-card::after {
+      content: '';
+      position: absolute;
+      top: -40px; right: -40px;
+      width: 200px; height: 200px;
+      background: rgba(255,255,255,0.04);
+      border-radius: 50%;
+    }
+    .ai-card::before {
+      content: '';
+      position: absolute;
+      bottom: -60px; right: 80px;
+      width: 160px; height: 160px;
+      background: rgba(255,255,255,0.03);
+      border-radius: 50%;
+    }
+    .ai-left { flex: 1; min-width: 0; }
+    .ai-tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: rgba(255,255,255,0.9);
+      font-size: 11.5px; font-weight: 700;
+      padding: 4px 10px; border-radius: 20px;
+      margin-bottom: 12px;
+      letter-spacing: 0.3px;
+    }
+    .ai-title { color: #fff; font-size: 16px; font-weight: 700; line-height: 1.4; margin-bottom: 16px; }
+    .ai-insights { display: flex; flex-direction: column; gap: 10px; }
+    .ai-insight-item {
+      display: flex; align-items: flex-start; gap: 10px;
+      color: rgba(255,255,255,0.88);
+      font-size: 13.5px;
+      line-height: 1.5;
+    }
+    .ai-insight-icon { flex-shrink: 0; margin-top: 1px; font-size: 15px; }
+    .ai-right {
+      display: flex; flex-direction: column; gap: 10px; align-items: flex-end;
+      flex-shrink: 0; padding-top: 4px;
+    }
+    .ai-stat {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 10px;
+      padding: 12px 16px; text-align: center;
+      min-width: 110px;
+    }
+    .ai-stat-value { color: #fff; font-size: 22px; font-weight: 800; line-height: 1; }
+    .ai-stat-label { color: rgba(255,255,255,0.6); font-size: 11px; margin-top: 3px; }
+
+    /* ── Separator row ── */
+    .section-gap { height: 0; }
+
+    /* ── Scroll ── */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ══ SIDEBAR ══ -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <rect x="2" y="3" width="7" height="7" rx="1"/><rect x="15" y="3" width="7" height="7" rx="1"/>
+          <rect x="2" y="14" width="7" height="7" rx="1"/><rect x="15" y="14" width="7" height="7" rx="1"/>
+        </svg>
+      </div>
+      <div>
+        <div class="sidebar-logo-text">forthAMS</div>
+        <div class="sidebar-logo-sub">资产管理系统</div>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">主菜单</div>
+      <a class="nav-item" href="#">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        总览
+      </a>
+      <a class="nav-item" href="#">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+        资产管理
+      </a>
+      <a class="nav-item" href="#">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+        工单管理
+      </a>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">盘点与追踪</div>
+      <a class="nav-item active" href="#">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        RFID 盘点
+        <span class="nav-badge">3</span>
+      </a>
+      <a class="nav-item" href="#">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/></svg>
+        位置追踪
+      </a>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">系统</div>
+      <a class="nav-item" href="#">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        用户管理
+      </a>
+      <a class="nav-item" href="#">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93A10 10 0 1 0 4.93 19.07"/></svg>
+        系统设置
+      </a>
+    </div>
+
+    <div class="sidebar-user">
+      <div class="avatar">张</div>
+      <div class="sidebar-user-info">
+        <div class="sidebar-user-name">张云华</div>
+        <div class="sidebar-user-role">资产管理员</div>
+      </div>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+    </div>
+  </aside>
+
+  <!-- ══ MAIN ══ -->
+  <div class="main">
+
+    <!-- ── Header ── -->
+    <header class="header">
+      <button class="btn-back" onclick="history.back()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+        返回
+      </button>
+      <div class="breadcrumb">
+        <a href="#">RFID 盘点</a>
+        <span class="sep">/</span>
+        <span class="current">智能报告</span>
+      </div>
+      <div class="header-right">
+        <div class="header-dot"></div>
+        <span class="header-status">系统正常运行</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" style="margin-left:6px"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <div class="avatar" style="width:34px;height:34px;font-size:13px;margin-left:4px">张</div>
+      </div>
+    </header>
+
+    <!-- ── Content ── -->
+    <main class="content">
+
+      <!-- Page title row -->
+      <div class="page-title-row">
+        <div class="page-title-left">
+          <div class="page-title">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+            智能盘点报告
+            <span class="page-title-badge">2026年05月 Q2</span>
+          </div>
+          <div class="page-subtitle">
+            任务：2026年5月全面盘点
+            <span style="color:#cbd5e1">·</span>
+            <span class="status-dot-done">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              已完成
+            </span>
+            <span style="color:#cbd5e1">·</span>
+            <span>2026-05-18</span>
+          </div>
+        </div>
+        <button class="btn-primary">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          导出报告
+        </button>
+      </div>
+
+      <!-- ── Row 1: KPI Cards ── -->
+      <div class="grid grid-4" style="margin-bottom:20px">
+
+        <!-- KPI 1: 总资产数 -->
+        <div class="kpi-card blue">
+          <div class="kpi-top">
+            <div class="kpi-icon blue">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+            </div>
+            <span class="kpi-trend neutral">本次范围</span>
+          </div>
+          <div>
+            <div class="kpi-value default">1,248</div>
+            <div class="kpi-label">总资产数</div>
+            <div class="kpi-sublabel" style="margin-top:4px">本次盘点范围</div>
+          </div>
+        </div>
+
+        <!-- KPI 2: 盘点完成率 -->
+        <div class="kpi-card green">
+          <div class="kpi-top">
+            <div class="kpi-icon green">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            </div>
+            <span class="kpi-trend up">↑ +3.2%</span>
+          </div>
+          <div>
+            <div class="kpi-value green">96.8%</div>
+            <div class="kpi-label">盘点完成率</div>
+            <div class="kpi-sublabel" style="margin-top:4px">已盘 1,208 / 总 1,248</div>
+          </div>
+        </div>
+
+        <!-- KPI 3: 账实差异数 -->
+        <div class="kpi-card red">
+          <div class="kpi-top">
+            <div class="kpi-icon red">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            </div>
+            <span class="kpi-trend" style="background:#fee2e2;color:#ef4444">需关注</span>
+          </div>
+          <div>
+            <div class="kpi-value red">40</div>
+            <div class="kpi-label">账实差异数</div>
+            <div class="kpi-sublabel" style="margin-top:4px">盘亏 28 · 盘盈 12</div>
+          </div>
+        </div>
+
+        <!-- KPI 4: 盘点准确率 -->
+        <div class="kpi-card purple">
+          <div class="kpi-top">
+            <div class="kpi-icon purple">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+            </div>
+            <span class="kpi-trend up">↑ +12.5%</span>
+          </div>
+          <div>
+            <div class="kpi-value" style="color:#8b5cf6">96.8%</div>
+            <div class="kpi-label">盘点准确率</div>
+            <div class="kpi-sublabel" style="margin-top:4px">较上次 +12.5%</div>
+          </div>
+        </div>
+
+      </div><!-- /grid-4 -->
+
+      <!-- ── Row 2: Trend + Donut ── -->
+      <div class="grid grid-7-5" style="margin-bottom:20px">
+
+        <!-- Left: Line chart -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">近6次盘点准确率趋势</div>
+              <div class="chart-subtitle">2026年1月 — 5月 Q2 · 双线对比</div>
+            </div>
+            <div class="chart-legend">
+              <div class="legend-item"><div class="legend-dot" style="background:#3b82f6"></div>准确率</div>
+              <div class="legend-item"><div class="legend-dot" style="background:#10b981"></div>完成率</div>
+            </div>
+          </div>
+          <div class="chart-area" style="height:220px">
+            <canvas id="trendChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Right: Donut chart -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">差异分布</div>
+              <div class="chart-subtitle">本次盘点 · 1,248 资产</div>
+            </div>
+          </div>
+          <div class="donut-wrap" style="height:180px">
+            <canvas id="donutChart"></canvas>
+            <div class="donut-center">
+              <div class="donut-center-value">40</div>
+              <div class="donut-center-label">差异</div>
+            </div>
+          </div>
+          <div class="donut-legend">
+            <div class="donut-legend-item">
+              <div class="donut-legend-left"><div class="donut-legend-dot" style="background:#10b981"></div><span class="donut-legend-name">正常资产</span></div>
+              <div class="donut-legend-right"><span class="donut-legend-count">1,208</span><span class="donut-legend-pct">96.8%</span></div>
+            </div>
+            <div class="donut-legend-item">
+              <div class="donut-legend-left"><div class="donut-legend-dot" style="background:#ef4444"></div><span class="donut-legend-name">盘亏</span></div>
+              <div class="donut-legend-right"><span class="donut-legend-count">28</span><span class="donut-legend-pct">2.2%</span></div>
+            </div>
+            <div class="donut-legend-item">
+              <div class="donut-legend-left"><div class="donut-legend-dot" style="background:#f59e0b"></div><span class="donut-legend-name">盘盈</span></div>
+              <div class="donut-legend-right"><span class="donut-legend-count">12</span><span class="donut-legend-pct">1.0%</span></div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /grid-7-5 -->
+
+      <!-- ── Row 3: Dept bars + Diff table ── -->
+      <div class="grid grid-5-7" style="margin-bottom:20px">
+
+        <!-- Left: Dept bar chart -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">按部门完成率</div>
+              <div class="chart-subtitle">各部门盘点进度</div>
+            </div>
+          </div>
+          <div class="dept-list">
+
+            <div class="dept-row">
+              <div class="dept-name">行政部</div>
+              <div class="dept-bar-wrap"><div class="dept-bar" style="width:99%;background:#3b82f6"></div></div>
+              <div class="dept-pct" style="color:#3b82f6">99%</div>
+            </div>
+            <div class="dept-row">
+              <div class="dept-name">研发部</div>
+              <div class="dept-bar-wrap"><div class="dept-bar" style="width:98%;background:#3b82f6"></div></div>
+              <div class="dept-pct" style="color:#3b82f6">98%</div>
+            </div>
+            <div class="dept-row">
+              <div class="dept-name">销售部</div>
+              <div class="dept-bar-wrap"><div class="dept-bar" style="width:95%;background:#f59e0b"></div></div>
+              <div class="dept-pct" style="color:#f59e0b">95%</div>
+            </div>
+            <div class="dept-row">
+              <div class="dept-name">财务部</div>
+              <div class="dept-bar-wrap"><div class="dept-bar" style="width:94%;background:#f59e0b"></div></div>
+              <div class="dept-pct" style="color:#f59e0b">94%</div>
+            </div>
+            <div class="dept-row">
+              <div class="dept-name">运营部</div>
+              <div class="dept-bar-wrap"><div class="dept-bar" style="width:91%;background:#ef4444"></div></div>
+              <div class="dept-pct" style="color:#ef4444">91%</div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Right: Diff table -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">差异资产明细</div>
+              <div class="chart-subtitle">前5条 · 共40条差异记录</div>
+            </div>
+          </div>
+          <div class="diff-table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>资产编号</th>
+                  <th>资产名称</th>
+                  <th>分类</th>
+                  <th>所属部门</th>
+                  <th>差异类型</th>
+                  <th>状态</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="cell-asset-id">AST-2024-0381</span></td>
+                  <td>Dell 27寸显示器</td>
+                  <td><span class="cell-secondary">IT设备</span></td>
+                  <td><span class="cell-secondary">研发部</span></td>
+                  <td><span class="badge orange">位置异常</span></td>
+                  <td><span class="badge blue">待核查</span></td>
+                </tr>
+                <tr>
+                  <td><span class="cell-asset-id">AST-2023-1042</span></td>
+                  <td>MacBook Pro 16"</td>
+                  <td><span class="cell-secondary">IT设备</span></td>
+                  <td><span class="cell-secondary">运营部</span></td>
+                  <td><span class="badge red">盘亏</span></td>
+                  <td><span class="badge" style="background:#fff7ed;color:#ea580c">待处理</span></td>
+                </tr>
+                <tr>
+                  <td><span class="cell-asset-id">AST-2025-0217</span></td>
+                  <td>会议桌（8人）</td>
+                  <td><span class="cell-secondary">办公家具</span></td>
+                  <td><span class="cell-secondary">行政部</span></td>
+                  <td><span class="badge green">盘盈</span></td>
+                  <td><span class="badge blue">待核查</span></td>
+                </tr>
+                <tr>
+                  <td><span class="cell-asset-id">AST-2024-0558</span></td>
+                  <td>HP 激光打印机</td>
+                  <td><span class="cell-secondary">办公设备</span></td>
+                  <td><span class="cell-secondary">财务部</span></td>
+                  <td><span class="badge red">盘亏</span></td>
+                  <td><span class="badge" style="background:#fff7ed;color:#ea580c">待处理</span></td>
+                </tr>
+                <tr>
+                  <td><span class="cell-asset-id">AST-2025-0094</span></td>
+                  <td>工业扫描枪</td>
+                  <td><span class="cell-secondary">专用设备</span></td>
+                  <td><span class="cell-secondary">运营部</span></td>
+                  <td><span class="badge orange">位置异常</span></td>
+                  <td><span class="badge blue">待核查</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="table-footer">
+            <span class="table-count">显示 5 条 / 共 40 条差异记录</span>
+            <a class="link-all" href="#">
+              查看全部 40 条差异
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+            </a>
+          </div>
+        </div>
+
+      </div><!-- /grid-5-7 -->
+
+      <!-- ── Row 4: AI Insight ── -->
+      <div class="ai-card">
+        <div class="ai-left">
+          <div class="ai-tag">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg>
+            AI 智能分析
+          </div>
+          <div class="ai-title">本次盘点整体表现优良，3 个维度需要关注</div>
+          <div class="ai-insights">
+            <div class="ai-insight-item">
+              <span class="ai-insight-icon">✅</span>
+              <span>准确率同比提升 <strong>12.5%</strong>，研发部表现最佳，连续三次盘点完成率 100%</span>
+            </div>
+            <div class="ai-insight-item">
+              <span class="ai-insight-icon">⚠️</span>
+              <span>运营部仓库区域出现 <strong>6 次位置异常</strong>，集中在 B 栋 3 层，建议安排实地核查</span>
+            </div>
+            <div class="ai-insight-item">
+              <span class="ai-insight-icon">📅</span>
+              <span>下次建议盘点时间：<strong>2026-06-15</strong>，共 <strong>2</strong> 个高风险资产需优先关注</span>
+            </div>
+          </div>
+        </div>
+        <div class="ai-right">
+          <div class="ai-stat">
+            <div class="ai-stat-value">A+</div>
+            <div class="ai-stat-label">综合评分</div>
+          </div>
+          <button class="btn-outline-white">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            生成整改建议
+          </button>
+        </div>
+      </div><!-- /ai-card -->
+
+    </main><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<!-- ══ Charts ══ -->
+<script>
+// ── Trend line chart ──
+(function() {
+  const ctx = document.getElementById('trendChart').getContext('2d');
+  const labels = ['1月', '2月', '3月', '4月', '5月 Q2'];
+  const accuracy = [84.2, 87.5, 90.1, 93.4, 96.8];
+  const completion = [88.0, 90.2, 91.8, 94.5, 96.8];
+
+  const gradientBlue = ctx.createLinearGradient(0, 0, 0, 200);
+  gradientBlue.addColorStop(0, 'rgba(59,130,246,0.25)');
+  gradientBlue.addColorStop(1, 'rgba(59,130,246,0.01)');
+
+  const gradientGreen = ctx.createLinearGradient(0, 0, 0, 200);
+  gradientGreen.addColorStop(0, 'rgba(16,185,129,0.15)');
+  gradientGreen.addColorStop(1, 'rgba(16,185,129,0.01)');
+
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: '准确率',
+          data: accuracy,
+          borderColor: '#3b82f6',
+          backgroundColor: gradientBlue,
+          borderWidth: 2.5,
+          pointBackgroundColor: '#3b82f6',
+          pointBorderColor: '#fff',
+          pointBorderWidth: 2,
+          pointRadius: 5,
+          pointHoverRadius: 7,
+          tension: 0.4,
+          fill: true,
+        },
+        {
+          label: '完成率',
+          data: completion,
+          borderColor: '#10b981',
+          backgroundColor: gradientGreen,
+          borderWidth: 2.5,
+          pointBackgroundColor: '#10b981',
+          pointBorderColor: '#fff',
+          pointBorderWidth: 2,
+          pointRadius: 5,
+          pointHoverRadius: 7,
+          tension: 0.4,
+          fill: true,
+          borderDash: [5,3],
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#0f172a',
+          titleColor: '#f8fafc',
+          bodyColor: '#94a3b8',
+          padding: 10,
+          cornerRadius: 8,
+          callbacks: {
+            label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y}%`
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: { display: false },
+          ticks: { color: '#94a3b8', font: { size: 12, family: 'Inter' } },
+          border: { display: false }
+        },
+        y: {
+          min: 80, max: 100,
+          grid: { color: '#f1f5f9', drawBorder: false },
+          ticks: {
+            color: '#94a3b8',
+            font: { size: 11, family: 'Inter' },
+            callback: v => v + '%',
+            stepSize: 5
+          },
+          border: { display: false }
+        }
+      }
+    }
+  });
+})();
+
+// ── Donut chart ──
+(function() {
+  const ctx = document.getElementById('donutChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['正常资产', '盘亏', '盘盈'],
+      datasets: [{
+        data: [1208, 28, 12],
+        backgroundColor: ['#10b981', '#ef4444', '#f59e0b'],
+        borderWidth: 0,
+        hoverOffset: 4,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '72%',
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#0f172a',
+          titleColor: '#f8fafc',
+          bodyColor: '#94a3b8',
+          padding: 10,
+          cornerRadius: 8,
+          callbacks: {
+            label: ctx => {
+              const total = ctx.dataset.data.reduce((a,b)=>a+b,0);
+              return ` ${ctx.label}: ${ctx.parsed} (${(ctx.parsed/total*100).toFixed(1)}%)`;
+            }
+          }
+        }
+      }
+    }
+  });
+})();
+</script>
+
+</body>
+</html>

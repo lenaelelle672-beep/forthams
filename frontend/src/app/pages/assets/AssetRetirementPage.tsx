@@ -127,16 +127,16 @@ export const AssetRetirementPage: React.FC = () => {
     return (
       <div className="max-w-3xl mx-auto space-y-6 pb-12" data-testid="retirement-page-loading">
         <div className="flex items-center gap-4 mb-8">
-          <div className="w-10 h-10 bg-gray-100 rounded-lg animate-pulse" />
+          <div className="w-10 h-10 bg-blue-50 rounded-lg animate-pulse" />
           <div className="space-y-2">
-            <div className="h-6 w-56 bg-gray-100 rounded animate-pulse" />
+            <div className="h-6 w-56 bg-blue-50 rounded animate-pulse" />
             <div className="h-4 w-40 bg-gray-50 rounded animate-pulse" />
           </div>
         </div>
         <Card>
           <CardContent className="p-6 space-y-4">
             {[...Array(4)].map((_, i) => (
-              <div key={i} className="h-12 w-full bg-gray-100 rounded animate-pulse" />
+              <div key={i} className="h-12 w-full bg-blue-50 rounded animate-pulse" />
             ))}
           </CardContent>
         </Card>
@@ -186,7 +186,7 @@ export const AssetRetirementPage: React.FC = () => {
           </div>
           <div>
             <h2 className="text-2xl font-bold text-gray-900">申请退役</h2>
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-gray-400 mt-1">
               填写退役原因并提交审批申请
             </p>
           </div>
@@ -199,11 +199,11 @@ export const AssetRetirementPage: React.FC = () => {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-500">资产信息</p>
+                <p className="text-sm text-gray-400">资产信息</p>
                 <p className="text-lg font-medium">
                   {assetInfo.assetName ?? assetInfo.assetCode ?? `资产 #${assetId}`}
                 </p>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-400">
                   编号：{assetInfo.assetCode ?? '-'}
                 </p>
               </div>

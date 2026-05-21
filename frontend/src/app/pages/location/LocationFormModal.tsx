@@ -127,9 +127,9 @@ export function LocationFormModal({
           <button
             type="button"
             onClick={onClose}
-            className="p-1 rounded-lg hover:bg-gray-100 transition-colors"
+            className="p-1 rounded-lg hover:bg-blue-50 transition-colors"
           >
-            <X className="w-5 h-5 text-gray-500" />
+            <X className="w-5 h-5 text-gray-400" />
           </button>
         </div>
 
@@ -140,7 +140,7 @@ export function LocationFormModal({
             <label className="block text-sm font-medium text-gray-700 mb-1">
               上级位置
             </label>
-            <div className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 bg-gray-50 text-gray-500">
+            <div className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 bg-gray-50 text-gray-400">
               {getParentName(formData.parentId, treeData)}
             </div>
           </div>
@@ -155,7 +155,7 @@ export function LocationFormModal({
               value={formData.name}
               onChange={(e) => onFieldChange("name", e.target.value)}
               placeholder="请输入位置名称"
-              className="w-full px-3 py-2 text-sm rounded-lg border border-gray-300
+              className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200
                 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500
                 focus:border-blue-500 transition-colors"
             />
@@ -174,7 +174,7 @@ export function LocationFormModal({
                   onFieldChange("locationCode", e.target.value)
                 }
                 placeholder="请输入位置编码"
-                className="w-full px-3 py-2 text-sm rounded-lg border border-gray-300
+                className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200
                   bg-white focus:outline-none focus:ring-2 focus:ring-blue-500
                   focus:border-blue-500 transition-colors"
               />
@@ -190,7 +190,7 @@ export function LocationFormModal({
                   onFieldChange("sortOrder", Number(e.target.value))
                 }
                 min={0}
-                className="w-full px-3 py-2 text-sm rounded-lg border border-gray-300
+                className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200
                   bg-white focus:outline-none focus:ring-2 focus:ring-blue-500
                   focus:border-blue-500 transition-colors"
               />
@@ -209,7 +209,7 @@ export function LocationFormModal({
               }
               placeholder="请输入位置描述"
               rows={3}
-              className="w-full px-3 py-2 text-sm rounded-lg border border-gray-300
+              className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200
                 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500
                 focus:border-blue-500 transition-colors resize-none"
             />
@@ -222,7 +222,7 @@ export function LocationFormModal({
             type="button"
             onClick={onClose}
             disabled={submitting}
-            className="px-4 py-2 text-sm rounded-lg border border-gray-300
+            className="px-4 py-2 text-sm rounded-lg border border-gray-200
               bg-white text-gray-700 hover:bg-gray-50
               disabled:opacity-50 transition-colors"
           >

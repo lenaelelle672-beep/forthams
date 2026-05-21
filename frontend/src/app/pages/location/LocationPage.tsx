@@ -352,7 +352,7 @@ export default function LocationPage() {
           type="button"
           onClick={handleExpandAll}
           className="inline-flex items-center gap-1.5 px-3 py-2 text-sm
-            rounded-lg border border-gray-300 bg-white text-gray-700
+            rounded-lg border border-gray-200 bg-white text-gray-700
             hover:bg-gray-50 transition-colors"
         >
           <ChevronDown className="w-4 h-4" />
@@ -362,7 +362,7 @@ export default function LocationPage() {
           type="button"
           onClick={handleCollapseAll}
           className="inline-flex items-center gap-1.5 px-3 py-2 text-sm
-            rounded-lg border border-gray-300 bg-white text-gray-700
+            rounded-lg border border-gray-200 bg-white text-gray-700
             hover:bg-gray-50 transition-colors"
         >
           <ChevronRight className="w-4 h-4" />
@@ -373,7 +373,7 @@ export default function LocationPage() {
           onClick={fetchLocations}
           disabled={loading}
           className="inline-flex items-center gap-1.5 px-3 py-2 text-sm
-            rounded-lg border border-gray-300 bg-white text-gray-700
+            rounded-lg border border-gray-200 bg-white text-gray-700
             hover:bg-gray-50 disabled:opacity-50 transition-colors"
         >
           <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
@@ -391,29 +391,29 @@ export default function LocationPage() {
       {/* 位置树形表格 */}
       {loading ? (
         <div className="rounded-lg border border-gray-200 shadow-sm">
-          <table className="min-w-full divide-y divide-gray-200">
+          <table className="min-w-full divide-y divide-[#1e3a5f]">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                   位置名称
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                   编码
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                   描述
                 </th>
-                <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">
                   排序
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                   操作
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-white divide-y divide-[#1e3a5f]">
               <tr>
-                <td colSpan={5} className="px-4 py-12 text-center text-gray-500">
+                <td colSpan={5} className="px-4 py-12 text-center text-gray-400">
                   <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2" />
                   加载中...
                 </td>
@@ -423,27 +423,27 @@ export default function LocationPage() {
         </div>
       ) : error ? (
         <div className="rounded-lg border border-gray-200 shadow-sm">
-          <table className="min-w-full divide-y divide-gray-200">
+          <table className="min-w-full divide-y divide-[#1e3a5f]">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                   位置名称
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                   编码
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                   描述
                 </th>
-                <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">
                   排序
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                   操作
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-white divide-y divide-[#1e3a5f]">
               <tr>
                 <td colSpan={5} className="px-4 py-12 text-center text-red-500">
                   <div className="error-container">
@@ -456,29 +456,29 @@ export default function LocationPage() {
         </div>
       ) : treeData.length === 0 ? (
         <div className="rounded-lg border border-gray-200 shadow-sm">
-          <table className="min-w-full divide-y divide-gray-200">
+          <table className="min-w-full divide-y divide-[#1e3a5f]">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                   位置名称
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                   编码
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                   描述
                 </th>
-                <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">
                   排序
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                   操作
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-white divide-y divide-[#1e3a5f]">
               <tr>
-                <td colSpan={5} className="px-4 py-12 text-center text-gray-500">
+                <td colSpan={5} className="px-4 py-12 text-center text-gray-400">
                   暂无位置数据，点击&quot;新增位置&quot;添加顶级位置
                 </td>
               </tr>
@@ -500,7 +500,7 @@ export default function LocationPage() {
       {/* 统计信息 */}
       {!loading && totalCount > 0 && (
         <div className="mt-4">
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-gray-500">
             共 {totalCount} 个位置节点
           </p>
         </div>

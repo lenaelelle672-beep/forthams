@@ -48,14 +48,14 @@ function getStatusBadgeProps(status?: string): { text: string; className: string
     case "REJECTED":
       return { text: "已拒绝", className: "bg-red-100 text-red-800" };
     case "CANCELLED":
-      return { text: "已取消", className: "bg-gray-100 text-gray-800" };
+      return { text: "已取消", className: "bg-blue-50 text-gray-800" };
     case "COMPLETED":
       return { text: "已完成", className: "bg-green-100 text-green-800" };
     case "APPROVING":
     case "IN_PROGRESS":
       return { text: "审批中", className: "bg-blue-100 text-blue-800" };
     default:
-      return { text: status ?? "未知", className: "bg-gray-100 text-gray-600" };
+      return { text: status ?? "未知", className: "bg-blue-50 text-gray-500" };
   }
 }
 
@@ -374,7 +374,7 @@ function ApprovalListPageInner() {
       {/* Page header */}
       <div>
         <h2 className="text-2xl font-semibold text-gray-900">审批列表</h2>
-        <p className="text-gray-600 mt-1">浏览和管理所有审批流程</p>
+        <p className="text-gray-500 mt-1">浏览和管理所有审批流程</p>
       </div>
 
       {/* Notice banner */}
@@ -402,7 +402,7 @@ function ApprovalListPageInner() {
             value={searchInput}
             onChange={(e) => handleSearchChange(e.target.value)}
             placeholder="搜索审批编号、类型..."
-            className="w-full pl-10 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full pl-10 pr-4 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             data-testid="approval-search-input"
           />
         </div>
@@ -419,7 +419,7 @@ function ApprovalListPageInner() {
                 className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
                   activeTab === tab
                     ? "border-blue-600 text-blue-600"
-                    : "border-transparent text-gray-600 hover:text-gray-900"
+                    : "border-transparent text-gray-500 hover:text-gray-900"
                 }`}
                 data-testid={`tab-${tab.toLowerCase()}`}
               >
@@ -433,16 +433,16 @@ function ApprovalListPageInner() {
         {isLoading && !selectedItemId && (
           <div className="p-6 space-y-4" data-testid="loading-skeleton">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="animate-pulse border border-gray-100 rounded-lg p-5">
+              <div key={i} className="animate-pulse border border-gray-200 rounded-lg p-5">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="h-5 bg-gray-200 rounded w-1/3" />
-                  <div className="h-5 bg-gray-200 rounded-full w-16" />
+                  <div className="h-5 bg-blue-50 rounded w-1/3" />
+                  <div className="h-5 bg-blue-50 rounded-full w-16" />
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="h-4 bg-gray-100 rounded w-3/4" />
-                  <div className="h-4 bg-gray-100 rounded w-1/2" />
-                  <div className="h-4 bg-gray-100 rounded w-2/3" />
-                  <div className="h-4 bg-gray-100 rounded w-1/2" />
+                  <div className="h-4 bg-blue-50 rounded w-3/4" />
+                  <div className="h-4 bg-blue-50 rounded w-1/2" />
+                  <div className="h-4 bg-blue-50 rounded w-2/3" />
+                  <div className="h-4 bg-blue-50 rounded w-1/2" />
                 </div>
               </div>
             ))}
@@ -468,7 +468,7 @@ function ApprovalListPageInner() {
         {!isLoading && !error && (
           <div className="p-6 space-y-4">
             {filteredApprovals.length === 0 ? (
-              <div className="py-12 text-center text-sm text-gray-500" data-testid="empty-state">
+              <div className="py-12 text-center text-sm text-gray-400" data-testid="empty-state">
                 暂无审批数据
               </div>
             ) : (
@@ -515,31 +515,31 @@ function ApprovalListPageInner() {
                       </button>
                     </div>
 
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-gray-600">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-gray-500">
                       <div>
-                        <span className="text-gray-500">审批编号:</span>{" "}
+                        <span className="text-gray-400">审批编号:</span>{" "}
                         {item.processNo || item.id}
                       </div>
                       <div>
-                        <span className="text-gray-500">业务ID:</span>{" "}
+                        <span className="text-gray-400">业务ID:</span>{" "}
                         {item.businessId ?? "-"}
                       </div>
                       <div>
-                        <span className="text-gray-500">申请人ID:</span>{" "}
+                        <span className="text-gray-400">申请人ID:</span>{" "}
                         {item.applicant ?? "-"}
                       </div>
                       <div>
-                        <span className="text-gray-500">提交时间:</span>{" "}
+                        <span className="text-gray-400">提交时间:</span>{" "}
                         {item.createdAt || "-"}
                       </div>
                       <div>
-                        <span className="text-gray-500">更新时间:</span>{" "}
+                        <span className="text-gray-400">更新时间:</span>{" "}
                         {item.updatedAt || "-"}
                       </div>
                     </div>
                     {item.businessSummary && (
-                      <p className="mt-3 text-sm text-gray-600">
-                        <span className="text-gray-500">业务摘要:</span> {item.businessSummary}
+                      <p className="mt-3 text-sm text-gray-500">
+                        <span className="text-gray-400">业务摘要:</span> {item.businessSummary}
                       </p>
                     )}
                   </div>
@@ -570,7 +570,7 @@ function ApprovalListPageInner() {
                 <h3 id="approval-detail-title" className="text-lg font-semibold text-gray-900">
                   审批详情{activeDetail ? ` — ${activeDetail.processNo || activeDetail.id}` : ""}
                 </h3>
-                <p className="mt-1 text-sm text-gray-500">详情在弹窗内独立滚动，长流程不会影响列表位置。</p>
+                <p className="mt-1 text-sm text-gray-400">详情在弹窗内独立滚动，长流程不会影响列表位置。</p>
               </div>
               <div className="flex shrink-0 items-center gap-3">
                 {activeDetail?.type && WORKFLOW_MANAGED_TYPES.has(activeDetail.type) ? (
@@ -585,7 +585,7 @@ function ApprovalListPageInner() {
                 <button
                   type="button"
                   onClick={handleClearSelection}
-                  className="text-gray-400 hover:text-gray-600 text-xl"
+                  className="text-gray-400 hover:text-gray-500 text-xl"
                   data-testid="close-detail-btn"
                   aria-label="关闭审批详情"
                 >
@@ -602,62 +602,62 @@ function ApprovalListPageInner() {
                       {error}
                     </div>
                   ) : (
-                    <span className="text-gray-500">正在加载审批详情...</span>
+                    <span className="text-gray-400">正在加载审批详情...</span>
                   )}
                 </div>
               ) : (
                 <>
                   {/* Process info */}
-                  <div className="px-6 py-4 border-b border-gray-100">
+                  <div className="px-6 py-4 border-b border-gray-200">
                     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 text-sm">
                       <div>
-                        <span className="text-gray-500">审批编号:</span>{" "}
+                        <span className="text-gray-400">审批编号:</span>{" "}
                         <span className="text-gray-900">{activeDetail.processNo || activeDetail.id}</span>
                       </div>
                       <div>
-                        <span className="text-gray-500">类型:</span>{" "}
+                        <span className="text-gray-400">类型:</span>{" "}
                         <span className="text-gray-900">{activeDetail.type || "-"}</span>
                       </div>
                       <div>
-                        <span className="text-gray-500">状态:</span>{" "}
+                        <span className="text-gray-400">状态:</span>{" "}
                         <span className={`inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full ${getStatusBadgeProps(activeDetail.status).className}`}>
                           {getStatusBadgeProps(activeDetail.status).text}
                         </span>
                       </div>
                       <div>
-                        <span className="text-gray-500">当前步骤:</span>{" "}
+                        <span className="text-gray-400">当前步骤:</span>{" "}
                         <span className="text-gray-900">{activeDetail.currentStep}</span>
                       </div>
                       <div>
-                        <span className="text-gray-500">申请人ID:</span>{" "}
+                        <span className="text-gray-400">申请人ID:</span>{" "}
                         <span className="text-gray-900">{activeDetail.applicant ?? "-"}</span>
                       </div>
                       <div>
-                        <span className="text-gray-500">业务ID:</span>{" "}
+                        <span className="text-gray-400">业务ID:</span>{" "}
                         <span className="text-gray-900">{activeDetail.businessId ?? "-"}</span>
                       </div>
                       <div>
-                        <span className="text-gray-500">业务摘要:</span>{" "}
+                        <span className="text-gray-400">业务摘要:</span>{" "}
                         <span className="text-gray-900">{activeDetail.businessSummary ?? "-"}</span>
                       </div>
                       <div>
-                        <span className="text-gray-500">创建时间:</span>{" "}
+                        <span className="text-gray-400">创建时间:</span>{" "}
                         <span className="text-gray-900">{activeDetail.createdAt || "-"}</span>
                       </div>
                       <div>
-                        <span className="text-gray-500">更新时间:</span>{" "}
+                        <span className="text-gray-400">更新时间:</span>{" "}
                         <span className="text-gray-900">{activeDetail.updatedAt || "-"}</span>
                       </div>
                     </div>
                   </div>
 
                   {businessDetails.length > 0 ? (
-                    <div className="px-6 py-4 border-b border-gray-100">
+                    <div className="px-6 py-4 border-b border-gray-200">
                       <h4 className="text-sm font-medium text-gray-700 mb-3">业务字段</h4>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
                         {businessDetails.map((item) => (
                           <div key={item.key} className="rounded-lg bg-gray-50 px-3 py-2">
-                            <span className="text-gray-500">{item.label}:</span>{" "}
+                            <span className="text-gray-400">{item.label}:</span>{" "}
                             <span className="text-gray-900 break-all">{item.value}</span>
                           </div>
                         ))}
@@ -666,7 +666,7 @@ function ApprovalListPageInner() {
                   ) : null}
 
                   {/* Approval flow chart */}
-                  <div className="px-6 py-4 border-b border-gray-100">
+                  <div className="px-6 py-4 border-b border-gray-200">
                     <h4 className="text-sm font-medium text-gray-700 mb-3">审批流转</h4>
                     <ApprovalFlowChart approval={activeDetail} approvalHistory={currentHistory} />
                   </div>

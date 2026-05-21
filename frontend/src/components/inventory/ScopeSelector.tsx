@@ -431,7 +431,7 @@ const ScopeSelector: React.FC<ScopeSelectorProps> = ({ value, onChange }) => {
                 maxHeight: 100,
                 overflowY: 'auto',
                 padding: 8,
-                background: '#fafafa',
+                background: '#f8fafc',
                 borderRadius: 6,
               }}
             >

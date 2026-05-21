@@ -200,7 +200,7 @@ export const RetirementTimeline: React.FC<RetirementTimelineProps> = ({
               {!isLast && (
                 <div
                   className={`w-px flex-1 min-h-6 ${
-                    isSuccess ? 'bg-green-200' : isReject || isCancel ? 'bg-red-200' : 'bg-gray-200'
+                    isSuccess ? 'bg-green-200' : isReject || isCancel ? 'bg-red-200' : 'bg-blue-50'
                   }`}
                 />
               )}
@@ -221,7 +221,7 @@ export const RetirementTimeline: React.FC<RetirementTimelineProps> = ({
                 </Badge>
               </div>
               {node.comment && (
-                <p className="text-sm text-gray-500 mt-1">
+                <p className="text-sm text-gray-400 mt-1">
                   {node.comment}
                 </p>
               )}

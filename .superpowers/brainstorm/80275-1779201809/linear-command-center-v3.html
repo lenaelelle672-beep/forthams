@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>forthAMS Linear + Traffic Command Big Screen</title>
+  <style>
+    :root {
+      --bg: #f5f6f8;
+      --ink: #151922;
+      --muted: #667085;
+      --line: #d8dee8;
+      --linear: #5e6ad2;
+      --linear-soft: #eef0ff;
+      --navy: #070b18;
+      --cyan: #00d4ff;
+      --cyan-soft: rgba(0, 212, 255, 0.22);
+      --green: #33f5a4;
+      --amber: #ffd166;
+      --red: #ff5b7a;
+      --purple: #a78bfa;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 8% 0%, #ffffff 0, transparent 38%),
+        linear-gradient(180deg, #f8fafc, #eef2f7);
+    }
+
+    .wrap {
+      width: min(1560px, calc(100vw - 48px));
+      margin: 0 auto;
+      padding: 28px 0 42px;
+    }
+
+    .head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 28px;
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 29px;
+      line-height: 1.18;
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    .decision {
+      max-width: 500px;
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: rgba(255,255,255,0.9);
+      box-shadow: 0 12px 30px rgba(20, 30, 55, 0.08);
+      color: #475467;
+      font-size: 12px;
+      line-height: 1.65;
+    }
+
+    .two {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(255,255,255,0.94);
+      box-shadow: 0 14px 34px rgba(20, 30, 55, 0.08);
+      overflow: hidden;
+    }
+
+    .card-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 48px;
+      padding: 0 15px;
+      border-bottom: 1px solid #e5e9f0;
+    }
+
+    .card-head h2 {
+      margin: 0;
+      font-size: 15px;
+    }
+
+    .pill {
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: #141516;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .card-body {
+      padding: 16px;
+    }
+
+    .linear-app {
+      height: 430px;
+      border: 1px solid #d7dce8;
+      border-radius: 14px;
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: 214px 1fr;
+      background: #fff;
+    }
+
+    .app-side {
+      background: #fbfbfd;
+      border-right: 1px solid #e4e8f0;
+      padding: 14px 12px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 16px;
+      font-weight: 800;
+      font-size: 14px;
+    }
+
+    .brand-mark {
+      width: 22px;
+      height: 22px;
+      border-radius: 7px;
+      background:
+        linear-gradient(135deg, #5e6ad2, #8a94ff),
+        #5e6ad2;
+      box-shadow: 0 6px 14px rgba(94,106,210,0.28);
+    }
+
+    .side-label {
+      margin: 15px 0 8px;
+      color: #98a2b3;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .nav {
+      height: 31px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 9px;
+      margin-bottom: 4px;
+      border-radius: 8px;
+      color: #566176;
+      font-size: 12px;
+    }
+
+    .nav::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 2px;
+      background: #c7cfdd;
+    }
+
+    .nav.active {
+      background: var(--linear-soft);
+      color: #4d57b8;
+      font-weight: 700;
+    }
+
+    .nav.active::before { background: var(--linear); }
+
+    .app-main {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      background: #f6f7fb;
+    }
+
+    .app-top {
+      height: 58px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      border-bottom: 1px solid #e4e8f0;
+      background: #fff;
+    }
+
+    .app-title b {
+      display: block;
+      font-size: 15px;
+      line-height: 1.2;
+    }
+
+    .app-title span {
+      color: #98a2b3;
+      font-size: 11px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 7px;
+      align-items: center;
+    }
+
+    .button {
+      height: 30px;
+      padding: 0 10px;
+      border: 1px solid #d5dce8;
+      border-radius: 8px;
+      background: #fff;
+      color: #475467;
+      font-size: 12px;
+    }
+
+    .button.primary {
+      border-color: var(--linear);
+      background: var(--linear);
+      color: #fff;
+      font-weight: 700;
+    }
+
+    .app-content {
+      padding: 14px;
+      display: grid;
+      grid-template-rows: 72px 40px 1fr;
+      gap: 12px;
+      min-height: 0;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    .stat {
+      border: 1px solid #dfe5ee;
+      border-radius: 10px;
+      background: #fff;
+      padding: 10px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat::after {
+      content: "";
+      position: absolute;
+      right: 10px;
+      top: 10px;
+      width: 30px;
+      height: 30px;
+      border-radius: 9px;
+      background: var(--linear-soft);
+    }
+
+    .stat b {
+      display: block;
+      font-size: 20px;
+      line-height: 1;
+      margin-bottom: 8px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .stat span {
+      color: #7a8496;
+      font-size: 11px;
+    }
+
+    .filters {
+      display: flex;
+      gap: 8px;
+    }
+
+    .filter {
+      height: 32px;
+      border: 1px solid #dfe5ee;
+      border-radius: 9px;
+      background: #fff;
+      min-width: 90px;
+    }
+
+    .filter.search { flex: 1; }
+
+    .work {
+      display: grid;
+      grid-template-columns: 160px 1fr;
+      gap: 12px;
+      min-height: 0;
+    }
+
+    .tree,
+    .table {
+      border: 1px solid #dfe5ee;
+      border-radius: 10px;
+      background: #fff;
+      overflow: hidden;
+    }
+
+    .tree { padding: 10px; }
+
+    .branch {
+      height: 24px;
+      border-radius: 7px;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 0 8px;
+      color: #667085;
+      font-size: 11px;
+    }
+
+    .branch::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 2px;
+      background: #c8d0dc;
+    }
+
+    .branch.active {
+      color: #4d57b8;
+      background: var(--linear-soft);
+      font-weight: 700;
+    }
+
+    .branch.active::before { background: var(--linear); }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1.1fr 1.25fr 0.8fr 0.85fr 0.7fr;
+      gap: 10px;
+      min-height: 34px;
+      align-items: center;
+      padding: 0 10px;
+      border-bottom: 1px solid #eef1f6;
+    }
+
+    .row.head {
+      min-height: 32px;
+      background: #f2f4f8;
+    }
+
+    .cell {
+      height: 8px;
+      border-radius: 999px;
+      background: #cfd7e4;
+    }
+
+    .cell.dark { background: #7b8799; }
+    .cell.accent { background: var(--linear); }
+    .cell.ok { background: #18a058; }
+    .cell.warn { background: #f59e0b; }
+
+    .nuxt-summary {
+      display: grid;
+      gap: 12px;
+      height: 430px;
+      align-content: start;
+    }
+
+    .summary-box {
+      border: 1px solid #dfe5ee;
+      border-radius: 12px;
+      background: #fff;
+      padding: 14px;
+    }
+
+    .summary-box h3 {
+      margin: 0 0 8px;
+      font-size: 14px;
+    }
+
+    .summary-box p,
+    .summary-box li {
+      color: #586475;
+      font-size: 12px;
+      line-height: 1.65;
+    }
+
+    .summary-box ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    .score {
+      display: grid;
+      grid-template-columns: 72px 1fr;
+      gap: 8px 10px;
+      align-items: center;
+      font-size: 11px;
+      color: #667085;
+      margin-top: 12px;
+    }
+
+    .bar {
+      height: 8px;
+      background: #e9edf4;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .bar i {
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--linear), #8b93ff);
+    }
+
+    .screen-wrap {
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1px solid rgba(0, 212, 255, 0.32);
+      background: #020714;
+      box-shadow: 0 30px 80px rgba(2, 7, 20, 0.38);
+    }
+
+    .screen {
+      position: relative;
+      min-height: 840px;
+      padding: 22px;
+      color: #e9fbff;
+      background:
+        radial-gradient(circle at 50% 45%, rgba(0, 212, 255, 0.28), transparent 25%),
+        radial-gradient(circle at 76% 18%, rgba(167, 139, 250, 0.2), transparent 18%),
+        radial-gradient(circle at 14% 76%, rgba(51, 245, 164, 0.16), transparent 18%),
+        linear-gradient(135deg, #030713 0%, #071326 42%, #020612 100%);
+      overflow: hidden;
+    }
+
+    .screen::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0, 212, 255, 0.075) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 212, 255, 0.075) 1px, transparent 1px);
+      background-size: 44px 44px;
+      mask-image: radial-gradient(circle at 50% 45%, #000 0%, transparent 76%);
+    }
+
+    .screen::after {
+      content: "";
+      position: absolute;
+      inset: -20%;
+      background:
+        linear-gradient(110deg, transparent 0 44%, rgba(0,212,255,0.11) 47%, transparent 51%),
+        linear-gradient(68deg, transparent 0 58%, rgba(167,139,250,0.09) 61%, transparent 65%);
+      animation: scan 6s ease-in-out infinite alternate;
+      pointer-events: none;
+    }
+
+    @keyframes scan {
+      from { transform: translateX(-4%) translateY(-1%); }
+      to { transform: translateX(4%) translateY(1%); }
+    }
+
+    .frame {
+      position: absolute;
+      inset: 14px;
+      border: 1px solid rgba(0, 212, 255, 0.25);
+      clip-path: polygon(0 18px, 18px 0, calc(100% - 18px) 0, 100% 18px, 100% calc(100% - 18px), calc(100% - 18px) 100%, 18px 100%, 0 calc(100% - 18px));
+      box-shadow: inset 0 0 38px rgba(0, 212, 255, 0.08);
+      pointer-events: none;
+    }
+
+    .screen-grid {
+      position: relative;
+      z-index: 2;
+      min-height: 796px;
+      display: grid;
+      grid-template-columns: 0.82fr 1.5fr 0.82fr;
+      grid-template-rows: 62px 82px 1fr 150px;
+      gap: 14px;
+    }
+
+    .titlebar {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 18px;
+      align-items: center;
+    }
+
+    .titlebar::before,
+    .titlebar::after {
+      content: "";
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(0,212,255,0.72), rgba(167,139,250,0.45), transparent);
+    }
+
+    .titlebar h2 {
+      margin: 0;
+      color: var(--cyan);
+      font-size: 26px;
+      letter-spacing: 7px;
+      text-shadow: 0 0 18px rgba(0, 212, 255, 0.75);
+      font-weight: 850;
+    }
+
+    .clock {
+      position: absolute;
+      top: 25px;
+      right: 30px;
+      color: #8be7ff;
+      font-size: 12px;
+      font-family: "SF Mono", "JetBrains Mono", monospace;
+    }
+
+    .global-strip {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 10px;
+    }
+
+    .global {
+      border: 1px solid rgba(0, 212, 255, 0.22);
+      border-radius: 10px;
+      background: linear-gradient(180deg, rgba(13, 31, 58, 0.82), rgba(4, 12, 28, 0.7));
+      padding: 12px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .global::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+    }
+
+    .global b {
+      display: block;
+      color: #fff;
+      font-size: 23px;
+      line-height: 1;
+      font-family: "SF Mono", "JetBrains Mono", monospace;
+      text-shadow: 0 0 12px rgba(0,212,255,0.42);
+    }
+
+    .global span {
+      display: block;
+      margin-top: 7px;
+      color: #8ba2ba;
+      font-size: 11px;
+    }
+
+    .col {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-height: 0;
+    }
+
+    .hud {
+      border: 1px solid rgba(0, 212, 255, 0.24);
+      border-radius: 12px;
+      background: linear-gradient(180deg, rgba(13, 31, 58, 0.78), rgba(4, 12, 28, 0.7));
+      box-shadow: inset 0 0 24px rgba(0, 212, 255, 0.06), 0 0 28px rgba(0, 38, 70, 0.14);
+      padding: 12px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hud::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 4px;
+      height: 34px;
+      background: var(--cyan);
+      box-shadow: 0 0 15px rgba(0,212,255,0.85);
+    }
+
+    .hud h3 {
+      margin: 0 0 11px;
+      padding-left: 9px;
+      color: #f8fcff;
+      font-size: 13px;
+      letter-spacing: 1px;
+    }
+
+    .quick {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+
+    .quick button {
+      height: 34px;
+      border: 1px solid rgba(0,212,255,0.3);
+      border-radius: 8px;
+      background: rgba(0,212,255,0.08);
+      color: #dff9ff;
+      font-size: 11px;
+    }
+
+    .quick button.hot {
+      border-color: rgba(255,91,122,0.45);
+      background: rgba(255,91,122,0.12);
+      color: #ffdfe6;
+    }
+
+    .hrow {
+      display: grid;
+      grid-template-columns: 76px 1fr 38px;
+      align-items: center;
+      gap: 8px;
+      color: #9fb4c8;
+      font-size: 10px;
+      margin: 8px 0;
+    }
+
+    .hbar {
+      height: 7px;
+      border-radius: 999px;
+      background: rgba(26, 48, 80, 0.9);
+      overflow: hidden;
+    }
+
+    .hbar i {
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #00d4ff, #0077ff 58%, #a78bfa);
+      box-shadow: 0 0 12px rgba(0, 212, 255, 0.5);
+    }
+
+    .event {
+      display: grid;
+      grid-template-columns: 42px 1fr auto;
+      gap: 8px;
+      align-items: center;
+      min-height: 32px;
+      border-bottom: 1px solid rgba(0,212,255,0.1);
+      color: #a9bad0;
+      font-size: 10px;
+    }
+
+    .badge {
+      border-radius: 999px;
+      padding: 3px 6px;
+      text-align: center;
+      color: #04101d;
+      background: var(--cyan);
+      font-weight: 800;
+    }
+
+    .badge.red { background: var(--red); color: #fff; }
+    .badge.amber { background: var(--amber); }
+
+    .map-stage {
+      grid-column: 2;
+      grid-row: 3;
+      position: relative;
+      min-height: 470px;
+      border: 1px solid rgba(0, 212, 255, 0.18);
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at 50% 50%, rgba(0, 212, 255, 0.14), transparent 32%),
+        rgba(0, 20, 45, 0.2);
+      overflow: hidden;
+    }
+
+    .city-grid {
+      position: absolute;
+      inset: 30px 42px;
+      transform: perspective(700px) rotateX(58deg) rotateZ(-14deg);
+      transform-origin: 50% 50%;
+      border: 1px solid rgba(0,212,255,0.12);
+      background:
+        linear-gradient(90deg, rgba(0,212,255,0.08) 1px, transparent 1px),
+        linear-gradient(rgba(0,212,255,0.08) 1px, transparent 1px);
+      background-size: 42px 42px;
+      box-shadow: 0 0 60px rgba(0,212,255,0.12);
+    }
+
+    .artery,
+    .artery2,
+    .artery3 {
+      position: absolute;
+      height: 4px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, transparent, var(--cyan), #6ee7ff, transparent);
+      box-shadow: 0 0 18px rgba(0,212,255,0.65);
+      transform-origin: center;
+      overflow: hidden;
+    }
+
+    .artery::after,
+    .artery2::after,
+    .artery3::after {
+      content: "";
+      position: absolute;
+      left: -30%;
+      top: 0;
+      width: 28%;
+      height: 100%;
+      background: #fff;
+      filter: blur(1px);
+      animation: flow 2.6s linear infinite;
+    }
+
+    @keyframes flow {
+      to { left: 105%; }
+    }
+
+    .artery { width: 520px; left: 55px; top: 218px; transform: rotate(-12deg); }
+    .artery2 { width: 430px; left: 112px; top: 276px; transform: rotate(18deg); }
+    .artery3 { width: 360px; left: 154px; top: 156px; transform: rotate(43deg); background: linear-gradient(90deg, transparent, var(--green), var(--cyan), transparent); }
+
+    .zone {
+      position: absolute;
+      border: 1px solid rgba(0,212,255,0.3);
+      border-radius: 14px;
+      background: rgba(0, 212, 255, 0.065);
+      box-shadow: inset 0 0 24px rgba(0,212,255,0.08);
+      color: #bdf5ff;
+      font-size: 11px;
+      padding: 9px;
+    }
+
+    .z1 { left: 72px; top: 88px; width: 122px; height: 72px; }
+    .z2 { right: 82px; top: 78px; width: 132px; height: 82px; border-color: rgba(167,139,250,0.35); }
+    .z3 { left: 92px; bottom: 92px; width: 148px; height: 86px; border-color: rgba(51,245,164,0.34); }
+    .z4 { right: 110px; bottom: 86px; width: 142px; height: 80px; border-color: rgba(255,209,102,0.4); }
+
+    .node {
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 0 7px rgba(0,212,255,0.12), 0 0 22px rgba(0,212,255,0.7);
+    }
+
+    .node.red {
+      background: var(--red);
+      box-shadow: 0 0 0 8px rgba(255,91,122,0.12), 0 0 24px rgba(255,91,122,0.75);
+      animation: pulse 1.2s ease-in-out infinite;
+    }
+
+    .node.green {
+      background: var(--green);
+      box-shadow: 0 0 0 7px rgba(51,245,164,0.12), 0 0 22px rgba(51,245,164,0.7);
+    }
+
+    @keyframes pulse {
+      50% { transform: scale(1.22); }
+    }
+
+    .n1 { left: 168px; top: 196px; }
+    .n2 { left: 410px; top: 164px; }
+    .n3 { left: 310px; top: 286px; }
+    .n4 { right: 180px; bottom: 146px; }
+    .n5 { left: 232px; bottom: 162px; }
+    .n6 { right: 120px; top: 218px; }
+
+    .command-core {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 150px;
+      height: 150px;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      border: 2px solid rgba(0,212,255,0.62);
+      background: radial-gradient(circle, rgba(0,212,255,0.28), rgba(0,212,255,0.05) 58%, transparent);
+      box-shadow: 0 0 50px rgba(0,212,255,0.35), inset 0 0 28px rgba(0,212,255,0.22);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: #fff;
+      font-size: 12px;
+      line-height: 1.45;
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+
+    .rings {
+      position: absolute;
+      inset: -24px;
+      border-radius: 50%;
+      border: 1px dashed rgba(0,212,255,0.35);
+      animation: spin 22s linear infinite;
+    }
+
+    .rings.r2 {
+      inset: -52px;
+      border-color: rgba(167,139,250,0.28);
+      animation-duration: 34s;
+      animation-direction: reverse;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .traffic-status {
+      position: absolute;
+      left: 50%;
+      bottom: 20px;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 8px;
+    }
+
+    .traffic-status span {
+      border: 1px solid rgba(0,212,255,0.24);
+      border-radius: 999px;
+      padding: 5px 9px;
+      color: #aeefff;
+      background: rgba(0,212,255,0.07);
+      font-size: 10px;
+    }
+
+    .bottom {
+      grid-column: 1 / -1;
+      grid-row: 4;
+      display: grid;
+      grid-template-columns: 1fr 1.35fr 1fr;
+      gap: 14px;
+    }
+
+    .trend {
+      height: 86px;
+      display: flex;
+      align-items: end;
+      gap: 8px;
+      padding: 0 8px 8px;
+      border-bottom: 1px solid rgba(0,212,255,0.2);
+      background: linear-gradient(rgba(0,212,255,0.075) 1px, transparent 1px);
+      background-size: 100% 18px;
+    }
+
+    .trend i {
+      flex: 1;
+      border-radius: 999px 999px 0 0;
+      background: linear-gradient(180deg, #00d4ff, rgba(0,212,255,0.16));
+      box-shadow: 0 0 14px rgba(0,212,255,0.34);
+    }
+
+    .trend i:nth-child(1) { height: 34%; }
+    .trend i:nth-child(2) { height: 58%; }
+    .trend i:nth-child(3) { height: 46%; }
+    .trend i:nth-child(4) { height: 78%; }
+    .trend i:nth-child(5) { height: 62%; }
+    .trend i:nth-child(6) { height: 92%; }
+    .trend i:nth-child(7) { height: 72%; }
+    .trend i:nth-child(8) { height: 86%; }
+
+    .note {
+      margin-top: 12px;
+      color: #5b6678;
+      font-size: 12px;
+      line-height: 1.65;
+    }
+
+    @media (max-width: 1200px) {
+      .two { grid-template-columns: 1fr; }
+      .screen-grid { grid-template-columns: 1fr; grid-template-rows: auto; }
+      .global-strip, .map-stage, .bottom { grid-column: auto; grid-row: auto; }
+      .global-strip, .bottom { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="head">
+      <div>
+        <h1>React/Vite + linear.app DESIGN.md + Nuxt checklist</h1>
+        <p class="subtitle">后台主系统走 Linear 的现代 SaaS 精致感；大屏走独立“交通指挥中心式”资产态势。工程不换栈，但吸收 Nuxt Pro 的中后台规范。</p>
+      </div>
+      <div class="decision">
+        已按你的选择更新：`linear.app` 成为 DESIGN.md 基准候选。Nuxt 作为工程 checklist：API 封装、表格/表单、DTO、权限、导出、加载/空/错误、i18n、a11y，不作为当前 React/Vite 项目的重写栈。
+      </div>
+    </section>
+
+    <section class="two">
+      <article class="card">
+        <div class="card-head">
+          <h2>日常后台：Linear 企业化版本</h2>
+          <span class="pill">Selected</span>
+        </div>
+        <div class="card-body">
+          <div class="linear-app">
+            <aside class="app-side">
+              <div class="brand"><span class="brand-mark"></span>forthAMS</div>
+              <div class="side-label">资产运营</div>
+              <div class="nav active">资产总览</div>
+              <div class="nav">资产台账</div>
+              <div class="nav">RFID 盘点</div>
+              <div class="nav">重要设备</div>
+              <div class="side-label">流程中心</div>
+              <div class="nav">审批流程</div>
+              <div class="nav">工单管理</div>
+              <div class="nav">审计日志</div>
+            </aside>
+            <section class="app-main">
+              <div class="app-top">
+                <div class="app-title"><b>资产总览</b><span>企业资产生命周期与风险状态</span></div>
+                <div class="actions">
+                  <button class="button">批量处理</button>
+                  <button class="button">导入/导出</button>
+                  <button class="button primary">新建资产</button>
+                </div>
+              </div>
+              <div class="app-content">
+                <div class="stats">
+                  <div class="stat"><b>8,426</b><span>资产总数</span></div>
+                  <div class="stat"><b>1,143</b><span>活跃资产</span></div>
+                  <div class="stat"><b>243</b><span>重点设备</span></div>
+                  <div class="stat"><b>113</b><span>待审批</span></div>
+                </div>
+                <div class="filters"><div class="filter search"></div><div class="filter"></div><div class="filter"></div><div class="filter"></div></div>
+                <div class="work">
+                  <div class="tree">
+                    <div class="branch active">全部资产</div>
+                    <div class="branch">工控设备</div>
+                    <div class="branch">网络设备</div>
+                    <div class="branch">办公设备</div>
+                    <div class="branch">安全设备</div>
+                    <div class="branch">生产设备</div>
+                  </div>
+                  <div class="table">
+                    <div class="row head"><div class="cell dark"></div><div class="cell dark"></div><div class="cell dark"></div><div class="cell dark"></div><div class="cell dark"></div></div>
+                    <div class="row"><div class="cell dark"></div><div class="cell"></div><div class="cell accent"></div><div class="cell"></div><div class="cell ok"></div></div>
+                    <div class="row"><div class="cell dark"></div><div class="cell"></div><div class="cell warn"></div><div class="cell"></div><div class="cell"></div></div>
+                    <div class="row"><div class="cell dark"></div><div class="cell"></div><div class="cell accent"></div><div class="cell"></div><div class="cell ok"></div></div>
+                    <div class="row"><div class="cell dark"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div></div>
+                    <div class="row"><div class="cell dark"></div><div class="cell"></div><div class="cell warn"></div><div class="cell"></div><div class="cell ok"></div></div>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </div>
+          <p class="note">Linear 的价值在“克制、精致、流程状态清楚”。落地时要把原模板的深色官网感改造成浅色企业后台，并保留紫蓝作为少量主强调色。</p>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-head">
+          <h2>Nuxt checklist 怎么进入 React/Vite</h2>
+          <span class="pill">No Stack Rewrite</span>
+        </div>
+        <div class="card-body">
+          <div class="nuxt-summary">
+            <div class="summary-box">
+              <h3>保留 React/Vite 的原因</h3>
+              <p>当前项目已有 React Router、Tailwind v4、Radix/shadcn、测试资产和页面体系。切 Nuxt 会重写大量边界，视觉收益并不自动增加。</p>
+              <div class="score">
+                <span>视觉上限</span><div class="bar"><i style="width:94%"></i></div>
+                <span>交付效率</span><div class="bar"><i style="width:84%"></i></div>
+                <span>迁移风险</span><div class="bar"><i style="width:24%;background:linear-gradient(90deg,#18a058,#33f5a4)"></i></div>
+              </div>
+            </div>
+            <div class="summary-box">
+              <h3>借鉴 Nuxt Frontend Design Pro 的部分</h3>
+              <ul>
+                <li>统一 API client、错误处理、鉴权失效跳转。</li>
+                <li>表格模式：筛选、列配置、批量操作、导入导出、空/加载/错误状态。</li>
+                <li>DTO 对齐、权限 Hook、i18n、暗黑模式、大屏独立路由。</li>
+              </ul>
+            </div>
+            <div class="summary-box">
+              <h3>可选试点</h3>
+              <p>如果你仍想验证 Nuxt，可以单独建 `frontend-nuxt` 做 1-2 个页面的 POC，但不建议直接替换主线。</p>
+            </div>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section class="screen-wrap">
+      <div class="screen">
+        <div class="frame"></div>
+        <div class="clock">2026-05-19 23:02:16 CST</div>
+        <div class="screen-grid">
+          <div class="titlebar"><h2>资产态势指挥中心</h2></div>
+
+          <div class="global-strip">
+            <div class="global"><b>8,426</b><span>纳管资产</span></div>
+            <div class="global"><b>1,143</b><span>实时活跃</span></div>
+            <div class="global"><b>27</b><span>异常事件</span></div>
+            <div class="global"><b>96.8%</b><span>在线率</span></div>
+            <div class="global"><b>12ms</b><span>平均响应</span></div>
+            <div class="global"><b>4</b><span>待处置高危</span></div>
+          </div>
+
+          <div class="col">
+            <div class="hud">
+              <h3>快捷处置</h3>
+              <div class="quick">
+                <button>一键定位</button>
+                <button>派发工单</button>
+                <button class="hot">隔离资产</button>
+                <button>导出处置单</button>
+              </div>
+            </div>
+            <div class="hud">
+              <h3>区域资产流量</h3>
+              <div class="hrow"><span>A 区产线</span><div class="hbar"><i style="width:96%"></i></div><span>96%</span></div>
+              <div class="hrow"><span>B 区机房</span><div class="hbar"><i style="width:82%"></i></div><span>82%</span></div>
+              <div class="hrow"><span>C 区办公</span><div class="hbar"><i style="width:64%"></i></div><span>64%</span></div>
+              <div class="hrow"><span>D 区仓储</span><div class="hbar"><i style="width:48%"></i></div><span>48%</span></div>
+            </div>
+            <div class="hud">
+              <h3>处置队列</h3>
+              <div class="event"><span class="badge red">高危</span><span>核心网关异常外联</span><span>1m</span></div>
+              <div class="event"><span class="badge amber">预警</span><span>PLC 离线抖动</span><span>4m</span></div>
+              <div class="event"><span class="badge">正常</span><span>批量盘点完成</span><span>8m</span></div>
+            </div>
+          </div>
+
+          <div class="map-stage">
+            <div class="city-grid"></div>
+            <div class="artery"></div>
+            <div class="artery2"></div>
+            <div class="artery3"></div>
+            <div class="zone z1">A 区产线<br>设备 1,240</div>
+            <div class="zone z2">核心机房<br>设备 486</div>
+            <div class="zone z3">办公区域<br>设备 2,180</div>
+            <div class="zone z4">仓储物流<br>设备 913</div>
+            <span class="node n1"></span>
+            <span class="node green n2"></span>
+            <span class="node red n3"></span>
+            <span class="node n4"></span>
+            <span class="node green n5"></span>
+            <span class="node red n6"></span>
+            <div class="command-core"><span class="rings"></span><span class="rings r2"></span>资产<br>调度核心</div>
+            <div class="traffic-status">
+              <span>青色：正常链路</span>
+              <span>绿色：高效运行</span>
+              <span>红色：异常阻断</span>
+            </div>
+          </div>
+
+          <div class="col">
+            <div class="hud">
+              <h3>风险热力 TOP5</h3>
+              <div class="hrow"><span>外联异常</span><div class="hbar"><i style="width:100%;background:linear-gradient(90deg,#ff5b7a,#ffd166)"></i></div><span>27</span></div>
+              <div class="hrow"><span>离线资产</span><div class="hbar"><i style="width:74%"></i></div><span>20</span></div>
+              <div class="hrow"><span>审批超时</span><div class="hbar"><i style="width:52%"></i></div><span>14</span></div>
+              <div class="hrow"><span>维保逾期</span><div class="hbar"><i style="width:44%"></i></div><span>12</span></div>
+            </div>
+            <div class="hud">
+              <h3>资产类型态势</h3>
+              <div class="hrow"><span>终端设备</span><div class="hbar"><i style="width:92%"></i></div><span>3,820</span></div>
+              <div class="hrow"><span>工控设备</span><div class="hbar"><i style="width:70%"></i></div><span>1,450</span></div>
+              <div class="hrow"><span>网络设备</span><div class="hbar"><i style="width:54%"></i></div><span>940</span></div>
+              <div class="hrow"><span>安全设备</span><div class="hbar"><i style="width:39%"></i></div><span>620</span></div>
+            </div>
+            <div class="hud">
+              <h3>效率指标</h3>
+              <div class="event"><span class="badge">SLA</span><span>告警平均确认</span><span>38s</span></div>
+              <div class="event"><span class="badge">工单</span><span>自动派发成功率</span><span>91%</span></div>
+              <div class="event"><span class="badge">盘点</span><span>RFID 同步效率</span><span>98%</span></div>
+            </div>
+          </div>
+
+          <div class="bottom">
+            <div class="hud">
+              <h3>区域通行效率</h3>
+              <div class="trend"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+            </div>
+            <div class="hud">
+              <h3>资产活跃度趋势</h3>
+              <div class="trend"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+            </div>
+            <div class="hud">
+              <h3>联动处置闭环</h3>
+              <div class="event"><span class="badge">01</span><span>发现异常资产</span><span>自动</span></div>
+              <div class="event"><span class="badge">02</span><span>匹配责任部门</span><span>2s</span></div>
+              <div class="event"><span class="badge">03</span><span>生成处置工单</span><span>完成</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

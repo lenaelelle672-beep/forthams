@@ -227,7 +227,7 @@ const DragUploadZone: React.FC<DragUploadZoneProps> = ({
         style={{
           ...zoneBaseStyle,
           border: '2px dashed #ff4d4f',
-          backgroundColor: '#fff2f0',
+          backgroundColor: '#3b1c1c',
         }}
       >
         <div style={{ fontSize: 48, marginBottom: 16, color: '#ff4d4f' }}>
@@ -300,7 +300,7 @@ const DragUploadZone: React.FC<DragUploadZoneProps> = ({
         ...zoneBaseStyle,
         border: isDragging ? '2px dashed #1890ff' : '2px dashed #d9d9d9',
         cursor: 'pointer',
-        backgroundColor: isDragging ? '#e6f7ff' : '#fafafa',
+        backgroundColor: isDragging ? '#e6f7ff' : '#0f172a',
       }}
     >
       <input

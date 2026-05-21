@@ -11,16 +11,16 @@
   display: flex;
   align-items: center;
   padding: 12px 16px;
-  background-color: var(--color-background, #fff);
+  background-color: var(--color-background, #ffffff);
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
-  border: 1px solid var(--color-border, #e8e8e8);
+  border: 1px solid var(--color-border, #f8fafc);
   margin-bottom: 8px;
 }
 
 .alertItem:hover {
-  background-color: var(--color-hover-bg, #f5f5f5);
+  background-color: var(--color-hover-bg, #ffffff);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
@@ -45,21 +45,21 @@
 .badgeUrgent {
   background-color: #fff1f0;
   color: #cf1322;
-  border: 1px solid #ffccc7;
+  border: 1px solid #7f1d1d;
 }
 
 /* 预警状态 - 8-30天 橙色 */
 .badgeWarning {
-  background-color: #fff7e6;
+  background-color: #f8fafc;
   color: #d46b08;
   border: 1px solid #ffd591;
 }
 
 /* 正常状态 - >30天 灰色 */
 .badgeNormal {
-  background-color: #f5f5f5;
+  background-color: #ffffff;
   color: #8c8c8c;
-  border: 1px solid #d9d9d9;
+  border: 1px solid #f8fafc;
 }
 
 /* 告警内容区域 */

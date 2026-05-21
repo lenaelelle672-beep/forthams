@@ -393,25 +393,25 @@ const DepreciationSchedule: React.FC<DepreciationScheduleProps> = ({
     return (
       <div className="grid grid-cols-4 gap-4 mb-4">
         <Card size="small">
-          <div className="text-gray-500 text-sm">本月折旧总额</div>
+          <div className="text-gray-400 text-sm">本月折旧总额</div>
           <div className="text-xl font-bold text-blue-600">
             ¥{summary.totalDepreciation.toLocaleString('zh-CN', { minimumFractionDigits: 2 })}
           </div>
         </Card>
         <Card size="small">
-          <div className="text-gray-500 text-sm">资产数量</div>
+          <div className="text-gray-400 text-sm">资产数量</div>
           <div className="text-xl font-bold">
             {summary.assetCount}
           </div>
         </Card>
         <Card size="small">
-          <div className="text-gray-500 text-sm">平均月折旧</div>
+          <div className="text-gray-400 text-sm">平均月折旧</div>
           <div className="text-xl font-bold text-purple-600">
             ¥{summary.averageDepreciation.toLocaleString('zh-CN', { minimumFractionDigits: 2 })}
           </div>
         </Card>
         <Card size="small">
-          <div className="text-gray-500 text-sm">记录数量</div>
+          <div className="text-gray-400 text-sm">记录数量</div>
           <div className="text-xl font-bold">
             {tableData.length}
           </div>
@@ -433,7 +433,7 @@ const DepreciationSchedule: React.FC<DepreciationScheduleProps> = ({
             <div className="font-medium">
               {firstRecord.asset?.assetName || '资产折旧计划'}
             </div>
-            <div className="text-gray-500 text-sm">
+            <div className="text-gray-400 text-sm">
               资产编号: {firstRecord.asset?.assetCode} | 
               折旧方法: {METHOD_LABELS[firstRecord.calculationMethod as DepreciationMethod]?.text}
             </div>
@@ -475,12 +475,12 @@ const DepreciationSchedule: React.FC<DepreciationScheduleProps> = ({
 
       {/* 工具栏 */}
       <div className="flex justify-between items-center mb-4">
-        <div className="text-gray-600">
+        <div className="text-gray-500">
           {assetId ? '折旧计划明细' : '折旧报表'}
         </div>
         <Space>
           {selectedRowKeys.length > 0 && (
-            <span className="text-gray-500">
+            <span className="text-gray-400">
               已选择 {selectedRowKeys.length} 条记录
             </span>
           )}
@@ -518,7 +518,7 @@ const DepreciationSchedule: React.FC<DepreciationScheduleProps> = ({
       {/* 折旧明细列表 - 用于资产详情页关联视图 */}
       {assetId && assetSchedule && (
         <div data-testid="depreciation-list" className="mt-4">
-          <div className="text-gray-600 font-medium mb-2">折旧明细列表</div>
+          <div className="text-gray-500 font-medium mb-2">折旧明细列表</div>
           <ul className="list-disc pl-5">
             {assetSchedule.slice(0, 12).map((record) => (
               <li key={record.id} className="text-sm py-1">

@@ -65,7 +65,7 @@
   padding: var(--fcd-padding-base);
   background: #ffffff;
   border-radius: var(--fcd-border-radius);
-  border: 1px solid #e5e7eb;
+  border: 1px solid #f8fafc;
 }
 
 .diff-header {
@@ -73,7 +73,7 @@
   align-items: center;
   justify-content: space-between;
   padding-bottom: calc(var(--fcd-spacing-unit) * 2);
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid #f8fafc;
 }
 
 .diff-title {
@@ -106,7 +106,7 @@
 }
 
 .diff-item:hover {
-  background: #f9fafb;
+  background: #f8fafc;
 }
 
 .diff-item--add {
@@ -141,7 +141,7 @@
   padding: 2px 8px;
   font-size: 11px;
   font-weight: 500;
-  color: #ffffff;
+  color: #f8fafc;
   background: var(--fcd-auditable-badge);
   border-radius: 12px;
   text-transform: uppercase;
@@ -292,7 +292,7 @@
   padding: var(--fcd-padding-base);
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   border-radius: var(--fcd-border-radius);
-  color: #ffffff;
+  color: #f8fafc;
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 4px 6px rgba(102, 126, 234, 0.3);
@@ -332,7 +332,7 @@
   justify-content: center;
   font-size: 10px;
   font-weight: 600;
-  color: #ffffff;
+  color: #f8fafc;
 }
 
 @keyframes node-pulse {
@@ -352,9 +352,9 @@
   position: relative;
   width: 100%;
   min-height: 400px;
-  background: #fafafa;
+  background: #f8fafc;
   border-radius: var(--fcd-border-radius);
-  border: 1px solid #e5e7eb;
+  border: 1px solid #f8fafc;
   overflow: hidden;
 }
 
@@ -376,7 +376,7 @@
   width: 36px;
   height: 36px;
   background: #ffffff;
-  border: 1px solid #e5e7eb;
+  border: 1px solid #f8fafc;
   border-radius: 8px;
   display: flex;
   align-items: center;

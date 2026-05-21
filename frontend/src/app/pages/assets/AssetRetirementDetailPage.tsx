@@ -336,9 +336,9 @@ export const AssetRetirementDetailPage: React.FC = () => {
     return (
       <div className="max-w-4xl mx-auto space-y-6 pb-12" data-testid="retirement-detail-loading">
         <div className="flex items-center gap-4 mb-8">
-          <div className="w-10 h-10 bg-gray-100 rounded-lg animate-pulse" />
+          <div className="w-10 h-10 bg-blue-50 rounded-lg animate-pulse" />
           <div className="space-y-2">
-            <div className="h-6 w-56 bg-gray-100 rounded animate-pulse" />
+            <div className="h-6 w-56 bg-blue-50 rounded animate-pulse" />
             <div className="h-4 w-40 bg-gray-50 rounded animate-pulse" />
           </div>
         </div>
@@ -396,7 +396,7 @@ export const AssetRetirementDetailPage: React.FC = () => {
           </div>
           <div>
             <h2 className="text-2xl font-bold text-gray-900">退役申请详情</h2>
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-gray-400 mt-1">
               查看退役申请状态与审批链路
             </p>
           </div>
@@ -437,7 +437,7 @@ export const AssetRetirementDetailPage: React.FC = () => {
         <CardContent className="p-6">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <p className="text-sm text-gray-500">流程编号</p>
+              <p className="text-sm text-gray-400">流程编号</p>
               <p
                 className="text-xl font-bold font-mono"
                 data-testid="process-no"
@@ -456,31 +456,31 @@ export const AssetRetirementDetailPage: React.FC = () => {
 
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
-              <span className="text-gray-500">关联资产：</span>
+              <span className="text-gray-400">关联资产：</span>
               <span className="font-medium">
                 {asset?.assetName ?? asset?.assetCode ?? application?.assetId ?? '-'}
               </span>
             </div>
             <div>
-              <span className="text-gray-500">资产编号：</span>
+              <span className="text-gray-400">资产编号：</span>
               <span className="font-medium font-mono">
                 {asset?.assetCode ?? application?.assetId ?? '-'}
               </span>
             </div>
             <div>
-              <span className="text-gray-500">资产状态：</span>
+              <span className="text-gray-400">资产状态：</span>
               <span className="font-medium" data-testid="asset-status-label">
                 {asset?.status ?? '-'}
               </span>
             </div>
             <div>
-              <span className="text-gray-500">申请时间：</span>
+              <span className="text-gray-400">申请时间：</span>
               <span className="font-medium">
                 {formatDateTime(application?.createdAt)}
               </span>
             </div>
             <div>
-              <span className="text-gray-500">更新时间：</span>
+              <span className="text-gray-400">更新时间：</span>
               <span className="font-medium">
                 {formatDateTime(application?.updatedAt)}
               </span>
@@ -489,7 +489,7 @@ export const AssetRetirementDetailPage: React.FC = () => {
 
           {application?.description && (
             <div className="mt-4 text-sm">
-              <span className="text-gray-500">描述：</span>
+              <span className="text-gray-400">描述：</span>
               <p className="mt-1 p-3 bg-gray-50 rounded-md text-gray-700">
                 {application.description}
               </p>

@@ -121,7 +121,7 @@ export const AssetSearchBar: React.FC<AssetSearchBarProps> = ({
           placeholder="搜索资产编号或名称..."
           value={keyword}
           onChange={(e) => onKeywordChange(e.target.value)}
-          className="w-full pl-10 pr-4 py-2 text-sm rounded-lg border border-gray-300
+          className="w-full pl-10 pr-4 py-2 text-sm rounded-lg border border-gray-200
             bg-white focus:outline-none focus:ring-2 focus:ring-blue-500
             focus:border-blue-500 transition-colors"
           data-testid="input-search"
@@ -132,7 +132,7 @@ export const AssetSearchBar: React.FC<AssetSearchBarProps> = ({
       <select
         value={statusFilter}
         onChange={(e) => onStatusChange(e.target.value)}
-        className="px-3 py-2 text-sm rounded-lg border border-gray-300
+        className="px-3 py-2 text-sm rounded-lg border border-gray-200
           bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
         data-testid="select-status"
       >
@@ -161,7 +161,7 @@ export const AssetSearchBar: React.FC<AssetSearchBarProps> = ({
         onClick={onRefresh}
         disabled={loading}
         className="inline-flex items-center gap-1.5 px-3 py-2 text-sm
-          rounded-lg border border-gray-300 bg-white text-gray-700
+          rounded-lg border border-gray-200 bg-white text-gray-700
           hover:bg-gray-50 disabled:opacity-50 transition-colors"
         data-testid="btn-refresh"
       >

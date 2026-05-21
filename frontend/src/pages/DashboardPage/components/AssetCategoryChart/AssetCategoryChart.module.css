@@ -25,7 +25,7 @@
   box-shadow: var(--shadow-sm, 0 1px 2px rgba(0, 0, 0, 0.05));
   
   /** 边框样式 */
-  border: 1px solid var(--color-border, #e5e7eb);
+  border: 1px solid var(--color-border, #f8fafc);
   
   /** 最小高度 */
   min-height: 320px;
@@ -103,7 +103,7 @@
 }
 
 .legendItem:hover {
-  background-color: var(--color-bg-hover, #f9fafb);
+  background-color: var(--color-bg-hover, #f1f5f9);
 }
 
 .legendColor {
@@ -132,7 +132,7 @@
 
 .echartsTooltip {
   background-color: var(--color-surface, #ffffff) !important;
-  border: 1px solid var(--color-border, #e5e7eb) !important;
+  border: 1px solid var(--color-border, #f8fafc) !important;
   border-radius: var(--radius-md, 8px) !important;
   padding: var(--spacing-sm, 10px) var(--spacing-md, 14px) !important;
   box-shadow: var(--shadow-lg, 0 10px 15px rgba(0, 0, 0, 0.1)) !important;
@@ -203,7 +203,7 @@
 .loadingSpinner {
   width: 40px;
   height: 40px;
-  border: 3px solid var(--color-border, #e5e7eb);
+  border: 3px solid var(--color-border, #f8fafc);
   border-top-color: var(--color-primary, #3b82f6);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
@@ -354,7 +354,7 @@
   }
   
   .legendItem {
-    border: 1px solid var(--color-border, #e5e7eb);
+    border: 1px solid var(--color-border, #f8fafc);
   }
   
   .legendLabel,

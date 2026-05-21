@@ -5,7 +5,7 @@
 
 .container {
   padding: 16px;
-  background: #fafafa;
+  background: #f8fafc;
   border-radius: 8px;
 }
 
@@ -14,8 +14,8 @@
   flex-direction: column;
   padding: 12px 16px;
   margin-bottom: 12px;
-  background: #fff;
-  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  border: 1px solid #f8fafc;
   border-radius: 6px;
   transition: all 0.2s ease;
 }
@@ -96,7 +96,7 @@
 
 .severityCritical {
   background: #7f1d1d;
-  color: #fff;
+  color: #ffffff;
 }
 
 /* 空状态样式 */
@@ -127,7 +127,7 @@
 .spinner {
   width: 32px;
   height: 32px;
-  border: 3px solid #e5e7eb;
+  border: 3px solid #f8fafc;
   border-top-color: #3b82f6;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
@@ -151,7 +151,7 @@
 
 .nodeLabel {
   font-size: 12px;
-  fill: #1e293b;
+  fill: #ffffff;
 }
 
 .edgeLabel {

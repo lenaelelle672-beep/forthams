@@ -11,6 +11,7 @@
 import React, { useState, useCallback } from 'react';
 import { Download, Loader2, AlertCircle, CheckCircle } from 'lucide-react';
 import { exportAssets, type ExportQueryParams } from '../../services/importExportApi';
+import { formatStatusLabel } from '../../constants/assetStatus';
 
 /* ------------------------------------------------------------------ */
 /*  Props 定义                                                          */
@@ -116,13 +117,13 @@ export default function AssetExportDialog({
         </h2>
 
         {/* 筛选条件预览 */}
-        <div className="mb-4 p-3 bg-gray-50 rounded-lg text-sm text-gray-600">
+        <div className="mb-4 p-3 bg-gray-50 rounded-lg text-sm text-gray-500">
           <p className="font-medium text-gray-700 mb-1">当前筛选条件：</p>
           {currentFilters.keyword && (
             <p>关键词：{currentFilters.keyword}</p>
           )}
           {currentFilters.status && (
-            <p>状态：{currentFilters.status}</p>
+            <p>状态：{formatStatusLabel(currentFilters.status)}</p>
           )}
           {currentFilters.categoryId && (
             <p>分类ID：{currentFilters.categoryId}</p>
@@ -164,7 +165,7 @@ export default function AssetExportDialog({
             type="button"
             onClick={handleClose}
             disabled={state === 'EXPORTING'}
-            className="px-4 py-2 text-sm rounded-lg border border-gray-300
+            className="px-4 py-2 text-sm rounded-lg border border-gray-200
               bg-white text-gray-700 hover:bg-gray-50
               disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             data-testid="export-btn-cancel"
