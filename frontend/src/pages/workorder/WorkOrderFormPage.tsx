@@ -2,8 +2,9 @@ import { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useNavigate, useLocation } from 'react-router';
+import { useNavigate, useLocation, useParams } from 'react-router';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import {
   Info,
   FileText,
@@ -19,6 +20,7 @@ import { Card, CardHeader, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { PageHeader } from '@/components/ui/PageHeader';
+import { createWorkOrder, updateWorkOrder } from '@/api/workorder';
 
 const schema = z.object({
   title: z.string().min(5, '标题至少 5 个字').max(100),
@@ -59,10 +61,13 @@ const collaborators = ['赵敏', '王刚'];
 export default function WorkOrderFormPage() {
   const navigate = useNavigate();
   const location = useLocation();
+  const params = useParams<{ id: string }>();
   const qc = useQueryClient();
   const prefill = (location.state as any) ?? {};
   const [collabInput, setCollabInput] = useState('');
   const [collaboratorsList, setCollaboratorsList] = useState(collaborators);
+  const editId = params.id ? Number(params.id) : null;
+  const isEdit = editId !== null;
 
   const {
     register,
@@ -79,21 +84,29 @@ export default function WorkOrderFormPage() {
     },
   });
 
-  const createMutation = useMutation({
+  const saveMutation = useMutation({
     mutationFn: async (data: FormValues) => {
-      // TODO: replace with real API call
-      console.log('创建工单:', data);
-      return { data: { id: 'WO-NEW-001' } };
+      if (isEdit && editId) {
+        return updateWorkOrder(editId, data);
+      }
+      return createWorkOrder(data);
     },
     onSuccess: (res: any) => {
       qc.invalidateQueries({ queryKey: ['workorders'] });
-      const orderId = res?.data?.id;
-      navigate(orderId ? `/workorders/${orderId}` : '/workorders');
+      toast.success(isEdit ? '工单更新成功' : '工单创建成功');
+      navigate('/workorders');
+    },
+    onError: (error: any) => {
+      const message =
+        error?.response?.data?.message ??
+        error?.message ??
+        '提交失败，请重试';
+      toast.error(message);
     },
   });
 
   const onSubmit = (values: FormValues) => {
-    createMutation.mutate(values);
+    saveMutation.mutate(values);
   };
 
   const removeCollaborator = (name: string) => {
@@ -114,11 +127,11 @@ export default function WorkOrderFormPage() {
     <div className="min-h-screen pb-28">
       <div className="max-w-[1440px] mx-auto px-10 py-6">
         <PageHeader
-          title="新建工单"
+          title={isEdit ? '编辑工单' : '新建工单'}
           breadcrumbs={[
             { label: '首页', href: '/dashboard' },
             { label: '工单管理', href: '/workorders' },
-            { label: '新建工单' },
+            { label: isEdit ? '编辑工单' : '新建工单' },
           ]}
         />
 
@@ -331,9 +344,9 @@ export default function WorkOrderFormPage() {
             </div>
           </div>
 
-          {createMutation.isError && (
+          {saveMutation.isError && (
             <div className="mt-6 p-3 rounded bg-[#ffdad6] border border-[#ba1a1a]/20 text-[#ba1a1a] text-sm">
-              {(createMutation.error as any)?.response?.data?.message ?? '提交失败，请重试'}
+              {(saveMutation.error as any)?.response?.data?.message ?? '提交失败，请重试'}
             </div>
           )}
         </form>
@@ -345,7 +358,7 @@ export default function WorkOrderFormPage() {
         </Button>
         <Button
           size="lg"
-          loading={isSubmitting || createMutation.isPending}
+          loading={isSubmitting || saveMutation.isPending}
           onClick={handleSubmit(onSubmit)}
         >
           <Send className="w-4 h-4" />
