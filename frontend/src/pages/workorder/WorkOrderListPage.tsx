@@ -8,6 +8,8 @@ import { useNavigate } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
 import { Plus, FileText } from 'lucide-react';
 import { getWorkOrderList } from '@/api/workorder';
+import type { PaginatedResponse } from '@/types/common';
+import type { WorkOrderListItem } from '@/types/workorder';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { FilterBar } from '@/components/ui/FilterBar';
@@ -24,7 +26,7 @@ const WO_STATUS_OPTIONS = [
   { key: 'CANCELLED',         label: '已取消'   },
 ];
 
-const STATUS_BADGE: Record<string, { label: string; variant: any }> = {
+const STATUS_BADGE: Record<string, { label: string; variant: 'default' | 'success' | 'warning' | 'danger' | 'gray' }> = {
   DRAFT:             { label: '草稿',      variant: 'gray'    },
   PENDING:           { label: '待审批',    variant: 'default' },
   APPROVING_LEVEL_1: { label: '一级审批中', variant: 'warning' },
@@ -40,7 +42,7 @@ const PRIORITY_LABEL: Record<string, string> = {
 
 export default function WorkOrderListPage() {
   const navigate = useNavigate();
-  const [params, setParams] = useState({ page: 1, pageSize: 20 } as any);
+  const [params, setParams] = useState<{ page: number; pageSize: number; keyword?: string; status?: string }>({ page: 1, pageSize: 20 });
 
   const { data: res, isLoading } = useQuery({
     queryKey: ['workorders', 'list', params],
@@ -49,8 +51,8 @@ export default function WorkOrderListPage() {
     placeholderData: (p) => p,
   });
 
-  const records = (res as any)?.data?.records ?? [];
-  const total   = (res as any)?.data?.total   ?? 0;
+  const records = (res as PaginatedResponse<WorkOrderListItem> | undefined)?.data?.records ?? [];
+  const total   = (res as PaginatedResponse<WorkOrderListItem> | undefined)?.data?.total   ?? 0;
 
   const columns: Column<any>[] = [
     {
@@ -117,11 +119,11 @@ export default function WorkOrderListPage() {
         <div className="p-4 border-b border-[#e5e7eb]">
           <FilterBar
             placeholder="搜索工单号、标题..."
-            onSearch={(keyword) => setParams((p: any) => ({ ...p, keyword, page: 1 }))}
+            onSearch={(keyword) => setParams((p) => ({ ...p, keyword, page: 1 }))}
             quickFilters={WO_STATUS_OPTIONS}
             activeFilter={params.status}
             onFilterChange={(key) =>
-              setParams((p: any) => ({
+              setParams((p) => ({
                 ...p,
                 status: key === 'all' ? undefined : key,
                 page: 1,
@@ -137,7 +139,7 @@ export default function WorkOrderListPage() {
           onRowClick={(row) => navigate(`/workorders/${row.id}`)}
           pagination={{
             page: params.page, pageSize: params.pageSize, total,
-            onChange: (page, pageSize) => setParams((p: any) => ({ ...p, page, pageSize })),
+            onChange: (page, pageSize) => setParams((p) => ({ ...p, page, pageSize })),
           }}
           emptyText="暂无工单记录"
         />
