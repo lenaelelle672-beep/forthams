@@ -22,6 +22,7 @@ import {
   getApprovalDetail,
 } from '@/api/approval';
 import type { ApprovalItem } from '@/api/approval';
+import type { ApiResponse, PaginatedResponse } from '@/types/common';
 import {
   Dialog,
   DialogContent,
@@ -64,6 +65,7 @@ export default function ApprovalListPage() {
   const [page, setPage] = useState(1);
   const [detailId, setDetailId] = useState<number | null>(null);
   const [rejectDialogId, setRejectDialogId] = useState<number | null>(null);
+  const [rejectDialogVersion, setRejectDialogVersion] = useState<number>(0);
   const [rejectReason, setRejectReason] = useState('');
 
   // Derive the status query param from activeTab + filterStatus
@@ -75,7 +77,7 @@ export default function ApprovalListPage() {
     queryFn: () => getPendingCount(),
     staleTime: 1000 * 30,
   });
-  const pendingCount = (pendingCountRes as any)?.data ?? 0;
+  const pendingCount = (pendingCountRes as ApiResponse<number> | undefined)?.data ?? 0;
 
   // ── Approval list ──
   const statusParam = filterStatus !== 'all' ? filterStatus.toUpperCase() : queryStatus;
@@ -91,13 +93,14 @@ export default function ApprovalListPage() {
     placeholderData: (p) => p,
   });
 
-  const records: ApprovalItem[] = (data as any)?.data?.records ?? [];
-  const total: number = (data as any)?.data?.total ?? 0;
+  const records: ApprovalItem[] = (data as PaginatedResponse<ApprovalItem> | undefined)?.data?.records ?? [];
+  const total: number = (data as PaginatedResponse<ApprovalItem> | undefined)?.data?.total ?? 0;
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   // ── Approve mutation ──
   const approveMutation = useMutation({
-    mutationFn: (id: number) => approveItem(id, { version: 0 }),
+    mutationFn: ({ id, version }: { id: number; version: number }) =>
+      approveItem(id, { version }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['approvals'] });
     },
@@ -105,8 +108,8 @@ export default function ApprovalListPage() {
 
   // ── Reject mutation ──
   const rejectMutation = useMutation({
-    mutationFn: ({ id, reason }: { id: number; reason: string }) =>
-      rejectItem(id, { version: 0, rejectionReason: reason }),
+    mutationFn: ({ id, version, reason }: { id: number; version: number; reason: string }) =>
+      rejectItem(id, { version, rejectionReason: reason }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['approvals'] });
       setRejectDialogId(null);
@@ -120,7 +123,7 @@ export default function ApprovalListPage() {
     queryFn: () => getApprovalDetail(detailId!),
     enabled: detailId !== null,
   });
-  const detail: ApprovalItem | null = (detailRes as any)?.data ?? null;
+  const detail: ApprovalItem | null = (detailRes as ApiResponse<ApprovalItem> | undefined)?.data ?? null;
 
   const handleTabChange = (tab: ApprovalTab) => {
     setActiveTab(tab);
@@ -282,13 +285,13 @@ export default function ApprovalListPage() {
                               <button
                                 className="text-[#16a34a] hover:underline text-sm font-semibold disabled:opacity-50"
                                 disabled={approveMutation.isPending}
-                                onClick={() => approveMutation.mutate(row.id)}
+                                onClick={() => approveMutation.mutate({ id: row.id, version: row.version })}
                               >
                                 {approveMutation.isPending ? '处理中...' : '通过'}
                               </button>
                               <button
                                 className="text-[#ba1a1a] hover:underline text-sm font-semibold"
-                                onClick={() => { setRejectDialogId(row.id); setRejectReason(''); }}
+                                onClick={() => { setRejectDialogId(row.id); setRejectReason(''); setRejectDialogVersion(row.version); }}
                               >
                                 驳回
                               </button>
@@ -379,7 +382,7 @@ export default function ApprovalListPage() {
               disabled={!rejectReason.trim() || rejectMutation.isPending}
               onClick={() => {
                 if (rejectDialogId !== null) {
-                  rejectMutation.mutate({ id: rejectDialogId, reason: rejectReason });
+                  rejectMutation.mutate({ id: rejectDialogId, version: rejectDialogVersion, reason: rejectReason });
                 }
               }}
             >

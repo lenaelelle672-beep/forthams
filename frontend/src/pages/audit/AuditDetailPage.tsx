@@ -16,6 +16,7 @@ import { Button } from '@/components/ui/Button';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { getAuditLogDetail } from '@/api/audit';
 import type { AuditLog } from '@/api/audit';
+import type { ApiResponse } from '@/types/common';
 import { Skeleton } from '@/components/ui/Skeleton';
 
 interface TimelineEntry {
@@ -45,7 +46,7 @@ export default function AuditDetailPage() {
     staleTime: 1000 * 60 * 5,
   });
 
-  const log: AuditLog = (res as any)?.data;
+  const log: AuditLog = (res as ApiResponse<AuditLog> | undefined)?.data;
 
   if (isLoading) {
     return (
@@ -76,8 +77,8 @@ export default function AuditDetailPage() {
     const timeStr = log.createdAt?.substring(11, 19) || '—';
 
     // If backend returns a timeline array, use it directly
-    if ((log as any).timeline && Array.isArray((log as any).timeline)) {
-      return (log as any).timeline;
+    if ('timeline' in log && Array.isArray(log.timeline)) {
+      return log.timeline as TimelineEntry[];
     }
 
     const changes = log.changes || [];

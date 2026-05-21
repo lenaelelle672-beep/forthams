@@ -1,13 +1,15 @@
-import { useState } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
 import {
-  Search, Upload, Download, Plus, ChevronLeft, ChevronRight,
+  Search, Upload, Download, Plus,
   TrendingUp, ShieldCheck, X,
 } from 'lucide-react';
-import { useAssetList } from '@/hooks/asset/useAssets';
+import { useAssetList, useCategoryTree } from '@/hooks/asset/useAssets';
 import { AssetStatus } from '@/types/asset';
-import type { AssetListQuery } from '@/types/asset';
+import type { AssetListQuery, AssetListItem } from '@/types/asset';
+import type { ApiResponse, PageData, Department } from '@/types/common';
+import { getDeptList } from '@/api/base';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -25,20 +27,6 @@ const STATUS_OPTIONS = [
   { key: AssetStatus.CLEARED,            label: '已清退', color: 'bg-[#EFEBE9] text-[#5D4037]' },
 ];
 
-const CATEGORY_OPTIONS = ['所有分类', '生产设备', 'IT设备', '办公家具', '办公设备', '后勤设备'];
-const DEPARTMENT_OPTIONS = ['所属部门', '生产部', '技术部', '运维部', '行政部', '市场部'];
-
-const MOCK_ASSETS = [
-  { id: 1, code: 'AST-2024-001', name: '高精度车床',     category: '生产设备', brand: 'Siemens S2000',        department: '生产部', owner: '张三', location: 'A栋3楼',     originalValue: 125000,   netValue: 45000,   status: AssetStatus.IN_USE },
-  { id: 2, code: 'AST-2024-002', name: 'MacBook Pro 16"', category: 'IT设备',  brand: 'Apple M3 Max',         department: '技术部', owner: '李四', location: 'B栋5楼-502', originalValue: 24999,    netValue: 21000,   status: AssetStatus.IDLE },
-  { id: 3, code: 'AST-2024-003', name: '激光切割机',     category: '生产设备', brand: "Han's Laser G3015",    department: '生产部', owner: '王五', location: 'C栋1楼',     originalValue: 450000,   netValue: 180000,  status: AssetStatus.MAINTENANCE },
-  { id: 4, code: 'AST-2024-004', name: '服务器机架',     category: 'IT设备',  brand: 'Dell PowerEdge R750',  department: '运维部', owner: '赵六', location: '数据中心 1A', originalValue: 88000,    netValue: 12000,   status: AssetStatus.PENDING_RETIREMENT },
-  { id: 5, code: 'AST-2023-088', name: '办公人体工学椅', category: '办公家具', brand: 'Herman Miller Aeron',  department: '行政部', owner: '钱七', location: 'B栋4楼',     originalValue: 12800,    netValue: 4500,    status: AssetStatus.RETIRED },
-  { id: 6, code: 'AST-2022-152', name: 'UPS备用电源',   category: 'IT设备',  brand: 'APC Smart-UPS',        department: '运维部', owner: '孙八', location: '数据中心 2C', originalValue: 5500,     netValue: 0,       status: AssetStatus.SCRAPPED },
-  { id: 7, code: 'AST-2023-015', name: '大型投影仪',     category: '办公设备', brand: 'Epson EB-PU2213B',     department: '市场部', owner: '周九', location: '会议中心',    originalValue: 35000,    netValue: 15600,   status: AssetStatus.CLEARED },
-  { id: 8, code: 'AST-2024-112', name: '空气质量监测系统', category: '后勤设备', brand: 'Honeywell AQ-9',     department: '行政部', owner: '吴十', location: '全办公区',    originalValue: 18200,    netValue: 17000,   status: AssetStatus.IN_USE },
-];
-
 const SUMMARY_CARDS = [
   { label: '资产总净值',  value: '¥4,281,900.00', sub: '较上月 +2.4%',      subIcon: TrendingUp, subColor: 'text-green-600', bg: 'bg-blue-50', border: 'border-blue-200' },
   { label: '待处理维修',  value: '14 项',          sub: '平均响应时间: 4.2h', subIcon: null,        subColor: '',              bg: 'bg-orange-50', border: 'border-orange-200' },
@@ -46,44 +34,101 @@ const SUMMARY_CARDS = [
   { label: '本月折旧',    value: '¥125,402',       sub: '查看折旧报表 →',    subIcon: null,        subColor: '',              bg: 'bg-white', border: 'border-[#e5e7eb]' },
 ];
 
+function flattenCategoryTree(tree: { id: number; categoryName: string; children?: { id: number; categoryName: string; children?: unknown[] }[] }): { id: number; name: string }[] {
+  const result: { id: number; name: string }[] = [];
+  const walk = (nodes: typeof tree[]) => {
+    for (const node of nodes) {
+      result.push({ id: node.id, name: node.categoryName });
+      if (node.children) walk(node.children as typeof tree[]);
+    }
+  };
+  walk([tree]);
+  return result;
+}
+
 export default function AssetListPage() {
   const navigate = useNavigate();
 
-  const [query, setQuery] = useState<AssetListQuery>({ page: 1, pageSize: 10 });
+  const [page, setPage] = useState(1);
+  const [pageSize] = useState(10);
+  const [keywordInput, setKeywordInput] = useState('');
   const [keyword, setKeyword] = useState('');
-  const [category, setCategory] = useState('所有分类');
-  const [department, setDepartment] = useState('所属部门');
+  const [categoryId, setCategoryId] = useState<number | ''>('');
+  const [deptId, setDeptId] = useState<number | ''>('');
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
   const [importantOnly, setImportantOnly] = useState(false);
 
-  const { data: res, isLoading } = useAssetList(query);
+  const { data: categoryRes } = useCategoryTree();
+  const { data: deptRes } = useQuery({
+    queryKey: ['departments'],
+    queryFn: getDeptList,
+    staleTime: 1000 * 60 * 5,
+  });
 
-  const records = (res as any)?.data?.records ?? MOCK_ASSETS;
-  const total = (res as any)?.data?.total ?? MOCK_ASSETS.length;
+  const categories = useMemo(() => {
+    const tree = categoryRes?.data ?? [];
+    if (!Array.isArray(tree) || tree.length === 0) return [];
+    return tree.flatMap((n) => flattenCategoryTree(n as Parameters<typeof flattenCategoryTree>[0]));
+  }, [categoryRes]);
+
+  const departments = useMemo(() => {
+    const list = (deptRes as unknown as ApiResponse<Department[]> | undefined)?.data ?? [];
+    const flat: { id: number; name: string }[] = [];
+    const walk = (nodes: Department[]) => {
+      for (const node of nodes) {
+        flat.push({ id: node.id, name: node.deptName });
+        if (node.children) walk(node.children);
+      }
+    };
+    walk(list);
+    return flat;
+  }, [deptRes]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setKeyword(keywordInput), 300);
+    return () => clearTimeout(timer);
+  }, [keywordInput]);
+
+  const apiQuery: AssetListQuery = useMemo(() => ({
+    page,
+    pageSize,
+    keyword: keyword || undefined,
+    categoryId: categoryId || undefined,
+    deptId: deptId || undefined,
+    status: selectedStatuses.length === 1 ? (selectedStatuses[0] as AssetStatus) : undefined,
+    isImportant: importantOnly ? 1 : undefined,
+  }), [page, pageSize, keyword, categoryId, deptId, selectedStatuses, importantOnly]);
+
+  const { data: res, isLoading } = useAssetList(apiQuery);
+
+  const pageData = (res as unknown as ApiResponse<PageData<AssetListItem>> | undefined)?.data;
+  const records = pageData?.records ?? [];
+  const total = pageData?.total ?? 0;
 
   const toggleStatus = (status: string) => {
     setSelectedStatuses((prev) =>
       prev.includes(status) ? prev.filter((s) => s !== status) : [...prev, status]
     );
+    setPage(1);
   };
 
-  const columns: Column<any>[] = [
+  const columns: Column<AssetListItem>[] = [
     {
-      key: 'code', title: '资产编号', width: 130,
+      key: 'assetNo', title: '资产编号', width: 130,
       render: (v) => <span className="font-mono text-[13px] text-[#0f172a]">{String(v)}</span>,
     },
-    { key: 'name', title: '资产名称', render: (v) => <span className="font-bold text-[#0f172a]">{String(v)}</span> },
-    { key: 'category', title: '分类', width: 90 },
+    { key: 'assetName', title: '资产名称', render: (v) => <span className="font-bold text-[#0f172a]">{String(v)}</span> },
+    { key: 'categoryName', title: '分类', width: 90 },
     { key: 'brand', title: '品牌/型号', render: (v) => <span className="text-[#505f76]">{String(v)}</span> },
-    { key: 'department', title: '使用部门', width: 80 },
-    { key: 'owner', title: '使用人', width: 70 },
+    { key: 'deptName', title: '使用部门', width: 80 },
+    { key: 'userName', title: '使用人', width: 70 },
     { key: 'location', title: '存放位置', width: 100 },
     {
       key: 'originalValue', title: '原值(¥)', width: 110, align: 'right',
       render: (v) => <span className="font-mono text-[13px]">{Number(v).toLocaleString('en', { minimumFractionDigits: 2 })}</span>,
     },
     {
-      key: 'netValue', title: '净值(¥)', width: 110, align: 'right',
+      key: 'currentValue', title: '净值(¥)', width: 110, align: 'right',
       render: (v) => <span className="font-mono text-[13px]">{Number(v).toLocaleString('en', { minimumFractionDigits: 2 })}</span>,
     },
     {
@@ -103,7 +148,7 @@ export default function AssetListPage() {
     },
   ];
 
-  const totalPages = Math.ceil(total / query.pageSize);
+  const totalPages = Math.ceil(total / pageSize);
 
   return (
     <div className="p-6 space-y-6">
@@ -133,18 +178,19 @@ export default function AssetListPage() {
             <div className="relative w-64">
               <Input
                 placeholder="搜索编号、名称..."
-                value={keyword}
-                onChange={(e) => setKeyword(e.target.value)}
+                value={keywordInput}
+                onChange={(e) => { setKeywordInput(e.target.value); }}
                 prefix={<Search className="w-4 h-4 text-[#737686]" />}
               />
             </div>
             <div className="flex items-center gap-3">
               <select
                 className="h-9 bg-white border border-[#e5e7eb] rounded-lg px-3 text-sm focus:border-[#004ac6] outline-none"
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
+                value={categoryId}
+                onChange={(e) => { setCategoryId(e.target.value ? Number(e.target.value) : ''); setPage(1); }}
               >
-                {CATEGORY_OPTIONS.map((opt) => <option key={opt}>{opt}</option>)}
+                <option value="">所有分类</option>
+                {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
               </select>
 
               <div className="flex items-center gap-2 bg-white border border-[#e5e7eb] rounded-lg px-2 py-1.5 h-9">
@@ -171,10 +217,11 @@ export default function AssetListPage() {
 
               <select
                 className="h-9 bg-white border border-[#e5e7eb] rounded-lg px-3 text-sm focus:border-[#004ac6] outline-none"
-                value={department}
-                onChange={(e) => setDepartment(e.target.value)}
+                value={deptId}
+                onChange={(e) => { setDeptId(e.target.value ? Number(e.target.value) : ''); setPage(1); }}
               >
-                {DEPARTMENT_OPTIONS.map((opt) => <option key={opt}>{opt}</option>)}
+                <option value="">所属部门</option>
+                {departments.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}
               </select>
             </div>
 
@@ -184,7 +231,7 @@ export default function AssetListPage() {
               <span className="text-sm text-[#64748b]">重要设备</span>
               <button
                 className={`w-10 h-5 rounded-full relative transition-colors ${importantOnly ? 'bg-[#2563eb]' : 'bg-[#c3c6d7]'}`}
-                onClick={() => setImportantOnly(!importantOnly)}
+                onClick={() => { setImportantOnly(!importantOnly); setPage(1); }}
               >
                 <div className={`absolute top-1 w-3 h-3 bg-white rounded-full transition-all ${importantOnly ? 'right-1' : 'left-1'}`} />
               </button>
@@ -192,7 +239,15 @@ export default function AssetListPage() {
 
             <button
               className="text-[#004ac6] text-sm font-bold hover:underline ml-auto"
-              onClick={() => { setSelectedStatuses([]); setKeyword(''); setCategory('所有分类'); setDepartment('所属部门'); setImportantOnly(false); }}
+              onClick={() => {
+                setSelectedStatuses([]);
+                setKeywordInput('');
+                setKeyword('');
+                setCategoryId('');
+                setDeptId('');
+                setImportantOnly(false);
+                setPage(1);
+              }}
             >
               重置
             </button>
@@ -209,10 +264,10 @@ export default function AssetListPage() {
             rowKey="id"
             onRowClick={(row) => navigate(`/assets/${row.id}`)}
             pagination={{
-              page: query.page ?? 1,
-              pageSize: query.pageSize ?? 10,
+              page,
+              pageSize,
               total,
-              onChange: (page, pageSize) => setQuery((prev) => ({ ...prev, page, pageSize })),
+              onChange: (p) => setPage(p),
             }}
           />
         </CardContent>
