@@ -6,16 +6,16 @@ import { deptService } from "../services/deptService";
 
 export function Settings() {
   const [activeTab, setActiveTab] = useState<'general' | 'users' | 'departments' | 'integration' | 'notification' | 'security'>('general');
-  const [users, setUsers] = useState<any[]>([]);
-  const [roles, setRoles] = useState<any[]>([]);
-  const [depts, setDepts] = useState<any[]>([]);
+  const [users, setUsers] = useState<unknown[]>([]);
+  const [roles, setRoles] = useState<unknown[]>([]);
+  const [depts, setDepts] = useState<unknown[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showAddUserModal, setShowAddUserModal] = useState(false);
   const [showAddDeptModal, setShowAddDeptModal] = useState(false);
   const [newUserName, setNewUserName] = useState('');
   const [newDeptName, setNewDeptName] = useState('');
-  const [editItem, setEditItem] = useState<any | null>(null);
+  const [editItem, setEditItem] = useState<Record<string, unknown> | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
 
   const loadData = async () => {
@@ -27,9 +27,9 @@ export function Settings() {
         roleService.list(),
         deptService.getAll(),
       ]);
-      setUsers(Array.isArray(userList) ? userList : (userList as any)?.records || []);
-      setRoles(Array.isArray(roleList) ? roleList : (roleList as any)?.records || []);
-      setDepts(Array.isArray(deptList) ? deptList : (deptList as any)?.records || []);
+      setUsers(Array.isArray(userList) ? userList : (userList as { records?: unknown[] })?.records || []);
+      setRoles(Array.isArray(roleList) ? roleList : (roleList as { records?: unknown[] })?.records || []);
+      setDepts(Array.isArray(deptList) ? deptList : (deptList as { records?: unknown[] })?.records || []);
     } catch (err) {
       console.error('Failed to load settings data:', err);
       setError('设置数据加载失败');

@@ -17,6 +17,7 @@ import { Select, SelectItem } from '@/components/ui/Select';
 import { getAssetList } from '@/api/asset';
 import { submitScrapApplication, saveScrapDraft } from '@/api/disposal';
 import type { AssetListItem } from '@/types/asset';
+import type { ApiResponse, PageData } from '@/types/common';
 
 const STEPS = [
   { key: 'fill-info', label: '填写信息', num: 1 },
@@ -145,7 +146,7 @@ export default function AssetScrapFormPage() {
     queryFn: () => getAssetList({ pageSize: 200 }),
   });
 
-  const availableAssets: AssetListItem[] = (assetListData as any)?.records ?? [];
+  const availableAssets: AssetListItem[] = (assetListData as ApiResponse<PageData<AssetListItem>> | undefined)?.data?.records ?? [];
 
   const {
     register, handleSubmit, control,
@@ -470,7 +471,7 @@ export default function AssetScrapFormPage() {
 
         {submitMutation.isError && (
           <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-red-600 text-sm">
-            {(submitMutation.error as any)?.response?.data?.message ?? '提交失败，请重试'}
+            {(submitMutation.error instanceof Error ? submitMutation.error.message : '提交失败，请重试')}
           </div>
         )}
 

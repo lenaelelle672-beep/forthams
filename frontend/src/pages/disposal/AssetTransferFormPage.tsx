@@ -15,7 +15,7 @@ import { getAssetList } from '@/api/asset';
 import { submitTransferApplication } from '@/api/disposal';
 import { getDeptTree, getLocationCascade } from '@/api/base';
 import type { AssetListItem } from '@/types/asset';
-import type { Department, Location } from '@/types/common';
+import type { Department, Location, ApiResponse, PageData } from '@/types/common';
 
 const schema = z.object({
   transferType: z.string().min(1, '请选择调拨类型'),
@@ -83,7 +83,7 @@ export default function AssetTransferFormPage() {
     queryFn: () => getAssetList({ pageSize: 200 }),
   });
 
-  const availableAssets: AssetListItem[] = (assetListData as any)?.records ?? [];
+  const availableAssets: AssetListItem[] = (assetListData as ApiResponse<PageData<AssetListItem>> | undefined)?.data?.records ?? [];
 
   // Filter assets by search keyword
   const filteredAssets = useMemo(() => {
@@ -103,7 +103,7 @@ export default function AssetTransferFormPage() {
     queryFn: () => getDeptTree(),
   });
   const deptOptions = useMemo(
-    () => flattenTree<Department>((deptData as any)?.data ?? [], 'deptName'),
+    () => flattenTree<Department>((deptData as ApiResponse<Department[]> | undefined)?.data ?? [], 'deptName'),
     [deptData],
   );
 
@@ -113,7 +113,7 @@ export default function AssetTransferFormPage() {
     queryFn: () => getLocationCascade(),
   });
   const locationOptions = useMemo(
-    () => flattenTree<Location>((locationData as any)?.data ?? [], 'locationName'),
+    () => flattenTree<Location>((locationData as ApiResponse<Location[]> | undefined)?.data ?? [], 'locationName'),
     [locationData],
   );
 
@@ -474,7 +474,7 @@ export default function AssetTransferFormPage() {
 
         {mutation.isError && (
           <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-red-600 text-sm">
-            {(mutation.error as any)?.response?.data?.message ?? '提交失败，请重试'}
+            {(mutation.error instanceof Error ? mutation.error.message : '提交失败，请重试')}
           </div>
         )}
       </form>

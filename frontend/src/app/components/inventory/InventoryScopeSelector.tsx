@@ -87,7 +87,7 @@ const InventoryScopeSelector: React.FC<InventoryScopeSelectorProps> = ({
     const disableParents = (
       nodes: NonNullable<TreeSelectProps['treeData']>,
     ): any[] =>
-      (nodes as any[]).map((node) => {
+      (nodes as unknown[]).map((node) => {
         const hasChildren =
           Array.isArray(node.children) && node.children.length > 0;
         return {
@@ -95,7 +95,7 @@ const InventoryScopeSelector: React.FC<InventoryScopeSelectorProps> = ({
           disableCheckbox: hasChildren,
           selectable: !hasChildren,
           children: hasChildren ? disableParents(node.children) : undefined,
-        } as any;
+        } as Record<string, unknown>;
       });
 
     return disableParents(treeData);
@@ -124,7 +124,7 @@ const InventoryScopeSelector: React.FC<InventoryScopeSelectorProps> = ({
       }
     };
 
-    walk(treeData as any[]);
+    walk(treeData as unknown[]);
     return map;
   }, [treeData]);
 

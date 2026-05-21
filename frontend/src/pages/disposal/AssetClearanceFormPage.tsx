@@ -12,6 +12,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { getAssetList } from '@/api/asset';
 import { submitClearanceApplication, saveClearanceDraft } from '@/api/disposal';
 import type { AssetListItem } from '@/types/asset';
+import type { ApiResponse, PageData } from '@/types/common';
 
 const schema = z.object({
   clearanceNo: z.string(),
@@ -91,7 +92,7 @@ export default function AssetClearanceFormPage() {
   });
 
   const assetRows: AssetRow[] = useMemo(() => {
-    const records = (assetListData as any)?.records ?? [];
+    const records = (assetListData as ApiResponse<PageData<AssetListItem>> | undefined)?.data?.records ?? [];
     return records.map(toAssetRow);
   }, [assetListData]);
 
@@ -538,7 +539,7 @@ export default function AssetClearanceFormPage() {
 
         {mutation.isError && (
           <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-red-600 text-sm">
-            {(mutation.error as any)?.response?.data?.message ?? '提交失败，请重试'}
+            {(mutation.error instanceof Error ? mutation.error.message : '提交失败，请重试')}
           </div>
         )}
 

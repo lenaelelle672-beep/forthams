@@ -180,7 +180,7 @@ export async function submitApproval(
 
   const flowError = createApprovalError(
     errorMessage,
-    (lastError as any)?.response?.status,
+    (lastError as { response?: { status?: number } })?.response?.status,
     submissionPayload,
     attempts
   );

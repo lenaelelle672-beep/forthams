@@ -7,13 +7,16 @@
  * - Offline Assets Count
  * - Total Assets Value
  * 
- * Part of SWARM-003 Dashboard Data Board Specification
- * @see {@link https://spec.example.com/swarm-003} for full requirements
+ * Fetches data from real API endpoints via @tanstack/react-query.
  * 
  * @since Iteration 5 (Phase 3)
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { getDashboardStats } from '@/api/asset';
+import type { DashboardStats } from '@/types/asset';
+import type { ApiResponse } from '@/types/common';
 import StatCard from '../StatCard/StatCard';
 import './StatisticsPanel.module.css';
 
@@ -46,21 +49,6 @@ interface TrendIndicator {
   /** Percentage change value */
   percentage: number;
 }
-
-// Mock API function - in production, this would call the actual backend API
-// GET /api/v1/assets/statistics
-const fetchAssetStatistics = async (): Promise<AssetStatistics> => {
-  // Simulating API call delay
-  await new Promise(resolve => setTimeout(resolve, 300));
-  
-  // Mock data - in production, replace with actual API call
-  return {
-    totalCount: 12584,
-    onlineCount: 9823,
-    offlineCount: 2761,
-    totalValue: 45678900.50,
-  };
-};
 
 /**
  * Formats large numbers with locale-aware separators
@@ -101,17 +89,10 @@ const formatCurrency = (value: number, currency: string = 'CNY'): string => {
  * - Total Value
  * 
  * Features:
- * - Automatic data fetching on mount
+ * - Real data fetching via getDashboardStats API
  * - Configurable auto-refresh polling (default: 60 seconds)
  * - Responsive grid layout
  * - Loading and error states
- * 
- * @param props - Component props
- * @param props.onDataLoaded - Optional callback when data loads
- * @param props.initialData - Optional initial data to display
- * @param props.autoRefresh - Enable/disable auto-refresh (default: true)
- * @param props.refreshInterval - Refresh interval in ms (default: 60000)
- * @returns React component
  */
 const StatisticsPanel: React.FC<StatisticsPanelProps> = ({
   onDataLoaded,
@@ -119,64 +100,27 @@ const StatisticsPanel: React.FC<StatisticsPanelProps> = ({
   autoRefresh = true,
   refreshInterval = 60000,
 }) => {
-  // State management for asset statistics
-  const [statistics, setStatistics] = useState<AssetStatistics | null>(initialData || null);
-  const [loading, setLoading] = useState<boolean>(!initialData);
-  const [error, setError] = useState<string | null>(null);
-  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const queryClient = useQueryClient();
 
-  /**
-   * Loads asset statistics from the API
-   * Updates state with fetched data and triggers optional callback
-   * 
-   * @returns Promise resolving to AssetStatistics or void on error
-   */
-  const loadStatistics = useCallback(async (): Promise<void> => {
-    try {
-      setLoading(true);
-      setError(null);
-      
-      const data = await fetchAssetStatistics();
-      setStatistics(data);
-      setLastUpdated(new Date());
-      
-      // Trigger callback if provided
-      if (onDataLoaded) {
-        onDataLoaded(data);
+  const { data: response, isLoading, error } = useQuery({
+    queryKey: ['dashboard', 'stats'],
+    queryFn: getDashboardStats,
+    staleTime: refreshInterval,
+    refetchInterval: autoRefresh ? refreshInterval : false,
+  });
+
+  // Extract stats from API response, falling back to initialData
+  const apiStats = (response as ApiResponse<DashboardStats> | undefined)?.data;
+  const statistics: AssetStatistics | null = apiStats
+    ? {
+        totalCount: apiStats.totalAssets ?? 0,
+        onlineCount: apiStats.inUseAssets ?? 0,
+        offlineCount: apiStats.idleAssets ?? 0,
+        totalValue: apiStats.totalValue ?? 0,
       }
-    } catch (err) {
-      const errorMessage = err instanceof Error 
-        ? err.message 
-        : 'Failed to load asset statistics';
-      setError(errorMessage);
-      console.error('[StatisticsPanel] Failed to load statistics:', err);
-    } finally {
-      setLoading(false);
-    }
-  }, [onDataLoaded]);
+    : initialData ?? null;
 
-  // Initial data load on mount
-  useEffect(() => {
-    if (!initialData) {
-      loadStatistics();
-    }
-  }, [loadStatistics, initialData]);
-
-  // Auto-refresh polling setup
-  useEffect(() => {
-    if (!autoRefresh) {
-      return;
-    }
-
-    const intervalId = setInterval(() => {
-      loadStatistics();
-    }, refreshInterval);
-
-    // Cleanup interval on unmount
-    return () => {
-      clearInterval(intervalId);
-    };
-  }, [autoRefresh, refreshInterval, loadStatistics]);
+  const errorMessage = error instanceof Error ? error.message : null;
 
   // Derive trend indicators from statistics for future use
   const getTrendIndicator = (type: 'total' | 'online' | 'offline' | 'value'): TrendIndicator => {
@@ -189,7 +133,7 @@ const StatisticsPanel: React.FC<StatisticsPanelProps> = ({
   };
 
   // Loading state - display skeleton cards
-  if (loading && !statistics) {
+  if (isLoading && !statistics) {
     return (
       <div 
         className="statistics-panel"
@@ -233,7 +177,7 @@ const StatisticsPanel: React.FC<StatisticsPanelProps> = ({
   }
 
   // Error state - display error message
-  if (error && !statistics) {
+  if (errorMessage && !statistics) {
     return (
       <div 
         className="statistics-panel"
@@ -242,10 +186,10 @@ const StatisticsPanel: React.FC<StatisticsPanelProps> = ({
       >
         <div className="statistics-error" role="alert">
           <span className="error-icon">⚠️</span>
-          <span className="error-message">{error}</span>
+          <span className="error-message">{errorMessage}</span>
           <button 
             className="retry-button"
-            onClick={loadStatistics}
+            onClick={() => queryClient.invalidateQueries({ queryKey: ['dashboard', 'stats'] })}
             aria-label="重新加载统计数据"
           >
             重试
@@ -262,13 +206,6 @@ const StatisticsPanel: React.FC<StatisticsPanelProps> = ({
       role="region"
       aria-label="资产总览统计"
     >
-      {/* Accessibility: announce last updated time */}
-      {lastUpdated && (
-        <div className="sr-only" aria-live="polite">
-          数据更新时间: {lastUpdated.toLocaleTimeString()}
-        </div>
-      )}
-      
       <div className="statistics-grid">
         {/* Total Assets Card */}
         <StatCard

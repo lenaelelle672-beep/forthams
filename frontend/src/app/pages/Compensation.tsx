@@ -30,7 +30,7 @@ export function Compensation() {
       setLoading(true);
       setError(null);
       const result = await compensationService.list();
-      setCompensations(Array.isArray(result) ? result : (result as any)?.records || []);
+      setCompensations(Array.isArray(result) ? result : (result as { records?: unknown[] })?.records || []);
     } catch (err) {
       console.error('Failed to load compensation data:', err);
       setError('赔偿数据加载失败');
@@ -56,7 +56,7 @@ export function Compensation() {
     try {
       setValuationLoading(true);
       setValuationBasis(null);
-      const valuation = await compensationService.estimate(formData) as any;
+      const valuation = await compensationService.estimate(formData) as Record<string, unknown>;
       setFormData(prev => ({
         ...prev,
         amount: String(valuation.estimatedAmount ?? prev.amount),
