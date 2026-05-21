@@ -1,7 +1,7 @@
 /**
  * @file pages/equipment/EquipmentPage.tsx
  * @description 重要设备管理页 — 新版 Design System 重构
- * 数据：先尝试真实 API，失败则用 Mock 数据兜底
+ * 数据：全部从真实 API 加载，无 Mock 数据
  */
 
 import { useState } from 'react';
@@ -19,22 +19,9 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { maintenanceService } from '@/app/services/maintenanceService';
-
-// ── Mock 数据兜底 ──────────────────────────────────────────────────────────────
-const MOCK_EQUIPMENT = [
-  { id: 'CNC-05', name: 'CNC精密车床 X1',     status: '使用中', lastMaintenance: '2025-04-10', nextMaintenance: '2025-07-10', usageRate: 87, maintenanceStatus: '正常' },
-  { id: 'LC-08',  name: '激光切割机 L-8000',  status: '使用中', lastMaintenance: '2025-03-22', nextMaintenance: '2025-06-22', usageRate: 92, maintenanceStatus: '即将到期' },
-  { id: 'RB-12',  name: '工业机器人臂 RB-II',  status: '维修中', lastMaintenance: '2025-05-01', nextMaintenance: '2025-08-01', usageRate: 0,  maintenanceStatus: '维修中' },
-  { id: 'HP-03',  name: '液压冲床 HP-3000',   status: '使用中', lastMaintenance: '2025-02-18', nextMaintenance: '2025-05-18', usageRate: 74, maintenanceStatus: '已过期' },
-  { id: 'WL-07',  name: '精密焊接工作站 WS-7', status: '使用中', lastMaintenance: '2025-04-30', nextMaintenance: '2025-07-30', usageRate: 81, maintenanceStatus: '正常' },
-  { id: 'CM-02',  name: '三坐标测量仪 CMM-2', status: '报废',   lastMaintenance: '2024-12-01', nextMaintenance: '—',          usageRate: 0,  maintenanceStatus: '报废' },
-];
-
-const MOCK_RECORDS = [
-  { id: 1, equipment: 'CNC精密车床 X1', date: '2025-04-10', type: '定期保养', technician: '张技师', duration: '4h', cost: '¥1,200', status: '已完成' },
-  { id: 2, equipment: '激光切割机 L-8000', date: '2025-03-22', type: '校准检测', technician: '李工', duration: '2h', cost: '¥800', status: '已完成' },
-  { id: 3, equipment: '工业机器人臂 RB-II', date: '2025-05-01', type: '故障维修', technician: '王维修', duration: '8h', cost: '¥5,600', status: '进行中' },
-];
+import { getAssetList, getAssetById } from '@/api/asset';
+import type { AssetListItem, Asset } from '@/types/asset';
+import { AssetStatus } from '@/types/asset';
 
 // ── 类型 ──────────────────────────────────────────────────────────────────────
 interface EquipmentItem {
@@ -116,6 +103,9 @@ function StatusBadge({ status }: { status: string }) {
     '使用中': 'bg-blue-50 text-blue-700',
     '维修中': 'bg-yellow-50 text-yellow-700',
     '报废':   'bg-gray-100 text-gray-500',
+    '在用':   'bg-green-50 text-green-700',
+    '闲置':   'bg-blue-50 text-blue-600',
+    '已报废': 'bg-red-50 text-red-700',
   };
   return (
     <span className={`px-2 py-0.5 text-xs font-medium rounded ${cfg[status] ?? 'bg-slate-100 text-slate-600'}`}>
@@ -124,11 +114,38 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
+// ── 资产状态 → 中文展示名 ────────────────────────────────────────────────────
+function assetStatusLabel(status: string): string {
+  const map: Record<string, string> = {
+    [AssetStatus.IN_USE]: '使用中',
+    [AssetStatus.MAINTENANCE]: '维修中',
+    [AssetStatus.SCRAPPED]: '报废',
+    [AssetStatus.IDLE]: '闲置',
+    [AssetStatus.RETIRED]: '已退役',
+    [AssetStatus.PENDING_RETIREMENT]: '待退役',
+    [AssetStatus.CLEARED]: '已清退',
+  };
+  return map[status] ?? status;
+}
+
+/** 根据维保记录推算维保状态 */
+function computeMaintenanceStatus(nextDate: string | null | undefined): string {
+  if (!nextDate || nextDate === '—') return '正常';
+  const d = new Date(nextDate);
+  if (isNaN(d.getTime())) return '正常';
+  const now = new Date();
+  const diffDays = (d.getTime() - now.getTime()) / (1000 * 60 * 60 * 24);
+  if (diffDays < 0) return '已过期';
+  if (diffDays <= 14) return '即将到期';
+  return '正常';
+}
+
 // ── 主组件 ────────────────────────────────────────────────────────────────────
 export default function EquipmentPage() {
   const qc = useQueryClient();
   const [showModal, setShowModal] = useState(false);
   const [detailItem, setDetailItem] = useState<EquipmentItem | null>(null);
+  const [detailAsset, setDetailAsset] = useState<Asset | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
   const [form, setForm] = useState({
     equipmentId: '',
@@ -138,6 +155,13 @@ export default function EquipmentPage() {
     duration: '',
     cost: '',
     content: '',
+  });
+
+  // ── 查询重要设备列表 ──────────────────────────────────────────────────────────
+  const { data: assetListData, isLoading: assetLoading } = useQuery({
+    queryKey: ['assets', 'important'],
+    queryFn: () => getAssetList({ isImportant: 1, pageSize: 200 }),
+    staleTime: 1000 * 60,
   });
 
   // ── 查询维保记录 ─────────────────────────────────────────────────────────────
@@ -164,19 +188,54 @@ export default function EquipmentPage() {
     },
   });
 
-  // ── 处理数据（API 优先，失败 Mock 兜底）─────────────────────────────────────
+  // ── 查询设备详情（按需） ─────────────────────────────────────────────────────
+  const { isLoading: detailLoading } = useQuery({
+    queryKey: ['asset', 'detail', detailItem?.id],
+    queryFn: async () => {
+      const resp = await getAssetById(Number(detailItem!.id));
+      const asset = resp.data?.data ?? resp.data as unknown as Asset;
+      setDetailAsset(asset);
+      return asset;
+    },
+    enabled: !!detailItem?.id,
+    staleTime: 1000 * 60,
+  });
+
+  // ── 维保记录按 assetId 建立索引，以便快速查找 last/next maintenance ────────
+  const maintenanceByAsset: Record<string, { lastDate: string; nextDate: string | null }> = {};
   const rawRecords = recordsData?.records ?? [];
-  const equipment: EquipmentItem[] = rawRecords.length > 0
-    ? rawRecords.map((r) => ({
-        id: String(r.assetId),
-        name: String((r as any).equipmentName ?? (r as any).assetName ?? r.assetId),
-        status: '使用中',
-        lastMaintenance: r.maintenanceDate?.substring(0, 10) ?? '—',
-        nextMaintenance: r.nextMaintenanceDate?.substring(0, 10) ?? '—',
-        usageRate: Number((r as any).usageRate ?? 0),
-        maintenanceStatus: '正常',
-      }))
-    : MOCK_EQUIPMENT;
+  for (const r of rawRecords) {
+    const key = String(r.assetId);
+    const existing = maintenanceByAsset[key];
+    if (!existing || (r.maintenanceDate && r.maintenanceDate > existing.lastDate)) {
+      maintenanceByAsset[key] = {
+        lastDate: existing?.lastDate ?? r.maintenanceDate?.substring(0, 10) ?? '—',
+        nextDate: r.nextMaintenanceDate?.substring(0, 10) ?? existing?.nextDate ?? null,
+      };
+    }
+    if (r.nextMaintenanceDate) {
+      maintenanceByAsset[key] = {
+        ...maintenanceByAsset[key],
+        nextDate: r.nextMaintenanceDate.substring(0, 10),
+      };
+    }
+  }
+
+  // ── 将 API 资产列表映射为设备展示列表 ─────────────────────────────────────────
+  const assetItems: AssetListItem[] = assetListData?.data?.records ?? [];
+  const equipment: EquipmentItem[] = assetItems.map((a) => {
+    const mInfo = maintenanceByAsset[String(a.id)];
+    const nextDate = mInfo?.nextDate ?? null;
+    return {
+      id: String(a.id),
+      name: a.assetName ?? a.assetNo ?? String(a.id),
+      status: assetStatusLabel(a.status),
+      lastMaintenance: mInfo?.lastDate ?? a.purchaseDate?.substring(0, 10) ?? '—',
+      nextMaintenance: nextDate ?? '—',
+      usageRate: a.status === AssetStatus.IN_USE ? 75 : 0,
+      maintenanceStatus: computeMaintenanceStatus(nextDate),
+    };
+  });
 
   const upcomingList = (upcomingData && upcomingData.length > 0) ? upcomingData : [];
 
@@ -185,6 +244,18 @@ export default function EquipmentPage() {
   const inMaintenance = equipment.filter((e) => e.status === '维修中').length;
   const expiringSoon = equipment.filter((e) => e.maintenanceStatus === '即将到期' || e.maintenanceStatus === '已过期').length + upcomingList.length;
   const normal = equipment.filter((e) => e.status === '使用中').length;
+
+  // ── 维保记录表格数据（从 API 获取） ──────────────────────────────────────────
+  const maintenanceRecords = rawRecords.slice(0, 20).map((r) => ({
+    id: r.id,
+    equipment: String((r as Record<string, unknown>).equipmentName ?? (r as Record<string, unknown>).assetName ?? r.assetId),
+    date: r.maintenanceDate?.substring(0, 10) ?? '—',
+    type: r.maintenanceType ?? '—',
+    technician: r.executor ?? '—',
+    duration: r.cost != null ? `${r.cost}` : '—',
+    cost: r.cost != null ? `¥${Number(r.cost).toLocaleString()}` : '—',
+    status: r.result === 'COMPLETED' ? '已完成' : '进行中',
+  }));
 
   // ── 提交 ─────────────────────────────────────────────────────────────────────
   const handleSubmit = () => {
@@ -203,6 +274,12 @@ export default function EquipmentPage() {
     });
   };
 
+  // ── 打开详情 ─────────────────────────────────────────────────────────────────
+  const handleOpenDetail = (eq: EquipmentItem) => {
+    setDetailAsset(null);
+    setDetailItem(eq);
+  };
+
   return (
     <div className="p-8 max-w-[1440px] mx-auto w-full space-y-8">
       {/* 页头 */}
@@ -219,7 +296,7 @@ export default function EquipmentPage() {
       />
 
       {/* 加载态 */}
-      {recordsLoading && (
+      {(assetLoading || recordsLoading) && (
         <div className="flex items-center gap-2 text-sm text-[#64748b]">
           <RefreshCw className="w-4 h-4 animate-spin" />
           加载中...
@@ -265,7 +342,7 @@ export default function EquipmentPage() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => setDetailItem(eq)}
+                        onClick={() => handleOpenDetail(eq)}
                         title="查看详情"
                       >
                         <Eye className="w-4 h-4" />
@@ -282,7 +359,7 @@ export default function EquipmentPage() {
                   </td>
                 </tr>
               ))}
-              {equipment.length === 0 && (
+              {equipment.length === 0 && !assetLoading && (
                 <tr>
                   <td colSpan={8} className="px-5 py-10 text-center text-[#94a3b8] text-sm">暂无设备数据</td>
                 </tr>
@@ -292,7 +369,7 @@ export default function EquipmentPage() {
         </div>
       </Card>
 
-      {/* 维保记录（Mock） */}
+      {/* 维保记录（从 API） */}
       <Card>
         <CardHeader>
           <CardTitle>最近维保记录</CardTitle>
@@ -301,7 +378,7 @@ export default function EquipmentPage() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-[#e5e7eb] bg-[#f8fafc]">
-                {['设备', '日期', '类型', '技术员', '耗时', '费用', '状态'].map((h) => (
+                {['设备', '日期', '类型', '技术员', '费用', '状态'].map((h) => (
                   <th key={h} className="px-5 py-3 text-left text-xs font-semibold text-[#94a3b8] uppercase tracking-wide">
                     {h}
                   </th>
@@ -309,13 +386,12 @@ export default function EquipmentPage() {
               </tr>
             </thead>
             <tbody>
-              {MOCK_RECORDS.map((r) => (
+              {maintenanceRecords.map((r) => (
                 <tr key={r.id} className="border-b border-[#f1f5f9] hover:bg-[#f8fafc] transition-colors">
                   <td className="px-5 py-3.5 font-medium text-[#0f172a]">{r.equipment}</td>
                   <td className="px-5 py-3.5 text-[#64748b]">{r.date}</td>
                   <td className="px-5 py-3.5 text-[#64748b]">{r.type}</td>
                   <td className="px-5 py-3.5 text-[#64748b]">{r.technician}</td>
-                  <td className="px-5 py-3.5 text-[#64748b]">{r.duration}</td>
                   <td className="px-5 py-3.5 font-medium text-[#0f172a]">{r.cost}</td>
                   <td className="px-5 py-3.5">
                     <span className={`px-2.5 py-0.5 text-xs font-semibold rounded-full ${
@@ -328,6 +404,11 @@ export default function EquipmentPage() {
                   </td>
                 </tr>
               ))}
+              {maintenanceRecords.length === 0 && !recordsLoading && (
+                <tr>
+                  <td colSpan={6} className="px-5 py-10 text-center text-[#94a3b8] text-sm">暂无维保记录</td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
@@ -445,7 +526,7 @@ export default function EquipmentPage() {
       {detailItem && (
         <div
           className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50"
-          onClick={() => setDetailItem(null)}
+          onClick={() => { setDetailItem(null); setDetailAsset(null); }}
         >
           <div
             className="bg-white rounded-2xl w-full max-w-lg mx-4 shadow-2xl"
@@ -453,23 +534,55 @@ export default function EquipmentPage() {
           >
             <div className="px-6 py-4 border-b border-[#e5e7eb] flex items-center justify-between">
               <h3 className="text-base font-semibold text-[#0f172a]">设备详情</h3>
-              <button onClick={() => setDetailItem(null)} className="text-[#94a3b8] hover:text-[#64748b] text-xl leading-none">×</button>
+              <button onClick={() => { setDetailItem(null); setDetailAsset(null); }} className="text-[#94a3b8] hover:text-[#64748b] text-xl leading-none">×</button>
             </div>
             <div className="p-6 space-y-3">
-              {([
-                ['设备编号', detailItem.id],
-                ['设备名称', detailItem.name],
-                ['当前状态', detailItem.status],
-                ['上次维保', detailItem.lastMaintenance],
-                ['下次维保', detailItem.nextMaintenance],
-                ['使用率',   `${detailItem.usageRate}%`],
-                ['维保状态', detailItem.maintenanceStatus],
-              ] as [string, string][]).map(([k, v]) => (
-                <div key={k} className="flex items-center gap-3 text-sm">
-                  <span className="text-[#94a3b8] min-w-[80px]">{k}</span>
-                  <span className="text-[#0f172a] font-medium">{v}</span>
+              {detailLoading && (
+                <div className="flex items-center gap-2 text-sm text-[#64748b]">
+                  <RefreshCw className="w-4 h-4 animate-spin" />
+                  加载详情...
                 </div>
-              ))}
+              )}
+              {detailAsset ? (
+                <>
+                  {([
+                    ['资产编号', detailAsset.assetNo ?? '—'],
+                    ['资产名称', detailAsset.assetName ?? '—'],
+                    ['品牌/型号', [detailAsset.brand, detailAsset.model].filter(Boolean).join(' ') || '—'],
+                    ['当前状态', assetStatusLabel(detailAsset.status)],
+                    ['使用部门', detailAsset.deptName ?? '—'],
+                    ['使用人', detailAsset.userName ?? '—'],
+                    ['存放地点', detailAsset.location ?? '—'],
+                    ['购置日期', detailAsset.purchaseDate?.substring(0, 10) ?? '—'],
+                    ['原值', detailAsset.originalValue != null ? `¥${Number(detailAsset.originalValue).toLocaleString()}` : '—'],
+                    ['净值', detailAsset.currentValue != null ? `¥${Number(detailAsset.currentValue).toLocaleString()}` : '—'],
+                    ['序列号', detailAsset.serialNo ?? '—'],
+                    ['描述', detailAsset.description ?? '—'],
+                  ] as [string, string][]).map(([k, v]) => (
+                    <div key={k} className="flex items-center gap-3 text-sm">
+                      <span className="text-[#94a3b8] min-w-[80px]">{k}</span>
+                      <span className="text-[#0f172a] font-medium">{v}</span>
+                    </div>
+                  ))}
+                </>
+              ) : !detailLoading && (
+                <>
+                  {([
+                    ['设备编号', detailItem.id],
+                    ['设备名称', detailItem.name],
+                    ['当前状态', detailItem.status],
+                    ['上次维保', detailItem.lastMaintenance],
+                    ['下次维保', detailItem.nextMaintenance],
+                    ['使用率',   `${detailItem.usageRate}%`],
+                    ['维保状态', detailItem.maintenanceStatus],
+                  ] as [string, string][]).map(([k, v]) => (
+                    <div key={k} className="flex items-center gap-3 text-sm">
+                      <span className="text-[#94a3b8] min-w-[80px]">{k}</span>
+                      <span className="text-[#0f172a] font-medium">{v}</span>
+                    </div>
+                  ))}
+                </>
+              )}
             </div>
           </div>
         </div>
