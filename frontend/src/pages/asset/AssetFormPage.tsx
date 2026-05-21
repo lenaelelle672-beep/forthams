@@ -12,7 +12,8 @@ import { z } from 'zod';
 import { ArrowLeft, Save } from 'lucide-react';
 import { useAssetDetail, useCreateAsset, useUpdateAsset, useCategoryTree } from '@/hooks/asset/useAssets';
 import { AssetStatus } from '@/types/asset';
-import type { CreateAssetRequest } from '@/types/asset';
+import type { CreateAssetRequest, Asset, AssetCategory } from '@/types/asset';
+import type { ApiResponse } from '@/types/common';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -52,8 +53,8 @@ export default function AssetFormPage() {
   const createMutation = useCreateAsset();
   const updateMutation = useUpdateAsset();
 
-  const asset = (assetRes as any)?.data;
-  const categories = (catRes as any)?.data ?? [];
+  const asset = (assetRes as ApiResponse<Asset> | undefined)?.data;
+  const categories = (catRes as ApiResponse<AssetCategory[]> | undefined)?.data ?? [];
 
   const {
     register, handleSubmit, control, reset,
@@ -90,13 +91,13 @@ export default function AssetFormPage() {
   const onSubmit = async (values: FormValues) => {
     try {
       if (isEdit && assetId) {
-        await updateMutation.mutateAsync({ id: assetId, ...values } as any);
+        await updateMutation.mutateAsync({ id: assetId, ...values } as CreateAssetRequest & { id: number });
       } else {
         await createMutation.mutateAsync(values as CreateAssetRequest);
       }
       navigate('/assets');
-    } catch (err: any) {
-      console.error('保存失败', err);
+    } catch (err) {
+      console.error('保存失败', err instanceof Error ? err.message : err);
     }
   };
 
