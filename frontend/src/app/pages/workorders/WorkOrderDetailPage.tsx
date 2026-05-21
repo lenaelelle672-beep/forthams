@@ -81,6 +81,10 @@ function getStatusBadgeClasses(status?: string): string {
       return "bg-blue-50 text-gray-800";
     case "PENDING":
       return "bg-yellow-100 text-yellow-800";
+    case "APPROVING_LEVEL_1":
+      return "bg-orange-100 text-orange-800";
+    case "APPROVING_LEVEL_2":
+      return "bg-orange-100 text-orange-800";
     case "APPROVED":
       return "bg-blue-100 text-blue-800";
     case "EXECUTING":
@@ -565,11 +569,17 @@ export function WorkOrderDetailPage() {
   // -- derived state -------------------------------------------------------
   const canEdit = isEditableStatus(order.status);
   const canSubmit = isSubmittableStatus(order.status);
-  const canApproveReject = order.status === "PENDING";
+  const canApproveReject =
+    order.status === "PENDING" ||
+    order.status === "APPROVING_LEVEL_1" ||
+    order.status === "APPROVING_LEVEL_2";
   const canStart = order.status === "APPROVED";
   const canComplete = order.status === "EXECUTING";
   const canCancel = isCancellableStatus(order.status);
-  const isPending = order.status === "PENDING";
+  const isPending =
+    order.status === "PENDING" ||
+    order.status === "APPROVING_LEVEL_1" ||
+    order.status === "APPROVING_LEVEL_2";
 
   // -- render: detail -------------------------------------------------------
   return (
@@ -657,7 +667,7 @@ export function WorkOrderDetailPage() {
           <div>
             <p className="font-medium">工单正在审批中</p>
             <p className="mt-1">
-              当前状态为待审批（PENDING），您可以通过下方按钮进行审批通过或拒绝操作。
+              当前状态为{getWorkOrderStatusLabel(order.status)}，您可以通过下方按钮进行审批通过或拒绝操作。
             </p>
           </div>
         </div>
@@ -847,7 +857,7 @@ export function WorkOrderDetailPage() {
         </button>
 
         {/* Cancel button */}
-        {canCancel && !isPending && (
+        {canCancel && order.status !== "PENDING" && order.status !== "APPROVING_LEVEL_1" && order.status !== "APPROVING_LEVEL_2" && (
           <button
             onClick={handleCancel}
             disabled={operating}

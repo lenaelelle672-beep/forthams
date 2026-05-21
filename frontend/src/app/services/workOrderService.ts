@@ -39,6 +39,8 @@ import type { PagedResult } from "./assetService";
 export type WorkOrderStatus =
   | "DRAFT"
   | "PENDING"
+  | "APPROVING_LEVEL_1"
+  | "APPROVING_LEVEL_2"
   | "APPROVED"
   | "EXECUTING"
   | "COMPLETED"
@@ -178,7 +180,13 @@ export function isDeletableStatus(status?: string): boolean {
  * @returns true if the work order can be cancelled
  */
 export function isCancellableStatus(status?: string): boolean {
-  return status === "DRAFT" || status === "PENDING" || status === "APPROVED";
+  return (
+    status === "DRAFT" ||
+    status === "PENDING" ||
+    status === "APPROVING_LEVEL_1" ||
+    status === "APPROVING_LEVEL_2" ||
+    status === "APPROVED"
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -195,6 +203,8 @@ export function getWorkOrderStatusLabel(status?: string): string {
   const labels: Record<string, string> = {
     DRAFT: "草稿",
     PENDING: "待审批",
+    APPROVING_LEVEL_1: "一级审批中",
+    APPROVING_LEVEL_2: "二级审批中",
     APPROVED: "待派工",
     EXECUTING: "处理中",
     COMPLETED: "已完成",

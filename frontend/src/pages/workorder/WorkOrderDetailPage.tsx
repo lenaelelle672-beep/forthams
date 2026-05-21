@@ -8,6 +8,8 @@ import { useParams, useNavigate } from 'react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, Check, X } from 'lucide-react';
 import { getWorkOrderDetail, approveWorkOrder, rejectWorkOrder } from '@/api/workorder';
+import type { ApiResponse } from '@/types/common';
+import type { WorkOrderDetailResponse } from '@/types/workorder';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
@@ -31,16 +33,17 @@ export default function WorkOrderDetailPage() {
     staleTime: 1000 * 30,
   });
 
-  const workOrder = (res as any)?.data?.workOrder ?? (res as any)?.data;
-  const approvalRecords = (res as any)?.data?.approvalRecords ?? [];
+  const detail = (res as ApiResponse<WorkOrderDetailResponse> | undefined)?.data;
+  const workOrder = detail?.workOrder ?? detail;
+  const approvalRecords = detail?.approvalRecords ?? [];
 
   const approveMutation = useMutation({
-    mutationFn: (data: any) => approveWorkOrder(orderId, data),
+    mutationFn: (data: { version?: number }) => approveWorkOrder(orderId, data),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['workorders'] }),
   });
 
   const rejectMutation = useMutation({
-    mutationFn: (data: any) => rejectWorkOrder(orderId, data),
+    mutationFn: (data: { version?: number; rejectionReason: string }) => rejectWorkOrder(orderId, data),
     onSuccess: () => { setRejectDialog(false); qc.invalidateQueries({ queryKey: ['workorders'] }); },
   });
 
@@ -112,7 +115,7 @@ export default function WorkOrderDetailPage() {
           <CardHeader><CardTitle>审批记录</CardTitle></CardHeader>
           <CardContent>
             <ApprovalTimeline
-              steps={approvalRecords.map((r: any) => ({
+              steps={approvalRecords.map((r) => ({
                 id:           r.id,
                 label:        r.approvalLevel === 'LEVEL_1' ? '一级审批' : '二级审批',
                 operatorName: r.operatorName,

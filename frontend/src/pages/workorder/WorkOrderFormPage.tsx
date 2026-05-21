@@ -24,9 +24,9 @@ import { createWorkOrder, updateWorkOrder } from '@/api/workorder';
 
 const schema = z.object({
   title: z.string().min(5, '标题至少 5 个字').max(100),
-  type: z.enum(['maintenance', 'upkeep', 'inspection', 'installation']),
+  type: z.enum(['PURCHASE', 'REPAIR', 'TRANSFER', 'DISPOSAL', 'OTHER']),
   assetKeyword: z.string().optional(),
-  priority: z.enum(['urgent', 'high', 'medium', 'low']),
+  priority: z.enum(['LOW', 'MEDIUM', 'HIGH', 'CRITICAL']),
   description: z.string().max(1000).optional(),
   estimatedCost: z.coerce.number().min(0).optional(),
   dueDate: z.string().optional(),
@@ -36,17 +36,18 @@ const schema = z.object({
 type FormValues = z.infer<typeof schema>;
 
 const TYPE_OPTIONS = [
-  { value: 'maintenance', label: '维修' },
-  { value: 'upkeep', label: '保养' },
-  { value: 'inspection', label: '巡检' },
-  { value: 'installation', label: '安装' },
+  { value: 'PURCHASE', label: '采购' },
+  { value: 'REPAIR', label: '维修' },
+  { value: 'TRANSFER', label: '调拨' },
+  { value: 'DISPOSAL', label: '处置' },
+  { value: 'OTHER', label: '其他' },
 ] as const;
 
 const PRIORITY_OPTIONS = [
-  { value: 'urgent' as const, label: '紧急', color: 'text-[#ba1a1a]', bg: 'bg-[#ffdad6]', ring: 'ring-[#ba1a1a]' },
-  { value: 'high' as const, label: '高', color: 'text-[#004ac6]', bg: '', ring: 'ring-[#004ac6]' },
-  { value: 'medium' as const, label: '中', color: 'text-[#004ac6]', bg: '', ring: 'ring-[#004ac6]' },
-  { value: 'low' as const, label: '低', color: 'text-[#004ac6]', bg: '', ring: 'ring-[#004ac6]' },
+  { value: 'CRITICAL' as const, label: '紧急', color: 'text-[#ba1a1a]', bg: 'bg-[#ffdad6]', ring: 'ring-[#ba1a1a]' },
+  { value: 'HIGH' as const, label: '高', color: 'text-[#004ac6]', bg: '', ring: 'ring-[#004ac6]' },
+  { value: 'MEDIUM' as const, label: '中', color: 'text-[#004ac6]', bg: '', ring: 'ring-[#004ac6]' },
+  { value: 'LOW' as const, label: '低', color: 'text-[#004ac6]', bg: '', ring: 'ring-[#004ac6]' },
 ];
 
 const ASSIGNEE_OPTIONS = [
@@ -63,7 +64,7 @@ export default function WorkOrderFormPage() {
   const location = useLocation();
   const params = useParams<{ id: string }>();
   const qc = useQueryClient();
-  const prefill = (location.state as any) ?? {};
+  const prefill = (location.state as Record<string, unknown> | null) ?? {};
   const [collabInput, setCollabInput] = useState('');
   const [collaboratorsList, setCollaboratorsList] = useState(collaborators);
   const editId = params.id ? Number(params.id) : null;
@@ -78,8 +79,8 @@ export default function WorkOrderFormPage() {
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
-      type: 'maintenance',
-      priority: 'urgent',
+      type: 'REPAIR',
+      priority: 'MEDIUM',
       title: prefill.title ?? '',
     },
   });
@@ -91,14 +92,13 @@ export default function WorkOrderFormPage() {
       }
       return createWorkOrder(data);
     },
-    onSuccess: (res: any) => {
+    onSuccess: (res: unknown) => {
       qc.invalidateQueries({ queryKey: ['workorders'] });
       toast.success(isEdit ? '工单更新成功' : '工单创建成功');
       navigate('/workorders');
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       const message =
-        error?.response?.data?.message ??
         error?.message ??
         '提交失败，请重试';
       toast.error(message);
@@ -192,7 +192,7 @@ export default function WorkOrderFormPage() {
                           />
                           <span
                             className={`text-sm font-medium px-2 py-0.5 rounded ${
-                              selectedPriority === p.value && p.value === 'urgent'
+                              selectedPriority === p.value && p.value === 'CRITICAL'
                                 ? 'text-[#ba1a1a] bg-[#ffdad6] font-bold'
                                 : selectedPriority === p.value
                                 ? 'text-[#191c1e] font-bold'
@@ -346,7 +346,7 @@ export default function WorkOrderFormPage() {
 
           {saveMutation.isError && (
             <div className="mt-6 p-3 rounded bg-[#ffdad6] border border-[#ba1a1a]/20 text-[#ba1a1a] text-sm">
-              {(saveMutation.error as any)?.response?.data?.message ?? '提交失败，请重试'}
+              {(saveMutation.error instanceof Error ? saveMutation.error.message : '提交失败，请重试')}
             </div>
           )}
         </form>
