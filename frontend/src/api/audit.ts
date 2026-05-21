@@ -64,7 +64,10 @@ export const getAuditStats = (params?: Pick<AuditListQuery, 'startTime' | 'endTi
   http.get<ApiResponse<AuditStats>>('/v1/audit/stats', { params });
 
 /** 获取资产的审计日志 */
-export const getAssetAuditLogs = (assetId: number, params?: Pick<AuditListQuery, 'page' | 'pageSize'>) =>
+export const getAssetAuditLogs = (
+  assetId: number,
+  params?: Pick<AuditListQuery, 'page' | 'pageSize' | 'operationType' | 'startTime' | 'endTime'>,
+) =>
   http.get<PaginatedResponse<AuditLog>>(`/audit-logs`, {
     params: { ...params, resourceType: 'ASSET', resourceId: String(assetId) },
   });
