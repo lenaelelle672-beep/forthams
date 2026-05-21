@@ -15,7 +15,8 @@ import {
   BarChart3,
 } from 'lucide-react';
 import { getInventoryTasks, createInventoryTask } from '@/api/inventory';
-import type { InventoryTaskStatus, CreateTaskPayload } from '@/types/inventory';
+import type { InventoryTaskStatus, CreateTaskPayload, InventoryTask } from '@/types/inventory';
+import type { PaginatedResponse } from '@/types/common';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
@@ -43,19 +44,11 @@ const QUICK_FILTERS = [
   { key: 'submitted', label: '已提交' },
 ];
 
-const MOCK_SUMMARY = [
-  { label: '进行中任务', value: 3, color: 'text-[#2563eb]', bg: 'bg-blue-50', icon: RefreshCw },
-  { label: '已完成', value: 12, color: 'text-[#16a34a]', bg: 'bg-green-50', icon: CheckCircle2 },
-  { label: '待开始', value: 2, color: 'text-[#727784]', bg: 'bg-slate-50', icon: Clock },
+const SUMMARY_CARDS = [
+  { label: '进行中任务', statusKey: 'in_progress' as const, color: 'text-[#2563eb]', bg: 'bg-blue-50', icon: RefreshCw },
+  { label: '已完成', statusKey: 'completed' as const, color: 'text-[#16a34a]', bg: 'bg-green-50', icon: CheckCircle2 },
+  { label: '待开始', statusKey: 'draft' as const, color: 'text-[#727784]', bg: 'bg-slate-50', icon: Clock },
 ] as const;
-
-const MOCK_CHART_DATA = [
-  { label: '周一', counted: 60, deficit: 30 },
-  { label: '周二', counted: 75, deficit: 20 },
-  { label: '周三', counted: 40, deficit: 50 },
-  { label: '周四', counted: 30, deficit: 60, highlight: true },
-  { label: '周五', counted: 80, deficit: 15 },
-];
 
 function ProgressBar({ value }: { value: number }) {
   const pct = Math.min(Math.max(value, 0), 100);
@@ -76,7 +69,7 @@ export default function InventoryTasksPage() {
   const navigate = useNavigate();
   const qc = useQueryClient();
 
-  const [params, setParams] = useState({ page: 1, pageSize: 20 } as any);
+  const [params, setParams] = useState<{ page: number; pageSize: number }>({ page: 1, pageSize: 20 });
   const [createOpen, setCreateOpen] = useState(false);
   const [newTask, setNewTask] = useState<Partial<CreateTaskPayload>>({
     taskName: '', scopeType: 'all', scopeIds: [],
@@ -98,8 +91,20 @@ export default function InventoryTasksPage() {
     },
   });
 
-  const records = (res as any)?.data?.records ?? [];
-  const total = (res as any)?.data?.total ?? 0;
+  const records = (res as PaginatedResponse<InventoryTask> | undefined)?.data?.records ?? [];
+  const total = (res as PaginatedResponse<InventoryTask> | undefined)?.data?.total ?? 0;
+
+  const statusCounts = records.reduce<Record<string, number>>((acc, r) => {
+    acc[r.status] = (acc[r.status] || 0) + 1;
+    return acc;
+  }, {});
+
+  const chartData = records.slice(0, 5).map((r, i) => ({
+    label: String(r.taskName ?? `任务${i + 1}`).substring(0, 4),
+    counted: Number(r.progress ?? 0),
+    deficit: 100 - Number(r.progress ?? 0),
+    highlight: i === 3,
+  }));
 
   const columns: Column<any>[] = [
     {
@@ -225,14 +230,16 @@ export default function InventoryTasksPage() {
       />
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {MOCK_SUMMARY.map(({ label, value, color, bg, icon: Icon }) => (
+        {SUMMARY_CARDS.map(({ label, statusKey, color, bg, icon: Icon }) => (
           <div
             key={label}
             className="bg-white p-6 rounded-xl border border-[#e2e8f0] flex items-center justify-between group hover:border-[#2563eb] transition-all cursor-default"
           >
             <div>
               <p className="text-[#64748b] text-sm font-medium mb-1">{label}</p>
-              <h3 className={`text-4xl font-bold ${color}`}>{value}</h3>
+              <h3 className={`text-4xl font-bold ${color}`}>
+                {isLoading ? '—' : (statusCounts[statusKey] ?? 0)}
+              </h3>
             </div>
             <div className={`w-12 h-12 rounded-full ${bg} flex items-center justify-center ${color} group-hover:scale-110 transition-transform`}>
               <Icon className="w-5 h-5" />
@@ -263,7 +270,7 @@ export default function InventoryTasksPage() {
             page: params.page,
             pageSize: params.pageSize,
             total,
-            onChange: (page, pageSize) => setParams((p: any) => ({ ...p, page, pageSize })),
+            onChange: (page, pageSize) => setParams((p) => ({ ...p, page, pageSize })),
           }}
           emptyText="暂无盘点任务，点击「新建盘点」开始"
         />
@@ -279,18 +286,24 @@ export default function InventoryTasksPage() {
             </div>
           </div>
           <div className="h-48 flex items-end justify-between gap-4 px-2">
-            {MOCK_CHART_DATA.map(({ label, counted, deficit, highlight }) => (
-              <div key={label} className="flex flex-col items-center gap-2 flex-1">
-                <div className="w-full flex flex-col justify-end gap-1 h-32">
-                  <div
-                    className={`w-full rounded-t ${highlight ? 'bg-[#dc2626]/30' : 'bg-[#2563eb]/20'}`}
-                    style={{ height: `${deficit}%` }}
-                  />
-                  <div className="w-full bg-[#2563eb] rounded-b" style={{ height: `${counted}%` }} />
+            {isLoading ? (
+              <div className="flex-1 text-center text-[#64748b] text-sm py-12">加载中...</div>
+            ) : chartData.length === 0 ? (
+              <div className="flex-1 text-center text-[#64748b] text-sm py-12">暂无数据</div>
+            ) : (
+              chartData.map(({ label, counted, deficit, highlight }) => (
+                <div key={label} className="flex flex-col items-center gap-2 flex-1">
+                  <div className="w-full flex flex-col justify-end gap-1 h-32">
+                    <div
+                      className={`w-full rounded-t ${highlight ? 'bg-[#dc2626]/30' : 'bg-[#2563eb]/20'}`}
+                      style={{ height: `${deficit}%` }}
+                    />
+                    <div className="w-full bg-[#2563eb] rounded-b" style={{ height: `${counted}%` }} />
+                  </div>
+                  <span className="text-[10px] font-bold text-[#64748b]">{label}</span>
                 </div>
-                <span className="text-[10px] font-bold text-[#64748b]">{label}</span>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
 
@@ -298,8 +311,9 @@ export default function InventoryTasksPage() {
           <div className="relative z-10">
             <h4 className="text-lg font-bold mb-2">资产管理助手</h4>
             <p className="text-white/80 text-sm leading-relaxed">
-              您的资产盘点准确率较上月提升了 <span className="text-white font-bold">12.5%</span>。
-              保持关注待处理的 2 个任务，以确保 Q2 数据合规。
+              您当前有 <span className="text-white font-bold">{statusCounts['in_progress'] ?? 0}</span> 个进行中任务，
+              <span className="text-white font-bold">{statusCounts['draft'] ?? 0}</span> 个待开始任务待处理。
+              保持关注盘点进度，以确保数据合规。
             </p>
           </div>
           <div className="relative z-10 mt-4">
@@ -333,7 +347,7 @@ export default function InventoryTasksPage() {
             <Select
               label="盘点范围"
               value={newTask.scopeType}
-              onValueChange={(v) => setNewTask((t) => ({ ...t, scopeType: v as any }))}
+              onValueChange={(v) => setNewTask((t) => ({ ...t, scopeType: v as 'all' | 'location' | 'category' }))}
             >
               <SelectItem value="all">全部资产</SelectItem>
               <SelectItem value="location">按存放位置</SelectItem>

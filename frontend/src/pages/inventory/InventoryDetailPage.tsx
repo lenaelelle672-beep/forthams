@@ -26,7 +26,8 @@ import {
   submitTask,
   getTaskSummary,
 } from '@/api/inventory';
-import type { ActualStatus } from '@/types/inventory';
+import type { ActualStatus, InventoryTask, InventoryAsset, InventorySummary } from '@/types/inventory';
+import type { ApiResponse, PaginatedResponse } from '@/types/common';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
@@ -56,7 +57,7 @@ function StatusSelect({
   return (
     <Select
       value={value ?? ''}
-      onValueChange={onChange as any}
+      onValueChange={onChange as (v: string) => void}
       disabled={disabled}
       placeholder="选择实盘状态"
     >
@@ -123,10 +124,10 @@ export default function InventoryDetailPage() {
     },
   });
 
-  const task = (taskRes as any)?.data;
-  const records = (assetsRes as any)?.data?.records ?? [];
-  const total = (assetsRes as any)?.data?.total ?? 0;
-  const summary = (summaryRes as any)?.data;
+  const task = (taskRes as ApiResponse<InventoryTask> | undefined)?.data;
+  const records = (assetsRes as PaginatedResponse<InventoryAsset> | undefined)?.data?.records ?? [];
+  const total = (assetsRes as PaginatedResponse<InventoryAsset> | undefined)?.data?.total ?? 0;
+  const summary = (summaryRes as ApiResponse<InventorySummary> | undefined)?.data;
 
   const canSubmit = task?.status === 'completed' || task?.progress >= 100;
   const progressPct = task?.progress ?? 0;

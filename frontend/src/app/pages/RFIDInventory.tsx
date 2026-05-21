@@ -31,7 +31,7 @@ export function RFIDInventory() {
       setLoading(true);
       setError(null);
       const tasks = await inventoryService.listTasks();
-      const taskList = Array.isArray(tasks) ? tasks : (tasks as any)?.records || [];
+      const taskList = Array.isArray(tasks) ? tasks : (tasks as { records?: unknown[] })?.records || [];
       setInventoryTasks(taskList);
       const firstTask = taskList[0];
       if (firstTask?.id) {
@@ -132,6 +132,9 @@ export function RFIDInventory() {
 
   const runningTasks = inventoryTasks.filter((task) => getTaskStatusLabel(task.status) === '进行中').length;
   const completedTasks = inventoryTasks.filter((task) => getTaskStatusLabel(task.status) === '已完成').length;
+  const avgProgress = inventoryTasks.length > 0
+    ? (inventoryTasks.reduce((sum, t) => sum + (t.progress || t.scanned || 0), 0) / inventoryTasks.length).toFixed(1)
+    : '0.0';
 
   return (
     <div className="space-y-6">
@@ -201,7 +204,7 @@ export function RFIDInventory() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-500">平均盘点率</p>
-              <p className="text-3xl font-semibold text-gray-900 mt-2">99.8%</p>
+              <p className="text-3xl font-semibold text-gray-900 mt-2">{avgProgress}%</p>
             </div>
             <div className="w-12 h-12 bg-purple-50 rounded-lg flex items-center justify-center">
               <BarChart className="w-6 h-6 text-purple-600" />
