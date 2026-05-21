@@ -5,8 +5,10 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useMutation } from '@tanstack/react-query';
 import { Eye, EyeOff, Shield, User, Lock, ShieldCheck, Package, Building2, Wrench } from 'lucide-react';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
+import { login } from '@/api/auth';
 
 const loginSchema = z.object({
   username: z.string().min(1, '请输入用户名'),
@@ -164,26 +166,25 @@ export default function LoginPage() {
   });
 
   const loginMutation = useMutation({
-    mutationFn: async (data: LoginForm) => {
-      // TODO: replace with real API call
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
-      if (!res.ok) throw new Error('用户名或密码错误');
-      return res.json();
-    },
-    onSuccess: (data) => {
-      const token = data?.data?.token ?? data?.token;
-      const userInfo = data?.data?.userInfo ?? data?.userInfo;
-      if (!token) throw new Error('登录响应缺少 token');
+    mutationFn: (data: LoginForm) => login(data),
+    onSuccess: (res) => {
+      const { token, userInfo } = res.data;
+      if (!token) {
+        toast.error('登录响应缺少 token');
+        return;
+      }
       localStorage.setItem('auth_token', token);
       localStorage.setItem('user_info', JSON.stringify(userInfo));
       navigate('/dashboard', { replace: true });
     },
     onError: (err: any) => {
-      setErrorMsg(err?.message || '登录失败，请重试');
+      const status = err?.response?.status;
+      const msg =
+        status === 401
+          ? '用户名或密码错误'
+          : err?.response?.data?.message || err?.message || '网络错误，请检查网络后重试';
+      toast.error(msg);
+      setErrorMsg(msg);
     },
   });
 
