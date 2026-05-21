@@ -72,21 +72,41 @@ export default function AuditDetailPage() {
     );
   }
 
-  // TODO: Replace placeholder data with extended API response
-  const timeline: TimelineEntry[] = [
-    { time: '14:30:00', description: '系统：正在完成记录更新。' },
-    {
-      time: log.createdAt?.substring(11, 19) || '14:22:15',
-      description: `${log.operatorName} 变更了状态。`,
-      isCurrent: true,
-    },
-    { time: '14:15:00', description: '审批已通过。' },
-    { time: '11:00:00', description: '系统：正在启动工作流。' },
-    {
-      time: '09:45:00',
-      description: `${log.operatorName}：已提交审核。`,
-    },
-  ];
+  const buildTimelineFromLog = (log: AuditLog): TimelineEntry[] => {
+    const timeStr = log.createdAt?.substring(11, 19) || '—';
+
+    // If backend returns a timeline array, use it directly
+    if ((log as any).timeline && Array.isArray((log as any).timeline)) {
+      return (log as any).timeline;
+    }
+
+    const changes = log.changes || [];
+    const entries: TimelineEntry[] = [];
+
+    // Build an entry for each field change
+    changes.forEach((change, index) => {
+      const fieldDisplay = change.fieldLabel || change.field;
+      const isLast = index === changes.length - 1;
+      entries.push({
+        time: timeStr,
+        description: `${log.operatorName} 将 ${fieldDisplay} 从 "${change.oldValue || '—'}" 变更为 "${change.newValue || '—'}"`,
+        isCurrent: isLast,
+      });
+    });
+
+    // If no changes, create a single entry from the operation itself
+    if (entries.length === 0) {
+      entries.push({
+        time: timeStr,
+        description: `${log.operatorName} 执行了 ${log.operationType} 操作${log.description ? `：${log.description}` : ''}`,
+        isCurrent: true,
+      });
+    }
+
+    return entries;
+  };
+
+  const timeline: TimelineEntry[] = buildTimelineFromLog(log);
 
   const context: OperationContext = {
     method: 'POST',
