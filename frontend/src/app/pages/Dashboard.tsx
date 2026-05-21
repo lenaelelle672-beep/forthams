@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import {
   AlertCircle,
   CheckCircle,
   Clock,
+  Download,
   Package,
 } from "lucide-react";
 import {
@@ -27,6 +28,7 @@ import {
   type DeptDistribution,
 } from "../services/dashboardService";
 import { approvalService, type ApprovalRecord } from '../services/approvalService';
+import { toast } from 'sonner';
 
 const CHINESE_FONT_FAMILY =
   '"PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", "Source Han Sans SC", "Heiti SC", "Arial Unicode MS", sans-serif';
@@ -268,7 +270,7 @@ export function Dashboard() {
         setStats(statsResponse);
         setValueTrends(trendsResponse);
         setDeptDistribution(distributionResponse);
-        setPendingApprovals((Array.isArray(approvalsResponse) ? approvalsResponse : (approvalsResponse as any)?.records) || []);
+        setPendingApprovals((Array.isArray(approvalsResponse) ? approvalsResponse : (approvalsResponse as { records?: unknown[] })?.records) || []);
         setApprovalError(approvalLoadError);
       } catch (loadError) {
         if (!mounted) {
@@ -367,12 +369,63 @@ export function Dashboard() {
     }
   };
 
+  const [exporting, setExporting] = useState(false);
+
+  const handleExport = useCallback(async () => {
+    setExporting(true);
+    try {
+      const exportStats = await dashboardService.getStats();
+      const rows = [
+        ["指标", "数值"],
+        ["资产总数", String(exportStats.totalAssets ?? "")],
+        ["在用资产", String(exportStats.inUseAssets ?? "")],
+        ["闲置资产", String(exportStats.idleAssets ?? "")],
+        ["维保中资产", String(exportStats.maintenanceAssets ?? "")],
+        ["报废资产", String(exportStats.scrapAssets ?? "")],
+        ["资产总值", String(exportStats.totalValue ?? "")],
+        ["资产净值", String(exportStats.netValue ?? "")],
+        ["待审批数", String(exportStats.pendingApprovals ?? "")],
+      ];
+      const csvContent = rows.map((r) => r.join(",")).join("\n");
+      const bom = "\uFEFF";
+      const blob = new Blob([bom + csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `dashboard-stats-${new Date().toISOString().slice(0, 10)}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      toast.success("导出成功");
+    } catch {
+      toast.error("导出失败，请稍后重试");
+    } finally {
+      setExporting(false);
+    }
+  }, []);
+
   return (
     <div className="space-y-6">
       {/* 页面标题 */}
-      <div>
-        <h2 className="text-2xl font-semibold text-gray-900">仪表板</h2>
-        <p className="text-gray-500 mt-1">欢迎回来，这是您的资产管理概览</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-semibold text-gray-900">仪表板</h2>
+          <p className="text-gray-500 mt-1">欢迎回来，这是您的资产管理概览</p>
+        </div>
+        <button
+          type="button"
+          onClick={handleExport}
+          disabled={exporting || loading}
+          className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium
+            rounded-lg border border-gray-200 bg-white text-gray-700
+            hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed
+            transition-colors"
+          data-testid="btn-export-stats"
+        >
+          <Download className="w-4 h-4" />
+          {exporting ? "导出中..." : "导出统计"}
+        </button>
       </div>
 
       {loading ? (
