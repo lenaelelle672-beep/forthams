@@ -1,89 +1,49 @@
 /**
  * @file pages/settings/SettingsPage.tsx
- * @description 系统设置页面 — Design System 重构版
+ * @description 系统设置页面 — 全量对接真实 API
  *
  * Tab 导航：用户管理 | 部门管理 | 系统配置 | 安全设置
- * API: GET /api/users, GET /api/departments, POST /api/users, POST /api/departments
+ * API: @/api/base (getUserList, createUser, updateUser, deleteUser, resetPassword,
+ *                getDeptTree, createDept, updateDept, deleteDept)
+ * Pattern: useQuery + useMutation + invalidateQueries
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router';
 import {
   Users, Building2, Settings2, Shield,
-  Plus, Pencil, Trash2, RefreshCw, Check,
+  Plus, Pencil, Trash2, RefreshCw, Check, KeyRound,
 } from 'lucide-react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
+import {
+  getUserList,
+  createUser as createUserApi,
+  updateUser as updateUserApi,
+  deleteUser as deleteUserApi,
+  resetPassword as resetPasswordApi,
+  getDeptTree,
+  createDept as createDeptApi,
+  updateDept as updateDeptApi,
+  deleteDept as deleteDeptApi,
+  type UserItem,
+} from '@/api/base';
+import type { Department } from '@/types/common';
 
 // ─── 类型定义 ───────────────────────────────────────────────────────────────
 
-interface User {
-  id: number;
-  username: string;
-  name: string;
-  role: string;
-  department: string;
-  status: 'active' | 'disabled';
-}
-
-interface Department {
-  id: number;
-  name: string;
-  code: string;
-  parentName?: string;
-}
-
 type TabKey = 'users' | 'departments' | 'system' | 'security';
 
-// ─── Mock 数据（API 失败时兜底）─────────────────────────────────────────────
+// ─── Query Keys ─────────────────────────────────────────────────────────────
 
-const MOCK_USERS: User[] = [
-  { id: 1, username: 'admin', name: '系统管理员', role: '超级管理员', department: '信息中心', status: 'active' },
-  { id: 2, username: 'zhangsan', name: '张三', role: '资产管理员', department: '财务部', status: 'active' },
-  { id: 3, username: 'lisi', name: '李四', role: '普通员工', department: '研发部', status: 'disabled' },
-];
-
-const MOCK_DEPTS: Department[] = [
-  { id: 1, name: '信息中心', code: 'IT', parentName: '总部' },
-  { id: 2, name: '财务部', code: 'FIN', parentName: '总部' },
-  { id: 3, name: '研发部', code: 'RD', parentName: '总部' },
-];
-
-// ─── API 函数 ────────────────────────────────────────────────────────────────
-
-async function fetchUsers(): Promise<User[]> {
-  const res = await fetch('/api/users');
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  const data = await res.json();
-  return Array.isArray(data) ? data : (data.data?.records ?? data.records ?? []);
-}
-
-async function fetchDepartments(): Promise<Department[]> {
-  const res = await fetch('/api/departments');
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  const data = await res.json();
-  return Array.isArray(data) ? data : (data.data?.records ?? data.records ?? []);
-}
-
-async function createUser(body: { username: string; name: string; role: string; department: string }): Promise<void> {
-  const res = await fetch('/api/users', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  });
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-}
-
-async function createDepartment(body: { name: string; code: string; parentName?: string }): Promise<void> {
-  const res = await fetch('/api/departments', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  });
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-}
+const QUERY_KEYS = {
+  users: ['settings', 'users'] as const,
+  depts: ['settings', 'depts'] as const,
+};
 
 // ─── Tab 配置 ────────────────────────────────────────────────────────────────
 
@@ -97,59 +57,160 @@ const TABS: { key: TabKey; label: string; icon: React.ReactNode }[] = [
 // ─── 用户管理 Tab ────────────────────────────────────────────────────────────
 
 function UsersTab() {
-  const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
+  const qc = useQueryClient();
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ username: '', name: '', role: '普通员工', department: '' });
-  const [submitting, setSubmitting] = useState(false);
+  const [editingUser, setEditingUser] = useState<UserItem | null>(null);
+  const [form, setForm] = useState({
+    username: '',
+    realName: '',
+    phone: '',
+    email: '',
+    deptName: '',
+    password: '',
+  });
 
-  const loadUsers = useCallback(async () => {
-    setLoading(true);
-    try {
-      const data = await fetchUsers();
-      setUsers(data.length ? data : MOCK_USERS);
-    } catch {
-      setUsers(MOCK_USERS);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  // ── Query: fetch user list ──────────────────────────────────────────────
+  const { data: usersData, isLoading } = useQuery({
+    queryKey: QUERY_KEYS.users,
+    queryFn: async () => {
+      const res = await getUserList({ page: 1, pageSize: 100 });
+      return res.data?.records ?? [];
+    },
+  });
 
-  useEffect(() => { loadUsers(); }, [loadUsers]);
+  const users = usersData ?? [];
 
-  const handleAddUser = async (e: React.FormEvent) => {
+  // ── Mutation: create user ───────────────────────────────────────────────
+  const createMut = useMutation({
+    mutationFn: (data: Parameters<typeof createUserApi>[0]) => createUserApi(data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: QUERY_KEYS.users });
+      toast.success('用户创建成功');
+      closeForm();
+    },
+    onError: (err: any) => {
+      toast.error(err?.response?.data?.message ?? '创建失败');
+    },
+  });
+
+  // ── Mutation: update user ───────────────────────────────────────────────
+  const updateMut = useMutation({
+    mutationFn: ({ id, data }: { id: number; data: Parameters<typeof updateUserApi>[1] }) =>
+      updateUserApi(id, data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: QUERY_KEYS.users });
+      toast.success('用户更新成功');
+      closeForm();
+    },
+    onError: (err: any) => {
+      toast.error(err?.response?.data?.message ?? '更新失败');
+    },
+  });
+
+  // ── Mutation: delete user ───────────────────────────────────────────────
+  const deleteMut = useMutation({
+    mutationFn: (id: number) => deleteUserApi(id),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: QUERY_KEYS.users });
+      toast.success('用户已删除');
+    },
+    onError: (err: any) => {
+      toast.error(err?.response?.data?.message ?? '删除失败');
+    },
+  });
+
+  // ── Mutation: reset password ────────────────────────────────────────────
+  const resetPwdMut = useMutation({
+    mutationFn: (id: number) => resetPasswordApi(id),
+    onSuccess: () => {
+      toast.success('密码已重置为默认密码');
+    },
+    onError: (err: any) => {
+      toast.error(err?.response?.data?.message ?? '重置密码失败');
+    },
+  });
+
+  const closeForm = () => {
+    setShowForm(false);
+    setEditingUser(null);
+    setForm({ username: '', realName: '', phone: '', email: '', deptName: '', password: '' });
+  };
+
+  const openCreateForm = () => {
+    setEditingUser(null);
+    setForm({ username: '', realName: '', phone: '', email: '', deptName: '', password: '' });
+    setShowForm(true);
+  };
+
+  const openEditForm = (user: UserItem) => {
+    setEditingUser(user);
+    setForm({
+      username: user.username,
+      realName: user.realName ?? '',
+      phone: user.phone ?? '',
+      email: user.email ?? '',
+      deptName: user.deptName ?? '',
+      password: '',
+    });
+    setShowForm(true);
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.username.trim() || !form.name.trim()) return;
-    setSubmitting(true);
-    try {
-      await createUser(form);
-      await loadUsers();
-    } catch {
-      const newId = Math.max(0, ...users.map(u => u.id)) + 1;
-      setUsers(prev => [...prev, { id: newId, ...form, status: 'active' }]);
-    } finally {
-      setSubmitting(false);
-      setShowForm(false);
-      setForm({ username: '', name: '', role: '普通员工', department: '' });
+    if (!form.username.trim()) return;
+    if (editingUser) {
+      updateMut.mutate({
+        id: editingUser.id,
+        data: {
+          username: form.username,
+          realName: form.realName,
+          phone: form.phone,
+          email: form.email,
+          deptName: form.deptName,
+        },
+      });
+    } else {
+      if (!form.username.trim() || !form.password.trim()) {
+        toast.error('用户名和密码为必填项');
+        return;
+      }
+      createMut.mutate({
+        username: form.username,
+        realName: form.realName,
+        phone: form.phone,
+        email: form.email,
+        deptName: form.deptName,
+        password: form.password,
+      });
     }
   };
 
-  const STATUS_BADGE: Record<User['status'], string> = {
-    active:   'bg-green-100 text-green-700',
-    disabled: 'bg-[#f1f5f9] text-[#94a3b8]',
+  const handleDelete = (user: UserItem) => {
+    if (!window.confirm(`确定要删除用户「${user.realName || user.username}」吗？`)) return;
+    deleteMut.mutate(user.id);
+  };
+
+  const handleResetPwd = (user: UserItem) => {
+    if (!window.confirm(`确定要重置「${user.realName || user.username}」的密码吗？`)) return;
+    resetPwdMut.mutate(user.id);
+  };
+
+  const STATUS_BADGE: Record<number, string> = {
+    1: 'bg-green-100 text-green-700',
+    0: 'bg-[#f1f5f9] text-[#94a3b8]',
   };
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>用户管理</CardTitle>
-        <Button variant="primary" size="sm" onClick={() => setShowForm(true)}>
+        <Button variant="primary" size="sm" onClick={openCreateForm}>
           <Plus className="w-4 h-4" />
           新增用户
         </Button>
       </CardHeader>
       <CardContent className="p-0">
-        {loading ? (
+        {isLoading ? (
           <div className="flex items-center justify-center py-12 text-[#94a3b8] text-sm">
             <RefreshCw className="w-4 h-4 animate-spin mr-2" /> 加载中...
           </div>
@@ -160,7 +221,6 @@ function UsersTab() {
                 <tr className="border-b border-[#e5e7eb] bg-[#f8fafc]">
                   <th className="px-5 py-3 text-left text-xs font-medium text-[#94a3b8] uppercase">用户名</th>
                   <th className="px-5 py-3 text-left text-xs font-medium text-[#94a3b8] uppercase">姓名</th>
-                  <th className="px-5 py-3 text-left text-xs font-medium text-[#94a3b8] uppercase">角色</th>
                   <th className="px-5 py-3 text-left text-xs font-medium text-[#94a3b8] uppercase">部门</th>
                   <th className="px-5 py-3 text-left text-xs font-medium text-[#94a3b8] uppercase">状态</th>
                   <th className="px-5 py-3 text-left text-xs font-medium text-[#94a3b8] uppercase">操作</th>
@@ -170,59 +230,63 @@ function UsersTab() {
                 {users.map(user => (
                   <tr key={user.id} className="hover:bg-[#f8fafc]">
                     <td className="px-5 py-3.5 font-mono text-xs text-[#374151]">{user.username}</td>
-                    <td className="px-5 py-3.5 font-medium text-[#0f172a]">{user.name}</td>
+                    <td className="px-5 py-3.5 font-medium text-[#0f172a]">{user.realName || '—'}</td>
+                    <td className="px-5 py-3.5 text-[#64748b]">{user.deptName || '—'}</td>
                     <td className="px-5 py-3.5">
-                      <span className="px-2 py-0.5 text-xs bg-blue-50 text-[#3b82f6] rounded">{user.role}</span>
-                    </td>
-                    <td className="px-5 py-3.5 text-[#64748b]">{user.department || '—'}</td>
-                    <td className="px-5 py-3.5">
-                      <span className={`px-2 py-0.5 text-xs rounded-full ${STATUS_BADGE[user.status]}`}>
-                        {user.status === 'active' ? '正常' : '禁用'}
+                      <span className={`px-2 py-0.5 text-xs rounded-full ${STATUS_BADGE[user.status] ?? STATUS_BADGE[0]}`}>
+                        {user.status === 1 ? '正常' : '禁用'}
                       </span>
                     </td>
                     <td className="px-5 py-3.5">
-                      <button className="text-[#3b82f6] hover:text-[#2563eb] text-xs mr-3">
+                      <button onClick={() => openEditForm(user)} className="text-[#3b82f6] hover:text-[#2563eb] text-xs mr-3">
                         <Pencil className="w-3.5 h-3.5 inline mr-1" />编辑
+                      </button>
+                      <button onClick={() => handleResetPwd(user)} className="text-amber-600 hover:text-amber-700 text-xs mr-3">
+                        <KeyRound className="w-3.5 h-3.5 inline mr-1" />重置密码
+                      </button>
+                      <button onClick={() => handleDelete(user)} className="text-red-500 hover:text-red-700 text-xs">
+                        <Trash2 className="w-3.5 h-3.5 inline mr-1" />删除
                       </button>
                     </td>
                   </tr>
                 ))}
+                {users.length === 0 && (
+                  <tr>
+                    <td colSpan={5} className="px-5 py-10 text-center text-[#94a3b8] text-sm">暂无用户数据</td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
         )}
       </CardContent>
 
-      {/* 新增用户内联弹窗 */}
+      {/* 新增/编辑用户弹窗 */}
       {showForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="absolute inset-0 bg-black/50" onClick={() => setShowForm(false)} />
+          <div className="absolute inset-0 bg-black/50" onClick={closeForm} />
           <div className="relative bg-white rounded-[10px] shadow-xl w-full max-w-md mx-4 p-6">
-            <h3 className="text-base font-semibold text-[#0f172a] mb-5">新增用户</h3>
-            <form onSubmit={handleAddUser} className="space-y-4">
+            <h3 className="text-base font-semibold text-[#0f172a] mb-5">
+              {editingUser ? '编辑用户' : '新增用户'}
+            </h3>
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <Input label="用户名 *" placeholder="登录用户名" value={form.username} onChange={e => setForm(p => ({ ...p, username: e.target.value }))} required />
-                <Input label="姓名 *" placeholder="真实姓名" value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} required />
+                <Input label="姓名" placeholder="真实姓名" value={form.realName} onChange={e => setForm(p => ({ ...p, realName: e.target.value }))} />
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-sm font-medium text-[#374151]">角色</label>
-                  <select
-                    value={form.role}
-                    onChange={e => setForm(p => ({ ...p, role: e.target.value }))}
-                    className="h-9 px-3 rounded-lg border border-[#e5e7eb] text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-[#3b82f6]"
-                  >
-                    <option>普通员工</option>
-                    <option>资产管理员</option>
-                    <option>部门管理员</option>
-                    <option>超级管理员</option>
-                  </select>
-                </div>
-                <Input label="部门" placeholder="所属部门" value={form.department} onChange={e => setForm(p => ({ ...p, department: e.target.value }))} />
+                <Input label="手机号" placeholder="手机号" value={form.phone} onChange={e => setForm(p => ({ ...p, phone: e.target.value }))} />
+                <Input label="邮箱" placeholder="邮箱" value={form.email} onChange={e => setForm(p => ({ ...p, email: e.target.value }))} />
               </div>
+              <Input label="部门" placeholder="所属部门" value={form.deptName} onChange={e => setForm(p => ({ ...p, deptName: e.target.value }))} />
+              {!editingUser && (
+                <Input label="初始密码 *" type="password" placeholder="登录密码" value={form.password} onChange={e => setForm(p => ({ ...p, password: e.target.value }))} required />
+              )}
               <div className="flex justify-end gap-3 pt-2">
-                <Button type="button" variant="secondary" onClick={() => setShowForm(false)}>取消</Button>
-                <Button type="submit" variant="primary" loading={submitting}>确认新增</Button>
+                <Button type="button" variant="secondary" onClick={closeForm}>取消</Button>
+                <Button type="submit" variant="primary" loading={createMut.isPending || updateMut.isPending}>
+                  {editingUser ? '确认修改' : '确认新增'}
+                </Button>
               </div>
             </form>
           </div>
@@ -234,60 +298,134 @@ function UsersTab() {
 
 // ─── 部门管理 Tab ────────────────────────────────────────────────────────────
 
-function DepartmentsTab() {
-  const [depts, setDepts] = useState<Department[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ name: '', code: '', parentName: '' });
-  const [submitting, setSubmitting] = useState(false);
-
-  const loadDepts = useCallback(async () => {
-    setLoading(true);
-    try {
-      const data = await fetchDepartments();
-      setDepts(data.length ? data : MOCK_DEPTS);
-    } catch {
-      setDepts(MOCK_DEPTS);
-    } finally {
-      setLoading(false);
+/** 将树形部门展开为平铺列表（用于展示） */
+function flattenDepts(tree: Department[]): Department[] {
+  const result: Department[] = [];
+  const walk = (nodes: Department[]) => {
+    for (const node of nodes) {
+      result.push(node);
+      if (node.children?.length) walk(node.children);
     }
-  }, []);
+  };
+  walk(tree);
+  return result;
+}
 
-  useEffect(() => { loadDepts(); }, [loadDepts]);
+function DepartmentsTab() {
+  const qc = useQueryClient();
+  const [showForm, setShowForm] = useState(false);
+  const [editingDept, setEditingDept] = useState<Department | null>(null);
+  const [form, setForm] = useState({ name: '', deptCode: '', parentId: '' });
 
-  const handleAddDept = async (e: React.FormEvent) => {
+  // ── Query: fetch dept tree ──────────────────────────────────────────────
+  const { data: deptTree, isLoading } = useQuery({
+    queryKey: QUERY_KEYS.depts,
+    queryFn: async () => {
+      const res = await getDeptTree();
+      return res.data ?? [];
+    },
+  });
+
+  const depts = deptTree ? flattenDepts(deptTree) : [];
+
+  // ── Mutation: create dept ───────────────────────────────────────────────
+  const createMut = useMutation({
+    mutationFn: (data: Parameters<typeof createDeptApi>[0]) => createDeptApi(data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: QUERY_KEYS.depts });
+      toast.success('部门创建成功');
+      closeForm();
+    },
+    onError: (err: any) => {
+      toast.error(err?.response?.data?.message ?? '创建失败');
+    },
+  });
+
+  // ── Mutation: update dept ───────────────────────────────────────────────
+  const updateMut = useMutation({
+    mutationFn: ({ id, data }: { id: number; data: Parameters<typeof updateDeptApi>[1] }) =>
+      updateDeptApi(id, data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: QUERY_KEYS.depts });
+      toast.success('部门更新成功');
+      closeForm();
+    },
+    onError: (err: any) => {
+      toast.error(err?.response?.data?.message ?? '更新失败');
+    },
+  });
+
+  // ── Mutation: delete dept ───────────────────────────────────────────────
+  const deleteMut = useMutation({
+    mutationFn: (id: number) => deleteDeptApi(id),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: QUERY_KEYS.depts });
+      toast.success('部门已删除');
+    },
+    onError: (err: any) => {
+      toast.error(err?.response?.data?.message ?? '删除失败');
+    },
+  });
+
+  const closeForm = () => {
+    setShowForm(false);
+    setEditingDept(null);
+    setForm({ name: '', deptCode: '', parentId: '' });
+  };
+
+  const openCreateForm = () => {
+    setEditingDept(null);
+    setForm({ name: '', deptCode: '', parentId: '' });
+    setShowForm(true);
+  };
+
+  const openEditForm = (dept: Department) => {
+    setEditingDept(dept);
+    setForm({
+      name: dept.deptName ?? '',
+      deptCode: '',
+      parentId: dept.parentId != null ? String(dept.parentId) : '',
+    });
+    setShowForm(true);
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.name.trim()) return;
-    setSubmitting(true);
-    try {
-      await createDepartment(form);
-      await loadDepts();
-    } catch {
-      const newId = Math.max(0, ...depts.map(d => d.id)) + 1;
-      setDepts(prev => [...prev, { id: newId, ...form }]);
-    } finally {
-      setSubmitting(false);
-      setShowForm(false);
-      setForm({ name: '', code: '', parentName: '' });
+    if (editingDept) {
+      updateMut.mutate({
+        id: editingDept.id,
+        data: {
+          name: form.name,
+          deptCode: form.deptCode || undefined,
+          parentId: form.parentId ? Number(form.parentId) : undefined,
+        },
+      });
+    } else {
+      createMut.mutate({
+        name: form.name,
+        deptCode: form.deptCode || undefined,
+        parentId: form.parentId ? Number(form.parentId) : undefined,
+      });
     }
   };
 
   const handleDelete = (dept: Department) => {
-    if (!window.confirm(`确定要删除部门「${dept.name}」吗？`)) return;
-    setDepts(prev => prev.filter(d => d.id !== dept.id));
+    if (!window.confirm(`确定要删除部门「${dept.deptName}」吗？`)) return;
+    deleteMut.mutate(dept.id);
   };
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>部门管理</CardTitle>
-        <Button variant="primary" size="sm" onClick={() => setShowForm(true)}>
+        <Button variant="primary" size="sm" onClick={openCreateForm}>
           <Plus className="w-4 h-4" />
           新增部门
         </Button>
       </CardHeader>
       <CardContent>
-        {loading ? (
+        {isLoading ? (
           <div className="flex items-center justify-center py-12 text-[#94a3b8] text-sm">
             <RefreshCw className="w-4 h-4 animate-spin mr-2" /> 加载中...
           </div>
@@ -300,15 +438,15 @@ function DepartmentsTab() {
                     <Building2 className="w-4 h-4 text-[#3b82f6]" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-[#0f172a]">{dept.name}</p>
+                    <p className="text-sm font-medium text-[#0f172a]">{dept.deptName}</p>
                     <p className="text-xs text-[#94a3b8]">
-                      编码：{dept.code || '—'}
-                      {dept.parentName && ` · 上级：${dept.parentName}`}
+                      ID: {dept.id}
+                      {dept.parentId != null && ` · 上级 ID：${dept.parentId}`}
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button className="p-1.5 rounded text-[#64748b] hover:bg-[#f1f5f9] hover:text-[#3b82f6] transition-colors">
+                  <button onClick={() => openEditForm(dept)} className="p-1.5 rounded text-[#64748b] hover:bg-[#f1f5f9] hover:text-[#3b82f6] transition-colors">
                     <Pencil className="w-4 h-4" />
                   </button>
                   <button
@@ -320,25 +458,30 @@ function DepartmentsTab() {
                 </div>
               </div>
             ))}
+            {depts.length === 0 && (
+              <div className="py-10 text-center text-[#94a3b8] text-sm">暂无部门数据</div>
+            )}
           </div>
         )}
       </CardContent>
 
-      {/* 新增部门内联弹窗 */}
+      {/* 新增/编辑部门弹窗 */}
       {showForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="absolute inset-0 bg-black/50" onClick={() => setShowForm(false)} />
+          <div className="absolute inset-0 bg-black/50" onClick={closeForm} />
           <div className="relative bg-white rounded-[10px] shadow-xl w-full max-w-md mx-4 p-6">
-            <h3 className="text-base font-semibold text-[#0f172a] mb-5">新增部门</h3>
-            <form onSubmit={handleAddDept} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <Input label="部门名称 *" placeholder="如 研发部" value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} required />
-                <Input label="部门编码" placeholder="如 RD" value={form.code} onChange={e => setForm(p => ({ ...p, code: e.target.value }))} />
-              </div>
-              <Input label="上级部门" placeholder="留空表示顶级部门" value={form.parentName} onChange={e => setForm(p => ({ ...p, parentName: e.target.value }))} />
+            <h3 className="text-base font-semibold text-[#0f172a] mb-5">
+              {editingDept ? '编辑部门' : '新增部门'}
+            </h3>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <Input label="部门名称 *" placeholder="如 研发部" value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} required />
+              <Input label="部门编码" placeholder="如 RD" value={form.deptCode} onChange={e => setForm(p => ({ ...p, deptCode: e.target.value }))} />
+              <Input label="上级部门 ID" placeholder="留空表示顶级部门" value={form.parentId} onChange={e => setForm(p => ({ ...p, parentId: e.target.value }))} />
               <div className="flex justify-end gap-3 pt-2">
-                <Button type="button" variant="secondary" onClick={() => setShowForm(false)}>取消</Button>
-                <Button type="submit" variant="primary" loading={submitting}>确认新增</Button>
+                <Button type="button" variant="secondary" onClick={closeForm}>取消</Button>
+                <Button type="submit" variant="primary" loading={createMut.isPending || updateMut.isPending}>
+                  {editingDept ? '确认修改' : '确认新增'}
+                </Button>
               </div>
             </form>
           </div>
@@ -363,7 +506,9 @@ function SystemConfigTab() {
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
+    // TODO: 系统配置暂无对应后端端点，先在前端保持本地状态
     setSaved(true);
+    toast.success('配置已保存（本地）');
     setTimeout(() => setSaved(false), 2000);
   };
 
@@ -459,7 +604,9 @@ function SecurityTab() {
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
+    // TODO: 安全设置暂无对应后端端点，先在前端保持本地状态
     setSaved(true);
+    toast.success('安全设置已保存（本地）');
     setTimeout(() => setSaved(false), 2000);
   };
 
