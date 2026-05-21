@@ -18,6 +18,22 @@ export const getDeptTree = () =>
 export const getDeptList = () =>
   http.get<ApiResponse<Department[]>>('/depts');
 
+/** 获取部门详情 */
+export const getDeptDetail = (id: number) =>
+  http.get<ApiResponse<Department>>(`/depts/${id}`);
+
+/** 创建部门 */
+export const createDept = (data: { name?: string; deptCode?: string; parentId?: number; sortOrder?: number; leader?: string; phone?: string; status?: string }) =>
+  http.post<ApiResponse<Department>>('/depts', data);
+
+/** 更新部门 */
+export const updateDept = (id: number, data: { name?: string; deptCode?: string; parentId?: number; sortOrder?: number; leader?: string; phone?: string; status?: string }) =>
+  http.put<ApiResponse<Department>>(`/depts/${id}`, data);
+
+/** 删除部门 */
+export const deleteDept = (id: number) =>
+  http.delete<ApiResponse<void>>(`/depts/${id}`);
+
 // ── 位置 ──────────────────────────────────────────────────────────────────────
 
 /** 获取位置树 */
