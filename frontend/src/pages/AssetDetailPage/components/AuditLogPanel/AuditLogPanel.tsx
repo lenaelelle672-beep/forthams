@@ -50,6 +50,9 @@ import {
 import { format, parseISO, isWithinInterval } from 'date-fns';
 import { zhCN } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
+import { getAssetAuditLogs } from '@/api/audit';
+import type { AuditLog as ApiAuditLog, AuditFieldChange } from '@/api/audit';
+import type { PaginatedResponse } from '@/types/common';
 
 // ============== Type Definitions ==============
 
@@ -513,7 +516,7 @@ const AuditEmptyState: React.FC = () => (
  * ```tsx
  * <AuditLogPanel 
  *   assetId="asset-uuid-12345"
- *   onFilterChange={(filters) => console.log(filters)}
+ *   onFilterChange={(filters) => { /* handle filters */ }}
  * />
  * ```
  */
@@ -558,11 +561,11 @@ export const AuditLogPanel: React.FC<AuditLogPanelProps> = ({
     onFilterChange?.(filters);
   }, [filters, onFilterChange]);
 
-  // WebSocket 实时更新订阅（预留接口）
+  // WebSocket 实时更新订阅（预留接口 — 等待后端 WebSocket 就绪）
   useEffect(() => {
     if (!assetId) return;
 
-    // TODO: 集成 WebSocket audit.asset.updated 事件订阅
+    // TODO: 等待后端 WebSocket 就绪 — 集成 audit.asset.updated 事件订阅
     // const unsubscribe = subscribeToAuditUpdates(assetId, (event) => {
     //   handleNewAuditEvent(event);
     // });
@@ -574,7 +577,26 @@ export const AuditLogPanel: React.FC<AuditLogPanelProps> = ({
   // ============== Handlers ==============
 
   /**
-   * 获取审计日志数据
+   * 将 API 审计日志映射为本地 AuditLogEntry
+   */
+  const mapApiLogToEntry = useCallback((apiLog: ApiAuditLog): AuditLogEntry => ({
+    eventId: String(apiLog.id),
+    assetId: apiLog.resourceId ?? '',
+    assetType: apiLog.resourceType ?? '',
+    operation: (apiLog.operationType as OperationType) || 'UPDATE',
+    operator: apiLog.operatorName,
+    timestamp: apiLog.createdAt,
+    changedFields: (apiLog.changes ?? []).map((change: AuditFieldChange) => ({
+      field: change.field,
+      displayName: change.fieldLabel ?? change.field,
+      oldValue: change.oldValue ?? '',
+      newValue: change.newValue ?? '',
+    })),
+    metadata: apiLog.description ? { description: apiLog.description } : undefined,
+  }), []);
+
+  /**
+   * 获取审计日志数据 — 调用真实 API
    */
   const fetchAuditLogs = useCallback(async () => {
     if (!assetId) return;
@@ -583,44 +605,31 @@ export const AuditLogPanel: React.FC<AuditLogPanelProps> = ({
     setError(null);
 
     try {
-      // TODO: 集成 AuditService API
-      // const response = await auditApi.getAuditLogs(assetId, filters);
-      // setLogs(response.data);
-      // setPagination(response.pagination);
+      const numericId = Number(assetId);
+      const response = await getAssetAuditLogs(numericId, {
+        page: pagination.page,
+        pageSize: pagination.pageSize,
+        ...(filters.operationType !== 'ALL' ? { operationType: filters.operationType } : {}),
+        ...(filters.timeRange.startTime ? { startTime: filters.timeRange.startTime.toISOString() } : {}),
+        ...(filters.timeRange.endTime ? { endTime: filters.timeRange.endTime.toISOString() } : {}),
+      });
 
-      // Mock 数据用于开发验证
-      const mockLogs: AuditLogEntry[] = [
-        {
-          eventId: 'evt-001',
-          assetId: assetId,
-          assetType: '固定资产',
-          operation: 'UPDATE',
-          operator: 'user@example.com',
-          timestamp: new Date().toISOString(),
-          changedFields: [
-            { field: 'name', displayName: '资产名称', oldValue: '旧名称', newValue: '新名称' },
-            { field: 'status', displayName: '资产状态', oldValue: '正常', newValue: '维修中' },
-          ],
-        },
-        {
-          eventId: 'evt-002',
-          assetId: assetId,
-          assetType: '固定资产',
-          operation: 'CREATE',
-          operator: 'admin@example.com',
-          timestamp: new Date(Date.now() - 86400000).toISOString(),
-          changedFields: [],
-        },
-      ];
+      const pageData = response.data.data;
+      const mappedLogs = pageData.records.map(mapApiLogToEntry);
 
-      setLogs(mockLogs);
-      setPagination(prev => ({ ...prev, total: mockLogs.length }));
+      setLogs(mappedLogs);
+      setPagination(prev => ({
+        ...prev,
+        total: pageData.total,
+        page: pageData.current,
+        pageSize: pageData.size,
+      }));
     } catch (err) {
       setError(err instanceof Error ? err : new Error('获取审计日志失败'));
     } finally {
       setLoading(false);
     }
-  }, [assetId, filters]);
+  }, [assetId, filters, pagination.page, pagination.pageSize, mapApiLogToEntry]);
 
   /**
    * 处理筛选变更
