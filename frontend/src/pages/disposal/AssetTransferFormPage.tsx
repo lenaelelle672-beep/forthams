@@ -1,15 +1,21 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useNavigate } from 'react-router';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import { ArrowLeft, Plus, Search, Trash2, Info, Package, GitBranch, CheckCircle } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Select, SelectItem } from '@/components/ui/Select';
+import { getAssetList } from '@/api/asset';
+import { submitTransferApplication } from '@/api/disposal';
+import { getDeptTree, getLocationCascade } from '@/api/base';
+import type { AssetListItem } from '@/types/asset';
+import type { Department, Location } from '@/types/common';
 
 const schema = z.object({
   transferType: z.string().min(1, '请选择调拨类型'),
@@ -26,17 +32,12 @@ type FormValues = z.infer<typeof schema>;
 
 interface SelectedAsset {
   id: string;
+  assetNo: string;
   name: string;
   category: string;
   location: string;
   status: string;
-  statusColor: string;
 }
-
-const MOCK_SELECTED_ASSETS: SelectedAsset[] = [
-  { id: 'AST-99042', name: '精密车床 X1', category: '工业加工', location: 'Bay B-12', status: '在用', statusColor: 'bg-blue-50 text-blue-600' },
-  { id: 'AST-008122', name: '服务器集群 B-12', category: 'IT基础设施', location: 'Floor 2', status: '运行中', statusColor: 'bg-blue-50 text-blue-700' },
-];
 
 const STEPS = [
   { num: 1, title: '基本信息', subtitle: '基础信息填写' },
@@ -51,13 +52,72 @@ const PRIORITY_LABELS: Record<string, string> = {
   HIGH: '高',
 };
 
+/** Flatten tree nodes into a flat list for dropdown rendering */
+function flattenTree<T extends { children?: T[]; id: number; [key: string]: unknown }>(
+  nodes: T[],
+  labelKey: string,
+  depth = 0,
+): Array<{ id: number; label: string; depth: number }> {
+  const result: Array<{ id: number; label: string; depth: number }> = [];
+  for (const node of nodes) {
+    const label = (node as Record<string, unknown>)[labelKey] as string;
+    result.push({ id: node.id, label, depth });
+    if (node.children?.length) {
+      result.push(...flattenTree(node.children, labelKey, depth + 1));
+    }
+  }
+  return result;
+}
+
 export default function AssetTransferFormPage() {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const [currentStep, setCurrentStep] = useState(0);
-  const [selectedAssets, setSelectedAssets] = useState<SelectedAsset[]>(MOCK_SELECTED_ASSETS);
+  const [selectedAssets, setSelectedAssets] = useState<SelectedAsset[]>([]);
   const [assetSearch, setAssetSearch] = useState('');
   const [draftSavedAt] = useState(new Date().toLocaleTimeString('zh-CN', { hour12: false }));
+
+  // Fetch available assets from real API
+  const { data: assetListData } = useQuery({
+    queryKey: ['assets', 'list', { pageSize: 200 }],
+    queryFn: () => getAssetList({ pageSize: 200 }),
+  });
+
+  const availableAssets: AssetListItem[] = (assetListData as any)?.records ?? [];
+
+  // Filter assets by search keyword
+  const filteredAssets = useMemo(() => {
+    if (!assetSearch.trim()) return availableAssets;
+    const kw = assetSearch.toLowerCase();
+    return availableAssets.filter(
+      (a) =>
+        a.assetNo?.toLowerCase().includes(kw) ||
+        a.assetName?.toLowerCase().includes(kw) ||
+        a.categoryName?.toLowerCase().includes(kw),
+    );
+  }, [availableAssets, assetSearch]);
+
+  // Fetch department tree
+  const { data: deptData } = useQuery({
+    queryKey: ['depts', 'tree'],
+    queryFn: () => getDeptTree(),
+  });
+  const deptOptions = useMemo(
+    () => flattenTree<Department>((deptData as any)?.data ?? [], 'deptName'),
+    [deptData],
+  );
+
+  // Fetch location cascade
+  const { data: locationData } = useQuery({
+    queryKey: ['locations', 'cascade'],
+    queryFn: () => getLocationCascade(),
+  });
+  const locationOptions = useMemo(
+    () => flattenTree<Location>((locationData as any)?.data ?? [], 'locationName'),
+    [locationData],
+  );
+
+  const selectedAssetIds = useMemo(() => new Set(selectedAssets.map((a) => a.id)), [selectedAssets]);
 
   const {
     register, handleSubmit, control,
@@ -66,8 +126,6 @@ export default function AssetTransferFormPage() {
     resolver: zodResolver(schema),
     defaultValues: {
       transferType: 'INTERNAL',
-      fromDept: 'MANUFACTURING',
-      toDept: 'RD_CENTER',
       workflow: 'STANDARD_V2',
       priority: 'NORMAL',
     },
@@ -75,16 +133,50 @@ export default function AssetTransferFormPage() {
 
   const mutation = useMutation({
     mutationFn: async (data: FormValues) => {
-      return new Promise((resolve) => setTimeout(resolve, 1000));
+      return submitTransferApplication({
+        assetIds: selectedAssets.map((a) => a.id),
+        transferType: data.transferType,
+        fromDept: data.fromDept,
+        toDept: data.toDept,
+        fromLocation: data.fromLocation,
+        toLocation: data.toLocation,
+        workflow: data.workflow,
+        priority: data.priority,
+        notes: data.notes,
+      });
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['transfers'] });
-      setCurrentStep(3);
+      qc.invalidateQueries({ queryKey: ['disposals'] });
+      toast.success('调拨申请提交成功');
+      navigate('/disposals');
+    },
+    onError: (error: any) => {
+      toast.error(error?.response?.data?.message ?? '提交失败，请重试');
     },
   });
 
   const onSubmit = (values: FormValues) => {
+    if (selectedAssets.length === 0) {
+      toast.error('请至少选择一项资产');
+      return;
+    }
     mutation.mutate(values);
+  };
+
+  const addAsset = (asset: AssetListItem) => {
+    if (selectedAssetIds.has(String(asset.id))) return;
+    setSelectedAssets((prev) => [
+      ...prev,
+      {
+        id: String(asset.id),
+        assetNo: asset.assetNo ?? '',
+        name: asset.assetName ?? '',
+        category: asset.categoryName ?? '',
+        location: asset.location ?? '',
+        status: asset.status ?? '',
+      },
+    ]);
   };
 
   const removeAsset = (assetId: string) => {
@@ -167,9 +259,11 @@ export default function AssetTransferFormPage() {
                 control={control}
                 render={({ field }) => (
                   <Select label="调出部门" value={field.value} onValueChange={field.onChange} error={errors.fromDept?.message}>
-                    <SelectItem value="MANUFACTURING">制造部</SelectItem>
-                    <SelectItem value="IT_SERVICES">IT服务部</SelectItem>
-                    <SelectItem value="OPERATIONS">运营部</SelectItem>
+                    {deptOptions.map((d) => (
+                      <SelectItem key={d.id} value={String(d.id)}>
+                        {'　'.repeat(d.depth)}{d.label}
+                      </SelectItem>
+                    ))}
                   </Select>
                 )}
               />
@@ -178,14 +272,42 @@ export default function AssetTransferFormPage() {
                 control={control}
                 render={({ field }) => (
                   <Select label="调入部门" value={field.value} onValueChange={field.onChange} error={errors.toDept?.message}>
-                    <SelectItem value="RD_CENTER">研发中心</SelectItem>
-                    <SelectItem value="MAINTENANCE">维修中心</SelectItem>
-                    <SelectItem value="LOGISTICS">物流部</SelectItem>
+                    {deptOptions.map((d) => (
+                      <SelectItem key={d.id} value={String(d.id)}>
+                        {'　'.repeat(d.depth)}{d.label}
+                      </SelectItem>
+                    ))}
                   </Select>
                 )}
               />
-              <Input label="调出位置" placeholder="例如：仓库A，货架4" error={errors.fromLocation?.message} {...register('fromLocation')} />
-              <Input label="调入位置" placeholder="例如：工厂B，1层" error={errors.toLocation?.message} {...register('toLocation')} />
+              <Controller
+                name="fromLocation"
+                control={control}
+                render={({ field }) => (
+                  <Select label="调出位置" value={field.value ?? ''} onValueChange={field.onChange} error={errors.fromLocation?.message}>
+                    <SelectItem value="">不限</SelectItem>
+                    {locationOptions.map((loc) => (
+                      <SelectItem key={loc.id} value={String(loc.id)}>
+                        {'　'.repeat(loc.depth)}{loc.label}
+                      </SelectItem>
+                    ))}
+                  </Select>
+                )}
+              />
+              <Controller
+                name="toLocation"
+                control={control}
+                render={({ field }) => (
+                  <Select label="调入位置" value={field.value ?? ''} onValueChange={field.onChange} error={errors.toLocation?.message}>
+                    <SelectItem value="">不限</SelectItem>
+                    {locationOptions.map((loc) => (
+                      <SelectItem key={loc.id} value={String(loc.id)}>
+                        {'　'.repeat(loc.depth)}{loc.label}
+                      </SelectItem>
+                    ))}
+                  </Select>
+                )}
+              />
             </div>
           </CardContent>
         </Card>
@@ -207,12 +329,33 @@ export default function AssetTransferFormPage() {
                   onChange={(e) => setAssetSearch(e.target.value)}
                 />
               </div>
-              <Button type="button" size="sm" variant="primary">
-                <Plus className="w-4 h-4" />
-                添加资产
-              </Button>
             </div>
           </CardHeader>
+          {/* Available assets list for selection */}
+          {assetSearch.trim() && filteredAssets.length > 0 && (
+            <div className="mx-6 border border-[#e5e7eb] rounded-lg max-h-48 overflow-y-auto">
+              {filteredAssets
+                .filter((a) => !selectedAssetIds.has(String(a.id)))
+                .slice(0, 20)
+                .map((asset) => (
+                  <div
+                    key={asset.id}
+                    className="flex items-center justify-between px-4 py-2 hover:bg-[#f8fafc] cursor-pointer border-b border-[#e5e7eb] last:border-b-0"
+                    onClick={() => addAsset(asset)}
+                  >
+                    <div className="flex items-center gap-4">
+                      <span className="text-sm text-[#3b82f6] font-medium">{asset.assetNo}</span>
+                      <span className="text-sm text-[#374151]">{asset.assetName}</span>
+                      <span className="text-xs text-[#64748b]">{asset.categoryName}</span>
+                    </div>
+                    <Button type="button" size="sm" variant="ghost">
+                      <Plus className="w-4 h-4" />
+                    </Button>
+                  </div>
+                ))}
+            </div>
+          )}
+          {/* Selected assets table */}
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
@@ -228,12 +371,12 @@ export default function AssetTransferFormPage() {
               <tbody className="divide-y divide-[#e5e7eb]">
                 {selectedAssets.map((asset) => (
                   <tr key={asset.id} className="hover:bg-[#f8fafc] transition-colors">
-                    <td className="px-5 py-3 text-sm text-[#3b82f6] font-medium">{asset.id}</td>
+                    <td className="px-5 py-3 text-sm text-[#3b82f6] font-medium">{asset.assetNo}</td>
                     <td className="px-5 py-3 text-sm text-[#374151]">{asset.name}</td>
                     <td className="px-5 py-3 text-sm text-[#64748b]">{asset.category}</td>
                     <td className="px-5 py-3 text-sm text-[#64748b]">{asset.location}</td>
                     <td className="px-5 py-3 text-sm">
-                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${asset.statusColor}`}>
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-600">
                         {asset.status}
                       </span>
                     </td>
@@ -253,7 +396,7 @@ export default function AssetTransferFormPage() {
                 {selectedAssets.length === 0 && (
                   <tr>
                     <td colSpan={6} className="px-5 py-8 text-center text-sm text-[#94a3b8]">
-                      暂无已选资产，点击"添加资产"搜索并添加。
+                      暂无已选资产，在上方搜索框中搜索并添加。
                     </td>
                   </tr>
                 )}

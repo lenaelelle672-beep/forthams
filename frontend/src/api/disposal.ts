@@ -212,3 +212,37 @@ export const saveClearanceDraft = (data: ClearanceDraftData): boolean => {
     return false;
   }
 };
+
+// ── 调拨申请 ────────────────────────────────────────────────────────────────
+
+export interface TransferApplicationPayload {
+  assetIds: string[];
+  transferType: string;
+  fromDept: string;
+  toDept: string;
+  fromLocation?: string;
+  toLocation?: string;
+  workflow: string;
+  priority: string;
+  notes?: string;
+}
+
+/** 提交调拨申请（通过审批流程 POST /approvals） */
+export const submitTransferApplication = (data: TransferApplicationPayload) =>
+  http.post<ApiResponse<unknown>>('/approvals', {
+    processType: 'ASSET_TRANSFER',
+    businessType: 'ASSET_TRANSFER',
+    businessId: Number(data.assetIds[0]) || 0,
+    title: `资产调拨申请 - ${data.fromDept} → ${data.toDept}`,
+    description: [
+      `调拨类型：${data.transferType}`,
+      `调出部门：${data.fromDept}`,
+      `调入部门：${data.toDept}`,
+      data.fromLocation ? `调出位置：${data.fromLocation}` : null,
+      data.toLocation ? `调入位置：${data.toLocation}` : null,
+      `审批流程：${data.workflow}`,
+      `紧急程度：${data.priority}`,
+      data.notes ? `备注：${data.notes}` : null,
+    ].filter(Boolean).join('；'),
+    businessData: JSON.stringify(data),
+  });
