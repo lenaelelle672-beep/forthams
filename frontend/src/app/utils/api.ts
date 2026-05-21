@@ -4,8 +4,8 @@ import axios, {
   type AxiosResponse,
 } from "axios";
 
-export const TOKEN_STORAGE_KEY = "ams_auth_token";
-export const USER_STORAGE_KEY = "ams_auth_user";
+export const TOKEN_STORAGE_KEY = "auth_token";
+export const USER_STORAGE_KEY = "user_info";
 
 export interface ApiResponse<T> {
   code: number;
