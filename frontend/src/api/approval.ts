@@ -17,6 +17,7 @@ export interface ApprovalItem {
   title: string;
   status: string;
   currentLevel?: number;
+  version: number;
   createdAt: string;
   submittedAt?: string;
 }

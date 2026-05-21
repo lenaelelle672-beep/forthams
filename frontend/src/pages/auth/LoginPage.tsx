@@ -168,13 +168,13 @@ export default function LoginPage() {
   const loginMutation = useMutation({
     mutationFn: (data: LoginForm) => login(data),
     onSuccess: (res) => {
-      const { token, userInfo } = res.data;
+      const { token, userId, username, realName } = res.data;
       if (!token) {
         toast.error('登录响应缺少 token');
         return;
       }
       localStorage.setItem('auth_token', token);
-      localStorage.setItem('user_info', JSON.stringify(userInfo));
+      localStorage.setItem('user_info', JSON.stringify({ userId, username, realName }));
       navigate('/dashboard', { replace: true });
     },
     onError: (err: any) => {

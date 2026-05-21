@@ -209,12 +209,10 @@ export interface LoginRequest {
  * 登录响应数据（ApiResponse<LoginResponse>）。
  */
 export interface LoginResponse {
-  /** JWT Token */
   token: string;
-  /** Token 类型，固定 "Bearer" */
-  tokenType: string;
-  /** 用户信息 */
-  userInfo: CurrentUser;
+  userId: number;
+  username: string;
+  realName: string;
 }
 
 // ---------------------------------------------------------------------------
