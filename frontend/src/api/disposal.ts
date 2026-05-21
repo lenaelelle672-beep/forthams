@@ -40,6 +40,26 @@ export const getDisposalList = (params?: DisposalListQuery) =>
 export const getDisposalDetail = (id: number) =>
   http.get<ApiResponse<Disposal>>(`/disposals/${id}`);
 
+// ── 处置统计 ──────────────────────────────────────────────────────────────────
+
+/** 处置统计聚合数据 */
+export interface DisposalStats {
+  /** 本月处置总量 */
+  totalThisMonth: number;
+  /** 较上月增量 */
+  monthOverMonthDelta: number;
+  /** 待审批数量 */
+  pendingCount: number;
+  /** 已完成数量 */
+  completedCount: number;
+  /** 本月资产回收价值 */
+  recoveredValue: number;
+}
+
+/** 获取处置统计数据 */
+export const getDisposalStats = () =>
+  http.get<ApiResponse<DisposalStats>>('/disposals/stats');
+
 // ── 赔偿管理 ──────────────────────────────────────────────────────────────────
 
 export interface Compensation {
