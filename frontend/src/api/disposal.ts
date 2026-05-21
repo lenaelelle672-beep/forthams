@@ -69,3 +69,55 @@ export const getCompensationList = (params?: CompensationListQuery) =>
 /** 赔偿详情 */
 export const getCompensationDetail = (id: number) =>
   http.get<ApiResponse<Compensation>>(`/compensation/${id}`);
+
+// ── 报废申请 ────────────────────────────────────────────────────────────────
+
+export interface ScrapApplicationPayload {
+  assetIds: string[];
+  scrapDate: string;
+  scrapReason: string;
+  disposalMethod: string;
+  estimatedResidualValue?: string;
+  approvalFlow: string;
+  remark?: string;
+}
+
+/** 提交报废申请（通过审批流程 POST /approvals） */
+export const submitScrapApplication = (data: ScrapApplicationPayload) =>
+  http.post<ApiResponse<unknown>>('/approvals', {
+    processType: 'ASSET_SCRAP',
+    businessType: 'ASSET_SCRAP',
+    businessId: Number(data.assetIds[0]) || 0,
+    title: `资产报废申请 - ${data.scrapDate}`,
+    description: [
+      `报废原因：${data.scrapReason}`,
+      `处置方式：${data.disposalMethod}`,
+      data.estimatedResidualValue ? `预估残值：¥${data.estimatedResidualValue}` : null,
+      data.remark ? `备注：${data.remark}` : null,
+    ].filter(Boolean).join('；'),
+    businessData: JSON.stringify(data),
+  });
+
+export interface ScrapDraftData {
+  scrapDate: string;
+  scrapReason: string;
+  disposalMethod: string;
+  estimatedResidualValue?: string;
+  approvalFlow: string;
+  remark?: string;
+  assetIds: string[];
+}
+
+/** 保存报废申请草稿到 localStorage */
+export const saveScrapDraft = (data: ScrapDraftData): boolean => {
+  try {
+    const timestamp = Date.now();
+    const dataKey = `ams_draft_scrap_${timestamp}`;
+    const indexKey = 'ams_draft_latest_scrap';
+    localStorage.setItem(dataKey, JSON.stringify(data));
+    localStorage.setItem(indexKey, dataKey);
+    return true;
+  } catch {
+    return false;
+  }
+};
