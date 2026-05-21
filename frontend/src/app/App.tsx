@@ -99,6 +99,26 @@ const AuditDetailPage = withSuspense(
   lazy(() => import("./pages/audit/AuditDetailPage").then((module) => ({ default: module.AuditDetailPage }))),
 );
 
+const InventoryTasksPage = withSuspense(
+  lazy(() => import("../pages/inventory/InventoryTasksPage")),
+);
+
+const InventoryDetailPage = withSuspense(
+  lazy(() => import("../pages/inventory/InventoryDetailPage")),
+);
+
+const RFIDScanPage = withSuspense(
+  lazy(() => import("../pages/inventory/RFIDScanPage")),
+);
+
+const SmartReportPage = withSuspense(
+  lazy(() => import("../pages/inventory/SmartReportPage")),
+);
+
+const WorkOrderFormPage = withSuspense(
+  lazy(() => import("../pages/workorder/WorkOrderFormPage")),
+);
+
 // ---------------------------------------------------------------------------
 // Shared utilities
 // ---------------------------------------------------------------------------
@@ -174,6 +194,10 @@ const router = createBrowserRouter([
           { path: "assets/:id/edit", Component: AssetFormPage },
           { path: "equipment", Component: ImportantEquipment },
           { path: "inventory", Component: RFIDInventory },
+          { path: "inventory/tasks", Component: InventoryTasksPage },
+          { path: "inventory/tasks/:taskId", Component: InventoryDetailPage },
+          { path: "inventory/scan/:taskId", Component: RFIDScanPage },
+          { path: "inventory/smart-report/:taskId", Component: SmartReportPage },
           { path: "idle", Component: IdleAssets },
           { path: "disposals", Component: Disposals },
           { path: "disposals/transfer/new", Component: AssetTransferForm },
@@ -198,6 +222,8 @@ const router = createBrowserRouter([
           ...assetImportExportRoutes,
           ...retirementRoutes,
           assetDetailRoute,
+          { path: "workorders/new", Component: WorkOrderFormPage },
+          { path: "workorders/:id/edit", Component: WorkOrderFormPage },
           ...workOrderRoutes,
         ],
       },

@@ -82,11 +82,7 @@ const RetirementDetail = withSuspense(
  * Asset detail page — includes retirement history tab.
  */
 const AssetDetailPage = withSuspense(
-  lazy(() =>
-    import('../pages/assets/AssetDetailPage').then((module) => ({
-      default: module.AssetDetailPage,
-    }))
-  )
+  lazy(() => import('@/pages/asset/AssetDetailPage'))
 );
 
 /**
