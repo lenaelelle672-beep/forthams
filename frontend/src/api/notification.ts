@@ -13,6 +13,7 @@ export interface NotificationListQuery {
   pageSize?: number;
   isRead?: boolean;
   type?: string;
+  category?: string;
 }
 
 /** 获取通知列表 */
