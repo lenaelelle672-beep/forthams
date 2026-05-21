@@ -1,10 +1,17 @@
 /**
  * @file pages/inventory/RFIDScanPage.tsx
- * @description RFID 扫描大屏页 — 新版 Design System 重构
+ * @description RFID 扫描大屏页 — 数据源绑定真实 API，无 MOCK 残留
  * 接受 taskId URL 参数，大屏扫描界面风格
+ *
+ * API 绑定:
+ *   - getTaskAssets(taskId)        → 盘点资产列表
+ *   - confirmAsset(taskId, assetId, data) → 单条确认
+ *   - batchConfirmAssets(taskId, data)    → 批量确认
+ *   - submitTask(taskId)           → 提交盘点
+ *   - getTaskSummary(taskId)       → 盘盈盘亏差异汇总
  */
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams } from 'react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
@@ -19,38 +26,20 @@ import {
   User,
   Hash,
   Clock,
+  CheckCheck,
+  Loader2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { inventoryService } from '@/app/services/inventoryService';
-
-// ── Mock 数据 ─────────────────────────────────────────────────────────────────
-const MOCK_TASK = {
-  id: 'task-001',
-  taskNo: 'INV-2024-Q2-A',
-  taskName: '2024年Q2盘点-A区',
-  location: 'A区生产车间',
-  responsible: '王盘点员',
-  totalAssets: 128,
-  scanned: 87,
-  progress: 68,
-  status: 'IN_PROGRESS',
-  startDate: '2024-05-20',
-  endDate: '2024-05-25',
-};
-
-const MOCK_SCANS = [
-  { id: 's1', assetNo: 'AS-2024-401', name: 'ThinkPad X1 Carbon',   time: '14:32:21', status: 'match' },
-  { id: 's2', assetNo: 'AS-2024-402', name: 'iPhone 14 Pro',         time: '14:32:22', status: 'match' },
-  { id: 's3', assetNo: 'AS-2024-403', name: 'MacBook Pro 16"',       time: '14:32:23', status: 'match' },
-  { id: 's4', assetNo: 'AS-2024-408', name: '资产位置异常',           time: '14:32:24', status: 'mismatch' },
-  { id: 's5', assetNo: 'AS-2024-409', name: 'Epson 投影仪',          time: '14:32:25', status: 'match' },
-];
-
-const MOCK_DISCREPANCIES = [
-  { id: 'd1', assetNo: 'AS-2024-408', name: '惠普打印机', type: '位置异常', detail: '预期：A区，实际：B区' },
-  { id: 'd2', assetNo: 'AS-2024-215', name: 'iPad Air',   type: '漏扫',     detail: '账面存在，未扫描到' },
-];
+import {
+  getTaskAssets,
+  confirmAsset,
+  batchConfirmAssets,
+  submitTask,
+  getTaskSummary,
+} from '@/api/inventory';
+import type { ActualStatus } from '@/types/inventory';
 
 // ── 任务进度条 ────────────────────────────────────────────────────────────────
 function ProgressBar({ value, className }: { value: number; className?: string }) {
@@ -100,29 +89,76 @@ export default function RFIDScanPage() {
     staleTime: 1000 * 30,
   });
 
-  // 完成扫描 mutation
-  const completeMutation = useMutation({
-    mutationFn: () =>
-      inventoryService.addScanResult(taskId!, {
-        rfidTag: `RFID-${Date.now()}`,
-        status: 'MATCH',
-        scanner: 'RFID-01',
-        scanTime: new Date().toISOString(),
-      }),
+  // ── 盘点资产列表 (getTaskAssets) ────────────────────────────────────────────
+  const { data: assetsResponse } = useQuery({
+    queryKey: ['inventory', 'task', taskId, 'assets'],
+    queryFn: () => getTaskAssets(taskId!, { page: 1, pageSize: 100 }),
+    enabled: !!taskId,
+    staleTime: 1000 * 30,
+  });
+
+  // ── 盘盈盘亏汇总 (getTaskSummary) ──────────────────────────────────────────
+  const { data: summaryResponse } = useQuery({
+    queryKey: ['inventory', 'task', taskId, 'summary'],
+    queryFn: () => getTaskSummary(taskId!),
+    enabled: !!taskId,
+    staleTime: 1000 * 30,
+  });
+
+  // ── 单条确认资产 (confirmAsset) ─────────────────────────────────────────────
+  const confirmMutation = useMutation({
+    mutationFn: ({
+      assetId,
+      actualStatus,
+      remark,
+    }: {
+      assetId: string;
+      actualStatus: ActualStatus;
+      remark?: string;
+    }) => confirmAsset(taskId!, assetId, { actualStatus, remark }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['inventory', 'task', taskId, 'assets'] });
+      qc.invalidateQueries({ queryKey: ['inventory', 'task', taskId, 'summary'] });
+    },
+  });
+
+  // ── 批量确认资产 (batchConfirmAssets) ───────────────────────────────────────
+  const batchConfirmMutation = useMutation({
+    mutationFn: (data: {
+      assetIds: string[];
+      actualStatus: ActualStatus;
+      remark?: string;
+    }) => batchConfirmAssets(taskId!, data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['inventory', 'task', taskId, 'assets'] });
+      qc.invalidateQueries({ queryKey: ['inventory', 'task', taskId, 'summary'] });
+    },
+  });
+
+  // ── 提交盘点任务 (submitTask) ──────────────────────────────────────────────
+  const submitMutation = useMutation({
+    mutationFn: () => submitTask(taskId!),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['inventory', 'task', taskId] });
+      qc.invalidateQueries({ queryKey: ['inventory', 'task', taskId, 'assets'] });
+      qc.invalidateQueries({ queryKey: ['inventory', 'task', taskId, 'summary'] });
       setScanning(false);
       setPaused(false);
     },
   });
 
-  // 获取任务数据（API 优先，失败 Mock 兜底）
+  // ── 派生数据 ────────────────────────────────────────────────────────────────
+  const assets = assetsResponse?.data?.records ?? [];
+  const summary = summaryResponse?.data;
+  const unconfirmedAssets = assets.filter((a) => !a.confirmed);
+
+  // 获取任务数据（纯 API，无 MOCK 兜底）
   const task = taskDetail?.task
     ? {
         id: String(taskDetail.task.id),
         taskNo: taskDetail.task.taskNo,
         taskName: taskDetail.task.taskName ?? 'RFID扫描任务',
-        location: (taskDetail.task as any).location ?? 'A区',
+        location: (taskDetail.task as Record<string, unknown>).location ?? '—',
         responsible: String(taskDetail.task.executorId ?? '—'),
         totalAssets: taskDetail.task.totalCount ?? 0,
         scanned: taskDetail.task.scannedCount ?? 0,
@@ -133,17 +169,50 @@ export default function RFIDScanPage() {
         startDate: taskDetail.task.startDate ?? '—',
         endDate: taskDetail.task.endDate ?? '—',
       }
-    : MOCK_TASK;
+    : null;
 
-  const recentScans = (detailRecords && detailRecords.length > 0)
-    ? detailRecords.slice(0, 5).map((r) => ({
-        id: String(r.id),
-        assetNo: String(r.assetId),
-        name: r.rfidTag ?? '未知资产',
-        time: r.scanTime?.substring(11, 19) ?? '—',
-        status: r.status === 'MATCH' ? 'match' : 'mismatch',
+  // 最近扫描记录：优先用资产列表 API 数据
+  const recentScans = assets.length > 0
+    ? assets.slice(0, 5).map((a) => ({
+        id: a.assetId,
+        assetNo: a.assetCode,
+        name: a.assetName,
+        time: a.confirmedAt?.substring(11, 19) ?? '—',
+        status: a.confirmed ? 'match' : 'mismatch',
+        confirmed: a.confirmed,
+        assetId: a.assetId,
       }))
-    : MOCK_SCANS;
+    : detailRecords && detailRecords.length > 0
+      ? detailRecords.slice(0, 5).map((r) => ({
+          id: String(r.id),
+          assetNo: String(r.assetId),
+          name: r.rfidTag ?? '未知资产',
+          time: r.scanTime?.substring(11, 19) ?? '—',
+          status: r.status === 'MATCH' ? 'match' : 'mismatch',
+          confirmed: r.status === 'MATCH',
+          assetId: String(r.assetId),
+        }))
+      : [];
+
+  // 差异列表：从 getTaskSummary API 获取
+  const discrepancies = [
+    ...(summary?.surplusItems ?? []).map((item, i) => ({
+      id: `surplus-${i}`,
+      assetNo: item.assetCode,
+      name: item.assetName,
+      type: '盘盈' as const,
+      detail: item.reason ?? '盘盈资产',
+    })),
+    ...(summary?.deficitItems ?? []).map((item, i) => ({
+      id: `deficit-${i}`,
+      assetNo: item.assetCode,
+      name: item.assetName,
+      type: '盘亏' as const,
+      detail: item.reason ?? '盘亏资产',
+    })),
+  ];
+
+  const discrepancyCount = (summary?.surplusCount ?? 0) + (summary?.deficitCount ?? 0);
 
   // ── 扫描模拟动画 ─────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -178,11 +247,48 @@ export default function RFIDScanPage() {
     }
   };
 
-  const handleComplete = () => {
-    completeMutation.mutate();
+  /** 提交盘点任务 */
+  const handleSubmit = () => {
+    submitMutation.mutate();
     const now = new Date().toLocaleTimeString('zh-CN', { hour12: false });
-    setScanLog((prev) => [...prev, `[${now}] 扫描完成，正在提交结果...`]);
+    setScanLog((prev) => [...prev, `[${now}] 提交盘点任务，等待核准...`]);
   };
+
+  /** 单条确认资产 */
+  const handleConfirmAsset = useCallback(
+    (assetId: string) => {
+      confirmMutation.mutate({ assetId, actualStatus: 'normal' });
+      const now = new Date().toLocaleTimeString('zh-CN', { hour12: false });
+      setScanLog((prev) => [...prev, `[${now}] ✓ 确认资产 ${assetId}`]);
+    },
+    [confirmMutation],
+  );
+
+  /** 批量确认所有未确认资产 */
+  const handleBatchConfirm = () => {
+    if (unconfirmedAssets.length === 0) return;
+    batchConfirmMutation.mutate({
+      assetIds: unconfirmedAssets.map((a) => a.assetId),
+      actualStatus: 'normal',
+    });
+    const now = new Date().toLocaleTimeString('zh-CN', { hour12: false });
+    setScanLog((prev) => [
+      ...prev,
+      `[${now}] ✓ 批量确认 ${unconfirmedAssets.length} 条资产`,
+    ]);
+  };
+
+  // ── 加载态 ──────────────────────────────────────────────────────────────────
+  if (!task) {
+    return (
+      <div className="min-h-screen bg-[#f8fafc] flex items-center justify-center">
+        <div className="flex items-center gap-3 text-[#64748b]">
+          <Loader2 className="w-5 h-5 animate-spin" />
+          <span>加载任务数据中...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#f8fafc] p-6">
@@ -345,13 +451,24 @@ export default function RFIDScanPage() {
               <Button
                 variant="primary"
                 size="lg"
+                className="flex-1 bg-blue-500 hover:bg-blue-600"
+                loading={batchConfirmMutation.isPending}
+                disabled={unconfirmedAssets.length === 0}
+                onClick={handleBatchConfirm}
+              >
+                <CheckCheck className="w-4 h-4" />
+                批量确认 ({unconfirmedAssets.length})
+              </Button>
+              <Button
+                variant="primary"
+                size="lg"
                 className="flex-1 bg-green-600 hover:bg-green-700"
-                loading={completeMutation.isPending}
-                disabled={!scanning && !paused}
-                onClick={handleComplete}
+                loading={submitMutation.isPending}
+                disabled={!scanning && !paused && unconfirmedAssets.length > 0}
+                onClick={handleSubmit}
               >
                 <CheckCircle className="w-4 h-4" />
-                完成扫描
+                提交盘点
               </Button>
             </div>
           </div>
@@ -369,9 +486,16 @@ export default function RFIDScanPage() {
               </CardHeader>
               <div className="divide-y divide-[#f1f5f9]">
                 {recentScans.map((scan) => (
-                  <div key={scan.id} className="px-4 py-3 flex items-center justify-between hover:bg-[#f8fafc] transition-colors">
+                  <div
+                    key={scan.id}
+                    className="px-4 py-3 flex items-center justify-between hover:bg-[#f8fafc] transition-colors cursor-pointer"
+                    onClick={() => !scan.confirmed && handleConfirmAsset(scan.assetId)}
+                    role={scan.confirmed ? undefined : 'button'}
+                    tabIndex={scan.confirmed ? undefined : 0}
+                    title={scan.confirmed ? '已确认' : '点击确认'}
+                  >
                     <div className="flex items-center gap-2.5">
-                      {scan.status === 'match'
+                      {scan.confirmed
                         ? <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0" />
                         : <AlertTriangle className="w-4 h-4 text-yellow-500 flex-shrink-0" />
                       }
@@ -394,11 +518,11 @@ export default function RFIDScanPage() {
               <CardHeader>
                 <CardTitle>差异列表</CardTitle>
                 <span className="px-2 py-0.5 text-xs font-semibold bg-yellow-100 text-yellow-700 rounded-full">
-                  {MOCK_DISCREPANCIES.length} 项
+                  {discrepancyCount} 项
                 </span>
               </CardHeader>
               <div className="divide-y divide-[#f1f5f9]">
-                {MOCK_DISCREPANCIES.map((d) => (
+                {discrepancies.map((d) => (
                   <div key={d.id} className="px-4 py-3 hover:bg-[#f8fafc] transition-colors">
                     <div className="flex items-start gap-2 mb-1">
                       <AlertTriangle className="w-3.5 h-3.5 text-yellow-500 flex-shrink-0 mt-0.5" />
@@ -407,7 +531,7 @@ export default function RFIDScanPage() {
                         <p className="text-xs text-[#94a3b8]">{d.assetNo}</p>
                       </div>
                       <span className={`ml-auto px-2 py-0.5 text-[10px] font-bold rounded-full flex-shrink-0 ${
-                        d.type === '漏扫' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'
+                        d.type === '盘亏' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'
                       }`}>
                         {d.type}
                       </span>
@@ -415,7 +539,7 @@ export default function RFIDScanPage() {
                     <p className="text-xs text-[#64748b] pl-5">{d.detail}</p>
                   </div>
                 ))}
-                {MOCK_DISCREPANCIES.length === 0 && (
+                {discrepancies.length === 0 && (
                   <div className="px-4 py-6 text-center text-sm text-[#94a3b8]">暂无差异</div>
                 )}
               </div>
@@ -431,7 +555,7 @@ export default function RFIDScanPage() {
                   { label: '资产总数',  value: task.totalAssets,                 color: 'text-[#0f172a]' },
                   { label: '已盘点',    value: task.scanned,                     color: 'text-[#3b82f6]' },
                   { label: '未盘点',    value: task.totalAssets - task.scanned,  color: 'text-[#f59e0b]' },
-                  { label: '差异数量',  value: MOCK_DISCREPANCIES.length,        color: 'text-red-500' },
+                  { label: '差异数量',  value: discrepancyCount,                  color: 'text-red-500' },
                 ].map(({ label, value, color }) => (
                   <div key={label} className="flex items-center justify-between text-sm">
                     <span className="text-[#64748b]">{label}</span>
