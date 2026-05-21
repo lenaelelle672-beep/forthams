@@ -157,3 +157,58 @@ export const saveScrapDraft = (data: ScrapDraftData): boolean => {
     return false;
   }
 };
+
+// ── 清退申请 ────────────────────────────────────────────────────────────────
+
+export interface ClearanceApplicationPayload {
+  assetIds: string[];
+  clearanceReason: string;
+  disposalMethod: string;
+  estimatedResidualValue?: number;
+  approvalFlow: string;
+  urgency: string;
+  remark?: string;
+  applicationDate: string;
+}
+
+/** 提交清退申请（通过审批流程 POST /approvals） */
+export const submitClearanceApplication = (data: ClearanceApplicationPayload) =>
+  http.post<ApiResponse<unknown>>('/approvals', {
+    processType: 'ASSET_CLEARANCE',
+    businessType: 'ASSET_CLEARANCE',
+    businessId: Number(data.assetIds[0]) || 0,
+    title: `资产清退申请 - ${data.applicationDate}`,
+    description: [
+      `清退原因：${data.clearanceReason}`,
+      `处置方式：${data.disposalMethod}`,
+      data.estimatedResidualValue ? `预估残值：¥${data.estimatedResidualValue}` : null,
+      `紧急程度：${data.urgency}`,
+      data.remark ? `备注：${data.remark}` : null,
+    ].filter(Boolean).join('；'),
+    businessData: JSON.stringify(data),
+  });
+
+export interface ClearanceDraftData {
+  clearanceReason: string;
+  disposalMethod: string;
+  estimatedResidualValue?: number;
+  approvalFlow: string;
+  urgency: string;
+  remark?: string;
+  applicationDate: string;
+  assetIds: string[];
+}
+
+/** 保存清退申请草稿到 localStorage */
+export const saveClearanceDraft = (data: ClearanceDraftData): boolean => {
+  try {
+    const timestamp = Date.now();
+    const dataKey = `ams_draft_clearance_${timestamp}`;
+    const indexKey = 'ams_draft_latest_clearance';
+    localStorage.setItem(dataKey, JSON.stringify(data));
+    localStorage.setItem(indexKey, dataKey);
+    return true;
+  } catch {
+    return false;
+  }
+};

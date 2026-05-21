@@ -1,14 +1,17 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useNavigate } from 'react-router';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, Info, ListChecks, Wrench, Search, Plus, ChevronRight } from 'lucide-react';
+import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
+import { toast } from 'sonner';
+import { ArrowLeft, Info, ListChecks, Wrench, Search, Plus } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
 import { PageHeader } from '@/components/ui/PageHeader';
+import { getAssetList } from '@/api/asset';
+import { submitClearanceApplication, saveClearanceDraft } from '@/api/disposal';
+import type { AssetListItem } from '@/types/asset';
 
 const schema = z.object({
   clearanceNo: z.string(),
@@ -20,7 +23,6 @@ const schema = z.object({
   approvalFlow: z.string().min(1, '请选择审批流程'),
   urgency: z.enum(['normal', 'urgent'], { required_error: '请选择紧急程度' }),
   remark: z.string().max(500).optional(),
-  assetSearch: z.string().optional(),
 });
 
 type FormValues = z.infer<typeof schema>;
@@ -28,16 +30,11 @@ type FormValues = z.infer<typeof schema>;
 const CLEARANCE_REASONS = ['设备老化', '技术淘汰', '闲置超过期限', '其他'] as const;
 const APPROVAL_FLOWS = ['标准清退审批流 v2.1', '紧急资产清退流程', '高价值资产清退流程'] as const;
 
-const MOCK_ASSETS = [
-  { id: 'AST-008122', name: '精密车床 X1', category: '制造设备', brand: 'DMG Mori NLX 2500', originalValue: 420000, netValue: 120000, idleDays: 45, status: 'idle' as const },
-  { id: 'AST-009441', name: '服务器集群 B-12', category: 'IT基础设施', brand: 'Dell PowerEdge R740', originalValue: 1200000, netValue: 450000, idleDays: 12, status: 'running' as const },
-  { id: 'AST-010233', name: 'CNC加工中心 M7', category: '制造设备', brand: 'Haas VF-3', originalValue: 680000, netValue: 280000, idleDays: 90, status: 'idle' as const },
-  { id: 'AST-011087', name: '网络交换机 S-48', category: 'IT基础设施', brand: 'Cisco Catalyst 9300', originalValue: 85000, netValue: 35000, idleDays: 7, status: 'running' as const },
-];
-
-const STATUS_CONFIG = {
-  idle: { label: '闲置', bg: 'bg-[#fef3c7]', text: 'text-[#d97706]' },
-  running: { label: '运行中', bg: 'bg-[#dcfce7]', text: 'text-[#16a34a]' },
+const STATUS_CONFIG: Record<string, { label: string; bg: string; text: string }> = {
+  IDLE: { label: '闲置', bg: 'bg-[#fef3c7]', text: 'text-[#d97706]' },
+  IN_USE: { label: '使用中', bg: 'bg-[#dcfce7]', text: 'text-[#16a34a]' },
+  RUNNING: { label: '运行中', bg: 'bg-[#dcfce7]', text: 'text-[#16a34a]' },
+  MAINTENANCE: { label: '维修中', bg: 'bg-[#dbeafe]', text: 'text-[#2563eb]' },
 };
 
 const DISPOSAL_METHOD_OPTIONS = [
@@ -57,17 +54,53 @@ function formatCurrency(value: number) {
   return `¥${value.toLocaleString()}`;
 }
 
+interface AssetRow {
+  id: string;
+  assetNo: string;
+  name: string;
+  category: string;
+  brand: string;
+  originalValue: number;
+  netValue: number;
+  status: string;
+}
+
+function toAssetRow(a: AssetListItem): AssetRow {
+  return {
+    id: String(a.id),
+    assetNo: a.assetNo,
+    name: a.assetName,
+    category: a.categoryName ?? '',
+    brand: [a.brand, a.model].filter(Boolean).join(' ') || '-',
+    originalValue: a.originalValue ?? 0,
+    netValue: a.currentValue ?? 0,
+    status: String(a.status ?? ''),
+  };
+}
+
 export default function AssetClearanceFormPage() {
   const navigate = useNavigate();
   const qc = useQueryClient();
-  const [selectedAssetIds, setSelectedAssetIds] = useState<Set<string>>(new Set(['AST-008122']));
+  const [selectedAssetIds, setSelectedAssetIds] = useState<Set<string>>(new Set());
   const [assetSearch, setAssetSearch] = useState('');
+
+  // Fetch real assets from API
+  const { data: assetListData } = useQuery({
+    queryKey: ['assets', 'list', { pageSize: 200 }],
+    queryFn: () => getAssetList({ pageSize: 200 }),
+  });
+
+  const assetRows: AssetRow[] = useMemo(() => {
+    const records = (assetListData as any)?.records ?? [];
+    return records.map(toAssetRow);
+  }, [assetListData]);
 
   const {
     register,
     handleSubmit,
     watch,
     setValue,
+    getValues,
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -80,7 +113,6 @@ export default function AssetClearanceFormPage() {
       approvalFlow: APPROVAL_FLOWS[0],
       urgency: 'normal',
       remark: '',
-      assetSearch: '',
     },
   });
 
@@ -88,16 +120,16 @@ export default function AssetClearanceFormPage() {
   const urgency = watch('urgency');
 
   const filteredAssets = useMemo(() => {
-    if (!assetSearch.trim()) return MOCK_ASSETS;
+    if (!assetSearch.trim()) return assetRows;
     const q = assetSearch.toLowerCase();
-    return MOCK_ASSETS.filter(
+    return assetRows.filter(
       (a) =>
-        a.id.toLowerCase().includes(q) ||
+        a.assetNo.toLowerCase().includes(q) ||
         a.name.toLowerCase().includes(q) ||
         a.category.toLowerCase().includes(q) ||
         a.brand.toLowerCase().includes(q),
     );
-  }, [assetSearch]);
+  }, [assetSearch, assetRows]);
 
   const toggleAsset = (id: string) => {
     setSelectedAssetIds((prev) => {
@@ -117,22 +149,58 @@ export default function AssetClearanceFormPage() {
   };
 
   const mutation = useMutation({
-    mutationFn: async (data: FormValues) => {
-      // TODO: replace with real API call
-      // return createClearance(data);
-      return new Promise((resolve) => setTimeout(resolve, 1000));
+    mutationFn: async (data: FormValues & { assetIds: string[] }) => {
+      return submitClearanceApplication({
+        assetIds: data.assetIds,
+        clearanceReason: data.clearanceReason,
+        disposalMethod: data.disposalMethod,
+        estimatedResidualValue: data.estimatedResidualValue,
+        approvalFlow: data.approvalFlow,
+        urgency: data.urgency,
+        remark: data.remark ?? '',
+        applicationDate: data.applicationDate,
+      });
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['clearance'] });
+      qc.invalidateQueries({ queryKey: ['disposals'] });
+      toast.success('清退申请提交成功');
       navigate('/disposals');
+    },
+    onError: (error: any) => {
+      toast.error(error?.response?.data?.message ?? '提交失败，请重试');
     },
   });
 
+  const handleSaveDraft = useCallback(() => {
+    const values = getValues();
+    const draft = {
+      clearanceReason: values.clearanceReason,
+      disposalMethod: values.disposalMethod,
+      estimatedResidualValue: values.estimatedResidualValue,
+      approvalFlow: values.approvalFlow,
+      urgency: values.urgency,
+      remark: values.remark ?? '',
+      applicationDate: values.applicationDate,
+      assetIds: Array.from(selectedAssetIds),
+    };
+    const ok = saveClearanceDraft(draft);
+    if (ok) {
+      toast.success('草稿保存成功');
+    } else {
+      toast.error('草稿保存失败');
+    }
+  }, [getValues, selectedAssetIds]);
+
   const onSubmit = (values: FormValues) => {
+    if (selectedAssetIds.size === 0) {
+      toast.error('请至少选择一项资产');
+      return;
+    }
     mutation.mutate({
       ...values,
       assetIds: Array.from(selectedAssetIds),
-    } as any);
+    } as FormValues & { assetIds: string[] });
   };
 
   return (
@@ -302,9 +370,6 @@ export default function AssetClearanceFormPage() {
                     <th className="px-4 py-4 text-[10px] leading-3 tracking-wider font-semibold text-[#424753] uppercase text-right">
                       净值
                     </th>
-                    <th className="px-4 py-4 text-[10px] leading-3 tracking-wider font-semibold text-[#424753] uppercase">
-                      闲置天数
-                    </th>
                     <th className="px-6 py-4 text-[10px] leading-3 tracking-wider font-semibold text-[#424753] uppercase">
                       状态
                     </th>
@@ -312,7 +377,7 @@ export default function AssetClearanceFormPage() {
                 </thead>
                 <tbody className="divide-y divide-[#e5e7eb]">
                   {filteredAssets.map((asset) => {
-                    const sc = STATUS_CONFIG[asset.status];
+                    const sc = STATUS_CONFIG[asset.status] ?? STATUS_CONFIG['IN_USE'];
                     return (
                       <tr
                         key={asset.id}
@@ -327,7 +392,7 @@ export default function AssetClearanceFormPage() {
                           />
                         </td>
                         <td className="px-4 py-4 text-sm font-medium text-[#161c27]">
-                          {asset.id}
+                          {asset.assetNo}
                         </td>
                         <td className="px-4 py-4 text-sm">{asset.name}</td>
                         <td className="px-4 py-4 text-sm text-[#424753]">{asset.category}</td>
@@ -338,7 +403,6 @@ export default function AssetClearanceFormPage() {
                         <td className="px-4 py-4 text-sm text-right">
                           {formatCurrency(asset.netValue)}
                         </td>
-                        <td className="px-4 py-4 text-sm">{asset.idleDays} 天</td>
                         <td className="px-6 py-4">
                           <span
                             className={`px-2 py-1 rounded text-xs font-semibold ${sc.bg} ${sc.text}`}
@@ -351,7 +415,7 @@ export default function AssetClearanceFormPage() {
                   })}
                   {filteredAssets.length === 0 && (
                     <tr>
-                      <td colSpan={9} className="px-6 py-8 text-center text-sm text-[#424753]">
+                      <td colSpan={8} className="px-6 py-8 text-center text-sm text-[#424753]">
                         未找到匹配的资产
                       </td>
                     </tr>
@@ -486,9 +550,7 @@ export default function AssetClearanceFormPage() {
             <Button
               type="button"
               className="bg-[#d4e0f9] text-[#576378] hover:brightness-95 border-0"
-              onClick={() => {
-                // TODO: save draft API
-              }}
+              onClick={handleSaveDraft}
             >
               保存草稿
             </Button>
