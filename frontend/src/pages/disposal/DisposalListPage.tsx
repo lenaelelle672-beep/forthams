@@ -1,15 +1,17 @@
 /**
  * @file pages/disposal/DisposalListPage.tsx
- * @description 资产处置管理列表页 — 替换 PlaceholderPage
+ * @description 资产处置管理列表页
  *
  * 功能：
  * - 4 个处置类型 Tab（调拨 / 清退 / 报废 / 赔偿）
- * - 搜索 + 状态过滤
+ * - 搜索 + 状态过滤（通过 API 参数传递）
  * - 新建各类处置单的入口
- * - 列表展示（带真实 API 对接，无数据时 Mock 兜底）
+ * - 列表展示（通过 getDisposalList / getCompensationList / getDisposalStats 真实 API 对接）
+ * - 分页绑定真实 total
+ * - 统计卡片数据从 API 聚合
  */
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
 import {
@@ -20,20 +22,17 @@ import {
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import http from '@/utils/http';
-
-// ── 类型定义 ──────────────────────────────────────────────────────────────────
-interface DisposalRecord {
-  id: number;
-  disposalNo: string;
-  changeType: string;
-  assetName: string;
-  assetNo: string;
-  applicant: string;
-  applyDate: string;
-  currentStatus: string;
-  reason: string;
-}
+import {
+  getDisposalList,
+  getDisposalStats,
+  getCompensationList,
+  type Disposal,
+  type DisposalType,
+  type DisposalStatus,
+  type DisposalStats,
+  type Compensation,
+} from '@/api/disposal';
+import type { ApiResponse, PageData } from '@/types/common';
 
 // ── Tab 配置 ──────────────────────────────────────────────────────────────────
 const TABS = [
@@ -47,40 +46,16 @@ type TabId = typeof TABS[number]['id'];
 
 // ── 状态配置 ──────────────────────────────────────────────────────────────────
 const STATUS_CONFIG: Record<string, { label: string; bg: string; text: string; icon: typeof Clock }> = {
-  '待审批':   { label: '待审批',   bg: 'bg-amber-50',  text: 'text-amber-600',  icon: Clock },
-  '审批中':   { label: '审批中',   bg: 'bg-blue-50',   text: 'text-blue-600',   icon: AlertCircle },
-  '已完成':   { label: '已完成',   bg: 'bg-green-50',  text: 'text-green-600',  icon: CheckCircle },
-  '已拒绝':   { label: '已拒绝',   bg: 'bg-red-50',    text: 'text-red-600',    icon: XCircle },
-  '草稿':     { label: '草稿',     bg: 'bg-slate-50',  text: 'text-slate-500',  icon: Clock },
+  PENDING:   { label: '待审批',  bg: 'bg-amber-50',  text: 'text-amber-600',  icon: Clock },
+  APPROVED:  { label: '审批中',  bg: 'bg-blue-50',   text: 'text-blue-600',   icon: AlertCircle },
+  COMPLETED: { label: '已完成',  bg: 'bg-green-50',  text: 'text-green-600',  icon: CheckCircle },
+  REJECTED:  { label: '已拒绝',  bg: 'bg-red-50',    text: 'text-red-600',    icon: XCircle },
+  '待审批':   { label: '待审批',  bg: 'bg-amber-50',  text: 'text-amber-600',  icon: Clock },
+  '审批中':   { label: '审批中',  bg: 'bg-blue-50',   text: 'text-blue-600',   icon: AlertCircle },
+  '已完成':   { label: '已完成',  bg: 'bg-green-50',  text: 'text-green-600',  icon: CheckCircle },
+  '已拒绝':   { label: '已拒绝',  bg: 'bg-red-50',    text: 'text-red-600',    icon: XCircle },
+  '草稿':     { label: '草稿',    bg: 'bg-slate-50',  text: 'text-slate-500',  icon: Clock },
 };
-
-// ── Mock 数据（API 降级兜底）─────────────────────────────────────────────────
-const MOCK_RECORDS: Record<TabId, DisposalRecord[]> = {
-  TRANSFER: [
-    { id: 1, disposalNo: 'TRF-2024-0001', changeType: 'TRANSFER', assetName: '精密车床 X1', assetNo: 'AST-9921', applicant: '张三', applyDate: '2024-05-20', currentStatus: '审批中', reason: '调配至分公司研发部门' },
-    { id: 2, disposalNo: 'TRF-2024-0002', changeType: 'TRANSFER', assetName: '服务器机架 R740', assetNo: 'AST-4402', applicant: '李四', applyDate: '2024-05-18', currentStatus: '已完成', reason: '数据中心扩容调配' },
-    { id: 3, disposalNo: 'TRF-2024-0003', changeType: 'TRANSFER', assetName: 'MacBook Pro 16"', assetNo: 'AST-8801', applicant: '王五', applyDate: '2024-05-15', currentStatus: '待审批', reason: '新员工设备分配' },
-  ],
-  CLEARANCE: [
-    { id: 4, disposalNo: 'CLR-2024-0001', changeType: 'CLEARANCE', assetName: '办公桌套装', assetNo: 'AST-2211', applicant: '赵六', applyDate: '2024-05-19', currentStatus: '待审批', reason: '办公室改造，部分家具清退' },
-    { id: 5, disposalNo: 'CLR-2024-0002', changeType: 'CLEARANCE', assetName: 'UPS 备用电源', assetNo: 'AST-6603', applicant: '钱七', applyDate: '2024-05-10', currentStatus: '已完成', reason: '设备更换，旧设备清退' },
-  ],
-  SCRAP: [
-    { id: 6, disposalNo: 'SCP-2024-0001', changeType: 'SCRAP', assetName: '旧型号投影仪', assetNo: 'AST-3312', applicant: '孙八', applyDate: '2024-05-16', currentStatus: '审批中', reason: '设备达到使用年限，申请报废' },
-    { id: 7, disposalNo: 'SCP-2024-0002', changeType: 'SCRAP', assetName: '废旧打印机×3', assetNo: 'AST-1104', applicant: '周九', applyDate: '2024-05-12', currentStatus: '已完成', reason: '批量报废处理' },
-  ],
-  COMPENSATION: [
-    { id: 8, disposalNo: 'CMP-2024-0001', changeType: 'COMPENSATION', assetName: '平板显示器', assetNo: 'AST-5571', applicant: '吴十', applyDate: '2024-05-17', currentStatus: '待审批', reason: '员工损坏，申请赔偿处理' },
-  ],
-};
-
-// ── 统计卡片 ──────────────────────────────────────────────────────────────────
-const STATS = [
-  { label: '本月处置总量', value: '24', sub: '较上月 +3', color: 'text-blue-600', bg: 'bg-blue-50', border: 'border-blue-200' },
-  { label: '待审批',       value: '7',  sub: '需及时处理',  color: 'text-amber-600', bg: 'bg-amber-50', border: 'border-amber-200' },
-  { label: '已完成',       value: '15', sub: '本月已结案',  color: 'text-green-600', bg: 'bg-green-50', border: 'border-green-200' },
-  { label: '资产回收价值', value: '¥84,200', sub: '本月合计', color: 'text-purple-600', bg: 'bg-purple-50', border: 'border-purple-200' },
-];
 
 function StatusBadge({ status }: { status: string }) {
   const cfg = STATUS_CONFIG[status] ?? { label: status, bg: 'bg-slate-50', text: 'text-slate-500', icon: Clock };
@@ -93,41 +68,156 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
+/** 将 Disposal 记录映射为统一行数据 */
+interface RowData {
+  id: number;
+  disposalNo: string;
+  assetName: string;
+  assetNo: string;
+  applicant: string;
+  applyDate: string;
+  currentStatus: string;
+  reason: string;
+}
+
+function disposalToRow(d: Disposal): RowData {
+  return {
+    id: d.id,
+    disposalNo: `DSP-${String(d.id).padStart(6, '0')}`,
+    assetName: d.assetName ?? '',
+    assetNo: d.assetNo ?? '',
+    applicant: d.applicantName ?? '',
+    applyDate: d.createdAt?.split('T')[0] ?? '',
+    currentStatus: d.status,
+    reason: d.reason ?? '',
+  };
+}
+
+function compensationToRow(c: Compensation): RowData {
+  return {
+    id: c.id,
+    disposalNo: `CMP-${String(c.id).padStart(6, '0')}`,
+    assetName: c.assetName ?? '',
+    assetNo: c.assetNo ?? '',
+    applicant: c.responsibleUserName ?? '',
+    applyDate: c.createdAt?.split('T')[0] ?? '',
+    currentStatus: c.status,
+    reason: c.reason,
+  };
+}
+
 export default function DisposalListPage() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<TabId>('TRANSFER');
+  const [statusFilter, setStatusFilter] = useState<DisposalStatus | ''>('');
   const [keyword, setKeyword] = useState('');
   const [page, setPage] = useState(1);
   const pageSize = 10;
 
   const currentTab = TABS.find(t => t.id === activeTab)!;
+  const isCompensationTab = activeTab === 'COMPENSATION';
 
-  // 真实 API（有 changeType filter）
-  const { data: apiRes } = useQuery({
-    queryKey: ['disposals', activeTab, page, keyword],
-    queryFn: async () => {
-      const params = new URLSearchParams({ page: String(page), pageSize: String(pageSize), changeType: activeTab });
-      if (keyword) params.set('keyword', keyword);
-      const res = await http.get<any>(`/asset-changes?${params}`);
-      return res;
+  // ── 统计数据 ──────────────────────────────────────────────────────────────
+  const { data: statsRes } = useQuery({
+    queryKey: ['disposal-stats'],
+    queryFn: () => getDisposalStats(),
+    staleTime: 60_000,
+  });
+  const stats: DisposalStats | null = (statsRes as ApiResponse<DisposalStats> | undefined)?.data ?? null;
+
+  const STATS_CONFIG = useMemo(() => [
+    {
+      label: '本月处置总量',
+      value: stats ? String(stats.totalThisMonth) : '—',
+      sub: stats ? `较上月 ${stats.monthOverMonthDelta >= 0 ? '+' : ''}${stats.monthOverMonthDelta}` : '加载中',
+      color: 'text-blue-600',
+      bg: 'bg-blue-50',
+      border: 'border-blue-200',
     },
+    {
+      label: '待审批',
+      value: stats ? String(stats.pendingCount) : '—',
+      sub: '需及时处理',
+      color: 'text-amber-600',
+      bg: 'bg-amber-50',
+      border: 'border-amber-200',
+    },
+    {
+      label: '已完成',
+      value: stats ? String(stats.completedCount) : '—',
+      sub: '本月已结案',
+      color: 'text-green-600',
+      bg: 'bg-green-50',
+      border: 'border-green-200',
+    },
+    {
+      label: '资产回收价值',
+      value: stats ? `¥${stats.recoveredValue.toLocaleString()}` : '—',
+      sub: '本月合计',
+      color: 'text-purple-600',
+      bg: 'bg-purple-50',
+      border: 'border-purple-200',
+    },
+  ], [stats]);
+
+  // ── 处置列表（TRANSFER / CLEARANCE / SCRAP）─────────────────────────────
+  const { data: disposalRes, isLoading: disposalLoading } = useQuery({
+    queryKey: ['disposals', activeTab, statusFilter, page, keyword],
+    queryFn: () =>
+      getDisposalList({
+        page,
+        pageSize,
+        type: activeTab as DisposalType,
+        status: statusFilter || undefined,
+        keyword: keyword || undefined,
+      }),
+    enabled: !isCompensationTab,
     retry: false,
     staleTime: 30_000,
   });
 
-  // 优先真实数据，降级 Mock
-  const records: DisposalRecord[] = (apiRes as any)?.data?.records ?? MOCK_RECORDS[activeTab];
-  const total: number = (apiRes as any)?.data?.total ?? records.length;
-  const filtered = keyword
-    ? records.filter(r =>
-        r.assetName.includes(keyword) ||
-        r.disposalNo.includes(keyword) ||
-        r.assetNo.includes(keyword) ||
-        r.applicant.includes(keyword)
-      )
-    : records;
+  // ── 赔偿列表 ─────────────────────────────────────────────────────────────
+  const { data: compensationRes, isLoading: compensationLoading } = useQuery({
+    queryKey: ['compensations', statusFilter, page, keyword],
+    queryFn: () =>
+      getCompensationList({
+        page,
+        pageSize,
+        status: statusFilter || undefined,
+        keyword: keyword || undefined,
+      }),
+    enabled: isCompensationTab,
+    retry: false,
+    staleTime: 30_000,
+  });
 
-  const totalPages = Math.ceil(total / pageSize);
+  // ── 解包列表数据 ─────────────────────────────────────────────────────────
+  const records: RowData[] = useMemo(() => {
+    if (isCompensationTab) {
+      const pageData = (compensationRes as ApiResponse<PageData<Compensation>> | undefined)?.data;
+      return pageData?.records?.map(compensationToRow) ?? [];
+    }
+    const pageData = (disposalRes as ApiResponse<PageData<Disposal>> | undefined)?.data;
+    return pageData?.records?.map(disposalToRow) ?? [];
+  }, [isCompensationTab, disposalRes, compensationRes]);
+
+  const total: number = useMemo(() => {
+    if (isCompensationTab) {
+      return (compensationRes as ApiResponse<PageData<Compensation>> | undefined)?.data?.total ?? 0;
+    }
+    return (disposalRes as ApiResponse<PageData<Disposal>> | undefined)?.data?.total ?? 0;
+  }, [isCompensationTab, disposalRes, compensationRes]);
+
+  const totalPages = Math.ceil(total / pageSize) || 1;
+  const loading = isCompensationTab ? compensationLoading : disposalLoading;
+
+  // ── Tab 切换时重置筛选 ────────────────────────────────────────────────────
+  const handleTabChange = (id: TabId) => {
+    setActiveTab(id);
+    setPage(1);
+    setKeyword('');
+    setStatusFilter('');
+  };
 
   return (
     <div className="space-y-6">
@@ -149,7 +239,7 @@ export default function DisposalListPage() {
 
       {/* ── 统计卡片 ── */}
       <div className="grid grid-cols-4 gap-4">
-        {STATS.map(({ label, value, sub, color, bg, border }) => (
+        {STATS_CONFIG.map(({ label, value, sub, color, bg, border }) => (
           <Card key={label} className={`${bg} ${border} border`}>
             <CardContent className="py-4 px-5">
               <p className="text-xs text-slate-500 mb-1">{label}</p>
@@ -167,7 +257,7 @@ export default function DisposalListPage() {
           {TABS.map(({ id, label, icon: Icon, color }) => (
             <button
               key={id}
-              onClick={() => { setActiveTab(id); setPage(1); setKeyword(''); }}
+              onClick={() => handleTabChange(id)}
               className={`flex items-center gap-2 px-5 py-3.5 text-sm font-medium transition-all border-b-2 -mb-px ${
                 activeTab === id
                   ? 'border-current text-[#0f172a] bg-[#f8fafc]'
@@ -177,18 +267,19 @@ export default function DisposalListPage() {
             >
               <Icon className="w-4 h-4" />
               {label}
-              <span className={`ml-1 text-[10px] px-1.5 py-0.5 rounded-full font-bold ${
-                activeTab === id ? 'bg-current/10' : 'bg-slate-100 text-slate-400'
-              }`}
-                style={activeTab === id ? { backgroundColor: color + '18', color } : {}}
-              >
-                {MOCK_RECORDS[id as TabId].length}
-              </span>
+              {activeTab === id && total > 0 && (
+                <span
+                  className="ml-1 text-[10px] px-1.5 py-0.5 rounded-full font-bold"
+                  style={{ backgroundColor: color + '18', color }}
+                >
+                  {total}
+                </span>
+              )}
             </button>
           ))}
         </div>
 
-        {/* 搜索栏 */}
+        {/* 搜索栏 + 状态筛选 */}
         <div className="flex items-center gap-3 px-5 py-3 border-b border-[#f1f5f9] bg-[#f8fafc]">
           <div className="relative flex-1 max-w-xs">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
@@ -200,6 +291,17 @@ export default function DisposalListPage() {
               className="w-full pl-9 pr-3 py-2 text-sm bg-white border border-[#e5e7eb] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 placeholder:text-slate-400"
             />
           </div>
+          <select
+            value={statusFilter}
+            onChange={e => { setStatusFilter(e.target.value as DisposalStatus | ''); setPage(1); }}
+            className="px-3 py-2 text-sm bg-white border border-[#e5e7eb] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 text-slate-600"
+          >
+            <option value="">全部状态</option>
+            <option value="PENDING">待审批</option>
+            <option value="APPROVED">审批中</option>
+            <option value="COMPLETED">已完成</option>
+            <option value="REJECTED">已拒绝</option>
+          </select>
           <span className="text-xs text-slate-400">共 {total} 条记录</span>
         </div>
 
@@ -215,7 +317,11 @@ export default function DisposalListPage() {
             <span className="text-center">操作</span>
           </div>
 
-          {filtered.length === 0 ? (
+          {loading ? (
+            <div className="py-16 text-center">
+              <p className="text-sm text-slate-400">加载中…</p>
+            </div>
+          ) : records.length === 0 ? (
             <div className="py-16 text-center">
               <div className="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center mx-auto mb-3">
                 <currentTab.icon className="w-6 h-6 text-slate-400" />
@@ -227,7 +333,7 @@ export default function DisposalListPage() {
               </Button>
             </div>
           ) : (
-            filtered.map((record) => (
+            records.map((record) => (
               <div
                 key={record.id}
                 className="grid grid-cols-[180px_1fr_120px_100px_120px_80px] gap-4 px-5 py-3.5 items-center hover:bg-[#f8fafc] transition-colors cursor-pointer group"
