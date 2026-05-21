@@ -3,25 +3,35 @@
  * @description 数据分析页 — 多维数据可视化与洞察
  *
  * 功能：
- * - 4个 KPI 概览卡片
- * - 资产增长趋势（面积图）
- * - 资产分类分布（饼图）
- * - 部门资产价值排行（横向柱图）
- * - 月度处置统计（柱状图）
- * - 关键指标汇总表格
+ * - 4个 KPI 概览卡片（从 getDashboardStats + getReportSummary 获取）
+ * - 资产增长趋势（面积图，从 getAssetValueTrends 获取）
+ * - 资产分类分布（饼图，从 getReportByCategory / getDashboardStats.categoryDistribution 获取）
+ * - 部门资产价值排行（横向柱图，从 getDeptDistribution 获取）
+ * - 月度处置统计（柱状图，从 getReportSummary 获取退役数据）
+ * - 日期范围筛选器绑定查询参数
+ *
+ * 数据源：所有图表绑定真实 API，无 MOCK 残留。
  */
 
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import {
   TrendingUp, Package, DollarSign, Activity, BarChart3,
-  Calendar, Filter,
+  Calendar,
 } from 'lucide-react';
 import {
   AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell,
   XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, CartesianGrid,
 } from 'recharts';
-import { getDashboardStats, getAssetValueTrends } from '@/api/asset';
+import {
+  getDashboardStats,
+  getAssetValueTrends,
+  getDeptDistribution,
+  getMaintenanceStats,
+} from '@/api/asset';
+import { getReportByCategory, getReportSummary, type ReportSummary, type CategoryReport } from '@/api/stats';
+import type { ApiResponse } from '@/types/common';
+import type { DashboardStats, AssetValueTrend, DeptAssetDistribution } from '@/types/asset';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { KpiCard } from '@/components/ui/KpiCard';
 import { PageHeader } from '@/components/ui/PageHeader';
@@ -42,78 +52,102 @@ const COLORS = {
 
 const PIE_COLORS = [COLORS.blue, COLORS.green, COLORS.amber, COLORS.red, COLORS.purple, COLORS.cyan, COLORS.pink, COLORS.gray];
 
-// ── 模拟数据（API 不可用时使用）─────────────────────────────────────────────────
-const MOCK_TREND = [
-  { month: '2025-06', count: 2450, value: 980 },
-  { month: '2025-07', count: 2510, value: 1005 },
-  { month: '2025-08', count: 2580, value: 1030 },
-  { month: '2025-09', count: 2650, value: 1060 },
-  { month: '2025-10', count: 2700, value: 1080 },
-  { month: '2025-11', count: 2680, value: 1070 },
-  { month: '2025-12', count: 2740, value: 1095 },
-  { month: '2026-01', count: 2780, value: 1110 },
-  { month: '2026-02', count: 2770, value: 1105 },
-  { month: '2026-03', count: 2820, value: 1130 },
-  { month: '2026-04', count: 2850, value: 1145 },
-  { month: '2026-05', count: 2847, value: 1268 },
-];
-
-const MOCK_CATEGORY = [
-  { name: '电子设备', value: 856 },
-  { name: '机械设备', value: 623 },
-  { name: '办公家具', value: 412 },
-  { name: '运输工具', value: 298 },
-  { name: '仪器仪表', value: 234 },
-  { name: '其他', value: 424 },
-];
-
-const MOCK_DEPT = [
-  { name: '信息技术部', value: 4320 },
-  { name: '生产制造部', value: 3680 },
-  { name: '研发中心',   value: 2950 },
-  { name: '行政管理部', value: 2180 },
-  { name: '市场销售部', value: 1560 },
-  { name: '财务部',     value: 1200 },
-  { name: '人力资源部', value: 790 },
-];
-
-const MOCK_DISPOSAL_MONTHLY = [
-  { month: '12月', transfer: 12, clearance: 5, scrap: 8,  compensation: 2 },
-  { month: '1月',  transfer: 15, clearance: 3, scrap: 6,  compensation: 4 },
-  { month: '2月',  transfer: 8,  clearance: 7, scrap: 10, compensation: 1 },
-  { month: '3月',  transfer: 20, clearance: 4, scrap: 5,  compensation: 3 },
-  { month: '4月',  transfer: 18, clearance: 6, scrap: 7,  compensation: 2 },
-  { month: '5月',  transfer: 14, clearance: 8, scrap: 9,  compensation: 5 },
-];
-
 export default function AnalyticsPage() {
   const [period, setPeriod] = useState('12');
 
-  // 仪表板统计
+  // ── API 查询 ────────────────────────────────────────────────────────────────
+
+  /** 仪表板核心统计 */
   const { data: statsRes, isLoading: statsLoading } = useQuery({
     queryKey: ['dashboard', 'stats'],
     queryFn: getDashboardStats,
     staleTime: 1000 * 60 * 5,
   });
 
-  // 资产价值趋势
+  /** 资产价值趋势（根据 period 计算天数） */
   const { data: trendsRes } = useQuery({
     queryKey: ['dashboard', 'trends', Number(period) * 30],
     queryFn: () => getAssetValueTrends(Number(period) * 30),
     staleTime: 1000 * 60 * 15,
   });
 
-  const stats = (statsRes as any)?.data;
-  const trends = (trendsRes as any)?.data ?? [];
+  /** 部门资产分布 */
+  const { data: deptRes } = useQuery({
+    queryKey: ['dashboard', 'dept-distribution'],
+    queryFn: getDeptDistribution,
+    staleTime: 1000 * 60 * 15,
+  });
 
-  // 趋势图数据
-  const trendData = trends.length > 0
-    ? trends.slice(-Number(period)).map((t: any) => ({
+  /** 维保统计 */
+  const { data: maintenanceRes } = useQuery({
+    queryKey: ['dashboard', 'maintenance-stats'],
+    queryFn: getMaintenanceStats,
+    staleTime: 1000 * 60 * 15,
+  });
+
+  /** 分类统计（ReportController） */
+  const { data: categoryRes } = useQuery({
+    queryKey: ['reports', 'by-category'],
+    queryFn: getReportByCategory,
+    staleTime: 1000 * 60 * 15,
+  });
+
+  /** 汇总统计（ReportController） */
+  const { data: summaryRes } = useQuery({
+    queryKey: ['reports', 'summary'],
+    queryFn: getReportSummary,
+    staleTime: 1000 * 60 * 15,
+  });
+
+  // ── 数据提取与格式化 ────────────────────────────────────────────────────────
+
+  const stats = (statsRes as ApiResponse<DashboardStats> | undefined)?.data;
+  const summary = (summaryRes as ApiResponse<ReportSummary> | undefined)?.data;
+  const trends = (trendsRes as ApiResponse<AssetValueTrend[]> | undefined)?.data ?? [];
+  const deptData = (deptRes as ApiResponse<DeptAssetDistribution[]> | undefined)?.data ?? [];
+  const categoryData = (categoryRes as ApiResponse<CategoryReport[]> | undefined)?.data ?? [];
+  const maintenanceData = (maintenanceRes as ApiResponse<Record<string, unknown>> | undefined)?.data;
+
+  /** 趋势图数据：将 API 响应映射为图表格式 */
+  const trendChartData = trends.length > 0
+    ? trends.slice(-Number(period)).map((t: AssetValueTrend) => ({
         month:  t.date?.substring(0, 7) ?? '',
-        count:  t.count ?? 0,
-        value:  Math.round((t.totalValue ?? 0) / 10000),
+        value:  Math.round(((t.totalValue ?? 0)) / 10000),
+        net:    Math.round(((t.netValue ?? 0)) / 10000),
       }))
-    : MOCK_TREND.slice(-Number(period));
+    : [];
+
+  /** 饼图数据：从 categoryReport（ReportController）或 categoryDistribution（DashboardStats）构建 */
+  const pieChartData = categoryData.length > 0
+    ? categoryData.map((c: CategoryReport) => ({
+        name:  c.categoryName,
+        value: c.assetCount,
+      }))
+    : stats?.categoryDistribution
+      ? Object.entries(stats.categoryDistribution as Record<string, number>).map(([name, count]) => ({
+          name,
+          value: count,
+        }))
+      : [];
+
+  /** 部门排行数据：映射为万元 */
+  const deptChartData = deptData.map((d: DeptAssetDistribution) => ({
+    name:  d.deptName,
+    value: d.assetCount,
+  }));
+
+  /** 处置统计：从 ReportSummary 构造汇总信息 */
+  const disposalData = summary
+    ? [
+        { type: '退役资产', count: summary.recentlyRetired ?? 0 },
+        { type: '待审批',   count: summary.pendingApproval ?? 0 },
+        { type: '在用资产', count: summary.activeAssets ?? 0 },
+      ]
+    : [];
+
+  // ── 加载状态 ────────────────────────────────────────────────────────────────
+
+  const allLoading = statsLoading && !stats && !summary;
 
   return (
     <div className="p-6 space-y-6">
@@ -137,35 +171,35 @@ export default function AnalyticsPage() {
 
       {/* KPI 概览 */}
       <div className="grid grid-cols-4 gap-4">
-        {statsLoading ? (
+        {allLoading ? (
           Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)
         ) : (
           <>
             <KpiCard
               title="资产总数"
-              value={(stats?.totalAssets ?? 2847).toLocaleString() + ' 台'}
-              trend={{ value: '月均增长 +2.1%', direction: 'up' }}
+              value={(stats?.totalAssets ?? 0).toLocaleString() + ' 台'}
+              trend={{ value: `在用 ${(stats?.inUseAssets ?? 0).toLocaleString()} 台`, direction: 'up' }}
               icon={Package}
               iconColor={COLORS.blue}
             />
             <KpiCard
               title="资产总价值"
-              value={'¥' + ((stats?.totalValue ?? 12680000) / 10000).toFixed(0) + ' 万'}
-              subtitle="净值 ¥924 万"
+              value={'¥' + ((stats?.totalValue ?? 0) / 10000).toFixed(0) + ' 万'}
+              subtitle={`净值 ¥${((stats?.netValue ?? 0) / 10000).toFixed(0)} 万`}
               icon={DollarSign}
               iconColor={COLORS.green}
             />
             <KpiCard
-              title="月度活跃率"
-              value="87.6%"
-              trend={{ value: '较上月 +1.2%', direction: 'up' }}
+              title="月度维保次数"
+              value={String(maintenanceData?.monthlyMaintenanceCount ?? 0)}
+              subtitle={`总计 ${maintenanceData?.totalMaintenanceCount ?? 0} 次`}
               icon={Activity}
               iconColor={COLORS.amber}
             />
             <KpiCard
-              title="处置完成率"
-              value="92.3%"
-              subtitle="本月 24/26 项"
+              title="待审批"
+              value={String(stats?.pendingApprovals ?? 0)}
+              subtitle={`退役 ${summary?.recentlyRetired ?? 0} 项`}
               icon={TrendingUp}
               iconColor={COLORS.purple}
             />
@@ -180,65 +214,71 @@ export default function AnalyticsPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <TrendingUp className="w-4 h-4 text-blue-500" />
-              资产增长趋势
+              资产价值趋势
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={240}>
-              <AreaChart data={trendData} margin={{ top: 5, right: 16, left: -16, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor={COLORS.blue} stopOpacity={0.15} />
-                    <stop offset="95%" stopColor={COLORS.blue} stopOpacity={0} />
-                  </linearGradient>
-                  <linearGradient id="colorCount" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor={COLORS.green} stopOpacity={0.15} />
-                    <stop offset="95%" stopColor={COLORS.green} stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                <XAxis
-                  dataKey="month"
-                  tick={{ fontSize: 11, fill: '#94a3b8' }}
-                  axisLine={false}
-                  tickLine={false}
-                  tickFormatter={(v) => v?.substring(5) ?? v}
-                />
-                <YAxis
-                  yAxisId="left"
-                  tick={{ fontSize: 11, fill: '#94a3b8' }}
-                  axisLine={false}
-                  tickLine={false}
-                />
-                <YAxis
-                  yAxisId="right"
-                  orientation="right"
-                  tick={{ fontSize: 11, fill: '#94a3b8' }}
-                  axisLine={false}
-                  tickLine={false}
-                />
-                <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8, border: '1px solid #e5e7eb' }} />
-                <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 12 }} />
-                <Area
-                  yAxisId="left"
-                  type="monotone"
-                  dataKey="value"
-                  name="价值（万元）"
-                  stroke={COLORS.blue}
-                  strokeWidth={2}
-                  fill="url(#colorValue)"
-                />
-                <Area
-                  yAxisId="right"
-                  type="monotone"
-                  dataKey="count"
-                  name="数量（台）"
-                  stroke={COLORS.green}
-                  strokeWidth={2}
-                  fill="url(#colorCount)"
-                />
-              </AreaChart>
-            </ResponsiveContainer>
+            {trendChartData.length > 0 ? (
+              <ResponsiveContainer width="100%" height={240}>
+                <AreaChart data={trendChartData} margin={{ top: 5, right: 16, left: -16, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor={COLORS.blue} stopOpacity={0.15} />
+                      <stop offset="95%" stopColor={COLORS.blue} stopOpacity={0} />
+                    </linearGradient>
+                    <linearGradient id="colorNet" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor={COLORS.green} stopOpacity={0.15} />
+                      <stop offset="95%" stopColor={COLORS.green} stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                  <XAxis
+                    dataKey="month"
+                    tick={{ fontSize: 11, fill: '#94a3b8' }}
+                    axisLine={false}
+                    tickLine={false}
+                    tickFormatter={(v) => v?.substring(5) ?? v}
+                  />
+                  <YAxis
+                    yAxisId="left"
+                    tick={{ fontSize: 11, fill: '#94a3b8' }}
+                    axisLine={false}
+                    tickLine={false}
+                  />
+                  <YAxis
+                    yAxisId="right"
+                    orientation="right"
+                    tick={{ fontSize: 11, fill: '#94a3b8' }}
+                    axisLine={false}
+                    tickLine={false}
+                  />
+                  <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8, border: '1px solid #e5e7eb' }} />
+                  <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 12 }} />
+                  <Area
+                    yAxisId="left"
+                    type="monotone"
+                    dataKey="value"
+                    name="总价值（万元）"
+                    stroke={COLORS.blue}
+                    strokeWidth={2}
+                    fill="url(#colorValue)"
+                  />
+                  <Area
+                    yAxisId="right"
+                    type="monotone"
+                    dataKey="net"
+                    name="净值（万元）"
+                    stroke={COLORS.green}
+                    strokeWidth={2}
+                    fill="url(#colorNet)"
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="flex items-center justify-center h-60 text-gray-400 text-sm">
+                暂无趋势数据
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -251,25 +291,31 @@ export default function AnalyticsPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={240}>
-              <PieChart>
-                <Pie
-                  data={MOCK_CATEGORY}
-                  cx="50%"
-                  cy="45%"
-                  innerRadius={50}
-                  outerRadius={80}
-                  dataKey="value"
-                  paddingAngle={2}
-                >
-                  {MOCK_CATEGORY.map((_, i) => (
-                    <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8 }} />
-                <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 11 }} />
-              </PieChart>
-            </ResponsiveContainer>
+            {pieChartData.length > 0 ? (
+              <ResponsiveContainer width="100%" height={240}>
+                <PieChart>
+                  <Pie
+                    data={pieChartData}
+                    cx="50%"
+                    cy="45%"
+                    innerRadius={50}
+                    outerRadius={80}
+                    dataKey="value"
+                    paddingAngle={2}
+                  >
+                    {pieChartData.map((_: Record<string, unknown>, i: number) => (
+                      <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8 }} />
+                  <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 11 }} />
+                </PieChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="flex items-center justify-center h-60 text-gray-400 text-sm">
+                暂无分类数据
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
@@ -281,62 +327,71 @@ export default function AnalyticsPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <DollarSign className="w-4 h-4 text-emerald-500" />
-              部门资产价值排行（万元）
+              部门资产数量排行
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={240}>
-              <BarChart
-                data={MOCK_DEPT}
-                layout="vertical"
-                margin={{ top: 0, right: 16, left: 80, bottom: 0 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" horizontal={false} />
-                <XAxis type="number" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
-                <YAxis
-                  type="category"
-                  dataKey="name"
-                  tick={{ fontSize: 11, fill: '#64748b' }}
-                  axisLine={false}
-                  tickLine={false}
-                  width={80}
-                />
-                <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8 }} />
-                <Bar dataKey="value" fill={COLORS.blue} radius={[0, 4, 4, 0]} name="资产价值（万元）" />
-              </BarChart>
-            </ResponsiveContainer>
+            {deptChartData.length > 0 ? (
+              <ResponsiveContainer width="100%" height={240}>
+                <BarChart
+                  data={deptChartData}
+                  layout="vertical"
+                  margin={{ top: 0, right: 16, left: 80, bottom: 0 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" horizontal={false} />
+                  <XAxis type="number" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+                  <YAxis
+                    type="category"
+                    dataKey="name"
+                    tick={{ fontSize: 11, fill: '#64748b' }}
+                    axisLine={false}
+                    tickLine={false}
+                    width={80}
+                  />
+                  <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8 }} />
+                  <Bar dataKey="value" fill={COLORS.blue} radius={[0, 4, 4, 0]} name="资产数量（台）" />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="flex items-center justify-center h-60 text-gray-400 text-sm">
+                暂无部门数据
+              </div>
+            )}
           </CardContent>
         </Card>
 
-        {/* 月度处置统计 */}
+        {/* 资产状态统计 */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Activity className="w-4 h-4 text-amber-500" />
-              月度处置统计
+              资产状态统计
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={240}>
-              <BarChart data={MOCK_DISPOSAL_MONTHLY} margin={{ top: 0, right: 16, left: -16, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
-                <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8 }} />
-                <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 11 }} />
-                <Bar dataKey="transfer"     name="转移" stackId="a" fill={COLORS.blue}   />
-                <Bar dataKey="clearance"    name="清退" stackId="a" fill={COLORS.green}  />
-                <Bar dataKey="scrap"        name="报废" stackId="a" fill={COLORS.amber}  />
-                <Bar dataKey="compensation" name="赔偿" stackId="a" fill={COLORS.purple} />
-              </BarChart>
-            </ResponsiveContainer>
+            {disposalData.length > 0 ? (
+              <ResponsiveContainer width="100%" height={240}>
+                <BarChart data={disposalData} margin={{ top: 0, right: 16, left: -16, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                  <XAxis dataKey="type" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+                  <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8 }} />
+                  <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 11 }} />
+                  <Bar dataKey="count" fill={COLORS.blue} name="数量" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="flex items-center justify-center h-60 text-gray-400 text-sm">
+                暂无统计数据
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
 
       {/* 底部说明 */}
       <div className="rounded-xl border border-blue-100 bg-blue-50/50 px-4 py-3 text-sm leading-6 text-blue-700">
-        数据分析模块当前基于 Dashboard 统计 API 与模拟数据。接入完整分析 API 后可进一步扩展数据维度与实时刷新能力。
+        数据分析模块已对接 Dashboard Stats、Trends、Dept Distribution、Maintenance Stats、Report Summary 及 Category Report API。日期筛选器控制趋势图的时间范围。
       </div>
     </div>
   );

@@ -95,11 +95,11 @@ export function WorkOrderForm() {
           assetCode: order.assetCode ?? "",
           reporterName: order.reporterName ?? "",
           assigneeName: order.assigneeName ?? "",
-          deptName: (order as any).deptName ?? "",
-          plannedStartDate: (order as any).plannedStartDate ?? "",
-          plannedEndDate: (order as any).plannedEndDate ?? "",
-          estimatedCost: (order as any).estimatedCost != null
-            ? String((order as any).estimatedCost)
+          deptName: (order as Record<string, unknown>).deptName as string ?? "",
+          plannedStartDate: (order as Record<string, unknown>).plannedStartDate as string ?? "",
+          plannedEndDate: (order as Record<string, unknown>).plannedEndDate as string ?? "",
+          estimatedCost: (order as Record<string, unknown>).estimatedCost != null
+            ? String((order as Record<string, unknown>).estimatedCost)
             : "",
         });
       } catch (err: any) {

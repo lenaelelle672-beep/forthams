@@ -37,7 +37,7 @@ export default function RetirementFormPage() {
   const location = useLocation();
   const qc = useQueryClient();
 
-  const prefilledAssetId = (location.state as any)?.assetId;
+  const prefilledAssetId = (location.state as { assetId?: number } | null)?.assetId;
 
   const {
     register,
@@ -256,7 +256,7 @@ export default function RetirementFormPage() {
 
             {mutation.isError && (
               <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-red-600 text-sm">
-                {(mutation.error as any)?.response?.data?.message ?? '提交失败，请重试'}
+                {(mutation.error instanceof Error ? mutation.error.message : '提交失败，请重试')}
               </div>
             )}
 

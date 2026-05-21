@@ -152,7 +152,7 @@ export default function AssetListPage() {
       // apiClient 直接返回 response.data (ApiResponse.data)，但此处直接用 axios 实例
       const data = response.data;
       // 处理 apiClient 的包装和直接 axios 两种情况
-      const paged = (data as any)?.data ?? data;
+      const paged = (data as { data?: unknown })?.data ?? data;
       setAssets(paged?.records ?? []);
       setTotal(paged?.total ?? 0);
     } catch (err) {

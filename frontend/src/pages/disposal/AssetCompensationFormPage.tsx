@@ -12,6 +12,7 @@ import { Select, SelectItem } from '@/components/ui/Select';
 import { getAssetList } from '@/api/asset';
 import { createCompensation } from '@/api/disposal';
 import type { AssetListItem } from '@/types/asset';
+import type { ApiResponse, PageData } from '@/types/common';
 
 const schema = z.object({
   applyDate: z.string().min(1, '请选择申请日期'),
@@ -99,7 +100,7 @@ export default function AssetCompensationFormPage() {
 
   // Derive the full asset list from API response
   const apiAssets: AssetRow[] = useMemo(
-    () => ((assetListData as any)?.records ?? []).map(toAssetRow),
+    () => ((assetListData as ApiResponse<PageData<AssetListItem>> | undefined)?.data?.records ?? []).map(toAssetRow),
     [assetListData],
   );
 
@@ -552,7 +553,7 @@ export default function AssetCompensationFormPage() {
         {/* Error */}
         {mutation.isError && (
           <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-red-600 text-sm">
-            {(mutation.error as any)?.response?.data?.message ?? '提交失败，请重试'}
+            {(mutation.error instanceof Error ? mutation.error.message : '提交失败，请重试')}
           </div>
         )}
 

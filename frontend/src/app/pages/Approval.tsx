@@ -6,11 +6,11 @@ import { workOrderService } from "../services/workOrderService";
 export function Approval() {
   const [activeTab, setActiveTab] = useState<'approval' | 'workorder'>('approval');
   const [statusFilter, setStatusFilter] = useState('全部状态');
-  const [approvals, setApprovals] = useState<any[]>([]);
-  const [workOrders, setWorkOrders] = useState<any[]>([]);
+  const [approvals, setApprovals] = useState<Record<string, unknown>[]>([]);
+  const [workOrders, setWorkOrders] = useState<Record<string, unknown>[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [detailItem, setDetailItem] = useState<any | null>(null);
+  const [detailItem, setDetailItem] = useState<Record<string, unknown> | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
 
   const loadData = async () => {
@@ -18,11 +18,13 @@ export function Approval() {
       setLoading(true);
       setError(null);
       const [result, workOrderResult] = await Promise.all([
-        approvalService.list() as any,
-        workOrderService.list({ pageSize: 50 }) as any,
-      ]);
-      setApprovals(Array.isArray(result) ? result : result?.records || []);
-      setWorkOrders(Array.isArray(workOrderResult) ? workOrderResult : workOrderResult?.records || []);
+        approvalService.list(),
+        workOrderService.list({ pageSize: 50 }),
+      ]) as [unknown, unknown];
+      const resultList = result as Record<string, unknown>;
+      const woResult = workOrderResult as Record<string, unknown>;
+      setApprovals(Array.isArray(result) ? result as Record<string, unknown>[] : (resultList?.records as Record<string, unknown>[]) || []);
+      setWorkOrders(Array.isArray(workOrderResult) ? workOrderResult as Record<string, unknown>[] : (woResult?.records as Record<string, unknown>[]) || []);
     } catch (err) {
       console.error('Failed to load approvals:', err);
       setError('审批数据加载失败');
@@ -46,7 +48,7 @@ export function Approval() {
     }
   };
 
-  const handleWorkOrderOperation = async (order: any, operation: 'submit' | 'start' | 'complete') => {
+  const handleWorkOrderOperation = async (order: Record<string, unknown>, operation: 'submit' | 'start' | 'complete') => {
     try {
       if (operation === 'submit') {
         await workOrderService.submit(order.id);

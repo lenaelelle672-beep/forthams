@@ -12,6 +12,8 @@ import {
   type RetirementStatus,
 } from '@/api/retirement';
 import { getAssetById } from '@/api/asset';
+import type { ApiResponse } from '@/types/common';
+import type { Asset } from '@/types/asset';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
@@ -112,7 +114,7 @@ export default function RetirementDetailPage() {
     staleTime: 1000 * 30,
   });
 
-  const record: RetirementApplication = (res as any)?.data;
+  const record: RetirementApplication = (res as ApiResponse<RetirementApplication> | undefined)?.data;
 
   const { data: assetRes } = useQuery({
     queryKey: ['asset', 'detail', record?.assetId],
@@ -120,7 +122,7 @@ export default function RetirementDetailPage() {
     enabled: !!record?.assetId,
     staleTime: 1000 * 60,
   });
-  const asset = (assetRes as any)?.data;
+  const asset = (assetRes as ApiResponse<Asset> | undefined)?.data;
 
   const withdrawMutation = useMutation({
     mutationFn: () => withdrawRetirement(retirementId),

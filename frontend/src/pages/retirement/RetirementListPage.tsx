@@ -21,13 +21,14 @@ import {
   CalendarDays,
 } from 'lucide-react';
 import { getRetirementList } from '@/api/retirement';
-import type { RetirementStatus } from '@/api/retirement';
+import type { RetirementStatus, RetirementApplication, RetirementListQuery } from '@/api/retirement';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { FilterBar } from '@/components/ui/FilterBar';
 import { DataTable, type Column } from '@/components/ui/DataTable';
 import { PageHeader } from '@/components/ui/PageHeader';
+import type { PaginatedResponse } from '@/types/common';
 import { Input } from '@/components/ui/Input';
 
 const STATUS_CONFIG: Record<
@@ -76,7 +77,7 @@ const METRIC_CARDS = [
 
 export default function RetirementListPage() {
   const navigate = useNavigate();
-  const [params, setParams] = useState({ page: 1, pageSize: 20 } as any);
+  const [params, setParams] = useState<{ page: number; pageSize: number; keyword?: string; status?: string; department?: string; dateRange?: string }>({ page: 1, pageSize: 20 });
 
   const { data: res, isLoading } = useQuery({
     queryKey: ['retirement', 'list', params],
@@ -85,8 +86,8 @@ export default function RetirementListPage() {
     placeholderData: (p) => p,
   });
 
-  const records = (res as any)?.data?.records ?? [];
-  const total = (res as any)?.data?.total ?? 0;
+  const records = (res as PaginatedResponse<RetirementApplication> | undefined)?.data?.records ?? [];
+  const total = (res as PaginatedResponse<RetirementApplication> | undefined)?.data?.total ?? 0;
 
   const columns: Column<any>[] = [
     {
@@ -225,7 +226,7 @@ export default function RetirementListPage() {
             <Input
               placeholder="搜索编号或资产..."
               prefix={<Search className="w-4 h-4" />}
-              onChange={(e) => setParams((p: any) => ({ ...p, keyword: e.target.value, page: 1 }))}
+              onChange={(e) => setParams((p) => ({ ...p, keyword: e.target.value, page: 1 }))}
             />
           </div>
           <div className="md:col-span-2">
@@ -234,7 +235,7 @@ export default function RetirementListPage() {
               className="w-full px-3 py-2 bg-white border border-[#e5e7eb] rounded-lg text-[13px] focus:ring-2 focus:ring-[#004191]/10 focus:border-[#004191] outline-none transition-all"
               value={params.status ?? ''}
               onChange={(e) =>
-                setParams((p: any) => ({
+                setParams((p) => ({
                   ...p,
                   status: e.target.value || undefined,
                   page: 1,
@@ -254,7 +255,7 @@ export default function RetirementListPage() {
               className="w-full px-3 py-2 bg-white border border-[#e5e7eb] rounded-lg text-[13px] focus:ring-2 focus:ring-[#004191]/10 focus:border-[#004191] outline-none transition-all"
               value={params.department ?? ''}
               onChange={(e) =>
-                setParams((p: any) => ({
+                setParams((p) => ({
                   ...p,
                   department: e.target.value || undefined,
                   page: 1,
@@ -274,7 +275,7 @@ export default function RetirementListPage() {
               placeholder="2024/05/01 - 2024/05/31"
               prefix={<CalendarDays className="w-4 h-4" />}
               onChange={(e) =>
-                setParams((p: any) => ({ ...p, dateRange: e.target.value, page: 1 }))
+                setParams((p) => ({ ...p, dateRange: e.target.value, page: 1 }))
               }
             />
           </div>
@@ -309,7 +310,7 @@ export default function RetirementListPage() {
             page: params.page,
             pageSize: params.pageSize,
             total,
-            onChange: (page, pageSize) => setParams((p: any) => ({ ...p, page, pageSize })),
+            onChange: (page, pageSize) => setParams((p) => ({ ...p, page, pageSize })),
           }}
           emptyText="暂无退役申请记录"
         />

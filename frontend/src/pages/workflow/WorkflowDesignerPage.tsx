@@ -38,9 +38,9 @@ function readRoleField(role: RoleRecord, keys: string[]) {
 }
 
 function normalizeRoles(res: unknown) {
-  let list: any[] = [];
+  let list: RoleRecord[] = [];
   if (Array.isArray(res)) list = res;
-  else if (res && typeof res === 'object') { const r = res as Record<string, unknown>; if (Array.isArray(r.records)) list = r.records; else if (r.data) return normalizeRoles(r.data); }
+  else if (res && typeof res === 'object') { const r = res as Record<string, unknown>; if (Array.isArray(r.data)) list = r.data as RoleRecord[]; else if (Array.isArray(r.records)) list = r.records as RoleRecord[]; }
   const roles = (list as RoleRecord[]).map((role) => readRoleField(role, ['roleCode', 'role_code', 'code']) || readRoleField(role, ['roleName', 'role_name', 'name'])).filter(Boolean);
   return Array.from(new Set(['SUPER_ADMIN', ...roles]));
 }
@@ -109,7 +109,7 @@ export default function WorkflowDesignerPage() {
         const res = await roleApi.getAll();
         let list: RoleRecord[] = [];
         if (Array.isArray(res)) list = res;
-        else if (res && typeof res === 'object') { const r = res as any; if (Array.isArray(r?.data)) list = r.data; else if (Array.isArray(r?.records)) list = r.records; }
+        else if (res && typeof res === 'object') { const r = res as Record<string, unknown>; if (Array.isArray(r?.data)) list = r.data as RoleRecord[]; else if (Array.isArray(r?.records)) list = r.records as RoleRecord[]; }
         const codes = list.map((role) => readRoleField(role, ['roleCode', 'role_code', 'code']) || readRoleField(role, ['roleName', 'role_name', 'name'])).filter(Boolean);
         const unique = Array.from(new Set(['SUPER_ADMIN', ...codes]));
         if (!cancelled && unique.length > 0) {
