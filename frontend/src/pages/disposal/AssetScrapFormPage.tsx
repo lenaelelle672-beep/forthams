@@ -1,18 +1,22 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useNavigate } from 'react-router';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import {
   FileText, Cog, Wrench, Search,
-  Plus, Trash2, ChevronRight,
+  Plus, Trash2,
 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Select, SelectItem } from '@/components/ui/Select';
+import { getAssetList } from '@/api/asset';
+import { submitScrapApplication, saveScrapDraft } from '@/api/disposal';
+import type { AssetListItem } from '@/types/asset';
 
 const STEPS = [
   { key: 'fill-info', label: '填写信息', num: 1 },
@@ -53,20 +57,25 @@ interface SelectedAsset {
   statusColor: 'green' | 'blue';
 }
 
-const MOCK_ASSETS: SelectedAsset[] = [
-  {
-    id: '1', assetNo: 'AST-008122', name: 'Precision Lathe X1',
-    category: 'Manufacturing', brand: 'DMG Mori',
-    originalValue: 420000, netValue: 120000, usedYears: 8,
-    status: '在用', statusColor: 'green',
-  },
-  {
-    id: '2', assetNo: 'AST-009441', name: 'Server Cluster B-12',
-    category: 'IT Infrastructure', brand: 'Dell PowerEdge',
-    originalValue: 1200000, netValue: 450000, usedYears: 5,
-    status: '运行中', statusColor: 'blue',
-  },
-];
+/** Convert an API asset list item to a SelectedAsset for the table */
+function toSelectedAsset(a: AssetListItem): SelectedAsset {
+  const purchaseYear = a.purchaseDate ? new Date(a.purchaseDate).getFullYear() : 0;
+  const usedYears = purchaseYear ? new Date().getFullYear() - purchaseYear : 0;
+  const statusStr = String(a.status ?? '');
+  const isBlue = statusStr === 'MAINTENANCE' || statusStr === 'IDLE';
+  return {
+    id: String(a.id),
+    assetNo: a.assetNo,
+    name: a.assetName,
+    category: a.categoryName ?? '',
+    brand: [a.brand, a.model].filter(Boolean).join(' ') || '-',
+    originalValue: a.originalValue ?? 0,
+    netValue: a.currentValue ?? 0,
+    usedYears: Math.max(0, usedYears),
+    status: statusStr,
+    statusColor: isBlue ? 'blue' : 'green',
+  };
+}
 
 const schema = z.object({
   scrapDate: z.string().min(1, '请选择申请日期'),
@@ -127,8 +136,16 @@ export default function AssetScrapFormPage() {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const [currentStep, setCurrentStep] = useState(1);
-  const [selectedAssets, setSelectedAssets] = useState<SelectedAsset[]>(MOCK_ASSETS);
+  const [selectedAssets, setSelectedAssets] = useState<SelectedAsset[]>([]);
   const [assetSearch, setAssetSearch] = useState('');
+
+  // Fetch available assets from the real API
+  const { data: assetListData } = useQuery({
+    queryKey: ['assets', 'list', { pageSize: 200 }],
+    queryFn: () => getAssetList({ pageSize: 200 }),
+  });
+
+  const availableAssets: AssetListItem[] = (assetListData as any)?.records ?? [];
 
   const {
     register, handleSubmit, control,
@@ -144,13 +161,23 @@ export default function AssetScrapFormPage() {
 
   const submitMutation = useMutation({
     mutationFn: async (data: FormValues & { assetIds: string[] }) => {
-      // TODO: 替换为真实 API 调用
-      // return api.post('/api/disposals/scrap', data);
-      return new Promise((resolve) => setTimeout(() => resolve({ id: 1 }), 1000));
+      return submitScrapApplication({
+        assetIds: data.assetIds,
+        scrapDate: data.scrapDate,
+        scrapReason: data.scrapReason,
+        disposalMethod: data.disposalMethod,
+        estimatedResidualValue: data.estimatedResidualValue ?? '',
+        approvalFlow: data.approvalFlow,
+        remark: data.remark ?? '',
+      });
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['disposals'] });
+      toast.success('报废申请提交成功');
       navigate('/disposals');
+    },
+    onError: (error: any) => {
+      toast.error(error?.response?.data?.message ?? '提交失败，请重试');
     },
   });
 
@@ -158,7 +185,33 @@ export default function AssetScrapFormPage() {
     setSelectedAssets((prev) => prev.filter((a) => a.id !== id));
   };
 
+  const addAsset = useCallback((asset: AssetListItem) => {
+    const selected = toSelectedAsset(asset);
+    setSelectedAssets((prev) => {
+      if (prev.some((a) => a.id === selected.id)) return prev;
+      return [...prev, selected];
+    });
+  }, []);
+
+  const handleSaveDraft = useCallback(() => {
+    const formData = {
+      scrapDate: (document.querySelector<HTMLInputElement>('input[name="scrapDate"]')?.value) ?? '',
+      scrapReason: (document.querySelector<HTMLSelectElement>('select[name="scrapReason"]')?.value) ?? '',
+      disposalMethod: (document.querySelector<HTMLInputElement>('input[name="disposalMethod"]:checked')?.value) ?? '',
+      estimatedResidualValue: (document.querySelector<HTMLInputElement>('input[name="estimatedResidualValue"]')?.value) ?? '',
+      approvalFlow: (document.querySelector<HTMLSelectElement>('select[name="approvalFlow"]')?.value) ?? '',
+      remark: (document.querySelector<HTMLTextAreaElement>('textarea[name="remark"]')?.value) ?? '',
+      assetIds: selectedAssets.map((a) => a.id),
+    };
+    saveScrapDraft(formData);
+    toast.success('草稿保存成功');
+  }, [selectedAssets]);
+
   const onSubmit = (values: FormValues) => {
+    if (selectedAssets.length === 0) {
+      toast.error('请至少选择一项资产');
+      return;
+    }
     submitMutation.mutate({
       ...values,
       assetIds: selectedAssets.map((a) => a.id),
@@ -167,6 +220,17 @@ export default function AssetScrapFormPage() {
 
   const formatCurrency = (val: number) =>
     val.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+  // Filter available assets that are not already selected
+  const unselectedAssets = availableAssets.filter(
+    (a) => !selectedAssets.some((s) => s.id === String(a.id)),
+  );
+  const filteredUnselected = unselectedAssets.filter(
+    (a) =>
+      !assetSearch ||
+      a.assetNo.toLowerCase().includes(assetSearch.toLowerCase()) ||
+      a.assetName.toLowerCase().includes(assetSearch.toLowerCase()),
+  );
 
   return (
     <div className="p-6 space-y-5 max-w-[1200px] mx-auto w-full">
@@ -248,12 +312,34 @@ export default function AssetScrapFormPage() {
                   className="h-8 pl-9 pr-4 rounded-lg border border-[#e5e7eb] bg-[#e9edfe] text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 w-72"
                 />
               </div>
-              <Button type="button" variant="primary" size="md">
-                <Plus className="w-4 h-4" />
-                添加资产
-              </Button>
             </div>
           </CardHeader>
+          {/* Available assets to add */}
+          {assetSearch && filteredUnselected.length > 0 && (
+            <div className="border-t border-[#e5e7eb] bg-[#f8faff]">
+              <div className="px-6 py-2 text-xs font-semibold text-[#535f74] uppercase tracking-wider">
+                可添加资产
+              </div>
+              <div className="max-h-40 overflow-y-auto divide-y divide-[#e5e7eb]">
+                {filteredUnselected.map((asset) => (
+                  <div
+                    key={asset.id}
+                    className="flex items-center justify-between px-6 py-2 hover:bg-[#f1f3ff]/70 transition-colors cursor-pointer"
+                    onClick={() => addAsset(asset)}
+                    role="button"
+                    tabIndex={0}
+                  >
+                    <div className="flex items-center gap-4 text-sm">
+                      <span className="font-semibold text-[#3b82f6]">{asset.assetNo}</span>
+                      <span>{asset.assetName}</span>
+                      <span className="text-[#535f74]">{asset.categoryName}</span>
+                    </div>
+                    <Plus className="w-4 h-4 text-[#3b82f6]" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
@@ -302,7 +388,7 @@ export default function AssetScrapFormPage() {
                 {selectedAssets.length === 0 && (
                   <tr>
                     <td colSpan={9} className="px-6 py-8 text-center text-[#94a3b8]">
-                      暂无选中资产，请点击「添加资产」
+                      暂无选中资产，请搜索并添加资产
                     </td>
                   </tr>
                 )}
@@ -403,9 +489,7 @@ export default function AssetScrapFormPage() {
               type="button"
               variant="outline"
               size="lg"
-              onClick={() => {
-                // TODO: 保存草稿逻辑
-              }}
+              onClick={handleSaveDraft}
             >
               保存草稿
             </Button>
