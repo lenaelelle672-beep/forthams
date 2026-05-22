@@ -9,10 +9,13 @@ import { useParams, useNavigate } from 'react-router';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, Save } from 'lucide-react';
 import { useAssetDetail, useCreateAsset, useUpdateAsset, useCategoryTree } from '@/hooks/asset/useAssets';
+import { getDeptList } from '@/api/base';
 import { AssetStatus } from '@/types/asset';
 import type { CreateAssetRequest, Asset, AssetCategory } from '@/types/asset';
+import type { Department } from '@/types/common';
 import type { ApiResponse } from '@/types/common';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -50,6 +53,11 @@ export default function AssetFormPage() {
 
   const { data: assetRes } = useAssetDetail(assetId);
   const { data: catRes } = useCategoryTree();
+  const { data: deptRes } = useQuery({
+    queryKey: ['departments'],
+    queryFn: () => getDeptList(),
+  });
+  const departments: Department[] = (deptRes as ApiResponse<Department[]> | undefined)?.data ?? [];
   const createMutation = useCreateAsset();
   const updateMutation = useUpdateAsset();
 
@@ -180,12 +188,27 @@ export default function AssetFormPage() {
         <Card>
           <CardHeader><CardTitle>位置归属</CardTitle></CardHeader>
           <CardContent className="grid grid-cols-3 gap-4">
-            <Input
-              label="使用部门 ID"
-              type="number"
-              placeholder="输入部门 ID"
-              error={errors.deptId?.message}
-              {...register('deptId')}
+            <Controller
+              name="deptId"
+              control={control}
+              render={({ field }) => (
+                <div className="space-y-1">
+                  <label className="block text-sm font-medium text-gray-700">使用部门</label>
+                  <select
+                    {...field}
+                    onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
+                    className="w-full h-10 px-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">请选择部门</option>
+                    {departments.map((d) => (
+                      <option key={d.id ?? d.deptId} value={d.id ?? d.deptId}>
+                        {d.deptName ?? d.name}
+                      </option>
+                    ))}
+                  </select>
+                  {errors.deptId && <p className="text-xs text-red-500">{errors.deptId.message}</p>}
+                </div>
+              )}
             />
             <Input label="存放位置" placeholder="例：研发中心 3F 机房" {...register('location')} />
             <Input label="RFID 标签" placeholder="例：TAG-20240001" {...register('rfidTag')} />
