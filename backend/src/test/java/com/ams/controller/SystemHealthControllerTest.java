@@ -15,14 +15,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles("test")
-@DisplayName("System Health & Hello Controller Tests")
+@DisplayName("SystemHealthController Tests (merged HealthCheck)")
 class SystemHealthControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     @Test
-    @DisplayName("HealthCheckController: /health returns UP status")
+    @DisplayName("GET /health returns UP status (merged from HealthCheckController)")
     void testHealthCheck() throws Exception {
         mockMvc.perform(get("/health")
                 .contentType(MediaType.APPLICATION_JSON))
