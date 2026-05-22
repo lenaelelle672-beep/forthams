@@ -224,7 +224,10 @@ export default function ApprovalListPage() {
           <span className="text-[#424753]">至</span>
           <input type="date" className="bg-white border border-[#c2c6d5] text-sm rounded px-3 py-1.5" />
         </div>
-        <button className="ml-auto flex items-center gap-2 bg-[#004191] text-white px-5 py-2 rounded text-sm font-semibold hover:opacity-90 transition-opacity">
+        <button
+          className="ml-auto flex items-center gap-2 bg-[#004191] text-white px-5 py-2 rounded text-sm font-semibold hover:opacity-90 transition-opacity"
+          onClick={() => { setFilterType('all'); setFilterStatus('all'); setPage(1); }}
+        >
           <ListFilter className="w-5 h-5" />
           重置筛选
         </button>

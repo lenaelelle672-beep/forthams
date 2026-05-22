@@ -8,6 +8,8 @@ import {
 import {
   getRetirementDetail,
   withdrawRetirement,
+  approveRetirement,
+  rejectRetirement,
   type RetirementApplication,
   type RetirementStatus,
 } from '@/api/retirement';
@@ -128,6 +130,20 @@ export default function RetirementDetailPage() {
     mutationFn: () => withdrawRetirement(retirementId),
     onSuccess: () => {
       setWithdrawDialog(false);
+      qc.invalidateQueries({ queryKey: ['retirement'] });
+    },
+  });
+
+  const approveMutation = useMutation({
+    mutationFn: () => approveRetirement(retirementId),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['retirement'] });
+    },
+  });
+
+  const rejectMutation = useMutation({
+    mutationFn: () => rejectRetirement(retirementId, '不符合退役条件'),
+    onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['retirement'] });
     },
   });
@@ -335,11 +351,24 @@ export default function RetirementDetailPage() {
             <div className="bg-white border border-gray-200 rounded-[10px] shadow-[0_1px_2px_rgba(15,23,42,0.04)] p-4 flex gap-3">
               {record.status === 'APPROVING' && (
                 <>
-                  <Button className="flex-1" size="md">
-                    <Check className="w-4 h-4" /> 通过审批
+                  <Button
+                    className="flex-1"
+                    size="md"
+                    disabled={approveMutation.isPending}
+                    onClick={() => approveMutation.mutate()}
+                  >
+                    {approveMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+                    通过审批
                   </Button>
-                  <Button variant="outline" className="flex-1" size="md">
-                    <AlertTriangle className="w-4 h-4" /> 驳回
+                  <Button
+                    variant="outline"
+                    className="flex-1"
+                    size="md"
+                    disabled={rejectMutation.isPending}
+                    onClick={() => rejectMutation.mutate()}
+                  >
+                    {rejectMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <AlertTriangle className="w-4 h-4" />}
+                    驳回
                   </Button>
                 </>
               )}

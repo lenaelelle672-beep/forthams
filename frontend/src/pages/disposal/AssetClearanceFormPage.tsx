@@ -107,7 +107,7 @@ export default function AssetClearanceFormPage() {
     resolver: zodResolver(schema),
     defaultValues: {
       clearanceNo: 'CLR-20231124-001',
-      applicant: 'Admin',
+      applicant: '系统管理员',
       applicationDate: new Date().toISOString().split('T')[0],
       clearanceReason: '',
       disposalMethod: 'sell',
@@ -335,7 +335,7 @@ export default function AssetClearanceFormPage() {
                   className="w-full bg-white border border-[#e5e7eb] rounded-lg pl-10 pr-4 py-2 text-xs focus:outline-none focus:border-[#004191]"
                 />
               </div>
-              <Button type="button" size="sm">
+              <Button type="button" size="sm" onClick={() => setAssetSearch(' ')}>
                 <Plus className="w-4 h-4" /> 添加资产
               </Button>
             </div>

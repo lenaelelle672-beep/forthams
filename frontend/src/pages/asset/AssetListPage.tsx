@@ -156,14 +156,24 @@ export default function AssetListPage() {
         title="资产台账"
         actions={
           <>
-            <Button variant="outline" size="md">
-              <Upload className="w-4 h-4" />
-              导入
-            </Button>
-            <Button variant="outline" size="md">
-              <Download className="w-4 h-4" />
-              导出
-            </Button>
+             <Button variant="outline" size="md" onClick={() => navigate('/assets/import-export')}>
+               <Upload className="w-4 h-4" />
+               导入
+             </Button>
+             <Button variant="outline" size="md" onClick={() => {
+               const csv = [
+                 ['资产编号', '资产名称', '分类', '状态', '原值', '存放位置'].join(','),
+                 ...assets.map(a => [a.assetNo ?? '', a.assetName ?? '', a.categoryName ?? '', a.status ?? '', String(a.originalValue ?? ''), a.location ?? ''].join(','))
+               ].join('\n');
+               const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
+               const url = URL.createObjectURL(blob);
+               const link = document.createElement('a');
+               link.href = url; link.download = `assets-${new Date().toISOString().slice(0, 10)}.csv`;
+               link.click(); URL.revokeObjectURL(url);
+             }}>
+               <Download className="w-4 h-4" />
+               导出
+             </Button>
             <Button variant="primary" size="md" onClick={() => navigate('/assets/new')}>
               <Plus className="w-4 h-4" />
               新建资产

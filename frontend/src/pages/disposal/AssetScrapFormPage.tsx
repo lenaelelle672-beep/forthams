@@ -265,7 +265,7 @@ export default function AssetScrapFormPage() {
               />
               <Input
                 label="申请人"
-                value="Admin"
+                value="系统管理员"
                 readOnly
                 className="bg-[#f1f3ff] cursor-not-allowed text-[#535f74]"
               />
