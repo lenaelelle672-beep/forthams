@@ -1,5 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
+import { MemoryRouter } from 'react-router';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { Dashboard } from '../../src/app/pages/Dashboard';
@@ -92,7 +93,11 @@ describe('Dashboard mojibake cleanup', () => {
   });
 
   it('repairs UTF-8-as-Latin-1 dashboard labels and hides unrecoverable garbled text', async () => {
-    render(<Dashboard />);
+    render(
+      <MemoryRouter>
+        <Dashboard />
+      </MemoryRouter>
+    );
 
     expect(await screen.findByText('总公司')).toBeInTheDocument();
     expect(await screen.findByText('研发部')).toBeInTheDocument();

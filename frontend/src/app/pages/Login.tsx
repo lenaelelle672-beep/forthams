@@ -42,8 +42,8 @@ const platformModules = [
 const trustSignals = ["JWT 安全会话", "角色权限控制", "操作审计留痕"];
 
 const testAccount = {
-  username: "admin",
-  password: "admin123",
+  username: import.meta.env.VITE_DEMO_USERNAME || "",
+  password: import.meta.env.VITE_DEMO_PASSWORD || "",
 };
 
 export function Login() {
@@ -647,6 +647,7 @@ export function Login() {
                   {submitting ? "登录中..." : "登录并进入仪表板"}
                 </Button>
 
+                {testAccount.username && testAccount.password && (
                 <div className="rounded-xl border border-[#1e3a5f]/30 bg-[#1e3a5f]/15 p-3 text-xs">
                   <div className="mb-2 flex items-center gap-1.5 font-medium text-blue-400/80">
                     <ShieldCheck className="size-3.5" />
@@ -663,6 +664,7 @@ export function Login() {
                     </div>
                   </div>
                 </div>
+                )}
 
                 <div className="flex items-center justify-center gap-4 pt-1 text-[10px] text-slate-600">
                   {trustSignals.map((s) => (

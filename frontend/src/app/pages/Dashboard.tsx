@@ -599,17 +599,18 @@ export function Dashboard() {
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-gray-900">待审批事项</h3>
-            <button
-              type="button"
-              onClick={() => navigate('/approval')}
-              className="text-sm text-blue-600 hover:text-blue-800 transition-colors"
-            >
-              查看全部 →
-            </button>
-          </div>
-          <span className="px-2.5 py-0.5 text-xs font-medium bg-red-100 text-red-800 rounded-full">
-              {formatNumber(pendingApprovals.length)}项待处理
-            </span>
+            <div className="flex items-center gap-3">
+              <span className="px-2.5 py-0.5 text-xs font-medium bg-red-100 text-red-800 rounded-full">
+                {formatNumber(pendingApprovals.length)}项待处理
+              </span>
+              <button
+                type="button"
+                onClick={() => navigate('/approval')}
+                className="text-sm text-blue-600 hover:text-blue-800 transition-colors"
+              >
+                查看全部 →
+              </button>
+            </div>
           </div>
           {approvalMessage ? <div className="mb-3 text-sm text-green-600">{approvalMessage}</div> : null}
           {approvalError ? <div className="mb-3 text-sm text-red-600">{approvalError}</div> : null}

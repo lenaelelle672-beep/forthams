@@ -29,12 +29,21 @@ interface Particle {
   maxLife: number;
 }
 
-const DEMO_ACCOUNTS = [
-  { label: '系统管理员', desc: '全域权限', username: 'admin', password: 'admin123', Icon: ShieldCheck },
-  { label: '资产管理员', desc: '全生命周期', username: 'asset', password: 'asset123', Icon: Package },
-  { label: '部门负责人', desc: '资源审批', username: 'manager', password: 'manager123', Icon: Building2 },
-  { label: '运维人员', desc: '巡检维修', username: 'staff', password: 'staff123', Icon: Wrench },
-] as const;
+// 开发环境使用演示账号，生产环境通过环境变量注入（为空则隐藏）
+const isDev = import.meta.env.DEV;
+const envDemoUser = import.meta.env.VITE_DEMO_USERNAME;
+const envDemoPass = import.meta.env.VITE_DEMO_PASSWORD;
+
+const DEMO_ACCOUNTS: Array<{ label: string; desc: string; username: string; password: string; Icon: typeof ShieldCheck }> = isDev
+  ? [
+      { label: '系统管理员', desc: '全域权限', username: envDemoUser || 'admin', password: envDemoPass || 'admin123', Icon: ShieldCheck },
+      { label: '资产管理员', desc: '全生命周期', username: 'asset', password: 'asset123', Icon: Package },
+      { label: '部门负责人', desc: '资源审批', username: 'manager', password: 'manager123', Icon: Building2 },
+      { label: '运维人员', desc: '巡检维修', username: 'staff', password: 'staff123', Icon: Wrench },
+    ]
+  : envDemoUser && envDemoPass
+    ? [{ label: '演示账号', desc: '只读权限', username: envDemoUser, password: envDemoPass, Icon: ShieldCheck }]
+    : [];
 
 function useParticleCanvas(canvasRef: React.RefObject<HTMLCanvasElement | null>) {
   const particlesRef = useRef<Particle[]>([]);
@@ -486,6 +495,7 @@ export default function LoginPage() {
           </form>
         </div>
 
+        {DEMO_ACCOUNTS.length > 0 && (
         <section className="w-full">
           <div className="flex items-center gap-4 mb-6">
             <div className="h-px flex-grow bg-white/10" />
@@ -515,6 +525,7 @@ export default function LoginPage() {
             ))}
           </div>
         </section>
+        )}
 
         <footer className="mt-12 text-center">
           <p className="text-xs text-[#434655]">© 2026 资产管理系统 版权所有</p>
