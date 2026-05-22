@@ -327,8 +327,7 @@ export default function LoginPage() {
       }} />
 
       <div className="login1-layout relative z-10 grid h-full w-full grid-cols-[minmax(0,1fr)_minmax(420px,500px)] items-center gap-12 px-[6vw] py-8">
-        <section className="login1-left relative min-h-[640px] overflow-hidden rounded-[40px] p-8 text-[#dae2fd]">
-          <div className="absolute inset-0 rounded-[40px] border border-white/10 bg-transparent shadow-[0_40px_140px_rgba(0,0,0,0.28)]" />
+        <section className="login1-left relative min-h-[640px] overflow-hidden p-8 text-[#dae2fd]">
           <div className="absolute -left-24 top-16 h-72 w-72 rounded-full bg-[#2563eb]/20 blur-3xl" />
           <div className="absolute bottom-8 right-10 h-80 w-80 rounded-full bg-[#14b8a6]/20 blur-3xl" />
 
