@@ -263,10 +263,9 @@ export default function LoginPage() {
         }
 
         .login1-asset-card {
-          background: linear-gradient(135deg, rgba(22, 34, 59, .72), rgba(8, 18, 38, .42));
+          background: rgba(22, 34, 59, 0.18);
           border: 1px solid rgba(148, 197, 255, .14);
           box-shadow: 0 24px 80px rgba(0, 0, 0, .28), inset 0 1px 0 rgba(255,255,255,.08);
-          backdrop-filter: blur(22px);
         }
 
         .login1-asset-visual {
@@ -329,7 +328,7 @@ export default function LoginPage() {
 
       <div className="login1-layout relative z-10 grid h-full w-full grid-cols-[minmax(0,1fr)_minmax(420px,500px)] items-center gap-12 px-[6vw] py-8">
         <section className="login1-left relative min-h-[640px] overflow-hidden rounded-[40px] p-8 text-[#dae2fd]">
-          <div className="absolute inset-0 rounded-[40px] border border-white/10 bg-[linear-gradient(135deg,rgba(23,31,51,0.56),rgba(7,18,37,0.22))] shadow-[0_40px_140px_rgba(0,0,0,0.28)] backdrop-blur-[18px]" />
+          <div className="absolute inset-0 rounded-[40px] border border-white/10 bg-transparent shadow-[0_40px_140px_rgba(0,0,0,0.28)]" />
           <div className="absolute -left-24 top-16 h-72 w-72 rounded-full bg-[#2563eb]/20 blur-3xl" />
           <div className="absolute bottom-8 right-10 h-80 w-80 rounded-full bg-[#14b8a6]/20 blur-3xl" />
 
@@ -338,10 +337,10 @@ export default function LoginPage() {
               <span className="h-2 w-2 rounded-full bg-[#5fffc1] shadow-[0_0_18px_rgba(95,255,193,.8)]" />
               资产数字孪生中心
             </div>
-            <h1 className="max-w-[620px] text-[52px] font-semibold leading-[1.04] tracking-[-0.04em] text-white">
+            <h1 className="max-w-[620px] text-[52px] font-semibold leading-[1.04] tracking-[-0.04em] text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.7)]">
               资产全生命周期，实时可视化掌控
             </h1>
-            <p className="mt-5 max-w-[560px] text-base leading-8 text-[#b8c8e6]">
+            <p className="mt-5 max-w-[560px] text-base leading-8 text-[#b8c8e6] drop-shadow-[0_1px_6px_rgba(0,0,0,0.6)]">
               聚合设备台账、位置分布、巡检维修、审批处置等关键数据，构建统一资产运营指挥入口。
             </p>
           </div>
@@ -395,8 +394,7 @@ export default function LoginPage() {
         <div
           className="glass-card w-full rounded-xl p-8 mb-8"
           style={{
-            background: 'rgba(23, 31, 51, 0.6)',
-            backdropFilter: 'blur(24px)',
+            background: 'rgba(23, 31, 51, 0.35)',
             border: '1px solid rgba(255, 255, 255, 0.1)',
           }}
         >
@@ -513,8 +511,7 @@ export default function LoginPage() {
                 disabled={loginMutation.isPending}
                 className="p-4 rounded-xl flex flex-col items-center text-center group hover:-translate-y-1 transition-all disabled:opacity-40"
                 style={{
-                  background: 'rgba(23, 31, 51, 0.6)',
-                  backdropFilter: 'blur(24px)',
+                  background: 'rgba(23, 31, 51, 0.35)',
                   border: '1px solid rgba(255, 255, 255, 0.1)',
                 }}
               >

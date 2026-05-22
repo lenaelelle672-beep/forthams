@@ -434,9 +434,8 @@ export function Login() {
 
         .login-hero-card {
           border: 1px solid rgba(59, 130, 246, 0.24);
-          background: linear-gradient(135deg, rgba(10, 22, 40, 0.76), rgba(15, 23, 42, 0.54));
+          background: rgba(10, 22, 40, 0.35);
           box-shadow: 0 18px 60px rgba(15, 23, 42, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-          backdrop-filter: blur(18px);
         }
 
         .login-hero-pulse {
@@ -586,7 +585,7 @@ export function Login() {
               <p className="text-sm text-slate-400">统一资产台账、流程审批、折旧管理与审计追踪</p>
             </div>
 
-            <div className="overflow-hidden rounded-2xl border border-[#1e3a5f]/50 bg-[#0a1628]/88 shadow-2xl shadow-blue-950/40 backdrop-blur-xl">
+            <div className="overflow-hidden rounded-2xl border border-[#1e3a5f]/50 bg-[#0a1628]/45 shadow-2xl shadow-blue-950/40">
             <div className="px-7 pt-7 pb-2 sm:px-8 sm:pt-8">
               <div className="mb-1 flex items-center gap-2">
                 <LockKeyhole className="size-4 text-blue-400" />

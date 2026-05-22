@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 public class Vendor {
     @TableId(type = IdType.AUTO)
     private Long id;
+    @TableField("vendor_name")
     private String name;
     private String vendorCode;
     @TableField("contact_person")
