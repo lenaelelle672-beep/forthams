@@ -92,7 +92,7 @@ describe('auditService API client integration', () => {
     });
 
     const { calledUrl, query } = queryFromFirstCall();
-    expect(calledUrl).toContain('/audit-logs/trend?');
+    expect(calledUrl).toContain('/audit-logs/trends?');
     expect(query.get('granularity')).toBe('weekly');
     expect(query.get('operation_type')).toBe('DELETE');
     expect(query.get('operator_id')).toBe('U001');

@@ -9,8 +9,8 @@ import { useParams, useNavigate } from 'react-router';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, Save } from 'lucide-react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { ArrowLeft, Save, Loader2 } from 'lucide-react';
 import { useAssetDetail, useCreateAsset, useUpdateAsset, useCategoryTree } from '@/hooks/asset/useAssets';
 import { getDeptList } from '@/api/base';
 import { AssetStatus } from '@/types/asset';
@@ -48,6 +48,7 @@ type FormValues = z.infer<typeof schema>;
 export default function AssetFormPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const isEdit = !!id && id !== 'new';
   const assetId = isEdit ? Number(id) : null;
 
@@ -65,12 +66,14 @@ export default function AssetFormPage() {
   const categories = (catRes as ApiResponse<AssetCategory[]> | undefined)?.data ?? [];
 
   const {
-    register, handleSubmit, control, reset,
+    register, handleSubmit, control, reset, watch,
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: { status: AssetStatus.IN_USE, isImportant: 0 },
   });
+
+  const isLoadingDetail = isEdit && !asset && useAssetDetail(assetId).isLoading;
 
   // 编辑模式：回填已有值
   useEffect(() => {
@@ -106,6 +109,7 @@ export default function AssetFormPage() {
       } else {
         await createMutation.mutateAsync(values as CreateAssetRequest);
       }
+      queryClient.invalidateQueries({ queryKey: ['assets'] });
       navigate('/assets');
     } catch (err) {
       const msg = err instanceof Error ? err.message : '保存失败，请重试';
@@ -114,6 +118,18 @@ export default function AssetFormPage() {
   };
 
   const flatCategories = (cats: any[]): any[] => cats.flatMap((c) => [c, ...flatCategories(c.children ?? [])]);
+
+  if (isLoadingDetail) {
+    return (
+      <div className="p-6 space-y-5">
+        <div className="animate-pulse space-y-4">
+          <div className="h-8 w-48 bg-blue-50 rounded" />
+          <div className="h-64 bg-blue-50 rounded-lg" />
+          <div className="h-48 bg-blue-50 rounded-lg" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 space-y-5">
@@ -270,19 +286,27 @@ export default function AssetFormPage() {
               <label className="text-sm font-medium text-[#374151]">资产描述</label>
               <textarea
                 rows={3}
+                maxLength={500}
                 placeholder="资产用途、主要配置等..."
                 className="w-full px-3 py-2 text-sm border border-[#e5e7eb] rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-[#3b82f6] resize-none placeholder:text-[#94a3b8]"
                 {...register('description')}
               />
+              <p className="text-right text-xs text-[#94a3b8]">
+                已输入 {(watch?.('description') ?? '').length} / 500 字
+              </p>
             </div>
             <div className="flex flex-col gap-1.5">
               <label className="text-sm font-medium text-[#374151]">备注</label>
               <textarea
                 rows={3}
+                maxLength={200}
                 placeholder="其他需要说明的信息..."
                 className="w-full px-3 py-2 text-sm border border-[#e5e7eb] rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-[#3b82f6] resize-none placeholder:text-[#94a3b8]"
                 {...register('remark')}
               />
+              <p className="text-right text-xs text-[#94a3b8]">
+                已输入 {(watch?.('remark') ?? '').length} / 200 字
+              </p>
             </div>
           </CardContent>
         </Card>

@@ -46,9 +46,4 @@ public class DeptController {
         deptService.deleteDept(id);
         return Result.success();
     }
-
-    @GetMapping("/all")
-    public Result<?> all() {
-        return list(null);
-    }
 }

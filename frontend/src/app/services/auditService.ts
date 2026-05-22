@@ -290,7 +290,7 @@ export async function fetchAuditLogTrend(
   if (params.module) queryParams.set('module', params.module);
 
   const backendTrend = await api.get<BackendTrendResponse>(
-    `${API_BASE}/trend?${queryParams.toString()}`
+    `${API_BASE}/trends?${queryParams.toString()}`
   );
 
   return {

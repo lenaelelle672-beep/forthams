@@ -7,6 +7,7 @@ import com.ams.dto.AssetUpdateDTO;
 import com.ams.entity.Asset;
 import com.ams.service.AssetService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,12 +17,7 @@ import org.springframework.web.bind.annotation.*;
 public class AssetController {
     private final AssetService assetService;
 
-    @GetMapping
-    public Result<Page<Asset>> listRoot(AssetQueryDTO queryDTO) {
-        return list(queryDTO);
-    }
-
-    @GetMapping("/list")
+    @GetMapping({"", "/list"})
     public Result<Page<Asset>> list(AssetQueryDTO queryDTO) {
         return Result.success(assetService.queryAssets(queryDTO));
     }
@@ -32,12 +28,12 @@ public class AssetController {
     }
 
     @PostMapping
-    public Result<Asset> create(@RequestBody AssetCreateDTO createDTO) {
+    public Result<Asset> create(@Valid @RequestBody AssetCreateDTO createDTO) {
         return Result.success(assetService.createAsset(createDTO));
     }
 
     @PutMapping("/{id}")
-    public Result<Asset> update(@PathVariable Long id, @RequestBody AssetUpdateDTO updateDTO) {
+    public Result<Asset> update(@PathVariable Long id, @Valid @RequestBody AssetUpdateDTO updateDTO) {
         return Result.success(assetService.updateAsset(id, updateDTO));
     }
 

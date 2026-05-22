@@ -335,7 +335,7 @@ function buildTrendUrl(filters: AuditLogFilters): string {
   }
   if (filters.module) params.set('module', filters.module);
 
-  return `${AUDIT_API_BASE}/trend?${params.toString()}`;
+  return `${AUDIT_API_BASE}/trends?${params.toString()}`;
 }
 
 // ---------------------------------------------------------------------------

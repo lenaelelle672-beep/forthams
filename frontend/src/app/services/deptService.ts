@@ -13,7 +13,7 @@ export const deptService = {
   },
 
   getAll() {
-    return api.get<DeptRecord[]>("/depts/all");
+    return api.get<DeptRecord[]>("/depts/list");
   },
 
   getById(id: number | string) {

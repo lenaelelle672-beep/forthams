@@ -196,7 +196,7 @@ async function fetchLogTrend(
     end_time: endTime,
   });
 
-  const response = await fetch(`${API_BASE}/trend?${params.toString()}`);
+  const response = await fetch(`${API_BASE}/trends?${params.toString()}`);
 
   if (!response.ok) {
     throw { status: response.status, message: `Trend API request failed: ${response.statusText}` };
@@ -596,7 +596,7 @@ describe('Log Dashboard - API Service (fetchLogTrend)', () => {
 
     expect(fetch).toHaveBeenCalledTimes(1);
     const calledUrl = (fetch as ReturnType<typeof vi.fn>).mock.calls[0][0] as string;
-    expect(calledUrl).toContain('/api/v1/audit-logs/trend?');
+    expect(calledUrl).toContain('/api/v1/audit-logs/trends?');
     expect(calledUrl).toContain('start_time=2025-04-01');
     expect(calledUrl).toContain('end_time=2025-04-07');
     expect(result).toHaveLength(7);

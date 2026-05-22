@@ -44,7 +44,7 @@ export default function AssetListPage() {
   const navigate = useNavigate();
 
   const [page, setPage] = useState(1);
-  const [pageSize] = useState(10);
+  const [pageSize, setPageSize] = useState(10);
   const [keywordInput, setKeywordInput] = useState('');
   const [keyword, setKeyword] = useState('');
   const [categoryId, setCategoryId] = useState<number | ''>('');
@@ -279,7 +279,7 @@ export default function AssetListPage() {
               page,
               pageSize,
               total,
-              onChange: (p) => setPage(p),
+              onChange: (p, ps) => { setPage(p); if (ps && ps !== pageSize) setPageSize(ps); },
             }}
           />
         </CardContent>
@@ -296,7 +296,7 @@ export default function AssetListPage() {
           </div>
           <div className="mt-1 text-sm flex items-center gap-1 font-bold text-green-600">
             <TrendingUp className="w-4 h-4" />
-            <span>较上月 +2.4%</span>
+            <span>较上月 --</span>
           </div>
         </div>
         {/* 待处理维修 */}
@@ -308,7 +308,7 @@ export default function AssetListPage() {
               : '—'}
           </div>
           <div className="mt-1 text-sm flex items-center gap-1 font-bold">
-            <span>平均响应时间: 4.2h</span>
+            <span>平均响应时间: --</span>
           </div>
         </div>
         {/* 闲置率 */}

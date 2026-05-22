@@ -34,9 +34,4 @@ public class AuthController {
         return Result.success("登出成功");
     }
 
-    @GetMapping("/test")
-    public Result<String> test() {
-        return Result.success("认证测试成功");
-    }
-
 }

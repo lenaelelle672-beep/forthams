@@ -449,7 +449,7 @@ export async function fetchAuditTrend(
 
   const client = httpClient();
   const response = await client.get<AuditTrendResponse>(
-    `${API_BASE}/trend`,
+    `${API_BASE}/trends`,
     { params: queryParams }
   );
   return response.data;

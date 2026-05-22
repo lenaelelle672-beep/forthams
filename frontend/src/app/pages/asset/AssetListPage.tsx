@@ -351,25 +351,42 @@ export default function AssetListPage() {
                 共 <span className="font-medium text-gray-700">{total.toLocaleString()}</span> 条，
                 第 {page} / {totalPages} 页
               </p>
-              <div className="flex items-center gap-1">
-                <button
-                  type="button"
-                  onClick={() => handlePageChange(page - 1)}
-                  disabled={page <= 1}
-                  className="inline-flex items-center gap-1 h-8 px-2.5 text-sm rounded border border-gray-200 bg-white hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                  上一页
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handlePageChange(page + 1)}
-                  disabled={page >= totalPages}
-                  className="inline-flex items-center gap-1 h-8 px-2.5 text-sm rounded border border-gray-200 bg-white hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-                >
-                  下一页
-                  <ChevronRight className="w-4 h-4" />
-                </button>
+              <div className="flex items-center gap-3">
+                {/* pageSize selector */}
+                <div className="flex items-center gap-1.5 text-sm text-gray-500">
+                  <span>每页</span>
+                  <select
+                    value={pageSize}
+                    onChange={(e) => setParam('pageSize', e.target.value)}
+                    className="h-7 px-1.5 text-sm rounded border border-gray-200 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  >
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                  </select>
+                  <span>条</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={() => handlePageChange(page - 1)}
+                    disabled={page <= 1}
+                    className="inline-flex items-center gap-1 h-8 px-2.5 text-sm rounded border border-gray-200 bg-white hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                    上一页
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handlePageChange(page + 1)}
+                    disabled={page >= totalPages}
+                    className="inline-flex items-center gap-1 h-8 px-2.5 text-sm rounded border border-gray-200 bg-white hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  >
+                    下一页
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
             </div>
           </div>

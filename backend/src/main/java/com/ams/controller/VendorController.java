@@ -1,11 +1,14 @@
 package com.ams.controller;
 
 import com.ams.common.Result;
+import com.ams.dto.VendorCreateDTO;
+import com.ams.dto.VendorUpdateDTO;
 import com.ams.entity.Vendor;
 import com.ams.service.VendorService;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import java.util.List;
 
 @RestController
 @RequestMapping("/vendors")
@@ -14,8 +17,10 @@ public class VendorController {
     private final VendorService vendorService;
 
     @GetMapping("/list")
-    public Result<List<Vendor>> list() {
-        return Result.success(vendorService.list());
+    public Result<Page<Vendor>> list(
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "10") Integer pageSize) {
+        return Result.success(vendorService.listPage(page, pageSize));
     }
 
     @GetMapping("/{id}")
@@ -24,13 +29,13 @@ public class VendorController {
     }
 
     @PostMapping
-    public Result<Vendor> create(@RequestBody Vendor vendor) {
-        return Result.success(vendorService.createVendor(vendor));
+    public Result<Vendor> create(@Valid @RequestBody VendorCreateDTO dto) {
+        return Result.success(vendorService.createVendor(dto));
     }
 
     @PutMapping("/{id}")
-    public Result<Vendor> update(@PathVariable Long id, @RequestBody Vendor vendor) {
-        return Result.success(vendorService.updateVendor(id, vendor));
+    public Result<Vendor> update(@PathVariable Long id, @Valid @RequestBody VendorUpdateDTO dto) {
+        return Result.success(vendorService.updateVendor(id, dto));
     }
 
     @DeleteMapping("/{id}")

@@ -6,7 +6,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
-import { Plus, FileText } from 'lucide-react';
+import { Plus, FileText, Download } from 'lucide-react';
+import { toast } from 'sonner';
 import { getWorkOrderList } from '@/api/workorder';
 import type { PaginatedResponse } from '@/types/common';
 import type { WorkOrderListItem } from '@/types/workorder';
@@ -22,6 +23,8 @@ const WO_STATUS_OPTIONS = [
   { key: 'APPROVING_LEVEL_1', label: '一级审批中' },
   { key: 'APPROVING_LEVEL_2', label: '二级审批中' },
   { key: 'APPROVED',          label: '已通过'   },
+  { key: 'IN_PROGRESS',       label: '进行中'   },
+  { key: 'COMPLETED',         label: '已完成'   },
   { key: 'REJECTED',          label: '已驳回'   },
   { key: 'CANCELLED',         label: '已取消'   },
 ];
@@ -32,6 +35,8 @@ const STATUS_BADGE: Record<string, { label: string; variant: 'default' | 'succes
   APPROVING_LEVEL_1: { label: '一级审批中', variant: 'warning' },
   APPROVING_LEVEL_2: { label: '二级审批中', variant: 'warning' },
   APPROVED:          { label: '已通过',    variant: 'success' },
+  IN_PROGRESS:       { label: '进行中',    variant: 'success' },
+  COMPLETED:         { label: '已完成',    variant: 'success' },
   REJECTED:          { label: '已驳回',    variant: 'danger'  },
   CANCELLED:         { label: '已取消',    variant: 'gray'    },
 };
@@ -109,9 +114,36 @@ export default function WorkOrderListPage() {
         subtitle={`共 ${total} 条工单`}
         breadcrumbs={[{ label: '仪表板', href: '/dashboard' }, { label: '工单管理' }]}
         actions={
-          <Button size="md" onClick={() => navigate('/workorders/new')}>
-            <Plus className="w-4 h-4" /> 新建工单
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="md" onClick={() => {
+              if (records.length === 0) {
+                toast.info('暂无数据可导出');
+                return;
+              }
+              const headers = ['工单号', '标题', '优先级', '状态', '申请人', '部门', '申请时间'];
+              const rows = records.map((r: any) => [
+                r.orderNo ?? r.id ?? '',
+                r.title ?? '',
+                PRIORITY_LABEL[r.priority] ?? r.priority ?? '',
+                STATUS_BADGE[r.status]?.label ?? r.status ?? '',
+                r.applicantName ?? '',
+                r.departmentName ?? '',
+                r.createdAt ?? '',
+              ]);
+              const csv = [headers, ...rows].map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
+              const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url; a.download = `workorders-${new Date().toISOString().slice(0, 10)}.csv`;
+              a.click(); URL.revokeObjectURL(url);
+              toast.success('导出成功');
+            }}>
+              <Download className="w-4 h-4" /> 导出CSV
+            </Button>
+            <Button size="md" onClick={() => navigate('/workorders/new')}>
+              <Plus className="w-4 h-4" /> 新建工单
+            </Button>
+          </div>
         }
       />
 

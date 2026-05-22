@@ -114,7 +114,7 @@ class AuditDashboardControllerTest {
                 eq("ASSET")))
                 .thenReturn(trend);
 
-        mockMvc.perform(get("/api/audit-logs/trend")
+        mockMvc.perform(get("/api/audit-logs/trends")
                         .contextPath("/api")
                         .param("start_time", "2026-05-01T00:00:00Z")
                         .param("end_time", "2026-05-31T23:59:59Z")

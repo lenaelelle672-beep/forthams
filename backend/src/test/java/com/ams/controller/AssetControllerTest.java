@@ -110,7 +110,7 @@ class AssetControllerTest {
         mockMvc.perform(post("/api/assets")
                 .contextPath("/api")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"assetName\":\"新资产\",\"categoryId\":1,\"status\":\"IDLE\"}"))
+                .content("{\"assetNo\":\"AST-2026-0002\",\"assetName\":\"新资产\",\"categoryId\":1,\"status\":\"IDLE\"}"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.code").value(200))
             .andExpect(jsonPath("$.data.assetName").value("新资产"));

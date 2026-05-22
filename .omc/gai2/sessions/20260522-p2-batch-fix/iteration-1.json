@@ -1,0 +1,16 @@
+{
+  "iteration": 1,
+  "review_status": "incomplete",
+  "review_file": ".omc/gai2/sessions/20260522-p2-batch-fix/review.json",
+  "rework_reasons": [
+    "前端 locationService.ts:69 仍调用 /locations/root（后端已删除该端点）→ 需改为 /locations/list",
+    "前端 deptService.ts:16 仍调用 /depts/all（后端已删除该端点）→ 需改为 /depts/list",
+    "vitest 2 个失败：audit-log API 测试期望 /trend 但后端已改为 /trends → 需修复测试或确认前端 API 路径"
+  ],
+  "dispatched_agents": ["gai2-builder"],
+  "expected_fixes": [
+    "locationService.ts getRoots() 改为调用 /locations/list",
+    "deptService.ts getAll() 改为调用 /depts/list",
+    "修复 audit-log 相关测试中的 /trend → /trends 路径"
+  ]
+}

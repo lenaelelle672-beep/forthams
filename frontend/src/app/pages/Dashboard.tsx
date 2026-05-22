@@ -19,6 +19,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { useNavigate } from 'react-router';
 import { QuickActions } from "../components/QuickActions";
 import { MaintenanceCalendar } from "../components/MaintenanceCalendar";
 import {
@@ -234,6 +235,7 @@ function getApprovalLabel(approval: ApprovalRecord, keys: string[], fallback = "
 }
 
 export function Dashboard() {
+  const navigate = useNavigate();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [valueTrends, setValueTrends] = useState<AssetValueTrend[]>([]);
   const [deptDistribution, setDeptDistribution] = useState<DeptDistribution[]>([]);
@@ -374,8 +376,12 @@ export function Dashboard() {
   const handleExport = useCallback(async () => {
     setExporting(true);
     try {
-      const exportStats = await dashboardService.getStats();
-      const rows = [
+      const [exportStats, exportTrends, exportDistribution] = await Promise.all([
+        dashboardService.getStats(),
+        dashboardService.getValueTrends(),
+        dashboardService.getDeptDistribution(),
+      ]);
+      const rows: string[][] = [
         ["指标", "数值"],
         ["资产总数", String(exportStats.totalAssets ?? "")],
         ["在用资产", String(exportStats.inUseAssets ?? "")],
@@ -385,6 +391,14 @@ export function Dashboard() {
         ["资产总值", String(exportStats.totalValue ?? "")],
         ["资产净值", String(exportStats.netValue ?? "")],
         ["待审批数", String(exportStats.pendingApprovals ?? "")],
+        [],
+        ["资产价值趋势"],
+        ["日期", "资产总值", "资产净值"],
+        ...exportTrends.map((t) => [String(t.date ?? ""), String(t.totalValue ?? ""), String(t.netValue ?? "")]),
+        [],
+        ["部门资产分布"],
+        ["部门ID", "部门名称", "资产数量"],
+        ...exportDistribution.map((d) => [String(d.deptId ?? ""), String(d.deptName ?? ""), String(d.assetCount ?? "")]),
       ];
       const csvContent = rows.map((r) => r.join(",")).join("\n");
       const bom = "\uFEFF";
@@ -392,7 +406,7 @@ export function Dashboard() {
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.download = `dashboard-stats-${new Date().toISOString().slice(0, 10)}.csv`;
+      link.download = `dashboard-full-${new Date().toISOString().slice(0, 10)}.csv`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -549,7 +563,16 @@ export function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* 最近动态 */}
         <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">最近动态</h3>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-900">最近动态</h3>
+            <button
+              type="button"
+              onClick={() => navigate('/approval')}
+              className="text-sm text-blue-600 hover:text-blue-800 transition-colors"
+            >
+              查看全部 →
+            </button>
+          </div>
           <div className="space-y-4">
             {recentActivities.length ? recentActivities.map((activity) => (
               <div key={activity.id} className="flex gap-3 pb-4 border-b border-gray-200 last:border-0">
@@ -576,7 +599,15 @@ export function Dashboard() {
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-gray-900">待审批事项</h3>
-            <span className="px-2.5 py-0.5 text-xs font-medium bg-red-100 text-red-800 rounded-full">
+            <button
+              type="button"
+              onClick={() => navigate('/approval')}
+              className="text-sm text-blue-600 hover:text-blue-800 transition-colors"
+            >
+              查看全部 →
+            </button>
+          </div>
+          <span className="px-2.5 py-0.5 text-xs font-medium bg-red-100 text-red-800 rounded-full">
               {formatNumber(pendingApprovals.length)}项待处理
             </span>
           </div>

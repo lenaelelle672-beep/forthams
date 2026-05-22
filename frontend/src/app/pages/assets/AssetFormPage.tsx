@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAssetDetail, useAssetMutation } from '../../hooks/useAssets';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getDeptList } from '../../../api/base';
 import type { Department } from '../../../types/common';
 
@@ -99,6 +99,7 @@ const INITIAL_FORM: AssetFormData = {
 export default function AssetFormPage() {
   const navigate = useNavigate();
   const { id: assetId } = useParams<{ id: string }>();
+  const queryClient = useQueryClient();
 
   /** Whether we are in edit mode (assetId present in URL) */
   const isEditMode = Boolean(assetId && assetId !== 'new');
@@ -223,17 +224,19 @@ export default function AssetFormPage() {
         const result = await update(assetId, payload);
         if (result) {
           toast.success('资产更新成功');
+          queryClient.invalidateQueries({ queryKey: ['assets'] });
           navigate(`/assets/${assetId}`);
         }
       } else {
         const result = await create(payload);
         if (result) {
           toast.success('资产创建成功');
+          queryClient.invalidateQueries({ queryKey: ['assets'] });
           navigate('/assets');
         }
       }
     },
-    [form, isEditMode, assetId, validateForm, create, update, reset, navigate],
+    [form, isEditMode, assetId, validateForm, create, update, reset, navigate, queryClient],
   );
 
   // ---- Loading skeleton (edit mode) ------------------------------------
@@ -479,11 +482,15 @@ export default function AssetFormPage() {
               value={form.remark}
               onChange={(e) => handleChange('remark', e.target.value)}
               rows={3}
+              maxLength={500}
               className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200
                 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors resize-y"
               placeholder="请输入备注信息"
               data-testid="input-remark"
             />
+            <p className="mt-1 text-right text-xs text-gray-400">
+              已输入 {form.remark.length} / 500 字
+            </p>
           </div>
         </div>
 

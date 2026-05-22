@@ -131,24 +131,6 @@ class LocationControllerTest {
             .andExpect(jsonPath("$.data").isEmpty());
     }
 
-    // ─── /root tests ─────────────────────────────────────────────
-
-    @Test
-    @DisplayName("root: 应返回根位置列表（与 /list 相同）")
-    void root_returnsRootLocations() throws Exception {
-        Location loc = new Location();
-        loc.setId(1L);
-        loc.setName("总部");
-
-        when(locationService.findRootLocations()).thenReturn(List.of(loc));
-
-        mockMvc.perform(get("/locations/root")
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.code").value(200))
-            .andExpect(jsonPath("$.data[0].name").value("总部"));
-    }
-
     // ─── /{id} tests ─────────────────────────────────────────────
 
     @Test

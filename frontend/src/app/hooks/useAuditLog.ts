@@ -595,7 +595,7 @@ export function useAuditLog(): UseAuditLogReturn {
         params.operator_id = filter.operatorId;
       }
 
-      const url = buildUrl(`${API_BASE}/trend`, params);
+      const url = buildUrl(`${API_BASE}/trends`, params);
       const data = await requestGet<AuditLogTrendResponse>(url);
       setTrendData(data);
     } catch (err) {

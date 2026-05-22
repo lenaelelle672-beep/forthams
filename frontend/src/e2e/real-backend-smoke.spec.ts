@@ -8,7 +8,7 @@ const approverRoleCode = 'SUPER_ADMIN';
 test.describe.configure({ mode: 'serial' });
 
 test('真实后端：登录后可打开仪表板和资产台账', async ({ page, request }) => {
-  const health = await request.get(`${apiBase}/auth/test`);
+  const health = await request.get(`${apiBase}/health`);
   test.skip(!health.ok(), `后端不可用：${apiBase}`);
 
   const auth = await loginThroughRequest(request);
@@ -39,7 +39,7 @@ test('真实后端：登录后可打开仪表板和资产台账', async ({ page,
 });
 
 test('真实后端：资产搜索框和流程设计器可用', async ({ page, request }) => {
-  const health = await request.get(`${apiBase}/auth/test`);
+  const health = await request.get(`${apiBase}/health`);
   test.skip(!health.ok(), `后端不可用：${apiBase}`);
 
   const errors = collectBrowserErrors(page);
@@ -58,7 +58,7 @@ test('真实后端：资产搜索框和流程设计器可用', async ({ page, re
 });
 
 test('真实后端：登录页可见且流程设计器配置校验有效', async ({ page, request }) => {
-  const health = await request.get(`${apiBase}/auth/test`);
+  const health = await request.get(`${apiBase}/health`);
   test.skip(!health.ok(), `后端不可用：${apiBase}`);
 
   const errors = collectBrowserErrors(page);
@@ -87,7 +87,7 @@ test('真实后端：登录页可见且流程设计器配置校验有效', async
 });
 
 test('真实后端：资产处置四类业务可打开对应流程设计器', async ({ page, request }) => {
-  const health = await request.get(`${apiBase}/auth/test`);
+  const health = await request.get(`${apiBase}/health`);
   test.skip(!health.ok(), `后端不可用：${apiBase}`);
 
   const errors = collectBrowserErrors(page);
@@ -151,7 +151,7 @@ test('真实后端：资产处置四类业务可打开对应流程设计器', as
 });
 
 test('真实后端：核心导航和顶栏操作可点击', async ({ page, request }) => {
-  const health = await request.get(`${apiBase}/auth/test`);
+  const health = await request.get(`${apiBase}/health`);
   test.skip(!health.ok(), `后端不可用：${apiBase}`);
 
   const errors = collectBrowserErrors(page);
@@ -194,7 +194,7 @@ test('真实后端：核心导航和顶栏操作可点击', async ({ page, reque
 });
 
 test('真实后端：工单审批和资产退役 API 闭环可跑通', async ({ request }) => {
-  const health = await request.get(`${apiBase}/auth/test`);
+  const health = await request.get(`${apiBase}/health`);
   test.skip(!health.ok(), `后端不可用：${apiBase}`);
 
   const auth = await loginThroughRequest(request);
@@ -257,7 +257,7 @@ test('真实后端：工单审批和资产退役 API 闭环可跑通', async ({ 
 });
 
 test('真实后端：赔偿页面可用', async ({ page, request }) => {
-  const health = await request.get(`${apiBase}/auth/test`);
+  const health = await request.get(`${apiBase}/health`);
   test.skip(!health.ok(), `后端不可用：${apiBase}`);
 
   const errors = collectBrowserErrors(page);
@@ -271,7 +271,7 @@ test('真实后端：赔偿页面可用', async ({ page, request }) => {
 });
 
 test('真实后端：大屏页面可访问', async ({ page, request }) => {
-  const health = await request.get(`${apiBase}/auth/test`);
+  const health = await request.get(`${apiBase}/health`);
   test.skip(!health.ok(), `后端不可用：${apiBase}`);
 
   const errors = collectBrowserErrors(page);
