@@ -38,32 +38,77 @@ import {
   Handshake,
   Archive,
   MonitorDot,
+  Monitor,
+  BoxesIcon,
 } from 'lucide-react';
 
-// ── 导航菜单项配置 ────────────────────────────────────────────────────────────
-const NAV_ITEMS = [
-  { path: '/dashboard',    label: '仪表板',    icon: LayoutDashboard },
-  { path: '/assets',       label: '资产台账',   icon: Package },
-  { path: '/equipment',    label: '重要设备',   icon: Cpu },
-  { path: '/inventory',    label: 'RFID 盘点', icon: ScanLine },
-  { path: '/workorders',   label: '工单管理',   icon: ClipboardList },
-  { path: '/approvals',    label: '审批流程',   icon: CheckSquare },
-  { path: '/retirement',   label: '退役管理',   icon: Archive },
-  { path: '/disposals',    label: '资产处置',   icon: Recycle },
-  { path: '/idle',         label: '闲置资产',   icon: Warehouse },
-  { path: '/compensation', label: '赔偿管理',   icon: Handshake },
-  { path: '/depreciation', label: '折旧管理',   icon: TrendingDown },
-  { path: '/audit',        label: '审计日志',   icon: FileText },
-  { path: '/analytics', label: '数据分析',   icon: BarChart3 },
-  { path: '/bigscreen', label: '态势大屏',   icon: MonitorDot, external: true },
-] as const;
+type NavItem = {
+  path: string;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  external?: boolean;
+};
 
-const NAV_BOTTOM_ITEMS = [
+type NavGroup = {
+  group: string;
+  items: NavItem[];
+};
+
+// ── 导航菜单分组配置 ──────────────────────────────────────────────────────────
+const NAV_GROUPS: NavGroup[] = [
+  {
+    group: '概览',
+    items: [
+      { path: '/dashboard', label: '仪表板', icon: LayoutDashboard },
+      { path: '/analytics', label: '数据分析', icon: BarChart3 },
+    ],
+  },
+  {
+    group: '资产管理',
+    items: [
+      { path: '/assets',       label: '资产台账', icon: Package },
+      { path: '/equipment',    label: '重要设备', icon: Cpu },
+      { path: '/idle',         label: '闲置资产', icon: Warehouse },
+      { path: '/depreciation', label: '折旧管理', icon: TrendingDown },
+    ],
+  },
+  {
+    group: '运营管理',
+    items: [
+      { path: '/inventory',  label: 'RFID 盘点', icon: ScanLine },
+      { path: '/workorders', label: '工单管理', icon: ClipboardList },
+      { path: '/approvals',  label: '审批流程', icon: CheckSquare },
+    ],
+  },
+  {
+    group: '退役与处置',
+    items: [
+      { path: '/retirement',   label: '退役管理', icon: Archive },
+      { path: '/disposals',    label: '资产处置', icon: Recycle },
+      { path: '/compensation', label: '赔偿管理', icon: Handshake },
+    ],
+  },
+  {
+    group: '监控与审计',
+    items: [
+      { path: '/audit', label: '审计日志', icon: FileText },
+    ],
+  },
+  {
+    group: '大屏',
+    items: [
+      { path: '/bigscreen',   label: '态势大屏',   icon: MonitorDot, external: true },
+      { path: '/bigscreen-3d', label: '3D 大屏', icon: Monitor, external: true },
+    ],
+  },
+];
+
+const NAV_BOTTOM_ITEMS: NavItem[] = [
   { path: '/vendors',   label: '供应商',  icon: Users },
   { path: '/locations', label: '位置管理', icon: MapPin },
   { path: '/workflows', label: '工作流',  icon: Workflow },
   { path: '/settings',  label: '系统设置', icon: Settings },
-] as const;
+];
 
 // ── 主布局组件 ────────────────────────────────────────────────────────────────
 export default function AppLayout() {
@@ -135,44 +180,55 @@ export default function AppLayout() {
         </div>
 
         {/* 导航主区 */}
-        <nav className="flex-1 overflow-y-auto py-4 space-y-0.5 px-2">
-          {NAV_ITEMS.map((item) => {
-            const { path, label, icon: Icon } = item;
-            const isExternal = 'external' in item && item.external;
-            if (isExternal) {
-              return (
-                <a
-                  key={path}
-                  href={path}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors text-sm font-medium text-[#94a3b8] hover:bg-[#1a2d47] hover:text-white"
-                  title={collapsed ? label : undefined}
-                >
-                  <Icon className="w-4 h-4 flex-shrink-0" />
-                  {!collapsed && <span className="truncate">{label}</span>}
-                  {!collapsed && <span className="ml-auto text-[10px] opacity-40">↗</span>}
-                </a>
-              );
-            }
-            return (
-              <NavLink
-                key={path}
-                to={path}
-                className={({ isActive }) =>
-                  `flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors text-sm font-medium ${
-                    isActive
-                      ? 'bg-[#1e3a5f] text-white border-l-2 border-blue-400 pl-[10px]'
-                      : 'text-[#94a3b8] hover:bg-[#1a2d47] hover:text-white'
-                  }`
+        <nav className="flex-1 overflow-y-auto py-4 px-2">
+          {NAV_GROUPS.map((group) => (
+            <div key={group.group} className="mb-2">
+              {!collapsed && (
+                <div className="px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-[#4a5568]">
+                  {group.group}
+                </div>
+              )}
+              {collapsed && (
+                <div className="mx-auto my-1 h-px bg-[#1a2d47]" />
+              )}
+              {group.items.map((item) => {
+                const { path, label, icon: Icon } = item;
+                if (item.external) {
+                  return (
+                    <a
+                      key={path}
+                      href={path}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors text-sm font-medium text-[#94a3b8] hover:bg-[#1a2d47] hover:text-white"
+                      title={collapsed ? label : undefined}
+                    >
+                      <Icon className="w-4 h-4 flex-shrink-0" />
+                      {!collapsed && <span className="truncate">{label}</span>}
+                      {!collapsed && <span className="ml-auto text-[10px] opacity-40">↗</span>}
+                    </a>
+                  );
                 }
-                title={collapsed ? label : undefined}
-              >
-                <Icon className="w-4 h-4 flex-shrink-0" />
-                {!collapsed && <span className="truncate">{label}</span>}
-              </NavLink>
-            );
-          })}
+                return (
+                  <NavLink
+                    key={path}
+                    to={path}
+                    className={({ isActive }) =>
+                      `flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors text-sm font-medium ${
+                        isActive
+                          ? 'bg-[#1e3a5f] text-white border-l-2 border-blue-400 pl-[10px]'
+                          : 'text-[#94a3b8] hover:bg-[#1a2d47] hover:text-white'
+                      }`
+                    }
+                    title={collapsed ? label : undefined}
+                  >
+                    <Icon className="w-4 h-4 flex-shrink-0" />
+                    {!collapsed && <span className="truncate">{label}</span>}
+                  </NavLink>
+                );
+              })}
+            </div>
+          ))}
 
           {/* 分隔线 */}
           <div className="border-t border-[#1a2d47] my-3 mx-1" />

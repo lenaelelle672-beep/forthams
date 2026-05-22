@@ -1,5 +1,6 @@
+import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   AreaChart, Area, ResponsiveContainer, XAxis, YAxis, Tooltip,
 } from 'recharts';
@@ -8,7 +9,7 @@ import {
   History, QrCode,
   FileQuestion,
 } from 'lucide-react';
-import { getAssetById, getDepreciationSchedule } from '@/api/asset';
+import { getAssetById, getDepreciationSchedule, deleteAsset } from '@/api/asset';
 import type { Asset } from '@/types/asset';
 import type { ApiResponse } from '@/types/common';
 import type { DepreciationScheduleItem } from '@/types/asset';
@@ -34,6 +35,21 @@ function formatDate(value: string | undefined | null): string {
 export default function AssetDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const qc = useQueryClient();
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+
+  const deleteMutation = useMutation({
+    mutationFn: () => deleteAsset(Number(id!)),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['assets'] });
+      navigate('/assets');
+    },
+    onError: (err: Error) => {
+      setDeleteError(err.message || '删除失败');
+      setShowDeleteConfirm(false);
+    },
+  });
 
   const { data: assetRes, isLoading, error } = useQuery({
     queryKey: ['asset', id],
