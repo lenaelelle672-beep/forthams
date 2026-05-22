@@ -201,10 +201,20 @@ export default function DashboardPage() {
         subtitle={`欢迎回来，系统管理员 · ${dateStr}`}
         actions={
           <>
-            <Button variant="outline" size="md">
-              <Download className="w-4 h-4" />
-              导出数据
-            </Button>
+             <Button variant="outline" size="md" onClick={() => {
+               const csv = [
+                 ['分类', '数量', '占比'].join(','),
+                 ...deptChartData.map(d => [d.name, d.value, `${((d.value / Math.max(deptChartData.reduce((s, x) => s + x.value, 0), 1)) * 100).toFixed(1)}%`].join(','))
+               ].join('\n');
+               const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
+               const url = URL.createObjectURL(blob);
+               const a = document.createElement('a');
+               a.href = url; a.download = `dashboard-${new Date().toISOString().slice(0, 10)}.csv`;
+               a.click(); URL.revokeObjectURL(url);
+             }}>
+               <Download className="w-4 h-4" />
+               导出数据
+             </Button>
             <Button variant="primary" size="md" onClick={handleRefresh}>
               <RefreshCw className="w-4 h-4" />
               刷新视图

@@ -60,6 +60,7 @@ function UsersTab() {
   const qc = useQueryClient();
   const [showForm, setShowForm] = useState(false);
   const [editingUser, setEditingUser] = useState<UserItem | null>(null);
+  const [confirmAction, setConfirmAction] = useState<{ type: 'delete' | 'resetPwd'; user: UserItem } | null>(null);
   const [form, setForm] = useState({
     username: '',
     realName: '',
@@ -186,13 +187,18 @@ function UsersTab() {
   };
 
   const handleDelete = (user: UserItem) => {
-    if (!window.confirm(`确定要删除用户「${user.realName || user.username}」吗？`)) return;
-    deleteMut.mutate(user.id);
+    setConfirmAction({ type: 'delete', user });
   };
 
   const handleResetPwd = (user: UserItem) => {
-    if (!window.confirm(`确定要重置「${user.realName || user.username}」的密码吗？`)) return;
-    resetPwdMut.mutate(user.id);
+    setConfirmAction({ type: 'resetPwd', user });
+  };
+
+  const executeConfirm = () => {
+    if (!confirmAction) return;
+    if (confirmAction.type === 'delete') deleteMut.mutate(confirmAction.user.id);
+    else resetPwdMut.mutate(confirmAction.user.id);
+    setConfirmAction(null);
   };
 
   const STATUS_BADGE: Record<number, string> = {
@@ -292,6 +298,27 @@ function UsersTab() {
           </div>
         </div>
       )}
+
+      {confirmAction && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl w-full max-w-sm mx-4 shadow-xl p-6 space-y-4">
+            <h3 className="text-base font-semibold text-gray-900">
+              {confirmAction.type === 'delete' ? '确认删除用户' : '确认重置密码'}
+            </h3>
+            <p className="text-sm text-gray-500">
+              {confirmAction.type === 'delete'
+                ? `确定要删除用户「${confirmAction.user.realName || confirmAction.user.username}」吗？此操作不可撤销。`
+                : `确定要重置「${confirmAction.user.realName || confirmAction.user.username}」的密码吗？`}
+            </p>
+            <div className="flex justify-end gap-3">
+              <Button variant="outline" size="sm" onClick={() => setConfirmAction(null)}>取消</Button>
+              <Button variant={confirmAction.type === 'delete' ? 'destructive' : 'primary'} size="sm" onClick={executeConfirm}>
+                确认
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </Card>
   );
 }
@@ -316,6 +343,7 @@ function DepartmentsTab() {
   const [showForm, setShowForm] = useState(false);
   const [editingDept, setEditingDept] = useState<Department | null>(null);
   const [form, setForm] = useState({ name: '', deptCode: '', parentId: '' });
+  const [deleteTarget, setDeleteTarget] = useState<Department | null>(null);
 
   // ── Query: fetch dept tree ──────────────────────────────────────────────
   const { data: deptTree, isLoading } = useQuery({
@@ -411,8 +439,13 @@ function DepartmentsTab() {
   };
 
   const handleDelete = (dept: Department) => {
-    if (!window.confirm(`确定要删除部门「${dept.deptName}」吗？`)) return;
-    deleteMut.mutate(dept.id);
+    setDeleteTarget(dept);
+  };
+
+  const executeDeleteDept = () => {
+    if (!deleteTarget) return;
+    deleteMut.mutate(deleteTarget.id);
+    setDeleteTarget(null);
   };
 
   return (
@@ -484,6 +517,21 @@ function DepartmentsTab() {
                 </Button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {deleteTarget && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl w-full max-w-sm mx-4 shadow-xl p-6 space-y-4">
+            <h3 className="text-base font-semibold text-gray-900">确认删除部门</h3>
+            <p className="text-sm text-gray-500">
+              确定要删除部门「{deleteTarget.deptName}」吗？此操作不可撤销。
+            </p>
+            <div className="flex justify-end gap-3">
+              <Button variant="outline" size="sm" onClick={() => setDeleteTarget(null)}>取消</Button>
+              <Button variant="destructive" size="sm" onClick={executeDeleteDept}>确认删除</Button>
+            </div>
           </div>
         </div>
       )}

@@ -218,7 +218,7 @@ export default function AssetCompensationFormPage() {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['compensation'] });
-      navigate('/disposal');
+      navigate('/disposals');
     },
   });
 
@@ -562,9 +562,9 @@ export default function AssetCompensationFormPage() {
           <Button type="button" variant="ghost" onClick={() => navigate(-1)}>
             取消
           </Button>
-          <Button type="button" variant="outline">
-            保存草稿
-          </Button>
+           <Button type="button" variant="outline" onClick={() => navigate('/disposals')}>
+             保存草稿
+           </Button>
           <Button type="submit" variant="primary" loading={isSubmitting || mutation.isPending}>
             提交申请
           </Button>

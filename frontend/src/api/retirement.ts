@@ -73,3 +73,11 @@ export const getAssetRetirementHistory = (assetId: number) =>
 /** 撤回退役申请 */
 export const withdrawRetirement = (id: number) =>
   http.post<ApiResponse<void>>(`/retirement/${id}/withdraw`);
+
+/** 审批通过退役申请 */
+export const approveRetirement = (id: number) =>
+  http.post<ApiResponse<void>>(`/retirement/${id}/approve`);
+
+/** 驳回退役申请 */
+export const rejectRetirement = (id: number, reason: string) =>
+  http.post<ApiResponse<void>>(`/retirement/${id}/reject`, { reason });

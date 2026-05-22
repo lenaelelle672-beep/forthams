@@ -126,7 +126,11 @@ export default function NotificationsPage() {
               <CheckCheck className="w-4 h-4" />
               全部已读
             </Button>
-            <button className="p-2 border border-[#e5e7eb] rounded hover:bg-[#f1f3ff] transition-colors">
+            <button
+              className="p-2 border border-[#e5e7eb] rounded hover:bg-[#f1f3ff] transition-colors"
+              onClick={() => { setActiveTab('all'); setPage(1); }}
+              title="重置筛选"
+            >
               <ListFilter className="w-5 h-5 text-[#424753]" />
             </button>
           </div>

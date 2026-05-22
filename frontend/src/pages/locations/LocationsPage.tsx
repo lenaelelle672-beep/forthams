@@ -228,6 +228,7 @@ export default function LocationsPage() {
   const [editingNode, setEditingNode] = useState<LocationNode | null>(null);
   const [parentId, setParentId] = useState<number | null>(null);
   const [parentName, setParentName] = useState('顶级');
+  const [deleteTarget, setDeleteTarget] = useState<LocationNode | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   // ── 数据加载 ───────────────────────────────────────────────────────────────
@@ -286,13 +287,19 @@ export default function LocationsPage() {
   };
 
   const handleDelete = async (node: LocationNode) => {
-    if (!window.confirm(`确定要删除位置「${node.locationName}」吗？子位置也将一并删除。`)) return;
+    setDeleteTarget(node);
+  };
+
+  const executeDelete = async () => {
+    if (!deleteTarget) return;
     try {
-      await apiDeleteLocation(node.id);
-      setTree(prev => deleteNodeFromTree(prev, node.id));
-      toast.success(`位置「${node.locationName}」已删除`);
+      await apiDeleteLocation(deleteTarget.id);
+      setTree(prev => deleteNodeFromTree(prev, deleteTarget.id));
+      toast.success(`位置「${deleteTarget.locationName}」已删除`);
     } catch (err) {
       toast.error('删除位置失败，请稍后重试');
+    } finally {
+      setDeleteTarget(null);
     }
   };
 
@@ -387,7 +394,22 @@ export default function LocationsPage() {
         submitting={submitting}
         onClose={() => { setDialogOpen(false); setEditingNode(null); }}
         onSubmit={handleSubmit}
-      />
+       />
+
+      {deleteTarget && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl w-full max-w-sm mx-4 shadow-xl p-6 space-y-4">
+            <h3 className="text-base font-semibold text-gray-900">确认删除位置</h3>
+            <p className="text-sm text-gray-500">
+              确定要删除位置「{deleteTarget.locationName}」吗？子位置也将一并删除。
+            </p>
+            <div className="flex justify-end gap-3">
+              <Button variant="outline" size="sm" onClick={() => setDeleteTarget(null)}>取消</Button>
+              <Button variant="destructive" size="sm" onClick={executeDelete}>确认删除</Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

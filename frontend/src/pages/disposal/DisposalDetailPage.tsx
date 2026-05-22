@@ -276,10 +276,10 @@ export default function DisposalDetailPage() {
             <Button variant="secondary" size="md" onClick={() => navigate('/disposals')}>
               返回列表
             </Button>
-            <Button variant="outline" size="md" onClick={() => navigate(-1)}>
-              <Undo2 className="w-4 h-4" />
-              撤回申请
-            </Button>
+             <Button variant="outline" size="md" onClick={() => navigate(-1)}>
+               <Undo2 className="w-4 h-4" />
+               返回上一页
+             </Button>
           </div>
         </div>
       </div>

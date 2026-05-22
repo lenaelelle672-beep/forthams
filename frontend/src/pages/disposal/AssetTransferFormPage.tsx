@@ -242,7 +242,7 @@ export default function AssetTransferFormPage() {
           <CardContent>
             <div className="grid grid-cols-2 gap-x-8 gap-y-4">
               <Input label="调拨编号" value="ATR-20231027-001" readOnly className="bg-[#f8fafc] cursor-not-allowed text-[#94a3b8]" />
-              <Input label="申请人" value="Admin" readOnly className="bg-[#f8fafc] cursor-not-allowed text-[#94a3b8]" />
+              <Input label="申请人" value="系统管理员" readOnly className="bg-[#f8fafc] cursor-not-allowed text-[#94a3b8]" />
               <Input label="调拨日期" value={new Date().toISOString().split('T')[0]} readOnly className="bg-[#f8fafc] cursor-not-allowed text-[#94a3b8]" />
               <Controller
                 name="transferType"
@@ -488,9 +488,9 @@ export default function AssetTransferFormPage() {
           <Button type="button" variant="outline" onClick={() => navigate(-1)}>
             取消
           </Button>
-          <Button type="button" variant="outline" className="border-[#3b82f6] text-[#3b82f6] hover:bg-blue-50">
-            保存草稿
-          </Button>
+           <Button type="button" variant="outline" className="border-[#3b82f6] text-[#3b82f6] hover:bg-blue-50" onClick={() => navigate('/disposals')}>
+             保存草稿
+           </Button>
           <Button
             type="button"
             loading={isSubmitting || mutation.isPending}

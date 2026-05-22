@@ -120,7 +120,7 @@ export default function RetirementFormPage() {
                     <div className="col-span-2">
                       <p className="text-[10px] text-[#64748b] uppercase tracking-wider">资产名称 & 编号</p>
                       <p className="text-xl font-bold text-[#161c27]">
-                        {assetSearch || 'Precision Lathe X1'}
+                        {assetSearch || '精密车床 X1'}
                       </p>
                       <p className="text-[12px] text-[#004191] font-mono">AST-2023-0891</p>
                     </div>

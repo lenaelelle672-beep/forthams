@@ -207,7 +207,7 @@ export default function RetirementListPage() {
             <Button
               variant="ghost"
               size="icon"
-              onClick={(e) => { e.stopPropagation(); navigate(`/retirement/${row.id}/edit`); }}
+              onClick={(e) => { e.stopPropagation(); navigate(`/retirement/${row.id}`); }}
             >
               <Edit2 className="w-4 h-4" />
             </Button>
