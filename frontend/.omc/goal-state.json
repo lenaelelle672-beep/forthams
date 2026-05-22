@@ -2,29 +2,17 @@
   "objective": "逐页深度实现：交互/按钮/功能100%，英文→中文，undefined兜底",
   "created": "2026-05-22T09:16:00Z",
   "status": "active",
-  "iteration": 5,
+  "iteration": 6,
   "max_iterations": 50,
-  "phase": "VERIFY",
+  "phase": "PATCH→VERIFY",
   "evidence": [
-    "构建 4.45s 通过，585/585 全绿",
-    "Wave 7: 17 个交互缺陷全部修复（9死按钮+2错误导航+4window.confirm+2误导按钮）",
-    "Wave 7: 4 处英文残留中文化",
-    "Wave 7: undefined 兜底统一 ?? '—' 风格",
-    "Wave 7: AssetDetailPage/ 死代码清除 -3411 行",
-    "retirement.ts 新增 approveRetirement/rejectRetirement API",
-    "SettingsPage/LocationsPage window.confirm→React确认弹窗",
-    "8 commits since Wave 6"
+    "构建 4.66s 通过，585/585 全绿",
+    "零 @/app/ 导入残留（活跃页面）",
+    "Wave 8: P0 关键修复 - 3页面@/app/迁移+2导出崩溃+工作流导航",
+    "3 个新 API 文件: maintenance.ts/depreciation.ts/inventory.ts",
+    "Wave 7: 17交互缺陷+4中文化+死代码-3411行",
+    "累计 10 commits since GAI start"
   ],
-  "actions_taken": [
-    "Wave 7-1: IdleAssets Mock→React Query",
-    "Wave 7-2: Equipment 搜索筛选",
-    "Wave 7-3: AssetDetail 删除确认弹窗",
-    "Wave 7-4: AssetForm 部门选择器",
-    "Wave 7-5: 类型统一 asset.types→asset.ts",
-    "Wave 7-6: 17交互缺陷+4中文化+兜底+死代码"
-  ],
-  "current_wave": "Wave 8: 深度验证",
-  "scan_issues_progress": "35/50 completed, 3 skipped, 12 remaining",
   "commit_log": [
     "1de6e737 refactor: IdleAssets Mock→React Query",
     "335a1ef9 feat: EquipmentPage 搜索筛选",
@@ -33,6 +21,8 @@
     "e0fae19c refactor: 类型统一 asset.types→asset.ts",
     "7e6edb1b fix: 17交互缺陷+4中文化",
     "062bd084 fix: undefined兜底+破折号统一",
-    "f568359e chore: 删除AssetDetailPage/ -3411行"
+    "f568359e chore: 删除AssetDetailPage/ -3411行",
+    "5d6096fc chore: 更新SCAN_ISSUES+GSD",
+    "577c37e6 fix: P0关键-3页面@/app/迁移+导出崩溃+工作流导航"
   ]
 }
