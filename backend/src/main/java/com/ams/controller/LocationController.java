@@ -5,6 +5,8 @@ import com.ams.entity.Location;
 import com.ams.service.LocationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -22,6 +24,34 @@ public class LocationController {
     @GetMapping("/root")
     public Result<List<Location>> root() {
         return Result.success(locationService.findRootLocations());
+    }
+
+    /**
+     * 级联查询：返回树形结构 [{code, name, children: [{code, name}...]}]
+     */
+    @GetMapping("/cascade")
+    public Result<List<Map<String, Object>>> cascade() {
+        List<Location> roots = locationService.findRootLocations();
+        List<Map<String, Object>> tree = new ArrayList<>();
+        for (Location root : roots) {
+            tree.add(buildCascadeNode(root));
+        }
+        return Result.success(tree);
+    }
+
+    private Map<String, Object> buildCascadeNode(Location location) {
+        Map<String, Object> node = new HashMap<>();
+        node.put("code", location.getLocationCode() != null ? location.getLocationCode() : String.valueOf(location.getId()));
+        node.put("name", location.getName() != null ? location.getName() : "");
+        List<Location> children = locationService.findChildrenByParentId(location.getId());
+        if (children != null && !children.isEmpty()) {
+            List<Map<String, Object>> childNodes = new ArrayList<>();
+            for (Location child : children) {
+                childNodes.add(buildCascadeNode(child));
+            }
+            node.put("children", childNodes);
+        }
+        return node;
     }
 
     @GetMapping("/{id}")

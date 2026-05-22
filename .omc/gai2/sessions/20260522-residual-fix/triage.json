@@ -1,0 +1,179 @@
+{
+  "triage_time": "2026-05-22T10:00:00+08:00",
+  "triage_agent": "gai2-triage",
+  "directive_summary": "修复 V2 报告残留问题：通知中心完整实现、位置级联端点、Controller 测试补齐、项目清理、P2 批量修复",
+  "tasks": [
+    {
+      "id": "T1",
+      "title": "通知中心完整实现",
+      "classification": "Heavy",
+      "scope": [
+        "backend/src/main/resources/schema.sql",
+        "backend/_quarantine_autogen/src/main/java/com/ams/entity/NotificationRecord.java",
+        "backend/_quarantine_autogen/src/main/java/com/ams/service/NotificationService.java",
+        "backend/src/main/java/com/ams/controller/NotificationController.java",
+        "backend/src/main/java/com/ams/mapper/NotificationRecordMapper.java（新建）",
+        "frontend/src/pages/notifications/NotificationsPage.tsx",
+        "frontend/src/components/NotificationBell.tsx",
+        "frontend/src/api/notification.ts"
+      ],
+      "risks": [
+        "数据库 DDL 变更需确保与现有数据兼容（schema.sql 新建表无风险）",
+        "从 quarantine 迁移 NotificationService/NotificationRecord 需调整包路径和依赖注入",
+        "Controller 重构：从 ApprovalService 派生改为独立 NotificationService，前端响应结构可能变化",
+        "多租户场景需确认 NotificationRecord 是否需要 tenant_id 字段",
+        "前端已使用的 isRead/read/createTime 等字段需保持向后兼容"
+      ],
+      "dependencies": [
+        "schema.sql DDL 先行",
+        "quarantine 代码迁移和包路径调整",
+        "Mapper 接口新建",
+        "Controller 重构依赖新 Service",
+        "前端适配依赖后端 API 稳定"
+      ],
+      "recommended_phases": ["audit", "debate", "builder", "reviewer"],
+      "acceptance_hints": [
+        "notification_record 表 DDL 在 schema.sql 中",
+        "NotificationService 从 quarantine 迁移到 main 源码",
+        "NotificationController 的 markAsRead/markAllAsRead/delete 真实持久化",
+        "前端通知页面刷新后已读状态保持",
+        "mvn test + vitest 全绿"
+      ],
+      "builder_notes": "建议拆分为 2 个子批次：B1-DDL+Entity+Mapper+Service 迁移；B2-Controller 重构 + 前端适配"
+    },
+    {
+      "id": "T2",
+      "title": "Location /cascade 级联查询端点",
+      "classification": "Light",
+      "scope": [
+        "backend/src/main/java/com/ams/controller/LocationController.java",
+        "backend/src/main/java/com/asm/service/LocationService.java",
+        "backend/src/test/java/com/ams/controller/LocationControllerTest.java（新建）"
+      ],
+      "risks": [
+        "前端调用路径为 /locations/cascade（context-path=/api 前缀已处理）",
+        "级联返回结构需与前端 assetExport.ts 中的 Location 类型对齐（id, name, parentId, children）"
+      ],
+      "dependencies": [
+        "LocationService 已有 findChildrenByParentId 和 findRootLocations 方法可复用"
+      ],
+      "recommended_phases": ["builder", "reviewer"],
+      "acceptance_hints": [
+        "GET /locations/cascade 返回树形结构",
+        "前端资产导出筛选面板位置级联不再 404",
+        "新增 LocationControllerTest 覆盖 cascade 端点"
+      ]
+    },
+    {
+      "id": "T3",
+      "title": "Controller 测试补齐",
+      "classification": "Medium",
+      "scope": [
+        "backend/src/test/java/com/ams/controller/LocationControllerTest.java（新建）",
+        "backend/src/test/java/com/ams/controller/ReportControllerTest.java（新建）",
+        "backend/src/test/java/com/ams/controller/VendorControllerTest.java（新建）",
+        "backend/src/test/java/com/ams/controller/WorkflowDefinitionControllerTest.java（新建）",
+        "backend/src/test/java/com/ams/controller/DeptControllerTest.java（新建）",
+        "backend/src/test/java/com/ams/controller/RoleControllerTest.java（新建）",
+        "backend/src/test/java/com/ams/controller/UserManagementControllerTest.java（新建）",
+        "backend/src/test/java/com/ams/controller/MaintenanceControllerTest.java（新建）",
+        "backend/src/test/java/com/ams/controller/StatsControllerTest.java（新建）",
+        "backend/src/test/java/com/ams/controller/CallbackControllerTest.java（新建）",
+        "backend/src/test/java/com/ams/controller/SystemHealthControllerTest.java（新建）",
+        "backend/src/test/java/com/ams/controller/HealthCheckControllerTest.java（新建）",
+        "backend/src/test/java/com/ams/controller/HelloControllerTest.java（新建）"
+      ],
+      "risks": [
+        "13 个缺测试 Controller 中部分涉及认证/权限（如 UserManagementController、RoleController），需 mock JwtUtil",
+        "部分 Controller 依赖外部服务（如 EmailService、ReportService），需 mock 或 stub",
+        "低价值 Controller（HealthCheckController、HelloController）可合并为一个测试类"
+      ],
+      "dependencies": [
+        "docs/testing/templates/ControllerTestTemplate.java 可参考模板",
+        "现有 14 个 ControllerTest 可参考模式"
+      ],
+      "recommended_phases": ["builder", "reviewer"],
+      "acceptance_hints": [
+        "Controller 测试从 14 个增至 20+ 个",
+        "每个测试至少覆盖 CRUD 主路径和错误边界",
+        "mvn test 全绿（含新增测试）"
+      ],
+      "builder_notes": "按优先级分批：B1-核心业务 Controller（Vendor、Maintenance、WorkflowDefinition、Report、Stats、Dept、Role、UserManagement）；B2-辅助 Controller（Callback、SystemHealth、HealthCheck、Hello、Location）。LocationController 如果 T2 合并则跳过。"
+    },
+    {
+      "id": "T4",
+      "title": ".gitignore 清理 coverage/playwright-report",
+      "classification": "Light",
+      "scope": [
+        ".gitignore"
+      ],
+      "risks": [
+        "coverage/ 和 playwright-report/ 已在 .gitignore 中，仅需 git rm --cached 清理已跟踪文件"
+      ],
+      "dependencies": [],
+      "recommended_phases": ["builder"],
+      "acceptance_hints": [
+        "git ls-files 中不再包含 coverage/ 和 playwright-report/ 下的文件",
+        "git status 无相关 untracked 提示"
+      ],
+      "builder_notes": "单条命令即可：git rm -r --cached coverage/ playwright-report/ test-results/（如已跟踪）"
+    },
+    {
+      "id": "T5",
+      "title": "P2 问题批量修复",
+      "classification": "Medium",
+      "scope": [
+        "待定位：V2 报告 P2 问题清单",
+        "已知 P2 候选：inventoryHandlers.ts 注释中 /api/v1/ 引用、Dept.java deleted 字段 @TableLogic 注解确认"
+      ],
+      "risks": [
+        "P2 问题清单需从 V2 报告中提取，当前 sessions 目录无 P2 明确列表",
+        "部分 P2 可能涉及数据库结构变更或前端逻辑调整",
+        "25 个 P2 不可能一轮全部修复，需按影响面和价值筛选"
+      ],
+      "dependencies": [
+        "需先读取 V2 报告获取 P2 完整清单",
+        "部分修复可能与其他任务（T1-T4）重叠"
+      ],
+      "recommended_phases": ["audit", "builder", "reviewer"],
+      "acceptance_hints": [
+        "至少修复 10 个 P2 问题",
+        "每个修复有对应测试或手动验证证据",
+        "mvn test + vitest 全绿"
+      ],
+      "builder_notes": "audit 阶段需先扫描 V2 报告，提取 P2 清单并分类：快速修复 vs 需讨论方案。建议优先修复注释清理、字段映射、前端路径对齐等低风险项。"
+    }
+  ],
+  "overall_classification": "Heavy",
+  "execution_strategy": {
+    "parallel_groups": [
+      {
+        "group": "G1-快速收尾",
+        "tasks": ["T2", "T4"],
+        "rationale": "Light 级别，无依赖，可并行执行"
+      },
+      {
+        "group": "G2-测试补齐",
+        "tasks": ["T3"],
+        "rationale": "Medium 级别，独立性强，可在 T1 并行进行"
+      },
+      {
+        "group": "G3-核心功能",
+        "tasks": ["T1"],
+        "rationale": "Heavy 级别，需串行执行子批次（DDL → 迁移 → 重构 → 前端适配）"
+      },
+      {
+        "group": "G4-批量修复",
+        "tasks": ["T5"],
+        "rationale": "需 audit 阶段先定位 P2 清单，建议在 G1-G3 完成后执行，避免与其他任务冲突"
+      }
+    ],
+    "recommended_order": ["G1", "G2", "G3", "G4"],
+    "estimated_batches": "6-8 个 builder 批次"
+  },
+  "cross_task_dependencies": [
+    "T3 中的 LocationControllerTest 可与 T2 合并（T2 新建 cascade 端点时一并补测试）",
+    "T5 中的部分 P2（如注释清理、字段映射）可能在 G1-G3 中顺手修复",
+    "T1 完成后 NotificationController 的测试可能需要更新（已有 NotificationControllerTest）"
+  ]
+}

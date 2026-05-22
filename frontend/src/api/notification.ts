@@ -20,9 +20,9 @@ export interface NotificationListQuery {
 export const getNotifications = (params?: NotificationListQuery) =>
   http.get<PaginatedResponse<Notification>>('/notifications', { params });
 
-/** 获取未读通知数量 */
+/** 获取未读通知数量（使用独立 notification 表的新端点） */
 export const getUnreadCount = () =>
-  http.get<ApiResponse<number>>('/notifications/pending/count');
+  http.get<ApiResponse<number>>('/notifications/unread-count');
 
 /** 标记通知为已读 */
 export const markAsRead = (id: number) =>
