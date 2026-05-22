@@ -122,9 +122,14 @@ export default function AssetDetailPage() {
                 <Edit className="w-4 h-4" />
                 编辑
               </Button>
-              <Button variant="destructive" size="md">
+              <Button
+                variant="destructive"
+                size="md"
+                onClick={() => { setShowDeleteConfirm(true); setDeleteError(null); }}
+                disabled={deleteMutation.isPending}
+              >
                 <Trash2 className="w-4 h-4" />
-                删除
+                {deleteMutation.isPending ? '删除中...' : '删除'}
               </Button>
             </div>
           </div>
@@ -272,6 +277,49 @@ export default function AssetDetailPage() {
           </CardContent>
         </Card>
       </div>
+
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl w-full max-w-md mx-4 shadow-xl">
+            <div className="p-6 space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+                  <Trash2 className="w-5 h-5 text-red-600" />
+                </div>
+                <div>
+                  <h3 className="text-base font-semibold text-gray-900">确认删除资产</h3>
+                  <p className="text-sm text-gray-500 mt-1">
+                    确定要删除「{asset?.assetName || '此资产'}」吗？此操作不可撤销。
+                  </p>
+                </div>
+              </div>
+              {deleteError && (
+                <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">
+                  {deleteError}
+                </div>
+              )}
+            </div>
+            <div className="flex justify-end gap-3 px-6 py-4 border-t border-gray-200">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowDeleteConfirm(false)}
+                disabled={deleteMutation.isPending}
+              >
+                取消
+              </Button>
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={() => deleteMutation.mutate()}
+                disabled={deleteMutation.isPending}
+              >
+                {deleteMutation.isPending ? '删除中...' : '确认删除'}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
