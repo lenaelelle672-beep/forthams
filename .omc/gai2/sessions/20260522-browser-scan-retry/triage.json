@@ -1,0 +1,72 @@
+{
+  "classification": "Heavy",
+  "risk_level": "HIGH",
+  "rationale": [
+    "跨多维度任务：浏览器模拟验证（需运行环境+数据）、前端覆盖率修复、前端 chunk 拆分、后端 Controller 测试补齐、E2E/临时目录清理，涉及前后端至少 10+ 文件。",
+    "浏览器模拟依赖本地服务、登录态、种子数据和端口配置，环境不可用将导致核心验收项 AC1 直接 blocked。",
+    "BigScreen3DPage 涉及 Three.js 资源和路由变更，拆分可能破坏大屏功能，属于高风险架构变更。",
+    "后端 17 个 Controller 缺测试，需认证/租户/数据库 fixture 支持，补齐范围和优先级需要决策。",
+    "100 分目标与实际可行范围可能存在差距，需要 audit 阶段量化缺口并设定分阶段目标。"
+  ],
+  "required_agents": [
+    "gai2-audit",
+    "gai2-builder",
+    "gai2-reviewer"
+  ],
+  "recommended_debate": true,
+  "debate_focus": [
+    "17 个缺测试 Controller 的优先级排序：哪些属于核心业务路径需优先覆盖，哪些可接受延后。",
+    "BigScreen3DPage 拆分策略：React.lazy + 动态 import vs Suspense 边界 vs 静态资源 CDN 化，需评估风险。",
+    "100 分目标是否应拆分为「可访问性达标」和「覆盖率达标」两个独立里程碑，避免单次修复范围膨胀。",
+    "浏览器模拟的环境依赖是否满足，若不满足应如何降级为代码审查+路由配置分析。"
+  ],
+  "suggested_builder_scope": [
+    "浏览器模拟验证：启动前后端服务，逐页面验证路由可达性，记录 2 处无法访问问题的复现路径和证据。",
+    "可访问性修复：根据 audit 报告修复路由配置、页面入口、权限或数据依赖问题。",
+    "inventory.ts 覆盖率修复：针对第 114-115、117-118 行补充测试用例。",
+    "BigScreen3DPage chunk 拆分：评估并实施按需加载或等效优化方案。",
+    "后端 Controller 测试：优先为 AuthController、AssetController、InventoryController、DashboardController 补充核心路径测试。",
+    "临时目录清理与 E2E：评估并记录现状，如范围过重则标注为后续迭代。"
+  ],
+  "verification_expectations": [
+    "浏览器模拟测试记录：每个关键页面的访问路径、状态码、控制台错误、截图或文字证据。",
+    "前端构建无报错且 BigScreen3DPage chunk 体积显著降低。",
+    "inventory.ts 函数覆盖率 ≥ 90%。",
+    "至少 3 个新 Controller 测试类通过，覆盖核心 CRUD 或认证路径。",
+    "所有已知无法访问页面修复后可通过浏览器模拟复验。",
+    "gai2-reviewer 对 AC1-AC5 逐条出具 PASS/PARTIAL/FAIL 判定。"
+  ],
+  "blockers_or_inputs_needed": [
+    "浏览器模拟需确认前后端服务可启动：端口是否占用、数据库是否就绪、种子数据是否可用。",
+    "浏览器模拟的登录凭据或默认账号需确认。",
+    "BigScreen3DPage 拆分需确认 Three.js 资源加载方式和当前 bundle 分析结果。",
+    "后端 Controller 测试需确认测试框架约定（JUnit5 + MockMvc?）、认证 mock 方式和数据库 fixture 模式。"
+  ],
+  "acceptance_checks": [
+    {
+      "id": "AC1",
+      "description": "通过浏览器模拟/真人式路径验证识别并记录当前至少 2 处无法访问入口或页面",
+      "status": "pending"
+    },
+    {
+      "id": "AC2",
+      "description": "结合浏览器验证结果与扫描报告，形成统一问题清单和优先级",
+      "status": "pending"
+    },
+    {
+      "id": "AC3",
+      "description": "修复可访问性/路由/页面入口问题，使关键业务页面可进入",
+      "status": "pending"
+    },
+    {
+      "id": "AC4",
+      "description": "推进扫描报告中的高价值修复：inventory.ts 覆盖率、BigScreen3DPage chunk、Controller 测试",
+      "status": "pending"
+    },
+    {
+      "id": "AC5",
+      "description": "gai2-builder 记录验证结果，gai2-reviewer 独立核验",
+      "status": "pending"
+    }
+  ]
+}

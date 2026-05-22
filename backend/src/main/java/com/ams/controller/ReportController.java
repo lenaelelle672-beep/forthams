@@ -21,7 +21,7 @@ import java.util.List;
  * </ul>
  */
 @RestController
-@RequestMapping("/api/reports")
+@RequestMapping("/reports")
 @RequiredArgsConstructor
 public class ReportController {
 

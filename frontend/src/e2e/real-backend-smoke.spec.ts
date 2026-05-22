@@ -256,6 +256,35 @@ test('真实后端：工单审批和资产退役 API 闭环可跑通', async ({ 
   expect(retiredAsset.status).toBe('SCRAPPED');
 });
 
+test('真实后端：赔偿页面可用', async ({ page, request }) => {
+  const health = await request.get(`${apiBase}/auth/test`);
+  test.skip(!health.ok(), `后端不可用：${apiBase}`);
+
+  const errors = collectBrowserErrors(page);
+  await loginThroughApi(page, request);
+
+  await page.goto('/compensation');
+  await expect(page.getByText('资产赔偿申请').first()).toBeVisible({ timeout: 15_000 });
+  await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
+
+  expect(errors).toEqual([]);
+});
+
+test('真实后端：大屏页面可访问', async ({ page, request }) => {
+  const health = await request.get(`${apiBase}/auth/test`);
+  test.skip(!health.ok(), `后端不可用：${apiBase}`);
+
+  const errors = collectBrowserErrors(page);
+  await loginThroughApi(page, request);
+
+  await page.goto('/bigscreen-3d');
+  await page.waitForLoadState('networkidle');
+
+  // 无论是否支持 WebGL，页面不应崩溃
+  await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
+  expect(errors.filter(e => !e.includes('WebGL') && !e.includes('webgl'))).toEqual([]);
+});
+
 async function loginThroughApi(page: Page, request: APIRequestContext) {
   const data = await loginThroughRequest(request);
 

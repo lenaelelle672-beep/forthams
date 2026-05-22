@@ -70,7 +70,7 @@ class WorkflowDefinitionServiceTest {
 
         List<WorkflowDefinitionDTO> definitions = workflowDefinitionService.listDefinitions();
 
-        assertEquals(4, definitions.size());
+        assertEquals(5, definitions.size());
         assertEquals("ASSET_TRANSFER", definitions.get(0).getBusinessType());
         assertTrue(definitions.stream().allMatch(definition -> "UNCONFIGURED".equals(definition.getStatus())));
         assertTrue(definitions.stream().allMatch(definition -> definition.getVersion() == 0));

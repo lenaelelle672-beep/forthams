@@ -1,0 +1,175 @@
+{
+  "changed_files": [
+    "frontend/src/pages/disposal/AssetCompensationFormPage.tsx",
+    "frontend/src/pages/bigscreen/BigScreen3DPage.tsx",
+    "frontend/src/pages/inventory/InventoryTasksPage.tsx",
+    "frontend/tests/unit/api.inventory.test.ts",
+    "frontend/vite.config.ts"
+  ],
+  "added_files": [
+    ".omc/gai2/sessions/20260522-browser-scan-retry/changes.json"
+  ],
+  "deleted_files": [],
+  "impact_analysis": [
+    {
+      "target": "AssetCompensationFormPage",
+      "risk": "LOW",
+      "summary": "GitNexus upstream impact 命中 frontend/src/pages/disposal/AssetCompensationFormPage.tsx，直接影响 0，受影响流程 0；本次仅移除 Radix SelectItem 空字符串回退项，改为禁用态和占位文案。"
+    },
+    {
+      "target": "BigScreen3DPage",
+      "risk": "UNKNOWN",
+      "summary": "GitNexus 未解析 BigScreen3DPage，延续审计中索引落后约束；人工影响面为 /bigscreen-3d 独立大屏页面和 Vite 分包配置。本次增加 WebGL 探测、错误边界和降级视图，并将 three/@react-three 依赖拆入独立 chunk。"
+    },
+    {
+      "target": "InventoryTasksPage",
+      "risk": "LOW",
+      "summary": "GitNexus upstream impact 命中 frontend/src/pages/inventory/InventoryTasksPage.tsx，直接影响 0，受影响流程 0；本次仅修正“查看智能报告”入口，优先跳转带 taskId 的报告路径，无任务时禁用按钮并提示。"
+    },
+    {
+      "target": "inventoryService",
+      "risk": "UNKNOWN",
+      "summary": "GitNexus 未解析 inventoryService；本次未改业务 API 实现，仅在 frontend/tests/unit/api.inventory.test.ts 补充 addScanResult 与 getTaskDetails 覆盖率测试。"
+    },
+    {
+      "target": "gitnexus_detect_changes",
+      "risk": "LOW",
+      "summary": "变更检测显示 changed_count 6、affected_count 0、changed_files 9、risk_level low；BigScreen3DPage 因索引约束未完整归入 changed_symbols，已用构建与浏览器复验补充风险控制。"
+    }
+  ],
+  "commands_run": [
+    {
+      "command": "gitnexus_impact AssetCompensationFormPage / BigScreen3DPage / InventoryTasksPage / inventoryService",
+      "outcome": "PASS",
+      "summary": "AssetCompensationFormPage 与 InventoryTasksPage 风险 LOW；BigScreen3DPage 与 inventoryService 目标未解析，按 UNKNOWN 记录并采用人工路径与验证补充。"
+    },
+    {
+      "command": "npm run test -- tests/unit/api.inventory.test.ts --run",
+      "outcome": "PASS",
+      "summary": "inventory API 单元测试 42 tests passed。"
+    },
+    {
+      "command": "npm run build",
+      "outcome": "PASS",
+      "summary": "前端生产构建通过；BigScreen3DPage chunk 从审计记录约 1159.96 kB 降至 265.70 kB，three 依赖拆分为独立 chunk 1068.71 kB，仍有 Vite 大 chunk 警告。"
+    },
+    {
+      "command": "npm run test:coverage -- tests/unit/api.inventory.test.ts --run",
+      "outcome": "PASS",
+      "summary": "定向覆盖率通过，inventory.ts statements/branches/functions/lines 均为 100%。"
+    },
+    {
+      "command": "npm run test:coverage -- --run",
+      "outcome": "PASS",
+      "summary": "前端完整 Vitest 覆盖率通过：22 files passed，587 tests passed；inventory.ts functions 100%。"
+    },
+    {
+      "command": "npm run dev + Playwright Chromium smoke (/compensation, /bigscreen-3d, /inventory)",
+      "outcome": "PASS",
+      "summary": "浏览器复验 3 个入口均未出现 Unexpected Application Error，pageErrors 为空；/bigscreen-3d 在禁用 WebGL 参数下展示安全降级模式。"
+    },
+    {
+      "command": "npm run dev + Playwright Chromium 检查 /inventory 智能报告按钮",
+      "outcome": "PASS",
+      "summary": "未登录/无任务数据场景下“查看智能报告”按钮存在且 disabled=true，title 为“暂无可查看的盘点任务，请先创建或选择任务”。"
+    },
+    {
+      "command": "git status --short",
+      "outcome": "PASS",
+      "summary": "确认业务变更为 5 个前端文件；覆盖率命令仍会更新 frontend/coverage 产物，.omc/gai2/goal-state.json 为既有 GAI2 状态变更，未作为业务修复内容。"
+    },
+    {
+      "command": "gitnexus_detect_changes(scope=unstaged)",
+      "outcome": "PASS",
+      "summary": "变更风险 low，affected_processes 为空；检测受索引限制未完整识别 BigScreen3DPage。"
+    },
+    {
+      "command": "python3 -m json.tool .omc/gai2/sessions/20260522-browser-scan-retry/changes.json >/dev/null",
+      "outcome": "PASS",
+      "summary": "changes.json 格式校验通过。"
+    },
+    {
+      "command": "backend tests",
+      "outcome": "BLOCKED",
+      "summary": "本轮未修改后端代码或新增 Controller 测试；按 directive 将后端 Controller 覆盖缺口作为残余风险记录，未运行后端测试。"
+    }
+  ],
+  "browser_verification": [
+    {
+      "path": "/compensation",
+      "outcome": "PASS",
+      "evidence": "Playwright 访问 http://127.0.0.1:5173/compensation，body 不包含 Unexpected Application Error，pageErrors 为空；责任部门下拉无数据时不再渲染 value=\"\" 的 SelectItem。"
+    },
+    {
+      "path": "/bigscreen-3d",
+      "outcome": "PASS",
+      "evidence": "Chromium 使用 --disable-webgl --disable-3d-apis 访问后展示“3D 地图已切换为安全降级模式”，body 不包含 Unexpected Application Error，pageErrors 为空。"
+    },
+    {
+      "path": "/inventory",
+      "outcome": "PASS",
+      "evidence": "Playwright 访问 /inventory 无 React Router 错误；无任务数据场景下“查看智能报告”按钮 disabled=true，避免跳转到 /inventory/smart-report 无 taskId 空态。"
+    }
+  ],
+  "verification_results": [
+    {
+      "check": "Radix Select 空字符串修复",
+      "status": "PASS",
+      "evidence": "AssetCompensationFormPage 改为仅渲染真实 deptOptions，空数据时 Select disabled 并显示“暂无可选部门”占位。"
+    },
+    {
+      "check": "WebGL 降级与页面不崩溃",
+      "status": "PASS",
+      "evidence": "BigScreen3DPage 增加 canCreateWebGLContext、WebGLBoundary 和 WebGLFallback；浏览器禁用 WebGL 复验通过。"
+    },
+    {
+      "check": "BigScreen3DPage 分包风险降低",
+      "status": "PARTIAL",
+      "evidence": "页面 chunk 构建输出为 265.70 kB，较审计 1159.96 kB 显著降低；three 独立 chunk 仍为 1068.71 kB 并触发 Vite 大 chunk 警告。"
+    },
+    {
+      "check": "inventory.ts 覆盖率",
+      "status": "PASS",
+      "evidence": "完整覆盖率测试显示 inventory.ts statements/branches/functions/lines 全部 100%。"
+    },
+    {
+      "check": "后端 Controller 测试覆盖",
+      "status": "PARTIAL",
+      "evidence": "本轮未补后端 Controller 测试，缺口已作为残余风险；前端入口修复不涉及后端代码。"
+    }
+  ],
+  "acceptance_mapping": [
+    {
+      "criterion_id": "AC1",
+      "status": "PASS",
+      "evidence": "审计已记录 /compensation 与 /bigscreen-3d 两处无法访问问题；本轮浏览器复验确认两者不再出现 React Router 默认错误页。"
+    },
+    {
+      "criterion_id": "AC2",
+      "status": "PASS",
+      "evidence": "changes.json 汇总 P0、P1、覆盖率、chunk 与 Controller 缺口，并记录验证结果与残余风险。"
+    },
+    {
+      "criterion_id": "AC3",
+      "status": "PASS",
+      "evidence": "/compensation、/bigscreen-3d、/inventory 智能报告入口均完成修复或安全降级，浏览器复验通过。"
+    },
+    {
+      "criterion_id": "AC4",
+      "status": "PARTIAL",
+      "evidence": "inventory.ts 覆盖率达 100%，BigScreen3DPage 页面 chunk 显著降低并可降级访问；后端 Controller 测试缺口未在本轮补齐，three 独立 chunk 仍较大。"
+    },
+    {
+      "criterion_id": "AC5",
+      "status": "PASS",
+      "evidence": "已运行并记录前端构建、前端单元/覆盖率、浏览器复验、GitNexus 影响分析与变更检测；changes.json 已写入。"
+    }
+  ],
+  "residual_risks": [
+    "后端 Controller 覆盖缺口未在本轮补齐，Auth/Dashboard/Asset/Inventory/Vendor 等核心 Controller 仍需要后续专项测试。",
+    "BigScreen3DPage 的页面 chunk 已降至 265.70 kB，但 three 独立 chunk 仍为 1068.71 kB，生产构建仍提示大 chunk 警告；后续可继续做更细粒度动态 import、资源压缩或按需加载。",
+    "浏览器复验未使用有效后端登录态，多数业务 API 403 的统一认证体验仍未解决；本轮判断聚焦页面是否崩溃和入口是否安全。",
+    "未新增正式 Playwright spec 文件；本轮使用临时 Playwright smoke 命令完成复验，E2E 覆盖缺口仍需后续沉淀为回归用例。",
+    "运行覆盖率命令会更新 frontend/coverage 下的测试产物；这些产物不属于本轮业务修复，应由提交前清理或按仓库策略处理。"
+  ]
+}

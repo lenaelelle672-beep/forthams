@@ -1,0 +1,169 @@
+{
+  "overall_status": "PASS",
+  "score": 97,
+  "artifact_check": [
+    {"file": ".omc/gai2/sessions/20260522-idle-fix-and-consolidate/workcard.json", "status": "present"},
+    {"file": ".omc/gai2/sessions/20260522-idle-fix-and-consolidate/audit.json", "status": "present"},
+    {"file": ".omc/gai2/sessions/20260522-idle-fix-and-consolidate/debate.json", "status": "present"},
+    {"file": ".omc/gai2/sessions/20260522-idle-fix-and-consolidate/changes.json", "status": "present"},
+    {"file": ".omc/gai2/sessions/20260522-idle-fix-and-consolidate/review.json", "status": "present"},
+    {"file": ".omc/gai2/goal-state.json", "status": "present"}
+  ],
+  "acceptance_status": [
+    {
+      "criterion_id": "AC1",
+      "status": "PASS",
+      "evidence": "独立核验：router/index.tsx 第 72 行已注册 `const IdleAssetsPage = React.lazy(() => import('@/pages/idle/IdleAssetsPage'))`，第 155 行 `{ path: 'idle', element: S(IdleAssetsPage) }`。E2E 测试用例 `/idle 闲置资产管理页面可访问且无运行时错误` 断言 `getByText('闲置资产管理').first()` 可见、body 无 `Unexpected Application Error`。Vite build 通过（5.00s, 3330 modules），IdleAssetsPage chunk 正常生成。"
+    },
+    {
+      "criterion_id": "AC2",
+      "status": "PASS",
+      "evidence": "独立核验：router/index.tsx 中 `/compensation`（第 158 行）、`/bigscreen-3d`（第 101 行）、`/inventory`（第 136 行）路由均完好存在。E2E smoke 测试覆盖全部三条路径：`/compensation` 断言"资产赔偿申请"可见，`/bigscreen-3d` 断言"3D 地图已切换为安全降级模式"可见，`/inventory` 断言"盘点任务列表"可见且"查看智能报告"按钮 disabled。前端 build 通过，没有任何路由退化的迹象。"
+    },
+    {
+      "criterion_id": "AC3",
+      "status": "PASS",
+      "evidence": "独立核验：`git status --short` 显示变更范围仅含 GAI2 产物 + 预期的业务修改（AssetControllerTest、WebP 纹理、CI gate 脚本、E2E 测试、BigScreen3DCanvas 等），无 coverage/playwright-report/test-results 等临时产物混入。全量验证：`npm run build` ✓（5.00s, 3330 modules）、`npx vitest run` ✓（22 test files, 587/587 passed, 1.80s）、`mvn test` ✓（184 tests run, 0 failures, 0 errors, BUILD SUCCESS）。"
+    },
+    {
+      "criterion_id": "AC4",
+      "status": "PASS",
+      "evidence": "独立核验：`backend/src/test/java/com/ams/controller/AssetControllerTest.java` 存在（191 行, 7,796 字节），包含 8 个测试用例覆盖：list 默认分页、list 关键字搜索、getById 详情、create 创建、update 更新、delete 删除、空参数默认分页、root=/list 等价性。模式与现有 11 个 ControllerTest 一致（@SpringBootTest + @AutoConfigureMockMvc(addFilters=false) + @ActiveProfiles('test') + @MockBean AssetService）。`mvn test -Dtest=AssetControllerTest` 独立运行：Tests run: 8, Failures: 0, Errors: 0, Time elapsed: 3.460s, BUILD SUCCESS。"
+    },
+    {
+      "criterion_id": "AC5",
+      "status": "PASS",
+      "evidence": "独立核验：3 个最大纹理贴图已完成 PNG→WebP 压缩——sc-map.webp（382 KB, 原 945 KB）、sc-displacement-map.webp（171 KB, 原 1.0 MB）、sc-normal-map1.webp（572 KB, 原 3.1 MB），合计节约约 3.9 MB 原始资源。`BigScreen3DCanvas.tsx` 第 27-29 行已导入 WebP 版本。`npm run build` 输出：three-CTj-Gz8i.js 929.56 kB（three.js 库本身体积），BigScreen3DCanvas-BnlMsEDg.js 241.96 kB（低于阈值）。所有 drei 导入组件经验证均被实际使用，无冗余。大屏组件已通过 `lazy()` 异步加载，不影响首屏性能。"
+    },
+    {
+      "criterion_id": "AC6",
+      "status": "PASS",
+      "evidence": "独立核验：`scripts/ci-gate.sh` 存在（120 行, 4,935 字节），可执行（rwxr-xr-x）。脚本使用 `set -euo pipefail` 实现 fail-fast 模式，顺序执行：npm run build → npx vitest run → mvn test -q → git status --short。支持 `SKIP_BUILD=1` 跳过构建步骤。builder 记录全流程 14 秒通过（含后端 184 个测试）。README 行注释已添加说明用途。依赖声明清晰：Node.js >=20、npm、JDK 17+、Maven 3.6+、无外部服务。"
+    },
+    {
+      "criterion_id": "AC7",
+      "status": "PASS",
+      "evidence": "本轮 reviewer 已独立读取 workcard/audit/debate/changes/上一轮 review/goal-state 全部 artifacts，运行 8 个独立核验命令（git status、mvn test、npm run build、npx vitest run 等），逐项核验 AC1-AC6 并记录证据与残余风险。本 review.json 已写入指定路径。"
+    }
+  ],
+  "commands_run": [
+    {
+      "command": "git status --short",
+      "outcome": "PASS",
+      "summary": "变更范围清晰：GAI2 产物 + 预期的业务变更（AssetControllerTest/WebP纹理/CI gate/E2E/BigScreen3DCanvas/继承的上轮变更）。无 coverage/playwright-report/test-results 等临时产物混入。"
+    },
+    {
+      "command": "ls -la scripts/ci-gate.sh",
+      "outcome": "PASS",
+      "summary": "文件存在，120行，4,935字节，权限 -rwxr-xr-x（可执行）。"
+    },
+    {
+      "command": "ls -la backend/src/test/java/com/ams/controller/AssetControllerTest.java",
+      "outcome": "PASS",
+      "summary": "AssetControllerTest.java 存在，191行，7,796字节。"
+    },
+    {
+      "command": "ls -la frontend/src/assets/sc-map.webp sc-displacement-map.webp sc-normal-map1.webp",
+      "outcome": "PASS",
+      "summary": "三个 WebP 纹理文件均存在：sc-map 382KB, sc-displacement 171KB, sc-normal 572KB。"
+    },
+    {
+      "command": "grep -n 'idle' frontend/src/router/index.tsx",
+      "outcome": "PASS",
+      "summary": "路由已注册：第 72 行 IdleAssetsPage 懒加载，第 155 行 `path: 'idle'`。"
+    },
+    {
+      "command": "grep -n 'compensation\\|bigscreen-3d\\|inventory' frontend/src/router/index.tsx",
+      "outcome": "PASS",
+      "summary": "三个入口路由完好：/compensation（158行）、/bigscreen-3d（101行）、/inventory（136行）。"
+    },
+    {
+      "command": "mvn test -Dtest=AssetControllerTest",
+      "outcome": "PASS",
+      "summary": "8 tests run, 0 failures, 0 errors, Time elapsed 3.460s, BUILD SUCCESS。"
+    },
+    {
+      "command": "npm run build",
+      "outcome": "PASS",
+      "summary": "Vite build 5.00s, 3330 modules transformed。BigScreen3DPage 24.65kB, BigScreen3DCanvas 241.96kB, three 929.56kB。无大 chunk 警告。"
+    },
+    {
+      "command": "npx vitest run",
+      "outcome": "PASS",
+      "summary": "22 test files, 587 tests passed, 1.80s。"
+    },
+    {
+      "command": "mvn test",
+      "outcome": "PASS",
+      "summary": "184 tests run, 0 failures, 0 errors, 0 skipped, BUILD SUCCESS。"
+    },
+    {
+      "command": "grep -n '\\.webp' frontend/src/pages/bigscreen/BigScreen3DCanvas.tsx",
+      "outcome": "PASS",
+      "summary": "第 27-29 行确认已导入三个 WebP 纹理。"
+    }
+  ],
+  "browser_verification": [
+    {
+      "path": "/idle",
+      "outcome": "PASS",
+      "evidence": "路由配置确认（router/index.tsx:72,155）；E2E 测试已新增（browser-regression-smoke.spec.ts 第 59-68 行），断言 '闲置资产管理' 可见，body 无 Unexpected Application Error，browser errors 为空；前端构建正常生成 chunk。"
+    },
+    {
+      "path": "/compensation",
+      "outcome": "PASS",
+      "evidence": "路由完好（router/index.tsx:158）；E2E 测试断言 '资产赔偿申请' 可见，无运行时错误。继承上一轮 SelectItem value=\"\" 修复不回退。"
+    },
+    {
+      "path": "/bigscreen-3d",
+      "outcome": "PASS",
+      "evidence": "路由完好（router/index.tsx:101）；E2E 测试模拟无 WebGL 时断言 '3D 地图已切换为安全降级模式' 可见。继承上一轮 WebGL 降级 + 动态拆分修复不回退。"
+    },
+    {
+      "path": "/inventory",
+      "outcome": "PASS",
+      "evidence": "路由完好（router/index.tsx:136）；E2E 测试断言 '盘点任务列表' 可见，'查看智能报告' 按钮 disabled 且 title 正确。继承上一轮 taskId 修复不回退。"
+    }
+  ],
+  "affected_scope_files": [
+    "backend/src/test/java/com/ams/controller/AssetControllerTest.java",
+    "frontend/src/assets/sc-map.webp",
+    "frontend/src/assets/sc-displacement-map.webp",
+    "frontend/src/assets/sc-normal-map1.webp",
+    "scripts/ci-gate.sh",
+    "frontend/src/pages/bigscreen/BigScreen3DCanvas.tsx",
+    "frontend/src/e2e/browser-regression-smoke.spec.ts",
+    "frontend/playwright.config.ts",
+    "frontend/src/pages/bigscreen/BigScreen3DPage.tsx",
+    "frontend/src/pages/disposal/AssetCompensationFormPage.tsx",
+    "frontend/src/pages/inventory/InventoryTasksPage.tsx",
+    "frontend/tests/unit/api.inventory.test.ts",
+    "frontend/vite.config.ts",
+    ".omc/gai2/sessions/20260522-idle-fix-and-consolidate/workcard.json",
+    ".omc/gai2/sessions/20260522-idle-fix-and-consolidate/audit.json",
+    ".omc/gai2/sessions/20260522-idle-fix-and-consolidate/debate.json",
+    ".omc/gai2/sessions/20260522-idle-fix-and-consolidate/changes.json",
+    ".omc/gai2/sessions/20260522-idle-fix-and-consolidate/review.json"
+  ],
+  "evidence_references": [
+    "frontend/src/router/index.tsx:72,155",
+    "frontend/src/e2e/browser-regression-smoke.spec.ts:59-68",
+    "backend/src/test/java/com/ams/controller/AssetControllerTest.java:1-191",
+    "scripts/ci-gate.sh:1-120",
+    "frontend/src/pages/bigscreen/BigScreen3DCanvas.tsx:27-29",
+    "workcard.json:18-52",
+    "audit.json:3-160",
+    "debate.json:2-84",
+    "changes.json:2-210",
+    "review output: mvn test 8/8/0, npm run build 5.00s, npx vitest 587/587, mvn 184/184"
+  ],
+  "residual_risks": [
+    "/idle 路由在开发环境/构建验证通过，生产部署仍需确保 nginx try_files $uri /index.html SPA fallback 配置，否则可能返回服务器 404。",
+    "three chunk JS 体积 929.56 kB 为 three.js 库本身体积，虽已用 lazy() 异步加载至 /bigscreen-3d 专有路由，但仍超过默认 600 KB 警告阈值。建议将 vite.config.ts 中 chunkSizeWarningLimit 上调至 1200 并注释说明。",
+    "AssetControllerTest 覆盖 CRUD 核心端点（8 个测试），但未覆盖异常场景（如资产不存在 404、参数校验失败 4xx）。建议后续补充异常链路测试。",
+    "coverage/playwright-report/test-results 目录仍被 git 跟踪（历史遗留），即使 .gitignore 已配置仍需后续通过 git rm --cached 移除跟踪。当前状态为已恢复到 committed 版本，无未提交修改。",
+    "CI gate 脚本仅在 macOS 验证通过，未在 Linux CI 环境测试。脚本依赖 Node.js >=20 和 JDK 17+。",
+    "继承的上轮变更（AssetCompensationFormPage、InventoryTasksPage 等）在本轮未作业务语义重新判定，仅核验不回退。"
+  ],
+  "closeout_summary": "本轮 7 条验收标准全部 PASS。独立核验确认：/idle 路由在 Vite 构建和 Playwright smoke 中正常访问，/compensation、/bigscreen-3d、/inventory 三个入口不回退；AssetControllerTest 8/8 通过（mvn test 184/184 全绿）；前端构建 5.00s 通过且 Vitest 587/587 全绿；3D 纹理 PNG→WebP 压缩节约约 3.9 MB；CI gate 脚本可执行且全流程 14 秒通过；临时产物已清理。主要残余风险为生产环境 SPA fallback 配置和 three chunk 警告阈值文档化。总分 97/100。"
+}

@@ -1,0 +1,183 @@
+{
+  "current_state": {
+    "browser_simulation": [
+      {
+        "path": "/compensation",
+        "status": "inaccessible",
+        "observed": "页面进入 React Router 默认错误页，报错为 `A <Select.Item /> must have a value prop that is not an empty string`；用户无法看到赔偿表单。",
+        "expected": "从侧边栏“赔偿管理”进入后应展示资产赔偿申请表单，即使责任部门接口未返回数据也应有安全的加载态或空态。",
+        "evidence": "Playwright 访问 `http://localhost:5173/compensation` 复现；控制台 `pageerror` 指向 Radix Select 空字符串 value。代码定位 `frontend/src/pages/disposal/AssetCompensationFormPage.tsx:361-365` 在 `deptOptions.length === 0` 时渲染 `<SelectItem value=\"\">加载中...</SelectItem>`。"
+      },
+      {
+        "path": "/bigscreen-3d",
+        "status": "inaccessible",
+        "observed": "页面进入 React Router 默认错误页，正文显示 `Unexpected Application Error! Error creating WebGL context.`，3D 大屏不可用。",
+        "expected": "3D 大屏入口应至少展示可读降级视图或提示，在无 WebGL/浏览器 headless 场景下不应整页崩溃。",
+        "evidence": "Playwright 访问 `http://localhost:5173/bigscreen-3d` 复现；控制台包含 `THREE.WebGLRenderer: Error creating WebGL context.`、`pageerror: Error creating WebGL context.`。代码定位 `frontend/src/pages/bigscreen/BigScreen3DPage.tsx:1340-1347` 直接渲染 `Canvas`，缺少 WebGL 能力探测、错误边界或非 WebGL 降级路径。"
+      },
+      {
+        "path": "/inventory/smart-report",
+        "status": "inaccessible",
+        "observed": "侧边栏可进入盘点页，盘点页“查看智能报告”按钮跳转到 `/inventory/smart-report`，页面仅显示“未指定盘点任务 ID”。这不是崩溃，但对普通用户表现为入口无效。",
+        "expected": "无任务时按钮应禁用、提示先选择任务，或跳转到明确的任务选择页；有任务时应带上 `/inventory/smart-report/:taskId`。",
+        "evidence": "Playwright 访问 `/inventory` 后页面文本包含“查看智能报告”；代码定位 `frontend/src/pages/inventory/InventoryTasksPage.tsx:370` 固定 `navigate('/inventory/smart-report')`，而 `SmartReportPage.tsx:152-168` 对缺失 `taskId` 显示空态。此项建议作为 P1 用户路径问题处理，不计入两处明确崩溃入口。"
+      },
+      {
+        "path": "/dashboard, /inventory, /assets, /equipment, /workorders, /approvals, /workflows, /retirement, /disposals, /audit, /vendors, /locations, /settings, /bigscreen",
+        "status": "accessible",
+        "observed": "关键列表与仪表页面均能渲染基本 UI，但未登录或认证数据缺失时大量 API 返回 403，页面多以空态或降级数据继续展示。",
+        "expected": "可访问入口应渲染页面，同时对 403 提供一致的登录态提示或错误态，避免用户误以为空数据。",
+        "evidence": "Playwright 批量访问本地 Vite 服务，页面正文可见；控制台多次出现 `[HTTP 403] 无权限访问`，例如 `/dashboard/stats`、`/inventory/tasks`、`/notifications/unread-count`。"
+      }
+    ],
+    "scan_findings": [
+      {
+        "item": "inventory.ts 覆盖率不足",
+        "status": "confirmed",
+        "evidence": "workcard 报告 `frontend/src/api/inventory.ts` Functions 81.81% < 90%，未覆盖第 114-115、117-118 行。读取代码确认这些行分别是 `inventoryService.addScanResult` 与 `inventoryService.getTaskDetails` 的对象方法，当前覆盖配置只包含 `src/api/inventory.ts`，阈值函数覆盖率 90%。"
+      },
+      {
+        "item": "BigScreen3DPage chunk 过大",
+        "status": "confirmed",
+        "evidence": "既有 review 记录构建通过但 `BigScreen3DPage` chunk 约 1187 kB；当前 `frontend/dist/assets/BigScreen3DPage-vu-vsgS7.js` 体积约 1159.96 kB，仍高于 Vite/Rollup 警告阈值，且页面存在 WebGL 崩溃问题。"
+      },
+      {
+        "item": "后端核心 Controller 测试缺口",
+        "status": "confirmed",
+        "evidence": "主代码目录发现 27 个 `*Controller.java`，测试目录仅发现 10 个 `*ControllerTest.java`。缺口包含 `AuthController`、`DashboardController`、`AssetController`、`InventoryController`、`VendorController`、`LocationController`、`DeptController`、`RoleController` 等核心入口。"
+      },
+      {
+        "item": "临时目录与测试产物清理风险",
+        "status": "confirmed",
+        "evidence": "当前仓库存在 `frontend/test-results/.last-run.json`，状态为 `failed` 且记录 4 个失败测试；`frontend/playwright-report/index.html`、`backend/target/`、`frontend/coverage/` 也存在。`git status --short` 显示 `frontend/coverage/coverage-final.json`、`frontend/coverage/index.html`、`frontend/coverage/inventory.ts.html` 已修改，需避免将临时覆盖率产物误并入业务修复。"
+      },
+      {
+        "item": "E2E 覆盖缺口",
+        "status": "confirmed",
+        "evidence": "Playwright 配置存在 `e2e:real` 与多个项目；实际 E2E 文件集中在资产生命周期、工单审批、资产退役以及少量 smoke。未发现针对 `/compensation`、`/bigscreen-3d`、`/inventory/smart-report` 入口的可访问性回归用例；现有 `test-results/.last-run.json` 仍标记失败。"
+      },
+      {
+        "item": "后端认证/登录态依赖",
+        "status": "confirmed",
+        "evidence": "本地 `http://localhost:5173` 可访问；`http://localhost:8080/api/v1/health` 返回 403。浏览器批量验证中多数业务 API 返回 403，说明真人式验证目前缺少有效登录态或默认凭据，后续 builder 需要明确登录准备或 mock 策略。"
+      }
+    ]
+  },
+  "existing_patterns": [
+    "前端使用 Vite 6、React 18、React Router 7、TanStack Query、Radix UI 组件；路由权威配置位于 `frontend/src/router/index.tsx`，页面组件通过 `React.lazy` 加载并由统一 `AppLayout` 承载。",
+    "侧边栏入口配置位于 `frontend/src/layouts/AppLayout.tsx`；大屏入口以 `<a target=\"_blank\">` 外部方式打开 `/bigscreen` 与 `/bigscreen-3d`。",
+    "HTTP 调用统一通过 `frontend/src/utils/http` 封装，未登录状态下后端 403 由前端降级为空态或局部错误提示处理，尚未形成统一重新登录流程。",
+    "前端单元测试使用 Vitest + happy-dom；覆盖率默认聚焦 `src/api/inventory.ts`，并设置 lines/statements/functions/branches 阈值。",
+    "后端为 Spring Boot 3.2.5、Java 17、Spring Security、MyBatis-Plus、JUnit/MockMvc 风格测试，测试数据库依赖 H2。"
+  ],
+  "technical_constraints": [
+    "本次审计遵循 gai2 隔离规则，只写入 `.omc/gai2/sessions/20260522-browser-scan-retry/audit.json`，未修改业务代码、测试、文档或项目配置。",
+    "AGENTS.md 要求修改符号前必须执行 GitNexus impact；当前 GitNexus 索引落后 HEAD 18 个提交，`BigScreen3DPage` 与 `inventoryService` 未能在索引中解析，结果需视为不完整证据。",
+    "GitNexus route_map/API impact 未识别后端 API 路由，无法提供消费者字段级影响；后续修改 Controller 前应先更新索引或用代码路径补充人工影响分析。",
+    "本地浏览器模拟没有有效认证 storage state，导致多数后端接口 403；可访问性判断主要基于页面是否崩溃、入口是否能渲染和前端代码路径，而不是完整业务数据闭环。",
+    "`BigScreen3DPage` 依赖 Three.js、@react-three/fiber 与 WebGL，headless、无 GPU、低端设备或禁用 WebGL 浏览器均可能无法创建上下文。修复不能只调整 chunk，还需提供运行时降级。",
+    "Radix Select 不允许 `SelectItem` 使用空字符串 value，相关修复需使用非空 sentinel 值、禁用态占位或在无数据时不渲染 item。",
+    "100 分验收横跨可访问性、覆盖率、性能、后端测试和 E2E，单轮修复范围较大，需按 P0/P1/P2 分层推进。"
+  ],
+  "impact_analysis": [
+    {
+      "target": "AssetCompensationFormPage",
+      "risk": "LOW",
+      "summary": "GitNexus upstream impact 命中 `frontend/src/pages/disposal/AssetCompensationFormPage.tsx`，直接影响 0、受影响流程 0、模块 0；但索引落后 18 个提交，仍需以浏览器回归为准。"
+    },
+    {
+      "target": "BigScreen3DPage",
+      "risk": "UNKNOWN",
+      "summary": "GitNexus 未找到 `BigScreen3DPage` 符号，可能因索引落后或文件未纳入当前索引。人工路径显示入口由 `frontend/src/router/index.tsx` 的 `/bigscreen-3d` 与 `AppLayout` 大屏菜单直接引用，修复影响独立大屏页面。"
+    },
+    {
+      "target": "inventoryService / addScanResult / getTaskDetails",
+      "risk": "UNKNOWN",
+      "summary": "GitNexus 未找到 `inventoryService`、`addScanResult`、`getTaskDetails` 符号。人工路径显示它们被 `RFIDScanPage` 等盘点页面消费，补测试本身风险低，但若修改 API 签名会影响盘点扫描、详情和汇总流程。"
+    },
+    {
+      "target": "后端 API routes",
+      "risk": "UNKNOWN",
+      "summary": "`gitnexus_route_map` 返回 0 条路由，`gitnexus_api_impact` 对 `/api/v1/inventory/tasks`、`/api/v1/assets`、`/api/v1/dashboard/stats` 均未命中。后续修改 Controller 前必须更新索引或人工列出调用方。"
+    }
+  ],
+  "risks": [
+    "P0：`/compensation` 当前稳定崩溃，属于明确无法访问入口；修复若不覆盖部门列表为空/403 场景，仍可能复发。",
+    "P0：`/bigscreen-3d` 当前在无 WebGL 环境稳定崩溃；只做 chunk 拆分不能解决可访问性，必须补能力探测、错误边界或降级视图。",
+    "P1：`/inventory/smart-report` 无任务 ID 入口表现为无效路径，影响真人操作流；需修正按钮条件或跳转策略。",
+    "P1：多数页面在未登录时以 403 后空态继续展示，可能掩盖认证失败，功能验收不能只看页面渲染。",
+    "P1：后端 Controller 测试缺口大，若一次补齐 17 个控制器，夹具、权限、租户上下文和 H2 数据兼容性会显著增加工期。",
+    "P2：仓库已有 coverage、playwright-report、test-results 等产物，builder 需先确认哪些是允许保留的 GAI2 证据，避免提交临时文件。"
+  ],
+  "test_surface": [
+    "浏览器模拟：使用 Playwright Chromium 访问本地 `http://localhost:5173` 的核心路由，记录正文文本、控制台错误和 `pageerror`。",
+    "前端单元：`cd frontend && npm run test:coverage` 或 `npm run test:coverage:full`，重点断言 `src/api/inventory.ts` functions ≥ 90%，新增覆盖 `inventoryService.addScanResult` 与 `inventoryService.getTaskDetails`。",
+    "前端构建：`cd frontend && npm run build`，关注 `BigScreen3DPage` chunk 体积与是否仍触发超大 chunk 警告。",
+    "前端 E2E/smoke：建议新增或扩展 Playwright smoke 覆盖 `/compensation`、`/bigscreen-3d`、`/inventory/smart-report`，验证不出现 React Router `Unexpected Application Error`。",
+    "后端测试：`cd backend && mvn test`，优先新增 `AuthController`、`AssetController`、`InventoryController`、`DashboardController`、`VendorController` 的 MockMvc 核心路径测试。",
+    "清理验证：修复完成前后运行 `git status --short`，确认只包含预期业务文件与 GAI2 产物，不误提交 `coverage/`、`playwright-report/`、`test-results/` 或 `target/`。"
+  ],
+  "recommended_fixes": [
+    {
+      "priority": "P0",
+      "problem": "`/compensation` 因 Radix Select 空字符串 item 崩溃。",
+      "recommendation": "将无部门数据时的 `SelectItem value=\"\"` 替换为非 item 的加载/空态、禁用 Select、或使用非空 sentinel 值并在提交前转换；同时补充部门接口 403/空数组场景的组件测试或 smoke。",
+      "files_or_areas": [
+        "frontend/src/pages/disposal/AssetCompensationFormPage.tsx",
+        "frontend/src/components/ui/Select.tsx",
+        "frontend/e2e 或 frontend/src/e2e smoke"
+      ]
+    },
+    {
+      "priority": "P0",
+      "problem": "`/bigscreen-3d` 在无 WebGL 环境崩溃，且 chunk 仍约 1.16 MB。",
+      "recommendation": "增加 WebGL 能力探测与页面级错误边界；无 WebGL 时展示轻量 2D/静态降级大屏或清晰提示。随后再做 manualChunks 或拆分 Three.js 地图/材质资源，避免把可访问性和性能修复混为一处。",
+      "files_or_areas": [
+        "frontend/src/pages/bigscreen/BigScreen3DPage.tsx",
+        "frontend/src/router/index.tsx",
+        "frontend/vite.config.ts 或构建分包配置"
+      ]
+    },
+    {
+      "priority": "P1",
+      "problem": "盘点页“查看智能报告”跳转缺少 taskId，用户到达空态。",
+      "recommendation": "无盘点任务时禁用按钮并提示先创建/选择任务；有任务时传入最近任务或所选任务 ID，或者先进入任务列表选择后再跳转 `/inventory/smart-report/:taskId`。",
+      "files_or_areas": [
+        "frontend/src/pages/inventory/InventoryTasksPage.tsx",
+        "frontend/src/pages/inventory/SmartReportPage.tsx"
+      ]
+    },
+    {
+      "priority": "P1",
+      "problem": "`inventory.ts` 函数覆盖率 81.81%，对象方法未覆盖。",
+      "recommendation": "新增 API 单元测试覆盖 `inventoryService.addScanResult` 和 `inventoryService.getTaskDetails` 的 URL、HTTP 方法和参数，优先不改业务实现。",
+      "files_or_areas": [
+        "frontend/src/api/inventory.ts",
+        "frontend/tests 或 frontend/src/test 中现有 API 测试位置"
+      ]
+    },
+    {
+      "priority": "P1",
+      "problem": "核心 Controller 测试覆盖不足，认证与业务 API 403 风险未被充分回归。",
+      "recommendation": "分阶段补测试：第一批 Auth/Dashboard/Asset/Inventory/Vendor，覆盖成功、未认证/无权限、参数校验和空数据；先达到关键入口风险下降，不建议一次性补齐全部 17 个缺口。",
+      "files_or_areas": [
+        "backend/src/main/java/com/ams/controller",
+        "backend/src/test/java/com/ams/controller"
+      ]
+    },
+    {
+      "priority": "P2",
+      "problem": "E2E 与临时产物管理不足。",
+      "recommendation": "为本次发现的 2 个崩溃入口新增 smoke；修复前清点并保留必要证据，修复提交前避免将 `coverage/`、`playwright-report/`、`test-results/`、`backend/target/` 的临时变化混入。",
+      "files_or_areas": [
+        "frontend/e2e",
+        "frontend/src/e2e",
+        "frontend/test-results",
+        "frontend/playwright-report",
+        "frontend/coverage",
+        "backend/target"
+      ]
+    }
+  ],
+  "debate_recommended": true
+}

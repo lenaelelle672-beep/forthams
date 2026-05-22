@@ -1,0 +1,37 @@
+{
+  "classification": "Heavy",
+  "risk_level": "HIGH",
+  "rationale": [
+    "directive 包含 6 个独立工作流（/idle 404 修复 + 固化成果 + E2E + 后端测试 + 3D 优化 + CI gate），涉及前端路由、后端 Controller、Playwright E2E、Vite 构建优化、CI 脚本等多维度变更",
+    "/idle 404 的根因尚未锁定：routes.ts 第 152 行已注册 { path: 'idle', Component: IdleAssets }，组件 IdleAssets.tsx 存在且导出 IdleAssets 命名导出，lazy import 路径正确；问题可能出在 SPA fallback 配置、路由挂载层级、Vite dev server proxy 或浏览器缓存",
+    "需要确保 /compensation、/bigscreen-3d、/inventory 三个已修复入口不回退，增加了变更约束和验证成本",
+    "后端 Controller 测试涉及 Spring Security 拦截器、多租户上下文、MockMvc 约定，技术风险中等偏高",
+    "3D 大屏 three chunk 930 kB 是库本身体积，完全消除不现实，需要评估拆分/异步加载策略的技术可行性"
+  ],
+  "required_agents": ["gai2-audit", "gai2-builder", "gai2-reviewer"],
+  "recommended_debate": false,
+  "suggested_builder_scope": [
+    "阶段1-诊断：定位 /idle 404 根因（检查主路由挂载点、createBrowserRouter 配置、Vite historyApiFallback、浏览器缓存）",
+    "阶段2-修复：修复 /idle 路由使其可正常访问，展示「闲置资产管理」标题和资产列表",
+    "阶段3-回归验证：curl/Playwright 验证 /idle、/compensation、/bigscreen-3d、/inventory 四个入口全部正常",
+    "阶段4-固化：git status 清理临时产物，前端 build + Vitest + E2E smoke 通过",
+    "阶段5-后端测试：补充至少 1 组高价值 Controller 测试（优先 AssetController 或 AuthController）",
+    "阶段6-3D优化：评估 three chunk 瘦身方案（去除未使用 drei 能力/纹理压缩/动态 import/文档化 threshold）",
+    "阶段7-CI gate：创建最小 CI gate 脚本（build + 前端测试 + E2E smoke + 后端测试一键执行）"
+  ],
+  "verification_expectations": [
+    "浏览器访问 http://localhost:5173/idle 返回 200，页面展示「闲置资产管理」标题和「闲置资产列表」表格",
+    "/compensation、/bigscreen-3d、/inventory 三个入口 smoke 验证无 Unexpected Application Error",
+    "前端 vite build 成功、Vitest 通过、E2E smoke 通过",
+    "后端 mvn test 包含新增 Controller 测试且全部通过",
+    "3D 大屏 chunk 体积有可量化的优化记录或明确的 threshold 文档",
+    "CI gate 脚本可通过单条命令执行完整验证流水线",
+    "git status 无临时测试产物混入"
+  ],
+  "blockers_or_inputs_needed": [
+    "需要确认 Vite dev server 的 historyApiFallback 配置是否正确处理 SPA 路由",
+    "需要确认前端路由使用 createBrowserRouter 还是 HashRouter，以判断 404 是服务端还是客户端路由匹配问题",
+    "后端 Controller 测试需要确认项目现有的 MockMvc 基类、认证 mock 模式（@WithMockUser 或自定义 filter 链）",
+    "3D chunk 优化需要当前 vite build 的 bundle 分析输出作为基线"
+  ]
+}

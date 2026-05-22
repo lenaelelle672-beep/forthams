@@ -1,0 +1,97 @@
+{
+  "directive": "两阶段：Part 1 — 真实登录态 E2E + AuthControllerTest + DashboardControllerTest + 结构化 commit 锁定当前状态；Part 2 — 按 REAL_USER_TEST_REPORT.md 修复 9 个 Bug（B-1 双/api 前缀、B-2 Vendor @TableField、B-3 Location @TableField、B-4 approval_process.applicant_id、B-5 IN_STOCK 枚举、B-6 categoryCode 校验、B-7 roleCode 唯一性、B-8 workflow 查询异常、B-9 audit 统计空数据），使 API 测试通过率从 69.9% 提升到可验收水平。",
+  "owner": "gai2-orchestrator",
+  "phase": "workcard_created",
+  "artifact_dir": ".omc/gai2/sessions/20260522-real-user-report-fix",
+  "parent_artifact_dirs": [
+    ".omc/gai2/sessions/20260522-idle-fix-and-consolidate",
+    ".omc/gai2/sessions/20260522-browser-scan-followup"
+  ],
+  "language_protocol": "所有自然语言输出必须使用简体中文；代码、命令、路径、JSON key、API 名称和错误原文可以保留英文。",
+  "constraints": [
+    "仅使用 .omc/gai2/ 作为状态和产物目录，保留 legacy gai 不动。",
+    "orchestrator 不直接运行项目命令、不编辑业务文件、不替代子 agent 实现。",
+    "创建 workcard 后必须调度 gai2-triage；若非 Light，必须调度 gai2-audit；实现必须由 gai2-builder；收尾必须由 gai2-reviewer。",
+    "Part 2 修复必须验证后端 API 测试通过率提升。"
+  ],
+  "acceptance_checks": [
+    {
+      "id": "AC1",
+      "description": "修复 B-1：4 个 Controller 的 @RequestMapping 去掉 /api 前缀，使 /stats、/reports、/health、/system/health 不再双 /api。",
+      "status": "pending"
+    },
+    {
+      "id": "AC2",
+      "description": "修复 B-2：Vendor Entity 的 @TableField 映射修正，创建供应商成功。",
+      "status": "pending"
+    },
+    {
+      "id": "AC3",
+      "description": "修复 B-3：Location Entity 的 @TableField 映射修正，创建位置成功。",
+      "status": "pending"
+    },
+    {
+      "id": "AC4",
+      "description": "修复 B-4：approval_process.applicant_id 数据库默认值或实体调整，提交工单成功。",
+      "status": "pending"
+    },
+    {
+      "id": "AC5",
+      "description": "修复 B-5：AssetCreateDTO 的 status 默认值使用 IDLE 而非 IN_STOCK，新建资产成功。",
+      "status": "pending"
+    },
+    {
+      "id": "AC6",
+      "description": "修复 B-6：CategoryUpdateDTO 的 categoryCode 校验放宽（@NotBlank 改 @Size(min=0)），更新分类成功。",
+      "status": "pending"
+    },
+    {
+      "id": "AC7",
+      "description": "修复 B-8：WorkflowDefinitionService 的 getByBusinessType 查询异常修复，工作流详情可查。",
+      "status": "pending"
+    },
+    {
+      "id": "AC8",
+      "description": "修复 B-9：Audit 统计查询增加空数据保护，操作类型分布和操作人排行不报错。",
+      "status": "pending"
+    },
+    {
+      "id": "AC9",
+      "description": "Part 1：新增后端 AuthControllerTest 和 DashboardControllerTest，mvn 测试通过。",
+      "status": "pending"
+    },
+    {
+      "id": "AC10",
+      "description": "Part 1：新增真实登录态 E2E 测试（覆盖登录→资产列表→赔偿→大屏等关键链路）。",
+      "status": "pending"
+    },
+    {
+      "id": "AC11",
+      "description": "后端 mvn test 全部通过，npm run build 通过，npx vitest run 通过。",
+      "status": "pending"
+    }
+  ],
+  "evidence_to_collect": [
+    "9 个 Bug 的逐一修复证据（代码变更 + 验证命令输出）",
+    "AuthControllerTest、DashboardControllerTest 测试文件与运行结果",
+    "真实登录态 E2E 测试文件与运行结果",
+    "git status 变更范围",
+    "Reviewer 逐项核验结论"
+  ],
+  "open_risks": [
+    "B-7（roleCode 已存在）是数据/测试数据唯一性问题，本次可能只做文档化或改测试用唯一编码。",
+    "B-4 需要数据库 DDL 变更（ALTER TABLE），需确认当前数据库环境和回滚方案。",
+    "真实登录态 E2E 需要与后端认证流程配合，可能依赖 mock 或固定测试账号。",
+    "后端 Controller 测试需要用 Spring Security 的 @WithMockUser 或 addFilters=false。",
+    "前端/后端服务需保持重启可用状态供验证。"
+  ],
+  "known_context": {
+    "report_path": "REAL_USER_TEST_REPORT.md",
+    "current_test_pass_rate": "72/103 (69.9%)",
+    "bug_count": 9,
+    "frontend_build_pass": true,
+    "frontend_vitest_pass": "587/587",
+    "backend_mvn_test_pass": "184/184",
+    "previous_verify_entries": ["/compensation", "/bigscreen-3d", "/inventory", "/idle"]
+  }
+}

@@ -24,13 +24,14 @@ export default defineConfig({
   },
 
   build: {
-    chunkSizeWarningLimit: 600,
+    chunkSizeWarningLimit: 1000,
     rollupOptions: {
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom', 'react-router'],
           charts: ['recharts'],
           ui: ['lucide-react'],
+          three: ['three', '@react-three/fiber', '@react-three/drei'],
         },
       },
     },

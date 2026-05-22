@@ -15,7 +15,6 @@ public class Location {
     @TableId(type = IdType.AUTO)
     private Long id;
 
-    @TableField("location_name")
     private String name;
 
     private String locationCode;

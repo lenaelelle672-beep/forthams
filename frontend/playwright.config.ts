@@ -9,7 +9,7 @@ export default defineConfig({
   timeout: 30000,
   reporter: 'html',
   use: {
-    baseURL: process.env.E2E_BASE_URL || 'http://localhost:5173',
+    baseURL: process.env.E2E_BASE_URL || 'http://127.0.0.1:5173',
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
   },
@@ -18,6 +18,12 @@ export default defineConfig({
       name: 'real-backend-smoke',
       testDir: './src/e2e',
       testMatch: /real-backend-smoke\.spec\.ts/,
+      use: { ...devices['Desktop Chrome'] },
+    },
+    {
+      name: 'browser-regression-smoke',
+      testDir: './src/e2e',
+      testMatch: /browser-regression-smoke\.spec\.ts/,
       use: { ...devices['Desktop Chrome'] },
     },
     {
@@ -67,8 +73,8 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'npm run dev',
-    url: 'http://localhost:5173',
+    command: 'npm run dev -- --host 127.0.0.1',
+    url: 'http://127.0.0.1:5173',
     reuseExistingServer: !process.env.CI,
     timeout: 120000,
   },

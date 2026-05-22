@@ -12,7 +12,7 @@ import java.util.Map;
  * 系统健康检查控制器，提供服务存活状态与基本信息探测端点。
  */
 @RestController
-@RequestMapping("/api/system")
+@RequestMapping("/system")
 public class SystemHealthController {
 
     @GetMapping("/health")

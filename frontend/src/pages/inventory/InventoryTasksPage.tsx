@@ -106,6 +106,7 @@ export default function InventoryTasksPage() {
     deficit: 100 - Number(r.progress ?? 0),
     highlight: i === 3,
   }));
+  const reportTask = records.find((task) => task.status === 'completed' || task.status === 'submitted') ?? records[0];
 
   const columns: Column<any>[] = [
     {
@@ -367,11 +368,21 @@ export default function InventoryTasksPage() {
           </div>
           <div className="relative z-10 mt-4">
             <button
-              onClick={() => navigate('/inventory/smart-report')}
-              className="bg-white/10 hover:bg-white/20 text-white border border-white/30 px-4 py-2 rounded-lg text-xs font-semibold backdrop-blur-sm transition-all"
+              type="button"
+              disabled={!reportTask}
+              onClick={() => {
+                if (reportTask?.taskId) {
+                  navigate(`/inventory/smart-report/${reportTask.taskId}`);
+                }
+              }}
+              title={reportTask ? `查看 ${reportTask.taskName} 的智能报告` : '暂无可查看的盘点任务，请先创建或选择任务'}
+              className="bg-white/10 hover:bg-white/20 disabled:hover:bg-white/10 disabled:opacity-60 disabled:cursor-not-allowed text-white border border-white/30 px-4 py-2 rounded-lg text-xs font-semibold backdrop-blur-sm transition-all"
             >
               查看智能报告
             </button>
+            {!reportTask && (
+              <p className="mt-2 text-xs text-white/70">暂无可查看的盘点任务，请先创建任务。</p>
+            )}
           </div>
           <div className="absolute -right-8 -bottom-8 w-32 h-32 bg-white/10 rounded-full blur-2xl" />
           <div className="absolute -left-4 -top-4 w-24 h-24 bg-[#0058be] rounded-full blur-xl border border-white/5" />

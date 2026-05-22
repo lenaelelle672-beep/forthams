@@ -226,7 +226,7 @@ public class WorkOrderService {
         approvalProcess.setTenantId(workOrder.getTenantId());
         approvalProcess.setStatus(status);
         approvalProcess.setCurrentStep(1);
-        approvalProcess.setApplicantId(workOrder.getReporterId());
+        approvalProcess.setApplicantId(workOrder.getReporterId() != null ? workOrder.getReporterId() : 0L);
         approvalProcess.setApplyTime(LocalDateTime.now());
         approvalProcessMapper.insert(approvalProcess);
     }

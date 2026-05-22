@@ -71,7 +71,7 @@ public enum AssetStatus {
         String normalized = value.trim().toUpperCase(Locale.ROOT);
         return switch (normalized) {
             case "ACTIVE", "USING", "USED", "NORMAL" -> IN_USE;
-            case "INACTIVE", "AVAILABLE", "UNUSED" -> IDLE;
+            case "INACTIVE", "AVAILABLE", "UNUSED", "IN_STOCK" -> IDLE;
             case "SCRAP", "DISPOSED" -> SCRAPPED;
             case "RETIRING", "PENDING_RETIRE", "PENDING_SCRAP", "PENDING_SCRAPPED" -> PENDING_RETIREMENT;
             case "RETIREMENT" -> RETIRED;
