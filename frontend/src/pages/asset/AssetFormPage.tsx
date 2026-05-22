@@ -4,7 +4,7 @@
  * 使用 React Hook Form + Zod 校验
  */
 
-import { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -88,7 +88,10 @@ export default function AssetFormPage() {
     }
   }, [asset, reset]);
 
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
   const onSubmit = async (values: FormValues) => {
+    setSubmitError(null);
     try {
       if (isEdit && assetId) {
         await updateMutation.mutateAsync({ id: assetId, ...values } as CreateAssetRequest & { id: number });
@@ -97,7 +100,8 @@ export default function AssetFormPage() {
       }
       navigate('/assets');
     } catch (err) {
-      console.error('保存失败', err instanceof Error ? err.message : err);
+      const msg = err instanceof Error ? err.message : '保存失败，请重试';
+      setSubmitError(msg);
     }
   };
 
@@ -261,6 +265,11 @@ export default function AssetFormPage() {
         </Card>
 
         {/* 提交按钮 */}
+        {submitError && (
+          <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">
+            {submitError}
+          </div>
+        )}
         <div className="flex justify-end gap-3">
           <Button type="button" variant="outline" onClick={() => navigate(-1)}>
             取消
