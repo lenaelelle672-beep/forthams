@@ -100,10 +100,24 @@ export default function DashboardPage() {
 
   // Trend data from API (no MOCK fallback)
   const trendData = trends.slice(-12).map((t: AssetValueTrend) => ({
-    month: t.date?.substring(5, 7) + '月',
+    month: t.date ? t.date.substring(5, 7) + '月' : '—',
     total: Math.round(t.totalValue / 10000),
     net:   Math.round(t.netValue / 10000),
   }));
+
+  // 基于趋势数据计算环比变化百分比（对比最近两个月）
+  const computeTrend = (key: 'totalValue' | 'netValue') => {
+    if (trends.length < 2) return undefined;
+    const current = trends[trends.length - 1][key];
+    const previous = trends[trends.length - 2][key];
+    if (!previous || previous === 0) return undefined;
+    const pct = ((current - previous) / previous * 100).toFixed(1);
+    const direction = current >= previous ? 'up' as const : 'down' as const;
+    return { value: `${Math.abs(Number(pct))}%`, direction };
+  };
+
+  const totalTrend = computeTrend('totalValue');
+  const netTrend = computeTrend('netValue');
 
   // Category distribution from stats API
   const categoryData = stats?.categoryDistribution
@@ -207,21 +221,21 @@ export default function DashboardPage() {
             <KpiCard
               title="总资产数"
               value={(stats?.totalAssets ?? 0).toLocaleString()}
-              trend={{ value: '2.4%', direction: 'up' }}
+              trend={totalTrend}
               icon={BarChart3}
               iconColor="#004ac6"
             />
             <KpiCard
               title="在用资产"
               value={(stats?.inUseAssets ?? 0).toLocaleString()}
-              trend={{ value: '5.1%', direction: 'up' }}
+              trend={netTrend}
               icon={CheckCircle2}
               iconColor="#16a34a"
             />
             <KpiCard
               title="闲置资产"
               value={(stats?.idleAssets ?? 0).toLocaleString()}
-              trend={{ value: '1.2%', direction: 'down' }}
+              trend={undefined}
               icon={Package}
               iconColor="#6b7280"
             />

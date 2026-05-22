@@ -13,6 +13,7 @@ import {
   RefreshCw,
   Calculator,
 } from 'lucide-react';
+import { toast } from 'sonner';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
@@ -177,11 +178,19 @@ export default function DepreciationListPage() {
         return true;
       });
 
-      setDataSource(deduped.length > 0 ? deduped : (p === 1 ? MOCK_SCHEDULES : []));
+      if (deduped.length > 0) {
+        setDataSource(deduped);
+      } else if (p === 1) {
+        toast.warning('当前显示示例数据，API 数据不可用');
+        setDataSource(MOCK_SCHEDULES);
+      } else {
+        setDataSource([]);
+      }
       setTotal(res.total || (p === 1 ? MOCK_SCHEDULES.length : 0));
       setPage(res.page || p);
     } catch {
       // API 不通，降级 Mock
+      toast.warning('当前显示示例数据，API 数据不可用');
       if (p === 1) {
         setDataSource(MOCK_SCHEDULES);
         setTotal(MOCK_SCHEDULES.length);

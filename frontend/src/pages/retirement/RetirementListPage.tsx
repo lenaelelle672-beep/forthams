@@ -68,12 +68,33 @@ const QUICK_FILTERS = [
   { key: 'COMPLETED', label: '已完成' },
 ];
 
-const METRIC_CARDS = [
-  { label: '退役总价值', value: '¥1,842,000', sub: '较上月 +12.5%', subColor: 'text-[#16a34a]', icon: Wallet, iconColor: 'text-[#004191]' },
-  { label: '待审核', value: '18 项申请', sub: '平均响应时间: 4.2h', subColor: 'text-[#64748b]', icon: Clock, iconColor: 'text-[#d97706]' },
-  { label: '残值回收', value: '¥610,200', sub: '回收率 33%', subColor: 'text-[#64748b]', icon: Recycle, iconColor: 'text-[#16a34a]' },
-  { label: '主要退役原因', value: '技术过时', sub: '占全部退役的 42%', subColor: 'text-[#64748b]', icon: AlertTriangle, iconColor: 'text-[#ba1a1a]' },
-] as const;
+function buildMetricCards(records: RetirementApplication[]) {
+  const totalValue = records.reduce((sum, r) => sum + (Number((r as Record<string, unknown>).originalValue) || 0), 0);
+  const pendingCount = records.filter((r) => r.status === 'PENDING').length;
+  const totalResidual = records.reduce((sum, r) => sum + (Number(r.residualValue) || 0), 0);
+  const residualRate = totalValue > 0 ? ((totalResidual / totalValue) * 100).toFixed(0) : '0';
+
+  // 退役原因统计
+  const reasonMap = new Map<string, number>();
+  records.forEach((r) => {
+    if (r.reason) reasonMap.set(r.reason, (reasonMap.get(r.reason) || 0) + 1);
+  });
+  let topReason = '—';
+  let topReasonCount = 0;
+  let totalReasons = 0;
+  reasonMap.forEach((count, reason) => {
+    totalReasons += count;
+    if (count > topReasonCount) { topReasonCount = count; topReason = reason; }
+  });
+  const reasonPct = totalReasons > 0 ? ((topReasonCount / totalReasons) * 100).toFixed(0) : '0';
+
+  return [
+    { label: '退役总价值', value: `¥${totalValue.toLocaleString()}`, sub: `共 ${records.length} 条记录`, subColor: 'text-[#64748b]', icon: Wallet, iconColor: 'text-[#004191]' },
+    { label: '待审核', value: `${pendingCount} 项申请`, sub: pendingCount > 0 ? '需要及时处理' : '暂无待审核', subColor: 'text-[#64748b]', icon: Clock, iconColor: 'text-[#d97706]' },
+    { label: '残值回收', value: `¥${totalResidual.toLocaleString()}`, sub: `回收率 ${residualRate}%`, subColor: 'text-[#64748b]', icon: Recycle, iconColor: 'text-[#16a34a]' },
+    { label: '主要退役原因', value: topReason, sub: `占全部退役的 ${reasonPct}%`, subColor: 'text-[#64748b]', icon: AlertTriangle, iconColor: 'text-[#ba1a1a]' },
+  ];
+}
 
 export default function RetirementListPage() {
   const navigate = useNavigate();
@@ -201,7 +222,7 @@ export default function RetirementListPage() {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
           <nav className="flex items-center text-[10px] text-[#64748b] space-x-2 mb-2 uppercase tracking-wider">
-            <a className="hover:text-[#004191] cursor-pointer" onClick={() => navigate('/dashboard')}>FORTHAMS</a>
+            <a className="hover:text-[#004191] cursor-pointer" onClick={() => navigate('/dashboard')}>首页</a>
             <ChevronRightIcon className="w-3 h-3" />
             <span className="text-[#004191] font-bold">资产退役</span>
           </nav>
@@ -284,7 +305,7 @@ export default function RetirementListPage() {
               variant="secondary"
               size="md"
               className="flex-1"
-              onClick={() => {}}
+              onClick={() => setParams((p) => ({ ...p }))}
             >
               <Filter className="w-3.5 h-3.5" /> 筛选
             </Button>
@@ -317,7 +338,7 @@ export default function RetirementListPage() {
       </Card>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-        {METRIC_CARDS.map(({ label, value, sub, subColor, icon: Icon, iconColor }) => (
+        {buildMetricCards(records).map(({ label, value, sub, subColor, icon: Icon, iconColor }) => (
           <div key={label} className="bg-white border border-[#e5e7eb] p-4 rounded-xl shadow-sm">
             <div className="flex items-center justify-between mb-2">
               <span className="text-[10px] text-[#64748b] uppercase tracking-wider">{label}</span>

@@ -17,6 +17,18 @@ import { ApprovalTimeline } from '@/components/ui/ApprovalTimeline';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/Dialog';
 import { Skeleton } from '@/components/ui/Skeleton';
 
+const STATUS_LABEL_MAP: Record<string, string> = {
+  'DRAFT': '草稿',
+  'SUBMITTED': '已提交',
+  'APPROVING_LEVEL_1': '一级审批中',
+  'APPROVING_LEVEL_2': '二级审批中',
+  'APPROVED': '已批准',
+  'REJECTED': '已驳回',
+  'EXECUTING': '执行中',
+  'COMPLETED': '已完成',
+  'CANCELLED': '已取消',
+};
+
 export default function WorkOrderDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -67,7 +79,7 @@ export default function WorkOrderDetailPage() {
               workOrder.status === 'REJECTED' ? 'danger' :
               workOrder.status.startsWith('APPROVING') ? 'warning' : 'default'
             }>
-              {workOrder.status}
+              {STATUS_LABEL_MAP[workOrder.status] ?? workOrder.status}
             </Badge>
           )}
         </div>
