@@ -9,7 +9,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { assetService } from '@/services/assetService';
-import type { Asset } from '@/types/asset.types';
+import type { Asset } from '@/types/asset';
 
 /**
  * Query key for asset detail queries

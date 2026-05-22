@@ -14,7 +14,7 @@
 import http from '@/utils/http';
 // Alias for compatibility
 const apiClient = http;
-import type { Asset, AssetDetail, AssetQuery, AssetListResponse } from '@/types/asset.types';
+import type { Asset, AssetDetail, AssetQuery, AssetListResponse } from '@/types/asset';
 
 /**
  * Query parameters for asset listing
