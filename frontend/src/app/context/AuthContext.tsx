@@ -47,7 +47,9 @@ function readStoredUser() {
     return null;
   }
 
-  const storedUser = window.localStorage.getItem(USER_STORAGE_KEY);
+  const storedUser =
+    window.sessionStorage.getItem(USER_STORAGE_KEY) ||
+    window.localStorage.getItem(USER_STORAGE_KEY);
 
   if (!storedUser) {
     return null;
@@ -69,7 +71,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const storedToken =
       typeof window === "undefined"
         ? null
-        : window.localStorage.getItem(TOKEN_STORAGE_KEY);
+        : window.sessionStorage.getItem(TOKEN_STORAGE_KEY) ||
+          window.localStorage.getItem(TOKEN_STORAGE_KEY);
     const storedUser = readStoredUser();
 
     if (storedToken && storedUser) {
@@ -92,8 +95,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
 
     if (typeof window !== "undefined") {
-      window.localStorage.setItem(TOKEN_STORAGE_KEY, response.token);
-      window.localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(nextUser));
+      window.sessionStorage.setItem(TOKEN_STORAGE_KEY, response.token);
+      window.sessionStorage.setItem(USER_STORAGE_KEY, JSON.stringify(nextUser));
     }
 
     setToken(response.token);

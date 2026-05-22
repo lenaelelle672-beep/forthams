@@ -68,7 +68,7 @@ function getStatusLabel(status: string): string {
 
 function getCurrentUserId(): number {
   try {
-    const raw = localStorage.getItem('user_info');
+    const raw = sessionStorage.getItem('user_info') || localStorage.getItem('user_info');
     if (!raw) return 0;
     const user = JSON.parse(raw);
     return Number(user.id ?? user.userId ?? 0);

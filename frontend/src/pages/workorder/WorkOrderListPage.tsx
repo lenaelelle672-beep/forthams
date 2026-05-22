@@ -6,9 +6,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
-import { Plus, FileText, Download } from 'lucide-react';
+import { Plus, FileText, Download, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { getWorkOrderList } from '@/api/workorder';
+import http from '@/utils/http';
 import type { PaginatedResponse } from '@/types/common';
 import type { WorkOrderListItem } from '@/types/workorder';
 import { Card } from '@/components/ui/Card';
@@ -48,6 +49,7 @@ const PRIORITY_LABEL: Record<string, string> = {
 export default function WorkOrderListPage() {
   const navigate = useNavigate();
   const [params, setParams] = useState<{ page: number; pageSize: number; keyword?: string; status?: string }>({ page: 1, pageSize: 20 });
+  const [exporting, setExporting] = useState(false);
 
   const { data: res, isLoading } = useQuery({
     queryKey: ['workorders', 'list', params],
@@ -115,30 +117,48 @@ export default function WorkOrderListPage() {
         breadcrumbs={[{ label: '仪表板', href: '/dashboard' }, { label: '工单管理' }]}
         actions={
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="md" onClick={() => {
-              if (records.length === 0) {
-                toast.info('暂无数据可导出');
-                return;
+            <Button variant="outline" size="md" disabled={exporting} onClick={async () => {
+              if (exporting) return;
+              setExporting(true);
+              try {
+                const allRes = await http.get('/workorders', {
+                  params: {
+                    page: 1,
+                    pageSize: 99999,
+                    keyword: params.keyword || undefined,
+                    status: params.status || undefined,
+                  },
+                });
+                const allRecords = (allRes as PaginatedResponse<WorkOrderListItem> | undefined)?.data?.records ?? [];
+                if (allRecords.length === 0) {
+                  toast.info('暂无数据可导出');
+                  return;
+                }
+                const headers = ['工单号', '标题', '优先级', '状态', '申请人', '部门', '申请时间'];
+                const rows = allRecords.map((r: any) => [
+                  r.orderNo ?? r.id ?? '',
+                  r.title ?? '',
+                  PRIORITY_LABEL[r.priority] ?? r.priority ?? '',
+                  STATUS_BADGE[r.status]?.label ?? r.status ?? '',
+                  r.applicantName ?? '',
+                  r.departmentName ?? '',
+                  r.createdAt ?? '',
+                ]);
+                const csv = [headers, ...rows].map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
+                const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url; a.download = `workorders-${new Date().toISOString().slice(0, 10)}.csv`;
+                a.click(); URL.revokeObjectURL(url);
+                toast.success(`已导出 ${allRecords.length} 条工单`);
+              } catch (err) {
+                toast.error('导出失败，请重试');
+              } finally {
+                setExporting(false);
               }
-              const headers = ['工单号', '标题', '优先级', '状态', '申请人', '部门', '申请时间'];
-              const rows = records.map((r: any) => [
-                r.orderNo ?? r.id ?? '',
-                r.title ?? '',
-                PRIORITY_LABEL[r.priority] ?? r.priority ?? '',
-                STATUS_BADGE[r.status]?.label ?? r.status ?? '',
-                r.applicantName ?? '',
-                r.departmentName ?? '',
-                r.createdAt ?? '',
-              ]);
-              const csv = [headers, ...rows].map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
-              const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
-              const url = URL.createObjectURL(blob);
-              const a = document.createElement('a');
-              a.href = url; a.download = `workorders-${new Date().toISOString().slice(0, 10)}.csv`;
-              a.click(); URL.revokeObjectURL(url);
-              toast.success('导出成功');
             }}>
-              <Download className="w-4 h-4" /> 导出CSV
+              {exporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+              {exporting ? '导出中...' : '导出全部'}
             </Button>
             <Button size="md" onClick={() => navigate('/workorders/new')}>
               <Plus className="w-4 h-4" /> 新建工单

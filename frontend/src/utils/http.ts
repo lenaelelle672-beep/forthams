@@ -39,7 +39,7 @@ const http = axios.create({
 // ── 请求拦截器：注入 Bearer Token ────────────────────────────────────────────
 http.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    const token = localStorage.getItem('auth_token');
+    const token = sessionStorage.getItem('auth_token') || localStorage.getItem('auth_token');
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -58,6 +58,8 @@ http.interceptors.response.use(
 
     if (status === 401) {
       // Token 失效或未登录 → 清除本地状态，跳转登录页
+      sessionStorage.removeItem('auth_token');
+      sessionStorage.removeItem('user_info');
       localStorage.removeItem('auth_token');
       localStorage.removeItem('user_info');
       window.location.href = '/login';

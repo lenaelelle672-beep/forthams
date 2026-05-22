@@ -21,7 +21,7 @@ export interface WorkflowDefinitionDTO {
  */
 function getOperatorId(): number | undefined {
   if (typeof window === 'undefined') return undefined;
-  const raw = window.localStorage.getItem('user_info');
+  const raw = window.sessionStorage.getItem('user_info') || window.localStorage.getItem('user_info');
   if (!raw) return undefined;
   try {
     const user = JSON.parse(raw);

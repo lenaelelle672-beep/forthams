@@ -52,7 +52,7 @@ export default function AssetFormPage() {
   const isEdit = !!id && id !== 'new';
   const assetId = isEdit ? Number(id) : null;
 
-  const { data: assetRes } = useAssetDetail(assetId);
+  const { data: assetRes, isLoading: assetLoading } = useAssetDetail(assetId);
   const { data: catRes } = useCategoryTree();
   const { data: deptRes } = useQuery({
     queryKey: ['departments'],
@@ -73,7 +73,7 @@ export default function AssetFormPage() {
     defaultValues: { status: AssetStatus.IN_USE, isImportant: 0 },
   });
 
-  const isLoadingDetail = isEdit && !asset && useAssetDetail(assetId).isLoading;
+  const isLoadingDetail = isEdit && !asset && assetLoading;
 
   // 编辑模式：回填已有值
   useEffect(() => {

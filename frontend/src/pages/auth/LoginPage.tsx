@@ -192,8 +192,8 @@ export default function LoginPage() {
         toast.error('登录响应缺少 token');
         return;
       }
-      localStorage.setItem('auth_token', token);
-      localStorage.setItem('user_info', JSON.stringify({ userId, username, realName }));
+      sessionStorage.setItem('auth_token', token);
+      sessionStorage.setItem('user_info', JSON.stringify({ userId, username, realName }));
       // 记住我：保存或清除用户名
       if (rememberMe) {
         localStorage.setItem('remembered_username', username);

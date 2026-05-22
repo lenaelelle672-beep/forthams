@@ -60,6 +60,9 @@ class ApprovalServiceTest {
     @Mock
     private UserRoleMapper userRoleMapper;
 
+    @Mock
+    private NotificationService notificationService;
+
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     private ApprovalService approvalService;
@@ -76,7 +79,8 @@ class ApprovalServiceTest {
                 compensationService,
                 workflowDefinitionService,
                 userRoleMapper,
-                objectMapper);
+                objectMapper,
+                notificationService);
     }
 
     @AfterEach

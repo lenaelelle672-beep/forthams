@@ -1,0 +1,58 @@
+{
+  "changed_files": [
+    "frontend/src/utils/http.ts",
+    "frontend/src/pages/auth/LoginPage.tsx",
+    "frontend/src/layouts/AppLayout.tsx",
+    "frontend/src/app/context/AuthContext.tsx",
+    "frontend/src/app/utils/api.ts",
+    "frontend/src/app/pages/LogDashboard/components/TrendChart/TrendChart.tsx",
+    "frontend/src/app/pages/AssetBulkImport/AssetBulkImportPage.tsx",
+    "frontend/src/components/inventory/ScopeSelector.tsx",
+    "frontend/src/pages/idle/IdleAssetsPage.tsx",
+    "frontend/src/api/workflow.ts",
+    "frontend/src/app/services/workflowDefinitionService.ts",
+    "frontend/src/pages/asset/AssetListPage.tsx",
+    "frontend/src/pages/workorder/WorkOrderListPage.tsx",
+    "frontend/src/pages/asset/AssetFormPage.tsx",
+    "backend/src/main/java/com/ams/controller/AuthController.java",
+    "backend/src/main/java/com/ams/service/AuthService.java",
+    "backend/src/main/java/com/ams/service/ApprovalService.java",
+    "backend/src/main/java/com/ams/service/WorkOrderService.java",
+    "backend/src/test/java/com/ams/service/ApprovalServiceTest.java",
+    "backend/src/test/java/com/ams/service/WorkOrderServiceTest.java"
+  ],
+  "added_files": [
+    "backend/src/main/java/com/ams/dto/ResetPasswordRequest.java"
+  ],
+  "commands_run": [
+    {
+      "command": "mvn test -pl .",
+      "result": "passed",
+      "notes": "251 tests, 0 failures, BUILD SUCCESS"
+    },
+    {
+      "command": "npx vitest run",
+      "result": "passed",
+      "notes": "587 tests, 0 failures, 22 test files passed"
+    },
+    {
+      "command": "npm run build",
+      "result": "passed",
+      "notes": "built in 5.10s, no errors"
+    }
+  ],
+  "verification_results": [
+    "AC1: Token 存储从 localStorage 改为 sessionStorage — LoginPage、AuthContext、api.ts、http.ts 拦截器均已修改，优先读 sessionStorage，向后兼容 localStorage 读取，清除时同时清两者",
+    "AC2: 忘记密码 — 后端添加 POST /auth/reset-password 端点（AuthService.resetPassword + ResetPasswordRequest DTO），前端已有 toast.info('请联系管理员重置密码') 按钮",
+    "AC3: 资产列表 CSV 全量导出 — AssetListPage 导出按钮改为先请求 pageSize=99999 获取全量数据再导出，添加 exporting 加载态和 toast 反馈",
+    "AC4: 工单列表 CSV 全量导出 — WorkOrderListPage 已有导出按钮，改为全量导出（pageSize=99999），添加 exporting 加载态和 toast 反馈",
+    "AC5: 资产表单编辑模式加载态 — 两个 AssetFormPage 均已有 loading skeleton。修复了 pages/asset/AssetFormPage.tsx 中重复调用 useAssetDetail 的 bug，改为解构 isLoading",
+    "AC6: 通知集成 — ApprovalService.approve() 审批完成后调用 NotificationService.create()，WorkOrderService.createWorkOrder() 创建工单后调用 NotificationService.create()，通知内容包含操作人和资产/工单名称，通知失败不影响主流程",
+    "AC7: mvn test(251 passed) + vitest(587 passed) + npm build(5.10s) 全绿"
+  ],
+  "residual_risks": [
+    "reset-password 端点当前无邮件验证，仅验证用户名存在，后端已标注 TODO，需后续接入邮件/短信验证",
+    "Token 从 localStorage 改为 sessionStorage 为过渡方案，关闭标签页后需重新登录；完整方案应使用 HttpOnly Cookie + CSRF 保护",
+    "CSV 全量导出使用 pageSize=99999，大数据量时可能有性能问题，后续应改为后端流式导出"
+  ]
+}
