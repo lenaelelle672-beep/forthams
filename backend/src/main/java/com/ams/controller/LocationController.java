@@ -21,11 +21,6 @@ public class LocationController {
         return Result.success(locationService.findRootLocations());
     }
 
-    @GetMapping("/root")
-    public Result<List<Location>> root() {
-        return Result.success(locationService.findRootLocations());
-    }
-
     /**
      * 级联查询：返回树形结构 [{code, name, children: [{code, name}...]}]
      */

@@ -65,14 +65,13 @@ class StatsControllerTest {
     }
 
     @Test
-    @DisplayName("Should return error when service throws exception")
+    @DisplayName("Should return server error when service throws exception")
     void testGetOverviewError() throws Exception {
         when(statsService.getOverview()).thenThrow(new RuntimeException("Database error"));
 
         mockMvc.perform(get("/stats/overview")
                 .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.code").value(500));
+            .andExpect(status().isInternalServerError());
 
         verify(statsService).getOverview();
     }

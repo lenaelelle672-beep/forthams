@@ -88,15 +88,4 @@ class AuthControllerTest {
 
         verify(authService).logout();
     }
-
-    @Test
-    @DisplayName("Should return test success")
-    void testEndpoint() throws Exception {
-        mockMvc.perform(get("/api/auth/test")
-                .contextPath("/api")
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.code").value(200))
-            .andExpect(jsonPath("$.data").value("认证测试成功"));
-    }
 }

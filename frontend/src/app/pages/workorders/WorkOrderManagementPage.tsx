@@ -21,7 +21,8 @@
 
 import { useState, useCallback, useRef, useEffect } from "react";
 import { useNavigate } from "react-router";
-import { Plus, ArrowLeft } from "lucide-react";
+import { Plus, ArrowLeft, Download } from "lucide-react";
+import { toast } from "sonner";
 import {
   workOrderService,
   type WorkOrderRecord,
@@ -242,6 +243,38 @@ export function WorkOrderManagementPage() {
     setMode("list");
   }, []);
 
+  // -- CSV export ----------------------------------------------------------
+
+  const handleExportCSV = useCallback(() => {
+    if (records.length === 0) {
+      toast.info("暂无数据可导出");
+      return;
+    }
+    const headers = ["工单编号", "标题", "关联资产", "报修人", "优先级", "指派给", "状态", "创建时间"];
+    const rows = records.map((r) => [
+      r.workOrderNo ?? r.id,
+      r.title ?? "",
+      r.assetName ?? "",
+      r.reporterName ?? "",
+      r.priority ?? "",
+      r.assigneeName ?? "",
+      r.status ?? "",
+      r.createTime ?? "",
+    ]);
+    const csvContent = [headers, ...rows].map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(",")).join("\n");
+    const bom = "\uFEFF";
+    const blob = new Blob([bom + csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `workorders-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    toast.success("导出成功");
+  }, [records]);
+
   // -- render: list mode ---------------------------------------------------
   if (mode === "create") {
     return (
@@ -282,14 +315,24 @@ export function WorkOrderManagementPage() {
           <h2 className="text-2xl font-semibold text-gray-900">工单管理</h2>
           <p className="text-gray-500 mt-1">创建、查看和管理所有工单</p>
         </div>
-        <button
-          onClick={() => setMode("create")}
-          className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors shadow-sm"
-          data-testid="work-order-create-nav-btn"
-        >
-          <Plus className="w-4 h-4" />
-          新建工单
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleExportCSV}
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 rounded-lg transition-colors shadow-sm"
+            data-testid="work-order-export-btn"
+          >
+            <Download className="w-4 h-4" />
+            导出CSV
+          </button>
+          <button
+            onClick={() => setMode("create")}
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors shadow-sm"
+            data-testid="work-order-create-nav-btn"
+          >
+            <Plus className="w-4 h-4" />
+            新建工单
+          </button>
+        </div>
       </div>
 
       {/* Notice banner */}

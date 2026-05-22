@@ -61,12 +61,12 @@ export const locationService = {
   /**
    * 获取根位置列表
    *
-   * @description 调用 GET /locations/root 获取所有根位置（parentId 为 null），
+   * @description 调用 GET /locations/list 获取所有根位置（parentId 为 null），
    * 后端通过递归 CTE 返回包含子节点的平铺列表。
    * @returns Promise<ILocation[]>
    */
   getRoots(): Promise<ILocation[]> {
-    return api.get<ILocation[]>("/locations/root");
+    return api.get<ILocation[]>("/locations/list");
   },
 
   /**

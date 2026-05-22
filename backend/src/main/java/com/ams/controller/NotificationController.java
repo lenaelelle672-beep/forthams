@@ -1,15 +1,18 @@
 package com.ams.controller;
 
 import com.ams.common.Result;
-import com.ams.common.exception.BusinessException;
 import com.ams.entity.ApprovalProcess;
 import com.ams.entity.NotificationRecord;
+import com.ams.entity.User;
+import com.ams.mapper.UserMapper;
 import com.ams.service.ApprovalService;
 import com.ams.service.NotificationService;
-import com.ams.utils.JwtUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -21,6 +24,7 @@ import java.util.*;
  * <p>提供通知的 CRUD 端点，基于独立的 notification 表持久化。
  * 保留 /pending 兼容端点，从 ApprovalService 派生。</p>
  */
+@Slf4j
 @RestController
 @RequestMapping("/notifications")
 @RequiredArgsConstructor
@@ -28,7 +32,7 @@ public class NotificationController {
 
     private final NotificationService notificationService;
     private final ApprovalService approvalService;
-    private final JwtUtil jwtUtil;
+    private final UserMapper userMapper;
 
     /**
      * 分页查询通知列表。
@@ -39,9 +43,8 @@ public class NotificationController {
             @RequestParam(required = false) String category,
             @RequestParam(required = false) String type,
             @RequestParam(defaultValue = "1") Integer page,
-            @RequestParam(defaultValue = "10") Integer pageSize,
-            HttpServletRequest request) {
-        Long userId = getCurrentUserId(request);
+            @RequestParam(defaultValue = "10") Integer pageSize) {
+        Long userId = getCurrentUserId();
         Page<NotificationRecord> pageResult = notificationService.getPage(userId, page, pageSize, category, type);
 
         List<Map<String, Object>> records = pageResult.getRecords().stream()
@@ -61,8 +64,8 @@ public class NotificationController {
      * 获取未读通知数量（新端点）。
      */
     @GetMapping("/unread-count")
-    public Result<Long> unreadCount(HttpServletRequest request) {
-        Long userId = getCurrentUserId(request);
+    public Result<Long> unreadCount() {
+        Long userId = getCurrentUserId();
         return Result.success(notificationService.getUnreadCount(userId));
     }
 
@@ -71,9 +74,8 @@ public class NotificationController {
      */
     @GetMapping("/pending")
     public Result<Map<String, Object>> pending(
-            @RequestParam(required = false) String type,
-            HttpServletRequest request) {
-        Long userId = getCurrentUserId(request);
+            @RequestParam(required = false) String type) {
+        Long userId = getCurrentUserId();
         List<Map<String, Object>> items = approvalService.getMyPendingApprovals(userId)
                 .stream()
                 .map(this::toApprovalNotificationItem)
@@ -90,8 +92,8 @@ public class NotificationController {
      * 兼容旧端点：获取待处理通知数量。
      */
     @GetMapping("/pending/count")
-    public Result<Long> pendingCount(HttpServletRequest request) {
-        Long userId = getCurrentUserId(request);
+    public Result<Long> pendingCount() {
+        Long userId = getCurrentUserId();
         // 优先返回真实未读数
         return Result.success(notificationService.getUnreadCount(userId));
     }
@@ -100,8 +102,8 @@ public class NotificationController {
      * 标记单条通知为已读。
      */
     @PutMapping("/{id}/read")
-    public Result<Void> markAsRead(@PathVariable Long id, HttpServletRequest request) {
-        Long userId = getCurrentUserId(request);
+    public Result<Void> markAsRead(@PathVariable Long id) {
+        Long userId = getCurrentUserId();
         notificationService.markAsRead(id, userId);
         return Result.success();
     }
@@ -110,8 +112,8 @@ public class NotificationController {
      * 全部标记为已读。
      */
     @PutMapping("/read-all")
-    public Result<Void> markAllAsRead(HttpServletRequest request) {
-        Long userId = getCurrentUserId(request);
+    public Result<Void> markAllAsRead() {
+        Long userId = getCurrentUserId();
         notificationService.markAllAsRead(userId);
         return Result.success();
     }
@@ -120,13 +122,34 @@ public class NotificationController {
      * 删除通知。
      */
     @DeleteMapping("/{id}")
-    public Result<Void> delete(@PathVariable Long id, HttpServletRequest request) {
-        Long userId = getCurrentUserId(request);
+    public Result<Void> delete(@PathVariable Long id) {
+        Long userId = getCurrentUserId();
         notificationService.delete(id, userId);
         return Result.success();
     }
 
     // ==================== 私有方法 ====================
+
+    /**
+     * 从 Spring Security SecurityContext 中获取当前认证用户的数据库 ID。
+     */
+    private Long getCurrentUserId() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getPrincipal())) {
+            throw new com.ams.common.exception.BusinessException("未获取到当前用户");
+        }
+        String username = auth.getName();
+        User user = userMapper.selectOne(
+                new LambdaQueryWrapper<User>()
+                        .eq(User::getUsername, username)
+                        .eq(User::getStatus, 1)
+                        .last("LIMIT 1")
+        );
+        if (user == null) {
+            throw new com.ams.common.exception.BusinessException("未获取到当前用户");
+        }
+        return user.getId();
+    }
 
     /**
      * 将 NotificationRecord 转为前端响应 Map。
@@ -208,17 +231,5 @@ public class NotificationController {
                 ? process.getApplyTime()
                 : process.getCreateTime();
         return createdAt == null ? "" : createdAt.toString();
-    }
-
-    private Long getCurrentUserId(HttpServletRequest request) {
-        String authHeader = request.getHeader("Authorization");
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            throw new BusinessException("未获取到当前用户");
-        }
-        Long userId = jwtUtil.getUserIdFromToken(authHeader.substring(7));
-        if (userId == null) {
-            throw new BusinessException("未获取到当前用户");
-        }
-        return userId;
     }
 }

@@ -82,6 +82,22 @@ export default function ApprovalListPage() {
   });
   const pendingCount = (pendingCountRes as ApiResponse<number> | undefined)?.data ?? 0;
 
+  // ── Approved count for summary cards ──
+  const { data: approvedCountRes } = useQuery({
+    queryKey: ['approvals', 'count', 'APPROVED'],
+    queryFn: () => getApprovalList({ status: 'APPROVED', page: 1, pageSize: 1 }),
+    staleTime: 1000 * 60,
+  });
+  const approvedCount = (approvedCountRes as PaginatedResponse<ApprovalItem> | undefined)?.data?.total ?? 0;
+
+  // ── Rejected count for summary cards ──
+  const { data: rejectedCountRes } = useQuery({
+    queryKey: ['approvals', 'count', 'REJECTED'],
+    queryFn: () => getApprovalList({ status: 'REJECTED', page: 1, pageSize: 1 }),
+    staleTime: 1000 * 60,
+  });
+  const rejectedCount = (rejectedCountRes as PaginatedResponse<ApprovalItem> | undefined)?.data?.total ?? 0;
+
   // ── Approval list ──
   const statusParam = filterStatus !== 'all' ? filterStatus.toUpperCase() : queryStatus;
   const { data, isLoading } = useQuery({
@@ -143,8 +159,8 @@ export default function ApprovalListPage() {
   // Summary cards — use real pending count, other cards derive from list total
   const summaryCards = [
     { label: '待审批', value: pendingCount, icon: ClipboardCheck, bg: 'bg-[#004191]/10', color: 'text-[#004191]' },
-    { label: '已通过', value: activeTab === 'completed' ? total : '-', icon: CheckCircle2, bg: 'bg-[#dcfce7]/50', color: 'text-[#16a34a]' },
-    { label: '已驳回', value: '-', icon: XCircle, bg: 'bg-[#ffdad6]/50', color: 'text-[#ba1a1a]' },
+    { label: '已通过', value: approvedCount, icon: CheckCircle2, bg: 'bg-[#dcfce7]/50', color: 'text-[#16a34a]' },
+    { label: '已驳回', value: rejectedCount, icon: XCircle, bg: 'bg-[#ffdad6]/50', color: 'text-[#ba1a1a]' },
   ];
 
   const getStatusInfo = (status: string) =>
@@ -218,7 +234,17 @@ export default function ApprovalListPage() {
           <span className="text-[10px] font-semibold tracking-wide text-[#424753]">状态</span>
           <select
             value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
+            onChange={(e) => {
+              const val = e.target.value;
+              setFilterStatus(val);
+              // 联动 Tab：选择具体状态时自动切换到 completed tab
+              if (val === 'approved' || val === 'rejected') {
+                setActiveTab('completed');
+              } else if (val === 'pending') {
+                setActiveTab('pending');
+              }
+              setPage(1);
+            }}
             className="bg-white border border-[#c2c6d5] text-sm rounded px-3 py-1.5 focus:ring-[#004191] focus:border-[#004191]"
           >
             <option value="all">全部状态</option>
@@ -232,14 +258,29 @@ export default function ApprovalListPage() {
           <input
             type="date"
             value={startDate}
-            onChange={(e) => { setStartDate(e.target.value); setPage(1); }}
+            onChange={(e) => {
+              setStartDate(e.target.value);
+              if (endDate && e.target.value > endDate) {
+                setEndDate('');
+                toast.info('结束日期已重置，不能早于开始日期');
+              }
+              setPage(1);
+            }}
             className="bg-white border border-[#c2c6d5] text-sm rounded px-3 py-1.5"
           />
           <span className="text-[#424753]">至</span>
           <input
             type="date"
             value={endDate}
-            onChange={(e) => { setEndDate(e.target.value); setPage(1); }}
+            min={startDate || undefined}
+            onChange={(e) => {
+              if (startDate && e.target.value < startDate) {
+                toast.error('结束日期不能早于开始日期');
+                return;
+              }
+              setEndDate(e.target.value);
+              setPage(1);
+            }}
             className="bg-white border border-[#c2c6d5] text-sm rounded px-3 py-1.5"
           />
         </div>
@@ -394,8 +435,10 @@ export default function ApprovalListPage() {
               className="w-full border border-[#c2c6d5] rounded px-3 py-2 text-sm focus:ring-[#004191] focus:border-[#004191] min-h-[100px]"
               value={rejectReason}
               onChange={(e) => setRejectReason(e.target.value)}
+              maxLength={500}
               placeholder="请输入驳回原因..."
             />
+            <p className="text-xs text-[#94a3b8] mt-1 text-right">{rejectReason.length}/500</p>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setRejectDialogId(null)}>取消</Button>

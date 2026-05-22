@@ -10,6 +10,7 @@ import {
   FileQuestion,
 } from 'lucide-react';
 import { getAssetById, getDepreciationSchedule, deleteAsset } from '@/api/asset';
+import { getAssetAuditLogs, type AuditLog } from '@/api/audit';
 import type { Asset } from '@/types/asset';
 import type { ApiResponse } from '@/types/common';
 import type { DepreciationScheduleItem } from '@/types/asset';
@@ -17,6 +18,7 @@ import { Card, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { StatusBadge } from '@/components/ui/Badge';
 import { Skeleton } from '@/components/ui/Skeleton';
+import { toast } from 'sonner';
 
 function formatCurrency(value: number | undefined | null): string {
   if (value == null) return '-';
@@ -43,6 +45,7 @@ export default function AssetDetailPage() {
     mutationFn: () => deleteAsset(Number(id!)),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['assets'] });
+      toast.success('资产删除成功');
       navigate('/assets');
     },
     onError: (err: Error) => {
@@ -68,6 +71,17 @@ export default function AssetDetailPage() {
   });
 
   const depreciationData = depRes ?? [];
+
+  const { data: auditRes } = useQuery({
+    queryKey: ['asset-audit-logs', id],
+    queryFn: async () => {
+      const res = await getAssetAuditLogs(Number(id!), { page: 1, pageSize: 10 });
+      return res.data;
+    },
+    enabled: !!id,
+  });
+
+  const auditLogs: AuditLog[] = auditRes?.records ?? [];
 
   if (isLoading) {
     return (
@@ -271,9 +285,49 @@ export default function AssetDetailPage() {
               <History className="w-5 h-5 text-[#004ac6]" />
               变更记录
             </h2>
-            <div className="flex flex-col items-center justify-center py-12 text-[#94a3b8] text-sm">
-              暂无变更记录
-            </div>
+            {auditLogs.length > 0 ? (
+              <div className="space-y-4">
+                {auditLogs.map((log) => (
+                  <div key={log.id} className="flex gap-4 pb-4 border-b border-[#e5e7eb]/60 last:border-0">
+                    <div className="flex flex-col items-center">
+                      <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                        <History className="w-4 h-4 text-blue-600" />
+                      </div>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-sm font-medium text-[#0f172a]">
+                          {log.operatorName || `用户#${log.operatorId}`}
+                        </span>
+                        <span className="px-2 py-0.5 text-xs font-medium bg-blue-50 text-blue-700 rounded">
+                          {log.operationType}
+                        </span>
+                        <span className="text-xs text-[#94a3b8]">{log.createdAt}</span>
+                      </div>
+                      {log.description && (
+                        <p className="text-sm text-[#64748b]">{log.description}</p>
+                      )}
+                      {log.changes && log.changes.length > 0 && (
+                        <div className="mt-2 space-y-1">
+                          {log.changes.map((change, idx) => (
+                            <div key={idx} className="text-xs text-[#64748b] bg-gray-50 rounded px-2 py-1">
+                              <span className="font-medium">{change.fieldLabel || change.field}:</span>{' '}
+                              <span className="text-red-500">{change.oldValue || '空'}</span>
+                              {' → '}
+                              <span className="text-green-600">{change.newValue || '空'}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-12 text-[#94a3b8] text-sm">
+                暂无变更记录
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>

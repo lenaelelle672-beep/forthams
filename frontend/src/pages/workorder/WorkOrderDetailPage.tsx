@@ -38,6 +38,7 @@ export default function WorkOrderDetailPage() {
 
   const [rejectDialog, setRejectDialog] = useState(false);
   const [rejectReason, setRejectReason] = useState('');
+  const [approveDialog, setApproveDialog] = useState(false);
 
   const { data: res, isLoading } = useQuery({
     queryKey: ['workorders', 'detail', orderId],
@@ -89,16 +90,15 @@ export default function WorkOrderDetailPage() {
         {canApprove && (
           <div className="flex gap-2 ml-auto">
             <Button
-              variant="destructive"
               size="md"
+              variant="destructive"
               onClick={() => setRejectDialog(true)}
             >
               <X className="w-4 h-4" /> 驳回
             </Button>
             <Button
               size="md"
-              loading={approveMutation.isPending}
-              onClick={() => approveMutation.mutate({ version: workOrder.version })}
+              onClick={() => setApproveDialog(true)}
             >
               <Check className="w-4 h-4" /> 审批通过
             </Button>
@@ -146,6 +146,34 @@ export default function WorkOrderDetailPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* 审批通过确认对话框 */}
+      <Dialog open={approveDialog} onOpenChange={setApproveDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>确认审批通过</DialogTitle>
+          </DialogHeader>
+          <div className="px-6 py-4">
+            <p className="text-sm text-[#374151]">
+              确定要通过工单「{workOrder?.title ?? ''}」的审批吗？此操作不可撤销。
+            </p>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setApproveDialog(false)}>取消</Button>
+            <Button
+              loading={approveMutation.isPending}
+              onClick={() => {
+                approveMutation.mutate(
+                  { version: workOrder?.version },
+                  { onSuccess: () => setApproveDialog(false) },
+                );
+              }}
+            >
+              确认通过
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* 驳回对话框 */}
       <Dialog open={rejectDialog} onOpenChange={setRejectDialog}>

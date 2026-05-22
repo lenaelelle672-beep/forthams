@@ -493,7 +493,7 @@ export async function fetchAuditLogTrend(
     queryParams.action_type = action_type;
   }
 
-  return apiGet<AuditLogTrendResponse>('/trend', queryParams);
+  return apiGet<AuditLogTrendResponse>('/trends', queryParams);
 }
 
 /**

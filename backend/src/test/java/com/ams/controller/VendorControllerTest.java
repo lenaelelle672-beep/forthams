@@ -1,7 +1,10 @@
 package com.ams.controller;
 
+import com.ams.dto.VendorCreateDTO;
+import com.ams.dto.VendorUpdateDTO;
 import com.ams.entity.Vendor;
 import com.ams.service.VendorService;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,8 +17,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
@@ -39,7 +40,7 @@ class VendorControllerTest {
     private VendorService vendorService;
 
     @Test
-    @DisplayName("Should return all vendors when listing")
+    @DisplayName("Should return paginated vendors when listing")
     void testList() throws Exception {
         Vendor v1 = new Vendor();
         v1.setId(1L);
@@ -47,33 +48,42 @@ class VendorControllerTest {
         Vendor v2 = new Vendor();
         v2.setId(2L);
         v2.setName("Supplier B");
-        List<Vendor> vendors = Arrays.asList(v1, v2);
 
-        when(vendorService.list()).thenReturn(vendors);
+        Page<Vendor> page = new Page<>(1, 10);
+        page.setRecords(Arrays.asList(v1, v2));
+        page.setTotal(2);
+
+        when(vendorService.listPage(1, 10)).thenReturn(page);
 
         mockMvc.perform(get("/vendors/list")
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.code").value(200))
-            .andExpect(jsonPath("$.data").isArray())
-            .andExpect(jsonPath("$.data.length()").value(2));
+            .andExpect(jsonPath("$.data.records").isArray())
+            .andExpect(jsonPath("$.data.records.length()").value(2))
+            .andExpect(jsonPath("$.data.total").value(2));
 
-        verify(vendorService).list();
+        verify(vendorService).listPage(1, 10);
     }
 
     @Test
-    @DisplayName("Should return empty list when no vendors")
+    @DisplayName("Should return empty page when no vendors")
     void testListEmpty() throws Exception {
-        when(vendorService.list()).thenReturn(Collections.emptyList());
+        Page<Vendor> emptyPage = new Page<>(1, 10);
+        emptyPage.setRecords(java.util.Collections.emptyList());
+        emptyPage.setTotal(0);
+
+        when(vendorService.listPage(1, 10)).thenReturn(emptyPage);
 
         mockMvc.perform(get("/vendors/list")
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.code").value(200))
-            .andExpect(jsonPath("$.data").isArray())
-            .andExpect(jsonPath("$.data.length()").value(0));
+            .andExpect(jsonPath("$.data.records").isArray())
+            .andExpect(jsonPath("$.data.records.length()").value(0))
+            .andExpect(jsonPath("$.data.total").value(0));
 
-        verify(vendorService).list();
+        verify(vendorService).listPage(1, 10);
     }
 
     @Test
@@ -99,45 +109,45 @@ class VendorControllerTest {
     @Test
     @DisplayName("Should create vendor successfully")
     void testCreate() throws Exception {
-        Vendor vendor = new Vendor();
-        vendor.setName("New Supplier");
-        vendor.setVendorCode("V003");
-        vendor.setContactPerson("John");
+        VendorCreateDTO dto = new VendorCreateDTO();
+        dto.setName("New Supplier");
+        dto.setVendorCode("V003");
+        dto.setContactPerson("John");
 
         Vendor saved = new Vendor();
         saved.setId(3L);
         saved.setName("New Supplier");
 
-        when(vendorService.createVendor(any(Vendor.class))).thenReturn(saved);
+        when(vendorService.createVendor(any(VendorCreateDTO.class))).thenReturn(saved);
 
         mockMvc.perform(post("/vendors")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(vendor)))
+                .content(objectMapper.writeValueAsString(dto)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.code").value(200));
 
-        verify(vendorService).createVendor(any(Vendor.class));
+        verify(vendorService).createVendor(any(VendorCreateDTO.class));
     }
 
     @Test
     @DisplayName("Should update vendor successfully")
     void testUpdate() throws Exception {
-        Vendor vendor = new Vendor();
-        vendor.setName("Updated Supplier");
+        VendorUpdateDTO dto = new VendorUpdateDTO();
+        dto.setName("Updated Supplier");
 
         Vendor updated = new Vendor();
         updated.setId(1L);
         updated.setName("Updated Supplier");
 
-        when(vendorService.updateVendor(eq(1L), any(Vendor.class))).thenReturn(updated);
+        when(vendorService.updateVendor(eq(1L), any(VendorUpdateDTO.class))).thenReturn(updated);
 
         mockMvc.perform(put("/vendors/{id}", 1L)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(vendor)))
+                .content(objectMapper.writeValueAsString(dto)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.code").value(200));
 
-        verify(vendorService).updateVendor(eq(1L), any(Vendor.class));
+        verify(vendorService).updateVendor(eq(1L), any(VendorUpdateDTO.class));
     }
 
     @Test

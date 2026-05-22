@@ -2,16 +2,21 @@ package com.ams.controller;
 
 import com.ams.entity.ApprovalProcess;
 import com.ams.entity.NotificationRecord;
+import com.ams.entity.User;
+import com.ams.mapper.UserMapper;
 import com.ams.service.ApprovalService;
 import com.ams.service.NotificationService;
-import com.ams.utils.JwtUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -41,7 +46,25 @@ class NotificationControllerTest {
     private ApprovalService approvalService;
 
     @MockBean
-    private JwtUtil jwtUtil;
+    private UserMapper userMapper;
+
+    @BeforeEach
+    void setUpSecurityContext() {
+        User mockUser = new User();
+        mockUser.setId(42L);
+        mockUser.setUsername("testuser");
+        mockUser.setStatus(1);
+        when(userMapper.selectOne(any())).thenReturn(mockUser);
+
+        UsernamePasswordAuthenticationToken auth =
+                new UsernamePasswordAuthenticationToken("testuser", null, List.of());
+        SecurityContextHolder.getContext().setAuthentication(auth);
+    }
+
+    @AfterEach
+    void clearSecurityContext() {
+        SecurityContextHolder.clearContext();
+    }
 
     @Test
     @DisplayName("Should expose pending notification list derived from approvals")
@@ -52,12 +75,10 @@ class NotificationControllerTest {
         process.setProcessType("WORK_ORDER");
         process.setApplyTime(LocalDateTime.of(2026, 5, 19, 8, 0));
 
-        when(jwtUtil.getUserIdFromToken("test-token")).thenReturn(42L);
         when(approvalService.getMyPendingApprovals(eq(42L))).thenReturn(List.of(process));
 
         mockMvc.perform(get("/api/notifications/pending")
-                        .contextPath("/api")
-                        .header("Authorization", "Bearer test-token"))
+                        .contextPath("/api"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data.unread_count").value(1))
@@ -71,12 +92,10 @@ class NotificationControllerTest {
     @Test
     @DisplayName("Should expose pending notification count via unread count")
     void pendingCountReturnsUserScopedCount() throws Exception {
-        when(jwtUtil.getUserIdFromToken("test-token")).thenReturn(42L);
         when(notificationService.getUnreadCount(42L)).thenReturn(5L);
 
         mockMvc.perform(get("/api/notifications/pending/count")
-                        .contextPath("/api")
-                        .header("Authorization", "Bearer test-token"))
+                        .contextPath("/api"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data").value(5));
@@ -87,12 +106,10 @@ class NotificationControllerTest {
     @Test
     @DisplayName("Should return unread count via new endpoint")
     void unreadCountReturnsCountFromService() throws Exception {
-        when(jwtUtil.getUserIdFromToken("test-token")).thenReturn(42L);
         when(notificationService.getUnreadCount(42L)).thenReturn(3L);
 
         mockMvc.perform(get("/api/notifications/unread-count")
-                        .contextPath("/api")
-                        .header("Authorization", "Bearer test-token"))
+                        .contextPath("/api"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data").value(3));
@@ -114,14 +131,12 @@ class NotificationControllerTest {
         page.setRecords(List.of(record));
         page.setTotal(1);
 
-        when(jwtUtil.getUserIdFromToken("test-token")).thenReturn(42L);
         when(notificationService.getPage(eq(42L), eq(1), eq(10), any(), any())).thenReturn(page);
 
         mockMvc.perform(get("/api/notifications")
                         .contextPath("/api")
                         .param("page", "1")
-                        .param("pageSize", "10")
-                        .header("Authorization", "Bearer test-token"))
+                        .param("pageSize", "10"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data.total").value(1))
@@ -133,11 +148,8 @@ class NotificationControllerTest {
     @Test
     @DisplayName("Should mark notification as read via service")
     void markAsReadCallsService() throws Exception {
-        when(jwtUtil.getUserIdFromToken("test-token")).thenReturn(42L);
-
         mockMvc.perform(put("/api/notifications/100/read")
-                        .contextPath("/api")
-                        .header("Authorization", "Bearer test-token"))
+                        .contextPath("/api"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200));
 
@@ -147,11 +159,8 @@ class NotificationControllerTest {
     @Test
     @DisplayName("Should mark all notifications as read via service")
     void markAllAsReadCallsService() throws Exception {
-        when(jwtUtil.getUserIdFromToken("test-token")).thenReturn(42L);
-
         mockMvc.perform(put("/api/notifications/read-all")
-                        .contextPath("/api")
-                        .header("Authorization", "Bearer test-token"))
+                        .contextPath("/api"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200));
 
@@ -161,11 +170,8 @@ class NotificationControllerTest {
     @Test
     @DisplayName("Should delete notification via service")
     void deleteCallsService() throws Exception {
-        when(jwtUtil.getUserIdFromToken("test-token")).thenReturn(42L);
-
         mockMvc.perform(delete("/api/notifications/200")
-                        .contextPath("/api")
-                        .header("Authorization", "Bearer test-token"))
+                        .contextPath("/api"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200));
 

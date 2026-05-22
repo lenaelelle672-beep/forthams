@@ -10,7 +10,6 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,11 +29,11 @@ public class AuditDashboardController {
     private final AuditService auditService;
 
     @GetMapping({"", "/list"})
-    public ResponseEntity<Result<Page<GeneralAuditEntry>>> getLogs(
+    public Result<Page<GeneralAuditEntry>> getLogs(
             @RequestParam(defaultValue = "0") @Min(0) int page,
             @RequestParam(defaultValue = "10") @Min(1) @Max(100) int size,
             @RequestParam Map<String, String> params) {
-        Result<Page<GeneralAuditEntry>> result = auditService.queryLogs(
+        return auditService.queryLogs(
                 page,
                 size,
                 firstParam(params, "start_time", "startTime", "startDate"),
@@ -42,11 +41,10 @@ public class AuditDashboardController {
                 firstParam(params, "operation_type", "action_type", "operationType"),
                 firstParam(params, "operator_id", "operatorId"),
                 firstParam(params, "module", "resourceType"));
-        return ResponseEntity.ok(result);
     }
 
     @GetMapping("/count")
-    public ResponseEntity<Result<Long>> getCount(@RequestParam Map<String, String> params) {
+    public Result<Long> getCount(@RequestParam Map<String, String> params) {
         long count = auditService.queryLogs(
                 0,
                 1,
@@ -57,10 +55,10 @@ public class AuditDashboardController {
                 firstParam(params, "module", "resourceType"))
                 .getData()
                 .getTotal();
-        return ResponseEntity.ok(Result.success(count));
+        return Result.success(count);
     }
 
-    @GetMapping({"/trends", "/trend"})
+    @GetMapping("/trends")
     public Result<TrendVO> getTrends(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,

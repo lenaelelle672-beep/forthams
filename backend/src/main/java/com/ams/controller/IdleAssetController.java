@@ -3,21 +3,26 @@ package com.ams.controller;
 import com.ams.common.exception.BusinessException;
 import com.ams.dto.IdleAssetCreateDTO;
 import com.ams.entity.IdleAssetNotice;
+import com.ams.entity.User;
+import com.ams.mapper.UserMapper;
 import com.ams.service.IdleAssetService;
-import com.ams.utils.JwtUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ams.common.Result;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RestController
 @RequestMapping("/idle-assets")
 @RequiredArgsConstructor
 public class IdleAssetController {
 
     private final IdleAssetService idleAssetService;
-    private final JwtUtil jwtUtil;
+    private final UserMapper userMapper;
 
     @GetMapping("/list")
     public Result<Page<IdleAssetNotice>> list(
@@ -37,8 +42,8 @@ public class IdleAssetController {
     }
 
     @PostMapping("/{id}/claim")
-    public Result<IdleAssetNotice> claim(@PathVariable Long id, HttpServletRequest request) {
-        return Result.success(idleAssetService.claimAsset(id, getCurrentUserId(request)));
+    public Result<IdleAssetNotice> claim(@PathVariable Long id) {
+        return Result.success(idleAssetService.claimAsset(id, getCurrentUserId()));
     }
 
     @PutMapping("/{id}/cancel")
@@ -52,15 +57,24 @@ public class IdleAssetController {
         return Result.success();
     }
 
-    private Long getCurrentUserId(HttpServletRequest request) {
-        String authHeader = request.getHeader("Authorization");
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+    /**
+     * 从 Spring Security SecurityContext 中获取当前认证用户的数据库 ID。
+     */
+    private Long getCurrentUserId() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getPrincipal())) {
             throw new BusinessException("未获取到当前用户");
         }
-        Long userId = jwtUtil.getUserIdFromToken(authHeader.substring(7));
-        if (userId == null) {
+        String username = auth.getName();
+        User user = userMapper.selectOne(
+                new LambdaQueryWrapper<User>()
+                        .eq(User::getUsername, username)
+                        .eq(User::getStatus, 1)
+                        .last("LIMIT 1")
+        );
+        if (user == null) {
             throw new BusinessException("未获取到当前用户");
         }
-        return userId;
+        return user.getId();
     }
 }

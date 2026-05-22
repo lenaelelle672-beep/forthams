@@ -4,8 +4,6 @@ import com.ams.common.Result;
 import com.ams.dto.StatsResponse;
 import com.ams.service.StatsService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
  *   <li>STAT-01: GET /api/stats/overview — 系统统计概览</li>
  * </ul>
  */
-@Slf4j
 @RestController
 @RequestMapping("/stats")
 @RequiredArgsConstructor
@@ -45,12 +42,6 @@ public class StatsController {
      */
     @GetMapping("/overview")
     public Result<StatsResponse> getOverview() {
-        try {
-            return Result.success(statsService.getOverview());
-        } catch (Exception e) {
-            log.error("Failed to get stats overview", e);
-            return Result.error(HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                    e.getMessage() != null ? e.getMessage() : "Internal server error");
-        }
+        return Result.success(statsService.getOverview());
     }
 }

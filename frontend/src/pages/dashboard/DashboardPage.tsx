@@ -76,7 +76,7 @@ export default function DashboardPage() {
   const { data: woRes } = useQuery({
     queryKey: ['dashboard', 'workorders'],
     queryFn: () => getWorkOrderList({ page: 1, pageSize: 5 }),
-    staleTime: 1000 * 30,
+    staleTime: 1000 * 60 * 5,
   });
 
   const { data: deptRes } = useQuery({
@@ -202,16 +202,42 @@ export default function DashboardPage() {
         actions={
           <>
              <Button variant="outline" size="md" onClick={() => {
-               const csv = [
-                 ['部门', '资产数量', '占比'].join(','),
-                 ...departmentStats.map(d => [d.name, d.count, `${d.pct}%`].join(','))
-               ].join('\n');
-               const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
-               const url = URL.createObjectURL(blob);
-               const a = document.createElement('a');
-               a.href = url; a.download = `dashboard-${new Date().toISOString().slice(0, 10)}.csv`;
-               a.click(); URL.revokeObjectURL(url);
-             }}>
+                const kpiRows = [
+                  ['指标', '数值'],
+                  ['总资产数', String(stats?.totalAssets ?? '')],
+                  ['在用资产', String(stats?.inUseAssets ?? '')],
+                  ['闲置资产', String(stats?.idleAssets ?? '')],
+                  ['维保中资产', String(stats?.maintenanceAssets ?? '')],
+                  ['报废资产', String(stats?.scrapAssets ?? '')],
+                  ['资产总值', String(stats?.totalValue ?? '')],
+                  ['资产净值', String(stats?.netValue ?? '')],
+                  ['待审批数', String(stats?.pendingApprovals ?? '')],
+                ];
+                const trendRows = [
+                  [],
+                  ['资产价值趋势 (近12个月)'],
+                  ['月份', '总价值(万)', '净值(万)'],
+                  ...trendData.map(t => [t.month, String(t.total), String(t.net)]),
+                ];
+                const deptRows = [
+                  [],
+                  ['部门资产统计 (Top 5)'],
+                  ['部门', '资产数量', '占比'],
+                  ...departmentStats.map(d => [d.name, d.count, `${d.pct}%`]),
+                ];
+                const categoryRows = [
+                  [],
+                  ['分类分布'],
+                  ['分类', '数量'],
+                  ...categoryData.map(c => [c.name, String(c.value)]),
+                ];
+                const csv = [...kpiRows, ...trendRows, ...deptRows, ...categoryRows].map(r => r.join(',')).join('\n');
+                const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url; a.download = `dashboard-full-${new Date().toISOString().slice(0, 10)}.csv`;
+                a.click(); URL.revokeObjectURL(url);
+              }}>
                <Download className="w-4 h-4" />
                导出数据
              </Button>
@@ -377,6 +403,14 @@ export default function DashboardPage() {
               <Bell className="w-4 h-4 text-[#737686]" />
               维保预警
             </CardTitle>
+            {maintenanceAlerts.length > 5 && (
+              <button
+                className="text-xs text-[#004ac6] font-medium hover:underline"
+                onClick={() => navigate('/assets?status=MAINTENANCE')}
+              >
+                查看全部
+              </button>
+            )}
           </CardHeader>
           <CardContent>
             {maintenanceAlerts.length > 0 ? (
