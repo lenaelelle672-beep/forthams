@@ -314,7 +314,7 @@ export default function DepreciationListPage() {
               )}
             </div>
 
-            <Button variant="default" size="sm" onClick={handleSearch}>
+            <Button variant="primary" size="sm" onClick={handleSearch}>
               <Search className="w-4 h-4 mr-1" />
               查询
             </Button>
@@ -344,7 +344,7 @@ export default function DepreciationListPage() {
       {/* 批量操作栏 */}
       <div className="flex items-center gap-3">
         <Button
-          variant="default"
+          variant="primary"
           size="sm"
           disabled={selectedIds.length === 0 || batchLoading}
           onClick={() => setBatchConfirm(true)}
@@ -485,7 +485,7 @@ export default function DepreciationListPage() {
                 取消
               </Button>
               <Button
-                variant="default"
+                variant="primary"
                 size="sm"
                 onClick={handleBatchCalculate}
                 disabled={batchLoading}
