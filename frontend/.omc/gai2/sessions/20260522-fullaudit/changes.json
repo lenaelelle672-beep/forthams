@@ -1,0 +1,184 @@
+{
+  "batches": [
+    {
+      "batch": 1,
+      "changed_files": [
+        "src/pages/retirement/RetirementDetailPage.tsx",
+        "src/pages/retirement/RetirementListPage.tsx",
+        "src/pages/retirement/RetirementFormPage.tsx",
+        "src/pages/asset/AssetListPage.tsx",
+        "src/pages/inventory/InventoryTasksPage.tsx",
+        "src/pages/workorder/WorkOrderDetailPage.tsx",
+        "src/pages/approval/ApprovalListPage.tsx"
+      ],
+      "added_files": [],
+      "commands_run": [
+        {
+          "command": "npm run build",
+          "result": "passed",
+          "notes": "✓ built in 4.81s, 3328 modules transformed, zero errors"
+        },
+        {
+          "command": "npx vitest run",
+          "result": "passed",
+          "notes": "585/585 tests passed in 22 test files, duration 1.85s"
+        }
+      ],
+      "verification_results": [
+        "Build: passed in 4.81s (zero TS/lint errors)",
+        "Tests: 585/585 green (22 test files)"
+      ],
+      "fix_summary": {
+        "Fix1_RetirementDetailPage": {
+          "description": "移除 mockSteps MOCK fallback，空审批记录改为'暂无审批记录'文本；新增驳回原因 Dialog；rejectMutation 接受 reason 参数；添加 toast.success/toast.error；修复 asset.assetName ?? asset.name ?? '—'",
+          "files": ["src/pages/retirement/RetirementDetailPage.tsx"]
+        },
+        "Fix2_RetirementListPage": {
+          "description": "确认无 /retirement/:id/edit 路由，移除 Edit2 按钮（保留 Eye 查看），移除未使用 import",
+          "files": ["src/pages/retirement/RetirementListPage.tsx"]
+        },
+        "Fix3_RetirementFormPage": {
+          "description": "接入真实 API getAssetList，替换 MOCK 资产预览数据；加载/空状态处理；onError toast",
+          "files": ["src/pages/retirement/RetirementFormPage.tsx"]
+        },
+        "Fix4_AssetListPage": {
+          "description": "操作列按钮文字'编辑'改为'查看'，语义对齐",
+          "files": ["src/pages/asset/AssetListPage.tsx"]
+        },
+        "Fix5_InventoryTasksPage": {
+          "description": "Edit2 按钮添加 onClick；筛选按钮实现状态下拉；导出按钮实现 CSV 下载",
+          "files": ["src/pages/inventory/InventoryTasksPage.tsx"]
+        },
+        "Fix6_WorkOrderDetailPage": {
+          "description": "approveMutation/rejectMutation 添加 onError toast",
+          "files": ["src/pages/workorder/WorkOrderDetailPage.tsx"]
+        },
+        "Fix7_ApprovalListPage": {
+          "description": "添加 onError toast；新增 startDate/endDate state 绑定日期筛选",
+          "files": ["src/pages/approval/ApprovalListPage.tsx"]
+        }
+      },
+      "residual_risks": [
+        "RetirementListPage: 无 /retirement/:id/edit 路由",
+        "RetirementFormPage: 折旧时间线硬编码柱状图未修复（Batch 1 不含）",
+        "AssetListPage: SUMMARY_CARDS 统计卡片仍为静态值（Batch 1 不含）"
+      ]
+    },
+    {
+      "batch": 2,
+      "changed_files": [
+        "src/pages/disposal/AssetCompensationFormPage.tsx",
+        "src/pages/audit/AuditDashboardPage.tsx",
+        "src/pages/audit/AuditDetailPage.tsx",
+        "src/pages/disposal/DisposalDetailPage.tsx",
+        "src/pages/workorder/WorkOrderFormPage.tsx",
+        "src/pages/notifications/NotificationsPage.tsx",
+        "src/pages/inventory/InventoryDetailPage.tsx"
+      ],
+      "added_files": [],
+      "commands_run": [
+        {
+          "command": "npm run build",
+          "result": "passed",
+          "notes": "✓ built in 4.63s, zero TS/build errors"
+        },
+        {
+          "command": "npx vitest run",
+          "result": "passed",
+          "notes": "585/585 tests passed in 22 test files, duration 1.90s"
+        }
+      ],
+      "verification_results": [
+        "Build: passed in 4.63s (zero TS/lint errors)",
+        "Tests: 585/585 green (22 test files)"
+      ],
+      "fix_summary": {
+        "Fix1_AssetCompensationFormPage": {
+          "description": "移除硬编码 DEPT_OPTIONS 数组；新增 useQuery 调用 getDeptList()；import getDeptList from @/api/base；import Department type；Select 从真实 API 渲染部门列表；defaultValue 改为空字符串；mutation 添加 onError: () => toast.error('提交失败，请重试')；import toast from 'sonner'",
+          "files": ["src/pages/disposal/AssetCompensationFormPage.tsx"]
+        },
+        "Fix2_AuditDashboardPage": {
+          "description": "getLogStatus 函数修复：根据 operationType/description 关键字映射 error/warning/success 状态；导出按钮实现 CSV 下载（当前 records 数据 → 审计日志_<date>.csv，BOM 编码）；筛选按钮添加 onClick 切换 filterOpen 状态；新增筛选展开行显示操作类型快捷筛选",
+          "files": ["src/pages/audit/AuditDashboardPage.tsx"]
+        },
+        "Fix3_AuditDetailPage": {
+          "description": "OperationContext 字段从硬编码改为从 log 对象动态读取：method=log.httpMethod??log.method??'—'，userAgent=log.userAgent??'—'，tenantId=log.tenantId??'—'；'导出日志'按钮实现 JSON 下载（Blob JSON.stringify(log)）",
+          "files": ["src/pages/audit/AuditDetailPage.tsx"]
+        },
+        "Fix4_DisposalDetailPage": {
+          "description": "引入 useMutation/useQueryClient；import approveItem/rejectItem from @/api/approval；import toast from 'sonner'；添加 approveMutation（onError toast）和 rejectMutation（onError toast）；footer 区域在 detail.status==='PENDING' 时条件渲染审批通过/驳回申请按钮；import CheckCircle2/XCircle icons",
+          "files": ["src/pages/disposal/DisposalDetailPage.tsx"]
+        },
+        "Fix5_WorkOrderFormPage": {
+          "description": "移除 MTTR '2.4h' 装饰卡片（整个 section grid-cols-2）；移除团队负载 '85%' 进度条区域；移除 ExternalLink 图标（'查看设备维护标准手册'卡片保留但无链接图标）；移除未使用的 BarChart3/ExternalLink imports",
+          "files": ["src/pages/workorder/WorkOrderFormPage.tsx"]
+        },
+        "Fix6_NotificationsPage": {
+          "description": "重置筛选按钮 onClick 添加 qc.invalidateQueries({ queryKey: ['notifications'] })，确保重置时清空缓存数据",
+          "files": ["src/pages/notifications/NotificationsPage.tsx"]
+        },
+        "Fix7_InventoryDetailPage": {
+          "description": "移除硬编码责任部门 ['IT运维部','生产部','人力资源部'] 和关键点位 ['B-12区','3楼','机房 S-4']；替换为从 task.scopeIds 动态读取，无数据时显示 '—'；Filter/Columns3 按钮添加 onClick 切换 filterOpen 状态；'保存草稿'按钮添加 onClick={() => navigate('/inventory')}；新增 filterOpen useState",
+          "files": ["src/pages/inventory/InventoryDetailPage.tsx"]
+        }
+      },
+      "residual_risks": [
+        "AuditLog 类型无 httpMethod/userAgent/tenantId 字段定义，使用 unknown cast 读取；若后端确实返回这些字段则运行时正常，否则显示 '—'（安全降级）",
+        "DisposalDetailPage 审批按钮调用 approveItem/rejectItem（通用审批 API），version 硬编码为 1；若后端需要实际 version 则需从 detail 对象读取",
+        "InventoryDetailPage 责任部门/关键点位使用 scopeIds（ID 列表），非可读名称；需后端返回 scopeNames 或前端查询名称 API 才能显示人类可读文本",
+        "WorkOrderFormPage '查看设备维护标准手册' 区块无实际链接（已移除 ExternalLink 图标），纯展示"
+      ]
+    }
+  ],
+  "batch3": {
+    "batch": 3,
+    "changed_files": [
+      "src/pages/AssetImportExport/AssetImportExportPage.tsx",
+      "src/pages/asset/AssetListPage.tsx",
+      "src/pages/AssetImportExport/ExportFilterForm.tsx",
+      "src/pages/inventory/RFIDScanPage.tsx"
+    ],
+    "added_files": [],
+    "commands_run": [
+      {
+        "command": "npm run build",
+        "result": "passed",
+        "notes": "✓ built in 4.35s, 3329 modules transformed, zero errors"
+      },
+      {
+        "command": "npx vitest run",
+        "result": "passed",
+        "notes": "585/585 tests passed in 22 test files, duration 1.79s"
+      }
+    ],
+    "verification_results": [
+      "Build: passed in 4.35s (zero TS/lint errors)",
+      "Tests: 585/585 green (22 test files)"
+    ],
+    "fix_summary": {
+      "Fix1_AssetImportExportPage": {
+        "description": "移除 MOCK_PREVIEW 常量；移除 simulateUpload 假进度函数；改用 parseImportFile(file, onUploadProgress) 真实上传 API，带 onUploadProgress 回调驱动进度条；上传成功后映射 API rows 到 PreviewRow 显示，有校验错误的行标注 error；空状态下显示'上传后将显示数据预览'；下载模板按钮添加 onClick 调用 getImportTemplate() 并 Blob 下载为'资产导入模板.xlsx'；创建请求按钮添加 onClick={() => navigate('/assets/new')}；移除未使用的 Input/useQuery import",
+        "files": ["src/pages/AssetImportExport/AssetImportExportPage.tsx"]
+      },
+      "Fix2_AssetListPage": {
+        "description": "移除硬编码 SUMMARY_CARDS 数组；新增 import getDashboardStats from @/api/asset；新增 import DashboardStats type；添加 useQuery({ queryKey: ['dashboard-stats'], queryFn: getDashboardStats }) 查询；底部统计卡片改为 4 个独立 JSX div，动态读取 stats.netValue/idleAssets/totalAssets/maintenanceAssets；netValue 使用 toLocaleString('zh-CN') 格式化；闲置率 = idleAssets/totalAssets*100；本月折旧 = totalValue - netValue（累计折旧近似值）；无数据时显示 '—'",
+        "files": ["src/pages/asset/AssetListPage.tsx"]
+      },
+      "Fix3_ExportFilterForm": {
+        "description": "全量英文文本中文化：'Export Failed'→'导出失败'，'All Categories'→'所有分类'，'All Statuses'→'所有状态'，'All Locations'→'所有位置'，aria-label='Reset filters'→'重置筛选'，'Export Asset Ledger'→'导出资产台账'，'Filter and export...'→中文说明，'Asset Category'→'资产分类'，'Status'→'状态'，'Location'→'存放位置'，'Clear Filters'→'清空筛选'，'Exporting...'→'导出中...'，'Export to Excel'→'导出到 Excel'，toast.success/error 改中文",
+        "files": ["src/pages/AssetImportExport/ExportFilterForm.tsx"]
+      },
+      "Fix4_RFIDScanPage": {
+        "description": "移除 setInterval 虚假扫描动画（每1.5s生成 AS-2024-4xx 假资产编号）；替换为 Option B 真实轮询：扫描状态下每5秒调用 qc.invalidateQueries 刷新 ['inventory','task',taskId,'assets']+['summary']+['task'] 三个查询键，获取真实扫描数据；日志改为'同步最新扫描数据...'；依赖数组从 [scanning, paused] 补充 taskId 和 qc",
+        "files": ["src/pages/inventory/RFIDScanPage.tsx"]
+      }
+    },
+    "residual_risks": [
+      "AssetImportExportPage: parseImportFile API 路径为 /v1/assets/import/parse（assetImport.ts 中定义），若后端 API 前缀不一致需检查 http baseURL 配置",
+      "AssetListPage: 本月折旧用 totalValue-netValue 计算（累计折旧），非月度折旧；如需精确月度折旧需后端新增月度折旧字段到 DashboardStats DTO",
+      "AssetListPage: DashboardStats 无 pendingRepairs/idleRate 字段，待处理维修用 maintenanceAssets 近似，闲置率用 idleAssets/totalAssets 计算",
+      "ExportFilterForm: 该文件使用 shadcn/ui Card/Select/Form 组件（来自 @/components/ui/card 小写路径），与主项目大写路径风格不一致，但已存在且构建通过，不做路径统一（风险：未来迁移时需注意）",
+      "RFIDScanPage: 5秒轮询在扫描量大时会产生较多 API 请求；建议后端升级 WebSocket 推送后改为订阅模式"
+    ]
+  }
+}

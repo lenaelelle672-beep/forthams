@@ -41,7 +41,25 @@ function getTypeColor(type: string) {
   return { typeColor: '#004191', typeBg: '#d8e2ff' };
 }
 
-function getLogStatus(_log: AuditLog): 'success' | 'warning' | 'error' {
+function getLogStatus(log: AuditLog): 'success' | 'warning' | 'error' {
+  // Map based on operationType keywords indicating failures/warnings
+  const type = (log.operationType ?? '').toLowerCase();
+  const desc = (log.description ?? '').toLowerCase();
+  if (
+    type.includes('fail') || type.includes('失败') ||
+    type.includes('error') || type.includes('错误') ||
+    type.includes('delete') || type.includes('删除') ||
+    desc.includes('失败') || desc.includes('error')
+  ) {
+    return 'error';
+  }
+  if (
+    type.includes('warn') || type.includes('警告') ||
+    type.includes('export') || type.includes('导出') ||
+    desc.includes('警告')
+  ) {
+    return 'warning';
+  }
   return 'success';
 }
 
@@ -70,6 +88,7 @@ export default function AuditDashboardPage() {
   const [search, setSearch] = useState('');
   const [activeFilter, setActiveFilter] = useState<'all' | 'alerts'>('all');
   const [page, setPage] = useState(1);
+  const [filterOpen, setFilterOpen] = useState(false);
 
   const now = new Date();
   const sevenDaysAgo = new Date(now);
@@ -177,7 +196,25 @@ export default function AuditDashboardPage() {
                 onChange={(e) => setSearch(e.target.value)}
               />
             </div>
-            <Button variant="primary" size="md">
+            <Button variant="primary" size="md" onClick={() => {
+              // Export logs as CSV
+              const headers = ['时间', '操作人', '操作类型', '描述', 'IP地址'];
+              const rows = records.map((log) => [
+                formatTime(log.createdAt),
+                log.operatorName || '',
+                log.operationType || '',
+                log.description || '',
+                log.ipAddress || '',
+              ]);
+              const csv = [headers, ...rows].map((r) => r.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
+              const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = `审计日志_${new Date().toISOString().slice(0, 10)}.csv`;
+              a.click();
+              URL.revokeObjectURL(url);
+            }}>
               <Download className="w-4 h-4" />
               导出
             </Button>
@@ -317,12 +354,26 @@ export default function AuditDashboardPage() {
                   告警
                 </button>
               </div>
-              <button className="flex items-center gap-1 text-[#424753] text-xs hover:text-[#004191]">
+              <button className={`flex items-center gap-1 text-xs hover:text-[#004191] ${filterOpen ? 'text-[#004191] font-semibold' : 'text-[#424753]'}`} onClick={() => setFilterOpen((v) => !v)}>
                 <ListFilter className="w-4 h-4" />
                 筛选
               </button>
             </div>
           </div>
+
+          {filterOpen && (
+            <div className="px-6 py-3 border-b border-[#e5e7eb] bg-[#f9f9ff] flex items-center gap-4 text-sm">
+              <span className="text-xs text-[#424753] font-semibold">操作类型：</span>
+              {Object.keys(typeDistribution).slice(0, 5).map((t) => (
+                <button key={t} className="px-2 py-0.5 rounded bg-[#d8e2ff] text-[#004191] text-xs hover:bg-[#004191] hover:text-white transition-colors">
+                  {t}
+                </button>
+              ))}
+              {Object.keys(typeDistribution).length === 0 && (
+                <span className="text-xs text-[#64748b]">暂无筛选项</span>
+              )}
+            </div>
+          )}
 
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">

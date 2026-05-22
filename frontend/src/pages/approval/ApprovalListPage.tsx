@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import {
   ClipboardCheck,
   CheckCircle2,
@@ -62,6 +63,8 @@ export default function ApprovalListPage() {
   const [activeTab, setActiveTab] = useState<ApprovalTab>('pending');
   const [filterType, setFilterType] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
   const [page, setPage] = useState(1);
   const [detailId, setDetailId] = useState<number | null>(null);
   const [rejectDialogId, setRejectDialogId] = useState<number | null>(null);
@@ -82,12 +85,14 @@ export default function ApprovalListPage() {
   // ── Approval list ──
   const statusParam = filterStatus !== 'all' ? filterStatus.toUpperCase() : queryStatus;
   const { data, isLoading } = useQuery({
-    queryKey: ['approvals', activeTab, filterType, statusParam, page],
+    queryKey: ['approvals', activeTab, filterType, statusParam, page, startDate, endDate],
     queryFn: () =>
       getApprovalList({
         status: statusParam,
         page,
         pageSize: PAGE_SIZE,
+        startDate: startDate || undefined,
+        endDate: endDate || undefined,
       }),
     staleTime: 1000 * 30,
     placeholderData: (p) => p,
@@ -104,6 +109,7 @@ export default function ApprovalListPage() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['approvals'] });
     },
+    onError: (err: Error) => toast.error(err.message || '操作失败'),
   });
 
   // ── Reject mutation ──
@@ -115,6 +121,7 @@ export default function ApprovalListPage() {
       setRejectDialogId(null);
       setRejectReason('');
     },
+    onError: (err: Error) => toast.error(err.message || '操作失败'),
   });
 
   // ── Detail query ──
@@ -129,6 +136,8 @@ export default function ApprovalListPage() {
     setActiveTab(tab);
     setPage(1);
     setFilterStatus('all');
+    setStartDate('');
+    setEndDate('');
   };
 
   // Summary cards — use real pending count, other cards derive from list total
@@ -220,13 +229,23 @@ export default function ApprovalListPage() {
         </div>
         <div className="flex items-center gap-2">
           <span className="text-[10px] font-semibold tracking-wide text-[#424753]">日期范围</span>
-          <input type="date" className="bg-white border border-[#c2c6d5] text-sm rounded px-3 py-1.5" />
+          <input
+            type="date"
+            value={startDate}
+            onChange={(e) => { setStartDate(e.target.value); setPage(1); }}
+            className="bg-white border border-[#c2c6d5] text-sm rounded px-3 py-1.5"
+          />
           <span className="text-[#424753]">至</span>
-          <input type="date" className="bg-white border border-[#c2c6d5] text-sm rounded px-3 py-1.5" />
+          <input
+            type="date"
+            value={endDate}
+            onChange={(e) => { setEndDate(e.target.value); setPage(1); }}
+            className="bg-white border border-[#c2c6d5] text-sm rounded px-3 py-1.5"
+          />
         </div>
         <button
           className="ml-auto flex items-center gap-2 bg-[#004191] text-white px-5 py-2 rounded text-sm font-semibold hover:opacity-90 transition-opacity"
-          onClick={() => { setFilterType('all'); setFilterStatus('all'); setPage(1); }}
+          onClick={() => { setFilterType('all'); setFilterStatus('all'); setStartDate(''); setEndDate(''); setPage(1); }}
         >
           <ListFilter className="w-5 h-5" />
           重置筛选

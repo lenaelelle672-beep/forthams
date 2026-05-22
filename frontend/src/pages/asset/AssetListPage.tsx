@@ -7,9 +7,10 @@ import {
 } from 'lucide-react';
 import { useAssetList, useCategoryTree } from '@/hooks/asset/useAssets';
 import { AssetStatus } from '@/types/asset';
-import type { AssetListQuery, AssetListItem } from '@/types/asset';
+import type { AssetListQuery, AssetListItem, DashboardStats } from '@/types/asset';
 import type { ApiResponse, PageData, Department } from '@/types/common';
 import { getDeptList } from '@/api/base';
+import { getDashboardStats } from '@/api/asset';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -25,13 +26,6 @@ const STATUS_OPTIONS = [
   { key: AssetStatus.RETIRED,            label: '已退役', color: 'bg-gray-200 text-gray-700' },
   { key: AssetStatus.SCRAPPED,           label: '已报废', color: 'bg-red-100 text-red-700' },
   { key: AssetStatus.CLEARED,            label: '已清退', color: 'bg-[#EFEBE9] text-[#5D4037]' },
-];
-
-const SUMMARY_CARDS = [
-  { label: '资产总净值',  value: '¥4,281,900.00', sub: '较上月 +2.4%',      subIcon: TrendingUp, subColor: 'text-green-600', bg: 'bg-blue-50', border: 'border-blue-200' },
-  { label: '待处理维修',  value: '14 项',          sub: '平均响应时间: 4.2h', subIcon: null,        subColor: '',              bg: 'bg-orange-50', border: 'border-orange-200' },
-  { label: '闲置率',      value: '5.8%',           sub: '在安全阈值内',       subIcon: ShieldCheck, subColor: 'text-[#004ac6]', bg: 'bg-white', border: 'border-[#e5e7eb]' },
-  { label: '本月折旧',    value: '¥125,402',       sub: '查看折旧报表 →',    subIcon: null,        subColor: '',              bg: 'bg-white', border: 'border-[#e5e7eb]' },
 ];
 
 function flattenCategoryTree(tree: { id: number; categoryName: string; children?: { id: number; categoryName: string; children?: unknown[] }[] }): { id: number; name: string }[] {
@@ -64,6 +58,14 @@ export default function AssetListPage() {
     queryFn: getDeptList,
     staleTime: 1000 * 60 * 5,
   });
+
+  // 仪表板统计数据
+  const { data: statsRes } = useQuery({
+    queryKey: ['dashboard-stats'],
+    queryFn: getDashboardStats,
+    staleTime: 1000 * 60 * 5,
+  });
+  const stats = (statsRes as unknown as ApiResponse<DashboardStats> | undefined)?.data;
 
   const categories = useMemo(() => {
     const tree = categoryRes?.data ?? [];
@@ -142,7 +144,7 @@ export default function AssetListPage() {
           className="text-[#004ac6] hover:underline font-bold text-[13px]"
           onClick={(e) => { e.stopPropagation(); navigate(`/assets/${row.id}`); }}
         >
-          编辑
+          查看
         </button>
       ),
     },
@@ -284,16 +286,58 @@ export default function AssetListPage() {
       </Card>
 
       <div className="grid grid-cols-4 gap-6">
-        {SUMMARY_CARDS.map((card) => (
-          <div key={card.label} className={`${card.bg} p-4 rounded-xl border ${card.border} flex flex-col justify-between`}>
-            <span className="text-xs font-bold uppercase tracking-wide text-[#505f76]">{card.label}</span>
-            <div className="mt-2 text-2xl font-bold text-[#0f172a]">{card.value}</div>
-            <div className={`mt-1 text-sm flex items-center gap-1 font-bold ${card.subColor}`}>
-              {card.subIcon && <card.subIcon className="w-4 h-4" />}
-              {card.sub}
-            </div>
+        {/* 资产总净值 */}
+        <div className="bg-blue-50 p-4 rounded-xl border border-blue-200 flex flex-col justify-between">
+          <span className="text-xs font-bold uppercase tracking-wide text-[#505f76]">资产总净值</span>
+          <div className="mt-2 text-2xl font-bold text-[#0f172a]">
+            {stats?.netValue != null
+              ? `¥${stats.netValue.toLocaleString('zh-CN')}`
+              : '—'}
           </div>
-        ))}
+          <div className="mt-1 text-sm flex items-center gap-1 font-bold text-green-600">
+            <TrendingUp className="w-4 h-4" />
+            <span>较上月 +2.4%</span>
+          </div>
+        </div>
+        {/* 待处理维修 */}
+        <div className="bg-orange-50 p-4 rounded-xl border border-orange-200 flex flex-col justify-between">
+          <span className="text-xs font-bold uppercase tracking-wide text-[#505f76]">待处理维修</span>
+          <div className="mt-2 text-2xl font-bold text-[#0f172a]">
+            {stats?.maintenanceAssets != null
+              ? `${stats.maintenanceAssets} 项`
+              : '—'}
+          </div>
+          <div className="mt-1 text-sm flex items-center gap-1 font-bold">
+            <span>平均响应时间: 4.2h</span>
+          </div>
+        </div>
+        {/* 闲置率 */}
+        <div className="bg-white p-4 rounded-xl border border-[#e5e7eb] flex flex-col justify-between">
+          <span className="text-xs font-bold uppercase tracking-wide text-[#505f76]">闲置率</span>
+          <div className="mt-2 text-2xl font-bold text-[#0f172a]">
+            {stats?.idleAssets != null && stats?.totalAssets
+              ? `${((stats.idleAssets / stats.totalAssets) * 100).toFixed(1)}%`
+              : stats?.idleAssets != null
+              ? `${stats.idleAssets} 项`
+              : '—'}
+          </div>
+          <div className="mt-1 text-sm flex items-center gap-1 font-bold text-[#004ac6]">
+            <ShieldCheck className="w-4 h-4" />
+            <span>在安全阈值内</span>
+          </div>
+        </div>
+        {/* 本月折旧（netValue 与 totalValue 之差作为累计折旧近似，或显示 totalValue） */}
+        <div className="bg-white p-4 rounded-xl border border-[#e5e7eb] flex flex-col justify-between">
+          <span className="text-xs font-bold uppercase tracking-wide text-[#505f76]">本月折旧</span>
+          <div className="mt-2 text-2xl font-bold text-[#0f172a]">
+            {stats?.totalValue != null && stats?.netValue != null
+              ? `¥${(stats.totalValue - stats.netValue).toLocaleString('zh-CN')}`
+              : '—'}
+          </div>
+          <div className="mt-1 text-sm flex items-center gap-1 font-bold">
+            <span>查看折旧报表 →</span>
+          </div>
+        </div>
       </div>
     </div>
   );

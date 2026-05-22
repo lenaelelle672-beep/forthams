@@ -1,0 +1,920 @@
+{
+  "current_state": "forthAMS 前端整体质量良好：API 已全量对接，无 @/app/ import 残留，无 window.confirm，无 variant='default'，585 测试全绿。主要短板集中在 5 类问题：① AssetImportExportPage 导入流程使用 MOCK 预览数据 + 上传仅模拟进度；② AssetListPage 底部 4 个统计卡片为硬编码静态值；③ RetirementFormPage 资产选择面板展示的是 MOCK 占位数据（精密车床X1 / DMG Mori / AST-2023-0891）而非真实搜索结果；④ WorkOrderFormPage 中团队负载「85%」和 MTTR「2.4h」为硬编码装饰性数字；⑤ 若干表单提交按钮与 form onSubmit 双重绑定，存在轻微冗余；⑥ 审批/驳回动作缺乏成功/失败 toast 反馈。整体评分 84/100，属于 B+ 级别。",
+
+  "page_scores": [
+    {
+      "page": "dashboard/DashboardPage",
+      "score": 94,
+      "issues": [
+        {
+          "severity": "LOW",
+          "dimension": "error_state",
+          "line": 64,
+          "description": "stats 查询仅有 isLoading 占位骨架，无 isError 错误提示 banner",
+          "fix": "添加 isError 判断，显示 '数据加载失败，请刷新' 提示"
+        },
+        {
+          "severity": "LOW",
+          "dimension": "chinese",
+          "line": 103,
+          "description": "trendData 中 date 为空时展示 '—'，与其他页面 null 显示方式一致，可接受",
+          "fix": "无需修改"
+        }
+      ]
+    },
+    {
+      "page": "analytics/AnalyticsPage",
+      "score": 88,
+      "issues": [
+        {
+          "severity": "LOW",
+          "dimension": "error_state",
+          "line": 61,
+          "description": "6 个 useQuery 均无 isError 处理，API 失败时只是空图表",
+          "fix": "在 allLoading 条件后添加错误 banner：statsRes?.error 或 isError 均触发"
+        },
+        {
+          "severity": "LOW",
+          "dimension": "crud",
+          "line": 56,
+          "description": "纯展示页，无 Create/Update/Delete 入口，但分析页本身不需要写操作",
+          "fix": "可添加导出按钮（数据导出 API 接口已存在）"
+        }
+      ]
+    },
+    {
+      "page": "asset/AssetListPage",
+      "score": 74,
+      "issues": [
+        {
+          "severity": "HIGH",
+          "dimension": "api",
+          "line": 31,
+          "description": "SUMMARY_CARDS（资产总净值 ¥4,281,900 / 待处理维修 14 项 / 闲置率 5.8% / 本月折旧 ¥125,402）为硬编码静态值，不反映真实数据",
+          "fix": "从 getDashboardStats / getDepreciationSchedules API 获取并注入到对应卡片"
+        },
+        {
+          "severity": "MEDIUM",
+          "dimension": "button_wiring",
+          "line": 139,
+          "description": "操作列显示'编辑'文字但实际跳转到详情页 /assets/:id，而非编辑页 /assets/:id/edit",
+          "fix": "将 navigate(`/assets/${row.id}`) 改为 navigate(`/assets/${row.id}/edit`) 或将文字改为'查看'"
+        },
+        {
+          "severity": "LOW",
+          "dimension": "error_state",
+          "line": 102,
+          "description": "useAssetList 查询缺少 isError 错误横幅",
+          "fix": "在 Card 上方添加错误提示组件"
+        }
+      ]
+    },
+    {
+      "page": "asset/AssetDetailPage",
+      "score": 92,
+      "issues": [
+        {
+          "severity": "LOW",
+          "dimension": "crud",
+          "line": 274,
+          "description": "变更记录 Card 静态显示'暂无变更记录'，无对应 API 调用（getAssetHistory 等）",
+          "fix": "对接变更历史 API 或标注 TODO 占位"
+        }
+      ]
+    },
+    {
+      "page": "asset/AssetFormPage",
+      "score": 95,
+      "issues": [
+        {
+          "severity": "LOW",
+          "dimension": "form",
+          "line": 36,
+          "description": "depreciationRate 校验范围 0~1 但 label 注释为 '0~1'，用户输入 0.1 表示 10%/年，但缺少百分比换算提示",
+          "fix": "添加 hint 或 placeholder 说明 '输入 0.1 表示年折旧率 10%'"
+        }
+      ]
+    },
+    {
+      "page": "equipment/EquipmentPage",
+      "score": 82,
+      "issues": [
+        {
+          "severity": "MEDIUM",
+          "dimension": "api",
+          "line": 238,
+          "description": "usageRate 硬编码为 75（IN_USE 状态）或 0，未从实际利用率 API 获取",
+          "fix": "如有利用率端点则对接，否则移除进度条列"
+        },
+        {
+          "severity": "LOW",
+          "dimension": "form",
+          "line": 272,
+          "description": "handleSubmit 是普通函数而非表单 submit，未阻止 enterKey 触发，但无 form 标签，可接受",
+          "fix": "若需要 form 语义可包裹 <form onSubmit> 并改为 type='submit'"
+        },
+        {
+          "severity": "LOW",
+          "dimension": "error_state",
+          "line": 184,
+          "description": "createMutation 缺少 onError 回调，提交失败时无错误提示",
+          "fix": "添加 onError: (err) => setFormError(err.message)"
+        }
+      ]
+    },
+    {
+      "page": "idle/IdleAssetsPage",
+      "score": 87,
+      "issues": [
+        {
+          "severity": "MEDIUM",
+          "dimension": "form",
+          "line": 370,
+          "description": "publishTitle 和 publishDeadline 未接入 publishIdleAsset API payload（API 目前只传 assetId），标题和截止日期字段收集后被丢弃",
+          "fix": "将 publishTitle/publishDeadline 加入 publishIdleAsset 调用参数，或调整 API 接口"
+        },
+        {
+          "severity": "LOW",
+          "dimension": "form",
+          "line": 373,
+          "description": "缺少对 publishDeadline 为空时的提交阻止逻辑",
+          "fix": "在 onClick 前校验 publishTarget && publishTitle && publishDeadline 均有值"
+        }
+      ]
+    },
+    {
+      "page": "depreciation/DepreciationListPage",
+      "score": 91,
+      "issues": [
+        {
+          "severity": "LOW",
+          "dimension": "error_state",
+          "line": 123,
+          "description": "catch 块使用 toast.error 但 setError 为 null，导致错误横幅只对批量计算失败展示，列表加载失败无明显红色提示",
+          "fix": "在 catch 块同时 setError('折旧数据加载失败')"
+        }
+      ]
+    },
+    {
+      "page": "inventory/InventoryTasksPage",
+      "score": 82,
+      "issues": [
+        {
+          "severity": "MEDIUM",
+          "dimension": "button_wiring",
+          "line": 209,
+          "description": "Edit2 图标按钮（编辑任务）无 onClick 处理，点击无任何响应",
+          "fix": "添加 onClick={() => navigate(`/inventory/tasks/${row.taskId}/edit`)} 或移除该按钮"
+        },
+        {
+          "severity": "MEDIUM",
+          "dimension": "button_wiring",
+          "line": 254,
+          "description": "筛选按钮和导出报表按钮无 onClick，为死按钮",
+          "fix": "实现筛选面板展开逻辑或导出 API 调用"
+        },
+        {
+          "severity": "LOW",
+          "dimension": "crud",
+          "line": 372,
+          "description": "新建对话框中范围 ID 字段为普通文本，无下拉选择或自动完成，易输错",
+          "fix": "改为 Select 组件，从 getLocationList/getCategoryList API 动态加载"
+        }
+      ]
+    },
+    {
+      "page": "inventory/InventoryDetailPage",
+      "score": 83,
+      "issues": [
+        {
+          "severity": "HIGH",
+          "dimension": "api",
+          "line": 314,
+          "description": "责任部门（IT运维部/生产部/人力资源部）和关键点位（B-12区/3楼/机房 S-4）为硬编码 MOCK 数据，未从任务 API 获取",
+          "fix": "将这两个数据块替换为 task?.deptList 和 task?.locationList 字段展示"
+        },
+        {
+          "severity": "MEDIUM",
+          "dimension": "button_wiring",
+          "line": 390,
+          "description": "Filter 和 Columns3 按钮为死按钮，无 onClick",
+          "fix": "实现列筛选/显示控制功能，或暂时移除"
+        },
+        {
+          "severity": "MEDIUM",
+          "dimension": "button_wiring",
+          "line": 425,
+          "description": "'保存草稿' 按钮无 onClick 处理",
+          "fix": "实现草稿保存逻辑，或移除该按钮"
+        },
+        {
+          "severity": "LOW",
+          "dimension": "crud",
+          "line": 139,
+          "description": "列表中无单条确认行内按钮，只能批量确认；单条确认交互已在 RFIDScanPage 实现但 InventoryDetailPage 未复用",
+          "fix": "在操作列添加单条状态确认 Select"
+        }
+      ]
+    },
+    {
+      "page": "inventory/RFIDScanPage",
+      "score": 78,
+      "issues": [
+        {
+          "severity": "HIGH",
+          "dimension": "api",
+          "line": 218,
+          "description": "扫描动画使用 setInterval 生成虚假资产编号（AS-2024-4xx），模拟扫描日志并非真实 RFID 数据流",
+          "fix": "接入真实 RFID 设备 WebSocket/SSE API，或明确标注该 UI 为演示模式"
+        },
+        {
+          "severity": "MEDIUM",
+          "dimension": "api",
+          "line": 401,
+          "description": "扫描速度（35/分）和准确率（99.5%）为硬编码",
+          "fix": "从实时扫描统计 API 获取，或在无真实数据时隐藏"
+        },
+        {
+          "severity": "LOW",
+          "dimension": "error_state",
+          "line": 282,
+          "description": "task 为 null 时展示 '加载任务数据中...' 但无超时处理，如 API 永久失败则无限 loading",
+          "fix": "添加 isError 判断，展示 '任务加载失败，返回列表' 按钮"
+        }
+      ]
+    },
+    {
+      "page": "workorder/WorkOrderListPage",
+      "score": 93,
+      "issues": [
+        {
+          "severity": "LOW",
+          "dimension": "error_state",
+          "line": 47,
+          "description": "查询无 isError 处理，API 失败时表格为空无提示",
+          "fix": "添加错误横幅"
+        }
+      ]
+    },
+    {
+      "page": "workorder/WorkOrderDetailPage",
+      "score": 88,
+      "issues": [
+        {
+          "severity": "MEDIUM",
+          "dimension": "error_state",
+          "line": 52,
+          "description": "approveMutation 和 rejectMutation 均无 onError 回调，操作失败时用户无任何反馈",
+          "fix": "添加 onError: (err) => toast.error(err.message || '操作失败')"
+        },
+        {
+          "severity": "LOW",
+          "dimension": "chinese",
+          "line": 49,
+          "description": "detail?.approvalRecords 为空时显示'暂无审批记录'，可接受",
+          "fix": "无需修改"
+        }
+      ]
+    },
+    {
+      "page": "workorder/WorkOrderFormPage",
+      "score": 76,
+      "issues": [
+        {
+          "severity": "HIGH",
+          "dimension": "api",
+          "line": 278,
+          "description": "MTTR '2.4h' 和 团队负载 '85%' 为硬编码装饰性数字，无 API 对接",
+          "fix": "如有对应 API 则对接，否则移除这两个装饰性卡片或标注'演示数据'"
+        },
+        {
+          "severity": "MEDIUM",
+          "dimension": "button_wiring",
+          "line": 361,
+          "description": "ExternalLink 图标（'查看设备维护标准手册'）的 onClick 无实际路由或链接",
+          "fix": "添加 onClick={() => window.open('/docs/maintenance-guide', '_blank')} 或移除"
+        },
+        {
+          "severity": "LOW",
+          "dimension": "form",
+          "line": 383,
+          "description": "footer 提交按钮使用 onClick={handleSubmit(onSubmit)} 而 form 本身已有 onSubmit，属于双重绑定（可正常工作但不规范）",
+          "fix": "footer 按钮改为 type='submit'，让 form onSubmit 统一处理"
+        }
+      ]
+    },
+    {
+      "page": "approval/ApprovalListPage",
+      "score": 85,
+      "issues": [
+        {
+          "severity": "MEDIUM",
+          "dimension": "error_state",
+          "line": 101,
+          "description": "approveMutation 和 rejectMutation 均无 onError 回调，操作失败时无提示",
+          "fix": "添加 onError toast"
+        },
+        {
+          "severity": "MEDIUM",
+          "dimension": "form",
+          "line": 222,
+          "description": "日期范围筛选（两个 input[type=date]）无绑定状态变量，值不参与 API 查询",
+          "fix": "添加 startDate/endDate state 并纳入 getApprovalList 参数"
+        },
+        {
+          "severity": "LOW",
+          "dimension": "api",
+          "line": 138,
+          "description": "summaryCards 中'已驳回'值始终为'-'，未从 API 获取真实驳回数量",
+          "fix": "在 getApprovalList 中传 status=REJECTED 查询总数"
+        }
+      ]
+    },
+    {
+      "page": "retirement/RetirementListPage",
+      "score": 86,
+      "issues": [
+        {
+          "severity": "MEDIUM",
+          "dimension": "button_wiring",
+          "line": 206,
+          "description": "Edit2 按钮与 Eye 按钮的 navigate 目标相同（均为 /retirement/:id），编辑应跳转 /retirement/:id/edit",
+          "fix": "Edit2 按钮改为 navigate(`/retirement/${row.id}/edit`)"
+        },
+        {
+          "severity": "LOW",
+          "dimension": "form",
+          "line": 308,
+          "description": "'筛选' 按钮 onClick 为 setParams(p => ({...p})) 未触发任何实际重查",
+          "fix": "移除该按钮或在 onClick 中手动 refetch"
+        }
+      ]
+    },
+    {
+      "page": "retirement/RetirementDetailPage",
+      "score": 80,
+      "issues": [
+        {
+          "severity": "HIGH",
+          "dimension": "api",
+          "line": 175,
+          "description": "当 record.approvalRecords 为空时展示 mockSteps（部门经理审核/资产管理审核 等硬编码步骤），这是 MOCK fallback",
+          "fix": "移除 mockSteps 兜底，空审批记录时显示 '暂无审批记录' 文本"
+        },
+        {
+          "severity": "MEDIUM",
+          "dimension": "form",
+          "line": 144,
+          "description": "rejectRetirement 硬编码拒绝原因 '不符合退役条件'，未提供用户输入",
+          "fix": "添加驳回原因输入 Dialog，类似 WorkOrderDetailPage 的实现"
+        },
+        {
+          "severity": "LOW",
+          "dimension": "chinese",
+          "line": 269,
+          "description": "asset.name 字段使用（退役详情关联资产），但 AssetDetailPage 使用 asset.assetName，字段名不一致",
+          "fix": "统一使用 asset.assetName ?? asset.name ?? '—'"
+        }
+      ]
+    },
+    {
+      "page": "retirement/RetirementFormPage",
+      "score": 71,
+      "issues": [
+        {
+          "severity": "HIGH",
+          "dimension": "api",
+          "line": 123,
+          "description": "资产预览面板展示硬编码 MOCK 数据（精密车床 X1 / DMG Mori / AST-2023-0891 / ¥420,000 净值 ¥120,000），assetSearch 只改变标题文字",
+          "fix": "监听 assetSearch 输入，调用 getAssetList(keyword) 并展示真实资产信息"
+        },
+        {
+          "severity": "HIGH",
+          "dimension": "api",
+          "line": 230,
+          "description": "折旧时间线（2020/2023/2025 柱状图）为完全硬编码，无 API 数据",
+          "fix": "对接 getDepreciationSchedule(assetId) API 渲染真实折旧曲线"
+        },
+        {
+          "severity": "MEDIUM",
+          "dimension": "error_state",
+          "line": 56,
+          "description": "createRetirement mutation 无 onError 错误提示（只有 mutation.isError 条件渲染，但没有具体信息）",
+          "fix": "添加 onError: (err) => toast.error(err.message)"
+        }
+      ]
+    },
+    {
+      "page": "disposal/DisposalListPage",
+      "score": 89,
+      "issues": [
+        {
+          "severity": "LOW",
+          "dimension": "error_state",
+          "line": 164,
+          "description": "disposalRes 和 compensationRes 查询设置了 retry: false 但无 isError 展示",
+          "fix": "添加 isError 错误横幅"
+        }
+      ]
+    },
+    {
+      "page": "disposal/DisposalDetailPage",
+      "score": 84,
+      "issues": [
+        {
+          "severity": "MEDIUM",
+          "dimension": "api",
+          "line": 134,
+          "description": "getDisposalDetail 响应解包为 res.data.data，若后端返回结构变化会报错",
+          "fix": "使用统一的 ApiResponse 类型解包 res.data"
+        },
+        {
+          "severity": "MEDIUM",
+          "dimension": "crud",
+          "line": 270,
+          "description": "详情页底部 footer 无审批操作按钮（审批通过/驳回），仅有返回按钮",
+          "fix": "根据 detail.status === 'PENDING' 条件添加审批操作"
+        },
+        {
+          "severity": "LOW",
+          "dimension": "api",
+          "line": 101,
+          "description": "buildApprovalSteps 基于状态推导时间线，步骤的 time/operator 字段为空字符串，而非真实审批人和时间",
+          "fix": "从 detail.approvalRecords 数组构建真实时间线"
+        }
+      ]
+    },
+    {
+      "page": "disposal/AssetScrapFormPage",
+      "score": 85,
+      "issues": [
+        {
+          "severity": "MEDIUM",
+          "dimension": "api",
+          "line": 262,
+          "description": "报废编号（SCRAP-20240520-001）和申请人（系统管理员）为硬编码，未从 API 获取当前用户信息",
+          "fix": "从 useCurrentUser hook 或 localStorage 读取真实用户信息"
+        },
+        {
+          "severity": "LOW",
+          "dimension": "button_wiring",
+          "line": 140,
+          "description": "步骤指示器（StepIndicator）currentStep 始终为 1，点击其他步骤号无法导航",
+          "fix": "将 currentStep 与表单分段状态绑定，或改为纯展示"
+        }
+      ]
+    },
+    {
+      "page": "disposal/AssetTransferFormPage",
+      "score": 85,
+      "issues": [
+        {
+          "severity": "MEDIUM",
+          "dimension": "api",
+          "line": 244,
+          "description": "调拨编号（ATR-20231027-001）、申请人（系统管理员）、调拨日期为硬编码",
+          "fix": "对接当前用户 API 并动态生成编号"
+        },
+        {
+          "severity": "LOW",
+          "dimension": "button_wiring",
+          "line": 491,
+          "description": "'保存草稿' 按钮仅跳转 /disposals，并未真正保存草稿数据",
+          "fix": "调用 saveTransferDraft API 或 localStorage 持久化"
+        }
+      ]
+    },
+    {
+      "page": "disposal/AssetClearanceFormPage",
+      "score": 84,
+      "issues": [
+        {
+          "severity": "MEDIUM",
+          "dimension": "api",
+          "line": 109,
+          "description": "清退编号（CLR-20231124-001）和申请人（系统管理员）为硬编码",
+          "fix": "从用户 API 读取并动态生成"
+        },
+        {
+          "severity": "LOW",
+          "dimension": "button_wiring",
+          "line": 338,
+          "description": "'添加资产' 按钮通过 setAssetSearch(' ') 触发搜索，属于 hack；但功能可用",
+          "fix": "改为 setAssetSearch('') 后显示全部资产，或移除该按钮"
+        }
+      ]
+    },
+    {
+      "page": "disposal/AssetCompensationFormPage",
+      "score": 82,
+      "issues": [
+        {
+          "severity": "MEDIUM",
+          "dimension": "api",
+          "line": 297,
+          "description": "赔偿编号（COMP-20240520-001）和申请人为硬编码",
+          "fix": "对接当前用户 API"
+        },
+        {
+          "severity": "MEDIUM",
+          "dimension": "api",
+          "line": 58,
+          "description": "DEPT_OPTIONS（技术研发部/行政管理部等）为硬编码枚举，未从 getDeptTree API 获取",
+          "fix": "使用 useQuery 从 getDeptTree 获取部门列表"
+        },
+        {
+          "severity": "LOW",
+          "dimension": "error_state",
+          "line": 203,
+          "description": "mutation 无 onError 提示，提交失败时无 toast",
+          "fix": "添加 onError: () => toast.error('提交失败，请重试')"
+        }
+      ]
+    },
+    {
+      "page": "workflow/WorkflowCenterPage",
+      "score": 91,
+      "issues": [
+        {
+          "severity": "LOW",
+          "dimension": "error_state",
+          "line": 63,
+          "description": "err 信息显示在 amber 横幅中并附加'页面仍展示本地草稿状态'，错误提示处理合理，无需修改",
+          "fix": "无需修改"
+        }
+      ]
+    },
+    {
+      "page": "workflow/WorkflowDesignerPage",
+      "score": 90,
+      "issues": [
+        {
+          "severity": "LOW",
+          "dimension": "button_wiring",
+          "line": 260,
+          "description": "Download 图标在 toolbar 中被 import 但未使用（已注释掉的导出功能）",
+          "fix": "移除未使用的 Download import 或实现导出定义功能"
+        }
+      ]
+    },
+    {
+      "page": "audit/AuditDashboardPage",
+      "score": 88,
+      "issues": [
+        {
+          "severity": "MEDIUM",
+          "dimension": "button_wiring",
+          "line": 180,
+          "description": "导出按钮无 onClick 处理",
+          "fix": "调用 getAuditLogs 导出 API 或实现 CSV 导出"
+        },
+        {
+          "severity": "LOW",
+          "dimension": "button_wiring",
+          "line": 320,
+          "description": "'筛选' 按钮无 onClick",
+          "fix": "展开筛选面板或移除"
+        },
+        {
+          "severity": "LOW",
+          "dimension": "api",
+          "line": 44,
+          "description": "getLogStatus 函数始终返回 'success'，所有日志状态均显示绿色成功，无法区分警告/失败操作",
+          "fix": "根据 log 字段（如 status / result）映射真实状态"
+        }
+      ]
+    },
+    {
+      "page": "audit/AuditDetailPage",
+      "score": 83,
+      "issues": [
+        {
+          "severity": "MEDIUM",
+          "dimension": "api",
+          "line": 112,
+          "description": "OperationContext（method: 'POST' / userAgent: 'Chrome/118' / tenantId: 'TENANT-FORTH-01'）为硬编码，非真实请求上下文",
+          "fix": "从 AuditLog 字段（httpMethod / userAgent / tenantId）映射，或移除该面板"
+        },
+        {
+          "severity": "LOW",
+          "dimension": "button_wiring",
+          "line": 150,
+          "description": "'导出日志' 按钮无 onClick，点击无响应",
+          "fix": "调用单条日志导出 API"
+        }
+      ]
+    },
+    {
+      "page": "settings/SettingsPage",
+      "score": 86,
+      "issues": [
+        {
+          "severity": "MEDIUM",
+          "dimension": "api",
+          "line": 564,
+          "description": "SystemConfigTab 和 SecurityTab 使用 localStorage 持久化，注释了 TODO：暂无后端端点",
+          "fix": "对接系统配置 API（如已实现），否则展示 '配置仅本地生效' 说明"
+        },
+        {
+          "severity": "LOW",
+          "dimension": "form",
+          "line": 159,
+          "description": "用户表单创建时仅检查 username 非空，缺少邮箱格式和手机号格式校验",
+          "fix": "添加 email/phone 格式 Zod 校验"
+        }
+      ]
+    },
+    {
+      "page": "locations/LocationsPage",
+      "score": 94,
+      "issues": [
+        {
+          "severity": "LOW",
+          "dimension": "error_state",
+          "line": 238,
+          "description": "loadTree 失败仅用 toast.error，无内联错误横幅",
+          "fix": "可添加内联错误状态，但 toast 已足够"
+        }
+      ]
+    },
+    {
+      "page": "vendors/VendorsPage",
+      "score": 93,
+      "issues": [
+        {
+          "severity": "LOW",
+          "dimension": "form",
+          "line": 86,
+          "description": "handleSubmit 仅校验 vendorName 非空，缺少邮箱格式和电话格式校验",
+          "fix": "添加基础格式校验"
+        }
+      ]
+    },
+    {
+      "page": "notifications/NotificationsPage",
+      "score": 90,
+      "issues": [
+        {
+          "severity": "LOW",
+          "dimension": "button_wiring",
+          "line": 129,
+          "description": "重置筛选按钮（ListFilter 图标）仅重置 tab 和 page，未调用 qc.invalidateQueries，可能显示缓存数据",
+          "fix": "添加 qc.invalidateQueries({ queryKey: ['notifications'] })"
+        }
+      ]
+    },
+    {
+      "page": "AssetImportExport/AssetImportExportPage",
+      "score": 58,
+      "issues": [
+        {
+          "severity": "HIGH",
+          "dimension": "api",
+          "line": 30,
+          "description": "MOCK_PREVIEW 为硬编码预览数据（卡特彼勒挖掘机等5条），校验统计（1240有效/12警告/3错误）均为静态字符串，无真实解析",
+          "fix": "上传文件后调用 POST /api/v1/assets/import/preview 并展示后端解析结果"
+        },
+        {
+          "severity": "HIGH",
+          "dimension": "api",
+          "line": 100,
+          "description": "simulateUpload 模拟进度条而非真实上传，文件从未被真正发送到后端",
+          "fix": "实现真实 FormData 上传，使用 XMLHttpRequest 或 axios onUploadProgress 追踪进度"
+        },
+        {
+          "severity": "HIGH",
+          "dimension": "button_wiring",
+          "line": 152,
+          "description": "'下载 Excel 模板' 按钮无 onClick，点击无响应",
+          "fix": "调用 GET /api/v1/assets/import/template 下载模板文件"
+        },
+        {
+          "severity": "MEDIUM",
+          "dimension": "api",
+          "line": 344,
+          "description": "导出摘要图表（预览2450条记录）为硬编码装饰图，无真实数据",
+          "fix": "调用资产统计 API 获取实际数量"
+        },
+        {
+          "severity": "MEDIUM",
+          "dimension": "button_wiring",
+          "line": 136,
+          "description": "页面头部'创建请求'按钮无 onClick 处理",
+          "fix": "明确该按钮用途并实现，或移除"
+        }
+      ]
+    }
+  ],
+
+  "existing_patterns": {
+    "http_client": "src/utils/http.ts default export (axios instance with interceptors)",
+    "query": "@tanstack/react-query v5 (useQuery / useMutation / useQueryClient)",
+    "forms": "react-hook-form v7 + zod resolver",
+    "toast": "sonner (toast.success / toast.error)",
+    "routing": "react-router v7 (useNavigate / useParams / useSearchParams)",
+    "state": "local useState + react-query server state",
+    "pagination": "DataTable component with pagination prop or manual paging",
+    "api_response": "ApiResponse<T> / PaginatedResponse<T> from @/types/common",
+    "error_display": "混用三种方式：inline div.bg-red-50、toast.error、setState error string",
+    "loading": "SkeletonCard 或 isLoading ? spinner : content 条件渲染"
+  },
+
+  "technical_constraints": [
+    "后端 API 基础路径为 /api/v1/，通过 http.ts 代理",
+    "系统配置（SystemConfigTab）和安全设置（SecurityTab）暂无后端 API，使用 localStorage",
+    "RFID 扫描功能无真实硬件接入，扫描动画为纯前端模拟",
+    "WorkOrderFormPage 中资产搜索字段（assetKeyword）暂无下拉联想，仅存储字符串",
+    "审批时间线组件（ApprovalTimeline）已在 WorkOrderDetailPage 封装，但 DisposalDetailPage 自行实现了重复组件",
+    "折旧时间线图表已在 AssetDetailPage 通过 recharts AreaChart 实现，RetirementFormPage 应复用但目前为硬编码柱状图",
+    "导入导出页（AssetImportExportPage）需要后端文件处理 API，目前完全未实现",
+    "部分页面编号/用户信息使用硬编码字符串，需 useCurrentUser 统一提供"
+  ],
+
+  "risks": [
+    {
+      "level": "high",
+      "detail": "AssetImportExportPage 文件实际从未上传至后端（simulateUpload 纯前端模拟），用户以为已导入但数据库无变化"
+    },
+    {
+      "level": "high",
+      "detail": "RetirementFormPage 资产预览面板展示硬编码 MOCK 数据，用户看到的是'精密车床 X1'而非其实际要退役的资产，可能导致错误提交"
+    },
+    {
+      "level": "high",
+      "detail": "AssetListPage 底部统计卡片（¥4,281,900 / 14项维修 / 5.8%闲置率）为静态值，与实际数据完全脱节，影响决策"
+    },
+    {
+      "level": "medium",
+      "detail": "RetirementDetailPage 审批时间线在无 approvalRecords 时展示 mockSteps，用户误认为流程已进入特定状态"
+    },
+    {
+      "level": "medium",
+      "detail": "InventoryDetailPage 责任部门和关键点位为硬编码，可能显示与当前盘点任务完全无关的部门信息"
+    },
+    {
+      "level": "medium",
+      "detail": "RFIDScanPage 扫描日志生成虚假资产编号，如现场人员依赖该日志核查则存在数据错误风险"
+    },
+    {
+      "level": "medium",
+      "detail": "多个审批/处置操作（approveMutation/rejectMutation）缺少 onError 回调，后端拒绝请求时用户无任何感知"
+    },
+    {
+      "level": "low",
+      "detail": "AssetCompensationFormPage DEPT_OPTIONS 硬编码4个部门，不反映真实组织架构"
+    },
+    {
+      "level": "low",
+      "detail": "AuditDetailPage OperationContext 字段（method/userAgent/tenantId）为硬编码，审计场景下此类信息须准确"
+    },
+    {
+      "level": "low",
+      "detail": "WorkOrderFormPage 中 MTTR/团队负载展示假数据，可能误导工单分配决策"
+    }
+  ],
+
+  "test_surface": "22 test files, 585 tests green (as confirmed by caller)",
+
+  "priority_fixes": [
+    {
+      "rank": 1,
+      "page": "AssetImportExport/AssetImportExportPage",
+      "dimension": "api",
+      "severity": "HIGH",
+      "description": "实现真实文件上传逻辑，对接 /api/v1/assets/import/preview，替换 MOCK_PREVIEW 和 simulateUpload"
+    },
+    {
+      "rank": 2,
+      "page": "retirement/RetirementFormPage",
+      "dimension": "api",
+      "severity": "HIGH",
+      "description": "将资产选择面板改为真实 API 搜索（getAssetList + keyword），移除 MOCK 占位数据"
+    },
+    {
+      "rank": 3,
+      "page": "asset/AssetListPage",
+      "dimension": "api",
+      "severity": "HIGH",
+      "description": "将底部 4 个统计卡片（净值/维修/闲置率/折旧）改为从 getDashboardStats 等真实 API 读取"
+    },
+    {
+      "rank": 4,
+      "page": "AssetImportExport/AssetImportExportPage",
+      "dimension": "button_wiring",
+      "severity": "HIGH",
+      "description": "实现'下载 Excel 模板'按钮，调用 GET /api/v1/assets/import/template"
+    },
+    {
+      "rank": 5,
+      "page": "retirement/RetirementDetailPage",
+      "dimension": "api",
+      "severity": "HIGH",
+      "description": "移除 mockSteps 兜底，approvalRecords 为空时展示'暂无审批记录'文本"
+    },
+    {
+      "rank": 6,
+      "page": "inventory/InventoryDetailPage",
+      "dimension": "api",
+      "severity": "HIGH",
+      "description": "将责任部门和关键点位改为从盘点任务 API 字段获取"
+    },
+    {
+      "rank": 7,
+      "page": "inventory/RFIDScanPage",
+      "dimension": "api",
+      "severity": "HIGH",
+      "description": "停止生成虚假扫描日志（setInterval 模拟），明确标注演示模式或接入真实数据流"
+    },
+    {
+      "rank": 8,
+      "page": "inventory/InventoryTasksPage",
+      "dimension": "button_wiring",
+      "severity": "MEDIUM",
+      "description": "Edit2 图标按钮添加 onClick 导航，筛选/导出按钮实现功能"
+    },
+    {
+      "rank": 9,
+      "page": "workorder/WorkOrderDetailPage",
+      "dimension": "error_state",
+      "severity": "MEDIUM",
+      "description": "approveMutation 和 rejectMutation 添加 onError toast"
+    },
+    {
+      "rank": 10,
+      "page": "approval/ApprovalListPage",
+      "dimension": "error_state",
+      "severity": "MEDIUM",
+      "description": "approveMutation 和 rejectMutation 添加 onError toast，日期范围筛选绑定 API 参数"
+    },
+    {
+      "rank": 11,
+      "page": "retirement/RetirementDetailPage",
+      "dimension": "form",
+      "severity": "MEDIUM",
+      "description": "驳回按钮添加原因输入 Dialog，替换硬编码拒绝理由"
+    },
+    {
+      "rank": 12,
+      "page": "workorder/WorkOrderFormPage",
+      "dimension": "api",
+      "severity": "MEDIUM",
+      "description": "移除或标注 MTTR '2.4h' 和团队负载 '85%' 装饰卡片为演示数据"
+    },
+    {
+      "rank": 13,
+      "page": "audit/AuditDashboardPage",
+      "dimension": "button_wiring",
+      "severity": "MEDIUM",
+      "description": "导出按钮实现 CSV 下载功能，筛选按钮展开筛选面板"
+    },
+    {
+      "rank": 14,
+      "page": "audit/AuditDetailPage",
+      "dimension": "api",
+      "severity": "MEDIUM",
+      "description": "OperationContext 替换硬编码字段，从 AuditLog 真实字段映射"
+    },
+    {
+      "rank": 15,
+      "page": "asset/AssetListPage",
+      "dimension": "button_wiring",
+      "severity": "MEDIUM",
+      "description": "操作列'编辑'跳转目标改为 /assets/:id/edit"
+    },
+    {
+      "rank": 16,
+      "page": "disposal/DisposalDetailPage",
+      "dimension": "crud",
+      "severity": "MEDIUM",
+      "description": "详情页添加条件审批操作按钮（PENDING 状态下展示审批通过/驳回）"
+    },
+    {
+      "rank": 17,
+      "page": "inventory/InventoryDetailPage",
+      "dimension": "button_wiring",
+      "severity": "MEDIUM",
+      "description": "'保存草稿'和工具栏 Filter/Columns3 按钮添加功能实现"
+    },
+    {
+      "rank": 18,
+      "page": "disposal/AssetCompensationFormPage",
+      "dimension": "api",
+      "severity": "MEDIUM",
+      "description": "DEPT_OPTIONS 从 getDeptTree API 动态获取"
+    },
+    {
+      "rank": 19,
+      "page": "idle/IdleAssetsPage",
+      "dimension": "form",
+      "severity": "MEDIUM",
+      "description": "将 publishTitle/publishDeadline 字段接入 publishIdleAsset API 调用"
+    },
+    {
+      "rank": 20,
+      "page": "retirement/RetirementFormPage",
+      "dimension": "api",
+      "severity": "HIGH",
+      "description": "折旧时间线改为调用 getDepreciationSchedule(assetId) API 渲染真实数据"
+    }
+  ]
+}

@@ -110,12 +110,12 @@ export default function AuditDetailPage() {
   const timeline: TimelineEntry[] = buildTimelineFromLog(log);
 
   const context: OperationContext = {
-    method: 'POST',
-    path: `/api/assets/${log.resourceId || '99042'}`,
-    userAgent: 'Chrome/118.0.0.0',
+    method: (log as unknown as Record<string, string>)?.httpMethod ?? (log as unknown as Record<string, string>)?.method ?? '—',
+    path: `/api/assets/${log.resourceId || '—'}`,
+    userAgent: (log as unknown as Record<string, string>)?.userAgent ?? '—',
     requestId: `REQ-${logId}`,
-    sessionId: `SESS-${log.operatorId || '0001'}`,
-    tenantId: 'TENANT-FORTH-01',
+    sessionId: `SESS-${log.operatorId || '—'}`,
+    tenantId: (log as unknown as Record<string, string>)?.tenantId ?? '—',
   };
 
   const relatedChanges = (log.changes || []).map((c) => ({
@@ -147,7 +147,15 @@ export default function AuditDetailPage() {
               <ArrowLeft className="w-4 h-4" />
               返回列表
             </Button>
-            <Button variant="outline" className="flex items-center gap-2">
+            <Button variant="outline" className="flex items-center gap-2" onClick={() => {
+              const blob = new Blob([JSON.stringify(log, null, 2)], { type: 'application/json' });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = `audit-log-${logId}.json`;
+              a.click();
+              URL.revokeObjectURL(url);
+            }}>
               <Download className="w-4 h-4" />
               导出日志
             </Button>

@@ -203,7 +203,7 @@ export const ExportFilterForm: React.FC<ExportFilterFormProps> = ({ onExportSucc
         }
       }, 1000);
 
-      toast.success('Export completed successfully');
+      toast.success('导出成功');
       onExportSuccess?.(filename);
     } catch (err: unknown) {
       const axiosErr = err as { response?: { data?: Blob }; message?: string };
@@ -218,7 +218,7 @@ export const ExportFilterForm: React.FC<ExportFilterFormProps> = ({ onExportSucc
       }
 
       setError(errorMessage);
-      toast.error(`Export failed: ${errorMessage}`);
+      toast.error(`导出失败: ${errorMessage}`);
     } finally {
       setIsExporting(false);
     }
@@ -238,9 +238,9 @@ export const ExportFilterForm: React.FC<ExportFilterFormProps> = ({ onExportSucc
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle>Export Asset Ledger</CardTitle>
+            <CardTitle>导出资产台账</CardTitle>
             <p className="text-sm text-muted-foreground">
-              Filter and export asset data to Excel
+              筛选条件并导出资产数据到 Excel
             </p>
           </div>
           <Button
@@ -248,7 +248,7 @@ export const ExportFilterForm: React.FC<ExportFilterFormProps> = ({ onExportSucc
             size="icon"
             onClick={resetFilters}
             disabled={isExporting}
-            aria-label="Reset filters"
+            aria-label="重置筛选"
           >
             <RefreshCcw className="h-4 w-4" />
           </Button>
@@ -258,7 +258,7 @@ export const ExportFilterForm: React.FC<ExportFilterFormProps> = ({ onExportSucc
         {error && (
           <Alert variant="destructive" className="mb-6">
             <AlertCircle className="h-4 w-4" />
-            <AlertTitle>Export Failed</AlertTitle>
+            <AlertTitle>导出失败</AlertTitle>
             <AlertDescription>{error}</AlertDescription>
           </Alert>
         )}
@@ -276,11 +276,11 @@ export const ExportFilterForm: React.FC<ExportFilterFormProps> = ({ onExportSucc
                 name="category"
                 render={({ field }) => (
                   <FormItem data-testid="filter-category">
-                    <FormLabel>Asset Category</FormLabel>
+                    <FormLabel>资产分类</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger className="w-full">
-                          <SelectValue placeholder="All Categories" />
+                          <SelectValue placeholder="所有分类" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -301,11 +301,11 @@ export const ExportFilterForm: React.FC<ExportFilterFormProps> = ({ onExportSucc
                 name="status"
                 render={({ field }) => (
                   <FormItem data-testid="filter-status">
-                    <FormLabel>Status</FormLabel>
+                    <FormLabel>状态</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger className="w-full">
-                          <SelectValue placeholder="All Statuses" />
+                          <SelectValue placeholder="所有状态" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -326,11 +326,11 @@ export const ExportFilterForm: React.FC<ExportFilterFormProps> = ({ onExportSucc
                 name="location"
                 render={({ field }) => (
                   <FormItem data-testid="filter-location">
-                    <FormLabel>Location</FormLabel>
+                    <FormLabel>存放位置</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger className="w-full">
-                          <SelectValue placeholder="All Locations" />
+                          <SelectValue placeholder="所有位置" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -358,7 +358,7 @@ export const ExportFilterForm: React.FC<ExportFilterFormProps> = ({ onExportSucc
                 }}
                 disabled={isExporting}
               >
-                Clear Filters
+                清空筛选
               </Button>
               <Button
                 type="submit"
@@ -371,7 +371,7 @@ export const ExportFilterForm: React.FC<ExportFilterFormProps> = ({ onExportSucc
                 ) : (
                   <Download className="h-4 w-4" />
                 )}
-                {isExporting ? 'Exporting...' : 'Export to Excel'}
+                {isExporting ? '导出中...' : '导出到 Excel'}
               </Button>
             </div>
           </form>

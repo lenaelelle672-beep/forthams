@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import {
   ArrowLeft, Check, RotateCcw, Package, Clock, DollarSign, FileText,
   MapPin, AlertTriangle, ChevronRight, Loader2,
@@ -108,6 +109,8 @@ export default function RetirementDetailPage() {
   const retirementId = Number(id);
 
   const [withdrawDialog, setWithdrawDialog] = useState(false);
+  const [rejectDialog, setRejectDialog] = useState(false);
+  const [rejectReason, setRejectReason] = useState('');
 
   const { data: res, isLoading } = useQuery({
     queryKey: ['retirement', 'detail', retirementId],
@@ -137,15 +140,21 @@ export default function RetirementDetailPage() {
   const approveMutation = useMutation({
     mutationFn: () => approveRetirement(retirementId),
     onSuccess: () => {
+      toast.success('审批通过');
       qc.invalidateQueries({ queryKey: ['retirement'] });
     },
+    onError: (err: Error) => toast.error(err.message || '审批操作失败，请重试'),
   });
 
   const rejectMutation = useMutation({
-    mutationFn: () => rejectRetirement(retirementId, '不符合退役条件'),
+    mutationFn: (reason: string) => rejectRetirement(retirementId, reason),
     onSuccess: () => {
+      toast.success('已驳回');
+      setRejectDialog(false);
+      setRejectReason('');
       qc.invalidateQueries({ queryKey: ['retirement'] });
     },
+    onError: (err: Error) => toast.error(err.message || '驳回操作失败，请重试'),
   });
 
   if (isLoading) {
@@ -171,14 +180,6 @@ export default function RetirementDetailPage() {
 
   const statusCfg = STATUS_CONFIG[record.status];
   const canWithdraw = record.status === 'PENDING' || record.status === 'DRAFT';
-
-  const mockSteps = [
-    { label: '提交申请', operator: record.applicantName ?? '申请人', time: record.createdAt?.substring(0, 16), status: 'done' as const },
-    { label: '部门经理审核', operator: '部门经理', status: 'done' as const },
-    { label: '资产管理审核', operator: '资产管理员', status: 'active' as const },
-    { label: '最终审批', operator: '待定', status: 'pending' as const },
-    { label: '退役执行', status: 'pending' as const },
-  ];
 
   return (
     <div className="space-y-6">
@@ -266,7 +267,7 @@ export default function RetirementDetailPage() {
                     <Package className="w-8 h-8 text-gray-300" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-base font-semibold text-gray-900">{asset.name ?? '—'}</h3>
+                    <h3 className="text-base font-semibold text-gray-900">{asset.assetName ?? asset.name ?? '—'}</h3>
                     <p className="text-sm text-blue-600 font-medium">{asset.assetNo ?? '—'}</p>
                     <span className="inline-block mt-1 text-[10px] font-semibold uppercase tracking-wider text-gray-500 bg-gray-100 px-2 py-0.5 rounded">
                       {asset.categoryName ?? '未分类'}
@@ -333,15 +334,7 @@ export default function RetirementDetailPage() {
                   ))}
                 </div>
               ) : (
-                <div className="space-y-0">
-                  {mockSteps.map((step, i) => (
-                    <TimelineStep
-                      key={step.label}
-                      {...step}
-                      isLast={i === mockSteps.length - 1}
-                    />
-                  ))}
-                </div>
+                <div className="py-8 text-center text-gray-400 text-sm">暂无审批记录</div>
               )}
             </div>
           </div>
@@ -365,7 +358,7 @@ export default function RetirementDetailPage() {
                     className="flex-1"
                     size="md"
                     disabled={rejectMutation.isPending}
-                    onClick={() => rejectMutation.mutate()}
+                    onClick={() => { setRejectReason(''); setRejectDialog(true); }}
                   >
                     {rejectMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <AlertTriangle className="w-4 h-4" />}
                     驳回
@@ -406,6 +399,40 @@ export default function RetirementDetailPage() {
               onClick={() => withdrawMutation.mutate()}
             >
               确认撤回
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Reject dialog */}
+      <Dialog open={rejectDialog} onOpenChange={setRejectDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>驳回退役申请</DialogTitle>
+          </DialogHeader>
+          <div className="px-6 py-4">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              驳回原因 <span className="text-red-500">*</span>
+            </label>
+            <textarea
+              rows={4}
+              value={rejectReason}
+              onChange={(e) => setRejectReason(e.target.value)}
+              placeholder="请填写驳回原因（必填，最多 500 字）..."
+              className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400 resize-none"
+              maxLength={500}
+            />
+            <p className="text-xs text-gray-400 mt-1 text-right">{rejectReason.length}/500</p>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setRejectDialog(false)}>取消</Button>
+            <Button
+              variant="destructive"
+              disabled={!rejectReason.trim()}
+              loading={rejectMutation.isPending}
+              onClick={() => rejectMutation.mutate(rejectReason)}
+            >
+              确认驳回
             </Button>
           </DialogFooter>
         </DialogContent>

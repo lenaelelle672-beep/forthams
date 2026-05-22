@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, Check, X } from 'lucide-react';
+import { toast } from 'sonner';
 import { getWorkOrderDetail, approveWorkOrder, rejectWorkOrder } from '@/api/workorder';
 import type { ApiResponse } from '@/types/common';
 import type { WorkOrderDetailResponse } from '@/types/workorder';
@@ -52,11 +53,13 @@ export default function WorkOrderDetailPage() {
   const approveMutation = useMutation({
     mutationFn: (data: { version?: number }) => approveWorkOrder(orderId, data),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['workorders'] }),
+    onError: (err: Error) => toast.error(err.message || '操作失败，请重试'),
   });
 
   const rejectMutation = useMutation({
     mutationFn: (data: { version?: number; rejectionReason: string }) => rejectWorkOrder(orderId, data),
     onSuccess: () => { setRejectDialog(false); qc.invalidateQueries({ queryKey: ['workorders'] }); },
+    onError: (err: Error) => toast.error(err.message || '操作失败，请重试'),
   });
 
   if (isLoading) {

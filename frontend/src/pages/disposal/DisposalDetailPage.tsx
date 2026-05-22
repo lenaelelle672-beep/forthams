@@ -1,10 +1,12 @@
 import { useParams, useNavigate } from 'react-router';
-import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, Undo2, Info, MapPin, User, Lightbulb } from 'lucide-react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { ArrowLeft, Undo2, Info, MapPin, User, Lightbulb, CheckCircle2, XCircle } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { getDisposalDetail, type DisposalType, type DisposalStatus } from '@/api/disposal';
+import { approveItem, rejectItem } from '@/api/approval';
+import { toast } from 'sonner';
 
 /** 处置类型中文映射 */
 const DISPOSAL_TYPE_LABEL: Record<DisposalType, string> = {
@@ -128,6 +130,7 @@ function buildApprovalSteps(status: DisposalStatus) {
 export default function DisposalDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const qc = useQueryClient();
 
   const { data: detail, isLoading, isError } = useQuery({
     queryKey: ['disposal', id],
@@ -136,6 +139,24 @@ export default function DisposalDetailPage() {
       return res.data.data;
     },
     enabled: !!id,
+  });
+
+  const approveMutation = useMutation({
+    mutationFn: () => approveItem(Number(id), { version: 1 }),
+    onSuccess: () => {
+      toast.success('审批通过');
+      qc.invalidateQueries({ queryKey: ['disposal', id] });
+    },
+    onError: () => toast.error('审批操作失败，请重试'),
+  });
+
+  const rejectMutation = useMutation({
+    mutationFn: () => rejectItem(Number(id), { version: 1, rejectionReason: '不符合处置条件' }),
+    onSuccess: () => {
+      toast.success('已驳回申请');
+      qc.invalidateQueries({ queryKey: ['disposal', id] });
+    },
+    onError: () => toast.error('驳回操作失败，请重试'),
   });
 
   if (isLoading) {
@@ -280,6 +301,29 @@ export default function DisposalDetailPage() {
                <Undo2 className="w-4 h-4" />
                返回上一页
              </Button>
+            {detail.status === 'PENDING' && (
+              <>
+                <Button
+                  variant="primary"
+                  size="md"
+                  loading={approveMutation.isPending}
+                  onClick={() => approveMutation.mutate()}
+                >
+                  <CheckCircle2 className="w-4 h-4" />
+                  审批通过
+                </Button>
+                <Button
+                  variant="outline"
+                  size="md"
+                  loading={rejectMutation.isPending}
+                  onClick={() => rejectMutation.mutate()}
+                  className="text-red-600 border-red-300 hover:bg-red-50"
+                >
+                  <XCircle className="w-4 h-4" />
+                  驳回申请
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </div>

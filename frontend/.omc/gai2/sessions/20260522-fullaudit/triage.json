@@ -1,0 +1,80 @@
+{
+  "classification": "Heavy",
+  "risk": "HIGH",
+  "phases_needed": ["audit", "builder", "reviewer"],
+  "debate_needed": false,
+  "top_risk_areas": [
+    {
+      "area": "src/app/pages/ — Legacy duplicate page layer",
+      "files_count": "~100",
+      "risk_reason": "Massive parallel page tree under src/app/pages/ duplicates src/pages/ with inconsistent quality. Contains 8 window.confirm calls, mixed English strings, inconsistent error/loading states. Highest blast-radius for a batch audit."
+    },
+    {
+      "area": "AssetImportExport/ExportFilterForm.tsx — English strings + MOCK data",
+      "files": ["src/pages/AssetImportExport/ExportFilterForm.tsx", "src/pages/AssetImportExport/AssetImportExportPage.tsx"],
+      "risk_reason": "Contains hardcoded English ('Warehouse A', 'Office HQ', 'All Categories'), and MOCK_PREVIEW constant used as fallback data source. Both i18n and mock removal needed."
+    },
+    {
+      "area": "src/app/pages/work-orders/ — New generation with window.confirm",
+      "files": ["WorkOrderListPage.tsx", "WorkOrderEditPage.tsx", "WorkOrderApprovalInboxPage.tsx", "WorkOrderCreatePage.tsx"],
+      "risk_reason": "Newest work-order pages still use window.confirm for destructive actions. Need migration to dialog pattern + i18n sweep."
+    },
+    {
+      "area": "Disposal form pages (4 pages) — Complex form interaction",
+      "files": ["AssetTransferFormPage.tsx", "AssetClearanceFormPage.tsx", "AssetScrapFormPage.tsx", "AssetCompensationFormPage.tsx"],
+      "risk_reason": "Multi-step forms with asset selectors, department trees, location trees. High interaction surface — every button, validation, loading state, error state needs verification."
+    },
+    {
+      "area": "RetirementDetailPage.tsx — Mock workflow steps",
+      "files": ["src/pages/retirement/RetirementDetailPage.tsx"],
+      "risk_reason": "Still uses mockSteps array (line 175) for approval timeline rendering. Needs real API binding."
+    },
+    {
+      "area": "WorkflowDesignerPage.tsx — Complex canvas interaction",
+      "files": ["src/pages/workflow/WorkflowDesignerPage.tsx"],
+      "risk_reason": "Node-edge graph editor with drag, connect, delete, save interactions. High UI complexity — each interaction needs loading/error/empty state coverage."
+    },
+    {
+      "area": "BigScreen3DPage.tsx — Three.js 3D dashboard",
+      "files": ["src/pages/bigscreen/BigScreen3DPage.tsx", "src/pages/bigscreen/BigScreenPage.tsx"],
+      "risk_reason": "WebGL canvas with real-time data binding. formatNumber has undefined handling but 700+ lines of complex rendering. Loading/error fallback for 3D scene is critical."
+    },
+    {
+      "area": "DashboardPage.tsx — Primary entry page",
+      "files": ["src/pages/dashboard/DashboardPage.tsx"],
+      "risk_reason": "First page users see. 6 parallel API calls with individual loading/error states. trend prop explicitly passed undefined (line 248). Every chart/card needs 100-point verification."
+    },
+    {
+      "area": "EquipmentPage.tsx — Maintenance management",
+      "files": ["src/pages/equipment/EquipmentPage.tsx"],
+      "risk_reason": "Complex CRUD with detail panel, maintenance records, form validation. computeMaintenanceStatus handles undefined but edge cases in form submission need audit."
+    },
+    {
+      "area": "App-level legacy pages (root src/app/pages/*.tsx)",
+      "files": ["AssetRegistry.tsx", "Assets.tsx", "Approval.tsx", "Settings.tsx", "Login.tsx", "DashboardPage.tsx", "Dashboard.tsx", "CyberDashboardV12.tsx", "IndustrialDashboardV13.tsx"],
+      "risk_reason": "~20 root-level page files with mixed patterns (some class components, some hooks). AssetRegistry uses window.confirm. Multiple dashboard variants suggest dead code. Highest uncertainty for per-page audit."
+    }
+  ],
+  "scope_summary": {
+    "total_page_files": "~85",
+    "src_pages_active": "~33",
+    "src_app_pages_active": "~50+",
+    "window_confirm_remaining": 8,
+    "english_strings_found": 17,
+    "mock_data_found": 2 areas (AssetImportExport, RetirementDetail),
+    "undefined_usage": 101+ occurrences (many legitimate, need per-case audit)"
+  },
+  "audit_checklist_per_page": [
+    "i18n: zero English strings in UI-facing text",
+    "undefined: all displayed values have fallback (?? or || '')",
+    "mock: no hardcoded/mock data as fallback",
+    "loading: skeleton/spinner on every async data load",
+    "error: user-friendly error state with retry on every API call",
+    "empty: empty-state UI when data returns []",
+    "interaction: every button/form/dialog works end-to-end",
+    "confirmation: no window.confirm/alert/prompt — use dialogs",
+    "a11y: basic keyboard nav + aria labels on interactive elements",
+    "dead-code: no unused imports, variables, or unreachable code"
+  ],
+  "rationale": "Heavy classification due to sheer scope (~85 page files across two parallel directory trees) combined with 6 distinct quality dimensions (i18n, undefined fallback, mock removal, loading/error/empty states). This is not a single refactoring — it's a systematic per-page audit requiring builder changes + reviewer verification. Debate is not needed because the acceptance criteria are well-defined (100-point per page) and the approach is straightforward batch-fix. The 8 remaining window.confirm calls in src/app/ and the mock data in AssetImportExport/RetirementDetail are known-specific fixes. The highest risk is the src/app/ legacy layer which has inconsistent patterns and duplicates src/pages/ functionality."
+}
