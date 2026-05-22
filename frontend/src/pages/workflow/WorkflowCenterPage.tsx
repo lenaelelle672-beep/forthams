@@ -56,7 +56,8 @@ export default function WorkflowCenterPage() {
   const load = async () => {
     try {
       setLoading(true); setErr(null);
-      const list = await workflowApi.list();
+      const res = await workflowApi.list();
+      const list = (res as { data?: unknown } | undefined)?.data ?? res;
       setDefs(Array.isArray(list) ? list : []);
     } catch (e) {
       setErr(e instanceof Error ? e.message : '加载失败');
@@ -122,10 +123,14 @@ export default function WorkflowCenterPage() {
             <FileText className="h-4 w-4" />
             返回资产处置
           </button>
-          <button
-            type="button"
-            className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 shadow-sm"
-          >
+           <button
+             type="button"
+             className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 shadow-sm"
+             onClick={() => {
+               const first = businessFlowOptions[0];
+               if (first) navigate(`/workflow-designer?businessType=${first.businessType}`);
+             }}
+           >
             <Plus className="h-4 w-4" />
             新建流程
           </button>

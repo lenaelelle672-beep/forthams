@@ -6,7 +6,7 @@ export interface WorkflowDefinitionDTO {
   name: string;
   description: string;
   definition: Record<string, unknown>;
-  status: 'UNCONFIGURED' | 'DRAFT' | 'PUBLISHED' | 'DISABLED';
+  status: 'UNCONFIGURED' | 'DRAFT' | 'PUBLISHED' | 'DISABLED' | 'ENABLED';
   version: number;
   updatedBy?: number;
   publishedBy?: number;
