@@ -7,7 +7,7 @@
  * @requires frontend/src/types/dashboard.types
  */
 
-import axios from 'axios';
+import http from '@/utils/http';
 import type {
   AssetStatistics,
   CategoryDistribution,
@@ -18,7 +18,7 @@ import type {
 } from '../types/dashboard.types';
 
 /** Base API URL for dashboard endpoints */
-const API_BASE_URL = '/api/v1';
+const API_BASE_URL = '/v1';
 
 /** Refresh interval in milliseconds (60 seconds) */
 const REFRESH_INTERVAL_MS = 60000;
@@ -38,10 +38,11 @@ const REFRESH_INTERVAL_MS = 60000;
  */
 export async function getAssetStatistics(): Promise<AssetStatistics> {
   try {
-    const response = await axios.get<DashboardStatisticsResponse>(
+    const response = await http.get<DashboardStatisticsResponse>(
       `${API_BASE_URL}/assets/statistics`
     );
-    return response.data.data;
+    // http 拦截器已解包 response.data，response 现在就是 DashboardStatisticsResponse
+    return (response as any).data;
   } catch (error) {
     console.error('[DashboardService] Failed to fetch asset statistics:', error);
     throw error;
@@ -66,10 +67,10 @@ export async function getAssetStatistics(): Promise<AssetStatistics> {
  */
 export async function getCategoryDistribution(): Promise<CategoryDistribution> {
   try {
-    const response = await axios.get<CategoryDistributionResponse>(
+    const response = await http.get<CategoryDistributionResponse>(
       `${API_BASE_URL}/assets/categories/distribution`
     );
-    return response.data.data;
+    return (response as any).data;
   } catch (error) {
     console.error('[DashboardService] Failed to fetch category distribution:', error);
     throw error;
@@ -96,10 +97,10 @@ export async function getCategoryDistribution(): Promise<CategoryDistribution> {
  */
 export async function getMaintenanceAlerts(): Promise<MaintenanceAlert[]> {
   try {
-    const response = await axios.get<MaintenanceAlertsResponse>(
+    const response = await http.get<MaintenanceAlertsResponse>(
       `${API_BASE_URL}/maintenance/alerts`
     );
-    return response.data.data;
+    return (response as any).data;
   } catch (error) {
     console.error('[DashboardService] Failed to fetch maintenance alerts:', error);
     throw error;

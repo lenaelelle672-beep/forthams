@@ -15,9 +15,13 @@ export interface WorkflowDefinitionDTO {
   updateTime?: string;
 }
 
-function getOperatorId() {
+/**
+ * 从 localStorage 获取当前登录用户 ID。
+ * http.ts 拦截器已解包 response.data，因此此函数不涉及 HTTP。
+ */
+function getOperatorId(): number | undefined {
   if (typeof window === 'undefined') return undefined;
-  const raw = window.localStorage.getItem('ams_auth_user') || window.localStorage.getItem('user_info');
+  const raw = window.localStorage.getItem('user_info');
   if (!raw) return undefined;
   try {
     const user = JSON.parse(raw);
@@ -26,29 +30,21 @@ function getOperatorId() {
   } catch { return undefined; }
 }
 
-function unwrap<T>(res: any): T {
-  if (res && typeof res === 'object' && 'code' in res) {
-    if (res.code !== 200) throw new Error(res.message || '请求失败');
-    return res.data as T;
-  }
-  return res as T;
-}
-
 export const workflowApi = {
   list: () =>
-    http.get('/workflows').then(unwrap<WorkflowDefinitionDTO[]>),
+    http.get<WorkflowDefinitionDTO[]>('/workflows'),
 
   get: (businessType: string) =>
-    http.get(`/workflows/${businessType}`).then(unwrap<WorkflowDefinitionDTO>),
+    http.get<WorkflowDefinitionDTO>(`/workflows/${businessType}`),
 
   saveDraft: (businessType: string, payload: { name: string; description: string; definition: Record<string, unknown> }) =>
-    http.put(`/workflows/${businessType}/draft`, { ...payload, operatorId: getOperatorId() }).then(unwrap<WorkflowDefinitionDTO>),
+    http.put<WorkflowDefinitionDTO>(`/workflows/${businessType}/draft`, { ...payload, operatorId: getOperatorId() }),
 
   publish: (businessType: string) =>
-    http.post(`/workflows/${businessType}/publish`, { operatorId: getOperatorId() }).then(unwrap<WorkflowDefinitionDTO>),
+    http.post<WorkflowDefinitionDTO>(`/workflows/${businessType}/publish`, { operatorId: getOperatorId() }),
 
   updateStatus: (businessType: string, status: string) =>
-    http.post(`/workflows/${businessType}/status`, { status, operatorId: getOperatorId() }).then(unwrap<WorkflowDefinitionDTO>),
+    http.post<WorkflowDefinitionDTO>(`/workflows/${businessType}/status`, { status, operatorId: getOperatorId() }),
 };
 
 export interface RoleRecord {
@@ -60,7 +56,7 @@ export interface RoleRecord {
 
 export const roleApi = {
   getAll: () =>
-    http.get('/roles/all').then(unwrap<RoleRecord[]>),
+    http.get<RoleRecord[]>('/roles/all'),
 };
 
 export interface UserRecord {
@@ -73,7 +69,7 @@ export interface UserRecord {
 
 export const userApi = {
   search: (keyword?: string) =>
-    http.get('/users/search', { params: keyword ? { keyword } : {} }).then(unwrap<UserRecord[]>),
+    http.get<UserRecord[]>('/users/search', { params: keyword ? { keyword } : {} }),
   getById: (id: string | number) =>
-    http.get(`/users/${id}`).then(unwrap<UserRecord>),
+    http.get<UserRecord>(`/users/${id}`),
 };

@@ -42,14 +42,14 @@ export interface CategoryReport {
 
 /** 获取系统统计概览 */
 export const getStatsOverview = () =>
-  http.get<ApiResponse<StatsOverview>>('/api/stats/overview');
+  http.get<ApiResponse<StatsOverview>>('/stats/overview');
 
 // ── ReportController (/api/reports) ──────────────────────────────────────────
 
 /** 获取资产汇总统计 */
 export const getReportSummary = () =>
-  http.get<ApiResponse<ReportSummary>>('/api/reports/summary');
+  http.get<ApiResponse<ReportSummary>>('/reports/summary');
 
 /** 获取按分类统计的资产数据 */
 export const getReportByCategory = () =>
-  http.get<ApiResponse<CategoryReport[]>>('/api/reports/by-category');
+  http.get<ApiResponse<CategoryReport[]>>('/reports/by-category');

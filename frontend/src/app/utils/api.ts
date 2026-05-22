@@ -1,5 +1,6 @@
 import axios, {
   AxiosError,
+  AxiosHeaders,
   type AxiosRequestConfig,
   type AxiosResponse,
 } from "axios";
@@ -49,8 +50,8 @@ apiClient.interceptors.request.use((config) => {
   const token = getStoredToken();
 
   if (token) {
-    config.headers = config.headers ?? {};
-    config.headers.Authorization = `Bearer ${token}`;
+    config.headers = AxiosHeaders.from(config.headers);
+    config.headers.set("Authorization", `Bearer ${token}`);
   }
 
   return config;

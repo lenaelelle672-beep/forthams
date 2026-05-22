@@ -47,8 +47,7 @@ export interface CategoryTreeNode {
  * ```
  */
 export async function getCategoryTree(): Promise<CategoryTreeNode[]> {
-  const response = await http.get<CategoryTreeNode[]>('/api/v1/asset-categories/tree');
-  return response.data;
+  return http.get<CategoryTreeNode[]>('/v1/asset-categories/tree');
 }
 
 /**

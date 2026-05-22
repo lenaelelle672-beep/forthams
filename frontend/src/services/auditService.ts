@@ -6,7 +6,7 @@
  */
 
 import type { AuditFilterParams, AuditTrendData } from '../types/audit.types';
-import { http } from '../utils/http';
+import http from '../utils/http';
 
 /** Raw item shape returned by the backend /api/audit/logs/stats endpoint */
 interface AuditStatsRawItem {
@@ -116,11 +116,11 @@ function mapResponseData(raw: AuditStatsApiResponse | AuditStatsRawItem[] | null
 export async function getAuditStats(params: AuditFilterParams): Promise<AuditTrendData[]> {
   const queryParams = serializeFilterParams(params);
 
-  const response = await http.get<AuditStatsApiResponse>('/api/audit/logs/stats', {
+  const response = await http.get<AuditStatsApiResponse>('/audit/logs/stats', {
     params: queryParams,
   });
 
-  return mapResponseData(response);
+  return mapResponseData(response as any);
 }
 
 /**

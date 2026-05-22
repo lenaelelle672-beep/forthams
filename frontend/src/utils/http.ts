@@ -12,17 +12,29 @@
 
 import axios, {
   type AxiosInstance,
+  type AxiosRequestConfig,
   type InternalAxiosRequestConfig,
   type AxiosResponse,
 } from 'axios';
 
-const http: AxiosInstance = axios.create({
+type UnwrappedHttpClient = Omit<AxiosInstance, 'request' | 'get' | 'delete' | 'head' | 'options' | 'post' | 'put' | 'patch'> & {
+  request<T = unknown, R = T, D = unknown>(config: AxiosRequestConfig<D>): Promise<R>;
+  get<T = unknown, R = T, D = unknown>(url: string, config?: AxiosRequestConfig<D>): Promise<R>;
+  delete<T = unknown, R = T, D = unknown>(url: string, config?: AxiosRequestConfig<D>): Promise<R>;
+  head<T = unknown, R = T, D = unknown>(url: string, config?: AxiosRequestConfig<D>): Promise<R>;
+  options<T = unknown, R = T, D = unknown>(url: string, config?: AxiosRequestConfig<D>): Promise<R>;
+  post<T = unknown, R = T, D = unknown>(url: string, data?: D, config?: AxiosRequestConfig<D>): Promise<R>;
+  put<T = unknown, R = T, D = unknown>(url: string, data?: D, config?: AxiosRequestConfig<D>): Promise<R>;
+  patch<T = unknown, R = T, D = unknown>(url: string, data?: D, config?: AxiosRequestConfig<D>): Promise<R>;
+};
+
+const http = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || '/api',
   timeout: 15000,
   headers: {
     'Content-Type': 'application/json',
   },
-});
+}) as UnwrappedHttpClient;
 
 // ── 请求拦截器：注入 Bearer Token ────────────────────────────────────────────
 http.interceptors.request.use(

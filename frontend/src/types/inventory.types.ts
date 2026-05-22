@@ -218,7 +218,8 @@ export interface AssetListQuery {
 // ============================================================================
 
 /**
- * 通用分页响应 — 列表接口统一返回结构
+ * 通用分页响应 — 从 common.ts re-export 统一定义。
+ * 此处保留原 items[] 接口以兼容本模块代码。
  */
 export interface PaginatedResponse<T> {
   /** 数据列表 */

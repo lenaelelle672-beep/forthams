@@ -8,8 +8,45 @@
  * @version 2.0.0
  */
 
-import type { AuditLog, GraphifyNode, GraphifyEdge, AuditLogResponse } from '../types/audit.types';
-import type { AssetAuditLog } from '../pages/AssetDetailPage/types/audit.types';
+import http from '@/utils/http';
+// Local type definitions (audit.types does not export these yet)
+interface AuditLog {
+  id: string;
+  operationType: string;
+  actionType: string;
+  operator: string;
+  targetEntity: string;
+  targetId: string;
+  entityId: string;
+  action: string;
+  description: string;
+  timestamp: string;
+  changes?: Record<string, unknown>;
+  details?: Record<string, unknown>;
+  [key: string]: unknown;
+}
+interface GraphifyNode {
+  id: string;
+  label: string;
+  type: string;
+  x?: number;
+  y?: number;
+  [key: string]: unknown;
+}
+interface GraphifyEdge {
+  source: string;
+  target: string;
+  label?: string;
+  [key: string]: unknown;
+}
+interface AuditLogResponse {
+  logs: AuditLog[];
+  data: AuditLog[];
+  total: number;
+}
+
+// AssetAuditLog type (originally from excluded AssetDetailPage)
+type AssetAuditLog = AuditLog;
 
 // ============================================================================
 // Type Definitions
@@ -62,7 +99,7 @@ export interface FieldChange {
 // ============================================================================
 
 /** Base API endpoint for audit operations */
-const API_BASE_PATH = '/api/audit';
+const API_BASE_PATH = '/audit';
 
 /** Default pagination limit */
 const DEFAULT_PAGE_SIZE = 50;
@@ -550,21 +587,9 @@ export async function fetchAuditLogs(
   const url = `${API_BASE_PATH}/logs${queryString ? `?${queryString}` : ''}`;
   
   try {
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      credentials: 'include'
-    });
-    
-    if (!response.ok) {
-      throw new Error(`HTTP error ${response.status}: ${response.statusText}`);
-    }
-    
-    const data = await response.json();
-    return data as AuditLogResponse;
+    const response = await http.get<AuditLogResponse>(url);
+    // http 拦截器已解包 response.data
+    return response as any as AuditLogResponse;
   } catch (error) {
     console.error('Failed to fetch audit logs:', error);
     throw error;
@@ -757,16 +782,3 @@ const auditApi = {
 };
 
 export default auditApi;
-
-// Named exports for convenience
-export {
-  fetchAuditLogs,
-  getAuditLogsByEntity,
-  getGraphifyAuditData,
-  getApprovalAuditLogs,
-  generateGraphifyNodes,
-  transformToGraphifyData,
-  convertChangesToGraphifyNodes,
-  formatAuditLogsToGraphifyNodes,
-  validateGraphifyNodes
-};

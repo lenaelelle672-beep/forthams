@@ -40,6 +40,7 @@ const S = (C: React.LazyExoticComponent<any>) => (
 const AppLayout     = React.lazy(() => import('@/layouts/AppLayout'));
 const LoginPage     = React.lazy(() => import('@/pages/auth/LoginPage'));
 const BigScreenPage = React.lazy(() => import('@/pages/bigscreen/BigScreenPage'));
+const BigScreen3DPage = React.lazy(() => import('@/pages/bigscreen/BigScreen3DPage'));
 
 // ── 新建完成的页面（直接导入）──────────────────────────────────────────────────
 const DashboardPage         = React.lazy(() => import('@/pages/dashboard/DashboardPage'));
@@ -95,6 +96,10 @@ const router = createBrowserRouter([
   {
     path: '/bigscreen',
     element: S(BigScreenPage),
+  },
+  {
+    path: '/bigscreen-3d',
+    element: S(BigScreen3DPage),
   },
 
   // 主应用（侧边栏布局）

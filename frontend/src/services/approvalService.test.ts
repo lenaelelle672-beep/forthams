@@ -24,13 +24,23 @@ import type {
   OrderStatus,
   WorkOrder,
   ApprovalRecord,
-  PendingApprovalItem,
-  ApprovalActionRequest,
-  RejectActionRequest,
-  ApprovalListResponse,
-  ApprovalDetailResponse,
   ApprovalActionResponse,
 } from '../types/approval';
+
+// ---------------------------------------------------------------------------
+// Type aliases for test compatibility — map old names to actual types
+// ---------------------------------------------------------------------------
+
+/** @deprecated Use ApprovalListItem from workorder.types instead */
+type PendingApprovalItem = any;
+/** @deprecated Use ApproveWorkOrderRequest instead */
+type ApprovalActionRequest = { version: number; comment?: string };
+/** @deprecated Use RejectWorkOrderRequest instead */
+type RejectActionRequest = { version: number; rejectionReason: string };
+/** @deprecated Use PaginatedResponse<ApprovalListItem> instead */
+type ApprovalListResponse = { items: PendingApprovalItem[]; total: number; page: number; pageSize: number };
+/** @deprecated Use WorkOrderDetailResponse instead */
+type ApprovalDetailResponse = { workOrder: WorkOrder; approvalRecords: ApprovalRecord[] };
 
 // ---------------------------------------------------------------------------
 // Mock setup
@@ -105,14 +115,8 @@ function buildPendingItem(overrides: Partial<PendingApprovalItem> = {}): Pending
 }
 
 /** Create a successful AxiosResponse wrapper. */
-function okResponse<T>(data: T, status = 200): AxiosResponse<T> {
-  return {
-    data,
-    status,
-    statusText: 'OK',
-    headers: {},
-    config: {} as any,
-  };
+function okResponse<T>(data: T, _status = 200): T {
+  return data;
 }
 
 /** Create an AxiosError for non-2xx responses. */
@@ -162,7 +166,7 @@ describe('approvalService', () => {
 
       const result = await approvalService.getPendingApprovals('DEPARTMENT_MANAGER');
 
-      expect(mockedHttp.get).toHaveBeenCalledWith('/api/approvals/pending', {
+      expect(mockedHttp.get).toHaveBeenCalledWith('/approvals/pending', {
         params: { role: 'DEPARTMENT_MANAGER' },
       });
       expect(result.items).toHaveLength(2);
@@ -180,7 +184,7 @@ describe('approvalService', () => {
 
       const result = await approvalService.getPendingApprovals('ASSET_MANAGER');
 
-      expect(mockedHttp.get).toHaveBeenCalledWith('/api/approvals/pending', {
+      expect(mockedHttp.get).toHaveBeenCalledWith('/approvals/pending', {
         params: { role: 'ASSET_MANAGER' },
       });
       expect(result.items).toHaveLength(1);
@@ -223,7 +227,7 @@ describe('approvalService', () => {
 
       await approvalService.getPendingApprovals('DEPARTMENT_MANAGER', { page: 2, pageSize: 10 });
 
-      expect(mockedHttp.get).toHaveBeenCalledWith('/api/approvals/pending', {
+      expect(mockedHttp.get).toHaveBeenCalledWith('/approvals/pending', {
         params: { role: 'DEPARTMENT_MANAGER', page: 2, pageSize: 10 },
       });
     });
@@ -244,7 +248,7 @@ describe('approvalService', () => {
 
       const result = await approvalService.getApprovalDetail('order-001');
 
-      expect(mockedHttp.get).toHaveBeenCalledWith('/api/approvals/order-001');
+      expect(mockedHttp.get).toHaveBeenCalledWith('/approvals/order-001');
       expect(result.workOrder.id).toBe('order-001');
       expect(result.approvalRecords).toHaveLength(1);
     });
@@ -291,7 +295,7 @@ describe('approvalService', () => {
 
       const result = await approvalService.approveOrder('order-001', 1);
 
-      expect(mockedHttp.post).toHaveBeenCalledWith('/api/orders/order-001/approve', {
+      expect(mockedHttp.post).toHaveBeenCalledWith('/orders/order-001/approve', {
         version: 1,
       });
       expect(result.workOrder.status).toBe('APPROVING_LEVEL_1');
@@ -309,7 +313,7 @@ describe('approvalService', () => {
 
       const result = await approvalService.approveOrder('order-001', 2);
 
-      expect(mockedHttp.post).toHaveBeenCalledWith('/api/orders/order-001/approve', {
+      expect(mockedHttp.post).toHaveBeenCalledWith('/orders/order-001/approve', {
         version: 2,
       });
       expect(result.workOrder.status).toBe('APPROVING_LEVEL_2');
@@ -340,7 +344,7 @@ describe('approvalService', () => {
 
       await approvalService.approveOrder('order-001', 4);
 
-      expect(mockedHttp.post).toHaveBeenCalledWith('/api/orders/order-001/approve', {
+      expect(mockedHttp.post).toHaveBeenCalledWith('/orders/order-001/approve', {
         version: 4,
       });
     });
@@ -395,7 +399,7 @@ describe('approvalService', () => {
 
       const result = await approvalService.rejectOrder('order-001', 1, '不合规');
 
-      expect(mockedHttp.post).toHaveBeenCalledWith('/api/orders/order-001/reject', {
+      expect(mockedHttp.post).toHaveBeenCalledWith('/orders/order-001/reject', {
         version: 1,
         rejectionReason: '不合规',
       });
@@ -589,13 +593,13 @@ describe('approvalService', () => {
 
       // Verify all three calls were made with correct version progression
       expect(mockedHttp.post).toHaveBeenCalledTimes(3);
-      expect(mockedHttp.post).toHaveBeenNthCalledWith(1, '/api/orders/order-001/approve', {
+      expect(mockedHttp.post).toHaveBeenNthCalledWith(1, '/orders/order-001/approve', {
         version: 1,
       });
-      expect(mockedHttp.post).toHaveBeenNthCalledWith(2, '/api/orders/order-001/approve', {
+      expect(mockedHttp.post).toHaveBeenNthCalledWith(2, '/orders/order-001/approve', {
         version: 2,
       });
-      expect(mockedHttp.post).toHaveBeenNthCalledWith(3, '/api/orders/order-001/approve', {
+      expect(mockedHttp.post).toHaveBeenNthCalledWith(3, '/orders/order-001/approve', {
         version: 3,
       });
     });
@@ -721,7 +725,7 @@ describe('approvalService', () => {
 
       const result = await approvalService.cancelOrder('order-001', 1);
 
-      expect(mockedHttp.post).toHaveBeenCalledWith('/api/orders/order-001/cancel', {
+      expect(mockedHttp.post).toHaveBeenCalledWith('/orders/order-001/cancel', {
         version: 1,
       });
       expect(result.workOrder.status).toBe('CANCELLED');
@@ -871,7 +875,7 @@ describe('approvalService', () => {
 
       await approvalService.getPendingApprovals('DEPARTMENT_MANAGER');
 
-      expect(mockedHttp.get).toHaveBeenCalledWith('/api/approvals/pending', {
+      expect(mockedHttp.get).toHaveBeenCalledWith('/approvals/pending', {
         params: { role: 'DEPARTMENT_MANAGER' },
       });
     });
@@ -882,7 +886,7 @@ describe('approvalService', () => {
 
       await approvalService.getPendingApprovals('ASSET_MANAGER');
 
-      expect(mockedHttp.get).toHaveBeenCalledWith('/api/approvals/pending', {
+      expect(mockedHttp.get).toHaveBeenCalledWith('/approvals/pending', {
         params: { role: 'ASSET_MANAGER' },
       });
     });

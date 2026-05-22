@@ -240,6 +240,8 @@ export interface CancelRequest {
 
 /**
  * Standard paginated list response wrapper.
+ * 保留 items[] 字段以兼容本模块代码。
+ * 其他模块请使用 types/common.ts 中的 PaginatedResponse<T>（使用 records[]）。
  */
 export interface PaginatedResponse<T> {
   /** List of items in the current page */

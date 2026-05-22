@@ -11,7 +11,9 @@
  * @version 1.0.0
  */
 
-import { apiClient } from '@/app/utils/api';
+import http from '@/utils/http';
+// Alias for compatibility
+const apiClient = http;
 import type { Asset, AssetDetail, AssetQuery, AssetListResponse } from '@/types/asset.types';
 
 /**
@@ -43,7 +45,7 @@ export interface AssetListParams {
 export async function getAssetList(params: AssetListParams = {}): Promise<AssetListResponse> {
   const { page = 1, pageSize = 20, ...filters } = params;
   
-  return apiClient.get<AssetListResponse>('/api/assets', {
+  return apiClient.get<AssetListResponse>('/assets', {
     params: {
       page,
       pageSize,
@@ -65,7 +67,7 @@ export async function getAssetList(params: AssetListParams = {}): Promise<AssetL
  * ```
  */
 export async function getAssetDetail(assetId: string): Promise<AssetDetail> {
-  return apiClient.get<AssetDetail>(`/api/assets/${assetId}`);
+  return apiClient.get<AssetDetail>(`/assets/${assetId}`);
 }
 
 /**
@@ -76,7 +78,7 @@ export async function getAssetDetail(assetId: string): Promise<AssetDetail> {
  * @throws {ApiError} When validation fails or API errors
  */
 export async function createAsset(assetData: Partial<Asset>): Promise<AssetDetail> {
-  return apiClient.post<AssetDetail>('/api/assets', assetData);
+  return apiClient.post<AssetDetail>('/assets', assetData);
 }
 
 /**
@@ -88,7 +90,7 @@ export async function createAsset(assetData: Partial<Asset>): Promise<AssetDetai
  * @throws {ApiError} When asset not found or validation fails
  */
 export async function updateAsset(assetId: string, updates: Partial<Asset>): Promise<AssetDetail> {
-  return apiClient.put<AssetDetail>(`/api/assets/${assetId}`, updates);
+  return apiClient.put<AssetDetail>(`/assets/${assetId}`, updates);
 }
 
 /**
@@ -99,7 +101,7 @@ export async function updateAsset(assetId: string, updates: Partial<Asset>): Pro
  * @throws {ApiError} When asset not found or deletion fails
  */
 export async function deleteAsset(assetId: string): Promise<void> {
-  return apiClient.delete<void>(`/api/assets/${assetId}`);
+  return apiClient.delete<void>(`/assets/${assetId}`);
 }
 
 /**
@@ -115,7 +117,7 @@ export async function transferAsset(
   targetDepartmentId: string,
   reason?: string
 ): Promise<AssetDetail> {
-  return apiClient.post<AssetDetail>(`/api/assets/${assetId}/transfer`, {
+  return apiClient.post<AssetDetail>(`/assets/${assetId}/transfer`, {
     targetDepartmentId,
     reason,
   });
@@ -132,7 +134,7 @@ export async function getAssetAuditLogs(
   assetId: string,
   params?: { page?: number; pageSize?: number; operation?: string }
 ): Promise<{ data: any[]; total: number }> {
-  return apiClient.get(`/api/assets/${assetId}/audit-logs`, { params });
+  return apiClient.get(`/assets/${assetId}/audit-logs`, { params });
 }
 
 /**
@@ -146,7 +148,7 @@ export async function exportAssets(
   assetIds: string[],
   format: 'csv' | 'excel' | 'pdf' = 'csv'
 ): Promise<{ downloadUrl: string }> {
-  return apiClient.post('/api/assets/export', {
+  return apiClient.post('/assets/export', {
     assetIds,
     format,
   });

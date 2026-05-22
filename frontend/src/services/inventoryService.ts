@@ -19,7 +19,7 @@
  * ```
  */
 
-import axios, { type AxiosResponse } from 'axios';
+import http from '@/utils/http';
 
 // ---------------------------------------------------------------------------
 // 类型定义（与 SPEC 数据约束一一对应）
@@ -260,7 +260,7 @@ export interface SubmitResult {
 // ---------------------------------------------------------------------------
 
 /** 盘点模块 API 基础路径 */
-const API_BASE = '/api/v1/inventory';
+const API_BASE = '/v1/inventory';
 
 /** 默认请求超时时间 (ms) */
 const DEFAULT_TIMEOUT = 10_000;
@@ -273,23 +273,11 @@ const DEFAULT_TIMEOUT = 10_000;
  *
  * @returns HTTP headers 对象
  */
-function getAuthHeaders(): Record<string, string> {
-  const token = localStorage.getItem('auth_token');
-  return token ? { Authorization: `Bearer ${token}` } : {};
-}
-
-/**
- * 构造带认证头和超时的请求配置
- *
- * @param extraConfig - 额外 axios 配置（如 params、data 等）
- * @returns 合并后的 AxiosRequestConfig
- */
 function withAuth(
   extraConfig: Record<string, unknown> = {},
 ): Record<string, unknown> {
   return {
     timeout: DEFAULT_TIMEOUT,
-    headers: getAuthHeaders(),
     ...extraConfig,
   };
 }
@@ -347,9 +335,7 @@ export function truncateBatchIds(assetIds: string[], maxItems = 100): string[] {
 export async function fetchTaskList(
   query: InventoryTaskQuery = {},
 ): Promise<PaginatedResponse<InventoryTask>> {
-  const response: AxiosResponse<PaginatedResponse<InventoryTask>> =
-    await axios.get(`${API_BASE}/tasks`, withAuth({ params: query }));
-  return response.data;
+  return http.get(`${API_BASE}/tasks`, withAuth({ params: query }));
 }
 
 /**
@@ -367,12 +353,11 @@ export async function fetchTaskList(
 export async function createTask(
   payload: CreateTaskPayload,
 ): Promise<InventoryTask> {
-  const response: AxiosResponse<InventoryTask> = await axios.post(
+  return http.post(
     `${API_BASE}/tasks`,
     payload,
     withAuth(),
   );
-  return response.data;
 }
 
 /**
@@ -389,11 +374,10 @@ export async function createTask(
 export async function fetchTaskDetail(
   taskId: string,
 ): Promise<InventoryTask> {
-  const response: AxiosResponse<InventoryTask> = await axios.get(
+  return http.get(
     `${API_BASE}/tasks/${taskId}`,
     withAuth(),
   );
-  return response.data;
 }
 
 /**
@@ -413,12 +397,11 @@ export async function updateTaskStatus(
   taskId: string,
   payload: UpdateStatusPayload,
 ): Promise<InventoryTask> {
-  const response: AxiosResponse<InventoryTask> = await axios.patch(
+  return http.patch(
     `${API_BASE}/tasks/${taskId}/status`,
     payload,
     withAuth(),
   );
-  return response.data;
 }
 
 // ---------------------------------------------------------------------------
@@ -442,12 +425,10 @@ export async function fetchTaskAssets(
   taskId: string,
   query: AssetListQuery = {},
 ): Promise<PaginatedResponse<InventoryAsset>> {
-  const response: AxiosResponse<PaginatedResponse<InventoryAsset>> =
-    await axios.get(
-      `${API_BASE}/tasks/${taskId}/assets`,
-      withAuth({ params: query }),
-    );
-  return response.data;
+  return http.get(
+    `${API_BASE}/tasks/${taskId}/assets`,
+    withAuth({ params: query }),
+  );
 }
 
 /**
@@ -469,12 +450,11 @@ export async function confirmAsset(
   assetId: string,
   payload: ConfirmPayload,
 ): Promise<InventoryAsset> {
-  const response: AxiosResponse<InventoryAsset> = await axios.patch(
+  return http.patch(
     `${API_BASE}/tasks/${taskId}/assets/${assetId}/confirm`,
     payload,
     withAuth(),
   );
-  return response.data;
 }
 
 /**
@@ -494,12 +474,11 @@ export async function batchConfirmAssets(
   taskId: string,
   payload: BatchConfirmPayload,
 ): Promise<BatchConfirmResult> {
-  const response: AxiosResponse<BatchConfirmResult> = await axios.post(
+  return http.post(
     `${API_BASE}/tasks/${taskId}/assets/batch-confirm`,
     payload,
     withAuth(),
   );
-  return response.data;
 }
 
 // ---------------------------------------------------------------------------
@@ -521,11 +500,10 @@ export async function batchConfirmAssets(
 export async function fetchTaskSummary(
   taskId: string,
 ): Promise<InventorySummary> {
-  const response: AxiosResponse<InventorySummary> = await axios.get(
+  return http.get(
     `${API_BASE}/tasks/${taskId}/summary`,
     withAuth(),
   );
-  return response.data;
 }
 
 /**
@@ -544,12 +522,11 @@ export async function fetchTaskSummary(
 export async function submitTask(
   taskId: string,
 ): Promise<SubmitResult> {
-  const response: AxiosResponse<SubmitResult> = await axios.post(
+  return http.post(
     `${API_BASE}/tasks/${taskId}/submit`,
     {},
     withAuth(),
   );
-  return response.data;
 }
 
 // ---------------------------------------------------------------------------

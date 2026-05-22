@@ -308,6 +308,8 @@ export interface ApprovalListQuery {
 
 /**
  * 通用分页响应包装。
+ * 保留 list[] 字段以兼容本模块代码。
+ * 其他模块请使用 types/common.ts 中的 PaginatedResponse<T>（使用 records[]）。
  */
 export interface PaginatedResponse<T> {
   /** 数据列表 */

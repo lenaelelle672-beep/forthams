@@ -11,7 +11,7 @@
  * @spec SWARM-P2-006-FE
  */
 
-import axios from 'axios';
+import http from '@/utils/http';
 
 // ---------------------------------------------------------------------------
 // Types & Interfaces（对齐 SPEC「数据约束」章节）
@@ -67,11 +67,11 @@ export interface ExportFilters {
  * 返回文件流（Blob）
  */
 export const getImportTemplate = async (): Promise<Blob> => {
-  const response = await axios.get<Blob>(
-    '/api/v1/assets/import/template',
+  const response = await http.get<Blob>(
+    '/v1/assets/import/template',
     { responseType: 'blob' },
   );
-  return response.data;
+  return response as any;
 };
 
 /**
@@ -89,8 +89,8 @@ export const parseImportFile = async (
   const formData = new FormData();
   formData.append('file', file);
 
-  const response = await axios.post<ParseResponse>(
-    '/api/v1/assets/import/parse',
+  const response = await http.post<ParseResponse>(
+    '/v1/assets/import/parse',
     formData,
     {
       headers: { 'Content-Type': 'multipart/form-data' },
@@ -104,7 +104,7 @@ export const parseImportFile = async (
       },
     },
   );
-  return response.data;
+  return response as any;
 };
 
 /**
@@ -118,11 +118,11 @@ export const commitImport = async (
   parseId: string,
   rows: AssetRow[],
 ): Promise<CommitResponse> => {
-  const response = await axios.post<CommitResponse>(
-    '/api/v1/assets/import/commit',
+  const response = await http.post<CommitResponse>(
+    '/v1/assets/import/commit',
     { parseId, rows },
   );
-  return response.data;
+  return response as any;
 };
 
 /**
@@ -133,8 +133,8 @@ export const commitImport = async (
  * @param filters - 筛选条件：分类编码、状态编码、位置编码数组
  */
 export const exportAssets = async (filters: ExportFilters): Promise<Blob> => {
-  const response = await axios.post<Blob>(
-    '/api/v1/assets/export',
+  const response = await http.post<Blob>(
+    '/v1/assets/export',
     {
       categoryCodes: filters.categoryCodes,
       statusCodes: filters.statusCodes,
@@ -142,63 +142,12 @@ export const exportAssets = async (filters: ExportFilters): Promise<Blob> => {
     },
     { responseType: 'blob' },
   );
-  return response.data;
+  return response as any;
 };
 
 // ---------------------------------------------------------------------------
 // Utility Helpers（Layer 0.2 / 0.3）
 // ---------------------------------------------------------------------------
-
-/** 文件大小上限 10 MB（10,485,760 Bytes） */
-const MAX_FILE_SIZE = 10 * 1024 * 1024;
-
-/**
- * FE-3: 上传文件前端校验（类型 + 大小）
- *
- * 校验规则：
- *  - 类型：仅允许 .xlsx
- *  - 大小：≤ 10 MB
- *
- * @param file - 待校验文件
- * @returns valid=true 通过；valid=false 时附带 message 说明原因
- */
-export const validateUploadFile = (
-  file: File,
-): { valid: boolean; message?: string } => {
-  // 类型校验：仅允许 .xlsx
-  if (!file.name.toLowerCase().endsWith('.xlsx')) {
-    return { valid: false, message: '仅支持 .xlsx 格式文件' };
-  }
-
-  // 大小校验：≤ 10MB
-  if (file.size > MAX_FILE_SIZE) {
-    return { valid: false, message: '文件大小不能超过 10MB' };
-  }
-
-  return { valid: true };
-};
-
-/**
- * FE-2 / FE-9: 浏览器端 Blob 文件下载工具
- *
- * 实现步骤：
- *  1. URL.createObjectURL(blob)
- *  2. 创建隐藏 <a> 标签并设置 download 属性
- *  3. 触发 click 下载
- *  4. URL.revokeObjectURL() 释放内存
- *
- * @param blob     - 文件 Blob 数据
- * @param filename - 下载文件名（含扩展名）
- */
-export const downloadBlob = (blob: Blob, filename: string): void => {
-  const url = URL.createObjectURL(blob);
-  const anchor = document.createElement('a');
-  anchor.href = url;
-  anchor.download = filename;
-  // 添加到 DOM 以兼容 Firefox
-  document.body.appendChild(anchor);
-  anchor.click();
-  document.body.removeChild(anchor);
-  // 释放 ObjectURL 防止内存泄漏
-  URL.revokeObjectURL(url);
-};
+// NOTE: validateUploadFile → @/utils/fileValidator (canonical)
+// NOTE: downloadBlob → @/utils/fileDownloader (canonical)
+// NOTE: MAX_FILE_SIZE → @/types/assetImportExport#MAX_UPLOAD_FILE_SIZE (canonical)
