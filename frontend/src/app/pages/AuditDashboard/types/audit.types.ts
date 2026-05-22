@@ -71,7 +71,7 @@ export const PAGINATION_DEFAULTS = {
 // =============================================================================
 
 /**
- * 审计日志实体，对应后端 /api/v1/audit-logs 返回的单条日志记录。
+ * 审计日志实体，对应后端 /api/audit-logs 返回的单条日志记录。
  * 字段命名与后端 OpenAPI 规范保持一致（snake_case → camelCase 映射在 API 层处理）。
  */
 export interface AuditLog {
@@ -102,7 +102,7 @@ export interface AuditLog {
 // =============================================================================
 
 /**
- * 审计日志查询参数，对应 /api/v1/audit-logs 的请求参数。
+ * 审计日志查询参数，对应 /api/audit-logs 的请求参数。
  * 三维度筛选器（时间/类型/操作人）联动时，参数合并发送。
  */
 export interface AuditLogQuery {
@@ -178,7 +178,7 @@ export function validateTimeRange(
 // =============================================================================
 
 /**
- * 审计日志分页响应，对应 /api/v1/audit-logs 的返回结构。
+ * 审计日志分页响应，对应 /api/audit-logs 的返回结构。
  * items 数组长度等于 limit 参数值（最后一页可能不足）。
  */
 export interface AuditLogResponse {

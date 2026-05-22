@@ -157,7 +157,7 @@ export interface ApprovalError {
 /**
  * API 基础路径
  */
-const API_BASE_PATH = '/v1/work-orders';
+const API_BASE_PATH = '/work-orders';
 
 /**
  * 审批意见最大字符数

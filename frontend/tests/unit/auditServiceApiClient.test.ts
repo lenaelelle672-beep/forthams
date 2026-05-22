@@ -60,7 +60,7 @@ describe('auditService API client integration', () => {
     });
 
     const { calledUrl, query } = queryFromFirstCall();
-    expect(calledUrl).toContain('/v1/audit-log/list?');
+    expect(calledUrl).toContain('/audit-logs/list?');
     expect(query.get('start_time')).toBe('2026-05-01T00:00:00Z');
     expect(query.get('end_time')).toBe('2026-05-02T00:00:00Z');
     expect(query.get('operation_type')).toBe('DELETE');
@@ -92,7 +92,7 @@ describe('auditService API client integration', () => {
     });
 
     const { calledUrl, query } = queryFromFirstCall();
-    expect(calledUrl).toContain('/v1/audit-log/trend?');
+    expect(calledUrl).toContain('/audit-logs/trend?');
     expect(query.get('granularity')).toBe('weekly');
     expect(query.get('operation_type')).toBe('DELETE');
     expect(query.get('operator_id')).toBe('U001');
@@ -127,7 +127,7 @@ describe('auditService API client integration', () => {
       response_payload: '{"status":"DELETED"}',
     });
 
-    expect(mockedApi.get).toHaveBeenNthCalledWith(1, '/v1/audit-log/meta');
-    expect(mockedApi.get).toHaveBeenNthCalledWith(2, '/v1/audit-log/1001');
+    expect(mockedApi.get).toHaveBeenNthCalledWith(1, '/audit-logs/meta');
+    expect(mockedApi.get).toHaveBeenNthCalledWith(2, '/audit-logs/1001');
   });
 });

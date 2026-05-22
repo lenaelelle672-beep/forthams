@@ -1,0 +1,179 @@
+{
+  "overall_status": "pass",
+  "directive_summary": "按 REAL_USER_TEST_REPORT_V2.md 修复全部 P0 和 P1 问题，选择性修复高价值 P2 问题。目标：P0 清零，P1 大幅降低，API 通过率从 79.3% 提升到 90%+。",
+  "affected_scope": [
+    "backend/src/main/java/com/ams/controller/InventoryController.java",
+    "backend/src/main/java/com/ams/controller/RetirementController.java",
+    "backend/src/main/java/com/ams/controller/AuditDashboardController.java",
+    "backend/src/main/java/com/ams/controller/WorkOrderController.java",
+    "backend/src/main/java/com/ams/controller/NotificationController.java",
+    "backend/src/main/java/com/ams/controller/HelloController.java",
+    "backend/src/main/java/com/ams/config/SecurityConfig.java",
+    "backend/src/main/java/com/ams/entity/Dept.java",
+    "backend/src/main/java/com/ams/service/AssetService.java",
+    "backend/src/main/resources/schema.sql",
+    "frontend/src/api/notification.ts",
+    "frontend/src/api/retirementApi.ts",
+    "frontend/src/api/assetExport.ts",
+    "frontend/src/api/assetImport.ts",
+    "frontend/src/api/audit.ts",
+    "frontend/src/api/retirement.ts",
+    "frontend/src/pages/asset/AssetListPage.tsx",
+    "frontend/src/types/asset.ts",
+    "frontend/src/pages/workorder/WorkOrderFormPage.tsx",
+    "frontend/src/services/inventoryService.ts",
+    "frontend/src/services/workorderService.ts",
+    "frontend/src/services/categoryService.ts",
+    "frontend/src/services/retirementService.ts",
+    "frontend/src/app/services/assetDisposalService.ts",
+    "frontend/src/app/services/auditService.ts",
+    "frontend/src/app/services/auditApi.ts",
+    "frontend/src/app/hooks/useInventory.ts",
+    "frontend/src/app/hooks/useDepreciation.ts",
+    "frontend/src/app/hooks/useAuditLog.ts",
+    "frontend/src/app/hooks/useAuditLogs.ts",
+    "frontend/src/app/pages/AuditDashboard/services/auditApi.ts",
+    "frontend/src/app/pages/AuditDashboard/types/audit.types.ts",
+    "frontend/src/app/types/audit.types.ts",
+    "frontend/src/types/assetImportExport.ts",
+    "frontend/src/types/inventory.types.ts",
+    "frontend/src/mocks/workOrderHandlers.ts",
+    "frontend/src/mocks/inventoryHandlers.ts",
+    "frontend/src/mocks/assetImportExportHandlers.ts",
+    "frontend/tests/unit/auditServiceApiClient.test.ts",
+    "backend/src/test/java/com/ams/controller/WorkOrderControllerTest.java",
+    "backend/src/test/java/com/ams/controller/RetirementControllerTest.java",
+    "backend/src/test/java/com/ams/controller/AuditDashboardControllerTest.java"
+  ],
+  "commands_checked": [
+    {
+      "command": "cd backend && mvn test 2>&1 | tail -20",
+      "result": "passed",
+      "notes": "Tests run: 191, Failures: 0, Errors: 0, Skipped: 0, BUILD SUCCESS (10.999s)"
+    },
+    {
+      "command": "cd frontend && npx vitest run 2>&1 | tail -20",
+      "result": "passed",
+      "notes": "Test Files: 22 passed (22), Tests: 587 passed (587), Duration: 1.82s"
+    },
+    {
+      "command": "cd frontend && npm run build 2>&1 | tail -10",
+      "result": "passed",
+      "notes": "built in 5.82s, no errors"
+    }
+  ],
+  "acceptance_status": [
+    {
+      "criterion": "AC1: BUG-V2-01 approve NPE 修复",
+      "status": "PASS",
+      "evidence": [
+        "InventoryController.java 第 59-61 行已添加 taskId null/空值校验：if (taskId == null || taskId.isBlank()) return Result.error(400, \"taskId 不能为空\")",
+        "mvn test 191/191 通过，含 InventoryController 相关测试"
+      ]
+    },
+    {
+      "criterion": "AC2: BUG-V2-02/03 Disposal/Compensation 500（审计确认为设计意图）",
+      "status": "PASS",
+      "evidence": [
+        "audit.json 明确记录：DisposalController transfer/clearance/scrap 抛 BusinessException(\"必须通过审批流程提交\")是设计决策，不是 Bug",
+        "CompensationController create/updateStatus 同理，为审批流程设计约束",
+        "前端已有 submitTransferApplication() 调用 POST /approvals 路径，不会直接触发这些 POST 端点"
+      ]
+    },
+    {
+      "criterion": "AC3: BUG-V2-04/05 vendor/location DDL",
+      "status": "PASS",
+      "evidence": [
+        "schema.sql 第 425 行已补充 CREATE TABLE IF NOT EXISTS vendor",
+        "schema.sql 第 440 行已补充 CREATE TABLE IF NOT EXISTS location",
+        "changes.json B1 批次记录：DDL 字段与对应 Entity 类对齐"
+      ]
+    },
+    {
+      "criterion": "AC4: BUG-V2-06 /health permitAll",
+      "status": "PASS",
+      "evidence": [
+        "SecurityConfig.java 第 41 行：.requestMatchers(\"/auth/**\", \"/public/**\", \"/health\", \"/system/health\", \"/system/info\").permitAll()",
+        "三个健康检查端点已全部加入白名单"
+      ]
+    },
+    {
+      "criterion": "AC5: BUG-V2-07 多状态筛选",
+      "status": "PASS",
+      "evidence": [
+        "AssetListPage.tsx 第 100 行：status: selectedStatuses.length > 0 ? selectedStatuses.join(',') : undefined",
+        "AssetListQuery.status 类型改为 string，兼容逗号拼接多值",
+        "后端 AssetService.queryAssets() 支持 comma-separated status：多值用 wrapper.in()，单值保持 wrapper.eq()",
+        "changes.json B3 批次确认后端逻辑正确"
+      ]
+    },
+    {
+      "criterion": "AC6: BUG-V2-11/12 双前缀清理",
+      "status": "PASS",
+      "evidence": [
+        "InventoryController.java 第 17 行：@RequestMapping(\"/inventory\")（无 /v1/ 前缀）",
+        "RetirementController.java 第 18 行：@RequestMapping(\"/retirement\")（无 /v1/ 前缀）",
+        "AuditDashboardController：@RequestMapping(\"/audit-logs\")（无 /v1/ 前缀）",
+        "WorkOrderController：@RequestMapping({\"/workorders\", \"/work-orders\"})（无 /v1/ 前缀）",
+        "前端 22 个文件 /v1/ 路径全部清理",
+        "vitest 587/587 通过，含 auditServiceApiClient.test.ts 路径断言更新"
+      ]
+    },
+    {
+      "criterion": "AC7: BUG-V2-14/15/16 Dept/Role 字段映射",
+      "status": "PASS",
+      "evidence": [
+        "Dept.java 第 38 行：@JsonProperty(\"deptName\") 注解在 name 字段上，JSON 序列化输出 deptName",
+        "Dept.java 第 51 行：@JsonProperty(\"sortOrder\") 注解在 orderNum 字段上",
+        "Dept.java 第 68 行：email 字段标记 @TableField(exist = false)，避免 INSERT/UPDATE 列不存在错误",
+        "BUG-V2-16 Role.java 确认字段映射正确，无需修改（审计结论）"
+      ]
+    },
+    {
+      "criterion": "AC8: BUG-V2-17 UserManagement 双前缀",
+      "status": "PASS",
+      "evidence": [
+        "changes.json B2 批次确认：UserManagementController @RequestMapping({\"/user-management\", \"/users\"}) 无 /v1/ 或 /api/ 前缀问题",
+        "全局扫描 25 个 Controller 无遗漏双前缀"
+      ]
+    },
+    {
+      "criterion": "AC9: 通知路径统一",
+      "status": "PASS",
+      "evidence": [
+        "frontend/src/api/notification.ts 第 25 行：getUnreadCount 路径改为 /notifications/pending/count（对齐后端端点）",
+        "NotificationController 已补充 GET /notifications 分页列表、PUT /notifications/{id}/read、PUT /notifications/read-all、DELETE /notifications/{id} 端点",
+        "前端 NotificationsPage 所有 API 调用不再 404"
+      ]
+    },
+    {
+      "criterion": "AC10: HelloController 双前缀",
+      "status": "PASS",
+      "evidence": [
+        "HelloController.java 第 10 行：@RequestMapping(\"\")（原为 @RequestMapping(\"/api\")）",
+        "实际路径从 /api/api/hello 修正为 /api/hello"
+      ]
+    },
+    {
+      "criterion": "AC11: mvn test + npm build + vitest 全通过",
+      "status": "PASS",
+      "evidence": [
+        "mvn test: 191 tests, 0 failures, 0 errors, BUILD SUCCESS (10.999s)",
+        "vitest: 22 test files, 587 tests passed, 0 failures (1.82s)",
+        "npm build: built in 5.82s, no errors"
+      ]
+    }
+  ],
+  "findings": [
+    "通知端点 PUT /notifications/{id}/read、PUT /notifications/read-all、DELETE /notifications/{id} 为 TODO stub 实现——不持久化已读/删除状态，页面刷新后状态丢失。需要后续实现独立 notification 表和 NotificationService",
+    "Dept.java deleted 字段未添加 @TableLogic 注解（audit.json 建议 BUG-V2-15 中提过），需确认是否在 schema 中有 deleted 列以及是否需要逻辑删除支持",
+    "assetExport.ts 中 /locations/cascade 路径对应的 LocationController 无 /cascade 端点（仅有 /list, /root, /{id}），位置级联筛选可能 404",
+    "inventoryHandlers.ts 注释中仍有 /api/v1/ 引用（仅注释，不影响功能）"
+  ],
+  "residual_risks": [
+    "通知 markAsRead/markAllAsRead/delete 为 stub——不持久化状态，需后续实现独立 notification 表",
+    "LocationController 缺少 /cascade 端点——导出筛选面板的位置级联可能 404",
+    "Dept.java deleted 字段的 @TableLogic 注解未确认——如果 sys_dept 表有 deleted 列且需要逻辑删除，需后续补充",
+    "工单资产搜索目前仅支持单个资产关联，WorkOrderDTO.assetId 为 Long（单值）"
+  ]
+}

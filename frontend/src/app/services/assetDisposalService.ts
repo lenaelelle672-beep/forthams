@@ -5,7 +5,7 @@
  * viewing disposal details, and performing approve/reject actions on
  * disposal workflows.
  *
- * Backend endpoints are served by RetirementController under /v1/retirement.
+ * Backend endpoints are served by RetirementController under /retirement.
  *
  * @module services/assetDisposalService
  * @since SWARM-028
@@ -150,7 +150,7 @@ export interface DisposalStatistics {
 export async function fetchDisposalList(
   params?: DisposalListParams,
 ): Promise<DisposalListResponse> {
-  return api.get<DisposalListResponse>('/v1/retirement/applications', {
+  return api.get<DisposalListResponse>('/retirement/applications', {
     params: {
       page: params?.page ?? 1,
       pageSize: params?.pageSize ?? 10,
@@ -175,7 +175,7 @@ export async function fetchDisposalList(
 export async function fetchDisposalDetail(
   id: number,
 ): Promise<DisposalApplication> {
-  return api.get<DisposalApplication>(`/v1/retirement/${id}`);
+  return api.get<DisposalApplication>(`/retirement/${id}`);
 }
 
 /**
@@ -193,7 +193,7 @@ export async function fetchDisposalDetail(
 export async function approveDisposal(
   id: number,
 ): Promise<DisposalApplication> {
-  return api.post<DisposalApplication>(`/v1/retirement/${id}/approve`);
+  return api.post<DisposalApplication>(`/retirement/${id}/approve`);
 }
 
 /**
@@ -213,7 +213,7 @@ export async function rejectDisposal(
   id: number,
   reason?: string,
 ): Promise<DisposalApplication> {
-  return api.post<DisposalApplication>(`/v1/retirement/${id}/reject`, {
+  return api.post<DisposalApplication>(`/retirement/${id}/reject`, {
     reason,
   });
 }
@@ -230,7 +230,7 @@ export async function rejectDisposal(
  * ```
  */
 export async function fetchDisposalStatistics(): Promise<DisposalStatistics> {
-  return api.get<DisposalStatistics>('/v1/retirement/statistics');
+  return api.get<DisposalStatistics>('/retirement/statistics');
 }
 
 /**
@@ -242,7 +242,7 @@ export async function fetchDisposalStatistics(): Promise<DisposalStatistics> {
 export async function fetchAssetDisposalHistory(
   assetId: number,
 ): Promise<DisposalApplication[]> {
-  return api.get<DisposalApplication[]>(`/v1/retirement/asset/${assetId}`);
+  return api.get<DisposalApplication[]>(`/retirement/asset/${assetId}`);
 }
 
 export interface DisposalApprovalRecord {
@@ -259,19 +259,19 @@ export interface DisposalApprovalRecord {
 export async function fetchDisposalApprovalHistory(
   id: number,
 ): Promise<DisposalApprovalRecord[]> {
-  return api.get<DisposalApprovalRecord[]>(`/v1/retirement/${id}/approval-history`);
+  return api.get<DisposalApprovalRecord[]>(`/retirement/${id}/approval-history`);
 }
 
 export async function approveDisposalWithComment(
   id: number,
   comment?: string,
 ): Promise<DisposalApplication> {
-  return api.post<DisposalApplication>(`/v1/retirement/${id}/approve`, { comment });
+  return api.post<DisposalApplication>(`/retirement/${id}/approve`, { comment });
 }
 
 export async function rejectDisposalWithReason(
   id: number,
   reason: string,
 ): Promise<DisposalApplication> {
-  return api.post<DisposalApplication>(`/v1/retirement/${id}/reject`, { reason });
+  return api.post<DisposalApplication>(`/retirement/${id}/reject`, { reason });
 }

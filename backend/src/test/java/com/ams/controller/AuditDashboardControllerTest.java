@@ -42,7 +42,7 @@ class AuditDashboardControllerTest {
     private AuditDashboardService auditDashboardService;
 
     @Test
-    @DisplayName("Should expose v1 audit-log list route and pass filters to service")
+    @DisplayName("Should expose audit-logs list route and pass filters to service")
     void v1ListRoutePassesFiltersToService() throws Exception {
         GeneralAuditEntry entry = new GeneralAuditEntry();
         entry.setId(1001L);
@@ -68,7 +68,7 @@ class AuditDashboardControllerTest {
                 eq("ASSET")))
                 .thenReturn(Result.success(page));
 
-        mockMvc.perform(get("/api/v1/audit-log/list")
+        mockMvc.perform(get("/api/audit-logs/list")
                         .contextPath("/api")
                         .param("page", "0")
                         .param("size", "20")
@@ -93,7 +93,7 @@ class AuditDashboardControllerTest {
     }
 
     @Test
-    @DisplayName("Should expose v1 audit-log trend route and pass snake_case filters")
+    @DisplayName("Should expose audit-logs trend route and pass snake_case filters")
     void v1TrendRoutePassesFiltersToService() throws Exception {
         TrendVO trend = TrendVO.builder()
                 .granularity("weekly")
@@ -114,7 +114,7 @@ class AuditDashboardControllerTest {
                 eq("ASSET")))
                 .thenReturn(trend);
 
-        mockMvc.perform(get("/api/v1/audit-log/trend")
+        mockMvc.perform(get("/api/audit-logs/trend")
                         .contextPath("/api")
                         .param("start_time", "2026-05-01T00:00:00Z")
                         .param("end_time", "2026-05-31T23:59:59Z")

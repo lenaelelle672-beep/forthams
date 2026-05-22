@@ -61,7 +61,7 @@ export const getAuditLogDetail = (id: number) =>
 
 /** 审计仪表板统计（趋势+分布） */
 export const getAuditStats = (params?: Pick<AuditListQuery, 'startTime' | 'endTime' | 'operationType'>) =>
-  http.get<ApiResponse<AuditStats>>('/v1/audit/stats', { params });
+  http.get<ApiResponse<AuditStats>>('/audit-logs/stats', { params });
 
 /** 获取资产的审计日志 */
 export const getAssetAuditLogs = (

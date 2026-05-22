@@ -5,12 +5,12 @@ import { http, HttpResponse, delay } from 'msw';
  * Conforms to [SWARM-P2-006-FE] specification.
  *
  * Endpoints covered:
- * - GET  /api/v1/assets/import/template    — Download import template (.xlsx)
- * - POST /api/v1/assets/import/parse       — Upload & parse Excel, return rows + errors
- * - POST /api/v1/assets/import/commit      — Commit corrected rows for final import
- * - POST /api/v1/assets/export             — Export assets as .xlsx based on filters
- * - GET  /api/v1/asset-categories/tree     — Category tree for export filter panel
- * - GET  /api/v1/asset-locations/cascade   — Location cascade for export filter panel
+ * - GET  /api/assets/import/template    — Download import template (.xlsx)
+ * - POST /api/assets/import/parse       — Upload & parse Excel, return rows + errors
+ * - POST /api/assets/import/commit      — Commit corrected rows for final import
+ * - POST /api/assets/export             — Export assets as .xlsx based on filters
+ * - GET  /api/categories/tree     — Category tree for export filter panel
+ * - GET  /api/locations/cascade   — Location cascade for export filter panel
  */
 
 // ─── Type Definitions ───────────────────────────────────────────────
@@ -245,7 +245,7 @@ export const assetImportExportHandlers = [
    * Download the Excel import template file.
    * ATB-002: Returns xlsx file with filename containing "asset_import_template".
    */
-  http.get('/api/v1/assets/import/template', async () => {
+   http.get('/api/assets/import/template', async () => {
     await delay(500);
     const blob = createExcelBlob();
     return new HttpResponse(blob, {
@@ -264,7 +264,7 @@ export const assetImportExportHandlers = [
    * Response shape: { parseId: string, rows: AssetRow[], errors: RowError[] }
    * ATB-008: Returns 50 rows (5 with errors) for pagination testing.
    */
-  http.post('/api/v1/assets/import/parse', async ({ request }) => {
+   http.post('/api/assets/import/parse', async ({ request }) => {
     await delay(1500);
 
     const formData = await request.formData();
@@ -294,7 +294,7 @@ export const assetImportExportHandlers = [
    * Response body: { success: boolean, importedCount: number, failedCount: number }
    * ATB-011: Shows success summary after commit.
    */
-  http.post('/api/v1/assets/import/commit', async ({ request }) => {
+   http.post('/api/assets/import/commit', async ({ request }) => {
     await delay(1000);
 
     const body = (await request.json()) as {
@@ -335,7 +335,7 @@ export const assetImportExportHandlers = [
    * Response:      Binary file stream (application/octet-stream)
    * ATB-016: Filename matches pattern 资产台账_YYYYMMDD_HHmmss.xlsx
    */
-  http.post('/api/v1/assets/export', async ({ request }) => {
+   http.post('/api/assets/export', async ({ request }) => {
     await delay(1200);
 
     // Validate request shape (filters are optional but body must parse)
@@ -363,7 +363,7 @@ export const assetImportExportHandlers = [
    * Return the asset category tree structure for the export filter panel.
    * ATB-014: TreeSelect data with hierarchical structure.
    */
-  http.get('/api/v1/asset-categories/tree', async () => {
+   http.get('/api/categories/tree', async () => {
     await delay(300);
     return HttpResponse.json(categoryTree);
   }),
@@ -373,7 +373,7 @@ export const assetImportExportHandlers = [
    * Return the location cascade data for the export filter panel.
    * ATB-014: Cascader data with province/city/district levels.
    */
-  http.get('/api/v1/asset-locations/cascade', async () => {
+   http.get('/api/locations/cascade', async () => {
     await delay(300);
     return HttpResponse.json(locationCascade);
   }),

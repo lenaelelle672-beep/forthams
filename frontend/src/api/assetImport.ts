@@ -2,10 +2,10 @@
  * 资产批量导入导出 API 客户端
  *
  * 对接后端端点：
- * - GET  /api/v1/assets/import/template    — 下载导入模板（文件流）
- * - POST /api/v1/assets/import/parse       — 上传并解析 Excel（multipart/form-data）
- * - POST /api/v1/assets/import/commit      — 确认提交解析数据（JSON body）
- * - POST /api/v1/assets/export             — 按条件导出（JSON body，返回文件流）
+ * - GET  /api/assets/import/template    — 下载导入模板（文件流）
+ * - POST /api/assets/import/parse       — 上传并解析 Excel（multipart/form-data）
+ * - POST /api/assets/import/commit      — 确认提交解析数据（JSON body）
+ * - POST /api/assets/export             — 按条件导出（JSON body，返回文件流）
  *
  * @module frontend/src/api/assetImport
  * @spec SWARM-P2-006-FE
@@ -63,12 +63,12 @@ export interface ExportFilters {
 
 /**
  * FE-2: 下载资产导入模板
- * GET /api/v1/assets/import/template
+ * GET /api/assets/import/template
  * 返回文件流（Blob）
  */
 export const getImportTemplate = async (): Promise<Blob> => {
   const response = await http.get<Blob>(
-    '/v1/assets/import/template',
+    '/assets/import/template',
     { responseType: 'blob' },
   );
   return response as any;
@@ -76,7 +76,7 @@ export const getImportTemplate = async (): Promise<Blob> => {
 
 /**
  * FE-3 / FE-4 / FE-5: 上传并解析 Excel 文件
- * POST /api/v1/assets/import/parse
+ * POST /api/assets/import/parse
  * Content-Type: multipart/form-data, field name: file
  *
  * @param file  - 上传的 .xlsx 文件
@@ -90,7 +90,7 @@ export const parseImportFile = async (
   formData.append('file', file);
 
   const response = await http.post<ParseResponse>(
-    '/v1/assets/import/parse',
+    '/assets/import/parse',
     formData,
     {
       headers: { 'Content-Type': 'multipart/form-data' },
@@ -109,7 +109,7 @@ export const parseImportFile = async (
 
 /**
  * FE-7: 确认提交解析数据
- * POST /api/v1/assets/import/commit
+ * POST /api/assets/import/commit
  *
  * @param parseId - 解析阶段返回的 ID
  * @param rows    - 用户修正后的资产行数据（可能包含用户编辑后的内容）
@@ -119,7 +119,7 @@ export const commitImport = async (
   rows: AssetRow[],
 ): Promise<CommitResponse> => {
   const response = await http.post<CommitResponse>(
-    '/v1/assets/import/commit',
+    '/assets/import/commit',
     { parseId, rows },
   );
   return response as any;
@@ -127,14 +127,14 @@ export const commitImport = async (
 
 /**
  * FE-9: 按条件导出资产台账
- * POST /api/v1/assets/export
+ * POST /api/assets/export
  * Content-Type: application/json，返回文件流（Blob）
  *
  * @param filters - 筛选条件：分类编码、状态编码、位置编码数组
  */
 export const exportAssets = async (filters: ExportFilters): Promise<Blob> => {
   const response = await http.post<Blob>(
-    '/v1/assets/export',
+    '/assets/export',
     {
       categoryCodes: filters.categoryCodes,
       statusCodes: filters.statusCodes,

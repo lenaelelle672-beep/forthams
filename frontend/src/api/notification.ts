@@ -22,7 +22,7 @@ export const getNotifications = (params?: NotificationListQuery) =>
 
 /** 获取未读通知数量 */
 export const getUnreadCount = () =>
-  http.get<ApiResponse<number>>('/notifications/unread-count');
+  http.get<ApiResponse<number>>('/notifications/pending/count');
 
 /** 标记通知为已读 */
 export const markAsRead = (id: number) =>

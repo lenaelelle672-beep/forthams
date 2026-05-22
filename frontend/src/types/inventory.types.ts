@@ -41,7 +41,7 @@ export type ActualStatus = 'normal' | 'surplus' | 'deficit' | 'damaged' | 'other
 // ============================================================================
 
 /**
- * 盘点任务 — 对应 GET /api/v1/inventory/tasks 返回的单条记录
+ * 盘点任务 — 对应 GET /api/inventory/tasks 返回的单条记录
  */
 export interface InventoryTask {
   /** 盘点任务唯一标识 (UUID) */
@@ -73,7 +73,7 @@ export interface InventoryTask {
 }
 
 /**
- * 盘点资产 — 对应 GET /api/v1/inventory/tasks/:taskId/assets 返回的单条记录
+ * 盘点资产 — 对应 GET /api/inventory/tasks/:taskId/assets 返回的单条记录
  */
 export interface InventoryAsset {
   /** 资产唯一标识 */
@@ -147,7 +147,7 @@ export interface CreateTaskPayload {
 }
 
 /**
- * 更新任务状态请求 — PATCH /api/v1/inventory/tasks/:taskId/status
+ * 更新任务状态请求 — PATCH /api/inventory/tasks/:taskId/status
  */
 export interface UpdateTaskStatusPayload {
   /** 目标状态 */
@@ -155,7 +155,7 @@ export interface UpdateTaskStatusPayload {
 }
 
 /**
- * 逐条确认资产请求 — PATCH /api/v1/inventory/tasks/:taskId/assets/:assetId/confirm
+ * 逐条确认资产请求 — PATCH /api/inventory/tasks/:taskId/assets/:assetId/confirm
  */
 export interface ConfirmPayload {
   /** 实盘状态 */
@@ -165,7 +165,7 @@ export interface ConfirmPayload {
 }
 
 /**
- * 批量确认资产请求 — POST /api/v1/inventory/tasks/:taskId/assets/batch-confirm
+ * 批量确认资产请求 — POST /api/inventory/tasks/:taskId/assets/batch-confirm
  * 单次上限 100 条
  */
 export interface BatchConfirmPayload {
@@ -178,7 +178,7 @@ export interface BatchConfirmPayload {
 }
 
 /**
- * 提交核准请求 — POST /api/v1/inventory/tasks/:taskId/submit
+ * 提交核准请求 — POST /api/inventory/tasks/:taskId/submit
  * 无额外请求体参数，taskId 在 URL 路径中
  */
 export type SubmitPayload = Record<string, never>;

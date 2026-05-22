@@ -321,7 +321,7 @@ export function useDepreciation(
       }
 
       const response = await httpClient.get<ApiResponse<DepreciationResult>>(
-        `/api/v1/assets/${assetId}/depreciation`,
+        `/assets/${assetId}/depreciation`,
         { params }
       );
 

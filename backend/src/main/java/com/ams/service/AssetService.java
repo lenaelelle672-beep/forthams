@@ -51,7 +51,17 @@ public class AssetService {
             wrapper.eq(Asset::getCategoryId, queryDTO.getCategoryId());
         }
         if (queryDTO.getStatus() != null && !queryDTO.getStatus().isEmpty()) {
-            wrapper.eq(Asset::getStatus, parseStatus(queryDTO.getStatus()).name());
+            // 支持逗号分隔的多状态查询（如 "IDLE,IN_USE"）
+            if (queryDTO.getStatus().contains(",")) {
+                java.util.List<String> statusValues = java.util.Arrays.stream(queryDTO.getStatus().split(","))
+                        .map(String::trim)
+                        .filter(s -> !s.isEmpty())
+                        .map(s -> parseStatus(s).name())
+                        .toList();
+                wrapper.in(Asset::getStatus, statusValues);
+            } else {
+                wrapper.eq(Asset::getStatus, parseStatus(queryDTO.getStatus()).name());
+            }
         }
         if (queryDTO.getDeptId() != null) {
             wrapper.eq(Asset::getDeptId, queryDTO.getDeptId());

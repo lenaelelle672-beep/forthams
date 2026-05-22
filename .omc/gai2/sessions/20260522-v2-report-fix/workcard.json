@@ -1,0 +1,32 @@
+{
+  "directive": "按 REAL_USER_TEST_REPORT_V2.md 修复全部 P0 和 P1 问题，选择性修复高价值 P2 问题。目标：P0 清零，P1 大幅降低，API 通过率从 79.3% 提升到 90%+。",
+  "owner": "gai2-orchestrator",
+  "phase": "workcard_created",
+  "artifact_dir": ".omc/gai2/sessions/20260522-v2-report-fix",
+  "language_protocol": "所有自然语言输出必须使用简体中文；代码、命令、路径、JSON key、API 名称和错误原文可以保留英文。",
+  "constraints": [
+    "仅使用 .omc/gai2/ 作为状态和产物目录，保留 legacy gai 不动。",
+    "orchestrator 不直接运行项目命令、不编辑业务文件、不替代子 agent 实现。",
+    "创建 workcard 后必须调度 gai2-triage；实现必须由 gai2-builder；收尾必须由 gai2-reviewer。"
+  ],
+  "acceptance_checks": [
+    {"id":"AC1","description":"BUG-V2-01: POST /inventory/approve Long.valueOf(taskId) 空值检查，防 NPE","status":"pending"},
+    {"id":"AC2","description":"BUG-V2-02/03: DisposalController/CompensationController POST 返回 400 而非 500","status":"pending"},
+    {"id":"AC3","description":"BUG-V2-04/05: schema.sql 补建 vendor 和 location 表 DDL","status":"pending"},
+    {"id":"AC4","description":"BUG-V2-06: SecurityConfig 添加 /health、/system/health 到 permitAll()","status":"pending"},
+    {"id":"AC5","description":"BUG-V2-07: AssetListPage 多状态筛选改为逗号拼接或数组参数","status":"pending"},
+    {"id":"AC6","description":"BUG-V2-11/12: InventoryController/RetirementController 清理 /v1/ 双前缀","status":"pending"},
+    {"id":"AC7","description":"BUG-V2-14/15/16: Dept Entity 删除 email / 添加 deleted + @TableLogic；Role Entity 添加 sortOrder","status":"pending"},
+    {"id":"AC8","description":"BUG-V2-17: UserManagementController 清理双前缀","status":"pending"},
+    {"id":"AC9","description":"通知中心前后端路径统一：前端 /unread-count 对齐后端","status":"pending"},
+    {"id":"AC10","description":"HelloController 双 /api 前缀修复","status":"pending"},
+    {"id":"AC11","description":"mvn test + npm build + vitest 全部通过","status":"pending"}
+  ],
+  "known_context": {
+    "report_path": "REAL_USER_TEST_REPORT_V2.md",
+    "p0_count": 6,
+    "p1_count": 11,
+    "current_pass_rate": "79.3%",
+    "v1_fixed": ["B-1 双/api x4","B-2 Vendor","B-3 Location","B-4 applicantId","B-5 IN_STOCK","B-6 categoryCode","B-8 workflow","B-9 audit"]
+  }
+}

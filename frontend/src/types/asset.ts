@@ -229,8 +229,8 @@ export interface AssetListQuery extends BaseListQuery {
   assetName?: string;
   /** 分类 ID */
   categoryId?: number;
-  /** 资产状态 */
-  status?: AssetStatus;
+  /** 资产状态（支持逗号分隔多值，如 "IDLE,IN_USE"） */
+  status?: string;
   /** 部门 ID */
   deptId?: number;
   /** 是否重要设备 */

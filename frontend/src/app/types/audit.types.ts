@@ -99,7 +99,7 @@ export const AUDIT_PAGINATION_CONSTRAINTS = {
 
 /**
  * 审计日志条目接口。
- * 对应后端 `/api/v1/audit-logs` 返回的 items 数组中的单条记录。
+ * 对应后端 `/api/audit-logs` 返回的 items 数组中的单条记录。
  */
 export interface AuditLog {
   /** 日志唯一标识 */
@@ -187,7 +187,7 @@ export interface TrendDataQuery {
 
 /**
  * 审计日志列表 API 响应接口。
- * 对应 `GET /api/v1/audit-logs` 的响应体结构。
+ * 对应 `GET /api/audit-logs` 的响应体结构。
  */
 export interface AuditLogListResponse {
   /** 审计日志条目列表 */

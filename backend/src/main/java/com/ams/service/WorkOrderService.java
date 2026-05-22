@@ -5,8 +5,10 @@ import com.ams.common.exception.BusinessException;
 import com.ams.context.TenantContext;
 import com.ams.dto.WorkOrderDTO;
 import com.ams.entity.ApprovalProcess;
+import com.ams.entity.User;
 import com.ams.entity.WorkOrder;
 import com.ams.mapper.ApprovalProcessMapper;
+import com.ams.mapper.UserMapper;
 import com.ams.mapper.WorkOrderMapper;
 import com.ams.security.TenantSecurityAudit;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -15,6 +17,8 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -33,6 +37,7 @@ public class WorkOrderService {
 
     private final WorkOrderMapper workOrderMapper;
     private final ApprovalProcessMapper approvalProcessMapper;
+    private final UserMapper userMapper;
 
     public Page<WorkOrder> queryWorkOrders(Integer page, Integer pageSize, String status, String keyword) {
         String tenantId = TenantContext.requireTenantId();
@@ -226,9 +231,44 @@ public class WorkOrderService {
         approvalProcess.setTenantId(workOrder.getTenantId());
         approvalProcess.setStatus(status);
         approvalProcess.setCurrentStep(1);
-        approvalProcess.setApplicantId(workOrder.getReporterId() != null ? workOrder.getReporterId() : 0L);
+        approvalProcess.setApplicantId(resolveApplicantId(workOrder));
         approvalProcess.setApplyTime(LocalDateTime.now());
         approvalProcessMapper.insert(approvalProcess);
+    }
+
+    /**
+     * 优先使用 workOrder.reporterId，其次从 SecurityContext 获取当前认证用户 ID，最终兜底 0L。
+     */
+    private Long resolveApplicantId(WorkOrder workOrder) {
+        if (workOrder.getReporterId() != null) {
+            return workOrder.getReporterId();
+        }
+        Long currentUserId = getCurrentUserIdFromSecurityContext();
+        return currentUserId != null ? currentUserId : 0L;
+    }
+
+    /**
+     * 从 Spring Security SecurityContext 中获取当前认证用户的数据库 ID。
+     * Authentication.principal 为 Spring Security User（仅含 username），需通过 UserMapper 反查 ID。
+     */
+    private Long getCurrentUserIdFromSecurityContext() {
+        try {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getPrincipal())) {
+                return null;
+            }
+            String username = auth.getName();
+            User user = userMapper.selectOne(
+                    new LambdaQueryWrapper<User>()
+                            .eq(User::getUsername, username)
+                            .eq(User::getStatus, 1)
+                            .last("LIMIT 1")
+            );
+            return user != null ? user.getId() : null;
+        } catch (Exception e) {
+            log.warn("failed_to_resolve_current_user_id: {}", e.getMessage());
+            return null;
+        }
     }
 
     private ApprovalProcess findApprovalProcess(Long workOrderId) {

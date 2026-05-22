@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -19,14 +19,15 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { createWorkOrder, updateWorkOrder } from '@/api/workorder';
+import { getAssetList } from '@/api/asset';
 import { getUserList } from '@/api/base';
 import type { UserItem } from '@/api/base';
-import type { PaginatedResponse } from '@/types/common';
+import type { PaginatedResponse, ApiResponse, PageData } from '@/types/common';
+import type { AssetListItem } from '@/types/asset';
 
 const schema = z.object({
   title: z.string().min(5, '标题至少 5 个字').max(100),
   type: z.enum(['PURCHASE', 'REPAIR', 'TRANSFER', 'DISPOSAL', 'OTHER']),
-  assetKeyword: z.string().optional(),
   priority: z.enum(['LOW', 'MEDIUM', 'HIGH', 'CRITICAL']),
   description: z.string().max(1000).optional(),
   estimatedCost: z.coerce.number().min(0).optional(),
@@ -65,6 +66,12 @@ export default function WorkOrderFormPage() {
   const [collabInput, setCollabInput] = useState('');
   const [collaboratorsList, setCollaboratorsList] = useState<string[]>(collaborators);
   const [assigneeOptions, setAssigneeOptions] = useState(ASSIGNEE_DEFAULT);
+  const [assetSearch, setAssetSearch] = useState('');
+  const [assetResults, setAssetResults] = useState<AssetListItem[]>([]);
+  const [showAssetDropdown, setShowAssetDropdown] = useState(false);
+  const [selectedAsset, setSelectedAsset] = useState<{ id: number; assetName: string; assetNo: string } | null>(null);
+  const assetSearchRef = useRef<HTMLDivElement>(null);
+  const assetSearchTimer = useRef<ReturnType<typeof setTimeout>>();
   const editId = params.id ? Number(params.id) : null;
   const isEdit = editId !== null;
 
@@ -92,6 +99,38 @@ export default function WorkOrderFormPage() {
     return () => { cancelled = true; };
   }, []);
 
+  // 资产搜索（防抖 300ms，复用 GET /assets 接口）
+  const searchAssets = useCallback((keyword: string) => {
+    if (assetSearchTimer.current) clearTimeout(assetSearchTimer.current);
+    if (!keyword.trim()) {
+      setAssetResults([]);
+      setShowAssetDropdown(false);
+      return;
+    }
+    assetSearchTimer.current = setTimeout(async () => {
+      try {
+        const res = await getAssetList({ keyword, pageSize: 10 });
+        const records = (res as ApiResponse<PageData<AssetListItem>> | undefined)?.data?.records ?? [];
+        setAssetResults(records);
+        setShowAssetDropdown(records.length > 0);
+      } catch {
+        setAssetResults([]);
+        setShowAssetDropdown(false);
+      }
+    }, 300);
+  }, []);
+
+  // 点击外部关闭资产搜索下拉
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (assetSearchRef.current && !assetSearchRef.current.contains(e.target as Node)) {
+        setShowAssetDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   const {
     register,
     handleSubmit,
@@ -109,10 +148,17 @@ export default function WorkOrderFormPage() {
 
   const saveMutation = useMutation({
     mutationFn: async (data: FormValues) => {
+      // 合并选中的资产信息
+      const payload = {
+        ...data,
+        assetId: selectedAsset?.id ?? null,
+        assetName: selectedAsset?.assetName ?? null,
+        assetCode: selectedAsset?.assetNo ?? null,
+      };
       if (isEdit && editId) {
-        return updateWorkOrder(editId, data);
+        return updateWorkOrder(editId, payload);
       }
-      return createWorkOrder(data);
+      return createWorkOrder(payload);
     },
     onSuccess: (res: unknown) => {
       qc.invalidateQueries({ queryKey: ['workorders'] });
@@ -189,15 +235,58 @@ export default function WorkOrderFormPage() {
 
                   <div className="flex flex-col gap-1.5">
                     <label className="text-xs font-semibold tracking-wide text-[#434655]">关联资产</label>
-                    <div className="relative">
-                      <input
-                        className="w-full h-9 rounded border border-[#c3c6d7] text-sm pl-3 pr-10 bg-white focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20 focus:border-[#2563eb]"
-                        placeholder="搜索或选择资产..."
-                        {...register('assetKeyword')}
-                      />
-                      <button type="button" className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-[#434655] hover:bg-[#e0e3e5] rounded transition-colors">
-                        <Search className="w-4 h-4" />
-                      </button>
+                    <div className="relative" ref={assetSearchRef}>
+                      {selectedAsset ? (
+                        <div className="flex items-center gap-2 h-9 border border-[#c3c6d7] rounded px-3 bg-[#f1f3ff]">
+                          <span className="text-sm text-[#191c1e] font-medium truncate">{selectedAsset.assetName}</span>
+                          <span className="text-xs text-[#434655]">({selectedAsset.assetNo})</span>
+                          <button
+                            type="button"
+                            className="ml-auto text-[#434655] hover:text-[#ba1a1a]"
+                            onClick={() => setSelectedAsset(null)}
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ) : (
+                        <>
+                          <input
+                            className="w-full h-9 rounded border border-[#c3c6d7] text-sm pl-3 pr-10 bg-white focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20 focus:border-[#2563eb]"
+                            placeholder="搜索资产编号或名称..."
+                            value={assetSearch}
+                            onChange={(e) => {
+                              setAssetSearch(e.target.value);
+                              searchAssets(e.target.value);
+                            }}
+                            onFocus={() => {
+                              if (assetResults.length > 0) setShowAssetDropdown(true);
+                            }}
+                          />
+                          <button type="button" className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-[#434655] hover:bg-[#e0e3e5] rounded transition-colors">
+                            <Search className="w-4 h-4" />
+                          </button>
+                          {showAssetDropdown && (
+                            <div className="absolute z-20 top-10 left-0 right-0 bg-white border border-[#e5e7eb] rounded shadow-lg max-h-48 overflow-y-auto">
+                              {assetResults.map((a) => (
+                                <button
+                                  key={a.id}
+                                  type="button"
+                                  className="w-full text-left px-3 py-2 hover:bg-[#f1f3ff] text-sm flex items-center gap-2"
+                                  onClick={() => {
+                                    setSelectedAsset({ id: a.id, assetName: a.assetName ?? '', assetNo: a.assetNo ?? '' });
+                                    setAssetSearch('');
+                                    setShowAssetDropdown(false);
+                                    setAssetResults([]);
+                                  }}
+                                >
+                                  <span className="font-medium">{a.assetName}</span>
+                                  <span className="text-xs text-[#434655]">{a.assetNo}</span>
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </>
+                      )}
                     </div>
                   </div>
 

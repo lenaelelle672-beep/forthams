@@ -9,7 +9,7 @@
  * - 列表查询强制分页，单页上限 100 条（默认 50 条）
  * - 深度分页限制偏移量不超过 10000
  * - 后端交互强制使用 UTC 时间（ISO 8601 格式）
- * - 操作类型枚举由后端统一下发（/api/v1/audit-log/meta），前端禁止硬编码
+ * - 操作类型枚举由后端统一下发（/api/audit-logs/meta），前端禁止硬编码
  */
 
 // ---------------------------------------------------------------------------
@@ -38,7 +38,7 @@ export interface AuditLogListParams {
   endTime: Date;
   /** 操作人 ID（可选） */
   operatorId?: string;
-  /** 操作类型编码（可选，值来源于 /api/v1/audit-log/meta 下发） */
+  /** 操作类型编码（可选，值来源于 /api/audit-logs/meta 下发） */
   actionType?: string;
   /** 页码，从 1 开始（默认 1） */
   page?: number;
@@ -149,7 +149,7 @@ const MAX_PAGE_SIZE = 100;
 const MAX_OFFSET = 10000;
 
 /** API 基础路径 */
-const API_BASE = '/api/v1/audit-log';
+const API_BASE = '/audit-logs';
 
 // ---------------------------------------------------------------------------
 // HTTP 客户端适配

@@ -1,7 +1,7 @@
 /**
  * @file api/retirement.ts
  * @description 资产退役 API
- * 对应后端：RetirementController (/retirement, /v1/retirement)
+ * 对应后端：RetirementController (/retirement)
  */
 
 import http from '@/utils/http';

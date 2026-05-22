@@ -41,13 +41,13 @@ class RetirementControllerTest {
     private JwtUtil jwtUtil;
 
     @Test
-    @DisplayName("Should expose v1 retirement apply route behind api context path")
+    @DisplayName("Should expose retirement apply route behind api context path")
     void applyRouteUsesApiContextPathOnlyOnce() throws Exception {
         RetirementApplication application = new RetirementApplication();
         when(jwtUtil.getUserIdFromToken("test-token")).thenReturn(42L);
         when(retirementApplicationService.submitApplication(any(), eq(42L))).thenReturn(application);
 
-        mockMvc.perform(post("/api/v1/retirement/apply")
+        mockMvc.perform(post("/api/retirement/apply")
                         .contextPath("/api")
                         .header("Authorization", "Bearer test-token")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -62,13 +62,13 @@ class RetirementControllerTest {
     }
 
     @Test
-    @DisplayName("Should expose v1 my applications route behind api context path")
+    @DisplayName("Should expose my applications route behind api context path")
     void myApplicationsRouteUsesApiContextPathOnlyOnce() throws Exception {
         when(jwtUtil.getUserIdFromToken("test-token")).thenReturn(42L);
         when(retirementApplicationService.getMyApplications(eq(42L), eq(1), eq(10)))
                 .thenReturn(new Page<>(1, 10));
 
-        mockMvc.perform(get("/api/v1/retirement/my-applications")
+        mockMvc.perform(get("/api/retirement/my-applications")
                         .contextPath("/api")
                         .header("Authorization", "Bearer test-token"))
                 .andExpect(status().isOk())
@@ -104,7 +104,7 @@ class RetirementControllerTest {
         when(jwtUtil.getUserIdFromToken("test-token")).thenReturn(42L);
         when(retirementApplicationService.getApplicationById(99L)).thenReturn(application);
 
-        mockMvc.perform(post("/api/v1/retirement/99/cancel")
+        mockMvc.perform(post("/api/retirement/99/cancel")
                         .contextPath("/api")
                         .header("Authorization", "Bearer test-token"))
                 .andExpect(status().isOk())
@@ -123,7 +123,7 @@ class RetirementControllerTest {
         when(jwtUtil.getUserIdFromToken("test-token")).thenReturn(42L);
         when(retirementApplicationService.approveApplication(99L, 42L)).thenReturn(application);
 
-        mockMvc.perform(post("/api/v1/retirement/approve")
+        mockMvc.perform(post("/api/retirement/approve")
                         .contextPath("/api")
                         .header("Authorization", "Bearer test-token")
                         .contentType(MediaType.APPLICATION_JSON)

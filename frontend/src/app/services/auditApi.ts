@@ -169,7 +169,7 @@ const MAX_PAGE_SIZE = 100;
 const MAX_OFFSET = 10000;
 
 /** Base URL for audit log API endpoints */
-const API_BASE = '/api/v1/audit-log';
+const API_BASE = '/audit-logs';
 
 // ---------------------------------------------------------------------------
 // Utility Functions

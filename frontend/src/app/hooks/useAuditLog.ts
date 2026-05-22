@@ -7,7 +7,7 @@
  * 边界约束：
  * - 单次查询时间跨度不得超过 90 天
  * - 分页默认 50 条，单页上限 100 条
- * - 操作类型枚举由后端 `/api/v1/audit-log/meta` 动态下发，前端禁止硬编码
+ * - 操作类型枚举由后端 `/api/audit-logs/meta` 动态下发，前端禁止硬编码
  * - 前端统一转换为用户本地时区展示，API 交互强制使用 UTC（ISO 8601）
  * - 趋势图表粒度根据查询范围自适应：≤7天按小时，8-30天按天，>30天按周
  *
@@ -170,7 +170,7 @@ const MAX_PAGE_SIZE = 100;
 const MAX_OFFSET = 10000;
 
 /** API 基础路径 */
-const API_BASE = '/api/v1/audit-log';
+const API_BASE = '/audit-logs';
 
 // ---------------------------------------------------------------------------
 // 工具函数
@@ -453,7 +453,7 @@ export function useAuditLog(): UseAuditLogReturn {
    * 获取审计日志元数据（操作类型枚举）
    *
    * 遵循操作类型约束：操作类型枚举由后端统一下发
-   * （`/api/v1/audit-log/meta`），前端禁止硬编码，需动态渲染筛选项。
+     * （`/api/audit-logs/meta`），前端禁止硬编码，需动态渲染筛选项。
    */
   const fetchMeta = useCallback(async () => {
     setMetaLoading(true);

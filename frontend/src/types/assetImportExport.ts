@@ -51,7 +51,7 @@ export interface RowError {
 }
 
 /**
- * Response from POST /api/v1/assets/import/parse.
+ * Response from POST /api/assets/import/parse.
  * Contains the parsed rows and any row-level validation errors.
  *
  * Spec reference: Parse return data structure in Data Constraints.
@@ -66,7 +66,7 @@ export interface ParseResponse {
 }
 
 /**
- * Request payload for POST /api/v1/assets/import/commit.
+ * Request payload for POST /api/assets/import/commit.
  * Includes user-corrected rows after preview editing.
  *
  * Spec reference: Submit request structure in Data Constraints.
@@ -97,7 +97,7 @@ export interface ImportCommitResponse {
 // ============================================================
 
 /**
- * Request payload for POST /api/v1/assets/export.
+ * Request payload for POST /api/assets/export.
  * All filter dimensions are optional; empty arrays mean "no filter".
  * The endpoint returns a binary file stream (application/octet-stream).
  *
@@ -187,7 +187,7 @@ export interface PreviewRow extends AssetRow {
 
 /**
  * Tree node for the asset category TreeSelect component.
- * Data source: GET /api/v1/asset-categories/tree
+ * Data source: GET /api/categories/tree
  */
 export interface CategoryTreeNode {
   /** Category code used as the select value */
@@ -200,7 +200,7 @@ export interface CategoryTreeNode {
 
 /**
  * Cascader option for the location Cascader component.
- * Data source: GET /api/v1/asset-locations/cascade
+ * Data source: GET /api/locations/cascade
  */
 export interface LocationCascaderOption {
   /** Location code used as the cascader value */

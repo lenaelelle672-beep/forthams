@@ -13,7 +13,7 @@ import http from '@/utils/http';
 
 /**
  * 导出筛选条件
- * 对应 POST /api/v1/assets/export 请求体
+ * 对应 POST /api/assets/export 请求体
  */
 export interface ExportFilters {
   /** 资产分类编码列表 */
@@ -26,7 +26,7 @@ export interface ExportFilters {
 
 /**
  * 分类树节点
- * 对应 GET /api/v1/asset-categories/tree 返回结构
+ * 对应 GET /api/categories/tree 返回结构
  */
 export interface CategoryTreeNode {
   /** 分类编码 */
@@ -39,7 +39,7 @@ export interface CategoryTreeNode {
 
 /**
  * 位置级联选项
- * 对应 GET /api/v1/asset-locations/cascade 返回结构
+ * 对应 GET /api/locations/cascade 返回结构
  */
 export interface LocationCascadeOption {
   /** 位置编码 */
@@ -55,14 +55,14 @@ export interface LocationCascadeOption {
 /**
  * 按条件导出资产台账为 Excel 文件
  *
- * 调用 POST /api/v1/assets/export，以 Blob 方式接收文件流。
+ * 调用 POST /api/assets/export，以 Blob 方式接收文件流。
  * 响应 Content-Type 为 application/octet-stream。
  *
  * @param filters - 导出筛选条件（分类、状态、位置）
  * @returns Promise<Blob> Excel 文件的 Blob 对象
  */
 export const exportAssets = async (filters: ExportFilters): Promise<Blob> => {
-  const response = await http.post<Blob>('/v1/assets/export', filters, {
+  const response = await http.post<Blob>('/assets/export', filters, {
     responseType: 'blob',
   });
   return response as any;
@@ -71,14 +71,14 @@ export const exportAssets = async (filters: ExportFilters): Promise<Blob> => {
 /**
  * 获取资产分类树形数据
  *
- * 调用 GET /api/v1/asset-categories/tree，
+ * 调用 GET /api/categories/tree，
  * 用于导出筛选面板的 TreeSelect 组件数据源。
  *
  * @returns Promise<CategoryTreeNode[]> 分类树节点数组
  */
 export const getCategoryTree = async (): Promise<CategoryTreeNode[]> => {
   const response = await http.get<CategoryTreeNode[]>(
-    '/v1/asset-categories/tree',
+    '/categories/tree',
   );
   return response as any;
 };
@@ -86,14 +86,14 @@ export const getCategoryTree = async (): Promise<CategoryTreeNode[]> => {
 /**
  * 获取存放位置级联数据
  *
- * 调用 GET /api/v1/asset-locations/cascade，
+ * 调用 GET /api/locations/cascade，
  * 用于导出筛选面板的 Cascader 组件数据源（省/市/区级联）。
  *
  * @returns Promise<LocationCascadeOption[]> 位置级联选项数组
  */
 export const getLocationCascade = async (): Promise<LocationCascadeOption[]> => {
   const response = await http.get<LocationCascadeOption[]>(
-    '/v1/asset-locations/cascade',
+    '/locations/cascade',
   );
   return response as any;
 };

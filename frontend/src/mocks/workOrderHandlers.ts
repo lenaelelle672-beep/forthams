@@ -172,7 +172,7 @@ function executeApprovalOperation(
 
 /**
  * 工作单审批操作 Handler
- * POST /api/v1/work-orders/:id/operate
+ * POST /api/work-orders/:id/operate
  * 
  * ATB-3: 审批 API 接口测试
  */
@@ -180,7 +180,7 @@ export const workOrderApproveHandler = http.post<
   { id: string },
   ApprovalOperationRequest
 >(
-  '/api/v1/work-orders/:id/operate',
+  '/api/work-orders/:id/operate',
   async ({ params, request }) => {
     // 模拟网络延迟 100-300ms
     await delay(100 + Math.random() * 200);
@@ -310,10 +310,10 @@ export const workOrderApproveHandler = http.post<
 
 /**
  * 工单详情查询 Handler
- * GET /api/v1/work-orders/:id
+ * GET /api/work-orders/:id
  */
 export const workOrderDetailHandler = http.get<{ id: string }>(
-  '/api/v1/work-orders/:id',
+  '/api/work-orders/:id',
   async ({ params }) => {
     await delay(50 + Math.random() * 50);
 
@@ -340,10 +340,10 @@ export const workOrderDetailHandler = http.get<{ id: string }>(
 
 /**
  * 工单列表查询 Handler
- * GET /api/v1/work-orders
+ * GET /api/work-orders
  */
 export const workOrderListHandler = http.get(
-  '/api/v1/work-orders',
+  '/api/work-orders',
   async ({ request }) => {
     await delay(100 + Math.random() * 100);
 
@@ -382,7 +382,7 @@ export const workOrderListHandler = http.get(
  * 模拟通知触发后的回调
  */
 export const notificationTriggerHandler = http.post(
-  '/api/v1/notifications/trigger',
+  '/api/notifications/trigger',
   async ({ request }) => {
     await delay(50);
 

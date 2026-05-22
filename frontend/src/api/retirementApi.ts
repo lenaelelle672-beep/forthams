@@ -135,7 +135,7 @@ export async function submitRetirementApplication(
   params: RetirementApplyParams
 ): Promise<RetirementApplication> {
   const response = await request.post<RetirementApplication>(
-    '/v1/retirement/apply',
+    '/retirement/apply',
     params
   );
   return response as any;
@@ -152,7 +152,7 @@ export async function getRetirementApplication(
   applicationId: string
 ): Promise<RetirementApplication> {
   const response = await request.get<RetirementApplication>(
-    `/v1/retirement/${applicationId}`
+    `/retirement/${applicationId}`
   );
   return response as any;
 }
@@ -169,7 +169,7 @@ export async function listMyRetirementApplications(
 ): Promise<RetirementApplication[]> {
   const params = status ? { status } : {};
   const response = await request.get<RetirementApplication[]>(
-    '/v1/retirement/my-applications',
+    '/retirement/my-applications',
     { params }
   );
   return response as any;
@@ -190,7 +190,7 @@ export async function updateRetirementApplication(
   params: RetirementUpdateParams
 ): Promise<RetirementApplication> {
   const response = await request.put<RetirementApplication>(
-    `/v1/retirement/${applicationId}`,
+    `/retirement/${applicationId}`,
     params
   );
   return response as any;
@@ -205,7 +205,7 @@ export async function updateRetirementApplication(
 export async function cancelRetirementApplication(
   applicationId: string
 ): Promise<void> {
-  await request.delete(`/v1/retirement/${applicationId}`);
+  await request.delete(`/retirement/${applicationId}`);
 }
 
 /**
@@ -341,7 +341,7 @@ export async function getAssetRetirementHistory(
   assetId: string
 ): Promise<RetirementApplication[]> {
   const response = await request.get<RetirementApplication[]>(
-    `/v1/retirement/asset/${assetId}`
+    `/retirement/asset/${assetId}`
   );
   return response as any;
 }
@@ -399,6 +399,6 @@ export async function getRetirementStatistics(params: {
     pending_count: number;
     total_residual_value: number;
     by_type: Record<string, number>;
-  }>('/v1/retirement/statistics', { params });
+  }>('/retirement/statistics', { params });
   return response as any;
 }
