@@ -23,7 +23,7 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { ChevronDown, Search, X } from 'lucide-react';
 import { useAssets } from '@/hooks/useAssetById';
-import { Asset } from '@/types/asset.types';
+import { Asset } from '@/types/asset';
 import { Spinner } from '@/components/ui/Spinner';
 
 export interface AssetSelectorProps {
