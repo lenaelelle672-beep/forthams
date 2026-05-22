@@ -14,6 +14,7 @@ import {
   Activity,
   Eye,
   RefreshCw,
+  Search,
 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -147,6 +148,8 @@ export default function EquipmentPage() {
   const [detailItem, setDetailItem] = useState<EquipmentItem | null>(null);
   const [detailAsset, setDetailAsset] = useState<Asset | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
+  const [searchKeyword, setSearchKeyword] = useState('');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
   const [form, setForm] = useState({
     equipmentId: '',
     type: '定期保养',
@@ -245,6 +248,14 @@ export default function EquipmentPage() {
   const expiringSoon = equipment.filter((e) => e.maintenanceStatus === '即将到期' || e.maintenanceStatus === '已过期').length + upcomingList.length;
   const normal = equipment.filter((e) => e.status === '使用中').length;
 
+  const filtered = equipment.filter((e) => {
+    const matchSearch = !searchKeyword
+      || e.name.toLowerCase().includes(searchKeyword.toLowerCase())
+      || e.id.toLowerCase().includes(searchKeyword.toLowerCase());
+    const matchStatus = statusFilter === 'all' || e.status === statusFilter;
+    return matchSearch && matchStatus;
+  });
+
   // ── 维保记录表格数据（从 API 获取） ──────────────────────────────────────────
   const maintenanceRecords = rawRecords.slice(0, 20).map((r) => ({
     id: r.id,
@@ -311,10 +322,44 @@ export default function EquipmentPage() {
         <StatCard label="正常运行"   value={normal}        icon={CheckCircle2} iconBg="bg-green-50"  iconColor="text-green-500" />
       </div>
 
+      {/* 搜索与筛选 */}
+      <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+        <div className="relative flex-1 max-w-sm">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <input
+            type="text"
+            placeholder="搜索设备名称或编号..."
+            value={searchKeyword}
+            onChange={(e) => setSearchKeyword(e.target.value)}
+            className="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+        <div className="flex gap-1.5">
+          {[{ key: 'all', label: '全部' }, { key: '使用中', label: '正常运行' }, { key: '维修中', label: '维修中' }, { key: '闲置', label: '闲置' }].map(({ key, label }) => (
+            <button
+              key={key}
+              onClick={() => setStatusFilter(key)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                statusFilter === key
+                  ? 'bg-blue-500 text-white'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+        {searchKeyword && (
+          <span className="text-xs text-gray-400">
+            找到 {filtered.length} 台设备
+          </span>
+        )}
+      </div>
+
       {/* 设备列表 */}
       <Card>
         <CardHeader>
-          <CardTitle>设备列表</CardTitle>
+          <CardTitle>设备列表{filtered.length !== equipment.length && ` (${filtered.length}/${equipment.length})`}</CardTitle>
         </CardHeader>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
@@ -328,7 +373,13 @@ export default function EquipmentPage() {
               </tr>
             </thead>
             <tbody>
-              {equipment.map((eq, i) => (
+              {filtered.length === 0 ? (
+                <tr>
+                  <td colSpan={8} className="px-5 py-10 text-center text-gray-400">
+                    {searchKeyword ? `未找到包含"${searchKeyword}"的设备` : '暂无设备数据'}
+                  </td>
+                </tr>
+              ) : filtered.map((eq, i) => (
                 <tr key={`${eq.id}-${i}`} className="border-b border-[#f1f5f9] hover:bg-[#f8fafc] transition-colors">
                   <td className="px-5 py-3.5 font-semibold text-[#0f172a]">{eq.name}</td>
                   <td className="px-5 py-3.5 text-[#3b82f6] font-medium">{eq.id}</td>
@@ -359,11 +410,6 @@ export default function EquipmentPage() {
                   </td>
                 </tr>
               ))}
-              {equipment.length === 0 && !assetLoading && (
-                <tr>
-                  <td colSpan={8} className="px-5 py-10 text-center text-[#94a3b8] text-sm">暂无设备数据</td>
-                </tr>
-              )}
             </tbody>
           </table>
         </div>
@@ -441,7 +487,7 @@ export default function EquipmentPage() {
                     className="w-full px-3 py-2 border border-[#e5e7eb] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#3b82f6]"
                   >
                     <option value="">请选择设备</option>
-                    {equipment.map((eq, i) => (
+                    {filtered.map((eq, i) => (
                       <option key={`${eq.id}-${i}`} value={eq.id}>{eq.name} ({eq.id})</option>
                     ))}
                   </select>
