@@ -11,6 +11,7 @@ import com.ams.dto.CompensationCreateDTO;
 import com.ams.entity.AssetCompensation;
 import com.ams.entity.ApprovalProcess;
 import com.ams.entity.ApprovalRecord;
+import com.ams.entity.NotificationRecord;
 import com.ams.entity.WorkflowDefinition;
 import com.ams.mapper.ApprovalProcessMapper;
 import com.ams.mapper.ApprovalRecordMapper;
@@ -21,6 +22,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -52,6 +55,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ApprovalService {
 
+    private static final Logger log = LoggerFactory.getLogger(ApprovalService.class);
     private static final int FINAL_STEP = 3;
     private static final String WORKFLOW_PAYLOAD_KEY = "_approvalPayload";
     private static final String WORKFLOW_DEFINITION_KEY = "_workflowDefinition";
@@ -73,6 +77,7 @@ public class ApprovalService {
     private final WorkflowDefinitionService workflowDefinitionService;
     private final UserRoleMapper userRoleMapper;
     private final ObjectMapper objectMapper;
+    private final NotificationService notificationService;
 
     /**
      * 分页查询审批流程列表。
@@ -250,6 +255,7 @@ public class ApprovalService {
 
         approvalProcessMapper.updateById(process);
         handleBusinessOutcome(process, approverId, result, opinion);
+        sendApprovalNotification(process, approverId, result);
         return process;
     }
 
@@ -691,6 +697,40 @@ public class ApprovalService {
             action.accept(dto);
         } catch (JsonProcessingException e) {
             throw new BusinessException("处置业务数据解析失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 审批完成后发送通知给申请人
+     */
+    private void sendApprovalNotification(ApprovalProcess process, Long approverId, String result) {
+        try {
+            Long applicantId = process.getApplicantId();
+            if (applicantId == null || applicantId.equals(approverId)) {
+                return;
+            }
+            String action = "APPROVED".equals(result) ? "通过" : "驳回";
+            String processLabel = switch (process.getProcessType()) {
+                case "RETIREMENT" -> "退役申请";
+                case "WORK_ORDER" -> "工单审批";
+                case "ASSET_TRANSFER" -> "资产转移";
+                case "ASSET_CLEARANCE" -> "资产清退";
+                case "ASSET_SCRAP" -> "资产报废";
+                case "ASSET_COMPENSATION" -> "资产赔偿";
+                default -> "审批流程";
+            };
+            NotificationRecord notification = new NotificationRecord();
+            notification.setUserId(applicantId);
+            notification.setTitle("审批结果通知");
+            notification.setContent("您的" + processLabel + "（编号：" + process.getProcessNo() + "）已被" + action);
+            notification.setType("APPROVAL");
+            notification.setCategory("WORKFLOW");
+            notification.setRefId(process.getId());
+            notification.setRefType("APPROVAL_PROCESS");
+            notificationService.create(notification);
+        } catch (Exception e) {
+            // 通知发送失败不影响主业务流程
+            log.warn("发送审批通知失败: {}", e.getMessage());
         }
     }
 }

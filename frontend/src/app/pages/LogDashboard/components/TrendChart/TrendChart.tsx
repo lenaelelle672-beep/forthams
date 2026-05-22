@@ -157,7 +157,7 @@ async function fetchTrendData(
     headers: {
       'Content-Type': 'application/json',
       // 实际项目中应从 auth context 获取 token
-      'Authorization': `Bearer ${localStorage.getItem('auth_token') || ''}`,
+      'Authorization': `Bearer ${sessionStorage.getItem('auth_token') || localStorage.getItem('auth_token') || ''}`,
     },
   });
 

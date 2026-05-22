@@ -19,7 +19,8 @@ export function getStoredToken() {
     return null;
   }
 
-  return window.localStorage.getItem(TOKEN_STORAGE_KEY);
+  return window.sessionStorage.getItem(TOKEN_STORAGE_KEY) ||
+         window.localStorage.getItem(TOKEN_STORAGE_KEY);
 }
 
 export function clearAuthStorage() {
@@ -27,6 +28,8 @@ export function clearAuthStorage() {
     return;
   }
 
+  window.sessionStorage.removeItem(TOKEN_STORAGE_KEY);
+  window.sessionStorage.removeItem(USER_STORAGE_KEY);
   window.localStorage.removeItem(TOKEN_STORAGE_KEY);
   window.localStorage.removeItem(USER_STORAGE_KEY);
 }

@@ -242,7 +242,7 @@ export const AssetBulkImportPage: React.FC<AssetBulkImportPageProps> = (props) =
         method: 'POST',
         body: formData,
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+          'Authorization': `Bearer ${sessionStorage.getItem('auth_token') || localStorage.getItem('auth_token')}`
         }
       });
 
@@ -287,7 +287,7 @@ export const AssetBulkImportPage: React.FC<AssetBulkImportPageProps> = (props) =
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+          'Authorization': `Bearer ${sessionStorage.getItem('auth_token') || localStorage.getItem('auth_token')}`
         },
         body: JSON.stringify(request)
       });
@@ -336,7 +336,7 @@ export const AssetBulkImportPage: React.FC<AssetBulkImportPageProps> = (props) =
       const response = await fetch(`${apiBaseUrl}/import/template?format=${format}`, {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+          'Authorization': `Bearer ${sessionStorage.getItem('auth_token') || localStorage.getItem('auth_token')}`
         }
       });
 

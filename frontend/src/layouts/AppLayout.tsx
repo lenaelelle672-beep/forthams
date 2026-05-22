@@ -130,6 +130,8 @@ export default function AppLayout() {
 
   const handleLogout = () => {
     // 清除所有可能的认证 key（兼容新旧两套存储）
+    sessionStorage.removeItem('auth_token');
+    sessionStorage.removeItem('user_info');
     localStorage.removeItem('auth_token');
     localStorage.removeItem('user_info');
     localStorage.removeItem('ams_auth_token');
@@ -139,8 +141,9 @@ export default function AppLayout() {
 
   const userInfo = (() => {
     try {
-      // 优先读新 key，fallback 到旧 key
+      // 优先读 sessionStorage，fallback 到 localStorage
       const raw =
+        sessionStorage.getItem('user_info') ||
         localStorage.getItem('ams_auth_user') ||
         localStorage.getItem('user_info') ||
         '{}';

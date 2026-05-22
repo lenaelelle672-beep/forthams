@@ -92,7 +92,7 @@ function buildKeyTitleMap(nodes: TreeNodeData[]): Map<string, string> {
 function getAuthHeaders(): HeadersInit {
   if (typeof window === 'undefined') return {};
 
-  const token = window.localStorage.getItem(TOKEN_STORAGE_KEY);
+  const token = window.sessionStorage.getItem(TOKEN_STORAGE_KEY) || window.localStorage.getItem(TOKEN_STORAGE_KEY);
   return token ? { Authorization: `Bearer ${token}` } : {};
 }
 

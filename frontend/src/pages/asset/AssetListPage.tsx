@@ -1,10 +1,11 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
 import {
   Search, Upload, Download, Plus,
-  TrendingUp, ShieldCheck, X,
+  TrendingUp, ShieldCheck, X, Loader2,
 } from 'lucide-react';
+import { toast } from 'sonner';
 import { useAssetList, useCategoryTree } from '@/hooks/asset/useAssets';
 import { AssetStatus } from '@/types/asset';
 import type { AssetListQuery, AssetListItem, DashboardStats } from '@/types/asset';
@@ -17,6 +18,7 @@ import { Input } from '@/components/ui/Input';
 import { DataTable, type Column } from '@/components/ui/DataTable';
 import { StatusBadge } from '@/components/ui/Badge';
 import { PageHeader } from '@/components/ui/PageHeader';
+import http from '@/utils/http';
 
 const STATUS_OPTIONS = [
   { key: AssetStatus.IN_USE,             label: '在用',   color: 'bg-green-100 text-green-700' },
@@ -51,6 +53,7 @@ export default function AssetListPage() {
   const [deptId, setDeptId] = useState<number | ''>('');
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
   const [importantOnly, setImportantOnly] = useState(false);
+  const [exporting, setExporting] = useState(false);
 
   const { data: categoryRes } = useCategoryTree();
   const { data: deptRes } = useQuery({
@@ -162,20 +165,44 @@ export default function AssetListPage() {
                <Upload className="w-4 h-4" />
                导入
              </Button>
-             <Button variant="outline" size="md" onClick={() => {
-               const csv = [
-                 ['资产编号', '资产名称', '分类', '状态', '原值', '存放位置'].join(','),
-                 ...records.map(a => [a.assetNo ?? '', a.assetName ?? '', a.categoryName ?? '', a.status ?? '', String(a.originalValue ?? ''), a.location ?? ''].join(','))
-               ].join('\n');
-               const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
-               const url = URL.createObjectURL(blob);
-               const link = document.createElement('a');
-               link.href = url; link.download = `assets-${new Date().toISOString().slice(0, 10)}.csv`;
-               link.click(); URL.revokeObjectURL(url);
-             }}>
-               <Download className="w-4 h-4" />
-               导出
-             </Button>
+              <Button variant="outline" size="md" disabled={exporting} onClick={async () => {
+                if (exporting) return;
+                setExporting(true);
+                try {
+                  const allQuery: AssetListQuery = {
+                    page: 1,
+                    pageSize: 99999,
+                    keyword: keyword || undefined,
+                    categoryId: categoryId || undefined,
+                    deptId: deptId || undefined,
+                    status: selectedStatuses.length > 0 ? selectedStatuses.join(',') : undefined,
+                    isImportant: importantOnly ? 1 : undefined,
+                  };
+                  const allRes = await http.get('/assets', { params: allQuery });
+                  const allRecords = (allRes as any)?.data?.records ?? [];
+                  if (allRecords.length === 0) {
+                    toast.info('暂无数据可导出');
+                    return;
+                  }
+                  const csv = [
+                    ['资产编号', '资产名称', '分类', '状态', '原值', '存放位置'].join(','),
+                    ...allRecords.map((a: AssetListItem) => [a.assetNo ?? '', a.assetName ?? '', a.categoryName ?? '', a.status ?? '', String(a.originalValue ?? ''), a.location ?? ''].join(','))
+                  ].join('\n');
+                  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
+                  const url = URL.createObjectURL(blob);
+                  const link = document.createElement('a');
+                  link.href = url; link.download = `assets-${new Date().toISOString().slice(0, 10)}.csv`;
+                  link.click(); URL.revokeObjectURL(url);
+                  toast.success(`已导出 ${allRecords.length} 条资产`);
+                } catch (err) {
+                  toast.error('导出失败，请重试');
+                } finally {
+                  setExporting(false);
+                }
+              }}>
+                {exporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+                {exporting ? '导出中...' : '导出全部'}
+              </Button>
             <Button variant="primary" size="md" onClick={() => navigate('/assets/new')}>
               <Plus className="w-4 h-4" />
               新建资产

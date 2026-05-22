@@ -5,6 +5,7 @@ import com.ams.common.exception.BusinessException;
 import com.ams.context.TenantContext;
 import com.ams.dto.WorkOrderDTO;
 import com.ams.entity.ApprovalProcess;
+import com.ams.entity.NotificationRecord;
 import com.ams.entity.User;
 import com.ams.entity.WorkOrder;
 import com.ams.mapper.ApprovalProcessMapper;
@@ -38,6 +39,7 @@ public class WorkOrderService {
     private final WorkOrderMapper workOrderMapper;
     private final ApprovalProcessMapper approvalProcessMapper;
     private final UserMapper userMapper;
+    private final NotificationService notificationService;
 
     public Page<WorkOrder> queryWorkOrders(Integer page, Integer pageSize, String status, String keyword) {
         String tenantId = TenantContext.requireTenantId();
@@ -64,6 +66,8 @@ public class WorkOrderService {
         workOrder.setWorkOrderNo(generateWorkOrderNo());
         workOrder.setStatus("DRAFT");
         workOrderMapper.insert(workOrder);
+
+        sendWorkOrderNotification(workOrder, "创建");
         return workOrder;
     }
 
@@ -324,5 +328,34 @@ public class WorkOrderService {
         return new LambdaQueryWrapper<WorkOrder>()
                 .eq(WorkOrder::getId, id)
                 .eq(WorkOrder::getTenantId, tenantId);
+    }
+
+    /**
+     * 工单操作完成后发送通知给相关用户
+     */
+    private void sendWorkOrderNotification(WorkOrder workOrder, String action) {
+        try {
+            Long reporterId = workOrder.getReporterId();
+            Long operatorId = getCurrentUserIdFromSecurityContext();
+            // 通知工单创建人（如果操作人不是创建人自己）
+            Long notifyUserId = reporterId;
+            if (notifyUserId == null) {
+                return;
+            }
+            if (operatorId != null && operatorId.equals(notifyUserId)) {
+                return;
+            }
+            NotificationRecord notification = new NotificationRecord();
+            notification.setUserId(notifyUserId);
+            notification.setTitle("工单通知");
+            notification.setContent("工单「" + (workOrder.getTitle() != null ? workOrder.getTitle() : workOrder.getWorkOrderNo()) + "」已被" + action);
+            notification.setType("WORK_ORDER");
+            notification.setCategory("OPERATION");
+            notification.setRefId(workOrder.getId());
+            notification.setRefType("WORK_ORDER");
+            notificationService.create(notification);
+        } catch (Exception e) {
+            log.warn("发送工单通知失败: {}", e.getMessage());
+        }
     }
 }

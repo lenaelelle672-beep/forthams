@@ -1,0 +1,20 @@
+{
+  "directive": "修复最后 6 个低优先级残留问题：Token安全改造、忘记密码、CSV全量导出、工单导出、编辑加载态、通知集成。目标全清零。",
+  "owner": "gai2-orchestrator",
+  "phase": "workcard_created",
+  "artifact_dir": ".omc/gai2/sessions/20260522-final-sweep",
+  "language_protocol": "简体中文",
+  "constraints": [
+    "仅使用 .omc/gai2/ 作为状态和产物目录",
+    "orchestrator 不直接运行项目命令、不编辑业务文件"
+  ],
+  "acceptance_checks": [
+    {"id":"AC1","description":"Token 存储从 localStorage 改为 sessionStorage（过渡方案）","status":"pending"},
+    {"id":"AC2","description":"忘记密码：后端添加 reset-password 端点 + 前端隐藏按钮或简化流程","status":"pending"},
+    {"id":"AC3","description":"资产列表 CSV 全量导出（支持导出全部而非仅当前页）","status":"pending"},
+    {"id":"AC4","description":"工单列表 CSV 导出功能","status":"pending"},
+    {"id":"AC5","description":"资产表单编辑模式加载态","status":"pending"},
+    {"id":"AC6","description":"审批通过/工单创建时调用 NotificationService.create()","status":"pending"},
+    {"id":"AC7","description":"mvn test + vitest + npm build 全绿","status":"pending"}
+  ]
+}

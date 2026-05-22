@@ -4,6 +4,7 @@ import com.ams.entity.ApprovalProcess;
 import com.ams.entity.WorkOrder;
 import com.ams.context.TenantContext;
 import com.ams.mapper.ApprovalProcessMapper;
+import com.ams.mapper.UserMapper;
 import com.ams.mapper.WorkOrderMapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,6 +33,12 @@ class WorkOrderServiceTest {
 
     @Mock
     private ApprovalProcessMapper approvalProcessMapper;
+
+    @Mock
+    private UserMapper userMapper;
+
+    @Mock
+    private NotificationService notificationService;
 
     @InjectMocks
     private WorkOrderService workOrderService;
