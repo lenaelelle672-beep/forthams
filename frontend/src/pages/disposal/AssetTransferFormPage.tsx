@@ -377,7 +377,7 @@ export default function AssetTransferFormPage() {
                     <td className="px-5 py-3 text-sm text-[#64748b]">{asset.location}</td>
                     <td className="px-5 py-3 text-sm">
                       <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-600">
-                        {asset.status}
+                        {asset.status ?? '—'}
                       </span>
                     </td>
                     <td className="px-5 py-3 text-right">

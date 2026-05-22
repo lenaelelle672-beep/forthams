@@ -210,7 +210,7 @@ export default function DisposalDetailPage() {
                 </div>
                 <div className="space-y-1">
                   <p className="text-[10px] text-[#424753] uppercase tracking-wider font-semibold">申请人</p>
-                  <p className="text-sm font-semibold text-[#161c27]">{detail.applicantName ?? '-'}</p>
+                  <p className="text-sm font-semibold text-[#161c27]">{detail.applicantName ?? '—'}</p>
                 </div>
                 <div className="space-y-1">
                   <p className="text-[10px] text-[#424753] uppercase tracking-wider font-semibold">当前状态</p>
@@ -218,7 +218,7 @@ export default function DisposalDetailPage() {
                 </div>
                 <div className="space-y-1">
                   <p className="text-[10px] text-[#424753] uppercase tracking-wider font-semibold">资产编号</p>
-                  <p className="text-sm font-semibold text-[#161c27]">{detail.assetNo ?? '-'}</p>
+                  <p className="text-sm font-semibold text-[#161c27]">{detail.assetNo ?? '—'}</p>
                 </div>
               </div>
             </CardContent>
@@ -242,14 +242,14 @@ export default function DisposalDetailPage() {
                   <User className="w-5 h-5 text-[#004191] mr-4 mt-0.5 flex-shrink-0" />
                   <div>
                     <p className="text-[10px] text-[#424753] uppercase tracking-wider font-semibold">申请人</p>
-                    <p className="text-sm font-semibold">{detail.applicantName ?? '-'}</p>
+                    <p className="text-sm font-semibold">{detail.applicantName ?? '—'}</p>
                   </div>
                 </div>
                 <div className="col-span-full flex items-start p-4 bg-[#f1f3ff]/20 rounded-lg">
                   <Lightbulb className="w-5 h-5 text-[#004191] mr-4 mt-0.5 flex-shrink-0" />
                   <div>
                     <p className="text-[10px] text-[#424753] uppercase tracking-wider font-semibold">处置原因</p>
-                    <p className="text-sm font-semibold">{detail.reason ?? '-'}</p>
+                    <p className="text-sm font-semibold">{detail.reason ?? '—'}</p>
                   </div>
                 </div>
               </div>
