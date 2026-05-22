@@ -66,11 +66,22 @@ function getStatusLabel(status: string): string {
   return map[status] ?? status;
 }
 
+function getCurrentUserId(): number {
+  try {
+    const raw = localStorage.getItem('user_info');
+    if (!raw) return 0;
+    const user = JSON.parse(raw);
+    return Number(user.id ?? user.userId ?? 0);
+  } catch { return 0; }
+}
+
 export default function IdleAssetsPage() {
   const qc = useQueryClient();
   const [activeTab, setActiveTab] = useState<TabKey>('pending');
   const [showPublish, setShowPublish] = useState(false);
   const [publishTarget, setPublishTarget] = useState<IdleAssetRecord | null>(null);
+  const [publishTitle, setPublishTitle] = useState('');
+  const [publishDeadline, setPublishDeadline] = useState('');
   const [toast, setToast] = useState<{ type: 'success' | 'error'; msg: string } | null>(null);
 
   const showToast = (type: 'success' | 'error', msg: string) => {
@@ -101,8 +112,11 @@ export default function IdleAssetsPage() {
   });
 
   const claimMutation = useMutation({
-    mutationFn: (asset: IdleAssetRecord) =>
-      claimIdleAsset(asset.id, Number(localStorage.getItem('user_info') ? JSON.parse(localStorage.getItem('user_info')!).id : 1)),
+    mutationFn: (asset: IdleAssetRecord) => {
+      const userId = getCurrentUserId();
+      if (!userId) throw new Error('请先登录');
+      return claimIdleAsset(asset.id, userId);
+    },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['idle-assets'] });
       showToast('success', '认领申请已提交');
@@ -133,7 +147,7 @@ export default function IdleAssetsPage() {
   const displayAssets = tabAssets[activeTab];
   const totalCount     = assets.length;
   const publishedCount = tabAssets.published.length;
-  const claimingCount  = tabAssets.published.length;
+  const claimingCount  = tabAssets.claimed.length;
   const disposedCount  = tabAssets.history.length;
 
   if (isLoading) {
@@ -151,7 +165,7 @@ export default function IdleAssetsPage() {
         subtitle="闲置资产公告发布与认领流程管理"
         actions={
           <Button
-            variant="default"
+            variant="primary"
             size="sm"
             onClick={() => setShowPublish(true)}
             disabled={tabAssets.pending.length === 0}
@@ -263,15 +277,15 @@ export default function IdleAssetsPage() {
                           {getTabKey(asset.status) === 'pending' && (
                             <Button
                               size="sm"
-                              variant="default"
-                              onClick={() => { setPublishTarget(asset); setShowPublish(true); }}
+                              variant="primary"
+                              onClick={() => { setPublishTarget(asset); setPublishTitle(`${asset.assetName ?? asset.name ?? ''} 闲置公告`); setShowPublish(true); }}
                             >
                               发布公告
                             </Button>
                           )}
                           {getTabKey(asset.status) === 'published' && (
                             <>
-                              <Button size="sm" variant="default" onClick={() => claimMutation.mutate(asset)}>
+                              <Button size="sm" variant="primary" onClick={() => claimMutation.mutate(asset)}>
                                 认领
                               </Button>
                               <Button size="sm" variant="outline" onClick={() => cancelMutation.mutate(asset)}>
@@ -320,7 +334,7 @@ export default function IdleAssetsPage() {
                         type="radio"
                         name="publishTarget"
                         checked={publishTarget?.id === asset.id}
-                        onChange={() => setPublishTarget(asset)}
+                        onChange={() => { setPublishTarget(asset); setPublishTitle(`${asset.assetName ?? asset.name ?? ''} 闲置公告`); }}
                         className="w-4 h-4 text-blue-600"
                       />
                       <span className="text-sm text-gray-900">
@@ -332,27 +346,30 @@ export default function IdleAssetsPage() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">公告标题 *</label>
-                <input
-                  type="text"
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="例：办公设备闲置资产处置公告"
-                  defaultValue={publishTarget ? `${publishTarget.assetName ?? publishTarget.name} 闲置公告` : ''}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">认领截止日期 *</label>
-                <input
-                  type="date"
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
+                 <input
+                   type="text"
+                   className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                   placeholder="例：办公设备闲置资产处置公告"
+                   value={publishTitle}
+                   onChange={(e) => setPublishTitle(e.target.value)}
+                 />
+               </div>
+               <div>
+                 <label className="block text-sm font-medium text-gray-700 mb-1">认领截止日期 *</label>
+                 <input
+                   type="date"
+                   className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                   value={publishDeadline}
+                   onChange={(e) => setPublishDeadline(e.target.value)}
+                 />
               </div>
             </div>
             <div className="flex justify-end gap-3 px-6 py-4 border-t border-gray-200">
-              <Button variant="outline" size="sm" onClick={() => { setShowPublish(false); setPublishTarget(null); }}>
+              <Button variant="outline" size="sm"                 onClick={() => { setShowPublish(false); setPublishTarget(null); setPublishTitle(''); setPublishDeadline(''); }}>
                 取消
               </Button>
               <Button
-                variant="default"
+                variant="primary"
                 size="sm"
                 disabled={!publishTarget || publishMutation.isPending}
                 onClick={() => publishTarget && publishMutation.mutate(publishTarget)}
