@@ -1,0 +1,131 @@
+{
+  "overall_status": "incomplete",
+  "directive_summary": "修复 V2 报告残留问题：通知中心完整实现、位置级联端点、Controller 测试补齐、项目清理、P2 批量修复。目标通过率 79.3% → 95%+。",
+  "affected_scope": [
+    "backend/src/main/resources/schema.sql",
+    "backend/src/main/java/com/ams/entity/NotificationRecord.java",
+    "backend/src/main/java/com/ams/mapper/NotificationMapper.java",
+    "backend/src/main/java/com/ams/service/NotificationService.java",
+    "backend/src/main/java/com/ams/controller/NotificationController.java",
+    "backend/src/main/java/com/ams/controller/LocationController.java",
+    "backend/src/test/java/com/ams/controller/NotificationControllerTest.java",
+    "backend/src/test/java/com/ams/controller/VendorControllerTest.java",
+    "backend/src/test/java/com/ams/controller/UserManagementControllerTest.java",
+    "backend/src/test/java/com/ams/controller/DeptControllerTest.java",
+    "backend/src/test/java/com/ams/controller/RoleControllerTest.java",
+    "backend/src/test/java/com/ams/controller/MaintenanceControllerTest.java",
+    "backend/src/test/java/com/ams/controller/ReportControllerTest.java",
+    "backend/src/test/java/com/ams/controller/StatsControllerTest.java",
+    "backend/src/test/java/com/ams/controller/WorkflowDefinitionControllerTest.java",
+    "backend/src/test/java/com/ams/controller/SystemHealthControllerTest.java",
+    "backend/src/test/java/com/ams/controller/LocationControllerTest.java",
+    "frontend/src/app/services/notificationApi.ts",
+    "frontend/src/components/NotificationBell.tsx",
+    "frontend/src/hooks/useNotifications.ts",
+    "frontend/src/types/common.ts",
+    "frontend/src/api/notification.ts",
+    "frontend/coverage/",
+    "frontend/playwright-report/"
+  ],
+  "commands_checked": [
+    {
+      "command": "cd backend && mvn test",
+      "result": "passed",
+      "notes": "253 tests, 0 failures, 0 errors, BUILD SUCCESS (16.3s)"
+    },
+    {
+      "command": "cd frontend && npx vitest run",
+      "result": "passed",
+      "notes": "22 test files, 587 tests passed, Duration 1.84s"
+    },
+    {
+      "command": "cd frontend && npm run build",
+      "result": "passed",
+      "notes": "✓ built in 6.11s, 无错误"
+    }
+  ],
+  "acceptance_status": [
+    {
+      "criterion": "AC1: 通知中心完整实现（表 + Service + Controller + 前端）",
+      "status": "PASS",
+      "evidence": [
+        "schema.sql:455 新增 CREATE TABLE IF NOT EXISTS notification，含 user_id/type/category/title/content/is_read 等字段，含 idx_notification_user_id 和 idx_notification_user_read 索引",
+        "新增 NotificationRecord.java Entity，@TableName(\"notification\") 字段与 DDL 完全对齐",
+        "新增 NotificationMapper.java extends BaseMapper<NotificationRecord>",
+        "新增 NotificationService.java 实现 getPage/getUnreadCount/markAsRead/markAllAsRead/delete/create/getUnreadList 共 7 个方法",
+        "NotificationController.java 重构：注入 NotificationService 替代直接使用 ApprovalService 空壳方法",
+        "GET/PUT/DELETE 端点均已真实持久化：PUT /{id}/read → 真实更新 is_read、PUT /read-all → 真实批量标记、DELETE /{id} → 真实删除",
+        "前端 notificationApi.ts 更新（103 行变更），新增 fetchNotifications 分页查询、fetchUnreadCount 调用 /notifications/unread-count",
+        "前端 NotificationBell.tsx 大幅更新（411 行变更），对接真实 API",
+        "前端 useNotifications.ts 重构（436 行变更）",
+        "前端 types/common.ts 更新（16 行变更）统一 Notification 类型"
+      ]
+    },
+    {
+      "criterion": "AC2: /locations/cascade 端点",
+      "status": "PASS",
+      "evidence": [
+        "LocationController.java:32-55 新增 @GetMapping(\"/cascade\") 端点",
+        "返回 List<Map<String, Object>> 树形结构：{code, name, children: [...]}",
+        "使用 buildCascadeNode 递归构建，调用 locationService.findRootLocations() + findChildrenByParentId()",
+        "30 行新增代码，逻辑正确"
+      ]
+    },
+    {
+      "criterion": "AC3: Controller 测试补齐（目标 20+）",
+      "status": "PASS",
+      "evidence": [
+        "新增 11 个 Controller 测试文件（全部为 untracked ?? 状态但文件存在于磁盘）",
+        "新增：VendorControllerTest、UserManagementControllerTest、DeptControllerTest、RoleControllerTest、MaintenanceControllerTest、ReportControllerTest、StatsControllerTest、WorkflowDefinitionControllerTest、SystemHealthControllerTest、LocationControllerTest",
+        "修改：NotificationControllerTest（从 2 个测试扩展至 7 个）",
+        "总计 24 个 Controller 测试文件（ls 统计），覆盖 27 个 Controller 中的 24 个（CallbackController 为空壳无端点，HelloController 为调试用，HealthCheckController 未覆盖但与 SystemHealthController 功能重复）",
+        "mvn test 通过：253 tests, 0 failures — 所有新增测试均绿色"
+      ]
+    },
+    {
+      "criterion": "AC4: .gitignore 清理 coverage/playwright-report",
+      "status": "PASS",
+      "evidence": [
+        ".gitignore:28-29 包含 frontend/playwright-report/ 和 frontend/coverage/",
+        ".gitignore:38,42 包含 coverage/ 和 playwright-report/（根目录级别）",
+        "git ls-files -- 'frontend/coverage/' 'frontend/playwright-report/' 返回空 — 已从 git 跟踪中移除",
+        "git diff --cached 显示 11 个 coverage/playwright-report 文件已 staged 删除（共 2006 行删除）"
+      ]
+    },
+    {
+      "criterion": "AC5: P2 问题（本批次不强制，评估已覆盖情况）",
+      "status": "PARTIAL",
+      "evidence": [
+        "audit.json 记录了 25 个 P2 问题 + 约 20 个 additional P2 问题",
+        "本批次直接修复的 P2 相关项：NOTIF-01（无 notification 表）→ 已修复、NOTIF-03（内存分页）→ 已修复改为 SQL 分页、CASCADE-01（缺 /cascade 端点）→ 已修复",
+        "前端通知类型统一（NOTIF-02）→ types/common.ts + notificationApi.ts + useNotifications.ts 已更新",
+        "约 40+ 个 P2 问题未被本批次触及（体验优化、安全改进、代码规范等）",
+        "workcard 标注 P2 为「本批次不强制」，但实际仅覆盖约 3-5 个核心问题",
+        "未触及的典型 P2：Token 存 localStorage（安全）、DTO 缺 @Valid（参数校验）、手动 JWT 解析（4 个 Controller）、冗余端点清理等"
+      ]
+    },
+    {
+      "criterion": "AC6: mvn test + vitest + npm build 全绿",
+      "status": "PASS",
+      "evidence": [
+        "mvn test: Tests run: 253, Failures: 0, Errors: 0, Skipped: 0, BUILD SUCCESS (16.3s)",
+        "vitest: 22 test files passed, 587 tests passed, Duration 1.84s",
+        "npm build: ✓ built in 6.11s, 无错误无警告"
+      ]
+    }
+  ],
+  "findings": [
+    "【中风险】新增的 11 个 Controller 测试文件均处于 git untracked（??）状态，未 git add。文件存在且测试通过，但未纳入版本控制。需要 git add 后再提交",
+    "【中风险】.gitignore 中 coverage/ 和 playwright-report/ 条目看起来是之前就存在的（.gitignore 本身不在 git diff 中），但 coverage/playwright-report 文件确实已 staged 删除。若 .gitignore 未修改，则之前的 tracked 文件应已被清理",
+    "【低风险】NotificationService.create() 需要业务侧（ApprovalService/WorkOrderService 等）调用才能产生通知记录，当前 notification 表初始为空",
+    "【低风险】前端 notificationApi.ts 仍调用 /notifications/pending/count 而非新端点 /notifications/unread-count，向后兼容但建议后续统一",
+    "【低风险】quarantine 下的 NotificationRecord.java 和 NotificationService.java 与本次新建的同名类功能不同，可能造成混淆",
+    "【提示】P2 问题仅覆盖约 3-5 个核心项（通知中心+级联端点），约 40+ 个 P2 未触及。符合 workcard「本批次不强制」定位，但距离「95%+ 通过率」目标仍有差距"
+  ],
+  "residual_risks": [
+    "新增测试文件未 git add，提交前需执行 git add",
+    "notification 表需要业务模块集成调 NotificationService.create() 写入通知",
+    "前端 /asset-locations/cascade 路径（assetService.ts:413）仍未统一为 /locations/cascade",
+    "P2 安全问题（Token localStorage、手动 JWT 解析）未在本批次修复，仍为 open"
+  ]
+}

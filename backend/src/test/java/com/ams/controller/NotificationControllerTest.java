@@ -1,8 +1,11 @@
 package com.ams.controller;
 
 import com.ams.entity.ApprovalProcess;
+import com.ams.entity.NotificationRecord;
 import com.ams.service.ApprovalService;
+import com.ams.service.NotificationService;
 import com.ams.utils.JwtUtil;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,10 +18,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -30,6 +33,9 @@ class NotificationControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @MockBean
+    private NotificationService notificationService;
 
     @MockBean
     private ApprovalService approvalService;
@@ -63,21 +69,106 @@ class NotificationControllerTest {
     }
 
     @Test
-    @DisplayName("Should expose pending notification count")
+    @DisplayName("Should expose pending notification count via unread count")
     void pendingCountReturnsUserScopedCount() throws Exception {
-        ApprovalProcess process = new ApprovalProcess();
-        process.setId(8L);
-
         when(jwtUtil.getUserIdFromToken("test-token")).thenReturn(42L);
-        when(approvalService.getMyPendingApprovals(eq(42L))).thenReturn(List.of(process));
+        when(notificationService.getUnreadCount(42L)).thenReturn(5L);
 
         mockMvc.perform(get("/api/notifications/pending/count")
                         .contextPath("/api")
                         .header("Authorization", "Bearer test-token"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
-                .andExpect(jsonPath("$.data").value(1));
+                .andExpect(jsonPath("$.data").value(5));
 
-        verify(approvalService).getMyPendingApprovals(42L);
+        verify(notificationService).getUnreadCount(42L);
+    }
+
+    @Test
+    @DisplayName("Should return unread count via new endpoint")
+    void unreadCountReturnsCountFromService() throws Exception {
+        when(jwtUtil.getUserIdFromToken("test-token")).thenReturn(42L);
+        when(notificationService.getUnreadCount(42L)).thenReturn(3L);
+
+        mockMvc.perform(get("/api/notifications/unread-count")
+                        .contextPath("/api")
+                        .header("Authorization", "Bearer test-token"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200))
+                .andExpect(jsonPath("$.data").value(3));
+    }
+
+    @Test
+    @DisplayName("Should return paginated notification list from service")
+    void listReturnsPaginatedNotifications() throws Exception {
+        NotificationRecord record = new NotificationRecord();
+        record.setId(1L);
+        record.setTitle("测试通知");
+        record.setType("system_alert");
+        record.setCategory("SYSTEM");
+        record.setContent("通知内容");
+        record.setIsRead(0);
+        record.setCreatedAt(LocalDateTime.of(2026, 5, 22, 10, 0));
+
+        Page<NotificationRecord> page = new Page<>(1, 10);
+        page.setRecords(List.of(record));
+        page.setTotal(1);
+
+        when(jwtUtil.getUserIdFromToken("test-token")).thenReturn(42L);
+        when(notificationService.getPage(eq(42L), eq(1), eq(10), any(), any())).thenReturn(page);
+
+        mockMvc.perform(get("/api/notifications")
+                        .contextPath("/api")
+                        .param("page", "1")
+                        .param("pageSize", "10")
+                        .header("Authorization", "Bearer test-token"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200))
+                .andExpect(jsonPath("$.data.total").value(1))
+                .andExpect(jsonPath("$.data.records[0].id").value(1))
+                .andExpect(jsonPath("$.data.records[0].title").value("测试通知"))
+                .andExpect(jsonPath("$.data.records[0].isRead").value(false));
+    }
+
+    @Test
+    @DisplayName("Should mark notification as read via service")
+    void markAsReadCallsService() throws Exception {
+        when(jwtUtil.getUserIdFromToken("test-token")).thenReturn(42L);
+
+        mockMvc.perform(put("/api/notifications/100/read")
+                        .contextPath("/api")
+                        .header("Authorization", "Bearer test-token"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200));
+
+        verify(notificationService).markAsRead(100L, 42L);
+    }
+
+    @Test
+    @DisplayName("Should mark all notifications as read via service")
+    void markAllAsReadCallsService() throws Exception {
+        when(jwtUtil.getUserIdFromToken("test-token")).thenReturn(42L);
+
+        mockMvc.perform(put("/api/notifications/read-all")
+                        .contextPath("/api")
+                        .header("Authorization", "Bearer test-token"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200));
+
+        verify(notificationService).markAllAsRead(42L);
+    }
+
+    @Test
+    @DisplayName("Should delete notification via service")
+    void deleteCallsService() throws Exception {
+        when(jwtUtil.getUserIdFromToken("test-token")).thenReturn(42L);
+
+        mockMvc.perform(delete("/api/notifications/200")
+                        .contextPath("/api")
+                        .header("Authorization", "Bearer test-token"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200));
+
+        verify(notificationService).delete(200L, 42L);
     }
 }

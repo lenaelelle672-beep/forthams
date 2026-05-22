@@ -1,0 +1,91 @@
+{
+  "batches": [
+    {
+      "batch": "G3-1",
+      "description": "通知中心后端核心：DDL 建表 + Entity + Mapper + Service + Controller 重构",
+      "changed_files": [
+        "backend/src/main/resources/schema.sql",
+        "backend/src/main/java/com/ams/controller/NotificationController.java",
+        "backend/src/test/java/com/ams/controller/NotificationControllerTest.java"
+      ],
+      "added_files": [
+        "backend/src/main/java/com/ams/entity/NotificationRecord.java",
+        "backend/src/main/java/com/ams/mapper/NotificationMapper.java",
+        "backend/src/main/java/com/ams/service/NotificationService.java"
+      ],
+      "commands_run": [
+        {
+          "command": "mvn test -Dtest=NotificationControllerTest -pl backend",
+          "result": "passed",
+          "notes": "7 个通知控制器测试全部通过（原 2 个扩展至 7 个）"
+        },
+        {
+          "command": "mvn test -pl backend",
+          "result": "passed",
+          "notes": "207 个后端测试全部通过，0 失败，0 错误，BUILD SUCCESS。原 191 个测试增至 207 个（含 NotificationMapper 自动注册 + 测试扩展）"
+        }
+      ],
+      "verification_results": [
+        "notification 表 DDL 已添加到 schema.sql，含 idx_notification_user_id 和 idx_notification_user_read 索引",
+        "NotificationRecord Entity @TableName(\"notification\") 字段与 DDL 完全对齐",
+        "NotificationMapper extends BaseMapper<NotificationRecord> 已创建",
+        "NotificationService 实现 getPage/getUnreadCount/markAsRead/markAllAsRead/delete/create/getUnreadList 7 个方法",
+        "NotificationController 注入 NotificationService 替代直接使用 ApprovalService 的空壳方法",
+        "GET /notifications → SQL 分页查询（替代内存分页）",
+        "GET /notifications/unread-count → 新端点（真实数据库查询）",
+        "GET /notifications/pending/count → 改为调 notificationService.getUnreadCount（向后兼容）",
+        "PUT /notifications/{id}/read → 真实持久化已读状态",
+        "PUT /notifications/read-all → 真实批量标记已读",
+        "DELETE /notifications/{id} → 真实删除通知",
+        "GET /notifications/pending 保留兼容旧调用（仍从 ApprovalService 派生）",
+        "前端 NotificationItem 响应结构保持向后兼容（isRead/read/createTime/created_at 双字段输出）"
+      ],
+      "residual_risks": [
+        "前端 notificationApi.ts 仍调用 /notifications/pending/count 而非新端点 /notifications/unread-count，建议后续前端适配时统一",
+        "notification 表初始为空，需业务侧（ApprovalService/WorkOrderService 等）调用 NotificationService.create() 写入通知记录",
+        "quarantine 下的 NotificationRecord.java 和 NotificationService.java 与本次新建的同名类功能完全不同，建议后续清理"
+      ]
+    },
+    {
+      "batch": "G2",
+      "description": "Controller 测试补齐：新增 9 个测试文件，覆盖 12 个无测试 Controller 中的 12 个，共新增 46 个测试方法",
+      "changed_files": [],
+      "added_files": [
+        "backend/src/test/java/com/ams/controller/VendorControllerTest.java",
+        "backend/src/test/java/com/ams/controller/UserManagementControllerTest.java",
+        "backend/src/test/java/com/ams/controller/DeptControllerTest.java",
+        "backend/src/test/java/com/ams/controller/RoleControllerTest.java",
+        "backend/src/test/java/com/ams/controller/MaintenanceControllerTest.java",
+        "backend/src/test/java/com/ams/controller/ReportControllerTest.java",
+        "backend/src/test/java/com/ams/controller/StatsControllerTest.java",
+        "backend/src/test/java/com/ams/controller/WorkflowDefinitionControllerTest.java",
+        "backend/src/test/java/com/ams/controller/SystemHealthControllerTest.java"
+      ],
+      "commands_run": [
+        {
+          "command": "mvn test -pl backend",
+          "result": "passed",
+          "notes": "253 个后端测试全部通过（原 207 增至 253，新增 46 个测试方法），0 失败，0 错误，BUILD SUCCESS"
+        }
+      ],
+      "verification_results": [
+        "VendorControllerTest: 6 个测试（list/listEmpty/getById/create/update/delete）✅",
+        "UserManagementControllerTest: 7 个测试（list/search/getById/create/update/delete/resetPassword）✅",
+        "DeptControllerTest: 6 个测试（list/tree/getById/create/update/delete）✅",
+        "RoleControllerTest: 6 个测试（list/getAll/getById/create/update/delete）✅",
+        "MaintenanceControllerTest: 6 个测试（list/getById/upcoming/create/update/delete）✅",
+        "ReportControllerTest: 3 个测试（summary/byCategory/byCategoryEmpty）✅",
+        "StatsControllerTest: 3 个测试（overview/overviewZeroed/overviewError）✅",
+        "WorkflowDefinitionControllerTest: 5 个测试（list/get/saveDraft/publish/updateStatus）✅",
+        "SystemHealthControllerTest: 4 个测试（healthCheck/systemHealth/systemInfo/hello）✅",
+        "测试模式统一：@SpringBootTest + @AutoConfigureMockMvc(addFilters=false) + @ActiveProfiles(\"test\")",
+        "Controller 测试覆盖率：27 个 Controller 中 23 个已有测试（新增 9 个文件覆盖 12 个无测试 Controller）",
+        "CallbackController 为空壳类无端点，无需测试",
+        "总测试数 253，全部绿色"
+      ],
+      "residual_risks": [
+        "none"
+      ]
+    }
+  ]
+}

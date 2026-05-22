@@ -452,6 +452,22 @@ CREATE TABLE IF NOT EXISTS location (
     INDEX idx_location_parent (parent_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+CREATE TABLE IF NOT EXISTS notification (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    user_id BIGINT NOT NULL,
+    title VARCHAR(255),
+    content TEXT,
+    type VARCHAR(50),
+    category VARCHAR(50),
+    is_read TINYINT DEFAULT 0,
+    ref_id BIGINT,
+    ref_type VARCHAR(50),
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    read_at DATETIME,
+    INDEX idx_notification_user_id (user_id),
+    INDEX idx_notification_user_read (user_id, is_read)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 INSERT INTO sys_dept (id, dept_name, dept_code, parent_id, sort_order, leader, status)
 VALUES
     (1, '总公司', 'HQ', 0, 1, '系统管理员', 1)

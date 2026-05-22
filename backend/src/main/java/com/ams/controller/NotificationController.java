@@ -3,8 +3,11 @@ package com.ams.controller;
 import com.ams.common.Result;
 import com.ams.common.exception.BusinessException;
 import com.ams.entity.ApprovalProcess;
+import com.ams.entity.NotificationRecord;
 import com.ams.service.ApprovalService;
+import com.ams.service.NotificationService;
 import com.ams.utils.JwtUtil;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -12,17 +15,24 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.*;
 
+/**
+ * 通知中心控制器
+ *
+ * <p>提供通知的 CRUD 端点，基于独立的 notification 表持久化。
+ * 保留 /pending 兼容端点，从 ApprovalService 派生。</p>
+ */
 @RestController
 @RequestMapping("/notifications")
 @RequiredArgsConstructor
 public class NotificationController {
 
+    private final NotificationService notificationService;
     private final ApprovalService approvalService;
     private final JwtUtil jwtUtil;
 
     /**
      * 分页查询通知列表。
-     * 当前基于审批流程派生，TODO: 后续实现独立通知表和 NotificationService。
+     * 从独立 notification 表查询，支持按 type/category 过滤。
      */
     @GetMapping
     public Result<Map<String, Object>> list(
@@ -32,27 +42,33 @@ public class NotificationController {
             @RequestParam(defaultValue = "10") Integer pageSize,
             HttpServletRequest request) {
         Long userId = getCurrentUserId(request);
-        List<Map<String, Object>> allItems = approvalService.getMyPendingApprovals(userId)
-                .stream()
-                .map(this::toNotificationItem)
-                .filter(item -> type == null || type.isBlank() || type.equals(item.get("type")))
-                .filter(item -> category == null || category.isBlank() || category.equals(item.get("category")))
-                .toList();
+        Page<NotificationRecord> pageResult = notificationService.getPage(userId, page, pageSize, category, type);
 
-        int total = allItems.size();
-        int fromIndex = Math.min((page - 1) * pageSize, total);
-        int toIndex = Math.min(fromIndex + pageSize, total);
-        List<Map<String, Object>> records = allItems.subList(fromIndex, toIndex);
+        List<Map<String, Object>> records = pageResult.getRecords().stream()
+                .map(this::toNotificationItem)
+                .toList();
 
         Map<String, Object> pageData = new LinkedHashMap<>();
         pageData.put("records", records);
-        pageData.put("total", total);
+        pageData.put("total", pageResult.getTotal());
         pageData.put("size", pageSize);
         pageData.put("current", page);
-        pageData.put("pages", (int) Math.ceil((double) total / pageSize));
+        pageData.put("pages", pageResult.getPages());
         return Result.success(pageData);
     }
 
+    /**
+     * 获取未读通知数量（新端点）。
+     */
+    @GetMapping("/unread-count")
+    public Result<Long> unreadCount(HttpServletRequest request) {
+        Long userId = getCurrentUserId(request);
+        return Result.success(notificationService.getUnreadCount(userId));
+    }
+
+    /**
+     * 兼容旧端点：获取待处理通知列表（从审批流程派生）。
+     */
     @GetMapping("/pending")
     public Result<Map<String, Object>> pending(
             @RequestParam(required = false) String type,
@@ -60,7 +76,7 @@ public class NotificationController {
         Long userId = getCurrentUserId(request);
         List<Map<String, Object>> items = approvalService.getMyPendingApprovals(userId)
                 .stream()
-                .map(this::toNotificationItem)
+                .map(this::toApprovalNotificationItem)
                 .filter(item -> type == null || type.isBlank() || type.equals(item.get("type")))
                 .toList();
 
@@ -70,43 +86,71 @@ public class NotificationController {
         return Result.success(response);
     }
 
+    /**
+     * 兼容旧端点：获取待处理通知数量。
+     */
     @GetMapping("/pending/count")
-    public Result<Integer> pendingCount(HttpServletRequest request) {
+    public Result<Long> pendingCount(HttpServletRequest request) {
         Long userId = getCurrentUserId(request);
-        return Result.success(approvalService.getMyPendingApprovals(userId).size());
+        // 优先返回真实未读数
+        return Result.success(notificationService.getUnreadCount(userId));
     }
 
     /**
      * 标记单条通知为已读。
-     * TODO: 实现独立通知表后支持真实已读状态更新。
      */
     @PutMapping("/{id}/read")
     public Result<Void> markAsRead(@PathVariable Long id, HttpServletRequest request) {
-        // TODO: 更新 notification 表的 read 状态
+        Long userId = getCurrentUserId(request);
+        notificationService.markAsRead(id, userId);
         return Result.success();
     }
 
     /**
      * 全部标记为已读。
-     * TODO: 实现独立通知表后支持批量已读。
      */
     @PutMapping("/read-all")
     public Result<Void> markAllAsRead(HttpServletRequest request) {
-        // TODO: 批量更新当前用户所有通知为已读
+        Long userId = getCurrentUserId(request);
+        notificationService.markAllAsRead(userId);
         return Result.success();
     }
 
     /**
      * 删除通知。
-     * TODO: 实现独立通知表后支持真实删除。
      */
     @DeleteMapping("/{id}")
     public Result<Void> delete(@PathVariable Long id, HttpServletRequest request) {
-        // TODO: 从 notification 表删除记录
+        Long userId = getCurrentUserId(request);
+        notificationService.delete(id, userId);
         return Result.success();
     }
 
-    private Map<String, Object> toNotificationItem(ApprovalProcess process) {
+    // ==================== 私有方法 ====================
+
+    /**
+     * 将 NotificationRecord 转为前端响应 Map。
+     */
+    private Map<String, Object> toNotificationItem(NotificationRecord record) {
+        Map<String, Object> item = new LinkedHashMap<>();
+        item.put("id", record.getId());
+        item.put("type", record.getType());
+        item.put("category", record.getCategory());
+        item.put("title", record.getTitle());
+        item.put("content", record.getContent());
+        item.put("isRead", record.getIsRead() != null && record.getIsRead() == 1);
+        item.put("read", record.getIsRead() != null && record.getIsRead() == 1);
+        item.put("refId", record.getRefId());
+        item.put("refType", record.getRefType());
+        item.put("created_at", record.getCreatedAt() == null ? "" : record.getCreatedAt().toString());
+        item.put("createTime", record.getCreatedAt() == null ? "" : record.getCreatedAt().toString());
+        return item;
+    }
+
+    /**
+     * 将 ApprovalProcess 转为旧格式通知 Map（兼容 /pending 端点）。
+     */
+    private Map<String, Object> toApprovalNotificationItem(ApprovalProcess process) {
         Map<String, Object> item = new LinkedHashMap<>();
         item.put("id", process.getId());
         item.put("type", toNotificationType(process.getProcessType()));

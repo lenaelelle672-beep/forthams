@@ -221,25 +221,33 @@ export interface LoginResponse {
 
 /**
  * 系统通知消息。
+ * 与后端 NotificationController.toNotificationItem() 输出字段严格对齐。
  */
 export interface Notification {
   id: number;
-  /** 通知类型 */
-  type: NotificationType;
+  /** 通知类型（如 APPROVAL / MAINTENANCE / INVENTORY / SYSTEM） */
+  type: string;
+  /** 通知分类（如 APPROVAL / ALERT / SYSTEM） */
+  category?: string;
   /** 通知标题 */
   title: string;
   /** 通知内容 */
   content: string;
-  /** 是否已读 */
+  /** 是否已读（后端同时输出 isRead 和 read，前端统一用 isRead） */
   isRead: boolean;
+  /** 后端兼容字段，同 isRead */
+  read?: boolean;
   /** 关联业务 ID（如工单 ID、资产 ID） */
   refId?: number;
   /** 关联业务类型 */
   refType?: string;
-  /** 创建时间 */
+  /** 创建时间（后端同时输出 createTime 和 created_at） */
   createTime: string;
+  /** 后端兼容字段，同 createTime */
+  created_at?: string;
 }
 
+/** @deprecated 使用 Notification.type 字符串替代 */
 export enum NotificationType {
   /** 待审批 */
   APPROVAL = 'APPROVAL',
