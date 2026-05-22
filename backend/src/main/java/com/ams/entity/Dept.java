@@ -2,6 +2,7 @@ package com.ams.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 import java.io.Serializable;
@@ -34,6 +35,7 @@ public class Dept implements Serializable {
      * 部门名称
      */
     @TableField("dept_name")
+    @JsonProperty("deptName")
     private String name;
 
     /**
@@ -46,6 +48,7 @@ public class Dept implements Serializable {
      * 排序号
      */
     @TableField("sort_order")
+    @JsonProperty("sortOrder")
     private Integer orderNum;
 
     /**
@@ -60,7 +63,9 @@ public class Dept implements Serializable {
 
     /**
      * 邮箱
+     * <p>sys_dept 表暂无 email 列，标记为非持久化字段。</p>
      */
+    @TableField(exist = false)
     private String email;
 
     /**

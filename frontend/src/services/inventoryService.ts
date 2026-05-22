@@ -1,7 +1,7 @@
 /**
  * @module inventoryService
  * @description 资产盘点管理服务层 — 封装所有盘点相关 API 调用函数，
- * 与后端 `/api/v1/inventory/*` 接口一一对应。
+ * 与后端 `/api/inventory/*` 接口一一对应。
  *
  * @example
  * ```ts
@@ -260,7 +260,7 @@ export interface SubmitResult {
 // ---------------------------------------------------------------------------
 
 /** 盘点模块 API 基础路径 */
-const API_BASE = '/v1/inventory';
+const API_BASE = '/inventory';
 
 /** 默认请求超时时间 (ms) */
 const DEFAULT_TIMEOUT = 10_000;
@@ -326,7 +326,7 @@ export function truncateBatchIds(assetIds: string[], maxItems = 100): string[] {
  * 默认按创建时间倒序排列，支持分页（默认每页 20 条）
  * 和按状态筛选（草稿/进行中/已完成/已提交）。
  *
- * 对应 API：`GET /api/v1/inventory/tasks`
+ * 对应 API：`GET /api/inventory/tasks`
  *
  * @param query - 分页与筛选参数
  * @returns 分页响应，包含 InventoryTask 列表
@@ -344,7 +344,7 @@ export async function fetchTaskList(
  * 创建成功后返回完整的任务对象（含后端生成的 taskId），
  * 任务初始状态为 `draft`（草稿）。
  *
- * 对应 API：`POST /api/v1/inventory/tasks`
+ * 对应 API：`POST /api/inventory/tasks`
  *
  * @param payload - 创建任务的请求载荷，含任务名称和范围选择
  * @returns 新创建的盘点任务对象
@@ -365,7 +365,7 @@ export async function createTask(
  *
  * 包含任务基本信息、进度统计快照等。
  *
- * 对应 API：`GET /api/v1/inventory/tasks/:taskId`
+ * 对应 API：`GET /api/inventory/tasks/:taskId`
  *
  * @param taskId - 盘点任务唯一标识 (UUID)
  * @returns 盘点任务详情对象
@@ -386,7 +386,7 @@ export async function fetchTaskDetail(
  * 用于将任务从「草稿」变为「进行中」、
  * 「进行中」变为「已完成」等状态流转。
  *
- * 对应 API：`PATCH /api/v1/inventory/tasks/:taskId/status`
+ * 对应 API：`PATCH /api/inventory/tasks/:taskId/status`
  *
  * @param taskId - 盘点任务唯一标识
  * @param payload - 包含目标状态的请求载荷
@@ -414,7 +414,7 @@ export async function updateTaskStatus(
  * 返回该任务范围内所有资产的盘点状态，
  * 支持分页、按确认状态和实盘状态筛选、按关键词搜索。
  *
- * 对应 API：`GET /api/v1/inventory/tasks/:taskId/assets`
+ * 对应 API：`GET /api/inventory/tasks/:taskId/assets`
  *
  * @param taskId - 盘点任务唯一标识
  * @param query - 分页与筛选参数
@@ -437,7 +437,7 @@ export async function fetchTaskAssets(
  * 对单条资产设置实盘状态并确认。仅当任务状态为「进行中」时允许操作；
  * 「已完成」「已提交」状态下应在前端禁用此操作。
  *
- * 对应 API：`PATCH /api/v1/inventory/tasks/:taskId/assets/:assetId/confirm`
+ * 对应 API：`PATCH /api/inventory/tasks/:taskId/assets/:assetId/confirm`
  *
  * @param taskId - 盘点任务唯一标识
  * @param assetId - 资产唯一标识
@@ -463,7 +463,7 @@ export async function confirmAsset(
  * 对多条资产统一设置实盘状态。单次上限 100 条，超出前端应截断并提示用户。
  * 需先在表格中勾选目标行（未勾选时批量按钮置灰）。
  *
- * 对应 API：`POST /api/v1/inventory/tasks/:taskId/assets/batch-confirm`
+ * 对应 API：`POST /api/inventory/tasks/:taskId/assets/batch-confirm`
  *
  * @param taskId - 盘点任务唯一标识
  * @param payload - 批量确认载荷，含资产 ID 列表、统一实盘状态和可选备注
@@ -491,7 +491,7 @@ export async function batchConfirmAssets(
  * 包含统计摘要（总资产/已盘/未盘/盘盈/盘亏）及盘盈/盘亏明细列表。
  * 在每次确认操作后应调用此接口刷新汇总数据。
  *
- * 对应 API：`GET /api/v1/inventory/tasks/:taskId/summary`
+ * 对应 API：`GET /api/inventory/tasks/:taskId/summary`
  *
  * @param taskId - 盘点任务唯一标识
  * @returns 盘盈盘亏汇总数据
@@ -513,7 +513,7 @@ export async function fetchTaskSummary(
  * **前端必须在调用前弹出二次确认弹窗**，提示"确认提交核准？提交后不可修改。"。
  * 所有写操作（创建任务、确认资产、提交核准）均需防重复提交。
  *
- * 对应 API：`POST /api/v1/inventory/tasks/:taskId/submit`
+ * 对应 API：`POST /api/inventory/tasks/:taskId/submit`
  *
  * @param taskId - 盘点任务唯一标识
  * @returns 提交结果，含成功标志和任务 ID

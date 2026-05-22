@@ -133,7 +133,7 @@ export interface AssetQueryParams {
 // API 基地址
 // ===========================================================================
 
-const API_BASE = '/api/v1/inventory/tasks';
+const API_BASE = '/inventory/tasks';
 
 // ===========================================================================
 // API 调用函数（对齐 SPEC API 契约）
@@ -216,7 +216,7 @@ async function fetchTaskAssets(
 /**
  * 逐条确认资产实盘状态
  *
- * 对应 SPEC: PATCH /api/v1/inventory/tasks/:taskId/assets/:assetId/confirm
+ * 对应 SPEC: PATCH /api/inventory/tasks/:taskId/assets/:assetId/confirm
  *
  * @param taskId  - 任务唯一标识
  * @param assetId - 资产唯一标识
@@ -236,7 +236,7 @@ async function confirmAsset(
 /**
  * 批量确认资产实盘状态
  *
- * 对应 SPEC: POST /api/v1/inventory/tasks/:taskId/assets/batch-confirm
+ * 对应 SPEC: POST /api/inventory/tasks/:taskId/assets/batch-confirm
  *
  * @param taskId  - 任务唯一标识
  * @param payload - 批量确认载荷（assetIds + 实盘状态 + 备注）
@@ -480,7 +480,7 @@ export function useUpdateTaskStatusMutation() {
 /**
  * 逐条确认资产 Mutation
  *
- * 对应 SPEC: PATCH /api/v1/inventory/tasks/:taskId/assets/:assetId/confirm
+ * 对应 SPEC: PATCH /api/inventory/tasks/:taskId/assets/:assetId/confirm
  *
  * 成功后自动刷新（无需整页重载）:
  * 1. 任务详情 — 进度百分比 + 统计摘要（已盘数 +1、未盘数 -1）
@@ -529,7 +529,7 @@ export function useConfirmMutation() {
 /**
  * 批量确认资产 Mutation
  *
- * 对应 SPEC: POST /api/v1/inventory/tasks/:taskId/assets/batch-confirm
+ * 对应 SPEC: POST /api/inventory/tasks/:taskId/assets/batch-confirm
  *
  * 前端截断：单次批量确认上限 100 条，超出部分丢弃。
  * 成功后自动刷新任务详情、资产清单和盘盈盘亏汇总。
@@ -578,7 +578,7 @@ export function useBatchConfirmMutation() {
 /**
  * 提交盘点结果核准 Mutation
  *
- * 对应 SPEC: POST /api/v1/inventory/tasks/:taskId/submit
+ * 对应 SPEC: POST /api/inventory/tasks/:taskId/submit
  *
  * **提交为不可逆操作**，调用方需在 UI 层实现二次确认弹窗：
  * "确认提交核准？提交后不可修改。"

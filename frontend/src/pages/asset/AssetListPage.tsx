@@ -97,7 +97,7 @@ export default function AssetListPage() {
     keyword: keyword || undefined,
     categoryId: categoryId || undefined,
     deptId: deptId || undefined,
-    status: selectedStatuses.length === 1 ? (selectedStatuses[0] as AssetStatus) : undefined,
+    status: selectedStatuses.length > 0 ? selectedStatuses.join(',') : undefined,
     isImportant: importantOnly ? 1 : undefined,
   }), [page, pageSize, keyword, categoryId, deptId, selectedStatuses, importantOnly]);
 

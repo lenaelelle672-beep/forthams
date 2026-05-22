@@ -422,6 +422,36 @@ CREATE TABLE IF NOT EXISTS sys_attachment (
     INDEX idx_attachment_business (business_type, business_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+CREATE TABLE IF NOT EXISTS vendor (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(256) NOT NULL,
+    vendor_code VARCHAR(64) UNIQUE,
+    contact_person VARCHAR(128),
+    contact_phone VARCHAR(32),
+    contact_email VARCHAR(128),
+    address VARCHAR(512),
+    status INT DEFAULT 1,
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+    update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    deleted INT DEFAULT 0,
+    INDEX idx_vendor_code (vendor_code)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS location (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(256) NOT NULL,
+    location_code VARCHAR(64) UNIQUE,
+    parent_id BIGINT DEFAULT NULL,
+    sort_order INT DEFAULT 0,
+    description VARCHAR(512),
+    status INT DEFAULT 1,
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+    update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    deleted INT DEFAULT 0,
+    INDEX idx_location_code (location_code),
+    INDEX idx_location_parent (parent_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 INSERT INTO sys_dept (id, dept_name, dept_code, parent_id, sort_order, leader, status)
 VALUES
     (1, '总公司', 'HQ', 0, 1, '系统管理员', 1)

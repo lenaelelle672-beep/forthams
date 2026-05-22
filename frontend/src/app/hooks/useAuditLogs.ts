@@ -133,7 +133,7 @@ const MAX_PAGE_SIZE = 100;
 const MAX_OFFSET = 10000;
 
 /** API 基础路径 */
-const AUDIT_API_BASE = '/v1/audit-log';
+const AUDIT_API_BASE = '/audit-logs';
 
 // ---------------------------------------------------------------------------
 // 默认筛选器

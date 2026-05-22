@@ -79,7 +79,7 @@ interface PaginatedResponse<T> {
 // Helpers
 // ---------------------------------------------------------------------------
 
-const API_BASE = '/api/v1/inventory';
+const API_BASE = '/api/inventory';
 
 /** 生成唯一任务 ID */
 let taskSeq = 100;

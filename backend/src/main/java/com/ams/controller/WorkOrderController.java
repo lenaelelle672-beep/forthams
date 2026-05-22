@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 @RestController
-@RequestMapping({"/workorders", "/work-orders", "/v1/workorders", "/v1/work-orders"})
+@RequestMapping({"/workorders", "/work-orders"})
 @RequiredArgsConstructor
 public class WorkOrderController {
 

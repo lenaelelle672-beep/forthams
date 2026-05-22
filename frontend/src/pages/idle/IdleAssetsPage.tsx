@@ -12,7 +12,7 @@ import {
   cancelIdleAssetPublish,
   type IdleAssetRecord,
 } from '@/api/idleAsset';
-import type { ApiResponse } from '@/types/common';
+import type { ApiResponse, PageData } from '@/types/common';
 
 type TabKey = 'pending' | 'published' | 'claimed' | 'history';
 
@@ -95,7 +95,14 @@ export default function IdleAssetsPage() {
     retry: 1,
   });
 
-  const assets: IdleAssetRecord[] = (assetsRes as ApiResponse<IdleAssetRecord[]> | undefined)?.data ?? [];
+  // 后端 /idle-assets/list 返回 ApiResponse<Page<IdleAssetNotice>>，即 { code, data: { records: [...] } }
+  // 需要从 data.records 提取数组，兼容 data 直接为数组的情况，兜底 []
+  const raw = (assetsRes as ApiResponse<unknown> | undefined)?.data;
+  const assets: IdleAssetRecord[] = Array.isArray(raw)
+    ? (raw as IdleAssetRecord[])
+    : Array.isArray((raw as PageData<IdleAssetRecord> | undefined)?.records)
+      ? (raw as PageData<IdleAssetRecord>).records
+      : [];
 
   const publishMutation = useMutation({
     mutationFn: (asset: IdleAssetRecord) =>

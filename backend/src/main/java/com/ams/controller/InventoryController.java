@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping({"/inventory", "/v1/inventory"})
+@RequestMapping("/inventory")
 @RequiredArgsConstructor
 public class InventoryController {
 
@@ -57,7 +57,10 @@ public class InventoryController {
     @PostMapping("/approve")
     public Result<InventoryTask> approve(@RequestBody Map<String, String> body) {
         String taskId = body.get("taskId");
-        Long id = Long.valueOf(taskId);
+        if (taskId == null || taskId.isBlank()) {
+            return Result.error(400, "taskId 不能为空");
+        }
+        Long id = Long.valueOf(taskId.trim());
         return Result.success(inventoryService.updateTaskStatus(id, "SUBMITTED"));
     }
 

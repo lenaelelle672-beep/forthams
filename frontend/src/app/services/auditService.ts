@@ -73,7 +73,7 @@ const MAX_TIME_RANGE_DAYS = 90;
 const DEFAULT_PAGE_SIZE = 50;
 const MAX_PAGE_SIZE = 100;
 const MAX_OFFSET = 10000;
-const API_BASE = '/v1/audit-log';
+const API_BASE = '/audit-logs';
 
 export { MAX_TIME_RANGE_DAYS, DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE, MAX_OFFSET };
 

@@ -4,7 +4,7 @@
  * 为资产批量导入导出页面的导出筛选面板（CategoryTreeSelect）提供数据源。
  *
  * 相关 API 端点：
- *   - GET /api/v1/asset-categories/tree  获取分类树形结构
+ *   - GET /api/categories/tree  获取分类树形结构
  *
  * @see [SWARM-P2-006-FE] 资产批量导入导出前端 — Layer 3.1 CategoryTreeSelect
  */
@@ -29,7 +29,7 @@ export interface CategoryTreeNode {
 /**
  * 获取资产分类树形结构数据。
  *
- * 调用 `GET /api/v1/asset-categories/tree` 接口，
+ * 调用 `GET /api/categories/tree` 接口，
  * 返回的树形数据可直接供 Ant Design `<TreeSelect>` 组件的 `treeData` 属性使用。
  *
  * @returns {Promise<CategoryTreeNode[]>} 分类树节点数组
@@ -47,7 +47,7 @@ export interface CategoryTreeNode {
  * ```
  */
 export async function getCategoryTree(): Promise<CategoryTreeNode[]> {
-  return http.get<CategoryTreeNode[]>('/v1/asset-categories/tree');
+  return http.get<CategoryTreeNode[]>('/categories/tree');
 }
 
 /**

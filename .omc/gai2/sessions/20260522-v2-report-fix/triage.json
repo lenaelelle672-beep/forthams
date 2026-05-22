@@ -1,0 +1,215 @@
+{
+  "classification": "Heavy",
+  "mcp_tools": [],
+  "scope": [
+    "backend/src/main/java/com/ams/controller/InventoryController.java",
+    "backend/src/main/java/com/ams/controller/DisposalController.java",
+    "backend/src/main/java/com/ams/controller/CompensationController.java",
+    "backend/src/main/java/com/ams/controller/HelloController.java",
+    "backend/src/main/java/com/ams/controller/NotificationController.java",
+    "backend/src/main/java/com/ams/controller/UserManagementController.java",
+    "backend/src/main/java/com/ams/controller/RetirementController.java",
+    "backend/src/main/java/com/ams/controller/LocationController.java",
+    "backend/src/main/java/com/ams/config/SecurityConfig.java",
+    "backend/src/main/java/com/ams/entity/Dept.java",
+    "backend/src/main/java/com/ams/entity/Role.java",
+    "backend/src/main/resources/schema.sql",
+    "frontend/src/pages/assets/AssetListPage.tsx",
+    "frontend/src/pages/assets/AssetFormPage.tsx",
+    "frontend/src/pages/workorders/WorkOrderFormPage.tsx",
+    "frontend/src/api/notifications.ts",
+    "frontend/src/services/notification.ts"
+  ],
+  "risks": [
+    "SecurityConfig 修改 permitAll 路径列表，错误放行可导致安全漏洞",
+    "DDL 补建 vendor/location 表需确认与现有 Entity 字段完全一致，遗漏字段会导致运行时 ORM 报错",
+    "Dept Entity 删除 email 字段需确认无任何代码引用该字段，否则编译失败",
+    "DisposalController/CompensationController 测试用例依赖现有 500 行为，修改返回码需同步更新测试",
+    "双前缀清理需同步检查前端 API 调用路径，遗漏会导致 404",
+    "通知路径统一需前后端双向修改，单侧修改会导致连接断裂",
+    "图片上传（BUG-V2-08）涉及新组件集成 + 后端文件存储接口，可能引入新依赖",
+    "工单关联资产搜索（BUG-V2-09）需新增弹窗组件 + 资产搜索 API 调用"
+  ],
+  "dependencies": [
+    "BUG-V2-02/03 (Disposal/Compensation 500) 与 DisposalControllerTest/CompensationControllerTest 强耦合，必须同步更新",
+    "BUG-V2-11/12 (双前缀) 需先确认前端实际调用路径再决定删除哪一侧",
+    "通知路径不匹配需前后端同步修改",
+    "BUG-V2-09/10 (工单表单) 需确认后端 WorkOrder DTO 是否已支持 collaborators 字段",
+    "BUG-V2-08 (图片上传) 需确认后端是否已有文件上传接口（/upload 或 /files）可复用"
+  ],
+  "recommended_phases": ["audit", "builder", "reviewer"],
+  "builder_batches": [
+    {
+      "batch_id": "B1-P0-CRASH",
+      "name": "P0 崩溃与安全修复",
+      "priority": "critical",
+      "description": "修复所有导致 500/NPE 和安全阻塞的 P0 问题",
+      "bugs": [
+        {
+          "id": "BUG-V2-01",
+          "title": "POST /inventory/approve NPE",
+          "file": "backend/src/main/java/com/ams/controller/InventoryController.java",
+          "fix_hint": "approve 方法中 Long.valueOf(taskId) 前添加 null 检查，或改用 @Valid DTO",
+          "estimated_effort": "5min"
+        },
+        {
+          "id": "BUG-V2-02",
+          "title": "DisposalController 三个 POST 返回 500",
+          "file": "backend/src/main/java/com/ams/controller/DisposalController.java",
+          "fix_hint": "transfer/clearance/scrap 方法改为抛 IllegalArgumentException 并被全局异常处理器捕获返回 400，同步更新 DisposalControllerTest",
+          "estimated_effort": "15min"
+        },
+        {
+          "id": "BUG-V2-03",
+          "title": "CompensationController POST create 返回 500",
+          "file": "backend/src/main/java/com/ams/controller/CompensationController.java",
+          "fix_hint": "create 方法改为返回 400 + 明确错误信息，同步更新 CompensationControllerTest",
+          "estimated_effort": "10min"
+        },
+        {
+          "id": "BUG-V2-06",
+          "title": "/health 和 /system/health 需 JWT 认证",
+          "file": "backend/src/main/java/com/ams/config/SecurityConfig.java",
+          "fix_hint": "securityFilterChain 中 requestMatchers 将 /health、/system/health、/system/info 添加到 permitAll()",
+          "estimated_effort": "5min"
+        },
+        {
+          "id": "BUG-V2-04/05",
+          "title": "vendor/location 表 DDL 缺失",
+          "file": "backend/src/main/resources/schema.sql",
+          "fix_hint": "参考 Vendor.java/Location.java Entity 字段补建 CREATE TABLE vendor/location 语句，注意与 MyBatis 自动建表结构一致",
+          "estimated_effort": "15min"
+        },
+        {
+          "id": "NOTIFY-PATH",
+          "title": "通知前后端路径不匹配",
+          "file": "backend/src/main/java/com/ams/controller/NotificationController.java + frontend/src/api/notifications.ts",
+          "fix_hint": "后端添加 /notifications/unread-count 别名映射到 pendingCount 方法，或前端改为 /pending/count",
+          "estimated_effort": "10min"
+        },
+        {
+          "id": "HELLO-PREFIX",
+          "title": "HelloController 双 /api 前缀",
+          "file": "backend/src/main/java/com/ams/controller/HelloController.java",
+          "fix_hint": "将 @RequestMapping(\"/api\") 改为 @RequestMapping(\"\") 或 @RequestMapping(\"/hello\")",
+          "estimated_effort": "3min"
+        }
+      ]
+    },
+    {
+      "batch_id": "B2-P1-ENTITY-PATH",
+      "name": "P1 Entity 字段与双前缀修复",
+      "priority": "high",
+      "description": "修复 Entity 字段不匹配和 Controller 双前缀问题",
+      "bugs": [
+        {
+          "id": "BUG-V2-14/15",
+          "title": "Dept Entity 字段修复",
+          "file": "backend/src/main/java/com/ams/entity/Dept.java",
+          "fix_hint": "删除 email 字段；添加 @TableLogic private Integer deleted 字段",
+          "estimated_effort": "10min",
+          "prerequisite": "需先 grep 确认 email 字段无任何代码引用"
+        },
+        {
+          "id": "BUG-V2-16",
+          "title": "Role Entity 缺 sortOrder",
+          "file": "backend/src/main/java/com/ams/entity/Role.java",
+          "fix_hint": "添加 private Integer sortOrder 字段",
+          "estimated_effort": "5min"
+        },
+        {
+          "id": "BUG-V2-11",
+          "title": "InventoryController 双前缀",
+          "file": "backend/src/main/java/com/ams/controller/InventoryController.java",
+          "fix_hint": "移除 @RequestMapping 中的 /v1/inventory 别名，保留 /inventory",
+          "estimated_effort": "5min"
+        },
+        {
+          "id": "BUG-V2-12",
+          "title": "RetirementController 双前缀",
+          "file": "backend/src/main/java/com/ams/controller/RetirementController.java",
+          "fix_hint": "移除 /v1/retirement 别名，保留 /retirement",
+          "estimated_effort": "5min"
+        },
+        {
+          "id": "BUG-V2-17",
+          "title": "UserManagementController 双前缀",
+          "file": "backend/src/main/java/com/ams/controller/UserManagementController.java",
+          "fix_hint": "统一为 /users 或 /user-management（需确认前端调用路径）",
+          "estimated_effort": "5min"
+        },
+        {
+          "id": "BUG-V2-13",
+          "title": "LocationController reorder 性能",
+          "file": "backend/src/main/java/com/ams/controller/LocationController.java",
+          "fix_hint": "reorder 改为批量 UPDATE（单次 SQL CASE WHEN），避免 N 次数据库操作",
+          "estimated_effort": "15min"
+        }
+      ]
+    },
+    {
+      "batch_id": "B3-P1-FRONTEND",
+      "name": "P1 前端功能修复",
+      "priority": "high",
+      "description": "修复前端交互和功能缺失问题",
+      "bugs": [
+        {
+          "id": "BUG-V2-07",
+          "title": "资产列表多状态筛选不生效",
+          "file": "frontend/src/pages/assets/AssetListPage.tsx",
+          "fix_hint": "修改 API 调用参数，将 selectedStatuses 数组改为逗号拼接字符串或直接传递数组参数",
+          "estimated_effort": "10min"
+        },
+        {
+          "id": "BUG-V2-08",
+          "title": "资产表单无图片上传",
+          "file": "frontend/src/pages/assets/AssetFormPage.tsx",
+          "fix_hint": "集成文件上传组件（如 antd Upload），对接后端文件上传接口。需先确认后端是否已有 /upload 端点",
+          "estimated_effort": "30-45min",
+          "prerequisite": "需确认后端文件上传接口是否可用"
+        },
+        {
+          "id": "BUG-V2-09",
+          "title": "工单表单关联资产搜索无功能",
+          "file": "frontend/src/pages/workorders/WorkOrderFormPage.tsx",
+          "fix_hint": "将搜索按钮绑定到资产搜索 API（GET /assets），弹窗展示搜索结果供选择",
+          "estimated_effort": "20-30min"
+        },
+        {
+          "id": "BUG-V2-10",
+          "title": "工单协作人未提交后端",
+          "file": "frontend/src/pages/workorders/WorkOrderFormPage.tsx",
+          "fix_hint": "在表单提交数据中包含 collaborators 字段，需确认后端 WorkOrderCreateDTO 是否支持",
+          "estimated_effort": "15min",
+          "prerequisite": "需确认后端 DTO 是否有 collaborators 字段"
+        }
+      ]
+    }
+  ],
+  "acceptance_hints": [
+    "P0: POST /inventory/approve 传入空 taskId 返回 400 而非 500",
+    "P0: POST /disposals/transfer|clearance|scrap 返回 400 而非 500",
+    "P0: POST /compensation 返回 400 而非 500",
+    "P0: schema.sql 包含 vendor 和 location 的 CREATE TABLE",
+    "P0: curl http://localhost:8080/health 无需 JWT 返回 200",
+    "P1: 资产列表选择多个状态筛选后 API 参数包含全部选中值",
+    "P1: HelloController 路径为 /hello 或 /api/hello（非 /api/api/hello）",
+    "P1: 通知未读数 API 前后端路径一致",
+    "P1: Dept Entity 无 email 字段，有 deleted 字段带 @TableLogic",
+    "P1: Role Entity 有 sortOrder 字段",
+    "P1: 双前缀 Controller 仅有单一有效路径",
+    "P1: location reorder 单次 SQL 完成",
+    "全量: mvn test + npm run build 通过"
+  ],
+  "complexity_breakdown": {
+    "total_bugs": 17,
+    "p0_count": 6,
+    "p1_count": 11,
+    "backend_files": 10,
+    "frontend_files": 4,
+    "new_feature_work": 2,
+    "simple_fixes": 10,
+    "needs_test_update": 3,
+    "needs_frontend_backend_sync": 4
+  }
+}

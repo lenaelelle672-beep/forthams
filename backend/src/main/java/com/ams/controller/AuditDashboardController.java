@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping({"/audit-logs", "/v1/audit-log", "/v1/audit"})
+@RequestMapping("/audit-logs")
 @RequiredArgsConstructor
 public class AuditDashboardController {
 

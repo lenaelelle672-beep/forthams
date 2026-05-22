@@ -37,7 +37,7 @@ class WorkOrderControllerTest {
     private WorkOrderService workOrderService;
 
     @ParameterizedTest
-    @ValueSource(strings = {"/workorders", "/work-orders", "/v1/workorders", "/v1/work-orders"})
+    @ValueSource(strings = {"/workorders", "/work-orders"})
     @DisplayName("Should expose work order aliases behind api context path")
     void testWorkOrderAliasesBehindApiContextPath(String path) throws Exception {
         when(workOrderService.queryWorkOrders(any(), any(), any(), any())).thenReturn(new Page<>(1, 10));
@@ -55,7 +55,7 @@ class WorkOrderControllerTest {
         WorkOrder workOrder = new WorkOrder();
         when(workOrderService.operateWorkOrder(eq(1L), eq("approve"), eq("ok"))).thenReturn(workOrder);
 
-        mockMvc.perform(post("/api/v1/work-orders/{id}/approve", 1L)
+        mockMvc.perform(post("/api/work-orders/{id}/approve", 1L)
                 .contextPath("/api")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"comment\":\"ok\"}"))

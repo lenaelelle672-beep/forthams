@@ -245,7 +245,7 @@ export const retirementService = {
       // 3. 提交申请到后端
       // http 拦截器已解包 response.data，response 现在就是 ApiResponse<T>
       const response = await apiClient.post<ApiResponse<RetirementApplication>>(
-        '/v1/retirement/apply',
+        '/retirement/apply',
         {
           ...params,
           request_id: requestId
@@ -285,7 +285,7 @@ export const retirementService = {
       
       // 2. 提交修改
       const response = await apiClient.put<ApiResponse<RetirementApplication>>(
-        `/v1/retirement/${params.id}`,
+        `/retirement/${params.id}`,
         {
           reason: params.reason,
           estimated_residual_value: params.estimated_residual_value,
@@ -319,7 +319,7 @@ export const retirementService = {
   async getById(retirementId: string): Promise<RetirementApplication> {
     try {
       const response = await apiClient.get<ApiResponse<RetirementApplication>>(
-        `/v1/retirement/${retirementId}`
+        `/retirement/${retirementId}`
       );
       return (response as any).data as RetirementApplication;
     } catch (error) {
@@ -364,8 +364,8 @@ export const retirementService = {
       
       // 2. 确定 API 端点
       const endpoint = params.action === ApprovalAction.APPROVE
-        ? '/v1/retirement/approve'
-        : '/v1/retirement/reject';
+        ? '/retirement/approve'
+        : '/retirement/reject';
       
       // 3. 执行审批操作
       const response = await apiClient.post<ApiResponse<{ success: boolean; message: string }>>(
@@ -407,7 +407,7 @@ export const retirementService = {
       // NOTE: 后端会校验当前用户是否有转交权限
       
       const response = await apiClient.post<ApiResponse<{ success: boolean; message: string }>>(
-        '/v1/retirement/transfer',
+        '/retirement/transfer',
         {
           task_id: params.task_id,
           target_user_id: params.target_user_id,
@@ -441,7 +441,7 @@ export const retirementService = {
     try {
       const params = userId ? { user_id: userId } : {};
       const response = await apiClient.get<ApiResponse<ApprovalTask[]>>(
-        '/v1/retirement/pending',
+        '/retirement/pending',
         { params }
       );
       return (response as any).data as ApprovalTask[];
@@ -485,7 +485,7 @@ export const retirementService = {
       };
       
       const response = await apiClient.get<ApiResponse<LifecycleResponse>>(
-        `/v1/retirement/timeline/${assetId}`,
+        `/retirement/timeline/${assetId}`,
         { params }
       );
       
@@ -513,7 +513,7 @@ export const retirementService = {
   async getApplicationsByAsset(assetId: string): Promise<RetirementApplication[]> {
     try {
       const response = await apiClient.get<ApiResponse<RetirementApplication[]>>(
-        '/v1/retirement/list',
+        '/retirement/list',
         { params: { asset_id: assetId } }
       );
       return (response as any).data as RetirementApplication[];
@@ -541,7 +541,7 @@ export const retirementService = {
     try {
       // 仅允许在审批前或驳回状态下取消
       const response = await apiClient.delete<ApiResponse<{ success: boolean; message: string }>>(
-        `/v1/retirement/${retirementId}`
+        `/retirement/${retirementId}`
       );
       return (response as any).data as { success: boolean; message: string };
     } catch (error) {
