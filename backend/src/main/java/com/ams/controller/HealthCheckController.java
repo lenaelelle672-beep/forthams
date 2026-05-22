@@ -8,7 +8,6 @@ import java.time.Instant;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api")
 public class HealthCheckController {
 
     @GetMapping("/health")

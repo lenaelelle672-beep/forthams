@@ -1,0 +1,239 @@
+{
+  "audit_date": "2026-05-22",
+  "auditor": "GAI2 Audit Agent",
+  "directive": "对 RuoYi-Vue-Plus / ruoyi-vue-pro / 自定义开发 三个脚手架方案进行深度技术审查",
+
+  "current_state": "国内 Spring Boot 业务系统脚手架市场已高度成熟。RuoYi-Vue-Plus（dromara 组织）已升级到 Spring Boot 3.5.x + MyBatis-Plus 3.5.11 + JDK 17/21，内置 JustAuth + MaxKey OAuth2 扩展实现，是 dromara 生态内与 MaxKey 深度集成的官方推荐路径。ruoyi-vue-pro（芋道源码）master 分支仍在 Spring Boot 2.7.18，master-jdk17 分支对齐 Spring Boot 3.2，原生前端均为 Vue3 + Element Plus，与目标前端技术栈（React 18 + Tailwind + shadcn/ui）存在根本性不匹配，必须完全替换前端。自定义开发路线可完全掌控技术栈，但用户/部门/认证模块均需从头搭建，工作量显著高于复用脚手架。",
+
+  "existing_patterns": {
+    "plan_a_ruoyi_vue_plus": {
+      "auth": "Sa-Token + JWT，放弃 Spring Security 原生方案",
+      "third_party_login": "JustAuth 框架，已有官方 AuthMaxKeyRequest 扩展，内置 MaxKey 作为支持平台（AuthMaxKeySource），server-url 通过 application.yml 配置",
+      "oauth2_flow": "Authorization Code 模式，state 存 Redis（CSRF 防护），回调处理 /auth/callback/{source}",
+      "user_sync": "仅处理 OAuth 登录时 JIT（Just-in-Time）账号创建，不含主动拉取 MaxKey 用户/部门的 Sync 机制，需自行实现定时任务",
+      "department_tree": "内置部门树（sys_dept）+ MyBatis-Plus，支持数据权限插件",
+      "frontend": "官方配套 Vue3 + ElementPlus，还有社区版 ruoyi-plus-vben5（基于 Vben5）、ruoyi-plus-soybean，均非 React",
+      "spring_boot_version": "当前 Spring Boot 3.5.x（最新 GA），MyBatis-Plus 3.5.11",
+      "multi_tenant": "内置多租户插件，如不需要可使用 RuoYi-Vue-Plus-Single 分支（已移除多租户）"
+    },
+    "plan_b_ruoyi_vue_pro": {
+      "auth": "Spring Security 5.x + Token + Redis（master 分支），Spring Security 6.x（master-jdk17 分支）",
+      "third_party_login": "JustAuth 集成，支持微信/钉钉/企业微信等，无原生 MaxKey 扩展（需自行扩展 AuthDefaultRequest）",
+      "user_sync": "无 MaxKey 专属 Connector，需手动实现 OpenAPI 定时同步",
+      "department_tree": "内置部门树模块，完整实现",
+      "frontend": "Vue3 + element-plus 或 Vue3 + Vben(ant-design-vue)，均非 React",
+      "spring_boot_version": "master 分支：Spring Boot 2.7.18（不满足需求），master-jdk17：Spring Boot 3.2",
+      "maxkey_support": "无显式 MaxKey 集成，仅提供 SSO 通用 OAuth2 应用管理，需参考 JustAuth 扩展模式自行实现"
+    },
+    "plan_c_custom": {
+      "auth": "Spring Boot 3.2.5 + Spring Security 6 + JWT，DaoAuthenticationProvider（本地密码）+ OAuth2LoginConfigurer（OAuth2/OIDC），二者可在同一 SecurityFilterChain 共存",
+      "user_sync": "完全自行实现 MaxKey OpenAPI 定时拉取或 SCIM 2.0 接收推送",
+      "department_tree": "完全自行实现",
+      "frontend": "React 18.3.1 + TypeScript + Vite + Tailwind + shadcn/ui，与目标栈完全一致",
+      "integration_complexity": "MaxKey OAuth2 对接约 1-2 天；同步账号/部门约 2-3 天；本地认证+混合控制开关约 2-3 天；用户/部门基础模块约 3-5 天，总计 8-13 人天核心后端工作"
+    }
+  },
+
+  "technical_constraints": [
+    "目标前端技术栈：React 18.3.1 + TypeScript + Vite + Tailwind + shadcn/ui + TanStack Query + React Router 7 —— RuoYi-Vue-Plus 和 ruoyi-vue-pro 官方前端均为 Vue3，必须完全弃用官方前端，仅复用后端",
+    "目标后端：Spring Boot 3.2.5 + Spring Security + JWT + MyBatis-Plus + MySQL —— 方案 A RuoYi-Vue-Plus 已不使用 Spring Security（改用 Sa-Token），若需保留 Spring Security 则需重写认证层",
+    "MaxKey 至少需要 JDK 8，但 MaxKey 服务端本身与对接方技术栈无关，只要实现标准 OAuth2 Authorization Code 即可集成",
+    "MyBatis-Plus 3.5.x 与 Spring Boot 3.2.x 兼容良好（mybatis-plus-spring-boot3-starter），需注意 jakarta.* 命名空间（旧版 mybatis-plus-boot-starter 使用 javax.* 不兼容 Spring Boot 3）",
+    "Spring Security 6（Spring Boot 3.x 内置）已移除多个已废弃 API，需使用新的 SecurityFilterChain DSL（configure(HttpSecurity) 已废弃），与 Spring Boot 2.x 代码不兼容",
+    "RuoYi-Vue-Plus 的 Sa-Token 认证模式与需求方的 Spring Security + JWT 强约束存在架构冲突，直接复用其后端认证层需大量改造",
+    "ruoyi-vue-pro master 分支 Spring Boot 2.7.18 不满足 Spring Boot 3.2.5 需求，必须用 master-jdk17 分支",
+    "MaxKey 同步：SCIM 2.0 推送端在 MaxKey 3.5.18 后从 maxkey-web-mgt 迁移至 maxkey-web-openapi，需确认 MaxKey 服务器版本",
+    "前端 satnaing/shadcn-admin 使用 TanStack Router（不是 React Router 7），存在路由层差异，需切换或接受不一致"
+  ],
+
+  "risks": [
+    {
+      "plan": "方案 A (RuoYi-Vue-Plus)",
+      "level": "medium",
+      "detail": "官方用 Sa-Token，不用 Spring Security。需求方要求 Spring Security + JWT，需重写整个认证层（约 3-5 天），否则与目标栈冲突。"
+    },
+    {
+      "plan": "方案 A (RuoYi-Vue-Plus)",
+      "level": "medium",
+      "detail": "JustAuth + MaxKey 扩展（AuthMaxKeyRequest）已存在，OAuth 登录流程可用，但 JIT 创建账号时 MaxKey 侧的用户/部门到本地 DB 的 Sync 机制需自行实现，无开箱即用支持。"
+    },
+    {
+      "plan": "方案 A (RuoYi-Vue-Plus)",
+      "level": "low",
+      "detail": "多租户默认开启，需切换到 Single 分支或手动关闭，否则表结构存在 tenant_id 字段增加复杂性。"
+    },
+    {
+      "plan": "方案 A (RuoYi-Vue-Plus)",
+      "level": "high",
+      "detail": "前端必须完全替换（Vue3 → React 18），所有官方提供的前端组件/页面全部不可用，只能参考布局和接口设计，前端工作量等同于新建，约 15-20 人天。"
+    },
+    {
+      "plan": "方案 B (ruoyi-vue-pro)",
+      "level": "high",
+      "detail": "master 分支 Spring Boot 2.7.18 不满足 3.2.5 要求；master-jdk17 分支虽有 Spring Boot 3.2 支持，但无 MaxKey 专属集成，JustAuth 扩展需自行实现（参考方案 A 逆向）。"
+    },
+    {
+      "plan": "方案 B (ruoyi-vue-pro)",
+      "level": "high",
+      "detail": "前端同样需完全替换（Vue3 → React 18），与方案 A 等量工作。"
+    },
+    {
+      "plan": "方案 B (ruoyi-vue-pro)",
+      "level": "medium",
+      "detail": "芋道源码模块极多（Mall/ERP/CRM/MES/IoT），引入大量无关依赖，精简复杂度高，删除无用模块约需 1-2 天，存在遗漏风险。"
+    },
+    {
+      "plan": "方案 C (自定义开发)",
+      "level": "medium",
+      "detail": "MaxKey 同步需自行实现。JDBC Connector 方式要求在 MaxKey 服务器部署 Connector 配置，依赖 MaxKey 服务器管理权限，若无服务器运维权限则仅能用 OpenAPI 定时任务拉取。"
+    },
+    {
+      "plan": "方案 C (自定义开发)",
+      "level": "low",
+      "detail": "Spring Security 6 同时配置 DaoAuthenticationProvider + OAuth2Login 是成熟模式：两者都可注册到同一 HttpSecurity，通过 authenticationManagerBuilder 协同，本地密码走 /api/auth/login（UsernamePasswordAuthenticationFilter），OAuth2 走 /oauth2/authorization/{registrationId}，风险低。"
+    },
+    {
+      "plan": "方案 C (自定义开发)",
+      "level": "medium",
+      "detail": "开发工作量最高（8-13 人天后端基础模块），但技术栈完全自主可控，无遗留包袱，适合多系统共用基础框架的场景。"
+    },
+    {
+      "plan": "通用",
+      "level": "medium",
+      "detail": "MaxKey 用户/部门同步到本地 DB 后需维护双向一致性（MaxKey 为 Source of Truth），任何本地修改可能被下次同步覆盖，需设计同步策略（覆盖 vs 合并）。"
+    }
+  ],
+
+  "test_surface": [
+    "curl -v 'http://maxkey-server/maxkey/oauth/v20/authorize?client_id=xxx&response_type=code&redirect_uri=xxx' — 验证 MaxKey OAuth2 Authorization Code 端点可达",
+    "JustAuth AuthMaxKeyRequest.authorize() → 返回 URL 包含 /maxkey/oauth/v20/authorize",
+    "OAuth2 callback 处理：GET /auth/callback/maxkey?code=xxx&state=yyy → 返回 JWT Token",
+    "本地密码登录：POST /api/auth/login {username, password} → 返回 JWT（DaoAuthenticationProvider 路径）",
+    "混合认证开关：系统参数 auth.oauth.enabled=false 时，禁用 /oauth2/authorization/{source} 端点，本地密码正常",
+    "MaxKey 同步任务：手动触发同步 → 本地 sys_user 表更新（upsert by maxkey_user_id），sys_dept 树结构更新",
+    "部门树接口：GET /api/system/dept/tree → 返回 treeNode[] 结构，parentId 正确",
+    "SCIM 2.0 端点（若用推送模式）：POST /scim/v2/Users → 更新本地用户表",
+    "MyBatis-Plus 3.5.x + Spring Boot 3.2 兼容性：mvn spring-boot:run 无 jakarta/javax ClassNotFound 异常",
+    "前端 satnaing/shadcn-admin 路由切换：从 TanStack Router 切换到 React Router 7 的路由声明验证"
+  ],
+
+  "maxkey_sync_options": {
+    "option_1_jdbc_connector": {
+      "name": "MaxKey JDBC Connector（主动推送，服务端部署）",
+      "description": "在 MaxKey 管理后台配置 Connector，MaxKey 通过 JDBC 直连目标系统数据库，定期将用户/组织架构同步写入。MaxKey 侧提供 maxkey-synchronizers 模块（含 LDAP、钉钉、飞书、企业微信同步器，以及通用 JDBC connector 接口）。",
+      "complexity": "中等：需要在 MaxKey 服务端配置 Connector（SQL 语句映射 MaxKey 用户字段 → 目标表），需要 MaxKey 服务器能访问目标数据库",
+      "stability": "高：MaxKey 官方支持，同步在 MaxKey 内部调度执行",
+      "pros": [
+        "官方支持，有 UI 配置界面",
+        "同步逻辑集中在 MaxKey 服务端，目标业务系统无需额外代码",
+        "支持 RocketMQ/Kafka 消息中间件异步推送（可选）"
+      ],
+      "cons": [
+        "需要 MaxKey 服务器直连目标数据库，跨网段/跨安全域时有安全风险",
+        "需要有 MaxKey 服务器运维权限",
+        "表结构变更时需同步修改 MaxKey Connector SQL 配置",
+        "若目标系统多个，每个都需配置一个 Connector"
+      ],
+      "recommended_when": "已有 MaxKey 运维权限，且网络允许 MaxKey 直连目标 DB"
+    },
+    "option_2_openapi_pull": {
+      "name": "MaxKey OpenAPI 定时任务（业务系统主动拉取）",
+      "description": "MaxKey 从 v3.5.18 起将 REST/SCIM 接口迁移到独立模块 maxkey-web-openapi。业务系统（Spring Boot）实现定时任务，通过 HTTP 调用 MaxKey REST API（/api/users, /api/orgs）分页拉取用户和组织，写入本地 DB。",
+      "complexity": "低~中：编写一个 Spring @Scheduled 定时任务，HTTP 调用 MaxKey REST API，upsert 本地 sys_user / sys_dept 表，约 2-3 天实现",
+      "stability": "中：依赖 MaxKey API 可用性和分页游标稳定性，网络抖动时可重试，但需处理增量同步（lastModified 时间戳过滤）",
+      "pros": [
+        "业务系统完全掌控同步逻辑",
+        "无需 MaxKey 直连目标数据库，网络安全性更高",
+        "可灵活控制同步频率、字段映射、冲突处理策略",
+        "不依赖 MaxKey 服务器部署权限"
+      ],
+      "cons": [
+        "需要业务系统自行维护定时任务代码",
+        "全量同步时性能受 MaxKey API 分页速度限制",
+        "需要向 MaxKey 申请 API 访问凭证（client_credentials 模式）"
+      ],
+      "recommended_when": "无法直连 MaxKey 数据库，或需要完全掌控同步业务逻辑"
+    },
+    "option_3_scim_push": {
+      "name": "SCIM 2.0 推送（MaxKey → 业务系统）",
+      "description": "在业务系统暴露 SCIM 2.0 标准端点（/scim/v2/Users, /scim/v2/Groups），MaxKey 作为 SCIM Client 将用户变更事件推送到业务系统。",
+      "complexity": "高：需要业务系统实现符合 RFC 7643/7644 的 SCIM 2.0 服务端，或引入开源 SCIM 库",
+      "stability": "高（事件驱动，实时性最好）",
+      "pros": ["实时同步，无轮询延迟", "标准协议"],
+      "cons": [
+        "实现复杂度高",
+        "需要业务系统暴露公网或内网可达的 SCIM 端点",
+        "MaxKey 4.x 才完整支持"
+      ],
+      "recommended_when": "需要实时同步且有资源实现 SCIM 服务端"
+    },
+    "recommendation": "推荐 Option 2（OpenAPI 定时任务拉取）：实现简单，网络安全性高，约 2-3 天完成，满足大多数企业内部同步场景（每 5-15 分钟同步一次已足够）。若 MaxKey 版本 ≥ 3.5.18 且服务器配置允许，可进一步评估 JDBC Connector。"
+  },
+
+  "frontend_template_options": {
+    "option_1_satnaing_shadcn_admin": {
+      "repo": "https://github.com/satnaing/shadcn-admin",
+      "stack": "shadcn/ui + TailwindCSS + Vite + TanStack Router + TypeScript + Lucide Icons",
+      "stars": "约 2万+ (2024年增长最快的 shadcn admin 模板)",
+      "pages": "10+ 页面，含登录、Dashboard、用户管理、设置等",
+      "pros": [
+        "完全匹配 shadcn/ui + Tailwind + Vite + TypeScript 目标栈",
+        "亮/暗模式、RTL 支持、响应式、无障碍",
+        "MIT 协议",
+        "活跃维护，社区活跃"
+      ],
+      "cons": [
+        "使用 TanStack Router，目标栈是 React Router 7，需切换路由层（改动约 1 天）",
+        "Clerk 认证（partial），需替换为自研 JWT 认证",
+        "无树形部门组件，需自行添加",
+        "定位为 UI 展示而非 starter 模板，无后端接口对接"
+      ],
+      "migration_effort": "约 1-2 天完成路由切换 + 认证替换",
+      "recommendation": "首选，与目标栈最接近"
+    },
+    "option_2_rohitsoni007_shadcn_admin": {
+      "repo": "https://github.com/rohitsoni007/shadcn-admin",
+      "stack": "shadcn/ui + React Router（不确定版本）+ TanStack Query + Vite",
+      "pros": ["与目标栈路由更接近"],
+      "cons": [
+        "stars 较少，社区活跃度低于 satnaing/shadcn-admin",
+        "页面完整度和组件质量需验证"
+      ],
+      "recommendation": "备选，若 TanStack Router → React Router 7 切换成本过高时考虑"
+    },
+    "option_3_custom_from_shadcn": {
+      "description": "直接基于 shadcn/ui + Vite + React Router 7 + TanStack Query 从空模板搭建",
+      "pros": [
+        "完全自主，无历史包袱",
+        "技术栈 100% 匹配"
+      ],
+      "cons": [
+        "侧边栏、导航、布局、权限路由等均需自行实现，约 5-7 天",
+        "无设计参考，需额外 UI 设计工作"
+      ],
+      "recommendation": "若时间充裕且有 UI 设计能力可选，否则建议从 satnaing/shadcn-admin 迁移"
+    },
+    "recommendation": "推荐 satnaing/shadcn-admin 作为前端起点，切换 TanStack Router → React Router 7 并替换 Clerk 为自研 JWT 认证，约 1-2 天工作量，可节省 5-7 天从零搭建时间。"
+  },
+
+  "spring_security_hybrid_auth_pattern": {
+    "description": "Spring Security 6（Spring Boot 3.x）同时配置 DaoAuthenticationProvider（本地密码）+ OAuth2LoginConfigurer（MaxKey OAuth2）的标准模式",
+    "configuration_sketch": "在 SecurityFilterChain Bean 中：http.formLogin(Customizer.withDefaults()) 或自定义 /api/auth/login 接口通过 AuthenticationManager 调用 DaoAuthenticationProvider；同时 http.oauth2Login(oauth2 -> oauth2.loginPage('/login').authorizationEndpoint(...).tokenEndpoint(...))。两者互不干扰，通过 URL 路径区分入口。",
+    "local_password_path": "POST /api/auth/login → UsernamePasswordAuthenticationToken → DaoAuthenticationProvider → UserDetailsService（查本地 DB）→ 返回 JWT",
+    "oauth2_path": "GET /oauth2/authorization/maxkey → 重定向 MaxKey → callback /login/oauth2/code/maxkey → OAuth2LoginAuthenticationProvider → 创建/更新本地用户 → 返回 JWT",
+    "switch_pattern": "在 SecurityFilterChain 中通过条件配置或系统参数 @ConditionalOnProperty 动态注册/注销 oauth2Login configurer，或在 OAuth2 callback 处理器中检查开关标志",
+    "risk": "低，Spring Security 6 官方支持此模式，已有大量生产案例"
+  },
+
+  "builder_notes": [
+    "【关键决策点】三个方案的前端工作量基本相同（均需全量实现 React 前端），因此前端不是方案选择的差异变量。后端核心差异在于：认证层（Sa-Token vs Spring Security）和 MaxKey 集成的开箱程度。",
+    "【方案 A 最大风险】RuoYi-Vue-Plus 的认证层是 Sa-Token，而非 Spring Security。若需求固定必须使用 Spring Security + JWT，则方案 A 的认证模块几乎等同于重写，性价比降低。若愿意改用 Sa-Token 则风险降低。",
+    "【方案 A MaxKey 优势】与 MaxKey 同属 dromara 组织，JustAuth 的 AuthMaxKeyRequest 已官方实现，是三个方案中 MaxKey OAuth2 登录集成开箱度最高的选项，配置只需填写 server-url + client-id + client-secret。",
+    "【方案 B 核心问题】Spring Boot 版本对齐需用 master-jdk17 分支（非默认 master），MaxKey 无原生支持，需参考方案 A 自行实现 AuthMaxKeyRequest，功能上等同于方案 C 但多了大量不需要的业务模块（商城/ERP/CRM等）作为噪音。",
+    "【方案 C 推荐场景】如果需要多个自研系统共用同一基础框架，自定义开发提供最高的技术栈一致性和长期可维护性。初始工作量约 8-13 人天后端，前端 15-20 人天，但后续每个新系统的复用成本极低。",
+    "【MaxKey 同步推荐】无论选哪个方案，MaxKey 账号/部门同步均推荐 OpenAPI 定时拉取（Spring @Scheduled），不推荐 JDBC Connector（安全边界问题）。同步实体设计：sys_user 增加 maxkey_uid 唯一索引，sys_dept 增加 maxkey_org_id 唯一索引，以 MaxKey ID 作为幂等键做 upsert。",
+    "【前端推荐】satnaing/shadcn-admin 是最接近目标栈的起点，切换路由层代价可控。注意其路由声明为 TanStack Router（文件式路由），需迁移到 React Router 7 的声明式路由。",
+    "【MyBatis-Plus 版本注意】Spring Boot 3.x 必须使用 mybatis-plus-spring-boot3-starter（不能用旧的 mybatis-plus-boot-starter），否则因 javax → jakarta 命名空间变更导致启动失败。当前最新稳定版 3.5.11 已通过 Spring Boot 3.5.x 验证。",
+    "【综合评分】如需最快上线且可接受 Sa-Token：选方案 A；如需 Spring Security 且不介意从源码中删除冗余模块：选方案 C；方案 B 在此需求下性价比最低。"
+  ]
+}

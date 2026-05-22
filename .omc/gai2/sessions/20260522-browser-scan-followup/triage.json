@@ -1,0 +1,124 @@
+{
+  "classification": "Medium",
+  "risk_level": "MEDIUM",
+  "rationale": [
+    "本轮是续作，P0 可访问性崩溃和 inventory.ts 覆盖率已在上轮解决，核心风险已从 HIGH 降至 MEDIUM。",
+    "残余任务分为 4 个独立维度：(1) 后端 Controller 测试补齐、(2) three 大 chunk 警告处理、(3) 临时 smoke 持久化为 E2E spec、(4) coverage 产物清理，每个维度相对独立，可分步推进。",
+    "6 个 AC 中 AC1（无回退验证）是回归确认，复杂度低；AC5（coverage 产物清理）是运维级操作；AC2/AC3/AC4 是核心实现项，但范围均可控。",
+    "后端 Controller 测试虽涉及认证 mock、H2 数据库和租户上下文，但本轮只需补至少 1 组高价值核心 Controller（如 AuthController 或 InventoryController），而非全量 17 个，范围明确且可裁剪。",
+    "three chunk 1068.71 kB 是 Three.js 库本身体积，业务无法缩减，合理出路是阈值调整、预加载策略文档化或 Vite build.chunkSizeWarningLimit 配置，属于配置/文档决策而非代码重构。",
+    "不需要重新审计——上一轮 audit.json 的 P0/P1/P2 问题清单、技术约束和修复建议仍然有效，本轮可直接进入实现阶段。",
+    "预估涉及文件：后端测试 1-3 个 Java 文件、前端 E2E spec 1-2 个文件、vite.config.ts 阈值配置、.gitignore 或清理脚本调整，总计 5-8 个文件，符合 Medium 分类。"
+  ],
+  "required_agents": [
+    "gai2-builder",
+    "gai2-reviewer"
+  ],
+  "recommended_debate": false,
+  "skip_audit_rationale": "上一轮 audit.json 已完整记录 P0/P1/P2 问题清单、现有技术模式和技术约束，本轮 4 个残余维度均有明确方向，无需重新审计。若 builder 在实施中发现新的阻塞（如 Controller 测试框架约定不明确），可由 builder 自行记录并降级处理。",
+  "suggested_builder_scope": [
+    {
+      "id": "AC1",
+      "description": "回归验证：运行临时 Playwright smoke 复验 /compensation、/bigscreen-3d、/inventory 三个入口无回退，确认上一轮修复仍然有效。",
+      "estimated_files": 0,
+      "estimated_effort": "low"
+    },
+    {
+      "id": "AC2",
+      "description": "E2E 持久化：将上一轮临时 Playwright smoke 脚本转化为至少 1 个可重复运行的 Playwright spec 文件，覆盖 /compensation 无崩溃、/bigscreen-3d WebGL 降级、/inventory 智能报告按钮禁用态。建议放入 frontend/e2e/smoke-accessibility.spec.ts 或类似路径。",
+      "estimated_files": "1-2 个前端 E2E spec",
+      "estimated_effort": "medium"
+    },
+    {
+      "id": "AC3",
+      "description": "three 大 chunk 处理：(a) 在 vite.config.ts 中设置 build.chunkSizeWarningLimit 为 1100 或合理阈值消除警告，或 (b) 为 three 依赖添加预加载提示（modulePreload），或 (c) 在文档/changes.json 中给出明确的技术决策证据说明为何保留当前体积。目标是构建输出不再有未解释的大 chunk 警告。",
+      "estimated_files": "frontend/vite.config.ts，可能 1 个文档说明",
+      "estimated_effort": "low-medium"
+    },
+    {
+      "id": "AC4",
+      "description": "后端 Controller 测试：选择至少 1 个高价值核心 Controller（优先 InventoryController 或 AuthController），补充至少 1 个 MockMvc 测试类，覆盖核心 CRUD 或认证路径。若后端测试环境不可用（H2 数据库、认证 mock 约定不明确），需以明确技术阻塞证据说明为何无法补齐，而非静默跳过。",
+      "estimated_files": "1-3 个 Java 测试文件",
+      "estimated_effort": "medium-high"
+    },
+    {
+      "id": "AC5",
+      "description": "coverage 产物清理：(a) 确认 frontend/coverage、frontend/playwright-report、frontend/test-results、backend/target 在 .gitignore 中已排除；(b) 若未排除则添加；(c) 运行 git checkout 或 rm 清理已跟踪的 coverage 产物；(d) 最终 git status 确认临时产物不混入业务变更。",
+      "estimated_files": ".gitignore（可能修改）",
+      "estimated_effort": "low"
+    },
+    {
+      "id": "AC6",
+      "description": "记录完整 changes.json，由 gai2-reviewer 独立核验 AC1-AC6 并给出 PASS/PARTIAL/FAIL。",
+      "estimated_files": "changes.json、review.json",
+      "estimated_effort": "low"
+    }
+  ],
+  "verification_expectations": [
+    "AC1：Playwright Chromium 访问 /compensation、/bigscreen-3d、/inventory，body 不含 'Unexpected Application Error'，pageErrors 为空。",
+    "AC2：至少 1 个新 Playwright spec 文件可通过 npx playwright test 运行，覆盖三个入口的基本可访问性断言。",
+    "AC3：npm run build 输出中不再出现 'Some chunks are larger than' 警告（通过阈值调整），或在 changes.json 中有明确文档化证据说明保留决策。",
+    "AC4：至少 1 个后端 Controller 测试类通过 mvn test（或等价命令），覆盖核心路径；若被阻塞，需有明确的技术阻塞证据。",
+    "AC5：git status --short 不包含 frontend/coverage、frontend/playwright-report、frontend/test-results、backend/target 的业务相关变更。",
+    "AC6：gai2-reviewer 独立核验全部 AC 并给出逐项判定和总体评分。",
+    "回归保障：上一轮已通过的 /compensation SelectItem 修复、/bigscreen-3d WebGL 降级、/inventory 智能报告按钮禁用态均未被回退。"
+  ],
+  "blockers_or_inputs_needed": [
+    "后端 Controller 测试需确认：测试框架约定（JUnit5 + MockMvc）、认证 mock 方式（@WithMockUser? 自定义 filter?）、H2 数据库兼容性和测试数据 fixture 模式。建议 builder 先读取现有 *ControllerTest.java 确认模式。",
+    "three chunk 阈值调整需确认：团队是否有构建体积规范、chunkSizeWarningLimit 的可接受上限。若无法确认，建议采用文档化决策路径。",
+    "Playwright E2E spec 需确认：仓库现有 E2E 文件的组织路径（frontend/e2e/ 还是其他）、Playwright 配置项目（是否有专门的 smoke project）、以及是否需要 storageState 处理登录态。",
+    "前端 dev server 需可启动（端口 5173），用于 AC1 回归验证和 E2E spec 运行。",
+    "后端服务需可启动（端口 8080），用于后端 Controller 测试运行。"
+  ],
+  "inheritance_from_parent": {
+    "parent_session": ".omc/gai2/sessions/20260522-browser-scan-retry",
+    "parent_score": 88,
+    "parent_status": "PARTIAL",
+    "carried_forward_risks": [
+      "后端 Controller 覆盖缺口仍未修复",
+      "three 独立 chunk 仍约 1068.71 kB 且 Vite 仍有大 chunk 警告",
+      "临时浏览器 smoke 未持久化为 E2E spec",
+      "coverage 产物需清理或隔离",
+      "未登录真实数据闭环仍未覆盖"
+    ],
+    "already_resolved": [
+      "/compensation Radix Select 空字符串崩溃已修复",
+      "/bigscreen-3d WebGL 降级已实现",
+      "/inventory 智能报告入口按钮已禁用化",
+      "inventory.ts 覆盖率已达 100%",
+      "npm run build 已通过"
+    ]
+  },
+  "acceptance_checks": [
+    {
+      "id": "AC1",
+      "description": "独立确认上一轮修复无回退：/compensation、/bigscreen-3d、/inventory 智能报告入口在浏览器模拟中仍可访问且无 Unexpected Application Error。",
+      "status": "pending"
+    },
+    {
+      "id": "AC2",
+      "description": "将上一轮临时浏览器 smoke 转化为可重复运行的持久化 E2E/浏览器回归测试或等价脚本，并在验证中运行通过。",
+      "status": "pending"
+    },
+    {
+      "id": "AC3",
+      "description": "进一步降低 BigScreen3DPage/Three.js 构建体积风险，使构建输出不再保留未解释的大 chunk 警告；如因业务必要无法消除，必须给出可验收的分包/阈值/文档化证据。",
+      "status": "pending"
+    },
+    {
+      "id": "AC4",
+      "description": "补充至少一组高价值后端核心 Controller 测试（优先 AuthController、DashboardController、AssetController、InventoryController 或 VendorController），或以明确技术阻塞证据说明为什么本轮无法补齐。",
+      "status": "pending"
+    },
+    {
+      "id": "AC5",
+      "description": "清理或隔离 coverage/playwright-report/test-results 等临时产物，确保 git status 中业务变更、测试变更和 GAI2 产物范围清晰。",
+      "status": "pending"
+    },
+    {
+      "id": "AC6",
+      "description": "由 gai2-builder 记录完整 changes.json，由 gai2-reviewer 独立核验并给出 PASS/PARTIAL/FAIL；若未达到完全通过，必须列出剩余不可接受项。",
+      "status": "pending"
+    }
+  ]
+}

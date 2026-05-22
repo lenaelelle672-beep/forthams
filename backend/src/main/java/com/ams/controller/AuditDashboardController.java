@@ -83,17 +83,21 @@ public class AuditDashboardController {
 
     @GetMapping("/action-type-distribution")
     public Result<TypeDistributionVO> getTypeDistribution(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
-        return Result.success(auditDashboardService.getTypeDistribution(startDate, endDate));
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+        LocalDate effectiveEnd = endDate != null ? endDate : LocalDate.now();
+        LocalDate effectiveStart = startDate != null ? startDate : effectiveEnd.minusDays(30);
+        return Result.success(auditDashboardService.getTypeDistribution(effectiveStart, effectiveEnd));
     }
 
     @GetMapping("/operator-ranking")
     public Result<List<OperatorRankingVO>> getOperatorRanking(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
             @RequestParam(defaultValue = "10") int limit) {
-        return Result.success(auditDashboardService.getOperatorRanking(startDate, endDate, limit));
+        LocalDate effectiveEnd = endDate != null ? endDate : LocalDate.now();
+        LocalDate effectiveStart = startDate != null ? startDate : effectiveEnd.minusDays(30);
+        return Result.success(auditDashboardService.getOperatorRanking(effectiveStart, effectiveEnd, limit));
     }
 
     @GetMapping("/meta")

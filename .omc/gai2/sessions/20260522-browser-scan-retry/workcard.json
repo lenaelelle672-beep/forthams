@@ -1,0 +1,62 @@
+{
+  "directive": "基于浏览器模拟测试对 forthAMS 企业资产管理系统进行真人式可访问性与功能入口验证，定位目前明确存在的 2 处无法访问问题；结合既有扫描/测试报告中 inventory.ts 覆盖率不足、BigScreen3DPage chunk 过大、后端 Controller 覆盖不足、临时目录清理、E2E 覆盖缺口等问题，汇总浏览器验证结果后推进修复，目标是让关键入口可访问并尽可能达到 100 分验收。",
+  "owner": "gai2-orchestrator",
+  "phase": "workcard_created",
+  "artifact_dir": ".omc/gai2/sessions/20260522-browser-scan-retry",
+  "language_protocol": "所有自然语言输出必须使用简体中文；代码、命令、路径、JSON key、API 名称和错误原文可以保留英文。",
+  "constraints": [
+    "仅使用 .omc/gai2/ 作为状态和产物目录，保留 legacy gai 不动。",
+    "orchestrator 不直接运行项目命令、不编辑业务文件、不替代子 agent 实现。",
+    "创建 workcard 后必须调度 gai2-triage；若非 Light，必须调度 gai2-audit；实现必须由 gai2-builder；收尾必须由 gai2-reviewer。",
+    "浏览器模拟验证、项目调查、测试、构建、修复与命令执行均交给子 agent 产出证据。",
+    "如必需子 agent 未被调用或必需产物缺失，只能报告 blocked/incomplete。"
+  ],
+  "acceptance_checks": [
+    {
+      "id": "AC1",
+      "description": "通过浏览器模拟/真人式路径验证识别并记录当前至少 2 处无法访问入口或页面，包含复现路径、现象、预期行为和证据。",
+      "status": "pending"
+    },
+    {
+      "id": "AC2",
+      "description": "结合浏览器验证结果与扫描报告，形成统一问题清单和优先级，避免只依赖单元测试通过来误判系统可用。",
+      "status": "pending"
+    },
+    {
+      "id": "AC3",
+      "description": "修复可访问性/路由/页面入口问题，使关键业务页面可进入并具备基础功能级验收条件。",
+      "status": "pending"
+    },
+    {
+      "id": "AC4",
+      "description": "推进扫描报告中的高价值修复：inventory.ts 函数覆盖率达标、BigScreen3DPage 按需拆分或等效性能风险降低、必要时补充核心 Controller 测试或明确残余风险。",
+      "status": "pending"
+    },
+    {
+      "id": "AC5",
+      "description": "由 gai2-builder 运行并记录相关验证命令结果，由 gai2-reviewer 独立核验 workcard、changes.json、review.json 及关键证据。",
+      "status": "pending"
+    }
+  ],
+  "evidence_to_collect": [
+    "浏览器模拟测试记录：访问路径、失败页面、控制台/网络错误、截图或文字证据、修复后复验结果。",
+    "扫描报告问题映射：inventory.ts 覆盖率、BigScreen3DPage chunk、Controller 测试覆盖、临时目录/E2E 风险。",
+    "代码变更清单：changed_files、added_files、删除文件或目录。",
+    "验证命令输出：前端构建、前端测试/覆盖率、后端相关测试或可行的替代验证。",
+    "最终 reviewer 对每条 acceptance_check 的 PASS/PARTIAL/FAIL 判定。"
+  ],
+  "open_risks": [
+    "浏览器模拟可能依赖本地服务、种子数据、登录账号或端口配置，若环境不可用需在 audit/changes 中明确 blocked 证据。",
+    "100 分目标可能超出一次修复范围，尤其后端 17 个 Controller 全覆盖和 E2E/Testcontainers 引入可能较重。",
+    "BigScreen3DPage 涉及 Three.js 资源拆分，需确保路由仍可访问且不破坏大屏功能。",
+    "后端覆盖补齐可能需要认证、租户隔离和数据库 fixture 约定，需优先选择高价值核心 Controller。"
+  ],
+  "known_context": {
+    "reported_backend_tests": "171/171 PASS",
+    "reported_frontend_tests": "585/585 PASS",
+    "reported_frontend_build": "PASS，但 BigScreen3DPage chunk 约 1187 kB",
+    "reported_frontend_coverage_gap": "inventory.ts Functions 81.81% < 90%，未覆盖第 114-115、117-118 行",
+    "reported_backend_gap": "27 个 Controller 中仅 10 个有测试，AuthController、DashboardController、AssetController、InventoryController、VendorController 等缺少测试",
+    "user_priority": "先基于浏览器模拟确认 2 处无法访问问题，再结合扫描结果汇总修复，追求 100 分"
+  }
+}

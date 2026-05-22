@@ -1,0 +1,244 @@
+{
+  "current_state": {
+    "idle_route_issue": {
+      "path": "/idle",
+      "status": "404 — 客户端无法访问",
+      "root_cause": "前端路由 `frontend/src/router/index.tsx` 第 155 行已注册 `{ path: 'idle', element: S(IdleAssetsPage) }`，组件文件 `frontend/src/pages/idle/IdleAssetsPage.tsx` 存在并正确 export default，侧边栏 `AppLayout.tsx:71` 已有导航入口 `{ path: '/idle', label: '闲置资产', icon: Warehouse }`，后端 `IdleAssetController.java` 存在且映射 `/idle-assets`。路由最近一次是以 commit `6d9199f2` (\"fix: P0 crash/route/security fixes\") 合入，与 router/index.tsx 仅 2 个历史提交吻合。三个最可能原因及证据如下：",
+      "evidence": "router/index.tsx 第 155 行已注册 idle；IdleAssetsPage.tsx 存在并默认导出；AppLayout.tsx 第 71 行存在导航入口；IdleAssetController.java @RequestMapping(\"/idle-assets\") 存在。root_cause_ranked: [1) 生产/Staging 服务器未配置 SPA fallback（index.html 兜底），直接访问 /idle 返回服务器 404；2) 上次部署在 6d9199f2 之前，路由变更未生效；3) 后端 API GET /idle-assets/list 返回 404（但页面应渲染错误提示而非整页 404）]。",
+      "root_cause_candidates": [
+        "A (最可能): Vite 构建产物部署到 Nginx/静态服务器时未配置 try_files $uri /index.html，SPA 路由在服务器端无对应文件返回 404。修复：检查生产部署的 nginx 配置或服务器 fallback 规则。",
+        "B (次可能): 部署的构建版本早于 commit 6d9199f2，前端路由未包含 /idle。修复：重新构建部署。",
+        "C (可能性低): Vite dev server 缓存问题或 React.lazy 在特定浏览器中加载失败。修复：清除浏览器缓存 / 硬刷新。"
+      ]
+    },
+    "inherited_fixes_verified": [
+      {
+        "entry": "/compensation",
+        "status": "已修复且已验证不回退",
+        "evidence": "上一轮 builder 将 `AssetCompensationFormPage.tsx` 中的 `SelectItem value=\"\"` 替换为禁用 Select + 占位文案；reviewer 独立 Playwright Chromium smoke 验证通过，body 无 Unexpected Application Error，pageErrors 为空。"
+      },
+      {
+        "entry": "/bigscreen-3d",
+        "status": "已修复且已验证不回退",
+        "evidence": "上一轮 builder 在 `BigScreen3DPage.tsx` 增加 canCreateWebGLContext、WebGLBoundary、WebGLFallback；reviewer 使用 `--disable-webgl --disable-3d-apis` 参数复验通过，展示“3D 地图已切换为安全降级模式”。"
+      },
+      {
+        "entry": "/inventory 智能报告入口",
+        "status": "已修复且已验证不回退",
+        "evidence": "上一轮 builder 在 `InventoryTasksPage.tsx` 修正无 taskId 时不跳转、按钮 disabled；reviewer Playwright 验证 button-disabled=true，title=\"暂无可查看的盘点任务\"。"
+      }
+    ],
+    "backend_test_gap": [
+      {
+        "controller": "AssetController",
+        "priority": "P0 — 最高业务价值",
+        "status": "未覆盖 — 核心资产 CRUD 入口，影响资产台账/详情/表单页数据闭环",
+        "code_location": "backend/src/main/java/com/ams/controller/AssetController.java",
+        "service_dependency": "AssetService",
+        "test_pattern": "沿用 @SpringBootTest(properties = \"server.servlet.context-path=/api\") + @AutoConfigureMockMvc(addFilters = false) + @ActiveProfiles(\"test\") + @MockBean AssetService，与 InventoryControllerTest/WorkOrderControllerTest 等现有 11 个 ControllerTest 模式一致",
+        "recommended_tests": [
+          "GET /api/assets — 代理 assetService.queryAssets(page, pageSize, search, dept) 返回 code=200",
+          "GET /api/assets/list — 同上",
+          "GET /api/assets/{id} — 返回单个 AssetDTO 或 Entity，code=200",
+          "POST /api/assets — 接收 AssetCreateDTO，调用 assetService.addAsset，返回 code=200",
+          "PUT /api/assets/{id} — 调用 assetService.updateAsset，返回 code=200",
+          "DELETE /api/assets/{id} — 调用 assetService.deleteAsset，返回 code=200",
+          "空数据/参数校验: 分页参数缺省时使用默认值 page=1 pageSize=10"
+        ],
+        "risk": "LOW — GitNexus upstream impact direct=0, processes_affected=0；纯服务代理模式，mock 后不依赖数据库",
+        "estimated_test_file_size": "80-120 行，继承标准模式"
+      },
+      {
+        "controller": "AuthController",
+        "priority": "P0 — 高阶但复杂度高",
+        "status": "未覆盖 — 认证是全局前提，但测试需要处理 @Valid、JWT、SecurityContext、过滤器链",
+        "code_location": "backend/src/main/java/com/ams/controller/AuthController.java",
+        "service_dependency": "AuthService",
+        "test_pattern": "与 AssetController 相同 MockMvc 模式，但因 AuthController 涉及登录/注册/登出，需要额外 mock AuthService 各方法，且需验证 cookie/token 响应头",
+        "recommended_tests": [
+          "POST /api/auth/login — 成功返回 token + 用户信息，code=200",
+          "POST /api/auth/register — 成功返回 注册成功 或已验证，code=200",
+          "POST /api/auth/logout — 调用 authService.logout，code=200",
+          "参数校验: 空用户名/密码返回 4xx 或业务 code 错误"
+        ],
+        "risk": "LOW — GitNexus upstream impact direct=0, processes_affected=0；但 @Valid 校验和 SecurityContext 需额外注意 mock 策略"
+      },
+      {
+        "controller": "DashboardController",
+        "priority": "P1 — 只读统计，复杂度最低",
+        "status": "未覆盖 — 上一轮 followup audit 已记录为稳定候选",
+        "code_location": "backend/src/main/java/com/ams/controller/DashboardController.java",
+        "service_dependency": "DashboardService",
+        "recommended_tests": [
+          "GET /api/dashboard/stats — 返回 DashboardStatsDTO，code=200",
+          "GET /api/dashboard/trends?days=7 — 将 days=7 传给 dashboardService.getValueTrends",
+          "GET /api/dashboard/dept-distribution — code=200",
+          "GET /api/dashboard/pending-approvals — code=200",
+          "GET /api/dashboard/maintenance-stats — code=200"
+        ],
+        "risk": "LOW — 只读代理，mock 分支最少"
+      },
+      {
+        "controller": "VendorController",
+        "priority": "P1 — 简单 CRUD，价值中等",
+        "status": "未覆盖",
+        "code_location": "backend/src/main/java/com/ams/controller/VendorController.java",
+        "service_dependency": "VendorService",
+        "recommended_tests": [
+          "GET /api/vendors/list — code=200",
+          "GET /api/vendors/{id} — code=200",
+          "POST /api/vendors — code=200",
+          "PUT /api/vendors/{id} — code=200",
+          "DELETE /api/vendors/{id} — code=200"
+        ],
+        "risk": "LOW — 标准 CRUD 代理模式"
+      }
+    ],
+    "three_chunk_state": {
+      "current_chunk": "three-CTj-Gz8i.js",
+      "current_kb": 908.0,
+      "previous_kb": 1068.71,
+      "improvement": "约 160 KB 减少（可能因手动 chunk 配置 + tree-shaking 效果）",
+      "warning_threshold": 600,
+      "configured_limit": 1000,
+      "still_over_default": true,
+      "page_chunk": "BigScreen3DCanvas-Dbl-YU2c.js = 240 KB, 低于阈值",
+      "dependency_map": {
+        "three": "^0.184.0",
+        "@react-three/fiber": "^8.18.0",
+        "@react-three/drei": "^9.122.0",
+        "d3-geo": "^3.1.1",
+        "textures": ["sc-map.png", "sc-displacement-map.png", "sc-normal-map1.png", "guangquan01.png", "fly-line.png", "quan1.png"],
+        "geojson": ["sc-demo2.json", "sc-outline-demo2.json"]
+      },
+      "optimization_options": [
+        "1) 纹理资源瘦身: 当前加载 6 张贴图 (sc-map.png ~200KB, sc-displacement-map.png, sc-normal-map1.png 等)，可将 PNG 用 TinyPNG/WebP 压缩或降分辨率，预计减少 100-300 KB",
+        "2) GeoJSON 数据抽稀: sc-demo2.json 和 sc-outline-demo2.json 可用 simplify、mapshaper 降低精度，预计减少 50-100 KB",
+        "3) 按需加载大纹理: 在 BigScreen3DCanvas 内对不急需的贴图（如 reliefMap、displacementMap）做动态 import()，首屏只加载 terrainMap",
+        "4) 子组件异步化: BeamLights、CityMarkers、FlyLines、BoundaryFollower 等装饰性 3D 组件可异步加载，但 SSR/headless 收益有限",
+        "5) 文档化阈值: 将 chunkSizeWarningLimit 设为 1200 并明确注释 three.js 专属大屏页面异步加载、非首屏依赖",
+        "6) 无操作: 当前 908 KB 已在 /bigscreen-3d 专享路由下异步加载，不低于 600 KB 但由于是专有页面，实际用户体验影响有限"
+      ],
+      "recommended": "优先执行方案 1+2（纹理压缩 + GeoJSON 抽稀），预计可降至 650-750 KB；次选方案 5（文档化阈值）作为残余风险管理。当前 908 KB 虽然超过默认阈值，但因 three.js 仅供 /bigscreen-3d 独立路由异步加载，不对首屏性能产生直接影响。"
+    },
+    "ci_gate": {
+      "existing_ci": ".github/workflows/sprint4_validation.yml — Python 项目专用，不覆盖前端/后端 Java/Node",
+      "existing_script": "scripts/smoke-test.sh — 全流程部署测试，耗时约 2-5 分钟，依赖启动后端 + 前端服务",
+      "recommended_commands": [
+        {"command": "cd frontend && npm run build", "description": "前端生产构建，验证无编译错误", "estimated_seconds": 15},
+        {"command": "cd frontend && npm run test -- --run", "description": "前端 Vitest 单元测试 headless 模式", "estimated_seconds": 10},
+        {"command": "cd frontend && npm run test:coverage -- --run", "description": "前端覆盖率检查（阈值: statements/functions/lines 90%, branches 85%）", "estimated_seconds": 15},
+        {"command": "cd backend && mvn test -q", "description": "后端 Maven 单元测试（含 H2 内嵌数据库）", "estimated_seconds": 60},
+        {"command": "git status --short", "description": "确认无意外临时产物混入变更范围", "estimated_seconds": 2}
+      ],
+      "estimated_total_time": "约 100-120 秒（2 分钟内）",
+      "dependencies": ["Node.js >=20", "npm", "JDK 17+", "Maven 3.6+", "无外部服务依赖（backend 测试用 H2）"],
+      "script_location": "建议新建 scripts/ci-gate.sh 或更新现有 scripts/smoke-test.sh 附加 gate 模式",
+      "sequential": true,
+      "fail_fast": true
+    }
+  },
+  "existing_patterns": [
+    "前端路由权威配置: frontend/src/router/index.tsx 为全局唯一路由，页面组件通过 React.lazy + Suspense 懒加载；S 函数封装 Suspense fallback（PageLoader）",
+    "侧边栏菜单: frontend/src/layouts/AppLayout.tsx 硬编码 NAV_GROUPS，/idle 在第 71 行已注册 { path: '/idle', label: '闲置资产', icon: Warehouse }",
+    "HTTP 客户端: frontend/src/utils/http.ts 基于 Axios，baseURL 为 '/api'（VITE_API_BASE_URL 可覆盖），自动注入 Bearer token；响应拦截器解包 data，401 跳转 /login",
+    "后端 Controller 测试模式: 11 个现有 *ControllerTest 统一使用 @SpringBootTest(properties = \"server.servlet.context-path=/api\") + @AutoConfigureMockMvc(addFilters = false) + @ActiveProfiles(\"test\") + @MockBean Service，请求使用 mockMvc.perform(get/post/put/delete).contextPath(\"/api\")，断言 status().isOk() + jsonPath(\"$.code\").value(200)",
+    "后端依赖: Spring Boot 3.2.5, Java 17, MyBatis-Plus 3.5.9, JWT 0.12.5, Hutool 5.8.26, H2 内嵌测试数据库",
+    "前端架构: Vite 6.4.2, React 18.3.1, React Router 7.13.0, TanStack React Query 5, Radix UI 组件体系, Tailwind CSS 4.1 + PostCSS, Vitest + happy-dom + @testing-library",
+    "构建分包: vite.config.ts 已使用 manualChunks 将 react 全家桶拆入 vendor、recharts 拆入 charts、lucide-react 拆入 ui、three.js 生态拆入 three 独立 chunk；chunkSizeWarningLimit 已设为 1000",
+    "后端 IdleAssetController: 使用 @RequestMapping(\"/idle-assets\")，无 /api 前缀（通过 server.servlet.context-path=/api 实现），存在 6 个端点：GET /list、GET /{id}、POST /、POST /{id}/claim、PUT /{id}/cancel、DELETE /{id}"
+  ],
+  "technical_constraints": [
+    "审计阶段不修改业务文件、测试文件或项目配置；仅写入 .omc/gai2/sessions/20260522-idle-fix-and-consolidate/audit.json",
+    "AGENTS.md 要求修改任何符号前运行 GitNexus impact；当前 GitNexus 索引可能落后 HEAD，BigScreen3DPage 等符号在索引中不可解析（历史记录为 UNKNOWN）",
+    "GitNexus API impact / route_map 对 Spring Controller 路由不可用（返回 0 条路由），涉及 API 修改时需人工核对 Controller → API 文件 → 前端 service → E2E mock",
+    "后端 MockMvc 测试使用 /api contextPath，请求路径必须形如 /api/idle-assets/list 并通过 .contextPath(\"/api\") 设置；不匹配时 Spring MockMvc 视路由为不存在",
+    "IdleAssetController.java 的 claim 端点依赖 JwtUtil.getUserIdFromToken，测试需 @MockBean JwtUtil（已验证在 IdleAssetControllerTest 中已实现此模式）",
+    "前端 IdleAssetsPage.tsx 依赖 @/api/idleAsset（存在）、@/components/ui/PageHeader/Button/Card/Badge（通过 glob 验证均存在）、@/types/common（存在），组件导入链完整",
+    "当前 playbook 要求同时推进 5 个方向（修复 idle + 固化 + E2E + 后端测试 + three 瘦身 + CI gate），范围紧凑；建议按 P0→P1→P2 分层推进",
+    "上一轮残留覆盖率产物 (frontend/coverage/) 可能被 git 跟踪显示修改，提交前需还原或 git rm --cached",
+    "IdleAssetControllerTest.java 已存在但仅含 1 个测试用例（claimUsesJwtUserId），远低于 InventoryControllerTest（5 个测试）的覆盖密度"
+  ],
+  "impact_analysis_plan": [
+    {
+      "target": "frontend/src/router/index.tsx — 路由注册",
+      "recommended_tool": "gitnexus_impact(target=\"router\", direction=\"upstream\", file_path=\"frontend/src/router/index.tsx\")；风险评估 — 索引可能未解析 React Router 配置，建议以人工路径补充",
+      "risk": "LOW — 路由新增/修改仅影响 /idle 页面和侧边栏导航，独立于其他模块"
+    },
+    {
+      "target": "IdleAssetsPage",
+      "recommended_tool": "gitnexus_impact(target=\"IdleAssetsPage\", direction=\"upstream\", file_path=\"frontend/src/pages/idle/IdleAssetsPage.tsx\")",
+      "risk": "LOW — 独立页面，直接消费者为 router/index.tsx 和 AppLayout.tsx 导航项"
+    },
+    {
+      "target": "AssetController (后端)",
+      "recommended_tool": "gitnexus_impact(target=\"AssetController\", direction=\"upstream\", file_path=\"backend/src/main/java/com/ams/controller/AssetController.java\", kind=\"Class\")",
+      "risk": "LOW — 本审计未执行但前一轮对 InventoryController/DashboardController/AuthController/AssetController/VendorController 的 GitNexus impact 均为 LOW（direct=0, processes_affected=0）"
+    },
+    {
+      "target": "BigScreen3DCanvas / BigScreen3DPage",
+      "recommended_tool": "gitnexus_impact(target=\"BigScreen3DCanvas\", direction=\"upstream\") 或 BigScreen3DPage；过往记录显示该符号在索引中不可解析 (UNKNOWN)",
+      "risk": "UNKNOWN — 索引约束，需人工验证路由入口和构建输出"
+    },
+    {
+      "target": "/api/idle-assets/list (后端 API)",
+      "recommended_tool": "gitnexus_api_impact(route=\"/api/idle-assets/list\") 或 route=\"/idle-assets/list\"; 本审计无法测试但 route_map 对 Spring Controller 不返回值",
+      "risk": "UNKNOWN — route_map 不可用，需人工核对 IdleAssetController → idleAsset.ts → Playwright mock 的 API 路径一致性"
+    }
+  ],
+  "risks": [
+    {"level": "high", "detail": "前端 router/index.tsx 已注册 /idle 路由但页面仍 404，根因可能是生产部署未配置 SPA fallback。如果不修复服务器配置，构建后仍无法访问。"},
+    {"level": "high", "detail": "5 个方向并行推进（修复+固化+E2E+测试+瘦身+CI）范围极广，任何方向阻塞都可能拖累整体验收。建议审计交付后启动 debate 确定本轮真实边界。"},
+    {"level": "medium", "detail": "上一轮 PARTIAL 88/100 的核心阻塞项是后端 Controller 测试缺口，本轮如果再次推后（只做前端/无后端测试），reviewer 很可能仍给 PARTIAL。"},
+    {"level": "medium", "detail": "three chunk 908 KB 虽然仅在大屏路由加载，但 Vite 构建仍输出 >600 KB 警告；仅做阈值解释可能被 reviewer 视为掩盖风险。"},
+    {"level": "medium", "detail": "IdleAssetControllerTest 当前仅 1 个 claim 测试，缺少 list/getById/create/cancel/delete 端点覆盖；如果 builder 扩充 Controller 测试时忽略 IdleAsset 自身的缺口，合规性上存在矛盾（要求补 Controller 测试但自身 Controller 测试不完整）"},
+    {"level": "low", "detail": "上一轮 coverage 产物 (frontend/coverage/) 被 git 跟踪，Builder 需在变更前 git checkout 还原或 git rm --cached，否则 reviewer 可能标记范围不干净。"},
+    {"level": "low", "detail": "现有 CI (sprint4_validation.yml) 为 Python 项目专用，与当前 Java/Node 栈完全不兼容；新增 CI gate 脚本与旧 CI 之间的维护边界需要明确。"}
+  ],
+  "recommended_fixes": [
+    {
+      "priority": "P0",
+      "problem": "/idle 页面 404 — 路由已注册但服务器无 SPA fallback 或部署版本落后",
+      "recommendation": "确认生产/Staging 服务器已配置 nginx try_files $uri /index.html 或等价的 SPA fallback；重新执行 `npm run build` 并更新部署。如果 dev server 下仍 404，检查 Vite dev server 是否正常工作并清除浏览器缓存。",
+      "files_or_areas": ["部署服务器 nginx/apache 配置", "frontend/package.json (build script)", "部署流水线"]
+    },
+    {
+      "priority": "P0",
+      "problem": "后端核心 Controller 测试缺口 — 上一轮 PARTIAL 的阻塞项",
+      "recommendation": "本轮优先补齐 AssetControllerTest（核心 CRUD 业务价值最高），使用现有标准 MockMvc 模式。如时间允许追加 DashboardControllerTest。AuthController 因认证模拟复杂度高建议作为独立阶段。",
+      "files_or_areas": ["backend/src/test/java/com/ams/controller/AssetControllerTest.java", "backend/src/test/java/com/ams/controller/DashboardControllerTest.java"]
+    },
+    {
+      "priority": "P1",
+      "problem": "three chunk 908 KB 仍触发构建超大 chunk 警告",
+      "recommendation": "优先做真实压缩：将 6 张贴图用 TinyPNG/WebP 压缩或降分辨率（预计减少 100-300 KB），将 GeoJSON 用 mapshaper simplify 抽稀（预计减少 50-100 KB）。若仍 >600 KB，将 chunkSizeWarningLimit 从 1000 调至 1200 并文档化为 three.js 专有路由异步加载。",
+      "files_or_areas": ["frontend/src/assets/sc-map.png", "frontend/src/assets/sc-displacement-map.png", "frontend/src/assets/sc-normal-map1.png", "frontend/src/assets/*.png", "frontend/src/assets/sc-demo2.json", "frontend/src/assets/sc-outline-demo2.json", "frontend/vite.config.ts"]
+    },
+    {
+      "priority": "P1",
+      "problem": "缺少真实登录态 E2E 回归用例 — 入口虽安全但认证闭环未验证",
+      "recommendation": "在 frontend/src/e2e/browser-regression-smoke.spec.ts 中新增持久化 Playwright 回归，覆盖 /compensation、/bigscreen-3d、/inventory、/idle 四个入口；断言无 Unexpected Application Error、pageErrors 为空；/bigscreen-3d 在无 WebGL 时展示降级。优先 mock API 模式，不依赖真实后端。",
+      "files_or_areas": ["frontend/src/e2e/browser-regression-smoke.spec.ts", "frontend/playwright.config.ts"]
+    },
+    {
+      "priority": "P1",
+      "problem": "IdleAssetControllerTest 覆盖率不足 — 仅 1/6 端点有测试",
+      "recommendation": "扩充 IdleAssetControllerTest 至少覆盖 list、getById、create、cancel、delete 端点。使用与 claim 测试相同的 @MockBean IdleAssetService + @MockBean JwtUtil 模式。这对验证 /idle 页面的后端 API 稳定性直接有益。",
+      "files_or_areas": ["backend/src/test/java/com/ams/controller/IdleAssetControllerTest.java"]
+    },
+    {
+      "priority": "P2",
+      "problem": "临时产物混入风险 (coverage/playwright-report/test-results)",
+      "recommendation": "git status 确认 coverage 是否被跟踪；如被跟踪则运行 git checkout -- frontend/coverage/ 还原；提交前全局检查 git status --short 确认只包含预期业务文件与 GAI2 产物。",
+      "files_or_areas": ["frontend/coverage/", "frontend/playwright-report/", "frontend/test-results/", ".gitignore"]
+    },
+    {
+      "priority": "P2",
+      "problem": "CI gate 脚本缺失 — 无法单命令验证全栈健康状态",
+      "recommendation": "在 scripts/ 下新建 ci-gate.sh，顺序执行：npm run build → npm run test -- --run → npm run test:coverage -- --run → mvn test -q → git status --short。预期总耗时约 2 分钟。不依赖外部服务。同时更新现有 sprint4_validation.yml 或新增 frontend-backend-ci.yml 工作流。",
+      "files_or_areas": ["scripts/ci-gate.sh", ".github/workflows/sprint4_validation.yml 或新增 frontend-backend.yml"]
+    }
+  ],
+  "debate_recommended": true,
+  "debate_rationale": "本轮范围横跨前端路由修复、CI gate、后端 Controller 测试、3D 资源优化、E2E 持久化和硬化锁定。其中有多组真实方案取舍需要 debate 决定：1) 后端 Controller 优先 AssetController 还是 AuthController？2) three chunk 做真实资源压缩还是仅调阈值？3) E2E 做 mock-only smoke 还是 real-backend smoke？4) 本轮是争取全 AC 通过（full scope）还是聚焦 2-3 项高置信度交付然后记录残余风险（lean scope）？建议在 audit 交付后调度 gai2-debate 对比至少 2 个 scope 方案。"
+}

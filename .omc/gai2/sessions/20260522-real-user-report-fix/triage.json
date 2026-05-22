@@ -1,0 +1,74 @@
+{
+  "classification": "Heavy",
+  "risk_level": "HIGH",
+  "rationale": [
+    "涉及 9 个 Bug 修复，横跨至少 8 个 Controller/Entity/Service 文件，且含 4 个高严重度问题（B-1/B-2/B-3/B-4）",
+    "B-1 涉及 4 个 Controller 的路由映射变更，可能影响前端 API 调用路径，需前后端联动验证",
+    "B-2/B-3 涉及 MyBatis-Plus @TableField 注解修正，直接影响数据库 INSERT 操作，变更后需运行时验证",
+    "B-4 涉及 approval_process 表 DDL 变更（applicant_id 默认值），存在数据库迁移风险",
+    "Part 1 需要编写新测试文件（AuthControllerTest、DashboardControllerTest、E2E 测试），属于测试基础设施扩展",
+    "最终验收标准明确要求 mvn test + npm run build + vitest 全部通过，测试覆盖率要求高",
+    "上一轮修复已得到 PASS 97/100，说明大部分修复模式已验证，但仍有回归风险"
+  ],
+  "required_agents": ["gai2-audit", "gai2-builder", "gai2-reviewer"],
+  "recommended_debate": true,
+  "debate_focus": [
+    "B-4 的 approval_process.applicant_id 修复策略：是改数据库 DDL 加默认值，还是改 Service 层在提交前显式设置？DDL 变更需确认回滚方案",
+    "B-1 双 /api 前缀修复：是去掉 Controller 级 @RequestMapping 的 /api 前缀，还是修改 context-path？需确认前端是否硬编码了完整 URL",
+    "B-7 roleCode 唯一性冲突：是修改测试用例使用唯一编码，还是在 Service 层做重复检测后自动调整？"
+  ],
+  "suggested_builder_scope": [
+    "B-1: 修正 StatsController、ReportController、SystemHealthController、HealthCheckController 的 @RequestMapping，移除重复 /api 前缀",
+    "B-2: 修正 Vendor Entity 的 @TableField(\"vendor_name\") → @TableField(\"name\") 或反过来调整数据库列名",
+    "B-3: 修正 Location Entity 的 @TableField(\"location_name\") → 匹配数据库实际列名",
+    "B-4: 为 approval_process 表的 applicant_id 设置默认值（DDL 或 Entity 层 @TableField(fill=...)）",
+    "B-5: 修正 AssetCreateDTO 默认 status 从 IN_STOCK 改为 IDLE",
+    "B-6: 放宽 CategoryUpdateDTO 的 categoryCode 校验注解（@NotBlank → @Size(min=0)）",
+    "B-7: 测试用例使用唯一 roleCode 或 Service 层增加重复检测逻辑",
+    "B-8: 修复 WorkflowDefinitionService.getByBusinessType 的查询逻辑，增加空结果保护",
+    "B-9: 修复 Audit 统计查询的空数据保护（action-type-distribution、operator-ranking）",
+    "Part 1: 新增 AuthControllerTest、DashboardControllerTest 后端单元测试",
+    "Part 1: 新增真实登录态 E2E 测试（登录→资产列表→赔偿→大屏等链路）"
+  ],
+  "verification_expectations": [
+    "mvn test 全部通过（当前 184/184，修复后不应有回归）",
+    "npm run build 构建成功",
+    "npx vitest run 全部通过（当前 587/587）",
+    "API 测试通过率从 72/103 (69.9%) 提升到可验收水平（预期 ≥95%）",
+    "逐项核验 9 个 Bug 修复的证据（代码变更截图 + API 验证命令输出）",
+    "git diff 变更范围可控，仅涉及预期的 Controller/Entity/DTO/Service 文件"
+  ],
+  "blockers_or_inputs_needed": [
+    "需确认当前数据库环境（MySQL）是否允许 DDL 变更（B-4），以及是否有 Flyway/Liquibase 迁移管理",
+    "需确认前端是否硬编码了带 /api 前缀的完整 URL（B-1 修复可能需要前端同步调整）",
+    "需确认后端服务已重启且可用（用于实时验证 API 修复效果）",
+    "B-7 roleCode 冲突：需确认种子数据中已存在哪些角色编码，以便测试用例避开"
+  ],
+  "part1_scope": {
+    "description": "Part 1 侧重测试基础设施建设",
+    "items": [
+      "新增 AuthControllerTest 后端单元测试",
+      "新增 DashboardControllerTest 后端单元测试",
+      "新增真实登录态 E2E 测试",
+      "结构化 commit 锁定当前状态"
+    ],
+    "risk": "MEDIUM",
+    "rationale": "新增测试文件不修改业务代码，但 E2E 测试需与后端认证流程配合，可能依赖 mock 或固定测试账号"
+  },
+  "part2_scope": {
+    "description": "Part 2 侧重 9 个 Bug 修复并提升测试通过率",
+    "items": [
+      "B-1: 4 个 Controller @RequestMapping 前缀修正",
+      "B-2: Vendor Entity @TableField 修正",
+      "B-3: Location Entity @TableField 修正",
+      "B-4: approval_process.applicant_id 默认值",
+      "B-5: AssetCreateDTO 默认 status 修正",
+      "B-6: CategoryUpdateDTO categoryCode 校验放宽",
+      "B-7: roleCode 唯一性处理",
+      "B-8: Workflow 查询修复",
+      "B-9: Audit 统计空数据保护"
+    ],
+    "risk": "HIGH",
+    "rationale": "涉及 Entity 映射、DDL 变更、路由修改，多个修复点直接影响数据库操作和 API 可用性"
+  }
+}

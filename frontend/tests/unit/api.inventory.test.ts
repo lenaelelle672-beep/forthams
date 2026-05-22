@@ -662,6 +662,39 @@ describe('inventoryApi', () => {
     });
   });
 
+  describe('inventoryService object methods', () => {
+    it('should send scanned asset payload to the task scan endpoint', async () => {
+      const payload = {
+        assetId: 'asset-001',
+        rfidTag: 'RFID-001',
+        actualLocation: '总部仓库',
+      };
+      const response = { success: true, detailId: 101 };
+
+      mockedPost.mockResolvedValueOnce(axiosOk(response));
+
+      const result = await inventoryApi.inventoryService.addScanResult('task-001', payload);
+
+      expect(result).toEqual(response);
+      expect(mockedPost).toHaveBeenCalledWith(`${API_BASE}/task-001/scan`, payload);
+    });
+
+    it('should fetch task detail rows from the details endpoint', async () => {
+      const response = {
+        records: [
+          { id: 1, taskId: 7, assetId: 10, status: 'normal' },
+        ],
+      };
+
+      mockedGet.mockResolvedValueOnce(axiosOk(response));
+
+      const result = await inventoryApi.inventoryService.getTaskDetails(7);
+
+      expect(result).toEqual(response);
+      expect(mockedGet).toHaveBeenCalledWith(`${API_BASE}/7/details`);
+    });
+  });
+
   // =========================================================================
   // Edge-case & contract verification tests
   // =========================================================================

@@ -357,13 +357,12 @@ export default function AssetCompensationFormPage() {
                     value={field.value}
                     onValueChange={field.onChange}
                     error={errors.responsibleDept?.message}
+                    placeholder={deptOptions.length > 0 ? '请选择责任部门' : '暂无可选部门'}
+                    disabled={deptOptions.length === 0}
                   >
-                     {deptOptions.length > 0
-                       ? deptOptions.map((opt) => (
-                           <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
-                         ))
-                       : <SelectItem value="">加载中...</SelectItem>
-                     }
+                    {deptOptions.map((opt) => (
+                      <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                    ))}
                   </Select>
                 )}
               />

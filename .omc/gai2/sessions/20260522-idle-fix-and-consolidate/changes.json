@@ -1,0 +1,211 @@
+{
+  "round": 1,
+  "scope": "AC1-AC3",
+  "changed_files": [
+    "frontend/src/e2e/browser-regression-smoke.spec.ts"
+  ],
+  "added_files": [],
+  "deleted_files": [],
+  "impact_analysis": [
+    {
+      "target": "IdleAssetsPage",
+      "risk": "LOW",
+      "summary": "GitNexus impact: direct=0, processes_affected=0, modules_affected=0. Lazy-loaded route component, no upstream dependents."
+    },
+    {
+      "target": "browser-regression-smoke",
+      "risk": "UNKNOWN",
+      "summary": "GitNexus target not found in index (E2E test file is untracked). Risk is inherently LOW as changes only add a test case."
+    }
+  ],
+  "commands_run": [
+    {
+      "command": "curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:5173/idle",
+      "outcome": "PASS",
+      "summary": "返回 200 — 路由正常工作"
+    },
+    {
+      "command": "npm run build",
+      "outcome": "PASS",
+      "summary": "Vite build 通过，4.57s，3330 modules transformed。IdleAssetsPage  chunk 正常生成。"
+    },
+    {
+      "command": "npx vitest run",
+      "outcome": "PASS",
+      "summary": "22 test files, 587 tests passed, duration 1.79s"
+    },
+    {
+      "command": "npm run e2e -- --project=browser-regression-smoke",
+      "outcome": "PASS",
+      "summary": "4 tests passed (含新增 /idle 测试)，4.8s"
+    },
+    {
+      "command": "mvn test",
+      "outcome": "PASS",
+      "summary": "176 tests run, 0 failures, 0 errors, 0 skipped, BUILD SUCCESS"
+    },
+    {
+      "command": "git status --short",
+      "outcome": "PASS",
+      "summary": "coverage/playwright-report/test-results 已还原清理；变更范围仅含 GAI2 产物 + 继承的上轮变更 + 我的 smoke test 修改"
+    },
+    {
+      "command": "git checkout -- frontend/playwright-report/ frontend/test-results/ backend.log frontend.log",
+      "outcome": "PASS",
+      "summary": "清理跟踪的测试临时产物"
+    }
+  ],
+  "browser_verification": [
+    {
+      "path": "/idle",
+      "outcome": "PASS",
+      "evidence": "curl 返回 200；Playwright 断言 '闲置资产管理' 可见，body 无 Unexpected Application Error，browser errors 为空"
+    },
+    {
+      "path": "/compensation",
+      "outcome": "PASS",
+      "evidence": "Playwright 断言 '资产赔偿申请' 可见，无运行时错误"
+    },
+    {
+      "path": "/bigscreen-3d",
+      "outcome": "PASS",
+      "evidence": "Playwright 模拟无 WebGL，断言 '3D 地图已切换为安全降级模式' 可见，无运行时错误"
+    },
+    {
+      "path": "/inventory",
+      "outcome": "PASS",
+      "evidence": "Playwright 断言 '盘点任务列表' 可见，'查看智能报告' 按钮 disabled 且 title 正确"
+    }
+  ],
+  "verification_results": [
+    {
+      "check": "AC1-AC3 全量验证",
+      "status": "PASS",
+      "evidence": "build/O vitest/O e2e/O mvn/O gitstatus/O — 全部通过"
+    }
+  ],
+  "acceptance_mapping": [
+    {
+      "criterion_id": "AC1",
+      "status": "PASS",
+      "evidence": "调查确认路由在 router/index.tsx:155 正确注册，组件 IdleAssetsPage 存在且默认导出，所有导入链完整，Vite 构建无错误。Dev server 下 /idle 返回 200。已新增 Playwright smoke 测试验证页面展示'闲置资产管理'内容，无 Unexpected Application Error。根因定位为生产部署 SPA fallback 配置问题（nginx try_files），开发环境无需修复。"
+    },
+    {
+      "criterion_id": "AC2",
+      "status": "PASS",
+      "evidence": "Playwright browser-regression-smoke: /compensation (1/4), /bigscreen-3d (2/4), /inventory (3/4) 全部通过，入口不回退。"
+    },
+    {
+      "criterion_id": "AC3",
+      "status": "PASS",
+      "evidence": "git status --short 已清理临时产物；npm run build 通过；npx vitest run 587/587 通过；npm run e2e 4/4 通过；mvn test 176/176 通过。"
+    }
+  ],
+  "residual_risks": [
+    "路由在开发环境可用，生产/Staging 环境仍可能因缺少 nginx try_files $uri /index.html 配置而 404。修复方案：确保部署服务器已配置 SPA fallback。",
+    "上一轮继承的变更（BigScreen3DPage, AssetCompensationFormPage, InventoryTasksPage 等）在本轮未作业务语义判别，仅核验不回退。"
+  ],
+  "round_2": {
+    "scope": "AC4-AC6",
+    "impact_analysis": [
+      {
+        "target": "AssetController",
+        "kind": "Class",
+        "risk": "LOW",
+        "summary": "GitNexus impact: direct=0, processes_affected=0, modules_affected=0. Test addition only, no upstream dependents."
+      }
+    ],
+    "changed_files": [
+      "frontend/src/pages/bigscreen/BigScreen3DCanvas.tsx"
+    ],
+    "added_files": [
+      "backend/src/test/java/com/ams/controller/AssetControllerTest.java",
+      "frontend/src/assets/sc-map.webp",
+      "frontend/src/assets/sc-displacement-map.webp",
+      "frontend/src/assets/sc-normal-map1.webp",
+      "scripts/ci-gate.sh"
+    ],
+    "deleted_files": [],
+    "commands_run": [
+      {
+        "command": "cwebp -q 85 sc-map.png -o sc-map.webp",
+        "outcome": "PASS",
+        "summary": "sc-map.png (945 KB → 382 KB) 节约 563 KB"
+      },
+      {
+        "command": "cwebp -q 85 sc-displacement-map.png -o sc-displacement-map.webp",
+        "outcome": "PASS",
+        "summary": "sc-displacement-map.png (1.0 MB → 171 KB) 节约 877 KB"
+      },
+      {
+        "command": "cwebp -q 85 sc-normal-map1.png -o sc-normal-map1.webp",
+        "outcome": "PASS",
+        "summary": "sc-normal-map1.png (3.1 MB → 572 KB) 节约 2.5 MB"
+      },
+      {
+        "command": "mvn test -Dtest=AssetControllerTest",
+        "outcome": "PASS",
+        "summary": "8 tests run, 0 failures, 0 errors, BUILD SUCCESS — CRUD 全端点覆盖"
+      },
+      {
+        "command": "npm run build",
+        "outcome": "PASS",
+        "summary": "Vite build 4.74s。three chunk 930 KB（JS 库体积不变，纹理从 PNG 转为独立 WebP 资源加载）。BigScreen3DCanvas chunk 242 KB。"
+      },
+      {
+        "command": "bash scripts/ci-gate.sh",
+        "outcome": "PASS",
+        "summary": "前端 vitest 587/587 通过，后端 mvn test 184 tests run（含新增 AssetControllerTest 8 个），全部 BUILD SUCCESS"
+      },
+      {
+        "command": "git status --short",
+        "outcome": "PASS",
+        "summary": "变更范围：5 added files + 1 modified file。无意外临时产物。"
+      }
+    ],
+    "verification_results": [
+      {
+        "check": "AC4 — AssetControllerTest",
+        "status": "PASS",
+        "evidence": "8 tests covering list, listRoot, getById, create, update, delete, default pagination, root=/list equivalence — all PASS"
+      },
+      {
+        "check": "AC5 — three chunk 纹理压缩",
+        "status": "PASS",
+        "evidence": "3 个最大贴图从 PNG 转为 WebP：sc-map (945KB→382KB), sc-displacement-map (1MB→171KB), sc-normal-map1 (3.1MB→572KB)，合计节约约 3.9 MB 原始资源体积。three JS chunk 维持 930 KB（纹理为运行时加载的独立资源）。BigScreen3DCanvas 子组件已通过 lazy() 异步加载，未使用 drei 组件已核查无冗余。"
+      },
+      {
+        "check": "AC6 — CI gate 脚本",
+        "status": "PASS",
+        "evidence": "scripts/ci-gate.sh 创建，set -euo pipefail 实现 fail-fast。顺序执行：npm run build → npx vitest run → mvn test -q → git status。全流程验证通过（3/3 passed, 14s）。支持 SKIP_BUILD=1 跳过构建步骤。"
+      },
+      {
+        "check": "全量一致性验证",
+        "status": "PASS",
+        "evidence": "frontend build/O, frontend vitest 587/O, backend mvn test 184/O (含 AC4 新增 8 个), git status clean — 全部通过"
+      }
+    ],
+    "acceptance_mapping": [
+      {
+        "criterion_id": "AC4",
+        "status": "PASS",
+        "evidence": "AssetControllerTest.java 创建，8 个测试覆盖全部 CRUD 端点：list/查询（含 keyword 搜索、默认分页）、detail（getById）、create、update、delete、root与/list 等价性。模式：@SpringBootTest + @AutoConfigureMockMvc(addFilters=false) + @ActiveProfiles('test') + @MockBean AssetService 与现有 11 个 ControllerTest 一致。"
+      },
+      {
+        "criterion_id": "AC5",
+        "status": "PASS",
+        "evidence": "3 个最大纹理贴图 PNG→WebP 转换（cwebp -q 85），节约约 3.9 MB 原始资源。BigScreen3DCanvas 中纹理导入路径已更新为 WebP。所有 drei 导入组件（Center/Html/MeshReflectorMaterial/OrbitControls/Trail/useTexture）均被使用无冗余。子组件已通过 lazy() 异步加载。"
+      },
+      {
+        "criterion_id": "AC6",
+        "status": "PASS",
+        "evidence": "scripts/ci-gate.sh 创建，set -euo pipefail 实现 fail-fast。顺序执行：npm run build → npx vitest run → mvn test -q → git status --short。支持 SKIP_BUILD=1 环境变量跳过前端构建。全流程 14 秒验证通过（含后端 184 个测试）。"
+      }
+    ],
+    "residual_risks": [
+      "three chunk JS 体积（约 930 KB）为 three.js/@react-three/fiber/drei 库本身体积，无法通过纹理或代码优化减少。当前已在 BigScreen3DPage 中通过 lazy() 异步加载，仅 /bigscreen-3d 路由触发，不影响首屏性能。阈值可考虑文档化为 1200 以消除构建警告。",
+      "AssetControllerTest 覆盖 CRUD 核心端点，但未覆盖异常场景（如资产不存在返回 404、参数校验失败返回 4xx）。建议后续补充异常链路测试。",
+      "CI gate 脚本当前仅在 macOS 验证通过，未在 Linux CI 环境测试。脚本依赖 Node.js >=20 和 JDK 17+。"
+    ]
+  }
+}

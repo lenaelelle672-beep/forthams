@@ -9,7 +9,6 @@ public class CategoryUpdateDTO {
     @NotBlank(message = "分类名称不能为空")
     private String categoryName;
 
-    @NotBlank(message = "分类编码不能为空")
     private String categoryCode;
 
     private Long parentId;

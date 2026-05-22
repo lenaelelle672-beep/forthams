@@ -1,0 +1,101 @@
+{
+  "options": [
+    {
+      "id": "A",
+      "name": "最小可验收闭环：InventoryControllerTest + 稳定 mock E2E + 真实 3D 动态拆分 + 还原 coverage",
+      "summary": "优先补 InventoryControllerTest，围绕 /inventory 智能报告相关后端入口建立 MockMvc 最小闭环；新增可被 npm run e2e 执行的 Playwright mock smoke，覆盖 /compensation、/bigscreen-3d、/inventory；对 BigScreen3DPage 继续做真实拆分，把 3D Canvas 与 three/drei/fiber 依赖放入按 WebGL 能力触发的动态 import 路径，若 three 依旧超过 600 kB 再用阈值和说明作为补充；coverage 采用还原已跟踪产物、不提交报告目录的策略。",
+      "backend_controller_choice": "首选 InventoryControllerTest；它依赖面相对单一，直接关联上一轮 /inventory 智能报告入口，并且审计已给出 LOW 影响面与可复用 MockMvc 模式。DashboardController 可作为补充，AuthController 留到第二阶段。",
+      "three_chunk_strategy": "继续真实拆分优先：新增或抽离 BigScreen3DCanvas 等子模块，在 BigScreen3DPage 内先执行 WebGL 能力判断，再动态 import 3D Canvas，从而让无 WebGL 或非 3D 路径不加载 three 生态。若构建后 three 仍因库本身体积超过阈值，再设置合理 chunkSizeWarningLimit 并在 changes.json 说明这是业务必要依赖的阈值解释，不是唯一优化。",
+      "e2e_strategy": "将持久化 smoke 放到当前 Playwright 配置实际会执行的位置；审计显示默认 testDir=./e2e 而既有 smoke 在 src/e2e，builder 必须先核对 frontend/playwright.config.ts 与 npm run e2e。推荐要么放入 frontend/e2e/browser-regression-smoke.spec.ts 使用默认项目，要么同步调整配置让 frontend/src/e2e/browser-regression-smoke.spec.ts 被 npm run e2e 明确执行。测试以 mock API 与本地登录态为主，保证不依赖真实后端。",
+      "coverage_strategy": "还原 frontend/coverage/ 的已跟踪变更，保留 .gitignore 忽略策略；不要在本轮混入 git rm --cached 大范围历史清理，除非 reviewer 明确要求单独评审。E2E 运行产生的 playwright-report/test-results 只作为本地证据，不提交。",
+      "pros": [
+        "直接命中上一轮 PARTIAL 的四个残余阻塞：后端 Controller 测试、three 警告、E2E 持久化、coverage 清理。",
+        "InventoryControllerTest 与 /inventory 智能报告入口强相关，比只补低价值 CRUD 更容易说服 reviewer 给 PASS。",
+        "three 处理先做真实动态 import，避免被认为只是调高阈值掩盖风险。",
+        "mock E2E 稳定、可重复，能明确防止 /compensation、/bigscreen-3d、/inventory 三个入口回退。",
+        "coverage 采用还原产物的低风险策略，保持本轮 diff 清晰。"
+      ],
+      "cons": [
+        "实现复杂度高于单纯阈值方案，需要改动 BigScreen3DPage 模块结构并重新验证无 WebGL 降级。",
+        "MockMvc 测试仍可能遇到 contextPath、@MockBean、DTO 字段和安全过滤器配置细节。",
+        "如果 three 库本身体积无法继续降低，最终仍需要阈值解释作为补充证据。"
+      ],
+      "cost": "medium",
+      "risk": "medium",
+      "estimated_scope": "约 4-7 个文件：1 个 InventoryControllerTest，1 个 E2E spec，可能 1 个 Playwright 配置调整，BigScreen3DPage 与 3D Canvas 子模块，可能 1 个 vite.config.ts 阈值补充；另还原 coverage 工作区产物。"
+    },
+    {
+      "id": "B",
+      "name": "低改动快速通关：DashboardControllerTest + 默认 e2e spec + chunk 阈值文档化 + coverage 还原",
+      "summary": "选择更稳定的 DashboardControllerTest 作为后端最小测试；新增默认 testDir 下的 E2E smoke；three 大 chunk 不继续拆分，只把 chunkSizeWarningLimit 调整到能覆盖当前 1068.71 kB 并在 changes.json 中解释 three 仅在 /bigscreen-3d 异步加载；coverage 仍还原已跟踪产物。",
+      "backend_controller_choice": "选择 DashboardControllerTest，因为只读统计代理更容易 mock 和稳定通过，但与 /inventory 智能报告入口关联较弱。",
+      "three_chunk_strategy": "以阈值文档化为主，说明 BigScreen3DPage 页面 chunk 已降至 265.70 kB，three 是独立异步 chunk 且属于业务必要 3D 依赖。",
+      "e2e_strategy": "将新 spec 放入 frontend/e2e/，保证默认 npm run e2e 能执行，覆盖三入口不崩溃和 /bigscreen-3d 降级。",
+      "coverage_strategy": "还原 frontend/coverage/ 已跟踪变更，不提交 coverage、playwright-report、test-results。",
+      "pros": [
+        "实施最快，后端测试和 E2E 配置风险较低。",
+        "能形式上覆盖 AC2、AC4、AC5，并消除未解释的大 chunk 警告。",
+        "业务代码改动少，回归风险相对低。"
+      ],
+      "cons": [
+        "DashboardController 与本轮 /inventory 残余风险关联弱，reviewer 可能认为后端测试价值不足。",
+        "three 仅调阈值容易被判定为掩盖性能风险，和已知审计建议“真实优化优先”冲突。",
+        "无法证明无 WebGL 场景避免加载 three，只能证明构建警告被解释。"
+      ],
+      "cost": "low",
+      "risk": "medium",
+      "estimated_scope": "约 3-5 个文件：1 个 DashboardControllerTest，1 个 E2E spec，可能调整 playwright.config.ts 和 vite.config.ts，另还原 coverage 产物。"
+    },
+    {
+      "id": "C",
+      "name": "高覆盖扩展方案：Inventory + Auth/Dashboard 双 Controller、mock 与 real-backend 双 E2E、three 外部化或预加载专项",
+      "summary": "一次性补 InventoryControllerTest 以及 AuthController 或 DashboardController；E2E 同时新增 mock smoke 和可跳过的 real-backend smoke；three 尝试外部化 CDN、预加载或更细粒度 drei 替换；coverage 做 git rm --cached 历史清理。",
+      "backend_controller_choice": "InventoryControllerTest 加 AuthControllerTest 或 DashboardControllerTest，提升后端核心覆盖说服力。",
+      "three_chunk_strategy": "评估 external、CDN、modulepreload、drei 按需替换和更细粒度分包，目标不仅消除警告，还降低 3D 入口体感加载成本。",
+      "e2e_strategy": "mock smoke 作为硬门禁，real-backend smoke 作为可跳过补充，覆盖登录态和真实业务数据闭环。",
+      "coverage_strategy": "除还原当前产物外，可考虑 git rm --cached frontend/coverage/** 将历史 coverage 从索引移出，但作为独立清理变更记录。",
+      "pros": [
+        "覆盖最全面，能显著降低未来同类回退风险。",
+        "后端、前端、真实后端联调都有证据，reviewer 质疑空间最小。",
+        "three 性能治理更彻底，可能带来真实加载收益。"
+      ],
+      "cons": [
+        "范围明显超出本轮从 PARTIAL 推进到 PASS 的最小路径，容易引入新失败点。",
+        "AuthController 和 real-backend smoke 受认证、fixture、环境可用性影响较大。",
+        "three 外部化或 CDN 会改变部署假设，可能引入缓存、安全、离线部署和 CSP 风险。",
+        "git rm --cached coverage 属于仓库历史清理，可能污染本轮业务修复评审。"
+      ],
+      "cost": "high",
+      "risk": "high",
+      "estimated_scope": "约 8-14 个文件，并可能涉及部署策略、测试 fixture、Playwright 项目矩阵和索引清理，适合作为后续专项而非本轮最小闭环。"
+    }
+  ],
+  "recommended_option": "A",
+  "rationale": [
+    "本轮目标不是重新扩大范围，而是把上一轮 PARTIAL 88/100 推进到 PASS；方案 A 正好覆盖 reviewer 明确列出的未通过项，并保留最小可验收边界。",
+    "后端测试选择 InventoryControllerTest 最贴近 /inventory 智能报告入口，能把上一轮前端 inventory.ts 覆盖率与后端 Controller 覆盖缺口连接起来，比 Dashboard 或 Vendor 更有审查价值。",
+    "three 处理采用真实动态 import/组件拆分优先，符合审计结论；若库本身体积仍大，再以阈值文档化作为补充证据，可避免 reviewer 认为只是隐藏警告。",
+    "E2E smoke 必须确认会被 npm run e2e 执行；方案 A 明确要求 builder 先对齐 playwright.config.ts 的 testDir/project，解决“测试文件存在但默认命令不跑”的风险。",
+    "coverage 采用还原已跟踪产物而不是本轮移出索引，能让 git status 中业务变更、测试变更和 GAI2 产物边界最清晰。"
+  ],
+  "rejected_options": [
+    {
+      "id": "B",
+      "reason": "虽然实施快，但后端测试与 /inventory 风险关联偏弱，three 主要靠阈值解释，可能仍被 reviewer 判定为未真正处理 P1 性能风险。"
+    },
+    {
+      "id": "C",
+      "reason": "覆盖最强但范围过大，容易被 Auth、真实后端 fixture、CDN 外部化或索引清理拖慢；不符合本轮从 PARTIAL 到 PASS 的最小可验收路径。"
+    }
+  ],
+  "builder_instructions": [
+    "新增后端测试前先按项目规则对 InventoryController 或实际修改目标运行 GitNexus upstream impact，并记录风险；若只新增测试类，也要人工核对 Controller 路径、contextPath 与 MockMvc 约定。",
+    "优先实现 backend/src/test/java/com/ams/controller/InventoryControllerTest.java，复用 @SpringBootTest(properties = \"server.servlet.context-path=/api\")、@AutoConfigureMockMvc(addFilters = false)、@ActiveProfiles(\"test\")、@MockBean InventoryService 模式，至少覆盖 tasks list、details、scan 和一个提交或批量更新分支。",
+    "新增 Playwright 持久化 smoke 前先读取 frontend/playwright.config.ts 和 package.json，确保新增 spec 会被 npm run e2e 执行；若放在 src/e2e，必须同步调整配置或命令证据。",
+    "E2E smoke 应稳定 mock 必要 API 或登录态，逐项断言 /compensation、/bigscreen-3d、/inventory 不出现 Unexpected Application Error，pageerror 为空；/bigscreen-3d 需覆盖无 WebGL 降级文案，/inventory 需覆盖智能报告按钮禁用态或带 taskId 跳转。",
+    "three 优先做 BigScreen3DPage 内 WebGL 检测后的动态 import，把 three/@react-three/fiber/@react-three/drei 依赖限制在 BigScreen3DCanvas 等 3D 子模块；运行 npm run build 记录 BigScreen3DPage 与 three chunk 大小。",
+    "如果真实拆分后 three chunk 仍超过 600 kB，可在 vite.config.ts 设置合理 chunkSizeWarningLimit，但 changes.json 必须说明这是对 three 业务必要异步 chunk 的阈值解释，并附构建输出证明非 3D 路由不受首屏影响。",
+    "提交前还原 frontend/coverage/ 已跟踪变更，删除或忽略 playwright-report/test-results；不要在本轮提交 coverage、dist 或报告产物。",
+    "验证命令至少包含后端定向 Maven 测试、npm run e2e 或等价默认脚本、npm run build、上一轮 inventory 覆盖率回归或相关前端测试、git status --short，并在 changes.json 中逐项记录。"
+  ]
+}
