@@ -157,6 +157,7 @@ export default function LoginPage() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [rememberMe, setRememberMe] = useState(false);
 
   useParticleCanvas(canvasRef);
 
@@ -164,6 +165,15 @@ export default function LoginPage() {
     resolver: zodResolver(loginSchema),
     defaultValues: { username: '', password: '' },
   });
+
+  // 页面加载时从 localStorage 恢复记住的用户名
+  useEffect(() => {
+    const saved = localStorage.getItem('remembered_username');
+    if (saved) {
+      setValue('username', saved);
+      setRememberMe(true);
+    }
+  }, [setValue]);
 
   const loginMutation = useMutation({
     mutationFn: (data: LoginForm) => login(data),
@@ -175,6 +185,12 @@ export default function LoginPage() {
       }
       localStorage.setItem('auth_token', token);
       localStorage.setItem('user_info', JSON.stringify({ userId, username, realName }));
+      // 记住我：保存或清除用户名
+      if (rememberMe) {
+        localStorage.setItem('remembered_username', username);
+      } else {
+        localStorage.removeItem('remembered_username');
+      }
       navigate('/dashboard', { replace: true });
     },
     onError: (err: any) => {
@@ -383,7 +399,7 @@ export default function LoginPage() {
               资产管理系统
             </h1>
             <p className="text-sm font-medium text-[#c3c6d7] mt-2 uppercase tracking-[0.2em]">
-              Secure Asset Gateway
+              安全资产网关
             </p>
           </header>
 
@@ -433,15 +449,22 @@ export default function LoginPage() {
               <label className="flex items-center gap-3 cursor-pointer group">
                 <input
                   type="checkbox"
+                  name="rememberMe"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
                   className="h-5 w-5 rounded border-[#434655] bg-[#2d3449] text-[#2563eb] focus:ring-offset-[#0b1326] focus:ring-[#2563eb]"
                 />
                 <span className="text-sm font-medium text-[#c3c6d7] group-hover:text-[#dae2fd] transition-colors">
                   记住我
                 </span>
               </label>
-              <a className="text-sm font-medium text-[#b4c5ff] hover:text-[#adc6ff] transition-colors underline-offset-4 hover:underline" href="#">
+              <button
+                type="button"
+                className="text-sm font-medium text-[#b4c5ff] hover:text-[#adc6ff] transition-colors underline-offset-4 hover:underline"
+                onClick={() => toast.info('请联系管理员重置密码')}
+              >
                 忘记密码？
-              </a>
+              </button>
             </div>
 
             {errorMsg && (
@@ -494,7 +517,7 @@ export default function LoginPage() {
         </section>
 
         <footer className="mt-12 text-center">
-          <p className="text-xs text-[#434655]">© 2026 资产管理系统. All rights reserved.</p>
+          <p className="text-xs text-[#434655]">© 2026 资产管理系统 版权所有</p>
           <div className="mt-2 flex justify-center gap-4">
             <a className="text-[10px] text-[#434655] hover:text-[#8d90a0]" href="#">安全策略</a>
             <a className="text-[10px] text-[#434655] hover:text-[#8d90a0]" href="#">服务条款</a>

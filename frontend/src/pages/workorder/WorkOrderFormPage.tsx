@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -21,6 +21,9 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { createWorkOrder, updateWorkOrder } from '@/api/workorder';
+import { getUserList } from '@/api/base';
+import type { UserItem } from '@/api/base';
+import type { PaginatedResponse } from '@/types/common';
 
 const schema = z.object({
   title: z.string().min(5, '标题至少 5 个字').max(100),
@@ -50,14 +53,10 @@ const PRIORITY_OPTIONS = [
   { value: 'LOW' as const, label: '低', color: 'text-[#004ac6]', bg: '', ring: 'ring-[#004ac6]' },
 ];
 
-const ASSIGNEE_OPTIONS = [
-  { value: '', label: '请选择负责人' },
-  { value: 'chenwei', label: '陈伟 (项目经理)' },
-  { value: 'lixiaohua', label: '李晓华 (高级工程师)' },
-  { value: 'zhangjianguo', label: '张建国 (运维组长)' },
-];
+// 负责人列表从 API 动态获取，此处仅保留默认占位
+const ASSIGNEE_DEFAULT = [{ value: '', label: '请选择负责人' }];
 
-const collaborators = ['赵敏', '王刚'];
+const collaborators: string[] = [];
 
 export default function WorkOrderFormPage() {
   const navigate = useNavigate();
@@ -66,9 +65,34 @@ export default function WorkOrderFormPage() {
   const qc = useQueryClient();
   const prefill = (location.state as Record<string, unknown> | null) ?? {};
   const [collabInput, setCollabInput] = useState('');
-  const [collaboratorsList, setCollaboratorsList] = useState(collaborators);
+  const [collaboratorsList, setCollaboratorsList] = useState<string[]>(collaborators);
+  const [assigneeOptions, setAssigneeOptions] = useState(ASSIGNEE_DEFAULT);
   const editId = params.id ? Number(params.id) : null;
   const isEdit = editId !== null;
+
+  // 从 API 获取用户列表作为负责人选项
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await getUserList({ page: 1, pageSize: 100 });
+        const users = (res as PaginatedResponse<UserItem> | undefined)?.data?.records ?? [];
+        if (cancelled) return;
+        if (users.length > 0) {
+          setAssigneeOptions([
+            { value: '', label: '请选择负责人' },
+            ...users.map((u) => ({
+              value: String(u.id),
+              label: `${u.realName ?? u.username}${u.deptName ? ` (${u.deptName})` : ''}`,
+            })),
+          ]);
+        }
+      } catch {
+        // API 不可用时保留默认选项
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
 
   const {
     register,
@@ -277,7 +301,7 @@ export default function WorkOrderFormPage() {
                       className="w-full h-9 rounded border border-[#c3c6d7] text-sm px-3 bg-white focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20 focus:border-[#2563eb]"
                       {...register('assignee')}
                     >
-                      {ASSIGNEE_OPTIONS.map((o) => (
+                      {assigneeOptions.map((o) => (
                         <option key={o.value} value={o.value}>{o.label}</option>
                       ))}
                     </select>

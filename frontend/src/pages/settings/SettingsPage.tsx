@@ -493,22 +493,32 @@ function DepartmentsTab() {
 
 // ─── 系统配置 Tab ────────────────────────────────────────────────────────────
 
+const SYSTEM_CONFIG_DEFAULTS = {
+  companyName: '示例科技有限公司',
+  systemName: '资产管理平台',
+  warrantyAlertDays: '30',
+  currency: 'CNY',
+  timezone: 'UTC+8',
+  backupFreq: 'daily',
+};
+
 function SystemConfigTab() {
   const [saved, setSaved] = useState(false);
-  const [form, setForm] = useState({
-    companyName: '示例科技有限公司',
-    systemName: '资产管理平台',
-    warrantyAlertDays: '30',
-    currency: 'CNY',
-    timezone: 'UTC+8',
-    backupFreq: 'daily',
+  const [form, setForm] = useState(() => {
+    try {
+      const stored = localStorage.getItem('system_config');
+      return stored ? { ...SYSTEM_CONFIG_DEFAULTS, ...JSON.parse(stored) } : { ...SYSTEM_CONFIG_DEFAULTS };
+    } catch {
+      return { ...SYSTEM_CONFIG_DEFAULTS };
+    }
   });
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: 系统配置暂无对应后端端点，先在前端保持本地状态
+    // TODO: 系统配置暂无对应后端端点，使用 localStorage 持久化
+    localStorage.setItem('system_config', JSON.stringify(form));
     setSaved(true);
-    toast.success('配置已保存（本地）');
+    toast.success('配置已保存');
     setTimeout(() => setSaved(false), 2000);
   };
 
@@ -589,24 +599,34 @@ function SystemConfigTab() {
 
 // ─── 安全设置 Tab ────────────────────────────────────────────────────────────
 
+const SECURITY_CONFIG_DEFAULTS = {
+  minPasswordLen: '8',
+  requireUppercase: true,
+  requireNumber: true,
+  requireSpecial: false,
+  passwordExpireDays: '90',
+  sessionTimeoutMin: '30',
+  enableTwoFactor: false,
+  enableAuditLog: true,
+};
+
 function SecurityTab() {
   const [saved, setSaved] = useState(false);
-  const [form, setForm] = useState({
-    minPasswordLen: '8',
-    requireUppercase: true,
-    requireNumber: true,
-    requireSpecial: false,
-    passwordExpireDays: '90',
-    sessionTimeoutMin: '30',
-    enableTwoFactor: false,
-    enableAuditLog: true,
+  const [form, setForm] = useState(() => {
+    try {
+      const stored = localStorage.getItem('security_config');
+      return stored ? { ...SECURITY_CONFIG_DEFAULTS, ...JSON.parse(stored) } : { ...SECURITY_CONFIG_DEFAULTS };
+    } catch {
+      return { ...SECURITY_CONFIG_DEFAULTS };
+    }
   });
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: 安全设置暂无对应后端端点，先在前端保持本地状态
+    // TODO: 安全设置暂无对应后端端点，使用 localStorage 持久化
+    localStorage.setItem('security_config', JSON.stringify(form));
     setSaved(true);
-    toast.success('安全设置已保存（本地）');
+    toast.success('安全设置已保存');
     setTimeout(() => setSaved(false), 2000);
   };
 
