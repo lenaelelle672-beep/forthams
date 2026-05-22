@@ -141,33 +141,33 @@ export default function AssetDetailPage() {
           <div className="grid grid-cols-3 gap-6">
             <div className="flex flex-col gap-1">
               <span className="text-xs text-[#64748b] font-medium tracking-wide">资产名称</span>
-              <span className="text-base font-semibold text-[#0f172a]">{asset.assetName || '-'}</span>
+              <span className="text-base font-semibold text-[#0f172a]">{asset.assetName ?? '—'}</span>
               <span className="text-[13px] text-[#64748b] mt-1">
-                资产编号: <span className="text-[#0f172a] font-medium">{asset.assetNo || '-'}</span>
+                资产编号: <span className="text-[#0f172a] font-medium">{asset.assetNo ?? '—'}</span>
               </span>
             </div>
             <div className="grid grid-cols-2 gap-y-4 border-x border-[#e5e7eb]/60 px-6">
               <div className="flex flex-col gap-1">
                 <span className="text-xs text-[#64748b] font-medium tracking-wide">分类</span>
-                <span className="text-sm font-medium text-[#0f172a]">{asset.categoryName || '-'}</span>
+                <span className="text-sm font-medium text-[#0f172a]">{asset.categoryName ?? '—'}</span>
               </div>
               <div className="flex flex-col gap-1">
                 <span className="text-xs text-[#64748b] font-medium tracking-wide">品牌</span>
-                <span className="text-sm font-medium text-[#0f172a]">{asset.brand || '-'}</span>
+                <span className="text-sm font-medium text-[#0f172a]">{asset.brand ?? '—'}</span>
               </div>
               <div className="flex flex-col gap-1">
                 <span className="text-xs text-[#64748b] font-medium tracking-wide">型号</span>
-                <span className="text-sm font-medium text-[#0f172a]">{asset.model || '-'}</span>
+                <span className="text-sm font-medium text-[#0f172a]">{asset.model ?? '—'}</span>
               </div>
               <div className="flex flex-col gap-1">
                 <span className="text-xs text-[#64748b] font-medium tracking-wide">序列号</span>
-                <span className="text-sm font-medium text-[#0f172a]">{asset.serialNo || '-'}</span>
+                <span className="text-sm font-medium text-[#0f172a]">{asset.serialNo ?? '—'}</span>
               </div>
             </div>
             <div className="flex items-center justify-center p-2">
               <div className="w-full h-24 bg-[#f3f4f6] border border-dashed border-[#c3c6d7] rounded-lg flex flex-col items-center justify-center gap-1 opacity-60">
                 <QrCode className="w-5 h-5 text-[#64748b]" />
-                <span className="text-xs font-medium text-[#64748b]">RFID: {asset.rfidTag || '-'}</span>
+                <span className="text-xs font-medium text-[#64748b]">RFID: {asset.rfidTag ?? '—'}</span>
               </div>
             </div>
           </div>
@@ -209,15 +209,15 @@ export default function AssetDetailPage() {
               </div>
               <div className="flex flex-col gap-1">
                 <span className="text-xs text-[#64748b] font-medium">使用部门</span>
-                <span className="text-sm text-[#0f172a]">{asset.deptName || '-'}</span>
+                <span className="text-sm text-[#0f172a]">{asset.deptName ?? '—'}</span>
               </div>
               <div className="flex flex-col gap-1">
                 <span className="text-xs text-[#64748b] font-medium">使用人</span>
-                <span className="text-sm text-[#0f172a]">{asset.userName || '-'}</span>
+                <span className="text-sm text-[#0f172a]">{asset.userName ?? '—'}</span>
               </div>
               <div className="flex flex-col gap-1">
                 <span className="text-xs text-[#64748b] font-medium">存放位置</span>
-                <span className="text-sm text-[#0f172a]">{asset.location || '-'}</span>
+                <span className="text-sm text-[#0f172a]">{asset.location ?? '—'}</span>
               </div>
               {asset.remark && (
                 <div className="col-span-4 flex flex-col gap-1 border-t border-[#e5e7eb]/60 pt-4">
