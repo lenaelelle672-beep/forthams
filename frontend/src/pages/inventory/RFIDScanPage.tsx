@@ -31,7 +31,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
-import { inventoryService } from '@/app/services/inventoryService';
+import { inventoryService } from '@/api/inventory';
 import {
   getTaskAssets,
   confirmAsset,

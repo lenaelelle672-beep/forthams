@@ -19,7 +19,7 @@ import {
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { PageHeader } from '@/components/ui/PageHeader';
-import { maintenanceService } from '@/app/services/maintenanceService';
+import { maintenanceService } from '@/api/maintenance';
 import { getAssetList, getAssetById } from '@/api/asset';
 import type { AssetListItem, Asset } from '@/types/asset';
 import { AssetStatus } from '@/types/asset';

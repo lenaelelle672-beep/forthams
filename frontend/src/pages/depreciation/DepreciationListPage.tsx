@@ -22,76 +22,11 @@ import {
   getDepreciationSchedules,
   batchCalculateDepreciation,
   PERIOD_REGEX,
-} from '@/app/services/depreciationApi';
+} from '@/api/depreciation';
 import type {
   DepreciationScheduleItem,
   DepreciationFilter,
-} from '@/app/services/depreciationApi';
-
-// ── Mock 数据 ─────────────────────────────────────────────────────────────────
-
-const MOCK_SCHEDULES: DepreciationScheduleItem[] = [
-  {
-    id: 1,
-    assetId: 101,
-    assetNo: 'AST-2024-001',
-    assetName: '联想 ThinkPad X1 笔记本',
-    period: '2024-01',
-    depreciationAmount: 708.33,
-    accumulatedDepreciation: 2833.32,
-    netValue: 5666.68,
-    depreciationMethod: 'straight_line',
-    assetStatus: 'IN_USE',
-  },
-  {
-    id: 2,
-    assetId: 102,
-    assetNo: 'AST-2024-002',
-    assetName: '戴尔服务器 PowerEdge R740',
-    period: '2024-01',
-    depreciationAmount: 1500.00,
-    accumulatedDepreciation: 9000.00,
-    netValue: 21000.00,
-    depreciationMethod: 'double_declining',
-    assetStatus: 'IN_USE',
-  },
-  {
-    id: 3,
-    assetId: 103,
-    assetNo: 'AST-2024-003',
-    assetName: '会议室投影仪 Epson EB-X49',
-    period: '2024-01',
-    depreciationAmount: 150.00,
-    accumulatedDepreciation: 1800.00,
-    netValue: 4200.00,
-    depreciationMethod: 'straight_line',
-    assetStatus: 'IDLE',
-  },
-  {
-    id: 4,
-    assetId: 104,
-    assetNo: 'AST-2024-004',
-    assetName: '惠普激光打印机 LaserJet Pro',
-    period: '2024-01',
-    depreciationAmount: 83.33,
-    accumulatedDepreciation: 500.00,
-    netValue: 2700.00,
-    depreciationMethod: 'straight_line',
-    assetStatus: 'IN_USE',
-  },
-  {
-    id: 5,
-    assetId: 105,
-    assetNo: 'AST-2023-015',
-    assetName: '工业数控机床 CNC-300',
-    period: '2024-01',
-    depreciationAmount: 5833.33,
-    accumulatedDepreciation: 46666.64,
-    netValue: 303333.36,
-    depreciationMethod: 'double_declining',
-    assetStatus: 'MAINTENANCE',
-  },
-];
+} from '@/api/depreciation';
 
 // ── 终态资产状态集合（不可计算折旧）────────────────────────────────────────────
 
@@ -180,24 +115,15 @@ export default function DepreciationListPage() {
 
       if (deduped.length > 0) {
         setDataSource(deduped);
-      } else if (p === 1) {
-        toast.warning('当前显示示例数据，API 数据不可用');
-        setDataSource(MOCK_SCHEDULES);
       } else {
         setDataSource([]);
       }
-      setTotal(res.total || (p === 1 ? MOCK_SCHEDULES.length : 0));
+      setTotal(res.total || 0);
       setPage(res.page || p);
     } catch {
-      // API 不通，降级 Mock
-      toast.warning('当前显示示例数据，API 数据不可用');
-      if (p === 1) {
-        setDataSource(MOCK_SCHEDULES);
-        setTotal(MOCK_SCHEDULES.length);
-      } else {
-        setDataSource([]);
-        setTotal(0);
-      }
+      toast.error('折旧数据加载失败，请稍后重试');
+      setDataSource([]);
+      setTotal(0);
     } finally {
       setLoading(false);
     }

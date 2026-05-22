@@ -203,8 +203,8 @@ export default function DashboardPage() {
           <>
              <Button variant="outline" size="md" onClick={() => {
                const csv = [
-                 ['分类', '数量', '占比'].join(','),
-                 ...deptChartData.map(d => [d.name, d.value, `${((d.value / Math.max(deptChartData.reduce((s, x) => s + x.value, 0), 1)) * 100).toFixed(1)}%`].join(','))
+                 ['部门', '资产数量', '占比'].join(','),
+                 ...departmentStats.map(d => [d.name, d.count, `${d.pct}%`].join(','))
                ].join('\n');
                const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
                const url = URL.createObjectURL(blob);

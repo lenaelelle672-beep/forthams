@@ -78,6 +78,7 @@ const NAV_GROUPS: NavGroup[] = [
       { path: '/inventory',  label: 'RFID 盘点', icon: ScanLine },
       { path: '/workorders', label: '工单管理', icon: ClipboardList },
       { path: '/approvals',  label: '审批流程', icon: CheckSquare },
+      { path: '/workflows',  label: '工作流',   icon: Workflow },
     ],
   },
   {
@@ -106,7 +107,6 @@ const NAV_GROUPS: NavGroup[] = [
 const NAV_BOTTOM_ITEMS: NavItem[] = [
   { path: '/vendors',   label: '供应商',  icon: Users },
   { path: '/locations', label: '位置管理', icon: MapPin },
-  { path: '/workflows', label: '工作流',  icon: Workflow },
   { path: '/settings',  label: '系统设置', icon: Settings },
 ];
 

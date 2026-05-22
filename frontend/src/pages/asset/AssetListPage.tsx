@@ -163,7 +163,7 @@ export default function AssetListPage() {
              <Button variant="outline" size="md" onClick={() => {
                const csv = [
                  ['资产编号', '资产名称', '分类', '状态', '原值', '存放位置'].join(','),
-                 ...assets.map(a => [a.assetNo ?? '', a.assetName ?? '', a.categoryName ?? '', a.status ?? '', String(a.originalValue ?? ''), a.location ?? ''].join(','))
+                 ...records.map(a => [a.assetNo ?? '', a.assetName ?? '', a.categoryName ?? '', a.status ?? '', String(a.originalValue ?? ''), a.location ?? ''].join(','))
                ].join('\n');
                const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
                const url = URL.createObjectURL(blob);
