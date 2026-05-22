@@ -224,8 +224,8 @@ export interface StatusOption {
 
 /** Pre-defined asset status options for the export filter panel */
 export const ASSET_STATUS_OPTIONS: StatusOption[] = [
-  { value: 'in_use', label: '在用' },
-  { value: 'idle', label: '闲置' },
-  { value: 'maintenance', label: '维修中' },
-  { value: 'scrapped', label: '报废' },
+  { value: 'IN_USE', label: '在用' },
+  { value: 'IDLE', label: '闲置' },
+  { value: 'MAINTENANCE', label: '维修中' },
+  { value: 'SCRAPPED', label: '报废' },
 ];

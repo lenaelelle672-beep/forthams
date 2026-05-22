@@ -266,7 +266,8 @@ export interface AssetQueryParams {
 }
 
 /**
- * 分页响应
+ * 分页响应 — 保留 items[] 字段以兼容本模块代码。
+ * 其他模块请使用 types/common.ts 中的 PaginatedResponse<T>（使用 records[]）。
  * @interface PaginatedResponse
  * @template T
  */

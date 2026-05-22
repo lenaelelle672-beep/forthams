@@ -122,17 +122,10 @@ export interface AuditStatsResponse {
 }
 
 /**
- * 通用 API 响应包装。
- * 后端统一返回 `{ code, message, data }` 格式时使用。
+ * 通用 API 响应包装 — re-export from common.ts 统一定义。
+ * @see types/common.ts ApiResponse
  */
-export interface ApiResponse<T> {
-  /** 业务状态码，0 表示成功 */
-  code: number;
-  /** 提示信息 */
-  message: string;
-  /** 响应数据 */
-  data: T;
-}
+export type { ApiResponse } from './common';
 
 // ---------------------------------------------------------------------------
 // 状态管理

@@ -162,7 +162,7 @@ interface ApiResponse<T> {
  */
 export class DepreciationService {
   /** API 基础路径 */
-  private readonly basePath = '/api/depreciation';
+  private readonly basePath = '/depreciation';
 
   /**
    * 获取资产折旧报表
@@ -198,11 +198,13 @@ export class DepreciationService {
       { params }
     );
 
-    if (response.data.code !== 200) {
-      throw new Error(response.data.message || '获取折旧报表失败');
+    // http 拦截器已解包 response.data，response 现在就是 ApiResponse<T>
+    const apiResponse = response as any as ApiResponse<DepreciationSummary>;
+    if (apiResponse.code !== 200) {
+      throw new Error(apiResponse.message || '获取折旧报表失败');
     }
 
-    return response.data.data;
+    return apiResponse.data;
   }
 
   /**
@@ -226,11 +228,12 @@ export class DepreciationService {
       }
     );
 
-    if (response.data.code !== 200) {
-      throw new Error(response.data.message || '获取月度折旧明细失败');
+    const apiResponse = response as any as ApiResponse<DepreciationRecord[]>;
+    if (apiResponse.code !== 200) {
+      throw new Error(apiResponse.message || '获取月度折旧明细失败');
     }
 
-    return response.data.data;
+    return apiResponse.data;
   }
 
   /**
@@ -261,11 +264,12 @@ export class DepreciationService {
       { params: queryParams }
     );
 
-    if (response.data.code !== 200) {
-      throw new Error(response.data.message || '获取折旧记录失败');
+    const apiResponse = response as any as ApiResponse<DepreciationRecord[]>;
+    if (apiResponse.code !== 200) {
+      throw new Error(apiResponse.message || '获取折旧记录失败');
     }
 
-    return response.data.data;
+    return apiResponse.data;
   }
 
   /**
@@ -295,11 +299,12 @@ export class DepreciationService {
       request
     );
 
-    if (response.data.code !== 200) {
-      throw new Error(response.data.message || '折旧重算失败');
+    const apiResponse = response as any as ApiResponse<{ affectedRecords: number }>;
+    if (apiResponse.code !== 200) {
+      throw new Error(apiResponse.message || '折旧重算失败');
     }
 
-    return response.data.data;
+    return apiResponse.data;
   }
 
   /**
@@ -324,11 +329,12 @@ export class DepreciationService {
       ApiResponse<{ successCount: number; failedCount: number; errors: string[] }>
     >(`${this.basePath}/batch-calculate`, request);
 
-    if (response.data.code !== 200) {
-      throw new Error(response.data.message || '批量计算失败');
+    const apiResponse = response as any as ApiResponse<{ successCount: number; failedCount: number; errors: string[] }>;
+    if (apiResponse.code !== 200) {
+      throw new Error(apiResponse.message || '批量计算失败');
     }
 
-    return response.data.data;
+    return apiResponse.data;
   }
 
   /**
@@ -362,11 +368,12 @@ export class DepreciationService {
       },
     });
 
-    if (response.data.code !== 200) {
-      throw new Error(response.data.message || '获取折旧趋势失败');
+    const apiResponse = response as any as ApiResponse<MonthlyDepreciationDetail[]>;
+    if (apiResponse.code !== 200) {
+      throw new Error(apiResponse.message || '获取折旧趋势失败');
     }
 
-    return response.data.data;
+    return apiResponse.data;
   }
 
   /**
@@ -389,11 +396,12 @@ export class DepreciationService {
       }
     );
 
-    if (response.data.code !== 200) {
-      throw new Error(response.data.message || '导出报表失败');
+    const apiResponse = response as any as ApiResponse<{ downloadUrl: string }>;
+    if (apiResponse.code !== 200) {
+      throw new Error(apiResponse.message || '导出报表失败');
     }
 
-    return response.data.data.downloadUrl;
+    return apiResponse.data.downloadUrl;
   }
 
   /**
@@ -416,11 +424,17 @@ export class DepreciationService {
       }>
     >(`${this.basePath}/config`);
 
-    if (response.data.code !== 200) {
-      throw new Error(response.data.message || '获取折旧配置失败');
+    const apiResponse = response as any as ApiResponse<{
+      defaultMethod: DepreciationMethod;
+      defaultUsefulLifeYears: number;
+      defaultSalvageRate: number;
+      updateSchedule: string;
+    }>;
+    if (apiResponse.code !== 200) {
+      throw new Error(apiResponse.message || '获取折旧配置失败');
     }
 
-    return response.data.data;
+    return apiResponse.data;
   }
 
   /**

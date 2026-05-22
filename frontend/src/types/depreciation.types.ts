@@ -19,9 +19,9 @@ import type { ApiResponse } from './common';
  */
 export enum DepreciationMethod {
   /** 直线法 */
-  STRAIGHT_LINE = 'straight_line',
+  STRAIGHT_LINE = 'STRAIGHT_LINE',
   /** 双倍余额递减法 */
-  DOUBLE_DECLINING_BALANCE = 'double_declining_balance',
+  DOUBLE_DECLINING_BALANCE = 'DOUBLE_DECLINING_BALANCE',
 }
 
 /**

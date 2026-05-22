@@ -10,14 +10,40 @@
  * @version SWARM-2026-Q2-002 Iteration 4
  */
 
-import { request } from '@/utils/http';
+import http from '@/utils/http';
+// Alias for compatibility with existing call sites
+const request = http;
 import type { 
   RetirementApplication, 
-  RetirementRequest, 
   RetirementStatus,
-  ApprovalTask,
-  LifecycleEvent 
+  CreateRetirementApplicationInput,
+  ApprovalRecord,
 } from '@/types/retirement.types';
+
+// Type aliases for backward compatibility
+/** @deprecated Use CreateRetirementApplicationInput instead */
+type RetirementRequest = CreateRetirementApplicationInput;
+/** @deprecated Approval task type - use inline type */
+interface ApprovalTask {
+  task_id: string;
+  application_id: string;
+  asset_id: string;
+  asset_name: string;
+  status: string;
+  approver_id: string;
+  approver_name: string;
+  level: number;
+  created_at: string;
+}
+/** @deprecated Lifecycle event type */
+interface LifecycleEvent {
+  event_id: string;
+  asset_id: string;
+  event_type: string;
+  description: string;
+  operator: string;
+  timestamp: string;
+}
 
 /**
  * 报废申请请求参数
@@ -112,7 +138,7 @@ export async function submitRetirementApplication(
     '/v1/retirement/apply',
     params
   );
-  return response.data;
+  return response as any;
 }
 
 /**
@@ -128,7 +154,7 @@ export async function getRetirementApplication(
   const response = await request.get<RetirementApplication>(
     `/v1/retirement/${applicationId}`
   );
-  return response.data;
+  return response as any;
 }
 
 /**
@@ -146,7 +172,7 @@ export async function listMyRetirementApplications(
     '/v1/retirement/my-applications',
     { params }
   );
-  return response.data;
+  return response as any;
 }
 
 /**
@@ -167,7 +193,7 @@ export async function updateRetirementApplication(
     `/v1/retirement/${applicationId}`,
     params
   );
-  return response.data;
+  return response as any;
 }
 
 /**
@@ -197,7 +223,7 @@ export async function getPendingApprovals(
     '/approvals/pending',
     { params }
   );
-  return response.data;
+  return response as any;
 }
 
 /**
@@ -225,7 +251,7 @@ export async function processApproval(
     next_approver?: string;
     completed_at?: string;
   }>(`/approvals/${taskId}`, params);
-  return response.data;
+  return response as any;
 }
 
 /**
@@ -238,7 +264,7 @@ export async function getApprovalTask(taskId: string): Promise<ApprovalTask> {
   const response = await request.get<ApprovalTask>(
     `/approvals/tasks/${taskId}`
   );
-  return response.data;
+  return response as any;
 }
 
 /**
@@ -302,7 +328,7 @@ export async function getAssetLifecycle(
       page_size: params.page_size || 50
     }
   });
-  return response.data;
+  return response as any;
 }
 
 /**
@@ -317,7 +343,7 @@ export async function getAssetRetirementHistory(
   const response = await request.get<RetirementApplication[]>(
     `/v1/retirement/asset/${assetId}`
   );
-  return response.data;
+  return response as any;
 }
 
 /**
@@ -344,7 +370,7 @@ export async function getApprovalChainConfig(): Promise<{
       role_code?: string;
     }>;
   }>('/approval/chain/config');
-  return response.data;
+  return response as any;
 }
 
 /**
@@ -374,5 +400,5 @@ export async function getRetirementStatistics(params: {
     total_residual_value: number;
     by_type: Record<string, number>;
   }>('/v1/retirement/statistics', { params });
-  return response.data;
+  return response as any;
 }

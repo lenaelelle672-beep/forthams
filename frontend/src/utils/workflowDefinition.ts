@@ -1,6 +1,6 @@
 import { MarkerType } from '@xyflow/react';
 import type { BusinessType } from '@/constants/workflowBusiness';
-import type { FlowDefinition, FlowEdge, FlowNode, FlowNodeData } from '@/types/flow';
+import type { FlowDefinition, FlowEdge, FlowNode, FlowNodeData, FlowNodeType } from '@/types/flow';
 
 export type WorkflowDefinitionPayload = FlowDefinition & { businessType: BusinessType };
 
@@ -18,7 +18,7 @@ const defaultNodeData: FlowNodeData = {
 function text(v: unknown) { return typeof v === 'string' ? v.trim() : ''; }
 
 function normalizeNode(node: FlowNode): FlowNode {
-  const type = node.type ?? node.data.type;
+  const type = (node.type ?? node.data.type) as FlowNodeType;
   return { ...node, type, position: { x: Number(node.position?.x ?? 0), y: Number(node.position?.y ?? 0) }, data: { ...defaultNodeData, ...node.data, type, approvalMode: node.data.approvalMode ?? 'sequence' } };
 }
 

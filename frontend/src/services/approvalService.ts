@@ -280,10 +280,10 @@ export async function getPendingApprovals(
   }
 
   const response = await http.get<PaginatedResponse<PendingApprovalItem>>(
-    '/api/orders/pending',
+    '/orders/pending',
     { params },
   );
-  return response.data;
+  return response as any as PaginatedResponse<PendingApprovalItem>;
 }
 
 /**
@@ -298,9 +298,9 @@ export async function getApprovalDetail(
   orderId: number,
 ): Promise<WorkOrderApprovalDetail> {
   const response = await http.get<WorkOrderApprovalDetail>(
-    `/api/orders/${orderId}`,
+    `/orders/${orderId}`,
   );
-  return response.data;
+  return response as any as WorkOrderApprovalDetail;
 }
 
 /**
@@ -314,9 +314,9 @@ export async function getApprovalRecords(
   orderId: number,
 ): Promise<ApprovalRecord[]> {
   const response = await http.get<ApprovalRecord[]>(
-    `/api/orders/${orderId}/approval-records`,
+    `/orders/${orderId}/approval-records`,
   );
-  return response.data;
+  return response as any as ApprovalRecord[];
 }
 
 /**
@@ -339,10 +339,10 @@ export async function approveOrder(
 ): Promise<ApprovalActionResponse> {
   try {
     const response = await http.post<ApprovalActionResponse>(
-      `/api/orders/${orderId}/approve`,
+      `/orders/${orderId}/approve`,
       { version } satisfies ApproveOrderRequest,
     );
-    return response.data;
+    return response as any as ApprovalActionResponse;
   } catch (error) {
     throw toApprovalApiError(error);
   }
@@ -373,10 +373,10 @@ export async function rejectOrder(
 ): Promise<ApprovalActionResponse> {
   try {
     const response = await http.post<ApprovalActionResponse>(
-      `/api/orders/${orderId}/reject`,
+      `/orders/${orderId}/reject`,
       { rejectionReason, version } satisfies RejectOrderRequest,
     );
-    return response.data;
+    return response as any as ApprovalActionResponse;
   } catch (error) {
     throw toApprovalApiError(error);
   }
@@ -392,9 +392,9 @@ export async function rejectOrder(
  */
 export async function getPendingApprovalCount(): Promise<number> {
   const response = await http.get<{ count: number }>(
-    '/api/orders/pending/count',
+    '/orders/pending/count',
   );
-  return response.data.count;
+  return (response as any).count;
 }
 
 /** Backward-compatible object export used by older tests and consumers. */
@@ -416,17 +416,15 @@ export const approvalService = {
     query: PendingApprovalQuery = {},
   ) {
     if (typeof roleOrQuery === 'string') {
-      const response = await http.get('/api/approvals/pending', {
+      return http.get('/approvals/pending', {
         params: { role: roleOrQuery, ...query },
       });
-      return response.data;
     }
     return getPendingApprovals(roleOrQuery ?? {});
   },
 
   async getApprovalDetail(orderId: string | number) {
-    const response = await http.get(`/api/approvals/${orderId}`);
-    return response.data;
+    return http.get(`/approvals/${orderId}`);
   },
 
   async getApprovalRecords(orderId: string | number) {
@@ -435,9 +433,9 @@ export const approvalService = {
 
   async approveOrder(orderId: string | number, version: number) {
     try {
-      const response = await http.post(`/api/orders/${orderId}/approve`, { version });
+      const response = await http.post(`/orders/${orderId}/approve`, { version });
       if (!response && lastApprovalError) throw lastApprovalError;
-      return response.data;
+      return response;
     } catch (error) {
       lastApprovalError = error;
       throw error;
@@ -453,12 +451,12 @@ export const approvalService = {
       throw validationError('驳回原因不能超过500字符', 'REJECTION_REASON_TOO_LONG');
     }
     try {
-      const response = await http.post(`/api/orders/${orderId}/reject`, {
+      const response = await http.post(`/orders/${orderId}/reject`, {
         version,
         rejectionReason,
       });
       if (!response && lastApprovalError) throw lastApprovalError;
-      return response.data;
+      return response;
     } catch (error) {
       lastApprovalError = error;
       throw error;
@@ -467,9 +465,9 @@ export const approvalService = {
 
   async cancelOrder(orderId: string | number, version: number) {
     try {
-      const response = await http.post(`/api/orders/${orderId}/cancel`, { version });
+      const response = await http.post(`/orders/${orderId}/cancel`, { version });
       if (!response && lastApprovalError) throw lastApprovalError;
-      return response.data;
+      return response;
     } catch (error) {
       lastApprovalError = error;
       throw error;

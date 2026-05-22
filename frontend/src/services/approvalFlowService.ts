@@ -5,10 +5,10 @@
  * 约束：严格遵从approval_flow_v2.yaml接口契约，禁止自行拼装聚合接口
  */
 
-import axios from 'axios';
+import http from '@/utils/http';
 
 // 常量定义
-const APPROVAL_API_BASE = '/api/v2/approval';
+const APPROVAL_API_BASE = '/v2/approval';
 const REQUEST_TIMEOUT_MS = 5000; // 硬编码5s超时阈值
 const MAX_RETRY_ATTEMPTS = 3;
 const RETRY_DELAY_MS = 1000;
@@ -134,7 +134,7 @@ export async function submitApproval(
   for (let attempt = 0; attempt < MAX_RETRY_ATTEMPTS; attempt++) {
     attempts = attempt + 1;
     try {
-      const response = await axios.post<ApprovalSubmitResponse>(
+      const response = await http.post<ApprovalSubmitResponse>(
         `${APPROVAL_API_BASE}/submit`,
         submissionPayload,
         {
@@ -146,7 +146,8 @@ export async function submitApproval(
         }
       );
 
-      const responseData = response.data;
+      // http 拦截器已解包 response.data，此处 response 即为 ApiResponse<T>
+      const responseData = response as unknown as ApprovalSubmitResponse;
 
       // 如果服务端返回新的idempotencyKey，更新payload用于后续重试
       if (responseData.data?.idempotencyKey) {
@@ -191,10 +192,9 @@ export async function submitApproval(
  * 获取审批详情
  */
 export async function getApprovalDetail(approvalId: string): Promise<any> {
-  const response = await axios.get(`${APPROVAL_API_BASE}/${approvalId}`, {
+  return http.get(`${APPROVAL_API_BASE}/${approvalId}`, {
     timeout: REQUEST_TIMEOUT_MS,
   });
-  return response.data;
 }
 
 /**
@@ -206,11 +206,10 @@ export async function getPendingList(
   const queryString = params
     ? `?${new URLSearchParams(params).toString()}`
     : '';
-  const response = await axios.get(
+  return http.get(
     `${APPROVAL_API_BASE}/pending${queryString}`,
     { timeout: REQUEST_TIMEOUT_MS }
   );
-  return response.data;
 }
 
 export default {

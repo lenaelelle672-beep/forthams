@@ -10,7 +10,7 @@
  * @version SWARM-2025-Q2-P0-003-Iteration-8
  */
 
-import { http } from '@/utils/http';
+import http from '@/utils/http';
 import type { AxiosRequestConfig } from 'axios';
 
 // ==================== 类型定义 ====================
@@ -157,7 +157,7 @@ export interface ApprovalError {
 /**
  * API 基础路径
  */
-const API_BASE_PATH = '/api/v1/work-orders';
+const API_BASE_PATH = '/v1/work-orders';
 
 /**
  * 审批意见最大字符数
@@ -239,7 +239,7 @@ export class WorkOrderService {
       `${API_BASE_PATH}/pending?${params.toString()}`
     );
 
-    return response.data;
+    return response as any as WorkOrderListResponse;
   }
 
   /**
@@ -256,7 +256,7 @@ export class WorkOrderService {
    */
   static async getDetail(id: string): Promise<WorkOrderDetail> {
     const response = await http.get<WorkOrderDetail>(`${API_BASE_PATH}/${id}`);
-    return response.data;
+    return response as any as WorkOrderDetail;
   }
 
   /**
@@ -292,7 +292,7 @@ export class WorkOrderService {
       createApprovalConfig({ id, reason, version })
     );
 
-    return response.data;
+    return response as any as ApprovalResponse;
   }
 
   /**
@@ -328,7 +328,7 @@ export class WorkOrderService {
       createApprovalConfig({ id, reason, version })
     );
 
-    return response.data;
+    return response as any as ApprovalResponse;
   }
 
   /**

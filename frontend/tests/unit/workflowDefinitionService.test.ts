@@ -176,7 +176,7 @@ describe('workflowDefinitionService', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     window.localStorage.clear();
-    window.localStorage.setItem('ams_auth_user', JSON.stringify({ id: 88 }));
+    window.localStorage.setItem('user_info', JSON.stringify({ id: 88 }));
   });
 
   it('passes every workflow designer field when saving a draft', async () => {

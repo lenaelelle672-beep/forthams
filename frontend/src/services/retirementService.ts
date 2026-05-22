@@ -10,7 +10,9 @@
  * @version SWARM-2026-Q2-002-iter4
  */
 
-import { apiClient } from '../utils/http';
+import http from '../utils/http';
+// Alias for compatibility with existing call sites
+const apiClient = http;
 
 /**
  * 报废申请状态枚举
@@ -241,6 +243,7 @@ export const retirementService = {
       // NOTE: 实际状态锁定在后端执行，确保原子性
       
       // 3. 提交申请到后端
+      // http 拦截器已解包 response.data，response 现在就是 ApiResponse<T>
       const response = await apiClient.post<ApiResponse<RetirementApplication>>(
         '/v1/retirement/apply',
         {
@@ -249,13 +252,7 @@ export const retirementService = {
         }
       );
       
-      // 4. 锁定资产状态（前端乐观更新）
-      // NOTE: 后端事务保证状态一致性
-      
-      // 5. 生成首条生命周期事件记录（前端本地记录）
-      // NOTE: 后端会记录完整的审计日志
-      
-      return response.data;
+      return (response as any).data as RetirementApplication;
     } catch (error) {
       console.error('[RetirementService] Submit failed:', error);
       throw new RetirementError(
@@ -295,10 +292,9 @@ export const retirementService = {
           attachments: params.attachments
         }
       );
-      
-      // 3. 重新锁定状态（启动新审批链）
-      
-      return response.data;
+
+      // http 拦截器已解包
+      return (response as any).data as RetirementApplication;
     } catch (error) {
       console.error('[RetirementService] Update failed:', error);
       throw new RetirementError(
@@ -325,7 +321,7 @@ export const retirementService = {
       const response = await apiClient.get<ApiResponse<RetirementApplication>>(
         `/v1/retirement/${retirementId}`
       );
-      return response.data;
+      return (response as any).data as RetirementApplication;
     } catch (error) {
       console.error('[RetirementService] GetById failed:', error);
       throw new RetirementError(
@@ -380,10 +376,7 @@ export const retirementService = {
         }
       );
       
-      // 4. 触发状态变更
-      // NOTE: 后端会更新资产状态并生成生命周期事件
-      
-      return response.data;
+      return (response as any).data as { success: boolean; message: string };
     } catch (error) {
       console.error('[RetirementService] ProcessApproval failed:', error);
       throw new RetirementError(
@@ -422,7 +415,7 @@ export const retirementService = {
         }
       );
       
-      return response.data;
+      return (response as any).data as { success: boolean; message: string };
     } catch (error) {
       console.error('[RetirementService] TransferApproval failed:', error);
       throw new RetirementError(
@@ -451,7 +444,7 @@ export const retirementService = {
         '/v1/retirement/pending',
         { params }
       );
-      return response.data;
+      return (response as any).data as ApprovalTask[];
     } catch (error) {
       console.error('[RetirementService] GetPendingApprovals failed:', error);
       throw new RetirementError(
@@ -496,7 +489,7 @@ export const retirementService = {
         { params }
       );
       
-      return response.data;
+      return (response as any).data as LifecycleResponse;
     } catch (error) {
       console.error('[RetirementService] GetLifecycleTimeline failed:', error);
       throw new RetirementError(
@@ -523,7 +516,7 @@ export const retirementService = {
         '/v1/retirement/list',
         { params: { asset_id: assetId } }
       );
-      return response.data;
+      return (response as any).data as RetirementApplication[];
     } catch (error) {
       console.error('[RetirementService] GetApplicationsByAsset failed:', error);
       throw new RetirementError(
@@ -550,7 +543,7 @@ export const retirementService = {
       const response = await apiClient.delete<ApiResponse<{ success: boolean; message: string }>>(
         `/v1/retirement/${retirementId}`
       );
-      return response.data;
+      return (response as any).data as { success: boolean; message: string };
     } catch (error) {
       console.error('[RetirementService] Cancel failed:', error);
       throw new RetirementError(

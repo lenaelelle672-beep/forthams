@@ -7,7 +7,7 @@
  * 以及 Blob 下载工具函数与导出文件名生成。
  */
 
-import axios from 'axios';
+import http from '@/utils/http';
 
 // ===================== 类型定义 =====================
 
@@ -62,10 +62,10 @@ export interface LocationCascadeOption {
  * @returns Promise<Blob> Excel 文件的 Blob 对象
  */
 export const exportAssets = async (filters: ExportFilters): Promise<Blob> => {
-  const response = await axios.post<Blob>('/api/v1/assets/export', filters, {
+  const response = await http.post<Blob>('/v1/assets/export', filters, {
     responseType: 'blob',
   });
-  return response.data;
+  return response as any;
 };
 
 /**
@@ -77,10 +77,10 @@ export const exportAssets = async (filters: ExportFilters): Promise<Blob> => {
  * @returns Promise<CategoryTreeNode[]> 分类树节点数组
  */
 export const getCategoryTree = async (): Promise<CategoryTreeNode[]> => {
-  const response = await axios.get<CategoryTreeNode[]>(
-    '/api/v1/asset-categories/tree',
+  const response = await http.get<CategoryTreeNode[]>(
+    '/v1/asset-categories/tree',
   );
-  return response.data;
+  return response as any;
 };
 
 /**
@@ -92,10 +92,10 @@ export const getCategoryTree = async (): Promise<CategoryTreeNode[]> => {
  * @returns Promise<LocationCascadeOption[]> 位置级联选项数组
  */
 export const getLocationCascade = async (): Promise<LocationCascadeOption[]> => {
-  const response = await axios.get<LocationCascadeOption[]>(
-    '/api/v1/asset-locations/cascade',
+  const response = await http.get<LocationCascadeOption[]>(
+    '/v1/asset-locations/cascade',
   );
-  return response.data;
+  return response as any;
 };
 
 // ===================== 工具函数 =====================
@@ -116,30 +116,7 @@ export const generateExportFilename = (): string => {
   return `资产台账_${datePart}_${timePart}.xlsx`;
 };
 
-/**
- * 触发浏览器从 Blob 下载文件
- *
- * 使用 URL.createObjectURL 创建临时链接，通过创建 <a> 元素模拟点击触发下载，
- * 下载完成后立即调用 URL.revokeObjectURL 释放内存，防止内存泄漏。
- *
- * 对应 SPEC Layer 0.2 downloadBlob 工具函数，
- * 满足 ATB-017 验收测试基准中 URL.revokeObjectURL 调用验证。
- *
- * @param blob - 文件内容的 Blob 对象
- * @param filename - 下载保存的文件名
- */
-export const downloadBlob = (blob: Blob, filename: string): void => {
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = filename;
-  link.style.display = 'none';
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  // 释放 Object URL，防止内存泄漏（安全约束）
-  URL.revokeObjectURL(url);
-};
+// NOTE: downloadBlob → @/utils/fileDownloader (canonical)
 
 // ===================== 导出筛选相关常量 =====================
 
