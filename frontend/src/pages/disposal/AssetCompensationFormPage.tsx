@@ -11,8 +11,10 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { Select, SelectItem } from '@/components/ui/Select';
 import { getAssetList } from '@/api/asset';
 import { createCompensation } from '@/api/disposal';
+import { getDeptList } from '@/api/base';
 import type { AssetListItem } from '@/types/asset';
-import type { ApiResponse, PageData } from '@/types/common';
+import type { ApiResponse, PageData, Department } from '@/types/common';
+import { toast } from 'sonner';
 
 const schema = z.object({
   applyDate: z.string().min(1, '请选择申请日期'),
@@ -55,13 +57,6 @@ const DAMAGE_TYPE_OPTIONS = [
   { value: 'stolen', label: '被盗' },
 ];
 
-const DEPT_OPTIONS = [
-  { value: 'tech', label: '技术研发部' },
-  { value: 'admin', label: '行政管理部' },
-  { value: 'marketing', label: '市场营运部' },
-  { value: 'finance', label: '财务审计部' },
-];
-
 const APPROVAL_OPTIONS = [
   { value: 'standard_v1', label: '标准赔偿流程 v1.0' },
   { value: 'simple_v2', label: '简易赔偿流程 v2.1' },
@@ -98,6 +93,16 @@ export default function AssetCompensationFormPage() {
     queryFn: () => getAssetList({ pageSize: 200 }),
   });
 
+  // Fetch department list from API
+  const { data: deptRes } = useQuery({
+    queryKey: ['depts', 'list'],
+    queryFn: () => getDeptList(),
+    staleTime: 5 * 60 * 1000,
+  });
+  const deptOptions: { value: string; label: string }[] = (
+    (deptRes as ApiResponse<Department[]> | undefined)?.data ?? []
+  ).map((d) => ({ value: String(d.id), label: d.deptName }));
+
   // Derive the full asset list from API response
   const apiAssets: AssetRow[] = useMemo(
     () => ((assetListData as ApiResponse<PageData<AssetListItem>> | undefined)?.data?.records ?? []).map(toAssetRow),
@@ -127,7 +132,7 @@ export default function AssetCompensationFormPage() {
       damageType: 'human',
       insured: 'no',
       compensationType: 'cash',
-      responsibleDept: 'tech',
+      responsibleDept: '',
       approvalProcess: 'standard_v1',
     },
   });
@@ -220,6 +225,7 @@ export default function AssetCompensationFormPage() {
       qc.invalidateQueries({ queryKey: ['compensation'] });
       navigate('/disposals');
     },
+    onError: () => toast.error('提交失败，请重试'),
   });
 
   const onSubmit = (values: FormValues) => {
@@ -352,9 +358,12 @@ export default function AssetCompensationFormPage() {
                     onValueChange={field.onChange}
                     error={errors.responsibleDept?.message}
                   >
-                    {DEPT_OPTIONS.map((opt) => (
-                      <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
-                    ))}
+                     {deptOptions.length > 0
+                       ? deptOptions.map((opt) => (
+                           <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                         ))
+                       : <SelectItem value="">加载中...</SelectItem>
+                     }
                   </Select>
                 )}
               />

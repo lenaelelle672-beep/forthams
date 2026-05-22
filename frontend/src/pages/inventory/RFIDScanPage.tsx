@@ -214,18 +214,22 @@ export default function RFIDScanPage() {
 
   const discrepancyCount = (summary?.surplusCount ?? 0) + (summary?.deficitCount ?? 0);
 
-  // ── 扫描模拟动画 ─────────────────────────────────────────────────────────────
+  // ── 扫描时轮询真实资产数据 ───────────────────────────────────────────────────
   useEffect(() => {
     if (!scanning || paused) return;
+    // 每 5 秒刷新一次盘点资产列表，同步最新扫描结果
     const timer = setInterval(() => {
+      qc.invalidateQueries({ queryKey: ['inventory', 'task', taskId, 'assets'] });
+      qc.invalidateQueries({ queryKey: ['inventory', 'task', taskId, 'summary'] });
+      qc.invalidateQueries({ queryKey: ['inventory', 'task', taskId] });
+      // 写一条日志说明正在刷新
       const now = new Date().toLocaleTimeString('zh-CN', { hour12: false });
-      const assetNo = `AS-2024-${Math.floor(400 + Math.random() * 100)}`;
-      setScanLog((prev) => [...prev.slice(-30), `[${now}] ✓ ${assetNo} 扫描成功`]);
+      setScanLog((prev) => [...prev.slice(-30), `[${now}] 同步最新扫描数据...`]);
       setFlash(true);
       setTimeout(() => setFlash(false), 300);
-    }, 1500);
+    }, 5000);
     return () => clearInterval(timer);
-  }, [scanning, paused]);
+  }, [scanning, paused, taskId, qc]);
 
   // 自动滚动日志
   useEffect(() => {

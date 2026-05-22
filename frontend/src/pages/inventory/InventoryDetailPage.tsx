@@ -77,6 +77,7 @@ export default function InventoryDetailPage() {
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [batchStatus, setBatchStatus] = useState<ActualStatus>('normal');
   const [activeTab, setActiveTab] = useState<string>('all');
+  const [filterOpen, setFilterOpen] = useState(false);
 
   const { data: taskRes, isLoading: taskLoading } = useQuery({
     queryKey: ['inventory', 'task', taskId],
@@ -303,7 +304,7 @@ export default function InventoryDetailPage() {
           </div>
         </div>
 
-        <div className="col-span-12 lg:col-span-4 bg-white p-6 border border-[#e5e7eb] rounded-xl">
+          <div className="col-span-12 lg:col-span-4 bg-white p-6 border border-[#e5e7eb] rounded-xl">
           <h3 className="text-base font-semibold text-[#161c27] mb-6">盘点范围</h3>
           <div className="space-y-6">
             <div>
@@ -311,14 +312,15 @@ export default function InventoryDetailPage() {
                 <Building2 className="w-3.5 h-3.5" /> 责任部门
               </p>
               <div className="flex flex-wrap gap-2">
-                {['IT运维部', '生产部', '人力资源部'].map((dept) => (
-                  <span
-                    key={dept}
-                    className="px-3 py-1 bg-[#d4e0f9] text-[#576378] text-[12px] rounded-full"
-                  >
-                    {dept}
-                  </span>
-                ))}
+                {task?.scopeType === 'location' || task?.scopeType === 'all' || !task ? (
+                  <span className="px-3 py-1 bg-[#d4e0f9] text-[#576378] text-[12px] rounded-full">—</span>
+                ) : (
+                  (task.scopeIds ?? []).length > 0
+                    ? task.scopeIds.map((id) => (
+                        <span key={id} className="px-3 py-1 bg-[#d4e0f9] text-[#576378] text-[12px] rounded-full">{id}</span>
+                      ))
+                    : <span className="px-3 py-1 bg-[#d4e0f9] text-[#576378] text-[12px] rounded-full">—</span>
+                )}
               </div>
             </div>
             <div className="pt-4 border-t border-[#e5e7eb]">
@@ -326,19 +328,20 @@ export default function InventoryDetailPage() {
                 <MapPin className="w-3.5 h-3.5" /> 关键点位
               </p>
               <ul className="space-y-3">
-                {[
-                  { name: 'B-12区', loc: '仓库A' },
-                  { name: '3楼', loc: '总部大楼' },
-                  { name: '机房 S-4', loc: '数据中心' },
-                ].map(({ name, loc }) => (
-                  <li key={name} className="flex items-center justify-between text-[13px] text-[#161c27]">
-                    <span className="flex items-center gap-2">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#004191]" />
-                      {name}
-                    </span>
-                    <span className="text-[#64748b] text-[12px]">{loc}</span>
-                  </li>
-                ))}
+                {task?.scopeType === 'location' && task.scopeIds && task.scopeIds.length > 0
+                  ? task.scopeIds.map((id) => (
+                      <li key={id} className="flex items-center justify-between text-[13px] text-[#161c27]">
+                        <span className="flex items-center gap-2">
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#004191]" />
+                          {id}
+                        </span>
+                        <span className="text-[#64748b] text-[12px]">{task.scopeType}</span>
+                      </li>
+                    ))
+                  : (
+                      <li className="text-[13px] text-[#64748b]">—</li>
+                    )
+                }
               </ul>
             </div>
           </div>
@@ -388,8 +391,8 @@ export default function InventoryDetailPage() {
             </div>
           </div>
           <div className="flex gap-2">
-            <Button variant="ghost" size="icon"><Filter className="w-4 h-4" /></Button>
-            <Button variant="ghost" size="icon"><Columns3 className="w-4 h-4" /></Button>
+            <Button variant="ghost" size="icon" onClick={() => setFilterOpen((v) => !v)} title="切换筛选"><Filter className="w-4 h-4" /></Button>
+            <Button variant="ghost" size="icon" onClick={() => setFilterOpen((v) => !v)} title="列设置"><Columns3 className="w-4 h-4" /></Button>
           </div>
         </div>
         <CardContent className="p-0">
@@ -422,7 +425,7 @@ export default function InventoryDetailPage() {
           </div>
         </div>
         <div className="flex gap-6">
-          <Button variant="outline" size="md">保存草稿</Button>
+          <Button variant="outline" size="md" onClick={() => navigate('/inventory')}>保存草稿</Button>
           <Button
             size="md"
             loading={submitMutation.isPending}

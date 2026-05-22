@@ -12,9 +12,7 @@ import {
   Search,
   Send,
   X,
-  BarChart3,
   Headset,
-  ExternalLink,
 } from 'lucide-react';
 import { Card, CardHeader, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -272,20 +270,6 @@ export default function WorkOrderFormPage() {
                 </CardContent>
               </Card>
 
-              <section className="grid grid-cols-2 gap-6">
-                <div className="bg-[#2563eb] rounded p-6 text-white flex flex-col justify-between min-h-[160px]">
-                  <div>
-                    <BarChart3 className="w-8 h-8 mb-2" />
-                    <h3 className="text-lg font-semibold">平均修复时长 (MTTR)</h3>
-                  </div>
-                  <div className="text-3xl font-bold">2.4h</div>
-                </div>
-                <div className="relative rounded overflow-hidden group min-h-[160px] bg-[#e0e3e5]">
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
-                    <p className="text-white text-xs font-semibold tracking-wide">查看设备维护标准手册</p>
-                  </div>
-                </div>
-              </section>
             </div>
 
             <div className="col-span-12 lg:col-span-4 flex flex-col gap-6">
@@ -339,26 +323,12 @@ export default function WorkOrderFormPage() {
                       />
                     </div>
                   </div>
-
-                  <div className="pt-4 mt-4 border-t border-[#e5e7eb]">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs font-semibold tracking-wide text-[#434655]">团队负载</span>
-                      <span className="text-xs font-semibold tracking-wide text-[#2563eb]">85%</span>
-                    </div>
-                    <div className="w-full h-2 bg-[#e0e3e5] rounded-full overflow-hidden">
-                      <div className="h-full bg-[#2563eb] w-[85%]" />
-                    </div>
-                    <p className="mt-2 text-[11px] text-[#434655] leading-tight">
-                      当前分配的负责人已有 3 个待处理工单。建议优先考虑资源负载。
-                    </p>
-                  </div>
                 </CardContent>
               </Card>
 
               <section className="bg-[#656d84] rounded p-6 text-[#eef0ff]">
                 <div className="flex items-start justify-between mb-4">
                   <Headset className="w-7 h-7" />
-                  <ExternalLink className="w-5 h-5 text-[#3f465c] cursor-pointer hover:text-white transition-colors" />
                 </div>
                 <h4 className="text-lg font-semibold mb-1">智能辅助系统</h4>
                 <p className="text-sm opacity-90">

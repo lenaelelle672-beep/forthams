@@ -1,0 +1,67 @@
+{
+  "directive": "全量页面100分审查 — 逐页深度推演实现，每个功能、按钮、交互达到100分，英文/undefined全部改中文，所有未实现功能补全",
+  "owner": "gai2-orchestrator",
+  "phase": "triage+audit",
+  "classification": "Heavy",
+  "artifact_dir": ".omc/gai2/sessions/20260522-fullaudit",
+  "created_at": "2026-05-22",
+  "acceptance_checks": [
+    "所有活跃页面(32+)按钮、表单、CRUD操作全部有效连通",
+    "零 variant=default / window.confirm / @/app/ 导入残留",
+    "零用户可见英文文本",
+    "零 undefined 显示给用户",
+    "所有 mock 数据降级逻辑移除",
+    "空状态/加载态/错误态完整",
+    "npm run build 通过",
+    "npx vitest run 585/585 全绿"
+  ],
+  "evidence_to_collect": [
+    "逐页交互完整性评分表",
+    "所有缺陷列表(文件+行号+描述)",
+    "修复前后对比",
+    "最终构建输出",
+    "最终测试输出"
+  ],
+  "open_risks": [
+    "后端 API 若不存在会导致前端正确实现但功能不可用",
+    "src/app/ 中仍有87个@ts-nocheck文件，类型错误可能隐藏运行时问题",
+    "WorkflowDesignerPage依赖ReactFlow，需确认节点编辑功能完整"
+  ],
+  "scope": {
+    "pages": [
+      "dashboard/DashboardPage",
+      "analytics/AnalyticsPage",
+      "asset/AssetListPage",
+      "asset/AssetDetailPage",
+      "asset/AssetFormPage",
+      "equipment/EquipmentPage",
+      "idle/IdleAssetsPage",
+      "depreciation/DepreciationListPage",
+      "inventory/InventoryTasksPage",
+      "inventory/InventoryDetailPage",
+      "inventory/RFIDScanPage",
+      "workorder/WorkOrderListPage",
+      "workorder/WorkOrderDetailPage",
+      "workorder/WorkOrderFormPage",
+      "approval/ApprovalListPage",
+      "retirement/RetirementListPage",
+      "retirement/RetirementDetailPage",
+      "retirement/RetirementFormPage",
+      "disposal/DisposalListPage",
+      "disposal/DisposalDetailPage",
+      "disposal/AssetScrapFormPage",
+      "disposal/AssetTransferFormPage",
+      "disposal/AssetClearanceFormPage",
+      "disposal/AssetCompensationFormPage",
+      "workflow/WorkflowCenterPage",
+      "workflow/WorkflowDesignerPage",
+      "audit/AuditDashboardPage",
+      "audit/AuditDetailPage",
+      "settings/SettingsPage",
+      "locations/LocationsPage",
+      "vendors/VendorsPage",
+      "notifications/NotificationsPage",
+      "AssetImportExport/AssetImportExportPage"
+    ]
+  }
+}

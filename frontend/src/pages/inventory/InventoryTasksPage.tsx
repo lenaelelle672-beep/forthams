@@ -69,7 +69,8 @@ export default function InventoryTasksPage() {
   const navigate = useNavigate();
   const qc = useQueryClient();
 
-  const [params, setParams] = useState<{ page: number; pageSize: number }>({ page: 1, pageSize: 20 });
+  const [params, setParams] = useState<{ page: number; pageSize: number; status?: string }>({ page: 1, pageSize: 20 });
+  const [filterOpen, setFilterOpen] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
   const [newTask, setNewTask] = useState<Partial<CreateTaskPayload>>({
     taskName: '', scopeType: 'all', scopeIds: [],
@@ -206,7 +207,10 @@ export default function InventoryTasksPage() {
             详情
           </button>
           {row.status !== 'completed' && row.status !== 'submitted' && (
-            <button className="text-[#64748b] hover:text-[#2563eb] transition-colors">
+            <button
+              className="text-[#64748b] hover:text-[#2563eb] transition-colors"
+              onClick={(e) => { e.stopPropagation(); navigate(`/inventory/tasks/${row.taskId ?? row.id}`); }}
+            >
               <Edit2 className="w-4 h-4" />
             </button>
           )}
@@ -250,13 +254,58 @@ export default function InventoryTasksPage() {
 
       <Card>
         <div className="p-4 border-b border-[#e2e8f0] bg-[#f8fafc]/30 flex items-center justify-between">
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm">
+          <div className="flex gap-2 flex-wrap items-center">
+            <Button variant="outline" size="sm" onClick={() => setFilterOpen((v) => !v)}>
               <Filter className="w-3.5 h-3.5" /> 筛选
             </Button>
-            <Button variant="outline" size="sm">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                const headers = ['盘点编号', '盘点名称', '类型', '进度', '状态', '创建时间'];
+                const rows = records.map((r) => [
+                  String(r.taskId ?? r.id ?? ''),
+                  String(r.taskName ?? ''),
+                  String(r.scopeType ?? ''),
+                  String(r.progress ?? 0) + '%',
+                  String(r.status ?? ''),
+                  String(r.createdAt ?? '').substring(0, 10),
+                ]);
+                const csv = [headers, ...rows].map((row) => row.join(',')).join('\n');
+                const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `inventory-tasks-${new Date().toISOString().slice(0, 10)}.csv`;
+                link.click();
+                URL.revokeObjectURL(url);
+              }}
+            >
               <Download className="w-3.5 h-3.5" /> 导出报表
             </Button>
+            {filterOpen && (
+              <div className="flex items-center gap-2 ml-2">
+                <span className="text-xs text-[#64748b]">状态:</span>
+                <select
+                  className="h-8 bg-white border border-[#e2e8f0] rounded-lg px-2 text-sm focus:border-[#2563eb] outline-none"
+                  value={params.status ?? ''}
+                  onChange={(e) => setParams((p) => ({ ...p, status: e.target.value || undefined, page: 1 }))}
+                >
+                  <option value="">全部</option>
+                  <option value="in_progress">进行中</option>
+                  <option value="draft">草稿</option>
+                  <option value="completed">已完成</option>
+                  <option value="submitted">已提交</option>
+                </select>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => { setParams({ page: 1, pageSize: 20 }); setFilterOpen(false); }}
+                >
+                  重置
+                </Button>
+              </div>
+            )}
           </div>
           <div className="text-[13px] text-[#64748b]">共 {total} 条盘点记录</div>
         </div>

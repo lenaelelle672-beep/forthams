@@ -3,7 +3,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useNavigate, useLocation } from 'react-router';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import {
   ArrowLeft,
   Send,
@@ -12,8 +13,12 @@ import {
   CalendarDays,
   Info,
   ChevronRight,
+  Loader2,
 } from 'lucide-react';
 import { createRetirement } from '@/api/retirement';
+import { getAssetList } from '@/api/asset';
+import type { AssetListItem } from '@/types/asset';
+import type { PaginatedResponse } from '@/types/common';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -59,7 +64,18 @@ export default function RetirementFormPage() {
       qc.invalidateQueries({ queryKey: ['retirement'] });
       navigate('/retirement');
     },
+    onError: (err: Error) => toast.error(err.message || '提交失败，请重试'),
   });
+
+  // 资产搜索
+  const { data: assetRes, isLoading: assetLoading } = useQuery({
+    queryKey: ['assets', 'search', assetSearch],
+    queryFn: () => getAssetList({ keyword: assetSearch, pageSize: 5 }),
+    enabled: assetSearch.trim().length > 0,
+    staleTime: 1000 * 30,
+  });
+  const assetResults = (assetRes as PaginatedResponse<AssetListItem> | undefined)?.data?.records ?? [];
+  const foundAsset: AssetListItem | null = assetResults[0] ?? null;
 
   const onSubmit = (values: FormValues) => {
     mutation.mutate({
@@ -68,8 +84,6 @@ export default function RetirementFormPage() {
       residualValue: values.residualValue,
     });
   };
-
-  const currentYear = 2024;
 
   return (
     <div className="p-6 space-y-6 max-w-[1440px] mx-auto w-full">
@@ -112,42 +126,61 @@ export default function RetirementFormPage() {
               />
 
               <div className="bg-[#f9f9ff] border border-[#004191]/10 p-4 rounded-lg">
-                <div className="flex gap-6">
-                  <div className="w-32 h-32 bg-[#e3e8f8] rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center">
-                    <Package className="w-12 h-12 text-[#64748b]" />
+                {!assetSearch.trim() ? (
+                  <div className="py-6 text-center text-sm text-[#94a3b8]">
+                    请输入资产编号或名称搜索
                   </div>
-                  <div className="flex-1 grid grid-cols-2 gap-y-4 gap-x-8">
-                    <div className="col-span-2">
-                      <p className="text-[10px] text-[#64748b] uppercase tracking-wider">资产名称 & 编号</p>
-                      <p className="text-xl font-bold text-[#161c27]">
-                        {assetSearch || '精密车床 X1'}
-                      </p>
-                      <p className="text-[12px] text-[#004191] font-mono">AST-2023-0891</p>
+                ) : assetLoading ? (
+                  <div className="py-6 text-center text-sm text-[#64748b] flex items-center justify-center gap-2">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    搜索中...
+                  </div>
+                ) : !foundAsset ? (
+                  <div className="py-6 text-center text-sm text-[#94a3b8]">
+                    未找到匹配的资产，请尝试其他关键词
+                  </div>
+                ) : (
+                  <div className="flex gap-6">
+                    <div className="w-32 h-32 bg-[#e3e8f8] rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center">
+                      <Package className="w-12 h-12 text-[#64748b]" />
                     </div>
-                    <div>
-                      <p className="text-[10px] text-[#64748b] uppercase tracking-wider">分类</p>
-                      <p className="text-[13px] text-[#161c27]">工业加工设备</p>
-                    </div>
-                    <div>
-                      <p className="text-[10px] text-[#64748b] uppercase tracking-wider">制造商</p>
-                      <p className="text-[13px] text-[#161c27]">DMG Mori</p>
-                    </div>
-                    <div>
-                      <p className="text-[10px] text-[#64748b] uppercase tracking-wider">原值</p>
-                      <p className="text-[13px] text-[#161c27] font-semibold">¥420,000</p>
-                    </div>
-                    <div>
-                      <p className="text-[10px] text-[#64748b] uppercase tracking-wider">净值</p>
-                      <p className="text-[13px] text-[#004191] font-semibold">¥120,000</p>
-                    </div>
-                    <div className="col-span-2 mt-2">
-                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#dcfce7] text-[#16a34a] border border-[#16a34a]/10 text-[11px] font-bold">
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#16a34a]" />
-                        运行中
-                      </span>
+                    <div className="flex-1 grid grid-cols-2 gap-y-4 gap-x-8">
+                      <div className="col-span-2">
+                        <p className="text-[10px] text-[#64748b] uppercase tracking-wider">资产名称 & 编号</p>
+                        <p className="text-xl font-bold text-[#161c27]">
+                          {foundAsset.assetName ?? '—'}
+                        </p>
+                        <p className="text-[12px] text-[#004191] font-mono">{foundAsset.assetNo ?? '—'}</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-[#64748b] uppercase tracking-wider">分类</p>
+                        <p className="text-[13px] text-[#161c27]">{foundAsset.categoryName ?? '—'}</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-[#64748b] uppercase tracking-wider">品牌/型号</p>
+                        <p className="text-[13px] text-[#161c27]">{foundAsset.brand ?? '—'}</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-[#64748b] uppercase tracking-wider">原值</p>
+                        <p className="text-[13px] text-[#161c27] font-semibold">
+                          {foundAsset.originalValue != null ? `¥${Number(foundAsset.originalValue).toLocaleString()}` : '—'}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-[#64748b] uppercase tracking-wider">净值</p>
+                        <p className="text-[13px] text-[#004191] font-semibold">
+                          {foundAsset.currentValue != null ? `¥${Number(foundAsset.currentValue).toLocaleString()}` : '—'}
+                        </p>
+                      </div>
+                      <div className="col-span-2 mt-2">
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#f1f3ff] text-[#64748b] border border-[#64748b]/10 text-[11px] font-bold">
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#64748b]" />
+                          {foundAsset.status ?? '—'}
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -229,7 +262,7 @@ export default function RetirementFormPage() {
                     {...register('residualValue')}
                   />
                   <p className="text-[11px] text-[#64748b] italic">
-                    基于净值的建议残值：¥120,000
+                    {foundAsset ? `基于净值的建议残值：${foundAsset.currentValue != null ? `¥${Number(foundAsset.currentValue).toLocaleString()}` : '—'}` : '搜索并选择资产后显示建议残值'}
                   </p>
                 </div>
 

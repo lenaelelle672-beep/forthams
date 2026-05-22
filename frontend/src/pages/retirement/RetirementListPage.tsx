@@ -7,7 +7,6 @@ import {
   Filter,
   RefreshCw,
   Eye,
-  Edit2,
   ChevronLeft,
   ChevronRight,
   ChevronRightIcon,
@@ -203,15 +202,6 @@ export default function RetirementListPage() {
           >
             <Eye className="w-4 h-4" />
           </Button>
-          {row.status !== 'COMPLETED' && (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={(e) => { e.stopPropagation(); navigate(`/retirement/${row.id}`); }}
-            >
-              <Edit2 className="w-4 h-4" />
-            </Button>
-          )}
         </div>
       ),
     },

@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback } from 'react';
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
+import { useNavigate } from 'react-router';
 import {
   Download,
   Upload,
@@ -12,13 +13,15 @@ import {
   AlertTriangle,
   XCircle,
 } from 'lucide-react';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
-import { Input } from '@/components/ui/Input';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/Tabs';
+import { parseImportFile, getImportTemplate } from '@/api/assetImport';
+import type { ParseResponse } from '@/api/assetImport';
 
-interface AssetRow {
+interface PreviewRow {
   id: string;
   name: string;
   category: string;
@@ -26,14 +29,6 @@ interface AssetRow {
   status: string;
   validation: 'success' | 'warning' | 'error';
 }
-
-const MOCK_PREVIEW: AssetRow[] = [
-  { id: '1', name: '卡特彼勒 320 GC 挖掘机', category: '挖掘机械', serialNumber: 'CAT320-99823', status: '在用', validation: 'success' },
-  { id: '2', name: '吉尼 Z-45/25J DC 高空作业平台', category: '高空作业设备', serialNumber: 'GENZ45-11022', status: '维修中', validation: 'warning' },
-  { id: '3', name: '海斯特 H50XT 叉车', category: '叉车', serialNumber: 'INVALID_SN', status: '在用', validation: 'error' },
-  { id: '4', name: '麦克 Granite GU813 自卸车', category: '自卸车', serialNumber: 'MACK-883921', status: '在途', validation: 'success' },
-  { id: '5', name: '山猫 S76 滑移装载机', category: '滑移装载机', serialNumber: 'BOB-S76-4402', status: '在用', validation: 'success' },
-];
 
 const VALIDATION_STYLES = {
   success: { bg: '#dcfce7', text: '#16a34a', border: '#16a34a1a', label: '成功', Icon: CheckCircle },
@@ -45,24 +40,19 @@ const CATEGORY_OPTIONS = ['全部分类', '重型设备', '车辆', '工业工�
 const STATUS_OPTIONS_EXPORT = ['全部状态', '在用', '维修中', '已退役'];
 
 export default function AssetImportExportPage() {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('import');
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [parseResult, setParseResult] = useState<ParseResponse | null>(null);
+  const [previewRows, setPreviewRows] = useState<PreviewRow[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [exportFormat, setExportFormat] = useState<'xlsx' | 'csv'>('xlsx');
   const [exportCategory, setExportCategory] = useState('');
   const [exportStatus, setExportStatus] = useState('');
-
-  useQuery({
-    queryKey: ['import-preview'],
-    queryFn: async () => {
-      return { data: MOCK_PREVIEW };
-    },
-    enabled: false,
-  });
 
   const exportMutation = useMutation({
     mutationFn: async (filters: { categories: string[]; statuses: string[]; format: string }) => {
@@ -76,12 +66,54 @@ export default function AssetImportExportPage() {
     },
   });
 
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-    const file = e.dataTransfer.files[0];
-    if (file) simulateUpload(file);
+  /** 真实上传：使用 parseImportFile API，带上传进度回调 */
+  const handleUpload = useCallback(async (file: File) => {
+    setIsUploading(true);
+    setUploadProgress(0);
+    setUploadedFile(file.name);
+    setParseResult(null);
+    setPreviewRows([]);
+
+    try {
+      const result = await parseImportFile(file, (progress) => {
+        setUploadProgress(progress);
+      });
+      setParseResult(result);
+      // 映射 API rows 到预览行
+      const rows: PreviewRow[] = (result.rows ?? []).map((row) => {
+        const hasError = (result.errors ?? []).some((e) => e.rowNumber === row.rowNumber);
+        return {
+          id: String(row.rowNumber),
+          name: row.name,
+          category: row.categoryCode,
+          serialNumber:
+            (row['serialNumber'] as string) ??
+            (row['assetCode'] as string) ??
+            '—',
+          status: row.statusCode,
+          validation: hasError ? 'error' : 'success',
+        };
+      });
+      setPreviewRows(rows);
+      setIsUploading(false);
+      toast.success('文件解析成功，请检查数据预览');
+    } catch (err: unknown) {
+      const message = (err as { message?: string }).message ?? '上传失败，请重试';
+      toast.error(message);
+      setIsUploading(false);
+      setUploadProgress(0);
+    }
   }, []);
+
+  const handleDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      setIsDragging(false);
+      const file = e.dataTransfer.files[0];
+      if (file) handleUpload(file);
+    },
+    [handleUpload],
+  );
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -92,31 +124,37 @@ export default function AssetImportExportPage() {
     setIsDragging(false);
   }, []);
 
-  const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) simulateUpload(file);
-  }, []);
-
-  const simulateUpload = (file: File) => {
-    setIsUploading(true);
-    setUploadProgress(0);
-    setUploadedFile(file.name);
-    let progress = 0;
-    const interval = setInterval(() => {
-      progress += Math.random() * 15 + 5;
-      if (progress >= 100) {
-        progress = 100;
-        clearInterval(interval);
-        setTimeout(() => setIsUploading(false), 500);
-      }
-      setUploadProgress(Math.min(Math.round(progress), 100));
-    }, 300);
-  };
+  const handleFileSelect = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (file) handleUpload(file);
+    },
+    [handleUpload],
+  );
 
   const handleCancelUpload = () => {
     setIsUploading(false);
     setUploadProgress(0);
     setUploadedFile(null);
+    setParseResult(null);
+    setPreviewRows([]);
+  };
+
+  /** 下载导入模板 */
+  const handleDownloadTemplate = async () => {
+    try {
+      const blob = await getImportTemplate();
+      const url = URL.createObjectURL(blob as unknown as Blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = '资产导入模板.xlsx';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch {
+      toast.error('模板下载失败，请重试');
+    }
   };
 
   const handleExport = () => {
@@ -127,13 +165,20 @@ export default function AssetImportExportPage() {
     });
   };
 
+  // 从解析结果计算统计数
+  const validCount = previewRows.filter((r) => r.validation === 'success').length;
+  const errorCount = previewRows.filter((r) => r.validation === 'error').length;
+  const warningCount = previewRows.filter((r) => r.validation === 'warning').length;
+  // parseResult 存在但 previewRows 为空时说明上传中
+  void parseResult;
+
   return (
     <div className="min-h-screen bg-[#f9f9ff]">
       <PageHeader
         title="资产导入导出"
         breadcrumbs={[{ label: '资产管理' }, { label: '导入导出' }]}
         actions={
-          <Button variant="primary" size="md">
+          <Button variant="primary" size="md" onClick={() => navigate('/assets/new')}>
             创建请求
           </Button>
         }
@@ -149,7 +194,7 @@ export default function AssetImportExportPage() {
           <TabsContent value="import">
             <div className="space-y-6 max-w-[1200px] mx-auto">
               <div className="flex justify-end">
-                <Button variant="outline" size="md">
+                <Button variant="outline" size="md" onClick={handleDownloadTemplate}>
                   <Download className="w-4 h-4" />
                   下载 Excel 模板
                 </Button>
@@ -170,7 +215,13 @@ export default function AssetImportExportPage() {
                 onDragLeave={handleDragLeave}
                 onClick={() => fileInputRef.current?.click()}
               >
-                <input ref={fileInputRef} type="file" accept=".xlsx,.csv,.xml" className="hidden" onChange={handleFileSelect} />
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".xlsx,.csv,.xml"
+                  className="hidden"
+                  onChange={handleFileSelect}
+                />
                 <div className="w-16 h-16 bg-[#d8e2ff] rounded-full flex items-center justify-center text-[#004191] group-hover:scale-110 transition-transform">
                   <Upload className="w-8 h-8" />
                 </div>
@@ -197,7 +248,10 @@ export default function AssetImportExportPage() {
                       />
                     </div>
                   </div>
-                  <button className="p-2 text-[#424753] hover:text-[#ba1a1a] transition-colors" onClick={handleCancelUpload}>
+                  <button
+                    className="p-2 text-[#424753] hover:text-[#ba1a1a] transition-colors"
+                    onClick={handleCancelUpload}
+                  >
                     <X className="w-5 h-5" />
                   </button>
                 </div>
@@ -206,54 +260,72 @@ export default function AssetImportExportPage() {
               <Card>
                 <div className="px-4 py-4 border-b border-[#e5e7eb] flex justify-between items-center">
                   <h3 className="text-base font-semibold text-[#161c27]">数据校验预览</h3>
-                  <div className="flex gap-2">
-                    <span className="text-xs text-[#424753] flex items-center gap-1">
-                      <span className="w-2 h-2 rounded-full bg-[#16a34a]" /> 1,240 条有效
-                    </span>
-                    <span className="text-xs text-[#424753] flex items-center gap-1">
-                      <span className="w-2 h-2 rounded-full bg-[#d97706]" /> 12 条警告
-                    </span>
-                    <span className="text-xs text-[#424753] flex items-center gap-1">
-                      <span className="w-2 h-2 rounded-full bg-[#ba1a1a]" /> 3 条错误
-                    </span>
-                  </div>
+                  {previewRows.length > 0 ? (
+                    <div className="flex gap-2">
+                      <span className="text-xs text-[#424753] flex items-center gap-1">
+                        <span className="w-2 h-2 rounded-full bg-[#16a34a]" /> {validCount} 条有效
+                      </span>
+                      <span className="text-xs text-[#424753] flex items-center gap-1">
+                        <span className="w-2 h-2 rounded-full bg-[#d97706]" /> {warningCount} 条警告
+                      </span>
+                      <span className="text-xs text-[#424753] flex items-center gap-1">
+                        <span className="w-2 h-2 rounded-full bg-[#ba1a1a]" /> {errorCount} 条错误
+                      </span>
+                    </div>
+                  ) : (
+                    <span className="text-xs text-[#424753]">上传文件后将显示数据预览</span>
+                  )}
                 </div>
-                <table className="w-full text-left border-collapse">
-                  <thead className="bg-[#f1f3ff]">
-                    <tr>
-                      {['资产名称', '分类', '序列号', '状态', '校验'].map((h) => (
-                        <th key={h} className="px-4 py-3 text-[10px] font-semibold text-[#424753] uppercase tracking-wider">
-                          {h}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-[#e5e7eb]">
-                    {MOCK_PREVIEW.map((row) => {
-                      const v = VALIDATION_STYLES[row.validation];
-                      const VIcon = v.Icon;
-                      return (
-                        <tr key={row.id} className="hover:bg-[#f1f3ff] transition-colors">
-                          <td className="px-4 py-4 text-sm font-semibold text-[#161c27]">{row.name}</td>
-                          <td className="px-4 py-4 text-sm text-[#161c27]">{row.category}</td>
-                          <td className={`px-4 py-4 text-xs font-mono ${row.validation === 'error' ? 'text-[#ba1a1a]' : 'text-[#424753]'}`}>
-                            {row.serialNumber}
-                          </td>
-                          <td className="px-4 py-4 text-sm text-[#161c27]">{row.status}</td>
-                          <td className="px-4 py-4">
-                            <span
-                              className="px-3 py-1 text-[10px] font-semibold uppercase tracking-wider rounded-full inline-flex items-center gap-1"
-                              style={{ background: v.bg, color: v.text, border: `1px solid ${v.border}` }}
+                {previewRows.length > 0 ? (
+                  <table className="w-full text-left border-collapse">
+                    <thead className="bg-[#f1f3ff]">
+                      <tr>
+                        {['资产名称', '分类', '序列号', '状态', '校验'].map((h) => (
+                          <th
+                            key={h}
+                            className="px-4 py-3 text-[10px] font-semibold text-[#424753] uppercase tracking-wider"
+                          >
+                            {h}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-[#e5e7eb]">
+                      {previewRows.map((row) => {
+                        const v = VALIDATION_STYLES[row.validation];
+                        const VIcon = v.Icon;
+                        return (
+                          <tr key={row.id} className="hover:bg-[#f1f3ff] transition-colors">
+                            <td className="px-4 py-4 text-sm font-semibold text-[#161c27]">{row.name}</td>
+                            <td className="px-4 py-4 text-sm text-[#161c27]">{row.category}</td>
+                            <td
+                              className={`px-4 py-4 text-xs font-mono ${
+                                row.validation === 'error' ? 'text-[#ba1a1a]' : 'text-[#424753]'
+                              }`}
                             >
-                              <VIcon className="w-3 h-3" />
-                              {v.label}
-                            </span>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+                              {row.serialNumber}
+                            </td>
+                            <td className="px-4 py-4 text-sm text-[#161c27]">{row.status}</td>
+                            <td className="px-4 py-4">
+                              <span
+                                className="px-3 py-1 text-[10px] font-semibold uppercase tracking-wider rounded-full inline-flex items-center gap-1"
+                                style={{ background: v.bg, color: v.text, border: `1px solid ${v.border}` }}
+                              >
+                                <VIcon className="w-3 h-3" />
+                                {v.label}
+                              </span>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                ) : (
+                  <div className="py-12 flex flex-col items-center justify-center text-center text-[#424753]">
+                    <FileSpreadsheet className="w-10 h-10 mb-3 text-[#c3c6d7]" />
+                    <p className="text-sm">上传后将显示数据预览</p>
+                  </div>
+                )}
               </Card>
             </div>
           </TabsContent>
@@ -304,10 +376,12 @@ export default function AssetImportExportPage() {
                       文件格式
                     </label>
                     <div className="flex gap-4">
-                      {([
-                        { value: 'xlsx' as const, label: 'XLSX', Icon: Table2 },
-                        { value: 'csv' as const, label: 'CSV', Icon: FileSpreadsheet },
-                      ]).map(({ value, label, Icon }) => (
+                      {(
+                        [
+                          { value: 'xlsx' as const, label: 'XLSX', Icon: Table2 },
+                          { value: 'csv' as const, label: 'CSV', Icon: FileSpreadsheet },
+                        ] as const
+                      ).map(({ value, label, Icon }) => (
                         <label
                           key={value}
                           className={`flex-1 flex items-center justify-center gap-3 p-4 border rounded-xl cursor-pointer hover:border-[#004191] transition-all ${
@@ -351,7 +425,9 @@ export default function AssetImportExportPage() {
                     {[60, 85, 45, 70, 55].map((h, i) => (
                       <div
                         key={i}
-                        className={`w-16 rounded-t-lg transition-all duration-1000 ${i % 2 === 0 ? 'bg-[#004191]' : 'bg-[#0058be]'}`}
+                        className={`w-16 rounded-t-lg transition-all duration-1000 ${
+                          i % 2 === 0 ? 'bg-[#004191]' : 'bg-[#0058be]'
+                        }`}
                         style={{ height: `${h}%` }}
                       />
                     ))}

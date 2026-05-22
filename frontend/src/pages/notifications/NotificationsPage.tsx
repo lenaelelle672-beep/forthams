@@ -128,7 +128,7 @@ export default function NotificationsPage() {
             </Button>
             <button
               className="p-2 border border-[#e5e7eb] rounded hover:bg-[#f1f3ff] transition-colors"
-              onClick={() => { setActiveTab('all'); setPage(1); }}
+              onClick={() => { setActiveTab('all'); setPage(1); qc.invalidateQueries({ queryKey: ['notifications'] }); }}
               title="重置筛选"
             >
               <ListFilter className="w-5 h-5 text-[#424753]" />
