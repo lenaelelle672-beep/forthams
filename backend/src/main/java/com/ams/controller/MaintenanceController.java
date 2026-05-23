@@ -7,6 +7,7 @@ import com.ams.service.MaintenanceService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ams.common.Result;
 import lombok.RequiredArgsConstructor;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -36,12 +37,12 @@ public class MaintenanceController {
     }
 
     @PostMapping
-    public Result<MaintenanceRecord> create(@RequestBody MaintenanceCreateDTO dto) {
+    public Result<MaintenanceRecord> create(@Valid @RequestBody MaintenanceCreateDTO dto) {
         return Result.success(maintenanceService.createRecord(dto));
     }
 
     @PutMapping("/{id}")
-    public Result<MaintenanceRecord> update(@PathVariable Long id, @RequestBody MaintenanceUpdateDTO dto) {
+    public Result<MaintenanceRecord> update(@PathVariable Long id, @Valid @RequestBody MaintenanceUpdateDTO dto) {
         return Result.success(maintenanceService.updateRecord(id, dto));
     }
 

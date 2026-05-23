@@ -7,6 +7,7 @@ import com.ams.service.UserManagementService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ams.common.Result;
 import lombok.RequiredArgsConstructor;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -54,12 +55,12 @@ public class UserManagementController {
     }
 
     @PostMapping
-    public Result<User> create(@RequestBody UserCreateDTO dto) {
+    public Result<User> create(@Valid @RequestBody UserCreateDTO dto) {
         return Result.success(userManagementService.createUser(dto));
     }
 
     @PutMapping("/{id}")
-    public Result<User> update(@PathVariable Long id, @RequestBody UserUpdateDTO dto) {
+    public Result<User> update(@PathVariable Long id, @Valid @RequestBody UserUpdateDTO dto) {
         return Result.success(userManagementService.updateUser(id, dto));
     }
 

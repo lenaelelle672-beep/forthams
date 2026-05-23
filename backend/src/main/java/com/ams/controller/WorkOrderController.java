@@ -2,12 +2,17 @@ package com.ams.controller;
 
 import com.ams.common.Result;
 import com.ams.dto.WorkOrderDTO;
+import com.ams.dto.DeptPendingDTO;
+import com.ams.dto.StatusDistributionDTO;
+
 import com.ams.entity.WorkOrder;
 import com.ams.service.WorkOrderService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -32,12 +37,12 @@ public class WorkOrderController {
     }
 
     @PostMapping
-    public Result<WorkOrder> createWorkOrder(@RequestBody WorkOrderDTO dto) {
+    public Result<WorkOrder> createWorkOrder(@Valid @RequestBody WorkOrderDTO dto) {
         return Result.success(workOrderService.createWorkOrder(dto));
     }
 
     @PutMapping("/{id}")
-    public Result<WorkOrder> updateWorkOrder(@PathVariable Long id, @RequestBody WorkOrderDTO dto) {
+    public Result<WorkOrder> updateWorkOrder(@PathVariable Long id, @Valid @RequestBody WorkOrderDTO dto) {
         return Result.success(workOrderService.updateWorkOrder(id, dto));
     }
 
@@ -73,4 +78,30 @@ public class WorkOrderController {
         String comment = body != null ? body.get("comment") : null;
         return Result.success(workOrderService.operateWorkOrder(id, operation, comment));
     }
+
+    /**
+     * RPT-07: 获取工单状态分布统计。
+     *
+     * <p>按工单状态（已完成/进行中/待处理等）分组计数，用于工单报表饼图/柱状图。
+     *
+     * @return 各状态工单计数列表
+     */
+    @GetMapping("/status-distribution")
+    public Result<List<StatusDistributionDTO>> getStatusDistribution() {
+        return Result.success(workOrderService.getStatusDistribution());
+    }
+
+    /**
+     * RPT-08: 获取各部门待处理工单数量。
+     *
+     * <p>按部门聚合 PENDING 状态工单计数，用于工单报表柱状图。
+     *
+     * @return 各部门待处理工单计数列表
+     */
+    @GetMapping("/dept-pending")
+    public Result<List<DeptPendingDTO>> getDeptPending() {
+        return Result.success(workOrderService.getDeptPending());
+    }
+
+
 }

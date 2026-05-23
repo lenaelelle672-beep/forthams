@@ -77,7 +77,8 @@ export default function AssetListPage() {
   }, [categoryRes]);
 
   const departments = useMemo(() => {
-    const list = (deptRes as unknown as ApiResponse<Department[]> | undefined)?.data ?? [];
+    const raw = (deptRes as unknown as ApiResponse<Department[]> | undefined)?.data;
+    const list = Array.isArray(raw) ? raw : [];
     const flat: { id: number; name: string }[] = [];
     const walk = (nodes: Department[]) => {
       for (const node of nodes) {

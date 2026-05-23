@@ -3,15 +3,34 @@
  * @description Vendor form dialog component for creating and editing vendors.
  *
  * Supports both "create" and "edit" modes based on the `currentVendor` prop.
- * Form fields strictly align with the Vendor entity 5-tuple:
- *   name, vendorCode, contactPerson, contactPhone, contactEmail
+ * Uses React Hook Form + Zod for real-time field-level validation.
+ * Form fields strictly align with the Vendor entity:
+ *   name, vendorCode, contactPerson, contactPhone, contactEmail, address
  *
  * @since SWARM-046
  */
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { X, Loader2 } from "lucide-react";
-import type { Vendor } from "../../services/vendorApi";
+import type { Vendor } from "../../services/vendorService";
+
+// ---------------------------------------------------------------------------
+// Zod Schema
+// ---------------------------------------------------------------------------
+
+const vendorFormSchema = z.object({
+  name: z.string().min(1, "供应商名称不能为空").max(100, "供应商名称不能超过100字"),
+  vendorCode: z.string().max(50, "供应商编码不能超过50字").optional().or(z.literal("")),
+  contactPerson: z.string().max(50, "联系人不能超过50字").optional().or(z.literal("")),
+  contactPhone: z.string().max(20, "联系电话不能超过20字").optional().or(z.literal("")),
+  contactEmail: z.string().max(100, "联系邮箱不能超过100字").email("邮箱格式不正确").optional().or(z.literal("")),
+  address: z.string().max(200, "地址不能超过200字").optional().or(z.literal("")),
+});
+
+type VendorFormValues = z.infer<typeof vendorFormSchema>;
 
 // ---------------------------------------------------------------------------
 // Props
@@ -40,19 +59,6 @@ interface VendorFormDialogProps {
 }
 
 // ---------------------------------------------------------------------------
-// Constants
-// ---------------------------------------------------------------------------
-
-/** 空表单初始值 */
-const EMPTY_FORM: Omit<Vendor, "id"> = {
-  name: "",
-  vendorCode: "",
-  contactPerson: "",
-  contactPhone: "",
-  contactEmail: "",
-};
-
-// ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
 
@@ -61,7 +67,7 @@ const EMPTY_FORM: Omit<Vendor, "id"> = {
  *
  * When `currentVendor` is provided, the form is pre-populated for editing.
  * When `currentVendor` is null/undefined, the form starts empty for creation.
- * Includes basic validation: name and vendorCode are required.
+ * Uses react-hook-form + zodResolver for field-level validation.
  *
  * @param props - VendorFormDialogProps
  * @returns React component
@@ -73,76 +79,70 @@ export default function VendorFormDialog({
   onSubmit,
   submitting,
 }: VendorFormDialogProps) {
-  // ---------------------------------------------------------------------------
-  // State
-  // ---------------------------------------------------------------------------
-
-  /** 表单数据 */
-  const [form, setForm] = useState<Omit<Vendor, "id">>(EMPTY_FORM);
-
-  // ---------------------------------------------------------------------------
-  // Effects
-  // ---------------------------------------------------------------------------
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<VendorFormValues>({
+    resolver: zodResolver(vendorFormSchema),
+    defaultValues: {
+      name: "",
+      vendorCode: "",
+      contactPerson: "",
+      contactPhone: "",
+      contactEmail: "",
+      address: "",
+    },
+  });
 
   /**
    * When dialog opens or currentVendor changes, populate form data.
-   * Edit mode: fill with currentVendor data.
-   * Create mode: reset to empty.
    */
   useEffect(() => {
     if (open) {
       if (currentVendor) {
-        setForm({
+        reset({
           name: currentVendor.name ?? "",
           vendorCode: currentVendor.vendorCode ?? "",
           contactPerson: currentVendor.contactPerson ?? "",
           contactPhone: currentVendor.contactPhone ?? "",
           contactEmail: currentVendor.contactEmail ?? "",
+          address: currentVendor.address ?? "",
         });
       } else {
-        setForm(EMPTY_FORM);
+        reset({
+          name: "",
+          vendorCode: "",
+          contactPerson: "",
+          contactPhone: "",
+          contactEmail: "",
+          address: "",
+        });
       }
     }
-  }, [open, currentVendor]);
-
-  // ---------------------------------------------------------------------------
-  // Handlers
-  // ---------------------------------------------------------------------------
+  }, [open, currentVendor, reset]);
 
   /**
-   * Handle form field change.
-   *
-   * @param field - field name
-   * @param value - new value
+   * Handle form submission with RHF validation.
    */
-  const handleChange = (field: keyof Omit<Vendor, "id">, value: string) => {
-    setForm((prev) => ({ ...prev, [field]: value }));
-  };
-
-  /**
-   * Handle form submission with validation.
-   *
-   * @param e - form event
-   */
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!form.name.trim()) {
-      return;
-    }
-
+  const onFormSubmit = (values: VendorFormValues) => {
     onSubmit({
-      name: form.name.trim(),
-      vendorCode: form.vendorCode.trim(),
-      contactPerson: form.contactPerson.trim(),
-      contactPhone: form.contactPhone.trim(),
-      contactEmail: form.contactEmail.trim(),
+      name: values.name.trim(),
+      vendorCode: (values.vendorCode ?? "").trim(),
+      contactPerson: (values.contactPerson ?? "").trim(),
+      contactPhone: (values.contactPhone ?? "").trim(),
+      contactEmail: (values.contactEmail ?? "").trim(),
+      address: (values.address ?? "").trim(),
     });
   };
 
-  // ---------------------------------------------------------------------------
-  // Render
-  // ---------------------------------------------------------------------------
+  const inputClass = (fieldError?: string) =>
+    `w-full px-3 py-2 text-sm rounded-lg border bg-white focus:outline-none focus:ring-2 transition-colors ${
+      fieldError
+        ? "border-red-300 focus:ring-red-500"
+        : "border-gray-200 focus:ring-blue-500 focus:border-blue-500"
+    }`;
 
   if (!open) return null;
 
@@ -170,7 +170,7 @@ export default function VendorFormDialog({
         </div>
 
         {/* 表单 */}
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-4">
           {/* 供应商名称 */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -178,31 +178,29 @@ export default function VendorFormDialog({
             </label>
             <input
               type="text"
-              value={form.name}
-              onChange={(e) => handleChange("name", e.target.value)}
               placeholder="请输入供应商名称"
-              required
-              className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200
-                bg-white focus:outline-none focus:ring-2 focus:ring-blue-500
-                focus:border-blue-500 transition-colors"
+              className={inputClass(errors.name?.message)}
+              {...register("name")}
             />
+            {errors.name && (
+              <p className="mt-1 text-xs text-red-500">{errors.name.message}</p>
+            )}
           </div>
 
           {/* 供应商编码 */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              供应商编码 <span className="text-red-500">*</span>
+              供应商编码
             </label>
             <input
               type="text"
-              value={form.vendorCode}
-              onChange={(e) => handleChange("vendorCode", e.target.value)}
               placeholder="请输入供应商编码"
-              required
-              className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200
-                bg-white focus:outline-none focus:ring-2 focus:ring-blue-500
-                focus:border-blue-500 transition-colors"
+              className={inputClass(errors.vendorCode?.message)}
+              {...register("vendorCode")}
             />
+            {errors.vendorCode && (
+              <p className="mt-1 text-xs text-red-500">{errors.vendorCode.message}</p>
+            )}
           </div>
 
           {/* 联系人 */}
@@ -212,13 +210,13 @@ export default function VendorFormDialog({
             </label>
             <input
               type="text"
-              value={form.contactPerson}
-              onChange={(e) => handleChange("contactPerson", e.target.value)}
               placeholder="请输入联系人"
-              className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200
-                bg-white focus:outline-none focus:ring-2 focus:ring-blue-500
-                focus:border-blue-500 transition-colors"
+              className={inputClass(errors.contactPerson?.message)}
+              {...register("contactPerson")}
             />
+            {errors.contactPerson && (
+              <p className="mt-1 text-xs text-red-500">{errors.contactPerson.message}</p>
+            )}
           </div>
 
           {/* 联系电话 */}
@@ -228,13 +226,13 @@ export default function VendorFormDialog({
             </label>
             <input
               type="text"
-              value={form.contactPhone}
-              onChange={(e) => handleChange("contactPhone", e.target.value)}
               placeholder="请输入联系电话"
-              className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200
-                bg-white focus:outline-none focus:ring-2 focus:ring-blue-500
-                focus:border-blue-500 transition-colors"
+              className={inputClass(errors.contactPhone?.message)}
+              {...register("contactPhone")}
             />
+            {errors.contactPhone && (
+              <p className="mt-1 text-xs text-red-500">{errors.contactPhone.message}</p>
+            )}
           </div>
 
           {/* 联系邮箱 */}
@@ -244,13 +242,29 @@ export default function VendorFormDialog({
             </label>
             <input
               type="email"
-              value={form.contactEmail}
-              onChange={(e) => handleChange("contactEmail", e.target.value)}
               placeholder="请输入联系邮箱"
-              className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200
-                bg-white focus:outline-none focus:ring-2 focus:ring-blue-500
-                focus:border-blue-500 transition-colors"
+              className={inputClass(errors.contactEmail?.message)}
+              {...register("contactEmail")}
             />
+            {errors.contactEmail && (
+              <p className="mt-1 text-xs text-red-500">{errors.contactEmail.message}</p>
+            )}
+          </div>
+
+          {/* 地址 */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              地址
+            </label>
+            <input
+              type="text"
+              placeholder="请输入地址"
+              className={inputClass(errors.address?.message)}
+              {...register("address")}
+            />
+            {errors.address && (
+              <p className="mt-1 text-xs text-red-500">{errors.address.message}</p>
+            )}
           </div>
 
           {/* 操作按钮 */}

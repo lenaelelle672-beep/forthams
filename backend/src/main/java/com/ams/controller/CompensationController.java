@@ -6,6 +6,7 @@ import com.ams.dto.CompensationUpdateDTO;
 import com.ams.dto.CompensationValuationDTO;
 import com.ams.entity.AssetCompensation;
 import com.ams.service.CompensationService;
+import jakarta.validation.Valid;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ams.common.Result;
 import lombok.RequiredArgsConstructor;
@@ -33,17 +34,17 @@ public class CompensationController {
     }
 
     @PostMapping
-    public Result<AssetCompensation> create(@RequestBody CompensationCreateDTO dto) {
+    public Result<AssetCompensation> create(@Valid @RequestBody CompensationCreateDTO dto) {
         throw new BusinessException("资产赔偿必须通过审批流程提交");
     }
 
     @PostMapping("/valuation")
-    public Result<CompensationValuationDTO> valuation(@RequestBody CompensationCreateDTO dto) {
+    public Result<CompensationValuationDTO> valuation(@Valid @RequestBody CompensationCreateDTO dto) {
         return Result.success(compensationService.estimateCompensation(dto));
     }
 
     @PutMapping("/{id}")
-    public Result<AssetCompensation> update(@PathVariable Long id, @RequestBody CompensationUpdateDTO dto) {
+    public Result<AssetCompensation> update(@PathVariable Long id, @Valid @RequestBody CompensationUpdateDTO dto) {
         return Result.success(compensationService.updateCompensation(id, dto));
     }
 

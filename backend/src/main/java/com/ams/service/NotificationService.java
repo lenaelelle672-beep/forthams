@@ -11,19 +11,28 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 
 /**
  * 通知中心服务
  *
  * <p>管理用户站内通知的完整生命周期：创建、分页查询、未读计数、
- * 标记已读（单条/全部）、删除。支持按类型和分类过滤。</p>
+ * 标记已读（单条/全部）、删除。支持按类型和分类过滤，
+ * 并提供退休通知域方法，同步创建站内通知并异步发送邮件。</p>
  */
 @Service
 @RequiredArgsConstructor
 public class NotificationService {
 
     private final NotificationMapper notificationMapper;
+    private final EmailService emailService;
+
+    @Autowired
+    @Lazy
+    private List<NotificationChannel> notificationChannels;
 
     /**
      * 分页查询用户通知列表
@@ -145,4 +154,117 @@ public class NotificationService {
                 .eq(NotificationRecord::getIsRead, 0)
                 .orderByDesc(NotificationRecord::getCreatedAt));
     }
+
+    // ==================== 退休通知域方法 ====================
+
+    /**
+     * 发送退休申请提交通知 — 创建站内通知 + 异步邮件通知
+     *
+     * @param applicationId  退休申请 ID
+     * @param applicantName  申请人名称
+     * @param assetCode      资产编码
+     */
+    public void sendRetirementSubmitted(Long applicationId, String applicantName, String assetCode) {
+        Objects.requireNonNull(applicationId, "applicationId must not be null");
+        Objects.requireNonNull(applicantName, "applicantName must not be null");
+        Objects.requireNonNull(assetCode, "assetCode must not be null");
+
+        NotificationRecord record = new NotificationRecord();
+        record.setUserId(0L);
+        record.setTitle("新的报废申请");
+        record.setContent("申请人 " + applicantName + " 提交了资产 " + assetCode + " 的报废申请");
+        record.setType("retirement_submitted");
+        record.setCategory("retirement");
+        record.setRefId(applicationId);
+        record.setRefType("RETIREMENT_APPLICATION");
+        if (notificationChannels != null) {
+            for (NotificationChannel channel : notificationChannels) {
+                channel.send(record);
+            }
+        }
+    }
+
+    /**
+     * 发送退休申请审批通过通知 — 创建站内通知 + 异步邮件通知
+     *
+     * @param applicationId  退休申请 ID
+     * @param applicantName  申请人名称
+     * @param assetCode      资产编码
+     */
+    public void sendRetirementApproved(Long applicationId, String applicantName, String assetCode) {
+        Objects.requireNonNull(applicationId, "applicationId must not be null");
+        Objects.requireNonNull(applicantName, "applicantName must not be null");
+        Objects.requireNonNull(assetCode, "assetCode must not be null");
+
+        NotificationRecord record = new NotificationRecord();
+        record.setUserId(0L);
+        record.setTitle("报废申请已通过");
+        record.setContent("您的资产 " + assetCode + " 的报废申请已审批通过");
+        record.setType("retirement_approved");
+        record.setCategory("retirement");
+        record.setRefId(applicationId);
+        record.setRefType("RETIREMENT_APPLICATION");
+        if (notificationChannels != null) {
+            for (NotificationChannel channel : notificationChannels) {
+                channel.send(record);
+            }
+        }
+    }
+
+    /**
+     * 发送退休申请审批拒绝通知 — 创建站内通知 + 异步邮件通知
+     *
+     * @param applicationId  退休申请 ID
+     * @param applicantName  申请人名称
+     * @param assetCode      资产编码
+     * @param rejectReason   驳回原因
+     */
+    public void sendRetirementRejected(Long applicationId, String applicantName, String assetCode, String rejectReason) {
+        Objects.requireNonNull(applicationId, "applicationId must not be null");
+        Objects.requireNonNull(applicantName, "applicantName must not be null");
+        Objects.requireNonNull(assetCode, "assetCode must not be null");
+
+        String reason = (rejectReason == null || rejectReason.isBlank()) ? "未提供原因" : rejectReason;
+        NotificationRecord record = new NotificationRecord();
+        record.setUserId(0L);
+        record.setTitle("报废申请已驳回");
+        record.setContent("您的资产 " + assetCode + " 的报废申请被驳回，原因：" + reason);
+        record.setType("retirement_rejected");
+        record.setCategory("retirement");
+        record.setRefId(applicationId);
+        record.setRefType("RETIREMENT_APPLICATION");
+        if (notificationChannels != null) {
+            for (NotificationChannel channel : notificationChannels) {
+                channel.send(record);
+            }
+        }
+    }
+
+    /**
+     * 发送 72h 超时催办通知 — 创建站内通知 + 异步邮件通知
+     *
+     * @param applicationId  退休申请 ID
+     * @param assetCode      资产编码
+     */
+    public void sendApprovalReminder(Long applicationId, String assetCode) {
+        Objects.requireNonNull(applicationId, "applicationId must not be null");
+        Objects.requireNonNull(assetCode, "assetCode must not be null");
+
+        NotificationRecord record = new NotificationRecord();
+        record.setUserId(0L);
+        record.setTitle("报废申请审批催办");
+        record.setContent("资产 " + assetCode + " 的报废申请已等待审批超过72小时，请及时处理");
+        record.setType("retirement_reminder");
+        record.setCategory("retirement");
+        record.setRefId(applicationId);
+        record.setRefType("RETIREMENT_APPLICATION");
+        if (notificationChannels != null) {
+            for (NotificationChannel channel : notificationChannels) {
+                channel.send(record);
+            }
+        }
+    }
+
+    // -- end retirement notification methods
+
 }

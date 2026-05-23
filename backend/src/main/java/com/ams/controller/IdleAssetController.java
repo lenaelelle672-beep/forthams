@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -37,7 +38,7 @@ public class IdleAssetController {
     }
 
     @PostMapping
-    public Result<IdleAssetNotice> create(@RequestBody IdleAssetCreateDTO dto) {
+    public Result<IdleAssetNotice> create(@Valid @RequestBody IdleAssetCreateDTO dto) {
         return Result.success(idleAssetService.publishNotice(dto));
     }
 

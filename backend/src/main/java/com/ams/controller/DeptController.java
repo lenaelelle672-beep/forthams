@@ -6,6 +6,7 @@ import com.ams.dto.DeptUpdateDTO;
 import com.ams.entity.Dept;
 import com.ams.service.DeptService;
 import lombok.RequiredArgsConstructor;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
@@ -32,12 +33,12 @@ public class DeptController {
     }
 
     @PostMapping
-    public Result<Dept> create(@RequestBody DeptCreateDTO dto) {
+    public Result<Dept> create(@Valid @RequestBody DeptCreateDTO dto) {
         return Result.success(deptService.createDept(dto));
     }
 
     @PutMapping("/{id}")
-    public Result<Dept> update(@PathVariable Long id, @RequestBody DeptUpdateDTO dto) {
+    public Result<Dept> update(@PathVariable Long id, @Valid @RequestBody DeptUpdateDTO dto) {
         return Result.success(deptService.updateDept(id, dto));
     }
 

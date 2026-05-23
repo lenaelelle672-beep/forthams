@@ -33,6 +33,12 @@ import {
   type UserItem,
 } from '@/api/base';
 import type { Department } from '@/types/common';
+import {
+  getSystemConfig,
+  saveSystemConfig as saveSystemConfigApi,
+  getSecurityConfig,
+  saveSecurityConfig as saveSecurityConfigApi,
+} from '@/api/systemConfig';
 
 // ─── 类型定义 ───────────────────────────────────────────────────────────────
 
@@ -552,22 +558,41 @@ const SYSTEM_CONFIG_DEFAULTS = {
 
 function SystemConfigTab() {
   const [saved, setSaved] = useState(false);
-  const [form, setForm] = useState(() => {
-    try {
-      const stored = localStorage.getItem('system_config');
-      return stored ? { ...SYSTEM_CONFIG_DEFAULTS, ...JSON.parse(stored) } : { ...SYSTEM_CONFIG_DEFAULTS };
-    } catch {
-      return { ...SYSTEM_CONFIG_DEFAULTS };
+  const queryClient = useQueryClient();
+
+  const { data: remoteConfig, isLoading } = useQuery({
+    queryKey: ['system-config'],
+    queryFn: async () => {
+      const res = await getSystemConfig();
+      return res.data ?? {};
+    },
+  });
+
+  const [form, setForm] = useState(() => ({ ...SYSTEM_CONFIG_DEFAULTS }));
+
+  // Sync remote data into form when loaded
+  React.useEffect(() => {
+    if (remoteConfig && Object.keys(remoteConfig).length > 0) {
+      setForm(prev => ({ ...prev, ...remoteConfig }));
     }
+  }, [remoteConfig]);
+
+  const saveMut = useMutation({
+    mutationFn: (data: Record<string, string>) => saveSystemConfigApi(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['system-config'] });
+      setSaved(true);
+      toast.success('配置已保存');
+      setTimeout(() => setSaved(false), 2000);
+    },
+    onError: (err: any) => {
+      toast.error(err?.response?.data?.message ?? '保存失败');
+    },
   });
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: 系统配置暂无对应后端端点，使用 localStorage 持久化
-    localStorage.setItem('system_config', JSON.stringify(form));
-    setSaved(true);
-    toast.success('配置已保存');
-    setTimeout(() => setSaved(false), 2000);
+    saveMut.mutate(form);
   };
 
   return (
@@ -660,22 +685,46 @@ const SECURITY_CONFIG_DEFAULTS = {
 
 function SecurityTab() {
   const [saved, setSaved] = useState(false);
-  const [form, setForm] = useState(() => {
-    try {
-      const stored = localStorage.getItem('security_config');
-      return stored ? { ...SECURITY_CONFIG_DEFAULTS, ...JSON.parse(stored) } : { ...SECURITY_CONFIG_DEFAULTS };
-    } catch {
-      return { ...SECURITY_CONFIG_DEFAULTS };
+  const queryClient = useQueryClient();
+
+  const { data: remoteConfig, isLoading } = useQuery({
+    queryKey: ['security-config'],
+    queryFn: async () => {
+      const res = await getSecurityConfig();
+      return res.data ?? {};
+    },
+  });
+
+  const [form, setForm] = useState(() => ({ ...SECURITY_CONFIG_DEFAULTS }));
+
+  // Sync remote data into form when loaded
+  React.useEffect(() => {
+    if (remoteConfig && Object.keys(remoteConfig).length > 0) {
+      setForm(prev => ({ ...prev, ...remoteConfig }));
     }
+  }, [remoteConfig]);
+
+  const saveMut = useMutation({
+    mutationFn: (data: Record<string, string>) => saveSecurityConfigApi(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['security-config'] });
+      setSaved(true);
+      toast.success('安全设置已保存');
+      setTimeout(() => setSaved(false), 2000);
+    },
+    onError: (err: any) => {
+      toast.error(err?.response?.data?.message ?? '保存失败');
+    },
   });
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: 安全设置暂无对应后端端点，使用 localStorage 持久化
-    localStorage.setItem('security_config', JSON.stringify(form));
-    setSaved(true);
-    toast.success('安全设置已保存');
-    setTimeout(() => setSaved(false), 2000);
+    // Convert boolean to string for API
+    const payload: Record<string, string> = {};
+    for (const [key, value] of Object.entries(form)) {
+      payload[key] = typeof value === 'boolean' ? String(value) : String(value);
+    }
+    saveMut.mutate(payload);
   };
 
   const Toggle = ({ checked, onChange }: { checked: boolean; onChange: (v: boolean) => void }) => (

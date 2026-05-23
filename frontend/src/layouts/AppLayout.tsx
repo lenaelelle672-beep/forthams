@@ -8,7 +8,7 @@
  * - 内容区：#f8fafc 背景，24px padding
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
 import http from '@/utils/http';
@@ -23,7 +23,6 @@ import {
   BarChart3,
   Settings,
   Bell,
-  Search,
   LogOut,
   ChevronLeft,
   ChevronRight,
@@ -39,8 +38,12 @@ import {
   Archive,
   MonitorDot,
   Monitor,
+  FileBarChart,
   BoxesIcon,
+  FolderTree,
 } from 'lucide-react';
+
+import GlobalSearch from '@/components/GlobalSearch';
 
 type NavItem = {
   path: string;
@@ -90,6 +93,12 @@ const NAV_GROUPS: NavGroup[] = [
     ],
   },
   {
+    group: '报表',
+    items: [
+      { path: '/reports', label: '报表中心', icon: FileBarChart },
+    ],
+  },
+  {
     group: '监控与审计',
     items: [
       { path: '/audit', label: '审计日志', icon: FileText },
@@ -105,6 +114,7 @@ const NAV_GROUPS: NavGroup[] = [
 ];
 
 const NAV_BOTTOM_ITEMS: NavItem[] = [
+  { path: '/categories', label: '资产分类', icon: FolderTree },
   { path: '/vendors',   label: '供应商',  icon: Users },
   { path: '/locations', label: '位置管理', icon: MapPin },
   { path: '/settings',  label: '系统设置', icon: Settings },
@@ -114,6 +124,14 @@ const NAV_BOTTOM_ITEMS: NavItem[] = [
 export default function AppLayout() {
   const [collapsed, setCollapsed] = useState(false);
   const navigate = useNavigate();
+
+  // ── 认证守卫：无 token 时重定向登录页 ──────────────────────────────────
+  useEffect(() => {
+    const token = sessionStorage.getItem('auth_token') || localStorage.getItem('auth_token');
+    if (!token) {
+      navigate('/login', { replace: true });
+    }
+  }, [navigate]);
 
   // 未读通知数
   const { data: unreadCount = 0 } = useQuery<number>({
@@ -304,21 +322,15 @@ export default function AppLayout() {
         {/* 顶栏 */}
         <header className="flex-none flex items-center justify-between h-16 px-6 bg-white border-b border-[#e5e7eb] z-10">
           {/* 左：搜索 */}
-          <div className="flex items-center gap-4">
-            <div className="relative hidden md:flex items-center">
-              <Search className="absolute left-3 w-4 h-4 text-slate-400" />
-              <input
-                type="text"
-                placeholder="搜索资产、工单..."
-                className="h-8 pl-9 pr-4 w-56 text-sm bg-[#f8fafc] border border-[#e5e7eb] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400 placeholder:text-slate-400"
-              />
-            </div>
+          <div className="flex items-center gap-3">
+            <GlobalSearch />
           </div>
 
           {/* 右：通知 + 用户 */}
           <div className="flex items-center gap-3">
             <NavLink
               to="/notifications"
+              aria-label="查看通知"
               className="relative w-8 h-8 flex items-center justify-center text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
             >
               <Bell className="w-5 h-5" />

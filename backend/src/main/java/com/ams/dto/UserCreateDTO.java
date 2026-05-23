@@ -1,6 +1,9 @@
 package com.ams.dto;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.NotBlank;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
+import jakarta.validation.constraints.Email;
 import lombok.Data;
 
 /**
@@ -9,11 +12,15 @@ import lombok.Data;
  */
 @Data
 public class UserCreateDTO {
+    @NotBlank
     private String username;
+    @NotBlank
     private String password;
     @JsonAlias({"name", "realName"})
     private String realName;
+    @Email
     private String email;
+    @Pattern(regexp = "^1[3-9]\\d{9}$", message = "手机号格式不正确")
     private String phone;
     @JsonAlias({"department", "deptId"})
     private Long deptId;

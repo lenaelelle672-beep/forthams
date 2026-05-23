@@ -62,7 +62,10 @@ http.interceptors.response.use(
       sessionStorage.removeItem('user_info');
       localStorage.removeItem('auth_token');
       localStorage.removeItem('user_info');
-      window.location.href = '/login';
+      // 如果已经在登录页，不再重载页面（避免覆盖 LoginPage 的错误消息）
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login';
+      }
     } else if (status === 403) {
       console.warn('[HTTP 403] 无权限访问:', error.config?.url);
     } else if (status >= 500) {

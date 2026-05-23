@@ -6,10 +6,12 @@
  * - 全项目只有此文件定义路由
  * - 所有页面组件使用 React.lazy + Suspense 懒加载
  * - 新页面已建立则直接使用，未建立则使用 PlaceholderPage
+ * - ProtectedRoute（同步组件，不 lazy）守卫受保护路由
  */
 
 import React, { Suspense } from 'react';
-import { createBrowserRouter, Navigate } from 'react-router';
+import { createBrowserRouter, Navigate, Outlet, useLocation } from 'react-router';
+import { useAuth } from '@/app/context/AuthContext';
 
 // ── 通用占位组件（未完成页面的临时展示）────────────────────────────────────────
 const PlaceholderPage = ({ title }: { title: string }) => (
@@ -35,6 +37,29 @@ const PageLoader = () => (
 const S = (C: React.LazyExoticComponent<any>) => (
   <Suspense fallback={<PageLoader />}><C /></Suspense>
 );
+
+// ── 路由守卫 ──────────────────────────────────────────────────────────────────
+function ProtectedRoute() {
+  const { isAuthenticated, loading } = useAuth();
+  const location = useLocation();
+
+  if (loading) {
+    return <PageLoader />;
+  }
+
+  if (!isAuthenticated) {
+    // 双保险：同步检查 storage（覆盖 LoginPage 直接写 sessionStorage 或测试 seed 场景）
+    const token = typeof window !== 'undefined'
+      ? (window.sessionStorage.getItem('auth_token') || window.localStorage.getItem('auth_token'))
+      : null;
+    if (token) {
+      return <Outlet />;
+    }
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  return <Outlet />;
+}
 
 // ── 布局 ──────────────────────────────────────────────────────────────────────
 const AppLayout     = React.lazy(() => import('@/layouts/AppLayout'));
@@ -66,6 +91,7 @@ const AssetClearanceFormPage   = React.lazy(() => import('@/pages/disposal/Asset
 const AssetScrapFormPage       = React.lazy(() => import('@/pages/disposal/AssetScrapFormPage'));
 const AssetCompensationFormPage = React.lazy(() => import('@/pages/disposal/AssetCompensationFormPage'));
 const AnalyticsPage            = React.lazy(() => import('@/pages/analytics/AnalyticsPage'));
+const ReportsPage           = React.lazy(() => import('@/pages/reports/ReportsPage'));
 const AssetImportExportPage   = React.lazy(() => import('@/pages/AssetImportExport/AssetImportExportPage'));
 
 // ── 重构完成的新页面 ──────────────────────────────────────────────────────────
@@ -86,13 +112,11 @@ const SettingsPage  = React.lazy(() => import('@/pages/settings/SettingsPage'));
 
 // ── 路由配置 ──────────────────────────────────────────────────────────────────
 const router = createBrowserRouter([
-  // 公开路由
+  // ── 公开路由（无需认证） ───────────────────────────────────────────────────
   {
     path: '/login',
     element: S(LoginPage),
   },
-
-  // 大屏（独立全屏布局）
   {
     path: '/bigscreen',
     element: S(BigScreenPage),
@@ -102,96 +126,104 @@ const router = createBrowserRouter([
     element: S(BigScreen3DPage),
   },
 
-  // 主应用（侧边栏布局）
+  // ── 受保护路由（需要认证） ────────────────────────────────────────────────
   {
     path: '/',
-    element: S(AppLayout),
+    element: <ProtectedRoute />,
     children: [
-      { index: true, element: <Navigate to="/dashboard" replace /> },
-
-      // 仪表板
-      { path: 'dashboard', element: S(DashboardPage) },
-
-      // 资产台账
-      { path: 'assets',              element: S(AssetListPage) },
-      { path: 'assets/new',          element: S(AssetFormPage) },
-      { path: 'assets/import-export', element: S(AssetImportExportPage) },
-      { path: 'assets/:id',          element: S(AssetDetailPage) },
-      { path: 'assets/:id/edit',     element: S(AssetFormPage) },
-
-      // 重要设备（已重构 → EquipmentPage）
-      { path: 'equipment',     element: S(EquipmentPage) },
-      { path: 'equipment/:id', element: S(EquipmentPage) },
-
-      // 工单管理
-      { path: 'workorders',      element: S(WorkOrderListPage) },
-      { path: 'workorders/new',  element: S(WorkOrderFormPage) },
-      { path: 'workorders/:id',  element: S(WorkOrderDetailPage) },
-
-      // 审批流程
-      { path: 'approvals',     element: S(ApprovalListPage) },
-      { path: 'approvals/:id', element: S(WorkOrderDetailPage) },
-
-      // 盘点管理
-      { path: 'inventory',                         element: S(InventoryTasksPage) },
-      { path: 'inventory/tasks/:taskId',            element: S(InventoryDetailPage) },
-      { path: 'inventory/scan/:taskId',             element: S(RFIDScanPage) },
-      { path: 'inventory/smart-report',             element: S(SmartReportPage) },
-      { path: 'inventory/smart-report/:taskId',     element: S(SmartReportPage) },
-
-      // 退役管理
-      { path: 'retirement',     element: S(RetirementListPage) },
-      { path: 'retirement/new', element: S(RetirementFormPage) },
-      { path: 'retirement/:id', element: S(RetirementDetailPage) },
-
-      // 资产处置
-      { path: 'disposals',              element: S(DisposalListPage) },
-      { path: 'disposals/:id',          element: S(DisposalDetailPage) },
-      { path: 'disposals/transfer/new',  element: S(AssetTransferFormPage) },
-      { path: 'disposals/clearance/new', element: S(AssetClearanceFormPage) },
-      { path: 'disposals/scrap/new',     element: S(AssetScrapFormPage) },
-
-      // 闲置资产
-      { path: 'idle', element: S(IdleAssetsPage) },
-
-      // 赔偿管理
-      { path: 'compensation',      element: S(AssetCompensationFormPage) },
-      { path: 'compensation/new',  element: S(AssetCompensationFormPage) },
-      { path: 'compensation/:id',  element: S(AssetCompensationFormPage) },
-
-      // 折旧管理
-      { path: 'depreciation', element: S(DepreciationListPage) },
-
-      // 审计日志
-      { path: 'audit',     element: S(AuditDashboardPage) },
-      { path: 'audit/:id', element: S(AuditDetailPage) },
-
-      // 数据分析
-      { path: 'analytics', element: S(AnalyticsPage) },
-
-      // 通知中心
-      { path: 'notifications', element: S(NotificationsPage) },
-
-      // 工作流
-      { path: 'workflows',         element: S(WorkflowCenterPage) },
-      { path: 'workflow-designer', element: S(WorkflowDesignerPage) },
-
-      // 基础数据
-      { path: 'vendors',       element: S(VendorsPage) },
-      { path: 'locations',     element: S(LocationsPage) },
-      { path: 'settings',      element: S(SettingsPage) },
-      { path: 'settings/:tab', element: S(SettingsPage) },
-
-      // 错误页
       {
-        path: '403',
-        element: <div className="flex items-center justify-center min-h-screen text-xl text-[#94a3b8]">403 — 无权限访问</div>,
+        element: S(AppLayout),
+        children: [
+          { index: true, element: <Navigate to="/dashboard" replace /> },
+
+          // 仪表板
+          { path: 'dashboard', element: S(DashboardPage) },
+
+          // 资产台账
+          { path: 'assets',              element: S(AssetListPage) },
+          { path: 'assets/new',          element: S(AssetFormPage) },
+          { path: 'assets/import-export', element: S(AssetImportExportPage) },
+          { path: 'assets/:id',          element: S(AssetDetailPage) },
+          { path: 'assets/:id/edit',     element: S(AssetFormPage) },
+
+          // 重要设备（已重构 → EquipmentPage）
+          { path: 'equipment',     element: S(EquipmentPage) },
+          { path: 'equipment/:id', element: S(EquipmentPage) },
+
+          // 工单管理
+          { path: 'workorders',      element: S(WorkOrderListPage) },
+          { path: 'workorders/new',  element: S(WorkOrderFormPage) },
+          { path: 'workorders/:id',  element: S(WorkOrderDetailPage) },
+
+          // 审批流程
+          { path: 'approvals',     element: S(ApprovalListPage) },
+          { path: 'approvals/:id', element: S(WorkOrderDetailPage) },
+
+          // 盘点管理
+          { path: 'inventory',                         element: S(InventoryTasksPage) },
+          { path: 'inventory/tasks/:taskId',            element: S(InventoryDetailPage) },
+          { path: 'inventory/scan/:taskId',             element: S(RFIDScanPage) },
+          { path: 'inventory/smart-report',             element: S(SmartReportPage) },
+          { path: 'inventory/smart-report/:taskId',     element: S(SmartReportPage) },
+
+          // 退役管理
+          { path: 'retirement',     element: S(RetirementListPage) },
+          { path: 'retirement/new', element: S(RetirementFormPage) },
+          { path: 'retirement/:id', element: S(RetirementDetailPage) },
+
+          // 资产处置
+          { path: 'disposals',              element: S(DisposalListPage) },
+          { path: 'disposals/:id',          element: S(DisposalDetailPage) },
+          { path: 'disposals/transfer/new',  element: S(AssetTransferFormPage) },
+          { path: 'disposals/clearance/new', element: S(AssetClearanceFormPage) },
+          { path: 'disposals/scrap/new',     element: S(AssetScrapFormPage) },
+
+          // 闲置资产
+          { path: 'idle', element: S(IdleAssetsPage) },
+
+          // 赔偿管理
+          { path: 'compensation',      element: S(AssetCompensationFormPage) },
+          { path: 'compensation/new',  element: S(AssetCompensationFormPage) },
+          { path: 'compensation/:id',  element: S(AssetCompensationFormPage) },
+
+          // 折旧管理
+          { path: 'depreciation', element: S(DepreciationListPage) },
+
+          // 审计日志
+          { path: 'audit',     element: S(AuditDashboardPage) },
+          { path: 'audit/:id', element: S(AuditDetailPage) },
+
+          // 数据分析
+          { path: 'analytics', element: S(AnalyticsPage) },
+
+          // 报表中心
+          { path: 'reports', element: S(ReportsPage) },
+
+          // 通知中心
+          { path: 'notifications', element: S(NotificationsPage) },
+
+          // 工作流
+          { path: 'workflows',         element: S(WorkflowCenterPage) },
+          { path: 'workflow-designer', element: S(WorkflowDesignerPage) },
+
+          // 基础数据
+          { path: 'vendors',       element: S(VendorsPage) },
+          { path: 'locations',     element: S(LocationsPage) },
+          { path: 'settings',      element: S(SettingsPage) },
+          { path: 'settings/:tab', element: S(SettingsPage) },
+
+          // 错误页
+          {
+            path: '403',
+            element: <div className="flex items-center justify-center min-h-screen text-xl text-[#94a3b8]">403 — 无权限访问</div>,
+          },
+          {
+            path: '404',
+            element: <div className="flex items-center justify-center min-h-screen text-xl text-[#94a3b8]">404 — 页面不存在</div>,
+          },
+          { path: '*', element: <Navigate to="/404" replace /> },
+        ],
       },
-      {
-        path: '404',
-        element: <div className="flex items-center justify-center min-h-screen text-xl text-[#94a3b8]">404 — 页面不存在</div>,
-      },
-      { path: '*', element: <Navigate to="/404" replace /> },
     ],
   },
 ]);

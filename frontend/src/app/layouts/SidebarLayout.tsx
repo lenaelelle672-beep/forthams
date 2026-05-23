@@ -11,7 +11,6 @@ import {
   BarChart3,
   Settings as SettingsIcon,
   User,
-  Search,
   LogOut,
   TrendingDown,
   MapPin,
@@ -22,10 +21,10 @@ import {
   Sparkles,
   Factory,
 } from "lucide-react";
-import { FormEvent, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { Button } from "../components/ui/button";
 import { NotificationCenter } from "../pages/notifications/NotificationCenter";
+import GlobalSearch from "@/components/GlobalSearch";
 
 interface NavItem {
   name: string;
@@ -87,23 +86,8 @@ const navGroups: NavGroup[] = [
 const SIDEBAR_W = 160;
 
 export function SidebarLayout() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [headerMessage, setHeaderMessage] = useState<string | null>(null);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const navigate = useNavigate();
   const { user, logout } = useAuth();
-
-  const handleGlobalSearch = (event: FormEvent) => {
-    event.preventDefault();
-    const keyword = searchQuery.trim();
-    if (!keyword) {
-      setHeaderMessage("请输入资产名称或编号后再搜索");
-      return;
-    }
-    setHeaderMessage(`正在搜索"${keyword}"`);
-    setIsSearchOpen(false);
-    navigate(`/assets?keyword=${encodeURIComponent(keyword)}`);
-  };
 
   return (
     <div className="min-h-screen bg-white">
@@ -111,51 +95,7 @@ export function SidebarLayout() {
         <div className="flex items-center justify-end h-full px-4">
 
           <div className="flex items-center gap-2.5">
-            <div className="relative">
-              {isSearchOpen ? (
-                <form className="relative" onSubmit={handleGlobalSearch}>
-                  <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
-                  <input
-                    autoFocus
-                    type="text"
-                    placeholder="搜索资产..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    onBlur={() => {
-                      if (!searchQuery.trim()) {
-                        setIsSearchOpen(false);
-                      }
-                    }}
-                    className="w-44 lg:w-52 pl-8 pr-8 h-7 border border-gray-200 rounded-md text-xs bg-white text-gray-700 placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-400/30 focus:border-blue-300 shadow-sm transition-all"
-                  />
-                  <button
-                    type="button"
-                    onMouseDown={(event) => event.preventDefault()}
-                    onClick={() => {
-                      setSearchQuery("");
-                      setIsSearchOpen(false);
-                    }}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 text-[11px] text-gray-400 hover:text-gray-600"
-                    aria-label="关闭搜索"
-                  >
-                    关闭
-                  </button>
-                </form>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setHeaderMessage(null);
-                    setIsSearchOpen(true);
-                  }}
-                  className="inline-flex h-7 items-center gap-1.5 rounded-md border border-gray-200 bg-white px-2.5 text-xs font-medium text-gray-500 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600 transition-colors"
-                  aria-label="打开资产搜索"
-                >
-                  <Search className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">搜索</span>
-                </button>
-              )}
-            </div>
+            <GlobalSearch />
             <NotificationCenter />
             <div className="flex items-center gap-2 pl-2.5 border-l border-gray-200">
               <div className="w-6 h-6 bg-blue-50 rounded-full flex items-center justify-center">
@@ -176,12 +116,6 @@ export function SidebarLayout() {
           </div>
         </div>
       </header>
-
-      {headerMessage && (
-        <div className="fixed top-12 right-4 z-50 rounded-md border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs text-blue-600 shadow-sm">
-          {headerMessage}
-        </div>
-      )}
 
       <aside
         className="fixed left-0 top-0 bottom-0 bg-[#0a1628] border-r border-[#1a2d47] overflow-y-auto overflow-x-hidden z-50 flex flex-col"
