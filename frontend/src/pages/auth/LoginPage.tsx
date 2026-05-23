@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useMutation } from '@tanstack/react-query';
-import { Eye, EyeOff, Shield, User, Lock, ShieldCheck, Package, Building2, Wrench } from 'lucide-react';
+import { Eye, EyeOff, Shield, User, Lock, ShieldCheck, Package, Building2, Wrench, BarChart3 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -247,14 +247,9 @@ export default function LoginPage() {
           50% { transform: translate3d(0, -14px, 0); }
         }
 
-        @keyframes login1-scan {
-          0% { transform: translateY(-110%); opacity: 0; }
-          20%, 72% { opacity: .82; }
-          100% { transform: translateY(110%); opacity: 0; }
-        }
-
-        @keyframes login1-flow {
-          to { stroke-dashoffset: -42; }
+        @keyframes rainbowShift {
+          0% { background-position: 0% 50%; }
+          100% { background-position: 300% 50%; }
         }
 
         @keyframes login1-pulse {
@@ -266,31 +261,6 @@ export default function LoginPage() {
           background: rgba(22, 34, 59, 0.18);
           border: 1px solid rgba(148, 197, 255, .14);
           box-shadow: 0 24px 80px rgba(0, 0, 0, .28), inset 0 1px 0 rgba(255,255,255,.08);
-        }
-
-        .login1-asset-visual {
-          animation: login1-float 7s ease-in-out infinite;
-        }
-
-        .login1-asset-visual::after {
-          content: '';
-          position: absolute;
-          inset: 12%;
-          border-radius: 999px;
-          background: linear-gradient(180deg, transparent, rgba(85, 200, 255, .20), transparent);
-          filter: blur(4px);
-          animation: login1-scan 4.8s ease-in-out infinite;
-        }
-
-        .login1-flow-line {
-          stroke-dasharray: 12 10;
-          animation: login1-flow 2.2s linear infinite;
-        }
-
-        .login1-node-glow {
-          transform-box: fill-box;
-          transform-origin: center;
-          animation: login1-pulse 3.6s ease-in-out infinite;
         }
 
         @media (max-width: 1024px) {
@@ -334,58 +304,56 @@ export default function LoginPage() {
           <div className="relative z-10 max-w-[680px]">
             <div className="mb-6 inline-flex items-center gap-3 rounded-full border border-[#6eb8ff]/20 bg-[#071225]/45 px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-[#9ecbff]">
               <span className="h-2 w-2 rounded-full bg-[#5fffc1] shadow-[0_0_18px_rgba(95,255,193,.8)]" />
-              资产数字孪生中心
+              星空无界 · UNI 有方
             </div>
             <h1 className="max-w-[620px] text-[52px] font-semibold leading-[1.04] tracking-[-0.04em] text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.7)]">
-              资产全生命周期，实时可视化掌控
+              仰望星空，<br />驾驭资产万象
             </h1>
             <p className="mt-5 max-w-[560px] text-base leading-8 text-[#b8c8e6] drop-shadow-[0_1px_6px_rgba(0,0,0,0.6)]">
-              聚合设备台账、位置分布、巡检维修、审批处置等关键数据，构建统一资产运营指挥入口。
+              以 Universe 之广，纳资产之全。<br />
+              设备、流程、数据，尽在 UNI 统一视界。
             </p>
           </div>
 
-          <div className="login1-asset-visual relative z-10 mx-auto mt-8 h-[330px] max-w-[620px]">
-            <div className="absolute left-1/2 top-1/2 h-56 w-56 -translate-x-1/2 -translate-y-1/2 rounded-[36px] border border-[#5ab4ff]/30 bg-[linear-gradient(145deg,rgba(37,99,235,.42),rgba(20,184,166,.16))] shadow-[0_0_80px_rgba(37,99,235,.36)]" />
-            <div className="absolute left-1/2 top-1/2 h-36 w-36 -translate-x-1/2 -translate-y-1/2 rotate-45 rounded-3xl border border-white/20 bg-[#06152d]/70 shadow-[inset_0_1px_30px_rgba(136,210,255,.18)]" />
-            <Package className="absolute left-1/2 top-1/2 z-10 h-16 w-16 -translate-x-1/2 -translate-y-1/2 text-[#d8f5ff] drop-shadow-[0_0_20px_rgba(94,220,255,.7)]" />
-            <svg className="absolute inset-0 h-full w-full" viewBox="0 0 620 330" fill="none" aria-hidden="true">
-              <ellipse cx="310" cy="166" rx="250" ry="104" stroke="rgba(94,220,255,.18)" strokeWidth="1" />
-              <ellipse cx="310" cy="166" rx="210" ry="76" stroke="rgba(255,255,255,.11)" strokeWidth="1" />
-              <path className="login1-flow-line" d="M112 166 C198 64 420 62 508 166" stroke="rgba(94,220,255,.62)" strokeWidth="2" />
-              <path className="login1-flow-line" d="M114 190 C230 286 426 282 506 188" stroke="rgba(95,255,193,.52)" strokeWidth="2" />
-              <path className="login1-flow-line" d="M310 58 C356 112 356 220 310 274" stroke="rgba(180,197,255,.46)" strokeWidth="2" />
-              <path className="login1-flow-line" d="M310 58 C264 112 264 220 310 274" stroke="rgba(180,197,255,.35)" strokeWidth="2" />
-              <g className="login1-node-glow">
-                <circle cx="112" cy="166" r="24" fill="rgba(37,99,235,.28)" stroke="rgba(180,213,255,.65)" />
-                <path d="M100 166h24M112 154v24" stroke="rgba(230,246,255,.82)" strokeWidth="2" />
-              </g>
-              <g className="login1-node-glow" style={{ animationDelay: '.4s' }}>
-                <circle cx="508" cy="166" r="24" fill="rgba(20,184,166,.24)" stroke="rgba(150,255,225,.62)" />
-                <path d="M496 158h24v18h-24zM502 152h12" stroke="rgba(230,246,255,.82)" strokeWidth="2" />
-              </g>
-              <g className="login1-node-glow" style={{ animationDelay: '.8s' }}>
-                <circle cx="310" cy="58" r="22" fill="rgba(255,212,92,.20)" stroke="rgba(255,221,132,.64)" />
-                <path d="M300 62l10-16 10 16zM300 66h20" stroke="rgba(255,246,218,.86)" strokeWidth="2" />
-              </g>
-              <g className="login1-node-glow" style={{ animationDelay: '1.2s' }}>
-                <circle cx="310" cy="274" r="22" fill="rgba(255,79,154,.18)" stroke="rgba(255,142,189,.56)" />
-                <path d="M300 266h20v16h-20zM306 260h8" stroke="rgba(255,230,241,.84)" strokeWidth="2" />
-              </g>
-            </svg>
-          </div>
-
-          <div className="relative z-10 mt-8 grid grid-cols-3 gap-4">
-            {[
-              ['资产总量', '12,846', '+18%'],
-              ['在线设备', '9,732', '实时同步'],
-              ['待办流程', '128', '需处理'],
-            ].map(([label, value, tag]) => (
-              <div key={label} className="login1-asset-card rounded-2xl p-4">
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#88a0c2]">{label}</p>
-                <strong className="mt-3 block text-2xl font-semibold text-white">{value}</strong>
-                <span className="mt-2 inline-flex rounded-full bg-[#2563eb]/20 px-2.5 py-1 text-[11px] font-medium text-[#9ed8ff]">{tag}</span>
+          <div className="relative z-10 mx-auto mt-8 flex h-[330px] max-w-[620px] items-center justify-center gap-6">
+            <div className="relative flex h-56 w-56 items-center justify-center">
+              <div className="absolute inset-0 animate-[login1-pulse_4s_ease-in-out_infinite] rounded-[40px] border border-[#5ab4ff]/20 bg-[linear-gradient(145deg,rgba(37,99,235,.18),rgba(20,184,166,.08))]" />
+              <div className="absolute inset-4 animate-[login1-float_6s_ease-in-out_infinite] rounded-2xl border border-white/10 bg-[#06152d]/40" />
+              <svg className="absolute inset-0 h-full w-full animate-[spin_6s_linear_infinite]" viewBox="0 0 224 224" fill="none">
+                <circle cx="112" cy="112" r="96" stroke="rgba(94,220,255,.12)" strokeWidth="1" strokeDasharray="8 6" />
+                <circle cx="112" cy="112" r="72" stroke="rgba(94,220,255,.08)" strokeWidth="1" strokeDasharray="4 8" />
+                <line x1="112" y1="112" x2="112" y2="16" stroke="rgba(94,220,255,.25)" strokeWidth="1.5" />
+              </svg>
+              <div className="relative z-10 flex items-center justify-center h-20 w-20">
+                <svg className="absolute inset-0 h-full w-full animate-[spin_8s_linear_infinite]" viewBox="0 0 80 80" fill="none">
+                  <circle cx="40" cy="40" r="36" stroke="rgba(94,220,255,.2)" strokeWidth="1" strokeDasharray="6 5" />
+                  <circle cx="40" cy="40" r="26" stroke="rgba(94,220,255,.13)" strokeWidth="1" strokeDasharray="3 7" />
+                  <line x1="40" y1="40" x2="40" y2="4" stroke="rgba(94,220,255,.3)" strokeWidth="1.2" />
+                  <circle cx="40" cy="40" r="16" stroke="rgba(94,220,255,.08)" strokeWidth="0.8" />
+                </svg>
+                <div className="relative flex flex-col items-center">
+                  <span className="text-[32px] font-black tracking-[0.18em] bg-clip-text text-transparent drop-shadow-[0_0_24px_rgba(255,255,255,.5)]" style={{ fontFamily: "'Arial Black','Impact','Inter',sans-serif", backgroundImage: 'linear-gradient(90deg,#ff6b6b,#ffd93d,#6bcb77,#4d96ff,#9b59b6,#ff6b6b)', backgroundSize: '300% 100%', animation: 'rainbowShift 3s linear infinite', lineHeight: 1 }}>
+                    UNI
+                  </span>
+                  <span className="text-[32px] font-black tracking-[0.18em] bg-clip-text text-transparent scale-y-[-1] opacity-20 translate-y-1" style={{ fontFamily: "'Arial Black','Impact','Inter',sans-serif", backgroundImage: 'linear-gradient(90deg,#ff6b6b,#ffd93d,#6bcb77,#4d96ff,#9b59b6,#ff6b6b)', backgroundSize: '300% 100%', animation: 'rainbowShift 3s linear infinite', lineHeight: 1, WebkitBackgroundClip: 'text', maskImage: 'linear-gradient(to bottom, black 30%, transparent 100%)', WebkitMaskImage: 'linear-gradient(to bottom, black 30%, transparent 100%)' }}>
+                    UNI
+                  </span>
+                </div>
               </div>
-            ))}
+            </div>
+            <div className="flex flex-col gap-5">
+              {[
+                { icon: Shield, label: '全生命周期追踪' },
+                { icon: BarChart3, label: '实时数据看板' },
+              ].map(({ icon: Icon, label }) => (
+                <div key={label} className="flex items-center gap-3 rounded-2xl border border-white/8 bg-white/[0.04] px-5 py-3 backdrop-blur-sm">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#2563eb]/20">
+                    <Icon className="h-4 w-4 text-[#9ecbff]" />
+                  </div>
+                  <span className="text-sm font-medium text-[#c3d4f0]">{label}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </section>
 
