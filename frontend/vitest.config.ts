@@ -29,10 +29,10 @@ export default defineConfig({
       all: false,
       reporter: ['text', 'json', 'html'],
       include: [
-        // Keep the default coverage gate focused on actively unit-tested core
-        // API contracts. Broader exploratory coverage can be run with
-        // npm run test:coverage:full and is expected to drive future test work.
-        'src/api/inventory.ts'
+        'src/api/inventory.ts',
+        'src/api/reports.ts',
+        'src/pages/reports/**/*.ts',
+        'src/pages/reports/**/*.tsx',
       ],
       exclude: [
         'node_modules/',

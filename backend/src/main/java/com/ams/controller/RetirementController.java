@@ -2,6 +2,7 @@ package com.ams.controller;
 
 import com.ams.common.Result;
 import com.ams.common.exception.BusinessException;
+import jakarta.validation.Valid;
 import com.ams.dto.RetirementApplyDTO;
 import com.ams.entity.RetirementApplication;
 import com.ams.service.RetirementApplicationService;
@@ -9,6 +10,7 @@ import com.ams.utils.JwtUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,19 +25,19 @@ public class RetirementController {
     private final JwtUtil jwtUtil;
 
     @PostMapping("/apply")
-    public Result<RetirementApplication> submitApplication(@RequestBody RetirementApplyDTO dto,
+    public Result<RetirementApplication> submitApplication(@Valid @RequestBody RetirementApplyDTO dto,
                                                             HttpServletRequest request) {
         return Result.success(retirementApplicationService.submitApplication(dto, getCurrentUserId(request)));
     }
 
     @PostMapping("/applications")
-    public Result<RetirementApplication> createApplication(@RequestBody RetirementApplyDTO dto,
+    public Result<RetirementApplication> createApplication(@Valid @RequestBody RetirementApplyDTO dto,
                                                             HttpServletRequest request) {
         return submitApplication(dto, request);
     }
 
     @PostMapping({"/draft", "/applications/draft"})
-    public Result<RetirementApplication> createDraftApplication(@RequestBody RetirementApplyDTO dto,
+    public Result<RetirementApplication> createDraftApplication(@Valid @RequestBody RetirementApplyDTO dto,
                                                                 HttpServletRequest request) {
         return Result.success(retirementApplicationService.createDraftApplication(dto, getCurrentUserId(request)));
     }
@@ -83,12 +85,12 @@ public class RetirementController {
     }
 
     @PutMapping("/{id}")
-    public Result<RetirementApplication> updateApplication(@PathVariable Long id, @RequestBody RetirementApplyDTO dto) {
+    public Result<RetirementApplication> updateApplication(@PathVariable Long id, @Valid @RequestBody RetirementApplyDTO dto) {
         return Result.success(retirementApplicationService.updateApplication(id, dto));
     }
 
     @PutMapping("/applications/{id}")
-    public Result<RetirementApplication> updateApplicationAlias(@PathVariable Long id, @RequestBody RetirementApplyDTO dto) {
+    public Result<RetirementApplication> updateApplicationAlias(@PathVariable Long id, @Valid @RequestBody RetirementApplyDTO dto) {
         return updateApplication(id, dto);
     }
 

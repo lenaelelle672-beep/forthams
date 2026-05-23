@@ -12,8 +12,8 @@
  *   PUT    /vendors/{id}   — update an existing vendor
  *   DELETE /vendors/{id}   — delete a vendor
  *
- * The Vendor entity has a strict 6-field boundary:
- *   id, name, vendorCode, contactPerson, contactPhone, contactEmail
+ * The Vendor entity has fields:
+ *   id, name, vendorCode, contactPerson, contactPhone, contactEmail, address
  *
  * @see backend/src/main/java/com/ams/controller/VendorController.java
  * @see backend/src/main/java/com/ams/service/VendorService.java
@@ -23,7 +23,7 @@
 import { api } from "../utils/api";
 
 // ---------------------------------------------------------------------------
-// Types — mirror backend Vendor.java entity (6-field boundary)
+// Types — mirror backend Vendor.java entity
 // ---------------------------------------------------------------------------
 
 /**
@@ -31,10 +31,6 @@ import { api } from "../utils/api";
  *
  * Fields align 1:1 with backend Vendor.java entity core attributes.
  * The `id` field is optional because it is not present during creation.
- *
- * The backend entity also has `address`, `status`, `createTime`, `updateTime`,
- * `deleted` fields, but the frontend form and display columns strictly use
- * only the 6-tuple defined by the spec.
  */
 export interface Vendor {
   /** 供应商 ID (server-assigned, absent during creation) */
@@ -49,18 +45,14 @@ export interface Vendor {
   contactPhone: string;
   /** 联系邮箱 */
   contactEmail: string;
+  /** 地址 */
+  address?: string;
 }
 
 /**
  * Vendor record with optional extended fields from the backend response.
- *
- * The backend may return additional fields (`address`, `status`, `createTime`,
- * `updateTime`) that are not part of the 6-tuple but may appear in the API
- * response. This type allows safe consumption of the full backend payload.
  */
 export interface VendorRecord extends Vendor {
-  /** 地址 */
-  address?: string;
   /** 状态 (0=禁用, 1=启用) */
   status?: number;
   /** 创建时间 */
@@ -85,7 +77,6 @@ export const vendorService = {
    * Fetch all vendors from the backend.
    *
    * Maps to: GET /api/vendors/list
-   * Backend: VendorService.list()
    *
    * @returns array of vendor records
    */
@@ -97,7 +88,6 @@ export const vendorService = {
    * Fetch a single vendor by its ID.
    *
    * Maps to: GET /api/vendors/{id}
-   * Backend: VendorService.getVendorById(Long id)
    *
    * @param id - vendor ID
    * @returns the vendor record
@@ -110,7 +100,6 @@ export const vendorService = {
    * Create a new vendor.
    *
    * Maps to: POST /api/vendors
-   * Backend: VendorService.createVendor(Vendor vendor)
    *
    * @param payload - vendor data (name is required)
    * @returns the created vendor with server-assigned id
@@ -123,7 +112,6 @@ export const vendorService = {
    * Update an existing vendor.
    *
    * Maps to: PUT /api/vendors/{id}
-   * Backend: VendorService.updateVendor(Long id, Vendor updatedVendor)
    *
    * @param id - vendor ID
    * @param payload - complete vendor object with updated fields
@@ -137,7 +125,6 @@ export const vendorService = {
    * Search vendors by keyword.
    *
    * Maps to: GET /api/vendors?keyword=xxx
-   * Backend: VendorService.list() with optional filtering
    *
    * @param keyword - search keyword to filter by name, vendorCode, etc.
    * @returns array of matching vendor records
@@ -150,7 +137,6 @@ export const vendorService = {
    * Delete a vendor by ID.
    *
    * Maps to: DELETE /api/vendors/{id}
-   * Backend: VendorService.deleteVendor(Long id)
    *
    * @param id - vendor ID
    */

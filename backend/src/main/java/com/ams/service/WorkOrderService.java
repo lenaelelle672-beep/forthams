@@ -4,6 +4,9 @@ import cn.hutool.core.bean.BeanUtil;
 import com.ams.common.exception.BusinessException;
 import com.ams.context.TenantContext;
 import com.ams.dto.WorkOrderDTO;
+import com.ams.dto.DeptPendingDTO;
+import com.ams.dto.StatusDistributionDTO;
+
 import com.ams.entity.ApprovalProcess;
 import com.ams.entity.NotificationRecord;
 import com.ams.entity.User;
@@ -29,6 +32,9 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.List;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -358,4 +364,88 @@ public class WorkOrderService {
             log.warn("发送工单通知失败: {}", e.getMessage());
         }
     }
+
+    /**
+     * 获取工单状态分布统计。
+     *
+     * <p>查询当前租户下所有工单，按状态分组计数。
+     *
+     * @return 各状态工单计数列表（如 已完成、进行中、待处理 等）
+     */
+    public List<StatusDistributionDTO> getStatusDistribution() {
+        String tenantId = TenantContext.requireTenantId();
+        try {
+            List<WorkOrder> allOrders = workOrderMapper.selectList(
+                    new LambdaQueryWrapper<WorkOrder>()
+                            .eq(WorkOrder::getTenantId, tenantId)
+                            .select(WorkOrder::getStatus));
+
+            Map<String, Long> statusMap = new HashMap<>();
+            for (WorkOrder wo : allOrders) {
+                String status = wo.getStatus() != null ? wo.getStatus() : "UNKNOWN";
+                statusMap.merge(status, 1L, Long::sum);
+            }
+
+            Map<String, String> statusLabels = new HashMap<>();
+            statusLabels.put("COMPLETED", "已完成");
+            statusLabels.put("EXECUTING", "进行中");
+            statusLabels.put("PENDING", "待处理");
+            statusLabels.put("APPROVED", "已审批");
+            statusLabels.put("DRAFT", "草稿");
+            statusLabels.put("REJECTED", "已驳回");
+            statusLabels.put("CANCELLED", "已取消");
+
+            List<StatusDistributionDTO> result = new ArrayList<>();
+            for (Map.Entry<String, Long> entry : statusMap.entrySet()) {
+                result.add(StatusDistributionDTO.builder()
+                        .name(statusLabels.getOrDefault(entry.getKey(), entry.getKey()))
+                        .value(entry.getValue())
+                        .build());
+            }
+
+            return result;
+        } catch (Exception e) {
+            log.warn("failed_to_query_status_distribution: {}", e.getMessage());
+            return new ArrayList<>();
+        }
+    }
+
+    /**
+     * 获取各部门待处理工单数量。
+     *
+     * <p>查询当前租户下所有 PENDING 状态工单，按 deptName 分组计数。
+     *
+     * @return 各部门待处理工单计数列表
+     */
+    public List<DeptPendingDTO> getDeptPending() {
+        String tenantId = TenantContext.requireTenantId();
+        try {
+            List<WorkOrder> pendingOrders = workOrderMapper.selectList(
+                    new LambdaQueryWrapper<WorkOrder>()
+                            .eq(WorkOrder::getTenantId, tenantId)
+                            .eq(WorkOrder::getStatus, "PENDING")
+                            .select(WorkOrder::getDeptName));
+
+            Map<String, Long> deptMap = new HashMap<>();
+            for (WorkOrder wo : pendingOrders) {
+                String deptName = wo.getDeptName() != null ? wo.getDeptName() : "未知部门";
+                deptMap.merge(deptName, 1L, Long::sum);
+            }
+
+            List<DeptPendingDTO> result = new ArrayList<>();
+            for (Map.Entry<String, Long> entry : deptMap.entrySet()) {
+                result.add(DeptPendingDTO.builder()
+                        .name(entry.getKey())
+                        .value(entry.getValue())
+                        .build());
+            }
+
+            return result;
+        } catch (Exception e) {
+            log.warn("failed_to_query_dept_pending: {}", e.getMessage());
+            return new ArrayList<>();
+        }
+    }
+
+
 }

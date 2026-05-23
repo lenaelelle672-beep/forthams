@@ -488,3 +488,21 @@ INSERT INTO sys_user_role (id, user_id, role_id)
 VALUES
     (1, 1, 1)
 ON DUPLICATE KEY UPDATE user_id = VALUES(user_id);
+
+-- =============================================================================
+-- sys_config — 系统配置 KV 表（SYSTEM/SECURITY 配置分组）
+-- 采用单表 KV + config_group 分区模式，支持未来 tenant_id 隔离
+-- 参考 debate.json 议题4 方案 A
+-- =============================================================================
+CREATE TABLE IF NOT EXISTS sys_config (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    tenant_id VARCHAR(64) NOT NULL DEFAULT 'GLOBAL',
+    config_group VARCHAR(32) NOT NULL COMMENT '配置分组：SYSTEM / SECURITY',
+    config_key VARCHAR(128) NOT NULL COMMENT '配置键',
+    config_value TEXT COMMENT '配置值',
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+    update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    deleted TINYINT DEFAULT 0,
+    UNIQUE KEY uk_config_tenant_group_key (tenant_id, config_group, config_key),
+    INDEX idx_config_tenant_group (tenant_id, config_group)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

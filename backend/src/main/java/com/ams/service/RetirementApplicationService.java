@@ -45,6 +45,7 @@ public class RetirementApplicationService {
     private final AssetChangeLogMapper assetChangeLogMapper;
     private final AssetMapper assetMapper;
     private final AssetLifecycleService assetLifecycleService;
+    private final NotificationService notificationService;
 
     @Transactional(rollbackFor = Exception.class)
     public RetirementApplication submitApplication(RetirementApplyDTO dto, Long applicantId) {
@@ -82,6 +83,12 @@ public class RetirementApplicationService {
                 applicantId,
                 null);
 
+                try {
+                    notificationService.sendRetirementSubmitted(application.getId(), application.getApplicantName(), application.getAssetCode());
+                } catch (Exception e) {
+                    log.warn("发送退休申请提交通知失败", e);
+                }
+
         return application;
     }
 
@@ -117,6 +124,12 @@ public class RetirementApplicationService {
         application.setTotalApprovalSteps(normalizeApprovalSteps(application.getTotalApprovalSteps()));
         retirementApplicationMapper.updateById(application);
         upsertPendingApprovalProcess(application, operatorId);
+
+        try {
+            notificationService.sendRetirementSubmitted(application.getId(), application.getApplicantName(), application.getAssetCode());
+        } catch (Exception e) {
+            log.warn("发送退休申请提交通知失败", e);
+        }
 
         assetLifecycleService.transitionLoadedAsset(
                 asset,
@@ -229,6 +242,12 @@ public class RetirementApplicationService {
                 "RETIREMENT_APPROVED",
                 application.getReason(),
                 operatorId);
+
+        try {
+            notificationService.sendRetirementApproved(application.getId(), application.getApplicantName(), application.getAssetCode());
+        } catch (Exception e) {
+            log.warn("发送退休申请审批通过通知失败", e);
+        }
         return application;
     }
 
@@ -273,6 +292,12 @@ public class RetirementApplicationService {
                 "RETIREMENT_REJECTED",
                 reason == null || reason.isBlank() ? application.getReason() : reason,
                 operatorId);
+
+        try {
+            notificationService.sendRetirementRejected(application.getId(), application.getApplicantName(), application.getAssetCode(), reason);
+        } catch (Exception e) {
+            log.warn("发送退休申请审批拒绝通知失败", e);
+        }
         return application;
     }
 

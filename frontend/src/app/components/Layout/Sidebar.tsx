@@ -29,6 +29,7 @@ import {
   Truck,
   FileText,
   ScrollText,
+  FolderTree,
 } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
 import { approvalService } from "../../services/approvalService";
@@ -55,6 +56,7 @@ const navigation: NavItem[] = [
   { name: "折旧管理", href: "/depreciation", icon: TrendingDown },
   { name: "工单管理", href: "/workorders", icon: FileText },
   { name: "供应商管理", href: "/vendors", icon: Truck },
+  { name: "资产分类", href: "/categories", icon: FolderTree },
   { name: "位置管理", href: "/locations", icon: MapPin },
   { name: "审计日志", href: "/audit", icon: ScrollText },
   { name: "流程管理", href: "/workflows", icon: Workflow },

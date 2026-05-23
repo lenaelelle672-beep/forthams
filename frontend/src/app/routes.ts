@@ -82,6 +82,13 @@ const IndustrialDashboardV13 = withSuspense(
   lazy(() => import("./pages/IndustrialDashboardV13").then((module) => ({ default: module.IndustrialDashboardV13 }))),
 );
 
+/** 资产分类管理页面 — 迭代14 */
+const CategoryManagerPage = withSuspense(
+  lazy(() =>
+    import("./pages/category/CategoryManagerPage").then((module) => ({ default: module.default })),
+  ),
+);
+
 function PageLoadingFallback() {
   return createElement(
     "div",
@@ -165,6 +172,7 @@ export const router = createBrowserRouter([
           { path: "settings", Component: Settings },
           { path: "workflows", Component: WorkflowCenter },
           { path: "workflow-designer", Component: WorkflowDesigner },
+          { path: "categories", Component: CategoryManagerPage },
           // Modular route modules
           ...vendorRoutes,
           ...locationRoutes,

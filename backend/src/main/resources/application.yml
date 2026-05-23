@@ -53,6 +53,16 @@ spring:
       write-dates-as-timestamps: false
     default-property-inclusion: non_null
 
+  # ========== Mail (SMTP) ==========
+  mail:
+    host: ${MAIL_HOST:smtp.example.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+
   # ========== Multipart 文件上传配置 (SWARM-P2-006 批量导入导出) ==========
   servlet:
     multipart:

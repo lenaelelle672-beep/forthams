@@ -10,6 +10,21 @@ export const Dialog = RadixDialog.Root;
 export const DialogTrigger = RadixDialog.Trigger;
 export const DialogClose = RadixDialog.Close;
 
+export function DialogDescription({
+  className,
+  children,
+  ...props
+}: React.ComponentPropsWithoutRef<typeof RadixDialog.Description>) {
+  return (
+    <RadixDialog.Description
+      className={cn('text-sm text-[#64748b]', className)}
+      {...props}
+    >
+      {children}
+    </RadixDialog.Description>
+  );
+}
+
 export function DialogContent({
   className,
   children,

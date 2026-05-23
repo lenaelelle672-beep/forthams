@@ -25,22 +25,25 @@ import { PageHeader } from '@/components/ui/PageHeader';
 
 // ── Zod schema ────────────────────────────────────────────────────────────────
 const schema = z.object({
-  assetName:      z.string().min(1, '资产名称不能为空').max(100),
-  categoryId:     z.coerce.number().positive('请选择资产分类'),
-  brand:          z.string().optional(),
-  model:          z.string().optional(),
-  serialNo:       z.string().optional(),
-  originalValue:  z.coerce.number().nonnegative('原值不能为负数').optional(),
-  purchaseDate:   z.string().optional(),
-  warrantyPeriod: z.coerce.number().int().nonnegative().optional(),
+  assetName:       z.string().min(1, '资产名称不能为空').max(100),
+  assetNo:         z.string().optional(),
+  categoryId:      z.coerce.number().positive('请选择资产分类'),
+  brand:           z.string().optional(),
+  model:           z.string().optional(),
+  serialNo:        z.string().optional(),
+  supplier:        z.string().optional(),
+  originalValue:   z.coerce.number().nonnegative('原值不能为负数').optional(),
+  currentValue:    z.coerce.number().nonnegative('当前净值不能为负数').optional(),
+  purchaseDate:    z.string().optional(),
+  warrantyPeriod:  z.coerce.number().int().nonnegative().optional(),
   depreciationRate: z.coerce.number().min(0).max(1).optional(),
-  status:         z.nativeEnum(AssetStatus).default(AssetStatus.IN_USE),
-  deptId:         z.coerce.number().positive('请选择使用部门').optional(),
-  location:       z.string().optional(),
-  rfidTag:        z.string().optional(),
-  isImportant:    z.coerce.number().int().min(0).max(1).default(0),
-  description:    z.string().max(500).optional(),
-  remark:         z.string().max(200).optional(),
+  status:          z.nativeEnum(AssetStatus).default(AssetStatus.IN_USE),
+  deptId:          z.coerce.number().positive('请选择使用部门').optional(),
+  location:        z.string().optional(),
+  rfidTag:         z.string().optional(),
+  isImportant:     z.coerce.number().int().min(0).max(1).default(0),
+  description:     z.string().max(500).optional(),
+  remark:          z.string().max(200).optional(),
 });
 
 type FormValues = z.infer<typeof schema>;
@@ -80,11 +83,14 @@ export default function AssetFormPage() {
     if (asset) {
       reset({
         assetName:       asset.assetName,
+        assetNo:         asset.assetNo ?? '',
         categoryId:      asset.categoryId,
         brand:           asset.brand ?? '',
         model:           asset.model ?? '',
         serialNo:        asset.serialNo ?? '',
+        supplier:        asset.supplier ?? '',
         originalValue:   asset.originalValue,
+        currentValue:    asset.currentValue,
         purchaseDate:    asset.purchaseDate?.substring(0, 10),
         warrantyPeriod:  asset.warrantyPeriod,
         depreciationRate: asset.depreciationRate,
@@ -197,6 +203,7 @@ export default function AssetFormPage() {
             <Input label="品牌/厂商" placeholder="例：Dell" {...register('brand')} />
             <Input label="规格型号"  placeholder="例：PowerEdge R740" {...register('model')} />
             <Input label="序列号"    placeholder="例：SN-2024-001234" {...register('serialNo')} />
+            <Input label="供应商"    placeholder="例：××科技公司" {...register('supplier')} />
           </CardContent>
         </Card>
 
@@ -256,6 +263,14 @@ export default function AssetFormPage() {
               placeholder="例：15000.00"
               error={errors.originalValue?.message}
               {...register('originalValue')}
+            />
+            <Input
+              label="当前净值（元）"
+              type="number"
+              step="0.01"
+              placeholder="例：12000.00"
+              error={errors.currentValue?.message}
+              {...register('currentValue')}
             />
             <Input
               label="购置日期"

@@ -8,6 +8,7 @@ import com.ams.service.InventoryService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ams.common.Result;
 import lombok.RequiredArgsConstructor;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -40,7 +41,7 @@ public class InventoryController {
     }
 
     @PostMapping("/tasks")
-    public Result<InventoryTask> create(@RequestBody InventoryTaskCreateDTO dto) {
+    public Result<InventoryTask> create(@Valid @RequestBody InventoryTaskCreateDTO dto) {
         return Result.success(inventoryService.createTask(dto));
     }
 
@@ -50,7 +51,7 @@ public class InventoryController {
     }
 
     @PostMapping("/tasks/{id}/scan")
-    public Result<InventoryDetail> scan(@PathVariable Long id, @RequestBody InventoryScanDTO dto) {
+    public Result<InventoryDetail> scan(@PathVariable Long id, @Valid @RequestBody InventoryScanDTO dto) {
         return Result.success(inventoryService.addScanResult(id, dto));
     }
 

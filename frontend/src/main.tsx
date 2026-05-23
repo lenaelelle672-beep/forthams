@@ -4,6 +4,7 @@
  *
  * 提供全局 Provider 包装：
  * - QueryClientProvider (TanStack Query)
+ * - AuthProvider (AuthContext)
  * - RouterProvider (React Router 7)
  * - TooltipProvider (Radix UI)
  */
@@ -14,6 +15,7 @@ import { RouterProvider } from 'react-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { TooltipProvider } from '@/components/ui/Tooltip';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { AuthProvider } from '@/app/context/AuthContext';
 import router from '@/router/index';
 import './styles/index.css';
 
@@ -30,9 +32,11 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <RouterProvider router={router} />
-        </TooltipProvider>
+        <AuthProvider>
+          <TooltipProvider>
+            <RouterProvider router={router} />
+          </TooltipProvider>
+        </AuthProvider>
       </QueryClientProvider>
     </ErrorBoundary>
   </StrictMode>,

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Archive, Send, CheckCircle, Clock, X } from 'lucide-react';
+import { Archive, Send, CheckCircle, Clock, X, AlertCircle } from 'lucide-react';
+import { z } from 'zod';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
@@ -103,6 +104,33 @@ export default function IdleAssetsPage() {
     : Array.isArray((raw as PageData<IdleAssetRecord> | undefined)?.records)
       ? (raw as PageData<IdleAssetRecord>).records
       : [];
+
+  // 发布公告表单校验 schema
+  const publishSchema = z.object({
+    title: z.string().min(1, '公告标题不能为空'),
+    deadline: z.string().min(1, '认领截止日期不能为空').refine(val => {
+      if (!val) return false;
+      const d = new Date(val);
+      return !isNaN(d.getTime()) && d > new Date();
+    }, '认领截止日期必须在今天之后'),
+  });
+
+  const [publishErrors, setPublishErrors] = useState<Record<string, string>>({});
+
+  const validatePublishForm = (): boolean => {
+    const result = publishSchema.safeParse({ title: publishTitle, deadline: publishDeadline });
+    if (!result.success) {
+      const errs: Record<string, string> = {};
+      for (const issue of result.error.issues) {
+        const field = issue.path[0] as string;
+        if (!errs[field]) errs[field] = issue.message;
+      }
+      setPublishErrors(errs);
+      return false;
+    }
+    setPublishErrors({});
+    return true;
+  };
 
   const publishMutation = useMutation({
     mutationFn: (asset: IdleAssetRecord) =>
@@ -355,31 +383,41 @@ export default function IdleAssetsPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">公告标题 *</label>
                  <input
                    type="text"
-                   className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                   className={`w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${publishErrors.title ? 'border-red-400 focus:ring-red-200' : 'border-gray-200'}`}
                    placeholder="例：办公设备闲置资产处置公告"
                    value={publishTitle}
-                   onChange={(e) => setPublishTitle(e.target.value)}
+                   onChange={(e) => { setPublishTitle(e.target.value); setPublishErrors(p => ({ ...p, title: '' })); }}
                  />
+                  {publishErrors.title && (
+                    <p className="mt-1 text-xs text-red-500 flex items-center gap-1">
+                      <AlertCircle className="w-3 h-3" /> {publishErrors.title}
+                    </p>
+                  )}
                </div>
                <div>
                  <label className="block text-sm font-medium text-gray-700 mb-1">认领截止日期 *</label>
                  <input
                    type="date"
-                   className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                   className={`w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${publishErrors.deadline ? 'border-red-400 focus:ring-red-200' : 'border-gray-200'}`}
                    value={publishDeadline}
-                   onChange={(e) => setPublishDeadline(e.target.value)}
+                   onChange={(e) => { setPublishDeadline(e.target.value); setPublishErrors(p => ({ ...p, deadline: '' })); }}
                  />
+                  {publishErrors.deadline && (
+                    <p className="mt-1 text-xs text-red-500 flex items-center gap-1">
+                      <AlertCircle className="w-3 h-3" /> {publishErrors.deadline}
+                    </p>
+                  )}
               </div>
             </div>
             <div className="flex justify-end gap-3 px-6 py-4 border-t border-gray-200">
-              <Button variant="outline" size="sm"                 onClick={() => { setShowPublish(false); setPublishTarget(null); setPublishTitle(''); setPublishDeadline(''); }}>
+              <Button variant="outline" size="sm"                 onClick={() => { setShowPublish(false); setPublishTarget(null); setPublishTitle(''); setPublishDeadline(''); setPublishErrors({}); }}>
                 取消
               </Button>
               <Button
                 variant="primary"
                 size="sm"
                 disabled={!publishTarget || publishMutation.isPending}
-                onClick={() => publishTarget && publishMutation.mutate(publishTarget)}
+                onClick={() => { if (validatePublishForm() && publishTarget) publishMutation.mutate(publishTarget); }}
               >
                 {publishMutation.isPending ? '发布中...' : '发布公告'}
               </Button>

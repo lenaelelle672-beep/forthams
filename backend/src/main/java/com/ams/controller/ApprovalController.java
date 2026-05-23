@@ -6,7 +6,7 @@ import com.ams.entity.ApprovalProcess;
 import com.ams.service.ApprovalService;
 import com.ams.utils.JwtUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.ams.common.Result;
+import jakarta.validation.Valid;import com.ams.common.Result;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -39,7 +39,7 @@ public class ApprovalController {
     }
 
     @PostMapping
-    public Result<ApprovalProcess> create(@RequestBody ApprovalCreateDTO dto, HttpServletRequest request) {
+    public Result<ApprovalProcess> create(@Valid @RequestBody ApprovalCreateDTO dto, HttpServletRequest request) {
         dto.setApplicantId(getCurrentUserId(request));
         return Result.success(approvalService.createProcess(dto));
     }

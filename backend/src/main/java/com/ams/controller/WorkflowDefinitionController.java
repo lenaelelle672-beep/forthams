@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -36,7 +37,7 @@ public class WorkflowDefinitionController {
     @PutMapping("/{businessType}/draft")
     public Result<WorkflowDefinitionDTO> saveDraft(
             @PathVariable String businessType,
-            @RequestBody WorkflowDefinitionSaveDTO dto) {
+            @Valid @RequestBody WorkflowDefinitionSaveDTO dto) {
         return Result.success(workflowDefinitionService.saveDraft(businessType, dto));
     }
 
@@ -51,7 +52,7 @@ public class WorkflowDefinitionController {
     @PostMapping("/{businessType}/status")
     public Result<WorkflowDefinitionDTO> updateStatus(
             @PathVariable String businessType,
-            @RequestBody WorkflowStatusUpdateDTO dto) {
+            @Valid @RequestBody WorkflowStatusUpdateDTO dto) {
         return Result.success(workflowDefinitionService.updateStatus(businessType, dto));
     }
 }

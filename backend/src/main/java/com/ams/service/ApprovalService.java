@@ -680,6 +680,16 @@ public class ApprovalService {
             case "WORK_ORDER":
                 workOrderService.applyApprovalOutcome(process.getBusinessId(), "REJECTED", opinion);
                 break;
+            case "ASSET_TRANSFER":
+            case "ASSET_CLEARANCE":
+            case "ASSET_SCRAP":
+                // 资产处置类驳回：资产尚未变更状态，仅记录日志
+                log.info("审批驳回: processType={}, businessId={}", process.getProcessType(), process.getBusinessId());
+                break;
+            case "ASSET_COMPENSATION":
+                // 赔偿驳回：更新赔偿记录状态为 REJECTED
+                compensationService.updateStatus(process.getBusinessId(), "REJECTED");
+                break;
             default:
                 break;
         }
@@ -705,6 +715,11 @@ public class ApprovalService {
      */
     private void sendApprovalNotification(ApprovalProcess process, Long approverId, String result) {
         try {
+            // 双重通知防护：退休流程由 NotificationService 的退休通知域方法处理，此处跳过
+            if ("RETIREMENT".equals(process.getProcessType())) {
+                return;
+            }
+
             Long applicantId = process.getApplicantId();
             if (applicantId == null || applicantId.equals(approverId)) {
                 return;

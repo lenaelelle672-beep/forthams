@@ -7,6 +7,7 @@ import com.ams.service.RoleService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ams.common.Result;
 import lombok.RequiredArgsConstructor;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -36,12 +37,12 @@ public class RoleController {
     }
 
     @PostMapping
-    public Result<Role> create(@RequestBody RoleCreateDTO dto) {
+    public Result<Role> create(@Valid @RequestBody RoleCreateDTO dto) {
         return Result.success(roleService.createRole(dto));
     }
 
     @PutMapping("/{id}")
-    public Result<Role> update(@PathVariable Long id, @RequestBody RoleUpdateDTO dto) {
+    public Result<Role> update(@PathVariable Long id, @Valid @RequestBody RoleUpdateDTO dto) {
         return Result.success(roleService.updateRole(id, dto));
     }
 

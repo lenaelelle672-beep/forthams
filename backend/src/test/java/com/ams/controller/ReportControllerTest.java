@@ -1,6 +1,7 @@
 package com.ams.controller;
 
 import com.ams.dto.CategoryReportDTO;
+import com.ams.dto.ReportMonthlyDTO;
 import com.ams.dto.ReportSummaryDTO;
 import com.ams.service.ReportService;
 import org.junit.jupiter.api.DisplayName;
@@ -95,5 +96,86 @@ class ReportControllerTest {
             .andExpect(jsonPath("$.data.length()").value(0));
 
         verify(reportService).getByCategory();
+    }
+
+    @Test
+    @DisplayName("Should return depreciation stats")
+    void testGetDepreciationStats() throws Exception {
+        List<ReportMonthlyDTO> mockData = Arrays.asList(
+                ReportMonthlyDTO.builder().month("1月").value(520.0).build(),
+                ReportMonthlyDTO.builder().month("2月").value(480.0).build()
+        );
+
+        when(reportService.getDepreciationStats()).thenReturn(mockData);
+
+        mockMvc.perform(get("/reports/depreciation-stats")
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.code").value(200))
+            .andExpect(jsonPath("$.data").isArray())
+            .andExpect(jsonPath("$.data.length()").value(2))
+            .andExpect(jsonPath("$.data[0].month").value("1月"))
+            .andExpect(jsonPath("$.data[0].value").value(520.0));
+
+        verify(reportService).getDepreciationStats();
+    }
+
+    @Test
+    @DisplayName("Should return maintenance stats")
+    void testGetMaintenanceStats() throws Exception {
+        List<ReportMonthlyDTO> mockData = Arrays.asList(
+                ReportMonthlyDTO.builder().month("1月").value(15.0).build(),
+                ReportMonthlyDTO.builder().month("2月").value(18.0).build()
+        );
+
+        when(reportService.getMaintenanceStats()).thenReturn(mockData);
+
+        mockMvc.perform(get("/reports/maintenance-stats")
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.code").value(200))
+            .andExpect(jsonPath("$.data").isArray())
+            .andExpect(jsonPath("$.data.length()").value(2))
+            .andExpect(jsonPath("$.data[0].month").value("1月"))
+            .andExpect(jsonPath("$.data[0].value").value(15.0));
+
+        verify(reportService).getMaintenanceStats();
+    }
+
+    @Test
+    @DisplayName("Should return retirement stats")
+    void testGetRetirementStats() throws Exception {
+        List<ReportMonthlyDTO> mockData = Arrays.asList(
+                ReportMonthlyDTO.builder().month("1月").value(4.0).build(),
+                ReportMonthlyDTO.builder().month("2月").value(5.0).build()
+        );
+
+        when(reportService.getRetirementStats()).thenReturn(mockData);
+
+        mockMvc.perform(get("/reports/retirement-stats")
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.code").value(200))
+            .andExpect(jsonPath("$.data").isArray())
+            .andExpect(jsonPath("$.data.length()").value(2))
+            .andExpect(jsonPath("$.data[0].month").value("1月"))
+            .andExpect(jsonPath("$.data[0].value").value(4.0));
+
+        verify(reportService).getRetirementStats();
+    }
+
+    @Test
+    @DisplayName("Should return empty depreciation stats when no data")
+    void testGetDepreciationStatsEmpty() throws Exception {
+        when(reportService.getDepreciationStats()).thenReturn(Collections.emptyList());
+
+        mockMvc.perform(get("/reports/depreciation-stats")
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.code").value(200))
+            .andExpect(jsonPath("$.data").isArray())
+            .andExpect(jsonPath("$.data.length()").value(0));
+
+        verify(reportService).getDepreciationStats();
     }
 }

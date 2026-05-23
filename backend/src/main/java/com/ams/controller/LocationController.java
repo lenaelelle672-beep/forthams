@@ -4,6 +4,7 @@ import com.ams.common.Result;
 import com.ams.entity.Location;
 import com.ams.service.LocationService;
 import lombok.RequiredArgsConstructor;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -55,13 +56,13 @@ public class LocationController {
     }
 
     @PostMapping
-    public Result<Location> create(@RequestBody Location location) {
+    public Result<Location> create(@Valid @RequestBody Location location) {
         locationService.insert(location);
         return Result.success(location);
     }
 
     @PutMapping("/{id}")
-    public Result<Location> update(@PathVariable Long id, @RequestBody Location location) {
+    public Result<Location> update(@PathVariable Long id, @Valid @RequestBody Location location) {
         location.setId(id);
         locationService.update(location);
         return Result.success(location);

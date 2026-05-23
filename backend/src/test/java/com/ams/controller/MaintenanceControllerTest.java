@@ -92,6 +92,8 @@ class MaintenanceControllerTest {
         MaintenanceCreateDTO dto = new MaintenanceCreateDTO();
         dto.setAssetId(1L);
         dto.setMaintenanceType("PREVENTIVE");
+        dto.setMaintenanceDate(java.time.LocalDate.now());
+        dto.setContent("定期维护检查");
 
         MaintenanceRecord saved = new MaintenanceRecord();
         saved.setId(10L);
