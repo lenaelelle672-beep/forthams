@@ -1,0 +1,90 @@
+{
+  "session_id": "20260524-flash-001",
+  "generated_at": "2026-05-24",
+  "classification": "Medium",
+  "scope": [
+    "backend/src/main/java/com/ams/dto/ResetPasswordRequest.java",
+    "backend/src/main/java/com/ams/service/AuthService.java",
+    "backend/src/main/java/com/ams/controller/AuthController.java",
+    "frontend/src/pages/dashboard/BigScreenPage.tsx",
+    "frontend/src/pages/dashboard/BigScreen3DPage.tsx",
+    "frontend/src/pages/report/ (单数目录，未接路由，建议清理)",
+    "frontend/src/router/index.tsx"
+  ],
+  "risks": [
+    "P0-1: AuthService.resetPassword() 仅校验用户名存在，缺少旧密码验证，安全漏洞（HIGH）",
+    "P0-1: UserManagementController 的管理员重置路径不需要旧密码，是正常设计不应修改",
+    "P0-2: BigScreen3DPage.queryFn catch 块直接 return fallbackStats，API 失败被静默吞掉",
+    "P0-2: BigScreenPage 使用 placeholderData 显示假数据，未判断 isError",
+    "P1-4: pages/report/（单数，未接路由）与 pages/reports/（复数，已接路由）并存，目录歧义",
+    "P1-4: pages/report/ 为死代码，功能与 reports/ 重叠，清理需先确认无其他引用"
+  ],
+  "dependencies": [
+    "P0-1: BCryptPasswordEncoder (SecurityConfig 已配置)、UserMapper、PasswordEncoder",
+    "P0-2: @tanstack/react-query useQuery.isError，可复用 ErrorBoundary 组件",
+    "P1-4: frontend/src/router/index.tsx"
+  ],
+  "next_phases": ["drafter", "refiner", "adjudication", "builder", "reviewer"],
+  "minions_applicable": true,
+  "items": [
+    {
+      "id": "P0-1",
+      "title": "密码重置加旧密码校验",
+      "priority": "P0",
+      "tier": "本轮实施",
+      "sub_classification": "Medium",
+      "target_path": "AuthController /auth/reset-password（用户自主重置）",
+      "files_to_change": [
+        "backend/src/main/java/com/ams/dto/ResetPasswordRequest.java - 新增 oldPassword 字段",
+        "backend/src/main/java/com/ams/service/AuthService.java - 加旧密码校验逻辑",
+        "backend/src/main/java/com/ams/controller/AuthController.java - 可能需要注释更新"
+      ],
+      "acceptance_hint": "不传 oldPassword 返回 400；传错误旧密码返回 403/BusinessException；传正确旧密码成功更新"
+    },
+    {
+      "id": "P0-2",
+      "title": "大屏 API 失败展示错误态，去掉假数据 fallback",
+      "priority": "P0",
+      "tier": "本轮实施",
+      "sub_classification": "Light",
+      "files_to_change": [
+        "frontend/src/pages/dashboard/BigScreenPage.tsx - 删除 placeholderData，加 isError 判断",
+        "frontend/src/pages/dashboard/BigScreen3DPage.tsx - 删除 fallbackStats，catch 改 throw，加 isError UI"
+      ],
+      "acceptance_hint": "API 5xx 时显示错误提示组件而非假数据；isError=true 时不渲染图表数据"
+    },
+    {
+      "id": "P1-4",
+      "title": "确认 report/ 目录去留，清理",
+      "priority": "P1",
+      "tier": "本轮实施",
+      "sub_classification": "Medium",
+      "decision": "废弃清理 pages/report/ 目录（死代码，功能与 reports/ 重叠）",
+      "files_to_change": [
+        "frontend/src/pages/report/ - 删除整个目录",
+        "确认无其他文件引用后删除"
+      ],
+      "acceptance_hint": "report/ 目录已删除，grep 无残留引用"
+    },
+    {
+      "id": "P1-3",
+      "title": "报表创建/预览功能（最小可用版）",
+      "priority": "P1",
+      "tier": "下周规划，本轮仅规划",
+      "planning_note": "依赖 P1-4 决策，可基于 pages/reports/ReportsPage.tsx 扩展"
+    },
+    {
+      "id": "P2-5-dashboard",
+      "title": "补 DashboardService 单元测试",
+      "priority": "P2",
+      "tier": "下周规划，本轮仅规划"
+    },
+    {
+      "id": "P3-7",
+      "title": "根目录历史文档批量归档",
+      "priority": "P3",
+      "tier": "下周规划，本轮仅规划",
+      "planning_note": "根目录 CHECKPOINT_*.md x7+、SPEC_*.md x8+、SWARM-*.md x4+ 历史文档，归档至 docs/archive/"
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "changed_files": [
+    "frontend/src/app/services/assetService.ts",
+    "frontend/src/app/pages/asset/AssetListPage.tsx",
+    "frontend/src/api/reports.ts",
+    "frontend/src/pages/reports/ReportsPage.tsx",
+    "frontend/src/pages/inventory/InventoryDetailPage.tsx",
+    "frontend/src/pages/depreciation/DepreciationListPage.tsx",
+    "frontend/src/pages/locations/LocationsPage.tsx",
+    "frontend/src/pages/bigscreen/BigScreenPage.tsx",
+    "frontend/src/pages/disposal/DisposalDetailPage.tsx",
+    "frontend/src/api/disposal.ts"
+  ],
+  "added_files": [],
+  "commands_run": [
+    { "command": "tsc --noEmit (type check)", "result": "passed", "notes": "仅项目已有错误，修改的文件无新增类型错误" }
+  ],
+  "verification_results": [
+    "P0-1 AssetListPage: 添加了 batchDelete (assetService) + 选择确认弹窗 + handleBatchDelete 函数",
+    "P0-2 ReportsPage: asset-dept 报表从随机系数伪数据改为调用 /dashboard/dept-distribution 真实 API",
+    "P0-3 InventoryDetailPage: 保存草稿按钮改为调用 updateTaskStatus(id, {status:'DRAFT'}) + useMutation",
+    "P1-4 DepreciationListPage: 从 useState+async/await 迁移到 useQuery，queryKey 含筛选条件自动重新获取",
+    "P1-5 LocationsPage: 从 useState+async/await 迁移到 useQuery，CRUD 后使用 invalidateQueries 刷新",
+    "P1-6 BigScreenPage: 移除 initialData:fallbackStats，改用 placeholderData，queryFn 失败时 throw 而非返回假数据",
+    "P1-7 DisposalDetailPage: approveItem/rejectItem 从硬编码 version:1 改为 (detail as any)?.version ?? 1，且 Disposal 接口添加 version? 字段"
+  ],
+  "minions_execution": {
+    "adjudication_file_read": true,
+    "selected_source": "draft",
+    "write_intent_preserved": true,
+    "degradation_blocked": false
+  },
+  "residual_risks": [
+    "ReportsPage asset-dept 后端 /dashboard/dept-distribution 可能需适配返回 NameValueItem[] 格式",
+    "InventoryDetailPage saveDraft 依赖 updateTaskStatus API（PATCH），需后端正确实现 DRAFT 状态保存",
+    "AssetListPage (app/pages) 中 batchDelete 调用 POST /assets/batch-delete，需后端实现该端点",
+    "BigScreenPage 的 placeholderData 在首次加载时仍用 fallbackStats 作为视觉占位，未能彻底消除 Mock 数据"
+  ]
+}

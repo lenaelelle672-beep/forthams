@@ -10,6 +10,7 @@ export interface FlowNodeData extends Record<string, unknown> {
   triggerType: string;
   approverType: "role" | "user";
   approverRole: string;
+  approverRoleName: string;
   approverId: string;
   approvalMode: "any" | "all" | "sequence";
   conditionExpression: string;
@@ -66,6 +67,7 @@ const NODE_DEFAULTS: Record<FlowNodeType, Omit<FlowNodeData, "type">> = {
     triggerType: "表单提交",
     approverType: "role",
     approverRole: "",
+    approverRoleName: "",
     approverId: "",
     approvalMode: "sequence",
     conditionExpression: "",
@@ -80,6 +82,7 @@ const NODE_DEFAULTS: Record<FlowNodeType, Omit<FlowNodeData, "type">> = {
     triggerType: "",
     approverType: "role",
     approverRole: "SUPER_ADMIN",
+    approverRoleName: "",
     approverId: "",
     approvalMode: "sequence",
     conditionExpression: "",
@@ -94,6 +97,7 @@ const NODE_DEFAULTS: Record<FlowNodeType, Omit<FlowNodeData, "type">> = {
     triggerType: "",
     approverType: "role",
     approverRole: "",
+    approverRoleName: "",
     approverId: "",
     approvalMode: "sequence",
     conditionExpression: "申请金额 >= 5000",
@@ -108,6 +112,7 @@ const NODE_DEFAULTS: Record<FlowNodeType, Omit<FlowNodeData, "type">> = {
     triggerType: "",
     approverType: "role",
     approverRole: "",
+    approverRoleName: "",
     approverId: "",
     approvalMode: "sequence",
     conditionExpression: "",

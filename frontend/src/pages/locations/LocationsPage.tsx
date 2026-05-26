@@ -237,7 +237,7 @@ export default function LocationsPage() {
     setLoading(true);
     try {
       const res = await getLocationTree();
-      const data = res.data?.data ?? res.data ?? [];
+      const data = res ?? [];
       setTree(Array.isArray(data) ? data : []);
     } catch (err) {
       toast.error('加载位置树失败，请稍后重试');

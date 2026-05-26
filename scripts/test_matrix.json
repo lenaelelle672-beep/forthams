@@ -1,0 +1,154 @@
+{
+  "schema_version": 1,
+  "description": "AMS 工作流端到端测试矩阵——数据驱动核心，4 个业务流程的 processType/businessData/预期结果集中管理",
+  "templates": {
+    "base_url": "http://localhost:8080/api",
+    "users": {
+      "applicant_user": { "username": "sim0526145701", "password": "admin123" },
+      "approver_user1": { "username": "sim0526145702", "password": "admin123" },
+      "approver_user2": { "username": "sim0526145703", "password": "admin123" },
+      "approver_user3": { "username": "sim0526145704", "password": "admin123" },
+      "approver_user4": { "username": "sim0526145705", "password": "admin123" },
+      "cross_user":    { "username": "sim0526145706", "password": "admin123" }
+    },
+    "workflow_definitions": {
+      "default_operator_id": 1
+    },
+    "approval_opinions": [
+      "一级审批通过，符合规定。",
+      "二级审批通过，材料齐全。",
+      "三级审批通过，无异议。",
+      "最终审批通过，同意执行。"
+    ]
+  },
+  "test_cases": [
+    {
+      "id": "TC-TRANSFER",
+      "processType": "ASSET_TRANSFER",
+      "title": "E2E资产调拨审批-调拨到B栋3层",
+      "asset_create": {
+        "assetNo": "E2E-TRANSFER-001",
+        "assetName": "e2e-transfer-asset",
+        "categoryId": 1,
+        "deptId": 1,
+        "userId": 1,
+        "location": "A栋2层",
+        "status": "IDLE",
+        "originalValue": 8000.00
+      },
+      "businessData": {
+        "assetId": null,
+        "targetDeptId": 2,
+        "targetUserId": 3,
+        "targetLocation": "B栋3层",
+        "reason": "部门调整需求"
+      },
+      "expected_asset_status": "IN_USE",
+      "expected_compensation_status": null,
+      "ac5_cross_check": false
+    },
+    {
+      "id": "TC-CLEARANCE",
+      "processType": "ASSET_CLEARANCE",
+      "title": "E2E资产清退审批-闲置设备清退",
+      "asset_create": {
+        "assetNo": "E2E-CLEARANCE-001",
+        "assetName": "e2e-clearance-asset",
+        "categoryId": 1,
+        "deptId": 1,
+        "userId": 1,
+        "location": "A栋1层仓库",
+        "status": "IDLE",
+        "originalValue": 3000.00
+      },
+      "businessData": {
+        "assetId": null,
+        "reason": "资产闲置过久"
+      },
+      "expected_asset_status": "CLEARED",
+      "expected_compensation_status": null,
+      "ac5_cross_check": false
+    },
+    {
+      "id": "TC-SCRAP",
+      "processType": "ASSET_SCRAP",
+      "title": "E2E资产报废审批-设备损坏报废",
+      "asset_create": {
+        "assetNo": "E2E-SCRAP-001",
+        "assetName": "e2e-scrap-asset",
+        "categoryId": 1,
+        "deptId": 1,
+        "userId": 1,
+        "location": "A栋3层",
+        "status": "IDLE",
+        "originalValue": 1500.00
+      },
+      "businessData": {
+        "assetId": null,
+        "reason": "设备损坏无法使用"
+      },
+      "expected_asset_status": "SCRAPPED",
+      "expected_compensation_status": null,
+      "ac5_cross_check": false
+    },
+    {
+      "id": "TC-COMPENSATION",
+      "processType": "ASSET_COMPENSATION",
+      "title": "E2E资产赔偿审批-资产丢失赔偿",
+      "asset_create": {
+        "assetNo": "E2E-COMPENSATION-001",
+        "assetName": "e2e-compensation-asset",
+        "categoryId": 1,
+        "deptId": 1,
+        "userId": 1,
+        "location": "A栋会议室",
+        "status": "IDLE",
+        "originalValue": 12000.00
+      },
+      "businessData": {
+        "assetId": null,
+        "compensationType": "LOSS",
+        "compensationAmount": 5000.00,
+        "description": "资产丢失赔偿",
+        "incidentDate": "2026-05-01",
+        "responsibleUserId": 1,
+        "responsibleDeptId": 1
+      },
+      "expected_asset_status": null,
+      "expected_compensation_status": "APPROVED",
+      "ac5_cross_check": false
+    }
+  ],
+  "ac6_required_fields": {
+    "approval": {
+      "id": "int",
+      "processNo": "str",
+      "processType": "str",
+      "businessId": "int|None",
+      "status": "str",
+      "currentStep": "int|None",
+      "applicantId": "int|None",
+      "applyTime": "str|None",
+      "createTime": "str|None",
+      "updateTime": "str|None"
+    },
+    "asset": {
+      "id": "int",
+      "assetNo": "str",
+      "assetName": "str",
+      "categoryId": "int|None",
+      "deptId": "int|None",
+      "userId": "int|None",
+      "location": "str|None",
+      "status": "str|None",
+      "originalValue": "float|int|None"
+    },
+    "auth_response": {
+      "token": "str",
+      "userId": "int",
+      "username": "str",
+      "realName": "str|None",
+      "roles": "list"
+    }
+  }
+}

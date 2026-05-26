@@ -27,7 +27,7 @@ import { Badge } from '@/components/ui/Badge';
 import { FilterBar } from '@/components/ui/FilterBar';
 import { DataTable, type Column } from '@/components/ui/DataTable';
 import { PageHeader } from '@/components/ui/PageHeader';
-import type { PaginatedResponse } from '@/types/common';
+import type { PaginatedResponse, PageData } from '@/types/common';
 import { Input } from '@/components/ui/Input';
 
 const STATUS_CONFIG: Record<
@@ -106,8 +106,8 @@ export default function RetirementListPage() {
     placeholderData: (p) => p,
   });
 
-  const records = (res as PaginatedResponse<RetirementApplication> | undefined)?.data?.records ?? [];
-  const total = (res as PaginatedResponse<RetirementApplication> | undefined)?.data?.total ?? 0;
+  const records = (res as PageData<RetirementApplication> | undefined)?.records ?? [];
+  const total = (res as PageData<RetirementApplication> | undefined)?.total ?? 0;
 
   const columns: Column<any>[] = [
     {

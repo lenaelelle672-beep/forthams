@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "agent": "gai2-orchestrator",
+  "decision": "use_refine",
+  "draft_verdict": "accept_with_refinements",
+  "selected_source": "refine",
+  "rationale": "Draft 核心设计完整（数据驱动架构、双文件方案、AC5/AC6 补全策略），Refiner 的 6 项改进建议均为 Builder 阶段可直接采纳的实用增强（动态 assetId 替换、标准字段名、前置检查、错误恢复、COMPENSATION 验证路径）。无写操作退化，write_intent 完整保留。使用 Refine 增强后的方案，Builder 需同时参考 Draft 的详细 content_outline 和 Refine 的改进建议。",
+  "builder_instructions": [
+    "创建 scripts/test_matrix.json：包含 4 个 test_cases（TRANSFER/CLEARANCE/SCRAP/COMPENSATION），每流程定义 processType/businessData/预期结果",
+    "创建 scripts/test_script.py：Python 数据驱动脚本，读取 test_matrix.json 驱动 4 流程 E2E 测试",
+    "TC-COMPENSATION 的 businessData 必须使用标准字段名：compensationType/compensationAmount/description/incidentDate/responsibleUserId/responsibleDeptId",
+    "TC-TRANSFER 的 businessData.assetId 在脚本中动态替换为实际创建的资产 ID（非 null）",
+    "实现 login/publish_workflow/create_approval/approve_step/verify_result/get_approvals_mine 公共函数",
+    "AC5：主循环后 cross_user 登录交叉验证 mine=true",
+    "AC6：每次审批响应后校验关键字段存在性（id/status/currentStep/processType）",
+    "脚本增加前置检查：验证后端可达、测试用户可登录、4 个 workflow definition 已 PUBLISH",
+    "脚本增加错误恢复：某流程失败后继续执行后续流程",
+    "COMPENSATION 流程只验证赔偿记录状态为 APPROVED，不验证资产状态变更"
+  ],
+  "write_action_guard": {
+    "target_files": ["scripts/test_matrix.json", "scripts/test_script.py"],
+    "operations": ["create", "create"],
+    "no_degradation": true
+  },
+  "fallback_labels": [],
+  "gap_coverage": {
+    "ac2-clearance-evidence": "TC-CLEARANCE 完整 4 级审批 → 资产状态 CLEARED 验证",
+    "ac5-tenant-strategy": "cross_user 登录后 GET /api/approvals?mine=true 验证隔离",
+    "ac6-field-alignment": "审批响应后 validate_field_alignment 检查关键字段"
+  },
+  "reviewer_checks": [
+    "验证 test_matrix.json 和 test_script.py 文件存在且可执行",
+    "验证 4 个流程 PASS/FAIL 输出摘要",
+    "验证 AC5 交叉验证输出：user1 和 cross_user 的 mine=true 结果隔离",
+    "验证 AC6 字段对齐输出：零缺失字段",
+    "验证 gap_fingerprint 三个缺口在测试输出中均有明确证据"
+  ]
+}

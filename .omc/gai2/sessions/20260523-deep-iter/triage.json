@@ -1,0 +1,155 @@
+{
+  "session_id": "20260523-deep-iter",
+  "classification": "Heavy",
+  "classified_at": "2026-05-23T17:30:00+08:00",
+  "scope_assessment": {
+    "frontend_files": [
+      "frontend/src/pages/disposal/DisposalListPage.tsx",
+      "frontend/src/pages/disposal/AssetTransferFormPage.tsx",
+      "frontend/src/pages/disposal/AssetClearanceFormPage.tsx",
+      "frontend/src/pages/disposal/AssetScrapFormPage.tsx",
+      "frontend/src/pages/disposal/AssetCompensationFormPage.tsx",
+      "frontend/src/pages/settings/SettingsPage.tsx",
+      "frontend/src/pages/retirement/RetirementFormPage.tsx",
+      "frontend/src/pages/workorder/WorkOrderFormPage.tsx",
+      "frontend/src/pages/asset/AssetFormPage.tsx",
+      "frontend/src/pages/asset/AssetListPage.tsx",
+      "frontend/src/pages/approval/ApprovalListPage.tsx",
+      "frontend/src/pages/maintenance/MaintenancePage.tsx",
+      "frontend/src/pages/retirement/RetirementListPage.tsx",
+      "frontend/src/pages/idle/IdleAssetsPage.tsx",
+      "frontend/src/pages/workorder/WorkOrderDetailPage.tsx",
+      "frontend/src/pages/AssetImportExport/ExportFilterForm.tsx"
+    ],
+    "backend_files": [
+      "backend/src/main/java/com/ams/controller/MaintenanceController.java",
+      "backend/src/main/java/com/ams/controller/RoleController.java",
+      "backend/src/main/java/com/ams/controller/RetirementController.java",
+      "backend/src/main/java/com/ams/controller/UserManagementController.java",
+      "backend/src/main/java/com/ams/controller/WorkOrderController.java",
+      "backend/src/main/java/com/ams/controller/CompensationController.java",
+      "backend/src/main/java/com/ams/controller/ApprovalController.java",
+      "backend/src/main/java/com/ams/controller/DeptController.java",
+      "backend/src/main/java/com/ams/controller/LocationController.java",
+      "backend/src/main/java/com/ams/controller/IdleAssetController.java",
+      "backend/src/main/java/com/ams/controller/InventoryController.java",
+      "backend/src/main/java/com/ams/controller/WorkflowDefinitionController.java",
+      "backend/src/main/java/com/ams/controller/DisposalController.java",
+      "backend/src/main/java/com/ams/service/DisposalService.java",
+      "backend/src/main/java/com/ams/service/CompensationService.java",
+      "backend/src/main/java/com/ams/service/ApprovalService.java",
+      "backend/src/main/java/com/ams/config/JwtAuthenticationFilter.java",
+      "backend/src/main/java/com/ams/config/MybatisPlusConfig.java",
+      "backend/src/main/java/com/ams/context/TenantContext.java",
+      "backend/src/main/java/com/ams/scheduler/DepreciationScheduler.java",
+      "backend/src/main/java/com/ams/dto/MaintenanceCreateDTO.java",
+      "backend/src/main/java/com/ams/dto/RoleCreateDTO.java",
+      "backend/src/main/java/com/ams/dto/RetirementApplyDTO.java",
+      "backend/src/main/java/com/ams/dto/UserCreateDTO.java",
+      "backend/src/main/java/com/ams/dto/UserUpdateDTO.java",
+      "backend/src/main/java/com/ams/dto/WorkOrderDTO.java",
+      "backend/src/main/java/com/ams/dto/CompensationCreateDTO.java",
+      "backend/src/main/java/com/ams/dto/IdleAssetCreateDTO.java",
+      "backend/src/main/java/com/ams/dto/WorkflowDefinitionSaveDTO.java",
+      "backend/src/main/java/com/ams/dto/DeptCreateDTO.java"
+    ],
+    "test_files": [
+      "frontend/src/services/approvalService.test.ts",
+      "frontend/vitest.config.ts",
+      "backend/src/test/java/com/ams/tenant/TenantIsolationIntegrationTest.java"
+    ],
+    "new_files_needed": [
+      "backend/.../controller/SystemConfigController.java",
+      "backend/.../controller/SecurityConfigController.java",
+      "backend/.../service/SystemConfigService.java",
+      "backend/.../service/SecurityConfigService.java",
+      "backend/.../entity/SystemConfig.java",
+      "backend/.../entity/SecurityConfig.java",
+      "backend/.../repository/SystemConfigRepository.java",
+      "backend/.../repository/SecurityConfigRepository.java",
+      "frontend/src/__tests__/components/*.test.tsx"
+    ]
+  },
+  "risk_assessment": {
+    "overall": "high",
+    "key_risks": [
+      "F-3: Disposal 三大接口全部抛 BusinessException，为业务核心链路断裂",
+      "F-8: 跨租户隔离依赖于 MybatisPlus TenantLineInnerInterceptor 是否已配置，未确认前存在数据泄漏风险",
+      "F-9: 审批回调缺失导致处置/赔偿业务审批通过后无业务效果",
+      "F-6: 前端无组件测试，6 个表单页新增/修改后无回归保护",
+      "范围膨胀：13 项 findings + stitchMCP 新页面 + 反复推演，执行面过宽可能导致注意力分散",
+      "F-1+F-2: 13 个 Controller + 10 个 DTO 需同时修改，批量改动量大"
+    ]
+  },
+  "recommended_phases": ["audit", "debate", "builder", "reviewer"],
+  "needs_debate": true,
+  "debate_topics": [
+    "Disposal 处置架构设计：强制审批流 vs 允许直接处置 + 审批双模式",
+    "审批回调模式：processType 路由分发 vs 事件驱动 vs AOP 切面",
+    "跨页面联动方案：queryClient.invalidateQueries 宽泛刷新 vs 精确关联 key 刷新 vs 引入事件总线",
+    "系统配置存储策略：单表 KV 模式 vs 多表结构化，是否纳入租户隔离"
+  ],
+  "estimated_effort": "high",
+  "estimated_hours": "32-48 小时",
+  "batch_suggestions": [
+    {
+      "batch": 1,
+      "description": "后端校验加固 — 为 13 个 Controller 添加 @Valid，为 15 个 DTO 补充 Jakarta Validation 约束注解（@NotBlank/@NotNull/@Size/@Pattern/@Positive/@Email 等），与前端 zod schema 保持一致",
+      "findings": ["F-1", "F-2"],
+      "dependencies": [],
+      "files_changed": 25,
+      "estimated_time": "6-8h"
+    },
+    {
+      "batch": 2,
+      "description": "核心缺失功能实现 — 实现 DisposalService.transfer/clearance/scrap 业务逻辑（创建审批流程、审批通过后执行资产状态变更）；实现 SystemConfigController/SecurityConfigController 后端 API（数据库持久化配置）；在 ApprovalService.approve 中添加 processType 回调分发机制，打通处置/赔偿审批回调链路",
+      "findings": ["F-3", "F-5", "F-9"],
+      "dependencies": ["需 debate 先行，确认架构方案"],
+      "files_changed": 15,
+      "estimated_time": "14-20h"
+    },
+    {
+      "batch": 3,
+      "description": "安全与基础设施 — 验证/配置 MybatisPlus TenantLineInnerInterceptor 跨租户隔离；统一前端组件导入路径为 @/components/ui/Card（大写）模式；拆分 SettingsPage 为独立 Tab 组件文件",
+      "findings": ["F-8", "F-12", "F-13"],
+      "dependencies": [],
+      "files_changed": 8,
+      "estimated_time": "3-5h"
+    },
+    {
+      "batch": 4,
+      "description": "前端校验补齐与交互联动 — 为 RetirementFormPage/WorkOrderFormPage/AssetTransferFormPage/AssetClearanceFormPage/AssetScrapFormPage/AssetCompensationFormPage 补充 zod schema + safeParse 或 RHF+zodResolver；在关键 mutation 成功后增加跨页面 queryKey invalidation；修复 assetNo/currentValue 显示",
+      "findings": ["F-4", "F-10", "F-11"],
+      "dependencies": ["Batch 2 完成后可验证联动效果"],
+      "files_changed": 12,
+      "estimated_time": "6-10h"
+    },
+    {
+      "batch": 5,
+      "description": "测试覆盖提升 — 对关键表单页补充 React Testing Library 组件测试（加载态/空态/提交校验）；对新增后端逻辑补充集成测试；确认 mvn test + vitest + npm build 全绿",
+      "findings": ["F-6", "F-7"],
+      "dependencies": ["Batch 1-4 代码稳定后执行"],
+      "files_changed": 10,
+      "estimated_time": "6-8h"
+    },
+    {
+      "batch": 6,
+      "description": "StitchMCP 新页面 + 最终推演 — 如发现缺失页面使用 stitchMCP 生成 UI 并集成；进行边界用例推演、异常场景测试、全链路验证；检查所有接受条件（AC-1 到 AC-8）是否满足",
+      "findings": ["stitchMCP", "推演"],
+      "dependencies": ["Batch 1-5 全部完成"],
+      "files_changed": 5,
+      "estimated_time": "6-10h"
+    }
+  ],
+  "key_domains": [
+    "Jakarta Bean Validation（@Valid / 约束注解）",
+    "Spring Boot REST API（Controller/Service/Repository）",
+    "资产管理业务逻辑（资产转移/清退/报废/赔偿）",
+    "工作流与审批回调（Approval Process + Service Dispatch）",
+    "跨租户数据隔离（MybatisPlus TenantLineInnerInterceptor）",
+    "前端表单校验（zod + react-hook-form + safeParse）",
+    "跨页面状态同步（@tanstack/react-query cache invalidation）",
+    "前端组件测试（React Testing Library + Vitest）",
+    "StitchMCP UI 生成与集成"
+  ]
+}

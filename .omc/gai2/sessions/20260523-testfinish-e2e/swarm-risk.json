@@ -1,0 +1,32 @@
+{
+  "swarm_role": "risk-security",
+  "stance": "认证守卫缺失是 CRITICAL 级别的生产安全漏洞，不是单纯的测试不通过问题。当前架构中没有任何主动防护层，http.ts 401 拦截器是伪兜底（E2E mock 环境下完全不触发），两套 Axios 实例并存造成配置漂移风险。",
+  "findings": [
+    "认证守卫完全缺失：router/index.tsx 中 25+ 个受保护路由无任何访问控制",
+    "AppLayout 仅在渲染用户头像时读取 user_info 存储，没有 token 存在性检查",
+    "http.ts 401 拦截器是伪兜底：E2E 测试中 mockApi 对所有请求返回 200，拦截器永不触发",
+    "两套 Axios 实例并存（utils/http.ts vs app/utils/api.ts）各有独立拦截器链和响应解包逻辑",
+    "Token 存储策略混乱：LoginPage 写 sessionStorage('auth_token')，http.ts 读 sessionStorage || localStorage('auth_token')，种子写 localStorage('ams_auth_token')",
+    "AuthProvider 未在 main.tsx 挂载，useAuth() 直接 throw Error",
+    "页面组件的敏感数据可能通过首次渲染暴露，即使后续 401 跳转"
+  ],
+  "recommendation": {
+    "approach": "AppLayout 强制 token 检查 + 统一 token 策略",
+    "details": "AppLayout 组件起始处添加 token 存在性检查。统一全系统 token key 为 'auth_token'，统一写 sessionStorage，取消 localStorage fallback。旧 Axios 实例应逐步废弃。",
+    "minimal_security_standard": "1) AppLayout 渲染前置 token 检查 2) 统一 token key = auth_token 3) 统一存储 = sessionStorage 4) 401 拦截器保持作为第三防线",
+    "risk_level": "high"
+  },
+  "risks": [
+    "不修复认证守卫：生产环境所有内网用户可访问全部资产数据、审批流程、系统设置和审计日志",
+    "仅做轻量 token 检查但不修复两套 Axios 实例：AuthContext 和页面组件的认证流程继续分裂",
+    "E2E 测试通过但生产不安全：mock 返回 200 掩盖所有权限问题"
+  ],
+  "evidence_needed": [
+    "确认后端 API 是否已在服务器端强制认证",
+    "确认有无安全合规要求（如等保、ISO 27001）对前端访问控制有明确规定"
+  ],
+  "open_questions": [
+    "后端是否已有一套完整的认证中间件？如果是，前端修复优先级可从 security-critical 降为 UX-critical",
+    "两套 Axios 实例的迁移计划是什么？"
+  ]
+}

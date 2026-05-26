@@ -1,0 +1,240 @@
+{
+  "audit_type": "E2E测试与GAI2迭代2新AC差距分析",
+  "auditor": "gai2-audit-agent",
+  "timestamp": "2026-05-24T12:00:00+08:00",
+  "target_goal": "testFinish 完美测试工程迭代2 — 自动爬取导航发现全部路由（含深层表单页），模拟真人点击操作，自动发现所有前后端不匹配，修复 disposal/transfer/new 等漏点",
+
+  "current_state": {
+    "summary": "当前 E2E 测试（forthams-e2e.spec.ts）使用 DOM 爬取方式发现导航链接（约21个），逐个访问并检测 API 错误、渲染崩溃、空白页。附带一个简化的深层页面探索步骤，点击匹配「新建|新增|添加|创建」的按钮后仅检查 API 错误。认证测试（forthams-certification.spec.ts）基于 mock 覆盖10个业务场景，PASS。但当前测试无法自动发现全部45+个注册路由，尤其是深层表单页（/assets/new, /disposals/transfer/new, /vendors/new 等）。",
+    "测试文件": "testFinish/tests/playwright/forthams-e2e.spec.ts",
+    "认证文件": "testFinish/tests/playwright/forthams-certification.spec.ts",
+    "当前覆盖路由数": "约21个（仅导航链接可见路由）",
+    "总注册路由数": "约45+个",
+    "深层表单页测试": "有限 — 点击新建按钮但不验证URL/内容/崩溃",
+    "认证测试状态": "10/10 PASS (3.4s)",
+    "E2E测试状态": "1/1 PASS (27.4s, 11/11页面正常, 0 API错误)",
+    "后端状态": "部分API端点仍返回500（retirement, audit-logs/stats, vendors, locations等）"
+  },
+
+  "existing_patterns": [
+    "SidebarLayout 导航模式：5个分组（无标签、资产管理、业务流程、资源管理、系统），共18个 NavLink，href 直接指向路由路径",
+    "深层表单页入口模式：列表页通过「新建XXX」按钮导航到深层表单（如 /disposals/transfer/new），按钮文本动态生成（如「新建资产调拨」）",
+    "Tab 切换模式：DisposalListPage 使用4个Tab（调拨/清退/报废/赔偿），每个Tab有独立的新建按钮指向不同深层路由",
+    "路由分散注册模式：主路由在 App.tsx 定义，vendor/location/retirement/workorder/disposal 路由分散在 router.tsx、AppRoutes.tsx、AppRouter.tsx 中",
+    "按钮文本模式：统一使用「新建/新增/添加/创建」前缀 + 动态标签，可以用正则匹配",
+    "模块化懒加载：所有页面组件使用 React.lazy + Suspense 按需加载",
+    "认证测试模式：基于 page.route() mock 拦截所有 /api/** 请求，模拟完整 CRUD 业务流程"
+  ],
+
+  "technical_constraints": [
+    "SidebarLayout 的 navGroups 是静态常量数组，编译后不可在运行时扩展 — 路由发现只能从 DOM 渲染结果爬取，不能从源码静态分析",
+    "深层表单页（/assets/new, /disposals/transfer/new 等）不在侧边栏导航中，只能通过点击按钮或直接输入URL访问",
+    "部分深层路由在 App.tsx 中定义但 SidebarLayout 中无对应入口（如 /assets/new, /vendors/new, /retirement/new, /retirement/:id）",
+    "部分页面需要前置数据（如 /disposals/transfer/new 需要资产列表/部门树/位置级联数据），缺少后端 mock 时可能渲染异常",
+    "动态参数路由（:id, :taskId）无法通过自动爬取穷举，需要策略性处理（使用固定测试ID或自动创建）",
+    "路由文件分散在 frontend/src/app/App.tsx、router.tsx、routes/AppRoutes.tsx、router/AppRouter.tsx 四个文件中，静态分析路由全量需要跨文件聚合",
+    "Playwright 测试在 testFinish 独立项目中运行，前端在 forthAMS 项目中，配置分离",
+    "后端服务仅部分端点可用（部分 GET API 仍返回 500），影响真 E2E 测试覆盖面"
+  ],
+
+  "gaps": [
+    {
+      "id": "GAP-AC1-A",
+      "ac": "AC-1",
+      "description": "当前测试仅爬取 DOM 中的 nav 链接（约21个），覆盖不到所有注册路由（约45个）。深层表单页（/assets/new, /disposals/transfer/new, /vendors/new, /locations/new, /retirement/new 等）不会被发现",
+      "severity": "high",
+      "affected_routes": ["/assets/new", "/disposals/transfer/new", "/disposals/clearance/new", "/disposals/scrap/new", "/disposals/compensation/new", "/vendors/new", "/locations/new", "/retirement/new", "/workorders/new", "/inventory/tasks", "/inventory/tasks/:taskId", "/retirement/:id", "/vendors/:id", "/locations/tree", "/workflows", "/workflow-designer", "/categories", "/situation", "/cyber-v12", "/industrial-v13"]
+    },
+    {
+      "id": "GAP-AC1-B",
+      "ac": "AC-1",
+      "description": "Tab 切换导致的路由未被发现 — DisposalListPage 有4个Tab（调拨/清退/报废/赔偿），每个Tab切换后页面内容变化，当前测试未切换Tab探索",
+      "severity": "medium"
+    },
+    {
+      "id": "GAP-AC2-A",
+      "ac": "AC-2",
+      "description": "当前深层页面探索（第106-128行）点击「新建/新增/添加/创建」按钮后，仅检查 API 错误增量，未验证：① 是否成功跳转到目标URL ② 目标页面是否空白/渲染崩溃 ③ 目标页面的 console.error",
+      "severity": "high",
+      "code_location": "forthams-e2e.spec.ts:106-128"
+    },
+    {
+      "id": "GAP-AC2-B",
+      "ac": "AC-2",
+      "description": "当前按钮匹配模式 `button, a[role=\"button\"]` 缺少对真正 `<button>` 元素和自定义 Button 组件的全覆盖 — DisposalListPage 使用自定义 Button 组件且有动态文本（如「新建资产调拨」），匹配可能失败",
+      "severity": "medium"
+    },
+    {
+      "id": "GAP-AC2-C",
+      "ac": "AC-2",
+      "description": "深层页面点击后没有继续递归爬取 — 到达深层表单页后应再次扫描该页面的二级按钮/链接以发现更深层路由",
+      "severity": "medium"
+    },
+    {
+      "id": "GAP-AC3",
+      "ac": "AC-3",
+      "description": "当前空白页检测仅检查 `document.body?.innerText?.length < 5`，对 SPA 路由页面不够精确（可能因 Suspense fallback 短暂显示空白开始就被误判）。深层页面检测完全缺失",
+      "severity": "medium"
+    },
+    {
+      "id": "GAP-AC4-A",
+      "ac": "AC-4",
+      "description": "/disposals/transfer/new 等深层页面完全不经过当前测试覆盖。这些页面（AssetTransferFormPage）依赖后端多个 API（资产列表、部门树、位置级联），后端500时会直接体现",
+      "severity": "high",
+      "affected_routes": ["/disposals/transfer/new", "/disposals/clearance/new", "/disposals/scrap/new", "/disposals/compensation/new"]
+    },
+    {
+      "id": "GAP-AC4-B",
+      "ac": "AC-4",
+      "description": "深层表单页提交操作未测试 — 当前测试只进入页面不提交，无法发现表单提交链路的 API 问题",
+      "severity": "low"
+    },
+    {
+      "id": "GAP-AC5",
+      "ac": "AC-5",
+      "description": "由于 AC1-4 覆盖不全，当前测试无法暴露深层路由中的所有问题，修复范围受限。需要先扩展测试覆盖度才能判断修复是否完整",
+      "severity": "high"
+    },
+    {
+      "id": "GAP-AC6",
+      "ac": "AC-6",
+      "description": "认证测试10/10 PASS 是独立套件与 E2E 测试无关。E2E 测试只覆盖 nav 层面，认证测试未覆盖深层表单页的 mock 交互",
+      "severity": "medium"
+    }
+  ],
+
+  "recommended_approach": {
+    "strategy": "增强现有 forthams-e2e.spec.ts 的自动爬取能力，不建议重写。推荐混合策略：先爬取 nav 访问基本页面，然后在每个列表页执行「按钮发现→点击→验证深层页面」的递归探索",
+    "phases": [
+      {
+        "phase": "1. 增强导航爬取",
+        "actions": [
+          "保留现有 nav 链接爬取逻辑",
+          "增加额外路由集合（从 App.tsx 和 router 文件中静态提取的路径匹配表），对无参路径直接访问（如 /assets/new, /vendors/new, /disposals/transfer/new 等）",
+          "对动态参数路由（:id, :taskId），访问已知的测试 ID 或推断路径"
+        ]
+      },
+      {
+        "phase": "2. 增强按钮发现与深层导航",
+        "actions": [
+          "改进「新建/新增」按钮匹配：使用更通用 selector（包含自定义 Button 组件），扩大匹配文本范围至所有以「新建」「新增」「添加」「创建」开头的按钮/链接",
+          "点击后验证：检查 URL 是否变更为期望的深层路由路径",
+          "访问深层页面后进行完整的错误检测（API 错误、React 崩溃、console.error、空白页）"
+        ]
+      },
+      {
+        "phase": "3. 递归探索",
+        "actions": [
+          "对每个访问的页面，再次扫描其中的「新建/新增」按钮，继续点击进入更深的表单页",
+          "支持 Tab 切换：对设置有多个 Tab 的页面（如 DisposalListPage），切换每个 Tab 并检测",
+          "避免无限循环（维护 visited URL 集合）"
+        ]
+      },
+      {
+        "phase": "4. 错误检测增强",
+        "actions": [
+          "改进空白页检测：等待 Suspense 完成后再判断页面内容",
+          "增加对表单页特定元素的可见性断言（如标题、表单字段）",
+          "对深层页面记录每个 API 调用的状态码和响应时间"
+        ]
+      },
+      {
+        "phase": "5. 认证测试补充",
+        "actions": [
+          "在 forthams-certification.spec.ts 中增加深层表单页的 mock 测试（如模拟提交 AssetTransferForm）",
+          "确保认证测试覆盖所有深层路由的 mock API 处理"
+        ]
+      }
+    ],
+    "risk_assessment": {
+      "implementation_effort": "中等（约200-300行测试代码变更）",
+      "main_test_impact": "低（仅增强现有测试，不改变认证测试）",
+      "flakiness_risk": "中等 — 深层表单页依赖后端 API，后端不可用或 mock 不完整时可能增加不稳定",
+      "execution_time_impact": "预计 E2E 测试从 27s 增加到 60-120s（取决于发现的路由数量）"
+    },
+    "key_design_decisions": [
+      {
+        "decision": "测试应支持两种模式：真后端模式 + mock 模式（使用认证测试的 mock 设施或独立 mock fixture）",
+        "rationale": "深层表单页依赖多个 API（资产、部门、位置），真后端不可用时测试失败。mock 模式保证可重复执行"
+      },
+      {
+        "decision": "不需要重写 SidebarLayout 暴露路由元数据",
+        "rationale": "DOM 爬取已足够发现 nav 链接。深层表单页通过按钮发现而非静态声明"
+      },
+      {
+        "decision": "对于 :id/:taskId 动态参数路由，使用已知测试 ID 或通过创建操作获取",
+        "rationale": "穷举所有 ID 不可能。策略：① 先通过 POST 创建资源获取 ID ② 使用固定测试 ID（mock 模式）③ 对详情页使用 first-item 模式"
+      }
+    ]
+  },
+
+  "risks": [
+    {
+      "level": "high",
+      "detail": "深层表单页依赖后端多个 API（如 AssetTransferFormPage 依赖 getAssetList、getDeptTree、getLocationCascade），后端 500 会直接暴露在测试中，但也可能导致大量假阳性失败",
+      "mitigation": "为深层页面提供 mock 兜底（参考 certification.spec.ts 的 mockApi 模式），在真后端 500 时自动降级到 mock"
+    },
+    {
+      "level": "high",
+      "detail": "增强后测试执行时间延长（从 27s 到 60-120s），CI 流水线可能需要调整超时配置",
+      "mitigation": "考虑将深层页面测试拆分为独立测试套件，与基础导航测试并行执行"
+    },
+    {
+      "level": "medium",
+      "detail": "按钮文本匹配可能因 UI 重构（更改文案、组件库替换）而失败",
+      "mitigation": "测试中注释说明匹配模式，使用 role 语义选择器 + aria-label 作为后备"
+    },
+    {
+      "level": "medium",
+      "detail": "动态参数路由（:id）需要测试数据，没有种子数据时无法覆盖详情页",
+      "mitigation": "先测试新建页面（创建入口），然后在 mock 模式下直接访问已知 ID"
+    },
+    {
+      "level": "low",
+      "detail": "Tab 切换可能触发多余 API 调用，增加测试噪声",
+      "mitigation": "在 Tab 切换前清空错误记录，仅收集切换后的增量错误"
+    }
+  ],
+
+  "test_surface": [
+    "testFinish/tests/playwright/forthams-e2e.spec.ts — 主要增强目标",
+    "testFinish/tests/playwright/forthams-certification.spec.ts — 需要补充深层表单页 mock 场景",
+    "testFinish/tests/playwright/fixtures/project-config.ts — 配置夹具，可能需要扩展",
+    "testFinish/playwright.config.ts — 可能需要调整超时"
+  ],
+
+  "builder_notes": [
+    "增强 forthams-e2e.spec.ts 时，建议保留现有 nav 爬取逻辑（21条），在其基础上添加深层路由发现",
+    "需要在测试顶部导入 App.tsx 中定义的路由列表吗？不推荐 — 应通过浏览器运行时发现",
+    "深层页面访问建议结构：先访问列表页 → 点击新建按钮 → 等待导航 → 验证 URL → 检查深层页 → 返回列表页 → 下一个",
+    "可使用 `page.waitForURL('**/disposals/transfer/new')` 精确等待导航完成",
+    "Tab 切换可参考 DisposalListPage 的 TABS 常量：['TRANSFER', 'CLEARANCE', 'SCRAP', 'COMPENSATION']",
+    "认证测试的 mockApi 函数（forthams-certification.spec.ts:318-493）可作为深层页面 mock 的参考模板",
+    "推荐使用 URL set 去重 + 递归深度限制（max 3 层）避免无限循环",
+    "后端当前状态：部分 API 仍返回 500（retirement、audit-logs/stats、vendors、locations），增强测试后这些会被自动发现"
+  ],
+
+  "appendix_full_route_table": {
+    "sidebar_visible_routes": [
+      "/", "/assets", "/equipment", "/inventory", "/idle",
+      "/disposals", "/approval", "/depreciation", "/workorders",
+      "/vendors", "/locations", "/audit", "/workflows",
+      "/analytics", "/situation", "/cyber-v12", "/industrial-v13",
+      "/settings"
+    ],
+    "deep_form_routes_not_in_sidebar": [
+      "/assets/new", "/assets/:id/edit",
+      "/inventory/tasks", "/inventory/tasks/:taskId", "/inventory/scan/:taskId", "/inventory/smart-report/:taskId",
+      "/disposals/transfer/new", "/disposals/clearance/new", "/disposals/scrap/new", "/disposals/compensation/new",
+      "/vendors/new", "/vendors/:id/edit", "/vendors/:id",
+      "/locations/new", "/locations/tree", "/locations/:id/edit",
+      "/assets/import-export",
+      "/retirement", "/retirement/new", "/retirement/:id",
+      "/workorders/new", "/workorders/:id/edit", "/workorders/:id",
+      "/categories",
+      "/workflow-designer",
+      "/audit/:id"
+    ],
+    "total_routes_count": 45
+  }
+}

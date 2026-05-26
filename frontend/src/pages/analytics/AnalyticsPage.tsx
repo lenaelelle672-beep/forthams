@@ -101,12 +101,12 @@ export default function AnalyticsPage() {
 
   // ── 数据提取与格式化 ────────────────────────────────────────────────────────
 
-  const stats = (statsRes as ApiResponse<DashboardStats> | undefined)?.data;
-  const summary = (summaryRes as ApiResponse<ReportSummary> | undefined)?.data;
-  const trends = (trendsRes as ApiResponse<AssetValueTrend[]> | undefined)?.data ?? [];
-  const deptData = (deptRes as ApiResponse<DeptAssetDistribution[]> | undefined)?.data ?? [];
-  const categoryData = (categoryRes as ApiResponse<CategoryReport[]> | undefined)?.data ?? [];
-  const maintenanceData = (maintenanceRes as ApiResponse<Record<string, unknown>> | undefined)?.data;
+  const stats = statsRes as unknown as DashboardStats | undefined;
+  const summary = summaryRes as unknown as ReportSummary | undefined;
+  const trends = trendsRes as unknown as AssetValueTrend[] | undefined ?? [];
+  const deptData = deptRes as unknown as DeptAssetDistribution[] | undefined ?? [];
+  const categoryData = categoryRes as unknown as CategoryReport[] | undefined ?? [];
+  const maintenanceData = maintenanceRes as unknown as Record<string, unknown> | undefined;
 
   /** 趋势图数据：将 API 响应映射为图表格式 */
   const trendChartData = trends.length > 0

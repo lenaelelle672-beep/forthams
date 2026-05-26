@@ -148,7 +148,7 @@ export default function RFIDScanPage() {
   });
 
   // ── 派生数据 ────────────────────────────────────────────────────────────────
-  const assets = assetsResponse?.data?.records ?? [];
+  const assets = assetsResponse?.records ?? [];
   const summary = summaryResponse?.data;
   const unconfirmedAssets = assets.filter((a) => !a.confirmed);
 

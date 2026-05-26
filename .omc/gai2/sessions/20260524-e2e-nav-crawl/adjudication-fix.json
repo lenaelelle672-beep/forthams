@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "decision": "use_draft",
+  "selected_source": "draft-fix.json",
+  "builder_instructions": "修复 AssetTransferFormPage.tsx 中 4 处 Select 空选项导致 Radix UI 崩溃。方法：对 fromDept/toDept/fromLocation/toLocation 四个 Controller 添加 deptOptions/locationOptions.length === 0 条件守卫，空时渲染加载占位而非 Select；移除 fromLocation/toLocation 的 field.value ?? '' 转换。",
+  "write_action_guard": [
+    "WA-1: fromDept Select 空选项守卫",
+    "WA-2: toDept Select 空选项守卫",
+    "WA-3: fromLocation Select 空选项守卫 + 移除 ?? ''",
+    "WA-4: toLocation Select 空选项守卫 + 移除 ?? ''"
+  ],
+  "fallback_labels": []
+}

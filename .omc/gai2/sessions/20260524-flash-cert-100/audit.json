@@ -1,0 +1,162 @@
+{
+  "current_state": "认证测试套件（forthams-certification.spec.ts）共 10 个测试，8/10 PASS，CERT-04 和 CERT-09 失败。测试文件头部标注 @deprecated，所有场景已迁移至 forthams-e2e.spec.ts（真 E2E 模式），但遗留 mock 测试仍可运行。EquipmentPage 和 SettingsPage 已使用新版 Design System 重构，数据源和交互方式与测试编写时相比有显著变化。",
+  "existing_patterns": [
+    "Test + Mock API 模式：所有 /api/** 请求被 page.route 拦截，由 mockApi() 处理，响应统一经 fulfill() 包装为 { code, message, data } 结构",
+    "部分 mock 端点（/maintenance/list）使用 route.fulfill() 直接返回裸数据（无 ApiResponse 包装），而资产端点使用 fulfill() 包装器，存在响应结构不一致",
+    "前端 http 拦截器在 response 层自动解包 response.data，但不同 API 函数的泛型类型假设了不同的解包层数（asset.ts 假设 ApiResponse 包装，maintenance.ts 假设 PageResponse 裸数据）",
+    "组件使用 @tanstack/react-query 的 useQuery/useMutation 模式，staleTime=60s，数据通过 queryKey 管理缓存",
+    "SettingsPage 使用 useParams 从 URL 读取 :tab 参数，Tab 切换触发 navigate 导致整页 URL 变更，子组件完整卸载/重挂载"
+  ],
+  "technical_constraints": [
+    "http.ts 响应拦截器统一返回 response.data，这意味着所有 API 函数的泛型类型必须与后端实际响应结构精确对齐，否则运行时字段访问会出错",
+    "SettingsPage 的 Tab 切换通过 URL 路由实现（navigate('/settings/' + tabKey)），每次 Tab 切换都会导致 SettingsPage 整体 re-render，子组件（UsersTab/DepartmentsTab/SystemConfigTab/SecurityTab）完整卸载再挂载，所有 useQuery 重新触发",
+    "PageHeader actions slot 渲染的 Button 带有 aria-hidden 的 SVG 图标，getByRole('button', { name }) 匹配的是 DOM text content，可能与 Playwright 的 accessible name 计算存在偏差",
+    "EquipmentPage 的维保记录表格从 maintenanceService.list() 获取数据，其 PageResponse 接口不包含 ApiResponse 外层包装；而资产列表从 getAssetList() 获取，其 PaginatedResponse 包含 ApiResponse 包装。两者解包路径不同（.records vs .data.records）",
+    "Department 卡片使用 Tailwind group-hover:opacity-100 控制操作按钮显示，Playwright 需要 hover() 后才能交互，且按钮无文字仅 SVG 图标 → accessible name 为空",
+    "Domains of selectors: 部门卡片定位依赖 div[class*=\"space-y-3\"] 和 div[class*=\"group\"] 等 Tailwind class 片段选择器，非常脆弱"
+  ],
+  "risks": [
+    {
+      "level": "high",
+      "detail": "CERT-04: EquipmentPage 重构后数据源从 /equipment/list 改为 /assets?isImportant=1，设备名称从 '数控机床 CNC-05' 变为资产名称（如 '笔记本电脑'），测试断言 page.getByText('数控机床 CNC-05') 只能从维保记录表中间接匹配，任何维保记录加载延迟或组件结构调整都会导致断言超时失败"
+    },
+    {
+      "level": "high",
+      "detail": "CERT-04: 测试选择器 page.getByRole('combobox').first() 在模态框打开后定位第一个 <select>，但模态框含两个同角色元素（设备选择 + 保养类型），虽然 .first() 可解决但任何组件变更（如新增筛选器）会打破选择器假设"
+    },
+    {
+      "level": "medium",
+      "detail": "CERT-09: 用户管理新增后立即点击 '删除' 按钮，但 mutation onSuccess 触发 toast 和 invalidateQueries，若 DOM 更新（列表重渲染）发生在点击 '删除' 之前，按钮引用可能变为 detached"
+    },
+    {
+      "level": "medium",
+      "detail": "CERT-09: 部门管理新增部门后，invalidateQueries 触发的 refetch 与后续 hover/delete 指令存在时序竞争——refetch 未完成时 deptCards 只有 1 张卡片，测试的 lastDeptCard 指向旧卡片（研发部）而非新部门"
+    },
+    {
+      "level": "medium",
+      "detail": "CERT-04: handleSubmit 中 assetId: Number(form.equipmentId) || undefined 对字符串类型 asset ID（如 'AST-001'）会计算出 NaN，导致 createMutation 发送 undefined assetId——虽不影响测试断言但说明 mock asset 的 id 字段为 string 类型与后端预期不符"
+    },
+    {
+      "level": "low",
+      "detail": "Mock /maintenance/list 响应未使用 fulfill() 包装器，而是使用 route.fulfill() 直接返回裸分页数据。如果后端实际返回了 { code, message, data } 包装，则 maintenanceService.list() 的类型与运行时实际值会不一致"
+    },
+    {
+      "level": "low",
+      "detail": "Mock 返回的 maintenance 记录字段名与 MaintenanceRecord 接口不完全匹配：mock 使用 type/technician，组件期望 maintenanceType/executor——虽然在 '—' 兜底下不会崩溃但字段值为空"
+    }
+  ],
+  "test_surface": [
+    "forthams-certification.spec.ts (CERT-04 第124-142行，CERT-09 第235-282行)",
+    "EquipmentPage.tsx (asset 查询 + maintenance 查询 + 模态框表单)",
+    "SettingsPage.tsx (UsersTab + DepartmentsTab + SystemConfigTab + SecurityTab)",
+    "api/asset.ts → getAssetList (GET /assets)",
+    "api/base.ts → getDeptTree (GET /depts/tree), createDept (POST /depts), deleteDept (DELETE /depts/:id)",
+    "api/maintenance.ts → maintenanceService.list (GET /maintenance/list), maintenanceService.getUpcoming (GET /maintenance/upcoming)",
+    "api/systemConfig.ts → getSystemConfig, saveSystemConfig, getSecurityConfig, saveSecurityConfig",
+    "utils/http.ts → 响应拦截器 response.data 解包行为"
+  ],
+  "findings_CERT04": {
+    "root_cause_analysis": [
+      {
+        "aspect": "数据源变更",
+        "diagnosis": "EquipmentPage 已重构为从 /assets?isImportant=1 获取设备数据（非旧版 /equipment/list），mock 资产 ID 为字符串 ('AST-001')，名称不包含测试期望的'数控机床 CNC-05'。该文本仅从维保记录表（/maintenance/list 返回的 state.maintenance[0].equipmentName）出现。测试第129行 getByText('数控机床 CNC-05') 依赖于维保记录表加载完成，若维保记录查询延迟则该断言超时失败。",
+        "severity": "high",
+        "confidence": "high"
+      },
+      {
+        "aspect": "combobox 选择器二义性",
+        "diagnosis": "模态框内含两个 <select>（设备选择 + 保养类型），测试用 getByRole('combobox').first() 定位第一个。Playwright 严格模式下虽然 .first() 可消歧义，但任何新增 <select> 元素都会改变选择器行为。",
+        "severity": "medium",
+        "confidence": "high"
+      },
+      {
+        "aspect": "表单校验阻塞",
+        "diagnosis": "测试仅通过 selectOption 设置了 equipmentId，未设置 date/technician/content 必填字段。handleSubmit 校验失败后 setFormError 显示错误信息，不会触发 createMutation。测试第135行单击'保存记录'仅触发前端校验，第137行断言模态框可见性——这些都是预期行为。第140行二次单击'保存记录'同样只触发校验（不会关闭模态框），测试未断言保存成功。",
+        "severity": "low",
+        "confidence": "high"
+      },
+      {
+        "aspect": "assetId 类型不匹配",
+        "diagnosis": "form.equipmentId 为字符串 'AST-001'，handleSubmit 中 Number('AST-001') 结果为 NaN，最终发送 assetId: undefined。mock 资产 id 字段为 string 类型，但后端预期的 Asset 主键为 number（Long）。组件类型 AssetListItem 的 id 应为 number，但 mock 赋予 string 值。",
+        "severity": "medium",
+        "confidence": "high"
+      },
+      {
+        "aspect": "维保记录字段名不匹配",
+        "diagnosis": "Mock state.maintenance 使用 type/technician，但组件代码访问 r.maintenanceType/r.executor。MaintenanceRecord 接口定义字段为 maintenanceType 和 executor。Mock 数据与接口类型约定不一致。",
+        "severity": "low",
+        "confidence": "high"
+      }
+    ],
+    "likely_failure_line": "第129行: await expect(page.getByText('数控机床 CNC-05').first()).toBeVisible() — 若维保记录表未及时渲染，或第130行定位 span 的百分比文本。也可能是第134行 selectOption 在 strict mode 下失败（2个 combobox 导致 getByRole 二义性）。"
+  },
+  "findings_CERT09": {
+    "root_cause_analysis": [
+      {
+        "aspect": "Tab 切换导致组件完整卸载重挂",
+        "diagnosis": "SettingsPage 的 Tab 切换通过 navigate('/settings/' + key) 改变 URL 路径实现，每次切换导致 SettingsPage 整体 re-render，所有子组件（UsersTab/DepartmentsTab/SystemConfigTab/SecurityTab）无条件卸载再挂载。测试流程依次通过'系统配置→用户管理→部门管理→安全设置'4次切换，每次触发 useQuery 重新获取数据。若任一查询因 mock 时序导致数据未就绪就执行后续操作，可能失败。",
+        "severity": "high",
+        "confidence": "high"
+      },
+      {
+        "aspect": "部门创建后 refetch 时序竞争",
+        "diagnosis": "POST /depts 成功后 onSuccess 调用 invalidateQueries 触发 getDeptTree() 重新获取。在 refetch 尚未完成时，组件仍渲染旧数据（1个部门），测试立即定位 deptCards.last() 指向的是旧部门卡片（研发部）而非新创建的。后续 hover/delete 操作作用于错误卡片但测试仅验证 DELETE 请求发送，不验证被删部门 ID，所以不会触发断言失败——但若 refetch 长期未完成则 deptCards 仅 1 张，操作可执行但语义错误。",
+        "severity": "medium",
+        "confidence": "medium"
+      },
+      {
+        "aspect": "部门卡片选择器脆弱性",
+        "diagnosis": "测试使用 page.locator('div[class*=\"space-y-3\"]').last() 定位部门列表容器。该 CSS class 片段选择器依赖 Tailwind utility class 的稳定存在。若组件样式重构（如改用 gap-y-3 替代 space-y-3），该选择器即失效。同样，部门卡片定位依赖 div[class*=\"group\"]，该 class 可能在其他组件中出现。",
+        "severity": "high",
+        "confidence": "high"
+      },
+      {
+        "aspect": "hover 后操作按钮可见性",
+        "diagnosis": "部门卡片的编辑/删除按钮使用 group-hover:opacity-100 控制可见性，测试在 hover 后使用 lastDeptCard.getByRole('button').nth(1) 定位删除按钮。这些按钮仅有 SVG 图标无文字，accessible name 为空字符串，getByRole('button') 可通过 role 匹配但不能通过 name 筛选。CSS transition 的 300ms 延时可能导致按钮未完全可见时就被点击。",
+        "severity": "medium",
+        "confidence": "high"
+      },
+      {
+        "aspect": "mock depts 数据结构与组件期望不一致",
+        "diagnosis": "getDeptTree() 期望返回树形结构（Department[] 含 children），但 mock state.depts 为扁平数组 [{ id: 1, name: '研发部' }]。DepartmentsTab 的 flattenDepts 函数能处理扁平数组（无 children 则直接返回），但这屏蔽了树形结构的场景覆盖。若后端实际返回树结构且嵌套层级 > 1，flattenDepts 行为正确，但 mock 未覆盖该场景。",
+        "severity": "low",
+        "confidence": "high"
+      }
+    ],
+    "likely_failure_line": "第259行点击'部门管理'Tab 后——若 Tab 切换导致旧组件卸载与新组件挂载之间的 race，或第260-261行新增部门后 invalidateQueries 时序问题导致部门列表未刷新。也可能是第266-272行的部门卡片 hover+delete 操作因 group-hover CSS transition 可见性问题失败。"
+  },
+  "mock_coverage": {
+    "CERT04_required_endpoints": {
+      "GET /assets?isImportant=1&pageSize=200": "COVERED (第443行, 但不按 isImportant 过滤, 返回全部 assets)",
+      "GET /maintenance/list?page=1&pageSize=50": "COVERED (第463行, 使用 route.fulfill 裸返回, 无 ApiResponse 包装)",
+      "GET /maintenance/upcoming?days=30": "COVERED (第467行)"
+    },
+    "CERT09_required_endpoints": {
+      "GET /user-management?page=1&pageSize=100": "COVERED (第548行)",
+      "POST /user-management": "COVERED (第543行)",
+      "DELETE /user-management/:id": "COVERED (第538行, 正则匹配)",
+      "GET /depts/tree": "COVERED (第559行, 但返回扁平数组而非树形结构)",
+      "POST /depts": "COVERED (第563行)",
+      "DELETE /depts/:id": "COVERED (第568行, 正则匹配)",
+      "PUT /system-config/system": "COVERED (第587行, 返回 null data)",
+      "GET /system-config/system": "COVERED (第586行)",
+      "PUT /system-config/security": "COVERED (第591行, 返回 null data)",
+      "GET /system-config/security": "COVERED (第590行)"
+    },
+    "response_format_inconsistency": [
+      "大多数 mock 端点使用 fulfill() 包装器返回 { code, message, data } 结构",
+      "但 /maintenance/list (第463-466行) 使用 route.fulfill() 直接返回裸分页数据 { records, total, ... }",
+      "这种差异与前端 API 函数的类型声明一致（asset.ts → PaginatedResponse=ApiResponse<PageData>，maintenance.ts → PageResponse=裸数据），但新加入的开发者容易混淆"
+    ],
+    "unmatched_routes": [],
+    "notes": "所有 CERT-04 和 CERT-09 涉及的 API 端点均被 mock 覆盖，无 404 风险。主要问题不在覆盖完整性，而在数据形状（字段名、包装层级）和响应时序方面。"
+  },
+  "builder_notes": [
+    "CERT-04 失败最可能原因：第129行 getByText('数控机床 CNC-05') 超时，或第134行 selectOption strict mode 违规。建议验证时在测试中加 page.on('pageerror') 捕获控制台错误以确认准确失败行",
+    "CERT-09 最脆弱环节：Tab 切换后的 refetch 时序 + 部门卡片 CSS class 选择器 + group-hover 交互。建议用 Playwright Trace Viewer 查看失败时的 DOM 状态",
+    "Mock /maintenance/list 的返回格式与其他端点不一致（无 ApiResponse 包装），如果这是设计意图（后端 maintenance 端点确实返回裸 PageResponse）则 OK；如果不是，mock 需要改为 fulfill(route, paged(state.maintenance))",
+    "Mock 资产 id 字段使用字符串类型 ('AST-001')，但 AssetListItem.id 类型为 number（Long）。后端实际返回 number，mock 与后端的类型约定应保持一致",
+    "部门管理测试的 delete 操作不验证被删除部门的具体 ID，只验证 DELETE 请求被发出。建议增加验证点以捕获潜在语义错误",
+    "因测试已标注 @deprecated 且迁移至 E2E 模式，修复建议优先级为：确认迁移后 E2E 测试覆盖了这些场景 > 修复遗漏的 mock 数据问题 > 调整 mock 测试断言"
+  ]
+}

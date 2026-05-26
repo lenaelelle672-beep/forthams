@@ -39,7 +39,7 @@ class AuthControllerTest {
     @Test
     @DisplayName("Should login and return token")
     void loginReturnsToken() throws Exception {
-        AuthResponse mockResponse = new AuthResponse("test-token", 1L, "admin", "管理员");
+        AuthResponse mockResponse = new AuthResponse("test-token", 1L, "admin", "管理员", null);
         when(authService.login(any(LoginRequest.class))).thenReturn(mockResponse);
 
         mockMvc.perform(post("/api/auth/login")
@@ -59,7 +59,7 @@ class AuthControllerTest {
     @Test
     @DisplayName("Should register and return token")
     void registerReturnsToken() throws Exception {
-        AuthResponse mockResponse = new AuthResponse("reg-token", 2L, "newuser", "新用户");
+        AuthResponse mockResponse = new AuthResponse("reg-token", 2L, "newuser", "新用户", null);
         when(authService.register(any(RegisterRequest.class))).thenReturn(mockResponse);
 
         mockMvc.perform(post("/api/auth/register")

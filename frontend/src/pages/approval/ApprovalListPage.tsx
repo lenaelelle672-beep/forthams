@@ -10,20 +10,23 @@ import {
   ChevronLeft,
   ChevronRight,
   Loader2,
+  Plus,
+  GitBranch,
 } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { PageHeader } from '@/components/ui/PageHeader';
 import {
   getApprovalList,
-  getPendingApprovals,
+  getApprovalDetail,
   getPendingCount,
   approveItem,
   rejectItem,
-  getApprovalDetail,
+  getProcessStats,
+  type ProcessTypeStat,
 } from '@/api/approval';
 import type { ApprovalItem } from '@/api/approval';
-import type { ApiResponse, PaginatedResponse } from '@/types/common';
+import type { PageData } from '@/types/common';
 import {
   Dialog,
   DialogContent,
@@ -31,6 +34,11 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/Dialog';
+import { workflowApi } from '@/api/workflow';
+import type { WorkflowDefinitionDTO } from '@/api/workflow';
+import { isCustomBusinessType } from '@/constants/workflowBusiness';
+import { getUserList } from '@/api/base';
+import ApprovalFlowTracker, { type FlowStep } from '@/components/ApprovalFlowTracker';
 
 type ApprovalTab = 'pending' | 'submitted' | 'completed';
 
@@ -70,6 +78,21 @@ export default function ApprovalListPage() {
   const [rejectDialogId, setRejectDialogId] = useState<number | null>(null);
   const [rejectDialogVersion, setRejectDialogVersion] = useState<number>(0);
   const [rejectReason, setRejectReason] = useState('');
+  const [launchOpen, setLaunchOpen] = useState(false);
+
+  // ── ENABLED 自定义流程列表（发起申请用）──
+  const { data: allWorkflows, isError: workflowsError, isLoading: workflowsLoading } = useQuery({
+    queryKey: ['workflows', 'list', 'launch'],
+    queryFn: () => workflowApi.list(),
+    enabled: launchOpen,
+    staleTime: 30_000,
+  });
+  const launchableFlows: WorkflowDefinitionDTO[] = Array.isArray(allWorkflows)
+    ? (allWorkflows as WorkflowDefinitionDTO[]).filter(
+        w => isCustomBusinessType(w.businessType) &&
+             (w.status === 'ENABLED' || w.status === 'PUBLISHED')
+      )
+    : [];
 
   // Derive the status query param from activeTab + filterStatus
   const queryStatus = activeTab === 'pending' ? 'PENDING' : activeTab === 'completed' ? 'APPROVED' : filterStatus !== 'all' ? filterStatus.toUpperCase() : undefined;
@@ -80,7 +103,7 @@ export default function ApprovalListPage() {
     queryFn: () => getPendingCount(),
     staleTime: 1000 * 30,
   });
-  const pendingCount = (pendingCountRes as ApiResponse<number> | undefined)?.data ?? 0;
+  const pendingCount = (pendingCountRes as number | undefined) ?? 0;
 
   // ── Approved count for summary cards ──
   const { data: approvedCountRes } = useQuery({
@@ -88,7 +111,7 @@ export default function ApprovalListPage() {
     queryFn: () => getApprovalList({ status: 'APPROVED', page: 1, pageSize: 1 }),
     staleTime: 1000 * 60,
   });
-  const approvedCount = (approvedCountRes as PaginatedResponse<ApprovalItem> | undefined)?.data?.total ?? 0;
+  const approvedCount = approvedCountRes?.total ?? 0;
 
   // ── Rejected count for summary cards ──
   const { data: rejectedCountRes } = useQuery({
@@ -96,15 +119,17 @@ export default function ApprovalListPage() {
     queryFn: () => getApprovalList({ status: 'REJECTED', page: 1, pageSize: 1 }),
     staleTime: 1000 * 60,
   });
-  const rejectedCount = (rejectedCountRes as PaginatedResponse<ApprovalItem> | undefined)?.data?.total ?? 0;
+  const rejectedCount = rejectedCountRes?.total ?? 0;
 
   // ── Approval list ──
   const statusParam = filterStatus !== 'all' ? filterStatus.toUpperCase() : queryStatus;
+  const isMineTab = activeTab === 'submitted';
   const { data, isLoading } = useQuery({
     queryKey: ['approvals', activeTab, filterType, statusParam, page, startDate, endDate],
     queryFn: () =>
       getApprovalList({
-        status: statusParam,
+        status: isMineTab ? undefined : statusParam,
+        mine: isMineTab ? true : undefined,
         page,
         pageSize: PAGE_SIZE,
         startDate: startDate || undefined,
@@ -114,8 +139,8 @@ export default function ApprovalListPage() {
     placeholderData: (p) => p,
   });
 
-  const records: ApprovalItem[] = (data as PaginatedResponse<ApprovalItem> | undefined)?.data?.records ?? [];
-  const total: number = (data as PaginatedResponse<ApprovalItem> | undefined)?.data?.total ?? 0;
+  const records: ApprovalItem[] = data?.records ?? [];
+  const total: number = data?.total ?? 0;
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   // ── Approve mutation ──
@@ -146,7 +171,46 @@ export default function ApprovalListPage() {
     queryFn: () => getApprovalDetail(detailId!),
     enabled: detailId !== null,
   });
-  const detail: ApprovalItem | null = (detailRes as ApiResponse<ApprovalItem> | undefined)?.data ?? null;
+  // 后端返回 { process: ApprovalProcess, records: [...] }
+  const detailContainer = detailRes as { process?: ApprovalItem; records?: Record<string, unknown>[]; workflowRuntimePath?: Record<string, unknown>[] } | null | undefined;
+  const detail: ApprovalItem | null = detailContainer?.process ?? null;
+  const detailRecords: Record<string, unknown>[] = detailContainer?.records ?? [];
+  const workflowPath: Record<string, unknown>[] = detailContainer?.workflowRuntimePath ?? [];
+
+  // ── User name map for flow tracker ──
+  const { data: userNameMapRes } = useQuery({
+    queryKey: ['users', 'name-map'],
+    queryFn: async () => {
+      const r = await getUserList({ page: 1, pageSize: 200 });
+      const records = (r as { records?: { id: number; realName?: string; username?: string }[] }).records ?? [];
+      return new Map<number, string>(records.map(u => [u.id, u.realName || u.username || `用户${u.id}`]));
+    },
+    staleTime: 60000,
+  });
+
+  // ── Flow steps for visualization ──
+  const flowSteps: FlowStep[] = (workflowPath as Array<Record<string, unknown>>).map((node: Record<string, unknown>, _i: number) => {
+    const stepNo = typeof node.stepNo === 'number' ? node.stepNo : Number(node.stepNo ?? 1);
+    const match = (detailRecords as Array<Record<string, unknown>>).find((r: Record<string, unknown>) => r.stepNo === stepNo);
+    const approverId = match?.approverId as number | undefined;
+    return {
+      stepNo,
+      nodeId: String(node.nodeId ?? node.nodeCode ?? ''),
+      nodeCode: String(node.nodeCode ?? ''),
+      label: String(node.label ?? ''),
+      approverType: String(node.approverType ?? ''),
+      approverRole: String(node.approverRole ?? ''),
+      approverRoleName: String(node.approverRoleName ?? ''),
+      approvalMode: String(node.approvalMode ?? 'sequence'),
+      record: match ? {
+        approverId: approverId ?? 0,
+        approverName: approverId != null ? (userNameMapRes?.get(approverId) ?? `用户${approverId}`) : undefined,
+        result: String(match.approveResult ?? ''),
+        opinion: String(match.approveOpinion ?? ''),
+        time: String(match.approveTime ?? ''),
+      } : undefined,
+    };
+  });
 
   const handleTabChange = (tab: ApprovalTab) => {
     setActiveTab(tab);
@@ -163,6 +227,20 @@ export default function ApprovalListPage() {
     { label: '已驳回', value: rejectedCount, icon: XCircle, bg: 'bg-[#ffdad6]/50', color: 'text-[#ba1a1a]' },
   ];
 
+  // ── Workflow process type stats ──
+  const { data: processStats } = useQuery({
+    queryKey: ['approvals', 'stats'],
+    queryFn: () => getProcessStats(),
+    staleTime: 60000,
+  });
+  const stats: ProcessTypeStat[] = (processStats as ProcessTypeStat[] | undefined) ?? [];
+
+  const STAT_LABELS: Record<string, string> = {
+    ASSET_TRANSFER: '资产调拨', ASSET_CLEARANCE: '资产清退',
+    ASSET_SCRAP: '资产报废', ASSET_COMPENSATION: '资产赔偿',
+    WORK_ORDER: '工单', RETIREMENT: '退役',
+  };
+
   const getStatusInfo = (status: string) =>
     STATUS_MAP[status] ?? { label: status, bg: 'bg-[#f1f3ff]', color: 'text-[#64748b]' };
 
@@ -178,6 +256,16 @@ export default function ApprovalListPage() {
         <PageHeader
           title="审批中心"
           breadcrumbs={[{ label: '仪表板', href: '/dashboard' }, { label: '审批中心' }]}
+          actions={
+            <button
+              type="button"
+              onClick={() => setLaunchOpen(true)}
+              className="inline-flex items-center gap-2 bg-[#004191] text-white px-4 py-2 rounded text-sm font-semibold hover:opacity-90 transition-opacity"
+            >
+              <Plus className="w-4 h-4" />
+              发起申请
+            </button>
+          }
         />
 
         <div className="flex border-b border-[#e5e7eb] gap-8">
@@ -214,6 +302,35 @@ export default function ApprovalListPage() {
           </Card>
         ))}
       </div>
+
+      {/* Workflow statistics */}
+      {stats.length > 0 && (
+        <div className="mt-2 mb-6">
+          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">流程类型统计</p>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+            {stats.map((s) => {
+              const label = STAT_LABELS[s.processType] || s.processType;
+              const approveRate = s.total > 0 ? Math.round((s.approved / s.total) * 100) : 0;
+              return (
+                <div key={s.processType} className="bg-white border border-gray-200 rounded-lg p-3 text-center">
+                  <p className="text-[11px] font-medium text-gray-500 mb-1 truncate">{label}</p>
+                  <p className="text-lg font-bold text-gray-800">{s.total}</p>
+                  <div className="flex justify-center gap-2 mt-1 text-[10px]">
+                    <span className="text-green-600">{s.approved}通过</span>
+                    <span className="text-red-500">{s.rejected}驳回</span>
+                    {s.pending > 0 && <span className="text-blue-500">{s.pending}待审</span>}
+                  </div>
+                  {s.total > 0 && (
+                    <div className="mt-2 h-1 bg-gray-100 rounded-full overflow-hidden">
+                      <div className="h-full bg-green-500 rounded-full" style={{ width: `${approveRate}%` }} />
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Filters */}
       <div className="bg-[#f1f3ff] p-4 rounded mb-3 flex flex-wrap items-center gap-4 border border-[#e5e7eb]/50">
@@ -314,52 +431,56 @@ export default function ApprovalListPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#e5e7eb]">
-                {records.map((row) => {
-                  const statusInfo = getStatusInfo(row.status);
-                  const typeInfo = getTypeInfo(row.businessType ?? row.status);
-                  const approvable = canApproveRow(row);
-                  return (
-                    <tr key={row.id} className="hover:bg-[#f8fafc] transition-colors">
-                      <td className="px-6 py-4 text-sm text-[#004191] font-bold">{row.id}</td>
-                      <td className="px-6 py-4 text-sm">{row.title}</td>
-                      <td className="px-6 py-4">
-                        <span className={`${typeInfo.color} border px-3 py-1 rounded-full text-xs font-medium`}>
-                          {typeInfo.label}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-2">
-                          <div className="w-6 h-6 rounded-full bg-[#d4e0f9] flex items-center justify-center text-[10px] font-bold text-[#004191]">
-                            {(row.applicantName ?? '-').charAt(0)}
-                          </div>
-                          <span className="text-sm">{row.applicantName ?? '-'}</span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 text-xs text-[#424753]">{row.createdAt ?? row.submittedAt ?? '-'}</td>
-                      <td className="px-6 py-4">
-                        <span className={`${statusInfo.bg} ${statusInfo.color} border border-current/10 px-3 py-1 rounded-full text-xs font-medium`}>
-                          {statusInfo.label}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-4">
-                          {approvable && (
-                            <>
-                              <button
-                                className="text-[#16a34a] hover:underline text-sm font-semibold disabled:opacity-50"
-                                disabled={approveMutation.isPending}
-                                onClick={() => approveMutation.mutate({ id: row.id, version: row.version })}
-                              >
-                                {approveMutation.isPending ? '处理中...' : '通过'}
-                              </button>
-                              <button
-                                className="text-[#ba1a1a] hover:underline text-sm font-semibold"
-                                onClick={() => { setRejectDialogId(row.id); setRejectReason(''); setRejectDialogVersion(row.version); }}
-                              >
-                                驳回
-                              </button>
-                            </>
-                          )}
+                 {records.map((row) => {
+                   const statusInfo = getStatusInfo(row.status);
+                   const typeInfo = getTypeInfo(row.processType ?? row.businessType ?? '');
+                   const approvable = canApproveRow(row);
+                   const displayTime = row.createTime ?? row.applyTime ?? row.createdAt ?? row.submittedAt ?? '-';
+                   const displayId = row.processNo ?? String(row.id);
+                   const displayTitle = row.title ?? row.processType ?? '-';
+                   const displayApplicant = row.applicantName ?? (row.applicantId ? `用户${row.applicantId}` : '-');
+                   return (
+                     <tr key={row.id} className="hover:bg-[#f8fafc] transition-colors">
+                       <td className="px-6 py-4 text-sm text-[#004191] font-bold">{displayId}</td>
+                       <td className="px-6 py-4 text-sm">{displayTitle}</td>
+                       <td className="px-6 py-4">
+                         <span className={`${typeInfo.color} border px-3 py-1 rounded-full text-xs font-medium`}>
+                           {typeInfo.label}
+                         </span>
+                       </td>
+                       <td className="px-6 py-4">
+                         <div className="flex items-center gap-2">
+                           <div className="w-6 h-6 rounded-full bg-[#d4e0f9] flex items-center justify-center text-[10px] font-bold text-[#004191]">
+                             {displayApplicant.charAt(0)}
+                           </div>
+                           <span className="text-sm">{displayApplicant}</span>
+                         </div>
+                       </td>
+                       <td className="px-6 py-4 text-xs text-[#424753]">{displayTime}</td>
+                       <td className="px-6 py-4">
+                         <span className={`${statusInfo.bg} ${statusInfo.color} border border-current/10 px-3 py-1 rounded-full text-xs font-medium`}>
+                           {statusInfo.label}
+                         </span>
+                       </td>
+                       <td className="px-6 py-4">
+                         <div className="flex items-center gap-4">
+                           {approvable && (
+                             <>
+                               <button
+                                 className="text-[#16a34a] hover:underline text-sm font-semibold disabled:opacity-50"
+                                 disabled={approveMutation.isPending}
+                                 onClick={() => approveMutation.mutate({ id: row.id, version: row.version })}
+                               >
+                                 {approveMutation.isPending ? '处理中...' : '通过'}
+                               </button>
+                               <button
+                                 className="text-[#ba1a1a] hover:underline text-sm font-semibold"
+                                 onClick={() => { setRejectDialogId(row.id); setRejectReason(''); setRejectDialogVersion(row.version ?? 0); }}
+                               >
+                                 驳回
+                               </button>
+                             </>
+                           )}
                           <button
                             className="text-[#424753] hover:text-[#161c27] transition-colors text-sm font-semibold"
                             onClick={() => setDetailId(row.id)}
@@ -423,6 +544,57 @@ export default function ApprovalListPage() {
         </div>
       </Card>
 
+      {/* ── Launch dialog ── */}
+      <Dialog open={launchOpen} onOpenChange={setLaunchOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>发起申请</DialogTitle>
+          </DialogHeader>
+          <div className="px-6 py-4">
+            {workflowsLoading ? (
+              <div className="flex items-center justify-center py-8 gap-2 text-sm text-[#64748b]">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                加载中...
+              </div>
+            ) : workflowsError ? (
+              <div className="text-center py-8 text-sm text-red-500">
+                加载流程列表失败，请关闭后重试
+              </div>
+            ) : launchableFlows.length === 0 ? (
+              <div className="text-center py-8 text-sm text-[#64748b]">
+                <GitBranch className="w-8 h-8 mx-auto mb-3 text-gray-300" />
+                <p>暂无可发起的自定义流程</p>
+                <p className="text-xs mt-1 text-gray-400">请在工作流中心发布自定义流程后再来发起</p>
+              </div>
+            ) : (
+              <ul className="space-y-2">
+                {launchableFlows.map(flow => (
+                  <li key={flow.businessType}>
+                    <button
+                      type="button"
+                      onClick={() => { setLaunchOpen(false); navigate(`/workflow-form/${flow.businessType}`); }}
+                      className="w-full flex items-center gap-4 px-4 py-3 rounded-lg border border-[#e5e7eb] hover:border-[#004191] hover:bg-[#f0f5ff] transition-all text-left group"
+                    >
+                      <div className="w-9 h-9 rounded-lg bg-[#004191]/10 flex items-center justify-center flex-shrink-0">
+                        <GitBranch className="w-4 h-4 text-[#004191]" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-[#0f172a] group-hover:text-[#004191] truncate">{flow.name}</p>
+                        {flow.description && <p className="text-xs text-[#64748b] truncate mt-0.5">{flow.description}</p>}
+                      </div>
+                      <span className="text-xs text-[#004191] font-medium flex-shrink-0">发起 →</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setLaunchOpen(false)}>关闭</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* ── Reject dialog ── */}
       <Dialog open={rejectDialogId !== null} onOpenChange={(open) => { if (!open) setRejectDialogId(null); }}>
         <DialogContent>
@@ -459,7 +631,7 @@ export default function ApprovalListPage() {
 
       {/* ── Detail dialog ── */}
       <Dialog open={detailId !== null} onOpenChange={(open) => { if (!open) setDetailId(null); }}>
-        <DialogContent>
+        <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle>审批详情</DialogTitle>
           </DialogHeader>
@@ -468,42 +640,35 @@ export default function ApprovalListPage() {
               <Loader2 className="w-5 h-5 animate-spin text-[#004191]" />
             </div>
           ) : detail ? (
-            <div className="px-6 py-4 space-y-4 text-sm">
-              <div className="grid grid-cols-2 gap-4">
+            <div className="px-6 py-4 space-y-5 text-sm">
+              {/* 基本信息 */}
+              <div className="grid grid-cols-2 gap-3 pb-4 border-b border-gray-100">
                 <div>
-                  <p className="text-[10px] font-semibold tracking-wide text-[#64748b] mb-1">编号</p>
-                  <p className="font-semibold text-[#0f172a]">{detail.id}</p>
+                  <p className="text-[10px] font-semibold tracking-wide text-[#64748b] mb-0.5">流程编号</p>
+                  <p className="font-semibold text-[#0f172a] text-xs">{detail.processNo ?? detail.id}</p>
                 </div>
                 <div>
-                  <p className="text-[10px] font-semibold tracking-wide text-[#64748b] mb-1">标题</p>
-                  <p className="font-semibold text-[#0f172a]">{detail.title}</p>
+                  <p className="text-[10px] font-semibold tracking-wide text-[#64748b] mb-0.5">流程类型</p>
+                  <p className="font-semibold text-[#0f172a] text-xs">{detail.processType ?? detail.businessType ?? '-'}</p>
                 </div>
                 <div>
-                  <p className="text-[10px] font-semibold tracking-wide text-[#64748b] mb-1">发起人</p>
-                  <p className="font-semibold text-[#0f172a]">{detail.applicantName ?? '-'}</p>
+                  <p className="text-[10px] font-semibold tracking-wide text-[#64748b] mb-0.5">发起人</p>
+                  <p className="font-semibold text-[#0f172a] text-xs">{detail.applicantName ?? (detail.applicantId ? `用户${detail.applicantId}` : '-')}</p>
                 </div>
                 <div>
-                  <p className="text-[10px] font-semibold tracking-wide text-[#64748b] mb-1">部门</p>
-                  <p className="font-semibold text-[#0f172a]">{detail.deptName ?? '-'}</p>
+                  <p className="text-[10px] font-semibold tracking-wide text-[#64748b] mb-0.5">发起时间</p>
+                  <p className="font-semibold text-[#0f172a] text-xs">{detail.createTime ?? detail.applyTime ?? '-'}</p>
                 </div>
-                <div>
-                  <p className="text-[10px] font-semibold tracking-wide text-[#64748b] mb-1">状态</p>
-                  <span className={`${getStatusInfo(detail.status).bg} ${getStatusInfo(detail.status).color} border border-current/10 px-3 py-1 rounded-full text-xs font-medium`}>
-                    {getStatusInfo(detail.status).label}
-                  </span>
-                </div>
-                <div>
-                  <p className="text-[10px] font-semibold tracking-wide text-[#64748b] mb-1">提交时间</p>
-                  <p className="font-semibold text-[#0f172a]">{detail.submittedAt ?? detail.createdAt ?? '-'}</p>
-                </div>
-                <div>
-                  <p className="text-[10px] font-semibold tracking-wide text-[#64748b] mb-1">业务类型</p>
-                  <p className="font-semibold text-[#0f172a]">{detail.businessType ?? '-'}</p>
-                </div>
-                <div>
-                  <p className="text-[10px] font-semibold tracking-wide text-[#64748b] mb-1">业务ID</p>
-                  <p className="font-semibold text-[#0f172a]">{detail.businessId ?? '-'}</p>
-                </div>
+              </div>
+
+              {/* 流转图 */}
+              <div>
+                <p className="text-[10px] font-semibold tracking-wide text-[#64748b] mb-3">审批流转</p>
+                <ApprovalFlowTracker
+                  currentStep={detail.currentStep ?? 1}
+                  status={detail.status}
+                  steps={flowSteps}
+                />
               </div>
             </div>
           ) : (

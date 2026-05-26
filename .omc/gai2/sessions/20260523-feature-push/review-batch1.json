@@ -1,0 +1,200 @@
+{
+  "directive_summary": "批次1：forthAMS 后端 DTO Bean Validation 校验补全 + Controller @Valid",
+  "overall_verdict": "FAIL",
+  "reviewed_at": "2026-05-23T15:45:00+08:00",
+  "reviewer": "gai2-reviewer",
+  "affected_files": [
+    "backend/src/main/java/com/ams/dto/WorkOrderDTO.java",
+    "backend/src/main/java/com/ams/controller/WorkOrderController.java",
+    "backend/src/main/java/com/ams/controller/RetirementController.java",
+    "backend/src/main/java/com/ams/controller/MaintenanceController.java",
+    "backend/src/main/java/com/ams/controller/InventoryController.java",
+    "backend/src/main/java/com/ams/controller/UserManagementController.java",
+    "backend/src/main/java/com/ams/controller/ApprovalController.java",
+    "backend/src/main/java/com/ams/controller/CompensationController.java",
+    "backend/src/main/java/com/ams/validation/Create.java",
+    "backend/src/main/java/com/ams/validation/Update.java"
+  ],
+  "evidence_collection_method": "通过 rg (ripgrep) 全量搜索 + git show HEAD 对比 + bash cat 直接读取文件内容确认。read 工具返回了缓存过时内容，已通过 bash 工具交叉验证。",
+  "checks": [
+    {
+      "item": "WorkOrderDTO.java — 引入 com.ams.validation.Create group 接口",
+      "result": "FAIL",
+      "evidence": [
+        "rg '@NotBlank|@NotNull|@Size|groups' backend/src/main/java/com/ams/dto/WorkOrderDTO.java 返回空结果",
+        "文件头部无 'import com.ams.validation.Create;'",
+        "title 和 priority 字段无任何 Bean Validation 注解",
+        "WorkOrderDTO 完全没有校验注解（既无 @NotBlank 也无 @Size）"
+      ]
+    },
+    {
+      "item": "WorkOrderDTO.java — title 和 priority 的 @NotBlank 标注 groups = Create.class",
+      "result": "FAIL",
+      "evidence": [
+        "title 字段（L18）：private String title; — 无任何注解",
+        "priority 字段（L22）：private String priority; — 无任何注解",
+        "整个 WorkOrderDTO 无任何 jakarta.validation import"
+      ]
+    },
+    {
+      "item": "WorkOrderDTO.java — @Size 注解不加 groups（Default 组）",
+      "result": "FAIL",
+      "evidence": [
+        "WorkOrderDTO 中不存在任何 @Size 注解",
+        "rg 搜索确认 DTO 中无校验注解"
+      ]
+    },
+    {
+      "item": "WorkOrderController.java — createWorkOrder 使用 @Validated(Create.class)",
+      "result": "FAIL",
+      "evidence": [
+        "实际签名：public Result<WorkOrder> createWorkOrder(@RequestBody WorkOrderDTO dto)",
+        "无 @Validated 注解，无 import org.springframework.validation.annotation.Validated",
+        "无 import com.ams.validation.Create"
+      ]
+    },
+    {
+      "item": "WorkOrderController.java — updateWorkOrder 使用 @Validated（Default 组）",
+      "result": "FAIL",
+      "evidence": [
+        "实际签名：public Result<WorkOrder> updateWorkOrder(@PathVariable Long id, @RequestBody WorkOrderDTO dto)",
+        "无 @Validated 注解",
+        "Controller 无任何 validation 相关 import"
+      ]
+    },
+    {
+      "item": "RetirementController.java — submitApplication/createApplication/createDraftApplication 三个端点都有 @Valid",
+      "result": "FAIL",
+      "evidence": [
+        "submitApplication：public Result<RetirementApplication> submitApplication(@RequestBody RetirementApplyDTO dto, ...) — 无 @Valid",
+        "createApplication：public Result<RetirementApplication> createApplication(@RequestBody RetirementApplyDTO dto, ...) — 无 @Valid",
+        "createDraftApplication：public Result<RetirementApplication> createDraftApplication(@RequestBody RetirementApplyDTO dto, ...) — 无 @Valid",
+        "Controller 无 import jakarta.validation.Valid"
+      ]
+    },
+    {
+      "item": "MaintenanceController.java — create 方法有 @Valid",
+      "result": "FAIL",
+      "evidence": [
+        "实际签名：public Result<MaintenanceRecord> create(@RequestBody MaintenanceCreateDTO dto)",
+        "无 @Valid 注解",
+        "Controller 无 import jakarta.validation.Valid"
+      ]
+    },
+    {
+      "item": "InventoryController.java — create 方法有 @Valid",
+      "result": "FAIL",
+      "evidence": [
+        "实际签名：public Result<InventoryTask> create(@RequestBody InventoryTaskCreateDTO dto)",
+        "无 @Valid 注解",
+        "Controller 无 import jakarta.validation.Valid"
+      ]
+    },
+    {
+      "item": "UserManagementController.java — create 方法有 @Valid",
+      "result": "FAIL",
+      "evidence": [
+        "实际签名：public Result<User> create(@RequestBody UserCreateDTO dto)",
+        "无 @Valid 注解",
+        "Controller 无 import jakarta.validation.Valid"
+      ]
+    },
+    {
+      "item": "ApprovalController.java — create 方法有 @Valid",
+      "result": "FAIL",
+      "evidence": [
+        "实际签名：public Result<ApprovalProcess> create(@RequestBody ApprovalCreateDTO dto, HttpServletRequest request)",
+        "无 @Valid 注解",
+        "Controller 无 import jakarta.validation.Valid"
+      ]
+    },
+    {
+      "item": "CompensationController.java — create 方法有 @Valid",
+      "result": "FAIL",
+      "evidence": [
+        "实际签名：public Result<AssetCompensation> create(@RequestBody CompensationCreateDTO dto)",
+        "无 @Valid 注解",
+        "Controller 无 import jakarta.validation.Valid"
+      ]
+    },
+    {
+      "item": "CompensationController.java — valuation 方法有 @Valid",
+      "result": "FAIL",
+      "evidence": [
+        "实际签名：public Result<CompensationValuationDTO> valuation(@RequestBody CompensationCreateDTO dto)",
+        "无 @Valid 注解"
+      ]
+    },
+    {
+      "item": "validation/Create.java 接口定义",
+      "result": "PASS",
+      "evidence": [
+        "文件存在：backend/src/main/java/com/ams/validation/Create.java",
+        "内容正确：package com.ams.validation; public interface Create {}",
+        "符合 Jakarta Validation groups 规范"
+      ]
+    },
+    {
+      "item": "validation/Update.java 接口定义",
+      "result": "PASS",
+      "evidence": [
+        "文件存在：backend/src/main/java/com/ams/validation/Update.java",
+        "内容正确：package com.ams.validation; public interface Update {}",
+        "符合 Jakarta Validation groups 规范"
+      ]
+    },
+    {
+      "item": "GlobalExceptionHandler 处理 MethodArgumentNotValidException",
+      "result": "PASS",
+      "evidence": [
+        "GlobalExceptionHandler.java L27-37：@ExceptionHandler(MethodArgumentNotValidException.class) 已存在",
+        "同时处理 BindException（L39-48）",
+        "返回 Result.error(400, errors) — 符合项目约定"
+      ]
+    },
+    {
+      "item": "DTO 校验注解现状（已有注解的 DTO）",
+      "result": "PASS",
+      "evidence": [
+        "RetirementApplyDTO: @NotNull(assetId), @NotBlank(reason), @Size(reason 10-500) ✓",
+        "MaintenanceCreateDTO: @NotNull(assetId), @NotBlank(maintenanceType) ✓",
+        "InventoryTaskCreateDTO: @NotBlank(taskName), @Size(max=100), @NotBlank(inventoryType) ✓",
+        "ApprovalCreateDTO: @NotBlank(processType), @NotBlank(title) ✓",
+        "CompensationCreateDTO: @NotNull(assetId), @NotNull(compensationAmount) ✓",
+        "UserCreateDTO: @NotBlank(username), @Size(username 3-50), @NotBlank(password), @Size(password 6-100), @Email ✓",
+        "注：这些 DTO 注解已在更早的提交中补全，不在本次批次 scope 内"
+      ]
+    },
+    {
+      "item": "changes-batch1.json 声称 mvn compile 通过",
+      "result": "PARTIAL",
+      "evidence": [
+        "changes-batch1.json 记录 'mvn compile -q' 通过",
+        "但实际文件内容（通过 rg + bash 验证）与 changes-batch1.json 描述的改动不一致",
+        "可能改动被后续提交覆盖回退，或 changes-batch1.json 记录的不是当前 working tree 状态",
+        "changes-batch2.json 记录 251 tests passed, 0 failures — 但改动在测试通过后可能被回退"
+      ]
+    }
+  ],
+  "acceptance_status": {
+    "AC2_partial": "FAIL",
+    "detail": "批次1 聚焦的 8 项改动中：2 项新文件创建（Create.java/Update.java）已完成，但 8 项 Controller @Valid 和 WorkOrderDTO validation groups 改动均未在实际文件中落地。changes-batch1.json 声称的改动与实际 working tree 内容严重不符。通过 rg 全量搜索确认：目标 7 个 Controller 中无任何新增 @Valid/@Validated 注解，WorkOrderDTO 无任何 Bean Validation 注解和 Create group import。"
+  },
+  "discrepancy_analysis": {
+    "title": "changes-batch1.json 与实际文件状态严重不一致",
+    "detail": "changes-batch1.json 声称：(1) CompensationController create/valuation 已加 @Valid ✓；(2) WorkOrderController createWorkOrder 改用 @Validated(Create.class) ✓；(3) WorkOrderDTO title/priority 已加 groups=Create.class ✓。但通过 rg 全量搜索和 bash cat 直接读取文件确认，这些改动均不存在于当前 working tree。可能原因：(a) 改动在 staging 后被回退；(b) changes-batch1.json 记录的是临时状态而非持久化结果；(c) 后续其他操作覆盖了这些文件。"
+  },
+  "residual_risks": [
+    "CRITICAL: changes-batch1.json 记录的改动全部未落地到实际文件中，批次1 的核心目标完全未实现",
+    "HIGH: WorkOrderDTO 无任何校验注解，createWorkOrder 和 updateWorkOrder 端点不执行任何参数校验",
+    "HIGH: 6 个 Controller 端点虽有 DTO 校验注解但未启用 @Valid，校验不会触发（形同虚设）",
+    "MEDIUM: validation/Create.java 和 Update.java 已创建但未被任何 DTO 或 Controller 引用，属于孤立代码",
+    "LOW: GlobalExceptionHandler 已就绪，一旦 @Valid 补全后即可正常处理校验异常"
+  ],
+  "recommendations": [
+    "重新执行批次1 builder，确保所有改动持久化到 working tree 并通过 git diff 确认",
+    "builder 完成后必须运行 rg '@Valid|@Validated|groups=' 验证改动是否真实存在",
+    "提交前运行 mvn compile 确认编译通过，mvn test 确认测试通过",
+    "WorkOrderDTO 需要同时添加 @NotBlank(groups=Create.class) 和 @Size（Default 组）注解"
+  ]
+}

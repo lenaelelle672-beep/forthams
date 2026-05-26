@@ -27,7 +27,7 @@ function futureDateStr(daysFromNow = 30): string {
 }
 
 // Helper to find a field error by path
-function findFieldError(result: z.SafeParseReturnType<any, any>, field: string) {
+function findFieldError(result: any, field: string) {
   if (result.success) return undefined;
   return result.error.issues.find(i => i.path[0] === field);
 }

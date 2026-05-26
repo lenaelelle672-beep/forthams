@@ -1,0 +1,70 @@
+{
+  "session_id": "20260524-flash-001",
+  "generated_at": "2026-05-24",
+  "current_state": {
+    "P0-1": {
+      "interface": "POST /auth/reset-password (公开，无需登录)",
+      "dto": "ResetPasswordRequest 仅有 username + newPassword 两个字段，无 oldPassword",
+      "service": "AuthService.resetPassword() 仅校验用户名存在，无 passwordEncoder.matches() 调用，直接 setPassword(newPassword)",
+      "controller": "AuthController 直接调用 service，无额外校验",
+      "frontend": "src/pages/auth/ 下无密码修改页面，SettingsPage 待确认"
+    },
+    "P0-2": {
+      "BigScreenPage": "使用 placeholderData 显示假数据，无 isError 判断，API 失败显示旧的 placeholder 数据",
+      "BigScreen3DPage": "queryFn catch 块直接 return fallbackStats 硬编码对象，API 失败被静默吞掉，用户看假数据；两文件均无错误态 UI 组件"
+    },
+    "P1-4": {
+      "report_dir": "frontend/src/pages/report/ 含 ReportPage.tsx、ReportCenterPage.tsx + 2个子组件，均未注册路由",
+      "reports_dir": "frontend/src/pages/reports/ 的 ReportsPage.tsx 已注册路由 /reports，功能完整",
+      "verdict": "report/（单数）为死代码，功能与 reports/（复数）重叠"
+    }
+  },
+  "existing_patterns": [
+    "后端：Controller → Service → Mapper 三层架构，DTO 使用 Lombok @Data",
+    "后端：异常使用 BusinessException 抛出，统一错误处理",
+    "后端：BCryptPasswordEncoder 已在 SecurityConfig 注入",
+    "前端：React Query (useQuery) 管理 API 请求状态",
+    "前端：ErrorBoundary 组件已存在于 src/components/",
+    "前端：Router 使用 react-router-dom，路由集中在 router/index.tsx"
+  ],
+  "technical_constraints": [
+    "P0-1：/auth/reset-password 是公开接口（permitAll），加旧密码校验是安全强化，不是破坏性变更",
+    "P0-1：UserManagementController /user-management/{id}/reset-password 是管理员接口，不需要旧密码，不要动",
+    "P0-2：BigScreen 页面可能有特殊的全屏样式，错误态 UI 需适配大屏显示",
+    "P1-4：清理 report/ 前必须确认无其他文件 import，否则会造成编译错误"
+  ],
+  "risks": [
+    "P0-1 HIGH: 当前任何人知道用户名即可越权重置他人密码",
+    "P0-2 MEDIUM: BigScreen3DPage catch 静默吞错误，监控系统无法感知 API 失败",
+    "P1-4 LOW: report/ 目录若有隐式引用（动态 import）清理后可能运行时报错，需全局 grep"
+  ],
+  "test_surface": {
+    "P0-1": "backend/src/test/java/com/ams/ 需补 AuthService 旧密码校验的单元测试",
+    "P0-2": "frontend/src/__tests__/ 有现有测试，BigScreen 相关测试需确认是否覆盖错误态",
+    "P1-4": "frontend/src/__tests__/pages/ReportPage.test.tsx 存在，清理目录后需同步删除测试文件"
+  },
+  "findings": {
+    "P0-1": {
+      "files": [
+        "backend/src/main/java/com/ams/dto/ResetPasswordRequest.java",
+        "backend/src/main/java/com/ams/service/AuthService.java",
+        "backend/src/main/java/com/ams/controller/AuthController.java"
+      ],
+      "key_finding": "安全漏洞：无旧密码校验，需在 DTO 加 oldPassword 字段，Service 加 passwordEncoder.matches() 校验"
+    },
+    "P0-2": {
+      "files": [
+        "frontend/src/pages/dashboard/BigScreenPage.tsx",
+        "frontend/src/pages/dashboard/BigScreen3DPage.tsx"
+      ],
+      "key_finding": "BigScreen3DPage catch 块 return fallbackStats 是最严重问题；两文件均需加 isError 错误态 UI"
+    },
+    "P1-4": {
+      "files": [
+        "frontend/src/pages/report/ (全目录)",
+        "frontend/src/__tests__/pages/ReportPage.test.tsx"
+      ],
+      "key_finding": "report/（单数）为死代码，建议清理；清理前须 grep 确认无引用"
+    }
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "classification": "Light",
+  "mcp_tools": [],
+  "scope": [
+    ".omc/gai2/sessions/20260524-flash-cert-100/review.json",
+    ".omc/gai2/sessions/20260524-flash-e2e/review.json",
+    ".omc/gai2/sessions/20260524-flash-e2e/workcard.json",
+    ".omc/gai2/goal-state.json"
+  ],
+  "risks": [
+    "纯状态验证/closeout 请求，不涉及代码修改",
+    "需确认已有 reviewer 产物覆盖所有验收标准",
+    "E2E 测试依赖后端服务，CI 环境需配置"
+  ],
+  "dependencies": [
+    "前序 session review.json 产物"
+  ],
+  "recommended_phases": [
+    "reviewer"
+  ],
+  "acceptance_hints": [
+    "认证测试 10/10 PASS（flash-cert-100/review.json overall_status=pass）",
+    "E2E CI 接入完成（flash-e2e/review.json overall_status=pass）",
+    "mock 测试废弃标记完成",
+    "goal-state.json 状态 completed"
+  ]
+}

@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "agent": "gai2-orchestrator-adjudication",
+  "session": "20260524-cert-upgrade-selectors",
+  "decision": "use_draft_with_refinements",
+  "selected_source": "draft-changes.json 为基础，按 refine.json 改进建议调整",
+  "rationale": "Draft 10 个 write_action 的 old_string 全部精确匹配，write_intent 保留。Refiner 确认无退化。2 项改进（ACT-07 Tab role 兼容、ACT-09 驳回路径同步）需纳入。1 项遗漏（CERT-05 heading L149）建议纳入以保持 modules 数组与页面断言一致。",
+  "adjudicated_actions": [
+    {
+      "id": "ACT-01",
+      "source": "draft-changes.json",
+      "decision": "apply_as_is",
+      "description": "CERT-02: modules 数组 6 处文本修正（L59-70）"
+    },
+    {
+      "id": "ACT-02",
+      "source": "draft-changes.json",
+      "decision": "apply_as_is",
+      "description": "CERT-03: 搜索框 placeholder（L96）"
+    },
+    {
+      "id": "ACT-03",
+      "source": "draft-changes.json",
+      "decision": "apply_as_is",
+      "description": "CERT-03: 创建资产流程全面重写（L99-112）"
+    },
+    {
+      "id": "ACT-04",
+      "source": "draft-changes.json",
+      "decision": "apply_as_is",
+      "description": "CERT-03: 搜索框 placeholder 断言（L121）"
+    },
+    {
+      "id": "ACT-05",
+      "source": "draft-changes.json",
+      "decision": "apply_as_is",
+      "description": "CERT-03: fillAssetForm 改用 data-testid（L331-336）"
+    },
+    {
+      "id": "ACT-06",
+      "source": "draft-changes.json",
+      "decision": "apply_as_is",
+      "description": "CERT-08: 路由 URL + heading（L215-216）"
+    },
+    {
+      "id": "ACT-07",
+      "source": "draft-changes.json",
+      "decision": "use_refine",
+      "description": "CERT-08: 状态过滤 Tab 按钮兼容（L219-221），按 refiner 改进版（兼容 tab/button role）",
+      "old_string": "    await page.locator('select').nth(1).selectOption('审批中');\n    await expect(page.getByText('资产转移审批').first()).toBeVisible();\n    // 默认全部显示，已批准审批仍然在列表中",
+      "new_string": "    // 新版使用 Tab 按钮过滤状态（兼容 tab/button role）\n    await page.locator('[role=\"tab\"], [role=\"button\"]').getByText('待审批', { exact: true }).first().click();\n    await expect(page.getByText('资产转移审批').first()).toBeVisible();\n    // 默认全部显示，已批准审批仍然在列表中"
+    },
+    {
+      "id": "ACT-08",
+      "source": "draft-changes.json",
+      "decision": "apply_as_is",
+      "description": "CERT-08: 通过操作详情弹窗路径（L223-224）"
+    },
+    {
+      "id": "ACT-09",
+      "source": "draft-changes.json",
+      "decision": "use_refine",
+      "description": "CERT-10: 路由 URL + 驳回操作完整修复（L297-302），按 refiner 改进版（详情弹窗路径）",
+      "old_string": "    await page.goto('/approvals');\n    await page.getByRole('button', { name: '驳回' }).first().click();\n    // 确认驳回对话框\n    await page.getByPlaceholder('请输入驳回原因...').fill('测试驳回');\n    await page.getByRole('button', { name: '确认驳回' }).click();\n    await expect(page.getByText('已驳回').first()).toBeVisible();",
+      "new_string": "    await page.goto('/approval');\n    // 新版审批操作：先点击列表项打开详情弹窗，再在 ApprovalActionPanel 中操作\n    await page.getByText('资产转移审批').first().click();\n    await expect(page.getByRole('dialog')).toBeVisible({ timeout: 5000 });\n    await page.getByRole('textbox').fill('测试驳回');\n    await page.getByRole('button', { name: '驳回' }).click();\n    await expect(page.getByText('已驳回').first()).toBeVisible();"
+    },
+    {
+      "id": "ACT-10",
+      "source": "draft-changes.json",
+      "decision": "apply_as_is",
+      "description": "CERT-10: 数据分析 heading 3 处统一修正（L305-311）"
+    },
+    {
+      "id": "ACT-11",
+      "source": "refine.json missed_items",
+      "decision": "apply",
+      "description": "CERT-05: heading L149 '盘点任务列表'→'盘点任务'（ACT-01 已同步 modules 数组，此处断言应一致）",
+      "old_string": "    await expect(page.getByRole('heading', { name: '盘点任务列表' })).toBeVisible();",
+      "new_string": "    await expect(page.getByRole('heading', { name: '盘点任务' })).toBeVisible();"
+    }
+  ],
+  "builder_instructions": "总共 11 个 write_action，使用 edit 工具逐个应用到 testFinish/tests/playwright/forthams-certification.spec.ts 文件。注意：每个 old_string 必须精确匹配当前文件内容（包括缩进、引号、空格）。替换顺序尽量从文件底部往顶部进行，避免行号偏移。全部应用后运行验证测试。",
+  "write_action_guard": "builder 必须使用 edit 工具的 old_string 精确匹配模式，不能使用正则或模糊替换。全部修改后运行 npx playwright test tests/playwright/forthams-certification.spec.ts --project=chromium --reporter=list 验证。确认 CERT-02、CERT-03、CERT-08、CERT-10 全部 PASS，且 CERT-01/04/05/06/07/09 无回归。",
+  "fallback_labels": [],
+  "reviewer_checks": [
+    "确认 11 个 write_action 全部成功应用",
+    "确认认证测试 10/10 PASS（至少 CERT-02/03/08/10 ✅）",
+    "确认 CERT-01/04/05/06/07/09 无回归"
+  ]
+}

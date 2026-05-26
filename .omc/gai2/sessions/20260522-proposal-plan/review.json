@@ -1,0 +1,168 @@
+{
+  "directive_summary": "用户要求为 forthAMS 项目下一步发展生成详细方案。方案以 557 行 proposal.md 形式输出，覆盖 4 个阶段（P1-P4）、38 个具体任务、预估 186-262 小时（23-33 天）。方案基于前一轮审查 93/100 分的成果和综合评分 54/100（C+）的审计基线。",
+  "overall_status": "pass",
+  "affected_scope": [
+    "frontend/src/app/ (353 文件，死代码清理目标)",
+    "frontend/src/utils/http.ts (Token 绕过修复)",
+    "frontend/src/components/WorkOrderList/index.tsx (Mock 残留)",
+    "frontend/src/components/NotificationBell.tsx (Mock 残留)",
+    "frontend/src/components/ImportPanel/FileUploader.tsx (Mock 残留)",
+    "frontend/src/pages/disposal/DisposalDetailPage.tsx (version 硬编码)",
+    "frontend/src/pages/audit/AuditDetailPage.tsx (类型不安全)",
+    "frontend/src/pages/inventory/InventoryDetailPage.tsx (scopeId 可读性)",
+    "frontend/src/api/*.ts (19 个文件，any 类型治理)",
+    "frontend/src/services/*.ts (13 个文件，any 类型治理)",
+    "backend 模块 (RBAC 数据库设计、SSO、数据权限)",
+    "proposal.md (方案文档输出)"
+  ],
+  "artifacts_reviewed": [
+    ".omc/gai2/goal-state.json",
+    ".omc/gai2/sessions/20260522-proposal-plan/workcard.json",
+    ".omc/gai2/sessions/20260522-proposal-plan/triage.json",
+    ".omc/gai2/sessions/20260522-proposal-plan/audit.json",
+    ".omc/gai2/sessions/20260522-proposal-plan/changes.json",
+    ".omc/gai2/sessions/20260522-proposal-plan/proposal.md"
+  ],
+  "acceptance_status": [
+    {
+      "criterion": "生成 forthAMS 项目下一步发展的详细方案",
+      "status": "PASS",
+      "evidence": [
+        "proposal.md 共 557 行，包含 8 个章节 + 3 个附录，覆盖现状分析、分阶段路线图、高风险项详细修复方案、技术选型建议、资源估算和风险评估",
+        "方案基于 10 个维度的审计评分（audit.json overall_score 54/100）和 8 个战略维度（triage.json D1-D8）",
+        "方案涵盖了 P1 紧急修复（6 任务）、P2 核心功能（16 任务）、P3 质量提升（9 任务）、P4 增强功能（8 任务），共 38 个具体任务"
+      ]
+    },
+    {
+      "criterion": "方案必须包含具体可执行的行动项",
+      "status": "PASS",
+      "evidence": [
+        "每个任务均包含：优先级（P0-P3）、具体文件路径（含行号）、预估工时、验收标准",
+        "例如 P1-1（清理 src/app/ 死代码）给出了 5 步操作的 bash 命令（grep 确认引用 → rm -rf → npm run build 验证）",
+        "P1-2（Token 绕过修复）提供了 Before/After 代码示例（ScopeSelector.tsx、workflow.ts）",
+        "P1-3（Mock 清理）的 FileUploader 提供了完整 FormData 上传实现代码",
+        "5.1 节（any 类型治理）给出了 Step 1/2/3 三步修复方案和代码示例",
+        "RBAC 子任务 RBAC-1 到 RBAC-7 均给出了具体文件路径（db/migration/、entity/、controller/、前端页面）"
+      ]
+    },
+    {
+      "criterion": "方案需基于项目当前状态和已完成 goal 的成果",
+      "status": "PASS",
+      "evidence": [
+        "方案标题页明确标注基线状态：'前端审查 93/100 分（commit b7011df1），585 测试全绿，构建 4.47s 通过'",
+        "附录 C 专门追踪 93→100 分差距的 3 项残留问题（InventoryDetailPage scopeId、AuditDetailPage 类型、DisposalDetailPage version），均纳入 P1-4/P1-5/P1-6",
+        "方案引用了 debate.json 的技术决策结论（Option C 纯自定义 RBAC）和 audit.json 的 10 维度评分",
+        "triage.json 的 context 字段记录了 previous_goal（全量页面100分审查）和 previous_score（93/100），方案正确继承",
+        "goal-state.json 当前活跃 goal（V2 报告残留问题修复）作为并行工作进行参考"
+      ]
+    },
+    {
+      "criterion": "方案需覆盖技术债务、功能增强、架构优化等多个维度",
+      "status": "PASS",
+      "evidence": [
+        "技术债务：TD-001 至 TD-007 全部覆盖，P1 阶段处理 HIGH 级别（双套页面代码），P3 阶段处理 MEDIUM 级别（any 类型 606→<50）",
+        "功能增强：P2-A RBAC（8-12 天）、P2-B MaxKey SSO（2-3 天）、P2-C 数据权限（2-3 天）、P4-5 大屏可视化深化、P4-6 Analytics 深化",
+        "架构优化：P3-1 HTTP 客户端泛型推断修复、P4-1 路由守卫增强、P4-2 全局错误边界、P4-3 API 重试策略",
+        "质量提升：P3-3/P3-4 测试覆盖（页面 15-20 个 + services 12 个 + hooks 8 个）、P3-5 覆盖率门槛扩展",
+        "安全加固：P1-2 Token 绕过修复、P3-2 统一 Token 存储、P3-8 user_info 反序列化安全",
+        "国际化：P4-4 react-i18next 引入，至少覆盖 10 个页面",
+        "无障碍：P4-7 a11y 基础加固，表单 label 关联 + Modal aria + 表格 aria",
+        "文档：P4-8 API 文档 + 组件文档 + 部署指南"
+      ]
+    }
+  ],
+  "findings": [
+    "【数据准确性】方案声称 src/app/ 有 341 个文件，但实际 find 统计为 353 个文件。差异 12 个文件，不影响结论但需注意精确性。",
+    "【数据准确性】方案声称 '606 处 any'，但实际 rg 统计 `: any` 为 513 处、`as any` 为 60 处。606 这个数字可能来自更宽泛的统计口径（包含注释和字符串中的 any），建议方案明确统计口径。",
+    "【覆盖完整性】audit.json 中识别的 TD-003（SettingsPage TODO 残留）在方案中未列为独立任务。虽然严重度为 LOW 且后端端点未实现是根因，但应至少在 P3 或 P4 阶段提及。",
+    "【覆盖完整性】audit.json 中 a11y_status 的 6 项 concerns（37 页面仅 6 个用 aria、label 缺 htmlFor、Modal 缺焦点陷阱等），方案仅在 P4-7 中概括处理，未拆分为具体子任务。",
+    "【覆盖完整性】audit.json 中 dependency_health 的 @vue/test-utils 误装问题在 P3-7 中提及，但 echarts+recharts 并存问题仅在技术选型建议中说明'维持双库'，未给出明确决策理由（方案 6.2 给出了理由，这一点是充分的）。",
+    "【一致性】triage.json 识别了 8 个维度（D1-D8），changes.json 声称覆盖了全部 8 个维度。proposal.md 中 D8（技术债务清单与治理路线）体现在第 2.2 节 TD-001 至 TD-007 的详细分析和 P3 阶段的具体治理任务中，覆盖充分。",
+    "【一致性】audit.json 中 security_status 的 HIGH 级别问题（Token 存 localStorage、多组件绕过）在方案 P1-2 和 P3-2 中分别处理，与审计发现一致。",
+    "【一致性】audit.json 中 mock_residual 的 3 个 HIGH 严重度发现（WorkOrderList、NotificationBell、FileUploader）在方案 P1-3 中完整覆盖并提供了具体修复代码，一致性好。",
+    "【可执行性-P1-1】清理 src/app/ 死代码的步骤清晰，经验证 grep -r '@/app/' 在活跃代码目录中无输出，确认可安全删除。但方案未考虑 src/app/ 中可能存在的可复用代码（如工具函数、类型定义），建议补充代码审查步骤。",
+    "【可执行性-P2】RBAC 8-12 天的估算是单人全栈开发，changes.json 也标注了这一点。对于实际项目，后端和前端可并行，时间可压缩到 6-8 天。",
+    "【可执行性-P3-1】any 类型治理声称 606→<50，但实际 as any 仅 60 处。建议将目标调整为更精确的指标，如 ': any 类型注解从 513 降至 <50'。",
+    "【可执行性-P3-3】测试编写预估 3-4 天新增 15-20 个测试文件（页面级），按每个测试文件 2-3 小时计算是合理的。但未考虑 vitest.config.ts 排除列表对新增测试的影响（audit.json builder_notes 提到了这一点）。",
+    "【风险遗漏】方案未充分评估 P1-1（删除 src/app/）可能影响的已有 git blame 历史追溯。大量文件删除可能影响代码审计能力。",
+    "【风险遗漏】方案未提及 RBAC 实施对现有 User/Dept/Role 实体的迁移风险。如果现有表中已有数据，DDL 变更可能导致数据丢失。P2 RBAC 风险表中提到了'数据库迁移与现有数据冲突'，但缓解措施较笼统。",
+    "【优先级合理性】P1 阶段将清理 Mock 残留（P1-3）设为 P0 优先级，但该任务依赖后端 API 就绪。如果后端未实现对应端点，P1-3 无法完成。方案在风险表中提到了这一点（概率中、影响中），但未给出降级方案的具体行动。",
+    "【优先级合理性】TD-003（SettingsPage TODO）被标记为 LOW 但在 P1 阶段未处理，而在后续阶段也未列为独立任务。这是合理的优先级判断。",
+    "【工时汇总】changes.json 声称 total_estimated_hours: 210，但 proposal.md 第 7.1 节给出 186-262 小时（23-33 天）。210 在此范围内，一致。",
+    "【工时分解】P1 阶段 changes.json 声称 12 小时，但 proposal.md 给出 10-14 小时（1.5-2 天），一致。",
+    "【debate.json 缺失】当前 session 目录中无 debate.json，方案引用了'来自 debate.json 的技术决策结论（Option C）'。但 debate.json 存在于其他 session（20260522-scaffold-swarm 等），方案可能是跨 session 引用了这些结论。这是可接受的，但建议在方案中注明引用来源 session。"
+  ],
+  "commands_checked": [
+    {
+      "command": "find frontend/src/app/ -type f | wc -l",
+      "result": "passed",
+      "notes": "实际 353 文件，方案声称 341，差异 12 个文件（3.5%），不影响结论"
+    },
+    {
+      "command": "grep -r '@/app/' frontend/src/pages/ src/components/ src/services/ src/api/ src/hooks/ src/router/",
+      "result": "passed",
+      "notes": "确认 src/app/ 无活跃引用，P1-1 清理方案安全可行"
+    },
+    {
+      "command": "rg 'as any' frontend/src/ --glob '*.ts' --glob '*.tsx' | wc -l",
+      "result": "passed",
+      "notes": "实际 60 处 as any，方案声称 606 处 any（统计口径不同：606 可能包含所有 any 关键字出现，实际 : any 有 513 处）"
+    },
+    {
+      "command": "rg ': any' frontend/src/ --glob '*.ts' --glob '*.tsx' | wc -l",
+      "result": "passed",
+      "notes": "实际 513 处 ': any' 类型注解，数量级与方案一致"
+    },
+    {
+      "command": "ls frontend/src/components/WorkOrderList/index.tsx",
+      "result": "passed",
+      "notes": "P1-3 Mock 残留目标文件存在"
+    },
+    {
+      "command": "ls frontend/src/pages/disposal/DisposalDetailPage.tsx",
+      "result": "passed",
+      "notes": "P1-4 version 硬编码修复目标文件存在"
+    }
+  ],
+  "evidence_references": [
+    "proposal.md: 第 92 行 P1-1 清理 src/app/ 死代码，给出完整 bash 步骤",
+    "proposal.md: 第 93 行 P1-2 Token 绕过修复，给出 Before/After 代码示例",
+    "proposal.md: 第 94 行 P1-3 Mock 残留清理，3 个组件均指定文件路径和行号",
+    "proposal.md: 第 95-97 行 P1-4/P1-5/P1-6 修复 93→100 分残留 3 项问题",
+    "proposal.md: 第 108-170 行 P2-A RBAC 7 个子任务，每个含具体文件路径",
+    "proposal.md: 第 130-153 行 P2-B SSO 4 个子任务，含 MaxKey 端点详情",
+    "proposal.md: 第 155-169 行 P2-C 数据权限 4 个子任务",
+    "proposal.md: 第 206-233 行 TD-001 双套页面代码清理方案（详细 bash 步骤）",
+    "proposal.md: 第 235-277 行 Token 绕过修复方案（含代码示例）",
+    "proposal.md: 第 278-311 行 Mock 残留清理方案（含 FileUploader 实现代码）",
+    "proposal.md: 第 316-351 行 any 类型治理三步方案（含代码示例）",
+    "proposal.md: 第 353-373 行测试覆盖率提升计划（5 批次、覆盖率目标）",
+    "proposal.md: 第 436-457 行关键路径分析和并行任务建议",
+    "proposal.md: 第 459-467 行 5 个里程碑定义",
+    "proposal.md: 第 472-491 行风险评估（7 个风险项 + 5 条缓解策略）",
+    "audit.json: overall_score 54/100 (C+)，10 维度评分作为方案基线",
+    "triage.json: 8 个战略维度 D1-D8，方案覆盖全部",
+    "workcard.json: 4 条验收标准，方案满足全部",
+    "changes.json: 38 任务 / 210 小时 / 4 阶段，与 proposal.md 一致",
+    "grep 验证: src/app/ 无活跃引用，P1-1 可安全执行",
+    "文件存在性验证: 所有方案中提到的目标文件（6 个关键文件）均已确认存在"
+  ],
+  "residual_risks": [
+    "方案引用 debate.json 的 Option C 结论，但 debate.json 不存在于当前 session，跨 session 引用需用户确认决策仍然有效",
+    "P1-3 Mock 清理依赖后端 API 就绪状态，如果后端未实现 WorkOrder/Notification/Import 端点，该任务将受阻",
+    "any 类型实际统计为 513 处 ': any' 和 60 处 'as any'，方案目标 '606→<50' 的基线数据需校准",
+    "src/app/ 目录实际有 353 个文件（方案声称 341），差异虽小但影响精确度",
+    "RBAC 实施涉及数据库 DDL 变更，现有 User/Dept/Role 表数据迁移风险未完全量化",
+    "TD-003（SettingsPage TODO 残留）未纳入方案任何阶段的具体任务，虽然 LOW 优先级但仍为遗漏项",
+    "P2 阶段总工时 80-120 小时（10-15 天）为单人估算，实际需协调前后端资源，项目管理复杂度未充分评估",
+    "goal-state.json 显示当前有另一个 active goal（V2 报告残留问题修复），与本方案可能存在资源冲突"
+  ],
+  "recommendations": [
+    "【建议-1】校准 any 类型统计口径：将方案中的 '606 处 any' 更新为精确数据（513 处 ': any' 类型注解 + 60 处 'as any' 断言），使目标可量化验证",
+    "【建议-2】补充 TD-003 处理方案：在 P4 阶段或 P3 阶段增加 SettingsPage TODO 清理任务（需后端配置端点支持）",
+    "【建议-3】P1-3 Mock 清理增加降级方案：当后端 API 未就绪时，添加 feature flag 控制 Mock/Real 切换，避免阻塞 P1 整体完成",
+    "【建议-4】注明 debate.json 引用来源：在方案 6.1 节补充 debate.json 所在 session（如 20260522-scaffold-swarm），方便追溯决策上下文",
+    "【建议-5】RBAC 实施前增加数据迁移评估：在 P2-A 启动前，先执行 User/Dept/Role 现有表结构和数据量盘点，输出迁移影响评估报告",
+    "【建议-6】与当前 active goal 协调：goal-state.json 中的 V2 报告修复 goal 应优先完成后再启动本方案，避免并行修改冲突"
+  ]
+}

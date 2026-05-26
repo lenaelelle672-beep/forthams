@@ -1,0 +1,55 @@
+{
+  "batch": 1,
+  "description": "后端DTO Bean Validation校验补全 + @Valid + 资产状态机保护",
+  "changed_files": [
+    "backend/src/main/java/com/ams/dto/WorkOrderDTO.java",
+    "backend/src/main/java/com/ams/dto/RetirementApplyDTO.java",
+    "backend/src/main/java/com/ams/dto/MaintenanceCreateDTO.java",
+    "backend/src/main/java/com/ams/dto/InventoryTaskCreateDTO.java",
+    "backend/src/main/java/com/ams/dto/UserCreateDTO.java",
+    "backend/src/main/java/com/ams/dto/CompensationCreateDTO.java",
+    "backend/src/main/java/com/ams/dto/ApprovalCreateDTO.java",
+    "backend/src/main/java/com/ams/controller/WorkOrderController.java",
+    "backend/src/main/java/com/ams/controller/RetirementController.java",
+    "backend/src/main/java/com/ams/controller/MaintenanceController.java",
+    "backend/src/main/java/com/ams/controller/InventoryController.java",
+    "backend/src/main/java/com/ams/controller/UserManagementController.java"
+  ],
+  "added_files": [
+    "backend/src/main/java/com/ams/validation/Create.java",
+    "backend/src/main/java/com/ams/validation/Update.java"
+  ],
+  "commands_run": [
+    {
+      "command": "cd backend && mvn compile -q",
+      "result": "passed",
+      "notes": "无编译错误输出"
+    },
+    {
+      "command": "cd backend && mvn test 2>&1 | grep -E 'Tests run:|BUILD'",
+      "result": "passed",
+      "notes": "Tests run: 251, Failures: 0, Errors: 0, Skipped: 0 — BUILD SUCCESS"
+    }
+  ],
+  "verification_results": [
+    "WorkOrderDTO: title 加 @NotBlank(groups=Create.class) @Size(max=200)，priority 加 @NotBlank(groups=Create.class)，import com.ams.validation.Create 已添加",
+    "RetirementApplyDTO: assetId 加 @NotNull，reason 加 @NotBlank + @Size(min=10,max=500)，jakarta.validation.constraints.* import 已添加",
+    "MaintenanceCreateDTO: assetId 加 @NotNull，maintenanceType 加 @NotBlank，jakarta.validation.constraints.* import 已添加",
+    "InventoryTaskCreateDTO: taskName 加 @NotBlank + @Size(max=100)，inventoryType 加 @NotBlank，jakarta.validation.constraints.* import 已添加",
+    "UserCreateDTO: username 加 @NotBlank + @Size(min=3,max=50)，password 加 @NotBlank + @Size(min=6,max=100)，email 加 @Email(null 时不校验)，jakarta.validation.constraints.* import 已添加",
+    "CompensationCreateDTO: assetId 加 @NotNull，compensationAmount 加 @NotNull + @DecimalMin(0)，jakarta.validation.constraints.* import 已添加",
+    "ApprovalCreateDTO: processType 加 @NotBlank，title 加 @NotBlank，jakarta.validation.constraints.NotBlank import 已添加",
+    "WorkOrderController: createWorkOrder 用 @Validated(Create.class)，updateWorkOrder 用 @Validated(Create.class)，import org.springframework.validation.annotation.Validated + com.ams.validation.Create 已添加",
+    "RetirementController: submitApplication 和 createApplication 均添加 @Valid，import jakarta.validation.Valid 已添加",
+    "MaintenanceController: create 方法添加 @Valid，import jakarta.validation.Valid 已添加",
+    "InventoryController: create 方法添加 @Valid，import jakarta.validation.Valid 已添加",
+    "UserManagementController: create 方法添加 @Valid，import jakarta.validation.Valid 已添加",
+    "任务13(AssetService 状态机保护): 已确认 updateAsset 通过调用 assetLifecycleService.transitionLoadedAsset() 实现完整状态机检查（AssetStatus.canTransitionTo，不满足时抛 BusinessException），无需额外修改",
+    "mvn compile -q: BUILD SUCCESS",
+    "mvn test: 251 tests, 0 failures, 0 errors, BUILD SUCCESS"
+  ],
+  "residual_risks": [
+    "WorkOrderDTO.title 的 @NotBlank 使用了 groups=Create.class，update 时也触发同组校验，与 PUT 语义（允许部分更新）有轻微不一致，但符合本项目已有的 validation group 设计",
+    "UserCreateDTO.email 的 @Email 不加 @NotNull，null 时 Jakarta Validation 默认不校验格式，符合\"可为 null 有值时校验\"的需求"
+  ]
+}

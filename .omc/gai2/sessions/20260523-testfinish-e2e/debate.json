@@ -1,0 +1,138 @@
+{
+  "session_id": "20260523-testfinish-e2e",
+  "topic": "forthAMS 认证守卫方案与 testFinish 测试对齐讨论",
+  "options": [
+    {
+      "name": "A1: AuthProvider + ProtectedRoute（useAuth）",
+      "description": "在 main.tsx 添加 AuthProvider 包裹 RouterProvider，在 router/index.tsx 创建 ProtectedRoute 组件使用 useAuth 守卫受保护路由。这是推荐方案。",
+      "pros": [
+        "复用现有 AuthContext，保持 React 单向数据流",
+        "支持 loading 状态（AuthContext 初始化时显示 loading）",
+        "可扩展性强（后续可加 role/permission 检查）",
+        "与旧系统 ProtectedRoute 设计模式一致"
+      ],
+      "cons": [
+        "需要同时修改 main.tsx 和 router/index.tsx 两个文件",
+        "AuthProvider 初始化有短暂 loading 态",
+        "多一层 context provider 嵌套"
+      ],
+      "effort": "medium",
+      "risk": "low"
+    },
+    {
+      "name": "A2: 路由层直接检查 sessionStorage",
+      "description": "在 router/index.tsx 中创建 SimpleGuard 组件，直接读取 sessionStorage.auth_token || localStorage.auth_token，不依赖 AuthContext",
+      "pros": [
+        "无需修改 main.tsx 的 Provider 链",
+        "同步检查，无 loading state",
+        "代码极少，约 10 行"
+      ],
+      "cons": [
+        "绕过 AuthContext 创建第二个认证判断点",
+        "无法利用 AuthContext 的响应式状态（如 token refresh）",
+        "后续维护时 storage key 修改容易遗漏"
+      ],
+      "effort": "small",
+      "risk": "medium"
+    },
+    {
+      "name": "A3: 切换到旧路由系统",
+      "description": "将 main.tsx 的 import 切换到 app/routes.ts，使用其完整的 ProtectedRoute 和旧路由树",
+      "pros": ["开箱即用已有 ProtectedRoute"],
+      "cons": [
+        "旧路由指向已被重构的旧页面组件",
+        "缺少审批(approvals)、扫描(inventory/scan)等新路径",
+        "遗留代码可能无法编译",
+        "高风险架构级变更"
+      ],
+      "effort": "large",
+      "risk": "high"
+    },
+    {
+      "name": "B1: 前端改为 ams_auth_token",
+      "description": "修改 LoginPage.tsx、http.ts、AuthContext.tsx 中使用的 storage key 从 auth_token 为 ams_auth_token",
+      "pros": ["测试无需修改，直接通过"],
+      "cons": [
+        "让生产代码使用测试专有命名 ams_ 前缀",
+        "项目 4 个文件已一致使用 auth_token",
+        "暴露测试细节到生产代码"
+      ],
+      "effort": "small",
+      "risk": "medium"
+    },
+    {
+      "name": "B2: 测试改为 auth_token（推荐）",
+      "description": "修改 testFinish 的 seedAuthenticatedSession 写入 localStorage.auth_token 替代 ams_auth_token",
+      "pros": [
+        "保持前端 auth_token 作为 canonical key",
+        "测试对齐真实实现",
+        "消除技术债务"
+      ],
+      "cons": [
+        "需要在 testFinish 项目中修改代码",
+        "如果 testFinish 同时测试其他使用 ams_auth_token 的项目需协调"
+      ],
+      "effort": "small",
+      "risk": "low"
+    },
+    {
+      "name": "B3: 双写兼容",
+      "description": "前端 LoginPage 同时写入 auth_token 和 ams_auth_token，http.ts 同时检查两个 key",
+      "pros": ["过渡期兼容性好"],
+      "cons": [
+        "引入永久技术债务",
+        "每次 auth 操作需同步两套 key",
+        "定位问题时增加困惑（数据在哪个 key 里？）"
+      ],
+      "effort": "small",
+      "risk": "medium"
+    },
+    {
+      "name": "C1: 前端对齐测试文案",
+      "description": "修改前端按钮文本、headings、placeholders、导航链接以匹配测试期望",
+      "pros": ["测试直接通过"],
+      "cons": [
+        "让产品 UI 迁就测试期望，本末倒置",
+        "'登录系统' 比 '登录并进入仪表板' 更符合 UX 规范",
+        "heading 可能是产品团队有意精简的"
+      ],
+      "effort": "medium",
+      "risk": "medium"
+    },
+    {
+      "name": "C2: 测试对齐前端实际文本（推荐）",
+      "description": "修改测试所有 button/getByPlaceholder/getByRole/getByHeading 的选择器文本为实际前端文案",
+      "pros": [
+        "测试反映真实 UI，可维护性高",
+        "不破坏产品 UX",
+        "符合测试最佳实践"
+      ],
+      "cons": ["需要在 testFinish 项目中修改多处"],
+      "effort": "small",
+      "risk": "low"
+    },
+    {
+      "name": "C3: 混合方案",
+      "description": "前端修正 2-3 处明显不合理的文本，测试修正剩余不匹配项",
+      "pros": ["灵活，可协商"],
+      "cons": [
+        "责任边界模糊——哪些改前端、哪些改测试难以决策",
+        "两端修改增加协调成本",
+        "后续难以确定权威来源"
+      ],
+      "effort": "medium",
+      "risk": "medium"
+    }
+  ],
+  "recommended_option": "A1 + B2 + C2",
+  "rationale": "遵循「测试是验证者，不是设计者」原则：(A1) 复用现有 AuthContext 是符合 React 架构的最佳实践——避免 A2 的平行认证点和 A3 的大规模路由切换风险；(B2) 保持前端 auth_token 作为 canonical key（全项目 LoginPage、http.ts、AuthContext、AppLayout 一致使用），测试对齐实现而非反之，避免 B1 的生产代码使用测试命名和 B3 的永久技术债务；(C2) 测试应反映真实 UI，避免 C1 的产品 UX 迁就测试或 C3 的边界模糊。三个分歧统一规则：实现是权威，测试应适配实现。",
+  "rejected_options": [
+    {"name": "A2", "reason": "绕过 AuthContext 创建第二个认证判断点，失去响应式能力；后续维护时 storage key 修改容易遗漏"},
+    {"name": "A3", "reason": "高风险架构级变更；旧路由指向已被重构的旧页面组件；缺少大量新路由路径"},
+    {"name": "B1", "reason": "让生产代码使用测试专有命名 ams_ 前缀；全项目 auth_token 已是一致约定"},
+    {"name": "B3", "reason": "引入永久技术债务——两套 key 代表同一件事；增加定位问题的困惑"},
+    {"name": "C1", "reason": "本末倒置——产品 UI 应基于 UX 设计而非测试期望"},
+    {"name": "C3", "reason": "责任边界模糊难以决策；两端修改增加协调成本"}
+  ],
+  "required_changes_summary": "前端 2 文件：main.tsx（添加 AuthProvider 包裹）、router/index.tsx（新增 ProtectedRoute 组件 + 重构路由嵌套）；testFinish 项目约 18 处选择器修正：seedAuthenticatedSession 的 storage key（ams_auth_token→auth_token）、CERT-01 按钮文本（登录并进入仪表板→登录系统）、CERT-02~CERT-10 的 heading/placeholder/nav-link 文本对齐实际前端文案。"
+}

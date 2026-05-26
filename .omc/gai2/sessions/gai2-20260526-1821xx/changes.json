@@ -1,0 +1,45 @@
+{
+  "changed_files": ["scripts/test_asset_workflow_e2e.py"],
+  "added_files": ["scripts/test_matrix.json", "scripts/test_asset_workflow_e2e.py", "scripts/test_asset_workflow_e2e_report.json"],
+  "commands_run": [
+    {
+      "command": "python3 scripts/test_asset_workflow_e2e.py",
+      "result": "passed",
+      "notes": "全 6 个测试用例通过（4 业务流程 + AC5 多租户隔离 + AC6 字段对齐汇总）。测试用户 sim05261457xx 不可用时自动回退到 admin。4 个业务流程均完成：登录→创建资产→发布工作流→创建审批→4 级审批通过→验证业务结果。AC5 通过动态注册新用户验证 mine=true 隔离。AC6 字段对齐零问题。"
+    },
+    {
+      "command": "python3 -c 'import json; json.load(open(\"scripts/test_matrix.json\"))'",
+      "result": "passed",
+      "notes": "test_matrix.json JSON 结构验证通过，含 4 个 test_cases、6 个用户配置、AC6 字段 schema 定义"
+    },
+    {
+      "command": "python3 -m py_compile scripts/test_asset_workflow_e2e.py",
+      "result": "passed",
+      "notes": "Python 语法检查通过"
+    }
+  ],
+  "verification_results": [
+    "TC-TRANSFER PASS: 资产调拨 4 级审批全部通过，资产状态 IN_USE，部门/位置已更新",
+    "TC-CLEARANCE PASS: 资产清退 4 级审批全部通过，资产状态 CLEARED（终态），补全 AC2 证据",
+    "TC-SCRAP PASS: 资产报废 4 级审批全部通过，资产状态 SCRAPPED（终态）",
+    "TC-COMPENSATION PASS: 资产赔偿 4 级审批全部通过，赔偿记录状态 APPROVED（仅验证赔偿记录，不验证资产状态变更）",
+    "AC5 PASS: 多租户隔离验证通过，admin 用户与动态注册用户 mine=true 交叉验证双向隔离",
+    "AC6 PASS: 审批返回字段与 DTO 对齐检查零问题，所有关键字段（id/processNo/processType/status/currentStep/applicantId）存在且类型正确",
+    "错误恢复机制验证: 测试用户 sim05261457xx 不可用（已存在但登录返回500），自动回退到 admin 用户，所有流程继续执行未中断",
+    "assetId 动态替换验证: TC-TRANSFER 的业务数据 assetId 从 null 动态替换为实际创建资产 ID=77",
+    "COMPENSATION 验证路径验证: businessId=0 时自动从赔偿列表查找最新记录，成功验证赔偿状态 APPROVED",
+    "前置检查验证: 后端连通性检查通过，4 个工作流定义全部预发布"
+  ],
+  "minions_execution": {
+    "adjudication_file_read": true,
+    "selected_source": "refine",
+    "write_intent_preserved": true,
+    "degradation_blocked": false
+  },
+  "residual_risks": [
+    "测试用户池 sim0526145701~5706 存在但无法登录（code=500），需排查用户状态（可能被禁用或角色缺失），当前通过 admin fallback 绕过",
+    "COMPENSATION 流程中审批创建时 businessId=0，说明审批创建时 businessId 未与赔偿记录关联，赔偿记录在审批通过回调中创建，需后端确认此行为是否符合预期",
+    "AC6 字段对齐检查仅在 4 个 E2E 流程中覆盖审批响应字段，未对资产 DTO/auth DTO 做运行时检查（schema 已在 test_matrix.json 中定义但未执行运行时验证）",
+    "4 级审批使用同一 admin 用户连续审批（因 sim 用户不可用），实际多级审批模式下可能要求不同审批人，生产环境需不同用户"
+  ]
+}

@@ -1,21 +1,32 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { addEdge, type Connection, useEdgesState, useNodesState } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import { ArrowLeft, Download, Layers3, Loader2, Play, Save, Send, Workflow } from 'lucide-react';
+import { ArrowLeft, Code, Layers3, Loader2, Play, Save, Send, X } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router';
 
 import { FlowCanvas } from '@/components/flow/FlowCanvas';
 import { NodeConfigPanel } from '@/components/flow/NodeConfigPanel';
 import { NodePanel } from '@/components/flow/NodePanel';
-import { workflowApi, roleApi, type RoleRecord } from '@/api/workflow';
-import { businessFlowOptions, getDraftStorageKey, isBusinessType, type BusinessType } from '@/constants/workflowBusiness';
+import { workflowApi, roleApi, type RoleRecord, type WorkflowDefinitionDTO } from '@/api/workflow';
+import { businessFlowOptions, getDraftStorageKey, isBusinessType, isCustomBusinessType } from '@/constants/workflowBusiness';
 import { normalizeWorkflowDefinition, validateWorkflowDefinition } from '@/utils/workflowDefinition';
 import { createFlowEdge, initialFlowEdges, initialFlowNodes, type FlowEdge, type FlowDefinition, type FlowNode, type FlowNodeData, type FlowNodeType } from '@/types/flow';
 
 function cloneNodes() { return initialFlowNodes.map((n) => ({ ...n, position: { ...n.position }, data: { ...n.data } })); }
 function cloneEdges() { return initialFlowEdges.map((e) => ({ ...e, data: e.data ? { ...e.data } : e.data })); }
 
-function readDraft(bt: BusinessType): Pick<FlowDefinition, 'nodes' | 'edges'> | null {
+function createFlowNode(type: FlowNodeType, pos: { x: number; y: number }): FlowNode {
+  const base = initialFlowNodes.find((n) => n.type === type) ?? initialFlowNodes[1];
+  return {
+    ...base,
+    id: type + '-' + Date.now(),
+    type: type,
+    position: { x: pos.x, y: pos.y },
+    data: { ...base.data, nodeCode: (type + '_' + Date.now()).toUpperCase() },
+  };
+}
+
+function readDraft(bt: string): Pick<FlowDefinition, 'nodes' | 'edges'> | null {
   try {
     const raw = localStorage.getItem(getDraftStorageKey(bt));
     if (!raw) return null;
@@ -25,7 +36,7 @@ function readDraft(bt: BusinessType): Pick<FlowDefinition, 'nodes' | 'edges'> | 
   } catch { return null; }
 }
 
-function fromApi(val: Record<string, unknown> | undefined, bt: BusinessType): Pick<FlowDefinition, 'nodes' | 'edges'> | null {
+function fromApi(val: Record<string, unknown> | undefined, bt: string): Pick<FlowDefinition, 'nodes' | 'edges'> | null {
   if (!val || !Array.isArray(val.nodes) || val.nodes.length === 0 || !Array.isArray(val.edges)) return null;
   return normalizeWorkflowDefinition(val as unknown as FlowDefinition, bt);
 }
@@ -35,14 +46,6 @@ function autoPos(i: number) { return { x: 220 + (i % 2) * 220, y: 120 + Math.flo
 function readRoleField(role: RoleRecord, keys: string[]) {
   for (const k of keys) { const v = role[k]; if (v != null && v !== '') return String(v); }
   return '';
-}
-
-function normalizeRoles(res: unknown) {
-  let list: RoleRecord[] = [];
-  if (Array.isArray(res)) list = res;
-  else if (res && typeof res === 'object') { const r = res as Record<string, unknown>; if (Array.isArray(r.data)) list = r.data as RoleRecord[]; else if (Array.isArray(r.records)) list = r.records as RoleRecord[]; }
-  const roles = (list as RoleRecord[]).map((role) => readRoleField(role, ['roleCode', 'role_code', 'code']) || readRoleField(role, ['roleName', 'role_name', 'name'])).filter(Boolean);
-  return Array.from(new Set(['SUPER_ADMIN', ...roles]));
 }
 
 const STATUS_STYLES: Record<string, { label: string; cls: string }> = {
@@ -57,8 +60,12 @@ export default function WorkflowDesignerPage() {
   const navigate = useNavigate();
   const [sp, setSp] = useSearchParams();
   const reqBt = sp.get('businessType');
-  const businessType: BusinessType = isBusinessType(reqBt) ? reqBt : 'ASSET_TRANSFER';
-  const flow = businessFlowOptions.find((o) => o.businessType === businessType) ?? businessFlowOptions[0];
+  const reqBtStr = reqBt || '';
+  const isCustom = reqBtStr ? isCustomBusinessType(reqBtStr) : false;
+  const businessType: string = reqBtStr && (isBusinessType(reqBtStr) || isCustom) ? reqBtStr : 'ASSET_TRANSFER';
+  const flow = businessFlowOptions.find((o) => o.businessType === businessType) ?? (isCustom
+    ? { businessType, name: businessType.replace(/^CUSTOM_/, ''), description: '自定义流程', businessName: '自定义' as const, formPath: '' as const, stepCount: 4 as const, accentClass: 'bg-gray-400' as const }
+    : businessFlowOptions[0]);
 
   const [nodes, setNodes, onNodesChange] = useNodesState<FlowNode>(cloneNodes());
   const [edges, setEdges, onEdgesChange] = useEdgesState<FlowEdge>(cloneEdges());
@@ -69,24 +76,32 @@ export default function WorkflowDesignerPage() {
   const [srvVersion, setSrvVersion] = useState(0);
   const [approverRoles, setApproverRoles] = useState<string[]>(['SUPER_ADMIN']);
   const [roleDetails, setRoleDetails] = useState<Array<{ roleCode: string; roleName: string }>>([]);
+  const [formSource, setFormSource] = useState('');
+  const [showFormSource, setShowFormSource] = useState(false);
+  const [srvName, setSrvName] = useState<string | null>(null);
+  const [srvDesc, setSrvDesc] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [publishing, setPublishing] = useState(false);
 
-  useEffect(() => { if (!isBusinessType(reqBt)) setSp({ businessType }, { replace: true }); }, [businessType, reqBt, setSp]);
+  useEffect(() => { if (!isBusinessType(reqBt) && !isCustomBusinessType(reqBt)) setSp({ businessType }, { replace: true }); }, [businessType, reqBt, setSp]);
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
       setSaveErr(null);
       try {
-        const def = await workflowApi.get(businessType);
+        const raw = await workflowApi.get(businessType);
+        const def = raw as WorkflowDefinitionDTO;
         if (cancelled) return;
-        const parsed = fromApi(def.definition as Record<string, unknown>, businessType);
+        const defData = def.definition as Record<string, unknown> | undefined;
+        const parsed = fromApi(defData, businessType);
         const nn = parsed?.nodes ?? cloneNodes();
         const ne = parsed?.edges ?? cloneEdges();
         setNodes(nn); setEdges(ne);
         setSelId(nn.find((n) => n.type === 'approval')?.id ?? 'approval-1');
         setSrvStatus(def.status); setSrvVersion(def.version);
+        setSrvName(def.name ?? null); setSrvDesc(def.description ?? null);
+        setFormSource((defData?.formSource as string) || '');
         setSaveMsg(def.id ? '已从后端恢复流程定义' : null);
       } catch {
         if (cancelled) return;
@@ -109,7 +124,7 @@ export default function WorkflowDesignerPage() {
         const res = await roleApi.getAll();
         let list: RoleRecord[] = [];
         if (Array.isArray(res)) list = res;
-        else if (res && typeof res === 'object') { const r = res as Record<string, unknown>; if (Array.isArray(r?.data)) list = r.data as RoleRecord[]; else if (Array.isArray(r?.records)) list = r.records as RoleRecord[]; }
+        if (list.length === 0) console.warn('[WorkflowDesignerPage] 角色加载结果为空列表，res=', res);
         const codes = list.map((role) => readRoleField(role, ['roleCode', 'role_code', 'code']) || readRoleField(role, ['roleName', 'role_name', 'name'])).filter(Boolean);
         const unique = Array.from(new Set(['SUPER_ADMIN', ...codes]));
         if (!cancelled && unique.length > 0) {
@@ -122,7 +137,12 @@ export default function WorkflowDesignerPage() {
   }, []);
 
   const selNode = useMemo(() => nodes.find((n) => n.id === selId) ?? null, [nodes, selId]);
-  const flowDef = useMemo<FlowDefinition>(() => ({ id: `WF-${businessType}`, name: flow.name, description: flow.description, nodes, edges }), [flow, businessType, nodes, edges]);
+  const flowDef = useMemo<FlowDefinition>(() => ({
+    id: `WF-${businessType}`,
+    name: isCustom && srvName ? srvName : flow.name,
+    description: isCustom && srvDesc ? srvDesc : flow.description,
+    nodes, edges
+  }), [flow, businessType, isCustom, srvName, srvDesc, nodes, edges]);
   const normDef = useMemo(() => normalizeWorkflowDefinition(flowDef, businessType), [businessType, flowDef]);
   const valErrors = useMemo(() => validateWorkflowDefinition(normDef), [normDef]);
 
@@ -150,31 +170,42 @@ export default function WorkflowDesignerPage() {
     setSelId((prev) => prev === id ? (nodes.find((n) => n.id !== id)?.id ?? null) : prev);
   }, [nodes, setEdges, setNodes]);
 
+  const defPayload = useMemo(() => {
+    const base = normDef as unknown as Record<string, unknown>;
+    if (formSource) {
+      return { ...base, formSource };
+    }
+    const { formSource: _, ...rest } = base;
+    return rest;
+  }, [normDef, formSource]);
+
   const handleSaveDraft = useCallback(async () => {
     setSaving(true);
     try {
-      const saved = await workflowApi.saveDraft(businessType, { name: normDef.name, description: normDef.description, definition: normDef as unknown as Record<string, unknown> });
-      localStorage.setItem(getDraftStorageKey(businessType), JSON.stringify({ ...normDef, savedAt: new Date().toISOString() }));
+      const raw = await workflowApi.saveDraft(businessType, { name: normDef.name, description: normDef.description, definition: defPayload });
+      const saved = raw as WorkflowDefinitionDTO;
+      localStorage.setItem(getDraftStorageKey(businessType), JSON.stringify({ ...normDef, formSource, savedAt: new Date().toISOString() }));
       setSrvStatus(saved.status); setSrvVersion(saved.version); setSaveErr(null);
       setSaveMsg(valErrors.length > 0 ? `${flow.name}已保存草稿，发布前需补全校验项` : `${flow.name}已保存草稿`);
     } catch {
-      localStorage.setItem(getDraftStorageKey(businessType), JSON.stringify({ ...normDef, savedAt: new Date().toISOString() }));
+      localStorage.setItem(getDraftStorageKey(businessType), JSON.stringify({ ...normDef, formSource, savedAt: new Date().toISOString() }));
       setSaveMsg(`${flow.name}已保存本地草稿`); setSaveErr('后端保存失败');
     } finally { setSaving(false); }
-  }, [businessType, flow.name, normDef, valErrors.length]);
+  }, [businessType, flow.name, normDef, defPayload, formSource, valErrors.length]);
 
   const handlePublish = useCallback(async () => {
     if (!ensureValid('发布')) return;
     setPublishing(true);
     try {
-      await workflowApi.saveDraft(businessType, { name: normDef.name, description: normDef.description, definition: normDef as unknown as Record<string, unknown> });
-      localStorage.setItem(getDraftStorageKey(businessType), JSON.stringify({ ...normDef, savedAt: new Date().toISOString() }));
-      const pub = await workflowApi.publish(businessType);
+      await workflowApi.saveDraft(businessType, { name: normDef.name, description: normDef.description, definition: defPayload });
+      localStorage.setItem(getDraftStorageKey(businessType), JSON.stringify({ ...normDef, formSource, savedAt: new Date().toISOString() }));
+      const raw = await workflowApi.publish(businessType);
+      const pub = raw as WorkflowDefinitionDTO;
       setSrvStatus(pub.status); setSrvVersion(pub.version); setSaveErr(null);
       setSaveMsg(`${flow.name}已发布为 v${pub.version}`);
     } catch (e) { setSaveMsg(null); setSaveErr(e instanceof Error ? e.message : '发布失败'); }
     finally { setPublishing(false); }
-  }, [businessType, ensureValid, flow.name, normDef]);
+  }, [businessType, ensureValid, flow.name, normDef, defPayload, formSource]);
 
   const statusStyle = STATUS_STYLES[srvStatus] ?? STATUS_STYLES.UNCONFIGURED;
 
@@ -200,13 +231,19 @@ export default function WorkflowDesignerPage() {
 
           {/* Center: business type selector + meta */}
           <div className="flex items-center gap-3">
-            <select
-              value={businessType}
-              onChange={(e) => { if (isBusinessType(e.target.value)) setSp({ businessType: e.target.value }); }}
-              className="h-8 rounded-lg border border-gray-200 bg-white px-3 text-sm text-gray-700 outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400"
-            >
-              {businessFlowOptions.map((o) => <option key={o.businessType} value={o.businessType}>{o.name}</option>)}
-            </select>
+            {isCustom ? (
+              <span className="inline-flex items-center h-8 rounded-lg border border-gray-200 bg-gray-50 px-3 text-sm text-gray-500 font-mono">
+                {businessType}
+              </span>
+            ) : (
+              <select
+                value={businessType}
+                onChange={(e) => { if (isBusinessType(e.target.value)) setSp({ businessType: e.target.value }); }}
+                className="h-8 rounded-lg border border-gray-200 bg-white px-3 text-sm text-gray-700 outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400"
+              >
+                {businessFlowOptions.map((o) => <option key={o.businessType} value={o.businessType}>{o.name}</option>)}
+              </select>
+            )}
             <span className="inline-flex items-center gap-1.5 h-8 rounded-lg border border-gray-200 bg-white px-3 text-sm text-gray-600">
               <Layers3 className="w-3.5 h-3.5" />
               {nodes.length} 个节点
@@ -239,13 +276,15 @@ export default function WorkflowDesignerPage() {
 
         {/* Messages */}
         {saveMsg && (
-          <div className="mt-2 rounded-lg border border-green-200 bg-green-50 px-4 py-2 text-sm text-green-700 flex items-center gap-2">
-            <Play className="w-3.5 h-3.5" /> {saveMsg}
+          <div className="mt-2 rounded-lg border border-green-200 bg-green-50 px-4 py-2 text-sm text-green-700 flex items-center justify-between gap-2">
+            <span className="flex items-center gap-2"><Play className="w-3.5 h-3.5" /> {saveMsg}</span>
+            <button type="button" onClick={() => setSaveMsg(null)} className="text-green-500 hover:text-green-700 flex-shrink-0"><X className="w-4 h-4" /></button>
           </div>
         )}
         {saveErr && (
-          <div className="mt-2 rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-700">
-            {saveErr}
+          <div className="mt-2 rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-700 flex items-center justify-between gap-2">
+            <span>{saveErr}</span>
+            <button type="button" onClick={() => setSaveErr(null)} className="text-red-500 hover:text-red-700 flex-shrink-0"><X className="w-4 h-4" /></button>
           </div>
         )}
         {valErrors.length > 0 && (
@@ -259,7 +298,40 @@ export default function WorkflowDesignerPage() {
       <div className="flex-1 min-h-0 grid grid-cols-[280px_minmax(0,1fr)_340px] divide-x divide-gray-200">
         <NodePanel onAddNode={(type) => handleAddNode(type)} />
         <FlowCanvas nodes={nodes} edges={edges} onNodesChange={onNodesChange} onEdgesChange={onEdgesChange} onConnect={handleConnect} onNodeSelect={(n) => setSelId(n?.id ?? null)} onAddNodeAtPosition={handleAddNode} />
-        <NodeConfigPanel selectedNode={selNode} edges={edges} approverRoles={approverRoles} roleDetails={roleDetails} onUpdateNode={handleUpdate} onDeleteNode={handleDelete} />
+        <div className="flex flex-col min-h-0">
+          <div className="flex-shrink-0 flex border-b border-gray-200">
+            <button
+              className={`flex-1 px-3 py-2 text-xs font-medium text-center ${!showFormSource ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50/50' : 'text-gray-500 hover:text-gray-700'}`}
+              onClick={() => setShowFormSource(false)}
+            >
+              节点属性
+            </button>
+            <button
+              className={`flex-1 px-3 py-2 text-xs font-medium text-center ${showFormSource ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50/50' : 'text-gray-500 hover:text-gray-700'}`}
+              onClick={() => setShowFormSource(true)}
+            >
+              <Code className="inline w-3 h-3 mr-1" />表单源码
+            </button>
+          </div>
+          {showFormSource ? (
+            <div className="flex-1 flex flex-col p-3 overflow-auto">
+              <div className="text-xs font-medium text-gray-500 mb-2">自定义表单 HTML（保存草稿后生效）</div>
+              <textarea
+                className="flex-1 w-full min-h-[200px] rounded-lg border border-gray-200 bg-gray-50 p-3 text-xs font-mono text-gray-800 outline-none resize-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+                placeholder={`<form>\n  <label>字段名</label>\n  <input name="field" />\n  <button type="submit">提交</button>\n</form>`}
+                value={formSource}
+                onChange={(e) => setFormSource(e.target.value)}
+              />
+              <p className="text-[10px] text-gray-400 mt-2 leading-relaxed">
+                表单源码会保存在流程定义中。自定义流程卡片上的"查看业务表单"按钮会渲染此 HTML。
+              </p>
+            </div>
+          ) : (
+            <div className="flex-1 min-h-0 overflow-auto">
+              <NodeConfigPanel selectedNode={selNode} edges={edges} approverRoles={approverRoles} roleDetails={roleDetails} onUpdateNode={handleUpdate} onDeleteNode={handleDelete} />
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

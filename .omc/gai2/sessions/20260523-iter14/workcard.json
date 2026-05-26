@@ -1,0 +1,61 @@
+{
+  "session_id": "20260523-iter14",
+  "directive": "forthAMS 迭代14 — 前端 RHF 升级 + stitchMCP 资产分类管理页面 + 边界推演",
+  "owner": "gai2-builder",
+  "phase": "builder",
+  "classification": "Medium",
+  "created_at": "2026-05-23T11:00:00.000Z",
+  "goal_ref": ".omc/gai2/goal-state.json",
+  "already_completed": [
+    "所有 18 个 Controller 已添加 @Valid/@Validated",
+    "ApprovalService.handleBusinessOutcome 已实现 6 种 processType 分发",
+    "DisposalService.transferAsset/clearAsset/scrapAsset 已实现",
+    "ApprovalService.handleRejection 已补全 4 种驳回处理",
+    "SystemConfig 后端 API（Controller/Service/Mapper/Entity）已实现",
+    "SettingsPage SystemConfigTab/SecurityTab 已从 localStorage 改为 API 调用",
+    "IdleAssetsPage 发布公告弹窗补充 zod 校验",
+    "@EnableScheduling 已配置",
+    "251 后端测试通过，612 前端测试通过，npm build 通过"
+  ],
+  "acceptance_checks": [
+    {
+      "id": "AC-rhf-vendors",
+      "check": "VendorsPage 从 zod safeParse 升级为 RHF+zodResolver，实现实时字段级校验",
+      "status": "pending"
+    },
+    {
+      "id": "AC-asset-form-schema",
+      "check": "AssetFormPage zod schema 补充 approvedValue/netValue 等字段，对齐后端 AssetCreateDTO",
+      "status": "pending"
+    },
+    {
+      "id": "AC-stitch-category-page",
+      "check": "使用 StitchMCP 生成资产分类管理页面（CategoryManagerPage），对接 AssetCategoryController CRUD",
+      "status": "pending"
+    },
+    {
+      "id": "AC-edge-reasoning",
+      "check": "对本次新增功能做边界用例和异常推演，记录在推演文档中",
+      "status": "pending"
+    },
+    {
+      "id": "AC-tests-green",
+      "check": "mvn test + vitest + npm build 全绿",
+      "status": "pending"
+    }
+  ],
+  "evidence_to_collect": [
+    "VendorsPage 使用 RHF+zodResolver 源码",
+    "AssetFormPage schema 更新",
+    "CategoryManagerPage 页面文件",
+    "边界推演记录",
+    "mvn test 结果",
+    "vitest 结果",
+    "npm build 结果"
+  ],
+  "open_risks": [
+    "VendorsPage 当前为单文件大组件，RHF 升级需谨慎处理 CRUD 逻辑",
+    "StitchMCP 生成的页面需要手动集成到现有路由和 API",
+    "AssetFormPage 的 edit 模式可能需后端配合才能读取全部字段"
+  ]
+}

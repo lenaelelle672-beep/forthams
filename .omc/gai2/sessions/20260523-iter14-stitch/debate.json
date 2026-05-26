@@ -1,0 +1,224 @@
+{
+  "session_id": "20260523-iter14-stitch",
+  "debated_at": "2026-05-23T12:00:00.000Z",
+  "topics": [
+    {
+      "topic": "议题 1：全局搜索后端架构方案",
+      "options": [
+        {
+          "label": "Option A: SearchController + 多 Service 组合",
+          "description": "新建 SearchController 接收 keyword+type 参数，内部调用 AssetService.search()、WorkOrderService.search()、VendorService.search() 分别查询各模块，在 Service 或 Controller 层合并结果并统一排序分页，返回统一 SearchResultDTO",
+          "pros": [
+            "审计 F03 明确推荐该方案，与 directive 完全对齐",
+            "各模块搜索逻辑保持在自己的 Service 层，不破坏现有模块化架构",
+            "可使用 CompletableFuture.supplyAsync() 并行查询多模块，性能可控",
+            "添加新搜索实体（如位置、合同）只需加一个 ModuleService.search()",
+            "结果合并层统一处理排序和分组展示逻辑"
+          ],
+          "cons": [
+            "跨表分页合并需明确策略——建议按 type 分组展示，不做全局 offset 分页",
+            "搜索结果类型需统一标准化，前端需按优先级排序展示"
+          ],
+          "risks": [
+            "多实体并行查询的性能模型未评估——审计 Risk 明确标注",
+            "若后续搜索实体增多，统一 search() 方法的参数签名可能膨胀"
+          ],
+          "evidence_from_audit": [
+            "F03: 创建 SearchController (GET /api/search/...)。SearchService 分别查询各模块 Mapper，合并结果排序",
+            "F03: 结果格式统一为 { id, type, title, subtitle, path }",
+            "F03: 建议使用 UNION 查询或并行 CompletableFuture 提升性能",
+            "Batch 1: 新建 SearchController + SearchService + SearchResultDTO — 实现跨实体搜索",
+            "Risk: 全局搜索 API 需新建 SearchController/SearchService — 涉及多表联查或并行查询，性能模型未评估"
+          ]
+        },
+        {
+          "label": "Option B: 数据库 UNION / 视图层统一查询",
+          "description": "创建数据库视图或使用 MyBatis UNION ALL 查询，在数据库层将 asset、work_order、vendor 三张表合并，返回统一结果集",
+          "pros": [
+            "单次查询无网络开销，数据库层能利用索引优化",
+            "天然统一排序和分页"
+          ],
+          "cons": [
+            "三张表列结构差异大，UNION 需要大量 NULL AS 填充，视图难以维护",
+            "添加新搜索实体（如位置、合同）需修改数据库视图定义，审批流程长",
+            "无法利用 MyBatis ORM 映射优势，结果集映射到统一 DTO 需额外转换"
+          ],
+          "risks": [
+            "与 F03 推荐方向不一致，审计以 Option A 为主方向",
+            "数据库视图变更涉及 DBA 审批，交付周期变长"
+          ],
+          "evidence_from_audit": [
+            "F03: 建议使用 UNION 查询或并行 CompletableFuture 提升性能（次要提及）",
+            "F03 审计推荐方案明显以新建 SearchController+SearchService 为主线"
+          ]
+        },
+        {
+          "label": "Option C: 前端枚举式调用",
+          "description": "前端 SearchDropdown 让用户选择搜索范围（资产/工单/供应商），根据选择调用对应模块 API（/api/assets/search、/api/work-orders/search 等），不做后端统一查询",
+          "pros": [
+            "实现最简单，几乎没有后端改动"
+          ],
+          "cons": [
+            "无法实现跨类型全局搜索——用户需先选类型再搜索，体验割裂",
+            "前端需串行发起多次请求或在客户端手动合并结果",
+            "每个新搜索实体都需前端改路由调用"
+          ],
+          "risks": [
+            "F04 明确要求统一搜索体验：搜索栏需要防抖 + API 调用 + 下拉展示",
+            "审计 Batch 1 包含 SearchController 的全栈新建，方案 C 与审计批次完全冲突"
+          ],
+          "evidence_from_audit": [
+            "F04: AppLayout.tsx 搜索栏为纯装饰性 — 需要后端统一 API 支持",
+            "Batch 1 任务列表包含 新建 SearchController + SearchService + SearchResultDTO",
+            "审计 recommended_approach 完全没有考虑前端枚举式方案"
+          ]
+        }
+      ],
+      "recommendation": {
+        "choice": "Option A: SearchController + 多 Service 组合",
+        "reasoning": "完全对齐审计 F03 推荐，保持模块化架构，并行 CompletableFuture 可缓解性能风险，扩展性最佳。建议结果按 type 分组展示以回避跨表分页难题。",
+        "fallback": "若单次搜索延迟超过 500ms，引入 Redis 缓存高频搜索词的结果摘要",
+        "unresolved_questions": [
+          "搜索结果按 type 分组的排序权重如何定义（资产>工单>供应商？）",
+          "是否需要对搜索结果做权限过滤（用户可能无权查看某些工单）",
+          "高频搜索词是否需要缓存——比如资产编号搜索"
+        ]
+      }
+    },
+    {
+      "topic": "议题 2：ReportCenterPage 图表渲染方案",
+      "options": [
+        {
+          "label": "Recharts",
+          "description": "使用项目中已安装并广泛使用的 Recharts 库（2.15.2），与 AnalyticsPage 统一图表技术栈，主要用于 ReportCenterPage 的预设报表展示",
+          "pros": [
+            "项目已有 28+ 组件使用 Recharts，技术经验丰富",
+            "AnalyticsPage 已使用 Recharts 实现面积图/饼图/柱状图，代码可复用",
+            "声明式 React API，与项目 React 技术栈天然一致",
+            "Tree-shaking 友好，不会显著增加 bundle 体积",
+            "F08 定位 ReportCenterPage 为预设报表，图表复杂度要求不高，Recharts 足够胜任"
+          ],
+          "cons": [
+            "复杂图表（如双轴混合图、热力图）能力有限",
+            "大数据量（万级数据点）SVG 渲染性能不如 ECharts Canvas"
+          ],
+          "risks": [
+            "如果未来 ReportCenterPage 需要高级图表（如甘特图），Recharts 无法支持"
+          ],
+          "evidence_from_audit": [
+            "F08: 差异化定位: AnalyticsPage = 交互式BI分析, ReportCenterPage = 预设报表仓库",
+            "AnalyticsPage.tsx 第 22-25 行 import 全部使用 Recharts",
+            "package.json 显示 recharts 2.15.2 已安装",
+            "全项目 28 处 import from recharts 覆盖常用图表类型"
+          ]
+        },
+        {
+          "label": "ECharts",
+          "description": "使用已安装的 echarts ^6.1.0 + echarts-for-react，提供丰富图表配置和 Canvas 高性能渲染",
+          "pros": [
+            "图表类型极丰富（热力图、桑基图、仪表盘等），配置灵活",
+            "Canvas 渲染，处理大数据量（万级）性能优越",
+            "已在项目中安装，不需新增依赖"
+          ],
+          "cons": [
+            "Bundle 体积大——即使按需导入最小引入包也超过 100KB gzipped",
+            "非原生声明式 React API，需通过 echarts-for-react 桥接",
+            "与项目主流图表技术栈（Recharts）不一致，维护两套体系"
+          ],
+          "risks": [
+            "与 F08 的预设报表仓库定位冲突——不需要 ECharts 的高级能力",
+            "新增一种图表库会增加前端构建时间和维护成本"
+          ],
+          "evidence_from_audit": [
+            "F08: ReportCenterPage 定位为预设报表仓库（固定格式报表列表+一键导出PDF/Excel）",
+            "package.json 第 66 行显示 echarts ^6.1.0 已安装",
+            "项目中 ECharts 仅用于 3 个旧版 app/pages/ 组件（旧 Dashboard）"
+          ]
+        }
+      ],
+      "recommendation": {
+        "choice": "Recharts",
+        "reasoning": "ReportCenterPage 定位为预设报表仓库（F08），只需柱状图、饼图、趋势线图等基础图表，Recharts 完全胜任。AnalyticsPage 已用 Recharts 实现全部所需图表类型，代码可直接复用。两个图表库并存会增加维护负担。",
+        "fallback": "若未来需要地图热力图或 3D 散点图等 Recharts 不支持的类型，按需从 echarts/core 导入特定模块，不做全局替代",
+        "unresolved_questions": [
+          "ReportCenterPage 具体的报表类型列表——需要哪些图表类型以验证 Recharts 是否足够",
+          "是否需要对报表进行大数据量导出（如 1 万+ 数据点导出为图片），这决定是否需要 Canvas 方案"
+        ]
+      }
+    },
+    {
+      "topic": "议题 3：CategoryManagerPage 树形组件方案",
+      "options": [
+        {
+          "label": "@tanstack/react-tree（审计推荐方案）",
+          "description": "使用 TanStack 生态的树形组件库，提供声明式 tree API、内置展开/折叠/CRUD 操作，与项目中已有的 @tanstack/react-query 适配",
+          "pros": [
+            "审计 F02 明确推荐使用 @tanstack/react-tree",
+            "TanStack 生态一致——项目已深度使用 @tanstack/react-query",
+            "内置 WAI-ARIA 无障碍支持，CategoryManagerPage 的树形 CRUD 操作开箱即用",
+            "无需手写递归树、状态管理、展开/折叠/键盘导航等复杂交互逻辑",
+            "后端 CategoryTreeDTO 结构可直接映射到 tree 库节点数据"
+          ],
+          "cons": [
+            "新增一个 npm 依赖",
+            "需要约 20 行 adapter 代码将 CategoryTreeDTO 转为 tree 库格式",
+            "样式需通过 render prop 映射 tailwind 类"
+          ],
+          "risks": [
+            "@tanstack/react-tree 可能仍处于实验阶段（需确认版本稳定度）",
+            "与现有 CategoryPanel.tsx 的渲染逻辑差异可能导致视觉不一致"
+          ],
+          "evidence_from_audit": [
+            "F02: 树组件推荐使用 @tanstack/react-tree 或 antd Tree 组件",
+            "F02: CategoryManagerPage 需要分类增/删/改的 UI 交互",
+            "Risk: CategoryManagerPage 需要树形 CRUD 交互 — 分类删除需检查子分类和关联资产",
+            "Batch 2: 使用 stitchMCP 生成 CategoryManagerPage 设计稿"
+          ]
+        },
+        {
+          "label": "自建纯 Tailwind 树形组件",
+          "description": "基于现有 CategoryPanel.tsx 的递归 TreeNode 模式，扩展为支持增/删/改/拖拽的完整管理树组件",
+          "pros": [
+            "零新增依赖，完全掌控渲染逻辑",
+            "现有 CategoryPanel.tsx（262 行）已有递归树原型可复用",
+            "可完全按产品需求定制交互细节"
+          ],
+          "cons": [
+            "CRUD 交互工作量极大：增/删/改/拖拽 + 级联确认至少 300-500 行新增代码",
+            "无障碍支持不足：CategoryPanel 当前无 aria-* 属性和键盘导航",
+            "树状状态管理（展开/折叠/异步刷新一致性）手工实现易出边界 bug"
+          ],
+          "risks": [
+            "时间成本高——CategoryPanel 团队已完成 262 行仅支持只读选择，CRUD 全功能预计翻倍工作量",
+            "与审计 F02 的明确推荐不一致"
+          ],
+          "evidence_from_audit": [
+            "F02: 树组件推荐使用 @tanstack/react-tree（审计专家的明确意见）",
+            "CategoryPanel.tsx 目前已实现的功能仅为只读选择树，无 CRUD",
+            "Risk: 分类删除需检查子分类和关联资产，避免级联问题"
+          ]
+        }
+      ],
+      "recommendation": {
+        "choice": "@tanstack/react-tree",
+        "reasoning": "审计 F02 明确推荐该方向。CategoryManagerPage 需要完整的树形 CRUD（增/删/改/拖拽），自建工作量巨大。项目已深度使用 TanStack Query，添加同生态 @tanstack/react-tree 成本最低、一致性最好。自建方案作为兼容性备选。",
+        "fallback": "若 @tanstack/react-tree 安装后 API 不兼容或树数据适配异常，回退到基于 CategoryPanel.tsx 增强的自建方案，此时需重点补充 a11y 和 CRUD 交互",
+        "unresolved_questions": [
+          "@tanstack/react-tree 当前版本是否稳定——需确认 npm 版本号和 break change 风险",
+          "树节点拖拽排序是否需要——现有后端是否支持排序字段更新",
+          "删除分类时的级联确认弹窗是前端做递归检查还是交给后端 409 响应",
+          "是否需要与旧版 CategoryPanel.tsx 共用一套树数据状态——避免两个组件数据不同步"
+        ]
+      }
+    }
+  ],
+  "cross_cutting_concerns": [
+    "数据就绪依赖：ReportService.getByCategory() 空实现（F06 CRITICAL）阻塞了议题 2 的分类统计图表，必须先修复",
+    "审计批次依赖：batch1（修复数据基础+搜索 API）必须完成，batch2+batch3 才能推进",
+    "stitchMCP 集成风险（F07）：stitchMCP 首次使用，生成的组件需手动对接 TanStack Query 并检查 Design System 一致性",
+    "功能重叠风险（F08）：ReportCenterPage 必须与 AnalyticsPage 差异化定位，图表选型不能过度设计",
+    "树形操作级联问题：分类删除需递归检查子分类和关联资产，树组件必须有级联确认交互",
+    "跨组件数据同步：CategoryManagerPage 的树变更需回写到 CategoryPanel（资产列表筛选侧边栏），需统一状态管理策略"
+  ],
+  "overall_recommendation": "三个议题的推荐方案均与审计发现高度一致：全局搜索选 SearchController+多 Service 组合（F03 推荐）、图表选 Recharts（F08 定位一致）、树组件选 @tanstack/react-tree（F02 推荐）。实施必须严格按审计 batch 计划推进——先 batch1 后端数据基础，再并行 stitchMCP 生成+数据绑定，最后边界推演。三个议题间最大的依赖关系是 batch1 的后端修复和搜索 API 新建，它们是前端页面可用的前置条件。"
+}

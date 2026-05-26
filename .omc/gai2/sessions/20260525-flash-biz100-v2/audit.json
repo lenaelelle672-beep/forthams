@@ -1,0 +1,122 @@
+{
+  "schema_version": 1,
+  "session_id": "20260525-flash-biz100-v2",
+  "audited_at": "2026-05-25T06:35:00Z",
+  "current_state": "代码总体上可用：后端 mvn compile 通过（无错误输出），前端 vite build ✓ built in 5.55s。大屏权限控制和自定义工作流新建功能已在第一轮实现，但用户反馈仍有问题——最可能的根因是前端 PermissionGuard 在用户 roles 为空时拦截所有用户，以及大屏路由架构上非 ProtectedRoute 子路由导致 AuthContext 加载时序问题。工作流新建UI和后端API完整存在，功能级覆盖度较高。",
+  "existing_patterns": [
+    "前端路由多层守卫：ProtectedRoute（认证）→ PermissionGuard（角色检查）→ 页面组件，两阶段分离",
+    "后端 Spring Security FilterChain：JwtAuthenticationFilter（token解析 + UserDetails）→ SecurityConfig（URL模式匹配 + hasAnyRole）",
+    "AuthContext 登录驱动：登录响应携带 roles → sessionStorage → AuthContext 初始化 → useAuth() 消费",
+    "工作流前后端链式交互：前端不直接存模板，后端 WorkflowDefinitionService 通过 TEMPLATES 静态列表 + 数据库 WorkflowDefinition 表混合提供数据",
+    "前端组件拆分: FlowCanvas(画布) + NodeConfigPanel(配置面板) + NodePanel(节点面板) 三栏布局设计器",
+    "旧版路由（router/index.tsx）+ 新版 app 路由（app/routes.ts）双路由存在，大屏使用旧版路由"
+  ],
+  "technical_constraints": [
+    "大屏路由在 router/index.tsx 中定义为公开路由（非 ProtectedRoute 子路由），使用独立 PermissionGuard 守卫",
+    "AppLayout 侧边栏大屏导航项使用 external:true + <a href target=_blank>，跳转到新标签页打开大屏",
+    "后端 SecurityConfig 中 hasAnyRole 需要 UserDetails 的 authorities 包含 ROLE_ADMIN 或 ROLE_SUPER_ADMIN（UserDetailsServiceImpl 自动加 ROLE_ 前缀）",
+    "AuthService.login 中的 roles 来自 userRoleMapper.selectRoleCodesByUserId 查询 sys_role.role_code 字段",
+    "自定义流程 businessType 强制 CUSTOM_ 前缀且长度 <= 64 字符（前端 + 后端双重校验）",
+    "自定义流程创建默认使用 开始→审批→结束 最小模板（不为空白）",
+    "PermissionGuard 中 `user?.roles` 为可选链，如果 user.roles 为 undefined/null/[] 则全员通过失败 → ForbiddenPage",
+    "前端 vite 使用 esbuild 转译，tsc 404 个预存类型错误不影响构建"
+  ],
+  "risks": [
+    {
+      "level": "high",
+      "detail": "大屏路由架构风险：/bigscreen 是公开路由（不在 ProtectedRoute 中），PermissionGuard 依赖 AuthContext 的 isAuthenticated 和 user.roles。如果 sessionStorage 中 user_info 缺少 roles 字段（旧版本遗留数据），所有用户（包括 ADMIN）都会看到 ForbiddenPage"
+    },
+    {
+      "level": "medium",
+      "detail": "BigScreenPage 实际调用 /dashboard/stats 而非 /bigscreen/stats 接口，后端 SecurityConfig 对 /bigscreen/** 的 hasAnyRole 限制对大屏页面数据无实际影响——/dashboard/stats 对所有已认证用户开放"
+    },
+    {
+      "level": "medium",
+      "detail": "自定义流程创建时 operatorId 从前端传入，但未从 JWT 安全上下文过滤——前端伪造 operatorId 可篡改操作人记录。当前 fallback 为 0L"
+    },
+    {
+      "level": "medium",
+      "detail": "AppLayout 侧边栏底部用户信息直接从 sessionStorage 读（user_info / ams_auth_user），与 AuthContext 从同一存储读取但路径不同——logout 时只清除了特定的 key，可能存在残留"
+    },
+    {
+      "level": "low",
+      "detail": "前端 tsc --noEmit 仍有 404 个预存类型错误，虽然不影响 vite build，但长期维护风险大"
+    },
+    {
+      "level": "low",
+      "detail": "WorkflowCenterPage 中自定义流程卡片 stepCount 硬编码为 5（第 104 行），但后端模板 RETIREMENT 的 stepCount 为 4——不对齐"
+    },
+    {
+      "level": "low",
+      "detail": "dashboard/stats API 被 BigScreenPage 使用，但 getGlobalStats() 实际委托给 getStats() 使用当前租户数据，并非真正的全局统计"
+    }
+  ],
+  "test_surface": [
+    "mvn compile（后端编译，当前通过）",
+    "npx vite build（前端构建，当前通过）",
+    "npx tsc --noEmit（前端类型检查，404 预存错误）",
+    "手动测试：非 ADMIN 用户登录 → 侧边栏大屏不可见 → 直接访问 /bigscreen → ForbiddenPage",
+    "手动测试：ADMIN 用户登录 → 侧边栏大屏可见 → 访问 /bigscreen → 正常展示数据",
+    "手动测试：/bigscreen-3d 同上的权限检查",
+    "手动测试：工作流中心 → 新建流程（下拉选择预定义模板 + 自定义流程对话框）",
+    "手动测试：自定义流程创建 → 跳转设计器 → 节点编辑/审批人配置/条件表达式 → 保存草稿 → 发布",
+    "手动测试：自定义流程数据持久化到 workflow_definition 表"
+  ],
+  "findings": [
+    {
+      "area": "大屏权限（前端路由守卫）",
+      "status": "issue",
+      "detail": "PermissionGuard 在 router/index.tsx 第 144-150 行守卫 /bigscreen 和 /bigscreen-3d。关键逻辑是 roles.some + user.roles.some 双循环大小写不敏感比较。如果 user.roles 为空数组或 undefined（因为 sessionStorage 中旧 user_info 缺少 roles 字段），全员被拒。根因排查：AuthService.login 已正确填充 roles（第 42-44 行），但旧版本登录后存储的 user_info 缺少 roles 字段，导致 sessionStorage 中的旧数据污染权限判定"
+    },
+    {
+      "area": "大屏权限（后端 SecurityConfig）",
+      "status": "ok",
+      "detail": "SecurityConfig.java 第 42 行正确添加 .requestMatchers(\"/bigscreen/**\", \"/bigscreen-3d/**\").hasAnyRole(\"ADMIN\", \"SUPER_ADMIN\")。UserDetailsServiceImpl 从 user_role 表查询 role_code 并添加 ROLE_ 前缀，与 hasAnyRole 的 ROLE_ 前缀规则匹配"
+    },
+    {
+      "area": "大屏权限（侧边栏导航）",
+      "status": "issue",
+      "detail": "AppLayout.tsx 第 126-136 行使用 hasRole('ADMIN') || hasRole('SUPER_ADMIN') 条件渲染大屏导航项。但导航使用 external:true + <a href target=_blank> 在新标签页打开，这跳过了 ProtectedRoute 的路由嵌套结构。PermissionGuard 在新标签页中依赖 AuthContext 从 sessionStorage 恢复状态，恢复失败（如旧数据无 roles）则全拒"
+    },
+    {
+      "area": "工作流新建功能",
+      "status": "ok",
+      "detail": "WorkflowCenterPage.tsx 第 160-193 行实现了「新建流程」下拉菜单：预定义模板列表 + 自定义流程入口。第 198-267 行实现了自定义流程创建对话框（名称 + 描述），调用 workflowApi.createCustomWorkflow（/workflows/custom POST），成功后跳转设计器。后端 WorkflowDefinitionController 第 61-66 行完整处理创建请求"
+    },
+    {
+      "area": "工作流配置功能",
+      "status": "ok",
+      "detail": "WorkflowDesignerPage.tsx 三栏布局（NodePanel + FlowCanvas + NodeConfigPanel）完整。支持节点添加/删除/连接、审批人角色/用户选择、条件表达式编辑、approvalMode 配置、保存草稿（服务端+本地双写）、发布流程。NodeConfigPanel 提供审批人搜索、角色详情显示"
+    },
+    {
+      "area": "工作流后端 Service",
+      "status": "ok",
+      "detail": "WorkflowDefinitionService.java createCustomDefinition 验证 businessType 格式（CUSTOM_ 前缀），自动生成默认节点（开始→审批→结束），保存到数据库。listDefinitions 正确包含自定义流程。saveDraft/publish/updateStatus 均支持自定义 businessType"
+    },
+    {
+      "area": "构建状态",
+      "status": "ok",
+      "detail": "mvn compile（后端）：通过，0 编译错误。vite build（前端）：✓ built in 5.55s，所有 chunk 正常生成。tsc --noEmit：404 个预存类型错误（非本轮引入，不影响 vite build）"
+    },
+    {
+      "area": "前次 session 变更影响",
+      "status": "ok",
+      "detail": "上一轮（20260525-flash-biz100）变更了 123 个文件（+9854/-2197 行），包括 AuthResponse 加 roles、SecurityConfig 加角色检查、AuthContext 扩展、PermissionGuard/ForbiddenPage 创建、WorkflowCenterPage 改造、WorkflowDesignerPage 设计器等。所有变更已编译通过"
+    },
+    {
+      "area": "tsc 类型错误预存风险",
+      "status": "issue",
+      "detail": "404 个 tsc --noEmit 错误分布在 services/ 和 components/ 下，虽然不影响 vite build（vite 用 esbuild 转译），但长期看可能隐藏类型安全问题"
+    }
+  ],
+  "recommendations": [
+    "【P0 - 大屏权限修复】在 PermissionGuard 中增加 user.roles 为空时的独立提示文案（如「请登录后以管理员身份访问」），而非无差别返回 ForbiddenPage。或在 PermissionGuard 中 fallback 检查 localStorage/sessionStorage 中的 user_info 是否包含 roles",
+    "【P0 - 大屏权限修复】在 AuthContext 初始化时（readStoredUser），如果 user_info 中缺少 roles 但 token 存在，发起一次 /auth/me 或 /user/profile 请求获取完整用户信息（含 roles）",
+    "【P0 - 大屏权限修复】将 /bigscreen 路由改为 ProtectedRoute 的子路由（放入 AppLayout 的 children 中），而非独立公开路由，避免新标签页 AuthContext 初始化状态不一致",
+    "【P0 - 大屏权限修复】AppLayout 侧边栏大屏导航项改为 NavLink（非 external:true），在侧边栏内 iframe 或内部路由打开大屏，避免新标签页隔离",
+    "【P1 - 工作流健全性】WorkflowCenterPage 第 104 行自定义流程 card 的 stepCount 从 5 改为从后端响应读取实际值，或统一为 4 与后端对齐",
+    "【P1 - 工作流安全性】createCustomDefinition 的 operatorId 改为从 JWT SecurityContext 解析，而非前端传入的可伪造参数",
+    "【P2 - 代码健康】规划清理 404 个 tsc 预存类型错误，重点关注 services/ 下的类型安全",
+    "【P2 - 文档】编写开发环境搭建和用户种子数据创建文档，确保测试时有 ADMIN 角色的用户可用于验证大屏权限"
+  ]
+}

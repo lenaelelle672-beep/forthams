@@ -1,0 +1,80 @@
+{
+  "current_state": "工作流中心页面（WorkflowCenterPage）和设计器页面（WorkflowDesignerPage）均已接入后端 API。从模板创建流程时直接调用 `workflowApi.publish()`（POST /workflows/{businessType}/publish），自动创建默认定义+校验+发布。设计器内提供分离的「保存草稿」（`saveDraft`）和「发布流程」（`publish`）操作。角色数据通过 `/roles/all` 端点拉取，在 NodeConfigPanel 的审批角色 select 中渲染。http.ts 响应拦截器已实现 Result<T> Guard 解包，但各页面仍残留二次解包模式 `(raw as { data?: T })?.data ?? raw`。",
+  "existing_patterns": [
+    "http.ts 统一 Axios 实例 + 响应拦截器解包 Result<T>：检查 body.code === 200 后返回 body.data，否则 reject",
+    "API 模块（workflow.ts）封装所有工作流端点，自动附加 operatorId 到 payload",
+    "Controller → Service → Mapper 三层架构，返回统一 Result<T> 包装",
+    "@PreAuthorize('hasAnyRole(\\\"ADMIN\\\", \\\"SUPER_ADMIN\\\")') 保护所有写操作端点（saveDraft/publish/updateStatus/createCustom）",
+    "前端组件内二次解包模式：`(raw as { data?: T })?.data ?? raw`，与 http.ts 的解包重复但无害（?? 回退确保正确性）",
+    "多字段名兼容：`readRoleField(role, ['roleCode', 'role_code', 'code'])` 容忍前后端字段名差异",
+    "本地 localStorage 草稿作为服务端兜底（fallback）",
+    "工作流定义存储为 JSON 嵌套 Map 结构（nodes/edges），序列化/反序列化使用 Jackson ObjectMapper",
+    "validateDefinition 在 publish 时严格校验：节点完整性、角色存在性、用户有效性、图连通性"
+  ],
+  "technical_constraints": [
+    "保存/发布操作要求当前用户拥有 ADMIN 或 SUPER_ADMIN 角色（Spring Security @PreAuthorize），否则返回 403 Forbidden",
+    "publish() 内部调用 validateDefinition()，要求默认审批角色（SUPER_ADMIN）必须在 sys_role 表中存在（status=1, deleted=0）且关联至少一个有效用户（sys_user_role 中有记录）",
+    "sys_role 表的字符集（charset）必须为 utf8mb4，否则中文 roleName 可能显示为乱码",
+    "数据库连接 URL 需包含 `characterEncoding=UTF-8` 参数",
+    "从模板创建流程自动执行完整 publish（含校验），不可跳过——用户无法先保存草稿再修改后发布",
+    "http.ts 的 Guard 解包依赖后端统一返回 `{ code: 200, data: T, message: string }` 格式；非标准格式（如直接返回数组或 Page 分页对象）无法被正确解包",
+    "localStorage 草稿的读写使用 JSON 序列化，与后端 definitionJson 的双向转换依赖 normalizeWorkflowDefinition",
+    "前端 useEffect 初始化顺序：先加载流程定义，再加载角色列表；角色列表加载失败时回退到 ['SUPER_ADMIN']",
+    "WorkflowDefinitionService.java 1148 行，严重违反单一职责原则——校验逻辑（validateNodeFields/validateEdges/validateReachability）应抽离到独立 Validator 类"
+  ],
+  "risks": [
+    {
+      "level": "high",
+      "detail": "【权限不足导致保存链路不工作】publish/saveDraft 端点要求 ADMIN 或 SUPER_ADMIN 角色。如果当前登录用户仅是一般角色，所有写操作均返回 403，前端仅 catch 显示「初始化失败/发布失败」，这是从模板创建和设计器保存不工作的最可能根因。"
+    },
+    {
+      "level": "high",
+      "detail": "【publish 发布校验失败】publish() 调用 validateDefinition() → validateApproverRole('SUPER_ADMIN', id)，要求该角色存在于 sys_role 且 status=1 且至少关联一个激活用户（sys_user 的 status=1）。若初始数据库中不存在 SUPER_ADMIN 角色或无关联用户，任何发布操作都会抛出 BusinessException。"
+    },
+    {
+      "level": "medium",
+      "detail": "【角色乱码根因：数据库编码】sys_role 表的 roleName 字段若存中文，表字符集（CHARSET）须为 utf8mb4。若为 latin1，中文会存储为乱码；若连接 URL 缺少 characterEncoding=UTF-8，JDBC 读取时也可能出现乱码。"
+    },
+    {
+      "level": "medium",
+      "detail": "【从模板创建缺乏草稿过渡】WorkflowCenterPage 的「从模板创建」直接调用 publish()，而非先 saveDraft 跳转设计器。用户无法自定义审批角色、节点等就立即发布了生产级流程定义，存在误发布风险。"
+    },
+    {
+      "level": "low",
+      "detail": "【前端二次解包模式与 http.ts 解包不一致】http.ts 已正确解包 Result.data，各页面仍执行 `(raw as { data?: T })?.data ?? raw`，虽因 ?? 回退无害，但代码可读性差且与类型系统（TypeScript 泛型）冲突。"
+    },
+    {
+      "level": "low",
+      "detail": "【角色 API 无权限限制】/roles/all 端点没有 @PreAuthorize，任何登录用户都能拉取全量角色列表（包括 roleCode、roleName），存在信息泄露风险。"
+    },
+    {
+      "level": "low",
+      "detail": "【本地草稿与后端草稿可能不同步】handleSaveDraft 和 handlePublish 在 API 调用后均写入 localStorage，但未校验服务端返回的 definitionJson 与本地 draft 是否一致。异常场景（如并发保存）可能产生冲突。"
+    },
+    {
+      "level": "low",
+      "detail": "【WorkflowDefinitionService 严重技术债】单文件 1148 行，承担了 CRUD、校验、解析、运行时计划生成、条件表达式求值等多种职责，不利于维护和测试。"
+    }
+  ],
+  "test_surface": [
+    "验证当前登录用户的角色权限：检查 SecurityContext 中 GrantedAuthority 是否包含 ROLE_ADMIN 或 ROLE_SUPER_ADMIN",
+    "从模板创建的完整 E2E：WorkflowCenterPage 点击模板 → publish API → 跳转设计器 → 页面正常加载",
+    "设计器 saveDraft：修改节点 → 点击保存草稿 → 验证后端数据库 definitionJson 已更新且 status=DRAFT",
+    "设计器 publish：保存草稿 → 发布 → 验证后端 status=PUBLISHED, version 递增, publishedAt 非空",
+    "角色下拉渲染：/roles/all 返回数据 → 前端提取 roleCode/roleName → NodeConfigPanel select 显示 `roleName（roleCode）`",
+    "角色乱码检测：SELECT role_name, HEX(role_name) FROM sys_role WHERE role_name REGEXP '^[^a-zA-Z0-9]' 确认角色名为合法 UTF-8 编码",
+    "权限拒绝测试：以非 ADMIN/SUPER_ADMIN 用户执行 publish/saveDraft → 验证 403 返回且前端正确显示错误",
+    "validateApproverRole 测试：删除 SUPER_ADMIN 角色或取消关联用户 → 执行 publish → 验证 BusinessException",
+    "数据库连接 charset 验证：检查 JDBC URL 是否包含 characterEncoding=UTF-8 和 useUnicode=true"
+  ],
+  "builder_notes": [
+    "【首要排查】检查当前登录用户是否拥有 ADMIN 或 SUPER_ADMIN 角色。可在 UserRoleMapper.selectRoleCodesByUserId 的返回值中确认。",
+    "【关键检查点】确认 sys_role 表中存在 roleCode='SUPER_ADMIN' 且 status=1、deleted=0 的记录，并且在 sys_user_role 中至少有一条关联的有效用户记录（sys_user.status=1）。",
+    "【数据库字符集】执行 SHOW CREATE TABLE sys_role，确认 CHARSET=utf8mb4；检查 Spring Boot 数据源 URL 是否包含 characterEncoding=UTF-8。",
+    "【推荐修改·从模板创建】将 WorkflowCenterPage 的「从模板创建」改为调用 saveDraft 而非 publish，跳转到设计器后让用户确认后再发布。",
+    "【推荐修改·统一解包】全局删除各组件的二次解包代码（?.data ?? raw），因为 http.ts 已统一解包，类型系统会正确推断。",
+    "【推荐修改·添加角色API权限】给 /roles/all 添加 @PreAuthorize('isAuthenticated()') 或指定角色限制，防止信息泄露。",
+    "【推荐修改·Service 拆分】将 WorkflowDefinitionService 中的校验逻辑（validateDefinitionMap, validateNodeFields, validateEdges, validateReachability, validateApproverRole, validateApproverUser）抽离到 WorkflowDefinitionValidator。",
+    "验证本地开发环境：检查 VITE_API_BASE_URL 配置是否指向正确的后端地址（/api），确保后端在 8080 端口运行且 /roles/all 可访问。"
+  ]
+}

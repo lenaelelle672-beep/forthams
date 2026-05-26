@@ -1,0 +1,58 @@
+{
+  "directive": "1、2、3 都需要实现，优先 1",
+  "owner": "gai2-orchestrator",
+  "phase": "blocked",
+  "blocked_reason": "gai2-drafter 未写入 draft 产物（draft.json/draft-changes.json 均不存在）。Drafter 返回了草案大纲但报告运行环境无 write/bash 工具。正在尝试重新调度 drafter。",
+  "classification": "Heavy",
+  "session_id": "gai2-20260526-multi-task",
+  "auto_mode": false,
+  "mcp_direct": false,
+  "minions_enabled": true,
+  "triage_inference": {
+    "task_1": "补充 reviewer 阶段产物（review.json）→ 已完成（verdict=PASS）",
+    "task_2": "处理 residual_risks 中的问题",
+    "task_3": "最终扫尾/状态更新"
+  },
+  "acceptance_checks": [
+    {
+      "id": "AC-RISK1",
+      "criterion": "测试用户池 sim05261457xx 登录 500 问题已排查并修复或确认根因"
+    },
+    {
+      "id": "AC-RISK2",
+      "criterion": "COMPENSATION businessId=0 行为已确认符合预期或修复"
+    },
+    {
+      "id": "AC-RISK3",
+      "criterion": "AC6 字段对齐检查已补充资产 DTO/auth DTO 的逐字段运行时验证"
+    },
+    {
+      "id": "AC-RISK4",
+      "criterion": "多级审批使用不同审批人的验证逻辑已补充"
+    },
+    {
+      "id": "AC-CLEANUP",
+      "criterion": "goal-state.json 和所有产物状态一致、完整闭环"
+    }
+  ],
+  "evidence_to_collect": [
+    "用户状态排查结论或修复记录",
+    "COMPENSATION 流程 businessId 行为确认证据",
+    "增强后的测试脚本执行输出",
+    "最终闭环 review.json"
+  ],
+  "open_risks": [
+    "用户池问题可能需要数据库直接操作",
+    "COMPENSATION businessId 可能涉及后端代码修改",
+    "Drafter 运行环境无法写入文件系统"
+  ],
+  "artifacts": {
+    "triage": ".omc/gai2/sessions/gai2-20260526-multi-task/triage.json",
+    "audit": ".omc/gai2/sessions/gai2-20260526-multi-task/audit.json",
+    "draft": ".omc/gai2/sessions/gai2-20260526-multi-task/draft.json",
+    "refine": ".omc/gai2/sessions/gai2-20260526-multi-task/refine.json",
+    "adjudication": ".omc/gai2/sessions/gai2-20260526-multi-task/adjudication.json",
+    "changes": ".omc/gai2/sessions/gai2-20260526-multi-task/changes.json",
+    "review": ".omc/gai2/sessions/gai2-20260526-multi-task/review.json"
+  }
+}

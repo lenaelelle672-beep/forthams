@@ -1,0 +1,40 @@
+{
+  "changed_files": [
+    "tests/playwright/forthams-certification.spec.ts"
+  ],
+  "added_files": [],
+  "commands_run": [
+    {
+      "command": "cd /Users/feigao/project/Project/testFinish && TEST_PROJECT_CONFIG=config/forthams.example.json npx playwright test tests/playwright/forthams-certification.spec.ts --project=chromium --reporter=json 2>&1",
+      "result": "passed",
+      "notes": "认证测试 10/10 PASS，1 个 SKIPPED（CERT-05b 旧版 RFID 扫描已跳过），0 FAILED。总耗时 3194ms。各用例耗时：CERT-01=1482ms, CERT-02=2395ms, CERT-03=1806ms, CERT-04=1114ms, CERT-05=1298ms, CERT-05b=0ms(skipped), CERT-06=1134ms, CERT-07=1365ms, CERT-08=1163ms, CERT-09=2417ms, CERT-10=1713ms"
+    },
+    {
+      "command": "sed -i '' 替换文件头部注释（@deprecated → 互补关系说明）",
+      "result": "passed",
+      "notes": "已将第1-5行 @deprecated 声明替换为说明认证测试与 E2E 测试是互补关系的新注释"
+    },
+    {
+      "command": "cd /Users/feigao/project/Project/testFinish && TEST_PROJECT_CONFIG=config/forthams.example.json npx playwright test tests/playwright/forthams-e2e.spec.ts --project=chromium --reporter=json 2>&1",
+      "result": "failed",
+      "notes": "E2E 测试 1 PASS / 5 FAILED。唯一通过的是'参数化路由探测(参考)'（静默跳过 13 条参数化路由）。5 个 FAILED 根因相同：login() 在 line 151 执行 expect(token).toBeTruthy() 得到 null。前端 dev server 在线（health check ✓），但真实登录 API 需要后端服务返回 JWT token，后端未运行导致登录失败。受影响用例：AC-1(登录+路由爬取), 导航路由逐页扫描, 深层路由逐页扫描, AC-2(新建按钮探索), AC-3(资产创建闭环)"
+    }
+  ],
+  "verification_results": [
+    "认证测试 10/10 PASS 确认 — 与审计中记录的'上次修复后 10/10'状态一致，认证测试稳定性得到验证",
+    "文件头部声明已修正 — @deprecated 内容替换为诚实的互补关系说明",
+    "E2E 测试 5/6 失败确认 — 全部因后端服务不可用导致登录失败，与先前的审计结论一致（E2E 需要真实后端 API 支持）",
+    "整体通过率评估：认证测试单独运行 100%（10/10），E2E 因环境依赖仅 1/6；两套测试合并仅可评估认证测试部分"
+  ],
+  "minions_execution": {
+    "adjudication_file_read": false,
+    "selected_source": "none",
+    "write_intent_preserved": true,
+    "degradation_blocked": false
+  },
+  "residual_risks": [
+    "认证测试基于 mock 数据，与实际后端行为可能存在偏差（如 audit.json 指出的字段名不一致、新版使用 PageHeader 组件等问题）",
+    "E2E 测试 5/6 失败因后端不可用，非代码逻辑问题，需要后端服务就绪后方可验证真实通过率",
+    "认证测试头部修正后仍存在部分用例断言较弱（使用 .first() 模糊匹配）的问题，但 debate 结论为短期内不修改测试逻辑"
+  ]
+}

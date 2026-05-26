@@ -1,0 +1,59 @@
+{
+  "classification": "Strategic",
+  "rationale": "该 directive 包含三重问题：(1)大屏权限不可访问(Medium) — 涉及前端 PermissionGuard + 后端 SecurityConfig/JWT 的多层校验链；(2)工作流不可配置(Medium) — 前端 UI 已建但功能不可用，需排查角色/API/路由；(3)所有业务功能100分(Strategic) — 无边界质量提升。组合后整体为 Strategic，需要先 audit 边界再分批执行。",
+  "scope": [
+    "frontend/src/router/index.tsx",
+    "frontend/src/app/context/AuthContext.tsx",
+    "frontend/src/pages/ForbiddenPage.tsx",
+    "frontend/src/pages/bigscreen/BigScreenPage.tsx",
+    "frontend/src/pages/bigscreen/BigScreen3DPage.tsx",
+    "frontend/src/pages/workflow/WorkflowCenterPage.tsx",
+    "frontend/src/pages/workflow/WorkflowDesignerPage.tsx",
+    "frontend/src/constants/workflowBusiness.ts",
+    "frontend/src/api/workflow.ts",
+    "frontend/src/app/utils/api.ts",
+    "backend/src/main/java/com/ams/config/SecurityConfig.java",
+    "backend/src/main/java/com/ams/config/JwtAuthenticationFilter.java",
+    "backend/src/main/java/com/ams/service/impl/UserDetailsServiceImpl.java",
+    "backend/src/main/java/com/ams/controller/BigScreenController.java",
+    "backend/src/main/java/com/ams/controller/WorkflowDefinitionController.java",
+    "backend/src/main/java/com/ams/service/WorkflowDefinitionService.java",
+    "frontend/src/pages/asset/AssetListPage.tsx",
+    "frontend/src/pages/asset/AssetDetailPage.tsx",
+    "frontend/src/pages/asset/AssetFormPage.tsx",
+    "frontend/src/pages/workorder/WorkOrderListPage.tsx",
+    "frontend/src/pages/workorder/WorkOrderDetailPage.tsx",
+    "frontend/src/pages/workorder/WorkOrderFormPage.tsx",
+    "frontend/src/pages/approval/ApprovalListPage.tsx",
+    "frontend/src/layouts/AppLayout.tsx"
+  ],
+  "risks": [
+    "权限修复误伤：修改 SecurityConfig / JwtAuthenticationFilter 可能影响所有受保护路由的认证流程",
+    "工作流 schema 变更：如果修改 WorkflowDefinition 的数据结构或校验规则，已有草稿/已发布流程可能损坏",
+    "Scope Creep 风险：'所有业务功能100分'无明确边界，必须设定可度量的 acceptance criteria",
+    "双重校验不一致：前端 PermissionGuard 与后端 hasAnyRole 的标准不一致会导致诡异 Bug",
+    "Tenant 上下文：JwtAuthenticationFilter 的 tenantId 校验可能误拦截有效请求",
+    "数据初始化依赖：工作流发布依赖 role 表有对应角色记录"
+  ],
+  "recommended_phases": [
+    "triage",
+    "audit",
+    "builder",
+    "reviewer"
+  ],
+  "key_findings": [
+    "大屏权限：前端 PermissionGuard 缺少 loading 状态处理，loading=true 时直接重定向 /login",
+    "大屏权限：external: true 导致全页跳转，React 重初始化触发 loading 竞争条件",
+    "大屏权限：后端 hasAnyRole ROLE_ 前缀处理正确，但 JWT filter 的 tenant 校验先于 role 校验",
+    "工作流配置：后端 TEMPLATES 有 5 个但用户只看到 4 个",
+    "工作流配置：前端新建流程 UI 完备但可能因角色未适配而隐藏",
+    "工作流配置：所有变更在工作树中但未被提交"
+  ],
+  "priority_items": [
+    "【P0-紧急】大屏权限修复：PermissionGuard 增加 loading 检查 + 移除 external: true 改用 SPA 内导航",
+    "【P0-紧急】工作流配置修复：排查 4 vs 5 个模板差异 + 确认新建流程按钮对所有角色可见",
+    "【P1-重要】工作流发布校验：approverRole 校验在生产环境可能因角色数据缺失而失败",
+    "【P2-提升】全局精细化推进：按模块分批 audit",
+    "【P2-提升】权限体系统一审查"
+  ]
+}

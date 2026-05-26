@@ -1,0 +1,39 @@
+{
+  "classification": "Medium",
+  "mcp_tools": [],
+  "scope": [
+    "backend/src/main/java/com/ams/config/SecurityConfig.java",
+    "backend/src/main/java/com/ams/config/JwtAuthenticationFilter.java",
+    "frontend/src/pages/settings/SettingsPage.tsx",
+    "frontend/src/pages/bigscreen/BigScreenPage.tsx",
+    "frontend/src/pages/bigscreen/BigScreen3DPage.tsx",
+    "frontend/src/types/dashboard.types.ts"
+  ],
+  "risks": [
+    "RISK-01（高危）：SecurityConfig 与 JwtAuthenticationFilter 两处需同步 /auth/** 路径收紧，缺少任意一处导致安全配置不一致",
+    "RISK-01 联动风险：resetPassword 端点从免认证改为需认证，前端 API 调用行为变更（需持有有效 token）",
+    "RISK-02（中危）：SettingsPage 从 localStorage 切换为 useAuth() 依赖 AuthProvider 包裹层次，路由重构时可能失效",
+    "RISK-02 扩展风险：handleChangePwd 修复后新增表单 UI 和 API 集成，引入额外验证面",
+    "RISK-03（低危）：两大屏 fallbackStats 提取为统一 interface，需确保两处引用命名和字段完全兼容",
+    "残留风险：resetPassword 仍从 request body 获取 username，未从 @AuthenticationPrincipal 注入，已认证用户可重置他人密码",
+    "残留风险：logout 无黑名单机制，token 仍有效直到自然过期",
+    "残留风险：JwtAuthenticationFilter 仍保留 /public/** 和 /static/** 前缀通配，未来新增敏感路由需注意同步收紧"
+  ],
+  "dependencies": [
+    "Spring Security (requestMatchers/permitAll)",
+    "JWT Filter Chain (JwtAuthenticationFilter)",
+    "React AuthContext (useAuth)",
+    "TanStack Query (bigscreen stats useQuery)",
+    "TypeScript 类型系统 (BigScreenStats interface)"
+  ],
+  "recommended_phases": ["audit", "builder", "reviewer"],
+  "acceptance_hints": [
+    "RISK-01: SecurityConfig requestMatchers 从 /auth/** 收紧为 /auth/login, /auth/register，JwtAuthenticationFilter.isAuthenticationSkippedRequest 同步精确匹配",
+    "RISK-01: 后端编译通过 (mvn compile)，后端测试全绿 (mvn test 258/258)",
+    "RISK-02: SettingsPage SecurityTab 使用 const { user } = useAuth() 替代 localStorage.getItem('username')",
+    "RISK-02: 前端类型检查通过 (npx tsc --noEmit)，无 useAuth/AuthContext 相关错误",
+    "RISK-03: BigScreenPage + BigScreen3DPage 改用 import type { BigScreenStats } from '@/types/dashboard.types'，fallbackStats 标注为 BigScreenStats 类型",
+    "RISK-03: 前端构建通过 (pnpm build success)",
+    "残留风险清单已列出，记录在 changes.json 和 review.json 中供后续迭代参考"
+  ]
+}

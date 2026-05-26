@@ -1,0 +1,343 @@
+{
+  "test_suite": "AMS 工作流数据驱动端到端测试 (GAI2 Builder)",
+  "executed_at": "2026-05-26T18:41:41.857629",
+  "base_url": "http://localhost:8080/api",
+  "matrix_file": "scripts/test_matrix.json",
+  "total": 6,
+  "passed": 6,
+  "failed": 0,
+  "results": [
+    {
+      "name": "TC-TRANSFER",
+      "passed": true,
+      "steps": [
+        {
+          "step": "申请用户登录",
+          "ok": true,
+          "detail": "userId=1, user=admin"
+        },
+        {
+          "step": "创建资产",
+          "ok": true,
+          "detail": "assetNo=E2E-TRANSFER-0526184136"
+        },
+        {
+          "step": "发布工作流 ASSET_TRANSFER",
+          "ok": true,
+          "detail": "code=200"
+        },
+        {
+          "step": "创建审批",
+          "ok": true,
+          "detail": "code=200"
+        },
+        {
+          "step": "第1级审批通过",
+          "ok": true,
+          "detail": "currentStep=2, status=PENDING"
+        },
+        {
+          "step": "第2级审批通过",
+          "ok": true,
+          "detail": "currentStep=3, status=PENDING"
+        },
+        {
+          "step": "第3级审批通过",
+          "ok": true,
+          "detail": "currentStep=4, status=PENDING"
+        },
+        {
+          "step": "第4级审批通过",
+          "ok": true,
+          "detail": "currentStep=4, status=APPROVED"
+        },
+        {
+          "step": "审批最终状态",
+          "ok": true,
+          "detail": "status=APPROVED"
+        },
+        {
+          "step": "资产状态期望=IN_USE",
+          "ok": true,
+          "detail": "实际=IN_USE"
+        }
+      ],
+      "evidence": [
+        "登录用户: admin, userId=1",
+        "资产创建成功: id=77, assetNo=E2E-TRANSFER-0526184136",
+        "审批创建成功: processId=74, currentStep=1, status=PENDING",
+        "第1级审批人: admin",
+        "第2级审批人: admin",
+        "第3级审批人: admin",
+        "第4级审批人: admin",
+        "审批最终状态: APPROVED",
+        "资产状态验证通过: IN_USE"
+      ],
+      "error": null
+    },
+    {
+      "name": "TC-CLEARANCE",
+      "passed": true,
+      "steps": [
+        {
+          "step": "申请用户登录",
+          "ok": true,
+          "detail": "userId=1, user=admin"
+        },
+        {
+          "step": "创建资产",
+          "ok": true,
+          "detail": "assetNo=E2E-CLEARANCE-0526184137"
+        },
+        {
+          "step": "发布工作流 ASSET_CLEARANCE",
+          "ok": true,
+          "detail": "code=200"
+        },
+        {
+          "step": "创建审批",
+          "ok": true,
+          "detail": "code=200"
+        },
+        {
+          "step": "第1级审批通过",
+          "ok": true,
+          "detail": "currentStep=2, status=PENDING"
+        },
+        {
+          "step": "第2级审批通过",
+          "ok": true,
+          "detail": "currentStep=3, status=PENDING"
+        },
+        {
+          "step": "第3级审批通过",
+          "ok": true,
+          "detail": "currentStep=4, status=PENDING"
+        },
+        {
+          "step": "第4级审批通过",
+          "ok": true,
+          "detail": "currentStep=4, status=APPROVED"
+        },
+        {
+          "step": "审批最终状态",
+          "ok": true,
+          "detail": "status=APPROVED"
+        },
+        {
+          "step": "资产状态期望=CLEARED",
+          "ok": true,
+          "detail": "实际=CLEARED"
+        }
+      ],
+      "evidence": [
+        "登录用户: admin, userId=1",
+        "资产创建成功: id=78, assetNo=E2E-CLEARANCE-0526184137",
+        "审批创建成功: processId=75, currentStep=1, status=PENDING",
+        "第1级审批人: admin",
+        "第2级审批人: admin",
+        "第3级审批人: admin",
+        "第4级审批人: admin",
+        "审批最终状态: APPROVED",
+        "资产状态验证通过: CLEARED"
+      ],
+      "error": null
+    },
+    {
+      "name": "TC-SCRAP",
+      "passed": true,
+      "steps": [
+        {
+          "step": "申请用户登录",
+          "ok": true,
+          "detail": "userId=1, user=admin"
+        },
+        {
+          "step": "创建资产",
+          "ok": true,
+          "detail": "assetNo=E2E-SCRAP-0526184139"
+        },
+        {
+          "step": "发布工作流 ASSET_SCRAP",
+          "ok": true,
+          "detail": "code=200"
+        },
+        {
+          "step": "创建审批",
+          "ok": true,
+          "detail": "code=200"
+        },
+        {
+          "step": "第1级审批通过",
+          "ok": true,
+          "detail": "currentStep=2, status=PENDING"
+        },
+        {
+          "step": "第2级审批通过",
+          "ok": true,
+          "detail": "currentStep=3, status=PENDING"
+        },
+        {
+          "step": "第3级审批通过",
+          "ok": true,
+          "detail": "currentStep=4, status=PENDING"
+        },
+        {
+          "step": "第4级审批通过",
+          "ok": true,
+          "detail": "currentStep=4, status=APPROVED"
+        },
+        {
+          "step": "审批最终状态",
+          "ok": true,
+          "detail": "status=APPROVED"
+        },
+        {
+          "step": "资产状态期望=SCRAPPED",
+          "ok": true,
+          "detail": "实际=SCRAPPED"
+        }
+      ],
+      "evidence": [
+        "登录用户: admin, userId=1",
+        "资产创建成功: id=79, assetNo=E2E-SCRAP-0526184139",
+        "审批创建成功: processId=76, currentStep=1, status=PENDING",
+        "第1级审批人: admin",
+        "第2级审批人: admin",
+        "第3级审批人: admin",
+        "第4级审批人: admin",
+        "审批最终状态: APPROVED",
+        "资产状态验证通过: SCRAPPED"
+      ],
+      "error": null
+    },
+    {
+      "name": "TC-COMPENSATION",
+      "passed": true,
+      "steps": [
+        {
+          "step": "申请用户登录",
+          "ok": true,
+          "detail": "userId=1, user=admin"
+        },
+        {
+          "step": "创建资产",
+          "ok": true,
+          "detail": "assetNo=E2E-COMPENSATION-0526184140"
+        },
+        {
+          "step": "发布工作流 ASSET_COMPENSATION",
+          "ok": true,
+          "detail": "code=200"
+        },
+        {
+          "step": "创建审批",
+          "ok": true,
+          "detail": "code=200"
+        },
+        {
+          "step": "第1级审批通过",
+          "ok": true,
+          "detail": "currentStep=2, status=PENDING"
+        },
+        {
+          "step": "第2级审批通过",
+          "ok": true,
+          "detail": "currentStep=3, status=PENDING"
+        },
+        {
+          "step": "第3级审批通过",
+          "ok": true,
+          "detail": "currentStep=4, status=PENDING"
+        },
+        {
+          "step": "第4级审批通过",
+          "ok": true,
+          "detail": "currentStep=4, status=APPROVED"
+        },
+        {
+          "step": "审批最终状态",
+          "ok": true,
+          "detail": "status=APPROVED"
+        },
+        {
+          "step": "赔偿记录状态验证",
+          "ok": true,
+          "detail": "status=APPROVED"
+        }
+      ],
+      "evidence": [
+        "登录用户: admin, userId=1",
+        "资产创建成功: id=80, assetNo=E2E-COMPENSATION-0526184140",
+        "审批创建成功: processId=77, currentStep=1, status=PENDING",
+        "第1级审批人: admin",
+        "第2级审批人: admin",
+        "第3级审批人: admin",
+        "第4级审批人: admin",
+        "审批最终状态: APPROVED",
+        "赔偿记录: id=8, status=APPROVED"
+      ],
+      "error": null
+    },
+    {
+      "name": "AC5-多租户隔离",
+      "passed": true,
+      "steps": [
+        {
+          "step": "用户A 创建审批",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "step": "用户B 创建审批",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "step": "用户A mine=true",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "step": "用户A看不到用户B审批",
+          "ok": true,
+          "detail": "列表长度=50, 含B=False"
+        },
+        {
+          "step": "用户B mine=true",
+          "ok": true,
+          "detail": ""
+        },
+        {
+          "step": "用户B看不到用户A审批",
+          "ok": true,
+          "detail": "列表长度=1, 含A=False"
+        }
+      ],
+      "evidence": [
+        "用户A (admin) 审批 id=78",
+        "用户B 注册成功: ac5test184141",
+        "用户B: id=21, username=ac5test184141",
+        "用户B 审批 id=79",
+        "用户A mine=true: 50条, 含B审批=False",
+        "用户B mine=true: 1条, 含A审批=False"
+      ],
+      "error": null
+    },
+    {
+      "name": "AC6-字段对齐汇总",
+      "passed": true,
+      "steps": [
+        {
+          "step": "字段对齐检查",
+          "ok": true,
+          "detail": "全部字段对齐"
+        }
+      ],
+      "evidence": [
+        "总计 0 个字段对齐问题"
+      ],
+      "error": null
+    }
+  ]
+}

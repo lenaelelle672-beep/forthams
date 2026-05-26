@@ -50,19 +50,26 @@ http.interceptors.request.use(
 
 // ── 响应拦截器：解包 data，统一错误处理 ─────────────────────────────────────
 http.interceptors.response.use(
-  // 成功响应：直接返回 response.data（即 ApiResponse<T>）
-  (response: AxiosResponse) => response.data,
+  // 成功响应：自动解包后端 Result<T> 包装
+  (response: AxiosResponse) => {
+    const body = response.data;
+    // Guard 模式：只对标准 Result<T> 包装做解包
+    if (body && typeof body === 'object' && 'code' in body) {
+      if (body.code === 200) return body.data;
+      return Promise.reject(new Error(body.message || '请求失败'));
+    }
+    return body;
+  },
   (error) => {
     const status = error.response?.status;
-    const message = error.response?.data?.message || error.message;
+    const backendMessage = error.response?.data?.message;
+    const message = backendMessage || error.message;
 
     if (status === 401) {
-      // Token 失效或未登录 → 清除本地状态，跳转登录页
       sessionStorage.removeItem('auth_token');
       sessionStorage.removeItem('user_info');
       localStorage.removeItem('auth_token');
       localStorage.removeItem('user_info');
-      // 如果已经在登录页，不再重载页面（避免覆盖 LoginPage 的错误消息）
       if (window.location.pathname !== '/login') {
         window.location.href = '/login';
       }
@@ -72,7 +79,7 @@ http.interceptors.response.use(
       console.error('[HTTP 5xx] 服务端错误:', status, message);
     }
 
-    return Promise.reject(error);
+    return Promise.reject(new Error(backendMessage || error.message));
   },
 );
 

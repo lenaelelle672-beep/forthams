@@ -17,6 +17,7 @@ export interface AuthUser {
   userId: number;
   username: string;
   realName: string;
+  roles: string[];
 }
 
 interface LoginPayload {
@@ -29,6 +30,7 @@ interface LoginResponse {
   userId: number;
   username: string;
   realName: string;
+  roles: string[];
 }
 
 interface AuthContextValue {
@@ -38,6 +40,7 @@ interface AuthContextValue {
   loading: boolean;
   login: (payload: LoginPayload) => Promise<void>;
   logout: () => void;
+  hasRole: (roleName: string) => boolean;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -78,6 +81,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (storedToken && storedUser) {
       setToken(storedToken);
       setUser(storedUser);
+
+      // 异步修复：检测到 user 缺少 roles 时从后端获取完整信息
+      if (!storedUser.roles || storedUser.roles.length === 0) {
+        api.get<{ userId: number; username: string; realName: string; roles: string[] }>('/users/current')
+          .then((data) => {
+            const fixedUser: AuthUser = {
+              userId: data.userId ?? storedUser.userId,
+              username: data.username ?? storedUser.username,
+              realName: data.realName ?? storedUser.realName,
+              roles: data.roles ?? [],
+            };
+            setUser(fixedUser);
+            // 同步更新 sessionStorage
+            if (typeof window !== 'undefined') {
+              window.sessionStorage.setItem(USER_STORAGE_KEY, JSON.stringify(fixedUser));
+            }
+          })
+          .catch(() => {
+            // 失败不阻断，保持原数据
+          });
+      }
     } else {
       clearAuthStorage();
     }
@@ -92,6 +116,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       userId: response.userId,
       username: response.username,
       realName: response.realName,
+      roles: response.roles ?? [],
     };
 
     if (typeof window !== "undefined") {
@@ -109,6 +134,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
   };
 
+  const hasRole = (roleName: string): boolean => {
+    if (!user || !user.roles || user.roles.length === 0) return false;
+    return user.roles.some(
+      (r) => r.toUpperCase() === roleName.toUpperCase()
+    );
+  };
+
   const value = useMemo<AuthContextValue>(
     () => ({
       user,
@@ -117,6 +149,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       loading,
       login,
       logout,
+      hasRole,
     }),
     [loading, token, user],
   );

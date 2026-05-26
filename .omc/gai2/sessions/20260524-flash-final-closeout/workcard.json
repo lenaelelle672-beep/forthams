@@ -1,0 +1,29 @@
+{
+  "schema_version": 2,
+  "session_id": "20260524-flash-final-closeout",
+  "directive": "GAI2 Flash 最终 Closeout — 确认全部工作已完成。认证测试(CERT-01~10) 10/10 ✅，E2E 自发现测试 5/5 全路由扫描 ✅，CI 接入(.gitlab-ci.yml + Jenkinsfile) ✅，mock 测试废弃标记(@deprecated) ✅。所有目标已达成，无待办 issue。",
+  "classification": null,
+  "phase": "closeout",
+  "auto_mode": true,
+  "flash_mode": true,
+  "acceptance_checks": [
+    "AC-1: 认证测试 CERT-01~10 全部 PASS（10/10）",
+    "AC-2: E2E 自发现测试全路由扫描通过（5/5 或等效覆盖）",
+    "AC-3: CI 配置已接入（.gitlab-ci.yml + Jenkinsfile 配置完成）",
+    "AC-4: mock 认证测试已标记废弃（@deprecated 标记 + 默认不运行）",
+    "AC-5: 所有目标已文档化并经过 reviewer 核验"
+  ],
+  "evidence_to_collect": [
+    "认证测试运行结果（10/10 PASS）",
+    "E2E 测试运行结果",
+    "CI 配置文件存在性验证",
+    "废弃标记验证",
+    "前序 reviewer closeout 产物"
+  ],
+  "open_risks": [
+    "E2E 测试需要真实后端服务运行，CI 环境需配置 BASE_URL",
+    "废弃的认证测试代码仍需维护以保持与新 UI 同步",
+    "资产创建闭环测试会写入数据库，需数据清理机制"
+  ],
+  "artifact_dir": ".omc/gai2/sessions/20260524-flash-final-closeout"
+}

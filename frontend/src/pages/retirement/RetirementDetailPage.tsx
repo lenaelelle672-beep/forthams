@@ -119,16 +119,14 @@ export default function RetirementDetailPage() {
     staleTime: 1000 * 30,
   });
 
-  const record: RetirementApplication = (res as ApiResponse<RetirementApplication> | undefined)?.data;
-
+  const record: RetirementApplication = res as unknown as RetirementApplication | undefined;
   const { data: assetRes } = useQuery({
     queryKey: ['asset', 'detail', record?.assetId],
     queryFn: () => getAssetById(record!.assetId),
     enabled: !!record?.assetId,
     staleTime: 1000 * 60,
   });
-  const asset = (assetRes as ApiResponse<Asset> | undefined)?.data;
-
+  const asset = assetRes as unknown as Asset | undefined;
   const withdrawMutation = useMutation({
     mutationFn: () => withdrawRetirement(retirementId),
     onSuccess: () => {

@@ -1,0 +1,35 @@
+{
+  "classification": "Medium",
+  "mcp_tools": [],
+  "scope": [
+    "frontend/src/pages/workflow/WorkflowCenterPage.tsx",
+    "frontend/src/pages/workflow/WorkflowDesignerPage.tsx",
+    "frontend/src/components/flow/NodeConfigPanel.tsx",
+    "frontend/src/api/workflow.ts",
+    "frontend/src/utils/http.ts",
+    "frontend/src/constants/workflowBusiness.ts",
+    "backend/src/main/java/com/ams/controller/WorkflowDefinitionController.java",
+    "backend/src/main/java/com/ams/controller/RoleController.java",
+    "backend/src/main/java/com/ams/entity/Role.java"
+  ],
+  "risks": [
+    "http.ts Guard 模式解包 body.data 后，WorkflowDesignerPage 又用 (raw as {data?:...})?.data 二次解包导致 undefined",
+    "从模板创建时 WorkflowCenterPage 直接调用 publish 而非先 saveDraft，流程定义不存在时后端可能 404/500",
+    "角色乱码可能涉及数据库编码或字段映射",
+    "后端 publish/saveDraft 端点有 @PreAuthorize 权限校验，当前用户可能无权限"
+  ],
+  "dependencies": [
+    "前后端 API 请求/响应数据契约对齐（Result<T> 单层 vs 多层解包）",
+    "数据库 sys_role 表角色数据完整性",
+    "前端角色下拉数据流：sys_role → RoleController → /roles/all → roleApi.getAll() → NodeConfigPanel",
+    "后端流程定义保存逻辑：saveDraft 先创建 → publish 再激活的流程顺序"
+  ],
+  "recommended_phases": ["audit", "builder", "reviewer"],
+  "acceptance_hints": [
+    "从模板创建流程后跳转设计器，保存草稿和发布均成功无报错",
+    "自定义新建流程保存草稿和发布后，工作流中心能看到新卡片",
+    "审批节点角色下拉显示正确中文角色名称（非乱码）",
+    "角色来源可追溯：sys_role → /roles/all → roleApi → NodeConfigPanel",
+    "编译构建通过且不影响现有功能"
+  ]
+}

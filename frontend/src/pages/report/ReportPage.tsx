@@ -118,8 +118,8 @@ export default function ReportPage() {
 
   // ── 数据提取 ────────────────────────────────────────────────────────────────
 
-  const summary = (summaryRes as ApiResponse<ReportSummary> | undefined)?.data;
-  const categoryData = (categoryRes as ApiResponse<CategoryReport[]> | undefined)?.data ?? [];
+  const summary = summaryRes as unknown as ReportSummary | undefined;
+  const categoryData = categoryRes as unknown as CategoryReport[] | undefined ?? [];
 
   // ── 图表数据转换 ────────────────────────────────────────────────────────────
 

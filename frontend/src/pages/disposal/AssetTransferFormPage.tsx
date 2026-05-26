@@ -15,7 +15,7 @@ import { getAssetList } from '@/api/asset';
 import { submitTransferApplication } from '@/api/disposal';
 import { getDeptTree, getLocationCascade } from '@/api/base';
 import type { AssetListItem } from '@/types/asset';
-import type { Department, Location, ApiResponse, PageData } from '@/types/common';
+import type { Department, Location, PageData } from '@/types/common';
 
 const schema = z.object({
   transferType: z.string().min(1, '请选择调拨类型'),
@@ -83,7 +83,7 @@ export default function AssetTransferFormPage() {
     queryFn: () => getAssetList({ pageSize: 200 }),
   });
 
-  const availableAssets: AssetListItem[] = (assetListData as ApiResponse<PageData<AssetListItem>> | undefined)?.data?.records ?? [];
+  const availableAssets: AssetListItem[] = (assetListData as PageData<AssetListItem> | undefined)?.records ?? [];
 
   // Filter assets by search keyword
   const filteredAssets = useMemo(() => {
@@ -103,7 +103,7 @@ export default function AssetTransferFormPage() {
     queryFn: () => getDeptTree(),
   });
   const deptOptions = useMemo(
-    () => flattenTree<Department>((deptData as ApiResponse<Department[]> | undefined)?.data ?? [], 'deptName'),
+    () => flattenTree<Department>((deptData as Department[] | undefined) ?? [], 'deptName'),
     [deptData],
   );
 
@@ -113,7 +113,7 @@ export default function AssetTransferFormPage() {
     queryFn: () => getLocationCascade(),
   });
   const locationOptions = useMemo(
-    () => flattenTree<Location>((locationData as ApiResponse<Location[]> | undefined)?.data ?? [], 'locationName'),
+    () => flattenTree<Location>((locationData as Location[] | undefined) ?? [], 'locationName'),
     [locationData],
   );
 
@@ -151,8 +151,8 @@ export default function AssetTransferFormPage() {
       toast.success('调拨申请提交成功');
       navigate('/disposals');
     },
-    onError: (error: any) => {
-      toast.error(error?.response?.data?.message ?? '提交失败，请重试');
+    onError: (error: unknown) => {
+      toast.error(error instanceof Error ? error.message : '提交失败，请重试');
     },
   });
 
@@ -284,8 +284,8 @@ export default function AssetTransferFormPage() {
                 name="fromLocation"
                 control={control}
                 render={({ field }) => (
-                  <Select label="调出位置" value={field.value ?? ''} onValueChange={field.onChange} error={errors.fromLocation?.message}>
-                    <SelectItem value="">不限</SelectItem>
+                  <Select label="调出位置" value={field.value ?? '__none__'} onValueChange={v => field.onChange(v === '__none__' ? undefined : v)} error={errors.fromLocation?.message}>
+                    <SelectItem value="__none__">不限</SelectItem>
                     {locationOptions.map((loc) => (
                       <SelectItem key={loc.id} value={String(loc.id)}>
                         {'　'.repeat(loc.depth)}{loc.label}
@@ -298,8 +298,8 @@ export default function AssetTransferFormPage() {
                 name="toLocation"
                 control={control}
                 render={({ field }) => (
-                  <Select label="调入位置" value={field.value ?? ''} onValueChange={field.onChange} error={errors.toLocation?.message}>
-                    <SelectItem value="">不限</SelectItem>
+                  <Select label="调入位置" value={field.value ?? '__none__'} onValueChange={v => field.onChange(v === '__none__' ? undefined : v)} error={errors.toLocation?.message}>
+                    <SelectItem value="__none__">不限</SelectItem>
                     {locationOptions.map((loc) => (
                       <SelectItem key={loc.id} value={String(loc.id)}>
                         {'　'.repeat(loc.depth)}{loc.label}

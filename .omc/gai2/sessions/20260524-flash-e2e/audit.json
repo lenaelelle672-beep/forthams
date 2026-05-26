@@ -1,0 +1,68 @@
+{
+  "current_state": "项目 testFinish（web-java-test-kit v0.1.0）包含两套 Playwright 测试：forthams-certification.spec.ts（mock API 认证测试，10 个 CERT 场景）和 forthams-e2e.spec.ts（真 E2E 路由扫描测试）。当前 CERT-04 和 CERT-09 因 DOM 选择器与实际组件不匹配而失败；E2E 测试仅有页面可达性验证，无业务校验闭环。CI 配置（GitLab CI + Jenkinsfile）基本可用但缺少必需的环境变量文档。",
+  "existing_patterns": [
+    "mock API 模式：page.route('/api/**', mockApi) 拦截全部后端请求，使用内存 state 对象模拟 CRUD",
+    "认证注入模式：page.addInitScript 注入 localStorage auth_token 和 user_info，跳过真实登录",
+    "路由双源归并：forthams-e2e 使用 NAV_ROUTES（编译期常量）+ DOM 自发现（运行时）双源验证路由可达性",
+    "waitForPageReady 模式：networkidle → domcontentloaded fallback → .animate-spin 消失等待",
+    "Tab 切换模式：SettingsPage 使用 /settings/:tab 路由参数控制 Tab 切换",
+    "Modal 表单模式：EquipmentPage/SettingsPage 均使用 fixed overlay + 内联 form state 管理弹窗表单"
+  ],
+  "technical_constraints": [
+    "CERT-04 L128：page.locator('select').first().selectOption('AST-001') 失败 — EquipmentPage 维保 Modal 中有 2 个 <select>（选择设备 + 保养类型），且设备 select 的 option value 来自 getAssetList API 响应，如果 mock API 路径不匹配则 option 列表为空",
+    "CERT-04 附加问题：selectOption('AST-001') 需要 option value='AST-001' 存在；但 state.assets 中 id 为 'AST-001', 'AST-002', 'AST-003'，可能因 getAssetList 的请求路径与 mockApi 的 /assets GET handler 不一致导致无数据返回",
+    "CERT-09 L254：page.getByPlaceholder('部门名称').fill('质量保障部') 超时 — DepartmentsTab 中新增部门表单的 Input placeholder 是 '如 研发部' 而非 '部门名称'",
+    "settings 页面路由为 /settings/:tab（如 /settings/departments），但 CERT-09 中 page.goto('/settings') 后通过按钮切换 Tab，测试依赖 DOM 渲染顺序",
+    "CERT-09 L258：page.getByRole('button', { name: '删除' }).first().click() — 页面可能有多个 '删除' 按钮（用户列表 + 部门列表），.first() 行为不确定"
+  ],
+  "risks": [
+    {
+      "level": "high",
+      "detail": "CERT-04 selectOption 失败：2个 <select> 在 Modal 中共存，且 selectOption value 可能因 mock API 路径不匹配导致 option 为空。修复需要精确 locator（如 getByLabel('选择设备')）并确保 mock 数据正确路由。"
+    },
+    {
+      "level": "high",
+      "detail": "CERT-09 getByPlaceholder 超时：部门管理表单 placeholder 为 '如 研发部' 而非 '部门名称'，测试选择器与真实 DOM 完全脱节。修复需改为 getByPlaceholder('如 研发部') 或改用 getByLabel('部门名称 *')。"
+    },
+    {
+      "level": "medium",
+      "detail": "mock 认证测试与真实 API 脱节：10 个 CERT 场景全部使用内存 mock 数据，无法验证真实后端 API 的响应格式、错误处理和业务逻辑。迁移到真 E2E 时需重新适配所有 DOM 选择器。"
+    },
+    {
+      "level": "medium",
+      "detail": "forthams-e2e.spec.ts 仅做页面可达性测试：30 条路由 + 按钮点击探索，无任何表单提交→数据落库→页面验证的业务闭环，真实业务缺陷无法被捕获。"
+    },
+    {
+      "level": "medium",
+      "detail": "CI 变量未文档化：GitLab CI 依赖 $RUN_WEB_JAVA_E2E=1 触发，Jenkins 依赖环境变量 BASE_URL、AMS_E2E_PASSWORD，但这些变量在配置文件中无显式文档或默认值说明。"
+    },
+    {
+      "level": "low",
+      "detail": "无独立的 test:e2e npm script：当前 test:chromium 运行 tests/playwright/ 下所有 spec，无法单独启动 forthams-e2e.spec.ts（需 --grep 过滤）。"
+    },
+    {
+      "level": "low",
+      "detail": "Jenkinsfile 硬编码了 TEST_PROJECT_CONFIG=config/project.example.json，但 forthAMS 实际应使用 config/forthams.example.json。"
+    }
+  ],
+  "test_surface": [
+    "npm run test:forthams — 运行 forthams-certification.spec.ts（10 个 mock 认证测试）",
+    "npm run test:chromium — 运行 tests/playwright/ 下所有 spec",
+    "npm run ci:e2e — CI 入口：check → test:chromium → report → flaky → certification:report → quality:gate",
+    "npm run test:headed — 带浏览器 UI 运行",
+    "npm run test:debug — Playwright debug 模式",
+    "npm run test:smoke — 运行 smoke.spec.ts（4 个通用 smoke 测试）",
+    "playwright config: 单项目（chromium），2 个 worker（CI），2 次 retry（CI），timeout 30s，trace/video/screenshot 失败保留",
+    "webServer 配置通过 WEB_SERVER_COMMAND + WEB_SERVER_URL 环境变量控制（默认未启用）"
+  ],
+  "builder_notes": [
+    "修复 CERT-04：将 locator('select').first() 替换为更精确的定位，如 page.locator('div:has(> label:text(\"选择设备\")) select') 或 page.getByLabel('选择设备 *').locator('..').locator('select')。同时确认 getAssetList 的 mock API 路径匹配以确保 option 存在。",
+    "修复 CERT-09：将 getByPlaceholder('部门名称') 改为 getByPlaceholder('如 研发部') 或 getByLabel('部门名称 *')。",
+    "新增 test:e2e 脚本：'test:e2e': 'playwright test tests/playwright/forthams-e2e.spec.ts --project=chromium'",
+    "GitLab CI 需要设置变量 RUN_WEB_JAVA_E2E=1 并确保 BASE_URL 指向已部署的前端。",
+    "Jenkins 需要将 TEST_PROJECT_CONFIG 改为 config/forthams.example.json，并配置 BASE_URL / AMS_E2E_PASSWORD 凭据。",
+    "真 E2E 迁移（废弃 mock 认证测试）：先为每个 CERT 场景编写对应的 API 请求（使用 Playwright APIRequestContext），然后逐步替换 page.route mock。建议从 CERT-01（登录）和 CERT-10（仪表板）开始，这两个对 mock 数据的依赖最低。",
+    "增加业务校验深度：在 forthams-e2e.spec.ts 中添加认证用户登录后的端到端业务流测试，如 登录→资产创建→列表验证→编辑→删除 的完整 CRUD 闭环。",
+    "注意 SettingsPage 中 部门管理 Tab 的按钮文字为 '新增部门'（不包含 '添加部门'），/添加部门|新增部门/ 正则可匹配，但建议统一为 /新增部门/ 避免误匹配。"
+  ]
+}

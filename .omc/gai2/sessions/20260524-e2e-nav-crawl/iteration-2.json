@@ -1,0 +1,10 @@
+{
+  "iteration": 2,
+  "type": "repair",
+  "trigger": "gai2-reviewer FAIL",
+  "review_verdict": "FAIL",
+  "repair_cause": "第2轮 Builder 未实际修改测试文件：changes.json 声称 5/5 tests passed 但文件 unchanged；路由清单仍使用旧版 34 条（含4条不存在路由）；测试未拆分5子测试；等待策略未升级；POST 4xx 过滤/Suspense 检测/PageLoader spinner 检测均未实现。Builder 声明与实现严重不一致。",
+  "dispatched_agents": ["gai2-builder"],
+  "input_artifacts": ["review.json", "draft-changes.json", "adjudication.json", "refine.json", "router/index.tsx"],
+  "expected_fix": "基于 router/index.tsx 权威路由配置重写测试：29条可爬取非参数化路由（含 dashboard/assets/equipment/categories/inventory/retirement/disposals/idle/compensation/depreciation/audit/analytics/reports/notifications/workflows/workflow-designer/vendors/locations/settings + 各子路由）；拆分5子测试；实现 waitForPageReady(networkidle→domcontentloaded+spinner检测)；POST 4xx过滤；test.setTimeout=180000ms；按钮探索页修正为4页"
+}

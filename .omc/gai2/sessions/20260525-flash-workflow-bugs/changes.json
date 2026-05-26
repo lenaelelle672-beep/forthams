@@ -1,0 +1,38 @@
+{
+  "changed_files": [
+    "backend/src/main/java/com/ams/service/ApprovalService.java",
+    "frontend/src/app/services/approval/types.ts",
+    "frontend/src/app/components/approval/ApprovalFlowChart.tsx",
+    "frontend/src/pages/workflow/WorkflowCenterPage.tsx"
+  ],
+  "added_files": [],
+  "commands_run": [
+    {
+      "command": "mvn compile -q (backend)",
+      "result": "passed",
+      "notes": "后端编译通过，无错误"
+    },
+    {
+      "command": "npx vite build (frontend)",
+      "result": "passed",
+      "notes": "前端构建通过，无错误"
+    }
+  ],
+  "verification_results": {
+    "backend_compile": "PASS",
+    "frontend_build": "PASS"
+  },
+  "residual_risks": [
+    "审批角色中文名查询每次请求都会查表，在高并发下可能增加数据库压力；后续可考虑引入缓存",
+    "两个 NodeConfigPanel 实现中 CustomNodes 标签直接显示 roleCode（如「审批人 · SUPER_ADMIN」），而非中文名；但设计器已有 roleDetails 映射显示在角色选择下拉中，角色代码可被识别",
+    "测试文件 approvalFlowChart.test.tsx 未覆盖 approverRoleName 场景，但组件处理了回退逻辑（无 approverRoleName 时显示 approverRole）",
+    "「从模版创建」的 publish 调用需要 ADMIN/SUPER_ADMIN 角色权限，与已有「创建并发布默认流程」按钮行为一致",
+    "F-003 至 F-005 未在本轮修复范围内"
+  ],
+  "minions_execution": {
+    "adjudication_file_read": false,
+    "selected_source": "none",
+    "write_intent_preserved": true,
+    "degradation_blocked": false
+  }
+}

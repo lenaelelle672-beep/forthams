@@ -25,7 +25,7 @@ import {
   markAllAsRead,
   deleteNotification,
 } from '@/api/notification';
-import type { PaginatedResponse } from '@/types/common';
+import type { PaginatedResponse, PageData } from '@/types/common';
 import type { Notification } from '@/types/common';
 
 type NotificationTab = 'all' | 'system' | 'approval' | 'alert';
@@ -103,8 +103,8 @@ export default function NotificationsPage() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ['notifications'] }),
   });
 
-  const notifications: Notification[] = (data as PaginatedResponse<Notification> | undefined)?.data?.records ?? [];
-  const total: number = (data as PaginatedResponse<Notification> | undefined)?.data?.total ?? 0;
+  const notifications: Notification[] = (data as PageData<Notification> | undefined)?.records ?? [];
+  const total: number = (data as PageData<Notification> | undefined)?.total ?? 0;
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   return (

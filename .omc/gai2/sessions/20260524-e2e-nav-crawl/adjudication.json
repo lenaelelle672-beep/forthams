@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "agent": "gai2-orchestrator-adjudication",
+  "model_route": "opencode-go/deepseek-v4-pro",
+  "verdict": "MERGE_REFINE_CORRECTIONS_INTO_DRAFT_FRAMEWORK",
+  "summary": "Refiner 发现关键路由真相源错误：实际运行时使用的是 router/index.tsx（共 30 条非参数化路由 + 13 条参数化路由 + 3 条公开路由），而非 Draft 基于的旧版 App.tsx/SidebarLayout.tsx（估算 38+ 条）。Draft 的策略框架（策略C组合策略、waitForPageReady、scanRoute、新建按钮探索、测试拆分等）全部保留，但路由清单必须按 Refiner 的修正值替换。",
+  "selected_source": "refine_with_draft_framework",
+  "draft_preserved": [
+    "策略C组合策略架构：导航路由 + 深层路由 + 新建按钮点击探索",
+    "waitForPageReady 函数：networkidle → domcontentloaded fallback + Suspense 检测",
+    "scanRoute 函数：逐页扫描检测 API 错误/空白页/渲染崩溃",
+    "extractNavRoutesFromDOM 函数：DOM 提取导航链接做双重验证",
+    "测试拆分结构：5 个子测试",
+    "错误监控体系：page.on response/pageerror/console Error 监听",
+    "表单页 GET-only 错误过滤",
+    "增量错误追踪模式"
+  ],
+  "refine_corrections_adopted": [
+    "路由真相源修正：router/index.tsx（非 App.tsx）",
+    "导航布局修正：AppLayout.tsx（非 SidebarLayout.tsx）",
+    "NAV_ROUTES 修正：19 条（非 18 条），移除 /situation、/cyber-v12、/industrial-v13，修正 /approval → /approvals",
+    "DEEP_ROUTES 修正：11 条（非 16 条），移除 /inventory/tasks（不存在）、/disposals/compensation/new（改为 /compensation/new），追加 /notifications、/compensation/new、/inventory/smart-report",
+    "总静态路由数：30 条（非 34 或 38+）",
+    "参数化路由清单：13 条（非 7 条）",
+    "CREATE_BUTTON_PAGES 缩减为 4 页（移除 /vendors/new 和 /locations/new 路由不存在的页面）"
+  ],
+  "builder_instructions": [
+    "步骤1：基于 router/index.tsx 定义路由常量",
+    "   NAV_ROUTES (19条): /dashboard, /analytics, /assets, /equipment, /idle, /depreciation, /inventory, /workorders, /approvals, /workflows, /retirement, /disposals, /compensation, /reports, /audit, /categories, /vendors, /locations, /settings",
+    "   DEEP_ROUTES (11条): /assets/new, /assets/import-export, /workorders/new, /inventory/smart-report, /retirement/new, /disposals/transfer/new, /disposals/clearance/new, /disposals/scrap/new, /compensation/new, /workflow-designer, /notifications",
+    "   ALL_STATIC_ROUTES = [...NAV_ROUTES, ...DEEP_ROUTES]（30 条，自动去重）",
+    "   PARAM_ROUTES (13条, skip): /assets/:id, /assets/:id/edit, /equipment/:id, /workorders/:id, /approvals/:id, /inventory/tasks/:taskId, /inventory/scan/:taskId, /inventory/smart-report/:taskId, /retirement/:id, /disposals/:id, /compensation/:id, /audit/:id, /settings/:tab",
+    "步骤2：保留登录流程和 page.on 监听器",
+    "步骤3：实现 waitForPageReady + scanRoute + extractNavRoutesFromDOM 辅助函数",
+    "步骤4：实现 DOM 爬取 + ALL_STATIC_ROUTES 双源归并",
+    "步骤5：对每条路由执行 goto + waitForPageReady + 增量错误检查",
+    "步骤6：新建按钮点击探索（4 页: /assets, /workorders, /inventory, /disposals），每页最多点击 3 次",
+    "步骤7：记录跳过的参数化路由清单",
+    "步骤8：最终断言 reactCrashes === 0 && fail === 0",
+    "步骤9：使用较长的 test.setTimeout(180000) 覆盖 30 页扫描",
+    "步骤10：验证阈值 ≥ 30 条路由"
+  ],
+  "write_action_guard": {
+    "minimal_changes": true,
+    "only_modify": ["../testFinish/tests/playwright/forthams-e2e.spec.ts"],
+    "no_business_code_changes": true
+  },
+  "fallback_labels": [],
+  "reviewer_checks": [
+    "RC-1: 爬取路由数 ≥ 30 条",
+    "RC-2: DOM 双重验证至少找到 19 条导航路由中的 18 条",
+    "RC-3: 深层路由（/assets/new、/disposals/transfer/new 等）全部被访问",
+    "RC-4: 新建按钮点击至少成功 2 页",
+    "RC-5: 最终断言 reactCrashes === 0",
+    "RC-6: 旧认证测试（forthams-certification.spec.ts）全部 PASS",
+    "RC-7: 参数化路由跳过记录 13 条"
+  ],
+  "degradation_check": {
+    "draft_write_intent_preserved": true,
+    "refiner_degradation_detected": false,
+    "adjudication_keeps_write_actions": true
+  }
+}

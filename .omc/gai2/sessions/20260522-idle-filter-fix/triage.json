@@ -1,0 +1,37 @@
+{
+  "classification": "Medium",
+  "scope": [
+    "frontend/src/pages/idle/IdleAssetsPage.tsx",
+    "backend/src/main/java/com/ams/service/WorkOrderService.java",
+    "frontend/src/api/idleAsset.ts",
+    "backend/src/main/java/com/ams/controller/IdleAssetController.java"
+  ],
+  "risks": [
+    "IdleAssetsPage 第 98 行将 ApiResponse<IdleAssetRecord[]> 解包为 assets，但后端 /list 返回的是 Result<Page<IdleAssetNotice>>，data 字段为 Page 对象而非数组，直接当数组调 .filter() 导致 TypeError",
+    "403（未认证）时后端可能返回空 body 或非 JSON 响应，assetsRes 为 undefined 时解包虽已有 ?? [] 兜底，但 Page 结构下 .data 是 {records:[], total:0}，数组在 .data.records 中",
+    "WorkOrderService 第 229 行 applicantId 硬编码 0L 兜底，应改为从 SecurityContext 获取当前用户 ID，需确认 SecurityContext 在该调用链可用",
+    "修改后需确保前端 build + vitest + 后端 mvn test 全部通过（AC3）"
+  ],
+  "dependencies": [
+    "前端 http 客户端对 403 响应的解析行为（是否抛异常或返回空）",
+    "后端 Result<Page<T>> 的 JSON 序列化结构：{ code, data: { records, total, ... } }",
+    "Spring Security SecurityContext 在 WorkOrderService 事务内是否可用"
+  ],
+  "recommended_phases": ["audit", "builder", "reviewer"],
+  "acceptance_hints": [
+    "AC1：IdleAssetsPage 正确从 assetsRes.data.records 提取数组（或兼容 data 本身为数组的情况），页面在 403 和 200 两种情况下均不崩溃",
+    "AC2：WorkOrderService.upsertApprovalProcess 中 applicantId 改为从 SecurityContext 获取，fallback 逻辑合理",
+    "AC3：npm run build + npx vitest run + mvn test 全部通过，/idle 路由浏览器无运行时错误"
+  ],
+  "analysis": {
+    "root_cause_ac1": "后端 /idle-assets/list 返回 Result<Page<IdleAssetNotice>>，即 { code, data: { records: [...], total, ... } }。前端第 98 行将 .data 直接当 IdleAssetRecord[] 使用，但 .data 实际是 Page 对象。对 Page 调 .filter() 崩溃。",
+    "root_cause_ac2": "WorkOrderService 第 229 行 workOrder.getReporterId() 可能为 null，此时 applicantId 被硬编码为 0L。",
+    "fix_strategy_ac1": "前端第 98 行增加响应适配：优先取 data.records（分页结构），其次取 data（数组结构），最后兜底 []。",
+    "fix_strategy_ac2": "在 upsertApprovalProcess 中通过 SecurityContextHolder 获取当前认证用户 ID，替代硬编码 0L。",
+    "files_to_modify": {
+      "ac1": ["frontend/src/pages/idle/IdleAssetsPage.tsx（第 98 行响应解包逻辑）"],
+      "ac2": ["backend/src/main/java/com/ams/service/WorkOrderService.java（第 229 行 applicantId 赋值）"]
+    },
+    "estimated_complexity": "两个独立修复点，各涉及 1-2 文件，逻辑清晰，无架构变更。"
+  }
+}

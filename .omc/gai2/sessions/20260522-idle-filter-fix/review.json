@@ -1,0 +1,70 @@
+{
+  "overall_status": "pass",
+  "directive_summary": "修复 IdleAssetsPage 的 assets.filter is not a function 运行时崩溃（数据解包适配），同时改进 WorkOrderService applicantId 三优先级链（reporterId → SecurityContext 当前用户 → 0L 兜底）。",
+  "affected_scope": [
+    "frontend/src/pages/idle/IdleAssetsPage.tsx",
+    "backend/src/main/java/com/ams/service/WorkOrderService.java"
+  ],
+  "commands_checked": [
+    {
+      "command": "npx vitest run (frontend)",
+      "result": "passed",
+      "notes": "22 test files, 587 tests passed, 0 failures, 耗时 2.04s"
+    },
+    {
+      "command": "mvn test (backend)",
+      "result": "passed",
+      "notes": "Tests run: 193, Failures: 0, Errors: 0, Skipped: 0, BUILD SUCCESS, 耗时 12.6s"
+    },
+    {
+      "command": "npm run build (frontend)",
+      "result": "passed",
+      "notes": "Vite production build 完成，6.27s，0 errors"
+    }
+  ],
+  "acceptance_status": [
+    {
+      "criterion": "AC1: 修复 IdleAssetsPage 的 assets.filter 崩溃 — 正确解包 API 响应，确保 assets 始终为数组",
+      "status": "PASS",
+      "evidence": [
+        "git diff 确认 IdleAssetsPage.tsx 第 98-105 行新增三级适配解包逻辑：const raw = assetsRes?.data → Array.isArray(raw) ? raw : Array.isArray(raw?.records) ? raw.records : []",
+        "原代码直接取 .data ?? []，无法处理 Page<IdleAssetNotice> 的 { records: [...] } 嵌套结构，修复后同时兼容 data 直接为数组和 Page 分页结构",
+        "新增 import PageData 类型用于类型安全转换",
+        "第 148 行 assets.filter(...) 在所有代码路径下 assets 均为合法数组，不会再抛出 TypeError"
+      ]
+    },
+    {
+      "criterion": "AC2: B-4 改进 — WorkOrderService applicantId 改为从 SecurityContext 获取当前用户 ID",
+      "status": "PASS",
+      "evidence": [
+        "git diff 确认 WorkOrderService.java 新增 resolveApplicantId 方法（第 242-248 行），实现三优先级链：① workOrder.reporterId → ② getCurrentUserIdFromSecurityContext() → ③ 兜底 0L",
+        "新增 getCurrentUserIdFromSecurityContext 方法（第 254-272 行）：从 SecurityContextHolder 获取 Authentication，通过 username 反查 UserMapper 获取数据库 ID",
+        "正确处理 anonymousUser、未认证、查询异常等边界情况，异常时 warn 日志 + 返回 null",
+        "upsertApprovalProcess 第 234 行已替换为 resolveApplicantId(workOrder) 调用",
+        "构造器注入 UserMapper（@RequiredArgsConstructor），无需手动装配"
+      ]
+    },
+    {
+      "criterion": "AC3: 前端 build + vitest + 后端 mvn test 全部通过",
+      "status": "PASS",
+      "evidence": [
+        "独立运行 npx vitest run：22 test files, 587 tests passed, 0 failures",
+        "独立运行 mvn test：Tests run: 193, Failures: 0, Errors: 0, BUILD SUCCESS",
+        "独立运行 npm run build：Vite production build 完成, 6.27s, 0 errors",
+        "git diff --stat HEAD 确认仅修改 2 个业务文件（IdleAssetsPage.tsx 和 WorkOrderService.java），日志文件变动不影响业务"
+      ]
+    }
+  ],
+  "findings": [
+    "无阻塞性问题。代码改动范围小且精准，仅涉及 2 个业务文件。",
+    "IdleAssetsPage 数据解包逻辑覆盖了后端可能返回的三种结构：Page 分页（data.records）、直接数组（data）、异常/空值（兜底 []）。",
+    "WorkOrderService applicantId 三优先级链设计合理，每层都有明确的 fallback，异常处理完整。",
+    "getCurrentUserIdFromSecurityContext 内有一次 UserMapper.selectOne 数据库查询，但仅在 upsertApprovalProcess（低频审批操作）中触发，性能风险可接受。"
+  ],
+  "residual_risks": [
+    "/idle 页面浏览器运行时验证需人工在浏览器中确认（CI 环境无浏览器），但 TypeScript 类型安全 + build 通过 + 三级兜底逻辑已确保 data 解包不会为非数组对象。",
+    "getCurrentUserIdFromSecurityContext 在并发审批提交场景下，若同一用户频繁操作可考虑引入本地缓存；当前使用频率低，暂无需优化。"
+  ],
+  "reviewer": "gai2-reviewer",
+  "reviewed_at": "2026-05-22T10:26:00+08:00"
+}

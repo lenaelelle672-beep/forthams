@@ -1,0 +1,103 @@
+{
+  "schema_version": 1,
+  "agent": "gai2-drafter",
+  "model_route": "opencode-go/deepseek-v4-flash",
+  "objective_summary": "本周三个优先级任务的实施草案：P0-1 密码重置加旧密码校验、P0-2 大屏API失败展示错误态去掉假数据fallback、P1-4 清理 report/ 死代码目录",
+  "context_files_read": [
+    ".omc/gai2/sessions/20260524-flash-001/workcard.json",
+    ".omc/gai2/sessions/20260524-flash-001/triage.json",
+    ".omc/gai2/sessions/20260524-flash-001/audit.json",
+    "backend/src/main/java/com/ams/dto/ResetPasswordRequest.java",
+    "backend/src/main/java/com/ams/service/AuthService.java",
+    "backend/src/main/java/com/ams/controller/AuthController.java",
+    "frontend/src/pages/bigscreen/BigScreenPage.tsx",
+    "frontend/src/pages/bigscreen/BigScreen3DPage.tsx",
+    "frontend/src/router/index.tsx",
+    "frontend/src/__tests__/pages/ReportPage.test.tsx",
+    "frontend/src/pages/report/ReportPage.tsx",
+    "frontend/src/pages/report/ReportCenterPage.tsx"
+  ],
+  "target_files": [
+    "backend/src/main/java/com/ams/dto/ResetPasswordRequest.java",
+    "backend/src/main/java/com/ams/service/AuthService.java",
+    "backend/src/main/java/com/ams/controller/AuthController.java",
+    "frontend/src/pages/bigscreen/BigScreenPage.tsx",
+    "frontend/src/pages/bigscreen/BigScreen3DPage.tsx",
+    "frontend/src/pages/report/（清理整个目录）",
+    "frontend/src/__tests__/pages/ReportPage.test.tsx"
+  ],
+  "write_intent": true,
+  "write_actions": [
+    {
+      "task_id": "P0-1",
+      "file": "backend/src/main/java/com/ams/dto/ResetPasswordRequest.java",
+      "action_type": "edit",
+      "description": "在 ResetPasswordRequest DTO 中添加 oldPassword 字段，加上 @NotBlank 校验",
+      "code_snippet": "在现有 username 和 newPassword 字段之后添加：\n\n    @NotBlank(message = \"旧密码不能为空\")\n    private String oldPassword;",
+      "expected_effect": "重置密码请求必须携带旧密码，后端可进行旧密码校验"
+    },
+    {
+      "task_id": "P0-1",
+      "file": "backend/src/main/java/com/ams/service/AuthService.java",
+      "action_type": "edit",
+      "description": "在 AuthService.resetPassword() 方法中，查出 user 后、设置新密码前，添加 passwordEncoder.matches() 校验旧密码",
+      "code_snippet": "在 user null 检查之后、user.setPassword() 之前插入：\n\n        if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {\n            throw new BusinessException(\"旧密码错误\");\n        }",
+      "expected_effect": "用户自主重置密码时必须提供正确旧密码，防止越权重置"
+    },
+    {
+      "task_id": "P0-1",
+      "file": "backend/src/main/java/com/ams/controller/AuthController.java",
+      "action_type": "edit",
+      "description": "更新 resetPassword 端点的 JavaDoc 注释，说明需要 oldPassword 参数",
+      "code_snippet": "更新 resetPassword 方法的 JavaDoc，明确说明需要 username、oldPassword 和 newPassword 三个字段",
+      "expected_effect": "文档与实现保持一致，接口契约明确"
+    },
+    {
+      "task_id": "P0-2",
+      "file": "frontend/src/pages/bigscreen/BigScreenPage.tsx",
+      "action_type": "edit",
+      "description": "删除假数据 fallback 机制，添加错误态 UI 分支",
+      "code_snippet": "1. 删除 fallbackStats 对象\n2. 定义显式 Stats 接口替代 type Stats = typeof fallbackStats\n3. useQuery 解构添加 isError，删除 placeholderData\n4. 删除 data ?? fallbackStats 兜底\n5. 在 return 前添加 if(isError) 错误态全屏 UI\n6. import AlertTriangle from lucide-react",
+      "expected_effect": "API 失败时不再显示缓存假数据，而是显示全屏错误态 UI"
+    },
+    {
+      "task_id": "P0-2",
+      "file": "frontend/src/pages/bigscreen/BigScreen3DPage.tsx",
+      "action_type": "edit",
+      "description": "删除假数据 catch fallback 机制，添加错误态 UI 分支",
+      "code_snippet": "1. 删除 fallbackStats 对象\n2. 定义显式 Stats 接口\n3. 修改 queryFn：去掉 try-catch 中的 return fallbackStats，改为字段级 0 fallback\n4. 删除 initialData: fallbackStats\n5. useQuery 解构添加 isError\n6. 删除 stats ?? fallbackStats 兜底\n7. 添加 isError 错误态 UI\n8. import AlertTriangle from lucide-react",
+      "expected_effect": "API 请求失败时 catch 不再静默返回假数据，而是抛出错误触发 isError 显示错误态 UI"
+    },
+    {
+      "task_id": "P1-4",
+      "file": "frontend/src/pages/report/",
+      "action_type": "delete",
+      "description": "清理 pages/report/ 死代码目录（4个文件：ReportPage.tsx, ReportCenterPage.tsx, components/ReportChart.tsx, components/ReportCard.tsx）",
+      "code_snippet": "删除整个 frontend/src/pages/report/ 目录",
+      "expected_effect": "消除目录歧义，移除死代码"
+    },
+    {
+      "task_id": "P1-4",
+      "file": "frontend/src/__tests__/pages/ReportPage.test.tsx",
+      "action_type": "delete",
+      "description": "同步清理与 pages/report/ 关联的测试文件",
+      "code_snippet": "删除文件",
+      "expected_effect": "删除与已清理死代码对应的测试文件，避免残留引用"
+    }
+  ],
+  "verification_plan": [
+    "P0-1: POST /auth/reset-password 不传 oldPassword → HTTP 400",
+    "P0-1: POST /auth/reset-password 传错误旧密码 → BusinessException('旧密码错误')",
+    "P0-1: POST /auth/reset-password 传正确旧密码 → HTTP 200 成功",
+    "P0-1: 确认管理员接口 /user-management/{id}/reset-password 不受影响",
+    "P0-2: 前端 BigScreen 页面 API 5xx 时显示错误态 UI 而非假数据",
+    "P0-2: 前端编译无 TypeScript 错误",
+    "P1-4: grep -r 'from.*pages/report/' frontend/src/ 结果为空",
+    "P1-4: 前端编译无模块缺失错误"
+  ],
+  "risks": [
+    "P0-1 MEDIUM: 旧密码校验可能被前端页面缺乏对应输入字段而阻塞，但接口级安全加固优先",
+    "P0-2 LOW: 删除字段级 fallbackStats 后 API 返回缺失字段时用 0 填充，比假数据更符合预期",
+    "P1-4 LOW: 全局 grep 确认无外部引用后方可删除"
+  ]
+}

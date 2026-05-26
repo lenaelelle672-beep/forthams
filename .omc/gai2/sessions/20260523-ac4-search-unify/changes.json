@@ -1,0 +1,42 @@
+{
+  "session_id": "20260523-ac4-search-unify",
+  "phase": "builder",
+  "completed_at": "2026-05-23T20:03:00+08:00",
+  "directive": "AC-4 搜索架构统一 — SidebarLayout 内联搜索移除 + GlobalSearch 增强（后端API搜索）+ AppLayout SearchDropdown 移除",
+  "changed_files": [
+    "frontend/src/app/layouts/SidebarLayout.tsx",
+    "frontend/src/components/GlobalSearch.tsx",
+    "frontend/src/layouts/AppLayout.tsx",
+    "frontend/src/__tests__/GlobalSearch.test.tsx"
+  ],
+  "added_files": [
+    ".omc/gai2/sessions/20260523-ac4-search-unify/workcard.json",
+    ".omc/gai2/sessions/20260523-ac4-search-unify/changes.json"
+  ],
+  "commands_run": [
+    {
+      "command": "cd frontend && npx vitest run",
+      "result": "30 files, 677 tests passed",
+      "notes": "GlobalSearch.test.tsx 7 tests passed（含 cmdk 受控输入兼容测试）"
+    },
+    {
+      "command": "cd frontend && npm run build",
+      "result": "0 errors, built in 5.18s",
+      "notes": "构建无错误"
+    }
+  ],
+  "verification_results": [
+    "SidebarLayout.tsx: 移除 import Search、FormEvent、useState；移除 searchQuery/headerMessage/isSearchOpen 三个状态；移除 handleGlobalSearch 函数；移除第114-158行内联搜索 UI（按钮+form+input+关闭按钮）；移除第181-185行 headerMessage 通知条；保留 GlobalSearch 和 NotificationCenter；保留导航菜单和布局",
+    "GlobalSearch.tsx: 新增 import globalSearch/SearchResult from @/api/search；新增 import Package/FileText/Truck 类型图标；新增 activeTab/query/dataResults/isSearching 搜索状态；新增300ms防抖API搜索 effect；新增 tab 切换 UI（页面导航/数据搜索）；新增 CommandDialog 内 Tab 切换按钮；新增业务数据分组展示（含类型图标）；新增 loading/empty 状态展示；CommandInput 受控（value/onValueChange/placeholder）；修复数据提取模式（res?.data ?? []）；CommandEmpty 文本改为「未找到匹配的页面或数据」；handleOpenChange 关闭时重置所有状态",
+    "AppLayout.tsx: 移除 import SearchDropdown；移除第319行 <SearchDropdown />；保留 GlobalSearch",
+    "GlobalSearch.test.tsx: 添加 vi.mock('@/api/search') 避免真实 HTTP 调用；使用 fireEvent.input 兼容 cmdk 受控输入；placeholder 匹配「搜索页面或业务数据...」；empty text 匹配「未找到匹配的页面或数据」；fix 截断文件",
+    "vitest: 30 files, 677 tests passed",
+    "npm build: 0 errors, built in 5.18s"
+  ],
+  "residual_risks": [
+    "GlobalSearch SearchDropdown 组件（frontend/src/components/SearchDropdown.tsx）未被删除，仅从 AppLayout 移除引用。当前无其他引用，可安全保留",
+    "GlobalSearch 的 tab 切换 UI 与 cmdk 组件交互：数据搜索 tab 下，cmdk 的 CommandEmpty 与自定义 empty 状态共存，行为正确",
+    "SidebarLayout header 去掉内联搜索后空间更紧凑，GlobalSearch（w-56）和 NotificationCenter 紧邻排列，视觉正常",
+    "AppLayout 和 SidebarLayout 两个布局的 GlobalSearch 组件现在行为一致（页面导航+API数据搜索）"
+  ]
+}

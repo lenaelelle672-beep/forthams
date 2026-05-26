@@ -67,6 +67,26 @@ class VendorControllerTest {
     }
 
     @Test
+    @DisplayName("Should support frontend root vendors list endpoint")
+    void testListFromRootPath() throws Exception {
+        Page<Vendor> page = new Page<>(1, 10);
+        page.setRecords(java.util.Collections.emptyList());
+        page.setTotal(0);
+
+        when(vendorService.listPage(1, 10)).thenReturn(page);
+
+        mockMvc.perform(get("/vendors")
+                .param("page", "1")
+                .param("pageSize", "10")
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.code").value(200))
+            .andExpect(jsonPath("$.data.records").isArray());
+
+        verify(vendorService).listPage(1, 10);
+    }
+
+    @Test
     @DisplayName("Should return empty page when no vendors")
     void testListEmpty() throws Exception {
         Page<Vendor> emptyPage = new Page<>(1, 10);

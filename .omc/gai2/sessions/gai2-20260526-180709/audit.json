@@ -1,0 +1,189 @@
+{
+  "current_state": "后端审批工作流引擎已实现 4 个核心业务流程（ASSET_TRANSFER / ASSET_CLEARANCE / ASSET_SCRAP / ASSET_COMPENSATION），统一走 ApprovalService → 多级审批 → handleBusinessOutcome 回调模式。所有流程定义由 WorkflowDefinitionService 管理，默认模板均为 4 级审批（approvalStepCount=4），默认审批角色 SUPER_ADMIN，审批模式 sequence。实际资产处置由 DisposalService / CompensationService 在审批回调中同步执行，事务边界由 @Transactional 保证。各 DTO 字段验证不完整（仅 AssetTransferDTO 有 @NotNull 注解验证 assetId 和 targetDeptId；CompensationCreateDTO 无注解验证，由 Service 层手动检查）。AssetStatus 枚举定义 7 种状态，其中 RETIRED、SCRAPPED、CLEARED 为终态，终态不可再迁移。认证体系为 JWT Bearer Token，所有业务端点需在 Authorization header 中携带 token。",
+  "existing_patterns": [
+    "审批流程模式：POST /api/approvals 创建审批流程 → 多级审批（POST /api/approvals/{id}/approve，每级通过后 currentStep++）→ 最终通过时触发 handleBusinessOutcome → 同步调用 DisposalService/CompensationService 执行业务操作",
+    "工作流定义模式：WorkflowDefinitionService 提供 5 个预定义模板（含 RETIREMENT），必须先 publish 才能创建审批。创建审批时 bindWorkflowSnapshot() 将流程定义快照 + 业务数据嵌入 businessData JSON 中",
+    "审批节点验证模式：resolveWorkflowRuntimePlan() 遍历节点图，解析审批节点（approverType: role/user，approvalMode: sequence/all/any），验证审批人权限",
+    "资产处置模式：DisposalService 通过 AssetLifecycleService.transitionAsset/transitionStatus 执行状态迁移 + 变更日志记录，包含租户隔离和状态迁移白名单检查",
+    "赔偿流程模式：CompensationService.createCompensation() 创建 PENDING 记录 → 审批通过后 updateStatus('APPROVED')，驳回后 updateStatus('REJECTED')",
+    "租户隔离模式：所有 Service 层操作通过 TenantContext.requireTenantId() 提取租户 ID，Mapper 查询强制 eq('tenant_id', tenantId)",
+    "通知模式：审批完成后 sendApprovalNotification() 发送通知，失败不影响主业务（catch + log.warn）"
+  ],
+  "technical_constraints": [
+    {
+      "category": "认证",
+      "detail": "除 POST /api/auth/login 外，所有 API 端点需要 Authorization: Bearer <token> header。token 由 JwtUtil.getUserIdFromToken() 解析当前用户 ID"
+    },
+    {
+      "category": "工作流预置条件",
+      "detail": "创建 4 个流程类型的审批前，必须确保对应 businessType 的 WorkflowDefinition 已 PUBLISH（requirePublishedDefinition）。可通过 POST /api/workflow-definitions/{businessType}/publish 发布默认模板"
+    },
+    {
+      "category": "审批顺序",
+      "detail": "4 个模板均为 4 级审批。审批为顺序流：第1级通过 → currentStep=2 → 第2级通过 → currentStep=3 → 第3级通过 → currentStep=4 → 第4级通过 → status=APPROVED。每级必须由对应角色审批人操作"
+    },
+    {
+      "category": "ApprovalCreateDTO 必填字段",
+      "detail": "processType(必需，枚举值 ASSET_TRANSFER/ASSET_CLEARANCE/ASSET_SCRAP/ASSET_COMPENSATION)，businessData(必需，JSON 格式的业务 DTO 数据)。title/description 可为空。applicantId 由后端自动从 JWT token 填充"
+    },
+    {
+      "category": "AssetTransferDTO 必填字段",
+      "detail": "assetId(@NotNull)、targetDeptId(@NotNull)。targetUserId、targetLocation、reason 可选"
+    },
+    {
+      "category": "AssetScrapDTO 必填字段",
+      "detail": "assetId(@NotNull)。reason 可选"
+    },
+    {
+      "category": "AssetClearanceDTO 必填字段",
+      "detail": "assetId(@NotNull)。reason 可选"
+    },
+    {
+      "category": "CompensationCreateDTO 必填字段",
+      "detail": "assetId(Service 层手动检查非空)、responsibleUserId(Service 层手动检查非空)。字段名支持别名：type→compensationType、amount→compensationAmount、reason→description、date→incidentDate、employee→responsibleUserId、department→responsibleDeptId"
+    },
+    {
+      "category": "状态迁移前置条件",
+      "detail": "transferAsset 要求资产当前状态在 {IDLE, IN_USE, MAINTENANCE} 中；clearAsset 和 scrapAsset 无前置状态约束，但资产必须存在且属于当前租户"
+    },
+    {
+      "category": "API 端点路径前缀",
+      "detail": "所有 API 路径前缀为 /api（由 application.yml 的 server.servlet.context-path=/api 配置）"
+    },
+    {
+      "category": "审批操作请求体格式",
+      "detail": "审批通过: POST /api/approvals/{id}/approve，body: { result: 'APPROVED', opinion: 'xxx' }（都是字符串）；驳回: POST /api/approvals/{id}/reject，body: { rejectionReason | comment | reason: 'xxx' }"
+    }
+  ],
+  "risks": [
+    {
+      "level": "medium",
+      "detail": "审批回调中 businessData JSON 反序列化失败会抛出 BusinessException，触发 @Transactional 回滚，导致审批流程状态也被回滚。但 businessData 是创建审批时嵌入的，生产环境风险较低"
+    },
+    {
+      "level": "medium",
+      "detail": "多级审批依赖 approverRole 对应的角色必须有关联用户。默认 SUPER_ADMIN 角色若无用户，审批将抛出 '审批角色未配置审批人'，阻塞流程"
+    },
+    {
+      "level": "high",
+      "detail": "CompensationCreateDTO 无 @NotNull 验证注解，仅 Service 层手动检查 responsibleUserId 和 assetId。若前端绕过 Controller 直接调用 Service（极端场景），可能产生空字段记录"
+    },
+    {
+      "level": "low",
+      "detail": "AssetStatus 终态（RETIRED/SCRAPPED/CLEARED）不可再迁移。测试时需注意已终态资产不能被再次转移/清理/报废"
+    },
+    {
+      "level": "medium",
+      "detail": "4 级审批需要 4 个不同的审批人（默认 approverRole=SUPER_ADMIN 且 approvalMode=sequence 时同一人可连续审批）。但同一步骤若 approvalMode=all，需所有角色关联用户都审批。测试环境可能缺少足够审批账号"
+    },
+    {
+      "level": "low",
+      "detail": "驳回处置类审批（ASSET_TRANSFER/CLEARANCE/SCRAP）仅记日志，不修改资产状态。但这可能导致前端误以为资产已变更"
+    },
+    {
+      "level": "medium",
+      "detail": "WorkflowDefinition 必须先 publish 才能创建审批。若测试环境未发布，createProcess 会直接抛 BusinessException。建议在测试套件 set up 中统一发布 4 个模板"
+    }
+  ],
+  "test_surface": [
+    {
+      "flow": "认证",
+      "steps": [
+        { "method": "POST", "path": "/api/auth/login", "body": { "username": "admin", "password": "admin123" }, "expected_status": 200, "expected_shape": { "code": 200, "message": "登录成功", "data": { "token": "<jwt>", "userId": 1, "username": "admin", "realName": "管理员", "roles": ["SUPER_ADMIN"] } } },
+        { "method": "POST", "path": "/api/auth/login", "body": { "username": "", "password": "" }, "expected_status": 400, "desc": "空用户名/密码应返回 400 验证错误" }
+      ]
+    },
+    {
+      "flow": "ASSET_TRANSFER 端到端",
+      "steps": [
+        { "step": 1, "method": "POST", "path": "/api/workflow-definitions/ASSET_TRANSFER/publish", "body": { "operatorId": 1 }, "expected_status": 200, "desc": "发布资产转移工作流模板" },
+        { "step": 2, "method": "POST", "path": "/api/approvals", "body": { "processType": "ASSET_TRANSFER", "title": "资产转移测试", "businessData": "{\"assetId\":1,\"targetDeptId\":2,\"targetUserId\":3,\"targetLocation\":\"B栋3层\",\"reason\":\"部门调整\"}" }, "expected_status": 200, "desc": "创建资产转移审批，businessData 包含 AssetTransferDTO 全部字段", "expected_shape": { "code": 200, "data": { "status": "PENDING", "currentStep": 1 } } },
+        { "step": 3, "method": "POST", "path": "/api/approvals/{processId}/approve", "body": { "result": "APPROVED", "opinion": "同意" }, "expected_status": 200, "desc": "第1级审批通过", "expected_shape": { "code": 200, "data": { "currentStep": 2 } } },
+        { "step": 4, "repeat_step_3_for_steps_2_3": "重复第3步两次（第2级、第3级审批通过）" },
+        { "step": 5, "method": "POST", "path": "/api/approvals/{processId}/approve", "body": { "result": "APPROVED" }, "expected_status": 200, "desc": "第4级（最终）审批通过 → 触发 transferAsset 回调", "expected_shape": { "code": 200, "data": { "status": "APPROVED" } } },
+        { "step": 6, "method": "GET", "path": "/api/assets/{assetId}", "expected_status": 200, "desc": "验证资产状态变为 IN_USE，部门/用户/位置已更新" }
+      ],
+      "expected_final_asset_status": "IN_USE"
+    },
+    {
+      "flow": "ASSET_CLEARANCE 端到端",
+      "steps": [
+        { "step": 1, "method": "POST", "path": "/api/workflow-definitions/ASSET_CLEARANCE/publish", "body": { "operatorId": 1 }, "expected_status": 200 },
+        { "step": 2, "method": "POST", "path": "/api/approvals", "body": { "processType": "ASSET_CLEARANCE", "title": "资产清退测试", "businessData": "{\"assetId\":2,\"reason\":\"资产闲置过久\"}" }, "expected_status": 200, "desc": "businessData 包含 AssetClearanceDTO 的 assetId 和 reason" },
+        { "step": 3, "method": "POST", "path": "/api/approvals/{processId}/approve", "body": { "result": "APPROVED" }, "repeat": 4, "desc": "依次完成 4 级审批" },
+        { "step": 4, "method": "GET", "path": "/api/assets/{assetId}", "expected_status": 200, "desc": "验证资产状态变为 CLEARED（终态）" }
+      ],
+      "expected_final_asset_status": "CLEARED"
+    },
+    {
+      "flow": "ASSET_SCRAP 端到端",
+      "steps": [
+        { "step": 1, "method": "POST", "path": "/api/workflow-definitions/ASSET_SCRAP/publish", "body": { "operatorId": 1 }, "expected_status": 200 },
+        { "step": 2, "method": "POST", "path": "/api/approvals", "body": { "processType": "ASSET_SCRAP", "title": "资产报废测试", "businessData": "{\"assetId\":3,\"reason\":\"设备损坏无法使用\"}" }, "expected_status": 200, "desc": "businessData 包含 AssetScrapDTO 的 assetId 和 reason" },
+        { "step": 3, "method": "POST", "path": "/api/approvals/{processId}/approve", "body": { "result": "APPROVED" }, "repeat": 4, "desc": "依次完成 4 级审批" },
+        { "step": 4, "method": "GET", "path": "/api/assets/{assetId}", "expected_status": 200, "desc": "验证资产状态变为 SCRAPPED（终态）" }
+      ],
+      "expected_final_asset_status": "SCRAPPED"
+    },
+    {
+      "flow": "ASSET_COMPENSATION 端到端",
+      "steps": [
+        { "step": 1, "method": "POST", "path": "/api/workflow-definitions/ASSET_COMPENSATION/publish", "body": { "operatorId": 1 }, "expected_status": 200 },
+        { "step": 2, "method": "POST", "path": "/api/approvals", "body": { "processType": "ASSET_COMPENSATION", "title": "资产赔偿测试", "businessId": 4, "businessData": "{\"assetId\":4,\"responsibleUserId\":5,\"responsibleDeptId\":2,\"compensationType\":\"LOSS\",\"compensationAmount\":5000.00,\"description\":\"资产丢失赔偿\",\"incidentDate\":\"2026-05-01\"}" }, "expected_status": 200, "desc": "businessData 包含 CompensationCreateDTO 的全部重名字段" },
+        { "step": 3, "method": "POST", "path": "/api/approvals/{processId}/approve", "body": { "result": "APPROVED" }, "repeat": 4 },
+        { "step": 4, "method": "GET", "path": "/api/compensations/{businessId}", "expected_status": 200, "desc": "验证赔偿记录 status=APPROVED" }
+      ],
+      "expected_final_compensation_status": "APPROVED",
+      "note": "赔偿流程不直接修改资产状态，仅创建 AssetCompensation 记录"
+    },
+    {
+      "flow": "审批驳回测试",
+      "steps": [
+        { "step": 1, "method": "POST", "path": "/api/workflow-definitions/ASSET_SCRAP/publish", "body": { "operatorId": 1 }, "expected_status": 200 },
+        { "step": 2, "method": "POST", "path": "/api/approvals", "body": { "processType": "ASSET_SCRAP", "businessData": "{\"assetId\":10}" }, "expected_status": 200 },
+        { "step": 3, "method": "POST", "path": "/api/approvals/{processId}/reject", "body": { "rejectionReason": "材料不充分" }, "expected_status": 200, "expected_shape": { "code": 200, "data": { "status": "REJECTED" } } }
+      ],
+      "desc": "验证驳回后审批流程状态变为 REJECTED，资产状态不变，赔偿记录状态变为 REJECTED"
+    },
+    {
+      "flow": "状态迁移白名单验证",
+      "steps": [
+        { "step": 1, "method": "POST", "path": "/api/workflow-definitions/ASSET_TRANSFER/publish", "body": { "operatorId": 1 }, "expected_status": 200 },
+        { "step": 2, "method": "POST", "path": "/api/approvals", "body": { "processType": "ASSET_TRANSFER", "businessData": "{\"assetId\":999,\"targetDeptId\":2}" }, "expected_status": 200 },
+        { "step": 3, "method": "POST", "path": "/api/approvals/{processId}/approve", "body": { "result": "APPROVED" }, "repeat": 4, "expected_status": 500, "desc": "不存在的资产应在回调时抛出 BusinessException（资产不存在）" }
+      ]
+    },
+    {
+      "flow": "端点签名验证",
+      "steps": [
+        { "point": "ApprovalController", "endpoints": [
+          "GET  /api/approvals?page=1&pageSize=10&status=PENDING&processType=ASSET_TRANSFER",
+          "GET  /api/approvals?mine=true  (自动使用当前用户为applicantId)",
+          "GET  /api/approvals/{id}",
+          "POST /api/approvals  Body: ApprovalCreateDTO",
+          "POST /api/approvals/{id}/approve  Body: {result, opinion}",
+          "POST /api/approvals/{id}/reject  Body: {rejectionReason|comment|reason}",
+          "POST /api/approvals/{id}/cancel",
+          "GET  /api/approvals/pending",
+          "GET  /api/approvals/pending/count"
+        ]},
+        { "point": "AuthController", "endpoints": [
+          "POST /api/auth/login  Body: {username, password}  Response: {code, message, data: {token, userId, username, realName, roles}}",
+          "POST /api/auth/register  Body: RegisterRequest",
+          "POST /api/auth/logout",
+          "POST /api/auth/reset-password  Body: {username, newPassword}"
+        ]}
+      ]
+    }
+  ],
+  "builder_notes": [
+    "创建审批前必须先发布对应工作流模板。建议测试脚本依次调用 POST /api/workflow-definitions/{type}/publish 预置 4 个模板",
+    "审批通过和驳回共用 ApprovalService.approve() 方法，通过 result 参数区分（APPROVED/REJECTED）。/reject 端点仅自动填充结果为 REJECTED",
+    "多级审批默认 approverRole=SUPER_ADMIN、approvalMode=sequence，同一审批人可连续审批全部 4 级",
+    "businessData 是 JSON 字符串，必须包含对应 DTO 的字段（不是 snake_case 映射，是 camelCase）。CompensationCreateDTO 支持多种别名",
+    "审批回调在 @Transactional 内执行，若回调抛异常，审批流程更新也会回滚。测试时需关注异常场景的事务一致性",
+    "AssetStatus 终态不可再迁移，建议测试前准备 IDLE 或 IN_USE 状态的资产",
+    "CompensationCreateDTO 无 @NotNull 注解，但 createCompensation() 对 assetId 和 responsibleUserId 做了手动非空检查。测试时故意缺字段可验证 Service 层验证是否生效",
+    "Application 上下文路径为 /api，端口 8080。完整 API 地址格式为 http://localhost:8080/api/xxx"
+  ]
+}

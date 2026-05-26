@@ -1,0 +1,65 @@
+{
+  "changed_files": [],
+  "added_files": [
+    "scripts/test_workflow_e2e.py"
+  ],
+  "commands_run": [
+    {
+      "command": "python3 -m py_compile scripts/test_workflow_e2e.py",
+      "result": "passed",
+      "notes": "Python 语法检查通过，无编译错误"
+    },
+    {
+      "command": "pip3 install --break-system-packages requests",
+      "result": "passed",
+      "notes": "测试依赖 requests 库已安装（2.34.2）。正式环境应使用虚拟环境"
+    }
+  ],
+  "verification_results": [
+    "脚本 syntax check 通过 (py_compile)",
+    "模块导入验证通过（APIClient、TestResult、TEST_MATRIX 等所有类和数据结构定义正确）",
+    "999 行可执行 Python 代码，包含完整的错误处理和彩色日志输出",
+    "实际端到端运行需要后端服务在 localhost:8080 可用（尚未执行运行时验证）"
+  ],
+  "minions_execution": {
+    "adjudication_file_read": false,
+    "selected_source": "none",
+    "write_intent_preserved": true,
+    "degradation_blocked": false,
+    "note": "本阶段无 adjudication.json，非 MINIONS 链路。workcard 声明 minions_enabled=false。代码实现基于 audit.json + debate.json + review.json 的分析结论。"
+  },
+  "residual_risks": [
+    "测试尚未在真实后端上执行——依赖 localhost:8080 服务运行、admin/admin123 可用、deptId=1/2 和 userId=1/3/5 存在",
+    "ASSET_TRANSFER DTO 中的 targetUserId=3 需要确实存在于数据库中，否则审批通过后回调可能失败",
+    "COMPENSATION 流程审批通过后不修改资产状态（已确认是设计意图），测试脚本仅验证赔偿记录 status=APPROVED",
+    "AC5 多租户隔离测试通过注册 API 创建第二用户——如注册接口受限，该测试会失败",
+    "工作流发布端点路径以实际代码 `/api/workflows/{type}/publish` 为准（audit.json 中写的 `/api/workflow-definitions/...` 与实际代码不一致）",
+    "测试资产保留在数据库中（符合 directive），长期积累可能产生脏数据",
+    "JWT token 过期风险——长脚本执行中未做 token 刷新（debate 建议每个流程开始时重新登录，当前实现使用单 token 全程复用）"
+  ],
+  "script_summary": {
+    "file": "scripts/test_workflow_e2e.py",
+    "lines": 999,
+    "language": "Python 3",
+    "dependency": "requests",
+    "test_count": 7,
+    "tests": [
+      "AC-ASSET_TRANSFER (4 流程端到端 #1)",
+      "AC-ASSET_CLEARANCE (4 流程端到端 #2)",
+      "AC-ASSET_SCRAP (4 流程端到端 #3)",
+      "AC-ASSET_COMPENSATION (4 流程端到端 #4)",
+      "AC2-ASSET_CLEARANCE-ACTUAL (补全 reviewer 指出的 CLEARANCE 证据缺口)",
+      "AC5-多租户隔离 (mine=true 交叉验证 2 用户)",
+      "AC6-字段对齐 (Auth/Approval/Asset DTO 字段 + JSON 解析健壮性)"
+    ],
+    "features": [
+      "JSON 数据驱动测试矩阵（TEST_MATRIX dict）",
+      "API 客户端封装（login/register/publish_workflow/create_approval/approve/reject）",
+      "4 级审批循环（序列化，按序推进）",
+      "彩色终端输出（PASS=绿/FAIL=红/WARN=黄）",
+      "结构化测试报告输出（JSON 文件）",
+      "测试数据保留（不做清理）",
+      "自动生成唯一资产编号避免主键冲突"
+    ]
+  }
+}

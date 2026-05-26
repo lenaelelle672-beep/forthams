@@ -14,7 +14,7 @@ const tokens = {
 function getMeta(type: FlowNodeType, data: FlowNodeData) {
   switch (type) {
     case 'start': return `触发方式 · ${data.triggerType || '手动触发'}`;
-    case 'approval': return `审批人 · ${data.approverRole || '待配置'}`;
+    case 'approval': return `审批人 · ${data.approverRoleName || data.approverRole || '待配置'}`;
     case 'condition': return data.conditionExpression || '请配置分支条件';
     case 'end': return `结束动作 · ${data.resultAction || '流程收口'}`;
     default: return '';

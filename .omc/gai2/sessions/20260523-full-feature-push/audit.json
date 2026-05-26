@@ -1,0 +1,140 @@
+{
+  "checked_at": "2026-05-23T00:00:00+08:00",
+  "findings": [
+    {
+      "id": "F-1",
+      "feature": "维保管理前端页面",
+      "current_state": "无独立 MaintenancePage。frontend/src/pages/ 下不存在 maintenance/ 目录或 MaintenancePage.tsx。router/index.tsx 中无 /maintenance 路由。侧边栏 NAV_GROUPS 中无维保管理入口。维保逻辑目前内嵌在 EquipmentPage.tsx（重要设备页），通过 maintenanceService 调用后端 /maintenance API。后端 MaintenanceController.java 和 MaintenanceService.java 已存在。",
+      "existing_patterns": [
+        "EquipmentPage.tsx 已集成维保记录列表、新建表单（maintenanceService.list / create / getUpcoming）",
+        "frontend/src/api/maintenance.ts 已存在，封装维保相关 API",
+        "backend MaintenanceController 和 MaintenanceService 已完整实现",
+        "dashboard/DashboardPage.tsx 和 analytics/AnalyticsPage.tsx 均有维保统计展示",
+        "通知类型 maintenance_reminder 已在 NotificationBell.tsx 中定义"
+      ],
+      "needed_change": "新建 frontend/src/pages/maintenance/MaintenancePage.tsx（独立维保管理页），在 router/index.tsx 添加 /maintenance 路由，在 AppLayout.tsx NAV_GROUPS 运营管理分组添加入口",
+      "risk": "low",
+      "key_files": [
+        "frontend/src/pages/equipment/EquipmentPage.tsx",
+        "frontend/src/api/maintenance.ts",
+        "frontend/src/router/index.tsx",
+        "frontend/src/layouts/AppLayout.tsx",
+        "backend/src/main/java/com/ams/controller/MaintenanceController.java",
+        "backend/src/main/java/com/ams/service/MaintenanceService.java"
+      ]
+    },
+    {
+      "id": "F-2",
+      "feature": "SettingsPage RolesTab",
+      "current_state": "SettingsPage.tsx 当前有 4 个 Tab：users（用户管理）、departments（部门管理）、system（系统配置）、security（安全设置）。无 RolesTab 相关代码，TabKey 类型不包含 roles。无 roleService.ts 文件（frontend/src/services/ 目录甚至不存在），无前端角色 API（frontend/src/api/ 下无 role.ts）。后端 RoleController.java（GET /roles/list、GET /roles/all、POST /roles、PUT /roles/{id}、DELETE /roles/{id}）和 RoleService.java 均已完整实现。",
+      "existing_patterns": [
+        "SettingsPage 使用 zod + 内联 state 表单模式（不使用 react-hook-form）",
+        "后端 RoleController 和 RoleService 已完整实现",
+        "RoleCreateDTO.java 和 RoleUpdateDTO.java 已存在",
+        "UsersTab 和 DepartmentsTab 的实现模式可复用作 RolesTab 模板"
+      ],
+      "needed_change": "1) 在 SettingsPage.tsx 中添加 roles Tab（TABS 数组、TabKey 类型、RolesTab 组件）；2) 新建 frontend/src/api/role.ts 封装 /roles 接口；3) 实现角色列表 + 新增/编辑/删除弹窗，复用 UsersTab 的 zod 校验模式",
+      "risk": "low",
+      "key_files": [
+        "frontend/src/pages/settings/SettingsPage.tsx",
+        "backend/src/main/java/com/ams/controller/RoleController.java",
+        "backend/src/main/java/com/ams/service/RoleService.java",
+        "backend/src/main/java/com/ams/dto/RoleCreateDTO.java"
+      ]
+    },
+    {
+      "id": "F-3",
+      "feature": "前端 zod 校验现状",
+      "current_state": "VendorsPage.tsx：已使用 zod（import {z} from 'zod'，vendorSchema 定义），使用内联 state 表单（非 react-hook-form），手动调用 schema.safeParse 校验。LocationsPage.tsx：未使用 zod 和 react-hook-form，使用 useState + 简单 trim 校验。AssetFormPage.tsx：已完整使用 react-hook-form + zod（import useForm、Controller、zodResolver、z），完整 schema 定义含 z.nativeEnum(AssetStatus)。SettingsPage UsersTab：已使用 zod（userCreateSchema/userEditSchema/deptSchema），使用内联 state 表单手动 safeParse，无 react-hook-form。ExportFilterForm.tsx：使用 react-hook-form（import useForm）但无 zod、无 zodResolver，无校验 schema，使用 shadcn/ui Form 组件（与主设计系统的 @/components/ui/Form 不同）。",
+      "existing_patterns": [
+        "AssetFormPage：react-hook-form + zodResolver + z.nativeEnum 完整模式",
+        "VendorsPage/SettingsPage：zod safeParse + useState 内联状态管理模式",
+        "ExportFilterForm：react-hook-form 无 zod（独立 shadcn/ui 组件体系）",
+        "LocationsPage：纯 useState，无任何 zod 校验"
+      ],
+      "needed_change": "1) LocationsPage 添加 zod schema + safeParse 校验（参考 VendorsPage 模式）；2) ExportFilterForm 添加 zodResolver 和 z schema（过滤条件为可选，低风险）；3) 整体上 react-hook-form 仅在 AssetFormPage 使用，其余页面为手动 safeParse，无需强制统一但需补充 LocationsPage 的校验",
+      "risk": "low",
+      "key_files": [
+        "frontend/src/pages/vendors/VendorsPage.tsx",
+        "frontend/src/pages/locations/LocationsPage.tsx",
+        "frontend/src/pages/asset/AssetFormPage.tsx",
+        "frontend/src/pages/settings/SettingsPage.tsx",
+        "frontend/src/pages/AssetImportExport/ExportFilterForm.tsx"
+      ]
+    },
+    {
+      "id": "F-4",
+      "feature": "资产状态机",
+      "current_state": "后端：AssetStatus.java 已实现完整 canTransitionTo 逻辑（IDLE/IN_USE/MAINTENANCE 可转到任意非终态；PENDING_RETIREMENT 可转到 IDLE/IN_USE/MAINTENANCE/RETIRED/SCRAPPED；RETIRED/SCRAPPED/CLEARED 为终态不可转出）。AssetLifecycleService.transitionLoadedAsset 在第 64 行调用 currentStatus.canTransitionTo(targetStatus)，不允许非法转换会抛出 BusinessException。AssetService.updateAsset 在第 122 行调用 assetLifecycleService.transitionLoadedAsset，状态机已完整接入。前端：AssetFormPage.tsx 的 status 下拉列表展示全部 6 个状态（IN_USE/IDLE/MAINTENANCE/PENDING_RETIREMENT/SCRAPPED/CLEARED），无基于当前状态的过滤逻辑，编辑模式下用户可以选择任意状态提交，后端校验会拦截非法转换但前端不给出提前提示。",
+      "existing_patterns": [
+        "后端状态机完整实现：AssetStatus.canTransitionTo + AssetLifecycleService.transitionLoadedAsset",
+        "AssetService.updateAsset 已正确经过状态机校验",
+        "前端 AssetFormPage 使用 z.nativeEnum(AssetStatus) 枚举校验，但不过滤选项",
+        "AssetController.update → AssetService.updateAsset → AssetLifecycleService 链路完整"
+      ],
+      "needed_change": "前端 AssetFormPage.tsx 编辑模式下，根据 asset.status（当前状态）动态过滤可选状态项（只展示合法的 nextStatus），提升 UX 同时减少无效请求。此为前端优化，后端无需修改",
+      "risk": "low",
+      "key_files": [
+        "backend/src/main/java/com/ams/enums/AssetStatus.java",
+        "backend/src/main/java/com/ams/service/AssetLifecycleService.java",
+        "backend/src/main/java/com/ams/service/AssetService.java",
+        "frontend/src/pages/asset/AssetFormPage.tsx"
+      ]
+    },
+    {
+      "id": "F-5",
+      "feature": "退役通知",
+      "current_state": "RetirementApplicationService.java 中 approveApplication（第 212 行）、completeApplication（第 236 行）、rejectApplication（第 259 行）三个方法均无 notificationService.create 调用。整个 RetirementApplicationService 的 import 列表（第 1-35 行）和字段声明（第 42-48 行）中不包含 NotificationService 的注入。NotificationService.java 已完整实现（backend/src/main/java/com/ams/service/NotificationService.java）。ApprovalNotificationEvent.java 已存在但未被 RetirementApplicationService 使用。",
+      "existing_patterns": [
+        "NotificationService 已完整实现，支持 create(userId, type, title, content) 等方法",
+        "ApprovalNotificationEvent 事件类已存在，可通过 Spring Event 机制发送",
+        "RetirementApplicationService 使用 @RequiredArgsConstructor 注入，新增注入只需添加 final 字段",
+        "其他 Service 中已有 NotificationService 注入的模式可参考"
+      ],
+      "needed_change": "1) 在 RetirementApplicationService 中添加 private final NotificationService notificationService 字段；2) 在 approveApplication、completeApplication、rejectApplication 三个方法中调用 notificationService.create 发送通知（申请人 applicantId + 对应类型消息）",
+      "risk": "medium",
+      "key_files": [
+        "backend/src/main/java/com/ams/service/RetirementApplicationService.java",
+        "backend/src/main/java/com/ams/service/NotificationService.java",
+        "backend/src/main/java/com/ams/event/ApprovalNotificationEvent.java"
+      ]
+    },
+    {
+      "id": "F-6",
+      "feature": "折旧调度",
+      "current_state": "正式代码路径（backend/src/main/java）中：不存在任何 Scheduler 类，无 @Scheduled 注解，无 @EnableScheduling。AssetManagementApplication.java 仅有 @SpringBootApplication + @MapperScan，无 @EnableScheduling。DepreciationService.java 已实现批量折旧计算 calculate(List<Long> assetIds) 方法（入参为 List<Long>，接受选中资产 ID 列表）。DepreciationController.java 已暴露 POST /depreciation/calculate 端点（接受 BatchCalculateRequest{List<Long> assetIds}）。调度逻辑存在于 backend/_quarantine_autogen/src/main/java/com/ams/task/DepreciationSyncTask.java（被隔离），依赖 Redis（RedisTemplate）、DepreciationRecordMapper、DepreciationCalculator 等在正式代码中不存在的依赖。隔离版 DepreciationConfig.java 中有 @EnableScheduling。",
+      "existing_patterns": [
+        "DepreciationService.calculate(List<Long> assetIds) 可手动触发批量折旧",
+        "_quarantine_autogen 中的 DepreciationSyncTask 已有完整调度逻辑但依赖隔离",
+        "正式代码无 Redis 依赖，_quarantine_autogen 版本依赖 spring-data-redis",
+        "DepreciationService 使用直接 SQL 计算而非独立折旧记录表"
+      ],
+      "needed_change": "1) 创建 backend/src/main/java/com/ams/scheduler/DepreciationScheduler.java，使用 @Component + @Scheduled；2) 在 AssetManagementApplication.java 或新建 SchedulingConfig 上添加 @EnableScheduling；3) Scheduler 调用 DepreciationService.calculate(allActiveAssetIds) 而非 _quarantine_autogen 版本的 Redis 锁方案（正式版无 Redis）；4) 避免引入 Redis 依赖，用简单 DB 幂等标记或接受重复执行风险",
+      "risk": "medium",
+      "key_files": [
+        "backend/src/main/java/com/ams/AssetManagementApplication.java",
+        "backend/src/main/java/com/ams/service/DepreciationService.java",
+        "backend/src/main/java/com/ams/controller/DepreciationController.java",
+        "backend/_quarantine_autogen/src/main/java/com/ams/task/DepreciationSyncTask.java"
+      ]
+    }
+  ],
+  "technical_constraints": [
+    "正式后端代码无 Redis 依赖，折旧调度不能直接移植隔离版的 Redis 分布式锁方案",
+    "SettingsPage 前端组件已超过 800 行，添加 RolesTab 会进一步增大体积，建议拆分为独立文件",
+    "ExportFilterForm.tsx 使用 shadcn/ui 组件体系（@/components/ui/card、select 等小写路径），与主设计系统的大写路径不同，需注意导入路径兼容性",
+    "AssetFormPage 的 status 字段在新建模式下不需要过滤，状态机约束只对编辑模式有意义",
+    "RetirementApplicationService 使用 @RequiredArgsConstructor（Lombok），新增 final 字段会自动注入，但需确认 NotificationService 的方法签名",
+    "前端无 react-hook-form 全局统一标准，VendorsPage/SettingsPage 使用 zod + useState 手动模式，AssetFormPage 使用 react-hook-form + zodResolver，两种模式同时存在",
+    "LocationsPage 表单无任何 zod 校验是技术债但不阻断功能"
+  ],
+  "confirmed_dependencies": [
+    "前端 zod 已安装（SettingsPage、VendorsPage、AssetFormPage 均 import）",
+    "前端 react-hook-form 已安装（AssetFormPage、ExportFilterForm 均 import）",
+    "后端 AssetStatus.canTransitionTo 状态机已完整实现并被 AssetLifecycleService 调用",
+    "后端 NotificationService 已实现，RetirementApplicationService 只需注入即可调用",
+    "后端 MaintenanceController + MaintenanceService 已完整实现，前端 api/maintenance.ts 已存在",
+    "后端 RoleController + RoleService 已完整实现，仅需添加前端 api/role.ts 和 Settings RolesTab",
+    "DepreciationService.calculate(List<Long>) 已可用，折旧调度只需新增 Scheduler 类并启用 @EnableScheduling"
+  ]
+}

@@ -17,7 +17,7 @@ import {
   getMaintenanceStats,
 } from '@/api/asset';
 import { getWorkOrderList } from '@/api/workorder';
-import type { ApiResponse, PaginatedResponse } from '@/types/common';
+import type { ApiResponse, PaginatedResponse, PageData } from '@/types/common';
 import type { DashboardStats, AssetValueTrend, DeptAssetDistribution } from '@/types/asset';
 import type { WorkOrderListItem } from '@/types/workorder';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
@@ -91,13 +91,12 @@ export default function DashboardPage() {
     staleTime: 1000 * 60 * 5,
   });
 
-  const stats = (statsRes as ApiResponse<DashboardStats> | undefined)?.data;
-  const trends = (trendsRes as ApiResponse<AssetValueTrend[]> | undefined)?.data ?? [];
-  const workorders = (woRes as PaginatedResponse<WorkOrderListItem> | undefined)?.data?.records ?? [];
+  const stats = statsRes as unknown as DashboardStats | undefined;
+  const trends = trendsRes as unknown as AssetValueTrend[] | undefined ?? [];
+  const workorders = (woRes as PageData<WorkOrderListItem> | undefined)?.records ?? [];
   const deptRawData: Array<{ deptId: number; deptName: string; assetCount: number }> =
-    (deptRes as ApiResponse<DeptAssetDistribution[]> | undefined)?.data ?? [];
-  const maintenanceStats = (maintenanceRes as ApiResponse<MaintenanceStatsData> | undefined)?.data;
-
+    deptRes as unknown as DeptAssetDistribution[] | undefined ?? [];
+  const maintenanceStats = maintenanceRes as unknown as MaintenanceStatsData | undefined;
   // Trend data from API (no MOCK fallback)
   const trendData = trends.slice(-12).map((t: AssetValueTrend) => ({
     month: t.date ? t.date.substring(5, 7) + '月' : '—',

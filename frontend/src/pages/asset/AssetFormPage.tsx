@@ -61,13 +61,12 @@ export default function AssetFormPage() {
     queryKey: ['departments'],
     queryFn: () => getDeptList(),
   });
-  const departments: Department[] = (deptRes as ApiResponse<Department[]> | undefined)?.data ?? [];
+  const departments: Department[] = deptRes as unknown as Department[] | undefined ?? [];
   const createMutation = useCreateAsset();
   const updateMutation = useUpdateAsset();
 
-  const asset = (assetRes as ApiResponse<Asset> | undefined)?.data;
-  const categories = (catRes as ApiResponse<AssetCategory[]> | undefined)?.data ?? [];
-
+  const asset = assetRes as unknown as Asset | undefined;
+  const categories = catRes as unknown as AssetCategory[] | undefined ?? [];
   const {
     register, handleSubmit, control, reset, watch,
     formState: { errors, isSubmitting },

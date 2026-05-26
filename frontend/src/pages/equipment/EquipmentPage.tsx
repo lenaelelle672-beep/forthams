@@ -196,7 +196,7 @@ export default function EquipmentPage() {
     queryKey: ['asset', 'detail', detailItem?.id],
     queryFn: async () => {
       const resp = await getAssetById(Number(detailItem!.id));
-      const asset = resp.data?.data ?? resp.data as unknown as Asset;
+      const asset = resp as unknown as Asset;
       setDetailAsset(asset);
       return asset;
     },
@@ -225,7 +225,7 @@ export default function EquipmentPage() {
   }
 
   // ── 将 API 资产列表映射为设备展示列表 ─────────────────────────────────────────
-  const assetItems: AssetListItem[] = assetListData?.data?.records ?? [];
+  const assetItems: AssetListItem[] = assetListData?.records ?? [];
   const equipment: EquipmentItem[] = assetItems.map((a) => {
     const mInfo = maintenanceByAsset[String(a.id)];
     const nextDate = mInfo?.nextDate ?? null;

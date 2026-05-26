@@ -1,0 +1,37 @@
+{
+  "classification": "Medium",
+  "mcp_tools": [],
+  "scope": [
+    "testFinish/tests/playwright/forthams-certification.spec.ts",
+    "frontend/src/pages/equipment/EquipmentPage.tsx",
+    "frontend/src/pages/settings/SettingsPage.tsx",
+    "frontend/src/utils/http.ts",
+    "frontend/src/api/asset.ts"
+  ],
+  "risks": [
+    "CERT-04: 设备列表数据通过 getAssetList() 消费 /assets?isImportant=1 返回数据，mock 响应采用 {code, message, data} 三层包装，http.ts 拦截器解包一层后 assetListData?.data?.records 路径可能因响应结构不一致导致列表为空，select 无 option 可选项使 selectOption 严格模式失败",
+    "CERT-04: selectOption 在 Playwright 严格模式下要求 select 元素可见且可交互，Modal 渲染时序可能引发元素不可交互错误",
+    "CERT-09: 部门管理 tab 通过 getDeptTree() 异步加载数据，首次加载完成前点击'新增部门'可能导致弹窗内 Input 尚未渲染而超时",
+    "CERT-09: 删除部门后使用 page.waitForTimeout(500) 硬等待稳定性差，应改用元素可见性等待",
+    "修复测试选择器或超时配置时可能影响已通过的 8 个用例",
+    "修改前端组件可能导致回归"
+  ],
+  "dependencies": [
+    "Playwright 测试框架（selectOption 严格模式行为、自动等待机制）",
+    "React + TypeScript + @tanstack/react-query（组件渲染与数据加载生命周期）",
+    "Axios + http.ts 响应拦截器（响应解包层级）",
+    "Mock API 层（测试文件内联 mock，与前端 API 路径的匹配完整性）"
+  ],
+  "recommended_phases": [
+    "audit",
+    "builder",
+    "reviewer"
+  ],
+  "acceptance_hints": [
+    "所有 10 个认证测试全部 PASS（原始 forthams-certification.spec.ts）",
+    "CERT-04 不再报 selectOption 严格模式错误，select 能正确选择 'AST-001'",
+    "CERT-09 不再超时，部门管理 placeholder 输入能成功填充",
+    "已通过的 8 个测试无回归",
+    "Playwright JSON 报告显示 10/10 passed"
+  ]
+}

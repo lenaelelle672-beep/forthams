@@ -146,7 +146,7 @@ export default function AssetScrapFormPage() {
     queryFn: () => getAssetList({ pageSize: 200 }),
   });
 
-  const availableAssets: AssetListItem[] = (assetListData as ApiResponse<PageData<AssetListItem>> | undefined)?.data?.records ?? [];
+  const availableAssets: AssetListItem[] = (assetListData as PageData<AssetListItem> | undefined)?.records ?? [];
 
   const {
     register, handleSubmit, control,
@@ -178,7 +178,7 @@ export default function AssetScrapFormPage() {
       navigate('/disposals');
     },
     onError: (error: any) => {
-      toast.error(error?.response?.data?.message ?? '提交失败，请重试');
+      toast.error(error instanceof Error ? error.message : '提交失败，请重试');
     },
   });
 

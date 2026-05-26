@@ -3,6 +3,8 @@ package com.ams.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 public class AuthResponse {
@@ -11,5 +13,6 @@ public class AuthResponse {
     private Long userId;
     private String username;
     private String realName;
+    private List<String> roles;
 
 }

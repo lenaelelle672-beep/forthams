@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "decision": "use_refine",
+  "selected_source": "refine.json refinements",
+  "builder_instructions": "执行3个写操作：后端路径修复（ApprovalController.java）+ 前端路径对齐（approval.ts）+ 前端空值保护（DisposalListPage.tsx）",
+  "write_action_guard": ["操作1: ApprovalController 空字符串路径删除", "操作2: approval.ts 路径对齐", "操作3: DisposalListPage 五字段空值保护"],
+  "fallback_labels": []
+}

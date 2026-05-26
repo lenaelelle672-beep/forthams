@@ -1,0 +1,70 @@
+{
+  "directive": "编写并执行 Python 数据驱动端到端测试脚本，对 4 个业务流程（ASSET_TRANSFER / ASSET_CLEARANCE / ASSET_SCRAP / ASSET_COMPENSATION）执行完整的 API 测试。每个流程：登录 → 发布工作流定义 → 创建审批 → 4级审批全部通过 → 验证结果。补全上一轮分析阶段 reviewer 识别的 3 个 PARTIAL 缺口。",
+  "owner": "gai2-orchestrator",
+  "phase": "build",
+  "classification": "Medium",
+  "session_id": "gai2-20260526-1821xx",
+  "auto_mode": false,
+  "mcp_direct": false,
+  "minions_enabled": true,
+  "parent_session": "gai2-20260526-180709",
+  "parent_artifacts": {
+    "triage": ".omc/gai2/sessions/gai2-20260526-180709/triage.json",
+    "audit": ".omc/gai2/sessions/gai2-20260526-180709/audit.json",
+    "debate": ".omc/gai2/sessions/gai2-20260526-180709/debate.json",
+    "swarm_architecture": ".omc/gai2/sessions/gai2-20260526-180709/swarm-architecture.json",
+    "swarm_delivery": ".omc/gai2/sessions/gai2-20260526-180709/swarm-delivery.json",
+    "swarm_risk": ".omc/gai2/sessions/gai2-20260526-180709/swarm-risk.json",
+    "review": ".omc/gai2/sessions/gai2-20260526-180709/review.json"
+  },
+  "acceptance_checks": [
+    {
+      "id": "AC1",
+      "criterion": "ASSET_TRANSFER 端到端：所有 4 级审批通过，验证资产状态变更正确"
+    },
+    {
+      "id": "AC2",
+      "criterion": "ASSET_CLEARANCE 端到端：重新执行并验证（补全上一轮缺失的 CLEARANCE 通过证据）"
+    },
+    {
+      "id": "AC3",
+      "criterion": "ASSET_SCRAP 端到端：所有 4 级审批通过，验证资产状态变为 SCRAPPED"
+    },
+    {
+      "id": "AC4",
+      "criterion": "ASSET_COMPENSATION 端到端：所有 4 级审批通过，验证赔偿记录状态为 APPROVED"
+    },
+    {
+      "id": "AC5",
+      "criterion": "多租户隔离验证：至少 2 个不同用户交叉验证 mine=true"
+    },
+    {
+      "id": "AC6",
+      "criterion": "审批返回字段验证：确认前后端 DTO 字段对齐，无序列化异常"
+    }
+  ],
+  "evidence_to_collect": [
+    "Python 测试脚本文件路径",
+    "测试矩阵 JSON 文件路径",
+    "测试执行输出（PASS/FAIL 摘要）",
+    "每个流程的审批记录 ID 和最终状态",
+    "多租户隔离验证结果",
+    "字段对齐核查结果"
+  ],
+  "open_risks": [
+    "后端服务是否运行在 localhost:8080",
+    "测试用户池 sim05261457xx 是否可用",
+    "4 个 workflow definition 是否已 PUBLISH",
+    "COMPENSATION 不修改资产状态是否为设计意图（需确认）",
+    "JWT token 在长脚本中过期处理"
+  ],
+  "reviewer_gap_fingerprint": "ac2-clearance-evidence|ac5-tenant-strategy|ac6-field-alignment",
+  "triage_phases": ["drafter", "refiner", "adjudication", "builder", "reviewer"],
+  "artifacts": {
+    "draft": ".omc/gai2/sessions/gai2-20260526-1821xx/draft.json",
+    "refine": ".omc/gai2/sessions/gai2-20260526-1821xx/refine.json",
+    "adjudication": ".omc/gai2/sessions/gai2-20260526-1821xx/adjudication.json",
+    "changes": ".omc/gai2/sessions/gai2-20260526-1821xx/changes.json",
+    "review": ".omc/gai2/sessions/gai2-20260526-1821xx/review.json"
+  }
+}

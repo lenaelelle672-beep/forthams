@@ -12,6 +12,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -77,6 +78,7 @@ class WorkflowDefinitionControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "SUPER_ADMIN")
     @DisplayName("Should save draft workflow successfully")
     void testSaveDraft() throws Exception {
         WorkflowDefinitionSaveDTO saveDTO = new WorkflowDefinitionSaveDTO();
@@ -99,6 +101,7 @@ class WorkflowDefinitionControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "SUPER_ADMIN")
     @DisplayName("Should publish workflow successfully")
     void testPublish() throws Exception {
         WorkflowDefinitionDTO result = new WorkflowDefinitionDTO();
@@ -117,6 +120,7 @@ class WorkflowDefinitionControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "SUPER_ADMIN")
     @DisplayName("Should update workflow status successfully")
     void testUpdateStatus() throws Exception {
         WorkflowStatusUpdateDTO statusDTO = new WorkflowStatusUpdateDTO();

@@ -1,0 +1,9 @@
+{
+  "iteration": 2,
+  "review_verdict": "PARTIAL",
+  "gap_fingerprint": "AC-REGRESS|ApiResponse_data_pattern_AssetTransferFormPage_AssetCompensationFormPage_2_sites",
+  "reason": "全局回归修复接近完成：Round 2 修21文件37处PaginatedResponse，Round 3修18文件44处ApiResponse，仅剩2处遗漏",
+  "dispatched_agent": "gai2-flash-builder",
+  "repair_scope": "AssetTransferFormPage.tsx L86 + AssetCompensationFormPage.tsx L108 两处残留",
+  "ts": "2026-05-25T09:58:00Z"
+}

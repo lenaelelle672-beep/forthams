@@ -1,0 +1,37 @@
+{
+  "report_title": "forthAMS 测试质量评估报告",
+  "session": "20260524-100-verify",
+  "assessment_date": "2026-05-24",
+  "test_suites": [
+    {
+      "name": "forthams-certification.spec.ts（认证测试 - Mock）",
+      "type": "mock E2E（基于 page.route 内联 mock）",
+      "status": "10/10 PASS ✅",
+      "coverage": "10 个业务场景：登录认证、模块导航、资产台账 CRUD、重要设备维保、RFID 盘点、闲置资产管理、资产处置、审批与工单流转、系统设置、仪表板与数据分析",
+      "validity": "PARTIAL — 测试针对旧版页面（@/app/pages/）选择器编写，实际 router 加载新版页面（@/pages/），存在 DOM 结构偏差风险",
+      "verdict": "可用但有限 — 可作为业务覆盖的基础门禁，但不能保证真实用户路径正确性"
+    },
+    {
+      "name": "forthams-e2e.spec.ts（E2E 测试 - 真后端）",
+      "type": "true E2E（需后端服务）",
+      "status": "1/6 PASS ⚠️（5 FAILED 因后端不可用）",
+      "coverage": "6 个测试：登录+路由爬取、导航逐页扫描、深层路由扫描、新建按钮探索、参数化路由探测、资产创建闭环",
+      "validity": "UNVERIFIABLE — 需要真实后端服务运行（dev server health check ✓ 但 login API 需后端返回 JWT）",
+      "verdict": "后端可用后可验证 — 目前无法评估真实通过率"
+    }
+  ],
+  "overall_pass_rate": "认证测试单独 100%（10/10）；E2E 因环境限制无法评估；两套合并精确值不可计算",
+  "known_gaps": [
+    "认证测试 3 个用例（CERT-02、CERT-03、CERT-08）的 selectors 在新版页面中交互路径完全不同（audit.json high risk）",
+    "认证测试 7 个用例存在选择性偏差（使用 .first() 模糊匹配等）",
+    "E2E 测试 5/6 因后端不可用而失败，无法验证",
+    "认证测试的 Mock 数据字段名别名（assetName/name）可能不匹配新版组件读取的字段",
+    "没有后端 API 集成测试覆盖"
+  ],
+  "recommendations": [
+    "短期（本月）：保持双套并行策略，认证测试作为 PR 门禁（10/10），E2E 在 CI 独立 job 运行",
+    "中期（下季度）：审计提出的 3 个高优先级用例（CERT-02/03/08）升级到新版页面选择器",
+    "长期：后端稳定后将认证测试核心场景逐步迁移到 E2E，最终统一为真 E2E 测试",
+    "持续：每次前端页面重构后同步更新认证测试选择器"
+  ]
+}

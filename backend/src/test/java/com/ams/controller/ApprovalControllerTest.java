@@ -99,7 +99,7 @@ class ApprovalControllerTest {
     @Test
     @DisplayName("Should list approvals with processType filter")
     void listWithProcessTypeFilter() throws Exception {
-        when(approvalService.queryProcesses(eq(1), eq(10), eq(null), eq("WORK_ORDER")))
+        when(approvalService.queryProcesses(eq(1), eq(10), eq(null), eq("WORK_ORDER"), eq(null)))
                 .thenReturn(new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>());
 
         mockMvc.perform(get("/api/approvals/list")
@@ -108,7 +108,7 @@ class ApprovalControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200));
 
-        verify(approvalService).queryProcesses(1, 10, null, "WORK_ORDER");
+        verify(approvalService).queryProcesses(1, 10, null, "WORK_ORDER", null);
     }
 
     @Test

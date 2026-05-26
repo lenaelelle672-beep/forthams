@@ -102,6 +102,7 @@ export interface ApprovalRuntimePathStep {
   nodeCode?: string;
   label: string;
   approverRole?: string;
+  approverRoleName?: string;
   approverType?: 'role' | 'user' | string;
   approverId?: string;
   approvalMode?: 'any' | 'all' | 'sequence' | string;

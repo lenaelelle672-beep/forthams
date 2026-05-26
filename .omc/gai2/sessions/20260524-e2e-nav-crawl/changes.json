@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "agent": "gai2-builder",
+  "iteration": 3,
+  "repair_round": "iteration-2",
+  "changed_files": [
+    "testFinish/tests/playwright/forthams-e2e.spec.ts"
+  ],
+  "added_files": [],
+  "commands_run": [
+    {
+      "command": "npx playwright test tests/playwright/forthams-e2e.spec.ts --list",
+      "result": "passed",
+      "notes": "列出 5 个子测试 × 2 project = 10 tests。测试结构：AC-1 登录+双重验证、NAV扫描(19条)、DEEP扫描(11条)、AC-2按钮探索(4页)、参数化路由(13条跳过)"
+    },
+    {
+      "command": "python3 验证脚本 — 29项内容检查",
+      "result": "passed",
+      "notes": "28/29 通过（1项假阳性：'/inventory/tasks' 存在于 PARAM_ROUTES 的 '/inventory/tasks/:taskId' 中，并非独立 DEEP 路由）"
+    }
+  ],
+  "verification_results": [
+    "VP-1: playwright --list 成功列出 5 个子测试 ✅",
+    "VP-2: NAV_ROUTES=19条（匹配 AppLayout.tsx NAV_GROUPS + NAV_BOTTOM_ITEMS）✅",
+    "VP-3: DEEP_ROUTES=11条（匹配 router/index.tsx 非导航静态路由）✅",
+    "VP-4: ALL_STATIC_ROUTES=30条（去重后）✅",
+    "VP-5: PARAM_ROUTES=13条（含所有 :id/:taskId/:tab 参数）✅",
+    "VP-6: test.setTimeout(180000) ✅",
+    "VP-7: waitForPageReady: networkidle(15s)→domcontentloaded(5s)→spinner(10s) ✅",
+    "VP-8: scanRoute 表单页 POST 4xx 过滤 ✅",
+    "VP-9: login 函数 admin/admin123 双存储认证 ✅",
+    "VP-10: setupPageListeners page.on response/pageerror ✅",
+    "VP-11: 空白页检测 body.innerText < 5 ✅",
+    "VP-12: 已删除不存在的路由：/situation、/cyber-v12、/industrial-v13 ✅",
+    "VP-13: 已修正 /approval → /approvals ✅",
+    "VP-14: 已删除 /inventory/tasks（独立路由不存在）✅",
+    "VP-15: 已删除 /disposals/compensation/new ✅",
+    "VP-16: 新增 /reports、/notifications、/compensation、/compensation/new、/inventory/smart-report ✅",
+    "VP-17: type Page 类型安全替换 any ✅",
+    "VP-18: EXTRA_NAV_WHITELIST 白名单（/bigscreen, /bigscreen-3d）✅",
+    "VP-19: scanRoute/setupPageListeners 提取为独立函数消除重复 ✅"
+  ],
+  "minions_execution": {
+    "adjudication_file_read": true,
+    "selected_source": "refine_with_draft_framework",
+    "write_intent_preserved": true,
+    "degradation_blocked": false,
+    "draft_preserved": [
+      "策略C组合策略架构：导航路由 + 深层路由 + 新建按钮点击探索",
+      "waitForPageReady 函数：networkidle → domcontentloaded fallback + Suspense 检测",
+      "extractDOMRoutes 函数：DOM 提取导航链接做双重验证",
+      "测试拆分结构：5 个子测试",
+      "错误监控体系：page.on response/pageerror 监听",
+      "表单页 GET-only 错误过滤",
+      "增量错误追踪模式"
+    ],
+    "refine_corrections_adopted": [
+      "路由真相源修正为 router/index.tsx",
+      "NAV_ROUTES 19 条（含 /retirement, /compensation, /categories）",
+      "DEEP_ROUTES 11 条（移除 /inventory/tasks, /disposals/compensation/new）",
+      "总静态路由 30 条",
+      "参数化路由 13 条",
+      "BUTTON_EXPLORE_PAGES 4 页（移除 /vendors, /locations）"
+    ]
+  },
+  "verification_env": {
+    "frontend_dev_server": "未验证（需要 frontend:5173 和 backend:8080 同时运行）",
+    "backend_api_health": "未验证（known issue: /health returns 404）",
+    "actual_e2e_run": "未执行（环境不可用，只能通过 --list 验证结构）"
+  },
+  "residual_risks": [
+    "实际 E2E 测试运行需要 frontend:5173 + backend:8080 同时运行，当前环境后端 health 返回 404",
+    "认证测试（forthams-certification.spec.ts）未在本轮运行，需 reviewer 确认回归结果",
+    "深层表单页（如 /disposals/transfer/new）需要后端真实数据才能渲染完整页面，可能存在 GET 4xx 导致测试 FAIL",
+    "参数化路由 13 条全部跳过，动态页面覆盖缺失",
+    "playwright --list 仅验证了测试结构，未验证运行时行为（如 spinner 检测、空白页检测、按钮点击等）"
+  ]
+}

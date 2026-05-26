@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "agent": "gai2-refiner",
+  "session": "20260524-cert-upgrade-selectors",
+  "verdict": "accept_with_refinements",
+  "preserved_from_draft": [
+    "ACT-01: modules 数组 6 处文本修正 — old_string L59-70 精确匹配，与 audit RISK-01/RISK-04 一致",
+    "ACT-02: 搜索框 placeholder '搜索编号、名称...'→'搜索资产...'（L96）— 精确匹配",
+    "ACT-03: CERT-03 创建资产流程全面重写（L99-112）— old_string 精确匹配，new_string 正确适配独立页面路由",
+    "ACT-04: 搜索框 placeholder 断言（L121）— 精确匹配",
+    "ACT-05: fillAssetForm 函数改用 data-testid（L331-336）— 解决了 getByLabel('购置日期') 不匹配问题",
+    "ACT-06: CERT-08 路由 URL + heading（L215-216）— /approvals→/approval 和 '审批中心'→'审批列表'",
+    "ACT-08: CERT-08 审批操作改为详情弹窗路径（L223-224）— 与 audit RISK-03 描述的 ApprovalActionPanel 交互一致",
+    "ACT-10: CERT-10 数据分析 heading 3 处统一修改（L305-311）— '数据分析'→'数据统计分析'"
+  ],
+  "improvements": [
+    {
+      "action_id": "ACT-07",
+      "reason": "新版 Tab 按钮可能使用 role='tab' 而非 role='button'",
+      "suggested_old": "    // 新版使用 Tab 按钮过滤状态\n    await page.getByRole('button', { name: '待审批' }).click();",
+      "suggested_new": "    // 新版使用 Tab 按钮过滤状态（兼容 tab/button role）\n    await page.locator('[role=\"tab\"], [role=\"button\"]').getByText('待审批', { exact: true }).first().click();"
+    },
+    {
+      "action_id": "ACT-09",
+      "reason": "CERT-10 驳回操作路径未同步修复，ACT-08 已修复通过操作路径但驳回仍用旧模式",
+      "suggested_old": "    await page.goto('/approvals');\n    await page.getByRole('button', { name: '驳回' }).first().click();\n    // 确认驳回对话框\n    await page.getByPlaceholder('请输入驳回原因...').fill('测试驳回');\n    await page.getByRole('button', { name: '确认驳回' }).click();\n    await expect(page.getByText('已驳回').first()).toBeVisible();",
+      "suggested_new": "    await page.goto('/approval');\n    // 新版审批操作：先点击列表项打开详情弹窗，再在 ApprovalActionPanel 中操作\n    await page.getByText('资产转移审批').first().click();\n    await expect(page.getByRole('dialog')).toBeVisible({ timeout: 5000 });\n    await page.getByRole('textbox').fill('测试驳回');\n    await page.getByRole('button', { name: '驳回' }).click();\n    await expect(page.getByText('已驳回').first()).toBeVisible();"
+    }
+  ],
+  "rejected_from_draft": [],
+  "missed_items": [
+    {
+      "description": "CERT-05 heading L149 '盘点任务列表'→'盘点任务' — 不在本次范围但 ACT-01 的 modules 数组已改，此处应同步",
+      "file": "testFinish/tests/playwright/forthams-certification.spec.ts",
+      "old_string": "    await expect(page.getByRole('heading', { name: '盘点任务列表' })).toBeVisible();",
+      "new_string": "    await expect(page.getByRole('heading', { name: '盘点任务' })).toBeVisible();"
+    }
+  ],
+  "write_intent_preserved": true,
+  "degradation_detected": false,
+  "overall_assessment": "Draft 质量较高：10 个 old_string 全部精确匹配，8/10 的 new_string 完全符合 audit。两个改进点（ACT-07 Tab role 兼容性、ACT-09 驳回操作路径完整性）均为中等风险，改进后方案可保证 CERT-02/03/08/10 在新版 DOM 下正确运行。"
+}

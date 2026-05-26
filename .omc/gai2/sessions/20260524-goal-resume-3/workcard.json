@@ -1,0 +1,21 @@
+{
+  "session_id": "20260524-goal-resume-3",
+  "directive": "继续 GAI2 目标：testFinish 完美测试工程。当前待确认状态：后端 API 500（disposals/list、disposals/stats、user-management）是否已修复。需要运行 E2E 测试获取真实状态，评估 AC-7/8/9 是否满足。",
+  "classification": "Light",
+  "phase": "verify-state",
+  "auto_mode": false,
+  "acceptance_checks": [
+    "AC-7: 修复上述两个问题后测试仍通过",
+    "AC-8: 真 E2E 全部 PASS",
+    "AC-9: 旧 mock 回归全部 PASS"
+  ],
+  "evidence_to_collect": [
+    "E2E 测试输出（PASS/FAIL/API errors）",
+    "旧 mock 认证测试输出"
+  ],
+  "open_risks": [
+    "后端 API 可能仍有未修复的 500",
+    "组件渲染崩溃可能复现"
+  ],
+  "artifact_dir": ".omc/gai2/sessions/20260524-goal-resume-3"
+}

@@ -100,12 +100,12 @@ export default function AssetCompensationFormPage() {
     staleTime: 5 * 60 * 1000,
   });
   const deptOptions: { value: string; label: string }[] = (
-    (deptRes as ApiResponse<Department[]> | undefined)?.data ?? []
+    deptRes as unknown as Department[] | undefined ?? []
   ).map((d) => ({ value: String(d.id), label: d.deptName }));
 
   // Derive the full asset list from API response
   const apiAssets: AssetRow[] = useMemo(
-    () => ((assetListData as ApiResponse<PageData<AssetListItem>> | undefined)?.data?.records ?? []).map(toAssetRow),
+    () => ((assetListData as unknown as PageData<AssetListItem> | undefined)?.records ?? []).map(toAssetRow),
     [assetListData],
   );
 

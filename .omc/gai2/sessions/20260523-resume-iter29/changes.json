@@ -1,0 +1,45 @@
+{
+  "session_id": "20260523-resume-iter29",
+  "phase": "builder",
+  "completed_at": "2026-05-23T19:40:00+08:00",
+  "changed_files": [
+    "frontend/src/pages/reports/ReportsPage.tsx",
+    "frontend/src/__tests__/ReportsPage.test.tsx"
+  ],
+  "added_files": [],
+  "commands_run": [
+    {
+      "command": "cd frontend && npm install xlsx",
+      "result": "passed",
+      "notes": "xlsx 包成功安装（SheetJS v0.21.x）"
+    },
+    {
+      "command": "cd frontend && npx vitest run",
+      "result": "passed",
+      "notes": "30 files, 677 tests passed（新增 5 个导出测试）"
+    },
+    {
+      "command": "cd frontend && npm run build",
+      "result": "passed",
+      "notes": "0 errors, built in 5.05s"
+    },
+    {
+      "command": "cd backend && mvn compile -q",
+      "result": "passed",
+      "notes": "编译成功"
+    }
+  ],
+  "verification_results": [
+    "AC-29-export-upgrade ✅ ReportsPage 导出按钮从 alert 占位升级为真实 xlsx 导出，文件名格式 报表中心_YYYYMMDD.xlsx",
+    "AC-29-tests ✅ 新增 5 个导出功能测试（按钮渲染、文件名格式、数据结构、导出成功 toast、导出失败处理）",
+    "AC-29-build-green ✅ vitest 677/677 passed, npm build 0 errors, mvn compile 成功",
+    "导出数据包含当前 tab 分类下的报表 title/description/category/updatedAt 字段"
+  ],
+  "not_completed": [],
+  "residual_risks": [
+    "Stitch MCP 外部阻塞（不可在本环境修复）",
+    "SheetJS 包体积约 200KB gzip 可能影响初始加载",
+    "乐观锁 @Version 未实现",
+    "AssetFormPage 两个路由版本共存问题"
+  ]
+}

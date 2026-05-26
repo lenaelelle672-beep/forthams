@@ -1,0 +1,35 @@
+{
+  "directive": "给出详细的方案吧",
+  "owner": "gai2-orchestrator",
+  "phase": "triage",
+  "classification": "pending",
+  "artifact_dir": ".omc/gai2/sessions/20260522-proposal-plan",
+  "created_at": "2026-05-22",
+  "acceptance_checks": [
+    "生成 forthAMS 项目下一步发展的详细方案",
+    "方案必须包含具体可执行的行动项",
+    "方案需基于项目当前状态和已完成 goal 的成果",
+    "方案需覆盖技术债务、功能增强、架构优化等多个维度"
+  ],
+  "evidence_to_collect": [
+    "triage.json 分类结果",
+    "audit.json 项目现状审计",
+    "debate.json 方案讨论（如有多个方案）",
+    "review.json 最终核验"
+  ],
+  "open_risks": [
+    "directive 含义模糊，用户可能指不同方向",
+    "已完成 goal 的 93/100 分仍有 7 分残留问题需纳入考量"
+  ],
+  "context": {
+    "previous_goal": "forthAMS 全量页面100分审查修复",
+    "previous_goal_status": "completed",
+    "previous_score": "93/100",
+    "previous_commit": "b7011df1",
+    "previous_residual_risks": [
+      "InventoryDetailPage scopeId可读性",
+      "AuditDetailPage类型未定义字段",
+      "DisposalDetailPage version硬编码"
+    ]
+  }
+}

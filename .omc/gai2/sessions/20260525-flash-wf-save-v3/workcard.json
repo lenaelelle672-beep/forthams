@@ -1,0 +1,44 @@
+{
+  "directive": "工作流页面新建流程和从模板创建无法正确保存；审批节点角色显示乱码；验证角色来源；修复后在 http://localhost:5173/workflows 能看到新创建的流程",
+  "owner": "gai2-flash-orchestrator",
+  "phase": "triage",
+  "mode": "flash",
+  "session_id": "20260525-flash-wf-save-v3",
+  "artifact_dir": ".omc/gai2/sessions/20260525-flash-wf-save-v3",
+  "acceptance_checks": [
+    "AC-WF1: 从模板创建流程后跳转设计器，保存草稿和发布均成功（不报错、数据持久化到后端）",
+    "AC-WF2: 自定义流程新建后保存草稿和发布均成功，工作流中心能看到新流程卡片",
+    "AC-WF3: 审批节点角色下拉显示正确的角色名称（非乱码）",
+    "AC-WF4: 角色来源可追溯：sys_role 表 → RoleController /roles/all → roleApi.getAll() → NodeConfigPanel",
+    "AC-WF5: 编译构建通过，代码质量符合规范"
+  ],
+  "evidence_to_collect": [
+    "从模板创建流程的完整链路日志（API 调用、后端响应、前端处理）",
+    "自定义流程创建后的保存和发布结果",
+    "角色下拉显示的截图或 DOM 验证",
+    "角色来源追踪：sys_role 表数据 → API 响应 → 前端渲染",
+    "编译构建输出"
+  ],
+  "open_risks": [
+    "http.ts Result<T> 解包可能与 WorkflowDesignerPage 二次解包冲突",
+    "从模板创建时 WorkflowCenterPage 直接调用 publish 而非先 saveDraft 可能导致后端 404/500",
+    "角色乱码可能是数据库编码问题或前端渲染问题",
+    "后端 publish 端点有 @PreAuthorize 权限校验，用户角色可能不匹配"
+  ],
+  "key_files": {
+    "frontend": [
+      "frontend/src/pages/workflow/WorkflowCenterPage.tsx",
+      "frontend/src/pages/workflow/WorkflowDesignerPage.tsx",
+      "frontend/src/components/flow/NodeConfigPanel.tsx",
+      "frontend/src/api/workflow.ts",
+      "frontend/src/utils/http.ts",
+      "frontend/src/constants/workflowBusiness.ts"
+    ],
+    "backend": [
+      "backend/src/main/java/com/ams/controller/WorkflowDefinitionController.java",
+      "backend/src/main/java/com/ams/controller/RoleController.java",
+      "backend/src/main/java/com/ams/entity/Role.java"
+    ]
+  },
+  "created_at": "2026-05-25T12:42:15Z"
+}

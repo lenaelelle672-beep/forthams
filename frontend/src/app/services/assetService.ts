@@ -158,7 +158,7 @@ export interface ImportCommitResponse {
 /**
  * 分类树节点
  *
- * @description GET /api/asset-categories/tree 返回的树形结构
+ * @description GET /api/categories/tree 返回的树形结构
  */
 export interface CategoryTreeNode {
   /** 节点键 */
@@ -399,7 +399,7 @@ export const assetService = {
    * @returns 分类树节点列表
    */
   getCategoryTree(): Promise<CategoryTreeNode[]> {
-    return api.get<CategoryTreeNode[]>('/asset-categories/tree');
+    return api.get<CategoryTreeNode[]>('/categories/tree');
   },
 
   /**

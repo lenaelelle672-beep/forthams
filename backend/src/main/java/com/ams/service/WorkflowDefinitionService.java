@@ -27,7 +27,9 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -96,20 +98,38 @@ public class WorkflowDefinitionService {
 
     public List<WorkflowDefinitionDTO> listDefinitions() {
         String tenantId = TenantContext.requireTenantId();
-        return TEMPLATES.stream()
-                .map(template -> toDto(findDefinition(tenantId, template.businessType()), template))
-                .toList();
+        List<WorkflowDefinition> allDefinitions = workflowDefinitionMapper.selectList(
+                new LambdaQueryWrapper<WorkflowDefinition>()
+                        .eq(WorkflowDefinition::getTenantId, tenantId));
+        Map<String, WorkflowDefinition> defMap = allDefinitions.stream()
+                .collect(Collectors.toMap(WorkflowDefinition::getBusinessType, d -> d, (a, b) -> a));
+        List<WorkflowDefinitionDTO> result = new ArrayList<>();
+        for (WorkflowTemplate template : TEMPLATES) {
+            result.add(toDto(defMap.get(template.businessType()), template));
+        }
+        Set<String> templateTypes = TEMPLATES.stream()
+                .map(WorkflowTemplate::businessType).collect(Collectors.toSet());
+        for (WorkflowDefinition def : allDefinitions) {
+            if (!templateTypes.contains(def.getBusinessType())) {
+                result.add(toDto(def, null));
+            }
+        }
+        return result;
     }
 
     public WorkflowDefinitionDTO getDefinition(String businessType) {
         String tenantId = TenantContext.requireTenantId();
-        WorkflowTemplate template = requireTemplate(businessType);
-        return toDto(findDefinition(tenantId, template.businessType()), template);
+        Optional<WorkflowTemplate> templateOpt = findTemplate(businessType);
+        WorkflowDefinition definition = findDefinition(tenantId, businessType);
+        if (templateOpt.isPresent()) {
+            return toDto(definition, templateOpt.get());
+        }
+        // 自定义流程类型：从数据库获取，无记录时返回空壳定义
+        return toCustomDto(definition, businessType);
     }
 
     public WorkflowDefinition requirePublishedDefinition(String businessType) {
         String tenantId = TenantContext.requireTenantId();
-        requireTemplate(businessType);
         WorkflowDefinition definition = findDefinition(tenantId, businessType);
         if (definition == null || !"PUBLISHED".equals(definition.getStatus()) || definition.getVersion() == null || definition.getVersion() <= 0) {
             throw new BusinessException("请先发布对应业务流程后再提交审批");
@@ -163,7 +183,7 @@ public class WorkflowDefinitionService {
             dto = new WorkflowDefinitionSaveDTO();
         }
         String tenantId = TenantContext.requireTenantId();
-        WorkflowTemplate template = requireTemplate(businessType);
+        Optional<WorkflowTemplate> templateOpt = findTemplate(businessType);
         WorkflowDefinition definition = findDefinition(tenantId, businessType);
 
         if (definition == null) {
@@ -176,9 +196,16 @@ public class WorkflowDefinitionService {
             definition.setStatus("DRAFT");
         }
 
-        definition.setName(firstPresent(dto.getName(), template.name()));
-        definition.setDescription(firstPresent(dto.getDescription(), template.description()));
-        definition.setDefinitionJson(toJson(dto.getDefinition() == null ? defaultDefinition(template) : dto.getDefinition()));
+        if (templateOpt.isPresent()) {
+            WorkflowTemplate template = templateOpt.get();
+            definition.setName(firstPresent(dto.getName(), template.name()));
+            definition.setDescription(firstPresent(dto.getDescription(), template.description()));
+            definition.setDefinitionJson(toJson(dto.getDefinition() == null ? defaultDefinition(template) : dto.getDefinition()));
+        } else {
+            definition.setName(firstPresent(dto.getName(), definition.getName() != null ? definition.getName() : businessType));
+            definition.setDescription(firstPresent(dto.getDescription(), definition.getDescription() != null ? definition.getDescription() : ""));
+            definition.setDefinitionJson(toJson(dto.getDefinition() == null ? defaultCustomDefinition() : dto.getDefinition()));
+        }
         definition.setUpdatedBy(dto.getOperatorId());
 
         if (definition.getId() == null) {
@@ -187,25 +214,40 @@ public class WorkflowDefinitionService {
             workflowDefinitionMapper.updateById(definition);
         }
 
-        return toDto(definition, template);
+        final WorkflowDefinition finalDef = definition;
+        return templateOpt
+                .map(template -> toDto(finalDef, template))
+                .orElseGet(() -> toCustomDto(finalDef, businessType));
     }
 
     @Transactional(rollbackFor = Exception.class)
     public WorkflowDefinitionDTO publish(String businessType, Long operatorId) {
         String tenantId = TenantContext.requireTenantId();
-        WorkflowTemplate template = requireTemplate(businessType);
+        Optional<WorkflowTemplate> templateOpt = findTemplate(businessType);
         WorkflowDefinition definition = findDefinition(tenantId, businessType);
 
         if (definition == null) {
-            WorkflowDefinitionSaveDTO dto = new WorkflowDefinitionSaveDTO();
-            dto.setName(template.name());
-            dto.setDescription(template.description());
-            dto.setDefinition(defaultDefinition(template));
-            dto.setOperatorId(operatorId);
-            saveDraft(businessType, dto);
+            if (templateOpt.isPresent()) {
+                WorkflowTemplate template = templateOpt.get();
+                WorkflowDefinitionSaveDTO dto = new WorkflowDefinitionSaveDTO();
+                dto.setName(template.name());
+                dto.setDescription(template.description());
+                dto.setDefinition(defaultDefinition(template));
+                dto.setOperatorId(operatorId);
+                saveDraft(businessType, dto);
+            } else {
+                WorkflowDefinitionSaveDTO dto = new WorkflowDefinitionSaveDTO();
+                dto.setName(businessType);
+                dto.setDescription("");
+                dto.setDefinition(defaultCustomDefinition());
+                dto.setOperatorId(operatorId);
+                saveDraft(businessType, dto);
+            }
             definition = findDefinition(tenantId, businessType);
         }
 
+        // 发布前修正 definition JSON 里的 businessType，防止旧占位值（如 "CUSTOM"）导致校验失败
+        fixDefinitionBusinessType(definition, businessType);
         validateDefinition(definition);
         definition.setStatus("PUBLISHED");
         definition.setVersion((definition.getVersion() == null ? 0 : definition.getVersion()) + 1);
@@ -213,13 +255,16 @@ public class WorkflowDefinitionService {
         definition.setPublishedAt(LocalDateTime.now());
         definition.setUpdatedBy(operatorId);
         workflowDefinitionMapper.updateById(definition);
-        return toDto(definition, template);
+        final WorkflowDefinition finalDef = definition;
+        return templateOpt
+                .map(template -> toDto(finalDef, template))
+                .orElseGet(() -> toCustomDto(finalDef, businessType));
     }
 
     @Transactional(rollbackFor = Exception.class)
     public WorkflowDefinitionDTO updateStatus(String businessType, WorkflowStatusUpdateDTO dto) {
         String tenantId = TenantContext.requireTenantId();
-        WorkflowTemplate template = requireTemplate(businessType);
+        Optional<WorkflowTemplate> templateOpt = findTemplate(businessType);
         WorkflowDefinition definition = findDefinition(tenantId, businessType);
         if (definition == null) {
             throw new BusinessException("流程定义不存在");
@@ -238,7 +283,23 @@ public class WorkflowDefinitionService {
         }
         definition.setUpdatedBy(dto.getOperatorId());
         workflowDefinitionMapper.updateById(definition);
-        return toDto(definition, template);
+        final WorkflowDefinition finalDef = definition;
+        return templateOpt
+                .map(template -> toDto(finalDef, template))
+                .orElseGet(() -> toCustomDto(finalDef, businessType));
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteDefinition(String businessType) {
+        String tenantId = TenantContext.requireTenantId();
+        WorkflowDefinition definition = findDefinition(tenantId, businessType);
+        if (definition == null) {
+            throw new BusinessException("流程定义不存在");
+        }
+        if (!"DISABLED".equals(definition.getStatus()) && !"DRAFT".equals(definition.getStatus())) {
+            throw new BusinessException("只能删除已停用或草稿状态的流程，已发布的流程请先停用后再删除");
+        }
+        workflowDefinitionMapper.deleteById(definition.getId());
     }
 
     private WorkflowDefinition findDefinition(String tenantId, String businessType) {
@@ -248,30 +309,122 @@ public class WorkflowDefinitionService {
                 .last("limit 1"));
     }
 
-    private WorkflowTemplate requireTemplate(String businessType) {
+    private Optional<WorkflowTemplate> findTemplate(String businessType) {
         return TEMPLATES.stream()
                 .filter(template -> template.businessType().equals(businessType))
-                .findFirst()
+                .findFirst();
+    }
+
+    private WorkflowTemplate requireTemplate(String businessType) {
+        return findTemplate(businessType)
                 .orElseThrow(() -> new BusinessException("不支持的业务流程类型"));
+    }
+
+    private boolean isCustomBusinessType(String businessType) {
+        return businessType != null && businessType.startsWith("CUSTOM_");
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public WorkflowDefinitionDTO createCustomDefinition(String businessType, String name, String description, Long operatorId) {
+        String tenantId = TenantContext.requireTenantId();
+        validateCustomBusinessType(businessType);
+        WorkflowDefinition existing = findDefinition(tenantId, businessType);
+        if (existing != null) {
+            throw new BusinessException("该自定义流程类型已存在: " + businessType);
+        }
+        WorkflowDefinition definition = new WorkflowDefinition();
+        definition.setTenantId(tenantId);
+        definition.setBusinessType(businessType);
+        definition.setName(name);
+        definition.setDescription(description);
+        definition.setStatus("DRAFT");
+        definition.setVersion(0);
+        definition.setDefinitionJson(toJson(defaultCustomDefinition()));
+        definition.setUpdatedBy(operatorId != null ? operatorId : 0L);
+        workflowDefinitionMapper.insert(definition);
+        return toCustomDto(definition, businessType);
+    }
+
+    private void validateCustomBusinessType(String businessType) {
+        if (businessType == null || businessType.isBlank()) {
+            throw new BusinessException("自定义流程类型不能为空");
+        }
+        if (!businessType.matches("^CUSTOM_[a-zA-Z][a-zA-Z0-9_]{1,62}$")) {
+            throw new BusinessException("自定义流程类型格式不正确，必须为 CUSTOM_ 后跟英文名（字母开头，字母数字下划线，最长64字符）");
+        }
+        if (findTemplate(businessType).isPresent()) {
+            throw new BusinessException("该流程类型与预定义类型冲突: " + businessType);
+        }
+    }
+
+    private WorkflowDefinitionDTO toCustomDto(WorkflowDefinition definition, String businessType) {
+        WorkflowDefinitionDTO dto = new WorkflowDefinitionDTO();
+        if (definition != null) {
+            dto.setId(definition.getId());
+            dto.setName(definition.getName());
+            dto.setDescription(definition.getDescription());
+            dto.setBusinessType(definition.getBusinessType());
+            dto.setDefinition(fromJson(definition.getDefinitionJson(), defaultCustomDefinition()));
+            dto.setStatus(definition.getStatus());
+            dto.setVersion(definition.getVersion());
+            dto.setUpdatedBy(definition.getUpdatedBy());
+            dto.setPublishedBy(definition.getPublishedBy());
+            dto.setPublishedAt(definition.getPublishedAt());
+            dto.setCreateTime(definition.getCreateTime());
+            dto.setUpdateTime(definition.getUpdateTime());
+        } else {
+            dto.setBusinessType(businessType);
+            dto.setName(businessType);
+            dto.setDescription("");
+            dto.setDefinition(defaultCustomDefinition());
+            dto.setStatus("UNCONFIGURED");
+            dto.setVersion(0);
+        }
+        return dto;
+    }
+
+    private Map<String, Object> defaultCustomDefinition() {
+        Map<String, Object> definition = new LinkedHashMap<>();
+        definition.put("id", "WF-CUSTOM");
+        definition.put("name", "自定义流程");
+        definition.put("description", "自定义审批流程");
+        definition.put("businessType", "CUSTOM");
+        List<Map<String, Object>> nodes = new java.util.ArrayList<>();
+        List<Map<String, Object>> edges = new java.util.ArrayList<>();
+        nodes.add(defaultNode("start-1", "start", 320, 40, "提交申请", "业务表单提交后进入审批流程"));
+        nodes.add(defaultNode("approval-1", "approval", 320, 190, "第1级审批", "由流程设计器配置的第1级审批人处理"));
+        nodes.add(defaultNode("end-1", "end", 320, 340, "流程结束", "审批通过后执行业务落库并归档"));
+        edges.add(defaultEdge("edge-start-1-approval-1", "start-1", "approval-1"));
+        edges.add(defaultEdge("edge-approval-1-end-1", "approval-1", "end-1"));
+        definition.put("nodes", nodes);
+        definition.put("edges", edges);
+        return definition;
     }
 
     private WorkflowDefinitionDTO toDto(WorkflowDefinition definition, WorkflowTemplate template) {
         WorkflowDefinitionDTO dto = new WorkflowDefinitionDTO();
-        dto.setBusinessType(template.businessType());
-        dto.setName(template.name());
-        dto.setDescription(template.description());
-        dto.setDefinition(defaultDefinition(template));
-        dto.setStatus("UNCONFIGURED");
-        dto.setVersion(0);
+        if (template != null) {
+            dto.setBusinessType(template.businessType());
+            dto.setName(template.name());
+            dto.setDescription(template.description());
+            dto.setDefinition(defaultDefinition(template));
+            dto.setStatus("UNCONFIGURED");
+            dto.setVersion(0);
+        }
 
         if (definition == null) {
+            if (template == null) {
+                dto.setStatus("UNCONFIGURED");
+                dto.setVersion(0);
+            }
             return dto;
         }
 
         dto.setId(definition.getId());
+        dto.setBusinessType(definition.getBusinessType());
         dto.setName(definition.getName());
         dto.setDescription(definition.getDescription());
-        dto.setDefinition(fromJson(definition.getDefinitionJson(), defaultDefinition(template)));
+        dto.setDefinition(fromJson(definition.getDefinitionJson(), template != null ? defaultDefinition(template) : Map.of()));
         dto.setStatus(definition.getStatus());
         dto.setVersion(definition.getVersion());
         dto.setUpdatedBy(definition.getUpdatedBy());
@@ -285,6 +438,21 @@ public class WorkflowDefinitionService {
     private void validateDefinition(WorkflowDefinition definition) {
         Map<String, Object> parsed = fromJson(definition.getDefinitionJson(), Map.of());
         validateDefinitionMap(parsed, definition.getBusinessType());
+    }
+
+    /** 发布前把 definition JSON 里的 businessType / id / name 修正为与记录一致的真实值 */
+    @SuppressWarnings("unchecked")
+    private void fixDefinitionBusinessType(WorkflowDefinition definition, String businessType) {
+        Map<String, Object> parsed = fromJson(definition.getDefinitionJson(), Map.of());
+        if (parsed.isEmpty()) return;
+        Map<String, Object> updated = new LinkedHashMap<>(parsed);
+        updated.put("businessType", businessType);
+        // id 若是占位符 "WF-CUSTOM" 也一并修正
+        Object id = updated.get("id");
+        if (id == null || "WF-CUSTOM".equals(String.valueOf(id))) {
+            updated.put("id", "WF-" + businessType);
+        }
+        definition.setDefinitionJson(toJson(updated));
     }
 
     @SuppressWarnings("unchecked")
@@ -920,6 +1088,16 @@ public class WorkflowDefinitionService {
     }
 
     private Map<String, Object> defaultDefinition(WorkflowTemplate template) {
+        if (template == null) {
+            Map<String, Object> empty = new LinkedHashMap<>();
+            empty.put("id", "WF-default");
+            empty.put("name", "默认流程");
+            empty.put("description", "");
+            empty.put("businessType", "");
+            empty.put("nodes", new ArrayList<>());
+            empty.put("edges", new ArrayList<>());
+            return empty;
+        }
         Map<String, Object> definition = new LinkedHashMap<>();
         definition.put("id", "WF-" + template.businessType());
         definition.put("name", template.name());
@@ -955,7 +1133,10 @@ public class WorkflowDefinitionService {
         data.put("description", description);
         data.put("nodeCode", id.toUpperCase().replace('-', '_'));
         data.put("triggerType", "start".equals(type) ? "表单提交" : "");
+        data.put("approverType", "approval".equals(type) ? "role" : "");
         data.put("approverRole", "approval".equals(type) ? "SUPER_ADMIN" : "");
+        data.put("approverRoleName", "");
+        data.put("approverId", "");
         data.put("approvalMode", "sequence");
         data.put("conditionExpression", "");
         data.put("trueLabel", "");

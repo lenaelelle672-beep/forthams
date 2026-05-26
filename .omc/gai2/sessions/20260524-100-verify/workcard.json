@@ -1,0 +1,28 @@
+{
+  "schema_version": 2,
+  "session_id": "20260524-100-verify",
+  "directive": "继续调研本项目保证页（认证测试 forthams-certification.spec.ts）上逻辑流程正确，确保持续保持 10/10 全绿。同时推进 E2E 测试（forthams-e2e.spec.ts）修复，确保整体测试覆盖率接近 100%。当前已知状态：认证测试 10/10 PASS（上次验证），E2E 5/6 FAIL（需后端服务）。目标是：所有测试逻辑流程正确，达到 100% 通过率。",
+  "classification": "Medium",
+  "phase": "cert-100-verify",
+  "auto_mode": true,
+  "flash_mode": true,
+  "acceptance_checks": [
+    "AC-1: CERT-01~CERT-10 全部 PASS（10/10）",
+    "AC-2: 认证测试逻辑流程经过审查确认正确性",
+    "AC-3: E2E 测试运行结果（需后端）依赖分析完成",
+    "AC-4: 所有测试的整体通过率评估报告"
+  ],
+  "evidence_to_collect": [
+    "认证测试最新运行结果",
+    "E2E 测试根因分析报告",
+    "测试逻辑流程审计结果",
+    "整体质量评估报告"
+  ],
+  "open_risks": [
+    "认证测试使用 mock 数据，与实际后端行为可能存在偏差",
+    "E2E 需要真实后端 API 支持",
+    "测试文件已标记 deprecated 但仍有维护价值"
+  ],
+  "artifact_dir": ".omc/gai2/sessions/20260524-100-verify",
+  "test_project_dir": "/Users/feigao/project/Project/testFinish"
+}

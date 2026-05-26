@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 public class VendorController {
     private final VendorService vendorService;
 
-    @GetMapping("/list")
+    @GetMapping({"", "/list"})
     public Result<Page<Vendor>> list(
             @RequestParam(defaultValue = "1") Integer page,
             @RequestParam(defaultValue = "10") Integer pageSize) {

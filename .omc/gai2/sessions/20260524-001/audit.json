@@ -1,0 +1,66 @@
+{
+  "audit_timestamp": "2026-05-24T00:00:00Z",
+  "current_state": {
+    "P0-1": {
+      "summary": "存在两套独立密码重置逻辑：1) POST /auth/reset-password（AuthService）仅验证用户名存在即可改密，无旧密码校验，代码注释标注为'过渡方案/TODO'；2) PUT /user-management/{id}/reset-password（UserManagementService）管理员强制重置，硬编码为'123456'。前端无自助修改密码 UI，SettingsPage 有密码输入框但未连任何 API（仅 placeholder）。",
+      "status": "需新增旧密码校验逻辑，前端需接入 API"
+    },
+    "P0-2": {
+      "summary": "BigScreenPage 第712行 placeholderData: fallbackStats + throwOnError: false，API 失败时静默展示假数据。BigScreen3DPage 第616行 initialData: fallbackStats，queryFn 内 catch 吞掉异常返回 fallbackStats，用户零感知 API 失败。后端 /bigscreen/stats API 实现完整且 JWT 白名单免认证。大量静态硬编码（warningRows、categoryBands 等）独立于 API。",
+      "status": "需移除 fallbackStats 注入，添加错误态 UI 展示"
+    },
+    "P1-4": {
+      "summary": "pages/reports/ 目录（ReportsPage.tsx + 2个组件）已接路由 /reports。pages/report/ 目录（ReportPage.tsx + ReportCenterPage.tsx + 2个组件）完全未接路由，为死码。vitest 覆盖率配置只包含 src/pages/reports/**，report/ 目录测试零覆盖。未发现 report/ 的跨目录 import 引用。",
+      "status": "可安全删除 pages/report/ 目录"
+    }
+  },
+  "existing_patterns": [
+    "React Query（useQuery）用于 API 数据获取，支持 placeholderData/initialData/throwOnError 配置",
+    "后端使用 Spring Boot + JWT 认证，/bigscreen/stats 已加入白名单",
+    "前端表单使用 React Hook Form",
+    "密码重置使用 POST /auth/reset-password，ResetPasswordRequest DTO"
+  ],
+  "technical_constraints": [
+    "P0-1 旧密码校验必须在服务端执行（安全要求）",
+    "P0-2 去掉 fallback 前需先有错误态 UI 替代，否则 API 失败白屏",
+    "P1-4 删除前需二次确认无跨目录 import"
+  ],
+  "risks": [
+    "P0-1: 后端接口改造影响现有密码重置流程",
+    "P0-2: 去掉 throwOnError:false 可能触发 React Query 错误冒泡",
+    "P0-2: BigScreen3DPage 字段级覆盖逻辑复杂，需精细判断哪些是防御性合理保留",
+    "P1-4: report/ 内 ReportCenterPage 功能更丰富，删除可能损失潜在功能"
+  ],
+  "test_surface": [
+    "P0-1: 密码重置接口单元测试（AuthService）、旧密码校验逻辑",
+    "P0-2: BigScreen 组件 API 错误态渲染测试",
+    "P1-4: 无测试影响（report/ 目录无测试覆盖）"
+  ],
+  "file_map": {
+    "P0-1": {
+      "backend": [
+        "src/main/java/**/auth/AuthController.java",
+        "src/main/java/**/auth/AuthService.java",
+        "src/main/java/**/auth/dto/ResetPasswordRequest.java",
+        "src/main/java/**/user/UserManagementService.java"
+      ],
+      "frontend": [
+        "src/pages/settings/SettingsPage.tsx"
+      ]
+    },
+    "P0-2": {
+      "frontend": [
+        "src/pages/bigscreen/BigScreenPage.tsx",
+        "src/pages/bigscreen/BigScreen3DPage.tsx"
+      ]
+    },
+    "P1-4": {
+      "frontend": [
+        "src/pages/report/ReportPage.tsx",
+        "src/pages/report/ReportCenterPage.tsx",
+        "src/pages/report/ (完整目录)",
+        "src/router/ (路由配置文件)"
+      ]
+    }
+  }
+}

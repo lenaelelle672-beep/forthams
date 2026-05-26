@@ -31,6 +31,31 @@ const fallbackStats = {
 type Stats = typeof fallbackStats;
 type StyleVars = CSSProperties & Record<`--${string}`, string | number>;
 
+function normalizeStats(input: Partial<Stats> | { data?: Partial<Stats> } | null | undefined): Stats {
+  const raw = ((input as { data?: Partial<Stats> } | null | undefined)?.data ?? input ?? {}) as Partial<Stats>;
+  const total = typeof raw.totalAssets === 'number' ? raw.totalAssets : fallbackStats.totalAssets;
+  const inUse = typeof raw.inUseAssets === 'number' ? raw.inUseAssets : fallbackStats.inUseAssets;
+
+  return {
+    ...fallbackStats,
+    totalAssets: total,
+    inUseAssets: inUse,
+    idleAssets: typeof raw.idleAssets === 'number' ? raw.idleAssets : fallbackStats.idleAssets,
+    scrapAssets: typeof raw.scrapAssets === 'number' ? raw.scrapAssets : fallbackStats.scrapAssets,
+    utilizationRate: typeof raw.utilizationRate === 'number'
+      ? raw.utilizationRate
+      : total > 0
+        ? Math.round((inUse / total) * 1000) / 10
+        : fallbackStats.utilizationRate,
+    totalValue: typeof raw.totalValue === 'number' ? raw.totalValue : fallbackStats.totalValue,
+    netValue: typeof raw.netValue === 'number' ? raw.netValue : fallbackStats.netValue,
+    pendingApprovals: typeof raw.pendingApprovals === 'number' ? raw.pendingApprovals : fallbackStats.pendingApprovals,
+    pendingWorkOrders: typeof raw.pendingWorkOrders === 'number' ? raw.pendingWorkOrders : fallbackStats.pendingWorkOrders,
+    inventoryProgress: typeof raw.inventoryProgress === 'number' ? raw.inventoryProgress : fallbackStats.inventoryProgress,
+    criticalAlerts: typeof raw.criticalAlerts === 'number' ? raw.criticalAlerts : fallbackStats.criticalAlerts,
+  };
+}
+
 const CSS = `
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap');
 
@@ -685,28 +710,16 @@ function IncomeChart() {
 
 export default function BigScreenPage() {
   const { data: apiStats } = useQuery<Stats>({
-    queryKey: ['dashboard', 'stats'],
+    queryKey: ['bigscreen', 'stats'],
     queryFn: async () => {
       try {
-        const res = await http.get<any>('/dashboard/stats');
-        const raw = res?.data ?? res ?? {};
-        const total = typeof raw.totalAssets === 'number' ? raw.totalAssets : fallbackStats.totalAssets;
-        const inUse = typeof raw.inUseAssets === 'number' ? raw.inUseAssets : fallbackStats.inUseAssets;
-        return {
-          ...fallbackStats,
-          totalAssets: total,
-          inUseAssets: inUse,
-          idleAssets: typeof raw.idleAssets === 'number' ? raw.idleAssets : fallbackStats.idleAssets,
-          scrapAssets: typeof raw.scrapAssets === 'number' ? raw.scrapAssets : fallbackStats.scrapAssets,
-          utilizationRate: total > 0 ? Math.round((inUse / total) * 1000) / 10 : fallbackStats.utilizationRate,
-          totalValue: typeof raw.totalValue === 'number' ? raw.totalValue : fallbackStats.totalValue,
-          netValue: typeof raw.netValue === 'number' ? raw.netValue : fallbackStats.netValue,
-          pendingApprovals: typeof raw.pendingApprovals === 'number' ? raw.pendingApprovals : fallbackStats.pendingApprovals,
-          pendingWorkOrders: typeof raw.pendingWorkOrders === 'number' ? raw.pendingWorkOrders : fallbackStats.pendingWorkOrders,
-          inventoryProgress: typeof raw.inventoryProgress === 'number' ? raw.inventoryProgress : fallbackStats.inventoryProgress,
-          criticalAlerts: typeof raw.criticalAlerts === 'number' ? raw.criticalAlerts : fallbackStats.criticalAlerts,
-        } as Stats;
-      } catch {
+        const res = await http.get<any>('/bigscreen/stats');
+        return normalizeStats(res);
+      } catch (err: any) {
+        // 区分 403 权限不足与网络错误
+        if (err?.response?.status === 403) {
+          console.warn('[BigScreen] 权限不足，使用 fallback 数据');
+        }
         return fallbackStats;
       }
     },
@@ -716,7 +729,7 @@ export default function BigScreenPage() {
     initialData: fallbackStats,
   });
 
-  const stats = apiStats ?? fallbackStats;
+  const stats = normalizeStats(apiStats);
   const [time, setTime] = useState(new Date());
 
   useEffect(() => {

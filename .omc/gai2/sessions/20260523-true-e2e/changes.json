@@ -1,0 +1,53 @@
+{
+  "changed_files": [
+    "backend/src/main/java/com/ams/controller/ApprovalController.java",
+    "frontend/src/api/approval.ts",
+    "frontend/src/pages/disposal/DisposalListPage.tsx"
+  ],
+  "added_files": [
+    ".omc/gai2/sessions/20260523-true-e2e/adjudication.json"
+  ],
+  "commands_run": [
+    {
+      "command": "sed -i '' (failed, Python替代): ApprovalController.java: @GetMapping({\"/list\", \"\"}) → @GetMapping(\"/list\")",
+      "result": "passed",
+      "notes": "Python字符串替换成功，已验证"
+    },
+    {
+      "command": "Python: approval.ts: /approvals → /approvals/list",
+      "result": "passed",
+      "notes": "路径对齐成功，已验证 line 42"
+    },
+    {
+      "command": "Python: DisposalListPage.tsx: 4处??0空值保护",
+      "result": "passed",
+      "notes": "stats.totalThisMonth/pendingCount/completedCount加??0；monthOverMonthDelta双处保护；recoveredValue已有??0无需重复"
+    },
+    {
+      "command": "mvn clean compile (backend目录)",
+      "result": "passed",
+      "notes": "BUILD SUCCESS, 224 files compiled, DashboardService.java已过时API警告与本修改无关"
+    }
+  ],
+  "verification_results": [
+    "操作1: ApprovalController.java line 25: @GetMapping(\"/list\") — 确认已删除空字符串路径",
+    "操作2: approval.ts line 42: /approvals/list — 确认路径已对齐",
+    "操作3a: DisposalListPage.tsx line 131: String(stats.totalThisMonth ?? 0) — 确认空值保护",
+    "操作3b: DisposalListPage.tsx line 132: (stats.monthOverMonthDelta ?? 0) / ${stats.monthOverMonthDelta ?? 0} — 确认双处保护",
+    "操作3c: DisposalListPage.tsx line 139: String(stats.pendingCount ?? 0) — 确认空值保护",
+    "操作3d: DisposalListPage.tsx line 147: String(stats.completedCount ?? 0) — 确认空值保护",
+    "操作3e: DisposalListPage.tsx line 155: (stats.recoveredValue ?? 0) — 已有空值保护，无需重复修改",
+    "后端编译: BUILD SUCCESS (224 files, no new errors)"
+  ],
+  "minions_execution": {
+    "adjudication_file_read": true,
+    "selected_source": "refine.json refinements",
+    "write_intent_preserved": true,
+    "degradation_blocked": false
+  },
+  "residual_risks": [
+    "sed命令因斜杠转义问题失败，使用Python替代完成，不影响结果",
+    "UserManagementController.java line 24也有@GetMapping({\"/list\", \"\"})，但本次操作1仅针对ApprovalController，未涉及用户管理控制器的同类问题",
+    "前端TypeScript编译未验证（未找到tsconfig或构建脚本），改动为纯字符串/类型安全级，风险低"
+  ]
+}

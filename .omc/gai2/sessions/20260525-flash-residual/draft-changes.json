@@ -1,0 +1,154 @@
+{
+  "schema_version": 1,
+  "agent": "gai2-drafter",
+  "model_route": "opencode-go/deepseek-v4-flash",
+  "session_id": "20260525-flash-residual",
+  
+  "objective_summary": "验证并确认三个残留风险（RISK-01/02/03）的代码修复状态。经实际文件扫描发现，三个 RISK 对应的代码修改均已在源文件中完成，本阶段重点从「执行修改」转为「验证确认」。",
+
+  "context_files_read": [
+    ".omc/gai2/sessions/20260525-flash-residual/workcard.json",
+    ".omc/gai2/sessions/20260525-flash-residual/audit.json",
+    ".omc/gai2/goal-state.json",
+    "backend/src/main/java/com/ams/config/SecurityConfig.java",
+    "backend/src/main/java/com/ams/controller/AuthController.java",
+    "backend/src/main/java/com/ams/config/JwtAuthenticationFilter.java",
+    "backend/src/main/java/com/ams/service/AuthService.java",
+    "frontend/src/pages/settings/SettingsPage.tsx",
+    "frontend/src/pages/bigscreen/BigScreenPage.tsx",
+    "frontend/src/pages/bigscreen/BigScreen3DPage.tsx",
+    "frontend/src/types/dashboard.types.ts",
+    "frontend/src/types/dashboard.d.ts",
+    "frontend/src/app/context/AuthContext.tsx",
+    "frontend/src/app/utils/api.ts",
+    "frontend/src/api/base.ts",
+    "frontend/src/pages/auth/LoginPage.tsx",
+    "frontend/src/layouts/AppLayout.tsx"
+  ],
+  
+  "target_files": [
+    "backend/src/main/java/com/ams/config/SecurityConfig.java",
+    "backend/src/main/java/com/ams/config/JwtAuthenticationFilter.java",
+    "frontend/src/pages/settings/SettingsPage.tsx",
+    "frontend/src/types/dashboard.types.ts",
+    "frontend/src/pages/bigscreen/BigScreenPage.tsx",
+    "frontend/src/pages/bigscreen/BigScreen3DPage.tsx"
+  ],
+  
+  "proposed_plan": [
+    "阶段1：代码状态验证 — 确认所有目标文件的实际代码与验收标准一致",
+    "阶段2：编译验证 — 后端 mvn compile + 前端 tsc --noEmit",
+    "阶段3：测试验证 — 后端 mvn test + 前端 pnpm test（可选）",
+    "阶段4：安全 review — 确认 POST /auth/reset-password 和 POST /auth/logout 现在需认证",
+    "阶段5：证据归档 — 标记 RISK-01/02/03 为 completed"
+  ],
+  
+  "write_intent": false,
+  "write_actions": [
+    {
+      "risk_id": "RISK-01",
+      "risk_level": "high",
+      "file": "backend/src/main/java/com/ams/config/SecurityConfig.java",
+      "operation": "verify",
+      "exact_location": "第41行",
+      "actual_content": ".requestMatchers(\"/auth/login\", \"/auth/register\", \"/public/**\", \"/health\", \"/system/health\", \"/system/info\").permitAll()",
+      "expected_state": "requestMatchers 中 auth 路径仅包含 /auth/login 和 /auth/register",
+      "match_target": true,
+      "reason": "验证 SecurityConfig 已正确限制免认证路径为 login 和 register 两个端点"
+    },
+    {
+      "risk_id": "RISK-01",
+      "risk_level": "high",
+      "file": "backend/src/main/java/com/ams/config/JwtAuthenticationFilter.java",
+      "operation": "verify",
+      "exact_location": "第122行",
+      "actual_content": "return uri.equals(\"/auth/login\") || uri.equals(\"/auth/register\") || uri.startsWith(\"/public/\") || uri.startsWith(\"/static/\") || uri.equals(\"/error\") || uri.equals(\"/favicon.ico\");",
+      "expected_state": "JWT 过滤器跳过路径使用 equals 精确匹配，仅放行 /auth/login 和 /auth/register",
+      "match_target": true,
+      "reason": "验证 JwtAuthenticationFilter 已与 SecurityConfig 同步"
+    },
+    {
+      "risk_id": "RISK-01-FOLLOWUP",
+      "risk_level": "medium",
+      "file": "backend/src/main/java/com/ams/controller/AuthController.java",
+      "operation": "verify",
+      "exact_location": "第32-50行 (logout/resetPassword)",
+      "actual_content": "logout() 无参数无认证注入；resetPassword() 接受 ResetPasswordRequest 无 @AuthenticationPrincipal",
+      "expected_state": "Controller 方法不依赖 @AuthenticationPrincipal，路径精确化后无 NPE 风险",
+      "match_target": true,
+      "reason": "验证 AuthController 方法在变为需认证后无 NPE 风险"
+    },
+    {
+      "risk_id": "RISK-02",
+      "risk_level": "medium",
+      "file": "frontend/src/pages/settings/SettingsPage.tsx",
+      "operation": "verify",
+      "exact_location": "第44行 + 第688行 + 第751行",
+      "actual_content": "Line 44: import { useAuth } from '@/app/context/AuthContext';\\nLine 688: const { user } = useAuth();\\nLine 751: const storedUsername = user?.username ?? '';",
+      "expected_state": "使用 AuthContext 获取 username，不再直接读 localStorage",
+      "match_target": true,
+      "reason": "验证 SettingsPage 已从 AuthContext 获取 username"
+    },
+    {
+      "risk_id": "RISK-03",
+      "risk_level": "low",
+      "file": "frontend/src/types/dashboard.types.ts",
+      "operation": "verify",
+      "exact_location": "第267-294行",
+      "actual_content": "export interface BigScreenStats { totalAssets: number; inUseAssets: number; idleAssets: number; scrapAssets: number; utilizationRate: number; totalValue: number; netValue: number; pendingApprovals: number; pendingWorkOrders: number; inventoryProgress: number; criticalAlerts: number; }",
+      "expected_state": "BigScreenStats 接口已定义，与两大屏 fallbackStats 字段一致",
+      "match_target": true,
+      "reason": "验证 BigScreenStats 共享接口已定义"
+    },
+    {
+      "risk_id": "RISK-03",
+      "risk_level": "low",
+      "file": "frontend/src/pages/bigscreen/BigScreenPage.tsx",
+      "operation": "verify",
+      "exact_location": "第16行 + 第18行 + 第32行",
+      "actual_content": "import type { BigScreenStats } from '@/types/dashboard.types';\\nconst fallbackStats: BigScreenStats = { ... };\\ntype Stats = BigScreenStats;",
+      "expected_state": "已引用显式 BigScreenStats 接口",
+      "match_target": true,
+      "reason": "验证 BigScreenPage 已迁移至显式类型"
+    },
+    {
+      "risk_id": "RISK-03",
+      "risk_level": "low",
+      "file": "frontend/src/pages/bigscreen/BigScreen3DPage.tsx",
+      "operation": "verify",
+      "exact_location": "第5行 + 第9行 + 第26行",
+      "actual_content": "import type { BigScreenStats } from '@/types/dashboard.types';\\nconst fallbackStats: BigScreenStats = { ... };\\ntype Stats = BigScreenStats;",
+      "expected_state": "已引用显式 BigScreenStats 接口",
+      "match_target": true,
+      "reason": "验证 BigScreen3DPage 已迁移至显式类型"
+    }
+  ],
+  
+  "verification_plan": [
+    "V1: 后端编译 — cd backend && mvn compile（验证 SecurityConfig/JwtAuthenticationFilter 无编译错误）",
+    "V2: 后端测试 — cd backend && mvn test（验证 AuthControllerTest 通过）",
+    "V3: 前端类型检查 — cd frontend && npx tsc --noEmit（验证 BigScreenStats import 正确）",
+    "V4: 前端构建 — cd frontend && pnpm build（确认完整构建通过）",
+    "V5: 安全验证 — 确认 /auth/reset-password 和 /auth/logout 不在 permitAll 列表中",
+    "V6: JWT 过滤器验证 — 确认 uri.equals 精确匹配而非 startsWith 通配"
+  ],
+  
+  "assumptions": [
+    "代码修改已在之前的 closeout 中完成，当前文件系统状态为最终状态",
+    "AuthControllerTest 使用 addFilters=false，SecurityConfig 修改不影响测试",
+    "AuthContext 中的 AuthUser 接口包含 username 字段",
+    "两大屏 fallbackStats 结构（11 个字段）与 BigScreenStats 接口完全一致"
+  ],
+  
+  "risks": [
+    {"id": "RISK-01-VERIFY-1", "level": "medium", "detail": "POST /auth/logout 改为需认证后，前端 logout API 调用需有 token；token 过期时后端返回 401 不影响前端登出体验"},
+    {"id": "RISK-01-VERIFY-2", "level": "info", "detail": "缺少 SecurityConfig 集成测试，建议未来添加 SecurityConfigIntegrationTest"},
+    {"id": "RISK-02-VERIFY-1", "level": "low", "detail": "useAuth() 返回的 user 可能为 null，但 user?.username 的 optional chaining 正确处理了此情况"},
+    {"id": "RISK-03-VERIFY-1", "level": "low", "detail": "BigScreenStats 接口字段若未来 API 变更需同步更新"}
+  ],
+  
+  "verdict": "ALL_RISKS_FIXED_NO_CHANGES_NEEDED",
+  "verdict_detail": "三个 RISK 的代码修改均已在源文件中完成。本阶段无需执行 edit 操作，仅需验证确认。建议直接执行验证计划中的编译/测试/类型检查步骤，完成后标记 RISK-01/02/03 为 completed。",
+  
+  "blocked_by": []
+}

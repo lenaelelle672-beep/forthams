@@ -132,8 +132,8 @@ export default function AuditDashboardPage() {
     placeholderData: (prev) => prev,
   });
 
-  const records: AuditLog[] = logsRes?.data?.records ?? [];
-  const totalLogs: number = logsRes?.data?.total ?? 0;
+  const records: AuditLog[] = logsRes?.records ?? [];
+  const totalLogs: number = logsRes?.total ?? 0;
   const totalPages = Math.max(1, Math.ceil(totalLogs / PAGE_SIZE));
 
   const activeUserCount = useMemo(() => {

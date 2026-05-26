@@ -66,7 +66,8 @@ class WorkflowDefinitionServiceTest {
 
     @Test
     void shouldListDefaultWorkflowTemplatesWhenTenantHasNoDefinitions() {
-        when(workflowDefinitionMapper.selectOne(any(LambdaQueryWrapper.class))).thenReturn(null);
+        lenient().when(workflowDefinitionMapper.selectOne(any(LambdaQueryWrapper.class))).thenReturn(null);
+        when(workflowDefinitionMapper.selectList(any(LambdaQueryWrapper.class))).thenReturn(List.of());
 
         List<WorkflowDefinitionDTO> definitions = workflowDefinitionService.listDefinitions();
 
@@ -126,7 +127,8 @@ class WorkflowDefinitionServiceTest {
 
     @Test
     void shouldExposeAllFieldsForEveryDefaultWorkflowTemplate() {
-        when(workflowDefinitionMapper.selectOne(any(LambdaQueryWrapper.class))).thenReturn(null);
+        lenient().when(workflowDefinitionMapper.selectOne(any(LambdaQueryWrapper.class))).thenReturn(null);
+        when(workflowDefinitionMapper.selectList(any(LambdaQueryWrapper.class))).thenReturn(List.of());
 
         List<WorkflowDefinitionDTO> definitions = workflowDefinitionService.listDefinitions();
 

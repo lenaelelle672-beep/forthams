@@ -1,0 +1,151 @@
+{
+  "audit_ts": "2026-05-25T00:00:00Z",
+  "session_id": "20260525-flash-residual",
+  "current_state": {
+    "summary": "项目为 forthAMS 固定资产管理系统，后端 Spring Boot + 前端 React/TypeScript。本次审计覆盖 4 个残留风险项：SecurityConfig 通配符白名单（高危）、SettingsPage localStorage 键名不匹配（中危）、两大屏 fallbackStats 类型推导（低危）、以及编译与测试验证。",
+    "backend": {
+      "framework": "Spring Boot (Maven/pom.xml)",
+      "auth": "JWT + Spring Security + BCryptPasswordEncoder",
+      "config_class": "SecurityConfig.java (84 loc)",
+      "auth_controller": "AuthController.java — 4 端点: POST /auth/login, /auth/register, /auth/logout, /auth/reset-password",
+      "jwt_filter": "JwtAuthenticationFilter 第122行也通过 uri.startsWith(\"/auth/\") 跳过 JWT 验证",
+      "build_tool": "Maven (pom.xml), spring-boot-starter-test + spring-security-test 在 test scope",
+      "test_framework": "JUnit 5 + MockMvc (addFilters=false)",
+      "test_coverage": "AuthControllerTest.java 覆盖 login、register、logout（MockMvc，无 Security 过滤器）；无 SecurityConfig 专用集成测试"
+    },
+    "frontend": {
+      "framework": "React 18 + TypeScript + React Router + TanStack Query",
+      "auth_storage": "TOKEN_STORAGE_KEY='auth_token', USER_STORAGE_KEY='user_info' — 存在 sessionStorage（LoginPage.tsx 第195-196行）",
+      "login_flow": "LoginPage → POST /auth/login → sessionStorage.setItem('auth_token', token) + sessionStorage.setItem('user_info', JSON.stringify({userId, username, realName}))",
+      "settings_page": "SecurityTab.handleChangePwd 使用 localStorage.getItem('username')（第750行）获取当前用户名以提交 changePassword API",
+      "bigscreen": "BigScreenPage.tsx (type Stats = typeof fallbackStats) + BigScreen3DPage.tsx (type Stats = typeof fallbackStats) — 两处 fallbackStats 结构完全相同",
+      "api_endpoints_auth_defined": "auth.ts 定义了 /auth/login, /auth/logout, /auth/me, /auth/refresh；其中 /auth/me 和 /auth/refresh 后端无对应实现",
+      "api_change_password": "base.ts 第107-108行: http.post('/auth/reset-password', data)，对应后端 AuthController.resetPassword"
+    }
+  },
+  "existing_patterns": [
+    "后端安全配置：requestMatchers 通配符模式 (/auth/**) 统一放行整个路由前缀",
+    "JWT 验证跳过：JwtAuthenticationFilter.isAuthenticationSkippedRequest 使用 uri.startsWith(\"/auth/\") 跳过 JWT 过滤",
+    "前端 localStorage/sessionStorage 双存储：auth_token 和 user_info 先存 sessionStorage，fallback 到 localStorage 读取",
+    "大屏组件 Stats 类型推导：使用 typeof fallbackStats 替代显式接口声明（BigScreenPage.tsx 第31行、BigScreen3DPage.tsx 第24行）",
+    "API 层统一错误处理：api.ts 中 axios interceptor 处理 401（clearAuthStorage + redirectToLogin）",
+    "后端测试模式：@SpringBootTest + @AutoConfigureMockMvc(addFilters = false) — 跳过安全过滤器链",
+    "前端查询模式：useQuery + useMutation + invalidateQueries 数据管理"
+  ],
+  "technical_constraints": [
+    "RISK-01: SecurityConfig 和 JwtAuthenticationFilter 两处都需要感知 /auth/** 路径变动，否则过滤器跳过 JWT 验证后，Controller 中的认证注入（如 @AuthenticationPrincipal）可能 NPE",
+    "RISK-01: AuthController.logout() 无参数，当前不需要认证即可登出（不消耗资源），但未来接入黑名单机制后需认证",
+    "RISK-01: frontend/src/api/base.ts 中 changePassword 调用 POST /auth/reset-password，该端点当前无认证保护——这是最直接的安全漏洞",
+    "RISK-02: localStorage.getItem('username') 完全无法获取到当前用户名，因为系统始终将用户信息以 JSON 格式存储在 sessionStorage 键 'user_info' 下",
+    "RISK-02: 登录页有 'remembered_username' 存于 localStorage，但该值仅在登录页自动填充用，且只在「记住我」勾选时才会存储",
+    "RISK-03: BigScreenPage 和 BigScreen3DPage 的 fallbackStats 字段数（11个）、类型、键名完全一致，适合共享统一 interface",
+    "前端测试：现有 __tests__ 文件夹未涉及 SettingsPage 和 BigScreen 组件，RISK-02/03 修改后需功能验证而非单元测试",
+    "后端测试：AuthControllerTest 使用 addFilters=false 跳过安全过滤器，因此修改 SecurityConfig 后不会影响现有测试通过"
+  ],
+  "risks": [
+    {
+      "level": "high",
+      "detail": "RISK-01: SecurityConfig 第41行使用 /auth/** 通配符将 auth 路由全部放行，包括 POST /auth/reset-password（修改密码）——攻击者可在无需认证的情况下直接重置任意用户的密码，造成账户接管。",
+      "affected_file": "backend/.../SecurityConfig.java:41"
+    },
+    {
+      "level": "high",
+      "detail": "RISK-01 关联风险: JwtAuthenticationFilter 第122行同样使用 uri.startsWith(\"/auth/\") 跳过 JWT 验证。若只改 SecurityConfig 不改 Filter，对 /auth/logout 和 /auth/reset-password 的请求将跳过 JWT 过滤器（无认证上下文注入），可能导致 Controller 中访问 Authentication 对象时 NPE。",
+      "affected_file": "backend/.../JwtAuthenticationFilter.java:122"
+    },
+    {
+      "level": "high",
+      "detail": "RISK-01 联动风险: POST /auth/reset-password 既有后端 AuthController.resetPassword 实现，又被前端 changePassword API 调用以修改密码。此端点当前完全免认证，修改后变为需认证，涉及前后端行为变更。",
+      "affected_file": "backend/.../AuthController.java + frontend/.../api/base.ts"
+    },
+    {
+      "level": "medium",
+      "detail": "RISK-02: SettingsPage.tsx 第750行 localStorage.getItem('username') 始终返回 null。修改密码功能中 handleChangePwd 会因此 toast 提示「无法获取当前用户名，请重新登录」——无法修改密码。",
+      "affected_file": "frontend/.../SettingsPage.tsx:750"
+    },
+    {
+      "level": "low",
+      "detail": "RISK-03: 两大屏使用 typeof fallbackStats 推导 Stats 类型。虽无运行时风险，但不符合显式类型声明的最佳实践；若未来 fallbackStats 变更可能导致类型漂移。",
+      "affected_file": "frontend/.../BigScreenPage.tsx & BigScreen3DPage.tsx"
+    },
+    {
+      "level": "info",
+      "detail": "RISK-04: AuthControllerTest 使用 addFilters=false 跳过安全过滤器链，修改 SecurityConfig 后现有测试应不受影响。但缺少 SecurityConfig 的集成测试来验证路径白名单变更。",
+      "affected_file": "backend/.../AuthControllerTest.java"
+    }
+  ],
+  "impact_analysis": {
+    "RISK-01": {
+      "severity": "high",
+      "impact": "直接安全漏洞：重置密码接口无需认证，任何知晓用户名的人可通过 POST /auth/reset-password 修改密码。此外 /auth/logout 也不需要认证即可登出（影响有限）。修改涉及 1 个后端文件（~3行变更），但需同步评估 JwtAuthenticationFilter 的兼容性。",
+      "current_behavior": "SecurityConfig: requestMatchers(\"/auth/**\").permitAll() → 所有 /auth/* 免认证",
+      "target_behavior": "requestMatchers(\"/auth/login\", \"/auth/register\", \"/public/**\", ...).permitAll() → 仅 login/register 免认证",
+      "auth_routes_affected": {
+        "POST /auth/login": "应免认证 ✓",
+        "POST /auth/register": "应免认证 ✓",
+        "POST /auth/logout": "当前免认证 → 改为需认证（影响：前端 logout API 需要 token 才能调用，当前前端调用 logout 时可能已有 token）",
+        "POST /auth/reset-password": "当前免认证（高危）→ 改为需认证（正确行为）",
+        "GET /auth/me": "前端 auth.ts 定义但后端无实现，不受影响",
+        "POST /auth/refresh": "前端 auth.ts 定义但后端无实现，不受影响"
+      },
+      "recommendation": "1. SecurityConfig 第41行将 \"/auth/**\" 改为 \"/auth/login\", \"/auth/register\" | 2. JwtAuthenticationFilter 第122行同步将 uri.startsWith(\"/auth/\") 改为对 \"/auth/login\" 和 \"/auth/register\" 的精确匹配，或保留 /auth/ 前缀跳过 JWT 解析但依赖 SecurityConfig 授权（风险：Controller 中获取 Authentication 可能为空） | 3. 建议保留 JwtAuthenticationFilter 的 /auth/ 前缀跳过规则（只跳过 JWT 解析），因为 SecurityConfig 已经会拒绝未授权请求",
+      "builder_notes": "1. 修改 SecurityConfig.java:41: \"auth/**\" → \"/auth/login\", \"/auth/register\" | 2. 保留 JwtAuthenticationFilter 第122行 uri.startsWith(\"/auth/\") 不变（该过滤器只负责跳过 JWT 解析，授权由 SecurityConfig 处理） | 3. 验证 AuthController.resetPassword 中是否有 @AuthenticationPrincipal 或其他认证信息注入（若有则需处理 NPE）"
+    },
+    "RISK-02": {
+      "severity": "medium",
+      "impact": "修改密码功能完全不可用：localStorage.getItem('username') 始终为 null，用户无法通过 SettingsPage 安全设置下的修改密码功能修改自己的密码。",
+      "current_behavior": "SettingsPage.tsx 第750行: const storedUsername = localStorage.getItem('username') ?? ''",
+      "target_behavior": "从 AuthContext 的 user 对象中获取 username，或从 sessionStorage 的 user_info JSON 中解析",
+      "storage_analysis": {
+        "login_storage": "sessionStorage.setItem('user_info', JSON.stringify({userId, username, realName})) — LoginPage.tsx:196",
+        "settings_read": "localStorage.getItem('username') — SettingsPage.tsx:750",
+        "mismatch_reason": "1) 存储介质不同: sessionStorage vs localStorage | 2) 键名不同: 'user_info' vs 'username' | 3) 格式不同: JSON 对象 vs 纯字符串 | 4) localStorage 只有 'remembered_username'（记住我功能），无 'username' 键"
+      },
+      "recommendation": "方案A（推荐）: 从 AuthContext 获取 user.username。修改 SettingsPage 导入 useAuth，从 context 获取当前用户名。\n方案B: 从 sessionStorage 读取并解析: JSON.parse(sessionStorage.getItem('user_info') ?? '{}').username\n方案A 更符合 React 最佳实践，避免直接操作 storage。",
+      "builder_notes": "优先方案A。在 SecurityTab 组件中引入 useAuth() 获取 user.username。需确保 SecurityTab 在 AuthProvider 内渲染（应为是，因其在 SettingsPage 内，而 SettingsPage 在 AuthProvider 包裹的 router 中）。"
+    },
+    "RISK-03": {
+      "severity": "low",
+      "impact": "纯代码质量改进，无运行时风险。两处 fallbackStats 字段完全一致（11个字段），可提取为共享 interface，提高类型安全性和可维护性。",
+      "current_behavior": "两文件各自定义完全相同 fallbackStats 对象，然后 type Stats = typeof fallbackStats",
+      "target_behavior": "在共享 types 文件中定义 BigScreenStats interface，两处统一引用",
+      "structure_identical": true,
+      "shared_fields": ["totalAssets", "inUseAssets", "idleAssets", "scrapAssets", "utilizationRate", "totalValue", "netValue", "pendingApprovals", "pendingWorkOrders", "inventoryProgress", "criticalAlerts"],
+      "type_compatibility": "两个 type Stats 完全兼容，可直接提取为统一 interface",
+      "recommendation": "在 frontend/src/types/ 下（如 dashboard.types.ts 或新文件）定义 BigScreenStats interface，替换两处 typeof fallbackStats。同时 fallbackStats 可作为默认值保留在各文件中。",
+      "builder_notes": "1. 先查看 dashboard.types.ts 和 dashboard.d.ts 是否已有相关类型 | 2. 建议在 dashboard.types.ts 中追加 BigScreenStats interface | 3. 两处都改为 import type { BigScreenStats } from '@/types/dashboard.types' | 4. fallbackStats 作为默认值保留，类型改为 satisfies BigScreenStats 或 BigScreenStats 类型标注"
+    }
+  },
+  "test_surface": {
+    "backend": {
+      "unit_tests": [
+        "AuthControllerTest.java — 覆盖 login、register、logout（MockMvc, addFilters=false，不涉及 SecurityConfig）"
+      ],
+      "test_command": "cd backend && ./mvnw test （或 mvn test）",
+      "security_test_gap": "无 SecurityConfig 集成测试。建议未来添加 SecurityConfigIntegrationTest 验证路径白名单变更（使用 @WithMockUser 或真实 JWT）",
+      "impact_on_existing_tests": "RISK-01 修改不影响现有测试（AuthControllerTest 使用 addFilters=false 跳过安全过滤器）"
+    },
+    "frontend": {
+      "unit_tests": [
+        "src/__tests__/ 下有 ReportsPage.test.tsx, GlobalSearch.test.tsx, ReportPage.test.tsx, CommandPalette.test.tsx 等",
+        "src/api/__tests__/reports.test.ts — API 层测试"
+      ],
+      "e2e_tests": [
+        "src/e2e/real-backend-smoke.spec.ts",
+        "src/e2e/browser-regression-smoke.spec.ts",
+        "src/e2e/browser-smoke.spec.ts",
+        "src/e2e/core-routes-smoke.spec.ts"
+      ],
+      "test_command": "cd frontend && pnpm test （或 npm test）",
+      "specific_test_gap": "SettingsPage.test.tsx 和 BigScreenPage.test.tsx 不存在。RISK-02 和 RISK-03 修改后无现有单元测试可以直接验证。e2e 测试可做回归验证。",
+      "compilation_check": "cd frontend && pnpm typecheck （或 npx tsc --noEmit） — RISK-02/03 修改后必须通过类型检查"
+    },
+    "verification_sequence": [
+      "步骤1：后端编译 — cd backend && mvn compile",
+      "步骤2：后端测试 — cd backend && mvn test",
+      "步骤3：前端类型检查 — cd frontend && npx tsc --noEmit",
+      "步骤4：前端构建 — cd frontend && pnpm build",
+      "步骤5（可选）：前端测试 — cd frontend && pnpm test"
+    ]
+  }
+}

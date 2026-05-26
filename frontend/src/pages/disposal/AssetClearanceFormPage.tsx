@@ -92,7 +92,7 @@ export default function AssetClearanceFormPage() {
   });
 
   const assetRows: AssetRow[] = useMemo(() => {
-    const records = (assetListData as ApiResponse<PageData<AssetListItem>> | undefined)?.data?.records ?? [];
+    const records = (assetListData as PageData<AssetListItem> | undefined)?.records ?? [];
     return records.map(toAssetRow);
   }, [assetListData]);
 
@@ -169,7 +169,7 @@ export default function AssetClearanceFormPage() {
       navigate('/disposals');
     },
     onError: (error: any) => {
-      toast.error(error?.response?.data?.message ?? '提交失败，请重试');
+      toast.error(error instanceof Error ? error.message : '提交失败，请重试');
     },
   });
 

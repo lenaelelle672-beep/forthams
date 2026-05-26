@@ -1,0 +1,52 @@
+{
+  "reviewer": "gai2-reviewer",
+  "reviewed_at": "2026-05-23T19:53:30+08:00",
+  "session_id": "20260523-iter30-ac4-search",
+  "directive_summary": "AC-4: GlobalSearch SEARCHABLE_PAGES 路由表与 App.tsx 对齐",
+  "overall": "PASS",
+  "affected_scope": [
+    "frontend/src/components/GlobalSearch.tsx",
+    "frontend/src/__tests__/ReportsPage.test.tsx"
+  ],
+  "commands_run_and_outcomes": [
+    {
+      "command": "cd frontend && npx vitest run",
+      "result": "30 files, 677 tests passed"
+    },
+    {
+      "command": "cd frontend && npm run build",
+      "result": "0 errors, built in 4.99s"
+    }
+  ],
+  "acceptance_status": [
+    {
+      "id": "AC-4-search-unify",
+      "status": "PASS",
+      "evidence": "GlobalSearch.tsx SEARCHABLE_PAGES (第28-65行) 共30条路由条目，逐条与 App.tsx 路由树（含 modular routes: vendorRoutes, locationRoutes, assetImportExportRoutes, retirementRoutes, assetDetailRoute, workOrderRoutes）对比确认完全对齐。已修复：/dashboard→/、/approvals→/approval、移除不存在路由（/reports、/notifications、/compensation）、补充缺失路由（/situation、/cyber-v12、/industrial-v13、/approval、/inventory/tasks、disposals系列等）。GlobalSearch 在 SidebarLayout 第29行 import、第159行使用，集成有效。"
+    },
+    {
+      "id": "AC-4-keyboard",
+      "status": "PASS",
+      "evidence": "GlobalSearch.tsx 第94-103行 useEffect 绑定 document.addEventListener('keydown', down)，当 e.key==='k' && (e.metaKey || e.ctrlKey) 时 toggle CommandDialog。return 中正确 cleanup removeEventListener。快捷键可通过 SidebarLayout 中挂载的 GlobalSearch 组件触发。"
+    },
+    {
+      "id": "AC-4-build",
+      "status": "PASS",
+      "evidence": "npx vitest run: 30 files, 677 tests passed（含 GlobalSearch.test.tsx 7 个测试和 ReportsPage.test.tsx 18 个修复后测试全部通过）。npm run build: 0 errors, built in 4.99s。"
+    }
+  ],
+  "evidence_references": [
+    "frontend/src/components/GlobalSearch.tsx",
+    "frontend/src/app/App.tsx",
+    "frontend/src/app/router/AppRouter.tsx",
+    "frontend/src/app/routes/AppRoutes.tsx",
+    "frontend/src/app/router.tsx",
+    "frontend/src/app/layouts/SidebarLayout.tsx"
+  ],
+  "residual_risks": [
+    "/inventory/smart-report 在 App.tsx 中注册为 /inventory/smart-report/:taskId（动态路由），SEARCHABLE_PAGES 保留的 /inventory/smart-report 不带 taskId 参数可能导致空白页，需手动补参",
+    "动态路由（:taskId、:id、:id/edit）在 SEARCHABLE_PAGES 中仅包含索引页，未收录带参数的编辑/详情页（如 /assets/:id 由 assetDetailRoute 处理但搜索中无对应条目）",
+    "SidebarLayout 仍同时存在 inline 行内搜索栏（handleGlobalSearch 导航到 /assets?keyword=...）和 GlobalSearch Cmd+K 两条路径，功能分离但用户感知上可能混淆"
+  ],
+  "recommendation": "completed"
+}

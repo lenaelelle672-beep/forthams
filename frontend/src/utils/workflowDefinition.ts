@@ -1,8 +1,6 @@
 import { MarkerType } from '@xyflow/react';
-import type { BusinessType } from '@/constants/workflowBusiness';
 import type { FlowDefinition, FlowEdge, FlowNode, FlowNodeData, FlowNodeType } from '@/types/flow';
-
-export type WorkflowDefinitionPayload = FlowDefinition & { businessType: BusinessType };
+export type WorkflowDefinitionPayload = FlowDefinition & { businessType: string };
 
 const defaultMarkerEnd = { type: MarkerType.ArrowClosed, color: '#3b82f6' };
 const defaultStyle = { stroke: '#3b82f6', strokeWidth: 2 };
@@ -11,7 +9,7 @@ const defaultLabelBgStyle = { fill: '#f8f9ff', fillOpacity: 1 };
 
 const defaultNodeData: FlowNodeData = {
   type: 'approval', label: '', description: '', nodeCode: '', triggerType: '',
-  approverType: 'role', approverRole: '', approverId: '', approvalMode: 'sequence',
+  approverType: 'role', approverRole: '', approverRoleName: '', approverId: '', approvalMode: 'sequence',
   conditionExpression: '', trueLabel: '', falseLabel: '', resultAction: '',
 };
 
@@ -33,7 +31,7 @@ function normalizeEdge(edge: FlowEdge): FlowEdge {
   };
 }
 
-export function normalizeWorkflowDefinition(definition: FlowDefinition, businessType: BusinessType): WorkflowDefinitionPayload {
+export function normalizeWorkflowDefinition(definition: FlowDefinition, businessType: string): WorkflowDefinitionPayload {
   const nodes = (Array.isArray(definition.nodes) ? definition.nodes : []).map(normalizeNode);
   const nodeIds = new Set(nodes.map((n) => n.id).filter(Boolean));
   const edges = (Array.isArray(definition.edges) ? definition.edges : []).map(normalizeEdge).filter((e) => nodeIds.has(e.source) && nodeIds.has(e.target) && e.source !== e.target);

@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "session_id": "20260525-flash-biz100",
+  "adjudicator": "gai2-orchestrator",
+  "model_route": "zai-coding-plan/glm-5.1",
+  "decision": "accept_with_refinements",
+  "selected_source": "draft_with_refinements",
+  "decision_rationale": "Refine verdict=accept_with_refinements，12个write_actions全部保留，write_intent_preserved=true，degradation_detected=false。Refine的改进建议均为builder阶段注意事项而非拒绝动作。选draft+refinements方案。",
+  "refine_verdict": "accept_with_refinements",
+  "builder_instructions": [
+    "【执行顺序】先T2再T3：必须先解除后端requireTemplate硬编码（WA-02），再实现前端自定义流程入口（WA-03/WA-10/WA-11）",
+    "【权限方案】统一使用 hasRole('ADMIN','SUPER_ADMIN')，不新增hasAuthority/权限表。前后端一致使用此方案",
+    "【命名规则】自定义businessType使用 CUSTOM_{用户输入的英文名} 格式，后端做唯一性校验，限制64字符",
+    "【初始模板】自定义流程创建使用最小模板（开始→审批→结束），非空白定义",
+    "【RETIREMENT stepCount】设为4（与服务端一致），注意前端当前其他模板stepCount=5与服务端不匹配",
+    "【roles来源】WA-05中roles从登录响应body的roles字段读取，而非JWT claims解析",
+    "【路由守卫范围】WA-06仅影响/bigscreen和/bigscreen-3d路由，不全局修改ProtectedRoute逻辑",
+    "【跳转逻辑】WA-10自定义流程创建后从POST响应获取ID，跳转到/workflow-designer?id={newId}",
+    "【侧边栏刷新】WA-08不做实时刷新，保持当前token过期刷新策略",
+    "【数据库】无需SQL插入权限记录——hasRole使用Spring Security内置角色（ROLE_ADMIN, ROLE_SUPER_ADMIN）",
+    "【双路由】在现有router/index.tsx（旧系统）上修改，不涉及app/App.tsx合并",
+    "【api/workflow.ts】新增createCustomWorkflow(businessType, name, description)封装POST /workflows/custom",
+    "【WorkflowCenterPage改造】新建流程按钮改下拉菜单：预定义模板列表+自定义流程选项；自定义弹框收集名称/描述/初始模板"
+  ],
+  "write_action_guard": {
+    "protected_actions": [
+      "WA-01: AuthResponse roles字段（向后兼容null处理）",
+      "WA-02: requireTemplate改为软约束（保留TEMPLATES作为默认模板引用，不删除）",
+      "WA-04: SecurityConfig顺序（hasRole必须在anyRequest.authenticated()之前）",
+      "WA-06: 仅影响/bigscreen路由，不修改全局ProtectedRoute"
+    ],
+    "degradation_risk": "none",
+    "fallback_strategy": "如果builder执行中遇到refine指出的边缘case无法处理，暂停并报告，不要自行降级为只读操作"
+  },
+  "fallback_labels": [],
+  "reviewer_checks": [
+    "验证大屏页面非管理员访问返回403或重定向至/forbidden",
+    "验证管理员正常访问大屏页面数据",
+    "验证自定义工作流API创建成功后数据持久化到数据库",
+    "验证前端工作流中心出现新建自定义流程入口",
+    "验证自定义流程设计器可配置节点、审批人、条件",
+    "验证前端businessFlowOptions包含RETIREMENT且stepCount=4",
+    "验证侧边栏大屏导航项仅对ADMIN/SUPER_ADMIN可见",
+    "验证编译通过、构建通过",
+    "验证WA-01/W-05前后端角色同步一致"
+  ],
+  "adjudicated_at": "2026-05-25T06:00:00Z"
+}

@@ -1,0 +1,39 @@
+{
+  "classification": "Medium",
+  "scope": [
+    "frontend/src/pages/workflow/WorkflowCenterPage.tsx",
+    "frontend/src/components/flow/CustomNodes.tsx",
+    "frontend/src/components/flow/NodeConfigPanel.tsx",
+    "frontend/src/app/components/approval/ApprovalFlowChart.tsx",
+    "frontend/src/app/services/approval/types.ts",
+    "frontend/src/api/workflow.ts",
+    "frontend/src/constants/workflowBusiness.ts",
+    "backend/src/main/java/com/ams/service/ApprovalService.java",
+    "backend/src/main/java/com/ams/service/WorkflowDefinitionService.java",
+    "backend/src/main/java/com/ams/controller/RoleController.java",
+    "backend/src/main/java/com/ams/entity/Role.java"
+  ],
+  "risks": [
+    "审批角色乱码是高优先级用户可见问题，后端 toWorkflowRuntimePath 未返回 roleName，前端直接渲染 roleCode",
+    "从模版创建仅做 navigate 跳转未调用后端 API，语义上与用户预期不符",
+    "前端两套 NodeConfigPanel 实现（src/components/flow 和 src/app/components/flow）需同步修改"
+  ],
+  "dependencies": [
+    "后端 Role 实体已有 roleCode/roleName 字段，/roles/all API 已就绪",
+    "设计器 NodeConfigPanel 已有 roleDetails 映射可复用"
+  ],
+  "recommended_phases": [
+    "builder",
+    "reviewer"
+  ],
+  "needs_audit": true,
+  "needs_debate": false,
+  "needs_builder": true,
+  "acceptance_hints": [
+    "AC-1: 从模版创建点击后应先调用后端 API 创建流程定义，再导航到设计器",
+    "AC-2: 审批流转图中审批角色显示中文角色名而非代码值",
+    "AC-3: 明确告知用户角色定义在 sys_role 表，通过 /roles API 管理",
+    "AC-4: 编译通过，构建通过"
+  ],
+  "rationale": "涉及两个 bug 修复和一个知识问答，audit 已完成，问题根因明确（F-002 后端不返回 roleName + F-001 从模版创建仅做导航不调 API），不需要 debate。直接进入 builder 修复，然后 reviewer 验证。分类降为 Medium：根因明确、修复路径清晰、不涉及架构变更。"
+}

@@ -1,0 +1,29 @@
+{
+  "classification": "Medium",
+  "mcp_tools": [],
+  "scope": [
+    "testFinish/tests/playwright/forthams-certification.spec.ts",
+    "frontend/src/app/pages/ApprovalListPage.tsx",
+    "frontend/src/app/pages/InventoryTasks/InventoryTasks.tsx",
+    "frontend/src/app/pages/assets/AssetCreatePage.tsx",
+    "frontend/src/app/pages/Analytics.tsx",
+    "frontend/src/app/pages/IdleAssets.tsx",
+    "frontend/src/components/ui/PageHeader.tsx",
+    "frontend/src/app/components/approval/ApprovalActionPanel.tsx"
+  ],
+  "risks": [
+    "CERT-02 的 10 个模块中部分实际标题与测试期望不同（盘点任务列表→盘点任务、审批中心→审批列表、数据分析→数据统计分析），需逐项确认并修复",
+    "CERT-03 创建资产路径完全变更（内联模态→独立页面跳转），需重写约 20 行交互代码",
+    "CERT-08 审批操作从行内按钮改为 Dialog 内 ApprovalActionPanel，交互路径完全不同",
+    "fillAssetForm 辅助函数可能也需要更新以匹配 AssetCreatePage 的新版表单字段",
+    "修复可能对当前 PASS 的其他测试用例产生回归"
+  ],
+  "dependencies": ["Playwright E2E 测试环境", "Mock API 数据层", "新版前端运行实例"],
+  "recommended_phases": ["builder", "reviewer"],
+  "acceptance_hints": [
+    "CERT-02 修复后 10 个模块导航后 heading 断言全部不超时",
+    "CERT-03 修复后创建资产流程走完整独立页面路径并成功返回列表",
+    "CERT-08 修复后审批操作通过 Dialog 内交互完成批准/驳回",
+    "修复后全部 CERT 测试用例 PASS"
+  ]
+}

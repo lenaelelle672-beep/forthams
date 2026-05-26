@@ -1,0 +1,106 @@
+{
+  "classification": "Heavy",
+  "checked_at": "2026-05-23T07:12:00Z",
+  "scope": {
+    "frontend_files": [
+      "frontend/src/pages/maintenance/MaintenancePage.tsx（新建）",
+      "frontend/src/pages/settings/SettingsPage.tsx（添加RolesTab）",
+      "frontend/src/api/role.ts（新建）",
+      "frontend/src/pages/vendors/VendorsPage.tsx（改用zod+RHF）",
+      "frontend/src/pages/locations/LocationsPage.tsx（添加zod）",
+      "frontend/src/pages/AssetImportExport/ExportFilterForm.tsx（添加zod schema）",
+      "frontend/src/pages/asset/AssetFormPage.tsx（状态下拉过滤）",
+      "frontend/src/router/（主路由文件添加/maintenance路由）",
+      "frontend/src/layouts/（侧边栏添加维保入口）"
+    ],
+    "backend_files": [
+      "backend/src/main/java/com/ams/service/RetirementApplicationService.java（添加通知调用）",
+      "backend/src/main/java/com/ams/scheduler/DepreciationScheduler.java（新建）",
+      "backend/src/main/java/com/ams/AssetManagementApplication.java（添加@EnableScheduling）"
+    ],
+    "test_files": [
+      "backend/src/test/java/com/ams/controller/MaintenanceControllerTest.java（新建）",
+      "backend/src/test/java/com/ams/scheduler/DepreciationSchedulerTest.java（新建）",
+      "backend/src/test/java/com/ams/service/RetirementNotificationTest.java（新建）",
+      "frontend/src/test/vendorForm.test.ts（新建）",
+      "frontend/src/test/locationForm.test.ts（新建）",
+      "frontend/src/test/settingsUsersForm.test.ts（新建）"
+    ]
+  },
+  "batches": [
+    {
+      "batch": 1,
+      "label": "前端新页面 + zod 表单重构",
+      "items": [
+        "新建 frontend/src/pages/maintenance/MaintenancePage.tsx（维保列表+CRUD表单，zod+RHF，对接 api/maintenance.ts）",
+        "新建 frontend/src/api/role.ts（对接 RoleController，GET/POST/PUT/DELETE /roles）",
+        "SettingsPage.tsx 添加 RolesTab 组件（角色增删改查）",
+        "VendorsPage.tsx 改用 zod+RHF（邮箱/电话格式校验）",
+        "LocationsPage.tsx 添加 zod schema（名称必填/长度限制）",
+        "SettingsPage.tsx UsersTab 改用 zod+RHF（邮箱格式/@Size密码/手机号正则）",
+        "ExportFilterForm.tsx 添加 zod schema（日期范围逻辑校验）",
+        "主路由文件注册 /maintenance 路由（需先确认主路由文件）",
+        "侧边栏添加维保管理入口"
+      ],
+      "risk": "MEDIUM - 路由三重定义需确认主路由文件；SettingsPage Tab 隔离需小心",
+      "can_parallelize": true
+    },
+    {
+      "batch": 2,
+      "label": "后端业务逻辑植入",
+      "items": [
+        "前端 AssetFormPage.tsx status 下拉根据当前状态调用 canTransitionTo 过滤可选项",
+        "RetirementApplicationService.java approveApplication/completeApplication/rejectApplication 注入 NotificationService + 添加通知调用",
+        "新建 DepreciationScheduler.java（@Scheduled 每天凌晨执行批量折旧）",
+        "AssetManagementApplication.java 添加 @EnableScheduling"
+      ],
+      "risk": "MEDIUM - 通知方法签名需核实；@EnableScheduling 不影响现有测试需验证",
+      "can_parallelize": false
+    },
+    {
+      "batch": 3,
+      "label": "有效测试用例补全",
+      "items": [
+        "后端 MaintenanceControllerTest（CRUD + @Valid 拒绝无效请求）",
+        "后端 DepreciationSchedulerTest（验证调度触发）",
+        "后端 RetirementNotificationTest（审批/完成/拒绝触发通知）",
+        "前端 vendorForm.test.ts（zod 邮箱/电话格式边界）",
+        "前端 locationForm.test.ts（名称必填/长度边界）",
+        "前端 settingsUsersForm.test.ts（密码强度/邮箱格式）",
+        "mvn test + vitest run 全绿确认"
+      ],
+      "risk": "LOW",
+      "can_parallelize": true
+    }
+  ],
+  "risks": [
+    {
+      "level": "high",
+      "detail": "路由三重定义（AppRouter.tsx/router.tsx/AppRoutes.tsx），注册维保路由前必须确认主路由文件，避免注册到废弃文件"
+    },
+    {
+      "level": "medium",
+      "detail": "SettingsPage RolesTab 新增时需严格隔离 state，不得破坏现有 UsersTab/DepsTab"
+    },
+    {
+      "level": "medium",
+      "detail": "@EnableScheduling 改主类可能影响测试环境，需确认 @SpringBootTest 不会启动调度器"
+    },
+    {
+      "level": "medium",
+      "detail": "NotificationService.create 方法签名未确认，注入前需核实"
+    },
+    {
+      "level": "low",
+      "detail": "AssetFormPage 状态过滤逻辑需与后端 AssetStatus.canTransitionTo 枚举严格一一对应"
+    }
+  ],
+  "dependencies": [
+    "批次1 frontend/src/api/maintenance.ts 已存在，可直接使用",
+    "批次1 前需确认主路由文件（AppRouter.tsx/router.tsx/AppRoutes.tsx 三选一）",
+    "批次2 依赖批次1 前端部分先完成（AssetFormPage 状态过滤）",
+    "批次3 依赖批次1+2 全部完成"
+  ],
+  "estimated_complexity": "3-4 天工作量，涉及 15+ 文件改动，6+ 新建文件",
+  "recommended_approach": "先批次1（最高价值的前端页面和校验），再批次2（后端逻辑），最后批次3（测试覆盖）。批次3 必须在 CI 通过后才能 closeout。"
+}

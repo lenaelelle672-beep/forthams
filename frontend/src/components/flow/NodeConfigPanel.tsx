@@ -106,16 +106,21 @@ export function NodeConfigPanel({ selectedNode, edges, approverRoles = [], roleD
               <div className="space-y-1.5">
                 <label className="text-xs font-medium text-gray-700">审批人类型</label>
                 <div className="flex gap-4">
-                  <label className="flex items-center gap-1.5 text-sm text-gray-700 cursor-pointer"><input type="radio" name={`at-${selectedNode.id}`} checked={approverType === 'role'} onChange={() => onUpdateNode(selectedNode.id, { approverType: 'role', approverId: '', approverRole: '' })} className="text-blue-600" />按角色</label>
-                  <label className="flex items-center gap-1.5 text-sm text-gray-700 cursor-pointer"><input type="radio" name={`at-${selectedNode.id}`} checked={approverType === 'user'} onChange={() => onUpdateNode(selectedNode.id, { approverType: 'user', approverId: '', approverRole: '' })} className="text-blue-600" />指定用户</label>
+                  <label className="flex items-center gap-1.5 text-sm text-gray-700 cursor-pointer"><input type="radio" name={`at-${selectedNode.id}`} checked={approverType === 'role'} onChange={() => onUpdateNode(selectedNode.id, { approverType: 'role', approverId: '', approverRole: '', approverRoleName: '' })} className="text-blue-600" />按角色</label>
+                  <label className="flex items-center gap-1.5 text-sm text-gray-700 cursor-pointer"><input type="radio" name={`at-${selectedNode.id}`} checked={approverType === 'user'} onChange={() => onUpdateNode(selectedNode.id, { approverType: 'user', approverId: '', approverRole: '', approverRoleName: '' })} className="text-blue-600" />指定用户</label>
                 </div>
               </div>
               {approverType === 'role' ? (
                 <div className="space-y-1.5">
                   <label className="text-xs font-medium text-gray-700">审批角色</label>
-                  <select className={selectCls} value={selectedNode.data.approverRole} onChange={(e) => { if (e.target.value) onUpdateNode(selectedNode.id, { approverRole: e.target.value }); }}>
+                  <select className={selectCls} value={selectedNode.data.approverRole} onChange={(e) => {
+                    if (e.target.value) {
+                      const selectedRole = roleDetails.find(r => r.roleCode === e.target.value);
+                      onUpdateNode(selectedNode.id, { approverRole: e.target.value, approverRoleName: selectedRole?.roleName || "" });
+                    }
+                  }}>
                     <option value="">选择角色</option>
-                    {roleDetails.length > 0 ? roleDetails.map((r) => <option key={r.roleCode} value={r.roleCode}>{r.roleName}（{r.roleCode}）</option>) : approverRoles.map((r) => <option key={r} value={r}>{r}</option>)}
+                    {roleDetails.length > 0 ? roleDetails.map((r) => <option key={r.roleCode} value={r.roleCode}>{r.roleName}（{r.roleCode}）</option>) : approverRoles.map((r) => <option key={r} value={r}>「{r}」（编码）</option>)}
                   </select>
                 </div>
               ) : (
@@ -138,7 +143,7 @@ export function NodeConfigPanel({ selectedNode, edges, approverRoles = [], roleD
                         <div className="absolute z-50 mt-1 w-full max-h-48 overflow-y-auto rounded-md border border-gray-200 bg-white shadow-lg">
                           {userResults.map((u) => (
                             <button key={u.id} type="button" className={`w-full px-3 py-2 text-left text-sm hover:bg-blue-50 flex items-center gap-2 ${String(u.id) === approverId ? 'bg-blue-50' : ''}`}
-                              onClick={() => { onUpdateNode(selectedNode.id, { approverId: String(u.id), approverRole: '' }); setShowUserDrop(false); setUserQ(''); }}>
+                              onClick={() => { onUpdateNode(selectedNode.id, { approverId: String(u.id), approverRole: '', approverRoleName: '' }); setShowUserDrop(false); setUserQ(''); }}>
                               <UserCheck className="size-3.5 text-blue-500 shrink-0" /><span className="font-medium">{u.realName || u.username}</span><span className="text-xs text-gray-400">ID:{u.id}</span>
                             </button>
                           ))}
@@ -160,6 +165,15 @@ export function NodeConfigPanel({ selectedNode, edges, approverRoles = [], roleD
           {t === 'condition' && (
             <>
               <div className="space-y-1.5"><label className="text-xs font-medium text-gray-700">条件表达式</label><textarea rows={3} className="flex w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 resize-none" value={selectedNode.data.conditionExpression} onChange={(e) => onUpdateNode(selectedNode.id, { conditionExpression: e.target.value })} /></div>
+              <details className="text-[11px] text-gray-400">
+                <summary className="cursor-pointer hover:text-gray-600">可用字段别名</summary>
+                <div className="mt-1 space-y-0.5 pl-2 border-l-2 border-gray-200">
+                  <div><code className="bg-gray-100 px-1 rounded">申请金额</code> → amount, compensationAmount, estimatedAmount</div>
+                  <div><code className="bg-gray-100 px-1 rounded">资产ID</code> → assetId</div>
+                  <div><code className="bg-gray-100 px-1 rounded">目标部门</code> → targetDeptId, responsibleDeptId</div>
+                  <div><code className="bg-gray-100 px-1 rounded">原因</code> → reason, description</div>
+                </div>
+              </details>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5"><label className="text-xs font-medium text-gray-700">满足标签</label><input className="flex h-9 w-full rounded-md border border-gray-200 bg-white px-3 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100" value={selectedNode.data.trueLabel} onChange={(e) => onUpdateNode(selectedNode.id, { trueLabel: e.target.value })} /></div>
                 <div className="space-y-1.5"><label className="text-xs font-medium text-gray-700">不满足标签</label><input className="flex h-9 w-full rounded-md border border-gray-200 bg-white px-3 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100" value={selectedNode.data.falseLabel} onChange={(e) => onUpdateNode(selectedNode.id, { falseLabel: e.target.value })} /></div>

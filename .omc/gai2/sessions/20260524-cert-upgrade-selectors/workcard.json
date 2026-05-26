@@ -1,0 +1,26 @@
+{
+  "session_id": "20260524-cert-upgrade-selectors",
+  "directive": "调研并升级 CERT-02/03/08 三个认证测试用例的选择器到新版页面。当前认证测试 10/10 PASS，但 audit 发现断言与新版 DOM 存在系统性偏差：CERT-02 的 heading 角色断言因新版 PageHeader 渲染方式不同而可能挂起或返回空；CERT-03 的创建资产流程从内联模态改为独立页面跳转；CERT-08 的审批操作从行内按钮改为 Dialog 内组件。需要逐项分析根因、确认实际 DOM 变化、并修复测试断言以真正匹配新版 UI 行为。",
+  "classification": "Medium",
+  "auto_mode": true,
+  "phase": "cert-upgrade-selectors",
+  "acceptance_checks": [
+    "AC-1: CERT-02 页面模块测试的选择器正确匹配新版 PageHeader DOM",
+    "AC-2: CERT-03 资产台账测试的选择器正确匹配新版独立页面跳转流程",
+    "AC-3: CERT-08 审批与工单测试的选择器正确匹配新版 Dialog 操作组件",
+    "AC-4: 修复后认证测试全部 10 个用例 PASS（CERT-01~CERT-10）",
+    "AC-5: 前端源码交叉确认修复根因无误"
+  ],
+  "evidence_to_collect": [
+    "CERT-02 的前端 PageHeader 组件实际渲染的 aria-role/文本",
+    "CERT-03 的创建资产页面路由和表单元素实际 DOM",
+    "CERT-08 的 ApprovalActionPanel 组件交互路径",
+    "修复后的测试运行日志（PASS/FAIL）"
+  ],
+  "open_risks": [
+    "PageHeader 可能使用 h1/h2/div 而不是 getByRole('heading')",
+    "创建资产页面可能有多个版本（AssetFormPage vs 旧内联模态）",
+    "审批操作的 Dialog 可能有异步加载问题"
+  ],
+  "artifact_dir": ".omc/gai2/sessions/20260524-cert-upgrade-selectors"
+}

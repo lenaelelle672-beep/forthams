@@ -1,0 +1,50 @@
+{
+  "swarm_role": "delivery-minimal-change",
+  "stance": "测试适配为主 + 最小前端安全补丁。UI 文案、token key、路由路径等差异应由测试适配（零回归风险），仅认证守卫缺失需要前端 5 行最小修复。",
+  "findings": [
+    "所有 10 项测试失败可分为两类：① 测试与前端预期不一致（9项）② 前端真正的安全缺陷（1项，认证守卫缺失）",
+    "测试种子写 localStorage('ams_auth_token') 但 http.ts 读 localStorage('auth_token') — 两者 key 不一致导致所有验证流程的 API 请求缺失 Bearer token",
+    "5 个页面 heading 文字不匹配，但前端标题是经过设计的，测试应适配而非修改前端",
+    "登录按钮文字 '登录系统' vs 测试预期 '登录并进入仪表板' — 纯文案差异",
+    "路由路径 /approval 少 's' — 测试 typo",
+    "CERT-01 登录后检查 heading '资产台账管理' 但实际跳转到 /dashboard（标题'仪表板'）",
+    "15 处测试修改集中在 1 个文件，比 8-12 处前端修改分布在 5+ 个文件风险更低"
+  ],
+  "recommendation": {
+    "approach": "测试适配 + 最小 auth guard",
+    "details": "修改 forthams-certification.spec.ts 的 15 处字符/路径/选择器对齐当前前端实现；在 AppLayout.tsx 添加 5 行 token 检查；不动其他前端文件",
+    "test_changes": [
+      "L28-29: page.goto('/assets') → page.goto('/login') 绕过 auth guard 依赖",
+      "L33,39: button name /登录并进入仪表板/ → /登录系统/",
+      "L35,41,45: localStorage('ams_auth_token') → localStorage('auth_token')",
+      "L40: heading '资产台账管理' → '仪表板'",
+      "L54: '资产台账管理' → '资产台账'",
+      "L57: 'RFID资产盘点' → '盘点任务列表'",
+      "L61: '审批流程管理' → '审批中心'",
+      "L62: '业务流程列表' → '业务流程管理'",
+      "L63: '数据统计分析' → '数据分析'",
+      "L73: getByLabel('查看通知') → page.locator('a[href=\"/notifications\"]')",
+      "L76: placeholder '搜索资产...' → '搜索页面或业务数据...'",
+      "L83: placeholder '搜索资产名称或编号...' → '搜索编号、名称...'",
+      "L236: page.goto('/approval') → page.goto('/approvals')",
+      "L336: seed 写入 'ams_auth_token' → 'auth_token'"
+    ],
+    "frontend_changes": [
+      "AppLayout.tsx 组件函数开头添加 token 检查"
+    ],
+    "estimated_risk": "low"
+  },
+  "risks": [
+    "AppLayout token 检查需排除 /login 路径避免死循环",
+    "修改测试后 CERT-01 失去了 '未登录访问受保护页面→重定向' 的验证覆盖",
+    "sessionStorage auth_token 在浏览器关闭后消失，种子写 localStorage 可跨会话持久"
+  ],
+  "evidence_needed": [
+    "确认 react-router 的 Navigate 组件在 AppLayout lazy 组件中正常工作",
+    "确认改后 playwright test --grep CERT-01 通过"
+  ],
+  "open_questions": [
+    "长期 token key 策略：统一 auth_token + sessionStorage 还是允许 localStorage fallback？",
+    "CERT-01 原始安全验证是否需在独立安全测试套件中覆盖？"
+  ]
+}

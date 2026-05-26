@@ -1,0 +1,84 @@
+{
+  "iteration": 1,
+  "iteration_type": "review-driven-rework",
+  "rework_reason": "Reviewer 发现 2 个严重问题：(1) certification.spec.ts 被修改，违反 write_action_guard；(2) IMP-2 Tab 切换检测缺失",
+  "changed_files": [
+    "testFinish/tests/playwright/forthams-e2e.spec.ts"
+  ],
+  "restored_files": [
+    "testFinish/tests/playwright/forthams-certification.spec.ts"
+  ],
+  "added_files": [],
+  "repair_actions": [
+    {
+      "id": "fix-1",
+      "severity": "critical",
+      "action": "恢复 certification.spec.ts 到 .bak 原始版本",
+      "method": "cp forthams-certification.spec.ts.bak forthams-certification.spec.ts",
+      "verification": "diff 确认两个文件完全一致（598 行）"
+    },
+    {
+      "id": "fix-2",
+      "severity": "medium",
+      "action": "在 e2e 文件中添加 IMP-2 /disposals Tab 切换检测",
+      "method": "在 extractNavRoutesFromDOM 函数后添加 scanDisposalTabs 辅助函数（第 69-115 行），在测试套件中添加新 test case（第 287-337 行）",
+      "verification": "括号平衡检查通过，关键结构 scanDisposalTabs + IMP-2 test 均存在，文件从 237 行增至 338 行"
+    }
+  ],
+  "commands_run": [
+    {
+      "command": "cp forthams-certification.spec.ts.bak forthams-certification.spec.ts",
+      "result": "passed",
+      "notes": "恢复认证测试文件到原始版本"
+    },
+    {
+      "command": "diff forthams-certification.spec.ts.bak forthams-certification.spec.ts",
+      "result": "passed",
+      "notes": "确认两个文件完全一致，恢复成功"
+    },
+    {
+      "command": "wc -l forthams-certification.spec.ts",
+      "result": "passed",
+      "notes": "确认恢复后文件为 598 行（原始版本）"
+    },
+    {
+      "command": "括号平衡检查 e2e 文件",
+      "result": "passed",
+      "notes": "Braces/Parens/Brackets 全部平衡，文件 339 行（含换行符），含 scanDisposalTabs 函数和 IMP-2 test"
+    },
+    {
+      "command": "npx playwright test forthams-e2e.spec.ts",
+      "result": "skipped",
+      "notes": "需要后端服务运行，按 directive 跳过执行"
+    },
+    {
+      "command": "npx playwright test forthams-certification.spec.ts",
+      "result": "skipped",
+      "notes": "需要后端服务运行，按 directive 跳过执行"
+    }
+  ],
+  "verification_results": [
+    "[fix-1] certification.spec.ts 已恢复为 .bak 原始版本（598 行），diff 确认完全一致",
+    "[fix-1] adjudication.json write_action_guard 第 3 条'不修改认证测试文件'已修复",
+    "[fix-2] scanDisposalTabs 辅助函数已添加（第 69-115 行），支持 [role='tab'] 和中文按钮名选择器",
+    "[fix-2] IMP-2 test case 已添加（第 287-337 行），独立登录 + /disposals 导航 + Tab 遍历检测",
+    "[fix-2] Tab 检测逻辑：记录基线 API 错误数 → 点击 Tab → 等待 500ms → 检查增量错误和 React 崩溃",
+    "[fix-2] 括号平衡检查全部通过：Braces=0, Parens=0, Brackets=0",
+    "[fix-2] 文件从 237 行增至 338 行，增量修改不影响现有测试逻辑",
+    "E2E 测试未实际运行（需后端服务），代码结构和语法已验证"
+  ],
+  "minions_execution": {
+    "adjudication_file_read": true,
+    "selected_source": "refine",
+    "write_intent_preserved": true,
+    "degradation_blocked": false,
+    "iteration": 1,
+    "rework_from_review": true
+  },
+  "residual_risks": [
+    "Tab 选择器 [role='tab'] 和中文按钮名可能在 /disposals 页面未匹配到任何元素（取决于实际 UI 实现），但不会导致测试失败（仅记录日志）",
+    "IMP-2 test 独立登录增加测试时间，但 120s 超时应足够",
+    "后端 API 500 问题（disposals/list、disposals/stats 等）仍存在，实际运行时 Tab 切换可能触发 API 错误",
+    "无法实际运行测试验证（后端服务不可用），仅做了静态验证"
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "classification": "Heavy",
+  "mcp_tools": [],
+  "scope": [
+    "testFinish/tests/playwright/forthams-certification.spec.ts",
+    "testFinish/tests/playwright/forthams-e2e.spec.ts",
+    "testFinish/.gitlab-ci.yml",
+    "testFinish/Jenkinsfile",
+    "testFinish/config/forthams.example.json",
+    "testFinish/playwright.config.ts"
+  ],
+  "risks": [
+    "CERT-04 select strict mode 可能是前端有 2 个 select 元素共存，.first() 未有效解决歧义，需改用更精确的选择器",
+    "CERT-09 部门 placeholder timeout 可能是 DOM 渲染时序问题或 placeholder 文本与 UI 不匹配",
+    "废弃 forthams-certification.spec.ts 可能导致 P0-P2 认证覆盖丢失，需确保新 E2E 测试覆盖全部测试场景",
+    "CI 配置修改可能影响其他项目的 CI 执行流程",
+    "E2E 测试需要真实后端 API 支持，CI 环境中需配置 BASE_URL",
+    "表单提交闭环测试涉及数据库写操作，需要清理机制避免测试数据污染"
+  ],
+  "dependencies": [
+    "Playwright E2E 测试环境（已安装）",
+    "forthAMS 后端 Java 服务运行中",
+    "forthAMS 前端 Vite dev server 运行中",
+    "GitLab CI / Jenkins 环境变量（BASE_URL, API_BASE_URL）",
+    "testFinish/config/forthams.example.json 项目配置"
+  ],
+  "recommended_phases": [
+    "audit",
+    "debate",
+    "builder",
+    "reviewer"
+  ],
+  "acceptance_hints": [
+    "AC-1: npx playwright test tests/playwright/forthams-certification.spec.ts --project=chromium → 10/10 PASS",
+    "AC-2: CI 配置新增 forthams-e2e job，触发后 forthams-e2e.spec.ts 被执行",
+    "AC-3: forthams-e2e.spec.ts 包含至少一个完整闭环测试",
+    "AC-4: forthams-certification.spec.ts 被标记 @deprecated 且移出默认运行范围"
+  ]
+}

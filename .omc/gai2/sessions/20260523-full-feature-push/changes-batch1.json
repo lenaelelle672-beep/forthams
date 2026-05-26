@@ -1,0 +1,35 @@
+{
+  "batch": 1,
+  "completed_at": "2026-05-23T08:30:00Z",
+  "changed_files": [
+    "frontend/src/api/role.ts",
+    "frontend/src/pages/settings/SettingsPage.tsx",
+    "frontend/src/pages/locations/LocationsPage.tsx",
+    "frontend/src/router/index.tsx",
+    "frontend/src/layouts/AppLayout.tsx"
+  ],
+  "added_files": [
+    "frontend/src/pages/maintenance/MaintenancePage.tsx"
+  ],
+  "commands_run": [
+    {
+      "command": "npx tsc --noEmit (filtered to changed files)",
+      "result": "passed",
+      "notes": "修改的6个文件均无 TypeScript 错误。其余错误均为预存在的（GraphifyKnowledgeGraph、DepreciationCard、ImportPanel 等），不在本批次修改范围内。"
+    }
+  ],
+  "verification_results": [
+    "任务1: MaintenancePage.tsx 创建成功，包含完整 zod schema（maintenanceSchema 覆盖9个字段）、useQuery 分页列表、useMutation CRUD、UpcomingAlert（getUpcoming(30)）、新增/编辑弹窗、删除确认弹窗",
+    "任务2: frontend/src/api/role.ts 创建成功，导出 getRoleList/getAllRoles/createRole/updateRole/deleteRole 函数及 RoleItem/RoleCreatePayload/RoleUpdatePayload 类型",
+    "任务3: SettingsPage.tsx 修改成功 — TabKey 添加 'roles'、TABS 数组添加角色管理 Tab（UserCheck 图标）、QUERY_KEYS.roles 添加、roleSchema 校验（roleName/roleCode/description）、RolesTab 组件完整实现（useQuery+useMutation+zod safeParse）、validTabs 添加 'roles'、主体渲染添加 RolesTab",
+    "任务4: LocationsPage.tsx 修改成功 — 添加 zod import、locationSchema 定义（locationName/locationCode）、LocationFormDialog 添加 errors state、handleSubmit 使用 locationSchema.safeParse 校验、Input 显示 error 属性",
+    "任务5: router/index.tsx 修改成功 — 添加 MaintenancePage lazy import、路由配置添加 { path: 'maintenance', element: S(MaintenancePage) }",
+    "任务6: AppLayout.tsx 修改成功 — 导入 Wrench 图标、运营管理分组添加 { path: '/maintenance', label: '维保管理', icon: Wrench }"
+  ],
+  "residual_risks": [
+    "maintenanceService.list() 返回类型在 MaintenancePage 中使用 (res as any) 处理，因为 http client 类型链在该文件的泛型参数配置较复杂。功能正常但类型不够严格。",
+    "RolesTab 中 getRoleList 返回的 data 使用 (res as any)?.records，因为 http client 对 T 的推断路径需要 ApiResponse 包装，建议后续统一类型。",
+    "LocationsPage 的 getLocationTree 类型在 api/base.ts 声明为 ApiResponse<Location[]>，与 http 拦截器解包行为有轻微类型不一致（预存在问题，已通过 as any 绕过）。",
+    "stash 操作导致部分文件需要多次恢复，建议后续避免 git stash 在 builder 阶段。"
+  ]
+}

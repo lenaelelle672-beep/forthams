@@ -1,0 +1,25 @@
+{
+  "session_id": "20260524-flash-testfinish",
+  "directive": "/gai2:flash 双任务：1) 将本次测试经验整合到 testFinish 项目（~/project/Project/testFinish），包括自动路由发现、API 500 修复模式、深层表单页验证策略、认证测试适配经验等；2) 对修改出来的新页面新接口启用业务校验，确保功能完整，保证 100 分通过。",
+  "classification": "Heavy",
+  "phase": "flash-integration",
+  "auto_mode": true,
+  "flash_mode": true,
+  "acceptance_checks": [
+    "AC-1: 测试经验成功整合到 testFinish，新增测试用例或验证规则 ≥ 3 条",
+    "AC-2: 新页面/新接口完成业务校验，所有校验规则覆盖核心业务逻辑",
+    "AC-3: 所有校验测试通过，达到 100 分",
+    "AC-4: 已有认证测试不因变更而破坏（regression PASS）"
+  ],
+  "evidence_to_collect": [
+    "testFinish 新增的测试用例/校验规则列表",
+    "新页面新接口业务校验的测试结果",
+    "回归测试结果"
+  ],
+  "open_risks": [
+    "部分深层页面可能仍依赖后端特定数据状态",
+    "前端 UI 版本差异可能导致校验测试的定位器匹配失败",
+    "并行任务需要合理的依赖顺序协调"
+  ],
+  "artifact_dir": ".omc/gai2/sessions/20260524-flash-testfinish"
+}

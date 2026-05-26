@@ -1,0 +1,20 @@
+{
+  "session_id": "20260524-cert-fix",
+  "directive": "修复认证回归测试 forthams-certification.spec.ts 中 CERT-03~CERT-10 共 8 项 pre-existing 失败问题。失败原因已知为 mock 数据/UI 预期不匹配（如 toast 文本差异、UI 选择器不匹配、mock 路由未触发），需要逐一分析根因并修复测试断言以匹配实际 UI 表现。",
+  "classification": "Medium",
+  "phase": "cert-fix",
+  "acceptance_checks": [
+    "AC-1: CERT-03~CERT-10 全部 PASS",
+    "AC-2: CERT-01~CERT-02 仍然 PASS（无回归）",
+    "AC-3: E2E 测试 5/5 仍然 PASS（无回归）"
+  ],
+  "evidence_to_collect": [
+    "修复后认证测试完整运行结果",
+    "修复后 E2E 测试运行结果"
+  ],
+  "open_risks": [
+    "UI 文本差异可能是 SidebarLayout 和 AppLayout 内容差异导致",
+    "部分 mock 数据可能与实际页面渲染不一致"
+  ],
+  "artifact_dir": ".omc/gai2/sessions/20260524-cert-fix"
+}

@@ -1,0 +1,52 @@
+{
+  "classification": "Heavy",
+  "mcp_tools": [],
+  "scope": [
+    "backend/src/main/java/com/ams/config/SecurityConfig.java",
+    "backend/src/main/java/com/ams/controller/DashboardController.java",
+    "backend/src/main/java/com/ams/controller/WorkflowDefinitionController.java",
+    "backend/src/main/java/com/ams/service/WorkflowDefinitionService.java",
+    "backend/src/main/java/com/ams/entity/WorkflowDefinition.java",
+    "backend/src/main/java/com/ams/mapper/WorkflowDefinitionMapper.java",
+    "frontend/src/pages/bigscreen/BigScreenPage.tsx",
+    "frontend/src/pages/bigscreen/BigScreen3DPage.tsx",
+    "frontend/src/router/index.tsx",
+    "frontend/src/app/routes.ts",
+    "frontend/src/pages/workflow/WorkflowCenterPage.tsx",
+    "frontend/src/pages/workflow/WorkflowDesignerPage.tsx",
+    "frontend/src/constants/workflowBusiness.ts",
+    "frontend/src/api/workflow.ts"
+  ],
+  "risks": [
+    "【HIGH】权限配置改动影响范围大，SecurityConfig 和路由守卫修改可能影响所有页面",
+    "【HIGH】后端 WorkflowDefinitionService.TEMPLATES 和 requireTemplate() 硬编码需架构级解除",
+    "【HIGH】'100分完整度'范围模糊，无明确标准，需 audit 先行收敛",
+    "【MEDIUM】前后端双路由系统共存，大屏功能分散",
+    "【MEDIUM】自定义工作流可能需数据库迁移，需兼容现有数据"
+  ],
+  "dependencies": [
+    "需要先确认大屏页面实际在用的前端路由",
+    "自定义工作流依赖后端解除硬编码后才能开发前端入口",
+    "权限修复依赖理解现有用户-角色-权限模型"
+  ],
+  "recommended_phases": ["audit", "drafter", "refiner", "adjudication", "builder", "reviewer"],
+  "subtasks": [
+    {"id": "T1", "title": "大屏页面权限修复", "priority": "P0", "depends_on": []},
+    {"id": "T2", "title": "自定义工作流 - 后端架构解除", "priority": "P0", "depends_on": []},
+    {"id": "T3", "title": "自定义工作流 - 前端入口与向导", "priority": "P0", "depends_on": ["T2"]},
+    {"id": "T4", "title": "工作流设计器可配置功能增强", "priority": "P1", "depends_on": ["T2"]},
+    {"id": "T5", "title": "数据库迁移（如需）", "priority": "P0", "depends_on": ["T2"]},
+    {"id": "T6", "title": "全页面业务功能 audit", "priority": "P0", "depends_on": []},
+    {"id": "T7", "title": "全页面业务功能修复", "priority": "P1", "depends_on": ["T6"]},
+    {"id": "T8", "title": "编译验证与集成测试", "priority": "P1", "depends_on": ["T1","T3","T4","T7"]}
+  ],
+  "priority_order": ["T2", "T1", "T5", "T6", "T3", "T4", "T7", "T8"],
+  "acceptance_hints": [
+    "AC-1: 大屏页面权限控制正确——有权限用户可正常访问，无权限用户有友好提示",
+    "AC-2: 工作流中心出现'新建自定义流程'入口",
+    "AC-3: 自定义流程可配置节点、审批人",
+    "AC-4: 编译通过，构建通过",
+    "AC-5: 代码质量符合规范"
+  ],
+  "triage_ts": "2026-05-25T05:44:00Z"
+}

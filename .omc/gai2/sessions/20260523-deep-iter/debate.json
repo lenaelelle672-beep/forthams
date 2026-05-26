@@ -1,0 +1,197 @@
+{
+  "session_id": "20260523-deep-iter",
+  "debated_at": "2026-05-23T18:30:00+08:00",
+  "topics": [
+    {
+      "topic": "议题1：Disposal 处置架构设计 — 强制审批流 vs 双模式",
+      "options": [
+        {
+          "id": "A",
+          "description": "强制审批流：所有处置操作必须先创建 ApprovalProcess，审批通过后通过 handleBusinessOutcome 回调执行 DisposalService 资产状态变更",
+          "pros": [
+            "现有代码架构（Controller 提示语、ApprovalService 分发、DisposalService 业务逻辑）全部围绕强制审批流构建，实施成本最低",
+            "工作流引擎已集成支持灵活配置审批步骤，低价值资产可通过配置简化审批（如 1 步自动审批），无需双模式",
+            "每次资产状态变更都有审批流程关联，保证审计追踪完整",
+            "单一处理路径，逻辑清晰，无分支复杂度"
+          ],
+          "cons": [
+            "紧急处置场景（如安全隐患资产立即报废）不能绕过审批流程",
+            "所有处置操作增加审批等待延迟（但工作流引擎支持单步审批缓解此问题）"
+          ]
+        },
+        {
+          "id": "B",
+          "description": "直接处置 + 审批双模式：允许低价值或紧急场景直接处置，高价值资产走审批流程",
+          "pros": [
+            "灵活应对紧急场景，支持管理员绕过审批直接处置",
+            "低价值资产可快速处置减少操作步骤"
+          ],
+          "cons": [
+            "需要在 DisposalService 和前端增加路由判断和配置开关，复杂度显著增加",
+            "直接处置绕过审批可能产生合规风险（资产处置未经审批就变更状态）",
+            "与现有代码的设计意图冲突（Controller 消息明确说必须通过审批流程）",
+            "紧急场景可通过工作流配置 1 步审批等效实现，无需架构级双模式"
+          ]
+        }
+      ],
+      "recommended_option": "A",
+      "rationale": "现有代码（Controller/ApprovalService/DisposalService/WorkflowDefinition）全部围绕强制审批流构建，实施双模式需要对现有架构做较大改动。紧急场景可通过工作流引擎配置快速审批通道（1 步自动审批或指定低阈值资产免审批）等效实现，无需引入架构级双模式。",
+      "rejected_options": [
+        "B) 直接处置+审批双模式：增加不必要的架构复杂度。紧急场景可通过工作流引擎的灵活配置等效满足。现有代码强制审批流的意图明确。"
+      ]
+    },
+    {
+      "topic": "议题2：审批回调模式 — processType 路由分发 vs 事件驱动 vs AOP",
+      "options": [
+        {
+          "id": "A",
+          "description": "processType 路由分发：在 ApprovalService.handleBusinessOutcome 中使用 switch/case 根据 processType 分发到不同 Service",
+          "pros": [
+            "已有完整实现（handleBusinessOutcome 方法已在生产运行），仅需完善 handleRejection 的分发缺失",
+            "回调与审批在同一 @Transactional 事务内，保证数据最终一致性",
+            "新增审批类型只需增加一个 case，模式清晰",
+            "调试和追踪简单，调用链在代码中显式可见",
+            "当前项目无事件基础设施，直接调用是最小变更路径"
+          ],
+          "cons": [
+            "switch/case 集中管理，随着审批类型增多代码会逐渐膨胀",
+            "新增审批类型需要修改 ApprovalService 代码（违反开闭原则）"
+          ]
+        },
+        {
+          "id": "B",
+          "description": "事件驱动：引入 Spring ApplicationEvent，业务 Service 监听审批完成事件执行回调",
+          "pros": [
+            "松耦合，ApprovalService 无需知道业务 Service 的存在",
+            "扩展性好，新增审批类型只需新增 Listener 无需修改核心代码",
+            "支持异步处理（@Async），审批流程不阻塞"
+          ],
+          "cons": [
+            "需要引入 Spring Event 基础设施和事务事件管理",
+            "异步事件模式下事务回滚与已发布事件之间需要补偿机制（最终一致性）",
+            "当前项目无事件基础设施先例，引入后增加认知负担",
+            "对于回调这种强一致性需求，异步事件不适合（同步事件与直接调用无区别）"
+          ]
+        },
+        {
+          "id": "C",
+          "description": "AOP 切面：使用 @Aspect 拦截 ApprovalService.approve 方法执行后的回调",
+          "pros": [
+            "集中管理所有审批后续操作",
+            "不侵入业务 Service 代码"
+          ],
+          "cons": [
+            "切面逻辑隐式，业务代码中看不到回调触发点，调试困难",
+            "切点表达式随代码变动需维护，容易遗漏或误拦截",
+            "新增审批类型需要修改切面代码，复杂度不低于 switch/case"
+          ]
+        }
+      ],
+      "recommended_option": "A",
+      "rationale": "handleBusinessOutcome 已有完整实现并在线运行，当前只需补齐 handleRejection() 中的 ASSET_TRANSFER/ASSET_CLEARANCE/ASSET_SCRAP/ASSET_COMPENSATION 驳回处理，以及修复 handleDisposalOutcome 中 operatorId 传 null 的问题。这是最小变更路径，且回调与审批在同一事务内保证了数据一致性。事件驱动对于当前中小项目过度设计，AOP 切面调试困难不推荐。",
+      "rejected_options": [
+        "B) 事件驱动：回调与审批需要同一事务保证强一致性，异步事件需要 Saga 或事务消息机制过于复杂。同步事件与直接调用无区别，增加间接层和认知负担。",
+        "C) AOP 切面：切面和切点逻辑隐式，新增审批类型需要修改多处配置，维护成本高。对已有 switch 模式的代码是架构级倒退。"
+      ]
+    },
+    {
+      "topic": "议题3：跨页面联动方案 — 宽泛刷新 vs 精确 key vs 事件总线",
+      "options": [
+        {
+          "id": "A",
+          "description": "宽泛刷新：在关键 mutation 成功后使用 queryClient.invalidateQueries({ queryKey: [\"assets\"] }) 刷新所有 assets 相关 cache",
+          "pros": [
+            "成本最低 — AssetFormPage 已使用此模式（第 144 行），验证了可行性",
+            "TanStack Query 内置 staleTime 和去重保护，同一 staleTime 内不会重复请求",
+            "未来新增资产相关 query 自动纳入刷新范围",
+            "一行代码解决所有跨页面刷新问题"
+          ],
+          "cons": [
+            "会刷新所有 [\"assets\"] 前缀 query，可能触发不必要的网络请求",
+            "[\"idle-assets\"]、[\"maintenance\"]、[\"retirement\"] 等独立 key 不在此前缀内，需要额外补充",
+            "宽泛失效导致所有列表页同时刷新，高并发场景可能有性能压力"
+          ]
+        },
+        {
+          "id": "B",
+          "description": "精确关联 key 刷新：在 AssetFormPage 的 mutation 成功后手动调用其他页面的 queryKey 失效",
+          "pros": [
+            "精确定位需要刷新的页面，无多余网络请求",
+            "每个页面按需刷新，性能最优"
+          ],
+          "cons": [
+            "需要维护跨模块 key 映射表，IdleAssetsPage 新增时需同步更新",
+            "人为遗漏导致 stale 数据不刷新，增加 BUG 风险",
+            "代码耦合度增加——AssetFormPage 需要知道 idle-assets/maintenance/disposal 的存在"
+          ]
+        },
+        {
+          "id": "C",
+          "description": "引入事件总线：使用自定义 EventEmitter 或 Zustand store 通知其他页面刷新",
+          "pros": [
+            "松耦合，页面之间不直接依赖",
+            "消息可携带 payload（变更类型、asset ID）实现更细粒度刷新"
+          ],
+          "cons": [
+            "架构复杂度显著增加，需要定义事件类型、监听器注册、生命周期管理",
+            "项目已有 TanStack Query 作为数据层，引入第二套通知机制增加认知负担",
+            "事件总线使得数据流向隐式化，追查 stale 数据困难"
+          ]
+        }
+      ],
+      "recommended_option": "A",
+      "rationale": "AssetFormPage 已使用宽泛刷新模式并验证可行。TanStack Query 的 staleTime 和去重机制避免了无效的网络请求。对于独立 key（[\"idle-assets\"]、[\"maintenance\"]、[\"retirement\"]、[\"disposals\"]），额外在 ~5 个关键页面的 mutation 成功后补充一行 invalidateQueries({ queryKey: [\"assets\"] }) 即可。这是最简路径，无需引入事件总线或维护 key 映射表。",
+      "rejected_options": [
+        "B) 精确关联 key 刷新：页面间 key 映射表需手动维护，IdleAssetsPage 等新增页面容易遗漏。AssetFormPage 需要显式依赖其他模块的 query key，增加耦合。",
+        "C) 事件总线：项目已有 TanStack Query 数据层，引入第二套通知机制（EventEmitter/Zustand）过度设计。事件路由隐式化导致可追踪性下降。"
+      ]
+    },
+    {
+      "topic": "议题4：系统配置存储策略 — 单表 KV 模式 vs 多表结构化 vs 租户隔离",
+      "options": [
+        {
+          "id": "A",
+          "description": "单表 KV + config_group 分区：一张 sys_config 表（config_group, config_key, config_value），SystemConfig 和 SecurityConfig 通过 config_group 区分",
+          "pros": [
+            "实施成本最低 — 1 张表 + 1 套 CRUD + 2 个 API 端点",
+            "新增配置项无需改表结构，INSERT 即可",
+            "config_group 天然支持前端已分离的 SystemConfigTab 和 SecurityTab",
+            "前端只需将 localStorage.setItem/getItem 替换为 API 调用，表单逻辑完全复用",
+            "预留 tenant_id 列，支持未来租户隔离"
+          ],
+          "cons": [
+            "value 为 TEXT 类型，丢失数据库字段类型约束",
+            "查询需要全组加载后反序列化",
+            "无法在数据库层做字段级校验"
+          ]
+        },
+        {
+          "id": "B",
+          "description": "多表结构化：分别创建 sys_system_config 和 sys_security_config 表，每个配置项有独立字段",
+          "pros": [
+            "数据库层有字段类型约束（VARCHAR/INT/BOOLEAN）",
+            "查询性能更好（字段级索引）",
+            "ORM 映射更自然"
+          ],
+          "cons": [
+            "新增配置需改表结构 → 改 Entity → 改 DTO → 改 Mapper → 改 Service → 改前端，变更成本高",
+            "当前仅 14 个配置项，类型多样（字符串/数字/布尔），结构化表需要为每种类型定义不同的列或大量 nullable 列",
+            "两张表各有独立 CRUD，代码量翻倍"
+          ]
+        }
+      ],
+      "recommended_option": "A",
+      "rationale": "单表 KV + config_group 分区方案最务实。当前 14 个配置项未来只会增加不会减少，KV 模式零成本扩展。config_group 字段天然匹配前端已分离的两个 Tab。前端 localStorage 替换为 API 调用后，表单逻辑几乎无需改动。对于租户隔离，sys_config 表追加 tenant_id 字段即可，查询时使用 WHERE tenant_id IN (currentTenant, 'GLOBAL') 实现全局+租户叠加。",
+      "rejected_options": [
+        "B) 多表结构化：每新增一个配置项需要改表结构、改 Entity、改 Mapper，变更成本高。当前 14 个配置项类型多样，结构化设计要为每种类型准备独立列，实际退化为带类型的 KV 模式但更复杂。"
+      ]
+    }
+  ],
+  "overall_recommendations": "四个议题的推荐方案一致指向最小变更路径：1. Disposal 使用强制审批流（沿用现有架构意图，工作流配置满足紧急场景）2. 审批回调保持现有的 switch/case 分发模式（完善 handleRejection 即可）3. 跨页面刷新使用宽泛的 invalidateQueries（~5 处补充 'assets' 前缀失效）4. 系统配置使用单表 KV + config_group 分区 + 预留 tenant_id。执行顺序：议题 2（补齐 handleRejection）→ 议题 1（实现 DisposalController 创建审批流程）→ 议题 3+4（独立并行）。",
+  "risks": [
+    "handleRejection 不完整风险：当前处置/赔偿审批驳回或取消时不会回滚资产状态，资产可能永久停留 PENDING_TRANSFER/PENDING_CLEARANCE 等中间状态。必须在实现处置业务前补齐。",
+    "operatorId 缺失风险：handleDisposalOutcome 回调 DisposalService 时传入的 operatorId 为 null，导致资产变更日志操作人字段为空。需从 ApprovalRecord 或 ApprovalProcess 获取当前操作人。",
+    "前端跨页面刷新不足风险：IdleAssetsPage([\"idle-assets\"])、MaintenancePage([\"maintenance\"])、RetirementFormPage([\"retirement\"]) 等独立 query key 不会被 [\"assets\"] 前缀覆盖。需逐个页面补充 invalidate。",
+    "系统配置迁移风险：从 localStorage 切换到后端 API 后，已保存的用户配置会丢失。需在首次加载时执行 localStorage → API 的迁移逻辑（一次性的数据导入）。"
+  ]
+}

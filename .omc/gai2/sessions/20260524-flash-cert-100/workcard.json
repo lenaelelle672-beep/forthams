@@ -1,0 +1,28 @@
+{
+  "schema_version": 2,
+  "session_id": "20260524-flash-cert-100",
+  "directive": "调研并修复认证测试(forthams-certification.spec.ts)中的失败项，保证所有页面的功能及业务逻辑正确。当前状态：8/10 PASS，CERT-04(重要设备保养记录校验selectOption严格模式)和CERT-09(系统设置部门管理placeholder超时)失败。需要分析根因、修复、验证，最终达到10/10 PASS 100%通过率。",
+  "classification": "Medium",
+  "phase": "cert-100",
+  "auto_mode": true,
+  "flash_mode": true,
+  "acceptance_checks": [
+    "AC-1: CERT-01~CERT-13 全部通过（10/10 原始认证测试 PASS）",
+    "AC-2: CERT-04 修复：selectOption严格模式问题修复，locator选择器精确到单个元素",
+    "AC-3: CERT-09 修复：部门管理placeholder超时问题修复",
+    "AC-4: 已有通过的测试不因修复而破坏回归",
+    "AC-5: E2E 自发现测试无回归"
+  ],
+  "evidence_to_collect": [
+    "Playwright 测试运行结果（JSON report）",
+    "CERT-04 修复前后对比证据",
+    "CERT-09 修复前后对比证据",
+    "回归测试结果"
+  ],
+  "open_risks": [
+    "认证测试使用mock数据而非真实后端，修复后需确保mock行为与实际UI一致",
+    "部分UI组件可能因版本迭代发生变化导致选择器失效",
+    "后端服务未启动时Playwright无法运行全量测试"
+  ],
+  "artifact_dir": ".omc/gai2/sessions/20260524-flash-cert-100"
+}

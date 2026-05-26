@@ -150,7 +150,7 @@ public class SearchService {
         try {
             List<Vendor> vendors = vendorMapper.selectList(
                     new QueryWrapper<Vendor>()
-                            .like("vendor_name", keyword)
+                            .like("name", keyword)
                             .or()
                             .like("vendor_code", keyword)
                             .or()

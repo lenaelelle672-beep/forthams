@@ -1,0 +1,32 @@
+{
+  "session_id": "20260525-flash-wf-save",
+  "mode": "flash",
+  "auto_mode": true,
+  "flash_model_routing": {
+    "orchestrator": "zai-coding-plan/glm-5.1",
+    "all_gai2_subagents": "opencode-go/deepseek-v4-flash"
+  },
+  "created_at": "2026-05-25T09:52:00Z",
+  "directive": "修复工作流页面两个问题：1) /workflows 页面「新建流程」和「从模板创建」无法正确保存（保存链路缺失/断裂）；2) 工作流节点上的审批角色显示乱码，需要追溯角色数据来源并修复显示。同时回答用户问题：角色从哪里定义、在哪修改或新建。",
+  "phase": "draft",
+  "owner": "gai2-flash-orchestrator",
+  "acceptance_checks": [
+    "AC-WF-1: 「新建流程」创建后能正确保存到后端（前端API调用正确 + 后端持久化成功）",
+    "AC-WF-2: 「从模板创建」选择模板后能正确保存到后端",
+    "AC-WF-3: 审批角色显示正常（无乱码），角色名称与后端数据一致",
+    "AC-WF-4: 角色来源可追溯——前端能正确获取和显示角色列表，后端角色数据结构正确",
+    "AC-WF-5: 编译通过，构建通过，无新增编译错误"
+  ],
+  "evidence_to_collect": [
+    "前端工作流保存API调用链路（请求URL、请求体、响应）",
+    "后端保存端点日志或代码确认",
+    "审批角色数据来源（数据库表/API接口）",
+    "角色显示组件代码（排查乱码原因）"
+  ],
+  "open_risks": [
+    "保存链路可能涉及多个前端组件和后端服务，需要完整追踪",
+    "乱码可能是编码问题或数据结构不匹配",
+    "角色管理可能需要新建管理页面"
+  ],
+  "artifact_dir": ".omc/gai2/sessions/20260525-flash-wf-save"
+}

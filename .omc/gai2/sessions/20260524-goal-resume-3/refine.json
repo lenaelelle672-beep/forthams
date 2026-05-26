@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "agent": "gai2-refiner",
+  "model_route": "zai-coding-plan/glm-5.1",
+  "fallback_used": false,
+  "fallback_labels": [],
+  "verdict": "accept_with_refinements",
+  "preserved_from_draft": [
+    "visitAndCheck 辅助函数设计",
+    "visitedUrls Set 去重机制",
+    "API 错误监听和 React 崩溃监听",
+    "空白页检测 bodyLen >= 5",
+    "waitUntil: 'networkidle' + waitForTimeout(1000)",
+    "测试超时 180s"
+  ],
+  "improvements": [
+    "IMP-1: Builder 必须确保完整保留现有测试的登录流程（goto /login → fill admin/admin123 → click submit → 检查 auth_token）",
+    "IMP-2: 在 /disposals 页面增加 Tab 切换检测（调拨/清退/报废/赔偿），遍历每个 Tab 点击后检查增量错误",
+    "IMP-3: 按钮点击后增加 URL 变更验证：使用 waitForURL('**/*new*') 验证导航到表单页",
+    "IMP-4: 在 visitAndCheck 中增加 Suspense 等待：await waitForSelector('main > *:not([class*=\"suspense\"])')",
+    "IMP-5: visitedUrls 阈值从 25 调整为 >= 30"
+  ],
+  "rejected_from_draft": [],
+  "write_intent_preserved": true,
+  "degradation_detected": false,
+  "required_regeneration": false
+}

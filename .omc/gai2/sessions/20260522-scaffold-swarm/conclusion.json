@@ -1,0 +1,142 @@
+{
+  "session_id": "20260522-scaffold-swarm",
+  "rounds_completed": 3,
+  "date": "2026-05-22",
+  "directive": "为 forthAMS 自研业务系统选择脚手架方案",
+  "requirements_confirmed": {
+    "maxkey_auth": "必须接入 MaxKey OAuth2（Authorization Code），作为主登录路径",
+    "local_fallback": "MaxKey 不可用时降级到本地密码登录",
+    "sync": "同步 MaxKey 账号和部门到本地数据库",
+    "system_count": 1,
+    "tech_stack_backend": "Spring Boot 3.2.5 + MyBatis-Plus + Spring Security + JWT + MySQL",
+    "tech_stack_frontend": "React 18.3.1 + TypeScript + Vite + Tailwind + shadcn/ui + TanStack Query + React Router 7"
+  },
+
+  "recommended_option": "方案 C：参考 RuoYi 表结构设计 + 基于 forthAMS 纯自定义实现",
+
+  "rationale": [
+    "forthAMS 已有完整的 Spring Security 6 认证链（SecurityConfig 84行，DaoAuthenticationProvider + JWT + CORS）、User/Dept/Role/SysPermission 实体层、React 18 前端组件库（30+ Radix 包）和 585 测试全绿的质量基线——不是从零开始，而是在已有 80% 基础设施上增量开发",
+    "混合方案（提取 RuoYi 用户模块）的核心成本（10-16天）花在 Sa-Token 解耦这种不产生业务价值的工作上，因为 ruoyi-common-mybatis 直接依赖 ruoyi-common-satoken，解耦深度超预期",
+    "MaxKey 官方仓库提供完整的 Spring Security OAuth2 集成示例和 OIDC Discovery 支持（/sign/authz/oauth/v20/.well-known/openid-configuration），标准路径清晰，不需要 JustAuth",
+    "RuoYi 的 Vue 前端与 forthAMS 的 React 前端完全不兼容，前端代码无法复用",
+    "纯自研方案 8-12 天 vs 混合方案 13-21 天，时间更短，技术债为零"
+  ],
+
+  "rejected_options": [
+    {
+      "name": "方案 A：RuoYi-Vue-Plus 全面采用（含 Sa-Token）",
+      "rejection_reason": "Sa-Token 替代 Spring Security 代价大（2-3周改造），且与 forthAMS 已有 Security 代码冲突。Vue 前端完全无法复用。"
+    },
+    {
+      "name": "方案 A'：RuoYi-Vue-Plus 混合提取（取用户模块 + Spring Security）",
+      "rejection_reason": "调研发现 ruoyi-common-mybatis 直接依赖 ruoyi-common-satoken，提取解耦成本 10-16 天，超过自研用户模块的成本。且无生产验证的 'Spring Security + RuoYi 用户模块' 组合。"
+    },
+    {
+      "name": "方案 B：ruoyi-vue-pro（芋道）",
+      "rejection_reason": "无原生 MaxKey 支持，自定义 Security 体系与标准 OAuth2 Client 冲突，含大量无关模块（Mall/ERP/CRM），综合性价比最低。"
+    }
+  ],
+
+  "key_evidence_from_swarm": {
+    "agent_a_finding": "RuoYi-Vue-Plus v5.6.1 的 ruoyi-common-mybatis 直接依赖 ruoyi-common-satoken，Sa-Token 渗透到 ORM 层，混合提取成本远超预期",
+    "agent_b_finding": "MaxKey 官方仓库有完整的 Spring Security OAuth2 集成示例，且支持 OIDC Discovery，标准路径成熟",
+    "agent_c_finding": "forthAMS 已有 User/Dept/Role/SysPermission 实体 + SecurityConfig 完整配置 + 585 测试全绿，是成熟的 scaffold 种子",
+    "debate_turning_point_1": "混合方案提取成本从 2-3 天修正为 10-16 天，超过自研成本",
+    "debate_turning_point_2": "MaxKey 官方 Spring Security 示例消除了 '手动对接复杂' 的顾虑",
+    "debate_turning_point_3": "forthAMS Dept.java 已有 parentId + children 树结构，不是从零开始"
+  },
+
+  "implementation_roadmap": {
+    "phase_1": {
+      "name": "MaxKey OAuth2 SSO 对接",
+      "duration": "2-3 天",
+      "tasks": [
+        "application.yml 配置 Spring Security OAuth2 Client（registration + provider，利用 OIDC Discovery 自动发现端点）",
+        "实现 OAuth2LoginSuccessHandler：MaxKey callback → 解析 UserInfo → upsert 本地 sys_user（含 maxkey_uid 唯一索引）→ 签发 JWT",
+        "实现 OAuth2LoginFailureHandler：MaxKey 不可用时重定向到本地密码登录页",
+        "前端：登录页增加 'SSO 登录' 按钮（重定向 /oauth2/authorization/maxkey）+ '本地密码登录' 表单",
+        "MaxKey 健康检查：定时检测 /sign/authz/oauth/v20/.well-known/openid-configuration 可达性，动态控制 SSO 按钮可见性"
+      ],
+      "maxkey_endpoints": {
+        "authorize": "/sign/authz/oauth/v20/authorize",
+        "token": "/sign/authz/oauth/v20/token",
+        "userinfo": "/sign/api/oauth/v20/me",
+        "oidc_discovery": "/sign/authz/oauth/v20/.well-known/openid-configuration"
+      }
+    },
+    "phase_2": {
+      "name": "本地密码降级认证",
+      "duration": "1 天",
+      "tasks": [
+        "确认 forthAMS 现有 DaoAuthenticationProvider + BCryptPasswordEncoder 正常工作",
+        "在 SecurityFilterChain 中同时配置 oauth2Login + formLogin（两者共存是 Spring Security 6 标准用法）",
+        "降级策略：前端检测 MaxKey 健康状态 → 不可用时隐藏 SSO 按钮，仅显示本地密码表单"
+      ]
+    },
+    "phase_3": {
+      "name": "MaxKey 账号/部门定时同步",
+      "duration": "2-3 天",
+      "tasks": [
+        "实现 MaxKeySyncService：调用 SCIM API（/api/idm/SCIM/v2/Users + /api/idm/SCIM/v2/Organizations）",
+        "Spring @Scheduled(cron='0 */10 * * * *') 定时任务，10 分钟增量同步",
+        "upsert sys_user（以 maxkey_uid 为幂等键），upsert sys_dept（以 maxkey_org_id 为幂等键）",
+        "手动触发端点：POST /api/admin/sync/maxkey（首次全量导入）",
+        "同步日志表 sys_sync_log"
+      ]
+    },
+    "phase_4": {
+      "name": "数据权限拦截器",
+      "duration": "2-3 天",
+      "tasks": [
+        "实现自定义 DataPermissionInterceptor（MyBatis-Plus 插件），参考 RuoYi @DataScope 思路",
+        "按部门过滤数据：当前用户部门及子部门的数据可见",
+        "AOP 注解 @DataScope 标注需要数据权限过滤的 Mapper 方法",
+        "超级管理员绕过数据权限"
+      ]
+    },
+    "phase_5": {
+      "name": "用户管理补全",
+      "duration": "1-2 天",
+      "tasks": [
+        "用户批量导入导出（Excel）",
+        "在线用户管理（Redis 记录活跃会话）",
+        "密码策略（过期天数、复杂度要求、首次登录强制改密）"
+      ]
+    }
+  },
+
+  "total_effort": "8-12 天后端（含所有 Phase），前端约 3-5 天登录页改造",
+
+  "risks_and_mitigations": [
+    {
+      "risk": "MaxKey OIDC Discovery 端点在当前版本不可用",
+      "mitigation": "手动配置所有端点路径（authorization-uri/token-uri/user-info-uri）作为降级方案",
+      "level": "low"
+    },
+    {
+      "risk": "SCIM API 返回字段与本地 sys_user/sys_dept 不完全匹配",
+      "mitigation": "编写字段映射层（MaxKeyFieldMapper），单元测试覆盖边界场景",
+      "level": "medium"
+    },
+    {
+      "risk": "数据权限拦截器对复杂 SQL（JOIN、子查询）支持不完善",
+      "mitigation": "初期只支持简单 WHERE 条件过滤，复杂场景通过 Service 层手动过滤",
+      "level": "medium"
+    },
+    {
+      "risk": "MaxKey 同步延迟（10分钟间隔）导致新用户无法立即登录",
+      "mitigation": "OAuth2 登录回调时实时 upsert 用户信息（JIT 创建），同步任务仅用于批量对齐",
+      "level": "low"
+    }
+  ],
+
+  "references": [
+    "MaxKey 官方 Spring Security 集成示例：integrations/spring-security-oauth2-sso/",
+    "MaxKey OAuth2 端点文档：/sign/authz/oauth/v20/authorize, /sign/authz/oauth/v20/token, /sign/api/oauth/v20/me",
+    "MaxKey OIDC Discovery：/sign/authz/oauth/v20/.well-known/openid-configuration",
+    "MaxKey SCIM API：/api/idm/SCIM/v2/Users, /api/idm/SCIM/v2/Organizations",
+    "RuoYi-Vue-Plus 表结构设计参考：sys_user, sys_dept (parent_id + ancestors), sys_role, sys_menu",
+    "Spring Security 6 多 AuthenticationProvider 共存文档",
+    "forthAMS 现有代码：SecurityConfig.java, User.java, Dept.java, Role.java"
+  ]
+}

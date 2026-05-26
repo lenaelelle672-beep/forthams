@@ -1,0 +1,48 @@
+{
+  "mode": "swarm-role",
+  "swarm_role": "delivery-minimal-change",
+  "stance": "从执行效率和最小改动角度审查方案，追求代码复用最大化、脚本数最少化、参数变更收敛于数据驱动层",
+  "findings": [
+    "【统一脚本完全可行】4 个流程 (CLEARANCE/TRANSFER/SCRAP/COMPENSATION) 共享相同 API 端点：POST /api/approvals 创建审批、POST /api/approvals/{id}/approve 逐级审批。均走 ApprovalService.createProcess → approve 统一入口，差异仅限于 processType 字符串 + businessData JSON 结构。单一 Python 脚本 + 参数化矩阵（JSON/YAML）即可覆盖全部流程，无需 4 个独立脚本。",
+    "【SCRAP 与 CLEARANCE 几乎零改动】DisposalController 中 scrap 和 clearance 端点都只接收 {assetId, reason}，AssetScrapDTO 与 AssetClearanceDTO 字段完全一致。从 CLEARANCE 已通过的脚本改到 SCRAP，只需改 processType: 'ASSET_SCRAP'，businessData 无需任何字段变更。",
+    "【TRANSFER 改动最小——只追加 3 个字段】AssetTransferDTO 比 AssetClearanceDTO 多了 targetDeptId、targetUserId、targetLocation，其余字段（assetId、reason）完全相同。复用 CLEARANCE 脚本只需在 businessData 中追加这 3 个字段。",
+    "【COMPENSATION 改动最大但仍是数据驱动】CompensationCreateDTO 字段集与处置类 DTO 完全不同（compensationType、compensationAmount、description、incidentDate、responsibleUserId、responsibleDeptId），还需 responsibleUserId 和 responsibleDeptId 引用已存在的测试用户/部门。但仍然是改 businessData 中的 JSON 内容，脚本流程框架不需要变——只需在测试矩阵中为 COMPENSATION 配不同的 businessData 模板。审批通过后的回调在 ApprovalService.handleBusinessOutcome 第 717-722 行已实现，无需额外编码。",
+    "【审批人不需要按流程分配】4 个模拟审批人都具有 SUPER_ADMIN 角色，工作流定义中 4 级审批的默认审批角色即 SUPER_ADMIN（WorkflowDefinitionService.java:57-60）。当前 approvalMode 默认不要求 'all'（isApprovalStepComplete 第 573 行：node==null 或非 'all' 时直接返回 true），任一 SUPER_ADMIN 用户可独立完成全部审批。因此无需按流程分配不同审批人，4 人足够覆盖全部流程。",
+    "【数据保留策略零成本实现】用户要求保留测试数据，意味着可以跳过 teardown/cleanup 步骤，反而降低脚本复杂度。唯一风险是重复运行时可能触发 UNIQUE 约束，可通过 title 中加入时间戳标记规避（processNo 已含日期+序号，基本不冲突）。",
+    "【测试资产每流程 1 个即可】除 TRANSFER 要求资产状态为 IDLE/IN_USE/MAINTENANCE（DisposalService.java:25-26），其余流程不校验资产状态。创建 4 个测试资产（每流程 1 个），审批通过后资产状态会被变更，无需复用。如果资产创建在脚本内动态进行，额外增加 4 次 POST /api/assets 调用，总复杂度可控。"
+  ],
+  "recommendation": {
+    "option": "单一 Python 脚本 + 测试矩阵 JSON 文件，驱动 4 个流程端到端测试",
+    "rationale": "4 个流程共享完全相同的 API 调用序列（登录→创建审批→4 次审批调用→验证结果），差异仅存在于 processType 和 businessData JSON。用数据驱动（JSON 测试矩阵）替代代码复制，最小化脚本数量和改动面。CLEARANCE 已验证通过的脚本结构可直接作为框架模板：提取公共函数 login/approve/reject，将流程差异收敛到测试矩阵的 data rows 中。SCRAP 几乎零改动（仅改 processType），TRANSFER 仅追加 3 字段，COMPENSATION 需单独构建 businessData 但脚本逻辑不变。",
+    "conditions": [
+      "创建 4 个测试资产：1 个 IDLE 状态（供 TRANSFER），3 个任意状态（供 CLEARANCE/SCRAP/COMPENSATION），可通过脚本内 POST /api/assets 创建或复用已有测试资产",
+      "测试矩阵 JSON 需包含 4 条 data row，每条定义：processType/businessData/expectedFinalStatus/流程标签",
+      "COMPENSATION 的 businessData 需额外提供 compensationType、compensationAmount、responsibleUserId（指向一名测试用户）、responsibleDeptId（指向一已有部门）。建议先调 POST /compensation/valuation 获取估值再填金额",
+      "测试用户登录时需获取 JWT token，脚本需处理 token 过期（建议每个流程开始时重新登录或至少 token 有效期 > 整个测试耗时约 30-60 秒）",
+      "test title 中加时间戳前缀如 'E2E-{ts}-' 确保重复运行不冲突",
+      "后端服务运行在 localhost:8080，测试用户池 sim05261457xx 均已存在且分配 SUPER_ADMIN 角色"
+    ]
+  },
+  "risks": [
+    "【同一用户自审风险】申请人本人也是 SUPER_ADMIN，可能审批自己提交的流程。ensureWorkflowApproverAllowed（ApprovalService.java:613）仅校验用户是否属于审批角色，未排除申请人自己。虽然审批记录 insert 正常但逻辑上不合理——建议 test script 中用不同于申请人的审批人来审批，避免掩盖缺陷",
+    "【COMPENSATION 字段别名混淆】CompensationCreateDTO 使用 @JsonAlias 同时接受 type/compensationType、amount/compensationAmount 等 6 对别名，如果 businessData JSON 中同时传了 'type' 和 'compensationType' 不同值，反序列化行为不确定。建议测试矩阵中只使用标准字段名（compensationType/compensationAmount 等）",
+    "【TRANSFER 需要目标部门存在】AssetTransferDTO.targetDeptId 必须是 sys_dept 表中的有效 ID，需要预先查询或硬编码已知部门 ID。如果目标部门不存在，审批通过后回调 transferAsset 会失败，导致审批状态和资产状态不一致",
+    "【JWT token 过期导致中途失败】4 个流程按序执行可能超过 token 有效期（通常 30 分钟），第 3-4 个流程审批时可能因 token 过期返回 401。建议每个流程开始前 refresh 或重新登录",
+    "【多租户数据串扰】测试资产和审批记录都在同一租户下，如果之前有残留测试数据未清理，query/mine=true 查询结果会受影响。建议脚本中查询时明确用 mine=true + 申请人过滤",
+    "【审批回调事务回滚风险】handleDisposalOutcome（第 751 行）在 approve 事务内执行，如果 transferAsset/clearAsset/scrapAsset/createCompensation 内部抛异常（例如目标部门无效），整个审批记录也会回滚，导致审批记录与用户预期不符。脚本需捕获且清晰报告这种场景"
+  ],
+  "evidence_needed": [
+    "确认当前默认工作流定义中 4 级审批的 approvalMode 是什么——是默认空（单人审批即可）还是 'all'（需该角色所有人审批）。这决定了 4 个审批人是否需要全部参与每个流程的每个级别",
+    "确认测试用户池 sim05261457xx 中 10 个用户的具体 UID 列表及其角色分配——脚本需要至少 2 个不同 UID（1 个申请人 + 1 个审批人）",
+    "确认 sys_dept 表中存在至少一个可用的部门 ID，供 TRANSFER 流程的 targetDeptId 使用",
+    "确认 COMPENSATION 流程审批通过后资产状态变化的目标值——ApprovalService 第 718-721 行仅创建赔偿记录和更新补偿状态为 APPROVED，未看到资产状态更新逻辑（与 CLEARANCE→CLEARED、SCRAP→SCRAPPED 不同），需确认这是预期行为还是遗漏",
+    "确认 CLEARANCE 已验证通过的脚本的具体实现——当前仓库中搜索不到 Python 测试脚本文件，仅存在 smoke-test.sh（bash）。需要澄清 CLEARANCE 测试是如何执行的，以确定真正的模板代码基础"
+  ],
+  "open_questions": [
+    "CLEARANCE 已验证通过——但验证方式是什么？浏览器手动操作？curl 命令？Playwright E2E？还是 Python 脚本？如果模板来源不明确，无法精准评估复用成本",
+    "COMPENSATION 审批通过后，资产本身的状态会变化吗？从代码看 createCompensation 只是创建资产赔偿记录（asset_compensation 表），不涉及 asset 表状态变更。这是否意味着 COMPENSATION 与其他三个流程的行为模式根本不同？",
+    "测试资产是由脚本动态创建还是从已有资产池中选取？动态创建需要额外的 POST /api/assets 和 asset DTO 知识，从已有池选则需要预先知道可用资产 ID",
+    "TRANSFER 审批通过后，资产从 IN_USE 变为什么状态？DisposalService.transferAsset 第 54 行调用 transitionAsset 目标状态为 IN_USE，但转移后资产仍在 IN_USE 状态——这意味着转移前后状态不变，仅变更部门和定位信息",
+    "是否需要验证审批驳回路径（REJECTED）？还是仅验证通过路径（APPROVED）？当前方案仅覆盖 4 级全部通过的 happy path"
+  ]
+}

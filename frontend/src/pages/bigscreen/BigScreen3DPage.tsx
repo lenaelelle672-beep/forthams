@@ -24,6 +24,31 @@ const BigScreen3DCanvas = lazy(() => import('./BigScreen3DCanvas'));
 type Stats = typeof fallbackStats;
 type StyleVars = CSSProperties & Record<`--${string}`, string | number>;
 
+function normalizeStats(input: Partial<Stats> | { data?: Partial<Stats> } | null | undefined): Stats {
+  const raw = ((input as { data?: Partial<Stats> } | null | undefined)?.data ?? input ?? {}) as Partial<Stats>;
+  const total = typeof raw.totalAssets === 'number' ? raw.totalAssets : fallbackStats.totalAssets;
+  const inUse = typeof raw.inUseAssets === 'number' ? raw.inUseAssets : fallbackStats.inUseAssets;
+
+  return {
+    ...fallbackStats,
+    totalAssets: total,
+    inUseAssets: inUse,
+    idleAssets: typeof raw.idleAssets === 'number' ? raw.idleAssets : fallbackStats.idleAssets,
+    scrapAssets: typeof raw.scrapAssets === 'number' ? raw.scrapAssets : fallbackStats.scrapAssets,
+    utilizationRate: typeof raw.utilizationRate === 'number'
+      ? raw.utilizationRate
+      : total > 0
+        ? Math.round((inUse / total) * 1000) / 10
+        : fallbackStats.utilizationRate,
+    totalValue: typeof raw.totalValue === 'number' ? raw.totalValue : fallbackStats.totalValue,
+    netValue: typeof raw.netValue === 'number' ? raw.netValue : fallbackStats.netValue,
+    pendingApprovals: typeof raw.pendingApprovals === 'number' ? raw.pendingApprovals : fallbackStats.pendingApprovals,
+    pendingWorkOrders: typeof raw.pendingWorkOrders === 'number' ? raw.pendingWorkOrders : fallbackStats.pendingWorkOrders,
+    inventoryProgress: typeof raw.inventoryProgress === 'number' ? raw.inventoryProgress : fallbackStats.inventoryProgress,
+    criticalAlerts: typeof raw.criticalAlerts === 'number' ? raw.criticalAlerts : fallbackStats.criticalAlerts,
+  };
+}
+
 type CityMetric = {
   name: string;
   assetCount: number;
@@ -31,21 +56,6 @@ type CityMetric = {
   warningCount: number;
   netValue: number;
 };
-
-function canCreateWebGLContext() {
-  if (typeof document === 'undefined') return false;
-
-  const canvas = document.createElement('canvas');
-  try {
-    return Boolean(
-      canvas.getContext('webgl2') ||
-      canvas.getContext('webgl') ||
-      canvas.getContext('experimental-webgl'),
-    );
-  } catch {
-    return false;
-  }
-}
 
 function WebGLFallback({ reason }: { reason: string }) {
   return (
@@ -582,33 +592,17 @@ export default function BigScreen3DPage() {
   const [selectedCity, setSelectedCity] = useState<string | null>(null);
   const [mapReady, setMapReady] = useState(false);
   const [time, setTime] = useState(new Date());
-  const [webglState, setWebglState] = useState<{ supported: boolean; reason: string }>(() => ({
-    supported: canCreateWebGLContext(),
-    reason: '当前浏览器或设备不支持 WebGL，已使用可访问降级视图。',
-  }));
+  const [webglState, setWebglState] = useState<{ supported: boolean; reason: string }>({
+    supported: true,
+    reason: 'WebGL 渲染初始化失败，已使用可访问降级视图。',
+  });
 
   const { data: apiStats } = useQuery<Stats>({
-    queryKey: ['dashboard', 'stats', 'demo2-style'],
+    queryKey: ['bigscreen', 'stats', '3d'],
     queryFn: async () => {
       try {
-        const res = await http.get<any>('/dashboard/stats');
-        const raw = res?.data ?? res ?? {};
-        const total = typeof raw.totalAssets === 'number' ? raw.totalAssets : fallbackStats.totalAssets;
-        const inUse = typeof raw.inUseAssets === 'number' ? raw.inUseAssets : fallbackStats.inUseAssets;
-        return {
-          ...fallbackStats,
-          totalAssets: total,
-          inUseAssets: inUse,
-          idleAssets: typeof raw.idleAssets === 'number' ? raw.idleAssets : fallbackStats.idleAssets,
-          scrapAssets: typeof raw.scrapAssets === 'number' ? raw.scrapAssets : fallbackStats.scrapAssets,
-          utilizationRate: total > 0 ? Math.round((inUse / total) * 1000) / 10 : fallbackStats.utilizationRate,
-          totalValue: typeof raw.totalValue === 'number' ? raw.totalValue : fallbackStats.totalValue,
-          netValue: typeof raw.netValue === 'number' ? raw.netValue : fallbackStats.netValue,
-          pendingApprovals: typeof raw.pendingApprovals === 'number' ? raw.pendingApprovals : fallbackStats.pendingApprovals,
-          pendingWorkOrders: typeof raw.pendingWorkOrders === 'number' ? raw.pendingWorkOrders : fallbackStats.pendingWorkOrders,
-          inventoryProgress: typeof raw.inventoryProgress === 'number' ? raw.inventoryProgress : fallbackStats.inventoryProgress,
-          criticalAlerts: typeof raw.criticalAlerts === 'number' ? raw.criticalAlerts : fallbackStats.criticalAlerts,
-        };
+        const res = await http.get<any>('/bigscreen/stats');
+        return normalizeStats(res);
       } catch {
         return fallbackStats;
       }
@@ -624,7 +618,7 @@ export default function BigScreen3DPage() {
     return () => window.clearInterval(timer);
   }, []);
 
-  const stats = apiStats ?? fallbackStats;
+  const stats = normalizeStats(apiStats);
   const cityMetrics = useMemo(() => buildCityMetrics(stats), [stats]);
   const selectedMetric = cityMetrics.find((item) => item.name === selectedCity) ?? cityMetrics.find((item) => item.name.includes('成都')) ?? cityMetrics[0];
   const topCities = cityMetrics.slice().sort((a, b) => b.assetCount - a.assetCount).slice(0, 5);

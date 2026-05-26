@@ -187,7 +187,7 @@ export default function LoginPage() {
   const loginMutation = useMutation({
     mutationFn: (data: LoginForm) => login(data),
     onSuccess: (res) => {
-      const { token, userId, username, realName } = res.data;
+      const { token, userId, username, realName } = res;
       if (!token) {
         toast.error('登录响应缺少 token');
         return;
@@ -203,11 +203,7 @@ export default function LoginPage() {
       navigate('/dashboard', { replace: true });
     },
     onError: (err: any) => {
-      const status = err?.response?.status;
-      const msg =
-        status === 401
-          ? '用户名或密码错误'
-          : err?.response?.data?.message || err?.message || '网络错误，请检查网络后重试';
+      const msg = err?.message || '网络错误，请检查网络后重试';
       toast.error(msg);
       setErrorMsg(msg);
     },

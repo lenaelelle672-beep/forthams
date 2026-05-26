@@ -81,7 +81,7 @@ export default function WorkOrderFormPage() {
     (async () => {
       try {
         const res = await getUserList({ page: 1, pageSize: 100 });
-        const users = (res as PaginatedResponse<UserItem> | undefined)?.data?.records ?? [];
+        const users = (res as PageData<UserItem> | undefined)?.records ?? [];
         if (cancelled) return;
         if (users.length > 0) {
           setAssigneeOptions([
@@ -110,7 +110,7 @@ export default function WorkOrderFormPage() {
     assetSearchTimer.current = setTimeout(async () => {
       try {
         const res = await getAssetList({ keyword, pageSize: 10 });
-        const records = (res as ApiResponse<PageData<AssetListItem>> | undefined)?.data?.records ?? [];
+        const records = (res as PageData<AssetListItem> | undefined)?.records ?? [];
         setAssetResults(records);
         setShowAssetDropdown(records.length > 0);
       } catch {

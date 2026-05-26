@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "agent": "gai2-orchestrator-adjudication",
+  "session": "20260524-cert-fix",
+  "decision": "accept_draft_with_refinements",
+  "selected_source": "draft-changes.json 为基础，按 refine.json 改进建议调整，当前 spec.ts（618行）已包含所有10处修改",
+  "adjudicated_actions": [
+    {
+      "id": "ACT-01",
+      "source": "draft-changes.json #1 + refine.json #12 补充",
+      "operation": "verify_already_applied",
+      "description": "CERT-03 L89+L114 placeholder 修改 — 当前文件已为 '搜索资产编号或名称...'，无需再次修改",
+      "status": "already_applied"
+    },
+    {
+      "id": "ACT-02",
+      "source": "draft-changes.json #2",
+      "operation": "verify_already_applied",
+      "description": "CERT-04 L124 使用率正则 /7[0-9]/ → /\\d+%/ — 当前文件已为 /\\d+%/，无需修改",
+      "status": "already_applied"
+    },
+    {
+      "id": "ACT-03",
+      "source": "draft-changes.json #3",
+      "operation": "verify_already_applied",
+      "description": "CERT-04 L130 toast 文本补全 '后再保存。' — 当前文件已包含完整文本，无需修改",
+      "status": "already_applied"
+    },
+    {
+      "id": "ACT-04",
+      "source": "draft-changes.json #5 #6 #7 #8 + refine.json #13 补充",
+      "operation": "verify_already_applied",
+      "description": "CERT-07 页签 '资产调拨'→'资产转移'（L185/L192）和 placeholder '搜索申请单号或资产ID...'（L188/L190/L191）— 当前文件已全部修正",
+      "status": "already_applied"
+    },
+    {
+      "id": "ACT-05",
+      "source": "draft-changes.json #9",
+      "operation": "verify_already_applied",
+      "description": "CERT-09 L268 toast '安全设置已保存到当前会话'→'安全设置已保存' — 当前文件已正确",
+      "status": "already_applied"
+    },
+    {
+      "id": "ACT-06",
+      "source": "refine.json 拒绝项 #4 #10 #11",
+      "operation": "reject",
+      "description": "CERT-05 PUT/PATCH 检查、CERT-10 金额/百分比断言 — 当前文件已简化测试，目标行不存在，拒绝应用",
+      "status": "rejected"
+    },
+    {
+      "id": "ACT-07",
+      "source": "验证阶段",
+      "operation": "run_verification",
+      "description": "所有代码修改已就绪，只需运行 Playwright 测试验证。无需再做任何文件修改",
+      "status": "pending_verification"
+    }
+  ],
+  "builder_instructions": "当前 spec.ts（618行）已包含 CERT-03~CERT-10 的全部 10 处修复。Builder 无需做任何文件编辑。只需执行验证命令：在 /Users/feigao/project/Project/testFinish 目录下运行 TEST_PROJECT_CONFIG=config/forthams.example.json npx playwright test tests/playwright/forthams-certification.spec.ts --project=chromium --reporter=list。如有失败，报告失败详情以便进一步诊断。",
+  "write_action_guard": [
+    "所有 write_actions 已在当前 spec.ts 中实现，Builder 不得再次执行编辑操作以避免重复修改",
+    "只读分析替代写操作在此场景中适用（因为修改已由先前 Builder 完成）",
+    "必须执行完整的测试验证并记录结果"
+  ],
+  "fallback_labels": [],
+  "reviewer_checks": [
+    "确认 CERT-01~CERT-02 仍然 PASS（无回归）",
+    "确认 CERT-03~CERT-10 全部 PASS",
+    "确认 L89/L114 placeholder '搜索资产编号或名称...' 正确",
+    "确认 L124 正则 /\\d+%/ 正确",
+    "确认 L130 toast 完整文本 '后再保存。' 正确",
+    "确认 L185/L192 页签 '资产转移' 正确",
+    "确认 L188/L190/L191 placeholder '搜索申请单号或资产ID...' 正确",
+    "确认 L268 toast '安全设置已保存' 正确",
+    "确认 L219 getByRole('link') 正确",
+    "确认 L286 双路径匹配正确"
+  ]
+}

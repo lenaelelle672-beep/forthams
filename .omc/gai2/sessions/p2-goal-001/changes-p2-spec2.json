@@ -1,0 +1,34 @@
+{
+  "spec": "P2-SPEC-2",
+  "description": "实现通知渠道 — NotificationChannel 接口 + InAppChannel + EmailChannel + AsyncConfig",
+  "added_files": [
+    "backend/src/main/java/com/ams/service/NotificationChannel.java",
+    "backend/src/main/java/com/ams/service/InAppChannel.java",
+    "backend/src/main/java/com/ams/service/EmailChannel.java",
+    "backend/src/main/java/com/ams/config/AsyncConfig.java"
+  ],
+  "changed_files": [
+    "backend/pom.xml",
+    "backend/src/main/resources/application.yml",
+    "backend/src/main/java/com/ams/service/NotificationService.java",
+    "backend/src/main/java/com/ams/service/ApprovalService.java"
+  ],
+  "commands_run": [
+    {
+      "command": "cd /Users/feigao/project/Project/forthAMS/backend && mvn compile -q",
+      "result": "passed",
+      "notes": "编译通过，无错误输出"
+    }
+  ],
+  "verification_results": [
+    "mvn compile -q 返回 0 退出码，所有新增和修改的 Java 文件编译通过",
+    "新增 4 个文件：NotificationChannel 接口、InAppChannel、EmailChannel、AsyncConfig",
+    "修改 4 个文件：pom.xml（添加 mail starter）、application.yml（添加 mail 配置段）、NotificationService（注入渠道列表遍历发送）、ApprovalService（RETIREMENT 类型跳过双重通知）"
+  ],
+  "residual_risks": [
+    "EmailChannel 依赖环境变量 MAIL_HOST/MAIL_PORT/MAIL_USERNAME/MAIL_PASSWORD，未配置时使用默认值（smtp.example.com:587）可能连接失败",
+    "InAppChannel 使用 @Lazy 解决循环依赖，若 Spring 代理初始化时序异常需排查",
+    "NotificationService.emailService 字段现未使用（被渠道迭代替代），属遗留死代码需后续清理",
+    "EmailChannel 中 UserMapper.selectById 查询无缓存，高频通知场景可能影响性能"
+  ]
+}

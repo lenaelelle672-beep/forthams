@@ -1,0 +1,43 @@
+{
+  "changed_files": [
+    "frontend/src/pages/reports/ReportsPage.tsx",
+    "frontend/src/__tests__/ReportsPage.test.tsx"
+  ],
+  "added_files": [
+    "frontend/src/api/__tests__/reports.test.ts"
+  ],
+  "commands_run": [
+    {
+      "command": "cd frontend && npx vitest run --reporter=verbose",
+      "result": "passed",
+      "notes": "672 tests passed (30 files, +11 新增: 2个 ReportsPage 空数据态 + 10个 api/reports mock 测试，删除1个 stub)"
+    },
+    {
+      "command": "cd frontend && npm run build",
+      "result": "passed",
+      "notes": "前端构建成功，6.14s，0 错误，0 警告"
+    },
+    {
+      "command": "cd backend && mvn compile -q",
+      "result": "passed",
+      "notes": "后端编译成功，无错误"
+    }
+  ],
+  "verification_results": [
+    "P0: api/stats.ts 重复定义已在之前迭代修复（已确认），stats.ts 通过 re-export 从 reports.ts 暴露 ReportSummary/CategoryReport 类型及 getReportSummary/getReportByCategory 函数，向后兼容",
+    "P1: ReportsPage.tsx — 为 3 个 useQuery 添加了 meta: { errorMessage: '数据加载失败，请重试' }，遵循 TanStack Query v5 的 onError 模式；新增 trendError 解构和 error condition 集成",
+    "P1: ReportsPage.test.tsx — 替换了无意义的 stub 测试，新增 2 个测试：空 API 数据卡片渲染验证、空数据图表预览优雅处理验证",
+    "P1: api/__tests__/reports.test.ts — 新增 10 个 API mock 测试，覆盖 getReportSummary / getReportByCategory / getReportTrend 三个端点的调用参数、响应类型、错误处理和数据类型验证",
+    "P2: vitest.config.ts coverage 已在之前迭代扩展，包含 src/api/reports.ts 和 src/pages/reports/**/*",
+    "vitest: 672 tests, 30 files, all passed (从 661/29 增长)",
+    "npm build: 成功，0 错误",
+    "mvn compile: 成功，无错误"
+  ],
+  "residual_risks": [
+    "ReportsPage 中 fin-depreciation/ops-maintenance/ops-retirement 三个报表仍使用 Math.random() mock 数据，未对接真实 API",
+    "Export 按钮仍为 alert 占位，未集成 jsPDF/xlsx 真实导出库",
+    "ReportService.getByCategory() 在 Java 内存中遍历全部资产计算，大数据量时性能堪忧",
+    "SidebarLayout（旧架构）搜索体验与新架构 Cmd+K 不统一",
+    "SEARCHABLE_PAGES 与 NAV_GROUPS 为两份独立数据，新增页面时需同时修改两处"
+  ]
+}

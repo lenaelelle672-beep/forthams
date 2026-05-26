@@ -1,0 +1,32 @@
+{
+  "session_id": "20260524-resume-1",
+  "run_timestamp": "2026-05-24T11:30:00+08:00",
+  "directive": "forthAMS 真 E2E 测试体系建设完成 — 验证所有验收标准",
+  "owner": "gai2-orchestrator",
+  "phase": "verification",
+  "classification": "Heavy",
+  "auto_mode": false,
+  "acceptance_checks": [
+    "AC-1: forthams-e2e.spec.ts 运行前检查后端健康，不通则skip",
+    "AC-2: 真 E2E 不 mock API",
+    "AC-3: 真实登录 admin/admin123",
+    "AC-4: 自动监听异常（console.error/404/500）",
+    "AC-5: 核心流程覆盖7步骤",
+    "AC-6: 运行发现真实问题",
+    "AC-7: 修复发现的问题（API 500等）",
+    "AC-8: 真 E2E 测试全部 PASS",
+    "AC-9: 旧 mock 测试保持全部 PASS"
+  ],
+  "evidence_to_collect": [
+    "测试文件代码确认 AC-1~AC-5",
+    "E2E 测试运行结果（1 passed, 0 failed）",
+    "所有 11 个 500 API 端点恢复 200",
+    "旧 mock 回归测试结果（forthams-certification 全部 PASS）",
+    "goal-state.json 更新"
+  ],
+  "open_risks": [
+    "smoke.spec.ts 无认证时返回 403（预期行为）",
+    "module-certification.spec.ts 需要 AMS_E2E_PASSWORD 环境变量"
+  ],
+  "artifact_dir": ".omc/gai2/sessions/20260524-resume-1"
+}

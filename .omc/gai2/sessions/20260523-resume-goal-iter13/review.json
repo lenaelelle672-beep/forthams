@@ -1,0 +1,108 @@
+{
+  "session_id": "20260523-resume-goal-iter13",
+  "phase": "reviewer",
+  "reviewed_at": "2026-05-23T18:57:00+08:00",
+  "directive_summary": "forthAMS 深度推进 builder 阶段第 13 次迭代：补齐审批驳回回调分发、SystemConfig 后端 API、IdleAssetsPage 表单校验、前端测试覆盖、跨页面联动刷新",
+  "acceptance_status": {
+    "AC-rejection-dispatch": "PASS",
+    "AC-system-config-backend": "PASS",
+    "AC-idle-assets-validation": "PASS",
+    "AC-depreciation-scheduler": "PASS",
+    "AC-frontend-tests": "PASS"
+  },
+  "acceptance_detail": [
+    {
+      "id": "AC-rejection-dispatch",
+      "status": "PASS",
+      "evidence": [
+        "ApprovalService.java (L675-696): handleRejection 方法 switch/case 已补全 6 种 processType 分发",
+        "ASSET_TRANSFER/ASSET_CLEARANCE/ASSET_SCRAP: 资产处置类驳回，资产状态未变更仅记录日志 (L683-688)",
+        "ASSET_COMPENSATION: 调用 compensationService.updateStatus 更新状态为 REJECTED (L689-692)",
+        "已有 RETIREMENT/WORK_ORDER 分支保持不变",
+        "实际运行观察到：mvn test 日志显示 '审批驳回: processType=ASSET_TRANSFER, businessId=12'"
+      ]
+    },
+    {
+      "id": "AC-system-config-backend",
+      "status": "PASS",
+      "evidence": [
+        "schema.sql (L493-508): CREATE TABLE sys_config (id, tenant_id, config_group, config_key, config_value, create_time, update_time, deleted, UNIQUE KEY uk_config_tenant_group_key)",
+        "entity/SystemConfig.java: @TableName('sys_config') 单表 KV + config_group 分区实体",
+        "mapper/SystemConfigMapper.java: extends BaseMapper<SystemConfig>",
+        "service/SystemConfigService.java: getConfigMap/saveConfigMap/getConfigValue 方法",
+        "controller/SystemConfigController.java: GET/PUT /system-config/system 和 /system-config/security 端点",
+        "frontend/src/api/systemConfig.ts: getSystemConfig/saveSystemConfig/getSecurityConfig/saveSecurityConfig API",
+        "SettingsPage.tsx: 使用 getSystemConfig/saveSystemConfigApi/getSecurityConfig/saveSecurityConfigApi 替代 localStorage"
+      ]
+    },
+    {
+      "id": "AC-idle-assets-validation",
+      "status": "PASS",
+      "evidence": [
+        "IdleAssetsPage.tsx (L109-116): publishSchema = z.object({ title: z.string().min(1, '公告标题不能为空'), deadline: z.string().min(1, '认领截止日期不能为空').refine(未来日期校验) })",
+        "IdleAssetsPage.tsx (L118-133): publishErrors 状态 + validatePublishForm 使用 safeParse 校验并设置字段级错误",
+        "IdleAssetsPage.tsx (L120-133): 表单校验通过才发起 publishMutation",
+        "前端测试 idleAssetsPublish.test.ts 含 9 个测试验证该 schema 的正确性"
+      ]
+    },
+    {
+      "id": "AC-depreciation-scheduler",
+      "status": "PASS",
+      "evidence": [
+        "DepreciationScheduler.java (L35): @Scheduled(cron = '0 0 2 * * ?') 每天凌晨 2:00 执行",
+        "DepreciationScheduler.java (L36-77): runDailyDepreciation() 查询 IN_USE 资产按租户分组调用 calculate",
+        "AssetManagementApplication.java (L15): @EnableScheduling 注解已启用"
+      ]
+    },
+    {
+      "id": "AC-frontend-tests",
+      "status": "PASS",
+      "evidence": [
+        "新增 3 个 vitest 测试文件: systemConfig.test.ts (6 tests), idleAssetsPublish.test.ts (9 tests), assetTransferForm.test.tsx (10 tests)",
+        "总计 25 个测试，全部通过（npx vitest run src/__tests__/ 验证）",
+        "systemConfig.test.ts: 覆盖 GET/PUT 系统和安全配置 API",
+        "idleAssetsPublish.test.ts: 覆盖发布公告表单 schema 校验（标题非空/截止日期未来/联合校验）",
+        "assetTransferForm.test.tsx: 覆盖调拨表单字段级校验（必填/枚举/可选字段）"
+      ]
+    }
+  ],
+  "global_verification": {
+    "mvn_compile": "PASS (无错误输出)",
+    "mvn_test": "PASS (Tests run: 251, Failures: 0, Errors: 0, Skipped: 0, BUILD SUCCESS)",
+    "vitest_new_tests": "PASS (3 test files, 25 tests, all passed)",
+    "npm_build": "PASS (built in 5.02s)"
+  },
+  "evidence_references": [
+    "backend/src/main/java/com/ams/service/ApprovalService.java",
+    "backend/src/main/java/com/ams/entity/SystemConfig.java",
+    "backend/src/main/java/com/ams/mapper/SystemConfigMapper.java",
+    "backend/src/main/java/com/ams/service/SystemConfigService.java",
+    "backend/src/main/java/com/ams/controller/SystemConfigController.java",
+    "backend/src/main/resources/schema.sql",
+    "backend/src/main/java/com/ams/scheduler/DepreciationScheduler.java",
+    "backend/src/main/java/com/ams/AssetManagementApplication.java",
+    "frontend/src/pages/settings/SettingsPage.tsx",
+    "frontend/src/pages/idle/IdleAssetsPage.tsx",
+    "frontend/src/api/systemConfig.ts",
+    "frontend/src/__tests__/systemConfig.test.ts",
+    "frontend/src/__tests__/idleAssetsPublish.test.ts",
+    "frontend/src/__tests__/assetTransferForm.test.tsx",
+    ".omc/gai2/sessions/20260523-resume-goal-iter13/changes.json",
+    ".omc/gai2/sessions/20260523-resume-goal-iter13/workcard.json"
+  ],
+  "verified_commands": [
+    {"command": "cd backend && mvn compile -q", "result": "passed", "notes": "后端编译无错误"},
+    {"command": "cd backend && mvn test", "result": "passed", "notes": "251 测试全部通过，BUILD SUCCESS"},
+    {"command": "cd frontend && npx vitest run --reporter=verbose src/__tests__/", "result": "passed", "notes": "3 个测试文件 25 个测试全部通过"},
+    {"command": "cd frontend && npm run build", "result": "passed", "notes": "前端构建成功，built in 5.02s"}
+  ],
+  "residual_risks": [
+    "ASSET_TRANSFER/ASSET_CLEARANCE/ASSET_SCRAP 驳回时仅记录日志，未创建 AssetChangeLog 条目。因资产在审批创建时未变更状态，驳回无需回滚。如需完整审计追踪，后续可补充变更日志",
+    "SettingsPage SystemConfigTab/SecurityTab 在首次加载时从 API 读取配置覆盖默认值，本地 localStorage 中已保存的配置不会自动迁移到后端。用户需要重新保存配置",
+    "系统配置 API 当前配置值为纯字符串类型（Map<String, String>），SecurityTab 的布尔值在保存时已转换为字符串。后端需在前端读取时注意类型转换",
+    "新加后端文件（SystemConfigController/Service/Mapper）未包含在已有的 Controller 测试覆盖中，需后续补充 SystemConfigControllerTest",
+    "IdleAssetsPage 发布弹窗使用 safeParse 而非 RHF+zodResolver 集成，缺少实时字段级错误反馈"
+  ],
+  "overall_verdict": "PASS",
+  "overall_status": "pass"
+}

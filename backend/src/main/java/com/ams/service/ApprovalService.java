@@ -12,11 +12,11 @@ import com.ams.entity.AssetCompensation;
 import com.ams.entity.ApprovalProcess;
 import com.ams.entity.ApprovalRecord;
 import com.ams.entity.NotificationRecord;
-import com.ams.entity.WorkflowDefinition;
+import com.ams.entity.Role;import com.ams.entity.WorkflowDefinition;
 import com.ams.mapper.ApprovalProcessMapper;
 import com.ams.mapper.ApprovalRecordMapper;
 import com.ams.mapper.UserRoleMapper;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.ams.mapper.RoleMapper;import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -30,10 +30,14 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -57,6 +61,7 @@ public class ApprovalService {
 
     private static final Logger log = LoggerFactory.getLogger(ApprovalService.class);
     private static final int FINAL_STEP = 3;
+    private final Map<String, String> roleNameCache = new ConcurrentHashMap<>();
     private static final String WORKFLOW_PAYLOAD_KEY = "_approvalPayload";
     private static final String WORKFLOW_DEFINITION_KEY = "_workflowDefinition";
     private static final String WORKFLOW_DEFINITION_ID_KEY = "_workflowDefinitionId";
@@ -76,7 +81,7 @@ public class ApprovalService {
     private final CompensationService compensationService;
     private final WorkflowDefinitionService workflowDefinitionService;
     private final UserRoleMapper userRoleMapper;
-    private final ObjectMapper objectMapper;
+    private final RoleMapper roleMapper;    private final ObjectMapper objectMapper;
     private final NotificationService notificationService;
 
     /**
@@ -88,7 +93,7 @@ public class ApprovalService {
      * @param processType 流程类型过滤（RETIREMENT/WORK_ORDER/ASSET_TRANSFER 等），为空则不过滤
      * @return 分页审批流程结果
      */
-    public Page<ApprovalProcess> queryProcesses(Integer page, Integer pageSize, String status, String processType) {
+    public Page<ApprovalProcess> queryProcesses(Integer page, Integer pageSize, String status, String processType, Long applicantId) {
         String tenantId = TenantContext.requireTenantId();
         Page<ApprovalProcess> pageParam = new Page<>(page, pageSize);
         QueryWrapper<ApprovalProcess> wrapper = new QueryWrapper<>();
@@ -99,6 +104,9 @@ public class ApprovalService {
         }
         if (processType != null && !processType.isEmpty()) {
             wrapper.eq("process_type", processType);
+        }
+        if (applicantId != null) {
+            wrapper.eq("applicant_id", applicantId);
         }
         wrapper.orderByDesc("create_time");
 
@@ -316,6 +324,29 @@ public class ApprovalService {
         );
     }
 
+    /** 按流程类型分组统计（总数/通过数/驳回数/审批中数/取消数） */
+    public List<Map<String, Object>> getProcessTypeStats() {
+        String tenantId = TenantContext.requireTenantId();
+        List<ApprovalProcess> all = approvalProcessMapper.selectList(
+                new QueryWrapper<ApprovalProcess>().eq("tenant_id", tenantId));
+        Map<String, Map<String, Object>> grouped = new LinkedHashMap<>();
+
+        for (ApprovalProcess p : all) {
+            String type = p.getProcessType() != null ? p.getProcessType() : "UNKNOWN";
+            grouped.putIfAbsent(type, new HashMap<>(Map.of(
+                    "processType", type,
+                    "total", 0L, "approved", 0L, "rejected", 0L, "pending", 0L, "cancelled", 0L)));
+            Map<String, Object> stat = grouped.get(type);
+            stat.put("total", ((Number) stat.get("total")).longValue() + 1);
+            String s = p.getStatus();
+            if ("APPROVED".equals(s)) stat.put("approved", ((Number) stat.get("approved")).longValue() + 1);
+            else if ("REJECTED".equals(s)) stat.put("rejected", ((Number) stat.get("rejected")).longValue() + 1);
+            else if ("CANCELLED".equals(s)) stat.put("cancelled", ((Number) stat.get("cancelled")).longValue() + 1);
+            else stat.put("pending", ((Number) stat.get("pending")).longValue() + 1);
+        }
+        return new ArrayList<>(grouped.values());
+    }
+
     /**
      * Cancel a PENDING approval process.
      *
@@ -436,7 +467,9 @@ public class ApprovalService {
     }
 
     private List<Map<String, Object>> toWorkflowRuntimePath(WorkflowDefinitionService.WorkflowRuntimePlan workflowPlan) {
-        return workflowPlan.approvalNodes().stream()
+        List<WorkflowDefinitionService.WorkflowApprovalNode> nodes = workflowPlan.approvalNodes();
+        Map<String, String> roleNameMap = batchResolveRoleNames(nodes);
+        return nodes.stream()
                 .map(node -> {
                     Map<String, Object> item = new HashMap<>();
                     item.put("stepNo", node.stepNo());
@@ -444,12 +477,57 @@ public class ApprovalService {
                     item.put("nodeCode", node.nodeCode());
                     item.put("label", node.label());
                     item.put("approverRole", node.approverRole());
+                    item.put("approverRoleName", resolveRoleName(node.approverRole(), roleNameMap));
                     item.put("approvalMode", node.approvalMode());
                     item.put("approverType", node.approverType());
                     item.put("approverId", node.approverId());
                     return item;
                 })
                 .toList();
+    }
+
+    private Map<String, String> batchResolveRoleNames(List<WorkflowDefinitionService.WorkflowApprovalNode> nodes) {
+        Set<String> uniqueCodes = nodes.stream()
+                .map(WorkflowDefinitionService.WorkflowApprovalNode::approverRole)
+                .filter(code -> code != null && !code.isEmpty())
+                .collect(Collectors.toSet());
+        if (uniqueCodes.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        Set<String> uncached = uniqueCodes.stream()
+                .filter(code -> !roleNameCache.containsKey(code))
+                .collect(Collectors.toSet());
+        if (!uncached.isEmpty()) {
+            try {
+                List<Role> roles = roleMapper.selectList(
+                        new QueryWrapper<Role>().in("role_code", uncached));
+                for (Role role : roles) {
+                    if (role != null && role.getRoleCode() != null) {
+                        roleNameCache.put(role.getRoleCode(), role.getRoleName());
+                    }
+                }
+                for (String code : uncached) {
+                    roleNameCache.putIfAbsent(code, null);
+                }
+            } catch (Exception e) {
+                log.warn("批量查询角色中文名失败", e);
+            }
+        }
+        Map<String, String> result = new HashMap<>();
+        for (String code : uniqueCodes) {
+            String name = roleNameCache.get(code);
+            if (name != null) {
+                result.put(code, name);
+            }
+        }
+        return result;
+    }
+
+    private String resolveRoleName(String roleCode, Map<String, String> roleNameMap) {
+        if (roleCode == null || roleCode.isEmpty()) {
+            return null;
+        }
+        return roleNameMap.get(roleCode);
     }
 
     private int resolveFinalStep(ApprovalProcess process) {
@@ -687,8 +765,14 @@ public class ApprovalService {
                 log.info("审批驳回: processType={}, businessId={}", process.getProcessType(), process.getBusinessId());
                 break;
             case "ASSET_COMPENSATION":
-                // 赔偿驳回：更新赔偿记录状态为 REJECTED
-                compensationService.updateStatus(process.getBusinessId(), "REJECTED");
+                // 赔偿驳回：仅在赔偿记录已创建（businessId 对应有效的 AssetCompensation）时更新状态
+                if (process.getBusinessId() != null) {
+                    try {
+                        compensationService.updateStatus(process.getBusinessId(), "REJECTED");
+                    } catch (BusinessException ignored) {
+                        log.warn("赔偿驳回：赔偿记录不存在或已处理, businessId={}", process.getBusinessId());
+                    }
+                }
                 break;
             default:
                 break;

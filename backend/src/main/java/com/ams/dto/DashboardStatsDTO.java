@@ -53,4 +53,24 @@ public class DashboardStatsDTO {
      * 待审批数量
      */
     private Long pendingApprovals;
+
+    /**
+     * 资产使用率
+     */
+    private Double utilizationRate;
+
+    /**
+     * 待处理工单数量
+     */
+    private Long pendingWorkOrders;
+
+    /**
+     * 盘点进度
+     */
+    private Double inventoryProgress;
+
+    /**
+     * 关键告警数量
+     */
+    private Long criticalAlerts;
 }

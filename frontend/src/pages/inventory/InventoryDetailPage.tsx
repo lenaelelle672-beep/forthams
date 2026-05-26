@@ -27,7 +27,7 @@ import {
   getTaskSummary,
 } from '@/api/inventory';
 import type { ActualStatus, InventoryTask, InventoryAsset, InventorySummary } from '@/types/inventory';
-import type { ApiResponse, PaginatedResponse } from '@/types/common';
+import type { ApiResponse, PaginatedResponse, PageData } from '@/types/common';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
@@ -125,11 +125,9 @@ export default function InventoryDetailPage() {
     },
   });
 
-  const task = (taskRes as ApiResponse<InventoryTask> | undefined)?.data;
-  const records = (assetsRes as PaginatedResponse<InventoryAsset> | undefined)?.data?.records ?? [];
-  const total = (assetsRes as PaginatedResponse<InventoryAsset> | undefined)?.data?.total ?? 0;
-  const summary = (summaryRes as ApiResponse<InventorySummary> | undefined)?.data;
-
+  const task = taskRes as unknown as InventoryTask | undefined;  const records = (assetsRes as PageData<InventoryAsset> | undefined)?.records ?? [];
+  const total = (assetsRes as PageData<InventoryAsset> | undefined)?.total ?? 0;
+  const summary = summaryRes as unknown as InventorySummary | undefined;
   const canSubmit = task?.status === 'completed' || task?.progress >= 100;
   const progressPct = task?.progress ?? 0;
   const countedAssets = task?.countedAssets ?? 0;

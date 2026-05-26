@@ -123,7 +123,7 @@ export default function DisposalListPage() {
     queryFn: () => getDisposalStats(),
     staleTime: 60_000,
   });
-  const stats: DisposalStats | null = (statsRes as ApiResponse<DisposalStats> | undefined)?.data ?? null;
+  const stats: DisposalStats | null = statsRes as unknown as DisposalStats | undefined ?? null;
 
   const STATS_CONFIG = useMemo(() => [
     {
@@ -194,18 +194,18 @@ export default function DisposalListPage() {
   // ── 解包列表数据 ─────────────────────────────────────────────────────────
   const records: RowData[] = useMemo(() => {
     if (isCompensationTab) {
-      const pageData = (compensationRes as ApiResponse<PageData<Compensation>> | undefined)?.data;
+      const pageData = (compensationRes as PageData<Compensation> | undefined);
       return pageData?.records?.map(compensationToRow) ?? [];
     }
-    const pageData = (disposalRes as ApiResponse<PageData<Disposal>> | undefined)?.data;
+    const pageData = (disposalRes as PageData<Disposal> | undefined);
     return pageData?.records?.map(disposalToRow) ?? [];
   }, [isCompensationTab, disposalRes, compensationRes]);
 
   const total: number = useMemo(() => {
     if (isCompensationTab) {
-      return (compensationRes as ApiResponse<PageData<Compensation>> | undefined)?.data?.total ?? 0;
+      return (compensationRes as PageData<Compensation> | undefined)?.total ?? 0;
     }
-    return (disposalRes as ApiResponse<PageData<Disposal>> | undefined)?.data?.total ?? 0;
+    return (disposalRes as PageData<Disposal> | undefined)?.total ?? 0;
   }, [isCompensationTab, disposalRes, compensationRes]);
 
   const totalPages = Math.ceil(total / pageSize) || 1;

@@ -98,7 +98,7 @@ export default function IdleAssetsPage() {
 
   // 后端 /idle-assets/list 返回 ApiResponse<Page<IdleAssetNotice>>，即 { code, data: { records: [...] } }
   // 需要从 data.records 提取数组，兼容 data 直接为数组的情况，兜底 []
-  const raw = (assetsRes as ApiResponse<unknown> | undefined)?.data;
+  const raw = assetsRes as unknown as unknown | undefined;
   const assets: IdleAssetRecord[] = Array.isArray(raw)
     ? (raw as IdleAssetRecord[])
     : Array.isArray((raw as PageData<IdleAssetRecord> | undefined)?.records)

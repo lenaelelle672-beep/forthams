@@ -192,7 +192,7 @@ export default function CategoryManagerPage() {
     staleTime: 1000 * 60,
   });
 
-  const treeData = (treeRes as ApiResponse<AssetCategory[]> | undefined)?.data ?? [];
+  const treeData = treeRes as unknown as AssetCategory[] | undefined ?? [];
 
   // ── 找到当前选中的节点 ────────────────────────────────────────────────────
   function findNode(nodes: AssetCategory[], id: number): AssetCategory | null {

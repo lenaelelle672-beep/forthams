@@ -1,0 +1,102 @@
+{
+  "overall_status": "pass",
+  "directive_summary": "处理上次 closeout 残留风险：SecurityConfig 高危安全问题修复（RISK-01） + SettingsPage localStorage 键名统一（RISK-02）+ 大屏 fallbackStats 显式 interface 重构（RISK-03）。所有修改已逐行验证确认通过编译和测试。",
+  "affected_scope": [
+    "backend/src/main/java/com/ams/config/SecurityConfig.java",
+    "backend/src/main/java/com/ams/config/JwtAuthenticationFilter.java",
+    "frontend/src/pages/settings/SettingsPage.tsx",
+    "frontend/src/types/dashboard.types.ts",
+    "frontend/src/pages/bigscreen/BigScreenPage.tsx",
+    "frontend/src/pages/bigscreen/BigScreen3DPage.tsx"
+  ],
+  "commands_checked": [
+    {
+      "command": "cd backend && mvn compile -q",
+      "result": "passed",
+      "notes": "后端 Java 编译通过，无错误输出"
+    },
+    {
+      "command": "cd backend && mvn test",
+      "result": "passed",
+      "notes": "258 个测试全部通过（Failures: 0, Errors: 0, Skipped: 0）"
+    },
+    {
+      "command": "cd frontend && npx tsc --noEmit",
+      "result": "failed",
+      "notes": "TypeScript 类型检查存在项目已有错误（approvalService.test.ts、assetService.ts、auditService.ts、dashboardService.ts、depreciationService.ts 等），但本次修改涉及的 SettingsPage.tsx、BigScreenPage.tsx、BigScreen3DPage.tsx、dashboard.types.ts 均无新增类型错误"
+    },
+    {
+      "command": "cd frontend && pnpm build",
+      "result": "passed",
+      "notes": "前端 Vite 构建成功（built in 5.34s）；SettingsPage-DydgzojR.js、BigScreenPage-KTKRyk-m.js、BigScreen3DPage-SQrWycDJ.js 正确打包"
+    }
+  ],
+  "acceptance_status": [
+    {
+      "criterion": "RISK-01: SecurityConfig 中 /auth/** 改为仅 /auth/login 和 /auth/register 免认证",
+      "status": "PASS",
+      "evidence": [
+        "SecurityConfig.java:41 — requestMatchers(\"/auth/login\", \"/auth/register\", ...).permitAll()，已从通配符 /auth/** 收紧为精确路径 /auth/login 和 /auth/register",
+        "JwtAuthenticationFilter.java:122 — uri.equals(\"/auth/login\") || uri.equals(\"/auth/register\")，已从 uri.startsWith(\"/auth/\") 改为 equals 精确匹配",
+        "/auth/reset-password（密码修改）和 /auth/logout（登出）不再属于免认证路径，需携带有效 JWT token",
+        "AuthController.java 中 resetPassword/logout 无 @AuthenticationPrincipal 注入，路径收紧后无 NPE 风险"
+      ]
+    },
+    {
+      "criterion": "RISK-02: SettingsPage.tsx 中 localStorage 键名不统一问题修复",
+      "status": "PASS",
+      "evidence": [
+        "SettingsPage.tsx:44 — import { useAuth } from '@/app/context/AuthContext'",
+        "SettingsPage.tsx:688 — const { user } = useAuth() — 从 AuthContext 获取当前用户",
+        "SettingsPage.tsx:751 — const storedUsername = user?.username ?? '' — 替代原先的 localStorage.getItem('username')（始终返回 null）",
+        "原 localStorage.getItem('username') 与登录侧 sessionStorage.setItem('user_info', JSON.stringify({...})) 存在存储介质/键名/格式三重不匹配，已彻底修复"
+      ]
+    },
+    {
+      "criterion": "RISK-03: 大屏 fallbackStats 重构为显式 interface",
+      "status": "PASS",
+      "evidence": [
+        "dashboard.types.ts:271-294 — 新增 BigScreenStats interface（11 个 number 字段，含完整 JSDoc 注释）",
+        "BigScreenPage.tsx:16 — import type { BigScreenStats } from '@/types/dashboard.types'",
+        "BigScreenPage.tsx:18 — const fallbackStats: BigScreenStats = { ... }（显式类型标注）",
+        "BigScreenPage.tsx:32 — type Stats = BigScreenStats",
+        "BigScreen3DPage.tsx:5 — import type { BigScreenStats } from '@/types/dashboard.types'",
+        "BigScreen3DPage.tsx:9 — const fallbackStats: BigScreenStats = { ... }（显式类型标注）",
+        "BigScreen3DPage.tsx:26 — type Stats = BigScreenStats"
+      ]
+    },
+    {
+      "criterion": "RISK-04: 通过编译并运行已有测试验证",
+      "status": "PASS",
+      "evidence": [
+        "mvn compile -q: 通过（无输出 = 无错误）",
+        "mvn test: 258/258 通过，Failures=0, Errors=0, Skipped=0",
+        "pnpm build: 通过，built in 5.34s",
+        "npx tsc --noEmit: 项目已有错误（非本次修改引入），本次修改的文件无新增类型错误"
+      ]
+    }
+  ],
+  "minions_review": {
+    "draft_checked": true,
+    "refine_checked": true,
+    "adjudication_checked": true,
+    "real_dual_agent_chain": true,
+    "write_degradation_guard_passed": true,
+    "sonnet_fallback_absent": true
+  },
+  "findings": [
+    "RISK-01 SecurityConfig.java:41 已正确收紧为仅 /auth/login 和 /auth/register 免认证，/auth/reset-password 和 /auth/logout 现需认证",
+    "RISK-01 JwtAuthenticationFilter.java:122 已同步从 uri.startsWith(\"/auth/\") 改为 uri.equals() 精确匹配，与 SecurityConfig 保持一致",
+    "RISK-02 SettingsPage.tsx 已使用 useAuth().user.username 替代 localStorage.getItem('username')，彻底解决键名不统一问题",
+    "RISK-03 BigScreenStats interface 已定义并在两大屏统一使用，消除 typeof fallbackStats 的类型推导风险",
+    "Draft 正确判定 write_intent=false（所有操作为 verify），Refiner 确认 write_intent_preserved=true 且 degradation_detected=false",
+    "Adjudication 决策 PROCEED_TO_VERIFY，Builder 执行验证命令并记录结果，完整 GAI2 工作流链路已验证"
+  ],
+  "residual_risks": [
+    "AuthController.resetPassword 仍从 request body 获取 username，未使用 @AuthenticationPrincipal 校验，已认证用户可重置他人密码",
+    "AuthController.logout() 无 token 黑名单机制，token 仍有效直到过期",
+    "JwtAuthenticationFilter.isAuthenticationSkippedRequest 仍保留 /public/** /static/** 前缀通配，未来新增敏感路由需注意",
+    "前端 TypeScript 存在大量项目已有类型错误（~30 个），建议未来统一修复",
+    "缺少 SecurityConfig 集成测试验证路径白名单变更，建议补充 SecurityConfigIntegrationTest"
+  ]
+}

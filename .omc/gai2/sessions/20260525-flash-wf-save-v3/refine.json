@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "agent": "gai2-flash-refiner",
+  "model_route": "opencode-go/deepseek-v4-flash",
+  "session_id": "20260525-flash-wf-save-v3",
+  "artifact_dir": ".omc/gai2/sessions/20260525-flash-wf-save-v3",
+  "verdict": "accept_with_refinements",
+  "preserved_from_draft": [
+    "FIX-1: 消除 WorkflowDesignerPage 三处二次解包（L87/L162/L179）→ 直接类型断言 raw as WorkflowDefinitionDTO",
+    "FIX-4: NodeConfigPanel L123 角色降级显示改善 → 「{r}」（编码）",
+    "FIX-5: WorkflowDesignerPage 角色加载为空时 console.warn 调试信息"
+  ],
+  "improvements": [
+    {
+      "id": "IMP-1",
+      "target_fix": "FIX-2",
+      "description": "简化角色加载类型判断方向正确，但建议保留一个 fallback 分支防止极端情况。简化为：`if (Array.isArray(res)) list = res; else if (res != null) console.warn('[WorkflowDesignerPage] 角色API返回非数组:', typeof res, res);`",
+      "risk": "low"
+    },
+    {
+      "id": "IMP-2",
+      "target_fix": "FIX-3",
+      "description": "从模板创建改为 saveDraft 的方向正确，但 saveDraft 传入空 definition {nodes:[], edges:[]} 需确认后端是否允许。如果后端要求非空 definition，建议改为：1) 保留 publish 调用但增加更详细的错误消息；2) 或者在 catch 中捕获后尝试 saveDraft 作为 fallback。",
+      "alternative": "如果 saveDraft 空 definition 被后端拒绝，备选方案：(A) 保留原 publish 调用 + 改善 catch 错误消息展示后端原始错误；(B) 前端构造包含默认节点的 minimal definition 传给 saveDraft"
+    }
+  ],
+  "rejected_from_draft": [],
+  "write_intent_preserved": true,
+  "degradation_detected": false,
+  "fallback_labels": [],
+  "refinement_summary": "FIX-1/FIX-4/FIX-5 完全保留，FIX-2 方向正确建议增加空值日志，FIX-3 方向正确但需确认后端空 definition 行为。建议按 FIX-1/FIX-4/FIX-5 先执行确定性修改，FIX-2/FIX-3 在执行时做运行时验证。",
+  "key_validation_checks": [
+    "http.ts L57-58 确认 Guard 模式解包：body.code===200 时 return body.data",
+    "WorkflowDesignerPage L87 确认 raw 是 WorkflowDefinitionDTO（非 Result<WorkflowDefinitionDTO>）",
+    "后端 WorkflowDefinitionService.saveDraft 对空 definition 的处理",
+    "后端 WorkflowDefinitionService.publish 对不存在 businessType 的自动创建逻辑"
+  ]
+}

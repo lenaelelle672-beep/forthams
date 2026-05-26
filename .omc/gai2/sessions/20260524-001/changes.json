@@ -1,0 +1,38 @@
+{
+  "changed_files": [
+    "backend/src/main/java/com/ams/dto/ResetPasswordRequest.java",
+    "backend/src/main/java/com/ams/service/AuthService.java",
+    "frontend/src/api/base.ts",
+    "frontend/src/pages/settings/SettingsPage.tsx",
+    "frontend/src/pages/bigscreen/BigScreenPage.tsx",
+    "frontend/src/pages/bigscreen/BigScreen3DPage.tsx"
+  ],
+  "added_files": [],
+  "deleted_files": [
+    "frontend/src/pages/report/ReportPage.tsx",
+    "frontend/src/pages/report/ReportCenterPage.tsx",
+    "frontend/src/pages/report/components/ReportChart.tsx",
+    "frontend/src/pages/report/components/ReportCard.tsx"
+  ],
+  "commands_run": [
+    { "command": "rm -rf frontend/src/pages/report/", "result": "passed", "notes": "确认无 import 引用后删除" }
+  ],
+  "verification_results": {
+    "P0-1": "后端：ResetPasswordRequest.java 新增 @NotBlank oldPassword 字段；AuthService.resetPassword 在更新密码前调用 passwordEncoder.matches(oldPassword, user.getPassword())，不匹配抛 BusinessException('旧密码不正确')。前端：api/base.ts 新增 changePassword(data) 调用 POST /auth/reset-password；SettingsPage SecurityTab 新增独立 form，含旧密码/新密码/确认新密码三个输入框，提交前校验用户名存在、两次新密码一致、长度>=6，调用 changePasswordApi mutation。",
+    "P0-2": "BigScreenPage.tsx：移除 placeholderData: fallbackStats 和 throwOnError: false；useQuery 解构增加 isError/isLoading；return 前加 isLoading 加载态和 isError 错误态（含'数据加载失败，请刷新重试'提示和刷新按钮）；fallbackStats 变量保留仅作类型推导（type Stats = typeof fallbackStats）。BigScreen3DPage.tsx：移除 initialData: fallbackStats、throwOnError: false；queryFn 内 catch 吞异常块已删除（改为直接 await，错误自然传播）；字段级默认值由 fallbackStats.xxx 改为数值 0；同样添加加载态和错误态 UI。",
+    "P1-4": "在 src/ 全局搜索确认 pages/report/（非 pages/reports/）无任何 import 引用，路由文件 router/index.tsx 中无对该目录的 lazy import。已安全删除 pages/report/ 目录下全部 4 个文件及目录本身。"
+  },
+  "minions_execution": {
+    "adjudication_file_read": false,
+    "selected_source": "none",
+    "write_intent_preserved": true,
+    "degradation_blocked": false
+  },
+  "residual_risks": [
+    "P0-1: SettingsPage 读取用户名通过 localStorage.getItem('username')，依赖登录时的存储键名，若项目实际存储键不同需调整（可能是 'user'、'userInfo.username' 等，建议 reviewer 确认）",
+    "P0-1: 后端 POST /auth/reset-password 路由是否在 JWT 白名单中需确认——如已加白名单则任何人都可提交，应改为需要认证的端点（建议 reviewer 确认 SecurityConfig 白名单配置）",
+    "P0-2: BigScreenPage/BigScreen3DPage 的 fallbackStats 变量仍在文件中（作为 Stats 类型来源），若类型可改为明确接口定义可进一步清理，但不影响运行时行为",
+    "P0-2: 首次加载期间（isLoading=true 且 apiStats=undefined）显示纯色背景加载页，与大屏风格差异较大，可后续优化为骨架屏",
+    "P1-4: ReportCenterPage.tsx 功能相对完整，若后续需要接入需重新开发——已删除，无法找回（需通过 git 恢复）"
+  ]
+}

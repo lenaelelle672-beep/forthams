@@ -1,0 +1,125 @@
+{
+  "schema_version": 1,
+  "agent": "gai2-minions-drafter",
+  "model_route": "opencode-go/deepseek-v4-flash",
+  "write_intent": "按照策略C升级 forthams-e2e.spec.ts：编译期硬编码导航路由（18条来自SidebarLayout navGroups）+ 硬编码深层路由（16条非导航路由）+ 新建按钮点击探索（6个列表页），实现全量静态路由自动检测，升级等待策略为 networkidle + Suspense fallback 检测，增强错误过滤区分 GET/POST 表单页错误。",
+  "write_actions": [
+    {
+      "file": "../testFinish/tests/playwright/forthams-e2e.spec.ts",
+      "action": "edit",
+      "summary": "整体重写测试文件：从 82 行单 test 升级为 280+ 行结构化测试套件",
+      "details": "保留原有健康检查+登录流程。新增：1.路由常量定义区（NAV_ROUTES 18条/DEEP_ROUTES 16条/PARAM_ROUTES 12条/CREATE_BUTTON_PAGES 6条）。2.辅助函数（waitForPageReady/extractNavRoutesFromDOM/scanRoute/reportResults/tryClickCreateButton）。3.测试拆分为5个子测试（导航双重验证/导航路由扫描/深层路由扫描/新建按钮探索/参数化路由探测）。4.检测增强（networkidle→domcontentloaded fallback+Suspense检测/表单页POST 4xx过滤/console.error噪声过滤）。"
+    }
+  ],
+  "proposed_code": {
+    "intro": "以下是 forthams-e2e.spec.ts 的核心修改方案（代码要点）：",
+    "route_constants": [
+      "const NAV_ROUTES: string[] = [",
+      "  '/', '/assets', '/equipment', '/inventory', '/idle',",
+      "  '/disposals', '/approval', '/depreciation', '/workorders',",
+      "  '/vendors', '/locations', '/audit', '/workflows',",
+      "  '/analytics', '/situation', '/cyber-v12', '/industrial-v13',",
+      "  '/settings',",
+      "]; // 来源: SidebarLayout.tsx navGroups (18条)",
+      "",
+      "const DEEP_ROUTES: string[] = [",
+      "  '/dashboard',",
+      "  '/assets/new', '/assets/import-export',",
+      "  '/inventory/tasks',",
+      "  '/disposals/transfer/new', '/disposals/clearance/new',",
+      "  '/disposals/scrap/new', '/disposals/compensation/new',",
+      "  '/retirement', '/retirement/new',",
+      "  '/categories', '/workflow-designer',",
+      "  '/vendors/new',",
+      "  '/locations/tree', '/locations/new',",
+      "  '/workorders/new',",
+      "]; // 来源: App.tsx 路由配置 (16条, 排除导航重复)",
+      "",
+      "const CREATE_BUTTON_PAGES = [",
+      "  { url: '/assets', buttonPattern: /新增资产|新建|添加资产/, expectedRoute: '/assets/new' },",
+      "  { url: '/vendors', buttonPattern: /新增供应商|新建/, expectedRoute: '/vendors/new' },",
+      "  { url: '/locations', buttonPattern: /新增位置|新建/, expectedRoute: '/locations/new' },",
+      "  { url: '/workorders', buttonPattern: /新增工单|新建/, expectedRoute: '/workorders/new' },",
+      "  { url: '/inventory', buttonPattern: /创建盘点任务|新建盘点/, expectedRoute: null },",
+      "  { url: '/disposals', buttonPattern: /发起处置|新建处置/, expectedRoute: null },",
+      "];"
+    ],
+    "helper_functions": [
+      "async function waitForPageReady(page, timeout = 15000) {",
+      "  await page.waitForLoadState('networkidle', { timeout }).catch(() =>",
+      "    page.waitForLoadState('domcontentloaded', { timeout: 5000 })",
+      "  );",
+      "  await page.waitForSelector('text=正在加载页面', { state: 'detached', timeout: 10000 }).catch(() => {});",
+      "}",
+      "",
+      "async function extractNavRoutesFromDOM(page) {",
+      "  return page.evaluate(() => {",
+      "    const seen = new Set();",
+      "    document.querySelectorAll('nav a[href], aside a[href], [role=navigation] a[href]').forEach(a => {",
+      "      const h = a.getAttribute('href');",
+      "      if (h && h.startsWith('/') && !h.startsWith('/login')) seen.add(h);",
+      "    });",
+      "    return [...seen];",
+      "  });",
+      "}",
+      "",
+      "async function scanRoute(page, href, apiErrors) {",
+      "  const pa = apiErrors.length;",
+      "  await page.goto(href, { waitUntil: 'commit', timeout: 15000 }).catch(() => {});",
+      "  await waitForPageReady(page);",
+      "  const newRaw = apiErrors.slice(pa);",
+      "  const isFormPage = href.endsWith('/new');",
+      "  const filtered = isFormPage ? newRaw.filter(e => e.method === 'GET') : newRaw;",
+      "  const bodyLen = await page.evaluate(() => document.body?.innerText?.trim()?.length || 0).catch(() => 0);",
+      "  const redirectedToLogin = page.url().includes('/login');",
+      "  return { href, ok: filtered.length === 0 && !redirectedToLogin && bodyLen >= 10, reason: filtered[0] ? `API ${filtered[0].method} ${filtered[0].path} → ${filtered[0].status}` : undefined };",
+      "}"
+    ],
+    "test_structure": [
+      "test.describe('forthAMS 全量路由自发现 (策略C)', () => {",
+      "  test.setTimeout(180000);",
+      "  test('AC-1: 导航路由爬取与双重验证', async ({ page }) => {",
+      "    // goto / 登录后，extractNavRoutesFromDOM vs NAV_ROUTES 比对",
+      "  });",
+      "  test('导航路由逐页扫描 (18条)', async ({ page }) => {",
+      "    // 遍历 NAV_ROUTES + /dashboard 逐页 scanRoute",
+      "  });",
+      "  test('深层路由逐页扫描 (16条)', async ({ page }) => {",
+      "    // 遍历 DEEP_ROUTES 逐页 scanRoute",
+      "  });",
+      "  test('AC-2: 新建按钮点击探索', async ({ page }) => {",
+      "    // 对 CREATE_BUTTON_PAGES 列表页 goto → 按钮匹配 → 点击 → URL 验证",
+      "  });",
+      "  test('参数化路由探测 (参考)', async ({ page }) => {",
+      "    // 对参数化路由静默探测",
+      "  });",
+      "});"
+    ]
+  },
+  "verification_plan": {
+    "commands": [
+      "cd /Users/feigao/project/Project/testFinish",
+      "TEST_PROJECT_CONFIG=config/forthams.example.json BASE_URL=http://localhost:5173 npx playwright test tests/playwright/forthams-e2e.spec.ts --project=chromium --reporter=list",
+      "TEST_PROJECT_CONFIG=config/forthams.example.json BASE_URL=http://localhost:5173 npx playwright test --project=chromium --reporter=list"
+    ],
+    "expected_outcomes": [
+      "playwright 显示 5 个子测试",
+      "导航双重验证：NAV_ROUTES 中所有 18 条均在 DOM 中被找到",
+      "导航路由扫描：全部页面渲染正常",
+      "深层路由扫描：全部页面渲染正常，表单页 POST 4xx 被正确过滤",
+      "新建按钮探索：至少 4 个页面找到并点击成功",
+      "旧认证测试（forthams-certification.spec.ts）全部 PASS"
+    ]
+  },
+  "risks": [
+    "networkidle 在部分页面可能超时，fallback 到 domcontentloaded + Suspense 检测可缓解",
+    "新建按钮文本在各页面不一致，正则匹配可能遗漏",
+    "测试执行时间大幅增长（~35 页面），需要 180s 超时",
+    "后端数据依赖：空数据库可能触发空白页检测假阳性"
+  ],
+  "context_files_read": [
+    "workcard.json", "audit.json", "triage.json", "debate.json",
+    "forthams-e2e.spec.ts", "SidebarLayout.tsx", "App.tsx",
+    "router.tsx", "routes/AppRoutes.tsx", "router/AppRouter.tsx"
+  ]
+}

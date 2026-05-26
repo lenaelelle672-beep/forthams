@@ -10,6 +10,7 @@ import com.ams.entity.WorkflowDefinition;
 import com.ams.context.TenantContext;
 import com.ams.mapper.ApprovalProcessMapper;
 import com.ams.mapper.ApprovalRecordMapper;
+import com.ams.mapper.RoleMapper;
 import com.ams.mapper.UserRoleMapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -61,6 +62,9 @@ class ApprovalServiceTest {
     private UserRoleMapper userRoleMapper;
 
     @Mock
+    private RoleMapper roleMapper;
+
+    @Mock
     private NotificationService notificationService;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -79,6 +83,7 @@ class ApprovalServiceTest {
                 compensationService,
                 workflowDefinitionService,
                 userRoleMapper,
+                roleMapper,
                 objectMapper,
                 notificationService);
     }

@@ -1,0 +1,34 @@
+{
+  "batch": 2,
+  "directive": "修复 6 个 Controller 缺失 @Valid 注解 — 重新添加 validation 支持并验证测试通过",
+  "changed_files": [
+    "backend/src/main/java/com/ams/controller/WorkOrderController.java",
+    "backend/src/main/java/com/ams/controller/RetirementController.java",
+    "backend/src/main/java/com/ams/controller/MaintenanceController.java",
+    "backend/src/main/java/com/ams/controller/InventoryController.java",
+    "backend/src/main/java/com/ams/controller/UserManagementController.java",
+    "backend/src/main/java/com/ams/controller/ApprovalController.java"
+  ],
+  "added_files": [],
+  "commands_run": [
+    {
+      "command": "cd /Users/feigao/project/Project/forthAMS/backend && mvn test 2>&1 | grep -E '(Tests run:|BUILD)'",
+      "result": "passed",
+      "notes": "251 tests, 0 failures, 0 errors, 0 skipped — BUILD SUCCESS"
+    }
+  ],
+  "verification_results": [
+    "WorkOrderController.java L37: createWorkOrder 参数添加 @Validated(Create.class) @RequestBody，使用 validation group 确保仅 create 时触发 title/priority 必填校验",
+    "WorkOrderController.java L42: updateWorkOrder 保持无 @Valid（部分更新不应触发 Create 组校验）",
+    "RetirementController.java L27: submitApplication 参数添加 @Valid @RequestBody，提交退役申请时触发 Bean Validation",
+    "RetirementController.java L39: createDraftApplication 保持无 @Valid（草稿允许部分填写）",
+    "MaintenanceController.java L40: create 参数添加 @Valid @RequestBody",
+    "InventoryController.java L44: create 参数添加 @Valid @RequestBody",
+    "UserManagementController.java L58: create 参数添加 @Valid @RequestBody",
+    "ApprovalController.java L43: create 参数添加 @Valid @RequestBody",
+    "mvn test: 251 tests, 0 failures, 0 errors — 与基线一致，无回归"
+  ],
+  "residual_risks": [
+    "none"
+  ]
+}

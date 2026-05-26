@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "agent": "gai2-orchestrator-adjudication",
+  "decision": "use_refine",
+  "selected_source": "refine.json refinements applied to draft",
+  "builder_instructions": "1. 读取 draft-changes.json 的完整 content 字段（完整 JSON，read 截断时用 grep/full file）\n2. 编辑 testFinish/tests/playwright/forthams-e2e.spec.ts\n3. 应用 Draft 的 visitAndCheck 架构 + visitedUrls + API 监听 + 空白页检测 + networkidle 等待\n4. 确认保留登录步骤（fill admin/admin123 → 检查 token）\n5. 添加 Tab 切换检测（IMP-2）：在 /disposals 页面点击每个 Tab 检查增量错误\n6. 添加按钮 URL 验证（IMP-3）：点击新建后 waitForURL 验证导航到表单页\n7. 添加 Suspense 等待（IMP-4）：visitAndCheck 中 waitForSelector 避免误判空白页\n8. visitedUrls 阈值 >= 30（IMP-5）\n9. 不修改 forthams-certification.spec.ts\n10. 写入文件后运行验证",
+  "write_action_guard": [
+    "保留现有测试的登录流程不破坏",
+    "增量添加不替换现有通过逻辑",
+    "不修改认证测试文件"
+  ],
+  "fallback_labels": [],
+  "reviewer_checks": [
+    "E2E 测试 PASS",
+    "认证测试 10/10 PASS",
+    "visitedUrls >= 30",
+    "API 错误列表正确记录",
+    "测试执行时间 < 180s"
+  ]
+}

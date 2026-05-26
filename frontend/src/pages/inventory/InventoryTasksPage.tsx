@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 import { getInventoryTasks, createInventoryTask } from '@/api/inventory';
 import type { InventoryTaskStatus, CreateTaskPayload, InventoryTask } from '@/types/inventory';
-import type { PaginatedResponse } from '@/types/common';
+import type { PaginatedResponse, PageData } from '@/types/common';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
@@ -92,8 +92,8 @@ export default function InventoryTasksPage() {
     },
   });
 
-  const records = (res as PaginatedResponse<InventoryTask> | undefined)?.data?.records ?? [];
-  const total = (res as PaginatedResponse<InventoryTask> | undefined)?.data?.total ?? 0;
+  const records = (res as PageData<InventoryTask> | undefined)?.records ?? [];
+  const total = (res as PageData<InventoryTask> | undefined)?.total ?? 0;
 
   const statusCounts = records.reduce<Record<string, number>>((acc, r) => {
     acc[r.status] = (acc[r.status] || 0) + 1;

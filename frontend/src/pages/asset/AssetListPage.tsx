@@ -68,7 +68,7 @@ export default function AssetListPage() {
     queryFn: getDashboardStats,
     staleTime: 1000 * 60 * 5,
   });
-  const stats = (statsRes as unknown as ApiResponse<DashboardStats> | undefined)?.data;
+  const stats = statsRes as unknown as DashboardStats | undefined;
 
   const categories = useMemo(() => {
     const tree = categoryRes?.data ?? [];
@@ -77,8 +77,7 @@ export default function AssetListPage() {
   }, [categoryRes]);
 
   const departments = useMemo(() => {
-    const raw = (deptRes as unknown as ApiResponse<Department[]> | undefined)?.data;
-    const list = Array.isArray(raw) ? raw : [];
+    const raw = deptRes as unknown as Department[] | undefined;    const list = Array.isArray(raw) ? raw : [];
     const flat: { id: number; name: string }[] = [];
     const walk = (nodes: Department[]) => {
       for (const node of nodes) {
@@ -107,7 +106,7 @@ export default function AssetListPage() {
 
   const { data: res, isLoading } = useAssetList(apiQuery);
 
-  const pageData = (res as unknown as ApiResponse<PageData<AssetListItem>> | undefined)?.data;
+  const pageData = res as unknown as PageData<AssetListItem> | undefined;
   const records = pageData?.records ?? [];
   const total = pageData?.total ?? 0;
 
@@ -180,7 +179,7 @@ export default function AssetListPage() {
                     isImportant: importantOnly ? 1 : undefined,
                   };
                   const allRes = await http.get('/assets', { params: allQuery });
-                  const allRecords = (allRes as any)?.data?.records ?? [];
+                  const allRecords = (allRes as any)?.records ?? [];
                   if (allRecords.length === 0) {
                     toast.info('暂无数据可导出');
                     return;

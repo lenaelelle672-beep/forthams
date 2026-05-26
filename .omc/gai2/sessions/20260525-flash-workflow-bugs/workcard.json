@@ -1,0 +1,26 @@
+{
+  "session_id": "20260525-flash-workflow-bugs",
+  "mode": "flash",
+  "auto_mode": true,
+  "created_at": "2026-05-25T15:30:00Z",
+  "directive": "用户在 http://localhost:5173/workflows 页面报告两个 bug：\n1. 新建流程中「从模版创建」链路缺失，无法通过模板创建新流程\n2. 节点上的审批角色显示乱码\n3. 用户还想知道审批角色从哪定义，在哪修改或新建",
+  "phase": "triage",
+  "owner": "gai2-orchestrator",
+  "acceptance_checks": [
+    "AC-1: 工作流页面「从模版创建」链路可用，能成功通过模板创建新流程",
+    "AC-2: 节点上审批角色显示正常（无乱码）",
+    "AC-3: 明确回答审批角色的定义位置和修改/新建方式",
+    "AC-4: 编译通过，构建通过，无阻塞性缺陷"
+  ],
+  "evidence_to_collect": [
+    "前端 workflows 页面代码中「从模版创建」的入口和逻辑",
+    "审批角色数据来源（前端显示组件 + 后端 API + 数据库表）",
+    "角色显示乱码的根因（编码问题/数据问题/字段映射错误）",
+    "编译构建结果"
+  ],
+  "open_risks": [
+    "角色乱码可能是数据库编码或后端接口返回格式问题",
+    "从模版创建链路可能是前端路由缺失或后端模板 API 缺失"
+  ],
+  "artifact_dir": ".omc/gai2/sessions/20260525-flash-workflow-bugs"
+}

@@ -1,0 +1,38 @@
+{
+  "swarm_role": "product-ux",
+  "stance": "当前前端的标题和文案选择在 7/9 个争议点上优于测试期望。不应修改前端去对齐测试。唯一的必要前端修改是通知按钮的 aria-label 添加。",
+  "findings": [
+    "'资产台账'比'资产台账管理'更简洁——'台账'本身就隐含管理语义",
+    "'盘点任务列表'比'RFID资产盘点'更准确——页面展示的是盘点任务列表，不是盘点操作页",
+    "'审批中心'比'审批流程管理'更适合——'中心'比'流程管理'更直观",
+    "'业务流程管理'比'业务流程列表'语义更广——页面有管理功能不仅仅有列表",
+    "'数据分析'比'数据统计分析'更简洁——'分析'已涵盖统计",
+    "'登录系统'是标准按钮文案——'登录并进入仪表板'违反了按钮短文案规范",
+    "'搜索页面或业务数据...'比'搜索资产...'更准确——GlobalSearch 搜索的不只是资产",
+    "'搜索编号、名称...'比'搜索资产名称或编号...'更简短——在输入框上下文里明确"
+  ],
+  "recommendation": {
+    "approach": "前端只改通知 aria-label，其余 8 项差异由测试适配",
+    "details": "前端只添加一个真正的无障碍缺陷修复（aria-label），其余 heading 文字、按钮文字、placeholder 等差异全部由测试适配。这是对产品体验质量负责的选择。",
+    "heading_changes": [
+      {"page": "/assets", "current": "资产台账", "recommended": "保留当前，测试适配为'资产台账'"},
+      {"page": "/inventory", "current": "盘点任务列表", "recommended": "保留当前，测试适配为'盘点任务列表'"},
+      {"page": "/approvals", "current": "审批中心", "recommended": "保留当前，测试适配为'审批中心'"},
+      {"page": "/workflows", "current": "业务流程管理", "recommended": "保留当前，测试适配为'业务流程管理'"},
+      {"page": "/analytics", "current": "数据分析", "recommended": "保留当前，测试适配为'数据分析'"}
+    ],
+    "ui_changes": [
+      "AppLayout 通知按钮添加 aria-label='查看通知'（无障碍改进，推荐前端修改）"
+    ]
+  },
+  "risks": [
+    "测试适配 heading 文字后，如果将来页面重构时又修改标题，需要再次同步测试",
+    "aria-label 添加后如果按钮结构重构（如从 NavLink 改为 Button）需要重新确认"
+  ],
+  "evidence_needed": [
+    "确认 NavLink 是否支持 aria-label prop（React Router 6+ 支持）"
+  ],
+  "open_questions": [
+    "通知页面是否显示'暂无新的待办通知'文字？如果文字不同，需同时修改测试"
+  ]
+}

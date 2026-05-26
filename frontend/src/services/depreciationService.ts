@@ -136,15 +136,6 @@ export interface BatchDepreciationRequest {
   };
 }
 
-/**
- * API 响应结构
- */
-interface ApiResponse<T> {
-  code: number;
-  message: string;
-  data: T;
-}
-
 // ============================================================
 // 服务类
 // ============================================================
@@ -193,18 +184,10 @@ export class DepreciationService {
       params.month = month;
     }
 
-    const response = await http.get<ApiResponse<DepreciationSummary>>(
+    return await http.get<DepreciationSummary>(
       `${this.basePath}/report`,
       { params }
     );
-
-    // http 拦截器已解包 response.data，response 现在就是 ApiResponse<T>
-    const apiResponse = response as any as ApiResponse<DepreciationSummary>;
-    if (apiResponse.code !== 200) {
-      throw new Error(apiResponse.message || '获取折旧报表失败');
-    }
-
-    return apiResponse.data;
   }
 
   /**
@@ -221,19 +204,12 @@ export class DepreciationService {
     year: number,
     month: number
   ): Promise<DepreciationRecord[]> {
-    const response = await http.get<ApiResponse<DepreciationRecord[]>>(
+    return await http.get<DepreciationRecord[]>(
       `${this.basePath}/monthly`,
       {
         params: { assetId, year, month },
       }
     );
-
-    const apiResponse = response as any as ApiResponse<DepreciationRecord[]>;
-    if (apiResponse.code !== 200) {
-      throw new Error(apiResponse.message || '获取月度折旧明细失败');
-    }
-
-    return apiResponse.data;
   }
 
   /**
@@ -259,17 +235,10 @@ export class DepreciationService {
       queryParams.method = params.method;
     }
 
-    const response = await http.get<ApiResponse<DepreciationRecord[]>>(
+    return await http.get<DepreciationRecord[]>(
       `${this.basePath}/records`,
       { params: queryParams }
     );
-
-    const apiResponse = response as any as ApiResponse<DepreciationRecord[]>;
-    if (apiResponse.code !== 200) {
-      throw new Error(apiResponse.message || '获取折旧记录失败');
-    }
-
-    return apiResponse.data;
   }
 
   /**
@@ -294,17 +263,10 @@ export class DepreciationService {
       endPeriod,
     };
 
-    const response = await http.post<ApiResponse<{ affectedRecords: number }>>(
+    return await http.post<{ affectedRecords: number }>(
       `${this.basePath}/recalculate`,
       request
     );
-
-    const apiResponse = response as any as ApiResponse<{ affectedRecords: number }>;
-    if (apiResponse.code !== 200) {
-      throw new Error(apiResponse.message || '折旧重算失败');
-    }
-
-    return apiResponse.data;
   }
 
   /**
@@ -325,16 +287,10 @@ export class DepreciationService {
       period,
     };
 
-    const response = await http.post<
-      ApiResponse<{ successCount: number; failedCount: number; errors: string[] }>
-    >(`${this.basePath}/batch-calculate`, request);
-
-    const apiResponse = response as any as ApiResponse<{ successCount: number; failedCount: number; errors: string[] }>;
-    if (apiResponse.code !== 200) {
-      throw new Error(apiResponse.message || '批量计算失败');
-    }
-
-    return apiResponse.data;
+    return await http.post<{ successCount: number; failedCount: number; errors: string[] }>(
+      `${this.basePath}/batch-calculate`,
+      request
+    );
   }
 
   /**
@@ -356,24 +312,18 @@ export class DepreciationService {
     endYear: number,
     endMonth: number
   ): Promise<MonthlyDepreciationDetail[]> {
-    const response = await http.get<
-      ApiResponse<MonthlyDepreciationDetail[]>
-    >(`${this.basePath}/trend`, {
-      params: {
-        assetId,
-        startYear,
-        startMonth,
-        endYear,
-        endMonth,
-      },
-    });
-
-    const apiResponse = response as any as ApiResponse<MonthlyDepreciationDetail[]>;
-    if (apiResponse.code !== 200) {
-      throw new Error(apiResponse.message || '获取折旧趋势失败');
-    }
-
-    return apiResponse.data;
+    return await http.get<MonthlyDepreciationDetail[]>(
+      `${this.basePath}/trend`,
+      {
+        params: {
+          assetId,
+          startYear,
+          startMonth,
+          endYear,
+          endMonth,
+        },
+      }
+    );
   }
 
   /**
@@ -389,19 +339,14 @@ export class DepreciationService {
     year: number,
     format: 'excel' | 'pdf' = 'excel'
   ): Promise<string> {
-    const response = await http.get<ApiResponse<{ downloadUrl: string }>>(
+    const result = await http.get<{ downloadUrl: string }>(
       `${this.basePath}/export`,
       {
         params: { assetId, year, format },
       }
     );
 
-    const apiResponse = response as any as ApiResponse<{ downloadUrl: string }>;
-    if (apiResponse.code !== 200) {
-      throw new Error(apiResponse.message || '导出报表失败');
-    }
-
-    return apiResponse.data.downloadUrl;
+    return result.downloadUrl;
   }
 
   /**
@@ -415,26 +360,12 @@ export class DepreciationService {
     defaultSalvageRate: number;
     updateSchedule: string;
   }> {
-    const response = await http.get<
-      ApiResponse<{
-        defaultMethod: DepreciationMethod;
-        defaultUsefulLifeYears: number;
-        defaultSalvageRate: number;
-        updateSchedule: string;
-      }>
-    >(`${this.basePath}/config`);
-
-    const apiResponse = response as any as ApiResponse<{
+    return await http.get<{
       defaultMethod: DepreciationMethod;
       defaultUsefulLifeYears: number;
       defaultSalvageRate: number;
       updateSchedule: string;
-    }>;
-    if (apiResponse.code !== 200) {
-      throw new Error(apiResponse.message || '获取折旧配置失败');
-    }
-
-    return apiResponse.data;
+    }>(`${this.basePath}/config`);
   }
 
   /**

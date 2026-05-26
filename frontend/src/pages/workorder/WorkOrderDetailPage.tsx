@@ -47,8 +47,7 @@ export default function WorkOrderDetailPage() {
     staleTime: 1000 * 30,
   });
 
-  const detail = (res as ApiResponse<WorkOrderDetailResponse> | undefined)?.data;
-  const workOrder = detail?.workOrder ?? detail;
+  const detail = res as unknown as WorkOrderDetailResponse | undefined;  const workOrder = detail?.workOrder ?? detail;
   const approvalRecords = detail?.approvalRecords ?? [];
 
   const approveMutation = useMutation({

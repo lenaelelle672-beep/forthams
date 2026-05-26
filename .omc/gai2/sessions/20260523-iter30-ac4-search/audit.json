@@ -1,0 +1,51 @@
+{
+  "current_state": "SidebarLayout 头部区域已存在两套搜索机制共存：(1) 行内搜索栏 — 一个可折叠的 inline input，提交后调用 handleGlobalSearch() 跳转到 /assets?keyword=xxx，用于资产关键词搜索；(2) GlobalSearch 组件 — 已通过 import GlobalSearch from '@/components/GlobalSearch'（第29行）导入并渲染于第159行 <GlobalSearch />，提供 Cmd+K 命令面板用于页面路由导航。这两个组件均位于 header 内 SearchDropdown 和 NotificationCenter 之间。当前 GlobalSearch 的 ⌘K 全局快捷键正常生效（绑定在 GlobalSearch 内部 useEffect 中）。",
+  "existing_patterns": [
+    "AppLayout（旧布局）模式：SearchDropdown（API 内容搜索）+ GlobalSearch（Cmd+K 页面导航）并排存在于顶栏左侧",
+    "SidebarLayout（新布局）模式：行内搜索栏（资产关键词搜索）+ GlobalSearch（Cmd+K 页面导航）+ NotificationCenter 并排"
+  ],
+  "differences": [
+    "【功能本质不同】行内搜索栏是「资产内容搜索」— 提交表单后跳转到资产列表页带 ?keyword= 参数；GlobalSearch 是「页面导航搜索」— 仅做前端路由跳转，不涉及后端 API",
+    "【交互方式不同】行内搜索栏：点击展开 → 输入 → Enter 提交（表单模式）；GlobalSearch：按 ⌘K → 弹出 CommandDialog → 输入过滤 → 选择跳转",
+    "【数据来源不同】行内搜索栏：用户自由输入任何文本，透传给后端 /assets?keyword=；GlobalSearch：静态 SEARCHABLE_PAGES 数组，只包含预设页面列表",
+    "【后端依赖不同】行内搜索栏依赖资产列表页的 keyword 参数逻辑；GlobalSearch 完全前端、无后端 API 调用",
+    "AppLayout 使用的 SearchDropdown 组件（调用 GET /api/search）在 SidebarLayout 中完全不存在"
+  ],
+  "technical_constraints": [
+    "GlobalSearch 的 SEARCHABLE_PAGES 路由表与 App.tsx + SidebarLayout 实际路由存在多处不匹配：GlobalSearch 使用 /dashboard 而 SidebarLayout 导航使用 /；GlobalSearch 使用 /approvals 但 App.tsx 注册的是 /approval；/reports、/notifications 等路由在 App.tsx 中不存在；/situation、/cyber-v12、/industrial-v13 等大屏路由未收录在 SEARCHABLE_PAGES 中",
+    "行内搜索栏的 headerMessage 状态管理（toast 反馈）独立于 GlobalSearch，移除后需考虑用户反馈机制替代方案",
+    "SidebarLayout 的侧边栏导航条目与 GlobalSearch 的 SEARCHABLE_PAGES 分组结构不一致（导航分组 → 资产管理/业务流程/资源管理/系统；GlobalSearch 分组 → 概览/资产管理/运营管理/退役与处置/监控与审计/基础数据/系统）",
+    "命名冲突：SidebarLayout 中的 handleGlobalSearch 函数与 GlobalSearch 组件无关联，仅为历史命名遗留",
+    "SearchDropdown 组件（AppLayout 使用）仅调用后端 GET /api/search，且返回 types 为 asset/workorder/vendor，不支持直接跳转到 /assets?keyword= 模式"
+  ],
+  "risks": [
+    {
+      "level": "high",
+      "detail": "功能丢失风险：行内搜索栏是 SidebarLayout 中唯一的资产关键词搜索入口。如果简单替换为 GlobalSearch（仅页面导航），用户将无法从顶部搜索资产名称/编号跳转到资产列表"
+    },
+    {
+      "level": "high",
+      "detail": "路由不一致风险：GlobalSearch 的 SEARCHABLE_PAGES 收录了 /reports（不存在路由）、/approvals（实际注册为 /approval）、缺少 /situation、/cyber-v12 等 SidebarLayout 实际存在的页面。替换后将出现导航到 404 页面的问题"
+    },
+    {
+      "level": "medium",
+      "detail": "工作卡事实误差：workcard.json acceptance check AC-4-search-unify 声称 'SidebarLayout 未使用 GlobalSearch 组件，也无 ⌘K 快捷键' — 实际代码显示 GlobalSearch 已导入并渲染，⌘K 快捷键已生效。此误差可能导致 Builder 做出错误的决策判断"
+    },
+    {
+      "level": "medium",
+      "detail": "Accessibility / 命名冲突：GlobalSearch 的触发按钮与行内搜索栏的触发按钮分别使用不同的 aria-label（'打开资产搜索' vs 无 label），替换后需要统一无障碍标注"
+    },
+    {
+      "level": "low",
+      "detail": "NotificationCenter 与其他 header 元素的样式排列：GlobalSearch 组件的样式（hidden md:inline-flex）与 SidebarLayout header 的紧凑布局（h-11, gap-2.5）存在尺寸不协调（GlobalSearch 使用 h-8, w-56 尺寸较大），替换后可能需要调整 spacing"
+    }
+  ],
+  "test_surface": [
+    "GlobalSearch.test.tsx — 6 个测试用例覆盖 ⌘K/⌃K 打开、输入过滤、空结果、导航功能",
+    "CommandPalette.test.tsx — 搜索数据源完整性、分组逻辑纯函数、搜索词校验、快捷键逻辑",
+    "缺少：SidebarLayout 集成测试（GlobalSearch 在 SidebarLayout 中的渲染和快捷键行为）",
+    "缺少：GlobalSearch SEARCHABLE_PAGES 与 App.tsx 路由的一致性验证测试",
+    "缺少：SearchDropdown 组件的测试覆盖（仅在 AppLayout 中使用，SidebarLayout 未使用）"
+  ],
+  "implementation_guide": "【关键决策】根据 Directive '替换行内搜索栏'，需明确替换方案：方案A（推荐）— 保留行内搜索栏的资产搜索功能，同时移除其 UI 样式，改为在 GlobalSearch CommandDialog 中新增「搜索资产...」输入项或集成 SearchDropdown；方案B（最小改动）— 行内搜索栏和 GlobalSearch 保持共存（当前已是），仅优化样式对齐。\n\n如选择方案A，实施步骤：\n1. 扩展 GlobalSearch 的 SEARCHABLE_PAGES 与 App.tsx 实际路由对齐（修复 /dashboard→/、/approvals→/approval，补充缺失路由）\n2. 在 GlobalSearch CommandDialog 中增加「资产搜索」功能区：允许输入关键词并触发 navigate('/assets?keyword=...') 或调用 /api/search\n3. 移除 SidebarLayout 中的行内搜索栏 DOM（行 114-157）、相关 state (searchQuery, isSearchOpen, headerMessage) 和 handleGlobalSearch 函数\n4. 调整 header 样式：移除多余空间，确保 NotificationCenter 和用户区布局紧凑\n5. 新增测试：GlobalSearch + SidebarLayout 集成测试、SEARCHABLE_PAGES 路由一致性验证测试"
+}

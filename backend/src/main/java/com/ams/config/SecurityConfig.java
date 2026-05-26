@@ -38,7 +38,8 @@ public class SecurityConfig {
             .csrf(AbstractHttpConfigurer::disable)
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/auth/**", "/public/**", "/health", "/system/health", "/system/info").permitAll()
+                .requestMatchers("/auth/login", "/auth/register", "/public/**", "/health", "/system/health", "/system/info").permitAll()
+                .requestMatchers("/bigscreen/**", "/bigscreen-3d/**").hasAnyRole("ADMIN", "SUPER_ADMIN")
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session

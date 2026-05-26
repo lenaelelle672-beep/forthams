@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "agent": "gai2-drafter",
+  "objective_summary": "升级 forthams-e2e.spec.ts，实现自动爬取 SidebarLayout 导航发现全部路由（18+ 导航项 + 深层表单页 + 模块化路由），模拟点击新建/新增按钮进入表单页，自动检测所有页面的 API 错误/渲染崩溃/空白页。",
+  "write_intent": true,
+  "write_actions": [
+    {
+      "action_id": "WA-1",
+      "title": "导航路由自动发现策略（双源归并）",
+      "approach": "策略 A + B 双源归并。策略 A：保留现有 DOM 自发现（page.evaluate 遍历 nav/aside a[href]），得到运行时实际渲染的导航链接。策略 B：在测试中维护一份由审计阶段提取的 ALL_STATIC_ROUTES 常量，作为静态完整的路由基线。运行时两者取并集，去重后得到最终的爬取清单。",
+      "rationale": "DOM 自发现能自动跟随 SidebarLayout 变更，但无法发现深层路由（如 /assets/new）。静态常量覆盖 App.tsx + 模块路由的所有非参数化路径，两者结合实现完全覆盖。",
+      "static_routes_list": [
+        {"group": "sidebar_导航项", "routes": ["/", "/assets", "/equipment", "/inventory", "/idle", "/disposals", "/approval", "/depreciation", "/workorders", "/vendors", "/locations", "/audit", "/workflows", "/analytics", "/situation", "/cyber-v12", "/industrial-v13", "/settings"]},
+        {"group": "额外非参数化路由", "routes": ["/dashboard", "/assets/new", "/categories", "/inventory/tasks", "/disposals/transfer/new", "/disposals/clearance/new", "/disposals/scrap/new", "/disposals/compensation/new", "/retirement", "/workflow-designer", "/workorders/new"]},
+        {"group": "参数化路由（跳过）", "routes": ["/assets/:id/edit", "/inventory/tasks/:taskId", "/inventory/scan/:taskId", "/inventory/smart-report/:taskId", "/audit/:id", "/retirement/:id", "/workorders/:id/edit"]}
+      ]
+    },
+    {
+      "action_id": "WA-2",
+      "title": "深层路由发现策略（直接导航 + 按钮点击双通道）",
+      "approach": "双通道策略。通道1（直接导航）：对 DEEP_FORM_ROUTES 中的每条路由直接从当前页 goto 到该 URL 并检测错误。通道2（按钮点击）：保留并增强现有新建/新增按钮点击逻辑，查找文本匹配多个关键词的 button/a，点击后检测新 URL。",
+      "rationale": "直接导航确保 100% 覆盖已知深层路由；按钮点击发现未知的嵌套入口。两者互补。"
+    },
+    {
+      "action_id": "WA-3",
+      "title": "参数化路由处理策略",
+      "approach": "硬跳过 + 日志记录。将包含 :id 参数的路由标记为 parametric，在遍历时跳过 goto。但在最终报告中记录跳过的参数化路由清单。",
+      "rationale": "带 :id 的动态段无法用固定占位值验证，跳过比产生误报更安全。"
+    },
+    {
+      "action_id": "WA-4",
+      "title": "新建/新增按钮点击增强策略",
+      "approach": "中文匹配扩展到 ['新建', '新增', '添加', '发起', '创建', '登记', '录入']；选择器范围扩展为 button, a[role=button], [class*=btn]；限制每个列表页最多点击 3 个按钮。",
+      "rationale": "比单一的文本匹配更全面，降低遗漏风险。"
+    },
+    {
+      "action_id": "WA-5",
+      "title": "错误监控复用与增强",
+      "approach": "保留现有 page.on 监听器。新增 Suspense 加载超时检测和页面标题/heading 检测。",
+      "rationale": "现有监控已覆盖 API 错误和 React 崩溃，新增 Suspense 卡死检测填补空白页前的一个常见问题场景。"
+    }
+  ],
+  "verification_plan": [
+    "VP-1: 运行升级后 E2E 测试，确认爬取路由数 ≥ 28 条，无新增 API 500/React 崩溃",
+    "VP-2: 运行旧认证测试，确认 10 tests 全部 PASS",
+    "VP-3: 检查每个深层路由（/assets/new, /disposals/*/new, /inventory/tasks 等）都至少被访问一次",
+    "VP-4: 检查参数化路由跳过清单与预期一致"
+  ],
+  "assumptions": [
+    "真后端 API 对于深层表单页的 GET 请求至少返回 200",
+    "SidebarLayout 中的 navGroups 常量在测试期间稳定",
+    "认证测试完全独立于真 E2E 测试，无共享状态"
+  ],
+  "risks": [
+    {"risk": "参数化路由（:id）无法覆盖", "level": "medium"},
+    {"risk": "深层表单页需后端特定数据才能渲染", "level": "medium"},
+    {"risk": "按钮点击探测可能遗漏非标准入口", "level": "low"},
+    {"risk": "测试执行时间增加到 ~90s", "level": "low"}
+  ],
+  "blocked_by": [
+    "深层表单页真后端 GET 数据可用性",
+    "/inventory/tasks 可能要求存在盘点任务数据"
+  ]
+}

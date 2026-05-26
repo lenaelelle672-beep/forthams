@@ -39,7 +39,7 @@ function getNodeMeta(type: FlowNodeType, data: FlowNodeData) {
     case "start":
       return `触发方式 · ${data.triggerType || "手动触发"}`;
     case "approval":
-      return `审批人 · ${data.approverRole || "待配置"}`;
+      return `审批人 · ${data.approverRoleName || data.approverRole || "待配置"}`;
     case "condition":
       return data.conditionExpression || "请配置分支条件";
     case "end":

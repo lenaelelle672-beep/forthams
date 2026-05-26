@@ -151,7 +151,11 @@ export const submitScrapApplication = (data: ScrapApplicationPayload) =>
       data.estimatedResidualValue ? `预估残值：¥${data.estimatedResidualValue}` : null,
       data.remark ? `备注：${data.remark}` : null,
     ].filter(Boolean).join('；'),
-    businessData: JSON.stringify(data),
+    // businessData 必须对齐后端 AssetScrapDTO: { assetId: Long, reason: String }
+    businessData: JSON.stringify({
+      assetId: Number(data.assetIds[0]) || 0,
+      reason: [data.scrapReason, data.disposalMethod, data.remark].filter(Boolean).join('；'),
+    }),
   });
 
 export interface ScrapDraftData {
@@ -205,7 +209,11 @@ export const submitClearanceApplication = (data: ClearanceApplicationPayload) =>
       `紧急程度：${data.urgency}`,
       data.remark ? `备注：${data.remark}` : null,
     ].filter(Boolean).join('；'),
-    businessData: JSON.stringify(data),
+    // businessData 必须对齐后端 AssetClearanceDTO: { assetId: Long, reason: String }
+    businessData: JSON.stringify({
+      assetId: Number(data.assetIds[0]) || 0,
+      reason: [data.clearanceReason, data.disposalMethod, data.remark].filter(Boolean).join('；'),
+    }),
   });
 
 export interface ClearanceDraftData {
@@ -264,5 +272,12 @@ export const submitTransferApplication = (data: TransferApplicationPayload) =>
       `紧急程度：${data.priority}`,
       data.notes ? `备注：${data.notes}` : null,
     ].filter(Boolean).join('；'),
-    businessData: JSON.stringify(data),
+    // businessData 必须对齐后端 AssetTransferDTO: { assetId, targetDeptId, targetUserId, targetLocation, reason }
+    businessData: JSON.stringify({
+      assetId: Number(data.assetIds[0]) || 0,
+      targetDeptId: Number(data.toDept) || 0,
+      targetUserId: 0,
+      targetLocation: data.toLocation || '',
+      reason: [data.transferType, data.notes].filter(Boolean).join('；'),
+    }),
   });

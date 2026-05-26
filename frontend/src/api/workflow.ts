@@ -25,7 +25,7 @@ function getOperatorId(): number | undefined {
   if (!raw) return undefined;
   try {
     const user = JSON.parse(raw);
-    const id = user.id ?? user.userId;
+    const id = user.id ?? user.userId ?? user.uid;
     return id != null && id !== '' ? Number(id) : undefined;
   } catch { return undefined; }
 }
@@ -37,7 +37,7 @@ export const workflowApi = {
   get: (businessType: string) =>
     http.get<WorkflowDefinitionDTO>(`/workflows/${businessType}`),
 
-  saveDraft: (businessType: string, payload: { name: string; description: string; definition: Record<string, unknown> }) =>
+  saveDraft: (businessType: string, payload: { name: string; description: string; definition: Record<string, unknown> | null }) =>
     http.put<WorkflowDefinitionDTO>(`/workflows/${businessType}/draft`, { ...payload, operatorId: getOperatorId() }),
 
   publish: (businessType: string) =>
@@ -45,6 +45,12 @@ export const workflowApi = {
 
   updateStatus: (businessType: string, status: string) =>
     http.post<WorkflowDefinitionDTO>(`/workflows/${businessType}/status`, { status, operatorId: getOperatorId() }),
+
+  createCustomWorkflow: (businessType: string, name: string, description: string) =>
+    http.post<WorkflowDefinitionDTO>('/workflows/custom', { businessType, name, description, operatorId: getOperatorId() }),
+
+  delete: (businessType: string) =>
+    http.delete<void>(`/workflows/${businessType}`),
 };
 
 export interface RoleRecord {

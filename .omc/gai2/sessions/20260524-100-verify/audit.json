@@ -1,0 +1,78 @@
+{
+  "current_state": "forthams-certification.spec.ts 是基于 Mock API 的认证测试套件（10 个用例），已标记 @deprecated。其设计目标为旧版页面组件（@/app/pages/），但路由配置（router/index.tsx）实际加载的是新版重构页面（@/pages/ 子目录）。运行时渲染的 DOM 结构与测试断言存在系统性偏差。",
+  "existing_patterns": [
+    "使用 page.route('/api/**', ...) 全局拦截 API 请求并返回 Mock 数据",
+    "Mock 数据响应格式：{ code, message, data } — 新版页面使用 tanstack/react-query + 真实 API 调用，响应处理依赖 ApiResponse<T>.data",
+    "测试 seed 认证：addInitScript 向 localStorage 注入 auth_token 和 user_info",
+    "新版页面统一使用 PageHeader 组件渲染标题，而非旧版的 <h1>/<h2> 原生标签",
+    "新版页面全面使用 @tanstack/react-query (useQuery/useMutation) 替代旧版的手动 fetch/useEffect",
+    "e2e 测试（forthams-e2e.spec.ts）采用真 E2E 模式（要求前端 dev server 在线），侧重路由可达性而非深度业务交互"
+  ],
+  "technical_constraints": [
+    "Mock 的 fulfill() 函数保证 status/code/message/data 结构，但新版页面的 API 服务层使用 http 实例（基于 axios）包装响应，提取逻辑为 response.data（即 ApiResponse 对象），再取 .data 字段得到真正载荷",
+    "新版组件大量使用 shadcn/ui 组件（Button, Input, Badge, DataTable 等），其中 button 元素的 accessible name 可能不同于旧版原生 <button>",
+    "PageHeader 组件内部标题可能不是 <h1>/<h2> 标签，导致 getByRole('heading', ...) 失效",
+    "新版 AssetListPage 的「创建资产」流程为跳转独立页面 /assets/new（AssetFormPage），而非旧版的模态框内联创建",
+    "新版 InventoryTasksPage 使用 DataTable + Dialog 组件，DOM 结构与旧版完全不同",
+    "新版 SettingsPage 的 Tab 导航改为侧边栏按钮 + 路由参数 /settings/:tab，API 调用从旧版手动 fetch 改为 tanstack/react-query",
+    "新版 ApprovalListPage 使用 Dialog 内嵌 ApprovalActionPanel + ApprovalFlowChart 组件，审批通过/驳回操作通过 Dialog 内表单提交，而非旧版的行内按钮直接点击",
+    "Mock 数据中的字段名（如 assetName/name、equipmentName/assetName/e等）存在冗余别名，新版组件可能只读取其一"
+  ],
+  "risks": [
+    {
+      "level": "high",
+      "detail": "测试断言依赖于旧版页面 DOM 结构（getByRole('heading') 匹配旧版 <h1>/<h2> 文本），新版使用 PageHeader 组件，可能导致 heading 角色断言永久挂起"
+    },
+    {
+      "level": "high",
+      "detail": "CERT-01 的退出登录选择器 button[title=\"退出登录\"] 在新版 AppLayout 中可能不存在或属性不同，导致退出验证失败"
+    },
+    {
+      "level": "high",
+      "detail": "CERT-03 的「创建资产」流程假设内联模态框（旧版），实际新版跳转 /assets/new 独立页面，交互路径完全不一致"
+    },
+    {
+      "level": "medium",
+      "detail": "CERT-02 的模块标题映射（如 'RFID 盘点'→'盘点任务列表'、'审批流程'→'审批中心'）与新版 InventoryTasksPage（'进行中任务'）和 ApprovalListPage（Tab: 待我审批/我发起的/已审批）的页面标题不一致"
+    },
+    {
+      "level": "medium",
+      "detail": "CERT-04 的维保记录创建选择器（page.locator('select').first()）在新版 EquipmentPage 中可能不匹配，新版使用 Custom Select 组件"
+    },
+    {
+      "level": "medium",
+      "detail": "CERT-05 的「新建盘点」按钮文本与新版 InventoryTasksPage 的「创建盘点任务」不完全匹配；创建任务表单字段（placeholder 和必填校验）不同"
+    },
+    {
+      "level": "medium",
+      "detail": "CERT-08 的 approval 操作选择器（getByRole('button', { name: '通过' })）在新版 ApprovalListPage 中不存在行内按钮，操作需通过 Dialog 弹出"
+    },
+    {
+      "level": "low",
+      "detail": "Mock API 路径 /approvals 和 /approvals/pending 等可能不匹配新版 ApprovalListPage 调用的真实 API 端点（/api/approvals/list 等）"
+    },
+    {
+      "level": "low",
+      "detail": "新版 LoginPage 使用 useForm + react-hook-form 和 useMutation 进行登录提交，validation 错误显示为 formState.errors 而非直接显示 API 错误文本"
+    }
+  ],
+  "test_surface": [
+    "npm run test:forthams（手动运行认证测试）",
+    "npm run test:e2e（运行真 E2E 测试）",
+    "10 个 CERT 测试用例覆盖：登录认证、模块导航、资产台账 CRUD、重要设备维保、RFID 盘点、闲置资产管理、资产处置、审批与工单流转、系统设置、仪表板与数据分析"
+  ],
+  "builder_notes": [
+    "【CERT-01 有偏差】登录流程交互基本正确（getByLabel 匹配新版 htmlFor、按钮文本匹配），但退出登录 button[title=\"退出登录\"] 选择器需要验证新 AppLayout 是否渲染",
+    "【CERT-02 需要修复】10 个模块的 heading 断言大部分不匹配新版 PageHeader 渲染方式。建议改用 getByText('仪表板') 等更通用的文本匹配，或确认 PageHeader 的 aria 角色",
+    "【CERT-03 需要修复】资产创建流程从内联模态改为独立页面跳转，整个「点击新建→填写表单→提交→验证」路径需重写",
+    "【CERT-04 有偏差】维保记录创建交互在新 EquipmentPage 中差异较大，保存按钮和选择器均需重新适配",
+    "【CERT-05 有偏差】盘点任务创建和列表 UI 在新版 InventoryTasksPage 中使用 DataTable + Dialog，需要重新适配选择器和交互路径",
+    "【CERT-06 有偏差】闲置资产管理页面已重构为 IdleAssetsPage（@/pages/idle/），使用 tanstack-query 和 Tab 视图，与旧版 IdleAssets.tsx 差异较大",
+    "【CERT-07 有偏差】资产处置页面已重构为 DisposalListPage（@/pages/disposal/），Tab 名称和搜索行为均已变化",
+    "【CERT-08 需要修复】审批操作从行内按钮改为 Dialog 内组件（ApprovalActionPanel），批准/驳回的交互路径完全不同",
+    "【CERT-09 需要修复】系统设置页面已完全重构为 SettingsPage（@/pages/settings/），Tab 名称为「用户管理/部门管理/系统配置/安全设置」，用户管理操作交互完全不同",
+    "【CERT-10 有偏差】仪表板标题使用 PageHeader，数据分析页已重构，KPI 卡片文本可能不同",
+    "【@deprecated 合理】e2e 测试（forthams-e2e.spec.ts）覆盖了 30+ 路由可达性、登录认证、新建按钮探索和资产创建闭环——覆盖范围更广且基于真后端。认证测试作为 Mock 时代的产物已不再适合维护",
+    "【Mock API 一致性】Mock 响应包装（{code, message, data}）与新版 http 层期望一致（ApiResponse<T>.data），但 mock 返回的 data 字段中的字段名（如 assets 中的 assetName vs name）需要确认新版组件读取的是哪个字段"
+  ]
+}

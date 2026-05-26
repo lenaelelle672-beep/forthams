@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "agent": "gai2-audit",
+  "session": "20260524-cert-upgrade-selectors",
+  "audit_timestamp": "2026-05-24T00:00:00+08:00",
+  "current_state": "认证测试 10/10 在 Mock 数据下 PASS，但断言与新版 DOM 存在系统性偏差。页面组件已完成重构（新路由、新布局、新交互模式），测试选择器仍基于旧版 DOM 结构编写，导致断言与实际 DOM 存在 10+ 处不匹配，涉及路由、heading 文本、表单字段、导航链接、过滤方式和审批操作路径。当前测试的 PASS 状态依赖于 Mock API 的宽松匹配和测试提前退出（如 CERT-03 删除了对对话框删除的断言），而非正确的 DOM 断言。",
+  "existing_patterns": {
+    "CERT-02": "测试循环导航 10 个模块并验证 heading。实际 sidebar 链接文字与测试预期有差异（'RFID 盘点' vs 'RFID盘点'，无'工作流'链接）；4 个页面的 heading 文字与测试预期不匹配：RFIDInventory（'盘点任务' vs '盘点任务列表'）、ApprovalListPage（'审批列表' vs '审批中心'）、WorkflowCenter（'业务流程列表' vs '业务流程管理'）、Analytics（'数据统计分析' vs '数据分析'）。Dashboard 使用 <h2>仪表板</h2>，隐含 role='heading'，getByRole 可正确匹配。全局搜索按钮 GlobalSearch 渲染桌面端按钮文本 '搜索...' 和移动端 aria-label='搜索'，/搜索/ 正则可匹配。",
+    "CERT-03": "资产创建流程已从内联模态框改为独立页面 /assets/new（AssetFormPage）。测试问题：(1) 按钮文字 '新建资产' → 实际 AssetToolbar 按钮 '新建'；(2) 搜索框 placeholder '搜索编号、名称...' → 实际 '搜索资产...'；(3) 创建表单字段结构完全不同：旧版有 combobox 分类选择器、'原值（元）'、'当前净值（元）'，新版使用 input 文本输入、'采购价格' 字段、无 '当前净值' 字段；(4) fillAssetForm 中的 getByLabel('购置日期') 无法匹配新版 label（实际为 '购置日期 *'）。新版 AssetFormPage 使用 data-testid 模式（如 data-testid='input-asset-name'），没有显式 aria-label 属性。",
+    "CERT-08": "审批页面已重构为 ApprovalListPage，使用 ApprovalStoreProvider + 详情弹窗 + ApprovalActionPanel 组件。测试问题：(1) 路由 URL 错误：测试使用 /approvals，实际路由 /approval；(2) heading 文字：'审批中心' → 实际 '审批列表'；(3) 状态过滤机制：旧版 <select> 下拉框 → 新版 Tab 按钮（全部/待审批/已通过/已拒绝/已取消）；(4) 审批操作路径：旧版行内 '通过' 按钮 → 新版需先点击列表项打开 Detail Modal，再通过 ApprovalActionPanel（含 comment textarea + 通过/驳回 按钮）操作。工单部分（'工单管理'）heading 匹配。"
+  },
+  "technical_constraints": [
+    "测试文件位于独立项目 /Users/feigao/project/Project/testFinish/，与前端项目分离，修改后需跨项目同步",
+    "AssetListPage 的 heading 使用 <h1> 而非其他页面通用的 <h2>，选择器需差异化处理",
+    "AssetFormPage 所有表单字段使用 data-testid 标识，无 explicit aria-label，getByLabel 依赖 label 元素的 accessible name 计算",
+    "RFIDInventory 页面没有页面级 <h1>/<h2> 主标题，仅含 <h3>盘点任务</h3> 作为区域标题",
+    "ApprovalListPage 使用 ApprovalStoreProvider 包裹状态，测试 Mock API 的 /approvals 端点可能需要调整路径前缀",
+    "SidebarLayout 中 NavLink 元素默认渲染为 <a> 标签，getByRole('link') 可匹配，但 reactive router 的 active 样式不影响 role 解析",
+    "GlobalSearch 渲染两个 button 元素（桌面可见 + 移动端隐藏），.first() 依赖于 visible 语义，不同 viewport 下行为可能不同",
+    "AssetToolbar 包含两个可见按钮：'新建'（蓝色主按钮）和左侧视图切换按钮，getByRole('button', { name: '新建资产' }) 找不到匹配",
+    "旧版审批流程的 select filter 使用 .nth(1) 选择第二个 select 元素，新版无 select 选择器会导致定位失败",
+    "fillAssetForm 函数中 getByLabel('购置日期') 无法匹配包含 <span>*</span> 子元素的 label 节点（accessible name 为 '购置日期 *'）"
+  ],
+  "risks": [
+    {
+      "id": "RISK-01",
+      "severity": "high",
+      "detail": "CERT-02 模块导航循环中 4/10 的 heading 断言必然失败：审批中心/审批列表、盘点任务列表/盘点任务、业务流程管理/业务流程列表、数据分析/数据统计分析。'工作流' 链接在 sidebar 中不存在（实际为'流程管理'），链接导航也会失败。"
+    },
+    {
+      "id": "RISK-02",
+      "severity": "high",
+      "detail": "CERT-03 创建资产流程的核心字段选择器全部不匹配：combobox 不存在、'原值（元）'/'当前净值（元）' label 不存在、'购置日期' label 需改为 '购置日期 *'。按当前断言实际创建操作无法正确填充表单。"
+    },
+    {
+      "id": "RISK-03",
+      "severity": "high",
+      "detail": "CERT-08 路由 URL /approvals 错误（正确为 /approval），导致页面导航失败，后续所有断言无法执行。状态过滤 select 元素不存在，'通过' 按钮不在列表行内而在详情弹窗的 ApprovalActionPanel 中。"
+    },
+    {
+      "id": "RISK-04",
+      "severity": "medium",
+      "detail": "CERT-02 RFID 盘点链接文字差异：sidebar 使用 'RFID盘点'（无空格），测试使用 'RFID 盘点'（有空格）。getByRole('link', { name: 'RFID 盘点' }) 的 name 匹配使用精确的 accessible name，空格差异可能导致匹配失败或 rely on fuzzy matching。"
+    },
+    {
+      "id": "RISK-05",
+      "severity": "medium",
+      "detail": "CERT-03 按钮文字 '新建资产' → 实际 '新建'。getByRole 的 name 匹配默认使用 exact name，若 Playwright 使用精确匹配则必失败；若使用 substring 或 regex 则可能意外匹配其他按钮。"
+    },
+    {
+      "id": "RISK-06",
+      "severity": "low",
+      "detail": "CERT-02 全局搜索按钮有两个实例（桌面和移动端），虽然 /.first()/ 在桌面 viewport 下只会匹配可见的桌面按钮，但测试未指定 viewport size，在不同环境下的可见性行为可能不一致。"
+    },
+    {
+      "id": "RISK-07",
+      "severity": "medium",
+      "detail": "CERT-02 通知页面链接使用 locator('a[href=\"/notifications\"]')，但实际 sidebar 和页面中未发现 /notifications 路由。NotificationCenter 组件通过 button 点击弹出，没有独立页面路由。此项断言依赖具体实现，可能无法正确定位到通知页面。"
+    }
+  ],
+  "test_surface": [
+    "forthams-certification.spec.ts:L63 — 'RFID 盘点' link text has space, sidebar uses no space",
+    "forthams-certification.spec.ts:L63 — heading '盘点任务列表' should be '盘点任务'",
+    "forthams-certification.spec.ts:L67 — heading '审批中心' should be '审批列表'",
+    "forthams-certification.spec.ts:L68 — link '工作流' not in sidebar (nearest: '流程管理')",
+    "forthams-certification.spec.ts:L68 — heading '业务流程管理' should be '业务流程列表'",
+    "forthams-certification.spec.ts:L69 — heading '数据分析' should be '数据统计分析'",
+    "forthams-certification.spec.ts:L76-78 — module navigation loop affected by above mismatches",
+    "forthams-certification.spec.ts:L84 — /搜索/ button may match both desktop and mobile buttons",
+    "forthams-certification.spec.ts:L96 — placeholder '搜索编号、名称...' should be '搜索资产...'",
+    "forthams-certification.spec.ts:L99 — button text '新建资产' should be '新建'",
+    "forthams-certification.spec.ts:L103-108 — Asset form uses different field structure vs new AssetFormPage",
+    "forthams-certification.spec.ts:L105 — no combobox in new AssetFormPage (uses text input)",
+    "forthams-certification.spec.ts:L107 — label '原值（元）' should be '采购价格'",
+    "forthams-certification.spec.ts:L108 — label '当前净值（元）' not present in new form",
+    "forthams-certification.spec.ts:L215 — route /approvals should be /approval",
+    "forthams-certification.spec.ts:L219 — select filter no longer exists (tab buttons instead)",
+    "forthams-certification.spec.ts:L223 — '通过' button moved to ApprovalActionPanel in detail modal",
+    "forthams-certification.spec.ts:L331-335 — fillAssetForm: getByLabel('购置日期') fails, actual label is '购置日期 *'"
+  ],
+  "builder_notes": [
+    "需要更新 10 个模块的 heading/link 文本以匹配新版 DOM（重点修复 4 个不匹配的 heading 和 1 个缺失的 link）",
+    "CERT-03 的资产创建流程需要完全重写表单填充逻辑，适配新版 AssetFormPage 的 data-testid 选择器",
+    "CERT-03 的 fillAssetForm 函数需将 getByLabel 改成基于 data-testid 的选择器（如 page.locator('[data-testid=\"input-asset-name\"]')）",
+    "CERT-08 需要将审批操作路径改为：点击列表项 → 打开详情弹窗 → 在 ApprovalActionPanel 中输入审批意见 → 点击通过/驳回",
+    "CERT-08 的状态过滤需要从 select 改为单击 tab button（如 page.getByTestId('tab-pending').click()）",
+    "CERT-02 的导航循环需要确认 link name 的模糊匹配行为，建议使用 getByRole('link', { name: /RFID/ }) 避免空格差异",
+    "通知页面 /notifications 路由在现有代码中未发现独立页面实现，需确认 NotificationCenter 组件是否支持直接 URL 访问",
+    "重要设备页的维保记录交互（CERT-04 相关）虽然不在本次审计范围内，但注意到测试中使用了旧版 selectOption，旧版 select 元素可能也已变更",
+    "所有修改需在 testFinish 项目中完成，注意保持两个项目的同步"
+  ]
+}

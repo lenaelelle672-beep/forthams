@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "agent": "gai2-refiner",
+  "session": "20260524-cert-fix",
+  "verdict": "accept_with_refinements",
+  "preserved_from_draft": [
+    "CERT-03: placeholder 修复（L89 行号精确匹配，前端 AssetSearchBar.tsx L121 已验证）",
+    "CERT-04: 正则表达式修复 /7[0-9]/→/\\d+%/（L124 行号精确匹配，mock usageRate 85/92 验证）",
+    "CERT-04: toast 文本补全 +'后再保存。'（L129 行号精确匹配，ImportantEquipment.tsx L78 已验证）",
+    "CERT-07: 4 处处置页签和 placeholder 修复（original 文本全部匹配，Disposals.tsx L7/L168 已验证）",
+    "CERT-09: toast 文本截断（前端 SettingsPage.tsx L712 已验证为'安全设置已保存'无后缀）"
+  ],
+  "improvements": [
+    "WA#4: 行号 L183→L184（CERT-07 首处页签名，偏移 +1）",
+    "WA#5: 行号 L186→L187（CERT-07 首处 placeholder，偏移 +1）",
+    "WA#6: 行号 L189→L190（CERT-07 第二处 placeholder，偏移 +1）",
+    "WA#7: 行号 L190→L191（CERT-07 第二处页签名，偏移 +1）",
+    "WA#8: 行号 L267→L262（CERT-09 toast 文本，偏移 -5）"
+  ],
+  "rejected_from_draft": [],
+  "write_intent_preserved": true,
+  "degradation_detected": false,
+  "required_regeneration": false,
+  "refined_plan": [
+    "1. 应用 WA#1（L89）: placeholder '搜索编号、名称...'→'搜索资产编号或名称...'",
+    "2. 应用 WA#2（L124）: 正则 /7[0-9]/→/\\d+%/",
+    "3. 应用 WA#3（L129）: toast 文本 +'后再保存。'",
+    "4. 应用 WA#4（L184）: '资产调拨'→'资产转移'",
+    "5. 应用 WA#5（L187）: placeholder→'搜索申请单号或资产ID...'",
+    "6. 应用 WA#6（L190）: placeholder→'搜索申请单号或资产ID...'（第二处）",
+    "7. 应用 WA#7（L191）: '资产调拨'→'资产转移'（第二处）",
+    "8. 应用 WA#8（L262）: '安全设置已保存到当前会话'→'安全设置已保存'",
+    "9. 运行 playwright test 验证全部 CERT 测试通过"
+  ],
+  "review_notes": [
+    "8/8 original 文本与当前测试文件完全匹配（逐行对比验证）",
+    "5/8 行号存在偏移（#4~#7 偏移+1，#8 偏移-5），已在 refined_plan 中修正",
+    "前端源码交叉验证通过：AssetSearchBar.tsx L121、Disposals.tsx L7/L168、ImportantEquipment.tsx L78、SettingsPage.tsx L712",
+    "所有 write_actions 为 edit 操作，无退化（写操作退化为只读）"
+  ]
+}

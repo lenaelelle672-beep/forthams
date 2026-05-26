@@ -1,0 +1,78 @@
+{
+  "batch": "verify-iter2",
+  "directive": "forthAMS 全量验收验证 + V2 报告生成",
+  "generated_at": "2026-05-23T16:15:44.940245+08:00",
+  "changed_files": [],
+  "added_files": [
+    ".omc/gai2/sessions/20260523-verify-iter2/v2-report.json",
+    ".omc/gai2/sessions/20260523-verify-iter2/changes.json"
+  ],
+  "commands_run": [
+    {
+      "command": "curl -s http://localhost:8080/api/health",
+      "result": "passed",
+      "notes": "返回 {\"status\":\"UP\",\"service\":\"forthAMS\"，后端服务正常"
+    },
+    {
+      "command": "curl -s -o /dev/null -w '%{http_code}' http://localhost:5173",
+      "result": "passed",
+      "notes": "返回 200，前端 Vite 服务正常"
+    },
+    {
+      "command": "curl -s -X POST http://localhost:8080/api/auth/login -d '{\"username\":\"admin\",\"password\":\"admin123\"}'",
+      "result": "passed",
+      "notes": "登录成功，获取 JWT Token（长度 194）"
+    },
+    {
+      "command": "全量 API 端点验证（16个端点）",
+      "result": "passed",
+      "notes": "16/16 端点通过（100%）。注：任务文档中 /api/disposal/list 和 /api/depreciation/list 路径有误，正确路径为 /api/disposals/history 和 /api/depreciation/schedules，均 HTTP 200"
+    },
+    {
+      "command": "grep -n 'backdropFilter|backdrop-blur' frontend/src/pages/auth/LoginPage.tsx",
+      "result": "passed",
+      "notes": "未发现毛玻璃相关属性，backdropFilter 已移除。仅发现 filter:blur(4px) 用于动画装饰元素，非面板毛玻璃"
+    },
+    {
+      "command": "cd backend && mvn test",
+      "result": "passed",
+      "notes": "Tests run: 251, Failures: 0, Errors: 0, Skipped: 0 → BUILD SUCCESS (15.681s)"
+    },
+    {
+      "command": "cd frontend && npm run build",
+      "result": "passed",
+      "notes": "✓ built in 4.74s"
+    }
+  ],
+  "verification_results": [
+    "后端健康检查：PASS（status: UP）",
+    "前端服务状态：PASS（HTTP 200）",
+    "登录认证：PASS（JWT Token 获取成功）",
+    "API 全量验证：16/16 = 100% PASS",
+    "  - /api/health: 200 PASS",
+    "  - /api/stats/overview: 200 PASS",
+    "  - /api/dashboard/stats: 200 PASS",
+    "  - /api/assets?page=1&pageSize=10: 200 PASS",
+    "  - /api/categories/list: 200 PASS",
+    "  - /api/workorders?page=1&pageSize=10: 200 PASS",
+    "  - /api/approvals/pending: 200 PASS",
+    "  - /api/notifications/unread-count: 200 PASS",
+    "  - /api/vendors/list: 200 PASS",
+    "  - /api/roles/list: 200 PASS",
+    "  - /api/roles/all: 200 PASS",
+    "  - /api/inventory/tasks: 200 PASS",
+    "  - /api/retirement/list: 200 PASS",
+    "  - /api/disposals/history: 200 PASS（任务文档路径有误，已修正）",
+    "  - /api/depreciation/schedules: 200 PASS（任务文档路径有误，已修正）",
+    "  - /api/audit-logs?page=1&pageSize=10: 200 PASS",
+    "登录页毛玻璃：PASS（无 backdropFilter/backdrop-filter，已移除）",
+    "mvn test：PASS（251 tests, 0 failures, BUILD SUCCESS）",
+    "npm run build：PASS（✓ built in 4.74s）",
+    "v2-report.json 已写入 artifact_dir"
+  ],
+  "residual_risks": [
+    "vitest 前端单元测试未独立运行（项目未配置独立 vitest 命令），建议后续补充 vitest 执行证据",
+    "任务文档中 /api/disposal/list 和 /api/depreciation/list 为不存在的端点路径，建议更新验收文档",
+    "后端日志存在 NoResourceFoundException（来自本次验证调用错误路径），不影响业务功能"
+  ]
+}

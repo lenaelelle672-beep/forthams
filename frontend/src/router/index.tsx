@@ -12,6 +12,7 @@
 import React, { Suspense } from 'react';
 import { createBrowserRouter, Navigate, Outlet, useLocation } from 'react-router';
 import { useAuth } from '@/app/context/AuthContext';
+import ForbiddenPage from '@/pages/ForbiddenPage';
 
 // ── 通用占位组件（未完成页面的临时展示）────────────────────────────────────────
 const PlaceholderPage = ({ title }: { title: string }) => (
@@ -61,12 +62,39 @@ function ProtectedRoute() {
   return <Outlet />;
 }
 
+// ── 角色守卫 ──────────────────────────────────────────────────────────────────
+function PermissionGuard({ roles, children }: { roles: string[]; children: React.ReactNode }) {
+  const { user, isAuthenticated, loading } = useAuth();
+
+  if (loading) {
+    return <PageLoader />;
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  // roles 为空或 undefined 时 — 用户信息不完整，引导重新登录
+  if (!user?.roles || user.roles.length === 0) {
+    return <Navigate to="/forbidden?reason=roles_missing" replace />;
+  }
+
+  const hasRequiredRole = roles.some((role) =>
+    user.roles.some((r) => r.toUpperCase() === role.toUpperCase())
+  );
+
+  if (!hasRequiredRole) {
+    return <ForbiddenPage />;
+  }
+
+  return <>{children}</>;
+}
+
 // ── 布局 ──────────────────────────────────────────────────────────────────────
 const AppLayout     = React.lazy(() => import('@/layouts/AppLayout'));
 const LoginPage     = React.lazy(() => import('@/pages/auth/LoginPage'));
 const BigScreenPage = React.lazy(() => import('@/pages/bigscreen/BigScreenPage'));
 const BigScreen3DPage = React.lazy(() => import('@/pages/bigscreen/BigScreen3DPage'));
-
 // ── 新建完成的页面（直接导入）──────────────────────────────────────────────────
 const DashboardPage         = React.lazy(() => import('@/pages/dashboard/DashboardPage'));
 const AssetListPage         = React.lazy(() => import('@/pages/asset/AssetListPage'));
@@ -93,6 +121,7 @@ const AssetCompensationFormPage = React.lazy(() => import('@/pages/disposal/Asse
 const AnalyticsPage            = React.lazy(() => import('@/pages/analytics/AnalyticsPage'));
 const ReportsPage           = React.lazy(() => import('@/pages/reports/ReportsPage'));
 const AssetImportExportPage   = React.lazy(() => import('@/pages/AssetImportExport/AssetImportExportPage'));
+const CategoryManagerPage     = React.lazy(() => import('@/pages/category/CategoryManagerPage'));
 
 // ── 重构完成的新页面 ──────────────────────────────────────────────────────────
 const IdleAssetsPage       = React.lazy(() => import('@/pages/idle/IdleAssetsPage'));
@@ -101,6 +130,7 @@ const DepreciationListPage = React.lazy(() => import('@/pages/depreciation/Depre
 // ── 工作流新版页面 ────────────────────────────────────────────────────────────
 const WorkflowCenterPage  = React.lazy(() => import('@/pages/workflow/WorkflowCenterPage'));
 const WorkflowDesignerPage = React.lazy(() => import('@/pages/workflow/WorkflowDesignerPage'));
+const WorkflowFormPage = React.lazy(() => import('@/pages/workflow/WorkflowFormPage'));
 
 // ── 重构完成的页面（新 Design System）────────────────────────────────────────
 const EquipmentPage = React.lazy(() => import('@/pages/equipment/EquipmentPage'));
@@ -118,19 +148,17 @@ const router = createBrowserRouter([
     element: S(LoginPage),
   },
   {
-    path: '/bigscreen',
-    element: S(BigScreenPage),
+    path: '/forbidden',
+    element: <ForbiddenPage />,
   },
-  {
-    path: '/bigscreen-3d',
-    element: S(BigScreen3DPage),
-  },
-
-  // ── 受保护路由（需要认证） ────────────────────────────────────────────────
+  // ── 受保护路由（需要认证） ───────────────────────────────────────────────────────────
   {
     path: '/',
     element: <ProtectedRoute />,
     children: [
+      // 大屏路由（全屏无侧边栏，需要 ADMIN 或 SUPER_ADMIN 角色）
+      { path: 'bigscreen',    element: <PermissionGuard roles={['ADMIN', 'SUPER_ADMIN']}>{S(BigScreenPage)}</PermissionGuard> },
+      { path: 'bigscreen-3d', element: <PermissionGuard roles={['ADMIN', 'SUPER_ADMIN']}>{S(BigScreen3DPage)}</PermissionGuard> },
       {
         element: S(AppLayout),
         children: [
@@ -205,8 +233,10 @@ const router = createBrowserRouter([
           // 工作流
           { path: 'workflows',         element: S(WorkflowCenterPage) },
           { path: 'workflow-designer', element: S(WorkflowDesignerPage) },
+          { path: 'workflow-form/:businessType', element: S(WorkflowFormPage) },
 
           // 基础数据
+          { path: 'categories',    element: S(CategoryManagerPage) },
           { path: 'vendors',       element: S(VendorsPage) },
           { path: 'locations',     element: S(LocationsPage) },
           { path: 'settings',      element: S(SettingsPage) },
@@ -215,7 +245,7 @@ const router = createBrowserRouter([
           // 错误页
           {
             path: '403',
-            element: <div className="flex items-center justify-center min-h-screen text-xl text-[#94a3b8]">403 — 无权限访问</div>,
+            element: <ForbiddenPage />,
           },
           {
             path: '404',

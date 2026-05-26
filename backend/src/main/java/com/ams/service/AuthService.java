@@ -7,6 +7,7 @@ import com.ams.dto.RegisterRequest;
 import com.ams.dto.ResetPasswordRequest;
 import com.ams.entity.User;
 import com.ams.mapper.UserMapper;
+import com.ams.mapper.UserRoleMapper;
 import com.ams.utils.JwtUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -24,6 +27,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
+    private final UserRoleMapper userRoleMapper;
 
     public AuthResponse login(LoginRequest request) {
         authenticationManager.authenticate(
@@ -35,8 +39,9 @@ public class AuthService {
         );
 
         String token = jwtUtil.generateToken(user.getUsername(), user.getId(), resolveTenantId(user));
+        List<String> roles = userRoleMapper.selectRoleCodesByUserId(user.getId());
 
-        return new AuthResponse(token, user.getId(), user.getUsername(), user.getRealName());
+        return new AuthResponse(token, user.getId(), user.getUsername(), user.getRealName(), roles);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -61,22 +66,15 @@ public class AuthService {
         userMapper.insert(user);
 
         String token = jwtUtil.generateToken(user.getUsername(), user.getId(), resolveTenantId(user));
+        List<String> roles = userRoleMapper.selectRoleCodesByUserId(user.getId());
 
-        return new AuthResponse(token, user.getId(), user.getUsername(), user.getRealName());
+        return new AuthResponse(token, user.getId(), user.getUsername(), user.getRealName(), roles);
     }
 
     public boolean logout() {
         return true;
     }
 
-    /**
-     * 重置密码（过渡方案）
-     *
-     * <p>TODO: 后续需接入邮件/短信验证码验证后再允许重置。
-     * 当前仅验证用户名存在即可更新密码。
-     *
-     * @param request 包含 username 和 newPassword
-     */
     @Transactional(rollbackFor = Exception.class)
     public void resetPassword(ResetPasswordRequest request) {
         User user = userMapper.selectOne(
@@ -84,6 +82,9 @@ public class AuthService {
         );
         if (user == null) {
             throw new BusinessException("用户不存在");
+        }
+        if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
+            throw new BusinessException("旧密码不正确");
         }
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userMapper.updateById(user);

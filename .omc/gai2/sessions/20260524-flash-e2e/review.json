@@ -1,0 +1,89 @@
+{
+  "schema_version": 1,
+  "agent": "gai2-reviewer",
+  "session": "20260524-flash-e2e",
+  "overall_status": "pass",
+  "directive_summary": "1) 修复剩余 2 个认证测试（CERT-04 select strict mode、CERT-09 部门 placeholder 超时），让 cert 10/10 全绿；2) 把 E2E 测试接入 CI；3) 增加业务校验深度 — 表单提交→数据落库→页面验证的闭环测试；4) 废弃 mock 认证测试，全部切换为真 E2E 模式。",
+  "affected_scope": [
+    "testFinish/tests/playwright/forthams-certification.spec.ts",
+    "testFinish/tests/playwright/forthams-e2e.spec.ts",
+    "testFinish/.gitlab-ci.yml",
+    "testFinish/Jenkinsfile",
+    "testFinish/package.json"
+  ],
+  "commands_checked": [
+    {
+      "command": "cd /Users/feigao/project/Project/testFinish && TEST_PROJECT_CONFIG=config/forthams.example.json npx playwright test tests/playwright/forthams-certification.spec.ts --project=chromium --reporter=list",
+      "result": "passed",
+      "notes": "10 passed, 1 skipped, 0 failed — CERT-01~CERT-10 全部 PASS ✅"
+    },
+    {
+      "command": "cd /Users/feigao/project/Project/testFinish && TEST_PROJECT_CONFIG=config/forthams.example.json npx playwright test tests/playwright/forthams-e2e.spec.ts --project=chromium --reporter=list",
+      "result": "failed",
+      "notes": "5 failed / 1 passed。失败原因为前端 dev server 离线（login 无法获取 token）。Builder 提交的文件存在语法错误（缺少 }); 闭包），已在 reviewer 阶段修复。修复后文件可被 Playwright 识别并执行测试。"
+    }
+  ],
+  "acceptance_status": [
+    {
+      "criterion": "AC-1: CERT-04 和 CERT-09 修复后全部 10 项 CERT 测试 PASS",
+      "status": "PASS",
+      "evidence": [
+        "changes-fix.json commands_run[0]: result=passed, notes='10 passed, 1 skipped, 0 failed'",
+        "changes-fix.json verification_results: CERT-01~CERT-10 全部标记 ✅",
+        "审查者亲自运行的 cert 测试验证确认: 10 passed, 1 skipped, 0 failed",
+        "CERT-04 修复: locator('select').first() → getByRole('combobox').first().selectOption('AST-001')",
+        "CERT-09 修复: getByPlaceholder('部门名称') → getByPlaceholder('如 研发部')",
+        "CERT-03/CERT-05/CERT-07 经第2轮修复后全部通过"
+      ]
+    },
+    {
+      "criterion": "AC-2: .gitlab-ci.yml / Jenkinsfile / package.json 已配置为运行 forthams-e2e.spec.ts 真 E2E 测试",
+      "status": "PASS",
+      "evidence": [
+        ".gitlab-ci.yml 新增 forthams-e2e job（第26-45行）：独立 job，使用 config/forthams.example.json，通过 RUN_FORTHAMS_E2E=1 触发，执行 npm run test:e2e",
+        "Jenkinsfile 新增 E2E-ForthAMS stage（第23-30行）：独立 stage，设置 TEST_PROJECT_CONFIG=config/forthams.example.json，执行 npm run test:e2e",
+        "package.json 新增 test:e2e 脚本（第26行）：'playwright test tests/playwright/forthams-e2e.spec.ts --project=chromium'"
+      ]
+    },
+    {
+      "criterion": "AC-3: forthams-e2e.spec.ts 新增至少一个表单提交→数据落库→页面验证的闭环测试用例",
+      "status": "PASS",
+      "evidence": [
+        "forthams-e2e.spec.ts 新增 'AC-3: 资产创建闭环 — 新建表单→提交→列表验证' 测试（第335-389行）",
+        "测试流程完整闭环：login → /assets → 点击新建资产 → 填写资产名称/分类/原值/净值/存放位置 → 提交 → 导航回列表 → 搜索新资产名称 → expect 验证可见",
+        "关闭了表单提交（第369-372行 submitBtn.click）、数据落库（waitForPageReady 等待服务端处理）、页面验证（第386行 getByText(assetName).toBeVisible）"
+      ]
+    },
+    {
+      "criterion": "AC-4: forthams-certification.spec.ts 已被标记废弃（@deprecated），默认不运行",
+      "status": "PASS",
+      "evidence": [
+        "forthams-certification.spec.ts 第1-5行: @deprecated JSDoc 标记，明确说明 '此文件包含基于 mock API 的认证测试，已废弃'",
+        "package.json test:chromium 脚本添加 --grep-invert 'forthAMS 页面功能与业务逻辑认证'（第13行）在默认运行中排除 cert 测试",
+        "保留 test:forthams 脚本（第12行）用于手动运行 cert 测试"
+      ]
+    }
+  ],
+  "minions_review": {
+    "draft_checked": false,
+    "refine_checked": false,
+    "adjudication_checked": false,
+    "real_dual_agent_chain": false,
+    "write_degradation_guard_passed": false,
+    "sonnet_fallback_absent": true,
+    "note": "本 session 未使用完整的 MINIONS 双 agent 链（drafter→refiner→adjudication）。triage 推荐 phases 为 [audit, debate, builder, review]，实际执行了 audit→debate→builder(2轮)→review。写退化保护不适用。Sonnet fallback 未触发。"
+  },
+  "findings": [
+    "⚠️ Builder 提交的 forthams-e2e.spec.ts 存在语法错误：第328行 test('参数化路由探测') 缺少 }); 闭包，导致整个文件无法被 Playwright 解析运行（Error: Unexpected token）。已在 reviewer 阶段修复（在第332行后添加 });）。",
+    "E2E 测试因前端 dev server 离线无法通过登录验证（health check 应跳过但 login 中 expect(token).toBeTruthy() 失败）。CI 环境中需配置 BASE_URL 指向已部署的前端。",
+    "changes.json 中的 test:chromium 脚本修改（--grep-invert）在 changes-fix.json 中未被重新提及，但实际 package.json 已正确配置。",
+    "AC-3 测试用例依赖真实后端 API，当前验证模式（page.route mock）不适用，需真实 forthAMS 后端运行。"
+  ],
+  "residual_risks": [
+    "CI 环境需设置 RUN_FORTHAMS_E2E=1 变量才能触发 forthams-e2e job；文档中未显式提及此变量",
+    "Jenkinsfile 的 TEST_PROJECT_CONFIG 默认值仍为 config/project.example.json（全局环境变量），E2E-ForthAMS stage 已覆盖为 config/forthams.example.json",
+    "AC-3 资产创建闭环测试会写入数据库，当前无测试数据清理机制，可能污染后续测试",
+    "forthams-certification.spec.ts 虽然已废弃，但仍然保留 630 行的完整 mock API + 测试代码，需要持续维护",
+    "test:chromium 通过 --grep-invert 排除 cert 测试，如果 cert 文件的 describe 标题被修改，需要同步更新 grep-invert 模式"
+  ]
+}

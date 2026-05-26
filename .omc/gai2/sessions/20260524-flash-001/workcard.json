@@ -1,0 +1,31 @@
+{
+  "session_id": "20260524-flash-001",
+  "mode": "flash",
+  "auto_mode": true,
+  "directive": "本周优先级处理：P0-1 密码重置加旧密码校验、P0-2 大屏API失败展示错误态去掉假数据fallback、P1-4 确认report/目录去留清理或接入路由；下周：P1-3报表创建/预览功能最小可用版、P2-5补DashboardService单元测试、P3-7根目录历史文档批量归档；后续迭代：P2-6前端核心页面测试覆盖、P2-5 NotificationService/ReportService测试、P3-8/9垃圾文件清理+架构一致性整理",
+  "owner": "gai2-orchestrator",
+  "phase": "triage+audit",
+  "created_at": "2026-05-24",
+  "classification": "pending",
+  "acceptance_checks": [
+    "P0-1: 密码重置接口加旧密码校验逻辑，校验失败返回明确错误",
+    "P0-2: 大屏相关API调用失败时显示错误态UI组件，不再使用假数据fallback",
+    "P1-4: report/目录确认去留，若保留则接入路由，若废弃则清理",
+    "P1-3: 报表创建/预览功能最小可用版接入路由可访问",
+    "P2-5: DashboardService单元测试补全",
+    "P3-7: 根目录历史文档归档完成"
+  ],
+  "evidence_to_collect": [
+    "密码重置相关代码路径",
+    "大屏API调用及假数据fallback位置",
+    "report/目录现有内容及路由接入情况",
+    "DashboardService现有测试覆盖",
+    "根目录历史文档列表"
+  ],
+  "open_risks": [
+    "P0-1旧密码校验可能影响现有密码重置流程",
+    "P0-2去掉假数据后大屏可能出现空白，需错误态UI兜底",
+    "P1-4 report/目录若有依赖需先确认再清理"
+  ],
+  "artifact_dir": ".omc/gai2/sessions/20260524-flash-001"
+}

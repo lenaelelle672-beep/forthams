@@ -1,0 +1,9 @@
+{
+  "classification": "Light",
+  "mcp_tools": [],
+  "scope": ["tests/playwright/forthams-certification.spec.ts"],
+  "risks": ["文本替换可能遗漏某些出现位置", "修改后可能影响 CERT-01~CERT-02 等通过用例"],
+  "dependencies": ["Playwright E2E 测试环境"],
+  "recommended_phases": ["builder", "reviewer"],
+  "acceptance_hints": ["CERT-03~CERT-10 全部 PASS", "CERT-01~CERT-02 仍然 PASS（无回归）"]
+}

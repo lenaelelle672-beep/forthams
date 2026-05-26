@@ -206,9 +206,9 @@ export default function SmartReportPage() {
     enabled: !!taskId,
   });
 
-  const task: InventoryTask | undefined = taskResponse?.data?.data;
-  const summary: InventorySummary | undefined = summaryResponse?.data?.data;
-  const assets: InventoryAsset[] = assetsResponse?.data?.data?.records ?? [];
+  const task: InventoryTask | undefined = taskResponse?.data;
+  const summary: InventorySummary | undefined = summaryResponse?.data;
+  const assets: InventoryAsset[] = assetsResponse?.data?.records ?? [];
 
   // ── 衍生数据 ────────────────────────────────────────────────────────────────
 

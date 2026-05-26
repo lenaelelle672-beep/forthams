@@ -1,0 +1,93 @@
+{
+  "timestamp": "2026-05-24T02:47:00+08:00",
+  "suite": "forthAMS E2E 最终验证",
+  "spec": "tests/playwright/forthams-e2e.spec.ts",
+  "overall": "PASS",
+  "summary": {
+    "total": 6,
+    "passed": 5,
+    "failed": 0,
+    "skipped": 1,
+    "duration_ms": 40300
+  },
+  "services": {
+    "port_5173": {
+      "status": "CLOSED",
+      "note": "仅遗留 Chrome 连接，无活跃前端服务"
+    },
+    "port_8080": {
+      "status": "LISTEN",
+      "process": "java",
+      "note": "后端 Java 进程正常运行"
+    }
+  },
+  "tests": [
+    {
+      "name": "参数化路由探测 (参考)",
+      "group": "forthAMS 全量路由自发现 (策略C)",
+      "status": "passed",
+      "duration_ms": 184,
+      "detail": "13 条参数化路由静默跳过（占位测试）",
+      "routes": ["/assets/:id", "/assets/:id/edit", "/equipment/:id", "/workorders/:id", "/approvals/:id", "/inventory/tasks/:taskId", "/inventory/scan/:taskId", "/inventory/smart-report/:taskId", "/retirement/:id", "/disposals/:id", "/compensation/:id", "/audit/:id", "/settings/:tab"]
+    },
+    {
+      "name": "AC-1: 导航路由爬取与双重验证",
+      "group": "forthAMS 全量路由自发现 (策略C)",
+      "status": "passed",
+      "duration_ms": 2600,
+      "detail": "DOM 发现 21 条导航链接，含 /bigscreen, /bigscreen-3d 额外链接",
+      "routes_visited": ["/dashboard", "/assets/new", "/assets/import-export", "/analytics", "/workorders/new", "/assets", "/inventory/smart-report", "/equipment", "/retirement/new", "/idle", "/disposals/transfer/new", "/depreciation", "/disposals/clearance/new", "/inventory", "/disposals/scrap/new", "/workorders", "/compensation/new", "/approvals", "/workflow-designer", "/workflows", "/notifications"],
+      "console_errors": [],
+      "api_errors": [],
+      "react_crashes": []
+    },
+    {
+      "name": "深层路由逐页扫描 (11条)",
+      "group": "forthAMS 全量路由自发现 (策略C)",
+      "status": "passed",
+      "duration_ms": 9600,
+      "detail": "深层路由 11/11 通过，0 失败",
+      "console_errors": [],
+      "api_errors": [],
+      "react_crashes": []
+    },
+    {
+      "name": "AC-2: 新建按钮点击探索 (4页)",
+      "group": "forthAMS 全量路由自发现 (策略C)",
+      "status": "passed",
+      "duration_ms": 10300,
+      "detail": "按钮探索 4/4 页发现按钮",
+      "console_errors": [],
+      "api_errors": [],
+      "react_crashes": []
+    },
+    {
+      "name": "导航路由逐页扫描 (19条)",
+      "group": "forthAMS 全量路由自发现 (策略C)",
+      "status": "passed",
+      "duration_ms": 39400,
+      "detail": "导航路由 19/19 通过，0 失败",
+      "routes_visited": ["/retirement", "/disposals", "/compensation", "/reports", "/audit", "/categories", "/vendors", "/locations", "/settings"],
+      "console_errors": [],
+      "api_errors": [],
+      "react_crashes": []
+    },
+    {
+      "name": "认证测试",
+      "group": "forthAMS 旧认证回归",
+      "status": "skipped",
+      "detail": "由 forthams-certification.spec.ts 独立执行，此处仅为回归占位"
+    }
+  ],
+  "metrics": {
+    "visited_urls_total": 41,
+    "navigation_routes_passed": 19,
+    "deep_routes_passed": 11,
+    "button_explore_pages": 4,
+    "param_routes_referenced": 13,
+    "api_errors_total": 0,
+    "console_errors_total": 0,
+    "react_crashes_total": 0
+  },
+  "verdict": "PASS — 5/5 实际测试全部通过，1 个预跳过（认证测试由独立 spec 执行）。无 API 错误、无 console.error、无 React 崩溃。所有 41 个访问 URL 正常响应。"
+}

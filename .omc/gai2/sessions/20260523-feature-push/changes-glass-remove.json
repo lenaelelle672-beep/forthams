@@ -1,0 +1,27 @@
+{
+  "changed_files": ["frontend/src/pages/auth/LoginPage.tsx"],
+  "added_files": [],
+  "commands_run": [
+    {
+      "command": "sed -i '' 's/glass-card w-full rounded-xl p-8 mb-8/w-full rounded-xl p-8 mb-8/' frontend/src/pages/auth/LoginPage.tsx",
+      "result": "passed",
+      "notes": "移除第394行 glass-card 类名"
+    },
+    {
+      "command": "grep -E 'glass-card|backdrop-blur|backdropFilter|backdrop-filter' frontend/src/pages/auth/LoginPage.tsx",
+      "result": "passed",
+      "notes": "确认文件中无残留毛玻璃相关关键字"
+    },
+    {
+      "command": "cd frontend && npx tsc --noEmit 2>&1 | head -20",
+      "result": "passed",
+      "notes": "TypeScript 编译无新增错误（已有错误均在 GraphifyKnowledgeGraph.tsx 和 DepreciationCard.tsx，与本次修改无关）"
+    }
+  ],
+  "verification_results": [
+    "grep 验证：LoginPage.tsx 中不再包含 glass-card、backdrop-blur、backdropFilter、backdrop-filter",
+    "tsc --noEmit：无新增 TypeScript 错误",
+    "保留原有 background: rgba(23, 31, 51, 0.35) 和 border: 1px solid rgba(255, 255, 255, 0.1) 样式"
+  ],
+  "residual_risks": ["none"]
+}

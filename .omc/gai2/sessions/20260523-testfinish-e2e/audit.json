@@ -1,0 +1,312 @@
+{
+  "current_state": {
+    "active_router": "src/router/index.tsx（createBrowserRouter, React Router 7）",
+    "auth_guard": "不存在 — 新路由无 ProtectedRoute 组件",
+    "legacy_auth_guard": "app/routes.ts 中存在 ProtectedRoute（使用 useAuth），但该文件已废弃未被引用",
+    "auth_provider": "main.tsx 仅挂载 ErrorBoundary + QueryClientProvider + TooltipProvider + RouterProvider，无 AuthProvider",
+    "auth_context": "AuthContext（app/context/AuthContext.tsx）仅被旧路由 app/routes.ts 使用，未被新路由使用",
+    "token_storage": {
+      "login_writes_to": "sessionStorage: auth_token（LoginPage.tsx line 195）",
+      "http_reads_from": "sessionStorage.getItem('auth_token') || localStorage.getItem('auth_token')（http.ts line 42）",
+      "authcontext_reads_from": "app/utils/api.ts: sessionStorage.getItem('auth_token') || localStorage.getItem('auth_token'）",
+      "applayout_reads_from": "sessionStorage.getItem('user_info') || localStorage.getItem('ams_auth_user') || localStorage.getItem('user_info')（AppLayout.tsx line 155-159）",
+      "ams_auth_token": "旧系统 localStorage key，当前代码已不使用",
+      "key_mismatch": "测试种子写入 localStorage('ams_auth_token')，但 http.ts 读取的是 localStorage('auth_token')"
+    },
+    "api_mock_fallback": "mockApi 最后一行 return fulfill(route, {}) 返回 {code:200,data:{}}，永远成功，绕过认证",
+    "test_seed": "seedAuthenticatedSession 写入 localStorage.ams_auth_token = 'cert-token' + localStorage.ams_auth_user，但 http.ts 拦截器读取 auth_token 而非 ams_auth_token",
+    "test_results": "10/10 全部失败"
+  },
+  "existing_patterns": {
+    "new_router": "src/router/index.tsx — 203 行，所有页面 React.lazy + Suspense，无认证守卫",
+    "old_router": "app/routes.ts — 188 行，有 ProtectedRoute 组件，使用 AuthContext，但已废弃",
+    "http_interceptor": "utils/http.ts — 请求拦截器注入 Bearer token（auth_token），响应拦截器 401 清除 token + window.location.href='/login'",
+    "legacy_http": "app/utils/api.ts — 旧 Axios 实例（apiClient），AuthContext 使用此实例，token key 也是 auth_token",
+    "login_flow": "LoginPage → api/auth.ts login() → 成功写 sessionStorage('auth_token') → navigate('/dashboard')",
+    "logout_flow": "AppLayout handleLogout → 清除 6 个 token keys（兼容新旧） → navigate('/login')",
+    "page_header": "所有页面使用 PageHeader 组件（title prop 渲染为 <h1>），部分页面使用原生 <h1>",
+    "mock_api": "page.route('**/api/**') 拦截全部 API，条件分支匹配路径+METHOD，fallback 返回 {code:200,data:{}}"
+  },
+  "heading_mismatches": {
+    "note": "测试使用 page.getByRole('heading', { name: '...' }) 匹配页面标题（PageHeader 的 h1 或原生 h1），以下为实际 vs 期望对比",
+    "mismatches": [
+      {
+        "page": "仪表板 /dashboard",
+        "route_in_router": "/dashboard",
+        "actual_title": "仪表板",
+        "expected_by_test": "仪表板",
+        "match": true
+      },
+      {
+        "page": "资产台账 /assets",
+        "route_in_router": "/assets",
+        "actual_title": "资产台账",
+        "expected_by_test": "资产台账管理",
+        "match": false,
+        "note": "缺少'管理'后缀"
+      },
+      {
+        "page": "重要设备 /equipment",
+        "route_in_router": "/equipment",
+        "actual_title": "重要设备管理",
+        "expected_by_test": "重要设备管理",
+        "match": true
+      },
+      {
+        "page": "RFID盘点 /inventory",
+        "route_in_router": "/inventory",
+        "actual_title": "盘点任务列表",
+        "expected_by_test": "RFID资产盘点",
+        "match": false,
+        "note": "完全不同的标题文字；InventoryTasksPage 的 PageHeader title='盘点任务列表'"
+      },
+      {
+        "page": "闲置资产 /idle",
+        "route_in_router": "/idle",
+        "actual_title": "闲置资产管理",
+        "expected_by_test": "闲置资产管理",
+        "match": true
+      },
+      {
+        "page": "资产处置 /disposals",
+        "route_in_router": "/disposals",
+        "actual_title": "资产处置管理",
+        "expected_by_test": "资产处置管理",
+        "match": true
+      },
+      {
+        "page": "审批流程 /approvals",
+        "route_in_router": "/approvals",
+        "actual_title": "审批中心",
+        "expected_by_test": "审批流程管理",
+        "match": false,
+        "note": "ApprovalListPage title='审批中心'；此外测试路径是 /approval（无 s），但路由是 /approvals"
+      },
+      {
+        "page": "流程管理 /workflows",
+        "route_in_router": "/workflows",
+        "actual_h1": "业务流程管理",
+        "expected_by_test": "业务流程列表",
+        "match": false,
+        "note": "WorkflowCenterPage <h1>业务流程管理</h1>，测试期望'业务流程列表'"
+      },
+      {
+        "page": "数据分析 /analytics",
+        "route_in_router": "/analytics",
+        "actual_title": "数据分析",
+        "expected_by_test": "数据统计分析",
+        "match": false,
+        "note": "AnalyticsPage title='数据分析'，测试期望'数据统计分析'"
+      },
+      {
+        "page": "系统设置 /settings",
+        "route_in_router": "/settings",
+        "actual_title": "系统设置",
+        "expected_by_test": "系统设置",
+        "match": true
+      }
+    ]
+  },
+  "critical_ui_element_mismatches": [
+    {
+      "test_case": "CERT-01 line 33, 39",
+      "test_action": "page.getByRole('button', { name: /登录并进入仪表板/ })",
+      "actual_text": "登录系统（LoginPage line 490）",
+      "impact": "按钮文字不匹配，点击失败",
+      "fix_required": "修改测试 button name 为 /登录系统/ 或修改 LoginPage 按钮文字"
+    },
+    {
+      "test_case": "CERT-01 line 41",
+      "test_action": "expect localStorage.getItem('ams_auth_token') === 'cert-token'",
+      "actual_text": "LoginPage 写入 sessionStorage('auth_token') 而非 localStorage('ams_auth_token')",
+      "impact": "token 存储位置和 key 都不匹配，断言失败",
+      "fix_required": "需统一 token key：要么修改测试种子写入 auth_token，要么修改 LoginPage 写入 ams_auth_token"
+    },
+    {
+      "test_case": "CERT-01 line 35",
+      "test_action": "expect localStorage.getItem('ams_auth_token') === null",
+      "actual_text": "LoginPage 不写入 localStorage('ams_auth_token')，此条通过",
+      "impact": "通过，但只是因为 LoginPage 不写这个 key",
+      "fix_required": "无"
+    },
+    {
+      "test_case": "CERT-01 line 45",
+      "test_action": "expect localStorage.getItem('ams_auth_token') === null（退出后）",
+      "actual_text": "AppLayout handleLogout 清除所有 6 个 token key，包括 ams_auth_token",
+      "impact": "通过（logout 清除了 ams_auth_token），但前提是前面的 token 检查通过",
+      "fix_required": "无"
+    },
+    {
+      "test_case": "CERT-01 line 40",
+      "test_action": "expect heading '资产台账管理'（登录后）",
+      "actual_text": "登录后 navigate('/dashboard')，dashboard 标题是'仪表板'",
+      "impact": "heading 文字不匹配，断言失败",
+      "fix_required": "修改测试期望为'仪表板'或修改登录后跳转逻辑"
+    },
+    {
+      "test_case": "CERT-02 line 73-74",
+      "test_action": "page.getByLabel('查看通知').click(); expect visible '暂无新的待办通知'",
+      "actual_text": "AppLayout 通知按钮 NavLink 无 aria-label='查看通知'；NotificationsPage 可能无此文字",
+      "impact": "找不到元素，操作失败",
+      "fix_required": "添加 aria-label 或修改测试定位器"
+    },
+    {
+      "test_case": "CERT-02 line 76-78",
+      "test_action": "page.getByPlaceholder('搜索资产...')",
+      "actual_text": "GlobalSearch placeholder='搜索页面或业务数据...'",
+      "impact": "placeholder 不匹配，找不到元素",
+      "fix_required": "修改 placeholder 或修改测试定位器"
+    },
+    {
+      "test_case": "CERT-02 line 82-83",
+      "test_action": "page.getByPlaceholder('搜索资产名称或编号...')",
+      "actual_text": "AssetListPage placeholder='搜索编号、名称...'",
+      "impact": "placeholder 不匹配",
+      "fix_required": "修改 placeholder 或修改测试定位器"
+    },
+    {
+      "test_case": "CERT-08 line 236",
+      "test_action": "page.goto('/approval')",
+      "actual_text": "路由定义 path='/approvals'（复数带 s）",
+      "impact": "路径不匹配，404 页面",
+      "fix_required": "修改测试路径为 /approvals 或新增路由别名 /approval"
+    }
+  ],
+  "technical_constraints": [
+    "React Router 7 createBrowserRouter 不支持嵌套 ProtectedRoute 模式；需在布局/组件层手动检查 token",
+    "AuthProvider 未在 main.tsx 挂载；新路由系统的任何页面都无法使用 useAuth() hook",
+    "http.ts 请求拦截器从 sessionStorage('auth_token') 或 localStorage('auth_token') 读取，但测试种子写入 localStorage('ams_auth_token') — key 不一致导致 token 注入失败",
+    "LoginPage 使用 @/api/auth 的 login() 函数（通过 http.ts），AuthContext 使用 app/utils/api.ts 的 api — 两套 Axios 实例并存",
+    "sessionStorage 和 localStorage 的 token key 不统一（auth_token vs ams_auth_token）",
+    "测试使用 page.route('**/api/**') 拦截所有 API，但 forthAMS 的 API 路径通过 vite proxy 映射到 localhost:8080；E2E 测试中 baseURL 为 localhost:5173，API 请求路径会经过 vite proxy",
+    "配置 forthams.example.json 中 baseUrl 为 http://localhost:5173（vite dev server），playwright baseURL 为 http://localhost:5173，但 forthams-certification.spec.ts 中 project-config.ts 默认 baseURL 为 http://localhost:8080（从 configPath 加载）",
+    "旧路由系统 app/routes.ts 中的 ProtectedRoute 使用 AuthContext + useAuth，但新路由完全不使用"
+  ],
+  "risks": [
+    {
+      "level": "high",
+      "detail": "认证守卫缺失：任何人都可以直接访问 /assets、/dashboard 等受保护路由，无需登录即可查看所有数据"
+    },
+    {
+      "level": "high",
+      "detail": "Token 存储 key 不一致：测试 seed 写入 localStorage('ams_auth_token')，但 http.ts 读取 localStorage('auth_token')，导致已登录的测试在 API 请求时也无法发送 Bearer token"
+    },
+    {
+      "level": "high",
+      "detail": "5 个页面 heading 文字与测试预期不匹配，CERT-02 核心导航检查将全部失败"
+    },
+    {
+      "level": "high",
+      "detail": "登录按钮文字不匹配（'登录系统' vs '登录并进入仪表板'），CERT-01 登录步骤无法点击"
+    },
+    {
+      "level": "medium",
+      "detail": "测试路由路径 /approval vs 实际路由 /approvals（缺少 's'），导致 404"
+    },
+    {
+      "level": "medium",
+      "detail": "CERT-01 登录后检查 heading '资产台账管理' 但实际跳转到 dashboard（标题 '仪表板'），逻辑不一致"
+    },
+    {
+      "level": "medium",
+      "detail": "Search placeholder 不匹配（全局搜索和资产列表搜索），CERT-02 搜索步骤失败"
+    },
+    {
+      "level": "medium",
+      "detail": "AuthProvider 未挂载在 main.tsx，任何组件使用 useAuth() 将直接 throw Error"
+    },
+    {
+      "level": "low",
+      "detail": "两套 Axios 实例并存（utils/http.ts 和 app/utils/api.ts），可能造成配置漂移"
+    }
+  ],
+  "test_surface": [
+    "CERT-01: 认证跳转 + 登录流程 + 失败提示 + token 存储 + 退出（3 个 UI 不匹配）",
+    "CERT-02: 10个模块导航 + 通知 + 全局搜索（5 个 heading 不匹配 + 2 个 placeholder 不匹配 + 通知 aria-label 缺失）",
+    "CERT-03: 资产列表筛选 + 表单校验 + 新增/删除/处置入口（依赖 API mock 数据，mock 路径可能与实际不同）",
+    "CERT-04: 设备保养统计 + 保养记录提交（依赖 API mock）",
+    "CERT-05: RFID 任务创建 + 盘点扫描流程（依赖 API mock）",
+    "CERT-06: 闲置资产发布/认领/取消（依赖 API mock）",
+    "CERT-07: 处置类型页签 + 过滤器 + 四类表单入口（heading '资产处置管理' ✅ 但搜索 placeholder 需确认）",
+    "CERT-08: 审批状态过滤 + 批准/驳回 + 工单流转（路由路径 /approval ❌ 应为 /approvals）",
+    "CERT-09: 用户/部门/集成/安全配置（依赖 API mock 路径对应）",
+    "CERT-10: 仪表板数据 + 审批驳回 + 导出报表（依赖 API mock）"
+  ],
+  "files_to_modify": [
+    {
+      "path": "forthAMS/frontend/src/router/index.tsx",
+      "reason": "缺少认证守卫，需在 AppLayout 层添加 token 检查，无 token 时 redirect /login",
+      "risk": "high",
+      "fix_type": "add_auth_guard"
+    },
+    {
+      "path": "testFinish/tests/playwright/forthams-certification.spec.ts",
+      "reason": "需修正：token key（ams_auth_token→auth_token）、button name、heading 文字、placeholder、路由路径 /approval→/approvals、通知 aria-label",
+      "risk": "high",
+      "fix_type": "test_code_correction"
+    },
+    {
+      "path": "forthAMS/frontend/src/main.tsx",
+      "reason": "需要挂载 AuthProvider（如果使用 useAuth），但当前路由系统不依赖 AuthContext，可以考虑不添加",
+      "risk": "medium",
+      "fix_type": "optional"
+    },
+    {
+      "path": "forthAMS/frontend/src/pages/asset/AssetListPage.tsx",
+      "reason": "标题 '资产台账' 应改为 '资产台账管理' 以匹配测试及语义完整性",
+      "risk": "low",
+      "fix_type": "heading_text_change"
+    },
+    {
+      "path": "forthAMS/frontend/src/pages/approval/ApprovalListPage.tsx",
+      "reason": "标题 '审批中心' 应改为 '审批流程管理' 或测试做适配",
+      "risk": "low",
+      "fix_type": "heading_text_change"
+    },
+    {
+      "path": "forthAMS/frontend/src/pages/analytics/AnalyticsPage.tsx",
+      "reason": "标题 '数据分析' 应改为 '数据统计分析' 或测试做适配",
+      "risk": "low",
+      "fix_type": "heading_text_change"
+    },
+    {
+      "path": "forthAMS/frontend/src/pages/inventory/InventoryTasksPage.tsx",
+      "reason": "标题 '盘点任务列表' 应改为 'RFID资产盘点' 或测试做适配",
+      "risk": "low",
+      "fix_type": "heading_text_change"
+    },
+    {
+      "path": "forthAMS/frontend/src/pages/workflow/WorkflowCenterPage.tsx",
+      "reason": "<h1> '业务流程管理' 应改为 '业务流程列表' 或测试做适配",
+      "risk": "low",
+      "fix_type": "heading_text_change"
+    },
+    {
+      "path": "forthAMS/frontend/src/layouts/AppLayout.tsx",
+      "reason": "通知按钮需添加 aria-label='查看通知'；或测试改用其他定位器",
+      "risk": "low",
+      "fix_type": "aria_label_change"
+    },
+    {
+      "path": "forthAMS/frontend/src/components/GlobalSearch.tsx",
+      "reason": "placeholder '搜索页面或业务数据...' 与测试 '搜索资产...' 不匹配",
+      "risk": "low",
+      "fix_type": "placeholder_change"
+    }
+  ],
+  "recommended_fix_order": [
+    "1. 【测试适配】修改测试 forthams-certification.spec.ts 中的 token key（ams_auth_token→auth_token）、button name、heading 文字、placeholder、路由路径",
+    "2. 【认证守卫】在 router/index.tsx 的 AppLayout 层或布局组件中添加 token 检查逻辑，无 token 时 redirect /login",
+    "3. 【页面标题】按测试预期修改 5 个页面的 heading 文字",
+    "4. 【UI 元素】添加通知 aria-label、修改 GlobalSearch placeholder",
+    "5. 【验证】从 CERT-01 到 CERT-10 逐一验证",
+    "6. 【全量回归】确认 10/10 通过"
+  ],
+  "debate_topics": [
+    "方案A（推荐）：修改测试以适应当前前端实现（改动量最小，风险最低）",
+    "方案B：修改前端以适配测试期望（页面标题、按钮文字等）",
+    "方案C：混合策略 — 测试适配 token key/路由路径，前端适配 heading 文字/按钮文字",
+    "关键决策：认证守卫是前端的真正安全需求还是仅为测试通过？如果是前者需要完整的 ProtectedRoute + AuthProvider，如果是后者只需简单的 token 检查",
+    "token key 统一：建议统一使用 auth_token，两套代码（http.ts、app/utils/api.ts）已统一使用 auth_token，测试应适配而非修改前端"
+  ]
+}

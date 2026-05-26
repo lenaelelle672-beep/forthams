@@ -1,0 +1,66 @@
+{
+  "session_id": "20260523-goal-resume-2",
+  "phase": "builder",
+  "completed_at": "2026-05-23T19:51:35+08:00",
+  "overall_status": "verified",
+  "ac_2_analysis": {
+    "total_hardcoded_branches": 5,
+    "already_done": [
+      {
+        "branch": "fin-depreciation",
+        "note": "已通过 ReportController.getDepreciationStats() + ReportService.getDepreciationStats() 使用真实数据，前端 chartData 已消费 depreciationRes"
+      },
+      {
+        "branch": "ops-maintenance",
+        "note": "已通过 ReportController.getMaintenanceStats() + ReportService.getMaintenanceStats() 使用真实数据，前端 chartData 已消费 maintenanceRes"
+      },
+      {
+        "branch": "ops-retirement",
+        "note": "已通过 ReportController.getRetirementStats() + ReportService.getRetirementStats() 使用真实数据，前端 chartData 已消费 retirementRes"
+      }
+    ],
+    "implemented_now": [
+      "wo-summary: 新增 WorkOrderController.getStatusDistribution() + WorkOrderService.getStatusDistribution() → GET /workorders/status-distribution",
+      "wo-pending: 新增 WorkOrderController.getDeptPending() + WorkOrderService.getDeptPending() → GET /workorders/dept-pending"
+    ]
+  },
+  "changed_files": [
+    "backend/src/main/java/com/ams/service/WorkOrderService.java",
+    "backend/src/main/java/com/ams/controller/WorkOrderController.java",
+    "frontend/src/api/reports.ts",
+    "frontend/src/pages/reports/ReportsPage.tsx"
+  ],
+  "added_files": [
+    "backend/src/main/java/com/ams/dto/StatusDistributionDTO.java",
+    "backend/src/main/java/com/ams/dto/DeptPendingDTO.java"
+  ],
+  "commands_run": [
+    {
+      "command": "cd backend && mvn compile",
+      "result": "passed",
+      "notes": "BUILD SUCCESS, 218 source files compiled"
+    },
+    {
+      "command": "cd frontend && npx vitest run",
+      "result": "passed",
+      "notes": "30 test files, 677 tests passed, 0 failures"
+    },
+    {
+      "command": "cd frontend && npm run build",
+      "result": "passed",
+      "notes": "built in 5.91s, no errors"
+    }
+  ],
+  "verification_results": {
+    "mvn_compile": "BUILD SUCCESS",
+    "vitest": "30 test files, 677 tests passed, 0 failures",
+    "npm_build": "built successfully in 5.91s"
+  },
+  "residual_risks": [
+    "wo-summary 分支：后端返回的状态映射使用硬编码中英文表（COMPLETED→已完成），如果将来新增状态需同步更新 WorkOrderService.statusLabels 映射表",
+    "wo-pending 分支：按 deptName 聚合 PENDING 工单，如果 deptName 为空则统一归为「未知部门」，可能影响数据准确性",
+    "fin-depreciation/ops-maintenance/ops-retirement 三个分支已在之前迭代中实现对接，本次验证确认其功能正常但未做代码审查",
+    "wo-summary 目前只返回实际存在的状态计数（不包含超时等派生状态），前端预期「超时」字段需等后端有超时计算逻辑后补充--当前改为仅展示实际状态分布",
+    "3个已有端点（/reports/depreciation-stats 等）不接受 months 参数，由前端 period 下拉选择但后端未过滤"
+  ]
+}

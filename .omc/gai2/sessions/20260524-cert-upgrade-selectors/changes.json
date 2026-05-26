@@ -1,0 +1,206 @@
+{
+  "schema_version": 1,
+  "agent": "gai2-builder",
+  "session": "20260524-cert-upgrade-selectors",
+  "changed_files": [
+    "testFinish/tests/playwright/forthams-certification.spec.ts"
+  ],
+  "added_files": [],
+  "write_actions_applied": [
+    {
+      "id": "ACT-01",
+      "source": "draft-changes.json",
+      "decision": "apply_as_is",
+      "status": "success",
+      "description": "CERT-02: modules 数组 6 处文本修正（L59-70）"
+    },
+    {
+      "id": "ACT-02",
+      "source": "draft-changes.json",
+      "decision": "apply_as_is",
+      "status": "overridden_by_rework_1",
+      "description": "CERT-03: 搜索框 placeholder \"搜索资产...\" → \"搜索资产编号或名称...\"（L96，第1轮返工覆盖）"
+    },
+    {
+      "id": "ACT-03",
+      "source": "draft-changes.json",
+      "decision": "apply_as_is",
+      "status": "success",
+      "description": "CERT-03: 创建资产流程全面重写（L99-112）"
+    },
+    {
+      "id": "ACT-04",
+      "source": "draft-changes.json",
+      "decision": "apply_as_is",
+      "status": "overridden_by_rework_2",
+      "description": "CERT-03: 搜索框 placeholder 断言 \"搜索资产...\" → \"搜索资产编号或名称...\"（L121，第1轮返工覆盖）"
+    },
+    {
+      "id": "ACT-05",
+      "source": "draft-changes.json",
+      "decision": "apply_as_is",
+      "status": "success",
+      "description": "CERT-03: fillAssetForm 改用 data-testid（L331-336）"
+    },
+    {
+      "id": "ACT-06",
+      "source": "draft-changes.json",
+      "decision": "apply_as_is",
+      "status": "success",
+      "description": "CERT-08: 路由 URL + heading（L215-216）"
+    },
+    {
+      "id": "ACT-07",
+      "source": "draft-changes.json → refine.json (improvement)",
+      "decision": "use_refine",
+      "status": "overridden_by_rework_3",
+      "description": "CERT-08: 状态过滤 Tab 按钮 → select 下拉框（L219-222，第1轮返工覆盖）"
+    },
+    {
+      "id": "ACT-08",
+      "source": "draft-changes.json",
+      "decision": "apply_as_is",
+      "status": "overridden_by_rework_4",
+      "description": "CERT-08: 通过操作详情弹窗路径 → 行内批准按钮（L224-229，第1轮返工覆盖）"
+    },
+    {
+      "id": "ACT-09",
+      "source": "draft-changes.json → refine.json (improvement)",
+      "decision": "use_refine",
+      "status": "overridden_by_rework_5",
+      "description": "CERT-10: 驳回操作详情弹窗路径 → 行内驳回按钮（L303-308，第1轮返工覆盖）"
+    },
+    {
+      "id": "ACT-10",
+      "source": "draft-changes.json",
+      "decision": "apply_as_is",
+      "status": "success",
+      "description": "CERT-10: 数据分析 heading 3 处统一修正（L305-311）"
+    },
+    {
+      "id": "ACT-11",
+      "source": "refine.json missed_items",
+      "decision": "apply",
+      "status": "success",
+      "description": "CERT-05: heading L149 '盘点任务列表' → '盘点任务'"
+    }
+  ],
+  "commands_run": [
+    {
+      "command": "cd /Users/feigao/project/Project/testFinish && TEST_PROJECT_CONFIG=config/forthams.example.json npx playwright test tests/playwright/forthams-certification.spec.ts --project=chromium --reporter=list",
+      "exit_code": 1,
+      "stdout": "11 tests: 6 passed, 4 failed, 1 skipped",
+      "details": {
+        "passed": [
+          "CERT-01 认证：登录、失败提示、受保护页面、退出登录",
+          "CERT-04 重要设备：保养统计、提醒、保养记录校验和保存",
+          "CERT-05 RFID盘点：任务创建、开始盘点、扫描暂停/继续/完成",
+          "CERT-06 闲置资产：发布、认领、取消发布和统计逻辑",
+          "CERT-07 资产处置：类型页签、本地过滤和四类处置表单入口",
+          "CERT-09 系统设置：用户、部门、集成、安全配置操作"
+        ],
+        "failed": [
+          "CERT-02 页面模块：核心导航、通知、全局搜索和受保护模块渲染 - 超时：getByRole('link', { name: 'RFID盘点' }) 找不到（link 文本在页面上可能保留空格 'RFID 盘点'）",
+          "CERT-03 资产台账：筛选、必填校验、价值校验、新增、删除、处置入口 - 超时：getByPlaceholder('搜索资产...') 找不到（placeholder 未匹配）",
+          "CERT-08 审批与工单：状态过滤、批准驳回、提交/开始/完成流转 - heading({ name: '审批列表' }) 不存在",
+          "CERT-10 仪表板与数据分析：金额格式、待办审批、导出报表 - 超时：getByText('资产转移审批') 找不到（/approval 页面无可点击列表项）"
+        ],
+        "skipped": [
+          "CERT-05b RFID扫描（新版UI中移至不同页面）"
+        ]
+      }
+    },
+    {
+      "round": 2,
+      "label": "第1轮返工修复验证",
+      "command": "cd /Users/feigao/project/Project/testFinish && TEST_PROJECT_CONFIG=config/forthams.example.json npx playwright test tests/playwright/forthams-certification.spec.ts --project=chromium --reporter=list",
+      "exit_code": 1,
+      "stdout": "11 tests: 6 passed, 4 failed, 1 skipped",
+      "details": {
+        "passed": [
+          "CERT-01 认证：登录、失败提示、受保护页面、退出登录",
+          "CERT-04 重要设备：保养统计、提醒、保养记录校验和保存",
+          "CERT-05 RFID盘点：任务创建、开始盘点、扫描暂停/继续/完成",
+          "CERT-06 闲置资产：发布、认领、取消发布和统计逻辑",
+          "CERT-07 资产处置：类型页签、本地过滤和四类处置表单入口",
+          "CERT-09 系统设置：用户、部门、集成、安全配置操作"
+        ],
+        "failed": [
+          "CERT-02 页面模块：getByRole(link, RFID盘点) 找不到 — modules 数组 link 值与页面 DOM 不匹配（带空格 RFID 盘点）",
+          "CERT-03 资产台账：getByPlaceholder(搜索资产编号或名称...) 找不到 — 此值仍与页面 DOM placeholder 不匹配，需进一步核查前端 AssetSearchBar.tsx 实际渲染值",
+          "CERT-08 审批与工单：getByRole(heading, 审批列表) 找不到 — 页面可能未正确渲染，或路由 /approval 未加载完整",
+          "CERT-10 仪表板与数据分析：getByRole(button, 驳回) 找不到 — 行内驳回按钮可能需特定前置条件才显示"
+        ],
+        "skipped": [
+          "CERT-05b RFID扫描（新版UI中移至不同页面）"
+        ]
+      }
+    }
+  ],
+  "verification_results": {
+    "code_changes_verified": true,
+    "round_1_rework_5_fixes_applied": true,
+    "rework_applied": [
+      {
+        "id": "修正1",
+        "action": "ACT-02",
+        "description": "搜索框 placeholder L96: 搜索资产... → 搜索资产编号或名称..."
+      },
+      {
+        "id": "修正2",
+        "action": "ACT-04",
+        "description": "搜索框 placeholder 断言 L121: 搜索资产... → 搜索资产编号或名称..."
+      },
+      {
+        "id": "修正3",
+        "action": "ACT-07",
+        "description": "状态过滤 L219-222: Tab 按钮 → select 下拉框"
+      },
+      {
+        "id": "修正4",
+        "action": "ACT-08",
+        "description": "通过操作 L224-229: 详情弹窗 → 行内批准按钮"
+      },
+      {
+        "id": "修正5",
+        "action": "ACT-09",
+        "description": "驳回操作 L303-308: 详情弹窗 → 行内驳回按钮"
+      }
+    ],
+    "test_results": {
+      "summary": "6/11 passed, 4/11 failed, 1/11 skipped (same as round 1)",
+      "round_1_regression_free": [
+        "CERT-01 ✅",
+        "CERT-04 ✅",
+        "CERT-05 ✅",
+        "CERT-06 ✅",
+        "CERT-07 ✅",
+        "CERT-09 ✅"
+      ],
+      "round_1_regression_possible": [],
+      "still_failing": [
+        "CERT-02 ❌ — modules 数组中 link: RFID盘点 与实际页面 DOM 不匹配（页面可能是 RFID 盘点 带空格）。不在本次 5 项修正范围内。",
+        "CERT-03 ❌ — placeholder 搜索资产编号或名称... 仍与 DOM 不匹配。前端 AssetSearchBar.tsx L121 placeholder 值需进一步核实。",
+        "CERT-08 ❌ — heading 审批列表 实际页面找不到。前端 Approval.tsx L194 <h3>审批列表</h3> 确认存在，可能页面渲染或路由加载问题。",
+        "CERT-10 ❌ — getByRole(button, 驳回) 在审批卡片上找不到。前端确认行内按钮存在，但可能需要特定前置条件。"
+      ]
+    }
+  },
+  "minions_execution": {
+    "adjudication_file_read": true,
+    "selected_source": "draft-changes.json 为基础，按 refine.json 改进建议调整",
+    "write_intent_preserved": true,
+    "degradation_blocked": false,
+    "actions_applied_from_draft": 8,
+    "actions_applied_from_refine_improvements": 2,
+    "actions_applied_from_refine_missed_items": 1,
+    "total_actions": 11
+  },
+  "residual_risks": [
+    "CERT-02 modules 数组 link 值 RFID盘点 需要进一步确认页面实际 link 文本（可能带空格）",
+    "CERT-03 placeholder 搜索资产编号或名称... 经前端源码交叉验证仍不匹配，需再次核查 AssetSearchBar.tsx 实际渲染值",
+    "CERT-08 heading 审批列表 前端确认存在但测试找不到，可能是测试环境页面加载问题或 mock 数据不完整",
+    "CERT-10 行内驳回按钮在审批卡片上存在但测试找不到，可能需要特定审批状态条件",
+    "5 项返工修正已正确应用到代码中，但 4 个测试仍因选择器值/环境问题失败，需要进一步调查根因"
+  ]
+}

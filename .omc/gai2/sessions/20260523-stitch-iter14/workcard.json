@@ -1,0 +1,53 @@
+{
+  "session_id": "20260523-stitch-iter14",
+  "iteration": 14,
+  "created_at": "2026-05-23T12:00:00.000Z",
+  "directive": "迭代14：使用 stitchMCP 生成新页面（全局搜索组件 + 报表中心页面）+ 边界推演 + 测试覆盖 + 前后端联动 + 构建验证全绿",
+  "status": "in_progress",
+  "classification": null,
+  "acceptance_checks": [
+    {
+      "id": "AC-stitch-global-search",
+      "check": "全局搜索组件 — 使用 Stitch MCP (stitch-mcp-generate-screen-from-text) 生成 Cmd+K 风格搜索 UI，集成到 AppLayout 顶栏，支持键盘快捷键触发"
+    },
+    {
+      "id": "AC-stitch-report-center",
+      "check": "报表中心页面 — 使用 Stitch MCP 生成报表中心页面 UI（报表列表、图表预览），添加路由和侧边栏导航"
+    },
+    {
+      "id": "AC-5-boundary",
+      "check": "边界推演 — 对新页面进行边界用例和异常推演，记录推演结果"
+    },
+    {
+      "id": "AC-6-tests",
+      "check": "测试覆盖 — 为新建页面编写 vitest 测试"
+    },
+    {
+      "id": "AC-7-api",
+      "check": "前后端联动 — 确保新页面正确调用后端 API，必要时新增后端端点"
+    },
+    {
+      "id": "AC-8-build",
+      "check": "构建验证 — mvn test + vitest + npm build 全绿"
+    }
+  ],
+  "evidence_to_collect": [
+    "Stitch MCP 生成的 UI 截图/代码",
+    "全局搜索组件集成代码 (GlobalSearch.tsx + command.tsx + AppLayout 集成)",
+    "报表中心页面代码 (ReportsPage.tsx + ReportCard + ChartPreview + 子组件)",
+    "路由配置 (router/index.tsx)",
+    "侧边栏导航添加 (NAV_GROUPS)",
+    "后端 API 文件（如有新增）",
+    "边界推演文档",
+    "测试文件 (vitest)",
+    "mvn test / vitest / npm build 执行结果"
+  ],
+  "open_risks": [
+    "Stitch MCP 可能受设计工具可用性限制",
+    "cmdk 包已依赖但需要确认与项目主题一致",
+    "报表中心可能需要新增后端 API",
+    "搜索组件需要跨模块查询可能带来性能问题"
+  ],
+  "mcp_direct": false,
+  "artifact_dir": ".omc/gai2/sessions/20260523-stitch-iter14"
+}

@@ -1,0 +1,55 @@
+{
+  "mode": "swarm-role",
+  "swarm_role": "risk-security",
+  "stance": "从风险与安全角度审查端到端测试方案，重点关注数据一致性、多租户隔离、异常路径覆盖和测试数据残留",
+  "findings": [
+    "【已确认-CLEARANCE】ASSET_CLEARANCE 流程端到端测试已通过，其 businessData 格式（assetId + reason）与 AssetClearanceDTO 完全对齐，可作为其余 3 个流程的参考模板。",
+    "【高优先级-字段名风险】所有 4 个 DTO（AssetTransferDTO/AssetScrapDTO/AssetClearanceDTO/CompensationCreateDTO）均使用 `assetId`（Long 单值），而后端 `ApprovalCreateDTO.businessId` 有 `@JsonAlias({assetId})` 兼容。但前端/测试脚本若发送 `assetIds`（数组）或 `asset_id` 等变体，会因 `FAIL_ON_UNKNOWN_PROPERTIES` 被禁用而静默忽略，导致 `assetId=null`，最终在 AssetLifecycleService 中抛出 '资产不存在' 异常——错误信息不明确，诊断困难。",
+    "【高优先级-COMPENSATION 唯一弱点】CompensationCreateDTO 通过 @JsonAlias 兼容了 `type/compensationType`、`amount/compensationAmount`、`reason/description`、`date/incidentDate`、`employee/responsibleUserId`、`department/responsibleDeptId`，是 4 个 DTO 中向前兼容最好的。但 `assetId` 字段无别名兼容——若前端使用 `assetIds`，同样会静默失败。",
+    "【已确认-TRANSFER/SCRAP 风险】AssetTransferDTO 和 AssetScrapDTO 没有 @JsonAlias 兼容层，字段必须精确匹配：TRANSFER 需 assetId/targetDeptId/targetUserId/targetLocation/reason，SCRAP 需 assetId/reason。任何字段名偏差都会导致反序列化时该字段为 null。",
+    "【中等优先级-审批人角色查询缺租户过滤】UserRoleMapper.selectActiveUserIdsByRole() 查询审批人时只按 role_code 过滤，未加 tenant_id 条件。在多租户环境中，租户 A 的审批人可能被租户 B 的审批流程错误匹配——当前测试环境若所有用户共享同一 tenant_id 则无害，但生产环境存在租户间串扰风险。",
+    "【已确认-事务安全】ApprovalService.approve() 与 handleDisposalOutcome() 在同一 @Transactional 内，若资产处置回调失败（如资产被删除），整个事务回滚，包括已写入的审批记录——保证数据一致性，但审批人看到的临时成功会回滚，可能造成困惑。",
+    "【中等优先级-端终状态不可逆】CLEARED/SCRAPPED 为资产终端状态，canTransitionTo() 明确禁止从终端状态再转换。测试若对同一资产反复执行端到端测试，后续测试将因状态锁定而失败——必须有独立的测试资产或状态重置机制。",
+    "【低优先级-审批记录逻辑删除】ApprovalRecord 实体无 @TableLogic 字段，而 ApprovalProcess 有 deleted 字段。这意味着审批流程可逻辑删除，但审批记录是硬删除或不可删除——测试数据残留可能导致统计偏差。",
+    "【低优先级-JWT 过期】长脚本执行中 token 可能过期，审批 API 调用会失败。Token 过期后的错误信息是 Spring Security 认证异常，可能被误判为业务逻辑 bug。",
+    "【结构确认】4 个流程的审批模板均为 4 级审批（WorkflowDefinitionService TEMPLATES），默认审批角色为 SUPER_ADMIN。测试只需确保工作流定义处于 PUBLISHED 状态即可发起审批。"
+  ],
+  "risks": [
+    "【严重】businessData 反序列化静默失败：若测试脚本使用 `assetIds`（数组）而非 `assetId`（Long），JSON 会忽略多余字段使 assetId 为 null，后端返回'资产不存在'而非明确的字段格式错误提示，诊断困难。TRANSFER/SCRAP/CLEARANCE 三个 DTO 无 @JsonAlias 兼容，COMPENSATION 虽有兼容但 assetId 仍无别名。修复建议：在 handleDisposalOutcome 中增加 null 字段显式检查，或给 assetId 也添加 @JsonAlias。",
+    "【严重】多租户审批人串扰：UserRoleMapper.selectActiveUserIdsByRole() 查询审批人时缺少 tenant_id 过滤条件（SQL 仅关联 sys_user_role 和 sys_role，未关联 user 的 tenant_id）。若不同租户有相同角色名的用户，A 租户的审批人可能审批 B 租户的流程——当前测试环境风险可控，但生产环境为严重漏洞。",
+    "【中等】审批回调与资产状态不一致窗口：handleDisposalOutcome 虽在同一事务中，但若 DisposeService 调用成功而后续通知发送失败（已 catch 不抛异常），审批状态已变更为 APPROVED，但通知未送达——虽然设计上通知失败不影响主流程，但缺少可观测性。",
+    "【中等】测试数据残留污染：审批流程创建后无 delete API（只有 cancelProcess），无法清理已完成的审批数据。需确认每个测试轮次使用独立资产或实现 teardown：资产逻辑删除（设置 deleted=1）、审批流程取消或逻辑删除。",
+    "【中等】审批人和申请人可能为同一用户：若测试用户同时具备申请人角色和审批人角色，审批通过后 sendApprovalNotification 会跳过（applicantId.equals(approverId)），但审批操作本身未被阻止——可能导致审计合规问题。",
+    "【低】资产状态竞态：两个审批流程同时对同一资产进行处置（如同时发起 CLEARANCE 和 SCRAP），第一个完成的审批回调修改资产状态后，第二个回调可能因状态转换规则限制而失败——但审批流程状态已变更为 APPROVED，造成审批状态与资产状态不一致。",
+    "【低】WorkflowDefinition 版本升级后存量审批：审批流程创建时通过 bindWorkflowSnapshot 将流程定义快照绑定到 businessData 中，后续审批使用快照而非实时查询——这是正确的设计，但需验证存量审批在流程定义升级后不受影响。"
+  ],
+  "evidence_needed": [
+    "【CRITICAL】确认测试脚本发送的 businessData JSON 字段名与后端 DTO 完全一致：对 TRANSFER 需验证 assetId 而非 assetIds、targetDeptId 而非 deptId 等；对 COMPENSATION 需验证使用 compensationAmount 还是 amount。",
+    "【CRITICAL】确认测试用户池（sim05261457xx）是否全部属于同一 tenant_id。若属于不同 tenant_id，需先确认各租户下 workflow definition 均已发布。",
+    "【重要】确认 4 个流程各自的 workflow definition 在测试租户下是否均已 PUBLISHED（发布版本 > 0），否则 ApprovalService.createProcess() 会抛出 '请先发布对应业务流程后再提交审批'。",
+    "【重要】确认测试脚本是否有 teardown/cleanup 机制：每个流程测试结束后，是清理审批记录和资产状态，还是使用全新资产。若无可清理策略，多轮测试会累积脏数据。",
+    "【重要】验证审批人角色配置：SUPER_ADMIN 角色在测试租户下是否有至少 4 个可用用户（4 级审批每级至少 1 人），且每级审批人不同（避免同一人重复审批被 '当前步骤已审批' 拦截）。",
+    "【建议】验证 skip 模式测试：流程种类多时，应支持跳过某些未准备好的流程（如 COMPENSATION 数据库表不存在），而非所有流程全失败。",
+    "【建议】收集每个异常路径测试的预期错误码/错误消息映射表，确保测试断言与后端 BusinessException 消息一致，避免消息变更导致误报。",
+    "【建议】确认真实 E2E 测试与 mock 测试隔离：smoke-test 并行执行时不应争抢同一测试数据。"
+  ],
+  "open_questions": [
+    "TRANSFER 流程中 targetUserId 是否必须有值？若为 null，AssetLifecycleService.transitionAsset 的 mutator 会设置 null，可能导致资产无归属用户——是否符合业务预期？",
+    "COMPENSATION 流程审批通过后资产状态应变更为什么？当前 handleDisposalOutcome 仅创建 AssetCompensation 并设置状态为 APPROVED，未修改 Asset 实体的 status——三份 DTO (TRANSFER→IN_USE, CLEARANCE→CLEARED, SCRAP→SCRAPPED) 对应明确的资产状态，COMPENSATION 是否应在赔偿通过后也变更资产状态（如 DAMAGED 或 LOST）？",
+    "SCRAP 流程中 AssetScrapDTO 仅有 assetId 和 reason，但 DisposalService.scrapAsset 内部不修改 deptId/userId——资产报废后仍归属原部门/用户，是否符合业务预期？",
+    "多轮测试中若使用同一测试资产，CLEARED/SCRAPPED 状态后无法再次发起处置审批。是否可在测试脚本中通过数据库直连重置资产状态为 IDLE（绕过 canTransitionTo 检查）？",
+    "审批人角色查询 selectActiveUserIdsByRole 缺 tenant_id 过滤是否为已知技术债？修复方案是否已在规划中？",
+    "测试脚本是否应覆盖审批模式（approvalMode）为 'all'（全部审批人通过）的场景，以验证 isApprovalStepComplete 逻辑对多审批人的正确性？"
+  ],
+  "recommendation": {
+    "option": "分阶段测试，先修复 critical 风险再推进全量 E2E",
+    "rationale": "当前 3 个未测流程（TRANSFER/SCRAP/COMPENSATION）的 businessData 格式应与已通过的 CLEARANCE 保持一致（均使用 assetId 单值），但前端/脚本的命名习惯未知是最大不确定性。建议：(1) 先对每个流程单独验证 createProcess 接口的参数格式——用最小 businessData JSON 测试能否成功创建审批流程，不进入审批步骤；(2) 格式确认后，复用 CLEARANCE 的测试脚本模板逐流程推进 4 级审批；(3) COMPENSATION 流程因有 @JsonAlias 兼容层，格式灵活性最高，可作为突破口优先测试；(4) 所有测试前必须确认 workflow definition 已发布 (PUBLISHED) 且审批人角色有足够用户。",
+    "conditions": [
+      "测试前必须确认每个流程对应的 workflow definition 在目标租户下 status='PUBLISHED' 且 version > 0",
+      "每个流程的 businessData JSON 必须确保 assetId 字段名精确匹配（不匹配时需在测试脚本中做字段映射）",
+      "测试使用全新创建的资产，测试结束后通过数据库或 API 清理（逻辑删除）",
+      "每个流程至少准备 4 个不同审批人（或确认审批模式为 'sequence' 时同一人可逐级审批）",
+      "制定异常路径测试优先级：格式验证 → 正常路径 → 权限验证 → 边界条件 → 并发场景"
+    ]
+  }
+}

@@ -12,7 +12,7 @@ import {
 import { getAssetById, getDepreciationSchedule, deleteAsset } from '@/api/asset';
 import { getAssetAuditLogs, type AuditLog } from '@/api/audit';
 import type { Asset } from '@/types/asset';
-import type { ApiResponse } from '@/types/common';
+import type { PageData,  ApiResponse } from '@/types/common';
 import type { DepreciationScheduleItem } from '@/types/asset';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -60,15 +60,13 @@ export default function AssetDetailPage() {
     enabled: !!id,
   });
 
-  const asset: Asset | undefined = (assetRes as ApiResponse<Asset> | undefined)?.data;
-
+  const asset: Asset | undefined = assetRes as unknown as Asset | undefined;
   const { data: depRes } = useQuery({
     queryKey: ['asset-depreciation', id],
     queryFn: () => getDepreciationSchedule(Number(id!)),
     enabled: !!id,
-    select: (res: ApiResponse<DepreciationScheduleItem[]>) =>
-      (res.data ?? []).map((d) => ({ date: d.periodDate, value: d.endValue })),
-  });
+    select: (res: unknown) =>
+      ((res ?? []) as DepreciationScheduleItem[]).map((d) => ({ date: d.periodDate, value: d.endValue })),  });
 
   const depreciationData = depRes ?? [];
 
@@ -76,8 +74,7 @@ export default function AssetDetailPage() {
     queryKey: ['asset-audit-logs', id],
     queryFn: async () => {
       const res = await getAssetAuditLogs(Number(id!), { page: 1, pageSize: 10 });
-      return res.data;
-    },
+      return res as unknown as PageData<AuditLog>;    },
     enabled: !!id,
   });
 

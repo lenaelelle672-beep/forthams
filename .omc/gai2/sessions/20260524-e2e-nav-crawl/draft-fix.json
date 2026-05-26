@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "agent": "gai2-drafter",
+  "objective_summary": "修复 AssetTransferFormPage.tsx 中 Radix UI Select 空选项崩溃",
+  "target_files": ["frontend/src/pages/disposal/AssetTransferFormPage.tsx"],
+  "root_cause": "4 处 Controller 使用 Radix UI Select 时，deptOptions/locationOptions 为空数组（API 未加载），Select 无匹配 SelectItem 而 value 为 undefined 或 ''",
+  "write_intent": true,
+  "write_actions": [
+    "WA-1: fromDept Select 添加 deptOptions.length===0 条件守卫",
+    "WA-2: toDept Select 添加相同守卫",
+    "WA-3: fromLocation Select 添加 locationOptions.length===0 守卫 + 移除 ?? ''",
+    "WA-4: toLocation Select 添加相同守卫"
+  ],
+  "verification_plan": [
+    "VP-1: 前端编译通过",
+    "VP-2: 访问 /disposals/transfer/new 无 React 崩溃",
+    "VP-3: 全量 E2E 测试 PASS"
+  ]
+}

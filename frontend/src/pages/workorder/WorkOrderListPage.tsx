@@ -10,7 +10,7 @@ import { Plus, FileText, Download, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { getWorkOrderList } from '@/api/workorder';
 import http from '@/utils/http';
-import type { PaginatedResponse } from '@/types/common';
+import type { PaginatedResponse, PageData } from '@/types/common';
 import type { WorkOrderListItem } from '@/types/workorder';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -58,8 +58,8 @@ export default function WorkOrderListPage() {
     placeholderData: (p) => p,
   });
 
-  const records = (res as PaginatedResponse<WorkOrderListItem> | undefined)?.data?.records ?? [];
-  const total   = (res as PaginatedResponse<WorkOrderListItem> | undefined)?.data?.total   ?? 0;
+  const records = (res as PageData<WorkOrderListItem> | undefined)?.records ?? [];
+  const total   = (res as PageData<WorkOrderListItem> | undefined)?.total   ?? 0;
 
   const columns: Column<any>[] = [
     {
@@ -129,7 +129,7 @@ export default function WorkOrderListPage() {
                     status: params.status || undefined,
                   },
                 });
-                const allRecords = (allRes as PaginatedResponse<WorkOrderListItem> | undefined)?.data?.records ?? [];
+                const allRecords = (allRes as PageData<WorkOrderListItem> | undefined)?.records ?? [];
                 if (allRecords.length === 0) {
                   toast.info('暂无数据可导出');
                   return;

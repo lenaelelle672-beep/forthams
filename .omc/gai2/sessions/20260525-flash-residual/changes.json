@@ -1,0 +1,185 @@
+{
+  "schema_version": 1,
+  "agent": "gai2-builder",
+  "session_id": "20260525-flash-residual",
+
+  "adjudication_compliance": {
+    "decision": "PROCEED_TO_VERIFY",
+    "selected_source": "draft",
+    "write_intent_preserved": true,
+    "degradation_detected": false,
+    "degradation_blocked": false,
+    "write_action_guard": "无 write_action 需要保护 — all verify operations"
+  },
+
+  "code_verification": {
+    "RISK-01_security_config_path_exact": {
+      "status": "pass",
+      "severity": "high",
+      "checks": [
+        {
+          "check_id": "SEC-01",
+          "file": "backend/src/main/java/com/ams/config/SecurityConfig.java",
+          "line": 41,
+          "expected": "requestMatchers 中 auth 路径仅含 /auth/login 和 /auth/register",
+          "actual": ".requestMatchers(\"/auth/login\", \"/auth/register\", \"/public/**\", \"/health\", \"/system/health\", \"/system/info\").permitAll()",
+          "result": "pass",
+          "detail": "免认证路径精确匹配，/auth/logout 和 /auth/reset-password 已被排除在 permitAll 之外"
+        },
+        {
+          "check_id": "SEC-02",
+          "file": "backend/src/main/java/com/ams/config/JwtAuthenticationFilter.java",
+          "line": 122,
+          "expected": "uri.equals() 精确匹配，无 startsWith(\"/auth/\") 通配",
+          "actual": "uri.equals(\"/auth/login\") || uri.equals(\"/auth/register\") || uri.startsWith(\"/public/\") || uri.startsWith(\"/static/\") || uri.equals(\"/error\") || uri.equals(\"/favicon.ico\")",
+          "result": "pass",
+          "detail": "JWT 过滤器使用 equals 精确匹配 /auth/login 和 /auth/register，与 SecurityConfig 保持一致，双重保障"
+        },
+        {
+          "check_id": "SEC-03",
+          "file": "backend/src/main/java/com/ams/controller/AuthController.java",
+          "result": "pass",
+          "detail": "logout() 和 resetPassword() 方法无 @AuthenticationPrincipal 依赖，路径精确化后无 NPE 风险"
+        }
+      ],
+      "residual_risk": "建议未来添加 SecurityConfigIntegrationTest 覆盖路径白名单变更"
+    },
+
+    "RISK-02_settings_localStorage_unify": {
+      "status": "pass",
+      "severity": "medium",
+      "checks": [
+        {
+          "check_id": "UI-01",
+          "file": "frontend/src/pages/settings/SettingsPage.tsx",
+          "line": 44,
+          "expected": "已导入 useAuth from AuthContext",
+          "actual": "import { useAuth } from '@/app/context/AuthContext'",
+          "result": "pass"
+        },
+        {
+          "check_id": "UI-02",
+          "file": "frontend/src/pages/settings/SettingsPage.tsx",
+          "line": 688,
+          "expected": "const { user } = useAuth()",
+          "actual": "const { user } = useAuth()",
+          "result": "pass"
+        },
+        {
+          "check_id": "UI-03",
+          "file": "frontend/src/pages/settings/SettingsPage.tsx",
+          "line": 751,
+          "expected": "使用 user?.username ?? '' 替代 localStorage.getItem('username')",
+          "actual": "const storedUsername = user?.username ?? ''",
+          "result": "pass",
+          "detail": "通过 optional chaining 防御 user 为 null 的情况"
+        }
+      ],
+      "residual_risk": "若 AuthProvider 未正确包裹路由则 useAuth 可能失败，可通过路由守卫解决"
+    },
+
+    "RISK-03_bigscreen_interface_refactor": {
+      "status": "pass",
+      "severity": "low",
+      "checks": [
+        {
+          "check_id": "TYPE-01",
+          "file": "frontend/src/types/dashboard.types.ts",
+          "line": 271,
+          "expected": "BigScreenStats interface 已定义，11 个 number 字段",
+          "result": "pass",
+          "detail": "BigScreenStats interface 在 dashboard.types.ts 第271-294行定义，包含 totalAssets, inUseAssets, idleAssets, scrapAssets, utilizationRate, totalValue, netValue, pendingApprovals, pendingWorkOrders, inventoryProgress, criticalAlerts"
+        },
+        {
+          "check_id": "TYPE-02",
+          "file": "frontend/src/pages/bigscreen/BigScreenPage.tsx",
+          "lines": "16,18,32",
+          "expected": "已导入 BigScreenStats，fallbackStats 使用显式类型标注",
+          "actual": "import type { BigScreenStats } from '@/types/dashboard.types'; const fallbackStats: BigScreenStats = { ... }; type Stats = BigScreenStats;",
+          "result": "pass"
+        },
+        {
+          "check_id": "TYPE-03",
+          "file": "frontend/src/pages/bigscreen/BigScreen3DPage.tsx",
+          "lines": "5,9,26",
+          "expected": "已导入 BigScreenStats，fallbackStats 使用显式类型标注",
+          "actual": "import type { BigScreenStats } from '@/types/dashboard.types'; const fallbackStats: BigScreenStats = { ... }; type Stats = BigScreenStats;",
+          "result": "pass"
+        }
+      ],
+      "residual_risk": "API 字段变更时需同步更新 BigScreenStats interface"
+    }
+  },
+
+  "commands_run": [
+    {
+      "command": "cd backend && mvn compile",
+      "exit_code": 0,
+      "output": "BUILD SUCCESS (0.425s)",
+      "notes": "后端编译通过，Nothing to compile - all classes are up to date"
+    },
+    {
+      "command": "cd backend && mvn test",
+      "exit_code": 0,
+      "output": "BUILD SUCCESS — Tests run: 258, Failures: 0, Errors: 0, Skipped: 0 (18.548s)",
+      "notes": "全部 258 个测试通过，无失败、无错误、无跳过"
+    },
+    {
+      "command": "cd frontend && npx tsc --noEmit",
+      "exit_code": 2,
+      "output": "存在项目预存类型错误（与 AssetImportExport, disposal, workorder, dashboard, services 等有关），但 SettingsPage.tsx、BigScreenPage.tsx、BigScreen3DPage.tsx、dashboard.types.ts 均无类型错误",
+      "notes": "TypeScript 检查报错为项目其他文件的预存问题，与本次验证的 3 个 RISK 无关。3 个 RISK 对应的文件均通过类型检查。"
+    },
+    {
+      "command": "cd frontend && pnpm build",
+      "exit_code": 0,
+      "output": "✓ built in 4.98s",
+      "notes": "Vite 构建成功，生成 3344 个模块，dist 产物完整包含 SettingsPage、BigScreenPage、BigScreen3DPage 等 chunk"
+    }
+  ],
+
+  "verification_summary": {
+    "RISK-01": {
+      "status": "pass",
+      "detail": "SecurityConfig 第41行免认证路径精确化，auth 路径仅含 /auth/login 和 /auth/register；JwtAuthenticationFilter 第122行使用 equals 精确匹配，双重保障无安全绕过"
+    },
+    "RISK-02": {
+      "status": "pass",
+      "detail": "SettingsPage 已从 AuthContext 获取 username（useAuth → user?.username ?? ''），不再直接读取 localStorage"
+    },
+    "RISK-03": {
+      "status": "pass",
+      "detail": "BigScreenStats 显式 interface 已定义，BigScreenPage 和 BigScreen3DPage 均导入并使用该类型标注 fallbackStats"
+    },
+    "build": {
+      "status": "pass",
+      "detail": "后端 mvn compile + mvn test (258/258) + 前端 pnpm build 全部通过。TypeScript 检查存在项目预存错误但与 RISK 文件无关。"
+    }
+  },
+
+  "changed_files": [],
+  "added_files": [],
+
+  "verification_results": [
+    "后端编译通过 (BUILD SUCCESS)",
+    "后端测试通过 (258/258, 0 failures, 0 errors, 0 skipped)",
+    "前端 pnpm build 通过 (4.98s)",
+    "TypeScript 检查：3 个 RISK 文件均无类型错误",
+    "RISK-01：SecurityConfig 路径精确化确认校验通过",
+    "RISK-02：SettingsPage localStorage 键名统一确认校验通过",
+    "RISK-03：BigScreenStats 显式 interface 确认校验通过"
+  ],
+
+  "minions_execution": {
+    "adjudication_file_read": true,
+    "selected_source": "draft",
+    "write_intent_preserved": true,
+    "degradation_blocked": false
+  },
+
+  "residual_risks": [
+    "RISK-01: 建议未来添加 SecurityConfigIntegrationTest 覆盖路径白名单变更",
+    "RISK-02: 若 AuthProvider 未正确包裹路由则 useAuth 可能失败",
+    "RISK-03: BigScreenStats interface 字段若未来 API 变更需同步更新"
+  ]
+}

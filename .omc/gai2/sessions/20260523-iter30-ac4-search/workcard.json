@@ -1,0 +1,49 @@
+{
+  "session_id": "20260523-iter30-ac4-search",
+  "iteration": 30,
+  "created_at": "2026-05-23T19:41:00+08:00",
+  "directive": "AC-4: SidebarLayout 与 Cmd+K 搜索架构统一 — 将 GlobalSearch Cmd+K 组件集成到 SidebarLayout，替换行内搜索栏",
+  "owner": "gai2-orchestrator",
+  "phase": "triage",
+  "classification": "Medium",
+  "status": "in_progress",
+  "goal_ref": ".omc/gai2/goal-state.json",
+  "acceptance_checks": [
+    {
+      "id": "AC-4-search-unify",
+      "check": "SidebarLayout 头部行内搜索栏替换为 GlobalSearch Cmd+K 组件",
+      "status": "pending",
+      "note": "SidebarLayout（新布局）当前有独立行内搜索栏但未使用 GlobalSearch 组件，也无 ⌘K 快捷键"
+    },
+    {
+      "id": "AC-4-asset-search",
+      "check": "保留资产搜索功能（navigate to /assets?keyword=...）",
+      "status": "pending",
+      "note": "SidebarLayout 的 handleGlobalSearch 导航到资产搜索页，需要保留"
+    },
+    {
+      "id": "AC-4-keyboard",
+      "check": "⌘K/⌃K 快捷键在 SidebarLayout 中可用",
+      "status": "pending",
+      "note": "GlobalSearch 自带 ⌘K 绑定"
+    },
+    {
+      "id": "AC-4-build",
+      "check": "vitest + npm build 全绿",
+      "status": "pending",
+      "note": ""
+    }
+  ],
+  "evidence_to_collect": [
+    "SidebarLayout.tsx 修改后源码",
+    "GlobalSearch 集成效果",
+    "vitest 测试结果",
+    "npm build 结果"
+  ],
+  "mcp_direct": false,
+  "open_risks": [
+    "SidebarLayout 与 AppLayout 两个布局共存可能产生混淆",
+    "GlobalSearch 的预设搜索页面列表（SEARCHABLE_PAGES）可能与 SidebarLayout 导航不一致"
+  ],
+  "artifact_dir": ".omc/gai2/sessions/20260523-iter30-ac4-search"
+}

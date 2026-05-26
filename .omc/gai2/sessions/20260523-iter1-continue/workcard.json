@@ -1,0 +1,63 @@
+{
+  "session_id": "20260523-iter1-continue",
+  "iteration": 1,
+  "created_at": "2026-05-23T19:41:00+08:00",
+  "directive": "forthAMS 迭代推进 — 完成剩余3项任务：AC-1 Stitch稳定调用方式确认、AC-2 3个报表从Math.random() mock改为对接真实后端、AC-4 SidebarLayout与Cmd+K搜索架构统一",
+  "owner": "gai2-orchestrator",
+  "phase": "initial",
+  "classification": null,
+  "status": "created",
+  "goal_ref": ".omc/gai2/goal-state.json",
+  "acceptance_checks": [
+    {
+      "id": "AC-1",
+      "description": "Stitch找到稳定调用方式（从存档文档恢复）",
+      "details": "项目已有stitch-design.html可直接浏览器打开预览，确认此离线存档方式为稳定参考方案",
+      "verification_hint": "stitch-design.html可正常浏览器打开预览"
+    },
+    {
+      "id": "AC-2-fin-depreciation",
+      "description": "fin-depreciation（折旧统计）从Math.random mock改为对接真实后端数据",
+      "details": "ReportsPage.tsx line 191: Math.random mock → 调用后端真实数据",
+      "verification_hint": "不再使用Math.random产生折旧数据"
+    },
+    {
+      "id": "AC-2-ops-maintenance",
+      "description": "ops-maintenance（维保统计）从Math.random mock改为对接真实后端数据",
+      "details": "ReportsPage.tsx line 196: Math.random mock → 调用后端真实数据",
+      "verification_hint": "不再使用Math.random产生维保数据"
+    },
+    {
+      "id": "AC-2-ops-retirement",
+      "description": "ops-retirement（退役处置统计）从Math.random mock改为对接真实后端数据",
+      "details": "ReportsPage.tsx line 201: Math.random mock → 调用后端真实数据",
+      "verification_hint": "不再使用Math.random产生退役处置数据"
+    },
+    {
+      "id": "AC-4",
+      "description": "SidebarLayout与Cmd+K搜索架构统一",
+      "details": "将AppLayout中的GlobalSearch（Cmd+K）集成到SidebarLayout中，替换现有内联搜索框，提供统一搜索体验",
+      "verification_hint": "SidebarLayout中使用GlobalSearch组件，支持Cmd+K快捷键"
+    },
+    {
+      "id": "AC-5",
+      "description": "mvn test + vitest + npm build 全绿",
+      "details": "前端的vitest测试、npm build和后端的mvn编译均无错误",
+      "verification_hint": "vitest全绿，npm build 0 errors，mvn compile通过"
+    }
+  ],
+  "evidence_to_collect": [
+    "stitch-design.html确认文件存在",
+    "RealService后端新增方法（折旧/维保/退役统计）",
+    "前端ReportsPage chartData更新不再使用Math.random",
+    "SidebarLayout集成GlobalSearch",
+    "vitest测试结果",
+    "npm build结果",
+    "mvn compile结果"
+  ],
+  "open_risks": [
+    "后端可能缺少折旧/维保/退役相关的Mapper或Entity，需要先审计现有数据模型",
+    "SidebarLayout集成GlobalSearch可能引起原有布局样式变化"
+  ],
+  "artifact_dir": ".omc/gai2/sessions/20260523-iter1-continue"
+}

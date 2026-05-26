@@ -10,6 +10,7 @@ export interface FlowNodeData extends Record<string, unknown> {
   triggerType: string;
   approverType: 'role' | 'user';
   approverRole: string;
+  approverRoleName: string;
   approverId: string;
   approvalMode: 'any' | 'all' | 'sequence';
   conditionExpression: string;
@@ -40,10 +41,10 @@ export const FLOW_NODE_CATALOG: Record<FlowNodeType, { label: string; descriptio
 };
 
 const NODE_DEFAULTS: Record<FlowNodeType, Omit<FlowNodeData, 'type'>> = {
-  start: { label: '开始节点', description: '从资产申请单提交开始', nodeCode: 'START-001', triggerType: '表单提交', approverType: 'role', approverRole: '', approverId: '', approvalMode: 'sequence', conditionExpression: '', trueLabel: '', falseLabel: '', resultAction: '' },
-  approval: { label: '审批节点', description: '由部门负责人审核资产申请', nodeCode: 'APP-001', triggerType: '', approverType: 'role', approverRole: 'SUPER_ADMIN', approverId: '', approvalMode: 'sequence', conditionExpression: '', trueLabel: '', falseLabel: '', resultAction: '' },
-  condition: { label: '条件分支', description: '根据金额或字段命中不同路径', nodeCode: 'COND-001', triggerType: '', approverType: 'role', approverRole: '', approverId: '', approvalMode: 'sequence', conditionExpression: '申请金额 >= 5000', trueLabel: '满足条件', falseLabel: '不满足条件', resultAction: '' },
-  end: { label: '结束节点', description: '流程结束并同步审批结果', nodeCode: 'END-001', triggerType: '', approverType: 'role', approverRole: '', approverId: '', approvalMode: 'sequence', conditionExpression: '', trueLabel: '', falseLabel: '', resultAction: '审批完成并归档' },
+  start: { label: '开始节点', description: '从资产申请单提交开始', nodeCode: 'START-001', triggerType: '表单提交', approverType: 'role', approverRole: '', approverRoleName: '', approverId: '', approvalMode: 'sequence', conditionExpression: '', trueLabel: '', falseLabel: '', resultAction: '' },
+  approval: { label: '审批节点', description: '由部门负责人审核资产申请', nodeCode: 'APP-001', triggerType: '', approverType: 'role', approverRole: 'SUPER_ADMIN', approverRoleName: '', approverId: '', approvalMode: 'sequence', conditionExpression: '', trueLabel: '', falseLabel: '', resultAction: '' },
+  condition: { label: '条件分支', description: '根据金额或字段命中不同路径', nodeCode: 'COND-001', triggerType: '', approverType: 'role', approverRole: '', approverRoleName: '', approverId: '', approvalMode: 'sequence', conditionExpression: '申请金额 >= 5000', trueLabel: '满足条件', falseLabel: '不满足条件', resultAction: '' },
+  end: { label: '结束节点', description: '流程结束并同步审批结果', nodeCode: 'END-001', triggerType: '', approverType: 'role', approverRole: '', approverRoleName: '', approverId: '', approvalMode: 'sequence', conditionExpression: '', trueLabel: '', falseLabel: '', resultAction: '审批完成并归档' },
 };
 
 function createId(prefix: string) {

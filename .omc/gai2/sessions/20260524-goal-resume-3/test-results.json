@@ -1,0 +1,15 @@
+{
+  "overall": "PASS",
+  "passed": 1,
+  "failed": 0,
+  "testDuration": "27.4s",
+  "pagesScanned": "11/11 normal",
+  "pageIssues": 0,
+  "apiErrors": 0,
+  "consoleErrors": 0,
+  "reactCrashes": false,
+  "failedSteps": [],
+  "failedStepDetails": "无",
+  "timestamp": "2026-05-24T12:00:00+08:00",
+  "detail": "全部 11 个页面（仪表板、资产台账、重要设备、RFID盘点、闲置资产、资产处置、审批流程、流程管理、数据分析、系统设置、资产分类）均正常渲染，无 API 错误，无 console.error，无 React 崩溃"
+}

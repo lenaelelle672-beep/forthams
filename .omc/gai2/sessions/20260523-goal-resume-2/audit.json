@@ -1,0 +1,168 @@
+{
+  "session_id": "20260523-goal-resume-2",
+  "ac_audits": {
+    "AC-1": {
+      "current_state": "Stitch 存档文档已部分恢复。.stitch/DESIGN.md 存在且内容完整（设计令牌、组件映射、生成规则、Prompt 模板）。.stitch/exports/ 下包含 3 个 meta.json：2 个实际 Stitch 屏幕导出（bb224576, d58fc553）+ 1 个 design-intent 回退文档（reports-center，因 Stitch SDK 网络连接失败而无法生成实际屏幕）。scripts/stitch-cli.js 实现了完整的 CLI 命令（projects/generate/screens/export/edit/variants/batch）。前端代码中对设计令牌的引用有限——SidebarLayout.tsx 使用硬编码颜色而非 CSS 变量，仅 sidebar.tsx 和 sonner.tsx 少量引用了 --sidebar-* 和 --border 变量。",
+      "existing_patterns": [
+        "Stitch CLI 工具封装为 scripts/stitch-cli.js，支持完整的生成/导出/编辑工作流",
+        "DESIGN.md 作为设计系统单一口述源，包含颜色/字体/间距/组件映射/生成规则",
+        "design-intent 回退模式：当 Stitch SDK 不可用时，手工备案设计意图",
+        "前端使用 Tailwind CSS + 少量 CSS 变量，但未统一消费 DESIGN.md 定义的设计令牌"
+      ],
+      "technical_constraints": [
+        "Stitch SDK 无法连接 Google 服务器（已被防火墙/网络策略阻止），导致实际 Stitch 屏幕生成不可用",
+        "仅有 2 个实际 Stitch 屏幕导出，缺少 Dashboard、Asset List、Work Order 等核心页面的设计产出",
+        "DESIGN.md 定义的设计令牌（--background, --foreground, --primary 等）未在前端代码中作为 CSS 变量实际使用",
+        "reports-center 的导出仅为 design-intent 备案文件，不是可消费的 HTML 设计稿"
+      ],
+      "risks": [
+        {
+          "level": "medium",
+          "detail": "Stitch SDK 网络不可用，任何需要重新生成或编辑 Stitch 屏幕的操作都会失败，限制了设计迭代能力"
+        },
+        {
+          "level": "low",
+          "detail": "DESIGN.md 与实际前端代码之间存在样式差距（设计令牌 vs 硬编码颜色），后续开发可能出现设计不一致"
+        }
+      ],
+      "status": "partial",
+      "evidence": [
+        ".stitch/DESIGN.md 存在且内容完整（149 行）",
+        ".stitch/exports/ 含 3 个 meta.json（2 个实际屏幕 + 1 个 design-intent）",
+        "scripts/stitch-cli.js 功能完整（228 行）",
+        "前端代码中 CSS 变量引用仅出现在 sidebar.tsx 和 sonner.tsx（共 16 个匹配）",
+        "SidebarLayout.tsx 使用硬编码颜色 #0a1628、#3b82f6 而非 CSS 变量"
+      ]
+    },
+    "AC-2": {
+      "current_state": "ReportsPage.tsx 的 chartData useMemo（第 143-221 行）包含 12 个 switch-case 分支，其中 7 个基于真实 API 数据（asset-summary/asset-category/asset-status/asset-dept/asset-trend/fin-category-value/fin-value-trend），5 个为硬编码模拟数据（fin-depreciation/ops-maintenance/ops-retirement/wo-summary/wo-pending）。ReportController 和 ReportService 支持汇总、分类、趋势查询（基于 AssetMapper 的 SQL 聚合）。后端 DepreciationController、MaintenanceController、RetirementController、WorkOrderController 和 DashboardController 提供基础 CRUD 和统计 API，但缺乏报表中心所需的月度聚合和分类统计端点。",
+      "existing_patterns": [
+        "前端 API 层（api/reports.ts）使用 http.get 封装，响应类型为 ApiResponse<T> 泛型",
+        "后端使用 Controller → Service → Mapper 三层架构，MyBatis-Plus + 多租户（TenantContext）",
+        "ReportService 在 Mapper 不可用或查询失败时返回空值/空列表，保证系统可用性",
+        "ReportController 缺少月份参数传递（/summary 和 /by-category 无参数，/trend 也不接受 months 参数）",
+        "前端 chartData useMemo 混合使用 API 响应数据和硬编码数据"
+      ],
+      "technical_constraints": [
+        "后端 /reports/trend 端点不接受 months 参数（前端传了但被忽略）",
+        "后端 /reports/summary 和 /reports/by-category 均不接受日期/期间过滤参数",
+        "DepreciationService.getSchedules 返回逐资产明细而非月度聚合",
+        "MaintenanceController 无月度维保次数聚合端点",
+        "RetirementApplicationService.getStatistics 仅返回本月/本年/pending/approved 计数，无月度分解",
+        "WorkOrderService 无按部门或状态的聚合查询",
+        "后端全部使用多租户隔离（tenant_id），报表查询需确保跨租户数据隔离"
+      ],
+      "risks": [
+        {
+          "level": "high",
+          "detail": "5 个硬编码数据分支需要在后端新增 3-5 个聚合查询端点，涉及 DepreciationService、MaintenanceService、RetirementService、WorkOrderService 四模块改动，工作量大"
+        },
+        {
+          "level": "medium",
+          "detail": "asset-dept 分支当前使用 categoryData 作为部门数据的代理（实际上用 categoryName 代替部门名称），数据语义错误——DashboardService.getDeptDistribution 有真实的部门分布数据但 ReportsPage 未使用"
+        },
+        {
+          "level": "low",
+          "detail": "asset-trend/fin-value-trend 分支依赖的 trendData 来自 ReportService.getTrend()，该方法在内存中对全量资产按月遍历计算趋势，数据量大时性能可能恶化"
+        }
+      ],
+      "status": "not_met",
+      "mock_data_points": [
+        {
+          "branch": "fin-depreciation",
+          "description": "月度折旧金额汇总（硬编码 12 个数值：[520,480,510,450,460,390,420,380,350,360,300,280]）",
+          "backend_source": "DepreciationController.getSchedules → DepreciationService.getSchedules（逐资产明细，非聚合）",
+          "needs_new_endpoint": true,
+          "new_endpoint_required": "新增 GET /depreciation/monthly-summary?months=12，返回月度折旧聚合数组",
+          "frontend_api_adjustment": "api/reports.ts 新增 getDepreciationMonthlySummary 函数，前端 chartData 分支改为调此 API"
+        },
+        {
+          "branch": "ops-maintenance",
+          "description": "月度维保次数统计（硬编码 12 个数值：[15,18,22,20,25,28,30,26,24,28,32,35]）",
+          "backend_source": "MaintenanceController.list → MaintenanceService.queryRecords（分页查询，无月度聚合）",
+          "needs_new_endpoint": true,
+          "new_endpoint_required": "新增 GET /maintenance/monthly-count?months=12，按月统计维保记录数",
+          "frontend_api_adjustment": "api/reports.ts 新增 getMaintenanceMonthlyCount 函数"
+        },
+        {
+          "branch": "ops-retirement",
+          "description": "月度退役资产数量（硬编码 12 个数值：[4,5,7,6,8,10,9,11,10,12,14,13]）",
+          "backend_source": "RetirementController.getStatistics → RetirementApplicationService.getStatistics（仅返回本日/本月/本年/pending/approved 计数）",
+          "needs_new_endpoint": true,
+          "new_endpoint_required": "新增 GET /retirement/monthly-count?months=12，按月统计退役申请数",
+          "frontend_api_adjustment": "api/report.ts 新增 getRetirementMonthlyCount 函数"
+        },
+        {
+          "branch": "wo-summary",
+          "description": "工单完成率状态分布（硬编码：已完成 156、进行中 34、待处理 28、超时 7）",
+          "backend_source": "WorkOrderController.queryWorkOrders → WorkOrderService.queryWorkOrders（支持 status 参数过滤，可逐状态计数）",
+          "needs_new_endpoint": true,
+          "new_endpoint_required": "新增 GET /workorders/status-distribution，返回各状态工单计数（DRAFT/PENDING/APPROVED/EXECUTING/COMPLETED/REJECTED/CANCELLED）",
+          "frontend_api_adjustment": "api/reports.ts 新增 getWorkOrderStatusDistribution 函数"
+        },
+        {
+          "branch": "wo-pending",
+          "description": "各部门待处理工单数量（硬编码：IT 部 12、财务部 8、行政部 5、生产部 15、研发部 3）",
+          "backend_source": "WorkOrderService 无部门级别聚合，DeptMapper 存在但未被用于工单查询",
+          "needs_new_endpoint": true,
+          "new_endpoint_required": "新增 GET /workorders/dept-pending，按部门聚合 PENDING 状态工单数",
+          "frontend_api_adjustment": "api/reports.ts 新增 getWorkOrderDeptPending 函数"
+        }
+      ],
+      "recommendation": "分两阶段实施：阶段一（高优先级）——新增后端 5 个聚合查询端点 + 前端 chartData 对应分支改为 API 调用。阶段二（中等优先级）——修复 asset-dept 分支，改用 DashboardService.getDeptDistribution 的真实部门数据；为现有 /reports/summary、/by-category、/trend 添加 months/dateRange 参数支持；考虑在 ReportService 中新增统一的报表聚合查询层以减少多个独立端点。"
+    },
+    "AC-4": {
+      "current_state": "项目存在三种搜索实现：① SidebarLayout.tsx 内联搜索（第 96-106 行）——表单提交式，仅搜索资产，跳转 /assets?keyword=xxx；② GlobalSearch.tsx（Cmd+K 组件）——前端页面路由搜索，仅搜索预定义的 SEARCHABLE_PAGES 列表，无后端 API 集成；③ SearchDropdown.tsx——后端 API 搜索，调用 /api/search 跨资产/工单/供应商搜索，带 300ms 防抖和下拉面板。后端 SearchController/SearchService 支持跨模块并行搜索（asset/workorder/vendor），基于 MyBatis-Plus LIKE 查询。此外 AppLayout.tsx 同时使用了 GlobalSearch + SearchDropdown 两个组件。",
+      "existing_patterns": [
+        "后端 SearchService 使用 CompletableFuture 实现跨模块并行搜索",
+        "后端搜索结果统一为 SearchResultDTO（id/type/title/subtitle/path）",
+        "前端 GlobalSearch 使用 CommandDialog/Radix UI 命令面板模式",
+        "前端 SearchDropdown 使用防抖输入 + 键盘导航 + 分组展示的自定义下拉模式",
+        "前端搜索结果类型映射为 TYPE_ICONS（Package/ClipboardList/Users）和 TYPE_LABELS"
+      ],
+      "technical_constraints": [
+        "SidebarLayout 和 AppLayout 是两个独立布局系统，各有自己的搜索实现，组件间无可复用设计",
+        "GlobalSearch 的数据源 SEARCHABLE_PAGES 是静态硬编码列表，与 SidebarLayout/AppLayout 的导航菜单需要手动同步",
+        "后端搜索仅支持 asset/workorder/vendor 三张表，不支持 maintenance/retirement/depreciation 等其他模块",
+        "后端搜索仅支持 LIKE 模糊匹配（全表扫描），大数据量下性能堪忧",
+        "SearchService 使用 CompletableFuture 并行查询但未配置自定义线程池，默认使用 ForkJoinPool.commonPool()",
+        "后端未对搜索关键词做长度限制或 SQL 注入防护（MyBatis-Plus LIKE 拼接有一定风险）"
+      ],
+      "risks": [
+        {
+          "level": "high",
+          "detail": "三个搜索实现共存导致用户体验碎片化：SidebarLayout 用户看到的是简单资产搜索，AppLayout 用户看到的是 GlobalSearch（页面导航）+ SearchDropdown（API 搜索），不一致的交互模式"
+        },
+        {
+          "level": "medium",
+          "detail": "GlobalSearch 仅搜索前端页面路由，不能搜索实际业务数据（资产、工单等），用户按 Cmd+K 期望的是全局搜索而非仅页面导航"
+        },
+        {
+          "level": "medium",
+          "detail": "后端搜索未集成全文检索引擎（ES/MeiliSearch），当前 SQL LIKE 模式在资产量超过 10 万时无法满足实时搜索性能要求"
+        },
+        {
+          "level": "low",
+          "detail": "后端 SearchResultDTO.path 字段硬编码为 /assets/{id}，与实际前端路由可能不匹配"
+        }
+      ],
+      "status": "not_met",
+      "recommendation": "统一搜索架构建议：① 废弃 SidebarLayout 的内联搜索，统一使用 GlobalSearch（Cmd+K）作为唯一搜索入口；② 增强 GlobalSearch，在 CommandDialog 中集成两组搜索结果标签——「页面导航」（现有前端路由）和「业务数据」（调用后端 /api/search）；③ 将 SearchDropdown 的后端 API 搜索能力合并到 GlobalSearch 中，消除 SearchDropdown 独立组件；④ 后端扩展搜索覆盖范围（增加 maintenance、depreciation、retirement 模块），并评估引入 MeiliSearch/ES 作为搜索后端；⑤ 为后端搜索配置自定义线程池，避免影响 ForkJoinPool 其他任务。"
+    }
+  },
+  "test_surface": {
+    "affected_tests": [
+      "frontend/src/__tests__/ReportsPage.test.tsx — 需要为 5 个新的 API 调用新增 mock 和测试用例",
+      "frontend/src/api/__tests__/reports.test.ts — 需要为新增 API 函数编写调用验证测试",
+      "frontend/src/__tests__/pages/ReportPage.test.tsx — 预定义报表模板验证可能需要更新",
+      "frontend/src/__tests__/GlobalSearch.test.tsx — 当 GlobalSearch 集成后端 API 后需要大幅重写",
+      "frontend/src/__tests__/components/CommandPalette.test.tsx — 搜索数据源和分组逻辑可能变化"
+    ],
+    "new_tests_needed": [
+      "后端搜索扩展测试：SearchService 新增模块覆盖的集成测试",
+      "后端新增 5 个聚合端点的 Controller 测试和 Service 测试",
+      "前端 GlobalSearch 集成后端 API 后的端到端测试",
+      "报表硬编码数据替换后的数据正确性验证测试（chartData 分支验证）"
+    ]
+  }
+}

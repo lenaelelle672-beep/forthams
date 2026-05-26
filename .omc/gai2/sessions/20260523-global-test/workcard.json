@@ -1,0 +1,23 @@
+{
+  "directive": "全局测试下 — 运行全量测试和构建验证，确认所有验收标准持续通过",
+  "owner": "gai2-orchestrator",
+  "session": "20260523-global-test",
+  "phase": "triage",
+  "mcp_direct": false,
+  "classification": null,
+  "acceptance_checks": [
+    "vitest 测试全部通过（677/677）",
+    "npm build 无错误",
+    "mvn compile 成功"
+  ],
+  "evidence_to_collect": [
+    "vitest run 输出结果",
+    "npm build 输出结果",
+    "mvn compile/test 输出结果"
+  ],
+  "open_risks": [
+    "测试环境可能有外部依赖不可用",
+    "之前已通过但可能因文件变更出现回归"
+  ],
+  "artifact_dir": ".omc/gai2/sessions/20260523-global-test"
+}

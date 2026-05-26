@@ -1,0 +1,120 @@
+{
+  "schema_version": 2,
+  "audit_ts": "2026-05-25T05:55:00Z",
+  "session_id": "20260525-flash-biz100",
+  "auditor": "gai2-audit",
+  "current_state": "项目存在两套独立路由系统（旧系统 router/index.tsx 为主入口实际使用，新系统 app/App.tsx 未被引用），大屏和工作流模块均有前后端实现但存在多处缺陷",
+  "existing_patterns": [
+    "后端使用 Spring Security SecurityFilterChain 链式配置，.anyRequest().authenticated() 统一认证",
+    "前端路由守卫 ProtectedRoute 仅检查 isAuthenticated（token 是否存在），无角色/权限细分",
+    "路由模块化注册模式：router/index.tsx 将所有页面集中在一个 createBrowserRouter 中",
+    "后端工作流使用预定义 TEMPLATES 模式（5 个默认 businessType），通过 requireTemplate 硬性约束",
+    "前端 businessFlowOptions 常量驱动工作流列表展示",
+    "后端使用 MyBatis-Plus CRUD，entity + mapper + service + controller 四层",
+    "大屏组件使用全屏独立布局（不在 AppLayout 内部），侧边栏通过 external=true 标签打开新窗口",
+    "前端工作流设计器使用 @xyflow/react 拖拽画布，NodeConfigPanel 侧边栏配置",
+    "后端工作流定义 JSON 采用 {id, name, description, businessType, nodes[], edges[]} 结构"
+  ],
+  "technical_constraints": [
+    "WorkflowDefinitionService.requireTemplate() 限制只能使用 5 种预定义 businessType，无法创建全新的流程类型",
+    "后端 TEMPLATES 包含 5 个：ASSET_TRANSFER, ASSET_CLEARANCE, ASSET_SCRAP, ASSET_COMPENSATION, RETIREMENT；前端 businessFlowOptions 只有 4 个（缺少 RETIREMENT）",
+    "前端 WorkflowCenterPage'新建流程'按钮实际只跳转到 businessFlowOptions[0] 的设计器，不是真正的'新建自定义流程'",
+    "前端大屏组件 BigScreenPage 和 BigScreen3DPage 在旧路由系统（router/index.tsx）注册为 /bigscreen 和 /bigscreen-3d；新路由系统（app/App.tsx）注册为 /cyber-v12 和 /industrial-v13，但新系统未被 main.tsx 引用",
+    "大屏路由在 ProtectedRoute 子级中但不在 AppLayout 内，故大屏页面是全屏无侧边栏模式（符合设计预期）",
+    "SecurityConfig.java 无任何大屏特定权限规则，只区分 permitAll 和 authenticated",
+    "前端 AuthContext 只维护 user/token 状态，无角色列表或权限码集合",
+    "大屏 API /bigscreen/stats 调用 DashboardService.getGlobalStats() 查询所有租户数据，非租户隔离",
+    "workflow_definition 表有 tenant_id 字段支持多租户，但前端 API 调用未显式传递 tenant context",
+    "后端 WorkflowDefinitionController 使用 @RequestMapping('/workflows')，SecurityConfig 无白名单规则，所有 /workflows/** 需要认证",
+    "大屏页面 BigScreenPage 和 BigScreen3DPage 使用硬编码民航场景演示数据（航空数据指标），与资产管理系统核心领域部分脱节",
+    "前端 constants/workflowBusiness.ts 中 stepCount 写死为 5，与服务端 approvalStepCount 不一致时可能导致显示偏差"
+  ],
+  "risks": [
+    {
+      "level": "high",
+      "detail": "双路由系统碎片化风险：router/index.tsx（旧系统，被主入口使用）和 app/App.tsx（新系统，未被引用）维护两套独立的路由和页面组件，大屏/工作流在新旧系统中有不同的路由路径和组件实现，造成用户混淆和维护负担"
+    },
+    {
+      "level": "high",
+      "detail": "权限控制缺失：前端无基于角色/权限码的访问控制，大屏链接对所有登录用户可见；后端 SecurityConfig 未对大屏 API 施加角色限制，任何有 token 的用户均可访问"
+    },
+    {
+      "level": "high",
+      "detail": "工作流不支持自定义流程类型：requireTemplate 硬性限制只能操作 5 种预定义 businessType，无法满足'新建自定义流程'需求，需要改动后端架构"
+    },
+    {
+      "level": "medium",
+      "detail": "前端后端模板不一致：后端有 RETIREMENT 模板但前端 businessFlowOptions 缺失，导致资产退役流程在前端不可见不可配置"
+    },
+    {
+      "level": "medium",
+      "detail": "大屏 API 全局数据泄露：getGlobalStats() 查询所有租户数据而非当前租户数据，存在跨租户数据可见风险"
+    },
+    {
+      "level": "medium",
+      "detail": "大屏数据与业务领域脱节：BigScreenPage 使用民航场景（航班延误、客座率等）硬编码演示数据，与资产管理系统核心领域（资产台账、工单、审批等）不一致"
+    },
+    {
+      "level": "low",
+      "detail": "流程设计器 localSotrage 兜底策略可能造成数据分歧：前端同时维护 localStorage 草稿和服务端草稿，切换浏览器或设备时可能使用过期草稿"
+    },
+    {
+      "level": "low",
+      "detail": "WorkflowCenterPage 的 stepCount 前端写死为 5，与服务端模板定义（approvalStepCount=4）不一致，显示偏差"
+    }
+  ],
+  "test_surface": [
+    "后端测试：WorkflowDefinitionControllerTest.java、WorkflowDefinitionServiceTest.java、BigScreenControllerTest.java",
+    "缺少前端大屏页面的权限测试用例",
+    "缺少工作流 '新建自定义流程' 的端到端测试",
+    "缺少安全测试：验证无权限用户访问 /bigscreen 的响应行为",
+    "前端 tests/unit/workflowBusinessForms.test.tsx 仅覆盖业务表单",
+    "需要补充路由守卫权限测试（mock AuthContext 返回不同角色）",
+    "需要补充工作流 API 异常场景测试（非法 businessType、重复发布等）"
+  ],
+  "key_files": {
+    "entry_point": "frontend/src/main.tsx",
+    "active_router": "frontend/src/router/index.tsx （旧路由系统，被 main.tsx 实际使用）",
+    "unused_new_router": "frontend/src/app/App.tsx （新路由系统，未被引用）",
+    "bigscreen_pages": [
+      "frontend/src/pages/bigscreen/BigScreenPage.tsx",
+      "frontend/src/pages/bigscreen/BigScreen3DPage.tsx",
+      "frontend/src/pages/bigscreen/BigScreen3DCanvas.tsx"
+    ],
+    "bigscreen_api": "backend/src/main/java/com/ams/controller/BigScreenController.java",
+    "dashboard_stats": "backend/src/main/java/com/ams/service/DashboardService.java",
+    "security_config": "backend/src/main/java/com/ams/config/SecurityConfig.java",
+    "auth_context": "frontend/src/app/context/AuthContext.tsx",
+    "route_guard_old": "frontend/src/router/index.tsx （ProtectedRoute 在第42-62行）",
+    "route_guard_new": "frontend/src/app/App.tsx （ProtectedRoute 在第148-176行）",
+    "sidebar_nav": "frontend/src/layouts/AppLayout.tsx （大屏导航在第107-113行，external=true）",
+    "workflow_controller": "backend/src/main/java/com/ams/controller/WorkflowDefinitionController.java",
+    "workflow_service": "backend/src/main/java/com/ams/service/WorkflowDefinitionService.java",
+    "workflow_entity": "backend/src/main/java/com/ams/entity/WorkflowDefinition.java",
+    "workflow_mapper": "backend/src/main/java/com/ams/mapper/WorkflowDefinitionMapper.java",
+    "workflow_dtos": [
+      "backend/src/main/java/com/ams/dto/WorkflowDefinitionDTO.java",
+      "backend/src/main/java/com/ams/dto/WorkflowDefinitionSaveDTO.java",
+      "backend/src/main/java/com/ams/dto/WorkflowStatusUpdateDTO.java"
+    ],
+    "workflow_center_frontend": "frontend/src/pages/workflow/WorkflowCenterPage.tsx",
+    "workflow_designer_frontend": "frontend/src/pages/workflow/WorkflowDesignerPage.tsx",
+    "workflow_api_frontend": "frontend/src/api/workflow.ts",
+    "workflow_constants_frontend": "frontend/src/constants/workflowBusiness.ts （仅4个模板，缺少RETIREMENT）",
+    "database_schema": "backend/src/main/resources/schema.sql （workflow_definition表第392-409行）",
+    "dashboard_stats_dto": "backend/src/main/java/com/ams/dto/DashboardStatsDTO.java",
+    "dashboard_types": "frontend/src/types/dashboard.types.ts （BigScreenStats在第271-294行）"
+  },
+  "builder_notes": [
+    "【最重要】确认业务意图：'无权限用户无法访问大屏页面'—当前系统无任何权限细分，所有登录用户均可访问。需要明确是实现'大屏菜单隐藏'还是'页面级别403拦截'，以及按什么维度控制（角色？权限码？）",
+    "建议统一路由系统：废弃 router/index.tsx 和 app/App.tsx 之一，避免双路由维护",
+    "工作流自定义流程需要改动 requireTemplate 架构，建议：移除硬约束或将 businessType 做成可配置（从数据库读取注册表）",
+    "前端 businessFlowOptions 补充 RETIREMENT 流程类型，保持与后端模板一致",
+    "大屏页面数据与业务领域脱节：建议将 BigScreenPage 的民航硬编码数据替换为资产管理系统真实指标",
+    "审计 BigScreen3DCanvas.tsx 的 WebGL 地图组件，确认其内容与资产管理业务相关",
+    "SecurityConfig.java 可以考虑对大屏路径增加 hasRole 或 hasAuthority 规则",
+    "前端 ProtectedRoute 或新增 PermissionGuard 组件实现基于角色的页面级访问控制",
+    "大屏 sidebar 导航栏增加角色判断：无权限用户隐藏大屏入口",
+    "所有修改需同步 GitNexus 影响分析"
+  ]
+}

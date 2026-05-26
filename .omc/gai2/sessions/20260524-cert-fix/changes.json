@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "agent": "gai2-builder",
+  "session": "20260524-cert-fix",
+  "changed_files": [],
+  "added_files": [],
+  "commands_run": [
+    {
+      "command": "TEST_PROJECT_CONFIG=config/forthams.example.json BASE_URL=http://localhost:5173 npx playwright test tests/playwright/forthams-certification.spec.ts --project=chromium --reporter=list",
+      "result": "partial",
+      "notes": "8 passed, 2 failed, 1 skipped (31.8s)"
+    }
+  ],
+  "verification_results": "Playwright 测试完整结果:\n\n总计 11 个测试用例 (11 workers, 31.8s):\n\n✅ PASSED (8):\n  - CERT-01 认证：登录、失败提示、受保护页面、退出登录 (1.8s)\n  - CERT-02 页面模块：核心导航、通知、全局搜索和受保护模块渲染 (2.8s)\n  - CERT-03 资产台账：筛选、必填校验、价值校验、新增、删除、处置入口 (2.2s)\n  - CERT-05 RFID盘点：任务创建、开始盘点、扫描暂停/继续/完成 (1.5s)\n  - CERT-06 闲置资产：发布、认领、取消发布和统计逻辑 (1.4s)\n  - CERT-07 资产处置：类型页签、本地过滤和四类处置表单入口 (1.8s)\n  - CERT-08 审批与工单：状态过滤、批准驳回、提交/开始/完成流转 (1.5s)\n  - CERT-10 仪表板与数据分析：金额格式、待办审批、导出报表 (2.1s)\n\n❌ FAILED (2):\n  - CERT-04 重要设备：保养统计、提醒、保养记录校验和保存\n    错误: locator('select') strict mode violation — 匹配到 2 个 <select> 元素\n    位置: L128 `page.locator('select').first().selectOption('AST-001')`\n    根因: 新建维保记录弹窗中有 2 个 <select> 下拉框，即使 .first() 仍报 strict mode violation\n\n  - CERT-09 系统设置：用户、部门、集成、安全配置操作\n    错误: Test timeout 30000ms exceeded\n    位置: L252 `page.getByPlaceholder('部门名称').fill('质量保障部')`\n    根因: 部门管理弹窗中无 placeholder='部门名称' 的输入框，可能 UI 使用了不同的 placeholder 文本或未渲染\n\n⏭ SKIPPED (1):\n  - CERT-05b RFID扫描（新版UI中移至不同页面）",
+  "minions_execution": {
+    "adjudication_file_read": true,
+    "selected_source": "none",
+    "write_intent_preserved": true,
+    "degradation_blocked": false
+  },
+  "residual_risks": [
+    "CERT-04 L128: locator('select') 匹配多个元素需更精确的选择器（如 .nth(0) 或 getByRole 组合定位），当前 .first() 未解决 strict mode 问题",
+    "CERT-09 L252: getByPlaceholder('部门名称') 超时，需确认部门管理表单中实际的 placeholder 文本，可能是 label 文本而非 placeholder",
+    "以上两个失败不在 adjudication 已确认的修复范围内（adjudication 覆盖的是 L124 正则、L130 toast、L268 toast 等），属于新发现的测试/UI 不匹配问题",
+    "建议下一轮 adjudication 评估是否需要补充修复 CERT-04 选择器和 CERT-09 部门 placeholder"
+  ]
+}

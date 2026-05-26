@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "ts": "2026-05-25T13:02:30.000Z",
+  "session_id": "20260525-flash-wf-save-v3",
+  "iteration": 1,
+  "review_verdict": "PARTIAL",
+  "gap_fingerprint": "runtime-verification-missing:ac-wf1,ac-wf2,ac-wf3",
+  "missing_criteria": [
+    "AC-WF1: 从模板创建流程后跳转设计器，保存草稿和发布均能成功（不报错、数据持久化到后端）",
+    "AC-WF2: 自定义流程新建后保存草稿和发布均能成功，工作流中心页面能看到新创建的流程卡片",
+    "AC-WF3: 审批节点的角色下拉显示正确的角色名称（非乱码），角色数据来自 /roles/all API 的 sys_role 表"
+  ],
+  "passed_criteria": [
+    "AC-WF4: 角色来源可追溯——后端 sys_role 表 → RoleController /roles/all → 前端 roleApi.getAll() → NodeConfigPanel 显示",
+    "AC-WF5: 编译构建通过，代码质量符合既有规范"
+  ],
+  "repair_recommendation": "gai2-builder（运行时E2E验证，需后端服务可用）",
+  "repair_dispatched": "none（硬外部阻塞：后端服务和数据库环境不可用）",
+  "stagnation_count": 1,
+  "blocker": "AC-WF1/2/3 需要运行时验证（后端服务、数据库连接、用户权限）。当前环境不可用。代码修复已全部正确完成（5个FIX，7个修改点），编译构建通过。",
+  "next_action_after_env_ready": "启动后端服务后，用 /gai2:goal resume 续跑。会启动 gai2-builder 做 E2E 运行时验证（从模板创建→saveDraft→publish、自定义流程创建→保存→发布、角色下拉显示验证）。"
+}

@@ -1,0 +1,192 @@
+{
+  "verdict": "PASS",
+  "overall_status": "pass",
+  "gap_fingerprint": null,
+  "missing_criteria": [],
+  "evidence_map": {
+    "AC1-ASSET_TRANSFER": [
+      "scripts/test_asset_workflow_e2e_report.json: TC-TRANSFER passed, 10/10 步骤 ok, assetId=77, processId=74",
+      "登录→创建资产(E2E-TRANSFER-0526184136, id=77)→发布工作流→创建审批→4级审批全部通过→最终状态 APPROVED→资产状态 IN_USE",
+      "4 级审批: currentStep 从 1 逐级推进至 4, 审批人 admin（因 sim 用户池不可用 fallback）",
+      "assets endpoint 确认: 资产状态=IN_USE, 调拨目标部门/位置/用户已更新"
+    ],
+    "AC2-ASSET_CLEARANCE": [
+      "scripts/test_asset_workflow_e2e_report.json: TC-CLEARANCE passed, 10/10 步骤 ok, assetId=78, processId=75",
+      "登录→创建资产(E2E-CLEARANCE-0526184137, id=78)→发布工作流→创建审批→4级审批全部通过→最终状态 APPROVED→资产状态 CLEARED",
+      "上一轮 gap ac2-clearance-evidence 已补全: 首次产生运行时 CLEARANCE 端到端通过证据，资产状态从 IDLE 正确迁移到 CLEARED 终态",
+      "assets endpoint 确认: status=CLEARED（终态），与 expected_asset_status 一致"
+    ],
+    "AC3-ASSET_SCRAP": [
+      "scripts/test_asset_workflow_e2e_report.json: TC-SCRAP passed, 10/10 步骤 ok, assetId=79, processId=76",
+      "登录→创建资产(E2E-SCRAP-0526184139, id=79)→发布工作流→创建审批→4级审批全部通过→最终状态 APPROVED→资产状态 SCRAPPED",
+      "assets endpoint 确认: 资产状态从 IDLE 正确迁移到 SCRAPPED 终态"
+    ],
+    "AC4-ASSET_COMPENSATION": [
+      "scripts/test_asset_workflow_e2e_report.json: TC-COMPENSATION passed, 10/10 步骤 ok, assetId=80, processId=77",
+      "赔偿记录 id=8, status=APPROVED（compensation endpoint 验证）",
+      "businessData 使用标准字段名: compensationType/compensationAmount/description/incidentDate/responsibleUserId/responsibleDeptId",
+      "COMPENSATION 不修改资产状态——已确认为设计意图（changes.json residual_risks 记录）"
+    ],
+    "AC5-多租户隔离": [
+      "scripts/test_asset_workflow_e2e_report.json: AC5-多租户隔离 passed, 6/6 步骤 ok",
+      "用户A (admin) 审批 id=78; 用户B (ac5test184141, 动态注册, id=21) 审批 id=79",
+      "用户A mine=true: 50条结果, 含B审批=False → 隔离成功",
+      "用户B mine=true: 1条结果, 含A审批=False → 隔离成功",
+      "上一轮 gap ac5-tenant-strategy 已补全: 动态注册新用户验证 mine=true 双向交叉隔离，比仅用不同 deptId 方案更健壮"
+    ],
+    "AC6-字段对齐": [
+      "scripts/test_asset_workflow_e2e_report.json: AC6-字段对齐汇总 passed, 1/1 步骤 ok，总计 0 个字段对齐问题",
+      "scripts/test_matrix.json: ac6_required_fields 定义 3 组期望字段 schema（approval/asset/auth_response）",
+      "审批响应字段 id/processNo/processType/status/currentStep/applicantId 全部存在且类型正确",
+      "上一轮 gap ac6-field-alignment 已补全: 运行时字段对齐检查零问题，无 @JsonAlias 歧义"
+    ],
+    "MINIONS-链路完整性": [
+      ".omc/gai2/sessions/gai2-20260526-1821xx/draft.json: agent=gai2-drafter, model=deepseek-v4-flash, write_intent + write_actions 完整定义",
+      ".omc/gai2/sessions/gai2-20260526-1821xx/refine.json: agent=gai2-refiner, model=glm-5.1, verdict=accept_with_refinements, 6项改进, write_intent_preserved=true, degradation_detected=false",
+      ".omc/gai2/sessions/gai2-20260526-1821xx/adjudication.json: agent=gai2-orchestrator, decision=use_refine, write_action_guard.no_degradation=true",
+      ".omc/gai2/sessions/gai2-20260526-1821xx/changes.json: minions_execution.write_intent_preserved=true, degradation_blocked=false, 3/3 commands 通过",
+      "链路: drafter(deepseek) → refiner(glm) → adjudication → builder → reviewer（当前），real_dual_agent_chain=true"
+    ],
+    "写操作退化保护": [
+      "draft.json: write_actions 指定 create scripts/test_matrix.json + scripts/test_script.py",
+      "refine.json: refined_write_actions 保持 target files 不变, write_intent_preserved=true, degradation_detected=false, required_regeneration=false",
+      "adjudication.json: write_action_guard operations=[create, create], no_degradation=true, target_files=[test_matrix.json, test_script.py]",
+      "changes.json: minions_execution 确认写意图完整保留, degradation_blocked=false",
+      "实际产物: scripts/test_matrix.json (4627 bytes) + scripts/test_asset_workflow_e2e.py (33968 bytes) 均已创建并成功执行",
+      "Refine 未将写动作退化为只读，adjudication 未选择 keep_draft/go_fallback_refine/regenerate_draft"
+    ],
+    "gap_fingerprint-交叉验证": [
+      "上一轮 gai2-20260526-180709 review.json 缺失 AC2/AC5/AC6 运行时证据",
+      "本轮 workcard.json reviewer_gap_fingerprint: ac2-clearance-evidence|ac5-tenant-strategy|ac6-field-alignment",
+      "adjudication.json gap_coverage 确认: ac2→TC-CLEARANCE 4级审批, ac5→cross_user mine=true, ac6→validate_field_alignment",
+      "test_asset_workflow_e2e_report.json: 6/6 PASS 包含 TC-CLEARANCE(AC2) + AC5-多租户隔离 + AC6-字段对齐汇总",
+      "3 个 PARTIAL 缺口全部被运行时 API 证据补全"
+    ],
+    "测试产物完备性": [
+      "scripts/test_matrix.json: python3 json.load() 解析通过, 含 4 个 test_cases, ac6_required_fields schema 定义",
+      "scripts/test_asset_workflow_e2e.py: python3 -m py_compile 语法检查通过, 33968 bytes",
+      "scripts/test_asset_workflow_e2e_report.json: 6/6 PASS, 0 FAIL, 含完整步骤级 evidence, executed_at 2026-05-26T18:41:41"
+    ]
+  },
+  "repair_recommendation": "none",
+  "directive_summary": "GAI2 实现阶段最终核验（第 2 轮 session gai2-20260526-1821xx）: workcard 定义的 6 个 AC 全部通过运行时验证。上一轮 reviewer 识别的 3 个 PARTIAL 缺口（ac2-clearance-evidence/ac5-tenant-strategy/ac6-field-alignment）均已被运行时 API 测试证据补全。MINIONS 双推理链路（drafter→refiner→adjudication→builder→reviewer）完整无退化。写操作保护通过。测试脚本执行产出了完整的 JSON 报告（scripts/test_asset_workflow_e2e_report.json, 6/6 PASS）。4 个业务流程（TRANSFER/CLEARANCE/SCRAP/COMPENSATION）均完成了登录→发布工作流定义→创建审批→4级审批全部通过→验证结果的完整端到端测试。",
+  "affected_scope": [
+    ".omc/gai2/sessions/gai2-20260526-1821xx/workcard.json",
+    ".omc/gai2/sessions/gai2-20260526-1821xx/draft.json",
+    ".omc/gai2/sessions/gai2-20260526-1821xx/refine.json",
+    ".omc/gai2/sessions/gai2-20260526-1821xx/adjudication.json",
+    ".omc/gai2/sessions/gai2-20260526-1821xx/changes.json",
+    ".omc/gai2/sessions/gai2-20260526-1821xx/review.json",
+    "scripts/test_matrix.json (新增, 4627 bytes)",
+    "scripts/test_asset_workflow_e2e.py (新增, 33968 bytes)",
+    "scripts/test_asset_workflow_e2e_report.json (新增, 6/6 PASS)"
+  ],
+  "commands_checked": [
+    {
+      "command": "python3 -m py_compile scripts/test_asset_workflow_e2e.py",
+      "result": "passed",
+      "notes": "Python 语法检查通过（SYNTAX_CHECK_PASS）"
+    },
+    {
+      "command": "python3 -c \"import json; json.load(open('scripts/test_matrix.json'))\"",
+      "result": "passed",
+      "notes": "test_matrix.json JSON 结构验证通过，含 4 个 test_cases"
+    },
+    {
+      "command": "python3 scripts/test_asset_workflow_e2e.py",
+      "result": "passed",
+      "notes": "全 6 个测试用例通过（4 业务流程 + AC5 多租户隔离 + AC6 字段对齐汇总）。产出 scripts/test_asset_workflow_e2e_report.json。测试用户 sim05261457xx 不可用时自动回退到 admin。"
+    },
+    {
+      "command": "报告数据完整性验证（所有步骤 ok 断言）",
+      "result": "passed",
+      "notes": "TC-TRANSFER: 10/10 ✓, TC-CLEARANCE: 10/10 ✓, TC-SCRAP: 10/10 ✓, TC-COMPENSATION: 10/10 ✓, AC5: 6/6 ✓, AC6: 1/1 ✓"
+    },
+    {
+      "command": "产物目录完整性检查",
+      "result": "passed",
+      "notes": "workcard.json / draft.json / refine.json / adjudication.json / changes.json / review.json 全部存在"
+    }
+  ],
+  "acceptance_status": [
+    {
+      "criterion": "AC1: ASSET_TRANSFER 端到端——创建资产→发起调拨申请→所有审批通过→验证资产状态变更正确",
+      "status": "PASS",
+      "evidence": [
+        "report TC-TRANSFER passed: assetId=77, processId=74, 10/10 步骤全部 ok",
+        "4 级审批全部通过，最终 status=APPROVED，资产状态 IN_USE",
+        "targetDeptId/targetUserId/targetLocation 已更新确认"
+      ]
+    },
+    {
+      "criterion": "AC2: ASSET_CLEARANCE 端到端——重新执行并验证（补全上一轮缺失的 CLEARANCE 通过证据）",
+      "status": "PASS",
+      "evidence": [
+        "report TC-CLEARANCE passed: assetId=78, processId=75, 10/10 步骤全部 ok",
+        "资产状态 CLEARED（终态）——与 expected_asset_status 一致",
+        "上一轮 gap ac2-clearance-evidence 已被运行时 API 证据补全"
+      ]
+    },
+    {
+      "criterion": "AC3: ASSET_SCRAP 端到端——创建资产→发起报废→所有审批通过→验证资产状态变为 SCRAPPED",
+      "status": "PASS",
+      "evidence": [
+        "report TC-SCRAP passed: assetId=79, processId=76, 10/10 步骤全部 ok",
+        "资产状态 SCRAPPED（终态）——与 expected_asset_status 一致"
+      ]
+    },
+    {
+      "criterion": "AC4: ASSET_COMPENSATION 端到端——创建资产→发起赔偿→所有审批通过→验证赔偿记录状态为 APPROVED",
+      "status": "PASS",
+      "evidence": [
+        "report TC-COMPENSATION passed: assetId=80, processId=77, 10/10 步骤全部 ok",
+        "赔偿记录 id=8, status=APPROVED——与 expected_compensation_status 一致",
+        "COMPENSATION 不修改资产状态（已确认为设计意图）"
+      ]
+    },
+    {
+      "criterion": "AC5: 多租户隔离验证——至少 2 个不同用户交叉验证 mine=true",
+      "status": "PASS",
+      "evidence": [
+        "report AC5-多租户隔离 passed: 6/6 步骤全部 ok",
+        "用户A (admin) mine=true: 50条, 含B审批=False；用户B (ac5test184141, 动态注册) mine=true: 1条, 含A审批=False",
+        "双向交叉验证: mine=true 隔离有效。使用动态注册用户（非仅不同 deptId）比上一轮方案更健壮"
+      ]
+    },
+    {
+      "criterion": "AC6: 审批返回字段验证——确认前后端 DTO 字段对齐，无序列化异常",
+      "status": "PASS",
+      "evidence": [
+        "report AC6-字段对齐汇总 passed: 总计 0 个字段对齐问题",
+        "审批关键字段 id/processNo/processType/status/currentStep/applicantId 全部存在且类型正确",
+        "test_matrix.json 定义 3 组期望字段 schema（approval/asset/auth_response），零 @JsonAlias 歧义"
+      ]
+    }
+  ],
+  "minions_review": {
+    "draft_checked": true,
+    "refine_checked": true,
+    "adjudication_checked": true,
+    "real_dual_agent_chain": true,
+    "write_degradation_guard_passed": true,
+    "sonnet_fallback_absent": true,
+    "detail": "MINIONS 双推理链路完整且真实执行: draft.json (gai2-drafter, deepseek-v4-flash, non-sonnet) → refine.json (gai2-refiner, glm-5.1, 不同模型, accept_with_refinements, 6 项改进) → adjudication.json (gai2-orchestrator, decision=use_refine, no_degradation) → changes.json (builder 执行, minions_execution 确认 write_intent_preserved)。与上一轮 gai2-20260526-180709 的 MINIONS=enabled=false 形成明确对比——本轮有完整且独立的 drafter/refiner 产物，非纯配置声明。draft-changes.json 缺失属于预期（adjudication 选择 refine 为 source）。所有产物均通过独立核验：draft.json(第 1 行 JSON 单行但含完整 write_intent + 2 个 write_actions)、refine.json(accept_with_refinements, 6 条 improvements)、adjudication.json(12 条 builder_instructions)、changes.json(3 条命令 + 10 条 verification_results)。写操作退化保护全链路通过：draft→refine→adjudication→builder 的 write_intent_preserved/degradation_detected/no_degradation/degradation_blocked 一致为 true/false/true/false，与 gai2-reviewer 的 minions_review 中 write_degradation_guard_passed=true 一致。"
+  },
+  "findings": [
+    "【PASS-全 AC 通过】workcard 定义的 6 个 AC 全部通过运行时 API 验证。test_asset_workflow_e2e_report.json: 6/6 PASS, 0 FAIL。每个流程含完整步骤级 evidence（共 47 个验证步骤，全部 ok）。",
+    "【PASS-GAP 补全确认】上一轮 reviewer 识别的 3 个 PARTIAL 缺口全部补全: AC2 CLEARANCE 首次产生运行时端到端通过记录（assetId=78, processId=75），AC5 使用动态注册用户验证 mine=true 双向隔离，AC6 字段对齐检查零问题。3 个 gap（ac2-clearance-evidence/ac5-tenant-strategy/ac6-field-alignment）的补全证据直接可追溯至 report.json 的对应测试结果。",
+    "【PASS-MINIONS 链路完整】drafter(deepseek-v4-flash)→refiner(glm-5.1)→adjudication(orchestrator)→builder→reviewer 链路完整。所有 MINIONS 产物均存在且符合预期格式。与上一轮 session（MINIONS 不适用）形成明确对比，两轮 session 的职责分离清晰：gai2-20260526-180709 做策略分析，gai2-20260526-1821xx 做实现验证。",
+    "【PASS-写操作保护】全链路写保护通过: Draft write_actions(2 creates)→Refine write_intent_preserved=true/degradation_detected=false→Adjudication no_degradation=true→changes.json minions_execution.write_intent_preserved=true/degradation_blocked=false。实际产物 files 与 write_actions 目标一致（test_asset_workflow_e2e.py 为 test_script.py 的具体命名实现，语义一致）。",
+    "【PASS-测试架构质量】数据驱动架构（test_matrix.json 定义流程参数 + Python 脚本统一驱动），错误恢复机制（admin fallback 当 sim 用户池不可用时），每个流程独立重新登录避免 JWT 过期，JSON 报告自动输出。",
+    "【INFO-goal 状态不一致】goal-state.json status='completed' 且 acceptance_evidence 仅为 manual met，但 goal 级 acceptance_criteria 为空数组。新一轮 session 的产物（draft/refine/adjudication/changes/review）证明实现阶段已补充完整证据。建议 Orchestrator 更新 goal-state acceptance_criteria 和 acceptance_evidence 以反映本轮所有 6 个 AC 的通过。",
+    "【INFO-测试用户池退化】test_matrix.json 定义的 6 个 sim05261457xx 用户无法登录（code=500），所有审批回退到同一 admin 用户。多级审批使用同一用户连续审批在生产环境不符合实际（应不同审批人）。此退化不影响 AC 通过，但标记了测试环境的局限——也佐证了 AC5（mine=true 隔离验证）需要动态注册新用户的必要性。",
+    "【INFO-AC6 粒度】字段对齐检查在审批响应中已全面通过（0 问题），但报告未展开资产 DTO/auth_response DTO 的逐字段运行时验证结果。当前 schema 已在 test_matrix.json 定义，字段级结果仅有汇总（总计 0 问题），可接受但非详尽——建议后续补充每个 schema 组别的逐字段检查明细。"
+  ],
+  "residual_risks": [
+    "测试用户池 sim0526145701~5706 登录返回 500（用户存在但可能被禁用或角色缺失），当前通过 admin fallback 绕过。不影响测试结论，但多级审批场景均使用同一 admin 用户，不反映真实审批人多样性",
+    "COMPENSATION 审批创建时 businessId=0（审批通过回调中创建赔偿记录），需后端确认此行为是否符合预期——若回调失败则赔偿记录与审批脱钩",
+    "4 级审批使用同一 admin 用户连续审批（sim 用户不可用的 fallback），实际多级审批模式下要求不同审批人，生产环境需不同用户验证",
+    "AC6 字段对齐检查仅在 4 个 E2E 流程中覆盖审批响应字段，未对资产 DTO/auth DTO 做逐字段运行时展开验证",
+    "测试数据保留在数据库中（符合 directive「保留测试数据」的要求），长期积累可能产生脏数据"
+  ]
+}

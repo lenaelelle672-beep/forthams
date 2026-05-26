@@ -1,0 +1,73 @@
+{
+  "session_id": "20260523-goal-resume-2",
+  "topic": "SidebarLayout 与 Cmd+K 搜索架构统一方案讨论 (AC-4)",
+  "options": [
+    {
+      "name": "方案A: 增强 GlobalSearch 为统一入口",
+      "description": "废弃 SidebarLayout 内联搜索，将 GlobalSearch (Cmd+K) 增强为唯一搜索入口。在 CommandDialog 中增加 tab 切换「页面导航」和「业务数据」两组结果，将 SearchDropdown 的后端 API 搜索能力合并到 GlobalSearch 中。",
+      "pros": [
+        "消除三个搜索入口的碎片化问题",
+        "后端 SearchService 已用 CompletableFuture 实现并行搜索，可零改动复用",
+        "Cmd+K 全局命令面板符合行业标准 UX（Linear/Notion/VS Code 模式）",
+        "长期维护最优——单一组件 vs 三个独立组件",
+        "与 audit 推荐方向一致"
+      ],
+      "cons": [
+        "需要在 CommandDialog 中处理两种不同类型搜索的 UI 融合",
+        "需要将静态 SEARCHABLE_PAGES 改为从导航配置动态生成",
+        "废弃 SidebarLayout 内联搜索可能对习惯该入口的用户造成短暂不适"
+      ],
+      "effort": {
+        "frontend": "Medium (3-4小时)",
+        "backend": "Low (搜索扩展——可选)"
+      }
+    },
+    {
+      "name": "方案B: 保留分离但统一交互",
+      "description": "保留三个搜索组件的职能拆分，在交互层面统一：SidebarLayout 和 GlobalSearch 共享同一 Cmd+K 快捷键；SearchDropdown 与 GlobalSearch 统一视觉风格；后端扩展搜索覆盖范围。",
+      "pros": [
+        "改动最小，各组件内部逻辑基本不变",
+        "渐进式迁移风险低"
+      ],
+      "cons": [
+        "不解决碎片化核心问题——用户仍有三个互不关联的搜索入口",
+        "Cmd+K 快捷键已被 GlobalSearch 注册，SidebarLayout 无法再绑定同一快捷键",
+        "AC-4 audit 已明确建议废弃内联搜索，方案B与此相悖",
+        "长期维护成本仍为三个独立组件"
+      ],
+      "effort": {
+        "frontend": "Medium (2-3小时)",
+        "backend": "Low"
+      }
+    },
+    {
+      "name": "方案C: GlobalSearch 做外壳，SearchDropdown 内嵌",
+      "description": "GlobalSearch 作为统一搜索面板，将 SearchDropdown 以子组件形式内嵌到 GlobalSearch 中，保持各自内部逻辑不变，仅统一触发方式和 UI 容器。",
+      "pros": [
+        "实施工作量最低",
+        "保留现有组件内部逻辑不需重写"
+      ],
+      "cons": [
+        "创造了两组输入框共享一个对话框的尴尬体验",
+        "把碎片藏起来而非消除碎片，长期是技术债",
+        "用户在 CommandDialog 中面对两个不同行为的输入框，交互混乱"
+      ],
+      "effort": {
+        "frontend": "Low (1-2小时)",
+        "backend": "None"
+      }
+    }
+  ],
+  "recommended_option": "方案A",
+  "rationale": "方案A最佳平衡了用户一致性、可维护性和实施成本。后端 SearchService 已经实现跨模块并行搜索（CompletableFuture），可直接复用。Cmd+K 全局搜索作为统一入口符合行业标准和用户预期。",
+  "rejected_options": [
+    {
+      "name": "方案B",
+      "reason": "不解决碎片化核心问题，Cmd+K 快捷键冲突无法回避，与 audit 推荐方向相悖"
+    },
+    {
+      "name": "方案C",
+      "reason": "创造了两组输入框共享对话框的尴尬体验，把碎片藏起来而非消除，长期技术债"
+    }
+  ]
+}

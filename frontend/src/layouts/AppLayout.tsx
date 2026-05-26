@@ -8,8 +8,9 @@
  * - 内容区：#f8fafc 背景，24px padding
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router';
+import { useAuth } from '@/app/context/AuthContext';
 import { useQuery } from '@tanstack/react-query';
 import http from '@/utils/http';
 import {
@@ -87,9 +88,8 @@ const NAV_GROUPS: NavGroup[] = [
   {
     group: '退役与处置',
     items: [
-      { path: '/retirement',   label: '退役管理', icon: Archive },
-      { path: '/disposals',    label: '资产处置', icon: Recycle },
-      { path: '/compensation', label: '赔偿管理', icon: Handshake },
+      { path: '/retirement', label: '退役管理', icon: Archive },
+      { path: '/disposals',  label: '资产处置', icon: Recycle },
     ],
   },
   {
@@ -102,13 +102,6 @@ const NAV_GROUPS: NavGroup[] = [
     group: '监控与审计',
     items: [
       { path: '/audit', label: '审计日志', icon: FileText },
-    ],
-  },
-  {
-    group: '大屏',
-    items: [
-      { path: '/bigscreen',   label: '态势大屏',   icon: MonitorDot, external: true },
-      { path: '/bigscreen-3d', label: '3D 大屏', icon: Monitor, external: true },
     ],
   },
 ];
@@ -124,6 +117,23 @@ const NAV_BOTTOM_ITEMS: NavItem[] = [
 export default function AppLayout() {
   const [collapsed, setCollapsed] = useState(false);
   const navigate = useNavigate();
+
+  const { hasRole } = useAuth();
+
+  // 大屏导航——仅 ADMIN 或 SUPER_ADMIN 角色可见
+  const navGroups = useMemo(() => {
+    const groups = [...NAV_GROUPS];
+    if (hasRole('ADMIN') || hasRole('SUPER_ADMIN')) {
+      groups.push({
+        group: '大屏',
+        items: [
+          { path: '/bigscreen',    label: '态势大屏', icon: MonitorDot },
+          { path: '/bigscreen-3d', label: '3D 大屏',  icon: Monitor },
+        ],
+      });
+    }
+    return groups;
+  }, [hasRole]);
 
   // ── 认证守卫：无 token 时重定向登录页 ──────────────────────────────────
   useEffect(() => {
@@ -202,7 +212,7 @@ export default function AppLayout() {
 
         {/* 导航主区 */}
         <nav className="flex-1 overflow-y-auto py-4 px-2">
-          {NAV_GROUPS.map((group) => (
+          {navGroups.map((group) => (
             <div key={group.group} className="mb-2">
               {!collapsed && (
                 <div className="px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-[#4a5568]">

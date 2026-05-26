@@ -209,7 +209,7 @@ export function NodeConfigPanel({ selectedNode, edges, approverRoles = [], roleD
                       name={`approverType-${selectedNode.id}`}
                       checked={approverType === "role"}
                       onChange={() => {
-                        onUpdateNode(selectedNode.id, { approverType: "role", approverId: "", approverRole: "" });
+                        onUpdateNode(selectedNode.id, { approverType: "role", approverId: "", approverRole: "", approverRoleName: "" });
                       }}
                       className="text-primary"
                     />
@@ -221,7 +221,7 @@ export function NodeConfigPanel({ selectedNode, edges, approverRoles = [], roleD
                       name={`approverType-${selectedNode.id}`}
                       checked={approverType === "user"}
                       onChange={() => {
-                        onUpdateNode(selectedNode.id, { approverType: "user", approverId: "", approverRole: "" });
+                        onUpdateNode(selectedNode.id, { approverType: "user", approverId: "", approverRole: "", approverRoleName: "" });
                       }}
                       className="text-primary"
                     />
@@ -239,7 +239,11 @@ export function NodeConfigPanel({ selectedNode, edges, approverRoles = [], roleD
                     value={approverRoles.includes(selectedNode.data.approverRole) ? selectedNode.data.approverRole : ""}
                     onChange={(event) => {
                       if (event.target.value) {
-                        onUpdateNode(selectedNode.id, { approverRole: event.target.value });
+                        const selectedRole = roleDetails.find(r => r.roleCode === event.target.value);
+                        onUpdateNode(selectedNode.id, {
+                          approverRole: event.target.value,
+                          approverRoleName: selectedRole?.roleName || "",
+                        });
                       }
                     }}
                   >
@@ -309,6 +313,7 @@ export function NodeConfigPanel({ selectedNode, edges, approverRoles = [], roleD
                                 onUpdateNode(selectedNode.id, {
                                   approverId: String(user.id),
                                   approverRole: "",
+                                  approverRoleName: "",
                                 });
                                 setShowUserSearch(false);
                                 setUserSearchKeyword("");

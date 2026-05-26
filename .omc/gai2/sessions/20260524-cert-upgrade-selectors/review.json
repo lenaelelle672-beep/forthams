@@ -1,0 +1,96 @@
+{
+  "directive_summary": "升级 CERT-02/03/08 三个认证测试用例的选择器到新版页面 DOM。当前认证测试 10/10 PASS 但断言与新版 DOM 存在系统性偏差：CERT-02 heading 角色断言因新版 PageHeader 渲染方式不同可能挂起；CERT-03 创建资产流程从内联模态改为独立页面跳转；CERT-08 审批操作从行内按钮改为 Dialog 内组件。需逐项分析根因、确认实际 DOM 变化并修复测试断言。",
+  "affected_scope": [
+    "testFinish/tests/playwright/forthams-certification.spec.ts"
+  ],
+  "commands_checked": [
+    {
+      "command": "cd /Users/feigao/project/Project/testFinish && TEST_PROJECT_CONFIG=config/forthams.example.json npx playwright test tests/playwright/forthams-certification.spec.ts --project=chromium --reporter=list",
+      "result": "failed",
+      "exit_code": 1,
+      "notes": "11 tests: 6 passed, 4 failed, 1 skipped。CERT-02/03/08/10 失败"
+    }
+  ],
+  "acceptance_status": [
+    {
+      "criterion": "AC-1: CERT-02 页面模块测试的选择器正确匹配新版 PageHeader DOM",
+      "status": "FAIL",
+      "evidence": [
+        "changes.json 测试结果：CERT-02 失败 - getByRole('link', { name: 'RFID盘点' }) 超时找不到（页面 link 文本可能保留空格 'RFID 盘点'）",
+        "ACT-01 将 link 'RFID 盘点'→'RFID盘点'（去空格），但实际 sidebar 侧边栏渲染存在两个版本：AppLayout.tsx 使用 'RFID 盘点'（有空格），SidebarLayout.tsx 使用 'RFID盘点'（无空格），选择器与运行时版本不匹配"
+      ]
+    },
+    {
+      "criterion": "AC-2: CERT-03 资产台账测试的选择器正确匹配新版独立页面跳转流程",
+      "status": "FAIL",
+      "evidence": [
+        "changes.json 测试结果：CERT-03 失败 - getByPlaceholder('搜索资产...') 超时找不到",
+        "前端源码显示多版本 placeholder：AssetSearchBar.tsx 使用 '搜索资产编号或名称...'，AssetToolbar.tsx 使用 '搜索资产...'，测试使用的 '搜索资产...' 与运行时页面组件不匹配",
+        "fillAssetForm 的 data-testid 选择器因前置步骤失败未实际验证"
+      ]
+    },
+    {
+      "criterion": "AC-3: CERT-08 审批与工单测试的选择器正确匹配新版 Dialog 操作组件",
+      "status": "FAIL",
+      "evidence": [
+        "changes.json 测试结果：CERT-08 失败 - heading({ name: '审批列表' }) 不存在",
+        "前端源码确认：app/pages/Approval.tsx（旧版路由）渲染 <h3>审批列表</h3>，但 pages/approval/ApprovalListPage.tsx（新版）使用 PageHeader title='审批中心' 渲染 <h1>审批中心</h1>。两次版本切换导致选择器不匹配",
+        "新版路由虽然 ACT-06 将 /approvals→/approval 正确，但 heading 文本 '审批列表' 可能是旧版文本，新版实际为 '审批中心'"
+      ]
+    },
+    {
+      "criterion": "AC-4: 修复后认证测试全部 10 个用例 PASS（CERT-01~CERT-10）",
+      "status": "FAIL",
+      "evidence": [
+        "测试结果：6/11 passed（CERT-01,04,05,06,07,09 ✅），4/11 failed（CERT-02,03,08,10 ❌），1/11 skipped",
+        "AC-4 明确要求「全部 10 个用例 PASS」，实际仅 6 个 PASS，4 个 FAIL"
+      ]
+    },
+    {
+      "criterion": "AC-5: 前端源码交叉确认修复根因无误",
+      "status": "PARTIAL",
+      "evidence": [
+        "changes.json residual_risks 明确承认：「所有选择器 new_string 值均为推断/假设值，未与实际前端页面交叉验证」",
+        "前端源码核查显示：PageHeader 渲染 <h1> 而非 <h2>，但 getByRole('heading') 可兼容两种 heading 级别",
+        "搜索框 placeholder 多版本并存（'搜索资产编号或名称...' vs '搜索资产...'），测试选择的文本与运行时组件不匹配",
+        "审批页面 heading 存在版本差异（旧版 '审批列表' vs 新版 '审批中心'），ACT-06 选择了错误值",
+        "整个 repair 未执行前端源码与测试选择器的逐项交叉验证"
+      ]
+    }
+  ],
+  "minions_review": {
+    "draft_checked": true,
+    "refine_checked": true,
+    "adjudication_checked": true,
+    "real_dual_agent_chain": true,
+    "write_degradation_guard_passed": true,
+    "sonnet_fallback_absent": true
+  },
+  "findings": [
+    "MINIONS 链路完整：gai2-drafter→gai2-refiner→adjudication→gai2-builder，所有产物齐全",
+    "写意图保护：draft write_intent 全部保留，refine write_intent_preserved=true，degradation_detected=false，adjudication write_action_guard 通过",
+    "所有 11 个 write_actions 的 old_string 精确匹配并成功应用，代码修改无问题",
+    "核心问题：new_string 值全部基于推断而非实际 DOM 验证——CERT-02 RFID 链接空格、CERT-03 placeholder 文本、CERT-08 heading 文本均与运行时 DOM 不匹配",
+    "修复后测试 4/11 FAIL，根因是选择器值推断错误而非代码修改技术问题",
+    "前端源码存在多版本并行问题（旧 app/pages/ 与新 pages/），测试环境运行版本不确定，影响选择器匹配准确性"
+  ],
+  "residual_risks": [
+    "CERT-02: link 'RFID盘点' vs 'RFID 盘点' 空格差异持续存在，需确认测试环境运行的是哪个 sidebar 版本（SidebarLayout 无空格 vs AppLayout 有空格）",
+    "CERT-03: 搜索框 placeholder 需确认运行时 AssetListPage 使用哪个组件（AssetSearchBar 的 '搜索资产编号或名称...' vs AssetToolbar 的 '搜索资产...'）",
+    "CERT-03: data-testid 选择器（input-asset-name/input-purchase-date/input-location/input-asset-category/input-purchase-price）均未实际验证，可能与 AssetFormPage 实际 DOM 不匹配",
+    "CERT-08: 审批页面 heading 需确认是 '审批中心'（新版 pages/approval/ApprovalListPage.tsx）还是 '审批列表'（旧版 app/pages/Approval.tsx）",
+    "CERT-08: 审批操作 dialog 路径（getByText('资产转移审批').click() → dialog）仅在 mock 数据包含匹配文本时有效",
+    "前端新老两套页面组件并行运行（app/pages/ vs pages/），测试必须明确知道指向哪个版本，否则选择器可能始终错位",
+    "所有修复基于推断而非实测，存在系统性偏差风险"
+  ],
+  "overall_status": "incomplete",
+  "recommended_next_actions": [
+    "紧急：启动前端运行时实例，逐一核验 CERT-02/03/08/10 四个失败用例的实际 DOM 文本和结构",
+    "对 CERT-02：核实 sidebar 的 RFID link 文本是 'RFID盘点' 还是 'RFID 盘点'，相应修正 getByRole name 参数",
+    "对 CERT-03：核实搜索框实际 placeholder 文本，修正 getByPlaceholder 参数；同时启动 data-testid 验证",
+    "对 CERT-08：确认运行时审批页面实际 heading 文本（'审批中心' 或 '审批列表'），核实 Tab 按钮 role 和 name",
+    "对 CERT-10：确认 /approval 页面是否可渲染条目列表，确认 '资产转移审批' 是否存在于 DOM 中",
+    "修复后重新运行全部 11 个测试，确保 CERT-01~CERT-10 全部 PASS（CERT-05b 可 skip）",
+    "建议建立前端源码→测试选择器的自动交叉验证机制，避免推断值导致的系统性偏差"
+  ]
+}

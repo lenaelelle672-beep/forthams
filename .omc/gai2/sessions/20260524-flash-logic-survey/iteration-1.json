@@ -1,0 +1,58 @@
+{
+  "iteration": 1,
+  "timestamp": "2026-05-24T19:00:00+08:00",
+  "review_conclusion": {
+    "overall_status": "incomplete",
+    "residual_findings": [
+      "ReportsPage.test.tsx 18 个测试因缺少 getDeptDistribution 的 mock 而失败",
+      "根因：frontend/src/api/reports.ts 新增了 getDeptDistribution 导出，但测试文件 vi.mock('@/api/reports') 未覆盖该导出"
+    ],
+    "score_impact": "review.json 中 AC-8 评分 95/100 因测试回归不能给满分，修复后应恢复 100/100"
+  },
+  "rework_cause": "测试回归 — 前次 build 实现了 ReportsPage 的 asset-dept 报表对接真实 API（getDeptDistribution），但未同步更新测试文件的 mock 配置，导致 18 个测试全部因 import 失败而无法运行",
+  "fix_summary": {
+    "root_cause": "测试文件 vi.mock('@/api/reports') 工厂函数中未导出 getDeptDistribution，导致所有测试在 import 时抛出 getDeptDistribution is not a function 错误",
+    "changes_made": [
+      {
+        "file": "frontend/src/__tests__/ReportsPage.test.tsx",
+        "line": 40,
+        "change": "在 vi.mock('@/api/reports') 工厂中添加 getDeptDistribution: vi.fn()"
+      },
+      {
+        "file": "frontend/src/__tests__/ReportsPage.test.tsx",
+        "line": 52,
+        "change": "在 import 中添加 getDeptDistribution"
+      },
+      {
+        "file": "frontend/src/__tests__/ReportsPage.test.tsx",
+        "line": 114,
+        "change": "在第一个 beforeEach 中添加 vi.mocked(getDeptDistribution).mockResolvedValue({ code: 200, message: 'success', data: [] })"
+      },
+      {
+        "file": "frontend/src/__tests__/ReportsPage.test.tsx",
+        "line": 371,
+        "change": "在第二个 beforeEach（导出功能测试块）中添加同样 mockResolvedValue"
+      }
+    ],
+    "mock_data": {
+      "return_type": "ApiResponse<NameValueItem[]>",
+      "value": "{ code: 200, message: 'success', data: [] }",
+      "rationale": "空数组是最安全的默认值，各测试用例按需覆盖具体返回值即可"
+    }
+  },
+  "verification": {
+    "target_command": "npx vitest run src/__tests__/ReportsPage.test.tsx",
+    "result": "passed",
+    "test_files": 1,
+    "tests_passed": 18,
+    "tests_failed": 0,
+    "full_suite_command": "npx vitest run",
+    "full_suite_result": "Test Files: 30 passed, Tests: 677 passed",
+    "full_suite_regression": false
+  },
+  "residual_risks": [
+    "后续在 api/reports.ts 中添加新导出时，需同步更新 ReportsPage.test.tsx 的 vi.mock 工厂和 beforeEach",
+    "其他测试文件（如 src/__tests__/pages/ReportPage.test.tsx）若也使用了 reports API 但未受影响，但长期应考虑共享 mock 工厂"
+  ],
+  "iteration_status": "completed"
+}

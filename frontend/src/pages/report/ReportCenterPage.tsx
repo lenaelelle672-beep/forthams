@@ -59,9 +59,9 @@ export default function ReportCenterPage() {
   const { data: trendRes } = useReportTrend();
 
   // ── 数据解析 ────────────────────────────────────────────────────────────────
-  const summary = (summaryRes as ApiResponse<ReportSummary> | undefined)?.data;
-  const categoryData = (categoryRes as ApiResponse<CategoryReport[]> | undefined)?.data ?? [];
-  const trendData = (trendRes as ApiResponse<ReportTrend[]> | undefined)?.data ?? [];
+  const summary = summaryRes as unknown as ReportSummary | undefined;
+  const categoryData = categoryRes as unknown as CategoryReport[] | undefined ?? [];
+  const trendData = trendRes as unknown as ReportTrend[] | undefined ?? [];
 
   // 分类柱状图数据
   const categoryBarData = useMemo(

@@ -46,8 +46,7 @@ export default function AuditDetailPage() {
     staleTime: 1000 * 60 * 5,
   });
 
-  const log: AuditLog = (res as ApiResponse<AuditLog> | undefined)?.data;
-
+  const log: AuditLog = res as unknown as AuditLog | undefined;
   if (isLoading) {
     return (
       <div className="p-8 space-y-6">

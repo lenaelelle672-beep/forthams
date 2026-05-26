@@ -249,7 +249,7 @@ export const ApprovalFlowChart: React.FC<ApprovalFlowChartProps> = ({
                 <p className="mt-1 text-xs text-gray-400">
                   {item.runtime.nodeCode ? `节点 ${item.runtime.nodeCode}` : '运行路径节点'}
                   {item.runtime.approverType === 'user' && item.runtime.approverId ? ` · 指定用户 #${item.runtime.approverId}` : ''}
-                  {item.runtime.approverRole ? ` · 角色 ${item.runtime.approverRole}` : ''}
+                  {item.runtime.approverRoleName ? ` · ${item.runtime.approverRoleName}` : item.runtime.approverRole ? ` · 角色 ${item.runtime.approverRole}` : ''}
                   {item.runtime.approvalMode ? ` · ${item.runtime.approvalMode}` : ''}
                 </p>
               ) : null}

@@ -18,7 +18,7 @@ import {
 import { createRetirement } from '@/api/retirement';
 import { getAssetList } from '@/api/asset';
 import type { AssetListItem } from '@/types/asset';
-import type { PaginatedResponse } from '@/types/common';
+import type { PaginatedResponse, PageData } from '@/types/common';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -74,7 +74,7 @@ export default function RetirementFormPage() {
     enabled: assetSearch.trim().length > 0,
     staleTime: 1000 * 30,
   });
-  const assetResults = (assetRes as PaginatedResponse<AssetListItem> | undefined)?.data?.records ?? [];
+  const assetResults = (assetRes as PageData<AssetListItem> | undefined)?.records ?? [];
   const foundAsset: AssetListItem | null = assetResults[0] ?? null;
 
   const onSubmit = (values: FormValues) => {

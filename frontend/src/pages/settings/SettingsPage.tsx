@@ -81,7 +81,7 @@ function UsersTab() {
     queryKey: QUERY_KEYS.users,
     queryFn: async () => {
       const res = await getUserList({ page: 1, pageSize: 100 });
-      return res.data?.records ?? [];
+      return res?.records ?? [];
     },
   });
 
@@ -356,7 +356,7 @@ function DepartmentsTab() {
     queryKey: QUERY_KEYS.depts,
     queryFn: async () => {
       const res = await getDeptTree();
-      return res.data ?? [];
+      return res ?? [];
     },
   });
 

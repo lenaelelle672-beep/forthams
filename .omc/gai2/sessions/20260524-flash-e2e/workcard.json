@@ -1,0 +1,27 @@
+{
+  "session_id": "20260524-flash-e2e",
+  "directive": "1) 修复剩余 2 个认证测试（CERT-04 select strict mode、CERT-09 部门 placeholder 超时），让 cert 10/10 全绿；\n2) 把 E2E 测试接入 CI（testFinish 已有 .gitlab-ci.yml/Jenkinsfile 模板，需配置为执行 forthams-e2e.spec.ts）；\n3) 增加业务校验深度 — forthams-e2e.spec.ts 当前只检测页面加载和 API 状态，需增加表单提交→数据落库→页面验证的闭环测试；\n4) 废弃 mock 认证测试（forthams-certification.spec.ts），全部切换为 forthams-e2e.spec.ts 的真 E2E 模式。",
+  "classification": "Medium",
+  "phase": "e2e-upgrade",
+  "auto_mode": true,
+  "flash_mode": true,
+  "acceptance_checks": [
+    "AC-1: CERT-04 和 CERT-09 修复后全部 10 项 CERT 测试 PASS",
+    "AC-2: .gitlab-ci.yml 或 Jenkinsfile 配置为运行 forthams-e2e.spec.ts 真 E2E 测试",
+    "AC-3: forthams-e2e.spec.ts 新增至少一个表单提交→数据落库→页面验证的闭环测试用例",
+    "AC-4: forthams-certification.spec.ts 被标记为废弃/归档，默认不运行"
+  ],
+  "evidence_to_collect": [
+    "Playwright 测试运行结果（cert 10/10 全绿）",
+    "更新后的 .gitlab-ci.yml / Jenkinsfile",
+    "更新后的 forthams-e2e.spec.ts（含业务闭环测试）",
+    "废弃认证测试的变更记录"
+  ],
+  "open_risks": [
+    "forthams-e2e.spec.ts 需要真实后端 API 支持，可能依赖测试数据准备",
+    "CI 环境需要配置 BASE_URL 和 API_BASE_URL 指向可用的测试环境",
+    "表单提交测试可能涉及数据库写操作，需要清理机制"
+  ],
+  "artifact_dir": ".omc/gai2/sessions/20260524-flash-e2e",
+  "test_project_dir": "/Users/feigao/project/Project/testFinish"
+}
