@@ -1,0 +1,33 @@
+{
+  "changed_files": [
+    "frontend/src/pages/system/DeptManagement.tsx",
+    "frontend/src/api/base.ts"
+  ],
+  "added_files": [
+    "frontend/src/components/ui/UserSearchSelect.tsx"
+  ],
+  "commands_run": [
+    {
+      "command": "npm run build (frontend directory)",
+      "result": "passed",
+      "notes": "3352 modules transformed, build completed in 4.56s, no errors or warnings"
+    }
+  ],
+  "verification_results": [
+    "DeptManagement.tsx: 表单布局已重构 — 删除了重复的「负责人」和「联系电话」Input，当前布局为：部门名称+编码 → 上级部门+排序 → 负责人+联系电话 → 邮箱+部门类型 → 部门领导(UserSearchSelect)+秘书(UserSearchSelect) → 状态 → 备注",
+    "DeptManagement.tsx: 已移除 getUserList 全量用户查询（原 pageSize=999 方案），改用 UserSearchSelect 按需搜索",
+    "base.ts: 新增 searchUsers API — http.get('/user-management/search', { params: { keyword } })",
+    "UserSearchSelect.tsx: 新建可复用搜索选择器组件 — 300ms 防抖、后端异步搜索、结果限制50条、显示 realName + @username、选中后缓存显示名",
+    "npm run build: 通过，无报错"
+  ],
+  "minions_execution": {
+    "adjudication_file_read": false,
+    "selected_source": "none",
+    "write_intent_preserved": true,
+    "degradation_blocked": false
+  },
+  "residual_risks": [
+    "编辑模式下预填的 leaderId/secretaryId 在未搜索前显示为「ID: xxx」（因后端 searchUsers 不支持按 ID 精确查找），用户点击下拉输入搜索后会正常显示姓名",
+    "UserSearchSelect 仅依赖后端 searchUsers API（limit 50），若搜索热词（如「王」）匹配超过50人，结果会被截断 — 后端可考虑提升 limit 或支持分页"
+  ]
+}

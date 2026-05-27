@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { useNavigate } from 'react-router';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { ArrowLeft, Plus, Search, Trash2, Info, Package, GitBranch, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, Info, Package, GitBranch, CheckCircle } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -14,6 +14,7 @@ import { Select, SelectItem } from '@/components/ui/Select';
 import { getAssetList } from '@/api/asset';
 import { submitTransferApplication } from '@/api/disposal';
 import { getDeptTree, getLocationCascade } from '@/api/base';
+import AssetPickerModal from '@/components/AssetPickerModal';
 import type { AssetListItem } from '@/types/asset';
 import type { Department, Location, PageData } from '@/types/common';
 
@@ -74,8 +75,8 @@ export default function AssetTransferFormPage() {
   const qc = useQueryClient();
   const [currentStep, setCurrentStep] = useState(0);
   const [selectedAssets, setSelectedAssets] = useState<SelectedAsset[]>([]);
-  const [assetSearch, setAssetSearch] = useState('');
   const [draftSavedAt] = useState(new Date().toLocaleTimeString('zh-CN', { hour12: false }));
+  const [showAssetPicker, setShowAssetPicker] = useState(false);
 
   // Fetch available assets from real API
   const { data: assetListData } = useQuery({
@@ -85,17 +86,7 @@ export default function AssetTransferFormPage() {
 
   const availableAssets: AssetListItem[] = (assetListData as PageData<AssetListItem> | undefined)?.records ?? [];
 
-  // Filter assets by search keyword
-  const filteredAssets = useMemo(() => {
-    if (!assetSearch.trim()) return availableAssets;
-    const kw = assetSearch.toLowerCase();
-    return availableAssets.filter(
-      (a) =>
-        a.assetNo?.toLowerCase().includes(kw) ||
-        a.assetName?.toLowerCase().includes(kw) ||
-        a.categoryName?.toLowerCase().includes(kw),
-    );
-  }, [availableAssets, assetSearch]);
+
 
   // Fetch department tree
   const { data: deptData } = useQuery({
@@ -162,21 +153,6 @@ export default function AssetTransferFormPage() {
       return;
     }
     mutation.mutate(values);
-  };
-
-  const addAsset = (asset: AssetListItem) => {
-    if (selectedAssetIds.has(String(asset.id))) return;
-    setSelectedAssets((prev) => [
-      ...prev,
-      {
-        id: String(asset.id),
-        assetNo: asset.assetNo ?? '',
-        name: asset.assetName ?? '',
-        category: asset.categoryName ?? '',
-        location: asset.location ?? '',
-        status: asset.status ?? '',
-      },
-    ]);
   };
 
   const removeAsset = (assetId: string) => {
@@ -319,90 +295,26 @@ export default function AssetTransferFormPage() {
               资产选择
             </CardTitle>
             <div className="flex items-center gap-3">
-              <div className="relative">
-                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94a3b8]" />
-                <input
-                  type="text"
-                  className="h-8 w-64 border border-[#e5e7eb] rounded-lg pl-8 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-[#3b82f6]"
-                  placeholder="搜索资产..."
-                  value={assetSearch}
-                  onChange={(e) => setAssetSearch(e.target.value)}
-                />
-              </div>
+              <Button type="button" size="sm" onClick={() => setShowAssetPicker(true)}>
+                <Plus className="w-4 h-4" /> 添加资产
+              </Button>
+              <span className="text-sm text-gray-500">已选 {selectedAssets.length} 项</span>
             </div>
           </CardHeader>
-          {/* Available assets list for selection */}
-          {assetSearch.trim() && filteredAssets.length > 0 && (
-            <div className="mx-6 border border-[#e5e7eb] rounded-lg max-h-48 overflow-y-auto">
-              {filteredAssets
-                .filter((a) => !selectedAssetIds.has(String(a.id)))
-                .slice(0, 20)
-                .map((asset) => (
-                  <div
-                    key={asset.id}
-                    className="flex items-center justify-between px-4 py-2 hover:bg-[#f8fafc] cursor-pointer border-b border-[#e5e7eb] last:border-b-0"
-                    onClick={() => addAsset(asset)}
-                  >
-                    <div className="flex items-center gap-4">
-                      <span className="text-sm text-[#3b82f6] font-medium">{asset.assetNo}</span>
-                      <span className="text-sm text-[#374151]">{asset.assetName}</span>
-                      <span className="text-xs text-[#64748b]">{asset.categoryName}</span>
-                    </div>
-                    <Button type="button" size="sm" variant="ghost">
-                      <Plus className="w-4 h-4" />
-                    </Button>
-                  </div>
-                ))}
+          {selectedAssets.length > 0 ? (
+            <div className="px-6 pb-6 flex flex-wrap gap-2">
+              {selectedAssets.map((asset) => (
+                <span key={asset.id} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-medium">
+                  {asset.assetNo} - {asset.name}
+                  <button type="button" onClick={() => removeAsset(asset.id)} className="ml-0.5 hover:text-red-500">&times;</button>
+                </span>
+              ))}
+            </div>
+          ) : (
+            <div className="px-6 pb-6">
+              <div className="text-center text-sm text-[#94a3b8] py-8">暂无已选资产，点击"添加资产"按钮选择。</div>
             </div>
           )}
-          {/* Selected assets table */}
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-[#f8fafc] border-b border-[#e5e7eb]">
-                  <th className="px-5 py-2 text-xs font-medium text-[#64748b] uppercase tracking-wider">资产编号</th>
-                  <th className="px-5 py-2 text-xs font-medium text-[#64748b] uppercase tracking-wider">名称</th>
-                  <th className="px-5 py-2 text-xs font-medium text-[#64748b] uppercase tracking-wider">分类</th>
-                  <th className="px-5 py-2 text-xs font-medium text-[#64748b] uppercase tracking-wider">原始位置</th>
-                  <th className="px-5 py-2 text-xs font-medium text-[#64748b] uppercase tracking-wider">状态</th>
-                  <th className="px-5 py-2 text-xs font-medium text-[#64748b] uppercase tracking-wider text-right">操作</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[#e5e7eb]">
-                {selectedAssets.map((asset) => (
-                  <tr key={asset.id} className="hover:bg-[#f8fafc] transition-colors">
-                    <td className="px-5 py-3 text-sm text-[#3b82f6] font-medium">{asset.assetNo}</td>
-                    <td className="px-5 py-3 text-sm text-[#374151]">{asset.name}</td>
-                    <td className="px-5 py-3 text-sm text-[#64748b]">{asset.category}</td>
-                    <td className="px-5 py-3 text-sm text-[#64748b]">{asset.location}</td>
-                    <td className="px-5 py-3 text-sm">
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-600">
-                        {asset.status ?? '—'}
-                      </span>
-                    </td>
-                    <td className="px-5 py-3 text-right">
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        className="text-red-500 hover:bg-red-50"
-                        onClick={() => removeAsset(asset.id)}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
-                {selectedAssets.length === 0 && (
-                  <tr>
-                    <td colSpan={6} className="px-5 py-8 text-center text-sm text-[#94a3b8]">
-                      暂无已选资产，在上方搜索框中搜索并添加。
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
         </Card>
 
         <Card>
@@ -500,6 +412,16 @@ export default function AssetTransferFormPage() {
           </Button>
         </div>
       </footer>
+
+      <AssetPickerModal
+        open={showAssetPicker}
+        onClose={() => setShowAssetPicker(false)}
+        selectedIds={selectedAssetIds}
+        onSelectionChange={(ids) => {
+          const newAssets = availableAssets.filter((a) => ids.has(String(a.id)));
+          setSelectedAssets(newAssets.map((a) => ({ id: String(a.id), assetNo: a.assetNo ?? '', name: a.assetName ?? '', category: a.categoryName ?? '', location: a.location ?? '', status: a.status ?? '' })));
+        }}
+      />
     </div>
   );
 }

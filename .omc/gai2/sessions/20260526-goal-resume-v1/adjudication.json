@@ -1,0 +1,136 @@
+{
+  "session_id": "20260526-goal-resume-v1",
+  "adjudication_timestamp": "2026-05-26T12:00:00+08:00",
+  "decision": "merged",
+  "selected_source": "merged",
+  "rationale": "Draft 的 32 项 write_actions 整体框架正确，write_intent 完整（DataPermissionInterceptor + @PreAuthorize 全覆盖 + 前端独立页面）。Refine 未检测到任何退化（degradation_detected=false），write_intent_preserved=true。但 Draft 缺失关键 AOP 组件 DataScopeAspect（IMP-01/IMP-09），且 @PreAuthorize 补充需先做精确覆盖检查（IMP-02）。采用 merged：保留 Draft 全部 32 项 write_actions 的执行框架，同时强制采纳 Refine 全部 10 项 improvements 和 2 项 rejected_from_draft 建议。此外合并用户补充的 6 项改进（SysMenuController 路由修复、前端 api/menu.ts 路径同步、DisposalController/InventoryController/CompensationController 确认已有 + NotificationController/StatsController/DashboardController 额外补充）。",
+  "draft_source": ".omc/gai2/sessions/20260526-mvp-enhance-v2/draft.json",
+  "refine_source": ".omc/gai2/sessions/20260526-mvp-enhance-v2/refine.json",
+  "write_intent_preserved": true,
+  "degradation_detected": false,
+  "preserved_from_draft": [
+    "WA-01: DataScope 注解创建",
+    "WA-02: DataPermissionContextHolder 创建",
+    "WA-03: DataPermissionInterceptor InnerInterceptor 创建（需配合 AOP 切面）",
+    "WA-04: MyBatisPlusConfig 注册拦截器",
+    "WA-05: RoleManagementController 新增 assignMenus/assignDepts 端点",
+    "WA-06: RoleService 新增事务方法",
+    "WA-07: UserManagementController 新增 assignRoles 端点",
+    "WA-08: UserManagementService 新增 assignUserRoles 方法",
+    "WA-09~24: 业务 Controller @PreAuthorize 全覆盖（先 grep 确认已有注解，仅补充缺失端点）",
+    "WA-25: schema.sql 业务权限种子数据（权限编码统一 'module:action' 格式，ID 避开 1000+）",
+    "WA-26: MenuManagement.tsx 编辑表单（MenuFormModal + 图标选择器）",
+    "WA-27: RoleManagement.tsx 独立页面（CRUD + 菜单权限树 + 部门权限选择器）",
+    "WA-28: UserManagement.tsx 独立页面",
+    "WA-29: router/index.tsx 新增独立路由（先移除现有重定向）",
+    "WA-30: api/role.ts 前端 API 层",
+    "WA-31: api/user-management.ts 前端 API 层"
+  ],
+  "rejected_from_draft": [
+    "WA-32: read_only 操作不属于 write_action 范畴，从 write_actions 中移除，改在 verification_plan 中确认"
+  ],
+  "mandatory_improvements": [
+    {
+      "id": "IMP-01/IMP-09",
+      "severity": "high",
+      "description": "新增 DataScopeAspect.java（@Aspect + @Around 拦截 @DataScope），从 SecurityContext 获取 LoginUser 设置 DataPermissionContextHolder。若无此 AOP 切面，DataPermissionInterceptor 永远读不到上下文",
+      "action": "创建 backend/src/main/java/com/ams/interceptor/DataScopeAspect.java"
+    },
+    {
+      "id": "IMP-02",
+      "severity": "high",
+      "description": "在添加 @PreAuthorize 前，先 grep 每个 Controller 确认现有注解数量，仅补充缺失端点。SysMenuController/UserManagementController/DeptController/RoleManagementController/WorkflowDefinitionController 已有 @PreAuthorize，避免重复添加",
+      "action": "grep @PreAuthorize 各 Controller → 对比差异 → 仅补充缺失端点"
+    },
+    {
+      "id": "IMP-03",
+      "severity": "high",
+      "description": "所有 @PreAuthorize 权限编码统一 'module:action' 格式（如 'asset:query'），与 schema.sql 种子数据完全匹配。使用 ON DUPLICATE KEY UPDATE 保证幂等",
+      "action": "统一权限编码格式，确保 Controller 注解与 schema.sql 种子数据一一对应"
+    },
+    {
+      "id": "IMP-04",
+      "severity": "medium",
+      "description": "补充 CallbackController 的 @PreAuthorize 覆盖（或使用 API Key 认证）",
+      "action": "评估 CallbackController 是否需要 @PreAuthorize 或改用 API Key 认证"
+    },
+    {
+      "id": "IMP-05",
+      "severity": "medium",
+      "description": "角色管理页面菜单树组件需验证 GET /menus/treeselect 响应格式是否含 children 结构",
+      "action": "实现前读取 SysMenuController.treeselect 和 api/menu.ts 的 API 定义"
+    },
+    {
+      "id": "IMP-06",
+      "severity": "medium",
+      "description": "确认图标选择器的存储格式（lucide-react 图标名 vs CSS class 名）",
+      "action": "读取 sys_menu.icon 现有值格式后实现图标选择器"
+    },
+    {
+      "id": "IMP-07",
+      "severity": "medium",
+      "description": "新增 /system/roles 和 /system/users 路由前，先移除现有 Navigate 重定向（/system/roles → /settings）",
+      "action": "先检查 router/index.tsx 中的重定向规则再添加新路由"
+    },
+    {
+      "id": "IMP-08",
+      "severity": "low",
+      "description": "schema.sql 种子数据 ID 避开 1000+（迁移脚本已使用），建议使用 100-999 范围",
+      "action": "确认 migrate_sys_permission_to_menu.sql 使用的 ID 范围后分配新 ID"
+    },
+    {
+      "id": "IMP-10",
+      "severity": "medium",
+      "description": "按依赖关系分组执行：Group-1 (AC-1 拦截器+AOP) → Group-2 (AC-5 @PreAuthorize+种子数据) → Group-3 (AC-2/3 后端 API) → Group-4 (AC-2/3/4 前端页面)",
+      "action": "按 Group 顺序分阶段实现，不要一次性提交所有变更"
+    }
+  ],
+  "user_supplemented_refinements": [
+    {
+      "id": "EXT-01",
+      "severity": "medium",
+      "description": "SysMenuController 路由修复：将管理后台路径改为 /menus/admin/**，与 MenuController 分离，解决路由冲突（对应 debate 决策3-B）",
+      "action": "修改 SysMenuController 的 @RequestMapping 从 /menus 改为 /menus/admin"
+    },
+    {
+      "id": "EXT-02",
+      "severity": "medium",
+      "description": "前端 api/menu.ts 路径同步：将 getMenuTree 调用路径从 /menus/treeselect 改为 /menus/tree（与 SysMenuController 一致）",
+      "action": "修改 api/menu.ts 中的 API 路径"
+    },
+    {
+      "id": "EXT-03",
+      "severity": "medium",
+      "description": "NotificationController/StatsController/DashboardController 等额外 Controller 的 @PreAuthorize 补充（Draft 未覆盖）",
+      "action": "grep 项目中所有 @RestController，确保所有 Controller 都有 @PreAuthorize 覆盖"
+    }
+  ],
+  "builder_instructions": "请实现本次 MVP 增强的全部内容。执行顺序按依赖分组：\n\n**Group-1（AC-1 数据权限拦截器）**：\n1. 先创建 DataScopeAspect.java（AOP 切面），再创建 DataScope 注解和 DataPermissionContextHolder，最后创建 DataPermissionInterceptor 并注册到 MyBatisPlusConfig\n2. 在 AssetService 试点验证 SQL 注入效果\n\n**Group-2（AC-5 @PreAuthorize 全覆盖 + 种子数据）**：\n1. 先 grep 每个 Controller 确认现有 @PreAuthorize，仅补充缺失端点\n2. 统一权限编码格式为 'module:action'\n3. 同步更新 schema.sql 种子数据，确保权限编码与注解完全匹配\n4. 特别补充：DisposalController/InventoryController/CompensationController 已包含在 WA-14/16/17 中；额外补充 NotificationController/StatsController/DashboardController/CallbackController\n5. SysMenuController 路由改为 /menus/admin 解决冲突\n6. 前端 api/menu.ts 路径同步\n\n**Group-3（AC-2/3 后端 API）**：\n1. RoleManagementController 新增 PUT /roles/{id}/menus 和 PUT /roles/{id}/depts\n2. RoleService 新增 assignMenus/assignDepts 事务方法\n3. UserManagementController 新增 PUT /user-management/{id}/roles\n4. UserManagementService 新增 assignUserRoles 方法\n\n**Group-4（AC-2/3/4 前端页面）**：\n1. 先移除 router/index.tsx 中 /system/roles → /settings 重定向\n2. 创建 RoleManagement.tsx（CRUD + 菜单树 + 部门权限选择器）\n3. 创建 UserManagement.tsx（用户列表 + 角色分配）\n4. 完善 MenuManagement.tsx 编辑表单（MenuFormModal + 图标选择器）\n5. 创建角色管理前端 API 层\n\n**重要约束**：\n- WA-32（迁移脚本）为 read_only，只做验证不做修改\n- 每个 Group 实现后运行 mvn compile 验证编译通过\n- DataPermissionInterceptor 需 JSqlParser 实现，关注多表 JOIN/子查询兼容性\n- 前端路由 /system/roles 和 /system/users 使用 React.lazy 懒加载",
+  "write_action_guard": {
+    "degradation_detected": false,
+    "note": "Refine 确认无退化。Recify 未否定任何 Draft 的写操作意图。所有 32 项 write_actions 保留，10 项 improvements 为增强。无退化风险。",
+    "fallback_triggers": [],
+    "guard_decision": "允许执行所有 write_actions"
+  },
+  "fallback_labels": [
+    "GLM_REFINE_OK",
+    "GO_FALLBACK_WRITE_RESOLVED",
+    "ADJUDICATION_MERGED",
+    "MINIONS_CHAIN_DRAFT_ACCEPTED",
+    "MINIONS_CHAIN_REFINE_ACCEPTED"
+  ],
+  "reviewer_checks": [
+    "1. AC-1: DataScopeAspect 是否存在且正确使用 @Aspect + @Around 拦截 @DataScope",
+    "2. AC-1: DataPermissionInterceptor 是否注册且位于 PaginationInnerInterceptor 之前",
+    "3. AC-1: DataPermissionInterceptor SQL 注入是否影响多表 JOIN/子查询/聚合查询",
+    "4. AC-5: 所有业务 Controller 是否都有 @PreAuthorize，无遗漏（特别是 Draft 未覆盖的 Controller）",
+    "5. AC-5: @PreAuthorize 权限编码是否与 schema.sql 种子数据完全匹配",
+    "6. AC-5: SysMenuController 路由是否已改为 /menus/admin",
+    "7. AC-5: 前端 api/menu.ts 路径是否已同步",
+    "8. AC-2: 角色管理独立页面是否完整（CRUD + 菜单树 + 部门权限选择器）",
+    "9. AC-3: 用户管理独立页面是否含角色分配 UI",
+    "10. AC-4: 菜单编辑表单是否可实际使用（非 toast 占位）",
+    "11. 前端路由 /system/roles 和 /system/users 是否可达且无冲突",
+    "12. seed 数据 ID 是否避开 1000+ 冲突范围"
+  ]
+}

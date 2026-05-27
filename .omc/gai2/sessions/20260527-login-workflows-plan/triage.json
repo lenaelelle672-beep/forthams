@@ -1,0 +1,45 @@
+{
+  "classification": "Heavy",
+  "mcp_tools": [],
+  "scope": [
+    "/api/auth/login",
+    "/workflows",
+    "认证登录链路",
+    "用户/部门/角色/权限数据",
+    "工作流新建与保存链路",
+    "前端 payload 与后端 service",
+    "数据库写入与刷新回显"
+  ],
+  "risks": [
+    "登录 500 尚未获取真实异常栈，当前原因仍是假设",
+    "认证链路涉及权限、数据范围、租户或部门上下文，错误修复可能引入安全风险",
+    "若采用超管 fallback 或权限放开，可能掩盖数据初始化问题并扩大权限面",
+    "/workflows 保存失败可能是独立问题，可能涉及 DTO、接口路径、权限、service 或数据库字段",
+    "本地数据、初始化脚本、测试数据和生产迁移策略可能不一致"
+  ],
+  "dependencies": [
+    "后端异常栈日志",
+    "数据库用户、部门、角色、权限数据",
+    "登录接口请求与响应证据",
+    "/workflows 前端提交 payload",
+    "/workflows 后端接口、service 与数据库写入链路",
+    "后端 mvn test",
+    "前端 npm test",
+    "前端 build",
+    "浏览器端冒烟验证"
+  ],
+  "recommended_phases": [
+    "audit",
+    "debate",
+    "reviewer"
+  ],
+  "acceptance_hints": [
+    "明确下一步优先定位 /api/auth/login 500",
+    "列出应采集的后端异常栈、数据库用户部门/角色/权限证据",
+    "明确优先采用数据兼容或初始化修复，避免粗暴放开权限",
+    "登录通过后再验证 /workflows 新建流程保存链路",
+    "覆盖前端 payload、接口路径、后端 service、权限/数据范围、数据库写入与刷新回显",
+    "最终回归包含后端测试、前端测试、前端 build、浏览器冒烟和至少一个流程保存回归测试"
+  ],
+  "source": "gai2-triage 返回内容；因子 agent 报告无文件写入工具，由 Orchestrator 归档其结构化结果。"
+}

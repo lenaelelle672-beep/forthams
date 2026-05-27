@@ -1,0 +1,113 @@
+{
+  "changed_files": [
+    "backend/src/main/java/com/ams/controller/AuthController.java",
+    "backend/src/main/java/com/ams/controller/DeptController.java",
+    "backend/src/main/java/com/ams/controller/UserManagementController.java",
+    "backend/src/main/java/com/ams/controller/WorkflowDefinitionController.java",
+    "backend/src/main/java/com/ams/dto/AuthResponse.java",
+    "backend/src/main/java/com/ams/entity/Dept.java",
+    "backend/src/main/java/com/ams/entity/Role.java",
+    "backend/src/main/java/com/ams/entity/SysMenu.java",
+    "backend/src/main/java/com/ams/service/DeptService.java",
+    "backend/src/main/java/com/ams/service/RoleService.java",
+    "backend/src/main/java/com/ams/service/impl/UserDetailsServiceImpl.java",
+    "backend/src/main/resources/schema.sql",
+    "frontend/src/app/context/AuthContext.tsx",
+    "frontend/src/app/utils/permissionHooks.ts",
+    "frontend/src/layouts/AppLayout.tsx",
+    "frontend/src/router/index.tsx",
+    "frontend/src/types/common.ts"
+  ],
+  "added_files": [
+    "backend/src/main/java/com/ams/controller/RoleManagementController.java",
+    "backend/src/main/java/com/ams/controller/SysMenuController.java",
+    "backend/src/main/java/com/ams/dto/AuthUserDTO.java",
+    "backend/src/main/java/com/ams/entity/SysRoleDept.java",
+    "backend/src/main/java/com/ams/entity/SysRoleMenu.java",
+    "backend/src/main/java/com/ams/mapper/SysMenuMapper.java",
+    "backend/src/main/java/com/ams/mapper/SysRoleDeptMapper.java",
+    "backend/src/main/java/com/ams/mapper/SysRoleMenuMapper.java",
+    "backend/src/main/java/com/ams/security/LoginUser.java",
+    "backend/src/main/java/com/ams/security/SecurityService.java",
+    "backend/src/main/java/com/ams/service/SysMenuService.java",
+    "backend/src/main/resources/migration/migrate_sys_permission_to_menu.sql",
+    "frontend/src/api/menu.ts",
+    "frontend/src/pages/system/MenuManagement.tsx"
+  ],
+  "removed_files": [
+    "backend/src/main/java/com/ams/controller/RoleController.java"
+  ],
+  "commands_run": [
+    {
+      "command": "mvn compile -f backend/pom.xml -DskipTests",
+      "result": "passed",
+      "notes": "BUILD SUCCESS，所有后端的 Entity/Mapper/Service/Controller 编译通过，无新增编译错误"
+    },
+    {
+      "command": "npx tsc --noEmit (frontend)",
+      "result": "passed (pre-existing errors only)",
+      "notes": "TypeScript 检查通过，报错的 GraphifyKnowledgeGraph.tsx 和 DepreciationCard.tsx 为预先存在的错误，非本次变更引入"
+    },
+    {
+      "command": "gitnexus_detect_changes",
+      "result": "passed",
+      "notes": "检测到 56 个 changed symbols, 15 个 affected processes，影响范围集中在 login/register/createRole/createDept/updateRole/updateDept 等预期流程内，不波及 JwtAuthenticationFilter 和 ApprovalService 核心逻辑"
+    },
+    {
+      "command": "ls backend/src/main/resources/migration/",
+      "result": "passed",
+      "notes": "migration 目录已创建，包含 migrate_sys_permission_to_menu.sql（83 行，三步迁移流程）"
+    },
+    {
+      "command": "wc -l backend/src/main/resources/migration/migrate_sys_permission_to_menu.sql",
+      "result": "passed",
+      "notes": "迁移脚本 83 行，包含完整三步流程：Step 1 父菜单创建(INSERT ON DUPLICATE KEY)、Step 2 INSERT SELECT 数据迁移(ON DUPLICATE KEY UPDATE)、Step 3 统计验证 SELECT"
+    },
+    {
+      "command": "grep -c \"sys_permission 已废弃\" backend/src/main/resources/schema.sql",
+      "result": "passed",
+      "notes": "schema.sql 末尾已追加 AC-2 废弃注释说明"
+    },
+    {
+      "command": "grep -c \"INSERT INTO sys_menu\" backend/src/main/resources/migration/migrate_sys_permission_to_menu.sql",
+      "result": "passed",
+      "notes": "迁移脚本包含 2 处 INSERT（父菜单创建 + 批量迁移），使用 ON DUPLICATE KEY UPDATE 保证幂等"
+    }
+  ],
+  "verification_results": [
+    "Phase 1 (DDL): schema.sql 具备完整的 sys_menu/sys_role_menu/sys_role_dept 三表 + ALTER sys_dept (ancestors/email) + ALTER sys_role (data_scope/menu_check_strictly/dept_check_strictly) + seed 数据 (21 个菜单节点 + SUPER_ADMIN 绑定) + workflow 种子数据 (workflow:definition:list/query/edit)，使用 IF NOT EXISTS + information_schema.columns 保证幂等",
+    "Phase 2 (Entity): Dept.java status Integer、deptCode/ancestors/deleted(@TableLogic)；Role.java sortOrder/dataScope/menuCheckStrictly/deptCheckStrictly；SysMenu.java @TableLogic + children(@TableField(exist=false))；SysRoleMenu.java；SysRoleDept.java — 所有 Entity 与 schema.sql 列对齐",
+    "Phase 3 (Mapper): SysMenuMapper (selectPermsByUserId/selectMenuTreeByUserId/selectAllPerms)、SysRoleMenuMapper (deleteByRoleId/selectMenuIdsByRoleId/insertBatch)、SysRoleDeptMapper (deleteByRoleId/selectDeptIdsByRoleId/insertBatch) — 三表映射完整",
+    "Phase 4 (LoginUser): security/LoginUser.java 实现 UserDetails，携带 userId/deptId/tenantId/roles/permissions/authorities，getAuthorities() 返回完整 GrantedAuthority 集合",
+    "Phase 5 (UserDetailsServiceImpl): loadUserByUsername 返回 LoginUser（非 Spring User），权限从 sys_menu.perms 加载，查询条件包含 deleted=0 过滤",
+    "Phase 6 (SecurityService): @Service('ss') SecurityService 实现 hasPermi/hasRole/hasAnyPermi/hasAllPermi，SUPER_ADMIN 角色短路仅检查 'SUPER_ADMIN'，支持通配符（*:*:*、system:*:*）",
+    "Phase 7 (SysMenuService): 新建菜单 CRUD Service，包含 selectMenuList/buildMenuTree/selectMenuTreeByUserId/insertMenu/updateMenu/deleteMenu/checkPermsUnique — 使用显式 setter，无 Hutool 依赖",
+    "Phase 8 (Controller): 新建 SysMenuController (/api/menus/**)；RoleController 重命名为 RoleManagementController；UserManagementController/DeptController 增删改接口补 @PreAuthorize(@ss.hasPermi)；WorkflowDefinitionController 补 @PreAuthorize(@ss.hasPermi('workflow:definition:edit') or hasAnyRole)",
+    "Phase 9 (AuthUser): 新建 AuthUserDTO (userId/deptId/tenantId/username/realName/roles/permissions)；AuthController 新增 GET /api/auth/me 端点",
+    "Phase 10 (SecurityConfig): @EnableMethodSecurity 已启用，/menus/current 通过 authenticated() 路径保护",
+    "Phase 11-14 (前端): permissionHooks.ts import 路径修复 (@/hooks/useAuth → @/app/context/AuthContext)；新建 api/menu.ts 菜单管理 API 模块；新建 pages/system/MenuManagement.tsx 菜单管理页面；router 新增 /system/menus 路由；AppLayout 已具备动态菜单功能（fetch /menus/current + convertMenuTreeToNavGroups + 静态 NAV_GROUPS fallback）",
+    "RoleService/DeptService 显式 setter 化：完全移除 Hutool BeanUtil 依赖，改用直接 setter 赋值，支持 IDE 重构检查和编译期类型安全",
+    "JwtAuthenticationFilter 认证链：Authentication.getPrincipal() 实际返回 LoginUser（UserDetailsServiceImpl 已改造），SecurityService.getLoginUser() 使用 instanceof LoginUser 安全转型，无需额外修改",
+    "AC-2: 迁移脚本已创建 backend/src/main/resources/migration/migrate_sys_permission_to_menu.sql（83 行，三步流程：父菜单创建→INSERT SELECT ON DUPLICATE KEY UPDATE→验证统计）",
+    "AC-2: schema.sql 末尾已追加废弃注释（第 634-645 行），说明 sys_permission 已废弃且所有新权限编码必须定义在 sys_menu.perms 中",
+    "AC-2: 迁移逻辑覆盖：permission_code→perms, permission_name→[旧]前缀→menu_name, parent_id=1000 指向旧权限系统父菜单, status/visible 等字段映射完整",
+    "AC-2: 幂等性保证：INSERT ... SELECT ... ON DUPLICATE KEY UPDATE + 固定父菜单 ID=1000（不与现有 1-24 冲突）"
+  ],
+  "minions_execution": {
+    "adjudication_file_read": true,
+    "selected_source": "draft_and_refine_combined",
+    "write_intent_preserved": true,
+    "degradation_blocked": false
+  },
+  "residual_risks": [
+    "前端动态菜单依赖后端 /api/menus/current 接口启动时返回数据，若数据库未初始化 sys_menu seed 数据，侧边栏将 fallback 到静态 NAV_GROUPS（保底可用但缺少系统管理入口）",
+    "前端 MenuManagement.tsx 页面编辑功能为占位 toast（toast.info('编辑功能开发中')），需后续迭代完善表单交互",
+    "前端 TypeScript 存在预先存在的类型错误（GraphifyKnowledgeGraph.tsx 23 errors, DepreciationCard.tsx 29 errors），非本次变更引入，需独立修复",
+    "RoleService 删除 Hutool 依赖后，若存在其他文件直接调用 RoleService 同一包内的私有工具方法（getStrProp/getIntProp/getLongProp），这些方法已被移除——经 grep 确认无外部引用",
+    "sys_menu.perms 字段使用 UNIQUE KEY uk_menu_perms 约束，多个按钮共享同一权限标识符（如 system:user:query）时会冲突——当前 seed 数据无此场景，但若未来业务需要需移除 UNIQUE 约束",
+    "审批流程（ApprovalService）回归测试为人工步骤（AC-8），需在真实环境启动后手工验证工作流定义/审批链完整性",
+    "WorkflowDefinitionController 新增 @ss.hasPermi('workflow:definition:edit') 依赖于 schema.sql 中的 workflow 种子数据（菜单节点 22-24 + SUPER_ADMIN 绑定），若数据库未同步执行，workflow 写接口将返回 403",
+    "AC-2 迁移脚本仅在 schema.sql 中追加了废弃注释。迁移脚本需在 DBA 指导下在目标数据库手动执行。（脚本本身幂等，可重复执行。）",
+    "sys_permission 表仍保留。若后续确认无业务依赖 sys_permission，可在独立变更中 DROP TABLE。"
+  ]
+}

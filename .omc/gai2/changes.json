@@ -1,0 +1,32 @@
+{
+  "changed_files": [
+    "frontend/src/pages/disposal/AssetTransferFormPage.tsx",
+    "frontend/src/pages/disposal/AssetScrapFormPage.tsx"
+  ],
+  "added_files": [
+    "frontend/src/components/AssetPickerModal.tsx"
+  ],
+  "commands_run": [
+    {
+      "command": "npm run build",
+      "result": "passed",
+      "notes": "3353 modules transformed, build completed in 4.79s, no errors"
+    }
+  ],
+  "verification_results": [
+    "npm run build 通过，无类型错误",
+    "AssetPickerModal 被正确打包为独立 chunk (AssetPickerModal-fwVfSYUB.js 5.17 kB)",
+    "AssetTransferFormPage 和 AssetScrapFormPage 均成功编译为独立 chunk"
+  ],
+  "minions_execution": {
+    "adjudication_file_read": false,
+    "selected_source": "none",
+    "write_intent_preserved": true,
+    "degradation_blocked": false
+  },
+  "residual_risks": [
+    "AssetPickerModal 使用 pageSize: 200 上限查询全部资产，如果有超过 200 条资产记录需要调整分页参数",
+    "ScrapPage 的 onSelectionChange 会完全替换 selectedAssets（而不是增量添加），与原有 addAsset 的去重行为一致",
+    "ScrapPage 的 useCallback 依赖中不再有 addAsset，handleSaveDraft 不受影响"
+  ]
+}

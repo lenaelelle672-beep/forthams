@@ -1,0 +1,30 @@
+{
+  "classification": "Medium",
+  "mcp_tools": [],
+  "scope": [
+    "frontend/src/pages/audit/AuditDashboardPage.tsx",
+    "frontend/src/api/audit.ts",
+    "frontend/src/pages/system/DeptManagement.tsx",
+    "backend/src/main/java/com/ams/service/AuditService.java",
+    "backend/src/main/java/com/ams/controller/AuditDashboardController.java",
+    "backend/src/main/java/com/ams/service/AuditDashboardService.java"
+  ],
+  "risks": [
+    "审计统计无数据：前端 getAuditStats 调用传参 startTime/endTime 正确但 stats 为空，需逐层排查后端 SQL 查询是否返回数据、数据映射字段是否匹配 AuditStats 接口定义",
+    "部门管理树形虚拟滚动：从平铺表格改为真正树形+虚拟滚动需引入第三方库（如 @tanstack/react-virtual），中高风险在于正确实现树展开/折叠与虚拟化兼容",
+    "两个任务并行无依赖冲突，但需注意工作范围隔离，避免单次改动过多文件"
+  ],
+  "dependencies": [
+    "getAuditStats 后端 /audit-logs/stats 接口返回数据的字段名是否与前端 AuditStats 类型完全对齐（trendData/typeDistribution/topOperators/totalCount）",
+    "部门管理树形展示需确认 getDeptTree 返回的 children 字段结构完整性",
+    "虚拟滚动可能需要安装 @tanstack/react-virtual 或 react-window 等依赖"
+  ],
+  "recommended_phases": [
+    "audit",
+    "builder"
+  ],
+  "acceptance_hints": [
+    "审计页面操作趋势 SVG 折线图展示近7天数据，环形图展示操作类型分布百分比",
+    "部门管理页面展示为可展开/折叠的树形结构，大量部门数据下页面不卡顿、滚动流畅"
+  ]
+}

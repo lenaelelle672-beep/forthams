@@ -1,0 +1,89 @@
+{
+  "verdict": "PASS",
+  "overall_status": "pass",
+  "gap_fingerprint": null,
+  "missing_criteria": [],
+  "evidence_map": {
+    "plan_login_first": [
+      "workcard.json: acceptance_checks[plan_login_first] 明确要求优先定位登录 500，并采集后端异常栈、数据库用户部门/角色/权限证据。",
+      "triage.json: acceptance_hints 明确下一步优先定位 /api/auth/login 500，并列出后端异常栈、数据库用户部门/角色/权限证据。",
+      "audit.json: test_surface 与 builder_notes 明确先触发 POST /api/auth/login、保存请求/响应/异常栈/SQL 日志，并先复现真实 500。"
+    ],
+    "safe_fix_strategy": [
+      "workcard.json: acceptance_checks[safe_fix_strategy] 明确优先采用数据兼容/初始化修复，必要时才做受控超管 fallback，避免粗暴放开权限。",
+      "debate.json: recommended_option 选择方案A：先查证再决策，优先数据兼容与初始化修复；方案C 被拒绝为高安全风险。",
+      "audit.json: technical_constraints 与 builder_notes 明确不得扩大免认证面、不得跳过 TenantContext.requireTenantId、不得给所有用户 SUPER_ADMIN。"
+    ],
+    "workflow_followup_plan": [
+      "workcard.json: acceptance_checks[workflow_followup_plan] 明确登录通过后验证 /workflows 保存链路，覆盖前端 payload、接口路径、后端 service、权限/数据范围、数据库写入与刷新回显。",
+      "triage.json: scope/dependencies/acceptance_hints 覆盖 /workflows、前端 payload、后端接口/service、数据库写入与刷新回显。",
+      "audit.json: current_state 定位 workflowApi.saveDraft -> PUT /workflows/{businessType}/draft -> WorkflowDefinitionController.saveDraft -> WorkflowDefinitionService.saveDraft；test_surface 明确 API 级验证与数据库回显检查。"
+    ],
+    "regression_plan": [
+      "workcard.json: acceptance_checks[regression_plan] 明确最终回归包含后端测试、前端测试、前端 build、浏览器冒烟及至少一个流程保存回归测试。",
+      "triage.json: dependencies 与 acceptance_hints 列出后端 mvn test、前端 npm test、前端 build、浏览器端冒烟验证。",
+      "audit.json: test_surface 列出 mvn test、npm test、npm run build、真实后端 Playwright/手动验证、工作流 API 级验证与安全回归。"
+    ]
+  },
+  "repair_recommendation": "none",
+  "directive_summary": "本次产物是 planning 收口评审：暂停继续改代码，下一步先定位 /api/auth/login 500 的真实异常与数据证据；登录通过后再验证 /workflows 新建流程保存链路，并按完整回归集合闭环。",
+  "affected_scope": [
+    ".omc/gai2/sessions/20260527-login-workflows-plan/workcard.json",
+    ".omc/gai2/sessions/20260527-login-workflows-plan/triage.json",
+    ".omc/gai2/sessions/20260527-login-workflows-plan/audit.json",
+    ".omc/gai2/sessions/20260527-login-workflows-plan/debate.json",
+    ".omc/gai2/sessions/20260527-login-workflows-plan/review.json"
+  ],
+  "commands_checked": [
+    {
+      "command": "未运行测试命令",
+      "result": "not_run",
+      "notes": "本轮按指令只评审 planning 产物；audit.json 也声明本次审计未重新运行测试。"
+    }
+  ],
+  "acceptance_status": [
+    {
+      "criterion": "plan_login_first",
+      "status": "PASS",
+      "evidence": [
+        "workcard.json、triage.json、audit.json 均明确 /api/auth/login 500 优先级和需采集证据。"
+      ]
+    },
+    {
+      "criterion": "safe_fix_strategy",
+      "status": "PASS",
+      "evidence": [
+        "debate.json 推荐方案A并拒绝方案C；audit.json 明确不得放开权限或绕过租户。"
+      ]
+    },
+    {
+      "criterion": "workflow_followup_plan",
+      "status": "PASS",
+      "evidence": [
+        "workcard.json、triage.json、audit.json 覆盖 /workflows 保存链路从前端 payload 到数据库回显。"
+      ]
+    },
+    {
+      "criterion": "regression_plan",
+      "status": "PASS",
+      "evidence": [
+        "workcard.json 与 audit.json 列出后端测试、前端测试、build、浏览器冒烟、流程保存回归和安全回归。"
+      ]
+    }
+  ],
+  "minions_review": {
+    "draft_checked": false,
+    "refine_checked": false,
+    "adjudication_checked": false,
+    "real_dual_agent_chain": false,
+    "write_degradation_guard_passed": true,
+    "sonnet_fallback_absent": true,
+    "notes": "artifact_dir 只包含 workcard.json、triage.json、audit.json、debate.json；本 workcard 标记 phase=planning 且 implementation_intent=false，未发现实现类 MINIONS 产物声明，因此不要求 draft/refine/adjudication 链路。"
+  },
+  "findings": [],
+  "residual_risks": [
+    "尚未采集 /api/auth/login 500 的真实异常栈与数据库证据，后续实现前仍存在根因不确定性。",
+    "当前计划本身未运行后端、前端或浏览器测试；测试需在后续修复/验证阶段执行。",
+    "工作区已有大量未提交改动，后续 builder 必须避免混入无关修复并按 AGENTS.md 做 GitNexus 影响分析。"
+  ]
+}

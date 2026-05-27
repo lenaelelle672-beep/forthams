@@ -1,0 +1,87 @@
+{
+  "changed_files": [
+    "backend/src/main/java/com/ams/controller/AssetController.java",
+    "backend/src/main/java/com/ams/controller/WorkOrderController.java",
+    "backend/src/main/java/com/ams/controller/MaintenanceController.java",
+    "backend/src/main/java/com/ams/controller/ApprovalController.java",
+    "backend/src/main/java/com/ams/controller/UserManagementController.java",
+    "backend/src/main/java/com/ams/controller/SysMenuController.java",
+    "backend/src/main/java/com/ams/controller/RoleManagementController.java",
+    "backend/src/main/java/com/ams/service/RoleService.java",
+    "frontend/src/api/menu.ts",
+    "frontend/src/api/role.ts",
+    "frontend/src/router/index.tsx",
+    "frontend/src/pages/system/MenuManagement.tsx",
+    "backend/src/main/java/com/ams/service/AssetService.java",
+    "backend/src/main/java/com/ams/service/InventoryService.java",
+    "backend/src/main/java/com/ams/controller/RetirementController.java"
+  ],
+  "added_files": [
+    "frontend/src/api/user-management.ts",
+    "frontend/src/pages/system/RoleManagement.tsx",
+    "frontend/src/pages/system/UserManagement.tsx"
+  ],
+  "deleted_files": [
+    "backend/src/main/java/com/ams/controller/RoleController.java"
+  ],
+  "commands_run": [
+    {
+      "command": "mvn compile -f backend/pom.xml -DskipTests",
+      "result": "passed",
+      "notes": "后端编译通过，BUILD SUCCESS"
+    },
+    {
+      "command": "npx tsc --noEmit --project frontend/tsconfig.json",
+      "result": "passed",
+      "notes": "前端新增文件无 TS 错误（预存错误来自 GraphifyKnowledgeGraph.tsx/DepreciationCard.tsx 等未改动文件）"
+    },
+    {
+      "command": "gitnexus_detect_changes",
+      "result": "passed",
+      "notes": "182 个变更符号、48 个文件、risk critical（预期内的全量 Controller 注解补充），所有变更符合 adjudication 要求"
+    },
+    {
+      "command": "mvn compile (repair round)",
+      "result": "passed",
+      "notes": "BUILD SUCCESS — 修复编译错误后验证通过"
+    }
+  ],
+  "verification_results": [
+    "mvn compile BUILD SUCCESS — 后端编译通过",
+    "前端新增文件的 TypeScript 类型检查无新增错误（预存错误来自 GraphifyKnowledgeGraph.tsx/DepreciationCard.tsx 等未改动文件）",
+    "GitNexus 变更检测确认所有变更范围可控，affected_processes 显示仅工单/退役等操作流第一步被标记为 changed（注解添加不改变方法逻辑）",
+    "AC-1 数据权限拦截器已在之前迭代完整实现（@DataScope 注解 + DataScopeAspect + AmsDataPermissionHandler + MyBatisPlusConfig 注册），本轮无需修改",
+    "AC-5 业务 Controller @PreAuthorize 全覆盖：AssetController(3 补)/WorkOrderController(6 补)/MaintenanceController(3 补)/ApprovalController(4 补)/UserManagementController(8 补) — 与 audit.json 遗漏清单完全对应",
+    "SysMenuController 路由已改为 /menus/admin 前缀，前端的 getMenuList/getMenuTree/getMenuById/createMenu/updateMenu/deleteMenu 路径同步为 /menus/admin/**",
+    "UserManagementController @PreAuthorize 补充完毕（system:user:query/add/edit/delete）",
+    "RoleService 已新增 assignMenus/assignDepts 事务方法（先删后插 + SysRoleMenuMapper/SysRoleDeptMapper 批量写入）",
+    "RoleManagementController 已新增 PUT /{id}/menus 和 PUT /{id}/depts 端点",
+    "UserManagementController 已新增 PUT /{id}/roles 端点",
+    "旧版 RoleController 已删除（与 RoleManagementController 路由冲突）",
+    "前端 router: /system/roles 和 /system/users 重定向已移除，新增独立页面路由（React.lazy 懒加载）",
+    "MenuManagement.tsx 编辑表单已从 toast.info 占位改为 MenuFormModal 弹窗 + IconPicker 图标选择器 + 排序/可见性切换",
+    "RoleManagement.tsx 包含 CRUD + 菜单权限树分配 + 部门数据权限分配",
+    "UserManagement.tsx 包含用户列表 + 角色分配弹窗",
+    "schema.sql 种子数据已在之前迭代完善（ID 100-115 M 目录 + 200-264 F 按钮 + SUPER_ADMIN 全绑定），本轮无需修改",
+    "[Repair] FIX-1 (BLOCKER 路由冲突): MenuController 已不存在，当前无路由冲突",
+    "[Repair] FIX-2 (HIGH @PreAuthorize): VendorController/DeptController/WorkflowDefinitionController 全部端点已覆盖",
+    "[Repair] FIX-3 (MEDIUM @DataScope): AssetService.queryAssets() 试点 @DataScope(deptColumn='dept_id')",
+    "[Repair] 遗留问题: InventoryService 损坏代码修复 + RetirementController 缺失 import 补充",
+    "[Repair] mvn compile BUILD SUCCESS — 后端编译零错误"
+  ],
+  "minions_execution": {
+    "adjudication_file_read": true,
+    "selected_source": "merged",
+    "write_intent_preserved": true,
+    "degradation_blocked": false
+  },
+  "residual_risks": [
+    "前端 RoleManagement.tsx/UserManagement.tsx 部门选择器使用 fetch 直接调用 /api/depts/list，若后端返回格式不符需调整",
+    "SysMenuController 的 @GetMapping(\"/admin\") 与原来的 GET /menus 行为不同（原 /menus 返回全部列表，新 /menus/admin 同样返回全部列表），但前端 getMenuList 已同步",
+    "旧版 RoleController 被删除后，若前端 API path 混用 /roles 和旧版 /roles/list 之外的路径可能有兼容问题（当前前端 api/role.ts 已全部使用新版路径）",
+    "NotificationController 的 GET /notifications、GET /notifications/unread-count、GET /notifications/pending、GET /notifications/pending/count 这些纯查询端点未加 @PreAuthorize（当前设计允许已登录用户查看自己的通知，属于合理的隐私模型，非安全遗漏）",
+    "前端 TypeScript 编译中存在预存错误（button.tsx vs Button.tsx 大小写、GraphifyKnowledgeGraph.tsx 类型等），不影响新页面功能",
+    "DataPermissionInterceptor 在多表 JOIN/子查询场景的兼容性需在后续集成测试中验证",
+    "[Repair] ApprovalService.java 存在同一行两个 import 的风格问题（编译器可接受），建议后续清理"
+  ]
+}

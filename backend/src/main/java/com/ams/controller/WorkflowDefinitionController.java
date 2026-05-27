@@ -28,11 +28,13 @@ public class WorkflowDefinitionController {
 
     private final WorkflowDefinitionService workflowDefinitionService;
 
+    @PreAuthorize("@ss.hasPermi('workflow:definition:query')")
     @GetMapping
     public Result<List<WorkflowDefinitionDTO>> list() {
         return Result.success(workflowDefinitionService.listDefinitions());
     }
 
+    @PreAuthorize("@ss.hasPermi('workflow:definition:query')")
     @GetMapping("/{businessType}")
     public Result<WorkflowDefinitionDTO> get(@PathVariable String businessType) {
         return Result.success(workflowDefinitionService.getDefinition(businessType));

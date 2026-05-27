@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -38,6 +39,7 @@ public class NotificationController {
      * 分页查询通知列表。
      * 从独立 notification 表查询，支持按 type/category 过滤。
      */
+    @PreAuthorize("@ss.hasPermi('notification:query')")
     @GetMapping
     public Result<Map<String, Object>> list(
             @RequestParam(required = false) String category,
@@ -63,6 +65,7 @@ public class NotificationController {
     /**
      * 获取未读通知数量（新端点）。
      */
+    @PreAuthorize("@ss.hasPermi('notification:query')")
     @GetMapping("/unread-count")
     public Result<Long> unreadCount() {
         Long userId = getCurrentUserId();
@@ -72,6 +75,7 @@ public class NotificationController {
     /**
      * 兼容旧端点：获取待处理通知列表（从审批流程派生）。
      */
+    @PreAuthorize("@ss.hasPermi('notification:query')")
     @GetMapping("/pending")
     public Result<Map<String, Object>> pending(
             @RequestParam(required = false) String type) {
@@ -91,6 +95,7 @@ public class NotificationController {
     /**
      * 兼容旧端点：获取待处理通知数量。
      */
+    @PreAuthorize("@ss.hasPermi('notification:query')")
     @GetMapping("/pending/count")
     public Result<Long> pendingCount() {
         Long userId = getCurrentUserId();
@@ -101,6 +106,7 @@ public class NotificationController {
     /**
      * 标记单条通知为已读。
      */
+    @PreAuthorize("@ss.hasPermi('notification:read')")
     @PutMapping("/{id}/read")
     public Result<Void> markAsRead(@PathVariable Long id) {
         Long userId = getCurrentUserId();
@@ -111,6 +117,7 @@ public class NotificationController {
     /**
      * 全部标记为已读。
      */
+    @PreAuthorize("@ss.hasPermi('notification:read')")
     @PutMapping("/read-all")
     public Result<Void> markAllAsRead() {
         Long userId = getCurrentUserId();
@@ -121,6 +128,7 @@ public class NotificationController {
     /**
      * 删除通知。
      */
+    @PreAuthorize("@ss.hasPermi('notification:delete')")
     @DeleteMapping("/{id}")
     public Result<Void> delete(@PathVariable Long id) {
         Long userId = getCurrentUserId();

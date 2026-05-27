@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "agent": "gai2-orchestrator",
+  "decision": "use_refine",
+  "selected_source": "refine.json (GLM-5.1)",
+  "rationale": "Refiner 正确识别了 Draft 的关键缺陷：缺少 DataScopeAspect AOP 切面、@PreAuthorize 覆盖范围需先 grep 确认、权限编码需统一、路由冲突需处理、菜单树 API 需验证。Draft 框架合理，但需采纳 10 项 improvements 修正后执行。",
+  "execution_groups": [
+    {
+      "group": 1,
+      "label": "AC-1 DataPermissionInterceptor + AOP",
+      "priority": "P1-阻塞",
+      "write_actions": ["WA-01", "WA-02", "WA-03", "WA-04"],
+      "improvements_to_apply": ["IMP-01: 补充 DataScopeAspect.java @Aspect + @Around 实现", "IMP-09: 确保三层协作完整（注解+AOP+ThreadLocal+Interceptor）"],
+      "verification": ["mvn compile -DskipTests", "grep -rl 'DataPermissionInterceptor' backend/src/"]
+    },
+    {
+      "group": 2,
+      "label": "AC-5 @PreAuthorize 补全 + schema.sql 种子数据",
+      "priority": "P2-高",
+      "write_actions": ["WA-09", "WA-12", "WA-13", "WA-14", "WA-16", "WA-17", "WA-18", "WA-19", "WA-20", "WA-21", "WA-23", "WA-24", "WA-25"],
+      "already_done": ["SysMenuController", "UserManagementController", "DeptController", "RoleManagementController", "WorkflowDefinitionController", "ApprovalController (4)", "AssetController (3)", "WorkOrderController (7)", "MaintenanceController (3)", "RetirementController (3)", "VendorController (3)", "DepreciationController (2)", "AssetCategoryController (7)"],
+      "improvements_to_apply": ["IMP-02: 先 grep 每个 Controller 现有 @PreAuthorize，仅补充缺失端点", "IMP-03: 统一权限编码为 module:action 格式，schema.sql 种子数据完全匹配", "IMP-04: 补充 CallbackController @PreAuthorize", "IMP-08: schema.sql 新 ID 避开 1-24 和 1000+ 范围"],
+      "verification": ["mvn compile -DskipTests"]
+    },
+    {
+      "group": 3,
+      "label": "AC-2/3 后端 API（角色/用户权限分配）",
+      "priority": "P2-中",
+      "write_actions": ["WA-05", "WA-06", "WA-07", "WA-08"],
+      "improvements_to_apply": ["无特殊改进，Draft 方案可直接执行"],
+      "verification": ["mvn compile -DskipTests", "grep -c 'menus' backend/src/main/java/com/ams/controller/RoleManagementController.java", "grep -c 'depts' backend/src/main/java/com/ams/controller/RoleManagementController.java", "grep -c 'roles' backend/src/main/java/com/ams/controller/UserManagementController.java"]
+    },
+    {
+      "group": 4,
+      "label": "AC-2/3/4 前端页面",
+      "priority": "P2-中",
+      "write_actions": ["WA-26", "WA-27", "WA-28", "WA-29", "WA-30", "WA-31"],
+      "improvements_to_apply": ["IMP-05: 先读取 SysMenuController treeselect API 验证响应格式", "IMP-06: 确认 icon 字段存储格式", "IMP-07: 移除 /system/roles → /settings 和 /system/users → /settings/users 重定向后再注册新路由"],
+      "verification": ["npx tsc --noEmit", "grep -l -e 'RoleManagementPage' -e 'UserManagementPage' frontend/src/router/index.tsx"]
+    }
+  ],
+  "rejected_actions": ["WA-32: read_only 操作非真实 write_action，降级为 verification_plan 检查项"],
+  "write_action_guard": {
+    "write_intent_preserved": true,
+    "degradation_detected": false,
+    "guard_notes": "所有 Draft 写操作经 Refiner 校验后保留，无退化为只读。新增 DataScopeAspect (IMP-01) 和 CallbackController @PreAuthorize (IMP-04) 补全方案。"
+  },
+  "fallback_labels": [],
+  "builder_instructions": [
+    "严格按 Group-1 → Group-2 → Group-3 → Group-4 顺序执行，每组完成后运行验证命令",
+    "Group-1: 先实现 DataPermissionInterceptor（参考 RuoYi DataScope 模式）+ DataScopeAspect AOP 切面，注册到 MyBatisPlusConfig",
+    "Group-2: 先 grep 每个目标 Controller 的现有 @PreAuthorize 数量，仅补充缺失的。统一权限编码为 module:action 格式。schema.sql 新增业务权限节点 ID 从 200 起（避开 1-24 和 1000+），INSERT ON DUPLICATE KEY UPDATE",
+    "Group-3: 在 RoleManagementController 新增 PUT /roles/{id}/menus 和 PUT /roles/{id}/depts，在 UserManagementController 新增 PUT /user-management/{id}/roles",
+    "Group-4: 前端先移除 router 中的 /system/roles → /settings 和 /system/users → /settings/users 重定向，再注册独立页面路由",
+    "每步完成后运行验证命令确认无编译/类型错误",
+    "所有变更写入 .omc/gai2/sessions/20260526-mvp-enhance-v2/changes.json"
+  ],
+  "reviewer_checks": [
+    "AC-1: glob backend/src/main/java/com/ams/**/Data*.java 返回 ≥4 个文件（DataScope.java + DataPermissionContextHolder.java + DataPermissionInterceptor.java + DataScopeAspect.java）",
+    "AC-1: MyBatisPlusConfig.java 包含 addInnerInterceptor(DataPermissionInterceptor)",
+    "AC-5: grep -c '@PreAuthorize' 在全部 20+ Controller 中 > 80 个注解",
+    "AC-2: RoleManagementController.java 总行数 > 100 且包含 menus/depts 端点",
+    "AC-2: frontend/src/pages/system/RoleManagement.tsx 存在",
+    "AC-3: frontend/src/pages/system/UserManagement.tsx 存在",
+    "AC-4: MenuManagement.tsx 编辑功能非 toast 占位，含 MenuFormModal 组件",
+    "AC-6: 无变化，仅确认迁移脚本仍存在"
+  ]
+}

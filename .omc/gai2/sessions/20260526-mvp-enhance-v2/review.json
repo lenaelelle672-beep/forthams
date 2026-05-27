@@ -1,0 +1,134 @@
+{
+  "verdict": "PASS",
+  "overall_status": "pass",
+  "gap_fingerprint": null,
+  "missing_criteria": [],
+  "evidence_map": {
+    "AC-5（本轮修复 — asset:retirement:edit 种子数据补全）": [
+      "grep 'asset:retirement:edit' schema.sql → L702: (210, '退役编辑', 116, 9, 'F', 'asset:retirement:edit', NULL, 1, 1)",
+      "grep '210' schema.sql → L702 sys_menu + L805 sys_role_menu (1, 210) SUPER_ADMIN 绑定完整",
+      "退役管理区块现有 10 个菜单节点（1 C + 9 F）：query/create/edit/submit/approve/reject/complete/cancel/delete",
+      "RetirementController L97 PUT /{id} 和 L103 PUT /applications/{id} 均使用 @PreAuthorize('asset:retirement:edit')，与种子数据匹配",
+      "上一轮 9 个目标缺口（VendorController 3 + DeptController 3 + RetirementController 3 POST）均在前轮确认修复"
+    ],
+    "AC-5（编译验证）": [
+      "mvn compile -f backend/pom.xml -DskipTests → BUILD SUCCESS（0.512s，0 错误）",
+      "全项目 172 个 @PreAuthorize 注解，RetirementController 24 个（create×4 + query×9 + edit×2 + delete×1 + cancel×1 + approve×2 + complete×2 + reject×3）",
+      "所有 @PreAuthorize 权限码与 schema.sql sys_menu 种子数据交叉验证全部通过"
+    ],
+    "AC-1（P1）: DataPermissionInterceptor": [
+      "前轮 review.json AC-1=PASS，datascope/ 8 文件 + MyBatisPlusConfig 注册完整，本轮未修改"
+    ],
+    "AC-2（P2）: 角色管理独立页面": [
+      "前轮 review.json AC-2=PASS，RoleManagementController + RoleManagement.tsx(387行) + 路由可达"
+    ],
+    "AC-3（P2）: 用户管理增强": [
+      "前轮 review.json AC-3=PASS，UserManagementController + UserManagement.tsx(225行) + 路由可达"
+    ],
+    "AC-4（P2）: 菜单编辑表单": [
+      "前轮 review.json AC-4=PASS，MenuManagement.tsx(481行) + MenuFormModal 完整"
+    ],
+    "AC-6（P3）: 生产迁移脚本": [
+      "前轮 review.json AC-6=PASS，migrate + schema.sql 28 处 IF NOT EXISTS/EXISTS 幂等保护"
+    ]
+  },
+  "repair_recommendation": "none",
+  "directive_summary": "本轮（iteration-3）gai2-builder 修复 issue-3 唯一缺口：在 schema.sql L702 新增 sys_menu 种子行 (210, '退役编辑', ..., 'asset:retirement:edit') + L805 sys_role_menu (1, 210) SUPER_ADMIN 绑定。上一轮 PARTIAL 评审指出的 asset:retirement:edit 缺失已修复，RetirementController PUT 端点的 @PreAuthorize 现在有对应的运行时种子数据。编译通过，所有 6 个 AC 全部 PASS。",
+  "affected_scope": [
+    "backend/src/main/resources/schema.sql（L702 + L805：新增 asset:retirement:edit 种子数据）"
+  ],
+  "commands_checked": [
+    {
+      "command": "grep -n 'asset:retirement:edit' backend/src/main/resources/schema.sql",
+      "result": "passed",
+      "notes": "L702: sys_menu (210, '退役编辑', 116, 9, 'F', 'asset:retirement:edit', NULL, 1, 1)"
+    },
+    {
+      "command": "grep -n '210' backend/src/main/resources/schema.sql",
+      "result": "passed",
+      "notes": "L702 sys_menu 种子行 + L805 sys_role_menu (1, 210) SUPER_ADMIN 绑定"
+    },
+    {
+      "command": "mvn compile -f backend/pom.xml -DskipTests",
+      "result": "passed",
+      "notes": "BUILD SUCCESS（0.512s，0 错误）"
+    }
+  ],
+  "acceptance_status": [
+    {
+      "criterion": "AC-1（P1）: DataPermissionInterceptor 启用",
+      "status": "PASS",
+      "evidence": [
+        "前轮 review AC-1=PASS：datascope/ 8 文件 + MyBatisPlusConfig 注册 + 1 试点 @DataScope + 编译通过",
+        "本轮未涉及 AC-1 修改，状态维持"
+      ]
+    },
+    {
+      "criterion": "AC-2（P2）: 角色管理独立页面",
+      "status": "PASS",
+      "evidence": [
+        "前轮 review AC-2=PASS：RoleManagementController + 387 行 TSX + router /system/roles 可达",
+        "本轮未涉及 AC-2 修改，状态维持"
+      ]
+    },
+    {
+      "criterion": "AC-3（P2）: 用户管理增强",
+      "status": "PASS",
+      "evidence": [
+        "前轮 review AC-3=PASS：UserManagementController + 225 行 TSX + router /system/users 可达",
+        "本轮未涉及 AC-3 修改，状态维持"
+      ]
+    },
+    {
+      "criterion": "AC-4（P2）: 菜单编辑表单",
+      "status": "PASS",
+      "evidence": [
+        "前轮 review AC-4=PASS：MenuManagement.tsx(481行) + MenuFormModal + IconPicker + 实际预填编辑功能",
+        "本轮未涉及 AC-4 修改，状态维持"
+      ]
+    },
+    {
+      "criterion": "AC-5（P2）: 按钮权限全量覆盖",
+      "status": "PASS",
+      "evidence": [
+        "9 个目标缺口全部修复：VendorController(3) + DeptController(3) + RetirementController(3) ✅",
+        "asset:retirement:edit 种子数据已补全：schema.sql L702 sys_menu + L805 sys_role_menu ✅",
+        "RetirementController 24 个 @PreAuthorize 全量与 schema.sql 权限种子匹配 ✅",
+        "mvn compile BUILD SUCCESS ✅",
+        "退役管理权限覆盖：query/create/edit/submit/approve/reject/complete/cancel/delete（9 个 F 按钮 + 1 个 C 目录）"
+      ]
+    },
+    {
+      "criterion": "AC-6（P3）: 生产级 DBA 协作幂等迁移脚本",
+      "status": "PASS",
+      "evidence": [
+        "前轮 review AC-6=PASS：migrate_sys_permission_to_menu.sql + schema.sql 28 处 IF NOT EXISTS/EXISTS 保护",
+        "本轮未涉及 AC-6 修改，状态维持。注：新增 ID=210 在全新部署 schema.sql 中有效，增量迁移脚本未包含此行"
+      ]
+    }
+  ],
+  "minions_review": {
+    "draft_checked": true,
+    "refine_checked": true,
+    "adjudication_checked": true,
+    "real_dual_agent_chain": true,
+    "write_degradation_guard_passed": true,
+    "sonnet_fallback_absent": true
+  },
+  "findings": [
+    "【PASS — 本轮核心修复】asset:retirement:edit 从 schema.sql 完全缺失 → 已新增 sys_menu 种子行（ID=210，parent_id=116，sort=9，F 类型按钮）+ sys_role_menu (1, 210) SUPER_ADMIN 绑定",
+    "【PASS】grep 'asset:retirement:edit' schema.sql 返回 1 条匹配（L702），与 iteration-3-changes.json 声明一致",
+    "【PASS】mvn compile BUILD SUCCESS，0 错误，RetirementController PUT 端点 @PreAuthorize('asset:retirement:edit') 现在有对应的运行时种子数据",
+    "【PASS】AC-5 所有已知缺口全部修复：9 个目标缺口（VendorController 3 + DeptController 3 + RetirementController 3）在前轮已确认 + asset:retirement:edit 种子数据本轮补全",
+    "【INFO】asset:retirement:submit (ID=119) 与 asset:retirement:create 存在两套编码（Controller 使用 create 但 schema.sql 同时包含 submit）— 非阻塞不一致，建议后续统一",
+    "【INFO】iteration-3-changes.json 声称 ID=210 是「当前最大 ID（209）之后的下一个可用号」— 核对 schema.sql 确认逻辑正确",
+    "【INFO】migrate_sys_permission_to_menu.sql 迁移脚本不包含 ID=210 — 全新部署使用 schema.sql 无影响，增量迁移场景需单独处理"
+  ],
+  "residual_risks": [
+    "asset:retirement:submit (ID=119) 在 schema.sql 存在但 Controller 中 POST /{id}/submit 使用 create 而非 submit — 存在两套编码不一致，需决定统一方案（非阻塞）",
+    "migrate_sys_permission_to_menu.sql 增量迁移脚本未包含本次新增的 sys_menu ID=210 + sys_role_menu (1, 210) — 仅影响增量迁移场景（非阻塞）",
+    "DeptController GET /list 对应 schema.sql ID=12 perms='system:dept:list'，但 Controller 使用 system:dept:query — 编码不一致（前轮已发现，非阻塞）",
+    "前端预存 TypeScript 错误 ~30+ 项未修复 — 不属于本轮修复范围，不在 AC 约束内",
+    "changes.json 记载 DeptController 删除使用 system:dept:remove 但实际代码使用 delete — 与 schema.sql ID=16 perms='system:dept:delete' 一致，属记录性错误"
+  ]
+}

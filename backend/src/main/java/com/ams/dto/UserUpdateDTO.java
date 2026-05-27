@@ -19,6 +19,8 @@ public class UserUpdateDTO {
     private String phone;
     @JsonAlias({"department", "deptId"})
     private Long deptId;
+    private Integer status;
+    private String remark;
     /** 角色ID列表，更新时先删旧 sys_user_role 再写入新关系 */
     private java.util.List<Long> roleIds;
 }

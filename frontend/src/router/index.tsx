@@ -100,16 +100,13 @@ const DashboardPage         = React.lazy(() => import('@/pages/dashboard/Dashboa
 const AssetListPage         = React.lazy(() => import('@/pages/asset/AssetListPage'));
 const AssetDetailPage       = React.lazy(() => import('@/pages/asset/AssetDetailPage'));
 const AssetFormPage         = React.lazy(() => import('@/pages/asset/AssetFormPage'));
-const WorkOrderListPage     = React.lazy(() => import('@/pages/workorder/WorkOrderListPage'));
+// 工单管理已合并到资产处置（WorkOrderDetailPage 仍被审批流程详情引用，WorkOrderFormPage 供新建按钮使用）
 const WorkOrderDetailPage   = React.lazy(() => import('@/pages/workorder/WorkOrderDetailPage'));
 const WorkOrderFormPage     = React.lazy(() => import('@/pages/workorder/WorkOrderFormPage'));
 const ApprovalListPage      = React.lazy(() => import('@/pages/approval/ApprovalListPage'));
 const NotificationsPage     = React.lazy(() => import('@/pages/notifications/NotificationsPage'));
 const InventoryTasksPage    = React.lazy(() => import('@/pages/inventory/InventoryTasksPage'));
 const InventoryDetailPage   = React.lazy(() => import('@/pages/inventory/InventoryDetailPage'));
-const RetirementListPage    = React.lazy(() => import('@/pages/retirement/RetirementListPage'));
-const RetirementFormPage    = React.lazy(() => import('@/pages/retirement/RetirementFormPage'));
-const RetirementDetailPage  = React.lazy(() => import('@/pages/retirement/RetirementDetailPage'));
 const AuditDashboardPage    = React.lazy(() => import('@/pages/audit/AuditDashboardPage'));
 const AuditDetailPage       = React.lazy(() => import('@/pages/audit/AuditDetailPage'));
 const DisposalListPage         = React.lazy(() => import('@/pages/disposal/DisposalListPage'));
@@ -139,6 +136,16 @@ const SmartReportPage   = React.lazy(() => import('@/pages/inventory/SmartReport
 const VendorsPage   = React.lazy(() => import('@/pages/vendors/VendorsPage'));
 const LocationsPage = React.lazy(() => import('@/pages/locations/LocationsPage'));
 const SettingsPage  = React.lazy(() => import('@/pages/settings/SettingsPage'));
+const MenuManagementPage = React.lazy(() => import('@/pages/system/MenuManagement'));
+
+// ── SSO 回调页 ──────────────────────────────────────────────────────────────
+const SsoCallbackPage = React.lazy(() => import('@/pages/auth/SsoCallbackPage'));
+
+// ── 系统管理独立页面 ─────────────────────────────────────────────────────────
+const RoleManagementPage = React.lazy(() => import('@/pages/system/RoleManagement'));
+const UserManagementPage = React.lazy(() => import('@/pages/system/UserManagement'));
+const PostManagementPage = React.lazy(() => import('@/pages/system/PostManagement'));
+const DeptManagementPage = React.lazy(() => import('@/pages/system/DeptManagement'));
 
 // ── 路由配置 ──────────────────────────────────────────────────────────────────
 const router = createBrowserRouter([
@@ -150,6 +157,10 @@ const router = createBrowserRouter([
   {
     path: '/forbidden',
     element: <ForbiddenPage />,
+  },
+  {
+    path: '/sso-callback',
+    element: S(SsoCallbackPage),
   },
   // ── 受保护路由（需要认证） ───────────────────────────────────────────────────────────
   {
@@ -178,8 +189,8 @@ const router = createBrowserRouter([
           { path: 'equipment',     element: S(EquipmentPage) },
           { path: 'equipment/:id', element: S(EquipmentPage) },
 
-          // 工单管理
-          { path: 'workorders',      element: S(WorkOrderListPage) },
+          // 工单管理已合并到资产处置，列表重定向，详情/新建页仍可访问
+          { path: 'workorders',      element: <Navigate to="/disposals" replace /> },
           { path: 'workorders/new',  element: S(WorkOrderFormPage) },
           { path: 'workorders/:id',  element: S(WorkOrderDetailPage) },
 
@@ -194,10 +205,10 @@ const router = createBrowserRouter([
           { path: 'inventory/smart-report',             element: S(SmartReportPage) },
           { path: 'inventory/smart-report/:taskId',     element: S(SmartReportPage) },
 
-          // 退役管理
-          { path: 'retirement',     element: S(RetirementListPage) },
-          { path: 'retirement/new', element: S(RetirementFormPage) },
-          { path: 'retirement/:id', element: S(RetirementDetailPage) },
+          // 退役管理已合并到资产处置/资产清退，旧路径保留重定向避免深链失效
+          { path: 'retirement',     element: <Navigate to="/disposals" replace /> },
+          { path: 'retirement/new', element: <Navigate to="/disposals/clearance/new" replace /> },
+          { path: 'retirement/:id', element: <Navigate to="/disposals" replace /> },
 
           // 资产处置
           { path: 'disposals',              element: S(DisposalListPage) },
@@ -239,7 +250,21 @@ const router = createBrowserRouter([
           { path: 'categories',    element: S(CategoryManagerPage) },
           { path: 'vendors',       element: S(VendorsPage) },
           { path: 'locations',     element: S(LocationsPage) },
-          { path: 'settings',      element: S(SettingsPage) },
+
+          // 系统管理 — 菜单权限
+          { path: 'system/menus',  element: S(MenuManagementPage) },
+          // 系统管理 — 角色管理（独立页面）
+          { path: 'system/roles',  element: S(RoleManagementPage) },
+          // 系统管理 — 用户管理（独立页面）
+          { path: 'system/users',  element: S(UserManagementPage) },
+          // 系统管理 — 岗位管理
+          { path: 'system/posts',  element: S(PostManagementPage) },
+          // 系统管理 — 部门管理
+          { path: 'system/depts',  element: S(DeptManagementPage) },
+          // 设置页（仅系统配置/安全设置；历史用户/部门设置入口重定向到系统管理）
+          { path: 'settings',      element: <Navigate to="/settings/system" replace /> },
+          { path: 'settings/users', element: <Navigate to="/system/users" replace /> },
+          { path: 'settings/departments', element: <Navigate to="/system/depts" replace /> },
           { path: 'settings/:tab', element: S(SettingsPage) },
 
           // 错误页

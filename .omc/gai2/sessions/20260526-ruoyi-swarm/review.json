@@ -1,0 +1,17 @@
+{
+  "verdict": "PASS",
+  "gap_fingerprint": null,
+  "missing_criteria": [],
+  "evidence_map": {
+    "字段级 DDL": "ruoyi-integration-plan.md 第 4 节覆盖 ALTER TABLE、CREATE TABLE、索引、默认值、初始化数据与回滚说明。",
+    "后端模块清单": "ruoyi-integration-plan.md 第 6、7、8 节覆盖 Entity、Mapper、Service、Controller、Security、DataScope 类清单。",
+    "前端闭环": "ruoyi-integration-plan.md 第 9 节覆盖 AuthUser、API、菜单路由映射、按钮权限、页面优先级。",
+    "迁移兼容": "ruoyi-integration-plan.md 第 5、10 节覆盖 sys_permission 兼容、现有接口、JWT tenant、灰度与回滚。",
+    "测试验收": "ruoyi-integration-plan.md 第 12 节覆盖数据库、权限、数据权限、前端、兼容、安全、性能验收。"
+  },
+  "repair_recommendation": "none",
+  "residual_risks": [
+    "实际实施前仍需对每个将修改的代码符号运行 GitNexus impact 分析。",
+    "数据权限插件接入后必须用真实 SQL 集成测试验证分页 count SQL 与复杂查询别名。"
+  ]
+}

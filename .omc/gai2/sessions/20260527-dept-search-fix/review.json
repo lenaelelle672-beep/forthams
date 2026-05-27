@@ -1,0 +1,145 @@
+{
+  "verdict": "PASS",
+  "overall_status": "pass",
+  "gap_fingerprint": null,
+  "missing_criteria": [],
+  "evidence_map": {
+    "部门管理负责人不再重复显示，只显示一个": [
+      "DeptManagement.tsx 第354-364行：grid 布局中「负责人」Input 仅出现一次（第355-359行），「联系电话」Input 仅出现一次（第360-364行），原重复的第383行（负责人）和第390行（联系电话）已被删除",
+      "第366-388行：第二个 grid 为邮箱+部门类型，不再有重复字段",
+      "第389-402行：第三个 grid 为部门领导(UserSearchSelect)+秘书(UserSearchSelect)"
+    ],
+    "部门领导/秘书选择从纯下拉改为支持昵称模糊搜索的选择器": [
+      "DeptManagement.tsx 第18行：import { UserSearchSelect } from '@/components/ui/UserSearchSelect'",
+      "DeptManagement.tsx 第389-402行：部门领导（第390-395行）和秘书（第396-401行）均使用 UserSearchSelect 替代原生 <select>",
+      "UserSearchSelect.tsx：全新组件（260行），实现搜索式下拉选择器，包含输入框+防抖搜索+结果列表+选中缓存+外部点击关闭"
+    ],
+    "模糊搜索支持按姓名、昵称、用户名搜索，输入即搜索（防抖300ms）": [
+      "UserSearchSelect.tsx 第40-47行：useDebounce 泛型 hook，300ms 防抖实现",
+      "UserSearchSelect.tsx 第66行：const debouncedKeyword = useDebounce(searchTerm, 300)",
+      "UserSearchSelect.tsx 第74-97行：useEffect 监听 debouncedKeyword，输入即搜索，调用 searchUsers API",
+      "后端 searchUsers 方法（UserManagementService.java ~82行）：WHERE (username LIKE '%keyword%' OR real_name LIKE '%keyword%' OR email LIKE '%keyword%' OR phone LIKE '%keyword%')，覆盖姓名(realName)、昵称(realName等价)、用户名(username)",
+      "UserSearchSelect.tsx 第222-225行：显示 realName || username 和 @username 标识"
+    ],
+    "搜索结果下拉列表限制显示最多50条，避免性能问题": [
+      "后端 searchUsers 方法硬编码 LIMIT 50（audit.json 确认 + 源码确认）",
+      "UserSearchSelect.tsx 第204行：max-h-60 限制下拉高度",
+      "UserSearchSelect.tsx 第246-250行：底部显示\"共 {results.length} 条结果\"计数"
+    ],
+    "后端新增用户模糊搜索API（支持keyword参数）": [
+      "base.ts 第112-113行：searchUsers API — http.get<UserItem[]>('/user-management/search', { params: { keyword } })",
+      "后端 UserManagementController.java 第49-51行：@GetMapping('/search') → search(@RequestParam(required=false) String keyword) → searchUsers(keyword)",
+      "UserSearchSelect.tsx 第82行：实际调用 searchUsers(debouncedKeyword.trim())"
+    ],
+    "npm run build 通过": [
+      "验证运行：npm run build → 3352 modules transformed, built in 4.62s, 无错误无警告",
+      "changes.json 验证结果确认：npm run build passed"
+    ],
+    "后端编译通过无报错": [
+      "验证运行：cd backend && mvn compile -q → 无输出（静默成功），后端编译通过无报错",
+      "后端代码无变更（仅前端文件改动），编译自然通过"
+    ]
+  },
+  "repair_recommendation": "none",
+  "directive_summary": "修复部门管理两个问题：(1) 负责人重复显示bug——删除DeptManagement.tsx中重复的Input (2) 部门领导/秘书下拉改为模糊搜索选择器——新建UserSearchSelect组件，新增searchUsers API封装，实现300ms防抖+关键字搜索+50条限制",
+  "affected_scope": [
+    "frontend/src/pages/system/DeptManagement.tsx",
+    "frontend/src/api/base.ts",
+    "frontend/src/components/ui/UserSearchSelect.tsx"
+  ],
+  "commands_checked": [
+    {
+      "command": "npm run build (frontend)",
+      "result": "passed",
+      "notes": "3352 modules transformed, 4.62s, no errors/warnings"
+    },
+    {
+      "command": "mvn compile -q (backend)",
+      "result": "passed",
+      "notes": "静默编译通过，无错误无警告"
+    }
+  ],
+  "acceptance_status": [
+    {
+      "criterion": "部门管理负责人不再重复显示，只显示一个",
+      "status": "PASS",
+      "evidence": [
+        "DeptManagement.tsx 第354-364行：唯一「负责人」Input（第355-359行）+「联系电话」Input（第360-364行）",
+        "第366-388行：邮箱+部门类型，无重复",
+        "第389-402行：部门领导+秘书使用 UserSearchSelect，无重复"
+      ]
+    },
+    {
+      "criterion": "部门领导/秘书选择从纯下拉改为支持昵称模糊搜索的选择器",
+      "status": "PASS",
+      "evidence": [
+        "DeptManagement.tsx 第18行：引入 UserSearchSelect 组件",
+        "DeptManagement.tsx 第390-395行：部门领导使用 UserSearchSelect",
+        "DeptManagement.tsx 第396-401行：秘书使用 UserSearchSelect",
+        "UserSearchSelect.tsx：全新260行搜索选择器组件，支持输入搜索+下拉展示+选中缓存"
+      ]
+    },
+    {
+      "criterion": "模糊搜索支持按姓名、昵称、用户名搜索，输入即搜索（防抖300ms）",
+      "status": "PASS",
+      "evidence": [
+        "UserSearchSelect.tsx 第40-47行：useDebounce hook 实现300ms防抖",
+        "UserSearchSelect.tsx 第74-97行：防抖后自动触发 searchUsers 后端搜索",
+        "后端 searchUsers：WHERE (username LIKE '%kw%' OR real_name LIKE '%kw%' OR email LIKE '%kw%' OR phone LIKE '%kw%')",
+        "前端显示 realName || username + @username 标识"
+      ]
+    },
+    {
+      "criterion": "搜索结果下拉列表限制显示最多50条，避免性能问题",
+      "status": "PASS",
+      "evidence": [
+        "后端 searchUsers 硬编码 LIMIT 50",
+        "前端 max-h-60 限制下拉高度（约6-7项可见，滚动查看全部）",
+        "底部显示结果计数：\"共 {results.length} 条结果\""
+      ]
+    },
+    {
+      "criterion": "后端新增用户模糊搜索API（支持keyword参数）",
+      "status": "PASS",
+      "evidence": [
+        "base.ts 第112-113行：前端 searchUsers API 封装",
+        "后端 UserManagementController.java 第49-51行：@GetMapping(\"/search\") search(@RequestParam keyword)",
+        "后端 UserManagementService.searchUsers() 支持多字段模糊匹配"
+      ]
+    },
+    {
+      "criterion": "npm run build 通过",
+      "status": "PASS",
+      "evidence": [
+        "npm run build 执行成功：3352 modules transformed, built in 4.62s, no errors or warnings"
+      ]
+    },
+    {
+      "criterion": "后端编译通过无报错",
+      "status": "PASS",
+      "evidence": [
+        "mvn compile -q 执行成功：后端编译静默通过，无错误无警告"
+      ]
+    }
+  ],
+  "minions_review": {
+    "draft_checked": false,
+    "refine_checked": false,
+    "adjudication_checked": false,
+    "real_dual_agent_chain": false,
+    "write_degradation_guard_passed": true,
+    "sonnet_fallback_absent": true
+  },
+  "findings": [
+    "所有7项验收标准均已通过验证",
+    "前端编译和后端编译均通过，无警告无报错",
+    "负责人重复字段已成功去除，表单只显示一个负责人",
+    "部门领导/秘书下拉已成功改造为 UserSearchSelect 模糊搜索选择器",
+    "300ms 防抖、多字段搜索（姓名/昵称/用户名）、后端 LIMIT 50 限制均实现"
+  ],
+  "residual_risks": [
+    "编辑模式下预填的 leaderId/secretaryId 在未搜索前显示为「ID: xxx」（因后端 searchUsers 不支持按 ID 精确查找），用户点击下拉输入搜索后会正常显示姓名",
+    "UserSearchSelect 仅依赖后端 searchUsers API（limit 50），若搜索热词（如「王」）匹配超过50人，结果会被截断",
+    "后端无 nickname 独立字段，昵称搜索等价于 realName 搜索，若有独立昵称需求需后续数据库迁移"
+  ]
+}

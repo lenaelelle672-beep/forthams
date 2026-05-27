@@ -106,22 +106,22 @@ export const getDepreciationSchedule = (assetId: number) =>
 
 /** 获取仪表板核心统计 */
 export const getDashboardStats = () =>
-  http.get<ApiResponse<DashboardStats>>('/dashboard/stats');
+  http.get<DashboardStats>('/dashboard/stats');
 
 /** 获取资产价值趋势（days: 最近多少天，默认 30） */
 export const getAssetValueTrends = (days = 30) =>
-  http.get<ApiResponse<AssetValueTrend[]>>('/dashboard/trends', {
+  http.get<AssetValueTrend[]>('/dashboard/trends', {
     params: { days },
   });
 
 /** 获取部门资产分布 */
 export const getDeptDistribution = () =>
-  http.get<ApiResponse<DeptAssetDistribution[]>>('/dashboard/dept-distribution');
+  http.get<DeptAssetDistribution[]>('/dashboard/dept-distribution');
 
 /** 获取维保统计 */
 export const getMaintenanceStats = () =>
-  http.get<ApiResponse<Record<string, unknown>>>('/dashboard/maintenance-stats');
+  http.get<Record<string, unknown>>('/dashboard/maintenance-stats');
 
 /** 获取待审批数量 */
 export const getPendingApprovalsCount = () =>
-  http.get<ApiResponse<number>>('/dashboard/pending-approvals');
+  http.get<number>('/dashboard/pending-approvals');

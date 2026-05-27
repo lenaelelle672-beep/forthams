@@ -1,0 +1,24 @@
+{
+  "session_id": "20260526-goal-resume-v1",
+  "goal_id": "forthams-mvp-enhance",
+  "directive": "forthAMS MVP 增强剩余工作：继续完成 AC-5（@PreAuthorize 全覆盖剩余 18+ Controller）、AC-1（DataPermissionInterceptor 新建）、AC-2（角色管理独立页面新建）、AC-3（用户管理增强独立页面新建）、AC-4（菜单编辑表单实现）。AC-6 已完成。",
+  "phase": "triage",
+  "classification": "heavy",
+  "auto_mode": false,
+  "acceptance_checks": [
+    "AC-1（P1）: DataPermissionInterceptor 启用，支持按部门/角色过滤数据查询，部门及子部门数据可见，管理员全量可见",
+    "AC-2（P2）: 角色管理独立页面，支持角色 CRUD、菜单权限分配、部门数据权限分配",
+    "AC-3（P2）: 用户管理增强，独立页面含用户列表、角色分配 UI、部门绑定",
+    "AC-4（P2）: 菜单编辑表单，支持菜单树增删改查、图标选择、排序、可见性切换",
+    "AC-5（P2）: 按钮权限全量覆盖，业务模块（审批/资产/报表等）的增删改导出等按钮均有 @PreAuthorize 控制",
+    "AC-6（P3）: 生产级 DBA 协作幂等迁移脚本（已完成 ✅）"
+  ],
+  "existing_artifacts": [
+    ".omc/gai2/sessions/20260526-mvp-enhance-v1/workcard.json",
+    ".omc/gai2/sessions/20260526-mvp-enhance-v1/audit.json",
+    ".omc/gai2/sessions/20260526-mvp-enhance-v1/debate.json",
+    ".omc/gai2/sessions/20260526-mvp-enhance-v1/triage.json",
+    ".omc/gai2/sessions/20260526-mvp-enhance-v2/draft.json"
+  ],
+  "artifact_dir": ".omc/gai2/sessions/20260526-goal-resume-v1"
+}

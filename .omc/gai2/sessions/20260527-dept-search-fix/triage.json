@@ -1,0 +1,33 @@
+{
+  "classification": "Medium",
+  "mcp_tools": [],
+  "scope": [
+    "frontend/src/pages/system/DeptManagement.tsx",
+    "frontend/src/api/base.ts",
+    "backend/src/main/java/com/ams/entity/User.java",
+    "backend/src/main/java/com/ams/service/UserManagementService.java"
+  ],
+  "risks": [
+    "User 实体无 nickname 字段，需确认昵称对应 realName 还是需新增字段",
+    "7000+用户模糊搜索依赖数据库 LIKE 查询，需确保 SQL 性能（已有 limit 50 兜底）",
+    "前端没有现成搜索选择器组件，需自建，增加实现复杂度",
+    "部门领导/秘书两个下拉都需要改造为搜索选择器，工作量为2份"
+  ],
+  "dependencies": [
+    "前端需要自建搜索选择器组件",
+    "后端 searchUsers API 已存在但搜索字段可能不满足昵称需求",
+    "需要确认 searchUsers 返回值是否包含足够字段用于渲染下拉选项"
+  ],
+  "recommended_phases": [
+    "audit",
+    "builder",
+    "reviewer"
+  ],
+  "acceptance_hints": [
+    "部门编辑表单中「负责人」字段只出现一次，不再重复",
+    "部门领导和秘书下拉框改为输入框，输入关键字后自动弹出匹配建议列表（防抖300ms）",
+    "搜索结果按姓名/昵称/用户名匹配，列表限制50条以内",
+    "页面不卡顿，7000+用户场景下正常搜索和选择",
+    "npm run build 通过，后端编译通过无报错"
+  ]
+}

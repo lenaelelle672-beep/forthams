@@ -1,0 +1,23 @@
+{
+  "decision": "use_refine",
+  "selected_source": "Draft + Refine 改进建议",
+  "rationale": "Draft 的写动作完整覆盖了两个验收缺口（Criterion 1 默认折叠、Criterion 4 新增字段展示）。Refine 确认无写动作退化（degradation_detected=false），并提出了 3 项体验改进（显示用户名而非 ID、函数参数传递、列名语义化）。裁决采用 Draft 核心变更加 Refine 改进建议。",
+  "builder_instructions": [
+    "步骤1: 修改 DeptManagement.tsx 中 useEffect（约 L257-273），无搜索时 setExpandedIds(new Set())，确保默认折叠仅显示根节点",
+    "步骤2: 修改 toggleAll 折叠分支（约 L296-304），折叠时保留根节点 ID（与 Refine 建议一致）",
+    "步骤3: 在组件内添加 useMemo 创建 userId→name 映射表（基于 userList query 结果）",
+    "步骤4: 修改 renderTreeRows 函数签名，添加 userNameMap: Map<number, string> 参数",
+    "步骤5: 更新 thead 列，添加'部门领导'和'秘书'列（在邮箱列之后），列名使用业务语义",
+    "步骤6: 在 renderTreeRows 的 tbody 中，通过 userNameMap 将 leaderId/secretaryId 映射为用户名显示，未找到时显示 '—'",
+    "步骤7: 运行 npm run build 验证构建通过"
+  ],
+  "write_action_guard": {
+    "degradation_prevented": true,
+    "fallback_labels": []
+  },
+  "reviewer_checks": [
+    "初始加载时所有部门节点处于折叠状态",
+    "表格包含'部门领导'和'秘书'列（显示用户名）",
+    "npm run build 通过"
+  ]
+}

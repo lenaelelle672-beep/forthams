@@ -134,10 +134,7 @@ export default function DisposalDetailPage() {
 
   const { data: detail, isLoading, isError } = useQuery({
     queryKey: ['disposal', id],
-    queryFn: async () => {
-      const res = await getDisposalDetail(Number(id));
-      return res.data.data;
-    },
+    queryFn: () => getDisposalDetail(Number(id)),
     enabled: !!id,
   });
 

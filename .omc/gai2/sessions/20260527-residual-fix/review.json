@@ -1,0 +1,93 @@
+{
+  "verdict": "PASS",
+  "overall_status": "pass",
+  "gap_fingerprint": null,
+  "missing_criteria": [],
+  "evidence_map": {
+    "编辑模式UserSearchSelect回填显示用户名": [
+      "UserSearchSelect.tsx 第21行：import { searchUsers, getUserDetail } from '@/api/base' — getUserDetail 已导入",
+      "base.ts 第92行：export const getUserDetail = (id: number) => 确认 API 存在并导出",
+      "UserSearchSelect.tsx 第110-124行：useEffect 在 value 非空且 cachedName 为空时调用 getUserDetail(Number(value))，获取 user.realName || user.username 并 setCachedName",
+      "第69行 displayName = cachedName || results.find(...) — 编辑模式下 cachedName 优先，显示真实用户名而非 'ID: xxx'",
+      "失败降级处理：catch(() => {}) 保持空 cachedName，触发第180行 'ID: ${value}' 兜底显示，不阻断交互"
+    ],
+    "searchUsers limit提升到200": [
+      "UserManagementService.java 第93行：.last(\"limit 200\") — 确认 limit 已从 50 改为 200",
+      "searchUsers 方法位于第80-97行，完整查询逻辑：status=1 + LIKE 搜索 + SELECT 指定字段 + limit 200"
+    ],
+    "npm run build通过": [
+      "实际运行 cd frontend && npm run build — vite v6.4.2, 3352 modules transformed, built in 4.67s, 0 errors"
+    ],
+    "后端编译通过": [
+      "实际运行 cd backend && mvn compile -q — 无输出（静默编译成功），0 errors"
+    ]
+  },
+  "repair_recommendation": "none",
+  "directive_summary": "修复两个残留问题：(1) UserSearchSelect 编辑模式下 value 非空时自动调用 getUserDetail 回填显示用户名，而非显示 'ID: xxx'；(2) 后端 searchUsers SQL limit 从 50 提升到 200，减少大姓氏场景下的结果截断。",
+  "affected_scope": [
+    "frontend/src/components/ui/UserSearchSelect.tsx",
+    "backend/src/main/java/com/ams/service/UserManagementService.java"
+  ],
+  "commands_checked": [
+    {
+      "command": "cd frontend && npm run build",
+      "result": "passed",
+      "notes": "vite v6.4.2, 3352 modules transformed, built in 4.67s, 零错误零警告"
+    },
+    {
+      "command": "cd backend && mvn compile -q",
+      "result": "passed",
+      "notes": "Maven 静默编译通过，无输出无错误"
+    }
+  ],
+  "acceptance_status": [
+    {
+      "criterion": "编辑模式下 UserSearchSelect 在 value 非空时自动调用 getUserDetail 回填显示用户名（非「ID: xxx」）",
+      "status": "PASS",
+      "evidence": [
+        "第21行 getUserDetail 已从 @/api/base 正确导入",
+        "base.ts 第92行确认 getUserDetail API 已导出",
+        "第110-124行 useEffect 逻辑：value && !cachedName → getUserDetail(Number(value)) → setCachedName(user.realName || user.username)",
+        "第69行 displayName 优先使用 cachedName，确保编辑模式显示真实用户名",
+        "失败降级：catch 为空，保持 'ID: xxx' 兜底，不阻断交互"
+      ]
+    },
+    {
+      "criterion": "后端 searchUsers limit 从 50 提升到 200",
+      "status": "PASS",
+      "evidence": [
+        "UserManagementService.java 第93行确认 .last(\"limit 200\")",
+        "原 limit 50 已被替换为 200，减少大姓氏（如张、王）场景下的结果截断"
+      ]
+    },
+    {
+      "criterion": "npm run build 通过",
+      "status": "PASS",
+      "evidence": [
+        "实际运行：vite v6.4.2, 3352 modules transformed, built in 4.67s, 0 errors"
+      ]
+    },
+    {
+      "criterion": "后端编译通过",
+      "status": "PASS",
+      "evidence": [
+        "实际运行：mvn compile -q 无输出（静默编译成功），0 errors"
+      ]
+    }
+  ],
+  "minions_review": {
+    "draft_checked": false,
+    "refine_checked": false,
+    "adjudication_checked": false,
+    "real_dual_agent_chain": false,
+    "write_degradation_guard_passed": true,
+    "sonnet_fallback_absent": true,
+    "note": "residual-fix 轻量修复 session，无 MINIONS 产物（draft/refine/adjudication 均不存在）。goal-state 声明 minions 启用但本 session 走快速路径，修改仅涉及 2 个文件共约 15 行代码变更，复杂度低，快速路径合理可接受。"
+  },
+  "findings": [],
+  "residual_risks": [
+    "getUserDetail 返回类型在 useEffect 中使用 any 断言（第114行 user: any），运行时正确但缺少编译期类型安全",
+    "useEffect 依赖数组省略 cachedName（eslint-disable 注释），这是有意为之避免无限循环，但 value 不变时不会重复触发回填",
+    "limit 200 在极端大量用户（>200 同姓）场景下仍可能截断，但对实际业务场景（7000+ 用户）足够"
+  ]
+}

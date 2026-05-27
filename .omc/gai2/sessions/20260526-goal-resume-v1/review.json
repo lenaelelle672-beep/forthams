@@ -1,0 +1,204 @@
+{
+  "verdict": "PARTIAL",
+  "overall_status": "incomplete",
+  "gap_fingerprint": "AC-2:缺data_scope选择器;AC-3:部门绑定缺变更操作;AC-1:@DataScope仅单业务试点",
+  "missing_criteria": [
+    "AC-2: 角色管理页面缺少 data_scope（数据权限范围：1=全部/2=自定义等）选择器",
+    "AC-3: 用户管理页面部门绑定仅有只读展示（部门#id），缺少部门变更/绑定操作 UI",
+    "AC-1: @DataScope 注解仅有 AssetService.queryAssets() 一个试点，尚未在更多业务 Service 上全面激活数据权限过滤"
+  ],
+  "evidence_map": {
+    "FIX-1 路由冲突已解除": [
+      "glob MenuController.java → 空（不存在）",
+      "SysMenuController @RequestMapping(/menus) + 子端点 @GetMapping(/admin) 等",
+      "前端 api/menu.ts 全部使用 /menus/admin/** 前缀，注释标明'已修复路由冲突'",
+      "/menus/current 保留给当前用户菜单接口不与 admin 路由冲突"
+    ],
+    "FIX-2 VendorController @PreAuthorize": [
+      "VendorController.java L20: @PreAuthorize(@ss.hasPermi('vendor:vendor:query')) — GET /list",
+      "VendorController.java L28: @PreAuthorize(@ss.hasPermi('vendor:vendor:query')) — GET /{id}",
+      "VendorController.java L34: @PreAuthorize(@ss.hasPermi('vendor:vendor:add')) — POST create",
+      "VendorController.java L40: @PreAuthorize(@ss.hasPermi('vendor:vendor:edit')) — PUT update",
+      "VendorController.java L46: @PreAuthorize(@ss.hasPermi('vendor:vendor:delete')) — DELETE delete",
+      "全部5个端点均有 @PreAuthorize 保护"
+    ],
+    "FIX-2 DeptController @PreAuthorize": [
+      "DeptController.java L36: @PreAuthorize(@ss.hasPermi('system:dept:add')) — POST create",
+      "DeptController.java L42: @PreAuthorize(@ss.hasPermi('system:dept:edit')) — PUT update",
+      "DeptController.java L48: @PreAuthorize(@ss.hasPermi('system:dept:remove')) — DELETE delete",
+      "3个写操作端点全部覆盖"
+    ],
+    "FIX-2 WorkflowDefinitionController @PreAuthorize": [
+      "L31: @PreAuthorize(@ss.hasPermi('workflow:definition:query')) — GET list",
+      "L37: @PreAuthorize(@ss.hasPermi('workflow:definition:query')) — GET /{businessType}",
+      "L44: @PreAuthorize(hasAnyRole('ADMIN','SUPER_ADMIN')) — PUT saveDraft",
+      "L52: @PreAuthorize(hasAnyRole('ADMIN','SUPER_ADMIN')) — POST publish",
+      "L61: @PreAuthorize(hasAnyRole('ADMIN','SUPER_ADMIN')) — POST updateStatus",
+      "L69: @PreAuthorize(hasAnyRole('ADMIN','SUPER_ADMIN')) — POST createCustomDefinition",
+      "L77: @PreAuthorize(hasAnyRole('ADMIN','SUPER_ADMIN')) — DELETE deleteDefinition",
+      "全部7个端点均有保护"
+    ],
+    "FIX-3 AssetService @DataScope": [
+      "AssetService.java L32: @DataScope(deptColumn = \"dept_id\", userColumn = \"create_by\")",
+      "queryAssets() 方法已标记为数据权限过滤启用",
+      "import com.ams.annotation.DataScope 已导入 (L22)"
+    ],
+    "AC-4": [
+      "MenuManagement.tsx 不存在 toast.info('编辑功能开发中') 占位",
+      "MenuFormModal 弹窗组件完整: Dialog/DialogContent/表单字段(menuName/menuType/parentId/sortOrder/perms/visible/status/icon)",
+      "IconPicker 组件存在(L68) + lucide-react 图标列表 + 搜索过滤",
+      "排序字段 sortOrder + 可见性切换 visible 字段"
+    ],
+    "AC-5": [
+      "@PreAuthorize 共 158+ 处分布在 27+ 个 Controller",
+      "VendorController 全部5端点已覆盖（新增 create/update/delete 3个）",
+      "DeptController 写操作3端点已覆盖",
+      "WorkflowDefinitionController 全部7端点已覆盖",
+      "RetirementController(18)/WorkOrderController(11)/UserManagementController(11)/InventoryController(9)/ApprovalController(9) 等均覆盖良好",
+      "上一轮 FAIL 的 Blocker 安全漏洞已全部修复"
+    ],
+    "AC-6": [
+      "migration/migrate_sys_permission_to_menu.sql 存在(83行三步幂等迁移脚本)",
+      "schema.sql CREATE TABLE IF NOT EXISTS 保护 + information_schema ALTER 幂等模式(64处)"
+    ]
+  },
+  "repair_recommendation": "gai2-builder",
+  "directive_summary": "第2轮修复核验。3个修复全部验证通过：(1) MenuController 路由冲突已解除；(2) VendorController/DeptController/WorkflowDefinitionController @PreAuthorize 已补全；(3) AssetService 已添加 @DataScope 试点。AC-4/5/6 全部 PASS。AC-1 从零使用升级为有单试点(PARTIAL)。AC-2(缺data_scope选择器)和AC-3(部门绑定仅展示)的PARTIAL仍存在。",
+  "affected_scope": [
+    "backend/src/main/java/com/ams/controller/VendorController.java",
+    "backend/src/main/java/com/ams/controller/DeptController.java",
+    "backend/src/main/java/com/ams/controller/WorkflowDefinitionController.java",
+    "backend/src/main/java/com/ams/service/AssetService.java",
+    "frontend/src/pages/system/RoleManagement.tsx",
+    "frontend/src/pages/system/UserManagement.tsx"
+  ],
+  "commands_checked": [
+    {
+      "command": "glob MenuController.java",
+      "result": "passed",
+      "notes": "MenuController 不存在，路由冲突已解除"
+    },
+    {
+      "command": "grep @PreAuthorize VendorController.java",
+      "result": "passed",
+      "notes": "5处匹配：list/query + create/add + update/edit + delete/delete 全覆盖"
+    },
+    {
+      "command": "grep @PreAuthorize DeptController.java",
+      "result": "passed",
+      "notes": "3处匹配：create(system:dept:add)/update(system:dept:edit)/delete(system:dept:remove)"
+    },
+    {
+      "command": "grep @PreAuthorize WorkflowDefinitionController.java",
+      "result": "passed",
+      "notes": "7处匹配：2×query + 5×hasAnyRole('ADMIN','SUPER_ADMIN') 全覆盖"
+    },
+    {
+      "command": "grep @DataScope AssetService.java",
+      "result": "passed",
+      "notes": "1处匹配: L32 @DataScope(deptColumn=\"dept_id\", userColumn=\"create_by\")"
+    },
+    {
+      "command": "grep /menus/admin menu.ts",
+      "result": "passed",
+      "notes": "6处匹配：getList/tree/getById/create/update/delete 全部使用 /menus/admin 前缀"
+    }
+  ],
+  "acceptance_status": [
+    {
+      "criterion": "AC-1（P1）: DataPermissionInterceptor 启用，支持按部门/角色过滤数据查询，部门及子部门数据可见，管理员全量可见",
+      "status": "PARTIAL",
+      "evidence": [
+        "datascope 包 8 个文件完整存在（AmsDataPermissionHandler/DataScopeAspect/DataScopeContextHolder/DataScopeDecisionService/DataScopeResult/DataScopeType + 2个辅助类）",
+        "MyBatisPlusConfig 注册 DataPermissionInterceptor",
+        "@DataScope 注解定义存在于 annotation/DataScope.java",
+        "DataScopeAspect.java AOP 切面拦截存在",
+        "[新] AssetService.java 第32行: @DataScope(deptColumn=\"dept_id\", userColumn=\"create_by\") — 首个业务试点激活",
+        "但尚未在更多业务 Service（WorkOrderService/InventoryService 等）上全面添加 @DataScope，未达到全量覆盖"
+      ]
+    },
+    {
+      "criterion": "AC-2（P2）: 角色管理独立页面，支持角色 CRUD、菜单权限分配、部门数据权限分配",
+      "status": "PARTIAL",
+      "evidence": [
+        "RoleManagement.tsx 存在（387行完整独立页面）",
+        "CRUD 完整: getRoleList + createRole + updateRole + deleteRole + RoleFormDialog",
+        "菜单权限分配: assignRoleMenus + MenuAssignDialog + 菜单树递归渲染",
+        "部门数据权限分配: assignRoleDepts + DeptAssignDialog",
+        "缺失: data_scope 选择器（1=全部/2=自定义/3=本部门/4=本部门及以下/5=仅本人）— 本轮未修复",
+        "RoleFormDialog 仅含 roleName/roleCode/description，无 dataScope 字段"
+      ]
+    },
+    {
+      "criterion": "AC-3（P2）: 用户管理增强，独立页面含用户列表、角色分配 UI、部门绑定",
+      "status": "PARTIAL",
+      "evidence": [
+        "UserManagement.tsx 存在（225行完整独立页面）",
+        "用户列表: getUserList + 完整表格渲染",
+        "角色分配 UI: assignUserRoles + 角色分配弹窗 + checkbox 多选",
+        "路由注册: /system/users 在 router/index.tsx",
+        "部门绑定缺陷: 仅展示 deptId（部门#id 格式），无部门变更/绑定操作 UI — 本轮未修复"
+      ]
+    },
+    {
+      "criterion": "AC-4（P2）: 菜单编辑表单，支持菜单树增删改查、图标选择、排序、可见性切换",
+      "status": "PASS",
+      "evidence": [
+        "toast.info('编辑功能开发中') 占位已移除",
+        "MenuFormModal 弹窗: Dialog/DialogContent + 新增/编辑模式切换",
+        "表单字段完整: menuName/menuType/parentId/sortOrder/perms/visible/status/icon/path/component",
+        "IconPicker 组件: lucide-react 图标列表 + 搜索过滤",
+        "排序: sortOrder 字段 + 表单输入",
+        "可见性: visible 字段(1=显示/0=隐藏)"
+      ]
+    },
+    {
+      "criterion": "AC-5（P2）: 按钮权限全量覆盖，业务模块的增删改导出等按钮均有 @PreAuthorize 控制",
+      "status": "PASS",
+      "evidence": [
+        "@PreAuthorize 共 158+ 处分布在 27+ 个 Controller",
+        "[修复] VendorController 全部5端点均已覆盖: create(vendor:vendor:add)/update(vendor:vendor:edit)/delete(vendor:vendor:delete) 已补齐",
+        "[修复] DeptController 写操作3端点已覆盖: create(system:dept:add)/update(system:dept:edit)/delete(system:dept:remove)",
+        "[修复] WorkflowDefinitionController 全部7端点已覆盖: query(2) + hasAnyRole(5)",
+        "其他 Controller 覆盖良好: RetirementController(18)/WorkOrderController(11)/UserManagementController(11)/InventoryController(9)/ApprovalController(9)/RoleManagementController(8)",
+        "上一轮 FAIL 的 Blocker 安全漏洞(VendorController 写操作无权限控制)已全部修复"
+      ]
+    },
+    {
+      "criterion": "AC-6（P3）: 生产级 DBA 协作幂等迁移脚本",
+      "status": "PASS",
+      "evidence": [
+        "migration/migrate_sys_permission_to_menu.sql 存在(83行三步幂等迁移脚本)",
+        "INSERT ON DUPLICATE KEY UPDATE 幂等保护",
+        "CREATE TABLE IF NOT EXISTS: sys_menu/sys_role_menu/sys_role_dept",
+        "ALTER 幂等: 64 处 information_schema + PREPARE stmt 模式",
+        "验证步骤: SELECT source_count/menu_count/match 对比"
+      ]
+    }
+  ],
+  "minions_review": {
+    "draft_checked": true,
+    "refine_checked": true,
+    "adjudication_checked": true,
+    "real_dual_agent_chain": true,
+    "write_degradation_guard_passed": true,
+    "sonnet_fallback_absent": true,
+    "notes": "本轮为修复核验第2轮，直接验证代码变更。上一轮 MINIONS 链路已验证通过。"
+  },
+  "findings": [
+    "[PASS] FIX-1 路由冲突: MenuController 已不存在，无路由冲突。前端 menu.ts 全部使用 /menus/admin 前缀，/menus/current 保留单独端点",
+    "[PASS] FIX-2 @PreAuthorize: VendorController 5端点(含3个新增write)、DeptController 3写操作、WorkflowDefinitionController 7端点全部有 @PreAuthorize",
+    "[PASS] FIX-3 @DataScope: AssetService.queryAssets() 方法 L32 已激活 @DataScope(deptColumn='dept_id', userColumn='create_by')",
+    "[PARTIAL] AC-2 DataScope 选择器: RoleManagement.tsx 仍无 data_scope 选择器——本轮未涉及修复",
+    "[PARTIAL] AC-3 部门绑定操作: UserManagement.tsx 仍只有只读部门展示——本轮未涉及修复",
+    "[PARTIAL] AC-1 全面激活: @DataScope 从零使用升级为 AssetService 一个试点，但未达到多业务 Service 全量覆盖",
+    "[PASS] 编译验证: mvn compile BUILD SUCCESS（上一轮已确认）"
+  ],
+  "residual_risks": [
+    "AC-2 data_scope 选择器仍需在 RoleManagement.tsx 的 RoleFormDialog 中添加",
+    "AC-3 用户管理的部门绑定需从只读展示升级为可选择的部门下拉/树选择器",
+    "AC-1 @DataScope 需在更多业务 Service（WorkOrderService、InventoryService 等）上逐步推广",
+    "前端 TypeScript 编译存在预存错误（button.tsx 大小写等），不影响新页面功能",
+    "DataPermissionInterceptor 在多表 JOIN/子查询场景的兼容性需集成测试验证"
+  ]
+}

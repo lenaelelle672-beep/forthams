@@ -1,0 +1,81 @@
+{
+  "current_state": "当前指令处于 planning 审计阶段，明确要求暂停继续改代码，先排清下一步。已读取 workcard.json 与 triage.json：优先级为先定位实际 POST /api/auth/login 500，再在登录通过后验证 /workflows 新建流程保存链路。仓库当前存在大量未提交改动与新增文件，涉及若依权限、租户、数据范围、认证、工作流和前端权限链路；此前记录称后端 mvn test、前端 npm test、前端 build 已通过且后端可启动，但本次审计未重新运行测试。当前登录链路为前端 LoginPage -> frontend/src/api/auth.ts -> http.post('/auth/login') -> 后端 AuthController.login -> AuthService.login；AuthService.login 会先经 AuthenticationManager 校验，再查询 User，调用 resolveTenantId，若 user.deptId 为 null 会抛出 BusinessException('用户未绑定部门，无法生成租户令牌')，随后生成 JWT、查询 roles 与 permissions。当前工作流保存链路为 /workflows 页面或 /workflow-designer 调用 workflowApi.saveDraft -> PUT /workflows/{businessType}/draft -> WorkflowDefinitionController.saveDraft -> WorkflowDefinitionService.saveDraft；该服务强依赖 TenantContext.requireTenantId()，按 tenantId + businessType 查找并 insert/update workflow_definition。",
+  "existing_patterns": [
+    "后端接口统一挂在 Spring Boot context-path /api 下，控制器自身映射使用 /auth、/workflows 等相对路径，前端 axios baseURL 默认为 /api。",
+    "后端标准响应使用 Result<T>，前端 frontend/src/utils/http.ts 只在 body.code === 200 时解包 body.data，非 200 code 或 HTTP 5xx 会抛 Error。",
+    "认证 token 同时兼容 sessionStorage 和 localStorage，key 为 auth_token；用户信息 key 为 user_info，workflowApi.getOperatorId 从 user.id/userId/uid 推导 operatorId。",
+    "权限控制混用 @PreAuthorize('@ss.hasPermi(...)') 与 hasAnyRole('ADMIN','SUPER_ADMIN')；/workflows 查询要求 workflow:definition:query，保存/发布/创建/删除要求 ADMIN 或 SUPER_ADMIN。",
+    "租户隔离通过 JWT 里的 tenantId 与 TenantContext 驱动，WorkflowDefinitionService.list/get/save/publish 都调用 TenantContext.requireTenantId()。",
+    "工作流默认模板内置在 WorkflowDefinitionService.TEMPLATES，保存草稿时标准模板会填充默认 name/description，并将前端 definition 序列化到 definitionJson。",
+    "前端流程设计器在后端保存失败时仍会落 localStorage 本地草稿，并显示‘后端保存失败’，因此 UI 表象可能掩盖后端未落库。",
+    "已有真实后端 Playwright 冒烟用例覆盖登录、/workflows 列表、设计器保存/发布等路径，但依赖本地后端、测试账号、SUPER_ADMIN 角色和健康检查。",
+    "GitNexus context 显示 AuthService.login 参与 Login -> GetSigningKey 与 Login -> BusinessException 流程；WorkflowDefinitionService.saveDraft 由控制器、发布流程和多个单元测试调用。"
+  ],
+  "technical_constraints": [
+    "本轮只能写入 .omc/gai2/sessions/20260527-login-workflows-plan/audit.json，禁止修改业务代码、测试、文档或项目配置。",
+    "下一步必须先采集 /api/auth/login 500 的真实后端异常栈、请求体、响应体与数据库用户/部门/角色/权限证据，不能基于 dept_id/租户假设直接修复。",
+    "若根因为用户 deptId 缺失，应优先考虑数据兼容、初始化脚本或迁移修复；受控超管 fallback 只能作为最后方案，且不能粗暴放开权限或绕过租户隔离。",
+    "SecurityConfig 当前允许 /auth/login、/auth/register、/auth/logout、/public/**、/health、/system/**、/oauth2-mock/**、/sso/** 免认证；修改登录链路时必须避免扩大免认证面。",
+    "AuthService.login 生成 JWT 依赖 resolveTenantId(user)，而后续 /workflows 保存依赖 TenantContext；登录 token 的租户声明与 workflow_definition.tenant_id 必须一致。",
+    "权限码查询 resolvePermissions 捕获异常后返回空列表，不会阻断登录；因此登录 500 更可能来自认证、用户查询、deptId、JWT、密码编码或未捕获的数据层异常。",
+    "WorkflowDefinitionControllerTest 使用 addFilters=false，不能证明真实 Security/JWT/TenantContext 链路可用；WorkflowDefinitionServiceTest 手动设置 TenantContext，不能证明真实请求可正确注入租户。",
+    "当前仓库已有大量未提交改动，后续 Builder 必须避免混入无关修复，并在提交前运行 gitnexus_detect_changes()。",
+    "GitNexus route impact 未能按 /api/auth/login 或 /workflows 匹配到 route，说明当前索引对 Spring context-path/路由抽取可能不完整；后续如改符号仍需按 AGENTS.md 先做 symbol 级 impact。"
+  ],
+  "risks": [
+    {
+      "level": "high",
+      "detail": "登录 500 根因尚未有真实异常栈，若直接按 deptId 假设改代码，可能误修并引入租户隔离或权限绕过风险。"
+    },
+    {
+      "level": "high",
+      "detail": "认证链路牵涉 AuthenticationManager、UserDetailsServiceImpl、PasswordEncoder、User/Dept/Role/SysMenu 数据、JWT tenantId 与前端 user_info；修复面跨多模块，回归不足会导致全站不可用。"
+    },
+    {
+      "level": "high",
+      "detail": "当前工作区包含 69 个已跟踪文件改动和大量新增文件，审计对象处在大规模未提交状态；任何继续修改都容易与既有未验证改动叠加。"
+    },
+    {
+      "level": "medium",
+      "detail": "SecurityConfig 中 /auth/logout 当前 permitAll，与既往残余审计提到‘仅 login/register 免认证’的安全预期存在潜在偏差，需要确认是否为本轮故意变更。"
+    },
+    {
+      "level": "medium",
+      "detail": "前端流程设计器 catch 保存失败后仍保存本地草稿，可能让用户误以为新建流程已保存；端到端验证必须检查数据库写入与刷新回显，而不是只看本地提示。"
+    },
+    {
+      "level": "medium",
+      "detail": "/workflows 保存依赖角色 ADMIN/SUPER_ADMIN 与 TenantContext；如果登录返回 roles/permissions 不完整或 token 缺 tenantId，可能表现为 401/403/500 或保存后查询不到。"
+    },
+    {
+      "level": "medium",
+      "detail": "测试中 MockMvc addFilters=false 和手动 TenantContext 降低了集成覆盖，真实过滤器、方法级权限、数据范围切面和租户注入缺口仍需浏览器/API 冒烟补齐。"
+    },
+    {
+      "level": "low",
+      "detail": "前端存在两套相近工作流服务路径（src/api/workflow.ts 与 src/app/services/workflowDefinitionService.ts），后续定位需确认当前路由实际使用哪套页面与按钮文案。"
+    }
+  ],
+  "test_surface": [
+    "只读定位：触发 POST /api/auth/login，保存完整请求体、HTTP 状态、响应 JSON、后端控制台异常栈和相关 SQL 日志。",
+    "数据库证据：查询登录用户的 sys_user/id/username/status/dept_id，关联 sys_dept、sys_user_role、sys_role、sys_role_menu、sys_menu 权限码，确认部门、角色、权限和启用状态。",
+    "认证链路验证：确认 UserDetailsServiceImpl 能加载用户、密码 BCrypt 匹配、AuthService.login 返回 token/userId/username/realName/roles/permissions。",
+    "后端单元/集成：在 backend 执行 mvn test，重点观察 AuthControllerTest、TenantIsolationIntegrationTest、WorkflowDefinitionControllerTest、WorkflowDefinitionServiceTest。",
+    "前端验证：在 frontend 执行 npm test 与 npm run build，重点观察登录页、权限守卫、workflowApi/http 解包相关测试。",
+    "真实后端冒烟：AMS_E2E_REAL_BACKEND=true npm run e2e:real，或等价 Playwright 手动验证登录、/workflows 列表、打开设计器、保存草稿、刷新回显。",
+    "工作流 API 级验证：登录成功后携带 Authorization 调 PUT /api/workflows/{businessType}/draft，检查响应 code/data、workflow_definition 表 tenant_id/business_type/definition_json、再 GET /api/workflows/{businessType} 回显。",
+    "安全回归：验证未登录访问 /api/workflows 返回 401，低权限用户保存/发布返回 403，SUPER_ADMIN 或 ADMIN 才能保存/发布。",
+    "变更影响检查：后续如进入修复，在提交前运行 gitnexus_detect_changes(scope='all', repo='forthams') 并确认影响范围只覆盖预期认证/工作流符号。"
+  ],
+  "builder_notes": [
+    "执行顺序必须是：先复现并拿到 /api/auth/login 500 真实异常栈，再判断根因；登录通过前不要进入 /workflows 保存修复。",
+    "优先排查 AuthService.login 第 37-50 行附近：AuthenticationManager、userMapper.selectOne、resolveTenantId、jwtUtil.generateToken、userRoleMapper.selectRoleCodesByUserId、sysMenuMapper.selectPermsByUserId。",
+    "特别检查 User.deptId、Dept 数据、schema.sql 初始化、migration 脚本和本地数据库实际数据是否一致；若要修复数据，需同时考虑测试数据和生产迁移策略。",
+    "不要通过放开 /workflows 权限、跳过 TenantContext.requireTenantId 或给所有用户 SUPER_ADMIN 来让流程保存通过。",
+    "若确需代码 fallback，应限制在明确条件下、可审计、可测试，并保证不会生成无租户 token 或跨租户访问 workflow_definition。",
+    "验证 /workflows 时不要只看前端绿色提示；必须确认后端 PUT 成功、数据库有对应 tenant_id/business_type 行、刷新页面或 GET 接口能回显同一 definition。",
+    "注意 workflowApi.getOperatorId 依赖 user_info；登录响应和 LoginPage 存储字段必须包含 userId，否则保存/发布 updatedBy/publishedBy 可能为空。",
+    "当前 GitNexus route_map 对 /api/auth/login 与 /workflows 未匹配，后续改 AuthService.login、SecurityConfig、WorkflowDefinitionService.saveDraft 等符号前仍需做 symbol 级 impact 并向用户报告风险。",
+    "本审计未执行测试、未启动服务、未连接数据库；所有根因判断均应在下一步以日志和数据证据闭环。"
+  ]
+}

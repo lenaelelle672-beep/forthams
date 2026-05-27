@@ -1,0 +1,36 @@
+{
+  "directive": "使用 GAI2 显式工作流处理当前指令：暂停继续改代码，先把下一步排清楚。当前已完成一批若依整合基础修复并通过后端 mvn test、前端 npm test、前端 build，后端可启动。剩余收口重点是先定位并修复实际登录 /api/auth/login 500，再进入 /workflows 新建流程无法保存的端到端验证与修复规划。",
+  "owner": "gai2-orchestrator",
+  "phase": "planning",
+  "artifact_dir": ".omc/gai2/sessions/20260527-login-workflows-plan",
+  "classification": null,
+  "implementation_intent": false,
+  "acceptance_checks": [
+    {
+      "id": "plan_login_first",
+      "description": "明确下一步优先定位登录 500，并列出应采集的后端异常栈、数据库用户部门/角色/权限证据。"
+    },
+    {
+      "id": "safe_fix_strategy",
+      "description": "明确优先采用数据兼容/初始化修复，必要时才做受控超管 fallback，避免粗暴放开权限。"
+    },
+    {
+      "id": "workflow_followup_plan",
+      "description": "明确登录通过后对 /workflows 的保存链路验证范围：前端 payload、接口路径、后端 service、权限/数据范围、数据库写入与刷新回显。"
+    },
+    {
+      "id": "regression_plan",
+      "description": "明确最终回归测试集合：后端测试、前端测试、前端 build、浏览器冒烟及至少一个流程保存回归测试。"
+    }
+  ],
+  "evidence_to_collect": [
+    "triage.json 对任务类型、风险和是否需要实现的分类",
+    "debate.json 如存在方案分歧时对数据修复、代码 fallback、权限处理的取舍",
+    "review.json 对计划完整性和验收项映射的核验"
+  ],
+  "open_risks": [
+    "尚未抓取登录 500 的真实异常栈，当前 dept_id/租户上下文判断仍是待证假设。",
+    "若本地数据与初始化脚本、测试数据和生产迁移策略不一致，可能需要分层处理。",
+    "登录问题修复后 /workflows 保存失败可能暴露出独立的 DTO、权限或数据库字段问题。"
+  ]
+}

@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import {
-  FileText, Cog, Wrench, Search,
+  FileText, Cog, Wrench,
   Plus, Trash2,
 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Select, SelectItem } from '@/components/ui/Select';
+import AssetPickerModal from '@/components/AssetPickerModal';
 import { getAssetList } from '@/api/asset';
 import { submitScrapApplication, saveScrapDraft } from '@/api/disposal';
 import type { AssetListItem } from '@/types/asset';
@@ -138,7 +139,7 @@ export default function AssetScrapFormPage() {
   const qc = useQueryClient();
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedAssets, setSelectedAssets] = useState<SelectedAsset[]>([]);
-  const [assetSearch, setAssetSearch] = useState('');
+  const [showAssetPicker, setShowAssetPicker] = useState(false);
 
   // Fetch available assets from the real API
   const { data: assetListData } = useQuery({
@@ -186,14 +187,6 @@ export default function AssetScrapFormPage() {
     setSelectedAssets((prev) => prev.filter((a) => a.id !== id));
   };
 
-  const addAsset = useCallback((asset: AssetListItem) => {
-    const selected = toSelectedAsset(asset);
-    setSelectedAssets((prev) => {
-      if (prev.some((a) => a.id === selected.id)) return prev;
-      return [...prev, selected];
-    });
-  }, []);
-
   const handleSaveDraft = useCallback(() => {
     const formData = {
       scrapDate: (document.querySelector<HTMLInputElement>('input[name="scrapDate"]')?.value) ?? '',
@@ -221,17 +214,6 @@ export default function AssetScrapFormPage() {
 
   const formatCurrency = (val: number) =>
     val.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-
-  // Filter available assets that are not already selected
-  const unselectedAssets = availableAssets.filter(
-    (a) => !selectedAssets.some((s) => s.id === String(a.id)),
-  );
-  const filteredUnselected = unselectedAssets.filter(
-    (a) =>
-      !assetSearch ||
-      a.assetNo.toLowerCase().includes(assetSearch.toLowerCase()) ||
-      a.assetName.toLowerCase().includes(assetSearch.toLowerCase()),
-  );
 
   return (
     <div className="p-6 space-y-5 max-w-[1200px] mx-auto w-full">
@@ -303,99 +285,26 @@ export default function AssetScrapFormPage() {
               资产选择
             </CardTitle>
             <div className="flex items-center gap-3">
-              <div className="relative">
-                <Search className="absolute left-3 top-2 w-4 h-4 text-[#94a3b8]" />
-                <input
-                  type="text"
-                  placeholder="搜索资产..."
-                  value={assetSearch}
-                  onChange={(e) => setAssetSearch(e.target.value)}
-                  className="h-8 pl-9 pr-4 rounded-lg border border-[#e5e7eb] bg-[#e9edfe] text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 w-72"
-                />
-              </div>
+              <Button type="button" size="sm" onClick={() => setShowAssetPicker(true)}>
+                <Plus className="w-4 h-4" /> 添加资产
+              </Button>
+              <span className="text-sm text-gray-500">已选 {selectedAssets.length} 项</span>
             </div>
           </CardHeader>
-          {/* Available assets to add */}
-          {assetSearch && filteredUnselected.length > 0 && (
-            <div className="border-t border-[#e5e7eb] bg-[#f8faff]">
-              <div className="px-6 py-2 text-xs font-semibold text-[#535f74] uppercase tracking-wider">
-                可添加资产
-              </div>
-              <div className="max-h-40 overflow-y-auto divide-y divide-[#e5e7eb]">
-                {filteredUnselected.map((asset) => (
-                  <div
-                    key={asset.id}
-                    className="flex items-center justify-between px-6 py-2 hover:bg-[#f1f3ff]/70 transition-colors cursor-pointer"
-                    onClick={() => addAsset(asset)}
-                    role="button"
-                    tabIndex={0}
-                  >
-                    <div className="flex items-center gap-4 text-sm">
-                      <span className="font-semibold text-[#3b82f6]">{asset.assetNo}</span>
-                      <span>{asset.assetName}</span>
-                      <span className="text-[#535f74]">{asset.categoryName}</span>
-                    </div>
-                    <Plus className="w-4 h-4 text-[#3b82f6]" />
-                  </div>
-                ))}
-              </div>
+          {selectedAssets.length > 0 ? (
+            <div className="px-6 pb-6 flex flex-wrap gap-2">
+              {selectedAssets.map((asset) => (
+                <span key={asset.id} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-medium">
+                  {asset.assetNo} - {asset.name}
+                  <button type="button" onClick={() => removeAsset(asset.id)} className="ml-0.5 hover:text-red-500">&times;</button>
+                </span>
+              ))}
+            </div>
+          ) : (
+            <div className="px-6 pb-6">
+              <div className="text-center text-sm text-[#94a3b8] py-8">暂无已选资产，点击"添加资产"按钮选择。</div>
             </div>
           )}
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-[#f1f3ff] text-[#424753] text-[10px] font-semibold uppercase tracking-wider">
-                  <th className="px-6 py-3 border-b border-[#e5e7eb]">资产编号</th>
-                  <th className="px-6 py-3 border-b border-[#e5e7eb]">资产名称</th>
-                  <th className="px-6 py-3 border-b border-[#e5e7eb]">分类</th>
-                  <th className="px-6 py-3 border-b border-[#e5e7eb]">品牌/型号</th>
-                  <th className="px-6 py-3 border-b border-[#e5e7eb] text-right">原值 (¥)</th>
-                  <th className="px-6 py-3 border-b border-[#e5e7eb] text-right">净值 (¥)</th>
-                  <th className="px-6 py-3 border-b border-[#e5e7eb]">已用年限</th>
-                  <th className="px-6 py-3 border-b border-[#e5e7eb]">状态</th>
-                  <th className="px-6 py-3 border-b border-[#e5e7eb] text-center">操作</th>
-                </tr>
-              </thead>
-              <tbody className="text-sm divide-y divide-[#e5e7eb]">
-                {selectedAssets
-                  .filter((a) =>
-                    !assetSearch ||
-                    a.assetNo.toLowerCase().includes(assetSearch.toLowerCase()) ||
-                    a.name.toLowerCase().includes(assetSearch.toLowerCase())
-                  )
-                  .map((asset) => (
-                    <tr key={asset.id} className="hover:bg-[#f1f3ff]/50 transition-colors">
-                      <td className="px-6 py-4 font-semibold text-[#3b82f6]">{asset.assetNo}</td>
-                      <td className="px-6 py-4">{asset.name}</td>
-                      <td className="px-6 py-4">{asset.category}</td>
-                      <td className="px-6 py-4 text-[#535f74]">{asset.brand}</td>
-                      <td className="px-6 py-4 text-right">{formatCurrency(asset.originalValue)}</td>
-                      <td className="px-6 py-4 text-right">{formatCurrency(asset.netValue)}</td>
-                        <td className="px-6 py-4">{asset.usedYears} 年</td>
-                      <td className="px-6 py-4">
-                        <StatusBadge status={asset.status} color={asset.statusColor} />
-                      </td>
-                      <td className="px-6 py-4 text-center">
-                        <button
-                          type="button"
-                          onClick={() => removeAsset(asset.id)}
-                          className="text-red-500 hover:bg-red-50 p-1.5 rounded transition-all"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                {selectedAssets.length === 0 && (
-                  <tr>
-                    <td colSpan={9} className="px-6 py-8 text-center text-[#94a3b8]">
-                      暂无选中资产，请搜索并添加资产
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
         </Card>
 
         {/* 报废配置 */}
@@ -504,6 +413,18 @@ export default function AssetScrapFormPage() {
           </div>
         </div>
       </form>
+
+      <AssetPickerModal
+        open={showAssetPicker}
+        onClose={() => setShowAssetPicker(false)}
+        selectedIds={new Set(selectedAssets.map((a) => a.id))}
+        onSelectionChange={(ids) => {
+          const newSelected = availableAssets
+            .filter((a) => ids.has(String(a.id)))
+            .map((a) => toSelectedAsset(a));
+          setSelectedAssets(newSelected);
+        }}
+      />
     </div>
   );
 }

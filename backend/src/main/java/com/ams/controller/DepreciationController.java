@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 
@@ -20,6 +21,7 @@ public class DepreciationController {
 
     private final DepreciationService depreciationService;
 
+    @PreAuthorize("@ss.hasPermi('depreciation:query')")
     @GetMapping("/schedules")
     public Result<DepreciationService.DepreciationSchedulePage> schedules(
             @RequestParam(required = false) String assetNo,
@@ -29,6 +31,7 @@ public class DepreciationController {
         return Result.success(depreciationService.getSchedules(assetNo, period, page, size));
     }
 
+    @PreAuthorize("@ss.hasPermi('depreciation:calculate')")
     @PostMapping("/calculate")
     public Result<DepreciationService.BatchCalculateResponse> calculate(@Valid @RequestBody BatchCalculateRequest request) {
         return Result.success(depreciationService.calculate(request.assetIds()));

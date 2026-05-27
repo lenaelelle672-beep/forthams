@@ -11,6 +11,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 import java.util.Map;
@@ -22,6 +23,7 @@ public class WorkOrderController {
 
     private final WorkOrderService workOrderService;
 
+    @PreAuthorize("@ss.hasPermi('workorder:order:query')")
     @GetMapping({"", "/list"})
     public Result<Page<WorkOrder>> queryWorkOrders(
             @RequestParam(defaultValue = "1") Integer page,
@@ -31,32 +33,38 @@ public class WorkOrderController {
         return Result.success(workOrderService.queryWorkOrders(page, pageSize, status, keyword));
     }
 
+    @PreAuthorize("@ss.hasPermi('workorder:order:query')")
     @GetMapping("/{id}")
     public Result<WorkOrder> getWorkOrderById(@PathVariable Long id) {
         return Result.success(workOrderService.getWorkOrderById(id));
     }
 
+    @PreAuthorize("@ss.hasPermi('workorder:order:create')")
     @PostMapping
     public Result<WorkOrder> createWorkOrder(@Valid @RequestBody WorkOrderDTO dto) {
         return Result.success(workOrderService.createWorkOrder(dto));
     }
 
+    @PreAuthorize("@ss.hasPermi('workorder:order:edit')")
     @PutMapping("/{id}")
     public Result<WorkOrder> updateWorkOrder(@PathVariable Long id, @Valid @RequestBody WorkOrderDTO dto) {
         return Result.success(workOrderService.updateWorkOrder(id, dto));
     }
 
+    @PreAuthorize("@ss.hasPermi('workorder:order:delete')")
     @DeleteMapping("/{id}")
     public Result<Void> deleteWorkOrder(@PathVariable Long id) {
         workOrderService.deleteWorkOrder(id);
         return Result.success();
     }
 
+    @PreAuthorize("@ss.hasPermi('workorder:order:submit')")
     @PostMapping("/{id}/submit")
     public Result<WorkOrder> submitWorkOrder(@PathVariable Long id) {
         return Result.success(workOrderService.submitWorkOrder(id));
     }
 
+    @PreAuthorize("@ss.hasPermi('workorder:order:operate')")
     @PostMapping("/{id}/operate")
     public Result<WorkOrder> operateWorkOrder(@PathVariable Long id, @RequestBody Map<String, String> body) {
         String operation = body.get("operation");
@@ -64,11 +72,13 @@ public class WorkOrderController {
         return Result.success(workOrderService.operateWorkOrder(id, operation, comment));
     }
 
+    @PreAuthorize("@ss.hasPermi('workorder:order:operate')")
     @PostMapping("/{id}/approve")
     public Result<WorkOrder> approveWorkOrder(@PathVariable Long id, @RequestBody(required = false) Map<String, String> body) {
         return operateWorkOrder(id, "approve", body);
     }
 
+    @PreAuthorize("@ss.hasPermi('workorder:order:operate')")
     @PostMapping("/{id}/reject")
     public Result<WorkOrder> rejectWorkOrder(@PathVariable Long id, @RequestBody(required = false) Map<String, String> body) {
         return operateWorkOrder(id, "reject", body);
@@ -86,6 +96,7 @@ public class WorkOrderController {
      *
      * @return 各状态工单计数列表
      */
+    @PreAuthorize("@ss.hasPermi('workorder:order:query')")
     @GetMapping("/status-distribution")
     public Result<List<StatusDistributionDTO>> getStatusDistribution() {
         return Result.success(workOrderService.getStatusDistribution());
@@ -98,6 +109,7 @@ public class WorkOrderController {
      *
      * @return 各部门待处理工单计数列表
      */
+    @PreAuthorize("@ss.hasPermi('workorder:order:query')")
     @GetMapping("/dept-pending")
     public Result<List<DeptPendingDTO>> getDeptPending() {
         return Result.success(workOrderService.getDeptPending());

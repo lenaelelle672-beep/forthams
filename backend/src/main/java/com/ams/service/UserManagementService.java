@@ -8,9 +8,13 @@ import com.ams.dto.UserUpdateDTO;
 import com.ams.entity.Role;
 import com.ams.entity.User;
 import com.ams.entity.UserRole;
+import com.ams.entity.Dept;
+import com.ams.mapper.DeptMapper;
 import com.ams.mapper.RoleMapper;
+import com.ams.mapper.SysUserPostMapper;
 import com.ams.mapper.UserMapper;
 import com.ams.mapper.UserRoleMapper;
+import com.ams.security.SecurityUserCacheService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -26,16 +30,24 @@ import java.util.Map;
 public class UserManagementService {
 
     private final UserMapper userMapper;
+    private final DeptMapper deptMapper;
     private final RoleMapper roleMapper;
+    private final SysUserPostMapper sysUserPostMapper;
     private final UserRoleMapper userRoleMapper;
     private final PasswordEncoder passwordEncoder;
+    private final SecurityUserCacheService securityUserCacheService;
 
-    public UserManagementService(UserMapper userMapper, RoleMapper roleMapper, UserRoleMapper userRoleMapper,
-                                 PasswordEncoder passwordEncoder) {
+    public UserManagementService(UserMapper userMapper, DeptMapper deptMapper, RoleMapper roleMapper,
+                                  SysUserPostMapper sysUserPostMapper, UserRoleMapper userRoleMapper,
+                                   PasswordEncoder passwordEncoder,
+                                   SecurityUserCacheService securityUserCacheService) {
         this.userMapper = userMapper;
+        this.deptMapper = deptMapper;
         this.roleMapper = roleMapper;
+        this.sysUserPostMapper = sysUserPostMapper;
         this.userRoleMapper = userRoleMapper;
         this.passwordEncoder = passwordEncoder;
+        this.securityUserCacheService = securityUserCacheService;
     }
 
     public Page<User> queryUsers(Integer page, Integer pageSize, String keyword, Long deptId, Integer status) {
@@ -46,6 +58,8 @@ public class UserManagementService {
             wrapper.and(w -> w.like("username", keyword)
                 .or()
                 .like("real_name", keyword)
+                .or()
+                .like("email", keyword)
                 .or()
                 .like("phone", keyword));
         }
@@ -71,10 +85,12 @@ public class UserManagementService {
                 .or()
                 .like("real_name", keyword)
                 .or()
+                .like("email", keyword)
+                .or()
                 .like("phone", keyword));
         }
         wrapper.select("id", "username", "real_name", "email", "phone", "dept_id", "status")
-               .last("limit 50");
+               .last("limit 200");
         List<User> users = userMapper.selectList(wrapper);
         users.forEach(user -> BeanUtil.setProperty(user, "password", null));
         return users;
@@ -124,10 +140,17 @@ public class UserManagementService {
         result.put("email", user.getEmail());
         result.put("phone", user.getPhone());
         result.put("deptId", user.getDeptId());
+        result.put("deptName", resolveDeptName(user.getDeptId()));
         result.put("status", user.getStatus());
+        result.put("remark", user.getRemark());
+        result.put("loginIp", user.getLoginIp());
+        result.put("loginDate", user.getLoginDate());
+        result.put("createTime", user.getCreateTime());
+        result.put("updateTime", user.getUpdateTime());
         result.put("roleIds", roleIds);
         result.put("roles", roles);
         result.put("roleCodes", roleCodes);
+        result.put("postIds", sysUserPostMapper.selectPostIdsByUserId(id));
         return result;
     }
 
@@ -149,7 +172,9 @@ public class UserManagementService {
         BeanUtil.setProperty(user, "email", getStrProp(dto, "email"));
         BeanUtil.setProperty(user, "phone", getStrProp(dto, "phone"));
         BeanUtil.setProperty(user, "deptId", getLongProp(dto, "deptId"));
-        BeanUtil.setProperty(user, "status", 1);
+        Integer status = Convert.toInt(BeanUtil.getProperty(dto, "status"), 1);
+        BeanUtil.setProperty(user, "status", status);
+        BeanUtil.setProperty(user, "remark", getStrProp(dto, "remark"));
         userMapper.insert(user);
 
         // 处理角色分配
@@ -170,6 +195,7 @@ public class UserManagementService {
             userRoleMapper.insert(userRole);
         }
 
+        evictUserCache(user);
         BeanUtil.setProperty(user, "password", null);
         return user;
     }
@@ -181,6 +207,11 @@ public class UserManagementService {
         BeanUtil.setProperty(user, "email", getStrProp(dto, "email"));
         BeanUtil.setProperty(user, "phone", getStrProp(dto, "phone"));
         BeanUtil.setProperty(user, "deptId", getLongProp(dto, "deptId"));
+        Integer status = Convert.toInt(BeanUtil.getProperty(dto, "status"));
+        if (status != null) {
+            BeanUtil.setProperty(user, "status", status);
+        }
+        BeanUtil.setProperty(user, "remark", getStrProp(dto, "remark"));
         userMapper.updateById(user);
 
         // 处理角色更新：先删旧关联，再写入新关联
@@ -192,6 +223,7 @@ public class UserManagementService {
             }
         }
 
+        evictUserCache(user);
         BeanUtil.setProperty(user, "password", null);
         return user;
     }
@@ -215,6 +247,7 @@ public class UserManagementService {
         User user = getUserEntityOrThrow(id);
         BeanUtil.setProperty(user, "password", passwordEncoder.encode("123456"));
         userMapper.updateById(user);
+        evictUserCache(user);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -222,13 +255,27 @@ public class UserManagementService {
         User user = getUserEntityOrThrow(id);
         BeanUtil.setProperty(user, "status", status);
         userMapper.updateById(user);
+        evictUserCache(user);
     }
 
     @Transactional(rollbackFor = Exception.class)
     public void deleteUser(Long id) {
-        getUserEntityOrThrow(id);
+        User user = getUserEntityOrThrow(id);
         userMapper.deleteById(id);
+        evictUserCache(user);
     }
+
+    /** 用户角色分配 — 先删后插批量替换（公开事务方法） */
+    @Transactional(rollbackFor = Exception.class)
+    public void assignUserRoles(Long userId, List<Long> roleIds) {
+        User user = getUserEntityOrThrow(userId); // 校验用户存在
+        userRoleMapper.deleteByUserId(userId);
+        if (roleIds != null && !roleIds.isEmpty()) {
+            assignRolesToUser(userId, roleIds);
+        }
+        evictUserCache(user);
+    }
+
 
     private User getUserEntityOrThrow(Long id) {
         User user = userMapper.selectById(id);
@@ -236,6 +283,20 @@ public class UserManagementService {
             throw new BusinessException("用户不存在");
         }
         return user;
+    }
+
+    private void evictUserCache(User user) {
+        if (user != null && user.getUsername() != null && !user.getUsername().isBlank()) {
+            securityUserCacheService.evictByUsername(user.getUsername());
+        }
+    }
+
+    private String resolveDeptName(Long deptId) {
+        if (deptId == null) {
+            return null;
+        }
+        Dept dept = deptMapper.selectById(deptId);
+        return dept == null ? null : dept.getName();
     }
 
     private Long getLongProp(Object bean, String fieldName) {

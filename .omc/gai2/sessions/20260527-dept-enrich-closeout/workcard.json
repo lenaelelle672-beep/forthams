@@ -1,0 +1,28 @@
+{
+  "directive": "丰富部门管理功能：支持折叠/展开（类菜单管理），新增部门领导/秘书等配置字段",
+  "owner": "gai2-orchestrator",
+  "phase": "review",
+  "acceptance_checks": [
+    "1. 部门树支持展开全部/折叠全部，默认折叠仅显示根节点",
+    "2. 后端 Dept 实体新增 leaderId、secretaryId、deptType、description 字段",
+    "3. 前端部门表单支持配置部门领导、秘书、部门类型、备注",
+    "4. 部门列表展示新增字段",
+    "5. npm run build 通过"
+  ],
+  "evidence_to_collect": [
+    "Dept.java 实体字段",
+    "DeptCreateDTO/DeptUpdateDTO DTO 字段",
+    "DeptService.java createDept/updateDept 赋值",
+    "schema.sql 表结构和迁移",
+    "common.ts Department 接口字段",
+    "DeptManagement.tsx 表单和表格展示",
+    "npm run build 结果"
+  ],
+  "open_risks": [
+    "数据库新字段需要运行 schema.sql 迁移才能使用",
+    "leaderId/secretaryId 为关联用户表的外键引用，需确保用户存在"
+  ],
+  "artifact_dir": ".omc/gai2/sessions/20260527-dept-enrich-closeout",
+  "phase_history": ["triage", "builder"],
+  "auto_mode": false
+}

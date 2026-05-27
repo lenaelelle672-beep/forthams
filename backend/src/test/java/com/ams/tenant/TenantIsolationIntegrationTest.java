@@ -70,6 +70,9 @@ class TenantIsolationIntegrationTest {
                     avatar VARCHAR(512),
                     status TINYINT DEFAULT 1,
                     dept_id BIGINT,
+                    login_ip VARCHAR(64),
+                    login_date TIMESTAMP,
+                    remark VARCHAR(512),
                     create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     deleted TINYINT DEFAULT 0

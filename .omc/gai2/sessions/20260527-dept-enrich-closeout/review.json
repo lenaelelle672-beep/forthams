@@ -1,0 +1,136 @@
+{
+  "verdict": "PASS",
+  "overall_status": "pass",
+  "gap_fingerprint": null,
+  "missing_criteria": [],
+  "evidence_map": {
+    "1. 部门树支持展开全部/折叠全部，默认折叠仅显示根节点": [
+      "DeptManagement.tsx L221: useState<Set<number>>(new Set()) — 默认折叠状态",
+      "DeptManagement.tsx L270-279: useEffect 中无搜索时 setExpandedIds(new Set()) — 默认折叠仅显示根节点",
+      "DeptManagement.tsx L293-317: toggleAll 函数实现展开全部（collectAll 所有节点）和折叠全部（collectRootIds 保留根节点 ID）",
+      "DeptManagement.tsx L472-478: UI 按钮 '展开全部' / '折叠全部' 交互",
+      "根节点行始终可见，子节点仅在展开时渲染"
+    ],
+    "2. 后端 Dept 实体新增 leaderId、secretaryId、deptType、description 字段": [
+      "Dept.java L65-66 (leaderId), L69-70 (secretaryId), L73-74 (deptType), L77 (description) — 实体含4个新字段",
+      "DeptCreateDTO.java L17-20: 包含 leaderId, secretaryId, deptType, description",
+      "DeptUpdateDTO.java L17-20: 包含 leaderId, secretaryId, deptType, description",
+      "DeptService.java L67-70: createDept 赋值 leaderId/secretaryId/deptType/description",
+      "DeptService.java L88-91: updateDept 赋值 leaderId/secretaryId/deptType/description",
+      "schema.sql: 对应列定义及迁移 SQL"
+    ],
+    "3. 前端部门表单支持配置部门领导、秘书、部门类型、备注": [
+      "DeptForm 类型 (L31-34): leaderId, secretaryId, deptType, description 字段定义",
+      "emptyForm 默认值 (L46-49): 全部初始化为空字符串",
+      "DeptManagement.tsx L605-617: 部门领导 select（用户列表下拉）",
+      "DeptManagement.tsx L618-630: 秘书 select（用户列表下拉）",
+      "DeptManagement.tsx L632-647: 部门类型 select（5种类型：管理/技术/支撑/生产/其他）",
+      "DeptManagement.tsx L660-668: 备注 textarea",
+      "DeptManagement.tsx L370-373: openEdit 回显 4 个新字段",
+      "DeptManagement.tsx L401-404: submitForm payload 包含 leaderId/secretaryId/deptType/description"
+    ],
+    "4. 部门列表展示新增字段": [
+      "DeptManagement.tsx L500-503: thead 列 '部门领导' / '秘书' / '部门类型' / '备注'",
+      "DeptManagement.tsx L151: tbody 领导列 userNameMap.get(leaderId) 显示用户名",
+      "DeptManagement.tsx L152: tbody 秘书列 userNameMap.get(secretaryId) 显示用户名",
+      "DeptManagement.tsx L153: tbody 部门类型列 DEPT_TYPE_LABELS 映射中文名称",
+      "DeptManagement.tsx L154: tbody 备注列显示 description"
+    ],
+    "5. npm run build 通过": [
+      "npm run build (frontend): ✓ built in 4.64s, 3351 modules transformed, 0 errors"
+    ]
+  },
+  "repair_recommendation": "none",
+  "directive_summary": "丰富部门管理功能：支持折叠/展开（类菜单管理），新增部门领导/秘书等配置字段",
+  "affected_scope": [
+    "backend/src/main/java/com/ams/entity/Dept.java",
+    "backend/src/main/java/com/ams/dto/DeptCreateDTO.java",
+    "backend/src/main/java/com/ams/dto/DeptUpdateDTO.java",
+    "backend/src/main/java/com/ams/service/DeptService.java",
+    "backend/src/main/resources/schema.sql",
+    "frontend/src/types/common.ts",
+    "frontend/src/pages/system/DeptManagement.tsx"
+  ],
+  "commands_checked": [
+    {
+      "command": "npm run build (frontend)",
+      "result": "passed",
+      "notes": "vite build 成功，3351 modules transformed，built in 4.64s，0 errors"
+    }
+  ],
+  "acceptance_status": [
+    {
+      "criterion": "1. 部门树支持展开全部/折叠全部，默认折叠仅显示根节点",
+      "status": "PASS",
+      "evidence": [
+        "useEffect 中无搜索时 setExpandedIds(new Set()) 实现默认折叠仅显示根节点",
+        "toggleAll 函数实现展开全部（collectAll）和折叠全部（collectRootIds 保留根节点 ID）",
+        "UI 按钮 '展开全部'/'折叠全部' 交互功能正常",
+        "初始状态 useState<Set>(new Set()) 确保首次加载全折叠"
+      ]
+    },
+    {
+      "criterion": "2. 后端 Dept 实体新增 leaderId、secretaryId、deptType、description 字段",
+      "status": "PASS",
+      "evidence": [
+        "Dept.java 实体包含 leaderId(L65-66)、secretaryId(L69-70)、deptType(L73-74)、description(L77)",
+        "DeptCreateDTO.java 和 DeptUpdateDTO.java 均包含全部 4 个字段",
+        "DeptService.java createDept(L67-70)/updateDept(L88-91) 完整赋值",
+        "schema.sql 包含对应列定义"
+      ]
+    },
+    {
+      "criterion": "3. 前端部门表单支持配置部门领导、秘书、部门类型、备注",
+      "status": "PASS",
+      "evidence": [
+        "部门领导 select（userList 下拉，显示 realName/username）",
+        "秘书 select（userList 下拉，显示 realName/username）",
+        "部门类型 select（5 种类型：管理部门/技术部门/支撑部门/生产部门/其他）",
+        "备注 textarea（placeholder: 部门描述、职责说明等）",
+        "submitForm payload 包含 leaderId/secretaryId/deptType/description",
+        "openEdit 编辑回显完整支持新字段"
+      ]
+    },
+    {
+      "criterion": "4. 部门列表展示新增字段",
+      "status": "PASS",
+      "evidence": [
+        "表格列头：部门领导、秘书、部门类型、备注",
+        "领导列通过 userNameMap 映射显示用户名（非原始 ID）",
+        "秘书列通过 userNameMap 映射显示用户名（非原始 ID）",
+        "部门类型列使用 DEPT_TYPE_LABELS 显示中文名称",
+        "备注列显示 description，超出截断"
+      ]
+    },
+    {
+      "criterion": "5. npm run build 通过",
+      "status": "PASS",
+      "evidence": [
+        "npm run build 成功：✓ built in 4.64s",
+        "3351 modules transformed，0 errors"
+      ]
+    }
+  ],
+  "minions_review": {
+    "draft_checked": true,
+    "refine_checked": true,
+    "adjudication_checked": true,
+    "real_dual_agent_chain": true,
+    "write_degradation_guard_passed": true,
+    "sonnet_fallback_absent": true
+  },
+  "findings": [
+    "全部 5 个验收标准均 PASS，无未满足的缺口",
+    "draft-changes.json write_intent 明确包含修改方案，write_actions 共 7 个动作",
+    "refine.json write_intent_preserved=true, degradation_detected=false，无写动作退化",
+    "adjudication.json write_action_guard.degradation_prevented=true，裁决采用 Draft+Refine",
+    "changes.json minions_execution 验证 adjudication 文件已读取，write_intent 已保持",
+    "真实链路 gai2-drafter → gai2-refiner → adjudication → gai2-builder → gai2-reviewer 完整",
+    "npm run build 通过（4.64s，0 错误）"
+  ],
+  "residual_risks": [
+    "leaderId/secretaryId 为关联用户表的外键引用，需确保目标用户存在",
+    "数据库新字段需要运行 schema.sql 迁移（ADD COLUMN）才能在实际数据库生效",
+    "userList 首次加载可能尚未完成，领导/秘书列优雅降级显示 '—'"
+  ]
+}

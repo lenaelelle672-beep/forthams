@@ -1,0 +1,47 @@
+{
+  "decisions": [
+    {
+      "id": "controller-conflict",
+      "title": "新旧 Controller 路由冲突",
+      "recommended": "A - 删除旧版 Controller",
+      "options": {
+        "A": {"action": "删除 MenuController.java 和 RoleController.java", "risk": "中（需验证前端 API 格式兼容）", "benefit": "技术债务清零，新版已完全覆盖旧版功能"},
+        "B": {"action": "保留旧版，改路径 /menus-legacy", "risk": "低", "benefit": "保留向后兼容"},
+        "C": {"action": "新版改名", "risk": "高", "benefit": "保留旧版但增加重构成本"}
+      },
+      "rationale": "新版 SysMenuController 和 RoleManagementController 已实现全部旧版功能并增加管理端点。旧版缺少 @PreAuthorize 保护且绕过 Service 层直调 Mapper。",
+      "attention": "旧版 GET /menus/current 返回 {menus, permissions, roles}，新版返回 List<SysMenu>，需确认前端侧边栏渲染兼容。"
+    },
+    {
+      "id": "datascope-location",
+      "title": "@DataScope 注解放置位置",
+      "recommended": "B - Service 层分页/查询方法",
+      "options": {
+        "A": {"action": "Mapper 接口方法", "feasibility": "不可行", "reason": "BaseMapper 方法由 MP 代理生成无法加注解，Spring AOP 不拦截 MyBatis Mapper 代理"},
+        "B": {"action": "Service 层分页/查询方法", "feasibility": "可行", "benefit": "Spring Bean 代理与 AOP 天然兼容，DataScopeAspect @Around 正常拦截"},
+        "C": {"action": "Controller 层", "feasibility": "可行但违反分层原则", "reason": "应在业务层而非接口层控制数据范围"}
+      },
+      "rationale": "DataScopeAspect 通过 @Around 设置 DataScopeContextHolder，MyBatisPlus 拦截器读取上下文注入 SQL。Service 层 Spring Bean 确保 AOP 可用。"
+    },
+    {
+      "id": "frontend-page-strategy",
+      "title": "前端角色/用户管理页面策略",
+      "recommended": "C - 独立页面 + 侧边栏入口",
+      "options": {
+        "A": {"action": "嵌入 SettingsPage Tab", "cost": "中（需重构 866 行 SettingsPage）"},
+        "B": {"action": "纯独立页面", "cost": "低"},
+        "C": {"action": "独立页面 + 侧边栏入口", "cost": "低", "benefit": "已有独立页面实现和路由注册，增加侧边栏入口即完成闭环"}
+      },
+      "rationale": "UserManagement.tsx(161行) 和 RoleManagement.tsx(579行) 已独立实现，路由已注册，仅需侧边栏入口链接。",
+      "attention": "需在侧边栏菜单配置中增加 '角色管理' 和 '用户管理' 两个入口，指向 /system/roles 和 /system/users"
+    }
+  ],
+  "execution_order": [
+    "1. P0-URGENT: 解决 Controller 路由冲突（删除旧版 MenuController/RoleController）",
+    "2. P0-URGENT: 补充 @PreAuthorize（UserManagementController + WorkOrderController + ApprovalController + AssetController + DeptController + VendorController）",
+    "3. P0-HIGH: 8 个业务 Service 查询方法打 @DataScope 注解",
+    "4. P0-HIGH: 数据权限 SQL 集成测试",
+    "5. P1: 前端菜单编辑弹窗完善",
+    "6. P1: 侧边栏增加角色管理/用户管理入口"
+  ]
+}

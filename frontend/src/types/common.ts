@@ -158,6 +158,37 @@ export interface OperationResult {
 }
 
 // ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// 菜单权限节点
+// ---------------------------------------------------------------------------
+
+/**
+ * 菜单树节点 — 前端动态菜单渲染使用。
+ *
+ * <p>对应后端 MenuNode DTO，字段与 RuoYi 菜单模型对齐：
+ * M=目录(可折叠)、C=菜单(路由链接)、F=按钮(权限控制不显示)</p>
+ */
+export interface MenuNode {
+  id: number;
+  parentId: number;
+  menuName: string;
+  /** M=目录 C=菜单 F=按钮 */
+  menuType: 'M' | 'C' | 'F';
+  /** 前端路由路径 */
+  path?: string;
+  /** 前端组件 Key */
+  component?: string;
+  /** 权限标识（如 system:user:list） */
+  perms?: string;
+  /** 图标名称 */
+  icon?: string;
+  sortOrder: number;
+  visible: number;
+  status: number;
+  /** 子菜单节点 */
+  children?: MenuNode[];
+}
+
 // 用户与认证
 // ---------------------------------------------------------------------------
 
@@ -177,6 +208,8 @@ export interface CurrentUser {
   deptId?: number;
   /** 部门名称 */
   deptName?: string;
+  /** 权限标识列表（如 system:user:list） */
+  permissions?: string[];
   /** 头像 URL */
   avatar?: string;
   /** Token 过期时间 */
@@ -213,6 +246,8 @@ export interface LoginResponse {
   userId: number;
   username: string;
   realName: string;
+  roles: string[];
+  permissions?: string[];
 }
 
 // ---------------------------------------------------------------------------
@@ -282,10 +317,22 @@ export interface UploadResponse {
 export interface Department {
   id: number;
   deptName: string;
+  deptCode?: string;
   parentId?: number | null;
   children?: Department[];
   sort?: number;
+  sortOrder?: number;
+  orderNum?: number;
+  leader?: string;
+  phone?: string;
+  email?: string;
   status?: number;
+  leaderId?: number;
+  secretaryId?: number;
+  deptType?: string;
+  description?: string;
+  createTime?: string;
+  updateTime?: string;
 }
 
 export interface Location {

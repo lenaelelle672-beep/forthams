@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -28,36 +29,63 @@ public class AuditDashboardController {
     private final AuditDashboardService auditDashboardService;
     private final AuditService auditService;
 
+    @PreAuthorize("@ss.hasPermi('audit:query')")
     @GetMapping({"", "/list"})
     public Result<Page<GeneralAuditEntry>> getLogs(
             @RequestParam(defaultValue = "0") @Min(0) int page,
             @RequestParam(defaultValue = "10") @Min(1) @Max(100) int size,
             @RequestParam Map<String, String> params) {
-        return auditService.queryLogs(
-                page,
-                size,
-                firstParam(params, "start_time", "startTime", "startDate"),
-                firstParam(params, "end_time", "endTime", "endDate"),
-                firstParam(params, "operation_type", "action_type", "operationType"),
-                firstParam(params, "operator_id", "operatorId"),
-                firstParam(params, "module", "resourceType"));
+        int effectiveSize = parseIntParam(firstParam(params, "size", "pageSize"), size);
+        String keyword = firstParam(params, "keyword", "search");
+        String start = firstParam(params, "start_time", "startTime", "startDate");
+        String end = firstParam(params, "end_time", "endTime", "endDate");
+        String operationType = firstParam(params, "operation_type", "action_type", "operationType");
+        String operatorId = firstParam(params, "operator_id", "operatorId");
+        String module = firstParam(params, "module", "resourceType");
+        if (!StringUtils.hasText(keyword)) {
+            return auditService.queryLogs(page, effectiveSize, start, end, operationType, operatorId, module);
+        }
+        return auditService.queryLogs(page, effectiveSize, start, end, operationType, operatorId, module, keyword);
     }
 
-    @GetMapping("/count")
-    public Result<Long> getCount(@RequestParam Map<String, String> params) {
-        long count = auditService.queryLogs(
-                0,
-                1,
+    @PreAuthorize("@ss.hasPermi('audit:query')")
+    @GetMapping("/stats")
+    public Result<Map<String, Object>> getStats(@RequestParam Map<String, String> params) {
+        return Result.success(auditDashboardService.getStats(
                 firstParam(params, "start_time", "startTime", "startDate"),
                 firstParam(params, "end_time", "endTime", "endDate"),
-                firstParam(params, "operation_type", "action_type", "operationType"),
-                firstParam(params, "operator_id", "operatorId"),
-                firstParam(params, "module", "resourceType"))
+                firstParam(params, "operation_type", "action_type", "operationType")));
+    }
+
+    @PreAuthorize("@ss.hasPermi('audit:query')")
+    @GetMapping("/count")
+    public Result<Long> getCount(@RequestParam Map<String, String> params) {
+        String keyword = firstParam(params, "keyword", "search");
+        Result<Page<GeneralAuditEntry>> result = StringUtils.hasText(keyword)
+                ? auditService.queryLogs(
+                    0,
+                    1,
+                    firstParam(params, "start_time", "startTime", "startDate"),
+                    firstParam(params, "end_time", "endTime", "endDate"),
+                    firstParam(params, "operation_type", "action_type", "operationType"),
+                    firstParam(params, "operator_id", "operatorId"),
+                    firstParam(params, "module", "resourceType"),
+                    keyword)
+                : auditService.queryLogs(
+                    0,
+                    1,
+                    firstParam(params, "start_time", "startTime", "startDate"),
+                    firstParam(params, "end_time", "endTime", "endDate"),
+                    firstParam(params, "operation_type", "action_type", "operationType"),
+                    firstParam(params, "operator_id", "operatorId"),
+                    firstParam(params, "module", "resourceType"));
+        long count = result
                 .getData()
                 .getTotal();
         return Result.success(count);
     }
 
+    @PreAuthorize("@ss.hasPermi('audit:query')")
     @GetMapping("/trends")
     public Result<TrendVO> getTrends(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
@@ -79,6 +107,7 @@ public class AuditDashboardController {
                 firstParam(params, "module", "resourceType")));
     }
 
+    @PreAuthorize("@ss.hasPermi('audit:query')")
     @GetMapping("/action-type-distribution")
     public Result<TypeDistributionVO> getTypeDistribution(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
@@ -88,6 +117,7 @@ public class AuditDashboardController {
         return Result.success(auditDashboardService.getTypeDistribution(effectiveStart, effectiveEnd));
     }
 
+    @PreAuthorize("@ss.hasPermi('audit:query')")
     @GetMapping("/operator-ranking")
     public Result<List<OperatorRankingVO>> getOperatorRanking(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
@@ -98,11 +128,13 @@ public class AuditDashboardController {
         return Result.success(auditDashboardService.getOperatorRanking(effectiveStart, effectiveEnd, limit));
     }
 
+    @PreAuthorize("@ss.hasPermi('audit:query')")
     @GetMapping("/meta")
     public Result<List<String>> getOperationTypes() {
         return Result.success(auditDashboardService.getOperationTypes());
     }
 
+    @PreAuthorize("@ss.hasPermi('audit:query')")
     @GetMapping("/{id}")
     public Result<GeneralAuditEntry> getDetail(@PathVariable Long id) {
         GeneralAuditEntry entry = auditService.queryLogById(id);
@@ -135,6 +167,17 @@ public class AuditDashboardController {
         try {
             return Instant.parse(trimmed).atZone(ZoneId.systemDefault()).toLocalDate();
         } catch (DateTimeParseException ignored) {
+            return fallback;
+        }
+    }
+
+    private int parseIntParam(String value, int fallback) {
+        if (!StringUtils.hasText(value)) {
+            return fallback;
+        }
+        try {
+            return Integer.parseInt(value.trim());
+        } catch (NumberFormatException ignored) {
             return fallback;
         }
     }

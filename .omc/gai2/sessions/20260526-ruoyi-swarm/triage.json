@@ -1,0 +1,33 @@
+{
+  "classification": "Strategic",
+  "mcp_tools": [],
+  "scope": [
+    "forthAMS RBAC 业务模块（Spring Security 6 + JWT + MyBatis-Plus）",
+    "RuoYi RBAC 原始版（Shiro + Session + MyBatis）",
+    "数据架构：表结构映射、字段对比、扩展字段设计",
+    "安全架构：认证链替换、鉴权模型迁移、JWT 无状态化",
+    "数据权限：部门数据隔离、自定义数据范围 SQL 注入方案",
+    "前端：React 18 权限控制体系 vs RuoYi 前端权限模型",
+    "全栈集成：端到端 RBAC 流程的集成路线图"
+  ],
+  "risks": [
+    "Shiro Subject 编程模型与 Spring Security SecurityContextHolder 范式差异",
+    "Session 有状态 → JWT 无状态迁移中的 Token 刷新与注销逻辑冲突",
+    "MyBatis XML SQL → MyBatis-Plus Lambda 链式的数据权限动态 SQL 构造方式不同",
+    "RuoYi 数据权限拦截器与 Spring Security Filter Chain 的注入点兼容性",
+    "前端权限树、路由守卫、按钮级控制的前后端契约需要重新定义"
+  ],
+  "dependencies": [
+    "Spring Security 6 体系",
+    "MyBatis-Plus 拦截器 / 数据权限插件",
+    "JWT (io.jsonwebtoken / nimbus-jose-jwt)",
+    "React 18 + 状态管理（权限状态机）",
+    "RuoYi 原始版 RBAC 表结构参考"
+  ],
+  "recommended_phases": ["debate"],
+  "acceptance_hints": [
+    "产出 5 个维度的 RBAC 集成分析报告（每个辩手一份）",
+    "明确每个维度的 RuoYi 设计优势、forthAMS 适配难点、集成方案建议",
+    "输出一份综合路线图：按阶段推荐的迁移/集成顺序和风险评估"
+  ]
+}

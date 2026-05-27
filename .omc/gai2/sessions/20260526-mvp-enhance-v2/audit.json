@@ -1,0 +1,100 @@
+{
+  "current_state": "上一轮 RuoYi RBAC 集成已落地 sys_menu/sys_role_menu/sys_role_dept 三表 DDL、6 个 Entity/Mapper、SecurityService(@ss)、UserDetailsServiceImpl 改造、SysMenuController 完整 CRUD（均带 @PreAuthorize）、SysMenuService 完整服务层、SysRoleMenuMapper/SysRoleDeptMapper 基础 Mapper、RoleManagementController CRUD + 权限注解、UserManagementController CRUD + 权限注解、前端 MenuManagement.tsx 树形展示 + api/menu.ts API 层。但本轮 6 个 AC 均存在重大缺口：\n\nAC-1：DataPermissionInterceptor 不存在 — MyBatisPlusConfig 仅配置 PaginationInnerInterceptor，无 InnerInterceptor 实现。\n\nAC-2：角色管理无独立前端页面（SettingsPage.tsx 无角色 Tab），后端缺少菜单权限分配/部门数据权限分配 API（SysRoleMenuMapper/SysRoleDeptMapper 已就绪但 Controller 未暴露）。\n\nAC-3：用户管理无独立前端页面（SettingsPage UsersTab 嵌入式），用户创建/编辑表单无角色选择 UI，后端缺少 PUT /user-management/{id}/roles 用户角色分配 API。\n\nAC-4：前端 MenuManagement.tsx 编辑功能为占位 toast('编辑功能开发中')，新增按钮无 onClick 处理，图标选择/排序编辑/可见性切换均缺失。后端 SysMenuController CRUD 已全部就绪，API 具备。\n\nAC-5：13 个业务 Controller（Asset/Approval/Maintenance/Retirement/Inventory/Depreciation/Disposal/Compensation/IdleAsset/Location/WorkOrder 等）零 @PreAuthorize 覆盖，约 60+ 个增删改导出端点完全无权限保护。\n\nAC-6：生产迁移脚本已存在（migrate_sys_permission_to_menu.sql + schema.sql 三表 IF NOT EXISTS + ALTER 幂等），但上一轮评审标注为缺失，需 confirm 实际文件存在性。",
+  "existing_patterns": [
+    "MyBatisPlusConfig: @Bean MybatisPlusInterceptor + addInnerInterceptor(PaginationInnerInterceptor)",
+    "SecurityConfig: @EnableMethodSecurity + @PreAuthorize(@ss.hasPermi(...)) 模式已在系统管理 Controller 中广泛使用",
+    "SysMenuController/UserManagementController/RoleManagementController: 每个增删改端点绑定 @PreAuthorize 注解，权限编码映射 sys_menu.perms",
+    "RoleManagementController: GET /roles/list|all|{id} + POST|PUT|DELETE CRUD，但缺少菜单权限分配和部门数据权限分配端点",
+    "UserManagementController: GET /user-management/list|search|current|{id}|{id}/detail|{id}/roles + POST|PUT|PUT reset-password|PUT status|DELETE CRUD，但缺少 PUT /user-management/{id}/roles 角色分配",
+    "SysMenuController: GET /menus/current|list|tree|{id} + POST|PUT|DELETE CRUD，全部 @PreAuthorize 保护，后端完整",
+    "前端 router: /system/users → redirect /settings/users；/system/roles → redirect /settings；/system/menus → MenuManagementPage",
+    "前端 SettingsPage: 嵌入式 Tab 组件（用户/部门/系统配置/安全设置），非独立页面模式",
+    "前端 MenuManagement: 树形表格展示（含展开/折叠/类型标签/权限标识/路由/排序/状态列），编辑=占位 toast",
+    "schema.sql: 三表 CREATE TABLE IF NOT EXISTS + ALTER information_schema.columns PREPARE stmt 幂等模式 + ON DUPLICATE KEY UPDATE 种子数据",
+    "migration/migrate_sys_permission_to_menu.sql: 完整 Step1/Step2/Step3 迁移逻辑"
+  ],
+  "technical_constraints": [
+    "MyBatis-Plus 3.5.9 + mybatis-plus-jsqlparser 3.5.9 依赖已就绪，DataPermissionInterceptor 可实现为 InnerInterceptor 添加到已有 MybatisPlusInterceptor",
+    "@EnableMethodSecurity 已启用，@PreAuthorize(@ss.hasPermi(...)) 模式已成熟，权限编码规则 system:module:action 已约定",
+    "前端 React Router v7 + React.lazy 懒加载模式，新独立页面需在 router/index.tsx 添加路由",
+    "前端现有 SettingsPage 嵌入式 Tab 与独立页面需共存：AC-2/3 新增独立页面后，原 SettingsPage Tab 是否保留需决策",
+    "后端 entity.Role 已含 data_scope/menu_check_strictly/dept_check_strictly 字段，Mapper 已就绪",
+    "SysRoleMenuMapper 含 selectMenuIdsByRoleId/deleteByRoleId/insertBatch 但 Controller 未暴露",
+    "SysRoleDeptMapper 含 selectDeptIdsByRoleId/deleteByRoleId/insertBatch 但 Controller 未暴露",
+    "UserRoleMapper 存在但未发现 selectRoleIdsByUserId 方法 — 需确认是否有 assignRole 能力",
+    "migrate_sys_permission_to_menu.sql 使用固定 ID=1000，如生产环境 ID 1000 已被占用则幂等冲突",
+    "schema.sql 中 sys_role ALTER 使用 information_schema.columns 检查列是否存在，PREPARE stmt 模式保证幂等"
+  ],
+  "risks": [
+    {
+      "level": "high",
+      "detail": "AC-1: DataPermissionInterceptor 完全不存在，MyBatisPlusConfig 未配置任何 InnerInterceptor。需从零实现，涉及部门树查询、角色 data_scope 字段（1-5 五种模式）解析、部门及子部门数据过滤 SQL 注入。mybatis-plus-jsqlparser 依赖已就绪，但无现成实现可参考。风险：实现复杂度高，需理解 JSqlParser API 生成 WHERE 条件"
+    },
+    {
+      "level": "high",
+      "detail": "AC-5: 13 个业务 Controller 约 60+ 个增删改端点零 @PreAuthorize 保护，属于安全高危漏洞。任一认证用户均可自由调用资产创建/删除、工单审批/驳回、盘点扫描/提交、报废申请/审批、维修记录增删改、闲置资产认领/取消、赔偿金增删改、位置/供应商增删改等核心业务操作。后续一旦对外开放 API，后果严重"
+    },
+    {
+      "level": "medium",
+      "detail": "AC-2/3: 前端缺失独立角色管理页面和用户管理页面的角色分配 UI。SettingsPage 嵌入式 Tab 模式缺乏角色 Tab，需决定独立页面与嵌入式 Tab 的共存策略"
+    },
+    {
+      "level": "medium",
+      "detail": "AC-2: 后端缺少角色菜单权限分配 API（PUT /roles/{id}/menus）和部门数据权限分配 API（PUT /roles/{id}/depts）。需在 RoleManagementController 新增端点，并在 RoleService 中实现事务性分配逻辑"
+    },
+    {
+      "level": "medium",
+      "detail": "AC-3: 后端缺少用户角色分配 API（PUT /user-management/{id}/roles）。UserRoleMapper 已存在但需确认是否有 selectRoleIdsByUserId + 批量更新方法"
+    },
+    {
+      "level": "medium",
+      "detail": "AC-4: 前端 MenuManagement.tsx 编辑/新增表单完全缺失（占位 toast）。需创建模态表单（12+ 字段），UI 复杂度高。后端 API 已就绪"
+    },
+    {
+      "level": "medium",
+      "detail": "AC-5: 权限编码命名尚未统一约定。需为 13 个业务模块定义一致的权限编码体系，并同步更新 schema.sql 种子数据添加按钮权限节点 + SUPER_ADMIN 绑定。此部分属于 schema.sql 变更，影响生产部署"
+    },
+    {
+      "level": "low",
+      "detail": "AC-6: migrate_sys_permission_to_menu.sql 使用固定 ID=1000，生产环境可能冲突"
+    },
+    {
+      "level": "low",
+      "detail": "前端预存 TypeScript 错误（GraphifyKnowledgeGraph.tsx/DepreciationCard.tsx）约 30+ 项，非本轮引入"
+    },
+    {
+      "level": "low",
+      "detail": "上一轮 review.json 指出 changes.json 记录完整性不足（缺失 12+ 文件），本次需确保产物完整"
+    }
+  ],
+  "test_surface": [
+    "mvn compile -f backend/pom.xml -DskipTests — 编译验证",
+    "npx tsc --noEmit — 前端 TypeScript 类型检查",
+    "POST /roles/{id}/menus — 角色菜单权限分配 API 功能测试",
+    "POST /roles/{id}/depts — 角色部门数据权限分配 API 功能测试",
+    "PUT /user-management/{id}/roles — 用户角色分配 API 功能测试",
+    "curl POST /assets — 验证无 asset:create 权限时返回 403",
+    "curl POST /assets — 验证 SUPER_ADMIN 短路正常通过",
+    "mysql source schema.sql — DDL 幂等验证",
+    "mysql source migration/migrate_sys_permission_to_menu.sql — 迁移脚本执行+验证",
+    "gitnexus_impact(MyBatisPlusConfig) — DataPermissionInterceptor 新增前爆破半径",
+    "gitnexus_detect_changes() — 提交前变更影响范围确认",
+    "前端角色管理独立页面 — 功能测试",
+    "前端用户管理独立页面 — 功能测试",
+    "前端菜单编辑表单 — 功能测试",
+    "审批工作流端到端回归 — 验证 @PreAuthorize 新增不影响现有审批链路"
+  ],
+  "builder_notes": [
+    "【P0-阻塞】AC-5: 先定义权限编码体系（asset:create/edit/delete/export/import、workorder:create/edit/delete/submit/approve/reject/cancel、maintenance:create/edit/delete、retirement:apply/submit/approve/reject/complete、inventory:task/create/scan/submit/approve、depreciation:calculate、disposal:transfer/clearance/scrap、compensation:create/edit/delete、idle:create/claim/cancel/delete、location:create/edit/delete）。建议在 schema.sql 种子数据区块新增对应 sys_menu 按钮节点（F 类型），并绑定 SUPER_ADMIN 角色。",
+    "【P1-先行】AC-1: DataPermissionInterceptor 实现为 MybatisPlusInterceptor 的 InnerInterceptor。使用 JSqlParser 在 SQL WHERE 中注入 dept_id IN (subquery)，参考 RuoYi 的 DataScopeAspect 逻辑：根据 LoginUser.deptId + Role.dataScope(1=全部/2=自定义/3=本部门/4=本部门及以下/5=仅本人) 决定过滤范围。需在 LoginUser 中携带 deptId。",
+    "【P1-先行】AC-2 后端: 在 RoleManagementController 新增 PUT /roles/{id}/menus（参数 menuIds: number[]）和 PUT /roles/{id}/depts（参数 deptIds: number[]），在 RoleService 中实现事务性批量替换（先 deleteByRoleId 再 insertBatch）。",
+    "【P2-并行】AC-3 后端: 在 UserManagementController 新增 PUT /user-management/{id}/roles（参数 roleIds: number[]），在 UserManagementService 中实现事务性批量替换（先 deleteByUserId 再 insertBatch）。前端 UserItem 需扩展 roleIds: number[] 字段。",
+    "【P2-并行】AC-2/3 前端: 创建 src/pages/system/RoleManagement.tsx（独立页面，树形表格+菜单权限分配树+部门树选择器）和 src/pages/system/UserManagement.tsx（独立页面，表格+用户CRUD弹窗+角色多选下拉）。在 router/index.tsx 注册新路由。SettingsPage 中用户管理/部门管理 Tab 可保留（渐进式共存）或在后续迭代中废弃。",
+    "【P2-并行】AC-4 前端: 完善 MenuManagement.tsx，实现 MenuFormModal 组件（支持 menuName/parentId 树选择/menuType M-C-F 下拉/sortOrder/path/component/perms/icon 选择器/visible/status 开关），调用 api/menu.ts 的 createMenu/updateMenu。注意 parentId 树选择器调用 getMenuTree，排除自身和子节点避免循环引用。",
+    "【P2-并行】AC-5 前端对应: 使用 PermissionGuard 或 permissionHooks 中的 hasPermission 包裹业务页面的操作按钮（新增/编辑/删除/批量操作/导出等），匹配 AC-5 定义的权限编码。",
+    "【P3-最后】AC-6: 确认 migrate_sys_permission_to_menu.sql 文件已存在（本次审计已确认！），需 DBA 审核并在生产环境执行。考虑将固定 ID=1000 改为动态分配。schema.sql 三表 DDL 已使用 IF NOT EXISTS，无需额外变更。",
+    "【代码质量】注意：上一轮 review.json 指出 changes.json 缺少约 12 个文件记录。本轮审计产物需确保完整记录所有变更文件。",
+    "【编译验证】每个 AC 完成后应运行 mvn compile -DskipTests + npx tsc --noEmit 确认无编译/类型错误。",
+    "【分支策略】schema.sql 的 sys_menu 种子数据新增和 @PreAuthorize 大量注解应合理拆分 commit，避免单次提交过大。建议按 AC 拆分 PR。"
+  ]
+}

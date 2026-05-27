@@ -4,6 +4,7 @@ import com.ams.common.Result;
 import com.ams.service.SystemConfigService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.Map;
 
@@ -24,6 +25,7 @@ public class SystemConfigController {
     /**
      * 获取系统配置（SYSTEM 分组）
      */
+    @PreAuthorize("@ss.hasPermi('system:config:query')")
     @GetMapping("/system")
     public Result<Map<String, String>> getSystemConfig() {
         return Result.success(systemConfigService.getConfigMap(SystemConfigService.GROUP_SYSTEM));
@@ -32,6 +34,7 @@ public class SystemConfigController {
     /**
      * 保存系统配置（SYSTEM 分组）
      */
+    @PreAuthorize("@ss.hasPermi('system:config:edit')")
     @PutMapping("/system")
     public Result<Void> saveSystemConfig(@RequestBody Map<String, String> configMap) {
         systemConfigService.saveConfigMap(SystemConfigService.GROUP_SYSTEM, configMap);
@@ -41,6 +44,7 @@ public class SystemConfigController {
     /**
      * 获取安全配置（SECURITY 分组）
      */
+    @PreAuthorize("@ss.hasPermi('system:config:query')")
     @GetMapping("/security")
     public Result<Map<String, String>> getSecurityConfig() {
         return Result.success(systemConfigService.getConfigMap(SystemConfigService.GROUP_SECURITY));
@@ -49,6 +53,7 @@ public class SystemConfigController {
     /**
      * 保存安全配置（SECURITY 分组）
      */
+    @PreAuthorize("@ss.hasPermi('system:config:edit')")
     @PutMapping("/security")
     public Result<Void> saveSecurityConfig(@RequestBody Map<String, String> configMap) {
         systemConfigService.saveConfigMap(SystemConfigService.GROUP_SECURITY, configMap);

@@ -8,22 +8,21 @@
  */
 
 import http from '@/utils/http';
-import type { ApiResponse } from '@/types/common';
 
 // ── API ───────────────────────────────────────────────────────────────────────
 
 /** 获取系统配置（SYSTEM 分组） */
 export const getSystemConfig = () =>
-  http.get<ApiResponse<Record<string, string>>>('/system-config/system');
+  http.get<Record<string, string>>('/system-config/system');
 
 /** 保存系统配置（SYSTEM 分组） */
 export const saveSystemConfig = (config: Record<string, string>) =>
-  http.put<ApiResponse<void>>('/system-config/system', config);
+  http.put<void>('/system-config/system', config);
 
 /** 获取安全配置（SECURITY 分组） */
 export const getSecurityConfig = () =>
-  http.get<ApiResponse<Record<string, string>>>('/system-config/security');
+  http.get<Record<string, string>>('/system-config/security');
 
 /** 保存安全配置（SECURITY 分组） */
 export const saveSecurityConfig = (config: Record<string, string>) =>
-  http.put<ApiResponse<void>>('/system-config/security', config);
+  http.put<void>('/system-config/security', config);

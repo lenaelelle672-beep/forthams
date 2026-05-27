@@ -14,12 +14,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 
+import com.ams.annotation.DataScope;
 @Service
 @RequiredArgsConstructor
 public class IdleAssetService {
 
     private final IdleAssetNoticeMapper idleAssetNoticeMapper;
 
+    @DataScope(userColumn = "create_by")
     public Page<IdleAssetNotice> queryIdleAssets(Integer page, Integer pageSize, String status) {
         String tenantId = TenantContext.requireTenantId();
         Page<IdleAssetNotice> pageParam = new Page<>(page, pageSize);

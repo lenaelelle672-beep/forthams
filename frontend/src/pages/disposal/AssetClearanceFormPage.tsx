@@ -84,6 +84,7 @@ export default function AssetClearanceFormPage() {
   const qc = useQueryClient();
   const [selectedAssetIds, setSelectedAssetIds] = useState<Set<string>>(new Set());
   const [assetSearch, setAssetSearch] = useState('');
+  const [showAssetPicker, setShowAssetPicker] = useState(false);
 
   // Fetch real assets from API
   const { data: assetListData } = useQuery({
@@ -324,106 +325,23 @@ export default function AssetClearanceFormPage() {
                 </span>
               )}
             </div>
-            <div className="flex items-center space-x-3">
-              <div className="relative w-64">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#424753]" />
-                <input
-                  type="text"
-                  placeholder="搜索资产..."
-                  value={assetSearch}
-                  onChange={(e) => setAssetSearch(e.target.value)}
-                  className="w-full bg-white border border-[#e5e7eb] rounded-lg pl-10 pr-4 py-2 text-xs focus:outline-none focus:border-[#004191]"
-                />
-              </div>
-              <Button type="button" size="sm" onClick={() => setAssetSearch(' ')}>
-                <Plus className="w-4 h-4" /> 添加资产
-              </Button>
-            </div>
+            <Button type="button" size="sm" onClick={() => setShowAssetPicker(true)}>
+              <Plus className="w-4 h-4" /> 添加资产
+            </Button>
           </div>
-          <CardContent className="p-0">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left">
-                <thead className="bg-[#f1f3ff]/50 border-b border-[#e5e7eb]">
-                  <tr>
-                    <th className="px-6 py-4 w-12">
-                      <input
-                        type="checkbox"
-                        checked={selectedAssetIds.size === filteredAssets.length && filteredAssets.length > 0}
-                        onChange={toggleAll}
-                        className="rounded border-[#c2c6d5] text-[#004191] focus:ring-[#004191]"
-                      />
-                    </th>
-                    <th className="px-4 py-4 text-[10px] leading-3 tracking-wider font-semibold text-[#424753] uppercase">
-                      资产编号
-                    </th>
-                    <th className="px-4 py-4 text-[10px] leading-3 tracking-wider font-semibold text-[#424753] uppercase">
-                      资产名称
-                    </th>
-                    <th className="px-4 py-4 text-[10px] leading-3 tracking-wider font-semibold text-[#424753] uppercase">
-                      分类
-                    </th>
-                    <th className="px-4 py-4 text-[10px] leading-3 tracking-wider font-semibold text-[#424753] uppercase">
-                      品牌/型号
-                    </th>
-                    <th className="px-4 py-4 text-[10px] leading-3 tracking-wider font-semibold text-[#424753] uppercase text-right">
-                      原值
-                    </th>
-                    <th className="px-4 py-4 text-[10px] leading-3 tracking-wider font-semibold text-[#424753] uppercase text-right">
-                      净值
-                    </th>
-                    <th className="px-6 py-4 text-[10px] leading-3 tracking-wider font-semibold text-[#424753] uppercase">
-                      状态
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-[#e5e7eb]">
-                  {filteredAssets.map((asset) => {
-                    const sc = STATUS_CONFIG[asset.status] ?? STATUS_CONFIG['IN_USE'];
-                    return (
-                      <tr
-                        key={asset.id}
-                        className="hover:bg-[#f1f3ff] transition-colors"
-                      >
-                        <td className="px-6 py-4">
-                          <input
-                            type="checkbox"
-                            checked={selectedAssetIds.has(asset.id)}
-                            onChange={() => toggleAsset(asset.id)}
-                            className="rounded border-[#c2c6d5] text-[#004191] focus:ring-[#004191]"
-                          />
-                        </td>
-                        <td className="px-4 py-4 text-sm font-medium text-[#161c27]">
-                          {asset.assetNo}
-                        </td>
-                        <td className="px-4 py-4 text-sm">{asset.name}</td>
-                        <td className="px-4 py-4 text-sm text-[#424753]">{asset.category}</td>
-                        <td className="px-4 py-4 text-sm text-[#424753]">{asset.brand}</td>
-                        <td className="px-4 py-4 text-sm text-right">
-                          {formatCurrency(asset.originalValue)}
-                        </td>
-                        <td className="px-4 py-4 text-sm text-right">
-                          {formatCurrency(asset.netValue)}
-                        </td>
-                        <td className="px-6 py-4">
-                          <span
-                            className={`px-2 py-1 rounded text-xs font-semibold ${sc.bg} ${sc.text}`}
-                          >
-                            {sc.label}
-                          </span>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                  {filteredAssets.length === 0 && (
-                    <tr>
-                      <td colSpan={8} className="px-6 py-8 text-center text-sm text-[#424753]">
-                        未找到匹配的资产
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
+          <CardContent className="p-6">
+            {selectedAssetIds.size > 0 ? (
+              <div className="flex flex-wrap gap-2">
+                {assetRows.filter(a => selectedAssetIds.has(a.id)).map(asset => (
+                  <span key={asset.id} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-[#dbeafe] text-[#2563eb] text-xs font-medium">
+                    {asset.assetNo} - {asset.name}
+                    <button type="button" onClick={() => toggleAsset(asset.id)} className="ml-0.5 hover:text-red-500 font-bold">&times;</button>
+                  </span>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-[#94a3b8] py-2">暂未选择资产，点击"添加资产"按钮选择</p>
+            )}
           </CardContent>
         </Card>
 
@@ -565,6 +483,85 @@ export default function AssetClearanceFormPage() {
           </div>
         </footer>
       </form>
+
+      {/* 资产选择模态 */}
+      {showAssetPicker && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setShowAssetPicker(false)} />
+          <div className="relative mx-4 w-full max-w-4xl max-h-[80vh] rounded-xl bg-white shadow-xl flex flex-col">
+            {/* 模态头部 */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-[#e5e7eb]">
+              <h3 className="text-base font-semibold text-[#0f172a]">选择资产</h3>
+              <button type="button" onClick={() => setShowAssetPicker(false)} className="text-gray-400 hover:text-gray-600 text-xl leading-none">&times;</button>
+            </div>
+
+            {/* 搜索栏 */}
+            <div className="px-6 py-3 border-b border-[#e5e7eb] bg-[#f8fafc]">
+              <div className="relative w-full max-w-sm">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94a3b8]" />
+                <input
+                  type="text"
+                  placeholder="搜索资产编号、名称、分类..."
+                  value={assetSearch}
+                  onChange={(e) => setAssetSearch(e.target.value)}
+                  className="w-full pl-9 pr-3 py-2 text-sm bg-white border border-[#e5e7eb] rounded-lg focus:outline-none focus:border-[#3b82f6] focus:ring-2 focus:ring-blue-100"
+                />
+              </div>
+            </div>
+
+            {/* 资产列表 */}
+            <div className="flex-1 overflow-y-auto">
+              <table className="w-full text-left">
+                <thead className="bg-[#f8fafc] text-xs uppercase text-[#94a3b8] sticky top-0">
+                  <tr>
+                    <th className="px-4 py-3 w-10">
+                      <input type="checkbox" checked={selectedAssetIds.size === filteredAssets.length && filteredAssets.length > 0} onChange={toggleAll} className="rounded" />
+                    </th>
+                    <th className="px-4 py-3">资产编号</th>
+                    <th className="px-4 py-3">资产名称</th>
+                    <th className="px-4 py-3">分类</th>
+                    <th className="px-4 py-3">品牌/型号</th>
+                    <th className="px-4 py-3 text-right">原值</th>
+                    <th className="px-4 py-3 text-right">净值</th>
+                    <th className="px-4 py-3">状态</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#f1f5f9]">
+                  {filteredAssets.map((asset) => {
+                    const sc = STATUS_CONFIG[asset.status] ?? STATUS_CONFIG['IN_USE'];
+                    return (
+                      <tr key={asset.id} className="hover:bg-[#f8fafc] transition-colors">
+                        <td className="px-4 py-3">
+                          <input type="checkbox" checked={selectedAssetIds.has(asset.id)} onChange={() => toggleAsset(asset.id)} className="rounded" />
+                        </td>
+                        <td className="px-4 py-3 text-sm font-mono text-[#0f172a]">{asset.assetNo}</td>
+                        <td className="px-4 py-3 text-sm font-medium text-[#0f172a]">{asset.name}</td>
+                        <td className="px-4 py-3 text-sm text-[#64748b]">{asset.category}</td>
+                        <td className="px-4 py-3 text-sm text-[#64748b]">{asset.brand}</td>
+                        <td className="px-4 py-3 text-sm text-right">{formatCurrency(asset.originalValue)}</td>
+                        <td className="px-4 py-3 text-sm text-right text-[#64748b]">{formatCurrency(asset.netValue)}</td>
+                        <td className="px-4 py-3"><span className={`px-2 py-0.5 rounded text-xs font-semibold ${sc.bg} ${sc.text}`}>{sc.label}</span></td>
+                      </tr>
+                    );
+                  })}
+                  {filteredAssets.length === 0 && (
+                    <tr><td colSpan={8} className="px-4 py-12 text-center text-sm text-[#94a3b8]">暂无匹配资产</td></tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            {/* 底部确认 */}
+            <div className="flex items-center justify-between px-6 py-4 border-t border-[#e5e7eb] bg-[#f8fafc]">
+              <span className="text-sm text-[#64748b]">已选 {selectedAssetIds.size} 项</span>
+              <div className="flex gap-3">
+                <Button type="button" variant="secondary" onClick={() => setShowAssetPicker(false)}>取消</Button>
+                <Button type="button" variant="primary" onClick={() => setShowAssetPicker(false)}>确认选择</Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

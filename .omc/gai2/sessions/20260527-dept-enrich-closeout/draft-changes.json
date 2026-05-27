@@ -1,0 +1,52 @@
+{
+  "directive": "修复部门管理两个验收缺口",
+  "write_intent": "修改 frontend/src/pages/system/DeptManagement.tsx，实现默认折叠和表格补充领导秘书列",
+  "write_actions": [
+    {
+      "file": "frontend/src/pages/system/DeptManagement.tsx",
+      "action": "edit",
+      "change": "修改 useEffect（约 L257-273）：无搜索时设置 expandedIds 为空 Set（全部折叠），确保默认折叠仅显示根节点。删除原代码中展开根节点的逻辑。"
+    },
+    {
+      "file": "frontend/src/pages/system/DeptManagement.tsx",
+      "action": "edit",
+      "change": "修改 toggleAll 折叠分支（约 L301-310）：折叠时设置 expandedIds 为空 Set，确保\"折叠全部\"后所有节点折叠。当前代码折叠回根节点，改为折叠全部。"
+    },
+    {
+      "file": "frontend/src/pages/system/DeptManagement.tsx",
+      "action": "edit",
+      "change": "修改 openEdit 函数（约 L352-369）：在编辑回显添加对 leaderId 和 secretaryId 的赋值（当前已存在），确认无需额外修改。"
+    },
+    {
+      "file": "frontend/src/pages/system/DeptManagement.tsx",
+      "action": "edit",
+      "change": "在 thead 中添加两列：<th>部门领导</th> 和 <th>秘书</th>，放在\"邮箱\"列之后（约 L493，在\"部门类型\"之前）。"
+    },
+    {
+      "file": "frontend/src/pages/system/DeptManagement.tsx",
+      "action": "edit",
+      "change": "在 renderTreeRows 的 tbody 中，在 email td 之后添加两列：领导列（通过 userList 查找 leaderId 对应的用户名）和秘书列（通过 userList 查找 secretaryId 对应的用户名）。如果暂无 userList 数据或关联用户不存在，显示 '—'。"
+    },
+    {
+      "file": "frontend/src/pages/system/DeptManagement.tsx",
+      "action": "edit",
+      "change": "修改 submitForm 的 payload（约 L386-399）：确认 leaderId/secretaryId 已包含在提交数据中（当前已存在），无需额外修改。"
+    },
+    {
+      "file": "frontend/src/pages/system/DeptManagement.tsx",
+      "action": "edit",
+      "change": "将 userList 传入 renderTreeRows 或调整为组件内直接访问 userList（userList 已通过 useQuery 在 DeptManagement 组件内可用）。确保 renderTreeRows 能获取到用户列表以关联 leaderId/secretaryId。"
+    }
+  ],
+  "verification_plan": [
+    "验证1: 前端构建通过 npm run build",
+    "验证2: 初始加载时所有部门节点处于折叠状态",
+    "验证3: 点击'展开全部'后所有节点展开",
+    "验证4: 点击'折叠全部'后所有节点折叠",
+    "验证5: 表格包含'部门领导'和'秘书'列，正确显示关联用户名称"
+  ],
+  "risks": [
+    "userList 可能在渲染时还未加载完成，领导/秘书列应优雅降级为 '—'",
+    "修改 toggleAll 折叠行为可能影响用户使用习惯"
+  ]
+}

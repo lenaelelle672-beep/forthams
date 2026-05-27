@@ -1,0 +1,40 @@
+{
+  "classification": "Heavy",
+  "scope": [
+    "P1-后端配置: config/MyBatisPlusConfig.java — 注册 DataPermissionInterceptor",
+    "P1-注解: annotation/DataScope.java（新建）",
+    "P1-处理器: security/DataPermissionHandler.java（新建）",
+    "P1-适配: 所有业务 Mapper 查询方法",
+    "P2-角色管理前端: frontend/src/pages/system/RoleManagement.tsx（新建）",
+    "P2-角色管理后端: controller/RoleManagementController.java — 角色权限分配接口",
+    "P2-用户管理前端: frontend/src/pages/system/UserManagement.tsx（新建）",
+    "P2-用户管理后端: controller/UserManagementController.java — 角色分配端点",
+    "P2-菜单编辑前端: frontend/src/pages/system/MenuManagement.tsx（增强）",
+    "P2-菜单编辑后端: controller/SysMenuController.java — CRUD 增强",
+    "P2-按钮权限: 全业务 Controller @PreAuthorize 覆盖（20+ Controller）",
+    "P3-迁移脚本: database/migration/V1.x__rbac_enhancement.sql（新建）",
+    "前端路由: frontend/src/router/index.tsx",
+    "前端 API: frontend/src/api/role.ts / system.ts / menu.ts"
+  ],
+  "risks": [
+    "HIGH: DataPermissionInterceptor 对现有查询性能影响未知",
+    "HIGH: 全量 @PreAuthorize 注解覆盖可能遗漏",
+    "MEDIUM: MenuController 与 SysMenuController 路由冲突",
+    "MEDIUM: P3 需 DBA 协作",
+    "LOW: 前端两套路由文件并存"
+  ],
+  "dependencies": [
+    "mybatis-plus-jsqlparser 3.5.9（已在 pom.xml 中）",
+    "Spring Boot 3.2.5 + Spring Security 6 + @EnableMethodSecurity",
+    "现有 Entity/Mapper/Service 均存在"
+  ],
+  "recommended_phases": ["audit", "debate", "builder", "reviewer"],
+  "acceptance_hints": [
+    "AC-1: DataPermissionInterceptor 启用后查询自动过滤部门数据",
+    "AC-2: /system/roles 页面 CRUD + 菜单权限分配",
+    "AC-3: /system/users 页面列表 + 角色分配",
+    "AC-4: /system/menus 页面完整编辑表单",
+    "AC-5: 所有业务 Controller @PreAuthorize 覆盖",
+    "AC-6: 幂等 DDL 可安全重复执行"
+  ]
+}

@@ -15,6 +15,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 @Slf4j
 @RestController
@@ -25,6 +26,7 @@ public class IdleAssetController {
     private final IdleAssetService idleAssetService;
     private final UserMapper userMapper;
 
+    @PreAuthorize("@ss.hasPermi('idle:query')")
     @GetMapping("/list")
     public Result<Page<IdleAssetNotice>> list(
             @RequestParam(defaultValue = "1") Integer page,
@@ -32,26 +34,31 @@ public class IdleAssetController {
         return Result.success(idleAssetService.queryIdleAssets(page, pageSize, null));
     }
 
+    @PreAuthorize("@ss.hasPermi('idle:query')")
     @GetMapping("/{id}")
     public Result<IdleAssetNotice> getById(@PathVariable Long id) {
         return Result.success(idleAssetService.getById(id));
     }
 
+    @PreAuthorize("@ss.hasPermi('idle:create')")
     @PostMapping
     public Result<IdleAssetNotice> create(@Valid @RequestBody IdleAssetCreateDTO dto) {
         return Result.success(idleAssetService.publishNotice(dto));
     }
 
+    @PreAuthorize("@ss.hasPermi('idle:claim')")
     @PostMapping("/{id}/claim")
     public Result<IdleAssetNotice> claim(@PathVariable Long id) {
         return Result.success(idleAssetService.claimAsset(id, getCurrentUserId()));
     }
 
+    @PreAuthorize("@ss.hasPermi('idle:cancel')")
     @PutMapping("/{id}/cancel")
     public Result<IdleAssetNotice> cancel(@PathVariable Long id) {
         return Result.success(idleAssetService.cancelNotice(id));
     }
 
+    @PreAuthorize("@ss.hasPermi('idle:delete')")
     @DeleteMapping("/{id}")
     public Result<Void> delete(@PathVariable Long id) {
         idleAssetService.deleteNotice(id);

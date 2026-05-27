@@ -1,0 +1,37 @@
+{
+  "mode": "minions_adjudication",
+  "session_id": "gai2-20260526-ruoyi-impl",
+  "phase": "1",
+  "decision": "use_refine",
+  "selected_source": "refine.json (accept_with_refinements)",
+  "builder_instructions": [
+    "按 draft.json 的 12 项 write_actions (WA-01 ~ WA-12) 执行所有代码变更",
+    "WA-03 执行时必须同步修改 DeptService.java：将 BeanUtil.setProperty(dept, \"status\", \"1\") 替换为 dept.setStatus(1)。使用 Grep 搜索 DeptService.java 中所有 BeanUtil.setProperty 调用，定位 status 相关行",
+    "WA-03 的 Dept.java status String→Integer 变更后，用 Grep 搜索所有读取 Dept.status 的代码（特别是 Controller 和 Service 层），确认无 status.equals(...) 字符串比较逻辑",
+    "WA-03 执行前对 Dept 符号运行 gitnexus_impact 分析（target=Dept, direction=upstream），确认 blast radius。如风险 HIGH 则先报告再继续",
+    "IMP-02~04 为建议性改进，Builder 自行判断采纳：IMP-02 关注 @Builder 兼容性、IMP-03 不加 UNIQUE、IMP-04 确认 @TableLogic"
+  ],
+  "write_action_guard": [
+    "WA-03: Dept.java status 从 String 改为 Integer 是破坏性变更。Builder 必须运行 GitNexus impact 分析 Dept，列出所有受影响的文件和符号，在 changes.json 中记录影响范围",
+    "所有新建 Entity: SysMenu/SysRoleMenu/SysRoleDept 必须包含 implements Serializable 和 serialVersionUID",
+    "所有新建 Mapper: 必须 @Mapper 注解、继承 BaseMapper<T>，自定义 SQL 优先 @Select/@Delete 注解（不用 XML）",
+    "WA-10: UserDetailsServiceImpl 添加 .eq(User::getDeleted, 0) 后，确认不影响正常用户登录。手动测试 admin 登录并检查 LambdaQueryWrapper 生成的 SQL"
+  ],
+  "fallback_labels": [],
+  "reviewer_checks": [
+    "确认 WA-03 DeptService.java 第 60 行已同步修改（BeanUtil.setProperty → setStatus(1)）",
+    "确认 Dept.status 类型变更后无编译错误（mvn compile 通过）",
+    "确认 GitNexus impact 分析 Dept 的结果已记录在 changes.json",
+    "确认所有新建文件编译通过、格式符合项目规范",
+    "确认 UserDetailsServiceImpl 的 SQL 包含 deleted=0 条件"
+  ],
+  "rejected_from_adjudication": [],
+  "draft_vs_refine_summary": {
+    "draft_total_actions": 12,
+    "refine_verdict": "accept_with_refinements",
+    "refine_ok_count": 11,
+    "refine_improve_count": 1,
+    "refine_reject_count": 0,
+    "key_change": "WA-03 增加同步修改 DeptService.java 的要求"
+  }
+}

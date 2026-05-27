@@ -6,6 +6,7 @@ import com.ams.service.LocationService;
 import lombok.RequiredArgsConstructor;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,14 +18,35 @@ import java.util.Map;
 public class LocationController {
     private final LocationService locationService;
 
+    @PreAuthorize("@ss.hasPermi('location:query')")
     @GetMapping("/list")
     public Result<List<Location>> list() {
         return Result.success(locationService.findRootLocations());
     }
 
+    @PreAuthorize("@ss.hasPermi('location:query')")
+    @GetMapping("/tree")
+    public Result<List<Location>> tree() {
+        List<Location> roots = locationService.findRootLocations();
+        buildTree(roots);
+        return Result.success(roots);
+    }
+
+    private void buildTree(List<Location> nodes) {
+        if (nodes == null) return;
+        for (Location node : nodes) {
+            List<Location> children = locationService.findChildrenByParentId(node.getId());
+            if (children != null && !children.isEmpty()) {
+                node.setChildren(children);
+                buildTree(children);
+            }
+        }
+    }
+
     /**
      * 级联查询：返回树形结构 [{code, name, children: [{code, name}...]}]
      */
+    @PreAuthorize("@ss.hasPermi('location:query')")
     @GetMapping("/cascade")
     public Result<List<Map<String, Object>>> cascade() {
         List<Location> roots = locationService.findRootLocations();
@@ -50,17 +72,20 @@ public class LocationController {
         return node;
     }
 
+    @PreAuthorize("@ss.hasPermi('location:query')")
     @GetMapping("/{id}")
     public Result<Location> getById(@PathVariable Long id) {
         return Result.success(locationService.findById(id));
     }
 
+    @PreAuthorize("@ss.hasPermi('location:create')")
     @PostMapping
     public Result<Location> create(@Valid @RequestBody Location location) {
         locationService.insert(location);
         return Result.success(location);
     }
 
+    @PreAuthorize("@ss.hasPermi('location:edit')")
     @PutMapping("/{id}")
     public Result<Location> update(@PathVariable Long id, @Valid @RequestBody Location location) {
         location.setId(id);
@@ -68,12 +93,14 @@ public class LocationController {
         return Result.success(location);
     }
 
+    @PreAuthorize("@ss.hasPermi('location:delete')")
     @DeleteMapping("/{id}")
     public Result<Void> delete(@PathVariable Long id) {
         locationService.deleteById(id);
         return Result.success();
     }
 
+    @PreAuthorize("@ss.hasPermi('location:edit')")
     @PutMapping("/reorder")
     public Result<Void> reorder(@RequestBody List<Map<String, Object>> items) {
         for (Map<String, Object> item : items) {

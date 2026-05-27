@@ -1,0 +1,196 @@
+{
+  "verdict": "FAIL",
+  "overall_status": "failed",
+  "gap_fingerprint": "ac1-datapermissioninterceptor-completely-missing-no-class-no-registration | ac2-frontend-role-page-missing-redirects-to-settings-no-api-module | ac5-business-controllers-approval-asset-report-missing-prepublish-annotations | ac4-menu-edit-form-placeholder-toast-only",
+  "missing_criteria": [
+    "AC-1: DataPermissionInterceptor 实现类完全缺失，MyBatisPlusConfig 未注册数据权限拦截器，仅有 Role.dataScope 字段无拦截逻辑",
+    "AC-2: 前端无独立角色管理页面（system/roles 路由重定向到 /settings），api/base.ts 无角色管理 API 函数，无菜单权限分配/部门数据权限分配 UI",
+    "AC-5: ApprovalController/AssetController/ReportController 等业务模块无 @PreAuthorize 注解，仅系统管理模块覆盖",
+    "AC-4: MenuManagement.tsx 编辑功能为占位 toast，并非完整编辑表单"
+  ],
+  "evidence_map": {
+    "AC-1": [
+      "❌ backend/src/main/java/com/ams/security/DataPermissionInterceptor.java: 不存在",
+      "❌ backend/src/main/java/com/ams/config/MyBatisPlusConfig.java (L13-16): 仅注册 PaginationInnerInterceptor，无 DataPermissionInterceptor",
+      "❌ 全局 grep '@DataScope': 无注解定义类，仅 RoleService.java 中字段级 getter/setter 使用（无实际拦截语义）",
+      "✅ backend/src/main/java/com/ams/entity/Role.java: dataScope 字段存在（为未来拦截器预留）",
+      "✅ backend/src/main/java/com/ams/service/RoleService.java L59/L79-80: setDataScope 赋值逻辑存在",
+      "⚠ triage.json scope[10]: 说明 '一期仅预留注册点，通过 ams.data-scope.enabled=false 关闭'",
+      "GAP: goal-state 明确要求 P1 启用 DataPermissionInterceptor，代码层面未实现任何拦截逻辑，未注册到 MyBatisPlusConfig"
+    ],
+    "AC-2": [
+      "✅ backend/src/main/java/com/ams/controller/RoleManagementController.java: 存在，支持 CRUD + 5 个 @PreAuthorize(@ss.hasPermi)",
+      "✅ backend/src/main/resources/migration/migrate_sys_permission_to_menu.sql: 83 行三步幂等迁移脚本（本修复新增）",
+      "✅ backend/src/main/resources/schema.sql L634-645: sys_permission 废弃注释 + 迁移脚本引用",
+      "❌ frontend/src/router/index.tsx L248: system/roles 路由直接 <Navigate to='/settings' replace />，无独立角色管理页面",
+      "❌ frontend/src/api/base.ts: 仅有部门/位置/用户管理 API（getUserList/createUser/updateUser/deleteUser），无 getRoleList/createRole/updateRole/deleteRole 等角色管理 API",
+      "❌ frontend/src/pages/settings/SettingsPage.tsx: Tab 仅有 用户管理|部门管理|系统配置|安全设置，无角色管理 Tab",
+      "GAP: AC-2 还要求 '菜单权限分配、部门数据权限分配'——SysRoleMenuMapper 和 SysRoleDeptMapper 存在（后端），但前端无分配 UI"
+    ],
+    "AC-3": [
+      "✅ backend/src/main/java/com/ams/controller/UserManagementController.java: 存在，含 getUserList/createUser/updateUser/deleteUser/resetPassword + 5 个 @PreAuthorize",
+      "✅ backend/src/main/java/com/ams/service/UserManagementService.java: 注入 UserMapper/UserRoleMapper/SysMenuMapper，支持增删改查",
+      "✅ frontend/src/pages/settings/SettingsPage.tsx: UsersTab 含用户列表查询/新增/编辑/删除/重置密码表单",
+      "✅ frontend/src/api/base.ts L74-104: UserItem 接口含 roles/deptName 字段，支持 createUser/updateUser/deleteUser/resetPassword",
+      "✅ frontend/src/router/index.tsx L247: system/users 路由注册",
+      "PASS (代码级)：用户管理增删改查 + 角色分配 + 部门绑定代码完整。运行时验证需启动 Spring Boot 服务"
+    ],
+    "AC-4": [
+      "✅ backend/src/main/java/com/ams/controller/SysMenuController.java: 存在，6 个方法 @PreAuthorize(系统管理 CRUD + query/list)",
+      "✅ backend/src/main/java/com/ams/service/SysMenuService.java: 完整菜单树构建/CRUD 逻辑",
+      "✅ frontend/src/pages/system/MenuManagement.tsx: 存在，含菜单树展示 + 新增表单 + 删除功能",
+      "✅ frontend/src/api/menu.ts: 完整 API 模块，含 getMenuTree/createMenu/updateMenu/deleteMenu",
+      "✅ frontend/src/router/index.tsx L244: system/menus 路由注册",
+      "❌ frontend/src/pages/system/MenuManagement.tsx: 编辑功能仅为 toast.info('编辑功能开发中')，无实际编辑表单交互",
+      "❌ 菜单编辑表单要求 '图标选择、排序、可见性切换' — 新增表单中可能包含这些字段，但编辑功能占位无法验证",
+      "PARTIAL：新增菜单表单可用，但编辑功能为占位，不满足 '增删改查' 中 '改' 的完整要求"
+    ],
+    "AC-5": [
+      "✅ SysMenuController: 6 个方法 @PreAuthorize(@ss.hasPermi('system:menu:*'))",
+      "✅ UserManagementController: 5 个方法 @PreAuthorize(@ss.hasPermi('system:user:*'))",
+      "✅ DeptController: 3 个方法 @PreAuthorize(@ss.hasPermi('system:dept:*'))",
+      "✅ RoleManagementController: 5 个方法 @PreAuthorize(@ss.hasPermi('system:role:*'))",
+      "✅ WorkflowDefinitionController: 5 个方法 @PreAuthorize(@ss.hasPermi('workflow:definition:edit') or hasAnyRole())",
+      "✅ backend/src/main/java/com/ams/security/SecurityService.java: @Service('ss') hasPermi/hasRole/hasAnyPermi/hasAllPermi + SUPER_ADMIN 短路 + 通配符",
+      "✅ SecurityConfig.java: @EnableMethodSecurity 已启用",
+      "❌ ApprovalController (approve/reject/cancel/create): 0 个 @PreAuthorize（POST /approvals + POST /{id}/approve/reject/cancel 无权限保护）",
+      "❌ AssetController (create/update/delete): 0 个 @PreAuthorize（POST/PUT/DELETE /assets 无权限保护）",
+      "❌ ReportController (summary/by-category/trend): 0 个 @PreAuthorize（全部 GET 无权限保护）",
+      "❌ 其他业务 Controller (MaintenanceController/WorkOrderController/RetirementController 等): 未逐个检查但大概率无注解",
+      "⚠ 全局 grep @PreAuthorize: 仅 27 matches，集中在 5 个系统管理 Controller（SysMenu/UserManagement/Dept/RoleManagement/WorkflowDefinition）",
+      "GAP: AC-5 要求 '业务模块（审批/资产/报表等）的增删改导出等按钮均有 @PreAuthorize 控制'，实际业务模块 0 覆盖"
+    ],
+    "AC-6": [
+      "✅ backend/src/main/resources/migration/migrate_sys_permission_to_menu.sql: 83 行，三步流程（父菜单创建→INSERT SELECT ON DUPLICATE KEY UPDATE→验证统计）",
+      "✅ 迁移脚本幂等保护: INSERT ... ON DUPLICATE KEY UPDATE (Step 1+2)",
+      "✅ schema.sql 三表 DDL: CREATE TABLE IF NOT EXISTS 保证幂等回放",
+      "✅ schema.sql ALTER 模式: information_schema.columns + PREPARE stmt 幂等",
+      "✅ schema.sql seed 数据: INSERT ... ON DUPLICATE KEY UPDATE (24 个菜单节点 + SUPER_ADMIN 绑定)",
+      "PASS (代码级)：迁移脚本和 DDL 均满足幂等、DBA 协作要求。运行时需在目标数据库手动执行"
+    ]
+  },
+  "repair_recommendation": "gai2-builder",
+  "directive_summary": "RuoYi RBAC 集成实施 MVP — 后端核心架构（Entity/Mapper/Service/Controller/Security）实现质量高，但存在 4 个结构性缺口：AC-1 DataPermissionInterceptor 完全缺失（P1 要求未满足），AC-2 前端角色管理无独立页面（嵌入 Settings 且路由重定向），AC-5 业务模块审批/资产/报表无 @PreAuthorize 保护，AC-4 菜单编辑功能为占位 toast。changes.json 本轮修复后覆盖 100% 实际变更（19 changed + 14 added），AC-2 迁移脚本已补全（83 行）。AC-3 用户管理、AC-6 迁移脚本代码级通过。",
+  "affected_scope": [
+    "后端缺失: DataPermissionInterceptor.java (未创建), MyBatisPlusConfig 注册",
+    "后端缺口: ApprovalController/AssetController/ReportController @PreAuthorize 注解",
+    "前端缺口: 角色管理独立页面 (system/roles), api/base.ts 角色管理 API",
+    "前端缺口: MenuManagement.tsx 编辑表单完善",
+    "已实现: Entity(Role/Dept/SysMenu/SysRoleMenu/SysRoleDept), Mapper(SysMenu/SysRoleMenu/SysRoleDept), Service(UserDetailsServiceImpl/SysMenuService/RoleService/DeptService), Controller(SysMenu/RoleManagement/UserManagement/Dept/WorkflowDefinition), Security(LoginUser/SecurityService)"
+  ],
+  "commands_checked": [
+    { "command": "mvn compile -f backend/pom.xml -DskipTests", "result": "passed", "notes": "BUILD SUCCESS，239 源文件编译通过" },
+    { "command": "npx tsc --noEmit (frontend)", "result": "passed (pre-existing errors only)", "notes": "TypeScript 检查通过，仅 GraphifyKnowledgeGraph/DepreciationCard 预存错误" },
+    { "command": "gitnexus_detect_changes", "result": "passed", "notes": "56 changed symbols, 15 affected processes，影响范围在预期模块内" },
+    { "command": "grep -rn 'DataPermissionInterceptor' backend/src/main/java", "result": "failed", "notes": "0 matches — 类不存在" },
+    { "command": "grep -rn '@PreAuthorize' backend/src/main/java/com/ams/controller/ApprovalController.java", "result": "failed", "notes": "0 matches — 审批模块无权限注解" },
+    { "command": "grep -rn '@PreAuthorize' backend/src/main/java/com/ams/controller/AssetController.java", "result": "failed", "notes": "0 matches — 资产模块无权限注解" },
+    { "command": "grep -rn '@PreAuthorize' backend/src/main/java/com/ams/controller/ReportController.java", "result": "failed", "notes": "0 matches — 报表模块无权限注解" },
+    { "command": "ls backend/src/main/resources/migration/migrate_sys_permission_to_menu.sql", "result": "passed", "notes": "83 行迁移脚本存在（本轮修复）" },
+    { "command": "wc -l backend/src/main/resources/migration/migrate_sys_permission_to_menu.sql", "result": "passed", "notes": "83 行完整脚本" },
+    { "command": "glob frontend/src/pages/**/Role*.tsx", "result": "failed", "notes": "0 matches — 无角色管理页面" },
+    { "command": "glob backend/src/main/java/com/ams/security/DataPermissionInterceptor.java", "result": "failed", "notes": "文件不存在" }
+  ],
+  "acceptance_status": [
+    {
+      "criterion": "AC-1（P1）: DataPermissionInterceptor 启用，支持按部门/角色过滤数据查询，部门及子部门数据可见，管理员全量可见",
+      "status": "FAIL",
+      "evidence": [
+        "❌ DataPermissionInterceptor.java 不存在，MyBatisPlusConfig 仅注册 PaginationInnerInterceptor",
+        "❌ 全局 grep @DataScope 无注解定义类，仅有 Role.dataScope 字段无拦截逻辑",
+        "⚠ triage 说明 '一期仅预留注册点'，但 goal-state 明确要求 P1 启用",
+        "GAP: P1 核心要求（数据权限拦截器）完全未实现"
+      ]
+    },
+    {
+      "criterion": "AC-2（P2）: 角色管理独立页面，支持角色 CRUD、菜单权限分配、部门数据权限分配",
+      "status": "FAIL",
+      "evidence": [
+        "✅ 后端 RoleManagementController 存在 + @PreAuthorize 保护",
+        "✅ migrate_sys_permission_to_menu.sql 83 行迁移脚本（本轮修复）",
+        "❌ 前端 system/roles 路由 → <Navigate to='/settings' replace />，无独立页面",
+        "❌ api/base.ts 无角色管理 API 函数",
+        "❌ SettingsPage Tab 无角色管理",
+        "GAP: 要求 '独立页面 + 菜单权限分配 + 部门数据权限分配'，前端均未实现"
+      ]
+    },
+    {
+      "criterion": "AC-3（P2）: 用户管理增强，独立页面含用户列表、角色分配 UI、部门绑定",
+      "status": "PASS",
+      "evidence": [
+        "✅ UserManagementController 增删改查 + @PreAuthorize",
+        "✅ SettingsPage UsersTab 含 CRUD + 角色分配 + 部门绑定",
+        "✅ api/base.ts UserItem 接口含 roles/deptName",
+        "✅ router/system/users 路由注册",
+        "PASS (代码级): 功能代码完整，编译通过。运行时验证需启动 Spring Boot + 前端 dev server"
+      ]
+    },
+    {
+      "criterion": "AC-4（P2）: 菜单编辑表单，支持菜单树增删改查、图标选择、排序、可见性切换",
+      "status": "PARTIAL",
+      "evidence": [
+        "✅ SysMenuController 6 方法 + SysMenuService 完整 CRUD",
+        "✅ MenuManagement.tsx 菜单树 + 新增表单 + 删除功能",
+        "✅ api/menu.ts 完整 API 模块",
+        "✅ router/system/menus 路由注册",
+        "❌ 编辑功能为 toast.info('编辑功能开发中') 占位",
+        "PARTIAL: 新增/删除/树展示可用，但编辑功能(改)为空占位"
+      ]
+    },
+    {
+      "criterion": "AC-5（P2）: 按钮权限全量覆盖，业务模块（审批/资产/报表等）的增删改导出等按钮均有 @PreAuthorize 控制",
+      "status": "FAIL",
+      "evidence": [
+        "✅ 系统管理 5 个 Controller 25+ 方法有 @PreAuthorize (全覆盖)",
+        "✅ SecurityService(@ss) 完整实现 + 通配符 + SUPER_ADMIN 短路",
+        "❌ ApprovalController: 0 个 @PreAuthorize (create/approve/reject/cancel)",
+        "❌ AssetController: 0 个 @PreAuthorize (create/update/delete)",
+        "❌ ReportController: 0 个 @PreAuthorize",
+        "GAP: AC-5 明确要求 '业务模块（审批/资产/报表等）'，实际业务模块 0 覆盖"
+      ]
+    },
+    {
+      "criterion": "AC-6（P3）: 生产级 DBA 协作幂等迁移脚本，sys_menu/sys_role_menu/sys_role_dept 的 ALTER/CREATE 带 IF NOT EXISTS/EXISTS 保护",
+      "status": "PASS",
+      "evidence": [
+        "✅ migrate_sys_permission_to_menu.sql: 83 行，三步幂等迁移（父菜单→INSERT SELECT ON DUPLICATE KEY UPDATE→验证统计）",
+        "✅ schema.sql: CREATE TABLE IF NOT EXISTS (三表) + information_schema 幂等 ALTER + INSERT ON DUPLICATE KEY UPDATE (seed)",
+        "✅ 迁移脚本固定父菜单 ID=1000（不与 1-24 冲突）",
+        "PASS (代码级): SQL 脚本完整且幂等。运行时需 DBA 在目标数据库手动执行"
+      ]
+    }
+  ],
+  "minions_review": {
+    "draft_checked": true,
+    "refine_checked": true,
+    "adjudication_checked": true,
+    "draft_changes_checked": false,
+    "draft_changes_note": "draft-changes.json 不存在；goal-state 中 artifact_files 声明了此文件但当前 session 未生成。不影响链路完整性（changes.json 为最终权威产物）",
+    "real_dual_agent_chain": true,
+    "write_degradation_guard_passed": true,
+    "sonnet_fallback_absent": true
+  },
+  "findings": [
+    "CRITICAL: AC-1 DataPermissionInterceptor 完全缺失——无实现类、无 MyBatisPlusConfig 注册、无 @DataScope 注解定义。P1 要求未满足，是根本性 FAIL 原因",
+    "CRITICAL: AC-5 业务模块部分——ApprovalController/AssetController/ReportController 等业务 Controller 无 @PreAuthorize 保护，审批/资产 CRUD 操作完全开放无权限校验",
+    "CRITICAL: AC-2 前端角色管理——system/roles 路由直接重定向到 /settings，无独立页面，无角色 CRUD UI，无菜单权限分配 UI，无部门数据权限分配 UI",
+    "MINIONS 链路完整：draft(deepseek-v4) → refine(GLM-5.1, accept_with_refinements) → adjudication(use_refine) → builder → reviewer，全链无断裂",
+    "写动作退化保护通过：draft.write_intent 明确 → refine.write_intent_preserved=true + degradation_detected=false → adjudication.write_action_guard 4 项 → changes.minions_execution.degradation_blocked=false",
+    "本轮修复已执行：changes.json changed_files (13→19) 和 added_files (7→14) 补全，覆盖 100% 实际变更；migrate_sys_permission_to_menu.sql (83 行) 创建",
+    "DeptService BeanUtil→setter 裁决要求已执行（IMP-01），Dept.java status String→Integer 变更完成",
+    "编译质量：mvn compile BUILD SUCCESS (239 files)，npx tsc 无新增错误",
+    "后端核心架构质量高：Entity/Mapper/Service/Security(@ss) 实现完整，审计指出的 5 项 critical_fix_before_start 全部修复",
+    "SecurityService 安全设计完善：SUPER_ADMIN 短路 + 通配符 *:*:* + system:user:* 三级权限匹配降级链"
+  ],
+  "residual_risks": [
+    "AC-1 DataPermissionInterceptor 缺失 × 1/3 P1 未满足——数据权限隔离完全不存在",
+    "AC-5 业务模块高危——ApprovalController create/approve/reject/cancel 无 @PreAuthorize，任何认证用户可执行审批操作",
+    "AC-5 业务模块高危——AssetController create/update/delete 无 @PreAuthorize，任何认证用户可修改资产数据",
+    "AC-2 前端缺口——后端 RoleManagementController 已实现但前端无调用入口，配置角色权限需直接调 API 或进数据库",
+    "AC-4 菜单编辑占位——生产中无法通过 UI 修改菜单配置",
+    "高 QPS 下 UserDetailsServiceImpl 三表 JOIN 每请求执行无缓存（triage 已知风险）",
+    "审批工作流回归测试未执行——需启动 Spring Boot 服务后手动验证（AC-8）",
+    "前端预存 TypeScript 错误（GraphifyKnowledgeGraph.tsx 23 errors + DepreciationCard.tsx 29 errors）非本次变更引入",
+    "sys_menu.perms UNIQUE KEY 可能影响未来多按钮共享同一权限码的场景"
+  ]
+}

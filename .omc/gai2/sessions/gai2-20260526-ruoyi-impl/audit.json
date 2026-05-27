@@ -1,0 +1,111 @@
+{
+  "current_state": "forthAMS 当前运行在 Spring Boot 3.2.5 + Spring Security 6 + MyBatis-Plus 3.5.9 + JWT 0.12.5 + React/Vite/shadcn-ui 技术栈上。认证体系已具备：SecurityConfig 启用 @EnableMethodSecurity + STATELESS Session，JwtAuthenticationFilter 每次请求调用 UserDetailsServiceImpl.loadUserByUsername() 从数据库加载用户和角色。但权限模型仅停留在 ROLE_xxx 级别，未实现 RuoYi 风格的方法级权限注解（@ss.hasPermi）、菜单权限树、数据权限。sys_menu/sys_role_menu/sys_role_dept 三个关键表完全不存在。前端菜单为静态硬编码，AuthUser 类型缺少 permissions 字段，且与 permissionHooks.ts 存在类型不一致问题。项目已具备 mybatis-plus-jsqlparser 依赖但未在 MyBatisPlusConfig 中注册任何数据权限拦截器。",
+  "existing_patterns": [
+    "Entity：@Data + @TableName + @TableId(IdType.AUTO) + @TableLogic，不使用基类继承，每个实体独立定义 createTime/updateTime/deleted 字段",
+    "Mapper：@Mapper + extends BaseMapper<T>，自定义 SQL 优先使用注解 @Select/@Delete（不用 XML）",
+    "Service：直接注入 Mapper（不 implements IService<T>），事务注解 @Transactional(rollbackFor = Exception.class)，多数使用 @RequiredArgsConstructor 但 RoleService 使用显式构造函数注入（风格不一致）",
+    "Controller：@RestController + @RequestMapping + @RequiredArgsConstructor，返回 Result<T> 统一响应包装，DTO 命名 XxxCreateDTO / XxxUpdateDTO",
+    "Security：JwtAuthenticationFilter (OncePerRequestFilter) + DaoAuthenticationProvider + BCryptPasswordEncoder，每次请求从 DB 加载 UserDetails，不缓存",
+    "JWT：jjwt 0.12.5，token claims 包含 userId + tenant_id（key: 'tenant_id'），不含 permissions",
+    "前端 HTTP：axios 单例（注入 Bearer Token 到 Authorization header），响应拦截器解包 data 字段",
+    "前端路由：React Router v7 (createBrowserRouter)，静态路由配置，PermissionGuard 基于 hasRole 做角色守卫",
+    "前端菜单：AppLayout.tsx 中 NAV_GROUPS 静态配置，不依赖后端数据动态渲染",
+    "数据库迁移：schema.sql 中已有 ALTER TABLE 模式使用 information_schema.columns + PREPARE stmt 保证幂等回放",
+    "pom.xml：在 properties 中统一管理版本号（mybatis-plus.version / jwt.version / hutool.version）"
+  ],
+  "technical_constraints": [
+    "Java 17，Spring Boot 3.2.5：不支持 javax.*，必须用 jakarta.* 命名空间",
+    "MyBatis-Plus 3.5.9 + jsqlparser 3.5.9 已引入：DataPermissionInterceptor 可直接基于现有依赖注册，无需额外引入",
+    "jjwt 0.12.5：API 与旧版 0.11.x 不同，使用 Jwts.parser().verifyWith().build().parseSignedClaims() 模式",
+    "sys_user 表无 deleted 过滤：UserDetailsServiceImpl.loadUserByUsername 只过滤 status=1，未过滤 deleted=0，存在安全缺口",
+    "sys_dept 的 status 列类型为 TINYINT，但 Dept.java entity 映射为 String 类型，直接读取可能抛类型转换异常",
+    "Role.java entity 缺少 sortOrder 字段映射：schema.sql 中 sys_role 有 sort_order 列，但 entity 无对应属性，新增角色时该列为 null",
+    "Dept.java entity 的 dept_name 通过 @JsonProperty('deptName') 映射到 name 属性，dept_code 列在 schema.sql 中存在但在 entity 中无映射字段（dept_code 列为 UNIQUE，但未被 entity 使用）",
+    "前端 AuthUser 接口只有 userId/username/realName/roles 四个字段，permissionHooks.ts 却引用 user?.permissions，TypeScript 严格模式会报类型错误",
+    "前端 common.ts 中 LoginResponse 类型与 AuthContext.tsx 中 LoginResponse 类型不一致：前者无 roles 字段，后者有",
+    "前端 token 存储 key 不一致：http.ts 和 AppLayout.tsx 使用 'auth_token'，api.ts 定义 TOKEN_STORAGE_KEY = 'auth_token'，但 AppLayout 还读 'ams_auth_token'",
+    "TenantContext 在 JwtAuthenticationFilter finally 块中 clear，Controller/Service 层仅在 filter 链内可读取 tenantId（非异步线程无法传递）",
+    "现有 sys_permission 表孤立存在，无 sys_role_permission 关联表，目前不被任何代码引用——迁移到 sys_menu 不会破坏现有功能"
+  ],
+  "risks": [
+    {
+      "level": "high",
+      "detail": "Role.java Entity 与 schema.sql 列不匹配：entity 缺少 sortOrder 字段，实施中若按 RuoYi 模型新增 dataScope/menuCheckStrictly/deptCheckStrictly 到 entity，sortOrder 也应同步补齐，否则新增角色后 sort_order 列为 null 且后续查询依赖该列排序会失效"
+    },
+    {
+      "level": "high",
+      "detail": "前端类型系统冲突：AuthUser 接口无 permissions 字段，permissionHooks.ts 却假定有。实施时需统一：要么扩展 AuthUser 加 permissions: string[]，要么修正 permissionHooks。同时 common.ts 的 LoginResponse 缺失 roles 字段需同步补齐"
+    },
+    {
+      "level": "medium",
+      "detail": "Security 性能风险：JwtAuthenticationFilter 每次请求都执行 userDetailsService.loadUserByUsername()，新增菜单权限加载后每次请求会执行 JOIN sys_menu/sys_role_menu/sys_user_role 三表查询。高 QPS 场景（如 dashboard 页多个并行请求）需关注 DB 压力。建议二阶段引入 Caffeine 本地缓存"
+    },
+    {
+      "level": "high",
+      "detail": "Dept.java entity 类型不一致：schema.sql 中 sys_dept.status 为 TINYINT，entity 定义为 String status。若 RuoYi 逻辑依赖 status 数值比较（如 status=1 启用/0 停用），String 类型会导致比较失败。建议立即修复为 Integer 或至少在 Service 层加类型转换"
+    },
+    {
+      "level": "medium",
+      "detail": "admin 锁死风险：初始数据中 SUPER_ADMIN 角色 (id=1) 绑定到 user id=1，但 schema.sql 用 ON DUPLICATE KEY UPDATE。若生产数据库已有数据，执行 sys_menu seed 时必须保证 SUPER_ADMIN 角色绑定所有菜单节点，否则首次部署后 admin 可能无法访问任何受 @PreAuthorize 保护的管理页面"
+    },
+    {
+      "level": "medium",
+      "detail": "权限双轨风险：sys_permission 表保留但不会被新代码引用。若未来有开发者错误地在 sys_permission 中新增权限编码而不同步到 sys_menu.perms，会导致部分用户实际有权限但系统不识别。需在文档中明确 'sys_permission 已废弃，所有权限编码必须在 sys_menu.perms 中定义'"
+    },
+    {
+      "level": "medium",
+      "detail": "RoleService 使用 Hutool BeanUtil 而非直接 setter 注入属性，createRole 中先用 insert 再 update sort_order。这种两步式写法在 sortOrder 缺失时可能产生脏数据（角色已插入但排序为 null）。且 DTO 字段到 entity 映射依赖 hutool 反射，无法利用 IDE 重构和编译检查"
+    },
+    {
+      "level": "low",
+      "detail": "mybatis-plus-jsqlparser 已在 pom.xml 中引入但 MyBatisPlusConfig 未注册 DataPermissionInterceptor。数据权限阶段实现时需注意与现有 PaginationInnerInterceptor 的注册顺序：数据权限拦截器应在分页拦截器之前执行"
+    },
+    {
+      "level": "low",
+      "detail": "前端菜单切换风险：当前 NAV_GROUPS 为静态 React 变量。改造为从 /menus/current 动态获取后，若接口失败或返回空数组，侧边栏会完全空白。需实现 fallback 到静态菜单的兜底策略"
+    },
+    {
+      "level": "low",
+      "detail": "UserDetailsServiceImpl.loadUserByUsername 未过滤 deleted=0，仅过滤 status=1。若逻辑删除后再创建同名用户，旧用户（deleted=1, status=1）可能被错误加载"
+    }
+  ],
+  "test_surface": [
+    "后端编译验证：mvn compile -f backend/pom.xml",
+    "后端测试运行：mvn test -f backend/pom.xml（若有 Spring Security Test 用例）",
+    "DDL 幂等回放：source backend/src/main/resources/schema.sql 执行两次验证无报错",
+    "安全链路手动测试：POST /auth/login → 检查响应含 token/roles/permissions",
+    "权限注解测试：用无权限用户 token 访问 @PreAuthorize 保护的接口，预期返回 403",
+    "SUPER_ADMIN 短路测试：admin 用户无需逐条 perms 即可访问任意受保护接口",
+    "前端类型检查：npx tsc --noEmit -p frontend/tsconfig.json",
+    "前端权限 Hook 测试：模拟 user.permissions 为空/存在/部分匹配场景",
+    "工作流回归测试：确保 RBAC 改造后审批流程完整可用（AC-8）",
+    "GitNexus 变更检测：在每次代码修改后运行 gitnexus_detect_changes 确认影响范围"
+  ],
+  "recommended_approach": {
+    "phased_implementation": true,
+    "phase_1_db_and_entity": "先完成 DDL 迁移（sys_menu/sys_role_menu/sys_role_dept + ALTER 语句），同时修复现有缺陷：Role.java 补 sortOrder、Dept.java 补 deptCode/ancestors/email 字段映射，修复 status 类型为 Integer",
+    "phase_2_security_core": "创建 LoginUser（携带 userId/deptId/roles/permissions），改造 UserDetailsServiceImpl 加载 perms，创建 SecurityService(@ss bean) 实现 hasPermi/hasRole 通配匹配",
+    "phase_3_api_and_frontend": "AuthService.login() 和 /users/current 返回 permissions 字段，AuthResponse DTO 增加 permissions，前端 AuthUser 接口扩展 permissions: string[]，修正 permissionHooks.ts 类型，新增 PermissionGate 按钮级组件",
+    "phase_4_menu_management": "SysMenu/SysRoleMenu/SysRoleDept Entity + Mapper + Service + Controller，前端菜单管理页面，/menus/current 动态菜单 API",
+    "rollback_safe": "所有新增表/列使用 IF NOT EXISTS 和 information_schema guard 保证幂等。@ss.hasPermi 注解先给管理员页面使用，公共/WEB 接口不加注解防止误拦截。数据权限阶段独立于菜单权限，可延后实施",
+    "critical_fix_before_start": [
+      "Role.java 补 sortOrder 字段映射",
+      "Dept.java 修复 status 类型为 Integer、补 deptCode 持久化字段",
+      "前端 AuthUser 接口添加 permissions: string[] 属性",
+      "UserDetailsServiceImpl 加 deleted=0 查询条件",
+      "统一前端 LoginResponse 类型（含 roles 字段）"
+    ]
+  },
+  "builder_notes": [
+    "RoleService.java 当前使用 Hutool BeanUtil.setProperty 反射设值而非直接 setter，新增字段时务必在 createRole/updateRole 中手动添加对应的 set 语句，否则字段不会写入数据库",
+    "schema.sql 已建立 information_schema + PREPARE stmt 的幂等 ALTER 模式（见 work_order 表的改造），新增 ALTER TABLE 时请复用此模式",
+    "Entity 与 schema.sql 列存在多处不一致（Role.sortOrder、Dept.deptCode/status/email/ancestors），实施 Entity 改造时建议以 schema.sql 为单一事实来源反向核对，确保所有列都有 entity 映射",
+    "现有 Service 层风格不统一：AuthService 等用 @RequiredArgsConstructor，RoleService 用显式构造函数。新增 Service 时统一用 @RequiredArgsConstructor 以保持一致性",
+    "mybatis-plus-jsqlparser 3.5.9 已在 classpath 中，DataPermissionInterceptor 可直接注册使用，无需额外添加 Maven 依赖",
+    "前端有两个 HTTP 客户端实例：src/utils/http.ts（全局单例）和 src/app/utils/api.ts（AuthContext 专用）。改造权限 API 层时统一使用 http.ts 实例以保证 token 拦截器一致性",
+    "JwtAuthenticationFilter 的 isTenantProtectedRequest 方法中，/auth/ 前缀路径被跳过不检查 tenant。新增 /menus/current 等公开接口时注意不要放在 /auth/ 下，应通过 SecurityConfig.permitAll 显式放行",
+    "当前 UserDetailsServiceImpl 返回的是 Spring Security 内建 org.springframework.security.core.userdetails.User 对象。改造为自定义 LoginUser 时需同步修改 JwtAuthenticationFilter 中对外部 UserDetails 的强制转换逻辑（若有）",
+    "Router 中的 PermissionGuard 是基于角色的（roles 数组匹配），新版的 @ss.hasPermi 是基于权限码的（perms 字符串匹配）。两者是不同的授权维度：前者控制路由级访问，后者控制按钮/操作级访问，实施时不要混淆",
+    "super_admin 短路逻辑建议在 SecurityService.hasPermi() 中实现：检查 authorities 是否包含 ROLE_SUPER_ADMIN，若包含则直接返回 true，无需从数据库逐条加载所有 perms——这与 RuoYi 原版行为一致"
+  ]
+}

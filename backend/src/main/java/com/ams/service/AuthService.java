@@ -6,8 +6,10 @@ import com.ams.dto.LoginRequest;
 import com.ams.dto.RegisterRequest;
 import com.ams.dto.ResetPasswordRequest;
 import com.ams.entity.User;
+import com.ams.mapper.SysMenuMapper;
 import com.ams.mapper.UserMapper;
 import com.ams.mapper.UserRoleMapper;
+import com.ams.security.SecurityUserCacheService;
 import com.ams.utils.JwtUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -28,6 +31,8 @@ public class AuthService {
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
     private final UserRoleMapper userRoleMapper;
+    private final SysMenuMapper sysMenuMapper;
+    private final SecurityUserCacheService securityUserCacheService;
 
     public AuthResponse login(LoginRequest request) {
         authenticationManager.authenticate(
@@ -40,8 +45,9 @@ public class AuthService {
 
         String token = jwtUtil.generateToken(user.getUsername(), user.getId(), resolveTenantId(user));
         List<String> roles = userRoleMapper.selectRoleCodesByUserId(user.getId());
+        List<String> permissions = resolvePermissions(user.getId());
 
-        return new AuthResponse(token, user.getId(), user.getUsername(), user.getRealName(), roles);
+        return new AuthResponse(token, user.getId(), user.getUsername(), user.getRealName(), roles, permissions);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -67,8 +73,9 @@ public class AuthService {
 
         String token = jwtUtil.generateToken(user.getUsername(), user.getId(), resolveTenantId(user));
         List<String> roles = userRoleMapper.selectRoleCodesByUserId(user.getId());
+        List<String> permissions = resolvePermissions(user.getId());
 
-        return new AuthResponse(token, user.getId(), user.getUsername(), user.getRealName(), roles);
+        return new AuthResponse(token, user.getId(), user.getUsername(), user.getRealName(), roles, permissions);
     }
 
     public boolean logout() {
@@ -88,6 +95,7 @@ public class AuthService {
         }
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userMapper.updateById(user);
+        securityUserCacheService.evictByUsername(user.getUsername());
     }
 
     private String resolveTenantId(User user) {
@@ -97,4 +105,16 @@ public class AuthService {
         return "dept:" + user.getDeptId();
     }
 
+    /**
+     * 查询用户权限码列表（安全兜底：空列表而非 null）
+     */
+    private List<String> resolvePermissions(Long userId) {
+        try {
+            List<String> perms = sysMenuMapper.selectPermsByUserId(userId);
+            return perms != null ? perms : Collections.emptyList();
+        } catch (Exception e) {
+            // 权限查询失败不阻断登录，返回空列表
+            return Collections.emptyList();
+        }
+    }
 }

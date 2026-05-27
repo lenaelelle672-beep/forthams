@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.ams.annotation.DataScope;
 @Service
 @RequiredArgsConstructor
 public class InventoryService {
@@ -33,6 +34,7 @@ public class InventoryService {
         return queryTasks(page, pageSize, status, null);
     }
 
+    @DataScope(userColumn = "create_by")
     public Page<InventoryTask> queryTasks(Integer page, Integer pageSize, String status, String search) {
         String tenantId = TenantContext.requireTenantId();
         Page<InventoryTask> pageParam = new Page<>(page == null ? 1 : page, pageSize == null ? 10 : pageSize);

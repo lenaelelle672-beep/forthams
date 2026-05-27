@@ -22,6 +22,17 @@ public class User implements Serializable {
     private Integer status;
     private Long deptId;
 
+    /** 最后登录 IP */
+    @TableField("login_ip")
+    private String loginIp;
+
+    /** 最后登录时间 */
+    @TableField("login_date")
+    private LocalDateTime loginDate;
+
+    /** 备注 */
+    private String remark;
+
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;
 
@@ -30,5 +41,4 @@ public class User implements Serializable {
 
     @TableLogic
     private Integer deleted;
-
 }

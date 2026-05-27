@@ -32,13 +32,39 @@ export interface DisposalListQuery {
   keyword?: string;
 }
 
-/** 处置列表 */
-export const getDisposalList = (params?: DisposalListQuery) =>
-  http.get<PaginatedResponse<Disposal>>('/disposals', { params });
+/** 处置列表 - 关联退役/清退数据 */
+export const getDisposalList = (params?: DisposalListQuery) => {
+  const queryParams: Record<string, any> = { page: params?.page ?? 1, pageSize: params?.pageSize ?? 10 };
+  if (params?.status) queryParams.status = params.status;
+  return http.get<any>('/retirement/list', { params: queryParams }).then((res: any) => ({
+    records: (res.records ?? []).map((r: any) => ({
+      id: r.id,
+      assetId: r.assetId,
+      assetNo: r.assetNo,
+      assetName: r.assetName,
+      type: 'CLEARANCE' as DisposalType,
+      status: r.status,
+      reason: r.reason,
+      applicantName: r.applicantName,
+      createdAt: r.createdAt,
+    })),
+    total: res.total ?? 0,
+  }));
+};
 
-/** 处置详情 */
+/** 处置详情 - 关联退役申请详情 */
 export const getDisposalDetail = (id: number) =>
-  http.get<ApiResponse<Disposal>>(`/disposals/${id}`);
+  http.get<any>(`/retirement/${id}`).then((r: any) => ({
+    id: r.id,
+    assetId: r.assetId,
+    assetNo: r.assetCode ?? r.assetNo,
+    assetName: r.assetName,
+    type: (r.retirementType ?? 'CLEARANCE') as DisposalType,
+    status: r.status,
+    reason: r.reason,
+    applicantName: r.applicantName,
+    createdAt: r.createTime ?? r.createdAt,
+  }));
 
 // ── 处置统计 ──────────────────────────────────────────────────────────────────
 
@@ -56,9 +82,15 @@ export interface DisposalStats {
   recoveredValue: number;
 }
 
-/** 获取处置统计数据 */
+/** 获取处置统计数据 - 关联退役统计 */
 export const getDisposalStats = () =>
-  http.get<ApiResponse<DisposalStats>>('/disposals/stats');
+  http.get<any>('/retirement/statistics').then((res: any) => ({
+    totalThisMonth: res.thisMonthCount ?? 0,
+    monthOverMonthDelta: 0,
+    pendingCount: res.pendingCount ?? 0,
+    completedCount: (res.approvedCount ?? 0) + (res.completedCount ?? 0),
+    recoveredValue: 0,
+  }));
 
 // ── 赔偿管理 ──────────────────────────────────────────────────────────────────
 

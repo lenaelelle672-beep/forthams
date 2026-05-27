@@ -1,0 +1,70 @@
+{
+  "mode": "minions_refine",
+  "session_id": "gai2-20260526-ruoyi-impl",
+  "phase": "1",
+  "verdict": "accept_with_refinements",
+  "write_note": "refine 分析由 gai2-refiner（GLM-5.1）生成，因 agent 环境无 write 工具，由 orchestrator 通过 general agent 代为写入。所有分析决策均来自 gai2-refiner。",
+  "preserved_from_draft": [
+    "WA-01: DDL 三表设计完整，字段与 RuoYi 模型对齐，IF NOT EXISTS 保证幂等",
+    "WA-02: Role.java 补 sortOrder，RoleService Hutool 反射自动匹配同名属性，无需额外修改 Service",
+    "WA-03: Dept.java status String→Integer 类型修复正确，deptCode 补字段映射必要",
+    "WA-04~06: 三个新 Entity 遵循项目 @Data+@TableName+@TableId+@TableLogic 模式，字段完备",
+    "WA-07~09: 三个新 Mapper 继承 BaseMapper，自定义 @Select 方法 SQL 正确，不含 XML",
+    "WA-10: UserDetailsServiceImpl 加 .eq(User::getDeleted,0) 过滤正确，与 @TableLogic 不冲突",
+    "WA-11: AuthContext.tsx AuthUser 加 permissions: string[] 字段，permissionHooks.ts 已做好 fallback 兼容",
+    "WA-12: common.ts LoginResponse 统一 roles 字段，解决两个文件类型不一致问题",
+    "7 项验证计划覆盖 DDL/Maven/TS/安全链路/GitNexus/回归"
+  ],
+  "improvements": [
+    {
+      "id": "IMP-01",
+      "target": "WA-03 (Dept.java + DeptService.java)",
+      "severity": "high",
+      "description": "Dept.java status String→Integer 后，必须同步修改 DeptService.java 中字符串赋值的代码。GitNexus 代码分析确认 DeptService.createDept 第 60 行存在 BeanUtil.setProperty(dept, \"status\", \"1\") 将字符串 \"1\" 传入。需改为显式 setter：dept.setStatus(1)。",
+      "risk_if_ignored": "若 Status 改为 Integer 但 Service 仍用 BeanUtil.setProperty 传字符串 \"1\"，HuTool 反射可能仍能转换（Convert 模块自动转换），但不安全且编译期无法检查。建议显式 setter。",
+      "mitigation": "在 WA-03 执行时同步修改 DeptService.java，将 BeanUtil.setProperty(dept, \"status\", \"1\") 替换为 dept.setStatus(1)"
+    },
+    {
+      "id": "IMP-02",
+      "target": "WA-03 (Dept.java)",
+      "severity": "medium",
+      "description": "Dept.java @Builder 注解与新增字段冲突风险。Dept.java 使用了 @Builder + @NoArgsConstructor + @AllArgsConstructor，新增 deptCode 字段后 Builder 会自动包含此字段。若现有测试或 Service 用 Dept.builder().build() 创建对象，deptCode 默认为 null，与 schema.sql 的 dept_code VARCHAR(64) UNIQUE 兼容（null 不算冲突）。但需确认无隐性假设 deptCode 非空。",
+      "risk_if_ignored": "低风险。dept_code 的 UNIQUE 约束允许多个 NULL 值（MySQL 行为）。但若未来有任何代码（如前端或导出）假定 deptCode 非空，可能出问题。"
+    },
+    {
+      "id": "IMP-03",
+      "target": "WA-01 (schema.sql)",
+      "severity": "low",
+      "description": "sys_menu.perms 字段建议加 UNIQUE 索引，防止重复权限编码。但 RuoYi 原版无此约束（同一 perms 可出现在多个菜单节点，如多个按钮共享 system:user:query 权限）。加 UNIQUE 会破坏此行为。建议不加 UNIQUE，但保留 idx_perms 普通索引。",
+      "adjudication_note": "draft 中 WA-01 已有 INDEX idx_perms (perms)，足够。无需改为 UNIQUE。"
+    },
+    {
+      "id": "IMP-04",
+      "target": "WA-04 (SysMenu.java Entity)",
+      "severity": "low",
+      "description": "SysMenu entity 需确认是否包含 deleted 逻辑删除字段（@TableLogic）。draft 中已包含，但需确认 @TableLogic 配置值（value=\"0\", delval=\"1\"）与现有 User/Role/Dept 实体一致。",
+      "adjudication_note": "draft WA-04 已包含 deleted 字段 + @TableLogic，无需额外修改。"
+    }
+  ],
+  "rejected_from_draft": [],
+  "write_intent_preserved": true,
+  "degradation_detected": false,
+  "degradation_detail": null,
+  "fallback_labels": [],
+  "recommended_adjudication": "use_refine",
+  "adjudication_notes": "建议裁决 use_refine。Builder 执行时必须在 WA-03 中同步修改 DeptService.java 第 60 行（IMP-01）。其他 IMP-02~04 为建议性改进，Builder 自行判断是否采纳。",
+  "reviewed_actions": {
+    "WA-01": {"status": "ok", "note": "DDL 设计正确，IF NOT EXISTS + idx_perms 索引到位。不建议加 UNIQUE。"},
+    "WA-02": {"status": "ok", "note": "sortOrder 反射匹配，RoleService 无需修改。"},
+    "WA-03": {"status": "improve", "note": "status 类型修复正确，但需同步修改 DeptService.java (BeanUtil→setter)。"},
+    "WA-04": {"status": "ok", "note": "Entity 字段与 sys_menu 表对齐，@TableLogic 正确。"},
+    "WA-05": {"status": "ok", "note": "SysRoleMenu 简洁，与 UserRole 模式一致。"},
+    "WA-06": {"status": "ok", "note": "SysRoleDept 为数据权限准备，结构正确。"},
+    "WA-07": {"status": "ok", "note": "自定义 SQL 正确，三表 JOIN 语义正确。"},
+    "WA-08": {"status": "ok", "note": "batch insert/delete 方法设计合理。"},
+    "WA-09": {"status": "ok", "note": "batch insert/delete 方法设计合理。"},
+    "WA-10": {"status": "ok", "note": "deleted=0 过滤安全且必要。"},
+    "WA-11": {"status": "ok", "note": "permissionHooks 已做好 fallback，类型安全。"},
+    "WA-12": {"status": "ok", "note": "common.ts LoginResponse 字段统一，类型一致。"}
+  }
+}

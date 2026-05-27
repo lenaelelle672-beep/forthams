@@ -19,6 +19,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.ams.annotation.DataScope;
 @Service
 @RequiredArgsConstructor
 public class AssetService {
@@ -28,6 +29,7 @@ public class AssetService {
     private final AssetMapper assetMapper;
     private final AssetLifecycleService assetLifecycleService;
 
+    @DataScope(deptColumn = "dept_id", userColumn = "create_by")
     public Page<Asset> queryAssets(AssetQueryDTO queryDTO) {
         String tenantId = TenantContext.requireTenantId();
         Page<Asset> page = new Page<>(queryDTO.getPage(), queryDTO.getPageSize());

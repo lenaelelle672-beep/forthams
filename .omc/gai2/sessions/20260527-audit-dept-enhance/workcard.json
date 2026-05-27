@@ -1,0 +1,30 @@
+{
+  "directive": "审计日志页面(http://localhost:5173/audit)最近操作有数据了，但操作趋势、类型分布等统计分类还未有实际数据展示，需把审计模块功能做到100分；部门管理页面(http://localhost:5173/system/depts)展示不够人性化，因为接了生产数据部门太多无法显示，需要优化为树形结构+虚拟滚动等适合大量数据展示的交互。",
+  "owner": "gai2-flash-orchestrator",
+  "mode": "flash",
+  "phase": "triage",
+  "created_at": "2026-05-27T15:30:00Z",
+  "acceptance_checks": [
+    "AC-A1: 审计仪表板统计卡片（总操作数、趋势数据点、活跃用户、操作类型）从后端 /audit-logs/stats 获取真实数据并正确展示",
+    "AC-A2: 操作趋势折线图正确渲染后端返回的 trendData，SVG 路径和数据标签对齐",
+    "AC-A3: 操作类型分布环形图正确展示后端返回的 typeDistribution 数据",
+    "AC-A4: 前端 /audit-logs/stats 调用的参数（startTime/endTime）与后端接口对齐，7天范围正确",
+    "AC-D1: 部门管理页面改为树形展示结构，支持展开/折叠，而非平铺表格",
+    "AC-D2: 大量部门数据时支持虚拟滚动或分页加载，避免DOM过载",
+    "AC-D3: 部门树支持搜索定位、快速展开匹配路径",
+    "AC-D4: 部门管理的增删改操作在树形结构中流畅可用"
+  ],
+  "evidence_to_collect": [
+    "前端构建通过 npm run build",
+    "前端测试通过 npm test -- --run",
+    "审计统计卡片、趋势图、分布图展示真实数据（截图或API验证）",
+    "部门树在大数据量下可正常展开/折叠/搜索",
+    "API冒烟确认 /audit-logs/stats 返回正确统计"
+  ],
+  "open_risks": [
+    "后端 /audit-logs/stats 的 trendData/typeDistribution 返回空数据时前端需优雅降级",
+    "生产环境部门数据量大（数百+），虚拟滚动库兼容性需确认",
+    "前端 recharts 等图表库是否已安装或需新增依赖"
+  ],
+  "artifact_dir": ".omc/gai2/sessions/20260527-audit-dept-enhance"
+}

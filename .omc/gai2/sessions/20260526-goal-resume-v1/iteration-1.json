@@ -1,0 +1,40 @@
+{
+  "round": 2,
+  "focus": "修复核验第2轮 — 验证3个修复是否成功",
+  "timestamp": "2026-05-26",
+  "verification_results": {
+    "FIX-1": {
+      "status": "PASS",
+      "description": "MenuController 与 SysMenuController 路由冲突解除",
+      "evidence": [
+        "MenuController.java 全局不存在（glob 返回空）",
+        "SysMenuController @RequestMapping(/menus) + 子端点 /menus/admin/**",
+        "前端 menu.ts API 全部使用 /menus/admin/** 前缀，/menus/current 保留给当前用户菜单接口"
+      ]
+    },
+    "FIX-2": {
+      "status": "PASS",
+      "description": "VendorController/DeptController/WorkflowDefinitionController @PreAuthorize 补全",
+      "evidence": [
+        "VendorController: 全部5个端点有 @PreAuthorize — list(vendor:vendor:query) + getById(vendor:vendor:query) + create(vendor:vendor:add) + update(vendor:vendor:edit) + delete(vendor:vendor:delete)",
+        "DeptController: 写操作3个端点有 @PreAuthorize — create(system:dept:add) + update(system:dept:edit) + delete(system:dept:remove)",
+        "WorkflowDefinitionController: 全部7个端点有 @PreAuthorize — 2x query + 5x hasAnyRole('ADMIN','SUPER_ADMIN')"
+      ]
+    },
+    "FIX-3": {
+      "status": "PASS",
+      "description": "AssetService @DataScope 试点",
+      "evidence": [
+        "AssetService.java 第32行: @DataScope(deptColumn = \"dept_id\", userColumn = \"create_by\")",
+        "queryAssets() 方法已激活数据权限过滤",
+        "import com.ams.annotation.DataScope 已导入"
+      ]
+    }
+  },
+  "remaining_gaps": [
+    "AC-2: RoleManagement.tsx 缺少 data_scope（数据权限范围）选择器",
+    "AC-3: UserManagement.tsx 部门绑定仅有只读展示，缺少部门变更操作 UI",
+    "AC-1: @DataScope 仅有 AssetService 试点，其他更多业务 Service 尚未激活数据权限"
+  ],
+  "overall_assessment": "3个修复全部成功验证通过。AC-5 的 Blocker 级别安全漏洞已修复，AC-1 数据权限框架已从零使用变为有试点激活。AC-2 和 AC-3 的前端 gap 仍存在但属于功能增强而非安全漏洞。"
+}

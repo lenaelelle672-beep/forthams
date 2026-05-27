@@ -1,7 +1,5 @@
 package com.ams.service;
 
-import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.convert.Convert;
 import com.ams.common.exception.BusinessException;
 import com.ams.dto.DeptCreateDTO;
 import com.ams.dto.DeptUpdateDTO;
@@ -9,7 +7,6 @@ import com.ams.entity.Dept;
 import com.ams.mapper.DeptMapper;
 import com.ams.mapper.UserMapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +15,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 部门管理 Service
+ *
+ * <p>使用显式 setter 赋值替代 Hutool BeanUtil 反射，确保类型安全与 IDE 重构检查。</p>
+ */
 @Service
 public class DeptService {
 
@@ -31,7 +33,7 @@ public class DeptService {
 
     public List<Map<String, Object>> queryDepts(String keyword) {
         QueryWrapper<Dept> wrapper = new QueryWrapper<>();
-        wrapper.select("id", "dept_name", "dept_code", "parent_id", "sort_order", "leader", "phone", "status", "create_time");
+        wrapper.select("id", "dept_name", "dept_code", "parent_id", "sort_order", "leader", "phone", "email", "status", "create_time");
         if (keyword != null && !keyword.isBlank()) {
             wrapper.and(w -> w.like("dept_name", keyword).or().like("dept_code", keyword));
         }
@@ -51,44 +53,47 @@ public class DeptService {
 
     @Transactional(rollbackFor = Exception.class)
     public Dept createDept(DeptCreateDTO dto) {
-        validateDeptCodeUnique(getStrProp(dto, "deptCode"), null);
+        validateDeptCodeUnique(dto.getDeptCode(), null);
 
         Dept dept = new Dept();
-        BeanUtil.setProperty(dept, "name", getStrProp(dto, "name"));
-        BeanUtil.setProperty(dept, "parentId", getLongProp(dto, "parentId") == null ? 0L : getLongProp(dto, "parentId"));
-        BeanUtil.setProperty(dept, "orderNum", getIntProp(dto, "sortOrder") == null ? 0 : getIntProp(dto, "sortOrder"));
-        BeanUtil.setProperty(dept, "status", "1");
+        dept.setName(dto.getName());
+        dept.setParentId(dto.getParentId() != null ? dto.getParentId() : 0L);
+        dept.setOrderNum(dto.getSortOrder() != null ? dto.getSortOrder() : 0);
+        dept.setStatus(dto.getStatus() != null ? dto.getStatus() : 1);
+        dept.setDeptCode(dto.getDeptCode());
+        dept.setLeader(dto.getLeader());
+        dept.setPhone(dto.getPhone());
+        dept.setEmail(dto.getEmail());
+        dept.setLeaderId(dto.getLeaderId());
+        dept.setSecretaryId(dto.getSecretaryId());
+        dept.setDeptType(dto.getDeptType());
+        dept.setDescription(dto.getDescription());
         deptMapper.insert(dept);
 
-        deptMapper.update(
-            null,
-            new UpdateWrapper<Dept>()
-                .eq("id", getLongProp(dept, "id"))
-                .set("dept_code", getStrProp(dto, "deptCode"))
-                .set("leader", getStrProp(dto, "leader"))
-                .set("phone", getStrProp(dto, "phone"))
-        );
         return dept;
     }
 
     @Transactional(rollbackFor = Exception.class)
     public Dept updateDept(Long id, DeptUpdateDTO dto) {
         Dept dept = getDeptById(id);
-        validateDeptCodeUnique(getStrProp(dto, "deptCode"), id);
+        validateDeptCodeUnique(dto.getDeptCode(), id);
 
-        BeanUtil.setProperty(dept, "name", getStrProp(dto, "name"));
-        BeanUtil.setProperty(dept, "parentId", getLongProp(dto, "parentId") == null ? 0L : getLongProp(dto, "parentId"));
-        BeanUtil.setProperty(dept, "orderNum", getIntProp(dto, "sortOrder") == null ? 0 : getIntProp(dto, "sortOrder"));
+        dept.setName(dto.getName());
+        dept.setParentId(dto.getParentId() != null ? dto.getParentId() : 0L);
+        dept.setOrderNum(dto.getSortOrder() != null ? dto.getSortOrder() : 0);
+        dept.setDeptCode(dto.getDeptCode());
+        dept.setLeader(dto.getLeader());
+        dept.setPhone(dto.getPhone());
+        dept.setEmail(dto.getEmail());
+        dept.setLeaderId(dto.getLeaderId());
+        dept.setSecretaryId(dto.getSecretaryId());
+        dept.setDeptType(dto.getDeptType());
+        dept.setDescription(dto.getDescription());
+        if (dto.getStatus() != null) {
+            dept.setStatus(dto.getStatus());
+        }
         deptMapper.updateById(dept);
 
-        deptMapper.update(
-            null,
-            new UpdateWrapper<Dept>()
-                .eq("id", id)
-                .set("dept_code", getStrProp(dto, "deptCode"))
-                .set("leader", getStrProp(dto, "leader"))
-                .set("phone", getStrProp(dto, "phone"))
-        );
         return dept;
     }
 
@@ -103,6 +108,11 @@ public class DeptService {
     }
 
     public List<Dept> listAllDepts() {
+        List<Dept> depts = deptMapper.selectList(new QueryWrapper<Dept>().orderByAsc("sort_order", "id"));
+        return buildDeptEntityTree(depts);
+    }
+
+    public List<Dept> listFlatDepts() {
         return deptMapper.selectList(new QueryWrapper<Dept>().orderByAsc("sort_order", "id"));
     }
 
@@ -141,6 +151,24 @@ public class DeptService {
         return roots;
     }
 
+    private List<Dept> buildDeptEntityTree(List<Dept> deptList) {
+        Map<Long, Dept> nodeMap = new HashMap<>();
+        List<Dept> roots = new ArrayList<>();
+        for (Dept dept : deptList) {
+            dept.setChildren(new ArrayList<>());
+            nodeMap.put(dept.getId(), dept);
+        }
+        for (Dept dept : deptList) {
+            Long parentId = dept.getParentId();
+            if (parentId == null || parentId == 0L || !nodeMap.containsKey(parentId)) {
+                roots.add(dept);
+                continue;
+            }
+            nodeMap.get(parentId).getChildren().add(dept);
+        }
+        return roots;
+    }
+
     private Long toLong(Object value) {
         if (value == null) {
             return null;
@@ -149,17 +177,5 @@ public class DeptService {
             return number.longValue();
         }
         return Long.valueOf(String.valueOf(value));
-    }
-
-    private Long getLongProp(Object bean, String fieldName) {
-        return Convert.toLong(BeanUtil.getProperty(bean, fieldName));
-    }
-
-    private Integer getIntProp(Object bean, String fieldName) {
-        return Convert.toInt(BeanUtil.getProperty(bean, fieldName));
-    }
-
-    private String getStrProp(Object bean, String fieldName) {
-        return Convert.toStr(BeanUtil.getProperty(bean, fieldName));
     }
 }

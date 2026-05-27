@@ -3,6 +3,10 @@ package com.ams.mapper;
 import com.ams.entity.Dept;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
+
+import java.util.Set;
 
 /**
  * 部门数据访问 Mapper 接口。
@@ -26,7 +30,9 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface DeptMapper extends BaseMapper<Dept> {
 
-    // BaseMapper<Dept> 已提供全部所需 CRUD 方法，无需额外自定义 SQL。
-    // 表名与字段映射由 Dept 实体类的 @TableName / @TableId / @TableField 注解决定。
-
+    @Select("""
+        SELECT id FROM sys_dept
+        WHERE deleted = 0 AND (id = #{deptId} OR FIND_IN_SET(#{deptId}, ancestors) > 0)
+        """)
+    Set<Long> selectDescendantIds(@Param("deptId") Long deptId);
 }

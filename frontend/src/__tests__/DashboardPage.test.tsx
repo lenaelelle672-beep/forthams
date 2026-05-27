@@ -46,13 +46,12 @@ describe('DashboardPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(getDashboardStats).mockResolvedValue({
-      code: 200, message: 'success',
-      data: { totalAssets: 150, inUseAssets: 120, idleAssets: 20, maintenanceAssets: 5, scrapAssets: 5, totalValue: 50000000, netValue: 35000000, categoryDistribution: {}, pendingApprovals: 3 },
+      totalAssets: 150, inUseAssets: 120, idleAssets: 20, maintenanceAssets: 5, scrapAssets: 5, totalValue: 50000000, netValue: 35000000, categoryDistribution: {}, pendingApprovals: 3,
     });
-    vi.mocked(getAssetValueTrends).mockResolvedValue({ code: 200, message: 'success', data: [] });
-    vi.mocked(getWorkOrderList).mockResolvedValue({ code: 200, message: 'success', data: { records: [], total: 0, size: 20, current: 1 } });
-    vi.mocked(getDeptDistribution).mockResolvedValue({ code: 200, message: 'success', data: [] });
-    vi.mocked(getMaintenanceStats).mockResolvedValue({ code: 200, message: 'success', data: {} });
+    vi.mocked(getAssetValueTrends).mockResolvedValue([]);
+    vi.mocked(getWorkOrderList).mockResolvedValue({ records: [], total: 0, size: 20, current: 1 });
+    vi.mocked(getDeptDistribution).mockResolvedValue([]);
+    vi.mocked(getMaintenanceStats).mockResolvedValue({});
   });
 
   it('renders page header', async () => {

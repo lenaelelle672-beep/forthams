@@ -1,0 +1,54 @@
+{
+  "options": [
+    {
+      "name": "决策1-A: MyBatis-Plus DataPermissionInterceptor + JSQLParser",
+      "summary": "使用 MyBatis-Plus 内置 DataPermissionInterceptor，通过 JSQLParser 在 SQL 层动态注入数据权限过滤条件",
+      "pros": ["MyBatis-Plus 生态标准方案，项目已依赖 mybatis-plus-jsqlparser 3.5.9", "对所有 BaseMapper 查询透明生效，业务代码仅需 @DataScope 注解", "支持多表别名场景，灵活匹配五种数据范围"],
+      "cons": ["JSQLParser 解析开销 5-15%", "复杂 SQL 兼容性需验证", "与分页插件排序冲突风险"],
+      "cost": "medium", "risk": "medium"
+    },
+    {
+      "name": "决策1-B: 自定义 Aspect 切面",
+      "summary": "Spring AOP @Around 切面在 Service 层注入数据权限参数",
+      "pros": ["实现简单，Java 层调试方便"],
+      "cons": ["侵入性强，20+ Service 类全部改造", "易遗漏", "违反关注点分离原则"],
+      "cost": "low", "risk": "high"
+    },
+    {
+      "name": "决策2-A: 先补 @PreAuthorize（安全优先）",
+      "summary": "先补全 20+ Controller 按钮权限注解，堵住最大安全漏洞",
+      "pros": ["立即堵住 20+ Controller 安全漏洞", "低风险机械标注工作", "为拦截器试点留缓冲期"],
+      "cons": ["短期功能权限和数据权限不一致"],
+      "cost": "medium", "risk": "low"
+    },
+    {
+      "name": "决策2-B: 先做拦截器",
+      "summary": "先完成架构基础再补注解",
+      "pros": ["架构基础优先"],
+      "cons": ["实施期间 20+ Controller 安全漏洞敞口", "阻塞前端工作"],
+      "cost": "high", "risk": "high"
+    },
+    {
+      "name": "决策3-B: /menus/admin/**（推荐）",
+      "summary": "SysMenuController 路径改为 /menus/admin，与 MenuController 分离",
+      "pros": ["改动最小", "URL 语义清晰", "两 Controller 职责分离"],
+      "cons": [],
+      "cost": "low", "risk": "low"
+    },
+    {
+      "name": "决策4-A: 独立页面（推荐）",
+      "summary": "角色管理/用户管理创建独立路由页面",
+      "pros": ["独立 URL 深层链接", "职责单一", "完整交互空间"],
+      "cons": ["前端路由新增 2 条目"],
+      "cost": "medium", "risk": "low"
+    }
+  ],
+  "recommended_option": "决策1-A + 决策2-A + 决策3-B + 决策4-A",
+  "rationale": "安全优先、风险可控、最小改动的组合路径。执行顺序：1) @PreAuthorize 注解全覆盖（2-3天）→ 2) 菜单路由修复（0.5天）→ 3) 前端角色管理独立页面（2-3天）→ 4) 前端用户管理增强（1-2天）→ 5) 前端菜单编辑表单（2天）→ 6) DataPermission 拦截器试点+推广（3-4天）→ 7) 生产迁移脚本（1天）。总工期 12-15 工作日。",
+  "rejected_options": [
+    {"name": "决策1-B", "reason": "侵入性强，易遗漏，与 MyBatis-Plus 生态背道而驰"},
+    {"name": "决策2-B", "reason": "实施期间 20+ Controller 安全漏洞敞口不可接受"},
+    {"name": "决策3-A: 合并 Controller", "reason": "改动面大，违反单一职责，不能自动修复路径 Bug"},
+    {"name": "决策4-B: SettingsPage 加 Tab", "reason": "Tab 模式无法承载复杂交互，违反 SPA 路由设计原则"}
+  ]
+}

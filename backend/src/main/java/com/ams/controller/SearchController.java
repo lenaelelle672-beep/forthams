@@ -5,6 +5,7 @@ import com.ams.dto.SearchResultDTO;
 import com.ams.service.SearchService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 
@@ -31,6 +32,7 @@ public class SearchController {
      * @param limit   每类结果最大条数，默认 10
      * @return 统一格式的搜索结果列表
      */
+    @PreAuthorize("@ss.hasPermi('search:query')")
     @GetMapping
     public Result<List<SearchResultDTO>> search(
             @RequestParam String keyword,

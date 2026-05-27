@@ -1,0 +1,28 @@
+{
+  "classification": "Heavy",
+  "scope": [
+    "backend: 8 个业务 Service @DataScope 注解 + DataScopeContextHolder 链路",
+    "backend: UserManagementController/RoleController @PreAuthorize 补充",
+    "backend: Controller 路由冲突解决 (RoleController vs RoleManagementController, MenuController vs SysMenuController)",
+    "backend: WorkOrderController/ApprovalController/AssetController/DeptController/VendorController @PreAuthorize 补充",
+    "backend: 数据权限 SQL 集成测试 (DataScopeIntegrationTest)",
+    "frontend: MenuManagement.tsx 编辑弹窗表单实现",
+    "frontend: RoleManagement.tsx 独立页面新建",
+    "frontend: UserManagement.tsx 独立页面新建",
+    "frontend: 路由注册 /system/roles, /system/users"
+  ],
+  "risks": [
+    {"level": "CRITICAL", "detail": "Controller 路由冲突：/roles 和 /menus 被新旧 Controller 双映射，Spring 启动报错"},
+    {"level": "CRITICAL", "detail": "UserManagementController 10 方法零 @PreAuthorize 保护，可越权操作所有用户"},
+    {"level": "HIGH", "detail": "@DataScope 零使用：10+ 业务 Mapper 全查询无数据过滤，数据权限形同虚设"},
+    {"level": "HIGH", "detail": "5 个核心业务 Controller 的增删改方法无 @PreAuthorize 保护"},
+    {"level": "MEDIUM", "detail": "JSQLParser 多表 JOIN 场景兼容性需逐场景验证"}
+  ],
+  "recommended_phases": ["debate", "builder", "reviewer"],
+  "subtask_priority": [
+    "1. 解决 Controller 路由冲突（删除旧版 Controller，保留新版）",
+    "2. 补充 @PreAuthorize 安全漏洞（UserManagementController + 5 个业务 Controller）",
+    "3. 业务 Service 打 @DataScope 注解 + 集成测试",
+    "4. 前端页面完善（菜单编辑 → 角色管理 → 用户管理）"
+  ]
+}

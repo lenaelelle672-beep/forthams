@@ -15,6 +15,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -39,7 +41,9 @@ class AuthControllerTest {
     @Test
     @DisplayName("Should login and return token")
     void loginReturnsToken() throws Exception {
-        AuthResponse mockResponse = new AuthResponse("test-token", 1L, "admin", "管理员", null);
+        AuthResponse mockResponse = new AuthResponse(
+                "test-token", 1L, "admin", "管理员",
+                List.of("SUPER_ADMIN"), List.of("system:user:query"));
         when(authService.login(any(LoginRequest.class))).thenReturn(mockResponse);
 
         mockMvc.perform(post("/api/auth/login")
@@ -49,7 +53,9 @@ class AuthControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.code").value(200))
             .andExpect(jsonPath("$.data.token").value("test-token"))
-            .andExpect(jsonPath("$.data.userId").value(1));
+            .andExpect(jsonPath("$.data.userId").value(1))
+            .andExpect(jsonPath("$.data.roles[0]").value("SUPER_ADMIN"))
+            .andExpect(jsonPath("$.data.permissions[0]").value("system:user:query"));
 
         ArgumentCaptor<LoginRequest> captor = ArgumentCaptor.forClass(LoginRequest.class);
         verify(authService).login(captor.capture());
@@ -59,7 +65,9 @@ class AuthControllerTest {
     @Test
     @DisplayName("Should register and return token")
     void registerReturnsToken() throws Exception {
-        AuthResponse mockResponse = new AuthResponse("reg-token", 2L, "newuser", "新用户", null);
+        AuthResponse mockResponse = new AuthResponse(
+                "reg-token", 2L, "newuser", "新用户",
+                List.of("USER"), List.of("dashboard:view"));
         when(authService.register(any(RegisterRequest.class))).thenReturn(mockResponse);
 
         mockMvc.perform(post("/api/auth/register")

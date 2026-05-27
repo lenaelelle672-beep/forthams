@@ -16,12 +16,14 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.ams.annotation.DataScope;
 @Service
 @RequiredArgsConstructor
 public class MaintenanceService {
 
     private final MaintenanceRecordMapper maintenanceRecordMapper;
 
+    @DataScope(userColumn = "create_by")
     public Page<MaintenanceRecord> queryRecords(Integer page, Integer pageSize, Long assetId, String maintenanceType) {
         String tenantId = TenantContext.requireTenantId();
         Page<MaintenanceRecord> pageParam = new Page<>(page == null ? 1 : page, pageSize == null ? 10 : pageSize);

@@ -10,4 +10,8 @@ public class RoleCreateDTO {
     @JsonAlias({"code", "roleCode"})
     private String roleCode;
     private String description;
+    private Integer sortOrder;
+    private Integer dataScope;
+    private Integer menuCheckStrictly;
+    private Integer deptCheckStrictly;
 }

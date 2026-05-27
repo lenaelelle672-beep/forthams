@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.ams.annotation.DataScope;
 @Service
 @RequiredArgsConstructor
 public class RetirementApplicationService {
@@ -151,6 +152,7 @@ public class RetirementApplicationService {
         return retirementApplicationMapper.selectPage(pageObj, wrapper);
     }
 
+    @DataScope(deptColumn = "dept_id", userColumn = "applicant_id")
     public Page<RetirementApplication> queryApplications(Integer page, Integer pageSize, String status, Long assetId) {
         String tenantId = TenantContext.requireTenantId();
         Page<RetirementApplication> pageObj = new Page<>(page, pageSize);

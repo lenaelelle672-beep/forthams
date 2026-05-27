@@ -1,0 +1,23 @@
+{
+  "session_id": "20260526-goal-continue-v2",
+  "goal_id": "forthams-mvp-enhance",
+  "directive": "forthAMS MVP 增强 -- 按用户优先级继续推进：\n\nP0（最高ROI）：给业务 Service/Mapper 实际使用 @DataScope 注解让数据权限真正生效。拦截器框架已建好但没人调用。\n- 在业务 Mapper（AssetMapper/WorkOrderMapper/ApprovalMapper 等）对应查询方法上加 @DataScope 注解\n- 在业务 Service 层确保 dept_id/role 上下文正确注入\n- 创建数据权限 SQL 集成测试\n\nP1（其次）：完善前端管理页面\n- 菜单编辑表单（当前只有 toast 占位，需实现完整弹窗表单含图标选择、排序、可见性）\n- 角色管理独立页面（/system/roles）含角色 CRUD、菜单权限分配树、部门数据权限\n- 用户管理独立页面（/system/users）含用户列表、角色分配、部门绑定",
+  "phase": "triage",
+  "classification": "pending",
+  "auto_mode": false,
+  "acceptance_checks": [
+    "AC-DS-1: 业务 Mapper 查询方法使用 @DataScope 注解，数据按部门/角色自动过滤",
+    "AC-DS-2: 数据权限 SQL 集成测试通过，覆盖多部门/子部门/管理员场景",
+    "AC-FE-1: 菜单编辑表单弹窗完整实现 -- 含图标选择、排序、可见性切换、状态管理",
+    "AC-FE-2: 角色管理独立页面新建 -- 角色 CRUD + 菜单权限树 + 部门数据权限分配",
+    "AC-FE-3: 用户管理独立页面新建 -- 用户列表 + 角色分配 UI + 部门绑定",
+    "AC-PRE: @PreAuthorize 覆盖剩余未补充的 Controller 方法"
+  ],
+  "evidence_to_collect": [],
+  "open_risks": [
+    "HIGH: @DataScope 在业务查询上的兼容性（多表JOIN/子查询场景）",
+    "MEDIUM: 前端新建页面路由冲突风险",
+    "MEDIUM: 是否有旧 sys_permission 表架构残留需清理"
+  ],
+  "artifact_dir": ".omc/gai2/sessions/20260526-goal-continue-v2"
+}

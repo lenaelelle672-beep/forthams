@@ -5,7 +5,7 @@
  */
 
 import http from '@/utils/http';
-import type { ApiResponse, PaginatedResponse } from '@/types/common';
+import type { PageData } from '@/types/common';
 
 export interface AuditLog {
   id: number;
@@ -18,6 +18,7 @@ export interface AuditLog {
   ipAddress?: string;
   changes?: AuditFieldChange[];
   createdAt: string;
+  raw?: Record<string, unknown>;
 }
 
 export interface AuditFieldChange {
@@ -51,23 +52,55 @@ export interface AuditStats {
   totalCount: number;
 }
 
+function normalizeAuditLog(raw: any): AuditLog {
+  const operationType = raw?.operationType ?? raw?.businessType ?? raw?.action ?? 'UNKNOWN';
+  const description = raw?.description ?? raw?.detail ?? raw?.action ?? raw?.resourceType;
+  const createdAt = raw?.createdAt ?? raw?.createTime ?? raw?.timestamp ?? '';
+  return {
+    id: raw?.id,
+    operationType,
+    operatorId: raw?.operatorId,
+    operatorName: raw?.operatorName ?? '未知用户',
+    resourceType: raw?.resourceType ?? raw?.module,
+    resourceId: raw?.resourceId ?? raw?.requestUri,
+    description,
+    ipAddress: raw?.ipAddress ?? raw?.operatorIp,
+    changes: raw?.changes ?? [],
+    createdAt,
+    raw,
+  };
+}
+
 /** 审计日志列表 */
-export const getAuditLogs = (params?: AuditListQuery) =>
-  http.get<PaginatedResponse<AuditLog>>('/audit-logs', { params });
+export const getAuditLogs = async (params?: AuditListQuery & { keyword?: string; search?: string }) => {
+  const page = params?.page && params.page > 0 ? params.page - 1 : 0;
+  const size = params?.pageSize ?? 10;
+  const res = await http.get<PageData<any>>('/audit-logs', {
+    params: { ...params, page, size, pageSize: undefined },
+  });
+  return {
+    ...res,
+    records: (res.records ?? []).map(normalizeAuditLog),
+  } as PageData<AuditLog>;
+};
 
 /** 审计日志详情 */
-export const getAuditLogDetail = (id: number) =>
-  http.get<ApiResponse<AuditLog>>(`/audit-logs/${id}`);
+export const getAuditLogDetail = async (id: number) => {
+  const res = await http.get<any>(`/audit-logs/${id}`);
+  return normalizeAuditLog(res);
+};
 
 /** 审计仪表板统计（趋势+分布） */
 export const getAuditStats = (params?: Pick<AuditListQuery, 'startTime' | 'endTime' | 'operationType'>) =>
-  http.get<ApiResponse<AuditStats>>('/audit-logs/stats', { params });
+  http.get<AuditStats>('/audit-logs/stats', { params });
 
 /** 获取资产的审计日志 */
 export const getAssetAuditLogs = (
   assetId: number,
   params?: Pick<AuditListQuery, 'page' | 'pageSize' | 'operationType' | 'startTime' | 'endTime'>,
 ) =>
-  http.get<PaginatedResponse<AuditLog>>(`/audit-logs`, {
-    params: { ...params, resourceType: 'ASSET', resourceId: String(assetId) },
+  getAuditLogs({
+    ...params,
+    resourceType: 'ASSET',
+    resourceId: String(assetId),
   });

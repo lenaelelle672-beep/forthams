@@ -24,6 +24,16 @@ import type { AuditLog } from '@/api/audit';
 
 const DISTRIBUTION_COLORS = ['#004191', '#535f74', '#36455a', '#adc6ff', '#d97706', '#16a34a'];
 
+const OPERATION_TYPE_LABELS: Record<string, string> = {
+  LOGIN: '登录',
+  INSERT: '新增',
+  UPDATE: '更新',
+  DELETE: '删除',
+  EXPORT: '导出',
+  IMPORT: '导入',
+  QUERY: '查询',
+};
+
 const STATUS_CONFIG = {
   success: { text: '成功', color: '#16a34a' },
   warning: { text: '警告', color: '#d97706' },
@@ -39,6 +49,10 @@ function getTypeColor(type: string) {
     return { typeColor: '#535f74', typeBg: '#d7e3fc' };
   }
   return { typeColor: '#004191', typeBg: '#d8e2ff' };
+}
+
+function formatOperationType(type: string) {
+  return OPERATION_TYPE_LABELS[type] ?? type;
 }
 
 function getLogStatus(log: AuditLog): 'success' | 'warning' | 'error' {
@@ -90,11 +104,12 @@ export default function AuditDashboardPage() {
   const [page, setPage] = useState(1);
   const [filterOpen, setFilterOpen] = useState(false);
 
-  const now = new Date();
-  const sevenDaysAgo = new Date(now);
-  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-  const startTime = sevenDaysAgo.toISOString();
-  const endTime = now.toISOString();
+  const { startTime, endTime } = useMemo(() => {
+    const end = new Date();
+    const start = new Date(end);
+    start.setDate(end.getDate() - 6);
+    return { startTime: start.toISOString(), endTime: end.toISOString() };
+  }, []);
 
   const { data: statsRes, isLoading: statsLoading } = useQuery({
     queryKey: ['audit-stats', startTime, endTime],
@@ -102,11 +117,30 @@ export default function AuditDashboardPage() {
     staleTime: 30_000,
   });
 
-  const stats = statsRes?.data;
+  const stats = statsRes;
   const totalCount = stats?.totalCount ?? 0;
-  const trendData = stats?.trendData ?? [];
+  const rawTrendData = stats?.trendData ?? [];
+  const trendData = useMemo(() => {
+    const byDate = new Map(rawTrendData.map((p) => [p.date.slice(0, 10), p.count]));
+    const end = new Date(endTime);
+    return Array.from({ length: 7 }, (_, index) => {
+      const day = new Date(end);
+      day.setDate(end.getDate() - (6 - index));
+      const key = day.toISOString().slice(0, 10);
+      return { date: key, count: byDate.get(key) ?? 0 };
+    });
+  }, [rawTrendData, endTime]);
   const typeDistribution = stats?.typeDistribution ?? {};
-  const topOperators = stats?.topOperators ?? [];
+  const rawTopOperators = stats?.topOperators ?? [];
+  const topOperators = useMemo(() => {
+    const merged = new Map<string, number>();
+    rawTopOperators.forEach((item) => {
+      const name = item.operatorName || '未知用户';
+      merged.set(name, (merged.get(name) ?? 0) + item.count);
+    });
+    return Array.from(merged, ([operatorName, count]) => ({ operatorName, count }))
+      .sort((a, b) => b.count - a.count);
+  }, [rawTopOperators]);
 
   const distEntries = useMemo(() => {
     const entries = Object.entries(typeDistribution);
@@ -125,6 +159,7 @@ export default function AuditDashboardPage() {
       getAuditLogs({
         page,
         pageSize: PAGE_SIZE,
+        keyword: search || undefined,
         startTime,
         endTime,
       }),
@@ -132,7 +167,10 @@ export default function AuditDashboardPage() {
     placeholderData: (prev) => prev,
   });
 
-  const records: AuditLog[] = logsRes?.records ?? [];
+  const allRecords: AuditLog[] = logsRes?.records ?? [];
+  const records = activeFilter === 'alerts'
+    ? allRecords.filter((log) => getLogStatus(log) !== 'success')
+    : allRecords;
   const totalLogs: number = logsRes?.total ?? 0;
   const totalPages = Math.max(1, Math.ceil(totalLogs / PAGE_SIZE));
 
@@ -141,29 +179,36 @@ export default function AuditDashboardPage() {
     return uniqueOperators.size;
   }, [records]);
 
+  const todayCount = trendData[trendData.length - 1]?.count ?? 0;
+
   const kpiCards = [
     { label: '总操作数', value: totalCount.toLocaleString(), icon: ClipboardList, bg: '#d8e2ff', color: '#004191' },
-    { label: '趋势数据点', value: trendData.length, icon: RefreshCw, bg: '#d7e3fc', color: '#535f74' },
+    { label: '今日操作', value: todayCount.toLocaleString(), icon: RefreshCw, bg: '#d7e3fc', color: '#535f74' },
     { label: '活跃用户', value: activeUserCount || topOperators.length, icon: Users, bg: '#d3e4fe', color: '#36455a' },
     { label: '操作类型', value: Object.keys(typeDistribution).length, icon: FileBarChart, bg: '#ffdad6', color: '#ba1a1a', borderError: true },
   ];
 
-  const trendPath = useMemo(() => {
-    if (trendData.length === 0) return '';
+  const trendPoints = useMemo(() => {
+    if (trendData.length === 0) return [];
     const maxCount = Math.max(...trendData.map((p) => p.count), 1);
     const w = 800;
     const h = 200;
-    const points = trendData.map((p, i) => ({
+    return trendData.map((p, i) => ({
       x: (i / Math.max(trendData.length - 1, 1)) * w,
       y: h - (p.count / maxCount) * (h * 0.8) - h * 0.1,
+      count: p.count,
     }));
-    return `M${points.map((p) => `${p.x},${p.y}`).join(' L')}`;
   }, [trendData]);
 
+  const trendPath = useMemo(() => {
+    if (trendPoints.length === 0) return '';
+    return `M${trendPoints.map((p) => `${p.x},${p.y}`).join(' L')}`;
+  }, [trendPoints]);
+
   const trendAreaPath = useMemo(() => {
-    if (trendData.length === 0) return '';
+    if (trendPoints.length === 0) return '';
     return `${trendPath} L800,200 L0,200 Z`;
-  }, [trendPath, trendData.length]);
+  }, [trendPath, trendPoints.length]);
 
   const svgCircle = 2 * Math.PI * 16;
   const distCumulative = useMemo(() => {
@@ -202,7 +247,7 @@ export default function AuditDashboardPage() {
               const rows = records.map((log) => [
                 formatTime(log.createdAt),
                 log.operatorName || '',
-                log.operationType || '',
+                formatOperationType(log.operationType || ''),
                 log.description || '',
                 log.ipAddress || '',
               ]);
@@ -275,6 +320,17 @@ export default function AuditDashboardPage() {
                   <svg className="absolute inset-0 w-full h-full p-4" preserveAspectRatio="none" viewBox="0 0 800 200">
                     <path d={trendPath} fill="none" stroke="#004191" strokeLinecap="round" strokeWidth="3" />
                     <path d={trendAreaPath} fill="url(#auditGrad)" opacity="0.1" />
+                    {trendPoints.map((point, index) => (
+                      <circle
+                        key={`${trendData[index]?.date}-${index}`}
+                        cx={point.x}
+                        cy={point.y}
+                        r={point.count > 0 ? 6 : 3}
+                        fill={point.count > 0 ? '#004191' : '#cbd5e1'}
+                        stroke="#ffffff"
+                        strokeWidth="2"
+                      />
+                    ))}
                     <defs>
                       <linearGradient id="auditGrad" x1="0%" x2="0%" y1="0%" y2="100%">
                         <stop offset="0%" stopColor="#004191" stopOpacity="1" />
@@ -322,7 +378,7 @@ export default function AuditDashboardPage() {
                   <div key={d.label} className="flex justify-between items-center">
                     <div className="flex items-center gap-2">
                       <span className="w-2 h-2 rounded-full" style={{ backgroundColor: DISTRIBUTION_COLORS[i % DISTRIBUTION_COLORS.length] }} />
-                      <span className="text-xs">{d.label}</span>
+                      <span className="text-xs">{formatOperationType(d.label)}</span>
                     </div>
                     <span className="text-xs font-semibold">{d.pct}%</span>
                   </div>
@@ -366,7 +422,7 @@ export default function AuditDashboardPage() {
               <span className="text-xs text-[#424753] font-semibold">操作类型：</span>
               {Object.keys(typeDistribution).slice(0, 5).map((t) => (
                 <button key={t} className="px-2 py-0.5 rounded bg-[#d8e2ff] text-[#004191] text-xs hover:bg-[#004191] hover:text-white transition-colors">
-                  {t}
+                  {formatOperationType(t)}
                 </button>
               ))}
               {Object.keys(typeDistribution).length === 0 && (
@@ -418,7 +474,7 @@ export default function AuditDashboardPage() {
                             className="px-2 py-0.5 rounded text-xs font-semibold"
                             style={{ backgroundColor: tc.typeBg, color: tc.typeColor, border: `1px solid ${tc.typeColor}33` }}
                           >
-                            {log.operationType}
+                            {formatOperationType(log.operationType)}
                           </span>
                         </td>
                         <td className="px-6 py-4 text-sm text-[#424753]">

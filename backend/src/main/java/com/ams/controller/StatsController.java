@@ -6,6 +6,7 @@ import com.ams.service.StatsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -40,6 +41,7 @@ public class StatsController {
      *
      * @return 系统统计概览数据
      */
+    @PreAuthorize("@ss.hasPermi('stats:query')")
     @GetMapping("/overview")
     public Result<StatsResponse> getOverview() {
         return Result.success(statsService.getOverview());

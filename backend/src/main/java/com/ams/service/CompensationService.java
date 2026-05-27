@@ -20,6 +20,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
+import com.ams.annotation.DataScope;
 @Service
 @RequiredArgsConstructor
 public class CompensationService {
@@ -28,6 +29,7 @@ public class CompensationService {
     private final AssetMapper assetMapper;
     private final WorkflowDefinitionService workflowDefinitionService;
 
+    @DataScope(deptColumn = "responsible_dept_id", userColumn = "responsible_user_id")
     public Page<AssetCompensation> queryCompensations(Integer page, Integer pageSize, String status, Long assetId) {
         String tenantId = TenantContext.requireTenantId();
         Page<AssetCompensation> pageParam = new Page<>(page, pageSize);

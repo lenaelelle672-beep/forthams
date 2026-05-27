@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useMutation } from '@tanstack/react-query';
-import { Eye, EyeOff, Shield, User, Lock, ShieldCheck, Package, Building2, Wrench, BarChart3 } from 'lucide-react';
+import { Eye, EyeOff, Shield, User, Lock, ShieldCheck, Package, Building2, Wrench, BarChart3, LogIn } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -284,6 +284,34 @@ export default function LoginPage() {
       `}</style>
       <canvas ref={canvasRef} className="absolute inset-0 z-0" />
 
+      {DEMO_ACCOUNTS.length > 0 && (
+        <section className="fixed left-5 top-5 z-20 w-[min(360px,calc(100vw-40px))] rounded-2xl border border-white/10 bg-[#071225]/70 p-3 shadow-2xl backdrop-blur-xl">
+          <div className="mb-3 flex items-center justify-between gap-3">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#9ecbff]">快捷账号</p>
+              <p className="text-[10px] text-[#6f7891]">测试期间保留，后续可按指令移除</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            {DEMO_ACCOUNTS.map(({ label, desc, username, password, Icon }) => (
+              <button
+                key={username}
+                type="button"
+                onClick={() => fillAndLogin(username, password)}
+                disabled={loginMutation.isPending}
+                className="rounded-xl border border-white/10 bg-white/[0.05] px-3 py-2 text-left transition-all hover:-translate-y-0.5 hover:bg-white/[0.08] disabled:opacity-40"
+              >
+                <div className="flex items-center gap-2">
+                  <Icon className="h-4 w-4 text-[#b4c5ff]" />
+                  <span className="text-xs font-medium text-[#dae2fd]">{label}</span>
+                </div>
+                <p className="mt-1 text-[10px] text-[#6f7891]">{desc}</p>
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
+
       <div className="fixed inset-0 pointer-events-none" style={{
         backgroundImage: `
           linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
@@ -454,38 +482,24 @@ export default function LoginPage() {
               登录系统
             </Button>
           </form>
-        </div>
 
-        {DEMO_ACCOUNTS.length > 0 && (
-        <section className="w-full">
-          <div className="flex items-center gap-4 mb-6">
-            <div className="h-px flex-grow bg-white/10" />
-            <h2 className="text-xs font-semibold text-[#8d90a0] tracking-[0.15em] uppercase whitespace-nowrap">
-              快捷账号
-            </h2>
-            <div className="h-px flex-grow bg-white/10" />
+          <div className="mt-6 pt-6 border-t border-white/10">
+            <div className="flex items-center gap-4 mb-4">
+              <div className="h-px flex-grow bg-white/10" />
+              <span className="text-xs font-semibold text-[#8d90a0] tracking-[0.15em] uppercase whitespace-nowrap">
+                MaxKey SSO
+              </span>
+              <div className="h-px flex-grow bg-white/10" />
+            </div>
+            <a
+              href={`${import.meta.env.VITE_API_BASE || ''}/api/oauth2/authorization/maxkey`}
+              className="flex items-center justify-center gap-2 w-full py-3.5 rounded-lg text-center text-base font-semibold bg-[#1e3a5f] text-[#dae2fd] hover:bg-[#2563eb] transition-colors shadow-lg"
+            >
+              <LogIn className="w-5 h-5" />SSO 单点登录
+            </a>
+            <p className="text-[10px] text-[#5a5e73] text-center mt-2">Mock 模式 — 自动登录为 admin</p>
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            {DEMO_ACCOUNTS.map(({ label, desc, username, password, Icon }) => (
-              <button
-                key={username}
-                type="button"
-                onClick={() => fillAndLogin(username, password)}
-                disabled={loginMutation.isPending}
-                className="p-4 rounded-xl flex flex-col items-center text-center group hover:-translate-y-1 transition-all disabled:opacity-40"
-                style={{
-                  background: 'rgba(23, 31, 51, 0.35)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
-                }}
-              >
-                <Icon className="w-6 h-6 text-[#8d90a0] group-hover:text-[#b4c5ff] mb-2 transition-colors" />
-                <span className="text-sm font-medium text-[#dae2fd]">{label}</span>
-                <span className="text-[10px] text-[#434655] mt-1">{desc}</span>
-              </button>
-            ))}
-          </div>
-        </section>
-        )}
+        </div>
 
         <footer className="mt-12 text-center">
           <p className="text-xs text-[#434655]">© 2026 资产管理系统 版权所有</p>

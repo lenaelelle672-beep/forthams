@@ -24,6 +24,8 @@ public class UserCreateDTO {
     private String phone;
     @JsonAlias({"department", "deptId"})
     private Long deptId;
+    private Integer status;
+    private String remark;
     /** 角色ID列表，创建时同步写入 sys_user_role */
     private java.util.List<Long> roleIds;
 }

@@ -1,0 +1,12 @@
+{
+  "session_id": "20260527-residual-fix",
+  "directive": "修复残留问题",
+  "acceptance_checks": [
+    "编辑模式UserSearchSelect回填显示用户名",
+    "searchUsers limit提升到200",
+    "npm run build通过",
+    "后端编译通过"
+  ],
+  "status": "completed",
+  "builder_notes": "两项修改已完成并通过编译验证"
+}

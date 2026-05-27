@@ -18,6 +18,7 @@ export interface AuthUser {
   username: string;
   realName: string;
   roles: string[];
+  permissions: string[];
 }
 
 interface LoginPayload {
@@ -31,6 +32,7 @@ interface LoginResponse {
   username: string;
   realName: string;
   roles: string[];
+  permissions?: string[];
 }
 
 interface AuthContextValue {
@@ -84,13 +86,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       // 异步修复：检测到 user 缺少 roles 时从后端获取完整信息
       if (!storedUser.roles || storedUser.roles.length === 0) {
-        api.get<{ userId: number; username: string; realName: string; roles: string[] }>('/users/current')
+        api.get<{ userId: number; username: string; realName: string; roles: string[]; permissions: string[] }>('/users/current')
           .then((data) => {
             const fixedUser: AuthUser = {
               userId: data.userId ?? storedUser.userId,
               username: data.username ?? storedUser.username,
               realName: data.realName ?? storedUser.realName,
               roles: data.roles ?? [],
+              permissions: data.permissions ?? [],
             };
             setUser(fixedUser);
             // 同步更新 sessionStorage
@@ -117,6 +120,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       username: response.username,
       realName: response.realName,
       roles: response.roles ?? [],
+      permissions: response.permissions ?? [],
     };
 
     if (typeof window !== "undefined") {

@@ -1,0 +1,48 @@
+{
+  "classification": "Heavy",
+  "mcp_tools": [],
+  "scope": [
+    "数据库迁移：sys_menu / sys_role_menu / sys_role_dept 表 + 索引 + ALTER 现有表（Role/Dept）",
+    "Entity/Mapper 层：SysMenu / SysRoleMenu / SysRoleDept 新实体 + 修复 Role.sortOrder / Dept.status/deptCode / Role.deleted 过滤 / Dept.status 类型",
+    "Service 层：菜单管理 CRUD + 角色菜单关联 + UserDetailsServiceImpl 改造（加载 perms 而非仅 ROLE_xxx）",
+    "Security 权限加载：LoginUser 自定义 UserDetails + SecurityService Bean（@ss.hasPermi / @ss.hasRole）+ JWT claims 可选扩展",
+    "@ss.hasPermi 注解：Spring Security @PreAuthorize Bean 实现 + SUPER_ADMIN 短路逻辑 + 通配符 *:*:* 匹配",
+    "API 层：/menus/current 动态菜单树 + /users/current 响应扩展 permissions 字段 + AuthService 改造",
+    "前端闭环：AuthUser 接口扩展 permissions: string[] + permissionHooks 修正 import 路径 + PermissionGate 按钮组件 + 菜单从静态 NAV_GROUPS 切换到动态渲染 + fallback 策略",
+    "数据权限插件：MyBatis-Plus DataPermissionInterceptor @DataScope（二期分阶段，一期仅预留注册点，通过 ams.data-scope.enabled=false 关闭）"
+  ],
+  "risks": [
+    "HIGH: Role.java Entity 缺少 sortOrder 字段映射，schema.sql 有 sort_order 列，新增角色后该列为 null",
+    "HIGH: 前端 AuthUser 接口无 permissions 字段，permissionHooks.ts 却假定存在，TypeScript 严格模式下类型错误",
+    "HIGH: UserDetailsService 每次请求三表 JOIN 查询（sys_menu/sys_role_menu/sys_user_role），高 QPS 下 DB 压力大，需后续引入 Caffeine 缓存",
+    "HIGH: Dept.java Entity status 类型不匹配（schema.sql TINYINT vs entity String），RuoYi 逻辑依赖数值比较时会失败",
+    "MEDIUM: admin 锁死风险 — 初始数据必须保证 SUPER_ADMIN (id=1) 绑定所有菜单节点，否则 admin 无法访问任何受保护页面",
+    "MEDIUM: sys_permission / sys_menu 双轨权限源冲突 — 需文档明确 sys_permission 已废弃，所有权限编码必须在 sys_menu.perms 定义",
+    "MEDIUM: RoleService 使用 Hutool BeanUtil 反射设值而非直接 setter，新增字段时容易遗漏，且无法利用 IDE 重构检查",
+    "LOW: mybatis-plus-jsqlparser 已引入但 MyBatisPlusConfig 未注册 DataPermissionInterceptor，需注意与 PaginationInnerInterceptor 的注册顺序",
+    "LOW: 前端菜单从静态 NAV_GROUPS 切换为动态 /menus/current 后，接口失败时侧边栏完全空白，需 fallback 兜底",
+    "LOW: UserDetailsServiceImpl.loadUserByUsername 未过滤 deleted=0，仅过滤 status=1，逻辑删除后同名用户可能被错误加载",
+    "RESIDUAL: 实施前需对每个将被修改的代码符号运行 GitNexus impact 分析（来自 review.json）",
+    "RESIDUAL: 数据权限插件接入后需真实 SQL 集成测试验证分页 count SQL 与复杂查询别名（来自 review.json）"
+  ],
+  "dependencies": [
+    "Spring Security 6 + JWT 0.12.5 (jjwt) + MyBatis-Plus 3.5.9 + jsqlparser 3.5.9",
+    "现有认证体系：JwtAuthenticationFilter (OncePerRequestFilter) + UserDetailsServiceImpl + DaoAuthenticationProvider",
+    "schema.sql 幂等 ALTER 模式（information_schema.columns + PREPARE stmt），新增 DDL 必须复用此模式",
+    "React Router v7 + shadcn-ui + TypeScript + Vite 前端体系",
+    "前端 HTTP 单例（src/utils/http.ts）和 AuthContext（src/app/utils/api.ts），改造时统一使用 http.ts",
+    "TenantContext（JwtAuthenticationFilter finally 块 clear）— Controller/Service 层仅在 filter 链内可读 tenantId"
+  ],
+  "recommended_phases": ["audit", "builder", "reviewer"],
+  "acceptance_hints": [
+    "DDL 幂等回放：source backend/src/main/resources/schema.sql 执行两次无报错",
+    "Maven 编译通过：mvn compile -f backend/pom.xml",
+    "安全链路手动测试：POST /auth/login → 响应含 token/roles/permissions",
+    "权限注解测试：无权限用户 token 访问 @PreAuthorize 保护接口返回 403",
+    "SUPER_ADMIN 短路：admin 用户无需逐条 perms 即可访问任意受保护接口",
+    "前端类型检查通过：npx tsc --noEmit -p frontend/tsconfig.json",
+    "前端权限 Hook 测试：模拟 user.permissions 为空/存在/部分匹配场景",
+    "GitNexus 变更检测：每次代码修改后运行 gitnexus_detect_changes 确认影响范围在预期内",
+    "工作流回归测试：RBAC 改造后审批流程完整可用（AC-8）"
+  ]
+}

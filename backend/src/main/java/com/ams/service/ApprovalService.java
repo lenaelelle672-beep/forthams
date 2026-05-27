@@ -55,6 +55,7 @@ import java.util.stream.Collectors;
  * @see RetirementApplicationService
  * @see WorkOrderService
  */
+import com.ams.annotation.DataScope;
 @Service
 @RequiredArgsConstructor
 public class ApprovalService {
@@ -93,6 +94,7 @@ public class ApprovalService {
      * @param processType 流程类型过滤（RETIREMENT/WORK_ORDER/ASSET_TRANSFER 等），为空则不过滤
      * @return 分页审批流程结果
      */
+    @DataScope(userColumn = "applicant_id")
     public Page<ApprovalProcess> queryProcesses(Integer page, Integer pageSize, String status, String processType, Long applicantId) {
         String tenantId = TenantContext.requireTenantId();
         Page<ApprovalProcess> pageParam = new Page<>(page, pageSize);

@@ -2,7 +2,7 @@
  * @file pages/settings/SettingsPage.tsx
  * @description 系统设置页面 — 全量对接真实 API
  *
- * Tab 导航：用户管理 | 部门管理 | 系统配置 | 安全设置
+ * Tab 导航：系统配置 | 安全设置
  * API: @/api/base (getUserList, createUser, updateUser, deleteUser, resetPassword,
  *                getDeptTree, createDept, updateDept, deleteDept)
  * Pattern: useQuery + useMutation + invalidateQueries
@@ -42,7 +42,7 @@ import {
 
 // ─── 类型定义 ───────────────────────────────────────────────────────────────
 
-type TabKey = 'users' | 'departments' | 'system' | 'security';
+type TabKey = 'system' | 'security';
 
 // ─── Query Keys ─────────────────────────────────────────────────────────────
 
@@ -54,8 +54,6 @@ const QUERY_KEYS = {
 // ─── Tab 配置 ────────────────────────────────────────────────────────────────
 
 const TABS: { key: TabKey; label: string; icon: React.ReactNode }[] = [
-  { key: 'users',       label: '用户管理', icon: <Users className="w-4 h-4" /> },
-  { key: 'departments', label: '部门管理', icon: <Building2 className="w-4 h-4" /> },
   { key: 'system',      label: '系统配置', icon: <Settings2 className="w-4 h-4" /> },
   { key: 'security',    label: '安全设置', icon: <Shield className="w-4 h-4" /> },
 ];
@@ -560,11 +558,10 @@ function SystemConfigTab() {
   const [saved, setSaved] = useState(false);
   const queryClient = useQueryClient();
 
-  const { data: remoteConfig, isLoading } = useQuery({
+  const { data: remoteConfig, isLoading, isError, refetch } = useQuery({
     queryKey: ['system-config'],
     queryFn: async () => {
-      const res = await getSystemConfig();
-      return res.data ?? {};
+      return await getSystemConfig();
     },
   });
 
@@ -592,8 +589,29 @@ function SystemConfigTab() {
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!form.companyName.trim() || !form.systemName.trim()) {
+      toast.error('公司名称和系统名称不能为空');
+      return;
+    }
+    const alertDays = Number(form.warrantyAlertDays);
+    if (!Number.isFinite(alertDays) || alertDays < 1 || alertDays > 365) {
+      toast.error('维保预警天数需在 1-365 之间');
+      return;
+    }
     saveMut.mutate(form);
   };
+
+  if (isLoading) {
+    return (
+      <Card><CardContent><div className="flex items-center py-10 text-sm text-[#94a3b8]"><RefreshCw className="mr-2 h-4 w-4 animate-spin" />加载系统配置...</div></CardContent></Card>
+    );
+  }
+
+  if (isError) {
+    return (
+      <Card><CardContent><div className="space-y-3 py-8 text-sm text-[#64748b]"><p>系统配置加载失败，请检查权限或后端服务。</p><Button variant="secondary" onClick={() => refetch()}>重试</Button></div></CardContent></Card>
+    );
+  }
 
   return (
     <Card>
@@ -660,7 +678,7 @@ function SystemConfigTab() {
             </select>
           </div>
           <div className="flex items-center gap-3 pt-2">
-            <Button type="submit" variant="primary">
+            <Button type="submit" variant="primary" loading={saveMut.isPending}>
               {saved ? <><Check className="w-4 h-4" /> 已保存</> : '保存配置'}
             </Button>
           </div>
@@ -687,11 +705,10 @@ function SecurityTab() {
   const [saved, setSaved] = useState(false);
   const queryClient = useQueryClient();
 
-  const { data: remoteConfig, isLoading } = useQuery({
+  const { data: remoteConfig, isLoading, isError, refetch } = useQuery({
     queryKey: ['security-config'],
     queryFn: async () => {
-      const res = await getSecurityConfig();
-      return res.data ?? {};
+      return await getSecurityConfig();
     },
   });
 
@@ -719,6 +736,16 @@ function SecurityTab() {
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
+    const minPasswordLen = Number(form.minPasswordLen);
+    const sessionTimeoutMin = Number(form.sessionTimeoutMin);
+    if (!Number.isFinite(minPasswordLen) || minPasswordLen < 6 || minPasswordLen > 64) {
+      toast.error('密码最小长度需在 6-64 之间');
+      return;
+    }
+    if (!Number.isFinite(sessionTimeoutMin) || sessionTimeoutMin < 5 || sessionTimeoutMin > 1440) {
+      toast.error('会话超时需在 5-1440 分钟之间');
+      return;
+    }
     // Convert boolean to string for API
     const payload: Record<string, string> = {};
     for (const [key, value] of Object.entries(form)) {
@@ -726,6 +753,18 @@ function SecurityTab() {
     }
     saveMut.mutate(payload);
   };
+
+  if (isLoading) {
+    return (
+      <Card><CardContent><div className="flex items-center py-10 text-sm text-[#94a3b8]"><RefreshCw className="mr-2 h-4 w-4 animate-spin" />加载安全设置...</div></CardContent></Card>
+    );
+  }
+
+  if (isError) {
+    return (
+      <Card><CardContent><div className="space-y-3 py-8 text-sm text-[#64748b]"><p>安全设置加载失败，请检查权限或后端服务。</p><Button variant="secondary" onClick={() => refetch()}>重试</Button></div></CardContent></Card>
+    );
+  }
 
   const Toggle = ({ checked, onChange }: { checked: boolean; onChange: (v: boolean) => void }) => (
     <button
@@ -809,7 +848,7 @@ function SecurityTab() {
             </div>
           </div>
 
-          <Button type="submit" variant="primary">
+          <Button type="submit" variant="primary" loading={saveMut.isPending}>
             {saved ? <><Check className="w-4 h-4" /> 已保存</> : '保存安全设置'}
           </Button>
         </form>
@@ -824,8 +863,8 @@ export default function SettingsPage() {
   const { tab } = useParams<{ tab?: string }>();
   const navigate = useNavigate();
 
-  const validTabs: TabKey[] = ['users', 'departments', 'system', 'security'];
-  const activeTab: TabKey = (tab && validTabs.includes(tab as TabKey)) ? tab as TabKey : 'users';
+  const validTabs: TabKey[] = ['system', 'security'];
+  const activeTab: TabKey = (tab && validTabs.includes(tab as TabKey)) ? tab as TabKey : 'system';
 
   const handleTabChange = (key: TabKey) => {
     navigate(`/settings/${key}`, { replace: true });
@@ -835,7 +874,7 @@ export default function SettingsPage() {
     <div className="p-6 bg-[#f8fafc] min-h-full">
       <PageHeader
         title="系统设置"
-        subtitle="用户、部门、权限与系统参数配置"
+        subtitle="集中维护系统参数、安全策略与审计开关；用户、部门、岗位请在系统管理中维护"
       />
 
       {/* Tab 导航 */}
@@ -857,8 +896,6 @@ export default function SettingsPage() {
       </div>
 
       {/* Tab 内容 */}
-      {activeTab === 'users'       && <UsersTab />}
-      {activeTab === 'departments' && <DepartmentsTab />}
       {activeTab === 'system'      && <SystemConfigTab />}
       {activeTab === 'security'    && <SecurityTab />}
     </div>

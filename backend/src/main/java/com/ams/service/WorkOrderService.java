@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.ams.annotation.DataScope;
 @Service
 @RequiredArgsConstructor
 public class WorkOrderService {
@@ -47,6 +48,7 @@ public class WorkOrderService {
     private final UserMapper userMapper;
     private final NotificationService notificationService;
 
+    @DataScope(deptColumn = "dept_id", userColumn = "reporter_id")
     public Page<WorkOrder> queryWorkOrders(Integer page, Integer pageSize, String status, String keyword) {
         String tenantId = TenantContext.requireTenantId();
         Page<WorkOrder> pageObj = new Page<>(page, pageSize);

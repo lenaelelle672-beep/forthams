@@ -1,0 +1,82 @@
+{
+  "current_state": "已读取 workcard.json 与 goal-state.json，并审计当前代码。项目当前工作区已有大量未提交/未跟踪变更，包含后端权限、租户、审计、系统管理与前端路由/页面变更。系统管理能力已部分落地：前端存在 /system/users、/system/roles、/system/menus、/system/posts 独立页面，/system/depts 仍重定向到 /settings/departments；/settings 页面仍内联用户管理、部门管理、系统配置、安全设置 Tab，系统管理与系统设置存在重复入口和重复维护界面。后端已有 UserManagementController、DeptController、PostController、SystemConfigController、AuditDashboardController、AuditService 等真实接口。用户管理后端已有详情、搜索、邮箱/电话/部门/角色等基础能力，但前端独立用户页仍需补齐详情查看、新建/编辑、筛选和岗位分配。部门与岗位后端基础 CRUD 已存在，但部门独立页缺失、岗位搜索前端未传 keyword。登录页快捷账号当前位于右侧登录卡片下方，尚未移动到左上角。/audit 页面已挂载到真实路由并调用审计 API，但前后端契约存在明显错位：前端 getAuditStats 调用 /audit-logs/stats，而后端当前提供 /audit-logs、/trends、/action-type-distribution、/operator-ranking、/meta 等端点；前端类型仍按 ApiResponse/ PaginatedResponse 包装声明，但 http 客户端会自动解包 Result.data，导致 statsRes?.data、logsRes?.records 等读取方式与运行时/类型均不稳定，可能是页面无数据的主因。",
+  "existing_patterns": [
+    "前端使用 Vite + React 18 + TypeScript + react-router v7，路由集中在 frontend/src/router/index.tsx，通过 React.lazy 挂载页面。",
+    "前端统一 HTTP 客户端为 frontend/src/utils/http.ts，响应拦截器会把后端 Result<T> 自动解包为 data；业务 API 类型应与解包后数据保持一致。",
+    "前端数据请求主要使用 @tanstack/react-query 的 useQuery/useMutation，列表页常见模式为 queryKey 绑定筛选状态、mutation 成功后 invalidateQueries。",
+    "系统管理独立页位于 frontend/src/pages/system/，当前包含用户、角色、菜单、岗位；系统设置页 frontend/src/pages/settings/SettingsPage.tsx 仍内联用户、部门、系统配置、安全设置。",
+    "导航由 frontend/src/layouts/AppLayout.tsx 的 NAV_GROUPS、SYSTEM_NAV_ITEMS、NAV_BOTTOM_ITEMS 静态配置，系统管理入口仅 ADMIN/SUPER_ADMIN 可见，系统设置位于底部基础入口。",
+    "后端使用 Spring Boot 3.2.5、Java 17、MyBatis-Plus 3.5.9，控制器统一返回 Result<T>，权限通过 @PreAuthorize(\"@ss.hasPermi('...')\") 控制。",
+    "若依风格权限能力已部分引入：sys_menu、sys_role_menu、sys_role_dept、sys_post、sys_user_post、SecurityService、@OperLog、@DataScope 等文件/概念已存在或正在变更。",
+    "系统配置采用 SystemConfigService 的 tenant_id + config_group + config_key/config_value 单表 KV 模式，SYSTEM 与 SECURITY 分组批量读写。",
+    "审计数据由 GeneralAuditEntry、AuditService、AuditLogMapper 查询，操作日志通过 @OperLog / 审计切面写入；岗位、用户等部分变更已接入操作日志。",
+    "前端已有 Stitch 脚本和 @google/stitch-sdk 依赖，相关页面生成/重构需要在本目标后续阶段记录 Stitch 调用或失败证据。"
+  ],
+  "technical_constraints": [
+    "只允许 Builder 在编辑具体符号前先运行 GitNexus impact 分析；重点符号包括 AuditDashboardPage、AuditDashboardController、AuditService、SettingsPage、UserManagement、DeptService、PostService、SystemConfigService、LoginPage、AppLayout、router/index.tsx。",
+    "提交前必须运行 gitnexus_detect_changes()，确认实际影响范围与预期一致。",
+    "当前工作区大量未提交变更可能不是本轮产生，实施前必须先确认基线，避免覆盖或误删已有改动。",
+    "http 客户端已经自动解包 Result<T>，不能同时在页面按 ApiResponse<T>.data 读取，否则会出现运行时字段错位或 TypeScript 类型错误。",
+    "/audit 前端 page/pageSize 与后端 page/size 参数不一致；后端 AuditService queryLogs 内部按 0-based pageNum 转 MyBatis-Plus 1-based，其他列表接口多按 1-based 处理，分页语义需统一。",
+    "SystemConfigService 依赖 TenantContext.requireTenantId()；开发快捷登录、测试或未注入租户的请求可能失败。",
+    "权限码必须与 schema.sql、migration、sys_menu 种子、SecurityService 和前端导航保持一致，尤其 audit:query、system:config:*、system:user:*、system:dept:*、system:post:*。",
+    "部门 DTO/实体字段存在若依字段未完全贯通风险，email/status/leader/phone/order/ancestors 等字段需统一 DTO、实体、表结构、前端表单和校验。",
+    "岗位前端 API getPostList 已支持分页但只传 page/pageSize，PostManagement 当前搜索状态不影响请求参数。",
+    "登录页测试账号必须继续受 import.meta.env.DEV 或 VITE_DEMO_USERNAME/VITE_DEMO_PASSWORD 控制，移动位置时不能在生产默认暴露 admin/admin123。"
+  ],
+  "risks": [
+    {
+      "level": "high",
+      "detail": "工作区存在大量未提交和未跟踪文件，且涉及权限、租户、系统管理、审计、登录等核心路径；若直接改动，容易覆盖已有实现或扩大回归面。"
+    },
+    {
+      "level": "high",
+      "detail": "/audit 数据链路存在端点和响应形态双重错位：前端调用 /audit-logs/stats 但后端无该端点，且前端按包装结构读取而 http 已解包，页面可能继续无数据或运行时报错。"
+    },
+    {
+      "level": "medium",
+      "detail": "系统管理与系统设置重复涉及路由、侧边栏、菜单权限、旧入口兼容和用户习惯，不能只删除页面；需要迁移或重定向策略。"
+    },
+    {
+      "level": "medium",
+      "detail": "若依风格用户/部门/岗位字段已部分出现但链路不完整，可能出现前端展示字段、后端 DTO、数据库列和权限码不一致。"
+    },
+    {
+      "level": "medium",
+      "detail": "系统配置批量覆盖式保存先删后插，缺少键白名单和值校验；异常或并发保存可能造成配置丢失或非法配置入库。"
+    },
+    {
+      "level": "medium",
+      "detail": "TenantContext 对系统配置、数据权限和审计查询的影响较大，测试账号快捷登录和后端测试需明确租户注入策略。"
+    },
+    {
+      "level": "low",
+      "detail": "登录页快捷账号移动到左上角属于低复杂度 UI 调整，但需验证响应式布局、遮挡和生产隐藏策略。"
+    },
+    {
+      "level": "low",
+      "detail": "Stitch SDK 可能受网络或凭证影响，需准备失败记录和设计意图兜底证据。"
+    }
+  ],
+  "test_surface": [
+    "前端构建：cd frontend && npm run build",
+    "前端单测：cd frontend && npm run test -- --run",
+    "前端审计专项：cd frontend && npm run e2e -- audit_dashboard.spec.ts（需要前后端与测试账号可用）",
+    "前端系统配置专项：cd frontend && npm run test -- --run src/__tests__/systemConfig.test.ts",
+    "后端全量测试：cd backend && mvn test",
+    "后端审计专项：cd backend && mvn test -Dtest=AuditDashboardControllerTest",
+    "后端用户/部门专项：cd backend && mvn test -Dtest=UserManagementControllerTest,DeptControllerTest",
+    "手工联调：登录后访问 /system/users、/system/depts、/system/posts、/settings、/audit，验证权限、列表、搜索/筛选、详情、新建/编辑、空状态、加载状态和错误提示。",
+    "数据库验证：在空库与已有库验证 schema.sql/migration 是否可重复执行，重点检查 sys_menu 权限种子、sys_config、sys_post、sys_dept、general_audit_entry。"
+  ],
+  "builder_notes": [
+    "实施前对每个拟编辑函数/类/方法运行 GitNexus impact，并向用户报告直接调用方、受影响流程和风险级别；高/关键风险需先暂停确认。",
+    "建议优先修复 /audit：二选一，新增后端 /audit-logs/stats 聚合端点，或改前端分别调用 /trends、/action-type-distribution、/operator-ranking；同时统一前端解包后类型。",
+    "建议收敛信息架构：保留 /system/* 作为若依式系统管理主入口，/settings 仅保留系统配置/安全设置或重定向到对应系统管理子页。",
+    "用户管理应在独立页补齐详情抽屉、新建/编辑弹窗、关键词/部门/状态筛选、角色和岗位分配，不建议继续扩展 SettingsPage 内的重复 UsersTab。",
+    "部门管理建议新增独立 /system/depts 页面并复用 DeptController，而不是继续依赖 /settings/departments 重定向。",
+    "系统配置需要前端校验、后端键白名单/值校验、错误与空状态，并考虑保存失败时避免整组配置被删除。",
+    "登录页快捷账号移动到左上角时要保持可移除、可隐藏，并验证移动端布局。",
+    "相关页面生成/重构需调用 Stitch 或记录调用失败证据，满足目标 AC-6。"
+  ]
+}

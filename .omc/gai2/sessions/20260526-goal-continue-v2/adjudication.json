@@ -1,0 +1,28 @@
+{
+  "decision": "use_refine",
+  "selected_source": "refine.json + draft-changes.json",
+  "builder_instructions": [
+    "【P0-URGENT 1】删除 backend/src/main/java/com/ams/controller/MenuController.java（解决路由冲突）",
+    "【P0-URGENT 2】修改 SysMenuController.currentUserMenus()：返回 Result<Map<String,Object>>，包含 {menus: 菜单树, permissions: 权限码列表, roles: 角色列表}。注入 SysMenuMapper.selectPermsByUserId 获取权限码。同时修改前端 frontend/src/api/menu.ts 的 getCurrentMenus 适配新格式",
+    "【P0-URGENT 3】DeptController：create→@PreAuthorize(@ss.hasPermi('system:dept:add')), update→edit, delete→delete",
+    "【P0-URGENT 4】VendorController：create→@PreAuthorize(@ss.hasPermi('vendor:vendor:add')), update→edit, delete→delete",
+    "【P0-URGENT 5】NotificationController：list/unreadCount/pending/pendingCount→@PreAuthorize(@ss.hasPermi('notification:read')) — 用 notification:read 替代 notification:query 因为后者不存在于种子数据",
+    "【P0-URGENT 6】WorkflowDefinitionController：list/get→@PreAuthorize(@ss.hasPermi('workflow:definition:query'))",
+    "【P0-HIGH 7-14】8 个 Service 查询方法添加 @DataScope 注解（参数见 draft-changes.json，已全部验证与 Registry 对齐）",
+    "【验证】mvn compile + 启动确认无 Ambiguous mapping"
+  ],
+  "write_action_guard": "所有写动作保留（未退化），通知用 notification:read 替代 notification:query",
+  "fallback_labels": [],
+  "reviewer_checks": [
+    "MenuController 文件已删除",
+    "SysMenuController.currentUserMenus() 返回 {menus, permissions, roles}",
+    "前端 menu.ts 适配了新格式",
+    "DeptController 3 个写方法有 @PreAuthorize",
+    "VendorController 3 个写方法有 @PreAuthorize",
+    "NotificationController 4 个方法有 @PreAuthorize(notification:read)",
+    "WorkflowDefinitionController 2 个方法有 @PreAuthorize",
+    "8 个 Service 文件 grep @DataScope 返回 > 0",
+    "mvn compile 成功",
+    "服务启动无路由冲突错误"
+  ]
+}

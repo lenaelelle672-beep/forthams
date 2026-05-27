@@ -18,7 +18,6 @@ import {
   Package,
   Cpu,
   ScanLine,
-  ClipboardList,
   CheckSquare,
   Recycle,
   BarChart3,
@@ -36,11 +35,9 @@ import {
   Workflow,
   TrendingDown,
   Handshake,
-  Archive,
   MonitorDot,
   Monitor,
   FileBarChart,
-  BoxesIcon,
   FolderTree,
 } from 'lucide-react';
 
@@ -80,7 +77,7 @@ const NAV_GROUPS: NavGroup[] = [
     group: '运营管理',
     items: [
       { path: '/inventory',  label: 'RFID 盘点', icon: ScanLine },
-      { path: '/workorders', label: '工单管理', icon: ClipboardList },
+      // 工单管理已合并到资产处置
       { path: '/approvals',  label: '审批流程', icon: CheckSquare },
       { path: '/workflows',  label: '工作流',   icon: Workflow },
     ],
@@ -88,7 +85,6 @@ const NAV_GROUPS: NavGroup[] = [
   {
     group: '退役与处置',
     items: [
-      { path: '/retirement', label: '退役管理', icon: Archive },
       { path: '/disposals',  label: '资产处置', icon: Recycle },
     ],
   },
@@ -106,11 +102,19 @@ const NAV_GROUPS: NavGroup[] = [
   },
 ];
 
+const SYSTEM_NAV_ITEMS: NavItem[] = [
+  { path: '/system/users', label: '用户管理', icon: Users },
+  { path: '/system/roles', label: '角色管理', icon: Shield },
+  { path: '/system/menus', label: '菜单管理', icon: FolderTree },
+  { path: '/system/depts', label: '部门管理', icon: MapPin },
+  { path: '/system/posts', label: '岗位管理', icon: Workflow },
+  { path: '/settings/system', label: '参数配置', icon: Settings },
+];
+
 const NAV_BOTTOM_ITEMS: NavItem[] = [
   { path: '/categories', label: '资产分类', icon: FolderTree },
   { path: '/vendors',   label: '供应商',  icon: Users },
   { path: '/locations', label: '位置管理', icon: MapPin },
-  { path: '/settings',  label: '系统设置', icon: Settings },
 ];
 
 // ── 主布局组件 ────────────────────────────────────────────────────────────────
@@ -124,6 +128,10 @@ export default function AppLayout() {
   const navGroups = useMemo(() => {
     const groups = [...NAV_GROUPS];
     if (hasRole('ADMIN') || hasRole('SUPER_ADMIN')) {
+      groups.push({
+        group: '系统管理',
+        items: SYSTEM_NAV_ITEMS,
+      });
       groups.push({
         group: '大屏',
         items: [

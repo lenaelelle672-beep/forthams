@@ -16,18 +16,18 @@ export const getDeptTree = () =>
 
 /** 获取所有部门（平铺） */
 export const getDeptList = () =>
-  http.get<Department[]>('/depts');
+  http.get<Department[]>('/depts/tree');
 
 /** 获取部门详情 */
 export const getDeptDetail = (id: number) =>
   http.get<Department>(`/depts/${id}`);
 
 /** 创建部门 */
-export const createDept = (data: { name?: string; deptCode?: string; parentId?: number; sortOrder?: number; leader?: string; phone?: string; status?: string }) =>
+export const createDept = (data: { name?: string; deptName?: string; deptCode?: string; parentId?: number; sortOrder?: number; leader?: string; phone?: string; email?: string; status?: number }) =>
   http.post<Department>('/depts', data);
 
 /** 更新部门 */
-export const updateDept = (id: number, data: { name?: string; deptCode?: string; parentId?: number; sortOrder?: number; leader?: string; phone?: string; status?: string }) =>
+export const updateDept = (id: number, data: { name?: string; deptName?: string; deptCode?: string; parentId?: number; sortOrder?: number; leader?: string; phone?: string; email?: string; status?: number }) =>
   http.put<Department>(`/depts/${id}`, data);
 
 /** 删除部门 */
@@ -66,9 +66,14 @@ export interface UserItem {
   email?: string;
   deptId?: number;
   deptName?: string;
+  remark?: string;
+  loginIp?: string;
+  loginDate?: string;
   status: number;
   roles?: string[];
+  postIds?: number[];
   createTime?: string;
+  updateTime?: string;
 }
 
 export interface UserListQuery {
@@ -102,3 +107,7 @@ export const deleteUser = (id: number) =>
 /** 重置密码（默认 123456） */
 export const resetPassword = (id: number) =>
   http.put<void>(`/user-management/${id}/reset-password`);
+
+/** 关键词搜索用户（用于搜索选择器，如部门领导/秘书选择） */
+export const searchUsers = (keyword: string) =>
+  http.get<UserItem[]>('/user-management/search', { params: { keyword } });

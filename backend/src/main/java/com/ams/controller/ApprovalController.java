@@ -11,6 +11,7 @@ import com.ams.common.Result;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 import java.util.Map;
@@ -24,6 +25,7 @@ public class ApprovalController {
     private final JwtUtil jwtUtil;
 
     /** 列表查询（支持 GET /approvals 和 GET /approvals/list 两个路径） */
+    @PreAuthorize("@ss.hasPermi('approval:process:query')")
     @GetMapping({"", "/list"})
     public Result<Page<ApprovalProcess>> list(
             @RequestParam(defaultValue = "1") Integer page,
@@ -41,17 +43,20 @@ public class ApprovalController {
         return Result.success(approvalService.queryProcesses(page, pageSize, status, processType, applicantId));
     }
 
+    @PreAuthorize("@ss.hasPermi('approval:process:query')")
     @GetMapping("/{id}")
     public Result<?> getById(@PathVariable Long id) {
         return Result.success(approvalService.getProcessById(id));
     }
 
+    @PreAuthorize("@ss.hasPermi('approval:process:create')")
     @PostMapping
     public Result<ApprovalProcess> create(@Valid @RequestBody ApprovalCreateDTO dto, HttpServletRequest request) {
         dto.setApplicantId(getCurrentUserId(request));
         return Result.success(approvalService.createProcess(dto));
     }
 
+    @PreAuthorize("@ss.hasPermi('approval:process:approve')")
     @PostMapping("/{id}/approve")
     public Result<ApprovalProcess> approve(@PathVariable Long id, @RequestBody Map<String, Object> body,
                                            HttpServletRequest request) {
@@ -61,6 +66,7 @@ public class ApprovalController {
     }
 
     /** 驳回审批 */
+    @PreAuthorize("@ss.hasPermi('approval:process:reject')")
     @PostMapping("/{id}/reject")
     public Result<ApprovalProcess> reject(@PathVariable Long id, @RequestBody Map<String, Object> body,
                                           HttpServletRequest request) {
@@ -69,25 +75,29 @@ public class ApprovalController {
         return Result.success(approvalService.approve(id, getCurrentUserId(request), "REJECTED", opinion));
     }
 
+    @PreAuthorize("@ss.hasPermi('approval:process:cancel')")
     @PostMapping("/{id}/cancel")
     public Result<ApprovalProcess> cancel(@PathVariable Long id, HttpServletRequest request) {
         return Result.success(approvalService.cancelProcess(id, getCurrentUserId(request)));
     }
 
+    @PreAuthorize("@ss.hasPermi('approval:process:query')")
     @GetMapping("/pending")
     public Result<?> pending(HttpServletRequest request) {
         return Result.success(approvalService.getMyPendingApprovals(getCurrentUserId(request)));
     }
 
-    @GetMapping("/pending/count")
-    public Result<Long> pendingCount() {
-        return Result.success(approvalService.getPendingCount());
-    }
-
     /** 流程统计：按 processType 分组返回各流程的总数/通过数/驳回数/审批中数 */
+    @PreAuthorize("@ss.hasPermi('approval:process:query')")
     @GetMapping("/stats")
     public Result<List<Map<String, Object>>> stats() {
         return Result.success(approvalService.getProcessTypeStats());
+    }
+
+    @PreAuthorize("@ss.hasPermi('approval:process:query')")
+    @GetMapping("/pending/count")
+    public Result<Long> pendingCount() {
+        return Result.success(approvalService.getPendingCount());
     }
 
     private Long getCurrentUserId(HttpServletRequest request) {

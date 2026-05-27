@@ -3905,3 +3905,1020 @@
 - 原因：generic profile 没有守护进程健康状态；继续执行目标
 - Profile：`generic`
 - 覆盖率：0/0
+
+## 2026/5/26 21:55:13
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/8
+
+## 2026/5/26 21:58:27
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/8
+
+## 2026/5/26 22:00:36
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/8
+
+## 2026/5/26 22:00:38
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/8
+
+## 2026/5/26 22:01:08
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/8
+
+## 2026/5/26 22:02:17
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/8
+
+## 2026/5/26 22:03:21
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/8
+
+## 2026/5/26 22:04:42
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/8
+
+## 2026/5/26 22:05:33
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/8
+
+## 2026/5/26 22:06:11
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/8
+
+## 2026/5/26 22:09:25
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/8
+
+## 2026/5/26 22:09:55
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/8
+
+## 2026/5/26 22:12:16
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/8
+
+## 2026/5/26 22:13:09
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/8
+
+## 2026/5/26 22:15:03
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/0
+
+## 2026/5/26 22:25:02
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/8
+
+## 2026/5/26 22:27:05
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/8
+
+## 2026/5/26 22:28:44
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/8
+
+## 2026/5/26 22:29:01
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/8
+
+## 2026/5/26 22:29:23
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/8
+
+## 2026/5/26 22:31:23
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/8
+
+## 2026/5/26 22:33:51
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/8
+
+## 2026/5/26 22:34:24
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/8
+
+## 2026/5/26 22:34:31
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/8
+
+## 2026/5/26 22:34:42
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/8
+
+## 2026/5/26 22:34:45
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/8
+
+## 2026/5/26 22:35:15
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/8
+
+## 2026/5/26 22:48:41
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/6
+
+## 2026/5/26 22:49:26
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/6
+
+## 2026/5/26 22:50:11
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/6
+
+## 2026/5/26 22:51:41
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/6
+
+## 2026/5/26 22:53:17
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/6
+
+## 2026/5/26 22:53:23
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/6
+
+## 2026/5/26 22:55:26
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：4/6
+
+## 2026/5/26 22:55:29
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：4/6
+
+## 2026/5/26 22:56:27
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：5/6
+
+## 2026/5/26 22:57:49
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：5/6
+
+## 2026/5/26 22:59:39
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：5/6
+
+## 2026/5/26 22:59:48
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：5/6
+
+## 2026/5/26 23:00:21
+
+- 运行时：`plugin`
+- 状态：`VERIFY_GOAL`
+- 动作：`run_completion_audit`
+- 原因：所有验收标准都有证据
+- Profile：`generic`
+- 覆盖率：6/6
+
+## 2026/5/26 23:01:19
+
+- 运行时：`plugin`
+- 状态：`VERIFY_GOAL`
+- 动作：`run_completion_audit`
+- 原因：所有验收标准都有证据
+- Profile：`generic`
+- 覆盖率：6/6
+
+## 2026/5/26 23:02:52
+
+- 运行时：`plugin`
+- 状态：`VERIFY_GOAL`
+- 动作：`run_completion_audit`
+- 原因：所有验收标准都有证据
+- Profile：`generic`
+- 覆盖率：6/6
+
+## 2026/5/26 23:06:42
+
+- 运行时：`plugin`
+- 状态：`VERIFY_GOAL`
+- 动作：`run_completion_audit`
+- 原因：所有验收标准都有证据
+- Profile：`generic`
+- 覆盖率：6/6
+
+## 2026/5/26 23:08:09
+
+- 运行时：`plugin`
+- 状态：`VERIFY_GOAL`
+- 动作：`run_completion_audit`
+- 原因：所有验收标准都有证据
+- Profile：`generic`
+- 覆盖率：6/6
+
+## 2026/5/26 23:08:45
+
+- 运行时：`plugin`
+- 状态：`VERIFY_GOAL`
+- 动作：`run_completion_audit`
+- 原因：所有验收标准都有证据
+- Profile：`generic`
+- 覆盖率：6/6
+
+## 2026/5/26 23:08:53
+
+- 运行时：`plugin`
+- 状态：`VERIFY_GOAL`
+- 动作：`run_completion_audit`
+- 原因：所有验收标准都有证据
+- Profile：`generic`
+- 覆盖率：6/6
+
+## 2026/5/26 23:10:02
+
+- 运行时：`plugin`
+- 状态：`VERIFY_GOAL`
+- 动作：`run_completion_audit`
+- 原因：所有验收标准都有证据
+- Profile：`generic`
+- 覆盖率：6/6
+
+## 2026/5/26 23:10:46
+
+- 运行时：`plugin`
+- 状态：`VERIFY_GOAL`
+- 动作：`run_completion_audit`
+- 原因：所有验收标准都有证据
+- Profile：`generic`
+- 覆盖率：6/6
+
+## 2026/5/26 23:11:20
+
+- 运行时：`plugin`
+- 状态：`VERIFY_GOAL`
+- 动作：`run_completion_audit`
+- 原因：所有验收标准都有证据
+- Profile：`generic`
+- 覆盖率：6/6
+
+## 2026/5/26 23:12:33
+
+- 运行时：`plugin`
+- 状态：`VERIFY_GOAL`
+- 动作：`run_completion_audit`
+- 原因：所有验收标准都有证据
+- Profile：`generic`
+- 覆盖率：6/6
+
+## 2026/5/26 23:15:30
+
+- 运行时：`plugin`
+- 状态：`VERIFY_GOAL`
+- 动作：`run_completion_audit`
+- 原因：所有验收标准都有证据
+- Profile：`generic`
+- 覆盖率：6/6
+
+## 2026/5/26 23:18:29
+
+- 运行时：`plugin`
+- 状态：`VERIFY_GOAL`
+- 动作：`run_completion_audit`
+- 原因：所有验收标准都有证据
+- Profile：`generic`
+- 覆盖率：6/6
+
+## 2026/5/26 23:19:13
+
+- 运行时：`plugin`
+- 状态：`VERIFY_GOAL`
+- 动作：`run_completion_audit`
+- 原因：所有验收标准都有证据
+- Profile：`generic`
+- 覆盖率：6/6
+
+## 2026/5/26 23:20:38
+
+- 运行时：`plugin`
+- 状态：`VERIFY_GOAL`
+- 动作：`run_completion_audit`
+- 原因：所有验收标准都有证据
+- Profile：`generic`
+- 覆盖率：6/6
+
+## 2026/5/26 23:20:49
+
+- 运行时：`plugin`
+- 状态：`VERIFY_GOAL`
+- 动作：`run_completion_audit`
+- 原因：所有验收标准都有证据
+- Profile：`generic`
+- 覆盖率：6/6
+
+## 2026/5/26 23:22:25
+
+- 运行时：`plugin`
+- 状态：`VERIFY_GOAL`
+- 动作：`run_completion_audit`
+- 原因：所有验收标准都有证据
+- Profile：`generic`
+- 覆盖率：6/6
+
+## 2026/5/26 23:23:28
+
+- 运行时：`plugin`
+- 状态：`VERIFY_GOAL`
+- 动作：`run_completion_audit`
+- 原因：所有验收标准都有证据
+- Profile：`generic`
+- 覆盖率：6/6
+
+## 2026/5/26 23:24:40
+
+- 运行时：`plugin`
+- 状态：`VERIFY_GOAL`
+- 动作：`run_completion_audit`
+- 原因：所有验收标准都有证据
+- Profile：`generic`
+- 覆盖率：6/6
+
+## 2026/5/26 23:25:04
+
+- 运行时：`plugin`
+- 状态：`VERIFY_GOAL`
+- 动作：`run_completion_audit`
+- 原因：所有验收标准都有证据
+- Profile：`generic`
+- 覆盖率：6/6
+
+## 2026/5/26 23:27:16
+
+- 运行时：`plugin`
+- 状态：`VERIFY_GOAL`
+- 动作：`run_completion_audit`
+- 原因：所有验收标准都有证据
+- Profile：`generic`
+- 覆盖率：6/6
+
+## 2026/5/26 23:27:55
+
+- 运行时：`plugin`
+- 状态：`VERIFY_GOAL`
+- 动作：`run_completion_audit`
+- 原因：所有验收标准都有证据
+- Profile：`generic`
+- 覆盖率：6/6
+
+## 2026/5/26 23:28:05
+
+- 运行时：`plugin`
+- 状态：`VERIFY_GOAL`
+- 动作：`run_completion_audit`
+- 原因：所有验收标准都有证据
+- Profile：`generic`
+- 覆盖率：6/6
+
+## 2026/5/26 23:35:28
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/6
+
+## 2026/5/26 23:35:43
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/6
+
+## 2026/5/26 23:37:34
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/6
+
+## 2026/5/26 23:38:34
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/6
+
+## 2026/5/26 23:39:28
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/6
+
+## 2026/5/26 23:39:49
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/6
+
+## 2026/5/26 23:45:10
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/6
+
+## 2026/5/26 23:45:18
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/6
+
+## 2026/5/26 23:45:34
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/6
+
+## 2026/5/26 23:45:39
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/6
+
+## 2026/5/26 23:46:16
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/6
+
+## 2026/5/26 23:46:46
+
+- 运行时：`plugin`
+- 状态：`VERIFY_GOAL`
+- 动作：`run_completion_audit`
+- 原因：所有验收标准都有证据
+- Profile：`generic`
+- 覆盖率：6/6
+
+## 2026/5/27 11:23:42
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/8
+
+## 2026/5/27 11:29:10
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/8
+
+## 2026/5/27 11:30:00
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/8
+
+## 2026/5/27 11:35:12
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/8
+
+## 2026/5/27 11:39:45
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/8
+
+## 2026/5/27 11:50:44
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/8
+
+## 2026/5/27 11:53:33
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/8
+
+## 2026/5/27 12:00:16
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/8
+
+## 2026/5/27 12:00:17
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/8
+
+## 2026/5/27 12:02:59
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/8
+
+## 2026/5/27 12:03:18
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/8
+
+## 2026/5/27 13:37:09
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/8
+
+## 2026/5/27 13:59:51
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/8
+
+## 2026/5/27 14:15:38
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/8
+
+## 2026/5/27 14:17:06
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/8
+
+## 2026/5/27 14:19:51
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/8
+
+## 2026/5/27 14:24:18
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/8
+
+## 2026/5/27 14:25:19
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/8
+
+## 2026/5/27 14:26:27
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/8
+
+## 2026/5/27 14:34:10
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/8
+
+## 2026/5/27 14:39:55
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/8
+
+## 2026/5/27 14:50:49
+
+- 运行时：`plugin`
+- 状态：`COOLDOWN`
+- 动作：`diagnose_repeated_review_gap`
+- 原因：reviewer 缺口指纹连续重复达到阈值
+- Profile：`generic`
+- 覆盖率：0/8
+
+## 2026/5/27 20:42:57
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/5
+
+## 2026/5/27 20:47:02
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/5
+
+## 2026/5/27 20:49:46
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/5
+
+## 2026/5/27 20:51:57
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/5
+
+## 2026/5/27 20:52:18
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/5
+
+## 2026/5/27 20:53:04
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/5
+
+## 2026/5/27 21:49:08
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/7
+
+## 2026/5/27 21:51:27
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/7
+
+## 2026/5/27 21:52:16
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/7
+
+## 2026/5/27 21:52:36
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/7
+
+## 2026/5/27 21:57:26
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/7
+
+## 2026/5/27 21:58:40
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/7
+
+## 2026/5/27 21:59:40
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：0/7
+
+## 2026/5/27 22:04:01
+
+- 运行时：`plugin`
+- 状态：`CONTINUE_GOAL`
+- 动作：`take_next_concrete_step`
+- 原因：generic profile 没有守护进程健康状态；继续执行目标
+- Profile：`generic`
+- 覆盖率：3/7
+
+## 2026/5/27 22:09:12
+
+- 运行时：`plugin`
+- 状态：`VERIFY_GOAL`
+- 动作：`run_completion_audit`
+- 原因：所有验收标准都有证据
+- Profile：`generic`
+- 覆盖率：7/7
+
+## 2026/5/27 22:13:32
+
+- 运行时：`plugin`
+- 状态：`VERIFY_GOAL`
+- 动作：`run_completion_audit`
+- 原因：所有验收标准都有证据
+- Profile：`generic`
+- 覆盖率：7/7
+
+## 2026/5/27 22:14:58
+
+- 运行时：`plugin`
+- 状态：`VERIFY_GOAL`
+- 动作：`run_completion_audit`
+- 原因：所有验收标准都有证据
+- Profile：`generic`
+- 覆盖率：7/7

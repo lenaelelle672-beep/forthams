@@ -16,7 +16,7 @@ import { useNavigate } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
 import {
   ArrowRightLeft, LogOut, Trash2, DollarSign, Plus, Search,
-  Eye, Clock, CheckCircle, XCircle, AlertCircle,
+  Eye, Clock, CheckCircle, XCircle, AlertCircle, ClipboardList,
   ChevronLeft, ChevronRight,
 } from 'lucide-react';
 import { PageHeader } from '@/components/ui/PageHeader';
@@ -33,6 +33,8 @@ import {
   type Compensation,
 } from '@/api/disposal';
 import type { ApiResponse, PageData } from '@/types/common';
+import { getWorkOrderList } from '@/api/workorder';
+import type { WorkOrderListItem } from '@/types/workorder';
 
 // ── Tab 配置 ──────────────────────────────────────────────────────────────────
 const TABS = [
@@ -40,6 +42,7 @@ const TABS = [
   { id: 'CLEARANCE',    label: '资产清退', icon: LogOut,         color: '#f59e0b', route: '/disposals/clearance/new' },
   { id: 'SCRAP',        label: '报废转让', icon: Trash2,         color: '#ef4444', route: '/disposals/scrap/new' },
   { id: 'COMPENSATION', label: '资产赔偿', icon: DollarSign,     color: '#10b981', route: '/compensation/new' },
+  { id: 'WORK_ORDER',   label: '工单管理', icon: ClipboardList,  color: '#8b5cf6', route: '/workorders/new' },
 ] as const;
 
 type TabId = typeof TABS[number]['id'];
@@ -55,6 +58,13 @@ const STATUS_CONFIG: Record<string, { label: string; bg: string; text: string; i
   '已完成':   { label: '已完成',  bg: 'bg-green-50',  text: 'text-green-600',  icon: CheckCircle },
   '已拒绝':   { label: '已拒绝',  bg: 'bg-red-50',    text: 'text-red-600',    icon: XCircle },
   '草稿':     { label: '草稿',    bg: 'bg-slate-50',  text: 'text-slate-500',  icon: Clock },
+  DRAFT:      { label: '草稿',    bg: 'bg-slate-50',  text: 'text-slate-500',  icon: Clock },
+  APPROVING:  { label: '审批中',  bg: 'bg-blue-50',   text: 'text-blue-600',   icon: AlertCircle },
+  WITHDRAWN:  { label: '已撤回',  bg: 'bg-slate-50',  text: 'text-slate-500',  icon: Clock },
+  // 工单状态
+  APPROVING_LEVEL_1: { label: '一级审批', bg: 'bg-blue-50',  text: 'text-blue-600', icon: AlertCircle },
+  APPROVING_LEVEL_2: { label: '二级审批', bg: 'bg-indigo-50', text: 'text-indigo-600', icon: AlertCircle },
+  CANCELLED:  { label: '已取消',  bg: 'bg-slate-50',  text: 'text-slate-500',  icon: Clock },
 };
 
 function StatusBadge({ status }: { status: string }) {
@@ -106,9 +116,22 @@ function compensationToRow(c: Compensation): RowData {
   };
 }
 
+function workorderToRow(w: WorkOrderListItem): RowData {
+  return {
+    id: w.id,
+    disposalNo: w.orderNo,
+    assetName: w.title,
+    assetNo: '',
+    applicant: w.applicantName ?? '',
+    applyDate: w.createdAt?.split('T')[0] ?? '',
+    currentStatus: w.status,
+    reason: w.type ? String(w.type) : '',
+  };
+}
+
 export default function DisposalListPage() {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<TabId>('TRANSFER');
+  const [activeTab, setActiveTab] = useState<TabId>('CLEARANCE');
   const [statusFilter, setStatusFilter] = useState<DisposalStatus | ''>('');
   const [keyword, setKeyword] = useState('');
   const [page, setPage] = useState(1);
@@ -116,6 +139,7 @@ export default function DisposalListPage() {
 
   const currentTab = TABS.find(t => t.id === activeTab)!;
   const isCompensationTab = activeTab === 'COMPENSATION';
+  const isWorkOrderTab = activeTab === 'WORK_ORDER';
 
   // ── 统计数据 ──────────────────────────────────────────────────────────────
   const { data: statsRes } = useQuery({
@@ -191,25 +215,47 @@ export default function DisposalListPage() {
     staleTime: 30_000,
   });
 
+  // ── 工单列表 ─────────────────────────────────────────────────────────────
+  const { data: workorderRes, isLoading: workorderLoading } = useQuery({
+    queryKey: ['workorders', statusFilter, page, keyword],
+    queryFn: () =>
+      getWorkOrderList({
+        page,
+        pageSize,
+        status: statusFilter || undefined,
+        keyword: keyword || undefined,
+      }),
+    enabled: isWorkOrderTab,
+    retry: false,
+    staleTime: 30_000,
+  });
+
   // ── 解包列表数据 ─────────────────────────────────────────────────────────
   const records: RowData[] = useMemo(() => {
     if (isCompensationTab) {
       const pageData = (compensationRes as PageData<Compensation> | undefined);
       return pageData?.records?.map(compensationToRow) ?? [];
     }
+    if (isWorkOrderTab) {
+      const pageData = (workorderRes as PageData<WorkOrderListItem> | undefined);
+      return pageData?.records?.map(workorderToRow) ?? [];
+    }
     const pageData = (disposalRes as PageData<Disposal> | undefined);
     return pageData?.records?.map(disposalToRow) ?? [];
-  }, [isCompensationTab, disposalRes, compensationRes]);
+  }, [isCompensationTab, isWorkOrderTab, disposalRes, compensationRes, workorderRes]);
 
   const total: number = useMemo(() => {
     if (isCompensationTab) {
       return (compensationRes as PageData<Compensation> | undefined)?.total ?? 0;
     }
+    if (isWorkOrderTab) {
+      return (workorderRes as PageData<WorkOrderListItem> | undefined)?.total ?? 0;
+    }
     return (disposalRes as PageData<Disposal> | undefined)?.total ?? 0;
-  }, [isCompensationTab, disposalRes, compensationRes]);
+  }, [isCompensationTab, isWorkOrderTab, disposalRes, compensationRes, workorderRes]);
 
   const totalPages = Math.ceil(total / pageSize) || 1;
-  const loading = isCompensationTab ? compensationLoading : disposalLoading;
+  const loading = isCompensationTab ? compensationLoading : isWorkOrderTab ? workorderLoading : disposalLoading;
 
   // ── Tab 切换时重置筛选 ────────────────────────────────────────────────────
   const handleTabChange = (id: TabId) => {
@@ -223,7 +269,7 @@ export default function DisposalListPage() {
     <div className="space-y-6">
       <PageHeader
         title="资产处置管理"
-        description="统一管理资产调拨、清退、报废、赔偿等全生命周期处置流程"
+        description="统一管理资产调拨、清退、报废、赔偿及工单等全生命周期处置流程"
         actions={
           <Button
             variant="primary"
@@ -297,10 +343,24 @@ export default function DisposalListPage() {
             className="px-3 py-2 text-sm bg-white border border-[#e5e7eb] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 text-slate-600"
           >
             <option value="">全部状态</option>
-            <option value="PENDING">待审批</option>
-            <option value="APPROVED">审批中</option>
-            <option value="COMPLETED">已完成</option>
-            <option value="REJECTED">已拒绝</option>
+            {isWorkOrderTab ? (
+              <>
+                <option value="DRAFT">草稿</option>
+                <option value="PENDING">待审批</option>
+                <option value="APPROVING_LEVEL_1">一级审批</option>
+                <option value="APPROVING_LEVEL_2">二级审批</option>
+                <option value="APPROVED">已通过</option>
+                <option value="REJECTED">已拒绝</option>
+                <option value="CANCELLED">已取消</option>
+              </>
+            ) : (
+              <>
+                <option value="PENDING">待审批</option>
+                <option value="APPROVED">审批中</option>
+                <option value="COMPLETED">已完成</option>
+                <option value="REJECTED">已拒绝</option>
+              </>
+            )}
           </select>
           <span className="text-xs text-slate-400">共 {total} 条记录</span>
         </div>
@@ -337,7 +397,7 @@ export default function DisposalListPage() {
               <div
                 key={record.id}
                 className="grid grid-cols-[180px_1fr_120px_100px_120px_80px] gap-4 px-5 py-3.5 items-center hover:bg-[#f8fafc] transition-colors cursor-pointer group"
-                onClick={() => navigate(`/disposals/${record.id}`)}
+                onClick={() => navigate(isWorkOrderTab ? `/workorders/${record.id}` : `/disposals/${record.id}`)}
               >
                 <span className="font-mono text-[12px] text-[#0f172a] font-semibold">{record.disposalNo}</span>
                 <div className="min-w-0">
@@ -349,7 +409,7 @@ export default function DisposalListPage() {
                 <StatusBadge status={record.currentStatus} />
                 <div className="flex justify-center">
                   <button
-                    onClick={e => { e.stopPropagation(); navigate(`/disposals/${record.id}`); }}
+                    onClick={e => { e.stopPropagation(); navigate(isWorkOrderTab ? `/workorders/${record.id}` : `/disposals/${record.id}`); }}
                     className="p-1.5 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-colors opacity-0 group-hover:opacity-100"
                   >
                     <Eye className="w-4 h-4" />

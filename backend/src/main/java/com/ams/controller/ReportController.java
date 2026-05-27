@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 
@@ -38,6 +39,7 @@ public class ReportController {
      *
      * @return 汇总数据（totalAssets, activeAssets, pendingApproval, recentlyRetired）
      */
+    @PreAuthorize("@ss.hasPermi('report:query')")
     @GetMapping("/summary")
     public Result<ReportSummaryDTO> getSummary() {
         return Result.success(reportService.getSummary());
@@ -48,6 +50,7 @@ public class ReportController {
      *
      * @return 分类统计列表
      */
+    @PreAuthorize("@ss.hasPermi('report:query')")
     @GetMapping("/by-category")
     public Result<List<CategoryReportDTO>> getByCategory() {
         return Result.success(reportService.getByCategory());
@@ -58,6 +61,7 @@ public class ReportController {
      *
      * @return 近 12 个月的趋势数据（总价值 + 净值）
      */
+    @PreAuthorize("@ss.hasPermi('report:query')")
     @GetMapping("/trend")
     public Result<List<ReportTrendDTO>> getTrend() {
         return Result.success(reportService.getTrend());
@@ -68,6 +72,7 @@ public class ReportController {
      *
      * @return 月度折旧金额列表（最近 12 个月）
      */
+    @PreAuthorize("@ss.hasPermi('report:query')")
     @GetMapping("/depreciation-stats")
     public Result<List<ReportMonthlyDTO>> getDepreciationStats() {
         return Result.success(reportService.getDepreciationStats());
@@ -78,6 +83,7 @@ public class ReportController {
      *
      * @return 月度维保次数列表（最近 12 个月）
      */
+    @PreAuthorize("@ss.hasPermi('report:query')")
     @GetMapping("/maintenance-stats")
     public Result<List<ReportMonthlyDTO>> getMaintenanceStats() {
         return Result.success(reportService.getMaintenanceStats());
@@ -88,6 +94,7 @@ public class ReportController {
      *
      * @return 月度退役处置数量列表（最近 12 个月）
      */
+    @PreAuthorize("@ss.hasPermi('report:query')")
     @GetMapping("/retirement-stats")
     public Result<List<ReportMonthlyDTO>> getRetirementStats() {
         return Result.success(reportService.getRetirementStats());

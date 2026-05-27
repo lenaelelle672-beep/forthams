@@ -1,0 +1,49 @@
+{
+  "directive": "RuoYi RBAC 集成实施 MVP：参考 RuoYi 业务模型，在 forthAMS 中落地 Spring Security 6 + JWT + MyBatis-Plus 权限体系。分析阶段已完成（session: 20260526-ruoyi-swarm），reviewer 复核 PASS。现在进入实施阶段。",
+  "owner": "gai2-orchestrator",
+  "phase": "triage",
+  "session_id": "gai2-20260526-ruoyi-impl",
+  "auto_mode": false,
+  "mcp_direct": false,
+  "analysis_session": "20260526-ruoyi-swarm",
+  "analysis_artifacts": {
+    "debate": ".omc/gai2/sessions/20260526-ruoyi-swarm/debate.json",
+    "review": ".omc/gai2/sessions/20260526-ruoyi-swarm/review.json",
+    "plan": ".omc/gai2/sessions/20260526-ruoyi-swarm/ruoyi-integration-plan.md",
+    "triage": ".omc/gai2/sessions/20260526-ruoyi-swarm/triage.json"
+  },
+  "implementation_roadmap": [
+    "数据库迁移：sys_menu/sys_role_menu/sys_role_dept 表 + 索引",
+    "Entity 与 Mapper：SysMenu/SysRoleMenu/SysRoleDept 实体类与 MyBatis-Plus 映射",
+    "Service 层：菜单管理 CRUD + 角色菜单关联 + 用户权限查询",
+    "Security 权限加载：UserDetailsService 从 sys_menu 加载 perms → GrantedAuthority",
+    "@ss.hasPermi 注解：Spring Security 权限校验 Bean",
+    "Controller：当前用户权限返回 API",
+    "前端：菜单/按钮权限闭环（后端授权菜单 + 前端 route map）"
+  ],
+  "acceptance_checks": [
+    "AC-1: sys_menu/sys_role_menu/sys_role_dept 表 DDL 正确执行",
+    "AC-2: sys_permission 兼容迁移策略就绪",
+    "AC-3: Entity/Mapper 可编译通过",
+    "AC-4: UserDetailsService 从 sys_menu 加载 perms 并转为 GrantedAuthority",
+    "AC-5: @PreAuthorize(\"@ss.hasPermi('xxx')\") 注解可用",
+    "AC-6: 当前用户权限返回 API 返回 perms 列表",
+    "AC-7: 前端菜单/按钮权限闭环可用",
+    "AC-8: 现有审批工作流不受影响"
+  ],
+  "evidence_to_collect": [
+    "DDL 执行日志",
+    "Maven 编译结果",
+    "权限校验测试结果",
+    "API 响应验证",
+    "前端权限功能截图",
+    "工作流回归测试结果"
+  ],
+  "open_risks": [
+    "实际实施前需对每个将修改的代码符号运行 GitNexus impact 分析",
+    "数据权限插件接入后需真实 SQL 集成测试验证分页 count SQL",
+    "sys_permission 兼容策略需保证现有用户/角色权限不丢失"
+  ],
+  "minions_enabled": true,
+  "artifact_dir": ".omc/gai2/sessions/gai2-20260526-ruoyi-impl"
+}

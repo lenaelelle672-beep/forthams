@@ -43,17 +43,14 @@ const SEARCHABLE_PAGES: SearchablePage[] = [
   { path: '/inventory',              label: 'RFID 盘点',      group: '运营管理' },
   { path: '/inventory/tasks',        label: '盘点任务',       group: '运营管理' },
   { path: '/inventory/smart-report', label: '智能盘点报告',   group: '运营管理' },
-  { path: '/workorders',             label: '工单管理',       group: '运营管理' },
-  { path: '/workorders/new',         label: '新建工单',       group: '运营管理' },
+  // 工单管理已合并到资产处置
   { path: '/approval',               label: '审批流程',       group: '运营管理' },
   { path: '/workflows',              label: '工作流',         group: '运营管理' },
   { path: '/workflow-designer',      label: '工作流设计器',   group: '运营管理' },
   // 退役与处置
-  { path: '/retirement',                label: '退役管理',     group: '退役与处置' },
-  { path: '/retirement/new',            label: '新建退役',     group: '退役与处置' },
   { path: '/disposals',                 label: '资产处置',     group: '退役与处置' },
   { path: '/disposals/transfer/new',    label: '资产转移',     group: '退役与处置' },
-  { path: '/disposals/clearance/new',   label: '资产清理',     group: '退役与处置' },
+  { path: '/disposals/clearance/new',   label: '资产清退',     group: '退役与处置' },
   { path: '/disposals/scrap/new',       label: '资产报废',     group: '退役与处置' },
   { path: '/disposals/compensation/new', label: '赔偿管理',    group: '退役与处置' },
   // 监控与审计
@@ -61,10 +58,16 @@ const SEARCHABLE_PAGES: SearchablePage[] = [
   // 基础数据
   { path: '/vendors',   label: '供应商',  group: '基础数据' },
   { path: '/locations', label: '位置管理', group: '基础数据' },
-  { path: '/settings',  label: '系统设置', group: '基础数据' },
+  // 系统管理
+  { path: '/system/users',  label: '用户管理', group: '系统管理' },
+  { path: '/system/roles',  label: '角色管理', group: '系统管理' },
+  { path: '/system/menus',  label: '菜单管理', group: '系统管理' },
+  { path: '/system/depts',  label: '部门管理', group: '系统管理' },
+  { path: '/system/posts',  label: '岗位管理', group: '系统管理' },
+  { path: '/settings/system', label: '参数配置', group: '系统管理' },
 ];
 
-const GROUP_ORDER = ['概览', '资产管理', '运营管理', '退役与处置', '监控与审计', '基础数据', '系统'];
+const GROUP_ORDER = ['概览', '资产管理', '运营管理', '退役与处置', '监控与审计', '基础数据', '系统管理', '系统'];
 
 function groupSorter(a: { group: string }, b: { group: string }) {
   return GROUP_ORDER.indexOf(a.group) - GROUP_ORDER.indexOf(b.group);

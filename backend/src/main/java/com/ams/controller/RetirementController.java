@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 import java.util.Map;
@@ -24,29 +25,34 @@ public class RetirementController {
     private final RetirementApplicationService retirementApplicationService;
     private final JwtUtil jwtUtil;
 
+    @PreAuthorize("@ss.hasPermi('asset:retirement:create')")
     @PostMapping("/apply")
     public Result<RetirementApplication> submitApplication(@Valid @RequestBody RetirementApplyDTO dto,
                                                             HttpServletRequest request) {
         return Result.success(retirementApplicationService.submitApplication(dto, getCurrentUserId(request)));
     }
 
+    @PreAuthorize("@ss.hasPermi('asset:retirement:create')")
     @PostMapping("/applications")
     public Result<RetirementApplication> createApplication(@Valid @RequestBody RetirementApplyDTO dto,
                                                             HttpServletRequest request) {
         return submitApplication(dto, request);
     }
 
+    @PreAuthorize("@ss.hasPermi('asset:retirement:create')")
     @PostMapping({"/draft", "/applications/draft"})
     public Result<RetirementApplication> createDraftApplication(@Valid @RequestBody RetirementApplyDTO dto,
                                                                 HttpServletRequest request) {
         return Result.success(retirementApplicationService.createDraftApplication(dto, getCurrentUserId(request)));
     }
 
+    @PreAuthorize("@ss.hasPermi('asset:retirement:create')")
     @PostMapping({"/{id}/submit", "/applications/{id}/submit"})
     public Result<RetirementApplication> submitExistingApplication(@PathVariable Long id, HttpServletRequest request) {
         return Result.success(retirementApplicationService.submitExistingApplication(id, getCurrentUserId(request)));
     }
 
+    @PreAuthorize("@ss.hasPermi('asset:retirement:query')")
     @GetMapping("/my-applications")
     public Result<Page<RetirementApplication>> getMyApplications(
             @RequestParam(defaultValue = "1") Integer page,
@@ -55,6 +61,7 @@ public class RetirementController {
         return Result.success(retirementApplicationService.getMyApplications(getCurrentUserId(request), page, pageSize));
     }
 
+    @PreAuthorize("@ss.hasPermi('asset:retirement:query')")
     @GetMapping("/applications")
     public Result<Page<RetirementApplication>> getApplications(
             @RequestParam(defaultValue = "1") Integer page,
@@ -69,53 +76,63 @@ public class RetirementController {
                 assetId != null ? assetId : assetIdAlias));
     }
 
+    @PreAuthorize("@ss.hasPermi('asset:retirement:query')")
     @GetMapping("/pending")
     public Result<List<RetirementApplication>> getPendingApplications() {
         return Result.success(retirementApplicationService.queryApplications(1, 100, "PENDING", null).getRecords());
     }
 
+    @PreAuthorize("@ss.hasPermi('asset:retirement:query')")
     @GetMapping("/{id}")
     public Result<RetirementApplication> getApplicationById(@PathVariable Long id) {
         return Result.success(retirementApplicationService.getApplicationById(id));
     }
 
+    @PreAuthorize("@ss.hasPermi('asset:retirement:query')")
     @GetMapping("/applications/{id}")
     public Result<RetirementApplication> getApplicationAlias(@PathVariable Long id) {
         return getApplicationById(id);
     }
 
+    @PreAuthorize("@ss.hasPermi('asset:retirement:edit')")
     @PutMapping("/{id}")
     public Result<RetirementApplication> updateApplication(@PathVariable Long id, @Valid @RequestBody RetirementApplyDTO dto) {
         return Result.success(retirementApplicationService.updateApplication(id, dto));
     }
 
+    @PreAuthorize("@ss.hasPermi('asset:retirement:edit')")
     @PutMapping("/applications/{id}")
     public Result<RetirementApplication> updateApplicationAlias(@PathVariable Long id, @Valid @RequestBody RetirementApplyDTO dto) {
         return updateApplication(id, dto);
     }
 
+    @PreAuthorize("@ss.hasPermi('asset:retirement:delete')")
     @DeleteMapping("/{id}")
     public Result<Void> cancelApplication(@PathVariable Long id, HttpServletRequest request) {
         retirementApplicationService.cancelApplication(id, getCurrentUserId(request));
         return Result.success();
     }
 
+    @PreAuthorize("@ss.hasPermi('asset:retirement:cancel')")
     @PostMapping({"/{id}/cancel", "/applications/{id}/cancel"})
     public Result<RetirementApplication> cancelApplicationAlias(@PathVariable Long id, HttpServletRequest request) {
         retirementApplicationService.cancelApplication(id, getCurrentUserId(request));
         return Result.success(retirementApplicationService.getApplicationById(id));
     }
 
+    @PreAuthorize("@ss.hasPermi('asset:retirement:approve')")
     @PostMapping({"/{id}/approve", "/applications/{id}/approve"})
     public Result<RetirementApplication> approveApplication(@PathVariable Long id, HttpServletRequest request) {
         return Result.success(retirementApplicationService.approveApplication(id, getCurrentUserId(request)));
     }
 
+    @PreAuthorize("@ss.hasPermi('asset:retirement:complete')")
     @PostMapping({"/{id}/complete", "/applications/{id}/complete"})
     public Result<RetirementApplication> completeApplication(@PathVariable Long id, HttpServletRequest request) {
         return Result.success(retirementApplicationService.completeApplication(id, getCurrentUserId(request)));
     }
 
+    @PreAuthorize("@ss.hasPermi('asset:retirement:reject')")
     @PostMapping({"/{id}/reject", "/applications/{id}/reject"})
     public Result<RetirementApplication> rejectApplication(@PathVariable Long id,
                                                            @RequestBody(required = false) Map<String, Object> body,
@@ -126,29 +143,34 @@ public class RetirementController {
                 extractText(body, "reason", "comment", "opinion")));
     }
 
+    @PreAuthorize("@ss.hasPermi('asset:retirement:approve')")
     @PostMapping("/approve")
     public Result<RetirementApplication> approveApplicationByBody(@RequestBody Map<String, Object> body,
                                                                    HttpServletRequest request) {
         return approveApplication(extractId(body), request);
     }
 
+    @PreAuthorize("@ss.hasPermi('asset:retirement:complete')")
     @PostMapping("/complete")
     public Result<RetirementApplication> completeApplicationByBody(@RequestBody Map<String, Object> body,
                                                                    HttpServletRequest request) {
         return completeApplication(extractId(body), request);
     }
 
+    @PreAuthorize("@ss.hasPermi('asset:retirement:reject')")
     @PostMapping("/reject")
     public Result<RetirementApplication> rejectApplicationByBody(@RequestBody Map<String, Object> body,
                                                                  HttpServletRequest request) {
         return rejectApplication(extractId(body), body, request);
     }
 
+    @PreAuthorize("@ss.hasPermi('asset:retirement:query')")
     @GetMapping("/asset/{assetId}")
     public Result<List<RetirementApplication>> getAssetRetirementHistory(@PathVariable Long assetId) {
         return Result.success(retirementApplicationService.getAssetRetirementHistory(assetId));
     }
 
+    @PreAuthorize("@ss.hasPermi('asset:retirement:query')")
     @GetMapping("/list")
     public Result<?> getApplicationList(
             @RequestParam(defaultValue = "1") Integer page,
@@ -163,16 +185,19 @@ public class RetirementController {
         return Result.success(retirementApplicationService.queryApplications(page, pageSize, status, null));
     }
 
+    @PreAuthorize("@ss.hasPermi('asset:retirement:query')")
     @GetMapping("/{id}/approval-history")
     public Result<List<Map<String, Object>>> getApprovalHistory(@PathVariable Long id) {
         return Result.success(retirementApplicationService.getApprovalHistory(id));
     }
 
+    @PreAuthorize("@ss.hasPermi('asset:retirement:query')")
     @GetMapping("/assets/{assetId}/state-history")
     public Result<Map<String, Object>> getAssetStateHistory(@PathVariable Long assetId) {
         return Result.success(retirementApplicationService.getAssetStateHistory(assetId));
     }
 
+    @PreAuthorize("@ss.hasPermi('asset:retirement:query')")
     @GetMapping("/statistics")
     public Result<Map<String, Object>> getStatistics() {
         return Result.success(retirementApplicationService.getStatistics());
