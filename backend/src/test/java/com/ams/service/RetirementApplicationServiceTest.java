@@ -75,8 +75,9 @@ class RetirementApplicationServiceTest {
                 {
                   "asset_id": 12,
                   "reason": "达到报废年限",
-                  "estimated_residual_value": 88.50,
-                  "retirement_type": "SCRAP"
+                  "residualValue": 88.50,
+                  "retirement_type": "SCRAP",
+                  "notes": "资产已拆除"
                 }
                 """, RetirementApplyDTO.class);
 
@@ -84,6 +85,7 @@ class RetirementApplicationServiceTest {
         assertEquals("达到报废年限", dto.getReason());
         assertEquals(new BigDecimal("88.50"), dto.getEstimatedResidualValue());
         assertEquals("SCRAP", dto.getRetirementType());
+        assertEquals("资产已拆除", dto.getRemark());
     }
 
     @Test
@@ -93,6 +95,7 @@ class RetirementApplicationServiceTest {
         asset.setTenantId("T001");
         asset.setAssetNo("A-001");
         asset.setAssetName("测试资产");
+        asset.setDeptId(3L);
         asset.setStatus("IN_USE");
         TenantContext.setTenantId("T001");
 
@@ -114,6 +117,7 @@ class RetirementApplicationServiceTest {
         ArgumentCaptor<RetirementApplication> applicationCaptor = ArgumentCaptor.forClass(RetirementApplication.class);
         verify(retirementApplicationMapper).insert(applicationCaptor.capture());
         assertEquals("T001", applicationCaptor.getValue().getTenantId());
+        assertEquals(3L, applicationCaptor.getValue().getDeptId());
 
         ArgumentCaptor<LambdaQueryWrapper<RetirementApplication>> applicationNoWrapperCaptor = ArgumentCaptor.forClass(LambdaQueryWrapper.class);
         verify(retirementApplicationMapper).selectList(applicationNoWrapperCaptor.capture());
@@ -294,6 +298,24 @@ class RetirementApplicationServiceTest {
         String sqlSegment = captor.getValue().getSqlSegment();
         assertTrue(sqlSegment.contains("tenant_id"));
         assertTrue(sqlSegment.contains("status"));
+    }
+
+    @Test
+    void shouldFilterQueryApplicationsByKeywordAndDepartment() {
+        TenantContext.setTenantId("T001");
+        when(retirementApplicationMapper.selectPage(any(Page.class), any(LambdaQueryWrapper.class)))
+                .thenReturn(new Page<>());
+
+        retirementApplicationService.queryApplications(1, 10, null, null, "A-001", 3L);
+
+        ArgumentCaptor<LambdaQueryWrapper<RetirementApplication>> captor = ArgumentCaptor.forClass(LambdaQueryWrapper.class);
+        verify(retirementApplicationMapper).selectPage(any(Page.class), captor.capture());
+        String sqlSegment = captor.getValue().getSqlSegment();
+        assertTrue(sqlSegment.contains("dept_id"));
+        assertTrue(sqlSegment.contains("application_no"));
+        assertTrue(captor.getValue().getParamNameValuePairs().containsValue(3L));
+        assertTrue(captor.getValue().getParamNameValuePairs().values().stream()
+                .anyMatch(value -> value instanceof String && value.toString().contains("A-001")));
     }
 
     @Test

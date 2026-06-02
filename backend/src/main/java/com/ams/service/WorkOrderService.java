@@ -16,10 +16,13 @@ import com.ams.mapper.UserMapper;
 import com.ams.mapper.WorkOrderMapper;
 import com.ams.security.TenantSecurityAudit;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DuplicateKeyException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -42,6 +45,15 @@ import com.ams.annotation.DataScope;
 public class WorkOrderService {
 
     private static final Logger log = LoggerFactory.getLogger(WorkOrderService.class);
+    private static final Map<String, String> PRIORITY_ALIASES = Map.of(
+            "LOW", "LOW",
+            "MEDIUM", "MEDIUM",
+            "HIGH", "HIGH",
+            "CRITICAL", "CRITICAL",
+            "NORMAL", "MEDIUM",
+            "URGENT", "HIGH",
+            "EMERGENCY", "CRITICAL");
+    private static final int MAX_RETRY = 3;
 
     private final WorkOrderMapper workOrderMapper;
     private final ApprovalProcessMapper approvalProcessMapper;
@@ -62,7 +74,9 @@ public class WorkOrderService {
                     .or().like(WorkOrder::getWorkOrderNo, keyword));
         }
         wrapper.orderByDesc(WorkOrder::getCreateTime);
-        return workOrderMapper.selectPage(pageObj, wrapper);
+        Page<WorkOrder> result = workOrderMapper.selectPage(pageObj, wrapper);
+        result.getRecords().forEach(this::normalizeLoadedWorkOrderPriority);
+        return result;
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -70,10 +84,21 @@ public class WorkOrderService {
         String tenantId = TenantContext.requireTenantId();
         WorkOrder workOrder = new WorkOrder();
         BeanUtil.copyProperties(dto, workOrder, "id", "workOrderNo", "status", "createTime", "updateTime");
+        workOrder.setPriority(normalizePriorityForWrite(dto.getPriority()));
         workOrder.setTenantId(tenantId);
-        workOrder.setWorkOrderNo(generateWorkOrderNo());
         workOrder.setStatus("DRAFT");
-        workOrderMapper.insert(workOrder);
+        int retries = 3;
+        while (retries > 0) {
+            try {
+                workOrder.setWorkOrderNo(generateWorkOrderNo());
+                workOrderMapper.insert(workOrder);
+                break;
+            } catch (Exception e) {
+                retries--;
+                if (retries == 0) throw e;
+                log.warn("工单创建冲突，正在重试: remaining={}", retries);
+            }
+        }
 
         sendWorkOrderNotification(workOrder, "创建");
         return workOrder;
@@ -86,17 +111,35 @@ public class WorkOrderService {
             throw new BusinessException("只有草稿或已驳回状态的工单可以修改");
         }
         BeanUtil.copyProperties(dto, workOrder, "id", "workOrderNo", "status", "createTime", "updateTime");
+        workOrder.setPriority(normalizePriorityForWrite(dto.getPriority()));
         workOrderMapper.updateById(workOrder);
         return workOrder;
     }
 
     @Transactional(rollbackFor = Exception.class)
     public void deleteWorkOrder(Long id) {
-        WorkOrder workOrder = getWorkOrder(id);
+        String tenantId = TenantContext.requireTenantId();
+        // 先查询确保工单存在且属于当前租户
+        WorkOrder workOrder = workOrderMapper.selectOne(
+                new LambdaQueryWrapper<WorkOrder>()
+                        .eq(WorkOrder::getId, id)
+                        .eq(WorkOrder::getTenantId, tenantId));
+        if (workOrder == null) {
+            // 检查是否属于其他租户，记录审计
+            WorkOrder existing = workOrderMapper.selectById(id);
+            if (existing == null) {
+                throw new BusinessException("工单不存在");
+            }
+            TenantSecurityAudit.logCrossTenantAttempt(log, "deleteWorkOrder", id, tenantId, existing.getTenantId());
+            throw new AccessDeniedException("Work order belongs to another tenant");
+        }
         if (!isDeletableStatus(workOrder.getStatus())) {
             throw new BusinessException("只有草稿、已驳回或已取消状态的工单可以删除");
         }
-        workOrderMapper.deleteById(id);
+        // 使用 LambdaUpdateWrapper 添加 tenantId 条件，确保跨租户安全
+        workOrderMapper.delete(new LambdaQueryWrapper<WorkOrder>()
+                .eq(WorkOrder::getId, id)
+                .eq(WorkOrder::getTenantId, tenantId));
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -151,7 +194,7 @@ public class WorkOrderService {
                 break;
             case "cancel":
                 if (!isCancellableStatus(workOrder.getStatus())) {
-                    throw new BusinessException("只有草稿、待审批或已审批状态的工单可以取消");
+                    throw new BusinessException("只有草稿或待审批状态的工单可以取消");
                 }
                 workOrder.setStatus("CANCELLED");
                 upsertApprovalProcess(workOrder, "CANCELLED", comment);
@@ -169,12 +212,11 @@ public class WorkOrderService {
         if (!"PENDING".equals(workOrder.getStatus())) {
             throw new BusinessException("只有待审批状态的工单可以审批");
         }
-        if ("APPROVED".equals(result)) {
-            workOrder.setStatus("APPROVED");
-        } else if ("REJECTED".equals(result)) {
-            workOrder.setStatus("REJECTED");
-        } else {
-            throw new BusinessException("审批结果无效");
+        switch (result) {
+            case "APPROVED" -> workOrder.setStatus("APPROVED");
+            case "REJECTED" -> workOrder.setStatus("REJECTED");
+            case "CANCELLED" -> workOrder.setStatus("CANCELLED");
+            default -> throw new BusinessException("审批结果无效");
         }
         workOrderMapper.updateById(workOrder);
         upsertApprovalProcess(workOrder, result, comment);
@@ -185,67 +227,124 @@ public class WorkOrderService {
         String tenantId = TenantContext.requireTenantId();
         WorkOrder workOrder = workOrderMapper.selectOne(workOrderById(id, tenantId));
         if (workOrder != null) {
+            normalizeLoadedWorkOrderPriority(workOrder);
             return workOrder;
         }
 
-        WorkOrder existingWorkOrder = workOrderMapper.selectById(id);
-        if (existingWorkOrder == null) {
-            throw new BusinessException("工单不存在");
-        }
-        TenantSecurityAudit.logCrossTenantAttempt(log, "getWorkOrder", id, tenantId, existingWorkOrder.getTenantId());
-        throw new AccessDeniedException("Work order belongs to another tenant");
+        throw new BusinessException("工单不存在");
     }
 
     public WorkOrder getWorkOrderById(Long id) {
         return getWorkOrder(id);
     }
 
-    private synchronized String generateWorkOrderNo() {
+    /**
+     * 生成工单编号。
+     * <p>格式：WO-YYYYMMDD-XXXX（每日从 0001 开始递增）。
+     * 使用数据库唯一约束兜底，发生冲突时自动重试。</p>
+     */
+    private String generateWorkOrderNo() {
         String tenantId = TenantContext.requireTenantId();
         String prefix = "WO-" + LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")) + "-";
-        LambdaQueryWrapper<WorkOrder> wrapper = new LambdaQueryWrapper<WorkOrder>()
-                .eq(WorkOrder::getTenantId, tenantId)
-                .likeRight(WorkOrder::getWorkOrderNo, prefix);
-        List<WorkOrder> workOrders = workOrderMapper.selectList(wrapper);
+        for (int attempt = 0; attempt < MAX_RETRY; attempt++) {
+            try {
+                LambdaQueryWrapper<WorkOrder> wrapper = new LambdaQueryWrapper<WorkOrder>()
+                        .eq(WorkOrder::getTenantId, tenantId)
+                        .likeRight(WorkOrder::getWorkOrderNo, prefix);
+                List<WorkOrder> workOrders = workOrderMapper.selectList(wrapper);
 
-        int maxSuffix = 0;
-        for (WorkOrder workOrder : workOrders) {
-            String workOrderNo = workOrder.getWorkOrderNo();
-            if (workOrderNo != null && workOrderNo.startsWith(prefix)) {
-                try {
-                    maxSuffix = Math.max(maxSuffix, Integer.parseInt(workOrderNo.substring(prefix.length())));
-                } catch (NumberFormatException ignored) {
-                    // Ignore malformed historical work order numbers.
+                int maxSuffix = 0;
+                for (WorkOrder wo : workOrders) {
+                    String workOrderNo = wo.getWorkOrderNo();
+                    if (workOrderNo != null && workOrderNo.startsWith(prefix)) {
+                        try {
+                            maxSuffix = Math.max(maxSuffix, Integer.parseInt(workOrderNo.substring(prefix.length())));
+                        } catch (NumberFormatException ignored) {
+                            // Ignore malformed historical work order numbers.
+                        }
+                    }
+                }
+                return prefix + String.format("%04d", maxSuffix + 1);
+            } catch (Exception e) {
+                log.warn("工单编号生成异常，正在重试 attempt={}", attempt + 1);
+                if (attempt == MAX_RETRY - 1) {
+                    throw new BusinessException("工单编号生成失败，请稍后重试");
                 }
             }
         }
-        return prefix + String.format("%04d", maxSuffix + 1);
+        throw new BusinessException("工单编号生成失败，请稍后重试");
     }
 
     private void upsertApprovalProcess(WorkOrder workOrder, String status, String comment) {
         if (approvalProcessMapper == null) {
-            return;
+            log.error("审批流程Mapper未注入，无法创建审批记录");
+            throw new BusinessException(500, "审批流程配置异常，请联系管理员");
         }
 
         ApprovalProcess approvalProcess = findApprovalProcess(workOrder.getId());
         if (approvalProcess != null) {
             approvalProcess.setStatus(status);
-            approvalProcess.setBusinessData(comment);
             approvalProcessMapper.updateById(approvalProcess);
             return;
         }
 
-        approvalProcess = new ApprovalProcess();
-        approvalProcess.setProcessNo(generateApprovalProcessNo());
-        approvalProcess.setProcessType("WORK_ORDER");
-        approvalProcess.setBusinessId(workOrder.getId());
-        approvalProcess.setBusinessData(comment);
-        approvalProcess.setTenantId(workOrder.getTenantId());
-        approvalProcess.setStatus(status);
-        approvalProcess.setCurrentStep(1);
-        approvalProcess.setApplicantId(resolveApplicantId(workOrder));
-        approvalProcess.setApplyTime(LocalDateTime.now());
-        approvalProcessMapper.insert(approvalProcess);
+        for (int attempt = 0; attempt < MAX_RETRY; attempt++) {
+            try {
+                approvalProcess = new ApprovalProcess();
+                approvalProcess.setProcessNo(generateApprovalProcessNo());
+                approvalProcess.setProcessType("WORK_ORDER");
+                approvalProcess.setBusinessId(workOrder.getId());
+                approvalProcess.setTenantId(workOrder.getTenantId());
+                approvalProcess.setStatus(status);
+                approvalProcess.setCurrentStep(1);
+                approvalProcess.setApplicantId(resolveApplicantId(workOrder));
+                approvalProcess.setApplyTime(LocalDateTime.now());
+                approvalProcessMapper.insert(approvalProcess);
+                return;
+            } catch (DuplicateKeyException e) {
+                log.warn("approval_process_insert_unique_conflict_retry attempt={}", attempt + 1);
+                if (attempt == MAX_RETRY - 1) {
+                    throw new BusinessException("审批编号生成失败，请稍后重试");
+                }
+            }
+        }
+    }
+
+    /**
+     * 生成审批流程编号。
+     * <p>格式：WOAPR-YYYYMMDD-XXXX（每日从 0001 开始递增）。
+     * 使用数据库唯一约束兜底，发生冲突时自动重试。</p>
+     */
+    private String generateApprovalProcessNo() {
+        String tenantId = TenantContext.requireTenantId();
+        String prefix = "WOAPR-" + LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")) + "-";
+        for (int attempt = 0; attempt < MAX_RETRY; attempt++) {
+            try {
+                LambdaQueryWrapper<ApprovalProcess> wrapper = new LambdaQueryWrapper<ApprovalProcess>()
+                        .eq(ApprovalProcess::getTenantId, tenantId)
+                        .likeRight(ApprovalProcess::getProcessNo, prefix);
+                List<ApprovalProcess> processes = approvalProcessMapper.selectList(wrapper);
+
+                int maxSuffix = 0;
+                for (ApprovalProcess process : processes == null ? List.<ApprovalProcess>of() : processes) {
+                    String processNo = process.getProcessNo();
+                    if (processNo != null && processNo.startsWith(prefix)) {
+                        try {
+                            maxSuffix = Math.max(maxSuffix, Integer.parseInt(processNo.substring(prefix.length())));
+                        } catch (NumberFormatException ignored) {
+                            // Ignore malformed historical approval process numbers.
+                        }
+                    }
+                }
+                return prefix + String.format("%04d", maxSuffix + 1);
+            } catch (Exception e) {
+                log.warn("审批编号生成异常，正在重试 attempt={}", attempt + 1);
+                if (attempt == MAX_RETRY - 1) {
+                    throw new BusinessException("审批编号生成失败，请稍后重试");
+                }
+            }
+        }
+        throw new BusinessException("审批编号生成失败，请稍后重试");
     }
 
     /**
@@ -294,26 +393,32 @@ public class WorkOrderService {
         return processes == null || processes.isEmpty() ? null : processes.get(0);
     }
 
-    private synchronized String generateApprovalProcessNo() {
-        String tenantId = TenantContext.requireTenantId();
-        String prefix = "WOAPR-" + LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")) + "-";
-        LambdaQueryWrapper<ApprovalProcess> wrapper = new LambdaQueryWrapper<ApprovalProcess>()
-                .eq(ApprovalProcess::getTenantId, tenantId)
-                .likeRight(ApprovalProcess::getProcessNo, prefix);
-        List<ApprovalProcess> processes = approvalProcessMapper.selectList(wrapper);
-
-        int maxSuffix = 0;
-        for (ApprovalProcess process : processes == null ? List.<ApprovalProcess>of() : processes) {
-            String processNo = process.getProcessNo();
-            if (processNo != null && processNo.startsWith(prefix)) {
-                try {
-                    maxSuffix = Math.max(maxSuffix, Integer.parseInt(processNo.substring(prefix.length())));
-                } catch (NumberFormatException ignored) {
-                    // Ignore malformed historical approval process numbers.
-                }
-            }
+    private String normalizePriorityForWrite(String priority) {
+        String normalized = normalizePriorityAlias(priority);
+        if (normalized != null) {
+            return normalized;
         }
-        return prefix + String.format("%04d", maxSuffix + 1);
+        if (!StringUtils.hasText(priority)) {
+            return "MEDIUM";
+        }
+        throw new BusinessException("工单优先级无效");
+    }
+
+    private void normalizeLoadedWorkOrderPriority(WorkOrder workOrder) {
+        if (workOrder == null || !StringUtils.hasText(workOrder.getPriority())) {
+            return;
+        }
+        String normalized = normalizePriorityAlias(workOrder.getPriority());
+        if (normalized != null) {
+            workOrder.setPriority(normalized);
+        }
+    }
+
+    private String normalizePriorityAlias(String priority) {
+        if (!StringUtils.hasText(priority)) {
+            return null;
+        }
+        return PRIORITY_ALIASES.get(priority.trim().toUpperCase(Locale.ROOT));
     }
 
     private boolean isEditableStatus(String status) {
@@ -329,7 +434,7 @@ public class WorkOrderService {
     }
 
     private boolean isCancellableStatus(String status) {
-        return "DRAFT".equals(status) || "PENDING".equals(status) || "APPROVED".equals(status);
+        return "DRAFT".equals(status) || "PENDING".equals(status);
     }
 
     private LambdaQueryWrapper<WorkOrder> workOrderById(Long id, String tenantId) {
@@ -370,24 +475,14 @@ public class WorkOrderService {
     /**
      * 获取工单状态分布统计。
      *
-     * <p>查询当前租户下所有工单，按状态分组计数。
+     * <p>使用 SQL GROUP BY 查询替代全量+内存分组，提升性能。
      *
-     * @return 各状态工单计数列表（如 已完成、进行中、待处理 等）
+     * @return 各状态工单计数列表
      */
     public List<StatusDistributionDTO> getStatusDistribution() {
         String tenantId = TenantContext.requireTenantId();
         try {
-            List<WorkOrder> allOrders = workOrderMapper.selectList(
-                    new LambdaQueryWrapper<WorkOrder>()
-                            .eq(WorkOrder::getTenantId, tenantId)
-                            .select(WorkOrder::getStatus));
-
-            Map<String, Long> statusMap = new HashMap<>();
-            for (WorkOrder wo : allOrders) {
-                String status = wo.getStatus() != null ? wo.getStatus() : "UNKNOWN";
-                statusMap.merge(status, 1L, Long::sum);
-            }
-
+            List<StatusDistributionDTO> list = workOrderMapper.selectStatusDistribution(tenantId);
             Map<String, String> statusLabels = new HashMap<>();
             statusLabels.put("COMPLETED", "已完成");
             statusLabels.put("EXECUTING", "进行中");
@@ -396,16 +491,10 @@ public class WorkOrderService {
             statusLabels.put("DRAFT", "草稿");
             statusLabels.put("REJECTED", "已驳回");
             statusLabels.put("CANCELLED", "已取消");
-
-            List<StatusDistributionDTO> result = new ArrayList<>();
-            for (Map.Entry<String, Long> entry : statusMap.entrySet()) {
-                result.add(StatusDistributionDTO.builder()
-                        .name(statusLabels.getOrDefault(entry.getKey(), entry.getKey()))
-                        .value(entry.getValue())
-                        .build());
+            for (StatusDistributionDTO item : list) {
+                item.setName(statusLabels.getOrDefault(item.getName(), item.getName()));
             }
-
-            return result;
+            return list;
         } catch (Exception e) {
             log.warn("failed_to_query_status_distribution: {}", e.getMessage());
             return new ArrayList<>();
@@ -415,39 +504,18 @@ public class WorkOrderService {
     /**
      * 获取各部门待处理工单数量。
      *
-     * <p>查询当前租户下所有 PENDING 状态工单，按 deptName 分组计数。
+     * <p>使用 SQL GROUP BY 查询替代全量+内存分组，提升性能。
      *
      * @return 各部门待处理工单计数列表
      */
     public List<DeptPendingDTO> getDeptPending() {
         String tenantId = TenantContext.requireTenantId();
         try {
-            List<WorkOrder> pendingOrders = workOrderMapper.selectList(
-                    new LambdaQueryWrapper<WorkOrder>()
-                            .eq(WorkOrder::getTenantId, tenantId)
-                            .eq(WorkOrder::getStatus, "PENDING")
-                            .select(WorkOrder::getDeptName));
-
-            Map<String, Long> deptMap = new HashMap<>();
-            for (WorkOrder wo : pendingOrders) {
-                String deptName = wo.getDeptName() != null ? wo.getDeptName() : "未知部门";
-                deptMap.merge(deptName, 1L, Long::sum);
-            }
-
-            List<DeptPendingDTO> result = new ArrayList<>();
-            for (Map.Entry<String, Long> entry : deptMap.entrySet()) {
-                result.add(DeptPendingDTO.builder()
-                        .name(entry.getKey())
-                        .value(entry.getValue())
-                        .build());
-            }
-
-            return result;
+            return workOrderMapper.selectDeptPending(tenantId);
         } catch (Exception e) {
             log.warn("failed_to_query_dept_pending: {}", e.getMessage());
             return new ArrayList<>();
         }
     }
-
 
 }

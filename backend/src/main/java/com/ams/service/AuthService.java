@@ -18,6 +18,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.Collections;
 import java.util.List;
@@ -57,7 +58,7 @@ public class AuthService {
         );
 
         if (existingUser != null) {
-            throw new BusinessException("用户名已存在");
+            throw new BusinessException(400, "用户名已存在");
         }
 
         User user = new User();
@@ -89,6 +90,9 @@ public class AuthService {
         );
         if (user == null) {
             throw new BusinessException("用户不存在");
+        }
+        if (!StringUtils.hasText(request.getOldPassword())) {
+            throw new BusinessException("旧密码不能为空");
         }
         if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
             throw new BusinessException("旧密码不正确");

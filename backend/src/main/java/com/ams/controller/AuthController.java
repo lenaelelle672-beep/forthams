@@ -41,11 +41,11 @@ public class AuthController {
     }
 
     /**
-     * 重置密码（过渡方案）
+     * 重置密码。
      *
-     * <p>TODO: 后续需接入邮件/短信验证码验证，目前仅验证 username 存在即可重置。
+     * <p>必须提供旧密码作为安全凭据；未验证请求会被服务端拒绝。
      *
-     * @param request 包含 username 和 newPassword
+     * @param request 包含 username、oldPassword 和 newPassword
      * @return 操作结果
      */
     @PostMapping("/reset-password")

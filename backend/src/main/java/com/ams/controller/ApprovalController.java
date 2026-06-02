@@ -40,7 +40,7 @@ public class ApprovalController {
         if ("true".equals(mine) && applicantId == null) {
             applicantId = getCurrentUserId(request);
         }
-        return Result.success(approvalService.queryProcesses(page, pageSize, status, processType, applicantId));
+        return Result.success(approvalService.queryProcesses(page, pageSize, status, processType, applicantId, keyword));
     }
 
     @PreAuthorize("@ss.hasPermi('approval:process:query')")
@@ -84,7 +84,7 @@ public class ApprovalController {
     @PreAuthorize("@ss.hasPermi('approval:process:query')")
     @GetMapping("/pending")
     public Result<?> pending(HttpServletRequest request) {
-        return Result.success(approvalService.getMyPendingApprovals(getCurrentUserId(request)));
+        return Result.success(approvalService.getMyPendingApprovals(getCurrentUserId(request), new Page<>(1, 20)));
     }
 
     /** 流程统计：按 processType 分组返回各流程的总数/通过数/驳回数/审批中数 */

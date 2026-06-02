@@ -18,6 +18,7 @@ public class AssetCategory implements Serializable {
     private Long parentId;
     private Integer sortOrder;
     private String description;
+    private Long fieldsetId;
 
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;

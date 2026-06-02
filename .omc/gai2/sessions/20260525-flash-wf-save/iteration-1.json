@@ -1,9 +1,0 @@
-{
-  "iteration": 1,
-  "review_verdict": "FAIL",
-  "gap_fingerprint": "AC-REGRESS|ApiResponse_data_pattern_18_files_44_sites",
-  "reason": "全局回归修复不完整：21个文件37处PaginatedResponse→PageData已修复，但18个文件44处ApiResponse<T>?.data模式残留",
-  "dispatched_agent": "gai2-flash-builder",
-  "repair_scope": "18个文件44处ApiResponse<T>?.data → 直接访问T",
-  "ts": "2026-05-25T09:55:00Z"
-}

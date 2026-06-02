@@ -10,6 +10,8 @@
 .env.*
 !.env.example
 !.env.sample
+.mcp.json
+.mcp.local.json
 frontend/.env.local
 frontend/.env.development.local
 frontend/.env.production.local
@@ -19,6 +21,8 @@ frontend/.env.production.local
 Thumbs.db
 *.swp
 *.swo
+*.bak
+*.bak*
 
 # Frontend / Node
 node_modules/
@@ -38,6 +42,7 @@ build/
 coverage/
 
 # Browser/e2e artifacts
+frontend/.auth/
 test-results/
 playwright-report/
 blob-report/
@@ -107,3 +112,12 @@ spec.md
 *.tmp
 *.temp
 2/
+
+# Local workflow state (GAI2 / GAI / OMC) — not for source control
+.omc/
+.gai/
+.gai2/
+
+# User uploads and runtime artifacts
+backend/uploads/
+backend/backend.log

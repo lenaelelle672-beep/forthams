@@ -11,10 +11,11 @@ public class RetirementApplyDTO {
     @JsonAlias("asset_id")
     private Long assetId;
     private String reason;
-    @JsonAlias("estimated_residual_value")
+    @JsonAlias({"estimated_residual_value", "residualValue"})
     private BigDecimal estimatedResidualValue;
     @JsonAlias("retirement_type")
     private String retirementType;
     private String attachments;
+    @JsonAlias("notes")
     private String remark;
 }

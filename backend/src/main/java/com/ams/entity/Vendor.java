@@ -21,6 +21,10 @@ public class Vendor {
     @TableField("contact_email")
     private String contactEmail;
     private String address;
+    private String bankAccount;
+    private String taxId;
+    private String password;
+    private Integer portalEnabled;
     private Integer status;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;

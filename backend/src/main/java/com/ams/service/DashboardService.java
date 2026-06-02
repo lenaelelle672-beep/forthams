@@ -40,49 +40,117 @@ public class DashboardService {
     private final InventoryTaskMapper inventoryTaskMapper;
 
     public DashboardStatsDTO getStats() {
-        List<Asset> allAssets = getCurrentTenantAssets();
         String tenantId = TenantContext.getTenantId();
-        return buildStats(allAssets, tenantId, getPendingApprovals());
+        if (tenantId == null || tenantId.isBlank()) {
+            return emptyStats();
+        }
+        return buildStatsFromDb(tenantId, getPendingApprovals());
+    }
+
+    private DashboardStatsDTO emptyStats() {
+        DashboardStatsDTO stats = new DashboardStatsDTO();
+        stats.setTotalAssets(0L);
+        stats.setInUseAssets(0L);
+        stats.setIdleAssets(0L);
+        stats.setMaintenanceAssets(0L);
+        stats.setScrapAssets(0L);
+        stats.setUtilizationRate(0D);
+        stats.setTotalValue(BigDecimal.ZERO);
+        stats.setNetValue(BigDecimal.ZERO);
+        stats.setCategoryDistribution(new HashMap<>());
+        stats.setPendingApprovals(0L);
+        stats.setPendingWorkOrders(0L);
+        stats.setInventoryProgress(0D);
+        stats.setCriticalAlerts(0L);
+        return stats;
     }
 
     public DashboardStatsDTO getGlobalStats() {
-        List<Asset> allAssets = assetMapper.selectList(new LambdaQueryWrapper<>());
-        return buildStats(allAssets, null, getGlobalPendingApprovals());
+        return buildStatsFromDb(null, getGlobalPendingApprovals());
     }
 
-    private DashboardStatsDTO buildStats(List<Asset> allAssets, String tenantId, Long pendingApprovals) {
+    /**
+     * 基于 SQL 聚合查询构建仪表盘统计，替代原有的全量 selectList + 内存 filter 模式。
+     */
+    private DashboardStatsDTO buildStatsFromDb(String tenantId, Long pendingApprovals) {
         DashboardStatsDTO stats = new DashboardStatsDTO();
+        boolean hasTenant = tenantId != null && !tenantId.isBlank();
 
-        stats.setTotalAssets((long) allAssets.size());
-        stats.setInUseAssets(allAssets.stream().filter(a -> AssetStatus.IN_USE.matches(a.getStatus())).count());
-        stats.setIdleAssets(allAssets.stream().filter(a -> AssetStatus.IDLE.matches(a.getStatus())).count());
-        stats.setMaintenanceAssets(allAssets.stream().filter(a -> AssetStatus.MAINTENANCE.matches(a.getStatus())).count());
-        stats.setScrapAssets(allAssets.stream().filter(a -> AssetStatus.SCRAPPED.matches(a.getStatus())).count());
-        stats.setUtilizationRate(calculateRate(stats.getInUseAssets(), stats.getTotalAssets()));
+        // 1. 总数
+        LambdaQueryWrapper<Asset> countWrapper = new LambdaQueryWrapper<>();
+        if (hasTenant) {
+            countWrapper.eq(Asset::getTenantId, tenantId);
+        }
+        Long totalAssets = assetMapper.selectCount(countWrapper);
+        stats.setTotalAssets(totalAssets != null ? totalAssets : 0L);
 
-        BigDecimal totalValue = allAssets.stream()
-                .map(Asset::getOriginalValue)
-                .filter(Objects::nonNull)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        stats.setTotalValue(totalValue);
+        // 2. 状态分布：SELECT status, COUNT(*) GROUP BY status
+        QueryWrapper<Asset> statusQw = new QueryWrapper<>();
+        if (hasTenant) {
+            statusQw.eq("tenant_id", tenantId);
+        }
+        statusQw.select("status, COUNT(*) as cnt").groupBy("status");
+        List<Map<String, Object>> statusRows = assetMapper.selectMaps(statusQw);
+        long inUse = 0, idle = 0, maintenance = 0, scrap = 0;
+        for (Map<String, Object> row : statusRows) {
+            Object statusObj = row.get("status");
+            Object cntObj = row.get("cnt");
+            if (statusObj == null || cntObj == null) continue;
+            String status = statusObj.toString();
+            long count = ((Number) cntObj).longValue();
+            if (AssetStatus.IN_USE.matches(status)) {
+                inUse = count;
+            } else if (AssetStatus.IDLE.matches(status)) {
+                idle = count;
+            } else if (AssetStatus.MAINTENANCE.matches(status)) {
+                maintenance = count;
+            } else if (AssetStatus.SCRAPPED.matches(status)) {
+                scrap = count;
+            }
+        }
+        stats.setInUseAssets(inUse);
+        stats.setIdleAssets(idle);
+        stats.setMaintenanceAssets(maintenance);
+        stats.setScrapAssets(scrap);
+        stats.setUtilizationRate(calculateRate(inUse, totalAssets != null ? totalAssets : 0L));
 
-        BigDecimal currentValueSum = allAssets.stream()
-                .map(Asset::getCurrentValue)
-                .filter(Objects::nonNull)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        stats.setNetValue(currentValueSum);
+        // 3. 价值总和：SELECT SUM(original_value), SUM(current_value)
+        QueryWrapper<Asset> valueQw = new QueryWrapper<>();
+        if (hasTenant) {
+            valueQw.eq("tenant_id", tenantId);
+        }
+        valueQw.select("IFNULL(SUM(original_value),0) as totalValue, IFNULL(SUM(current_value),0) as netValue");
+        List<Map<String, Object>> valueRows = assetMapper.selectMaps(valueQw);
+        if (!valueRows.isEmpty()) {
+            Map<String, Object> row = valueRows.get(0);
+            stats.setTotalValue(toBigDecimal(row.get("totalValue")));
+            stats.setNetValue(toBigDecimal(row.get("netValue")));
+        }
 
-        Map<String, Long> categoryDist = allAssets.stream()
-                .collect(Collectors.groupingBy(
-                        a -> String.valueOf(a.getCategoryId() != null ? a.getCategoryId() : 0),
-                        Collectors.counting()
-                ));
+        // 4. 分类分布：SELECT category_id, COUNT(*) GROUP BY category_id
+        QueryWrapper<Asset> catQw = new QueryWrapper<>();
+        if (hasTenant) {
+            catQw.eq("tenant_id", tenantId);
+        }
+        catQw.select("category_id, COUNT(*) as cnt")
+                .isNotNull("category_id")
+                .groupBy("category_id");
+        List<Map<String, Object>> catRows = assetMapper.selectMaps(catQw);
+        Map<String, Long> categoryDist = new HashMap<>();
+        for (Map<String, Object> row : catRows) {
+            Object catIdObj = row.get("category_id");
+            Object cntObj = row.get("cnt");
+            Long catId = catIdObj != null ? ((Number) catIdObj).longValue() : 0L;
+            long count = cntObj != null ? ((Number) cntObj).longValue() : 0L;
+            categoryDist.put(String.valueOf(catId), count);
+        }
         stats.setCategoryDistribution(categoryDist);
 
+        // 5. 其他关联数据
         stats.setPendingApprovals(pendingApprovals);
         stats.setPendingWorkOrders(getPendingWorkOrders(tenantId));
         stats.setInventoryProgress(getInventoryProgress(tenantId));
-        stats.setCriticalAlerts(getCriticalAlerts(allAssets, tenantId));
+        stats.setCriticalAlerts(getCriticalAlertsFromDb(tenantId));
 
         return stats;
     }
@@ -90,24 +158,28 @@ public class DashboardService {
     public List<AssetValueTrendDTO> getValueTrends(Integer days) {
         List<AssetValueTrendDTO> trends = new ArrayList<>();
         LocalDate today = LocalDate.now();
-        List<Asset> allAssets = getCurrentTenantAssets();
+
+        // 一次性计算资产总值，避免在循环中重复全量查询
+        String tenantId = TenantContext.getTenantId();
+        BigDecimal totalValue = BigDecimal.ZERO;
+        BigDecimal netValue = BigDecimal.ZERO;
+        if (tenantId != null && !tenantId.isBlank()) {
+            QueryWrapper<Asset> valueQw = new QueryWrapper<>();
+            valueQw.eq("tenant_id", tenantId);
+            valueQw.select("IFNULL(SUM(original_value),0) as totalValue, IFNULL(SUM(current_value),0) as netValue");
+            List<Map<String, Object>> rows = assetMapper.selectMaps(valueQw);
+            if (!rows.isEmpty()) {
+                Map<String, Object> row = rows.get(0);
+                totalValue = toBigDecimal(row.get("totalValue"));
+                netValue = toBigDecimal(row.get("netValue"));
+            }
+        }
 
         for (int i = days - 1; i >= 0; i--) {
             AssetValueTrendDTO trend = new AssetValueTrendDTO();
-            LocalDate date = today.minusDays(i);
-            trend.setDate(date);
-
-            BigDecimal totalValue = allAssets.stream()
-                    .map(Asset::getOriginalValue)
-                    .filter(Objects::nonNull)
-                    .reduce(BigDecimal.ZERO, BigDecimal::add);
-            BigDecimal currentValueSum = allAssets.stream()
-                    .map(Asset::getCurrentValue)
-                    .filter(Objects::nonNull)
-                    .reduce(BigDecimal.ZERO, BigDecimal::add);
-
+            trend.setDate(today.minusDays(i));
             trend.setTotalValue(totalValue);
-            trend.setNetValue(currentValueSum);
+            trend.setNetValue(netValue);
             trends.add(trend);
         }
 
@@ -115,25 +187,36 @@ public class DashboardService {
     }
 
     public List<DeptAssetDistributionDTO> getDeptDistribution() {
-        List<Asset> allAssets = getCurrentTenantAssets();
-
-        Map<Long, Long> deptCountMap = allAssets.stream()
-                .filter(a -> a.getDeptId() != null)
-                .collect(Collectors.groupingBy(Asset::getDeptId, Collectors.counting()));
-
-        if (deptCountMap.isEmpty()) {
+        String tenantId = TenantContext.getTenantId();
+        if (tenantId == null || tenantId.isBlank()) {
             return Collections.emptyList();
         }
 
-        Map<Long, String> deptNameMap = deptMapper.selectBatchIds(deptCountMap.keySet()).stream()
+        // 使用 SQL GROUP BY 替代全量查询 + 内存 groupBy
+        QueryWrapper<Asset> qw = new QueryWrapper<>();
+        qw.eq("tenant_id", tenantId)
+                .isNotNull("dept_id")
+                .select("dept_id, COUNT(*) as cnt")
+                .groupBy("dept_id");
+        List<Map<String, Object>> rows = assetMapper.selectMaps(qw);
+
+        if (rows.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        Set<Long> deptIds = rows.stream()
+                .map(r -> ((Number) r.get("dept_id")).longValue())
+                .collect(Collectors.toSet());
+        Map<Long, String> deptNameMap = deptMapper.selectBatchIds(deptIds).stream()
                 .collect(Collectors.toMap(Dept::getId, Dept::getName));
 
-        return deptCountMap.entrySet().stream()
-                .map(entry -> {
+        return rows.stream()
+                .map(row -> {
                     DeptAssetDistributionDTO dto = new DeptAssetDistributionDTO();
-                    dto.setDeptId(entry.getKey());
-                    dto.setDeptName(deptNameMap.getOrDefault(entry.getKey(), "未知部门"));
-                    dto.setAssetCount(entry.getValue());
+                    Long deptId = ((Number) row.get("dept_id")).longValue();
+                    dto.setDeptId(deptId);
+                    dto.setDeptName(deptNameMap.getOrDefault(deptId, "未知部门"));
+                    dto.setAssetCount(((Number) row.get("cnt")).longValue());
                     return dto;
                 })
                 .sorted(Comparator.comparing(DeptAssetDistributionDTO::getAssetCount).reversed())
@@ -144,6 +227,7 @@ public class DashboardService {
         Map<String, Object> stats = new HashMap<>();
         try {
             List<Long> tenantAssetIds = getCurrentTenantAssetIds();
+
             if (tenantAssetIds.isEmpty()) {
                 stats.put("totalMaintenanceCount", 0L);
                 stats.put("avgMaintenanceCost", BigDecimal.ZERO);
@@ -174,8 +258,7 @@ public class DashboardService {
                     new LambdaQueryWrapper<MaintenanceRecord>()
                             .in(MaintenanceRecord::getAssetId, tenantAssetIds)
                             .ge(MaintenanceRecord::getMaintenanceDate, monthStart)
-                            .le(MaintenanceRecord::getMaintenanceDate, monthEnd)
-            );
+                            .le(MaintenanceRecord::getMaintenanceDate, monthEnd));
 
             stats.put("totalMaintenanceCount", totalMaintenanceCount);
             stats.put("avgMaintenanceCost", avgMaintenanceCost);
@@ -215,38 +298,43 @@ public class DashboardService {
     }
 
     private Double getInventoryProgress(String tenantId) {
-        LambdaQueryWrapper<InventoryTask> wrapper = new LambdaQueryWrapper<>();
+        QueryWrapper<InventoryTask> wrapper = new QueryWrapper<>();
         if (tenantId != null && !tenantId.isBlank()) {
-            wrapper.eq(InventoryTask::getTenantId, tenantId);
+            wrapper.eq("tenant_id", tenantId);
         }
-
-        List<InventoryTask> tasks = inventoryTaskMapper.selectList(wrapper);
-        long totalCount = tasks.stream()
-                .map(InventoryTask::getTotalCount)
-                .filter(Objects::nonNull)
-                .mapToLong(Integer::longValue)
-                .sum();
-        long scannedCount = tasks.stream()
-                .map(InventoryTask::getScannedCount)
-                .filter(Objects::nonNull)
-                .mapToLong(Integer::longValue)
-                .sum();
+        // 使用 SQL SUM 聚合替代全量 selectList + 内存 sum
+        wrapper.select("IFNULL(SUM(total_count),0) as totalCount, IFNULL(SUM(scanned_count),0) as scannedCount");
+        List<Map<String, Object>> rows = inventoryTaskMapper.selectMaps(wrapper);
+        if (rows.isEmpty()) {
+            return 0D;
+        }
+        Map<String, Object> row = rows.get(0);
+        long totalCount = row.get("totalCount") != null ? ((Number) row.get("totalCount")).longValue() : 0L;
+        long scannedCount = row.get("scannedCount") != null ? ((Number) row.get("scannedCount")).longValue() : 0L;
         return calculateRate(scannedCount, totalCount);
     }
 
-    private Long getCriticalAlerts(List<Asset> allAssets, String tenantId) {
-        long importantMaintenanceAssets = allAssets.stream()
-                .filter(asset -> Integer.valueOf(1).equals(asset.getIsImportant()))
-                .filter(asset -> AssetStatus.MAINTENANCE.matches(asset.getStatus()))
-                .count();
+    private Long getCriticalAlertsFromDb(String tenantId) {
+        // 重要维修资产计数：is_important=1 AND status='MAINTENANCE'
+        QueryWrapper<Asset> assetQw = new QueryWrapper<>();
+        if (tenantId != null && !tenantId.isBlank()) {
+            assetQw.eq("tenant_id", tenantId);
+        }
+        assetQw.eq("is_important", 1).eq("status", "MAINTENANCE");
+        Long importantMaintenanceAssets = assetMapper.selectCount(assetQw);
 
-        LambdaQueryWrapper<WorkOrder> wrapper = new LambdaQueryWrapper<WorkOrder>()
-                .in(WorkOrder::getPriority, List.of("URGENT", "EMERGENCY"))
+        // 高优先级未完成工单计数
+        LambdaQueryWrapper<WorkOrder> woWrapper = new LambdaQueryWrapper<WorkOrder>()
+                .in(WorkOrder::getPriority, List.of("HIGH", "CRITICAL", "URGENT", "EMERGENCY"))
                 .notIn(WorkOrder::getStatus, List.of("COMPLETED", "REJECTED", "CANCELLED"));
         if (tenantId != null && !tenantId.isBlank()) {
-            wrapper.eq(WorkOrder::getTenantId, tenantId);
+            woWrapper.eq(WorkOrder::getTenantId, tenantId);
         }
-        return importantMaintenanceAssets + workOrderMapper.selectCount(wrapper);
+        Long highPriorityOrders = workOrderMapper.selectCount(woWrapper);
+
+        long important = importantMaintenanceAssets != null ? importantMaintenanceAssets : 0L;
+        long high = highPriorityOrders != null ? highPriorityOrders : 0L;
+        return important + high;
     }
 
     private Double calculateRate(long numerator, long denominator) {
@@ -259,6 +347,15 @@ public class DashboardService {
                 .doubleValue();
     }
 
+    private List<Long> getCurrentTenantAssetIds() {
+        String tenantId = TenantContext.getTenantId();
+        if (tenantId == null) return List.of();
+        return getCurrentTenantAssets().stream()
+                .map(Asset::getId)
+                .filter(Objects::nonNull)
+                .toList();
+    }
+
     private List<Asset> getCurrentTenantAssets() {
         String tenantId = TenantContext.getTenantId();
         if (tenantId == null) return List.of();
@@ -266,10 +363,9 @@ public class DashboardService {
                 .eq(Asset::getTenantId, tenantId));
     }
 
-    private List<Long> getCurrentTenantAssetIds() {
-        return getCurrentTenantAssets().stream()
-                .map(Asset::getId)
-                .filter(Objects::nonNull)
-                .toList();
+    private BigDecimal toBigDecimal(Object value) {
+        if (value == null) return BigDecimal.ZERO;
+        if (value instanceof BigDecimal) return (BigDecimal) value;
+        return new BigDecimal(value.toString());
     }
 }

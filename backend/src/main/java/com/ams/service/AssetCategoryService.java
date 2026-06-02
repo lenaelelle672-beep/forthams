@@ -2,6 +2,7 @@ package com.ams.service;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.ams.common.exception.BusinessException;
+import com.ams.common.exception.ConflictException;
 import com.ams.dto.CategoryCreateDTO;
 import com.ams.dto.CategoryUpdateDTO;
 import com.ams.entity.AssetCategory;
@@ -51,7 +52,7 @@ public class AssetCategoryService {
                 new LambdaQueryWrapper<AssetCategory>().eq(AssetCategory::getCategoryCode, createDTO.getCategoryCode())
             );
             if (existingCategory != null) {
-                throw new BusinessException("分类编码已存在");
+                throw new ConflictException("分类编码已存在");
             }
         }
 
@@ -75,7 +76,7 @@ public class AssetCategoryService {
                 .ne(AssetCategory::getId, id)
         );
         if (existingCategory != null) {
-            throw new BusinessException("分类编码已存在");
+            throw new ConflictException("分类编码已存在");
         }
 
         BeanUtil.copyProperties(updateDTO, category, "id", "createTime");

@@ -21,6 +21,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,6 +40,7 @@ import com.ams.annotation.DataScope;
 public class RetirementApplicationService {
 
     private static final Logger log = LoggerFactory.getLogger(RetirementApplicationService.class);
+    private static final int MAX_RETRY = 3;
 
     private final RetirementApplicationMapper retirementApplicationMapper;
     private final ApprovalProcessMapper approvalProcessMapper;
@@ -154,6 +156,11 @@ public class RetirementApplicationService {
 
     @DataScope(deptColumn = "dept_id", userColumn = "applicant_id")
     public Page<RetirementApplication> queryApplications(Integer page, Integer pageSize, String status, Long assetId) {
+        return queryApplications(page, pageSize, status, assetId, null, null);
+    }
+
+    @DataScope(deptColumn = "dept_id", userColumn = "applicant_id")
+    public Page<RetirementApplication> queryApplications(Integer page, Integer pageSize, String status, Long assetId, String keyword, Long deptId) {
         String tenantId = TenantContext.requireTenantId();
         Page<RetirementApplication> pageObj = new Page<>(page, pageSize);
         LambdaQueryWrapper<RetirementApplication> wrapper = new LambdaQueryWrapper<>();
@@ -164,6 +171,16 @@ public class RetirementApplicationService {
         if (assetId != null) {
             loadAssetForCurrentTenant(assetId, "queryRetirementApplications");
             wrapper.eq(RetirementApplication::getAssetId, assetId);
+        }
+        if (deptId != null) {
+            wrapper.eq(RetirementApplication::getDeptId, deptId);
+        }
+        if (keyword != null && !keyword.isBlank()) {
+            String trimmedKeyword = keyword.trim();
+            wrapper.and(w -> w.like(RetirementApplication::getApplicationNo, trimmedKeyword)
+                    .or().like(RetirementApplication::getAssetName, trimmedKeyword)
+                    .or().like(RetirementApplication::getAssetCode, trimmedKeyword)
+                    .or().like(RetirementApplication::getReason, trimmedKeyword));
         }
         wrapper.orderByDesc(RetirementApplication::getCreateTime);
         return retirementApplicationMapper.selectPage(pageObj, wrapper);
@@ -246,7 +263,7 @@ public class RetirementApplicationService {
                 operatorId);
 
         try {
-            notificationService.sendRetirementApproved(application.getId(), application.getApplicantName(), application.getAssetCode());
+            notificationService.sendRetirementApproved(application.getId(), application.getApplicantId(), application.getApplicantName(), application.getAssetCode());
         } catch (Exception e) {
             log.warn("发送退休申请审批通过通知失败", e);
         }
@@ -296,7 +313,7 @@ public class RetirementApplicationService {
                 operatorId);
 
         try {
-            notificationService.sendRetirementRejected(application.getId(), application.getApplicantName(), application.getAssetCode(), reason);
+            notificationService.sendRetirementRejected(application.getId(), application.getApplicantId(), application.getApplicantName(), application.getAssetCode(), reason);
         } catch (Exception e) {
             log.warn("发送退休申请审批拒绝通知失败", e);
         }
@@ -488,48 +505,64 @@ public class RetirementApplicationService {
         return stats;
     }
 
-    private synchronized String generateApplicationNo() {
+    private String generateApplicationNo() {
         String tenantId = TenantContext.requireTenantId();
         String prefix = "RA-" + LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")) + "-";
-        LambdaQueryWrapper<RetirementApplication> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(RetirementApplication::getTenantId, tenantId)
-                .likeRight(RetirementApplication::getApplicationNo, prefix);
-        List<RetirementApplication> applications = retirementApplicationMapper.selectList(wrapper);
 
-        int maxSuffix = 0;
-        for (RetirementApplication application : applications) {
-            String applicationNo = application.getApplicationNo();
-            if (applicationNo != null && applicationNo.startsWith(prefix)) {
-                try {
-                    maxSuffix = Math.max(maxSuffix, Integer.parseInt(applicationNo.substring(prefix.length())));
-                } catch (NumberFormatException ignored) {
-                    // Ignore malformed historical application numbers.
+        for (int attempt = 0; attempt < MAX_RETRY; attempt++) {
+            try {
+                LambdaQueryWrapper<RetirementApplication> wrapper = new LambdaQueryWrapper<>();
+                wrapper.eq(RetirementApplication::getTenantId, tenantId)
+                        .likeRight(RetirementApplication::getApplicationNo, prefix);
+                List<RetirementApplication> applications = retirementApplicationMapper.selectList(wrapper);
+
+                int maxSuffix = 0;
+                for (RetirementApplication application : applications) {
+                    String applicationNo = application.getApplicationNo();
+                    if (applicationNo != null && applicationNo.startsWith(prefix)) {
+                        try {
+                            maxSuffix = Math.max(maxSuffix, Integer.parseInt(applicationNo.substring(prefix.length())));
+                        } catch (NumberFormatException ignored) {
+                            // Ignore malformed historical application numbers.
+                        }
+                    }
                 }
+                return prefix + String.format("%04d", maxSuffix + 1);
+            } catch (DuplicateKeyException e) {
+                log.warn("application_no_conflict_retry prefix={} attempt={}", prefix, attempt + 1);
             }
         }
-        return prefix + String.format("%04d", maxSuffix + 1);
+        throw new BusinessException("编号生成失败，请稍后重试");
     }
 
-    private synchronized String generateProcessNo() {
+    private String generateProcessNo() {
         String tenantId = TenantContext.requireTenantId();
         String prefix = "APR-" + LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")) + "-";
-        LambdaQueryWrapper<ApprovalProcess> wrapper = new LambdaQueryWrapper<ApprovalProcess>()
-                .eq(ApprovalProcess::getTenantId, tenantId)
-                .likeRight(ApprovalProcess::getProcessNo, prefix);
-        List<ApprovalProcess> processes = approvalProcessMapper.selectList(wrapper);
 
-        int maxSuffix = 0;
-        for (ApprovalProcess process : processes) {
-            String processNo = process.getProcessNo();
-            if (processNo != null && processNo.startsWith(prefix)) {
-                try {
-                    maxSuffix = Math.max(maxSuffix, Integer.parseInt(processNo.substring(prefix.length())));
-                } catch (NumberFormatException ignored) {
-                    // Ignore malformed historical process numbers.
+        for (int attempt = 0; attempt < MAX_RETRY; attempt++) {
+            try {
+                LambdaQueryWrapper<ApprovalProcess> wrapper = new LambdaQueryWrapper<ApprovalProcess>()
+                        .eq(ApprovalProcess::getTenantId, tenantId)
+                        .likeRight(ApprovalProcess::getProcessNo, prefix);
+                List<ApprovalProcess> processes = approvalProcessMapper.selectList(wrapper);
+
+                int maxSuffix = 0;
+                for (ApprovalProcess process : processes) {
+                    String processNo = process.getProcessNo();
+                    if (processNo != null && processNo.startsWith(prefix)) {
+                        try {
+                            maxSuffix = Math.max(maxSuffix, Integer.parseInt(processNo.substring(prefix.length())));
+                        } catch (NumberFormatException ignored) {
+                            // Ignore malformed historical process numbers.
+                        }
+                    }
                 }
+                return prefix + String.format("%03d", maxSuffix + 1);
+            } catch (DuplicateKeyException e) {
+                log.warn("process_no_conflict_retry prefix={} attempt={}", prefix, attempt + 1);
             }
         }
-        return prefix + String.format("%03d", maxSuffix + 1);
+        throw new BusinessException("编号生成失败，请稍后重试");
     }
 
     private boolean isEditableStatus(String status) {
@@ -550,6 +583,7 @@ public class RetirementApplicationService {
         application.setAssetId(dto.getAssetId());
         application.setAssetName(asset.getAssetName());
         application.setAssetCode(asset.getAssetNo());
+        application.setDeptId(asset.getDeptId());
         application.setReason(dto.getReason());
         application.setEstimatedResidualValue(dto.getEstimatedResidualValue());
         application.setRetirementType(dto.getRetirementType());

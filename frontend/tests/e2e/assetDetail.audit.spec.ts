@@ -23,7 +23,7 @@
 import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
 import { test, Page } from '@playwright/test';
 import type { GraphifyNodeResult, GraphifyNode, AssetAuditLog } from '../../src/app/types/audit.types';
-import type { MockGraphifyNode, MockGraphifyEdge } from '../../src/mocks/assetDetail.mock';
+import type { MockGraphifyNode, MockGraphifyEdge } from '../mocks/assetDetail.mock';
 
 // Import service functions for testing
 import {
@@ -37,7 +37,7 @@ import {
   getMockGraphifyEdgesByAssetId,
   getMockAuditLogsByAssetId,
   MOCK_ASSET_IDS,
-} from '../../src/mocks/assetDetail.mock';
+} from '../mocks/assetDetail.mock';
 
 // Import formatting utilities
 import {

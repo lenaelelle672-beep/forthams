@@ -29,6 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -118,7 +119,6 @@ class ApprovalServiceTest {
     void shouldBindWorkflowSnapshotWhenCreatingManagedProcess() throws Exception {
         WorkflowDefinition definition = workflowDefinition("ASSET_TRANSFER");
         when(workflowDefinitionService.requirePublishedDefinition("ASSET_TRANSFER")).thenReturn(definition);
-        when(approvalProcessMapper.selectCount(any(QueryWrapper.class))).thenReturn(0L);
         ApprovalCreateDTO dto = new ApprovalCreateDTO();
         dto.setProcessType("ASSET_TRANSFER");
         dto.setBusinessType("ASSET_TRANSFER");
@@ -363,8 +363,7 @@ class ApprovalServiceTest {
                 workflowNode(1, "approval-1", "SUPER_ADMIN", "sequence"),
                 workflowNode(2, "approval-2", "USER", "any")
         ), "审批完成并归档");
-        when(approvalProcessMapper.selectList(any(QueryWrapper.class))).thenReturn(List.of(process));
-        when(approvalRecordMapper.selectList(any(QueryWrapper.class))).thenReturn(List.of(previousStepApproval));
+        when(approvalProcessMapper.selectPendingNotProcessed(anyString(), anyLong(), any())).thenReturn(List.of(process));
         when(workflowDefinitionService.requirePublishedRuntimePlan("ASSET_TRANSFER", process.getBusinessData())).thenReturn(plan);
         when(userRoleMapper.selectActiveUserIdsByRole("USER")).thenReturn(List.of(42L));
 
@@ -380,8 +379,7 @@ class ApprovalServiceTest {
         WorkflowDefinitionService.WorkflowRuntimePlan plan = new WorkflowDefinitionService.WorkflowRuntimePlan(List.of(
                 workflowUserNode(1, "approval-1", 99L, "sequence")
         ), "审批完成并归档");
-        when(approvalProcessMapper.selectList(any(QueryWrapper.class))).thenReturn(List.of(process));
-        when(approvalRecordMapper.selectList(any(QueryWrapper.class))).thenReturn(List.of());
+        when(approvalProcessMapper.selectPendingNotProcessed(anyString(), anyLong(), any())).thenReturn(List.of(process));
         when(workflowDefinitionService.requirePublishedRuntimePlan("ASSET_TRANSFER", process.getBusinessData())).thenReturn(plan);
 
         List<ApprovalProcess> pending = approvalService.getMyPendingApprovals(42L);
@@ -527,7 +525,7 @@ class ApprovalServiceTest {
 
         assertEquals("CANCELLED", result.getStatus());
         verify(approvalProcessMapper).updateById(process);
-        verify(workOrderService).applyApprovalOutcome(9L, "REJECTED", "流程已取消");
+        verify(workOrderService).applyApprovalOutcome(9L, "CANCELLED", "流程已取消");
     }
 
     @Test

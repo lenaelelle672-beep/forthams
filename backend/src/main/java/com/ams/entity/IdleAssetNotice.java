@@ -17,10 +17,17 @@ public class IdleAssetNotice implements Serializable {
     private String tenantId;
     private Long assetId;
     private Integer idleDays;
+    private String title;
+    private String reason;
     private LocalDate noticeDate;
+    private LocalDate claimDeadline;
     private String status;
     private Long claimantId;
     private LocalDate claimDate;
+    private String claimStatus;
+    private Long claimApprovedBy;
+    private LocalDateTime claimApprovedTime;
+    private String approvalOpinion;
     private Long createBy;
 
     @TableField(fill = FieldFill.INSERT)

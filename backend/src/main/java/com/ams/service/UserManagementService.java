@@ -3,6 +3,7 @@ package com.ams.service;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.convert.Convert;
 import com.ams.common.exception.BusinessException;
+import com.ams.common.exception.ConflictException;
 import com.ams.dto.UserCreateDTO;
 import com.ams.dto.UserUpdateDTO;
 import com.ams.entity.Role;
@@ -21,10 +22,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 public class UserManagementService {
@@ -51,6 +55,11 @@ public class UserManagementService {
     }
 
     public Page<User> queryUsers(Integer page, Integer pageSize, String keyword, Long deptId, Integer status) {
+        return queryUsers(page, pageSize, keyword, deptId, status, null, null, null);
+    }
+
+    public Page<User> queryUsers(Integer page, Integer pageSize, String keyword, Long deptId, Integer status,
+                                 List<Long> roleIds, LocalDate createTimeStart, LocalDate createTimeEnd) {
         Page<User> pager = new Page<>(page, pageSize);
         QueryWrapper<User> wrapper = new QueryWrapper<>();
 
@@ -68,6 +77,22 @@ public class UserManagementService {
         }
         if (status != null) {
             wrapper.eq("status", status);
+        }
+        if (roleIds != null && !roleIds.isEmpty()) {
+            String roleIdSql = roleIds.stream()
+                    .filter(Objects::nonNull)
+                    .distinct()
+                    .map(String::valueOf)
+                    .collect(Collectors.joining(","));
+            if (!roleIdSql.isBlank()) {
+                wrapper.inSql("id", "SELECT ur.user_id FROM sys_user_role ur WHERE ur.role_id IN (" + roleIdSql + ")");
+            }
+        }
+        if (createTimeStart != null) {
+            wrapper.ge("create_time", createTimeStart.atStartOfDay());
+        }
+        if (createTimeEnd != null) {
+            wrapper.lt("create_time", createTimeEnd.plusDays(1).atStartOfDay());
         }
 
         wrapper.orderByDesc("create_time");
@@ -90,7 +115,7 @@ public class UserManagementService {
                 .like("phone", keyword));
         }
         wrapper.select("id", "username", "real_name", "email", "phone", "dept_id", "status")
-               .last("limit 200");
+               .last("limit 50");
         List<User> users = userMapper.selectList(wrapper);
         users.forEach(user -> BeanUtil.setProperty(user, "password", null));
         return users;
@@ -160,7 +185,7 @@ public class UserManagementService {
             new QueryWrapper<User>().eq("username", getStrProp(dto, "username"))
         );
         if (existingUser != null) {
-            throw new BusinessException("用户名已存在");
+            throw new BusinessException(400, "用户名已存在");
         }
 
         User user = new User();

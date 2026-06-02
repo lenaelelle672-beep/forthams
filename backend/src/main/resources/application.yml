@@ -6,6 +6,10 @@ server:
       charset: UTF-8
       enabled: true
       force: true
+  error:
+    include-stacktrace: never
+    include-exception: false
+    include-binding-errors: never
 
 spring:
   application:

@@ -5,6 +5,7 @@ import com.ams.context.TenantContext;
 import com.ams.entity.SystemConfig;
 import com.ams.mapper.SystemConfigMapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +31,85 @@ public class SystemConfigService {
     public static final String GROUP_SYSTEM = "SYSTEM";
     /** 安全配置分组 */
     public static final String GROUP_SECURITY = "SECURITY";
+
+    public Page<SystemConfig> getPage(Integer page, Integer pageSize, String configName, String configKey) {
+        String tenantId = TenantContext.requireTenantId();
+        QueryWrapper<SystemConfig> wrapper = new QueryWrapper<SystemConfig>()
+                .eq("tenant_id", tenantId);
+        if (configName != null && !configName.isBlank()) {
+            wrapper.like("config_name", configName);
+        }
+        if (configKey != null && !configKey.isBlank()) {
+            wrapper.like("config_key", configKey);
+        }
+        wrapper.orderByDesc("update_time");
+        return systemConfigMapper.selectPage(new Page<>(page == null ? 1 : page, pageSize == null ? 10 : pageSize), wrapper);
+    }
+
+    public SystemConfig getById(Long id) {
+        String tenantId = TenantContext.requireTenantId();
+        SystemConfig config = systemConfigMapper.selectOne(new QueryWrapper<SystemConfig>()
+                .eq("tenant_id", tenantId)
+                .eq("id", id)
+                .last("limit 1"));
+        if (config == null) {
+            throw new BusinessException("系统参数不存在");
+        }
+        return config;
+    }
+
+    public SystemConfig getByKey(String key) {
+        String tenantId = TenantContext.requireTenantId();
+        SystemConfig config = systemConfigMapper.selectOne(new QueryWrapper<SystemConfig>()
+                .eq("tenant_id", tenantId)
+                .eq("config_key", key)
+                .last("limit 1"));
+        if (config == null) {
+            throw new BusinessException("系统参数不存在");
+        }
+        return config;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public SystemConfig create(SystemConfig config) {
+        String tenantId = TenantContext.requireTenantId();
+        config.setTenantId(tenantId);
+        if (config.getConfigGroup() == null || config.getConfigGroup().isBlank()) {
+            config.setConfigGroup(GROUP_SYSTEM);
+        }
+        if (config.getConfigType() == null || config.getConfigType().isBlank()) {
+            config.setConfigType("N");
+        }
+        if (config.getStatus() == null) {
+            config.setStatus(0);
+        }
+        systemConfigMapper.insert(config);
+        return config;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public SystemConfig update(Long id, SystemConfig config) {
+        SystemConfig existing = getById(id);
+        if (config.getConfigGroup() != null) existing.setConfigGroup(config.getConfigGroup());
+        if (config.getConfigKey() != null) existing.setConfigKey(config.getConfigKey());
+        if (config.getConfigValue() != null) existing.setConfigValue(config.getConfigValue());
+        if (config.getConfigName() != null) existing.setConfigName(config.getConfigName());
+        if (config.getConfigType() != null) existing.setConfigType(config.getConfigType());
+        if (config.getRemark() != null) existing.setRemark(config.getRemark());
+        if (config.getStatus() != null) existing.setStatus(config.getStatus());
+        systemConfigMapper.updateById(existing);
+        return existing;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void delete(Long id) {
+        getById(id);
+        systemConfigMapper.deleteById(id);
+    }
+
+    public void refreshCache() {
+        // 当前配置服务直接读库，保留接口用于前端“刷新缓存”操作兼容。
+    }
 
     /**
      * 获取指定分组的全部配置（Map 形式）。
@@ -80,6 +160,9 @@ public class SystemConfigService {
                     config.setConfigGroup(configGroup);
                     config.setConfigKey(entry.getKey());
                     config.setConfigValue(entry.getValue());
+                    config.setConfigName(entry.getKey());
+                    config.setConfigType("N");
+                    config.setStatus(0);
                     return config;
                 })
                 .collect(Collectors.toList());

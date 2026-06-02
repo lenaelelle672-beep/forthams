@@ -33,6 +33,18 @@ public class SystemConfig implements Serializable {
     /** 配置值 */
     private String configValue;
 
+    /** 参数名称 */
+    private String configName;
+
+    /** 系统内置(Y)/自定义(N) */
+    private String configType;
+
+    /** 备注 */
+    private String remark;
+
+    /** 状态：0=正常，1=停用 */
+    private Integer status;
+
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;
 

@@ -117,14 +117,21 @@ public class AssetService {
         String tenantId = TenantContext.requireTenantId();
         Asset asset = getAssetById(id);
         String requestedStatus = updateDTO.getStatus();
+        AssetStatus requestedAssetStatus = null;
+        if (requestedStatus != null && !requestedStatus.isBlank()) {
+            requestedAssetStatus = parseStatus(requestedStatus);
+            if (requestedAssetStatus.isTerminal()) {
+                throw new BusinessException("资产终态需通过审批流程变更");
+            }
+        }
 
         BeanUtil.copyProperties(updateDTO, asset, "id", "assetNo", "createBy", "createTime", "status");
 
         assetMapper.update(asset, assetById(id, tenantId));
-        if (requestedStatus != null && !requestedStatus.isBlank()) {
+        if (requestedAssetStatus != null) {
             return assetLifecycleService.transitionLoadedAsset(
                     asset,
-                    parseStatus(requestedStatus),
+                    requestedAssetStatus,
                     AssetLifecycleService.CHANGE_TYPE_STATUS,
                     "资产状态更新",
                     null,

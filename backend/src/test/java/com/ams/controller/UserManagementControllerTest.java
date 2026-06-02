@@ -26,6 +26,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import com.ams.common.exception.ConflictException;
 
 @SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
@@ -51,7 +52,7 @@ class UserManagementControllerTest {
         u1.setUsername("admin");
         mockPage.setRecords(List.of(u1));
 
-        when(userManagementService.queryUsers(anyInt(), anyInt(), any(), any(), any())).thenReturn(mockPage);
+        when(userManagementService.queryUsers(anyInt(), anyInt(), any(), any(), any(), any(), any(), any())).thenReturn(mockPage);
 
         mockMvc.perform(get("/user-management/list")
                 .param("page", "1")
@@ -60,7 +61,7 @@ class UserManagementControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.code").value(200));
 
-        verify(userManagementService).queryUsers(1, 10, null, null, null);
+        verify(userManagementService).queryUsers(1, 10, null, null, null, null, null, null);
     }
 
     @Test
@@ -165,4 +166,25 @@ class UserManagementControllerTest {
 
         verify(userManagementService).resetPassword(1L);
     }
+
+    @Test
+    @DisplayName("Should return 409 when creating with duplicate username")
+    void testCreateWithDuplicateUsername() throws Exception {
+        UserCreateDTO dto = new UserCreateDTO();
+        dto.setUsername("existinguser");
+        dto.setPassword("password123");
+
+        when(userManagementService.createUser(any(UserCreateDTO.class)))
+                .thenThrow(new ConflictException("用户名已存在"));
+
+        mockMvc.perform(post("/user-management")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dto)))
+            .andExpect(status().isConflict())
+            .andExpect(jsonPath("$.code").value(409))
+            .andExpect(jsonPath("$.message").value("用户名已存在"));
+
+        verify(userManagementService).createUser(any(UserCreateDTO.class));
+    }
+
 }

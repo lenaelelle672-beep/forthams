@@ -75,7 +75,7 @@ class NotificationControllerTest {
         process.setProcessType("WORK_ORDER");
         process.setApplyTime(LocalDateTime.of(2026, 5, 19, 8, 0));
 
-        when(approvalService.getMyPendingApprovals(eq(42L))).thenReturn(List.of(process));
+        when(approvalService.getMyPendingApprovals(eq(42L), any())).thenReturn(List.of(process));
 
         mockMvc.perform(get("/api/notifications/pending")
                         .contextPath("/api"))
@@ -86,7 +86,7 @@ class NotificationControllerTest {
                 .andExpect(jsonPath("$.data.items[0].type").value("work_order"))
                 .andExpect(jsonPath("$.data.items[0].title").value("APR-001"));
 
-        verify(approvalService).getMyPendingApprovals(42L);
+        verify(approvalService).getMyPendingApprovals(eq(42L), any());
     }
 
     @Test

@@ -55,6 +55,7 @@ public class PostService {
     public SysPost create(SysPost post) {
         if (post.getSortOrder() == null) post.setSortOrder(0);
         if (post.getStatus() == null) post.setStatus(1);
+        validatePostCodeUnique(post.getPostCode(), null);
         sysPostMapper.insert(post);
         securityUserCacheService.evictAll();
         return post;
@@ -63,7 +64,10 @@ public class PostService {
     @Transactional(rollbackFor = Exception.class)
     public SysPost update(Long id, SysPost updates) {
         SysPost post = getById(id);
-        if (updates.getPostCode() != null) post.setPostCode(updates.getPostCode());
+        if (updates.getPostCode() != null) {
+            validatePostCodeUnique(updates.getPostCode(), id);
+            post.setPostCode(updates.getPostCode());
+        }
         if (updates.getPostName() != null) post.setPostName(updates.getPostName());
         if (updates.getSortOrder() != null) post.setSortOrder(updates.getSortOrder());
         if (updates.getStatus() != null) post.setStatus(updates.getStatus());
@@ -76,6 +80,10 @@ public class PostService {
     @Transactional(rollbackFor = Exception.class)
     public void delete(Long id) {
         getById(id);
+        int userCount = sysUserPostMapper.countByPostId(id);
+        if (userCount > 0) {
+            throw new BusinessException("该岗位下存在" + userCount + "个关联用户，无法删除");
+        }
         sysPostMapper.deleteById(id);
         securityUserCacheService.evictAll();
     }
@@ -96,5 +104,17 @@ public class PostService {
             }
         }
         securityUserCacheService.evictAll();
+    }
+
+    private void validatePostCodeUnique(String postCode, Long excludeId) {
+        QueryWrapper<SysPost> wrapper = new QueryWrapper<>();
+        wrapper.eq("post_code", postCode);
+        if (excludeId != null) {
+            wrapper.ne("id", excludeId);
+        }
+        SysPost existing = sysPostMapper.selectOne(wrapper);
+        if (existing != null) {
+            throw new BusinessException("岗位编码「" + postCode + "」已存在");
+        }
     }
 }

@@ -85,7 +85,7 @@ class ApprovalControllerTest {
     @DisplayName("Should query pending approvals with user id from JWT")
     void pendingUsesJwtUserId() throws Exception {
         when(jwtUtil.getUserIdFromToken("test-token")).thenReturn(42L);
-        when(approvalService.getMyPendingApprovals(eq(42L))).thenReturn(List.of());
+        when(approvalService.getMyPendingApprovals(eq(42L), any())).thenReturn(List.of());
 
         mockMvc.perform(get("/api/approvals/pending")
                         .contextPath("/api")
@@ -93,13 +93,13 @@ class ApprovalControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200));
 
-        verify(approvalService).getMyPendingApprovals(42L);
+        verify(approvalService).getMyPendingApprovals(eq(42L), any());
     }
 
     @Test
     @DisplayName("Should list approvals with processType filter")
     void listWithProcessTypeFilter() throws Exception {
-        when(approvalService.queryProcesses(eq(1), eq(10), eq(null), eq("WORK_ORDER"), eq(null)))
+        when(approvalService.queryProcesses(eq(1), eq(10), eq(null), eq("WORK_ORDER"), eq(null), eq(null)))
                 .thenReturn(new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>());
 
         mockMvc.perform(get("/api/approvals/list")
@@ -108,7 +108,22 @@ class ApprovalControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200));
 
-        verify(approvalService).queryProcesses(1, 10, null, "WORK_ORDER", null);
+        verify(approvalService).queryProcesses(1, 10, null, "WORK_ORDER", null, null);
+    }
+
+    @Test
+    @DisplayName("Should pass keyword to approval query service")
+    void listPassesKeywordFilter() throws Exception {
+        when(approvalService.queryProcesses(eq(1), eq(10), eq(null), eq(null), eq(null), eq("WO-001")))
+                .thenReturn(new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>());
+
+        mockMvc.perform(get("/api/approvals/list")
+                        .contextPath("/api")
+                        .param("keyword", "WO-001"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200));
+
+        verify(approvalService).queryProcesses(1, 10, null, null, null, "WO-001");
     }
 
     @Test

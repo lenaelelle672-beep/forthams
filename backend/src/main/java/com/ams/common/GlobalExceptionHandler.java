@@ -1,7 +1,9 @@
 package com.ams.common;
 
 import com.ams.common.exception.BusinessException;
+import com.ams.common.exception.ConflictException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.BindException;
@@ -17,8 +19,22 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(DuplicateKeyException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Result<Void> handleDuplicateKeyException(DuplicateKeyException e) {
+        log.warn("唯一约束冲突（映射为 400）: {}", e.getMessage());
+        return Result.error(400, "数据重复，请检查输入");
+    }
+
+    @ExceptionHandler(ConflictException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public Result<Void> handleConflictException(ConflictException e) {
+        log.error("Conflict exception: {}", e.getMessage());
+        return Result.error(409, e.getMessage());
+    }
+
     @ExceptionHandler(BusinessException.class)
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Result<Void> handleBusinessException(BusinessException e) {
         log.error("Business exception: {}", e.getMessage());
         return Result.error(e.getCode(), e.getMessage());

@@ -61,10 +61,15 @@ class DashboardServiceTest {
     void getGlobalStats_returnsAllTenantsAggregated() {
         Asset a1 = new Asset(); a1.setTenantId("T001"); a1.setStatus("IN_USE"); a1.setOriginalValue(BigDecimal.valueOf(1000)); a1.setCurrentValue(BigDecimal.valueOf(800)); a1.setCategoryId(1L);
         Asset a2 = new Asset(); a2.setTenantId("T002"); a2.setStatus("IDLE"); a2.setOriginalValue(BigDecimal.valueOf(2000)); a2.setCurrentValue(BigDecimal.valueOf(1500)); a2.setCategoryId(2L);
-        when(assetMapper.selectList(any(LambdaQueryWrapper.class))).thenReturn(List.of(a1, a2));
+        when(assetMapper.selectCount(any(LambdaQueryWrapper.class))).thenReturn(2L);
+        when(assetMapper.selectMaps(any(QueryWrapper.class)))
+                .thenReturn(List.of(Map.of("status","IN_USE","cnt",1L), Map.of("status","IDLE","cnt",1L)))
+                .thenReturn(List.of(Map.of("totalValue", BigDecimal.valueOf(3000), "netValue", BigDecimal.valueOf(2300))))
+                .thenReturn(List.of(Map.of("category_id",1L,"cnt",1L), Map.of("category_id",2L,"cnt",1L)));
         when(approvalProcessMapper.selectCount(any(LambdaQueryWrapper.class))).thenReturn(3L);
         when(workOrderMapper.selectCount(any(LambdaQueryWrapper.class))).thenReturn(1L);
-        when(inventoryTaskMapper.selectList(any(LambdaQueryWrapper.class))).thenReturn(List.of());
+        when(inventoryTaskMapper.selectMaps(any(QueryWrapper.class)))
+                .thenReturn(List.of(Map.of("totalCount",0L,"scannedCount",0L)));
 
         DashboardStatsDTO result = dashboardService.getGlobalStats();
 
@@ -82,10 +87,15 @@ class DashboardServiceTest {
     @Test
     void getStats_returnsCurrentTenantStats() {
         Asset asset = new Asset(); asset.setTenantId("T001"); asset.setStatus("IN_USE"); asset.setOriginalValue(BigDecimal.valueOf(1000)); asset.setCurrentValue(BigDecimal.valueOf(800)); asset.setCategoryId(1L);
-        when(assetMapper.selectList(any(LambdaQueryWrapper.class))).thenReturn(List.of(asset));
+        when(assetMapper.selectCount(any(LambdaQueryWrapper.class))).thenReturn(1L);
+        when(assetMapper.selectMaps(any(QueryWrapper.class)))
+                .thenReturn(List.of(Map.of("status","IN_USE","cnt",1L)))
+                .thenReturn(List.of(Map.of("totalValue", BigDecimal.valueOf(1000), "netValue", BigDecimal.valueOf(800))))
+                .thenReturn(List.of(Map.of("category_id",1L,"cnt",1L)));
         when(approvalProcessMapper.selectCount(any(LambdaQueryWrapper.class))).thenReturn(2L);
         when(workOrderMapper.selectCount(any(LambdaQueryWrapper.class))).thenReturn(0L);
-        when(inventoryTaskMapper.selectList(any(LambdaQueryWrapper.class))).thenReturn(List.of());
+        when(inventoryTaskMapper.selectMaps(any(QueryWrapper.class)))
+                .thenReturn(List.of(Map.of("totalCount",0L,"scannedCount",0L)));
 
         DashboardStatsDTO result = dashboardService.getStats();
 
@@ -104,8 +114,8 @@ class DashboardServiceTest {
 
     @Test
     void getValueTrends_returnsDailyTrends() {
-        Asset asset = new Asset(); asset.setTenantId("T001"); asset.setStatus("IN_USE"); asset.setOriginalValue(BigDecimal.valueOf(1000)); asset.setCurrentValue(BigDecimal.valueOf(800)); asset.setCategoryId(1L);
-        when(assetMapper.selectList(any(LambdaQueryWrapper.class))).thenReturn(List.of(asset));
+        when(assetMapper.selectMaps(any(QueryWrapper.class)))
+                .thenReturn(List.of(Map.of("totalValue", BigDecimal.valueOf(1000), "netValue", BigDecimal.valueOf(800))));
 
         var result = dashboardService.getValueTrends(3);
 
@@ -118,10 +128,10 @@ class DashboardServiceTest {
 
     @Test
     void getDeptDistribution_returnsSortedByAssetCount() {
-        Asset a1 = new Asset(); a1.setTenantId("T001"); a1.setStatus("IN_USE"); a1.setDeptId(10L);
-        Asset a2 = new Asset(); a2.setTenantId("T001"); a2.setStatus("IDLE"); a2.setDeptId(20L);
-        Asset a3 = new Asset(); a3.setTenantId("T001"); a3.setStatus("IDLE"); a3.setDeptId(20L);
-        when(assetMapper.selectList(any(LambdaQueryWrapper.class))).thenReturn(List.of(a1, a2, a3));
+        when(assetMapper.selectMaps(any(QueryWrapper.class)))
+                .thenReturn(List.of(
+                        Map.of("dept_id",10L,"cnt",1L),
+                        Map.of("dept_id",20L,"cnt",2L)));
         lenient().when(deptMapper.selectBatchIds(any())).thenReturn(
                 List.of(createDept(10L, "研发部"), createDept(20L, "生产部"))
         );
@@ -137,8 +147,7 @@ class DashboardServiceTest {
 
     @Test
     void getDeptDistribution_whenNoDept_returnsEmpty() {
-        Asset asset = new Asset(); asset.setTenantId("T001"); asset.setStatus("IN_USE");
-        when(assetMapper.selectList(any(LambdaQueryWrapper.class))).thenReturn(List.of(asset));
+        when(assetMapper.selectMaps(any(QueryWrapper.class))).thenReturn(List.of());
 
         assertTrue(dashboardService.getDeptDistribution().isEmpty());
     }
@@ -188,13 +197,15 @@ class DashboardServiceTest {
 
     @Test
     void buildStats_inventoryProgressCalculatesRate() {
-        Asset asset = new Asset(); asset.setTenantId("T001"); asset.setStatus("IN_USE"); asset.setCategoryId(1L);
-        when(assetMapper.selectList(any(LambdaQueryWrapper.class))).thenReturn(List.of(asset));
+        when(assetMapper.selectCount(any(LambdaQueryWrapper.class))).thenReturn(1L);
+        when(assetMapper.selectMaps(any(QueryWrapper.class)))
+                .thenReturn(List.of(Map.of("status","IN_USE","cnt",1L)))
+                .thenReturn(List.of(Map.of("totalValue", BigDecimal.valueOf(0), "netValue", BigDecimal.valueOf(0))))
+                .thenReturn(List.of(Map.of("category_id",1L,"cnt",1L)));
         when(approvalProcessMapper.selectCount(any(LambdaQueryWrapper.class))).thenReturn(0L);
         when(workOrderMapper.selectCount(any(LambdaQueryWrapper.class))).thenReturn(0L);
-        InventoryTask task = new InventoryTask();
-        task.setTotalCount(100); task.setScannedCount(35);
-        when(inventoryTaskMapper.selectList(any(LambdaQueryWrapper.class))).thenReturn(List.of(task));
+        when(inventoryTaskMapper.selectMaps(any(QueryWrapper.class)))
+                .thenReturn(List.of(Map.of("totalCount",100L,"scannedCount",35L)));
 
         DashboardStatsDTO result = dashboardService.getGlobalStats();
 
@@ -203,12 +214,17 @@ class DashboardServiceTest {
 
     @Test
     void buildStats_criticalAlertsCountsImportantMaintenanceAndUrgentWorkOrders() {
-        Asset a1 = new Asset(); a1.setTenantId("T001"); a1.setStatus("MAINTENANCE"); a1.setCategoryId(1L); a1.setIsImportant(1);
-        Asset a2 = new Asset(); a2.setTenantId("T001"); a2.setStatus("IN_USE"); a2.setCategoryId(2L); a2.setIsImportant(0);
-        when(assetMapper.selectList(any(LambdaQueryWrapper.class))).thenReturn(List.of(a1, a2));
+        when(assetMapper.selectCount(any(LambdaQueryWrapper.class))).thenReturn(2L);
+        when(assetMapper.selectMaps(any(QueryWrapper.class)))
+                .thenReturn(List.of(Map.of("status","MAINTENANCE","cnt",1L), Map.of("status","IN_USE","cnt",1L)))
+                .thenReturn(List.of(Map.of("totalValue", BigDecimal.valueOf(0), "netValue", BigDecimal.valueOf(0))))
+                .thenReturn(List.of(Map.of("category_id",1L,"cnt",1L), Map.of("category_id",2L,"cnt",1L)));
         when(approvalProcessMapper.selectCount(any(LambdaQueryWrapper.class))).thenReturn(0L);
         when(workOrderMapper.selectCount(any(LambdaQueryWrapper.class))).thenReturn(3L);
-        when(inventoryTaskMapper.selectList(any(LambdaQueryWrapper.class))).thenReturn(List.of());
+        when(inventoryTaskMapper.selectMaps(any(QueryWrapper.class)))
+                .thenReturn(List.of(Map.of("totalCount",0L,"scannedCount",0L)));
+        // Mock selectCount for isImportant=1 AND status='MAINTENANCE' (critical alerts - asset part)
+        when(assetMapper.selectCount(any(QueryWrapper.class))).thenReturn(1L);
 
         DashboardStatsDTO result = dashboardService.getGlobalStats();
 

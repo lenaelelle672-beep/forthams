@@ -1,8 +1,0 @@
-{
-  "iteration": 1,
-  "review_verdict": "PARTIAL",
-  "gap_fingerprint": "ac2-clearance-evidence|ac5-tenant-strategy|ac6-field-alignment",
-  "repair_action": "gai2-builder 编写测试脚本 scripts/test_workflow_e2e.py",
-  "repair_summary": "生成 999 行 Python 测试脚本，覆盖 7 个测试用例（4 流程端到端 + 3 个 reviewer 缺口补全）。脚本语法检查通过。",
-  "timestamp": "2026-05-26T10:22:00Z"
-}

@@ -68,12 +68,16 @@ public class RetirementController {
             @RequestParam(defaultValue = "10") Integer pageSize,
             @RequestParam(required = false) String status,
             @RequestParam(required = false) Long assetId,
-            @RequestParam(name = "asset_id", required = false) Long assetIdAlias) {
+            @RequestParam(name = "asset_id", required = false) Long assetIdAlias,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) Long deptId) {
         return Result.success(retirementApplicationService.queryApplications(
                 page,
                 pageSize,
                 status,
-                assetId != null ? assetId : assetIdAlias));
+                assetId != null ? assetId : assetIdAlias,
+                keyword,
+                deptId));
     }
 
     @PreAuthorize("@ss.hasPermi('asset:retirement:query')")
@@ -177,12 +181,14 @@ public class RetirementController {
             @RequestParam(defaultValue = "10") Integer pageSize,
             @RequestParam(required = false) String status,
             @RequestParam(required = false) Long assetId,
-            @RequestParam(name = "asset_id", required = false) Long assetIdAlias) {
+            @RequestParam(name = "asset_id", required = false) Long assetIdAlias,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) Long deptId) {
         Long resolvedAssetId = assetId != null ? assetId : assetIdAlias;
         if (resolvedAssetId != null) {
             return Result.success(retirementApplicationService.getAssetRetirementHistory(resolvedAssetId));
         }
-        return Result.success(retirementApplicationService.queryApplications(page, pageSize, status, null));
+        return Result.success(retirementApplicationService.queryApplications(page, pageSize, status, null, keyword, deptId));
     }
 
     @PreAuthorize("@ss.hasPermi('asset:retirement:query')")

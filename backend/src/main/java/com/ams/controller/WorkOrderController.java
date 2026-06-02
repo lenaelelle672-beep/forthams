@@ -64,7 +64,7 @@ public class WorkOrderController {
         return Result.success(workOrderService.submitWorkOrder(id));
     }
 
-    @PreAuthorize("@ss.hasPermi('workorder:order:operate')")
+    @PreAuthorize("@ss.hasPermi('workorder:order:submit')")
     @PostMapping("/{id}/operate")
     public Result<WorkOrder> operateWorkOrder(@PathVariable Long id, @RequestBody Map<String, String> body) {
         String operation = body.get("operation");
@@ -72,13 +72,13 @@ public class WorkOrderController {
         return Result.success(workOrderService.operateWorkOrder(id, operation, comment));
     }
 
-    @PreAuthorize("@ss.hasPermi('workorder:order:operate')")
+    @PreAuthorize("@ss.hasPermi('workorder:order:approve')")
     @PostMapping("/{id}/approve")
     public Result<WorkOrder> approveWorkOrder(@PathVariable Long id, @RequestBody(required = false) Map<String, String> body) {
         return operateWorkOrder(id, "approve", body);
     }
 
-    @PreAuthorize("@ss.hasPermi('workorder:order:operate')")
+    @PreAuthorize("@ss.hasPermi('workorder:order:reject')")
     @PostMapping("/{id}/reject")
     public Result<WorkOrder> rejectWorkOrder(@PathVariable Long id, @RequestBody(required = false) Map<String, String> body) {
         return operateWorkOrder(id, "reject", body);

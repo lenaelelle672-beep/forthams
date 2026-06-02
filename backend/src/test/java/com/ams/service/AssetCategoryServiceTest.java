@@ -1,5 +1,8 @@
 package com.ams.service;
 
+import com.ams.common.exception.ConflictException;
+import com.ams.dto.CategoryCreateDTO;
+import com.ams.dto.CategoryUpdateDTO;
 import com.ams.dto.CategoryTreeDTO;
 import com.ams.entity.AssetCategory;
 import com.ams.mapper.AssetCategoryMapper;
@@ -27,6 +30,22 @@ class AssetCategoryServiceTest {
     private AssetCategoryService assetCategoryService;
 
     @Test
+    void createCategoryShouldRejectDuplicateCategoryCode() {
+        AssetCategory existingCategory = new AssetCategory();
+        existingCategory.setId(1L);
+        existingCategory.setCategoryCode("CAT001");
+        when(assetCategoryMapper.selectOne(any(LambdaQueryWrapper.class))).thenReturn(existingCategory);
+
+        CategoryCreateDTO dto = new CategoryCreateDTO();
+        dto.setCategoryName("重复分类");
+        dto.setCategoryCode("CAT001");
+
+        ConflictException ex = assertThrows(ConflictException.class, () -> assetCategoryService.createCategory(dto));
+
+        assertEquals("分类编码已存在", ex.getMessage());
+    }
+
+    @Test
     void testGetCategoryTree() {
         // [弹坑重构区] Mock 数据库返回那些因为长年堆积而乱七八糟没有层级的线性分类返回集
         AssetCategory root = new AssetCategory();
@@ -50,4 +69,27 @@ class AssetCategoryServiceTest {
         assertEquals(1, tree.get(0).getChildren().size(), "子节点没有被吸入挂载！");
         assertEquals("机甲核心舱", tree.get(0).getChildren().get(0).getCategoryName(), "挂载的是什么垃圾！错误！");
     }
+
+    @Test
+    void updateCategoryShouldRejectDuplicateCategoryCode() {
+        AssetCategory existingCategory = new AssetCategory();
+        existingCategory.setId(1L);
+        existingCategory.setCategoryCode("CAT001");
+
+        AssetCategory conflictingCategory = new AssetCategory();
+        conflictingCategory.setId(2L);
+        conflictingCategory.setCategoryCode("CAT001");
+
+        when(assetCategoryMapper.selectById(1L)).thenReturn(existingCategory);
+        when(assetCategoryMapper.selectOne(any(LambdaQueryWrapper.class))).thenReturn(conflictingCategory);
+
+        CategoryUpdateDTO dto = new CategoryUpdateDTO();
+        dto.setCategoryCode("CAT001");
+
+        ConflictException ex = assertThrows(ConflictException.class,
+            () -> assetCategoryService.updateCategory(1L, dto));
+
+        assertEquals("分类编码已存在", ex.getMessage());
+    }
+
 }

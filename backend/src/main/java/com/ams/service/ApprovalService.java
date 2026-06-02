@@ -24,6 +24,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DuplicateKeyException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,6 +40,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -95,7 +98,7 @@ public class ApprovalService {
      * @return 分页审批流程结果
      */
     @DataScope(userColumn = "applicant_id")
-    public Page<ApprovalProcess> queryProcesses(Integer page, Integer pageSize, String status, String processType, Long applicantId) {
+    public Page<ApprovalProcess> queryProcesses(Integer page, Integer pageSize, String status, String processType, Long applicantId, String keyword) {
         String tenantId = TenantContext.requireTenantId();
         Page<ApprovalProcess> pageParam = new Page<>(page, pageSize);
         QueryWrapper<ApprovalProcess> wrapper = new QueryWrapper<>();
@@ -109,6 +112,12 @@ public class ApprovalService {
         }
         if (applicantId != null) {
             wrapper.eq("applicant_id", applicantId);
+        }
+        if (keyword != null && !keyword.isBlank()) {
+            String trimmedKeyword = keyword.trim();
+            wrapper.and(w -> w.like("process_no", trimmedKeyword)
+                    .or().like("process_type", trimmedKeyword)
+                    .or().like("business_data", trimmedKeyword));
         }
         wrapper.orderByDesc("create_time");
 
@@ -174,12 +183,22 @@ public class ApprovalService {
         ApprovalProcess process = new ApprovalProcess();
         BeanUtil.copyProperties(dto, process);
         BeanUtil.setProperty(process, "tenantId", tenantId);
-        BeanUtil.setProperty(process, "processNo", generateProcessNo());
         BeanUtil.setProperty(process, "status", "PENDING");
         BeanUtil.setProperty(process, "currentStep", 1);
         BeanUtil.setProperty(process, "applyTime", LocalDateTime.now());
 
-        approvalProcessMapper.insert(process);
+        int retries = 3;
+        while (retries > 0) {
+            try {
+                BeanUtil.setProperty(process, "processNo", generateProcessNo());
+                approvalProcessMapper.insert(process);
+                break;
+            } catch (DataIntegrityViolationException e) {
+                retries--;
+                if (retries == 0) throw e;
+                log.warn("approval_process_no_conflict_retrying: remaining={}", retries);
+            }
+        }
         return process;
     }
 
@@ -278,38 +297,42 @@ public class ApprovalService {
      * @return 未被该审批人处理过的待审批流程列表
      */
     public List<ApprovalProcess> getMyPendingApprovals(Long approverId) {
-        String tenantId = TenantContext.requireTenantId();
-        List<ApprovalProcess> pendingList = approvalProcessMapper.selectList(
-            new QueryWrapper<ApprovalProcess>()
-                .eq("tenant_id", tenantId)
-                .eq("status", "PENDING")
-                .orderByDesc("create_time")
-        );
+        return getMyPendingApprovals(approverId, new Page<>(1, 100));
+    }
 
-        if (approverId == null || pendingList.isEmpty()) {
+    /**
+     * 获取指定审批人待审批的流程列表（分页版本）。
+     *
+     * <p>使用 NOT EXISTS 子查询排除该审批人已经处理过的流程，
+     * 避免全量查询+内存过滤导致 OOM。
+     *
+     * @param approverId 审批人 ID
+     * @param page       分页参数
+     * @return 未被该审批人处理过的待审批流程列表
+     */
+    public List<ApprovalProcess> getMyPendingApprovals(Long approverId, Page<ApprovalProcess> page) {
+        String tenantId = TenantContext.requireTenantId();
+
+        if (approverId == null) {
+            Page<ApprovalProcess> result = approvalProcessMapper.selectPage(page,
+                new QueryWrapper<ApprovalProcess>()
+                    .eq("tenant_id", tenantId)
+                    .eq("status", "PENDING")
+                    .orderByDesc("create_time")
+            );
+            return result.getRecords();
+        }
+
+        // 使用 NOT EXISTS 子查询排除已审批过的流程
+        List<ApprovalProcess> pendingList = approvalProcessMapper.selectPendingNotProcessed(tenantId, approverId, page);
+        if (pendingList.isEmpty()) {
             return pendingList;
         }
 
-        List<ApprovalRecord> myRecords = approvalRecordMapper.selectList(
-            new QueryWrapper<ApprovalRecord>()
-                .eq("tenant_id", tenantId)
-                .eq("approver_id", approverId)
-        );
-
-        Set<String> processedStepKeys = (myRecords == null ? List.<ApprovalRecord>of() : myRecords).stream()
-            .map(item -> stepKey(
-                    parseLong(BeanUtil.getProperty(item, "processId"), null),
-                    parseInteger(BeanUtil.getProperty(item, "stepNo"), null)))
-            .filter(key -> key != null)
-            .collect(Collectors.toSet());
+        // workflow 节点权限过滤仍需在内存中进行
         return pendingList.stream()
-            .filter(item -> {
-                Long id = parseLong(BeanUtil.getProperty(item, "id"), null);
-                Integer currentStep = parseInteger(BeanUtil.getProperty(item, "currentStep"), 1);
-                return id == null || !processedStepKeys.contains(stepKey(id, currentStep));
-            })
-            .filter(item -> canApproveCurrentWorkflowNode(item, approverId))
-            .collect(Collectors.toList());
+                .filter(item -> canApproveCurrentWorkflowNode(item, approverId))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -329,22 +352,30 @@ public class ApprovalService {
     /** 按流程类型分组统计（总数/通过数/驳回数/审批中数/取消数） */
     public List<Map<String, Object>> getProcessTypeStats() {
         String tenantId = TenantContext.requireTenantId();
-        List<ApprovalProcess> all = approvalProcessMapper.selectList(
-                new QueryWrapper<ApprovalProcess>().eq("tenant_id", tenantId));
-        Map<String, Map<String, Object>> grouped = new LinkedHashMap<>();
+        // 使用 SQL GROUP BY 替代全量 selectList + 内存 HashMap 分组，避免 OOM
+        QueryWrapper<ApprovalProcess> qw = new QueryWrapper<>();
+        qw.eq("tenant_id", tenantId)
+                .select("process_type, status, COUNT(*) as cnt")
+                .groupBy("process_type", "status");
+        List<Map<String, Object>> rows = approvalProcessMapper.selectMaps(qw);
 
-        for (ApprovalProcess p : all) {
-            String type = p.getProcessType() != null ? p.getProcessType() : "UNKNOWN";
+        Map<String, Map<String, Object>> grouped = new LinkedHashMap<>();
+        for (Map<String, Object> row : rows) {
+            String type = row.get("process_type") != null ? row.get("process_type").toString() : "UNKNOWN";
+            String status = row.get("status") != null ? row.get("status").toString() : "UNKNOWN";
+            long cnt = row.get("cnt") != null ? ((Number) row.get("cnt")).longValue() : 0L;
+
             grouped.putIfAbsent(type, new HashMap<>(Map.of(
                     "processType", type,
                     "total", 0L, "approved", 0L, "rejected", 0L, "pending", 0L, "cancelled", 0L)));
             Map<String, Object> stat = grouped.get(type);
-            stat.put("total", ((Number) stat.get("total")).longValue() + 1);
-            String s = p.getStatus();
-            if ("APPROVED".equals(s)) stat.put("approved", ((Number) stat.get("approved")).longValue() + 1);
-            else if ("REJECTED".equals(s)) stat.put("rejected", ((Number) stat.get("rejected")).longValue() + 1);
-            else if ("CANCELLED".equals(s)) stat.put("cancelled", ((Number) stat.get("cancelled")).longValue() + 1);
-            else stat.put("pending", ((Number) stat.get("pending")).longValue() + 1);
+            stat.put("total", ((Number) stat.get("total")).longValue() + cnt);
+            switch (status) {
+                case "APPROVED" -> stat.put("approved", ((Number) stat.get("approved")).longValue() + cnt);
+                case "REJECTED" -> stat.put("rejected", ((Number) stat.get("rejected")).longValue() + cnt);
+                case "CANCELLED" -> stat.put("cancelled", ((Number) stat.get("cancelled")).longValue() + cnt);
+                default -> stat.put("pending", ((Number) stat.get("pending")).longValue() + cnt);
+            }
         }
         return new ArrayList<>(grouped.values());
     }
@@ -354,7 +385,7 @@ public class ApprovalService {
      *
      * <p>Only processes in PENDING status can be cancelled. Cancellation
      * updates the process status to CANCELLED and triggers the
-     * appropriate business rejection callbacks so downstream state
+     * appropriate business cancellation callbacks so downstream state
      * stays consistent.
      *
      * @param processId  the approval process ID
@@ -377,27 +408,23 @@ public class ApprovalService {
             throw new BusinessException("仅PENDING状态的流程可取消");
         }
 
+        // 检查是否已有审批记录（防止已操作的流程被随意取消）
+        if (hasAnyApprovalRecords(processId)) {
+            throw new BusinessException("审批流程已有处理记录，无法取消，请联系管理员");
+        }
+
         BeanUtil.setProperty(process, "status", "CANCELLED");
         approvalProcessMapper.updateById(process);
 
-        // Trigger business-side cancellation via the rejection handler
-        handleRejection(process, operatorId, "流程已取消");
+        handleCancellation(process, operatorId, "流程已取消");
 
         return process;
     }
 
     private String generateProcessNo() {
-        String tenantId = TenantContext.requireTenantId();
         String dateStr = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
         String prefix = "APR-" + dateStr + "-";
-
-        Long count = approvalProcessMapper.selectCount(
-            new QueryWrapper<ApprovalProcess>()
-                .eq("tenant_id", tenantId)
-                .likeRight("process_no", prefix)
-        );
-        long sequence = (count == null ? 0 : count) + 1;
-        return prefix + String.format("%03d", sequence);
+        return prefix + String.format("%05d", ThreadLocalRandom.current().nextInt(1, 99999)) + '-' + System.currentTimeMillis() % 10000;
     }
 
     private Integer parseInteger(Object value, Integer defaultValue) {
@@ -781,6 +808,33 @@ public class ApprovalService {
         }
     }
 
+    private void handleCancellation(ApprovalProcess process, Long operatorId, String opinion) {
+        switch (process.getProcessType()) {
+            case "RETIREMENT":
+                retirementApplicationService.cancelApplication(process.getBusinessId(), operatorId);
+                break;
+            case "WORK_ORDER":
+                workOrderService.applyApprovalOutcome(process.getBusinessId(), "CANCELLED", opinion);
+                break;
+            case "ASSET_TRANSFER":
+            case "ASSET_CLEARANCE":
+            case "ASSET_SCRAP":
+                log.info("审批取消: processType={}, businessId={}", process.getProcessType(), process.getBusinessId());
+                break;
+            case "ASSET_COMPENSATION":
+                if (process.getBusinessId() != null) {
+                    try {
+                        compensationService.updateStatus(process.getBusinessId(), "CANCELLED");
+                    } catch (BusinessException ignored) {
+                        log.warn("赔偿取消：赔偿记录不存在或已处理, businessId={}", process.getBusinessId());
+                    }
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
     private <T> void handleDisposalOutcome(ApprovalProcess process, Class<T> dtoClass, Consumer<T> action) {
         String businessData = process.getBusinessData();
         if (businessData == null || businessData.isBlank()) {
@@ -799,6 +853,30 @@ public class ApprovalService {
     /**
      * 审批完成后发送通知给申请人
      */
+    /**
+     * 检查审批流程是否已有审批记录。
+     *
+     * <p>用于 cancelProcess 前置校验，防止已有人处理过的审批流程被随意取消。
+     *
+     * @param processId 审批流程 ID
+     * @return 如果存在至少一条审批记录返回 true，否则返回 false
+     */
+    private boolean hasAnyApprovalRecords(Long processId) {
+        if (processId == null) {
+            return false;
+        }
+        try {
+            Long count = approvalRecordMapper.selectCount(
+                new QueryWrapper<ApprovalRecord>()
+                    .eq("process_id", processId)
+            );
+            return count != null && count > 0;
+        } catch (Exception e) {
+            log.warn("failed_to_check_approval_records_for_process: {}, error: {}", processId, e.getMessage());
+            return false;
+        }
+    }
+
     private void sendApprovalNotification(ApprovalProcess process, Long approverId, String result) {
         try {
             // 双重通知防护：退休流程由 NotificationService 的退休通知域方法处理，此处跳过

@@ -6,6 +6,7 @@ import com.ams.dto.AssetQueryDTO;
 import com.ams.dto.AssetUpdateDTO;
 import com.ams.entity.Asset;
 import com.ams.service.AssetService;
+import com.ams.service.DepreciationService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 @RequiredArgsConstructor
 public class AssetController {
     private final AssetService assetService;
+    private final DepreciationService depreciationService;
 
     @PreAuthorize("@ss.hasPermi('asset:ledger:query')")
     @GetMapping({"", "/list"})
@@ -28,6 +30,14 @@ public class AssetController {
     @GetMapping("/{id}")
     public Result<Asset> getById(@PathVariable Long id) {
         return Result.success(assetService.getAssetById(id));
+    }
+
+    @PreAuthorize("@ss.hasPermi('asset:ledger:query')")
+    @GetMapping("/{id}/depreciation-schedule")
+    public Result<java.util.List<DepreciationService.DepreciationScheduleItem>> getDepreciationSchedule(
+            @PathVariable Long id,
+            @RequestParam(required = false) String period) {
+        return Result.success(depreciationService.getScheduleByAssetId(id, period));
     }
 
     @PreAuthorize("@ss.hasPermi('asset:ledger:create')")

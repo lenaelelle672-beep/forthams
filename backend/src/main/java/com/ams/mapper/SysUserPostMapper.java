@@ -21,4 +21,9 @@ public interface SysUserPostMapper extends BaseMapper<SysUserPost> {
         DELETE FROM sys_user_post WHERE user_id = #{userId}
         """)
     void deleteByUserId(@Param("userId") Long userId);
+
+    @Select("""
+        SELECT COUNT(*) FROM sys_user_post WHERE post_id = #{postId}
+        """)
+    int countByPostId(@Param("postId") Long postId);
 }

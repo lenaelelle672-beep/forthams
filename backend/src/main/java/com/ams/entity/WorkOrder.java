@@ -6,10 +6,12 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @TableName("work_order")
@@ -20,7 +22,7 @@ public class WorkOrder {
     private String title;
     private String description;
     private String status;  // DRAFT/PENDING/APPROVED/EXECUTING/COMPLETED/REJECTED/CANCELLED
-    private String priority;  // NORMAL/URGENT/EMERGENCY
+    private String priority;  // LOW/MEDIUM/HIGH/CRITICAL
     private String tenantId;
     private Long assetId;
     private String assetName;
@@ -38,10 +40,16 @@ public class WorkOrder {
     private BigDecimal estimatedCost;
     private BigDecimal actualCost;
     private String completionNote;
+    @TableField(exist = false)
+    private List<String> collaborators;
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
+    @TableField(exist = false)
+    private LocalDateTime slaDeadline;
+    @TableField(exist = false)
+    private String slaStatus;
     @TableLogic
     private Integer deleted;
 

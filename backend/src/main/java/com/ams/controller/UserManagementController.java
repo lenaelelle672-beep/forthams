@@ -16,8 +16,10 @@ import lombok.RequiredArgsConstructor;
 import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,8 +42,12 @@ public class UserManagementController {
             @RequestParam(defaultValue = "10") Integer pageSize,
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) Long deptId,
-            @RequestParam(required = false) Integer status) {
-        return Result.success(userManagementService.queryUsers(page, pageSize, keyword, deptId, status));
+            @RequestParam(required = false) Integer status,
+            @RequestParam(required = false) List<Long> roleIds,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate createTimeStart,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate createTimeEnd) {
+        return Result.success(userManagementService.queryUsers(
+                page, pageSize, keyword, deptId, status, roleIds, createTimeStart, createTimeEnd));
     }
 
     /** 关键词搜索用户（流程设计器审批人选择器使用） */

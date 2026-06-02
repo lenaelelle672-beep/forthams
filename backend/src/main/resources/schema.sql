@@ -227,7 +227,9 @@ CREATE TABLE IF NOT EXISTS work_order (
     deleted TINYINT DEFAULT 0,
     UNIQUE KEY uk_work_order_tenant_no (tenant_id, work_order_no),
     INDEX idx_work_order_tenant (tenant_id),
-    INDEX idx_work_order_status (status)
+    INDEX idx_work_order_status (status),
+    INDEX idx_work_order_tenant_status (tenant_id, status),
+    INDEX idx_work_order_tenant_time (tenant_id, create_time)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Existing development databases may have an older work_order table. Replay
@@ -266,11 +268,17 @@ SET @sql = (SELECT IF(COUNT(*) = 0, 'ALTER TABLE work_order ADD COLUMN actual_co
 PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 SET @sql = (SELECT IF(COUNT(*) = 0, 'ALTER TABLE work_order ADD COLUMN completion_note TEXT AFTER actual_cost', 'SELECT 1') FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'work_order' AND column_name = 'completion_note');
 PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+SET @sql = (SELECT IF(COUNT(*) = 0, 'ALTER TABLE work_order ADD COLUMN collaborators JSON AFTER completion_note', 'SELECT 1') FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'work_order' AND column_name = 'collaborators');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 SET @sql = (SELECT IF(COUNT(*) = 0, 'ALTER TABLE work_order ADD INDEX idx_work_order_tenant (tenant_id)', 'SELECT 1') FROM information_schema.statistics WHERE table_schema = DATABASE() AND table_name = 'work_order' AND index_name = 'idx_work_order_tenant');
 PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 SET @sql = (SELECT IF(COUNT(*) = 0, 'ALTER TABLE work_order ADD INDEX idx_work_order_status (status)', 'SELECT 1') FROM information_schema.statistics WHERE table_schema = DATABASE() AND table_name = 'work_order' AND index_name = 'idx_work_order_status');
 PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 SET @sql = (SELECT IF(COUNT(*) = 0, 'ALTER TABLE work_order ADD UNIQUE KEY uk_work_order_tenant_no (tenant_id, work_order_no)', 'SELECT 1') FROM information_schema.statistics WHERE table_schema = DATABASE() AND table_name = 'work_order' AND index_name = 'uk_work_order_tenant_no');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+SET @sql = (SELECT IF(COUNT(*) = 0, 'ALTER TABLE work_order ADD INDEX idx_work_order_tenant_status (tenant_id, status)', 'SELECT 1') FROM information_schema.statistics WHERE table_schema = DATABASE() AND table_name = 'work_order' AND index_name = 'idx_work_order_tenant_status');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+SET @sql = (SELECT IF(COUNT(*) = 0, 'ALTER TABLE work_order ADD INDEX idx_work_order_tenant_time (tenant_id, create_time)', 'SELECT 1') FROM information_schema.statistics WHERE table_schema = DATABASE() AND table_name = 'work_order' AND index_name = 'idx_work_order_tenant_time');
 PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 
 CREATE TABLE IF NOT EXISTS retirement_application (
@@ -364,16 +372,24 @@ CREATE TABLE IF NOT EXISTS idle_asset_notice (
     tenant_id VARCHAR(64) NOT NULL,
     asset_id BIGINT NOT NULL,
     idle_days INT DEFAULT 0,
+    title VARCHAR(256),
+    reason VARCHAR(1024),
     notice_date DATE,
+    claim_deadline DATE,
     status VARCHAR(32) DEFAULT 'PUBLISHED',
     claimant_id BIGINT,
     claim_date DATE,
+    claim_status VARCHAR(32),
+    claim_approved_by BIGINT,
+    claim_approved_time DATETIME,
+    approval_opinion VARCHAR(1024),
     create_by BIGINT,
     create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
     update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     deleted TINYINT DEFAULT 0,
     INDEX idx_idle_asset_tenant (tenant_id),
-    INDEX idx_idle_asset_id (asset_id)
+    INDEX idx_idle_asset_id (asset_id),
+    INDEX idx_idle_asset_status (status, claim_status)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS asset_compensation (
@@ -411,7 +427,9 @@ CREATE TABLE IF NOT EXISTS approval_process (
     update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     deleted TINYINT DEFAULT 0,
     INDEX idx_process_no (process_no),
-    INDEX idx_approval_process_tenant (tenant_id)
+    INDEX idx_approval_process_tenant (tenant_id),
+    INDEX idx_approval_process_tenant_type_status (tenant_id, process_type, status),
+    UNIQUE KEY uk_ap_tenant_process (tenant_id, process_no)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Existing development databases may have been created before tenant isolation
@@ -420,7 +438,11 @@ SET @sql = (SELECT IF(COUNT(*) = 0, 'ALTER TABLE approval_process ADD COLUMN ten
 PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 SET @sql = (SELECT IF(COUNT(*) = 0, 'ALTER TABLE approval_process ADD INDEX idx_approval_process_tenant (tenant_id)', 'SELECT 1') FROM information_schema.statistics WHERE table_schema = DATABASE() AND table_name = 'approval_process' AND index_name = 'idx_approval_process_tenant');
 PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+SET @sql = (SELECT IF(COUNT(*) = 0, 'ALTER TABLE approval_process ADD INDEX idx_approval_process_tenant_type_status (tenant_id, process_type, status)', 'SELECT 1') FROM information_schema.statistics WHERE table_schema = DATABASE() AND table_name = 'approval_process' AND index_name = 'idx_approval_process_tenant_type_status');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 
+SET @sql = (SELECT IF(COUNT(*) = 0, 'ALTER TABLE approval_process ADD UNIQUE KEY uk_ap_tenant_process (tenant_id, process_no)', 'SELECT 1') FROM information_schema.statistics WHERE table_schema = DATABASE() AND table_name = 'approval_process' AND index_name = 'uk_ap_tenant_process');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 CREATE TABLE IF NOT EXISTS approval_record (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     process_id BIGINT NOT NULL,
@@ -432,12 +454,15 @@ CREATE TABLE IF NOT EXISTS approval_record (
     approve_time DATETIME,
     create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
     INDEX idx_approval_record_process (process_id),
-    INDEX idx_approval_record_tenant (tenant_id)
+    INDEX idx_approval_record_tenant (tenant_id),
+    INDEX idx_approval_record_process_approver (process_id, approver_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 SET @sql = (SELECT IF(COUNT(*) = 0, 'ALTER TABLE approval_record ADD COLUMN tenant_id VARCHAR(64) NOT NULL DEFAULT ''T001'' AFTER process_id', 'SELECT 1') FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'approval_record' AND column_name = 'tenant_id');
 PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 SET @sql = (SELECT IF(COUNT(*) = 0, 'ALTER TABLE approval_record ADD INDEX idx_approval_record_tenant (tenant_id)', 'SELECT 1') FROM information_schema.statistics WHERE table_schema = DATABASE() AND table_name = 'approval_record' AND index_name = 'idx_approval_record_tenant');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+SET @sql = (SELECT IF(COUNT(*) = 0, 'ALTER TABLE approval_record ADD INDEX idx_approval_record_process_approver (process_id, approver_id)', 'SELECT 1') FROM information_schema.statistics WHERE table_schema = DATABASE() AND table_name = 'approval_record' AND index_name = 'idx_approval_record_process_approver');
 PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 
 CREATE TABLE IF NOT EXISTS workflow_definition (
@@ -707,7 +732,7 @@ ON DUPLICATE KEY UPDATE menu_id = VALUES(menu_id);
 
 -- =============================================================================
 -- AC-5: 业务模块权限种子数据（sys_menu 权限节点 + SUPER_ADMIN 绑定）
--- ID 范围: 100-208，避开已有 1-24 和迁移脚本 1000+
+-- ID 范围: 100-211，避开已有 1-24 和迁移脚本 1000+
 -- 权限编码格式: module:submodule:action（与 Controller @PreAuthorize 保持一致）
 -- =============================================================================
 
@@ -747,8 +772,9 @@ INSERT INTO sys_menu (id, menu_name, parent_id, sort_order, menu_type, perms, ic
     (131, '闲置查询', 130, 1, 'F', 'idle:query', NULL, 1, 1),
     (132, '闲置发布', 130, 2, 'F', 'idle:create', NULL, 1, 1),
     (133, '闲置认领', 130, 3, 'F', 'idle:claim', NULL, 1, 1),
-    (134, '闲置取消', 130, 4, 'F', 'idle:cancel', NULL, 1, 1),
-    (135, '闲置删除', 130, 5, 'F', 'idle:delete', NULL, 1, 1),
+    (211, '认领审批', 130, 4, 'F', 'idle:approve', NULL, 1, 1),
+    (134, '闲置取消', 130, 5, 'F', 'idle:cancel', NULL, 1, 1),
+    (135, '闲置删除', 130, 6, 'F', 'idle:delete', NULL, 1, 1),
     (136, '资产赔偿', 100, 7, 'C', 'compensation:query', 'dollar-sign', 1, 1),
     (137, '赔偿查询', 136, 1, 'F', 'compensation:query', NULL, 1, 1),
     (138, '赔偿创建', 136, 2, 'F', 'compensation:create', NULL, 1, 1),
@@ -850,6 +876,7 @@ INSERT INTO sys_role_menu (role_id, menu_id) VALUES
     (1, 131),
     (1, 132),
     (1, 133),
+    (1, 211),
     (1, 134),
     (1, 135),
     (1, 136),

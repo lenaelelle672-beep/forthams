@@ -1,0 +1,2 @@
+此目录用于存放 Thymeleaf 邮件模板 HTML 文件。
+运行时使用 sys_mail_template 表中的 content_template 字段渲染，不使用文件模板。

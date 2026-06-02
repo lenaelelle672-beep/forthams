@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -31,8 +32,11 @@ public class WorkOrderDTO {
     private BigDecimal estimatedCost;
     private BigDecimal actualCost;
     private String completionNote;
+    private List<String> collaborators;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
+    private LocalDateTime slaDeadline;
+    private String slaStatus;
 
     public WorkOrderDTO(Long id, String status) {
         this.id = id;

@@ -4,9 +4,9 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 /**
- * 重置密码请求 DTO（过渡方案）
+ * 重置密码请求 DTO。
  *
- * <p>TODO: 后续增加 email/phone + verificationCode 字段
+ * <p>当前安全凭据为旧密码；未提供旧密码的请求不会通过基础校验。</p>
  */
 @Data
 public class ResetPasswordRequest {

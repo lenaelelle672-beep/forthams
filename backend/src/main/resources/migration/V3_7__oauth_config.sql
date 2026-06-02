@@ -1,0 +1,12 @@
+CREATE TABLE IF NOT EXISTS sys_oauth_config (
+    id          BIGINT AUTO_INCREMENT PRIMARY KEY,
+    provider    VARCHAR(20) NOT NULL COMMENT 'OAuth2提供商 DINGTALK/WECHAT/QIWEI',
+    app_id      VARCHAR(200) NOT NULL COMMENT '应用ID/ClientID',
+    app_secret  VARCHAR(500) NOT NULL COMMENT '应用密钥/ClientSecret',
+    redirect_url VARCHAR(500) COMMENT '回调URL',
+    enabled     TINYINT DEFAULT 1 COMMENT '是否启用',
+    remark      VARCHAR(500),
+    created_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE INDEX idx_oauth_provider (provider)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='OAuth2第三方登录配置';

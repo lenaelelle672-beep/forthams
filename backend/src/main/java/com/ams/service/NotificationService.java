@@ -1,8 +1,11 @@
 package com.ams.service;
 
 import com.ams.common.exception.BusinessException;
+import com.ams.entity.NotificationTemplate;
 import com.ams.entity.NotificationRecord;
 import com.ams.mapper.NotificationMapper;
+import com.ams.mapper.NotificationTemplateMapper;
+import com.ams.mapper.UserRoleMapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -13,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.List;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 
@@ -29,6 +33,10 @@ public class NotificationService {
 
     private final NotificationMapper notificationMapper;
     private final EmailService emailService;
+    private final NotificationTemplateMapper notificationTemplateMapper;
+    private static final String RETIREMENT_APPROVER_ROLE = "SUPER_ADMIN";
+
+    private final UserRoleMapper userRoleMapper;
 
     @Autowired
     @Lazy
@@ -132,6 +140,7 @@ public class NotificationService {
      */
     @Transactional(rollbackFor = Exception.class)
     public NotificationRecord create(NotificationRecord record) {
+        validateTargetUserId(record == null ? null : record.getUserId());
         if (record.getCreatedAt() == null) {
             record.setCreatedAt(LocalDateTime.now());
         }
@@ -155,6 +164,72 @@ public class NotificationService {
                 .orderByDesc(NotificationRecord::getCreatedAt));
     }
 
+    public NotificationRecord sendByTemplate(String templateCode, Map<String, Object> variables,
+                                             Long userId, Long refId, String refType) {
+        NotificationTemplate template = notificationTemplateMapper.selectOne(new LambdaQueryWrapper<NotificationTemplate>()
+                .eq(NotificationTemplate::getTemplateCode, templateCode)
+                .eq(NotificationTemplate::getStatus, 1)
+                .last("limit 1"));
+
+        validateTargetUserId(userId);
+
+        NotificationRecord record = new NotificationRecord();
+        record.setUserId(userId);
+        record.setTitle(renderTemplate(template == null ? templateCode : template.getTitleTemplate(), variables));
+        record.setContent(renderTemplate(template == null ? templateCode : template.getContentTemplate(), variables));
+        record.setType(templateCode);
+        record.setCategory(template == null ? "system" : template.getCategory());
+        record.setRefId(refId);
+        record.setRefType(refType);
+        create(record);
+        if (notificationChannels != null) {
+            for (NotificationChannel channel : notificationChannels) {
+                channel.send(record);
+            }
+        }
+        return record;
+    }
+
+    public int sendByTemplateToRole(String templateCode, String roleCode, Map<String, Object> variables,
+                                    Long refId, String refType) {
+        List<Long> userIds = userRoleMapper.selectActiveUserIdsByRole(roleCode);
+        if (userIds == null || userIds.isEmpty()) {
+            throw new BusinessException("未找到通知目标用户");
+        }
+        int sent = 0;
+        for (Long userId : userIds) {
+            sendByTemplate(templateCode, variables, userId, refId, refType);
+            sent++;
+        }
+        return sent;
+    }
+
+    private void validateTargetUserId(Long userId) {
+        if (userId == null || userId <= 0) {
+            throw new BusinessException("通知目标用户无效");
+        }
+    }
+
+    private void dispatch(NotificationRecord record) {
+        create(record);
+        if (notificationChannels != null) {
+            for (NotificationChannel channel : notificationChannels) {
+                channel.send(record);
+            }
+        }
+    }
+
+    private String renderTemplate(String template, Map<String, Object> variables) {
+        if (template == null) return "";
+        if (variables == null || variables.isEmpty()) return template;
+        String result = template;
+        for (Map.Entry<String, Object> entry : variables.entrySet()) {
+            String value = entry.getValue() == null ? "" : entry.getValue().toString();
+            result = result.replace("${" + entry.getKey() + "}", value);
+        }
+        return result;
+    }
+
     // ==================== 退休通知域方法 ====================
 
     /**
@@ -169,19 +244,12 @@ public class NotificationService {
         Objects.requireNonNull(applicantName, "applicantName must not be null");
         Objects.requireNonNull(assetCode, "assetCode must not be null");
 
-        NotificationRecord record = new NotificationRecord();
-        record.setUserId(0L);
-        record.setTitle("新的报废申请");
-        record.setContent("申请人 " + applicantName + " 提交了资产 " + assetCode + " 的报废申请");
-        record.setType("retirement_submitted");
-        record.setCategory("retirement");
-        record.setRefId(applicationId);
-        record.setRefType("RETIREMENT_APPLICATION");
-        if (notificationChannels != null) {
-            for (NotificationChannel channel : notificationChannels) {
-                channel.send(record);
-            }
-        }
+        sendByTemplateToRole(
+                "retirement_submitted",
+                RETIREMENT_APPROVER_ROLE,
+                Map.of("applicantName", applicantName, "assetCode", assetCode),
+                applicationId,
+                "RETIREMENT_APPLICATION");
     }
 
     /**
@@ -191,24 +259,21 @@ public class NotificationService {
      * @param applicantName  申请人名称
      * @param assetCode      资产编码
      */
-    public void sendRetirementApproved(Long applicationId, String applicantName, String assetCode) {
+    public void sendRetirementApproved(Long applicationId, Long applicantUserId, String applicantName, String assetCode) {
         Objects.requireNonNull(applicationId, "applicationId must not be null");
         Objects.requireNonNull(applicantName, "applicantName must not be null");
         Objects.requireNonNull(assetCode, "assetCode must not be null");
+        validateTargetUserId(applicantUserId);
 
         NotificationRecord record = new NotificationRecord();
-        record.setUserId(0L);
+        record.setUserId(applicantUserId);
         record.setTitle("报废申请已通过");
         record.setContent("您的资产 " + assetCode + " 的报废申请已审批通过");
         record.setType("retirement_approved");
         record.setCategory("retirement");
         record.setRefId(applicationId);
         record.setRefType("RETIREMENT_APPLICATION");
-        if (notificationChannels != null) {
-            for (NotificationChannel channel : notificationChannels) {
-                channel.send(record);
-            }
-        }
+        dispatch(record);
     }
 
     /**
@@ -219,25 +284,22 @@ public class NotificationService {
      * @param assetCode      资产编码
      * @param rejectReason   驳回原因
      */
-    public void sendRetirementRejected(Long applicationId, String applicantName, String assetCode, String rejectReason) {
+    public void sendRetirementRejected(Long applicationId, Long applicantUserId, String applicantName, String assetCode, String rejectReason) {
         Objects.requireNonNull(applicationId, "applicationId must not be null");
         Objects.requireNonNull(applicantName, "applicantName must not be null");
         Objects.requireNonNull(assetCode, "assetCode must not be null");
+        validateTargetUserId(applicantUserId);
 
         String reason = (rejectReason == null || rejectReason.isBlank()) ? "未提供原因" : rejectReason;
         NotificationRecord record = new NotificationRecord();
-        record.setUserId(0L);
+        record.setUserId(applicantUserId);
         record.setTitle("报废申请已驳回");
         record.setContent("您的资产 " + assetCode + " 的报废申请被驳回，原因：" + reason);
         record.setType("retirement_rejected");
         record.setCategory("retirement");
         record.setRefId(applicationId);
         record.setRefType("RETIREMENT_APPLICATION");
-        if (notificationChannels != null) {
-            for (NotificationChannel channel : notificationChannels) {
-                channel.send(record);
-            }
-        }
+        dispatch(record);
     }
 
     /**
@@ -250,19 +312,12 @@ public class NotificationService {
         Objects.requireNonNull(applicationId, "applicationId must not be null");
         Objects.requireNonNull(assetCode, "assetCode must not be null");
 
-        NotificationRecord record = new NotificationRecord();
-        record.setUserId(0L);
-        record.setTitle("报废申请审批催办");
-        record.setContent("资产 " + assetCode + " 的报废申请已等待审批超过72小时，请及时处理");
-        record.setType("retirement_reminder");
-        record.setCategory("retirement");
-        record.setRefId(applicationId);
-        record.setRefType("RETIREMENT_APPLICATION");
-        if (notificationChannels != null) {
-            for (NotificationChannel channel : notificationChannels) {
-                channel.send(record);
-            }
-        }
+        sendByTemplateToRole(
+                "retirement_reminder",
+                RETIREMENT_APPROVER_ROLE,
+                Map.of("assetCode", assetCode),
+                applicationId,
+                "RETIREMENT_APPLICATION");
     }
 
     // -- end retirement notification methods

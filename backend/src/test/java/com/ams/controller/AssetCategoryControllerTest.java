@@ -2,6 +2,7 @@ package com.ams.controller;
 
 import com.ams.dto.CategoryCreateDTO;
 import com.ams.dto.CategoryUpdateDTO;
+import com.ams.common.exception.ConflictException;
 import com.ams.entity.AssetCategory;
 import com.ams.service.AssetCategoryService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -111,6 +112,23 @@ class AssetCategoryControllerTest {
     }
 
     @Test
+    @DisplayName("Should return 409 when creating duplicate category code")
+    void testCreateWithDuplicateCategoryCode() throws Exception {
+        String requestBody = "{\"categoryName\":\"Duplicate Category\",\"categoryCode\":\"CAT001\"}";
+        when(assetCategoryService.createCategory(any(CategoryCreateDTO.class)))
+                .thenThrow(new ConflictException("分类编码已存在"));
+
+        mockMvc.perform(post("/categories")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody))
+            .andExpect(status().isConflict())
+            .andExpect(jsonPath("$.code").value(409))
+            .andExpect(jsonPath("$.message").value("分类编码已存在"));
+
+        verify(assetCategoryService).createCategory(any(CategoryCreateDTO.class));
+    }
+
+    @Test
     @DisplayName("Should update successfully with valid data")
     void testUpdate() throws Exception {
         String requestBody = "{\"categoryName\":\"Updated Category\",\"categoryCode\":\"CAT001\"}";
@@ -162,4 +180,23 @@ class AssetCategoryControllerTest {
                 .content(invalidRequest))
             .andExpect(status().isBadRequest());
     }
+
+    @Test
+    @DisplayName("Should return 409 when updating with duplicate category code")
+    void testUpdateWithDuplicateCategoryCode() throws Exception {
+        String requestBody = "{\"categoryName\":\"Updated Category\",\"categoryCode\":\"CAT001\"}";
+        
+        when(assetCategoryService.updateCategory(eq(1L), any(CategoryUpdateDTO.class)))
+                .thenThrow(new ConflictException("分类编码已存在"));
+
+        mockMvc.perform(put("/categories/{id}", 1L)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody))
+            .andExpect(status().isConflict())
+            .andExpect(jsonPath("$.code").value(409))
+            .andExpect(jsonPath("$.message").value("分类编码已存在"));
+
+        verify(assetCategoryService).updateCategory(eq(1L), any(CategoryUpdateDTO.class));
+    }
+
 }

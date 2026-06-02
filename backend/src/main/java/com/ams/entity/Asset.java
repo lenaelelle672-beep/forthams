@@ -33,9 +33,16 @@ public class Asset implements Serializable {
     private String status;
     private Long deptId;
     private Long userId;
+    private Long locationId;
     private String location;
 
     private String rfidTag;
+    private BigDecimal locationLat;
+    private BigDecimal locationLng;
+
+    @TableField(exist = false)
+    private String locationName;
+
     private Integer isImportant;
 
     private String description;

@@ -1,6 +1,7 @@
 package com.ams.controller;
 
 import com.ams.common.exception.BusinessException;
+import com.ams.dto.IdleAssetClaimReviewDTO;
 import com.ams.dto.IdleAssetCreateDTO;
 import com.ams.entity.IdleAssetNotice;
 import com.ams.entity.User;
@@ -43,13 +44,27 @@ public class IdleAssetController {
     @PreAuthorize("@ss.hasPermi('idle:create')")
     @PostMapping
     public Result<IdleAssetNotice> create(@Valid @RequestBody IdleAssetCreateDTO dto) {
-        return Result.success(idleAssetService.publishNotice(dto));
+        return Result.success(idleAssetService.publishNotice(dto, getCurrentUserId()));
     }
 
     @PreAuthorize("@ss.hasPermi('idle:claim')")
     @PostMapping("/{id}/claim")
     public Result<IdleAssetNotice> claim(@PathVariable Long id) {
         return Result.success(idleAssetService.claimAsset(id, getCurrentUserId()));
+    }
+
+    @PreAuthorize("@ss.hasPermi('idle:approve')")
+    @PostMapping("/{id}/claim/approve")
+    public Result<IdleAssetNotice> approveClaim(@PathVariable Long id,
+                                                @RequestBody(required = false) IdleAssetClaimReviewDTO dto) {
+        return Result.success(idleAssetService.approveClaim(id, getCurrentUserId(), dto == null ? null : dto.getOpinion()));
+    }
+
+    @PreAuthorize("@ss.hasPermi('idle:approve')")
+    @PostMapping("/{id}/claim/reject")
+    public Result<IdleAssetNotice> rejectClaim(@PathVariable Long id,
+                                               @RequestBody(required = false) IdleAssetClaimReviewDTO dto) {
+        return Result.success(idleAssetService.rejectClaim(id, getCurrentUserId(), dto == null ? null : dto.getOpinion()));
     }
 
     @PreAuthorize("@ss.hasPermi('idle:cancel')")

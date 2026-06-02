@@ -80,7 +80,7 @@ public class NotificationController {
     public Result<Map<String, Object>> pending(
             @RequestParam(required = false) String type) {
         Long userId = getCurrentUserId();
-        List<Map<String, Object>> items = approvalService.getMyPendingApprovals(userId)
+        List<Map<String, Object>> items = approvalService.getMyPendingApprovals(userId, new Page<>(1, 20))
                 .stream()
                 .map(this::toApprovalNotificationItem)
                 .filter(item -> type == null || type.isBlank() || type.equals(item.get("type")))

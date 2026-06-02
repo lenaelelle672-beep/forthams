@@ -3,6 +3,7 @@ package com.ams.service;
 import com.ams.entity.ApprovalProcess;
 import com.ams.entity.WorkOrder;
 import com.ams.context.TenantContext;
+import com.ams.dto.WorkOrderDTO;
 import com.ams.mapper.ApprovalProcessMapper;
 import com.ams.mapper.UserMapper;
 import com.ams.mapper.WorkOrderMapper;
@@ -17,13 +18,17 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Collections;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.never;
 
 @ExtendWith(MockitoExtension.class)
 class WorkOrderServiceTest {
@@ -77,6 +82,31 @@ class WorkOrderServiceTest {
         assertEquals("PENDING", process.getStatus());
         assertEquals("T001", process.getTenantId());
         assertEquals(7L, process.getApplicantId());
+        assertNull(process.getBusinessData());
+    }
+
+    @Test
+    void shouldNormalizeLegacyPriorityWhenCreatingWorkOrder() {
+        WorkOrderDTO dto = new WorkOrderDTO();
+        dto.setTitle("更换显示器");
+        dto.setPriority("NORMAL");
+
+        WorkOrder result = workOrderService.createWorkOrder(dto);
+
+        assertEquals("MEDIUM", result.getPriority());
+        ArgumentCaptor<WorkOrder> captor = ArgumentCaptor.forClass(WorkOrder.class);
+        verify(workOrderMapper).insert(captor.capture());
+        assertEquals("MEDIUM", captor.getValue().getPriority());
+    }
+
+    @Test
+    void shouldRejectInvalidPriorityWhenCreatingWorkOrder() {
+        WorkOrderDTO dto = new WorkOrderDTO();
+        dto.setTitle("更换显示器");
+        dto.setPriority("INVALID");
+
+        assertThrows(com.ams.common.exception.BusinessException.class,
+                () -> workOrderService.createWorkOrder(dto));
     }
 
     @Test
@@ -142,9 +172,28 @@ class WorkOrderServiceTest {
         workOrder.setStatus("APPROVED");
         when(workOrderMapper.selectOne(any(LambdaQueryWrapper.class))).thenReturn(workOrder);
 
-        WorkOrder result = workOrderService.operateWorkOrder(5L, "cancel", "不再执行");
+        assertThrows(com.ams.common.exception.BusinessException.class,
+                () -> workOrderService.operateWorkOrder(5L, "cancel", "不再执行"));
+        verify(workOrderMapper, never()).updateById(any(WorkOrder.class));
+    }
 
-        assertEquals("CANCELLED", result.getStatus());
-        verify(workOrderMapper).updateById(workOrder);
+    @Test
+    void shouldPreserveApprovalProcessBusinessDataWhenUpdatingStatus() {
+        WorkOrder workOrder = new WorkOrder();
+        workOrder.setId(8L);
+        workOrder.setTenantId("T001");
+        workOrder.setStatus("PENDING");
+        when(workOrderMapper.selectOne(any(LambdaQueryWrapper.class))).thenReturn(workOrder);
+        ApprovalProcess existingProcess = new ApprovalProcess();
+        existingProcess.setId(88L);
+        existingProcess.setBusinessData("{\"title\":\"已有快照\"}");
+        when(approvalProcessMapper.selectList(any(LambdaQueryWrapper.class))).thenReturn(List.of(existingProcess));
+
+        workOrderService.operateWorkOrder(8L, "approve", "同意");
+
+        ArgumentCaptor<ApprovalProcess> captor = ArgumentCaptor.forClass(ApprovalProcess.class);
+        verify(approvalProcessMapper).updateById(captor.capture());
+        assertEquals("APPROVED", captor.getValue().getStatus());
+        assertEquals("{\"title\":\"已有快照\"}", captor.getValue().getBusinessData());
     }
 }

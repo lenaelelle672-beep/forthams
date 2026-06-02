@@ -96,6 +96,23 @@ class RetirementControllerTest {
     }
 
     @Test
+    @DisplayName("Should pass keyword and deptId to retirement list service")
+    void listPassesKeywordAndDeptId() throws Exception {
+        when(retirementApplicationService.queryApplications(eq(1), eq(10), eq("PENDING"), eq(null), eq("A-001"), eq(3L)))
+                .thenReturn(new Page<>(1, 10));
+
+        mockMvc.perform(get("/api/retirement/list")
+                        .contextPath("/api")
+                        .param("status", "PENDING")
+                        .param("keyword", "A-001")
+                        .param("deptId", "3"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200));
+
+        verify(retirementApplicationService).queryApplications(1, 10, "PENDING", null, "A-001", 3L);
+    }
+
+    @Test
     @DisplayName("Should expose retirement cancel alias and call rollback-capable service")
     void cancelAliasCallsService() throws Exception {
         RetirementApplication application = new RetirementApplication();

@@ -1,6 +1,7 @@
 package com.ams.controller;
 
 import com.ams.dto.AuthResponse;
+import com.ams.common.exception.ConflictException;
 import com.ams.dto.LoginRequest;
 import com.ams.dto.RegisterRequest;
 import com.ams.service.AuthService;
@@ -83,6 +84,23 @@ class AuthControllerTest {
     }
 
     @Test
+    @DisplayName("Should return 409 when registering duplicate username")
+    void registerDuplicateUsernameReturnsConflict() throws Exception {
+        when(authService.register(any(RegisterRequest.class)))
+                .thenThrow(new ConflictException("用户名已存在"));
+
+        mockMvc.perform(post("/api/auth/register")
+                .contextPath("/api")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"username\":\"newuser\",\"password\":\"pass123\",\"realName\":\"新用户\"}"))
+            .andExpect(status().isConflict())
+            .andExpect(jsonPath("$.code").value(409))
+            .andExpect(jsonPath("$.message").value("用户名已存在"));
+
+        verify(authService).register(any(RegisterRequest.class));
+    }
+
+    @Test
     @DisplayName("Should logout successfully")
     void logoutReturnsSuccess() throws Exception {
         when(authService.logout()).thenReturn(true);
@@ -96,4 +114,27 @@ class AuthControllerTest {
 
         verify(authService).logout();
     }
+    @Test
+    @DisplayName("Should reject reset password without old password")
+    void resetPasswordWithoutOldPasswordIsRejected() throws Exception {
+        mockMvc.perform(post("/api/auth/reset-password")
+                .contextPath("/api")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"username\":\"admin\",\"newPassword\":\"newPass123\"}"))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("Should accept reset password request with old password")
+    void resetPasswordWithOldPasswordCallsService() throws Exception {
+        mockMvc.perform(post("/api/auth/reset-password")
+                .contextPath("/api")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"username\":\"admin\",\"oldPassword\":\"oldPass123\",\"newPassword\":\"newPass123\"}"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.code").value(200));
+
+        verify(authService).resetPassword(any());
+    }
+
 }

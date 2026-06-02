@@ -112,14 +112,19 @@ class TenantIsolationIntegrationTest {
                     status VARCHAR(32) DEFAULT 'IDLE',
                     dept_id BIGINT,
                     user_id BIGINT,
+                    location_id BIGINT,
                     location VARCHAR(256),
                     rfid_tag VARCHAR(128),
+                    location_lat DECIMAL(10,7),
+                    location_lng DECIMAL(10,7),
                     is_important TINYINT DEFAULT 0,
                     description TEXT,
                     remark TEXT,
                     create_by BIGINT,
                     create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    sla_deadline TIMESTAMP,
+                    sla_status VARCHAR(32),
                     deleted TINYINT DEFAULT 0,
                     UNIQUE KEY uk_asset_tenant_asset_no (tenant_id, asset_no)
                 )
@@ -166,8 +171,11 @@ class TenantIsolationIntegrationTest {
                     estimated_cost DECIMAL(15,2),
                     actual_cost DECIMAL(15,2),
                     completion_note TEXT,
+                    collaborators TEXT,
                     create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    sla_deadline TIMESTAMP,
+                    sla_status VARCHAR(32),
                     deleted TINYINT DEFAULT 0,
                     UNIQUE KEY uk_work_order_tenant_no (tenant_id, work_order_no)
                 )

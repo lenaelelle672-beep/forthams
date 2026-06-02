@@ -57,6 +57,24 @@ public class DepreciationService {
         return new DepreciationSchedulePage(rows, assets.size(), safePage, safeSize);
     }
 
+    public List<DepreciationScheduleItem> getScheduleByAssetId(Long assetId, String period) {
+        if (assetId == null) {
+            throw new BusinessException("资产ID不能为空");
+        }
+
+        String tenantId = TenantContext.requireTenantId();
+        String effectivePeriod = normalizePeriod(period);
+        Asset asset = assetMapper.selectOne(new QueryWrapper<Asset>()
+                .eq("tenant_id", tenantId)
+                .eq("id", assetId)
+                .last("LIMIT 1"));
+        if (asset == null) {
+            throw new BusinessException("资产不存在");
+        }
+
+        return List.of(toScheduleItem(asset, effectivePeriod));
+    }
+
     @Transactional(rollbackFor = Exception.class)
     public BatchCalculateResponse calculate(List<Long> assetIds) {
         if (assetIds == null || assetIds.isEmpty()) {
