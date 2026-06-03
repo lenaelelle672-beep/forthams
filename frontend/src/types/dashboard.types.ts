@@ -139,6 +139,8 @@ export interface MaintenanceAlert {
   dueDate: Date;
   /** 距离到期的天数 */
   daysUntilDue: number;
+  /** 旧服务字段名：距离到期/过期天数 */
+  daysUntilExpiration?: number;
   /** 紧急程度 */
   urgency: MaintenanceAlertUrgency;
 }
@@ -262,5 +264,7 @@ export interface DashboardLoadingState {
  * API 响应类型别名
  */
 export type AssetStatisticsResponse = AssetStatistics;
+export type DashboardStatisticsResponse = AssetStatistics;
 export type CategoryDistributionResponse = CategoryDistribution[];
 export type MaintenanceAlertResponse = MaintenanceAlert[];
+export type MaintenanceAlertsResponse = MaintenanceAlert[];

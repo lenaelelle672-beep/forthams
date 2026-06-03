@@ -95,12 +95,18 @@ export const ASSET_STATUS_CONFIG: Record<
 export interface Asset extends BaseEntity {
   /** 资产编号（业务唯一标识，如 AST-2024-001） */
   assetNo: string;
+  /** 旧组件使用的资产编号别名 */
+  assetCode?: string;
+  /** 旧组件使用的资产名称别名 */
+  name?: string;
   /** 资产名称 */
   assetName: string;
   /** 分类 ID */
   categoryId: number;
   /** 分类名称（冗余展示） */
   categoryName?: string;
+  /** ABC 分类: A-高价值, B-中价值, C-低价值, CATEGORY-分类规则 */
+  abcClassification?: 'A' | 'B' | 'C' | 'CATEGORY' | null;
   /** 品牌/厂商 */
   brand?: string;
   /** 规格型号 */
@@ -119,6 +125,14 @@ export interface Asset extends BaseEntity {
   warrantyPeriod?: number;
   /** 折旧率 */
   depreciationRate?: number;
+  /** 采购成本 */
+  purchaseCost?: number;
+  /** 折旧方法 */
+  depreciationMethod?: string;
+  /** 总预期工作量（UOP） */
+  totalExpectedUnits?: number;
+  /** 实际已工作量（UOP） */
+  actualUnits?: number;
   /** 资产状态 */
   status: AssetStatus;
   /** 使用部门 ID */
@@ -131,6 +145,16 @@ export interface Asset extends BaseEntity {
   userName?: string;
   /** 存放地点 */
   location?: string;
+  /** 存放地点展示名称 */
+  locationName?: string;
+  /** 采购价格 */
+  purchasePrice?: number;
+  /** 购置日期 */
+  // purchaseDate removed - duplicate, see line 121
+  /** 使用年限 */
+  usefulLifeYears?: number;
+  /** 残值 */
+  salvageValue?: number;
   /** RFID 标签 */
   rfidTag?: string;
   /** 是否重要设备（0=否，1=是） */
@@ -289,4 +313,113 @@ export interface DeptAssetDistribution {
   deptId: number;
   deptName: string;
   assetCount: number;
+}
+
+
+export type AssetDetail = Asset;
+export type AssetQuery = BaseListQuery & { keyword?: string; status?: string; categoryId?: string | number };
+export interface AssetListResponse { items: Asset[]; total: number; page?: number; pageSize?: number; records?: Asset[]; }
+
+// ---------------------------------------------------------------------------
+// 附件 — 对应后端 SysAttachment (businessType='ASSET')
+// ---------------------------------------------------------------------------
+
+/**
+ * 资产附件（对应后端 SysAttachment 实体）。
+ */
+export interface AssetAttachment {
+  id: number;
+  fileName: string;
+  filePath: string;
+  fileSize: number;
+  fileType: string;
+  uploadBy: number;
+  createTime: string;
+}
+
+// ---------------------------------------------------------------------------
+// 资产父子关系 — 对应后端 AssetParentChild
+// ---------------------------------------------------------------------------
+
+/**
+ * 资产关系类型枚举（与后端 AssetRelationType 对应）。
+ */
+export enum AssetRelationType {
+  /** 备件 */
+  SPARE_PART = 'SPARE_PART',
+  /** 配件/附件 */
+  ACCESSORY = 'ACCESSORY',
+  /** 升级件 */
+  UPGRADE = 'UPGRADE',
+  /** 附属物 */
+  ATTACHMENT = 'ATTACHMENT',
+  /** 其他 */
+  OTHER = 'OTHER',
+}
+
+/**
+ * 关系类型的中文标签配置。
+ */
+export const ASSET_RELATION_TYPE_LABELS: Record<AssetRelationType, string> = {
+  [AssetRelationType.SPARE_PART]: '备件',
+  [AssetRelationType.ACCESSORY]: '配件/附件',
+  [AssetRelationType.UPGRADE]: '升级件',
+  [AssetRelationType.ATTACHMENT]: '附属物',
+  [AssetRelationType.OTHER]: '其他',
+};
+
+/**
+ * 资产父子关系实体（对应后端 AssetParentChild）。
+ */
+export interface AssetParentChild {
+  id: number;
+  parentAssetId: number;
+  childAssetId: number;
+  relationType: AssetRelationType;
+  quantity: number;
+  remark?: string;
+  createTime: string;
+}
+
+/**
+ * 添加父子关系请求。
+ */
+export interface AddRelationRequest {
+  parentAssetId: number;
+  childAssetId: number;
+  relationType: AssetRelationType;
+  quantity?: number;
+  remark?: string;
+}
+
+/**
+ * 父子关系 VO（含资产名称等补充信息）。
+ */
+export interface RelationVO {
+  relationId: number;
+  parentAssetId: number;
+  childAssetId: number;
+  relationType: AssetRelationType;
+  quantity: number;
+  remark?: string;
+  createTime?: string;
+  childAssetName?: string;
+  childAssetNo?: string;
+  parentAssetName?: string;
+  parentAssetNo?: string;
+  children?: RelationVO[];
+}
+
+/**
+ * 父子关系树节点。
+ */
+export interface RelationTreeNode {
+  relationId: number;
+  childAssetId: number;
+  childAssetName?: string;
+  childAssetNo?: string;
+  relationType: AssetRelationType;
+  quantity: number;
+  remark?: string;
+  children?: RelationTreeNode[];
 }

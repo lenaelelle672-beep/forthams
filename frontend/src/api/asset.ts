@@ -22,6 +22,11 @@ import type {
   AssetValueTrend,
   DeptAssetDistribution,
   DepreciationScheduleItem,
+  AssetAttachment,
+  RelationVO,
+  RelationTreeNode,
+  AddRelationRequest,
+  AssetParentChild,
 } from '@/types/asset';
 
 // ── 资产 CRUD ─────────────────────────────────────────────────────────────────
@@ -125,3 +130,68 @@ export const getMaintenanceStats = () =>
 /** 获取待审批数量 */
 export const getPendingApprovalsCount = () =>
   http.get<number>('/dashboard/pending-approvals');
+
+// ── 资产附件 ────────────────────────────────────────────────────────────────
+
+/** 获取资产附件列表 */
+export const getAssetAttachments = (assetId: number) =>
+  http.get<AssetAttachment[]>(`/assets/${assetId}/attachments`);
+
+/** 上传资产附件（注意：不设置 Content-Type，浏览器自动添加 boundary） */
+export const uploadAssetAttachment = (assetId: number, file: File) => {
+  const formData = new FormData();
+  formData.append('file', file);
+  return http.post<AssetAttachment>(`/assets/${assetId}/attachments`, formData);
+};
+
+/** 删除资产附件 */
+export const deleteAssetAttachment = (assetId: number, attachmentId: number) =>
+  http.delete<void>(`/assets/${assetId}/attachments/${attachmentId}`);
+
+// ── 父子关系 ────────────────────────────────────────────────────────────────
+
+/** 获取子资产列表 */
+export const getAssetChildren = (id: number) =>
+  http.get<Asset[]>(`/assets/${id}/children`);
+
+/** 获取资产树 */
+export const getAssetTree = (id: number) =>
+  http.get<Asset>(`/assets/${id}/tree`);
+
+/** 获取父资产信息 */
+export const getAssetParent = (id: number) =>
+  http.get<Asset>(`/assets/${id}/parent`);
+
+/** 设置父资产 */
+export const setAssetParent = (id: number, parentAssetId: number, relationType?: string) =>
+  http.put<void>(`/assets/${id}/parent`, null, { params: { parentAssetId, relationType } });
+
+/** 移除父资产关系 */
+export const removeAssetParent = (id: number) =>
+  http.delete<void>(`/assets/${id}/parent`);
+
+// ── 资产父子关系 ──────────────────────────────────────────────────────────
+
+/** 获取子资产关联列表 */
+export const getRelations = (assetId: number) =>
+  http.get<RelationVO[]>(`/assets/${assetId}/relations`);
+
+/** 添加父子关系 */
+export const addRelation = (assetId: number, data: AddRelationRequest) =>
+  http.post<AssetParentChild>(`/assets/${assetId}/relations`, data);
+
+/** 删除父子关系 */
+export const removeRelation = (assetId: number, relationId: number) =>
+  http.delete<void>(`/assets/${assetId}/relations/${relationId}`);
+
+/** 获取父子关系树 */
+export const getRelationTree = (assetId: number) =>
+  http.get<RelationTreeNode[]>(`/assets/${assetId}/relations/tree`);
+
+// ── ABC 分类管理 ────────────────────────────────────────────────────────────────
+
+/** 计算 ABC 分类 */
+export const calculateABCClassification = (categoryId?: number) =>
+  http.post<Asset[]>('/assets/abc-classification/calculate', null, {
+    params: categoryId !== undefined ? { categoryId } : {},
+  });

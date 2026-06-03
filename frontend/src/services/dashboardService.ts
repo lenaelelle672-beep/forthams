@@ -65,7 +65,7 @@ export async function getAssetStatistics(): Promise<AssetStatistics> {
  * });
  * ```
  */
-export async function getCategoryDistribution(): Promise<CategoryDistribution> {
+export async function getCategoryDistribution(): Promise<CategoryDistribution[]> {
   try {
     const response = await http.get<CategoryDistributionResponse>(
       `${API_BASE_URL}/assets/categories/distribution`
@@ -124,7 +124,7 @@ export async function getMaintenanceAlerts(): Promise<MaintenanceAlert[]> {
  */
 export async function fetchDashboardData(): Promise<{
   statistics: AssetStatistics;
-  distribution: CategoryDistribution;
+  distribution: CategoryDistribution[];
   alerts: MaintenanceAlert[];
 }> {
   const [statistics, distribution, alerts] = await Promise.all([
@@ -133,7 +133,7 @@ export async function fetchDashboardData(): Promise<{
     getMaintenanceAlerts()
   ]);
 
-  return { statistics, distribution, alerts };
+  return { statistics, distribution: distribution as CategoryDistribution[], alerts };
 }
 
 /**
@@ -202,9 +202,10 @@ export function filterAlertsByUrgency(alerts: MaintenanceAlert[]): {
  * ```
  */
 export function transformCategoryForChart(
-  distribution: CategoryDistribution
+  distribution: CategoryDistribution | CategoryDistribution[]
 ): Array<{ name: string; value: number }> {
-  return distribution.map(item => ({
+  const items: CategoryDistribution[] = Array.isArray(distribution) ? distribution : [distribution];
+  return items.map(item => ({
     name: item.categoryName,
     value: item.count
   }));

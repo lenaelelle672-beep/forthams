@@ -1,4 +1,4 @@
-import type { DragEvent } from 'react';
+import { type DragEvent, useState } from 'react';
 import { ArrowRight, Flag, GitBranch, MoveRight, Play, ShieldCheck } from 'lucide-react';
 import { cn } from '@/utils/cn';
 import { FLOW_NODE_CATALOG, FLOW_NODE_DND_TYPE, FLOW_NODE_ORDER, type FlowNodeType } from '@/types/flow';
@@ -14,9 +14,16 @@ const colors: Record<FlowNodeType, string> = {
 interface Props { onAddNode: (type: FlowNodeType) => void; }
 
 export function NodePanel({ onAddNode }: Props) {
-  const handleDrag = (e: DragEvent<HTMLDivElement>, type: FlowNodeType) => {
+  const [draggingType, setDraggingType] = useState<FlowNodeType | null>(null);
+
+  const handleDragStart = (e: DragEvent<HTMLDivElement>, type: FlowNodeType) => {
     e.dataTransfer.setData(FLOW_NODE_DND_TYPE, type);
     e.dataTransfer.effectAllowed = 'move';
+    setDraggingType(type);
+  };
+
+  const handleDragEnd = () => {
+    setDraggingType(null);
   };
 
   return (
@@ -30,8 +37,20 @@ export function NodePanel({ onAddNode }: Props) {
           {FLOW_NODE_ORDER.map((type) => {
             const meta = FLOW_NODE_CATALOG[type];
             const Icon = icons[type];
+            const isDragging = draggingType === type;
             return (
-              <div key={type} draggable onDragStart={(e) => handleDrag(e, type)} className="group cursor-grab rounded-2xl border border-gray-100 bg-white p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md active:cursor-grabbing">
+              <div
+                key={type}
+                draggable
+                onDragStart={(e) => handleDragStart(e, type)}
+                onDragEnd={handleDragEnd}
+                className={cn(
+                  'cursor-grab rounded-2xl border bg-white p-4 shadow-sm transition-all',
+                  isDragging
+                    ? 'border-blue-400 bg-blue-50/30 opacity-50 ring-2 ring-blue-200 shadow-md scale-[0.97]'
+                    : 'border-gray-100 group hover:-translate-y-0.5 hover:shadow-md active:cursor-grabbing'
+                )}
+              >
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-start gap-3">
                     <div className={cn('flex size-10 items-center justify-center rounded-2xl', colors[type])}><Icon className="size-5" /></div>

@@ -22,7 +22,7 @@ export interface ReportCardData {
   /** 所属分类 */
   category: string;
   /** 图表类型（用于 ChartPreview） */
-  chartType?: 'bar' | 'pie' | 'area' | 'table';
+  chartType?: 'bar' | 'pie' | 'area' | 'table' | 'line';
 }
 
 interface ReportCardProps {

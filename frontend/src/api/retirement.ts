@@ -17,6 +17,10 @@ export interface RetirementApplication {
   reason: string;
   status: RetirementStatus;
   residualValue?: number;
+  estimatedResidualValue?: number;
+  deptId?: number;
+  deptName?: string;
+  remark?: string;
   approvalRecords?: RetirementApprovalRecord[];
   createdAt: string;
   updatedAt: string;
@@ -44,6 +48,7 @@ export interface CreateRetirementRequest {
   assetId: number;
   reason: string;
   residualValue?: number;
+  notes?: string;
   attachments?: string[];
 }
 
@@ -52,15 +57,22 @@ export interface RetirementListQuery {
   pageSize?: number;
   status?: RetirementStatus;
   keyword?: string;
+  deptId?: number;
 }
 
 /** 提交退役申请 */
 export const createRetirement = (data: CreateRetirementRequest) =>
-  http.post<ApiResponse<RetirementApplication>>('/retirement', data);
+  http.post<ApiResponse<RetirementApplication>>('/retirement/apply', {
+    assetId: data.assetId,
+    reason: data.reason,
+    estimatedResidualValue: data.residualValue,
+    remark: data.notes,
+    attachments: data.attachments?.join(','),
+  });
 
 /** 获取退役申请列表 */
 export const getRetirementList = (params?: RetirementListQuery) =>
-  http.get<PaginatedResponse<RetirementApplication>>('/retirement', { params });
+  http.get<PaginatedResponse<RetirementApplication>>('/retirement/list', { params });
 
 /** 获取退役申请详情 */
 export const getRetirementDetail = (id: number) =>

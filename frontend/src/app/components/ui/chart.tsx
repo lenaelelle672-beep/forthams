@@ -69,6 +69,15 @@ function ChartContainer({
   );
 }
 
+/**
+ * 注入 Recharts 图表的 CSS 自定义属性（--color-*）。
+ *
+ * 安全审计（P2-06）：此处使用 dangerouslySetInnerHTML 是安全的，原因如下：
+ * - `config` 是开发人员在组件代码中静态定义的 ChartConfig 对象，非用户输入；
+ * - 生成的 CSS 内容仅包含颜色值（十六进制/rgb 字符串）和 CSS 选择器；
+ * - 数据流路径为：开发者编写 → 编译 → bundle → 运行，无用户输入注入点。
+ * 如果未来需要从 API 动态加载 config，必须先用 DOMPurify 过滤。
+ */
 const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
   const colorConfig = Object.entries(config).filter(
     ([, config]) => config.theme || config.color,

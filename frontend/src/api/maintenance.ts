@@ -7,6 +7,7 @@ export interface MaintenanceRecord {
   id: number;
   tenantId?: string;
   assetId: number;
+  workOrderId?: number | null;
   maintenanceType: string;
   maintenanceDate: string;
   nextMaintenanceDate: string | null;
@@ -18,12 +19,14 @@ export interface MaintenanceRecord {
   createBy?: number | null;
   createTime?: string;
   updateTime?: string;
+  sourceType?: string;
   equipmentName?: string;
   assetName?: string;
 }
 
 export interface CreateMaintenancePayload {
   assetId?: number;
+  workOrderId?: number;
   maintenanceType?: string;
   maintenanceDate?: string;
   nextMaintenanceDate?: string;

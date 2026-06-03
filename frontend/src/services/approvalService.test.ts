@@ -38,7 +38,7 @@ type ApprovalActionRequest = { version: number; comment?: string };
 /** @deprecated Use RejectWorkOrderRequest instead */
 type RejectActionRequest = { version: number; rejectionReason: string };
 /** @deprecated Use PaginatedResponse<ApprovalListItem> instead */
-type ApprovalListResponse = { items: PendingApprovalItem[]; total: number; page: number; pageSize: number };
+type ApprovalListResponse = { items: PendingApprovalItem[]; total: number; page?: number; pageSize?: number };
 /** @deprecated Use WorkOrderDetailResponse instead */
 type ApprovalDetailResponse = { workOrder: WorkOrder; approvalRecords: ApprovalRecord[] };
 

@@ -43,3 +43,15 @@ export {
   getReportSummary,
   getReportByCategory,
 } from '@/api/reports';
+
+
+export interface UtilizationOverview { utilizationRate: number; overallUtilizationRate?: number; activeAssets: number; idleAssets: number; totalAssets: number; idleAssetCount?: number; inUseAssetCount?: number; highUtilizationCount?: number; }
+export interface UtilizationTrend { date: string; month?: string; utilizationRate: number; usedHours?: number; activeCount: number; idleCount: number; }
+export interface UtilizationSummary { label: string; value: number; change?: number; byCategory?: { name?: string; category?: string; value: number; utilizationRate?: number }[]; }
+export interface AssetUtilization { id: string | number; assetId?: string | number; assetName: string; assetNo?: string; assetCode?: string; utilizationRate: number; usedHours?: number; usageHours?: number; idleDays?: number; status?: string; }
+
+export const getUtilizationOverview = (..._args: unknown[]) => http.get<UtilizationOverview>('/utilization/overview');
+export const getUtilizationTrend = (..._args: unknown[]) => http.get<UtilizationTrend[]>('/utilization/trend');
+export const getUtilizationSummary = (..._args: unknown[]) => http.get<UtilizationSummary[]>('/utilization/summary');
+export const getTopUtilized = (..._args: unknown[]) => http.get<AssetUtilization[]>('/utilization/top');
+export const getIdleAssets = (..._args: unknown[]) => http.get<AssetUtilization[]>('/utilization/idle');

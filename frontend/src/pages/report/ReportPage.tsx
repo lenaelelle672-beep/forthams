@@ -18,6 +18,7 @@ import {
   FileBarChart, BarChart3, PieChart, TrendingUp,
   Package, DollarSign, ClipboardList, Plus,
 } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { getReportSummary, getReportByCategory, type ReportSummary, type CategoryReport } from '@/api/stats';
 import type { ApiResponse } from '@/types/common';
 import { PageHeader } from '@/components/ui/PageHeader';
@@ -44,7 +45,7 @@ interface ReportTemplate {
   title: string;
   description: string;
   lastUpdated: string;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: LucideIcon;
   iconColor: string;
 }
 

@@ -29,11 +29,11 @@ import {
   FileText,
   Calendar,
   Download,
+  Eye,
 } from 'lucide-react';
-import { PageHeader } from '@/components/ui/PageHeader';
+import { cn } from '@/utils/cn';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/Tabs';
 import { Select, SelectItem } from '@/components/ui/Select';
-import { SkeletonCard } from '@/components/ui/Skeleton';
 import { EmptyState } from '@/components/ui/EmptyState';
 import {
   getReportByCategory,
@@ -48,15 +48,15 @@ import {
 import type { CategoryReport, ReportSummary, TrendReport, NameValueItem } from '@/api/reports';
 import type { ApiResponse } from '@/types/common';
 import { Button } from '@/components/ui/Button';
-import { ReportCard, type ReportCardData } from './components/ReportCard';
+import { type ReportCardData } from './components/ReportCard';
 import { ChartPreview } from './components/ChartPreview';
 
 // ── 报表分类定义 ──────────────────────────────────────────────────────────────
 const REPORT_CATEGORIES = [
-  { id: 'asset',      label: '资产报表', icon: Package },
-  { id: 'financial',  label: '财务报表', icon: DollarSign },
-  { id: 'maintenance', label: '运维报表', icon: Activity },
-  { id: 'workorder',  label: '工单报表', icon: FileText },
+  { id: 'asset',      label: '资产报表', icon: Package,     gradient: 'from-blue-600 to-cyan-500' },
+  { id: 'financial',  label: '财务报表', icon: DollarSign,  gradient: 'from-emerald-500 to-teal-400' },
+  { id: 'maintenance', label: '运维报表', icon: Activity,    gradient: 'from-amber-500 to-orange-400' },
+  { id: 'workorder',  label: '工单报表', icon: FileText,     gradient: 'from-violet-500 to-purple-400' },
 ];
 
 /** 所有预定义报表卡片 */
@@ -300,101 +300,201 @@ export default function ReportsPage() {
   const isLoading = categoryLoading || summaryLoading;
 
   return (
-    <div className="p-6 space-y-6">
-      <PageHeader
-        title="报表中心"
-        subtitle="预定义报表查看与数据可视化"
-        breadcrumbs={[{ label: '仪表板', href: '/dashboard' }, { label: '报表中心' }]}
-        actions={
-          <div className="flex items-center gap-2">
-            <Calendar className="w-4 h-4 text-[#94a3b8]" />
-            <Select value={period} onValueChange={setPeriod}>
-              <SelectItem value="6">近 6 个月</SelectItem>
-              <SelectItem value="12">近 12 个月</SelectItem>
-              <SelectItem value="24">近 24 个月</SelectItem>
-            </Select>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={handleExport}
-            >
-              <Download className="w-3.5 h-3.5" />
-              导出
-            </Button>
+    <div className="min-h-full bg-[var(--app-background)] px-4 py-5 sm:px-6 lg:px-8">
+      <div className="mx-auto flex w-full max-w-[1480px] flex-col gap-6">
+        {/* ── 页头 + 统计概览 ───────────────────────────────────────────── */}
+        <section className="rounded-2xl border border-[var(--surface-border)] bg-white shadow-sm">
+          <div className="flex flex-wrap items-center justify-between gap-4 px-6 py-5">
+            <div>
+              <h1 className="text-xl font-bold text-slate-900">报表中心</h1>
+              <p className="mt-1 text-sm text-slate-500">预定义报表查看与数据可视化</p>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50/50 px-3 py-2">
+                <Calendar className="w-4 h-4 text-slate-400" />
+                <Select value={period} onValueChange={setPeriod}>
+                  <SelectItem value="6">近 6 个月</SelectItem>
+                  <SelectItem value="12">近 12 个月</SelectItem>
+                  <SelectItem value="24">近 24 个月</SelectItem>
+                </Select>
+              </div>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={handleExport}
+                className="rounded-lg"
+              >
+                <Download className="w-3.5 h-3.5" />
+                导出
+              </Button>
+            </div>
           </div>
-        }
-      />
 
-      {/* 分类 Tabs */}
-      <Tabs value={activeCategory} onValueChange={(v) => { setActiveCategory(v); setSelectedReport(null); }}>
-        <TabsList>
+          {/* 分类统计栏 */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-slate-100 border-t border-slate-100">
+            {REPORT_CATEGORIES.map((cat) => {
+              const Icon = cat.icon;
+              const count = ALL_REPORTS.filter((r) => r.category === cat.id).length;
+              return (
+                <div key={cat.id} className="flex items-center gap-3.5 px-6 py-4">
+                  <div className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ${cat.gradient}`}>
+                    <Icon className="w-5 h-5 text-white" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-xs font-medium text-slate-500">{cat.label}</p>
+                    <p className="text-lg font-bold text-slate-900 tabular-nums">{count}</p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* ── 分类筛选 pills ────────────────────────────────────────────── */}
+        <div className="flex flex-wrap items-center gap-2">
           {REPORT_CATEGORIES.map((cat) => {
             const Icon = cat.icon;
+            const isActive = activeCategory === cat.id;
             return (
-              <TabsTrigger key={cat.id} value={cat.id} className="flex items-center gap-2">
-                <Icon className="w-4 h-4" />
+              <button
+                key={cat.id}
+                type="button"
+                onClick={() => { setActiveCategory(cat.id); setSelectedReport(null); }}
+                className={cn(
+                  'inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-all',
+                  isActive
+                    ? 'border-blue-200 bg-blue-50 text-blue-700 shadow-sm'
+                    : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50',
+                )}
+              >
+                <Icon className="w-3.5 h-3.5" />
                 {cat.label}
-              </TabsTrigger>
+              </button>
             );
           })}
-        </TabsList>
+        </div>
 
-        {REPORT_CATEGORIES.map((cat) => (
-          <TabsContent key={cat.id} value={cat.id}>
-            {isLoading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                {Array.from({ length: 4 }).map((_, i) => (
-                  <SkeletonCard key={i} />
-                ))}
-              </div>
-            ) : (categoryError || summaryError || trendError) ? (
-              <EmptyState
-                title="数据加载失败"
-                description="无法加载报表数据，请稍后重试"
-              />
-            ) : currentReports.length === 0 ? (
-              <EmptyState
-                title="暂无报表"
-                description="当前分类下暂无可用报表"
-              />
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                {currentReports.map((report) => (
-                  <ReportCard
-                    key={report.id}
-                    report={report}
-                    selected={selectedReport === report.id}
-                    onClick={() =>
-                      setSelectedReport(selectedReport === report.id ? null : report.id)
-                    }
-                  />
-                ))}
-              </div>
-            )}
-          </TabsContent>
-        ))}
-      </Tabs>
+        {/* ── 报表卡片网格 ──────────────────────────────────────────────── */}
+        {isLoading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="h-44 animate-pulse rounded-2xl border border-slate-200 bg-slate-50" />
+            ))}
+          </div>
+        ) : (categoryError || summaryError || trendError) ? (
+          <EmptyState
+            title="数据加载失败"
+            description="无法加载报表数据，请稍后重试"
+          />
+        ) : currentReports.length === 0 ? (
+          <EmptyState
+            title="暂无报表"
+            description="当前分类下暂无可用报表"
+          />
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+            {currentReports.map((report) => {
+              const Icon = report.icon;
+              const catDef = REPORT_CATEGORIES.find((c) => c.id === report.category);
+              const isSelected = selectedReport === report.id;
+              return (
+                <div
+                  key={report.id}
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => setSelectedReport(isSelected ? null : report.id)}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSelectedReport(isSelected ? null : report.id); } }}
+                  className={cn(
+                    'group relative cursor-pointer overflow-hidden rounded-2xl border bg-white p-5 transition-all duration-200',
+                    'before:pointer-events-none before:absolute before:inset-x-4 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-blue-200/70 before:to-transparent hover:-translate-y-0.5 hover:shadow-lg hover:shadow-blue-900/5',
+                    isSelected
+                      ? 'border-blue-300 shadow-md ring-2 ring-blue-500/20'
+                      : 'border-slate-200/80 shadow-sm hover:border-slate-300',
+                  )}
+                >
+                  {/* ── 顶部：类别标签 + 更新时间 ── */}
+                  <div className="flex items-center justify-between mb-3">
+                    {catDef && (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2.5 py-0.5 text-[11px] font-semibold text-blue-600 ring-1 ring-inset ring-blue-100">
+                        <catDef.icon className="w-3 h-3" />
+                        {catDef.label}
+                      </span>
+                    )}
+                    <span className="inline-flex items-center gap-1 text-[11px] text-slate-400">
+                      <Calendar className="w-3 h-3" />
+                      {report.updatedAt}
+                    </span>
+                  </div>
 
-      {/* 图表预览区 */}
-      {selectedReportData && chartData.length > 0 && (
-        <ChartPreview
-          title={selectedReportData.title}
-          type={selectedReportData.chartType ?? 'bar'}
-          data={chartData}
-          dataKey={selectedReportData.chartType === 'area' ? 'month' : 'name'}
-          valueKey="value"
-        />
-      )}
+                  {/* ── 中部：图标 + 标题 + 描述 ── */}
+                  <div className="flex items-start gap-3 mb-4">
+                    <div className={`flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ${catDef?.gradient ?? 'from-blue-600 to-cyan-500'} shadow-inner transition-colors`}>
+                      <Icon className="w-5 h-5 text-white" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-sm font-semibold text-slate-900 truncate leading-snug">
+                          {report.title}
+                        </h3>
+                        {catDef && (
+                          <span className="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-medium text-slate-500 flex-shrink-0">
+                            {catDef.label}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed">
+                        {report.description}
+                      </p>
+                    </div>
+                  </div>
 
-      {selectedReportData && chartData.length === 0 && !isLoading && !categoryError && !summaryError && (
-        <ChartPreview
-          title={selectedReportData.title}
-          type={selectedReportData.chartType ?? 'bar'}
-          data={[]}
-          dataKey="name"
-          valueKey="value"
-        />
-      )}
+                  {/* ── 底部：操作按钮 ── */}
+                  <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+                    <button
+                      type="button"
+                      className={cn(
+                        'inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-semibold transition-all',
+                        isSelected
+                          ? 'bg-blue-600 text-white shadow-sm'
+                          : 'bg-slate-50 text-slate-600 hover:bg-slate-100',
+                      )}
+                      onClick={(e) => { e.stopPropagation(); setSelectedReport(isSelected ? null : report.id); }}
+                    >
+                      <Eye className="w-3.5 h-3.5" />
+                      查看
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* ── 图表预览区 ────────────────────────────────────────────────── */}
+        {selectedReportData && chartData.length > 0 && (
+          <div className="rounded-2xl border border-slate-200/80 bg-white shadow-sm overflow-hidden">
+            <ChartPreview
+              title={selectedReportData.title}
+              type={selectedReportData.chartType ?? 'bar'}
+              data={chartData as unknown as Record<string, unknown>[] }
+              dataKey={selectedReportData.chartType === 'area' ? 'month' : 'name'}
+              valueKey="value"
+            />
+          </div>
+        )}
+
+        {selectedReportData && chartData.length === 0 && !isLoading && !categoryError && !summaryError && (
+          <div className="rounded-2xl border border-slate-200/80 bg-white shadow-sm overflow-hidden">
+            <ChartPreview
+              title={selectedReportData.title}
+              type={selectedReportData.chartType ?? 'bar'}
+              data={[]}
+              dataKey="name"
+              valueKey="value"
+            />
+          </div>
+        )}
+      </div>
     </div>
   );
 }

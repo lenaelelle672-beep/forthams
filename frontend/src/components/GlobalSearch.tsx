@@ -27,35 +27,50 @@ interface SearchablePage {
 
 const SEARCHABLE_PAGES: SearchablePage[] = [
   // 概览
-  { path: '/',            label: '仪表板',     group: '概览' },
+  { path: '/dashboard',   label: '仪表板',     group: '概览' },
   { path: '/analytics',   label: '数据分析',    group: '概览' },
-  { path: '/situation',   label: '资产大屏',    group: '概览' },
-  { path: '/cyber-v12',   label: '科技大屏',    group: '概览' },
-  { path: '/industrial-v13', label: '工业大屏', group: '概览' },
   // 资产管理
   { path: '/assets',             label: '资产台账',   group: '资产管理' },
   { path: '/assets/new',         label: '新建资产',   group: '资产管理' },
   { path: '/assets/import-export', label: '导入导出', group: '资产管理' },
+  { path: '/asset-models',       label: '资产型号',   group: '资产管理' },
   { path: '/equipment',          label: '重要设备',   group: '资产管理' },
   { path: '/idle',               label: '闲置资产',   group: '资产管理' },
   { path: '/depreciation',       label: '折旧管理',   group: '资产管理' },
   // 运营管理
   { path: '/inventory',              label: 'RFID 盘点',      group: '运营管理' },
-  { path: '/inventory/tasks',        label: '盘点任务',       group: '运营管理' },
   { path: '/inventory/smart-report', label: '智能盘点报告',   group: '运营管理' },
+  { path: '/maintenance',            label: '维保记录',       group: '运营管理' },
+  { path: '/maintenance/plans',      label: '维保计划',       group: '运营管理' },
   // 工单管理已合并到资产处置
-  { path: '/approval',               label: '审批流程',       group: '运营管理' },
+  { path: '/approvals',              label: '审批流程',       group: '运营管理' },
   { path: '/workflows',              label: '工作流',         group: '运营管理' },
   { path: '/workflow-designer',      label: '工作流设计器',   group: '运营管理' },
+  // 采购与合同
+  { path: '/purchase-orders', label: '采购订单', group: '采购与合同' },
+  { path: '/contracts',       label: '合同管理', group: '采购与合同' },
+  // 空间与能耗
+  { path: '/gis',        label: 'GIS 地图', group: '空间与能耗' },
+  { path: '/floorplans', label: '楼层平面图', group: '空间与能耗' },
+  { path: '/energy',     label: '能耗管理', group: '空间与能耗' },
+  // 软件与合规
+  { path: '/licenses', label: '软件许可证', group: '软件与合规' },
+  { path: '/sam',      label: 'SAM 合规', group: '软件与合规' },
   // 退役与处置
   { path: '/disposals',                 label: '资产处置',     group: '退役与处置' },
   { path: '/disposals/transfer/new',    label: '资产转移',     group: '退役与处置' },
   { path: '/disposals/clearance/new',   label: '资产清退',     group: '退役与处置' },
   { path: '/disposals/scrap/new',       label: '资产报废',     group: '退役与处置' },
-  { path: '/disposals/compensation/new', label: '赔偿管理',    group: '退役与处置' },
+  { path: '/compensation',              label: '赔偿管理',     group: '退役与处置' },
+  // 报表
+  { path: '/reports', label: '报表中心', group: '报表' },
   // 监控与审计
   { path: '/audit', label: '审计日志', group: '监控与审计' },
+  // 通知
+  { path: '/notifications', label: '通知中心', group: '通知' },
   // 基础数据
+  { path: '/categories', label: '资产分类', group: '基础数据' },
+  { path: '/manufacturers', label: '制造商', group: '基础数据' },
   { path: '/vendors',   label: '供应商',  group: '基础数据' },
   { path: '/locations', label: '位置管理', group: '基础数据' },
   // 系统管理
@@ -64,10 +79,20 @@ const SEARCHABLE_PAGES: SearchablePage[] = [
   { path: '/system/menus',  label: '菜单管理', group: '系统管理' },
   { path: '/system/depts',  label: '部门管理', group: '系统管理' },
   { path: '/system/posts',  label: '岗位管理', group: '系统管理' },
-  { path: '/settings/system', label: '参数配置', group: '系统管理' },
+  { path: '/system/custom-fields', label: '自定义字段', group: '系统管理' },
+  { path: '/system/custom-fieldsets', label: '字段集', group: '系统管理' },
+  { path: '/settings/sysconfig', label: '参数配置', group: '系统管理' },
+  { path: '/settings/numbering', label: '编号规则', group: '系统管理' },
+  { path: '/settings/notif-pref', label: '通知偏好', group: '系统管理' },
+  { path: '/settings/notif-template', label: '通知模板', group: '系统管理' },
+  { path: '/settings/notif-channel', label: '通知渠道', group: '系统管理' },
+  { path: '/settings/notif-switch', label: '流程通知开关', group: '系统管理' },
+  { path: '/settings/mail-template', label: '邮件模板', group: '系统管理' },
+  { path: '/settings/mail-log', label: '邮件日志', group: '系统管理' },
+  { path: '/settings/webhook', label: 'Webhook 配置', group: '系统管理' },
 ];
 
-const GROUP_ORDER = ['概览', '资产管理', '运营管理', '退役与处置', '监控与审计', '基础数据', '系统管理', '系统'];
+const GROUP_ORDER = ['概览', '资产管理', '运营管理', '采购与合同', '空间与能耗', '软件与合规', '退役与处置', '报表', '监控与审计', '通知', '基础数据', '系统管理'];
 
 function groupSorter(a: { group: string }, b: { group: string }) {
   return GROUP_ORDER.indexOf(a.group) - GROUP_ORDER.indexOf(b.group);

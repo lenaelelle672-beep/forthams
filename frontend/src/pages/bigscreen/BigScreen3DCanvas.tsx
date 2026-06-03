@@ -808,7 +808,7 @@ export default function BigScreen3DCanvas({ selectedCity, onSelectCity, onIntroC
       dpr={[1, 1.5]}
       gl={{ alpha: false, antialias: true, powerPreference: 'high-performance' }}
       onCreated={({ gl }) => gl.setClearColor('#000000', 1)}
-      onError={(event) => onError(event.message || 'WebGL 渲染初始化失败')}
+      onError={(event) => onError((event as unknown as Error).message || 'WebGL 渲染初始化失败')}
     >
       <SichuanMapScene selectedCity={selectedCity} onSelectCity={onSelectCity} onIntroComplete={onIntroComplete} />
     </Canvas>

@@ -5,7 +5,7 @@
  * 每个卡片展示一个报表模板：标题、描述、最后更新时间、操作按钮。
  */
 import * as React from 'react';
-import type { LucideIcon } from 'lucide-react';
+
 import { Eye, Download } from 'lucide-react';
 import { cn } from '@/utils/cn';
 import { Card, CardContent, CardFooter } from '@/components/ui/Card';
@@ -19,7 +19,7 @@ export interface ReportCardProps {
   /** 最后更新时间 */
   lastUpdated: string;
   /** 图标 */
-  icon?: LucideIcon;
+  icon?: React.ComponentType<{ className?: string; style?: React.CSSProperties }>;
   /** 图标颜色 */
   iconColor?: string;
   /** 查看回调 */

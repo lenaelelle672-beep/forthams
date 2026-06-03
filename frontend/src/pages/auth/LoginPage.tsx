@@ -1,13 +1,12 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useMutation } from '@tanstack/react-query';
-import { Eye, EyeOff, Shield, User, Lock, ShieldCheck, Package, Building2, Wrench, BarChart3, LogIn } from 'lucide-react';
+import { Eye, EyeOff, Shield, User, Lock, ShieldCheck, Package, Building2, Wrench, BarChart3, LogIn, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
 import { login } from '@/api/auth';
 
 const loginSchema = z.object({
@@ -16,18 +15,6 @@ const loginSchema = z.object({
 });
 
 type LoginForm = z.infer<typeof loginSchema>;
-
-interface Particle {
-  x: number;
-  y: number;
-  vx: number;
-  vy: number;
-  size: number;
-  opacity: number;
-  hue: number;
-  life: number;
-  maxLife: number;
-}
 
 // 开发环境使用演示账号，生产环境通过环境变量注入（为空则隐藏）
 const isDev = import.meta.env.DEV;
@@ -45,130 +32,11 @@ const DEMO_ACCOUNTS: Array<{ label: string; desc: string; username: string; pass
     ? [{ label: '演示账号', desc: '只读权限', username: envDemoUser, password: envDemoPass, Icon: ShieldCheck }]
     : [];
 
-function useParticleCanvas(canvasRef: React.RefObject<HTMLCanvasElement | null>) {
-  const particlesRef = useRef<Particle[]>([]);
-  const animRef = useRef<number>(0);
-  const mouseRef = useRef({ x: -1000, y: -1000 });
-  const timeRef = useRef(0);
-
-  const initParticles = useCallback((width: number, height: number) => {
-    const count = Math.min(Math.floor((width * height) / 6000), 120);
-    particlesRef.current = Array.from({ length: count }, () => ({
-      x: Math.random() * width,
-      y: Math.random() * height,
-      vx: (Math.random() - 0.5) * 0.25,
-      vy: (Math.random() - 0.5) * 0.25,
-      size: Math.random() * 2 + 0.5,
-      opacity: Math.random() * 0.4 + 0.15,
-      hue: Math.random() * 60 + 200,
-      life: 0,
-      maxLife: Math.random() * 500 + 300,
-    }));
-  }, []);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    const resize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      if (particlesRef.current.length === 0) initParticles(canvas.width, canvas.height);
-    };
-    resize();
-    window.addEventListener('resize', resize);
-    window.addEventListener('mousemove', (e) => {
-      mouseRef.current = { x: e.clientX, y: e.clientY };
-    });
-
-    const CONNECTION_DIST = 120;
-    const MOUSE_DIST = 200;
-
-    const animate = () => {
-      timeRef.current++;
-      ctx.fillStyle = 'rgba(11, 19, 38, 0.15)';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      const particles = particlesRef.current;
-      const mouse = mouseRef.current;
-
-      for (let i = 0; i < particles.length; i++) {
-        const p = particles[i];
-        p.life++;
-        const lifeRatio = p.life / p.maxLife;
-        const fadeIn = Math.min(p.life / 60, 1);
-        const fadeOut = lifeRatio > 0.8 ? 1 - (lifeRatio - 0.8) / 0.2 : 1;
-        const alpha = p.opacity * fadeIn * fadeOut;
-
-        if (p.life >= p.maxLife) {
-          p.x = Math.random() * canvas.width;
-          p.y = Math.random() * canvas.height;
-          p.life = 0;
-          p.maxLife = Math.random() * 500 + 300;
-        }
-
-        const dx = mouse.x - p.x;
-        const dy = mouse.y - p.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < MOUSE_DIST) {
-          const force = (MOUSE_DIST - dist) / MOUSE_DIST * 0.006;
-          p.vx += dx * force;
-          p.vy += dy * force;
-        }
-
-        p.vx *= 0.988;
-        p.vy *= 0.988;
-        p.x += p.vx;
-        p.y += p.vy;
-
-        if (p.x < 0) { p.x = 0; p.vx *= -1; }
-        if (p.x > canvas.width) { p.x = canvas.width; p.vx *= -1; }
-        if (p.y < 0) { p.y = 0; p.vy *= -1; }
-        if (p.y > canvas.height) { p.y = canvas.height; p.vy *= -1; }
-
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx.fillStyle = `hsla(${p.hue}, 80%, 75%, ${alpha})`;
-        ctx.fill();
-
-        for (let j = i + 1; j < particles.length; j++) {
-          const p2 = particles[j];
-          const ddx = p.x - p2.x;
-          const ddy = p.y - p2.y;
-          const d = Math.sqrt(ddx * ddx + ddy * ddy);
-          if (d < CONNECTION_DIST) {
-            const lineAlpha = (1 - d / CONNECTION_DIST) * 0.15 * fadeIn * fadeOut;
-            ctx.beginPath();
-            ctx.moveTo(p.x, p.y);
-            ctx.lineTo(p2.x, p2.y);
-            ctx.strokeStyle = `hsla(${p.hue}, 70%, 65%, ${lineAlpha})`;
-            ctx.lineWidth = 0.6;
-            ctx.stroke();
-          }
-        }
-      }
-
-      animRef.current = requestAnimationFrame(animate);
-    };
-
-    animate();
-    return () => {
-      window.removeEventListener('resize', resize);
-      cancelAnimationFrame(animRef.current);
-    };
-  }, [canvasRef, initParticles]);
-}
-
 export default function LoginPage() {
   const navigate = useNavigate();
-  const canvasRef = useRef<HTMLCanvasElement>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [rememberMe, setRememberMe] = useState(false);
-
-  useParticleCanvas(canvasRef);
 
   const { register, handleSubmit, setValue, formState: { errors } } = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
@@ -224,291 +92,200 @@ export default function LoginPage() {
   };
 
   return (
-    <main
-      className="login1-screen relative flex h-screen w-full overflow-hidden font-sans"
-      style={{ background: 'radial-gradient(circle at top left, #131b2e 0%, #0b1326 100%)' }}
-    >
-      <style>{`
-        .login1-screen {
-          background:
-            radial-gradient(circle at 18% 16%, rgba(37, 99, 235, 0.32), transparent 34%),
-            radial-gradient(circle at 74% 28%, rgba(20, 184, 166, 0.18), transparent 32%),
-            linear-gradient(135deg, #101827 0%, #071225 50%, #050b17 100%) !important;
-          background-color: #071225 !important;
-          isolation: isolate;
-        }
+    <main className="relative min-h-screen overflow-hidden bg-[#071225] text-slate-100 selection:bg-blue-300/30">
+      <div aria-hidden className="absolute inset-0">
+        <div className="absolute left-[-12%] top-[-18%] h-[460px] w-[460px] rounded-full bg-blue-500/20 blur-3xl" />
+        <div className="absolute bottom-[-18%] right-[-10%] h-[520px] w-[520px] rounded-full bg-cyan-400/10 blur-3xl" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.045)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.035)_1px,transparent_1px)] bg-[size:48px_48px] opacity-45" />
+      </div>
 
-        @keyframes login1-float {
-          0%, 100% { transform: translate3d(0, 0, 0); }
-          50% { transform: translate3d(0, -14px, 0); }
-        }
-
-        @keyframes rainbowShift {
-          0% { background-position: 0% 50%; }
-          100% { background-position: 300% 50%; }
-        }
-
-        @keyframes login1-pulse {
-          0%, 100% { opacity: .45; transform: scale(.98); }
-          50% { opacity: 1; transform: scale(1.04); }
-        }
-
-        .login1-asset-card {
-          background: rgba(22, 34, 59, 0.18);
-          border: 1px solid rgba(148, 197, 255, .14);
-          box-shadow: 0 24px 80px rgba(0, 0, 0, .28), inset 0 1px 0 rgba(255,255,255,.08);
-        }
-
-        @media (max-width: 1024px) {
-          .login1-layout {
-            grid-template-columns: 1fr !important;
-            overflow-y: auto;
-            padding: 32px 24px !important;
-          }
-
-          .login1-left {
-            min-height: 420px;
-          }
-
-          .login1-panel-column {
-            justify-self: center !important;
-            width: min(480px, 100%) !important;
-          }
-        }
-
-        @media (max-width: 720px) {
-          .login1-left {
-            display: none;
-          }
-        }
-      `}</style>
-      <canvas ref={canvasRef} className="absolute inset-0 z-0" />
-
-      {DEMO_ACCOUNTS.length > 0 && (
-        <section className="fixed left-5 top-5 z-20 w-[min(360px,calc(100vw-40px))] rounded-2xl border border-white/10 bg-[#071225]/70 p-3 shadow-2xl backdrop-blur-xl">
-          <div className="mb-3 flex items-center justify-between gap-3">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#9ecbff]">快捷账号</p>
-              <p className="text-[10px] text-[#6f7891]">测试期间保留，后续可按指令移除</p>
-            </div>
+      <div className="relative z-10 grid min-h-screen grid-cols-1 lg:grid-cols-[minmax(0,1fr)_520px]">
+        <section className="hidden min-h-screen flex-col justify-between px-[6vw] py-10 lg:flex">
+          <div className="inline-flex w-fit items-center gap-2 rounded-full border border-white/10 bg-white/[0.06] px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-blue-100 shadow-lg shadow-black/10 backdrop-blur">
+            <ShieldCheck className="h-3.5 w-3.5 text-cyan-200" />
+            forthAMS Control Center
           </div>
-          <div className="grid grid-cols-2 gap-2">
-            {DEMO_ACCOUNTS.map(({ label, desc, username, password, Icon }) => (
-              <button
-                key={username}
-                type="button"
-                onClick={() => fillAndLogin(username, password)}
-                disabled={loginMutation.isPending}
-                className="rounded-xl border border-white/10 bg-white/[0.05] px-3 py-2 text-left transition-all hover:-translate-y-0.5 hover:bg-white/[0.08] disabled:opacity-40"
-              >
-                <div className="flex items-center gap-2">
-                  <Icon className="h-4 w-4 text-[#b4c5ff]" />
-                  <span className="text-xs font-medium text-[#dae2fd]">{label}</span>
-                </div>
-                <p className="mt-1 text-[10px] text-[#6f7891]">{desc}</p>
-              </button>
-            ))}
-          </div>
-        </section>
-      )}
 
-      <div className="fixed inset-0 pointer-events-none" style={{
-        backgroundImage: `
-          linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
-          linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px)
-        `,
-        backgroundSize: '32px 32px',
-      }} />
-
-      <div className="login1-layout relative z-10 grid h-full w-full grid-cols-[minmax(0,1fr)_minmax(420px,500px)] items-center gap-12 px-[6vw] py-8">
-        <section className="login1-left relative min-h-[640px] overflow-hidden p-8 text-[#dae2fd]">
-          <div className="absolute -left-24 top-16 h-72 w-72 rounded-full bg-[#2563eb]/20 blur-3xl" />
-          <div className="absolute bottom-8 right-10 h-80 w-80 rounded-full bg-[#14b8a6]/20 blur-3xl" />
-
-          <div className="relative z-10 max-w-[680px]">
-            <div className="mb-6 inline-flex items-center gap-3 rounded-full border border-[#6eb8ff]/20 bg-[#071225]/45 px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-[#9ecbff]">
-              <span className="h-2 w-2 rounded-full bg-[#5fffc1] shadow-[0_0_18px_rgba(95,255,193,.8)]" />
-              星空无界 · UNI 有方
-            </div>
-            <h1 className="max-w-[620px] text-[52px] font-semibold leading-[1.04] tracking-[-0.04em] text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.7)]">
-              仰望星空，<br />驾驭资产万象
+          <div className="max-w-[680px]">
+            <h1 className="text-5xl font-semibold leading-tight tracking-[-0.04em] text-white xl:text-[64px]">
+              统一资产、流程与审计的运营入口
             </h1>
-            <p className="mt-5 max-w-[560px] text-base leading-8 text-[#b8c8e6] drop-shadow-[0_1px_6px_rgba(0,0,0,0.6)]">
-              以 Universe 之广，纳资产之全。<br />
-              设备、流程、数据，尽在 UNI 统一视界。
+            <p className="mt-6 max-w-[560px] text-base leading-8 text-slate-300">
+              为资产台账、盘点、审批和审计提供一致的登录起点，帮助运营团队稳定进入核心工作台。
             </p>
-          </div>
 
-          <div className="relative z-10 mx-auto mt-8 flex h-[330px] max-w-[620px] items-center justify-center gap-6">
-            <div className="relative flex h-56 w-56 items-center justify-center">
-              <div className="absolute inset-0 animate-[login1-pulse_4s_ease-in-out_infinite] rounded-[40px] border border-[#5ab4ff]/20 bg-[linear-gradient(145deg,rgba(37,99,235,.18),rgba(20,184,166,.08))]" />
-              <div className="absolute inset-4 animate-[login1-float_6s_ease-in-out_infinite] rounded-2xl border border-white/10 bg-[#06152d]/40" />
-              <svg className="absolute inset-0 h-full w-full animate-[spin_6s_linear_infinite]" viewBox="0 0 224 224" fill="none">
-                <circle cx="112" cy="112" r="96" stroke="rgba(94,220,255,.12)" strokeWidth="1" strokeDasharray="8 6" />
-                <circle cx="112" cy="112" r="72" stroke="rgba(94,220,255,.08)" strokeWidth="1" strokeDasharray="4 8" />
-                <line x1="112" y1="112" x2="112" y2="16" stroke="rgba(94,220,255,.25)" strokeWidth="1.5" />
-              </svg>
-              <div className="relative z-10 flex items-center justify-center h-20 w-20">
-                <svg className="absolute inset-0 h-full w-full animate-[spin_8s_linear_infinite]" viewBox="0 0 80 80" fill="none">
-                  <circle cx="40" cy="40" r="36" stroke="rgba(94,220,255,.2)" strokeWidth="1" strokeDasharray="6 5" />
-                  <circle cx="40" cy="40" r="26" stroke="rgba(94,220,255,.13)" strokeWidth="1" strokeDasharray="3 7" />
-                  <line x1="40" y1="40" x2="40" y2="4" stroke="rgba(94,220,255,.3)" strokeWidth="1.2" />
-                  <circle cx="40" cy="40" r="16" stroke="rgba(94,220,255,.08)" strokeWidth="0.8" />
-                </svg>
-                <div className="relative flex flex-col items-center">
-                  <span className="text-[32px] font-black tracking-[0.18em] bg-clip-text text-transparent drop-shadow-[0_0_24px_rgba(255,255,255,.5)]" style={{ fontFamily: "'Arial Black','Impact','Inter',sans-serif", backgroundImage: 'linear-gradient(90deg,#ff6b6b,#ffd93d,#6bcb77,#4d96ff,#9b59b6,#ff6b6b)', backgroundSize: '300% 100%', animation: 'rainbowShift 3s linear infinite', lineHeight: 1 }}>
-                    UNI
-                  </span>
-                  <span className="text-[32px] font-black tracking-[0.18em] bg-clip-text text-transparent scale-y-[-1] opacity-20 translate-y-1" style={{ fontFamily: "'Arial Black','Impact','Inter',sans-serif", backgroundImage: 'linear-gradient(90deg,#ff6b6b,#ffd93d,#6bcb77,#4d96ff,#9b59b6,#ff6b6b)', backgroundSize: '300% 100%', animation: 'rainbowShift 3s linear infinite', lineHeight: 1, WebkitBackgroundClip: 'text', maskImage: 'linear-gradient(to bottom, black 30%, transparent 100%)', WebkitMaskImage: 'linear-gradient(to bottom, black 30%, transparent 100%)' }}>
-                    UNI
-                  </span>
-                </div>
-              </div>
-            </div>
-            <div className="flex flex-col gap-5">
+            <div className="mt-10 grid max-w-[620px] grid-cols-3 gap-3">
               {[
-                { icon: Shield, label: '全生命周期追踪' },
-                { icon: BarChart3, label: '实时数据看板' },
-              ].map(({ icon: Icon, label }) => (
-                <div key={label} className="flex items-center gap-3 rounded-2xl border border-white/8 bg-white/[0.04] px-5 py-3 backdrop-blur-sm">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#2563eb]/20">
-                    <Icon className="h-4 w-4 text-[#9ecbff]" />
-                  </div>
-                  <span className="text-sm font-medium text-[#c3d4f0]">{label}</span>
+                { label: '资产台账', value: '统一入口', Icon: Package },
+                { label: '审批流程', value: '权限守护', Icon: Shield },
+                { label: '运营分析', value: '实时洞察', Icon: BarChart3 },
+              ].map(({ label, value, Icon }) => (
+                <div key={label} className="rounded-2xl border border-white/10 bg-white/[0.07] p-4 shadow-2xl shadow-black/10 backdrop-blur">
+                  <Icon className="h-5 w-5 text-cyan-100" />
+                  <p className="mt-4 text-sm font-semibold text-white">{label}</p>
+                  <p className="mt-1 text-xs text-slate-400">{value}</p>
                 </div>
               ))}
             </div>
           </div>
+
+          <div className="grid max-w-[760px] grid-cols-2 gap-4">
+            {[
+              '多角色权限隔离',
+              '统一组织身份认证',
+              '审计日志全链路留痕',
+              '移动盘点与审批协同',
+            ].map((item) => (
+              <div key={item} className="flex items-center gap-3 rounded-2xl border border-white/10 bg-[#071225]/55 px-4 py-3 shadow-inner backdrop-blur">
+                <CheckCircle2 className="h-4 w-4 text-emerald-300" />
+                <span className="text-sm text-slate-200">{item}</span>
+              </div>
+            ))}
+          </div>
         </section>
 
-        <div className="login1-panel-column relative z-10 flex w-full max-w-[480px] flex-col items-center justify-self-end">
-        <div
-          className="glass-card w-full rounded-xl p-8 mb-8"
-          style={{
-            background: 'rgba(23, 31, 51, 0.35)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-          }}
-        >
-          <header className="flex flex-col items-center mb-10 text-center">
-            <div className="w-14 h-14 rounded-xl flex items-center justify-center mb-4 border border-[#2563eb]/20" style={{ background: 'rgba(37, 99, 235, 0.12)' }}>
-              <Shield className="w-7 h-7 text-[#b4c5ff]" />
-            </div>
-            <h1 className="text-[28px] font-semibold text-[#dae2fd] tracking-tight leading-9">
-              资产管理系统
-            </h1>
-            <p className="text-sm font-medium text-[#c3c6d7] mt-2 uppercase tracking-[0.2em]">
-              安全资产网关
-            </p>
-          </header>
+        <section className="flex min-h-screen items-center justify-center px-5 py-8 sm:px-8 lg:bg-[#061226]/55 lg:backdrop-blur-sm">
+          <div className="w-full max-w-[460px]">
+            <div className="relative overflow-hidden rounded-[28px] border border-white/10 bg-white/[0.08] p-7 shadow-[0_28px_80px_rgba(0,0,0,0.32)] ring-1 ring-white/[0.04] backdrop-blur-2xl sm:p-8">
+              <div aria-hidden className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-cyan-200/50 to-transparent" />
+              <header className="mb-8">
+                <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl border border-blue-300/15 bg-blue-400/10 shadow-inner">
+                  <Shield className="h-6 w-6 text-blue-100" />
+                </div>
+                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-blue-100/75">Secure Sign In</p>
+                <h1 className="mt-2 text-3xl font-semibold tracking-tight text-white">登录资产管理系统</h1>
+                <p className="mt-2 text-sm leading-6 text-slate-400">使用组织账号进入 forthAMS 工作台。</p>
+              </header>
 
-          <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
-            <div className="space-y-2">
-              <label className="text-xs font-semibold text-[#c3c6d7] uppercase tracking-wider ml-1" htmlFor="username">
-                用户名
-              </label>
-              <div className="relative flex items-center border border-white/10 rounded-lg bg-[#060e20]/50 group transition-all duration-200 focus-within:shadow-[0_0_15px_rgba(37,99,235,0.3)] focus-within:border-[#2563eb]">
-                <User className="absolute left-4 w-5 h-5 text-[#8d90a0] group-focus-within:text-[#b4c5ff]" />
-                <input
-                  {...register('username')}
-                  id="username"
-                  type="text"
-                  placeholder="请输入账号"
-                  className="w-full bg-transparent border-none py-3.5 pl-12 pr-4 text-[#dae2fd] placeholder:text-[#434655] focus:ring-0 text-base outline-none"
-                />
-              </div>
-              {errors.username && <p className="text-xs text-[#ffb4ab] ml-1">{errors.username.message}</p>}
-            </div>
+              <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
+                <div className="space-y-2">
+                  <label className="ml-1 text-xs font-semibold uppercase tracking-wider text-slate-300" htmlFor="username">
+                    用户名
+                  </label>
+                  <div className="group relative flex items-center rounded-xl border border-white/10 bg-[#061126]/70 transition-all duration-200 hover:border-white/20 focus-within:border-blue-300/70 focus-within:bg-[#071833]/80 focus-within:shadow-[0_0_0_4px_rgba(59,130,246,0.16)]">
+                    <User className="absolute left-4 h-5 w-5 text-slate-500 transition-colors group-focus-within:text-blue-100" />
+                    <input
+                      {...register('username')}
+                      id="username"
+                      type="text"
+                      placeholder="请输入账号"
+                      className="w-full border-none bg-transparent py-3.5 pl-12 pr-4 text-base text-slate-100 outline-none placeholder:text-slate-600 focus:ring-0"
+                    />
+                  </div>
+                  {errors.username && <p className="ml-1 text-xs text-red-200">{errors.username.message}</p>}
+                </div>
 
-            <div className="space-y-2">
-              <label className="text-xs font-semibold text-[#c3c6d7] uppercase tracking-wider ml-1" htmlFor="password">
-                密码
-              </label>
-              <div className="relative flex items-center border border-white/10 rounded-lg bg-[#060e20]/50 group transition-all duration-200 focus-within:shadow-[0_0_15px_rgba(37,99,235,0.3)] focus-within:border-[#2563eb]">
-                <Lock className="absolute left-4 w-5 h-5 text-[#8d90a0] group-focus-within:text-[#b4c5ff]" />
-                <input
-                  {...register('password')}
-                  id="password"
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder="••••••••"
-                  className="w-full bg-transparent border-none py-3.5 pl-12 pr-12 text-[#dae2fd] placeholder:text-[#434655] focus:ring-0 text-base outline-none"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword((v) => !v)}
-                  className="absolute right-4 text-[#8d90a0] hover:text-[#dae2fd] transition-colors"
+                <div className="space-y-2">
+                  <label className="ml-1 text-xs font-semibold uppercase tracking-wider text-slate-300" htmlFor="password">
+                    密码
+                  </label>
+                  <div className="group relative flex items-center rounded-xl border border-white/10 bg-[#061126]/75 transition-all duration-200 hover:border-white/20 focus-within:border-blue-300/70 focus-within:bg-[#071832]/85 focus-within:shadow-[0_0_0_4px_rgba(59,130,246,0.16)]">
+                    <Lock className="absolute left-4 h-5 w-5 text-slate-500 transition-colors group-focus-within:text-blue-100" />
+                    <input
+                      {...register('password')}
+                      id="password"
+                      type={showPassword ? 'text' : 'password'}
+                      placeholder="请输入密码"
+                      className="w-full border-none bg-transparent py-3.5 pl-12 pr-12 text-base text-slate-100 outline-none placeholder:text-slate-600 focus:ring-0"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((v) => !v)}
+                      className="absolute right-4 text-slate-500 transition-colors hover:text-slate-100"
+                      aria-label={showPassword ? '隐藏密码' : '显示密码'}
+                    >
+                      {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                    </button>
+                  </div>
+                  {errors.password && <p className="ml-1 text-xs text-red-200">{errors.password.message}</p>}
+                </div>
+
+                <div className="flex items-center justify-between gap-4">
+                  <label className="group flex cursor-pointer items-center gap-3">
+                    <input
+                      type="checkbox"
+                      name="rememberMe"
+                      checked={rememberMe}
+                      onChange={(e) => setRememberMe(e.target.checked)}
+                      className="h-4 w-4 rounded border-slate-500 bg-[#1b2a44] text-blue-500 focus:ring-blue-400 focus:ring-offset-[#071225]"
+                    />
+                    <span className="text-sm font-medium text-slate-300 transition-colors group-hover:text-white">记住用户名</span>
+                  </label>
+                  <button
+                    type="button"
+                    className="text-sm font-medium text-blue-100 underline-offset-4 transition-colors hover:text-white hover:underline"
+                    onClick={() => toast.info('请联系管理员重置密码')}
+                  >
+                    忘记密码？
+                  </button>
+                </div>
+
+                {errorMsg && (
+                  <div className="rounded-xl border border-red-300/20 bg-red-500/10 px-3 py-2.5 text-center text-sm text-red-100">
+                    {errorMsg}
+                  </div>
+                )}
+
+                <Button
+                  type="submit"
+                  variant="primary"
+                  size="lg"
+                  loading={loginMutation.isPending}
+                  className="!h-11 w-full !rounded-xl !text-base !font-semibold !shadow-lg !shadow-blue-500/20 transition-transform active:scale-[0.99]"
                 >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                </button>
+                  登录系统
+                </Button>
+              </form>
+
+              <div className="mt-6 border-t border-white/10 pt-6">
+                <a
+                  href={`${import.meta.env.VITE_API_BASE || ''}/api/oauth2/authorization/maxkey`}
+                  className="flex w-full items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.06] py-3 text-center text-sm font-semibold text-slate-100 shadow-lg transition-all hover:-translate-y-0.5 hover:border-blue-300/30 hover:bg-white/[0.1]"
+                >
+                  <LogIn className="h-4 w-4" />
+                  MaxKey 单点登录
+                </a>
+                <p className="mt-2 text-center text-[11px] text-slate-500">使用组织统一身份认证登录</p>
               </div>
-              {errors.password && <p className="text-xs text-[#ffb4ab] ml-1">{errors.password.message}</p>}
+
+              {DEMO_ACCOUNTS.length > 0 && (
+                <div className="mt-6 rounded-2xl border border-white/10 bg-white/[0.04] p-3">
+                  <div className="mb-3 flex items-center justify-between gap-3">
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-blue-100/80">快捷账号</p>
+                      <p className="text-[11px] text-slate-500">授权演示环境可用</p>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    {DEMO_ACCOUNTS.map(({ label, desc, username, password, Icon }) => (
+                      <button
+                        key={username}
+                        type="button"
+                        onClick={() => fillAndLogin(username, password)}
+                        disabled={loginMutation.isPending}
+                        className="rounded-xl border border-white/10 bg-[#071225]/45 px-3 py-2 text-left transition-all hover:-translate-y-0.5 hover:bg-white/[0.08] disabled:opacity-40"
+                      >
+                        <div className="flex items-center gap-2">
+                          <Icon className="h-4 w-4 text-blue-100" />
+                          <span className="text-xs font-medium text-slate-100">{label}</span>
+                        </div>
+                        <p className="mt-1 text-[10px] text-slate-500">{desc}</p>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
-            <div className="flex items-center justify-between">
-              <label className="flex items-center gap-3 cursor-pointer group">
-                <input
-                  type="checkbox"
-                  name="rememberMe"
-                  checked={rememberMe}
-                  onChange={(e) => setRememberMe(e.target.checked)}
-                  className="h-5 w-5 rounded border-[#434655] bg-[#2d3449] text-[#2563eb] focus:ring-offset-[#0b1326] focus:ring-[#2563eb]"
-                />
-                <span className="text-sm font-medium text-[#c3c6d7] group-hover:text-[#dae2fd] transition-colors">
-                  记住我
-                </span>
-              </label>
-              <button
-                type="button"
-                className="text-sm font-medium text-[#b4c5ff] hover:text-[#adc6ff] transition-colors underline-offset-4 hover:underline"
-                onClick={() => toast.info('请联系管理员重置密码')}
-              >
-                忘记密码？
-              </button>
-            </div>
-
-            {errorMsg && (
-              <div className="p-3 rounded-lg text-sm text-center border" style={{ background: 'rgba(147,0,10,0.2)', borderColor: 'rgba(255,180,171,0.2)', color: '#ffb4ab' }}>
-                {errorMsg}
+            <footer className="mt-8 text-center text-xs text-slate-600">
+              <p>© 2026 资产管理系统 版权所有</p>
+              <div className="mt-2 flex justify-center gap-4">
+                <a className="hover:text-slate-300" href="#">安全策略</a>
+                <a className="hover:text-slate-300" href="#">服务条款</a>
               </div>
-            )}
-
-            <Button
-              type="submit"
-              variant="primary"
-              size="lg"
-              loading={loginMutation.isPending}
-              className="w-full !py-4 !text-base !font-semibold !rounded-lg !shadow-lg !shadow-[#2563eb]/20"
-              style={{ background: '#2563eb' }}
-            >
-              登录系统
-            </Button>
-          </form>
-
-          <div className="mt-6 pt-6 border-t border-white/10">
-            <div className="flex items-center gap-4 mb-4">
-              <div className="h-px flex-grow bg-white/10" />
-              <span className="text-xs font-semibold text-[#8d90a0] tracking-[0.15em] uppercase whitespace-nowrap">
-                MaxKey SSO
-              </span>
-              <div className="h-px flex-grow bg-white/10" />
-            </div>
-            <a
-              href={`${import.meta.env.VITE_API_BASE || ''}/api/oauth2/authorization/maxkey`}
-              className="flex items-center justify-center gap-2 w-full py-3.5 rounded-lg text-center text-base font-semibold bg-[#1e3a5f] text-[#dae2fd] hover:bg-[#2563eb] transition-colors shadow-lg"
-            >
-              <LogIn className="w-5 h-5" />SSO 单点登录
-            </a>
-            <p className="text-[10px] text-[#5a5e73] text-center mt-2">Mock 模式 — 自动登录为 admin</p>
+            </footer>
           </div>
-        </div>
-
-        <footer className="mt-12 text-center">
-          <p className="text-xs text-[#434655]">© 2026 资产管理系统 版权所有</p>
-          <div className="mt-2 flex justify-center gap-4">
-            <a className="text-[10px] text-[#434655] hover:text-[#8d90a0]" href="#">安全策略</a>
-            <a className="text-[10px] text-[#434655] hover:text-[#8d90a0]" href="#">服务条款</a>
-          </div>
-        </footer>
-        </div>
+        </section>
       </div>
     </main>
   );

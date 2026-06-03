@@ -2,19 +2,18 @@
 @import './tailwind.css';
 @import './theme.css';
 
-html, body, #app, main, .page-container {
-  background-color: var(--background) !important;
+html, body, #app, .page-container {
+  background-color: var(--app-background);
 }
 
 main {
-  color: #111827;
+  color: var(--foreground, #111827);
   text-rendering: geometricPrecision;
 }
 
-main,
 main .page-container,
 main [class*="bg-[#f5f7fa]"] {
-  background-color: #ffffff !important;
+  background-color: var(--app-background-soft) !important;
 }
 
 main .bg-gray-50 {
@@ -26,11 +25,89 @@ main .border-gray-200 {
 }
 
 main {
-  --enterprise-card-bg: #ffffff;
-  --enterprise-card-border: #dbe5f0;
-  --enterprise-card-radius: 14px;
-  --enterprise-card-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 10px 28px rgba(15, 23, 42, 0.06);
-  --enterprise-card-hover-shadow: 0 2px 4px rgba(15, 23, 42, 0.05), 0 14px 34px rgba(15, 23, 42, 0.09);
+  --enterprise-card-bg: var(--surface-card-raised);
+  --enterprise-card-border: var(--surface-border);
+  --enterprise-card-radius: var(--surface-radius);
+  --enterprise-card-shadow: var(--shadow-card);
+  --enterprise-card-hover-shadow: var(--shadow-card-hover);
+}
+
+/* ── 磨砂玻璃工具类 ── */
+.glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.dark .glass {
+  background: rgba(15, 23, 42, 0.7);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+/* ── 渐变工具类 ── */
+.gradient-brand {
+  background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+}
+
+.gradient-accent {
+  background: linear-gradient(135deg, var(--brand-secondary), var(--brand-accent));
+}
+
+.gradient-warm {
+  background: linear-gradient(135deg, #f59e0b, #ef4444);
+}
+
+.gradient-cool {
+  background: linear-gradient(135deg, #1d4ed8, #06b6d4);
+}
+
+/* ── 流光脉冲动画 ── */
+@keyframes glow-pulse {
+  0%, 100% {
+    box-shadow: 0 0 8px rgba(29, 78, 216, 0.15), 0 0 20px rgba(29, 78, 216, 0.08);
+  }
+  50% {
+    box-shadow: 0 0 16px rgba(29, 78, 216, 0.3), 0 0 40px rgba(29, 78, 216, 0.15);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+@keyframes breathe {
+  0%, 100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.02);
+  }
+}
+
+/* ── 禁用动画偏好 ── */
+@media (prefers-reduced-motion: reduce) {
+  .glow-pulse,
+  .shimmer,
+  .breathe {
+    animation: none !important;
+  }
+
+  main *,
+  main *::before,
+  main *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /* Global content card refresh: clearer enterprise surfaces across mixed UI kits. */
@@ -109,11 +186,11 @@ main table tfoot[class*="divide-y"] > :not([hidden]) ~ :not([hidden]) {
 }
 
 main table tbody tr:hover {
-  background-color: #f8fbff;
+  background-color: var(--surface-hover);
 }
 
 main table thead {
-  background-color: #fbfdff;
+  background-color: var(--surface-card-muted);
 }
 
 main table th {
@@ -127,5 +204,41 @@ main table td {
 }
 
 main table tbody tr {
-  box-shadow: inset 0 -1px 0 rgba(226, 232, 240, 0.55);
+  box-shadow: inset 0 -1px 0 var(--surface-line);
+}
+
+main :is(input, select, textarea):focus-visible {
+  border-color: #93c5fd;
+  box-shadow: var(--shadow-focus);
+}
+
+main :is(button, a)[class*="rounded"] {
+  -webkit-tap-highlight-color: transparent;
+}
+
+main :is([data-visual-surface="quiet"], [data-visual-surface="filter"]) {
+  border-color: var(--surface-border);
+  background: linear-gradient(135deg, rgba(255,255,255,0.94), rgba(248,251,255,0.9));
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+}
+
+/* 统一可点击视觉状态，同时避免污染大屏和 RFID 深色扫描页。 */
+main :is(button, a, [role="button"]):focus-visible {
+  outline: 2px solid rgba(29, 78, 216, 0.36);
+  outline-offset: 2px;
+}
+
+main :is(.bigscreen-page, .bigscreen-shell, .rfid-scan-page) :is([data-slot="card"], table) {
+  box-shadow: inherit;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  main *,
+  main *::before,
+  main *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
 }

@@ -414,7 +414,7 @@ const VirtualPreviewList: React.FC<VirtualPreviewListProps> = ({
       </div>
 
       {/* 虚拟列表主体 */}
-      <FixedSizeList
+      <FixedList
         height={listHeight}
         itemCount={data.length}
         itemSize={rowHeight}
@@ -422,7 +422,7 @@ const VirtualPreviewList: React.FC<VirtualPreviewListProps> = ({
         overscanCount={5}
       >
         {RowRenderer}
-      </FixedSizeList>
+      </FixedList>
     </div>
   );
 };
