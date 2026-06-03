@@ -173,9 +173,10 @@ export default function AssetImportExportPage() {
   void parseResult;
 
   return (
-    <div className="min-h-screen bg-[#f9f9ff]">
+    <div className="space-y-6">
       <PageHeader
         title="资产导入导出"
+        subtitle="统一处理资产批量导入、数据校验预览和按条件导出。"
         breadcrumbs={[{ label: '资产管理' }, { label: '导入导出' }]}
         actions={
           <Button variant="primary" size="md" onClick={() => navigate('/assets/new')}>
@@ -184,9 +185,9 @@ export default function AssetImportExportPage() {
         }
       />
 
-      <div className="px-6">
+      <div>
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="mb-6">
+          <TabsList className="mb-6 rounded-xl border border-[var(--surface-border)] bg-white/95 px-2 shadow-[var(--shadow-card)] backdrop-blur">
             <TabsTrigger value="import">导入资产</TabsTrigger>
             <TabsTrigger value="export">导出资产</TabsTrigger>
           </TabsList>
@@ -201,15 +202,11 @@ export default function AssetImportExportPage() {
               </div>
 
               <div
-                className={`bg-white p-12 rounded-xl flex flex-col items-center justify-center text-center space-y-4 group cursor-pointer transition-all ${
-                  isDragging ? 'bg-[#f1f3ff] border-[#004191]' : ''
+                className={`group relative flex cursor-pointer flex-col items-center justify-center space-y-4 overflow-hidden rounded-2xl border-2 border-dashed p-10 text-center transition-all sm:p-12 ${
+                  isDragging
+                    ? 'border-[#004191] bg-[#f1f6ff] shadow-[var(--shadow-card-hover)] ring-4 ring-blue-100/80'
+                    : 'border-[var(--surface-border)] bg-white hover:border-blue-200 hover:bg-[var(--surface-card-muted)]'
                 }`}
-                style={{
-                  backgroundImage: !isDragging
-                    ? "url(\"data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' stroke='%23004191' stroke-width='2' stroke-dasharray='8%2c 8' stroke-dashoffset='0' stroke-linecap='square'/%3e%3c/svg%3e\")"
-                    : undefined,
-                  border: isDragging ? '2px solid #004191' : undefined,
-                }}
                 onDrop={handleDrop}
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
@@ -222,7 +219,7 @@ export default function AssetImportExportPage() {
                   className="hidden"
                   onChange={handleFileSelect}
                 />
-                <div className="w-16 h-16 bg-[#d8e2ff] rounded-full flex items-center justify-center text-[#004191] group-hover:scale-110 transition-transform">
+                <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[#d8e2ff] text-[#004191] shadow-inner transition-transform group-hover:scale-105 group-hover:shadow-[0_12px_28px_rgba(0,65,145,0.18)]">
                   <Upload className="w-8 h-8" />
                 </div>
                 <div>
@@ -232,7 +229,7 @@ export default function AssetImportExportPage() {
               </div>
 
               {uploadedFile && (
-                <div className="bg-white p-4 rounded-xl border border-[#e5e7eb] flex items-center gap-4">
+                <div className="flex items-center gap-4 rounded-xl border border-[var(--surface-border)] bg-white p-4 shadow-[var(--shadow-card)]">
                   <div className="w-10 h-10 bg-[#e3e8f8] rounded flex items-center justify-center">
                     <FileText className="w-5 h-5 text-[#004191]" />
                   </div>
@@ -257,8 +254,8 @@ export default function AssetImportExportPage() {
                 </div>
               )}
 
-              <Card>
-                <div className="px-4 py-4 border-b border-[#e5e7eb] flex justify-between items-center">
+              <Card className="overflow-hidden">
+                <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#e5e7eb] bg-gradient-to-r from-white to-[#f8fbff] px-4 py-4">
                   <h3 className="text-base font-semibold text-[#161c27]">数据校验预览</h3>
                   {previewRows.length > 0 ? (
                     <div className="flex gap-2">
@@ -277,7 +274,8 @@ export default function AssetImportExportPage() {
                   )}
                 </div>
                 {previewRows.length > 0 ? (
-                  <table className="w-full text-left border-collapse">
+                  <div className="overflow-x-auto">
+                  <table className="w-full min-w-[720px] text-left border-collapse">
                     <thead className="bg-[#f1f3ff]">
                       <tr>
                         {['资产名称', '分类', '序列号', '状态', '校验'].map((h) => (
@@ -320,8 +318,9 @@ export default function AssetImportExportPage() {
                       })}
                     </tbody>
                   </table>
+                  </div>
                 ) : (
-                  <div className="py-12 flex flex-col items-center justify-center text-center text-[#424753]">
+                  <div className="flex flex-col items-center justify-center rounded-b-2xl bg-gradient-to-b from-white to-[#f8fbff] py-12 text-center text-[#424753]">
                     <FileSpreadsheet className="w-10 h-10 mb-3 text-[#c3c6d7]" />
                     <p className="text-sm">上传后将显示数据预览</p>
                   </div>
@@ -333,7 +332,7 @@ export default function AssetImportExportPage() {
           <TabsContent value="export">
             <div className="space-y-6 max-w-[800px] mx-auto">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <Card className="p-6 space-y-4">
+                <Card className="space-y-4 p-6">
                   <h3 className="text-base font-semibold text-[#161c27]">数据筛选</h3>
                   <div className="space-y-3">
                     <label className="block text-xs font-semibold text-[#424753] uppercase tracking-wider">
@@ -360,7 +359,7 @@ export default function AssetImportExportPage() {
                     <select
                       value={exportStatus}
                       onChange={(e) => setExportStatus(e.target.value)}
-                      className="w-full bg-[#f1f3ff] border-0 rounded-lg p-3 text-sm focus:ring-2 focus:ring-[#004191]/20 appearance-none"
+                      className="w-full appearance-none rounded-lg border border-[var(--surface-border)] bg-white p-3 text-sm focus:ring-2 focus:ring-[#004191]/20"
                     >
                       {STATUS_OPTIONS_EXPORT.map((s) => (
                         <option key={s}>{s}</option>
@@ -369,7 +368,7 @@ export default function AssetImportExportPage() {
                   </div>
                 </Card>
 
-                <Card className="p-6 space-y-6 flex flex-col">
+                <Card className="flex flex-col space-y-6 p-6">
                   <h3 className="text-base font-semibold text-[#161c27]">导出配置</h3>
                   <div className="space-y-4 flex-1">
                     <label className="block text-xs font-semibold text-[#424753] uppercase tracking-wider">
@@ -384,7 +383,7 @@ export default function AssetImportExportPage() {
                       ).map(({ value, label, Icon }) => (
                         <label
                           key={value}
-                          className={`flex-1 flex items-center justify-center gap-3 p-4 border rounded-xl cursor-pointer hover:border-[#004191] transition-all ${
+                          className={`flex-1 flex items-center justify-center gap-3 rounded-2xl border p-4 cursor-pointer shadow-sm hover:border-[#004191] hover:shadow-md transition-all ${
                             exportFormat === value ? 'bg-[#d8e2ff] border-[#004191]' : 'border-[#e5e7eb]'
                           }`}
                         >
@@ -418,9 +417,9 @@ export default function AssetImportExportPage() {
               <Card className="p-6">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-base font-semibold text-[#161c27]">导出摘要</h3>
-                  <span className="text-xs text-[#424753]">预览 2,450 条记录</span>
+                  <span className="text-xs text-[#424753]">按当前筛选条件生成文件</span>
                 </div>
-                <div className="relative h-48 w-full bg-[#f1f3ff] rounded-lg flex items-center justify-center overflow-hidden">
+                <div className="relative flex h-48 w-full items-center justify-center overflow-hidden rounded-2xl border border-[#d8e2ff] bg-[#f1f3ff]">
                   <div className="absolute inset-0 flex items-end justify-between px-12 pb-6 gap-4">
                     {[60, 85, 45, 70, 55].map((h, i) => (
                       <div

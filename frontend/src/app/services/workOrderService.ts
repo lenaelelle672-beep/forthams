@@ -39,16 +39,14 @@ import type { PagedResult } from "./assetService";
 export type WorkOrderStatus =
   | "DRAFT"
   | "PENDING"
-  | "APPROVING_LEVEL_1"
-  | "APPROVING_LEVEL_2"
   | "APPROVED"
   | "EXECUTING"
   | "COMPLETED"
   | "REJECTED"
   | "CANCELLED";
 
-/** Work order priority enum. */
-export type WorkOrderPriority = "NORMAL" | "URGENT" | "EMERGENCY";
+/** Work order priority enum matching backend WorkOrder.java. */
+export type WorkOrderPriority = "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
 
 /**
  * A single work order record as returned by the backend API.
@@ -78,6 +76,9 @@ export interface WorkOrderRecord {
   estimatedCost?: number;
   actualCost?: number;
   completionNote?: string;
+  collaborators?: string[];
+  slaDeadline?: string;
+  slaStatus?: string;
   createTime?: string;
   updateTime?: string;
   deleted?: number;
@@ -111,6 +112,9 @@ export interface WorkOrderDTO {
   estimatedCost?: number;
   actualCost?: number;
   completionNote?: string;
+  collaborators?: string[];
+  slaDeadline?: string;
+  slaStatus?: string;
   createTime?: string;
   updateTime?: string;
 }
@@ -183,8 +187,6 @@ export function isCancellableStatus(status?: string): boolean {
   return (
     status === "DRAFT" ||
     status === "PENDING" ||
-    status === "APPROVING_LEVEL_1" ||
-    status === "APPROVING_LEVEL_2" ||
     status === "APPROVED"
   );
 }
@@ -203,8 +205,6 @@ export function getWorkOrderStatusLabel(status?: string): string {
   const labels: Record<string, string> = {
     DRAFT: "草稿",
     PENDING: "待审批",
-    APPROVING_LEVEL_1: "一级审批中",
-    APPROVING_LEVEL_2: "二级审批中",
     APPROVED: "待派工",
     EXECUTING: "处理中",
     COMPLETED: "已完成",
@@ -222,9 +222,10 @@ export function getWorkOrderStatusLabel(status?: string): string {
  */
 export function getPriorityLabel(priority?: string): string {
   const labels: Record<string, string> = {
-    NORMAL: "中",
-    URGENT: "高",
-    EMERGENCY: "紧急",
+    LOW: "低",
+    MEDIUM: "中",
+    HIGH: "高",
+    CRITICAL: "紧急",
   };
   return labels[priority || ""] || priority || "-";
 }

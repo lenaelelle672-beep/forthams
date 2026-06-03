@@ -43,8 +43,13 @@ declare module "antd" {
   export const Empty: any;
   export const Steps: any;
   export const Upload: any;
+  export const List: any;
+  export const Pagination: any;
+  export const Breadcrumb: any;
   export const ConfigProvider: any;
   export type { TableProps, SelectProps, ModalProps, FormProps, InputProps, ButtonProps } from "antd";
+  export type UploadProps = any;
+  export type TreeProps = any;
 }
 
 declare module "antd/es/table" {
@@ -80,9 +85,11 @@ declare module "@ant-design/icons" {
   export const DownloadOutlined: any;
   export const UploadOutlined: any;
   export const CheckOutlined: any;
+  export const CheckSquareOutlined: any;
   export const CloseOutlined: any;
   export const WarningOutlined: any;
   export const ExclamationCircleOutlined: any;
+  export const ExclamationCircleFilled: any;
   export const QuestionCircleOutlined: any;
   export const InfoCircleOutlined: any;
   export const SettingOutlined: any;
@@ -167,7 +174,9 @@ declare module "@ant-design/icons" {
   export const MehOutlined: any;
   export const LoadingOutlined: any;
   export const CheckCircleOutlined: any;
+  export const CheckCircleFilled: any;
   export const CloseCircleOutlined: any;
+  export const CloseCircleFilled: any;
   export const InfoCircleFilled: any;
   export const WarningFilled: any;
   export const PlusCircleOutlined: any;
@@ -205,6 +214,7 @@ declare module "@ant-design/icons" {
   export const TrophyOutlined: any;
   export const FlagOutlined: any;
   export const BellOutlined: any;
+  export const SendOutlined: any;
   export const SoundOutlined: any;
   export const AudioOutlined: any;
   export const VideoCameraOutlined: any;
@@ -322,6 +332,7 @@ declare module "@mui/material" {
   export const Tooltip: any;
   export const Snackbar: any;
   export const Alert: any;
+  export const AlertTitle: any;
   export const LinearProgress: any;
   export const CircularProgress: any;
   export const Skeleton: any;
@@ -447,6 +458,8 @@ declare module "@/components/ui/card" {
 }
 declare module "@/components/ui/Badge" {
   export const Badge: any;
+  export const StatusBadge: any;
+  export const WorkOrderStatusBadge: any;
   export default Badge;
 }
 declare module "@/components/ui/badge" {
@@ -508,6 +521,8 @@ declare module "@/components/ui/input" {
 }
 declare module "@/components/ui/Skeleton" {
   export const Skeleton: any;
+  export const SkeletonCard: any;
+  export const SkeletonTable: any;
   export default Skeleton;
 }
 declare module "@/components/ui/skeleton" {

@@ -6,6 +6,7 @@
 
 import {
   BarChart, Bar, PieChart, Pie, Cell, AreaChart, Area,
+  LineChart, Line,
   XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, CartesianGrid,
 } from 'recharts';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
@@ -19,7 +20,7 @@ interface ChartPreviewProps {
   /** 图表标题 */
   title: string;
   /** 图表类型 */
-  type: 'bar' | 'pie' | 'area' | 'table';
+  type: 'bar' | 'pie' | 'area' | 'table' | 'line';
   /** 图表数据 */
   data: Record<string, unknown>[];
   /** X 轴/名称 数据字段 */
@@ -154,6 +155,37 @@ export function ChartPreview({
                 name={valueKey}
               />
             </AreaChart>
+          </ResponsiveContainer>
+        );
+
+      case 'line':
+        return (
+          <ResponsiveContainer width="100%" height={280}>
+            <LineChart data={data} margin={{ top: 5, right: 16, left: -16, bottom: 0 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+              <XAxis
+                dataKey={dataKey}
+                tick={{ fontSize: 11, fill: '#94a3b8' }}
+                axisLine={false}
+                tickLine={false}
+              />
+              <YAxis
+                tick={{ fontSize: 11, fill: '#94a3b8' }}
+                axisLine={false}
+                tickLine={false}
+              />
+              <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8, border: '1px solid #e5e7eb' }} />
+              <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 12 }} />
+              <Line
+                type="monotone"
+                dataKey={valueKey}
+                stroke="#3b82f6"
+                strokeWidth={2}
+                dot={{ r: 3 }}
+                activeDot={{ r: 5, strokeWidth: 2 }}
+                name={valueKey}
+              />
+            </LineChart>
           </ResponsiveContainer>
         );
 

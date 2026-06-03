@@ -5,28 +5,29 @@ import { z } from 'zod';
 import { useNavigate } from 'react-router';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { ArrowLeft, Info, ListChecks, Wrench, Search, Plus } from 'lucide-react';
+import { ArrowLeft, Info, ListChecks, Wrench, Search, Plus, AlertTriangle, ShieldCheck } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { getAssetList } from '@/api/asset';
 import { submitClearanceApplication, saveClearanceDraft } from '@/api/disposal';
 import type { AssetListItem } from '@/types/asset';
-import type { ApiResponse, PageData } from '@/types/common';
+import type { PaginatedResponse, PageData } from '@/types/common';
 
 const schema = z.object({
   clearanceNo: z.string(),
   applicant: z.string(),
   applicationDate: z.string().min(1, '请选择申请日期'),
   clearanceReason: z.string().min(1, '请选择清退原因'),
-  disposalMethod: z.enum(['storage', 'sell', 'donate'], { required_error: '请选择处理方式' }),
+  disposalMethod: z.enum(['storage', 'sell', 'donate'], { message: '请选择处理方式' }),
   estimatedResidualValue: z.coerce.number().nonnegative('残值不能为负数').optional(),
   approvalFlow: z.string().min(1, '请选择审批流程'),
-  urgency: z.enum(['normal', 'urgent'], { required_error: '请选择紧急程度' }),
+  urgency: z.enum(['normal', 'urgent'], { message: '请选择紧急程度' }),
   remark: z.string().max(500).optional(),
 });
 
-type FormValues = z.infer<typeof schema>;
+type FormInput = z.input<typeof schema>;
+type FormValues = z.output<typeof schema>;
 
 const CLEARANCE_REASONS = ['设备老化', '技术淘汰', '闲置超过期限', '其他'] as const;
 const APPROVAL_FLOWS = ['标准清退审批流 v2.1', '紧急资产清退流程', '高价值资产清退流程'] as const;
@@ -79,6 +80,25 @@ function toAssetRow(a: AssetListItem): AssetRow {
   };
 }
 
+function getAssetRecords(
+  response: PaginatedResponse<AssetListItem> | PageData<AssetListItem> | undefined,
+): AssetListItem[] {
+  if (!response) {
+    return [];
+  }
+
+  return response.records;
+}
+
+function getOptionalNumber(value: unknown): number | undefined {
+  if (value == null || value === '') {
+    return undefined;
+  }
+
+  const numericValue = Number(value);
+  return Number.isFinite(numericValue) ? numericValue : undefined;
+}
+
 export default function AssetClearanceFormPage() {
   const navigate = useNavigate();
   const qc = useQueryClient();
@@ -93,7 +113,7 @@ export default function AssetClearanceFormPage() {
   });
 
   const assetRows: AssetRow[] = useMemo(() => {
-    const records = (assetListData as PageData<AssetListItem> | undefined)?.records ?? [];
+    const records = getAssetRecords(assetListData);
     return records.map(toAssetRow);
   }, [assetListData]);
 
@@ -104,7 +124,7 @@ export default function AssetClearanceFormPage() {
     setValue,
     getValues,
     formState: { errors, isSubmitting },
-  } = useForm<FormValues>({
+  } = useForm<FormInput, undefined, FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
       clearanceNo: 'CLR-20231124-001',
@@ -169,7 +189,7 @@ export default function AssetClearanceFormPage() {
       toast.success('清退申请提交成功');
       navigate('/disposals');
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       toast.error(error instanceof Error ? error.message : '提交失败，请重试');
     },
   });
@@ -179,7 +199,7 @@ export default function AssetClearanceFormPage() {
     const draft = {
       clearanceReason: values.clearanceReason,
       disposalMethod: values.disposalMethod,
-      estimatedResidualValue: values.estimatedResidualValue,
+      estimatedResidualValue: getOptionalNumber(values.estimatedResidualValue),
       approvalFlow: values.approvalFlow,
       urgency: values.urgency,
       remark: values.remark ?? '',
@@ -202,7 +222,7 @@ export default function AssetClearanceFormPage() {
     mutation.mutate({
       ...values,
       assetIds: Array.from(selectedAssetIds),
-    } as FormValues & { assetIds: string[] });
+    });
   };
 
   return (
@@ -244,6 +264,15 @@ export default function AssetClearanceFormPage() {
             </span>
           </div>
         ))}
+      </div>
+
+      {/* ── 风险提示横幅 ────────────────────────────────────────────────── */}
+      <div className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3">
+        <AlertTriangle className="w-5 h-5 text-amber-500 mt-0.5 shrink-0" />
+        <div className="text-sm text-amber-800 leading-relaxed">
+          <span className="font-semibold">风险提示：</span>
+          资产清退操作一旦提交审批，所选资产将进入处置流程。提交前请确认资产范围和清退原因无误，避免误操作。
+        </div>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -364,12 +393,31 @@ export default function AssetClearanceFormPage() {
                         value={opt.value}
                         checked={disposalMethod === opt.value}
                         onChange={() => setValue('disposalMethod', opt.value, { shouldValidate: true })}
-                        className="w-4 h-4 text-[#004191] focus:ring-[#004191] border-[#c2c6d5]"
+                        className={`w-4 h-4 focus:ring-[#004191] border-[#c2c6d5] ${
+                          opt.value === 'sell' ? 'text-[#ba1a1a] focus:ring-[#ba1a1a]' : 'text-[#004191]'
+                        }`}
                       />
-                      <span className="ml-2 text-sm">{opt.label}</span>
+                      <span
+                        className={`ml-2 text-sm ${
+                          opt.value === 'sell' ? 'text-[#ba1a1a] font-medium' : ''
+                        }`}
+                      >
+                        {opt.label}
+                      </span>
+                      {opt.value === 'sell' && (
+                        <span className="ml-1.5 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-red-50 text-[#ba1a1a] border border-red-200">
+                          不可逆
+                        </span>
+                      )}
                     </label>
                   ))}
                 </div>
+                {disposalMethod === 'sell' && (
+                  <p className="text-xs text-[#ba1a1a] flex items-center gap-1 mt-1">
+                    <AlertTriangle className="w-3.5 h-3.5" />
+                    变卖处理后资产将从台账中移除，此操作不可撤销
+                  </p>
+                )}
                 {errors.disposalMethod && (
                   <p className="text-xs text-[#ba1a1a]">{errors.disposalMethod.message}</p>
                 )}
@@ -460,6 +508,25 @@ export default function AssetClearanceFormPage() {
             {(mutation.error instanceof Error ? mutation.error.message : '提交失败，请重试')}
           </div>
         )}
+
+        {/* ── 提交确认区 ────────────────────────────────────────────────── */}
+        <div className="rounded-xl border border-[#e5e7eb] bg-white">
+          <div className="px-6 py-4 border-b border-[#e5e7eb] flex items-center bg-[#f1f3ff] rounded-t-xl">
+            <ShieldCheck className="w-5 h-5 text-[#004191] mr-2" />
+            <CardTitle>确认提交</CardTitle>
+            {selectedAssetIds.size > 0 && (
+              <span className="ml-3 text-sm text-[#424753]">
+                即将对 <span className="font-semibold text-[#004191]">{selectedAssetIds.size}</span> 项资产发起清退审批
+              </span>
+            )}
+          </div>
+          {selectedAssetIds.size === 0 && (
+            <div className="px-6 py-3 flex items-center gap-2 text-sm text-amber-700 bg-amber-50 border-b border-amber-200">
+              <AlertTriangle className="w-4 h-4 shrink-0" />
+              请先选择至少一项资产后再提交
+            </div>
+          )}
+        </div>
 
         <footer className="flex items-center justify-between py-6">
           <Button type="button" variant="outline" onClick={() => navigate('/disposals')}>

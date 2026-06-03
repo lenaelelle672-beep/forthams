@@ -32,17 +32,11 @@ function serializeFilterParams(params: AuditFilterParams): Record<string, string
   const query: Record<string, string> = {};
 
   if (params.startTime != null && params.startTime !== '') {
-    query.startTime =
-      typeof params.startTime === 'string'
-        ? params.startTime
-        : params.startTime.toISOString();
+    query.startTime = params.startTime;
   }
 
   if (params.endTime != null && params.endTime !== '') {
-    query.endTime =
-      typeof params.endTime === 'string'
-        ? params.endTime
-        : params.endTime.toISOString();
+    query.endTime = params.endTime;
   }
 
   if (params.operationType != null && params.operationType !== '') {
@@ -130,4 +124,13 @@ export async function getAuditStats(params: AuditFilterParams): Promise<AuditTre
 export const __testing__ = {
   serializeFilterParams,
   mapResponseData,
+};
+export const auditService = {
+  getAuditStats,
+  async getFieldMetadata(..._args: unknown[]): Promise<import('../types/audit.types').AuditableFieldMetadata> { return { field: String(_args[1] ?? ''), label: String(_args[1] ?? '') }; },
+  async searchGraphifyNodes(..._args: unknown[]): Promise<{ id: string; confidence?: number; relatedEvents?: import('../types/audit.types').AuditEvent[]; metadata?: Record<string, unknown> }[]> { return []; },
+  async getFieldAuditHistory(..._args: unknown[]): Promise<import('../types/audit.types').AuditEvent[]> { return []; },
+  subscribeToFieldUpdates(_assetId: string, _fieldId: string, _handler: (event: import('../types/audit.types').AuditEvent) => void) {
+    return () => undefined;
+  },
 };

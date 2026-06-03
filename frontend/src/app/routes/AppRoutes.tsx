@@ -208,6 +208,90 @@ const WorkOrderDetailPage = withSuspense(
   )
 );
 
+/**
+ * Maintenance execution page — execution tracking with timeline, steps, materials, and photos.
+ * T3.1 维修执行跟踪
+ */
+const MaintenanceExecutionPage = withSuspense(
+  lazy(() =>
+    import('../pages/maintenance/execution/MaintenanceExecutionPage').then((module) => ({
+      default: module.MaintenanceExecutionPage,
+    }))
+  )
+);
+
+/**
+ * Depreciation comparison page — compare depreciation across different methods.
+ * T4.4 折旧对比报表
+ */
+const DepreciationComparisonPage = withSuspense(
+  lazy(() =>
+    import('../pages/depreciation/DepreciationComparisonPage').then((module) => ({
+      default: module.default,
+    }))
+  )
+);
+
+/**
+ * Inspection template management page.
+ * T5.2 检验模板管理
+ */
+const InspectionTemplatePage = withSuspense(
+  lazy(() =>
+    import('../pages/inspection/InspectionTemplatePage').then((module) => ({
+      default: module.default,
+    }))
+  )
+);
+
+/**
+ * Inspection record management page.
+ * T5.2 检验记录管理
+ */
+const InspectionRecordPage = withSuspense(
+  lazy(() =>
+    import('../pages/inspection/InspectionRecordPage').then((module) => ({
+      default: module.default,
+    }))
+  )
+);
+
+/**
+ * Inspection task management page.
+ * T5.2 检验任务管理
+ */
+const InspectionTaskPage = withSuspense(
+  lazy(() =>
+    import('../pages/inspection/InspectionTaskPage').then((module) => ({
+      default: module.default,
+    }))
+  )
+);
+
+/**
+ * Inspection form page (create/edit).
+ * T5.2 检验表单页
+ */
+const InspectionFormPage = withSuspense(
+  lazy(() =>
+    import('../pages/inspection/InspectionFormPage').then((module) => ({
+      default: module.default,
+    }))
+  )
+);
+
+/**
+ * Inspection detail page.
+ * T5.2 检验详情页
+ */
+const InspectionDetailPage = withSuspense(
+  lazy(() =>
+    import('../pages/inspection/InspectionDetailPage').then((module) => ({
+      default: module.default,
+    }))
+  )
+);
+
 // ---------------------------------------------------------------------------
 // Route definitions
 // ---------------------------------------------------------------------------
@@ -326,6 +410,82 @@ export const disposalRoutes: RouteObject[] = [
 ];
 
 /**
+ * Maintenance execution routes.
+ *
+ * @description Defines routes for:
+ * - `/maintenance/execution/:id` — Execution tracking page with timeline, steps, materials, photos
+ *
+ * T3.1 维修执行跟踪
+ */
+export const maintenanceRoutes: RouteObject[] = [
+  {
+    path: 'maintenance/execution/:id',
+    Component: MaintenanceExecutionPage,
+  },
+];
+
+/**
+ * Depreciation management routes.
+ *
+ * @description Defines routes for:
+ * - `/depreciation/comparison` — Depreciation comparison page (T4.4)
+ */
+export const depreciationRoutes: RouteObject[] = [
+  {
+    path: 'depreciation/comparison',
+    Component: DepreciationComparisonPage,
+  },
+];
+
+/**
+ * Inspection management routes.
+ *
+ * @description Defines routes for:
+ * - `/inspections` — Inspection list page (T5.2)
+ * - `/inspections/new` — Create new inspection (T5.2)
+ * - `/inspections/:id` — Inspection detail page (T5.2)
+ * - `/inspections/:id/edit` — Edit inspection (T5.2)
+ * - `/inspections/:id/detail` — Inspection detail view (T5.2)
+ * - `/inspection/templates` — Inspection template management page (T5.2)
+ * - `/inspection/records` — Inspection record management page (T5.2)
+ * - `/inspection/tasks` — Inspection task management page (T5.2)
+ */
+export const inspectionRoutes: RouteObject[] = [
+  {
+    path: 'inspection/templates',
+    Component: InspectionTemplatePage,
+  },
+  {
+    path: 'inspection/records',
+    Component: InspectionRecordPage,
+  },
+  {
+    path: 'inspection/tasks',
+    Component: InspectionTaskPage,
+  },
+  {
+    path: 'inspections',
+    Component: InspectionRecordPage,
+  },
+  {
+    path: 'inspections/new',
+    Component: InspectionFormPage,
+  },
+  {
+    path: 'inspections/:id',
+    Component: InspectionFormPage,
+  },
+  {
+    path: 'inspections/:id/edit',
+    Component: InspectionFormPage,
+  },
+  {
+    path: 'inspections/:id/detail',
+    Component: InspectionDetailPage,
+  },
+];
+
+/**
  * All routes exported by this module.
  * Merge these into the main router's RootLayout children array.
  */
@@ -335,6 +495,9 @@ export const allAppRoutes: RouteObject[] = [
   ...workOrderRoutes,
   ...approvalRoutes,
   ...disposalRoutes,
+  ...maintenanceRoutes,
+  ...depreciationRoutes,
+  ...inspectionRoutes,
 ];
 
 export default allAppRoutes;

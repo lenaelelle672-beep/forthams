@@ -15,6 +15,7 @@ import {
   Truck,
   FileText,
   ScrollText,
+  TestTube,
 } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
 import { approvalService } from "../services/approvalService";
@@ -41,6 +42,7 @@ const navigation: NavItem[] = [
   { name: "审计日志", href: "/audit", icon: ScrollText },
   { name: "流程管理", href: "/workflows", icon: Workflow },
   { name: "数据分析", href: "/analytics", icon: BarChart3 },
+  { name: "测试结果", href: "/test-results", icon: TestTube },
   { name: "系统设置", href: "/settings", icon: SettingsIcon },
 ];
 

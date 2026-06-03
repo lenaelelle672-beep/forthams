@@ -45,11 +45,11 @@ export const getLocationCascade = () =>
   http.get<Location[]>('/locations/cascade');
 
 /** 创建位置 */
-export const createLocation = (data: { locationName: string; locationCode?: string; parentId?: number | null }) =>
+export const createLocation = (data: { name: string; locationCode?: string; parentId?: number | null }) =>
   http.post<Location>('/locations', data);
 
 /** 更新位置 */
-export const updateLocation = (id: number, data: { locationName: string; locationCode?: string; parentId?: number | null }) =>
+export const updateLocation = (id: number, data: { name: string; locationCode?: string; parentId?: number | null }) =>
   http.put<Location>(`/locations/${id}`, data);
 
 /** 删除位置 */

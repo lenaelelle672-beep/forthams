@@ -245,21 +245,24 @@ const AssetTable: React.FC<AssetTableProps> = ({
    */
   const handleConfirm = useCallback(
     (asset: InventoryAsset) => {
-      const edit = getRowEdit(asset.id);
+      const assetKey = asset.id ?? asset.assetId;
+      const edit = getRowEdit(assetKey);
 
       if (!edit.actualStatus) {
         message.warning('请先选择实盘状态');
         return;
       }
 
-      setConfirmingAssetId(asset.id);
+      setConfirmingAssetId(assetKey);
 
       confirmMutation.mutate(
         {
           taskId,
-          assetId: asset.id,
-          actualStatus: edit.actualStatus,
-          remark: edit.remark,
+          assetId: assetKey,
+          payload: {
+            actualStatus: edit.actualStatus,
+            remark: edit.remark,
+          },
         },
         {
           onSuccess: () => {
@@ -267,7 +270,7 @@ const AssetTable: React.FC<AssetTableProps> = ({
             // 清除该行临时编辑状态
             setRowEdits((prev) => {
               const next = { ...prev };
-              delete next[asset.id];
+              delete next[assetKey];
               return next;
             });
           },
@@ -420,7 +423,8 @@ const AssetTable: React.FC<AssetTableProps> = ({
           }
 
           // ---- 可编辑：下拉选择 ----
-          const edit = getRowEdit(record.id);
+          const recordKey = record.id ?? record.assetId;
+          const edit = getRowEdit(recordKey);
           return (
             <Select
               placeholder="请选择"
@@ -429,7 +433,7 @@ const AssetTable: React.FC<AssetTableProps> = ({
               options={ACTUAL_STATUS_OPTIONS}
               value={edit.actualStatus}
               onChange={(val: ActualStatus) =>
-                updateRowEdit(record.id, { actualStatus: val })
+                updateRowEdit(recordKey, { actualStatus: val })
               }
               aria-label={`实盘状态选择-${record.assetCode}`}
             />
@@ -452,7 +456,8 @@ const AssetTable: React.FC<AssetTableProps> = ({
           }
 
           // ---- 可编辑：输入框（0-200 字符） ----
-          const edit = getRowEdit(record.id);
+          const recordKey = record.id ?? record.assetId;
+          const edit = getRowEdit(recordKey);
           return (
             <Input
               size="small"
@@ -460,7 +465,7 @@ const AssetTable: React.FC<AssetTableProps> = ({
               maxLength={200}
               value={edit.remark}
               onChange={(e) =>
-                updateRowEdit(record.id, { remark: e.target.value })
+                updateRowEdit(recordKey, { remark: e.target.value })
               }
               aria-label={`备注输入-${record.assetCode}`}
             />
@@ -478,7 +483,8 @@ const AssetTable: React.FC<AssetTableProps> = ({
             return null;
           }
 
-          const isConfirming = confirmingAssetId === record.id;
+          const recordKey = record.id ?? record.assetId;
+          const isConfirming = confirmingAssetId === recordKey;
 
           return (
             <Button
@@ -579,7 +585,7 @@ const AssetTable: React.FC<AssetTableProps> = ({
       <Table<InventoryAsset>
         columns={columns}
         dataSource={assets}
-        rowKey="id"
+        rowKey={(record) => record.id ?? record.assetId}
         loading={isLoading}
         rowSelection={rowSelection}
         scroll={

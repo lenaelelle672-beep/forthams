@@ -2,24 +2,27 @@ import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Archive, Send, CheckCircle, Clock, X, AlertCircle } from 'lucide-react';
 import { z } from 'zod';
-import { PageHeader } from '@/components/ui/PageHeader';
+import { useAuth } from '@/app/context/AuthContext';
 import { Button } from '@/components/ui/Button';
-import { Card, CardContent } from '@/components/ui/Card';
-import { Badge } from '@/components/ui/Badge';
+import { Card } from '@/components/ui/Card';
+import { DataTable, type Column } from '@/components/ui/DataTable';
 import {
   getIdleAssetList,
   publishIdleAsset,
   claimIdleAsset,
+  approveIdleAssetClaim,
+  rejectIdleAssetClaim,
   cancelIdleAssetPublish,
   type IdleAssetRecord,
 } from '@/api/idleAsset';
-import type { ApiResponse, PageData } from '@/types/common';
+import type { PageData } from '@/types/common';
 
-type TabKey = 'pending' | 'published' | 'claimed' | 'history';
+type TabKey = 'pending' | 'published' | 'review' | 'claimed' | 'history';
 
 const TABS: { key: TabKey; label: string }[] = [
   { key: 'pending',   label: '待处理' },
   { key: 'published', label: '公告中' },
+  { key: 'review',    label: '待审批' },
   { key: 'claimed',   label: '已认领' },
   { key: 'history',   label: '历史记录' },
 ];
@@ -29,6 +32,7 @@ const STATUS_TAB_MAP: Record<string, TabKey> = {
   'PENDING': 'pending',
   '已发布': 'published',
   'PUBLISHED': 'published',
+  'CLAIM_PENDING': 'review',
   '已认领': 'claimed',
   'CLAIMED': 'claimed',
   '已处置': 'history',
@@ -47,12 +51,18 @@ function getIdleDaysColor(days?: number): string {
   return 'text-blue-600';
 }
 
-function getStatusBadgeVariant(status: string): 'default' | 'success' | 'warning' | 'gray' {
+function getStatusBadgeClasses(status: string): { container: string; dot: string } {
   switch (status) {
-    case '已发布': case 'PUBLISHED': return 'default';
-    case '已认领': case 'CLAIMED': return 'success';
-    case '已处置': case 'DISPOSED': case 'CANCELLED': return 'gray';
-    default: return 'warning';
+    case '已发布': case 'PUBLISHED':
+      return { container: 'border-blue-200 bg-blue-50 text-blue-700 ring-blue-600/20', dot: 'bg-blue-500' };
+    case 'CLAIM_PENDING':
+      return { container: 'border-amber-200 bg-amber-50 text-amber-700 ring-amber-600/20', dot: 'bg-amber-500' };
+    case '已认领': case 'CLAIMED':
+      return { container: 'border-emerald-200 bg-emerald-50 text-emerald-700 ring-emerald-600/20', dot: 'bg-emerald-500' };
+    case '已处置': case 'DISPOSED': case 'CANCELLED':
+      return { container: 'border-slate-200 bg-slate-50 text-slate-600 ring-slate-500/20', dot: 'bg-slate-400' };
+    default:
+      return { container: 'border-amber-200 bg-amber-50 text-amber-700 ring-amber-600/20', dot: 'bg-amber-500' };
   }
 }
 
@@ -60,6 +70,7 @@ function getStatusLabel(status: string): string {
   const map: Record<string, string> = {
     '待发布': '待处理', 'PENDING': '待处理',
     '已发布': '公告中', 'PUBLISHED': '公告中',
+    'CLAIM_PENDING': '待审批',
     '已认领': '已认领', 'CLAIMED': '已认领',
     '已处置': '已处置', 'DISPOSED': '已处置',
     'CANCELLED': '已取消',
@@ -67,23 +78,35 @@ function getStatusLabel(status: string): string {
   return map[status] ?? status;
 }
 
-function getCurrentUserId(): number {
-  try {
-    const raw = sessionStorage.getItem('user_info') || localStorage.getItem('user_info');
-    if (!raw) return 0;
-    const user = JSON.parse(raw);
-    return Number(user.id ?? user.userId ?? 0);
-  } catch { return 0; }
+/* ------------------------------------------------------------------ */
+/*  Status badge sub-component                                        */
+/* ------------------------------------------------------------------ */
+function StatusBadge({ status }: { status: string }) {
+  const { container, dot } = getStatusBadgeClasses(status);
+  return (
+    <span
+      className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-semibold ring-1 ring-inset ${container}`}
+    >
+      <span className={`h-1.5 w-1.5 rounded-full ${dot}`} />
+      {getStatusLabel(status)}
+    </span>
+  );
 }
 
+/* ================================================================== */
+/*  Page                                                              */
+/* ================================================================== */
 export default function IdleAssetsPage() {
   const qc = useQueryClient();
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<TabKey>('pending');
   const [showPublish, setShowPublish] = useState(false);
   const [publishTarget, setPublishTarget] = useState<IdleAssetRecord | null>(null);
   const [publishTitle, setPublishTitle] = useState('');
   const [publishDeadline, setPublishDeadline] = useState('');
   const [toast, setToast] = useState<{ type: 'success' | 'error'; msg: string } | null>(null);
+  const permissions = Array.isArray(user?.permissions) ? user.permissions : [];
+  const canApproveClaims = permissions.includes('*') || permissions.includes('idle:approve');
 
   const showToast = (type: 'success' | 'error', msg: string) => {
     setToast({ type, msg });
@@ -134,12 +157,21 @@ export default function IdleAssetsPage() {
 
   const publishMutation = useMutation({
     mutationFn: (asset: IdleAssetRecord) =>
-      publishIdleAsset({ assetId: asset.assetId ?? asset.id }),
+      publishIdleAsset({
+        assetId: asset.assetId ?? asset.id,
+        idleDays: asset.idleDays,
+        title: publishTitle.trim(),
+        reason: publishTitle.trim(),
+        claimDeadline: publishDeadline,
+      }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['idle-assets'] });
       showToast('success', '公告发布成功');
       setShowPublish(false);
       setPublishTarget(null);
+      setPublishTitle('');
+      setPublishDeadline('');
+      setPublishErrors({});
     },
     onError: (err: Error) => {
       showToast('error', `发布失败：${err.message}`);
@@ -147,17 +179,35 @@ export default function IdleAssetsPage() {
   });
 
   const claimMutation = useMutation({
-    mutationFn: (asset: IdleAssetRecord) => {
-      const userId = getCurrentUserId();
-      if (!userId) throw new Error('请先登录');
-      return claimIdleAsset(asset.id, userId);
-    },
+    mutationFn: (asset: IdleAssetRecord) => claimIdleAsset(asset.id),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['idle-assets'] });
-      showToast('success', '认领申请已提交');
+      showToast('success', '认领申请已提交，等待资产管理员审批');
     },
     onError: (err: Error) => {
       showToast('error', `认领失败：${err.message}`);
+    },
+  });
+
+  const approveMutation = useMutation({
+    mutationFn: (asset: IdleAssetRecord) => approveIdleAssetClaim(asset.id, { opinion: '同意认领' }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['idle-assets'] });
+      showToast('success', '认领申请已通过');
+    },
+    onError: (err: Error) => {
+      showToast('error', `审批失败：${err.message}`);
+    },
+  });
+
+  const rejectMutation = useMutation({
+    mutationFn: (asset: IdleAssetRecord) => rejectIdleAssetClaim(asset.id, { opinion: '不符合认领条件' }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['idle-assets'] });
+      showToast('success', '认领申请已驳回，公告恢复为可认领');
+    },
+    onError: (err: Error) => {
+      showToast('error', `驳回失败：${err.message}`);
     },
   });
 
@@ -175,6 +225,7 @@ export default function IdleAssetsPage() {
   const tabAssets: Record<TabKey, IdleAssetRecord[]> = {
     pending:   assets.filter(a => getTabKey(a.status) === 'pending'),
     published: assets.filter(a => getTabKey(a.status) === 'published'),
+    review:    assets.filter(a => getTabKey(a.status) === 'review'),
     claimed:   assets.filter(a => getTabKey(a.status) === 'claimed'),
     history:   assets.filter(a => getTabKey(a.status) === 'history'),
   };
@@ -182,249 +233,339 @@ export default function IdleAssetsPage() {
   const displayAssets = tabAssets[activeTab];
   const totalCount     = assets.length;
   const publishedCount = tabAssets.published.length;
-  const claimingCount  = tabAssets.claimed.length;
-  const disposedCount  = tabAssets.history.length;
+  const reviewCount    = tabAssets.review.length;
+  const claimedCount   = tabAssets.claimed.length;
 
+  /* ---- DataTable column definitions ---- */
+  const columns: Column<IdleAssetRecord>[] = [
+    {
+      key: 'assetId',
+      title: '资产编号',
+      width: 120,
+      render: (_v, row) => (
+        <span className="font-medium text-blue-600">
+          {String(row.assetId ?? row.id)}
+        </span>
+      ),
+    },
+    {
+      key: 'assetName',
+      title: '资产名称',
+      render: (_v, row) => (
+        <div>
+          <p className="font-medium text-gray-900">{row.assetName ?? row.name ?? '—'}</p>
+          <p className="text-xs text-gray-400">{row.category ?? '—'}</p>
+        </div>
+      ),
+    },
+    {
+      key: 'originalDept',
+      title: '部门',
+      render: (_v, row) => <span className="text-gray-500">{row.originalDept ?? '—'}</span>,
+    },
+    {
+      key: 'idleDays',
+      title: '闲置天数',
+      width: 110,
+      render: (_v, row) => (
+        <span className={`font-medium ${getIdleDaysColor(row.idleDays)}`}>
+          {row.idleDays ?? '—'} 天
+        </span>
+      ),
+    },
+    {
+      key: 'status',
+      title: '状态',
+      width: 130,
+      render: (_v, row) => <StatusBadge status={row.status} />,
+    },
+    {
+      key: 'actions',
+      title: '操作',
+      width: 240,
+      render: (_v, asset) => (
+        <div className="flex flex-wrap gap-2">
+          {getTabKey(asset.status) === 'pending' && (
+            <Button
+              size="sm"
+              variant="primary"
+              onClick={() => { setPublishTarget(asset); setPublishTitle(`${asset.assetName ?? asset.name ?? ''} 闲置公告`); setShowPublish(true); }}
+            >
+              发布公告
+            </Button>
+          )}
+          {getTabKey(asset.status) === 'published' && (
+            <>
+              <Button size="sm" variant="primary" onClick={() => claimMutation.mutate(asset)}>
+                申请认领
+              </Button>
+              <Button size="sm" variant="outline" onClick={() => cancelMutation.mutate(asset)}>
+                取消公告
+              </Button>
+            </>
+          )}
+          {getTabKey(asset.status) === 'review' && (
+            canApproveClaims ? (
+              <>
+                <Button size="sm" variant="primary" onClick={() => approveMutation.mutate(asset)}>
+                  通过
+                </Button>
+                <Button size="sm" variant="outline" onClick={() => rejectMutation.mutate(asset)}>
+                  驳回
+                </Button>
+              </>
+            ) : (
+              <span className="text-xs text-orange-600 font-medium">等待资产管理员审批</span>
+            )
+          )}
+          {getTabKey(asset.status) === 'claimed' && (
+            <span className="text-xs text-green-600 font-medium">
+              {asset.claimDept ? `认领部门：${asset.claimDept}` : '认领已通过'}
+            </span>
+          )}
+          {getTabKey(asset.status) === 'history' && (
+            <span className="text-xs text-gray-400">已处置</span>
+          )}
+        </div>
+      ),
+    },
+  ];
+
+  /* ---- Loading state ---- */
   if (isLoading) {
     return (
-      <div className="p-6 flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />
+      <div className="flex min-h-full items-center justify-center bg-[var(--app-background)]">
+        <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-blue-500" />
       </div>
     );
   }
 
+  /* ---- Stat definitions ---- */
+  const stats = [
+    {
+      label: '闲置总量',
+      value: totalCount,
+      icon: Archive,
+      gradient: 'from-amber-500 to-yellow-400',
+      bg: 'bg-amber-50',
+    },
+    {
+      label: '已发布公告',
+      value: publishedCount,
+      icon: Send,
+      gradient: 'from-blue-600 to-blue-400',
+      bg: 'bg-blue-50',
+    },
+    {
+      label: '待审批认领',
+      value: reviewCount,
+      icon: Clock,
+      gradient: 'from-orange-500 to-amber-400',
+      bg: 'bg-orange-50',
+    },
+    {
+      label: '已完成认领',
+      value: claimedCount,
+      icon: CheckCircle,
+      gradient: 'from-emerald-500 to-green-400',
+      bg: 'bg-emerald-50',
+    },
+  ] as const;
+
+  /* ---- Render ---- */
   return (
-    <div className="space-y-6">
-      <PageHeader
-        title="闲置资产管理"
-        subtitle="闲置资产公告发布与认领流程管理"
-        actions={
-          <Button
-            variant="primary"
-            size="sm"
-            onClick={() => setShowPublish(true)}
-            disabled={tabAssets.pending.length === 0}
-          >
-            <Send className="w-4 h-4 mr-1" />
-            发布公告
-          </Button>
-        }
-      />
+    <div className="min-h-full bg-[var(--app-background)] px-4 py-5 sm:px-6 lg:px-8">
+      <div className="mx-auto flex w-full max-w-[1480px] flex-col gap-6">
 
-      {toast && (
-        <div className={`p-3 rounded-lg text-sm ${
-          toast.type === 'success' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'
-        }`}>
-          {toast.msg}
-        </div>
-      )}
-
-      {error && (
-        <div className="p-3 rounded-lg bg-yellow-50 border border-yellow-200 text-yellow-700 text-sm">
-          后端服务暂不可用，请稍后重试。
-        </div>
-      )}
-
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {[
-          { label: '闲置总量',   value: totalCount,     icon: Archive,      color: 'text-yellow-600', bg: 'bg-yellow-50' },
-          { label: '已发布公告', value: publishedCount,  icon: Send,         color: 'text-blue-600',   bg: 'bg-blue-50'   },
-          { label: '进行中认领', value: claimingCount,   icon: Clock,        color: 'text-orange-500', bg: 'bg-orange-50' },
-          { label: '本月处置',   value: disposedCount,   icon: CheckCircle,  color: 'text-green-600',  bg: 'bg-green-50'  },
-        ].map(({ label, value, icon: Icon, color, bg }) => (
-          <Card key={label}>
-            <CardContent className="p-5">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-500">{label}</p>
-                  <p className="text-3xl font-semibold text-gray-900 mt-1">{value}</p>
-                </div>
-                <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${bg}`}>
-                  <Icon className={`w-5 h-5 ${color}`} />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      <Card>
-        <div className="border-b border-gray-200 px-4 flex gap-1">
-          {TABS.map(tab => (
-            <button
-              key={tab.key}
-              onClick={() => setActiveTab(tab.key)}
-              className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
-                activeTab === tab.key
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
-              }`}
+        {/* ---- Header + Stat bar ---- */}
+        <section className="rounded-2xl border border-[var(--surface-border)] bg-white shadow-sm">
+          <div className="flex flex-wrap items-center justify-between gap-4 px-6 py-5">
+            <div>
+              <h1 className="text-lg font-bold tracking-tight text-gray-900">闲置资产管理</h1>
+              <p className="mt-0.5 text-sm text-gray-500">闲置资产公告发布与认领流程管理</p>
+            </div>
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => setShowPublish(true)}
+              disabled={tabAssets.pending.length === 0}
             >
-              {tab.label}
-              <span className="ml-1.5 text-xs text-gray-400">
-                ({tabAssets[tab.key].length})
-              </span>
-            </button>
-          ))}
-        </div>
-
-        <CardContent className="p-0">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="bg-gray-50 border-b border-gray-200">
-                <tr>
-                  <th className="px-5 py-3 text-left text-xs font-medium text-gray-400 uppercase">资产编号</th>
-                  <th className="px-5 py-3 text-left text-xs font-medium text-gray-400 uppercase">资产名称</th>
-                  <th className="px-5 py-3 text-left text-xs font-medium text-gray-400 uppercase">部门</th>
-                  <th className="px-5 py-3 text-left text-xs font-medium text-gray-400 uppercase">闲置天数</th>
-                  <th className="px-5 py-3 text-left text-xs font-medium text-gray-400 uppercase">状态</th>
-                  <th className="px-5 py-3 text-left text-xs font-medium text-gray-400 uppercase">操作</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {displayAssets.length === 0 ? (
-                  <tr>
-                    <td colSpan={6} className="px-5 py-10 text-center text-gray-400">暂无数据</td>
-                  </tr>
-                ) : (
-                  displayAssets.map(asset => (
-                    <tr key={asset.id} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-5 py-4 font-medium text-blue-600">
-                        {String(asset.assetId ?? asset.id)}
-                      </td>
-                      <td className="px-5 py-4">
-                        <p className="font-medium text-gray-900">{asset.assetName ?? asset.name ?? '—'}</p>
-                        <p className="text-xs text-gray-400">{asset.category ?? '—'}</p>
-                      </td>
-                      <td className="px-5 py-4 text-gray-500">{asset.originalDept ?? '—'}</td>
-                      <td className="px-5 py-4">
-                        <span className={`font-medium ${getIdleDaysColor(asset.idleDays)}`}>
-                          {asset.idleDays ?? '—'} 天
-                        </span>
-                      </td>
-                      <td className="px-5 py-4">
-                        <Badge variant={getStatusBadgeVariant(asset.status)}>
-                          {getStatusLabel(asset.status)}
-                        </Badge>
-                      </td>
-                      <td className="px-5 py-4">
-                        <div className="flex gap-2">
-                          {getTabKey(asset.status) === 'pending' && (
-                            <Button
-                              size="sm"
-                              variant="primary"
-                              onClick={() => { setPublishTarget(asset); setPublishTitle(`${asset.assetName ?? asset.name ?? ''} 闲置公告`); setShowPublish(true); }}
-                            >
-                              发布公告
-                            </Button>
-                          )}
-                          {getTabKey(asset.status) === 'published' && (
-                            <>
-                              <Button size="sm" variant="primary" onClick={() => claimMutation.mutate(asset)}>
-                                认领
-                              </Button>
-                              <Button size="sm" variant="outline" onClick={() => cancelMutation.mutate(asset)}>
-                                取消公告
-                              </Button>
-                            </>
-                          )}
-                          {getTabKey(asset.status) === 'claimed' && (
-                            <span className="text-xs text-green-600 font-medium">
-                              {asset.claimDept ? `认领部门：${asset.claimDept}` : '已认领'}
-                            </span>
-                          )}
-                          {getTabKey(asset.status) === 'history' && (
-                            <span className="text-xs text-gray-400">已处置</span>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
+              <Send className="mr-1.5 h-4 w-4" />
+              发布公告
+            </Button>
           </div>
-        </CardContent>
-      </Card>
 
-      {showPublish && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl w-full max-w-lg mx-4 shadow-xl">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-              <h3 className="text-base font-semibold text-gray-900">发布闲置资产公告</h3>
-              <button
-                onClick={() => { setShowPublish(false); setPublishTarget(null); }}
-                className="text-gray-400 hover:text-gray-600 transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            <div className="p-6 space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">选择闲置资产 *</label>
-                <div className="border border-gray-200 rounded-lg p-3 max-h-40 overflow-y-auto space-y-1">
-                  {tabAssets.pending.map(asset => (
-                    <label key={asset.id} className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded cursor-pointer">
-                      <input
-                        type="radio"
-                        name="publishTarget"
-                        checked={publishTarget?.id === asset.id}
-                        onChange={() => { setPublishTarget(asset); setPublishTitle(`${asset.assetName ?? asset.name ?? ''} 闲置公告`); }}
-                        className="w-4 h-4 text-blue-600"
-                      />
-                      <span className="text-sm text-gray-900">
-                        {asset.assetName ?? asset.name} — {String(asset.assetValue ?? asset.value ?? '—')}
-                      </span>
-                    </label>
-                  ))}
+          {/* Stat bar */}
+          <div className="grid grid-cols-2 divide-x divide-slate-100 border-t border-slate-100 sm:grid-cols-4">
+            {stats.map(({ label, value, icon: Icon, gradient, bg }) => (
+              <div key={label} className="flex items-center gap-3.5 px-5 py-4">
+                <div
+                  className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ${gradient} shadow-sm`}
+                >
+                  <Icon className="h-5 w-5 text-white" />
+                </div>
+                <div>
+                  <p className="text-xs font-medium text-gray-500">{label}</p>
+                  <p className="text-xl font-bold tracking-tight text-gray-900">{value}</p>
                 </div>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">公告标题 *</label>
-                 <input
-                   type="text"
-                   className={`w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${publishErrors.title ? 'border-red-400 focus:ring-red-200' : 'border-gray-200'}`}
-                   placeholder="例：办公设备闲置资产处置公告"
-                   value={publishTitle}
-                   onChange={(e) => { setPublishTitle(e.target.value); setPublishErrors(p => ({ ...p, title: '' })); }}
-                 />
+            ))}
+          </div>
+        </section>
+
+        {/* ---- Toast / Error banners ---- */}
+        {toast && (
+          <div
+            className={`rounded-xl border px-4 py-3 text-sm shadow-sm ${
+              toast.type === 'success'
+                ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+                : 'border-red-200 bg-red-50 text-red-700'
+            }`}
+          >
+            {toast.msg}
+          </div>
+        )}
+
+        {error && (
+          <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700 shadow-sm">
+            后端服务暂不可用，请稍后重试。
+          </div>
+        )}
+
+        {/* ---- Main content card ---- */}
+        <Card className="overflow-hidden rounded-2xl border-slate-200/80 shadow-sm">
+          {/* Toolbar: filter pills + result summary */}
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 px-5 py-4">
+            <div className="flex flex-wrap gap-2">
+              {TABS.map(tab => {
+                const active = activeTab === tab.key;
+                return (
+                  <button
+                    key={tab.key}
+                    onClick={() => setActiveTab(tab.key)}
+                    className={`rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-colors ${
+                      active
+                        ? 'border-blue-500 bg-blue-600 text-white'
+                        : 'border-slate-200 bg-white text-gray-600 hover:border-slate-300 hover:bg-slate-50'
+                    }`}
+                  >
+                    {tab.label}
+                    <span className={`ml-1.5 ${active ? 'text-blue-200' : 'text-gray-400'}`}>
+                      {tabAssets[tab.key].length}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+            <p className="text-xs text-gray-400">
+              共 <span className="font-semibold text-gray-600">{displayAssets.length}</span> 条结果
+            </p>
+          </div>
+
+          {/* DataTable */}
+          <div className="p-5">
+            <DataTable<IdleAssetRecord>
+              columns={columns}
+              data={displayAssets}
+              rowKey={(row) => String(row.id)}
+              emptyText="暂无数据"
+            />
+          </div>
+        </Card>
+
+        {/* ---- Publish modal ---- */}
+        {showPublish && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+            <div className="mx-4 w-full max-w-lg rounded-2xl bg-white shadow-2xl">
+              {/* Modal header */}
+              <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
+                <h3 className="text-base font-semibold text-gray-900">发布闲置资产公告</h3>
+                <button
+                  onClick={() => { setShowPublish(false); setPublishTarget(null); setPublishTitle(''); setPublishDeadline(''); setPublishErrors({}); }}
+                  className="rounded-lg p-1 text-gray-400 transition-colors hover:bg-slate-100 hover:text-gray-600"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+
+              {/* Modal body */}
+              <div className="space-y-5 px-6 py-5">
+                <div>
+                  <label className="mb-1.5 block text-sm font-medium text-gray-700">选择闲置资产 *</label>
+                  <div className="max-h-40 space-y-1 overflow-y-auto rounded-xl border border-slate-200 p-3">
+                    {tabAssets.pending.map(asset => (
+                      <label key={asset.id} className="flex cursor-pointer items-center gap-2 rounded-lg p-2 transition-colors hover:bg-slate-50">
+                        <input
+                          type="radio"
+                          name="publishTarget"
+                          checked={publishTarget?.id === asset.id}
+                          onChange={() => { setPublishTarget(asset); setPublishTitle(`${asset.assetName ?? asset.name ?? ''} 闲置公告`); }}
+                          className="h-4 w-4 text-blue-600"
+                        />
+                        <span className="text-sm text-gray-900">
+                          {asset.assetName ?? asset.name} — {String(asset.assetValue ?? asset.value ?? '—')}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <label className="mb-1.5 block text-sm font-medium text-gray-700">公告标题 *</label>
+                  <input
+                    type="text"
+                    className={`w-full rounded-xl border px-3.5 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                      publishErrors.title ? 'border-red-400 focus:ring-red-200' : 'border-slate-200'
+                    }`}
+                    placeholder="例：办公设备闲置资产处置公告"
+                    value={publishTitle}
+                    onChange={(e) => { setPublishTitle(e.target.value); setPublishErrors(p => ({ ...p, title: '' })); }}
+                  />
                   {publishErrors.title && (
-                    <p className="mt-1 text-xs text-red-500 flex items-center gap-1">
-                      <AlertCircle className="w-3 h-3" /> {publishErrors.title}
+                    <p className="mt-1 flex items-center gap-1 text-xs text-red-500">
+                      <AlertCircle className="h-3 w-3" /> {publishErrors.title}
                     </p>
                   )}
-               </div>
-               <div>
-                 <label className="block text-sm font-medium text-gray-700 mb-1">认领截止日期 *</label>
-                 <input
-                   type="date"
-                   className={`w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${publishErrors.deadline ? 'border-red-400 focus:ring-red-200' : 'border-gray-200'}`}
-                   value={publishDeadline}
-                   onChange={(e) => { setPublishDeadline(e.target.value); setPublishErrors(p => ({ ...p, deadline: '' })); }}
-                 />
+                </div>
+                <div>
+                  <label className="mb-1.5 block text-sm font-medium text-gray-700">认领截止日期 *</label>
+                  <input
+                    type="date"
+                    className={`w-full rounded-xl border px-3.5 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                      publishErrors.deadline ? 'border-red-400 focus:ring-red-200' : 'border-slate-200'
+                    }`}
+                    value={publishDeadline}
+                    onChange={(e) => { setPublishDeadline(e.target.value); setPublishErrors(p => ({ ...p, deadline: '' })); }}
+                  />
                   {publishErrors.deadline && (
-                    <p className="mt-1 text-xs text-red-500 flex items-center gap-1">
-                      <AlertCircle className="w-3 h-3" /> {publishErrors.deadline}
+                    <p className="mt-1 flex items-center gap-1 text-xs text-red-500">
+                      <AlertCircle className="h-3 w-3" /> {publishErrors.deadline}
                     </p>
                   )}
+                </div>
+              </div>
+
+              {/* Modal footer */}
+              <div className="flex justify-end gap-3 border-t border-slate-100 px-6 py-4">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => { setShowPublish(false); setPublishTarget(null); setPublishTitle(''); setPublishDeadline(''); setPublishErrors({}); }}
+                >
+                  取消
+                </Button>
+                <Button
+                  variant="primary"
+                  size="sm"
+                  disabled={!publishTarget || publishMutation.isPending}
+                  onClick={() => { if (validatePublishForm() && publishTarget) publishMutation.mutate(publishTarget); }}
+                >
+                  {publishMutation.isPending ? '发布中...' : '发布公告'}
+                </Button>
               </div>
             </div>
-            <div className="flex justify-end gap-3 px-6 py-4 border-t border-gray-200">
-              <Button variant="outline" size="sm"                 onClick={() => { setShowPublish(false); setPublishTarget(null); setPublishTitle(''); setPublishDeadline(''); setPublishErrors({}); }}>
-                取消
-              </Button>
-              <Button
-                variant="primary"
-                size="sm"
-                disabled={!publishTarget || publishMutation.isPending}
-                onClick={() => { if (validatePublishForm() && publishTarget) publishMutation.mutate(publishTarget); }}
-              >
-                {publishMutation.isPending ? '发布中...' : '发布公告'}
-              </Button>
-            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }

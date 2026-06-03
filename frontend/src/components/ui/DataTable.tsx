@@ -3,7 +3,7 @@
  * @description 企业级数据表格
  *
  * 功能：分页、排序、loading/empty 状态、行点击
- * 遵循 Design System：表头 #f8fafc，行高 40px，hover #f8fbff
+ * AI 去味：行 hover 微渐变高亮、斑马纹改为微渐变交替、列头字重差异化
  */
 
 import * as React from 'react';
@@ -71,19 +71,21 @@ export function DataTable<T extends object>({
 
   return (
     <div className={cn('w-full', className)}>
-      <div className="overflow-x-auto rounded-[10px] border border-[#e5e7eb]">
+      <div data-slot="data-table" className="overflow-x-auto rounded-[var(--surface-radius)] border border-[var(--surface-border)] bg-[color:var(--surface-card-raised)] shadow-[0_1px_2px_rgba(15,23,42,0.03)] ring-1 ring-white/70">
         <table className="w-full border-collapse">
           {/* Header */}
           <thead>
-            <tr className="bg-[#f8fafc] border-b border-[#e5e7eb]">
+            <tr className="border-b border-[#e5e7eb] bg-gradient-to-r from-[#fbfdff] to-[#f3f7fb]">
               {columns.map((col) => (
                 <th
                   key={col.key}
                   className={cn(
-                    'px-4 py-2.5 text-left text-xs font-semibold text-[#64748b] uppercase tracking-wide whitespace-nowrap select-none',
+                    'select-none whitespace-nowrap px-4 py-3 text-left text-xs uppercase tracking-[0.08em]',
+                    /* 列头字重差异化：sortable 列更粗表示可交互 */
+                    col.sortable ? 'font-extrabold text-[#374151]' : 'font-semibold text-[#64748b]',
                     col.align === 'center' && 'text-center',
                     col.align === 'right' && 'text-right',
-                    col.sortable && 'cursor-pointer hover:text-[#374151]',
+                    col.sortable && 'cursor-pointer hover:text-[#1d4ed8]',
                   )}
                   style={{ width: col.width }}
                   onClick={() => col.sortable && handleSort(col.key)}
@@ -94,9 +96,9 @@ export function DataTable<T extends object>({
                       <span className="text-[#cbd5e1]">
                         {sortKey === col.key ? (
                           sortDir === 'asc' ? (
-                            <ChevronUp className="w-3 h-3 text-[#3b82f6]" />
+                            <ChevronUp className="w-3 h-3 text-[#1d4ed8]" />
                           ) : (
-                            <ChevronDown className="w-3 h-3 text-[#3b82f6]" />
+                            <ChevronDown className="w-3 h-3 text-[#1d4ed8]" />
                           )
                         ) : (
                           <ChevronsUpDown className="w-3 h-3" />
@@ -129,8 +131,13 @@ export function DataTable<T extends object>({
                   key={getRowKey(row, index)}
                   className={cn(
                     rowHeight,
-                    'border-b border-[#f1f5f9] last:border-b-0 transition-colors',
-                    onRowClick && 'cursor-pointer hover:bg-[#f8fbff]',
+                    'border-b border-[#f1f5f9] last:border-b-0',
+                    /* 斑马纹：每两行渐变交替，代替纯色斑马纹 */
+                    index % 2 === 1 ? 'bg-gradient-to-r from-transparent via-[var(--surface-muted)]/40 to-transparent' : '',
+                    /* 行 hover：微渐变高亮 + 左侧指示条，替代纯背景色 */
+                    'transition-colors duration-150 ease-out',
+                    onRowClick && 'cursor-pointer hover:bg-[var(--surface-hover)] hover:shadow-[inset_3px_0_0_rgba(29,78,216,0.22)]',
+                    'motion-reduce:transition-none',
                   )}
                   onClick={() => onRowClick?.(row)}
                 >
@@ -138,7 +145,7 @@ export function DataTable<T extends object>({
                     <td
                       key={col.key}
                       className={cn(
-                        'px-4 py-2 text-sm text-[#374151]',
+                        'px-4 py-2.5 text-sm leading-6 text-[#374151]',
                         col.align === 'center' && 'text-center',
                         col.align === 'right' && 'text-right',
                       )}
@@ -157,7 +164,7 @@ export function DataTable<T extends object>({
 
       {/* 分页 */}
       {pagination && pagination.total > 0 && (
-        <div className="flex items-center justify-between mt-4 text-sm">
+        <div className="mt-4 flex items-center justify-between rounded-[var(--surface-radius)] border border-[var(--surface-border)] bg-white/80 px-3 py-2 text-sm shadow-[0_1px_2px_rgba(15,23,42,0.03)]">
           <span className="text-[#94a3b8]">
             共 <span className="font-medium text-[#374151]">{pagination.total}</span> 条
           </span>
@@ -165,11 +172,10 @@ export function DataTable<T extends object>({
             <button
               onClick={() => pagination.onChange(pagination.page - 1, pagination.pageSize)}
               disabled={pagination.page <= 1}
-              className="h-8 w-8 flex items-center justify-center rounded-lg border border-[#e5e7eb] disabled:opacity-40 hover:bg-[#f8fafc] transition-colors"
+              className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#dbe5f0] bg-white transition-colors hover:bg-[#f8fbff] disabled:opacity-40 focus-visible:outline-none focus-visible:shadow-[var(--shadow-focus)]"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
-            {/* 页码按钮 */}
             {(() => {
               const totalPages = Math.ceil(pagination.total / pagination.pageSize);
               const pages: (number | '...')[] = [];
@@ -197,10 +203,10 @@ export function DataTable<T extends object>({
                     key={p}
                     onClick={() => pagination.onChange(p as number, pagination.pageSize)}
                     className={cn(
-                      'h-8 min-w-[32px] px-2 rounded-lg border text-sm transition-colors',
+                      'h-8 min-w-[32px] rounded-lg border px-2 text-sm font-medium shadow-[var(--shadow-control)] transition-colors focus-visible:outline-none focus-visible:shadow-[var(--shadow-focus)]',
                       pagination.page === p
-                        ? 'bg-[#3b82f6] text-white border-[#3b82f6] font-medium'
-                        : 'border-[#e5e7eb] hover:bg-[#f8fafc]',
+                        ? 'bg-[#1d4ed8] text-white border-[#1d4ed8] font-medium shadow-blue-500/20'
+                        : 'border-[var(--surface-border)] bg-white hover:bg-[var(--surface-hover)]',
                     )}
                   >
                     {p}
@@ -211,7 +217,7 @@ export function DataTable<T extends object>({
             <button
               onClick={() => pagination.onChange(pagination.page + 1, pagination.pageSize)}
               disabled={pagination.page >= Math.ceil(pagination.total / pagination.pageSize)}
-              className="h-8 w-8 flex items-center justify-center rounded-lg border border-[#e5e7eb] disabled:opacity-40 hover:bg-[#f8fafc] transition-colors"
+              className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#dbe5f0] bg-white transition-colors hover:bg-[#f8fbff] disabled:opacity-40 focus-visible:outline-none focus-visible:shadow-[var(--shadow-focus)]"
             >
               <ChevronRight className="w-4 h-4" />
             </button>

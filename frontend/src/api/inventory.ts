@@ -1,7 +1,10 @@
 import http from '@/utils/http';
+import type { PageData } from '@/types/common';
+import type { InventoryAsset, InventorySummary, InventoryTask as InventoryTaskView } from '@/types/inventory';
 
 export interface InventoryTaskRecord {
   id: number;
+  taskId?: string;
   taskNo: string;
   taskName: string;
   inventoryType: string | null;
@@ -48,6 +51,8 @@ export interface InventoryTaskListParams {
 
 export interface InventoryTaskCreatePayload {
   taskName: string;
+  scopeType?: string;
+  scopeIds?: string[];
   inventoryType?: string;
   deptIds?: string;
   location?: string;
@@ -59,50 +64,48 @@ export interface InventoryTaskCreatePayload {
   totalCount?: number;
 }
 
-interface PageResponse<T> {
-  records: T[];
-  total: number;
-  size: number;
-  current: number;
-  pages: number;
-}
-
 const BASE = '/inventory/tasks';
 
-export function getInventoryTasks(params?: InventoryTaskListParams) {
-  return http.get(BASE, { params });
+export function getInventoryTasks(params?: InventoryTaskListParams): Promise<PageData<InventoryTaskView>> {
+  return http.get<PageData<InventoryTaskView>>(BASE, { params });
 }
 
-export function createInventoryTask(data: InventoryTaskCreatePayload) {
-  return http.post(BASE, data);
+export function createInventoryTask(data: InventoryTaskCreatePayload): Promise<InventoryTaskRecord & { taskId?: string }> {
+  return http.post<InventoryTaskRecord & { taskId?: string }>(BASE, data);
 }
 
-export function getInventoryTaskDetail(id: number | string) {
-  return http.get(`${BASE}/${id}`);
+export const createTask = createInventoryTask;
+
+export function getInventoryTaskDetail(id: number | string): Promise<InventoryTaskDetail> {
+  return http.get<InventoryTaskDetail>(`${BASE}/${id}`);
 }
 
-export function updateTaskStatus(id: number | string, payload: { status: string }) {
-  return (http as { patch: (url: string, data?: unknown) => Promise<unknown> }).patch(`${BASE}/${id}/status`, payload);
+export function updateTaskStatus(id: number | string, payload: { status: string }): Promise<InventoryTaskRecord> {
+  return http.patch<InventoryTaskRecord>(`${BASE}/${id}/status`, payload);
 }
 
-export function getTaskAssets(taskId: number | string, params?: Record<string, unknown>) {
-  return http.get(`${BASE}/${taskId}/assets`, { params });
+export function getTaskAssets(taskId: number | string, params?: Record<string, unknown>): Promise<PageData<InventoryAsset>> {
+  return http.get<PageData<InventoryAsset>>(`${BASE}/${taskId}/assets`, { params });
 }
 
-export function confirmAsset(taskId: number | string, assetId: number | string, payload?: Record<string, unknown>) {
-  return (http as { patch: (url: string, data?: unknown) => Promise<unknown> }).patch(`${BASE}/${taskId}/assets/${assetId}/confirm`, payload);
+export function confirmAsset(taskId: number | string, assetId: number | string, payload?: Record<string, unknown>): Promise<void> {
+  return http.patch<void>(`${BASE}/${taskId}/assets/${assetId}/confirm`, payload);
 }
 
-export function batchConfirmAssets(taskId: number | string, payload: { assetIds: (string | number)[]; actualStatus?: string; remark?: string }) {
-  return http.post(`${BASE}/${taskId}/assets/batch-confirm`, payload);
+export function batchConfirmAssets(taskId: number | string, payload: { assetIds: (string | number)[]; actualStatus?: string; remark?: string }): Promise<void> {
+  return http.post<void>(`${BASE}/${taskId}/assets/batch-confirm`, payload);
 }
 
-export function submitTask(taskId: number | string) {
-  return http.post(`${BASE}/${taskId}/submit`);
+export function submitTask(taskId: number | string): Promise<void> {
+  return http.post<void>(`${BASE}/${taskId}/submit`);
 }
 
-export function getTaskSummary(taskId: number | string) {
-  return http.get(`${BASE}/${taskId}/summary`);
+export function getTaskSummary(taskId: number | string): Promise<InventorySummary> {
+  return http.get<InventorySummary>(`${BASE}/${taskId}/summary`);
+}
+
+export function approveTask(taskId: number | string): Promise<{ surplusCreated: number; deficitMarked: number; damagedMarked: number; errors: string[] }> {
+  return http.post<{ surplusCreated: number; deficitMarked: number; damagedMarked: number; errors: string[] }>(`${BASE}/${taskId}/approve`);
 }
 
 export const inventoryService = {
@@ -113,7 +116,7 @@ export const inventoryService = {
   addScanResult(taskId: number | string, data: Record<string, unknown>) {
     return http.post(`${BASE}/${taskId}/scan`, data);
   },
-  getTaskDetails(taskId: number | string) {
-    return http.get(`${BASE}/${taskId}/details`);
+  getTaskDetails(taskId: number | string): Promise<InventoryDetailRecord[]> {
+    return http.get<InventoryDetailRecord[]>(`${BASE}/${taskId}/details`);
   },
 };

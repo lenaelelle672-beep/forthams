@@ -254,3 +254,11 @@ export class AssetService {
 }
 
 export default AssetService;
+export const assetService = {
+  getAssetById: async (assetId: string) => ({ data: await getAssetDetail(assetId) }),
+  getAssetList,
+  getAssetDetail,
+  createAsset,
+  updateAsset,
+  deleteAsset,
+};

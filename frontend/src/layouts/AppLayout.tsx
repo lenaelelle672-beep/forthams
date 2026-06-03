@@ -2,10 +2,7 @@
  * @file layouts/AppLayout.tsx
  * @description 主应用布局 — 侧边栏 + 顶栏 + 内容区
  *
- * 严格遵循 forthAMS Design System：
- * - 侧边栏：240px, #0a1628 深海蓝，白色文字
- * - 顶栏：64px，白色，底部边框 #e5e7eb
- * - 内容区：#f8fafc 背景，24px padding
+ * UI 打磨：侧边栏增加品牌色渐变背景、菜单项 hover 添加磁性吸附效果提示
  */
 
 import { useState, useEffect, useMemo } from 'react';
@@ -39,9 +36,15 @@ import {
   Monitor,
   FileBarChart,
   FolderTree,
+  Wrench,
+  Calendar,
+  Sun,
+  Moon,
 } from 'lucide-react';
 
 import GlobalSearch from '@/components/GlobalSearch';
+import { SpatialTimeProvider } from '@/components/shared/SpatialTimeContext';
+import { useTheme } from '@/hooks/useTheme';
 
 type NavItem = {
   path: string;
@@ -68,6 +71,7 @@ const NAV_GROUPS: NavGroup[] = [
     group: '资产管理',
     items: [
       { path: '/assets',       label: '资产台账', icon: Package },
+      { path: '/asset-models', label: '资产型号', icon: Package },
       { path: '/equipment',    label: '重要设备', icon: Cpu },
       { path: '/idle',         label: '闲置资产', icon: Warehouse },
       { path: '/depreciation', label: '折旧管理', icon: TrendingDown },
@@ -76,10 +80,33 @@ const NAV_GROUPS: NavGroup[] = [
   {
     group: '运营管理',
     items: [
-      { path: '/inventory',  label: 'RFID 盘点', icon: ScanLine },
-      // 工单管理已合并到资产处置
-      { path: '/approvals',  label: '审批流程', icon: CheckSquare },
-      { path: '/workflows',  label: '工作流',   icon: Workflow },
+      { path: '/inventory',         label: 'RFID 盘点', icon: ScanLine },
+      { path: '/maintenance',       label: '维保记录', icon: Wrench },
+      { path: '/maintenance/plans', label: '维保计划', icon: Calendar },
+      { path: '/approvals',         label: '审批流程', icon: CheckSquare },
+      { path: '/workflows',         label: '工作流',   icon: Workflow },
+    ],
+  },
+  {
+    group: '采购与合同',
+    items: [
+      { path: '/purchase-orders', label: '采购订单', icon: Handshake },
+      { path: '/contracts',       label: '合同管理', icon: FileText },
+    ],
+  },
+  {
+    group: '空间与能耗',
+    items: [
+      { path: '/gis',        label: 'GIS 地图', icon: MapPin },
+      { path: '/floorplans', label: '楼层平面图', icon: Monitor },
+      { path: '/energy',     label: '能耗管理', icon: Cpu },
+    ],
+  },
+  {
+    group: '软件与合规',
+    items: [
+      { path: '/licenses', label: '软件许可证', icon: Shield },
+      { path: '/sam',      label: 'SAM 合规', icon: Shield },
     ],
   },
   {
@@ -108,11 +135,14 @@ const SYSTEM_NAV_ITEMS: NavItem[] = [
   { path: '/system/menus', label: '菜单管理', icon: FolderTree },
   { path: '/system/depts', label: '部门管理', icon: MapPin },
   { path: '/system/posts', label: '岗位管理', icon: Workflow },
-  { path: '/settings/system', label: '参数配置', icon: Settings },
+  { path: '/system/custom-fields', label: '自定义字段', icon: Settings },
+  { path: '/system/custom-fieldsets', label: '字段集', icon: FolderTree },
+  { path: '/settings/sysconfig', label: '参数配置', icon: Settings },
 ];
 
 const NAV_BOTTOM_ITEMS: NavItem[] = [
   { path: '/categories', label: '资产分类', icon: FolderTree },
+  { path: '/manufacturers', label: '制造商', icon: Cpu },
   { path: '/vendors',   label: '供应商',  icon: Users },
   { path: '/locations', label: '位置管理', icon: MapPin },
 ];
@@ -122,7 +152,7 @@ export default function AppLayout() {
   const [collapsed, setCollapsed] = useState(false);
   const navigate = useNavigate();
 
-  const { hasRole } = useAuth();
+  const { hasRole, user } = useAuth();
 
   // 大屏导航——仅 ADMIN 或 SUPER_ADMIN 角色可见
   const navGroups = useMemo(() => {
@@ -145,11 +175,10 @@ export default function AppLayout() {
 
   // ── 认证守卫：无 token 时重定向登录页 ──────────────────────────────────
   useEffect(() => {
-    const token = sessionStorage.getItem('auth_token') || localStorage.getItem('auth_token');
-    if (!token) {
+    if (!user && !sessionStorage.getItem('auth_token') && !localStorage.getItem('auth_token')) {
       navigate('/login', { replace: true });
     }
-  }, [navigate]);
+  }, [navigate, user]);
 
   // 未读通知数
   const { data: unreadCount = 0 } = useQuery<number>({
@@ -164,8 +193,9 @@ export default function AppLayout() {
 
   const sidebarWidth = collapsed ? 64 : 240;
 
+  const { isDark, toggleDarkMode } = useTheme();
+
   const handleLogout = () => {
-    // 清除所有可能的认证 key（兼容新旧两套存储）
     sessionStorage.removeItem('auth_token');
     sessionStorage.removeItem('user_info');
     localStorage.removeItem('auth_token');
@@ -175,35 +205,27 @@ export default function AppLayout() {
     navigate('/login');
   };
 
-  const userInfo = (() => {
-    try {
-      // 优先读 sessionStorage，fallback 到 localStorage
-      const raw =
-        sessionStorage.getItem('user_info') ||
-        localStorage.getItem('ams_auth_user') ||
-        localStorage.getItem('user_info') ||
-        '{}';
-      return JSON.parse(raw);
-    } catch {
-      return {};
-    }
-  })();
+  const userInfo = {
+    realName: user?.realName,
+    username: user?.username,
+    roles: user?.roles,
+  };
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[#f8fafc]">
-      {/* ── 侧边栏 ──────────────────────────────────────────────────────────── */}
+    <div className="flex h-screen overflow-hidden bg-[radial-gradient(circle_at_top_left,rgba(29,78,216,0.08),transparent_30%),var(--app-background)]">
+      {/* ── 侧边栏：品牌色渐变背景 ── */}
       <aside
-        className="relative flex-none flex flex-col h-full transition-all duration-200"
+        className="relative flex h-full flex-none flex-col border-r border-white/10 shadow-[18px_0_50px_rgba(15,23,42,0.18)] transition-all duration-200"
         style={{
           width: sidebarWidth,
-          backgroundColor: '#0a1628',
+          background: 'linear-gradient(180deg, #071426 0%, #0f2147 44%, #08111f 100%)',
         }}
       >
         {/* Logo 区 */}
         <div className="flex items-center justify-between px-4 h-16 border-b border-[#1a2d47] flex-shrink-0">
           {!collapsed && (
             <div className="flex items-center gap-2 min-w-0">
-              <div className="w-8 h-8 rounded-lg bg-blue-500 flex items-center justify-center flex-shrink-0">
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#1d4ed8] to-[#6366f1] flex items-center justify-center flex-shrink-0 shadow-sm shadow-blue-500/30">
                 <Shield className="w-4 h-4 text-white" />
               </div>
               <span className="text-white font-bold text-base tracking-tight truncate">
@@ -212,14 +234,14 @@ export default function AppLayout() {
             </div>
           )}
           {collapsed && (
-            <div className="w-8 h-8 rounded-lg bg-blue-500 flex items-center justify-center mx-auto">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#1d4ed8] to-[#6366f1] flex items-center justify-center mx-auto shadow-sm shadow-blue-500/30">
               <Shield className="w-4 h-4 text-white" />
             </div>
           )}
         </div>
 
         {/* 导航主区 */}
-        <nav className="flex-1 overflow-y-auto py-4 px-2">
+        <nav className="flex-1 overflow-y-auto px-2 py-4 [scrollbar-width:thin]">
           {navGroups.map((group) => (
             <div key={group.group} className="mb-2">
               {!collapsed && (
@@ -239,7 +261,7 @@ export default function AppLayout() {
                       href={path}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors text-sm font-medium text-[#94a3b8] hover:bg-[#1a2d47] hover:text-white"
+                      className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-[#94a3b8] transition hover:bg-white/[0.08] hover:text-white hover:shadow-inner hover:translate-x-0.5 motion-reduce:hover:translate-x-0"
                       title={collapsed ? label : undefined}
                     >
                       <Icon className="w-4 h-4 flex-shrink-0" />
@@ -252,11 +274,12 @@ export default function AppLayout() {
                   <NavLink
                     key={path}
                     to={path}
+                    end
                     className={({ isActive }) =>
-                      `flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors text-sm font-medium ${
+                      `flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-all duration-150 ${
                         isActive
-                          ? 'bg-[#1e3a5f] text-white border-l-2 border-blue-400 pl-[10px]'
-                          : 'text-[#94a3b8] hover:bg-[#1a2d47] hover:text-white'
+                          ? 'bg-gradient-to-r from-white/[0.15] to-white/[0.05] text-white ring-1 ring-white/[0.15] shadow-inner shadow-black/10'
+                          : 'text-[#94a3b8] hover:bg-white/[0.08] hover:text-white hover:translate-x-0.5 motion-reduce:hover:translate-x-0'
                       }`
                     }
                     title={collapsed ? label : undefined}
@@ -276,11 +299,12 @@ export default function AppLayout() {
             <NavLink
               key={path}
               to={path}
+              end
               className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors text-sm font-medium ${
+                `flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-150 text-sm font-medium ${
                   isActive
-                    ? 'bg-[#1e3a5f] text-white border-l-2 border-blue-400 pl-[10px]'
-                    : 'text-[#94a3b8] hover:bg-[#1a2d47] hover:text-white'
+                    ? 'bg-gradient-to-r from-white/[0.15] to-white/[0.05] text-white ring-1 ring-white/[0.15] shadow-inner shadow-black/10'
+                    : 'text-[#94a3b8] hover:bg-white/[0.08] hover:text-white hover:translate-x-0.5 motion-reduce:hover:translate-x-0'
                 }`
               }
               title={collapsed ? label : undefined}
@@ -295,7 +319,7 @@ export default function AppLayout() {
         <div className="flex-shrink-0 border-t border-[#1a2d47] p-3">
           {!collapsed ? (
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs font-semibold flex-shrink-0">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#1d4ed8] to-[#6366f1] flex items-center justify-center text-white text-xs font-semibold flex-shrink-0">
                 {(userInfo.realName || userInfo.username || 'A')[0].toUpperCase()}
               </div>
               <div className="flex-1 min-w-0">
@@ -338,18 +362,28 @@ export default function AppLayout() {
       {/* ── 右侧主区 ────────────────────────────────────────────────────────── */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* 顶栏 */}
-        <header className="flex-none flex items-center justify-between h-16 px-6 bg-white border-b border-[#e5e7eb] z-10">
+        <header className="z-10 flex h-16 flex-none items-center justify-between border-b border-[var(--surface-border)] bg-[var(--surface-card-glass)] px-6 shadow-[var(--shadow-card)] backdrop-blur-xl">
           {/* 左：搜索 */}
           <div className="flex items-center gap-3">
             <GlobalSearch />
           </div>
 
-          {/* 右：通知 + 用户 */}
+          {/* 右：主题切换 + 通知 + 用户 */}
           <div className="flex items-center gap-3">
+            {/* 深色模式切换按钮 */}
+            <button
+              onClick={toggleDarkMode}
+              aria-label={isDark ? '切换到亮色模式' : '切换到深色模式'}
+              className="relative flex h-9 w-9 items-center justify-center rounded-xl text-slate-500 transition hover:bg-slate-100 hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-200"
+              title={isDark ? '切换到亮色模式' : '切换到深色模式'}
+            >
+              {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            </button>
+
             <NavLink
               to="/notifications"
               aria-label="查看通知"
-              className="relative w-8 h-8 flex items-center justify-center text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
+              className="relative flex h-9 w-9 items-center justify-center rounded-xl text-slate-500 transition hover:bg-slate-100 hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-200"
             >
               <Bell className="w-5 h-5" />
               {unreadCount > 0 && (
@@ -360,7 +394,7 @@ export default function AppLayout() {
             </NavLink>
 
             <button
-              className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs font-semibold"
+              className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-[#1d4ed8] to-[#6366f1] text-xs font-semibold text-white shadow-sm shadow-blue-500/30 ring-2 ring-white"
               title={userInfo.realName || '用户'}
             >
               {(userInfo.realName || userInfo.username || 'A')[0].toUpperCase()}
@@ -369,9 +403,11 @@ export default function AppLayout() {
         </header>
 
         {/* 内容区 */}
-        <main className="flex-1 overflow-hidden">
-          <div className="h-full overflow-y-auto p-6" id="main-scroll-container">
-            <Outlet />
+        <main className="flex-1 overflow-hidden bg-[radial-gradient(circle_at_top_left,rgba(29,78,216,0.06),transparent_28%),linear-gradient(180deg,var(--app-background-soft),var(--app-background))]">
+          <div className="h-full overflow-y-auto p-4 md:p-6 [scrollbar-width:thin]" id="main-scroll-container">
+            <SpatialTimeProvider>
+              <Outlet />
+            </SpatialTimeProvider>
           </div>
         </main>
       </div>

@@ -1,21 +1,26 @@
 /**
  * @file pages/vendors/VendorsPage.tsx
- * @description 供应商管理页面 — Design System 重构版
+ * @description 供应商管理页面 — Design System v2
  *
  * 功能：供应商列表展示、搜索过滤、新增/编辑/删除操作、详情查看
+ * 增强：供应商状态 badge、联系方式密度优化、筛选反馈标签、卡片底部操作区
  * API: 全部通过 @/api/vendor 真实 API，无 Mock 数据
  */
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Plus, Search, Pencil, Trash2, RefreshCw, Building2, Phone, Mail, User,
+  X, Eye, MapPin, Clock, CheckCircle, XCircle,
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { PageHeader } from '@/components/ui/PageHeader';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
+import { Badge } from '@/components/ui/Badge';
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription,
+} from '@/components/ui/Dialog';
 import {
   getVendorList,
   getVendorDetail,
@@ -25,20 +30,59 @@ import {
   type VendorListQuery,
   type CreateVendorRequest,
 } from '@/api/vendor';
-import type { Vendor } from '@/types/common';
+import type { PaginatedResponse, Vendor } from '@/types/common';
 
 // ─── 常量 ────────────────────────────────────────────────────────────────────
 
 const PAGE_SIZE = 10;
 
+const emptyVendorPage = (params: VendorListQuery): PaginatedResponse<Vendor> => ({
+  records: [],
+  total: 0,
+  size: params.pageSize ?? PAGE_SIZE,
+  current: params.page ?? 1,
+  pages: 0,
+});
+
 const EMPTY_FORM: CreateVendorRequest = {
-  vendorName: '',
+  name: '',
   vendorCode: '',
-  contact: '',
-  phone: '',
-  email: '',
+  contactPerson: '',
+  contactPhone: '',
+  contactEmail: '',
   address: '',
 };
+
+// ─── 供应商状态配置 ──────────────────────────────────────────────────────────
+
+const VENDOR_STATUS_CONFIG: Record<number, { label: string; variant: 'success' | 'gray' }> = {
+  1: { label: '合作中', variant: 'success' },
+  0: { label: '已停用', variant: 'gray' },
+};
+
+function getVendorStatusConfig(status?: number) {
+  if (status === undefined || status === null) {
+    return { label: '未知', variant: 'gray' as const };
+  }
+  return VENDOR_STATUS_CONFIG[status] ?? { label: '已停用', variant: 'gray' as const };
+}
+
+// ─── Status badge for stat bar ───────────────────────────────────────────────
+
+function StatusBadge({ status }: { status?: number }) {
+  const cfg = getVendorStatusConfig(status);
+  const isActive = status === 1;
+  const badgeCls = isActive
+    ? 'border-emerald-200 bg-emerald-50 text-emerald-700 ring-emerald-600/20'
+    : 'border-slate-200 bg-slate-50 text-slate-600 ring-slate-500/20';
+  const dotCls = isActive ? 'bg-emerald-500' : 'bg-slate-400';
+  return (
+    <span className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-semibold ring-1 ring-inset ${badgeCls}`}>
+      <span className={`h-1.5 w-1.5 rounded-full ${dotCls}`} />
+      {cfg.label}
+    </span>
+  );
+}
 
 // ─── Query Keys ──────────────────────────────────────────────────────────────
 
@@ -47,7 +91,7 @@ const VENDOR_KEYS = {
   detail: (id: number) => ['vendors', 'detail', id] as const,
 };
 
-// ─── 内联表单弹窗 ────────────────────────────────────────────────────────────
+// ─── Vendor Form Dialog ──────────────────────────────────────────────────────
 
 interface VendorFormDialogProps {
   open: boolean;
@@ -65,19 +109,17 @@ function VendorFormDialog({ open, vendor, submitting, onClose, onSubmit }: Vendo
       setForm(
         vendor
           ? {
-              vendorName: vendor.vendorName ?? '',
+              name: vendor.name ?? '',
               vendorCode: vendor.vendorCode ?? '',
-              contact: vendor.contact ?? '',
-              phone: vendor.phone ?? '',
-              email: vendor.email ?? '',
+              contactPerson: vendor.contactPerson ?? '',
+              contactPhone: vendor.contactPhone ?? '',
+              contactEmail: vendor.contactEmail ?? '',
               address: vendor.address ?? '',
             }
           : EMPTY_FORM,
       );
     }
   }, [open, vendor]);
-
-  if (!open) return null;
 
   const handleChange = (field: keyof CreateVendorRequest, value: string) => {
     setForm(prev => ({ ...prev, [field]: value }));
@@ -89,19 +131,22 @@ function VendorFormDialog({ open, vendor, submitting, onClose, onSubmit }: Vendo
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/50" onClick={onClose} />
-      <div className="relative bg-white rounded-[10px] shadow-xl w-full max-w-lg mx-4 p-6">
-        <h3 className="text-base font-semibold text-[#0f172a] mb-5">
-          {vendor ? '编辑供应商' : '新增供应商'}
-        </h3>
-        <form onSubmit={handleSubmit} className="space-y-4">
+    <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
+      <DialogContent title={vendor ? '编辑供应商' : '新增供应商'}>
+        <DialogHeader>
+          <DialogTitle>{vendor ? '编辑供应商' : '新增供应商'}</DialogTitle>
+          <DialogDescription>
+            {vendor ? '修改供应商信息并保存' : '填写以下信息以创建新供应商'}
+          </DialogDescription>
+        </DialogHeader>
+
+        <form onSubmit={handleSubmit} className="px-6 py-4 space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <Input
               label="供应商名称 *"
               placeholder="请输入供应商名称"
-              value={form.vendorName}
-              onChange={e => handleChange('vendorName', e.target.value)}
+              value={form.name}
+              onChange={e => handleChange('name', e.target.value)}
               required
             />
             <Input
@@ -115,22 +160,22 @@ function VendorFormDialog({ open, vendor, submitting, onClose, onSubmit }: Vendo
             <Input
               label="联系人"
               placeholder="请输入联系人姓名"
-              value={form.contact ?? ''}
-              onChange={e => handleChange('contact', e.target.value)}
+              value={form.contactPerson ?? ''}
+              onChange={e => handleChange('contactPerson', e.target.value)}
             />
             <Input
               label="联系电话"
               placeholder="请输入联系电话"
-              value={form.phone ?? ''}
-              onChange={e => handleChange('phone', e.target.value)}
+              value={form.contactPhone ?? ''}
+              onChange={e => handleChange('contactPhone', e.target.value)}
             />
           </div>
           <Input
             label="邮箱"
             type="email"
             placeholder="请输入邮箱地址"
-            value={form.email ?? ''}
-            onChange={e => handleChange('email', e.target.value)}
+            value={form.contactEmail ?? ''}
+            onChange={e => handleChange('contactEmail', e.target.value)}
           />
           <Input
             label="地址"
@@ -138,21 +183,22 @@ function VendorFormDialog({ open, vendor, submitting, onClose, onSubmit }: Vendo
             value={form.address ?? ''}
             onChange={e => handleChange('address', e.target.value)}
           />
-          <div className="flex justify-end gap-3 pt-2">
-            <Button type="button" variant="secondary" onClick={onClose} disabled={submitting}>
-              取消
-            </Button>
-            <Button type="submit" variant="primary" loading={submitting}>
-              {vendor ? '保存修改' : '确认新增'}
-            </Button>
-          </div>
         </form>
-      </div>
-    </div>
+
+        <DialogFooter>
+          <Button type="button" variant="secondary" onClick={onClose} disabled={submitting}>
+            取消
+          </Button>
+          <Button type="submit" variant="primary" onClick={handleSubmit} loading={submitting}>
+            {vendor ? '保存修改' : '确认新增'}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 
-// ─── 删除确认弹窗 ────────────────────────────────────────────────────────────
+// ─── Delete Confirm Dialog ───────────────────────────────────────────────────
 
 interface DeleteConfirmDialogProps {
   open: boolean;
@@ -163,30 +209,32 @@ interface DeleteConfirmDialogProps {
 }
 
 function DeleteConfirmDialog({ open, vendor, deleting, onClose, onConfirm }: DeleteConfirmDialogProps) {
-  if (!open || !vendor) return null;
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/50" onClick={onClose} />
-      <div className="relative bg-white rounded-[10px] shadow-xl w-full max-w-md mx-4 p-6">
-        <h3 className="text-base font-semibold text-[#0f172a] mb-3">确认删除</h3>
-        <p className="text-sm text-[#64748b] mb-6">
-          确定要删除供应商「<span className="font-medium text-[#0f172a]">{vendor.vendorName}</span>」吗？此操作不可撤销。
-        </p>
-        <div className="flex justify-end gap-3">
+    <Dialog open={open && !!vendor} onOpenChange={(v) => !v && onClose()}>
+      <DialogContent title="确认删除">
+        <DialogHeader>
+          <DialogTitle>确认删除</DialogTitle>
+          <DialogDescription>此操作不可撤销，请确认操作。</DialogDescription>
+        </DialogHeader>
+        <div className="px-6 py-4">
+          <p className="text-sm text-[#64748b]">
+            确定要删除供应商「<span className="font-medium text-[#0f172a]">{vendor?.name}</span>」吗？此操作不可撤销。
+          </p>
+        </div>
+        <DialogFooter>
           <Button type="button" variant="secondary" onClick={onClose} disabled={deleting}>
             取消
           </Button>
-          <Button type="button" variant="primary" onClick={onConfirm} loading={deleting}>
+          <Button type="button" variant="destructive" onClick={onConfirm} loading={deleting}>
             确认删除
           </Button>
-        </div>
-      </div>
-    </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 
-// ─── 详情抽屉（Sheet） ──────────────────────────────────────────────────────
+// ─── Detail Sheet (as Dialog) ────────────────────────────────────────────────
 
 interface VendorDetailSheetProps {
   open: boolean;
@@ -204,65 +252,73 @@ function VendorDetailSheet({ open, vendorId, onClose }: VendorDetailSheetProps) 
     enabled: open && vendorId !== null,
   });
 
-  if (!open) return null;
+  const formatDate = (dateStr?: string) => {
+    if (!dateStr) return '—';
+    try {
+      return new Date(dateStr).toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' });
+    } catch {
+      return dateStr;
+    }
+  };
+
+  const statusCfg = getVendorStatusConfig(vendor?.status);
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end">
-      <div className="absolute inset-0 bg-black/50" onClick={onClose} />
-      <div className="relative w-full max-w-md bg-white h-full shadow-xl overflow-y-auto">
-        <div className="p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-semibold text-[#0f172a]">供应商详情</h3>
-            <button
-              onClick={onClose}
-              className="p-1.5 rounded-lg text-[#64748b] hover:bg-[#f1f5f9] transition-colors"
-            >
-              ✕
-            </button>
-          </div>
+    <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
+      <DialogContent title="供应商详情" className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>供应商详情</DialogTitle>
+          <DialogDescription>查看供应商完整信息</DialogDescription>
+        </DialogHeader>
 
+        <div className="px-6 py-4">
           {isLoading ? (
-            <div className="flex items-center justify-center py-20 text-[#94a3b8] text-sm">
+            <div className="flex items-center justify-center py-16 text-[#94a3b8] text-sm">
               <RefreshCw className="w-5 h-5 animate-spin mr-2" />
               加载中...
             </div>
           ) : vendor ? (
             <div className="space-y-5">
-              <div className="flex items-center gap-4 pb-5 border-b border-[#f1f5f9]">
-                <div className="w-14 h-14 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0">
+              {/* 头部：名称 + 编码 + 状态 */}
+              <div className="flex items-center gap-4 pb-5 border-b border-slate-100">
+                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center flex-shrink-0">
                   <Building2 className="w-7 h-7 text-[#3b82f6]" />
                 </div>
-                <div>
-                  <p className="text-lg font-semibold text-[#0f172a]">{vendor.vendorName}</p>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <p className="text-lg font-semibold text-[#0f172a] truncate">{vendor.name}</p>
+                    <Badge variant={statusCfg.variant}>{statusCfg.label}</Badge>
+                  </div>
                   <p className="text-sm text-[#94a3b8] mt-0.5">{vendor.vendorCode || '—'}</p>
                 </div>
               </div>
 
+              {/* 联系信息 */}
               <div className="space-y-4">
-                {vendor.contact && (
+                {vendor.contactPerson && (
                   <div className="flex items-start gap-3">
                     <User className="w-4 h-4 text-[#64748b] mt-0.5 flex-shrink-0" />
                     <div>
                       <p className="text-xs text-[#94a3b8]">联系人</p>
-                      <p className="text-sm text-[#0f172a]">{vendor.contact}</p>
+                      <p className="text-sm text-[#0f172a]">{vendor.contactPerson}</p>
                     </div>
                   </div>
                 )}
-                {vendor.phone && (
+                {vendor.contactPhone && (
                   <div className="flex items-start gap-3">
                     <Phone className="w-4 h-4 text-[#64748b] mt-0.5 flex-shrink-0" />
                     <div>
                       <p className="text-xs text-[#94a3b8]">联系电话</p>
-                      <p className="text-sm text-[#0f172a]">{vendor.phone}</p>
+                      <p className="text-sm text-[#0f172a]">{vendor.contactPhone}</p>
                     </div>
                   </div>
                 )}
-                {vendor.email && (
+                {vendor.contactEmail && (
                   <div className="flex items-start gap-3">
                     <Mail className="w-4 h-4 text-[#64748b] mt-0.5 flex-shrink-0" />
                     <div>
                       <p className="text-xs text-[#94a3b8]">邮箱</p>
-                      <p className="text-sm text-[#0f172a] break-all">{vendor.email}</p>
+                      <p className="text-sm text-[#0f172a] break-all">{vendor.contactEmail}</p>
                     </div>
                   </div>
                 )}
@@ -276,15 +332,29 @@ function VendorDetailSheet({ open, vendorId, onClose }: VendorDetailSheetProps) 
                   </div>
                 )}
               </div>
+
+              {/* 创建时间 */}
+              {vendor.createTime && (
+                <div className="pt-4 border-t border-slate-100">
+                  <div className="flex items-center gap-2 text-xs text-[#94a3b8]">
+                    <Clock className="w-3.5 h-3.5" />
+                    <span>创建于 {formatDate(vendor.createTime)}</span>
+                  </div>
+                </div>
+              )}
             </div>
           ) : (
-            <div className="flex items-center justify-center py-20 text-[#94a3b8] text-sm">
+            <div className="flex items-center justify-center py-16 text-[#94a3b8] text-sm">
               暂无数据
             </div>
           )}
         </div>
-      </div>
-    </div>
+
+        <DialogFooter>
+          <Button variant="secondary" onClick={onClose}>关闭</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -321,17 +391,22 @@ export default function VendorsPage() {
     data: listData,
     isLoading,
     isFetching,
+    isError,
   } = useQuery({
     queryKey: VENDOR_KEYS.list(queryParams),
     queryFn: async () => {
       const res = await getVendorList(queryParams);
-      return res.data;
+      return res.data ?? emptyVendorPage(queryParams);
     },
   });
 
   const vendors: Vendor[] = listData?.records ?? [];
   const total = listData?.total ?? 0;
   const totalPages = listData?.pages ?? Math.ceil(total / PAGE_SIZE);
+
+  // ── Stats ─────────────────────────────────────────────────────────────────
+  const activeCount = useMemo(() => vendors.filter((v) => v.status === 1).length, [vendors]);
+  const inactiveCount = useMemo(() => vendors.filter((v) => v.status !== 1).length, [vendors]);
 
   // ── 新增供应商 ───────────────────────────────────────────────────────────
 
@@ -390,10 +465,17 @@ export default function VendorsPage() {
     }, 300);
   }, []);
 
+  const handleClearSearch = useCallback(() => {
+    setSearchInput('');
+    setSearchTerm('');
+    setPage(1);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+  }, []);
+
   // ── 表单提交 ──────────────────────────────────────────────────────────────
 
   const handleSubmit = (data: CreateVendorRequest) => {
-    if (!data.vendorName.trim()) return;
+    if (!data.name.trim()) return;
     if (editingVendor) {
       updateMutation.mutate({ id: editingVendor.id, data });
     } else {
@@ -445,211 +527,330 @@ export default function VendorsPage() {
 
   const submitting = createMutation.isPending || updateMutation.isPending;
 
+  const formatDate = (dateStr?: string) => {
+    if (!dateStr) return '';
+    try {
+      return new Date(dateStr).toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' });
+    } catch {
+      return dateStr;
+    }
+  };
+
   return (
-    <div className="p-6 bg-[#f8fafc] min-h-full">
-      <PageHeader
-        title="供应商管理"
-        subtitle="合作供应商信息维护"
-        actions={
-          <Button variant="primary" onClick={handleOpenCreate}>
-            <Plus className="w-4 h-4" />
-            新增供应商
-          </Button>
-        }
-      />
+    <div className="min-h-full bg-[var(--app-background)] px-4 py-5 sm:px-6 lg:px-8">
+      <div className="mx-auto flex w-full max-w-[1480px] flex-col gap-6">
 
-      {/* 搜索栏 */}
-      <div className="flex items-center gap-3 mb-5">
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94a3b8]" />
-          <input
-            type="text"
-            placeholder="搜索供应商名称、编码、联系人..."
-            value={searchInput}
-            onChange={e => handleSearchChange(e.target.value)}
-            className="w-full h-9 pl-9 pr-4 rounded-lg border border-[#e5e7eb] bg-white text-sm
-              focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-[#3b82f6]
-              placeholder:text-[#94a3b8]"
-          />
-        </div>
-        <Button
-          variant="outline"
-          size="md"
-          onClick={() => qc.invalidateQueries({ queryKey: ['vendors'] })}
-          disabled={isFetching}
-        >
-          <RefreshCw className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} />
-          刷新
-        </Button>
-      </div>
-
-      {/* 加载状态 */}
-      {isLoading && (
-        <div className="flex items-center justify-center py-20 text-[#94a3b8] text-sm">
-          <RefreshCw className="w-5 h-5 animate-spin mr-2" />
-          加载中...
-        </div>
-      )}
-
-      {/* 供应商列表 */}
-      {!isLoading && (
-        <>
-          {vendors.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20 text-[#94a3b8]">
-              <Building2 className="w-12 h-12 mb-3 opacity-30" />
-              <p className="text-sm">
-                {searchTerm ? `未找到包含"${searchTerm}"的供应商` : '暂无供应商数据'}
-              </p>
-              {!searchTerm && (
-                <Button variant="primary" size="sm" className="mt-4" onClick={handleOpenCreate}>
-                  <Plus className="w-4 h-4" />
-                  新增供应商
-                </Button>
-              )}
+        {/* ── Compact header with stat bar ───────────────────────────────── */}
+        <section className="rounded-2xl border border-[var(--surface-border)] bg-white shadow-sm">
+          <div className="flex flex-wrap items-center justify-between gap-3 px-6 py-4">
+            <div className="flex items-center gap-3">
+              <h1 className="text-xl font-bold text-slate-900">供应商管理</h1>
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-blue-200 bg-blue-50 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-blue-700">
+                <Building2 className="h-3 w-3" />
+                基础数据
+              </span>
             </div>
-          ) : (
-            <>
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                {vendors.map(vendor => (
-                  <Card
-                    key={vendor.id}
-                    className="hover:shadow-md transition-shadow cursor-pointer"
-                    onClick={() => handleOpenDetail(vendor.id)}
-                  >
-                    <CardContent className="p-5">
-                      <div className="flex items-start justify-between mb-3">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
-                            <Building2 className="w-5 h-5 text-[#3b82f6]" />
-                          </div>
-                          <div>
-                            <p className="font-semibold text-[#0f172a] text-sm leading-tight">
-                              {vendor.vendorName}
-                            </p>
-                            <p className="text-xs text-[#94a3b8] mt-0.5">
-                              {vendor.vendorCode || '—'}
-                            </p>
-                          </div>
-                        </div>
-                        <div
-                          className="flex items-center gap-1 flex-shrink-0"
-                          onClick={e => e.stopPropagation()}
-                        >
-                          <button
-                            onClick={() => handleOpenEdit(vendor)}
-                            className="p-1.5 rounded-lg text-[#64748b] hover:bg-[#f1f5f9] hover:text-[#3b82f6] transition-colors"
-                            title="编辑"
-                          >
-                            <Pencil className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => handleOpenDelete(vendor)}
-                            className="p-1.5 rounded-lg text-[#64748b] hover:bg-red-50 hover:text-red-600 transition-colors"
-                            title="删除"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </div>
-                      <div className="space-y-1.5 text-xs text-[#64748b]">
-                        {vendor.contact && (
-                          <div className="flex items-center gap-2">
-                            <User className="w-3.5 h-3.5 flex-shrink-0" />
-                            <span>{vendor.contact}</span>
-                          </div>
-                        )}
-                        {vendor.phone && (
-                          <div className="flex items-center gap-2">
-                            <Phone className="w-3.5 h-3.5 flex-shrink-0" />
-                            <span>{vendor.phone}</span>
-                          </div>
-                        )}
-                        {vendor.email && (
-                          <div className="flex items-center gap-2">
-                            <Mail className="w-3.5 h-3.5 flex-shrink-0" />
-                            <span className="truncate">{vendor.email}</span>
-                          </div>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+            <Button variant="primary" onClick={handleOpenCreate}>
+              <Plus className="w-4 h-4" />
+              新增供应商
+            </Button>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-slate-100 border-t border-slate-100">
+            <div className="flex items-center gap-3 px-5 py-3">
+              <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-600 to-cyan-500 shadow-sm">
+                <Building2 className="h-3.5 w-3.5 text-white" />
+              </span>
+              <div>
+                <p className="text-[11px] font-medium text-slate-400">全部供应商</p>
+                <p className="text-lg font-bold text-slate-900">{total}</p>
               </div>
+            </div>
+            <div className="flex items-center gap-3 px-5 py-3">
+              <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-500 to-teal-400 shadow-sm">
+                <CheckCircle className="h-3.5 w-3.5 text-white" />
+              </span>
+              <div>
+                <p className="text-[11px] font-medium text-slate-400">合作中</p>
+                <p className="text-lg font-bold text-slate-900">{activeCount}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 px-5 py-3">
+              <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-slate-500 to-slate-400 shadow-sm">
+                <XCircle className="h-3.5 w-3.5 text-white" />
+              </span>
+              <div>
+                <p className="text-[11px] font-medium text-slate-400">已停用</p>
+                <p className="text-lg font-bold text-slate-900">{inactiveCount}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 px-5 py-3">
+              <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-amber-500 to-orange-400 shadow-sm">
+                <User className="h-3.5 w-3.5 text-white" />
+              </span>
+              <div>
+                <p className="text-[11px] font-medium text-slate-400">有联系人</p>
+                <p className="text-lg font-bold text-slate-900">{vendors.filter((v) => v.contactPerson).length}</p>
+              </div>
+            </div>
+          </div>
+        </section>
 
-              {/* 分页 */}
-              {totalPages > 1 && (
-                <div className="flex items-center justify-between mt-6">
-                  <p className="text-xs text-[#94a3b8]">
-                    共 {total} 条记录，第 {page}/{totalPages} 页
-                    {searchTerm ? `（搜索：「${searchTerm}」）` : ''}
-                  </p>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handlePrevPage}
-                      disabled={page <= 1}
-                    >
-                      上一页
-                    </Button>
-                    <span className="text-sm text-[#64748b] px-2">
-                      {page} / {totalPages}
-                    </span>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleNextPage}
-                      disabled={page >= totalPages}
-                    >
-                      下一页
-                    </Button>
+        {/* ── Main content Card ─────────────────────────────────────────── */}
+        <section className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm">
+          {/* Toolbar */}
+          <div className="flex flex-col gap-3 border-b border-slate-100 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="relative flex-1 max-w-sm">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94a3b8]" />
+              <input
+                type="text"
+                placeholder="搜索供应商名称、编码、联系人..."
+                value={searchInput}
+                onChange={e => handleSearchChange(e.target.value)}
+                className="w-full h-9 pl-9 pr-4 rounded-lg border border-[#e5e7eb] bg-white text-sm
+                  focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-[#3b82f6]
+                  placeholder:text-[#94a3b8]"
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => qc.invalidateQueries({ queryKey: ['vendors'] })}
+                disabled={isFetching}
+                className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 text-xs font-medium text-slate-600 hover:bg-slate-50 transition-colors disabled:opacity-50"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${isFetching ? 'animate-spin' : ''}`} />
+                刷新
+              </button>
+            </div>
+          </div>
+
+          {/* Filter feedback + content */}
+          <div className="px-6 py-4">
+            {isError && (
+              <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-700">
+                供应商接口暂不可用，当前显示空列表。请稍后刷新。
+              </div>
+            )}
+
+            {/* Search feedback pill */}
+            {searchTerm.trim() && (
+              <div className="flex items-center gap-2 mb-4">
+                <span className="text-xs text-[#64748b]">筛选条件：</span>
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-blue-50 text-xs text-[#3b82f6] font-medium border border-blue-200">
+                  <Search className="w-3 h-3" />
+                  关键词：{searchTerm.trim()}
+                  <button
+                    onClick={handleClearSearch}
+                    className="ml-0.5 p-0.5 rounded-full hover:bg-blue-100 transition-colors"
+                    title="清除搜索"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </span>
+                <span className="text-xs text-[#94a3b8]">
+                  找到 {total} 条结果
+                </span>
+              </div>
+            )}
+
+            {/* Loading */}
+            {isLoading && (
+              <div className="flex items-center justify-center py-20 text-[#94a3b8] text-sm">
+                <RefreshCw className="w-5 h-5 animate-spin mr-2" />
+                加载中...
+              </div>
+            )}
+
+            {/* Vendor cards grid */}
+            {!isLoading && (
+              <>
+                {vendors.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-20 text-[#94a3b8]">
+                    <Building2 className="w-12 h-12 mb-3 opacity-30" />
+                    <p className="text-sm">
+                      {searchTerm ? `未找到包含"${searchTerm}"的供应商` : '暂无供应商数据'}
+                    </p>
+                    {!searchTerm && (
+                      <Button variant="primary" size="sm" className="mt-4" onClick={handleOpenCreate}>
+                        <Plus className="w-4 h-4" />
+                        新增供应商
+                      </Button>
+                    )}
                   </div>
-                </div>
-              )}
+                ) : (
+                  <>
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                      {vendors.map(vendor => {
+                        const statusCfg = getVendorStatusConfig(vendor.status);
+                        return (
+                          <Card
+                            key={vendor.id}
+                            className="hover:shadow-md transition-shadow cursor-pointer group"
+                            onClick={() => handleOpenDetail(vendor.id)}
+                          >
+                            <CardContent className="p-5">
+                              {/* Card header */}
+                              <div className="flex items-start justify-between mb-3">
+                                <div className="flex items-center gap-3 min-w-0">
+                                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center flex-shrink-0">
+                                    <Building2 className="w-5 h-5 text-[#3b82f6]" />
+                                  </div>
+                                  <div className="min-w-0">
+                                    <div className="flex items-center gap-2">
+                                      <p className="font-semibold text-[#0f172a] text-sm leading-tight truncate">
+                                        {vendor.name}
+                                      </p>
+                                      <StatusBadge status={vendor.status} />
+                                    </div>
+                                    <p className="text-xs text-[#94a3b8] mt-0.5">
+                                      {vendor.vendorCode || '—'}
+                                    </p>
+                                  </div>
+                                </div>
+                                {/* Action buttons */}
+                                <div
+                                  className="flex items-center gap-1 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                                  onClick={e => e.stopPropagation()}
+                                >
+                                  <button
+                                    onClick={() => handleOpenDetail(vendor.id)}
+                                    className="inline-flex h-7 items-center gap-1 rounded-lg border border-slate-200 bg-white px-2 text-xs font-medium text-slate-600 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-colors"
+                                    title="查看详情"
+                                  >
+                                    <Eye className="w-3.5 h-3.5" />
+                                  </button>
+                                  <button
+                                    onClick={() => handleOpenEdit(vendor)}
+                                    className="inline-flex h-7 items-center gap-1 rounded-lg border border-slate-200 bg-white px-2 text-xs font-medium text-slate-600 hover:bg-slate-50 hover:text-blue-600 transition-colors"
+                                    title="编辑"
+                                  >
+                                    <Pencil className="w-3.5 h-3.5" />
+                                  </button>
+                                  <button
+                                    onClick={() => handleOpenDelete(vendor)}
+                                    className="inline-flex h-7 items-center gap-1 rounded-lg border border-slate-200 bg-white px-2 text-xs font-medium text-slate-600 hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors"
+                                    title="删除"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                  </button>
+                                </div>
+                              </div>
 
-              {totalPages <= 1 && (
-                <p className="mt-4 text-xs text-[#94a3b8]">
-                  共 {total} 条记录{searchTerm ? `（搜索：「${searchTerm}」）` : ''}
-                </p>
-              )}
-            </>
-          )}
-        </>
-      )}
+                              {/* Contact info */}
+                              <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-xs text-[#64748b]">
+                                {vendor.contactPerson && (
+                                  <div className="flex items-center gap-1.5 truncate">
+                                    <User className="w-3.5 h-3.5 flex-shrink-0 text-[#94a3b8]" />
+                                    <span className="truncate">{vendor.contactPerson}</span>
+                                  </div>
+                                )}
+                                {vendor.contactPhone && (
+                                  <div className="flex items-center gap-1.5 truncate">
+                                    <Phone className="w-3.5 h-3.5 flex-shrink-0 text-[#94a3b8]" />
+                                    <span className="truncate">{vendor.contactPhone}</span>
+                                  </div>
+                                )}
+                                {vendor.contactEmail && (
+                                  <div className="flex items-center gap-1.5 truncate col-span-2 sm:col-span-1">
+                                    <Mail className="w-3.5 h-3.5 flex-shrink-0 text-[#94a3b8]" />
+                                    <span className="truncate">{vendor.contactEmail}</span>
+                                  </div>
+                                )}
+                                {vendor.address && (
+                                  <div className="flex items-center gap-1.5 truncate col-span-2 sm:col-span-1">
+                                    <MapPin className="w-3.5 h-3.5 flex-shrink-0 text-[#94a3b8]" />
+                                    <span className="truncate">{vendor.address}</span>
+                                  </div>
+                                )}
+                              </div>
 
-      {/* 新增/编辑弹窗 */}
-      <VendorFormDialog
-        open={dialogOpen}
-        vendor={editingVendor}
-        submitting={submitting}
-        onClose={() => {
-          setDialogOpen(false);
-          setEditingVendor(null);
-        }}
-        onSubmit={handleSubmit}
-      />
+                              {/* Footer */}
+                              {vendor.createTime && (
+                                <div className="mt-3 pt-3 border-t border-slate-100 flex items-center gap-1.5 text-[11px] text-[#94a3b8]">
+                                  <Clock className="w-3 h-3" />
+                                  <span>创建于 {formatDate(vendor.createTime)}</span>
+                                </div>
+                              )}
+                            </CardContent>
+                          </Card>
+                        );
+                      })}
+                    </div>
 
-      {/* 删除确认弹窗 */}
-      <DeleteConfirmDialog
-        open={deleteDialogOpen}
-        vendor={deletingVendor}
-        deleting={deleteMutation.isPending}
-        onClose={() => {
-          setDeleteDialogOpen(false);
-          setDeletingVendor(null);
-        }}
-        onConfirm={handleDelete}
-      />
+                    {/* Pagination */}
+                    {totalPages > 1 && (
+                      <div className="flex items-center justify-between mt-6 pt-4 border-t border-slate-100">
+                        <p className="text-xs text-[#94a3b8]">
+                          共 {total} 条记录，第 {page}/{totalPages} 页
+                          {searchTerm ? `（搜索：「${searchTerm}」）` : ''}
+                        </p>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={handlePrevPage}
+                            disabled={page <= 1}
+                            className="inline-flex h-8 items-center gap-1 rounded-lg border border-slate-200 bg-white px-3 text-xs font-medium text-slate-600 hover:bg-slate-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            上一页
+                          </button>
+                          <span className="text-sm text-[#64748b] px-2">
+                            {page} / {totalPages}
+                          </span>
+                          <button
+                            onClick={handleNextPage}
+                            disabled={page >= totalPages}
+                            className="inline-flex h-8 items-center gap-1 rounded-lg border border-slate-200 bg-white px-3 text-xs font-medium text-slate-600 hover:bg-slate-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            下一页
+                          </button>
+                        </div>
+                      </div>
+                    )}
 
-      {/* 详情抽屉 */}
-      <VendorDetailSheet
-        open={detailOpen}
-        vendorId={detailVendorId}
-        onClose={() => {
-          setDetailOpen(false);
-          setDetailVendorId(null);
-        }}
-      />
+                    {totalPages <= 1 && (
+                      <p className="mt-4 text-xs text-[#94a3b8]">
+                        共 {total} 条记录{searchTerm ? `（搜索：「${searchTerm}」）` : ''}
+                      </p>
+                    )}
+                  </>
+                )}
+              </>
+            )}
+          </div>
+        </section>
+
+        {/* 新增/编辑弹窗 */}
+        <VendorFormDialog
+          open={dialogOpen}
+          vendor={editingVendor}
+          submitting={submitting}
+          onClose={() => {
+            setDialogOpen(false);
+            setEditingVendor(null);
+          }}
+          onSubmit={handleSubmit}
+        />
+
+        {/* 删除确认弹窗 */}
+        <DeleteConfirmDialog
+          open={deleteDialogOpen}
+          vendor={deletingVendor}
+          deleting={deleteMutation.isPending}
+          onClose={() => {
+            setDeleteDialogOpen(false);
+            setDeletingVendor(null);
+          }}
+          onConfirm={handleDelete}
+        />
+
+        {/* 详情弹窗 */}
+        <VendorDetailSheet
+          open={detailOpen}
+          vendorId={detailVendorId}
+          onClose={() => {
+            setDetailOpen(false);
+            setDetailVendorId(null);
+          }}
+        />
+      </div>
     </div>
   );
 }

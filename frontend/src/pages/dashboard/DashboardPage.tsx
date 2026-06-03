@@ -26,6 +26,9 @@ import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { DataTable, type Column } from '@/components/ui/DataTable';
+import { MagicCard } from '@/components/ui/MagicCard';
+import { GlowEffect } from '@/components/ui/GlowEffect';
+import { BouncePress, ParallaxFloat } from '@/components/ui/MicroInteraction';
 import { SkeletonCard } from '@/components/ui/Skeleton';
 
 const PIE_COLORS = ['#2563eb', '#004ac6', '#505f76', '#943700', '#737686', '#d8dadc'];
@@ -34,8 +37,8 @@ const WO_STATUS_BADGE: Record<string, { label: string; variant: 'default' | 'suc
   PENDING:           { label: '待处理',  variant: 'default'  },
   IN_PROGRESS:       { label: '进行中',  variant: 'success'  },
   COMPLETED:         { label: '已完成',  variant: 'success'  },
-  APPROVING_LEVEL_1: { label: '审批中',  variant: 'warning'  },
   REJECTED:          { label: '已驳回',  variant: 'danger'   },
+  EXECUTING:         { label: '进行中',  variant: 'success'  },
   CANCELLED:         { label: '已取消',  variant: 'gray'     },
 };
 
@@ -67,7 +70,7 @@ export default function DashboardPage() {
     staleTime: 1000 * 60 * 5,
   });
 
-  const { data: trendsRes } = useQuery({
+  const { data: trendsRes, isLoading: trendsLoading } = useQuery({
     queryKey: ['dashboard', 'trends', 12],
     queryFn: () => getAssetValueTrends(365),
     staleTime: 1000 * 60 * 15,
@@ -155,7 +158,7 @@ export default function DashboardPage() {
 
   const woColumns: Column<any>[] = [
     {
-      key: 'orderNo', title: '工单编号', width: 130,
+      key: 'workOrderNo', title: '工单编号', width: 130,
       render: (v) => <span className="font-mono text-xs text-[#004ac6] font-medium">{String(v)}</span>,
     },
     { key: 'title',  title: '标题' },
@@ -188,7 +191,7 @@ export default function DashboardPage() {
       },
     },
     {
-      key: 'createdAt', title: '创建时间', width: 110,
+      key: 'createTime', title: '创建时间', width: 110,
       render: (v) => <span className="text-xs text-[#64748b]">{String(v)}</span>,
     },
   ];
@@ -196,54 +199,58 @@ export default function DashboardPage() {
   return (
     <div className="p-6 space-y-6">
       <PageHeader
-        title="仪表板"
+        title="仪表板与数据分析"
         subtitle={`欢迎回来，系统管理员 · ${dateStr}`}
-        actions={
+         actions={
           <>
-             <Button variant="outline" size="md" onClick={() => {
-                const kpiRows = [
-                  ['指标', '数值'],
-                  ['总资产数', String(stats?.totalAssets ?? '')],
-                  ['在用资产', String(stats?.inUseAssets ?? '')],
-                  ['闲置资产', String(stats?.idleAssets ?? '')],
-                  ['维保中资产', String(stats?.maintenanceAssets ?? '')],
-                  ['报废资产', String(stats?.scrapAssets ?? '')],
-                  ['资产总值', String(stats?.totalValue ?? '')],
-                  ['资产净值', String(stats?.netValue ?? '')],
-                  ['待审批数', String(stats?.pendingApprovals ?? '')],
-                ];
-                const trendRows = [
-                  [],
-                  ['资产价值趋势 (近12个月)'],
-                  ['月份', '总价值(万)', '净值(万)'],
-                  ...trendData.map(t => [t.month, String(t.total), String(t.net)]),
-                ];
-                const deptRows = [
-                  [],
-                  ['部门资产统计 (Top 5)'],
-                  ['部门', '资产数量', '占比'],
-                  ...departmentStats.map(d => [d.name, d.count, `${d.pct}%`]),
-                ];
-                const categoryRows = [
-                  [],
-                  ['分类分布'],
-                  ['分类', '数量'],
-                  ...categoryData.map(c => [c.name, String(c.value)]),
-                ];
-                const csv = [...kpiRows, ...trendRows, ...deptRows, ...categoryRows].map(r => r.join(',')).join('\n');
-                const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url; a.download = `dashboard-full-${new Date().toISOString().slice(0, 10)}.csv`;
-                a.click(); URL.revokeObjectURL(url);
-              }}>
-               <Download className="w-4 h-4" />
-               导出数据
-             </Button>
-            <Button variant="primary" size="md" onClick={handleRefresh}>
-              <RefreshCw className="w-4 h-4" />
-              刷新视图
-            </Button>
+             <BouncePress scale={0.95}>
+              <Button variant="outline" size="md" className="hidden md:flex" onClick={() => {
+                 const kpiRows = [
+                   ['指标', '数值'],
+                   ['总资产数', String(stats?.totalAssets ?? '')],
+                   ['在用资产', String(stats?.inUseAssets ?? '')],
+                   ['闲置资产', String(stats?.idleAssets ?? '')],
+                   ['维保中资产', String(stats?.maintenanceAssets ?? '')],
+                   ['报废资产', String(stats?.scrapAssets ?? '')],
+                   ['资产总值', String(stats?.totalValue ?? '')],
+                   ['资产净值', String(stats?.netValue ?? '')],
+                   ['待审批数', String(stats?.pendingApprovals ?? '')],
+                 ];
+                 const trendRows = [
+                   [],
+                   ['资产价值趋势 (近12个月)'],
+                   ['月份', '总价值(万)', '净值(万)'],
+                   ...trendData.map(t => [t.month, String(t.total), String(t.net)]),
+                 ];
+                 const deptRows = [
+                   [],
+                   ['部门资产统计 (Top 5)'],
+                   ['部门', '资产数量', '占比'],
+                   ...departmentStats.map(d => [d.name, d.count, `${d.pct}%`]),
+                 ];
+                 const categoryRows = [
+                   [],
+                   ['分类分布'],
+                   ['分类', '数量'],
+                   ...categoryData.map(c => [c.name, String(c.value)]),
+                 ];
+                 const csv = [...kpiRows, ...trendRows, ...deptRows, ...categoryRows].map(r => r.join(',')).join('\n');
+                 const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
+                 const url = URL.createObjectURL(blob);
+                 const a = document.createElement('a');
+                 a.href = url; a.download = `dashboard-full-${new Date().toISOString().slice(0, 10)}.csv`;
+                 a.click(); URL.revokeObjectURL(url);
+               }}>
+                 <Download className="w-4 h-4" />
+                 导出数据
+               </Button>
+             </BouncePress>
+            <BouncePress scale={0.95}>
+              <Button variant="primary" size="md" onClick={handleRefresh}>
+                <RefreshCw className="w-4 h-4" />
+                刷新视图
+              </Button>
+            </BouncePress>
           </>
         }
       />
@@ -253,34 +260,57 @@ export default function DashboardPage() {
           Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)
         ) : (
           <>
-            <KpiCard
-              title="总资产数"
-              value={(stats?.totalAssets ?? 0).toLocaleString()}
-              trend={totalTrend}
-              icon={BarChart3}
-              iconColor="#004ac6"
-            />
-            <KpiCard
-              title="在用资产"
-              value={(stats?.inUseAssets ?? 0).toLocaleString()}
-              trend={netTrend}
-              icon={CheckCircle2}
-              iconColor="#16a34a"
-            />
-            <KpiCard
-              title="闲置资产"
-              value={(stats?.idleAssets ?? 0).toLocaleString()}
-              trend={undefined}
-              icon={Package}
-              iconColor="#6b7280"
-            />
-            <KpiCard
-              title="待审批"
-              value={stats?.pendingApprovals ?? 0}
-              icon={Clock}
-              iconColor="#943700"
-              className="border-l-4 border-l-[#943700]"
-            />
+            <div className="w-full h-full">
+              <GlowEffect mode="pulse" intensity={0.35}>
+                <MagicCard variant="glass" size="md" className="w-full h-full">
+                  <KpiCard
+                    title="总资产数"
+                    value={(stats?.totalAssets ?? 0).toLocaleString()}
+                    trend={totalTrend}
+                    icon={BarChart3}
+                    iconColor="#004ac6"
+                    className="!bg-transparent !shadow-none !border-none"
+                  />
+                </MagicCard>
+              </GlowEffect>
+            </div>
+            <div className="w-full h-full">
+              <GlowEffect mode="pulse" intensity={0.35}>
+                <MagicCard variant="glass" size="md" className="w-full h-full">
+                  <KpiCard
+                    title="在用资产"
+                    value={(stats?.inUseAssets ?? 0).toLocaleString()}
+                    trend={netTrend}
+                    icon={CheckCircle2}
+                    iconColor="#16a34a"
+                    className="!bg-transparent !shadow-none !border-none"
+                  />
+                </MagicCard>
+              </GlowEffect>
+            </div>
+            <div className="w-full h-full">
+              <MagicCard variant="glass" size="md" className="w-full h-full">
+                <KpiCard
+                  title="闲置资产"
+                  value={(stats?.idleAssets ?? 0).toLocaleString()}
+                  trend={undefined}
+                  icon={Package}
+                  iconColor="#6b7280"
+                  className="!bg-transparent !shadow-none !border-none"
+                />
+              </MagicCard>
+            </div>
+            <div className="w-full h-full">
+              <MagicCard variant="glass" size="md" className="w-full h-full">
+                <KpiCard
+                  title="待审批"
+                  value={stats?.pendingApprovals ?? 0}
+                  icon={Clock}
+                  iconColor="#943700"
+                  className="!bg-transparent !shadow-none !border-none !border-l-4 !border-l-[#943700]"
+                />
+              </MagicCard>
+            </div>
           </>
         )}
       </div>
@@ -301,7 +331,9 @@ export default function DashboardPage() {
             </div>
           </CardHeader>
           <CardContent>
-            {trendData.length > 0 ? (
+            {trendsLoading ? (
+              <SkeletonCard className="h-[280px] rounded-none" />
+            ) : trendData.length > 0 ? (
               <ResponsiveContainer width="100%" height={280}>
                 <AreaChart data={trendData} margin={{ top: 8, right: 16, left: -16, bottom: 24 }}>
                   <defs>
@@ -330,17 +362,19 @@ export default function DashboardPage() {
             <CardTitle>分类分布</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col items-center">
-            {categoryData.length > 0 ? (
+            {statsLoading ? (
+              <SkeletonCard className="h-[280px] w-full rounded-none" />
+            ) : categoryData.length > 0 ? (
               <>
-                <div className="relative w-48 h-48">
+                <div className="relative w-40 h-40 md:w-48 md:h-48">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie
                         data={categoryData}
                         cx="50%"
                         cy="50%"
-                        innerRadius={55}
-                        outerRadius={80}
+                        innerRadius={40}
+                        outerRadius={60}
                         dataKey="value"
                         paddingAngle={2}
                       >
@@ -352,7 +386,9 @@ export default function DashboardPage() {
                     </PieChart>
                   </ResponsiveContainer>
                   <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                    <span className="text-2xl font-bold text-[#0f172a]">{totalAssetCount.toLocaleString()}</span>
+                    <ParallaxFloat amplitude={6} duration={4}>
+                      <span className="text-2xl font-bold text-[#0f172a]">{totalAssetCount.toLocaleString()}</span>
+                    </ParallaxFloat>
                     <span className="text-[10px] text-[#64748b]">资产总额</span>
                   </div>
                 </div>

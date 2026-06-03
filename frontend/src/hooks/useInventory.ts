@@ -60,6 +60,7 @@ export interface InventoryTask {
   deficitAssets: number;
   createdAt: string;
   updatedAt: string;
+  assigneeName?: string;
 }
 
 /** 盘点任务详情（继承基础任务字段，含扩展信息） */
@@ -69,6 +70,8 @@ export interface InventoryTaskDetail extends InventoryTask {
 
 /** 盘点资产条目 */
 export interface InventoryAsset {
+  /** 兼容旧盘点表格的行键，优先与 assetId 同步 */
+  id?: string;
   assetId: string;
   assetCode: string;
   assetName: string;
@@ -88,6 +91,8 @@ export interface DifferenceItem {
 
 /** 盘盈盘亏汇总 */
 export interface InventorySummary {
+  normalCount?: number;
+  abnormalCount?: number;
   surplusCount: number;
   deficitCount: number;
   surplusItems: DifferenceItem[];
@@ -148,11 +153,7 @@ const API_BASE = '/inventory/tasks';
 async function fetchTasks(
   params?: TaskFilterParams,
 ): Promise<PaginatedResponse<InventoryTask>> {
-  const { data } = await http.get<PaginatedResponse<InventoryTask>>(
-    API_BASE,
-    { params },
-  );
-  return data;
+  return http.get<PaginatedResponse<InventoryTask>>(API_BASE, { params });
 }
 
 /**
@@ -162,8 +163,7 @@ async function fetchTasks(
  * @returns 新创建的任务对象
  */
 async function createTask(payload: CreateTaskParams): Promise<InventoryTask> {
-  const { data } = await http.post<InventoryTask>(API_BASE, payload);
-  return data;
+  return http.post<InventoryTask>(API_BASE, payload);
 }
 
 /**
@@ -173,8 +173,7 @@ async function createTask(payload: CreateTaskParams): Promise<InventoryTask> {
  * @returns 任务详情对象（含统计数据）
  */
 async function fetchTaskDetail(taskId: string): Promise<InventoryTaskDetail> {
-  const { data } = await http.get<InventoryTaskDetail>(`${API_BASE}/${taskId}`);
-  return data;
+  return http.get<InventoryTaskDetail>(`${API_BASE}/${taskId}`);
 }
 
 /**
@@ -188,11 +187,7 @@ async function updateTaskStatus(
   taskId: string,
   status: TaskStatus,
 ): Promise<InventoryTask> {
-  const { data } = await http.patch<InventoryTask>(
-    `${API_BASE}/${taskId}/status`,
-    { status },
-  );
-  return data;
+  return http.patch<InventoryTask>(`${API_BASE}/${taskId}/status`, { status });
 }
 
 /**
@@ -206,11 +201,10 @@ async function fetchTaskAssets(
   taskId: string,
   params?: AssetQueryParams,
 ): Promise<PaginatedResponse<InventoryAsset>> {
-  const { data } = await http.get<PaginatedResponse<InventoryAsset>>(
+  return http.get<PaginatedResponse<InventoryAsset>>(
     `${API_BASE}/${taskId}/assets`,
     { params },
   );
-  return data;
 }
 
 /**
@@ -255,10 +249,7 @@ async function batchConfirmAssets(
  * @returns 盘盈盘亏汇总对象
  */
 async function fetchTaskSummary(taskId: string): Promise<InventorySummary> {
-  const { data } = await http.get<InventorySummary>(
-    `${API_BASE}/${taskId}/summary`,
-  );
-  return data;
+  return http.get<InventorySummary>(`${API_BASE}/${taskId}/summary`);
 }
 
 /**
@@ -489,19 +480,24 @@ export function useUpdateTaskStatusMutation() {
  *
  * @returns React Mutation 对象（mutate({ taskId, assetId, payload })）
  */
-export function useConfirmMutation() {
+export function useConfirmMutation(boundTaskId?: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({
-      taskId,
-      assetId,
-      payload,
-    }: {
-      taskId: string;
+    mutationFn: (variables: {
+      taskId?: string;
       assetId: string;
-      payload: ConfirmPayload;
-    }) => confirmAsset(taskId, assetId, payload),
+      payload?: ConfirmPayload;
+      actualStatus?: ActualStatus;
+      remark?: string;
+    }) => {
+      const taskId = variables.taskId ?? boundTaskId ?? '';
+      const payload = variables.payload ?? {
+        actualStatus: variables.actualStatus ?? 'normal',
+        remark: variables.remark,
+      };
+      return confirmAsset(taskId, variables.assetId, payload);
+    },
     onSuccess: (_data, variables) => {
       const { taskId } = variables;
 
@@ -536,17 +532,23 @@ export function useConfirmMutation() {
  *
  * @returns React Mutation 对象（mutate({ taskId, payload })）
  */
-export function useBatchConfirmMutation() {
+export function useBatchConfirmMutation(boundTaskId?: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({
-      taskId,
-      payload,
-    }: {
-      taskId: string;
-      payload: BatchConfirmPayload;
+    mutationFn: (variables: {
+      taskId?: string;
+      payload?: BatchConfirmPayload;
+      assetIds?: string[];
+      actualStatus?: ActualStatus;
+      remark?: string;
     }) => {
+      const taskId = variables.taskId ?? boundTaskId ?? '';
+      const payload = variables.payload ?? {
+        assetIds: variables.assetIds ?? [],
+        actualStatus: variables.actualStatus ?? 'normal',
+        remark: variables.remark,
+      };
       /** 前端截断：单次批量确认上限 100 条 */
       const cappedIds = payload.assetIds.slice(0, 100);
       return batchConfirmAssets(taskId, { ...payload, assetIds: cappedIds });
@@ -590,7 +592,7 @@ export function useBatchConfirmMutation() {
  *
  * @returns React Mutation 对象（mutate(taskId)）
  */
-export function useSubmitMutation() {
+export function useSubmitMutation(_boundTaskId?: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -616,3 +618,10 @@ export function useSubmitMutation() {
     },
   });
 }
+
+// ---------------------------------------------------------------------------
+// 旧盘点组件兼容别名：保持 React Query 失效策略一致，便于逐步迁移到新命名。
+// ---------------------------------------------------------------------------
+export const useInventoryAssets = useAssets;
+export const useConfirmAsset = useConfirmMutation;
+export const useBatchConfirmAssets = useBatchConfirmMutation;

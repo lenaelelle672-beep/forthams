@@ -1,7 +1,10 @@
 /**
  * @file pages/equipment/EquipmentPage.tsx
- * @description 重要设备管理页 — 新版 Design System 重构
+ * @description 重要设备管理页 — Design System 基准对齐版
  * 数据：全部从真实 API 加载，无 Mock 数据
+ *
+ * UI 层重构：对齐 benchmark 设计模式（page container + stat bar + DataTable + Dialog）
+ * 业务逻辑、API 调用、数据流完全保持不变
  */
 
 import { useState } from 'react';
@@ -16,9 +19,10 @@ import {
   RefreshCw,
   Search,
 } from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
+import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { PageHeader } from '@/components/ui/PageHeader';
+import { DataTable, type Column } from '@/components/ui/DataTable';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/Dialog';
 import { maintenanceService } from '@/api/maintenance';
 import { getAssetList, getAssetById } from '@/api/asset';
 import type { AssetListItem, Asset } from '@/types/asset';
@@ -35,81 +39,71 @@ interface EquipmentItem {
   maintenanceStatus: string;
 }
 
-// ── 子组件：统计卡片 ──────────────────────────────────────────────────────────
-function StatCard({
-  label,
-  value,
-  icon: Icon,
-  iconBg,
-  iconColor,
-}: {
-  label: string;
-  value: number | string;
-  icon: React.ElementType;
-  iconBg: string;
-  iconColor: string;
-}) {
-  return (
-    <Card>
-      <CardContent className="flex items-center justify-between">
-        <div>
-          <p className="text-sm text-[#64748b] font-medium">{label}</p>
-          <p className="text-3xl font-bold text-[#0f172a] mt-1">{value}</p>
-        </div>
-        <div className={`w-12 h-12 rounded-xl ${iconBg} flex items-center justify-center`}>
-          <Icon className={`w-6 h-6 ${iconColor}`} />
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
 // ── 进度条 ────────────────────────────────────────────────────────────────────
 function UsageBar({ value }: { value: number }) {
   const pct = Math.min(Math.max(value, 0), 100);
   const color =
-    pct >= 80 ? 'bg-[#3b82f6]' :
-    pct >= 60 ? 'bg-[#22c55e]' :
-    pct > 0   ? 'bg-[#f59e0b]' :
-                'bg-[#e5e7eb]';
+    pct >= 80 ? 'bg-blue-500' :
+    pct >= 60 ? 'bg-emerald-500' :
+    pct > 0   ? 'bg-amber-500' :
+                'bg-slate-200';
   return (
-    <div className="flex items-center gap-2 min-w-[120px]">
-      <div className="flex-1 h-1.5 bg-[#f1f5f9] rounded-full overflow-hidden">
+    <div className="flex items-center gap-2 min-w-[100px]">
+      <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
         <div className={`h-full ${color} rounded-full transition-all`} style={{ width: `${pct}%` }} />
       </div>
-      <span className="text-[12px] font-semibold text-[#64748b] w-9 text-right">{pct}%</span>
+      <span className="text-xs font-semibold text-slate-500 w-9 text-right">{pct}%</span>
     </div>
   );
 }
 
-// ── 维保状态徽标 ──────────────────────────────────────────────────────────────
+// ── 维保状态徽标（benchmark 设计：ring + dot）──────────────────────────────────
 function MaintenanceBadge({ status }: { status: string }) {
-  const cfg: Record<string, string> = {
-    '正常':   'bg-green-100 text-green-700',
-    '即将到期': 'bg-yellow-100 text-yellow-700',
-    '已过期': 'bg-red-100 text-red-700',
-    '维修中': 'bg-blue-100 text-blue-700',
-    '报废':   'bg-gray-100 text-gray-500',
+  const cfg: Record<string, { dot: string; text: string; bg: string; border: string }> = {
+    '正常':     { dot: 'bg-emerald-400', text: 'text-emerald-700', bg: 'bg-emerald-50', border: 'border-emerald-200' },
+    '即将到期': { dot: 'bg-amber-400',   text: 'text-amber-700',   bg: 'bg-amber-50',   border: 'border-amber-200' },
+    '已过期':   { dot: 'bg-red-400',     text: 'text-red-700',     bg: 'bg-red-50',     border: 'border-red-200' },
+    '维修中':   { dot: 'bg-blue-400',    text: 'text-blue-700',    bg: 'bg-blue-50',    border: 'border-blue-200' },
+    '报废':     { dot: 'bg-slate-400',   text: 'text-slate-600',   bg: 'bg-slate-50',   border: 'border-slate-200' },
   };
+  const c = cfg[status] ?? { dot: 'bg-slate-400', text: 'text-slate-600', bg: 'bg-slate-50', border: 'border-slate-200' };
   return (
-    <span className={`px-2.5 py-0.5 text-xs font-semibold rounded-full ${cfg[status] ?? 'bg-slate-100 text-slate-600'}`}>
+    <span className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-semibold ring-1 ring-inset ${c.bg} ${c.text} ${c.border} ring-${c.dot}/20`}>
+      <span className={`h-1.5 w-1.5 rounded-full ${c.dot}`} />
       {status}
     </span>
   );
 }
 
-// ── 设备状态徽标 ──────────────────────────────────────────────────────────────
+// ── 设备状态徽标（benchmark 设计：ring + dot）─────────────────────────────────
 function StatusBadge({ status }: { status: string }) {
-  const cfg: Record<string, string> = {
-    '使用中': 'bg-blue-50 text-blue-700',
-    '维修中': 'bg-yellow-50 text-yellow-700',
-    '报废':   'bg-gray-100 text-gray-500',
-    '在用':   'bg-green-50 text-green-700',
-    '闲置':   'bg-blue-50 text-blue-600',
-    '已报废': 'bg-red-50 text-red-700',
+  const cfg: Record<string, { dot: string; text: string; bg: string; border: string }> = {
+    '使用中': { dot: 'bg-blue-400',    text: 'text-blue-700',    bg: 'bg-blue-50',    border: 'border-blue-200' },
+    '维修中': { dot: 'bg-amber-400',   text: 'text-amber-700',   bg: 'bg-amber-50',   border: 'border-amber-200' },
+    '报废':   { dot: 'bg-slate-400',   text: 'text-slate-600',   bg: 'bg-slate-50',   border: 'border-slate-200' },
+    '在用':   { dot: 'bg-emerald-400', text: 'text-emerald-700', bg: 'bg-emerald-50', border: 'border-emerald-200' },
+    '闲置':   { dot: 'bg-cyan-400',    text: 'text-cyan-700',    bg: 'bg-cyan-50',    border: 'border-cyan-200' },
+    '已报废': { dot: 'bg-red-400',     text: 'text-red-700',     bg: 'bg-red-50',     border: 'border-red-200' },
   };
+  const c = cfg[status] ?? { dot: 'bg-slate-400', text: 'text-slate-600', bg: 'bg-slate-50', border: 'border-slate-200' };
   return (
-    <span className={`px-2 py-0.5 text-xs font-medium rounded ${cfg[status] ?? 'bg-slate-100 text-slate-600'}`}>
+    <span className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-semibold ring-1 ring-inset ${c.bg} ${c.text} ${c.border}`}>
+      <span className={`h-1.5 w-1.5 rounded-full ${c.dot}`} />
+      {status}
+    </span>
+  );
+}
+
+// ── 维保记录状态徽标 ──────────────────────────────────────────────────────────
+function RecordStatusBadge({ status }: { status: string }) {
+  const cfg: Record<string, { dot: string; text: string; bg: string; border: string }> = {
+    '已完成': { dot: 'bg-emerald-400', text: 'text-emerald-700', bg: 'bg-emerald-50', border: 'border-emerald-200' },
+    '进行中': { dot: 'bg-blue-400',    text: 'text-blue-700',    bg: 'bg-blue-50',    border: 'border-blue-200' },
+  };
+  const c = cfg[status] ?? { dot: 'bg-slate-400', text: 'text-slate-600', bg: 'bg-slate-50', border: 'border-slate-200' };
+  return (
+    <span className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-semibold ring-1 ring-inset ${c.bg} ${c.text} ${c.border}`}>
+      <span className={`h-1.5 w-1.5 rounded-full ${c.dot}`} />
       {status}
     </span>
   );
@@ -259,7 +253,7 @@ export default function EquipmentPage() {
   // ── 维保记录表格数据（从 API 获取） ──────────────────────────────────────────
   const maintenanceRecords = rawRecords.slice(0, 20).map((r) => ({
     id: r.id,
-    equipment: String((r as Record<string, unknown>).equipmentName ?? (r as Record<string, unknown>).assetName ?? r.assetId),
+    equipment: String((r as unknown as Record<string, unknown>).equipmentName ?? (r as unknown as Record<string, unknown>).assetName ?? r.assetId),
     date: r.maintenanceDate?.substring(0, 10) ?? '—',
     type: r.maintenanceType ?? '—',
     technician: r.executor ?? '—',
@@ -291,200 +285,249 @@ export default function EquipmentPage() {
     setDetailItem(eq);
   };
 
-  return (
-    <div className="p-8 max-w-[1440px] mx-auto w-full space-y-8">
-      {/* 页头 */}
-      <PageHeader
-        title="重要设备管理"
-        subtitle="关键生产设备维保追踪与状态监控"
-        breadcrumbs={[{ label: '仪表板', href: '/dashboard' }, { label: '重要设备' }]}
-        actions={
-          <Button size="lg" onClick={() => setShowModal(true)}>
-            <Plus className="w-4 h-4" />
-            新建维保记录
+  // ── DataTable 列定义：设备列表 ─────────────────────────────────────────────────
+  const equipmentColumns: Column<EquipmentItem>[] = [
+    {
+      key: 'name',
+      title: '设备名称',
+      render: (_v, row) => <span className="font-semibold text-slate-900">{row.name}</span>,
+    },
+    {
+      key: 'id',
+      title: '设备ID',
+      render: (_v, row) => <span className="font-medium text-blue-600">{row.id}</span>,
+    },
+    {
+      key: 'status',
+      title: '状态',
+      render: (_v, row) => <StatusBadge status={row.status} />,
+    },
+    {
+      key: 'lastMaintenance',
+      title: '上次维保',
+      render: (_v, row) => <span className="text-slate-500">{row.lastMaintenance}</span>,
+    },
+    {
+      key: 'nextMaintenance',
+      title: '下次维保',
+      render: (_v, row) => <span className="text-slate-500">{row.nextMaintenance}</span>,
+    },
+    {
+      key: 'usageRate',
+      title: '使用率',
+      render: (_v, row) => <UsageBar value={row.usageRate} />,
+    },
+    {
+      key: 'maintenanceStatus',
+      title: '维保状态',
+      render: (_v, row) => <MaintenanceBadge status={row.maintenanceStatus} />,
+    },
+    {
+      key: 'actions',
+      title: '操作',
+      render: (_v, row) => (
+        <div className="flex items-center gap-2">
+          <Button variant="ghost" size="sm" onClick={() => handleOpenDetail(row)} title="查看详情">
+            <Eye className="w-4 h-4" />
+            详情
           </Button>
-        }
-      />
-
-      {/* 加载态 */}
-      {(assetLoading || recordsLoading) && (
-        <div className="flex items-center gap-2 text-sm text-[#64748b]">
-          <RefreshCw className="w-4 h-4 animate-spin" />
-          加载中...
-        </div>
-      )}
-
-      {/* 统计卡片 */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        <StatCard label="总设备数"   value={total}         icon={Wrench}       iconBg="bg-blue-50"   iconColor="text-[#3b82f6]" />
-        <StatCard label="维保中"     value={inMaintenance} icon={AlertCircle}  iconBg="bg-yellow-50" iconColor="text-yellow-500" />
-        <StatCard label="即将到期"   value={expiringSoon}  icon={Activity}     iconBg="bg-red-50"    iconColor="text-red-500" />
-        <StatCard label="正常运行"   value={normal}        icon={CheckCircle2} iconBg="bg-green-50"  iconColor="text-green-500" />
-      </div>
-
-      {/* 搜索与筛选 */}
-      <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
-        <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-          <input
-            type="text"
-            placeholder="搜索设备名称或编号..."
-            value={searchKeyword}
-            onChange={(e) => setSearchKeyword(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-        <div className="flex gap-1.5">
-          {[{ key: 'all', label: '全部' }, { key: '使用中', label: '正常运行' }, { key: '维修中', label: '维修中' }, { key: '闲置', label: '闲置' }].map(({ key, label }) => (
-            <button
-              key={key}
-              onClick={() => setStatusFilter(key)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                statusFilter === key
-                  ? 'bg-blue-500 text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-        {searchKeyword && (
-          <span className="text-xs text-gray-400">
-            找到 {filtered.length} 台设备
-          </span>
-        )}
-      </div>
-
-      {/* 设备列表 */}
-      <Card>
-        <CardHeader>
-          <CardTitle>设备列表{filtered.length !== equipment.length && ` (${filtered.length}/${equipment.length})`}</CardTitle>
-        </CardHeader>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-[#e5e7eb] bg-[#f8fafc]">
-                {['设备名称', '设备ID', '状态', '上次维保', '下次维保', '使用率', '维保状态', '操作'].map((h) => (
-                  <th key={h} className="px-5 py-3 text-left text-xs font-semibold text-[#94a3b8] uppercase tracking-wide">
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.length === 0 ? (
-                <tr>
-                  <td colSpan={8} className="px-5 py-10 text-center text-gray-400">
-                    {searchKeyword ? `未找到包含"${searchKeyword}"的设备` : '暂无设备数据'}
-                  </td>
-                </tr>
-              ) : filtered.map((eq, i) => (
-                <tr key={`${eq.id}-${i}`} className="border-b border-[#f1f5f9] hover:bg-[#f8fafc] transition-colors">
-                  <td className="px-5 py-3.5 font-semibold text-[#0f172a]">{eq.name}</td>
-                  <td className="px-5 py-3.5 text-[#3b82f6] font-medium">{eq.id}</td>
-                  <td className="px-5 py-3.5"><StatusBadge status={eq.status} /></td>
-                  <td className="px-5 py-3.5 text-[#64748b]">{eq.lastMaintenance}</td>
-                  <td className="px-5 py-3.5 text-[#64748b]">{eq.nextMaintenance}</td>
-                  <td className="px-5 py-3.5"><UsageBar value={eq.usageRate} /></td>
-                  <td className="px-5 py-3.5"><MaintenanceBadge status={eq.maintenanceStatus} /></td>
-                  <td className="px-5 py-3.5">
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleOpenDetail(eq)}
-                        title="查看详情"
-                      >
-                        <Eye className="w-4 h-4" />
-                        详情
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => { setForm((f) => ({ ...f, equipmentId: eq.id })); setShowModal(true); }}
-                      >
-                        新建维保
-                      </Button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </Card>
-
-      {/* 维保记录（从 API） */}
-      <Card>
-        <CardHeader>
-          <CardTitle>最近维保记录</CardTitle>
-        </CardHeader>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-[#e5e7eb] bg-[#f8fafc]">
-                {['设备', '日期', '类型', '技术员', '费用', '状态'].map((h) => (
-                  <th key={h} className="px-5 py-3 text-left text-xs font-semibold text-[#94a3b8] uppercase tracking-wide">
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {maintenanceRecords.map((r) => (
-                <tr key={r.id} className="border-b border-[#f1f5f9] hover:bg-[#f8fafc] transition-colors">
-                  <td className="px-5 py-3.5 font-medium text-[#0f172a]">{r.equipment}</td>
-                  <td className="px-5 py-3.5 text-[#64748b]">{r.date}</td>
-                  <td className="px-5 py-3.5 text-[#64748b]">{r.type}</td>
-                  <td className="px-5 py-3.5 text-[#64748b]">{r.technician}</td>
-                  <td className="px-5 py-3.5 font-medium text-[#0f172a]">{r.cost}</td>
-                  <td className="px-5 py-3.5">
-                    <span className={`px-2.5 py-0.5 text-xs font-semibold rounded-full ${
-                      r.status === '已完成' ? 'bg-green-100 text-green-700' :
-                      r.status === '进行中' ? 'bg-blue-100 text-blue-700' :
-                      'bg-gray-100 text-gray-600'
-                    }`}>
-                      {r.status}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-              {maintenanceRecords.length === 0 && !recordsLoading && (
-                <tr>
-                  <td colSpan={6} className="px-5 py-10 text-center text-[#94a3b8] text-sm">暂无维保记录</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </Card>
-
-      {/* 新建维保记录 Modal */}
-      {showModal && (
-        <div
-          className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50"
-          onClick={() => setShowModal(false)}
-        >
-          <div
-            className="bg-white rounded-2xl w-full max-w-2xl mx-4 shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => { setForm((f) => ({ ...f, equipmentId: row.id })); setShowModal(true); }}
           >
-            <div className="px-6 py-4 border-b border-[#e5e7eb] flex items-center justify-between">
-              <h3 className="text-base font-semibold text-[#0f172a]">新建维保记录</h3>
-              <button onClick={() => setShowModal(false)} className="text-[#94a3b8] hover:text-[#64748b] text-xl leading-none">×</button>
+            新建维保
+          </Button>
+        </div>
+      ),
+    },
+  ];
+
+  // ── DataTable 列定义：维保记录 ─────────────────────────────────────────────────
+  const recordColumns: Column<typeof maintenanceRecords[0]>[] = [
+    {
+      key: 'equipment',
+      title: '设备',
+      render: (_v, row) => <span className="font-medium text-slate-900">{row.equipment}</span>,
+    },
+    {
+      key: 'date',
+      title: '日期',
+      render: (_v, row) => <span className="text-slate-500">{row.date}</span>,
+    },
+    {
+      key: 'type',
+      title: '类型',
+      render: (_v, row) => <span className="text-slate-500">{row.type}</span>,
+    },
+    {
+      key: 'technician',
+      title: '技术员',
+      render: (_v, row) => <span className="text-slate-500">{row.technician}</span>,
+    },
+    {
+      key: 'cost',
+      title: '费用',
+      render: (_v, row) => <span className="font-medium text-slate-900">{row.cost}</span>,
+    },
+    {
+      key: 'status',
+      title: '状态',
+      render: (_v, row) => <RecordStatusBadge status={row.status} />,
+    },
+  ];
+
+  // ── 统计栏配置 ────────────────────────────────────────────────────────────────
+  const stats = [
+    { label: '总设备数', value: total, icon: Wrench, iconColor: 'text-blue-600', iconBg: 'bg-blue-50' },
+    { label: '维保中', value: inMaintenance, icon: AlertCircle, iconColor: 'text-amber-500', iconBg: 'bg-amber-50' },
+    { label: '即将到期', value: expiringSoon, icon: Activity, iconColor: 'text-red-500', iconBg: 'bg-red-50' },
+    { label: '正常运行', value: normal, icon: CheckCircle2, iconColor: 'text-emerald-500', iconBg: 'bg-emerald-50' },
+  ];
+
+  // ── 快速筛选 ──────────────────────────────────────────────────────────────────
+  const quickFilters = [
+    { key: 'all', label: '全部' },
+    { key: '使用中', label: '正常运行' },
+    { key: '维修中', label: '维修中' },
+    { key: '闲置', label: '闲置' },
+  ];
+
+  return (
+    <div className="min-h-full bg-[var(--app-background)] px-4 py-5 sm:px-6 lg:px-8">
+      <div className="mx-auto flex w-full max-w-[1480px] flex-col gap-6">
+
+        {/* ── Header + Stat Bar ─────────────────────────────────────────────── */}
+        <section className="rounded-2xl border border-[var(--surface-border)] bg-white shadow-sm">
+          <div className="flex flex-col gap-4 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h1 className="text-xl font-bold tracking-tight text-slate-900">重要设备管理</h1>
+              <p className="mt-1 text-sm text-slate-500">关键生产设备维保追踪与状态监控</p>
             </div>
-            <div className="p-6 space-y-4">
+            <Button size="lg" onClick={() => setShowModal(true)}>
+              <Plus className="w-4 h-4" />
+              新建维保记录
+            </Button>
+          </div>
+          {/* stat bar */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-slate-100 border-t border-slate-100">
+            {stats.map(({ label, value, icon: Icon, iconColor, iconBg }) => (
+              <div key={label} className="flex items-center gap-3 px-6 py-4">
+                <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${iconBg}`}>
+                  <Icon className={`h-5 w-5 ${iconColor}`} />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-slate-900">{value}</p>
+                  <p className="text-xs font-medium text-slate-500">{label}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* ── 加载态 ────────────────────────────────────────────────────────── */}
+        {(assetLoading || recordsLoading) && (
+          <div className="flex items-center gap-2 text-sm text-slate-500">
+            <RefreshCw className="w-4 h-4 animate-spin" />
+            加载中...
+          </div>
+        )}
+
+        {/* ── 设备列表 Card ─────────────────────────────────────────────────── */}
+        <Card className="overflow-hidden rounded-2xl border-slate-200/80 shadow-sm">
+          {/* Toolbar */}
+          <div className="flex flex-col gap-3 border-b border-slate-100 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+            <h2 className="text-sm font-semibold text-slate-900">
+              设备列表
+              {filtered.length !== equipment.length && (
+                <span className="ml-2 text-xs font-normal text-slate-400">
+                  {filtered.length}/{equipment.length}
+                </span>
+              )}
+            </h2>
+            <div className="flex items-center gap-3">
+              <div className="relative w-full sm:w-64">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <input
+                  type="text"
+                  placeholder="搜索设备名称或编号..."
+                  value={searchKeyword}
+                  onChange={(e) => setSearchKeyword(e.target.value)}
+                  className="w-full pl-9 pr-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Quick filter pills */}
+          <div className="flex flex-wrap items-center gap-2 border-b border-slate-100 px-5 py-3">
+            {quickFilters.map(({ key, label }) => (
+              <button
+                key={key}
+                onClick={() => setStatusFilter(key)}
+                className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+                  statusFilter === key
+                    ? 'bg-blue-600 text-white shadow-sm'
+                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+            {searchKeyword && (
+              <span className="ml-auto text-xs text-slate-400">
+                找到 {filtered.length} 台设备
+              </span>
+            )}
+          </div>
+
+          {/* DataTable */}
+          <div className="p-0">
+            <DataTable
+              columns={equipmentColumns}
+              data={filtered}
+              rowKey="id"
+              loading={assetLoading}
+              emptyText={searchKeyword ? `未找到包含"${searchKeyword}"的设备` : '暂无设备数据'}
+            />
+          </div>
+        </Card>
+
+        {/* ── 维保记录 Card ─────────────────────────────────────────────────── */}
+        <Card className="overflow-hidden rounded-2xl border-slate-200/80 shadow-sm">
+          <div className="border-b border-slate-100 px-5 py-4">
+            <h2 className="text-sm font-semibold text-slate-900">最近维保记录</h2>
+          </div>
+          <div className="p-0">
+            <DataTable
+              columns={recordColumns}
+              data={maintenanceRecords}
+              rowKey="id"
+              loading={recordsLoading}
+              emptyText="暂无维保记录"
+            />
+          </div>
+        </Card>
+
+        {/* ── 新建维保记录 Dialog ───────────────────────────────────────────── */}
+        <Dialog open={showModal} onOpenChange={setShowModal}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>新建维保记录</DialogTitle>
+            </DialogHeader>
+            <div className="px-6 py-5 space-y-5">
               {formError && (
-                <div className="text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg px-4 py-2">{formError}</div>
+                <div className="text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg px-4 py-2">
+                  {formError}
+                </div>
               )}
               <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-[#374151] mb-1">选择设备 *</label>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-sm font-medium text-slate-700">选择设备 *</label>
                   <select
                     value={form.equipmentId}
                     onChange={(e) => setForm((f) => ({ ...f, equipmentId: e.target.value }))}
-                    className="w-full px-3 py-2 border border-[#e5e7eb] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#3b82f6]"
+                    className="w-full h-9 px-3 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500"
                   >
                     <option value="">请选择设备</option>
                     {filtered.map((eq, i) => (
@@ -492,12 +535,12 @@ export default function EquipmentPage() {
                     ))}
                   </select>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-[#374151] mb-1">保养类型 *</label>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-sm font-medium text-slate-700">保养类型 *</label>
                   <select
                     value={form.type}
                     onChange={(e) => setForm((f) => ({ ...f, type: e.target.value }))}
-                    className="w-full px-3 py-2 border border-[#e5e7eb] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#3b82f6]"
+                    className="w-full h-9 px-3 border border-slate-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500"
                   >
                     <option>定期保养</option>
                     <option>故障维修</option>
@@ -505,86 +548,74 @@ export default function EquipmentPage() {
                     <option>升级改造</option>
                   </select>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-[#374151] mb-1">保养日期 *</label>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-sm font-medium text-slate-700">保养日期 *</label>
                   <input
                     type="date"
                     value={form.date}
                     onChange={(e) => setForm((f) => ({ ...f, date: e.target.value }))}
-                    className="w-full px-3 py-2 border border-[#e5e7eb] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#3b82f6]"
+                    className="w-full h-9 px-3 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500"
                   />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-[#374151] mb-1">技术员 *</label>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-sm font-medium text-slate-700">技术员 *</label>
                   <input
                     type="text"
                     value={form.technician}
                     onChange={(e) => setForm((f) => ({ ...f, technician: e.target.value }))}
                     placeholder="技术员姓名"
-                    className="w-full px-3 py-2 border border-[#e5e7eb] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#3b82f6]"
+                    className="w-full h-9 px-3 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500"
                   />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-[#374151] mb-1">耗时（小时）</label>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-sm font-medium text-slate-700">耗时（小时）</label>
                   <input
                     type="number"
                     step="0.5"
                     value={form.duration}
                     onChange={(e) => setForm((f) => ({ ...f, duration: e.target.value }))}
-                    className="w-full px-3 py-2 border border-[#e5e7eb] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#3b82f6]"
+                    className="w-full h-9 px-3 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500"
                   />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-[#374151] mb-1">费用（元）</label>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-sm font-medium text-slate-700">费用（元）</label>
                   <input
                     type="number"
                     value={form.cost}
                     onChange={(e) => setForm((f) => ({ ...f, cost: e.target.value }))}
-                    className="w-full px-3 py-2 border border-[#e5e7eb] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#3b82f6]"
+                    className="w-full h-9 px-3 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500"
                   />
                 </div>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-[#374151] mb-1">保养内容 *</label>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-sm font-medium text-slate-700">保养内容 *</label>
                 <textarea
                   rows={3}
                   value={form.content}
                   onChange={(e) => setForm((f) => ({ ...f, content: e.target.value }))}
                   placeholder="请详细描述保养内容..."
-                  className="w-full px-3 py-2 border border-[#e5e7eb] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#3b82f6] resize-none"
+                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500 resize-none"
                 />
               </div>
             </div>
-            <div className="px-6 py-4 border-t border-[#e5e7eb] flex justify-end gap-3">
+            <DialogFooter>
               <Button variant="secondary" onClick={() => setShowModal(false)}>取消</Button>
-              <Button
-                loading={createMutation.isPending}
-                onClick={handleSubmit}
-              >
+              <Button loading={createMutation.isPending} onClick={handleSubmit}>
                 保存记录
               </Button>
-            </div>
-          </div>
-        </div>
-      )}
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
-      {/* 设备详情 Modal */}
-      {detailItem && (
-        <div
-          className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50"
-          onClick={() => { setDetailItem(null); setDetailAsset(null); }}
-        >
-          <div
-            className="bg-white rounded-2xl w-full max-w-lg mx-4 shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="px-6 py-4 border-b border-[#e5e7eb] flex items-center justify-between">
-              <h3 className="text-base font-semibold text-[#0f172a]">设备详情</h3>
-              <button onClick={() => { setDetailItem(null); setDetailAsset(null); }} className="text-[#94a3b8] hover:text-[#64748b] text-xl leading-none">×</button>
-            </div>
-            <div className="p-6 space-y-3">
+        {/* ── 设备详情 Dialog ───────────────────────────────────────────────── */}
+        <Dialog open={!!detailItem} onOpenChange={(open) => { if (!open) { setDetailItem(null); setDetailAsset(null); } }}>
+          <DialogContent className="max-w-lg">
+            <DialogHeader>
+              <DialogTitle>设备详情</DialogTitle>
+            </DialogHeader>
+            <div className="px-6 py-5 space-y-3">
               {detailLoading && (
-                <div className="flex items-center gap-2 text-sm text-[#64748b]">
+                <div className="flex items-center gap-2 text-sm text-slate-500">
                   <RefreshCw className="w-4 h-4 animate-spin" />
                   加载详情...
                 </div>
@@ -606,8 +637,8 @@ export default function EquipmentPage() {
                     ['描述', detailAsset.description ?? '—'],
                   ] as [string, string][]).map(([k, v]) => (
                     <div key={k} className="flex items-center gap-3 text-sm">
-                      <span className="text-[#94a3b8] min-w-[80px]">{k}</span>
-                      <span className="text-[#0f172a] font-medium">{v}</span>
+                      <span className="text-slate-400 min-w-[80px]">{k}</span>
+                      <span className="text-slate-900 font-medium">{v}</span>
                     </div>
                   ))}
                 </>
@@ -623,16 +654,17 @@ export default function EquipmentPage() {
                     ['维保状态', detailItem.maintenanceStatus],
                   ] as [string, string][]).map(([k, v]) => (
                     <div key={k} className="flex items-center gap-3 text-sm">
-                      <span className="text-[#94a3b8] min-w-[80px]">{k}</span>
-                      <span className="text-[#0f172a] font-medium">{v}</span>
+                      <span className="text-slate-400 min-w-[80px]">{k}</span>
+                      <span className="text-slate-900 font-medium">{v}</span>
                     </div>
                   ))}
                 </>
               )}
             </div>
-          </div>
-        </div>
-      )}
+          </DialogContent>
+        </Dialog>
+
+      </div>
     </div>
   );
 }

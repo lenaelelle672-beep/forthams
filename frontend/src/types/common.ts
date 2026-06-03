@@ -48,9 +48,10 @@ export interface PageData<T> {
 }
 
 /**
- * 完整分页响应（ApiResponse 包装 PageData）。
+ * HTTP 客户端会自动解包后端 Result<T>，因此业务层分页响应直接使用 PageData<T>。
+ * 如需描述未解包的后端原始结构，请显式使用 ApiResponse<PageData<T>>。
  */
-export type PaginatedResponse<T> = ApiResponse<PageData<T>>;
+export type PaginatedResponse<T> = PageData<T> & { data?: PageData<T> };
 
 // ---------------------------------------------------------------------------
 // 前端内部使用的标准化分页状态（解包后）
@@ -315,8 +316,13 @@ export interface UploadResponse {
 // ---------------------------------------------------------------------------
 
 export interface Department {
+  [key: string]: unknown;
   id: number;
+  /** 后端主键别名，兼容既有页面选择器 */
+  deptId?: number;
   deptName: string;
+  /** 展示名别名，兼容通用树/选择器 */
+  name?: string;
   deptCode?: string;
   parentId?: number | null;
   children?: Department[];
@@ -336,8 +342,9 @@ export interface Department {
 }
 
 export interface Location {
+  [key: string]: unknown;
   id: number;
-  locationName: string;
+  name: string;
   locationCode?: string;
   parentId?: number | null;
   children?: Location[];
@@ -346,11 +353,11 @@ export interface Location {
 
 export interface Vendor {
   id: number;
-  vendorName: string;
+  name: string;
   vendorCode?: string;
-  contact?: string;
-  phone?: string;
-  email?: string;
+  contactPerson?: string;
+  contactPhone?: string;
+  contactEmail?: string;
   address?: string;
   status?: number;
   createTime?: string;

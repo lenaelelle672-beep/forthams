@@ -46,7 +46,7 @@ export default function AuditDetailPage() {
     staleTime: 1000 * 60 * 5,
   });
 
-  const log: AuditLog = res as unknown as AuditLog | undefined;
+  const log = res as AuditLog | undefined;
   if (isLoading) {
     return (
       <div className="p-8 space-y-6">
@@ -109,12 +109,12 @@ export default function AuditDetailPage() {
   const timeline: TimelineEntry[] = buildTimelineFromLog(log);
 
   const context: OperationContext = {
-    method: (log as unknown as Record<string, string>)?.httpMethod ?? (log as unknown as Record<string, string>)?.method ?? '—',
+    method: log.httpMethod ?? '—',
     path: `/api/assets/${log.resourceId || '—'}`,
-    userAgent: (log as unknown as Record<string, string>)?.userAgent ?? '—',
+    userAgent: log.userAgent ?? '—',
     requestId: `REQ-${logId}`,
     sessionId: `SESS-${log.operatorId || '—'}`,
-    tenantId: (log as unknown as Record<string, string>)?.tenantId ?? '—',
+    tenantId: log.tenantId ?? '—',
   };
 
   const relatedChanges = (log.changes || []).map((c) => ({

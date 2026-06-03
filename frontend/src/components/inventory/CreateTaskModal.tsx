@@ -87,7 +87,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
   onClose,
   onSuccess,
 }) => {
-  const [form] = Form.useForm<TaskFormValues>();
+  const [form] = Form.useForm();
   const [submitting, setSubmitting] = useState(false);
 
   /**
@@ -112,7 +112,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
     if (submittingRef.current) return;
 
     try {
-      const values = await form.validateFields();
+      const values = (await form.validateFields()) as TaskFormValues;
 
       // 校验通过后才锁定，避免校验失败时也进入 loading
       submittingRef.current = true;
@@ -210,7 +210,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
             },
           ]}
         >
-          <ScopeSelector />
+          <ScopeSelector value={form.getFieldValue('scope')} onChange={(value) => form.setFieldValue('scope', value)} />
         </Form.Item>
       </Form>
     </Modal>

@@ -18,6 +18,9 @@ export interface AuditLog {
   ipAddress?: string;
   changes?: AuditFieldChange[];
   createdAt: string;
+  httpMethod?: string;
+  userAgent?: string;
+  tenantId?: string;
   raw?: Record<string, unknown>;
 }
 
@@ -67,6 +70,9 @@ function normalizeAuditLog(raw: any): AuditLog {
     ipAddress: raw?.ipAddress ?? raw?.operatorIp,
     changes: raw?.changes ?? [],
     createdAt,
+    httpMethod: raw?.httpMethod ?? raw?.method,
+    userAgent: raw?.userAgent,
+    tenantId: raw?.tenantId,
     raw,
   };
 }
