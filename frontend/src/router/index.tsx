@@ -93,6 +93,7 @@ function PermissionGuard({ roles, children }: { roles: string[]; children: React
 // ── 布局 ──────────────────────────────────────────────────────────────────────
 const AppLayout     = React.lazy(() => import('@/layouts/AppLayout'));
 const LoginPage     = React.lazy(() => import('@/pages/auth/LoginPage'));
+const Login2Page    = React.lazy(() => import('@/pages/auth/Login2Page'));
 const BigScreenPage = React.lazy(() => import('@/pages/bigscreen/BigScreenPage'));
 const BigScreen3DPage = React.lazy(() => import('@/pages/bigscreen/BigScreen3DPage'));
 // ── 新建完成的页面（直接导入）──────────────────────────────────────────────────
@@ -153,6 +154,10 @@ const router = createBrowserRouter([
   {
     path: '/login',
     element: S(LoginPage),
+  },
+  {
+    path: '/login2',
+    element: S(Login2Page),
   },
   {
     path: '/forbidden',
