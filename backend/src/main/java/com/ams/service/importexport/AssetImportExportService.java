@@ -1,7 +1,7 @@
-package com.ams.service;
+package com.ams.service.importexport;
 
-import com.ams.dto.ExportQueryDTO;
-import com.ams.dto.ImportResultDTO;
+import com.ams.dto.importexport.ExportQueryDTO;
+import com.ams.dto.importexport.ImportResultDTO;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.multipart.MultipartFile;
 
