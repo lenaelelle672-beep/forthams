@@ -1,5 +1,6 @@
 package com.ams.service.impl;
 
+import com.ams.common.exception.BizErrorCode;
 import com.ams.common.exception.BusinessException;
 import com.ams.context.TenantContext;
 import com.ams.dto.WorkOrderDTO;
@@ -201,7 +202,7 @@ public class InspectionServiceImpl implements InspectionService {
                 inspection.setResult("PENDING"); // 待检验
                 inspectionMapper.insert(inspection);
                 batch.add(inspection);
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 log.error("生成检验记录失败: assetId={}", assetId, e);
             }
         }
@@ -244,7 +245,7 @@ public class InspectionServiceImpl implements InspectionService {
         for (String tenantId : tenantIds) {
             try {
                 checkExpiringForTenant(tenantId);
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 log.error("租户 {} 到期检查失败: {}", tenantId, e.getMessage(), e);
             }
         }
@@ -264,7 +265,7 @@ public class InspectionServiceImpl implements InspectionService {
         for (String tenantId : tenantIds) {
             try {
                 markOverdueForTenant(tenantId);
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 log.error("租户 {} 逾期标记失败: {}", tenantId, e.getMessage(), e);
             }
         }
@@ -284,7 +285,7 @@ public class InspectionServiceImpl implements InspectionService {
         for (String tenantId : tenantIds) {
             try {
                 generateStatisticsForTenant(tenantId);
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 log.error("租户 {} 统计报告失败: {}", tenantId, e.getMessage(), e);
             }
         }
@@ -426,7 +427,7 @@ public class InspectionServiceImpl implements InspectionService {
             return pdfBytes;
         } catch (Exception e) {
             log.error("生成检验报告失败: inspectionId={}", inspectionId, e);
-            throw new BusinessException("生成报告失败: " + e.getMessage());
+            throw new BusinessException(BizErrorCode.REPORT_GENERATION_FAILED, "生成报告失败", e);
         }
     }
 
@@ -574,8 +575,8 @@ public class InspectionServiceImpl implements InspectionService {
 
                 log.info("发送检验到期提醒: inspectionId={}, assetName={}, daysRemaining={}",
                         inspection.getId(), asset.getAssetName(), daysRemaining);
-            } catch (Exception e) {
-                log.error("发送提醒失败: inspectionId={}, error={}", inspection.getId(), e.getMessage());
+            } catch (RuntimeException e) {
+                log.error("发送提醒失败: inspectionId={}", inspection.getId(), e);
             }
         }
     }
@@ -629,8 +630,8 @@ public class InspectionServiceImpl implements InspectionService {
                     workOrderService.createWorkOrder(dto);
                     log.info("生成逾期整改工单: inspectionId={}, assetName={}", inspection.getId(), asset.getAssetName());
                 }
-            } catch (Exception e) {
-                log.error("标记逾期失败: inspectionId={}, error={}", inspection.getId(), e.getMessage());
+            } catch (RuntimeException e) {
+                log.error("标记逾期失败: inspectionId={}", inspection.getId(), e);
             }
         }
 
@@ -710,8 +711,8 @@ public class InspectionServiceImpl implements InspectionService {
             if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
                 return (long) auth.getName().hashCode();
             }
-        } catch (Exception e) {
-            // ignore
+        } catch (RuntimeException e) {
+            log.warn("获取当前用户身份异常", e);
         }
         return 0L;
     }
