@@ -5,6 +5,7 @@ import com.ams.context.TenantContext;
 import com.ams.entity.InspectionTask;
 import com.ams.mapper.InspectionTaskMapper;
 import com.ams.service.InspectionTaskService;
+import com.ams.service.TenantService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class InspectionTaskServiceImpl implements InspectionTaskService {
     private final InspectionTaskMapper taskMapper;
+    private final TenantService tenantService;
 
     @Override
     public Page<InspectionTask> listTasks(String keyword, String status, String taskType,
@@ -255,7 +257,7 @@ public class InspectionTaskServiceImpl implements InspectionTaskService {
      * 获取活跃租户列表
      */
     private List<String> getActiveTenantIds() {
-        // TODO: 从租户管理服务获取活跃租户列表
-        return List.of("1");
+        // 从 TenantService 获取配置化租户 ID 列表（阶段 1 占位实现）
+        return tenantService.getActiveTenantIds();
     }
 }

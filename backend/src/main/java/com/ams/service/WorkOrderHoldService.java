@@ -5,6 +5,7 @@ import com.ams.context.TenantContext;
 import com.ams.entity.WorkOrder;
 import com.ams.entity.WorkOrderHoldRecord;
 import com.ams.mapper.WorkOrderHoldRecordMapper;
+import com.ams.service.TenantService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -25,6 +26,7 @@ public class WorkOrderHoldService {
     private final WorkOrderHoldRecordMapper workOrderHoldRecordMapper;
     private final WorkOrderService workOrderService;
     private final NotificationService notificationService;
+    private final TenantService tenantService;
 
     /**
      * 挂起工单
@@ -122,9 +124,8 @@ public class WorkOrderHoldService {
      * 获取活跃租户列表
      */
     private List<String> getActiveTenantIds() {
-        // TODO: 从租户管理服务获取活跃租户列表
-        // 临时实现：返回默认租户或从配置中读取
-        return List.of("1");
+        // 从 TenantService 获取配置化租户 ID 列表（阶段 1 占位实现）
+        return tenantService.getActiveTenantIds();
     }
 
     /**

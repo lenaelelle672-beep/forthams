@@ -11,6 +11,7 @@ import com.ams.mapper.InspectionMapper;
 import com.ams.service.AssetService;
 import com.ams.service.InspectionService;
 import com.ams.service.NotificationService;
+import com.ams.service.TenantService;
 import com.ams.service.WorkOrderService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -37,6 +38,7 @@ public class InspectionServiceImpl implements InspectionService {
     private final AssetMapper assetMapper;
     private final NotificationService notificationService;
     private final WorkOrderService workOrderService;
+    private final TenantService tenantService;
 
     @Override
     public Page<Inspection> listInspection(String keyword, String inspectionType, String result,
@@ -426,6 +428,9 @@ public class InspectionServiceImpl implements InspectionService {
             log.info("生成检验报告成功: inspectionId={}", inspectionId);
             return pdfBytes;
         } catch (Exception e) {
+            // 不能替换为 catch(RuntimeException)：
+            // generatePdfReport 方法签名声明 throws Exception（iText 操作可能抛出 DocumentException 等受检异常），
+            // 若使用 RuntimeException 将导致未处理的受检异常编译错误。此处保持 catch(Exception) 确保所有异常被捕获。
             log.error("生成检验报告失败: inspectionId={}", inspectionId, e);
             throw new BusinessException(BizErrorCode.REPORT_GENERATION_FAILED, "生成报告失败", e);
         }
@@ -696,9 +701,8 @@ public class InspectionServiceImpl implements InspectionService {
      * 获取活跃租户列表
      */
     private List<String> getActiveTenantIds() {
-        // TODO: 从租户管理服务获取活跃租户列表
-        // 临时实现：返回默认租户
-        return List.of("1");
+        // 从 TenantService 获取配置化租户 ID 列表（阶段 1 占位实现）
+        return tenantService.getActiveTenantIds();
     }
 
     /**

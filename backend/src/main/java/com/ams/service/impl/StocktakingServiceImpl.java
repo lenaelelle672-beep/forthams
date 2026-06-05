@@ -9,6 +9,7 @@ import com.ams.mapper.AssetMapper;
 import com.ams.mapper.StocktakingCycleMapper;
 import com.ams.mapper.StocktakingTaskMapper;
 import com.ams.service.StocktakingService;
+import com.ams.service.TenantService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +28,7 @@ public class StocktakingServiceImpl implements StocktakingService {
     private final StocktakingCycleMapper cycleMapper;
     private final StocktakingTaskMapper taskMapper;
     private final AssetMapper assetMapper;
+    private final TenantService tenantService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -47,7 +49,7 @@ public class StocktakingServiceImpl implements StocktakingService {
                 return (long) auth.getName().hashCode();
             }
         } catch (RuntimeException e) {
-            log.warn("获取当前用户身份异常", e);
+            log.warn("获取当前用户ID失败，返回默认值 0", e);
         }
         return 0L;
     }
@@ -310,9 +312,8 @@ public class StocktakingServiceImpl implements StocktakingService {
      * 获取活跃租户列表
      */
     private List<String> getActiveTenantIds() {
-        // TODO: 从租户管理服务获取活跃租户列表
-        // 临时实现：返回默认租户
-        return List.of("1");
+        // 从 TenantService 获取配置化租户 ID 列表（阶段 1 占位实现）
+        return tenantService.getActiveTenantIds();
     }
 
     /**
@@ -356,7 +357,7 @@ public class StocktakingServiceImpl implements StocktakingService {
                 totalTasksGenerated += taskCount;
                 log.info("租户 {} 周期 {} 自动生成 {} 个盘点任务", tenantId, cycle.getId(), taskCount);
             } catch (RuntimeException e) {
-                log.error("租户 {} 周期 {} 任务生成失败: {}", tenantId, cycle.getId(), e.getMessage(), e);
+                log.error("租户 {} 周期 {} 任务生成失败", tenantId, cycle.getId(), e);
             }
         }
 

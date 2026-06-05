@@ -9,6 +9,7 @@ import com.ams.service.NotificationService;
 import com.ams.service.PdfExportService;
 import com.ams.service.SafetyChecklistAttachmentService;
 import com.ams.service.SafetyChecklistService;
+import com.ams.service.TenantService;
 import com.ams.service.WorkOrderService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -35,6 +36,7 @@ public class SafetyChecklistServiceImpl implements SafetyChecklistService {
     private final NotificationService notificationService;
     private final SafetyChecklistAttachmentService safetyChecklistAttachmentService;
     private final PdfExportService pdfExportService;
+    private final TenantService tenantService;
 
     // ── 模板 CRUD ─────────────────────────────────────────────────────────────
 
@@ -508,9 +510,8 @@ public class SafetyChecklistServiceImpl implements SafetyChecklistService {
      * 获取活跃租户列表
      */
     private List<String> getActiveTenantIds() {
-        // TODO: 从租户管理服务获取活跃租户列表
-        // 临时实现：返回默认租户
-        return List.of("1");
+        // 从 TenantService 获取配置化租户 ID 列表（阶段 1 占位实现）
+        return tenantService.getActiveTenantIds();
     }
 
     // ── 批量执行 ───────────────────────────────────────────────────────────────
