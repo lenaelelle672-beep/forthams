@@ -32,3 +32,7 @@
 1. 迁移文件一旦执行（已写入 `flyway_schema_history` 表），**禁止修改**已提交的脚本。如需变更，请新建更高版本的迁移文件。
 2. 版本号必须严格递增，不能跳号或重复。
 3. 所有迁移文件应保持幂等性（同一环境重复执行不报错），推荐使用 `IF NOT EXISTS` / `IF EXISTS` 子句。
+
+## 其他迁移目录
+
+`backend/migrations/versions/` 是早期使用过的备用迁移目录（包含 `001_create_tickets_table.sql` 等文件）。该目录自 V1_x 起已被 `src/main/resources/migration/` 取代，**当前为废弃状态**。新环境部署应只使用 `src/main/resources/migration/`。如有遗留文件需要合并到主迁移目录，请参照上方"版本号规范"小节重新命名并按顺序追加。
