@@ -310,8 +310,8 @@ public class SafetyChecklistServiceImpl implements SafetyChecklistService {
 
             workOrderService.createWorkOrder(dto);
             log.info("[SafetyChecklist] 已为执行记录 {} 生成整改工单，不合规项：{}", execution.getId(), failItemNames);
-        } catch (Exception e) {
-            log.error("[SafetyChecklist] 自动生成整改工单失败: {}", e.getMessage(), e);
+        } catch (RuntimeException e) {
+            log.error("[SafetyChecklist] 自动生成整改工单失败", e);
         }
     }
 
@@ -338,7 +338,7 @@ public class SafetyChecklistServiceImpl implements SafetyChecklistService {
         for (String tenantId : tenantIds) {
             try {
                 checkExpiringForTenant(tenantId);
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 log.error("租户 {} 安全检查任务到期检查失败: {}", tenantId, e.getMessage(), e);
             }
         }
@@ -358,7 +358,7 @@ public class SafetyChecklistServiceImpl implements SafetyChecklistService {
         for (String tenantId : tenantIds) {
             try {
                 checkOverdueForTenant(tenantId);
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 log.error("租户 {} 逾期执行任务检查失败: {}", tenantId, e.getMessage(), e);
             }
         }
@@ -397,7 +397,7 @@ public class SafetyChecklistServiceImpl implements SafetyChecklistService {
                 try {
                     sendOverdueNotification(execution, tenantId);
                     totalOverdue++;
-                } catch (Exception e) {
+                } catch (RuntimeException e) {
                     log.error("发送逾期执行任务通知失败，执行记录ID: {}: {}", execution.getId(), e.getMessage(), e);
                 }
             }
@@ -463,7 +463,7 @@ public class SafetyChecklistServiceImpl implements SafetyChecklistService {
         for (SafetyChecklistExecution execution : soonToExpireExecutions) {
             try {
                 sendExpiryReminder(execution, tenantId);
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 log.error("发送安全检查任务提醒失败，执行记录ID: {}: {}", execution.getId(), e.getMessage(), e);
             }
         }
@@ -551,10 +551,10 @@ public class SafetyChecklistServiceImpl implements SafetyChecklistService {
                     SafetyChecklistExecution execution = startExecution(templateId, assetId, executorId);
                     successCount++;
                     results.put(assetId, execution);
-                } catch (Exception e) {
+                } catch (RuntimeException e) {
                     failCount++;
                     failedAssetIds.add(assetId);
-                    log.error("启动安全检查执行失败: templateId={}, assetId={}, error={}", templateId, assetId, e.getMessage());
+                    log.error("启动安全检查执行失败: templateId={}, assetId={}", templateId, assetId, e);
                 }
             }
         }
