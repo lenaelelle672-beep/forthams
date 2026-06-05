@@ -46,8 +46,8 @@ public class StocktakingServiceImpl implements StocktakingService {
             if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
                 return (long) auth.getName().hashCode();
             }
-        } catch (Exception e) {
-            // ignore
+        } catch (RuntimeException e) {
+            log.warn("获取当前用户身份异常", e);
         }
         return 0L;
     }
@@ -251,7 +251,7 @@ public class StocktakingServiceImpl implements StocktakingService {
         for (String tenantId : tenantIds) {
             try {
                 generateTasksForTenant(tenantId, now);
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 log.error("租户 {} 定时任务生成失败: {}", tenantId, e.getMessage(), e);
             }
         }
@@ -275,7 +275,7 @@ public class StocktakingServiceImpl implements StocktakingService {
         for (String tenantId : tenantIds) {
             try {
                 checkOverdueTasksForTenant(tenantId, overdueThreshold, now);
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 log.error("租户 {} 逾期检查失败: {}", tenantId, e.getMessage(), e);
             }
         }
@@ -298,7 +298,7 @@ public class StocktakingServiceImpl implements StocktakingService {
         for (String tenantId : tenantIds) {
             try {
                 calculateCompletionRateForTenant(tenantId, now);
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 log.error("租户 {} 完成率统计失败: {}", tenantId, e.getMessage(), e);
             }
         }
@@ -355,8 +355,8 @@ public class StocktakingServiceImpl implements StocktakingService {
                 ).longValue();
                 totalTasksGenerated += taskCount;
                 log.info("租户 {} 周期 {} 自动生成 {} 个盘点任务", tenantId, cycle.getId(), taskCount);
-            } catch (Exception e) {
-                log.error("租户 {} 周期 {} 任务生成失败: {}", tenantId, cycle.getId(), e.getMessage());
+            } catch (RuntimeException e) {
+                log.error("租户 {} 周期 {} 任务生成失败: {}", tenantId, cycle.getId(), e.getMessage(), e);
             }
         }
 
