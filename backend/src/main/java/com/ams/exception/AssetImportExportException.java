@@ -1,4 +1,4 @@
-package com.assetmanage.exception;
+package com.ams.exception;
 
 /**
  * 资产批量导入导出异常。

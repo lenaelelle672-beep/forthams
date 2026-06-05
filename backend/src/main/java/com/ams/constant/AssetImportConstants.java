@@ -1,4 +1,4 @@
-package com.assetmanage.constant;
+package com.ams.constant;
 
 /**
  * 资产批量导入导出相关常量定义。

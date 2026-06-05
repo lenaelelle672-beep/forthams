@@ -1,4 +1,4 @@
-package com.assetmanage.parser;
+package com.ams.parser;
 
 import java.io.IOException;
 import java.io.InputStream;

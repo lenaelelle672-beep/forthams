@@ -1,4 +1,4 @@
-package com.assetmanage.dto;
+package com.ams.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
