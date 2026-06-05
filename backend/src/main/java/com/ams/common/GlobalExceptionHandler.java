@@ -36,7 +36,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BusinessException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Result<Void> handleBusinessException(BusinessException e) {
-        log.error("Business exception: {}", e.getMessage());
+        log.error("Business exception: code={}, errorCode={}, message={}", e.getCode(), e.getErrorCode(), e.getMessage(), e);
         return Result.error(e.getCode(), e.getMessage());
     }
 
@@ -68,6 +68,13 @@ public class GlobalExceptionHandler {
     public Result<Void> handleAccessDeniedException(AccessDeniedException e) {
         log.warn("Access denied: {}", e.getMessage());
         return Result.error(403, e.getMessage());
+    }
+
+    @ExceptionHandler(org.springframework.dao.DataAccessException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public Result<Void> handleDataAccessException(org.springframework.dao.DataAccessException e) {
+        log.error("数据库操作异常", e);
+        return Result.error(500, "数据库操作异常，请稍后重试");
     }
 
     @ExceptionHandler(Exception.class)

@@ -81,9 +81,11 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // 从环境变量 CORS_ALLOWED_ORIGINS 读取，支持逗号分隔多域名
+        // 从 @Value 注入的 corsAllowedOrigins 读取，支持逗号分隔多域名
         // 默认值 http://localhost:5173 用于开发环境
-        String[] origins = corsAllowedOrigins.split(",");
+        String[] origins = Arrays.stream(corsAllowedOrigins.split(","))
+                .map(String::trim)
+                .toArray(String[]::new);
         configuration.setAllowedOriginPatterns(Arrays.asList(origins));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
@@ -93,17 +95,6 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
-
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-        return config.getAuthenticationManager();
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-}
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
