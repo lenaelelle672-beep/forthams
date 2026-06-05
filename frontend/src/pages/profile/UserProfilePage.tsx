@@ -4,6 +4,8 @@
  */
 
 import { useQuery } from '@tanstack/react-query';
+import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/app/context/AuthContext';
 import { getUserDetail } from '@/api/user-management';
 import type { UserDetail } from '@/api/user-management';
@@ -23,21 +25,25 @@ import {
   BadgeCheck,
 } from 'lucide-react';
 
-const ROLE_LABELS: Record<string, string> = {
-  SUPER_ADMIN: '超级管理员',
-  ADMIN: '管理员',
-  USER: '普通用户',
-  VIEWER: '查看者',
-};
-
-const STATUS_MAP: Record<number, { label: string; color: string }> = {
-  0: { label: '正常', color: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
-  1: { label: '已停用', color: 'bg-red-50 text-red-700 border-red-200' },
-};
-
 export default function UserProfilePage() {
+  const { t } = useTranslation('user');
   const { user } = useAuth();
   const userId = user?.userId;
+
+  const getRoleLabel = useMemo(
+    () => (code: string) => t(`roleLabels.${code}`, { defaultValue: code }),
+    [t],
+  );
+  const getStatusLabel = useMemo(
+    () => (code: number) => ({
+      label: code === 1 ? t('accountStatus.disabled') : t('accountStatus.active'),
+      color:
+        code === 1
+          ? 'bg-red-50 text-red-700 border-red-200'
+          : 'bg-emerald-50 text-emerald-700 border-emerald-200',
+    }),
+    [t],
+  );
 
   const { data: detail, isLoading } = useQuery<UserDetail>({
     queryKey: ['user-profile', userId],
@@ -60,7 +66,7 @@ export default function UserProfilePage() {
     id: user?.userId ?? 0,
     username: user?.username ?? '',
     realName: user?.realName ?? '',
-    roles: user?.roles?.map((r) => ({ id: 0, roleCode: r, roleName: ROLE_LABELS[r] ?? r })) ?? [],
+    roles: user?.roles?.map((r) => ({ id: 0, roleCode: r, roleName: getRoleLabel(r) })) ?? [],
     email: undefined,
     phone: undefined,
     deptName: undefined,
@@ -71,16 +77,18 @@ export default function UserProfilePage() {
     createTime: undefined,
   };
 
-  const displayName = profile.realName || profile.username || '系统管理员';
+  const displayName = profile.realName || profile.username || t('profile.systemAdmin');
   const initial = displayName[0].toUpperCase();
-  const roleNames = profile.roles?.map((r) => ROLE_LABELS[r.roleCode] ?? r.roleName ?? r.roleCode) ?? user?.roles?.map((r) => ROLE_LABELS[r] ?? r) ?? [];
-  const statusCfg = STATUS_MAP[profile.status ?? 0] ?? STATUS_MAP[0];
+  const roleNames =
+    profile.roles?.map((r) => getRoleLabel(r.roleCode)) ??
+    user?.roles?.map((r) => getRoleLabel(r)) ??
+    [];
+  const statusCfg = getStatusLabel(profile.status ?? 0);
 
   return (
     <PageTransition>
       <div className="min-h-full bg-[var(--app-background)] px-4 py-5 sm:px-6 lg:px-8">
         <div className="mx-auto w-full max-w-[900px] space-y-6">
-
           {/* ── 头部 Profile Card ── */}
           <Card className="overflow-hidden rounded-2xl border-slate-200/80 shadow-sm">
             <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-8 py-8">
@@ -100,7 +108,9 @@ export default function UserProfilePage() {
                         {r}
                       </span>
                     ))}
-                    <span className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-semibold backdrop-blur-sm ${statusCfg.color}`}>
+                    <span
+                      className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-semibold backdrop-blur-sm ${statusCfg.color}`}
+                    >
                       <BadgeCheck className="w-3 h-3" />
                       {statusCfg.label}
                     </span>
@@ -118,18 +128,44 @@ export default function UserProfilePage() {
                   <User className="w-5 h-5 text-blue-600" />
                 </div>
                 <div>
-                  <CardTitle>基本信息</CardTitle>
-                  <p className="text-xs text-gray-500 mt-0.5">账号与个人资料</p>
+                  <CardTitle>{t('profile.title')}</CardTitle>
+                  <p className="text-xs text-gray-500 mt-0.5">{t('profile.accountBasic')}</p>
                 </div>
               </div>
             </CardHeader>
             <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              <InfoRow icon={<Hash className="w-4 h-4" />} label="用户 ID" value={`#${profile.id}`} mono />
-              <InfoRow icon={<User className="w-4 h-4" />} label="用户名" value={profile.username || '—'} mono />
-              <InfoRow icon={<User className="w-4 h-4" />} label="姓名" value={profile.realName || '—'} />
-              <InfoRow icon={<Building2 className="w-4 h-4" />} label="所属部门" value={profile.deptName || '未分配'} />
-              <InfoRow icon={<Mail className="w-4 h-4" />} label="邮箱" value={profile.email || '未设置'} />
-              <InfoRow icon={<Phone className="w-4 h-4" />} label="手机号" value={profile.phone || '未设置'} />
+              <InfoRow
+                icon={<Hash className="w-4 h-4" />}
+                label={t('profile.userID')}
+                value={`#${profile.id}`}
+                mono
+              />
+              <InfoRow
+                icon={<User className="w-4 h-4" />}
+                label={t('profile.username')}
+                value={profile.username || '—'}
+                mono
+              />
+              <InfoRow
+                icon={<User className="w-4 h-4" />}
+                label={t('profile.realName')}
+                value={profile.realName || '—'}
+              />
+              <InfoRow
+                icon={<Building2 className="w-4 h-4" />}
+                label={t('profile.dept')}
+                value={profile.deptName || t('profile.noDept')}
+              />
+              <InfoRow
+                icon={<Mail className="w-4 h-4" />}
+                label={t('profile.email')}
+                value={profile.email || t('profile.noEmail')}
+              />
+              <InfoRow
+                icon={<Phone className="w-4 h-4" />}
+                label={t('profile.phone')}
+                value={profile.phone || t('profile.noPhone')}
+              />
             </CardContent>
           </Card>
 
@@ -141,52 +177,54 @@ export default function UserProfilePage() {
                   <Key className="w-5 h-5 text-violet-600" />
                 </div>
                 <div>
-                  <CardTitle>角色与权限</CardTitle>
-                  <p className="text-xs text-gray-500 mt-0.5">当前账号的角色分配</p>
+                  <CardTitle>{t('profile.rolePermission')}</CardTitle>
+                  <p className="text-xs text-gray-500 mt-0.5">{t('profile.roleDesc')}</p>
                 </div>
               </div>
             </CardHeader>
             <CardContent>
               <div className="flex flex-wrap gap-2">
-                {(profile.roles ?? []).length > 0 ? (
-                  profile.roles!.map((r) => (
-                    <span
-                      key={r.roleCode}
-                      className="inline-flex items-center gap-1.5 rounded-lg border border-violet-200 bg-violet-50 px-3 py-1.5 text-sm font-semibold text-violet-700"
-                    >
-                      <Shield className="w-3.5 h-3.5" />
-                      {ROLE_LABELS[r.roleCode] ?? r.roleName ?? r.roleCode}
-                    </span>
-                  ))
-                ) : (
-                  user?.roles?.map((r) => (
-                    <span
-                      key={r}
-                      className="inline-flex items-center gap-1.5 rounded-lg border border-violet-200 bg-violet-50 px-3 py-1.5 text-sm font-semibold text-violet-700"
-                    >
-                      <Shield className="w-3.5 h-3.5" />
-                      {ROLE_LABELS[r] ?? r}
-                    </span>
-                  ))
-                )}
-                {(!profile.roles || profile.roles.length === 0) && (!user?.roles || user.roles.length === 0) && (
-                  <span className="text-sm text-slate-400">暂无角色分配</span>
-                )}
+                {(profile.roles ?? []).length > 0
+                  ? profile.roles!.map((r) => (
+                      <span
+                        key={r.roleCode}
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-violet-200 bg-violet-50 px-3 py-1.5 text-sm font-semibold text-violet-700"
+                      >
+                        <Shield className="w-3.5 h-3.5" />
+                        {getRoleLabel(r.roleCode)}
+                      </span>
+                    ))
+                  : user?.roles?.map((r) => (
+                      <span
+                        key={r}
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-violet-200 bg-violet-50 px-3 py-1.5 text-sm font-semibold text-violet-700"
+                      >
+                        <Shield className="w-3.5 h-3.5" />
+                        {getRoleLabel(r)}
+                      </span>
+                    ))}
+                {(!profile.roles || profile.roles.length === 0) &&
+                  (!user?.roles || user.roles.length === 0) && (
+                    <span className="text-sm text-slate-400">{t('profile.noRole')}</span>
+                  )}
               </div>
               {profile.permissions && profile.permissions.length > 0 && (
                 <div className="mt-4 border-t border-slate-100 pt-4">
                   <p className="text-xs font-semibold text-slate-500 mb-2">
-                    权限列表（共 {profile.permissions.length} 项）
+                    {t('profile.permissionCount', { count: profile.permissions.length })}
                   </p>
                   <div className="flex flex-wrap gap-1.5">
                     {profile.permissions.slice(0, 20).map((p) => (
-                      <span key={p} className="rounded bg-slate-100 px-2 py-0.5 text-xs font-mono text-slate-600">
+                      <span
+                        key={p}
+                        className="rounded bg-slate-100 px-2 py-0.5 text-xs font-mono text-slate-600"
+                      >
                         {p}
                       </span>
                     ))}
                     {profile.permissions.length > 20 && (
                       <span className="rounded bg-slate-100 px-2 py-0.5 text-xs text-slate-400">
-                        +{profile.permissions.length - 20} 更多
+                        +{profile.permissions.length - 20} {t('profile.more')}
                       </span>
                     )}
                   </div>
@@ -203,27 +241,31 @@ export default function UserProfilePage() {
                   <Clock className="w-5 h-5 text-emerald-600" />
                 </div>
                 <div>
-                  <CardTitle>登录信息</CardTitle>
-                  <p className="text-xs text-gray-500 mt-0.5">最近登录与账号创建时间</p>
+                  <CardTitle>{t('profile.loginInfo')}</CardTitle>
+                  <p className="text-xs text-gray-500 mt-0.5">{t('profile.loginDesc')}</p>
                 </div>
               </div>
             </CardHeader>
             <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <InfoRow
                 icon={<Clock className="w-4 h-4" />}
-                label="最近登录时间"
-                value={profile.loginDate ? profile.loginDate.replace('T', ' ').substring(0, 16) : '—'}
+                label={t('profile.loginDate')}
+                value={
+                  profile.loginDate ? profile.loginDate.replace('T', ' ').substring(0, 16) : '—'
+                }
               />
               <InfoRow
                 icon={<MapPin className="w-4 h-4" />}
-                label="最近登录 IP"
+                label={t('profile.loginIp')}
                 value={profile.loginIp || '—'}
                 mono
               />
               <InfoRow
                 icon={<Clock className="w-4 h-4" />}
-                label="账号创建时间"
-                value={profile.createTime ? profile.createTime.replace('T', ' ').substring(0, 16) : '—'}
+                label={t('profile.createTime')}
+                value={
+                  profile.createTime ? profile.createTime.replace('T', ' ').substring(0, 16) : '—'
+                }
               />
             </CardContent>
           </Card>
@@ -253,7 +295,9 @@ function InfoRow({
       </span>
       <div className="min-w-0">
         <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">{label}</p>
-        <p className={`mt-0.5 text-sm font-medium text-slate-800 truncate ${mono ? 'font-mono' : ''}`}>
+        <p
+          className={`mt-0.5 text-sm font-medium text-slate-800 truncate ${mono ? 'font-mono' : ''}`}
+        >
           {value}
         </p>
       </div>
