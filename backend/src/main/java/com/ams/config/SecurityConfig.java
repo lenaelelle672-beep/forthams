@@ -62,7 +62,8 @@ public class SecurityConfig {
                 .requestMatchers(
                     "/auth/login", "/auth/register", "/auth/logout",
                     "/public/**", "/health", "/system/health", "/system/info",
-                    "/oauth2-mock/**", "/sso/**"
+                    "/oauth2-mock/**", "/sso/**",
+                    "/api-docs/**", "/swagger-ui/**"
                 ).permitAll()
                 .requestMatchers("/bigscreen/**", "/bigscreen-3d/**").hasAnyRole("ADMIN", "SUPER_ADMIN")
                 .anyRequest().authenticated()
@@ -95,7 +96,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOriginPatterns(Arrays.asList("*"));
+        configuration.setAllowedOriginPatterns(Arrays.asList("http://localhost:5173"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);
