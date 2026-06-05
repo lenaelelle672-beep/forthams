@@ -10,6 +10,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Save, Loader2, Circle, CheckCircle, CircleDot, Info, MapPin, DollarSign, FileText, Paperclip, GitBranch } from 'lucide-react';
 import { useAssetDetail, useCreateAsset, useUpdateAsset, useCategoryTree } from '@/hooks/asset/useAssets';
 import { getDeptList } from '@/api/base';
@@ -112,6 +113,7 @@ const formSections: FormSection[] = [
 ];
 
 export default function AssetFormPage() {
+  const { t } = useTranslation(['asset', 'common']);
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -230,7 +232,7 @@ export default function AssetFormPage() {
       queryClient.invalidateQueries({ queryKey: ['assets'] });
       navigate('/assets');
     } catch (err) {
-      const msg = err instanceof Error ? err.message : '保存失败，请重试';
+      const msg = err instanceof Error ? err.message : t('asset:form.messages.createFailed');
       setSubmitError(msg);
     }
   };
@@ -252,15 +254,15 @@ export default function AssetFormPage() {
   return (
     <div className="p-6 space-y-5">
       <PageHeader
-        title={isEdit ? '编辑资产' : '新增资产'}
+        title={isEdit ? t('asset:form.editTitle') : t('asset:form.createTitle')}
         breadcrumbs={[
-          { label: '资产台账', href: '/assets' },
-          { label: isEdit ? '编辑资产' : '新增资产' },
+          { label: t('asset:list.title'), href: '/assets' },
+          { label: isEdit ? t('asset:form.editTitle') : t('asset:form.createTitle') },
         ]}
         actions={
           <Button variant="ghost" size="md" onClick={() => navigate(-1)}>
             <ArrowLeft className="w-4 h-4" />
-            返回
+            {t('asset:form.actions.cancel')}
           </Button>
         }
       />
@@ -319,14 +321,14 @@ export default function AssetFormPage() {
                   <Info className="w-5 h-5 text-blue-600" />
                 </div>
                 <div>
-                  <CardTitle>基本信息</CardTitle>
-                  <p className="text-xs text-gray-500 mt-0.5">资产基础属性与分类</p>
+                  <CardTitle>{t('asset:form.sections.basic')}</CardTitle>
+                  <p className="text-xs text-gray-500 mt-0.5">{t('asset:detail.sections.basic')}</p>
                 </div>
               </div>
             </CardHeader>
             <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <Input
-                label="资产名称 *"
+                label={t('asset:form.fields.assetName') + ' *'}
                 placeholder="例：戴尔服务器 R740"
                 error={errors.assetName?.message}
                 {...register('assetName')}
@@ -386,7 +388,7 @@ export default function AssetFormPage() {
                   <MapPin className="w-5 h-5 text-orange-600" />
                 </div>
                 <div>
-                  <CardTitle>位置归属</CardTitle>
+                  <CardTitle>{t('asset:form.sections.location')}</CardTitle>
                   <p className="text-xs text-gray-500 mt-0.5">使用部门与物理位置</p>
                 </div>
               </div>
@@ -464,7 +466,7 @@ export default function AssetFormPage() {
         {/* 财务信息 */}
         <div ref={(el) => { if (el) sectionRefs.current['finance'] = el; }}>
           <Card className={activeSection === 'finance' ? 'ring-2 ring-blue-500 ring-offset-2' : ''}>
-            <CardHeader><CardTitle>财务信息</CardTitle></CardHeader>
+            <CardHeader>                  <CardTitle>{t('asset:form.sections.financial')}</CardTitle></CardHeader>
             <CardContent className="grid grid-cols-3 gap-4">
               <Input
                 label="原值（元）"
@@ -606,11 +608,11 @@ export default function AssetFormPage() {
         )}
         <div className="flex justify-end gap-3">
           <Button type="button" variant="outline" onClick={() => navigate(-1)}>
-            取消
+            {t('asset:form.actions.cancel')}
           </Button>
           <Button type="submit" loading={isSubmitting}>
             <Save className="w-4 h-4" />
-            {isEdit ? '保存修改' : '创建资产'}
+            {isEdit ? t('asset:form.actions.save') : t('asset:actions.create')}
           </Button>
         </div>
       </form>

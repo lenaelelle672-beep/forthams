@@ -11,6 +11,7 @@
 import { useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import {
   ArrowLeft,
@@ -227,6 +228,7 @@ function NestedValue({ value, depth = 0 }: { value: unknown; depth?: number }) {
 // ── 主组件 ────────────────────────────────────────────────────────────────────
 
 export default function ApprovalDetailPage() {
+  const { t } = useTranslation(['approval', 'common']);
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const qc = useQueryClient();
@@ -297,7 +299,7 @@ export default function ApprovalDetailPage() {
   const approveMutation = useMutation({
     mutationFn: () => approveItem(approvalId, { version: detail?.version ?? 0, comment: approveComment }),
     onSuccess: () => {
-      toast.success('审批已通过');
+      toast.success(t('approval:messages.approveSuccess'));
       setApproveDialogOpen(false);
       setApproveComment('');
       qc.invalidateQueries({ queryKey: ['approvals'] });
@@ -308,7 +310,7 @@ export default function ApprovalDetailPage() {
   const rejectMutation = useMutation({
     mutationFn: () => rejectItem(approvalId, { version: detail?.version ?? 0, rejectionReason: rejectReason }),
     onSuccess: () => {
-      toast.success('已驳回');
+      toast.success(t('approval:messages.rejectSuccess'));
       setRejectDialogOpen(false);
       setRejectReason('');
       qc.invalidateQueries({ queryKey: ['approvals'] });
@@ -319,7 +321,7 @@ export default function ApprovalDetailPage() {
   const cancelMutation = useMutation({
     mutationFn: () => cancelApproval(approvalId),
     onSuccess: () => {
-      toast.success('已取消审批');
+      toast.success(t('approval:messages.recallSuccess'));
       setCancelDialogOpen(false);
       qc.invalidateQueries({ queryKey: ['approvals'] });
     },
@@ -350,7 +352,7 @@ export default function ApprovalDetailPage() {
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="flex flex-col items-center gap-3">
           <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-          <p className="text-sm text-slate-500">加载审批详情...</p>
+          <p className="text-sm text-slate-500">{t('approval:list.loading')}</p>
         </div>
       </div>
     );

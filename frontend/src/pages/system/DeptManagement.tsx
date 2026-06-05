@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import {
   Building2,
@@ -183,6 +184,7 @@ function DeptTreeNode({
 // ── Main component ─────────────────────────────────────────────────────────────
 
 export default function DeptManagement() {
+  const { t } = useTranslation(['user', 'common']);
   const queryClient = useQueryClient();
   const [keyword, setKeyword] = useState('');
   const [selectedDept, setSelectedDept] = useState<Department | null>(null);
@@ -435,7 +437,7 @@ export default function DeptManagement() {
         <section className="rounded-2xl border border-[var(--surface-border)] bg-white shadow-sm">
           <div className="flex flex-wrap items-center justify-between gap-3 px-6 py-4">
             <div className="flex items-center gap-3">
-              <h1 className="text-xl font-bold text-slate-900">部门管理</h1>
+              <h1 className="text-xl font-bold text-slate-900">{t('user:dept.title')}</h1>
               <span className="inline-flex items-center gap-1.5 rounded-full border border-cyan-200 bg-cyan-50 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-cyan-700">
                 <Building2 className="h-3 w-3" />
                 组织架构
@@ -444,7 +446,7 @@ export default function DeptManagement() {
             <div className="flex items-center gap-2">
               <Button variant="primary" size="md" onClick={() => openCreate()}>
                 <Plus className="w-4 h-4" />
-                新增部门
+                {t('user:dept.actions.create')}
               </Button>
             </div>
           </div>

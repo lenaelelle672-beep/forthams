@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { useNavigate, useLocation, useParams } from 'react-router';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 import {
   Info,
   FileText,
@@ -103,6 +104,7 @@ const sectionHeaderClass = "px-6 py-4 border-b border-[#e5e7eb] flex items-cente
 const sectionIconClass = "inline-flex h-9 w-9 items-center justify-center rounded-xl bg-blue-50 text-[#2563eb]";
 
 export default function WorkOrderFormPage() {
+  const { t } = useTranslation(['workorder', 'common']);
   const navigate = useNavigate();
   const location = useLocation();
   const params = useParams<{ id: string }>();
@@ -222,7 +224,7 @@ export default function WorkOrderFormPage() {
     },
     onSuccess: (res: unknown) => {
       qc.invalidateQueries({ queryKey: ['workorders'] });
-      toast.success(isEdit ? '工单更新成功' : '工单创建成功');
+      toast.success(isEdit ? t('workorder:messages.updateSuccess') : t('workorder:messages.createSuccess'));
       navigate('/workorders');
     },
     onError: (error: Error) => {

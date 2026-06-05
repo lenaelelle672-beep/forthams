@@ -6,6 +6,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { Plus, FileText, Download, Loader2, Clock, AlertTriangle, Shield } from 'lucide-react';
 import { toast } from 'sonner';
 import { getWorkOrderList } from '@/api/workorder';
@@ -60,12 +61,13 @@ const PRIORITY_CONFIG: Record<string, { borderClass: string; badgeClass: string 
 };
 
 export default function WorkOrderListPage() {
+  const { t } = useTranslation(['workorder', 'common']);
   const navigate = useNavigate();
   const [params, setParams] = useState<{ page: number; pageSize: number; keyword?: string; status?: string; slaStatus?: string }>({ page: 1, pageSize: 20 });
   const [exporting, setExporting] = useState(false);
   const { exporting: pdfExporting, exportPdf } = usePdfExport({
     type: 'workorder-summary',
-    filename: '工单统计报表',
+    filename: 'workorder-export',
   });
 
   const { data: res, isLoading } = useQuery({
@@ -81,13 +83,13 @@ export default function WorkOrderListPage() {
   const columns: Column<any>[] = [
     {
       key: 'workOrderNo',
-      title: '工单号',
+      title: t('workorder:columns.workOrderNo'),
       width: 150,
       render: (v) => <span className="font-mono text-xs text-[#3b82f6] font-medium">{String(v)}</span>,
     },
     {
       key: 'title',
-      title: '工单标题',
+      title: t('workorder:columns.title'),
       render: (v, row) => (
         <div>
           <p className="font-medium text-sm text-[#0f172a] line-clamp-1">{String(v)}</p>
@@ -97,7 +99,7 @@ export default function WorkOrderListPage() {
     },
     {
       key: 'priority',
-      title: '优先级',
+      title: t('workorder:columns.priority'),
       width: 80,
       render: (v) => {
         const key = String(v);
@@ -113,7 +115,7 @@ export default function WorkOrderListPage() {
     },
     {
       key: 'status',
-      title: '状态',
+      title: t('workorder:columns.status'),
       width: 110,
       render: (v) => {
         const cfg = STATUS_BADGE[String(v)];
@@ -124,11 +126,11 @@ export default function WorkOrderListPage() {
         );
       },
     },
-    { key: 'reporterName', title: '申请人', width: 80 },
-    { key: 'deptName', title: '部门', width: 100 },
-    {
+    { key: 'reporterName', title: t('workorder:columns.reporterName'), width: 80 },
+    { key: 'deptName', title: t('workorder:columns.deptName'), width: 100 },
+
       key: 'createTime',
-      title: '申请时间',
+      title: t('workorder:columns.createTime'),
       width: 120,
       render: (v) => <span className="text-xs text-[#94a3b8]">{String(v ?? '').substring(0, 10)}</span>,
     },
@@ -137,13 +139,13 @@ export default function WorkOrderListPage() {
   return (
     <div className="p-6 space-y-5">
       <PageHeader
-        title="工单管理"
+        title={t('workorder:list.title')}
         subtitle={
           params.status
-            ? `过滤: ${STATUS_BADGE[params.status]?.label ?? params.status} · 共 ${total} 条`
-            : `共 ${total} 条工单`
+            ? t('workorder:list.filterLabel', { status: STATUS_BADGE[params.status]?.label ?? params.status })
+            : t('workorder:list.subtitle', { total })
         }
-        breadcrumbs={[{ label: '仪表板', href: '/dashboard' }, { label: '工单管理' }]}
+        breadcrumbs={[{ label: t('workorder:title'), href: '/dashboard' }, { label: t('workorder:list.title') }]}
         actions={
           <div className="flex items-center gap-2">
             <Button variant="outline" size="md" disabled={exporting} onClick={async () => {
@@ -194,7 +196,7 @@ export default function WorkOrderListPage() {
               {pdfExporting ? '导出中...' : '导出 PDF'}
             </Button>
             <Button size="md" onClick={() => navigate('/workorders/new')}>
-              <Plus className="w-4 h-4" /> 新建工单
+              <Plus className="w-4 h-4" /> {t('workorder:list.create')}
             </Button>
           </div>
         }
@@ -225,7 +227,7 @@ export default function WorkOrderListPage() {
                   : 'bg-[#f1f5f9] text-[#64748b] hover:bg-[#e2e8f0]'
               }`}
             >
-              全部 SLA
+              {t('workorder:list.slaAll')}
             </button>
             {SLA_STATUS_OPTIONS.map((opt) => (
               <button
@@ -246,21 +248,21 @@ export default function WorkOrderListPage() {
         {(isLoading || !!params.status || !!params.slaStatus) && (
           <div className="px-4 py-2 border-b border-[#e5e7eb] bg-[#f8fbff] flex items-center gap-3 text-xs text-[#64748b]">
             {isLoading ? (
-              <><Loader2 className="w-3 h-3 animate-spin text-[#3b82f6]" /><span>加载中...</span></>
+              <><Loader2 className="w-3 h-3 animate-spin text-[#3b82f6]" /><span>{t('workorder:list.loading')}</span></>
             ) : (
               <>
                 <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#3b82f6]" />
                 <span>
                   {params.status || params.slaStatus
-                    ? `当前筛选：共 ${total} 条结果`
-                    : `共 ${total} 条工单`}
+                    ? t('workorder:list.totalResults', { total })
+                    : t('workorder:list.totalCount', { total })}
                 </span>
                 {(params.status || params.slaStatus) && (
                   <button
                     className="ml-auto text-[#94a3b8] hover:text-[#ef4444] transition-colors"
                     onClick={() => setParams((p) => ({ ...p, status: undefined, slaStatus: undefined, page: 1 }))}
                   >
-                    清除筛选
+                    {t('common:actions.clear') || '清除筛选'}
                   </button>
                 )}
               </>
@@ -277,7 +279,7 @@ export default function WorkOrderListPage() {
             page: params.page, pageSize: params.pageSize, total,
             onChange: (page, pageSize) => setParams((p) => ({ ...p, page, pageSize })),
           }}
-          emptyText="暂无工单记录"
+          emptyText={t('workorder:list.emptyText')}
         />
       </MagicCard>
     </div>

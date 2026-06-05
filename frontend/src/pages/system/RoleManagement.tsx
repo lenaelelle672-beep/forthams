@@ -6,6 +6,7 @@
 
 import React, { useState, useCallback, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import {
   Plus,
@@ -604,6 +605,7 @@ function DeptAssignDialog({
 
 // ─── 主组件 ───────────────────────────────────────────────────────────────────
 export default function RoleManagement() {
+  const { t } = useTranslation(['user', 'common']);
   const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
   const [pageSize] = useState(20);
@@ -755,7 +757,7 @@ export default function RoleManagement() {
         <section className="rounded-2xl border border-[var(--surface-border)] bg-white shadow-sm">
           <div className="flex flex-wrap items-center justify-between gap-3 px-6 py-4">
             <div className="flex items-center gap-3">
-              <h1 className="text-xl font-bold text-slate-900">角色管理</h1>
+              <h1 className="text-xl font-bold text-slate-900">{t('user:role.title')}</h1>
               <span className="inline-flex items-center gap-1.5 rounded-full border border-violet-200 bg-violet-50 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-violet-700">
                 <Shield className="h-3 w-3" />
                 RBAC
@@ -764,7 +766,7 @@ export default function RoleManagement() {
             <div className="flex items-center gap-2">
               <Button variant="primary" size="md" onClick={handleNew}>
                 <Plus className="w-4 h-4" />
-                新增角色
+                {t('user:role.actions.create')}
               </Button>
             </div>
           </div>

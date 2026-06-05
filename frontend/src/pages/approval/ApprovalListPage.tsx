@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import {
   ClipboardCheck,
@@ -155,6 +156,7 @@ const STAT_CARD_DEFS: StatCardDef[] = [
 ];
 
 export default function ApprovalListPage() {
+  const { t } = useTranslation(['approval', 'common']);
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<ApprovalTab>('pending');
   const [filterType, setFilterType] = useState('all');
@@ -388,7 +390,7 @@ export default function ApprovalListPage() {
     activeFilterChips.push({ key: 'type', label: opt?.label ?? filterType, clearFn: () => { setFilterType('all'); setPage(1); } });
   }
   if (filterStatus !== 'all') {
-    const statusLabelMap: Record<string, string> = { pending: '审批中', approved: '已通过', rejected: '已驳回' };
+    const statusLabelMap: Record<string, string> = { pending: t('approval:statusOptions.PENDING'), approved: t('approval:statusOptions.APPROVED'), rejected: t('approval:statusOptions.REJECTED') };
     activeFilterChips.push({ key: 'status', label: statusLabelMap[filterStatus] ?? filterStatus, clearFn: () => { setFilterStatus('all'); setPage(1); } });
   }
   if (startDate) {
@@ -635,8 +637,8 @@ export default function ApprovalListPage() {
           {isError && !isLoading && (
             <div className="flex flex-col items-center justify-center gap-3 py-16 text-sm text-slate-500">
               <XCircle className="h-8 w-8 text-red-500" />
-              <p className="font-semibold text-red-600">加载审批数据失败，请重试</p>
-              <Button variant="outline" onClick={() => refetch()}>重新加载</Button>
+              <p className="font-semibold text-red-600">{t('approval:messages.loadFailed')}</p>
+              <Button variant="outline" onClick={() => refetch()}>{t('common:actions.refresh')}</Button>
             </div>
           )}
 
@@ -658,7 +660,7 @@ export default function ApprovalListPage() {
                   total,
                   onChange: (p) => setPage(p),
                 }}
-                emptyText="暂无审批数据，试试调整搜索、状态或日期筛选"
+                emptyText={t('approval:list.emptyText')}
               />
             </div>
           )}
@@ -675,7 +677,7 @@ export default function ApprovalListPage() {
             {workflowsLoading ? (
               <div className="flex items-center justify-center gap-2 py-8 text-sm text-slate-500">
                 <Loader2 className="h-4 w-4 animate-spin" />
-                加载中...
+                {t('approval:list.loading')}
               </div>
             ) : workflowsError ? (
               <div className="py-8 text-center text-sm text-red-500">

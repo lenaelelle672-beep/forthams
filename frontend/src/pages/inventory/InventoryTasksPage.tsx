@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import {
   Plus,
   RefreshCw,
@@ -285,6 +286,7 @@ interface StatCardDef {
 // ── 主组件 ───────────────────────────────────────────────────────────────────
 
 export default function InventoryTasksPage() {
+  const { t } = useTranslation(['inventory', 'common']);
   const navigate = useNavigate();
   const qc = useQueryClient();
 
@@ -444,7 +446,7 @@ export default function InventoryTasksPage() {
     },
     {
       key: 'taskName',
-      title: '盘点任务',
+      title: t('inventory:title'),
       render: (_, row) => {
         const deficit = getTaskDeficit(row);
         const surplus = getTaskSurplus(row);
@@ -523,7 +525,7 @@ export default function InventoryTasksPage() {
     },
     {
       key: 'status',
-      title: '状态',
+      title: t('inventory:taskList.columns.status'),
       width: 110,
       render: (v) => <TaskStatusBadge status={(v as InventoryTaskStatus) ?? 'draft'} />,
     },
@@ -603,7 +605,7 @@ export default function InventoryTasksPage() {
         <section className="rounded-2xl border border-[var(--surface-border)] bg-white shadow-sm">
           <div className="flex flex-wrap items-center justify-between gap-3 px-6 py-4">
             <div className="flex items-center gap-3">
-              <h1 className="text-xl font-bold text-slate-900">资产盘点管理</h1>
+              <h1 className="text-xl font-bold text-slate-900">{t('inventory:title')}</h1>
               <span className="inline-flex items-center gap-1.5 rounded-full border border-blue-200 bg-blue-50 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-blue-700">
                 <Radio className="h-3 w-3" />
                 RFID
@@ -615,7 +617,7 @@ export default function InventoryTasksPage() {
             </div>
             <Button size="md" onClick={() => setCreateOpen(true)}>
               <Plus className="h-4 w-4" />
-              新建盘点任务
+              {t('inventory:taskList.createTaskBtn')}
             </Button>
           </div>
 
@@ -706,16 +708,16 @@ export default function InventoryTasksPage() {
                       onClick={() => setFilterOpen((v) => !v)}
                     >
                       <Filter className="h-3.5 w-3.5" />
-                      筛选
+                       筛选
                     </Button>
                     <Button variant="outline" size="sm" onClick={handleExportCSV}>
                       <Download className="h-3.5 w-3.5" />
-                      导出
+                       {t('common:actions.export')}
                     </Button>
                     <Button size="sm" onClick={() => setCreateOpen(true)}>
                       <Plus className="h-3.5 w-3.5" />
-                      新建
-                    </Button>
+                       {t('inventory:taskList.createTaskBtn')}
+                     </Button>
                   </div>
                 </div>
 
@@ -880,7 +882,7 @@ export default function InventoryTasksPage() {
                           <span className="text-slate-300">|</span>
                           <span className="font-semibold text-amber-700">
                             <AlertTriangle className="mr-0.5 inline h-3.5 w-3.5" />
-                            差异 {deficitAssets} 项
+                            {t('inventory:progressSummary.statsCards.deficitAssets')} {deficitAssets} 项
                           </span>
                         </>
                       )}
@@ -977,7 +979,7 @@ export default function InventoryTasksPage() {
                     onChange: (page, pageSize) =>
                       setParams((p) => ({ ...p, page, pageSize })),
                   }}
-                  emptyText="暂无盘点任务，点击「新建」开始创建"
+                  emptyText={t('inventory:taskList.emptyState')}
                 />
               </div>
             </Card>
@@ -1040,7 +1042,7 @@ export default function InventoryTasksPage() {
                 variant="outline"
                 onClick={() => setCreateOpen(false)}
               >
-                取消
+                {t('common:actions.cancel')}
               </Button>
               <Button
                 disabled={!newTask.taskName?.trim()}
@@ -1053,7 +1055,7 @@ export default function InventoryTasksPage() {
                   } as any)
                 }
               >
-                创建任务
+                {t('inventory:createTaskModal.actions.confirm')}
               </Button>
             </DialogFooter>
           </DialogContent>

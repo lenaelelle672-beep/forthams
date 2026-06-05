@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 import {
   Building2,
   Eye,
@@ -94,6 +95,7 @@ function toggleSetValue(set: Set<number>, value: number) {
 }
 
 export default function UserManagement() {
+  const { t } = useTranslation(['user', 'common']);
   const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
   const [keyword, setKeyword] = useState('');
@@ -167,8 +169,8 @@ export default function UserManagement() {
         await assignUserPosts(editingUser.id, Array.from(form.postIds));
         return updated;
       }
-      if (!form.username.trim()) throw new Error('用户名不能为空');
-      if (!form.password.trim()) throw new Error('初始密码不能为空');
+      if (!form.username.trim()) throw new Error(t('user:messages.usernameRequired'));
+      if (!form.password.trim()) throw new Error(t('user:messages.passwordRequired'));
       const created = await createUser({
         ...payload,
         username: form.username.trim(),
@@ -178,36 +180,36 @@ export default function UserManagement() {
       return created;
     },
     onSuccess: () => {
-      toast.success(editingUser ? '用户更新成功' : '用户创建成功');
+      toast.success(editingUser ? t('user:messages.updateSuccess') : t('user:messages.createSuccess'));
       queryClient.invalidateQueries({ queryKey: ['users'] });
       closeForm();
     },
-    onError: (err: Error) => toast.error(err.message || '保存失败'),
+    onError: (err: Error) => toast.error(err.message || t('user:messages.saveFailed')),
   });
 
   const deleteMut = useMutation({
     mutationFn: deleteUser,
     onSuccess: () => {
-      toast.success('用户已删除');
+      toast.success(t('user:messages.deleteSuccess'));
       queryClient.invalidateQueries({ queryKey: ['users'] });
       setDeleteTarget(null);
     },
-    onError: (err: Error) => toast.error(err.message || '删除失败'),
+    onError: (err: Error) => toast.error(err.message || t('user:messages.deleteFailed')),
   });
 
   const resetPasswordMut = useMutation({
     mutationFn: resetPassword,
-    onSuccess: () => toast.success('密码已重置为 123456'),
-    onError: (err: Error) => toast.error(err.message || '重置密码失败'),
+    onSuccess: () => toast.success(t('user:messages.passwordReset')),
+    onError: (err: Error) => toast.error(err.message || t('user:messages.passwordResetFailed')),
   });
 
   const statusMut = useMutation({
     mutationFn: ({ id, nextStatus }: { id: number; nextStatus: number }) => updateUserStatus(id, nextStatus),
     onSuccess: () => {
-      toast.success('用户状态已更新');
+      toast.success(t('user:messages.statusUpdated'));
       queryClient.invalidateQueries({ queryKey: ['users'] });
     },
-    onError: (err: Error) => toast.error(err.message || '状态更新失败'),
+    onError: (err: Error) => toast.error(err.message || t('user:messages.statusUpdateFailed')),
   });
 
   function openCreate() {
@@ -269,17 +271,17 @@ export default function UserManagement() {
 
   /* ── Stat bar definitions ── */
   const statCards = [
-    { label: '用户总量', value: total, icon: Users, gradient: 'from-blue-600 to-cyan-500' },
-    { label: '角色数', value: roles.length, icon: Shield, gradient: 'from-violet-500 to-purple-400' },
-    { label: '岗位数', value: posts.length, icon: Briefcase, gradient: 'from-emerald-500 to-teal-400' },
-    { label: '总页数', value: totalPages, icon: RefreshCw, gradient: 'from-amber-500 to-orange-400' },
+    { label: t('user:stats.totalUsers'), value: total, icon: Users, gradient: 'from-blue-600 to-cyan-500' },
+    { label: t('user:stats.roleCount'), value: roles.length, icon: Shield, gradient: 'from-violet-500 to-purple-400' },
+    { label: t('user:stats.postCount'), value: posts.length, icon: Briefcase, gradient: 'from-emerald-500 to-teal-400' },
+    { label: t('user:stats.totalPages'), value: totalPages, icon: RefreshCw, gradient: 'from-amber-500 to-orange-400' },
   ];
 
   /* ── DataTable columns ── */
   const columns: Column<UserItem>[] = [
     {
       key: 'realName',
-      title: '用户',
+      title: t('user:columns.user'),
       render: (_, row) => (
         <div className="flex items-center gap-3">
           <div className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-50 text-xs font-bold text-blue-600">
@@ -294,7 +296,7 @@ export default function UserManagement() {
     },
     {
       key: 'email',
-      title: '邮箱/手机号',
+      title: t('user:columns.emailPhone'),
       render: (_, row) => (
         <div>
           <div className="text-sm text-slate-600">{row.email || '—'}</div>
@@ -304,17 +306,17 @@ export default function UserManagement() {
     },
     {
       key: 'deptName',
-      title: '部门',
+      title: t('user:columns.department'),
       render: (_, row) => (
         <span className="inline-flex items-center gap-1.5 text-sm text-slate-600">
           <Building2 className="h-3.5 w-3.5 text-slate-400" />
-          {row.deptName || (row.deptId ? deptNameById.get(row.deptId) || `部门#${row.deptId}` : '未分配')}
+          {row.deptName || (row.deptId ? deptNameById.get(row.deptId) || `部门#${row.deptId}` : t('user:unassigned'))}
         </span>
       ),
     },
     {
       key: 'status',
-      title: '状态',
+      title: t('user:columns.status'),
       width: 100,
       render: (_, row) => (
         <button
@@ -327,19 +329,19 @@ export default function UserManagement() {
           }`}
         >
           <span className={`h-1.5 w-1.5 rounded-full ${row.status === 1 ? 'bg-emerald-400' : 'bg-red-400'}`} />
-          {row.status === 1 ? '正常' : '停用'}
+          {row.status === 1 ? t('user:statusNormal') : t('user:statusDisabled')}
         </button>
       ),
     },
     {
       key: 'createTime',
-      title: '创建时间',
+      title: t('user:columns.createTime'),
       width: 160,
       render: (v) => <span className="text-xs text-slate-400">{formatTime(v as string)}</span>,
     },
     {
       key: 'actions',
-      title: '操作',
+      title: t('user:columns.actions'),
       width: 260,
       render: (_, row) => (
         <div className="flex flex-wrap items-center gap-1.5">
@@ -347,25 +349,25 @@ export default function UserManagement() {
             className="inline-flex h-7 items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 text-xs font-medium text-slate-600 transition hover:border-blue-200 hover:text-blue-600"
             onClick={() => setDetailUserId(row.id)}
           >
-            <Eye className="h-3.5 w-3.5" />详情
+            <Eye className="h-3.5 w-3.5" />{t('user:actions.detail')}
           </button>
           <button
             className="inline-flex h-7 items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 text-xs font-medium text-slate-600 transition hover:border-blue-200 hover:text-blue-600"
             onClick={() => openEdit(row)}
           >
-            <Pencil className="h-3.5 w-3.5" />编辑
+            <Pencil className="h-3.5 w-3.5" />{t('user:actions.edit')}
           </button>
           <span className="mx-0.5 h-4 w-px bg-slate-200" />
           <button
             className="inline-flex h-7 items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 text-xs font-medium text-amber-600 transition hover:border-amber-200 hover:bg-amber-50"
             onClick={() => resetPasswordMut.mutate(row.id)}
           >
-            <KeyRound className="h-3.5 w-3.5" />重置
+            <KeyRound className="h-3.5 w-3.5" />{t('user:actions.resetPassword')}
           </button>
           <button
             className="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-slate-200 text-slate-400 transition hover:border-red-200 hover:text-red-500"
             onClick={() => setDeleteTarget(row)}
-            title="删除"
+            title={t('user:actions.delete')}
           >
             <Trash2 className="h-3.5 w-3.5" />
           </button>
@@ -381,16 +383,16 @@ export default function UserManagement() {
         <section className="rounded-2xl border border-[var(--surface-border)] bg-white shadow-sm">
           <div className="flex flex-wrap items-center justify-between gap-3 px-6 py-4">
             <div className="flex items-center gap-3">
-              <h1 className="text-xl font-bold text-slate-900">用户管理</h1>
+              <h1 className="text-xl font-bold text-slate-900">{t('user:title')}</h1>
               <span className="inline-flex items-center gap-1.5 rounded-full border border-blue-200 bg-blue-50 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-blue-700">
                 <Users className="h-3 w-3" />
-                用户
+                {t('user:columns.user')}
               </span>
             </div>
             <div className="flex items-center gap-2">
               <Button variant="primary" size="md" onClick={openCreate}>
                 <Plus className="w-4 h-4" />
-                新增用户
+                {t('user:actions.create')}
               </Button>
             </div>
           </div>
@@ -422,10 +424,10 @@ export default function UserManagement() {
               <div>
                 <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.15em] text-blue-600">
                   <Search className="h-3.5 w-3.5" />
-                  用户列表
+                  {t('user:sectionTitle')}
                 </div>
                 <h2 className="mt-1 text-lg font-bold text-slate-900">
-                  账号与权限管理
+                  {t('user:subtitle')}
                 </h2>
               </div>
             </div>
@@ -441,7 +443,7 @@ export default function UserManagement() {
                     : 'border-slate-200 bg-white text-slate-600 hover:border-blue-200 hover:text-blue-700'
                 }`}
               >
-                全部
+                {t('common:status.all')}
                 <span className="ml-1 rounded-full bg-white/20 px-1.5 py-0 text-[10px]">
                   {total}
                 </span>
@@ -455,8 +457,8 @@ export default function UserManagement() {
                     : 'border-slate-200 bg-white text-slate-600 hover:border-emerald-200 hover:text-emerald-700'
                 }`}
               >
-                <span className={`h-1.5 w-1.5 rounded-full ${status === '1' ? 'bg-white' : 'bg-emerald-400'}`} />
-                正常
+                <span className={`h-1.5 w-1.5 rounded-full ${status === '1' ? 'bg-white' : 'bg-emerald-400'}`}                 />
+                {t('user:statusNormal')}
                 <span className={`ml-0.5 rounded-full px-1.5 py-0 text-[10px] ${
                   status === '1' ? 'bg-white/20 text-white' : 'bg-emerald-50 text-emerald-600'
                 }`}>
@@ -472,8 +474,8 @@ export default function UserManagement() {
                     : 'border-slate-200 bg-white text-slate-600 hover:border-red-200 hover:text-red-700'
                 }`}
               >
-                <span className={`h-1.5 w-1.5 rounded-full ${status === '0' ? 'bg-white' : 'bg-red-400'}`} />
-                停用
+                <span className={`h-1.5 w-1.5 rounded-full ${status === '0' ? 'bg-white' : 'bg-red-400'}`}                 />
+                {t('user:statusDisabled')}
                 <span className={`ml-0.5 rounded-full px-1.5 py-0 text-[10px] ${
                   status === '0' ? 'bg-white/20 text-white' : 'bg-red-50 text-red-600'
                 }`}>
@@ -489,7 +491,7 @@ export default function UserManagement() {
                 <input
                   value={keyword}
                   onChange={(event) => { setKeyword(event.target.value); setPage(1); }}
-                  placeholder="搜索用户名、姓名、邮箱或手机号"
+                  placeholder={t('user:filter.searchPlaceholder')}
                   className="h-9 w-full rounded-lg border border-slate-200 bg-white pl-9 pr-3 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
                 />
               </div>
@@ -498,7 +500,7 @@ export default function UserManagement() {
                 onChange={(event) => { setDeptId(event.target.value); setPage(1); }}
                 className="h-9 rounded-lg border border-slate-200 bg-white px-3 text-sm outline-none focus:border-blue-400"
               >
-                <option value="">全部部门</option>
+                <option value="">{t('user:filter.allDept')}</option>
                 {depts.map((dept) => (
                   <option key={dept.id} value={dept.id}>{'—'.repeat(dept.level)} {getDeptName(dept)}</option>
                 ))}
@@ -507,7 +509,7 @@ export default function UserManagement() {
                 className="text-xs font-bold text-blue-600 hover:underline"
                 onClick={() => { setKeyword(''); setDeptId(''); setStatus(''); setPage(1); }}
               >
-                重置
+                {t('common:actions.reset')}
               </button>
             </div>
           </div>
@@ -517,12 +519,12 @@ export default function UserManagement() {
             {(status !== '' || deptId !== '' || keyword.trim()) && (
               <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-bold text-blue-700">
                 <Filter className="h-3 w-3" />
-                筛选中
+                {t('user:filter.searching')}
               </span>
             )}
             <span className="text-xs text-slate-500">
-              共 <span className="font-bold text-slate-700">{total}</span> 条用户
-              {' · '}本页 <span className="font-bold text-slate-700">{users.length}</span> 条
+              {t('user:filter.totalUsers', { total })}
+              {' · '}{t('user:filter.pageUsers', { count: users.length })}
             </span>
             {status !== '' && (
               <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-semibold ${
@@ -530,7 +532,7 @@ export default function UserManagement() {
                   ? 'border-emerald-200/60 bg-emerald-50 text-emerald-700'
                   : 'border-red-200/60 bg-red-50 text-red-600'
               }`}>
-                状态: {status === '1' ? '正常' : '停用'}
+                {t('user:filter.statusColon')}: {status === '1' ? t('user:statusNormal') : t('user:statusDisabled')}
               </span>
             )}
             {deptId !== '' && (
@@ -541,7 +543,7 @@ export default function UserManagement() {
             )}
             {keyword.trim() && (
               <span className="inline-flex items-center gap-1 rounded-full border border-amber-200/60 bg-amber-50 px-2 py-0.5 text-[11px] font-semibold text-amber-700">
-                搜索: {keyword.trim()}
+                {t('user:filter.searchColon')}: {keyword.trim()}
               </span>
             )}
           </div>
@@ -559,7 +561,7 @@ export default function UserManagement() {
                 total,
                 onChange: (p) => setPage(p),
               }}
-              emptyText="暂无用户数据，可调整筛选或新建用户"
+              emptyText={t('user:messages.noUsers')}
             />
           </div>
         </Card>
@@ -567,44 +569,44 @@ export default function UserManagement() {
 
       {/* ── Create / Edit Dialog ── */}
       <Dialog open={showForm} onOpenChange={(v) => { if (!v) closeForm(); }}>
-        <DialogContent title={editingUser ? '编辑用户' : '新增用户'} className="max-w-3xl max-h-[90vh] overflow-y-auto">
+        <DialogContent title={editingUser ? t('user:dialog.editUser') : t('user:dialog.createUser')} className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <form onSubmit={submitForm} className="space-y-5 p-6">
             <div className="grid grid-cols-2 gap-4">
-              <Input label="用户名 *" value={form.username} disabled={!!editingUser} onChange={(e) => setForm((p) => ({ ...p, username: e.target.value }))} required />
+              <Input label={`${t('user:form.username')} *`} value={form.username} disabled={!!editingUser} onChange={(e) => setForm((p) => ({ ...p, username: e.target.value }))} required />
               {!editingUser ? (
-                <Input label="初始密码 *" type="password" value={form.password} onChange={(e) => setForm((p) => ({ ...p, password: e.target.value }))} required />
+                <Input label={`${t('user:form.password')} *`} type="password" value={form.password} onChange={(e) => setForm((p) => ({ ...p, password: e.target.value }))} required />
               ) : (
-                <Input label="账号 ID" value={String(editingUser.id)} disabled />
+                <Input label={t('user:form.accountId')} value={String(editingUser.id)} disabled />
               )}
             </div>
             <div className="grid grid-cols-2 gap-4">
-              <Input label="真实姓名" value={form.realName} onChange={(e) => setForm((p) => ({ ...p, realName: e.target.value }))} />
-              <Input label="邮箱" type="email" value={form.email} onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))} />
+              <Input label={t('user:form.realName')} value={form.realName} onChange={(e) => setForm((p) => ({ ...p, realName: e.target.value }))} />
+              <Input label={t('user:form.email')} type="email" value={form.email} onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))} />
             </div>
             <div className="grid grid-cols-3 gap-4">
-              <Input label="手机号" value={form.phone} onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))} />
+              <Input label={t('user:form.phone')} value={form.phone} onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))} />
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-medium text-slate-700">部门</label>
+                <label className="text-sm font-medium text-slate-700">{t('user:form.department')}</label>
                 <select value={form.deptId} onChange={(e) => setForm((p) => ({ ...p, deptId: e.target.value }))} className="h-9 rounded-lg border border-slate-200 bg-white px-3 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100">
-                  <option value="">未分配</option>
+                  <option value="">{t('user:unassigned')}</option>
                   {depts.map((dept) => (
                     <option key={dept.id} value={dept.id}>{'—'.repeat(dept.level)} {getDeptName(dept)}</option>
                   ))}
                 </select>
               </div>
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-medium text-slate-700">状态</label>
+                <label className="text-sm font-medium text-slate-700">{t('user:form.status')}</label>
                 <select value={form.status} onChange={(e) => setForm((p) => ({ ...p, status: Number(e.target.value) }))} className="h-9 rounded-lg border border-slate-200 bg-white px-3 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100">
-                  <option value={1}>正常</option>
-                  <option value={0}>停用</option>
+                  <option value={1}>{t('user:statusNormal')}</option>
+                  <option value={0}>{t('user:statusDisabled')}</option>
                 </select>
               </div>
             </div>
-            <Input label="备注" value={form.remark} onChange={(e) => setForm((p) => ({ ...p, remark: e.target.value }))} />
+            <Input label={t('user:form.remark')} value={form.remark} onChange={(e) => setForm((p) => ({ ...p, remark: e.target.value }))} />
 
             <div className="grid grid-cols-2 gap-4">
               <div className="rounded-xl border border-slate-200 p-4">
-                <p className="mb-3 text-sm font-semibold text-slate-700">角色分配</p>
+                <p className="mb-3 text-sm font-semibold text-slate-700">{t('user:assign.roleLabel')}</p>
                 <div className="max-h-48 space-y-2 overflow-y-auto">
                   {roles.map((role) => (
                     <label key={role.id} className="flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 hover:bg-slate-50">
@@ -613,11 +615,11 @@ export default function UserManagement() {
                       <span className="text-xs text-slate-400">{role.roleCode}</span>
                     </label>
                   ))}
-                  {roles.length === 0 && <p className="text-sm text-slate-400">暂无角色</p>}
+                  {roles.length === 0 && <p className="text-sm text-slate-400">{t('user:messages.noRole')}</p>}
                 </div>
               </div>
               <div className="rounded-xl border border-slate-200 p-4">
-                <p className="mb-3 text-sm font-semibold text-slate-700">岗位分配</p>
+                <p className="mb-3 text-sm font-semibold text-slate-700">{t('user:assign.postLabel')}</p>
                 <div className="max-h-48 space-y-2 overflow-y-auto">
                   {posts.map((post) => (
                     <label key={post.id} className="flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 hover:bg-slate-50">
@@ -626,16 +628,16 @@ export default function UserManagement() {
                       <span className="text-xs text-slate-400">{post.postCode}</span>
                     </label>
                   ))}
-                  {posts.length === 0 && <p className="text-sm text-slate-400">暂无岗位</p>}
+                  {posts.length === 0 && <p className="text-sm text-slate-400">{t('user:messages.noPost')}</p>}
                 </div>
               </div>
             </div>
 
             <div className="flex justify-end gap-2 border-t border-slate-100 pt-4">
               <DialogClose asChild>
-                <Button type="button" variant="secondary">取消</Button>
+                <Button type="button" variant="secondary">{t('common:actions.cancel')}</Button>
               </DialogClose>
-              <Button type="submit" variant="primary" loading={saveUserMut.isPending}>{editingUser ? '保存修改' : '确认新增'}</Button>
+              <Button type="submit" variant="primary" loading={saveUserMut.isPending}>{editingUser ? t('user:button.saveUpdate') : t('user:button.confirmCreate')}</Button>
             </div>
           </form>
         </DialogContent>
@@ -643,22 +645,22 @@ export default function UserManagement() {
 
       {/* ── User Detail Dialog ── */}
       <Dialog open={detailUserId != null} onOpenChange={(v) => { if (!v) setDetailUserId(null); }}>
-        <DialogContent title="用户详情" className="max-w-2xl">
+        <DialogContent title={t('user:dialog.userDetail')} className="max-w-2xl">
           <div className="p-6">
             {detailLoading ? (
               <div className="py-10 text-center text-sm text-slate-400">
                 <RefreshCw className="mx-auto mb-2 h-5 w-5 animate-spin" />
-                加载中...
+                {t('user:messages.loading')}
               </div>
             ) : detail ? (
               <UserDetailPanel detail={detail} deptName={detail.deptName || (detail.deptId ? deptNameById.get(detail.deptId) : undefined)} />
             ) : (
-              <div className="py-10 text-center text-sm text-slate-400">未找到用户详情</div>
+              <div className="py-10 text-center text-sm text-slate-400">{t('user:messages.noDetail')}</div>
             )}
           </div>
           <div className="flex justify-end border-t border-slate-100 px-6 py-4">
             <DialogClose asChild>
-              <Button variant="secondary" onClick={() => setDetailUserId(null)}>关闭</Button>
+              <Button variant="secondary" onClick={() => setDetailUserId(null)}>{t('common:actions.close')}</Button>
             </DialogClose>
           </div>
         </DialogContent>
@@ -666,18 +668,18 @@ export default function UserManagement() {
 
       {/* ── Delete Confirmation Dialog ── */}
       <Dialog open={deleteTarget != null} onOpenChange={(v) => { if (!v) setDeleteTarget(null); }}>
-        <DialogContent title="确认删除用户">
+        <DialogContent title={t('user:dialog.deleteConfirmTitle')}>
           <div className="p-6">
             <p className="text-sm text-slate-600">
-              确定要删除「<strong className="text-slate-900">{deleteTarget?.realName || deleteTarget?.username}</strong>」吗？此操作不可撤销。
+              {t('user:messages.deleteConfirmWithName', { name: deleteTarget?.realName || deleteTarget?.username })}
             </p>
           </div>
           <div className="flex justify-end gap-2 border-t border-slate-100 px-6 py-4">
             <DialogClose asChild>
-              <Button variant="secondary" onClick={() => setDeleteTarget(null)}>取消</Button>
+              <Button variant="secondary" onClick={() => setDeleteTarget(null)}>{t('common:actions.cancel')}</Button>
             </DialogClose>
             <Button variant="destructive" loading={deleteMut.isPending} onClick={() => deleteTarget && deleteMut.mutate(deleteTarget.id)}>
-              确认删除
+              {t('user:button.confirmDelete')}
             </Button>
           </div>
         </DialogContent>
@@ -687,24 +689,25 @@ export default function UserManagement() {
 }
 
 function UserDetailPanel({ detail, deptName }: { detail: UserDetail; deptName?: string }) {
+  const { t } = useTranslation(['user', 'common']);
   const fields = [
-    ['用户名', detail.username],
-    ['真实姓名', detail.realName || '—'],
-    ['邮箱', detail.email || '—'],
-    ['手机号', detail.phone || '—'],
-    ['所属部门', deptName || (detail.deptId ? `部门#${detail.deptId}` : '未分配')],
-    ['状态', detail.status === 1 ? '正常' : '停用'],
-    ['最后登录 IP', detail.loginIp || '—'],
-    ['最后登录时间', formatTime(detail.loginDate)],
-    ['创建时间', formatTime(detail.createTime)],
-    ['更新时间', formatTime(detail.updateTime)],
-    ['备注', detail.remark || '—'],
+    [t('user:detail.username'), detail.username],
+    [t('user:detail.realName'), detail.realName || '—'],
+    [t('user:detail.email'), detail.email || '—'],
+    [t('user:detail.phone'), detail.phone || '—'],
+    [t('user:detail.dept'), deptName || (detail.deptId ? `${t('user:unassigned')}#${detail.deptId}` : t('user:unassigned'))],
+    [t('user:detail.status'), detail.status === 1 ? t('user:statusNormal') : t('user:statusDisabled')],
+    [t('user:detail.loginIp'), detail.loginIp || '—'],
+    [t('user:detail.loginDate'), formatTime(detail.loginDate)],
+    [t('user:detail.createTime'), formatTime(detail.createTime)],
+    [t('user:detail.updateTime'), formatTime(detail.updateTime)],
+    [t('user:detail.remark'), detail.remark || '—'],
   ];
   return (
     <div className="space-y-5">
       <div className="grid grid-cols-2 gap-3">
-        {fields.map(([label, value]) => (
-          <div key={label} className="rounded-xl border border-slate-100 bg-slate-50/50 p-3">
+        {fields.map(([label, value], idx) => (
+          <div key={idx} className="rounded-xl border border-slate-100 bg-slate-50/50 p-3">
             <p className="text-xs text-slate-400">{label}</p>
             <p className="mt-1 text-sm font-medium text-slate-900">{value}</p>
           </div>
@@ -712,21 +715,21 @@ function UserDetailPanel({ detail, deptName }: { detail: UserDetail; deptName?: 
       </div>
       <div className="grid grid-cols-2 gap-4">
         <div className="rounded-xl border border-slate-200 p-4">
-          <p className="mb-2 text-sm font-semibold text-slate-700">角色</p>
+          <p className="mb-2 text-sm font-semibold text-slate-700">{t('user:detailSection.role')}</p>
           <div className="flex flex-wrap gap-2">
             {(detail.roles ?? []).map((role) => (
               <span key={role.id} className="inline-flex items-center gap-1 rounded-full border border-blue-200 bg-blue-50 px-2 py-0.5 text-xs font-semibold text-blue-700">{role.roleName}</span>
             ))}
-            {(detail.roles ?? []).length === 0 && <span className="text-sm text-slate-400">暂无角色</span>}
+            {(detail.roles ?? []).length === 0 && <span className="text-sm text-slate-400">{t('user:messages.noRole')}</span>}
           </div>
         </div>
         <div className="rounded-xl border border-slate-200 p-4">
-          <p className="mb-2 text-sm font-semibold text-slate-700">岗位 ID</p>
+          <p className="mb-2 text-sm font-semibold text-slate-700">{t('user:detailSection.postId')}</p>
           <div className="flex flex-wrap gap-2">
             {(detail.postIds ?? []).map((postId) => (
-              <span key={postId} className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-700">岗位#{postId}</span>
+              <span key={postId} className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-700">{t('user:detailSection.postId')}#{postId}</span>
             ))}
-            {(detail.postIds ?? []).length === 0 && <span className="text-sm text-slate-400">暂无岗位</span>}
+            {(detail.postIds ?? []).length === 0 && <span className="text-sm text-slate-400">{t('user:messages.noPost')}</span>}
           </div>
         </div>
       </div>

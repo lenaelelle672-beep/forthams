@@ -19,6 +19,9 @@ import { AuthProvider } from '@/app/context/AuthContext';
 import router from '@/router/index';
 import './styles/index.css';
 
+// i18n 初始化（确保在 React 渲染前完成）
+import './i18n';
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {

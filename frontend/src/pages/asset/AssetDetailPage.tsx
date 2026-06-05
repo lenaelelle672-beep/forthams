@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import {
   AreaChart, Area, ResponsiveContainer, XAxis, YAxis, Tooltip,
   PieChart, Pie, Cell, BarChart, Bar, LineChart, Line,
@@ -43,6 +44,7 @@ function formatDate(value: string | undefined | null): string {
 }
 
 export default function AssetDetailPage() {
+  const { t } = useTranslation('asset');
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const qc = useQueryClient();
@@ -53,11 +55,11 @@ export default function AssetDetailPage() {
     mutationFn: () => deleteAsset(Number(id!)),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['assets'] });
-      toast.success('资产删除成功');
+      toast.success(t('detail.deleteSuccess'));
       navigate('/assets');
     },
     onError: (err: Error) => {
-      setDeleteError(err.message || '删除失败');
+      setDeleteError(err.message || t('detail.deleteFailed'));
       setShowDeleteConfirm(false);
     },
   });
@@ -149,12 +151,12 @@ export default function AssetDetailPage() {
       <div className="p-6 flex flex-col items-center justify-center min-h-[400px] gap-4">
         <FileQuestion className="w-12 h-12 text-[#94a3b8] dark:text-gray-500" />
         <p className="text-[#64748b] dark:text-gray-400">
-          {error instanceof Error ? error.message : '未找到资产信息'}
+          {error instanceof Error ? error.message : t('detail.deleteFailed')}
         </p>
         <div className="flex gap-3">
           <Button variant="outline" size="md" onClick={() => navigate('/assets')}>
             <ArrowLeft className="w-4 h-4" />
-            返回列表
+            {t('detail.buttons.back')}
           </Button>
         </div>
       </div>
@@ -176,7 +178,7 @@ export default function AssetDetailPage() {
               </button>
               <div className="flex flex-col gap-1">
                 <div className="flex items-center gap-3">
-                  <h1 className="text-2xl font-bold text-[#0f172a] dark:text-gray-100 tracking-tight">资产详情</h1>
+                  <h1 className="text-2xl font-bold text-[#0f172a] dark:text-gray-100 tracking-tight">{t('detail.title')}</h1>
                   <div className="flex items-center gap-2 ml-3">
                     <StatusBadge status={asset.status} size="lg" />
                   </div>
@@ -194,7 +196,7 @@ export default function AssetDetailPage() {
                 className="hover:bg-[#004ac6]/5 hover:border-[#dbe1ff] dark:border-blue-800 hover:text-[#004ac6] transition-all font-medium shadow-sm"
               >
                 <Edit className="w-4 h-4 mr-2" />
-                编辑资产
+                {t('detail.buttons.edit')}
               </Button>
               <Button
                 variant="destructive"
@@ -204,7 +206,7 @@ export default function AssetDetailPage() {
                 className="bg-[#dc2626] hover:bg-[#b91c1c] transition-all font-medium shadow-sm"
               >
                 <Trash2 className="w-4 h-4 mr-2" />
-                {deleteMutation.isPending ? '删除中...' : '删除资产'}
+                {deleteMutation.isPending ? t('common:actions.deleting') || '删除中...' : t('detail.buttons.delete')}
               </Button>
             </div>
           </div>
@@ -304,12 +306,12 @@ export default function AssetDetailPage() {
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-lg font-bold flex items-center gap-2 text-[#0f172a] dark:text-gray-100">
                 <Info className="w-5 h-5 text-[#004ac6]" />
-                基本信息
+                {t('detail.sections.basic')}
               </h2>
             </div>
             <div className="grid grid-cols-4 gap-x-6 gap-y-6">
               <div className="flex flex-col gap-1.5">
-                <span className="text-xs text-[#64748b] dark:text-gray-400 font-medium tracking-wide uppercase">原值</span>
+                <span className="text-xs text-[#64748b] dark:text-gray-400 font-medium tracking-wide uppercase">{t('detail.fields.originalValue')}</span>
                 <span className="text-base font-bold text-[#0f172a] dark:text-gray-100">{formatCurrency(asset.originalValue)}</span>
               </div>
               <div className="flex flex-col gap-1.5">
@@ -355,7 +357,7 @@ export default function AssetDetailPage() {
           <CardContent className="p-6 flex flex-col flex-1">
             <h2 className="text-lg font-bold flex items-center gap-2 mb-4 text-[#0f172a] dark:text-gray-100">
               <TrendingDown className="w-5 h-5 text-[#004ac6]" />
-              折旧趋势
+              {t('detail.sections.depreciation')}
             </h2>
             {depreciationData.length > 0 ? (
               <div className="flex-1 relative min-h-[240px]">
@@ -665,9 +667,9 @@ export default function AssetDetailPage() {
                   <Trash2 className="w-5 h-5 text-red-600 dark:text-red-400" />
                 </div>
                 <div>
-                  <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100">确认删除资产</h3>
+                  <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100">{t('detail.deleteConfirm')}</h3>
                   <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                    确定要删除「{asset?.assetName || '此资产'}」吗？此操作不可撤销。
+                    {t('detail.deleteConfirmMessage')}
                   </p>
                 </div>
               </div>
@@ -692,7 +694,7 @@ export default function AssetDetailPage() {
                 onClick={() => deleteMutation.mutate()}
                 disabled={deleteMutation.isPending}
               >
-                {deleteMutation.isPending ? '删除中...' : '确认删除'}
+                {deleteMutation.isPending ? t('common:actions.deleting') || '删除中...' : t('detail.buttons.delete')}
               </Button>
             </div>
           </div>

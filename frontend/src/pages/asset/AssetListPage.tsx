@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import {
   Search, Upload, Download, Plus, FileText,
   X, Loader2, Package, TrendingUp, AlertTriangle, Wrench,
@@ -22,13 +23,16 @@ import { StatusBadge } from '@/components/ui/Badge';
 import http from '@/utils/http';
 
 const STATUS_OPTIONS = [
-  { key: AssetStatus.IN_USE,             label: '在用',   dot: 'bg-emerald-400', text: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-200' },
-  { key: AssetStatus.IDLE,               label: '闲置',   dot: 'bg-blue-400', text: 'text-blue-600', bg: 'bg-blue-50', border: 'border-blue-200' },
-  { key: AssetStatus.MAINTENANCE,        label: '维修中', dot: 'bg-amber-400', text: 'text-amber-600', bg: 'bg-amber-50', border: 'border-amber-200' },
-  { key: AssetStatus.PENDING_RETIREMENT, label: '待退役', dot: 'bg-violet-400', text: 'text-violet-600', bg: 'bg-violet-50', border: 'border-violet-200' },
-  { key: AssetStatus.RETIRED,            label: '已退役', dot: 'bg-slate-400', text: 'text-slate-500', bg: 'bg-slate-50', border: 'border-slate-200' },
-  { key: AssetStatus.SCRAPPED,           label: '已报废', dot: 'bg-red-400', text: 'text-red-600', bg: 'bg-red-50', border: 'border-red-200' },
-  { key: AssetStatus.CLEARED,            label: '已清退', dot: 'bg-orange-400', text: 'text-orange-600', bg: 'bg-orange-50', border: 'border-orange-200' },
+];
+
+const STATUS_OPTIONS_DEF = [
+  { key: AssetStatus.IN_USE,             dot: 'bg-emerald-400', text: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-200' },
+  { key: AssetStatus.IDLE,               dot: 'bg-blue-400', text: 'text-blue-600', bg: 'bg-blue-50', border: 'border-blue-200' },
+  { key: AssetStatus.MAINTENANCE,        dot: 'bg-amber-400', text: 'text-amber-600', bg: 'bg-amber-50', border: 'border-amber-200' },
+  { key: AssetStatus.PENDING_RETIREMENT, dot: 'bg-violet-400', text: 'text-violet-600', bg: 'bg-violet-50', border: 'border-violet-200' },
+  { key: AssetStatus.RETIRED,            dot: 'bg-slate-400', text: 'text-slate-500', bg: 'bg-slate-50', border: 'border-slate-200' },
+  { key: AssetStatus.SCRAPPED,           dot: 'bg-red-400', text: 'text-red-600', bg: 'bg-red-50', border: 'border-red-200' },
+  { key: AssetStatus.CLEARED,            dot: 'bg-orange-400', text: 'text-orange-600', bg: 'bg-orange-50', border: 'border-orange-200' },
 ];
 
 function flattenCategoryTree(tree: { id: number; categoryName: string; children?: { id: number; categoryName: string; children?: unknown[] }[] }): { id: number; name: string }[] {
@@ -52,7 +56,13 @@ interface StatCardDef {
 }
 
 export default function AssetListPage() {
+  const { t } = useTranslation(['asset', 'common']);
   const navigate = useNavigate();
+
+  const STATUS_OPTIONS = useMemo(() => STATUS_OPTIONS_DEF.map(opt => ({
+    ...opt,
+    label: t(`asset:statusOptions.${opt.key}`),
+  })), [t]);
 
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -152,21 +162,21 @@ export default function AssetListPage() {
 
   const statCards: StatCardDef[] = [
     {
-      label: '资产总净值',
+      label: t('asset:list.statNetValue'),
       value: stats?.netValue != null ? `¥${stats.netValue.toLocaleString('zh-CN')}` : '—',
       unit: '',
       icon: Package,
       gradient: 'from-blue-600 to-cyan-500',
     },
     {
-      label: '待处理维修',
+      label: t('asset:list.statMaintenance'),
       value: stats?.maintenanceAssets ?? '—',
       unit: '项',
       icon: Wrench,
       gradient: 'from-amber-500 to-orange-400',
     },
     {
-      label: '闲置率',
+      label: t('asset:list.statIdleRate'),
       value: stats?.idleAssets != null && stats?.totalAssets
         ? `${((stats.idleAssets / stats.totalAssets) * 100).toFixed(1)}%`
         : stats?.idleAssets != null ? `${stats.idleAssets}` : '—',
@@ -175,7 +185,7 @@ export default function AssetListPage() {
       gradient: 'from-violet-500 to-purple-400',
     },
     {
-      label: '累计折旧',
+      label: t('asset:list.statDepreciation'),
       value: stats?.totalValue != null && stats?.netValue != null
         ? `¥${(stats.totalValue - stats.netValue).toLocaleString('zh-CN')}`
         : '—',
@@ -187,11 +197,11 @@ export default function AssetListPage() {
 
   const columns: Column<AssetListItem>[] = [
     {
-      key: 'assetNo', title: '编号', width: 120,
+      key: 'assetNo', title: t('asset:columns.assetNo'), width: 120,
       render: (v) => <span className="font-mono text-xs font-semibold text-blue-600">#{String(v)}</span>,
     },
     {
-      key: 'assetName', title: '资产名称',
+      key: 'assetName', title: t('asset:columns.assetName'),
       render: (v, row) => (
         <div className="min-w-[160px]">
           <div className="flex items-center gap-2">
@@ -205,31 +215,31 @@ export default function AssetListPage() {
       ),
     },
     {
-      key: 'brand', title: '品牌/型号', width: 120,
+      key: 'brand', title: t('asset:columns.brandModel'), width: 120,
       render: (v) => <span className="text-xs text-slate-500">{String(v)}</span>,
     },
     {
-      key: 'deptName', title: '使用部门', width: 90,
+      key: 'deptName', title: t('asset:columns.department'), width: 90,
       render: (v) => <span className="text-xs text-slate-600">{String(v ?? '—')}</span>,
     },
     {
-      key: 'userName', title: '使用人', width: 80,
+      key: 'userName', title: t('asset:columns.userName'), width: 80,
       render: (v) => <span className="text-xs text-slate-600">{String(v ?? '—')}</span>,
     },
     {
-      key: 'location', title: '存放位置', width: 100,
+      key: 'location', title: t('asset:columns.location'), width: 100,
       render: (v) => <span className="text-xs text-slate-500">{String(v ?? '—')}</span>,
     },
     {
-      key: 'originalValue', title: '原值(¥)', width: 110, align: 'right',
+      key: 'originalValue', title: `${t('asset:columns.originalValue')}(¥)`, width: 110, align: 'right',
       render: (v) => <span className="font-mono text-xs text-slate-600">{Number(v).toLocaleString('en', { minimumFractionDigits: 2 })}</span>,
     },
     {
-      key: 'currentValue', title: '净值(¥)', width: 110, align: 'right',
+      key: 'currentValue', title: `${t('asset:columns.netValue')}(¥)`, width: 110, align: 'right',
       render: (v) => <span className="font-mono text-xs font-semibold text-slate-800">{Number(v).toLocaleString('en', { minimumFractionDigits: 2 })}</span>,
     },
     {
-      key: 'status', title: '状态', width: 100,
+      key: 'status', title: t('asset:columns.status'), width: 100,
       render: (v) => {
         const statusStr = String(v);
         const cfg = STATUS_OPTIONS.find(o => o.key === statusStr);
@@ -243,7 +253,7 @@ export default function AssetListPage() {
       },
     },
     {
-      key: 'id', title: '操作', width: 120, align: 'right',
+      key: 'id', title: t('asset:columns.actions'), width: 120, align: 'right',
       render: (_, row) => (
         <div className="flex justify-end gap-1.5">
           <button
@@ -251,12 +261,12 @@ export default function AssetListPage() {
             onClick={(e) => { e.stopPropagation(); navigate(`/assets/${row.id}`); }}
           >
             <Eye className="h-3.5 w-3.5" />
-            详情
+            {t('common:actions.detail')}
           </button>
           <button
             className="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-slate-200 text-slate-400 transition hover:border-blue-200 hover:text-blue-500"
             onClick={(e) => { e.stopPropagation(); navigate(`/assets/${row.id}/edit`); }}
-            title="编辑"
+            title={t('common:actions.edit')}
           >
             <Pencil className="h-3.5 w-3.5" />
           </button>
@@ -307,28 +317,28 @@ export default function AssetListPage() {
         <section className="rounded-2xl border border-[var(--surface-border)] bg-white shadow-sm">
           <div className="flex flex-wrap items-center justify-between gap-3 px-6 py-4">
             <div className="flex items-center gap-3">
-              <h1 className="text-xl font-bold text-slate-900">资产台账</h1>
+              <h1 className="text-xl font-bold text-slate-900">{t('asset:list.title')}</h1>
               <span className="inline-flex items-center gap-1.5 rounded-full border border-blue-200 bg-blue-50 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-blue-700">
                 <Package className="h-3 w-3" />
-                台账
+                {t('asset:title')}
               </span>
             </div>
             <div className="flex items-center gap-2">
               <Button variant="outline" size="md" onClick={() => navigate('/assets/import-export')}>
                 <Upload className="w-4 h-4" />
-                导入/导出
+                 {t('asset:actions.import')}
               </Button>
               <Button variant="outline" size="md" disabled={exporting} onClick={handleExportCSV}>
                 {exporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
-                {exporting ? '导出中...' : '导出全部'}
+                {exporting ? t('asset:messages.exporting') : t('asset:list.exportAll')}
               </Button>
               <Button variant="outline" size="md" disabled={pdfExporting} onClick={exportPdf}>
                 {pdfExporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileText className="w-4 h-4" />}
-                {pdfExporting ? '导出中...' : '导出 PDF'}
+                {pdfExporting ? t('asset:messages.exporting') : t('asset:list.exportPDF')}
               </Button>
               <Button variant="primary" size="md" onClick={() => navigate('/assets/new')}>
                 <Plus className="w-4 h-4" />
-                新建资产
+                {t('asset:actions.create')}
               </Button>
             </div>
           </div>
@@ -363,22 +373,22 @@ export default function AssetListPage() {
               <div>
                 <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.15em] text-blue-600">
                   <Search className="h-3.5 w-3.5" />
-                  资产列表
+                  {t('asset:list.filterTitle')}
                 </div>
                 <h2 className="mt-1 text-xl font-bold text-slate-900">
-                  资产台账管理
+                  {t('asset:list.subtitle')}
                 </h2>
               </div>
               <div className="flex flex-wrap items-center gap-2">
-                <Button variant="outline" size="sm" onClick={() => setFilterOpen((v) => !v)}>
-                  <Filter className="h-3.5 w-3.5" />
-                  高级筛选
+                  <Button variant="outline" size="sm" onClick={() => setFilterOpen((v) => !v)}>
+                    <Filter className="h-3.5 w-3.5" />
+                    {t('asset:search.advanced')}
                   <ChevronDown className={`h-3 w-3 transition-transform ${filterOpen ? 'rotate-180' : ''}`} />
                 </Button>
                 {isFetching && !isLoading && (
                   <span className="inline-flex items-center gap-1.5 rounded-full bg-cyan-50 px-3 py-1.5 text-xs font-bold text-cyan-700">
                     <RefreshCw className="h-3 w-3 animate-spin" />
-                    刷新中
+                    {t('asset:list.refreshing')}
                   </span>
                 )}
               </div>
@@ -395,7 +405,7 @@ export default function AssetListPage() {
                     : 'border-slate-200 bg-white text-slate-600 hover:border-blue-200 hover:text-blue-700'
                 }`}
               >
-                全部
+                {t('asset:list.statusAll')}
                 <span className="ml-1 rounded-full bg-white/20 px-1.5 py-0 text-[10px]">
                   {records.length}
                 </span>
@@ -433,7 +443,7 @@ export default function AssetListPage() {
                   <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                   <input
                     className="h-9 w-full rounded-lg border border-slate-200 bg-white pl-9 pr-3 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
-                    placeholder="搜索编号、名称..."
+                    placeholder={t('asset:list.searchPlaceholder')}
                     value={keywordInput}
                     onChange={(e) => { setKeywordInput(e.target.value); setPage(1); }}
                   />
