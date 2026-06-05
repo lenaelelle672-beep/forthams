@@ -63,6 +63,7 @@ public class MyBatisPlusConfig {
             "schedule_job_log",
             "location",
             "asset_category",
+            "notification",
             "manufacturer",
             "workflow_definition",
             "workflow_instance",
