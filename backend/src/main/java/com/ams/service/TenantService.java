@@ -11,7 +11,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -75,5 +77,20 @@ public class TenantService {
         result.put("userUsagePercent", tenant.getMaxUsers() > 0 ?
                 Math.round(userCount * 100.0 / tenant.getMaxUsers()) : 0);
         return result;
+    }
+
+    /**
+     * 获取活跃租户 ID 列表。
+     *
+     * <p>从 sys_tenant 表查询 status = 'ACTIVE' 的租户 ID 列表。
+     *
+     * @return 活跃租户 ID 列表
+     */
+    public List<String> getActiveTenantIds() {
+        LambdaQueryWrapper<SysTenant> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(SysTenant::getStatus, "ACTIVE");
+        return sysTenantMapper.selectList(wrapper).stream()
+                .map(SysTenant::getId)
+                .collect(Collectors.toList());
     }
 }
