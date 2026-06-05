@@ -1,18 +1,22 @@
 package com.ams.service.impl;
 
+import com.ams.common.exception.BusinessException;
 import com.ams.context.TenantContext;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.ams.entity.SavedReport;
 import com.ams.mapper.SavedReportMapper;
 import com.ams.service.DynamicReportService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class DynamicReportServiceImpl implements DynamicReportService {
@@ -84,8 +88,8 @@ public class DynamicReportServiceImpl implements DynamicReportService {
                     .build()
                     .readValue(report.getConfigJson(), Map.class);
             config = parsed;
-        } catch (Exception e) {
-            throw new RuntimeException("Invalid configJson: " + e.getMessage(), e);
+        } catch (JsonProcessingException e) {
+            throw new BusinessException(500, "INVALID_REPORT_CONFIG", "Invalid configJson: " + e.getMessage(), e);
         }
 
         // 根据报表类型和配置动态执行查询

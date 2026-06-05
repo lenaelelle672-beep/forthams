@@ -8,6 +8,7 @@ import com.ams.mapper.AssetMapper;
 import com.ams.service.ABCClassificationService;
 import com.ams.service.CycleCountRuleService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -85,8 +86,8 @@ public class ABCClassificationServiceImpl implements ABCClassificationService {
                     if (!categoryIds.isEmpty() && !categoryIds.contains(asset.getCategoryId())) {
                         continue;
                     }
-                } catch (Exception e) {
-                    log.warn("[ABC分类] 解析 categoryIds JSON 失败: {} [ruleId: {}]", rule.getCategoryIds(), rule.getId());
+                } catch (JsonProcessingException e) {
+                    log.warn("[ABC分类] 解析 categoryIds JSON 失败: ruleId={}", rule.getId(), e);
                     continue;
                 }
             }
@@ -144,9 +145,9 @@ public class ABCClassificationServiceImpl implements ABCClassificationService {
                     log.info("[ABC分类] 批量更新分类: batch size={}, total success={}", batch.size(), successCount);
                     batch.clear();
                 }
-            } catch (Exception e) {
-                failureCount++;
-                log.warn("[ABC分类] 资产分类失败: assetId={}, error={}", asset.getId(), e.getMessage());
+            } catch (RuntimeException e) {
+                    failureCount++;
+                log.warn("[ABC分类] 资产分类失败: assetId={}", asset.getId(), e);
             }
         }
 
@@ -155,7 +156,7 @@ public class ABCClassificationServiceImpl implements ABCClassificationService {
             try {
                 assetMapper.updateABCBatch(batch);
                 successCount += batch.size();
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 failureCount += batch.size();
                 log.error("[ABC分类] 批量更新失败: batch size={}, error={}", batch.size(), e.getMessage(), e);
             }
@@ -207,9 +208,9 @@ public class ABCClassificationServiceImpl implements ABCClassificationService {
                     successCount += batch.size();
                     batch.clear();
                 }
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 failureCount++;
-                log.warn("[ABC分类] 资产分类失败: assetId={}, error={}", asset.getId(), e.getMessage());
+                log.warn("[ABC分类] 资产分类失败: assetId={}", asset.getId(), e);
             }
         }
 
@@ -217,7 +218,7 @@ public class ABCClassificationServiceImpl implements ABCClassificationService {
             try {
                 assetMapper.updateABCBatch(batch);
                 successCount += batch.size();
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 failureCount += batch.size();
                 log.error("[ABC分类] 批量更新失败: batch size={}, error={}", batch.size(), e.getMessage(), e);
             }
@@ -340,8 +341,8 @@ public class ABCClassificationServiceImpl implements ABCClassificationService {
                     if (!categoryIds.isEmpty() && !categoryIds.contains(asset.getCategoryId())) {
                         continue;
                     }
-                } catch (Exception e) {
-                    log.warn("[ABC分类] 解析 categoryIds JSON 失败: {} [ruleId: {}]", rule.getCategoryIds(), rule.getId());
+                } catch (JsonProcessingException e) {
+                    log.warn("[ABC分类] 解析 categoryIds JSON 失败: ruleId={}", rule.getId(), e);
                     continue;
                 }
             }

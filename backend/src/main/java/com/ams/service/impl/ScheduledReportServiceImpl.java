@@ -1,5 +1,6 @@
 package com.ams.service.impl;
 
+import com.ams.common.exception.BusinessException;
 import com.ams.context.TenantContext;
 import com.ams.entity.ScheduledReport;
 import com.ams.mapper.ScheduledReportMapper;
@@ -87,7 +88,7 @@ public class ScheduledReportServiceImpl implements ScheduledReportService {
     @Transactional(rollbackFor = Exception.class)
     public ScheduledReport toggleStatus(Long id) {
         ScheduledReport report = getById(id);
-        if (report == null) throw new IllegalArgumentException("ScheduledReport not found");
+        if (report == null) throw new BusinessException("定时报表不存在: id=" + id);
         if ("ACTIVE".equals(report.getStatus())) {
             report.setStatus("PAUSED");
         } else {
@@ -132,7 +133,7 @@ public class ScheduledReportServiceImpl implements ScheduledReportService {
                 report.setNextRunAt(calculateNextRun(report.getCronExpr()));
                 scheduledReportMapper.updateById(report);
                 log.info("Scheduled report executed successfully: id={}", report.getId());
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 log.error("Failed to execute scheduled report: id={}", report.getId(), e);
             }
         }
@@ -196,7 +197,7 @@ public class ScheduledReportServiceImpl implements ScheduledReportService {
 
             log.warn("在 2 年内未找到匹配 cron 的时间，默认 1 小时后: {}", cronExpr);
             return LocalDateTime.now().plusHours(1);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             log.error("cron 表达式解析失败，默认 1 小时后: {}", cronExpr, e);
             return LocalDateTime.now().plusHours(1);
         }

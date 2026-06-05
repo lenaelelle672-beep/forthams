@@ -7,6 +7,7 @@ import com.ams.mapper.UserRoleMapper;
 import com.ams.security.LoginUser;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -25,6 +26,7 @@ import java.util.List;
  * 返回的 LoginUser 替代 Spring Security 内建 User，携带 userId/deptId/roles/permissions
  * 等业务上下文，供 SecurityService(@ss) 和 Controller 层使用。</p>
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService {
@@ -57,7 +59,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         List<String> permissions;
         try {
             permissions = sysMenuMapper.selectPermsByUserId(user.getId());
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
+            log.warn("加载用户权限失败，返回空权限列表: userId={}", user.getId(), e);
             permissions = Collections.emptyList();
         }
         if (permissions == null) {

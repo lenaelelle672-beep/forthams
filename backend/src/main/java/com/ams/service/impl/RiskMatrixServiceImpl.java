@@ -1,11 +1,13 @@
 package com.ams.service.impl;
 
+import com.ams.common.exception.BusinessException;
 import com.ams.entity.RiskMatrix;
 import com.ams.context.TenantContext;
 import com.ams.mapper.RiskMatrixMapper;
 import com.ams.service.RiskMatrixService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -64,7 +66,7 @@ public class RiskMatrixServiceImpl implements RiskMatrixService {
         String tenantId = TenantContext.requireTenantId();
         RiskMatrix existing = getById(id);
         if (existing == null) {
-            throw new IllegalArgumentException("风险矩阵配置不存在");
+            throw new BusinessException("风险矩阵配置不存在: id=" + id);
         }
         matrix.setId(id);
         matrix.setTenantId(tenantId);
@@ -79,7 +81,7 @@ public class RiskMatrixServiceImpl implements RiskMatrixService {
         String tenantId = TenantContext.requireTenantId();
         RiskMatrix existing = getById(id);
         if (existing == null) {
-            throw new IllegalArgumentException("风险矩阵配置不存在");
+            throw new BusinessException("风险矩阵配置不存在: id=" + id);
         }
         riskMatrixMapper.deleteById(id);
         log.info("删除风险矩阵配置成功，ID: {}, 租户: {}", id, tenantId);
@@ -119,7 +121,7 @@ public class RiskMatrixServiceImpl implements RiskMatrixService {
                     return level;
                 }
             }
-        } catch (Exception e) {
+        } catch (JsonProcessingException | RuntimeException e) {
             log.error("解析矩阵配置失败，使用默认规则", e);
         }
 

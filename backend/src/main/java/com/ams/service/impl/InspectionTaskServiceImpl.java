@@ -82,7 +82,7 @@ public class InspectionTaskServiceImpl implements InspectionTaskService {
         String tenantId = TenantContext.requireTenantId();
         InspectionTask existing = getTaskById(id);
         if (existing == null) {
-            throw new IllegalArgumentException("Task not found");
+            throw new BusinessException("检验任务不存在: id=" + id);
         }
         task.setId(id);
         task.setTenantId(tenantId);
@@ -96,7 +96,7 @@ public class InspectionTaskServiceImpl implements InspectionTaskService {
         String tenantId = TenantContext.requireTenantId();
         InspectionTask existing = getTaskById(id);
         if (existing == null) {
-            throw new IllegalArgumentException("Task not found");
+            throw new BusinessException("检验任务不存在: id=" + id);
         }
         taskMapper.deleteById(id);
         log.info("删除检验任务成功: id={}", id);
@@ -129,7 +129,7 @@ public class InspectionTaskServiceImpl implements InspectionTaskService {
         String tenantId = TenantContext.requireTenantId();
         InspectionTask task = getTaskById(id);
         if (task == null) {
-            throw new IllegalArgumentException("Task not found");
+            throw new BusinessException("检验任务不存在: id=" + id);
         }
         task.setStatus(status);
         taskMapper.updateById(task);
@@ -178,7 +178,7 @@ public class InspectionTaskServiceImpl implements InspectionTaskService {
         for (String tenantId : tenantIds) {
             try {
                 checkExpiringForTenant(tenantId);
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 log.error("租户 {} 到期检查失败: {}", tenantId, e.getMessage(), e);
             }
         }
@@ -196,7 +196,7 @@ public class InspectionTaskServiceImpl implements InspectionTaskService {
         for (String tenantId : tenantIds) {
             try {
                 markOverdueForTenant(tenantId);
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 log.error("租户 {} 逾期标记失败: {}", tenantId, e.getMessage(), e);
             }
         }
