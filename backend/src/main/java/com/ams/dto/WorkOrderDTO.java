@@ -33,6 +33,7 @@ public class WorkOrderDTO {
     private BigDecimal actualCost;
     private String completionNote;
     private List<String> collaborators;
+    private List<String> attachments;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
     private LocalDateTime slaDeadline;

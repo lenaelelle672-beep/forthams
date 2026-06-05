@@ -17,7 +17,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Table, Tag, Space, Button, Select, Input, Card, Typography, Empty, Spin, message } from 'antd';
 import { SearchOutlined, ReloadOutlined, EyeOutlined, CheckOutlined, CloseOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
-import type { WorkOrder, WorkOrderStatus, WorkOrderType, WorkOrderQuery } from '../../types/workorder.types';
+import type { WorkOrder, WorkOrderStatus, WorkOrderType, WorkOrderQuery, WorkOrderListQuery, WorkOrderListItem } from '../../types/workorder.types';
+import { getWorkOrderList } from '@/api/workorder';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -25,21 +26,25 @@ const { Option } = Select;
 /**
  * 工单状态枚举映射
  */
-const STATUS_MAP: Record<WorkOrderStatus, { label: string; color: string }> = {
+const STATUS_MAP: Partial<Record<WorkOrderStatus, { label: string; color: string }>> = {
   DRAFT: { label: '草稿', color: 'default' },
   PENDING: { label: '待审批', color: 'orange' },
   APPROVED: { label: '已通过', color: 'green' },
   REJECTED: { label: '已拒绝', color: 'red' },
-  CLOSED: { label: '已关闭', color: 'gray' },
+  CANCELLED: { label: '已取消', color: 'gray' },
 };
 
 /**
  * 工单类型枚举映射
  */
-const TYPE_MAP: Record<WorkOrderType, string> = {
+const TYPE_MAP: Partial<Record<WorkOrderType, string>> = {
   IT_SUPPORT: 'IT 支持',
   PURCHASE: '采购申请',
   PERMISSION: '权限申请',
+  REPAIR: '维修',
+  TRANSFER: '转移',
+  DISPOSAL: '处置',
+  OTHER: '其他',
 };
 
 /**
@@ -107,46 +112,34 @@ export const WorkOrderList: React.FC<WorkOrderListProps> = ({
   const [searchKeyword, setSearchKeyword] = useState<string>('');
 
   /**
-   * 模拟获取工单列表数据
-   * @description 实际项目中应替换为真实 API 调用
+   * 获取工单列表数据 — 真实 API 调用
    */
   const fetchWorkOrders = useCallback(async () => {
     setLoading(true);
     try {
-      // 模拟网络延迟 200-500ms
-      await new Promise(resolve => setTimeout(resolve, 200 + Math.random() * 300));
-      
-      // Mock 数据生成
-      const mockData: WorkOrder[] = generateMockData(pagination.total || 50);
-      
-      // 应用筛选条件
-      let filteredData = mockData;
-      
-      if (queryParams.status) {
-        filteredData = filteredData.filter(wo => wo.status === queryParams.status);
-      }
-      
-      if (queryParams.type) {
-        filteredData = filteredData.filter(wo => wo.type === queryParams.type);
-      }
-      
-      if (searchKeyword) {
-        const keyword = searchKeyword.toLowerCase();
-        filteredData = filteredData.filter(wo => 
-          wo.title.toLowerCase().includes(keyword) ||
-          wo.description.toLowerCase().includes(keyword)
-        );
-      }
+      const params: WorkOrderListQuery = {
+        page: pagination.current,
+        pageSize: pagination.pageSize,
+        status: queryParams.status,
+        type: queryParams.type,
+        keyword: searchKeyword || undefined,
+      };
+      const res = await getWorkOrderList(params);
+      const rawItems = res.records ?? [];
+      const total = res.total ?? 0;
 
-      // 分页计算
-      const startIndex = (pagination.current - 1) * pagination.pageSize;
-      const endIndex = startIndex + pagination.pageSize;
-      const paginatedData = filteredData.slice(startIndex, endIndex);
+      // 将 API 响应映射到组件期望的 WorkOrder 格式
+      const mappedItems: WorkOrder[] = rawItems.map((item: WorkOrderListItem) => ({
+        ...item,
+        creatorName: item.reporterName || '',
+        updatedAt: item.submittedAt || '',
+        description: item.title || '',
+      }));
 
-      setWorkOrders(paginatedData);
+      setWorkOrders(mappedItems);
       setPagination(prev => ({
         ...prev,
-        total: filteredData.length,
+        total,
       }));
     } catch (error) {
       message.error('获取工单列表失败');
@@ -155,39 +148,6 @@ export const WorkOrderList: React.FC<WorkOrderListProps> = ({
       setLoading(false);
     }
   }, [queryParams, pagination.current, pagination.pageSize, searchKeyword]);
-
-  /**
-   * 生成 Mock 数据
-   * @param count - 数据条数
-   */
-  const generateMockData = (count: number): WorkOrder[] => {
-    const statuses: WorkOrderStatus[] = ['DRAFT', 'PENDING', 'APPROVED', 'REJECTED', 'CLOSED'];
-    const types: WorkOrderType[] = ['IT_SUPPORT', 'PURCHASE', 'PERMISSION'];
-    
-    const titles = {
-      IT_SUPPORT: ['电脑蓝屏问题', '网络连接异常', '打印机无法使用', '软件安装请求', '账号无法登录'],
-      PURCHASE: ['办公桌椅采购', '显示器采购', '键鼠套装采购', '笔记本电脑采购', '服务器采购'],
-      PERMISSION: ['数据库访问权限', '管理员权限申请', '系统配置权限', '文件共享权限', 'VPN访问权限'],
-    };
-
-    return Array.from({ length: count }, (_, index) => {
-      const type = types[index % types.length];
-      const status = statuses[index % statuses.length];
-      const titleOptions = titles[type];
-      
-      return {
-        id: `WO-${String(index + 1).padStart(6, '0')}`,
-        title: titleOptions[index % titleOptions.length],
-        type,
-        description: `这是第 ${index + 1} 条工单的详细描述信息，描述了用户提交的具体需求内容。`,
-        status,
-        creatorId: `user-${(index % 5) + 1}`,
-        creatorName: ['张三', '李四', '王五', '赵六', '钱七'][index % 5],
-        createdAt: new Date(Date.now() - index * 86400000).toISOString(),
-        updatedAt: new Date(Date.now() - index * 43200000).toISOString(),
-      };
-    });
-  };
 
   // 初始加载和查询参数变化时获取数据
   useEffect(() => {

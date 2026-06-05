@@ -1,6 +1,6 @@
 /**
  * @file pages/category/CategoryManagerPage.tsx
- * @description 资产分类管理页面 — 树形分类展示 + CRUD
+ * @description 资产分类管理页面 — Design System v2
  *
  * 功能：
  * - 左侧分类树（/categories/tree）
@@ -16,7 +16,7 @@
  * - DELETE /categories/{id} — 删除分类
  */
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Plus,
@@ -28,8 +28,9 @@ import {
   FolderOpen,
   AlertTriangle,
   Loader2,
+  Layers,
+  FolderTree,
 } from 'lucide-react';
-import { PageHeader } from '@/components/ui/PageHeader';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import {
@@ -163,6 +164,16 @@ function TreeNode({
   );
 }
 
+// ── 辅助：统计分类总数 ─────────────────────────────────────────────────────
+function countAll(nodes: AssetCategory[]): number {
+  let count = 0;
+  for (const n of nodes) {
+    count += 1;
+    if (n.children) count += countAll(n.children);
+  }
+  return count;
+}
+
 // ── 主页面 ──────────────────────────────────────────────────────────────────
 export default function CategoryManagerPage() {
   const queryClient = useQueryClient();
@@ -193,6 +204,10 @@ export default function CategoryManagerPage() {
   });
 
   const treeData = treeRes as unknown as AssetCategory[] | undefined ?? [];
+
+  // ── Stats ─────────────────────────────────────────────────────────────────
+  const totalCategories = useMemo(() => countAll(treeData), [treeData]);
+  const rootCount = treeData.length;
 
   // ── 找到当前选中的节点 ────────────────────────────────────────────────────
   function findNode(nodes: AssetCategory[], id: number): AssetCategory | null {
@@ -324,209 +339,257 @@ export default function CategoryManagerPage() {
 
   // ── 渲染 ──────────────────────────────────────────────────────────────────
   return (
-    <div className="p-6 space-y-6">
-      <PageHeader
-        title="资产分类管理"
-        subtitle="管理资产分类层级结构"
-        breadcrumbs={[{ label: '仪表板', href: '/dashboard' }, { label: '资产分类' }]}
-        actions={
-          <Button size="sm" onClick={() => openCreateDialog(null)}>
-            <Plus className="w-4 h-4" />
-            添加根分类
-          </Button>
-        }
-      />
+    <div className="min-h-full bg-[var(--app-background)] px-4 py-5 sm:px-6 lg:px-8">
+      <div className="mx-auto flex w-full max-w-[1480px] flex-col gap-6">
 
-      <div className="flex gap-6">
-        {/* ── 左侧：分类树 ─────────────────────────────────────────────────── */}
-        <div className="w-80 flex-shrink-0">
-          <div className="bg-white rounded-xl border border-[#e5e7eb] overflow-hidden">
-            <div className="px-4 py-3 border-b border-[#e5e7eb]">
-              <h3 className="text-sm font-semibold text-[#0f172a]">分类结构</h3>
+        {/* ── Compact header with stat bar ───────────────────────────────── */}
+        <section className="rounded-2xl border border-[var(--surface-border)] bg-white shadow-sm">
+          <div className="flex flex-col gap-4 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h1 className="text-lg font-semibold text-[#0f172a]">资产分类管理</h1>
+              <p className="mt-0.5 text-sm text-[#64748b]">管理资产分类层级结构</p>
             </div>
-            <div className="p-2 max-h-[600px] overflow-y-auto">
-              {treeLoading ? (
-                <div className="flex items-center justify-center py-8">
-                  <Loader2 className="w-5 h-5 text-[#94a3b8] animate-spin" />
-                </div>
-              ) : treeError ? (
-                <EmptyState title="加载失败" description="无法加载分类数据" />
-              ) : treeData.length === 0 ? (
-                <EmptyState
-                  title="暂无分类"
-                  description="点击上方按钮添加根分类"
-                  action={
-                    <Button size="sm" onClick={() => openCreateDialog(null)}>
-                      添加分类
-                    </Button>
-                  }
-                />
-              ) : (
-                treeData.map((node) => (
-                  <TreeNode
-                    key={node.id}
-                    node={node}
-                    selectedId={selectedId}
-                    onSelect={setSelectedId}
-                    onAddChild={(parentId) => {
-                      const parent = findNode(treeData, parentId);
-                      openCreateDialog(parentId);
-                    }}
-                    onEdit={openEditDialog}
-                    onDelete={openDeleteDialog}
+            <Button size="sm" onClick={() => openCreateDialog(null)}>
+              <Plus className="w-4 h-4" />
+              添加根分类
+            </Button>
+          </div>
+          {/* stat bar */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-slate-100 border-t border-slate-100">
+            <div className="flex items-center gap-3 px-6 py-4">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-blue-50 to-blue-100">
+                <Layers className="h-4.5 w-4.5 text-blue-600" />
+              </div>
+              <div>
+                <p className="text-xs text-slate-500">总分类数</p>
+                <p className="text-lg font-bold text-slate-900">{totalCategories}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 px-6 py-4">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-50 to-emerald-100">
+                <FolderTree className="h-4.5 w-4.5 text-emerald-600" />
+              </div>
+              <div>
+                <p className="text-xs text-slate-500">根分类</p>
+                <p className="text-lg font-bold text-slate-900">{rootCount}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 px-6 py-4">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-violet-50 to-violet-100">
+                <FolderOpen className="h-4.5 w-4.5 text-violet-600" />
+              </div>
+              <div>
+                <p className="text-xs text-slate-500">当前选中</p>
+                <p className="text-lg font-bold text-slate-900">{selectedNode?.categoryName ?? '—'}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 px-6 py-4">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-amber-50 to-amber-100">
+                <Folder className="h-4.5 w-4.5 text-amber-600" />
+              </div>
+              <div>
+                <p className="text-xs text-slate-500">子分类数</p>
+                <p className="text-lg font-bold text-slate-900">{selectedNode?.children?.length ?? 0}</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ── Main content area ─────────────────────────────────────────── */}
+        <div className="flex gap-6">
+          {/* ── 左侧：分类树 ─────────────────────────────────────────────── */}
+          <div className="w-80 flex-shrink-0">
+            <section className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm">
+              <div className="px-5 py-3.5 border-b border-slate-100">
+                <h3 className="text-sm font-semibold text-[#0f172a]">分类结构</h3>
+              </div>
+              <div className="p-2 max-h-[600px] overflow-y-auto">
+                {treeLoading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <Loader2 className="w-5 h-5 text-[#94a3b8] animate-spin" />
+                  </div>
+                ) : treeError ? (
+                  <EmptyState title="加载失败" description="无法加载分类数据" />
+                ) : treeData.length === 0 ? (
+                  <EmptyState
+                    title="暂无分类"
+                    description="点击上方按钮添加根分类"
+                    action={
+                      <Button size="sm" onClick={() => openCreateDialog(null)}>
+                        添加分类
+                      </Button>
+                    }
                   />
-                ))
+                ) : (
+                  treeData.map((node) => (
+                    <TreeNode
+                      key={node.id}
+                      node={node}
+                      selectedId={selectedId}
+                      onSelect={setSelectedId}
+                      onAddChild={(parentId) => {
+                        openCreateDialog(parentId);
+                      }}
+                      onEdit={openEditDialog}
+                      onDelete={openDeleteDialog}
+                    />
+                  ))
+                )}
+              </div>
+            </section>
+          </div>
+
+          {/* ── 右侧：分类详情 ──────────────────────────────────────────── */}
+          <div className="flex-1">
+            {selectedNode ? (
+              <section className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm">
+                <div className="px-6 py-5 border-b border-slate-100">
+                  <h3 className="text-lg font-semibold text-[#0f172a]">{selectedNode.categoryName}</h3>
+                  <p className="mt-0.5 text-sm text-[#64748b]">分类编码：{selectedNode.categoryCode || '-'}</p>
+                </div>
+                <div className="px-6 py-5">
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div className="rounded-lg border border-slate-100 bg-slate-50/50 p-3">
+                      <span className="text-xs text-[#94a3b8]">分类编码</span>
+                      <p className="text-sm font-semibold text-[#374151] mt-0.5">{selectedNode.categoryCode || '-'}</p>
+                    </div>
+                    <div className="rounded-lg border border-slate-100 bg-slate-50/50 p-3">
+                      <span className="text-xs text-[#94a3b8]">ID</span>
+                      <p className="text-sm font-semibold text-[#374151] mt-0.5">{selectedNode.id}</p>
+                    </div>
+                    <div className="rounded-lg border border-slate-100 bg-slate-50/50 p-3">
+                      <span className="text-xs text-[#94a3b8]">父分类 ID</span>
+                      <p className="text-sm font-semibold text-[#374151] mt-0.5">
+                        {selectedNode.parentId ? selectedNode.parentId.toString() : '根分类'}
+                      </p>
+                    </div>
+                    <div className="rounded-lg border border-slate-100 bg-slate-50/50 p-3">
+                      <span className="text-xs text-[#94a3b8]">子分类数</span>
+                      <p className="text-sm font-semibold text-[#374151] mt-0.5">
+                        {selectedNode.children?.length ?? 0}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex gap-2 pt-5 mt-5 border-t border-slate-100">
+                    <button
+                      onClick={() => openEditDialog(selectedNode)}
+                      className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 text-xs font-medium text-slate-600 hover:bg-slate-50 hover:text-blue-600 transition-colors"
+                    >
+                      <Edit3 className="w-3.5 h-3.5" />
+                      编辑
+                    </button>
+                    <button
+                      onClick={() => openCreateDialog(selectedNode.id)}
+                      className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 text-xs font-medium text-slate-600 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-colors"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      添加子分类
+                    </button>
+                    <button
+                      onClick={() => openDeleteDialog(selectedNode)}
+                      className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 text-xs font-medium text-slate-600 hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      删除
+                    </button>
+                  </div>
+                </div>
+              </section>
+            ) : (
+              <section className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm">
+                <div className="px-6 py-12">
+                  <EmptyState
+                    title="选择分类"
+                    description="请在左侧树中选择一个分类查看详情，或点击上方按钮添加新分类"
+                  />
+                </div>
+              </section>
+            )}
+          </div>
+        </div>
+
+        {/* ── 新增/编辑 Dialog ──────────────────────────────────────────── */}
+        <Dialog open={dialogState.open && dialogState.mode !== 'delete'} onOpenChange={(v) => !v && closeDialog()}>
+          <DialogContent title={dialogState.title}>
+            <DialogHeader>
+              <DialogTitle>{dialogState.title}</DialogTitle>
+              <DialogDescription>
+                {dialogState.mode === 'create'
+                  ? dialogState.parentId
+                    ? '为选中分类添加子分类'
+                    : '创建一个新的根分类'
+                  : '修改分类的名称和编码'}
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="px-6 py-4 space-y-4">
+              <Input
+                label="分类名称"
+                placeholder="请输入分类名称"
+                value={formName}
+                onChange={(e) => setFormName(e.target.value)}
+                error={formError && formError.includes('名称') ? formError : undefined}
+              />
+              <Input
+                label="分类编码"
+                placeholder="请输入分类编码"
+                value={formCode}
+                onChange={(e) => setFormCode(e.target.value)}
+                error={formError && formError.includes('编码') ? formError : undefined}
+              />
+              {formError && !formError.includes('名称') && !formError.includes('编码') && (
+                <p className="text-xs text-red-500">{formError}</p>
               )}
             </div>
-          </div>
-        </div>
 
-        {/* ── 右侧：分类详情 ──────────────────────────────────────────────── */}
-        <div className="flex-1">
-          {selectedNode ? (
-            <div className="bg-white rounded-xl border border-[#e5e7eb] p-6 space-y-4">
-              <h3 className="text-lg font-semibold text-[#0f172a]">{selectedNode.categoryName}</h3>
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <span className="text-[#94a3b8]">分类编码</span>
-                  <p className="text-[#374151] font-medium">{selectedNode.categoryCode || '-'}</p>
-                </div>
-                <div>
-                  <span className="text-[#94a3b8]">ID</span>
-                  <p className="text-[#374151] font-medium">{selectedNode.id}</p>
-                </div>
-                <div>
-                  <span className="text-[#94a3b8]">父分类 ID</span>
-                  <p className="text-[#374151] font-medium">
-                    {selectedNode.parentId ? selectedNode.parentId.toString() : '根分类'}
-                  </p>
-                </div>
-                <div>
-                  <span className="text-[#94a3b8]">子分类数</span>
-                  <p className="text-[#374151] font-medium">
-                    {selectedNode.children?.length ?? 0}
-                  </p>
+            <DialogFooter>
+              <Button variant="secondary" onClick={closeDialog} disabled={isMutating}>
+                取消
+              </Button>
+              <Button onClick={handleSubmit} loading={isMutating}>
+                {dialogState.mode === 'create' ? '创建' : '保存'}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* ── 删除确认 Dialog ──────────────────────────────────────────── */}
+        <Dialog
+          open={dialogState.open && dialogState.mode === 'delete'}
+          onOpenChange={(v) => !v && closeDialog()}
+        >
+          <DialogContent title="确认删除">
+            <DialogHeader>
+              <DialogTitle>确认删除</DialogTitle>
+              <DialogDescription>
+                此操作不可撤销，请确认是否删除分类 &quot;{dialogState.node?.categoryName}&quot;
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="px-6 py-4">
+              <div className="flex items-start gap-3 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
+                <div className="text-sm text-amber-800">
+                  <p className="font-medium mb-1">注意</p>
+                  <p>删除分类前，请确保该分类下没有子分类和关联资产。若有子分类，需先删除子分类。</p>
                 </div>
               </div>
-              <div className="flex gap-2 pt-2">
-                <Button
-                  size="sm"
-                  variant="secondary"
-                  onClick={() => openEditDialog(selectedNode)}
-                >
-                  <Edit3 className="w-3.5 h-3.5" />
-                  编辑
-                </Button>
-                <Button
-                  size="sm"
-                  variant="secondary"
-                  onClick={() => openCreateDialog(selectedNode.id)}
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                  添加子分类
-                </Button>
-                <Button
-                  size="sm"
-                  variant="destructive"
-                  onClick={() => openDeleteDialog(selectedNode)}
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                  删除
-                </Button>
-              </div>
+              {formError && (
+                <p className="text-xs text-red-500 mt-2">{formError}</p>
+              )}
             </div>
-          ) : (
-            <div className="bg-white rounded-xl border border-[#e5e7eb] p-6">
-              <EmptyState
-                title="选择分类"
-                description="请在左侧树中选择一个分类查看详情，或点击上方按钮添加新分类"
-              />
-            </div>
-          )}
-        </div>
+
+            <DialogFooter>
+              <Button variant="secondary" onClick={closeDialog} disabled={isMutating}>
+                取消
+              </Button>
+              <Button variant="destructive" onClick={handleSubmit} loading={deleteMutation.isPending}>
+                确认删除
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
-
-      {/* ── 新增/编辑 Dialog ──────────────────────────────────────────────── */}
-      <Dialog open={dialogState.open && dialogState.mode !== 'delete'} onOpenChange={(v) => !v && closeDialog()}>
-        <DialogContent title={dialogState.title}>
-          <DialogHeader>
-            <DialogTitle>{dialogState.title}</DialogTitle>
-            <DialogDescription>
-              {dialogState.mode === 'create'
-                ? dialogState.parentId
-                  ? '为选中分类添加子分类'
-                  : '创建一个新的根分类'
-                : '修改分类的名称和编码'}
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="px-6 py-4 space-y-4">
-            <Input
-              label="分类名称"
-              placeholder="请输入分类名称"
-              value={formName}
-              onChange={(e) => setFormName(e.target.value)}
-              error={formError && formError.includes('名称') ? formError : undefined}
-            />
-            <Input
-              label="分类编码"
-              placeholder="请输入分类编码"
-              value={formCode}
-              onChange={(e) => setFormCode(e.target.value)}
-              error={formError && formError.includes('编码') ? formError : undefined}
-            />
-            {formError && !formError.includes('名称') && !formError.includes('编码') && (
-              <p className="text-xs text-red-500">{formError}</p>
-            )}
-          </div>
-
-          <DialogFooter>
-            <Button variant="secondary" onClick={closeDialog} disabled={isMutating}>
-              取消
-            </Button>
-            <Button onClick={handleSubmit} loading={isMutating}>
-              {dialogState.mode === 'create' ? '创建' : '保存'}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* ── 删除确认 Dialog ──────────────────────────────────────────────── */}
-      <Dialog
-        open={dialogState.open && dialogState.mode === 'delete'}
-        onOpenChange={(v) => !v && closeDialog()}
-      >
-        <DialogContent title="确认删除">
-          <DialogHeader>
-            <DialogTitle>确认删除</DialogTitle>
-            <DialogDescription>
-              此操作不可撤销，请确认是否删除分类 &quot;{dialogState.node?.categoryName}&quot;
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="px-6 py-4">
-            <div className="flex items-start gap-3 p-3 bg-amber-50 border border-amber-200 rounded-lg">
-              <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
-              <div className="text-sm text-amber-800">
-                <p className="font-medium mb-1">注意</p>
-                <p>删除分类前，请确保该分类下没有子分类和关联资产。若有子分类，需先删除子分类。</p>
-              </div>
-            </div>
-            {formError && (
-              <p className="text-xs text-red-500 mt-2">{formError}</p>
-            )}
-          </div>
-
-          <DialogFooter>
-            <Button variant="secondary" onClick={closeDialog} disabled={isMutating}>
-              取消
-            </Button>
-            <Button variant="destructive" onClick={handleSubmit} loading={deleteMutation.isPending}>
-              确认删除
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

@@ -22,6 +22,14 @@ public class FloorPlan implements Serializable {
     private String description;
     private Long createdBy;
 
+    /**
+     * 关联 Location.id（gai2 W8 — FloorPlan locationId FK 关联 Location.id）。
+     * 替代/补充 building/floor 字符串匹配；W9 V3_20 migration 添加列 + 索引。
+     * building/floor 字符串保留作为冗余展示。
+     */
+    @TableField("location_id")
+    private Long locationId;
+
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createdAt;
 

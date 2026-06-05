@@ -70,12 +70,16 @@ export interface InventoryTask {
   createdAt: string;
   /** 更新时间 (ISO 8601) */
   updatedAt: string;
+  /** 负责人名称，旧详情页展示使用 */
+  assigneeName?: string;
 }
 
 /**
  * 盘点资产 — 对应 GET /api/inventory/tasks/:taskId/assets 返回的单条记录
  */
 export interface InventoryAsset {
+  /** 兼容旧表格 rowKey；缺省时与 assetId 同义 */
+  id?: string;
   /** 资产唯一标识 */
   assetId: string;
   /** 资产编号 */
@@ -108,6 +112,10 @@ export interface InventoryAsset {
  * 盘盈盘亏汇总 — 对应 GET /api/v1/inventory/tasks/:taskId/summary
  */
 export interface InventorySummary {
+  /** 正常资产数量，旧详情页统计使用 */
+  normalCount?: number;
+  /** 异常资产数量，旧详情页统计使用 */
+  abnormalCount?: number;
   /** 盘盈明细列表 */
   surplusItems: InventoryDifferenceItem[];
   /** 盘亏明细列表 */

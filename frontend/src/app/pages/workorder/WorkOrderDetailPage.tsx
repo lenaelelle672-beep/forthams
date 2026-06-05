@@ -91,13 +91,15 @@ function getStatusBadgeClasses(status?: string): string {
  */
 function getPriorityBadgeClasses(priority?: string): string {
   switch (priority) {
-    case "EMERGENCY":
+    case "CRITICAL":
       return "bg-red-100 text-red-800";
-    case "URGENT":
+    case "HIGH":
       return "bg-orange-100 text-orange-800";
-    case "NORMAL":
-    default:
+    case "MEDIUM":
       return "bg-yellow-100 text-yellow-800";
+    case "LOW":
+    default:
+      return "bg-blue-50 text-blue-800";
   }
 }
 

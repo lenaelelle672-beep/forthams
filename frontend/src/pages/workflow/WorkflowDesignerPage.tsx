@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { addEdge, type Connection, useEdgesState, useNodesState } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import { ArrowLeft, Code, Layers3, Loader2, Play, Save, Send, X } from 'lucide-react';
+import { ArrowLeft, Code, Layers3, Loader2, Play, Redo, Save, Send, Undo, X } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router';
 
 import { FlowCanvas } from '@/components/flow/FlowCanvas';
@@ -56,6 +56,27 @@ const STATUS_STYLES: Record<string, { label: string; cls: string }> = {
   DISABLED:     { label: '已停用', cls: 'bg-red-50 text-red-700' },
 };
 
+/* ---------- undo/redo 快照 ---------- */
+interface DesignerSnapshot {
+  nodes: FlowNode[];
+  edges: FlowEdge[];
+  selId: string | null;
+}
+
+function deepCloneSnapshot(nodes: FlowNode[], edges: FlowEdge[], selId: string | null): DesignerSnapshot {
+  return { nodes: JSON.parse(JSON.stringify(nodes)), edges: JSON.parse(JSON.stringify(edges)), selId };
+}
+
+const MAX_HISTORY = 50;
+
+/* ---------- 判断当前焦点是否在输入组件中（避免快捷键误触） ---------- */
+function isInputFocused(): boolean {
+  const el = document.activeElement;
+  if (!el || !(el instanceof HTMLElement)) return false;
+  const tag = el.tagName;
+  return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || el.isContentEditable;
+}
+
 export default function WorkflowDesignerPage() {
   const navigate = useNavigate();
   const [sp, setSp] = useSearchParams();
@@ -74,7 +95,7 @@ export default function WorkflowDesignerPage() {
   const [saveErr, setSaveErr] = useState<string | null>(null);
   const [srvStatus, setSrvStatus] = useState('UNCONFIGURED');
   const [srvVersion, setSrvVersion] = useState(0);
-  const [approverRoles, setApproverRoles] = useState<string[]>(['SUPER_ADMIN']);
+  const [approverRoles, setApproverRoles] = useState<string[]>([]);
   const [roleDetails, setRoleDetails] = useState<Array<{ roleCode: string; roleName: string }>>([]);
   const [formSource, setFormSource] = useState('');
   const [showFormSource, setShowFormSource] = useState(false);
@@ -82,6 +103,42 @@ export default function WorkflowDesignerPage() {
   const [srvDesc, setSrvDesc] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [publishing, setPublishing] = useState(false);
+
+  /* ---- undo / redo 历史栈 ---- */
+  const pastStates = useRef<DesignerSnapshot[]>([]);
+  const futureStates = useRef<DesignerSnapshot[]>([]);
+
+  const pushSnapshot = useCallback(() => {
+    pastStates.current.push(deepCloneSnapshot(nodes, edges, selId));
+    if (pastStates.current.length > MAX_HISTORY) pastStates.current.shift();
+    futureStates.current = [];
+  }, [nodes, edges, selId]);
+
+  const handleUndo = useCallback(() => {
+    const prev = pastStates.current.pop();
+    if (!prev) return;
+    // 保存当前状态到 future 栈
+    const cur = deepCloneSnapshot(nodes, edges, selId);
+    futureStates.current.push(cur);
+    if (futureStates.current.length > MAX_HISTORY) futureStates.current.shift();
+    // 恢复历史
+    setNodes(prev.nodes);
+    setEdges(prev.edges);
+    setSelId(prev.selId);
+  }, [nodes, edges, selId, setNodes, setEdges]);
+
+  const handleRedo = useCallback(() => {
+    const next = futureStates.current.pop();
+    if (!next) return;
+    // 保存当前状态到 past 栈
+    const cur = deepCloneSnapshot(nodes, edges, selId);
+    pastStates.current.push(cur);
+    if (pastStates.current.length > MAX_HISTORY) pastStates.current.shift();
+    // 恢复
+    setNodes(next.nodes);
+    setEdges(next.edges);
+    setSelId(next.selId);
+  }, [nodes, edges, selId, setNodes, setEdges]);
 
   useEffect(() => { if (!isBusinessType(reqBt) && !isCustomBusinessType(reqBt)) setSp({ businessType }, { replace: true }); }, [businessType, reqBt, setSp]);
 
@@ -131,7 +188,7 @@ export default function WorkflowDesignerPage() {
           setApproverRoles(unique);
           setRoleDetails(list.map((r) => ({ roleCode: readRoleField(r, ['roleCode', 'role_code', 'code']), roleName: readRoleField(r, ['roleName', 'role_name', 'name']) })).filter((r) => r.roleCode));
         }
-      } catch { if (!cancelled) { setApproverRoles(['SUPER_ADMIN']); setRoleDetails([]); } }
+      } catch { if (!cancelled) { setApproverRoles([]); setRoleDetails([]); } }
     })();
     return () => { cancelled = true; };
   }, []);
@@ -152,24 +209,32 @@ export default function WorkflowDesignerPage() {
     return false;
   }, [valErrors]);
 
+  /* ---- 流程修改操作（每个操作前保存快照以支持撤销） ---- */
   const handleAddNode = useCallback((type: FlowNodeType, pos?: { x: number; y: number }) => {
+    pushSnapshot();
     setNodes((cur) => { const n = createFlowNode(type, pos ?? autoPos(cur.length)); setSelId(n.id); return [...cur, n]; });
-  }, [setNodes]);
+  }, [setNodes, pushSnapshot]);
 
   const handleConnect = useCallback((conn: Connection) => {
     const edge = createFlowEdge(conn);
     if (!edge || edge.source === edge.target) { if (edge?.source === edge.target) { setSaveMsg(null); setSaveErr('同一节点不能连接自身'); } return; }
+    pushSnapshot();
     setEdges((cur) => cur.some((e) => e.source === edge.source && e.target === edge.target && e.sourceHandle === edge.sourceHandle) ? cur : addEdge(edge, cur));
-  }, [setEdges]);
+  }, [setEdges, pushSnapshot]);
 
-  const handleUpdate = useCallback((id: string, patch: Partial<FlowNodeData>) => { setNodes((cur) => cur.map((n) => n.id === id ? { ...n, data: { ...n.data, ...patch } } : n)); }, [setNodes]);
+  const handleUpdate = useCallback((id: string, patch: Partial<FlowNodeData>) => {
+    pushSnapshot();
+    setNodes((cur) => cur.map((n) => n.id === id ? { ...n, data: { ...n.data, ...patch } } : n));
+  }, [setNodes, pushSnapshot]);
 
   const handleDelete = useCallback((id: string) => {
+    pushSnapshot();
     setNodes((cur) => cur.filter((n) => n.id !== id));
     setEdges((cur) => cur.filter((e) => e.source !== id && e.target !== id));
     setSelId((prev) => prev === id ? (nodes.find((n) => n.id !== id)?.id ?? null) : prev);
-  }, [nodes, setEdges, setNodes]);
+  }, [nodes, setEdges, setNodes, pushSnapshot]);
 
+  /* ---- 保存 / 发布 ---- */
   const defPayload = useMemo(() => {
     const base = normDef as unknown as Record<string, unknown>;
     if (formSource) {
@@ -208,6 +273,39 @@ export default function WorkflowDesignerPage() {
   }, [businessType, ensureValid, flow.name, normDef, defPayload, formSource]);
 
   const statusStyle = STATUS_STYLES[srvStatus] ?? STATUS_STYLES.UNCONFIGURED;
+
+  /* ---- 快捷键绑定 ---- */
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      // ⌘Z / Ctrl+Z → 撤销
+      if ((e.metaKey || e.ctrlKey) && e.key === 'z' && !e.shiftKey) {
+        e.preventDefault();
+        handleUndo();
+        return;
+      }
+      // ⌘⇧Z / Ctrl+Shift+Z → 重做
+      if ((e.metaKey || e.ctrlKey) && e.key === 'z' && e.shiftKey) {
+        e.preventDefault();
+        handleRedo();
+        return;
+      }
+      // ⌘S / Ctrl+S → 保存
+      if ((e.metaKey || e.ctrlKey) && e.key === 's') {
+        e.preventDefault();
+        handleSaveDraft();
+        return;
+      }
+      // Del / Backspace → 删除选中节点（仅当不在输入框中时）
+      if ((e.key === 'Delete' || e.key === 'Backspace') && !isInputFocused()) {
+        if (selId) {
+          e.preventDefault();
+          handleDelete(selId);
+        }
+      }
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [handleUndo, handleRedo, handleSaveDraft, handleDelete, selId]);
 
   return (
     <div className="flex flex-col h-full -m-6">
@@ -284,7 +382,7 @@ export default function WorkflowDesignerPage() {
         {saveErr && (
           <div className="mt-2 rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-700 flex items-center justify-between gap-2">
             <span>{saveErr}</span>
-            <button type="button" onClick={() => setSaveErr(null)} className="text-red-500 hover:text-red-700 flex-shrink-0"><X className="w-4 h-4" /></button>
+            <button type="button" onClick={() => setSaveMsg(null)} className="text-green-500 hover:text-green-700 flex-shrink-0"><X className="w-4 h-4" /></button>
           </div>
         )}
         {valErrors.length > 0 && (
@@ -294,10 +392,58 @@ export default function WorkflowDesignerPage() {
         )}
       </div>
 
+      {/* Keyboard shortcuts hint */}
+      <div className="flex-shrink-0 border-t border-gray-100 px-6 py-1.5 flex items-center justify-between">
+        <div className="flex items-center gap-4 text-[11px] text-gray-400">
+          <span className="flex items-center gap-1">
+            <kbd className="inline-flex items-center justify-center h-5 min-w-[20px] px-1 border border-gray-200 bg-gray-50 rounded text-[10px] font-mono text-gray-500">Del</kbd>
+            删除节点
+          </span>
+          <span className="flex items-center gap-1">
+            <kbd className="inline-flex items-center justify-center h-5 min-w-[20px] px-1 border border-gray-200 bg-gray-50 rounded text-[10px] font-mono text-gray-500">⌘S</kbd>
+            保存草稿
+          </span>
+          <span className="flex items-center gap-1">
+            <kbd className="inline-flex items-center justify-center h-5 min-w-[20px] px-1 border border-gray-200 bg-gray-50 rounded text-[10px] font-mono text-gray-500">⌘Z</kbd>
+            撤销
+          </span>
+          <span className="flex items-center gap-1">
+            <kbd className="inline-flex items-center justify-center h-5 min-w-[20px] px-1 border border-gray-200 bg-gray-50 rounded text-[10px] font-mono text-gray-500">⌘⇧Z</kbd>
+            重做
+          </span>
+          {/* undo/redo toolbar buttons as visual indicator */}
+          <span className="w-px h-4 bg-gray-200 mx-1" />
+          <button
+            onClick={handleUndo}
+            disabled={pastStates.current.length === 0}
+            className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[11px] text-gray-400 hover:text-gray-600 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            title="撤销 (⌘Z)"
+          >
+            <Undo className="w-3 h-3" />
+          </button>
+          <button
+            onClick={handleRedo}
+            disabled={futureStates.current.length === 0}
+            className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[11px] text-gray-400 hover:text-gray-600 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            title="重做 (⌘⇧Z)"
+          >
+            <Redo className="w-3 h-3" />
+          </button>
+        </div>
+        <span className="text-[11px] text-gray-300">滚轮缩放 · 拖拽布点 · 连线分流 · 拖拽吸附对齐</span>
+      </div>
+
       {/* 3-column layout */}
       <div className="flex-1 min-h-0 grid grid-cols-[280px_minmax(0,1fr)_340px] divide-x divide-gray-200">
         <NodePanel onAddNode={(type) => handleAddNode(type)} />
-        <FlowCanvas nodes={nodes} edges={edges} onNodesChange={onNodesChange} onEdgesChange={onEdgesChange} onConnect={handleConnect} onNodeSelect={(n) => setSelId(n?.id ?? null)} onAddNodeAtPosition={handleAddNode} />
+        <FlowCanvas
+          nodes={nodes} edges={edges}
+          onNodesChange={onNodesChange} onEdgesChange={onEdgesChange}
+          onConnect={handleConnect}
+          onNodeSelect={(n) => setSelId(n?.id ?? null)}
+          onAddNodeAtPosition={handleAddNode}
+          onNodeDragStart={pushSnapshot}
+        />
         <div className="flex flex-col min-h-0">
           <div className="flex-shrink-0 flex border-b border-gray-200">
             <button

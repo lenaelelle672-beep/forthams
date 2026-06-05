@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ams.mapper.InspectionRecordMapper">
+
+    <!-- 查询即将到期的检验记录 -->
+    <select id="selectExpiringInspections" resultType="com.ams.entity.InspectionRecord">
+        SELECT * FROM inspection_record
+        WHERE deleted = 0
+          AND tenant_id = #{tenantId}
+          AND next_inspection_date IS NOT NULL
+          AND next_inspection_date &lt;= #{warningDate}
+          AND status != 'completed'
+        ORDER BY next_inspection_date ASC
+    </select>
+
+    <!-- 查询已逾期的检验记录 -->
+    <select id="selectOverdueInspections" resultType="com.ams.entity.InspectionRecord">
+        SELECT * FROM inspection_record
+        WHERE deleted = 0
+          AND tenant_id = #{tenantId}
+          AND next_inspection_date IS NOT NULL
+          AND next_inspection_date &lt; #{currentDate}
+          AND status != 'completed'
+        ORDER BY next_inspection_date ASC
+    </select>
+
+    <!-- 按日期范围统计检验记录 -->
+    <select id="selectStatisticsByDateRange" resultType="java.util.HashMap">
+        SELECT
+            COUNT(*) as totalCount,
+            SUM(CASE WHEN result = 'PASS' THEN 1 ELSE 0 END) as completedCount,
+            SUM(CASE WHEN next_inspection_date &lt; CURDATE() AND status != 'completed' THEN 1 ELSE 0 END) as overdueCount,
+            SUM(CASE WHEN result = 'PASS' THEN 1 ELSE 0 END) * 100.0 / COUNT(*) as completionRate,
+            SUM(CASE WHEN next_inspection_date &lt; CURDATE() AND status != 'completed' THEN 1 ELSE 0 END) * 100.0 / COUNT(*) as overdueRate
+        FROM inspection_record
+        WHERE deleted = 0
+          AND tenant_id = #{tenantId}
+          AND inspection_date &gt;= #{startDate}
+          AND inspection_date &lt;= #{endDate}
+    </select>
+
+    <!-- 按检验类型统计 -->
+    <select id="selectStatisticsByType" resultType="java.util.HashMap">
+        SELECT
+            inspection_type as inspectionType,
+            COUNT(*) as totalCount,
+            SUM(CASE WHEN result = 'PASS' THEN 1 ELSE 0 END) as passCount,
+            SUM(CASE WHEN result = 'FAIL' THEN 1 ELSE 0 END) as failCount
+        FROM inspection_record
+        WHERE deleted = 0
+          AND tenant_id = #{tenantId}
+        GROUP BY inspection_type
+        ORDER BY totalCount DESC
+    </select>
+
+    <!-- 按资产分类统计 -->
+    <select id="selectStatisticsByAssetCategory" resultType="java.util.HashMap">
+        SELECT
+            ac.category_name as categoryName,
+            COUNT(ir.id) as totalCount,
+            SUM(CASE WHEN ir.result = 'PASS' THEN 1 ELSE 0 END) as passCount,
+            SUM(CASE WHEN ir.result = 'FAIL' THEN 1 ELSE 0 END) as failCount
+        FROM inspection_record ir
+        INNER JOIN asset a ON ir.asset_id = a.id
+        INNER JOIN asset_category ac ON a.category_id = ac.id
+        WHERE ir.deleted = 0
+          AND ir.tenant_id = #{tenantId}
+          AND a.deleted = 0
+        GROUP BY ac.id, ac.category_name
+        ORDER BY totalCount DESC
+    </select>
+
+    <!-- 按资产ID查询检验记录 -->
+    <select id="selectByAssetId" resultType="com.ams.entity.InspectionRecord">
+        SELECT * FROM inspection_record
+        WHERE deleted = 0
+          AND tenant_id = #{tenantId}
+          AND asset_id = #{assetId}
+        ORDER BY inspection_date DESC
+    </select>
+
+</mapper>

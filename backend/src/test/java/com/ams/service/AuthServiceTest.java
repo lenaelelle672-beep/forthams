@@ -1,7 +1,6 @@
 package com.ams.service;
 
 import com.ams.common.exception.BusinessException;
-import com.ams.common.exception.ConflictException;
 import com.ams.dto.RegisterRequest;
 import com.ams.dto.ResetPasswordRequest;
 import com.ams.entity.User;
@@ -59,7 +58,7 @@ class AuthServiceTest {
         request.setRealName("管理员");
 
         assertThatThrownBy(() -> authService.register(request))
-                .isInstanceOf(ConflictException.class)
+                .isInstanceOf(BusinessException.class)
                 .hasMessageContaining("用户名已存在");
 
         verify(userMapper, never()).insert(any(User.class));

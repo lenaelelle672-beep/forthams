@@ -131,7 +131,7 @@ export interface UseDepreciationReturn {
   /** 当前使用的计算方法 */
   currentMethod: DepreciationMethod;
   /** 资产基础信息（从Asset对象提取） */
-  assetInfo: Partial<Pick<Asset, 'purchase_price' | 'purchase_date' | 'useful_life_years' | 'salvage_value'>> | null;
+  assetInfo: Partial<Pick<Asset, 'purchasePrice' | 'purchaseDate' | 'usefulLifeYears' | 'salvageValue'>> | null;
 }
 
 /**
@@ -243,19 +243,19 @@ export function useDepreciation(
   const [currentMethod, setCurrentMethod] = useState<DepreciationMethod>(
     DepreciationMethod.STRAIGHT_LINE
   );
-  const [assetInfo, setAssetInfo] = useState<Partial<Pick<Asset, 'purchase_price' | 'purchase_date' | 'useful_life_years' | 'salvage_value'>> | null>(null);
+  const [assetInfo, setAssetInfo] = useState<Partial<Pick<Asset, 'purchasePrice' | 'purchaseDate' | 'usefulLifeYears' | 'salvageValue'>> | null>(null);
 
   /**
    * 转换原始API结果为详情格式
    */
   const transformToDetails = useCallback((
     result: DepreciationResult,
-    asset?: Partial<Pick<Asset, 'purchase_price' | 'purchase_date' | 'useful_life_years' | 'salvage_value'>>
+    asset?: Partial<Pick<Asset, 'purchasePrice' | 'purchaseDate' | 'usefulLifeYears' | 'salvageValue'>>
   ): DepreciationDetails => {
     const now = new Date();
     const referenceDateObj = new Date(result.reference_date);
-    const purchaseDate = asset?.purchase_date ? new Date(asset.purchase_date) : referenceDateObj;
-    const totalMonths = (asset?.useful_life_years || 10) * 12;
+    const purchaseDate = asset?.purchaseDate ? new Date(asset.purchaseDate) : referenceDateObj;
+    const totalMonths = (asset?.usefulLifeYears || 10) * 12;
     const monthsUsed = result.periods_elapsed;
     const remainingMonths = Math.max(0, totalMonths - monthsUsed);
     const depreciableAmount = result.purchase_price - result.salvage_value;
@@ -272,9 +272,9 @@ export function useDepreciation(
 
     // 计算预计结束日期
     let estimatedEndDate: string | null = null;
-    if (asset?.purchase_date && asset?.useful_life_years) {
-      const endDate = new Date(asset.purchase_date);
-      endDate.setFullYear(endDate.getFullYear() + asset.useful_life_years);
+    if (asset?.purchaseDate && asset?.usefulLifeYears) {
+      const endDate = new Date(asset.purchaseDate);
+      endDate.setFullYear(endDate.getFullYear() + asset.usefulLifeYears);
       estimatedEndDate = formatDate(endDate);
     }
 
@@ -330,8 +330,8 @@ export function useDepreciation(
       // 如果响应包含资产信息，保存下来
       if (result.purchase_price) {
         setAssetInfo({
-          purchase_price: result.purchase_price,
-          salvage_value: result.salvage_value
+          purchasePrice: result.purchase_price,
+          salvageValue: result.salvage_value
         });
       }
 

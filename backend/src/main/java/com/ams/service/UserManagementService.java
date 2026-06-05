@@ -121,6 +121,37 @@ public class UserManagementService {
         return users;
     }
 
+    /**
+     * 根据部门ID列表和关键词搜索用户（用于租户过滤场景）
+     *
+     * @param keyword 搜索关键词（可选）
+     * @param deptIds 部门ID列表（可选）
+     * @return 用户列表
+     */
+    public List<User> searchUsersByDepts(String keyword, List<Long> deptIds) {
+        QueryWrapper<User> wrapper = new QueryWrapper<>();
+        wrapper.eq("status", 1);
+
+        if (deptIds != null && !deptIds.isEmpty()) {
+            wrapper.in("dept_id", deptIds);
+        }
+
+        if (keyword != null && !keyword.isBlank()) {
+            wrapper.and(w -> w.like("username", keyword)
+                .or()
+                .like("real_name", keyword)
+                .or()
+                .like("email", keyword)
+                .or()
+                .like("phone", keyword));
+        }
+        wrapper.select("id", "username", "real_name", "email", "phone", "dept_id", "status")
+               .last("limit 50");
+        List<User> users = userMapper.selectList(wrapper);
+        users.forEach(user -> BeanUtil.setProperty(user, "password", null));
+        return users;
+    }
+
     /** 获取用户的角色ID列表 */
     public List<Long> getUserRoleIds(Long userId) {
         return userRoleMapper.selectRoleIdsByUserId(userId);

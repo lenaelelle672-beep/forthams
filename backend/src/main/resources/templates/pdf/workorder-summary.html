@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <title>工单统计报表</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 2cm;
+    }
+    body {
+      font-family: "PingFang SC", "STHeiti", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+      font-size: 11px;
+      color: #333;
+      line-height: 1.6;
+      margin: 0;
+      padding: 0;
+    }
+    h1 {
+      text-align: center;
+      color: #7c3aed;
+      font-size: 20px;
+      margin: 0 0 4px 0;
+    }
+    .header-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #666;
+      font-size: 10px;
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #7c3aed;
+    }
+    h2 {
+      color: #7c3aed;
+      font-size: 14px;
+      margin: 16px 0 8px 0;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .kpi-grid {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .kpi-card {
+      flex: 1;
+      text-align: center;
+      padding: 10px 8px;
+      background: #f5f3ff;
+      border-radius: 6px;
+      border: 1px solid #e9d5ff;
+    }
+    .kpi-card .label {
+      font-size: 9px;
+      color: #6b7280;
+      margin-bottom: 2px;
+    }
+    .kpi-card .value {
+      font-size: 18px;
+      font-weight: 700;
+      color: #7c3aed;
+    }
+    .kpi-card .sub {
+      font-size: 8px;
+      color: #9ca3af;
+      margin-top: 2px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 8px 0 16px 0;
+    }
+    th, td {
+      padding: 6px 10px;
+      text-align: left;
+      border: 1px solid #e5e7eb;
+      font-size: 10px;
+    }
+    th {
+      background-color: #7c3aed;
+      color: #fff;
+      font-weight: 600;
+    }
+    tr:nth-child(even) {
+      background-color: #faf5ff;
+    }
+    .bar-cell {
+      position: relative;
+    }
+    .bar {
+      display: inline-block;
+      height: 10px;
+      background: #7c3aed;
+      border-radius: 3px;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+    .status-open     { color: #3b82f6; font-weight: 600; }
+    .status-progress { color: #f59e0b; font-weight: 600; }
+    .status-closed   { color: #16a34a; font-weight: 600; }
+    .status-overdue  { color: #ef4444; font-weight: 600; }
+    .footer {
+      text-align: center;
+      color: #999;
+      font-size: 9px;
+      margin-top: 20px;
+      padding-top: 8px;
+      border-top: 1px solid #e2e8f0;
+    }
+  </style>
+</head>
+<body>
+  <div class="header-info">
+    <span>forthAMS 资产管理系统</span>
+    <span th:text="'生成时间：' + ${#dates.format(#dates.createNow(), 'yyyy-MM-dd HH:mm:ss')}">生成时间</span>
+  </div>
+
+  <h1>工单统计报表</h1>
+
+  <!-- KPI 概览 -->
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="label">工单总数</div>
+      <div class="value" th:text="${totalWorkOrders}">0</div>
+    </div>
+    <div class="kpi-card">
+      <div class="label">已完成</div>
+      <div class="value" th:text="${completedOrders}">0</div>
+      <div class="sub" th:text="'完成率 ' + ${completionRate} + '%'">完成率 0%</div>
+    </div>
+    <div class="kpi-card">
+      <div class="label">处理中</div>
+      <div class="value" th:text="${inProgressOrders}">0</div>
+    </div>
+    <div class="kpi-card">
+      <div class="label">待处理</div>
+      <div class="value" th:text="${pendingOrders}">0</div>
+    </div>
+    <div class="kpi-card">
+      <div class="label">超时工单</div>
+      <div class="value" th:text="${overdueOrders}">0</div>
+    </div>
+  </div>
+
+  <!-- 状态分布表 -->
+  <h2>一、工单状态分布</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>状态</th>
+        <th>数量</th>
+        <th>占比</th>
+        <th style="width: 40%;">可视化</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr th:each="item : ${statusDistribution}">
+        <td th:text="${item?.name}">-</td>
+        <td th:text="${item?.value}">0</td>
+        <td th:text="${item?.percentage} + '%'">0%</td>
+        <td class="bar-cell">
+          <span class="bar" th:style="'width: ' + ${item?.percentage} + 'px;'"></span>
+          <span th:text="${item?.value}">0</span>
+        </td>
+      </tr>
+      <tr th:if="${statusDistribution == null or #lists.isEmpty(statusDistribution)}">
+        <td colspan="4" style="text-align: center; color: #999;">暂无数据</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- 部门工单排行 -->
+  <h2>二、部门工单排行</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>排名</th>
+        <th>部门</th>
+        <th>工单数</th>
+        <th>已完成</th>
+        <th>完成率</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr th:each="dept, stat : ${deptRanking}">
+        <td th:text="${stat.count}">1</td>
+        <td th:text="${dept?.departmentName}">-</td>
+        <td th:text="${dept?.totalCount}">0</td>
+        <td th:text="${dept?.completedCount}">0</td>
+        <td th:text="${dept?.completionRate} + '%'">0%</td>
+      </tr>
+      <tr th:if="${deptRanking == null or #lists.isEmpty(deptRanking)}">
+        <td colspan="5" style="text-align: center; color: #999;">暂无数据</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- 近期工单明细 -->
+  <h2>三、近期工单明细</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>工单号</th>
+        <th>标题</th>
+        <th>类型</th>
+        <th>优先级</th>
+        <th>状态</th>
+        <th>创建时间</th>
+        <th>负责人</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr th:each="order : ${recentOrders}">
+        <td th:text="${order?.orderNo}">-</td>
+        <td th:text="${order?.title}">-</td>
+        <td th:text="${order?.type}">-</td>
+        <td th:text="${order?.priority}">-</td>
+        <td>
+          <span th:if="${order?.status == 'OPEN'}" class="status-open">待处理</span>
+          <span th:if="${order?.status == 'IN_PROGRESS'}" class="status-progress">处理中</span>
+          <span th:if="${order?.status == 'CLOSED'}" class="status-closed">已关闭</span>
+          <span th:if="${order?.status == 'OVERDUE'}" class="status-overdue">已超时</span>
+          <span th:if="${order?.status != 'OPEN' and order?.status != 'IN_PROGRESS' and order?.status != 'CLOSED' and order?.status != 'OVERDUE'}" th:text="${order?.status}">-</span>
+        </td>
+        <td th:text="${order?.createTime}">-</td>
+        <td th:text="${order?.assigneeName}">-</td>
+      </tr>
+      <tr th:if="${recentOrders == null or #lists.isEmpty(recentOrders)}">
+        <td colspan="7" style="text-align: center; color: #999;">暂无工单数据</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="footer">
+    <p>forthAMS 资产管理系统 — 自动生成工单统计报表</p>
+  </div>
+</body>
+</html>

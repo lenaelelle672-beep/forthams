@@ -17,7 +17,11 @@ public class MaintenanceRecord implements Serializable {
 
     private String tenantId;
     private Long assetId;
+    /** 关联工单ID（可为空，兼容存量数据） */
+    private Long workOrderId;
     private String maintenanceType;
+    /** 来源: MANUAL/PLAN（计划生成或手动创建） */
+    private String sourceType;
     private LocalDate maintenanceDate;
     private LocalDate nextMaintenanceDate;
     private BigDecimal cost;

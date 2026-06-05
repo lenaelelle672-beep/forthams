@@ -184,7 +184,7 @@ function isJsonResponse(response: Response): boolean {
  * revokes all remaining URLs on unmount to prevent memory leaks.
  */
 const ExportTab: React.FC = () => {
-  const [form] = Form.useForm<ExportFilterValues>();
+  const [form] = Form.useForm();
 
   /** Whether an export request is in progress */
   const [exporting, setExporting] = useState<boolean>(false);

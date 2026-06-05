@@ -29,11 +29,13 @@
 import React, { useState, useCallback, useRef } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Upload, FileText, X, AlertCircle, CheckCircle, Download, Loader2 } from 'lucide-react';
-import { Button } from '../ui/button';
-import { Progress } from '../ui/progress';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../ui/card';
-import { Badge } from '../ui/badge';
+import { Button } from '../ui/Button';
+import { Progress } from '../ui/Progress';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../ui/Card';
+import { Badge } from '../ui/Badge';
 import { cn } from '@/lib/utils';
+import { parseImportFile, commitImport } from '@/api/assetImport';
+import type { ParseResponse, CommitResponse } from '@/api/assetImport';
 
 // 文件大小限制：10MB
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
@@ -197,6 +199,9 @@ export function FileUploader({
     setUploadProgress(0);
     onProgress?.(0, 'uploading');
     
+    // 初始化 AbortController
+    abortControllerRef.current = new AbortController();
+    
     try {
       // 3. 文件预览
       await handleFilePreview(file);
@@ -204,48 +209,86 @@ export function FileUploader({
       onProgress?.(20, 'validating');
       setStatus('validating');
       
-      // 4. 上传文件到服务器
-      const formData = new FormData();
-      formData.append('file', file);
-      
-      abortControllerRef.current = new AbortController();
-      
+      // 检查是否已取消
+      if (abortControllerRef.current?.signal.aborted) {
+        throw new Error('上传已取消');
+      }
+
       setUploadProgress(40);
       onProgress?.(40, 'importing');
       setStatus('importing');
-      
-      // 模拟上传进度（实际项目中替换为真实 API 调用）
-      const uploadResponse = await simulateUpload(formData, (progress) => {
-        const actualProgress = 40 + progress * 0.5;
+
+      // 4. 调用真实解析 API
+      const parseResult: ParseResponse = await parseImportFile(file, (progress) => {
+        const actualProgress = 40 + progress * 0.3;
         setUploadProgress(actualProgress);
         onProgress?.(actualProgress, 'importing');
-      }, abortControllerRef.current.signal);
-      
-      setUploadProgress(90);
-      onProgress?.(90, 'validating');
-      setStatus('validating');
-      
-      // 5. 获取导入结果
-      const result: ImportResult = uploadResponse.data;
-      
+      });
+
+      // 检查是否已取消
+      if (abortControllerRef.current?.signal.aborted) {
+        throw new Error('上传已取消');
+      }
+
+      // 5. 处理解析结果
+      if (parseResult.errors && parseResult.errors.length > 0) {
+        // 有校验错误
+        const mappedErrors: ValidationError[] = parseResult.errors.map((err) => ({
+          row: err.rowNumber,
+          field: err.field,
+          value: '',
+          reason: err.message,
+        }));
+        setValidationErrors(mappedErrors);
+        setStatus('error');
+        setImportResult({
+          taskId: parseResult.parseId,
+          status: 'failed',
+          totalRows: parseResult.rows.length,
+          successRows: 0,
+          failedRows: parseResult.errors.length,
+          errors: mappedErrors,
+        });
+        onProgress?.(100, 'error');
+        onUploadError?.(new Error('文件校验失败'));
+        return;
+      }
+
+      // 6. 无错误，自动提交
+      setUploadProgress(70);
+      onProgress?.(70, 'importing');
+
+      const commitResult: CommitResponse = await commitImport(parseResult.parseId, parseResult.rows);
+
+      // 检查是否已取消
+      if (abortControllerRef.current?.signal.aborted) {
+        throw new Error('上传已取消');
+      }
+
       setUploadProgress(100);
+
+      // 7. 映射结果到 ImportResult
+      const totalRows = (commitResult.importedCount || 0) + (commitResult.failedCount || 0);
+      const result: ImportResult = {
+        taskId: parseResult.parseId,
+        status: commitResult.success ? 'completed' : 'failed',
+        totalRows,
+        successRows: commitResult.importedCount || 0,
+        failedRows: commitResult.failedCount || 0,
+        errors: [],
+      };
+
       setImportResult(result);
-      
+
       if (result.status === 'completed') {
         setStatus('success');
         onProgress?.(100, 'success');
         onUploadSuccess?.(result.taskId, result);
-      } else if (result.status === 'failed') {
+      } else {
         setStatus('error');
-        setError('导入失败，请查看错误报告');
-        setValidationErrors(result.errors);
+        setError('导入失败');
         onProgress?.(100, 'error');
         onUploadError?.(new Error('导入失败'));
-      } else {
-        // partial
-        setStatus('error');
-        setValidationErrors(result.errors);
-        onProgress?.(100, 'error');
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : '文件上传失败';
@@ -255,48 +298,6 @@ export function FileUploader({
       onUploadError?.(err instanceof Error ? err : new Error(errorMessage));
     }
   }, [handleFilePreview, onUploadSuccess, onUploadError, onProgress]);
-
-  /**
-   * 模拟文件上传（实际项目中替换为真实 API）
-   * @param formData - 表单数据
-   * @param onProgress - 进度回调
-   * @param signal - AbortSignal
-   * @returns Promise
-   */
-  const simulateUpload = async (
-    formData: FormData,
-    onProgress: (progress: number) => void,
-    signal: AbortSignal
-  ): Promise<{ data: ImportResult }> => {
-    return new Promise((resolve, reject) => {
-      let progress = 0;
-      const interval = setInterval(() => {
-        if (signal.aborted) {
-          clearInterval(interval);
-          reject(new Error('上传已取消'));
-          return;
-        }
-        
-        progress += 10;
-        onProgress(progress);
-        
-        if (progress >= 100) {
-          clearInterval(interval);
-          // 模拟成功响应
-          resolve({
-            data: {
-              taskId: `task_${Date.now()}`,
-              status: 'completed',
-              totalRows: 0,
-              successRows: 0,
-              failedRows: 0,
-              errors: []
-            }
-          });
-        }
-      }, 200);
-    });
-  };
 
   /**
    * 下载错误报告
@@ -379,13 +380,13 @@ export function FileUploader({
    * @returns 徽章配置
    */
   const getStatusBadge = (currentStatus: ImportStatus) => {
-    const badges: Record<ImportStatus, { label: string; variant: 'default' | 'success' | 'error' | 'warning' | 'secondary' }> = {
-      idle: { label: '等待上传', variant: 'secondary' },
+    const badges: Record<ImportStatus, { label: string; variant: 'default' | 'success' | 'danger' | 'warning' | 'gray' }> = {
+      idle: { label: '等待上传', variant: 'gray' },
       uploading: { label: '上传中', variant: 'default' },
       validating: { label: '校验中', variant: 'warning' },
       importing: { label: '导入中', variant: 'default' },
       success: { label: '导入成功', variant: 'success' },
-      error: { label: '导入失败', variant: 'error' }
+      error: { label: '导入失败', variant: 'danger' }
     };
     return badges[currentStatus];
   };

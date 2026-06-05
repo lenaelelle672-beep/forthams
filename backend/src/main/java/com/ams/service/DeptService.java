@@ -40,7 +40,11 @@ public class DeptService {
         wrapper.orderByAsc("sort_order", "id");
 
         List<Map<String, Object>> depts = deptMapper.selectMaps(wrapper);
-        return buildDeptTree(depts);
+        List<Map<String, Object>> camelDepts = new ArrayList<>(depts.size());
+        for (Map<String, Object> d : depts) {
+            camelDepts.add(toCamelCaseMap(d));
+        }
+        return buildDeptTree(camelDepts);
     }
 
     public Dept getDeptById(Long id) {
@@ -139,7 +143,7 @@ public class DeptService {
         }
 
         for (Map<String, Object> item : deptList) {
-            Long parentId = toLong(item.get("parent_id"));
+            Long parentId = toLong(item.get("parentId"));
             if (parentId == null || parentId == 0L || !nodeMap.containsKey(parentId)) {
                 roots.add(item);
                 continue;
@@ -177,5 +181,30 @@ public class DeptService {
             return number.longValue();
         }
         return Long.valueOf(String.valueOf(value));
+    }
+
+    private Map<String, Object> toCamelCaseMap(Map<String, Object> source) {
+        Map<String, Object> result = new HashMap<>(source.size());
+        for (Map.Entry<String, Object> entry : source.entrySet()) {
+            result.put(snakeToCamel(entry.getKey()), entry.getValue());
+        }
+        return result;
+    }
+
+    private String snakeToCamel(String snake) {
+        if (snake == null || !snake.contains("_")) {
+            return snake;
+        }
+        StringBuilder sb = new StringBuilder(snake.length());
+        boolean upper = false;
+        for (char c : snake.toCharArray()) {
+            if (c == '_') {
+                upper = true;
+            } else {
+                sb.append(upper ? Character.toUpperCase(c) : c);
+                upper = false;
+            }
+        }
+        return sb.toString();
     }
 }

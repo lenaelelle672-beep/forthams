@@ -10,6 +10,11 @@
  * - 月度处置统计（柱状图，从 getReportSummary 获取退役数据）
  * - 日期范围筛选器绑定查询参数
  *
+ * 布局改进 (FD-20260530-23)：
+ * - 响应式图表网格，小屏单列、大屏多列稳定布局
+ * - 每个图表独立处理 加载/错误/空 三种状态，不伪造数据
+ * - 筛选器标注"数据范围"标签，图表标题附加说明性副标题
+ *
  * 数据源：所有图表绑定真实 API，无 MOCK 残留。
  */
 
@@ -17,7 +22,7 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import {
   TrendingUp, Package, DollarSign, Activity, BarChart3,
-  Calendar,
+  Calendar, AlertCircle, Loader2,
 } from 'lucide-react';
 import {
   AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell,
@@ -33,10 +38,7 @@ import { getReportByCategory, getReportSummary, type ReportSummary, type Categor
 import type { ApiResponse } from '@/types/common';
 import type { DashboardStats, AssetValueTrend, DeptAssetDistribution } from '@/types/asset';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
-import { KpiCard } from '@/components/ui/KpiCard';
-import { PageHeader } from '@/components/ui/PageHeader';
 import { Select, SelectItem } from '@/components/ui/Select';
-import { SkeletonCard } from '@/components/ui/Skeleton';
 
 // ── 颜色常量 ──────────────────────────────────────────────────────────────────
 const COLORS = {
@@ -52,48 +54,82 @@ const COLORS = {
 
 const PIE_COLORS = [COLORS.blue, COLORS.green, COLORS.amber, COLORS.red, COLORS.purple, COLORS.cyan, COLORS.pink, COLORS.gray];
 
+// ── 图表状态组件 ──────────────────────────────────────────────────────────────
+
+/** 图表空状态占位 */
+function ChartEmptyState({ message }: { message: string }) {
+  return (
+    <div className="flex flex-col items-center justify-center h-60 text-slate-400">
+      <BarChart3 className="w-10 h-10 mb-3 text-slate-200" />
+      <span className="text-sm font-medium">{message}</span>
+    </div>
+  );
+}
+
+/** 图表加载状态 */
+function ChartLoadingState() {
+  return (
+    <div className="flex flex-col items-center justify-center h-60 text-slate-400">
+      <Loader2 className="w-7 h-7 mb-3 animate-spin text-blue-500" />
+      <span className="text-sm font-medium">加载中…</span>
+    </div>
+  );
+}
+
+/** 图表错误状态 */
+function ChartErrorState({ message }: { message: string }) {
+  return (
+    <div className="flex flex-col items-center justify-center h-60 text-red-500">
+      <AlertCircle className="w-7 h-7 mb-3" />
+      <span className="text-sm font-medium">{message}</span>
+    </div>
+  );
+}
+
+// ── 主组件 ────────────────────────────────────────────────────────────────────
+
 export default function AnalyticsPage() {
   const [period, setPeriod] = useState('12');
 
   // ── API 查询 ────────────────────────────────────────────────────────────────
 
   /** 仪表板核心统计 */
-  const { data: statsRes, isLoading: statsLoading } = useQuery({
+  const { data: statsRes, isLoading: statsLoading, isError: statsError } = useQuery({
     queryKey: ['dashboard', 'stats'],
     queryFn: getDashboardStats,
     staleTime: 1000 * 60 * 5,
   });
 
   /** 资产价值趋势（根据 period 计算天数） */
-  const { data: trendsRes } = useQuery({
+  const { data: trendsRes, isLoading: trendsLoading, isError: trendsError } = useQuery({
     queryKey: ['dashboard', 'trends', Number(period) * 30],
     queryFn: () => getAssetValueTrends(Number(period) * 30),
     staleTime: 1000 * 60 * 15,
   });
 
   /** 部门资产分布 */
-  const { data: deptRes } = useQuery({
+  const { data: deptRes, isLoading: deptLoading, isError: deptError } = useQuery({
     queryKey: ['dashboard', 'dept-distribution'],
     queryFn: getDeptDistribution,
     staleTime: 1000 * 60 * 15,
   });
 
   /** 维保统计 */
-  const { data: maintenanceRes } = useQuery({
+  const { data: maintenanceRes, isLoading: maintenanceLoading } = useQuery({
     queryKey: ['dashboard', 'maintenance-stats'],
     queryFn: getMaintenanceStats,
     staleTime: 1000 * 60 * 15,
   });
 
   /** 分类统计（ReportController） */
-  const { data: categoryRes } = useQuery({
+  const { data: categoryRes, isLoading: categoryLoading, isError: categoryError } = useQuery({
     queryKey: ['reports', 'by-category'],
     queryFn: getReportByCategory,
     staleTime: 1000 * 60 * 15,
   });
 
   /** 汇总统计（ReportController） */
-  const { data: summaryRes } = useQuery({
+  const { data: summaryRes, isLoading: summaryLoading, isError: summaryError } = useQuery({
     queryKey: ['reports', 'summary'],
     queryFn: getReportSummary,
     staleTime: 1000 * 60 * 15,
@@ -130,7 +166,7 @@ export default function AnalyticsPage() {
         }))
       : [];
 
-  /** 部门排行数据：映射为万元 */
+  /** 部门排行数据：映射数量 */
   const deptChartData = deptData.map((d: DeptAssetDistribution) => ({
     name:  d.deptName,
     value: d.assetCount,
@@ -149,249 +185,316 @@ export default function AnalyticsPage() {
 
   const allLoading = statsLoading && !stats && !summary;
 
+  // ── KPI 数据配置 ────────────────────────────────────────────────────────────
+
+  const kpiItems = [
+    {
+      title: '资产总数',
+      value: (stats?.totalAssets ?? 0).toLocaleString() + ' 台',
+      subtitle: `在用 ${(stats?.inUseAssets ?? 0).toLocaleString()} 台`,
+      icon: Package,
+      gradient: 'from-blue-500 to-blue-600',
+    },
+    {
+      title: '资产总价值',
+      value: '¥' + ((stats?.totalValue ?? 0) / 10000).toFixed(0) + ' 万',
+      subtitle: `净值 ¥${((stats?.netValue ?? 0) / 10000).toFixed(0)} 万`,
+      icon: DollarSign,
+      gradient: 'from-emerald-500 to-emerald-600',
+    },
+    {
+      title: '月度维保次数',
+      value: String(maintenanceData?.monthlyMaintenanceCount ?? 0),
+      subtitle: `总计 ${maintenanceData?.totalMaintenanceCount ?? 0} 次`,
+      icon: Activity,
+      gradient: 'from-amber-500 to-amber-600',
+    },
+    {
+      title: '待审批',
+      value: String(stats?.pendingApprovals ?? 0),
+      subtitle: `退役 ${summary?.recentlyRetired ?? 0} 项`,
+      icon: TrendingUp,
+      gradient: 'from-purple-500 to-purple-600',
+    },
+  ];
+
   return (
-    <div className="p-6 space-y-6">
-      <PageHeader
-        title="数据分析"
-        subtitle="多维度资产数据洞察与趋势分析"
-        breadcrumbs={[{ label: '仪表板', href: '/dashboard' }, { label: '数据分析' }]}
-        actions={
-          <div className="flex items-center gap-2">
-            <Calendar className="w-4 h-4 text-[#94a3b8]" />
-            <Select
-              value={period}
-              onValueChange={setPeriod}
-            >
-              <SelectItem value="6">近 6 个月</SelectItem>
-              <SelectItem value="12">近 12 个月</SelectItem>
-            </Select>
+    <div className="min-h-full bg-[var(--app-background)] px-4 py-5 sm:px-6 lg:px-8">
+      <div className="mx-auto flex w-full max-w-[1480px] flex-col gap-6">
+        {/* ── 页头 + KPI 统计栏 ───────────────────────────────────────────── */}
+        <section className="rounded-2xl border border-[var(--surface-border)] bg-white shadow-sm">
+          <div className="flex flex-wrap items-center justify-between gap-4 px-6 py-5">
+            <div>
+              <h1 className="text-xl font-bold text-slate-900">数据分析</h1>
+              <p className="mt-1 text-sm text-slate-500">多维度资产数据洞察与趋势分析</p>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50/50 px-3 py-2">
+                <Calendar className="w-4 h-4 text-slate-400" />
+                <span className="text-xs font-medium text-slate-500 hidden sm:inline">数据范围</span>
+                <Select value={period} onValueChange={setPeriod}>
+                  <SelectItem value="6">近 6 个月</SelectItem>
+                  <SelectItem value="12">近 12 个月</SelectItem>
+                </Select>
+              </div>
+            </div>
           </div>
-        }
-      />
 
-      {/* KPI 概览 */}
-      <div className="grid grid-cols-4 gap-4">
-        {allLoading ? (
-          Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)
-        ) : (
-          <>
-            <KpiCard
-              title="资产总数"
-              value={(stats?.totalAssets ?? 0).toLocaleString() + ' 台'}
-              trend={{ value: `在用 ${(stats?.inUseAssets ?? 0).toLocaleString()} 台`, direction: 'up' }}
-              icon={Package}
-              iconColor={COLORS.blue}
-            />
-            <KpiCard
-              title="资产总价值"
-              value={'¥' + ((stats?.totalValue ?? 0) / 10000).toFixed(0) + ' 万'}
-              subtitle={`净值 ¥${((stats?.netValue ?? 0) / 10000).toFixed(0)} 万`}
-              icon={DollarSign}
-              iconColor={COLORS.green}
-            />
-            <KpiCard
-              title="月度维保次数"
-              value={String(maintenanceData?.monthlyMaintenanceCount ?? 0)}
-              subtitle={`总计 ${maintenanceData?.totalMaintenanceCount ?? 0} 次`}
-              icon={Activity}
-              iconColor={COLORS.amber}
-            />
-            <KpiCard
-              title="待审批"
-              value={String(stats?.pendingApprovals ?? 0)}
-              subtitle={`退役 ${summary?.recentlyRetired ?? 0} 项`}
-              icon={TrendingUp}
-              iconColor={COLORS.purple}
-            />
-          </>
-        )}
-      </div>
-
-      {/* 图表行 1：趋势 + 分类分布 */}
-      <div className="grid grid-cols-5 gap-4">
-        {/* 资产增长趋势 */}
-        <Card className="col-span-3">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-blue-500" />
-              资产价值趋势
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {trendChartData.length > 0 ? (
-              <ResponsiveContainer width="100%" height={240}>
-                <AreaChart data={trendChartData} margin={{ top: 5, right: 16, left: -16, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor={COLORS.blue} stopOpacity={0.15} />
-                      <stop offset="95%" stopColor={COLORS.blue} stopOpacity={0} />
-                    </linearGradient>
-                    <linearGradient id="colorNet" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor={COLORS.green} stopOpacity={0.15} />
-                      <stop offset="95%" stopColor={COLORS.green} stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                  <XAxis
-                    dataKey="month"
-                    tick={{ fontSize: 11, fill: '#94a3b8' }}
-                    axisLine={false}
-                    tickLine={false}
-                    tickFormatter={(v) => v?.substring(5) ?? v}
-                  />
-                  <YAxis
-                    yAxisId="left"
-                    tick={{ fontSize: 11, fill: '#94a3b8' }}
-                    axisLine={false}
-                    tickLine={false}
-                  />
-                  <YAxis
-                    yAxisId="right"
-                    orientation="right"
-                    tick={{ fontSize: 11, fill: '#94a3b8' }}
-                    axisLine={false}
-                    tickLine={false}
-                  />
-                  <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8, border: '1px solid #e5e7eb' }} />
-                  <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 12 }} />
-                  <Area
-                    yAxisId="left"
-                    type="monotone"
-                    dataKey="value"
-                    name="总价值（万元）"
-                    stroke={COLORS.blue}
-                    strokeWidth={2}
-                    fill="url(#colorValue)"
-                  />
-                  <Area
-                    yAxisId="right"
-                    type="monotone"
-                    dataKey="net"
-                    name="净值（万元）"
-                    stroke={COLORS.green}
-                    strokeWidth={2}
-                    fill="url(#colorNet)"
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            ) : (
-              <div className="flex items-center justify-center h-60 text-gray-400 text-sm">
-                暂无趋势数据
+          {/* KPI 统计栏 */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-slate-100 border-t border-slate-100">
+            {allLoading ? (
+              Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="flex items-center gap-3 px-6 py-5">
+                  <div className="h-10 w-10 animate-pulse rounded-xl bg-slate-100" />
+                  <div className="space-y-2">
+                    <div className="h-3 w-16 animate-pulse rounded bg-slate-100" />
+                    <div className="h-5 w-20 animate-pulse rounded bg-slate-100" />
+                  </div>
+                </div>
+              ))
+            ) : statsError ? (
+              <div className="col-span-full flex items-center justify-center gap-2 py-8 text-red-500 text-sm font-medium">
+                <AlertCircle className="w-5 h-5" />
+                统计数据加载失败
               </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* 分类分布 */}
-        <Card className="col-span-2">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <BarChart3 className="w-4 h-4 text-purple-500" />
-              资产分类分布
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {pieChartData.length > 0 ? (
-              <ResponsiveContainer width="100%" height={240}>
-                <PieChart>
-                  <Pie
-                    data={pieChartData}
-                    cx="50%"
-                    cy="45%"
-                    innerRadius={50}
-                    outerRadius={80}
-                    dataKey="value"
-                    paddingAngle={2}
-                  >
-                    {pieChartData.map((_: Record<string, unknown>, i: number) => (
-                      <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8 }} />
-                  <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 11 }} />
-                </PieChart>
-              </ResponsiveContainer>
             ) : (
-              <div className="flex items-center justify-center h-60 text-gray-400 text-sm">
-                暂无分类数据
-              </div>
+              kpiItems.map((kpi, idx) => {
+                const Icon = kpi.icon;
+                return (
+                  <div key={idx} className="flex items-center gap-3.5 px-6 py-5">
+                    <div className={`flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ${kpi.gradient} shadow-sm`}>
+                      <Icon className="w-5 h-5 text-white" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-xs font-medium text-slate-500 truncate">{kpi.title}</p>
+                      <p className="text-lg font-bold text-slate-900 tabular-nums">{kpi.value}</p>
+                      <p className="text-xs text-slate-400 truncate">{kpi.subtitle}</p>
+                    </div>
+                  </div>
+                );
+              })
             )}
-          </CardContent>
-        </Card>
-      </div>
+          </div>
+        </section>
 
-      {/* 图表行 2：部门排行 + 处置统计 */}
-      <div className="grid grid-cols-2 gap-4">
-        {/* 部门资产价值排行 */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <DollarSign className="w-4 h-4 text-emerald-500" />
-              部门资产数量排行
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {deptChartData.length > 0 ? (
-              <ResponsiveContainer width="100%" height={240}>
-                <BarChart
-                  data={deptChartData}
-                  layout="vertical"
-                  margin={{ top: 0, right: 16, left: 80, bottom: 0 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" horizontal={false} />
-                  <XAxis type="number" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
-                  <YAxis
-                    type="category"
-                    dataKey="name"
-                    tick={{ fontSize: 11, fill: '#64748b' }}
-                    axisLine={false}
-                    tickLine={false}
-                    width={80}
-                  />
-                  <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8 }} />
-                  <Bar dataKey="value" fill={COLORS.blue} radius={[0, 4, 4, 0]} name="资产数量（台）" />
-                </BarChart>
-              </ResponsiveContainer>
-            ) : (
-              <div className="flex items-center justify-center h-60 text-gray-400 text-sm">
-                暂无部门数据
-              </div>
-            )}
-          </CardContent>
-        </Card>
+        {/* ── 图表行 1：趋势 + 分类分布 ─────────────────────────────────── */}
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
+          {/* 资产增长趋势 */}
+          <Card className="overflow-hidden rounded-2xl border-slate-200/80 shadow-sm col-span-1 lg:col-span-3">
+            <div className="bg-white/90 backdrop-blur-sm rounded-2xl border border-slate-200/60 shadow-lg shadow-blue-900/5 m-3">
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center gap-2.5 text-base">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50">
+                    <TrendingUp className="w-4 h-4 text-blue-600" />
+                  </div>
+                  <span className="font-semibold text-slate-900">资产价值趋势</span>
+                  <span className="text-xs font-normal text-slate-400 ml-auto">
+                    {period === '6' ? '近 6 个月' : '近 12 个月'}
+                  </span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {trendsLoading ? (
+                  <ChartLoadingState />
+                ) : trendsError ? (
+                  <ChartErrorState message="趋势数据加载失败" />
+                ) : trendChartData.length > 0 ? (
+                  <ResponsiveContainer width="100%" height={260}>
+                    <AreaChart data={trendChartData} margin={{ top: 5, right: 16, left: -16, bottom: 0 }}>
+                      <defs>
+                        <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor={COLORS.blue} stopOpacity={0.2} />
+                          <stop offset="95%" stopColor={COLORS.blue} stopOpacity={0} />
+                        </linearGradient>
+                        <linearGradient id="colorNet" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor={COLORS.green} stopOpacity={0.2} />
+                          <stop offset="95%" stopColor={COLORS.green} stopOpacity={0} />
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                      <XAxis
+                        dataKey="month"
+                        tick={{ fontSize: 11, fill: '#94a3b8' }}
+                        axisLine={false}
+                        tickLine={false}
+                        tickFormatter={(v) => v?.substring(5) ?? v}
+                      />
+                      <YAxis
+                        yAxisId="left"
+                        tick={{ fontSize: 11, fill: '#94a3b8' }}
+                        axisLine={false}
+                        tickLine={false}
+                      />
+                      <YAxis
+                        yAxisId="right"
+                        orientation="right"
+                        tick={{ fontSize: 11, fill: '#94a3b8' }}
+                        axisLine={false}
+                        tickLine={false}
+                      />
+                      <Tooltip contentStyle={{ fontSize: 12, borderRadius: 12, border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
+                      <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 12 }} />
+                      <Area
+                        yAxisId="left"
+                        type="monotone"
+                        dataKey="value"
+                        name="总价值（万元）"
+                        stroke={COLORS.blue}
+                        strokeWidth={2.5}
+                        fill="url(#colorValue)"
+                      />
+                      <Area
+                        yAxisId="right"
+                        type="monotone"
+                        dataKey="net"
+                        name="净值（万元）"
+                        stroke={COLORS.green}
+                        strokeWidth={2.5}
+                        fill="url(#colorNet)"
+                      />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <ChartEmptyState message="暂无趋势数据" />
+                )}
+              </CardContent>
+            </div>
+          </Card>
 
-        {/* 资产状态统计 */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Activity className="w-4 h-4 text-amber-500" />
-              资产状态统计
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {disposalData.length > 0 ? (
-              <ResponsiveContainer width="100%" height={240}>
-                <BarChart data={disposalData} margin={{ top: 0, right: 16, left: -16, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                  <XAxis dataKey="type" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
-                  <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
-                  <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8 }} />
-                  <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 11 }} />
-                  <Bar dataKey="count" fill={COLORS.blue} name="数量" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            ) : (
-              <div className="flex items-center justify-center h-60 text-gray-400 text-sm">
-                暂无统计数据
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
+          {/* 分类分布 */}
+          <Card className="overflow-hidden rounded-2xl border-slate-200/80 shadow-sm col-span-1 lg:col-span-2">
+            <div className="bg-white/90 backdrop-blur-sm rounded-2xl border border-slate-200/60 shadow-lg shadow-blue-900/5 m-3">
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center gap-2.5 text-base">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-50">
+                    <BarChart3 className="w-4 h-4 text-purple-600" />
+                  </div>
+                  <span className="font-semibold text-slate-900">资产分类分布</span>
+                  <span className="text-xs font-normal text-slate-400 ml-auto">按类别统计</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {categoryLoading || (statsLoading && !stats?.categoryDistribution) ? (
+                  <ChartLoadingState />
+                ) : categoryError && !stats?.categoryDistribution ? (
+                  <ChartErrorState message="分类数据加载失败" />
+                ) : pieChartData.length > 0 ? (
+                  <ResponsiveContainer width="100%" height={260}>
+                    <PieChart>
+                      <Pie
+                        data={pieChartData}
+                        cx="50%"
+                        cy="45%"
+                        innerRadius={55}
+                        outerRadius={85}
+                        dataKey="value"
+                        paddingAngle={3}
+                      >
+                        {pieChartData.map((_: Record<string, unknown>, i: number) => (
+                          <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip contentStyle={{ fontSize: 12, borderRadius: 12, boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
+                      <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 11 }} />
+                    </PieChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <ChartEmptyState message="暂无分类数据" />
+                )}
+              </CardContent>
+            </div>
+          </Card>
+        </div>
 
-      {/* 底部说明 */}
-      <div className="rounded-xl border border-blue-100 bg-blue-50/50 px-4 py-3 text-sm leading-6 text-blue-700">
-        数据分析模块已对接 Dashboard Stats、Trends、Dept Distribution、Maintenance Stats、Report Summary 及 Category Report API。日期筛选器控制趋势图的时间范围。
+        {/* ── 图表行 2：部门排行 + 处置统计 ─────────────────────────────── */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+          {/* 部门资产数量排行 */}
+          <Card className="overflow-hidden rounded-2xl border-slate-200/80 shadow-sm">
+            <div className="bg-white/90 backdrop-blur-sm rounded-2xl border border-slate-200/60 shadow-lg shadow-blue-900/5 m-3">
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center gap-2.5 text-base">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50">
+                    <DollarSign className="w-4 h-4 text-emerald-600" />
+                  </div>
+                  <span className="font-semibold text-slate-900">部门资产数量排行</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {deptLoading ? (
+                  <ChartLoadingState />
+                ) : deptError ? (
+                  <ChartErrorState message="部门数据加载失败" />
+                ) : deptChartData.length > 0 ? (
+                  <ResponsiveContainer width="100%" height={260}>
+                    <BarChart
+                      data={deptChartData}
+                      layout="vertical"
+                      margin={{ top: 0, right: 16, left: 80, bottom: 0 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" horizontal={false} />
+                      <XAxis type="number" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+                      <YAxis
+                        type="category"
+                        dataKey="name"
+                        tick={{ fontSize: 11, fill: '#64748b' }}
+                        axisLine={false}
+                        tickLine={false}
+                        width={80}
+                      />
+                      <Tooltip contentStyle={{ fontSize: 12, borderRadius: 12, boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
+                      <Bar dataKey="value" fill={COLORS.blue} radius={[0, 6, 6, 0]} name="资产数量（台）" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <ChartEmptyState message="暂无部门数据" />
+                )}
+              </CardContent>
+            </div>
+          </Card>
+
+          {/* 资产状态统计 */}
+          <Card className="overflow-hidden rounded-2xl border-slate-200/80 shadow-sm">
+            <div className="bg-white/90 backdrop-blur-sm rounded-2xl border border-slate-200/60 shadow-lg shadow-blue-900/5 m-3">
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center gap-2.5 text-base">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-50">
+                    <Activity className="w-4 h-4 text-amber-600" />
+                  </div>
+                  <span className="font-semibold text-slate-900">资产状态统计</span>
+                  <span className="text-xs font-normal text-slate-400 ml-auto">退役 / 审批 / 在用</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {summaryLoading ? (
+                  <ChartLoadingState />
+                ) : summaryError ? (
+                  <ChartErrorState message="汇总数据加载失败" />
+                ) : disposalData.length > 0 ? (
+                  <ResponsiveContainer width="100%" height={260}>
+                    <BarChart data={disposalData} margin={{ top: 0, right: 16, left: -16, bottom: 0 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                      <XAxis dataKey="type" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+                      <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+                      <Tooltip contentStyle={{ fontSize: 12, borderRadius: 12, boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
+                      <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 11 }} />
+                      <Bar dataKey="count" fill={COLORS.blue} name="数量" radius={[6, 6, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <ChartEmptyState message="暂无统计数据" />
+                )}
+              </CardContent>
+            </div>
+          </Card>
+        </div>
+
+        {/* ── 底部说明 ────────────────────────────────────────────────────── */}
+        <div className="rounded-xl border border-blue-100 bg-gradient-to-r from-blue-50/80 to-indigo-50/50 px-5 py-4 text-sm leading-6 text-blue-700 shadow-sm">
+          <div className="flex items-start gap-2">
+            <Activity className="w-4 h-4 mt-0.5 flex-shrink-0 text-blue-500" />
+            <span>数据分析模块已对接 Dashboard Stats、Trends、Dept Distribution、Maintenance Stats、Report Summary 及 Category Report API。日期筛选器控制趋势图的时间范围。</span>
+          </div>
+        </div>
       </div>
     </div>
   );

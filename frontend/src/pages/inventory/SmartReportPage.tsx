@@ -1,9 +1,6 @@
 /**
  * @file SmartReportPage.tsx
- * @description RFID 盘点智能报告页面
- *
- * 由 Stitch 设计稿转换（Project: 2014907722451863252, Screen: fc51ef74f0854b369d3b6a74b2ba8dfd）
- * 设计稿预览：frontend/src/pages/inventory/smart-report/stitch-design.html
+ * @description RFID 盘点报告页面
  *
  * 路由：/inventory/smart-report/:taskId
  */
@@ -18,7 +15,6 @@ import {
   CheckCircle2,
   AlertTriangle,
   TrendingUp,
-  Sparkles,
   ChevronRight,
   Loader2,
   AlertCircle,
@@ -38,10 +34,10 @@ import type {
 
 type DiscrepancyType = '盘亏' | '盘盈' | '位置异常';
 
-const DISCREPANCY_BADGE: Record<DiscrepancyType, { bg: string; text: string }> = {
-  '盘亏':   { bg: 'bg-red-50',    text: 'text-red-600' },
-  '盘盈':   { bg: 'bg-green-50',  text: 'text-green-700' },
-  '位置异常': { bg: 'bg-orange-50', text: 'text-orange-600' },
+const DISCREPANCY_BADGE: Record<DiscrepancyType, { bg: string; text: string; dot: string }> = {
+  '盘亏':   { bg: 'bg-red-50',    text: 'text-red-600', dot: 'bg-red-500' },
+  '盘盈':   { bg: 'bg-green-50',  text: 'text-green-700', dot: 'bg-green-500' },
+  '位置异常': { bg: 'bg-orange-50', text: 'text-orange-600', dot: 'bg-orange-500' },
 };
 
 /** 将 ActualStatus 映射为展示用的差异类型 */
@@ -82,28 +78,31 @@ function KpiCard({
   sub?: string;
   trend?: string;
   trendColor?: string;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: React.ComponentType<{ className?: string; style?: React.CSSProperties }>;
   accentColor: string;
 }) {
   return (
-    <div className="bg-white border border-[#e2e8f0] rounded-xl overflow-hidden flex flex-col">
-      {/* 顶部色条 */}
+    <div
+      className="group relative bg-white/95 border border-[#e2e8f0] rounded-2xl overflow-hidden flex flex-col transition-all duration-200 hover:shadow-md"
+      style={{ boxShadow: '0 8px 24px rgba(15, 23, 42, 0.04)' }}
+    >
+      {/* 顶部状态色条 */}
       <div className="h-1" style={{ backgroundColor: accentColor }} />
       <div className="p-5 flex flex-col gap-3 flex-1">
         <div className="flex items-center justify-between">
-          <span className="text-sm text-[#64748b]">{label}</span>
+          <span className="text-sm font-medium text-[#64748b] tracking-wide">{label}</span>
           <span
-            className="w-8 h-8 rounded-lg flex items-center justify-center"
-            style={{ backgroundColor: accentColor + '18' }}
+            className="w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:shadow-sm"
+            style={{ backgroundColor: accentColor + '15' }}
           >
-            <Icon className="w-4 h-4" style={{ color: accentColor } as React.CSSProperties} />
+            <Icon className="w-4.5 h-4.5" style={{ color: accentColor } as React.CSSProperties} />
           </span>
         </div>
         <div className="flex items-end gap-2">
-          <span className="text-3xl font-bold text-[#0f172a]">{value}</span>
+          <span className="text-3xl sm:text-4xl font-bold text-[#0f172a] tracking-tight leading-none">{value}</span>
           {trend && (
             <span
-              className="mb-0.5 px-2 py-0.5 rounded-full text-xs font-semibold"
+              className="mb-1 px-2.5 py-0.5 rounded-full text-xs font-semibold"
               style={{
                 backgroundColor: (trendColor ?? '#10b981') + '18',
                 color: trendColor ?? '#10b981',
@@ -113,7 +112,7 @@ function KpiCard({
             </span>
           )}
         </div>
-        {sub && <p className="text-xs text-[#94a3b8]">{sub}</p>}
+        {sub && <p className="text-xs text-[#94a3b8] leading-relaxed">{sub}</p>}
       </div>
     </div>
   );
@@ -122,10 +121,13 @@ function KpiCard({
 /** 全屏居中 loading */
 function FullscreenLoader() {
   return (
-    <div className="min-h-screen bg-[#f8fafc] flex items-center justify-center">
-      <div className="flex flex-col items-center gap-3">
-        <Loader2 className="w-8 h-8 text-[#2563eb] animate-spin" />
-        <span className="text-sm text-[#64748b]">正在加载智能报告…</span>
+    <div className="min-h-screen bg-gradient-to-br from-[#f8fafc] to-[#eef2f7] flex items-center justify-center">
+      <div className="flex flex-col items-center gap-4">
+        <div className="relative">
+          <Loader2 className="w-10 h-10 text-[#2563eb] animate-spin" />
+          <div className="absolute inset-0 w-10 h-10 rounded-full bg-[#2563eb]/5 animate-pulse" />
+        </div>
+        <span className="text-sm font-medium text-[#64748b]">正在加载盘点报告…</span>
       </div>
     </div>
   );
@@ -134,13 +136,15 @@ function FullscreenLoader() {
 /** 全屏错误态 */
 function FullscreenError({ message, onRetry }: { message: string; onRetry: () => void }) {
   return (
-    <div className="min-h-screen bg-[#f8fafc] flex items-center justify-center">
-      <div className="flex flex-col items-center gap-3 max-w-md text-center">
-        <AlertCircle className="w-8 h-8 text-red-500" />
+    <div className="min-h-screen bg-gradient-to-br from-[#f8fafc] to-[#eef2f7] flex items-center justify-center">
+      <div className="flex flex-col items-center gap-4 max-w-md text-center bg-white rounded-2xl px-8 py-10 shadow-sm border border-[#e2e8f0]">
+        <div className="w-14 h-14 rounded-2xl bg-red-50 flex items-center justify-center">
+          <AlertCircle className="w-7 h-7 text-red-500" />
+        </div>
         <p className="text-sm text-[#64748b]">{message}</p>
         <button
           onClick={onRetry}
-          className="px-4 py-2 bg-[#2563eb] text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+          className="px-5 py-2.5 bg-[#2563eb] hover:bg-blue-700 text-white text-sm font-semibold rounded-xl transition-all duration-200 hover:shadow-md active:scale-[0.98]"
         >
           重试
         </button>
@@ -153,13 +157,15 @@ function FullscreenError({ message, onRetry }: { message: string; onRetry: () =>
 function MissingTaskId() {
   const navigate = useNavigate();
   return (
-    <div className="min-h-screen bg-[#f8fafc] flex items-center justify-center">
-      <div className="flex flex-col items-center gap-3 text-center">
-        <AlertCircle className="w-8 h-8 text-[#94a3b8]" />
-        <p className="text-sm text-[#64748b]">未指定盘点任务 ID</p>
+    <div className="min-h-screen bg-gradient-to-br from-[#f8fafc] to-[#eef2f7] flex items-center justify-center">
+      <div className="flex flex-col items-center gap-4 text-center bg-white rounded-2xl px-8 py-10 shadow-sm border border-[#e2e8f0]">
+        <div className="w-14 h-14 rounded-2xl bg-slate-50 flex items-center justify-center">
+          <AlertCircle className="w-7 h-7 text-[#94a3b8]" />
+        </div>
+        <p className="text-sm font-medium text-[#64748b]">未指定盘点任务 ID</p>
         <button
           onClick={() => navigate('/inventory')}
-          className="px-4 py-2 bg-[#2563eb] text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+          className="px-5 py-2.5 bg-[#2563eb] hover:bg-blue-700 text-white text-sm font-semibold rounded-xl transition-all duration-200 hover:shadow-md active:scale-[0.98]"
         >
           返回盘点列表
         </button>
@@ -206,9 +212,27 @@ export default function SmartReportPage() {
     enabled: !!taskId,
   });
 
-  const task: InventoryTask | undefined = taskResponse?.data;
-  const summary: InventorySummary | undefined = summaryResponse?.data;
-  const assets: InventoryAsset[] = assetsResponse?.data?.records ?? [];
+  const task: InventoryTask | undefined = taskResponse?.task
+    ? {
+        taskId: String(taskResponse.task.id),
+        taskName: taskResponse.task.taskName,
+        scopeType: 'all',
+        scopeIds: [],
+        status: (taskResponse.task.status?.toLowerCase() ?? 'draft') as InventoryTask['status'],
+        progress: taskResponse.task.totalCount
+          ? Math.round(((taskResponse.task.matchedCount ?? 0) / taskResponse.task.totalCount) * 1000) / 10
+          : 0,
+        totalAssets: taskResponse.task.totalCount ?? 0,
+        countedAssets: taskResponse.task.matchedCount ?? 0,
+        uncountedAssets: Math.max((taskResponse.task.totalCount ?? 0) - (taskResponse.task.matchedCount ?? 0), 0),
+        surplusAssets: summaryResponse?.surplusCount ?? 0,
+        deficitAssets: summaryResponse?.deficitCount ?? 0,
+        createdAt: taskResponse.task.createTime ?? new Date().toISOString(),
+        updatedAt: taskResponse.task.updateTime ?? taskResponse.task.createTime ?? new Date().toISOString(),
+      }
+    : undefined;
+  const summary: InventorySummary | undefined = summaryResponse;
+  const assets: InventoryAsset[] = assetsResponse?.records ?? [];
 
   // ── 衍生数据 ────────────────────────────────────────────────────────────────
 
@@ -305,63 +329,74 @@ export default function SmartReportPage() {
 
   const statusLabel =
     task.status === 'completed' || task.status === 'submitted'
-      ? '✓ 已完成'
+      ? '已完成'
       : task.status === 'in_progress'
         ? '进行中'
         : '草稿';
 
-  const statusColor =
-    task.status === 'completed' || task.status === 'submitted'
-      ? 'text-[#10b981]'
+  const statusConfig = {
+    label: statusLabel,
+    bg: task.status === 'completed' || task.status === 'submitted'
+      ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
       : task.status === 'in_progress'
-        ? 'text-[#f59e0b]'
-        : 'text-[#64748b]';
+        ? 'bg-amber-50 text-amber-700 border-amber-200'
+        : 'bg-slate-50 text-slate-600 border-slate-200',
+    dot: task.status === 'completed' || task.status === 'submitted'
+      ? 'bg-emerald-500'
+      : task.status === 'in_progress'
+        ? 'bg-amber-500'
+        : 'bg-slate-400',
+  };
 
   // ── Render ──────────────────────────────────────────────────────────────────
 
   return (
-    <div className="min-h-screen bg-[#f8fafc]">
-      {/* ── 顶部面包屑 Header ─────────────────────────────────────────────── */}
-      <div className="bg-white border-b border-[#e2e8f0] px-6 h-14 flex items-center gap-3">
+    <div className="min-h-screen bg-gradient-to-br from-[#f8fafc] via-white to-[#f1f5f9]">
+      {/* ── 顶部 Header ───────────────────────────────────────────────────── */}
+      <div className="bg-white/80 backdrop-blur-md border-b border-[#e2e8f0] px-4 sm:px-6 h-14 flex items-center gap-3 sticky top-0 z-20">
         <button
           onClick={() => navigate(-1)}
-          className="p-1.5 rounded-lg hover:bg-[#f1f5f9] text-[#64748b] transition-colors"
+          className="p-1.5 rounded-xl hover:bg-[#f1f5f9] text-[#64748b] transition-all duration-200 hover:scale-105 active:scale-95"
           aria-label="返回"
         >
           <ArrowLeft className="w-4 h-4" />
         </button>
         <nav className="flex items-center gap-1.5 text-sm text-[#94a3b8]">
           <span
-            className="hover:text-[#2563eb] cursor-pointer transition-colors"
+            className="hover:text-[#2563eb] cursor-pointer transition-colors font-medium"
             onClick={() => navigate('/inventory')}
           >
             RFID 盘点
           </span>
           <ChevronRight className="w-3.5 h-3.5" />
-          <span className="text-[#0f172a] font-medium">智能报告</span>
+          <span className="text-[#0f172a] font-semibold">盘点报告</span>
         </nav>
       </div>
 
       {/* ── 主内容区 ────────────────────────────────────────────────────────── */}
-      <div className="p-6 space-y-6 max-w-[1280px] mx-auto">
+      <div className="p-4 sm:p-6 lg:p-8 space-y-6 sm:space-y-8 max-w-[1400px] mx-auto">
 
         {/* 页面标题行 */}
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-3 mb-1.5">
-              <h1 className="text-2xl font-bold text-[#0f172a]">智能盘点报告</h1>
-              <span className="px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-semibold border border-blue-100">
-                {task.taskName}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex-1 min-w-0">
+            <div className="flex flex-wrap items-center gap-3 mb-2">
+              <h1 className="text-2xl sm:text-3xl font-bold text-[#0f172a] tracking-tight">
+                盘点报告
+              </h1>
+              <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${statusConfig.bg}`}>
+                <span className={`w-1.5 h-1.5 rounded-full ${statusConfig.dot}`} />
+                {statusConfig.label}
               </span>
             </div>
-            <p className="text-sm text-[#64748b]">
-              任务：{task.taskName} ·{' '}
-              <span className={`${statusColor} font-medium`}>{statusLabel}</span>
-              {' '}· {new Date(task.createdAt).toLocaleDateString('zh-CN')}
-              <span className="ml-2 text-[#94a3b8] font-mono text-xs">#{taskId}</span>
-            </p>
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-[#64748b]">
+              <span className="font-medium text-[#334155]">{task.taskName}</span>
+              <span className="hidden sm:inline text-[#cbd5e1]">·</span>
+              <span>{new Date(task.createdAt).toLocaleDateString('zh-CN')}</span>
+              <span className="hidden sm:inline text-[#cbd5e1]">·</span>
+              <span className="font-mono text-xs text-[#94a3b8] bg-[#f1f5f9] px-2 py-0.5 rounded-md">#{taskId}</span>
+            </div>
           </div>
-          <button className="flex items-center gap-2 px-4 py-2 bg-[#2563eb] hover:bg-blue-700 text-white text-sm font-semibold rounded-lg transition-colors shrink-0">
+          <button className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#2563eb] hover:bg-blue-700 text-white text-sm font-semibold rounded-xl transition-all duration-200 hover:shadow-md active:scale-[0.98] shrink-0">
             <Download className="w-4 h-4" />
             导出报告
           </button>
@@ -369,7 +404,7 @@ export default function SmartReportPage() {
 
         {/* ── KPI 卡片行 ─────────────────────────────────────────────────── */}
         {kpiValues && (
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             <KpiCard
               label="总资产数"
               value={fmtNum(kpiValues.total)}
@@ -402,9 +437,9 @@ export default function SmartReportPage() {
         )}
 
         {/* ── 图表行（7:5）──────────────────────────────────────────────────── */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
           {/* 趋势折线图 — 展示当前任务进度 */}
-          <div className="lg:col-span-7 bg-white border border-[#e2e8f0] rounded-xl p-5 flex flex-col" style={{ minHeight: 280 }}>
+          <div className="lg:col-span-7 bg-white border border-[#e2e8f0] rounded-xl p-5 sm:p-6 flex flex-col transition-shadow duration-200 hover:shadow-sm" style={{ minHeight: 280 }}>
             <div className="flex items-center justify-between mb-4 pb-3 border-b border-[#f1f5f9]">
               <h3 className="text-base font-semibold text-[#0f172a]">盘点进度概览</h3>
               <div className="flex items-center gap-4 text-xs text-[#64748b]">
@@ -422,7 +457,7 @@ export default function SmartReportPage() {
           </div>
 
           {/* 差异分布圆环图 */}
-          <div className="lg:col-span-5 bg-white border border-[#e2e8f0] rounded-xl p-5 flex flex-col" style={{ minHeight: 280 }}>
+          <div className="lg:col-span-5 bg-white border border-[#e2e8f0] rounded-xl p-5 sm:p-6 flex flex-col transition-shadow duration-200 hover:shadow-sm" style={{ minHeight: 280 }}>
             <h3 className="text-base font-semibold text-[#0f172a] mb-4 pb-3 border-b border-[#f1f5f9]">差异分布</h3>
             <DonutChart
               normalCount={task.countedAssets - totalDiscrepancyCount}
@@ -435,15 +470,15 @@ export default function SmartReportPage() {
         </div>
 
         {/* ── 详情行（5:7）──────────────────────────────────────────────────── */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
           {/* 资产状态概览 */}
-          <div className="lg:col-span-5 bg-white border border-[#e2e8f0] rounded-xl p-5">
+          <div className="lg:col-span-5 bg-white border border-[#e2e8f0] rounded-xl p-5 sm:p-6 transition-shadow duration-200 hover:shadow-sm">
             <h3 className="text-base font-semibold text-[#0f172a] mb-4 pb-3 border-b border-[#f1f5f9]">资产状态概览</h3>
             <AssetStatusBars task={task} />
           </div>
 
           {/* 差异资产明细表格 */}
-          <div className="lg:col-span-7 bg-white border border-[#e2e8f0] rounded-xl p-5 overflow-x-auto">
+          <div className="lg:col-span-7 bg-white border border-[#e2e8f0] rounded-xl p-5 sm:p-6 overflow-x-auto transition-shadow duration-200 hover:shadow-sm">
             <div className="flex items-center justify-between mb-4 pb-3 border-b border-[#f1f5f9]">
               <h3 className="text-base font-semibold text-[#0f172a]">
                 差异资产明细
@@ -453,16 +488,22 @@ export default function SmartReportPage() {
               </h3>
             </div>
             {discrepancyItems.length === 0 ? (
-              <div className="flex items-center justify-center py-10 text-sm text-[#94a3b8]">
-                暂无差异资产
+              <div className="flex items-center justify-center py-12 text-sm text-[#94a3b8]">
+                <div className="flex flex-col items-center gap-2">
+                  <CheckCircle2 className="w-8 h-8 text-[#10b981]/60" />
+                  <span>暂无差异资产，盘点结果正常</span>
+                </div>
               </div>
             ) : (
               <>
                 <table className="w-full text-left border-collapse">
                   <thead>
-                    <tr className="bg-[#f8fafc]">
+                    <tr>
                       {['资产编号', '资产名称', '分类', '位置/部门', '差异类型'].map((h) => (
-                        <th key={h} className="px-3 py-2 text-xs font-semibold text-[#94a3b8] uppercase tracking-wide">
+                        <th
+                          key={h}
+                          className="px-3 py-3 text-xs font-semibold text-[#94a3b8] uppercase tracking-wider border-b-2 border-[#f1f5f9]"
+                        >
                           {h}
                         </th>
                       ))}
@@ -474,18 +515,19 @@ export default function SmartReportPage() {
                       return (
                         <tr
                           key={item.id}
-                          className={`border-b border-[#f1f5f9] hover:bg-[#f8fafc] transition-colors ${idx === discrepancyItems.length - 1 ? 'border-none' : ''}`}
+                          className="group border-b border-[#f1f5f9] last:border-none transition-all duration-200 hover:bg-[#f8fafc] hover:shadow-sm"
                         >
-                          <td className="px-3 py-2.5">
-                            <span className="font-mono text-xs bg-[#f1f5f9] text-[#2563eb] px-1.5 py-0.5 rounded">
+                          <td className="px-3 py-3">
+                            <span className="font-mono text-xs bg-[#f1f5f9] text-[#2563eb] px-2 py-1 rounded-md font-semibold group-hover:bg-blue-50 transition-colors">
                               {item.id}
                             </span>
                           </td>
-                          <td className="px-3 py-2.5 text-sm text-[#374151] font-medium">{item.name}</td>
-                          <td className="px-3 py-2.5 text-sm text-[#64748b]">{item.category}</td>
-                          <td className="px-3 py-2.5 text-sm text-[#64748b]">{item.dept}</td>
-                          <td className="px-3 py-2.5">
-                            <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${badge.bg} ${badge.text}`}>
+                          <td className="px-3 py-3 text-sm text-[#374151] font-medium">{item.name}</td>
+                          <td className="px-3 py-3 text-sm text-[#64748b]">{item.category || '—'}</td>
+                          <td className="px-3 py-3 text-sm text-[#64748b]">{item.dept || '—'}</td>
+                          <td className="px-3 py-3">
+                            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${badge.bg} ${badge.text}`}>
+                              <span className={`w-1.5 h-1.5 rounded-full ${badge.dot}`} />
                               {item.type}
                             </span>
                           </td>
@@ -494,10 +536,10 @@ export default function SmartReportPage() {
                     })}
                   </tbody>
                 </table>
-                <div className="mt-3 pt-3 border-t border-[#f1f5f9]">
-                  <button className="text-sm text-[#2563eb] hover:text-blue-700 font-medium flex items-center gap-1 transition-colors">
+                <div className="mt-4 pt-4 border-t border-[#f1f5f9]">
+                  <button className="inline-flex items-center gap-1.5 text-sm text-[#2563eb] hover:text-blue-700 font-semibold transition-all duration-200 hover:gap-2 group">
                     查看全部 {totalDiscrepancyCount} 条差异
-                    <ChevronRight className="w-3.5 h-3.5" />
+                    <ChevronRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
                   </button>
                 </div>
               </>
@@ -505,58 +547,47 @@ export default function SmartReportPage() {
           </div>
         </div>
 
-        {/* ── AI 智能分析卡片 ────────────────────────────────────────────────── */}
-        <div
-          className="rounded-xl p-6 relative overflow-hidden flex flex-col md:flex-row items-start md:items-center justify-between gap-6"
-          style={{ background: 'linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%)' }}
-        >
-          {/* 装饰光晕 */}
-          <div
-            className="absolute -right-12 -top-12 w-48 h-48 rounded-full pointer-events-none"
-            style={{ background: 'radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%)' }}
-          />
-          <div
-            className="absolute -left-8 -bottom-8 w-32 h-32 rounded-full pointer-events-none"
-            style={{ background: 'rgba(255,255,255,0.05)' }}
-          />
+        {/* ── 盘点结论卡片 ──────────────────────────────────────────────────────── */}
+        <div className="rounded-2xl p-6 sm:p-8 relative overflow-hidden flex flex-col md:flex-row items-start md:items-center justify-between gap-6 sm:gap-8 bg-white/95 border border-[#dbeafe] shadow-sm">
+          <div className="absolute -right-16 -top-16 w-64 h-64 rounded-full pointer-events-none bg-blue-50" />
+          <div className="absolute -left-12 -bottom-12 w-48 h-48 rounded-full pointer-events-none bg-emerald-50" />
 
           {/* 左侧内容 */}
           <div className="relative z-10 flex-1">
-            <div className="flex items-center gap-2 mb-3">
-              <span className="flex items-center gap-1.5 bg-white/10 border border-white/20 text-white/80 px-3 py-1 rounded-full text-xs font-medium">
-                <Sparkles className="w-3.5 h-3.5" />
-                AI 智能分析
+            <div className="flex items-center gap-2 mb-4">
+              <span className="inline-flex items-center gap-1.5 bg-blue-50 border border-blue-100 text-[#2563eb] px-3 py-1.5 rounded-full text-xs font-semibold">
+                盘点结论
               </span>
             </div>
-            <h2 className="text-lg font-bold text-white mb-4">
+            <h2 className="text-xl sm:text-2xl font-bold text-[#0f172a] mb-5 leading-snug">
               {totalDiscrepancyCount === 0
                 ? '本次盘点账实完全一致，无差异'
                 : `本次盘点发现 ${totalDiscrepancyCount} 处差异，需要关注`}
             </h2>
-            <ul className="space-y-2.5">
-              <li className="flex items-start gap-2.5 text-sm text-white/90">
-                <span className="mt-0.5 text-base">✅</span>
+            <ul className="space-y-3">
+              <li className="flex items-start gap-3 text-sm text-[#475569]">
+                <span className="mt-0.5 w-5 h-5 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center text-xs shrink-0">✓</span>
                 <span>
-                  盘点范围 <strong>{fmtNum(task.totalAssets)}</strong> 项资产，
-                  已确认 <strong>{fmtNum(task.countedAssets)}</strong> 项，
-                  完成率 <strong>{fmtPct(task.progress)}</strong>
+                  盘点范围 <strong className="text-[#0f172a]">{fmtNum(task.totalAssets)}</strong> 项资产，
+                  已确认 <strong className="text-[#0f172a]">{fmtNum(task.countedAssets)}</strong> 项，
+                  完成率 <strong className="text-[#0f172a]">{fmtPct(task.progress)}</strong>
                 </span>
               </li>
               {totalDiscrepancyCount > 0 && (
-                <li className="flex items-start gap-2.5 text-sm text-yellow-200">
-                  <span className="mt-0.5 text-base">⚠️</span>
+                <li className="flex items-start gap-3 text-sm text-amber-700">
+                  <span className="mt-0.5 w-5 h-5 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center text-xs shrink-0">!</span>
                   <span>
-                    共发现差异 <strong>{totalDiscrepancyCount}</strong> 处：
-                    盘亏 <strong>{task.deficitAssets}</strong> 项，盘盈 <strong>{task.surplusAssets}</strong> 项
+                    共发现差异 <strong className="text-[#0f172a]">{totalDiscrepancyCount}</strong> 处：
+                    盘亏 <strong className="text-[#0f172a]">{task.deficitAssets}</strong> 项，盘盈 <strong className="text-[#0f172a]">{task.surplusAssets}</strong> 项
                   </span>
                 </li>
               )}
-              <li className="flex items-start gap-2.5 text-sm text-white/80">
-                <span className="mt-0.5 text-base">📅</span>
+              <li className="flex items-start gap-3 text-sm text-[#64748b]">
+                <span className="mt-0.5 w-5 h-5 rounded-full bg-slate-50 text-slate-500 flex items-center justify-center text-xs shrink-0">📅</span>
                 <span>
-                  盘点任务创建于 <strong>{new Date(task.createdAt).toLocaleDateString('zh-CN')}</strong>
+                  盘点任务创建于 <strong className="text-[#334155]">{new Date(task.createdAt).toLocaleDateString('zh-CN')}</strong>
                   {task.updatedAt && (
-                    <>，最后更新 <strong>{new Date(task.updatedAt).toLocaleDateString('zh-CN')}</strong></>
+                    <>，最后更新 <strong className="text-[#334155]">{new Date(task.updatedAt).toLocaleDateString('zh-CN')}</strong></>
                   )}
                 </span>
               </li>
@@ -564,8 +595,8 @@ export default function SmartReportPage() {
           </div>
 
           {/* 右侧评分 + 按钮 */}
-          <div className="relative z-10 flex flex-col items-center bg-white/10 border border-white/20 backdrop-blur-sm rounded-xl px-8 py-5 shrink-0 gap-3">
-            <div className="text-6xl font-black text-white/20 leading-none select-none">
+          <div className="relative z-10 flex flex-col items-center bg-[#f8fafc] border border-[#e2e8f0] rounded-2xl px-8 sm:px-10 py-6 shrink-0 gap-3 min-w-[160px] shadow-sm">
+            <div className="text-5xl sm:text-6xl font-black text-[#2563eb]/25 leading-none select-none">
               {kpiValues
                 ? kpiValues.accuracyRate >= 98
                   ? 'A+'
@@ -576,9 +607,9 @@ export default function SmartReportPage() {
                       : 'B'
                 : '-'}
             </div>
-            <div className="text-white/60 text-xs font-medium -mt-1">综合评分</div>
-            <button className="w-full px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/30 text-white text-sm font-semibold rounded-lg transition-colors">
-              生成整改建议
+            <div className="text-[#64748b] text-xs font-semibold tracking-wide -mt-1">准确率参考</div>
+            <button className="w-full px-5 py-2.5 bg-white hover:bg-blue-50 border border-[#bfdbfe] text-[#2563eb] text-sm font-semibold rounded-xl transition-all duration-200 hover:shadow-md active:scale-[0.98]">
+              查看处理建议
             </button>
           </div>
         </div>
@@ -588,9 +619,9 @@ export default function SmartReportPage() {
   );
 }
 
-// ─── 内部子组件（接收 API 数据作为 props）─────────────────────────────────────
+// ─── 内部子组件（接收 API 数据作为 props，样式增强版）────────────────────────
 
-/** 进度概览柱状条形图（纯 SVG），展示已盘/未盘/差异 */
+/** 进度概览柱状条形图 */
 function ProgressChart({ task }: { task: InventoryTask }) {
   const W = 400;
   const H = 160;
@@ -603,14 +634,13 @@ function ProgressChart({ task }: { task: InventoryTask }) {
   const uncounted = task.uncountedAssets;
   const discrepancy = task.surplusAssets + task.deficitAssets;
 
-  // Bar positions for 3 metrics
   const barWidth = 40;
   const gap = (chartW - 3 * barWidth) / 4;
 
   const metrics = [
-    { label: '已盘', value: counted, pct: (counted / total) * 100, color: '#3b82f6' },
-    { label: '未盘', value: uncounted, pct: (uncounted / total) * 100, color: '#94a3b8' },
-    { label: '差异', value: discrepancy, pct: (discrepancy / total) * 100, color: '#f59e0b' },
+    { label: '已盘', value: counted, pct: (counted / total) * 100, gradientId: 'barGrad1' },
+    { label: '未盘', value: uncounted, pct: (uncounted / total) * 100, gradientId: 'barGrad2' },
+    { label: '差异', value: discrepancy, pct: (discrepancy / total) * 100, gradientId: 'barGrad3' },
   ];
 
   const maxPct = Math.max(...metrics.map((m) => m.pct), 1);
@@ -618,17 +648,54 @@ function ProgressChart({ task }: { task: InventoryTask }) {
   return (
     <div className="flex-1 relative">
       <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-full" preserveAspectRatio="xMidYMid meet">
+        <defs>
+          <linearGradient id="barGrad1" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#60a5fa" />
+            <stop offset="100%" stopColor="#2563eb" />
+          </linearGradient>
+          <linearGradient id="barGrad2" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#cbd5e1" />
+            <stop offset="100%" stopColor="#94a3b8" />
+          </linearGradient>
+          <linearGradient id="barGrad3" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#fbbf24" />
+            <stop offset="100%" stopColor="#f59e0b" />
+          </linearGradient>
+        </defs>
         {metrics.map((m, i) => {
           const x = PAD.left + gap + i * (barWidth + gap);
           const barH = (m.pct / maxPct) * chartH;
           const y = PAD.top + chartH - barH;
           return (
             <g key={m.label}>
-              <rect x={x} y={y} width={barWidth} height={barH} fill={m.color} rx={4} opacity={0.85} />
-              <text x={x + barWidth / 2} y={y - 4} textAnchor="middle" fontSize="9" fill="#0f172a" fontFamily="Inter, sans-serif">
+              <rect
+                x={x}
+                y={y}
+                width={barWidth}
+                height={barH}
+                fill={`url(#${m.gradientId})`}
+                rx={6}
+                opacity={0.9}
+              />
+              <text
+                x={x + barWidth / 2}
+                y={y - 6}
+                textAnchor="middle"
+                fontSize="9"
+                fill="#0f172a"
+                fontFamily="Inter, sans-serif"
+                fontWeight="600"
+              >
                 {fmtNum(m.value)}
               </text>
-              <text x={x + barWidth / 2} y={H - 4} textAnchor="middle" fontSize="9" fill="#94a3b8" fontFamily="Inter, sans-serif">
+              <text
+                x={x + barWidth / 2}
+                y={H - 4}
+                textAnchor="middle"
+                fontSize="9"
+                fill="#94a3b8"
+                fontFamily="Inter, sans-serif"
+              >
                 {m.label}
               </text>
             </g>
@@ -639,7 +706,7 @@ function ProgressChart({ task }: { task: InventoryTask }) {
   );
 }
 
-/** 差异分布圆环图（CSS conic-gradient） */
+/** 差异分布圆环图 */
 function DonutChart({
   normalCount,
   deficitCount,
@@ -676,25 +743,25 @@ function DonutChart({
 
   return (
     <div className="flex flex-col items-center gap-4 flex-1 justify-center">
-      <div className="relative w-36 h-36">
+      <div className="relative w-36 h-36 sm:w-40 sm:h-40">
         <div
-          className="w-full h-full rounded-full"
+          className="w-full h-full rounded-full transition-transform duration-500 hover:scale-[1.02]"
           style={{ background: conic }}
         />
-        <div className="absolute inset-0 m-5 rounded-full bg-white flex flex-col items-center justify-center">
-          <span className="text-2xl font-bold text-[#0f172a]">{totalDiscrepancy}</span>
-          <span className="text-xs text-[#94a3b8]">差异</span>
+        <div className="absolute inset-0 m-5 sm:m-5.5 rounded-full bg-white flex flex-col items-center justify-center">
+          <span className="text-3xl sm:text-4xl font-bold text-[#0f172a] tracking-tight">{totalDiscrepancy}</span>
+          <span className="text-xs text-[#94a3b8] font-medium">差异</span>
         </div>
       </div>
-      <div className="space-y-2 w-full px-2">
+      <div className="space-y-2.5 w-full px-2">
         {segments.map((s) => (
           <div key={s.label} className="flex items-center justify-between text-xs">
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: s.color }} />
-              <span className="text-[#64748b]">{s.label}</span>
+              <span className="text-[#64748b] font-medium">{s.label}</span>
             </div>
             <div className="flex gap-2 text-[#0f172a] font-mono">
-              <span>{s.value}</span>
+              <span className="font-semibold">{s.value}</span>
               <span className="text-[#94a3b8]">{s.pct}</span>
             </div>
           </div>
@@ -704,32 +771,36 @@ function DonutChart({
   );
 }
 
-/** 资产状态概览（水平进度条） */
+/** 资产状态概览 */
 function AssetStatusBars({ task }: { task: InventoryTask }) {
   const total = task.totalAssets || 1;
   const bars = [
-    { label: '已确认', count: task.countedAssets, color: '#10b981' },
-    { label: '未盘点', count: task.uncountedAssets, color: '#94a3b8' },
-    { label: '盘盈', count: task.surplusAssets, color: '#f59e0b' },
-    { label: '盘亏', count: task.deficitAssets, color: '#ef4444' },
+    { label: '已确认', count: task.countedAssets, from: '#34d399', to: '#10b981' },
+    { label: '未盘点', count: task.uncountedAssets, from: '#cbd5e1', to: '#94a3b8' },
+    { label: '盘盈', count: task.surplusAssets, from: '#fbbf24', to: '#f59e0b' },
+    { label: '盘亏', count: task.deficitAssets, from: '#f87171', to: '#ef4444' },
   ];
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       {bars.map((bar) => {
         const rate = (bar.count / total) * 100;
         return (
           <div key={bar.label}>
             <div className="flex justify-between items-center mb-1.5">
               <span className="text-sm text-[#374151] font-medium">{bar.label}</span>
-              <span className="text-sm font-bold" style={{ color: bar.color }}>
-                {fmtNum(bar.count)} ({fmtPct(rate)})
+              <span className="text-sm font-bold font-mono" style={{ color: bar.to }}>
+                {fmtNum(bar.count)}
+                <span className="text-[#94a3b8] font-normal ml-1">({fmtPct(rate)})</span>
               </span>
             </div>
-            <div className="w-full h-2 bg-[#f1f5f9] rounded-full overflow-hidden">
+            <div className="w-full h-2.5 bg-[#f1f5f9] rounded-full overflow-hidden">
               <div
-                className="h-full rounded-full transition-all"
-                style={{ width: `${rate}%`, backgroundColor: bar.color }}
+                className="h-full rounded-full transition-all duration-1000 ease-out"
+                style={{
+                  width: `${rate}%`,
+                  background: `linear-gradient(90deg, ${bar.from}, ${bar.to})`,
+                }}
               />
             </div>
           </div>

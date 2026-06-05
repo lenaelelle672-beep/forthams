@@ -39,6 +39,12 @@ public class AssetCreateDTO {
 
     @JsonAlias({"user", "userId"})
     private Long userId;
+
+    /** 存放地点 ID */
+    @JsonAlias({"location", "locationId"})
+    private Long locationId;
+
+    /** 存放地点名称 */
     private String location;
     private String rfidTag;
     private Integer isImportant;

@@ -2,6 +2,7 @@ package com.ams.controller;
 
 import com.ams.common.Result;
 import com.ams.entity.Location;
+import com.ams.entity.LocationType;
 import com.ams.service.LocationService;
 import lombok.RequiredArgsConstructor;
 import jakarta.validation.Valid;
@@ -76,6 +77,18 @@ public class LocationController {
     @GetMapping("/{id}")
     public Result<Location> getById(@PathVariable Long id) {
         return Result.success(locationService.findById(id));
+    }
+
+    /**
+     * gai2 W7 — 按 parent + 可选 type 返回子节点列表。
+     * 供空间级联选择器使用：type=BUILDING|FLOOR|ROOM 过滤；type 缺省时返回所有子节点。
+     */
+    @PreAuthorize("@ss.hasPermi('location:query')")
+    @GetMapping("/{id}/children")
+    public Result<List<Location>> getChildren(@PathVariable Long id,
+                                              @RequestParam(required = false) String type) {
+        LocationType lt = LocationType.of(type);
+        return Result.success(locationService.findChildrenByParentIdAndType(id, lt));
     }
 
     @PreAuthorize("@ss.hasPermi('location:create')")

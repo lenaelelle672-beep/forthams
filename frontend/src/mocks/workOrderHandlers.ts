@@ -36,7 +36,7 @@ export interface ApprovalOperationResponse {
 const STATE_TRANSITIONS: Record<string, { targetStatus: WorkOrderStatus; allowedOperations: string[] }> = {
   'DRAFT': { targetStatus: 'DRAFT', allowedOperations: ['submit'] },
   'PENDING': { targetStatus: 'PENDING', allowedOperations: ['approve', 'reject', 'return', 'cancel'] },
-  'RETURNED': { targetStatus: 'RETURNED', allowedOperations: ['resubmit'] },
+  'RETURNED': { targetStatus: 'PENDING', allowedOperations: ['resubmit'] },
   'APPROVED': { targetStatus: 'APPROVED', allowedOperations: [] },
   'REJECTED': { targetStatus: 'REJECTED', allowedOperations: [] },
   'CANCELLED': { targetStatus: 'CANCELLED', allowedOperations: [] },
@@ -46,7 +46,7 @@ const STATE_TRANSITIONS: Record<string, { targetStatus: WorkOrderStatus; allowed
 const TERMINAL_STATES: WorkOrderStatus[] = ['APPROVED', 'REJECTED', 'CANCELLED'];
 
 /** 需要触发通知的状态 */
-const NOTIFICATION_TRIGGER_STATES: WorkOrderStatus[] = ['APPROVED', 'REJECTED', 'RETURNED'];
+const NOTIFICATION_TRIGGER_STATES: WorkOrderStatus[] = ['APPROVED', 'REJECTED', 'PENDING'];
 
 /** 模拟工单数据存储 */
 let mockWorkOrders: Map<string, WorkOrder> = new Map();
@@ -94,7 +94,7 @@ function getTargetStatus(operation: OperationType): WorkOrderStatus {
     case 'reject':
       return 'REJECTED';
     case 'return':
-      return 'RETURNED';
+      return 'PENDING';
     case 'cancel':
       return 'CANCELLED';
     default:
@@ -145,7 +145,7 @@ function executeApprovalOperation(
     status: targetStatus,
     updated_at: new Date().toISOString(),
     approval_history: [
-      ...(workOrder.approval_history || []),
+      ...(Array.isArray(workOrder.approval_history) ? workOrder.approval_history : []),
       {
         id: `ah-${Date.now()}`,
         work_order_id: workOrder.id,
@@ -386,8 +386,13 @@ export const notificationTriggerHandler = http.post(
   async ({ request }) => {
     await delay(50);
 
-    const body = await request.json();
-    const { work_order_id, status, operator_id, created_at } = body;
+    const notificationBody = (await request.json()) as unknown as {
+      work_order_id?: string | number;
+      status?: string;
+      operator_id?: string | number;
+      created_at?: string;
+    };
+    const { work_order_id, status, operator_id, created_at } = notificationBody;
 
     // ATB-4.1-4.4: 验证通知内容
     if (!work_order_id || !status || !operator_id || !created_at) {
@@ -456,7 +461,7 @@ export function initializeMockWorkOrders(testData?: WorkOrder[]): void {
       id: 'WO-2025-0003',
       title: '测试工单-已退回',
       description: '被退回需修改的工单',
-      status: 'RETURNED',
+      status: 'PENDING',
       priority: 'LOW',
       requester_id: 'user-003',
       assignee_id: 'user-002',
@@ -467,7 +472,7 @@ export function initializeMockWorkOrders(testData?: WorkOrder[]): void {
   ];
 
   defaultWorkOrders.forEach(wo => {
-    mockWorkOrders.set(wo.id, wo);
+    mockWorkOrders.set(String(wo.id), wo);
   });
 }
 

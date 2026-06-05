@@ -18,7 +18,9 @@ import {
   FileBarChart, BarChart3, PieChart, TrendingUp,
   Package, DollarSign, ClipboardList, Plus,
 } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { getReportSummary, getReportByCategory, type ReportSummary, type CategoryReport } from '@/api/stats';
+import { exportReportPdf, downloadBlob } from '@/api/reports';
 import type { ApiResponse } from '@/types/common';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
@@ -44,7 +46,7 @@ interface ReportTemplate {
   title: string;
   description: string;
   lastUpdated: string;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: LucideIcon;
   iconColor: string;
 }
 
@@ -143,12 +145,30 @@ export default function ReportPage() {
     toast.info(`正在加载「${template.title}」…`);
   };
 
+  /** 报表 ID → 后端模板类型映射 */
+  const REPORT_TYPE_MAP: Record<string, string> = {
+    'asset-summary':    'asset-register',
+    'asset-category':   'asset-register',
+    'dept-assets':      'asset-register',
+    'asset-trends':     'summary',
+    'maintenance-report': 'summary',
+    'financial-summary':  'summary',
+  };
+
   const handleExportReport = async (template: ReportTemplate) => {
     setLoadingExport(template.id);
-    // 模拟导出延迟
-    await new Promise((resolve) => setTimeout(resolve, 800));
-    setLoadingExport(null);
-    toast.success(`「${template.title}」导出成功`);
+    try {
+      const type = REPORT_TYPE_MAP[template.id] ?? 'summary';
+      const blob = await exportReportPdf(type);
+      const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+      downloadBlob(blob, `${template.title}_${dateStr}.pdf`);
+      toast.success(`「${template.title}」PDF 导出成功`);
+    } catch (err) {
+      console.error('PDF 导出失败:', err);
+      toast.error('PDF 导出失败，请重试');
+    } finally {
+      setLoadingExport(null);
+    }
   };
 
   // ── 加载态 ──────────────────────────────────────────────────────────────────

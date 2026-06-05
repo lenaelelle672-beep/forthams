@@ -89,6 +89,16 @@ class WebGLBoundary extends Component<{ children: ReactNode; onError: (message: 
   }
 }
 
+function canCreateWebGLContext(): boolean {
+  try {
+    const canvas = document.createElement('canvas');
+    const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+    return gl instanceof WebGLRenderingContext;
+  } catch {
+    return false;
+  }
+}
+
 const cityWeights = [0.18, 0.08, 0.05, 0.07, 0.09, 0.1, 0.045, 0.05, 0.04, 0.035, 0.045, 0.04, 0.055, 0.035, 0.03, 0.025, 0.03, 0.025, 0.02, 0.02];
 
 const categoryBands = [
@@ -271,7 +281,9 @@ const CSS = `
   overflow: hidden;
   min-height: 0;
   pointer-events: auto;
-  background: linear-gradient(180deg, rgba(3, 11, 28, 0.74), rgba(2, 6, 18, 0.52));
+  background: linear-gradient(180deg, rgba(3, 11, 28, 0.82), rgba(2, 6, 18, 0.72));
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
   box-shadow: inset 0 0 30px rgba(48, 97, 219, 0.08), 0 18px 42px rgba(0, 0, 0, 0.24);
   opacity: 0;
 }

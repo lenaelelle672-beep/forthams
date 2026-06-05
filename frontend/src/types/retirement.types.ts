@@ -31,13 +31,7 @@ export enum RetirementStatus {
   PROCESSING = 'PROCESSING',
 }
 
-/** 审批流程状态 */
-export enum ApprovalStatus {
-  PENDING = 'PENDING',
-  APPROVED = 'APPROVED',
-  REJECTED = 'REJECTED',
-  TRANSFERRED = 'TRANSFERRED',
-}
+// ApprovalStatus 从 asset.types.ts 导入（统一枚举定义）
 
 // ============================================================================
 // Core Types - Asset Entity with Depreciation Attributes

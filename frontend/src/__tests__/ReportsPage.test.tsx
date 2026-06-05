@@ -70,6 +70,10 @@ function createWrapper() {
   );
 }
 
+function getPrimaryExportButton() {
+  return screen.getAllByRole('button', { name: '导出' })[0];
+}
+
 const emptySummary: ApiResponse<ReportSummary> = {
   code: 200,
   message: 'success',
@@ -124,7 +128,7 @@ describe('ReportsPage', () => {
     render(<ReportsPage />, { wrapper: createWrapper() });
 
     await waitFor(() => {
-      expect(screen.getByText('资产报表')).toBeInTheDocument();
+      expect(screen.getAllByRole('tab', { name: /资产报表/ })[0]).toBeInTheDocument();
       expect(screen.getByText('财务报表')).toBeInTheDocument();
       expect(screen.getByText('运维报表')).toBeInTheDocument();
       expect(screen.getByText('工单报表')).toBeInTheDocument();
@@ -171,7 +175,7 @@ describe('ReportsPage', () => {
     render(<ReportsPage />, { wrapper: createWrapper() });
 
     // The page container should exist (without assertions on specific data)
-    expect(screen.getByText('资产报表')).toBeInTheDocument();
+    expect(screen.getAllByRole('tab', { name: /资产报表/ })[0]).toBeInTheDocument();
   });
 
   it('should show error state when API calls fail', async () => {
@@ -283,7 +287,7 @@ describe('ReportsPage', () => {
     render(<ReportsPage />, { wrapper: createWrapper() });
 
     await waitFor(() => {
-      expect(screen.getByText('导出')).toBeInTheDocument();
+      expect(getPrimaryExportButton()).toBeInTheDocument();
       // Time range select renders with "近 12 个月" as default
       expect(screen.getByText('近 12 个月')).toBeInTheDocument();
     });
@@ -309,7 +313,7 @@ describe('ReportsPage', () => {
       expect(screen.getByText('资产汇总表')).toBeInTheDocument();
       expect(screen.getByText('资产增长趋势')).toBeInTheDocument();
       // Tab headers render
-      expect(screen.getByText('资产报表')).toBeInTheDocument();
+      expect(screen.getAllByRole('tab', { name: /资产报表/ })[0]).toBeInTheDocument();
     });
   });
 
@@ -371,7 +375,7 @@ describe('ReportsPage — 导出功能', () => {
     render(<ReportsPage />, { wrapper: createWrapper() });
 
     await waitFor(() => {
-      expect(screen.getByText('导出')).toBeInTheDocument();
+      expect(getPrimaryExportButton()).toBeInTheDocument();
     });
   });
 
@@ -383,7 +387,7 @@ describe('ReportsPage — 导出功能', () => {
       expect(screen.getByText('资产汇总表')).toBeInTheDocument();
     });
 
-    await user.click(screen.getByText('导出'));
+    await user.click(getPrimaryExportButton());
 
     await waitFor(() => {
       expect(XLSX.writeFile).toHaveBeenCalledTimes(1);
@@ -400,7 +404,7 @@ describe('ReportsPage — 导出功能', () => {
       expect(screen.getByText('资产汇总表')).toBeInTheDocument();
     });
 
-    await user.click(screen.getByText('导出'));
+    await user.click(getPrimaryExportButton());
 
     await waitFor(() => {
       // 传入 json_to_sheet 的数据应包含当前分类（asset）的报表
@@ -426,7 +430,7 @@ describe('ReportsPage — 导出功能', () => {
       expect(screen.getByText('资产汇总表')).toBeInTheDocument();
     });
 
-    await user.click(screen.getByText('导出'));
+    await user.click(getPrimaryExportButton());
 
     await waitFor(() => {
       expect(toast.success).toHaveBeenCalledWith('导出成功');
@@ -446,7 +450,7 @@ describe('ReportsPage — 导出功能', () => {
       expect(screen.getByText('资产汇总表')).toBeInTheDocument();
     });
 
-    await user.click(screen.getByText('导出'));
+    await user.click(getPrimaryExportButton());
 
     await waitFor(() => {
       expect(toast.error).toHaveBeenCalledWith('导出失败，请重试');

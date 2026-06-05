@@ -4,6 +4,8 @@ import { auditService } from '../services/auditService';
 
 const DEFAULT_BINDING_CONFIG: Required<AuditBindingConfig> = {
   assetId: '',
+  entityId: '',
+  fields: [],
   entityType: 'Asset',
   enableRealtime: true,
   enableGraphify: true,
@@ -128,7 +130,10 @@ export function useAuditableFields(
     }
 
     try {
-      const metadata = await auditService.getFieldMetadata(entityType, fieldId);
+      const metadataResult = await auditService.getFieldMetadata();
+      const metadata = Array.isArray(metadataResult)
+        ? metadataResult.find((item) => item.field === fieldId) ?? null
+        : metadataResult;
 
       if (metadata && mountedRef.current) {
         metadataCacheRef.current.set(cacheKey, {
@@ -157,12 +162,12 @@ export function useAuditableFields(
     }
 
     try {
-      const nodes = await auditService.searchGraphifyNodes({
-        query: fieldName,
-        entityType: config.entityType,
-        assetId: config.assetId,
-        limit: 5,
-      });
+      const nodes = await auditService.searchGraphifyNodes() as Array<{
+        id: string;
+        confidence?: number;
+        relatedEvents?: AuditEvent[];
+        metadata?: Record<string, unknown>;
+      }>;
 
       if (!nodes || nodes.length === 0) {
         console.warn(
@@ -189,12 +194,7 @@ export function useAuditableFields(
 
   async function fetchFieldEvents(fieldId: string): Promise<AuditEvent[]> {
     try {
-      const events = await auditService.getFieldAuditHistory({
-        assetId: config.assetId,
-        entityType: config.entityType,
-        fieldId,
-        limit: 50,
-      });
+      const events = await auditService.getFieldAuditHistory();
 
       return events;
     } catch (err) {
@@ -456,9 +456,3 @@ export function useAuditableFields(
   };
 }
 
-export type {
-  FieldBinding,
-  GraphifyNodeMatch,
-  UseAuditableFieldsOptions,
-  UseAuditableFieldsReturn,
-};

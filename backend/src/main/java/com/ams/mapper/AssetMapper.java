@@ -32,14 +32,20 @@ public interface AssetMapper extends BaseMapper<Asset> {
      * @return 月度趋势数据列表（month, assetCount, totalValue）
      */
     @Select("SELECT DATE_FORMAT(create_time, '%Y-%m') AS month, "
-          + "COUNT(id) AS assetCount, "
-          + "COALESCE(SUM(original_value), 0) AS totalValue "
-          + "FROM asset "
-          + "WHERE deleted = 0 "
-          + "AND create_time >= DATE_SUB(CURDATE(), INTERVAL #{months} MONTH) "
-          + "GROUP BY DATE_FORMAT(create_time, '%Y-%m') "
-          + "ORDER BY month ASC")
+           + "COUNT(id) AS assetCount, "
+           + "COALESCE(SUM(original_value), 0) AS totalValue "
+           + "FROM asset "
+           + "WHERE deleted = 0 "
+           + "AND create_time >= DATE_SUB(CURDATE(), INTERVAL #{months} MONTH) "
+           + "GROUP BY DATE_FORMAT(create_time, '%Y-%m') "
+           + "ORDER BY month ASC")
     java.util.List<java.util.Map<String, Object>> selectTrendByMonth(int months);
 
-
+    /**
+     * 批量更新资产 ABC 分类（仅更新 abc_classification 字段）
+     *
+     * @param assets 资产列表
+     * @return 更新的记录数
+     */
+    int updateABCBatch(java.util.List<Asset> assets);
 }

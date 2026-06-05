@@ -7,7 +7,8 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * Work order state machine implementing the dual-level approval workflow.
+ * Work order state machine implementing the dual-level approval workflow
+ * with hold/resume and acceptance/rework support.
  *
  * <p>State flow:</p>
  * <pre>
@@ -16,16 +17,21 @@ import java.util.Objects;
  *      │CANCEL              │REJECT                               │REJECT
  *      ▼                     ▼                                      ▼
  *   CANCELLED            REJECTED                               REJECTED
+ *
+ *   APPROVED ──START──▶ EXECUTING ──COMPLETE──▶ COMPLETED ──SUBMIT_ACCEPTANCE──▶ PENDING_ACCEPTANCE
+ *                          │                                                    │
+ *                          │PUT_ON_HOLD                                         │ACCEPT
+ *                          ▼                                                    ▼
+ *                       ON_HOLD ──RESUME──▶ EXECUTING                        ACCEPTED (COMPLETED)
+ *                          │                                                    │
+ *                          │RESUME (auto)                                      │REJECT_ACCEPTANCE
+ *                          ▼                                                    ▼
+ *                       EXECUTING                                          ACCEPTANCE_REJECTED
+ *                                                                                │
+ *                                                                                │RESUME (返工)
+ *                                                                                ▼
+ *                                                                             EXECUTING
  * </pre>
- *
- * <p>APPROVED, REJECTED, and CANCELLED are terminal states — no further
- * transitions are permitted. Cross-level transitions (e.g. PENDING →
- * APPROVING_LEVEL_2) are strictly prohibited and will throw
- * {@link StateTransitionException}.</p>
- *
- * <p>When triggering a {@link WorkOrderEvent#REJECT} event, a rejection reason
- * is mandatory and must contain at least {@value #MIN_REJECTION_REASON_LENGTH}
- * non-whitespace characters.</p>
  */
 public class WorkOrderStateMachine {
 
@@ -37,27 +43,34 @@ public class WorkOrderStateMachine {
 
     /**
      * Events that can trigger state transitions in the work order lifecycle.
-     *
-     * <p>Each event corresponds to a single, well-defined transition edge in the
-     * state diagram. Events are intentionally granular to prevent cross-level
-     * approval (e.g. {@code APPROVE_LEVEL_1} can only fire from
-     * {@code APPROVING_LEVEL_1}).</p>
      */
     public enum WorkOrderEvent {
-        /** Submit a pending work order for level-1 (department supervisor) approval. */
+        /** Submit a pending work order for level-1 approval. */
         SUBMIT,
-
         /** Approve at level-1 — transitions from APPROVING_LEVEL_1 to APPROVING_LEVEL_2. */
         APPROVE_LEVEL_1,
-
         /** Approve at level-2 — transitions from APPROVING_LEVEL_2 to APPROVED. */
         APPROVE_LEVEL_2,
-
+        /** Direct approve from PENDING to APPROVED (single-level, backward compatibility). */
+        APPROVE,
         /** Reject the work order at the current approval level — transitions to REJECTED. */
         REJECT,
-
-        /** Cancel the work order — transitions from PENDING to CANCELLED. */
-        CANCEL
+        /** Cancel the work order — transitions from PENDING/DRAFT to CANCELLED. */
+        CANCEL,
+        /** Start execution — transitions from APPROVED to EXECUTING. */
+        START,
+        /** Complete execution — transitions from EXECUTING to COMPLETED. */
+        COMPLETE,
+        /** Put on hold — transitions from EXECUTING to ON_HOLD. */
+        PUT_ON_HOLD,
+        /** Resume from hold — transitions from ON_HOLD to EXECUTING, or from ACCEPTANCE_REJECTED to EXECUTING. */
+        RESUME,
+        /** Submit for acceptance — transitions from COMPLETED to PENDING_ACCEPTANCE. */
+        SUBMIT_ACCEPTANCE,
+        /** Accept work order — transitions from PENDING_ACCEPTANCE to COMPLETED. */
+        ACCEPT,
+        /** Reject acceptance — transitions from PENDING_ACCEPTANCE to ACCEPTANCE_REJECTED. */
+        REJECT_ACCEPTANCE,
     }
 
     // ──────────────────────────────────────────────────────────────────────
@@ -69,40 +82,71 @@ public class WorkOrderStateMachine {
     static {
         TRANSITION_TABLE = new EnumMap<>(OrderStatus.class);
 
-        // PENDING → SUBMIT → APPROVING_LEVEL_1
-        // PENDING → CANCEL → CANCELLED
+        // DRAFT
+        Map<WorkOrderEvent, OrderStatus> draftTransitions = new EnumMap<>(WorkOrderEvent.class);
+        draftTransitions.put(WorkOrderEvent.SUBMIT, OrderStatus.PENDING);
+        draftTransitions.put(WorkOrderEvent.CANCEL, OrderStatus.CANCELLED);
+        TRANSITION_TABLE.put(OrderStatus.DRAFT, draftTransitions);
+
+        // PENDING
         Map<WorkOrderEvent, OrderStatus> pendingTransitions = new EnumMap<>(WorkOrderEvent.class);
         pendingTransitions.put(WorkOrderEvent.SUBMIT, OrderStatus.APPROVING_LEVEL_1);
+        pendingTransitions.put(WorkOrderEvent.APPROVE, OrderStatus.APPROVED);
         pendingTransitions.put(WorkOrderEvent.CANCEL, OrderStatus.CANCELLED);
         TRANSITION_TABLE.put(OrderStatus.PENDING, pendingTransitions);
 
-        // APPROVING_LEVEL_1 → APPROVE_LEVEL_1 → APPROVING_LEVEL_2
-        // APPROVING_LEVEL_1 → REJECT → REJECTED
+        // APPROVING_LEVEL_1
         Map<WorkOrderEvent, OrderStatus> l1Transitions = new EnumMap<>(WorkOrderEvent.class);
         l1Transitions.put(WorkOrderEvent.APPROVE_LEVEL_1, OrderStatus.APPROVING_LEVEL_2);
         l1Transitions.put(WorkOrderEvent.REJECT, OrderStatus.REJECTED);
         TRANSITION_TABLE.put(OrderStatus.APPROVING_LEVEL_1, l1Transitions);
 
-        // APPROVING_LEVEL_2 → APPROVE_LEVEL_2 → APPROVED
-        // APPROVING_LEVEL_2 → REJECT → REJECTED
+        // APPROVING_LEVEL_2
         Map<WorkOrderEvent, OrderStatus> l2Transitions = new EnumMap<>(WorkOrderEvent.class);
         l2Transitions.put(WorkOrderEvent.APPROVE_LEVEL_2, OrderStatus.APPROVED);
         l2Transitions.put(WorkOrderEvent.REJECT, OrderStatus.REJECTED);
         TRANSITION_TABLE.put(OrderStatus.APPROVING_LEVEL_2, l2Transitions);
 
-        // APPROVED, REJECTED, CANCELLED are terminal states — no outgoing transitions
+        // APPROVED → EXECUTING
+        Map<WorkOrderEvent, OrderStatus> approvedTransitions = new EnumMap<>(WorkOrderEvent.class);
+        approvedTransitions.put(WorkOrderEvent.START, OrderStatus.EXECUTING);
+        TRANSITION_TABLE.put(OrderStatus.APPROVED, approvedTransitions);
+
+        // EXECUTING → COMPLETED, ON_HOLD, SUBMIT_ACCEPTANCE
+        Map<WorkOrderEvent, OrderStatus> executingTransitions = new EnumMap<>(WorkOrderEvent.class);
+        executingTransitions.put(WorkOrderEvent.COMPLETE, OrderStatus.COMPLETED);
+        executingTransitions.put(WorkOrderEvent.PUT_ON_HOLD, OrderStatus.ON_HOLD);
+        executingTransitions.put(WorkOrderEvent.SUBMIT_ACCEPTANCE, OrderStatus.PENDING_ACCEPTANCE);
+        TRANSITION_TABLE.put(OrderStatus.EXECUTING, executingTransitions);
+
+        // ON_HOLD → EXECUTING
+        Map<WorkOrderEvent, OrderStatus> onHoldTransitions = new EnumMap<>(WorkOrderEvent.class);
+        onHoldTransitions.put(WorkOrderEvent.RESUME, OrderStatus.EXECUTING);
+        TRANSITION_TABLE.put(OrderStatus.ON_HOLD, onHoldTransitions);
+
+        // COMPLETED → PENDING_ACCEPTANCE
+        Map<WorkOrderEvent, OrderStatus> completedTransitions = new EnumMap<>(WorkOrderEvent.class);
+        completedTransitions.put(WorkOrderEvent.SUBMIT_ACCEPTANCE, OrderStatus.PENDING_ACCEPTANCE);
+        TRANSITION_TABLE.put(OrderStatus.COMPLETED, completedTransitions);
+
+        // PENDING_ACCEPTANCE → COMPLETED (accepted), ACCEPTANCE_REJECTED
+        Map<WorkOrderEvent, OrderStatus> pendingAcceptanceTransitions = new EnumMap<>(WorkOrderEvent.class);
+        pendingAcceptanceTransitions.put(WorkOrderEvent.ACCEPT, OrderStatus.COMPLETED);
+        pendingAcceptanceTransitions.put(WorkOrderEvent.REJECT_ACCEPTANCE, OrderStatus.ACCEPTANCE_REJECTED);
+        TRANSITION_TABLE.put(OrderStatus.PENDING_ACCEPTANCE, pendingAcceptanceTransitions);
+
+        // ACCEPTANCE_REJECTED → EXECUTING (rework)
+        Map<WorkOrderEvent, OrderStatus> acceptanceRejectedTransitions = new EnumMap<>(WorkOrderEvent.class);
+        acceptanceRejectedTransitions.put(WorkOrderEvent.RESUME, OrderStatus.EXECUTING);
+        TRANSITION_TABLE.put(OrderStatus.ACCEPTANCE_REJECTED, acceptanceRejectedTransitions);
+
+        // REJECTED, CANCELLED are terminal states — no outgoing transitions
     }
 
     // ──────────────────────────────────────────────────────────────────────
     // Constructors
     // ──────────────────────────────────────────────────────────────────────
 
-    /**
-     * Construct a state machine with the given initial status.
-     *
-     * @param initialStatus the starting status of the work order; must not be null
-     * @throws NullPointerException if initialStatus is null
-     */
     public WorkOrderStateMachine(OrderStatus initialStatus) {
         Objects.requireNonNull(initialStatus, "Initial status must not be null");
         this.currentStatus = initialStatus;
@@ -112,31 +156,10 @@ public class WorkOrderStateMachine {
     // Public API
     // ──────────────────────────────────────────────────────────────────────
 
-    /**
-     * Get the current status of the work order.
-     *
-     * @return the current order status, never null
-     */
     public OrderStatus getCurrentStatus() {
         return currentStatus;
     }
 
-    /**
-     * Attempt a state transition triggered by the given event, with an optional
-     * rejection reason.
-     *
-     * <p>For {@link WorkOrderEvent#REJECT} events, {@code rejectionReason} is
-     * mandatory and must satisfy the business rule (non-blank, at least
-     * {@value #MIN_REJECTION_REASON_LENGTH} characters after trimming). For all
-     * other events, {@code rejectionReason} must be {@code null}.</p>
-     *
-     * @param event           the triggering event; must not be null
-     * @param rejectionReason the rejection reason (required for REJECT, must be null otherwise)
-     * @return the new status after a successful transition
-     * @throws NullPointerException       if event is null
-     * @throws StateTransitionException   if the transition is invalid, or rejection
-     *                                    reason validation fails
-     */
     public OrderStatus transition(WorkOrderEvent event, String rejectionReason) {
         Objects.requireNonNull(event, "Event must not be null");
 
@@ -152,7 +175,7 @@ public class WorkOrderStateMachine {
         Map<WorkOrderEvent, OrderStatus> allowedTransitions = TRANSITION_TABLE.get(currentStatus);
         if (allowedTransitions == null) {
             throw new StateTransitionException(
-                String.format("No transitions allowed from terminal state %s", currentStatus));
+                String.format("No transitions allowed from state %s", currentStatus));
         }
 
         OrderStatus targetStatus = allowedTransitions.get(event);
@@ -165,42 +188,17 @@ public class WorkOrderStateMachine {
         return this.currentStatus;
     }
 
-    /**
-     * Attempt a state transition triggered by the given event (without a
-     * rejection reason).
-     *
-     * <p>This is a convenience overload equivalent to
-     * {@code transition(event, null)}.</p>
-     *
-     * @param event the triggering event; must not be null
-     * @return the new status after a successful transition
-     * @throws StateTransitionException if the transition is invalid
-     */
     public OrderStatus transition(WorkOrderEvent event) {
         return transition(event, null);
     }
 
-    /**
-     * Check whether a given event can be applied in the current state without
-     * actually performing the transition.
-     *
-     * @param event the event to check
-     * @return {@code true} if the transition is allowed from the current state
-     */
     public boolean canTransition(WorkOrderEvent event) {
         Map<WorkOrderEvent, OrderStatus> allowedTransitions = TRANSITION_TABLE.get(currentStatus);
         return allowedTransitions != null && allowedTransitions.containsKey(event);
     }
 
-    /**
-     * Check whether the current state is a terminal state (APPROVED, REJECTED,
-     * or CANCELLED) from which no further transitions are possible.
-     *
-     * @return {@code true} if the current state is terminal
-     */
     public boolean isTerminalState() {
-        return currentStatus == OrderStatus.APPROVED
-            || currentStatus == OrderStatus.REJECTED
+        return currentStatus == OrderStatus.REJECTED
             || currentStatus == OrderStatus.CANCELLED;
     }
 
@@ -208,15 +206,6 @@ public class WorkOrderStateMachine {
     // Private helpers
     // ──────────────────────────────────────────────────────────────────────
 
-    /**
-     * Validate the rejection reason according to business rules.
-     *
-     * <p>The reason must be non-null, non-blank, and contain at least
-     * {@value #MIN_REJECTION_REASON_LENGTH} non-whitespace characters.</p>
-     *
-     * @param reason the rejection reason to validate
-     * @throws StateTransitionException if the reason is null, blank, or too short
-     */
     private void validateRejectionReason(String reason) {
         if (reason == null || reason.isBlank()) {
             throw new StateTransitionException(
@@ -235,31 +224,12 @@ public class WorkOrderStateMachine {
     // Nested exception
     // ──────────────────────────────────────────────────────────────────────
 
-    /**
-     * Exception thrown when an invalid state transition is attempted on a work
-     * order, including rejection-reason validation failures.
-     *
-     * <p>This is an unchecked exception because invalid transitions represent
-     * programming errors or business-rule violations that callers should handle
-     * at the application boundary (e.g. translating to HTTP 409 / 400).</p>
-     */
     public static class StateTransitionException extends RuntimeException {
 
-        /**
-         * Construct a new state transition exception with the given message.
-         *
-         * @param message the detail message explaining why the transition failed
-         */
         public StateTransitionException(String message) {
             super(message);
         }
 
-        /**
-         * Construct a new state transition exception with the given message and cause.
-         *
-         * @param message the detail message
-         * @param cause   the underlying cause
-         */
         public StateTransitionException(String message, Throwable cause) {
             super(message, cause);
         }

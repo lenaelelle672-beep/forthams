@@ -83,4 +83,5 @@ http.interceptors.response.use(
   },
 );
 
+export const httpClient = http;
 export default http;

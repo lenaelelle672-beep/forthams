@@ -17,7 +17,7 @@ spring:
 
   # ========== DataSource ==========
   datasource:
-    url: ${DB_URL:jdbc:mysql://localhost:3306/ams_db?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&allowEmptyPasswords=true}
+    url: ${DB_URL:jdbc:mysql://localhost:3306/ams_db?useUnicode=true&characterEncoding=utf8&connectionCollation=utf8mb4_unicode_ci&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&allowEmptyPasswords=true}
     username: ${DB_USERNAME:root}
     password: ${DB_PASSWORD:root}
     driver-class-name: ${DB_DRIVER:com.mysql.cj.jdbc.Driver}
@@ -91,6 +91,14 @@ mybatis-plus:
       logic-delete-field: deleted
       logic-delete-value: 1
       logic-not-delete-value: 0
+
+# ========== SpringDoc OpenAPI (Swagger) ==========
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+  packages-to-scan: com.ams.controller
 
 # ========== JWT ==========
 jwt:

@@ -490,16 +490,3 @@ export class DepreciationService {
  * 折旧服务单例实例
  */
 export const depreciationService = new DepreciationService();
-
-// ============================================================
-// 导出类型（供外部使用）
-// ============================================================
-
-export type {
-  DepreciationRecord,
-  DepreciationSummary,
-  MonthlyDepreciationDetail,
-  DepreciationQueryParams,
-  RecalculateRequest,
-  BatchDepreciationRequest,
-};

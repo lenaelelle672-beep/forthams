@@ -296,3 +296,11 @@ export type ActionTypeValue = `${ActionType}`;
  * 用于路由守卫与权限判断。
  */
 export type AuditDashboardAllowedRole = `${AuditDashboardRole}`;
+
+export interface Asset { id: string | number; assetNo?: string; assetName?: string; [key: string]: unknown; }
+export interface AssetAuditLog { id: string | number; action?: string; createdAt?: string; [key: string]: unknown; }
+export interface ApprovalProcess { id: string | number; status?: string; [key: string]: unknown; }
+export interface ApprovalRecord { id: string | number; action?: string; [key: string]: unknown; }
+export interface GraphifyNodeResult { id: string; label?: string; [key: string]: unknown; }
+export interface GraphifyEdgeResult { source: string; target: string; label?: string; [key: string]: unknown; }
+export interface AuditFieldChange { field: string; oldValue?: unknown; newValue?: unknown; }

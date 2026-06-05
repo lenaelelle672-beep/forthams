@@ -13,7 +13,7 @@
  * - 跨流程串联验证 (LC → WO → RT)
  */
 
-import { test, expect, Browser } from '@playwright/test';
+import { test, expect, Browser, type Page } from '@playwright/test';
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -21,6 +21,13 @@ import { test, expect, Browser } from '@playwright/test';
 
 const TEST_ASSET_NAME = 'E2E-TEST-ASSET-001';
 const SECOND_ASSET_NAME = 'E2E-TEST-ASSET-002';
+
+async function waitForAssetListPage(page: Page) {
+  await expect(page).toHaveURL(/\/assets(?:[?#].*)?$/);
+  await expect(page.getByRole('heading', { name: '资产台账' })).toBeVisible();
+  await expect(page.getByRole('button', { name: '新建资产' })).toBeVisible();
+  await expect(page.getByRole('table')).toBeVisible();
+}
 
 // ---------------------------------------------------------------------------
 // Helper: create a new context with the given storage state
@@ -45,7 +52,7 @@ test.describe('资产报废退役流程 (RT-001 ~ RT-010)', () => {
   // -----------------------------------------------------------------------
   test('RT-001: 确保资产处于可报废状态', async ({ page }) => {
     await page.goto('/assets');
-    await page.waitForSelector('[data-testid="asset-list-table"]', { timeout: 5000 });
+    await waitForAssetListPage(page);
 
     // Navigate to asset detail
     const row = page.locator(`[data-testid="asset-row-${TEST_ASSET_NAME}"]`);
@@ -57,7 +64,7 @@ test.describe('资产报废退役流程 (RT-001 ~ RT-010)', () => {
     // If asset is in 使用中, return it first
     if (statusText?.includes('使用中')) {
       await page.goBack();
-      await page.waitForSelector('[data-testid="asset-list-table"]', { timeout: 5000 });
+      await waitForAssetListPage(page);
       const assetRow = page.locator(`[data-testid="asset-row-${TEST_ASSET_NAME}"]`);
       await assetRow.locator('[data-testid="btn-action-return"]').click();
       await page.click('[data-testid="btn-confirm"]');
@@ -72,7 +79,7 @@ test.describe('资产报废退役流程 (RT-001 ~ RT-010)', () => {
   // -----------------------------------------------------------------------
   test('RT-002: 发起报废申请，POST 返回 201', async ({ page }) => {
     await page.goto('/assets');
-    await page.waitForSelector('[data-testid="asset-list-table"]', { timeout: 5000 });
+    await waitForAssetListPage(page);
 
     const row = page.locator(`[data-testid="asset-row-${TEST_ASSET_NAME}"]`);
     await row.click();
@@ -110,7 +117,7 @@ test.describe('资产报废退役流程 (RT-001 ~ RT-010)', () => {
   // -----------------------------------------------------------------------
   test('RT-003: 验证资产状态变更为待报废', async ({ page }) => {
     await page.goto('/assets');
-    await page.waitForSelector('[data-testid="asset-list-table"]', { timeout: 5000 });
+    await waitForAssetListPage(page);
 
     const row = page.locator(`[data-testid="asset-row-${TEST_ASSET_NAME}"]`);
     await row.click();
@@ -156,7 +163,7 @@ test.describe('资产报废退役流程 (RT-001 ~ RT-010)', () => {
   // -----------------------------------------------------------------------
   test('RT-006: 验证资产状态变更为已报废', async ({ page }) => {
     await page.goto('/assets');
-    await page.waitForSelector('[data-testid="asset-list-table"]', { timeout: 5000 });
+    await waitForAssetListPage(page);
 
     const row = page.locator(`[data-testid="asset-row-${TEST_ASSET_NAME}"]`);
     await row.click();
@@ -170,7 +177,7 @@ test.describe('资产报废退役流程 (RT-001 ~ RT-010)', () => {
   // -----------------------------------------------------------------------
   test('RT-007: 验证已报废资产不可再操作', async ({ page }) => {
     await page.goto('/assets');
-    await page.waitForSelector('[data-testid="asset-list-table"]', { timeout: 5000 });
+    await waitForAssetListPage(page);
 
     const row = page.locator(`[data-testid="asset-row-${TEST_ASSET_NAME}"]`);
 
@@ -198,7 +205,7 @@ test.describe('资产报废退役流程 (RT-001 ~ RT-010)', () => {
   // -----------------------------------------------------------------------
   test('RT-008: 验证操作日志记录', async ({ page }) => {
     await page.goto('/assets');
-    await page.waitForSelector('[data-testid="asset-list-table"]', { timeout: 5000 });
+    await waitForAssetListPage(page);
 
     const row = page.locator(`[data-testid="asset-row-${TEST_ASSET_NAME}"]`);
     await row.click();
@@ -233,7 +240,7 @@ test.describe('资产报废退役流程 (RT-001 ~ RT-010)', () => {
   test('RT-009: 验证报废驳回路径', async ({ page, browser }) => {
     // First, create a second asset and put it in IN_STOCK state for rejection test
     await page.goto('/assets');
-    await page.waitForSelector('[data-testid="asset-list-table"]', { timeout: 5000 });
+    await waitForAssetListPage(page);
 
     // Use the second asset for rejection test
     const secondRow = page.locator(`[data-testid="asset-row-${SECOND_ASSET_NAME}"]`);
@@ -252,7 +259,7 @@ test.describe('资产报废退役流程 (RT-001 ~ RT-010)', () => {
 
       // Stock-in
       await page.goto('/assets');
-      await page.waitForSelector('[data-testid="asset-list-table"]', { timeout: 5000 });
+      await waitForAssetListPage(page);
       const newRow = page.locator(`[data-testid="asset-row-${SECOND_ASSET_NAME}"]`);
       await newRow.locator('[data-testid="btn-action-stock-in"]').click();
       await page.click('[data-testid="btn-confirm"]');
@@ -263,7 +270,7 @@ test.describe('资产报废退役流程 (RT-001 ~ RT-010)', () => {
 
     // Navigate to second asset detail and submit retirement
     await page.goto('/assets');
-    await page.waitForSelector('[data-testid="asset-list-table"]', { timeout: 5000 });
+    await waitForAssetListPage(page);
     const secondAssetRow = page.locator(`[data-testid="asset-row-${SECOND_ASSET_NAME}"]`);
     await secondAssetRow.click();
 
@@ -316,7 +323,7 @@ test.describe('资产报废退役流程 (RT-001 ~ RT-010)', () => {
 
     // Verify asset status reverted to original
     await page.goto('/assets');
-    await page.waitForSelector('[data-testid="asset-list-table"]', { timeout: 5000 });
+    await waitForAssetListPage(page);
     const revertedRow = page.locator(`[data-testid="asset-row-${SECOND_ASSET_NAME}"]`);
     await revertedRow.click();
     await page.waitForSelector('[data-testid="asset-status"]', { timeout: 5000 });
@@ -331,7 +338,7 @@ test.describe('资产报废退役流程 (RT-001 ~ RT-010)', () => {
   test('RT-010: 跨流程串联验证 — 完整链路后终态为已报废，操作日志 ≥ 5 条', async ({ page, browser }) => {
     // Verify the main test asset is in RETIRED state
     await page.goto('/assets');
-    await page.waitForSelector('[data-testid="asset-list-table"]', { timeout: 5000 });
+    await waitForAssetListPage(page);
 
     const row = page.locator(`[data-testid="asset-row-${TEST_ASSET_NAME}"]`);
     await row.click();

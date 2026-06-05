@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ams.mapper.FaultCodeMapper">
+
+    <!-- 通用结果映射 -->
+    <resultMap id="BaseResultMap" type="com.ams.entity.FaultCode">
+        <id column="id" property="id" />
+        <result column="code" property="code" />
+        <result column="fault_phenomenon" property="faultPhenomenon" />
+        <result column="fault_cause" property="faultCause" />
+        <result column="solution" property="solution" />
+        <result column="parent_id" property="parentId" />
+        <result column="level" property="level" />
+        <result column="category_ids" property="categoryIds" />
+        <result column="tenant_id" property="tenantId" />
+        <result column="status" property="status" />
+        <result column="sort_order" property="sortOrder" />
+        <result column="deleted" property="deleted" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <!-- 带父节点名称的结果映射（用于树形展示） -->
+    <resultMap id="WithParentResultMap" type="com.ams.entity.FaultCode" extends="BaseResultMap">
+        <result column="parent_name" property="parentName" />
+        <result column="parent_code" property="parentCode" />
+    </resultMap>
+
+    <!-- 查询直接子节点 -->
+    <select id="selectChildrenByParentId" resultMap="BaseResultMap">
+        SELECT * FROM fault_code
+        WHERE parent_id = #{parentId}
+          AND deleted = 0
+          AND tenant_id = #{tenantId}
+        ORDER BY sort_order ASC
+    </select>
+
+    <!-- 按层级过滤查询全部节点 -->
+    <select id="selectTreeByMaxLevel" resultMap="WithParentResultMap">
+        SELECT
+            fc.*,
+            parent.code AS parent_code,
+            parent.fault_phenomenon AS parent_name
+        FROM fault_code fc
+        LEFT JOIN fault_code parent ON fc.parent_id = parent.id AND parent.deleted = 0
+        WHERE fc.deleted = 0
+          AND fc.tenant_id = #{tenantId}
+          AND fc.level &lt;= #{maxLevel}
+        ORDER BY fc.level ASC, fc.sort_order ASC
+    </select>
+
+    <!-- 查询节点及其完整路径 -->
+    <select id="selectNodeWithPath" resultMap="WithParentResultMap">
+        SELECT
+            fc.*,
+            parent.code AS parent_code,
+            parent.fault_phenomenon AS parent_name
+        FROM fault_code fc
+        LEFT JOIN fault_code parent ON fc.parent_id = parent.id AND parent.deleted = 0
+        WHERE fc.id = #{id}
+          AND fc.deleted = 0
+          AND fc.tenant_id = #{tenantId}
+    </select>
+
+    <!-- 查询指定层级的节点列表 -->
+    <select id="selectByLevelOrdered" resultMap="BaseResultMap">
+        SELECT * FROM fault_code
+        WHERE level = #{level}
+          AND deleted = 0
+          AND tenant_id = #{tenantId}
+        ORDER BY sort_order ASC
+    </select>
+
+    <!-- 检查是否有子节点 -->
+    <select id="countChildren" resultType="int">
+        SELECT COUNT(1) FROM fault_code
+        WHERE parent_id = #{parentId}
+          AND deleted = 0
+          AND tenant_id = #{tenantId}
+    </select>
+
+</mapper>

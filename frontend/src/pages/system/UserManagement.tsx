@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import {
   Building2,
   Eye,
+  Filter,
   KeyRound,
   Pencil,
   Plus,
@@ -11,11 +12,14 @@ import {
   Search,
   Trash2,
   Users,
+  Shield,
+  Briefcase,
 } from 'lucide-react';
-import { PageHeader } from '@/components/ui/PageHeader';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
+import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
+import { DataTable, type Column } from '@/components/ui/DataTable';
+import { Dialog, DialogContent, DialogClose } from '@/components/ui/Dialog';
 import { getDeptTree } from '@/api/base';
 import { getAllRoles } from '@/api/role';
 import { assignUserPosts, getAllPosts } from '@/api/post';
@@ -259,245 +263,425 @@ export default function UserManagement() {
     saveUserMut.mutate();
   }
 
-  return (
-    <div className="p-6 space-y-6">
-      <PageHeader title="用户管理" subtitle="按若依用户模型维护账号、部门、岗位、角色、邮箱与状态" />
+  /* ── Status counts for quick-filter pills ── */
+  const activeOnPage = users.filter((u) => u.status === 1).length;
+  const disabledOnPage = users.length - activeOnPage;
 
-      <Card>
-        <CardHeader>
-          <CardTitle>用户列表</CardTitle>
-          <Button variant="primary" size="sm" onClick={openCreate}>
-            <Plus className="w-4 h-4" />新增用户
-          </Button>
-        </CardHeader>
-        <CardContent>
-          <div className="mb-4 grid grid-cols-1 gap-3 lg:grid-cols-[minmax(260px,1fr)_180px_180px_auto]">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#94a3b8]" />
-              <input
-                value={keyword}
-                onChange={(event) => { setKeyword(event.target.value); setPage(1); }}
-                placeholder="搜索用户名、姓名、邮箱或手机号"
-                className="h-10 w-full rounded-lg border border-[#e5e7eb] bg-white pl-9 pr-3 text-sm outline-none focus:border-[#3b82f6] focus:ring-2 focus:ring-blue-100"
-              />
-            </div>
-            <select
-              value={deptId}
-              onChange={(event) => { setDeptId(event.target.value); setPage(1); }}
-              className="h-10 rounded-lg border border-[#e5e7eb] bg-white px-3 text-sm outline-none focus:border-[#3b82f6] focus:ring-2 focus:ring-blue-100"
-            >
-              <option value="">全部部门</option>
-              {depts.map((dept) => (
-                <option key={dept.id} value={dept.id}>{'—'.repeat(dept.level)} {getDeptName(dept)}</option>
-              ))}
-            </select>
-            <select
-              value={status}
-              onChange={(event) => { setStatus(event.target.value); setPage(1); }}
-              className="h-10 rounded-lg border border-[#e5e7eb] bg-white px-3 text-sm outline-none focus:border-[#3b82f6] focus:ring-2 focus:ring-blue-100"
-            >
-              <option value="">全部状态</option>
-              <option value="1">正常</option>
-              <option value="0">停用</option>
-            </select>
-            <Button variant="secondary" onClick={() => { setKeyword(''); setDeptId(''); setStatus(''); setPage(1); }}>
-              重置筛选
-            </Button>
+  /* ── Stat bar definitions ── */
+  const statCards = [
+    { label: '用户总量', value: total, icon: Users, gradient: 'from-blue-600 to-cyan-500' },
+    { label: '角色数', value: roles.length, icon: Shield, gradient: 'from-violet-500 to-purple-400' },
+    { label: '岗位数', value: posts.length, icon: Briefcase, gradient: 'from-emerald-500 to-teal-400' },
+    { label: '总页数', value: totalPages, icon: RefreshCw, gradient: 'from-amber-500 to-orange-400' },
+  ];
+
+  /* ── DataTable columns ── */
+  const columns: Column<UserItem>[] = [
+    {
+      key: 'realName',
+      title: '用户',
+      render: (_, row) => (
+        <div className="flex items-center gap-3">
+          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-50 text-xs font-bold text-blue-600">
+            {(row.realName || row.username).slice(0, 2).toUpperCase()}
           </div>
-
-          {isLoading ? (
-            <div className="flex items-center justify-center py-12 text-sm text-[#94a3b8]">
-              <RefreshCw className="mr-2 h-4 w-4 animate-spin" />加载用户中...
-            </div>
-          ) : users.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-[#cbd5e1] py-12 text-center text-sm text-[#64748b]">
-              暂无用户数据，可调整筛选或新建用户
-            </div>
-          ) : (
-            <div className="overflow-x-auto rounded-xl border border-[#e5e7eb]">
-              <table className="w-full text-left text-sm">
-                <thead className="bg-[#f8fafc] text-xs uppercase text-[#94a3b8]">
-                  <tr>
-                    <th className="px-5 py-3">用户</th>
-                    <th className="px-5 py-3">邮箱/手机号</th>
-                    <th className="px-5 py-3">部门</th>
-                    <th className="px-5 py-3">状态</th>
-                    <th className="px-5 py-3">创建时间</th>
-                    <th className="px-5 py-3">操作</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-[#f1f5f9]">
-                  {users.map((user) => (
-                    <tr key={user.id} className="hover:bg-[#f8fafc]">
-                      <td className="px-5 py-3.5">
-                        <div className="flex items-center gap-3">
-                          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-50 text-xs font-bold text-[#2563eb]">
-                            {(user.realName || user.username).slice(0, 2).toUpperCase()}
-                          </div>
-                          <div>
-                            <p className="font-medium text-[#0f172a]">{user.realName || '—'}</p>
-                            <p className="font-mono text-xs text-[#64748b]">{user.username}</p>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-5 py-3.5 text-[#64748b]">
-                        <div>{user.email || '—'}</div>
-                        <div className="text-xs text-[#94a3b8]">{user.phone || '—'}</div>
-                      </td>
-                      <td className="px-5 py-3.5 text-[#64748b]">
-                        <Building2 className="mr-1 inline h-3.5 w-3.5 text-[#94a3b8]" />
-                        {user.deptName || (user.deptId ? deptNameById.get(user.deptId) || `部门#${user.deptId}` : '未分配')}
-                      </td>
-                      <td className="px-5 py-3.5">
-                        <button
-                          onClick={() => statusMut.mutate({ id: user.id, nextStatus: user.status === 1 ? 0 : 1 })}
-                          className={`rounded-full px-2 py-0.5 text-xs ${user.status === 1 ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-500'}`}
-                        >
-                          {user.status === 1 ? '正常' : '停用'}
-                        </button>
-                      </td>
-                      <td className="px-5 py-3.5 text-xs text-[#94a3b8]">{formatTime(user.createTime)}</td>
-                      <td className="px-5 py-3.5">
-                        <div className="flex flex-wrap items-center gap-3 text-xs">
-                          <button className="text-[#3b82f6] hover:text-[#2563eb]" onClick={() => setDetailUserId(user.id)}>
-                            <Eye className="mr-1 inline h-3.5 w-3.5" />详情
-                          </button>
-                          <button className="text-[#3b82f6] hover:text-[#2563eb]" onClick={() => openEdit(user)}>
-                            <Pencil className="mr-1 inline h-3.5 w-3.5" />编辑
-                          </button>
-                          <button className="text-amber-600 hover:text-amber-700" onClick={() => resetPasswordMut.mutate(user.id)}>
-                            <KeyRound className="mr-1 inline h-3.5 w-3.5" />重置密码
-                          </button>
-                          <button className="text-red-500 hover:text-red-700" onClick={() => setDeleteTarget(user)}>
-                            <Trash2 className="mr-1 inline h-3.5 w-3.5" />删除
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-
-          <div className="mt-4 flex items-center justify-between text-xs text-[#64748b]">
-            <span>共 {total} 项，当前第 {page} / {totalPages} 页</span>
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage((p) => Math.max(1, p - 1))}>上一页</Button>
-              <Button variant="outline" size="sm" disabled={page >= totalPages} onClick={() => setPage((p) => Math.min(totalPages, p + 1))}>下一页</Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {showForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="absolute inset-0 bg-black/50" onClick={closeForm} />
-          <div className="relative mx-4 max-h-[92vh] w-full max-w-3xl overflow-y-auto rounded-xl bg-white p-6 shadow-xl">
-            <h3 className="mb-5 text-base font-semibold text-[#0f172a]">{editingUser ? '编辑用户' : '新增用户'}</h3>
-            <form onSubmit={submitForm} className="space-y-5">
-              <div className="grid grid-cols-2 gap-4">
-                <Input label="用户名 *" value={form.username} disabled={!!editingUser} onChange={(e) => setForm((p) => ({ ...p, username: e.target.value }))} required />
-                {!editingUser ? (
-                  <Input label="初始密码 *" type="password" value={form.password} onChange={(e) => setForm((p) => ({ ...p, password: e.target.value }))} required />
-                ) : (
-                  <Input label="账号 ID" value={String(editingUser.id)} disabled />
-                )}
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <Input label="真实姓名" value={form.realName} onChange={(e) => setForm((p) => ({ ...p, realName: e.target.value }))} />
-                <Input label="邮箱" type="email" value={form.email} onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))} />
-              </div>
-              <div className="grid grid-cols-3 gap-4">
-                <Input label="手机号" value={form.phone} onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))} />
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-sm font-medium text-[#374151]">部门</label>
-                  <select value={form.deptId} onChange={(e) => setForm((p) => ({ ...p, deptId: e.target.value }))} className="h-9 rounded-lg border border-[#e5e7eb] bg-white px-3 text-sm outline-none focus:border-[#3b82f6] focus:ring-2 focus:ring-blue-100">
-                    <option value="">未分配</option>
-                    {depts.map((dept) => (
-                      <option key={dept.id} value={dept.id}>{'—'.repeat(dept.level)} {getDeptName(dept)}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-sm font-medium text-[#374151]">状态</label>
-                  <select value={form.status} onChange={(e) => setForm((p) => ({ ...p, status: Number(e.target.value) }))} className="h-9 rounded-lg border border-[#e5e7eb] bg-white px-3 text-sm outline-none focus:border-[#3b82f6] focus:ring-2 focus:ring-blue-100">
-                    <option value={1}>正常</option>
-                    <option value={0}>停用</option>
-                  </select>
-                </div>
-              </div>
-              <Input label="备注" value={form.remark} onChange={(e) => setForm((p) => ({ ...p, remark: e.target.value }))} />
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="rounded-xl border border-[#e5e7eb] p-4">
-                  <p className="mb-3 text-sm font-semibold text-[#374151]">角色分配</p>
-                  <div className="max-h-48 space-y-2 overflow-y-auto">
-                    {roles.map((role) => (
-                      <label key={role.id} className="flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 hover:bg-[#f8fafc]">
-                        <input type="checkbox" checked={form.roleIds.has(role.id)} onChange={() => setForm((p) => ({ ...p, roleIds: toggleSetValue(p.roleIds, role.id) }))} />
-                        <span className="text-sm text-[#0f172a]">{role.roleName}</span>
-                        <span className="text-xs text-[#94a3b8]">{role.roleCode}</span>
-                      </label>
-                    ))}
-                    {roles.length === 0 && <p className="text-sm text-[#94a3b8]">暂无角色</p>}
-                  </div>
-                </div>
-                <div className="rounded-xl border border-[#e5e7eb] p-4">
-                  <p className="mb-3 text-sm font-semibold text-[#374151]">岗位分配</p>
-                  <div className="max-h-48 space-y-2 overflow-y-auto">
-                    {posts.map((post) => (
-                      <label key={post.id} className="flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 hover:bg-[#f8fafc]">
-                        <input type="checkbox" checked={form.postIds.has(post.id)} onChange={() => setForm((p) => ({ ...p, postIds: toggleSetValue(p.postIds, post.id) }))} />
-                        <span className="text-sm text-[#0f172a]">{post.postName}</span>
-                        <span className="text-xs text-[#94a3b8]">{post.postCode}</span>
-                      </label>
-                    ))}
-                    {posts.length === 0 && <p className="text-sm text-[#94a3b8]">暂无岗位</p>}
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex justify-end gap-3 pt-2">
-                <Button type="button" variant="secondary" onClick={closeForm}>取消</Button>
-                <Button type="submit" variant="primary" loading={saveUserMut.isPending}>{editingUser ? '保存修改' : '确认新增'}</Button>
-              </div>
-            </form>
+          <div>
+            <p className="font-medium text-slate-900">{row.realName || '—'}</p>
+            <p className="font-mono text-xs text-slate-500">{row.username}</p>
           </div>
         </div>
-      )}
+      ),
+    },
+    {
+      key: 'email',
+      title: '邮箱/手机号',
+      render: (_, row) => (
+        <div>
+          <div className="text-sm text-slate-600">{row.email || '—'}</div>
+          <div className="text-xs text-slate-400">{row.phone || '—'}</div>
+        </div>
+      ),
+    },
+    {
+      key: 'deptName',
+      title: '部门',
+      render: (_, row) => (
+        <span className="inline-flex items-center gap-1.5 text-sm text-slate-600">
+          <Building2 className="h-3.5 w-3.5 text-slate-400" />
+          {row.deptName || (row.deptId ? deptNameById.get(row.deptId) || `部门#${row.deptId}` : '未分配')}
+        </span>
+      ),
+    },
+    {
+      key: 'status',
+      title: '状态',
+      width: 100,
+      render: (_, row) => (
+        <button
+          onClick={() => statusMut.mutate({ id: row.id, nextStatus: row.status === 1 ? 0 : 1 })}
+          title="点击切换状态"
+          className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-semibold ring-1 ring-inset transition-colors ${
+            row.status === 1
+              ? 'border-emerald-200 bg-emerald-50 text-emerald-600 hover:bg-emerald-100'
+              : 'border-red-200 bg-red-50 text-red-600 hover:bg-red-100'
+          }`}
+        >
+          <span className={`h-1.5 w-1.5 rounded-full ${row.status === 1 ? 'bg-emerald-400' : 'bg-red-400'}`} />
+          {row.status === 1 ? '正常' : '停用'}
+        </button>
+      ),
+    },
+    {
+      key: 'createTime',
+      title: '创建时间',
+      width: 160,
+      render: (v) => <span className="text-xs text-slate-400">{formatTime(v as string)}</span>,
+    },
+    {
+      key: 'actions',
+      title: '操作',
+      width: 260,
+      render: (_, row) => (
+        <div className="flex flex-wrap items-center gap-1.5">
+          <button
+            className="inline-flex h-7 items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 text-xs font-medium text-slate-600 transition hover:border-blue-200 hover:text-blue-600"
+            onClick={() => setDetailUserId(row.id)}
+          >
+            <Eye className="h-3.5 w-3.5" />详情
+          </button>
+          <button
+            className="inline-flex h-7 items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 text-xs font-medium text-slate-600 transition hover:border-blue-200 hover:text-blue-600"
+            onClick={() => openEdit(row)}
+          >
+            <Pencil className="h-3.5 w-3.5" />编辑
+          </button>
+          <span className="mx-0.5 h-4 w-px bg-slate-200" />
+          <button
+            className="inline-flex h-7 items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 text-xs font-medium text-amber-600 transition hover:border-amber-200 hover:bg-amber-50"
+            onClick={() => resetPasswordMut.mutate(row.id)}
+          >
+            <KeyRound className="h-3.5 w-3.5" />重置
+          </button>
+          <button
+            className="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-slate-200 text-slate-400 transition hover:border-red-200 hover:text-red-500"
+            onClick={() => setDeleteTarget(row)}
+            title="删除"
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      ),
+    },
+  ];
 
-      {detailUserId != null && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="absolute inset-0 bg-black/50" onClick={() => setDetailUserId(null)} />
-          <div className="relative mx-4 w-full max-w-2xl rounded-xl bg-white p-6 shadow-xl">
-            <h3 className="text-base font-semibold text-[#0f172a]">用户详情</h3>
+  return (
+    <div className="min-h-full bg-[var(--app-background)] px-4 py-5 sm:px-6 lg:px-8">
+      <div className="mx-auto flex w-full max-w-[1480px] flex-col gap-6">
+        {/* ── Compact header with stat bar ── */}
+        <section className="rounded-2xl border border-[var(--surface-border)] bg-white shadow-sm">
+          <div className="flex flex-wrap items-center justify-between gap-3 px-6 py-4">
+            <div className="flex items-center gap-3">
+              <h1 className="text-xl font-bold text-slate-900">用户管理</h1>
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-blue-200 bg-blue-50 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-blue-700">
+                <Users className="h-3 w-3" />
+                用户
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button variant="primary" size="md" onClick={openCreate}>
+                <Plus className="w-4 h-4" />
+                新增用户
+              </Button>
+            </div>
+          </div>
+
+          {/* stat bar */}
+          <div className="grid grid-cols-2 divide-x divide-slate-100 border-t border-slate-100 sm:grid-cols-4">
+            {statCards.map((stat) => {
+              const Icon = stat.icon;
+              return (
+                <div key={stat.label} className="flex items-center gap-3 px-5 py-3">
+                  <span className={`inline-flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br ${stat.gradient} shadow-sm`}>
+                    <Icon className="h-3.5 w-3.5 text-white" />
+                  </span>
+                  <div>
+                    <p className="text-[11px] font-medium text-slate-400">{stat.label}</p>
+                    <p className="text-lg font-bold text-slate-900">{stat.value}</p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* ── Main content card ── */}
+        <Card className="overflow-hidden rounded-2xl border-slate-200/80 shadow-sm">
+          {/* Toolbar */}
+          <div className="border-b border-slate-100 bg-gradient-to-r from-white via-[#fbfdff] to-[#f8fbff] px-5 py-4">
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.15em] text-blue-600">
+                  <Search className="h-3.5 w-3.5" />
+                  用户列表
+                </div>
+                <h2 className="mt-1 text-lg font-bold text-slate-900">
+                  账号与权限管理
+                </h2>
+              </div>
+            </div>
+
+            {/* Quick filter pills */}
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                onClick={() => { setStatus(''); setPage(1); }}
+                className={`rounded-full border px-3.5 py-1.5 text-xs font-semibold transition ${
+                  status === ''
+                    ? 'border-slate-900 bg-slate-900 text-white shadow-sm'
+                    : 'border-slate-200 bg-white text-slate-600 hover:border-blue-200 hover:text-blue-700'
+                }`}
+              >
+                全部
+                <span className="ml-1 rounded-full bg-white/20 px-1.5 py-0 text-[10px]">
+                  {total}
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={() => { setStatus('1'); setPage(1); }}
+                className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-xs font-semibold transition ${
+                  status === '1'
+                    ? 'border-emerald-500 bg-emerald-600 text-white shadow-md shadow-emerald-500/20'
+                    : 'border-slate-200 bg-white text-slate-600 hover:border-emerald-200 hover:text-emerald-700'
+                }`}
+              >
+                <span className={`h-1.5 w-1.5 rounded-full ${status === '1' ? 'bg-white' : 'bg-emerald-400'}`} />
+                正常
+                <span className={`ml-0.5 rounded-full px-1.5 py-0 text-[10px] ${
+                  status === '1' ? 'bg-white/20 text-white' : 'bg-emerald-50 text-emerald-600'
+                }`}>
+                  {activeOnPage}
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={() => { setStatus('0'); setPage(1); }}
+                className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-xs font-semibold transition ${
+                  status === '0'
+                    ? 'border-red-500 bg-red-600 text-white shadow-md shadow-red-500/20'
+                    : 'border-slate-200 bg-white text-slate-600 hover:border-red-200 hover:text-red-700'
+                }`}
+              >
+                <span className={`h-1.5 w-1.5 rounded-full ${status === '0' ? 'bg-white' : 'bg-red-400'}`} />
+                停用
+                <span className={`ml-0.5 rounded-full px-1.5 py-0 text-[10px] ${
+                  status === '0' ? 'bg-white/20 text-white' : 'bg-red-50 text-red-600'
+                }`}>
+                  {disabledOnPage}
+                </span>
+              </button>
+            </div>
+
+            {/* Search + dept filter */}
+            <div className="mt-3 flex flex-wrap items-center gap-3 rounded-xl border border-blue-100 bg-blue-50/50 p-3">
+              <div className="relative w-64">
+                <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <input
+                  value={keyword}
+                  onChange={(event) => { setKeyword(event.target.value); setPage(1); }}
+                  placeholder="搜索用户名、姓名、邮箱或手机号"
+                  className="h-9 w-full rounded-lg border border-slate-200 bg-white pl-9 pr-3 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+                />
+              </div>
+              <select
+                value={deptId}
+                onChange={(event) => { setDeptId(event.target.value); setPage(1); }}
+                className="h-9 rounded-lg border border-slate-200 bg-white px-3 text-sm outline-none focus:border-blue-400"
+              >
+                <option value="">全部部门</option>
+                {depts.map((dept) => (
+                  <option key={dept.id} value={dept.id}>{'—'.repeat(dept.level)} {getDeptName(dept)}</option>
+                ))}
+              </select>
+              <button
+                className="text-xs font-bold text-blue-600 hover:underline"
+                onClick={() => { setKeyword(''); setDeptId(''); setStatus(''); setPage(1); }}
+              >
+                重置
+              </button>
+            </div>
+          </div>
+
+          {/* Result summary bar */}
+          <div className="flex flex-wrap items-center gap-3 border-b border-slate-100 bg-gradient-to-r from-slate-50/80 via-white to-slate-50/60 px-5 py-2">
+            {(status !== '' || deptId !== '' || keyword.trim()) && (
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-bold text-blue-700">
+                <Filter className="h-3 w-3" />
+                筛选中
+              </span>
+            )}
+            <span className="text-xs text-slate-500">
+              共 <span className="font-bold text-slate-700">{total}</span> 条用户
+              {' · '}本页 <span className="font-bold text-slate-700">{users.length}</span> 条
+            </span>
+            {status !== '' && (
+              <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-semibold ${
+                status === '1'
+                  ? 'border-emerald-200/60 bg-emerald-50 text-emerald-700'
+                  : 'border-red-200/60 bg-red-50 text-red-600'
+              }`}>
+                状态: {status === '1' ? '正常' : '停用'}
+              </span>
+            )}
+            {deptId !== '' && (
+              <span className="inline-flex items-center gap-1 rounded-full border border-blue-200/60 bg-blue-50 px-2 py-0.5 text-[11px] font-semibold text-blue-700">
+                <Building2 className="h-3 w-3" />
+                {deptNameById.get(Number(deptId)) || `部门#${deptId}`}
+              </span>
+            )}
+            {keyword.trim() && (
+              <span className="inline-flex items-center gap-1 rounded-full border border-amber-200/60 bg-amber-50 px-2 py-0.5 text-[11px] font-semibold text-amber-700">
+                搜索: {keyword.trim()}
+              </span>
+            )}
+          </div>
+
+          {/* DataTable */}
+          <div className="p-4 sm:p-5">
+            <DataTable
+              columns={columns}
+              data={users}
+              loading={isLoading}
+              rowKey="id"
+              pagination={{
+                page,
+                pageSize: PAGE_SIZE,
+                total,
+                onChange: (p) => setPage(p),
+              }}
+              emptyText="暂无用户数据，可调整筛选或新建用户"
+            />
+          </div>
+        </Card>
+      </div>
+
+      {/* ── Create / Edit Dialog ── */}
+      <Dialog open={showForm} onOpenChange={(v) => { if (!v) closeForm(); }}>
+        <DialogContent title={editingUser ? '编辑用户' : '新增用户'} className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <form onSubmit={submitForm} className="space-y-5 p-6">
+            <div className="grid grid-cols-2 gap-4">
+              <Input label="用户名 *" value={form.username} disabled={!!editingUser} onChange={(e) => setForm((p) => ({ ...p, username: e.target.value }))} required />
+              {!editingUser ? (
+                <Input label="初始密码 *" type="password" value={form.password} onChange={(e) => setForm((p) => ({ ...p, password: e.target.value }))} required />
+              ) : (
+                <Input label="账号 ID" value={String(editingUser.id)} disabled />
+              )}
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <Input label="真实姓名" value={form.realName} onChange={(e) => setForm((p) => ({ ...p, realName: e.target.value }))} />
+              <Input label="邮箱" type="email" value={form.email} onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))} />
+            </div>
+            <div className="grid grid-cols-3 gap-4">
+              <Input label="手机号" value={form.phone} onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))} />
+              <div className="flex flex-col gap-1.5">
+                <label className="text-sm font-medium text-slate-700">部门</label>
+                <select value={form.deptId} onChange={(e) => setForm((p) => ({ ...p, deptId: e.target.value }))} className="h-9 rounded-lg border border-slate-200 bg-white px-3 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100">
+                  <option value="">未分配</option>
+                  {depts.map((dept) => (
+                    <option key={dept.id} value={dept.id}>{'—'.repeat(dept.level)} {getDeptName(dept)}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-sm font-medium text-slate-700">状态</label>
+                <select value={form.status} onChange={(e) => setForm((p) => ({ ...p, status: Number(e.target.value) }))} className="h-9 rounded-lg border border-slate-200 bg-white px-3 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100">
+                  <option value={1}>正常</option>
+                  <option value={0}>停用</option>
+                </select>
+              </div>
+            </div>
+            <Input label="备注" value={form.remark} onChange={(e) => setForm((p) => ({ ...p, remark: e.target.value }))} />
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="rounded-xl border border-slate-200 p-4">
+                <p className="mb-3 text-sm font-semibold text-slate-700">角色分配</p>
+                <div className="max-h-48 space-y-2 overflow-y-auto">
+                  {roles.map((role) => (
+                    <label key={role.id} className="flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 hover:bg-slate-50">
+                      <input type="checkbox" checked={form.roleIds.has(role.id)} onChange={() => setForm((p) => ({ ...p, roleIds: toggleSetValue(p.roleIds, role.id) }))} />
+                      <span className="text-sm text-slate-900">{role.roleName}</span>
+                      <span className="text-xs text-slate-400">{role.roleCode}</span>
+                    </label>
+                  ))}
+                  {roles.length === 0 && <p className="text-sm text-slate-400">暂无角色</p>}
+                </div>
+              </div>
+              <div className="rounded-xl border border-slate-200 p-4">
+                <p className="mb-3 text-sm font-semibold text-slate-700">岗位分配</p>
+                <div className="max-h-48 space-y-2 overflow-y-auto">
+                  {posts.map((post) => (
+                    <label key={post.id} className="flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 hover:bg-slate-50">
+                      <input type="checkbox" checked={form.postIds.has(post.id)} onChange={() => setForm((p) => ({ ...p, postIds: toggleSetValue(p.postIds, post.id) }))} />
+                      <span className="text-sm text-slate-900">{post.postName}</span>
+                      <span className="text-xs text-slate-400">{post.postCode}</span>
+                    </label>
+                  ))}
+                  {posts.length === 0 && <p className="text-sm text-slate-400">暂无岗位</p>}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-2 border-t border-slate-100 pt-4">
+              <DialogClose asChild>
+                <Button type="button" variant="secondary">取消</Button>
+              </DialogClose>
+              <Button type="submit" variant="primary" loading={saveUserMut.isPending}>{editingUser ? '保存修改' : '确认新增'}</Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* ── User Detail Dialog ── */}
+      <Dialog open={detailUserId != null} onOpenChange={(v) => { if (!v) setDetailUserId(null); }}>
+        <DialogContent title="用户详情" className="max-w-2xl">
+          <div className="p-6">
             {detailLoading ? (
-              <div className="py-10 text-center text-sm text-[#94a3b8]">加载中...</div>
+              <div className="py-10 text-center text-sm text-slate-400">
+                <RefreshCw className="mx-auto mb-2 h-5 w-5 animate-spin" />
+                加载中...
+              </div>
             ) : detail ? (
               <UserDetailPanel detail={detail} deptName={detail.deptName || (detail.deptId ? deptNameById.get(detail.deptId) : undefined)} />
             ) : (
-              <div className="py-10 text-center text-sm text-[#94a3b8]">未找到用户详情</div>
+              <div className="py-10 text-center text-sm text-slate-400">未找到用户详情</div>
             )}
-            <div className="mt-6 flex justify-end">
+          </div>
+          <div className="flex justify-end border-t border-slate-100 px-6 py-4">
+            <DialogClose asChild>
               <Button variant="secondary" onClick={() => setDetailUserId(null)}>关闭</Button>
-            </div>
+            </DialogClose>
           </div>
-        </div>
-      )}
+        </DialogContent>
+      </Dialog>
 
-      {deleteTarget && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="mx-4 w-full max-w-sm rounded-xl bg-white p-6 shadow-xl">
-            <h3 className="text-base font-semibold text-gray-900">确认删除用户</h3>
-            <p className="mt-3 text-sm text-gray-500">确定要删除「{deleteTarget.realName || deleteTarget.username}」吗？此操作不可撤销。</p>
-            <div className="mt-5 flex justify-end gap-3">
-              <Button variant="outline" size="sm" onClick={() => setDeleteTarget(null)}>取消</Button>
-              <Button variant="destructive" size="sm" loading={deleteMut.isPending} onClick={() => deleteMut.mutate(deleteTarget.id)}>确认删除</Button>
-            </div>
+      {/* ── Delete Confirmation Dialog ── */}
+      <Dialog open={deleteTarget != null} onOpenChange={(v) => { if (!v) setDeleteTarget(null); }}>
+        <DialogContent title="确认删除用户">
+          <div className="p-6">
+            <p className="text-sm text-slate-600">
+              确定要删除「<strong className="text-slate-900">{deleteTarget?.realName || deleteTarget?.username}</strong>」吗？此操作不可撤销。
+            </p>
           </div>
-        </div>
-      )}
+          <div className="flex justify-end gap-2 border-t border-slate-100 px-6 py-4">
+            <DialogClose asChild>
+              <Button variant="secondary" onClick={() => setDeleteTarget(null)}>取消</Button>
+            </DialogClose>
+            <Button variant="destructive" loading={deleteMut.isPending} onClick={() => deleteTarget && deleteMut.mutate(deleteTarget.id)}>
+              确认删除
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
@@ -517,32 +701,32 @@ function UserDetailPanel({ detail, deptName }: { detail: UserDetail; deptName?: 
     ['备注', detail.remark || '—'],
   ];
   return (
-    <div className="mt-5 space-y-5">
+    <div className="space-y-5">
       <div className="grid grid-cols-2 gap-3">
         {fields.map(([label, value]) => (
-          <div key={label} className="rounded-lg bg-[#f8fafc] p-3">
-            <p className="text-xs text-[#94a3b8]">{label}</p>
-            <p className="mt-1 text-sm font-medium text-[#0f172a]">{value}</p>
+          <div key={label} className="rounded-xl border border-slate-100 bg-slate-50/50 p-3">
+            <p className="text-xs text-slate-400">{label}</p>
+            <p className="mt-1 text-sm font-medium text-slate-900">{value}</p>
           </div>
         ))}
       </div>
       <div className="grid grid-cols-2 gap-4">
-        <div className="rounded-xl border border-[#e5e7eb] p-4">
-          <p className="mb-2 text-sm font-semibold text-[#374151]">角色</p>
+        <div className="rounded-xl border border-slate-200 p-4">
+          <p className="mb-2 text-sm font-semibold text-slate-700">角色</p>
           <div className="flex flex-wrap gap-2">
             {(detail.roles ?? []).map((role) => (
-              <span key={role.id} className="rounded-full bg-blue-50 px-2 py-1 text-xs text-[#2563eb]">{role.roleName}</span>
+              <span key={role.id} className="inline-flex items-center gap-1 rounded-full border border-blue-200 bg-blue-50 px-2 py-0.5 text-xs font-semibold text-blue-700">{role.roleName}</span>
             ))}
-            {(detail.roles ?? []).length === 0 && <span className="text-sm text-[#94a3b8]">暂无角色</span>}
+            {(detail.roles ?? []).length === 0 && <span className="text-sm text-slate-400">暂无角色</span>}
           </div>
         </div>
-        <div className="rounded-xl border border-[#e5e7eb] p-4">
-          <p className="mb-2 text-sm font-semibold text-[#374151]">岗位 ID</p>
+        <div className="rounded-xl border border-slate-200 p-4">
+          <p className="mb-2 text-sm font-semibold text-slate-700">岗位 ID</p>
           <div className="flex flex-wrap gap-2">
             {(detail.postIds ?? []).map((postId) => (
-              <span key={postId} className="rounded-full bg-emerald-50 px-2 py-1 text-xs text-emerald-700">岗位#{postId}</span>
+              <span key={postId} className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-700">岗位#{postId}</span>
             ))}
-            {(detail.postIds ?? []).length === 0 && <span className="text-sm text-[#94a3b8]">暂无岗位</span>}
+            {(detail.postIds ?? []).length === 0 && <span className="text-sm text-slate-400">暂无岗位</span>}
           </div>
         </div>
       </div>

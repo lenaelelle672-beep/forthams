@@ -9,8 +9,10 @@ import java.time.LocalDate;
 public class MaintenanceUpdateDTO {
     @JsonAlias({"equipmentId", "assetId"})
     private Long assetId;
+    private Long workOrderId;
     @JsonAlias({"type", "maintenanceType"})
     private String maintenanceType;
+    private String sourceType;
     private LocalDate maintenanceDate;
     @JsonAlias({"technician", "executor"})
     private String executor;

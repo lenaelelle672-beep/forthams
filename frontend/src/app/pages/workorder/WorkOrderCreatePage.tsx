@@ -44,7 +44,7 @@ interface WorkOrderFormData {
 const INITIAL_FORM: WorkOrderFormData = {
   title: "",
   description: "",
-  priority: "NORMAL",
+  priority: "MEDIUM",
   assetId: "",
   assetName: "",
   assetCode: "",
@@ -233,9 +233,10 @@ export function WorkOrderCreatePage() {
                   disabled={isLoading}
                   className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-blue-50 disabled:cursor-not-allowed"
                 >
-                  <option value="NORMAL">中</option>
-                  <option value="URGENT">高</option>
-                  <option value="EMERGENCY">紧急</option>
+                  <option value="LOW">低</option>
+                  <option value="MEDIUM">中</option>
+                  <option value="HIGH">高</option>
+                  <option value="CRITICAL">紧急</option>
                 </select>
               </div>
 

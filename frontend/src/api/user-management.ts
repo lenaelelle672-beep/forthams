@@ -23,15 +23,26 @@ export interface UserDetail extends UserItem {
   postIds?: number[];
 }
 
-/** 分页查询用户列表 */
-export function getUserList(params: {
+export interface UserListParams {
   page?: number;
   pageSize?: number;
   keyword?: string;
   deptId?: number;
   status?: number;
-}) {
-  return http.get<{ records: UserItem[]; total: number }>('/user-management/list', { params });
+  roleIds?: number[];
+  createTimeStart?: string;
+  createTimeEnd?: string;
+}
+
+/** 分页查询用户列表 */
+export function getUserList(params: UserListParams) {
+  const { roleIds, ...rest } = params;
+  return http.get<{ records: UserItem[]; total: number }>('/user-management/list', {
+    params: {
+      ...rest,
+      roleIds: roleIds?.length ? roleIds.join(',') : undefined,
+    },
+  });
 }
 
 /** 获取用户详情（含角色信息） */

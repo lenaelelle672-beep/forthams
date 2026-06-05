@@ -46,7 +46,7 @@ import {
   ReloadOutlined,
   EditOutlined,
 } from '@ant-design/icons';
-import type { UploadProps, FormInstance } from 'antd';
+import type { UploadProps } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 
 /* ------------------------------------------------------------------ */
@@ -329,7 +329,7 @@ const ImportTab: React.FC = () => {
   const [isExporting, setIsExporting] = useState(false);
 
   /** 导出表单引用 */
-  const [exportForm] = Form.useForm<FormInstance<ExportFilterValues>>();
+  const [exportForm] = Form.useForm();
 
   /** 存储 objectURL 以便卸载时释放 */
   const objectUrlRef = useRef<string | null>(null);
@@ -730,7 +730,6 @@ const ImportTab: React.FC = () => {
                   type="primary"
                   icon={<CheckCircleFilled />}
                   disabled={hasErrors}
-                  loading={phase === 'submitting'}
                   onClick={handleReSubmit}
                 >
                   {hasErrors ? '存在错误，禁止入库' : '确认入库'}

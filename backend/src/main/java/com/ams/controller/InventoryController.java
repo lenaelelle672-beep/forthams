@@ -39,6 +39,16 @@ public class InventoryController {
     }
 
     @PreAuthorize("@ss.hasPermi('inventory:query')")
+    @GetMapping("/tasks/{id}/assets")
+    public Result<Map<String, Object>> getTaskAssets(
+            @PathVariable Long id,
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "20") Integer pageSize,
+            @RequestParam(required = false) String status) {
+        return Result.success(inventoryService.getTaskAssets(id, page, pageSize, status));
+    }
+
+    @PreAuthorize("@ss.hasPermi('inventory:query')")
     @GetMapping("/tasks/{id}/details")
     public Result<List<InventoryDetail>> getDetails(@PathVariable Long id) {
         return Result.success(inventoryService.getTaskDetails(id));
@@ -62,21 +72,22 @@ public class InventoryController {
         return Result.success(inventoryService.addScanResult(id, dto));
     }
 
-    @PreAuthorize("@ss.hasPermi('inventory:submit')")
-    @PostMapping("/approve")
-    public Result<InventoryTask> approve(@RequestBody Map<String, String> body) {
-        String taskId = body.get("taskId");
-        if (taskId == null || taskId.isBlank()) {
-            return Result.error(400, "taskId 不能为空");
-        }
-        Long id = Long.valueOf(taskId.trim());
-        return Result.success(inventoryService.updateTaskStatus(id, "SUBMITTED"));
+    @PreAuthorize("@ss.hasPermi('inventory:query')")
+    @GetMapping("/tasks/{id}/summary")
+    public Result<Map<String, Object>> getTaskSummary(@PathVariable Long id) {
+        return Result.success(inventoryService.getTaskSummary(id));
     }
 
     @PreAuthorize("@ss.hasPermi('inventory:submit')")
     @PostMapping("/tasks/{id}/submit")
-    public Result<InventoryTask> submit(@PathVariable Long id) {
-        return Result.success(inventoryService.updateTaskStatus(id, "SUBMITTED"));
+    public Result<InventoryTask> submitTask(@PathVariable Long id) {
+        return Result.success(inventoryService.submitTask(id));
+    }
+
+    @PreAuthorize("@ss.hasPermi('inventory:submit')")
+    @PostMapping("/tasks/{id}/approve")
+    public Result<Map<String, Object>> approveTask(@PathVariable Long id) {
+        return Result.success(inventoryService.approveTask(id));
     }
 
     /**

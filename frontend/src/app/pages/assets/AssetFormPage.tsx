@@ -53,6 +53,12 @@ interface AssetFormData {
   purchasePrice: string;
   /** Remarks / notes */
   remark: string;
+  /** 折旧方法 */
+  depreciationMethod: string;
+  /** 总预期工作量（UOP工作量法） */
+  totalExpectedUnits: string;
+  /** 实际已工作量（UOP工作量法） */
+  actualUnits: string;
 }
 
 /**
@@ -67,6 +73,7 @@ interface FormErrors {
   departmentId?: string;
   purchaseDate?: string;
   purchasePrice?: string;
+  totalExpectedUnits?: string;
 }
 
 /** Initial empty form values */
@@ -80,6 +87,9 @@ const INITIAL_FORM: AssetFormData = {
   purchaseDate: '',
   purchasePrice: '',
   remark: '',
+  depreciationMethod: 'STRAIGHT_LINE',
+  totalExpectedUnits: '',
+  actualUnits: '',
 };
 
 /* ------------------------------------------------------------------ */
@@ -151,6 +161,9 @@ export default function AssetFormPage() {
         purchaseDate: asset.purchaseDate ?? '',
         purchasePrice: (asset.originalValue ?? asset.purchasePrice) != null ? String(asset.originalValue ?? asset.purchasePrice) : '',
         remark: (asset.remark as string) ?? '',
+        depreciationMethod: (asset.depreciationMethod as string) ?? 'STRAIGHT_LINE',
+        totalExpectedUnits: asset.totalExpectedUnits != null ? String(asset.totalExpectedUnits) : '',
+        actualUnits: asset.actualUnits != null ? String(asset.actualUnits) : '',
       });
       setInitialized(true);
     }
@@ -181,6 +194,10 @@ export default function AssetFormPage() {
     }
     if (form.purchasePrice && isNaN(Number(form.purchasePrice))) {
       newErrors.purchasePrice = '采购价格必须为数字';
+    }
+    // UOP 方法需要总预期工作量
+    if (form.depreciationMethod === 'UOP' && (!form.totalExpectedUnits || isNaN(Number(form.totalExpectedUnits)) || Number(form.totalExpectedUnits) <= 0)) {
+      newErrors.totalExpectedUnits = '工作量法需要填写总预期工作量，且必须大于0';
     }
 
     setErrors(newErrors);
@@ -218,6 +235,9 @@ export default function AssetFormPage() {
         purchaseDate: form.purchaseDate,
         originalValue: form.purchasePrice ? Number(form.purchasePrice) : null,
         remark: form.remark.trim(),
+        depreciationMethod: form.depreciationMethod,
+        totalExpectedUnits: form.depreciationMethod === 'UOP' && form.totalExpectedUnits ? Number(form.totalExpectedUnits) : null,
+        actualUnits: form.depreciationMethod === 'UOP' && form.actualUnits ? Number(form.actualUnits) : null,
       };
 
       if (isEditMode && assetId) {
@@ -472,6 +492,72 @@ export default function AssetFormPage() {
               )}
             </div>
           </div>
+
+          {/* Row: Depreciation Method */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              折旧方法
+            </label>
+            <select
+              value={form.depreciationMethod}
+              onChange={(e) => handleChange('depreciationMethod', e.target.value)}
+              className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200
+                bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+              data-testid="select-depreciation-method"
+            >
+              <option value="STRAIGHT_LINE">直线法</option>
+              <option value="DOUBLE_DECLINING">双倍余额递减法</option>
+              <option value="SYD">年数总和法</option>
+              <option value="UOP">工作量法</option>
+            </select>
+            <p className="mt-1 text-xs text-gray-400">
+              {form.depreciationMethod === 'STRAIGHT_LINE' && '平均分摊，适用于资产损耗均匀的情况'}
+              {form.depreciationMethod === 'DOUBLE_DECLINING' && '前期多提后期少提，适用于技术更新快的资产'}
+              {form.depreciationMethod === 'SYD' && '前期多提后期少提，基于使用年限总和'}
+              {form.depreciationMethod === 'UOP' && '按工作量比例分摊，适用于使用量不均的资产'}
+            </p>
+          </div>
+
+          {/* Row: Units (UOP only) */}
+          {form.depreciationMethod === 'UOP' && (
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  总预期工作量 <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={form.totalExpectedUnits}
+                  onChange={(e) => handleChange('totalExpectedUnits', e.target.value)}
+                  className={`w-full px-3 py-2 text-sm rounded-lg border
+                    ${errors.totalExpectedUnits ? 'border-red-300 focus:ring-red-500' : 'border-gray-200 focus:ring-blue-500'}
+                    focus:outline-none focus:ring-2 transition-colors`}
+                  placeholder="请输入总预期工作量"
+                  data-testid="input-total-expected-units"
+                />
+                {errors.totalExpectedUnits && (
+                  <p className="mt-1 text-xs text-red-600">{errors.totalExpectedUnits}</p>
+                )}
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  实际已工作量
+                </label>
+                <input
+                  type="text"
+                  value={form.actualUnits}
+                  onChange={(e) => handleChange('actualUnits', e.target.value)}
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200
+                    focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+                  placeholder="请输入实际已工作量"
+                  data-testid="input-actual-units"
+                />
+                <p className="mt-1 text-xs text-gray-400">
+                  工作量法必填，用于按使用量计算折旧
+                </p>
+              </div>
+            </div>
+          )}
 
           {/* Row: Remark */}
           <div>

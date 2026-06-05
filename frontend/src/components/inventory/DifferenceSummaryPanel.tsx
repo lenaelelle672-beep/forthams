@@ -1,11 +1,11 @@
 /**
  * DifferenceSummaryPanel — 盘盈盘亏汇总面板
  *
- * 展示盘点任务的盘盈和盘亏差异汇总信息，包含两个 Tab（盘盈明细 / 盘亏明细），
+ * 展示盘点任务的盘盈、盘亏和损坏差异汇总信息，包含三个 Tab（盘盈明细 / 盘亏明细 / 损坏明细），
  * 以及「提交核准」按钮（非只读模式下可见）。
  *
  * 遵循 ATB-006 验收标准：
- *  - 两个 Tab 分别展示盘盈/盘亏明细（资产编号、资产名称、原因）
+ *  - Tab 分别展示盘盈/盘亏/损坏明细（资产编号、资产名称、原因）
  *  - 存在差异时「提交核准」按钮可见且 enabled
  *  - 无差异时显示「无差异」，「提交核准」按钮仍可见
  *  - 提交前弹出二次确认弹窗："确认提交核准？提交后不可修改。"
@@ -31,6 +31,7 @@ import {
 } from '@ant-design/icons';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { ColumnsType } from 'antd/es/table';
+import http from '@/utils/http';
 
 const { Text } = Typography;
 
@@ -56,10 +57,18 @@ export interface SummaryResponse {
   surplusItems: DifferenceItem[];
   /** 盘亏明细列表 */
   deficitItems: DifferenceItem[];
+  /** 损坏明细列表 */
+  damagedItems: DifferenceItem[];
   /** 盘盈数量 */
   surplusCount: number;
   /** 盘亏数量 */
   deficitCount: number;
+  /** 损坏数量 */
+  damagedCount: number;
+  /** 正常数量 */
+  normalCount?: number;
+  /** 异常数量 */
+  abnormalCount?: number;
 }
 
 /** 组件 Props（与 SPEC 定义的 DifferenceSummaryPanelProps 一致） */
@@ -82,37 +91,22 @@ export interface DifferenceSummaryPanelProps {
  * @throws 网络错误或后端异常时抛出 Error
  */
 async function fetchSummary(taskId: string): Promise<SummaryResponse> {
-  const res = await fetch(`/api/v1/inventory/tasks/${taskId}/summary`);
-  if (!res.ok) {
-    const body = await res.text().catch(() => '');
-    throw new Error(`获取汇总数据失败 (HTTP ${res.status}): ${body}`);
-  }
-  return res.json() as Promise<SummaryResponse>;
+  return http.get<SummaryResponse>(`/inventory/tasks/${taskId}/summary`);
 }
 
 /**
  * 提交盘点任务核准（不可逆操作）
- *
- * @param taskId - 盘点任务 ID
- * @throws 网络错误或后端异常时抛出 Error
  */
 async function submitForApproval(taskId: string): Promise<void> {
-  const res = await fetch(`/api/v1/inventory/tasks/${taskId}/submit`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-  });
-  if (!res.ok) {
-    const body = await res.text().catch(() => '');
-    throw new Error(`提交核准失败 (HTTP ${res.status}): ${body}`);
-  }
+  await http.post(`/inventory/tasks/${taskId}/submit`);
 }
 
 // ---------------------------------------------------------------------------
 // Column definitions
 // ---------------------------------------------------------------------------
 
-/** 盘盈明细表格列配置 */
-const surplusColumns: ColumnsType<DifferenceItem> = [
+/** 差异明细通用表格列配置 */
+const diffColumns: ColumnsType<DifferenceItem> = [
   {
     title: '资产编号',
     dataIndex: 'assetCode',
@@ -126,29 +120,7 @@ const surplusColumns: ColumnsType<DifferenceItem> = [
     ellipsis: true,
   },
   {
-    title: '盘盈原因',
-    dataIndex: 'reason',
-    key: 'reason',
-    ellipsis: true,
-  },
-];
-
-/** 盘亏明细表格列配置 */
-const deficitColumns: ColumnsType<DifferenceItem> = [
-  {
-    title: '资产编号',
-    dataIndex: 'assetCode',
-    key: 'assetCode',
-    width: 180,
-  },
-  {
-    title: '资产名称',
-    dataIndex: 'assetName',
-    key: 'assetName',
-    ellipsis: true,
-  },
-  {
-    title: '盘亏原因',
+    title: '原因',
     dataIndex: 'reason',
     key: 'reason',
     ellipsis: true,
@@ -249,9 +221,11 @@ const DifferenceSummaryPanel: React.FC<DifferenceSummaryPanelProps> = ({
 
   const surplusItems = summary?.surplusItems ?? [];
   const deficitItems = summary?.deficitItems ?? [];
+  const damagedItems = summary?.damagedItems ?? [];
   const surplusCount = summary?.surplusCount ?? 0;
   const deficitCount = summary?.deficitCount ?? 0;
-  const hasDifferences = surplusCount > 0 || deficitCount > 0;
+  const damagedCount = summary?.damagedCount ?? 0;
+  const hasDifferences = surplusCount > 0 || deficitCount > 0 || damagedCount > 0;
 
   // ---- Render: loading ----
 
@@ -335,7 +309,7 @@ const DifferenceSummaryPanel: React.FC<DifferenceSummaryPanelProps> = ({
               children: (
                 <Table<DifferenceItem>
                   dataSource={surplusItems}
-                  columns={surplusColumns}
+                  columns={diffColumns}
                   rowKey="assetId"
                   size="small"
                   pagination={
@@ -352,7 +326,7 @@ const DifferenceSummaryPanel: React.FC<DifferenceSummaryPanelProps> = ({
               children: (
                 <Table<DifferenceItem>
                   dataSource={deficitItems}
-                  columns={deficitColumns}
+                  columns={diffColumns}
                   rowKey="assetId"
                   size="small"
                   pagination={
@@ -360,6 +334,23 @@ const DifferenceSummaryPanel: React.FC<DifferenceSummaryPanelProps> = ({
                   }
                   locale={{ emptyText: '暂无盘亏记录' }}
                   aria-label="盘亏明细表格"
+                />
+              ),
+            },
+            {
+              key: 'damaged',
+              label: `损坏明细 (${damagedItems.length})`,
+              children: (
+                <Table<DifferenceItem>
+                  dataSource={damagedItems}
+                  columns={diffColumns}
+                  rowKey="assetId"
+                  size="small"
+                  pagination={
+                    damagedItems.length > 10 ? { pageSize: 10 } : false
+                  }
+                  locale={{ emptyText: '暂无损坏记录' }}
+                  aria-label="损坏明细表格"
                 />
               ),
             },

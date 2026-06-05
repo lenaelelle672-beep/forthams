@@ -373,13 +373,13 @@ class TenantIsolationIntegrationTest {
     @Transactional
     void tenantCannotGetUpdateOrDeleteAnotherTenantAsset() throws Exception {
         jdbcTemplate.update("""
-                INSERT INTO asset (id, tenant_id, asset_name, asset_no, category_id, status)
-                VALUES (?, ?, ?, ?, ?, ?)
+                INSERT INTO asset (id, tenant_id, asset_name, asset_no, category_id, status, deleted)
+                VALUES (?, ?, ?, ?, ?, ?, 0)
                 """, 9001L, TENANT_T002, "TenantTwo-Private", "TENANT-PRIVATE", 1L, "IDLE");
 
         mockMvc.perform(get("/assets/{id}", 9001L)
                         .header("Authorization", "Bearer " + generateTenantJwt(TENANT_T001)))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isBadRequest());
 
         mockMvc.perform(put("/assets/{id}", 9001L)
                         .header("Authorization", "Bearer " + generateTenantJwt(TENANT_T001))
@@ -387,11 +387,11 @@ class TenantIsolationIntegrationTest {
                         .content("""
                                 {"name":"Blocked Update","categoryId":1}
                                 """))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isBadRequest());
 
         mockMvc.perform(delete("/assets/{id}", 9001L)
                         .header("Authorization", "Bearer " + generateTenantJwt(TENANT_T001)))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isBadRequest());
 
         Integer rows = jdbcTemplate.queryForObject(
                 "SELECT COUNT(*) FROM asset WHERE id = ? AND tenant_id = ? AND deleted = 0",

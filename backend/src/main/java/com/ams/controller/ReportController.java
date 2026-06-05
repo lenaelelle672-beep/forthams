@@ -5,14 +5,19 @@ import com.ams.dto.CategoryReportDTO;
 import com.ams.dto.ReportMonthlyDTO;
 import com.ams.dto.ReportSummaryDTO;
 import com.ams.dto.ReportTrendDTO;
+import com.ams.service.PdfExportService;
 import com.ams.service.ReportService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 资产报表控制器。
@@ -30,9 +35,11 @@ import java.util.List;
 @RestController
 @RequestMapping("/reports")
 @RequiredArgsConstructor
+@Tag(name = "报表中心", description = "资产报表统计与 PDF 导出")
 public class ReportController {
 
     private final ReportService reportService;
+    private final PdfExportService pdfExportService;
 
     /**
      * RPT-01: 获取资产汇总统计。
@@ -98,5 +105,18 @@ public class ReportController {
     @GetMapping("/retirement-stats")
     public Result<List<ReportMonthlyDTO>> getRetirementStats() {
         return Result.success(reportService.getRetirementStats());
+    }
+
+    @Operation(summary = "导出 PDF 报表", description = "按类型导出报表为 PDF，支持 summary/category/trend 等类型")
+    @PreAuthorize("@ss.hasPermi('report:export')")
+    @PostMapping("/{type}/export-pdf")
+    public ResponseEntity<byte[]> exportPdf(
+            @PathVariable String type,
+            @RequestBody(required = false) Map<String, Object> params) {
+        byte[] pdfBytes = pdfExportService.exportReport(type + "-report", params);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDispositionFormData("attachment", type + "-report.pdf");
+        return ResponseEntity.ok().headers(headers).body(pdfBytes);
     }
 }

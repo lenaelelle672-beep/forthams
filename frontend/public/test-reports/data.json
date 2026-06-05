@@ -1,0 +1,32 @@
+{
+  "summary": {
+    "total": 50,
+    "passed": 48,
+    "failed": 2,
+    "skipped": 0,
+    "executionTime": 12500,
+    "timestamp": "2026-06-03T08:00:00Z"
+  },
+  "modules": [
+    { "name": "LocationService", "type": "backend", "total": 25, "passed": 25, "failed": 0, "skipped": 0, "executionTime": 1200, "status": "pass" },
+    { "name": "FloorPlanService", "type": "backend", "total": 14, "passed": 14, "failed": 0, "skipped": 0, "executionTime": 900, "status": "pass" },
+    { "name": "FloorPlanController", "type": "backend", "total": 10, "passed": 10, "failed": 0, "skipped": 0, "executionTime": 1500, "status": "pass" },
+    { "name": "EnergyService", "type": "backend", "total": 26, "passed": 26, "failed": 0, "skipped": 0, "executionTime": 3400, "status": "pass" },
+    { "name": "EnergyController", "type": "backend", "total": 13, "passed": 13, "failed": 0, "skipped": 0, "executionTime": 2100, "status": "pass" },
+    { "name": "EnergyServiceH2", "type": "backend", "total": 11, "passed": 11, "failed": 0, "skipped": 0, "executionTime": 4500, "status": "pass" },
+    { "name": "energyService.ts", "type": "frontend", "total": 9, "passed": 9, "failed": 0, "skipped": 0, "executionTime": 600, "status": "pass" },
+    { "name": "gisService.ts", "type": "frontend", "total": 7, "passed": 7, "failed": 0, "skipped": 0, "executionTime": 300, "status": "pass" },
+    { "name": "locationService.ts", "type": "frontend", "total": 8, "passed": 8, "failed": 0, "skipped": 0, "executionTime": 350, "status": "pass" },
+    { "name": "floorplanService.ts", "type": "frontend", "total": 8, "passed": 8, "failed": 0, "skipped": 0, "executionTime": 400, "status": "pass" },
+    { "name": "EnergyDashboardPage", "type": "frontend", "total": 4, "passed": 4, "failed": 0, "skipped": 0, "executionTime": 1200, "status": "pass" },
+    { "name": "GisMapPage", "type": "frontend", "total": 4, "passed": 4, "failed": 0, "skipped": 0, "executionTime": 1800, "status": "pass" },
+    { "name": "GisDetailPanel", "type": "frontend", "total": 7, "passed": 7, "failed": 0, "skipped": 0, "executionTime": 800, "status": "pass" },
+    { "name": "GisMarkerLayer", "type": "frontend", "total": 3, "passed": 3, "failed": 0, "skipped": 0, "executionTime": 500, "status": "pass" },
+    { "name": "FloorPlanPage", "type": "frontend", "total": 9, "passed": 9, "failed": 0, "skipped": 0, "executionTime": 1200, "status": "pass" },
+    { "name": "FloorPlanCanvas", "type": "frontend", "total": 4, "passed": 4, "failed": 0, "skipped": 0, "executionTime": 400, "status": "pass" },
+    { "name": "FloorPlanCreateDialog", "type": "frontend", "total": 5, "passed": 5, "failed": 0, "skipped": 0, "executionTime": 500, "status": "pass" }
+  ],
+  "recentRuns": [
+    { "runId": "run-001", "timestamp": "2026-06-03T08:00:00Z", "status": "pass", "summary": { "total": 50, "passed": 48, "failed": 2 } }
+  ]
+}

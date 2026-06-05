@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <title>资产台账</title>
+  <style>
+    @page {
+      size: A4 landscape;
+      margin: 1.5cm;
+    }
+    body {
+      font-family: "PingFang SC", "STHeiti", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+      font-size: 10px;
+      color: #333;
+      line-height: 1.5;
+      margin: 0;
+      padding: 0;
+    }
+    h1 {
+      text-align: center;
+      color: #1d4ed8;
+      font-size: 18px;
+      margin: 0 0 6px 0;
+    }
+    .header-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #666;
+      font-size: 9px;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #1d4ed8;
+    }
+    .summary-bar {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 12px;
+      padding: 8px 12px;
+      background: #f8fafc;
+      border-radius: 6px;
+      border: 1px solid #e2e8f0;
+    }
+    .summary-item {
+      text-align: center;
+    }
+    .summary-item .label {
+      font-size: 9px;
+      color: #64748b;
+    }
+    .summary-item .value {
+      font-size: 14px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0;
+    }
+    th, td {
+      padding: 5px 8px;
+      text-align: left;
+      border: 1px solid #ddd;
+      font-size: 9px;
+      white-space: nowrap;
+    }
+    th {
+      background-color: #1d4ed8;
+      color: #fff;
+      font-weight: 600;
+      font-size: 9px;
+    }
+    tr:nth-child(even) {
+      background-color: #f8fafc;
+    }
+    tr:hover {
+      background-color: #eff6ff;
+    }
+    .status-active { color: #16a34a; font-weight: 600; }
+    .status-idle   { color: #d97706; font-weight: 600; }
+    .status-retired { color: #94a3b8; }
+    .status-pending { color: #3b82f6; font-weight: 600; }
+    .footer {
+      text-align: center;
+      color: #999;
+      font-size: 8px;
+      margin-top: 12px;
+      padding-top: 8px;
+      border-top: 1px solid #e2e8f0;
+    }
+  </style>
+</head>
+<body>
+  <div class="header-info">
+    <span>forthAMS 资产管理系统</span>
+    <span th:text="'打印时间：' + ${#dates.format(#dates.createNow(), 'yyyy-MM-dd HH:mm:ss')}">打印时间</span>
+  </div>
+
+  <h1>资产台账</h1>
+
+  <!-- 汇总概览 -->
+  <div class="summary-bar">
+    <div class="summary-item">
+      <div class="label">资产总数</div>
+      <div class="value" th:text="${totalAssets}">0</div>
+    </div>
+    <div class="summary-item">
+      <div class="label">在用</div>
+      <div class="value" th:text="${activeAssets}">0</div>
+    </div>
+    <div class="summary-item">
+      <div class="label">闲置</div>
+      <div class="value" th:text="${idleAssets}">0</div>
+    </div>
+    <div class="summary-item">
+      <div class="label">待审批</div>
+      <div class="value" th:text="${pendingApproval}">0</div>
+    </div>
+    <div class="summary-item">
+      <div class="label">已退役</div>
+      <div class="value" th:text="${retiredAssets}">0</div>
+    </div>
+    <div class="summary-item">
+      <div class="label">资产总值（元）</div>
+      <div class="value" th:text="${#numbers.formatDecimal(totalValue, 1, 2)}">0.00</div>
+    </div>
+  </div>
+
+  <!-- 资产明细表 -->
+  <table>
+    <thead>
+      <tr>
+        <th>序号</th>
+        <th>资产编号</th>
+        <th>资产名称</th>
+        <th>分类</th>
+        <th>型号</th>
+        <th>使用部门</th>
+        <th>存放位置</th>
+        <th>状态</th>
+        <th>原值（元）</th>
+        <th>净值（元）</th>
+        <th>购入日期</th>
+        <th>使用人</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr th:each="asset, stat : ${assets}">
+        <td th:text="${stat.count}">1</td>
+        <td th:text="${asset?.assetNo}">-</td>
+        <td th:text="${asset?.assetName}">-</td>
+        <td th:text="${asset?.categoryName}">-</td>
+        <td th:text="${asset?.model}">-</td>
+        <td th:text="${asset?.departmentName}">-</td>
+        <td th:text="${asset?.location}">-</td>
+        <td>
+          <span th:if="${asset?.status == 'ACTIVE'}" class="status-active">在用</span>
+          <span th:if="${asset?.status == 'IDLE'}" class="status-idle">闲置</span>
+          <span th:if="${asset?.status == 'RETIRED'}" class="status-retired">已退役</span>
+          <span th:if="${asset?.status == 'PENDING'}" class="status-pending">待审批</span>
+          <span th:if="${asset?.status != 'ACTIVE' and asset?.status != 'IDLE' and asset?.status != 'RETIRED' and asset?.status != 'PENDING'}" th:text="${asset?.status}">-</span>
+        </td>
+        <td th:text="${asset?.originalValue != null ? #numbers.formatDecimal(asset.originalValue, 1, 2) : '-'}">-</td>
+        <td th:text="${asset?.netValue != null ? #numbers.formatDecimal(asset.netValue, 1, 2) : '-'}">-</td>
+        <td th:text="${asset?.purchaseDate}">-</td>
+        <td th:text="${asset?.userName}">-</td>
+      </tr>
+      <tr th:if="${assets == null or #lists.isEmpty(assets)}">
+        <td colspan="12" style="text-align: center; color: #999;">暂无资产数据</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="footer">
+    <p>forthAMS 资产管理系统 — 自动生成台账</p>
+  </div>
+</body>
+</html>

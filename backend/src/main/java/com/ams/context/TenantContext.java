@@ -109,6 +109,17 @@ public final class TenantContext {
     }
 
     /**
+     * 返回 tenant 标识为「可跳过」时的判断（供 MyBatis-Plus TenantLineInnerInterceptor 调用）。
+     *
+     * <p>当前实现：登录上下文缺失或租户标识为空白字符串时返回 true。
+     * 主要服务于全局字典表、Quartz 任务表等非租户业务表的 INSERT 场景。</p>
+     */
+    public static boolean isSkipTenant() {
+        String t = TENANT_ID_HOLDER.get();
+        return t == null || t.isBlank();
+    }
+
+    /**
      * Alias for {@link #remove()} — provided for semantic clarity in filter code
      * that prefers the "clear context" naming convention.
      *

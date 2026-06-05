@@ -321,10 +321,11 @@ export function convertAuditLogsToGraphifyEdges(
     const opNodeId = generateNodeId('op', operationType);
     if (nodeMap.has(opNodeId)) {
       edges.push({
+        id: `${rootId}-${opNodeId}`,
         source: rootId,
         target: opNodeId,
-        type: 'owns',
-        properties: { weight: 1 }
+        relationType: 'belongs_to',
+        label: '资产操作'
       });
     }
     
@@ -332,10 +333,11 @@ export function convertAuditLogsToGraphifyEdges(
     const userNodeId = generateNodeId('user', userId);
     if (nodeMap.has(userNodeId)) {
       edges.push({
+        id: `${userNodeId}-${opNodeId}-${log.id ?? 'unknown'}`,
         source: userNodeId,
         target: opNodeId,
-        type: 'performs',
-        properties: { timestamp: log.timestamp }
+        relationType: 'related_to',
+        label: log.timestamp ? `执行于 ${log.timestamp}` : '执行操作'
       });
     }
     
@@ -343,10 +345,11 @@ export function convertAuditLogsToGraphifyEdges(
     const logNodeId = generateNodeId('log', log.id || '');
     if (nodeMap.has(logNodeId)) {
       edges.push({
+        id: `${opNodeId}-${logNodeId}`,
         source: opNodeId,
         target: logNodeId,
-        type: 'modifies',
-        properties: { field: log.field }
+        relationType: 'related_to',
+        label: log.changes ? `变更字段：${Object.keys(log.changes).join('、') || '未知'}` : '关联日志'
       });
     }
   }

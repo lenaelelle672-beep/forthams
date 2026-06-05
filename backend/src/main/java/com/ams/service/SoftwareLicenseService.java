@@ -1,111 +1,47 @@
 package com.ams.service;
 
-import com.ams.common.exception.BusinessException;
 import com.ams.entity.LicenseAssignment;
 import com.ams.entity.SoftwareLicense;
-import com.ams.mapper.LicenseAssignmentMapper;
-import com.ams.mapper.SoftwareLicenseMapper;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
-@Service
-@RequiredArgsConstructor
-public class SoftwareLicenseService {
+/**
+ * 软件许可证服务接口。
+ */
+public interface SoftwareLicenseService {
 
-    private final SoftwareLicenseMapper licenseMapper;
-    private final LicenseAssignmentMapper assignmentMapper;
+    /** 分页查询许可证 */
+    Page<SoftwareLicense> getPage(Integer page, Integer pageSize, String keyword, String status);
 
-    public Page<SoftwareLicense> getPage(Integer page, Integer pageSize, String keyword, String status) {
-        LambdaQueryWrapper<SoftwareLicense> wrapper = new LambdaQueryWrapper<>();
-        if (keyword != null && !keyword.isBlank()) {
-            wrapper.like(SoftwareLicense::getLicenseName, keyword)
-                   .or().like(SoftwareLicense::getManufacturer, keyword);
-        }
-        if (status != null && !status.isBlank()) {
-            wrapper.eq(SoftwareLicense::getStatus, status);
-        }
-        wrapper.orderByDesc(SoftwareLicense::getCreatedAt);
-        return licenseMapper.selectPage(new Page<>(page, pageSize), wrapper);
-    }
+    /** 获取即将过期的许可证 */
+    List<SoftwareLicense> getExpiring(Integer days);
 
-    public SoftwareLicense getById(Long id) {
-        SoftwareLicense l = licenseMapper.selectById(id);
-        if (l == null) throw new BusinessException("许可证不存在");
-        return l;
-    }
+    /** 获取许可证汇总信息 */
+    Map<String, Object> getSummary();
 
-    public List<SoftwareLicense> getExpiring(Integer days) {
-        LocalDate today = LocalDate.now();
-        LocalDate future = today.plusDays(days == null ? 30 : days);
-        return licenseMapper.findExpiring(today, future);
-    }
+    /** 获取许可证详情 */
+    SoftwareLicense getById(Long id);
 
-    public int getUsedSeats(Long licenseId) {
-        return assignmentMapper.countActiveByLicense(licenseId);
-    }
+    /** 获取许可证已用席位数 */
+    int getUsedSeats(Long licenseId);
 
-    public List<LicenseAssignment> getActiveAssignments(Long licenseId) {
-        return assignmentMapper.findActiveByLicense(licenseId);
-    }
+    /** 获取许可证的活跃分配记录 */
+    List<LicenseAssignment> getActiveAssignments(Long licenseId);
 
-    public SoftwareLicense create(SoftwareLicense l) {
-        if (l.getStatus() == null) l.setStatus("ACTIVE");
-        licenseMapper.insert(l);
-        return l;
-    }
+    /** 创建许可证 */
+    SoftwareLicense create(SoftwareLicense license);
 
-    public SoftwareLicense update(Long id, SoftwareLicense l) {
-        getById(id);
-        l.setId(id);
-        licenseMapper.updateById(l);
-        return l;
-    }
+    /** 更新许可证 */
+    SoftwareLicense update(Long id, SoftwareLicense license);
 
-    public void delete(Long id) {
-        int used = assignmentMapper.countActiveByLicense(id);
-        if (used > 0) throw new BusinessException("该许可证尚有 " + used + " 个分配未归还，无法删除");
-        licenseMapper.deleteById(id);
-    }
+    /** 删除许可证 */
+    void delete(Long id);
 
-    @Transactional
-    public LicenseAssignment assign(Long licenseId, Long assetId, Long userId, String notes) {
-        SoftwareLicense l = getById(licenseId);
-        int used = assignmentMapper.countActiveByLicense(licenseId);
-        if (used >= l.getTotalSeats()) {
-            throw new BusinessException("许可证席位已满 (" + used + "/" + l.getTotalSeats() + ")");
-        }
-        LicenseAssignment a = new LicenseAssignment();
-        a.setLicenseId(licenseId);
-        a.setAssetId(assetId);
-        a.setUserId(userId);
-        a.setAssignedDate(LocalDate.now());
-        a.setNotes(notes);
-        assignmentMapper.insert(a);
-        return a;
-    }
+    /** 分配许可证席位 */
+    LicenseAssignment assign(Long licenseId, Long assetId, Long userId, String notes);
 
-    @Transactional
-    public void returnLicense(Long assignmentId, String notes) {
-        LicenseAssignment a = assignmentMapper.selectById(assignmentId);
-        if (a == null) throw new BusinessException("分配记录不存在");
-        if (a.getReturnedDate() != null) throw new BusinessException("该席位已归还");
-        a.setReturnedDate(LocalDate.now());
-        if (notes != null) a.setNotes(notes);
-        assignmentMapper.updateById(a);
-    }
-
-    public Map<String, Object> getSummary() {
-        long total = licenseMapper.selectCount(new LambdaQueryWrapper<>());
-        long active = licenseMapper.selectCount(new LambdaQueryWrapper<SoftwareLicense>()
-                .eq(SoftwareLicense::getStatus, "ACTIVE"));
-        List<SoftwareLicense> expiring30 = getExpiring(30);
-        return Map.of("total", total, "active", active, "expiringSoon", expiring30.size());
-    }
+    /** 归还许可证席位 */
+    void returnLicense(Long assignmentId, String notes);
 }

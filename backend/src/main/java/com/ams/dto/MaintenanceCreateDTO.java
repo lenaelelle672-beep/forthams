@@ -12,9 +12,11 @@ public class MaintenanceCreateDTO {
     @JsonAlias({"equipmentId", "assetId"})
     @NotNull
     private Long assetId;
+    private Long workOrderId;
     @JsonAlias({"type", "maintenanceType"})
     @NotBlank
     private String maintenanceType;
+    private String sourceType;
     @NotNull
     private LocalDate maintenanceDate;
     @JsonAlias({"technician", "executor"})

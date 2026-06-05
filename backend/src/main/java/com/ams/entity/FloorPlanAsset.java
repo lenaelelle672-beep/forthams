@@ -25,4 +25,14 @@ public class FloorPlanAsset implements Serializable {
 
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updatedAt;
+
+    /** JOIN 冗余字段：来自 asset 表，由 FloorPlanAssetMapper.selectWithAssetInfo 填充 */
+    @TableField(exist = false)
+    private String assetNo;
+
+    @TableField(exist = false)
+    private String assetName;
+
+    @TableField(value = "asset_status", exist = false)
+    private String assetStatus;
 }

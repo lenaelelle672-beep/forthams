@@ -63,10 +63,41 @@ import type {
   ActualStatus,
 } from '../../types/inventory';
 
-// --- 国际化文案 ---
-import { t } from '../../locales/zh-CN/inventory';
-
 const { Title, Text } = Typography;
+
+const t = (key: string, params?: Record<string, string | number>) => {
+  const dict: Record<string, string> = {
+    batchConfirmLimitWarning: `单次批量确认上限 ${params?.limit ?? 100} 条，已自动截断`,
+    batchConfirmSuccess: '批量确认成功',
+    batchConfirmError: '批量确认失败，请重试',
+    submitSuccess: '盘点结果已提交核准',
+    submitError: '提交核准失败，请重试',
+    loading: '加载中…',
+    loadFailed: '数据加载失败，请重试',
+    taskNotFound: '盘点任务不存在',
+    backToList: '返回列表',
+    breadcrumbRoot: '盘点管理',
+    breadcrumbDetail: '任务详情',
+    draftWarningTip: '草稿状态下不能提交或确认资产',
+    draftWarning: '草稿状态',
+    submitApproval: '提交核准',
+    readOnlyTip: '当前任务已提交或完成，仅可查看',
+    readOnlyBadge: '只读模式',
+    draftStatusMessage: '请先将任务状态变更为进行中',
+    progressSectionLabel: '盘点进度',
+    assetTableSectionLabel: '资产清单',
+    diffSummarySectionLabel: '盘盈盘亏汇总',
+    batchConfirmDialogTitle: '批量确认',
+    confirm: '确认',
+    cancel: '取消',
+    submitConfirmTitle: '确认提交核准',
+    submitConfirmContent: '提交后将不可继续修改盘点结果，请确认。',
+    selectedCount: `已选 ${params?.count ?? 0} 项`,
+  };
+  return dict[key] ?? key;
+};
+
+
 
 // ---------------------------------------------------------------------------
 // 常量
@@ -141,9 +172,9 @@ export default function TaskDetailPage() {
   } = useSummary(taskId);
 
   // --- React Query 变更 mutations ---
-  const confirmMutation = useConfirmMutation(taskId);
-  const batchConfirmMutation = useBatchConfirmMutation(taskId);
-  const submitMutation = useSubmitMutation(taskId);
+  const confirmMutation = useConfirmMutation();
+  const batchConfirmMutation = useBatchConfirmMutation();
+  const submitMutation = useSubmitMutation();
 
   // --- 只读级别 ---
   const readOnlyLevel = useMemo(
@@ -188,7 +219,7 @@ export default function TaskDetailPage() {
       }
 
       batchConfirmMutation.mutate(
-        { assetIds, actualStatus, remark },
+        { taskId, payload: { assetIds, actualStatus, remark } },
         {
           onSuccess: () => {
             message.success(t('batchConfirmSuccess'));
@@ -357,10 +388,10 @@ export default function TaskDetailPage() {
       <section aria-label={t('assetTableSectionLabel')} className="mb-6">
         {!isReadOnly && !isDraft && (
           <AssetTableToolbar
-            taskId={taskId}
-            selectedCount={selectedAssetIds.length}
+            selectedAssetIds={selectedAssetIds}
+            readOnly={isReadOnly || !!isDraft}
             onBatchConfirm={() => setBatchDialogOpen(true)}
-            batchConfirmLoading={batchConfirmMutation.isPending}
+            loading={batchConfirmMutation.isPending}
           />
         )}
         <AssetTable
@@ -384,7 +415,7 @@ export default function TaskDetailPage() {
           title={t('batchConfirmDialogTitle')}
           okText={t('confirm')}
           cancelText={t('cancel')}
-          onOk={handleSubmitApproval}
+          onOk={() => setBatchDialogOpen(false)}
           onCancel={() => setBatchDialogOpen(false)}
           confirmLoading={batchConfirmMutation.isPending}
           destroyOnClose
@@ -412,7 +443,7 @@ export default function TaskDetailPage() {
           okText={t('submitApproval')}
           cancelText={t('cancel')}
           okButtonProps={{ danger: true, loading: submitMutation.isPending }}
-          onOk={handleSubmitApproval}
+          onOk={() => setBatchDialogOpen(false)}
           onCancel={() => setSubmitDialogOpen(false)}
           closable={false}
           destroyOnClose

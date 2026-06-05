@@ -10,10 +10,13 @@ import {
   Send,
   Search,
   Package,
-  CalendarDays,
   Info,
   ChevronRight,
   Loader2,
+  AlertTriangle,
+  FileText,
+  DollarSign,
+  MessageSquare,
 } from 'lucide-react';
 import { createRetirement } from '@/api/retirement';
 import { getAssetList } from '@/api/asset';
@@ -31,11 +34,22 @@ const schema = z.object({
   notes: z.string().max(1000).optional(),
 });
 
-type FormValues = z.infer<typeof schema>;
+type FormInput = z.input<typeof schema>;
+type FormValues = z.output<typeof schema>;
 
 const DEPRECIATION_BARS = [
   90, 80, 70, 60, 50, 45, 40, 35, 30, 28, 25, 20,
 ];
+
+const getAssetRecords = (
+  response: PaginatedResponse<AssetListItem> | PageData<AssetListItem> | undefined,
+): AssetListItem[] => {
+  if (!response) {
+    return [];
+  }
+
+  return response.records;
+};
 
 export default function RetirementFormPage() {
   const navigate = useNavigate();
@@ -47,9 +61,9 @@ export default function RetirementFormPage() {
   const {
     register,
     handleSubmit,
-    watch,
+    setValue,
     formState: { errors, isSubmitting },
-  } = useForm<FormValues>({
+  } = useForm<FormInput, undefined, FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
       assetId: prefilledAssetId ?? undefined,
@@ -57,6 +71,7 @@ export default function RetirementFormPage() {
   });
 
   const [assetSearch, setAssetSearch] = useState('');
+  const [selectedAsset, setSelectedAsset] = useState<AssetListItem | null>(null);
 
   const mutation = useMutation({
     mutationFn: createRetirement,
@@ -74,14 +89,20 @@ export default function RetirementFormPage() {
     enabled: assetSearch.trim().length > 0,
     staleTime: 1000 * 30,
   });
-  const assetResults = (assetRes as PageData<AssetListItem> | undefined)?.records ?? [];
-  const foundAsset: AssetListItem | null = assetResults[0] ?? null;
+  const assetResults = getAssetRecords(assetRes);
+
+  const selectAsset = (asset: AssetListItem) => {
+    setSelectedAsset(asset);
+    setAssetSearch(`${asset.assetNo ?? ''} ${asset.assetName ?? ''}`.trim());
+    setValue('assetId', Number(asset.id), { shouldDirty: true, shouldValidate: true });
+  };
 
   const onSubmit = (values: FormValues) => {
     mutation.mutate({
       assetId: values.assetId,
       reason: values.reason,
       residualValue: values.residualValue,
+      notes: values.notes,
     });
   };
 
@@ -126,7 +147,7 @@ export default function RetirementFormPage() {
               />
 
               <div className="bg-[#f9f9ff] border border-[#004191]/10 p-4 rounded-lg">
-                {!assetSearch.trim() ? (
+                {!assetSearch.trim() && !selectedAsset ? (
                   <div className="py-6 text-center text-sm text-[#94a3b8]">
                     请输入资产编号或名称搜索
                   </div>
@@ -135,50 +156,75 @@ export default function RetirementFormPage() {
                     <Loader2 className="w-4 h-4 animate-spin" />
                     搜索中...
                   </div>
-                ) : !foundAsset ? (
-                  <div className="py-6 text-center text-sm text-[#94a3b8]">
-                    未找到匹配的资产，请尝试其他关键词
-                  </div>
-                ) : (
+                ) : selectedAsset ? (
                   <div className="flex gap-6">
                     <div className="w-32 h-32 bg-[#e3e8f8] rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center">
                       <Package className="w-12 h-12 text-[#64748b]" />
                     </div>
                     <div className="flex-1 grid grid-cols-2 gap-y-4 gap-x-8">
-                      <div className="col-span-2">
-                        <p className="text-[10px] text-[#64748b] uppercase tracking-wider">资产名称 & 编号</p>
-                        <p className="text-xl font-bold text-[#161c27]">
-                          {foundAsset.assetName ?? '—'}
-                        </p>
-                        <p className="text-[12px] text-[#004191] font-mono">{foundAsset.assetNo ?? '—'}</p>
+                      <div className="col-span-2 flex items-start justify-between gap-3">
+                        <div>
+                          <p className="text-[10px] text-[#64748b] uppercase tracking-wider">已选资产</p>
+                          <p className="text-xl font-bold text-[#161c27]">{selectedAsset.assetName ?? '—'}</p>
+                          <p className="text-[12px] text-[#004191] font-mono">{selectedAsset.assetNo ?? '—'}</p>
+                        </div>
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setSelectedAsset(null)}
+                        >
+                          重新选择
+                        </Button>
                       </div>
                       <div>
                         <p className="text-[10px] text-[#64748b] uppercase tracking-wider">分类</p>
-                        <p className="text-[13px] text-[#161c27]">{foundAsset.categoryName ?? '—'}</p>
+                        <p className="text-[13px] text-[#161c27]">{selectedAsset.categoryName ?? '—'}</p>
                       </div>
                       <div>
                         <p className="text-[10px] text-[#64748b] uppercase tracking-wider">品牌/型号</p>
-                        <p className="text-[13px] text-[#161c27]">{foundAsset.brand ?? '—'}</p>
+                        <p className="text-[13px] text-[#161c27]">{selectedAsset.brand ?? '—'}</p>
                       </div>
                       <div>
                         <p className="text-[10px] text-[#64748b] uppercase tracking-wider">原值</p>
                         <p className="text-[13px] text-[#161c27] font-semibold">
-                          {foundAsset.originalValue != null ? `¥${Number(foundAsset.originalValue).toLocaleString()}` : '—'}
+                          {selectedAsset.originalValue != null ? `¥${Number(selectedAsset.originalValue).toLocaleString()}` : '—'}
                         </p>
                       </div>
                       <div>
                         <p className="text-[10px] text-[#64748b] uppercase tracking-wider">净值</p>
                         <p className="text-[13px] text-[#004191] font-semibold">
-                          {foundAsset.currentValue != null ? `¥${Number(foundAsset.currentValue).toLocaleString()}` : '—'}
+                          {selectedAsset.currentValue != null ? `¥${Number(selectedAsset.currentValue).toLocaleString()}` : '—'}
                         </p>
                       </div>
                       <div className="col-span-2 mt-2">
                         <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#f1f3ff] text-[#64748b] border border-[#64748b]/10 text-[11px] font-bold">
                           <span className="w-1.5 h-1.5 rounded-full bg-[#64748b]" />
-                          {foundAsset.status ?? '—'}
+                          {selectedAsset.status ?? '—'}
                         </span>
                       </div>
                     </div>
+                  </div>
+                ) : assetResults.length === 0 ? (
+                  <div className="py-6 text-center text-sm text-[#94a3b8]">
+                    未找到匹配的资产，请尝试其他关键词
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {assetResults.map((asset) => (
+                      <button
+                        key={asset.id}
+                        type="button"
+                        className="w-full text-left flex items-center justify-between gap-3 p-3 rounded-lg bg-white border border-[#e5e7eb] hover:border-[#004191]/40 hover:bg-[#f1f3ff] transition-colors"
+                        onClick={() => selectAsset(asset)}
+                      >
+                        <span>
+                          <span className="block text-sm font-semibold text-[#161c27]">{asset.assetName ?? '—'}</span>
+                          <span className="block text-[11px] font-mono text-[#004191]">{asset.assetNo ?? '—'}</span>
+                        </span>
+                        <span className="text-[11px] text-[#64748b]">{asset.categoryName ?? asset.status ?? '—'}</span>
+                      </button>
+                    ))}
                   </div>
                 )}
               </div>
@@ -214,22 +260,24 @@ export default function RetirementFormPage() {
           </Card>
         </section>
 
-        <section className="col-span-12 lg:col-span-5 flex flex-col gap-3">
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
-            <Card className="h-full">
+        <section className="col-span-12 lg:col-span-5 flex flex-col gap-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            {/* ── 分组 1：退役原因 ── */}
+            <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <CalendarDays className="w-4 h-4 text-[#004191]" />
-                  退役信息
+                  <FileText className="w-4 h-4 text-[#004191]" />
+                  退役原因
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-6">
-                <Input
-                  label="资产 ID *"
-                  type="number"
-                  placeholder="输入需要退役的资产 ID"
-                  error={errors.assetId?.message}
-                  {...register('assetId')}
+              <CardContent className="space-y-5">
+                  <Input
+                    label="资产 ID *"
+                    type="number"
+                    placeholder="请先搜索并选择资产"
+                    readOnly={!!selectedAsset}
+                    error={errors.assetId?.message}
+                    {...register('assetId')}
                 />
 
                 <div className="flex flex-col gap-1.5">
@@ -248,60 +296,99 @@ export default function RetirementFormPage() {
                     <p className="text-xs text-red-500">{errors.reason.message}</p>
                   )}
                 </div>
-
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-[10px] text-[#64748b] uppercase tracking-wider block font-semibold">
-                    预计残值
-                  </label>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    placeholder="0.00"
-                    prefix={<span className="text-[#004191] font-semibold">¥</span>}
-                    error={errors.residualValue?.message}
-                    {...register('residualValue')}
-                  />
-                  <p className="text-[11px] text-[#64748b] italic">
-                    {foundAsset ? `基于净值的建议残值：${foundAsset.currentValue != null ? `¥${Number(foundAsset.currentValue).toLocaleString()}` : '—'}` : '搜索并选择资产后显示建议残值'}
-                  </p>
-                </div>
-
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-[10px] text-[#64748b] uppercase tracking-wider block font-semibold">
-                    备注说明
-                  </label>
-                  <textarea
-                    rows={3}
-                    placeholder="可选的内部备注"
-                    className="w-full p-4 bg-[#f1f3ff] border-none rounded-lg text-[13px] focus:ring-2 focus:ring-[#004191]/20 transition-all outline-none resize-none placeholder:text-[#94a3b8]"
-                    {...register('notes')}
-                  />
-                </div>
-
-                <div className="p-4 bg-[#dbeafe] rounded-lg flex gap-3 border border-[#2563eb]/10">
-                  <Info className="w-4 h-4 text-[#2563eb] flex-shrink-0 mt-0.5" />
-                  <p className="text-[12px] text-[#2563eb]">
-                    提交此申请将启动多级审批流程，涉及部门负责人和财务总监。
-                  </p>
-                </div>
               </CardContent>
             </Card>
 
+            {/* ── 分组 2：残值评估 ── */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <DollarSign className="w-4 h-4 text-[#004191]" />
+                  残值评估
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <Input
+                  type="number"
+                  step="0.01"
+                  placeholder="0.00"
+                  prefix={<span className="text-[#004191] font-semibold">¥</span>}
+                  error={errors.residualValue?.message}
+                  {...register('residualValue')}
+                />
+                <p className="text-[11px] text-[#64748b] italic">
+                  {selectedAsset
+                    ? `基于净值的建议残值：${selectedAsset.currentValue != null ? `¥${Number(selectedAsset.currentValue).toLocaleString()}` : '—'}`
+                    : '搜索并选择资产后显示建议残值'}
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* ── 分组 3：备注与附件 ── */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <MessageSquare className="w-4 h-4 text-[#004191]" />
+                  备注与说明
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <textarea
+                  rows={3}
+                  placeholder="可选的内部备注或附件说明"
+                  className="w-full p-4 bg-[#f1f3ff] border-none rounded-lg text-[13px] focus:ring-2 focus:ring-[#004191]/20 transition-all outline-none resize-none placeholder:text-[#94a3b8]"
+                  {...register('notes')}
+                />
+              </CardContent>
+            </Card>
+
+            {/* ── 风险提示 ── */}
+            <div className="p-4 bg-[#fef3c7] rounded-lg flex gap-3 border border-[#d97706]/20">
+              <AlertTriangle className="w-5 h-5 text-[#d97706] flex-shrink-0 mt-0.5" />
+              <div className="space-y-1">
+                <p className="text-[13px] text-[#92400e] font-semibold">
+                  退役操作不可逆
+                </p>
+                <p className="text-[12px] text-[#92400e]/80 leading-relaxed">
+                  提交后将启动多级审批流程（部门负责人 → 财务总监），审批通过后资产将从在册清单中移除。请确认退役原因和残值信息无误。
+                </p>
+              </div>
+            </div>
+
+            {/* ── 审批流程提示 ── */}
+            <div className="p-4 bg-[#dbeafe] rounded-lg flex gap-3 border border-[#2563eb]/10">
+              <Info className="w-4 h-4 text-[#2563eb] flex-shrink-0 mt-0.5" />
+              <p className="text-[12px] text-[#2563eb]">
+                提交此申请将启动多级审批流程，涉及部门负责人和财务总监。
+              </p>
+            </div>
+
+            {/* ── 错误提示 ── */}
             {mutation.isError && (
               <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-red-600 text-sm">
                 {(mutation.error instanceof Error ? mutation.error.message : '提交失败，请重试')}
               </div>
             )}
 
-            <div className="flex items-center justify-end gap-3 pt-2">
-              <Button type="button" variant="outline" onClick={() => navigate(-1)}>
-                取消
-              </Button>
-              <Button type="submit" loading={isSubmitting || mutation.isPending}>
-                <Send className="w-4 h-4" />
-                提交申请
-              </Button>
-            </div>
+            {/* ── 提交区域 ── */}
+            <Card>
+              <CardContent className="flex items-center justify-between py-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => navigate(-1)}
+                >
+                  取消
+                </Button>
+                <Button
+                  type="submit"
+                  loading={isSubmitting || mutation.isPending}
+                >
+                  <Send className="w-4 h-4" />
+                  提交退役申请
+                </Button>
+              </CardContent>
+            </Card>
           </form>
         </section>
       </div>

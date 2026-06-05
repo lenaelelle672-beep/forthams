@@ -22,7 +22,7 @@ import {
 } from '@ant-design/icons';
 import type { TreeProps } from 'antd';
 
-import { TOKEN_STORAGE_KEY } from '../../app/utils/api';
+import http from '@/utils/http';
 
 const { Text } = Typography;
 
@@ -36,9 +36,9 @@ export type ScopeType = 'location' | 'category' | 'all';
 /** ScopeSelector 组件属性接口 */
 export interface ScopeSelectorProps {
   /** 当前选中的范围值（受控模式） */
-  value: { scopeType: ScopeType; scopeIds: string[] };
+  value?: { scopeType: ScopeType; scopeIds: string[] };
   /** 范围变更回调 */
-  onChange: (value: { scopeType: ScopeType; scopeIds: string[] }) => void;
+  onChange?: (value: { scopeType: ScopeType; scopeIds: string[] }) => void;
 }
 
 /** 树节点数据结构（兼容 Ant Design DataNode） */
@@ -89,12 +89,6 @@ function buildKeyTitleMap(nodes: TreeNodeData[]): Map<string, string> {
  * @returns 解析后的树节点数组
  * @throws 网络错误或非 200 响应
  */
-function getAuthHeaders(): HeadersInit {
-  if (typeof window === 'undefined') return {};
-
-  const token = window.sessionStorage.getItem(TOKEN_STORAGE_KEY) || window.localStorage.getItem(TOKEN_STORAGE_KEY);
-  return token ? { Authorization: `Bearer ${token}` } : {};
-}
 
 function normalizeTreeNode(node: RawTreeNodeData): TreeNodeData {
   const key = node.key ?? node.id;
@@ -108,13 +102,9 @@ function normalizeTreeNode(node: RawTreeNodeData): TreeNodeData {
 }
 
 async function fetchTreeData(url: string): Promise<TreeNodeData[]> {
-  const response = await fetch(url, { headers: getAuthHeaders() });
-  if (!response.ok) {
-    throw new Error(`请求失败 (HTTP ${response.status})`);
-  }
-  const raw = await response.json();
-  // 兼容 { data: [...] } 或直接返回数组的响应格式，并归一化后端字段为 Ant Design Tree 需要的 key/title。
-  const nodes = Array.isArray(raw) ? raw : Array.isArray(raw.data) ? raw.data : [];
+  const response = await http.get(url);
+  const data = (response as Record<string, unknown>)?.data ?? response;
+  const nodes: unknown[] = Array.isArray(data) ? data : (data && typeof data === 'object' && Array.isArray((data as Record<string, unknown>).data)) ? (data as Record<string, unknown>).data as unknown[] : [];
   if (Array.isArray(nodes)) return nodes.map(normalizeTreeNode);
   return [];
 }
@@ -182,7 +172,7 @@ function useTreeData(url: string): {
  * @param props - ScopeSelectorProps
  * @returns React 组件
  */
-const ScopeSelector: React.FC<ScopeSelectorProps> = ({ value, onChange }) => {
+const ScopeSelector: React.FC<ScopeSelectorProps> = ({ value = { scopeType: 'location', scopeIds: [] }, onChange }) => {
   // ---- 树数据加载 ----
   const locationTree = useTreeData('/api/locations/list');
   const categoryTree = useTreeData('/api/categories/tree');
@@ -218,7 +208,7 @@ const ScopeSelector: React.FC<ScopeSelectorProps> = ({ value, onChange }) => {
    */
   const handleTabChange = useCallback(
     (key: string) => {
-      onChange({ scopeType: key as ScopeType, scopeIds: [] });
+      onChange?.({ scopeType: key as ScopeType, scopeIds: [] });
     },
     [onChange],
   );
@@ -233,7 +223,7 @@ const ScopeSelector: React.FC<ScopeSelectorProps> = ({ value, onChange }) => {
       const keys = Array.isArray(checkedKeys)
         ? checkedKeys
         : checkedKeys.checked;
-      onChange({
+      onChange?.({
         scopeType: value.scopeType,
         scopeIds: keys.map(String),
       });
@@ -249,7 +239,7 @@ const ScopeSelector: React.FC<ScopeSelectorProps> = ({ value, onChange }) => {
   const handleRemoveItem = useCallback(
     (id: string) => {
       const newIds = value.scopeIds.filter((sid) => sid !== id);
-      onChange({ scopeType: value.scopeType, scopeIds: newIds });
+      onChange?.({ scopeType: value.scopeType, scopeIds: newIds });
     },
     [value.scopeType, value.scopeIds, onChange],
   );
@@ -258,7 +248,7 @@ const ScopeSelector: React.FC<ScopeSelectorProps> = ({ value, onChange }) => {
    * 清空所有已选节点
    */
   const handleClearAll = useCallback(() => {
-    onChange({ scopeType: value.scopeType, scopeIds: [] });
+    onChange?.({ scopeType: value.scopeType, scopeIds: [] });
   }, [value.scopeType, onChange]);
 
   // ---- 渲染辅助 ----

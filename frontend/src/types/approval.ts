@@ -24,25 +24,26 @@
  * Reverse flow:  Any APPROVING_* → REJECTED
  * Cancellation:  PENDING / APPROVING_LEVEL_1 → CANCELLED
  */
-export enum OrderStatus {
+export const OrderStatus = {
   /** 工单已创建，等待进入审批流程 */
-  PENDING = 'PENDING',
+  PENDING: 'PENDING',
 
   /** 一级审批中（部门主管） */
-  APPROVING_LEVEL_1 = 'APPROVING_LEVEL_1',
+  APPROVING_LEVEL_1: 'APPROVING_LEVEL_1',
 
   /** 二级审批中（资产管理员） */
-  APPROVING_LEVEL_2 = 'APPROVING_LEVEL_2',
+  APPROVING_LEVEL_2: 'APPROVING_LEVEL_2',
 
   /** 审批通过，工单完成 */
-  APPROVED = 'APPROVED',
+  APPROVED: 'APPROVED',
 
   /** 审批驳回（终态） */
-  REJECTED = 'REJECTED',
+  REJECTED: 'REJECTED',
 
   /** 工单已取消（终态） */
-  CANCELLED = 'CANCELLED',
-}
+  CANCELLED: 'CANCELLED',
+} as const;
+export type OrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus];
 
 /**
  * Mapping of each status to its human-readable Chinese label.
@@ -70,20 +71,23 @@ export const TERMINAL_STATUSES: ReadonlySet<OrderStatus> = new Set([
 // ---------------------------------------------------------------------------
 
 /** Actions an approver can perform on a work order. */
-export enum ApprovalAction {
-  APPROVE = 'APPROVE',
-  REJECT = 'REJECT',
-}
+export const ApprovalAction = {
+  APPROVE: 'APPROVE',
+  REJECT: 'REJECT',
+  CANCEL: 'CANCEL',
+} as const;
+export type ApprovalAction = (typeof ApprovalAction)[keyof typeof ApprovalAction];
 
 // ---------------------------------------------------------------------------
 // 3. Approval Level Enum
 // ---------------------------------------------------------------------------
 
 /** The two approval levels in the workflow. */
-export enum ApprovalLevel {
-  LEVEL_1 = 'LEVEL_1', // 部门主管
-  LEVEL_2 = 'LEVEL_2', // 资产管理员
-}
+export const ApprovalLevel = {
+  LEVEL_1: 'LEVEL_1', // 部门主管
+  LEVEL_2: 'LEVEL_2', // 资产管理员
+} as const;
+export type ApprovalLevel = (typeof ApprovalLevel)[keyof typeof ApprovalLevel];
 
 // ---------------------------------------------------------------------------
 // 4. Approval Record – Persistence Entity
@@ -95,6 +99,8 @@ export enum ApprovalLevel {
  * Captures who performed what action, when, and optional rejection reason.
  */
 export interface ApprovalRecord {
+  /** 兼容历史测试与 mock 的扩展字段 */
+  [key: string]: unknown;
   /** Unique record identifier */
   id: string;
 
@@ -111,7 +117,7 @@ export interface ApprovalRecord {
   action: ApprovalAction;
 
   /** Approval level at which this action was taken */
-  approvalLevel: ApprovalLevel;
+  approvalLevel?: ApprovalLevel;
 
   /** Optional comment / note from the approver */
   comment?: string;
@@ -126,7 +132,7 @@ export interface ApprovalRecord {
   createdAt: string;
 
   /** ISO 8601 timestamp of last update */
-  updatedAt: string;
+  updatedAt?: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -138,6 +144,8 @@ export interface ApprovalRecord {
  * fields required by the frontend workbench.
  */
 export interface WorkOrder {
+  /** 兼容历史测试与 mock 的扩展字段 */
+  [key: string]: unknown;
   /** Unique work order identifier */
   id: string;
 
@@ -157,7 +165,7 @@ export interface WorkOrder {
   departmentName?: string;
 
   /** Brief description of the work order */
-  description: string;
+  description?: string;
 
   /** ISO 8601 timestamp when the order was created */
   createdAt: string;
@@ -175,7 +183,7 @@ export interface WorkOrder {
   version: number;
 
   /** Ordered list of approval records for this work order */
-  approvalRecords: ApprovalRecord[];
+  approvalRecords?: ApprovalRecord[];
 
   /** Whether this order is flagged as critical / urgent */
   isCritical?: boolean;
@@ -257,18 +265,23 @@ export interface PaginatedResponse<T> {
   pageSize: number;
 
   /** Total number of pages */
-  totalPages: number;
+  totalPages?: number;
 }
 
 /**
  * Response returned after a successful approve / reject / cancel action.
  */
 export interface ApprovalActionResponse {
+  /** 兼容历史测试与 mock 的扩展字段 */
+  [key: string]: unknown;
   /** The updated work order */
-  order: WorkOrder;
-
+  order?: WorkOrder;
+  /** 历史响应字段 */
+  workOrder?: WorkOrder;
   /** The newly created approval record */
-  record: ApprovalRecord;
+  record?: ApprovalRecord;
+  /** 历史响应字段 */
+  approvalRecord?: ApprovalRecord;
 }
 
 // ---------------------------------------------------------------------------
@@ -342,7 +355,7 @@ export interface ApprovalDetailViewModel {
   nextStatusOnApprove: OrderStatus | null;
 
   /** Status the order will transition to if rejected */
-  statusOnReject: OrderStatus.REJECTED;
+  statusOnReject: typeof OrderStatus.REJECTED;
 }
 
 // ---------------------------------------------------------------------------

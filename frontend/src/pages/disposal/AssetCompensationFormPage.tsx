@@ -80,6 +80,16 @@ function toAssetRow(a: AssetListItem): AssetRow {
   };
 }
 
+/**
+ * 资产赔偿申请表单页面
+ *
+ * 提供资产赔偿申请的完整录入流程，包括：
+ * - 基本信息填写（申请日期、损坏类型）
+ * - 损坏详情录入（描述、责任人、责任部门、发现人、是否报险）
+ * - 资产选择与赔偿金额配置
+ * - 赔偿方式与审批流程选择
+ * - 提交至后端审批流
+ */
 export default function AssetCompensationFormPage() {
   const navigate = useNavigate();
   const qc = useQueryClient();
@@ -323,7 +333,7 @@ export default function AssetCompensationFormPage() {
           </CardContent>
         </Card>
 
-        {/* Section 2: Damage Details */}
+        {/* Section 2: Damage Details — 强化损坏描述、责任人、赔偿金额的视觉层次 */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 border-l-4 border-[#2563eb] pl-3">
@@ -331,23 +341,50 @@ export default function AssetCompensationFormPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
+            {/* 资产损失说明 — 顶层高亮区块 */}
+            <div className="mb-6 p-4 bg-[#eff6ff] border border-[#bfdbfe] rounded-lg">
+              <label className="block text-sm font-semibold text-[#1e40af] mb-1.5">
+                资产损失说明 <span className="text-red-500">*</span>
+              </label>
+              <textarea
+                rows={4}
+                placeholder="请详细描述资产损坏情况、发生经过及损失范围..."
+                className={`w-full px-3 py-2.5 text-sm border rounded-lg bg-white transition-all placeholder:text-[#94a3b8] focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-[#3b82f6] resize-none ${
+                  errors.damageDesc ? 'border-red-400 ring-2 ring-red-100' : 'border-[#93c5fd]'
+                }`}
+                {...register('damageDesc')}
+              />
+              {errors.damageDesc && (
+                <div className="flex items-center gap-1.5 mt-1.5">
+                  <svg className="w-3.5 h-3.5 text-red-500 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" /></svg>
+                  <p className="text-xs font-medium text-red-600">{errors.damageDesc.message}</p>
+                </div>
+              )}
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-5">
-              <div className="md:col-span-3 flex flex-col gap-1.5">
-                <label className="text-sm font-medium text-[#434655]">损坏描述 *</label>
-                <textarea
-                  rows={3}
-                  placeholder="请详细描述资产损坏情况及发生经过..."
-                  className={`w-full px-3 py-2 text-sm border rounded-lg bg-white transition-all placeholder:text-[#94a3b8] focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-[#3b82f6] resize-none ${
-                    errors.damageDesc ? 'border-red-300' : 'border-[#e2e8f0]'
+              <Input label="损坏日期" type="date" error={errors.damageDate?.message} {...register('damageDate')} />
+
+              {/* 责任人 — 高可读性强调字段 */}
+              <div className="flex flex-col gap-1.5">
+                <label className="text-sm font-semibold text-[#1e293b]">
+                  责任人 <span className="text-red-500">*</span>
+                </label>
+                <input
+                  placeholder="输入责任人姓名"
+                  className={`w-full px-3 py-2 text-sm font-medium border rounded-lg bg-white transition-all placeholder:text-[#94a3b8] placeholder:font-normal focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-[#3b82f6] ${
+                    errors.responsiblePerson ? 'border-red-400 ring-2 ring-red-100' : 'border-[#e2e8f0]'
                   }`}
-                  {...register('damageDesc')}
+                  {...register('responsiblePerson')}
                 />
-                {errors.damageDesc && (
-                  <p className="text-xs text-red-500">{errors.damageDesc.message}</p>
+                {errors.responsiblePerson && (
+                  <div className="flex items-center gap-1.5">
+                    <svg className="w-3.5 h-3.5 text-red-500 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" /></svg>
+                    <p className="text-xs font-medium text-red-600">{errors.responsiblePerson.message}</p>
+                  </div>
                 )}
               </div>
-              <Input label="损坏日期" type="date" error={errors.damageDate?.message} {...register('damageDate')} />
-              <Input label="责任人" placeholder="输入姓名" error={errors.responsiblePerson?.message} {...register('responsiblePerson')} />
+
               <Controller
                 name="responsibleDept"
                 control={control}
@@ -463,7 +500,7 @@ export default function AssetCompensationFormPage() {
                     <td className="px-6 py-4 text-right">
                       <input
                         type="text"
-                        className="w-32 border-[#e2e8f0] rounded text-sm text-right py-1 px-2 focus:ring-1 focus:ring-[#2563eb] outline-none"
+                        className="w-36 border border-[#bfdbfe] bg-[#eff6ff] rounded-md text-sm text-right font-semibold text-[#1e40af] py-1.5 px-3 focus:ring-2 focus:ring-blue-200 focus:border-[#3b82f6] outline-none"
                         value={formatCurrency(asset.compensationAmount)}
                         onChange={(e) => {
                           const raw = e.target.value.replace(/[^\d.]/g, '');
@@ -521,13 +558,13 @@ export default function AssetCompensationFormPage() {
                 </div>
               </div>
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-medium text-[#434655]">总赔偿金额 (¥)</label>
-                <input
-                  type="text"
-                  readOnly
-                  value={formatCurrency(totalCompensation)}
-                  className="w-full bg-[#f3f3fe] font-bold text-[#004ac6] border-[#e2e8f0] rounded-lg text-sm py-2 px-3 focus:ring-0 cursor-not-allowed"
-                />
+                <label className="text-sm font-semibold text-[#1e293b]">总赔偿金额 (¥)</label>
+                <div className="flex items-center bg-gradient-to-r from-[#eff6ff] to-[#dbeafe] border border-[#93c5fd] rounded-lg px-4 py-3">
+                  <span className="text-lg font-bold text-[#1e40af] tracking-wide">
+                    ¥ {formatCurrency(totalCompensation)}
+                  </span>
+                  <span className="ml-auto text-xs text-[#3b82f6]">合计</span>
+                </div>
               </div>
               <Controller
                 name="approvalProcess"
@@ -565,15 +602,21 @@ export default function AssetCompensationFormPage() {
           </div>
         )}
 
-        {/* Footer Actions */}
-        <div className="mt-12 flex justify-end items-center gap-4 py-6 border-t border-[#e2e8f0]">
+        {/* Footer Actions — 主次分明 */}
+        <div className="mt-12 flex justify-end items-center gap-3 py-6 border-t border-[#e2e8f0]">
           <Button type="button" variant="ghost" onClick={() => navigate(-1)}>
             取消
           </Button>
            <Button type="button" variant="outline" onClick={() => navigate('/disposals')}>
              保存草稿
            </Button>
-          <Button type="submit" variant="primary" loading={isSubmitting || mutation.isPending}>
+          <Button
+            type="submit"
+            variant="primary"
+            size="lg"
+            loading={isSubmitting || mutation.isPending}
+            className="min-w-[120px] font-semibold shadow-md hover:shadow-lg transition-shadow"
+          >
             提交申请
           </Button>
         </div>

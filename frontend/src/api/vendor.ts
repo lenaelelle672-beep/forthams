@@ -16,11 +16,11 @@ export interface VendorListQuery {
 }
 
 export interface CreateVendorRequest {
-  vendorName: string;
+  name: string;
   vendorCode?: string;
-  contact?: string;
-  phone?: string;
-  email?: string;
+  contactPerson?: string;
+  contactPhone?: string;
+  contactEmail?: string;
   address?: string;
 }
 

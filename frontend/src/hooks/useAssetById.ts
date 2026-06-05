@@ -8,7 +8,7 @@
  */
 
 import { useQuery } from '@tanstack/react-query';
-import { assetService } from '@/services/assetService';
+import { assetService, getAssetList } from '@/services/assetService';
 import type { Asset } from '@/types/asset';
 
 /**
@@ -60,3 +60,13 @@ export function useAssetById(
 }
 
 export default useAssetById;
+export function useAssets() {
+  return useQuery({
+    queryKey: [...assetByIdKeys.all, 'list'],
+    queryFn: async (): Promise<Asset[]> => {
+      const response = await getAssetList({ page: 1, pageSize: 200 });
+      return response.items ?? response.records ?? [];
+    },
+    staleTime: 300000,
+  });
+}

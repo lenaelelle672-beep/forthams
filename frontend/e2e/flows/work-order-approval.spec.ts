@@ -11,7 +11,7 @@
  * - 关联资产状态联动
  */
 
-import { test, expect, Browser } from '@playwright/test';
+import { test, expect, Browser, type Page } from '@playwright/test';
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -19,6 +19,27 @@ import { test, expect, Browser } from '@playwright/test';
 
 const TEST_ASSET_NAME = 'E2E-TEST-ASSET-001';
 const TEST_ORDER_TITLE = 'E2E-REPAIR-ORDER-001';
+
+async function waitForAssetListPage(page: Page) {
+  await expect(page).toHaveURL(/\/assets(?:[?#].*)?$/);
+  await expect(page.getByRole('heading', { name: '资产台账' })).toBeVisible();
+  await expect(page.getByRole('button', { name: '新建资产' })).toBeVisible();
+  await expect(page.getByRole('table')).toBeVisible();
+}
+
+async function gotoWorkOrderCreatePage(page: Page) {
+  await page.goto('/workorders/new');
+  await expect(page).toHaveURL(/\/workorders\/new(?:[?#].*)?$/);
+  await expect(page.getByRole('heading', { name: '新建工单' })).toBeVisible();
+  await expect(page.getByLabel('标题 *')).toBeVisible();
+}
+
+async function gotoWorkOrderListPage(page: Page) {
+  await page.goto('/disposals');
+  await expect(page.getByRole('heading', { name: '资产处置管理' })).toBeVisible();
+  await page.getByRole('button', { name: /工单管理/ }).click();
+  await expect(page.getByRole('button', { name: '新建工单管理' })).toBeVisible();
+}
 
 // ---------------------------------------------------------------------------
 // Helper: create a new context with the given storage state
@@ -42,45 +63,34 @@ test.describe('工单审批流程 (WO-001 ~ WO-011)', () => {
   // WO-001: Operator creates a work order
   // -----------------------------------------------------------------------
   test('WO-001: operator 创建工单', async ({ page }) => {
-    // Navigate to work orders page
-    await page.goto('/work-orders');
-    await page.waitForSelector('[data-testid="work-order-list"]', { timeout: 5000 });
-
-    // Click create work order button
-    await page.click('[data-testid="btn-create-work-order"]');
-
-    // Wait for creation form
-    await page.waitForSelector('[data-testid="input-order-title"]', { timeout: 5000 });
+    // 当前路由中工单列表合并到资产处置，创建入口为 /workorders/new。
+    await gotoWorkOrderCreatePage(page);
   });
 
   // -----------------------------------------------------------------------
   // WO-002: Associate asset and submit work order
   // -----------------------------------------------------------------------
   test('WO-002: 关联资产并提交工单，POST 返回 201', async ({ page }) => {
-    await page.goto('/work-orders');
-    await page.waitForSelector('[data-testid="work-order-list"]', { timeout: 5000 });
-    await page.click('[data-testid="btn-create-work-order"]');
-    await page.waitForSelector('[data-testid="input-order-title"]', { timeout: 5000 });
+    await gotoWorkOrderCreatePage(page);
 
     // Fill work order details
-    await page.fill('[data-testid="input-order-title"]', TEST_ORDER_TITLE);
+    await page.getByLabel('标题 *').fill(TEST_ORDER_TITLE);
 
     // Select type
-    await page.click('[data-testid="select-order-type"]');
-    await page.click('[data-testid="option-order-type-repair"]');
+    await page.locator('select').first().selectOption('REPAIR');
 
     // Associate asset
-    await page.click('[data-testid="select-asset"]');
-    await page.click(`[data-testid="option-asset-${TEST_ASSET_NAME}"]`);
+    await page.getByPlaceholder('搜索资产编号或名称...').fill(TEST_ASSET_NAME);
+    await page.getByRole('button', { name: new RegExp(TEST_ASSET_NAME) }).first().click();
 
     // Submit and intercept API
     const [response] = await Promise.all([
       page.waitForResponse(
-        (resp) => resp.url().includes('/api/work-orders')
+        (resp) => resp.url().includes('/api/workorders')
           && resp.request().method() === 'POST'
           && resp.status() === 201,
       ),
-      page.click('[data-testid="btn-submit"]'),
+      page.getByRole('button', { name: '提交工单' }).click(),
     ]);
 
     expect(response.status()).toBe(201);
@@ -90,8 +100,7 @@ test.describe('工单审批流程 (WO-001 ~ WO-011)', () => {
   // WO-003: Verify work order status is 待审批
   // -----------------------------------------------------------------------
   test('WO-003: 验证工单状态为待审批', async ({ page }) => {
-    await page.goto('/work-orders');
-    await page.waitForSelector('[data-testid="work-order-list"]', { timeout: 5000 });
+    await gotoWorkOrderListPage(page);
 
     // Navigate to the order detail
     await page.click(`[data-testid="work-order-row-${TEST_ORDER_TITLE}"]`);
@@ -112,8 +121,7 @@ test.describe('工单审批流程 (WO-001 ~ WO-011)', () => {
 
     try {
       // Navigate to work order detail
-      await page.goto('/work-orders');
-      await page.waitForSelector('[data-testid="work-order-list"]', { timeout: 5000 });
+      await gotoWorkOrderListPage(page);
 
       await page.click(`[data-testid="work-order-row-${TEST_ORDER_TITLE}"]`);
       await page.waitForSelector('[data-testid="work-order-status"]', { timeout: 5000 });
@@ -128,7 +136,7 @@ test.describe('工单审批流程 (WO-001 ~ WO-011)', () => {
       // Submit approval
       const [response] = await Promise.all([
         page.waitForResponse(
-          (resp) => resp.url().match(/\/api\/work-orders\/[^/]+\/approve/) !== null
+          (resp) => resp.url().match(/\/api\/workorders\/[^/]+\/approve/) !== null
             && resp.status() === 200,
         ),
         page.click('[data-testid="btn-confirm-approve"]'),
@@ -144,8 +152,7 @@ test.describe('工单审批流程 (WO-001 ~ WO-011)', () => {
   // WO-006: Verify work order status changed to 已审批
   // -----------------------------------------------------------------------
   test('WO-006: 验证工单状态变更为已审批', async ({ page }) => {
-    await page.goto('/work-orders');
-    await page.waitForSelector('[data-testid="work-order-list"]', { timeout: 5000 });
+    await gotoWorkOrderListPage(page);
 
     await page.click(`[data-testid="work-order-row-${TEST_ORDER_TITLE}"]`);
     await page.waitForSelector('[data-testid="work-order-status"]', { timeout: 5000 });
@@ -163,8 +170,7 @@ test.describe('工单审批流程 (WO-001 ~ WO-011)', () => {
     );
 
     try {
-      await page.goto('/work-orders');
-      await page.waitForSelector('[data-testid="work-order-list"]', { timeout: 5000 });
+      await gotoWorkOrderListPage(page);
 
       await page.click(`[data-testid="work-order-row-${TEST_ORDER_TITLE}"]`);
       await page.waitForSelector('[data-testid="work-order-status"]', { timeout: 5000 });
@@ -179,10 +185,10 @@ test.describe('工单审批流程 (WO-001 ~ WO-011)', () => {
       // Submit
       const [response] = await Promise.all([
         page.waitForResponse(
-          (resp) => resp.url().match(/\/api\/work-orders\/[^/]+\/execute/) !== null
+          (resp) => resp.url().match(/\/api\/workorders\/[^/]+\/execute/) !== null
             && resp.status() === 200,
         ),
-        page.click('[data-testid="btn-submit"]'),
+        page.getByRole('button', { name: '提交工单' }).click(),
       ]);
 
       expect(response.status()).toBe(200);
@@ -198,8 +204,7 @@ test.describe('工单审批流程 (WO-001 ~ WO-011)', () => {
   // WO-009: Complete the work order
   // -----------------------------------------------------------------------
   test('WO-009: 完成工单', async ({ page }) => {
-    await page.goto('/work-orders');
-    await page.waitForSelector('[data-testid="work-order-list"]', { timeout: 5000 });
+    await gotoWorkOrderListPage(page);
 
     await page.click(`[data-testid="work-order-row-${TEST_ORDER_TITLE}"]`);
     await page.waitForSelector('[data-testid="work-order-status"]', { timeout: 5000 });
@@ -214,10 +219,10 @@ test.describe('工单审批流程 (WO-001 ~ WO-011)', () => {
     // Submit
     const [response] = await Promise.all([
       page.waitForResponse(
-        (resp) => resp.url().match(/\/api\/work-orders\/[^/]+\/complete/) !== null
+        (resp) => resp.url().match(/\/api\/workorders\/[^/]+\/complete/) !== null
           && resp.status() === 200,
       ),
-      page.click('[data-testid="btn-submit"]'),
+      page.getByRole('button', { name: '提交工单' }).click(),
     ]);
 
     expect(response.status()).toBe(200);
@@ -232,7 +237,7 @@ test.describe('工单审批流程 (WO-001 ~ WO-011)', () => {
   test('WO-010: 验证关联资产状态联动', async ({ page }) => {
     // Navigate to asset detail
     await page.goto('/assets');
-    await page.waitForSelector('[data-testid="asset-list-table"]', { timeout: 5000 });
+    await waitForAssetListPage(page);
 
     const row = page.locator(`[data-testid="asset-row-${TEST_ASSET_NAME}"]`);
     await row.click();
@@ -257,24 +262,20 @@ test.describe('工单审批流程 (WO-001 ~ WO-011)', () => {
 
     try {
       // Create work order for rejection
-      await opPage.goto('/work-orders');
-      await opPage.waitForSelector('[data-testid="work-order-list"]', { timeout: 5000 });
-      await opPage.click('[data-testid="btn-create-work-order"]');
-      await opPage.waitForSelector('[data-testid="input-order-title"]', { timeout: 5000 });
+      await gotoWorkOrderCreatePage(opPage);
 
-      await opPage.fill('[data-testid="input-order-title"]', 'E2E-REJECT-ORDER-001');
-      await opPage.click('[data-testid="select-order-type"]');
-      await opPage.click('[data-testid="option-order-type-repair"]');
-      await opPage.click('[data-testid="select-asset"]');
-      await opPage.click(`[data-testid="option-asset-${TEST_ASSET_NAME}"]`);
+      await opPage.getByLabel('标题 *').fill('E2E-REJECT-ORDER-001');
+      await opPage.locator('select').first().selectOption('REPAIR');
+      await opPage.getByPlaceholder('搜索资产编号或名称...').fill(TEST_ASSET_NAME);
+      await opPage.getByRole('button', { name: new RegExp(TEST_ASSET_NAME) }).first().click();
 
       const [createResponse] = await Promise.all([
         opPage.waitForResponse(
-          (resp) => resp.url().includes('/api/work-orders')
+          (resp) => resp.url().includes('/api/workorders')
             && resp.request().method() === 'POST'
             && resp.status() === 201,
         ),
-        opPage.click('[data-testid="btn-submit"]'),
+        opPage.getByRole('button', { name: '提交工单' }).click(),
       ]);
       expect(createResponse.status()).toBe(201);
     } finally {
@@ -288,8 +289,7 @@ test.describe('工单审批流程 (WO-001 ~ WO-011)', () => {
     );
 
     try {
-      await appPage.goto('/work-orders');
-      await appPage.waitForSelector('[data-testid="work-order-list"]', { timeout: 5000 });
+      await gotoWorkOrderListPage(appPage);
 
       await appPage.click('[data-testid="work-order-row-E2E-REJECT-ORDER-001"]');
       await appPage.waitForSelector('[data-testid="work-order-status"]', { timeout: 5000 });
@@ -303,7 +303,7 @@ test.describe('工单审批流程 (WO-001 ~ WO-011)', () => {
 
       const [rejectResponse] = await Promise.all([
         appPage.waitForResponse(
-          (resp) => resp.url().match(/\/api\/work-orders\/[^/]+\/reject/) !== null
+          (resp) => resp.url().match(/\/api\/workorders\/[^/]+\/reject/) !== null
             && resp.status() === 200,
         ),
         appPage.click('[data-testid="btn-confirm-reject"]'),
@@ -324,7 +324,7 @@ test.describe('工单审批流程 (WO-001 ~ WO-011)', () => {
 
     try {
       await verifyPage.goto('/assets');
-      await verifyPage.waitForSelector('[data-testid="asset-list-table"]', { timeout: 5000 });
+      await waitForAssetListPage(verifyPage);
 
       const row = verifyPage.locator(`[data-testid="asset-row-${TEST_ASSET_NAME}"]`);
       const statusText = await row.locator('[data-testid="asset-status"]').textContent();

@@ -28,6 +28,11 @@ public class InventoryTask implements Serializable {
     private Integer lossCount;
     private Long executorId;
     private Long createBy;
+    private Integer surplusCount;
+    private Integer deficitCount;
+    private Integer damageCount;
+    private Long approvedBy;
+    private LocalDateTime approvedAt;
 
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;

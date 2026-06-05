@@ -10,7 +10,7 @@
  * - 同时校验 UI 文本与 API 响应
  */
 
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
 
 // ---------------------------------------------------------------------------
 // Shared constants
@@ -19,6 +19,13 @@ import { test, expect } from '@playwright/test';
 const TEST_ASSET_NAME = 'E2E-TEST-ASSET-001';
 const TEST_ASSET_CATEGORY = 'IT设备';
 const TEST_ASSET_LOCATION = '机房A';
+
+async function waitForAssetListPage(page: Page) {
+  await expect(page).toHaveURL(/\/assets(?:[?#].*)?$/);
+  await expect(page.getByRole('heading', { name: '资产台账' })).toBeVisible();
+  await expect(page.getByRole('button', { name: '新建资产' })).toBeVisible();
+  await expect(page.getByRole('table')).toBeVisible();
+}
 
 // ---------------------------------------------------------------------------
 // LC-001 ~ LC-010: Asset lifecycle serial tests
@@ -32,8 +39,7 @@ test.describe('资产生命周期全流程 (LC-001 ~ LC-010)', () => {
   // -----------------------------------------------------------------------
   test('LC-001: 导航至资产列表页，表格可见', async ({ page }) => {
     await page.goto('/assets');
-    await page.waitForSelector('[data-testid="asset-list-table"]', { timeout: 5000 });
-    await expect(page.locator('[data-testid="asset-list-table"]')).toBeVisible();
+    await waitForAssetListPage(page);
   });
 
   // -----------------------------------------------------------------------
@@ -41,7 +47,7 @@ test.describe('资产生命周期全流程 (LC-001 ~ LC-010)', () => {
   // -----------------------------------------------------------------------
   test('LC-002: 点击新增资产按钮，表单可见', async ({ page }) => {
     await page.goto('/assets');
-    await page.waitForSelector('[data-testid="asset-list-table"]', { timeout: 5000 });
+    await waitForAssetListPage(page);
 
     await page.click('[data-testid="btn-add-asset"]');
 
@@ -59,7 +65,7 @@ test.describe('资产生命周期全流程 (LC-001 ~ LC-010)', () => {
   // -----------------------------------------------------------------------
   test('LC-003: 填写资产表单并提交，POST 返回 201', async ({ page }) => {
     await page.goto('/assets');
-    await page.waitForSelector('[data-testid="asset-list-table"]', { timeout: 5000 });
+    await waitForAssetListPage(page);
     await page.click('[data-testid="btn-add-asset"]');
 
     // Wait for the form to appear
@@ -87,7 +93,7 @@ test.describe('资产生命周期全流程 (LC-001 ~ LC-010)', () => {
   // -----------------------------------------------------------------------
   test('LC-004: 列表新增记录存在，状态为草稿', async ({ page }) => {
     await page.goto('/assets');
-    await page.waitForSelector('[data-testid="asset-list-table"]', { timeout: 5000 });
+    await waitForAssetListPage(page);
 
     const row = page.locator(`[data-testid="asset-row-${TEST_ASSET_NAME}"]`);
     await expect(row).toBeVisible();
@@ -101,7 +107,7 @@ test.describe('资产生命周期全流程 (LC-001 ~ LC-010)', () => {
   // -----------------------------------------------------------------------
   test('LC-005: 执行入库操作', async ({ page }) => {
     await page.goto('/assets');
-    await page.waitForSelector('[data-testid="asset-list-table"]', { timeout: 5000 });
+    await waitForAssetListPage(page);
 
     const row = page.locator(`[data-testid="asset-row-${TEST_ASSET_NAME}"]`);
     await expect(row).toBeVisible();
@@ -129,7 +135,7 @@ test.describe('资产生命周期全流程 (LC-001 ~ LC-010)', () => {
   // -----------------------------------------------------------------------
   test('LC-006: 验证状态变更为在库', async ({ page }) => {
     await page.goto('/assets');
-    await page.waitForSelector('[data-testid="asset-list-table"]', { timeout: 5000 });
+    await waitForAssetListPage(page);
 
     const row = page.locator(`[data-testid="asset-row-${TEST_ASSET_NAME}"]`);
     const statusCell = row.locator('[data-testid="asset-status"]');
@@ -141,7 +147,7 @@ test.describe('资产生命周期全流程 (LC-001 ~ LC-010)', () => {
   // -----------------------------------------------------------------------
   test('LC-007: 执行领用操作', async ({ page }) => {
     await page.goto('/assets');
-    await page.waitForSelector('[data-testid="asset-list-table"]', { timeout: 5000 });
+    await waitForAssetListPage(page);
 
     const row = page.locator(`[data-testid="asset-row-${TEST_ASSET_NAME}"]`);
     await row.locator('[data-testid="btn-action-assign"]').click();
@@ -167,7 +173,7 @@ test.describe('资产生命周期全流程 (LC-001 ~ LC-010)', () => {
   // -----------------------------------------------------------------------
   test('LC-008: 验证状态变更为使用中', async ({ page }) => {
     await page.goto('/assets');
-    await page.waitForSelector('[data-testid="asset-list-table"]', { timeout: 5000 });
+    await waitForAssetListPage(page);
 
     const row = page.locator(`[data-testid="asset-row-${TEST_ASSET_NAME}"]`);
     const statusCell = row.locator('[data-testid="asset-status"]');
@@ -179,7 +185,7 @@ test.describe('资产生命周期全流程 (LC-001 ~ LC-010)', () => {
   // -----------------------------------------------------------------------
   test('LC-009: 执行归还操作，状态变为已归还', async ({ page }) => {
     await page.goto('/assets');
-    await page.waitForSelector('[data-testid="asset-list-table"]', { timeout: 5000 });
+    await waitForAssetListPage(page);
 
     const row = page.locator(`[data-testid="asset-row-${TEST_ASSET_NAME}"]`);
     await row.locator('[data-testid="btn-action-return"]').click();
@@ -205,7 +211,7 @@ test.describe('资产生命周期全流程 (LC-001 ~ LC-010)', () => {
   // -----------------------------------------------------------------------
   test('LC-010: 执行维修登记，状态变为维修中', async ({ page }) => {
     await page.goto('/assets');
-    await page.waitForSelector('[data-testid="asset-list-table"]', { timeout: 5000 });
+    await waitForAssetListPage(page);
 
     const row = page.locator(`[data-testid="asset-row-${TEST_ASSET_NAME}"]`);
     await row.locator('[data-testid="btn-action-repair"]').click();

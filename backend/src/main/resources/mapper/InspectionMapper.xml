@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ams.mapper.InspectionMapper">
+
+    <!-- 查询即将到期的检验记录 -->
+    <select id="findExpiringSoon" resultType="com.ams.entity.Inspection">
+        SELECT * FROM inspection
+        WHERE deleted = 0
+          AND tenant_id = #{tenantId}
+          AND next_inspection_date IS NOT NULL
+          AND next_inspection_date &lt;= #{warningDate}
+    </select>
+
+</mapper>

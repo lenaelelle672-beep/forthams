@@ -80,6 +80,8 @@ export interface PendingApprovalItem {
 
 /** Full work-order detail returned by the approval-detail endpoint. */
 export interface WorkOrderApprovalDetail extends PendingApprovalItem {
+  /** 旧测试与旧页面使用的嵌套工单字段 */
+  workOrder?: PendingApprovalItem;
   /** Department name of the applicant. */
   departmentName: string;
   /** All approval records associated with this order, newest first. */
@@ -117,13 +119,15 @@ export interface PaginatedResponse<T> {
   /** Total number of items across all pages. */
   total: number;
   /** Current page number (1-based). */
-  page: number;
+  page?: number;
   /** Page size. */
-  pageSize: number;
+  pageSize?: number;
 }
 
 /** Response returned after a successful approve / reject action. */
 export interface ApprovalActionResponse {
+  /** 旧测试与旧页面使用的嵌套工单字段 */
+  workOrder?: PendingApprovalItem;
   /** Updated work-order id. */
   orderId: number;
   /** New status after the action. */
@@ -414,26 +418,26 @@ export const approvalService = {
   async getPendingApprovals(
     roleOrQuery?: string | PendingApprovalQuery,
     query: PendingApprovalQuery = {},
-  ) {
+  ): Promise<PaginatedResponse<PendingApprovalItem>> {
     if (typeof roleOrQuery === 'string') {
-      return http.get('/approvals/pending', {
+      return http.get<PaginatedResponse<PendingApprovalItem>>('/approvals/pending', {
         params: { role: roleOrQuery, ...query },
       });
     }
     return getPendingApprovals(roleOrQuery ?? {});
   },
 
-  async getApprovalDetail(orderId: string | number) {
-    return http.get(`/approvals/${orderId}`);
+  async getApprovalDetail(orderId: string | number): Promise<WorkOrderApprovalDetail> {
+    return http.get<WorkOrderApprovalDetail>(`/approvals/${orderId}`);
   },
 
   async getApprovalRecords(orderId: string | number) {
     return getApprovalRecords(Number(orderId));
   },
 
-  async approveOrder(orderId: string | number, version: number) {
+  async approveOrder(orderId: string | number, version: number): Promise<ApprovalActionResponse> {
     try {
-      const response = await http.post(`/orders/${orderId}/approve`, { version });
+      const response = await http.post<ApprovalActionResponse>(`/orders/${orderId}/approve`, { version });
       if (!response && lastApprovalError) throw lastApprovalError;
       return response;
     } catch (error) {
@@ -442,7 +446,7 @@ export const approvalService = {
     }
   },
 
-  async rejectOrder(orderId: string | number, version: number, rejectionReason: string) {
+  async rejectOrder(orderId: string | number, version: number, rejectionReason: string): Promise<ApprovalActionResponse> {
     const useClientValidation = !hasQueuedMockResponse(http.post);
     if (useClientValidation && !rejectionReason.trim()) {
       throw validationError('驳回原因不能为空', 'MISSING_REJECTION_REASON');
@@ -451,7 +455,7 @@ export const approvalService = {
       throw validationError('驳回原因不能超过500字符', 'REJECTION_REASON_TOO_LONG');
     }
     try {
-      const response = await http.post(`/orders/${orderId}/reject`, {
+      const response = await http.post<ApprovalActionResponse>(`/orders/${orderId}/reject`, {
         version,
         rejectionReason,
       });
@@ -463,9 +467,9 @@ export const approvalService = {
     }
   },
 
-  async cancelOrder(orderId: string | number, version: number) {
+  async cancelOrder(orderId: string | number, version: number): Promise<ApprovalActionResponse> {
     try {
-      const response = await http.post(`/orders/${orderId}/cancel`, { version });
+      const response = await http.post<ApprovalActionResponse>(`/orders/${orderId}/cancel`, { version });
       if (!response && lastApprovalError) throw lastApprovalError;
       return response;
     } catch (error) {

@@ -24,7 +24,7 @@ import React, { useState, useMemo, useCallback } from 'react';
 import { ChevronDown, Search, X } from 'lucide-react';
 import { useAssets } from '@/hooks/useAssetById';
 import { Asset } from '@/types/asset';
-import { Spinner } from '@/components/ui/Spinner';
+import Spinner from '@/components/ui/Spinner';
 
 export interface AssetSelectorProps {
   /** Currently selected asset ID */
@@ -89,8 +89,8 @@ export const AssetSelector: React.FC<AssetSelectorProps> = ({
     const term = searchTerm.toLowerCase();
     return eligibleAssets.filter(
       (asset) =>
-        asset.assetCode.toLowerCase().includes(term) ||
-        asset.name.toLowerCase().includes(term) ||
+        (asset.assetCode ?? asset.assetNo).toLowerCase().includes(term) ||
+        (asset.name ?? asset.assetName).toLowerCase().includes(term) ||
         (asset.categoryName && asset.categoryName.toLowerCase().includes(term))
     );
   }, [eligibleAssets, searchTerm]);
@@ -98,7 +98,7 @@ export const AssetSelector: React.FC<AssetSelectorProps> = ({
   // Find selected asset details
   const selectedAsset = useMemo(() => {
     if (!value || !assets) return null;
-    return assets.find((asset) => asset.id === value);
+    return assets.find((asset) => String(asset.id) === value);
   }, [value, assets]);
   
   /**
@@ -106,7 +106,7 @@ export const AssetSelector: React.FC<AssetSelectorProps> = ({
    * @param asset - Selected asset object
    */
   const handleSelect = useCallback((asset: Asset) => {
-    onChange(asset.id);
+    onChange(String(asset.id));
     setIsOpen(false);
     setSearchTerm('');
   }, [onChange]);
@@ -145,16 +145,23 @@ export const AssetSelector: React.FC<AssetSelectorProps> = ({
   const renderAssetOption = (asset: Asset) => (
     <div
       key={asset.id}
-      className="px-3 py-2 cursor-pointer hover:bg-blue-50 border-b border-gray-200 last:border-b-0 transition-colors"
+      className="px-3 py-2 cursor-pointer hover:bg-blue-50 border-b border-gray-200 last:border-b-0 transition-colors focus:outline-none focus:bg-blue-50"
       onClick={() => handleSelect(asset)}
+      onKeyDown={(event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          handleSelect(asset);
+        }
+      }}
       role="option"
-      aria-selected={value === asset.id}
+      aria-selected={value === String(asset.id)}
+      tabIndex={0}
     >
       <div className="flex items-center justify-between">
         <div>
-          <div className="font-medium text-gray-900">{asset.name}</div>
+          <div className="font-medium text-gray-900">{asset.name ?? asset.assetName}</div>
           <div className="text-sm text-gray-400">
-            {asset.assetCode}
+            {asset.assetCode ?? asset.assetNo}
             {asset.categoryName && ` · ${asset.categoryName}`}
           </div>
         </div>
@@ -220,6 +227,7 @@ export const AssetSelector: React.FC<AssetSelectorProps> = ({
         `}
         aria-haspopup="listbox"
         aria-expanded={isOpen}
+        aria-label="选择报废资产"
       >
         <div className="flex-1 min-w-0">
           {selectedAsset ? (
@@ -237,6 +245,7 @@ export const AssetSelector: React.FC<AssetSelectorProps> = ({
                 onClick={handleClear}
                 className="ml-2 p-1 hover:bg-blue-50 rounded-full"
                 tabIndex={-1}
+                aria-label="清除已选资产"
               >
                 <X className="w-4 h-4 text-gray-400" />
               </button>
@@ -265,6 +274,7 @@ export const AssetSelector: React.FC<AssetSelectorProps> = ({
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="搜索资产编码或名称..."
                 className="w-full pl-8 pr-3 py-1.5 text-sm border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                aria-label="搜索可报废资产"
                 autoFocus
               />
             </div>

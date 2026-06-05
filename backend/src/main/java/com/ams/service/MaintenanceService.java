@@ -61,6 +61,7 @@ public class MaintenanceService {
         if (record.getAssetId() == null) record.setAssetId(0L);
         if (record.getContent() == null) record.setContent("");
         if (record.getMaintenanceDate() == null) record.setMaintenanceDate(java.time.LocalDate.now());
+        if (record.getSourceType() == null) record.setSourceType("MANUAL");
         maintenanceRecordMapper.insert(record);
         return record;
     }
@@ -77,6 +78,19 @@ public class MaintenanceService {
     public void deleteRecord(Long id) {
         getRecordById(id);
         maintenanceRecordMapper.deleteById(id);
+    }
+
+    /**
+     * 为维保记录关联工单。
+     *
+     * @param id 维保记录ID
+     * @param workOrderId 工单ID
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void linkWorkOrder(Long id, Long workOrderId) {
+        MaintenanceRecord record = getRecordById(id);
+        record.setWorkOrderId(workOrderId);
+        maintenanceRecordMapper.updateById(record);
     }
 
     public List<MaintenanceRecord> getUpcomingMaintenance(Integer days) {

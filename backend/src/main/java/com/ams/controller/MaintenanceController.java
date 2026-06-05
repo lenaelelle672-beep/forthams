@@ -2,7 +2,9 @@ package com.ams.controller;
 
 import com.ams.dto.MaintenanceCreateDTO;
 import com.ams.dto.MaintenanceUpdateDTO;
+import com.ams.entity.MaintenanceExecution;
 import com.ams.entity.MaintenanceRecord;
+import com.ams.service.MaintenanceExecutionService;
 import com.ams.service.MaintenanceService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ams.common.Result;
@@ -11,12 +13,15 @@ import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/maintenance")
 @RequiredArgsConstructor
 public class MaintenanceController {
 
     private final MaintenanceService maintenanceService;
+    private final MaintenanceExecutionService maintenanceExecutionService;
 
     @PreAuthorize("@ss.hasPermi('asset:maintenance:query')")
     @GetMapping("/list")
@@ -57,5 +62,24 @@ public class MaintenanceController {
     public Result<Void> delete(@PathVariable Long id) {
         maintenanceService.deleteRecord(id);
         return Result.success();
+    }
+
+    /**
+     * 关联维保记录到工单。
+     */
+    @PreAuthorize("@ss.hasPermi('asset:maintenance:edit')")
+    @PostMapping("/{id}/link-work-order")
+    public Result<Void> linkWorkOrder(@PathVariable Long id, @RequestParam Long workOrderId) {
+        maintenanceService.linkWorkOrder(id, workOrderId);
+        return Result.success();
+    }
+
+    /**
+     * 查询维保记录的执行跟踪。
+     */
+    @PreAuthorize("@ss.hasPermi('asset:maintenance:query')")
+    @GetMapping("/{id}/execution")
+    public Result<List<MaintenanceExecution>> getExecution(@PathVariable Long id) {
+        return Result.success(maintenanceExecutionService.getByMaintenanceRecordId(id));
     }
 }

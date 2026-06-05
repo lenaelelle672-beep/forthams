@@ -10,18 +10,20 @@
  * @enum {string}
  */
 export enum AssetStatus {
-  /** 正常 */
-  NORMAL = 'NORMAL',
-  /** 维修中 */
-  MAINTENANCE = 'MAINTENANCE',
   /** 闲置 */
   IDLE = 'IDLE',
-  /** 报废中 */
-  RETIREMENT_PENDING = 'RETIREMENT_PENDING',
+  /** 使用中 */
+  IN_USE = 'IN_USE',
+  /** 维修中 */
+  MAINTENANCE = 'MAINTENANCE',
+  /** 待报废 */
+  PENDING_RETIREMENT = 'PENDING_RETIREMENT',
   /** 已报废 */
   RETIRED = 'RETIRED',
-  /** 转让中 */
-  TRANSFER_PENDING = 'TRANSFER_PENDING',
+  /** 已报废处置 */
+  SCRAPPED = 'SCRAPPED',
+  /** 已清退 */
+  CLEARED = 'CLEARED',
 }
 
 /**
@@ -163,6 +165,8 @@ export enum ApprovalStatus {
   REJECTED = 'REJECTED',
   /** 已撤回 */
   WITHDRAWN = 'WITHDRAWN',
+  /** 已取消 */
+  CANCELLED = 'CANCELLED',
   /** 已过期 */
   EXPIRED = 'EXPIRED',
 }
@@ -345,3 +349,4 @@ export interface AssetStatistics {
   /** 已报废资产数 */
   retiredCount: number;
 }
+export type { Asset } from './asset';

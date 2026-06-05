@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router';
 import { ArrowLeft, Loader2, Send } from 'lucide-react';
+import DOMPurify from 'dompurify';
 import { workflowApi, type WorkflowDefinitionDTO } from '@/api/workflow';
 import { submitApproval } from '@/api/approval';
 
@@ -137,11 +138,11 @@ export default function WorkflowFormPage() {
         </div>
       </div>
 
-      {/* Form HTML */}
+      {/* Form HTML — 经过 DOMPurify 安全过滤，防止 XSS 攻击（P2-06） */}
       <div
         ref={formContainerRef}
         className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm"
-        dangerouslySetInnerHTML={{ __html: formSource }}
+        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(formSource) }}
       />
 
       {/* Error / success feedback */}

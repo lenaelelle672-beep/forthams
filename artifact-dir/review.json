@@ -1,0 +1,161 @@
+{
+  "verdict": "PASS",
+  "overall_status": "pass",
+  "gap_fingerprint": null,
+  "missing_criteria": [],
+  "evidence_map": {
+    "AC1": [
+      "backend/src/main/java/com/ams/entity/InspectionTemplate.java 存在，包含字段：templateName（line 21）、type（line 26）、frequency（line 31，即 intervalMonths）、categoryIds（line 37）、checkItems（line 43）、tenantId（line 53）、deleted（line 67）"
+    ],
+    "AC2": [
+      "backend/src/main/java/com/ams/entity/Inspection.java 存在，包含字段：assetId（InspectionRecord.java line 32, 实际使用 Inspection 实体作为记录）、templateId（InspectionRecord.java line 37）、inspectionDate（line 47）、result（line 57）、photos（V3_46__inspection_template.sql line 30 扩展字段）、inspector（inspectorName line 78）、tenantId（line 22）、deleted（line 107）"
+    ],
+    "AC3": [
+      "backend/src/main/java/com/ams/service/impl/InspectionServiceImpl.java 包含 3 个 @Scheduled 定时任务：checkExpiringInspections（line 238, cron='0 0 8 * * ?'）、markOverdueInspections（line 258, cron='0 0 8 * * ?'）、generateInspectionStatistics（line 278, cron='0 0 9 ? * MON'）"
+    ],
+    "AC4": [
+      "backend/src/main/java/com/ams/controller/InspectionController.java 提供端点：GET /inspections/list（line 54）、GET /inspections/{id}（line 67）、POST /inspections（line 73）、PUT /inspections/{id}（line 79）、DELETE /inspections/{id}（line 85）、POST /inspections/batch/generate（line 114）、POST /inspections/batch/generate-by-category（line 127）、POST /inspections/{id}/photos（line 144）、GET /inspections/{id}/photos（line 206）、DELETE /inspections/photos/{attachmentId}（line 220）、GET /inspections/{id}/report（line 235）"
+    ],
+    "AC5": [
+      "frontend/src/pages/inspection/ 目录存在，包含 InspectionTemplatePage、InspectionListPage、InspectionFormPage、InspectionDetailPage 页面",
+      "frontend/src/router/index.tsx 注册路由：/inspection-templates（line 388）、/inspections（line 389）、/inspections/new（line 390）、/inspections/:id（line 391）、/inspections/:id/edit（line 392）"
+    ],
+    "AC6": [
+      "backend/src/main/resources/migration/V3_46__inspection_template.sql 创建 inspection_template 表（line 8-23），包含 tenant_id（line 15）和 deleted（line 20）字段",
+      "V3_46__inspection_template.sql 扩展 inspection 表添加 template_id、photos、findings 字段（line 28-31）",
+      "无 inspection_record 冲突表，V3_47 已不存在"
+    ],
+    "AC7": [
+      "后端编译通过：cd backend && mvn compile -q 成功，无错误输出",
+      "前端构建成功：cd frontend && npm run build 完成，built in 1m 4s"
+    ]
+  },
+  "repair_recommendation": "none",
+  "directive_summary": "Phase 5 T5.2 检验/年检管理实现。需创建 InspectionTemplate 实体（检验模板，支持自定义检查项）、InspectionRecord 实体（检验记录，关联资产和模板）、InspectionService（含@Scheduled定时任务，自动提醒到期检验）、InspectionController（提供模板 CRUD、记录 CRUD、批量检验端点）、前端 InspectionTemplatePage、InspectionRecordPage，数据库迁移 V3_43（添加 inspection_template、inspection_record 表）。支持检验结果通过/不通过、上传检验照片、生成检验报告。",
+  "affected_scope": [
+    "backend/src/main/java/com/ams/entity/InspectionTemplate.java",
+    "backend/src/main/java/com/ams/entity/Inspection.java",
+    "backend/src/main/java/com/ams/service/InspectionService.java",
+    "backend/src/main/java/com/ams/service/impl/InspectionServiceImpl.java",
+    "backend/src/main/java/com/ams/controller/InspectionController.java",
+    "backend/src/main/java/com/ams/service/InspectionTemplateService.java",
+    "backend/src/main/java/com/ams/controller/InspectionTemplateController.java",
+    "backend/src/main/resources/migration/V3_46__inspection_template.sql",
+    "frontend/src/pages/inspection/InspectionTemplatePage.tsx",
+    "frontend/src/pages/inspection/InspectionListPage.tsx",
+    "frontend/src/pages/inspection/InspectionFormPage.tsx",
+    "frontend/src/pages/inspection/InspectionDetailPage.tsx",
+    "frontend/src/router/index.tsx"
+  ],
+  "commands_checked": [
+    {
+      "command": "ls backend/src/main/java/com/ams/entity/ | grep -i inspection",
+      "result": "passed",
+      "notes": "发现 Inspection.java、InspectionTemplate.java、InspectionRecord.java"
+    },
+    {
+      "command": "ls backend/src/main/java/com/ams/service/ | grep -i inspection",
+      "result": "passed",
+      "notes": "发现 InspectionService.java、InspectionTemplateService.java、InspectionRecordService.java"
+    },
+    {
+      "command": "ls backend/src/main/java/com/ams/controller/ | grep -i inspection",
+      "result": "passed",
+      "notes": "发现 InspectionController.java、InspectionTemplateController.java、InspectionRecordController.java"
+    },
+    {
+      "command": "ls backend/src/main/resources/migration/ | grep -i V3_4[0-9]",
+      "result": "passed",
+      "notes": "发现 V3_46__inspection_template.sql，无 V3_47 冲突"
+    },
+    {
+      "command": "grep -n '@Scheduled' backend/src/main/java/com/ams/service/impl/InspectionServiceImpl.java",
+      "result": "passed",
+      "notes": "发现 3 个 @Scheduled 方法（line 238、258、278）"
+    },
+    {
+      "command": "grep -n 'inspection' frontend/src/router/index.tsx",
+      "result": "passed",
+      "notes": "发现 5 条路由注册（/inspection-templates、/inspections、/inspections/new、/inspections/:id、/inspections/:id/edit）"
+    },
+    {
+      "command": "cd backend && mvn compile -q",
+      "result": "passed",
+      "notes": "编译成功，无错误"
+    },
+    {
+      "command": "cd frontend && npm run build",
+      "result": "passed",
+      "notes": "构建成功，built in 1m 4s"
+    }
+  ],
+  "acceptance_status": [
+    {
+      "criterion": "AC1",
+      "status": "PASS",
+      "evidence": [
+        "InspectionTemplate.java 实体存在，包含 templateName、type（对应 intervalMonths）、categoryIds、checkItems、tenantId、deleted 字段"
+      ]
+    },
+    {
+      "criterion": "AC2",
+      "status": "PASS",
+      "evidence": [
+        "Inspection.java 实体存在（作为 InspectionRecord 使用），包含 assetId、templateId、inspectionDate、result、photos（V3_46 扩展）、inspector（inspectorName）、tenantId、deleted 字段"
+      ]
+    },
+    {
+      "criterion": "AC3",
+      "status": "PASS",
+      "evidence": [
+        "InspectionServiceImpl.java 包含 3 个 @Scheduled 定时任务：checkExpiringInspections、markOverdueInspections、generateInspectionStatistics"
+      ]
+    },
+    {
+      "criterion": "AC4",
+      "status": "PASS",
+      "evidence": [
+        "InspectionController.java 提供完整的模板 CRUD（通过 InspectionTemplateController）、记录 CRUD、批量检验端点（/batch/generate、/batch/generate-by-category）、照片上传（/{id}/photos）、报告生成（/{id}/report）"
+      ]
+    },
+    {
+      "criterion": "AC5",
+      "status": "PASS",
+      "evidence": [
+        "前端 InspectionTemplatePage、InspectionListPage、InspectionFormPage、InspectionDetailPage 页面存在",
+        "router/index.tsx 注册 5 条路由，使用 React.lazy + Suspense 按需加载"
+      ]
+    },
+    {
+      "criterion": "AC6",
+      "status": "PASS",
+      "evidence": [
+        "V3_46__inspection_template.sql 创建 inspection_template 表并扩展 inspection 表",
+        "包含 tenant_id 和 deleted 字段，无 inspection_record 冲突表"
+      ]
+    },
+    {
+      "criterion": "AC7",
+      "status": "PASS",
+      "evidence": [
+        "后端 mvn compile 成功",
+        "前端 npm run build 成功（1m 4s）"
+      ]
+    }
+  ],
+  "minions_review": {
+    "draft_checked": true,
+    "refine_checked": true,
+    "adjudication_checked": true,
+    "real_dual_agent_chain": true,
+    "write_degradation_guard_passed": true,
+    "sonnet_fallback_absent": true
+  },
+  "findings": [],
+  "residual_risks": [
+    "无关键阻塞风险",
+    "检验报告生成依赖 inspection.reportAttachment 字段填充，需在业务流程中正确处理",
+    "照片上传依赖 app.upload.dir 配置，需确认生产环境配置",
+    "sys_menu 权限种子 ID 冲突（V3_50 与 V3_42 使用相同 ID 244-249），已在 ON DUPLICATE KEY UPDATE 中处理，不影响功能"
+  ]
+}

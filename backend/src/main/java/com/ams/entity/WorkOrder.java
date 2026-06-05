@@ -42,13 +42,14 @@ public class WorkOrder {
     private String completionNote;
     @TableField(exist = false)
     private List<String> collaborators;
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private List<String> attachments;
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
-    @TableField(exist = false)
+    private Long faultCodeId;
     private LocalDateTime slaDeadline;
-    @TableField(exist = false)
     private String slaStatus;
     @TableLogic
     private Integer deleted;

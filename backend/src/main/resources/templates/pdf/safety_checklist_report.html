@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>安全检查报告</title>
+    <style>
+        body {
+            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 30px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #1890ff;
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            color: #1890ff;
+            margin: 0;
+            font-size: 24px;
+        }
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        .info-table th, .info-table td {
+            border: 1px solid #e0e0e0;
+            padding: 10px;
+            text-align: left;
+        }
+        .info-table th {
+            background-color: #f5f5f5;
+            width: 30%;
+        }
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        .items-table th, .items-table td {
+            border: 1px solid #e0e0e0;
+            padding: 10px;
+            text-align: left;
+        }
+        .items-table th {
+            background-color: #1890ff;
+            color: #fff;
+        }
+        .status-pass {
+            color: #52c41a;
+            font-weight: bold;
+        }
+        .status-fail {
+            color: #ff4d4f;
+            font-weight: bold;
+        }
+        .status-na {
+            color: #999;
+        }
+        .photos {
+            margin-top: 10px;
+        }
+        .photos img {
+            max-width: 200px;
+            max-height: 200px;
+            margin: 5px;
+            border: 1px solid #e0e0e0;
+        }
+        .footer {
+            text-align: center;
+            color: #999;
+            font-size: 12px;
+            margin-top: 30px;
+            border-top: 1px solid #e0e0e0;
+            padding-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 th:text="${template?.templateName ?: '安全检查报告'}">安全检查报告</h1>
+        </div>
+
+        <!-- 执行记录信息 -->
+        <table class="info-table">
+            <tr>
+                <th>执行编号</th>
+                <td th:text="${execution?.id}">-</td>
+            </tr>
+            <tr>
+                <th>资产编号</th>
+                <td th:text="${execution?.assetId}">-</td>
+            </tr>
+            <tr>
+                <th>执行日期</th>
+                <td th:text="${execution?.executeDate}">-</td>
+            </tr>
+            <tr>
+                <th>执行状态</th>
+                <td th:text="${execution?.status}">-</td>
+            </tr>
+            <tr>
+                <th>总体结果</th>
+                <td th:text="${execution?.overallResult}">-</td>
+            </tr>
+            <tr>
+                <th>执行人</th>
+                <td th:text="${execution?.executorId}">-</td>
+            </tr>
+            <tr>
+                <th>报告生成时间</th>
+                <td th:text="${#temporals.format(reportTime, 'yyyy-MM-dd HH:mm:ss')}">-</td>
+            </tr>
+        </table>
+
+        <!-- 检查项结果 -->
+        <h2>检查项结果</h2>
+        <table class="items-table">
+            <thead>
+                <tr>
+                    <th>序号</th>
+                    <th>检查项名称</th>
+                    <th>类型</th>
+                    <th>结果</th>
+                    <th>备注</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="item, stat : ${items}">
+                    <td th:text="${stat.count}">1</td>
+                    <td th:text="${item?.itemName}">-</td>
+                    <td th:text="${item?.itemType}">-</td>
+                    <td>
+                        <span th:each="result : ${results}"
+                              th:if="${result?.itemId == item?.id}"
+                              th:class="${result?.result == 'PASS' ? 'status-pass' : (result?.result == 'FAIL' ? 'status-fail' : 'status-na')}"
+                              th:text="${result?.result}">-</span>
+                    </td>
+                    <td>
+                        <div th:each="result : ${results}" th:if="${result?.itemId == item?.id}">
+                            <div th:if="${result?.note != null}" th:text="${result?.note}">-</div>
+                            <div th:if="${result?.reading != null}" th:text="'读数: ' + ${result?.reading}">-</div>
+                            <div class="photos" th:if="${photosByResultId != null and photosByResultId.containsKey(result?.id)}">
+                                <div th:each="photo : ${photosByResultId.get(result?.id)}">
+                                    <img th:src="${photo?.filePath}" th:alt="${photo?.fileName}" />
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="footer">
+            <p>本报告由 AMS 系统自动生成</p>
+            <p th:text="'生成时间: ' + ${#temporals.format(reportTime, 'yyyy-MM-dd HH:mm:ss')}">生成时间</p>
+        </div>
+    </div>
+</body>
+</html>

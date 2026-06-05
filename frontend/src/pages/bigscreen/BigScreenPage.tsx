@@ -182,7 +182,7 @@ const CSS = `
   position: relative;
   z-index: 2;
   display: grid;
-  grid-template-columns: 30.8% minmax(430px, 38.4%) 30.8%;
+  grid-template-columns: minmax(260px, 1fr) minmax(320px, 1.25fr) minmax(260px, 1fr);
   gap: 24px;
   width: 100%;
   height: 100%;
@@ -204,7 +204,11 @@ const CSS = `
   display: flex;
   flex-direction: column;
   gap: 14px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
 }
+.bs-side::-webkit-scrollbar { display: none; }
 
 .bs-center {
   z-index: 3;
@@ -216,10 +220,13 @@ const CSS = `
 .bs-center-tabs {
   position: absolute;
   top: 0;
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 7;
   display: flex;
   align-items: center;
   border: 1px solid rgba(93, 176, 255, 0.34);
+  border-radius: 0 0 4px 4px;
   background: rgba(8, 39, 88, 0.64);
   box-shadow: inset 0 0 16px rgba(75, 171, 255, 0.08);
 }

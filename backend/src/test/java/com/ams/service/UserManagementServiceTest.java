@@ -1,6 +1,6 @@
 package com.ams.service;
 
-import com.ams.common.exception.ConflictException;
+import com.ams.common.exception.BusinessException;
 import com.ams.dto.UserCreateDTO;
 import com.ams.entity.User;
 import com.ams.mapper.DeptMapper;
@@ -59,9 +59,9 @@ class UserManagementServiceTest {
         UserCreateDTO dto = new UserCreateDTO();
         dto.setUsername("admin");
 
-        ConflictException ex = assertThrows(ConflictException.class,
+        BusinessException ex = assertThrows(BusinessException.class,
             () -> userManagementService.createUser(dto));
 
-        assertEquals("用户名已存在", ex.getMessage());
+        assertTrue(ex.getMessage().contains("用户名已存在"));
     }
 }

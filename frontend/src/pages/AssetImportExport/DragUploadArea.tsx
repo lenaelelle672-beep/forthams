@@ -35,25 +35,25 @@ import {
   Filter,
   Trash2,
 } from 'lucide-react';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/Tabs';
+import { Button } from '@/components/ui/Button';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '@/components/ui/Select';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Progress } from '@/components/ui/progress';
-import { Badge } from '@/components/ui/badge';
+} from '@/components/ui/Card';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/Alert';
+import { Progress } from '@/components/ui/Progress';
+import { Badge } from '@/components/ui/Badge';
 import { toast } from 'sonner';
 
 /* ------------------------------------------------------------------ */

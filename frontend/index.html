@@ -5,6 +5,16 @@
       <meta charset="UTF-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <title>资产管理平台</title>
+      <!-- 防闪烁：在 CSS 加载前同步应用深色主题 -->
+      <script>
+        (function() {
+          try {
+            var t = localStorage.getItem('theme-config');
+            var dark = t === 'dark' || (t !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+            if (dark) document.documentElement.classList.add('dark');
+          } catch(e) {}
+        })();
+      </script>
     </head>
 
     <body>

@@ -216,3 +216,8 @@ export const INITIAL_AUDIT_DASHBOARD_STATE: AuditDashboardState = {
   status: AuditDataStatus.IDLE,
   errorMessage: null,
 };
+
+export interface AuditableFieldMetadata { field: string; label: string; displayName?: string; defaultValue?: unknown; type?: string; required?: boolean; }
+export interface AuditEvent { id: string | number; action?: string; operationType?: string; operator?: string; createdAt?: string; timestamp?: string | number | Date; [key: string]: unknown; }
+export interface AuditBindingConfig { assetId?: string; entityType?: string; entityId?: string | number; fields?: AuditableFieldMetadata[]; enableRealtime?: boolean; enableGraphify?: boolean; cacheTimeout?: number; maxRetries?: number; retryDelay?: number; [key: string]: unknown; }
+export interface AuditLog { id: string | number; action?: string; operationType?: string; operator?: string; createdAt?: string; timestamp?: string | number | Date; detail?: string; [key: string]: unknown; }

@@ -1,0 +1,63 @@
+name: CI Pipeline
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'backend/**'
+      - 'frontend/**'
+      - '.github/workflows/**'
+  workflow_dispatch:
+
+env:
+  JAVA_VERSION: '17'
+  NODE_VERSION: '20'
+
+jobs:
+  build-and-test:
+    name: Build & Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # ---- Java 17 ----
+      - name: Setup Java ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: 'temurin'
+          cache: 'maven'
+          cache-dependency-path: backend/pom.xml
+
+      # ---- Node 20 ----
+      - name: Setup Node ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      # ---- Frontend: install dependencies ----
+      - name: Install Frontend Dependencies
+        run: npm ci
+        working-directory: frontend
+
+      # ---- Frontend: build ----
+      - name: Frontend Build
+        run: npm run build
+        working-directory: frontend
+
+      # ---- TypeScript strict check ----
+      - name: TypeScript Check
+        run: npx tsc --noEmit
+        working-directory: frontend
+
+      # ---- Frontend: unit tests ----
+      - name: Frontend Test
+        run: npm test -- --run
+        working-directory: frontend
+
+      # ---- Backend: unit tests ----
+      - name: Backend Test
+        run: mvn test -q
+        working-directory: backend

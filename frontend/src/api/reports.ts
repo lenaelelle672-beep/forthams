@@ -87,3 +87,34 @@ export const getWorkOrderStatusDistribution = () =>
 /** 获取各部门待处理工单数量 */
 export const getWorkOrderDeptPending = () =>
   http.get<ApiResponse<NameValueItem[]>>('/workorders/dept-pending');
+
+// ── PDF 导出 ────────────────────────────────────────────────────────────────
+
+/**
+ * 导出 PDF 报表（资产台账 / 工单统计等）
+ *
+ * @param type  报表类型标识（对应后端 templates/pdf/ 下的模板文件前缀）
+ * @param params 可选的模板参数
+ * @returns Blob 对象（PDF 二进制流）
+ */
+export const exportReportPdf = (type: string, params?: Record<string, unknown>) =>
+  http.post<Blob>(`/reports/${type}/export-pdf`, params ?? {}, {
+    responseType: 'blob',
+  });
+
+/**
+ * 触发浏览器下载 Blob 文件
+ *
+ * @param blob     二进制数据
+ * @param filename 下载文件名
+ */
+export function downloadBlob(blob: Blob, filename: string): void {
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement('a');
+  anchor.href = url;
+  anchor.download = filename;
+  document.body.appendChild(anchor);
+  anchor.click();
+  document.body.removeChild(anchor);
+  URL.revokeObjectURL(url);
+}

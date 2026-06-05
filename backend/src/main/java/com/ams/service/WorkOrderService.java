@@ -39,6 +39,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.ams.state.WorkOrderStateMachine;
+import com.ams.state.WorkOrderStateMachine.WorkOrderEvent;
+import com.ams.state.WorkOrderStateMachine.StateTransitionException;
+import com.ams.enums.OrderStatus;
+import com.ams.state.WorkOrderStateMachine;
+import com.ams.state.WorkOrderStateMachine.WorkOrderEvent;
+import com.ams.state.WorkOrderStateMachine.StateTransitionException;
+import com.ams.enums.OrderStatus;
 import com.ams.annotation.DataScope;
 @Service
 @RequiredArgsConstructor
@@ -59,15 +67,24 @@ public class WorkOrderService {
     private final ApprovalProcessMapper approvalProcessMapper;
     private final UserMapper userMapper;
     private final NotificationService notificationService;
+    private final SlaService slaService;
 
     @DataScope(deptColumn = "dept_id", userColumn = "reporter_id")
     public Page<WorkOrder> queryWorkOrders(Integer page, Integer pageSize, String status, String keyword) {
+        return queryWorkOrders(page, pageSize, status, keyword, null);
+    }
+
+    @DataScope(deptColumn = "dept_id", userColumn = "reporter_id")
+    public Page<WorkOrder> queryWorkOrders(Integer page, Integer pageSize, String status, String slaStatus, String keyword) {
         String tenantId = TenantContext.requireTenantId();
         Page<WorkOrder> pageObj = new Page<>(page, pageSize);
         LambdaQueryWrapper<WorkOrder> wrapper = new LambdaQueryWrapper<WorkOrder>()
                 .eq(WorkOrder::getTenantId, tenantId);
         if (StringUtils.hasText(status)) {
             wrapper.eq(WorkOrder::getStatus, status);
+        }
+        if (StringUtils.hasText(slaStatus)) {
+            wrapper.eq(WorkOrder::getSlaStatus, slaStatus);
         }
         if (StringUtils.hasText(keyword)) {
             wrapper.and(w -> w.like(WorkOrder::getTitle, keyword)
@@ -87,6 +104,10 @@ public class WorkOrderService {
         workOrder.setPriority(normalizePriorityForWrite(dto.getPriority()));
         workOrder.setTenantId(tenantId);
         workOrder.setStatus("DRAFT");
+        // 计算 SLA 截止时间（基于创建时间 + 优先级对应的解决时限）
+        LocalDateTime now = LocalDateTime.now();
+        workOrder.setSlaDeadline(slaService.calculateSlaDeadline(workOrder.getPriority(), now));
+        workOrder.setSlaStatus("NORMAL");
         int retries = 3;
         while (retries > 0) {
             try {
@@ -110,8 +131,15 @@ public class WorkOrderService {
         if (!isEditableStatus(workOrder.getStatus())) {
             throw new BusinessException("只有草稿或已驳回状态的工单可以修改");
         }
+        String oldPriority = workOrder.getPriority();
         BeanUtil.copyProperties(dto, workOrder, "id", "workOrderNo", "status", "createTime", "updateTime");
         workOrder.setPriority(normalizePriorityForWrite(dto.getPriority()));
+        // 优先级变更时重新计算 SLA 截止时间
+        if (!workOrder.getPriority().equals(oldPriority)) {
+            LocalDateTime createdAt = workOrder.getCreateTime() != null ? workOrder.getCreateTime() : LocalDateTime.now();
+            workOrder.setSlaDeadline(slaService.calculateSlaDeadline(workOrder.getPriority(), createdAt));
+            workOrder.setSlaStatus("NORMAL");
+        }
         workOrderMapper.updateById(workOrder);
         return workOrder;
     }
@@ -160,50 +188,132 @@ public class WorkOrderService {
         String normalizedOperation = StringUtils.hasText(operation)
                 ? operation.trim().toLowerCase(Locale.ROOT)
                 : "";
-        switch (normalizedOperation) {
+
+        // 1. 确定状态机事件
+        WorkOrderEvent event = mapOperationToEvent(normalizedOperation);
+        if (event == null) {
+            throw new BusinessException("不支持的操作: " + operation);
+        }
+
+        // 2. 解析当前状态
+        OrderStatus currentStatus = parseOrderStatus(workOrder.getStatus());
+        if (currentStatus == null) {
+            throw new BusinessException("当前工单状态异常: " + workOrder.getStatus());
+        }
+
+        // 3. 创建状态机实例并执行转换（状态机只管理状态转换）
+        OrderStatus newStatus;
+        try {
+            WorkOrderStateMachine stateMachine = new WorkOrderStateMachine(currentStatus);
+            newStatus = stateMachine.transition(event, normalizedOperation.equals("reject") ? comment : null);
+        } catch (StateTransitionException e) {
+            throw new BusinessException(e.getMessage());
+        }
+
+        // 4. 设置转换后的状态
+        String oldStatus = workOrder.getStatus();
+        workOrder.setStatus(newStatus.name());
+
+        // 5. 副作用处理（Service 保留，状态机不处理副作用）
+        handleTransitionSideEffects(workOrder, normalizedOperation, comment);
+
+        workOrderMapper.updateById(workOrder);
+
+        // 6. 状态变更通知
+        if (!oldStatus.equals(workOrder.getStatus())) {
+            sendWorkOrderNotification(workOrder, switch (normalizedOperation) {
+                case "approve" -> "审批通过";
+                case "reject" -> "驳回";
+                case "start" -> "开始执行";
+                case "complete" -> "完成";
+                case "cancel" -> "取消";
+                default -> "操作";
+            });
+        }
+
+        return workOrder;
+    }
+
+    /**
+     * 将操作字符串映射为状态机事件。
+     */
+    private WorkOrderEvent mapOperationToEvent(String operation) {
+        if (operation == null) return null;
+        return switch (operation) {
+            case "approve" -> WorkOrderEvent.APPROVE;
+            case "reject" -> WorkOrderEvent.REJECT;
+            case "start" -> WorkOrderEvent.START;
+            case "complete" -> WorkOrderEvent.COMPLETE;
+            case "cancel" -> WorkOrderEvent.CANCEL;
+            case "hold" -> WorkOrderEvent.PUT_ON_HOLD;
+            case "resume" -> WorkOrderEvent.RESUME;
+            case "submit-acceptance" -> WorkOrderEvent.SUBMIT_ACCEPTANCE;
+            case "accept" -> WorkOrderEvent.ACCEPT;
+            case "reject-acceptance" -> WorkOrderEvent.REJECT_ACCEPTANCE;
+            default -> null;
+        };
+    }
+
+    /**
+     * 将状态字符串解析为 OrderStatus 枚举。
+     */
+    private OrderStatus parseOrderStatus(String status) {
+        if (status == null) return null;
+        try {
+            return OrderStatus.valueOf(status);
+        } catch (IllegalArgumentException e) {
+            log.warn("Unknown OrderStatus string: {}", status);
+            return null;
+        }
+    }
+
+    /**
+     * 处理状态转换的副作用（状态机只负责状态转换，不处理副作用）。
+     * 副作用包括：actualStartDate、actualEndDate、completionNote、upsertApprovalProcess 等。
+     */
+    private void handleTransitionSideEffects(WorkOrder workOrder, String operation, String comment) {
+        switch (operation) {
             case "approve":
-                if (!"PENDING".equals(workOrder.getStatus())) {
-                    throw new BusinessException("只有待审批状态的工单可以审批");
-                }
-                workOrder.setStatus("APPROVED");
                 upsertApprovalProcess(workOrder, "APPROVED", comment);
                 break;
             case "reject":
-                if (!"PENDING".equals(workOrder.getStatus())) {
-                    throw new BusinessException("只有待审批状态的工单可以驳回");
-                }
-                workOrder.setStatus("REJECTED");
                 upsertApprovalProcess(workOrder, "REJECTED", comment);
                 break;
             case "start":
-                if (!"APPROVED".equals(workOrder.getStatus())) {
-                    throw new BusinessException("只有已审批状态的工单可以开始执行");
-                }
-                workOrder.setStatus("EXECUTING");
                 workOrder.setActualStartDate(LocalDateTime.now());
                 break;
             case "complete":
-                if (!"EXECUTING".equals(workOrder.getStatus())) {
-                    throw new BusinessException("只有执行中的工单可以完成");
-                }
-                workOrder.setStatus("COMPLETED");
                 workOrder.setActualEndDate(LocalDateTime.now());
                 if (StringUtils.hasText(comment)) {
                     workOrder.setCompletionNote(comment);
                 }
                 break;
             case "cancel":
-                if (!isCancellableStatus(workOrder.getStatus())) {
-                    throw new BusinessException("只有草稿或待审批状态的工单可以取消");
-                }
-                workOrder.setStatus("CANCELLED");
                 upsertApprovalProcess(workOrder, "CANCELLED", comment);
                 break;
+            case "hold":
+                // 挂起副作用由 WorkOrderHoldService 处理
+                break;
+            case "resume":
+                // 恢复副作用由 WorkOrderHoldService 处理
+                break;
+            case "submit-acceptance":
+                // 提交验收，记录状态文字即可
+                break;
+            case "accept":
+                workOrder.setActualEndDate(LocalDateTime.now());
+                if (StringUtils.hasText(comment)) {
+                    workOrder.setCompletionNote(comment);
+                }
+                break;
+            case "reject-acceptance":
+                if (StringUtils.hasText(comment)) {
+                    workOrder.setCompletionNote(comment);
+                }
+                break;
             default:
-                throw new BusinessException("不支持的操作: " + operation);
+                // no side effects for unknown operations
         }
-        workOrderMapper.updateById(workOrder);
-        return workOrder;
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -473,6 +583,19 @@ public class WorkOrderService {
     }
 
     /**
+     * 完成维保执行对应的工单状态流转。
+     * <p>将工单从 EXECUTING 流转至 COMPLETED。由 MaintenanceExecutionService
+     * 在施工完成时调用，保证两个模块的状态机一致。</p>
+     *
+     * @param workOrderId 工单ID
+     * @param comment 完成备注
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void completeExecution(Long workOrderId, String comment) {
+        operateWorkOrder(workOrderId, "complete", comment);
+    }
+
+    /**
      * 获取工单状态分布统计。
      *
      * <p>使用 SQL GROUP BY 查询替代全量+内存分组，提升性能。
@@ -491,6 +614,9 @@ public class WorkOrderService {
             statusLabels.put("DRAFT", "草稿");
             statusLabels.put("REJECTED", "已驳回");
             statusLabels.put("CANCELLED", "已取消");
+            statusLabels.put("ON_HOLD", "挂起中");
+            statusLabels.put("PENDING_ACCEPTANCE", "待验收");
+            statusLabels.put("ACCEPTANCE_REJECTED", "验收驳回");
             for (StatusDistributionDTO item : list) {
                 item.setName(statusLabels.getOrDefault(item.getName(), item.getName()));
             }

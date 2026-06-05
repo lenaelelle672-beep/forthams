@@ -26,6 +26,9 @@ import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { DataTable, type Column } from '@/components/ui/DataTable';
+import { MagicCard } from '@/components/ui/MagicCard';
+import { GlowEffect } from '@/components/ui/GlowEffect';
+import { BouncePress, ParallaxFloat } from '@/components/ui/MicroInteraction';
 import { SkeletonCard } from '@/components/ui/Skeleton';
 
 const PIE_COLORS = ['#2563eb', '#004ac6', '#505f76', '#943700', '#737686', '#d8dadc'];
@@ -34,8 +37,8 @@ const WO_STATUS_BADGE: Record<string, { label: string; variant: 'default' | 'suc
   PENDING:           { label: '待处理',  variant: 'default'  },
   IN_PROGRESS:       { label: '进行中',  variant: 'success'  },
   COMPLETED:         { label: '已完成',  variant: 'success'  },
-  APPROVING_LEVEL_1: { label: '审批中',  variant: 'warning'  },
   REJECTED:          { label: '已驳回',  variant: 'danger'   },
+  EXECUTING:         { label: '进行中',  variant: 'success'  },
   CANCELLED:         { label: '已取消',  variant: 'gray'     },
 };
 
@@ -67,7 +70,7 @@ export default function DashboardPage() {
     staleTime: 1000 * 60 * 5,
   });
 
-  const { data: trendsRes } = useQuery({
+  const { data: trendsRes, isLoading: trendsLoading } = useQuery({
     queryKey: ['dashboard', 'trends', 12],
     queryFn: () => getAssetValueTrends(365),
     staleTime: 1000 * 60 * 15,
@@ -155,22 +158,22 @@ export default function DashboardPage() {
 
   const woColumns: Column<any>[] = [
     {
-      key: 'orderNo', title: '工单编号', width: 130,
+      key: 'workOrderNo', title: '工单编号', width: 130,
       render: (v) => <span className="font-mono text-xs text-[#004ac6] font-medium">{String(v)}</span>,
     },
     { key: 'title',  title: '标题' },
     {
       key: 'type', title: '类型', width: 70,
       render: (v) => {
-        const color = String(v) === '抢修' ? 'bg-orange-50 text-orange-700' : 'bg-blue-50 text-blue-700';
+        const color = String(v) === '抢修' ? 'bg-orange-50 text-orange-700' : 'bg-blue-50 dark:bg-blue-900/30 text-blue-700';
         return <span className={`text-[11px] font-bold px-2 py-0.5 rounded ${color}`}>{String(v)}</span>;
       },
     },
     {
       key: 'priority', title: '优先级', width: 70,
       render: (v) => {
-        const map: Record<string, string> = { '高': 'bg-red-50 text-red-700', '中': 'bg-blue-50 text-blue-700', '低': 'bg-gray-50 text-gray-700' };
-        const cls = map[String(v)] ?? 'bg-gray-50 text-gray-700';
+        const map: Record<string, string> = { '高': 'bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300', '中': 'bg-blue-50 dark:bg-blue-900/30 text-blue-700', '低': 'bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300' };
+        const cls = map[String(v)] ?? 'bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300';
         return <span className={`text-[11px] font-bold px-2 py-0.5 rounded ${cls}`}>{String(v)}</span>;
       },
     },
@@ -188,62 +191,66 @@ export default function DashboardPage() {
       },
     },
     {
-      key: 'createdAt', title: '创建时间', width: 110,
-      render: (v) => <span className="text-xs text-[#64748b]">{String(v)}</span>,
+      key: 'createTime', title: '创建时间', width: 110,
+      render: (v) => <span className="text-xs text-[#64748b] dark:text-gray-400">{String(v)}</span>,
     },
   ];
 
   return (
     <div className="p-6 space-y-6">
       <PageHeader
-        title="仪表板"
+        title="仪表板与数据分析"
         subtitle={`欢迎回来，系统管理员 · ${dateStr}`}
-        actions={
+         actions={
           <>
-             <Button variant="outline" size="md" onClick={() => {
-                const kpiRows = [
-                  ['指标', '数值'],
-                  ['总资产数', String(stats?.totalAssets ?? '')],
-                  ['在用资产', String(stats?.inUseAssets ?? '')],
-                  ['闲置资产', String(stats?.idleAssets ?? '')],
-                  ['维保中资产', String(stats?.maintenanceAssets ?? '')],
-                  ['报废资产', String(stats?.scrapAssets ?? '')],
-                  ['资产总值', String(stats?.totalValue ?? '')],
-                  ['资产净值', String(stats?.netValue ?? '')],
-                  ['待审批数', String(stats?.pendingApprovals ?? '')],
-                ];
-                const trendRows = [
-                  [],
-                  ['资产价值趋势 (近12个月)'],
-                  ['月份', '总价值(万)', '净值(万)'],
-                  ...trendData.map(t => [t.month, String(t.total), String(t.net)]),
-                ];
-                const deptRows = [
-                  [],
-                  ['部门资产统计 (Top 5)'],
-                  ['部门', '资产数量', '占比'],
-                  ...departmentStats.map(d => [d.name, d.count, `${d.pct}%`]),
-                ];
-                const categoryRows = [
-                  [],
-                  ['分类分布'],
-                  ['分类', '数量'],
-                  ...categoryData.map(c => [c.name, String(c.value)]),
-                ];
-                const csv = [...kpiRows, ...trendRows, ...deptRows, ...categoryRows].map(r => r.join(',')).join('\n');
-                const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url; a.download = `dashboard-full-${new Date().toISOString().slice(0, 10)}.csv`;
-                a.click(); URL.revokeObjectURL(url);
-              }}>
-               <Download className="w-4 h-4" />
-               导出数据
-             </Button>
-            <Button variant="primary" size="md" onClick={handleRefresh}>
-              <RefreshCw className="w-4 h-4" />
-              刷新视图
-            </Button>
+             <BouncePress scale={0.95}>
+              <Button variant="outline" size="md" className="hidden md:flex" onClick={() => {
+                 const kpiRows = [
+                   ['指标', '数值'],
+                   ['总资产数', String(stats?.totalAssets ?? '')],
+                   ['在用资产', String(stats?.inUseAssets ?? '')],
+                   ['闲置资产', String(stats?.idleAssets ?? '')],
+                   ['维保中资产', String(stats?.maintenanceAssets ?? '')],
+                   ['报废资产', String(stats?.scrapAssets ?? '')],
+                   ['资产总值', String(stats?.totalValue ?? '')],
+                   ['资产净值', String(stats?.netValue ?? '')],
+                   ['待审批数', String(stats?.pendingApprovals ?? '')],
+                 ];
+                 const trendRows = [
+                   [],
+                   ['资产价值趋势 (近12个月)'],
+                   ['月份', '总价值(万)', '净值(万)'],
+                   ...trendData.map(t => [t.month, String(t.total), String(t.net)]),
+                 ];
+                 const deptRows = [
+                   [],
+                   ['部门资产统计 (Top 5)'],
+                   ['部门', '资产数量', '占比'],
+                   ...departmentStats.map(d => [d.name, d.count, `${d.pct}%`]),
+                 ];
+                 const categoryRows = [
+                   [],
+                   ['分类分布'],
+                   ['分类', '数量'],
+                   ...categoryData.map(c => [c.name, String(c.value)]),
+                 ];
+                 const csv = [...kpiRows, ...trendRows, ...deptRows, ...categoryRows].map(r => r.join(',')).join('\n');
+                 const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
+                 const url = URL.createObjectURL(blob);
+                 const a = document.createElement('a');
+                 a.href = url; a.download = `dashboard-full-${new Date().toISOString().slice(0, 10)}.csv`;
+                 a.click(); URL.revokeObjectURL(url);
+               }}>
+                 <Download className="w-4 h-4" />
+                 导出数据
+               </Button>
+             </BouncePress>
+            <BouncePress scale={0.95}>
+              <Button variant="primary" size="md" onClick={handleRefresh}>
+                <RefreshCw className="w-4 h-4" />
+                刷新视图
+              </Button>
+            </BouncePress>
           </>
         }
       />
@@ -253,34 +260,57 @@ export default function DashboardPage() {
           Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)
         ) : (
           <>
-            <KpiCard
-              title="总资产数"
-              value={(stats?.totalAssets ?? 0).toLocaleString()}
-              trend={totalTrend}
-              icon={BarChart3}
-              iconColor="#004ac6"
-            />
-            <KpiCard
-              title="在用资产"
-              value={(stats?.inUseAssets ?? 0).toLocaleString()}
-              trend={netTrend}
-              icon={CheckCircle2}
-              iconColor="#16a34a"
-            />
-            <KpiCard
-              title="闲置资产"
-              value={(stats?.idleAssets ?? 0).toLocaleString()}
-              trend={undefined}
-              icon={Package}
-              iconColor="#6b7280"
-            />
-            <KpiCard
-              title="待审批"
-              value={stats?.pendingApprovals ?? 0}
-              icon={Clock}
-              iconColor="#943700"
-              className="border-l-4 border-l-[#943700]"
-            />
+            <div className="w-full h-full">
+              <GlowEffect mode="pulse" intensity={0.35}>
+                <MagicCard variant="glass" size="md" className="w-full h-full">
+                  <KpiCard
+                    title="总资产数"
+                    value={(stats?.totalAssets ?? 0).toLocaleString()}
+                    trend={totalTrend}
+                    icon={BarChart3}
+                    iconColor="#004ac6"
+                    className="!bg-transparent !shadow-none !border-none"
+                  />
+                </MagicCard>
+              </GlowEffect>
+            </div>
+            <div className="w-full h-full">
+              <GlowEffect mode="pulse" intensity={0.35}>
+                <MagicCard variant="glass" size="md" className="w-full h-full">
+                  <KpiCard
+                    title="在用资产"
+                    value={(stats?.inUseAssets ?? 0).toLocaleString()}
+                    trend={netTrend}
+                    icon={CheckCircle2}
+                    iconColor="#16a34a"
+                    className="!bg-transparent !shadow-none !border-none"
+                  />
+                </MagicCard>
+              </GlowEffect>
+            </div>
+            <div className="w-full h-full">
+              <MagicCard variant="glass" size="md" className="w-full h-full">
+                <KpiCard
+                  title="闲置资产"
+                  value={(stats?.idleAssets ?? 0).toLocaleString()}
+                  trend={undefined}
+                  icon={Package}
+                  iconColor="#6b7280"
+                  className="!bg-transparent !shadow-none !border-none"
+                />
+              </MagicCard>
+            </div>
+            <div className="w-full h-full">
+              <MagicCard variant="glass" size="md" className="w-full h-full">
+                <KpiCard
+                  title="待审批"
+                  value={stats?.pendingApprovals ?? 0}
+                  icon={Clock}
+                  iconColor="#943700"
+                  className="!bg-transparent !shadow-none !border-none !border-l-4 !border-l-[#943700]"
+                />
+              </MagicCard>
+            </div>
           </>
         )}
       </div>
@@ -292,16 +322,18 @@ export default function DashboardPage() {
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
                 <span className="w-3 h-3 rounded-full bg-[#004ac6]" />
-                <span className="text-xs text-[#64748b]">总价值</span>
+                <span className="text-xs text-[#64748b] dark:text-gray-400">总价值</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="w-3 h-3 rounded-full bg-[#b7c8e1]" />
-                <span className="text-xs text-[#64748b]">净值</span>
+                <span className="text-xs text-[#64748b] dark:text-gray-400">净值</span>
               </div>
             </div>
           </CardHeader>
           <CardContent>
-            {trendData.length > 0 ? (
+            {trendsLoading ? (
+              <SkeletonCard className="h-[280px] rounded-none" />
+            ) : trendData.length > 0 ? (
               <ResponsiveContainer width="100%" height={280}>
                 <AreaChart data={trendData} margin={{ top: 8, right: 16, left: -16, bottom: 24 }}>
                   <defs>
@@ -318,7 +350,7 @@ export default function DashboardPage() {
                 </AreaChart>
               </ResponsiveContainer>
             ) : (
-              <div className="flex items-center justify-center h-[280px] text-[#64748b] text-sm">
+              <div className="flex items-center justify-center h-[280px] text-[#64748b] dark:text-gray-400 text-sm">
                 暂无趋势数据
               </div>
             )}
@@ -330,17 +362,19 @@ export default function DashboardPage() {
             <CardTitle>分类分布</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col items-center">
-            {categoryData.length > 0 ? (
+            {statsLoading ? (
+              <SkeletonCard className="h-[280px] w-full rounded-none" />
+            ) : categoryData.length > 0 ? (
               <>
-                <div className="relative w-48 h-48">
+                <div className="relative w-40 h-40 md:w-48 md:h-48">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie
                         data={categoryData}
                         cx="50%"
                         cy="50%"
-                        innerRadius={55}
-                        outerRadius={80}
+                        innerRadius={40}
+                        outerRadius={60}
                         dataKey="value"
                         paddingAngle={2}
                       >
@@ -352,21 +386,23 @@ export default function DashboardPage() {
                     </PieChart>
                   </ResponsiveContainer>
                   <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                    <span className="text-2xl font-bold text-[#0f172a]">{totalAssetCount.toLocaleString()}</span>
-                    <span className="text-[10px] text-[#64748b]">资产总额</span>
+                    <ParallaxFloat amplitude={6} duration={4}>
+                      <span className="text-2xl font-bold text-[#0f172a] dark:text-gray-100">{totalAssetCount.toLocaleString()}</span>
+                    </ParallaxFloat>
+                    <span className="text-[10px] text-[#64748b] dark:text-gray-400">资产总额</span>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-x-8 gap-y-2 mt-6 w-full">
                   {categoryData.map((d) => (
                     <div key={d.name} className="flex items-center gap-2">
                       <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: d.color }} />
-                      <span className="text-xs text-[#64748b]">{d.name} ({d.value})</span>
+                      <span className="text-xs text-[#64748b] dark:text-gray-400">{d.name} ({d.value})</span>
                     </div>
                   ))}
                 </div>
               </>
             ) : (
-              <div className="flex items-center justify-center h-48 text-[#64748b] text-sm">
+              <div className="flex items-center justify-center h-48 text-[#64748b] dark:text-gray-400 text-sm">
                 暂无分类数据
               </div>
             )}
@@ -389,7 +425,7 @@ export default function DashboardPage() {
             {workorders.length > 0 ? (
               <DataTable columns={woColumns} data={workorders} compact onRowClick={(row) => navigate(`/workorders/${row.id}`)} />
             ) : (
-              <div className="flex items-center justify-center py-12 text-[#64748b] text-sm">
+              <div className="flex items-center justify-center py-12 text-[#64748b] dark:text-gray-400 text-sm">
                 暂无工单数据
               </div>
             )}
@@ -417,24 +453,24 @@ export default function DashboardPage() {
                 {maintenanceAlerts.slice(0, 5).map((alert) => {
                   const daysLeft = alert.daysLeft ?? alert.remainingDays ?? 0;
                   const isUrgent = alert.urgency === 'urgent' || daysLeft <= 7;
-                  const urgentColors = 'bg-red-50 text-red-600';
+                  const urgentColors = 'bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400';
                   const normalColors = 'bg-[#ffdbcd] text-[#943700]';
                   const colors = isUrgent ? urgentColors : normalColors;
                   return (
-                    <div key={alert.id} className="flex items-center gap-3 p-3 hover:bg-[#f8fafc] rounded-lg transition-colors border border-transparent hover:border-[#e5e7eb]/60">
+                    <div key={alert.id} className="flex items-center gap-3 p-3 hover:bg-[#f8fafc] dark:bg-gray-700 rounded-lg transition-colors border border-transparent hover:border-[#e5e7eb] dark:border-gray-700/60">
                       <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${colors}`}>
                         <Wrench className="w-5 h-5" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex justify-between items-start">
-                          <h5 className="text-sm font-bold text-[#0f172a] truncate">{alert.assetName}</h5>
-                          <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded flex-shrink-0 ml-2 ${isUrgent ? 'bg-red-50 text-red-700' : 'bg-[#ffdbcd] text-[#943700]'}`}>
+                          <h5 className="text-sm font-bold text-[#0f172a] dark:text-gray-100 truncate">{alert.assetName}</h5>
+                          <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded flex-shrink-0 ml-2 ${isUrgent ? 'bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300' : 'bg-[#ffdbcd] text-[#943700]'}`}>
                             {isUrgent ? '紧急' : '普通'}
                           </span>
                         </div>
                         <div className="flex justify-between items-center mt-1">
-                          <span className="text-[11px] text-[#64748b]">{alert.maintenanceType ?? '维保提醒'}</span>
-                          <span className={`text-[11px] font-bold ${isUrgent ? 'text-red-600' : 'text-[#943700]'}`}>
+                          <span className="text-[11px] text-[#64748b] dark:text-gray-400">{alert.maintenanceType ?? '维保提醒'}</span>
+                          <span className={`text-[11px] font-bold ${isUrgent ? 'text-red-600 dark:text-red-400' : 'text-[#943700]'}`}>
                             剩余 {daysLeft} 天
                           </span>
                         </div>
@@ -444,7 +480,7 @@ export default function DashboardPage() {
                 })}
               </div>
             ) : (
-              <div className="flex items-center justify-center py-12 text-[#64748b] text-sm">
+              <div className="flex items-center justify-center py-12 text-[#64748b] dark:text-gray-400 text-sm">
                 暂无维保预警
               </div>
             )}
@@ -461,11 +497,11 @@ export default function DashboardPage() {
             <div className="space-y-5">
               {departmentStats.map((dept) => (
                 <div key={dept.name} className="space-y-2">
-                  <div className="flex justify-between text-xs font-medium text-[#0f172a]">
+                  <div className="flex justify-between text-xs font-medium text-[#0f172a] dark:text-gray-100">
                     <span>{dept.name}</span>
                     <span>{dept.count}</span>
                   </div>
-                  <div className="w-full h-3 bg-[#e6e8ea] rounded-full overflow-hidden">
+                  <div className="w-full h-3 bg-[#e6e8ea] dark:bg-gray-600 rounded-full overflow-hidden">
                     <div
                       className="h-full bg-[#004ac6] rounded-full transition-all duration-500"
                       style={{ width: `${dept.pct}%` }}
@@ -475,7 +511,7 @@ export default function DashboardPage() {
               ))}
             </div>
           ) : (
-            <div className="flex items-center justify-center py-8 text-[#64748b] text-sm">
+            <div className="flex items-center justify-center py-8 text-[#64748b] dark:text-gray-400 text-sm">
               暂无部门统计数据
             </div>
           )}
