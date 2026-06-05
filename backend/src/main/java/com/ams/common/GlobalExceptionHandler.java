@@ -2,7 +2,11 @@ package com.ams.common;
 
 import com.ams.common.exception.BusinessException;
 import com.ams.common.exception.ConflictException;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
@@ -13,17 +17,30 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 @Slf4j
+@RequiredArgsConstructor
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    private final MessageSource messageSource;
+
+    private String getMessage(String code, Object... args) {
+        Locale locale = LocaleContextHolder.getLocale();
+        try {
+            return messageSource.getMessage(code, args, locale);
+        } catch (Exception e) {
+            return code;
+        }
+    }
 
     @ExceptionHandler(DuplicateKeyException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Result<Void> handleDuplicateKeyException(DuplicateKeyException e) {
         log.warn("唯一约束冲突（映射为 400）: {}", e.getMessage());
-        return Result.error(400, "数据重复，请检查输入");
+        return Result.error(400, getMessage("exception.data.duplicate"));
     }
 
     @ExceptionHandler(ConflictException.class)
@@ -74,14 +91,14 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public Result<Void> handleDataAccessException(org.springframework.dao.DataAccessException e) {
         log.error("数据库操作异常", e);
-        return Result.error(500, "数据库操作异常，请稍后重试");
+        return Result.error(500, getMessage("exception.db.error"));
     }
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public Result<Void> handleException(Exception e) {
         log.error("Unexpected error occurred", e);
-        return Result.error("系统异常,请联系管理员");
+        return Result.error(getMessage("exception.system.error"));
     }
 
 }
