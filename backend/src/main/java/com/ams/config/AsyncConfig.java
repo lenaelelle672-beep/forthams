@@ -12,7 +12,7 @@ import java.util.concurrent.ThreadPoolExecutor;
  * 异步任务配置
  *
  * <p>启用异步方法执行 ({@link EnableAsync})，为通知渠道提供独立的线程池，
- * 避免邮件发送等阻塞操作占用 Web 容器线程。</p>
+ * 避免邮件/GIMI等发送操作占用 Web 容器线程。</p>
  */
 @Configuration
 @EnableAsync

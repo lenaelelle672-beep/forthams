@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"><title>系统通知</title></head>
+<body style="font-family: -apple-system, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+  <div style="background: #1890ff; color: white; padding: 12px 20px; border-radius: 4px;">
+    <h2 style="margin: 0;" th:text="${title}">系统通知</h2>
+  </div>
+  <div style="padding: 20px 0;">
+    <p th:text="${message}">通知内容</p>
+    <p th:if="${link}"><a th:href="${link}" style="color: #1890ff;">查看详情 →</a></p>
+  </div>
+  <div style="color: #999; font-size: 12px; border-top: 1px solid #eee; padding-top: 16px;">
+    <p th:text="${'时间: ' + #temporals.format(timestamp, 'yyyy-MM-dd HH:mm')}">时间</p>
+  </div>
+</body>
+</html>
