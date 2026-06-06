@@ -9,11 +9,14 @@ import com.ams.service.BusinessCommentService;
 import com.ams.service.NotificationService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +32,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @DisplayName("评论系统集成测试")
 class CommentIntegrationTest {
 
@@ -44,10 +48,67 @@ class CommentIntegrationTest {
     @Autowired
     private NotificationMapper notificationMapper;
 
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
     private final String tenantId = "integration-test-tenant";
     private final Long userId1 = 1001L;
     private final Long userId2 = 1002L;
     private final Long userId3 = 1003L;
+
+    @BeforeAll
+    void setUpSchema() {
+        jdbcTemplate.execute("""
+                CREATE TABLE IF NOT EXISTS business_comment (
+                    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                    business_type VARCHAR(32) NOT NULL,
+                    business_id BIGINT NOT NULL,
+                    user_id BIGINT NOT NULL,
+                    user_name VARCHAR(128) NOT NULL,
+                    content TEXT NOT NULL,
+                    parent_comment_id BIGINT DEFAULT NULL,
+                    likes INT DEFAULT 0,
+                    tenant_id VARCHAR(64) NOT NULL,
+                    deleted TINYINT DEFAULT 0,
+                    create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+                """);
+        jdbcTemplate.execute("""
+                CREATE TABLE IF NOT EXISTS notification (
+                    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                    user_id BIGINT NOT NULL,
+                    type VARCHAR(64) NOT NULL,
+                    category VARCHAR(32),
+                    title VARCHAR(256),
+                    content TEXT,
+                    ref_id BIGINT,
+                    ref_type VARCHAR(64),
+                    is_read TINYINT DEFAULT 0,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    read_at TIMESTAMP NULL
+                )
+                """);
+        jdbcTemplate.execute("""
+                CREATE TABLE IF NOT EXISTS sys_user (
+                    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                    username VARCHAR(64) NOT NULL UNIQUE,
+                    password VARCHAR(128) NOT NULL,
+                    real_name VARCHAR(64) NOT NULL,
+                    email VARCHAR(128),
+                    phone VARCHAR(32),
+                    avatar VARCHAR(512),
+                    status TINYINT DEFAULT 1,
+                    dept_id BIGINT,
+                    login_ip VARCHAR(64),
+                    login_date TIMESTAMP,
+                    remark VARCHAR(512),
+                    deleted TINYINT DEFAULT 0,
+                    create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+                """);
+    }
 
     @BeforeEach
     void setUp() {
