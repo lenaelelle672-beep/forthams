@@ -32,6 +32,7 @@ public interface UserRoleMapper extends BaseMapper<UserRole> {
           AND u.deleted = 0
           AND r.status = 1
           AND r.deleted = 0
+        ORDER BY u.id ASC
         """)
     List<Long> selectActiveUserIdsByRole(@Param("role") String role);
 

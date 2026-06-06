@@ -9,8 +9,8 @@ import { abcClassificationApi, type ClassificationStatistics, type BatchResult }
 import { getAssetList } from '@/api/asset';
 import type { Asset } from '@/types/asset';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/Button';
+import { Badge } from '@/components/ui/Badge';
 import { Dialog } from '@/components/ui/Dialog';
 import { Table } from 'antd';
 import { Modal } from 'antd';

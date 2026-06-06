@@ -34,6 +34,8 @@ public class WorkflowNode implements Serializable {
 
     private Integer sortOrder;
 
+    private Integer orderIndex;
+
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createdAt;
 

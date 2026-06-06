@@ -131,12 +131,17 @@ public class WorkOrderHoldService {
     /**
      * 扫描指定租户的超时记录
      */
+    /**
+     * 最大分页扫描页数，防止意外无限循环。
+     */
+    private static final int MAX_SCAN_PAGES = 1000;
+
     private void scanTimeoutRecordsForTenant(String tenantId, LocalDateTime now) {
         int pageSize = 100;
         int currentPage = 1;
         int totalProcessed = 0;
 
-        while (true) {
+        while (currentPage <= MAX_SCAN_PAGES) {
             // 使用分页查询，避免一次性加载大量数据
             com.baomidou.mybatisplus.extension.plugins.pagination.Page<WorkOrderHoldRecord> page =
                 new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>(currentPage, pageSize);

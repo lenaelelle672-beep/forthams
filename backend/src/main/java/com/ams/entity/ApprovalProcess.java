@@ -31,4 +31,7 @@ public class ApprovalProcess implements Serializable {
 
     @TableLogic
     private Integer deleted;
+
+    @Version
+    private Integer version;
 }

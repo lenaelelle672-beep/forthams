@@ -18,6 +18,7 @@ import org.thymeleaf.spring6.SpringTemplateEngine;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -54,6 +55,32 @@ public class EmailServiceImpl implements EmailService {
     @Override
     public void sendEmailWithAttachment(String to, String subject, String body, File attachment) {
         sendMimeMessage(to, subject, body, false, attachment);
+    }
+
+    @Async("mailTaskExecutor")
+    @Override
+    public void sendHtmlEmailWithCc(String to, List<String> cc, List<String> bcc, String subject, String htmlBody) {
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, StandardCharsets.UTF_8.name());
+            helper.setTo(to);
+            if (cc != null && !cc.isEmpty()) {
+                helper.setCc(cc.toArray(new String[0]));
+            }
+            if (bcc != null && !bcc.isEmpty()) {
+                helper.setBcc(bcc.toArray(new String[0]));
+            }
+            helper.setSubject(subject);
+            helper.setText(htmlBody, true);
+            mailSender.send(message);
+            log.info("[Email] CC 邮件发送成功: to={}, cc={}, subject={}", to, cc, subject);
+        } catch (MailException e) {
+            log.error("[Email] CC 邮件发送失败: to={}, subject={}", to, subject, e);
+            throw new BusinessException(BizErrorCode.EMAIL_SEND_FAILED, "CC 邮件发送失败: " + e.getMessage(), e);
+        } catch (MessagingException e) {
+            log.error("[Email] CC 邮件消息构造失败: to={}, subject={}", to, subject, e);
+            throw new BusinessException(BizErrorCode.EMAIL_SEND_FAILED, "CC 邮件消息构造失败", e);
+        }
     }
 
     private void sendMimeMessage(String to, String subject, String content, boolean isHtml, File attachment) {

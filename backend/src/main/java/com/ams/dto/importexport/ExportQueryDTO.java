@@ -1,4 +1,4 @@
-package com.ams.dto;
+package com.ams.dto.importexport;
 
 import lombok.Data;
 

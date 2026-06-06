@@ -12,15 +12,27 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 废弃的工作流设计器服务。
+ * <p>操作 workflow_node/edge 独立表，与 /workflows/* 主路径的 definitionJson JSON 方案
+ * 构成双轨存储。前端已全部使用主路径，此路径不再有消费者。
+ * <p>请使用 {@link WorkflowDefinitionService} 替代。
+ *
+ * @deprecated 双轨路径废弃，前端已统一使用 /workflows/* JSON 方案
+ */
+@Deprecated(forRemoval = true)
 @Service
 @RequiredArgsConstructor
 public class WorkflowDesignerService {
 
+    private static final Logger log = LoggerFactory.getLogger(WorkflowDesignerService.class);
     private final WorkflowNodeMapper workflowNodeMapper;
     private final WorkflowEdgeMapper workflowEdgeMapper;
     private final WorkflowDefinitionMapper workflowDefinitionMapper;
@@ -29,6 +41,7 @@ public class WorkflowDesignerService {
      * 获取指定流程定义的节点和连线数据
      */
     public Map<String, Object> getDesign(Long definitionId) {
+        log.warn("废弃服务方法被调用: getDesign({}) — 请迁移至 WorkflowDefinitionService", definitionId);
         WorkflowDefinition def = workflowDefinitionMapper.selectById(definitionId);
         if (def == null) {
             throw new BusinessException("流程定义不存在");
@@ -56,6 +69,7 @@ public class WorkflowDesignerService {
      */
     @Transactional(rollbackFor = Exception.class)
     public void saveDesign(Long definitionId, List<WorkflowNode> nodes, List<WorkflowEdge> edges) {
+        log.warn("废弃服务方法被调用: saveDesign({}) — 请迁移至 WorkflowDefinitionService", definitionId);
         WorkflowDefinition def = workflowDefinitionMapper.selectById(definitionId);
         if (def == null) {
             throw new BusinessException("流程定义不存在");
@@ -99,6 +113,7 @@ public class WorkflowDesignerService {
      */
     @Transactional(rollbackFor = Exception.class)
     public WorkflowDefinition publishDesign(Long definitionId) {
+        log.warn("废弃服务方法被调用: publishDesign({}) — 请迁移至 WorkflowDefinitionService", definitionId);
         WorkflowDefinition def = workflowDefinitionMapper.selectById(definitionId);
         if (def == null) {
             throw new BusinessException("流程定义不存在");
@@ -145,6 +160,7 @@ public class WorkflowDesignerService {
      * 获取版本历史（这里简化返回 WorkflowDefinition 的版本信息）
      */
     public List<WorkflowDefinition> getVersionHistory(Long definitionId) {
+        log.warn("废弃服务方法被调用: getVersionHistory({}) — 请迁移至 WorkflowDefinitionService", definitionId);
         WorkflowDefinition def = workflowDefinitionMapper.selectById(definitionId);
         if (def == null) {
             throw new BusinessException("流程定义不存在");

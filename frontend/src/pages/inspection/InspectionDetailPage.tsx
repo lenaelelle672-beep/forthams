@@ -2,7 +2,9 @@ import React, { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
 import { inspectionApi } from '../../api/inspection';
-import { Card, Descriptions, Badge, Button, Spin, Space, Image, Table, Tag } from 'antd';
+import { Card, Badge, Button, Spin, Space, Table, Tag } from 'antd';
+import Descriptions from 'antd/es/descriptions';
+import Image from 'antd/es/image';
 import { ArrowLeftOutlined, EditOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 

@@ -15,6 +15,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,12 +35,36 @@ import java.util.stream.Collectors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * 工作流定义服务。
+ *
+ * <p>管理各类工作流定义的生命周期，包括创建、发布、更新、删除和验证。
+ *
+ * <p>支持的审批模式：
+ * <ul>
+ *   <li>sequence - 顺序审批，按审批人 ID 自然排序依次审批</li>
+ *   <li>all - 全员审批，所有审批人都需审批通过</li>
+ *   <li>any - 任意一人审批，任一审批人审批通过即可</li>
+ *   <li>count - 计数审批，达到指定数量的审批人审批通过即可</li>
+ * </ul>
+ *
+ * <p>条件节点表达式限制：
+ * 当前版本仅支持简单表达式（字段名 操作符 值），不支持 AND/OR 复合条件。
+ * 支持的操作符：>=、<=、==、!=、>、<
+ * 示例：amount >= 1000、status == "PENDING"
+ *
+ * @see WorkflowTemplate
+ * @see WorkflowRuntimePlan
+ * @see WorkflowApprovalNode
+ */
 @Service
 @RequiredArgsConstructor
 public class WorkflowDefinitionService {
 
+    private static final Logger log = LoggerFactory.getLogger(WorkflowDefinitionService.class);
+
     private static final Set<String> NODE_TYPES = Set.of("start", "approval", "condition", "end");
-    private static final Set<String> APPROVAL_MODES = Set.of("sequence", "all", "any");
+    private static final Set<String> APPROVAL_MODES = Set.of("sequence", "all", "any", "count");
     private static final Pattern CONDITION_PATTERN = Pattern.compile("^(.+?)\\s*(>=|<=|==|!=|>|<)\\s*(.+)$");
     private static final Map<String, List<String>> CONDITION_FIELD_ALIASES = Map.ofEntries(
             Map.entry("申请金额", List.of("amount", "compensationAmount", "estimatedAmount", "currentValue", "originalValue")),
@@ -75,7 +101,11 @@ public class WorkflowDefinitionService {
             String approverRole,
             String approvalMode,
             String approverType,
-            String approverId
+            String approverId,
+            String ccRoleCodes,
+            String ccUserIds,
+            int orderIndex,
+            int countThreshold
     ) {
     }
 
@@ -435,6 +465,19 @@ public class WorkflowDefinitionService {
         return dto;
     }
 
+    /**
+     * 验证流程定义的合法性。
+     *
+     * <p>验证内容包括：节点类型、可达性、审批模式、条件节点表达式等。
+     *
+     * <p>条件节点表达式限制：
+     * 仅支持简单表达式（字段名 操作符 值），不支持 AND/OR 复合条件。
+     * 支持的操作符：>=、<=、==、!=、>、<
+     * 示例：amount >= 1000、status == "PENDING"
+     *
+     * @param definition 工作流定义实体
+     * @throws BusinessException 验证失败时抛出
+     */
     private void validateDefinition(WorkflowDefinition definition) {
         Map<String, Object> parsed = fromJson(definition.getDefinitionJson(), Map.of());
         validateDefinitionMap(parsed, definition.getBusinessType());
@@ -522,10 +565,20 @@ public class WorkflowDefinitionService {
     private void validateNodeFields(Map<String, Object> node, String type, String id) {
         Object position = node.get("position");
         if (!(position instanceof Map<?, ?> rawPosition)) {
-            throw new BusinessException("节点" + id + "缺少坐标信息");
+            log.info("节点{}缺少坐标信息，已注入默认坐标(320, 0)", id);
+            Map<String, Object> defaultPosition = new java.util.HashMap<>();
+            defaultPosition.put("x", 320);
+            defaultPosition.put("y", 0);
+            node.put("position", defaultPosition);
+        } else {
+            Map<String, Object> posMap = (Map<String, Object>) rawPosition;
+            if (!(posMap.get("x") instanceof Number)) {
+                posMap.put("x", 320);
+            }
+            if (!(posMap.get("y") instanceof Number)) {
+                posMap.put("y", 0);
+            }
         }
-        requireNumber(rawPosition.get("x"), "节点" + id + "坐标x不能为空");
-        requireNumber(rawPosition.get("y"), "节点" + id + "坐标y不能为空");
 
         Object data = node.get("data");
         if (!(data instanceof Map<?, ?> rawData)) {
@@ -554,7 +607,22 @@ public class WorkflowDefinitionService {
             }
             String approvalMode = requireText(nodeData.get("approvalMode"), "审批节点审批模式不能为空");
             if (!APPROVAL_MODES.contains(approvalMode)) {
-                throw new BusinessException("审批节点审批模式仅支持 sequence/all/any");
+                throw new BusinessException("审批节点审批模式仅支持 sequence/all/any/count");
+            }
+            // count 模式需要校验 countThreshold 配置合法性
+            if ("count".equals(approvalMode)) {
+                int countThreshold = parseIntValue(nodeData.get("countThreshold"), 0);
+                if (countThreshold <= 0) {
+                    throw new BusinessException("节点" + id + "的 count 模式需要配置 countThreshold 且值必须大于 0");
+                }
+                // 验证 countThreshold 不能超过审批人数量
+                String approverRole = textValue(nodeData.get("approverRole"));
+                if (approverRole != null && !approverRole.isBlank() && userRoleMapper != null) {
+                    List<Long> approverIds = userRoleMapper.selectActiveUserIdsByRole(approverRole);
+                    if (approverIds != null && countThreshold > approverIds.size()) {
+                        throw new BusinessException("节点" + id + "的 countThreshold(" + countThreshold + ")不能超过审批人数量(" + approverIds.size() + ")");
+                    }
+                }
             }
         }
         if ("condition".equals(type)) {
@@ -840,6 +908,21 @@ public class WorkflowDefinitionService {
         int guard = 0;
         int maxSteps = Math.max(1, nodeById.size() + edgesBySource.values().stream().mapToInt(List::size).sum() + 1);
 
+        // 预缓存审批角色-成员映射，避免循环内重复查询
+        Map<String, List<Long>> roleMemberCache = new HashMap<>();
+        if (userRoleMapper != null) {
+            for (Map.Entry<String, Map<String, Object>> entry : nodeById.entrySet()) {
+                if ("approval".equals(nodeType(entry.getValue()))) {
+                    Map<String, Object> nd = nodeData(entry.getValue());
+                    String approverRole = textValue(nd.get("approverRole"));
+                    if (approverRole != null && !approverRole.isBlank() && !roleMemberCache.containsKey(approverRole)) {
+                        List<Long> ids = userRoleMapper.selectActiveUserIdsByRole(approverRole);
+                        roleMemberCache.put(approverRole, ids != null ? ids : List.of());
+                    }
+                }
+            }
+        }
+
         while (currentNodeId != null && nodeById.containsKey(currentNodeId)) {
             if (++guard > maxSteps || !visited.add(currentNodeId)) {
                 throw new BusinessException("流程定义存在循环，无法执行");
@@ -849,6 +932,21 @@ public class WorkflowDefinitionService {
             Map<String, Object> data = nodeData(node);
             String type = nodeType(node);
             if ("approval".equals(type)) {
+                String approvalMode = firstPresent(textValue(data.get("approvalMode")), "sequence");
+                // 运行时校验 count 模式的 countThreshold 合法性
+                if ("count".equals(approvalMode)) {
+                    int countThreshold = parseIntValue(data.get("countThreshold"), 0);
+                    if (countThreshold <= 0) {
+                        throw new BusinessException("运行时校验: count 模式节点 " + currentNodeId + " 的 countThreshold(" + countThreshold + ") 必须大于 0");
+                    }
+                    String approverRole = textValue(data.get("approverRole"));
+                    if (approverRole != null && !approverRole.isBlank()) {
+                        List<Long> approverIds = roleMemberCache.getOrDefault(approverRole, List.of());
+                        if (!approverIds.isEmpty() && countThreshold > approverIds.size()) {
+                            throw new BusinessException("运行时校验: count 模式节点 " + currentNodeId + " 的 countThreshold(" + countThreshold + ") 不能超过审批人数(" + approverIds.size() + ")");
+                        }
+                    }
+                }
                 String nodeApproverType = textValue(data.get("approverType"));
                 String nodeApproverId = textValue(data.get("approverId"));
                 approvalNodes.add(new WorkflowApprovalNode(
@@ -857,9 +955,13 @@ public class WorkflowDefinitionService {
                         textValue(data.get("nodeCode")),
                         textValue(data.get("label")),
                         textValue(data.get("approverRole")),
-                        firstPresent(textValue(data.get("approvalMode")), "sequence"),
+                        approvalMode,
                         "user".equals(nodeApproverType) ? "user" : "role",
-                        "user".equals(nodeApproverType) ? nodeApproverId : ""
+                        "user".equals(nodeApproverType) ? nodeApproverId : "",
+                        textValue(data.get("ccRoleCodes")),
+                        textValue(data.get("ccUserIds")),
+                        parseIntValue(data.get("orderIndex"), 0),
+                        parseIntValue(data.get("countThreshold"), 0)
                 ));
             } else if ("end".equals(type)) {
                 resultAction = textValue(data.get("resultAction"));
@@ -882,7 +984,7 @@ public class WorkflowDefinitionService {
         List<WorkflowApprovalNode> approvalNodes = new ArrayList<>();
         for (int index = 1; index <= Math.max(0, fallbackApprovalStepCount); index++) {
             approvalNodes.add(new WorkflowApprovalNode(index, "fallback-" + index, "FALLBACK_" + index,
-                    "第" + index + "级审批", "", "sequence", "role", ""));
+                    "第" + index + "级审批", "", "sequence", "role", "", "", "", 0, 0));
         }
         return new WorkflowRuntimePlan(approvalNodes, "");
     }
@@ -1138,6 +1240,7 @@ public class WorkflowDefinitionService {
         data.put("approverRoleName", "");
         data.put("approverId", "");
         data.put("approvalMode", "sequence");
+        data.put("countThreshold", "");
         data.put("conditionExpression", "");
         data.put("trueLabel", "");
         data.put("falseLabel", "");
@@ -1170,6 +1273,19 @@ public class WorkflowDefinitionService {
         edge.put("labelStyle", Map.of("fill", "var(--color-foreground)", "fontSize", 12, "fontWeight", 600));
         edge.put("labelBgStyle", Map.of("fill", "var(--workflow-surface)", "fillOpacity", 1));
         return edge;
+    }
+
+    private int parseIntValue(Object value, int defaultValue) {
+        if (value instanceof Number num) {
+            return num.intValue();
+        }
+        if (value instanceof String str && !str.isBlank()) {
+            try {
+                return Integer.parseInt(str.trim());
+            } catch (NumberFormatException ignored) {
+            }
+        }
+        return defaultValue;
     }
 
     private String firstPresent(String value, String fallback) {

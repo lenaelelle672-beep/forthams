@@ -1,6 +1,7 @@
 package com.ams.controller;
 
 import com.ams.common.exception.BusinessException;
+import com.ams.dto.ApprovalActionDTO;
 import com.ams.dto.ApprovalCreateDTO;
 import com.ams.entity.ApprovalProcess;
 import com.ams.service.ApprovalService;
@@ -58,21 +59,17 @@ public class ApprovalController {
 
     @PreAuthorize("@ss.hasPermi('approval:process:approve')")
     @PostMapping("/{id}/approve")
-    public Result<ApprovalProcess> approve(@PathVariable Long id, @RequestBody Map<String, Object> body,
+    public Result<ApprovalProcess> approve(@PathVariable Long id, @Valid @RequestBody ApprovalActionDTO dto,
                                            HttpServletRequest request) {
-        String result = (String) body.getOrDefault("result", "APPROVED");
-        String opinion = (String) body.getOrDefault("opinion", "");
-        return Result.success(approvalService.approve(id, getCurrentUserId(request), result, opinion));
+        return Result.success(approvalService.approve(id, getCurrentUserId(request), dto.getResult(), dto.getOpinion()));
     }
 
     /** 驳回审批 */
     @PreAuthorize("@ss.hasPermi('approval:process:reject')")
     @PostMapping("/{id}/reject")
-    public Result<ApprovalProcess> reject(@PathVariable Long id, @RequestBody Map<String, Object> body,
+    public Result<ApprovalProcess> reject(@PathVariable Long id, @Valid @RequestBody ApprovalActionDTO dto,
                                           HttpServletRequest request) {
-        String opinion = (String) body.getOrDefault("rejectionReason",
-                         body.getOrDefault("comment", body.getOrDefault("reason", "")));
-        return Result.success(approvalService.approve(id, getCurrentUserId(request), "REJECTED", opinion));
+        return Result.success(approvalService.approve(id, getCurrentUserId(request), "REJECTED", dto.getOpinion()));
     }
 
     @PreAuthorize("@ss.hasPermi('approval:process:cancel')")

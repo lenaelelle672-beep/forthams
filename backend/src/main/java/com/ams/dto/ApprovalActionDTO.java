@@ -7,7 +7,7 @@ import lombok.Data;
 public class ApprovalActionDTO {
 
     @NotBlank(message = "审批结果不能为空")
-    private String approveResult;
+    private String result;
 
-    private String approveOpinion;
+    private String opinion;
 }

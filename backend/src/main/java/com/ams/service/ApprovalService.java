@@ -2,6 +2,7 @@ package com.ams.service;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.ams.common.exception.BusinessException;
+import com.ams.common.exception.ConflictException;
 import com.ams.context.TenantContext;
 import com.ams.dto.ApprovalCreateDTO;
 import com.ams.dto.AssetClearanceDTO;
@@ -12,11 +13,13 @@ import com.ams.entity.AssetCompensation;
 import com.ams.entity.ApprovalProcess;
 import com.ams.entity.ApprovalRecord;
 import com.ams.entity.NotificationRecord;
-import com.ams.entity.Role;import com.ams.entity.WorkflowDefinition;
+import com.ams.entity.Role;
+import com.ams.entity.WorkflowDefinition;
 import com.ams.mapper.ApprovalProcessMapper;
 import com.ams.mapper.ApprovalRecordMapper;
 import com.ams.mapper.UserRoleMapper;
-import com.ams.mapper.RoleMapper;import com.fasterxml.jackson.core.JsonProcessingException;
+import com.ams.mapper.RoleMapper;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -28,6 +31,7 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.context.ApplicationEventPublisher;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -39,7 +43,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -59,13 +65,18 @@ import java.util.stream.Collectors;
  * @see WorkOrderService
  */
 import com.ams.annotation.DataScope;
+import com.ams.event.ApprovalProcessEvent;
 @Service
 @RequiredArgsConstructor
 public class ApprovalService {
 
     private static final Logger log = LoggerFactory.getLogger(ApprovalService.class);
     private static final int FINAL_STEP = 3;
-    private final Map<String, String> roleNameCache = new ConcurrentHashMap<>();
+    private final Cache<String, String> roleNameCache = Caffeine.newBuilder()
+            .expireAfterWrite(10, TimeUnit.MINUTES)
+            .maximumSize(100)
+            .recordStats()
+            .build();
     private static final String WORKFLOW_PAYLOAD_KEY = "_approvalPayload";
     private static final String WORKFLOW_DEFINITION_KEY = "_workflowDefinition";
     private static final String WORKFLOW_DEFINITION_ID_KEY = "_workflowDefinitionId";
@@ -87,6 +98,7 @@ public class ApprovalService {
     private final UserRoleMapper userRoleMapper;
     private final RoleMapper roleMapper;    private final ObjectMapper objectMapper;
     private final NotificationService notificationService;
+    private final ApplicationEventPublisher eventPublisher;
 
     /**
      * 分页查询审批流程列表。
@@ -199,6 +211,8 @@ public class ApprovalService {
                 log.warn("approval_process_no_conflict_retrying: remaining={}", retries);
             }
         }
+        // 审批创建成功后，发布 CC 提交通知（仅工作流管理的流程类型）
+        publishCcSubmittedEvent(process);
         return process;
     }
 
@@ -233,7 +247,7 @@ public class ApprovalService {
         if (process == null) {
             throw new BusinessException("审批流程不存在");
         }
-        String processStatus = BeanUtil.getProperty(process, "status") instanceof String s ? s : String.valueOf(BeanUtil.getProperty(process, "status"));
+        String processStatus = safeGetStringProperty(process, "status", "");
         if (!"PENDING".equals(processStatus)) {
             switch (processStatus) {
                 case "APPROVED":
@@ -253,8 +267,8 @@ public class ApprovalService {
         Integer currentStep = parseInteger(BeanUtil.getProperty(process, "currentStep"), 1);
         WorkflowDefinitionService.WorkflowRuntimePlan workflowPlan = resolveWorkflowRuntimePlan(process);
         WorkflowDefinitionService.WorkflowApprovalNode currentWorkflowNode = workflowPlan == null ? null : workflowPlan.nodeAtStep(currentStep);
-        ensureWorkflowApproverAllowed(currentWorkflowNode, approverId);
         List<ApprovalRecord> currentStepRecords = selectCurrentStepRecords(processId, tenantId, currentStep);
+        ensureWorkflowApproverAllowed(currentWorkflowNode, approverId, currentStepRecords);
         if (hasApprovedCurrentStep(currentStepRecords, approverId)) {
             throw new BusinessException("当前步骤已审批");
         }
@@ -282,7 +296,30 @@ public class ApprovalService {
             }
         }
 
-        approvalProcessMapper.updateById(process);
+        int rows = approvalProcessMapper.updateById(process);
+        if (rows == 0) {
+            log.warn("乐观锁冲突: processId={}, version={}", process.getId(), process.getVersion());
+            throw new ConflictException("审批数据已被其他操作修改，请刷新后重试");
+        }
+        // 发布审批事件供 NotificationEventListener 异步处理
+        try {
+            ApprovalProcessEvent approvalEvent = new ApprovalProcessEvent(
+                process.getId(),
+                process.getProcessNo(),
+                process.getProcessType(),
+                currentStep,
+                finalStep,
+                result,
+                approverId,
+                null,
+                process.getApplicantId(),
+                process.getBusinessData(),
+                tenantId,
+                LocalDateTime.now());
+            eventPublisher.publishEvent(approvalEvent);
+        } catch (Exception e) {
+            log.error("发布审批事件异常，不阻塞主流程: processId={}", process.getId(), e);
+        }
         handleBusinessOutcome(process, approverId, result, opinion);
         sendApprovalNotification(process, approverId, result);
         return process;
@@ -361,7 +398,8 @@ public class ApprovalService {
 
         Map<String, Map<String, Object>> grouped = new LinkedHashMap<>();
         for (Map<String, Object> row : rows) {
-            String type = row.get("business_type") != null ? row.get("business_type").toString() : "UNKNOWN";
+            if (row.get("business_type") == null) continue;
+            String type = row.get("business_type").toString();
             String status = row.get("status") != null ? row.get("status").toString() : "UNKNOWN";
             long cnt = row.get("cnt") != null ? ((Number) row.get("cnt")).longValue() : 0L;
 
@@ -403,7 +441,7 @@ public class ApprovalService {
         if (process == null) {
             throw new BusinessException("审批流程不存在");
         }
-        String processStatus = BeanUtil.getProperty(process, "status") instanceof String s ? s : String.valueOf(BeanUtil.getProperty(process, "status"));
+        String processStatus = safeGetStringProperty(process, "status", "");
         if (!"PENDING".equals(processStatus)) {
             throw new BusinessException("仅PENDING状态的流程可取消");
         }
@@ -414,7 +452,11 @@ public class ApprovalService {
         }
 
         BeanUtil.setProperty(process, "status", "CANCELLED");
-        approvalProcessMapper.updateById(process);
+        int rows = approvalProcessMapper.updateById(process);
+        if (rows == 0) {
+            log.warn("乐观锁冲突: cancelProcess processId={}, version={}", process.getId(), process.getVersion());
+            throw new ConflictException("审批数据已被其他操作修改，请重试");
+        }
 
         handleCancellation(process, operatorId, "流程已取消");
 
@@ -462,6 +504,22 @@ public class ApprovalService {
         } catch (NumberFormatException ex) {
             return defaultValue;
         }
+    }
+
+    /**
+     * 安全获取 BeanUtil.getProperty 返回的 String 值。
+     * <p>BeanUtil.getProperty 返回 Object，直接赋值 String 有 ClassCastException 风险。
+     * 此方法统一处理 null → defaultValue、String → 自身、其他 → toString。</p>
+     */
+    private String safeGetStringProperty(Object bean, String propertyName, String defaultValue) {
+        Object value = BeanUtil.getProperty(bean, propertyName);
+        if (value == null) {
+            return defaultValue;
+        }
+        if (value instanceof String s) {
+            return s;
+        }
+        return String.valueOf(value);
     }
 
     private String stepKey(Long processId, Integer stepNo) {
@@ -524,7 +582,7 @@ public class ApprovalService {
             return Collections.emptyMap();
         }
         Set<String> uncached = uniqueCodes.stream()
-                .filter(code -> !roleNameCache.containsKey(code))
+                .filter(code -> roleNameCache.getIfPresent(code) == null)
                 .collect(Collectors.toSet());
         if (!uncached.isEmpty()) {
             try {
@@ -536,7 +594,7 @@ public class ApprovalService {
                     }
                 }
                 for (String code : uncached) {
-                    roleNameCache.putIfAbsent(code, null);
+                    roleNameCache.put(code, null);
                 }
             } catch (Exception e) {
                 log.warn("批量查询角色中文名失败", e);
@@ -544,7 +602,7 @@ public class ApprovalService {
         }
         Map<String, String> result = new HashMap<>();
         for (String code : uniqueCodes) {
-            String name = roleNameCache.get(code);
+            String name = roleNameCache.getIfPresent(code);
             if (name != null) {
                 result.put(code, name);
             }
@@ -626,7 +684,45 @@ public class ApprovalService {
     private boolean isApprovalStepComplete(WorkflowDefinitionService.WorkflowApprovalNode node,
                                            List<ApprovalRecord> currentStepRecords,
                                            Long approverId) {
-        if (node == null || !"all".equals(node.approvalMode())) {
+        if (node == null) {
+            return true;
+        }
+        if ("sequence".equals(node.approvalMode())) {
+            // sequence 模式：当前审批人通过即步骤完成（逐人推进）
+            // 顺序控制由 ensureWorkflowApproverAllowed 中的 sequence 校验负责
+            List<Long> roleApproverIds = resolveRoleApproverIds(node.approverRole());
+            if (roleApproverIds.isEmpty()) {
+                return true;
+            }
+            return roleApproverIds.contains(approverId);
+        }
+        if ("count".equals(node.approvalMode())) {
+            // count 模式：达到指定审批人数即步骤完成
+            int threshold = node.countThreshold();
+            if (threshold <= 0) {
+                throw new BusinessException("count 模式 countThreshold(" + threshold + ")必须大于 0");
+            }
+            // 运行时校验：countThreshold 不能超过当前审批人数
+            List<Long> roleApproverIds = resolveRoleApproverIds(node.approverRole());
+            if (!roleApproverIds.isEmpty() && threshold > roleApproverIds.size()) {
+                log.error("count 模式 countThreshold({}) 超过当前审批人数({}), 节点: {}",
+                        threshold, roleApproverIds.size(), node.nodeCode());
+                throw new BusinessException("countThreshold(" + threshold + ")不能超过当前审批人数(" + roleApproverIds.size() + ")");
+            }
+            Set<Long> approvedIds = currentStepRecords.stream()
+                    .filter(r -> "APPROVED".equals(safeGetStringProperty(r, "approveResult", "")))
+                    .map(r -> parseLong(BeanUtil.getProperty(r, "approverId"), null))
+                    .filter(id -> id != null)
+                    .collect(Collectors.toSet());
+            if (approverId != null) {
+                approvedIds.add(approverId);
+            }
+            boolean complete = approvedIds.size() >= threshold;
+            log.debug("count 模式审批: 已通过 {} 人, 阈值 {}, 步骤完成: {}",
+                    approvedIds.size(), threshold, complete);
+            return complete;
+        }
+        if (!"all".equals(node.approvalMode())) {
             return true;
         }
         if ("user".equals(node.approverType())) {
@@ -640,7 +736,7 @@ public class ApprovalService {
         }
 
         Set<Long> approvedApproverIds = currentStepRecords.stream()
-                .filter(record -> "APPROVED".equals(BeanUtil.getProperty(record, "approveResult")))
+                .filter(record -> "APPROVED".equals(safeGetStringProperty(record, "approveResult", "")))
                 .map(record -> parseLong(BeanUtil.getProperty(record, "approverId"), null))
                 .filter(id -> id != null)
                 .collect(Collectors.toSet());
@@ -664,7 +760,9 @@ public class ApprovalService {
                 .toList();
     }
 
-    private void ensureWorkflowApproverAllowed(WorkflowDefinitionService.WorkflowApprovalNode node, Long approverId) {
+    private void ensureWorkflowApproverAllowed(WorkflowDefinitionService.WorkflowApprovalNode node,
+                                               Long approverId,
+                                               List<ApprovalRecord> currentStepRecords) {
         if (node == null || approverId == null) {
             return;
         }
@@ -687,6 +785,23 @@ public class ApprovalService {
         }
         if (!roleApproverIds.contains(approverId)) {
             throw new BusinessException("当前用户不属于节点审批角色");
+        }
+        // sequence 模式顺序校验：当前审批人必须是按 approverId 自然排序后第一个未审批的人
+        if ("sequence".equals(node.approvalMode()) && "role".equals(node.approverType())) {
+            List<Long> sortedRoleApproverIds = roleApproverIds.stream().sorted().toList();
+            Set<Long> approvedIds = currentStepRecords.stream()
+                    .filter(r -> "APPROVED".equals(safeGetStringProperty(r, "approveResult", "")))
+                    .map(r -> parseLong(BeanUtil.getProperty(r, "approverId"), null))
+                    .filter(id -> id != null)
+                    .collect(Collectors.toSet());
+            for (Long expectedApproverId : sortedRoleApproverIds) {
+                if (!approvedIds.contains(expectedApproverId)) {
+                    if (!expectedApproverId.equals(approverId)) {
+                        throw new BusinessException("sequence 模式下必须按顺序审批，当前不是您的审批轮次");
+                    }
+                    return;
+                }
+            }
         }
     }
 
@@ -873,7 +988,8 @@ public class ApprovalService {
             return count != null && count > 0;
         } catch (Exception e) {
             log.warn("failed_to_check_approval_records_for_process: {}, error: {}", processId, e.getMessage());
-            return false;
+            // fail-safe: 无法验证时默认有记录，避免误取消
+            return true;
         }
     }
 
@@ -909,7 +1025,54 @@ public class ApprovalService {
             notificationService.create(notification);
         } catch (Exception e) {
             // 通知发送失败不影响主业务流程
-            log.warn("发送审批通知失败: {}", e.getMessage());
+            log.error("发送审批通知失败: processId={}", process.getId(), e);
+        }
+    }
+
+    /**
+     * 发布 CC 提交通知事件。
+     * <p>审批流程创建成功后，获取工作流运行时计划第一个节点的 CC 配置，
+     * 发布 SUBMITTED 事件，由 NotificationEventListener 异步发送 CC 通知。</p>
+     */
+    private void publishCcSubmittedEvent(ApprovalProcess process) {
+        if (!isWorkflowManaged(process)) {
+            return;
+        }
+        try {
+            WorkflowDefinitionService.WorkflowRuntimePlan plan = resolveWorkflowRuntimePlan(process);
+            String ccRoleCodes = null;
+            String ccUserIds = null;
+            if (plan != null && !plan.approvalNodes().isEmpty()) {
+                WorkflowDefinitionService.WorkflowApprovalNode firstNode = plan.nodeAtStep(1);
+                if (firstNode != null) {
+                    ccRoleCodes = firstNode.ccRoleCodes();
+                    ccUserIds = firstNode.ccUserIds();
+                }
+            }
+            if ((ccRoleCodes == null || ccRoleCodes.isBlank())
+                    && (ccUserIds == null || ccUserIds.isBlank())) {
+                return; // 无 CC 配置，不发布事件
+            }
+            String tenantId = TenantContext.requireTenantId();
+            ApprovalProcessEvent event = new ApprovalProcessEvent(
+                    process.getId(),
+                    process.getProcessNo(),
+                    process.getProcessType(),
+                    null, null,
+                    "SUBMITTED",
+                    null, null,
+                    process.getApplicantId(),
+                    process.getBusinessData(),
+                    tenantId,
+                    LocalDateTime.now(),
+                    ccRoleCodes,
+                    ccUserIds);
+            eventPublisher.publishEvent(event);
+            log.info("CC 提交通知事件已发布: processId={}, ccRoleCodes={}, ccUserIds={}",
+                    process.getId(), ccRoleCodes, ccUserIds);
+        } catch (Exception e) {
+            // CC 事件发布异常不阻塞流程创建
+            log.warn("发布 CC 提交通知事件异常: processId={}", process.getId(), e);
         }
     }
 }

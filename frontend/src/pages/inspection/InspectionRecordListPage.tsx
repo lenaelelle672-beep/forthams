@@ -5,7 +5,8 @@ import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { inspectionApi } from '@/api/inspection';
 import { Inspection, InspectionTypeEnum, InspectionResultEnum } from '@/types/inspection';
 import { useNavigate } from 'react-router-dom';
-import dayjs, { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
+import type Dayjs from 'dayjs';
 
 const { Search } = Input;
 const { Option } = Select;
@@ -264,7 +265,6 @@ const InspectionRecordListPage: React.FC = () => {
         <Button type="primary" icon={<PlusOutlined />} onClick={handleCreate}>
           新建记录
         </Button>
-      </div>
       </div>
 
       {/* 数据表格 */}
