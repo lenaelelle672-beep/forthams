@@ -1,7 +1,8 @@
 package com.ams.controller;
 
+import com.ams.common.Result;
+import com.ams.entity.BusinessComment;
 import com.ams.entity.User;
-import com.ams.service.AssetService;
 import com.ams.service.UserManagementService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,8 +20,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -46,13 +45,8 @@ class UserSearchControllerTest {
     @MockBean
     private UserManagementService userManagementService;
 
-    @MockBean
-    private AssetService assetService;
-
     private User testUser1;
     private User testUser2;
-
-    private final List<Long> testDeptIds = Arrays.asList(1L, 2L);
 
     @BeforeEach
     void setUp() {
@@ -71,16 +65,13 @@ class UserSearchControllerTest {
         testUser2.setEmail("test2@example.com");
         testUser2.setPhone("13800138002");
         testUser2.setStatus(1);
-
-        when(assetService.getDeptIdsByTenant(org.mockito.ArgumentMatchers.anyString()))
-                .thenReturn(testDeptIds);
     }
 
     @Test
     @DisplayName("Should search users with keyword")
     void testSearchUsersWithKeyword() throws Exception {
         List<User> mockUsers = Arrays.asList(testUser1, testUser2);
-        when(userManagementService.searchUsersByDepts(eq("test"), anyList())).thenReturn(mockUsers);
+        when(userManagementService.searchUsers("test")).thenReturn(mockUsers);
 
         mockMvc.perform(get("/users/search")
                         .param("keyword", "test")
@@ -93,14 +84,14 @@ class UserSearchControllerTest {
                 .andExpect(jsonPath("$.data[0].realName").value("测试用户1"))
                 .andExpect(jsonPath("$.data[1].username").value("testuser2"));
 
-        verify(userManagementService).searchUsersByDepts(eq("test"), anyList());
+        verify(userManagementService).searchUsers("test");
     }
 
     @Test
     @DisplayName("Should return empty list when no keyword")
     void testSearchUsersWithoutKeyword() throws Exception {
         List<User> mockUsers = Collections.emptyList();
-        when(userManagementService.searchUsersByDepts(eq(null), anyList())).thenReturn(mockUsers);
+        when(userManagementService.searchUsers(null)).thenReturn(mockUsers);
 
         mockMvc.perform(get("/users/search")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -109,14 +100,14 @@ class UserSearchControllerTest {
                 .andExpect(jsonPath("$.data").isArray())
                 .andExpect(jsonPath("$.data.length()").value(0));
 
-        verify(userManagementService).searchUsersByDepts(eq(null), anyList());
+        verify(userManagementService).searchUsers(null);
     }
 
     @Test
     @DisplayName("Should return empty list when no users found")
     void testSearchUsersNoResults() throws Exception {
         List<User> mockUsers = Collections.emptyList();
-        when(userManagementService.searchUsersByDepts(eq("nonexistent"), anyList())).thenReturn(mockUsers);
+        when(userManagementService.searchUsers("nonexistent")).thenReturn(mockUsers);
 
         mockMvc.perform(get("/users/search")
                         .param("keyword", "nonexistent")
@@ -126,6 +117,6 @@ class UserSearchControllerTest {
                 .andExpect(jsonPath("$.data").isArray())
                 .andExpect(jsonPath("$.data.length()").value(0));
 
-        verify(userManagementService).searchUsersByDepts(eq("nonexistent"), anyList());
+        verify(userManagementService).searchUsers("nonexistent");
     }
 }

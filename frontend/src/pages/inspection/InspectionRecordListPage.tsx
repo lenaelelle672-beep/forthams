@@ -21,7 +21,7 @@ const InspectionRecordListPage: React.FC = () => {
   const [keyword, setKeyword] = useState<string>('');
   const [inspectionType, setInspectionType] = useState<string | undefined>();
   const [result, setResult] = useState<string | undefined>();
-  const [dateRange, setDateRange] = useState<[Dayjs, Dayjs] | null>(null);
+  const [dateRange, setDateRange] = useState<[any, any] | null>(null);
   const [pageNum, setPageNum] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
@@ -260,7 +260,7 @@ const InspectionRecordListPage: React.FC = () => {
         </Select>
         <RangePicker
           placeholder={['开始日期', '结束日期']}
-          onChange={(dates) => setDateRange(dates as [Dayjs, Dayjs] | null)}
+          onChange={(dates) => setDateRange(dates as [any, any] | null)}
         />
         <Button type="primary" icon={<PlusOutlined />} onClick={handleCreate}>
           新建记录
