@@ -128,7 +128,7 @@ export default function WorkOrderListPage() {
     },
     { key: 'reporterName', title: t('workorder:columns.reporterName'), width: 80 },
     { key: 'deptName', title: t('workorder:columns.deptName'), width: 100 },
-
+    {
       key: 'createTime',
       title: t('workorder:columns.createTime'),
       width: 120,
