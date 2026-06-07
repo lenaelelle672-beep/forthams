@@ -4,7 +4,7 @@ import {
   CardHeader,
   CardTitle,
   CardContent
-} from '@/components/ui/card';
+} from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import {
   Table,

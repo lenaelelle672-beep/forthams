@@ -46,7 +46,7 @@ const SafetyChecklistExecutionPage: React.FC = () => {
 
   const startMutation = useMutation({
     mutationFn: (data: { templateId: number; assetId: number; executorId: number }) =>
-      safetyApi.startExecution(data.templateId, data.assetId, data.executorId),
+      safetyApi.startExecution({ templateId: data.templateId, assetId: data.assetId, executorId: data.executorId }),
     onSuccess: (data: any) => {
       message.success('检查开始执行');
       navigate(`/safety-checklists/execute/${(data as any).id}`, { replace: true });

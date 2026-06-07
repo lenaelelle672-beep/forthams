@@ -381,7 +381,7 @@ const SafetyChecklistTemplatePage: React.FC = () => {
           }))
       : [];
 
-    const allItems = [...items, ...parsedItems];
+    const allItems = [...items, ...parsedItems] as SafetyChecklistItem[];
     batchSaveMutation.mutate({ templateId: selectedTemplateId, items: allItems });
   };
 
