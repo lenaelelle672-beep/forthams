@@ -7,7 +7,7 @@
  * - 通过 namespace 隔离模块文案
  */
 import i18n from 'i18next';
-import { initReactI18next } from 'react-i18next';
+import initReactI18next from 'react-i18next';
 
 // ── 通用文案 ──
 import commonZhCN from './locales/zh-CN/common';
