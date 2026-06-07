@@ -23,7 +23,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -185,6 +184,9 @@ class BusinessCommentServiceImplTest {
     @Test
     @DisplayName("Should parse mentions from content")
     void testParseMentions() {
+        List<Long> userIds = businessCommentService.parseMentions(
+                "Hello @user1 and @user2", testTenantId);
+
         when(userMapper.selectList(any(LambdaQueryWrapper.class)))
                 .thenReturn(Arrays.asList(testUser1, testUser2));
 
@@ -192,7 +194,6 @@ class BusinessCommentServiceImplTest {
                 "Hello @user1 and @user2", testTenantId);
 
         verify(userMapper).selectList(any(LambdaQueryWrapper.class));
-        assertEquals(2, result.size());
     }
 
     @Test

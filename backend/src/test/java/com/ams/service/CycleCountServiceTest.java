@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestPropertySource;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -28,6 +29,7 @@ import static org.mockito.Mockito.*;
  * 使用 Mock 数据验证 P0 级端到端场景逻辑
  */
 @SpringBootTest
+@TestPropertySource(locations = "classpath:application-test.properties")
 class CycleCountServiceTest {
 
     @Mock

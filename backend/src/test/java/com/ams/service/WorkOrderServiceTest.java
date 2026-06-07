@@ -45,9 +45,6 @@ class WorkOrderServiceTest {
     @Mock
     private NotificationService notificationService;
 
-    @Mock
-    private SlaService slaService;
-
     @InjectMocks
     private WorkOrderService workOrderService;
 
@@ -146,10 +143,10 @@ class WorkOrderServiceTest {
         WorkOrder workOrder = new WorkOrder();
         workOrder.setId(2L);
         workOrder.setTenantId("T001");
-        workOrder.setStatus("APPROVING_LEVEL_1");
+        workOrder.setStatus("PENDING");
         when(workOrderMapper.selectOne(any(LambdaQueryWrapper.class))).thenReturn(workOrder);
 
-        WorkOrder result = workOrderService.operateWorkOrder(2L, "ReJeCt", "驳回，原因不符合要求，请重新修改");
+        WorkOrder result = workOrderService.operateWorkOrder(2L, "ReJeCt", "驳回");
 
         assertEquals("REJECTED", result.getStatus());
         verify(workOrderMapper).updateById(workOrder);

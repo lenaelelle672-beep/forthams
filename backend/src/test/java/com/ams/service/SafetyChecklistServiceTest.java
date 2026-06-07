@@ -6,10 +6,10 @@ import com.ams.mapper.*;
 import com.ams.service.impl.SafetyChecklistServiceImpl;
 import com.ams.context.TenantContext;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -57,31 +57,16 @@ class SafetyChecklistServiceTest {
     @Mock
     private PdfExportService pdfExportService;
 
-    @Mock
-    private TenantService tenantService;
-
+    @InjectMocks
     private SafetyChecklistServiceImpl safetyChecklistService;
 
     private final String tenantId = "test-tenant";
 
-    private MockedStatic<TenantContext> mockedTenantContext;
-
     @BeforeEach
     void setUp() {
         // 模拟租户上下文
-        mockedTenantContext = mockStatic(TenantContext.class);
-        mockedTenantContext.when(TenantContext::requireTenantId).thenReturn(tenantId);
-
-        safetyChecklistService = new SafetyChecklistServiceImpl(
-                templateMapper, itemMapper, executionMapper, resultMapper,
-                workOrderService, notificationService, safetyChecklistAttachmentService,
-                pdfExportService, tenantService);
-    }
-
-    @AfterEach
-    void tearDown() {
-        if (mockedTenantContext != null) {
-            mockedTenantContext.close();
+        try (MockedStatic<TenantContext> mockedStatic = mockStatic(TenantContext.class)) {
+            mockedStatic.when(TenantContext::requireTenantId).thenReturn(tenantId);
         }
     }
 
@@ -145,7 +130,7 @@ class SafetyChecklistServiceTest {
         template.setId(1L);
         template.setTenantId(tenantId);
 
-        lenient().when(templateMapper.selectOne(any())).thenReturn(template);
+        when(templateMapper.selectOne(any())).thenReturn(template);
         when(executionMapper.insert(any(SafetyChecklistExecution.class))).thenReturn(1);
 
         // Act
@@ -228,14 +213,16 @@ class SafetyChecklistServiceTest {
         item.setItemType("PASS_FAIL");
         item.setSortOrder(1);
         item.setRequired(1);
+
         List<SafetyChecklistItem> items = List.of(item);
 
-        SafetyChecklistResult resultItem = new SafetyChecklistResult();
-        resultItem.setId(1L);
-        resultItem.setExecutionId(1L);
-        resultItem.setItemId(1L);
-        resultItem.setResult("PASS");
-        List<SafetyChecklistResult> results = List.of(resultItem);
+        SafetyChecklistResult checkResult = new SafetyChecklistResult();
+        checkResult.setId(1L);
+        checkResult.setExecutionId(1L);
+        checkResult.setItemId(1L);
+        checkResult.setResult("PASS");
+
+        List<SafetyChecklistResult> results = List.of(checkResult);
 
         when(executionMapper.selectOne(any())).thenReturn(execution);
         when(templateMapper.selectById(1L)).thenReturn(template);

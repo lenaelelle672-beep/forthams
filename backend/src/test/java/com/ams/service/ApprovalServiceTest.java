@@ -32,7 +32,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentCaptor.forClass;
-import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -80,9 +79,6 @@ class ApprovalServiceTest {
     @BeforeEach
     void setUp() {
         TenantContext.setTenantId("T001");
-        // 默认 mock MyBatis-Plus 增删改操作返回值（避免乐观锁冲突）
-        lenient().when(approvalProcessMapper.updateById(any(ApprovalProcess.class))).thenReturn(1);
-        lenient().when(approvalRecordMapper.insert(any(ApprovalRecord.class))).thenReturn(1);
         approvalService = new ApprovalService(
                 approvalProcessMapper,
                 approvalRecordMapper,
