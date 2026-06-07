@@ -43,6 +43,11 @@ declare module "antd" {
   export const Empty: any;
   export const Steps: any;
   export const Upload: any;
+  export const InputNumber: any;
+  export const Descriptions: any;
+  export const Result: any;
+  export const Rate: any;
+  export const Slider: any;
   export const List: any;
   export const Pagination: any;
   export const Breadcrumb: any;
@@ -271,10 +276,11 @@ declare module "@ant-design/icons" {
 declare module "dayjs" {
   const dayjs: any;
   export default dayjs;
+  export type Dayjs = any;
 }
 
 declare module "react-i18next" {
-  export function useTranslation(): { t: (key: string) => string; i18n: any };
+  export function useTranslation(ns?: string | string[]): { t: (key: string) => string; i18n: any };
   export const Trans: any;
   export const withTranslation: any;
 }
