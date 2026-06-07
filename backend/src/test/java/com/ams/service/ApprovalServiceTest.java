@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 
 import java.util.List;
 import java.util.Map;
@@ -31,6 +32,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentCaptor.forClass;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -68,6 +70,9 @@ class ApprovalServiceTest {
     @Mock
     private NotificationService notificationService;
 
+    @Mock
+    private ApplicationEventPublisher eventPublisher;
+
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     private ApprovalService approvalService;
@@ -75,6 +80,9 @@ class ApprovalServiceTest {
     @BeforeEach
     void setUp() {
         TenantContext.setTenantId("T001");
+        // 默认 mock MyBatis-Plus 增删改操作返回值（避免乐观锁冲突）
+        lenient().when(approvalProcessMapper.updateById(any(ApprovalProcess.class))).thenReturn(1);
+        lenient().when(approvalRecordMapper.insert(any(ApprovalRecord.class))).thenReturn(1);
         approvalService = new ApprovalService(
                 approvalProcessMapper,
                 approvalRecordMapper,
@@ -86,7 +94,8 @@ class ApprovalServiceTest {
                 userRoleMapper,
                 roleMapper,
                 objectMapper,
-                notificationService);
+                notificationService,
+                eventPublisher);
     }
 
     @AfterEach
@@ -784,10 +793,10 @@ class ApprovalServiceTest {
     }
 
     private WorkflowDefinitionService.WorkflowApprovalNode workflowNode(int stepNo, String nodeId, String approverRole, String approvalMode) {
-        return new WorkflowDefinitionService.WorkflowApprovalNode(stepNo, nodeId, nodeId.toUpperCase(), "审批节点", approverRole, approvalMode, "role", null);
+        return new WorkflowDefinitionService.WorkflowApprovalNode(stepNo, nodeId, nodeId.toUpperCase(), "审批节点", approverRole, approvalMode, "role", null, null, null, 0, 0);
     }
 
     private WorkflowDefinitionService.WorkflowApprovalNode workflowUserNode(int stepNo, String nodeId, Long approverId, String approvalMode) {
-        return new WorkflowDefinitionService.WorkflowApprovalNode(stepNo, nodeId, nodeId.toUpperCase(), "审批节点", "", approvalMode, "user", String.valueOf(approverId));
+        return new WorkflowDefinitionService.WorkflowApprovalNode(stepNo, nodeId, nodeId.toUpperCase(), "审批节点", "", approvalMode, "user", String.valueOf(approverId), null, null, 0, 0);
     }
 }
