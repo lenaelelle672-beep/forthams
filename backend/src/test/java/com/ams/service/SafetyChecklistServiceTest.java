@@ -6,10 +6,10 @@ import com.ams.mapper.*;
 import com.ams.service.impl.SafetyChecklistServiceImpl;
 import com.ams.context.TenantContext;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -57,16 +57,31 @@ class SafetyChecklistServiceTest {
     @Mock
     private PdfExportService pdfExportService;
 
-    @InjectMocks
+    @Mock
+    private TenantService tenantService;
+
     private SafetyChecklistServiceImpl safetyChecklistService;
 
     private final String tenantId = "test-tenant";
 
+    private MockedStatic<TenantContext> mockedTenantContext;
+
     @BeforeEach
     void setUp() {
         // 模拟租户上下文
-        try (MockedStatic<TenantContext> mockedStatic = mockStatic(TenantContext.class)) {
-            mockedStatic.when(TenantContext::requireTenantId).thenReturn(tenantId);
+        mockedTenantContext = mockStatic(TenantContext.class);
+        mockedTenantContext.when(TenantContext::requireTenantId).thenReturn(tenantId);
+
+        safetyChecklistService = new SafetyChecklistServiceImpl(
+                templateMapper, itemMapper, executionMapper, resultMapper,
+                workOrderService, notificationService, safetyChecklistAttachmentService,
+                pdfExportService, tenantService);
+    }
+
+    @AfterEach
+    void tearDown() {
+        if (mockedTenantContext != null) {
+            mockedTenantContext.close();
         }
     }
 
@@ -109,7 +124,7 @@ class SafetyChecklistServiceTest {
         // Arrange
         SafetyChecklistTemplate template = new SafetyChecklistTemplate();
         template.setTemplateName("测试模板");
-        when(templateMapper.insert(any())).thenReturn(1);
+        when(templateMapper.insert(any(SafetyChecklistTemplate.class))).thenReturn(1);
 
         // Act
         SafetyChecklistTemplate result = safetyChecklistService.createTemplate(template);
@@ -118,7 +133,7 @@ class SafetyChecklistServiceTest {
         assertNotNull(result);
         assertEquals(tenantId, result.getTenantId());
         assertEquals("ACTIVE", result.getStatus());
-        verify(templateMapper).insert(any());
+        verify(templateMapper).insert(any(SafetyChecklistTemplate.class));
     }
 
     // ── 执行流程测试 ─────────────────────────────────────────────────────────
@@ -130,8 +145,8 @@ class SafetyChecklistServiceTest {
         template.setId(1L);
         template.setTenantId(tenantId);
 
-        when(templateMapper.selectOne(any())).thenReturn(template);
-        when(executionMapper.insert(any())).thenReturn(1);
+        lenient().when(templateMapper.selectOne(any())).thenReturn(template);
+        when(executionMapper.insert(any(SafetyChecklistExecution.class))).thenReturn(1);
 
         // Act
         SafetyChecklistExecution result = safetyChecklistService.startExecution(1L, 100L, 1L);
@@ -153,7 +168,7 @@ class SafetyChecklistServiceTest {
         template.setTenantId(tenantId);
 
         when(templateMapper.selectOne(any())).thenReturn(template);
-        when(executionMapper.insert(any())).thenReturn(1);
+        when(executionMapper.insert(any(SafetyChecklistExecution.class))).thenReturn(1);
 
         List<Long> assetIds = List.of(100L, 101L, 102L);
 
@@ -178,7 +193,7 @@ class SafetyChecklistServiceTest {
         template.setTenantId(tenantId);
 
         when(templateMapper.selectOne(any())).thenReturn(template);
-        when(executionMapper.insert(any())).thenReturn(1);
+        when(executionMapper.insert(any(SafetyChecklistExecution.class))).thenReturn(1);
 
         List<Long> assetIds = List.of(100L, 101L, 102L);
 
@@ -206,13 +221,21 @@ class SafetyChecklistServiceTest {
         template.setId(1L);
         template.setTemplateName("测试模板");
 
-        List<SafetyChecklistItem> items = List.of(
-                new SafetyChecklistItem(1L, 1L, "检查项1", "PASS_FAIL", 1, 1)
-        );
+        SafetyChecklistItem item = new SafetyChecklistItem();
+        item.setId(1L);
+        item.setTemplateId(1L);
+        item.setItemName("检查项1");
+        item.setItemType("PASS_FAIL");
+        item.setSortOrder(1);
+        item.setRequired(1);
+        List<SafetyChecklistItem> items = List.of(item);
 
-        List<SafetyChecklistResult> results = List.of(
-                new SafetyChecklistResult(1L, 1L, 1L, "PASS", null, null, null)
-        );
+        SafetyChecklistResult resultItem = new SafetyChecklistResult();
+        resultItem.setId(1L);
+        resultItem.setExecutionId(1L);
+        resultItem.setItemId(1L);
+        resultItem.setResult("PASS");
+        List<SafetyChecklistResult> results = List.of(resultItem);
 
         when(executionMapper.selectOne(any())).thenReturn(execution);
         when(templateMapper.selectById(1L)).thenReturn(template);

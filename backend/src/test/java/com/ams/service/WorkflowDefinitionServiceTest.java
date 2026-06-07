@@ -381,7 +381,7 @@ class WorkflowDefinitionServiceTest {
         BusinessException exception = assertThrows(BusinessException.class,
                 () -> workflowDefinitionService.publish("ASSET_TRANSFER", 11L));
 
-        assertEquals("审批节点审批模式仅支持 sequence/all/any", exception.getMessage());
+        assertEquals("审批节点审批模式仅支持 sequence/all/any/count", exception.getMessage());
     }
 
     private WorkflowDefinition definition(String status, Integer version) {

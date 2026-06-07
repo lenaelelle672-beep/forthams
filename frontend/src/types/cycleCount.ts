@@ -34,7 +34,7 @@ export interface BatchResult {
 }
 
 /**
- * 分类统计数据
+ * 分类统计数据（total_value 类字段在某些场景下为可选，某些场景下为必需）
  */
 export interface ClassificationStatistics {
   A_count: number;
@@ -42,20 +42,6 @@ export interface ClassificationStatistics {
   C_count: number;
   CATEGORY_count: number;
   total_value?: number;
-  A_total_value?: number;
-  B_total_value?: number;
-  C_total_value?: number;
-  CATEGORY_total_value?: number;
-}
-
-/**
- * 分类统计数据
- */
-export interface ClassificationStatistics {
-  A_count: number;
-  B_count: number;
-  C_count: number;
-  CATEGORY_count: number;
   A_total_value: number;
   B_total_value: number;
   C_total_value: number;

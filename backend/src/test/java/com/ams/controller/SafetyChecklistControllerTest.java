@@ -20,6 +20,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.List;
 import java.util.Map;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -140,10 +141,22 @@ class SafetyChecklistControllerTest {
     @Test
     void testGetPhotos_WithValidExecutionId() throws Exception {
         // Arrange
-        List<SafetyChecklistResult> results = List.of(new SafetyChecklistResult(1L, 1L, 1L, "PASS", null, null, null));
-        List<SysAttachment> photos = List.of(
-                new SysAttachment(1L, "SAFETY_CHECKLIST_RESULT", 1L, "photo.jpg", "/uploads/1.jpg", 1024L, "image/jpeg", 1L)
-        );
+        SafetyChecklistResult result = new SafetyChecklistResult();
+        result.setId(1L);
+        result.setExecutionId(1L);
+        result.setItemId(1L);
+        result.setResult("PASS");
+        List<SafetyChecklistResult> results = List.of(result);
+        SysAttachment photo = new SysAttachment();
+        photo.setId(1L);
+        photo.setBusinessType("SAFETY_CHECKLIST_RESULT");
+        photo.setBusinessId(1L);
+        photo.setFileName("photo.jpg");
+        photo.setFilePath("/uploads/1.jpg");
+        photo.setFileSize(1024L);
+        photo.setFileType("image/jpeg");
+        photo.setUploadBy(1L);
+        List<SysAttachment> photos = List.of(photo);
 
         when(safetyChecklistService.getResultsByExecutionId(1L)).thenReturn(results);
         when(safetyChecklistAttachmentService.getAttachments(1L)).thenReturn(photos);
