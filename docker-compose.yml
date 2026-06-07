@@ -1,107 +1,84 @@
-version: '3.8'
+version: "3.9"
 
 services:
-  # MySQL 数据库
+  # ============================================================
+  # MySQL 8.0 数据库
+  # ============================================================
   mysql:
     image: mysql:8.0
-    container_name: ams-mysql
+    container_name: forthams-mysql
+    restart: unless-stopped
+    ports:
+      - "3307:3306"
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: ams
-      MYSQL_USER: ams
-      MYSQL_PASSWORD: ams123
-      TZ: Asia/Shanghai
-    ports:
-      - "3306:3306"
+      MYSQL_DATABASE: ams_db
+      MYSQL_CHARACTER_SET_SERVER: utf8mb4
+      MYSQL_COLLATION_SERVER: utf8mb4_unicode_ci
     volumes:
-      - mysql-data:/var/lib/mysql
-      - ./mysql-init:/docker-entrypoint-initdb.d:ro
+      - mysql_data:/var/lib/mysql
+      - ./backend/src/main/resources/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 30s
-    networks:
-      - ams-network
 
-  # Redis 缓存
+  # ============================================================
+  # Redis 7 缓存
+  # ============================================================
   redis:
     image: redis:7-alpine
-    container_name: ams-redis
+    container_name: forthams-redis
+    restart: unless-stopped
     ports:
-      - "6379:6379"
-    volumes:
-      - redis-data:/data
-    command: redis-server --appendonly yes --requirepass ams123
+      - "6380:6379"
     healthcheck:
-      test: ["CMD", "redis-cli", "-a", "ams123", "ping"]
+      test: ["CMD", "redis-cli", "ping"]
       interval: 10s
-      timeout: 5s
+      timeout: 3s
       retries: 5
       start_period: 10s
-    networks:
-      - ams-network
 
-  # 后端服务
+  # ============================================================
+  # 后端 Spring Boot 应用
+  # ============================================================
   backend:
     build:
-      context: .
-      dockerfile: backend/Dockerfile
-      target: backend-build
-    container_name: ams-backend
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: forthams-backend
+    restart: unless-stopped
     ports:
       - "8080:8080"
     environment:
-      SPRING_PROFILES_ACTIVE: prod
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/ams?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
-      SPRING_DATASOURCE_USERNAME: ams
-      SPRING_DATASOURCE_PASSWORD: ams123
-      SPRING_REDIS_HOST: redis
-      SPRING_REDIS_PORT: 6379
-      SPRING_REDIS_PASSWORD: ams123
-      JAVA_OPTS: "-Xms512m -Xmx1024m -XX:+UseG1GC -XX:+UseContainerSupport"
-      TZ: Asia/Shanghai
+      DB_URL: jdbc:mysql://mysql:3306/ams_db?useUnicode=true&characterEncoding=utf8&connectionCollation=utf8mb4_unicode_ci&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+      DB_USERNAME: root
+      DB_PASSWORD: root
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      JWT_SECRET: ${JWT_SECRET:-default-dev-secret-change-in-production}
     depends_on:
       mysql:
         condition: service_healthy
       redis:
         condition: service_healthy
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 60s
-    networks:
-      - ams-network
 
-  # 前端服务
+  # ============================================================
+  # 前端 Nginx 静态文件服务
+  # ============================================================
   frontend:
     build:
       context: .
       dockerfile: frontend/Dockerfile
-      target: frontend-build
-    container_name: ams-frontend
+    container_name: forthams-frontend
+    restart: unless-stopped
     ports:
-      - "80:80"
+      - "3000:80"
     depends_on:
       - backend
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:80/"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
-      start_period: 10s
-    networks:
-      - ams-network
 
 volumes:
-  mysql-data:
+  mysql_data:
     driver: local
-  redis-data:
-    driver: local
-
-networks:
-  ams-network:
-    driver: bridge

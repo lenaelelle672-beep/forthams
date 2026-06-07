@@ -142,7 +142,7 @@ public class NotificationEventListener {
                     todoReq.setUserId(userId);
                     todoReq.setTitle(processLabel + "（编号：" + event.getProcessNo() + "）需要您审批");
                     todoReq.setRefType("APPROVAL_PROCESS");
-                    todoReq.setRefId(event.getProcessId().toString());
+                    todoReq.setRefId(String.valueOf(event.getProcessId()));
                     todoReq.setPriority("HIGH");
                     todoReq.setDueAt(LocalDateTime.now().plusDays(7));
                     todoService.createTodo(todoReq);
