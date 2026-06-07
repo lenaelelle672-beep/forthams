@@ -22,7 +22,7 @@ export default function FaultCodeTreePage() {
   const [deleteConfirm, setDeleteConfirm] = useState<FaultCode | null>(null);
   const [editingNode, setEditingNode] = useState<FaultCode | null>(null);
   const [parentNode, setParentNode] = useState<FaultCode | null>(null);
-  const [form, setForm] = useState({ code: '', faultPhenomenon: '', faultCause: '', solution: '', sortOrder: 0 });
+  const [form, setForm] = useState<{ code: string; faultPhenomenon: string; faultCause: string; solution: string; sortOrder: number; parentId?: number; level?: number }>({ code: '', faultPhenomenon: '', faultCause: '', solution: '', sortOrder: 0 });
 
   const { data: res, isLoading } = useQuery({
     queryKey: ['fault-codes', 'tree'],
@@ -249,7 +249,7 @@ export default function FaultCodeTreePage() {
                 value={form.faultPhenomenon || form.faultCause || form.solution}
                 onChange={e => {
                   const val = e.target.value;
-                  setForm(prev => ({
+                  setForm((prev: any) => ({
                     ...prev,
                     faultPhenomenon: !prev.parentId ? val : undefined,
                     faultCause: prev.parentId && prev.level !== 3 ? val : undefined,

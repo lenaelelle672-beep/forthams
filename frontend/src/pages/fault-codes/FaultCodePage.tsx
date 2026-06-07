@@ -351,7 +351,7 @@ export default function FaultCodePage() {
                 value={form.faultPhenomenon || form.faultCause || form.solution}
                 onChange={e => {
                   const val = e.target.value;
-                  setForm(prev => ({
+                  setForm((prev: any) => ({
                     ...prev,
                     faultPhenomenon: prev.parentId ? undefined : val,
                     faultCause: prev.parentId ? val : undefined,

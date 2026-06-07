@@ -67,8 +67,8 @@ const PhotoUpload: React.FC<{ value?: string; onChange?: (value: string) => void
           preview={{
             visible: previewOpen,
             onVisibleChange: (vis) => setPreviewOpen(vis),
-            current: previewImage,
-            onChange: (current) => setPreviewImage(current)
+            current: Number(previewImage) || 0,
+            onChange: (current) => setPreviewImage(String(current))
           }}
         >
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>

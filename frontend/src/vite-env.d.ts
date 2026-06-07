@@ -177,6 +177,8 @@ declare module "@ant-design/icons" {
   export const SmileOutlined: any;
   export const FrownOutlined: any;
   export const MehOutlined: any;
+  export const QrcodeOutlined: any;
+  export const StopOutlined: any;
   export const LoadingOutlined: any;
   export const CheckCircleOutlined: any;
   export const CheckCircleFilled: any;
