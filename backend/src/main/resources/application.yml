@@ -115,7 +115,8 @@ springdoc:
 
 # ========== JWT ==========
 jwt:
-  secret: ${JWT_SECRET:ams-secret-key-for-jwt-token-generation-must-be-at-least-256-bits-long}
+  # 不提供弱默认值：JWT_SECRET 必须由环境变量注入（ApplicationConfigValidator 在缺失时阻止启动）
+  secret: ${JWT_SECRET:}
   expiration: ${JWT_EXPIRATION:86400000}
 
 # ========== 日志配置 ==========

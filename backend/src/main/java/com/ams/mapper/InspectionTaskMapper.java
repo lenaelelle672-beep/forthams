@@ -68,7 +68,11 @@ public interface InspectionTaskMapper extends BaseMapper<InspectionTask> {
      * @param taskIds 任务ID列表
      * @param status  新状态
      */
-    @Update("UPDATE inspection_task SET status = #{status}, update_time = NOW() " +
-            "WHERE id IN (${taskIds}) AND deleted = 0")
-    void batchUpdateStatus(@Param("taskIds") String taskIds, @Param("status") String status);
+    @Update("<script>" +
+            "UPDATE inspection_task SET status = #{status}, update_time = NOW() " +
+            "WHERE id IN " +
+            "<foreach item='id' collection='taskIds' open='(' separator=',' close=')'>#{id}</foreach>" +
+            " AND deleted = 0" +
+            "</script>")
+    void batchUpdateStatus(@Param("taskIds") List<Long> taskIds, @Param("status") String status);
 }
