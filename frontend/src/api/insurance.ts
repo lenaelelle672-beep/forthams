@@ -4,11 +4,11 @@ import type {
   InsuranceClaim,
   InsuranceQueryParams
 } from '@/types/insurance';
-import type { PageResult } from '@/types/common';
+import type { PageData } from '@/types/common';
 
 export const insuranceApi = {
   list: (params: InsuranceQueryParams) =>
-    http.get<PageResult<Insurance>>('/insurance/list', { params }),
+    http.get<PageData<Insurance>>('/insurance/list', { params }),
 
   getById: (id: number) =>
     http.get<Insurance>(`/insurance/${id}`),
@@ -33,7 +33,7 @@ export const insuranceApi = {
 
 export const claimApi = {
   list: (insuranceId?: number, status?: string, pageNum: number = 1, pageSize: number = 10) =>
-    http.get<PageResult<InsuranceClaim>>(insuranceId ? `/insurance/${insuranceId}/claims` : '/insurance/claims', {
+    http.get<PageData<InsuranceClaim>>(insuranceId ? `/insurance/${insuranceId}/claims` : '/insurance/claims', {
       params: { status, pageNum, pageSize }
     }),
 

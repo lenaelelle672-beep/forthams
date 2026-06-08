@@ -3,7 +3,9 @@ import type {
   SafetyChecklistTemplate,
   SafetyChecklistItem,
   SafetyChecklistExecution,
-  SafetyChecklistResult
+  SafetyChecklistResult,
+  SysAttachment,
+  SafetyChecklistBatchResult
 } from '@/types/safety';
 
 export const safetyApi = {

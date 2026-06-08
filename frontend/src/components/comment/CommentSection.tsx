@@ -32,7 +32,7 @@ export default function CommentSection({ businessType, businessId, maxHeight = '
     queryFn: () => getComments(businessType, businessId),
   });
 
-  const comments = (commentsRes as any)?.records ?? (commentsRes as BusinessComment[]) ?? [];
+  const comments: BusinessComment[] = (commentsRes as any)?.records ?? [];
 
   const createMutation = useMutation({
     mutationFn: (data: { content: string; parentCommentId?: number | null }) =>

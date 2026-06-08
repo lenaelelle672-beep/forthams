@@ -57,8 +57,9 @@ const mockComments: BusinessComment[] = [
     userName: '测试用户',
     content: '这是一条测试评论',
     parentCommentId: null,
-    tenantId: 'test-tenant',
+    likes: 0,
     createTime: '2024-01-01T10:00:00',
+    updateTime: '2024-01-01T10:00:00',
   },
   {
     id: 2,
@@ -68,8 +69,9 @@ const mockComments: BusinessComment[] = [
     userName: '另一个用户',
     content: '这是另一条评论 @testuser',
     parentCommentId: null,
-    tenantId: 'test-tenant',
+    likes: 0,
     createTime: '2024-01-01T11:00:00',
+    updateTime: '2024-01-01T11:00:00',
   },
 ];
 
