@@ -248,7 +248,7 @@
                 <configuration>
                     <forkCount>1</forkCount>
                     <reuseForks>false</reuseForks>
-                    <argLine>-Xmx1024m -XX:+UseParallelGC</argLine>
+                    <argLine>-Xmx2048m -XX:+UseParallelGC</argLine>
                 </configuration>
             </plugin>
             <plugin>
