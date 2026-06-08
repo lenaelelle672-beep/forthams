@@ -1,11 +1,14 @@
 package com.ams.controller;
 
 import com.ams.common.Result;
+import com.ams.common.exception.BusinessException;
 import com.ams.dto.CreateCustomDefinitionRequest;
 import com.ams.dto.WorkflowDefinitionDTO;
 import com.ams.dto.WorkflowDefinitionSaveDTO;
 import com.ams.dto.WorkflowStatusUpdateDTO;
 import com.ams.service.WorkflowDefinitionService;
+import com.ams.utils.JwtUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -27,6 +30,7 @@ import java.util.Map;
 public class WorkflowDefinitionController {
 
     private final WorkflowDefinitionService workflowDefinitionService;
+    private final JwtUtil jwtUtil;
 
     @PreAuthorize("@ss.hasPermi('workflow:definition:query')")
     @GetMapping
@@ -44,16 +48,18 @@ public class WorkflowDefinitionController {
     @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
     public Result<WorkflowDefinitionDTO> saveDraft(
             @PathVariable String businessType,
-            @Valid @RequestBody WorkflowDefinitionSaveDTO dto) {
-        return Result.success(workflowDefinitionService.saveDraft(businessType, dto));
+            @Valid @RequestBody WorkflowDefinitionSaveDTO dto,
+            HttpServletRequest request) {
+        Long operatorId = getCurrentUserId(request);
+        return Result.success(workflowDefinitionService.saveDraft(businessType, dto, operatorId));
     }
 
     @PostMapping("/{businessType}/publish")
     @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
     public Result<WorkflowDefinitionDTO> publish(
             @PathVariable String businessType,
-            @RequestBody(required = false) WorkflowStatusUpdateDTO dto) {
-        Long operatorId = dto == null ? null : dto.getOperatorId();
+            HttpServletRequest request) {
+        Long operatorId = getCurrentUserId(request);
         return Result.success(workflowDefinitionService.publish(businessType, operatorId));
     }
 
@@ -61,16 +67,20 @@ public class WorkflowDefinitionController {
     @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
     public Result<WorkflowDefinitionDTO> updateStatus(
             @PathVariable String businessType,
-            @Valid @RequestBody WorkflowStatusUpdateDTO dto) {
-        return Result.success(workflowDefinitionService.updateStatus(businessType, dto));
+            @Valid @RequestBody WorkflowStatusUpdateDTO dto,
+            HttpServletRequest request) {
+        Long operatorId = getCurrentUserId(request);
+        return Result.success(workflowDefinitionService.updateStatus(businessType, dto, operatorId));
     }
 
     @PostMapping("/custom")
     @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
     public Result<WorkflowDefinitionDTO> createCustomDefinition(
-            @Valid @RequestBody CreateCustomDefinitionRequest request) {
+            @Valid @RequestBody CreateCustomDefinitionRequest req,
+            HttpServletRequest request) {
+        Long operatorId = getCurrentUserId(request);
         return Result.success(workflowDefinitionService.createCustomDefinition(
-                request.getBusinessType(), request.getName(), request.getDescription(), request.getOperatorId()));
+                req.getBusinessType(), req.getName(), req.getDescription(), operatorId));
     }
 
     @DeleteMapping("/{businessType}")
@@ -78,5 +88,17 @@ public class WorkflowDefinitionController {
     public Result<Void> deleteDefinition(@PathVariable String businessType) {
         workflowDefinitionService.deleteDefinition(businessType);
         return Result.success(null);
+    }
+
+    private Long getCurrentUserId(HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            throw new BusinessException("未获取到当前用户");
+        }
+        Long userId = jwtUtil.getUserIdFromToken(authHeader.substring(7));
+        if (userId == null) {
+            throw new BusinessException("未获取到当前用户");
+        }
+        return userId;
     }
 }

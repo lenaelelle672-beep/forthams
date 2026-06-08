@@ -1,5 +1,6 @@
 package com.ams.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -20,6 +21,8 @@ public class CreateCustomDefinitionRequest {
     @Size(max = 500, message = "流程描述最长500字符")
     private String description;
 
-    /** 操作人ID，由后端从安全上下文获取后注入 */
+    /** @deprecated 操作人ID已改为从JWT安全上下文获取，此字段将被忽略 */
+    @Deprecated
+    @JsonIgnore
     private Long operatorId;
 }

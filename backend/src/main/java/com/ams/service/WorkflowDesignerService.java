@@ -2,6 +2,7 @@ package com.ams.service;
 
 import com.ams.common.exception.BusinessException;
 import com.ams.entity.WorkflowDefinition;
+import com.ams.enums.WorkflowStatus;
 import com.ams.entity.WorkflowEdge;
 import com.ams.entity.WorkflowNode;
 import com.ams.mapper.WorkflowDefinitionMapper;
@@ -148,7 +149,7 @@ public class WorkflowDesignerService {
         }
 
         // 更新定义状态
-        def.setStatus("PUBLISHED");
+        def.setStatus(WorkflowStatus.PUBLISHED.name());
         def.setVersion((def.getVersion() == null ? 0 : def.getVersion()) + 1);
         def.setPublishedAt(LocalDateTime.now());
         workflowDefinitionMapper.updateById(def);
