@@ -33,12 +33,12 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentCaptor.forClass;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-@Disabled("依赖已删除类，第4轮修复时标记")
 class ApprovalServiceTest {
 
     @Mock
@@ -94,6 +94,8 @@ class ApprovalServiceTest {
                 objectMapper,
                 notificationService,
                 eventPublisher);
+        // 模拟乐观锁更新成功（影响 1 行）；用 lenient 以兼容走 never()/创建路径的用例
+        lenient().when(approvalProcessMapper.updateById(any(ApprovalProcess.class))).thenReturn(1);
     }
 
     @AfterEach

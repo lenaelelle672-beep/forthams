@@ -33,6 +33,12 @@ class AssetServiceTest {
     @Mock
     private AssetLifecycleService assetLifecycleService;
 
+    @Mock
+    private AssetParentChildService assetParentChildService;
+
+    @Mock
+    private ABCClassificationService abcClassificationService;
+
     @InjectMocks
     private AssetService assetService;
 

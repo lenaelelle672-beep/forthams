@@ -32,7 +32,6 @@ import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 
 @ExtendWith(MockitoExtension.class)
-@Disabled("运行时类找不到，第4轮修复时标记")
 class WorkOrderServiceTest {
 
     @Mock
@@ -46,6 +45,9 @@ class WorkOrderServiceTest {
 
     @Mock
     private NotificationService notificationService;
+
+    @Mock
+    private SlaService slaService;
 
     @InjectMocks
     private WorkOrderService workOrderService;
@@ -145,10 +147,12 @@ class WorkOrderServiceTest {
         WorkOrder workOrder = new WorkOrder();
         workOrder.setId(2L);
         workOrder.setTenantId("T001");
-        workOrder.setStatus("PENDING");
+        // REJECT 仅在审批中状态有效（PENDING 只能 SUBMIT/APPROVE/CANCEL）
+        workOrder.setStatus("APPROVING_LEVEL_1");
         when(workOrderMapper.selectOne(any(LambdaQueryWrapper.class))).thenReturn(workOrder);
 
-        WorkOrder result = workOrderService.operateWorkOrder(2L, "ReJeCt", "驳回");
+        // 驳回原因需满足状态机最小长度校验（>=10 字符）
+        WorkOrder result = workOrderService.operateWorkOrder(2L, "ReJeCt", "工单信息有误，需驳回处理");
 
         assertEquals("REJECTED", result.getStatus());
         verify(workOrderMapper).updateById(workOrder);

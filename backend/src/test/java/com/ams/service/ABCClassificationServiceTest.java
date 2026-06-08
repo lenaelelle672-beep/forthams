@@ -28,7 +28,6 @@ import static org.mockito.Mockito.*;
  * ABC 分类服务单元测试
  */
 @ExtendWith(MockitoExtension.class)
-@Disabled("依赖已删除类，第4轮修复时标记")
 class ABCClassificationServiceTest {
 
     @Mock

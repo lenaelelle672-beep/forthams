@@ -17,7 +17,6 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("租户服务测试")
-@Disabled("依赖已删除类，第4轮修复时标记")
 class TenantServiceTest {
 
     @Mock

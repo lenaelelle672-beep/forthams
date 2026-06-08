@@ -4,6 +4,7 @@ import com.ams.context.TenantContext;
 import com.ams.entity.BusinessComment;
 import com.ams.entity.NotificationRecord;
 import com.ams.entity.User;
+import com.ams.mapper.BusinessCommentLikeRecordMapper;
 import com.ams.mapper.BusinessCommentMapper;
 import com.ams.mapper.UserMapper;
 import com.ams.service.NotificationService;
@@ -24,6 +25,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -35,7 +37,6 @@ import static org.mockito.Mockito.*;
  */
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Business Comment Service Tests")
-@Disabled("依赖已删除类，第4轮修复时标记")
 class BusinessCommentServiceImplTest {
 
     @Mock
@@ -46,6 +47,9 @@ class BusinessCommentServiceImplTest {
 
     @Mock
     private NotificationService notificationService;
+
+    @Mock
+    private BusinessCommentLikeRecordMapper businessCommentLikeRecordMapper;
 
     @InjectMocks
     private BusinessCommentServiceImpl businessCommentService;
@@ -186,15 +190,13 @@ class BusinessCommentServiceImplTest {
     @Test
     @DisplayName("Should parse mentions from content")
     void testParseMentions() {
-        List<Long> userIds = businessCommentService.parseMentions(
-                "Hello @user1 and @user2", testTenantId);
-
         when(userMapper.selectList(any(LambdaQueryWrapper.class)))
                 .thenReturn(Arrays.asList(testUser1, testUser2));
 
         List<Long> result = businessCommentService.parseMentions(
                 "Hello @user1 and @user2", testTenantId);
 
+        assertEquals(Arrays.asList(1L, 2L), result);
         verify(userMapper).selectList(any(LambdaQueryWrapper.class));
     }
 

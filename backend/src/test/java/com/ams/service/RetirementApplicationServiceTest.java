@@ -7,6 +7,8 @@ import com.ams.entity.Asset;
 import com.ams.entity.RetirementApplication;
 import com.ams.enums.AssetStatus;
 import com.ams.mapper.ApprovalProcessMapper;
+import com.ams.mapper.ApprovalRecordMapper;
+import com.ams.mapper.AssetChangeLogMapper;
 import com.ams.mapper.AssetMapper;
 import com.ams.mapper.RetirementApplicationMapper;
 import com.baomidou.mybatisplus.core.MybatisConfiguration;
@@ -53,6 +55,15 @@ class RetirementApplicationServiceTest {
 
     @Mock
     private AssetLifecycleService assetLifecycleService;
+
+    @Mock
+    private ApprovalRecordMapper approvalRecordMapper;
+
+    @Mock
+    private AssetChangeLogMapper assetChangeLogMapper;
+
+    @Mock
+    private NotificationService notificationService;
 
     @InjectMocks
     private RetirementApplicationService retirementApplicationService;

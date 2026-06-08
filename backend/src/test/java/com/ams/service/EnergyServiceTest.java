@@ -7,6 +7,9 @@ import com.ams.mapper.EnergyConsumptionMapper;
 import com.ams.mapper.EnergyMeterMapper;
 import com.ams.mapper.LocationMapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.MybatisConfiguration;
+import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
+import org.apache.ibatis.builder.MapperBuilderAssistant;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,7 +17,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -28,7 +30,6 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@Disabled("运行时类找不到，第4轮修复时标记")
 class EnergyServiceTest {
 
     @Mock
@@ -42,11 +43,20 @@ class EnergyServiceTest {
     @Mock
     private AssetMapper assetMapper;
 
-    @InjectMocks
     private EnergyService energyService;
 
     @BeforeEach
-    void setUp() { TenantContext.setTenantId("T001"); }
+    void setUp() {
+        TenantContext.setTenantId("T001");
+        // 初始化 MyBatis-Plus 实体元数据：LambdaQueryWrapper 解析方法引用需要 TableInfo 缓存
+        MapperBuilderAssistant assistant = new MapperBuilderAssistant(new MybatisConfiguration(), "");
+        TableInfoHelper.initTableInfo(assistant, Asset.class);
+        TableInfoHelper.initTableInfo(assistant, EnergyMeter.class);
+        TableInfoHelper.initTableInfo(assistant, EnergyConsumption.class);
+        // 显式构造，避免 @InjectMocks 漏注入 assetMapper（与本仓其它 service 单测一致）
+        energyService = new EnergyService(
+                energyMeterMapper, energyConsumptionMapper, locationMapper, locationService, assetMapper);
+    }
     @AfterEach
     void tearDown() { TenantContext.clear(); }
 
