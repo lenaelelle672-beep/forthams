@@ -44,6 +44,8 @@ declare module "antd" {
   export const Steps: any;
   export const Upload: any;
   export const InputNumber: any;
+  export const Image: any;
+  export type UploadFile = any;
   export const Descriptions: any;
   export const Result: any;
   export const Rate: any;
@@ -282,9 +284,10 @@ declare module "dayjs" {
 }
 
 declare module "react-i18next" {
-  export function useTranslation(ns?: string | string[]): { t: (key: string) => string; i18n: any };
+  export function useTranslation(ns?: string | string[]): { t: (key: string, options?: Record<string, any>) => string; i18n: any };
   export const Trans: any;
   export const withTranslation: any;
+  export const initReactI18next: any;
 }
 
 declare module "react-force-graph-2d" {

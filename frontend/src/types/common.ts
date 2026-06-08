@@ -52,6 +52,7 @@ export interface PageData<T> {
  * 如需描述未解包的后端原始结构，请显式使用 ApiResponse<PageData<T>>。
  */
 export type PaginatedResponse<T> = PageData<T> & { data?: PageData<T> };
+export type PageResult<T> = ApiResponse<PageData<T>>;
 
 // ---------------------------------------------------------------------------
 // 前端内部使用的标准化分页状态（解包后）

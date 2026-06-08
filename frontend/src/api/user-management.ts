@@ -21,6 +21,8 @@ export interface UserDetail extends UserItem {
   roles?: { id: number; roleCode: string; roleName: string }[];
   roleCodes?: string[];
   postIds?: number[];
+  /** 权限标识列表 */
+  permissions?: string[];
 }
 
 export interface UserListParams {

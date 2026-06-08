@@ -26,7 +26,15 @@ export interface RevaluationCreateRequest {
   evidence?: string;
 }
 
+export interface RevaluationUpdateRequest {
+  revaluationType?: 'IMPAIRMENT' | 'REVALUATION';
+  newValue?: number;
+  reason?: string;
+  evidence?: string;
+}
+
 export interface RevaluationApproveRequest {
+  id?: number;
   status: 'APPROVED' | 'REJECTED';
   approvedBy: number;
 }

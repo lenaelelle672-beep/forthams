@@ -9,6 +9,8 @@ export interface SoftwareLicense {
   version?: string;
   licenseType?: string;
   totalSeats?: number;
+  /** 已使用授权数 */
+  usedSeats?: number;
   purchaseDate?: string;
   expiryDate?: string;
   purchasePrice?: number;
