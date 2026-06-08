@@ -30,7 +30,7 @@ const ABCClassificationPage: React.FC = () => {
   // 查询资产列表
   const { data: assets, isLoading: assetsLoading } = useQuery({
     queryKey: ['assets'],
-    queryFn: () => getAssetList({ pageNum: 1, pageSize: 1000 }).then(res => res.records || res.list || []),
+    queryFn: () => getAssetList({ page: 1, pageSize: 1000 }).then(res => (res as any).records || (res as any).list || []),
   });
 
   // 批量重新分类 mutation

@@ -101,7 +101,7 @@ const InspectionRecordPage: React.FC = () => {
 
   const { data: records, isLoading: recordsLoading } = useQuery({
     queryKey: ['inspections', params],
-    queryFn: () => inspectionApi.list(params),
+    queryFn: () => inspectionApi.list(params as any),
   });
 
   const { data: templates } = useQuery({
@@ -163,7 +163,8 @@ const InspectionRecordPage: React.FC = () => {
   });
 
   const batchGenerateMutation = useMutation({
-    mutationFn: inspectionApi.batchGenerate,
+    mutationFn: (args: { assetIds: number[]; templateId: number }) =>
+      inspectionApi.batchGenerate(args.assetIds, args.templateId),
     onSuccess: (data: any) => {
       message.success(`成功生成 ${data.generated} 条检验记录`);
       setBatchModalVisible(false);

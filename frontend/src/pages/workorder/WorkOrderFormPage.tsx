@@ -25,6 +25,7 @@ import { Input } from '@/components/ui/Input';
 import { PageHeader } from '@/components/ui/PageHeader';
 import http from '@/utils/http';
 import { createWorkOrder, updateWorkOrder } from '@/api/workorder';
+import type { CreateWorkOrderRequest } from '@/types/workorder';
 import { getAssetList } from '@/api/asset';
 import { getUserList } from '@/api/base';
 import FaultCodeSelector from '@/components/fault-code/FaultCodeSelector';
@@ -220,7 +221,7 @@ export default function WorkOrderFormPage() {
       if (isEdit && editId) {
         return updateWorkOrder(editId, payload);
       }
-      return createWorkOrder(payload);
+      return createWorkOrder(payload as unknown as CreateWorkOrderRequest);
     },
     onSuccess: (res: unknown) => {
       qc.invalidateQueries({ queryKey: ['workorders'] });

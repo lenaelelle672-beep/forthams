@@ -75,7 +75,7 @@ const InspectionListPage: React.FC = () => {
 
   const { data, isLoading } = useQuery({
     queryKey: ['inspections', params],
-    queryFn: () => inspectionApi.list(params),
+    queryFn: () => inspectionApi.list(params as any),
   });
 
   const records: Inspection[] = data?.records || data?.list || [];
@@ -142,7 +142,7 @@ const InspectionListPage: React.FC = () => {
       '检验日期': record.inspectionDate,
       '下次检验日期': record.nextInspectionDate,
       '检验机构': record.inspectionAgency,
-      '检验人': record.inspector,
+      '检验人': (record as any).inspector ?? record.inspectorName ?? '',
       '检验结果':
         { PASS: '通过', FAIL: '不通过', CONDITIONAL: '附条件通过' }[record.result] || record.result,
       '备注': record.findings || '',

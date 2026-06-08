@@ -21,7 +21,7 @@ const InspectionDetailPage: React.FC = () => {
   // 查询检验历史
   const { data: historyData } = useQuery({
     queryKey: ['inspection-history', (data as any)?.assetId],
-    queryFn: () => inspectionApi.getHistory((data as any)?.assetId),
+    queryFn: () => inspectionApi.getHistoryByAsset((data as any)?.assetId),
     enabled: !!(data as any)?.assetId
   });
 

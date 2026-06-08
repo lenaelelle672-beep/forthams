@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { cycleCountApi } from '../../api/cycleCount';
 import type { CycleCountRule } from '../../types/cycleCount';
-import { Card, Table, Button, Space, Modal, Form, Select, InputNumber, message, Tag, Tooltip } from 'antd';
+import { Card, Table, Button, Space, Modal, Form, Select, InputNumber, Input, message, Tag, Tooltip } from 'antd';
 import { PlusOutlined, PlayCircleOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 
 const CycleCountConfigPage: React.FC = () => {

@@ -516,7 +516,7 @@ export default function BudgetListPage() {
               <DataTable
                 columns={rateColumns}
                 data={execRates as ExecutionRate[]}
-                rowKey={(_, index) => index}
+                rowKey={(row: any) => row.id ?? Math.random()}
                 emptyText="暂无执行率数据"
               />
             </div>

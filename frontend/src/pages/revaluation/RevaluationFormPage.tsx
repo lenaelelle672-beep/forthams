@@ -63,7 +63,7 @@ export default function RevaluationFormPage() {
     if (!assetSearch.trim()) return;
     try {
       const res = await getAssetById(Number(assetSearch));
-      setSelectedAsset(res as Asset);
+      setSelectedAsset((res as any).data ?? (res as any).data);
     } catch {
       toast.error('未找到资产');
     }
@@ -95,7 +95,6 @@ export default function RevaluationFormPage() {
   const approveMutation = useMutation({
     mutationFn: (status: 'APPROVED' | 'REJECTED') =>
       approveRevaluation(Number(viewId!), {
-        id: Number(viewId!),
         status,
         approvedBy: 1, // TODO: 从当前登录用户获取
       }),

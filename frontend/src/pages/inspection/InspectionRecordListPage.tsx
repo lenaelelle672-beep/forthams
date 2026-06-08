@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Table, Button, Space, Tag, Input, Select, DatePicker, Row, Col, Card, Statistic, message, Modal } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { inspectionApi } from '@/api/inspection';
-import { Inspection, InspectionTypeEnum, InspectionResultEnum } from '@/types/inspection';
+import { Inspection, InspectionTypeEnum, InspectionResultEnum, InspectionRecord } from '@/types/inspection';
 import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
 import type Dayjs from 'dayjs';
@@ -22,16 +22,17 @@ const InspectionRecordListPage: React.FC = () => {
   const [inspectionType, setInspectionType] = useState<string | undefined>();
   const [result, setResult] = useState<string | undefined>();
   const [dateRange, setDateRange] = useState<[any, any] | null>(null);
+  const [assetId, setAssetId] = useState<number | undefined>();
   const [pageNum, setPageNum] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
   // 查询记录列表
   const { data, isLoading, refetch } = useQuery({
-    queryKey: ['inspections', keyword, assetId, inspectionType, result, dateRange, pageNum, pageSize],
+    queryKey: ['inspections', keyword, inspectionType, result, dateRange, pageNum, pageSize],
     queryFn: () => inspectionApi.list({
       keyword,
-      inspectionType,
-      result,
+      inspectionType: inspectionType as InspectionTypeEnum | undefined,
+      result: result as InspectionResultEnum | undefined,
       startDate: dateRange?.[0]?.format('YYYY-MM-DD'),
       endDate: dateRange?.[1]?.format('YYYY-MM-DD'),
       pageNum,
@@ -159,7 +160,7 @@ const InspectionRecordListPage: React.FC = () => {
       title: '操作',
       key: 'action',
       width: 200,
-      render: (_: any, record: InspectionRecord) => (
+      render: (_: any, record: any) => (
         <Space size="small">
           <Button type="link" onClick={() => handleView(record.id!)}>
             详情

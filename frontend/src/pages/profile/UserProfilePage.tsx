@@ -208,13 +208,13 @@ export default function UserProfilePage() {
                     <span className="text-sm text-slate-400">{t('profile.noRole')}</span>
                   )}
               </div>
-              {profile.permissions && profile.permissions.length > 0 && (
+              {(profile as any).permissions && (profile as any).permissions.length > 0 && (
                 <div className="mt-4 border-t border-slate-100 pt-4">
                   <p className="text-xs font-semibold text-slate-500 mb-2">
-                    {t('profile.permissionCount', { count: profile.permissions.length })}
+                    {t('profile.permissionCount', { count: (profile as any).permissions.length })}
                   </p>
                   <div className="flex flex-wrap gap-1.5">
-                    {profile.permissions.slice(0, 20).map((p) => (
+                    {(profile as any).permissions.slice(0, 20).map((p: string) => (
                       <span
                         key={p}
                         className="rounded bg-slate-100 px-2 py-0.5 text-xs font-mono text-slate-600"
@@ -222,9 +222,9 @@ export default function UserProfilePage() {
                         {p}
                       </span>
                     ))}
-                    {profile.permissions.length > 20 && (
+                    {(profile as any).permissions.length > 20 && (
                       <span className="rounded bg-slate-100 px-2 py-0.5 text-xs text-slate-400">
-                        +{profile.permissions.length - 20} {t('profile.more')}
+                        +{(profile as any).permissions.length - 20} {t('profile.more')}
                       </span>
                     )}
                   </div>

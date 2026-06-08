@@ -462,7 +462,7 @@ export default function SoftwareLicensePage() {
       key: 'usedSeats',
       title: '席位使用',
       width: 140,
-      render: (_v, row) => <SeatsCell usedSeats={row.usedSeats} totalSeats={row.totalSeats} />,
+      render: (_v, row) => <SeatsCell usedSeats={(row as any).usedSeats} totalSeats={row.totalSeats} />,
     },
     { key: 'expiryDate', title: '到期日期', width: 120 },
     {

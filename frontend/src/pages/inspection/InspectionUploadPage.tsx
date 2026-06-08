@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { inspectionApi } from '@/api/inspection';
-import { Card, Upload, Button, message, Spin, Space, Image, Row, Col, Breadcrumb, Typography, Progress, Alert } from 'antd';
+import { Card, Upload, Button, message, Spin, Space, Row, Col, Breadcrumb, Typography, Progress, Alert } from 'antd';
 import { ArrowLeftOutlined, UploadOutlined, DeleteOutlined, CheckCircleOutlined, LoadingOutlined } from '@ant-design/icons';
-import type { UploadFile, UploadProps } from 'antd';
+import { Image } from 'antd';
+import type { UploadProps, UploadFile } from 'antd';
 
 const { Title } = Typography;
 

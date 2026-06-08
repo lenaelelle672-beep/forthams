@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Form, Input, Select, InputNumber, Button, message, Card, Space } from 'antd';
+import type { FormInstance } from 'antd/es/form';
 import { ArrowLeftOutlined, SaveOutlined } from '@ant-design/icons';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { inspectionTemplateApi } from '@/api/inspection';
-import { InspectionTemplate, InspectionTypeEnum } from '@/types/inspection';
+import { InspectionTypeEnum } from '@/types/inspection';
+import type { InspectionTemplate } from '@/types/inspection';
 
 const { Option } = Select;
 
@@ -15,7 +17,7 @@ const { Option } = Select;
 const InspectionTemplateFormPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [form] = Form.useForm<InspectionTemplate>();
+  const [form] = Form.useForm();
   const isEdit = !!id;
 
   // 查询模板详情（编辑模式）

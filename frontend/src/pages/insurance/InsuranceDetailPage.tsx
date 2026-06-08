@@ -123,7 +123,7 @@ const InsuranceDetailPage: React.FC = () => {
           </div>
           <Table
             columns={claimColumns}
-            dataSource={claimsData?.list || []}
+            dataSource={(claimsData as any)?.list ?? (claimsData as any)?.records ?? []}
             loading={claimsLoading}
             rowKey="id"
             pagination={{

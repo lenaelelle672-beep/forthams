@@ -650,9 +650,9 @@ export default function MaintenancePlanPage() {
             <TooltipContent>{asset.assetName} ({asset.assetNo})</TooltipContent>
           </Tooltip>
         ) : (
-          <button onClick={() => navigate(`/assets/${v}`)}
+          <button onClick={() => navigate(`/assets/${String(v as string)}`)}
             className="inline-flex items-center gap-1 rounded-md bg-indigo-50 px-2 py-0.5 text-xs font-medium text-indigo-700 ring-1 ring-inset ring-indigo-100 hover:bg-indigo-100 transition-colors">
-            #{v}
+            #{String(v as string)}
           </button>
         );
       },
