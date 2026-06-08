@@ -38,6 +38,7 @@ spring:
       data-locations: ""
 
   # ========== Flyway ==========
+  # Flyway disabled: 使用 schema.sql 初始化数据库，迁移脚本位于 src/main/resources/db/migration/
   flyway:
     enabled: false
 
