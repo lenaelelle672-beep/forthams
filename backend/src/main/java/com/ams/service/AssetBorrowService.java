@@ -7,6 +7,7 @@ import com.ams.dto.AssetBorrowQueryDTO;
 import com.ams.dto.AssetBorrowUpdateDTO;
 import com.ams.entity.Asset;
 import com.ams.entity.AssetBorrow;
+import com.ams.entity.NotificationRecord;
 import com.ams.enums.AssetStatus;
 import com.ams.mapper.AssetBorrowMapper;
 import com.ams.mapper.AssetMapper;
@@ -36,6 +37,7 @@ public class AssetBorrowService {
     private final AssetBorrowMapper borrowMapper;
     private final AssetMapper assetMapper;
     private final TenantService tenantService;
+    private final NotificationService notificationService;
 
     // ── CRUD ─────────────────────────────────────────────────────────────────
 
@@ -247,7 +249,7 @@ public class AssetBorrowService {
                     count++;
                     log.warn("借用到期标记 OVERDUE: tenantId={}, borrowId={}, assetId={}, expectedReturnDate={}",
                             tenantId, borrow.getId(), borrow.getAssetId(), borrow.getExpectedReturnDate());
-                    // TODO: 实际发送通知（站内信/邮件），后续可对接 NotificationService
+                    sendOverdueNotification(borrow);
                 }
 
                 if (count > 0) {
@@ -275,6 +277,34 @@ public class AssetBorrowService {
                 borrow.setAssetNo(asset.getAssetNo());
                 borrow.setAssetName(asset.getAssetName());
             }
+        }
+    }
+
+    private void sendOverdueNotification(AssetBorrow borrow) {
+        if (borrow.getBorrowerId() == null || borrow.getBorrowerId() <= 0) {
+            log.debug("借用逾期通知跳过: borrowId={}, borrowerId为空", borrow.getId());
+            return;
+        }
+
+        try {
+            Asset asset = borrow.getAssetId() == null ? null : assetMapper.selectById(borrow.getAssetId());
+            String assetLabel = asset == null
+                    ? "资产ID " + borrow.getAssetId()
+                    : asset.getAssetName() + "（" + asset.getAssetNo() + "）";
+
+            NotificationRecord notification = new NotificationRecord();
+            notification.setUserId(borrow.getBorrowerId());
+            notification.setTitle("资产借用已逾期");
+            notification.setContent("您借用的" + assetLabel + "已超过预计归还日期 "
+                    + borrow.getExpectedReturnDate() + "，请尽快归还或联系资产管理员。");
+            notification.setType("ASSET_BORROW");
+            notification.setCategory("OPERATION");
+            notification.setRefId(borrow.getId());
+            notification.setRefType("ASSET_BORROW");
+            notificationService.create(notification);
+        } catch (RuntimeException e) {
+            log.warn("借用逾期通知发送失败: borrowId={}, borrowerId={}, error={}",
+                    borrow.getId(), borrow.getBorrowerId(), e.getMessage());
         }
     }
 }

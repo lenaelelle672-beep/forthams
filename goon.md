@@ -1,5 +1,24 @@
 # goon.md — 交接笔记（Cowork → Claude Code）
 
+## 2026-06-09 21:20 最新状态（Codex GAI2 资产借用逾期通知收敛）
+
+### 当前事实
+- `AssetBorrowService.checkOverdue` 不再只标记 `OVERDUE` 后留下通知 TODO；现在会为有 `borrowerId` 的逾期借用单创建站内通知。
+- 通知内容使用资产名称/编号作为可读标签，通知类型为 `ASSET_BORROW`，分类为 `OPERATION`，引用 `refType=ASSET_BORROW`、`refId=borrowId`。
+- 通知发送失败会被捕获并记录 warn，不回滚逾期状态与 `notified=1` 标记，避免消息服务异常阻塞调度状态推进。
+- `AssetBorrowServiceTest` 已扩展断言：租户上下文扫描、逾期状态更新、通知创建参数均正确。
+
+### 最新验证
+- GitNexus impact：`AssetBorrowService` 风险 `LOW`，直接依赖为 `AssetBorrowController`；`checkOverdue` 风险 `LOW`，无受影响流程。
+- Targeted 后端：`mvn test -Dtest=AssetBorrowServiceTest -DfailIfNoTests=false` 通过，`1` 个测试通过。
+- 后端全量：`mvn test` 通过，`589` 个测试，0 failure/error/skip。
+- `git diff --check` 通过；旧借用通知 TODO 已扫不到。
+
+### 剩余动作
+- P0：原生 Docker/Nginx 验证仍无法在当前机器执行，`docker` 与 `nginx` 命令均不存在。
+- P1：`.DS_Store` tracked 元数据清理仍需用户明确确认。
+- P1：移动端继续冻结；不纳入当前桌面/后端质量闭环。
+
 ## 2026-06-09 21:16 最新状态（Codex GAI2 审批待办持久化收敛）
 
 ### 当前事实
