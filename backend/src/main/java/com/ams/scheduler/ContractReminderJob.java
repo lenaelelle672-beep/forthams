@@ -1,8 +1,10 @@
 package com.ams.scheduler;
 
+import com.ams.context.TenantContext;
 import com.ams.entity.Contract;
 import com.ams.service.ContractService;
 import com.ams.service.NotificationService;
+import com.ams.service.TenantService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -26,6 +28,7 @@ public class ContractReminderJob {
 
     private final ContractService contractService;
     private final NotificationService notificationService;
+    private final TenantService tenantService;
 
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
@@ -36,33 +39,44 @@ public class ContractReminderJob {
     public void scanExpiringContracts() {
         log.info("contract_reminder_start");
         try {
-            List<Contract> expiring = contractService.getExpiring(30);
-            if (expiring == null || expiring.isEmpty()) {
-                log.info("contract_reminder_no_expiring");
-                return;
-            }
-            
+            int total = 0;
             int notified = 0;
-            for (Contract contract : expiring) {
+            for (String tenantId : tenantService.getActiveTenantIds()) {
                 try {
-                    long daysLeft = ChronoUnit.DAYS.between(LocalDate.now(), contract.getEndDate());
-                    Map<String, Object> variables = new HashMap<>();
-                    variables.put("contractName", contract.getContractName());
-                    variables.put("contractNo", contract.getContractNo());
-                    variables.put("endDate", contract.getEndDate().format(FORMATTER));
-                    variables.put("daysLeft", daysLeft);
-                    
-                    // 通知 ASSET_MANAGER 角色的用户
-                    notificationService.sendByTemplateToRole(
-                            "CONTRACT_EXPIRING", "ASSET_MANAGER",
-                            variables, contract.getId(), "contract");
-                    notified++;
+                    TenantContext.setTenantId(tenantId);
+                    List<Contract> expiring = contractService.getExpiring(30);
+                    if (expiring == null || expiring.isEmpty()) {
+                        log.info("contract_reminder_tenant_no_expiring tenant={}", tenantId);
+                        continue;
+                    }
+                    total += expiring.size();
+                    for (Contract contract : expiring) {
+                        try {
+                            long daysLeft = ChronoUnit.DAYS.between(LocalDate.now(), contract.getEndDate());
+                            Map<String, Object> variables = new HashMap<>();
+                            variables.put("contractName", contract.getContractName());
+                            variables.put("contractNo", contract.getContractNo());
+                            variables.put("endDate", contract.getEndDate().format(FORMATTER));
+                            variables.put("daysLeft", daysLeft);
+
+                            // 通知 ASSET_MANAGER 角色的用户
+                            notificationService.sendByTemplateToRole(
+                                    "CONTRACT_EXPIRING", "ASSET_MANAGER",
+                                    variables, contract.getId(), "contract");
+                            notified++;
+                        } catch (Exception e) {
+                            log.warn("contract_reminder_single_failed tenant={} id={} error={}",
+                                    tenantId, contract.getId(), e.getMessage());
+                        }
+                    }
                 } catch (Exception e) {
-                    log.warn("contract_reminder_single_failed id={} error={}", 
-                            contract.getId(), e.getMessage());
+                    log.error("contract_reminder_tenant_error tenant={} error={}",
+                            tenantId, e.getMessage(), e);
+                } finally {
+                    TenantContext.clear();
                 }
             }
-            log.info("contract_reminder_done total={} notified={}", expiring.size(), notified);
+            log.info("contract_reminder_done total={} notified={}", total, notified);
         } catch (Exception e) {
             log.error("contract_reminder_fatal error={}", e.getMessage(), e);
         }

@@ -202,7 +202,7 @@ mvn -q test
 已落地：
 
 - `MyBatisPlusConfig` 注册 `TenantLineInnerInterceptor`，并固定拦截器顺序为 OptimisticLocker / DataPermission / Pagination / TenantLine。
-- `TENANT_IGNORE_TABLES` 白名单覆盖系统表、Quartz、位置树、资产分类、供应商/合同、workflow node/edge、CTE 派生表等当前全局或无 tenant 表。
+- `TENANT_IGNORE_TABLES` 白名单覆盖系统表、Quartz、位置树、资产分类、供应商、workflow node/edge、CTE 派生表等当前全局或无 tenant 表；`contract` 暂保留白名单以兼容供应商门户伪租户 token，但内部 `ContractService` 已显式按 `TenantContext` 过滤。
 - 租户业务表缺 TenantContext 时由 `TenantContext.requireTenantId()` 显式拒绝，不再生成 `tenant_id = ''` 的静默空结果。
 - `MyBatisPlusConfigTest` 覆盖拦截器顺序、字符串 tenantId、白名单、insert tenant_id 自动注入策略和缺租户拒绝。
 
@@ -216,13 +216,13 @@ env MAVEN_OPTS=-Djdk.attach.allowAttachSelf=true mvn test -DfailIfNoTests=false
 cd frontend && npm run e2e:real -- --reporter=line
 ```
 
-结果：后端全量 615 个测试通过；真实后端 E2E 9 个测试通过。
+结果：后端全量 621 个测试通过；真实后端 E2E 9 个测试通过。
 
 仍需持续治理：
 
-- 明确哪些基础表是全局字典表，例如 `AssetCategory`、`Dept`、`Role`、`Vendor`、`Location`。
+- 明确哪些基础表是全局字典表，例如 `AssetCategory`、`Dept`、`Role`、`Vendor`、`Location`；合同内部租户隔离已落地，供应商门户跨租户模型仍需产品/架构决策。
 - 新增业务表时同步维护 tenant 字段、白名单和 schema consistency 测试。
-- 对更多后台调度补充 TenantContext 传播或显式租户遍历测试；邮件异步 executor 缺口已由 `AsyncConfigTest` 覆盖，SLA、保险、风险评审、维保计划、定时报表、循环盘点、折旧、邮件重试、检验任务、检验记录、安全检查调度已有专项测试覆盖。
+- 对更多后台调度补充 TenantContext 传播或显式租户遍历测试；邮件异步 executor 缺口已由 `AsyncConfigTest` 覆盖，SLA、保险、风险评审、维保计划、定时报表、循环盘点、折旧、邮件重试、检验任务、检验记录、安全检查、合同提醒调度已有专项测试覆盖。
 
 ## 当前不建议做的事
 

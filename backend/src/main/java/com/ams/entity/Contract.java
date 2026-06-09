@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 public class Contract {
     @TableId(type = IdType.AUTO)
     private Long id;
+    private String tenantId;
     private String contractNo;
     private String contractName;
     private String contractType;

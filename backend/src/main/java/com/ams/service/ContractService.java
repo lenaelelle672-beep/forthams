@@ -1,6 +1,7 @@
 package com.ams.service;
 
 import com.ams.common.exception.BusinessException;
+import com.ams.context.TenantContext;
 import com.ams.entity.Contract;
 import com.ams.mapper.ContractMapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -24,10 +25,12 @@ public class ContractService {
 
     public Page<Contract> getPage(Integer page, Integer pageSize, String keyword,
                                    String contractType, String status, Long vendorId) {
+        String tenantId = TenantContext.requireTenantId();
         LambdaQueryWrapper<Contract> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Contract::getTenantId, tenantId);
         if (keyword != null && !keyword.isBlank()) {
-            wrapper.like(Contract::getContractName, keyword)
-                   .or().like(Contract::getContractNo, keyword);
+            wrapper.and(q -> q.like(Contract::getContractName, keyword)
+                    .or().like(Contract::getContractNo, keyword));
         }
         if (contractType != null && !contractType.isBlank()) {
             wrapper.eq(Contract::getContractType, contractType);
@@ -43,7 +46,9 @@ public class ContractService {
     }
 
     public Contract getById(Long id) {
-        Contract c = contractMapper.selectById(id);
+        Contract c = contractMapper.selectOne(new LambdaQueryWrapper<Contract>()
+                .eq(Contract::getId, id)
+                .eq(Contract::getTenantId, TenantContext.requireTenantId()));
         if (c == null) throw new BusinessException("合同不存在");
         return c;
     }
@@ -51,12 +56,15 @@ public class ContractService {
     public List<Contract> getExpiring(Integer days) {
         LocalDate today = LocalDate.now();
         LocalDate future = today.plusDays(days == null ? 30 : days);
-        return contractMapper.findExpiring(today, future);
+        return contractMapper.findExpiring(TenantContext.requireTenantId(), today, future);
     }
 
     public Contract create(Contract c) {
+        String tenantId = TenantContext.requireTenantId();
+        c.setTenantId(tenantId);
         if (c.getContractNo() != null) {
             Long cnt = contractMapper.selectCount(new LambdaQueryWrapper<Contract>()
+                    .eq(Contract::getTenantId, tenantId)
                     .eq(Contract::getContractNo, c.getContractNo()));
             if (cnt > 0) throw new BusinessException("合同编号已存在: " + c.getContractNo());
         }
@@ -66,8 +74,9 @@ public class ContractService {
     }
 
     public Contract update(Long id, Contract c) {
-        getById(id);
+        Contract existing = getById(id);
         c.setId(id);
+        c.setTenantId(existing.getTenantId());
         contractMapper.updateById(c);
         return c;
     }

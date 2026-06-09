@@ -7,6 +7,6 @@ import java.time.LocalDate;
 import java.util.List;
 @Mapper
 public interface ContractMapper extends BaseMapper<Contract> {
-    @Select("SELECT * FROM contract WHERE deleted=0 AND end_date BETWEEN #{today} AND #{future} ORDER BY end_date ASC")
-    List<Contract> findExpiring(LocalDate today, LocalDate future);
+    @Select("SELECT * FROM contract WHERE deleted=0 AND tenant_id=#{tenantId} AND end_date BETWEEN #{today} AND #{future} ORDER BY end_date ASC")
+    List<Contract> findExpiring(String tenantId, LocalDate today, LocalDate future);
 }

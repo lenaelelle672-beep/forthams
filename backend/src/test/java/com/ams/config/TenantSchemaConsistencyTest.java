@@ -67,6 +67,17 @@ class TenantSchemaConsistencyTest {
     }
 
     @Test
+    void contractTenantMigrationShouldScopeInternalContractManagement() throws IOException {
+        String migration = Files.readString(MIGRATION_DIR.resolve("V2_76__contract_tenant_scope.sql"));
+
+        assertThat(migration).contains("ALTER TABLE contract ADD COLUMN tenant_id VARCHAR(64)");
+        assertThat(migration).contains("UPDATE contract");
+        assertThat(migration).contains("ADD UNIQUE KEY uk_contract_tenant_no (tenant_id, contract_no)");
+        assertThat(migration).contains("ADD INDEX idx_contract_tenant_end_date (tenant_id, end_date)");
+        assertThat(migration).contains("ADD INDEX idx_contract_tenant_vendor (tenant_id, vendor_id)");
+    }
+
+    @Test
     void legacyTenantIdMigrationsShouldBePatchedForwardWithoutChecksumChanges() throws IOException {
         String v236 = Files.readString(MIGRATION_DIR.resolve("V2_36__asset_parent_child.sql"));
         String v258 = Files.readString(MIGRATION_DIR.resolve("V2_58__inspection_template_and_record.sql"));
