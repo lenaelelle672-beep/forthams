@@ -1,5 +1,37 @@
 # goon.md — 交接笔记（Cowork → Claude Code）
 
+## 2026-06-09 22:00 最新状态（Codex GAI2 桌面真实数据闭环推进）
+
+### 当前事实
+- 工作流保存、审批待办、检验模板复制、逾期通知、盘点通知、安全检查照片、报表执行/预览等核心闭环已连续提交修复。
+- 桌面端 `/energy`、`/gis`、`/floorplans` 不再在接口空数据时注入内置 Mock 数据，均改为真实空态/错误态。
+- 桌面端 `/system/custom-fields` 已从本地 Mock CRUD 切换为真实 `/system/custom-fields` API 查询、创建、更新、删除。
+- 报表构建器预览与后端已保存报表执行均接入真实资产/财务/维保/库存统计数据，不再返回随机或固定样例。
+- 移动端按用户要求继续冻结，未纳入本轮修改、暂存或提交。
+
+### 最新验证
+- 前端类型检查：`npx tsc -p tsconfig.json --noEmit --pretty false` 通过。
+- 前端全量：`npm test -- --run --reporter=dot` 通过，`85` 个测试文件、`861` 个测试通过。
+- 前端构建：`npm run build` 通过，仅保留既有 `three-Caxi2su_.js` 大 chunk warning。
+- 后端全量最近一次：`mvn test` 通过，`597` 个测试通过。
+- GitNexus staged 检测：最近多次提交均为 `LOW`，无 affected_processes。
+- 非移动端运行代码扫描：除未路由旧 `frontend/src/pages/report/ReportPage.tsx` 的“即将上线” toast、`MaxKeySsoController` 注释 TODO 外，未发现新的运行中 Mock 兜底/假数据入口。
+
+### 本轮新增提交
+- `645d25014 fix: load custom fields from api`
+- `a2b0a8325 fix: show real empty floor plans`
+- `89140ea91 fix: show real empty gis map`
+- `cf7ef28a1 fix: show real empty energy dashboard`
+- `925801e3a fix: preview report builder with live data`
+- `cd2bddc4d fix: execute saved reports with real data`
+- `e6263d9ec fix: notify overdue stocktaking tasks`
+
+### 剩余动作
+- P0：原生 Docker/Nginx 验证仍无法在当前机器执行，`docker` 与 `nginx` 命令均不存在。
+- P1：`.DS_Store` tracked 元数据清理仍需用户明确确认。
+- P1：移动端继续冻结；当前工作树里移动端相关改动仍未处理，需等用户恢复移动端范围后再审计。
+- P2：旧 `frontend/src/pages/report/ReportPage.tsx` 未被当前路由加载；若决定清理遗留页，再统一处理旧测试与入口引用。
+
 ## 2026-06-09 21:36 最新状态（Codex GAI2 安全检查照片文件闭环）
 
 ### 当前事实
