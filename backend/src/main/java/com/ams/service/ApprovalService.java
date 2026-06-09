@@ -445,6 +445,10 @@ public class ApprovalService {
         if (!"PENDING".equals(processStatus)) {
             throw new BusinessException("仅PENDING状态的流程可取消");
         }
+        Long applicantId = parseLong(BeanUtil.getProperty(process, "applicantId"), null);
+        if (operatorId == null || applicantId == null || !applicantId.equals(operatorId)) {
+            throw new BusinessException("仅流程发起人可取消审批流程");
+        }
 
         // 检查是否已有审批记录（防止已操作的流程被随意取消）
         if (hasAnyApprovalRecords(processId)) {

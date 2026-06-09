@@ -568,6 +568,7 @@ class ApprovalServiceTest {
         process.setBusinessId(9L);
         process.setStatus("PENDING");
         process.setCurrentStep(1);
+        process.setApplicantId(42L);
         when(approvalProcessMapper.selectOne(any(QueryWrapper.class))).thenReturn(process);
 
         ApprovalProcess result = approvalService.cancelProcess(5L, 42L);
@@ -575,6 +576,25 @@ class ApprovalServiceTest {
         assertEquals("CANCELLED", result.getStatus());
         verify(approvalProcessMapper).updateById(process);
         verify(workOrderService).applyApprovalOutcome(9L, "CANCELLED", "流程已取消");
+    }
+
+    @Test
+    void shouldRejectCancellationByNonApplicant() {
+        ApprovalProcess process = new ApprovalProcess();
+        process.setId(5L);
+        process.setTenantId("dept:1");
+        process.setProcessType("WORK_ORDER");
+        process.setBusinessId(9L);
+        process.setStatus("PENDING");
+        process.setCurrentStep(1);
+        process.setApplicantId(42L);
+        when(approvalProcessMapper.selectOne(any(QueryWrapper.class))).thenReturn(process);
+
+        BusinessException exception = assertThrows(BusinessException.class,
+                () -> approvalService.cancelProcess(5L, 7L));
+
+        assertEquals("仅流程发起人可取消审批流程", exception.getMessage());
+        verify(approvalProcessMapper, never()).updateById(any(ApprovalProcess.class));
     }
 
     @Test
