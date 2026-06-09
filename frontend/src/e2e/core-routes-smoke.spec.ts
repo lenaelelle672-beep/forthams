@@ -11,12 +11,14 @@ const coreRoutes = [
   { path: '/', heading: /仪表板与数据分析|仪表板/, landmark: '总资产数' },
   { path: '/assets', heading: /资产台账/, landmark: '笔记本电脑' },
   { path: '/equipment', heading: '重要设备管理', landmark: '总设备数' },
+  { path: '/depreciation', heading: '折旧管理', landmark: '本月折旧总额' },
   { path: '/inventory', heading: /资产盘点管理|盘点管理/, landmark: '盘点任务' },
   { path: '/idle', heading: '闲置资产管理', landmark: '闲置总量' },
   { path: '/disposals', heading: '资产处置管理', landmark: '本月处置总量' },
   { path: '/approvals', heading: '审批中心', landmark: 'APR-001' },
   { path: '/workflows', heading: /业务流程管理|业务流程列表/, landmark: '资产转移流程' },
   { path: '/analytics', heading: '数据分析', landmark: '资产价值趋势' },
+  { path: '/audit', heading: '审计日志', landmark: '总操作数' },
   { path: '/settings', heading: '系统设置', landmark: '系统参数' },
 ];
 
@@ -131,6 +133,38 @@ async function mockApi(route: Route) {
     ]));
   }
 
+  if (path === '/depreciation/methods') {
+    return fulfill(route, [
+      { code: 'STRAIGHT_LINE', label: '直线法' },
+      { code: 'DOUBLE_DECLINING', label: '双倍余额递减法' },
+      { code: 'SYD', label: '年数总和法' },
+      { code: 'UOP', label: '工作量法' },
+    ]);
+  }
+
+  if (path === '/depreciation/schedules') {
+    return fulfill(route, {
+      data: [
+        {
+          id: 1,
+          assetId: 1,
+          assetNo: 'AST-001',
+          assetName: '笔记本电脑',
+          period: '2026-06',
+          depreciationAmount: 1200,
+          accumulatedDepreciation: 8400,
+          netValue: 21600,
+          depreciationRate: 0.04,
+          assetStatus: 'IN_USE',
+          depreciationMethod: 'STRAIGHT_LINE',
+        },
+      ],
+      total: 1,
+      page: 1,
+      pageSize: 10,
+    });
+  }
+
   if (path.includes('/inventory/tasks/') && path.endsWith('/details')) {
     return fulfill(route, {
       discrepancies: [{ id: 1, assetName: '标签异常资产', status: 'MISMATCH' }],
@@ -169,6 +203,35 @@ async function mockApi(route: Route) {
   if (path.startsWith('/approvals')) {
     return fulfill(route, paged([
       { id: 1, processNo: 'APR-001', processType: '资产转移', status: 'PENDING', applicantId: 1 },
+    ]));
+  }
+
+  if (path === '/audit-logs/stats') {
+    return fulfill(route, {
+      trendData: [
+        { date: '2026-06-07', count: 2 },
+        { date: '2026-06-08', count: 4 },
+        { date: '2026-06-09', count: 3 },
+      ],
+      typeDistribution: { LOGIN: 4, UPDATE: 3, EXPORT: 2 },
+      topOperators: [{ operatorName: '系统管理员', count: 9 }],
+      totalCount: 9,
+    });
+  }
+
+  if (path === '/audit-logs' || path === '/audit-logs/list') {
+    return fulfill(route, paged([
+      {
+        id: 1,
+        operationType: 'LOGIN',
+        operatorId: 1,
+        operatorName: '系统管理员',
+        resourceType: 'AUTH',
+        resourceId: 'login',
+        description: '用户登录',
+        ipAddress: '127.0.0.1',
+        createdAt: '2026-06-09T09:00:00',
+      },
     ]));
   }
 
