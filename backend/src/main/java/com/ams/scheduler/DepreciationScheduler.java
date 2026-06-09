@@ -4,6 +4,7 @@ import com.ams.context.TenantContext;
 import com.ams.entity.Asset;
 import com.ams.mapper.AssetMapper;
 import com.ams.service.DepreciationService;
+import com.ams.service.TenantService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,8 +12,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * 折旧自动计算定时任务
@@ -27,6 +26,7 @@ public class DepreciationScheduler {
 
     private final AssetMapper assetMapper;
     private final DepreciationService depreciationService;
+    private final TenantService tenantService;
 
     /**
      * 每天凌晨 2:00 执行批量折旧计算。
@@ -35,29 +35,23 @@ public class DepreciationScheduler {
     @Scheduled(cron = "0 0 2 * * ?")
     public void runDailyDepreciation() {
         log.info("depreciation_scheduler_start");
+        int totalProcessed = 0;
         try {
-            // 查询所有 IN_USE 状态的资产（不限租户）
-            List<Asset> activeAssets = assetMapper.selectList(
-                    new QueryWrapper<Asset>().eq("status", "IN_USE"));
-
-            if (activeAssets == null || activeAssets.isEmpty()) {
-                log.info("depreciation_scheduler_no_assets");
-                return;
-            }
-
-            // 按 tenantId 分组
-            Map<String, List<Asset>> byTenant = activeAssets.stream()
-                    .filter(a -> a.getTenantId() != null)
-                    .collect(Collectors.groupingBy(Asset::getTenantId));
-
-            int totalProcessed = 0;
-            for (Map.Entry<String, List<Asset>> entry : byTenant.entrySet()) {
-                String tenantId = entry.getKey();
-                List<Long> assetIds = entry.getValue().stream()
-                        .map(Asset::getId)
-                        .collect(Collectors.toList());
+            for (String tenantId : tenantService.getActiveTenantIds()) {
                 try {
                     TenantContext.setTenantId(tenantId);
+                    List<Asset> activeAssets = assetMapper.selectList(new QueryWrapper<Asset>()
+                            .eq("tenant_id", tenantId)
+                            .eq("status", "IN_USE"));
+
+                    if (activeAssets == null || activeAssets.isEmpty()) {
+                        log.info("depreciation_scheduler_tenant_no_assets tenant={}", tenantId);
+                        continue;
+                    }
+
+                    List<Long> assetIds = activeAssets.stream()
+                            .map(Asset::getId)
+                            .toList();
                     DepreciationService.BatchCalculateResponse result =
                             depreciationService.calculate(assetIds);
                     totalProcessed += result.processedCount();

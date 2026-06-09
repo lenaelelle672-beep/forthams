@@ -9,7 +9,7 @@
 | 前端构建 | `cd frontend && npm run build` | 通过；仅保留既有 `three` chunk >1000 kB 警告 |
 | 桌面浏览器回归 | `cd frontend && npx playwright test --project=browser-regression-smoke` | 23 个测试通过，含核心路由、工作流新建保存、报表/审批空态、3D 大屏降级 |
 | 真实后端 E2E | `cd backend && mvn spring-boot:test-run -Dspring-boot.run.profiles=e2e` 后执行 `cd frontend && npm run e2e:real -- --reporter=line` | 9 个测试通过；覆盖真实 Spring Boot 后端、Vite proxy、登录、流程设计器、工单审批、退役申请、折旧计算、审计查询、审批列表、报表与大屏 |
-| 后端测试 | `cd backend && mvn test -DfailIfNoTests=false` | 608 个测试通过，0 失败，0 错误 |
+| 后端测试 | `cd backend && mvn test -DfailIfNoTests=false` | 609 个测试通过，0 失败，0 错误 |
 | 流程定义服务测试 | `cd backend && mvn -q -Dtest=WorkflowDefinitionServiceTest test` | 6 个测试通过，覆盖默认列表、保存草稿、发布、启停、未发布拦截 |
 | 赔偿流程发布与估值 | `cd backend && mvn -q -Dtest=CompensationServiceTest,WorkflowDefinitionServiceTest test` | 通过，赔偿提交必须存在已发布 `ASSET_COMPENSATION` 流程；缺金额时按资产当前价值/原值自动估值 |
 | WorkOrder/Retirement 闭环 | `cd backend && mvn -q -Dtest=WorkOrderServiceTest,WorkOrderControllerTest,ApprovalServiceTest,RetirementApplicationServiceTest,RetirementControllerTest,AssetLifecycleServiceTest test` | 通过 |
@@ -24,6 +24,7 @@
 | 维保计划后台调度租户绑定 | `cd backend && env MAVEN_OPTS=-Djdk.attach.allowAttachSelf=true mvn -q -Dtest=MaintenancePlanServiceTest test` | 通过；覆盖维保记录自动生成与到期预警逐活跃租户绑定/清理 TenantContext |
 | 定时报表后台调度租户绑定 | `cd backend && env MAVEN_OPTS=-Djdk.attach.allowAttachSelf=true mvn -q -Dtest=ScheduledReportServiceImplTest test` | 通过；覆盖定时报表扫描、邮件发送与状态更新期间逐活跃租户绑定/清理 TenantContext |
 | 循环盘点后台调度租户绑定 | `cd backend && env MAVEN_OPTS=-Djdk.attach.allowAttachSelf=true mvn -q -Dtest=CycleCountServiceTest test` | 通过；覆盖循环盘点任务生成、资产查询与盘点明细写入期间逐活跃租户绑定/清理 TenantContext |
+| 折旧后台调度租户绑定 | `cd backend && env MAVEN_OPTS=-Djdk.attach.allowAttachSelf=true mvn -q -Dtest=DepreciationSchedulerTest test` | 通过；覆盖折旧调度逐活跃租户绑定/清理 TenantContext 后查询在用资产并触发折旧计算 |
 | 前端覆盖率门禁 | `cd frontend && npm run test:coverage -- --run` | 89 个测试文件，883 个测试通过；All files statements/lines 93.91%，branches 86.77%，functions 91.17%，通过全局阈值 |
 | 前端安全审计 | `cd frontend && npm audit --audit-level=high` | 0 vulnerabilities |
 | Node 版本 | `cd frontend && node -v` | `v22.22.2`，满足 `.nvmrc`、`frontend/package.json engines.node` 和 `happy-dom@20.9.0` 的 Node `>=20` 要求 |
@@ -73,7 +74,7 @@
 
 本轮新增若依操作日志覆盖：资产新增/修改/删除、资产导入/导出、折旧计算、工单新增/修改/删除/提交/审批/挂起/验收等主业务写操作已接入 `@OperLog`；真实后端 E2E profile 开启 `ams.oper-log.enabled=true`，并断言“资产新增”“折旧计算”可从 `/audit-logs` 查询到 `sys_operate_log` 落库记录。
 
-本轮补强多租户 SQL 防漏：`TenantLineInnerInterceptor` 对租户业务表缺少 TenantContext 的 SQL 改为显式拒绝，不再生成 `tenant_id = ''` 的静默空结果；后端全量 608 个测试通过，真实后端 E2E 9 个测试通过。
+本轮补强多租户 SQL 防漏：`TenantLineInnerInterceptor` 对租户业务表缺少 TenantContext 的 SQL 改为显式拒绝，不再生成 `tenant_id = ''` 的静默空结果；后端全量 609 个测试通过，真实后端 E2E 9 个测试通过。
 
 本轮补齐异步邮件执行器：`AsyncConfig` 新增 `mailTaskExecutor`，与 `EmailServiceImpl` 中的 `@Async("mailTaskExecutor")` 保持一致，避免邮件发送链路运行期找不到 executor Bean；新增 `AsyncConfigTest` 锁定通知与邮件线程池配置。
 
@@ -86,3 +87,5 @@
 本轮补强定时报表后台调度租户治理：`ScheduledReportServiceImpl#scanAndExecute` 改为按活跃租户逐个设置并清理 `TenantContext`，定时报表扫描条件同步加入 `tenant_id` 过滤；新增 `ScheduledReportServiceImplTest` 防止定时报表调度跨租户扫描、邮件发送和更新。
 
 本轮补强循环盘点后台调度租户治理：`CycleCountService` 的月度/季度/年度定时入口改为按活跃租户逐个设置并清理 `TenantContext`，手动触发仍保持当前租户语义；新增 `CycleCountServiceTest` 防止循环盘点规则扫描、任务创建和明细写入缺失租户上下文。
+
+本轮补强折旧后台调度租户治理：`DepreciationScheduler#runDailyDepreciation` 改为按活跃租户逐个设置并清理 `TenantContext`，每个租户内查询在用资产并调用折旧计算；新增 `DepreciationSchedulerTest` 防止折旧调度缺失租户上下文。
