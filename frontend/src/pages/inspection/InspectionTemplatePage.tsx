@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { inspectionTemplateApi } from '@/api/inspection';
 import type { InspectionTemplate } from '@/types/inspection';
 import { Card, Button, Table, Badge, Input, Select, Space, message, Modal, Form, InputNumber, Tag, Popconfirm } from 'antd';
-import { PlusOutlined, SearchOutlined, ReloadOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { PlusOutlined, SearchOutlined, ReloadOutlined, EditOutlined, DeleteOutlined, CopyOutlined } from '@ant-design/icons';
 import TextArea from 'antd/es/input/TextArea';
 
 const InspectionTemplatePage: React.FC = () => {
@@ -53,6 +53,17 @@ const InspectionTemplatePage: React.FC = () => {
     }
   });
 
+  const copyMutation = useMutation({
+    mutationFn: inspectionTemplateApi.copy,
+    onSuccess: () => {
+      message.success('复制成功');
+      queryClient.invalidateQueries({ queryKey: ['inspectionTemplates'] });
+    },
+    onError: () => {
+      message.error('复制失败');
+    }
+  });
+
   const toggleStatusMutation = useMutation({
     mutationFn: ({ id, status }: { id: number; status: string }) =>
       inspectionTemplateApi.toggleStatus(id, status),
@@ -89,6 +100,10 @@ const InspectionTemplatePage: React.FC = () => {
 
   const handleDelete = (id: number) => {
     deleteMutation.mutate(id);
+  };
+
+  const handleCopy = (id: number) => {
+    copyMutation.mutate(id);
   };
 
   const handleToggleStatus = (record: InspectionTemplate) => {
@@ -181,6 +196,15 @@ const InspectionTemplatePage: React.FC = () => {
             onClick={() => handleEdit(record)}
           >
             编辑
+          </Button>
+          <Button
+            type="link"
+            size="small"
+            icon={<CopyOutlined />}
+            loading={copyMutation.isPending}
+            onClick={() => handleCopy(record.id!)}
+          >
+            复制
           </Button>
           <Popconfirm
             title="确定要删除这个模板吗？"

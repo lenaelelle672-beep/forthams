@@ -61,6 +61,15 @@ public class InspectionTemplateController {
     }
 
     /**
+     * 复制检验模板
+     */
+    @PreAuthorize("@ss.hasPermi('inspection:template:create')")
+    @PostMapping("/{id}/copy")
+    public Result<InspectionTemplate> copy(@PathVariable Long id) {
+        return Result.success(templateService.copyTemplate(id));
+    }
+
+    /**
      * 删除检验模板
      */
     @PreAuthorize("@ss.hasPermi('inspection:template:remove')")

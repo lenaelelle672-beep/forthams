@@ -47,6 +47,14 @@ public interface InspectionTemplateService {
     InspectionTemplate updateTemplate(Long id, InspectionTemplate template);
 
     /**
+     * 复制检验模板
+     *
+     * @param id 源模板ID
+     * @return 新复制的检验模板
+     */
+    InspectionTemplate copyTemplate(Long id);
+
+    /**
      * 删除检验模板
      *
      * @param id 模板ID

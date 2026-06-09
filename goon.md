@@ -1,5 +1,26 @@
 # goon.md — 交接笔记（Cowork → Claude Code）
 
+## 2026-06-09 21:05 最新状态（Codex GAI2 检验模板复制闭环）
+
+### 当前事实
+- 已补齐检验模板复制闭环：`InspectionTemplateService.copyTemplate` 会复制源模板名称、类型、周期、适用分类、检查项、状态、创建人，并以当前 `TenantContext` 写入新模板。
+- `InspectionTemplateController` 新增 `POST /inspection-templates/{id}/copy`，权限使用 `inspection:template:create`，与“复制会创建新模板”的语义一致。
+- 桌面 `InspectionTemplatePage` 操作列新增“复制”按钮，调用已有 `inspectionTemplateApi.copy` 并在成功后刷新模板列表。
+- 新增 `InspectionTemplateServiceImplTest`，覆盖成功复制和源模板不存在时报错。
+
+### 最新验证
+- GitNexus impact：`InspectionTemplateService` upstream 风险 `MEDIUM`，5 个直接依赖、无受影响流程；`InspectionTemplatePage` upstream 风险 `LOW`。
+- Targeted 后端：`mvn test -Dtest=InspectionTemplateServiceImplTest -DfailIfNoTests=false` 通过，`2` 个测试通过。
+- 前端类型检查：`npx tsc -p tsconfig.json --noEmit --pretty false` 通过。
+- 后端全量：`mvn test` 通过，`585` 个测试，0 failure/error/skip。
+- 前端全量：`npm test -- --run --reporter=dot` 通过，`85` 个文件、`861` 个测试通过。
+- 前端构建：`npm run build` 通过，仅保留既有 `three-Caxi2su_.js` 大 chunk warning。
+
+### 剩余动作
+- P0：原生 Docker/Nginx 验证仍无法在当前机器执行，`docker` 与 `nginx` 命令均不存在。
+- P1：`.DS_Store` tracked 元数据清理仍需用户明确确认。
+- P1：移动端继续冻结；不纳入当前桌面/后端质量闭环。
+
 ## 2026-06-09 20:50 最新状态（Codex GAI2 检验按类别自动生成入口收敛）
 
 ### 当前事实

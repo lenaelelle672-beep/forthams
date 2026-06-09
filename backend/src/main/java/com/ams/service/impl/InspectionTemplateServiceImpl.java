@@ -81,6 +81,29 @@ public class InspectionTemplateServiceImpl implements InspectionTemplateService 
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    public InspectionTemplate copyTemplate(Long id) {
+        String tenantId = TenantContext.requireTenantId();
+        InspectionTemplate existing = getTemplateById(id);
+        if (existing == null) {
+            throw new BusinessException("检验模板不存在");
+        }
+
+        InspectionTemplate copy = new InspectionTemplate();
+        copy.setTemplateName(existing.getTemplateName() + " 副本");
+        copy.setType(existing.getType());
+        copy.setFrequency(existing.getFrequency());
+        copy.setCategoryIds(existing.getCategoryIds());
+        copy.setCheckItems(existing.getCheckItems());
+        copy.setStatus(existing.getStatus() == null ? "ACTIVE" : existing.getStatus());
+        copy.setTenantId(tenantId);
+        copy.setCreateBy(existing.getCreateBy());
+        templateMapper.insert(copy);
+        log.info("复制检验模板: sourceTemplateId={}, copiedTemplateId={}", id, copy.getId());
+        return copy;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
     public void deleteTemplate(Long id) {
         InspectionTemplate existing = getTemplateById(id);
         if (existing == null) {
