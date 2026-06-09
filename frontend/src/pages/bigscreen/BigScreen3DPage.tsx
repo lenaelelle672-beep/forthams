@@ -5,47 +5,47 @@ import http from '@/utils/http';
 
 const DESIGN_WIDTH = 1920;
 const DESIGN_HEIGHT = 1080;
-const fallbackStats = {
-  totalAssets: 57,
-  inUseAssets: 21,
-  idleAssets: 25,
-  scrapAssets: 9,
-  utilizationRate: 36.8,
-  totalValue: 60000,
-  netValue: 49000,
-  pendingApprovals: 3,
-  pendingWorkOrders: 24,
-  inventoryProgress: 70,
-  criticalAlerts: 7,
+const emptyStats = {
+  totalAssets: 0,
+  inUseAssets: 0,
+  idleAssets: 0,
+  scrapAssets: 0,
+  utilizationRate: 0,
+  totalValue: 0,
+  netValue: 0,
+  pendingApprovals: 0,
+  pendingWorkOrders: 0,
+  inventoryProgress: 0,
+  criticalAlerts: 0,
 };
 
 const BigScreen3DCanvas = lazy(() => import('./BigScreen3DCanvas'));
 
-type Stats = typeof fallbackStats;
+type Stats = typeof emptyStats;
 type StyleVars = CSSProperties & Record<`--${string}`, string | number>;
 
 function normalizeStats(input: Partial<Stats> | null | undefined): Stats {
   const raw = (input ?? {}) as Partial<Stats>;
-  const total = typeof raw.totalAssets === 'number' ? raw.totalAssets : fallbackStats.totalAssets;
-  const inUse = typeof raw.inUseAssets === 'number' ? raw.inUseAssets : fallbackStats.inUseAssets;
+  const total = typeof raw.totalAssets === 'number' ? raw.totalAssets : emptyStats.totalAssets;
+  const inUse = typeof raw.inUseAssets === 'number' ? raw.inUseAssets : emptyStats.inUseAssets;
 
   return {
-    ...fallbackStats,
+    ...emptyStats,
     totalAssets: total,
     inUseAssets: inUse,
-    idleAssets: typeof raw.idleAssets === 'number' ? raw.idleAssets : fallbackStats.idleAssets,
-    scrapAssets: typeof raw.scrapAssets === 'number' ? raw.scrapAssets : fallbackStats.scrapAssets,
+    idleAssets: typeof raw.idleAssets === 'number' ? raw.idleAssets : emptyStats.idleAssets,
+    scrapAssets: typeof raw.scrapAssets === 'number' ? raw.scrapAssets : emptyStats.scrapAssets,
     utilizationRate: typeof raw.utilizationRate === 'number'
       ? raw.utilizationRate
       : total > 0
         ? Math.round((inUse / total) * 1000) / 10
-        : fallbackStats.utilizationRate,
-    totalValue: typeof raw.totalValue === 'number' ? raw.totalValue : fallbackStats.totalValue,
-    netValue: typeof raw.netValue === 'number' ? raw.netValue : fallbackStats.netValue,
-    pendingApprovals: typeof raw.pendingApprovals === 'number' ? raw.pendingApprovals : fallbackStats.pendingApprovals,
-    pendingWorkOrders: typeof raw.pendingWorkOrders === 'number' ? raw.pendingWorkOrders : fallbackStats.pendingWorkOrders,
-    inventoryProgress: typeof raw.inventoryProgress === 'number' ? raw.inventoryProgress : fallbackStats.inventoryProgress,
-    criticalAlerts: typeof raw.criticalAlerts === 'number' ? raw.criticalAlerts : fallbackStats.criticalAlerts,
+        : emptyStats.utilizationRate,
+    totalValue: typeof raw.totalValue === 'number' ? raw.totalValue : emptyStats.totalValue,
+    netValue: typeof raw.netValue === 'number' ? raw.netValue : emptyStats.netValue,
+    pendingApprovals: typeof raw.pendingApprovals === 'number' ? raw.pendingApprovals : emptyStats.pendingApprovals,
+    pendingWorkOrders: typeof raw.pendingWorkOrders === 'number' ? raw.pendingWorkOrders : emptyStats.pendingWorkOrders,
+    inventoryProgress: typeof raw.inventoryProgress === 'number' ? raw.inventoryProgress : emptyStats.inventoryProgress,
+    criticalAlerts: typeof raw.criticalAlerts === 'number' ? raw.criticalAlerts : emptyStats.criticalAlerts,
   };
 }
 
@@ -580,9 +580,9 @@ function buildCityMetrics(stats: Stats): CityMetric[] {
     const ratio = (cityWeights[index] ?? 0.02) / totalWeight;
     return {
       name,
-      assetCount: Math.max(2, Math.round(stats.totalAssets * ratio)),
+      assetCount: stats.totalAssets > 0 ? Math.max(1, Math.round(stats.totalAssets * ratio)) : 0,
       onlineRate: Math.max(82, Math.min(99.8, 94 + ((index * 7) % 10) / 2)),
-      warningCount: Math.max(0, Math.round(stats.criticalAlerts * ratio + (index % 3 === 0 ? 1 : 0))),
+      warningCount: stats.criticalAlerts > 0 ? Math.max(0, Math.round(stats.criticalAlerts * ratio + (index % 3 === 0 ? 1 : 0))) : 0,
       netValue: Math.round(stats.netValue * ratio),
     };
   });
@@ -616,10 +616,10 @@ export default function BigScreen3DPage() {
         const res = await http.get<any>('/bigscreen/stats');
         return normalizeStats(res);
       } catch {
-        return fallbackStats;
+        return emptyStats;
       }
     },
-    initialData: fallbackStats,
+    initialData: emptyStats,
     refetchInterval: 30000,
     refetchOnWindowFocus: false,
     throwOnError: false,
