@@ -17,10 +17,13 @@ import {
   TrendingUp, GripVertical, X, Plus, Trash2,
 } from 'lucide-react';
 import { createSavedReport } from '@/api/savedReport';
+import { getAssetList } from '@/api/asset';
+import { getDepreciationStats, getMaintenanceStats, getReportByCategory } from '@/api/reports';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { toast } from 'sonner';
 import type { ReportConfig, ReportField, SavedReport } from '@/types/savedReport';
+import type { AssetListItem } from '@/types/asset';
 
 // 可用字段分组
 const AVAILABLE_FIELDS: Record<string, ReportField[]> = {
@@ -65,6 +68,71 @@ const REPORT_TYPES = [
 ];
 
 const PIE_COLORS = ['#1d4ed8', '#06b6d4', '#8b5cf6', '#f59e0b', '#10b981', '#ef4444', '#ec4899', '#14b8a6'];
+
+type PreviewRow = Record<string, unknown>;
+
+async function loadPreviewRows(reportType: string, selectedFields: ReportField[]): Promise<PreviewRow[]> {
+  switch (reportType) {
+    case 'ASSET':
+      return loadAssetPreviewRows(selectedFields);
+    case 'FINANCIAL':
+      return (await getDepreciationStats()).slice(0, 8).map((item) => projectPreviewRow({
+        name: item.month,
+        depreciationAmount: item.value,
+        maintenanceCost: 0,
+        energyCost: 0,
+        totalCost: item.value,
+      }, selectedFields));
+    case 'MAINTENANCE':
+      return (await getMaintenanceStats()).slice(0, 8).map((item) => projectPreviewRow({
+        name: item.month,
+        workOrderCount: 0,
+        maintenanceCount: item.value,
+        faultCount: 0,
+        mtbf: null,
+        mttr: null,
+      }, selectedFields));
+    case 'INVENTORY':
+      return (await getReportByCategory()).slice(0, 8).map((item) => projectPreviewRow({
+        name: item.categoryName,
+        categoryName: item.categoryName,
+        assetCount: item.assetCount,
+        totalValue: item.totalValue,
+      }, selectedFields));
+    default:
+      return [];
+  }
+}
+
+async function loadAssetPreviewRows(selectedFields: ReportField[]): Promise<PreviewRow[]> {
+  const page = await getAssetList({ page: 1, pageSize: 8 });
+  return (page.records ?? []).map((asset) => projectPreviewRow(assetPreviewRow(asset), selectedFields));
+}
+
+function assetPreviewRow(asset: AssetListItem): PreviewRow {
+  return {
+    name: asset.assetName || asset.assetNo,
+    assetCode: asset.assetNo,
+    assetName: asset.assetName,
+    categoryName: asset.categoryName ?? asset.categoryId,
+    status: asset.status,
+    originalValue: asset.originalValue,
+    currentValue: asset.currentValue,
+    purchaseDate: asset.purchaseDate,
+    locationName: asset.location,
+    departmentName: asset.deptName ?? asset.deptId,
+  };
+}
+
+function projectPreviewRow(row: PreviewRow, selectedFields: ReportField[]): PreviewRow {
+  const projected: PreviewRow = { name: row.name };
+  selectedFields.forEach((field) => {
+    if (field.name in row) {
+      projected[field.name] = row[field.name];
+    }
+  });
+  return projected;
+}
 
 // ── react-dnd 拖拽相关 ─────────────────────────────────────────────────────
 
@@ -267,6 +335,7 @@ export default function ReportBuilderPage() {
   const [selectedFields, setSelectedFields] = useState<ReportField[]>([]);
   const [chartType, setChartType] = useState<string>('table');
   const [previewData, setPreviewData] = useState<any[]>([]);
+  const [previewLoading, setPreviewLoading] = useState(false);
 
   const handleAddField = useCallback((field: ReportField) => {
     if (!selectedFields.find((f) => f.name === field.name)) {
@@ -287,30 +356,28 @@ export default function ReportBuilderPage() {
     });
   }, []);
 
-  const handleGeneratePreview = useCallback(() => {
+  const handleGeneratePreview = useCallback(async () => {
     if (selectedFields.length === 0) {
       toast.warning('请至少选择一个字段');
       return;
     }
-    // 生成模拟预览数据
-    const mockData = Array.from({ length: 8 }, (_, i) => {
-      const row: Record<string, any> = { name: `项目 ${i + 1}` };
-      selectedFields.forEach((f) => {
-        if (f.name.includes('Value') || f.name.includes('Cost') || f.name.includes('Amount')) {
-          row[f.name] = Math.round(Math.random() * 100000) / 100;
-        } else if (f.name.includes('Count') || f.name.includes('Count')) {
-          row[f.name] = Math.floor(Math.random() * 50);
-        } else if (f.name === 'status') {
-          row[f.name] = ['在库', '使用中', '维修中', '已报废'][Math.floor(Math.random() * 4)];
-        } else {
-          row[f.name] = `${f.label} ${i + 1}`;
-        }
-      });
-      return row;
-    });
-    setPreviewData(mockData);
-    toast.success('预览数据已生成');
-  }, [selectedFields]);
+
+    setPreviewLoading(true);
+    try {
+      const rows = await loadPreviewRows(reportType, selectedFields);
+      setPreviewData(rows);
+      if (rows.length === 0) {
+        toast.info('暂无可预览数据');
+      } else {
+        toast.success('预览数据已更新');
+      }
+    } catch (err) {
+      console.error('预览数据加载失败:', err);
+      toast.error('预览数据加载失败，请稍后重试');
+    } finally {
+      setPreviewLoading(false);
+    }
+  }, [reportType, selectedFields]);
 
   const saveMutation = useMutation({
     mutationFn: (data: Partial<SavedReport>) => createSavedReport(data),
@@ -560,11 +627,12 @@ export default function ReportBuilderPage() {
               <div className="mt-4 flex items-center justify-end gap-2">
                 <Button
                   onClick={handleGeneratePreview}
+                  disabled={previewLoading}
                   variant="outline"
                   className="inline-flex items-center gap-1.5"
                 >
                   <Eye className="w-4 h-4" />
-                  生成预览
+                  {previewLoading ? '加载中...' : '生成预览'}
                 </Button>
                 <Button
                   onClick={handleSave}
