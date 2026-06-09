@@ -114,6 +114,18 @@ class TenantSchemaConsistencyTest {
     }
 
     @Test
+    void utilizationTenantMigrationShouldScopeUsageLogsAndSnapshots() throws IOException {
+        String migration = Files.readString(MIGRATION_DIR.resolve("V2_81__asset_utilization_tenant_scope.sql"));
+
+        assertThat(migration).contains("ALTER TABLE asset_usage_log ADD COLUMN tenant_id VARCHAR(64)");
+        assertThat(migration).contains("ALTER TABLE asset_utilization_snapshot ADD COLUMN tenant_id VARCHAR(64)");
+        assertThat(migration).contains("UPDATE asset_usage_log l");
+        assertThat(migration).contains("UPDATE asset_utilization_snapshot s");
+        assertThat(migration).contains("ADD INDEX idx_aul_tenant_asset_date (tenant_id, asset_id, usage_date)");
+        assertThat(migration).contains("ADD UNIQUE KEY uk_aus_tenant_asset_period (tenant_id, asset_id, period_type, period_start)");
+    }
+
+    @Test
     void legacyTenantIdMigrationsShouldBePatchedForwardWithoutChecksumChanges() throws IOException {
         String v236 = Files.readString(MIGRATION_DIR.resolve("V2_36__asset_parent_child.sql"));
         String v258 = Files.readString(MIGRATION_DIR.resolve("V2_58__inspection_template_and_record.sql"));

@@ -1,5 +1,6 @@
 package com.ams.service;
 
+import com.ams.context.TenantContext;
 import com.ams.dto.AssetUtilizationDTO;
 import com.ams.dto.UtilizationOverviewDTO;
 import com.ams.dto.UtilizationSummaryDTO;
@@ -38,7 +39,9 @@ public class UtilizationService {
 
     @Transactional(rollbackFor = Exception.class)
     public void recordUsage(Long assetId, Long userId, String action, BigDecimal duration) {
+        String tenantId = TenantContext.requireTenantId();
         AssetUsageLog log = new AssetUsageLog();
+        log.setTenantId(tenantId);
         log.setAssetId(assetId);
         log.setUserId(userId);
         log.setAction(action);
@@ -205,6 +208,7 @@ public class UtilizationService {
 
     @Transactional(rollbackFor = Exception.class)
     public void calculateMonthlySnapshot() {
+        String tenantId = TenantContext.requireTenantId();
         YearMonth lastMonth = YearMonth.from(LocalDate.now().minusMonths(1));
         LocalDate periodStart = lastMonth.atDay(1);
         LocalDate periodEnd = lastMonth.atEndOfMonth();
@@ -227,23 +231,24 @@ public class UtilizationService {
             page++;
 
             for (Asset asset : assets) {
-            Map<String, Object> usage = usageLogMapper.selectTotalUsage(asset.getId(), periodStart, periodEnd);
-            BigDecimal usedHours = usage != null ? (BigDecimal) usage.get("totalHours") : BigDecimal.ZERO;
-            BigDecimal rate = totalHours.compareTo(BigDecimal.ZERO) > 0
-                    ? usedHours.multiply(HUNDRED).divide(totalHours, 2, RoundingMode.HALF_UP)
-                    : BigDecimal.ZERO;
-            BigDecimal idleHours = totalHours.subtract(usedHours);
+                Map<String, Object> usage = usageLogMapper.selectTotalUsage(asset.getId(), periodStart, periodEnd);
+                BigDecimal usedHours = usage != null ? (BigDecimal) usage.get("totalHours") : BigDecimal.ZERO;
+                BigDecimal rate = totalHours.compareTo(BigDecimal.ZERO) > 0
+                        ? usedHours.multiply(HUNDRED).divide(totalHours, 2, RoundingMode.HALF_UP)
+                        : BigDecimal.ZERO;
+                BigDecimal idleHours = totalHours.subtract(usedHours);
 
-            AssetUtilizationSnapshot snapshot = new AssetUtilizationSnapshot();
-            snapshot.setAssetId(asset.getId());
-            snapshot.setPeriodType("MONTHLY");
-            snapshot.setPeriodStart(periodStart);
-            snapshot.setPeriodEnd(periodEnd);
-            snapshot.setTotalHours(totalHours);
-            snapshot.setUsedHours(usedHours);
-            snapshot.setUtilizationRate(rate);
-            snapshot.setIdleHours(idleHours);
-            snapshotMapper.insert(snapshot);
+                AssetUtilizationSnapshot snapshot = new AssetUtilizationSnapshot();
+                snapshot.setTenantId(tenantId);
+                snapshot.setAssetId(asset.getId());
+                snapshot.setPeriodType("MONTHLY");
+                snapshot.setPeriodStart(periodStart);
+                snapshot.setPeriodEnd(periodEnd);
+                snapshot.setTotalHours(totalHours);
+                snapshot.setUsedHours(usedHours);
+                snapshot.setUtilizationRate(rate);
+                snapshot.setIdleHours(idleHours);
+                snapshotMapper.insert(snapshot);
             }
         }
     }
