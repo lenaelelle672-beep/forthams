@@ -46,30 +46,6 @@ const METER_TYPE_COLORS: Record<string, string> = {
   ELECTRICITY: '#f59e0b', WATER: '#3b82f6', GAS: '#ef4444',
 };
 
-/* ── Mock 兜底数据（后端未就绪时展示） ───────────────────────────────────── */
-const MOCK_ENERGY_DASHBOARD: EnergyDashboardData = {
-  byType: { ELECTRICITY: 12500, WATER: 3200, GAS: 800 },
-  trend: {
-    '2025-07': 1320, '2025-08': 1580, '2025-09': 1410, '2025-10': 1260,
-    '2025-11': 1150, '2025-12': 1380, '2026-01': 1620, '2026-02': 1480,
-    '2026-03': 1350, '2026-04': 1290, '2026-05': 1450, '2026-06': 1510,
-  },
-  assetRanking: [
-    { assetId: 4, consumption: 2850 },
-    { assetId: 1, consumption: 2340 },
-    { assetId: 11, consumption: 1980 },
-    { assetId: 5, consumption: 1720 },
-    { assetId: 2, consumption: 1560 },
-    { assetId: 7, consumption: 1280 },
-    { assetId: 9, consumption: 1150 },
-    { assetId: 15, consumption: 980 },
-    { assetId: 3, consumption: 820 },
-    { assetId: 10, consumption: 650 },
-  ],
-  total: 16500,
-  periodType: 'MONTH',
-};
-
 /* ── 节能建议模板（保留既有） ─────────────────────────────────────────────── */
 const SUGGESTION_TEMPLATES: Array<{
   condition: (data: any) => boolean;
@@ -132,11 +108,14 @@ const EnergyDashboardPage: React.FC = () => {
         : undefined,
   });
 
-  // Mock 兜底：当真实数据为空时使用 mock 数据
-  const effectiveData = useMemo<EnergyDashboardData | undefined>(
-    () => (data && (data.byType && Object.keys(data.byType).length > 0 || data.assetRanking?.length > 0) ? data : !isLoading ? MOCK_ENERGY_DASHBOARD : undefined),
-    [data, isLoading],
-  );
+  const effectiveData = useMemo<EnergyDashboardData | undefined>(() => {
+    if (!data) return undefined;
+    const hasByType = Object.keys(data.byType || {}).length > 0;
+    const hasTrend = Object.keys(data.trend || {}).length > 0;
+    const hasRanking = (data.assetRanking || []).length > 0;
+    const hasTotal = Number(data.total || 0) > 0;
+    return hasByType || hasTrend || hasRanking || hasTotal ? data : undefined;
+  }, [data]);
 
   // 同环比 — 前端 useMemo 兜底（B5 后端权威化推迟到下一轮）
   const trendChange = useMemo<number | null>(() => {
@@ -164,7 +143,7 @@ const EnergyDashboardPage: React.FC = () => {
   );
 
   const totalConsumption = effectiveData
-    ? Object.values(effectiveData.byType || {}).reduce<number>((a, b) => a + Number(b), 0)
+    ? Object.values(effectiveData.byType || {}).reduce<number>((a, b) => a + Number(b), 0) || Number(effectiveData.total || 0)
     : 0;
   const electricConsumption = Number(effectiveData?.byType?.ELECTRICITY || 0);
   const waterConsumption = Number(effectiveData?.byType?.WATER || 0);

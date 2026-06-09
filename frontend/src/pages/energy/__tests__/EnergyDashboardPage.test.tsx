@@ -61,12 +61,12 @@ describe('EnergyDashboardPage', () => {
     expect(screen.getByText('Failed to load')).toBeInTheDocument();
   });
 
-  it('should show fallback dashboard when api returns no data', () => {
+  it('should show empty state when api returns no data', () => {
     mockedUseDashboard.mockReturnValue({ data: undefined, isLoading: false, isError: false, error: null, refetch: vi.fn() } as any);
     renderPage();
-    expect(screen.getByText('能耗管理')).toBeInTheDocument();
-    expect(screen.getByText('总能耗')).toBeInTheDocument();
-    expect(screen.getByText('16,500')).toBeInTheDocument();
+    expect(screen.getByText('暂无能耗数据')).toBeInTheDocument();
+    expect(screen.getByText('尚未采集到能耗数据')).toBeInTheDocument();
+    expect(screen.queryByText('16,500')).not.toBeInTheDocument();
   });
 
   it('should show KPI cards with data', () => {
