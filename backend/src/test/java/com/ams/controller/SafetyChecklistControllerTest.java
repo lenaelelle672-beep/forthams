@@ -8,14 +8,14 @@ import com.ams.service.SafetyChecklistService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
@@ -24,7 +24,6 @@ import java.util.Map;
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -36,9 +35,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * - PDF 报告生成
  * - 批量执行
  */
-@WebMvcTest(SafetyChecklistController.class)
-@WithMockUser(username = "admin", roles = {"ADMIN"})
-@Disabled("运行时类找不到，第4轮修复时标记")
+@SpringBootTest
+@AutoConfigureMockMvc(addFilters = false)
+@ActiveProfiles("test")
 class SafetyChecklistControllerTest {
 
     @Autowired
@@ -91,8 +90,7 @@ class SafetyChecklistControllerTest {
         // Act & Assert
         mockMvc.perform(multipart("/safety-checklists/executions/1/results/1/photos")
                         .file(file)
-                        .param("uploadBy", "1")
-                        .with(csrf()))
+                        .param("uploadBy", "1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data.fileName").value("photo.jpg"));
@@ -111,8 +109,7 @@ class SafetyChecklistControllerTest {
         // Act & Assert
         mockMvc.perform(multipart("/safety-checklists/executions/1/results/1/photos")
                         .file(file)
-                        .param("uploadBy", "1")
-                        .with(csrf()))
+                        .param("uploadBy", "1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(500))
                 .andExpect(jsonPath("$.message").value(containsString("不支持的文件类型")));
@@ -131,8 +128,7 @@ class SafetyChecklistControllerTest {
         // Act & Assert
         mockMvc.perform(multipart("/safety-checklists/executions/1/results/1/photos")
                         .file(file)
-                        .param("uploadBy", "1")
-                        .with(csrf()))
+                        .param("uploadBy", "1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(500))
                 .andExpect(jsonPath("$.message").value(containsString("文件大小不能超过 5MB")));
@@ -176,8 +172,7 @@ class SafetyChecklistControllerTest {
     @Test
     void testDeletePhoto_WithValidPhotoId() throws Exception {
         // Act & Assert
-        mockMvc.perform(delete("/safety-checklists/photos/1")
-                        .with(csrf()))
+        mockMvc.perform(delete("/safety-checklists/photos/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200));
     }
@@ -232,8 +227,7 @@ class SafetyChecklistControllerTest {
         // Act & Assert
         mockMvc.perform(post("/safety-checklists/executions/batch-start")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(params))
-                        .with(csrf()))
+                        .content(objectMapper.writeValueAsString(params)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data.successCount").value(3))
@@ -263,8 +257,7 @@ class SafetyChecklistControllerTest {
         // Act & Assert
         mockMvc.perform(post("/safety-checklists/executions/batch-start")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(params))
-                        .with(csrf()))
+                        .content(objectMapper.writeValueAsString(params)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data.successCount").value(2))

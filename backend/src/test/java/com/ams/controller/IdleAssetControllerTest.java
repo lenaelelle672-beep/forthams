@@ -34,7 +34,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles("test")
 @DisplayName("Idle Asset Controller Tests")
-@Disabled("依赖已删除类，第4轮修复时标记")
 class IdleAssetControllerTest {
 
     @Autowired

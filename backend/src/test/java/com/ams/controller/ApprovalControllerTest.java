@@ -33,7 +33,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles("test")
 @DisplayName("Approval Controller Tests")
-@Disabled("依赖已删除类，第4轮修复时标记")
 class ApprovalControllerTest {
 
     @Autowired
@@ -56,7 +55,7 @@ class ApprovalControllerTest {
                         .contextPath("/api")
                         .header("Authorization", "Bearer test-token")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"title\":\"Approval\",\"applicantId\":1}"))
+                        .content("{\"processType\":\"WORK_ORDER\",\"title\":\"Approval\",\"applicantId\":1}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200));
 

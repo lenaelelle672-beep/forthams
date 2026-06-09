@@ -64,4 +64,23 @@ class WorkOrderControllerTest {
 
         verify(workOrderService).operateWorkOrder(1L, "approve", "ok");
     }
+
+    @Test
+    @DisplayName("Should return direct work order detail payload expected by current backend contract")
+    void testGetWorkOrderDetailReturnsDirectWorkOrder() throws Exception {
+        WorkOrder workOrder = new WorkOrder();
+        workOrder.setId(9L);
+        workOrder.setTitle("空调压缩机异响");
+        workOrder.setFaultCodeId(42L);
+        when(workOrderService.getWorkOrderById(9L)).thenReturn(workOrder);
+
+        mockMvc.perform(get("/api/workorders/{id}", 9L)
+                .contextPath("/api")
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.code").value(200))
+            .andExpect(jsonPath("$.data.id").value(9))
+            .andExpect(jsonPath("$.data.title").value("空调压缩机异响"))
+            .andExpect(jsonPath("$.data.faultCodeId").value(42));
+    }
 }

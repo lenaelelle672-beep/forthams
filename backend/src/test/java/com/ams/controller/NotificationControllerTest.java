@@ -35,7 +35,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles("test")
 @DisplayName("Notification controller tests")
-@Disabled("运行时类找不到，第4轮修复时标记")
 class NotificationControllerTest {
 
     @Autowired

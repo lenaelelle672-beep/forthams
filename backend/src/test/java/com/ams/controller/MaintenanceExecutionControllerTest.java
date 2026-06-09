@@ -8,7 +8,9 @@ import com.ams.dto.ExecutionStepUpdateDTO;
 import com.ams.entity.MaintenanceExecution;
 import com.ams.entity.MaintenanceExecutionMaterial;
 import com.ams.entity.MaintenanceExecutionStep;
+import com.ams.entity.User;
 import com.ams.mapper.SysAttachmentMapper;
+import com.ams.mapper.UserMapper;
 import com.ams.service.MaintenanceExecutionMaterialService;
 import com.ams.service.MaintenanceExecutionService;
 import com.ams.service.MaintenanceExecutionStepService;
@@ -39,7 +41,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles("test")
 @DisplayName("MaintenanceExecution Controller Tests")
-@Disabled("运行时类找不到，第4轮修复时标记")
 class MaintenanceExecutionControllerTest {
 
     @Autowired
@@ -60,12 +61,15 @@ class MaintenanceExecutionControllerTest {
     @MockBean
     private SysAttachmentMapper sysAttachmentMapper;
 
+    @MockBean
+    private UserMapper userMapper;
+
     // ── Helpers ──────────────────────────────────────────────────────────────
 
     private MaintenanceExecution createExecution(Long id, String status) {
         MaintenanceExecution e = new MaintenanceExecution();
         e.setId(id);
-        e.setTenantId("T001");
+        e.setTenantId("dept:1");
         e.setMaintenanceRecordId(1L);
         e.setWorkOrderId(10L);
         e.setStatus(status);
@@ -192,6 +196,7 @@ class MaintenanceExecutionControllerTest {
     @DisplayName("POST /maintenance/execution/{id}/steps — 创建步骤")
     void testCreateStep() throws Exception {
         ExecutionStepCreateDTO dto = new ExecutionStepCreateDTO();
+        dto.setExecutionId(1L);
         dto.setStepName("拆卸外壳");
         dto.setLaborHours(new BigDecimal("1.5"));
 
@@ -258,6 +263,7 @@ class MaintenanceExecutionControllerTest {
     @DisplayName("POST /maintenance/execution/{id}/materials — 添加物料")
     void testAddMaterial() throws Exception {
         ExecutionMaterialCreateDTO dto = new ExecutionMaterialCreateDTO();
+        dto.setExecutionId(1L);
         dto.setMaterialName("轴承");
         dto.setQuantity(new BigDecimal("2"));
 
@@ -296,6 +302,12 @@ class MaintenanceExecutionControllerTest {
                 new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(
                         "admin", "password", java.util.Collections.emptyList());
         org.springframework.security.core.context.SecurityContextHolder.getContext().setAuthentication(auth);
+        // getCurrentUserId 通过 userMapper 按用户名查询用户ID
+        User currentUser = new User();
+        currentUser.setId(1L);
+        currentUser.setUsername("admin");
+        currentUser.setStatus(1);
+        when(userMapper.selectOne(any())).thenReturn(currentUser);
 
         MockMultipartFile file = new MockMultipartFile(
                 "file",

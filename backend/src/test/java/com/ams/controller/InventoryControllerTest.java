@@ -23,6 +23,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -32,7 +33,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles("test")
 @DisplayName("Inventory Controller Tests")
-@Disabled("运行时类找不到，第4轮修复时标记")
 class InventoryControllerTest {
 
     @Autowired
@@ -105,17 +105,50 @@ class InventoryControllerTest {
     void shouldSubmitInventoryTask() throws Exception {
         InventoryTask task = new InventoryTask();
         task.setId(7L);
-        task.setStatus("SUBMITTED");
-        when(inventoryService.updateTaskStatus(7L, "SUBMITTED")).thenReturn(task);
+        task.setStatus("PENDING_APPROVAL");
+        when(inventoryService.submitTask(7L)).thenReturn(task);
 
         mockMvc.perform(post("/api/inventory/tasks/{id}/submit", 7L)
                 .contextPath("/api")
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.code").value(200))
-            .andExpect(jsonPath("$.data.status").value("SUBMITTED"));
+            .andExpect(jsonPath("$.data.status").value("PENDING_APPROVAL"));
 
-        verify(inventoryService).updateTaskStatus(7L, "SUBMITTED");
+        verify(inventoryService).submitTask(7L);
+    }
+
+    @Test
+    @DisplayName("Should confirm one inventory detail through task scoped route")
+    void shouldConfirmInventoryDetail() throws Exception {
+        InventoryDetail detail = new InventoryDetail();
+        detail.setId(11L);
+        detail.setTaskId(7L);
+        detail.setStatus("damaged");
+        when(inventoryService.confirmAsset(7L, 11L, "damaged", "屏幕破损")).thenReturn(detail);
+
+        mockMvc.perform(patch("/api/inventory/tasks/{taskId}/assets/{detailId}/confirm", 7L, 11L)
+                .contextPath("/api")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"actualStatus\":\"damaged\",\"remark\":\"屏幕破损\"}"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.code").value(200))
+            .andExpect(jsonPath("$.data.status").value("damaged"));
+
+        verify(inventoryService).confirmAsset(7L, 11L, "damaged", "屏幕破损");
+    }
+
+    @Test
+    @DisplayName("Should batch confirm inventory details through frontend contract route")
+    void shouldBatchConfirmInventoryDetails() throws Exception {
+        mockMvc.perform(post("/api/inventory/tasks/{taskId}/assets/batch-confirm", 7L)
+                .contextPath("/api")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"assetIds\":[\"11\",\"12\"],\"actualStatus\":\"normal\",\"remark\":\"批量确认\"}"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.code").value(200));
+
+        verify(inventoryService).batchConfirmAssets(7L, List.of("11", "12"), "normal", "批量确认");
     }
 
     @Test

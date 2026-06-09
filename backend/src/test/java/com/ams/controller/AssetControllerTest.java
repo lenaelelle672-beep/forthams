@@ -6,8 +6,8 @@ import com.ams.dto.AssetUpdateDTO;
 import com.ams.entity.Asset;
 import com.ams.service.AssetService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import java.math.BigDecimal;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,15 +15,19 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -31,7 +35,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles("test")
 @DisplayName("Asset Controller Tests")
-@Disabled("运行时类找不到，第4轮修复时标记")
 class AssetControllerTest {
 
     @Autowired
@@ -189,5 +192,140 @@ class AssetControllerTest {
             .andExpect(jsonPath("$.code").value(200));
 
         verify(assetService, atLeastOnce()).queryAssets(any(AssetQueryDTO.class));
+    }
+
+    @Test
+    @DisplayName("Should download CSV import template")
+    void downloadImportTemplateReturnsCsv() throws Exception {
+        mockMvc.perform(get("/api/assets/import/template")
+                .contextPath("/api"))
+            .andExpect(status().isOk())
+            .andExpect(header().string("Content-Type", org.hamcrest.Matchers.containsString("text/csv")))
+            .andExpect(header().string("Content-Disposition", org.hamcrest.Matchers.containsString("asset_import_template.csv")));
+    }
+
+    @Test
+    @DisplayName("Should parse CSV import file")
+    void parseImportFileReturnsPreviewRows() throws Exception {
+        MockMultipartFile file = new MockMultipartFile(
+                "file",
+                "assets.csv",
+                "text/csv",
+                "assetNo,assetName,categoryId,status\nAST-1,测试资产,1,IDLE\n".getBytes(java.nio.charset.StandardCharsets.UTF_8));
+
+        mockMvc.perform(multipart("/api/assets/import/parse")
+                .file(file)
+                .contextPath("/api"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.code").value(200))
+            .andExpect(jsonPath("$.data.rows[0].assetNo").value("AST-1"))
+            .andExpect(jsonPath("$.data.errors").isArray());
+    }
+
+    @Test
+    @DisplayName("Should reject non CSV import files with controlled response")
+    void parseImportFileRejectsUnsupportedFile() throws Exception {
+        MockMultipartFile file = new MockMultipartFile(
+                "file",
+                "assets.xlsx",
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                new byte[] {1, 2, 3});
+
+        mockMvc.perform(multipart("/api/assets/import/parse")
+                .file(file)
+                .contextPath("/api"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.code").value(400))
+            .andExpect(jsonPath("$.message").value("当前导入接口支持 CSV 文件，请先下载模板填写后上传"));
+    }
+
+    @Test
+    @DisplayName("Should reject import commit without rows")
+    void commitImportRejectsMissingRows() throws Exception {
+        mockMvc.perform(post("/api/assets/import/commit")
+                .contextPath("/api")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{}"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.code").value(400))
+            .andExpect(jsonPath("$.message").value("导入数据不能为空"));
+    }
+
+    @Test
+    @DisplayName("Should commit valid import rows and keep row-level failures")
+    void commitImportReturnsPartialSuccessWithRowErrors() throws Exception {
+        Asset created = new Asset();
+        created.setId(1L);
+        when(assetService.createAsset(any(AssetCreateDTO.class)))
+                .thenReturn(created)
+                .thenThrow(new IllegalArgumentException("资产编号已存在"));
+
+        mockMvc.perform(post("/api/assets/import/commit")
+                .contextPath("/api")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                        {
+                          "rows": [
+                            {
+                              "rowNumber": 2,
+                              "assetNo": "AST-OK",
+                              "assetName": "导入成功资产",
+                              "categoryId": "10",
+                              "status": "IDLE",
+                              "deptId": "1",
+                              "locationId": "20",
+                              "originalValue": "1234.50",
+                              "remark": "首行"
+                            },
+                            {
+                              "rowNumber": 3,
+                              "assetNo": "AST-DUP",
+                              "assetName": "重复资产"
+                            }
+                          ]
+                        }
+                        """))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.code").value(200))
+            .andExpect(jsonPath("$.data.success").value(false))
+            .andExpect(jsonPath("$.data.importedCount").value(1))
+            .andExpect(jsonPath("$.data.failedCount").value(1))
+            .andExpect(jsonPath("$.data.errors[0].rowNumber").value(3))
+            .andExpect(jsonPath("$.data.errors[0].message").value("资产编号已存在"));
+
+        ArgumentCaptor<AssetCreateDTO> captor = ArgumentCaptor.forClass(AssetCreateDTO.class);
+        verify(assetService, times(2)).createAsset(captor.capture());
+        AssetCreateDTO first = captor.getAllValues().get(0);
+        assertThat(first.getAssetNo()).isEqualTo("AST-OK");
+        assertThat(first.getAssetName()).isEqualTo("导入成功资产");
+        assertThat(first.getCategoryId()).isEqualTo(10L);
+        assertThat(first.getDeptId()).isEqualTo(1L);
+        assertThat(first.getLocationId()).isEqualTo(20L);
+        assertThat(first.getOriginalValue()).isEqualByComparingTo(new BigDecimal("1234.50"));
+        assertThat(first.getRemark()).isEqualTo("首行");
+    }
+
+    @Test
+    @DisplayName("Should export assets as CSV")
+    void exportAssetsReturnsCsv() throws Exception {
+        Page<Asset> page = new Page<>(1, 10);
+        Asset asset = new Asset();
+        asset.setAssetNo("AST-1");
+        asset.setAssetName("测试资产");
+        asset.setStatus("IDLE");
+        page.setRecords(java.util.List.of(asset));
+        when(assetService.queryAssets(any(AssetQueryDTO.class))).thenReturn(page);
+
+        mockMvc.perform(post("/api/assets/export")
+                .contextPath("/api")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"status\":\"IDLE\"}"))
+            .andExpect(status().isOk())
+            .andExpect(header().string("Content-Type", org.hamcrest.Matchers.containsString("text/csv")))
+            .andExpect(content().string(org.hamcrest.Matchers.containsString("AST-1")));
+
+        ArgumentCaptor<AssetQueryDTO> captor = ArgumentCaptor.forClass(AssetQueryDTO.class);
+        verify(assetService, atLeastOnce()).queryAssets(captor.capture());
+        assertThat(captor.getValue().getPageSize()).isEqualTo(50000);
     }
 }
