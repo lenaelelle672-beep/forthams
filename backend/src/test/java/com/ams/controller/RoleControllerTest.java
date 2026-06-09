@@ -14,12 +14,17 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -40,6 +45,27 @@ class RoleControllerTest {
 
     @MockBean
     private RoleService roleService;
+
+    @Test
+    @DisplayName("Should protect role management endpoints with RuoYi permissions")
+    void shouldUseSeededRolePermissions() throws Exception {
+        Map<String, String> expected = Map.of(
+                "list", "@ss.hasPermi('system:role:query')",
+                "all", "@ss.hasPermi('system:role:query')",
+                "getById", "@ss.hasPermi('system:role:query')",
+                "create", "@ss.hasPermi('system:role:add')",
+                "update", "@ss.hasPermi('system:role:edit')",
+                "delete", "@ss.hasPermi('system:role:delete')",
+                "assignMenus", "@ss.hasPermi('system:role:edit')",
+                "assignDepts", "@ss.hasPermi('system:role:edit')");
+
+        for (Map.Entry<String, String> entry : expected.entrySet()) {
+            Method method = findMethod(entry.getKey());
+            PreAuthorize preAuthorize = method.getAnnotation(PreAuthorize.class);
+            assertNotNull(preAuthorize, entry.getKey() + " should declare @PreAuthorize");
+            assertEquals(entry.getValue(), preAuthorize.value());
+        }
+    }
 
     @Test
     @DisplayName("Should return paginated role list")
@@ -155,5 +181,14 @@ class RoleControllerTest {
             .andExpect(jsonPath("$.code").value(200));
 
         verify(roleService).deleteRole(1L);
+    }
+
+    private Method findMethod(String methodName) throws Exception {
+        for (Method method : RoleManagementController.class.getDeclaredMethods()) {
+            if (method.getName().equals(methodName)) {
+                return method;
+            }
+        }
+        throw new NoSuchMethodException("RoleManagementController." + methodName);
     }
 }

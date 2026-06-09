@@ -26,6 +26,8 @@ import java.util.stream.Collectors;
 @Service
 public class RoleService {
 
+    private static final int DATA_SCOPE_DEPT = 3;
+
     private final RoleMapper roleMapper;
     private final SysRoleMenuMapper sysRoleMenuMapper;
     private final SysRoleDeptMapper sysRoleDeptMapper;
@@ -71,7 +73,7 @@ public class RoleService {
         role.setRoleCode(dto.getRoleCode());
         role.setDescription(dto.getDescription());
         role.setSortOrder(dto.getSortOrder() != null ? dto.getSortOrder() : 0);
-        role.setDataScope(dto.getDataScope() != null ? dto.getDataScope() : 1);
+        role.setDataScope(dto.getDataScope() != null ? dto.getDataScope() : DATA_SCOPE_DEPT);
         role.setMenuCheckStrictly(dto.getMenuCheckStrictly() != null ? dto.getMenuCheckStrictly() : 1);
         role.setDeptCheckStrictly(dto.getDeptCheckStrictly() != null ? dto.getDeptCheckStrictly() : 1);
         role.setStatus(1);

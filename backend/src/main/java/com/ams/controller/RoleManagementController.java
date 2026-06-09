@@ -38,6 +38,7 @@ public class RoleManagementController {
     }
 
     @GetMapping("/all")
+    @PreAuthorize("@ss.hasPermi('system:role:query')")
     public Result<List<Role>> all() {
         return Result.success(roleService.listAllRoles());
     }
