@@ -1,6 +1,7 @@
 package com.ams.controller;
 
 import com.ams.common.Result;
+import com.ams.context.TenantContext;
 import com.ams.dto.ExecutionMaterialCreateDTO;
 import com.ams.dto.ExecutionStartDTO;
 import com.ams.dto.ExecutionStepCreateDTO;
@@ -16,6 +17,7 @@ import com.ams.service.MaintenanceExecutionService;
 import com.ams.service.MaintenanceExecutionStepService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.AfterEach;
 import org.springframework.mock.web.MockMultipartFile;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -63,6 +65,12 @@ class MaintenanceExecutionControllerTest {
 
     @MockBean
     private UserMapper userMapper;
+
+    @AfterEach
+    void tearDown() {
+        TenantContext.clear();
+        org.springframework.security.core.context.SecurityContextHolder.clearContext();
+    }
 
     // ── Helpers ──────────────────────────────────────────────────────────────
 
@@ -297,6 +305,7 @@ class MaintenanceExecutionControllerTest {
     @Test
     @DisplayName("POST /maintenance/execution/{id}/upload-photo — 上传照片")
     void testUploadPhoto() throws Exception {
+        TenantContext.setTenantId("dept:1");
         // 设置安全上下文，使 getCurrentUserId 可正常获取用户
         org.springframework.security.core.Authentication auth =
                 new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(

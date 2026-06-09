@@ -1,5 +1,6 @@
 package com.ams.service;
 
+import com.ams.context.TenantContext;
 import com.ams.entity.SysAttachment;
 import com.ams.mapper.SysAttachmentMapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -61,6 +62,7 @@ public class AssetAttachmentService {
         }
 
         SysAttachment attachment = new SysAttachment();
+        attachment.setTenantId(TenantContext.requireTenantId());
         attachment.setBusinessType(BUSINESS_TYPE_ASSET);
         attachment.setBusinessId(assetId);
         attachment.setFileName(fileName);

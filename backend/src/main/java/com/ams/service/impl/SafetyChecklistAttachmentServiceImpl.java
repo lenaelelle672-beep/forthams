@@ -1,5 +1,6 @@
 package com.ams.service.impl;
 
+import com.ams.context.TenantContext;
 import com.ams.entity.SysAttachment;
 import com.ams.mapper.SysAttachmentMapper;
 import com.ams.service.SafetyChecklistAttachmentService;
@@ -80,6 +81,7 @@ public class SafetyChecklistAttachmentServiceImpl implements SafetyChecklistAtta
         }
 
         SysAttachment attachment = new SysAttachment();
+        attachment.setTenantId(TenantContext.requireTenantId());
         attachment.setBusinessType(BUSINESS_TYPE_SAFETY_CHECKLIST_RESULT);
         attachment.setBusinessId(resultId);
         attachment.setFileName(fileName);

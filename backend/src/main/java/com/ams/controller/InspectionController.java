@@ -1,6 +1,7 @@
 package com.ams.controller;
 
 import com.ams.common.Result;
+import com.ams.context.TenantContext;
 import com.ams.dto.InspectionBatchGenerateDTO;
 import com.ams.dto.InspectionCategoryGenerateDTO;
 import com.ams.entity.Inspection;
@@ -186,6 +187,7 @@ public class InspectionController {
 
             // 3. 创建 SysAttachment 关联记录
             SysAttachment attachment = new SysAttachment();
+            attachment.setTenantId(TenantContext.requireTenantId());
             attachment.setBusinessType("INSPECTION");
             attachment.setBusinessId(id);
             attachment.setFileName(originalFilename != null ? originalFilename : "unknown");

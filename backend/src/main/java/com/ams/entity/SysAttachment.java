@@ -13,6 +13,8 @@ public class SysAttachment implements Serializable {
     @TableId(type = IdType.AUTO)
     private Long id;
 
+    private String tenantId;
+
     private String businessType;
     private Long businessId;
     private String fileName;

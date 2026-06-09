@@ -2,6 +2,7 @@ package com.ams.controller;
 
 import com.ams.common.Result;
 import com.ams.common.exception.BusinessException;
+import com.ams.context.TenantContext;
 import com.ams.dto.ExecutionMaterialCreateDTO;
 import com.ams.dto.ExecutionStartDTO;
 import com.ams.dto.ExecutionStepCreateDTO;
@@ -245,6 +246,7 @@ public class MaintenanceExecutionController {
 
             // 3. 创建 SysAttachment 关联记录
             SysAttachment attachment = new SysAttachment();
+            attachment.setTenantId(TenantContext.requireTenantId());
             attachment.setBusinessType("MAINTENANCE_EXECUTION");
             attachment.setBusinessId(id);
             attachment.setFileName(originalFilename != null ? originalFilename : "unknown");
