@@ -61,6 +61,7 @@ class TenantSchemaConsistencyTest {
         assertThat(migration).contains("create_time DATETIME");
         assertThat(migration).contains("deleted TINYINT DEFAULT 0");
         assertThat(migration).contains("ALTER TABLE asset_parent_child MODIFY COLUMN tenant_id VARCHAR(64)");
+        assertThat(migration).contains("ALTER TABLE asset_change_log ADD COLUMN tenant_id VARCHAR(64)");
         assertThat(migration).contains("ALTER TABLE asset_parent_child ADD COLUMN quantity");
         assertThat(migration).contains("ALTER TABLE asset_parent_child ADD COLUMN create_time");
         assertThat(migration).contains("ALTER TABLE asset_parent_child ADD COLUMN deleted");

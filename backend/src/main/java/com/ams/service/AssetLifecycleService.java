@@ -125,6 +125,7 @@ public class AssetLifecycleService {
     private void createChangeLog(Long assetId, String changeType, String oldValue, String newValue, String reason,
                                  Long operatorId) {
         AssetChangeLog changeLog = new AssetChangeLog();
+        changeLog.setTenantId(TenantContext.requireTenantId());
         changeLog.setAssetId(assetId);
         changeLog.setChangeType(changeType);
         changeLog.setOldValue(oldValue);

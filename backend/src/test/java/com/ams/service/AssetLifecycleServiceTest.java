@@ -59,6 +59,7 @@ class AssetLifecycleServiceTest {
         ArgumentCaptor<AssetChangeLog> captor = ArgumentCaptor.forClass(AssetChangeLog.class);
         verify(assetChangeLogMapper).insert(captor.capture());
         AssetChangeLog log = captor.getValue();
+        assertEquals("dept:1", log.getTenantId());
         assertEquals(1L, log.getAssetId());
         assertEquals("SCRAP", log.getChangeType());
         assertEquals("broken", log.getReason());
