@@ -70,7 +70,7 @@ function createWrapper() {
 }
 
 function getPrimaryExportButton() {
-  return screen.getByRole('button', { name: '导出 Excel' });
+  return screen.getByRole('button', { name: '导出 CSV' });
 }
 
 const emptySummary: ReportSummary = { totalAssets: 0, activeAssets: 0, pendingApproval: 0, recentlyRetired: 0 };
@@ -313,16 +313,15 @@ describe('ReportsPage', () => {
 
 // ── 导出功能测试 ──────────────────────────────────────────────────────────────
 
-vi.mock('xlsx', () => ({
-  utils: {
-    json_to_sheet: vi.fn(() => ({ '!ref': 'A1:D5' })),
-    book_new: vi.fn(() => ({ SheetNames: [], Sheets: {} })),
-    book_append_sheet: vi.fn(),
-  },
-  writeFile: vi.fn(),
-}));
+vi.mock('@/utils/fileDownloader', async () => {
+  const actual = await vi.importActual<typeof import('@/utils/fileDownloader')>('@/utils/fileDownloader');
+  return {
+    ...actual,
+    downloadCsvRecords: vi.fn(),
+  };
+});
 
-import * as XLSX from 'xlsx';
+import { downloadCsvRecords } from '@/utils/fileDownloader';
 
 describe('ReportsPage — 导出功能', () => {
   beforeEach(() => {
@@ -356,9 +355,9 @@ describe('ReportsPage — 导出功能', () => {
     await user.click(getPrimaryExportButton());
 
     await waitFor(() => {
-      expect(XLSX.writeFile).toHaveBeenCalledTimes(1);
-      const fileName = vi.mocked(XLSX.writeFile).mock.calls[0][1] as string;
-      expect(fileName).toMatch(/^报表中心_\d{8}\.xlsx$/);
+      expect(downloadCsvRecords).toHaveBeenCalledTimes(1);
+      const fileName = vi.mocked(downloadCsvRecords).mock.calls[0][1] as string;
+      expect(fileName).toMatch(/^报表中心_\d{8}\.csv$/);
     });
   });
 
@@ -373,8 +372,8 @@ describe('ReportsPage — 导出功能', () => {
     await user.click(getPrimaryExportButton());
 
     await waitFor(() => {
-      // 传入 json_to_sheet 的数据应包含当前分类（asset）的报表
-      const exportData = vi.mocked(XLSX.utils.json_to_sheet).mock.calls[0][0] as Record<string, string>[];
+      // 传入 CSV 下载工具的数据应包含当前分类（asset）的报表
+      const exportData = vi.mocked(downloadCsvRecords).mock.calls[0][0] as Record<string, string>[];
       expect(exportData.length).toBeGreaterThan(0);
       // 每个条目应有 title、description、category、updatedAt 字段
       expect(exportData[0]).toHaveProperty('title');
@@ -405,8 +404,8 @@ describe('ReportsPage — 导出功能', () => {
 
   it('导出失败时应在控制台输出错误并调用 toast.error', async () => {
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    vi.mocked(XLSX.utils.json_to_sheet).mockImplementationOnce(() => {
-      throw new Error('Sheet error');
+    vi.mocked(downloadCsvRecords).mockImplementationOnce(() => {
+      throw new Error('CSV error');
     });
 
     const user = userEvent.setup();

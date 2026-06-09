@@ -15,7 +15,7 @@ import { Dialog } from '@/components/ui/Dialog';
 import { Table } from 'antd';
 import { Modal } from 'antd';
 import { toast } from 'sonner';
-import * as XLSX from 'xlsx';
+import { downloadCsvRows } from '@/utils/fileDownloader';
 
 const ABCClassificationPage: React.FC = () => {
   const queryClient = useQueryClient();
@@ -52,7 +52,7 @@ const ABCClassificationPage: React.FC = () => {
     reclassifyMutation.mutate();
   };
 
-  // 导出 Excel 报告
+  // 导出 CSV 报告
   const handleExport = () => {
     if (!assets || !stats) {
       toast.error('数据未加载完成');
@@ -78,20 +78,13 @@ const ABCClassificationPage: React.FC = () => {
       asset.categoryName || '-',
     ]);
 
-    // 创建工作簿
-    const wb = XLSX.utils.book_new();
-
-    // 添加统计工作表
-    const statsSheet = XLSX.utils.aoa_to_sheet(statsData);
-    XLSX.utils.book_append_sheet(wb, statsSheet, '统计');
-
-    // 添加资产列表工作表
     const assetHeader = [['资产编号', '资产名称', 'ABC 分类', '原值', '分类']];
-    const assetSheet = XLSX.utils.aoa_to_sheet([...assetHeader, ...assetData]);
-    XLSX.utils.book_append_sheet(wb, assetSheet, '资产列表');
 
     // 下载文件
-    XLSX.writeFile(wb, `ABC分类报告_${new Date().toISOString().slice(0, 10)}.xlsx`);
+    downloadCsvRows(
+      [['统计'], ...statsData, [], ['资产列表'], ...assetHeader, ...assetData],
+      `ABC分类报告_${new Date().toISOString().slice(0, 10)}.csv`,
+    );
     toast.success('报告导出成功');
   };
 

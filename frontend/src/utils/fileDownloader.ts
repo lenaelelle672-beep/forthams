@@ -22,7 +22,7 @@
  * @example
  * // ATB-017: 验证 URL.revokeObjectURL 被调用
  * const blob = new Blob(['content'], { type: 'application/octet-stream' });
- * downloadBlob(blob, 'test.xlsx');
+ * downloadBlob(blob, 'test.csv');
  */
 export function downloadBlob(blob: Blob, filename: string): void {
   // Step 1: 创建临时 Object URL
@@ -41,6 +41,33 @@ export function downloadBlob(blob: Blob, filename: string): void {
   // Step 4: 清理 DOM 节点并释放 Object URL 内存
   document.body.removeChild(link);
   URL.revokeObjectURL(url);
+}
+
+export type CsvCell = string | number | boolean | null | undefined;
+
+function escapeCsvCell(value: CsvCell): string {
+  const text = value === null || value === undefined ? '' : String(value);
+
+  if (/[",\r\n]/.test(text)) {
+    return `"${text.replace(/"/g, '""')}"`;
+  }
+
+  return text;
+}
+
+export function downloadCsvRows(rows: CsvCell[][], filename: string): void {
+  const csv = rows.map((row) => row.map(escapeCsvCell).join(',')).join('\r\n');
+  downloadBlob(new Blob([`\uFEFF${csv}`], { type: 'text/csv;charset=utf-8;' }), filename);
+}
+
+export function downloadCsvRecords(records: Record<string, CsvCell>[], filename: string): void {
+  if (records.length === 0) {
+    downloadCsvRows([], filename);
+    return;
+  }
+
+  const headers = Object.keys(records[0]);
+  downloadCsvRows([headers, ...records.map((record) => headers.map((header) => record[header]))], filename);
 }
 
 /**

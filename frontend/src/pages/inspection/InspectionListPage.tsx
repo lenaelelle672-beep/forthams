@@ -11,8 +11,8 @@ import {
   Plus, Search, RotateCcw, Trash2, Download,
   ClipboardList, CheckCircle2, XCircle, AlertTriangle,
 } from 'lucide-react';
-import * as XLSX from 'xlsx';
 import dayjs from 'dayjs';
+import { downloadCsvRecords } from '@/utils/fileDownloader';
 
 /* ---------- constants ---------- */
 
@@ -148,14 +148,9 @@ const InspectionListPage: React.FC = () => {
       '备注': record.findings || '',
     }));
 
-    // 创建工作表
-    const ws = XLSX.utils.json_to_sheet(exportData);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, '检验记录');
-
     // 生成文件名
-    const fileName = `检验记录_${dayjs().format('YYYY-MM-DD_HHmmss')}.xlsx`;
-    XLSX.writeFile(wb, fileName);
+    const fileName = `检验记录_${dayjs().format('YYYY-MM-DD_HHmmss')}.csv`;
+    downloadCsvRecords(exportData, fileName);
 
     message.success(`成功导出 ${selectedRowKeys.length} 条记录`);
   };

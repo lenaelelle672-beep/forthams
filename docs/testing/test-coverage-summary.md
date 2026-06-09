@@ -4,7 +4,7 @@
 
 | 类型 | 命令 | 结果 |
 |---|---|---:|
-| 前端单元测试 | `cd frontend && npm test -- --run --reporter=dot` | 87 个测试文件，868 个测试通过 |
+| 前端单元测试 | `cd frontend && npm test -- --run --reporter=dot` | 88 个测试文件，871 个测试通过 |
 | 前端类型检查 | `cd frontend && npx tsc -p tsconfig.json --noEmit --pretty false` | 通过 |
 | 前端构建 | `cd frontend && npm run build` | 通过；仅保留既有 `three` chunk >1000 kB 警告 |
 | 桌面浏览器回归 | `cd frontend && npx playwright test --project=browser-regression-smoke` | 23 个测试通过，含核心路由、工作流新建保存、报表/审批空态、3D 大屏降级 |
@@ -60,6 +60,6 @@
 
 本轮新增赔偿估值最小闭环：后端新增 `POST /compensations/valuation`，创建赔偿单时如果未传赔偿金额，会按资产当前价值估算，当前价值缺失时使用资产原值；前端新增“系统估值”按钮并允许人工覆盖。
 
-本轮关闭前端依赖安全风险：`happy-dom` 与 `vite` 已升级，`npm audit --audit-level=high` 返回 0 vulnerabilities；当前 Node `v22.22.2` 满足新依赖运行要求。仓库已新增 `.nvmrc` 并在 `frontend/package.json` 声明 `engines.node >=20`，CI 配置和关键文档已同步到 Node 20+。
+本轮关闭前端依赖安全风险：`happy-dom` 与 `vite` 已升级，`react-router` 已升级到安全版本，存在高危且无修复版本的 `xlsx` 已从前端直接依赖中移除；`npm audit --audit-level=high` 返回 0 vulnerabilities。当前 Node `v22.22.2` 满足 `.nvmrc`、`frontend/package.json engines.node` 和 `happy-dom@20.9.0` 的 Node `>=20` 要求。
 
 本轮新增认证闭环浏览器覆盖：未登录访问受保护页面会跳转登录页；退出登录会清理本地会话并返回登录页。该测试曾发现退出后 URL 已到 `/login` 但旧布局仍渲染的问题，已通过 `AuthContext#logout` 改为由 auth state 驱动路由跳转修复。

@@ -1,6 +1,6 @@
 /**
  * @file pages/reports/ReportsPage.tsx
- * @description 报表中心页面 — 报表列表 + 图表预览 + Excel 导出
+ * @description 报表中心页面 — 报表列表 + 图表预览 + CSV 导出
  *
  * 功能：
  * - PageHeader 显示"报表中心"标题
@@ -9,7 +9,7 @@
  * - 卡片点击展开图表预览
  * - 与后端 ReportController 对接获取数据
  * - API 错误时通过 sonner toast 提示
- * - 导出按钮生成当前分类报表的 .xlsx 文件
+ * - 导出按钮生成当前分类报表的 .csv 文件
  *
  * 遵循 forthAMS Design System 设计令牌
  */
@@ -17,7 +17,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import * as XLSX from 'xlsx';
 import {
   BarChart3,
   PieChart,
@@ -49,6 +48,7 @@ import {
 } from '@/api/reports';
 import type { CategoryReport, ReportSummary, TrendReport, NameValueItem } from '@/api/reports';
 import { Button } from '@/components/ui/Button';
+import { downloadCsvRecords } from '@/utils/fileDownloader';
 import { type ReportCardData } from './components/ReportCard';
 import { ChartPreview } from './components/ChartPreview';
 
@@ -285,7 +285,7 @@ export default function ReportsPage() {
     }
   }, [selectedReportData, summary, categoryData, trendData, period, depreciationRes, maintenanceRes, retirementRes, workOrderStatusRes, workOrderDeptPendingRes]);
 
-  // ── Excel 导出 ──────────────────────────────────────────────────────────────
+  // ── CSV 导出 ───────────────────────────────────────────────────────────────
   const handleExport = () => {
     try {
       const data = currentReports.map((r) => ({
@@ -295,10 +295,7 @@ export default function ReportsPage() {
         updatedAt: r.updatedAt,
       }));
 
-      const ws = XLSX.utils.json_to_sheet(data);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, '报表数据');
-      XLSX.writeFile(wb, `报表中心_${formatDate(new Date())}.xlsx`);
+      downloadCsvRecords(data, `报表中心_${formatDate(new Date())}.csv`);
       toast.success('导出成功');
     } catch (err) {
       toast.error('导出失败，请重试');
@@ -361,7 +358,7 @@ export default function ReportsPage() {
                 className="rounded-lg"
               >
                 <Download className="w-3.5 h-3.5" />
-                导出 Excel
+                导出 CSV
               </Button>
               <Button
                 size="sm"
