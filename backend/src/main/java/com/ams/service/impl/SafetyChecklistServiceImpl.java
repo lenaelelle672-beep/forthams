@@ -339,9 +339,12 @@ public class SafetyChecklistServiceImpl implements SafetyChecklistService {
         List<String> tenantIds = getActiveTenantIds();
         for (String tenantId : tenantIds) {
             try {
+                TenantContext.setTenantId(tenantId);
                 checkExpiringForTenant(tenantId);
             } catch (RuntimeException e) {
                 log.error("租户 {} 安全检查任务到期检查失败: {}", tenantId, e.getMessage(), e);
+            } finally {
+                TenantContext.clear();
             }
         }
         log.info("即将到期安全检查任务检查完成");
@@ -359,9 +362,12 @@ public class SafetyChecklistServiceImpl implements SafetyChecklistService {
         List<String> tenantIds = getActiveTenantIds();
         for (String tenantId : tenantIds) {
             try {
+                TenantContext.setTenantId(tenantId);
                 checkOverdueForTenant(tenantId);
             } catch (RuntimeException e) {
                 log.error("租户 {} 逾期执行任务检查失败: {}", tenantId, e.getMessage(), e);
+            } finally {
+                TenantContext.clear();
             }
         }
         log.info("逾期安全检查执行任务检查完成");

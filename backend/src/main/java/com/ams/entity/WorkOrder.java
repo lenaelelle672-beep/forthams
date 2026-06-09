@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
-@TableName("work_order")
+@TableName(value = "work_order", autoResultMap = true)
 public class WorkOrder {
     @TableId(type = IdType.AUTO)
     private Long id;
@@ -40,7 +40,7 @@ public class WorkOrder {
     private BigDecimal estimatedCost;
     private BigDecimal actualCost;
     private String completionNote;
-    @TableField(exist = false)
+    @TableField(typeHandler = JacksonTypeHandler.class)
     private List<String> collaborators;
     @TableField(typeHandler = JacksonTypeHandler.class)
     private List<String> attachments;

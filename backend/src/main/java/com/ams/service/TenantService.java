@@ -1,6 +1,7 @@
 package com.ams.service;
 
 import com.ams.common.exception.BusinessException;
+import com.ams.context.TenantContext;
 import com.ams.entity.SysTenant;
 import com.ams.mapper.SysTenantMapper;
 import com.ams.mapper.UserMapper;
@@ -35,6 +36,10 @@ public class TenantService {
         SysTenant tenant = sysTenantMapper.selectById(id);
         if (tenant == null) throw new BusinessException("租户不存在");
         return tenant;
+    }
+
+    public SysTenant getCurrentTenant() {
+        return getTenant(TenantContext.requireTenantId());
     }
 
     @Transactional(rollbackFor = Exception.class)

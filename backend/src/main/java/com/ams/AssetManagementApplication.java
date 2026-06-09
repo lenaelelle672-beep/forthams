@@ -5,7 +5,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
  * 资产管理系统启动类
@@ -14,7 +13,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
  * @since 2024-03-28
  */
 @SpringBootApplication
-@EnableScheduling
 @EnableAsync
 @EnableCaching
 @MapperScan("com.ams.mapper")

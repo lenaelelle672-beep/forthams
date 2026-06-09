@@ -66,10 +66,44 @@ public class InventoryController {
         return Result.success(inventoryService.updateTaskStatus(id, body.get("status")));
     }
 
+    @PreAuthorize("@ss.hasPermi('inventory:edit')")
+    @PatchMapping("/tasks/{id}/status")
+    public Result<InventoryTask> patchStatus(@PathVariable Long id, @RequestBody Map<String, String> body) {
+        return Result.success(inventoryService.updateTaskStatus(id, body.get("status")));
+    }
+
     @PreAuthorize("@ss.hasPermi('inventory:scan')")
     @PostMapping("/tasks/{id}/scan")
     public Result<InventoryDetail> scan(@PathVariable Long id, @Valid @RequestBody InventoryScanDTO dto) {
         return Result.success(inventoryService.addScanResult(id, dto));
+    }
+
+    @PreAuthorize("@ss.hasPermi('inventory:edit')")
+    @PatchMapping("/tasks/{taskId}/assets/{detailId}/confirm")
+    public Result<InventoryDetail> confirmAsset(
+            @PathVariable Long taskId,
+            @PathVariable Long detailId,
+            @RequestBody Map<String, String> body) {
+        return Result.success(inventoryService.confirmAsset(
+                taskId,
+                detailId,
+                body.get("actualStatus"),
+                body.get("remark")));
+    }
+
+    @PreAuthorize("@ss.hasPermi('inventory:edit')")
+    @PostMapping("/tasks/{taskId}/assets/batch-confirm")
+    public Result<Void> batchConfirmAssets(@PathVariable Long taskId, @RequestBody Map<String, Object> body) {
+        @SuppressWarnings("unchecked")
+        List<String> detailIds = ((List<?>) body.getOrDefault("assetIds", List.of())).stream()
+                .map(String::valueOf)
+                .toList();
+        inventoryService.batchConfirmAssets(
+                taskId,
+                detailIds,
+                String.valueOf(body.get("actualStatus")),
+                body.get("remark") == null ? null : String.valueOf(body.get("remark")));
+        return Result.success();
     }
 
     @PreAuthorize("@ss.hasPermi('inventory:query')")

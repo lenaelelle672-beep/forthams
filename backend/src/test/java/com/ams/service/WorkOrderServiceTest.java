@@ -54,7 +54,7 @@ class WorkOrderServiceTest {
 
     @BeforeEach
     void setUp() {
-        TenantContext.setTenantId("T001");
+        TenantContext.setTenantId("dept:1");
         lenient().when(workOrderMapper.selectList(any(LambdaQueryWrapper.class))).thenReturn(Collections.emptyList());
         lenient().when(approvalProcessMapper.selectList(any(LambdaQueryWrapper.class))).thenReturn(Collections.emptyList());
     }
@@ -68,7 +68,7 @@ class WorkOrderServiceTest {
     void shouldCreatePendingApprovalProcessWhenSubmittingWorkOrder() {
         WorkOrder workOrder = new WorkOrder();
         workOrder.setId(3L);
-        workOrder.setTenantId("T001");
+        workOrder.setTenantId("dept:1");
         workOrder.setStatus("DRAFT");
         workOrder.setReporterId(7L);
         when(workOrderMapper.selectOne(any(LambdaQueryWrapper.class))).thenReturn(workOrder);
@@ -84,7 +84,7 @@ class WorkOrderServiceTest {
         assertEquals("WORK_ORDER", process.getProcessType());
         assertEquals(3L, process.getBusinessId());
         assertEquals("PENDING", process.getStatus());
-        assertEquals("T001", process.getTenantId());
+        assertEquals("dept:1", process.getTenantId());
         assertEquals(7L, process.getApplicantId());
         assertNull(process.getBusinessData());
     }
@@ -104,6 +104,24 @@ class WorkOrderServiceTest {
     }
 
     @Test
+    void shouldPersistFaultCodeAndAttachmentsWhenCreatingWorkOrder() {
+        WorkOrderDTO dto = new WorkOrderDTO();
+        dto.setTitle("空调压缩机异响");
+        dto.setPriority("HIGH");
+        dto.setFaultCodeId(42L);
+        dto.setAttachments(List.of("/uploads/workorder/a.png"));
+
+        WorkOrder result = workOrderService.createWorkOrder(dto);
+
+        assertEquals(42L, result.getFaultCodeId());
+        assertEquals(List.of("/uploads/workorder/a.png"), result.getAttachments());
+        ArgumentCaptor<WorkOrder> captor = ArgumentCaptor.forClass(WorkOrder.class);
+        verify(workOrderMapper).insert(captor.capture());
+        assertEquals(42L, captor.getValue().getFaultCodeId());
+        assertEquals(List.of("/uploads/workorder/a.png"), captor.getValue().getAttachments());
+    }
+
+    @Test
     void shouldRejectInvalidPriorityWhenCreatingWorkOrder() {
         WorkOrderDTO dto = new WorkOrderDTO();
         dto.setTitle("更换显示器");
@@ -117,7 +135,7 @@ class WorkOrderServiceTest {
     void shouldAllowRejectedWorkOrderToBeSubmittedAgain() {
         WorkOrder workOrder = new WorkOrder();
         workOrder.setId(6L);
-        workOrder.setTenantId("T001");
+        workOrder.setTenantId("dept:1");
         workOrder.setStatus("REJECTED");
         workOrder.setReporterId(7L);
         when(workOrderMapper.selectOne(any(LambdaQueryWrapper.class))).thenReturn(workOrder);
@@ -132,7 +150,7 @@ class WorkOrderServiceTest {
     void shouldAcceptUpperCaseApproveOperation() {
         WorkOrder workOrder = new WorkOrder();
         workOrder.setId(1L);
-        workOrder.setTenantId("T001");
+        workOrder.setTenantId("dept:1");
         workOrder.setStatus("PENDING");
         when(workOrderMapper.selectOne(any(LambdaQueryWrapper.class))).thenReturn(workOrder);
 
@@ -146,7 +164,7 @@ class WorkOrderServiceTest {
     void shouldAcceptMixedCaseRejectOperation() {
         WorkOrder workOrder = new WorkOrder();
         workOrder.setId(2L);
-        workOrder.setTenantId("T001");
+        workOrder.setTenantId("dept:1");
         // REJECT 仅在审批中状态有效（PENDING 只能 SUBMIT/APPROVE/CANCEL）
         workOrder.setStatus("APPROVING_LEVEL_1");
         when(workOrderMapper.selectOne(any(LambdaQueryWrapper.class))).thenReturn(workOrder);
@@ -162,7 +180,7 @@ class WorkOrderServiceTest {
     void shouldRejectUpdatingPendingWorkOrder() {
         WorkOrder workOrder = new WorkOrder();
         workOrder.setId(4L);
-        workOrder.setTenantId("T001");
+        workOrder.setTenantId("dept:1");
         workOrder.setStatus("PENDING");
         when(workOrderMapper.selectOne(any(LambdaQueryWrapper.class))).thenReturn(workOrder);
 
@@ -174,7 +192,7 @@ class WorkOrderServiceTest {
     void shouldCancelApprovedWorkOrder() {
         WorkOrder workOrder = new WorkOrder();
         workOrder.setId(5L);
-        workOrder.setTenantId("T001");
+        workOrder.setTenantId("dept:1");
         workOrder.setStatus("APPROVED");
         when(workOrderMapper.selectOne(any(LambdaQueryWrapper.class))).thenReturn(workOrder);
 
@@ -187,7 +205,7 @@ class WorkOrderServiceTest {
     void shouldPreserveApprovalProcessBusinessDataWhenUpdatingStatus() {
         WorkOrder workOrder = new WorkOrder();
         workOrder.setId(8L);
-        workOrder.setTenantId("T001");
+        workOrder.setTenantId("dept:1");
         workOrder.setStatus("PENDING");
         when(workOrderMapper.selectOne(any(LambdaQueryWrapper.class))).thenReturn(workOrder);
         ApprovalProcess existingProcess = new ApprovalProcess();

@@ -47,7 +47,7 @@ class EnergyServiceTest {
 
     @BeforeEach
     void setUp() {
-        TenantContext.setTenantId("T001");
+        TenantContext.setTenantId("dept:1");
         // 初始化 MyBatis-Plus 实体元数据：LambdaQueryWrapper 解析方法引用需要 TableInfo 缓存
         MapperBuilderAssistant assistant = new MapperBuilderAssistant(new MybatisConfiguration(), "");
         TableInfoHelper.initTableInfo(assistant, Asset.class);
@@ -71,7 +71,7 @@ class EnergyServiceTest {
         c.setConsumption(value); c.setUnit("kWh"); return c;
     }
 
-    private Asset asset(Long id) { Asset a = new Asset(); a.setId(id); a.setTenantId("T001"); return a; }
+    private Asset asset(Long id) { Asset a = new Asset(); a.setId(id); a.setTenantId("dept:1"); return a; }
 
     @Nested @DisplayName("读数管理")
     class ReadingTests {

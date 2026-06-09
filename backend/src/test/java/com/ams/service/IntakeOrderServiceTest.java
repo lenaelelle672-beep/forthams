@@ -59,7 +59,7 @@ class IntakeOrderServiceTest {
 
     @BeforeEach
     void setUp() {
-        TenantContext.setTenantId("T001");
+        TenantContext.setTenantId("dept:1");
     }
 
     @AfterEach
@@ -249,7 +249,7 @@ class IntakeOrderServiceTest {
         order.setId(1L);
         order.setOrderNo("IO-2026-0001");
         order.setStatus("DRAFT");
-        order.setTenantId("T001");
+        order.setTenantId("dept:1");
         return order;
     }
 }

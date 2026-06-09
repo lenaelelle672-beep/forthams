@@ -179,9 +179,12 @@ public class InspectionTaskServiceImpl implements InspectionTaskService {
         List<String> tenantIds = getActiveTenantIds();
         for (String tenantId : tenantIds) {
             try {
+                TenantContext.setTenantId(tenantId);
                 checkExpiringForTenant(tenantId);
             } catch (RuntimeException e) {
                 log.error("租户 {} 到期检查失败: {}", tenantId, e.getMessage(), e);
+            } finally {
+                TenantContext.clear();
             }
         }
         log.info("即将到期任务提醒任务完成");
@@ -197,9 +200,12 @@ public class InspectionTaskServiceImpl implements InspectionTaskService {
         List<String> tenantIds = getActiveTenantIds();
         for (String tenantId : tenantIds) {
             try {
+                TenantContext.setTenantId(tenantId);
                 markOverdueForTenant(tenantId);
             } catch (RuntimeException e) {
                 log.error("租户 {} 逾期标记失败: {}", tenantId, e.getMessage(), e);
+            } finally {
+                TenantContext.clear();
             }
         }
         log.info("逾期任务标记任务完成");

@@ -33,6 +33,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class SlaService {
 
+    private static final List<String> PRIORITIES = List.of("LOW", "MEDIUM", "HIGH", "CRITICAL");
+    private static final BigDecimal DEFAULT_WARNING_RATIO = BigDecimal.valueOf(0.80);
+
     private final SlaConfigMapper slaConfigMapper;
     private final WorkOrderMapper workOrderMapper;
 
@@ -126,6 +129,7 @@ public class SlaService {
      */
     public List<SlaConfig> listConfigs() {
         String tenantId = TenantContext.requireTenantId();
+        ensureTenantConfigs(tenantId);
         return slaConfigMapper.selectList(
                 new LambdaQueryWrapper<SlaConfig>()
                         .eq(SlaConfig::getTenantId, tenantId)
@@ -136,14 +140,20 @@ public class SlaService {
      * 更新 SLA 配置。
      */
     public SlaConfig updateConfig(Long id, SlaConfig config) {
+        String tenantId = TenantContext.requireTenantId();
         SlaConfig existing = slaConfigMapper.selectById(id);
-        if (existing == null) {
+        if (existing == null || !tenantId.equals(existing.getTenantId())) {
             throw new com.ams.common.exception.BusinessException("SLA 配置不存在");
         }
-        existing.setResponseHours(config.getResponseHours());
-        existing.setResolveHours(config.getResolveHours());
-        existing.setWarningRatio(config.getWarningRatio());
-        existing.setStatus(config.getStatus());
+        Integer responseHours = config.getResponseHours() != null ? config.getResponseHours() : existing.getResponseHours();
+        Integer resolveHours = config.getResolveHours() != null ? config.getResolveHours() : existing.getResolveHours();
+        BigDecimal warningRatio = config.getWarningRatio() != null ? config.getWarningRatio() : existing.getWarningRatio();
+        Integer status = config.getStatus() != null ? config.getStatus() : existing.getStatus();
+        validateConfig(responseHours, resolveHours, warningRatio);
+        existing.setResponseHours(responseHours);
+        existing.setResolveHours(resolveHours);
+        existing.setWarningRatio(warningRatio);
+        existing.setStatus(status);
         slaConfigMapper.updateById(existing);
         return existing;
     }
@@ -184,6 +194,50 @@ public class SlaService {
         return config;
     }
 
+    private void ensureTenantConfigs(String tenantId) {
+        List<SlaConfig> existing = slaConfigMapper.selectList(
+                new LambdaQueryWrapper<SlaConfig>()
+                        .eq(SlaConfig::getTenantId, tenantId));
+        Map<String, SlaConfig> existingByPriority = existing.stream()
+                .collect(Collectors.toMap(SlaConfig::getPriority, Function.identity(), (a, b) -> a));
+        if (PRIORITIES.stream().allMatch(existingByPriority::containsKey)) {
+            return;
+        }
+
+        Map<String, SlaConfig> defaults = loadConfigMap("0");
+        for (String priority : PRIORITIES) {
+            if (existingByPriority.containsKey(priority)) {
+                continue;
+            }
+            SlaConfig source = defaults.get(priority);
+            SlaConfig copy = new SlaConfig();
+            copy.setTenantId(tenantId);
+            copy.setPriority(priority);
+            copy.setResponseHours(source != null && source.getResponseHours() != null
+                    ? source.getResponseHours() : getDefaultResponseHours(priority));
+            copy.setResolveHours(source != null && source.getResolveHours() != null
+                    ? source.getResolveHours() : getDefaultResolveHours(priority));
+            copy.setWarningRatio(source != null && source.getWarningRatio() != null
+                    ? source.getWarningRatio() : DEFAULT_WARNING_RATIO);
+            copy.setStatus(source != null && source.getStatus() != null ? source.getStatus() : 1);
+            slaConfigMapper.insert(copy);
+        }
+    }
+
+    private void validateConfig(Integer responseHours, Integer resolveHours, BigDecimal warningRatio) {
+        if (responseHours == null || responseHours <= 0) {
+            throw new com.ams.common.exception.BusinessException("SLA 响应时限必须大于 0");
+        }
+        if (resolveHours == null || resolveHours <= 0) {
+            throw new com.ams.common.exception.BusinessException("SLA 解决时限必须大于 0");
+        }
+        if (warningRatio == null
+                || warningRatio.compareTo(BigDecimal.ZERO) <= 0
+                || warningRatio.compareTo(BigDecimal.ONE) > 0) {
+            throw new com.ams.common.exception.BusinessException("SLA 预警阈值必须在 0 到 1 之间");
+        }
+    }
+
     private Map<String, SlaConfig> loadConfigMap(String tenantId) {
         List<SlaConfig> configs = slaConfigMapper.selectList(
                 new LambdaQueryWrapper<SlaConfig>()
@@ -222,6 +276,15 @@ public class SlaService {
             case "HIGH" -> 72;      // 3 天
             case "CRITICAL" -> 24;  // 1 天
             default -> 168;         // 7 天（MEDIUM）
+        };
+    }
+
+    private int getDefaultResponseHours(String priority) {
+        return switch (priority != null ? priority : "MEDIUM") {
+            case "LOW" -> 72;
+            case "HIGH" -> 24;
+            case "CRITICAL" -> 8;
+            default -> 48;
         };
     }
 

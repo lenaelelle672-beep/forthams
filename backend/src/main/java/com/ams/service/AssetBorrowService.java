@@ -35,6 +35,7 @@ public class AssetBorrowService {
 
     private final AssetBorrowMapper borrowMapper;
     private final AssetMapper assetMapper;
+    private final TenantService tenantService;
 
     // ── CRUD ─────────────────────────────────────────────────────────────────
 
@@ -227,24 +228,41 @@ public class AssetBorrowService {
     @Transactional(rollbackFor = Exception.class)
     public void checkOverdue() {
         LocalDate today = LocalDate.now();
-        List<AssetBorrow> overdueList = borrowMapper.selectList(
-                new LambdaQueryWrapper<AssetBorrow>()
-                        .eq(AssetBorrow::getStatus, "BORROWED")
-                        .lt(AssetBorrow::getExpectedReturnDate, today));
+        int totalCount = 0;
 
-        int count = 0;
-        for (AssetBorrow borrow : overdueList) {
-            borrow.setStatus("OVERDUE");
-            borrow.setNotified(1);
-            borrowMapper.updateById(borrow);
-            count++;
-            log.warn("借用到期标记 OVERDUE: borrowId={}, assetId={}, expectedReturnDate={}",
-                    borrow.getId(), borrow.getAssetId(), borrow.getExpectedReturnDate());
-            // TODO: 实际发送通知（站内信/邮件），后续可对接 NotificationService
+        for (String tenantId : tenantService.getActiveTenantIds()) {
+            try {
+                TenantContext.setTenantId(tenantId);
+                List<AssetBorrow> overdueList = borrowMapper.selectList(
+                        new LambdaQueryWrapper<AssetBorrow>()
+                                .eq(AssetBorrow::getTenantId, tenantId)
+                                .eq(AssetBorrow::getStatus, "BORROWED")
+                                .lt(AssetBorrow::getExpectedReturnDate, today));
+
+                int count = 0;
+                for (AssetBorrow borrow : overdueList) {
+                    borrow.setStatus("OVERDUE");
+                    borrow.setNotified(1);
+                    borrowMapper.updateById(borrow);
+                    count++;
+                    log.warn("借用到期标记 OVERDUE: tenantId={}, borrowId={}, assetId={}, expectedReturnDate={}",
+                            tenantId, borrow.getId(), borrow.getAssetId(), borrow.getExpectedReturnDate());
+                    // TODO: 实际发送通知（站内信/邮件），后续可对接 NotificationService
+                }
+
+                if (count > 0) {
+                    log.info("租户 {} 借用到期提醒完成: 本次标记 {} 条记录为 OVERDUE", tenantId, count);
+                    totalCount += count;
+                }
+            } catch (RuntimeException e) {
+                log.error("租户 {} 借用到期提醒失败: {}", tenantId, e.getMessage(), e);
+            } finally {
+                TenantContext.clear();
+            }
         }
 
-        if (count > 0) {
-            log.info("借用到期提醒完成: 本次标记 {} 条记录为 OVERDUE", count);
+        if (totalCount > 0) {
+            log.info("借用到期提醒完成: 本次共标记 {} 条记录为 OVERDUE", totalCount);
         }
     }
 

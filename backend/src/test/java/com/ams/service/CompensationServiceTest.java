@@ -46,7 +46,7 @@ class CompensationServiceTest {
 
     @BeforeEach
     void setUp() {
-        TenantContext.setTenantId("T001");
+        TenantContext.setTenantId("dept:1");
     }
 
     @AfterEach
@@ -92,7 +92,7 @@ class CompensationServiceTest {
         ArgumentCaptor<AssetCompensation> captor = ArgumentCaptor.forClass(AssetCompensation.class);
         verify(assetCompensationMapper).insert(captor.capture());
         AssetCompensation compensation = captor.getValue();
-        assertEquals("T001", compensation.getTenantId());
+        assertEquals("dept:1", compensation.getTenantId());
         assertEquals(12L, compensation.getAssetId());
         assertEquals(42L, compensation.getResponsibleUserId());
         assertTrue(compensation.getCompensationNo().matches("CMP-\\d{8}-001"));

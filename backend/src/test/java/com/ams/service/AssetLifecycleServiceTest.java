@@ -45,9 +45,9 @@ class AssetLifecycleServiceTest {
     void shouldTransitionStatusAndRecordChangeLog() {
         Asset asset = new Asset();
         asset.setId(1L);
-        asset.setTenantId("T001");
+        asset.setTenantId("dept:1");
         asset.setStatus("IN_USE");
-        TenantContext.setTenantId("T001");
+        TenantContext.setTenantId("dept:1");
         when(assetMapper.selectOne(any(LambdaQueryWrapper.class))).thenReturn(asset);
         when(assetMapper.update(any(Asset.class), any(LambdaQueryWrapper.class))).thenReturn(1);
 
@@ -71,9 +71,9 @@ class AssetLifecycleServiceTest {
     void shouldRejectTransitionFromTerminalStatus() {
         Asset asset = new Asset();
         asset.setId(2L);
-        asset.setTenantId("T001");
+        asset.setTenantId("dept:1");
         asset.setStatus("RETIRED");
-        TenantContext.setTenantId("T001");
+        TenantContext.setTenantId("dept:1");
         when(assetMapper.selectOne(any(LambdaQueryWrapper.class))).thenReturn(asset);
 
         assertThrows(BusinessException.class,
@@ -87,9 +87,9 @@ class AssetLifecycleServiceTest {
     void shouldPersistAssetMutationsWithStatusTransition() {
         Asset asset = new Asset();
         asset.setId(3L);
-        asset.setTenantId("T001");
+        asset.setTenantId("dept:1");
         asset.setStatus("IDLE");
-        TenantContext.setTenantId("T001");
+        TenantContext.setTenantId("dept:1");
         when(assetMapper.selectOne(any(LambdaQueryWrapper.class))).thenReturn(asset);
         when(assetMapper.update(any(Asset.class), any(LambdaQueryWrapper.class))).thenReturn(1);
 
@@ -121,9 +121,9 @@ class AssetLifecycleServiceTest {
     void shouldRollbackRetirementToOriginalStatusFromChangeLog() {
         Asset asset = new Asset();
         asset.setId(4L);
-        asset.setTenantId("T001");
+        asset.setTenantId("dept:1");
         asset.setStatus("PENDING_RETIREMENT");
-        TenantContext.setTenantId("T001");
+        TenantContext.setTenantId("dept:1");
         when(assetMapper.selectOne(any(LambdaQueryWrapper.class))).thenReturn(asset);
         when(assetMapper.update(any(Asset.class), any(LambdaQueryWrapper.class))).thenReturn(1);
 
@@ -143,7 +143,7 @@ class AssetLifecycleServiceTest {
         otherTenantAsset.setId(5L);
         otherTenantAsset.setTenantId("T002");
         otherTenantAsset.setStatus("IN_USE");
-        TenantContext.setTenantId("T001");
+        TenantContext.setTenantId("dept:1");
         when(assetMapper.selectOne(any(LambdaQueryWrapper.class))).thenReturn(null);
         when(assetMapper.selectById(5L)).thenReturn(otherTenantAsset);
 

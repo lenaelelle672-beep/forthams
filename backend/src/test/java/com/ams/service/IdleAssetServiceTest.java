@@ -43,7 +43,7 @@ class IdleAssetServiceTest {
 
     @BeforeEach
     void setUp() {
-        TenantContext.setTenantId("T001");
+        TenantContext.setTenantId("dept:1");
     }
 
     @AfterEach
@@ -154,7 +154,7 @@ class IdleAssetServiceTest {
     private Asset asset(Long id, String name, String status) {
         Asset asset = new Asset();
         asset.setId(id);
-        asset.setTenantId("T001");
+        asset.setTenantId("dept:1");
         asset.setAssetName(name);
         asset.setStatus(status);
         return asset;
@@ -163,7 +163,7 @@ class IdleAssetServiceTest {
     private IdleAssetNotice notice(Long id, String status) {
         IdleAssetNotice notice = new IdleAssetNotice();
         notice.setId(id);
-        notice.setTenantId("T001");
+        notice.setTenantId("dept:1");
         notice.setStatus(status);
         return notice;
     }

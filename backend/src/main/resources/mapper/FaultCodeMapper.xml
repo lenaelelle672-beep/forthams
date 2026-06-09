@@ -74,12 +74,4 @@
         ORDER BY sort_order ASC
     </select>
 
-    <!-- 检查是否有子节点 -->
-    <select id="countChildren" resultType="int">
-        SELECT COUNT(1) FROM fault_code
-        WHERE parent_id = #{parentId}
-          AND deleted = 0
-          AND tenant_id = #{tenantId}
-    </select>
-
 </mapper>

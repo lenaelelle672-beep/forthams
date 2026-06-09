@@ -19,7 +19,7 @@ import java.util.List;
  * 租户过滤：通过当前租户的资产数据获取部门ID列表，然后过滤用户。</p>
  */
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/users/mentions")
 @RequiredArgsConstructor
 @Tag(name = "用户搜索", description = "用户搜索接口，用于 @mention 自动补全")
 public class UserSearchController {

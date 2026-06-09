@@ -11,15 +11,20 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.MockedStatic;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -44,7 +49,7 @@ class AssetServiceTest {
 
     @BeforeEach
     void setUp() {
-        TenantContext.setTenantId("T001");
+        TenantContext.setTenantId("dept:1");
     }
 
     @AfterEach
@@ -90,10 +95,48 @@ class AssetServiceTest {
         verify(assetMapper).update(eq(asset), any(LambdaQueryWrapper.class));
     }
 
+    @Test
+    void shouldClassifyImmediatelyWhenNoTransactionSynchronization() {
+        Asset asset = asset();
+        when(assetMapper.selectOne(any(LambdaQueryWrapper.class))).thenReturn(asset);
+
+        assetService.updateAsset(1L, new AssetUpdateDTO());
+
+        verify(abcClassificationService).classifyAsset(1L);
+        assertEquals("dept:1", TenantContext.getTenantId());
+    }
+
+    @Test
+    void shouldScheduleAbcClassificationAfterAssetUpdateCommit() {
+        Asset asset = asset();
+        when(assetMapper.selectOne(any(LambdaQueryWrapper.class))).thenReturn(asset);
+        TransactionSynchronization[] synchronization = new TransactionSynchronization[1];
+
+        try (MockedStatic<TransactionSynchronizationManager> tx =
+                     mockStatic(TransactionSynchronizationManager.class)) {
+            tx.when(TransactionSynchronizationManager::isSynchronizationActive).thenReturn(true);
+            tx.when(() -> TransactionSynchronizationManager.registerSynchronization(any(TransactionSynchronization.class)))
+                    .thenAnswer(invocation -> {
+                        synchronization[0] = invocation.getArgument(0);
+                        return null;
+                    });
+
+            assetService.updateAsset(1L, new AssetUpdateDTO());
+
+            verify(abcClassificationService, never()).classifyAsset(1L);
+            assertNotNull(synchronization[0]);
+
+            synchronization[0].afterCommit();
+
+            verify(abcClassificationService).classifyAsset(1L);
+            assertEquals("dept:1", TenantContext.getTenantId());
+        }
+    }
+
     private Asset asset() {
         Asset asset = new Asset();
         asset.setId(1L);
-        asset.setTenantId("T001");
+        asset.setTenantId("dept:1");
         asset.setAssetNo("A-001");
         asset.setAssetName("测试资产");
         asset.setStatus(AssetStatus.IN_USE.name());

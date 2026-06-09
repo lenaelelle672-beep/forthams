@@ -114,7 +114,14 @@ public class WorkOrderHoldService {
         // 按租户扫描，确保多租户隔离
         List<String> tenantIds = getActiveTenantIds();
         for (String tenantId : tenantIds) {
-            scanTimeoutRecordsForTenant(tenantId, now);
+            try {
+                TenantContext.setTenantId(tenantId);
+                scanTimeoutRecordsForTenant(tenantId, now);
+            } catch (RuntimeException e) {
+                log.error("租户 {} 超时挂起工单扫描失败: {}", tenantId, e.getMessage(), e);
+            } finally {
+                TenantContext.clear();
+            }
         }
 
         log.info("超时挂起工单扫描完成");

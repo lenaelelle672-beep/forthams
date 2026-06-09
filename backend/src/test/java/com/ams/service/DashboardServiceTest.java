@@ -49,7 +49,7 @@ class DashboardServiceTest {
 
     @BeforeEach
     void setUp() {
-        TenantContext.setTenantId("T001");
+        TenantContext.setTenantId("dept:1");
     }
 
     @AfterEach
@@ -59,7 +59,7 @@ class DashboardServiceTest {
 
     @Test
     void getGlobalStats_returnsAllTenantsAggregated() {
-        Asset a1 = new Asset(); a1.setTenantId("T001"); a1.setStatus("IN_USE"); a1.setOriginalValue(BigDecimal.valueOf(1000)); a1.setCurrentValue(BigDecimal.valueOf(800)); a1.setCategoryId(1L);
+        Asset a1 = new Asset(); a1.setTenantId("dept:1"); a1.setStatus("IN_USE"); a1.setOriginalValue(BigDecimal.valueOf(1000)); a1.setCurrentValue(BigDecimal.valueOf(800)); a1.setCategoryId(1L);
         Asset a2 = new Asset(); a2.setTenantId("T002"); a2.setStatus("IDLE"); a2.setOriginalValue(BigDecimal.valueOf(2000)); a2.setCurrentValue(BigDecimal.valueOf(1500)); a2.setCategoryId(2L);
         when(assetMapper.selectCount(any(LambdaQueryWrapper.class))).thenReturn(2L);
         when(assetMapper.selectMaps(any(QueryWrapper.class)))
@@ -86,7 +86,7 @@ class DashboardServiceTest {
 
     @Test
     void getStats_returnsCurrentTenantStats() {
-        Asset asset = new Asset(); asset.setTenantId("T001"); asset.setStatus("IN_USE"); asset.setOriginalValue(BigDecimal.valueOf(1000)); asset.setCurrentValue(BigDecimal.valueOf(800)); asset.setCategoryId(1L);
+        Asset asset = new Asset(); asset.setTenantId("dept:1"); asset.setStatus("IN_USE"); asset.setOriginalValue(BigDecimal.valueOf(1000)); asset.setCurrentValue(BigDecimal.valueOf(800)); asset.setCategoryId(1L);
         when(assetMapper.selectCount(any(LambdaQueryWrapper.class))).thenReturn(1L);
         when(assetMapper.selectMaps(any(QueryWrapper.class)))
                 .thenReturn(List.of(Map.of("status","IN_USE","cnt",1L)))
@@ -101,7 +101,7 @@ class DashboardServiceTest {
 
         assertEquals(1, result.getTotalAssets());
         assertEquals(Long.valueOf(2), result.getPendingApprovals());
-        assertEquals("T001", TenantContext.getTenantId());
+        assertEquals("dept:1", TenantContext.getTenantId());
     }
 
     @Test
@@ -154,7 +154,7 @@ class DashboardServiceTest {
 
     @Test
     void getMaintenanceStats_returnsStatsForCurrentTenant() {
-        Asset asset = new Asset(); asset.setId(1L); asset.setTenantId("T001"); asset.setStatus("IN_USE");
+        Asset asset = new Asset(); asset.setId(1L); asset.setTenantId("dept:1"); asset.setStatus("IN_USE");
         when(assetMapper.selectList(any(LambdaQueryWrapper.class))).thenReturn(List.of(asset));
         when(maintenanceRecordMapper.selectCount(any(LambdaQueryWrapper.class))).thenReturn(5L);
         when(maintenanceRecordMapper.selectMaps(any(QueryWrapper.class))).thenReturn(
@@ -175,7 +175,7 @@ class DashboardServiceTest {
 
     @Test
     void getMaintenanceStats_onException_returnsFallback() {
-        Asset asset = new Asset(); asset.setId(1L); asset.setTenantId("T001"); asset.setStatus("IN_USE");
+        Asset asset = new Asset(); asset.setId(1L); asset.setTenantId("dept:1"); asset.setStatus("IN_USE");
         when(assetMapper.selectList(any(LambdaQueryWrapper.class))).thenReturn(List.of(asset));
         when(maintenanceRecordMapper.selectCount(any(LambdaQueryWrapper.class))).thenThrow(new RuntimeException("DB error"));
 

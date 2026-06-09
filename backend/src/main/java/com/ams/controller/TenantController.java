@@ -27,6 +27,11 @@ public class TenantController {
         return Result.success(Map.of("records", result.getRecords(), "total", result.getTotal()));
     }
 
+    @GetMapping("/current")
+    public Result<SysTenant> current() {
+        return Result.success(tenantService.getCurrentTenant());
+    }
+
     @PreAuthorize("@ss.hasPermi('system:tenant')")
     @GetMapping("/{id}")
     public Result<SysTenant> detail(@PathVariable String id) {

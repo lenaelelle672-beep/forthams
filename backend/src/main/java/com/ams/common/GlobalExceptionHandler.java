@@ -46,14 +46,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ConflictException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public Result<Void> handleConflictException(ConflictException e) {
-        log.error("Conflict exception: {}", e.getMessage());
+        log.warn("Conflict exception: {}", e.getMessage());
         return Result.error(409, e.getMessage());
     }
 
     @ExceptionHandler(BusinessException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Result<Void> handleBusinessException(BusinessException e) {
-        log.error("Business exception: code={}, errorCode={}, message={}", e.getCode(), e.getErrorCode(), e.getMessage(), e);
+        log.warn("Business exception: code={}, errorCode={}, message={}", e.getCode(), e.getErrorCode(), e.getMessage());
         return Result.error(e.getCode(), e.getMessage());
     }
 
@@ -65,7 +65,7 @@ public class GlobalExceptionHandler {
                 .stream()
                 .map(FieldError::getDefaultMessage)
                 .collect(Collectors.joining(", "));
-        log.error("Validation failed: {}", errors);
+        log.warn("Validation failed: {}", errors);
         return Result.error(400, errors);
     }
 
@@ -76,7 +76,7 @@ public class GlobalExceptionHandler {
                 .stream()
                 .map(FieldError::getDefaultMessage)
                 .collect(Collectors.joining(", "));
-        log.error("Bind exception: {}", errors);
+        log.warn("Bind exception: {}", errors);
         return Result.error(400, errors);
     }
 

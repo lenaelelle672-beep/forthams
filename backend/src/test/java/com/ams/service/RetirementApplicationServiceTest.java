@@ -103,12 +103,12 @@ class RetirementApplicationServiceTest {
     void shouldSetProcessNoWhenSubmittingApplication() {
         Asset asset = new Asset();
         asset.setId(12L);
-        asset.setTenantId("T001");
+        asset.setTenantId("dept:1");
         asset.setAssetNo("A-001");
         asset.setAssetName("测试资产");
         asset.setDeptId(3L);
         asset.setStatus("IN_USE");
-        TenantContext.setTenantId("T001");
+        TenantContext.setTenantId("dept:1");
 
         RetirementApplyDTO dto = new RetirementApplyDTO();
         dto.setAssetId(12L);
@@ -127,14 +127,14 @@ class RetirementApplicationServiceTest {
 
         ArgumentCaptor<RetirementApplication> applicationCaptor = ArgumentCaptor.forClass(RetirementApplication.class);
         verify(retirementApplicationMapper).insert(applicationCaptor.capture());
-        assertEquals("T001", applicationCaptor.getValue().getTenantId());
+        assertEquals("dept:1", applicationCaptor.getValue().getTenantId());
         assertEquals(3L, applicationCaptor.getValue().getDeptId());
 
         ArgumentCaptor<LambdaQueryWrapper<RetirementApplication>> applicationNoWrapperCaptor = ArgumentCaptor.forClass(LambdaQueryWrapper.class);
         verify(retirementApplicationMapper).selectList(applicationNoWrapperCaptor.capture());
         LambdaQueryWrapper<RetirementApplication> applicationNoWrapper = applicationNoWrapperCaptor.getValue();
         assertTrue(applicationNoWrapper.getSqlSegment().contains("tenant_id"));
-        assertTrue(applicationNoWrapper.getParamNameValuePairs().containsValue("T001"));
+        assertTrue(applicationNoWrapper.getParamNameValuePairs().containsValue("dept:1"));
 
         ArgumentCaptor<ApprovalProcess> captor = ArgumentCaptor.forClass(ApprovalProcess.class);
         verify(approvalProcessMapper).insert(captor.capture());
@@ -157,14 +157,14 @@ class RetirementApplicationServiceTest {
     void shouldCancelPendingApplicationAndRollbackAssetStatus() {
         RetirementApplication application = new RetirementApplication();
         application.setId(99L);
-        application.setTenantId("T001");
+        application.setTenantId("dept:1");
         application.setAssetId(12L);
         application.setStatus("PENDING");
         application.setReason("达到报废年限");
         Asset asset = new Asset();
         asset.setId(12L);
-        asset.setTenantId("T001");
-        TenantContext.setTenantId("T001");
+        asset.setTenantId("dept:1");
+        TenantContext.setTenantId("dept:1");
 
         ApprovalProcess approvalProcess = new ApprovalProcess();
         approvalProcess.setId(88L);
@@ -194,7 +194,7 @@ class RetirementApplicationServiceTest {
     void shouldApprovePendingApplicationAndRetireAsset() {
         RetirementApplication application = new RetirementApplication();
         application.setId(99L);
-        application.setTenantId("T001");
+        application.setTenantId("dept:1");
         application.setAssetId(12L);
         application.setStatus("PENDING");
         application.setReason("达到报废年限");
@@ -202,8 +202,8 @@ class RetirementApplicationServiceTest {
         application.setTotalApprovalSteps(1);
         Asset asset = new Asset();
         asset.setId(12L);
-        asset.setTenantId("T001");
-        TenantContext.setTenantId("T001");
+        asset.setTenantId("dept:1");
+        TenantContext.setTenantId("dept:1");
 
         ApprovalProcess approvalProcess = new ApprovalProcess();
         approvalProcess.setId(88L);
@@ -227,15 +227,15 @@ class RetirementApplicationServiceTest {
     void shouldCompleteApprovedApplicationAndKeepScrappedAssetTerminal() {
         RetirementApplication application = new RetirementApplication();
         application.setId(99L);
-        application.setTenantId("T001");
+        application.setTenantId("dept:1");
         application.setAssetId(12L);
         application.setStatus("APPROVED");
         application.setReason("损坏");
         application.setRetirementType("SCRAP");
         Asset asset = new Asset();
         asset.setId(12L);
-        asset.setTenantId("T001");
-        TenantContext.setTenantId("T001");
+        asset.setTenantId("dept:1");
+        TenantContext.setTenantId("dept:1");
 
         ApprovalProcess approvalProcess = new ApprovalProcess();
         approvalProcess.setId(88L);
@@ -267,7 +267,7 @@ class RetirementApplicationServiceTest {
         dto.setAssetId(12L);
         dto.setReason("达到报废年限");
 
-        TenantContext.setTenantId("T001");
+        TenantContext.setTenantId("dept:1");
         when(assetMapper.selectOne(any(LambdaQueryWrapper.class))).thenReturn(null);
         when(assetMapper.selectById(12L)).thenReturn(otherTenantAsset);
 
@@ -283,7 +283,7 @@ class RetirementApplicationServiceTest {
 
     @Test
     void shouldFilterMyApplicationsByTenant() {
-        TenantContext.setTenantId("T001");
+        TenantContext.setTenantId("dept:1");
         when(retirementApplicationMapper.selectPage(any(Page.class), any(LambdaQueryWrapper.class)))
                 .thenReturn(new Page<>());
 
@@ -298,7 +298,7 @@ class RetirementApplicationServiceTest {
 
     @Test
     void shouldFilterQueryApplicationsByTenant() {
-        TenantContext.setTenantId("T001");
+        TenantContext.setTenantId("dept:1");
         when(retirementApplicationMapper.selectPage(any(Page.class), any(LambdaQueryWrapper.class)))
                 .thenReturn(new Page<>());
 
@@ -313,7 +313,7 @@ class RetirementApplicationServiceTest {
 
     @Test
     void shouldFilterQueryApplicationsByKeywordAndDepartment() {
-        TenantContext.setTenantId("T001");
+        TenantContext.setTenantId("dept:1");
         when(retirementApplicationMapper.selectPage(any(Page.class), any(LambdaQueryWrapper.class)))
                 .thenReturn(new Page<>());
 
@@ -331,7 +331,7 @@ class RetirementApplicationServiceTest {
 
     @Test
     void shouldFilterStatisticsByTenant() {
-        TenantContext.setTenantId("T001");
+        TenantContext.setTenantId("dept:1");
         when(retirementApplicationMapper.selectCount(any(LambdaQueryWrapper.class))).thenReturn(1L);
 
         Map<String, Object> stats = retirementApplicationService.getStatistics();
@@ -348,7 +348,7 @@ class RetirementApplicationServiceTest {
         RetirementApplication otherTenantApplication = new RetirementApplication();
         otherTenantApplication.setId(99L);
         otherTenantApplication.setTenantId("T002");
-        TenantContext.setTenantId("T001");
+        TenantContext.setTenantId("dept:1");
         when(retirementApplicationMapper.selectOne(any(LambdaQueryWrapper.class))).thenReturn(null);
         when(retirementApplicationMapper.selectById(99L)).thenReturn(otherTenantApplication);
 

@@ -125,10 +125,14 @@ public class OAuth2Controller {
                 response.sendRedirect(frontendUrl + "/login?error=oauth_user_not_bound");
                 return;
             }
+            if (user.getDeptId() == null) {
+                response.sendRedirect(frontendUrl + "/login?error=oauth_tenant_missing");
+                return;
+            }
 
             // 签发 JWT
             String token = jwtUtil.generateToken(user.getUsername(), user.getId(),
-                    "default");
+                    "dept:" + user.getDeptId());
 
             // 重定向到前端回调页
             response.sendRedirect(frontendUrl + "/oauth2/callback?token=" + token

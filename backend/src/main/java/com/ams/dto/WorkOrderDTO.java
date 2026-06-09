@@ -34,6 +34,7 @@ public class WorkOrderDTO {
     private String completionNote;
     private List<String> collaborators;
     private List<String> attachments;
+    private Long faultCodeId;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
     private LocalDateTime slaDeadline;

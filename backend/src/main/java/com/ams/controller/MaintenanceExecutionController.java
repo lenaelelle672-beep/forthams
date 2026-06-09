@@ -224,7 +224,8 @@ public class MaintenanceExecutionController {
     public Result<String> uploadPhoto(@PathVariable Long id,
                                        @RequestParam("file") MultipartFile file) {
         if (file.isEmpty()) {
-            return Result.error("上传文件不能为空");
+            // 空文件属客户端错误，返回 400 而非默认 500
+            return Result.error(400, "上传文件不能为空");
         }
 
         try {

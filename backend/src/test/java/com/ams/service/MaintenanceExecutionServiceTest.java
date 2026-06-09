@@ -51,7 +51,7 @@ class MaintenanceExecutionServiceTest {
 
     @BeforeEach
     void setUp() {
-        TenantContext.setTenantId("T001");
+        TenantContext.setTenantId("dept:1");
     }
 
     @AfterEach
@@ -80,7 +80,7 @@ class MaintenanceExecutionServiceTest {
         assertNotNull(result);
         assertEquals(ExecutionStatus.RUNNING.name(), result.getStatus());
         assertNotNull(result.getStartTime());
-        assertEquals("T001", result.getTenantId());
+        assertEquals("dept:1", result.getTenantId());
         assertEquals(1L, result.getMaintenanceRecordId());
         assertEquals(10L, result.getWorkOrderId());
         assertEquals(100L, result.getAssigneeId());
@@ -236,7 +236,7 @@ class MaintenanceExecutionServiceTest {
     private MaintenanceExecution createExecution(Long id, ExecutionStatus status) {
         MaintenanceExecution execution = new MaintenanceExecution();
         execution.setId(id);
-        execution.setTenantId("T001");
+        execution.setTenantId("dept:1");
         execution.setMaintenanceRecordId(1L);
         execution.setWorkOrderId(10L);
         execution.setStatus(status.name());

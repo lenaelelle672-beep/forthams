@@ -1,6 +1,7 @@
 package com.ams.service;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.ams.annotation.DataScope;
 import com.ams.common.exception.BusinessException;
 import com.ams.context.TenantContext;
 import com.ams.dto.AssetCreateDTO;
@@ -18,12 +19,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.List;
 import java.util.Set;
 
-import com.ams.annotation.DataScope;
-import org.springframework.security.access.AccessDeniedException;
 @Service
 @RequiredArgsConstructor
 public class AssetService {
@@ -116,12 +117,7 @@ public class AssetService {
         }
         assetMapper.insert(asset);
 
-        // 自动 ABC 分类（降级策略：分类失败不影响资产保存）
-        try {
-            abcClassificationService.classifyAsset(asset.getId());
-        } catch (Exception e) {
-            log.warn("[ABC分类] 资产创建后分类失败，资产保存成功: assetId={}, error={}", asset.getId(), e.getMessage());
-        }
+        scheduleABCClassificationAfterCommit(asset.getId(), tenantId, "创建");
 
         return asset;
     }
@@ -143,12 +139,7 @@ public class AssetService {
 
         assetMapper.update(asset, assetById(id, tenantId));
 
-        // 自动 ABC 分类（降级策略：分类失败不影响资产更新）
-        try {
-            abcClassificationService.classifyAsset(id);
-        } catch (Exception e) {
-            log.warn("[ABC分类] 资产更新后分类失败，资产更新成功: assetId={}, error={}", id, e.getMessage());
-        }
+        scheduleABCClassificationAfterCommit(id, tenantId, "更新");
 
         if (requestedAssetStatus != null) {
             return assetLifecycleService.transitionLoadedAsset(
@@ -160,6 +151,37 @@ public class AssetService {
                     null);
         }
         return asset;
+    }
+
+    private void scheduleABCClassificationAfterCommit(Long assetId, String tenantId, String action) {
+        Runnable classifyTask = () -> {
+            String previousTenantId = TenantContext.getTenantId();
+            try {
+                TenantContext.setTenantId(tenantId);
+                abcClassificationService.classifyAsset(assetId);
+            } catch (Exception e) {
+                log.warn("[ABC分类] 资产{}后分类失败，资产{}成功: assetId={}, error={}",
+                        action, action, assetId, e.getMessage());
+            } finally {
+                if (previousTenantId == null) {
+                    TenantContext.clear();
+                } else {
+                    TenantContext.setTenantId(previousTenantId);
+                }
+            }
+        };
+
+        if (TransactionSynchronizationManager.isSynchronizationActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    classifyTask.run();
+                }
+            });
+            return;
+        }
+
+        classifyTask.run();
     }
 
     @Transactional(rollbackFor = Exception.class)

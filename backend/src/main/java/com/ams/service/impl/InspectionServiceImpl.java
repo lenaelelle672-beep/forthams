@@ -246,9 +246,12 @@ public class InspectionServiceImpl implements InspectionService {
         List<String> tenantIds = getActiveTenantIds();
         for (String tenantId : tenantIds) {
             try {
+                TenantContext.setTenantId(tenantId);
                 checkExpiringForTenant(tenantId);
             } catch (RuntimeException e) {
                 log.error("租户 {} 到期检查失败: {}", tenantId, e.getMessage(), e);
+            } finally {
+                TenantContext.clear();
             }
         }
         log.info("即将到期检验检查任务完成");
@@ -266,9 +269,12 @@ public class InspectionServiceImpl implements InspectionService {
         List<String> tenantIds = getActiveTenantIds();
         for (String tenantId : tenantIds) {
             try {
+                TenantContext.setTenantId(tenantId);
                 markOverdueForTenant(tenantId);
             } catch (RuntimeException e) {
                 log.error("租户 {} 逾期标记失败: {}", tenantId, e.getMessage(), e);
+            } finally {
+                TenantContext.clear();
             }
         }
         log.info("逾期检验标记任务完成");
@@ -286,9 +292,12 @@ public class InspectionServiceImpl implements InspectionService {
         List<String> tenantIds = getActiveTenantIds();
         for (String tenantId : tenantIds) {
             try {
+                TenantContext.setTenantId(tenantId);
                 generateStatisticsForTenant(tenantId);
             } catch (RuntimeException e) {
                 log.error("租户 {} 统计报告失败: {}", tenantId, e.getMessage(), e);
+            } finally {
+                TenantContext.clear();
             }
         }
         log.info("检验统计报告生成完成");

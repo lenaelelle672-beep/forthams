@@ -175,6 +175,46 @@ public class InventoryService {
     }
 
     /**
+     * Confirm a single inventory detail row from the task detail UI.
+     *
+     * <p>The frontend route names this path segment {@code assetId}, but the
+     * table row id is the inventory_detail id. Keeping the service contract
+     * detail-oriented prevents duplicate asset rows from overwriting each other.
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public InventoryDetail confirmAsset(Long taskId, Long detailId, String actualStatus, String remark) {
+        InventoryTask task = getTaskEntityById(taskId);
+        InventoryDetail detail = getTaskDetailEntity(task.getId(), detailId);
+        detail.setStatus(normalizeActualStatus(actualStatus));
+        if (StringUtils.hasText(remark)) {
+            detail.setRemark(remark);
+        }
+        inventoryDetailMapper.updateById(detail);
+        return detail;
+    }
+
+    /**
+     * Batch confirm inventory detail rows from the task detail UI.
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void batchConfirmAssets(Long taskId, List<String> detailIds, String actualStatus, String remark) {
+        if (detailIds == null || detailIds.isEmpty()) {
+            return;
+        }
+        InventoryTask task = getTaskEntityById(taskId);
+        String normalizedStatus = normalizeActualStatus(actualStatus);
+        for (String idStr : detailIds) {
+            Long detailId = Long.valueOf(idStr);
+            InventoryDetail detail = getTaskDetailEntity(task.getId(), detailId);
+            detail.setStatus(normalizedStatus);
+            if (StringUtils.hasText(remark)) {
+                detail.setRemark(remark);
+            }
+            inventoryDetailMapper.updateById(detail);
+        }
+    }
+
+    /**
      * 获取盘点任务差异汇总。
      * 按 InventoryDetail.status 字段分组统计：surplus/deficit/damaged/normal。
      */
@@ -264,31 +304,44 @@ public class InventoryService {
                         asset.setAssetNo("AS-INV-" + id + "-" + (surplusCreated + 1));
                         asset.setAssetName(detail.getRemark() != null ? detail.getRemark() : "盘点盘盈资产");
                         asset.setCategoryId(0L); // 兜底分类 ID
-                        asset.setStatus("IN_USE");
+                        asset.setStatus("IDLE");
                         asset.setTenantId(task.getTenantId());
                         asset.setLocation(detail.getActualLocation());
                         assetMapper.insert(asset);
+                        recordAdjustment(task, detail, asset, "SURPLUS", null, "IDLE", "盘盈自动创建资产");
                         surplusCreated++;
                     }
                     case "deficit" -> {
                         // 盘亏：变更 Asset 为 LOST
                         if (detail.getAssetId() != null) {
-                            Asset asset = assetMapper.selectById(detail.getAssetId());
+                            Asset asset = assetMapper.selectOne(new LambdaQueryWrapper<Asset>()
+                                    .eq(Asset::getId, detail.getAssetId())
+                                    .eq(Asset::getTenantId, task.getTenantId()));
                             if (asset != null) {
+                                String beforeStatus = asset.getStatus();
                                 asset.setStatus("LOST");
                                 assetMapper.updateById(asset);
+                                recordAdjustment(task, detail, asset, "DEFICIT", beforeStatus, "LOST", "盘亏自动标记资产状态");
                                 deficitMarked++;
+                            } else {
+                                errors.add("资产 " + detail.getAssetId() + " 不属于当前租户或不存在");
                             }
                         }
                     }
                     case "damaged" -> {
                         // 损坏：变更 Asset 为 MAINTENANCE
                         if (detail.getAssetId() != null) {
-                            Asset asset = assetMapper.selectById(detail.getAssetId());
+                            Asset asset = assetMapper.selectOne(new LambdaQueryWrapper<Asset>()
+                                    .eq(Asset::getId, detail.getAssetId())
+                                    .eq(Asset::getTenantId, task.getTenantId()));
                             if (asset != null) {
+                                String beforeStatus = asset.getStatus();
                                 asset.setStatus("MAINTENANCE");
                                 assetMapper.updateById(asset);
+                                recordAdjustment(task, detail, asset, "DAMAGE", beforeStatus, "MAINTENANCE", "损坏自动标记资产状态");
                                 damagedMarked++;
+                            } else {
+                                errors.add("资产 " + detail.getAssetId() + " 不属于当前租户或不存在");
                             }
                         }
                     }
@@ -331,6 +384,56 @@ public class InventoryService {
                 return item;
             })
             .collect(Collectors.toList());
+    }
+
+    private InventoryDetail getTaskDetailEntity(Long taskId, Long detailId) {
+        String tenantId = TenantContext.requireTenantId();
+        InventoryDetail detail = inventoryDetailMapper.selectOne(
+                new LambdaQueryWrapper<InventoryDetail>()
+                        .eq(InventoryDetail::getTenantId, tenantId)
+                        .eq(InventoryDetail::getTaskId, taskId)
+                        .eq(InventoryDetail::getId, detailId));
+        if (detail == null) {
+            throw new BusinessException("盘点明细不存在");
+        }
+        return detail;
+    }
+
+    private String normalizeActualStatus(String status) {
+        if (!StringUtils.hasText(status)) {
+            throw new BusinessException("盘点状态不能为空");
+        }
+        String normalized = status.trim().toLowerCase(Locale.ROOT);
+        return switch (normalized) {
+            case "normal", "match" -> "normal";
+            case "surplus" -> "surplus";
+            case "deficit", "loss" -> "deficit";
+            case "damaged", "damage" -> "damaged";
+            case "other" -> "other";
+            default -> throw new BusinessException("盘点状态无效: " + status);
+        };
+    }
+
+    private void recordAdjustment(
+            InventoryTask task,
+            InventoryDetail detail,
+            Asset asset,
+            String adjustmentType,
+            String statusBefore,
+            String statusAfter,
+            String remark) {
+        InventoryAdjustmentLog log = new InventoryAdjustmentLog();
+        log.setTaskId(task.getId());
+        log.setDetailId(detail.getId());
+        log.setAssetId(asset.getId());
+        log.setAssetNo(asset.getAssetNo());
+        log.setAssetName(asset.getAssetName());
+        log.setAdjustmentType(adjustmentType);
+        log.setStatusBefore(statusBefore);
+        log.setStatusAfter(statusAfter);
+        log.setRemark(remark);
+        log.setCreatedBy(getCurrentUserId());
+        inventoryAdjustmentLogMapper.insert(log);
     }
 
     /**
