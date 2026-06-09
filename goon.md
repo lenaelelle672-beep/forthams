@@ -1,5 +1,24 @@
 # goon.md — 交接笔记（Cowork → Claude Code）
 
+## 2026-06-09 20:15 最新状态（Codex GAI2 部署闭环继续推进）
+
+### 当前事实
+- 已新增提交 `eb84fd139 fix: repair production web container routing`：根 `Dockerfile` 从“Spring Boot 直接托管 dist”改为单容器 Nginx + Spring Boot 拓扑，Nginx 对外监听 `8080` 服务桌面 SPA 和 `/api/*` 反代，后端内部监听 `8081`；同时新增 `docker/single-container-nginx.conf` 与 `docker/single-container-entrypoint.sh`。
+- 已新增提交 `928d93505 fix: align split docker deployment checks`：分体部署补齐 `frontend/Dockerfile` 的完整构建依赖安装，避免 `vite` 位于 devDependencies 时 Docker build 缺构建器；`backend/Dockerfile` 健康检查统一改为公开 `/api/health`。
+- `frontend/nginx.conf` 已从完整 nginx 主配置改为合法的 `conf.d/default.conf` server 片段，并使用 `location ^~ /api/` 避免 API 路径被静态资源正则抢占。
+- 移动端仍冻结，未纳入提交：`frontend/src/pages/mobile/**` 与 `frontend/src/router/index.tsx` 的移动相关改动仍留在工作树；`.DS_Store` 仍为本机元数据改动，未提交。
+
+### 最新验证
+- 反例验证：临时 Spring Boot 静态托管模式下，`/api/health` 为 `200`，但 `/` 为 `404`、`/api/` 与 `/api/index.html` 为 `401`，证明旧根 `Dockerfile` 健康检查会过但桌面前端不可用。
+- 等价运行态 smoke：本地后端模拟容器内部端口 `18081`，临时 Node 代理模拟 Nginx 对外端口 `18080`；`/`、`/workflows`、真实 JS 资源 `/assets/index-*.js`、`/api/health` 均返回 `200`。
+- 门禁复验：`sh -n docker/single-container-entrypoint.sh` 通过；后端 `mvn test` 通过，`580` 个测试通过，0 failure/error/skip；前端 `npm test -- --run` 通过，`83` 个测试文件、`857` 个测试通过；前端 `npm run build` 通过，仅保留既有大 chunk warning。
+- 提交前审计：两次部署提交均执行 `detect_changes(scope=staged)`，结果均为 `risk_level=low`、`changed_symbols=[]`、`affected_processes=[]`；`git diff --check` 通过。
+
+### 剩余动作
+- P0：在有 Docker/Nginx 的机器上补原生验证：`docker build -t forthams:local .`、`docker compose build backend frontend`，并跑 `/`、`/workflows`、`/api/health`、一个真实鉴权 API smoke。本机当前无 `docker` 与 `nginx` 命令，无法完成该证据。
+- P1：`.DS_Store` 已被 `.gitignore` 覆盖但当前仍有 tracked 修改；是否执行 `git rm --cached .DS_Store` 需要用户明确确认。
+- P1：移动端继续冻结；后续若恢复移动端，应单独审计并提交 `frontend/src/pages/mobile/**` 与 `frontend/src/router/index.tsx`，不要混入桌面/后端批次。
+
 ## 2026-06-09 20:08 最新状态（Codex GAI2 继续推进）
 
 ### 当前事实
