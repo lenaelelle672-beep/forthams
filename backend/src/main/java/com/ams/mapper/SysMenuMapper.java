@@ -53,6 +53,7 @@ public interface SysMenuMapper extends BaseMapper<SysMenu> {
           AND r.deleted = 0
           AND m.status = 1
           AND m.deleted = 0
+          AND m.visible = 1
           AND m.menu_type IN ('M', 'C')
         ORDER BY m.parent_id, m.sort_order
         """)

@@ -1,6 +1,7 @@
 package com.ams.config;
 
 import com.ams.context.TenantContext;
+import com.ams.security.LoginUser;
 import com.ams.utils.JwtUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -10,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -77,11 +79,26 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
 
             try {
-                if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                if (username == null || !jwtUtil.validateToken(token, username)) {
+                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token");
+                    return;
+                }
+
+                Authentication existingAuthentication = SecurityContextHolder.getContext().getAuthentication();
+                if (existingAuthentication != null) {
+                    if (!matchesExistingAuthentication(username, tenantId, existingAuthentication)) {
+                        log.warn("jwt_existing_auth_tenant_mismatch clientIp={} method={} path={} username={} tokenTenant={}",
+                                request.getRemoteAddr(), request.getMethod(), request.getRequestURI(), username, tenantId);
+                        response.sendError(HttpServletResponse.SC_FORBIDDEN, "Tenant mismatch");
+                        return;
+                    }
+                } else {
                     UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-                    if (!jwtUtil.validateToken(token, username)) {
-                        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token");
+                    if (!matchesAuthenticatedTenant(tenantId, userDetails)) {
+                        log.warn("jwt_tenant_mismatch clientIp={} method={} path={} username={} tokenTenant={}",
+                                request.getRemoteAddr(), request.getMethod(), request.getRequestURI(), username, tenantId);
+                        response.sendError(HttpServletResponse.SC_FORBIDDEN, "Tenant mismatch");
                         return;
                     }
 
@@ -124,10 +141,38 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         return !(uri.startsWith("/auth/")
+                || uri.startsWith("/vendor-portal/")
                 || uri.startsWith("/public/")
                 || uri.startsWith("/static/")
+                || uri.startsWith("/oauth2-mock/")
+                || uri.startsWith("/sso/")
+                || uri.startsWith("/api-docs/")
+                || uri.startsWith("/swagger-ui/")
+                || uri.equals("/health")
+                || uri.equals("/system/health")
+                || uri.equals("/system/info")
                 || uri.equals("/error")
                 || uri.equals("/favicon.ico"));
+    }
+
+    private boolean matchesExistingAuthentication(String tokenUsername, String tokenTenantId, Authentication authentication) {
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof UserDetails userDetails && !userDetails.getUsername().equals(tokenUsername)) {
+            return false;
+        }
+        if (principal instanceof LoginUser loginUser) {
+            String userTenantId = loginUser.getTenantId();
+            return userTenantId != null && userTenantId.equals(tokenTenantId);
+        }
+        return false;
+    }
+
+    private boolean matchesAuthenticatedTenant(String tokenTenantId, UserDetails userDetails) {
+        if (userDetails instanceof LoginUser loginUser) {
+            String userTenantId = loginUser.getTenantId();
+            return userTenantId != null && userTenantId.equals(tokenTenantId);
+        }
+        return false;
     }
 
 }

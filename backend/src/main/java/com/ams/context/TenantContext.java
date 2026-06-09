@@ -8,7 +8,7 @@ import org.springframework.security.access.AccessDeniedException;
  * TenantContext provides thread-local storage for the current tenant's identifier.
  *
  * <p>This context is populated by security filters during request processing (e.g.,
- * {@code TenantFilter}) and <b>must</b> be cleared at the end of each request to prevent
+ * {@code JwtAuthenticationFilter}) and <b>must</b> be cleared at the end of each request to prevent
  * memory leaks and cross-tenant data leakage in thread-pool environments.</p>
  *
  * <h3>Design Note</h3>
@@ -54,7 +54,7 @@ public final class TenantContext {
      * and a warning is logged. This defensive behaviour prevents accidental context
      * corruption from malformed tokens.</p>
      *
-     * @param tenantId the unique identifier of the tenant (e.g. "T001"); must not be null or blank
+     * @param tenantId the unique identifier of the tenant (e.g. "dept:1"); must not be null or blank
      */
     public static void setTenantId(String tenantId) {
         if (tenantId == null || tenantId.isBlank()) {

@@ -224,7 +224,7 @@ public class AuditSchemaInitializer implements ApplicationRunner {
                     (19, '菜单新增', 17, 2, NULL, NULL, 'F', 'system:menu:add', NULL, 1, 1),
                     (20, '菜单编辑', 17, 3, NULL, NULL, 'F', 'system:menu:edit', NULL, 1, 1),
                     (21, '菜单删除', 17, 4, NULL, NULL, 'F', 'system:menu:delete', NULL, 1, 1),
-                    (22, '工作流定义', 1, 5, 'workflow-definition', 'system/workflow/index', 'C', 'workflow:definition:list', 'workflow', 1, 1),
+                    (22, '工作流定义', 1, 5, 'workflows', 'workflow/WorkflowCenterPage', 'C', 'workflow:definition:query', 'workflow', 1, 1),
                     (23, '工作流查询', 22, 1, NULL, NULL, 'F', 'workflow:definition:query', NULL, 1, 1),
                     (24, '工作流编辑', 22, 2, NULL, NULL, 'F', 'workflow:definition:edit', NULL, 1, 1),
                     (30, '岗位管理', 1, 6, 'post', 'system/post/index', 'C', 'system:post:list', 'briefcase', 1, 1),

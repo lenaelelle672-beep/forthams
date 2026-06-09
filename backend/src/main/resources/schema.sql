@@ -1,6 +1,31 @@
 CREATE DATABASE IF NOT EXISTS ams_db DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE ams_db;
 
+CREATE TABLE IF NOT EXISTS sys_tenant (
+    id VARCHAR(64) PRIMARY KEY COMMENT '租户ID',
+    name VARCHAR(100) NOT NULL COMMENT '租户名称',
+    domain VARCHAR(200) COMMENT '绑定域名',
+    plan VARCHAR(20) DEFAULT 'FREE' COMMENT '套餐',
+    max_users INT DEFAULT 100,
+    max_assets INT DEFAULT 1000,
+    status VARCHAR(10) DEFAULT 'ACTIVE',
+    contact_name VARCHAR(50),
+    contact_phone VARCHAR(20),
+    contact_email VARCHAR(100),
+    expire_at DATETIME,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='租户管理';
+
+INSERT INTO sys_tenant (id, name, plan, status, max_users, max_assets)
+VALUES ('dept:1', '默认租户', 'ENTERPRISE', 'ACTIVE', 9999, 999999)
+ON DUPLICATE KEY UPDATE
+    name = VALUES(name),
+    plan = VALUES(plan),
+    status = VALUES(status),
+    max_users = VALUES(max_users),
+    max_assets = VALUES(max_assets);
+
 CREATE TABLE IF NOT EXISTS sys_user (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     username VARCHAR(64) NOT NULL UNIQUE,
@@ -121,6 +146,7 @@ CREATE TABLE IF NOT EXISTS asset (
 
 CREATE TABLE IF NOT EXISTS asset_change_log (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    tenant_id VARCHAR(64) NOT NULL DEFAULT 'dept:1',
     asset_id BIGINT NOT NULL,
     change_type VARCHAR(64) NOT NULL,
     old_value TEXT,
@@ -128,7 +154,183 @@ CREATE TABLE IF NOT EXISTS asset_change_log (
     reason VARCHAR(512),
     operator_id BIGINT,
     create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
-    INDEX idx_change_asset (asset_id)
+    INDEX idx_change_asset (asset_id),
+    INDEX idx_change_tenant (tenant_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS asset_parent_child (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    tenant_id VARCHAR(64) NOT NULL DEFAULT 'dept:1',
+    parent_asset_id BIGINT NOT NULL,
+    child_asset_id BIGINT NOT NULL,
+    relation_type VARCHAR(50) NOT NULL,
+    quantity INT DEFAULT 1,
+    remark VARCHAR(500),
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+    deleted TINYINT DEFAULT 0,
+    UNIQUE KEY uk_relation (tenant_id, parent_asset_id, child_asset_id, deleted),
+    INDEX idx_apc_parent_tenant (parent_asset_id, tenant_id),
+    INDEX idx_apc_child_tenant (child_asset_id, tenant_id),
+    INDEX idx_apc_deleted (deleted)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS tco_record (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    tenant_id VARCHAR(64) NOT NULL DEFAULT 'dept:1',
+    asset_id BIGINT NOT NULL,
+    calculation_date DATE NOT NULL,
+    period_year INT,
+    period_month INT,
+    total_cost DECIMAL(14,2) DEFAULT 0.00,
+    purchase_cost DECIMAL(12,2) DEFAULT 0.00,
+    maintenance_cost DECIMAL(12,2) DEFAULT 0.00,
+    work_order_cost DECIMAL(12,2) DEFAULT 0.00,
+    energy_cost DECIMAL(12,2) DEFAULT 0.00,
+    insurance_cost DECIMAL(12,2) DEFAULT 0.00,
+    current_value DECIMAL(12,2) DEFAULT 0.00,
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_tco_tenant (tenant_id),
+    INDEX idx_tco_asset (asset_id),
+    INDEX idx_tco_date (calculation_date)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS energy_consumption (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    tenant_id VARCHAR(64) NOT NULL DEFAULT 'dept:1',
+    asset_id BIGINT NOT NULL,
+    meter_type VARCHAR(20) NOT NULL,
+    period_type VARCHAR(10) NOT NULL,
+    period_start DATE NOT NULL,
+    period_end DATE NOT NULL,
+    consumption DECIMAL(12,2) NOT NULL,
+    unit VARCHAR(20) DEFAULT 'kWh',
+    cost DECIMAL(12,2),
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uk_energy_period (tenant_id, asset_id, meter_type, period_type, period_start),
+    INDEX idx_ec_asset (asset_id),
+    INDEX idx_ec_tenant (tenant_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS insurance (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    policy_no VARCHAR(128) NOT NULL,
+    insurance_name VARCHAR(256) NOT NULL,
+    insurance_type VARCHAR(32) NOT NULL,
+    asset_ids JSON,
+    insurer VARCHAR(256),
+    premium DECIMAL(12,2) DEFAULT 0.00,
+    coverage DECIMAL(12,2) DEFAULT 0.00,
+    deductible DECIMAL(12,2) DEFAULT 0.00,
+    start_date DATE NOT NULL,
+    end_date DATE NOT NULL,
+    status VARCHAR(32) DEFAULT 'ACTIVE',
+    remark VARCHAR(500),
+    tenant_id VARCHAR(64) NOT NULL DEFAULT 'dept:1',
+    create_by BIGINT,
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+    update_time DATETIME DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+    deleted TINYINT DEFAULT 0,
+    INDEX idx_ins_tenant (tenant_id, deleted),
+    INDEX idx_ins_policy (policy_no),
+    INDEX idx_ins_dates (start_date, end_date),
+    INDEX idx_ins_status (status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS asset_assignment (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    asset_id BIGINT NOT NULL,
+    applicant_id BIGINT,
+    applicant_dept_id BIGINT,
+    assigned_to_user_id BIGINT,
+    assigned_to_dept_id BIGINT,
+    expected_return_date DATE,
+    actual_return_date DATE,
+    status VARCHAR(32) NOT NULL DEFAULT 'DRAFT',
+    assignment_date DATE,
+    return_condition VARCHAR(500),
+    allocation_type VARCHAR(20) NOT NULL DEFAULT 'ASSIGNMENT',
+    approver_id BIGINT,
+    approval_time DATETIME,
+    approval_remark VARCHAR(500),
+    remark VARCHAR(500),
+    tenant_id VARCHAR(64) NOT NULL DEFAULT 'dept:1',
+    create_by BIGINT,
+    create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    update_time DATETIME NULL ON UPDATE CURRENT_TIMESTAMP,
+    deleted TINYINT NOT NULL DEFAULT 0,
+    INDEX idx_assignment_asset (asset_id),
+    INDEX idx_assignment_status (status),
+    INDEX idx_assignment_tenant (tenant_id),
+    INDEX idx_assignment_type (allocation_type)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS asset_borrow (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    asset_id BIGINT NOT NULL,
+    borrower_id BIGINT,
+    borrower_dept_id BIGINT,
+    borrow_date DATE NOT NULL,
+    expected_return_date DATE NOT NULL,
+    actual_return_date DATE,
+    status VARCHAR(32) NOT NULL DEFAULT 'DRAFT',
+    purpose VARCHAR(500),
+    remark VARCHAR(500),
+    notified TINYINT NOT NULL DEFAULT 0,
+    tenant_id VARCHAR(64) NOT NULL DEFAULT 'dept:1',
+    create_by BIGINT,
+    create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    update_time DATETIME NULL ON UPDATE CURRENT_TIMESTAMP,
+    deleted TINYINT NOT NULL DEFAULT 0,
+    INDEX idx_borrow_asset (asset_id),
+    INDEX idx_borrow_status (status),
+    INDEX idx_borrow_due_date (expected_return_date),
+    INDEX idx_borrow_tenant (tenant_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS inspection (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    inspection_no VARCHAR(128) NOT NULL,
+    asset_id BIGINT NOT NULL,
+    inspection_type VARCHAR(32) NOT NULL,
+    inspection_date DATE NOT NULL,
+    next_inspection_date DATE,
+    inspection_agency VARCHAR(256),
+    inspector_name VARCHAR(128),
+    result VARCHAR(32) NOT NULL,
+    certificate_no VARCHAR(128),
+    certificate_expiry DATE,
+    report_attachment VARCHAR(512),
+    cost DECIMAL(12,2) DEFAULT 0.00,
+    template_id BIGINT,
+    photos TEXT,
+    findings TEXT,
+    tenant_id VARCHAR(64) NOT NULL DEFAULT 'dept:1',
+    create_by BIGINT,
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+    update_time DATETIME DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+    deleted TINYINT DEFAULT 0,
+    INDEX idx_insp_tenant (tenant_id, deleted),
+    INDEX idx_insp_asset (asset_id),
+    INDEX idx_insp_next_date (next_inspection_date),
+    INDEX idx_insp_result (result)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS intake_order (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    order_no VARCHAR(64) NOT NULL,
+    vendor_id BIGINT,
+    order_date DATE,
+    status VARCHAR(32) NOT NULL DEFAULT 'DRAFT',
+    total_amount DECIMAL(12,2),
+    remark VARCHAR(500),
+    reject_reason VARCHAR(500),
+    tenant_id VARCHAR(64) NOT NULL DEFAULT 'dept:1',
+    create_by BIGINT,
+    create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    update_time DATETIME NULL ON UPDATE CURRENT_TIMESTAMP,
+    deleted TINYINT NOT NULL DEFAULT 0,
+    INDEX idx_intake_tenant_status (tenant_id, status),
+    INDEX idx_intake_order_no (order_no)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS general_audit_entry (
@@ -222,6 +424,10 @@ CREATE TABLE IF NOT EXISTS work_order (
     estimated_cost DECIMAL(15,2),
     actual_cost DECIMAL(15,2),
     completion_note TEXT,
+    attachments TEXT COMMENT '附件 URL 列表（JSON 数组）',
+    fault_code_id BIGINT NULL COMMENT '关联故障代码ID',
+    sla_deadline DATETIME NULL COMMENT 'SLA 截止时间',
+    sla_status VARCHAR(32) NULL DEFAULT 'NORMAL' COMMENT 'SLA 状态: NORMAL/WARNING/BREACHED',
     create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
     update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     deleted TINYINT DEFAULT 0,
@@ -229,7 +435,9 @@ CREATE TABLE IF NOT EXISTS work_order (
     INDEX idx_work_order_tenant (tenant_id),
     INDEX idx_work_order_status (status),
     INDEX idx_work_order_tenant_status (tenant_id, status),
-    INDEX idx_work_order_tenant_time (tenant_id, create_time)
+    INDEX idx_work_order_tenant_time (tenant_id, create_time),
+    INDEX idx_work_order_sla (tenant_id, sla_status, sla_deadline),
+    INDEX idx_fault_code (fault_code_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Existing development databases may have an older work_order table. Replay
@@ -270,6 +478,14 @@ SET @sql = (SELECT IF(COUNT(*) = 0, 'ALTER TABLE work_order ADD COLUMN completio
 PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 SET @sql = (SELECT IF(COUNT(*) = 0, 'ALTER TABLE work_order ADD COLUMN collaborators JSON AFTER completion_note', 'SELECT 1') FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'work_order' AND column_name = 'collaborators');
 PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+SET @sql = (SELECT IF(COUNT(*) = 0, 'ALTER TABLE work_order ADD COLUMN attachments TEXT COMMENT ''附件 URL 列表（JSON 数组）'' AFTER completion_note', 'SELECT 1') FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'work_order' AND column_name = 'attachments');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+SET @sql = (SELECT IF(COUNT(*) = 0, 'ALTER TABLE work_order ADD COLUMN fault_code_id BIGINT NULL COMMENT ''关联故障代码ID'' AFTER attachments', 'SELECT 1') FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'work_order' AND column_name = 'fault_code_id');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+SET @sql = (SELECT IF(COUNT(*) = 0, 'ALTER TABLE work_order ADD COLUMN sla_deadline DATETIME NULL COMMENT ''SLA 截止时间'' AFTER fault_code_id', 'SELECT 1') FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'work_order' AND column_name = 'sla_deadline');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+SET @sql = (SELECT IF(COUNT(*) = 0, 'ALTER TABLE work_order ADD COLUMN sla_status VARCHAR(32) NULL DEFAULT ''NORMAL'' COMMENT ''SLA 状态: NORMAL/WARNING/BREACHED'' AFTER sla_deadline', 'SELECT 1') FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'work_order' AND column_name = 'sla_status');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 SET @sql = (SELECT IF(COUNT(*) = 0, 'ALTER TABLE work_order ADD INDEX idx_work_order_tenant (tenant_id)', 'SELECT 1') FROM information_schema.statistics WHERE table_schema = DATABASE() AND table_name = 'work_order' AND index_name = 'idx_work_order_tenant');
 PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 SET @sql = (SELECT IF(COUNT(*) = 0, 'ALTER TABLE work_order ADD INDEX idx_work_order_status (status)', 'SELECT 1') FROM information_schema.statistics WHERE table_schema = DATABASE() AND table_name = 'work_order' AND index_name = 'idx_work_order_status');
@@ -280,6 +496,29 @@ SET @sql = (SELECT IF(COUNT(*) = 0, 'ALTER TABLE work_order ADD INDEX idx_work_o
 PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 SET @sql = (SELECT IF(COUNT(*) = 0, 'ALTER TABLE work_order ADD INDEX idx_work_order_tenant_time (tenant_id, create_time)', 'SELECT 1') FROM information_schema.statistics WHERE table_schema = DATABASE() AND table_name = 'work_order' AND index_name = 'idx_work_order_tenant_time');
 PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+SET @sql = (SELECT IF(COUNT(*) = 0, 'ALTER TABLE work_order ADD INDEX idx_work_order_sla (tenant_id, sla_status, sla_deadline)', 'SELECT 1') FROM information_schema.statistics WHERE table_schema = DATABASE() AND table_name = 'work_order' AND index_name = 'idx_work_order_sla');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+SET @sql = (SELECT IF(COUNT(*) = 0, 'ALTER TABLE work_order ADD INDEX idx_fault_code (fault_code_id)', 'SELECT 1') FROM information_schema.statistics WHERE table_schema = DATABASE() AND table_name = 'work_order' AND index_name = 'idx_fault_code');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+CREATE TABLE IF NOT EXISTS sla_config (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    tenant_id VARCHAR(64) NOT NULL COMMENT '租户 ID',
+    priority VARCHAR(32) NOT NULL COMMENT '工单优先级: LOW/MEDIUM/HIGH/CRITICAL',
+    response_hours INT NOT NULL DEFAULT 48 COMMENT '响应时限（小时）',
+    resolve_hours INT NOT NULL DEFAULT 168 COMMENT '解决时限（小时）',
+    warning_ratio DECIMAL(3,2) NOT NULL DEFAULT 0.80 COMMENT '预警阈值比例',
+    status TINYINT NOT NULL DEFAULT 1 COMMENT '状态: 1=启用 0=禁用',
+    create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    update_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uk_tenant_priority (tenant_id, priority)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='SLA 配置表';
+
+INSERT IGNORE INTO sla_config (tenant_id, priority, response_hours, resolve_hours, warning_ratio) VALUES
+('0', 'LOW',      72, 336, 0.80),
+('0', 'MEDIUM',   48, 168, 0.80),
+('0', 'HIGH',     24,  72, 0.80),
+('0', 'CRITICAL',  8,  24, 0.80);
 
 CREATE TABLE IF NOT EXISTS retirement_application (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
@@ -418,6 +657,11 @@ CREATE TABLE IF NOT EXISTS inventory_task (
     scanned_count INT DEFAULT 0,
     match_count INT DEFAULT 0,
     loss_count INT DEFAULT 0,
+    surplus_count INT DEFAULT 0,
+    deficit_count INT DEFAULT 0,
+    damage_count INT DEFAULT 0,
+    approved_by BIGINT,
+    approved_at DATETIME,
     executor_id BIGINT,
     create_by BIGINT,
     create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -442,6 +686,34 @@ CREATE TABLE IF NOT EXISTS inventory_detail (
     INDEX idx_inventory_detail_tenant (tenant_id),
     INDEX idx_inventory_detail_task (task_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+SET @sql = (SELECT IF(COUNT(*) = 0, 'ALTER TABLE inventory_task ADD COLUMN surplus_count INT DEFAULT 0 AFTER loss_count', 'SELECT 1') FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'inventory_task' AND column_name = 'surplus_count');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+SET @sql = (SELECT IF(COUNT(*) = 0, 'ALTER TABLE inventory_task ADD COLUMN deficit_count INT DEFAULT 0 AFTER surplus_count', 'SELECT 1') FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'inventory_task' AND column_name = 'deficit_count');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+SET @sql = (SELECT IF(COUNT(*) = 0, 'ALTER TABLE inventory_task ADD COLUMN damage_count INT DEFAULT 0 AFTER deficit_count', 'SELECT 1') FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'inventory_task' AND column_name = 'damage_count');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+SET @sql = (SELECT IF(COUNT(*) = 0, 'ALTER TABLE inventory_task ADD COLUMN approved_by BIGINT AFTER damage_count', 'SELECT 1') FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'inventory_task' AND column_name = 'approved_by');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+SET @sql = (SELECT IF(COUNT(*) = 0, 'ALTER TABLE inventory_task ADD COLUMN approved_at DATETIME AFTER approved_by', 'SELECT 1') FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'inventory_task' AND column_name = 'approved_at');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+CREATE TABLE IF NOT EXISTS inventory_adjustment_log (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    task_id BIGINT NOT NULL COMMENT '盘点任务 ID',
+    detail_id BIGINT COMMENT '盘点明细 ID',
+    asset_id BIGINT COMMENT '资产 ID',
+    asset_no VARCHAR(128) COMMENT '资产编号',
+    asset_name VARCHAR(256) COMMENT '资产名称',
+    adjustment_type VARCHAR(32) NOT NULL COMMENT '调账类型: SURPLUS/DEFICIT/DAMAGE',
+    status_before VARCHAR(32) COMMENT '变更前状态',
+    status_after VARCHAR(32) COMMENT '变更后状态',
+    remark VARCHAR(500) COMMENT '备注',
+    created_by BIGINT COMMENT '操作人',
+    create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_task (task_id),
+    INDEX idx_asset (asset_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='盘点调账日志表';
 
 CREATE TABLE IF NOT EXISTS idle_asset_notice (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
@@ -510,7 +782,16 @@ CREATE TABLE IF NOT EXISTS approval_process (
 
 -- Existing development databases may have been created before tenant isolation
 -- columns were added. Keep startup/schema replays additive and tenant-safe.
-SET @sql = (SELECT IF(COUNT(*) = 0, 'ALTER TABLE approval_process ADD COLUMN tenant_id VARCHAR(64) NOT NULL DEFAULT ''T001'' AFTER business_data', 'SELECT 1') FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'approval_process' AND column_name = 'tenant_id');
+SET @sql = (SELECT IF(COUNT(*) = 0, 'ALTER TABLE approval_process ADD COLUMN tenant_id VARCHAR(64) NOT NULL DEFAULT ''dept:1'' AFTER business_id', 'SELECT 1') FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'approval_process' AND column_name = 'tenant_id');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+SET @sql = (SELECT IF(COUNT(*) = 0, 'ALTER TABLE approval_process ADD COLUMN process_type VARCHAR(64) NOT NULL DEFAULT ''UNKNOWN'' AFTER process_no', 'SELECT 1') FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'approval_process' AND column_name = 'process_type');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+UPDATE approval_process SET process_type = business_type WHERE process_type = 'UNKNOWN' AND business_type IS NOT NULL;
+SET @sql = (SELECT IF(COUNT(*) = 0, 'ALTER TABLE approval_process ADD COLUMN business_data TEXT AFTER business_id', 'SELECT 1') FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'approval_process' AND column_name = 'business_data');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+SET @sql = (SELECT IF(COUNT(*) = 0, 'ALTER TABLE approval_process ADD COLUMN apply_time DATETIME DEFAULT CURRENT_TIMESTAMP AFTER applicant_id', 'SELECT 1') FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'approval_process' AND column_name = 'apply_time');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+SET @sql = (SELECT IF(COUNT(*) = 0, 'ALTER TABLE approval_process ADD COLUMN version INT DEFAULT 0 AFTER deleted', 'SELECT 1') FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'approval_process' AND column_name = 'version');
 PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 SET @sql = (SELECT IF(COUNT(*) = 0, 'ALTER TABLE approval_process ADD INDEX idx_approval_process_tenant (tenant_id)', 'SELECT 1') FROM information_schema.statistics WHERE table_schema = DATABASE() AND table_name = 'approval_process' AND index_name = 'idx_approval_process_tenant');
 PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
@@ -534,7 +815,7 @@ CREATE TABLE IF NOT EXISTS approval_record (
     INDEX idx_approval_record_process_approver (process_id, approver_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-SET @sql = (SELECT IF(COUNT(*) = 0, 'ALTER TABLE approval_record ADD COLUMN tenant_id VARCHAR(64) NOT NULL DEFAULT ''T001'' AFTER process_id', 'SELECT 1') FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'approval_record' AND column_name = 'tenant_id');
+SET @sql = (SELECT IF(COUNT(*) = 0, 'ALTER TABLE approval_record ADD COLUMN tenant_id VARCHAR(64) NOT NULL DEFAULT ''dept:1'' AFTER process_id', 'SELECT 1') FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'approval_record' AND column_name = 'tenant_id');
 PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 SET @sql = (SELECT IF(COUNT(*) = 0, 'ALTER TABLE approval_record ADD INDEX idx_approval_record_tenant (tenant_id)', 'SELECT 1') FROM information_schema.statistics WHERE table_schema = DATABASE() AND table_name = 'approval_record' AND index_name = 'idx_approval_record_tenant');
 PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
@@ -562,6 +843,7 @@ CREATE TABLE IF NOT EXISTS workflow_definition (
 
 CREATE TABLE IF NOT EXISTS sys_attachment (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    tenant_id VARCHAR(64) NOT NULL DEFAULT 'dept:1',
     business_type VARCHAR(64) NOT NULL,
     business_id BIGINT NOT NULL,
     file_name VARCHAR(256) NOT NULL,
@@ -571,7 +853,8 @@ CREATE TABLE IF NOT EXISTS sys_attachment (
     upload_by BIGINT,
     create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
     deleted TINYINT DEFAULT 0,
-    INDEX idx_attachment_business (business_type, business_id)
+    INDEX idx_attachment_business (business_type, business_id),
+    INDEX idx_attachment_tenant (tenant_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS vendor (
@@ -582,6 +865,10 @@ CREATE TABLE IF NOT EXISTS vendor (
     contact_phone VARCHAR(32),
     contact_email VARCHAR(128),
     address VARCHAR(512),
+    bank_account VARCHAR(50),
+    tax_id VARCHAR(50),
+    password VARCHAR(200),
+    portal_enabled TINYINT DEFAULT 0,
     status INT DEFAULT 1,
     create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
     update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -782,10 +1069,20 @@ PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 
 -- A9: Seed 数据 — 工作流定义管理权限
 INSERT INTO sys_menu (id, menu_name, parent_id, sort_order, path, component, menu_type, perms, icon, visible, status) VALUES
-    (22, '工作流定义', 1, 5, 'workflow-definition', 'system/workflow/index', 'C', 'workflow:definition:list', 'workflow', 1, 1),
+    (22, '工作流定义', 1, 5, 'workflows', 'workflow/WorkflowCenterPage', 'C', 'workflow:definition:query', 'workflow', 1, 1),
     (23, '工作流查询', 22, 1, NULL, NULL, 'F', 'workflow:definition:query', NULL, 1, 1),
     (24, '工作流编辑', 22, 2, NULL, NULL, 'F', 'workflow:definition:edit', NULL, 1, 1)
-ON DUPLICATE KEY UPDATE menu_name = VALUES(menu_name);
+ON DUPLICATE KEY UPDATE
+    menu_name = VALUES(menu_name),
+    parent_id = VALUES(parent_id),
+    sort_order = VALUES(sort_order),
+    path = VALUES(path),
+    component = VALUES(component),
+    menu_type = VALUES(menu_type),
+    perms = VALUES(perms),
+    icon = VALUES(icon),
+    visible = VALUES(visible),
+    status = VALUES(status);
 
 -- A10: SUPER_ADMIN 角色绑定 workflow 菜单节点
 INSERT INTO sys_role_menu (role_id, menu_id) VALUES
@@ -824,6 +1121,9 @@ INSERT INTO sys_menu (id, menu_name, parent_id, sort_order, menu_type, perms, ic
     (108, '分类创建', 106, 2, 'F', 'asset:category:create', NULL, 1, 1),
     (109, '分类编辑', 106, 3, 'F', 'asset:category:edit', NULL, 1, 1),
     (110, '分类删除', 106, 4, 'F', 'asset:category:delete', NULL, 1, 1),
+    (300, 'ABC分类', 100, 3, 'C', 'abc:query', 'layers', 1, 1),
+    (301, 'ABC查询', 300, 1, 'F', 'abc:query', NULL, 1, 1),
+    (302, 'ABC重分类', 300, 2, 'F', 'abc:reclassify', NULL, 1, 1),
     (111, '维修管理', 100, 3, 'C', 'asset:maintenance:query', 'tool', 1, 1),
     (112, '维修查询', 111, 1, 'F', 'asset:maintenance:query', NULL, 1, 1),
     (113, '维修创建', 111, 2, 'F', 'asset:maintenance:create', NULL, 1, 1),
@@ -921,6 +1221,74 @@ INSERT INTO sys_menu (id, menu_name, parent_id, sort_order, menu_type, perms, ic
 
 ON DUPLICATE KEY UPDATE menu_name = VALUES(menu_name);
 
+-- Desktop route metadata used by /menus/current consumers.
+-- Keep this aligned with the React Router paths before switching the sidebar
+-- from static NAV_GROUPS to backend-driven menus.
+UPDATE sys_menu
+SET path = CASE id
+    WHEN 2 THEN 'system/users'
+    WHEN 7 THEN 'system/roles'
+    WHEN 12 THEN 'system/depts'
+    WHEN 17 THEN 'system/menus'
+    WHEN 101 THEN 'assets'
+    WHEN 106 THEN 'categories'
+    WHEN 111 THEN 'maintenance'
+    WHEN 116 THEN 'retirement'
+    WHEN 125 THEN 'inventory'
+    WHEN 130 THEN 'idle'
+    WHEN 136 THEN 'compensation'
+    WHEN 141 THEN 'depreciation'
+    WHEN 144 THEN 'disposals'
+    WHEN 151 THEN 'approvals'
+    WHEN 161 THEN 'workorders'
+    WHEN 171 THEN 'locations'
+    WHEN 176 THEN 'vendors'
+    WHEN 186 THEN 'dashboard'
+    WHEN 188 THEN 'reports'
+    WHEN 190 THEN 'analytics'
+    WHEN 192 THEN 'bigscreen'
+    WHEN 194 THEN 'audit'
+    WHEN 201 THEN 'notifications'
+    WHEN 206 THEN 'settings/sysconfig'
+    WHEN 212 THEN 'maintenance/execution'
+    WHEN 300 THEN 'inventory/abc-classification'
+    ELSE path
+END,
+component = CASE id
+    WHEN 2 THEN 'system/UserManagement'
+    WHEN 7 THEN 'system/RoleManagement'
+    WHEN 12 THEN 'system/DeptManagement'
+    WHEN 17 THEN 'system/MenuManagement'
+    WHEN 101 THEN 'asset/AssetListPage'
+    WHEN 106 THEN 'category/CategoryManagerPage'
+    WHEN 111 THEN 'maintenance/MaintenancePage'
+    WHEN 116 THEN 'retirement/RetirementListPage'
+    WHEN 125 THEN 'inventory/InventoryTasksPage'
+    WHEN 130 THEN 'idle/IdleAssetsPage'
+    WHEN 136 THEN 'disposal/AssetCompensationFormPage'
+    WHEN 141 THEN 'depreciation/DepreciationListPage'
+    WHEN 144 THEN 'disposal/DisposalListPage'
+    WHEN 151 THEN 'approval/ApprovalListPage'
+    WHEN 161 THEN 'workorder/WorkOrderFormPage'
+    WHEN 171 THEN 'locations/LocationsPage'
+    WHEN 176 THEN 'vendors/VendorsPage'
+    WHEN 186 THEN 'dashboard/DashboardPage'
+    WHEN 188 THEN 'reports/ReportsPage'
+    WHEN 190 THEN 'analytics/AnalyticsPage'
+    WHEN 192 THEN 'bigscreen/BigScreenPage'
+    WHEN 194 THEN 'audit/AuditDashboardPage'
+    WHEN 201 THEN 'notifications/NotificationsPage'
+    WHEN 206 THEN 'settings/SettingsPage'
+    WHEN 212 THEN 'maintenance/execution/MaintenanceExecutionPage'
+    WHEN 300 THEN 'inventory/ABCClassificationPage'
+    ELSE component
+END
+WHERE id IN (
+    2, 7, 12, 17,
+    101, 106, 111, 116, 125, 130, 136, 141, 144, 151, 161, 171, 176,
+    186, 188, 190, 192, 194, 201, 206, 212, 300
+);
+
 -- SUPER_ADMIN 角色绑定所有业务菜单节点 (role_id=1)
 INSERT INTO sys_role_menu (role_id, menu_id) VALUES
     (1, 100),
@@ -934,6 +1302,9 @@ INSERT INTO sys_role_menu (role_id, menu_id) VALUES
     (1, 108),
     (1, 109),
     (1, 110),
+    (1, 300),
+    (1, 301),
+    (1, 302),
     (1, 111),
     (1, 112),
     (1, 113),
@@ -1043,3 +1414,18 @@ ON DUPLICATE KEY UPDATE menu_name = VALUES(menu_name);
 INSERT INTO sys_role_menu (role_id, menu_id) VALUES
     (1, 30), (1, 31), (1, 32), (1, 33), (1, 34)
 ON DUPLICATE KEY UPDATE menu_id = VALUES(menu_id);
+
+-- A12: 循环盘点 ABC 分类规则表（真实 E2E / schema.sql 初始化需要）
+CREATE TABLE IF NOT EXISTS cycle_count_rule (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    classification VARCHAR(8) NOT NULL COMMENT 'A/B/C/CATEGORY',
+    frequency VARCHAR(16) NOT NULL COMMENT 'MONTHLY/QUARTERLY/YEARLY',
+    category_ids TEXT COMMENT '适用分类ID(JSON数组)',
+    min_value DECIMAL(14,2) COMMENT '最小价值',
+    max_value DECIMAL(14,2) COMMENT '最大价值',
+    tenant_id VARCHAR(64) NOT NULL,
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+    update_time DATETIME DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+    deleted TINYINT DEFAULT 0,
+    INDEX idx_ccr_tenant (tenant_id, deleted)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='循环盘点ABC分类规则表';

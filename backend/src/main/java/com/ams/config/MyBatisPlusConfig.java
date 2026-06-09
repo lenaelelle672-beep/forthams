@@ -10,6 +10,7 @@ import com.ams.mapper.SysRoleDeptMapper;
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.DataPermissionInterceptor;
+import com.baomidou.mybatisplus.extension.plugins.inner.OptimisticLockerInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.TenantLineInnerInterceptor;
 import net.sf.jsqlparser.expression.Expression;
@@ -28,7 +29,7 @@ import java.util.List;
  * <p>blast_radius（AR-6 注释）：</p>
  * <ul>
  *   <li>本类位于 {@code backend/src/main/java/com/ams/config/MyBatisPlusConfig.java}（大写 B，Java 严格区分大小写）</li>
- *   <li>仅追加 TenantLineInnerInterceptor + 白名单 + 顺序注释，<strong>不删改</strong>现有 DataPermissionInterceptor / PaginationInnerInterceptor</li>
+ *   <li>保留 OptimisticLocker / DataPermission / Pagination / TenantLine 拦截器链</li>
  *   <li>所有 SQL 自动追加 {@code WHERE tenant_id = ?}；白名单表（location / asset_category / sys_* / qrtz_* 等）保持原行为</li>
  *   <li>与 AssetService 手写 {@code .eq(Asset::getTenantId, TenantContext.requireTenantId())} 共存 1-2 迭代作双重保险（RR-1 低危）</li>
  * </ul>
@@ -43,6 +44,7 @@ public class MyBatisPlusConfig {
     private static final List<String> TENANT_IGNORE_TABLES = Arrays.asList(
             "flyway_schema_history",
             "sys_config",
+            "sys_tenant",
             "sys_menu",
             "sys_role",
             "sys_role_menu",
@@ -65,9 +67,10 @@ public class MyBatisPlusConfig {
             "asset_category",
             "notification",
             "manufacturer",
-            "workflow_definition",
-            "workflow_instance",
-            "workflow_task",
+            "vendor",
+            "contract",
+            "workflow_node",
+            "workflow_edge",
             "bpm_mail_config",
             // CTE 派生表（location 树递归查询）— MyBatis-Plus 拦截器对派生表追加 WHERE 时会失败
             "cte",
@@ -79,6 +82,7 @@ public class MyBatisPlusConfig {
      *
      * <p><strong>顺序（关键 — 不可调整）</strong>：</p>
      * <ol>
+     *   <li>OptimisticLockerInnerInterceptor：乐观锁 — 先补齐 {@code @Version} 更新参数</li>
      *   <li>DataPermissionInterceptor：数据权限（部门/角色）— 先于租户过滤，
      *       让 dept_id IN (...) 也能正常拼装，避免被租户拦截器当作外键条件截断</li>
      *   <li>PaginationInnerInterceptor：分页</li>
@@ -96,18 +100,20 @@ public class MyBatisPlusConfig {
         MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
         AmsDataPermissionHandler handler = new AmsDataPermissionHandler(
                 decisionService, tableRegistry, deptMapper, roleMapper, sysRoleDeptMapper);
-        // 1) 数据权限：先于租户过滤
+        // 1) 乐观锁：为 @Version 实体补齐 MP_OPTLOCK_VERSION_ORIGINAL 参数
+        interceptor.addInnerInterceptor(new OptimisticLockerInnerInterceptor());
+        // 2) 数据权限：先于租户过滤
         interceptor.addInnerInterceptor(new DataPermissionInterceptor(handler));
-        // 2) 分页
+        // 3) 分页
         interceptor.addInnerInterceptor(new PaginationInnerInterceptor(DbType.MYSQL));
-        // 3) 多租户：MyBatis-Plus 文档建议 TenantLineInnerInterceptor 放最内层
+        // 4) 多租户：MyBatis-Plus 文档建议 TenantLineInnerInterceptor 放最内层
         interceptor.addInnerInterceptor(buildTenantLineInnerInterceptor());
         return interceptor;
     }
 
     /**
      * 构建 TenantLineInnerInterceptor：从 TenantContext 读 tenantId，白名单表放行，
-     * insert 阶段允许 Service 层显式 setTenantId（避免重复注入）。
+     * insert 阶段仅在 Service 层显式写入 tenant_id 列时跳过自动注入。
      *
      * <p><strong>关键约束（CTE 派生表处理）</strong>：{@code @Select} 注解的 {@code WITH RECURSIVE cte} SQL
      * 会被 jsqlparser 解析为派生表 MyBatis-Plus TenantLineInnerInterceptor 会向其追加
@@ -157,8 +163,9 @@ public class MyBatisPlusConfig {
 
             @Override
             public boolean ignoreInsert(List<Column> columns, String tenantIdColumn) {
-                // 允许 Service 层在 insert 前显式 setTenantId，拦截器不再自动注入
-                return TenantContext.hasTenantId();
+                // 已显式包含 tenant_id 时避免重复注入；否则由拦截器从 TenantContext 自动填充。
+                return columns != null && columns.stream()
+                        .anyMatch(column -> tenantIdColumn.equalsIgnoreCase(column.getColumnName()));
             }
         });
     }

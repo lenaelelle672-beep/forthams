@@ -36,7 +36,7 @@ public class SecurityConfig {
     private final UserDetailsService userDetailsService;
     private final SsoSuccessHandler ssoSuccessHandler;
 
-    @Value("${CORS_ALLOWED_ORIGINS:http://localhost:5173}")
+    @Value("${CORS_ALLOWED_ORIGINS:http://localhost:5173,http://127.0.0.1:5173}")
     private String corsAllowedOrigins;
 
     @Bean
@@ -47,6 +47,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
                     "/auth/login", "/auth/register", "/auth/logout",
+                    "/vendor-portal/**",
                     "/public/**", "/health", "/system/health", "/system/info",
                     "/oauth2-mock/**", "/sso/**",
                     "/api-docs/**", "/swagger-ui/**"
@@ -82,7 +83,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         // 从 @Value 注入的 corsAllowedOrigins 读取，支持逗号分隔多域名
-        // 默认值 http://localhost:5173 用于开发环境
+        // 默认值覆盖 localhost 与 127.0.0.1 两种常见开发入口
         String[] origins = Arrays.stream(corsAllowedOrigins.split(","))
                 .map(String::trim)
                 .toArray(String[]::new);
