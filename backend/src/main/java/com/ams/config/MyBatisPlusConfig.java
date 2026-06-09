@@ -60,6 +60,13 @@ public class MyBatisPlusConfig {
             "sys_log",
             "sys_operate_log",
             "sys_login_log",
+            "sys_permission",
+            "sys_oauth_config",
+            "sys_webhook_config",
+            "sys_channel_config",
+            "sys_custom_field",
+            "sys_custom_fieldset",
+            "sys_custom_fieldset_field",
             "qrtz_*",
             "schedule_job",
             "schedule_job_log",
@@ -72,6 +79,7 @@ public class MyBatisPlusConfig {
             "workflow_node",
             "workflow_edge",
             "bpm_mail_config",
+            "bpm_mail_variable",
             // CTE 派生表（location 树递归查询）— MyBatis-Plus 拦截器对派生表追加 WHERE 时会失败
             "cte",
             "recursive_cte"
@@ -154,7 +162,7 @@ public class MyBatisPlusConfig {
                 }
                 String lower = tableName.toLowerCase();
                 for (String ignore : TENANT_IGNORE_TABLES) {
-                    if (lower.equals(ignore) || lower.startsWith(ignore.replace("*", ""))) {
+                    if (lower.equals(ignore) || (ignore.contains("*") && lower.startsWith(ignore.replace("*", "")))) {
                         return true;
                     }
                 }

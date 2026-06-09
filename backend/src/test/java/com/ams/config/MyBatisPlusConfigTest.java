@@ -87,9 +87,20 @@ class MyBatisPlusConfigTest {
         assertTrue(handler.ignoreTable("contract"));
         assertTrue(handler.ignoreTable("workflow_node"));
         assertTrue(handler.ignoreTable("workflow_edge"));
+        assertTrue(handler.ignoreTable("sys_permission"));
+        assertTrue(handler.ignoreTable("sys_oauth_config"));
+        assertTrue(handler.ignoreTable("sys_webhook_config"));
+        assertTrue(handler.ignoreTable("sys_channel_config"));
+        assertTrue(handler.ignoreTable("sys_custom_field"));
+        assertTrue(handler.ignoreTable("sys_custom_fieldset"));
+        assertTrue(handler.ignoreTable("sys_custom_fieldset_field"));
+        assertTrue(handler.ignoreTable("bpm_mail_variable"));
         assertFalse(handler.ignoreTable("asset"));
         assertFalse(handler.ignoreTable("work_order"));
         assertFalse(handler.ignoreTable("workflow_definition"));
+        assertFalse(handler.ignoreTable("purchase_order"));
+        assertFalse(handler.ignoreTable("asset_usage_log"));
+        assertFalse(handler.ignoreTable("sys_custom_field_value"));
     }
 
     @Test
