@@ -1,5 +1,22 @@
 # goon.md — 交接笔记（Cowork → Claude Code）
 
+## 2026-06-09 20:22 最新状态（Codex GAI2 数据库启动策略收敛）
+
+### 当前事实
+- 已新增提交 `743c32f7f fix: make database bootstrap explicit`：后端默认不再在 Spring Boot 启动时执行完整 `schema.sql`，`spring.sql.init.mode` 改为 `${SQL_INIT_MODE:never}`，如需本地一次性初始化可显式设置 `SQL_INIT_MODE=always`。
+- `application.yml` 去掉 `DB_PASSWORD:root` 弱默认，与 `application.properties` 的空默认保持一致；`ApplicationConfigValidator` 仍要求运行时注入 `DB_PASSWORD` 与 `JWT_SECRET`。
+- `backend/src/main/resources/migration/README.md` 已改为当前真实策略：迁移脚本按 Flyway 风格保存，但应用默认关闭 SQL init 和 Flyway 自动迁移；Docker fresh install 由 MySQL 容器挂载 `schema.sql` 初始化，已有环境升级由部署流程/DBA/CI 手动编排。
+
+### 最新验证
+- `git diff --check` 通过。
+- 后端 `mvn test` 通过，`580` 个测试通过，0 failure/error/skip。
+- test profile 临时启动通过：`SPRING_PROFILES_ACTIVE=test` + 端口 `18082`，`GET /api/health` 返回 `200`。
+- 提交前 `detect_changes(scope=staged)`：`risk_level=low`、`affected_processes=[]`。
+
+### 剩余动作
+- P0：仍需在有 Docker/Nginx 的机器上补原生镜像构建与容器 smoke。
+- P1：`.DS_Store` 与移动端冻结差异仍未处理，保持不提交。
+
 ## 2026-06-09 20:15 最新状态（Codex GAI2 部署闭环继续推进）
 
 ### 当前事实
