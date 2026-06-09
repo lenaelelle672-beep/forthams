@@ -18,6 +18,7 @@
 | WorkOrder/Approval 租户隔离 | `cd backend && env MAVEN_OPTS=-Djdk.attach.allowAttachSelf=true mvn -q -Dtest=WorkOrderServiceTest,ApprovalServiceTest,MyBatisPlusConfigTest test` | 通过 |
 | 主业务租户隔离扩展 | `cd backend && env MAVEN_OPTS=-Djdk.attach.allowAttachSelf=true mvn -q -Dtest=AssetServiceTest,DashboardServiceTest,CompensationServiceTest,IdleAssetServiceTest,StocktakingServiceTest test` | 通过 |
 | TenantLine SQL 防漏 | `cd backend && env MAVEN_OPTS=-Djdk.attach.allowAttachSelf=true mvn -q -Dtest=MyBatisPlusConfigTest,TenantSchemaConsistencyTest test` | 通过；覆盖 MyBatis-Plus 拦截器顺序、租户白名单、字符串 tenantId、缺租户显式拒绝 |
+| 异步任务配置 | `cd backend && env MAVEN_OPTS=-Djdk.attach.allowAttachSelf=true mvn -q -Dtest=AsyncConfigTest test` | 通过；覆盖通知线程池与邮件线程池 Bean，防止 `@Async("mailTaskExecutor")` 运行期缺 Bean |
 | 前端覆盖率门禁 | `cd frontend && npm run test:coverage -- --run` | 89 个测试文件，883 个测试通过；All files statements/lines 93.91%，branches 86.77%，functions 91.17%，通过全局阈值 |
 | 前端安全审计 | `cd frontend && npm audit --audit-level=high` | 0 vulnerabilities |
 | Node 版本 | `cd frontend && node -v` | `v22.22.2`，满足 `.nvmrc`、`frontend/package.json engines.node` 和 `happy-dom@20.9.0` 的 Node `>=20` 要求 |
@@ -68,3 +69,5 @@
 本轮新增若依操作日志覆盖：资产新增/修改/删除、资产导入/导出、折旧计算、工单新增/修改/删除/提交/审批/挂起/验收等主业务写操作已接入 `@OperLog`；真实后端 E2E profile 开启 `ams.oper-log.enabled=true`，并断言“资产新增”“折旧计算”可从 `/audit-logs` 查询到 `sys_operate_log` 落库记录。
 
 本轮补强多租户 SQL 防漏：`TenantLineInnerInterceptor` 对租户业务表缺少 TenantContext 的 SQL 改为显式拒绝，不再生成 `tenant_id = ''` 的静默空结果；后端全量 598 个测试通过，真实后端 E2E 9 个测试通过。
+
+本轮补齐异步邮件执行器：`AsyncConfig` 新增 `mailTaskExecutor`，与 `EmailServiceImpl` 中的 `@Async("mailTaskExecutor")` 保持一致，避免邮件发送链路运行期找不到 executor Bean；新增 `AsyncConfigTest` 锁定通知与邮件线程池配置。

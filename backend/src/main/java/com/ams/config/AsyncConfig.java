@@ -23,11 +23,23 @@ public class AsyncConfig {
      */
     @Bean(name = "notificationExecutor")
     public Executor notificationExecutor() {
+        return buildExecutor("notification-");
+    }
+
+    /**
+     * 邮件发送专用线程池
+     */
+    @Bean(name = "mailTaskExecutor")
+    public Executor mailTaskExecutor() {
+        return buildExecutor("mail-");
+    }
+
+    private Executor buildExecutor(String threadNamePrefix) {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(2);
         executor.setMaxPoolSize(5);
         executor.setQueueCapacity(50);
-        executor.setThreadNamePrefix("notification-");
+        executor.setThreadNamePrefix(threadNamePrefix);
         executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
         executor.setWaitForTasksToCompleteOnShutdown(true);
         executor.setAwaitTerminationSeconds(30);
