@@ -1,8 +1,10 @@
 package com.ams.scheduled;
 
+import com.ams.context.TenantContext;
 import com.ams.entity.Insurance;
 import com.ams.service.InsuranceService;
 import com.ams.service.NotificationService;
+import com.ams.service.TenantService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -25,6 +27,7 @@ public class InsuranceExpiryTask {
 
     private final InsuranceService insuranceService;
     private final NotificationService notificationService;
+    private final TenantService tenantService;
 
     /**
      * 每天早上 8 点执行一次
@@ -32,6 +35,21 @@ public class InsuranceExpiryTask {
     @Scheduled(cron = "0 0 8 * * ?")
     public void scanExpiringPolicies() {
         log.info("[InsuranceExpiryTask] 开始扫描即将到期保单...");
+        int totalChecked = 0;
+        for (String tenantId : tenantService.getActiveTenantIds()) {
+            try {
+                TenantContext.setTenantId(tenantId);
+                totalChecked += scanExpiringPoliciesForCurrentTenant();
+            } catch (Exception e) {
+                log.error("[InsuranceExpiryTask] 租户 {} 保单到期扫描失败: {}", tenantId, e.getMessage(), e);
+            } finally {
+                TenantContext.clear();
+            }
+        }
+        log.info("[InsuranceExpiryTask] 扫描完成，共检查 {} 条保单", totalChecked);
+    }
+
+    private int scanExpiringPoliciesForCurrentTenant() {
         List<Insurance> expiringPolicies = insuranceService.getExpiringPolicies(30);
         LocalDate today = LocalDate.now();
 
@@ -60,6 +78,6 @@ public class InsuranceExpiryTask {
                 log.error("[InsuranceExpiryTask] 处理保单 {} 提醒时出错: {}", policy.getPolicyNo(), e.getMessage(), e);
             }
         }
-        log.info("[InsuranceExpiryTask] 扫描完成，共检查 {} 条保单", expiringPolicies.size());
+        return expiringPolicies.size();
     }
 }

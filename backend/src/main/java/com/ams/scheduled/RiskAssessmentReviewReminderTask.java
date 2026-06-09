@@ -1,8 +1,10 @@
 package com.ams.scheduled;
 
+import com.ams.context.TenantContext;
 import com.ams.entity.RiskAssessment;
 import com.ams.service.RiskAssessmentService;
 import com.ams.service.NotificationService;
+import com.ams.service.TenantService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -25,6 +27,7 @@ public class RiskAssessmentReviewReminderTask {
 
     private final RiskAssessmentService riskAssessmentService;
     private final NotificationService notificationService;
+    private final TenantService tenantService;
 
     /**
      * 每天早上 8 点执行一次
@@ -34,6 +37,26 @@ public class RiskAssessmentReviewReminderTask {
     public void scanUpcomingReviews() {
         log.info("[RiskAssessmentReviewReminderTask] 开始扫描即将到期的风险评估评审...");
 
+        int totalChecked = 0;
+        int totalSent = 0;
+        for (String tenantId : tenantService.getActiveTenantIds()) {
+            try {
+                TenantContext.setTenantId(tenantId);
+                ReminderScanResult result = scanUpcomingReviewsForCurrentTenant();
+                totalChecked += result.checked();
+                totalSent += result.sent();
+            } catch (Exception e) {
+                log.error("[RiskAssessmentReviewReminderTask] 租户 {} 风险评审扫描失败: {}", tenantId, e.getMessage(), e);
+            } finally {
+                TenantContext.clear();
+            }
+        }
+
+        log.info("[RiskAssessmentReviewReminderTask] 扫描完成，共检查 {} 条风险评估，发送 {} 条提醒",
+                totalChecked, totalSent);
+    }
+
+    private ReminderScanResult scanUpcomingReviewsForCurrentTenant() {
         try {
             // 查询30天内需要评审的风险评估
             LocalDate today = LocalDate.now();
@@ -83,9 +106,14 @@ public class RiskAssessmentReviewReminderTask {
 
             log.info("[RiskAssessmentReviewReminderTask] 扫描完成，共检查 {} 条风险评估，发送 {} 条提醒",
                     upcomingReviews.size(), sentCount);
+            return new ReminderScanResult(upcomingReviews.size(), sentCount);
 
         } catch (Exception e) {
             log.error("[RiskAssessmentReviewReminderTask] 扫描过程出错: {}", e.getMessage(), e);
+            return new ReminderScanResult(0, 0);
         }
+    }
+
+    private record ReminderScanResult(int checked, int sent) {
     }
 }

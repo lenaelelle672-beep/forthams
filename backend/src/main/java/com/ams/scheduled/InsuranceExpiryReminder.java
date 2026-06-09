@@ -1,8 +1,10 @@
 package com.ams.scheduled;
 
+import com.ams.context.TenantContext;
 import com.ams.entity.Insurance;
 import com.ams.service.InsuranceService;
 import com.ams.service.NotificationService;
+import com.ams.service.TenantService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -18,13 +20,23 @@ import java.util.Map;
 public class InsuranceExpiryReminder {
     private final InsuranceService insuranceService;
     private final NotificationService notificationService;
+    private final TenantService tenantService;
 
     @Scheduled(cron = "0 0 8 * * ?")
     public void checkExpiringInsurances() {
         log.info("开始检查即将到期的保险...");
-        sendExpiryReminders(30);
-        sendExpiryReminders(15);
-        sendExpiryReminders(7);
+        for (String tenantId : tenantService.getActiveTenantIds()) {
+            try {
+                TenantContext.setTenantId(tenantId);
+                sendExpiryReminders(30);
+                sendExpiryReminders(15);
+                sendExpiryReminders(7);
+            } catch (Exception e) {
+                log.error("租户 {} 保险到期检查失败: {}", tenantId, e.getMessage(), e);
+            } finally {
+                TenantContext.clear();
+            }
+        }
         log.info("保险到期检查完成");
     }
 
