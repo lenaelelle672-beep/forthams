@@ -6,8 +6,8 @@ WORKDIR /app
 # 复制 package 文件
 COPY frontend/package*.json ./
 
-# 安装依赖
-RUN npm ci --only=production
+# 安装完整构建依赖；Vite 与插件位于 devDependencies，生产镜像只复制 dist。
+RUN npm ci
 
 # 复制源代码
 COPY frontend/ ./
