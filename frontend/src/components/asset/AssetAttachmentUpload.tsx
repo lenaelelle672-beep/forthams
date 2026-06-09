@@ -63,6 +63,20 @@ function ImagePreview({ src, alt, fileType }: { src: string; alt: string; fileTy
   );
 }
 
+export function resolveAssetAttachmentUrl(attachment: Pick<AssetAttachment, 'id' | 'filePath'>): string {
+  const filePath = attachment.filePath?.trim();
+  if (!filePath) {
+    return `/api/file/${attachment.id}`;
+  }
+  if (/^(https?:)?\/\//.test(filePath) || filePath.startsWith('data:') || filePath.startsWith('blob:')) {
+    return filePath;
+  }
+  if (filePath.startsWith('/api/file/')) {
+    return filePath;
+  }
+  return `/api/file/${filePath.replace(/^\/+/, '')}`;
+}
+
 /** 格式化文件大小 */
 function formatFileSize(bytes: number): string {
   if (bytes === 0) return '0 B';
@@ -152,8 +166,7 @@ export default function AssetAttachmentUpload({ assetId, readOnly = false }: Ass
    * 图片预览：在新标签页中打开完整图片 URL。
    */
   const previewImage = (attachment: AssetAttachment) => {
-    const fullUrl = `${import.meta.env.VITE_API_BASE_URL}${attachment.filePath}`;
-    window.open(fullUrl, '_blank');
+    window.open(resolveAssetAttachmentUrl(attachment), '_blank');
   };
 
   // ── 加载态 ──
@@ -234,7 +247,7 @@ export default function AssetAttachmentUpload({ assetId, readOnly = false }: Ass
               >
                 {isImage(att.fileType) ? (
                   <ImagePreview
-                    src={`${import.meta.env.VITE_API_BASE_URL}${att.filePath}`}
+                    src={resolveAssetAttachmentUrl(att)}
                     alt={att.fileName}
                     fileType={att.fileType}
                   />
