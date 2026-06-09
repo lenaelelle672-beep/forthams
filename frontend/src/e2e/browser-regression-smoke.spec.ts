@@ -174,6 +174,35 @@ test.describe('浏览器回归 smoke', () => {
     expect(errors).toEqual([]);
   });
 
+  test('/workflows 仅查询权限账号进入只读模式', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+
+    await page.goto('/');
+    await page.evaluate((user) => {
+      window.localStorage.setItem('auth_token', 'browser-regression-smoke-token');
+      window.localStorage.setItem('user_info', JSON.stringify(user));
+      window.sessionStorage.setItem('auth_token', 'browser-regression-smoke-token');
+      window.sessionStorage.setItem('user_info', JSON.stringify(user));
+    }, {
+      userId: 2,
+      username: 'readonly',
+      realName: '只读用户',
+      roles: ['USER'],
+      permissions: ['workflow:definition:query'],
+    });
+
+    await page.goto('/workflows');
+    await page.waitForLoadState('networkidle');
+
+    await expect(page.getByText('当前账号只有流程查看权限，无法新建、发布或编辑流程。')).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByRole('button', { name: /新建流程/ })).toBeDisabled();
+    await expect(page.getByRole('button', { name: /打开设计器/ })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: /发布流程|重新发布|停用流程|创建并发布默认流程/ })).toHaveCount(0);
+    expect(workflowDraftSaveCount).toBe(0);
+    await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
+    expect(errors).toEqual([]);
+  });
+
   test('模块验收 smoke：资产、处置、报表和工单详情路径可交互', async ({ page }) => {
     const errors = collectBrowserErrors(page);
 

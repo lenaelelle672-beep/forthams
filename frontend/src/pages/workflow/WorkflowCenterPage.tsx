@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState, useRef } from 'react';
 import { useNavigate } from 'react-router';
 import { workflowApi, type WorkflowDefinitionDTO } from '@/api/workflow';
 import { businessFlowOptions, getDraftStorageKey, isBusinessType, isCustomBusinessType } from '@/constants/workflowBusiness';
+import { useAuth, type AuthUser } from '@/context/AuthContext';
 import { initialFlowNodes, initialFlowEdges } from '@/types/flow';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
@@ -75,8 +76,18 @@ const FILTER_PILL_BASE = 'rounded-full border px-3.5 py-1.5 text-xs font-semibol
 const FILTER_PILL_ACTIVE = 'border-blue-600 bg-blue-600 text-white shadow-sm';
 const FILTER_PILL_INACTIVE = 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50';
 
+function canEditWorkflowDefinitions(user: AuthUser | null) {
+  if (!user) return true;
+  const roles = user.roles ?? [];
+  if (roles.some((role) => ['ADMIN', 'SUPER_ADMIN'].includes(role.toUpperCase()))) return true;
+  const permissions = user.permissions ?? [];
+  if (permissions.length === 0) return true;
+  return permissions.includes('*') || permissions.includes('*:*:*') || permissions.includes('workflow:definition:edit');
+}
+
 export default function WorkflowCenterPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [defs, setDefs] = useState<WorkflowDefinitionDTO[]>([]);
   const [loading, setLoading] = useState(true);
   const [msg, setMsg] = useState<string | null>(null);
@@ -91,6 +102,7 @@ export default function WorkflowCenterPage() {
   const [activeFilter, setActiveFilter] = useState<'all' | 'PUBLISHED' | 'DRAFT' | 'DISABLED'>('all');
   const [deleteTarget, setDeleteTarget] = useState<{ businessType: string; name: string } | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const canEditWorkflow = useMemo(() => canEditWorkflowDefinitions(user), [user]);
 
   const load = async () => {
     try {
@@ -224,13 +236,15 @@ export default function WorkflowCenterPage() {
               <div className="relative" ref={dropdownRef}>
                 <Button
                   type="button"
+                  disabled={!canEditWorkflow}
+                  title={!canEditWorkflow ? '缺少 workflow:definition:edit 权限' : undefined}
                   onClick={() => setShowNewDropdown((v) => !v)}
                 >
                   <Plus className="h-4 w-4" />
                   新建流程
                   <ChevronDown className={`h-3 w-3 transition-transform ${showNewDropdown ? 'rotate-180' : ''}`} />
                 </Button>
-                {showNewDropdown && (
+                {canEditWorkflow && showNewDropdown && (
                   <div className="absolute right-0 top-full z-50 mt-2 w-64 rounded-xl border border-[var(--surface-border)] bg-white py-2 shadow-[var(--shadow-card-hover)]">
                     <div className="px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-gray-400">从模板创建</div>
                     {businessFlowOptions.map((f) => (
@@ -341,6 +355,7 @@ export default function WorkflowCenterPage() {
                 className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
                 onClick={async () => {
                   if (!customCode.trim()) return;
+                  if (!canEditWorkflow) return;
                   setCreating(true);
                   try {
                     setErr(null);
@@ -433,6 +448,11 @@ export default function WorkflowCenterPage() {
           <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 flex items-center justify-between gap-2 animate-in fade-in slide-in-from-top-1 duration-300">
             <span className="truncate">{err}</span>
             <button type="button" onClick={() => setErr(null)} className="text-amber-500 hover:text-amber-700 flex-shrink-0"><X className="h-4 w-4" /></button>
+          </div>
+        )}
+        {!canEditWorkflow && (
+          <div className="rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800">
+            当前账号只有流程查看权限，无法新建、发布或编辑流程。
           </div>
         )}
 
@@ -580,21 +600,24 @@ export default function WorkflowCenterPage() {
                     {isUnconfigured ? (
                       <button
                         type="button"
+                        disabled={!canEditWorkflow}
                         onClick={() => handlePublish(flow.businessType, flow.name)}
-                        className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 shadow-sm"
+                        className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
                       >
-                        创建并发布默认流程
+                        {canEditWorkflow ? '创建并发布默认流程' : '需要编辑权限'}
                       </button>
                     ) : (
                       <>
-                        <button
-                          type="button"
-                          onClick={() => navigate(`/workflow-designer?businessType=${flow.businessType}`)}
-                          className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700 shadow-sm"
-                        >
-                          打开设计器
-                          <ArrowRight className="h-4 w-4" />
-                        </button>
+                        {canEditWorkflow && (
+                          <button
+                            type="button"
+                            onClick={() => navigate(`/workflow-designer?businessType=${flow.businessType}`)}
+                            className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700 shadow-sm"
+                          >
+                            打开设计器
+                            <ArrowRight className="h-4 w-4" />
+                          </button>
+                        )}
                         {(flow.formPath || (flow.isCustom && flow.server?.definition && (flow.server.definition as Record<string, unknown>)?.formSource)) ? (
                           <button
                             type="button"
@@ -603,7 +626,7 @@ export default function WorkflowCenterPage() {
                           >
                             查看业务表单
                           </button>
-                        ) : flow.isCustom && (
+                        ) : flow.isCustom && canEditWorkflow && (
                           <button
                             type="button"
                             onClick={() => navigate(`/workflow-designer?businessType=${flow.businessType}`)}
@@ -612,7 +635,7 @@ export default function WorkflowCenterPage() {
                             配置表单源码
                           </button>
                         )}
-                        {!isDisabled && (
+                        {canEditWorkflow && !isDisabled && (
                           <button
                             type="button"
                             onClick={() => handlePublish(flow.businessType, flow.name)}
@@ -621,7 +644,7 @@ export default function WorkflowCenterPage() {
                             {isDraft ? '发布流程' : '重新发布'}
                           </button>
                         )}
-                        {flow.server && flow.server.version > 0 && (
+                        {canEditWorkflow && flow.server && flow.server.version > 0 && (
                           <button
                             type="button"
                             onClick={() => handleToggle(flow.businessType, flow.name, isDisabled)}
@@ -630,7 +653,7 @@ export default function WorkflowCenterPage() {
                             {isDisabled ? '启用流程' : '停用流程'}
                           </button>
                         )}
-                        {(isDisabled || isDraft) && flow.isCustom && (
+                        {canEditWorkflow && (isDisabled || isDraft) && flow.isCustom && (
                           <button
                             type="button"
                             onClick={() => setDeleteTarget({ businessType: flow.businessType, name: flow.name })}
