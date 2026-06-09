@@ -1,11 +1,10 @@
 /**
  * @file api/barcode.ts
  * @description 条码/QR 码管理 API
- * 对应后端：BarcodeController (/api/barcodes)
+ * 对应后端：BarcodeController (/barcodes)，由统一 HTTP baseURL 提供 /api 前缀
  */
 
 import http from '@/utils/http';
-import type { ApiResponse } from '@/types/common';
 
 /** 标签数据（QR码 base64 + 资产信息） */
 export interface AssetLabel {
@@ -22,16 +21,16 @@ export interface AssetLabel {
 
 /** 获取资产 QR 码 PNG（返回 blob） */
 export const getAssetQrCode = (assetId: number) =>
-  http.get<Blob>(`/api/barcodes/asset/${assetId}`, { responseType: 'blob' });
+  http.get<Blob>(`/barcodes/asset/${assetId}`, { responseType: 'blob' });
 
 /** 获取资产标签数据（JSON: qrBase64 + assetInfo） */
 export const getAssetLabel = (assetId: number) =>
-  http.get<ApiResponse<AssetLabel>>(`/api/barcodes/asset/${assetId}/label`);
+  http.get<AssetLabel>(`/barcodes/asset/${assetId}/label`);
 
 /** 获取资产标签图片 PNG（返回 blob） */
 export const getAssetLabelImage = (assetId: number) =>
-  http.get<Blob>(`/api/barcodes/asset/${assetId}/label-image`, { responseType: 'blob' });
+  http.get<Blob>(`/barcodes/asset/${assetId}/label-image`, { responseType: 'blob' });
 
 /** 批量生成资产标签 */
 export const batchGenerateLabels = (assetIds: number[]) =>
-  http.post<ApiResponse<AssetLabel[]>>('/api/barcodes/batch', { assetIds });
+  http.post<AssetLabel[]>('/barcodes/batch', { assetIds });

@@ -50,7 +50,7 @@ export default function SparePartListPage() {
     placeholderData: (p) => p,
   });
 
-  const pageData = (res as any)?.data as PageData<SparePart> | undefined;
+  const pageData: PageData<SparePart> | undefined = res;
   const records = pageData?.records ?? [];
   const total = pageData?.total ?? 0;
 

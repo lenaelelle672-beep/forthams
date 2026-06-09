@@ -31,14 +31,14 @@ export default function BorrowFormPage() {
   const [purpose, setPurpose] = useState('');
   const [remark, setRemark] = useState('');
   const [loading, setLoading] = useState(false);
+  const assets = assetsRes?.records ?? [];
 
   React.useEffect(() => {
     if (detailRes) {
-      const item = (detailRes as any)?.data || detailRes;
-      setAssetId(item.assetId || '');
-      setExpectedReturnDate(item.expectedReturnDate || '');
-      setPurpose(item.purpose || '');
-      setRemark(item.remark || '');
+      setAssetId(detailRes.assetId || '');
+      setExpectedReturnDate(detailRes.expectedReturnDate || '');
+      setPurpose(detailRes.purpose || '');
+      setRemark(detailRes.remark || '');
     }
   }, [detailRes]);
 
@@ -76,7 +76,7 @@ export default function BorrowFormPage() {
               <select className="w-full px-3 py-2 text-sm border border-[#e5e7eb] rounded-lg bg-white"
                 value={assetId} onChange={(e) => setAssetId(e.target.value ? Number(e.target.value) : '')} disabled={isEdit}>
                 <option value="">请选择资产</option>
-                {(assetsRes as any)?.records?.map((a: any) => (
+                {assets.map((a) => (
                   <option key={a.id} value={a.id}>{a.assetNo} - {a.assetName}</option>
                 ))}
               </select>

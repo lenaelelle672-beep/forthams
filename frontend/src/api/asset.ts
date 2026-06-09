@@ -7,10 +7,7 @@
  */
 
 import http from '@/utils/http';
-import type {
-  ApiResponse,
-  PaginatedResponse,
-} from '@/types/common';
+import type { PaginatedResponse } from '@/types/common';
 import type {
   Asset,
   AssetListItem,
@@ -37,19 +34,19 @@ export const getAssetList = (params?: AssetListQuery) =>
 
 /** 获取资产详情 */
 export const getAssetById = (id: number) =>
-  http.get<ApiResponse<Asset>>(`/assets/${id}`);
+  http.get<Asset>(`/assets/${id}`);
 
 /** 新建资产 */
 export const createAsset = (data: CreateAssetRequest) =>
-  http.post<ApiResponse<Asset>>('/assets', data);
+  http.post<Asset>('/assets', data);
 
 /** 更新资产 */
 export const updateAsset = ({ id, ...data }: UpdateAssetRequest) =>
-  http.put<ApiResponse<Asset>>(`/assets/${id}`, data);
+  http.put<Asset>(`/assets/${id}`, data);
 
 /** 删除资产 */
 export const deleteAsset = (id: number) =>
-  http.delete<ApiResponse<void>>(`/assets/${id}`);
+  http.delete<void>(`/assets/${id}`);
 
 // ── 资产批量操作 ──────────────────────────────────────────────────────────────
 
@@ -61,7 +58,7 @@ export const getImportTemplate = () =>
 export const parseImportFile = (file: File) => {
   const formData = new FormData();
   formData.append('file', file);
-  return http.post<ApiResponse<{ parseId: string; rows: unknown[] }>>(
+  return http.post<{ parseId: string; rows: unknown[] }>(
     '/assets/import/parse',
     formData,
     { headers: { 'Content-Type': 'multipart/form-data' } },
@@ -70,7 +67,7 @@ export const parseImportFile = (file: File) => {
 
 /** 确认提交导入（第二步：写入） */
 export const commitImport = (parseId: string, rows: unknown[]) =>
-  http.post<ApiResponse<{ importedCount: number; failedCount: number }>>(
+  http.post<{ importedCount: number; failedCount: number }>(
     '/assets/import/commit',
     { parseId, rows },
   );
@@ -85,25 +82,25 @@ export const exportAssets = (
 
 /** 获取分类树 */
 export const getCategoryTree = () =>
-  http.get<ApiResponse<AssetCategory[]>>('/categories/tree');
+  http.get<AssetCategory[]>('/categories/tree');
 
 /** 新建分类 */
 export const createCategory = (data: { categoryName: string; parentId?: number | null }) =>
-  http.post<ApiResponse<AssetCategory>>('/categories', data);
+  http.post<AssetCategory>('/categories', data);
 
 /** 更新分类 */
 export const updateCategory = (id: number, data: Partial<AssetCategory>) =>
-  http.put<ApiResponse<AssetCategory>>(`/categories/${id}`, data);
+  http.put<AssetCategory>(`/categories/${id}`, data);
 
 /** 删除分类 */
 export const deleteCategory = (id: number) =>
-  http.delete<ApiResponse<void>>(`/categories/${id}`);
+  http.delete<void>(`/categories/${id}`);
 
 // ── 折旧排期 ──────────────────────────────────────────────────────────────────
 
 /** 获取资产折旧排期 */
 export const getDepreciationSchedule = (assetId: number) =>
-  http.get<ApiResponse<DepreciationScheduleItem[]>>(
+  http.get<DepreciationScheduleItem[]>(
     `/assets/${assetId}/depreciation-schedule`,
   );
 

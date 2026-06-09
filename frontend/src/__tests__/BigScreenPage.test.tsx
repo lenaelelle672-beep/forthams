@@ -38,16 +38,12 @@ describe('BigScreenPage', () => {
     });
 
     vi.mocked(http.get).mockResolvedValue({
-      code: 200,
-      message: 'success',
-      data: {
-        totalAssets: 10,
-        inUseAssets: 3,
-        idleAssets: 7,
-        totalValue: 10000,
-        netValue: 8000,
-        pendingApprovals: 1,
-      },
+      totalAssets: 10,
+      inUseAssets: 3,
+      idleAssets: 7,
+      totalValue: 10000,
+      netValue: 8000,
+      pendingApprovals: 1,
     });
 
     renderWithClient(queryClient);

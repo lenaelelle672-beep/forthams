@@ -8,6 +8,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import CommentSection from '@/components/comment/CommentSection';
 import type { BusinessComment } from '@/types/comment';
+import { toast } from 'sonner';
 
 // Mock dependencies
 vi.mock('sonner', () => ({
@@ -30,7 +31,7 @@ vi.mock('@/components/ui/command', () => ({
   ),
 }));
 
-vi.mock('@/app/context/AuthContext', () => ({
+vi.mock('@/context/AuthContext', () => ({
   useAuth: vi.fn(() => ({
     user: {
       userId: 1,
@@ -107,7 +108,8 @@ describe('CommentSection', () => {
 
     await waitFor(() => {
       expect(screen.getByText('测试用户')).toBeInTheDocument();
-      expect(screen.getByText('另一条评论 @testuser')).toBeInTheDocument();
+      expect(screen.getByText('另一个用户')).toBeInTheDocument();
+      expect(screen.getByText('@testuser')).toBeInTheDocument();
     });
   });
 
@@ -143,7 +145,7 @@ describe('CommentSection', () => {
     });
 
     // 点击折叠按钮
-    const collapseButton = screen.getByRole('button');
+    const collapseButton = screen.getByRole('button', { name: '折叠评论' });
     fireEvent.click(collapseButton);
 
     await waitFor(() => {
@@ -208,13 +210,10 @@ describe('CommentSection', () => {
       { wrapper: createWrapper() }
     );
 
-    await waitFor(() => {
-      const submitButton = screen.getByText('发表评论');
-      fireEvent.click(submitButton);
-    });
+    const submitButton = await screen.findByRole('button', { name: '发表评论' });
 
-    // 应该显示警告提示
-    expect(require('sonner').toast.warning).toHaveBeenCalledWith('请输入评论内容');
+    expect(submitButton).toBeDisabled();
+    expect(toast.warning).not.toHaveBeenCalled();
   });
 
   it('应该能够删除自己的评论', async () => {
@@ -235,11 +234,10 @@ describe('CommentSection', () => {
     });
 
     // 找到删除按钮（用户ID为1，评论的userId也为1）
-    const deleteButton = screen.getByRole('button', { name: /删除/ });
-    fireEvent.click(deleteButton);
-
     // 确认对话框
     window.confirm = vi.fn(() => true);
+    const deleteButton = screen.getByRole('button', { name: /删除评论 1/ });
+    fireEvent.click(deleteButton);
 
     await waitFor(() => {
       expect(deleteComment).toHaveBeenCalledWith(1);

@@ -15,7 +15,7 @@ import { RouterProvider } from 'react-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { TooltipProvider } from '@/components/ui/Tooltip';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
-import { AuthProvider } from '@/app/context/AuthContext';
+import { AuthProvider } from '@/context/AuthContext';
 import router from '@/router/index';
 import './styles/index.css';
 

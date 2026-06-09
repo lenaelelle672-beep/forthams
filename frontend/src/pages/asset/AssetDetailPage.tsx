@@ -15,7 +15,7 @@ import { getAssetById, getDepreciationSchedule, deleteAsset, getAssetChildren, g
 import { getAssetTco, getTcoTrend, getTcoCompare } from '@/api/tco';
 import { getAssetAuditLogs, type AuditLog } from '@/api/audit';
 import { AssetStatus, type Asset } from '@/types/asset';
-import type { PageData,  ApiResponse } from '@/types/common';
+import type { PageData } from '@/types/common';
 import type { DepreciationScheduleItem } from '@/types/asset';
 import AssetAttachmentUpload from '@/components/asset/AssetAttachmentUpload';
 import AssetGallery from '@/components/asset/AssetGallery';
@@ -90,7 +90,7 @@ export default function AssetDetailPage() {
 
   const { data: parentRes } = useQuery({
     queryKey: ['asset-parent', id],
-    queryFn: () => getAssetParent(Number(id!)),
+    queryFn: async () => (await getAssetParent(Number(id!))) ?? null,
     enabled: !!id,
   });
   const parentAsset = parentRes && typeof parentRes === 'object' && 'id' in parentRes ? parentRes as Asset : undefined;

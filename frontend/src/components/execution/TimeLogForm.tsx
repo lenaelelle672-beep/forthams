@@ -10,7 +10,6 @@ import { Play, Square, Plus, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import http from '@/utils/http';
-import type { ApiResponse } from '@/types/common';
 
 interface TimeLog {
   id: number;
@@ -36,10 +35,10 @@ export default function TimeLogForm({ workOrderId }: TimeLogFormProps) {
 
   const { data: res } = useQuery({
     queryKey: ['workorder', workOrderId, 'time-logs'],
-    queryFn: () => http.get<ApiResponse<TimeLog[]>>(`/workorders/${workOrderId}/execution/time-logs`),
+    queryFn: () => http.get<TimeLog[]>(`/workorders/${workOrderId}/execution/time-logs`),
   });
 
-  const logs = (res as any)?.data ?? [];
+  const logs = res ?? [];
 
   const startTimerMutation = useMutation({
     mutationFn: () => http.post(`/workorders/${workOrderId}/execution/time-logs`, { startTimer: true }),

@@ -21,7 +21,6 @@ import {
 import type { LucideIcon } from 'lucide-react';
 import { getReportSummary, getReportByCategory, type ReportSummary, type CategoryReport } from '@/api/stats';
 import { exportReportPdf, downloadBlob } from '@/api/reports';
-import type { ApiResponse } from '@/types/common';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { KpiCard } from '@/components/ui/KpiCard';

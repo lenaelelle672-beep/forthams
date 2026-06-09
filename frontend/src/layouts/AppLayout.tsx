@@ -7,9 +7,9 @@
 
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router';
-import { useAuth } from '@/app/context/AuthContext';
+import { useAuth } from '@/context/AuthContext';
 import { useQuery } from '@tanstack/react-query';
-import http from '@/utils/http';
+import { getUnreadCount } from '@/api/notification';
 import {
   LayoutDashboard,
   Package,
@@ -47,6 +47,7 @@ import {
 import GlobalSearch from '@/components/GlobalSearch';
 import { SpatialTimeProvider } from '@/components/shared/SpatialTimeContext';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { canAccessRoute } from '@/utils/routePermissions';
 
 type NavItem = {
   path: string;
@@ -158,11 +159,17 @@ export default function AppLayout() {
 
   // 大屏导航——仅 ADMIN 或 SUPER_ADMIN 角色可见
   const navGroups = useMemo(() => {
-    const groups = [...NAV_GROUPS];
+    const groups = NAV_GROUPS
+      .map((group) => ({
+        ...group,
+        items: group.items.filter((item) => canAccessRoute(item.path, user)),
+      }))
+      .filter((group) => group.items.length > 0);
     if (hasRole('ADMIN') || hasRole('SUPER_ADMIN')) {
+      const systemItems = SYSTEM_NAV_ITEMS.filter((item) => canAccessRoute(item.path, user));
       groups.push({
         group: '系统管理',
-        items: SYSTEM_NAV_ITEMS,
+        items: systemItems,
       });
       groups.push({
         group: '大屏',
@@ -173,7 +180,12 @@ export default function AppLayout() {
       });
     }
     return groups;
-  }, [hasRole]);
+  }, [hasRole, user]);
+
+  const bottomItems = useMemo(
+    () => NAV_BOTTOM_ITEMS.filter((item) => canAccessRoute(item.path, user)),
+    [user],
+  );
 
   // ── 认证守卫：无 token 时重定向登录页 ──────────────────────────────────
   useEffect(() => {
@@ -185,10 +197,7 @@ export default function AppLayout() {
   // 未读通知数
   const { data: unreadCount = 0 } = useQuery<number>({
     queryKey: ['notifications', 'unread-count'],
-    queryFn: async () => {
-      const res = await http.get<any>('/notifications/unread-count');
-      return res?.data?.count ?? res?.count ?? 0;
-    },
+    queryFn: getUnreadCount,
     refetchInterval: 60_000,
     retry: false,
   });
@@ -312,7 +321,7 @@ export default function AppLayout() {
           {/* 分隔线 */}
           <div className="border-t border-[#1a2d47] my-3 mx-1" />
 
-          {NAV_BOTTOM_ITEMS.map(({ path, label, icon: Icon }) => (
+          {bottomItems.map(({ path, label, icon: Icon }) => (
             <NavLink
               key={path}
               to={path}

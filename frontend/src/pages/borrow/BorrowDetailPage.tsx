@@ -25,10 +25,7 @@ export default function BorrowDetailPage() {
   const returnMutation = useReturnBorrow();
   const cancelMutation = useCancelBorrow();
 
-  const item = React.useMemo(() => {
-    const res = detailRes as any;
-    return res?.data || res;
-  }, [detailRes]);
+  const item = detailRes;
 
   const status = item?.status as BorrowStatus | undefined;
 

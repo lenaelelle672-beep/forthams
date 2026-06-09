@@ -47,7 +47,7 @@ export default function IntakeFormPage() {
     queryKey: ['vendors', 'select'],
     queryFn: async () => {
       const res = await getVendorList({ page: 1, pageSize: 999 });
-      return (res as any)?.records ?? [];
+      return res.records ?? [];
     },
     staleTime: 60_000,
   });
@@ -58,9 +58,7 @@ export default function IntakeFormPage() {
     queryKey: ['categories', 'tree'],
     queryFn: async () => {
       const res = await getCategoryTree();
-      // 处理可能的分页/解包结构
-      const raw = (res as any)?.data ?? res;
-      return Array.isArray(raw) ? raw : [];
+      return Array.isArray(res) ? res : [];
     },
     staleTime: 60_000,
   });
@@ -99,13 +97,12 @@ export default function IntakeFormPage() {
 
   React.useEffect(() => {
     if (detailRes) {
-      const order = (detailRes as any)?.data || detailRes;
-      setRemark(order.remark || '');
-      setOrderDate(order.orderDate || new Date().toISOString().split('T')[0]);
-      setTotalAmount(order.totalAmount?.toString() || '');
-      setVendorId(order.vendorId?.toString() || '');
-      if (order.checkItems?.length) setCheckItems(order.checkItems);
-      if (order.intakeAssets?.length) setIntakeAssets(order.intakeAssets);
+      setRemark(detailRes.remark || '');
+      setOrderDate(detailRes.orderDate || new Date().toISOString().split('T')[0]);
+      setTotalAmount(detailRes.totalAmount?.toString() || '');
+      setVendorId(detailRes.vendorId?.toString() || '');
+      if (detailRes.checkItems?.length) setCheckItems(detailRes.checkItems);
+      if (detailRes.intakeAssets?.length) setIntakeAssets(detailRes.intakeAssets);
     }
   }, [detailRes]);
 

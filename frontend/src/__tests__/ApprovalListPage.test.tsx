@@ -6,6 +6,20 @@ import ApprovalListPage from '@/pages/approval/ApprovalListPage';
 
 vi.mock('sonner', () => ({ toast: { error: vi.fn(), success: vi.fn(), info: vi.fn() } }));
 
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string) => ({
+      'approval:messages.loadFailed': '加载审批数据失败，请重试',
+      'approval:list.emptyText': '暂无审批数据，试试调整搜索、状态或日期筛选',
+      'approval:list.loading': '加载中',
+      'approval:statusOptions.PENDING': '审批中',
+      'approval:statusOptions.APPROVED': '已通过',
+      'approval:statusOptions.REJECTED': '已驳回',
+      'common:actions.refresh': '重新加载',
+    }[key] ?? key),
+  }),
+}));
+
 vi.mock('@/api/workflow', () => ({
   workflowApi: { list: vi.fn().mockResolvedValue([]) },
 }));
@@ -88,22 +102,22 @@ describe('ApprovalListPage', () => {
   it('displays tabs for filtering', async () => {
     render(<ApprovalListPage />, { wrapper: createWrapper() });
     await waitFor(() => {
-      expect(screen.getByText('待我审批')).toBeTruthy();
-      expect(screen.getByText('我发起的')).toBeTruthy();
+      expect(screen.getByRole('button', { name: /待我审批/ })).toBeTruthy();
+      expect(screen.getByRole('button', { name: '我发起的' })).toBeTruthy();
       expect(screen.getAllByText('已通过').length).toBeGreaterThanOrEqual(1);
     });
   });
 
-  it('shows breadcrumb link to dashboard', async () => {
+  it('shows launch application action', async () => {
     render(<ApprovalListPage />, { wrapper: createWrapper() });
-    await waitFor(() => expect(screen.getByText('仪表板')).toBeTruthy());
+    await waitFor(() => expect(screen.getByRole('button', { name: '发起申请' })).toBeTruthy());
   });
 
   it('passes processType when type filter changes', async () => {
     render(<ApprovalListPage />, { wrapper: createWrapper() });
 
     await waitFor(() => expect(screen.getByText('资产转移申请')).toBeTruthy());
-    fireEvent.change(screen.getByDisplayValue('全部类型'), { target: { value: 'ASSET_TRANSFER' } });
+    fireEvent.click(screen.getByRole('button', { name: '资产调拨' }));
 
     await waitFor(() => {
       expect(vi.mocked(getApprovalList)).toHaveBeenCalledWith(
@@ -129,31 +143,22 @@ describe('ApprovalListPage', () => {
     render(<ApprovalListPage />, { wrapper: createWrapper() });
 
     await waitFor(() => expect(screen.getByText('资产转移申请')).toBeTruthy());
-    fireEvent.click(screen.getByText('我发起的'));
+    fireEvent.click(screen.getByRole('button', { name: '我发起的' }));
 
     await waitFor(() => {
       expect(screen.queryByText('通过')).toBeNull();
       expect(screen.queryByText('驳回')).toBeNull();
-      expect(screen.getByText('详情')).toBeTruthy();
+      expect(screen.getAllByRole('button', { name: '查看' }).length).toBeGreaterThanOrEqual(1);
     });
   });
 
-  it('handles approve and reject interactions', async () => {
+  it('renders view-only row action in the list', async () => {
     render(<ApprovalListPage />, { wrapper: createWrapper() });
 
     await waitFor(() => expect(screen.getByText('资产转移申请')).toBeTruthy());
-    fireEvent.click(screen.getByText('通过'));
-    await waitFor(() => expect(approveItem).toHaveBeenCalledWith(101, { version: 2 }));
-
-    fireEvent.click(screen.getByText('驳回'));
-    const rejectButton = screen.getByText('确认驳回') as HTMLButtonElement;
-    expect(rejectButton.disabled).toBe(true);
-
-    fireEvent.change(screen.getByPlaceholderText('请输入驳回原因...'), { target: { value: '资料不完整' } });
-    fireEvent.click(rejectButton);
-    await waitFor(() => {
-      expect(rejectItem).toHaveBeenCalledWith(101, { version: 2, rejectionReason: '资料不完整' });
-    });
+    expect(screen.getAllByRole('button', { name: '查看' }).length).toBeGreaterThanOrEqual(1);
+    expect(screen.queryByRole('button', { name: '通过' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: '驳回' })).not.toBeInTheDocument();
   });
 
   it('shows empty state when approval list is empty', async () => {

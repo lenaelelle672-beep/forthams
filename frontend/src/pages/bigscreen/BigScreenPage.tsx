@@ -31,8 +31,8 @@ const fallbackStats = {
 type Stats = typeof fallbackStats;
 type StyleVars = CSSProperties & Record<`--${string}`, string | number>;
 
-function normalizeStats(input: Partial<Stats> | { data?: Partial<Stats> } | null | undefined): Stats {
-  const raw = ((input as { data?: Partial<Stats> } | null | undefined)?.data ?? input ?? {}) as Partial<Stats>;
+function normalizeStats(input: Partial<Stats> | null | undefined): Stats {
+  const raw = (input ?? {}) as Partial<Stats>;
   const total = typeof raw.totalAssets === 'number' ? raw.totalAssets : fallbackStats.totalAssets;
   const inUse = typeof raw.inUseAssets === 'number' ? raw.inUseAssets : fallbackStats.inUseAssets;
 

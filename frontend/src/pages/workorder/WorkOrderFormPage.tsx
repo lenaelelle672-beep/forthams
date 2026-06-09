@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useNavigate, useLocation, useParams } from 'react-router';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import {
@@ -19,19 +19,25 @@ import {
   File as FileIcon,
   AlertTriangle,
 } from 'lucide-react';
-import { Card, CardHeader, CardContent } from '@/components/ui/Card';
+import { Card, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { PageHeader } from '@/components/ui/PageHeader';
 import http from '@/utils/http';
-import { createWorkOrder, updateWorkOrder } from '@/api/workorder';
-import type { CreateWorkOrderRequest } from '@/types/workorder';
+import { createWorkOrder, getWorkOrderDetail, updateWorkOrder } from '@/api/workorder';
 import { getAssetList } from '@/api/asset';
 import { getUserList } from '@/api/base';
 import FaultCodeSelector from '@/components/fault-code/FaultCodeSelector';
 import type { UserItem } from '@/api/base';
-import type { PaginatedResponse, ApiResponse, PageData } from '@/types/common';
+import type { PageData } from '@/types/common';
 import type { AssetListItem } from '@/types/asset';
+import {
+  buildWorkOrderPayload,
+  getSelectedAssetFromListItem,
+  getSelectedAssetFromWorkOrder,
+  getWorkOrderFormDefaults,
+  type SelectedWorkOrderAsset,
+} from './workOrderFormMapper';
 
 const schema = z.object({
   title: z.string().min(5, '标题至少 5 个字').max(100),
@@ -45,6 +51,7 @@ const schema = z.object({
 
 type FormInput = z.input<typeof schema>;
 type FormValues = z.output<typeof schema>;
+type FormWorkOrderType = FormValues['type'];
 
 const TYPE_OPTIONS = [
   { value: 'PURCHASE', label: '采购' },
@@ -53,6 +60,17 @@ const TYPE_OPTIONS = [
   { value: 'DISPOSAL', label: '处置' },
   { value: 'OTHER', label: '其他' },
 ] as const;
+
+const FORM_WORK_ORDER_TYPES = new Set<FormWorkOrderType>(TYPE_OPTIONS.map((option) => option.value));
+
+function toFormDefaults(defaults: Partial<import('./workOrderFormMapper').WorkOrderFormValues>): Partial<FormValues> {
+  return {
+    ...defaults,
+    type: defaults.type && FORM_WORK_ORDER_TYPES.has(defaults.type as FormWorkOrderType)
+      ? (defaults.type as FormWorkOrderType)
+      : 'OTHER',
+  };
+}
 
 /** 优先级选项 — 含语义色与描述说明 */
 const PRIORITY_OPTIONS = [
@@ -114,10 +132,11 @@ export default function WorkOrderFormPage() {
   const [collabInput, setCollabInput] = useState('');
   const [collaboratorsList, setCollaboratorsList] = useState<string[]>(collaborators);
   const [assigneeOptions, setAssigneeOptions] = useState(ASSIGNEE_DEFAULT);
+  const [assigneeUsers, setAssigneeUsers] = useState<UserItem[]>([]);
   const [assetSearch, setAssetSearch] = useState('');
   const [assetResults, setAssetResults] = useState<AssetListItem[]>([]);
   const [showAssetDropdown, setShowAssetDropdown] = useState(false);
-  const [selectedAsset, setSelectedAsset] = useState<{ id: number; assetName: string; assetNo: string } | null>(null);
+  const [selectedAsset, setSelectedAsset] = useState<SelectedWorkOrderAsset | null>(null);
   const assetSearchRef = useRef<HTMLDivElement>(null);
   const assetSearchTimer = useRef<ReturnType<typeof setTimeout>>();
   const editId = params.id ? Number(params.id) : null;
@@ -139,6 +158,7 @@ export default function WorkOrderFormPage() {
         const res = await getUserList({ page: 1, pageSize: 100 });
         const users = (res as PageData<UserItem> | undefined)?.records ?? [];
         if (cancelled) return;
+        setAssigneeUsers(users);
         if (users.length > 0) {
           setAssigneeOptions([
             { value: '', label: '请选择负责人' },
@@ -154,6 +174,13 @@ export default function WorkOrderFormPage() {
     })();
     return () => { cancelled = true; };
   }, []);
+
+  const { data: editingWorkOrder } = useQuery({
+    queryKey: ['workorders', 'detail', editId],
+    queryFn: () => getWorkOrderDetail(editId as number),
+    enabled: isEdit && !!editId,
+    staleTime: 1000 * 30,
+  });
 
   // 资产搜索（防抖 300ms，复用 GET /assets 接口）
   const searchAssets = useCallback((keyword: string) => {
@@ -190,8 +217,8 @@ export default function WorkOrderFormPage() {
   const {
     register,
     handleSubmit,
-    control,
     watch,
+    reset,
     formState: { errors, isSubmitting },
   } = useForm<FormInput, unknown, FormValues>({
     resolver: zodResolver(schema as never) as never,
@@ -206,22 +233,28 @@ export default function WorkOrderFormPage() {
     } satisfies Partial<FormValues>,
   });
 
+  useEffect(() => {
+    if (!editingWorkOrder) return;
+    reset(toFormDefaults(getWorkOrderFormDefaults(editingWorkOrder)));
+    setSelectedAsset(getSelectedAssetFromWorkOrder(editingWorkOrder));
+    setCollaboratorsList(editingWorkOrder.collaborators ?? []);
+    setAttachmentList(editingWorkOrder.attachments ?? []);
+    setFaultCodeId(editingWorkOrder.faultCodeId);
+  }, [editingWorkOrder, reset]);
+
   const saveMutation = useMutation({
     mutationFn: async (data: FormValues) => {
-      // 合并选中的资产信息和故障代码
-      const payload: Record<string, unknown> = {
-        ...data,
-        assetId: selectedAsset?.id ?? null,
-        assetName: selectedAsset?.assetName ?? null,
-        assetCode: selectedAsset?.assetNo ?? null,
+      const payload = buildWorkOrderPayload(data, {
+        selectedAsset,
+        assigneeUsers,
         collaborators: collaboratorsList,
         attachments: attachmentList,
-        faultCodeId: data.type === 'REPAIR' ? (faultCodeId ?? null) : null,
-      };
+        faultCodeId,
+      });
       if (isEdit && editId) {
         return updateWorkOrder(editId, payload);
       }
-      return createWorkOrder(payload as unknown as CreateWorkOrderRequest);
+      return createWorkOrder(payload);
     },
     onSuccess: (res: unknown) => {
       qc.invalidateQueries({ queryKey: ['workorders'] });
@@ -247,8 +280,7 @@ export default function WorkOrderFormPage() {
       const res = await http.post<string>('/file/upload', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
-      // res 是返回的 URL 字符串
-      const url = typeof res === 'string' ? res : (res as any)?.data ?? (res as any)?.url ?? '';
+      const url = res ?? '';
       if (url) {
         setAttachmentList((prev) => [...prev, url]);
         toast.success('文件上传成功');
@@ -378,7 +410,7 @@ export default function WorkOrderFormPage() {
                                   type="button"
                                   className="w-full text-left px-3 py-2.5 hover:bg-blue-50 text-sm flex items-center gap-2 rounded-xl transition-colors"
                                   onClick={() => {
-                                    setSelectedAsset({ id: a.id, assetName: a.assetName ?? '', assetNo: a.assetNo ?? '' });
+                                    setSelectedAsset(getSelectedAssetFromListItem(a));
                                     setAssetSearch('');
                                     setShowAssetDropdown(false);
                                     setAssetResults([]);

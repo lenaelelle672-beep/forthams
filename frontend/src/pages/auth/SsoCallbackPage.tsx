@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router';
-import { TOKEN_STORAGE_KEY, USER_STORAGE_KEY } from '@/app/utils/api';
+import { TOKEN_STORAGE_KEY, USER_STORAGE_KEY } from '@/utils/auth';
 
 export default function SsoCallbackPage() {
   const [searchParams] = useSearchParams();

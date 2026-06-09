@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { ArrowLeft, Save } from 'lucide-react';
+import { createStocktakingCycle } from '@/api/stocktaking';
 
 export default function StocktakingCycleFormPage() {
   const navigate = useNavigate();
@@ -15,14 +16,7 @@ export default function StocktakingCycleFormPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const url = '/api/stocktaking/cycles';
-      const method = 'POST';
-
-      await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
+      await createStocktakingCycle(formData);
 
       navigate('/stocktaking-cycles');
     } catch (error) {

@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, act, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 
 function createMockLeafletMarker() {
@@ -52,7 +53,20 @@ const mockedUseGisAssets = vi.mocked(useGisAssets);
 const mockedUseMapFilters = vi.mocked(useMapFilters);
 
 function renderPage() {
-  return render(React.createElement(MemoryRouter, null, React.createElement(GisMapPage)));
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: { retry: false },
+      mutations: { retry: false },
+    },
+  });
+
+  return render(
+    React.createElement(
+      QueryClientProvider,
+      { client: queryClient },
+      React.createElement(MemoryRouter, null, React.createElement(GisMapPage)),
+    ),
+  );
 }
 
 describe('GisMapPage', () => {
@@ -71,10 +85,11 @@ describe('GisMapPage', () => {
     expect(screen.getByText('Failed to load')).toBeInTheDocument();
   });
 
-  it('should show empty state', async () => {
+  it('should show fallback assets when api returns empty data', async () => {
     mockedUseGisAssets.mockReturnValue({ data: [], isLoading: false, isError: false, error: null, refetch: vi.fn() } as any);
     await act(async () => { renderPage(); });
-    expect(screen.getByText('暂无资产定位数据')).toBeInTheDocument();
+    expect(screen.getByText('定位资产总数')).toBeInTheDocument();
+    expect(screen.getByText(/20\/20 个定位资产/)).toBeInTheDocument();
   });
 
   it('should show cards when assets exist', async () => {
@@ -119,7 +134,7 @@ describe('GisMapPage', () => {
       isLoading: false, isError: false, error: null, refetch: vi.fn(),
     } as any);
     await act(async () => { renderPage(); });
-    const select = screen.getByRole('combobox');
+    const select = screen.getAllByRole('combobox')[1];
     expect(select).toBeTruthy();
     await act(async () => {
       fireEvent.click(select);

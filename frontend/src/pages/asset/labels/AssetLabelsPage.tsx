@@ -52,8 +52,7 @@ export default function AssetLabelsPage() {
       const results = await Promise.all(
         Array.from(selectedIds).map(async (id) => {
           try {
-            const res = await getAssetLabel(id);
-            const label = (res as unknown as { data: AssetLabel }).data;
+            const label = await getAssetLabel(id);
             return [id, label] as const;
           } catch {
             return null;

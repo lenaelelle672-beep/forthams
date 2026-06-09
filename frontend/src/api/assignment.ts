@@ -4,41 +4,41 @@
  */
 
 import http from '@/utils/http';
-import type { ApiResponse, PaginatedResponse } from '@/types/common';
+import type { PaginatedResponse } from '@/types/common';
 import type { AssetAssignment, CreateAssignmentRequest, UpdateAssignmentRequest, AssignmentListQuery } from '@/types/assignment';
 
 export const getAssignments = (params?: AssignmentListQuery) =>
   http.get<PaginatedResponse<AssetAssignment>>('/assignments', { params });
 
 export const getAssignment = (id: number) =>
-  http.get<ApiResponse<AssetAssignment>>(`/assignments/${id}`);
+  http.get<AssetAssignment>(`/assignments/${id}`);
 
 export const createAssignment = (data: CreateAssignmentRequest) =>
-  http.post<ApiResponse<AssetAssignment>>('/assignments', data);
+  http.post<AssetAssignment>('/assignments', data);
 
 export const updateAssignment = (id: number, data: UpdateAssignmentRequest) =>
-  http.put<ApiResponse<AssetAssignment>>(`/assignments/${id}`, data);
+  http.put<AssetAssignment>(`/assignments/${id}`, data);
 
 export const deleteAssignment = (id: number) =>
-  http.delete<ApiResponse<void>>(`/assignments/${id}`);
+  http.delete<void>(`/assignments/${id}`);
 
 export const submitAssignment = (id: number) =>
-  http.post<ApiResponse<AssetAssignment>>(`/assignments/${id}/submit`);
+  http.post<AssetAssignment>(`/assignments/${id}/submit`);
 
 export const approveAssignment = (id: number) =>
-  http.post<ApiResponse<AssetAssignment>>(`/assignments/${id}/approve`);
+  http.post<AssetAssignment>(`/assignments/${id}/approve`);
 
 export const rejectAssignment = (id: number, reason?: string) =>
-  http.post<ApiResponse<AssetAssignment>>(`/assignments/${id}/reject`, null, { params: { reason } });
+  http.post<AssetAssignment>(`/assignments/${id}/reject`, null, { params: { reason } });
 
 export const checkoutAssignment = (id: number) =>
-  http.post<ApiResponse<AssetAssignment>>(`/assignments/${id}/checkout`);
+  http.post<AssetAssignment>(`/assignments/${id}/checkout`);
 
 export const returnRequestAssignment = (id: number) =>
-  http.post<ApiResponse<AssetAssignment>>(`/assignments/${id}/return-request`);
+  http.post<AssetAssignment>(`/assignments/${id}/return-request`);
 
 export const approveReturnAssignment = (id: number, returnCondition?: string) =>
-  http.post<ApiResponse<AssetAssignment>>(`/assignments/${id}/approve-return`, null, { params: { returnCondition } });
+  http.post<AssetAssignment>(`/assignments/${id}/approve-return`, null, { params: { returnCondition } });
 
 export const cancelAssignment = (id: number) =>
-  http.post<ApiResponse<AssetAssignment>>(`/assignments/${id}/cancel`);
+  http.post<AssetAssignment>(`/assignments/${id}/cancel`);

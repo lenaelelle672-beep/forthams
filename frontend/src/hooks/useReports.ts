@@ -6,7 +6,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { getReportSummary, getReportByCategory } from '@/api/stats';
 import http from '@/utils/http';
-import type { ApiResponse } from '@/types/common';
 
 // ── 类型 ──────────────────────────────────────────────────────────────────────
 
@@ -20,7 +19,7 @@ export interface ReportTrend {
 
 /** 获取月度趋势数据 */
 export const getReportTrend = () =>
-  http.get<ApiResponse<ReportTrend[]>>('/reports/trend');
+  http.get<ReportTrend[]>('/reports/trend');
 
 // ── Query keys ────────────────────────────────────────────────────────────────
 

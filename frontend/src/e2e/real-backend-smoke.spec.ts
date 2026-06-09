@@ -30,8 +30,8 @@ test('真实后端：登录、storageState、资产列表与详情可验证', as
   const errors = collectBrowserErrors(page);
 
   await page.goto('/login');
-  await page.getByLabel('用户名').fill(username);
-  await page.getByLabel('密码').fill(password);
+  await page.getByRole('textbox', { name: '用户名' }).fill(username);
+  await page.getByLabel('密码', { exact: true }).fill(password);
   await page.getByRole('button', { name: /登录(?:系统|并进入仪表板)/ }).click();
 
   await expect(page.getByRole('heading', { name: /仪表板|仪表板与数据分析/ })).toBeVisible({ timeout: 15_000 });
@@ -46,7 +46,7 @@ test('真实后端：登录、storageState、资产列表与详情可验证', as
   expect(storageSnapshot.userInfo, '前端真实登录后应写入 user_info').toBeTruthy();
 
   await page.goto(`/assets?keyword=${encodeURIComponent(seededAssetName)}`);
-  await expect(page.getByRole('heading', { name: /资产台账|资产台账管理/ })).toBeVisible({ timeout: 15_000 });
+  await expect(page.getByRole('heading', { name: '资产台账', exact: true })).toBeVisible({ timeout: 15_000 });
   await expect(page.getByText(seededAssetName).first()).toBeVisible({ timeout: 15_000 });
 
   await page.goto(`/assets/${seededAsset.id}`);
@@ -81,9 +81,9 @@ test('真实后端：登录页可见且流程设计器配置校验有效', async
   const errors = collectBrowserErrors(page);
 
   await page.goto('/login');
-  await expect(page.getByRole('heading', { name: /欢迎登录|资产管理系统/ })).toBeVisible({ timeout: 15_000 });
-  await expect(page.getByLabel('用户名')).toBeVisible();
-  await expect(page.getByLabel('密码')).toBeVisible();
+  await expect(page.getByRole('heading', { name: /欢迎登录|欢迎回来|资产管理系统/ })).toBeVisible({ timeout: 15_000 });
+  await expect(page.getByRole('textbox', { name: '用户名' })).toBeVisible();
+  await expect(page.getByLabel('密码', { exact: true })).toBeVisible();
 
   await loginThroughApi(page, request);
   await page.goto('/workflow-designer');
@@ -134,7 +134,7 @@ test('真实后端：核心导航、审批入口和报表入口可点击', async
   const navItems = [
     { name: '资产台账', heading: /资产台账|资产台账管理/ },
     { name: '重要设备', heading: '重要设备管理' },
-    { name: /RFID\s*盘点/, heading: '资产盘点管理' },
+    { name: /RFID\s*盘点/, heading: /资产盘点管理|盘点管理/ },
     { name: '闲置资产', heading: '闲置资产管理' },
     { name: '资产处置', heading: '资产处置管理' },
     { name: '审批流程', heading: /审批列表|审批中心/ },

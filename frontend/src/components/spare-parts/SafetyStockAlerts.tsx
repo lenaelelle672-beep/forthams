@@ -19,7 +19,7 @@ export default function SafetyStockAlerts() {
     refetchInterval: 60000, // 每分钟刷新
   });
 
-  const alerts = (res as any)?.data ?? [];
+  const alerts: SparePart[] = res ?? [];
 
   if (isLoading) {
     return (

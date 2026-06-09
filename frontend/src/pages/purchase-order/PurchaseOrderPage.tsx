@@ -278,8 +278,7 @@ function OrderDetailSheet({ open, orderId, onClose }: OrderDetailSheetProps) {
   const { data: result, isLoading } = useQuery({
     queryKey: PAGE_KEYS.detail(orderId ?? 0),
     queryFn: async () => {
-      const res = await getPurchaseOrderDetail(orderId!);
-      return res.data as { order: PurchaseOrder; items: PurchaseOrderItem[] };
+      return getPurchaseOrderDetail(orderId!);
     },
     enabled: open && orderId !== null,
   });
@@ -451,16 +450,14 @@ export default function PurchaseOrderPage() {
   const { data: listData, isLoading, isFetching } = useQuery({
     queryKey: PAGE_KEYS.list(queryParams),
     queryFn: async () => {
-      const res = await getPurchaseOrderList(queryParams);
-      return res.data;
+      return getPurchaseOrderList(queryParams);
     },
   });
 
   const { data: statsData } = useQuery({
     queryKey: PAGE_KEYS.stats(),
     queryFn: async () => {
-      const res = await getPurchaseOrderStats();
-      return res.data as PurchaseOrderStats;
+      return getPurchaseOrderStats();
     },
   });
 

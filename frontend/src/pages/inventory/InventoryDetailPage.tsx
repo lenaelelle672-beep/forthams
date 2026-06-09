@@ -148,6 +148,7 @@ export default function InventoryDetailPage() {
       setSelected(new Set());
       qc.invalidateQueries({ queryKey: ['inventory', 'assets', taskId] });
       qc.invalidateQueries({ queryKey: ['inventory', 'task', taskId] });
+      qc.invalidateQueries({ queryKey: ['inventory', 'summary', taskId] });
     },
   });
 
@@ -218,6 +219,8 @@ export default function InventoryDetailPage() {
   /** 异常待处理 = 损坏 + 其他 + 未确认异常 */
   const pendingAbnormal = abnormalCount - surplusCount - deficitCount;
   const matchRate = countedAssets > 0 ? ((normalCount / countedAssets) * 100) : 0;
+  const isConfirmLocked = rawStatus === 'PENDING_APPROVAL' || rawStatus === 'APPROVED';
+  const getDetailRowId = (row: InventoryAsset) => String(row.id ?? row.assetId);
 
   /**
    * 将位置/部门树展平为 id→name 映射
@@ -253,6 +256,35 @@ export default function InventoryDetailPage() {
   }, [locations, departments]);
 
   const columns: Column<any>[] = [
+    {
+      key: 'select',
+      title: '',
+      width: 48,
+      align: 'center',
+      render: (_, row: InventoryAsset) => {
+        const rowId = getDetailRowId(row);
+        return (
+          <input
+            type="checkbox"
+            checked={selected.has(rowId)}
+            disabled={isConfirmLocked}
+            onClick={(event) => event.stopPropagation()}
+            onChange={() => {
+              setSelected((prev) => {
+                const next = new Set(prev);
+                if (next.has(rowId)) {
+                  next.delete(rowId);
+                } else {
+                  next.add(rowId);
+                }
+                return next;
+              });
+            }}
+            className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-40"
+          />
+        );
+      },
+    },
     {
       key: 'assetCode',
       title: '资产编号',
@@ -372,6 +404,18 @@ export default function InventoryDetailPage() {
         <span className="text-[13px] text-slate-500">
           {v ? String(v).substring(0, 16) : '—'}
         </span>
+      ),
+    },
+    {
+      key: 'confirmAction',
+      title: '确认',
+      width: 150,
+      render: (_, row: InventoryAsset) => (
+        <StatusSelect
+          value={row.actualStatus}
+          disabled={isConfirmLocked || confirmMutation.isPending}
+          onChange={(status) => confirmMutation.mutate({ assetId: getDetailRowId(row), status })}
+        />
       ),
     },
   ];
@@ -894,7 +938,7 @@ export default function InventoryDetailPage() {
               columns={columns}
               data={records}
               loading={assetsLoading}
-              rowKey="assetId"
+              rowKey="id"
               pagination={{
                 page: assetParams.page,
                 pageSize: assetParams.pageSize,

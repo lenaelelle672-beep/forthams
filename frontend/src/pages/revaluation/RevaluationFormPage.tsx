@@ -52,8 +52,8 @@ export default function RevaluationFormPage() {
       setReason(existingRecord.reason || '');
       setEvidence(existingRecord.evidence || '');
       // 加载资产信息
-      getAssetById(existingRecord.assetId).then((asset: any) => {
-        setSelectedAsset(asset as Asset);
+      getAssetById(existingRecord.assetId).then((asset) => {
+        setSelectedAsset(asset);
         setAssetSearch(asset?.assetNo || '');
       }).catch(() => {});
     }
@@ -63,7 +63,7 @@ export default function RevaluationFormPage() {
     if (!assetSearch.trim()) return;
     try {
       const res = await getAssetById(Number(assetSearch));
-      setSelectedAsset((res as any).data ?? (res as any).data);
+      setSelectedAsset(res);
     } catch {
       toast.error('未找到资产');
     }
@@ -96,7 +96,6 @@ export default function RevaluationFormPage() {
     mutationFn: (status: 'APPROVED' | 'REJECTED') =>
       approveRevaluation(Number(viewId!), {
         status,
-        approvedBy: 1, // TODO: 从当前登录用户获取
       }),
     onSuccess: (res, status) => {
       toast.success(status === 'APPROVED' ? '审批通过' : '审批拒绝');

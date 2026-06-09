@@ -7,7 +7,7 @@ import { useState, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { MessageSquare, Reply, Trash2, ChevronDown, ChevronUp, Loader2, ThumbsUp } from 'lucide-react';
 import { getComments, createComment, deleteComment, likeComment } from '@/api/comment';
-import { useAuth } from '@/app/context/AuthContext';
+import { useAuth } from '@/context/AuthContext';
 import UserMentionAutocomplete from '@/components/comment/UserMentionAutocomplete';
 import { toast } from 'sonner';
 import type { BusinessComment } from '@/types/comment';
@@ -109,6 +109,7 @@ export default function CommentSection({ businessType, businessId, maxHeight = '
       {/* 头部 */}
       <button
         onClick={() => setExpanded((v) => !v)}
+        aria-label={expanded ? '折叠评论' : '展开评论'}
         className="flex w-full items-center justify-between px-4 py-3 text-sm font-semibold text-[var(--surface-heading)]"
       >
         <div className="flex items-center gap-2">
@@ -191,6 +192,7 @@ export default function CommentSection({ businessType, businessId, maxHeight = '
                           onClick={() => {
                             if (confirm('确认删除该评论？')) deleteMutation.mutate(comment.id);
                           }}
+                          aria-label={`删除评论 ${comment.id}`}
                           className="text-[var(--surface-muted-text)] hover:text-[var(--destructive)] transition"
                         >
                           <Trash2 className="w-3.5 h-3.5" />

@@ -1,6 +1,6 @@
 import { ShieldX, ArrowLeft, Home, LogOut } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router';
-import { clearAuthStorage } from '@/app/utils/api';
+import { clearAuthStorage } from '@/utils/auth';
 
 export default function ForbiddenPage() {
   const navigate = useNavigate();

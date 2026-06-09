@@ -12,6 +12,18 @@ import { render, screen, fireEvent, waitFor, cleanup } from '@testing-library/re
 import { MemoryRouter } from 'react-router';
 import GlobalSearch from '@/components/GlobalSearch';
 
+vi.mock('@/context/AuthContext', () => ({
+  useAuth: () => ({
+    user: {
+      userId: 1,
+      username: 'admin',
+      realName: '系统管理员',
+      roles: ['SUPER_ADMIN'],
+      permissions: [],
+    },
+  }),
+}));
+
 // Mock globalSearch API to prevent actual HTTP calls
 vi.mock('@/api/search', () => ({
   globalSearch: vi.fn().mockResolvedValue({ data: [] }),

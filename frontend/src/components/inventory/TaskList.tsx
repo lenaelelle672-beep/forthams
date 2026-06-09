@@ -41,6 +41,7 @@ import {
   GlobalOutlined,
 } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
+import http from '@/utils/http';
 
 /* ================================================================== */
 /*  Types — aligned with SPEC Data Constraints                        */
@@ -85,6 +86,32 @@ interface PaginatedResponse<T> {
   page: number;
   pageSize: number;
 }
+
+type InventoryTaskPageResponse<T> = {
+  records?: T[];
+  items?: T[];
+  total?: number;
+  current?: number;
+  page?: number;
+  size?: number;
+  pageSize?: number;
+};
+
+type BackendInventoryTask = Partial<InventoryTask> & {
+  id?: number | string;
+  taskNo?: string;
+  inventoryType?: string | null;
+  scope?: string | null;
+  deptIds?: string | null;
+  totalCount?: number | null;
+  scannedCount?: number | null;
+  matchCount?: number | null;
+  lossCount?: number | null;
+  surplusCount?: number | null;
+  deficitCount?: number | null;
+  createTime?: string | null;
+  updateTime?: string | null;
+};
 
 /** TaskList 组件 Props — 对齐 SPEC Props 接口摘要 */
 export interface TaskListProps {
@@ -149,6 +176,60 @@ const STATUS_OPTIONS = [
   { value: 'submitted', label: '已提交' },
 ];
 
+function toSafeNumber(value: unknown, fallback = 0): number {
+  const n = Number(value);
+  return Number.isFinite(n) ? n : fallback;
+}
+
+function normalizeTaskStatus(status?: string): TaskStatus {
+  const normalized = status?.toLowerCase();
+  if (normalized === 'in_progress' || normalized === 'processing' || normalized === 'running') {
+    return 'in_progress';
+  }
+  if (normalized === 'completed' || normalized === 'done') {
+    return 'completed';
+  }
+  if (normalized === 'submitted' || normalized === 'pending_approval' || normalized === 'approved') {
+    return 'submitted';
+  }
+  return 'draft';
+}
+
+function normalizeScopeType(scope?: string | null): ScopeType {
+  const normalized = scope?.toLowerCase();
+  if (normalized === 'location') return 'location';
+  if (normalized === 'category') return 'category';
+  return 'all';
+}
+
+function normalizeTask(raw: BackendInventoryTask): InventoryTask {
+  const totalAssets = toSafeNumber(raw.totalAssets ?? raw.totalCount);
+  const countedAssets = toSafeNumber(raw.countedAssets ?? raw.scannedCount ?? raw.matchCount);
+  const progress = raw.progress ?? (totalAssets > 0 ? Math.min((countedAssets / totalAssets) * 100, 100) : 0);
+  const scopeIds = Array.isArray(raw.scopeIds)
+    ? raw.scopeIds
+    : String(raw.deptIds ?? '')
+        .split(',')
+        .map((item) => item.trim())
+        .filter(Boolean);
+
+  return {
+    taskId: String(raw.taskId ?? raw.id ?? raw.taskNo ?? ''),
+    taskName: raw.taskName ?? raw.taskNo ?? '未命名盘点任务',
+    scopeType: normalizeScopeType(raw.scopeType ?? raw.inventoryType ?? raw.scope),
+    scopeIds,
+    status: normalizeTaskStatus(raw.status),
+    progress,
+    totalAssets,
+    countedAssets,
+    uncountedAssets: toSafeNumber(raw.uncountedAssets, Math.max(totalAssets - countedAssets, 0)),
+    surplusAssets: toSafeNumber(raw.surplusAssets ?? raw.surplusCount),
+    deficitAssets: toSafeNumber(raw.deficitAssets ?? raw.deficitCount ?? raw.lossCount),
+    createdAt: raw.createdAt ?? raw.createTime ?? '',
+    updatedAt: raw.updatedAt ?? raw.updateTime ?? raw.createdAt ?? raw.createTime ?? '',
+  };
+}
+
 /* ================================================================== */
 /*  API client                                                         */
 /*  In production imported from @/api/inventory                        */
@@ -157,7 +238,7 @@ const STATUS_OPTIONS = [
 /**
  * 获取盘点任务分页列表
  *
- * 调用 GET /api/v1/inventory/tasks，传递分页与筛选参数。
+ * 调用 GET /api/inventory/tasks，传递分页与筛选参数。
  * 后端默认按创建时间倒序排列。
  *
  * @param query - 分页与筛选参数
@@ -167,24 +248,24 @@ const STATUS_OPTIONS = [
 async function fetchTaskList(
   query: TaskListQuery,
 ): Promise<PaginatedResponse<InventoryTask>> {
-  const params = new URLSearchParams({
-    page: String(query.page),
-    pageSize: String(query.pageSize),
-  });
-  if (query.status) {
-    params.set('status', query.status);
-  }
-  if (query.keyword) {
-    params.set('keyword', query.keyword);
-  }
+  const response = await http.get<InventoryTaskPageResponse<BackendInventoryTask>>(
+    '/inventory/tasks',
+    {
+      params: {
+        page: query.page,
+        pageSize: query.pageSize,
+        status: query.status,
+        search: query.keyword,
+      },
+    },
+  );
 
-  const response = await fetch(`/api/v1/inventory/tasks?${params}`);
-
-  if (!response.ok) {
-    throw new Error(`获取盘点任务列表失败 (HTTP ${response.status})`);
-  }
-
-  return response.json() as Promise<PaginatedResponse<InventoryTask>>;
+  return {
+    items: (response.items ?? response.records ?? []).map(normalizeTask),
+    total: response.total ?? 0,
+    page: response.page ?? response.current ?? query.page,
+    pageSize: response.pageSize ?? response.size ?? query.pageSize,
+  };
 }
 
 /* ================================================================== */

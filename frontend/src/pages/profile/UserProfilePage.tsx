@@ -6,8 +6,9 @@
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from '@/app/context/AuthContext';
+import { useAuth } from '@/context/AuthContext';
 import { getUserDetail } from '@/api/user-management';
+import { getCurrentTenant } from '@/api/tenant';
 import type { UserDetail } from '@/api/user-management';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { PageTransition } from '@/components/ui/PageTransition';
@@ -23,6 +24,7 @@ import {
   Key,
   Hash,
   BadgeCheck,
+  Crown,
 } from 'lucide-react';
 
 export default function UserProfilePage() {
@@ -50,6 +52,12 @@ export default function UserProfilePage() {
     queryFn: () => getUserDetail(userId!),
     enabled: !!userId,
     staleTime: 30_000,
+  });
+
+  const { data: currentTenant } = useQuery({
+    queryKey: ['current-tenant-plan'],
+    queryFn: getCurrentTenant,
+    staleTime: 60_000,
   });
 
   if (isLoading) {
@@ -155,6 +163,12 @@ export default function UserProfilePage() {
                 icon={<Building2 className="w-4 h-4" />}
                 label={t('profile.dept')}
                 value={profile.deptName || t('profile.noDept')}
+              />
+              <InfoRow
+                icon={<Crown className="w-4 h-4" />}
+                label="当前套餐"
+                value={currentTenant?.plan || '—'}
+                mono
               />
               <InfoRow
                 icon={<Mail className="w-4 h-4" />}

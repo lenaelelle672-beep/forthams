@@ -54,7 +54,7 @@ export default function SearchDropdown() {
     debounceRef.current = setTimeout(async () => {
       try {
         const res = await globalSearch(query.trim());
-        const data = res?.data ?? [];
+        const data = res ?? [];
         setResults(data);
         setOpen(data.length > 0);
         setSelectedIndex(-1);

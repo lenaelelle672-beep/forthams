@@ -9,22 +9,18 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Pencil, Trash2, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
-import http from '@/utils/http';
+import {
+  createWebhookConfig,
+  deleteWebhookConfig,
+  listWebhookConfigs,
+  updateWebhookConfig,
+  type WebhookConfig as WebhookItem,
+} from '@/api/webhookConfig';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 
 // ─── 类型定义 ───────────────────────────────────────────────────────────────
-
-interface WebhookItem {
-  id: number;
-  name: string;
-  url: string;
-  secret?: string;
-  events: string[];
-  description?: string;
-  enabled: number;
-}
 
 interface WebhookFormState {
   name: string;
@@ -68,9 +64,9 @@ export default function WebhookConfigTab() {
   const fetchData = async (p = 1) => {
     setLoading(true);
     try {
-      const res = await http.get<any>('/webhook-configs', { params: { page: p, pageSize: PAGE_SIZE } });
-      setData(res.data?.records || []);
-      setTotal(res.data?.total || 0);
+      const res = await listWebhookConfigs({ page: p, pageSize: PAGE_SIZE });
+      setData(res.records || []);
+      setTotal(res.total || 0);
       setPage(p);
     } catch {
       toast.error('获取 Webhook 配置失败');
@@ -98,10 +94,10 @@ export default function WebhookConfigTab() {
     setSaving(true);
     try {
       if (editingItem) {
-        await http.put(`/webhook-configs/${editingItem.id}`, payload);
+        await updateWebhookConfig(editingItem.id, payload);
         toast.success('更新成功');
       } else {
-        await http.post('/webhook-configs', payload);
+        await createWebhookConfig(payload);
         toast.success('创建成功');
       }
       setModalVisible(false);
@@ -117,7 +113,7 @@ export default function WebhookConfigTab() {
   const handleDelete = async () => {
     if (!deleteTarget) return;
     try {
-      await http.delete(`/webhook-configs/${deleteTarget.id}`);
+      await deleteWebhookConfig(deleteTarget.id);
       toast.success('删除成功');
       setDeleteTarget(null);
       fetchData(page);

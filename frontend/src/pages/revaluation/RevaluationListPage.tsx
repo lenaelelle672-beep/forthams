@@ -89,7 +89,7 @@ export default function RevaluationListPage() {
       const params: any = { page, pageSize: 10 };
       if (statusFilter) params.status = statusFilter;
       const res = await getRevaluations(params);
-      return { data: res?.records ?? res?.data ?? [], total: res?.total ?? 0 };
+      return { data: res?.records ?? [], total: res?.total ?? 0 };
     },
   });
 

@@ -61,6 +61,7 @@ export interface AssetAssignment {
   status: AssignmentStatus;
   assignmentDate?: string;
   returnCondition?: string;
+  reason?: string;
   remark?: string;
   assetNo?: string;
   assetName?: string;

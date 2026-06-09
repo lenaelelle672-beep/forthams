@@ -120,13 +120,12 @@ export function useNotifications(
         getUnreadCount(),
       ]);
 
-      const pageData = (listResponse as any)?.data;
+      const pageData = listResponse;
       setNotifications(pageData?.records ?? []);
       setTotal(pageData?.total ?? 0);
       setTotalPages(pageData?.pages ?? Math.ceil((pageData?.total ?? 0) / pageSize));
 
-      const count = (countResponse as any)?.data;
-      setUnreadCount(typeof count === 'number' ? count : 0);
+      setUnreadCount(typeof countResponse === 'number' ? countResponse : 0);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : '获取通知列表失败';
       setError(errorMessage);

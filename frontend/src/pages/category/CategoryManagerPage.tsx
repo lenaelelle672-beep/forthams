@@ -44,7 +44,6 @@ import {
 import { EmptyState } from '@/components/ui/EmptyState';
 import { getCategoryTree, createCategory, updateCategory, deleteCategory } from '@/api/asset';
 import type { AssetCategory } from '@/types/asset';
-import type { ApiResponse } from '@/types/common';
 
 // ── 递归树节点组件 ──────────────────────────────────────────────────────────
 function TreeNode({

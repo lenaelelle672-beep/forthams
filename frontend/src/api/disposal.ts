@@ -7,7 +7,7 @@
  */
 
 import http from '@/utils/http';
-import type { ApiResponse, PaginatedResponse } from '@/types/common';
+import type { PaginatedResponse } from '@/types/common';
 
 export type DisposalType = 'TRANSFER' | 'CLEARANCE' | 'SCRAP';
 export type DisposalStatus = 'PENDING' | 'APPROVED' | 'REJECTED' | 'COMPLETED';
@@ -120,7 +120,7 @@ export const getCompensationList = (params?: CompensationListQuery) =>
 
 /** 赔偿详情 */
 export const getCompensationDetail = (id: number) =>
-  http.get<ApiResponse<Compensation>>(`/compensation/${id}`);
+  http.get<Compensation>(`/compensation/${id}`);
 
 /** 赔偿创建 DTO（对应后端 CompensationCreateDTO） */
 export interface CompensationCreatePayload {
@@ -141,7 +141,7 @@ export interface CompensationUpdatePayload extends CompensationCreatePayload {}
  * 后端 POST /compensation 被封门，必须走审批流。
  */
 export const createCompensation = (data: CompensationCreatePayload) =>
-  http.post<ApiResponse<unknown>>('/approvals', {
+  http.post<unknown>('/approvals', {
     processType: 'ASSET_COMPENSATION',
     businessType: 'ASSET_COMPENSATION',
     businessId: data.assetId ?? 0,
@@ -156,7 +156,7 @@ export const createCompensation = (data: CompensationCreatePayload) =>
 
 /** 更新赔偿记录（PUT /compensation/{id}） */
 export const updateCompensation = (id: number, data: CompensationUpdatePayload) =>
-  http.put<ApiResponse<Compensation>>(`/compensation/${id}`, data);
+  http.put<Compensation>(`/compensation/${id}`, data);
 
 // ── 报废申请 ────────────────────────────────────────────────────────────────
 
@@ -172,7 +172,7 @@ export interface ScrapApplicationPayload {
 
 /** 提交报废申请（通过审批流程 POST /approvals） */
 export const submitScrapApplication = (data: ScrapApplicationPayload) =>
-  http.post<ApiResponse<unknown>>('/approvals', {
+  http.post<unknown>('/approvals', {
     processType: 'ASSET_SCRAP',
     businessType: 'ASSET_SCRAP',
     businessId: Number(data.assetIds[0]) || 0,
@@ -229,7 +229,7 @@ export interface ClearanceApplicationPayload {
 
 /** 提交清退申请（通过审批流程 POST /approvals） */
 export const submitClearanceApplication = (data: ClearanceApplicationPayload) =>
-  http.post<ApiResponse<unknown>>('/approvals', {
+  http.post<unknown>('/approvals', {
     processType: 'ASSET_CLEARANCE',
     businessType: 'ASSET_CLEARANCE',
     businessId: Number(data.assetIds[0]) || 0,
@@ -289,7 +289,7 @@ export interface TransferApplicationPayload {
 
 /** 提交调拨申请（通过审批流程 POST /approvals） */
 export const submitTransferApplication = (data: TransferApplicationPayload) =>
-  http.post<ApiResponse<unknown>>('/approvals', {
+  http.post<unknown>('/approvals', {
     processType: 'ASSET_TRANSFER',
     businessType: 'ASSET_TRANSFER',
     businessId: Number(data.assetIds[0]) || 0,

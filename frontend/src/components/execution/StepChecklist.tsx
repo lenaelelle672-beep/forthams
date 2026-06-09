@@ -12,7 +12,6 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import ProgressBar from './ProgressBar';
 import http from '@/utils/http';
-import type { ApiResponse } from '@/types/common';
 
 interface WorkOrderStep {
   id: number;
@@ -29,22 +28,35 @@ interface StepChecklistProps {
   workOrderId: number;
 }
 
+interface ExecutionProgress {
+  totalSteps: number;
+  completedSteps: number;
+  percentage: number;
+  totalDurationMinutes?: number;
+}
+
+const EMPTY_PROGRESS: ExecutionProgress = {
+  totalSteps: 0,
+  completedSteps: 0,
+  percentage: 0,
+};
+
 export default function StepChecklist({ workOrderId }: StepChecklistProps) {
   const queryClient = useQueryClient();
   const [newStepName, setNewStepName] = useState('');
 
   const { data: res } = useQuery({
     queryKey: ['workorder', workOrderId, 'steps'],
-    queryFn: () => http.get<ApiResponse<WorkOrderStep[]>>(`/workorders/${workOrderId}/execution/steps`),
+    queryFn: () => http.get<WorkOrderStep[]>(`/workorders/${workOrderId}/execution/steps`),
   });
 
   const { data: progressRes } = useQuery({
     queryKey: ['workorder', workOrderId, 'progress'],
-    queryFn: () => http.get<ApiResponse<any>>(`/workorders/${workOrderId}/execution/progress`),
+    queryFn: () => http.get<ExecutionProgress>(`/workorders/${workOrderId}/execution/progress`),
   });
 
-  const steps = (res as any)?.data ?? [];
-  const progress = (progressRes as any)?.data ?? { totalSteps: 0, completedSteps: 0, percentage: 0 };
+  const steps = res ?? [];
+  const progress = progressRes ?? EMPTY_PROGRESS;
 
   const createMutation = useMutation({
     mutationFn: (stepName: string) =>

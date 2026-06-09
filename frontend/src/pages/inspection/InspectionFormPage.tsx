@@ -23,10 +23,9 @@ const PhotoUpload: React.FC<{ value?: string; onChange?: (value: string) => void
       const formData = new FormData();
       formData.append('file', files[0]);
       try {
-        const res = await http.post('/file/upload', formData, {
+        const url = await http.post<string>('/file/upload', formData, {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
-        const url = (res as any)?.data || '';
         if (url) {
           const newPhotos = [...photos, url];
           setPhotos(newPhotos);

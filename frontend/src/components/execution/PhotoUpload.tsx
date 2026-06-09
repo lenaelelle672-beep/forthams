@@ -29,7 +29,7 @@ export default function PhotoUpload({ workOrderId, existingPhotos = [], onPhotos
       const res = await http.post('/file/upload', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
-      return (res as any)?.data || '';
+      return typeof res === 'string' ? res : '';
     },
     onSuccess: (url) => {
       if (url) {

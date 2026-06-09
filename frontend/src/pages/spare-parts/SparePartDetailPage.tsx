@@ -3,11 +3,10 @@
  * @description 备品备件详情页面
  */
 
-import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, Edit, AlertTriangle, Package } from 'lucide-react';
-import { getSparePartDetail, getUsageBySparePart, getLowStockAlerts } from '@/api/sparePart';
+import { getSparePartDetail, getUsageBySparePart } from '@/api/sparePart';
 import type { SparePart, SparePartUsage } from '@/types/sparePart';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Button } from '@/components/ui/Button';
@@ -31,8 +30,8 @@ export default function SparePartDetailPage() {
     enabled: !!sparePartId,
   });
 
-  const sparePart = (detailRes as any)?.data as SparePart | undefined;
-  const usages = (usageRes as any)?.data ?? [];
+  const sparePart: SparePart | undefined = detailRes;
+  const usages: SparePartUsage[] = usageRes ?? [];
 
   if (isLoading) {
     return <div className="flex items-center justify-center min-h-screen">加载中...</div>;

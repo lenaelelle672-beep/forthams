@@ -12,7 +12,7 @@ import { useAssetList, useCategoryTree } from '@/hooks/asset/useAssets';
 import { usePdfExport } from '@/hooks/usePdfExport';
 import { AssetStatus } from '@/types/asset';
 import type { AssetListQuery, AssetListItem, DashboardStats } from '@/types/asset';
-import type { ApiResponse, PageData, Department } from '@/types/common';
+import type { PageData, Department } from '@/types/common';
 import { getDeptList } from '@/api/base';
 import { getDashboardStats } from '@/api/asset';
 import { Card, CardContent } from '@/components/ui/Card';
@@ -94,7 +94,7 @@ export default function AssetListPage() {
   const stats = statsRes as unknown as DashboardStats | undefined;
 
   const categories = useMemo(() => {
-    const tree = categoryRes?.data ?? [];
+    const tree = categoryRes ?? [];
     if (!Array.isArray(tree) || tree.length === 0) return [];
     return tree.flatMap((n) => flattenCategoryTree(n as Parameters<typeof flattenCategoryTree>[0]));
   }, [categoryRes]);
@@ -380,9 +380,29 @@ export default function AssetListPage() {
                 </h2>
               </div>
               <div className="flex flex-wrap items-center gap-2">
-                  <Button variant="outline" size="sm" onClick={() => setFilterOpen((v) => !v)}>
-                    <Filter className="h-3.5 w-3.5" />
-                    {t('asset:search.advanced')}
+                <div className="relative w-full min-w-[220px] sm:w-72">
+                  <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                  <input
+                    aria-label="资产搜索"
+                    className="h-9 w-full rounded-lg border border-slate-200 bg-white pl-9 pr-9 text-sm outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+                    placeholder={t('asset:list.searchPlaceholder')}
+                    value={keywordInput}
+                    onChange={(e) => { setKeywordInput(e.target.value); setPage(1); }}
+                  />
+                  {keywordInput && (
+                    <button
+                      type="button"
+                      aria-label="清空资产搜索"
+                      className="absolute right-2 top-1/2 inline-flex h-5 w-5 -translate-y-1/2 items-center justify-center rounded-full text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+                      onClick={() => { setKeywordInput(''); setKeyword(''); setPage(1); }}
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  )}
+                </div>
+                <Button variant="outline" size="sm" onClick={() => setFilterOpen((v) => !v)}>
+                  <Filter className="h-3.5 w-3.5" />
+                  {t('asset:search.advanced')}
                   <ChevronDown className={`h-3 w-3 transition-transform ${filterOpen ? 'rotate-180' : ''}`} />
                 </Button>
                 {isFetching && !isLoading && (

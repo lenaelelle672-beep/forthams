@@ -1,6 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { Camera, QrCode, Save, AlertCircle, Check, X } from 'lucide-react';
+import {
+  adjustStocktakingTask,
+  getStocktakingTask,
+  scanStocktakingTask,
+  type StocktakingTask,
+} from '@/api/stocktaking';
 
 // 动态导入 html5-qrcode（仅在需要时加载）
 const Html5Qrcode = typeof window !== 'undefined' ? require('html5-qrcode').Html5Qrcode : null;
@@ -8,7 +14,7 @@ const Html5Qrcode = typeof window !== 'undefined' ? require('html5-qrcode').Html
 export default function StocktakingTaskPage() {
   const { taskId } = useParams();
   const navigate = useNavigate();
-  const [task, setTask] = useState<any>(null);
+  const [task, setTask] = useState<StocktakingTask | null>(null);
   const [quantity, setQuantity] = useState(0);
   const [photo, setPhoto] = useState<string | null>(null);
   const [isScanning, setIsScanning] = useState(false);
@@ -34,11 +40,10 @@ export default function StocktakingTaskPage() {
       return;
     }
     try {
-      const response = await fetch(`/api/stocktaking/tasks/${taskId}`);
-      const data = await response.json();
-      if (data.data) {
-        setTask(data.data);
-        setQuantity(data.data.expectedQuantity ?? 0);
+      const taskData = await getStocktakingTask(taskId);
+      if (taskData) {
+        setTask(taskData);
+        setQuantity(taskData.expectedQuantity ?? 0);
       } else {
         setCameraError('获取任务数据失败');
       }
@@ -102,25 +107,18 @@ export default function StocktakingTaskPage() {
 
     setSubmitting(true);
     try {
-      await fetch(`/api/stocktaking/tasks/${taskId}/scan`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ quantity, photoUrl: photo }),
-      });
+      if (!taskId || !task) return;
+      await scanStocktakingTask(taskId, { quantity, photoUrl: photo });
 
       setResult('success');
 
-      const variance = quantity - task.expectedQuantity;
+      const variance = quantity - (task.expectedQuantity ?? 0);
       if (variance !== 0) {
         const shouldAdjust = confirm(
           `发现差异: ${variance > 0 ? '+' : ''}${variance}\n是否需要调整？`
         );
         if (shouldAdjust) {
-          await fetch(`/api/stocktaking/tasks/${taskId}/adjust`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ threshold: 1000, reason: '盘点差异调整' }),
-          });
+          await adjustStocktakingTask(taskId, { threshold: 1000, reason: '盘点差异调整' });
         }
       }
 

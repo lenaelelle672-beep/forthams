@@ -8,7 +8,7 @@
  */
 
 import { useQuery } from '@tanstack/react-query';
-import { assetService, getAssetList } from '@/services/assetService';
+import { getAssetDetail, getAssetList } from '@/services/assetService';
 import type { Asset } from '@/types/asset';
 
 /**
@@ -50,8 +50,7 @@ export function useAssetById(
   return useQuery({
     queryKey: assetByIdKeys.detail(assetId),
     queryFn: async (): Promise<Asset> => {
-      const response = await assetService.getAssetById(assetId);
-      return response.data;
+      return getAssetDetail(assetId);
     },
     enabled: Boolean(assetId) && enabled,
     staleTime,

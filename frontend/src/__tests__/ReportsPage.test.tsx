@@ -50,8 +50,7 @@ import {
   getWorkOrderDeptPending,
 } from '@/api/reports';
 import { toast } from 'sonner';
-import type { ApiResponse } from '@/types/common';
-import type { ReportSummary, CategoryReport } from '@/api/reports';
+import type { CategoryReport, ReportMonthly, ReportSummary, TrendReport, NameValueItem } from '@/api/reports';
 
 function createWrapper() {
   const queryClient = new QueryClient({
@@ -71,37 +70,23 @@ function createWrapper() {
 }
 
 function getPrimaryExportButton() {
-  return screen.getAllByRole('button', { name: '导出' })[0];
+  return screen.getByRole('button', { name: '导出 Excel' });
 }
 
-const emptySummary: ApiResponse<ReportSummary> = {
-  code: 200,
-  message: 'success',
-  data: { totalAssets: 0, activeAssets: 0, pendingApproval: 0, recentlyRetired: 0 },
-};
+const emptySummary: ReportSummary = { totalAssets: 0, activeAssets: 0, pendingApproval: 0, recentlyRetired: 0 };
 
-const emptyCategory: ApiResponse<CategoryReport[]> = {
-  code: 200,
-  message: 'success',
-  data: [],
-};
+const emptyCategory: CategoryReport[] = [];
 
-const sampleCategory: ApiResponse<CategoryReport[]> = {
-  code: 200,
-  message: 'success',
-  data: [
-    { categoryName: '电子设备', assetCount: 80, totalValue: 5000000 },
-    { categoryName: '机械设备', assetCount: 45, totalValue: 8000000 },
-  ],
-};
+const sampleCategory: CategoryReport[] = [
+  { categoryName: '电子设备', assetCount: 80, totalValue: 5000000 },
+  { categoryName: '机械设备', assetCount: 45, totalValue: 8000000 },
+];
 
-const sampleSummary: ApiResponse<ReportSummary> = {
-  code: 200,
-  message: 'success',
-  data: { totalAssets: 150, activeAssets: 120, pendingApproval: 10, recentlyRetired: 5 },
-};
+const sampleSummary: ReportSummary = { totalAssets: 150, activeAssets: 120, pendingApproval: 10, recentlyRetired: 5 };
 
-const emptyMonthly = { code: 200, message: 'success', data: [] };
+const emptyMonthly: ReportMonthly[] = [];
+const emptyTrend: TrendReport[] = [];
+const emptyNameValue: NameValueItem[] = [];
 
 describe('ReportsPage', () => {
   beforeEach(() => {
@@ -109,12 +94,13 @@ describe('ReportsPage', () => {
     // Default mock: resolve with empty data so page renders
     vi.mocked(getReportSummary).mockResolvedValue(emptySummary);
     vi.mocked(getReportByCategory).mockResolvedValue(emptyCategory);
-    vi.mocked(getReportTrend).mockResolvedValue({ code: 200, message: 'success', data: [] });
+    vi.mocked(getReportTrend).mockResolvedValue(emptyTrend);
     vi.mocked(getDepreciationStats).mockResolvedValue(emptyMonthly);
     vi.mocked(getMaintenanceStats).mockResolvedValue(emptyMonthly);
     vi.mocked(getRetirementStats).mockResolvedValue(emptyMonthly);
-    vi.mocked(getWorkOrderStatusDistribution).mockResolvedValue(emptyMonthly);
-    vi.mocked(getWorkOrderDeptPending).mockResolvedValue(emptyMonthly);  });
+    vi.mocked(getWorkOrderStatusDistribution).mockResolvedValue(emptyNameValue);
+    vi.mocked(getWorkOrderDeptPending).mockResolvedValue(emptyNameValue);
+  });
 
   it('should render page header with subtitle', async () => {
     render(<ReportsPage />, { wrapper: createWrapper() });
@@ -128,10 +114,10 @@ describe('ReportsPage', () => {
     render(<ReportsPage />, { wrapper: createWrapper() });
 
     await waitFor(() => {
-      expect(screen.getAllByRole('tab', { name: /资产报表/ })[0]).toBeInTheDocument();
-      expect(screen.getByText('财务报表')).toBeInTheDocument();
-      expect(screen.getByText('运维报表')).toBeInTheDocument();
-      expect(screen.getByText('工单报表')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: '资产报表' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: '财务报表' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: '运维报表' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: '工单报表' })).toBeInTheDocument();
     });
   });
 
@@ -159,7 +145,7 @@ describe('ReportsPage', () => {
       expect(screen.getByText('资产汇总表')).toBeInTheDocument();
     });
 
-    await user.click(screen.getByText('财务报表'));
+    await user.click(screen.getByRole('button', { name: '财务报表' }));
 
     await waitFor(() => {
       expect(screen.getByText('资产价值趋势')).toBeInTheDocument();
@@ -175,7 +161,7 @@ describe('ReportsPage', () => {
     render(<ReportsPage />, { wrapper: createWrapper() });
 
     // The page container should exist (without assertions on specific data)
-    expect(screen.getAllByRole('tab', { name: /资产报表/ })[0]).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '资产报表' })).toBeInTheDocument();
   });
 
   it('should show error state when API calls fail', async () => {
@@ -255,14 +241,10 @@ describe('ReportsPage', () => {
   it('should show trend data and call getReportTrend with default period', async () => {
     vi.mocked(getReportSummary).mockResolvedValue(sampleSummary);
     vi.mocked(getReportByCategory).mockResolvedValue(sampleCategory);
-    vi.mocked(getReportTrend).mockResolvedValue({
-      code: 200,
-      message: 'success',
-      data: [
-        { month: '2026-01', assetCount: 100, totalValue: 5000000 },
-        { month: '2026-02', assetCount: 110, totalValue: 5500000 },
-      ],
-    });
+    vi.mocked(getReportTrend).mockResolvedValue([
+      { month: '2026-01', assetCount: 100, totalValue: 5000000 },
+      { month: '2026-02', assetCount: 110, totalValue: 5500000 },
+    ]);
 
     const user = userEvent.setup();
     render(<ReportsPage />, { wrapper: createWrapper() });
@@ -295,16 +277,8 @@ describe('ReportsPage', () => {
 
   it('should render cards with zero API data', async () => {
     // API returns successful response with zero values
-    vi.mocked(getReportSummary).mockResolvedValue({
-      code: 200,
-      message: 'success',
-      data: { totalAssets: 0, activeAssets: 0, pendingApproval: 0, recentlyRetired: 0 },
-    });
-    vi.mocked(getReportByCategory).mockResolvedValue({
-      code: 200,
-      message: 'success',
-      data: [],
-    });
+    vi.mocked(getReportSummary).mockResolvedValue(emptySummary);
+    vi.mocked(getReportByCategory).mockResolvedValue(emptyCategory);
 
     render(<ReportsPage />, { wrapper: createWrapper() });
 
@@ -313,21 +287,13 @@ describe('ReportsPage', () => {
       expect(screen.getByText('资产汇总表')).toBeInTheDocument();
       expect(screen.getByText('资产增长趋势')).toBeInTheDocument();
       // Tab headers render
-      expect(screen.getAllByRole('tab', { name: /资产报表/ })[0]).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: '资产报表' })).toBeInTheDocument();
     });
   });
 
   it('should handle empty category data gracefully when chart is opened', async () => {
-    vi.mocked(getReportSummary).mockResolvedValue({
-      code: 200,
-      message: 'success',
-      data: { totalAssets: 0, activeAssets: 0, pendingApproval: 0, recentlyRetired: 0 },
-    });
-    vi.mocked(getReportByCategory).mockResolvedValue({
-      code: 200,
-      message: 'success',
-      data: [],
-    });
+    vi.mocked(getReportSummary).mockResolvedValue(emptySummary);
+    vi.mocked(getReportByCategory).mockResolvedValue(emptyCategory);
 
     const user = userEvent.setup();
     render(<ReportsPage />, { wrapper: createWrapper() });
@@ -363,13 +329,13 @@ describe('ReportsPage — 导出功能', () => {
     vi.clearAllMocks();
     vi.mocked(getReportSummary).mockResolvedValue(emptySummary);
     vi.mocked(getReportByCategory).mockResolvedValue(emptyCategory);
-    vi.mocked(getReportTrend).mockResolvedValue({ code: 200, message: 'success', data: [] });
+    vi.mocked(getReportTrend).mockResolvedValue(emptyTrend);
     vi.mocked(getDepreciationStats).mockResolvedValue(emptyMonthly);
     vi.mocked(getMaintenanceStats).mockResolvedValue(emptyMonthly);
-    vi.mocked(getWorkOrderStatusDistribution).mockResolvedValue(emptyMonthly);
-    vi.mocked(getWorkOrderDeptPending).mockResolvedValue(emptyMonthly);    vi.mocked(getRetirementStats).mockResolvedValue(emptyMonthly);
-    vi.mocked(getWorkOrderStatusDistribution).mockResolvedValue(emptyMonthly);
-    vi.mocked(getWorkOrderDeptPending).mockResolvedValue(emptyMonthly);  });
+    vi.mocked(getRetirementStats).mockResolvedValue(emptyMonthly);
+    vi.mocked(getWorkOrderStatusDistribution).mockResolvedValue(emptyNameValue);
+    vi.mocked(getWorkOrderDeptPending).mockResolvedValue(emptyNameValue);
+  });
 
   it('应渲染导出按钮', async () => {
     render(<ReportsPage />, { wrapper: createWrapper() });

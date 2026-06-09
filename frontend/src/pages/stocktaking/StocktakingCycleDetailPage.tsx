@@ -11,13 +11,25 @@ import {
   FileText,
 } from 'lucide-react';
 import { usePdfExport } from '@/hooks/usePdfExport';
+import {
+  assignStocktakingTasks,
+  completeStocktakingCycle,
+  getStocktakingCycle,
+  getStocktakingCycleStats,
+  getStocktakingCycleTasks,
+  pauseStocktakingCycle,
+  resumeStocktakingCycle,
+  type StocktakingCycle,
+  type StocktakingCycleStats,
+  type StocktakingTask,
+} from '@/api/stocktaking';
 
 export default function StocktakingCycleDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [cycle, setCycle] = useState<any>(null);
-  const [tasks, setTasks] = useState<any[]>([]);
-  const [stats, setStats] = useState<any>(null);
+  const [cycle, setCycle] = useState<StocktakingCycle | null>(null);
+  const [tasks, setTasks] = useState<StocktakingTask[]>([]);
+  const [stats, setStats] = useState<StocktakingCycleStats | null>(null);
   const [loading, setLoading] = useState(true);
   const { exporting: pdfExporting, exportPdf } = usePdfExport({
     type: 'stocktaking',
@@ -36,19 +48,15 @@ export default function StocktakingCycleDetailPage() {
     }
     setLoading(true);
     try {
-      const [cycleRes, tasksRes, statsRes] = await Promise.all([
-        fetch(`/api/stocktaking/cycles/${id}`),
-        fetch(`/api/stocktaking/cycles/${id}/tasks`),
-        fetch(`/api/stocktaking/cycles/${id}/stats`),
+      const [cycleData, tasksData, statsData] = await Promise.all([
+        getStocktakingCycle(id),
+        getStocktakingCycleTasks(id),
+        getStocktakingCycleStats(id),
       ]);
 
-      const cycleData = await cycleRes.json();
-      const tasksData = await tasksRes.json();
-      const statsData = await statsRes.json();
-
-      setCycle(cycleData.data);
-      setTasks(tasksData.data || []);
-      setStats(statsData.data);
+      setCycle(cycleData);
+      setTasks(tasksData || []);
+      setStats(statsData);
     } catch (error) {
       console.error('获取数据失败:', error);
     } finally {
@@ -60,7 +68,8 @@ export default function StocktakingCycleDetailPage() {
     if (!confirm('确认分配盘点任务？')) return;
 
     try {
-      await fetch(`/api/stocktaking/cycles/${id}/assign`, { method: 'POST' });
+      if (!id) return;
+      await assignStocktakingTasks(id);
       fetchData();
     } catch (error) {
       console.error('分配任务失败:', error);
@@ -70,7 +79,8 @@ export default function StocktakingCycleDetailPage() {
 
   const handlePause = async () => {
     try {
-      await fetch(`/api/stocktaking/cycles/${id}/pause`, { method: 'POST' });
+      if (!id) return;
+      await pauseStocktakingCycle(id);
       fetchData();
     } catch (error) {
       console.error('暂停失败:', error);
@@ -79,7 +89,8 @@ export default function StocktakingCycleDetailPage() {
 
   const handleResume = async () => {
     try {
-      await fetch(`/api/stocktaking/cycles/${id}/resume`, { method: 'POST' });
+      if (!id) return;
+      await resumeStocktakingCycle(id);
       fetchData();
     } catch (error) {
       console.error('恢复失败:', error);
@@ -90,7 +101,8 @@ export default function StocktakingCycleDetailPage() {
     if (!confirm('确认完成盘点周期？完成后将无法修改。')) return;
 
     try {
-      await fetch(`/api/stocktaking/cycles/${id}/complete`, { method: 'POST' });
+      if (!id) return;
+      await completeStocktakingCycle(id);
       fetchData();
     } catch (error) {
       console.error('完成失败:', error);
@@ -278,9 +290,9 @@ export default function StocktakingCycleDetailPage() {
                   <div className="text-sm text-gray-600">
                     <div>预期数量: {task.expectedQuantity}</div>
                     <div>实际数量: {task.actualQuantity}</div>
-                    {task.variance !== 0 && (
+                    {(task.variance ?? 0) !== 0 && (
                       <div className="text-red-600">
-                        差异: {task.variance > 0 ? '+' : ''}{task.variance}
+                        差异: {(task.variance ?? 0) > 0 ? '+' : ''}{task.variance}
                       </div>
                     )}
                   </div>

@@ -3,7 +3,7 @@
  *
  * 对接后端端点：
  * - GET  /api/assets/import/template    — 下载导入模板（文件流）
- * - POST /api/assets/import/parse       — 上传并解析 Excel（multipart/form-data）
+ * - POST /api/assets/import/parse       — 上传并解析 CSV（multipart/form-data）
  * - POST /api/assets/import/commit      — 确认提交解析数据（JSON body）
  * - POST /api/assets/export             — 按条件导出（JSON body，返回文件流）
  *
@@ -55,6 +55,7 @@ export interface ExportFilters {
   categoryCodes: string[];
   statusCodes: string[];
   locationCodes: string[];
+  keyword?: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -75,11 +76,11 @@ export const getImportTemplate = async (): Promise<Blob> => {
 };
 
 /**
- * FE-3 / FE-4 / FE-5: 上传并解析 Excel 文件
+ * FE-3 / FE-4 / FE-5: 上传并解析 CSV 文件
  * POST /api/assets/import/parse
  * Content-Type: multipart/form-data, field name: file
  *
- * @param file  - 上传的 .xlsx 文件
+ * @param file  - 上传的 .csv 文件
  * @param onUploadProgress - 可选的上传进度回调，参数为 0~100 的百分比
  */
 export const parseImportFile = async (
@@ -133,12 +134,16 @@ export const commitImport = async (
  * @param filters - 筛选条件：分类编码、状态编码、位置编码数组
  */
 export const exportAssets = async (filters: ExportFilters): Promise<Blob> => {
+  const firstNumericCategory = filters.categoryCodes
+    .map((value) => Number(value))
+    .find((value) => Number.isFinite(value));
+
   const response = await http.post<Blob>(
     '/assets/export',
     {
-      categoryCodes: filters.categoryCodes,
-      statusCodes: filters.statusCodes,
-      locationCodes: filters.locationCodes,
+      categoryId: firstNumericCategory,
+      status: filters.statusCodes.filter(Boolean).join(','),
+      keyword: filters.keyword,
     },
     { responseType: 'blob' },
   );

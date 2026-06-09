@@ -58,43 +58,35 @@ describe('ReportPage — API 调用测试', () => {
   describe('getReportSummary', () => {
     it('应正确调用 /reports/summary 端点', async () => {
       const mockResponse = {
-        code: 200,
-        message: '操作成功',
-        data: {
-          totalAssets: 1200,
-          activeAssets: 850,
-          pendingApproval: 23,
-          recentlyRetired: 45,
-        },
+        totalAssets: 1200,
+        activeAssets: 850,
+        pendingApproval: 23,
+        recentlyRetired: 45,
       };
       mockedHttp.get.mockResolvedValueOnce(mockResponse);
 
       const result = await getReportSummary();
 
       expect(mockedHttp.get).toHaveBeenCalledWith('/reports/summary');
-      expect(result.data.totalAssets).toBe(1200);
-      expect(result.data.activeAssets).toBe(850);
-      expect(result.data.pendingApproval).toBe(23);
-      expect(result.data.recentlyRetired).toBe(45);
+      expect(result.totalAssets).toBe(1200);
+      expect(result.activeAssets).toBe(850);
+      expect(result.pendingApproval).toBe(23);
+      expect(result.recentlyRetired).toBe(45);
     });
 
     it('应在无数据时返回零值', async () => {
       const mockResponse = {
-        code: 200,
-        message: '操作成功',
-        data: {
-          totalAssets: 0,
-          activeAssets: 0,
-          pendingApproval: 0,
-          recentlyRetired: 0,
-        },
+        totalAssets: 0,
+        activeAssets: 0,
+        pendingApproval: 0,
+        recentlyRetired: 0,
       };
       mockedHttp.get.mockResolvedValueOnce(mockResponse);
 
       const result = await getReportSummary();
 
-      expect(result.data.totalAssets).toBe(0);
-      expect(result.data.activeAssets).toBe(0);
+      expect(result.totalAssets).toBe(0);
+      expect(result.activeAssets).toBe(0);
     });
 
     it('应处理服务端错误响应', async () => {
@@ -113,32 +105,22 @@ describe('ReportPage — API 调用测试', () => {
         { categoryName: '办公家具', assetCount: 280, totalValue: 1_800_000 },
         { categoryName: '生产设备', assetCount: 120, totalValue: 12_000_000 },
       ];
-      const mockResponse = {
-        code: 200,
-        message: '操作成功',
-        data: mockCategories,
-      };
-      mockedHttp.get.mockResolvedValueOnce(mockResponse);
+      mockedHttp.get.mockResolvedValueOnce(mockCategories);
 
       const result = await getReportByCategory();
 
       expect(mockedHttp.get).toHaveBeenCalledWith('/reports/by-category');
-      expect(result.data).toHaveLength(3);
-      expect(result.data[0].categoryName).toBe('IT 设备');
-      expect(result.data[0].assetCount).toBe(350);
+      expect(result).toHaveLength(3);
+      expect(result[0].categoryName).toBe('IT 设备');
+      expect(result[0].assetCount).toBe(350);
     });
 
     it('应在无分类数据时返回空数组', async () => {
-      const mockResponse = {
-        code: 200,
-        message: '操作成功',
-        data: [],
-      };
-      mockedHttp.get.mockResolvedValueOnce(mockResponse);
+      mockedHttp.get.mockResolvedValueOnce([]);
 
       const result = await getReportByCategory();
 
-      expect(result.data).toEqual([]);
+      expect(result).toEqual([]);
     });
 
     it('应处理网络错误', async () => {

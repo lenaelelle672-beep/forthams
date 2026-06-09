@@ -6,35 +6,19 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { PageTransition, ErrorState, EmptyState, SkeletonTable } from '@/components/ui';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { Modal, Tag, message } from 'antd';
-import http from '@/utils/http';
+import {
+  activateTenant,
+  createTenant,
+  listTenants,
+  suspendTenant,
+  updateTenant,
+  type TenantPayload as TenantForm,
+  type TenantRecord,
+} from '@/api/tenant';
 
 const planColors: Record<string, string> = {
   FREE: 'default', BASIC: 'blue', PRO: 'green', ENTERPRISE: 'gold'
 };
-
-interface TenantRecord {
-  id: string;
-  name: string;
-  plan: string;
-  maxUsers: number;
-  maxAssets: number;
-  status: string;
-  contactName?: string;
-  contactPhone?: string;
-  contactEmail?: string;
-  [key: string]: any;
-}
-
-interface TenantForm {
-  id: string;
-  name: string;
-  plan: string;
-  maxUsers: number;
-  maxAssets: number;
-  contactName: string;
-  contactPhone: string;
-  contactEmail: string;
-}
 
 const defaultForm: TenantForm = { id: '', name: '', plan: 'FREE', maxUsers: 100, maxAssets: 1000, contactName: '', contactPhone: '', contactEmail: '' };
 
@@ -60,8 +44,7 @@ function TenantManagementContent() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const res: any = await http.get('/tenants', { params: { pageSize: 100 } });
-      const data: { records?: TenantRecord[]; total?: number } = res.data || res;
+      const data = await listTenants({ pageSize: 100 });
       setTenants(data?.records || []);
     } catch (e) {
       setError(e instanceof Error ? e.message : '获取租户列表失败');
@@ -75,9 +58,9 @@ function TenantManagementContent() {
   const handleSave = async () => {
     try {
       if (editingItem) {
-        await http.put(`/tenants/${editingItem.id}`, form);
+        await updateTenant(editingItem.id, form);
       } else {
-        await http.post('/tenants', form);
+        await createTenant(form);
       }
       message.success('保存成功');
       setModalVisible(false);
@@ -87,7 +70,11 @@ function TenantManagementContent() {
 
   const handleToggleStatus = async (id: string, action: 'suspend' | 'activate') => {
     try {
-      await http.put(`/tenants/${id}/${action}`);
+      if (action === 'suspend') {
+        await suspendTenant(id);
+      } else {
+        await activateTenant(id);
+      }
       message.success('操作成功');
       fetchData();
     } catch { message.error('操作失败'); }
@@ -163,7 +150,7 @@ function TenantManagementContent() {
 
         <Modal title={editingItem ? '编辑租户' : '新建租户'} open={modalVisible} onOk={handleSave} onCancel={() => setModalVisible(false)}>
           <div className="space-y-4">
-            {!editingItem && <Input placeholder="租户ID (如 T001)" value={form.id} onChange={e => setForm(f => ({ ...f, id: e.target.value }))} />}
+            {!editingItem && <Input placeholder="租户ID (如 dept:42)" value={form.id} onChange={e => setForm(f => ({ ...f, id: e.target.value }))} />}
             <Input placeholder="租户名称" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
             <Input placeholder="联系人" value={form.contactName} onChange={e => setForm(f => ({ ...f, contactName: e.target.value }))} />
             <Input placeholder="联系电话" value={form.contactPhone} onChange={e => setForm(f => ({ ...f, contactPhone: e.target.value }))} />

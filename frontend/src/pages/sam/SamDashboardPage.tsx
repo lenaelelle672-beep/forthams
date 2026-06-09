@@ -13,7 +13,15 @@ import { Button } from '@/components/ui/Button';
 import { DataTable, type Column } from '@/components/ui/DataTable';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/Dialog';
 import { toast } from 'sonner';
-import http from '@/utils/http';
+import {
+  getSamDashboard,
+  getSamHistory,
+  getSamScanDetails,
+  runSamComplianceScan,
+  type SamComplianceScan as ScanRecord,
+  type SamDashboardData as DashboardData,
+  type SamDetailItem as DetailItem,
+} from '@/api/sam';
 import {
   ShieldCheck,
   AlertTriangle,
@@ -23,49 +31,6 @@ import {
   ScanSearch,
   RefreshCw,
 } from 'lucide-react';
-
-/* ── 类型定义 ─────────────────────────────────────────────────────────────── */
-interface ScanRecord {
-  id: number;
-  scanDate: string;
-  totalLicenses: number;
-  compliantCount: number;
-  overusedCount: number;
-  underusedCount: number;
-  expiredCount: number;
-  complianceRate: number;
-  status: string;
-  createdAt: string;
-}
-
-interface DetailItem {
-  id: number;
-  scanId: number;
-  licenseId: number;
-  softwareName: string;
-  licenseType: string;
-  totalSeats: number;
-  usedSeats: number;
-  complianceStatus: string;
-  riskLevel: string;
-  recommendation: string;
-  expiryDate?: string;
-}
-
-interface DashboardData {
-  hasData: boolean;
-  complianceRate: number;
-  totalLicenses: number;
-  compliantCount: number;
-  overusedCount: number;
-  underusedCount: number;
-  expiredCount: number;
-  highRiskItems: DetailItem[];
-  byLicenseType: Record<string, number>;
-  upcomingExpiry?: DetailItem[];
-  scanId: number;
-  scanDate: string;
-}
 
 interface HistoryData {
   records: ScanRecord[];
@@ -136,8 +101,8 @@ const SamDashboardPage: React.FC = () => {
   const fetchDashboard = useCallback(async () => {
     setLoading(true);
     try {
-      const res: any = await http.get('/sam/dashboard');
-      setDashboard(res.data || res);
+      const res = await getSamDashboard();
+      setDashboard(res);
     } catch (e) {
       setError(e instanceof Error ? e.message : '获取合规数据失败');
       toast.error('获取合规数据失败');
@@ -147,8 +112,8 @@ const SamDashboardPage: React.FC = () => {
 
   const fetchHistory = useCallback(async (page = 1, size = 10) => {
     try {
-      const res: any = await http.get('/sam/history', { params: { page, pageSize: size } });
-      setHistory(res.data || res);
+      const res = await getSamHistory({ page, pageSize: size });
+      setHistory(res);
     } catch {
       // 静默
     }
@@ -164,7 +129,7 @@ const SamDashboardPage: React.FC = () => {
     if (!confirm('确认执行合规扫描？扫描将遍历所有许可证并检查使用情况，期间可能短暂增加数据库负载。')) return;
     setScanning(true);
     try {
-      await http.post('/sam/scan');
+      await runSamComplianceScan();
       toast.success('合规扫描完成');
       await fetchDashboard();
       await fetchHistory();
@@ -179,8 +144,7 @@ const SamDashboardPage: React.FC = () => {
     setDetailModalOpen(true);
     setDetailLoading(true);
     try {
-      const res: any = await http.get(`/sam/${scanId}/details`);
-      const data = res.data || res;
+      const data = await getSamScanDetails(scanId);
       setDetailItems(data.details || []);
     } catch {
       toast.error('获取扫描详情失败');

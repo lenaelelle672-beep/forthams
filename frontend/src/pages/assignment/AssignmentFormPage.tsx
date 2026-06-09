@@ -10,7 +10,7 @@ import { useCreateAssignment, useUpdateAssignment, useAssignmentDetail } from '@
 import { useAssetList } from '@/hooks/asset/useAssets';
 import { AssetStatus } from '@/types/asset';
 import { AllocationType, ALLOCATION_TYPE_CONFIG } from '@/types/assignment';
-import type { CreateAssignmentRequest, AssetAssignment } from '@/types/assignment';
+import type { CreateAssignmentRequest } from '@/types/assignment';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -35,17 +35,16 @@ export default function AssignmentFormPage() {
   const [remark, setRemark] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const assets = Array.isArray(assetsRes) ? assetsRes : [];
+  const assets = assetsRes?.records ?? [];
 
   React.useEffect(() => {
     if (detailRes) {
-      const item = (detailRes as any)?.data || detailRes;
-      setAssetId(item.assetId || '');
-      setAssignedToUserId(item.assignedToUserId?.toString() || '');
-      setAssignedToDeptId(item.assignedToDeptId?.toString() || '');
-      setAllocationType(item.allocationType || AllocationType.ASSIGNMENT);
-      setExpectedReturnDate(item.expectedReturnDate || '');
-      setRemark(item.remark || '');
+      setAssetId(detailRes.assetId || '');
+      setAssignedToUserId(detailRes.assignedToUserId?.toString() || '');
+      setAssignedToDeptId(detailRes.assignedToDeptId?.toString() || '');
+      setAllocationType(detailRes.allocationType || AllocationType.ASSIGNMENT);
+      setExpectedReturnDate(detailRes.expectedReturnDate || '');
+      setRemark(detailRes.remark || '');
     }
   }, [detailRes]);
 
@@ -136,7 +135,7 @@ export default function AssignmentFormPage() {
                 disabled={isEdit}
               >
                 <option value="">请选择资产</option>
-                {(assetsRes as any)?.records?.map((a: any) => (
+                {assets.map((a) => (
                   <option key={a.id} value={a.id}>{a.assetNo} - {a.assetName}</option>
                 ))}
               </select>

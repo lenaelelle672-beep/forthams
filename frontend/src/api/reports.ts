@@ -14,7 +14,6 @@
  */
 
 import http from '@/utils/http';
-import type { ApiResponse } from '@/types/common';
 
 // ── 响应类型定义 ──────────────────────────────────────────────────────────────
 
@@ -58,35 +57,35 @@ export interface ReportMonthly {
 
 /** 获取资产汇总统计 */
 export const getReportSummary = () =>
-  http.get<ApiResponse<ReportSummary>>('/reports/summary');
+  http.get<ReportSummary>('/reports/summary');
 
 /** 获取按分类统计的资产数据 */
 export const getReportByCategory = () =>
-  http.get<ApiResponse<CategoryReport[]>>('/reports/by-category');
+  http.get<CategoryReport[]>('/reports/by-category');
 
 /** 获取月度资产趋势 */
 export const getReportTrend = (months = 12) =>
-  http.get<ApiResponse<TrendReport[]>>('/reports/trend', { params: { months } });
+  http.get<TrendReport[]>('/reports/trend', { params: { months } });
 
 /** 获取折旧月度统计 */
 export const getDepreciationStats = () =>
-  http.get<ApiResponse<ReportMonthly[]>>('/reports/depreciation-stats');
+  http.get<ReportMonthly[]>('/reports/depreciation-stats');
 
 /** 获取维保月度统计 */
 export const getMaintenanceStats = () =>
-  http.get<ApiResponse<ReportMonthly[]>>('/reports/maintenance-stats');
+  http.get<ReportMonthly[]>('/reports/maintenance-stats');
 
 /** 获取退役处置月度统计 */
 export const getRetirementStats = () =>
-  http.get<ApiResponse<ReportMonthly[]>>('/reports/retirement-stats');
+  http.get<ReportMonthly[]>('/reports/retirement-stats');
 
 /** 获取工单状态分布统计 */
 export const getWorkOrderStatusDistribution = () =>
-  http.get<ApiResponse<NameValueItem[]>>('/workorders/status-distribution');
+  http.get<NameValueItem[]>('/workorders/status-distribution');
 
 /** 获取各部门待处理工单数量 */
 export const getWorkOrderDeptPending = () =>
-  http.get<ApiResponse<NameValueItem[]>>('/workorders/dept-pending');
+  http.get<NameValueItem[]>('/workorders/dept-pending');
 
 // ── PDF 导出 ────────────────────────────────────────────────────────────────
 

@@ -14,7 +14,7 @@ export { KpiCard } from './KpiCard';
 export { Skeleton, SkeletonCard, SkeletonTable } from './Skeleton';
 export { EmptyState } from './EmptyState';
 export { Select, SelectItem } from './Select';
-export { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from './Dialog';
+export { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from './Dialog';
 export { Sheet, SheetContent, SheetHeader, SheetTitle } from './Sheet';
 export { Tabs, TabsList, TabsTrigger, TabsContent } from './Tabs';
 export { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from './DropdownMenu';

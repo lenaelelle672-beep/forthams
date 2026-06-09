@@ -15,6 +15,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { AlertTriangle, TrendingDown, DollarSign, Calendar, Loader2, RefreshCw } from 'lucide-react';
+import http from '@/utils/http';
 
 /** 折旧方法枚举 */
 export type DepreciationMethod = 'straight_line' | 'double_declining';
@@ -47,14 +48,28 @@ export interface DepreciationRequestParams {
   referenceDate?: string;
 }
 
+/** 后端折旧对比接口单项数据 */
+export interface DepreciationComparisonItem {
+  methodCode: string;
+  methodName: string;
+  monthlyDepreciation: number;
+  annualDepreciation: number;
+  annualRate: number;
+  accumulatedDepreciation: number;
+  netValue: number;
+  description?: string;
+}
+
 /** API 响应数据结构 */
 export interface DepreciationApiResponse {
-  current_depreciation: number;
-  accumulated_depreciation: number;
-  net_book_value: number;
-  monthly_depreciation: number;
-  method: string;
-  calculated_at: string;
+  assetId: number | string;
+  assetNo?: string;
+  assetName?: string;
+  originalValue?: number;
+  currentValue?: number;
+  usefulLifeYears?: number;
+  period?: string;
+  data?: DepreciationComparisonItem[];
 }
 
 /** DepreciationCard 组件 Props */
@@ -77,6 +92,11 @@ export interface DepreciationCardProps {
 const METHOD_LABELS: Record<DepreciationMethod, string> = {
   straight_line: '直线法',
   double_declining: '双倍余额递减法',
+};
+
+const METHOD_CODES: Record<DepreciationMethod, string> = {
+  straight_line: 'STRAIGHT_LINE',
+  double_declining: 'DOUBLE_DECLINING',
 };
 
 /** 默认折旧数据（资产未计算折旧时使用） */
@@ -119,39 +139,65 @@ export const formatPercentage = (rate: number, decimals: number = 2): string => 
   return `${(rate * 100).toFixed(decimals)}%`;
 };
 
+const toNumber = (value: unknown, fallback = 0): number => {
+  const n = Number(value);
+  return Number.isFinite(n) ? n : fallback;
+};
+
+const normalizeRate = (rate: number): number => {
+  return rate > 1 ? rate / 100 : rate;
+};
+
+const isCancelledRequest = (error: unknown): boolean => {
+  return error instanceof Error && (error.name === 'AbortError' || error.name === 'CanceledError');
+};
+
 /**
  * 将 API 响应转换为组件数据格式
  * 
  * @param response - API 响应数据
+ * @param requestedMethod - 当前组件请求的折旧方法
  * @returns 组件内部使用的数据结构
  */
-export const transformApiResponse = (response: DepreciationApiResponse): DepreciationData => {
-  const method = response.method as DepreciationMethod;
-  const monthlyAmount = response.monthly_depreciation || 0;
-  const accumulated = response.accumulated_depreciation || 0;
-  const netValue = response.net_book_value || 0;
-  const purchasePrice = monthlyAmount > 0 ? (monthlyAmount * 12 * 10) + netValue + accumulated : 0; // 估算原值
+export const transformApiResponse = (
+  response: DepreciationApiResponse,
+  requestedMethod: DepreciationMethod = 'straight_line',
+): DepreciationData => {
+  const methodCode = METHOD_CODES[requestedMethod];
+  const items = response.data ?? [];
+  const selectedItem = items.find((item) => item.methodCode === methodCode) ?? items[0];
 
-  // 计算折旧率
-  const depreciationRate = purchasePrice > 0 
-    ? accumulated / purchasePrice 
-    : 0;
+  if (!selectedItem) {
+    return {
+      ...DEFAULT_DEPRECIATION,
+      method: requestedMethod,
+      methodLabel: METHOD_LABELS[requestedMethod],
+      calculatedAt: response.period ?? '',
+    };
+  }
+
+  const monthlyAmount = toNumber(selectedItem.monthlyDepreciation);
+  const accumulated = toNumber(selectedItem.accumulatedDepreciation);
+  const netValue = toNumber(selectedItem.netValue, toNumber(response.currentValue));
+  const purchasePrice = toNumber(response.originalValue);
+  const annualDepreciation = toNumber(selectedItem.annualDepreciation, monthlyAmount * 12);
+  const annualRate = normalizeRate(toNumber(selectedItem.annualRate));
 
   return {
-    method,
-    methodLabel: METHOD_LABELS[method] || method,
+    method: requestedMethod,
+    methodLabel: selectedItem.methodName || METHOD_LABELS[requestedMethod],
     purchasePrice,
-    usefulLifeYears: monthlyAmount > 0 ? Math.round(1 / (monthlyAmount / (netValue + accumulated + monthlyAmount * 12))) : 0,
+    usefulLifeYears: toNumber(response.usefulLifeYears),
     salvageValue: 0,
     monthlyDepreciation: {
       amount: monthlyAmount,
-      rate: monthlyAmount / purchasePrice,
+      rate: purchasePrice > 0 ? monthlyAmount / purchasePrice : 0,
     },
     accumulatedDepreciation: accumulated,
     netBookValue: netValue,
-    currentYearDepreciation: monthlyAmount * 12,
-    depreciationRate,
-    calculatedAt: response.calculated_at,
+    currentYearDepreciation: annualDepreciation,
+    depreciationRate: annualRate,
+    calculatedAt: response.period ?? '',
   };
 };
 
@@ -170,28 +216,15 @@ export const fetchDepreciationData = async (
   referenceDate?: string,
   signal?: AbortSignal
 ): Promise<DepreciationData> => {
-  const params = new URLSearchParams({
-    method,
-    ...(referenceDate && { reference_date: referenceDate }),
-  });
-
-  const response = await fetch(
-    `/api/v1/assets/${assetId}/depreciation?${params.toString()}`,
-    { signal }
+  const period = referenceDate?.slice(0, 7);
+  const data = await http.get<DepreciationApiResponse>(
+    `/depreciation/comparison/${assetId}`,
+    {
+      params: period ? { period } : undefined,
+      signal,
+    },
   );
-
-  if (!response.ok) {
-    if (response.status === 404) {
-      throw new Error('资产不存在');
-    }
-    if (response.status === 422) {
-      throw new Error('无效的折旧方法参数');
-    }
-    throw new Error(`折旧计算失败: ${response.statusText}`);
-  }
-
-  const data: DepreciationApiResponse = await response.json();
-  return transformApiResponse(data);
+  return transformApiResponse(data, method);
 };
 
 /**
@@ -240,7 +273,7 @@ const DepreciationCard: React.FC<DepreciationCardProps> = ({
         }
       } catch (err) {
         if (!cancelled && err instanceof Error) {
-          if (err.name === 'AbortError') {
+          if (isCancelledRequest(err)) {
             // 请求被取消，不更新状态
             return;
           }
@@ -279,7 +312,7 @@ const DepreciationCard: React.FC<DepreciationCardProps> = ({
       setError(null);
       onRefresh?.();
     } catch (err) {
-      if (err instanceof Error && err.name !== 'AbortError') {
+      if (err instanceof Error && !isCancelledRequest(err)) {
         setError(err.message);
       }
     } finally {

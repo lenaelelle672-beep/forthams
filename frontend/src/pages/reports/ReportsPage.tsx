@@ -48,7 +48,6 @@ import {
   downloadBlob,
 } from '@/api/reports';
 import type { CategoryReport, ReportSummary, TrendReport, NameValueItem } from '@/api/reports';
-import type { ApiResponse } from '@/types/common';
 import { Button } from '@/components/ui/Button';
 import { type ReportCardData } from './components/ReportCard';
 import { ChartPreview } from './components/ChartPreview';

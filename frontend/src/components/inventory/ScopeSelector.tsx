@@ -102,9 +102,7 @@ function normalizeTreeNode(node: RawTreeNodeData): TreeNodeData {
 }
 
 async function fetchTreeData(url: string): Promise<TreeNodeData[]> {
-  const response = await http.get(url);
-  const data = (response as Record<string, unknown>)?.data ?? response;
-  const nodes: unknown[] = Array.isArray(data) ? data : (data && typeof data === 'object' && Array.isArray((data as Record<string, unknown>).data)) ? (data as Record<string, unknown>).data as unknown[] : [];
+  const nodes = await http.get<RawTreeNodeData[]>(url);
   if (Array.isArray(nodes)) return nodes.map(normalizeTreeNode);
   return [];
 }

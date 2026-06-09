@@ -547,7 +547,7 @@ export default function MaintenancePlanPage() {
   // Build a lookup map: assetId -> AssetListItem
   const assetMap = useMemo(() => {
     const map = new Map<number, AssetListItem>();
-    const records = (assetOptions as any)?.records ?? (assetOptions as any)?.data?.records ?? [];
+    const records = assetOptions?.records ?? [];
     records.forEach((a: AssetListItem) => map.set(a.id, a));
     return map;
   }, [assetOptions]);

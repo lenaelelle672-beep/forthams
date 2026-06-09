@@ -67,7 +67,7 @@ export default function FaultCodePage() {
     queryFn: () => getFaultCodeTree(),
   });
 
-  const tree = (res as any)?.data ?? [];
+  const tree: FaultCode[] = res ?? [];
 
   /* ── Mutations (unchanged) ────────────────────────────────────────────── */
 

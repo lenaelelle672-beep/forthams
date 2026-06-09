@@ -6,7 +6,7 @@
  * 父组件 FloorPlanPage 负责 open/onClose 状态 + refetch 列表。
  */
 import React from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import floorplanService from '@/services/floorplanService';
@@ -57,6 +57,7 @@ export const FloorPlanCreateDialog: React.FC<FloorPlanCreateDialogProps> = ({ op
       <DialogContent title="新建平面图" className="max-w-md">
         <DialogHeader>
           <DialogTitle>新建平面图</DialogTitle>
+          <DialogDescription>填写平面图名称、楼栋、楼层和图片地址后创建新的空间视图。</DialogDescription>
         </DialogHeader>
         <div className="px-6 py-4 space-y-3">
           <Field label="名称 *" placeholder="平面图名称" value={form.name} onChange={(v) => update({ name: v })} />

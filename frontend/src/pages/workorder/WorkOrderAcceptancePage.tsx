@@ -13,8 +13,13 @@ import { Button } from '@/components/ui/Button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { PageHeader } from '@/components/ui/PageHeader';
-import type { ApiResponse } from '@/types/common';
 import type { WorkOrder } from '@/types/workorder.types';
+
+function resolveWorkOrder(payload: unknown): WorkOrder | undefined {
+  const unwrapped = (payload as { data?: unknown } | undefined)?.data ?? payload;
+  const nested = (unwrapped as { workOrder?: unknown } | undefined)?.workOrder;
+  return (nested ?? unwrapped) as WorkOrder | undefined;
+}
 
 export default function WorkOrderAcceptancePage() {
   const { id } = useParams<{ id: string }>();
@@ -29,8 +34,7 @@ export default function WorkOrderAcceptancePage() {
     enabled: !!workOrderId,
   });
 
-  const detail = (res as any)?.data;
-  const workOrder: WorkOrder | undefined = detail?.workOrder ?? detail;
+  const workOrder = resolveWorkOrder(res);
 
   const submitMutation = useMutation({
     mutationFn: () => submitForAcceptance(workOrderId, { comment }),

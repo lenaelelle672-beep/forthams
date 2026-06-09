@@ -25,10 +25,7 @@ export default function IntakeDetailPage() {
   const cancelMutation = useCancelIntakeOrder();
   const inspectMutation = useInspectIntakeOrder();
 
-  const order: IntakeOrder | undefined = React.useMemo(() => {
-    const res = detailRes as any;
-    return res?.data || res;
-  }, [detailRes]);
+  const order: IntakeOrder | undefined = detailRes;
 
   const [editingItems, setEditingItems] = useState<Record<number, { actualValue: string; result: string; remark: string }>>({});
 

@@ -6,7 +6,6 @@
  */
 
 import http from '@/utils/http';
-import type { ApiResponse } from '@/types/common';
 
 // ── 响应类型定义 ──────────────────────────────────────────────────────────────
 
@@ -27,6 +26,6 @@ export const globalSearch = (
   type: 'all' | 'asset' | 'workorder' | 'vendor' = 'all',
   limit = 10,
 ) =>
-  http.get<ApiResponse<SearchResult[]>>('/search', {
+  http.get<SearchResult[]>('/search', {
     params: { keyword, type, limit },
   });

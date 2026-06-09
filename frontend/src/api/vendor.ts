@@ -5,7 +5,7 @@
  */
 
 import http from '@/utils/http';
-import type { ApiResponse, PaginatedResponse } from '@/types/common';
+import type { PaginatedResponse } from '@/types/common';
 import type { Vendor } from '@/types/common';
 
 export interface VendorListQuery {
@@ -30,16 +30,16 @@ export const getVendorList = (params?: VendorListQuery) =>
 
 /** 供应商详情 */
 export const getVendorDetail = (id: number) =>
-  http.get<ApiResponse<Vendor>>(`/vendors/${id}`);
+  http.get<Vendor>(`/vendors/${id}`);
 
 /** 新建供应商 */
 export const createVendor = (data: CreateVendorRequest) =>
-  http.post<ApiResponse<Vendor>>('/vendors', data);
+  http.post<Vendor>('/vendors', data);
 
 /** 更新供应商 */
 export const updateVendor = (id: number, data: Partial<CreateVendorRequest>) =>
-  http.put<ApiResponse<Vendor>>(`/vendors/${id}`, data);
+  http.put<Vendor>(`/vendors/${id}`, data);
 
 /** 删除供应商 */
 export const deleteVendor = (id: number) =>
-  http.delete<ApiResponse<void>>(`/vendors/${id}`);
+  http.delete<void>(`/vendors/${id}`);

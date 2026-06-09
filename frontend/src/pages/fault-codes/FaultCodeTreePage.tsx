@@ -29,7 +29,7 @@ export default function FaultCodeTreePage() {
     queryFn: () => getFaultCodeTree(),
   });
 
-  const tree = (res as any)?.data ?? [];
+  const tree: FaultCode[] = res ?? [];
 
   const createMutation = useMutation({
     mutationFn: (data: CreateFaultCodeRequest) => createFaultCode(data),

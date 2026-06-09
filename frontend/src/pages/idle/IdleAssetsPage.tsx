@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Archive, Send, CheckCircle, Clock, X, AlertCircle } from 'lucide-react';
 import { z } from 'zod';
-import { useAuth } from '@/app/context/AuthContext';
+import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { DataTable, type Column } from '@/components/ui/DataTable';

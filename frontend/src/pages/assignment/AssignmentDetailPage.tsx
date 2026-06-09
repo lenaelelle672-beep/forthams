@@ -30,10 +30,7 @@ export default function AssignmentDetailPage() {
   const [rejectReason, setRejectReason] = useState('');
   const [showRejectInput, setShowRejectInput] = useState(false);
 
-  const item = React.useMemo(() => {
-    const res = detailRes as any;
-    return res?.data || res;
-  }, [detailRes]);
+  const item = detailRes;
 
   const status = item?.status as AssignmentStatus | undefined;
   const allocationType = item?.allocationType as string | undefined;

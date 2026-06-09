@@ -6,7 +6,6 @@ import {
   Upload,
   FileText,
   X,
-  Table2,
   FileSpreadsheet,
   ArrowUpFromLine,
   CheckCircle,
@@ -18,7 +17,7 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/Tabs';
-import { parseImportFile, getImportTemplate } from '@/api/assetImport';
+import { parseImportFile, getImportTemplate, exportAssets } from '@/api/assetImport';
 import type { ParseResponse } from '@/api/assetImport';
 
 interface PreviewRow {
@@ -50,19 +49,31 @@ export default function AssetImportExportPage() {
   const [previewRows, setPreviewRows] = useState<PreviewRow[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const [exportFormat, setExportFormat] = useState<'xlsx' | 'csv'>('xlsx');
+  const [exportFormat, setExportFormat] = useState<'csv'>('csv');
   const [exportCategory, setExportCategory] = useState('');
   const [exportStatus, setExportStatus] = useState('');
 
   const exportMutation = useMutation({
-    mutationFn: async (filters: { categories: string[]; statuses: string[]; format: string }) => {
-      const res = await fetch('/api/v1/assets/export', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(filters),
+    mutationFn: async (filters: { categories: string[]; statuses: string[] }) => {
+      return exportAssets({
+        categoryCodes: [],
+        statusCodes: filters.statuses,
+        locationCodes: [],
       });
-      if (!res.ok) throw new Error('导出失败');
-      return res.blob();
+    },
+    onSuccess: (blob) => {
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `assets_export_${new Date().toISOString().slice(0, 10)}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      toast.success('导出文件已生成');
+    },
+    onError: (err: unknown) => {
+      toast.error((err as { message?: string }).message ?? '导出失败，请重试');
     },
   });
 
@@ -84,13 +95,13 @@ export default function AssetImportExportPage() {
         const hasError = (result.errors ?? []).some((e) => e.rowNumber === row.rowNumber);
         return {
           id: String(row.rowNumber),
-          name: row.name,
-          category: row.categoryCode,
+          name: String(row.assetName ?? row.name ?? ''),
+          category: String(row.categoryId ?? row.categoryCode ?? ''),
           serialNumber:
             (row['serialNumber'] as string) ??
-            (row['assetCode'] as string) ??
+            (row['assetNo'] as string) ??
             '—',
-          status: row.statusCode,
+          status: String(row.status ?? row.statusCode ?? ''),
           validation: hasError ? 'error' : 'success',
         };
       });
@@ -147,7 +158,7 @@ export default function AssetImportExportPage() {
       const url = URL.createObjectURL(blob as unknown as Blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = '资产导入模板.xlsx';
+      link.download = '资产导入模板.csv';
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -161,7 +172,6 @@ export default function AssetImportExportPage() {
     exportMutation.mutate({
       categories: exportCategory && exportCategory !== '全部分类' ? [exportCategory] : [],
       statuses: exportStatus && exportStatus !== '全部状态' ? [exportStatus] : [],
-      format: exportFormat,
     });
   };
 
@@ -197,7 +207,7 @@ export default function AssetImportExportPage() {
               <div className="flex justify-end">
                 <Button variant="outline" size="md" onClick={handleDownloadTemplate}>
                   <Download className="w-4 h-4" />
-                  下载 Excel 模板
+                  下载 CSV 模板
                 </Button>
               </div>
 
@@ -215,7 +225,7 @@ export default function AssetImportExportPage() {
                 <input
                   ref={fileInputRef}
                   type="file"
-                  accept=".xlsx,.csv,.xml"
+                  accept=".csv"
                   className="hidden"
                   onChange={handleFileSelect}
                 />
@@ -224,7 +234,7 @@ export default function AssetImportExportPage() {
                 </div>
                 <div>
                   <p className="text-base font-semibold text-[#161c27]">拖拽文件到此处或点击浏览</p>
-                  <p className="text-xs text-[#424753] mt-1">支持 XLSX、CSV 和 XML 格式（最大 50MB）</p>
+                  <p className="text-xs text-[#424753] mt-1">支持 CSV 格式，请先下载模板填写后上传</p>
                 </div>
               </div>
 
@@ -377,7 +387,6 @@ export default function AssetImportExportPage() {
                     <div className="flex gap-4">
                       {(
                         [
-                          { value: 'xlsx' as const, label: 'XLSX', Icon: Table2 },
                           { value: 'csv' as const, label: 'CSV', Icon: FileSpreadsheet },
                         ] as const
                       ).map(({ value, label, Icon }) => (

@@ -2,20 +2,10 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router';
 import { Card } from '@/components/ui/Card';
 import { DataTable, type Column } from '@/components/ui/DataTable';
+import { listStocktakingCycles, type StocktakingCycle } from '@/api/stocktaking';
 import {
   Plus, ListChecks, PlayCircle, CheckCircle2, ClipboardList,
 } from 'lucide-react';
-
-/* ---------- types ---------- */
-
-interface StocktakingCycle {
-  id: number;
-  cycleName: string;
-  cycleType: string;
-  status: string;
-  startDate?: string;
-  endDate?: string;
-}
 
 /* ---------- constants ---------- */
 
@@ -98,12 +88,7 @@ export default function StocktakingCycleListPage() {
   const fetchCycles = async () => {
     setLoading(true);
     try {
-      const params = new URLSearchParams();
-      if (filterStatus) params.append('status', filterStatus);
-
-      const response = await fetch(`/api/stocktaking/cycles?${params}`);
-      const data = await response.json();
-      setCycles(data.data?.records || []);
+      setCycles(await listStocktakingCycles(filterStatus || undefined));
     } catch (error) {
       console.error('获取盘点周期列表失败:', error);
     } finally {

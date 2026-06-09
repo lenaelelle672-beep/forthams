@@ -108,6 +108,35 @@ function resolveSlaDisplay(
   return { level: 'normal', label: `剩余 ${limit - hours}h` };
 }
 
+type WorkOrderDetailPayload = WorkOrderDetailResponse | WorkOrder;
+type ResolvedWorkOrderDetail = {
+  workOrder?: WorkOrder;
+  approvalRecords: WorkOrderDetailResponse['approvalRecords'];
+};
+
+function isWorkOrderDetailResponse(payload: WorkOrderDetailPayload): payload is WorkOrderDetailResponse {
+  return 'workOrder' in payload
+    && typeof payload.workOrder === 'object'
+    && payload.workOrder !== null
+    && Array.isArray((payload as WorkOrderDetailResponse).approvalRecords);
+}
+
+function resolveWorkOrderDetail(payload?: WorkOrderDetailPayload): ResolvedWorkOrderDetail {
+  if (!payload) {
+    return { workOrder: undefined, approvalRecords: [] };
+  }
+  if (isWorkOrderDetailResponse(payload)) {
+    return {
+      workOrder: payload.workOrder,
+      approvalRecords: payload.approvalRecords,
+    };
+  }
+  return {
+    workOrder: payload as WorkOrder,
+    approvalRecords: [],
+  };
+}
+
 export default function WorkOrderDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -132,9 +161,7 @@ export default function WorkOrderDetailPage() {
     staleTime: 1000 * 30,
   });
 
-  const detail = res as unknown as WorkOrderDetailResponse | undefined;
-  const workOrder = detail?.workOrder as WorkOrder | undefined;
-  const approvalRecords = detail?.approvalRecords ?? [];
+  const { workOrder, approvalRecords } = resolveWorkOrderDetail(res as unknown as WorkOrderDetailPayload | undefined);
 
   const approveMutation = useMutation({
     mutationFn: (data: { version?: number }) => approveWorkOrder(orderId, data),

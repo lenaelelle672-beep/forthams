@@ -7,6 +7,7 @@ import { useState, useEffect, useRef, type KeyboardEvent, type ChangeEvent } fro
 import { Command, CommandInput, CommandList, CommandEmpty, CommandGroup, CommandItem } from '@/components/ui/command';
 import { Search, User, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import http from '@/utils/http';
 
 interface UserMentionAutocompleteProps {
   value: string;
@@ -58,23 +59,10 @@ export default function UserMentionAutocomplete({
   const searchUsers = async (searchKeyword: string) => {
     setIsLoading(true);
     try {
-      const token = localStorage.getItem('access_token');
-      const response = await fetch(`/api/users/search?keyword=${encodeURIComponent(searchKeyword)}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
+      const data = await http.get<UserInfo[]>('/users/mentions/search', {
+        params: { keyword: searchKeyword },
       });
-
-      if (!response.ok) {
-        throw new Error('搜索用户失败');
-      }
-
-      const data = await response.json();
-      if (data.code === 200 && data.data) {
-        setUsers(data.data);
-      } else {
-        setUsers([]);
-      }
+      setUsers(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('搜索用户失败:', error);
       toast.error('搜索用户失败');

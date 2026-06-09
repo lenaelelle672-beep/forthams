@@ -246,8 +246,7 @@ function VendorDetailSheet({ open, vendorId, onClose }: VendorDetailSheetProps) 
   const { data: vendor, isLoading } = useQuery({
     queryKey: VENDOR_KEYS.detail(vendorId ?? 0),
     queryFn: async () => {
-      const res = await getVendorDetail(vendorId!);
-      return res.data as Vendor;
+      return getVendorDetail(vendorId!);
     },
     enabled: open && vendorId !== null,
   });
@@ -396,7 +395,7 @@ export default function VendorsPage() {
     queryKey: VENDOR_KEYS.list(queryParams),
     queryFn: async () => {
       const res = await getVendorList(queryParams);
-      return res.data ?? emptyVendorPage(queryParams);
+      return res ?? emptyVendorPage(queryParams);
     },
   });
 

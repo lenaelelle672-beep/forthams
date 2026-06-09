@@ -29,6 +29,8 @@ import { CalendarIcon, Download, FileSpreadsheet, FileText } from 'lucide-react'
 import { format as formatDate } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { exportAssets } from '@/api/assetImport';
+import { downloadBlob } from '@/utils/fileDownloader';
 
 export type ExportFormat = 'csv' | 'xlsx';
 
@@ -111,34 +113,16 @@ export function FormatSelector({
       if (onExport) {
         await onExport(format, filters);
       } else {
-        // 默认导出逻辑：触发 API 下载
-        const params = new URLSearchParams({
-          format,
-          ...(filters.assetType && { asset_type: filters.assetType }),
-          ...(filters.status && { status: filters.status }),
-          ...(filters.startDate && {
-            start_date: formatDate(filters.startDate, 'yyyy-MM-dd'),
-          }),
-          ...(filters.endDate && {
-            end_date: formatDate(filters.endDate, 'yyyy-MM-dd'),
-          }),
-        });
-
-        const response = await fetch(`/api/v1/assets/export?${params}`);
-        if (!response.ok) {
-          throw new Error(`Export failed: ${response.statusText}`);
+        if (format !== 'csv') {
+          throw new Error('当前后端仅支持 CSV 导出，请选择 CSV 格式');
         }
 
-        // 创建下载链接
-        const blob = await response.blob();
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = filename;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
+        const blob = await exportAssets({
+          categoryCodes: filters.assetType ? [filters.assetType] : [],
+          statusCodes: filters.status ? [filters.status] : [],
+          locationCodes: [],
+        });
+        downloadBlob(blob, filename);
       }
 
       toast.success(`导出成功`, {

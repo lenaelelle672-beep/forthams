@@ -34,13 +34,19 @@ export function useLoginForm() {
   const loginMutation = useMutation({
     mutationFn: (data: LoginFormValues) => login(data),
     onSuccess: (res) => {
-      const { token, userId, username, realName } = res;
+      const { token, userId, username, realName, roles = [], permissions = [] } = res;
       if (!token) {
         toast.error('登录响应缺少 token');
         return;
       }
       sessionStorage.setItem('auth_token', token);
-      sessionStorage.setItem('user_info', JSON.stringify({ userId, username, realName }));
+      sessionStorage.setItem('user_info', JSON.stringify({
+        userId,
+        username,
+        realName,
+        roles,
+        permissions,
+      }));
       if (rememberMe) {
         localStorage.setItem('remembered_username', username);
       } else {

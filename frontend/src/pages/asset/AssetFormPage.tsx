@@ -21,7 +21,6 @@ import AssetRelationTree from '@/components/asset/AssetRelationTree';
 import { AssetStatus } from '@/types/asset';
 import type { CreateAssetRequest, Asset, AssetCategory } from '@/types/asset';
 import type { Department } from '@/types/common';
-import type { ApiResponse } from '@/types/common';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';

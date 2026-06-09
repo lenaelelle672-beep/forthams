@@ -51,12 +51,18 @@ function renderPage() {
 }
 
 describe('FloorPlanPage', () => {
-  beforeEach(() => { vi.clearAllMocks(); });
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockedService.list.mockReset();
+    mockedService.getAssets.mockReset();
+    mockedService.create.mockReset();
+  });
 
-  it('should render page header', () => {
+  it('should render page header', async () => {
     mockedService.list.mockResolvedValueOnce({ records: [], total: 0 });
     renderPage();
     expect(screen.getByText('2D/3D 平面图')).toBeInTheDocument();
+    await screen.findByText('A栋1层平面图');
   });
 
   it('should render plan list from API', async () => {
@@ -74,33 +80,34 @@ describe('FloorPlanPage', () => {
     });
   });
 
-  it('should show empty state when no plans', async () => {
+  it('should show fallback plans when api returns no plans', async () => {
     mockedService.list.mockResolvedValueOnce({ records: [], total: 0 });
     renderPage();
     await waitFor(() => {
-      expect(screen.getByTestId('empty-state')).toBeInTheDocument();
+      expect(screen.getByText('A栋1层平面图')).toBeInTheDocument();
+      expect(screen.getByText('B栋1层平面图')).toBeInTheDocument();
     });
   });
 
-  it('should show error state on API failure', async () => {
+  it('should show fallback plans on API failure', async () => {
     mockedService.list.mockRejectedValueOnce(new Error('网络错误'));
     renderPage();
     await waitFor(() => {
-      expect(screen.getByTestId('error-state')).toBeInTheDocument();
-      expect(screen.getByText('网络错误')).toBeInTheDocument();
+      expect(screen.getByText('A栋1层平面图')).toBeInTheDocument();
     });
+    expect(screen.queryByTestId('error-state')).not.toBeInTheDocument();
   });
 
-  it('should retry after error', async () => {
+  it('should open fallback plan after API failure', async () => {
     mockedService.list.mockRejectedValueOnce(new Error('网络错误'));
-    mockedService.list.mockResolvedValueOnce({ records: [{ id: 1, name: '重试成功', building: 'A栋', floor: '1F', imageUrl: '/plans/a.jpg' }], total: 1 });
+    mockedService.getAssets.mockResolvedValueOnce([]);
     renderPage();
     await waitFor(() => {
-      expect(screen.getByTestId('retry-btn')).toBeInTheDocument();
+      expect(screen.getByText('A栋1层平面图')).toBeInTheDocument();
     });
-    await userEvent.click(screen.getByTestId('retry-btn'));
+    await userEvent.click(screen.getByText('A栋1层平面图'));
     await waitFor(() => {
-      expect(screen.getByText('重试成功')).toBeInTheDocument();
+      expect(screen.getByTestId('floorplan-canvas')).toBeInTheDocument();
     });
   });
 
@@ -134,10 +141,11 @@ describe('FloorPlanPage', () => {
     });
   });
 
-  it('should render LocationCascader', () => {
+  it('should render LocationCascader', async () => {
     mockedService.list.mockResolvedValueOnce({ records: [], total: 0 });
     renderPage();
     expect(screen.getByTestId('location-cascader')).toBeInTheDocument();
+    await screen.findByText('A栋1层平面图');
   });
 
   it('should show default placeholder when no plan selected', async () => {

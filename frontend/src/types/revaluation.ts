@@ -36,7 +36,7 @@ export interface RevaluationUpdateRequest {
 export interface RevaluationApproveRequest {
   id?: number;
   status: 'APPROVED' | 'REJECTED';
-  approvedBy: number;
+  approvedBy?: number;
 }
 
 export interface RevaluationQuery {

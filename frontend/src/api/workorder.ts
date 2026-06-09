@@ -7,7 +7,7 @@
  */
 
 import http from '@/utils/http';
-import type { ApiResponse, PaginatedResponse } from '@/types/common';
+import type { PaginatedResponse } from '@/types/common';
 import type {
   WorkOrder,
   WorkOrderListItem,
@@ -16,8 +16,18 @@ import type {
   ApproveWorkOrderRequest,
   RejectWorkOrderRequest,
   CancelWorkOrderRequest,
-  WorkOrderDetailResponse,
 } from '@/types/workorder';
+
+export interface WorkOrderHoldRecord {
+  id?: number;
+  workOrderId?: number;
+  reason?: string;
+  holdStartTime?: string;
+  holdEndTime?: string;
+  resumeTime?: string;
+  resumeNote?: string;
+  status?: string;
+}
 
 // ── 工单 CRUD ─────────────────────────────────────────────────────────────────
 
@@ -25,30 +35,30 @@ export const getWorkOrderList = (params?: WorkOrderListQuery) =>
   http.get<PaginatedResponse<WorkOrderListItem>>('/workorders', { params });
 
 export const getWorkOrderDetail = (id: number) =>
-  http.get<ApiResponse<WorkOrderDetailResponse>>(`/workorders/${id}`);
+  http.get<WorkOrder>(`/workorders/${id}`);
 
 export const createWorkOrder = (data: CreateWorkOrderRequest) =>
-  http.post<ApiResponse<WorkOrder>>('/workorders', data);
+  http.post<WorkOrder>('/workorders', data);
 
 export const updateWorkOrder = (id: number, data: Partial<CreateWorkOrderRequest>) =>
-  http.put<ApiResponse<WorkOrder>>(`/workorders/${id}`, data);
+  http.put<WorkOrder>(`/workorders/${id}`, data);
 
 export const deleteWorkOrder = (id: number) =>
-  http.delete<ApiResponse<void>>(`/workorders/${id}`);
+  http.delete<void>(`/workorders/${id}`);
 
 // ── 工单状态流转 ───────────────────────────────────────────────────────────────
 
 export const submitWorkOrder = (id: number) =>
-  http.post<ApiResponse<WorkOrder>>(`/workorders/${id}/submit`);
+  http.post<WorkOrder>(`/workorders/${id}/submit`);
 
 export const approveWorkOrder = (id: number, data: ApproveWorkOrderRequest) =>
-  http.post<ApiResponse<WorkOrder>>(`/workorders/${id}/approve`, data);
+  http.post<WorkOrder>(`/workorders/${id}/approve`, data);
 
 export const rejectWorkOrder = (id: number, data: RejectWorkOrderRequest) =>
-  http.post<ApiResponse<WorkOrder>>(`/workorders/${id}/reject`, data);
+  http.post<WorkOrder>(`/workorders/${id}/reject`, data);
 
 export const cancelWorkOrder = (id: number, data: CancelWorkOrderRequest) =>
-  http.post<ApiResponse<WorkOrder>>(`/workorders/${id}/operate`, {
+  http.post<WorkOrder>(`/workorders/${id}/operate`, {
     operation: 'cancel',
     ...data,
   });
@@ -56,21 +66,21 @@ export const cancelWorkOrder = (id: number, data: CancelWorkOrderRequest) =>
 // ── Phase 3: 挂起/恢复 ───────────────────────────────────────────────────────
 
 export const holdWorkOrder = (id: number, data: { reason: string; holdEndTime?: string }) =>
-  http.post<ApiResponse<any>>(`/workorders/${id}/hold`, data);
+  http.post<WorkOrderHoldRecord>(`/workorders/${id}/hold`, data);
 
 export const resumeWorkOrder = (id: number, data: { note?: string }) =>
-  http.post<ApiResponse<any>>(`/workorders/${id}/resume`, data);
+  http.post<WorkOrderHoldRecord>(`/workorders/${id}/resume`, data);
 
 // ── Phase 3: 验收 ───────────────────────────────────────────────────────────
 
 export const submitForAcceptance = (id: number, data?: { comment?: string }) =>
-  http.post<ApiResponse<WorkOrder>>(`/workorders/${id}/submit-acceptance`, data ?? {});
+  http.post<WorkOrder>(`/workorders/${id}/submit-acceptance`, data ?? {});
 
 export const acceptWorkOrder = (id: number, data?: { comment?: string }) =>
-  http.post<ApiResponse<WorkOrder>>(`/workorders/${id}/accept`, data ?? {});
+  http.post<WorkOrder>(`/workorders/${id}/accept`, data ?? {});
 
 export const rejectAcceptance = (id: number, data?: { comment?: string }) =>
-  http.post<ApiResponse<WorkOrder>>(`/workorders/${id}/reject-acceptance`, data ?? {});
+  http.post<WorkOrder>(`/workorders/${id}/reject-acceptance`, data ?? {});
 
 // ── 审批工作台 ────────────────────────────────────────────────────────────────
 

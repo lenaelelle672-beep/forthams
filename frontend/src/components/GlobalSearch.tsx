@@ -5,7 +5,7 @@
  * 快捷键：macOS Cmd+K / Windows Linux Ctrl+K
  */
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router';
 import { Package, FileText, Truck } from 'lucide-react';
 import {
@@ -17,6 +17,8 @@ import {
   CommandList,
 } from '@/components/ui/command';
 import { globalSearch, SearchResult } from '@/api/search';
+import { useAuth } from '@/context/AuthContext';
+import { canAccessRoute } from '@/utils/routePermissions';
 
 // ── 可搜索页面路由配置 ────────────────────────────────────────────────────────
 interface SearchablePage {
@@ -127,6 +129,7 @@ export default function GlobalSearch() {
   const [dataResults, setDataResults] = useState<SearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   // 快捷键绑定
   useEffect(() => {
@@ -151,7 +154,7 @@ export default function GlobalSearch() {
       setIsSearching(true);
       try {
         const res = await globalSearch(query.trim());
-        setDataResults(res?.data ?? []);
+        setDataResults(res ?? []);
       } catch {
         setDataResults([]);
       } finally {
@@ -211,7 +214,10 @@ export default function GlobalSearch() {
     }
   }
 
-  const grouped = groupPages(SEARCHABLE_PAGES);
+  const grouped = useMemo(
+    () => groupPages(SEARCHABLE_PAGES.filter((page) => canAccessRoute(page.path, user))),
+    [user],
+  );
 
   // ── Tab 按钮样式 ─────────────────────────────────────────────────────────
   const tabBtn = (tab: 'page' | 'data') =>

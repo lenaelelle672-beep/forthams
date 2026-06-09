@@ -5,7 +5,7 @@
  */
 
 import http from '@/utils/http';
-import type { ApiResponse, PaginatedResponse } from '@/types/common';
+import type { PaginatedResponse } from '@/types/common';
 
 export interface RetirementApplication {
   id: number;
@@ -62,7 +62,7 @@ export interface RetirementListQuery {
 
 /** 提交退役申请 */
 export const createRetirement = (data: CreateRetirementRequest) =>
-  http.post<ApiResponse<RetirementApplication>>('/retirement/apply', {
+  http.post<RetirementApplication>('/retirement/apply', {
     assetId: data.assetId,
     reason: data.reason,
     estimatedResidualValue: data.residualValue,
@@ -76,20 +76,20 @@ export const getRetirementList = (params?: RetirementListQuery) =>
 
 /** 获取退役申请详情 */
 export const getRetirementDetail = (id: number) =>
-  http.get<ApiResponse<RetirementApplication>>(`/retirement/${id}`);
+  http.get<RetirementApplication>(`/retirement/${id}`);
 
 /** 获取资产退役历史 */
 export const getAssetRetirementHistory = (assetId: number) =>
-  http.get<ApiResponse<RetirementApplication[]>>(`/retirement/asset/${assetId}`);
+  http.get<RetirementApplication[]>(`/retirement/asset/${assetId}`);
 
 /** 撤回退役申请 */
 export const withdrawRetirement = (id: number) =>
-  http.post<ApiResponse<void>>(`/retirement/${id}/withdraw`);
+  http.post<RetirementApplication>(`/retirement/${id}/cancel`);
 
 /** 审批通过退役申请 */
 export const approveRetirement = (id: number) =>
-  http.post<ApiResponse<void>>(`/retirement/${id}/approve`);
+  http.post<RetirementApplication>(`/retirement/${id}/approve`);
 
 /** 驳回退役申请 */
 export const rejectRetirement = (id: number, reason: string) =>
-  http.post<ApiResponse<void>>(`/retirement/${id}/reject`, { reason });
+  http.post<RetirementApplication>(`/retirement/${id}/reject`, { reason });

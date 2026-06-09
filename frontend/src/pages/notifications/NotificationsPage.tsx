@@ -25,7 +25,7 @@ import {
   markAllAsRead,
   deleteNotification,
 } from '@/api/notification';
-import type { PaginatedResponse, PageData } from '@/types/common';
+import type { PageData } from '@/types/common';
 import type { Notification } from '@/types/common';
 
 type NotificationTab = 'all' | 'system' | 'approval' | 'alert';

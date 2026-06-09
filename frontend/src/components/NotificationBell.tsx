@@ -2,7 +2,7 @@
  * NotificationBell Component
  *
  * 通知铃铛组件 — 接入真实后端 API
- * 使用 app/services/notificationApi 调用后端端点。
+ * 使用统一 api/notification 调用后端端点。
  *
  * @component
  * @features
@@ -17,12 +17,17 @@
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
-  fetchPendingNotifications,
-  fetchUnreadCount,
-  markNotificationAsRead,
-  markAllNotificationsAsRead,
-} from '@/app/services/notificationApi';
-import type { NotificationItem } from '@/app/services/notificationApi';
+  getNotifications,
+  getUnreadCount,
+  markAsRead,
+  markAllAsRead,
+} from '@/api/notification';
+import type { Notification } from '@/types/common';
+
+type NotificationItem = Notification & {
+  created_at: string;
+  read: boolean;
+};
 
 interface NotificationBellProps {
   /** Custom class for the bell icon container */
@@ -50,6 +55,12 @@ const TYPE_LABELS: Record<string, string> = {
   system_alert: '系统通知',
 };
 
+const toNotificationItem = (notification: Notification): NotificationItem => ({
+  ...notification,
+  read: notification.read ?? notification.isRead ?? false,
+  created_at: notification.created_at ?? notification.createTime ?? '',
+});
+
 /**
  * NotificationBell Component
  *
@@ -71,7 +82,7 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({
   // 获取未读数
   const refreshUnreadCount = useCallback(async () => {
     try {
-      const count = await fetchUnreadCount();
+      const count = await getUnreadCount();
       setUnreadCount(typeof count === 'number' ? count : 0);
     } catch {
       // 静默降级
@@ -82,9 +93,9 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({
   const refreshNotifications = useCallback(async () => {
     setIsLoading(true);
     try {
-      const response = await fetchPendingNotifications();
-      setNotifications(response.items ?? []);
-      setUnreadCount(response.unread_count ?? 0);
+      const response = await getNotifications({ page: 1, pageSize: 20 });
+      const items = (response.records ?? []).map(toNotificationItem);
+      setNotifications(items);
     } catch (error) {
       console.error('Failed to fetch notifications:', error);
     } finally {
@@ -129,7 +140,7 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({
   const handleMarkAsRead = useCallback(async (id: number, event: React.MouseEvent) => {
     event.stopPropagation();
     try {
-      await markNotificationAsRead(id);
+      await markAsRead(id);
       setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
       setUnreadCount(prev => Math.max(0, prev - 1));
     } catch (error) {
@@ -141,7 +152,7 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({
   const handleMarkAllAsRead = useCallback(async () => {
     setMarkingAllRead(true);
     try {
-      await markAllNotificationsAsRead();
+      await markAllAsRead();
       setNotifications(prev => prev.map(n => ({ ...n, read: true })));
       setUnreadCount(0);
     } catch (error) {

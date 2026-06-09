@@ -234,6 +234,20 @@ export interface CreateWorkOrderRequest {
   type?: WorkOrderType;
   priority?: WorkOrderPriority;
   assetId?: number;
+  assetName?: string;
+  assetCode?: string;
+  reporterId?: number;
+  reporterName?: string;
+  assigneeId?: number;
+  assigneeName?: string;
+  deptId?: number;
+  deptName?: string;
+  plannedStartDate?: string;
+  plannedEndDate?: string;
+  estimatedCost?: number;
+  actualCost?: number;
+  completionNote?: string;
+  collaborators?: string[];
   faultCodeId?: number;
   attachments?: string[];
 }

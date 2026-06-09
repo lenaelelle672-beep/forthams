@@ -6,13 +6,21 @@
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { ChevronRight } from 'lucide-react';
-import { getFaultCodeTree, getFaultCodeByLevel, getFaultCodeChildren } from '@/api/faultCode';
+import { getFaultCodeTree, getFaultCodeChildren } from '@/api/faultCode';
 import type { FaultCode } from '@/types/faultCode';
 
 interface FaultCodeSelectorProps {
   value?: number;
   onChange: (faultCodeId: number | undefined, label: string) => void;
   disabled?: boolean;
+}
+
+function resolveFaultCodeList(payload: unknown): FaultCode[] {
+  if (Array.isArray(payload)) {
+    return payload;
+  }
+  const data = (payload as { data?: unknown } | undefined)?.data;
+  return Array.isArray(data) ? data : [];
 }
 
 export default function FaultCodeSelector({ value, onChange, disabled }: FaultCodeSelectorProps) {
@@ -30,8 +38,7 @@ export default function FaultCodeSelector({ value, onChange, disabled }: FaultCo
   });
 
   useEffect(() => {
-    const tree = (treeRes as any)?.data ?? [];
-    setLevel1List(tree);
+    setLevel1List(resolveFaultCodeList(treeRes));
   }, [treeRes]);
 
   // 选择一级 → 加载二级
@@ -43,8 +50,8 @@ export default function FaultCodeSelector({ value, onChange, disabled }: FaultCo
     setLevel3List([]);
     onChange(undefined, '');
     if (id) {
-      getFaultCodeChildren(id).then((res: any) => {
-        setLevel2List(res?.data ?? []);
+      getFaultCodeChildren(id).then((res: unknown) => {
+        setLevel2List(resolveFaultCodeList(res));
       });
     }
   }
@@ -56,8 +63,8 @@ export default function FaultCodeSelector({ value, onChange, disabled }: FaultCo
     setLevel3List([]);
     onChange(undefined, '');
     if (id) {
-      getFaultCodeChildren(id).then((res: any) => {
-        setLevel3List(res?.data ?? []);
+      getFaultCodeChildren(id).then((res: unknown) => {
+        setLevel3List(resolveFaultCodeList(res));
       });
     }
   }

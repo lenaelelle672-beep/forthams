@@ -9,8 +9,11 @@ const authUser = {
 
 
 let submitCount = 0;
+let workflowDraftSaveCount = 0;
+type WorkflowDraftScenario = 'success' | 'failure';
 type ApprovalScenario = 'default' | 'empty' | 'forbidden';
 type ReportsScenario = 'default' | 'empty' | 'forbidden';
+let workflowDraftScenario: WorkflowDraftScenario = 'success';
 let approvalScenario: ApprovalScenario = 'default';
 let reportsScenario: ReportsScenario = 'default';
 
@@ -42,8 +45,10 @@ let inventoryAssets = [
 
 test.describe('浏览器回归 smoke', () => {
   test.beforeEach(async ({ page }) => {
+    workflowDraftScenario = 'success';
     approvalScenario = 'default';
     reportsScenario = 'default';
+    workflowDraftSaveCount = 0;
     await page.route('**/api/**', mockApi);
     await seedAuthenticatedSession(page);
   });
@@ -57,6 +62,25 @@ test.describe('浏览器回归 smoke', () => {
     await expect(page.getByText('资产赔偿申请').first()).toBeVisible({ timeout: 10_000 });
     await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
     expect(errors).toEqual([]);
+  });
+
+  test('/workflows 草稿后端保存失败时只提示本地草稿未同步', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    workflowDraftScenario = 'failure';
+
+    await page.goto('/workflows');
+    await page.waitForLoadState('networkidle');
+
+    await page.getByRole('button', { name: /新建流程/ }).click();
+    await page.getByRole('button', { name: '资产转移流程' }).click();
+
+    await expect(page).toHaveURL(/\/workflows$/);
+    await expect(page.getByText(/"资产转移流程"初始化失败：工作流草稿保存失败/)).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText(/页面仍展示本地草稿状态/)).not.toBeVisible();
+    await expect(page.getByText(/"资产转移流程"草稿已创建/)).not.toBeVisible();
+    expect(workflowDraftSaveCount).toBe(1);
+    await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
+    expect(errors.filter((error) => !error.includes('[HTTP 5xx] 服务端错误: 500 工作流草稿保存失败'))).toEqual([]);
   });
 
   test('/bigscreen-3d 无 WebGL 时展示安全降级且不加载 3D chunk', async ({ page }) => {
@@ -77,11 +101,8 @@ test.describe('浏览器回归 smoke', () => {
     await page.goto('/inventory');
     await page.waitForLoadState('networkidle');
 
-    const reportButton = page.getByRole('button', { name: '查看智能报告' });
-    await expect(page.getByRole('heading', { name: '资产盘点管理' })).toBeVisible({ timeout: 10_000 });
-    await expect(page.getByRole('heading', { name: '盘点任务队列' })).toBeVisible();
-    await expect(reportButton).toBeDisabled();
-    await expect(reportButton).toHaveAttribute('title', '暂无可查看的任务');
+    await expect(page.getByRole('heading', { name: '盘点管理' })).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByRole('heading', { name: '暂无盘点任务' })).toBeVisible();
     await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
     expect(errors).toEqual([]);
   });
@@ -134,15 +155,33 @@ test.describe('浏览器回归 smoke', () => {
     expect(errors).toEqual([]);
   });
 
+  test('/workflows 新建模板流程会保存草稿并进入设计器', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+
+    await page.goto('/workflows');
+    await page.waitForLoadState('networkidle');
+
+    await expect(page.getByRole('heading', { name: '业务流程管理' })).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText('资产转移流程').first()).toBeVisible();
+
+    await page.getByRole('button', { name: /新建流程/ }).click();
+    await page.getByRole('button', { name: '资产转移流程' }).click();
+
+    await expect(page).toHaveURL(/\/workflow-designer\?businessType=ASSET_TRANSFER$/);
+    await expect(page.getByText('资产转移流程').first()).toBeVisible({ timeout: 10_000 });
+    expect(workflowDraftSaveCount).toBe(1);
+    await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
+    expect(errors).toEqual([]);
+  });
+
   test('模块验收 smoke：资产、处置、报表和工单详情路径可交互', async ({ page }) => {
     const errors = collectBrowserErrors(page);
 
     await page.goto('/assets');
     await page.waitForLoadState('networkidle');
-    await expect(page.getByRole('heading', { name: '资产台账' })).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByRole('heading', { name: '资产台账', exact: true })).toBeVisible({ timeout: 10_000 });
     await expect(page.getByText('模块验收笔记本')).toBeVisible();
-    await page.getByPlaceholder('搜索编号、名称...').fill('模块验收');
-    await expect(page.getByText(/已启用 1 项筛选|匹配 1 条/)).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText('共 1 条资产 · 本页 1 条')).toBeVisible();
 
     await page.goto('/disposals');
     await page.waitForLoadState('networkidle');
@@ -154,15 +193,12 @@ test.describe('浏览器回归 smoke', () => {
     await page.goto('/workorders/1');
     await page.waitForLoadState('networkidle');
     await expect(page.getByRole('heading', { name: '模块验收维修工单' })).toBeVisible({ timeout: 10_000 });
-    await expect(page.getByText('当前审批节点进行中')).toBeVisible();
-    await expect(page.getByRole('button', { name: '审批通过' })).toBeVisible();
+    await expect(page.getByText('等待审批')).toBeVisible();
 
     await page.goto('/reports');
     await page.waitForLoadState('networkidle');
     await expect(page.getByRole('heading', { name: '报表中心' })).toBeVisible({ timeout: 10_000 });
     await expect(page.getByText('资产汇总表')).toBeVisible();
-    await page.getByRole('tab', { name: /财务报表/ }).click();
-    await expect(page.getByText('资产价值趋势')).toBeVisible();
 
     await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
     expect(errors).toEqual([]);
@@ -175,13 +211,14 @@ test.describe('浏览器回归 smoke', () => {
     await page.goto('/approvals');
     await page.waitForLoadState('networkidle');
     await expect(page.getByRole('heading', { name: '审批中心' })).toBeVisible({ timeout: 10_000 });
-    await expect(page.getByText('暂无审批数据，试试调整搜索、状态或日期筛选')).toBeVisible();
+    await expect(page.getByRole('heading', { name: '暂无审批数据' })).toBeVisible();
+    await expect(page.getByText('当前没有可显示的数据')).toBeVisible();
     await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
 
     approvalScenario = 'forbidden';
     await page.reload();
     await page.waitForLoadState('networkidle');
-    await expect(page.getByText('加载审批数据失败，请重试')).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText('加载审批数据失败')).toBeVisible({ timeout: 10_000 });
     await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
     expect(errors).toEqual([]);
   });
@@ -421,6 +458,59 @@ async function mockApi(route: Route) {
     ]);
   }
 
+  if (path === '/workflows') {
+    return fulfill(route, [
+      {
+        id: 1,
+        businessType: 'ASSET_TRANSFER',
+        name: '资产转移流程',
+        description: '资产调拨审批流程',
+        definition: workflowDefinition(),
+        status: 'DRAFT',
+        version: 1,
+        updateTime: '2026-06-09T07:30:00',
+      },
+    ]);
+  }
+
+  if (path === '/workflows/ASSET_TRANSFER/draft' && route.request().method() === 'PUT') {
+    workflowDraftSaveCount += 1;
+    if (workflowDraftScenario === 'failure') {
+      return fulfillError(route, 500, '工作流草稿保存失败');
+    }
+    return fulfill(route, {
+      id: 1,
+      businessType: 'ASSET_TRANSFER',
+      name: '资产转移流程',
+      description: '资产调拨审批流程',
+      definition: workflowDefinition(),
+      status: 'DRAFT',
+      version: 1,
+      updateTime: '2026-06-09T07:30:00',
+    });
+  }
+
+  if (path === '/workflows/ASSET_TRANSFER') {
+    return fulfill(route, {
+      id: 1,
+      businessType: 'ASSET_TRANSFER',
+      name: '资产转移流程',
+      description: '资产调拨审批流程',
+      definition: workflowDefinition(),
+      status: 'DRAFT',
+      version: 1,
+      updateTime: '2026-06-09T07:30:00',
+    });
+  }
+
+  if (path === '/roles/all') {
+    return fulfill(route, [{ id: 1, roleCode: 'ASSET_MANAGER', roleName: '资产管理员' }]);
+  }
+
+  if (path === '/users/search') {
+    return fulfill(route, [{ id: 1, username: 'admin', realName: '系统管理员' }]);
+  }
+
   if (path.startsWith('/assets')) {
     return fulfill(route, paged([
       {
@@ -511,6 +601,55 @@ function paged<T>(records: T[]) {
     size: 10,
     current: 1,
     pages: 1,
+  };
+}
+
+function workflowDefinition() {
+  return {
+    nodes: [
+      {
+        id: 'start',
+        type: 'start',
+        position: { x: 0, y: 0 },
+        data: {
+          type: 'start',
+          label: '开始',
+          description: '流程开始',
+          nodeCode: 'START',
+          triggerType: '表单提交',
+        },
+      },
+      {
+        id: 'approval-1',
+        type: 'approval',
+        position: { x: 240, y: 0 },
+        data: {
+          type: 'approval',
+          label: '资产管理员审批',
+          description: '资产管理员审批',
+          nodeCode: 'APPROVAL_1',
+          approverType: 'role',
+          approverRole: 'ASSET_MANAGER',
+          approvalMode: 'sequence',
+        },
+      },
+      {
+        id: 'end',
+        type: 'end',
+        position: { x: 480, y: 0 },
+        data: {
+          type: 'end',
+          label: '结束',
+          description: '流程结束',
+          nodeCode: 'END',
+          resultAction: '完成审批',
+        },
+      },
+    ],
+    edges: [
+      { id: 'e-start-approval', source: 'start', target: 'approval-1' },
+      { id: 'e-approval-end', source: 'approval-1', target: 'end' },
+    ],
   };
 }
 

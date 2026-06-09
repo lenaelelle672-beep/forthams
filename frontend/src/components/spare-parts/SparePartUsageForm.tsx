@@ -12,7 +12,6 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { consumePart, getUsageByWorkOrder, getSparePartList } from '@/api/sparePart';
 import type { SparePart, SparePartUsage } from '@/types/sparePart';
-import type { ApiResponse, PageData } from '@/types/common';
 
 interface SparePartUsageFormProps {
   workOrderId: number;
@@ -34,8 +33,8 @@ export default function SparePartUsageForm({ workOrderId }: SparePartUsageFormPr
     queryFn: () => getUsageByWorkOrder ? getUsageByWorkOrder(workOrderId) : Promise.resolve(null),
   });
 
-  const spareParts = ((sparePartsRes as any)?.data as PageData<SparePart>)?.records ?? [];
-  const usages = (usageRes as any)?.data ?? [];
+  const spareParts: SparePart[] = sparePartsRes?.records ?? [];
+  const usages: SparePartUsage[] = usageRes ?? [];
 
   const consumeMutation = useMutation({
     mutationFn: () => consumePart({

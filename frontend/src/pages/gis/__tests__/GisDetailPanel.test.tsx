@@ -36,13 +36,13 @@ describe('GisDetailPanel', () => {
   it('should render onViewEnergy button when provided', () => {
     const onViewEnergy = vi.fn();
     render(<GisDetailPanel asset={mockAsset} onViewEnergy={onViewEnergy} />);
-    fireEvent.click(screen.getByText('查看此资产能耗 →'));
+    fireEvent.click(screen.getByRole('button', { name: '查看此资产能耗' }));
     expect(onViewEnergy).toHaveBeenCalledWith(mockAsset);
   });
 
   it('should not render onViewEnergy when not provided', () => {
     render(<GisDetailPanel asset={mockAsset} />);
-    expect(screen.queryByText('查看此资产能耗 →')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: '查看此资产能耗' })).not.toBeInTheDocument();
   });
 
   it('should render status label for known status', () => {

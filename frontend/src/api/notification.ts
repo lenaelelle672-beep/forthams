@@ -5,7 +5,7 @@
  */
 
 import http from '@/utils/http';
-import type { ApiResponse, PaginatedResponse } from '@/types/common';
+import type { PaginatedResponse } from '@/types/common';
 import type { Notification } from '@/types/common';
 
 export interface NotificationListQuery {
@@ -22,16 +22,16 @@ export const getNotifications = (params?: NotificationListQuery) =>
 
 /** 获取未读通知数量（使用独立 notification 表的新端点） */
 export const getUnreadCount = () =>
-  http.get<ApiResponse<number>>('/notifications/unread-count');
+  http.get<number>('/notifications/unread-count');
 
 /** 标记通知为已读 */
 export const markAsRead = (id: number) =>
-  http.put<ApiResponse<void>>(`/notifications/${id}/read`);
+  http.put<void>(`/notifications/${id}/read`);
 
 /** 标记全部已读 */
 export const markAllAsRead = () =>
-  http.put<ApiResponse<void>>('/notifications/read-all');
+  http.put<void>('/notifications/read-all');
 
 /** 删除通知 */
 export const deleteNotification = (id: number) =>
-  http.delete<ApiResponse<void>>(`/notifications/${id}`);
+  http.delete<void>(`/notifications/${id}`);

@@ -254,7 +254,7 @@ export default function WorkflowDesignerPage() {
       setSaveMsg(valErrors.length > 0 ? `${flow.name}已保存草稿，发布前需补全校验项` : `${flow.name}已保存草稿`);
     } catch {
       localStorage.setItem(getDraftStorageKey(businessType), JSON.stringify({ ...normDef, formSource, savedAt: new Date().toISOString() }));
-      setSaveMsg(`${flow.name}已保存本地草稿`); setSaveErr('后端保存失败');
+      setSaveMsg(null); setSaveErr(`${flow.name}仅保存为本地草稿，后端未同步，请稍后重试`);
     } finally { setSaving(false); }
   }, [businessType, flow.name, normDef, defPayload, formSource, valErrors.length]);
 
