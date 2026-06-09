@@ -78,6 +78,18 @@ class TenantSchemaConsistencyTest {
     }
 
     @Test
+    void energyTenantMigrationShouldScopeRawReadingsAndSummaries() throws IOException {
+        String migration = Files.readString(MIGRATION_DIR.resolve("V2_78__energy_meter_tenant_scope.sql"));
+
+        assertThat(migration).contains("ALTER TABLE energy_meter ADD COLUMN tenant_id VARCHAR(64)");
+        assertThat(migration).contains("ALTER TABLE energy_consumption ADD COLUMN tenant_id VARCHAR(64)");
+        assertThat(migration).contains("UPDATE energy_meter");
+        assertThat(migration).contains("UPDATE energy_consumption");
+        assertThat(migration).contains("ADD INDEX idx_em_tenant_asset_date (tenant_id, asset_id, reading_date)");
+        assertThat(migration).contains("ADD INDEX idx_ec_tenant_asset_period (tenant_id, asset_id, period_type, period_start)");
+    }
+
+    @Test
     void legacyTenantIdMigrationsShouldBePatchedForwardWithoutChecksumChanges() throws IOException {
         String v236 = Files.readString(MIGRATION_DIR.resolve("V2_36__asset_parent_child.sql"));
         String v258 = Files.readString(MIGRATION_DIR.resolve("V2_58__inspection_template_and_record.sql"));

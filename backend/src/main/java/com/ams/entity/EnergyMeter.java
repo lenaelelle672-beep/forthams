@@ -15,6 +15,8 @@ public class EnergyMeter implements Serializable {
     @TableId(type = IdType.AUTO)
     private Long id;
 
+    private String tenantId;
+
     private Long assetId;
 
     private String meterType;

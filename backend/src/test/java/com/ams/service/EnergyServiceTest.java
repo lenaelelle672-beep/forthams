@@ -26,6 +26,7 @@ import java.time.Month;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
@@ -79,7 +80,11 @@ class EnergyServiceTest {
     class ReadingTests {
         @Test void addReading_shouldSetDefaultUnit() {
             EnergyMeter m = meter(null, 1L, BigDecimal.valueOf(100), LocalDate.now()); m.setUnit(null);
-            energyService.addReading(m); assertEquals("kWh", m.getUnit()); verify(energyMeterMapper).insert(m);
+            energyService.addReading(m);
+
+            assertEquals("kWh", m.getUnit());
+            assertEquals("dept:1", m.getTenantId());
+            verify(energyMeterMapper).insert(m);
         }
         @Test void addReading_shouldPreserveUnit() {
             EnergyMeter m = meter(null, 1L, BigDecimal.valueOf(100), LocalDate.now()); m.setUnit("m³");
@@ -138,7 +143,10 @@ class EnergyServiceTest {
             when(energyConsumptionMapper.selectOne(any(LambdaQueryWrapper.class))).thenReturn(null);
             EnergyConsumption result = energyService.calculateMonthlyConsumption(1L,"ELECTRICITY",2026,1);
             assertNotNull(result); assertEquals(BigDecimal.valueOf(500), result.getConsumption());
-            verify(energyConsumptionMapper).insert(any(EnergyConsumption.class));
+            assertEquals("dept:1", result.getTenantId());
+            var captor = forClass(EnergyConsumption.class);
+            verify(energyConsumptionMapper).insert(captor.capture());
+            assertEquals("dept:1", captor.getValue().getTenantId());
         }
         @Test void existing_shouldUpdate() {
             EnergyConsumption existing = consumption(1L,"ELECTRICITY","MONTH",LocalDate.of(2026,1,1),BigDecimal.valueOf(300));
@@ -148,6 +156,7 @@ class EnergyServiceTest {
                 meter(2L,1L,BigDecimal.valueOf(2000),LocalDate.of(2026,1,31))));
             when(energyConsumptionMapper.selectOne(any(LambdaQueryWrapper.class))).thenReturn(existing);
             assertEquals(BigDecimal.valueOf(1000), energyService.calculateMonthlyConsumption(1L,"ELECTRICITY",2026,1).getConsumption());
+            assertEquals("dept:1", existing.getTenantId());
             verify(energyConsumptionMapper).updateById(existing);
             verify(energyConsumptionMapper, never()).insert(any(EnergyConsumption.class));
         }

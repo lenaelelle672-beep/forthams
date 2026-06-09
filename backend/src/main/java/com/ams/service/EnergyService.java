@@ -42,7 +42,8 @@ public class EnergyService {
 
     @Transactional(rollbackFor = Exception.class)
     public EnergyMeter addReading(EnergyMeter meter) {
-        requireTenantAsset(meter.getAssetId());
+        String tenantId = requireTenantAsset(meter.getAssetId());
+        meter.setTenantId(tenantId);
         if (meter.getUnit() == null) {
             meter.setUnit("kWh");
         }
@@ -160,11 +161,13 @@ public class EnergyService {
             existing.setConsumption(consumption);
             existing.setPeriodEnd(end);
             existing.setUnit(unit);
+            existing.setTenantId(TenantContext.requireTenantId());
             energyConsumptionMapper.updateById(existing);
             return existing;
         }
 
         EnergyConsumption ec = new EnergyConsumption();
+        ec.setTenantId(TenantContext.requireTenantId());
         ec.setAssetId(assetId);
         ec.setMeterType(meterType);
         ec.setPeriodType(pt);
@@ -329,7 +332,7 @@ public class EnergyService {
         }
     }
 
-    private void requireTenantAsset(Long assetId) {
+    private String requireTenantAsset(Long assetId) {
         if (assetId == null) {
             throw new AccessDeniedException("Missing energy asset identifier");
         }
@@ -340,6 +343,7 @@ public class EnergyService {
         if (count == null || count <= 0) {
             throw new AccessDeniedException("Energy asset is outside current tenant");
         }
+        return tenantId;
     }
 
     /** 生成时间桶起点列表（按 DAY/WEEK/MONTH/YEAR） */
