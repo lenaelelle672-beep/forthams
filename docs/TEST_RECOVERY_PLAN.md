@@ -9,7 +9,7 @@
 |---|---|---|
 | 活跃可编译测试文件 | **8** | 旧扫描"8 文件/86 测试"基本正确；中途"71/596"是误数（`find src/test` 把 java-excluded 也算进去了） |
 | `java-excluded` 隔离文件 | **63**（505 个 @Test） | git 历史确认：第 4 轮修复时"移除非编译测试到 java-excluded" |
-| Surefire 运行期排除 | `**/controller/**`、`**/integration/**`、`**/tenant/**` | 编译但不运行 |
+| Surefire 运行期排除 | `**/integration/**`、`**/tenant/**` | controller 测试已恢复运行；integration/tenant 仍按波次隔离 |
 
 **关键发现**：63 个隔离文件中绝大多数被打了**过时的 `@Disabled` 标签**（"依赖已删除类"），但被引用的类**全部仍然存在**——导入预检 63/63 通过。所以多数是"假性不可编译"，实际是轻量恢复。
 
@@ -65,11 +65,11 @@ mvn -q -Dtest='*ServiceTest,AssetStatusTest' test
 - `CommentIntegrationTest` → 编译干净；需同时移除 surefire `**/integration/**` 排除；`@BeforeAll` 用 H2 建表，注意共享内存库隔离
 - `TenantIsolationIntegrationTest` → **保留 `@Disabled`**；先查 git 历史确认第 4 轮删了什么类，再决定恢复
 
-## 6. 构建配置修复（建议独立 PR，需编译器验证）
+## 6. 构建配置修复（已部分落地，需继续验证覆盖率报告）
 
-- 🔴 **JaCoCo 覆盖率当前是静默失效的**：`pom.xml` surefire 用 `<argLine>${surefire.argLine}</argLine>`，但 JaCoCo `prepare-agent` 注入的是 `argLine` 属性。应改为 `<argLine>@{argLine} -Xmx2048m -XX:+UseParallelGC</argLine>`（晚绑定），否则覆盖率报告为空。
-- `forkCount=0` + `reuseForks=false`：`reuseForks` 在 `forkCount=0` 下是无效配置。改 `forkCount=1` 可隔离 `@SpringBootTest` 间的静态状态（如 `TenantContext` 泄漏），代价是构建变慢；**必须与上面的 `@{argLine}` 同时改**，否则覆盖率仍坏。
-- 解除 3 条 surefire 排除（`controller`/`integration`/`tenant`）应分别在对应 wave 完成、且该波测试编译通过后再做。
+- `pom.xml` 已改为 `<argLine>@{argLine} ${surefire.argLine}</argLine>`，恢复 JaCoCo `prepare-agent` 晚绑定入口；仍需后续显式跑覆盖率报告确认生成内容非空。
+- `forkCount=1` + `reuseForks=true` 已落地，用于隔离 `@SpringBootTest` 间的静态状态（如 `TenantContext` 泄漏）。
+- `controller` surefire 排除已解除；`integration`、`tenant` 仍按波次保留排除，需分别完成重写/隔离验证后再解除。
 
 ## 7. 已删除的 8 个重复/被取代副本
 
@@ -89,8 +89,20 @@ mvn -q test                  # 跑全部启用的测试
 
 | 波次 | 文件数 | 状态 |
 |---|---|---|
-| 重复清理 | 8 | 待脚本删除 |
-| Wave 1 service/enum | 20 | **内容已就绪**，待 `git mv` + 验证 |
-| Wave 2 controller | 31 | 已诊断；待去 @Disabled + 2 行修 + 2 重写 + 解除 surefire 排除 |
-| Wave 3 集成/重写 | 4 | 已诊断；需逐个重写 |
-| 构建配置 | — | JaCoCo/forkCount/surefire，独立 PR |
+| 重复清理 | 8 | 已处理（当前全量测试可编译运行） |
+| Wave 1 service/enum | 20 | 已恢复并通过后端全量测试 |
+| Wave 2 controller | 31 | 已恢复并通过后端全量测试 |
+| Wave 3 集成/重写 | 4 | 集成/tenant 仍按 surefire 排除策略保留，未作为本轮全量启用范围 |
+| 测试环境降噪 | — | 已配置 `ams.scheduling.enabled=false`、`ams.oper-log.enabled=false`；已清理 `FaultCodeMapper.countChildren` 重复映射 |
+| 构建配置 | — | forkCount/argLine 已调整；JaCoCo 报告内容仍需单独验证 |
+
+## 10. 2026-06-09 最新验证记录
+
+- 前端全量测试：`83` 个测试文件，`857` 个测试全部通过。
+- 前端构建：`npm run build` 通过，仅剩 chunk 体积 warning。
+- 后端全量测试：`mvn test` 通过，`571` 个测试通过，0 failure/error/skip。
+- 后端 D 批次 targeted gate 通过，覆盖资产导入、盘点、审批、通知事件与 ABC 分类，`82` 个测试通过。
+- 前端 E 批次 targeted gate 通过，覆盖 API wrapper、报表、全局搜索、评论用户提及、折旧卡片、故障码选择器、工单验收与表单 mapper，`35` 个文件、`92` 个测试通过。
+- workflow 保存链路已补充认证兼容测试和前端 API 契约测试。
+- 当前剩余日志主要来自测试刻意触发的业务异常路径，不再是定时任务或操作日志切面对测试库的副作用。
+- GAI2 拆批提交补充记录：已提交 `4178cb375 fix: harden backend runtime operations` 与 `2e688c6b4 fix: align desktop frontend api contracts`；最新 GitNexus `detect_changes(scope=all)` 已降为 `low`，`changed_count=39`、`affected_count=0`、`changed_files=9`。剩余改动主要是移动端冻结文件、路由中的移动入口、仓库元文件与交接记录。
