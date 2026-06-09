@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import {
   Plus, Pencil, Trash2, Search, Settings,
@@ -11,21 +12,13 @@ import { DataTable, type Column } from '@/components/ui/DataTable';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Select, SelectItem } from '@/components/ui/Select';
-
-/* ── Types ─────────────────────────────────────────────────────────────── */
-
-interface CustomFieldItem {
-  id: number;
-  fieldName: string;
-  fieldLabel: string;
-  fieldType: string;
-  fieldOptions?: string | null;
-  validationPattern?: string | null;
-  fieldOrder: number;
-  required: number;
-  encrypted: number;
-  status: number;
-}
+import {
+  createCustomField,
+  deleteCustomField,
+  getCustomFieldList,
+  updateCustomField,
+  type CustomFieldItem,
+} from '@/api/customField';
 
 /* ── Constants ─────────────────────────────────────────────────────────── */
 
@@ -63,26 +56,6 @@ const STAT_BG: Record<string, string> = {
   EMAIL: 'bg-pink-50 text-pink-500', REGEX: 'bg-rose-50 text-rose-500',
 };
 
-/* ── Mock Data ─────────────────────────────────────────────────────────── */
-
-let _nextId = 14;
-
-const INITIAL_FIELDS: CustomFieldItem[] = [
-  { id: 1, fieldName: 'purchase_channel', fieldLabel: '采购渠道', fieldType: 'DROPDOWN', fieldOptions: '["京东","天猫","线下","直采"]', validationPattern: null, fieldOrder: 1, required: 1, encrypted: 0, status: 1 },
-  { id: 2, fieldName: 'warranty_expiry', fieldLabel: '保修到期', fieldType: 'DATE', fieldOptions: null, validationPattern: null, fieldOrder: 2, required: 0, encrypted: 0, status: 1 },
-  { id: 3, fieldName: 'asset_weight', fieldLabel: '资产重量(kg)', fieldType: 'NUMBER', fieldOptions: null, validationPattern: null, fieldOrder: 3, required: 0, encrypted: 0, status: 1 },
-  { id: 4, fieldName: 'vendor_website', fieldLabel: '供应商网址', fieldType: 'URL', fieldOptions: null, validationPattern: null, fieldOrder: 4, required: 0, encrypted: 0, status: 1 },
-  { id: 5, fieldName: 'contact_email', fieldLabel: '联系邮箱', fieldType: 'EMAIL', fieldOptions: null, validationPattern: null, fieldOrder: 5, required: 1, encrypted: 0, status: 1 },
-  { id: 6, fieldName: 'is_imported', fieldLabel: '是否进口', fieldType: 'BOOLEAN', fieldOptions: null, validationPattern: null, fieldOrder: 6, required: 0, encrypted: 0, status: 1 },
-  { id: 7, fieldName: 'serial_code', fieldLabel: '序列号', fieldType: 'REGEX', fieldOptions: null, validationPattern: '^[A-Z]{2}\\d{6,12}$', fieldOrder: 7, required: 1, encrypted: 0, status: 1 },
-  { id: 8, fieldName: 'storage_location', fieldLabel: '存放位置', fieldType: 'TEXT', fieldOptions: null, validationPattern: null, fieldOrder: 8, required: 0, encrypted: 0, status: 1 },
-  { id: 9, fieldName: 'depreciation_method', fieldLabel: '折旧方式', fieldType: 'DROPDOWN', fieldOptions: '["直线法","双倍余额递减","年数总和"]', validationPattern: null, fieldOrder: 9, required: 0, encrypted: 0, status: 1 },
-  { id: 10, fieldName: 'maintenance_cycle', fieldLabel: '保养周期(天)', fieldType: 'NUMBER', fieldOptions: null, validationPattern: null, fieldOrder: 10, required: 0, encrypted: 0, status: 1 },
-  { id: 11, fieldName: 'last_inspection', fieldLabel: '上次检验日期', fieldType: 'DATE', fieldOptions: null, validationPattern: null, fieldOrder: 11, required: 0, encrypted: 0, status: 0 },
-  { id: 12, fieldName: 'risk_level', fieldLabel: '风险等级', fieldType: 'DROPDOWN', fieldOptions: '["低","中","高","极高"]', validationPattern: null, fieldOrder: 12, required: 1, encrypted: 0, status: 1 },
-  { id: 13, fieldName: 'remarks', fieldLabel: '备注', fieldType: 'TEXT', fieldOptions: null, validationPattern: null, fieldOrder: 99, required: 0, encrypted: 0, status: 1 },
-];
-
 /* ── Helpers ───────────────────────────────────────────────────────────── */
 
 function parseOptions(raw?: string | null): string[] {
@@ -98,13 +71,57 @@ const EMPTY_FORM = {
 /* ── Page Component ────────────────────────────────────────────────────── */
 
 export default function CustomFieldsPage() {
-  const [fields, setFields] = useState<CustomFieldItem[]>(INITIAL_FIELDS);
+  const qc = useQueryClient();
+  const pageSize = 100;
   const [keyword, setKeyword] = useState('');
   const [typeFilter, setTypeFilter] = useState('ALL');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<CustomFieldItem | null>(null);
   const [form, setForm] = useState({ ...EMPTY_FORM });
   const [preview, setPreview] = useState<CustomFieldItem | null>(null);
+
+  const { data, isLoading } = useQuery({
+    queryKey: ['customFields', keyword],
+    queryFn: () => getCustomFieldList(1, pageSize, keyword.trim() || undefined),
+  });
+
+  const fields = data?.records ?? [];
+
+  const closeDialog = () => {
+    setDialogOpen(false);
+    setEditing(null);
+  };
+
+  const invalidateFields = () => qc.invalidateQueries({ queryKey: ['customFields'] });
+
+  const createMut = useMutation({
+    mutationFn: createCustomField,
+    onSuccess: () => {
+      toast.success('字段创建成功');
+      invalidateFields();
+      closeDialog();
+    },
+    onError: () => toast.error('字段创建失败'),
+  });
+
+  const updateMut = useMutation({
+    mutationFn: ({ id, ...payload }: { id: number } & Partial<CustomFieldItem>) => updateCustomField(id, payload),
+    onSuccess: () => {
+      toast.success('字段更新成功');
+      invalidateFields();
+      closeDialog();
+    },
+    onError: () => toast.error('字段更新失败'),
+  });
+
+  const deleteMut = useMutation({
+    mutationFn: deleteCustomField,
+    onSuccess: () => {
+      toast.success('字段已删除');
+      invalidateFields();
+    },
+    onError: () => toast.error('删除失败'),
+  });
 
   /* filtered data */
   const filtered = useMemo(() => {
@@ -144,20 +161,14 @@ export default function CustomFieldsPage() {
     if (!form.fieldName.trim() || !form.fieldLabel.trim()) { toast.error('字段名和显示名不能为空'); return; }
     if (form.fieldType === 'DROPDOWN' && !form.fieldOptions.trim()) { toast.error('下拉类型需要填写选项（JSON 数组）'); return; }
     if (editing) {
-      setFields((prev) => prev.map((f) => f.id === editing.id ? { ...f, ...form } : f));
-      toast.success('字段更新成功');
+      updateMut.mutate({ id: editing.id, ...form });
     } else {
-      const newField: CustomFieldItem = { ...form, id: _nextId++ };
-      setFields((prev) => [...prev, newField]);
-      toast.success('字段创建成功');
+      createMut.mutate(form);
     }
-    setDialogOpen(false);
-    setEditing(null);
   }
 
   function handleDelete(id: number) {
-    setFields((prev) => prev.filter((f) => f.id !== id));
-    toast.success('字段已删除');
+    deleteMut.mutate(id);
   }
 
   /* columns */
@@ -286,6 +297,7 @@ export default function CustomFieldsPage() {
           <DataTable<CustomFieldItem>
             columns={columns}
             data={filtered}
+            loading={isLoading}
             emptyText="没有找到匹配的字段"
           />
         </Card>
@@ -362,8 +374,10 @@ export default function CustomFieldsPage() {
               </fieldset>
 
               <div className="flex justify-end gap-2 border-t border-[#e5e7eb] pt-4">
-                <Button variant="outline" onClick={() => { setDialogOpen(false); setEditing(null); }}>取消</Button>
-                <Button onClick={handleSave}>{editing ? '保存修改' : '创建字段'}</Button>
+                <Button variant="outline" onClick={closeDialog}>取消</Button>
+                <Button onClick={handleSave} disabled={createMut.isPending || updateMut.isPending}>
+                  {editing ? '保存修改' : '创建字段'}
+                </Button>
               </div>
             </div>
           </DialogContent>
