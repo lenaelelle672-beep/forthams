@@ -1,5 +1,22 @@
 # goon.md — 交接笔记（Cowork → Claude Code）
 
+## 2026-06-09 21:30 最新状态（Codex GAI2 工单挂起操作者审计收敛）
+
+### 当前事实
+- `WorkOrderHoldService.getCurrentUserId` 不再固定返回 `0L`；现在从 `SecurityContext` 取当前用户名，并通过 `UserMapper` 反查启用状态的 `sys_user.id`。
+- 挂起工单写入 `heldBy`，恢复工单写入 `resumedBy`；用户不存在、匿名访问或解析失败时仍兜底 `0L`，不改变原有容错行为。
+- 新增 `WorkOrderHoldServiceTest`，覆盖 hold 写入真实 `heldBy`、resume 写入真实 `resumedBy`，并验证对应工单状态操作仍按原流程触发。
+
+### 最新验证
+- GitNexus impact：`WorkOrderHoldService` class 风险 `LOW`，直接依赖 `WorkOrderController`；`getCurrentUserId` 风险 `LOW`，直接影响 `hold` / `resume`，受影响流程为 `holdWorkOrder`。
+- Targeted 后端：`mvn test -Dtest=WorkOrderHoldServiceTest -DfailIfNoTests=false` 通过，`2` 个测试通过。
+- 后端全量：`mvn test` 通过，`592` 个测试，0 failure/error/skip。
+
+### 剩余动作
+- P0：原生 Docker/Nginx 验证仍无法在当前机器执行，`docker` 与 `nginx` 命令均不存在。
+- P1：`.DS_Store` tracked 元数据清理仍需用户明确确认。
+- P1：移动端继续冻结；不纳入当前桌面/后端质量闭环。
+
 ## 2026-06-09 21:25 最新状态（Codex GAI2 检验任务到期通知收敛）
 
 ### 当前事实

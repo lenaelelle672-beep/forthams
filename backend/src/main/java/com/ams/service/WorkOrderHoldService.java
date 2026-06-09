@@ -2,10 +2,11 @@ package com.ams.service;
 
 import com.ams.common.exception.BusinessException;
 import com.ams.context.TenantContext;
+import com.ams.entity.User;
 import com.ams.entity.WorkOrder;
 import com.ams.entity.WorkOrderHoldRecord;
+import com.ams.mapper.UserMapper;
 import com.ams.mapper.WorkOrderHoldRecordMapper;
-import com.ams.service.TenantService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -27,6 +28,7 @@ public class WorkOrderHoldService {
     private final WorkOrderService workOrderService;
     private final NotificationService notificationService;
     private final TenantService tenantService;
+    private final UserMapper userMapper;
 
     /**
      * 挂起工单
@@ -227,8 +229,12 @@ public class WorkOrderHoldService {
                 org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
             if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
                 String username = auth.getName();
-                // TODO: 通过 UserMapper 反查 ID，这里简化处理
-                return 0L;
+                User user = userMapper.selectOne(
+                        new LambdaQueryWrapper<User>()
+                                .eq(User::getUsername, username)
+                                .eq(User::getStatus, 1)
+                                .last("LIMIT 1"));
+                return user != null ? user.getId() : 0L;
             }
         } catch (Exception e) {
             log.warn("获取当前用户ID失败: {}", e.getMessage());
