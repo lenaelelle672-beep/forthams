@@ -126,6 +126,17 @@ class TenantSchemaConsistencyTest {
     }
 
     @Test
+    void customFieldValueTenantMigrationShouldScopeAssetValues() throws IOException {
+        String migration = Files.readString(MIGRATION_DIR.resolve("V2_82__custom_field_value_tenant_scope.sql"));
+
+        assertThat(migration).contains("ALTER TABLE sys_custom_field_value ADD COLUMN tenant_id VARCHAR(64)");
+        assertThat(migration).contains("UPDATE sys_custom_field_value v");
+        assertThat(migration).contains("DROP INDEX uk_asset_field");
+        assertThat(migration).contains("ADD UNIQUE KEY uk_cfv_tenant_asset_field (tenant_id, asset_id, field_id)");
+        assertThat(migration).contains("ADD INDEX idx_cfv_tenant_asset (tenant_id, asset_id)");
+    }
+
+    @Test
     void legacyTenantIdMigrationsShouldBePatchedForwardWithoutChecksumChanges() throws IOException {
         String v236 = Files.readString(MIGRATION_DIR.resolve("V2_36__asset_parent_child.sql"));
         String v258 = Files.readString(MIGRATION_DIR.resolve("V2_58__inspection_template_and_record.sql"));

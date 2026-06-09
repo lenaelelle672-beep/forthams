@@ -1,6 +1,7 @@
 package com.ams.service;
 
 import com.ams.common.exception.BusinessException;
+import com.ams.context.TenantContext;
 import com.ams.dto.CustomFieldValueBatchDTO;
 import com.ams.entity.*;
 import com.ams.mapper.AssetCategoryMapper;
@@ -55,6 +56,7 @@ public class CustomFieldValueService {
 
     @Transactional(rollbackFor = Exception.class)
     public void saveAssetCustomFields(Long assetId, CustomFieldValueBatchDTO dto) {
+        String tenantId = TenantContext.requireTenantId();
         Asset asset = assetMapper.selectById(assetId);
         if (asset == null) {
             throw new BusinessException("资产不存在");
@@ -82,11 +84,13 @@ public class CustomFieldValueService {
                 );
                 if (value == null) {
                     value = new CustomFieldValue();
+                    value.setTenantId(tenantId);
                     value.setAssetId(assetId);
                     value.setFieldId(item.getFieldId());
                     value.setFieldValue(item.getFieldValue());
                     customFieldValueMapper.insert(value);
                 } else {
+                    value.setTenantId(tenantId);
                     value.setFieldValue(item.getFieldValue());
                     customFieldValueMapper.updateById(value);
                 }

@@ -13,6 +13,8 @@ public class CustomFieldValue implements Serializable {
     @TableId(type = IdType.AUTO)
     private Long id;
 
+    private String tenantId;
+
     private Long assetId;
     private Long fieldId;
     private String fieldValue;
