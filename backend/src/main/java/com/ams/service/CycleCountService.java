@@ -35,6 +35,7 @@ public class CycleCountService {
     private final InventoryTaskMapper inventoryTaskMapper;
     private final AssetMapper assetMapper;
     private final InventoryDetailMapper inventoryDetailMapper;
+    private final TenantService tenantService;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     /**
@@ -43,7 +44,7 @@ public class CycleCountService {
     @Scheduled(cron = "0 0 2 1 * ?")
     @Transactional(rollbackFor = Exception.class)
     public void generateMonthlyTasks() {
-        generateTasksByClassification("A", "MONTHLY");
+        generateTasksForActiveTenants("A", "MONTHLY");
     }
 
     /**
@@ -52,7 +53,7 @@ public class CycleCountService {
     @Scheduled(cron = "0 0 3 1 */3 ?")
     @Transactional(rollbackFor = Exception.class)
     public void generateQuarterlyTasks() {
-        generateTasksByClassification("B", "QUARTERLY");
+        generateTasksForActiveTenants("B", "QUARTERLY");
     }
 
     /**
@@ -61,15 +62,31 @@ public class CycleCountService {
     @Scheduled(cron = "0 0 4 1 1 ?")
     @Transactional(rollbackFor = Exception.class)
     public void generateYearlyTasks() {
-        generateTasksByClassification("C", "YEARLY");
+        generateTasksForActiveTenants("C", "YEARLY");
     }
 
     /**
-     * 按分类和频率生成盘点任务
+     * 按活跃租户逐个绑定上下文生成盘点任务。
      */
-    private void generateTasksByClassification(String classification, String frequency) {
+    private void generateTasksForActiveTenants(String classification, String frequency) {
+        for (String tenantId : tenantService.getActiveTenantIds()) {
+            try {
+                TenantContext.setTenantId(tenantId);
+                generateTasksByClassificationForCurrentTenant(classification, frequency);
+            } catch (RuntimeException e) {
+                log.error("[CycleCount] 租户 {} 生成盘点任务失败: {}", tenantId, e.getMessage(), e);
+            } finally {
+                TenantContext.clear();
+            }
+        }
+    }
+
+    /**
+     * 按分类和频率为当前租户生成盘点任务
+     */
+    private void generateTasksByClassificationForCurrentTenant(String classification, String frequency) {
+        String tenantId = TenantContext.requireTenantId();
         try {
-            // Scheduled 任务中 tenantContext 为空，需要遍历所有规则
             List<CycleCountRule> rules = cycleCountRuleService.listAll();
             for (CycleCountRule rule : rules) {
                 if (!classification.equals(rule.getClassification()) || !frequency.equals(rule.getFrequency())) {
@@ -78,6 +95,7 @@ public class CycleCountService {
                 // 检查本月是否已生成过
                 String thisMonth = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMM"));
                 Long existingCount = inventoryTaskMapper.selectCount(new LambdaQueryWrapper<InventoryTask>()
+                        .eq(InventoryTask::getTenantId, tenantId)
                         .eq(InventoryTask::getTaskNo, "CC-" + thisMonth + "-" + rule.getClassification() + "-" + rule.getId()));
                 if (existingCount != null && existingCount > 0) {
                     log.info("[CycleCount] 本月 {} 类盘点任务已存在，跳过生成 [ruleId: {}]", rule.getClassification(), rule.getId());
@@ -96,7 +114,7 @@ public class CycleCountService {
                 task.setTaskNo("CC-" + thisMonth + "-" + rule.getClassification() + "-" + rule.getId());
                 task.setTaskName(rule.getClassification() + "类资产循环盘点（" + getFrequencyLabel(frequency) + "）");
                 task.setInventoryType("CYCLE_COUNT");
-                task.setTenantId(rule.getTenantId());
+                task.setTenantId(tenantId);
                 task.setStatus("DRAFT");
                 task.setStartDate(LocalDate.now());
                 task.setEndDate(LocalDate.now().plusDays(getDurationDays(frequency)));
@@ -109,7 +127,7 @@ public class CycleCountService {
                 List<InventoryDetail> details = assets.stream().map(asset -> {
                     InventoryDetail detail = new InventoryDetail();
                     detail.setTaskId(task.getId());
-                    detail.setTenantId(rule.getTenantId());
+                    detail.setTenantId(tenantId);
                     detail.setAssetId(asset.getId());
                     detail.setRfidTag(asset.getRfidTag());
                     detail.setExpectedLocation(asset.getLocation());
@@ -183,7 +201,7 @@ public class CycleCountService {
             case "C" -> "YEARLY";
             default -> throw new IllegalArgumentException("Unknown classification: " + classification);
         };
-        generateTasksByClassification(classification, frequency);
+        generateTasksByClassificationForCurrentTenant(classification, frequency);
         return 1;
     }
 
