@@ -4,13 +4,13 @@
 
 根目录 `prd.md` 的多租户隔离需求已经完成了认证上下文、主要业务域强制过滤、缺失 tenant 拒绝、跨租户审计日志和 MyBatis-Plus TenantLine 统一 SQL 防漏的核心链路。
 
-当前状态应判定为：核心安全链路已打通，主要业务表具备 Service 手写过滤与 TenantLine 双层防护；异步通知链路已补齐邮件 executor 配置，SLA、保险、风险评审后台调度已按租户绑定 TenantContext。剩余工作集中在基础字典/系统表的产品归属确认、白名单持续治理和更多后台调度 TenantContext 传播专项验证。
+当前状态应判定为：核心安全链路已打通，主要业务表具备 Service 手写过滤与 TenantLine 双层防护；异步通知链路已补齐邮件 executor 配置，SLA、保险、风险评审、维保计划后台调度已按租户绑定 TenantContext。剩余工作集中在基础字典/系统表的产品归属确认、白名单持续治理和更多后台调度 TenantContext 传播专项验证。
 
 ## PRD 条目状态
 
 | PRD 项 | 要求 | 当前状态 | 证据 | 缺口 |
 | --- | --- | --- | --- | --- |
-| F1 TenantContext 构建 | JWT 解析 `tenant_id` 并注入 ThreadLocal | 已实现 | `JwtAuthenticationFilter`、`TenantContext`、`JwtUtil`、`AsyncConfigTest`、`SlaMonitorJobTest`、`InsuranceExpiryTaskTest`、`InsuranceExpiryReminderTest`、`RiskAssessmentReviewReminderTaskTest` | 需持续关注后台定时任务上下文传播策略 |
+| F1 TenantContext 构建 | JWT 解析 `tenant_id` 并注入 ThreadLocal | 已实现 | `JwtAuthenticationFilter`、`TenantContext`、`JwtUtil`、`AsyncConfigTest`、`SlaMonitorJobTest`、`InsuranceExpiryTaskTest`、`InsuranceExpiryReminderTest`、`RiskAssessmentReviewReminderTaskTest`、`MaintenancePlanServiceTest` | 需持续关注后台定时任务上下文传播策略 |
 | F2 AssetController 强制拦截 | 资源租户不匹配直接拒绝 | 已实现于主要业务资源关键路径 | `AssetService`、`RetirementApplicationService`、`AssetLifecycleService`、`WorkOrderService`、`ApprovalService`、`InventoryService`、`CompensationService`、`IdleAssetService`、`MaintenanceService` | 仍需持续维护白名单与新增业务表归属 |
 | F3 数据库隔离查询 | 所有数据访问带 tenant 条件 | 主要业务域已实现双层防护 | 资产、退役、工单、审批、盘点、赔偿、闲置、维护均使用 tenant 条件；`MyBatisPlusConfig` 注册 `TenantLineInnerInterceptor` | 全局字典/系统表仍需明确哪些按租户隔离、哪些全局共享 |
 | F4 缺失 TenantID 回退保护 | 缺 tenant 默认拒绝 | 请求层与 SQL 拦截层均已实现 | `JwtAuthenticationFilter#isTenantProtectedRequest`、`TenantContext#requireTenantId`、`MyBatisPlusConfig#getTenantId` | 异步任务必须显式设置 TenantContext，避免后台业务表 SQL 被拒绝 |
@@ -216,13 +216,13 @@ env MAVEN_OPTS=-Djdk.attach.allowAttachSelf=true mvn test -DfailIfNoTests=false
 cd frontend && npm run e2e:real -- --reporter=line
 ```
 
-结果：后端全量 604 个测试通过；真实后端 E2E 9 个测试通过。
+结果：后端全量 606 个测试通过；真实后端 E2E 9 个测试通过。
 
 仍需持续治理：
 
 - 明确哪些基础表是全局字典表，例如 `AssetCategory`、`Dept`、`Role`、`Vendor`、`Location`。
 - 新增业务表时同步维护 tenant 字段、白名单和 schema consistency 测试。
-- 对更多后台调度补充 TenantContext 传播或显式租户遍历测试；邮件异步 executor 缺口已由 `AsyncConfigTest` 覆盖，SLA、保险、风险评审调度已有专项测试覆盖。
+- 对更多后台调度补充 TenantContext 传播或显式租户遍历测试；邮件异步 executor 缺口已由 `AsyncConfigTest` 覆盖，SLA、保险、风险评审、维保计划调度已有专项测试覆盖。
 
 ## 当前不建议做的事
 

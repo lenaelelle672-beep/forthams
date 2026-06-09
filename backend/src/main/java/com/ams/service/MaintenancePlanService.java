@@ -35,6 +35,7 @@ public class MaintenancePlanService {
     private final MaintenancePlanMapper maintenancePlanMapper;
     private final MaintenanceRecordMapper maintenanceRecordMapper;
     private final NotificationService notificationService;
+    private final TenantService tenantService;
 
     // ==================== CRUD（租户隔离） ====================
 
@@ -382,18 +383,27 @@ public class MaintenancePlanService {
         log.info("开始定时生成维保记录...");
         LocalDate today = LocalDate.now();
 
-        List<MaintenancePlan> duePlans = maintenancePlanMapper.selectDuePlansForScheduler(
-                "ACTIVE", today.toString());
-
         int successCount = 0;
         int failCount = 0;
-        for (MaintenancePlan plan : duePlans) {
+        for (String tenantId : tenantService.getActiveTenantIds()) {
             try {
-                generateRecordsForPlan(plan.getId());
-                successCount++;
+                TenantContext.setTenantId(tenantId);
+                List<MaintenancePlan> duePlans = maintenancePlanMapper.selectDuePlansForScheduler(
+                        tenantId, "ACTIVE", today.toString());
+                for (MaintenancePlan plan : duePlans) {
+                    try {
+                        generateRecordsForPlan(plan.getId());
+                        successCount++;
+                    } catch (Exception e) {
+                        log.error("维保记录生成失败: tenantId={}, planId={}", tenantId, plan.getId(), e);
+                        failCount++;
+                    }
+                }
             } catch (Exception e) {
-                log.error("维保记录生成失败: planId={}", plan.getId(), e);
+                log.error("租户 {} 维保记录定时生成失败", tenantId, e);
                 failCount++;
+            } finally {
+                TenantContext.clear();
             }
         }
         log.info("定时生成维保记录完成: 成功={}, 失败={}", successCount, failCount);
@@ -409,25 +419,33 @@ public class MaintenancePlanService {
         LocalDate today = LocalDate.now();
         LocalDate threeDaysLater = today.plusDays(3);
 
-        List<MaintenancePlan> upcomingPlans = maintenancePlanMapper.selectUpcomingPlansForScheduler(
-                "ACTIVE", today.toString(), threeDaysLater.toString());
-
         int sentCount = 0;
-        for (MaintenancePlan plan : upcomingPlans) {
+        for (String tenantId : tenantService.getActiveTenantIds()) {
             try {
-                Map<String, Object> variables = new HashMap<>();
-                variables.put("planName", plan.getPlanName());
-                variables.put("assetId", String.valueOf(plan.getAssetId()));
-                variables.put("dueDate", plan.getNextDueDate() != null ? plan.getNextDueDate().toString() : "");
-                variables.put("triggerType", plan.getTriggerType());
-                long daysLeft = ChronoUnit.DAYS.between(today, plan.getNextDueDate());
-                variables.put("daysLeft", String.valueOf(daysLeft));
+                TenantContext.setTenantId(tenantId);
+                List<MaintenancePlan> upcomingPlans = maintenancePlanMapper.selectUpcomingPlansForScheduler(
+                        tenantId, "ACTIVE", today.toString(), threeDaysLater.toString());
+                for (MaintenancePlan plan : upcomingPlans) {
+                    try {
+                        Map<String, Object> variables = new HashMap<>();
+                        variables.put("planName", plan.getPlanName());
+                        variables.put("assetId", String.valueOf(plan.getAssetId()));
+                        variables.put("dueDate", plan.getNextDueDate() != null ? plan.getNextDueDate().toString() : "");
+                        variables.put("triggerType", plan.getTriggerType());
+                        long daysLeft = ChronoUnit.DAYS.between(today, plan.getNextDueDate());
+                        variables.put("daysLeft", String.valueOf(daysLeft));
 
-                Long userId = plan.getCreateBy() != null ? plan.getCreateBy() : 0L;
-                notificationService.sendByTemplate("maintenance_due", variables, userId, plan.getId(), "maintenance_plan");
-                sentCount++;
+                        Long userId = plan.getCreateBy() != null ? plan.getCreateBy() : 0L;
+                        notificationService.sendByTemplate("maintenance_due", variables, userId, plan.getId(), "maintenance_plan");
+                        sentCount++;
+                    } catch (Exception e) {
+                        log.error("维保到期预警发送失败: tenantId={}, planId={}", tenantId, plan.getId(), e);
+                    }
+                }
             } catch (Exception e) {
-                log.error("维保到期预警发送失败: planId={}", plan.getId(), e);
+                log.error("租户 {} 维保到期预警扫描失败", tenantId, e);
+            } finally {
+                TenantContext.clear();
             }
         }
         log.info("维保到期预警发送完成: 已处理={}", sentCount);
