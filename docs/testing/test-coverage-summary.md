@@ -8,8 +8,8 @@
 | 前端类型检查 | `cd frontend && npx tsc -p tsconfig.json --noEmit --pretty false` | 通过 |
 | 前端构建 | `cd frontend && npm run build` | 通过；仅保留既有 `three` chunk >1000 kB 警告 |
 | 桌面浏览器回归 | `cd frontend && npx playwright test --project=browser-regression-smoke` | 23 个测试通过，含核心路由、工作流新建保存、报表/审批空态、3D 大屏降级 |
-| 真实后端 E2E | `cd frontend && npm run e2e:real -- --reporter=line` | 历史记录 6 个测试通过；本轮未复跑，当前本机 `127.0.0.1:8080` 未监听 |
-| 后端测试 | `cd backend && mvn test -DfailIfNoTests=false` | 597 个测试通过，0 失败，0 错误 |
+| 真实后端 E2E | `cd backend && mvn spring-boot:test-run -Dspring-boot.run.profiles=e2e` 后执行 `cd frontend && npm run e2e:real -- --reporter=line` | 8 个测试通过；覆盖真实 Spring Boot 后端、Vite proxy、登录、流程设计器、工单审批、退役申请、审批列表、报表与大屏 |
+| 后端测试 | `cd backend && mvn test -DfailIfNoTests=false` | 598 个测试通过，0 失败，0 错误 |
 | 流程定义服务测试 | `cd backend && mvn -q -Dtest=WorkflowDefinitionServiceTest test` | 6 个测试通过，覆盖默认列表、保存草稿、发布、启停、未发布拦截 |
 | 赔偿流程发布与估值 | `cd backend && mvn -q -Dtest=CompensationServiceTest,WorkflowDefinitionServiceTest test` | 通过，赔偿提交必须存在已发布 `ASSET_COMPENSATION` 流程；缺金额时按资产当前价值/原值自动估值 |
 | WorkOrder/Retirement 闭环 | `cd backend && mvn -q -Dtest=WorkOrderServiceTest,WorkOrderControllerTest,ApprovalServiceTest,RetirementApplicationServiceTest,RetirementControllerTest,AssetLifecycleServiceTest test` | 通过 |

@@ -205,20 +205,30 @@ public class DashboardService {
         }
 
         Set<Long> deptIds = rows.stream()
-                .map(r -> ((Number) r.get("dept_id")).longValue())
+                .map(r -> getLongValue(r, "dept_id", "DEPT_ID"))
+                .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
+        if (deptIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+
         Map<Long, String> deptNameMap = deptMapper.selectBatchIds(deptIds).stream()
                 .collect(Collectors.toMap(Dept::getId, Dept::getName));
 
         return rows.stream()
                 .map(row -> {
+                    Long deptId = getLongValue(row, "dept_id", "DEPT_ID");
+                    if (deptId == null) {
+                        return null;
+                    }
+
                     DeptAssetDistributionDTO dto = new DeptAssetDistributionDTO();
-                    Long deptId = ((Number) row.get("dept_id")).longValue();
                     dto.setDeptId(deptId);
                     dto.setDeptName(deptNameMap.getOrDefault(deptId, "未知部门"));
-                    dto.setAssetCount(((Number) row.get("cnt")).longValue());
+                    dto.setAssetCount(Optional.ofNullable(getLongValue(row, "cnt", "CNT")).orElse(0L));
                     return dto;
                 })
+                .filter(Objects::nonNull)
                 .sorted(Comparator.comparing(DeptAssetDistributionDTO::getAssetCount).reversed())
                 .collect(Collectors.toList());
     }
@@ -367,5 +377,18 @@ public class DashboardService {
         if (value == null) return BigDecimal.ZERO;
         if (value instanceof BigDecimal) return (BigDecimal) value;
         return new BigDecimal(value.toString());
+    }
+
+    private Long getLongValue(Map<String, Object> row, String... keys) {
+        for (String key : keys) {
+            Object value = row.get(key);
+            if (value instanceof Number number) {
+                return number.longValue();
+            }
+            if (value != null) {
+                return Long.parseLong(value.toString());
+            }
+        }
+        return null;
     }
 }

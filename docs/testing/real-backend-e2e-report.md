@@ -2,17 +2,24 @@
 
 ## 目标
 
-在上一轮 mock 浏览器冒烟通过后，进一步验证前端经 Vite proxy 调用真实 Spring Boot + MySQL 后端时，核心页面与接口链路是否可用。
+在上一轮 mock 浏览器冒烟通过后，进一步验证前端经 Vite proxy 调用真实 Spring Boot 后端时，核心页面与接口链路是否可用。
 
 ## 前置环境
 
-- MySQL：`root/root`
-- 数据库：`ams_db`
+- 本地可复现 profile：`e2e`，使用 `backend/src/test/resources/application-e2e.properties` 和 H2 内存库
+- MySQL 真实库：`root/root`、数据库 `ams_db`
 - 后端：`http://localhost:8080/api`
 - 前端：`http://localhost:5173`
 - 测试账号：`admin / admin123`
 
 ## 数据库准备
+
+```bash
+cd backend
+mvn spring-boot:test-run -Dspring-boot.run.profiles=e2e
+```
+
+真实 MySQL 环境可继续使用主 schema：
 
 ```bash
 mysql -u root -proot < backend/src/main/resources/schema.sql
@@ -40,7 +47,7 @@ npm run e2e:real -- --reporter=line
 ## 执行结果
 
 ```text
-6 passed (8.7s)
+8 passed (13.4s)
 ```
 
 ## 覆盖项
@@ -72,7 +79,10 @@ npm run e2e:real -- --reporter=line
 | 真实 E2E 并行写流程定义草稿互相覆盖 | 多个 Playwright worker 共享真实后端和同一业务流程草稿 | `real-backend-smoke.spec.ts` 改为串行执行 |
 | 工单真实 API smoke 返回 500 | 旧 MySQL `work_order` 表缺新字段，且 Mapper XML 覆盖了 MyBatis-Plus 默认 CRUD | 补充非破坏性 schema replay，移除 WorkOrder XML 自定义 CRUD |
 | 退役申请真实 API 缺表风险 | 旧 MySQL 未创建 `retirement_application` 表 | `schema.sql` 新增退役申请表 |
+| e2e profile 启动缺少若依整合列 | H2 初始化无法执行 MySQL 动态 ALTER，`sys_user`、`sys_role`、`asset`、`work_order`、`approval_process` 等表存在新旧 schema 差异 | 新增 `application-e2e.properties` 与 `e2e-h2-fixes.sql`，将本地真实后端 E2E 固化为可复现 profile |
+| 部门分布接口在 H2 返回 500 | 聚合查询返回 `DEPT_ID`/`CNT` 大写键，服务只读取 `dept_id`/`cnt` | `DashboardService#getDeptDistribution` 兼容 H2/MySQL 聚合别名，并补充单测 |
+| 位置级联接口在 H2 返回 500 | H2 对递归 CTE 未显式列名时无法解析 `cte.id` | `LocationMapper` 递归 CTE 改为显式列清单 `cte(id, name, parent_id)` |
 
 ## 结论
 
-无 mock 的真实后端浏览器冒烟、核心点击、流程中心、流程定义保存/发布、工单审批与资产退役链路已通过。当前核心链路已经从“代码测试”推进到“浏览器 + 真实 API + 真实 MySQL”的可用性验证。
+无 mock 的真实后端浏览器冒烟、核心点击、流程中心、流程定义保存/发布、工单审批、资产退役、审批列表、报表与大屏链路已通过。当前核心链路已经从“代码测试”推进到“浏览器 + 真实 Spring Boot API”的可复现验证。

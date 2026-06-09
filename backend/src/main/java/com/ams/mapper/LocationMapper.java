@@ -21,7 +21,7 @@ public interface LocationMapper {
     @Delete("DELETE FROM location WHERE id = #{id}")
     void deleteById(Long id);
 
-    @Select("WITH RECURSIVE cte AS ( " +
+    @Select("WITH RECURSIVE cte(id, name, parent_id) AS ( " +
             "  SELECT id, name, parent_id " +
             "  FROM location " +
             "  WHERE id = #{id} " +
@@ -33,7 +33,7 @@ public interface LocationMapper {
             "SELECT * FROM cte ORDER BY id")
     List<Location> findLocationHierarchy(@Param("id") Long id);
 
-    @Select("WITH RECURSIVE cte AS ( " +
+    @Select("WITH RECURSIVE cte(id, name, parent_id) AS ( " +
             "  SELECT id, name, parent_id " +
             "  FROM location " +
             "  WHERE parent_id IS NULL " +
@@ -45,7 +45,7 @@ public interface LocationMapper {
             "SELECT * FROM cte ORDER BY id")
     List<Location> findRootLocations();
 
-    @Select("WITH RECURSIVE cte AS ( " +
+    @Select("WITH RECURSIVE cte(id, name, parent_id) AS ( " +
             "  SELECT id, name, parent_id " +
             "  FROM location " +
             "  WHERE parent_id = #{parentId} " +
@@ -57,7 +57,7 @@ public interface LocationMapper {
             "SELECT * FROM cte ORDER BY id")
     List<Location> findChildrenByParentId(@Param("parentId") Long parentId);
 
-    @Select("WITH RECURSIVE cte AS ( " +
+    @Select("WITH RECURSIVE cte(id, name, parent_id) AS ( " +
             "  SELECT id, name, parent_id " +
             "  FROM location " +
             "  WHERE id = #{id} " +

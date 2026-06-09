@@ -146,6 +146,20 @@ class DashboardServiceTest {
     }
 
     @Test
+    void getDeptDistribution_supportsUppercaseAggregateKeys() {
+        when(assetMapper.selectMaps(any(QueryWrapper.class)))
+                .thenReturn(List.of(Map.of("DEPT_ID", 10L, "CNT", 3L)));
+        when(deptMapper.selectBatchIds(any())).thenReturn(List.of(createDept(10L, "研发部")));
+
+        List<DeptAssetDistributionDTO> result = dashboardService.getDeptDistribution();
+
+        assertEquals(1, result.size());
+        assertEquals(10L, result.get(0).getDeptId());
+        assertEquals("研发部", result.get(0).getDeptName());
+        assertEquals(3L, result.get(0).getAssetCount());
+    }
+
+    @Test
     void getDeptDistribution_whenNoDept_returnsEmpty() {
         when(assetMapper.selectMaps(any(QueryWrapper.class))).thenReturn(List.of());
 
