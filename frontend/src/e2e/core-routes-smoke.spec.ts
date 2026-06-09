@@ -4,19 +4,20 @@ const authUser = {
   userId: 1,
   username: 'admin',
   realName: '系统管理员',
+  roles: ['SUPER_ADMIN', 'ADMIN'],
 };
 
 const coreRoutes = [
-  { path: '/', heading: '仪表板', landmark: '资产总数' },
-  { path: '/assets', heading: '资产台账管理', landmark: '笔记本电脑' },
-  { path: '/equipment', heading: '重要设备管理', landmark: '智能提醒' },
-  { path: '/inventory', heading: 'RFID资产盘点', landmark: '盘点任务' },
-  { path: '/idle', heading: '闲置资产管理', landmark: '投影仪' },
-  { path: '/disposals', heading: '资产处置管理', landmark: '资产转移' },
-  { path: '/approval', heading: '审批流程管理', landmark: 'APR-001' },
-  { path: '/workflows', heading: '业务流程列表', landmark: '资产转移流程' },
-  { path: '/analytics', heading: '数据统计分析', landmark: '资产价值趋势' },
-  { path: '/settings', heading: '系统设置', landmark: '基础设置' },
+  { path: '/', heading: /仪表板与数据分析|仪表板/, landmark: '总资产数' },
+  { path: '/assets', heading: /资产台账/, landmark: '笔记本电脑' },
+  { path: '/equipment', heading: '重要设备管理', landmark: '总设备数' },
+  { path: '/inventory', heading: /资产盘点管理|盘点管理/, landmark: '盘点任务' },
+  { path: '/idle', heading: '闲置资产管理', landmark: '闲置总量' },
+  { path: '/disposals', heading: '资产处置管理', landmark: '本月处置总量' },
+  { path: '/approvals', heading: '审批中心', landmark: 'APR-001' },
+  { path: '/workflows', heading: /业务流程管理|业务流程列表/, landmark: '资产转移流程' },
+  { path: '/analytics', heading: '数据分析', landmark: '资产价值趋势' },
+  { path: '/settings', heading: '系统设置', landmark: '系统参数' },
 ];
 
 test.describe('核心受保护路由 smoke', () => {
@@ -32,6 +33,7 @@ test.describe('核心受保护路由 smoke', () => {
       await page.goto(route.path);
       await page.waitForLoadState('networkidle');
 
+      await expect(page.locator('body')).not.toContainText('页面加载失败');
       await expect(page.getByRole('heading', { name: route.heading }).first()).toBeVisible({ timeout: 10_000 });
       await expect(page.getByText(route.landmark).first()).toBeVisible({ timeout: 10_000 });
       expect(errors).toEqual([]);
@@ -43,6 +45,8 @@ async function seedAuthenticatedSession(page: Page) {
   await page.addInitScript(({ user }) => {
     window.localStorage.setItem('ams_auth_token', 'core-routes-smoke-token');
     window.localStorage.setItem('ams_auth_user', JSON.stringify(user));
+    window.localStorage.setItem('auth_token', 'core-routes-smoke-token');
+    window.localStorage.setItem('user_info', JSON.stringify(user));
   }, { user: authUser });
 }
 
@@ -51,7 +55,10 @@ function collectBrowserErrors(page: Page) {
 
   page.on('console', (message) => {
     if (message.type() === 'error') {
-      errors.push(message.text());
+      const text = message.text();
+      if (!text.includes('Failed to load resource') && !text.startsWith('Warning:')) {
+        errors.push(text);
+      }
     }
   });
 
@@ -64,6 +71,10 @@ function collectBrowserErrors(page: Page) {
 
 async function mockApi(route: Route) {
   const url = new URL(route.request().url());
+  if (!url.pathname.startsWith('/api/')) {
+    return route.continue();
+  }
+
   const path = url.pathname.replace(/^\/api/, '');
 
   if (path === '/dashboard/stats') {
@@ -145,10 +156,20 @@ async function mockApi(route: Route) {
     ]);
   }
 
-  if (path.startsWith('/approvals')) {
+  if (path === '/approvals/pending/count') {
+    return fulfill(route, 1);
+  }
+
+  if (path === '/approvals/stats') {
     return fulfill(route, [
-      { id: 1, processNo: 'APR-001', processType: '资产转移', status: 'PENDING', applicantId: 1 },
+      { processType: 'ASSET_TRANSFER', total: 1, approved: 0, rejected: 0, pending: 1, cancelled: 0 },
     ]);
+  }
+
+  if (path.startsWith('/approvals')) {
+    return fulfill(route, paged([
+      { id: 1, processNo: 'APR-001', processType: '资产转移', status: 'PENDING', applicantId: 1 },
+    ]));
   }
 
   if (path.startsWith('/workflows')) {

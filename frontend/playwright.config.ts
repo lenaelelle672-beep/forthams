@@ -26,7 +26,7 @@ export default defineConfig({
     {
       name: 'browser-regression-smoke',
       testDir: './src/e2e',
-      testMatch: /browser-regression-smoke\.spec\.ts/,
+      testMatch: /(browser-regression-smoke|core-routes-smoke)\.spec\.ts/,
       use: { ...devices['Desktop Chrome'] },
     },
     {

@@ -247,10 +247,7 @@ export default function AnalyticsPage() {
   const kpiItems = [
     {
       title: t('analytics:kpi.totalAssets'),
-      value:
-        (stats?.totalAssets ?? 0).toLocaleString() +
-        ' ' +
-        t('common:table.pageSize').replace('{size}', ''),
+      value: (stats?.totalAssets ?? 0).toLocaleString() + ' 项',
       subtitle:
         t('analytics:statusLabels.inUse') + ' ' + (stats?.inUseAssets ?? 0).toLocaleString(),
       icon: Package,
@@ -272,10 +269,7 @@ export default function AnalyticsPage() {
     {
       title: t('analytics:kpi.monthlyMaintenance'),
       value: String(maintenanceData?.monthlyMaintenanceCount ?? 0),
-      subtitle: t('common:table.total').replace(
-        '{count}',
-        String(maintenanceData?.totalMaintenanceCount ?? 0),
-      ),
+      subtitle: '共 ' + String(maintenanceData?.totalMaintenanceCount ?? 0) + ' 次',
       icon: Activity,
       gradient: 'from-amber-500 to-amber-600',
     },

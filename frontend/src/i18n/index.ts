@@ -19,6 +19,7 @@ import inventoryZhCN from './locales/zh-CN/inventory';
 import assetZhCN from './locales/zh-CN/asset';
 import approvalZhCN from './locales/zh-CN/approval';
 import userZhCN from './locales/zh-CN/user';
+import analyticsZhCN from './locales/zh-CN/analytics';
 
 // 英文翻译（阶段 1：复用中文或 key）
 import workorderEn from './locales/en/workorder';
@@ -26,6 +27,7 @@ import inventoryEn from './locales/en/inventory';
 import assetEn from './locales/en/asset';
 import approvalEn from './locales/en/approval';
 import userEn from './locales/en/user';
+import analyticsEn from './locales/en/analytics';
 
 i18n.use(initReactI18next).init({
   resources: {
@@ -36,6 +38,7 @@ i18n.use(initReactI18next).init({
       asset: assetZhCN,
       approval: approvalZhCN,
       user: userZhCN,
+      analytics: analyticsZhCN,
     },
     en: {
       common: commonEn,
@@ -44,11 +47,12 @@ i18n.use(initReactI18next).init({
       asset: assetEn,
       approval: approvalEn,
       user: userEn,
+      analytics: analyticsEn,
     },
   },
   lng: 'zh-CN',
   fallbackLng: 'zh-CN',
-  ns: ['common', 'workorder', 'inventory', 'asset', 'approval', 'user'],
+  ns: ['common', 'workorder', 'inventory', 'asset', 'approval', 'user', 'analytics'],
   defaultNS: 'common',
   interpolation: {
     escapeValue: false, // React 已处理 XSS
