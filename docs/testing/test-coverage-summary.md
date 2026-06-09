@@ -27,7 +27,7 @@
 |---|---|---|
 | Node 版本一致性 | `cd frontend && node -v` | 本机为 `v22.22.2`；CI/部署需保持 Node `>=20` |
 | 折旧生产链路 | `DepreciationController` / `DepreciationService` / `frontend/src/api/depreciation.ts` / `/depreciation` | 已形成 Spring Boot API、前端主路由、桌面 smoke 与真实后端 E2E 写入/计算/记录查询闭环 |
-| 审计/操作日志生产链路 | `AuditDashboardController` / `AuditService` / `frontend/src/api/audit.ts` / `/audit` | 已形成 Spring Boot API、前端主路由、桌面 smoke 与真实后端 E2E 查询/统计/页面覆盖；后续可补生产审计写入来源与落库策略验证 |
+| 审计/操作日志生产链路 | `OperLogAspect` / `AuditDashboardController` / `AuditService` / `frontend/src/api/audit.ts` / `/audit` | 已形成若依 `sys_operate_log` 写入、Spring Boot 查询统计 API、前端主路由、桌面 smoke 与真实后端 E2E 查询/统计/页面覆盖；真实 E2E 已验证资产新增与折旧计算操作可落库查询 |
 
 ## 模块文档清单
 
@@ -63,3 +63,5 @@
 本轮关闭前端依赖安全风险：`happy-dom` 与 `vite` 已升级，`react-router` 已升级到安全版本，存在高危且无修复版本的 `xlsx` 已从前端直接依赖中移除；`npm audit --audit-level=high` 返回 0 vulnerabilities。当前 Node `v22.22.2` 满足 `.nvmrc`、`frontend/package.json engines.node` 和 `happy-dom@20.9.0` 的 Node `>=20` 要求。
 
 本轮新增认证闭环浏览器覆盖：未登录访问受保护页面会跳转登录页；退出登录会清理本地会话并返回登录页。该测试曾发现退出后 URL 已到 `/login` 但旧布局仍渲染的问题，已通过 `AuthContext#logout` 改为由 auth state 驱动路由跳转修复。
+
+本轮新增若依操作日志覆盖：资产新增/修改/删除、资产导入/导出、折旧计算、工单新增/修改/删除/提交/审批/挂起/验收等主业务写操作已接入 `@OperLog`；真实后端 E2E profile 开启 `ams.oper-log.enabled=true`，并断言“资产新增”“折旧计算”可从 `/audit-logs` 查询到 `sys_operate_log` 落库记录。

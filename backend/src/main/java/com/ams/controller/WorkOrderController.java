@@ -1,6 +1,8 @@
 package com.ams.controller;
 
 import com.ams.common.Result;
+import com.ams.annotation.OperBusinessType;
+import com.ams.annotation.OperLog;
 import com.ams.dto.WorkOrderDTO;
 import com.ams.dto.DeptPendingDTO;
 import com.ams.dto.StatusDistributionDTO;
@@ -51,6 +53,7 @@ public class WorkOrderController {
 
     @Operation(summary = "创建工单", description = "创建新的维修/保养工单")
     @PreAuthorize("@ss.hasPermi('workorder:order:create')")
+    @OperLog(title = "工单新增", businessType = OperBusinessType.INSERT)
     @PostMapping
     public Result<WorkOrder> createWorkOrder(@Valid @RequestBody WorkOrderDTO dto) {
         return Result.success(workOrderService.createWorkOrder(dto));
@@ -58,6 +61,7 @@ public class WorkOrderController {
 
     @Operation(summary = "更新工单", description = "修改指定工单的属性信息")
     @PreAuthorize("@ss.hasPermi('workorder:order:edit')")
+    @OperLog(title = "工单修改", businessType = OperBusinessType.UPDATE)
     @PutMapping("/{id}")
     public Result<WorkOrder> updateWorkOrder(@PathVariable Long id, @Valid @RequestBody WorkOrderDTO dto) {
         return Result.success(workOrderService.updateWorkOrder(id, dto));
@@ -65,6 +69,7 @@ public class WorkOrderController {
 
     @Operation(summary = "删除工单", description = "逻辑删除指定工单")
     @PreAuthorize("@ss.hasPermi('workorder:order:delete')")
+    @OperLog(title = "工单删除", businessType = OperBusinessType.DELETE)
     @DeleteMapping("/{id}")
     public Result<Void> deleteWorkOrder(@PathVariable Long id) {
         workOrderService.deleteWorkOrder(id);
@@ -72,12 +77,14 @@ public class WorkOrderController {
     }
 
     @PreAuthorize("@ss.hasPermi('workorder:order:submit')")
+    @OperLog(title = "工单提交", businessType = OperBusinessType.UPDATE)
     @PostMapping("/{id}/submit")
     public Result<WorkOrder> submitWorkOrder(@PathVariable Long id) {
         return Result.success(workOrderService.submitWorkOrder(id));
     }
 
     @PreAuthorize("@ss.hasPermi('workorder:order:submit')")
+    @OperLog(title = "工单操作", businessType = OperBusinessType.UPDATE)
     @PostMapping("/{id}/operate")
     public Result<WorkOrder> operateWorkOrder(@PathVariable Long id, @RequestBody Map<String, String> body) {
         String operation = body.get("operation");
@@ -86,12 +93,14 @@ public class WorkOrderController {
     }
 
     @PreAuthorize("@ss.hasPermi('workorder:order:approve')")
+    @OperLog(title = "工单审批通过", businessType = OperBusinessType.UPDATE)
     @PostMapping("/{id}/approve")
     public Result<WorkOrder> approveWorkOrder(@PathVariable Long id, @RequestBody(required = false) Map<String, String> body) {
         return operateWorkOrder(id, "approve", body);
     }
 
     @PreAuthorize("@ss.hasPermi('workorder:order:reject')")
+    @OperLog(title = "工单审批驳回", businessType = OperBusinessType.UPDATE)
     @PostMapping("/{id}/reject")
     public Result<WorkOrder> rejectWorkOrder(@PathVariable Long id, @RequestBody(required = false) Map<String, String> body) {
         return operateWorkOrder(id, "reject", body);
@@ -100,6 +109,7 @@ public class WorkOrderController {
     // ── 挂起/恢复 ────────────────────────────────────────────────────────
 
     @PreAuthorize("@ss.hasPermi('workorder:order:hold')")
+    @OperLog(title = "工单挂起", businessType = OperBusinessType.UPDATE)
     @PostMapping("/{id}/hold")
     public Result<WorkOrderHoldRecord> holdWorkOrder(@PathVariable Long id, @RequestBody Map<String, Object> body) {
         String reason = (String) body.get("reason");
@@ -109,6 +119,7 @@ public class WorkOrderController {
     }
 
     @PreAuthorize("@ss.hasPermi('workorder:order:hold')")
+    @OperLog(title = "工单恢复", businessType = OperBusinessType.UPDATE)
     @PostMapping("/{id}/resume")
     public Result<WorkOrderHoldRecord> resumeWorkOrder(@PathVariable Long id, @RequestBody Map<String, String> body) {
         String note = body.get("note");
@@ -118,6 +129,7 @@ public class WorkOrderController {
     // ── 验收 ─────────────────────────────────────────────────────────────
 
     @PreAuthorize("@ss.hasPermi('workorder:order:edit')")
+    @OperLog(title = "工单提交验收", businessType = OperBusinessType.UPDATE)
     @PostMapping("/{id}/submit-acceptance")
     public Result<WorkOrder> submitForAcceptance(@PathVariable Long id, @RequestBody(required = false) Map<String, String> body) {
         String comment = body != null ? body.get("comment") : null;
@@ -125,6 +137,7 @@ public class WorkOrderController {
     }
 
     @PreAuthorize("@ss.hasPermi('workorder:order:approve')")
+    @OperLog(title = "工单验收通过", businessType = OperBusinessType.UPDATE)
     @PostMapping("/{id}/accept")
     public Result<WorkOrder> acceptWorkOrder(@PathVariable Long id, @RequestBody(required = false) Map<String, String> body) {
         String comment = body != null ? body.get("comment") : null;
@@ -132,6 +145,7 @@ public class WorkOrderController {
     }
 
     @PreAuthorize("@ss.hasPermi('workorder:order:reject')")
+    @OperLog(title = "工单验收驳回", businessType = OperBusinessType.UPDATE)
     @PostMapping("/{id}/reject-acceptance")
     public Result<WorkOrder> rejectAcceptance(@PathVariable Long id, @RequestBody(required = false) Map<String, String> body) {
         String comment = body != null ? body.get("comment") : null;

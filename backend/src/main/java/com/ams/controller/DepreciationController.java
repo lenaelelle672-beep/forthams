@@ -1,6 +1,8 @@
 package com.ams.controller;
 
 import com.ams.common.Result;
+import com.ams.annotation.OperBusinessType;
+import com.ams.annotation.OperLog;
 import com.ams.dto.DepreciationMethodVO;
 import com.ams.entity.DepreciationRecord;
 import com.ams.enums.DepreciationMethodEnum;
@@ -35,6 +37,7 @@ public class DepreciationController {
     }
 
     @PreAuthorize("@ss.hasPermi('depreciation:calculate')")
+    @OperLog(title = "折旧计算", businessType = OperBusinessType.UPDATE)
     @PostMapping("/calculate")
     public Result<DepreciationService.BatchCalculateResponse> calculate(
             @Valid @RequestBody BatchCalculateRequest request) {

@@ -107,6 +107,38 @@ CREATE TABLE IF NOT EXISTS sys_channel_config (
     updated_at DATETIME
 );
 
+CREATE TABLE IF NOT EXISTS notification_template (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    tenant_id VARCHAR(64) DEFAULT 'dept:1',
+    template_code VARCHAR(64) NOT NULL,
+    template_name VARCHAR(128),
+    category VARCHAR(64) DEFAULT 'general',
+    channel_type VARCHAR(32) DEFAULT 'ALL',
+    title_template VARCHAR(256),
+    content_template TEXT,
+    variables TEXT,
+    is_builtin TINYINT DEFAULT 0,
+    status TINYINT DEFAULT 1,
+    create_by VARCHAR(64),
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+    update_by VARCHAR(64),
+    update_time DATETIME,
+    deleted TINYINT DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS sys_webhook_config (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    tenant_id VARCHAR(64) NOT NULL DEFAULT 'dept:1',
+    name VARCHAR(100) NOT NULL,
+    url VARCHAR(500) NOT NULL,
+    secret VARCHAR(200),
+    events TEXT,
+    enabled TINYINT DEFAULT 1,
+    description VARCHAR(500),
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME
+);
+
 CREATE TABLE IF NOT EXISTS maintenance_record (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     tenant_id VARCHAR(64) NOT NULL DEFAULT 'dept:1',

@@ -1,6 +1,8 @@
 package com.ams.controller;
 
 import com.ams.common.Result;
+import com.ams.annotation.OperBusinessType;
+import com.ams.annotation.OperLog;
 import com.ams.dto.AssetCreateDTO;
 import com.ams.dto.AssetHistoryEvent;
 import com.ams.dto.AssetQueryDTO;
@@ -87,6 +89,7 @@ public class AssetController {
 
     @Operation(summary = "创建资产", description = "创建新的资产台账记录")
     @PreAuthorize("@ss.hasPermi('asset:ledger:create')")
+    @OperLog(title = "资产新增", businessType = OperBusinessType.INSERT)
     @PostMapping
     public Result<Asset> create(@Valid @RequestBody AssetCreateDTO createDTO) {
         return Result.success(assetService.createAsset(createDTO));
@@ -94,6 +97,7 @@ public class AssetController {
 
     @Operation(summary = "更新资产", description = "修改指定资产的属性信息")
     @PreAuthorize("@ss.hasPermi('asset:ledger:edit')")
+    @OperLog(title = "资产修改", businessType = OperBusinessType.UPDATE)
     @PutMapping("/{id}")
     public Result<Asset> update(@PathVariable Long id, @Valid @RequestBody AssetUpdateDTO updateDTO) {
         return Result.success(assetService.updateAsset(id, updateDTO));
@@ -101,6 +105,7 @@ public class AssetController {
 
     @Operation(summary = "删除资产", description = "根据 ID 删除资产（逻辑删除）")
     @PreAuthorize("@ss.hasPermi('asset:ledger:delete')")
+    @OperLog(title = "资产删除", businessType = OperBusinessType.DELETE)
     @DeleteMapping("/{id}")
     public Result<Void> delete(@PathVariable Long id) {
         assetService.deleteAsset(id);
@@ -120,6 +125,7 @@ public class AssetController {
 
     @Operation(summary = "解析资产导入文件", description = "解析 CSV 文件并返回预览行与行级错误")
     @PreAuthorize("@ss.hasPermi('asset:ledger:create')")
+    @OperLog(title = "资产导入解析", businessType = OperBusinessType.IMPORT, saveRequestData = false)
     @PostMapping("/import/parse")
     public Result<Map<String, Object>> parseImportFile(@RequestParam("file") MultipartFile file) throws IOException {
         if (file == null || file.isEmpty()) {
@@ -163,6 +169,7 @@ public class AssetController {
 
     @Operation(summary = "提交资产导入", description = "将前端确认后的 CSV 预览行写入资产台账")
     @PreAuthorize("@ss.hasPermi('asset:ledger:create')")
+    @OperLog(title = "资产导入提交", businessType = OperBusinessType.IMPORT)
     @PostMapping("/import/commit")
     public Result<Map<String, Object>> commitImport(@RequestBody Map<String, Object> payload) {
         Object rawRows = payload.get("rows");
@@ -199,6 +206,7 @@ public class AssetController {
 
     @Operation(summary = "导出资产 CSV", description = "按当前筛选条件导出资产台账 CSV")
     @PreAuthorize("@ss.hasPermi('asset:ledger:query')")
+    @OperLog(title = "资产导出", businessType = OperBusinessType.EXPORT)
     @PostMapping("/export")
     public ResponseEntity<byte[]> exportAssets(@RequestBody(required = false) AssetQueryDTO queryDTO) {
         AssetQueryDTO exportQuery = queryDTO == null ? new AssetQueryDTO() : queryDTO;

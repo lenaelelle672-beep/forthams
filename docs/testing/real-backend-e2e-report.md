@@ -69,6 +69,7 @@ npm run e2e:real -- --reporter=line
 | 折旧计算 API 闭环 | 创建资产、查询折旧方法与计划、执行折旧计算、查询折旧记录，并断言资产当前价值下降 | 通过 |
 | 折旧管理页面 | 打开 `/depreciation`，断言桌面页面可见且无 401/403/500 兜底错误 | 通过 |
 | 审计查询 API | 查询 `/audit-logs` 与 `/audit-logs/stats`，断言分页记录与趋势数据结构可用 | 通过 |
+| 若依操作日志落库 | 资产新增与折旧计算后，按关键词查询 `/audit-logs` 可返回 `sys_operate_log` 中的 `INSERT`/`UPDATE` 记录 | 通过 |
 | 审计日志页面 | 打开 `/audit`，断言桌面页面可见且无 401/403/500 兜底错误 | 通过 |
 | 浏览器错误 | 监听 `console.error` 与 `pageerror` | 通过 |
 
@@ -89,7 +90,9 @@ npm run e2e:real -- --reporter=line
 | 折旧计算真实 E2E 返回 500 | e2e H2 schema 缺少 `depreciation_record` 表 | `e2e-h2-fixes.sql` 补充折旧记录表，覆盖折旧计算与记录查询 |
 | 审计统计真实 E2E 返回 500 | H2 不支持 MySQL `DATE_FORMAT` 函数 | 新增测试侧 `H2Functions#dateFormat` 并在 e2e H2 初始化中注册别名 |
 | 异步通知日志噪声 | 若依整合后的通知通道表在 e2e H2 schema 中缺失 | `e2e-h2-fixes.sql` 补充 `sys_channel_config` 最小表结构 |
+| 真实 E2E 无法验证若依操作日志落库 | `application-e2e.properties` 关闭了 `ams.oper-log.enabled`，`@OperLog` AOP 未启用 | e2e profile 改为启用操作日志，并对资产新增、折旧计算增加真实落库断言 |
+| 退役通知真实 E2E 出现缺表日志 | e2e H2 schema 缺少 `notification_template` 与 `sys_webhook_config` | `e2e-h2-fixes.sql` 补齐通知模板与 Webhook 配置最小表结构 |
 
 ## 结论
 
-无 mock 的真实后端浏览器冒烟、核心点击、流程中心、流程定义保存/发布、工单审批、资产退役、折旧计算、审计查询、审批列表、报表与大屏链路已通过。当前核心链路已经从“代码测试”推进到“浏览器 + 真实 Spring Boot API”的可复现验证。
+无 mock 的真实后端浏览器冒烟、核心点击、流程中心、流程定义保存/发布、工单审批、资产退役、折旧计算、若依操作日志落库、审计查询、审批列表、报表与大屏链路已通过。当前核心链路已经从“代码测试”推进到“浏览器 + 真实 Spring Boot API”的可复现验证。

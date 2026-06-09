@@ -317,6 +317,16 @@ test('真实后端：折旧计算与审计查询 API 和页面可用', async ({ 
     params: { page: 0, size: 5 },
   }), '查询审计日志列表');
   expect(Array.isArray(pageRecords(auditLogs)), '审计日志应返回分页记录或数组').toBe(true);
+  const assetCreateLogs = pageRecords(await apiData(await request.get(`${apiBase}/audit-logs`, {
+    headers,
+    params: { keyword: '资产新增', page: 0, size: 10 },
+  }), '查询资产新增操作日志'));
+  expect(assetCreateLogs.some((log) => log.action === '资产新增' && log.operationType === 'INSERT')).toBe(true);
+  const depreciationCalculateLogs = pageRecords(await apiData(await request.get(`${apiBase}/audit-logs`, {
+    headers,
+    params: { keyword: '折旧计算', page: 0, size: 10 },
+  }), '查询折旧计算操作日志'));
+  expect(depreciationCalculateLogs.some((log) => log.action === '折旧计算' && log.operationType === 'UPDATE')).toBe(true);
   const auditStats = await apiData(await request.get(`${apiBase}/audit-logs/stats`, { headers }), '查询审计统计');
   expect(Array.isArray(auditStats.trendData), '审计统计应返回趋势数组').toBe(true);
 
