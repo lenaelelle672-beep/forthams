@@ -66,4 +66,30 @@ class InspectionTaskServiceImplTest {
         assertEquals("INSPECTION_TASK", notification.getRefType());
         assertNull(TenantContext.getTenantId());
     }
+
+    @Test
+    void shouldMarkOverdueTasksWithinTenantContext() {
+        InspectionTaskServiceImpl service = new InspectionTaskServiceImpl(taskMapper, tenantService, notificationService);
+        InspectionTask task = new InspectionTask();
+        task.setId(10L);
+        task.setTaskNo("TSK-002");
+        task.setTaskName("逾期检验");
+
+        when(tenantService.getActiveTenantIds()).thenReturn(List.of("dept:1", "dept:2"));
+        when(taskMapper.findOverdueTasks("dept:1")).thenAnswer(invocation -> {
+            assertEquals("dept:1", TenantContext.getTenantId());
+            return List.of(task);
+        });
+        when(taskMapper.findOverdueTasks("dept:2")).thenAnswer(invocation -> {
+            assertEquals("dept:2", TenantContext.getTenantId());
+            return List.of();
+        });
+
+        service.markOverdueTasks();
+
+        ArgumentCaptor<InspectionTask> captor = ArgumentCaptor.forClass(InspectionTask.class);
+        verify(taskMapper).updateById(captor.capture());
+        assertEquals("OVERDUE", captor.getValue().getStatus());
+        assertNull(TenantContext.getTenantId());
+    }
 }

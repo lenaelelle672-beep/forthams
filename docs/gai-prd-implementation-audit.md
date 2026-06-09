@@ -4,7 +4,7 @@
 
 根目录 `prd.md` 的多租户隔离需求已经完成了认证上下文、主要业务域强制过滤、缺失 tenant 拒绝、跨租户审计日志和 MyBatis-Plus TenantLine 统一 SQL 防漏的核心链路。
 
-当前状态应判定为：核心安全链路已打通，主要业务表具备 Service 手写过滤与 TenantLine 双层防护；异步通知链路已补齐邮件 executor 配置，SLA、保险、风险评审、维保计划、定时报表、循环盘点、折旧、邮件重试后台调度已按租户绑定 TenantContext。剩余工作集中在基础字典/系统表的产品归属确认、白名单持续治理和更多后台调度 TenantContext 传播专项验证。
+当前状态应判定为：核心安全链路已打通，主要业务表具备 Service 手写过滤与 TenantLine 双层防护；异步通知链路已补齐邮件 executor 配置，SLA、保险、风险评审、维保计划、定时报表、循环盘点、折旧、邮件重试后台调度已按租户绑定 TenantContext；检验任务到期/逾期调度已有专项测试护栏。剩余工作集中在基础字典/系统表的产品归属确认、白名单持续治理和更多后台调度 TenantContext 传播专项验证。
 
 ## PRD 条目状态
 
@@ -216,13 +216,13 @@ env MAVEN_OPTS=-Djdk.attach.allowAttachSelf=true mvn test -DfailIfNoTests=false
 cd frontend && npm run e2e:real -- --reporter=line
 ```
 
-结果：后端全量 612 个测试通过；真实后端 E2E 9 个测试通过。
+结果：后端全量 613 个测试通过；真实后端 E2E 9 个测试通过。
 
 仍需持续治理：
 
 - 明确哪些基础表是全局字典表，例如 `AssetCategory`、`Dept`、`Role`、`Vendor`、`Location`。
 - 新增业务表时同步维护 tenant 字段、白名单和 schema consistency 测试。
-- 对更多后台调度补充 TenantContext 传播或显式租户遍历测试；邮件异步 executor 缺口已由 `AsyncConfigTest` 覆盖，SLA、保险、风险评审、维保计划、定时报表、循环盘点、折旧、邮件重试调度已有专项测试覆盖。
+- 对更多后台调度补充 TenantContext 传播或显式租户遍历测试；邮件异步 executor 缺口已由 `AsyncConfigTest` 覆盖，SLA、保险、风险评审、维保计划、定时报表、循环盘点、折旧、邮件重试、检验任务调度已有专项测试覆盖。
 
 ## 当前不建议做的事
 
