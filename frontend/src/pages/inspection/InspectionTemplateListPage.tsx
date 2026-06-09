@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Table, Button, Space, Tag, Input, Select, message, Modal } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, PoweroffOutlined } from '@ant-design/icons';
+import { PlusOutlined, EditOutlined, DeleteOutlined, PoweroffOutlined, CopyOutlined } from '@ant-design/icons';
 import { inspectionTemplateApi } from '@/api/inspection';
 import { InspectionTemplate, InspectionTypeEnum } from '@/types/inspection';
 import { useNavigate } from 'react-router-dom';
@@ -19,6 +19,7 @@ const InspectionTemplateListPage: React.FC = () => {
   const [type, setType] = useState<string | undefined>();
   const [pageNum, setPageNum] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [copyingId, setCopyingId] = useState<number | null>(null);
 
   // 查询模板列表
   const { data, isLoading, refetch } = useQuery({
@@ -62,11 +63,15 @@ const InspectionTemplateListPage: React.FC = () => {
 
   // 复制模板
   const handleCopy = async (id: number) => {
+    setCopyingId(id);
     try {
-      // TODO: 实现复制功能
-      message.info('复制功能开发中');
+      await inspectionTemplateApi.copy(id);
+      message.success('复制成功');
+      refetch();
     } catch (error) {
       message.error('复制失败');
+    } finally {
+      setCopyingId(null);
     }
   };
 
@@ -148,6 +153,8 @@ const InspectionTemplateListPage: React.FC = () => {
           </Button>
           <Button
             type="link"
+            icon={<CopyOutlined />}
+            loading={copyingId === record.id}
             onClick={() => handleCopy(record.id!)}
           >
             复制

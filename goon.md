@@ -1,5 +1,23 @@
 # goon.md — 交接笔记（Cowork → Claude Code）
 
+## 2026-06-09 21:10 最新状态（Codex GAI2 检验模板备用入口收敛）
+
+### 当前事实
+- 已提交 `9794e2c25 fix: enable inspection template copy`，补齐主桌面检验模板页、后端接口和 service 复制闭环。
+- 继续发现 `InspectionTemplateListPage` 备用桌面列表页仍保留“复制功能开发中”占位；该页不是当前主路由 `/inspection-templates` 入口，但仍在代码库内，后续切路由可能复现同一问题。
+- 已将备用列表页复制按钮改为调用真实 `inspectionTemplateApi.copy(id)`，成功后提示并 `refetch()` 刷新列表；失败提示“复制失败”。
+
+### 最新验证
+- GitNexus impact：`InspectionTemplateListPage` upstream 风险 `LOW`，`direct=0`、`processes_affected=0`。
+- 前端类型检查：`npx tsc -p tsconfig.json --noEmit --pretty false` 通过。
+- 前端全量：`npm test -- --run --reporter=dot` 通过，`85` 个文件、`861` 个测试通过。
+- `git diff --check` 通过。
+
+### 剩余动作
+- P0：原生 Docker/Nginx 验证仍无法在当前机器执行，`docker` 与 `nginx` 命令均不存在。
+- P1：`.DS_Store` tracked 元数据清理仍需用户明确确认。
+- P1：移动端继续冻结；不纳入当前桌面/后端质量闭环。
+
 ## 2026-06-09 21:05 最新状态（Codex GAI2 检验模板复制闭环）
 
 ### 当前事实
