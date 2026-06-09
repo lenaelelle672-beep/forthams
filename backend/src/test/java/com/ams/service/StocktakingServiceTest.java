@@ -4,6 +4,7 @@ import com.ams.common.exception.BusinessException;
 import com.ams.context.TenantContext;
 import com.ams.dto.StocktakingCycleStatsDTO;
 import com.ams.entity.Asset;
+import com.ams.entity.NotificationRecord;
 import com.ams.entity.StocktakingCycle;
 import com.ams.entity.StocktakingTask;
 import com.ams.mapper.AssetMapper;
@@ -26,6 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -46,12 +48,15 @@ class StocktakingServiceTest {
     @Mock
     private TenantService tenantService;
 
+    @Mock
+    private NotificationService notificationService;
+
     private StocktakingServiceImpl service;
 
     @BeforeEach
     void setUp() {
         TenantContext.setTenantId("dept:1");
-        service = new StocktakingServiceImpl(cycleMapper, taskMapper, assetMapper, tenantService);
+        service = new StocktakingServiceImpl(cycleMapper, taskMapper, assetMapper, tenantService, notificationService);
     }
 
     @AfterEach
@@ -173,6 +178,60 @@ class StocktakingServiceTest {
         assertNull(TenantContext.getTenantId());
     }
 
+    @Test
+    void shouldNotifyCycleCreatorWhenScheduledTaskBecomesOverdue() {
+        TenantContext.clear();
+        StocktakingTask task = task(21L, "PENDING", "dept:1");
+        task.setAssetId(1001L);
+        StocktakingCycle cycle = cycle(7L, "dept:1", "IN_PROGRESS");
+        cycle.setCreatorId(88L);
+        cycle.setCycleName("二季度盘点");
+
+        when(tenantService.getActiveTenantIds()).thenReturn(List.of("dept:1"));
+        when(taskMapper.selectPage(any(Page.class), any(LambdaQueryWrapper.class)))
+                .thenAnswer(invocation -> pageWithRecords(invocation.getArgument(0), List.of(task)))
+                .thenAnswer(invocation -> pageWithRecords(invocation.getArgument(0), List.of()));
+        when(cycleMapper.selectById(7L)).thenReturn(cycle);
+
+        service.checkOverdueTasks();
+
+        ArgumentCaptor<NotificationRecord> notificationCaptor = ArgumentCaptor.forClass(NotificationRecord.class);
+        verify(taskMapper).updateById(task);
+        assertEquals("OVERDUE", task.getStatus());
+        verify(notificationService).create(notificationCaptor.capture());
+        NotificationRecord notification = notificationCaptor.getValue();
+        assertEquals(88L, notification.getUserId());
+        assertEquals("盘点任务已逾期", notification.getTitle());
+        assertEquals("STOCKTAKING_TASK", notification.getType());
+        assertEquals("OPERATION", notification.getCategory());
+        assertEquals(21L, notification.getRefId());
+        assertEquals("STOCKTAKING_TASK", notification.getRefType());
+        assertNull(TenantContext.getTenantId());
+    }
+
+    @Test
+    void shouldKeepOverdueStatusWhenStocktakingNotificationFails() {
+        TenantContext.clear();
+        StocktakingTask task = task(22L, "ASSIGNED", "dept:1");
+        StocktakingCycle cycle = cycle(7L, "dept:1", "IN_PROGRESS");
+        cycle.setCreatorId(88L);
+        cycle.setCycleName("二季度盘点");
+
+        when(tenantService.getActiveTenantIds()).thenReturn(List.of("dept:1"));
+        when(taskMapper.selectPage(any(Page.class), any(LambdaQueryWrapper.class)))
+                .thenAnswer(invocation -> pageWithRecords(invocation.getArgument(0), List.of(task)))
+                .thenAnswer(invocation -> pageWithRecords(invocation.getArgument(0), List.of()));
+        when(cycleMapper.selectById(7L)).thenReturn(cycle);
+        doThrow(new RuntimeException("notify failed"))
+                .when(notificationService).create(any(NotificationRecord.class));
+
+        service.checkOverdueTasks();
+
+        verify(taskMapper).updateById(task);
+        assertEquals("OVERDUE", task.getStatus());
+        assertNull(TenantContext.getTenantId());
+    }
+
     private StocktakingCycle cycle(Long id, String tenantId) {
         return cycle(id, tenantId, "IN_PROGRESS");
     }
@@ -182,7 +241,13 @@ class StocktakingServiceTest {
         cycle.setId(id);
         cycle.setTenantId(tenantId);
         cycle.setStatus(status);
+        cycle.setCycleName("默认盘点");
         return cycle;
+    }
+
+    private Page<StocktakingTask> pageWithRecords(Page<StocktakingTask> page, List<StocktakingTask> records) {
+        page.setRecords(records);
+        return page;
     }
 
     private Asset asset(Long id, String assetNo, Long locationId, String abcClassification) {

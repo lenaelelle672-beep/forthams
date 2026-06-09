@@ -4,11 +4,13 @@ import com.ams.common.exception.BusinessException;
 import com.ams.context.TenantContext;
 import com.ams.dto.StocktakingCycleStatsDTO;
 import com.ams.entity.Asset;
+import com.ams.entity.NotificationRecord;
 import com.ams.entity.StocktakingCycle;
 import com.ams.entity.StocktakingTask;
 import com.ams.mapper.AssetMapper;
 import com.ams.mapper.StocktakingCycleMapper;
 import com.ams.mapper.StocktakingTaskMapper;
+import com.ams.service.NotificationService;
 import com.ams.service.StocktakingService;
 import com.ams.service.TenantService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -30,6 +32,7 @@ public class StocktakingServiceImpl implements StocktakingService {
     private final StocktakingTaskMapper taskMapper;
     private final AssetMapper assetMapper;
     private final TenantService tenantService;
+    private final NotificationService notificationService;
 
     @Override
     public List<StocktakingCycle> listCycles(String status) {
@@ -469,7 +472,7 @@ public class StocktakingServiceImpl implements StocktakingService {
                 log.warn("任务逾期: taskId={}, cycleId={}, assetId={}, createTime={}",
                         task.getId(), task.getCycleId(), task.getAssetId(), task.getCreateTime());
 
-                // TODO: 发送逾期通知（需要 NotificationService）
+                sendOverdueNotification(task, cycle);
             }
 
             currentPage++;
@@ -520,8 +523,30 @@ public class StocktakingServiceImpl implements StocktakingService {
 
             log.info("租户 {} 周期 {} 完成率统计: 总任务={}, 已完成={}, 完成率={}%",
                     tenantId, cycle.getId(), totalCount, completedCount, String.format("%.2f", completionRate));
+        }
+    }
 
-            // TODO: 可以在这里更新周期的完成率字段（如果需要的话）
+    private void sendOverdueNotification(StocktakingTask task, StocktakingCycle cycle) {
+        if (cycle.getCreatorId() == null || cycle.getCreatorId() <= 0) {
+            log.debug("盘点逾期通知跳过: taskId={}, cycleId={}, creatorId为空",
+                    task.getId(), task.getCycleId());
+            return;
+        }
+
+        try {
+            NotificationRecord notification = new NotificationRecord();
+            notification.setUserId(cycle.getCreatorId());
+            notification.setTitle("盘点任务已逾期");
+            notification.setContent("盘点周期「" + cycle.getCycleName() + "」中资产ID "
+                    + task.getAssetId() + " 的盘点任务已逾期，请及时处理。");
+            notification.setType("STOCKTAKING_TASK");
+            notification.setCategory("OPERATION");
+            notification.setRefId(task.getId());
+            notification.setRefType("STOCKTAKING_TASK");
+            notificationService.create(notification);
+        } catch (RuntimeException e) {
+            log.warn("盘点逾期通知发送失败: taskId={}, cycleId={}, creatorId={}, error={}",
+                    task.getId(), task.getCycleId(), cycle.getCreatorId(), e.getMessage());
         }
     }
 }
