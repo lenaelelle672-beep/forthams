@@ -65,9 +65,10 @@ mvn -q -Dtest='*ServiceTest,AssetStatusTest' test
 - `CommentIntegrationTest` → 编译干净；需同时移除 surefire `**/integration/**` 排除；`@BeforeAll` 用 H2 建表，注意共享内存库隔离
 - `TenantIsolationIntegrationTest` → **保留 `@Disabled`**；先查 git 历史确认第 4 轮删了什么类，再决定恢复
 
-## 6. 构建配置修复（已部分落地，需继续验证覆盖率报告）
+## 6. 构建配置修复（已落地，覆盖率报告已验证）
 
-- `pom.xml` 已改为 `<argLine>@{argLine} ${surefire.argLine}</argLine>`，恢复 JaCoCo `prepare-agent` 晚绑定入口；仍需后续显式跑覆盖率报告确认生成内容非空。
+- `pom.xml` 已改为 `<argLine>@{argLine} ${surefire.argLine}</argLine>`，恢复 JaCoCo `prepare-agent` 晚绑定入口。
+- 2026-06-09 已验证 JaCoCo 输出非空：`backend/target/jacoco.exec` 为 36,510,464 bytes，`backend/target/site/jacoco/jacoco.xml` 为 1,698,282 bytes，且 XML 顶层存在 `INSTRUCTION`、`BRANCH`、`LINE` 等 counter。
 - `forkCount=1` + `reuseForks=true` 已落地，用于隔离 `@SpringBootTest` 间的静态状态（如 `TenantContext` 泄漏）。
 - `controller` surefire 排除已解除；`integration`、`tenant` 仍按波次保留排除，需分别完成重写/隔离验证后再解除。
 
@@ -94,15 +95,19 @@ mvn -q test                  # 跑全部启用的测试
 | Wave 2 controller | 31 | 已恢复并通过后端全量测试 |
 | Wave 3 集成/重写 | 4 | 集成/tenant 仍按 surefire 排除策略保留，未作为本轮全量启用范围 |
 | 测试环境降噪 | — | 已配置 `ams.scheduling.enabled=false`、`ams.oper-log.enabled=false`；已清理 `FaultCodeMapper.countChildren` 重复映射 |
-| 构建配置 | — | forkCount/argLine 已调整；JaCoCo 报告内容仍需单独验证 |
+| 构建配置 | — | forkCount/argLine 已调整；JaCoCo 报告内容已验证非空 |
 
 ## 10. 2026-06-09 最新验证记录
 
-- 前端全量测试：`83` 个测试文件，`857` 个测试全部通过。
+- 前端全量测试：`85` 个测试文件，`861` 个测试全部通过。
 - 前端构建：`npm run build` 通过，仅剩 chunk 体积 warning。
-- 后端全量测试：`mvn test` 通过，`571` 个测试通过，0 failure/error/skip。
+- 后端全量测试：`mvn test` 通过，`582` 个测试通过，0 failure/error/skip。
 - 后端 D 批次 targeted gate 通过，覆盖资产导入、盘点、审批、通知事件与 ABC 分类，`82` 个测试通过。
 - 前端 E 批次 targeted gate 通过，覆盖 API wrapper、报表、全局搜索、评论用户提及、折旧卡片、故障码选择器、工单验收与表单 mapper，`35` 个文件、`92` 个测试通过。
 - workflow 保存链路已补充认证兼容测试和前端 API 契约测试。
+- 桌面浏览器回归：`npx playwright test src/e2e/browser-regression-smoke.spec.ts --project=browser-regression-smoke --reporter=line` 通过，`11/11`；覆盖 `/workflows` 保存失败提示和新建模板流程保存草稿后进入设计器。
+- JaCoCo 报告已验证生成：`backend/target/jacoco.exec`、`backend/target/site/jacoco/index.html`、`backend/target/site/jacoco/jacoco.xml` 均存在且 XML counter 非空。
 - 当前剩余日志主要来自测试刻意触发的业务异常路径，不再是定时任务或操作日志切面对测试库的副作用。
-- GAI2 拆批提交补充记录：已提交 `4178cb375 fix: harden backend runtime operations` 与 `2e688c6b4 fix: align desktop frontend api contracts`；最新 GitNexus `detect_changes(scope=all)` 已降为 `low`，`changed_count=39`、`affected_count=0`、`changed_files=9`。剩余改动主要是移动端冻结文件、路由中的移动入口、仓库元文件与交接记录。
+- GAI2 拆批提交补充记录：已提交 `4178cb375 fix: harden backend runtime operations`、`2e688c6b4 fix: align desktop frontend api contracts`、`eb84fd139 fix: repair production web container routing`、`928d93505 fix: align split docker deployment checks`、`743c32f7f fix: make database bootstrap explicit`、`b7b523560 fix: preserve asset export category filter`、`b607c2b6c fix: normalize asset attachment preview urls`、`9d5f936c3 fix: align webhook config permissions`、`0e8cf71f9 fix: parse escaped asset import csv` 等批次。
+- 最新 GitNexus `detect_changes(scope=all)` 已降为 `low`、`affected_count=0`；剩余可见工作树主要是移动端冻结文件、移动入口路由和 tracked `.DS_Store` 元数据改动。
+- 仍未达到 100 分的外部阻断：当前机器无原生 `docker` 与 `nginx` 命令，不能补真实镜像构建、Nginx 配置加载和容器 smoke；`.DS_Store` 的 tracked 清理需要用户明确确认；移动端按用户要求暂不继续。

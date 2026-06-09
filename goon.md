@@ -1,5 +1,21 @@
 # goon.md — 交接笔记（Cowork → Claude Code）
 
+## 2026-06-09 20:45 最新状态（Codex GAI2 计划与证据校准）
+
+### 当前事实
+- 已校准 `docs/TEST_RECOVERY_PLAN.md` 的最新验证记录：前端全量为 `85` 个测试文件、`861` 个测试通过；后端全量为 `582` 个测试通过；桌面浏览器回归为 `11/11` 通过。
+- 已将 JaCoCo 从“仍需验证”改为“已验证非空”：`backend/target/jacoco.exec` 为 36,510,464 bytes，`backend/target/site/jacoco/jacoco.xml` 为 1,698,282 bytes，且 XML 顶层包含覆盖率 counter。
+- 本次只更新计划/交接证据，没有改业务代码、测试代码、移动端代码或路由。
+
+### 最新验证
+- 文件证据：`backend/target/jacoco.exec`、`backend/target/site/jacoco/index.html`、`backend/target/site/jacoco/jacoco.xml` 均存在。
+- XML 证据：`jacoco.xml` 顶层含 `INSTRUCTION`、`BRANCH`、`LINE` 等 counter，确认不是空报告。
+
+### 剩余动作
+- P0：原生 Docker/Nginx 验证仍无法在当前机器执行，`docker` 与 `nginx` 命令均不存在。
+- P1：`.DS_Store` tracked 元数据清理仍需用户明确确认。
+- P1：移动端继续冻结；不纳入当前桌面/后端质量闭环。
+
 ## 2026-06-09 20:42 最新状态（Codex GAI2 CSV 导入解析兼容性收敛）
 
 ### 当前事实
