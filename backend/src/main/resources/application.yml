@@ -19,7 +19,7 @@ spring:
   datasource:
     url: ${DB_URL:jdbc:mysql://localhost:3306/ams_db?useUnicode=true&characterEncoding=utf8&connectionCollation=utf8mb4_unicode_ci&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&allowEmptyPasswords=true}
     username: ${DB_USERNAME:root}
-    password: ${DB_PASSWORD:root}
+    password: ${DB_PASSWORD:}
     driver-class-name: ${DB_DRIVER:com.mysql.cj.jdbc.Driver}
     hikari:
       minimum-idle: 5
@@ -29,16 +29,19 @@ spring:
       connection-timeout: 30000
       pool-name: AMSHikariCP
 
-  # ========== SQL Init（用 schema.sql 完整初始化数据库） ==========
+  # ========== SQL Init ==========
+  # 默认不在 Spring Boot 启动时执行 schema.sql，避免生产库重复跑完整 DDL。
+  # 全新 Docker/MySQL 环境由 docker-compose 挂载 schema.sql 初始化；
+  # 如需本地一次性初始化，可显式设置 SQL_INIT_MODE=always。
   sql:
     init:
-      mode: always
+      mode: ${SQL_INIT_MODE:never}
       schema-locations: classpath:schema.sql
-      continue-on-error: true
+      continue-on-error: false
       data-locations: ""
 
   # ========== Flyway ==========
-  # Flyway disabled: 使用 schema.sql 初始化数据库，迁移脚本位于 src/main/resources/db/migration/
+  # Flyway disabled: 当前迁移脚本按 Flyway 命名保管，生产执行方式为外部 DBA/CI 手动编排。
   flyway:
     enabled: false
 

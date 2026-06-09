@@ -2,7 +2,7 @@
 
 ## 技术选型
 
-本目录使用 **Flyway 风格** 的增量 SQL 迁移文件，通过 Spring Boot 启动时自动执行。
+本目录使用 **Flyway 风格** 的增量 SQL 迁移文件保存数据库变更顺序。当前应用默认关闭 Spring Boot SQL init 与 Flyway 自动迁移，迁移执行由部署流程、DBA 或 CI 手动编排。
 
 ## 命名约定
 
@@ -20,12 +20,13 @@
 
 ## schema.sql
 
-`schema.sql` 是完整的 DDL 快照，**仅用于全新安装**。首次部署时可直接执行 `schema.sql` 初始化全部表结构；后续增量更新使用本目录下的迁移文件。
+`schema.sql` 是完整的 DDL 快照，**仅用于全新安装**。首次部署时可直接执行 `schema.sql` 初始化全部表结构；Docker Compose 中的 MySQL 服务通过 `/docker-entrypoint-initdb.d/01-schema.sql` 挂载完成首次初始化。后续增量更新使用本目录下的迁移文件。
 
 ## 执行方式
 
-- **自动执行**（推荐）：Spring Boot 启动时，Flyway 自动检测未执行的迁移脚本并按版本号顺序执行。
-- **手动执行**：在 MySQL 客户端中按文件名顺序执行，或通过 `flyway migrate` 命令。
+- **全新 Docker/MySQL 安装**：由 MySQL 容器首次创建数据目录时执行挂载的 `schema.sql`。
+- **已有环境升级**：在 MySQL 客户端中按文件名顺序执行本目录迁移文件，或由外部迁移工具按相同顺序编排。
+- **本地一次性 Spring SQL init**：仅在明确需要时设置 `SQL_INIT_MODE=always`；默认值为 `never`，避免运行态反复执行完整 DDL。
 
 ## 注意事项
 
