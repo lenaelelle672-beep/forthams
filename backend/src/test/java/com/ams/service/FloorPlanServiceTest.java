@@ -1,14 +1,18 @@
 package com.ams.service;
 
 import com.ams.common.exception.BusinessException;
+import com.ams.context.TenantContext;
 import com.ams.entity.FloorPlan;
 import com.ams.entity.FloorPlanAsset;
 import com.ams.mapper.FloorPlanAssetMapper;
 import com.ams.mapper.FloorPlanMapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -31,6 +35,16 @@ class FloorPlanServiceTest {
 
     @InjectMocks
     private FloorPlanService floorPlanService;
+
+    @BeforeEach
+    void setUp() {
+        TenantContext.setTenantId("dept:1");
+    }
+
+    @AfterEach
+    void tearDown() {
+        TenantContext.clear();
+    }
 
     private FloorPlan plan(Long id, String name) {
         FloorPlan p = new FloorPlan();
@@ -92,6 +106,7 @@ class FloorPlanServiceTest {
         FloorPlan newPlan = plan(null, "新平面图");
         FloorPlan result = floorPlanService.create(newPlan);
         assertEquals("新平面图", result.getName());
+        assertEquals("dept:1", result.getTenantId());
         verify(floorPlanMapper).insert(newPlan);
     }
 
@@ -146,6 +161,7 @@ class FloorPlanServiceTest {
         FloorPlanAsset result = floorPlanService.placeAsset(1L, 101L, BigDecimal.TEN, BigDecimal.ONE, "新标签");
         assertEquals(BigDecimal.TEN, result.getPosX());
         assertEquals("新标签", result.getLabel());
+        assertEquals("dept:1", result.getTenantId());
         verify(floorPlanAssetMapper).updateById(existing);
         verify(floorPlanAssetMapper, never()).insert(any(FloorPlanAsset.class));
     }
@@ -156,7 +172,10 @@ class FloorPlanServiceTest {
         FloorPlanAsset result = floorPlanService.placeAsset(1L, 999L, new BigDecimal("10.5"), new BigDecimal("20.3"), "新标记");
         assertEquals(1L, result.getPlanId());
         assertEquals(999L, result.getAssetId());
-        verify(floorPlanAssetMapper).insert(any(FloorPlanAsset.class));
+        assertEquals("dept:1", result.getTenantId());
+        ArgumentCaptor<FloorPlanAsset> captor = ArgumentCaptor.forClass(FloorPlanAsset.class);
+        verify(floorPlanAssetMapper).insert(captor.capture());
+        assertEquals("dept:1", captor.getValue().getTenantId());
     }
 
     @Test

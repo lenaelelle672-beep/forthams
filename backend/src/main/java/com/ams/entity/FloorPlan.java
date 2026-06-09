@@ -13,6 +13,8 @@ public class FloorPlan implements Serializable {
     @TableId(type = IdType.AUTO)
     private Long id;
 
+    private String tenantId;
+
     private String name;
     private String building;
     private String floor;

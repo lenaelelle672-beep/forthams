@@ -90,6 +90,18 @@ class TenantSchemaConsistencyTest {
     }
 
     @Test
+    void floorPlanTenantMigrationShouldScopePlansAndPlacements() throws IOException {
+        String migration = Files.readString(MIGRATION_DIR.resolve("V2_79__floor_plan_tenant_scope.sql"));
+
+        assertThat(migration).contains("ALTER TABLE floor_plan ADD COLUMN tenant_id VARCHAR(64)");
+        assertThat(migration).contains("ALTER TABLE floor_plan_asset ADD COLUMN tenant_id VARCHAR(64)");
+        assertThat(migration).contains("UPDATE floor_plan");
+        assertThat(migration).contains("UPDATE floor_plan_asset");
+        assertThat(migration).contains("ADD INDEX idx_fp_tenant_deleted (tenant_id, deleted)");
+        assertThat(migration).contains("ADD INDEX idx_fpa_tenant_plan (tenant_id, plan_id)");
+    }
+
+    @Test
     void legacyTenantIdMigrationsShouldBePatchedForwardWithoutChecksumChanges() throws IOException {
         String v236 = Files.readString(MIGRATION_DIR.resolve("V2_36__asset_parent_child.sql"));
         String v258 = Files.readString(MIGRATION_DIR.resolve("V2_58__inspection_template_and_record.sql"));

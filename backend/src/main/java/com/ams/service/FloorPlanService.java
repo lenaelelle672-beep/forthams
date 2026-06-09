@@ -1,6 +1,7 @@
 package com.ams.service;
 
 import com.ams.common.exception.BusinessException;
+import com.ams.context.TenantContext;
 import com.ams.entity.FloorPlan;
 import com.ams.entity.FloorPlanAsset;
 import com.ams.mapper.FloorPlanMapper;
@@ -38,6 +39,7 @@ public class FloorPlanService {
 
     @Transactional(rollbackFor = Exception.class)
     public FloorPlan create(FloorPlan plan) {
+        plan.setTenantId(TenantContext.requireTenantId());
         floorPlanMapper.insert(plan);
         return plan;
     }
@@ -70,10 +72,12 @@ public class FloorPlanService {
             existing.setPosX(posX);
             existing.setPosY(posY);
             existing.setLabel(label);
+            existing.setTenantId(TenantContext.requireTenantId());
             floorPlanAssetMapper.updateById(existing);
             return existing;
         }
         FloorPlanAsset fpa = new FloorPlanAsset();
+        fpa.setTenantId(TenantContext.requireTenantId());
         fpa.setPlanId(planId);
         fpa.setAssetId(assetId);
         fpa.setPosX(posX);
