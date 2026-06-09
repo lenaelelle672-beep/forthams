@@ -7,6 +7,6 @@ import java.time.LocalDate;
 import java.util.List;
 @Mapper
 public interface SoftwareLicenseMapper extends BaseMapper<SoftwareLicense> {
-    @Select("SELECT * FROM software_license WHERE deleted=0 AND expiry_date BETWEEN #{today} AND #{future} ORDER BY expiry_date ASC")
-    List<SoftwareLicense> findExpiring(LocalDate today, LocalDate future);
+    @Select("SELECT * FROM software_license WHERE deleted=0 AND tenant_id=#{tenantId} AND expiry_date BETWEEN #{today} AND #{future} ORDER BY expiry_date ASC")
+    List<SoftwareLicense> findExpiring(String tenantId, LocalDate today, LocalDate future);
 }

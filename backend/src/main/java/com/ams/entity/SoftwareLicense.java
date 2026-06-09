@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 public class SoftwareLicense {
     @TableId(type = IdType.AUTO)
     private Long id;
+    private String tenantId;
     private String licenseName;
     private String licenseKey;
     private String softwareType;

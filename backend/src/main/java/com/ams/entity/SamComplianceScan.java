@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 public class SamComplianceScan {
     @TableId(type = IdType.AUTO)
     private Long id;
+    private String tenantId;
     private LocalDateTime scanDate;
     private Integer totalLicenses;
     private Integer compliantCount;

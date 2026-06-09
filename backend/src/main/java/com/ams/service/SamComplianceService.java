@@ -1,6 +1,6 @@
 package com.ams.service;
 
-import com.ams.entity.LicenseAssignment;
+import com.ams.context.TenantContext;
 import com.ams.entity.SamComplianceDetail;
 import com.ams.entity.SamComplianceScan;
 import com.ams.entity.SoftwareLicense;
@@ -37,8 +37,10 @@ public class SamComplianceService {
      */
     @Transactional
     public SamComplianceScan runScan() {
+        String tenantId = TenantContext.requireTenantId();
         // 创建扫描记录
         SamComplianceScan scan = new SamComplianceScan();
+        scan.setTenantId(tenantId);
         scan.setScanDate(LocalDateTime.now());
         scan.setStatus("RUNNING");
         scanMapper.insert(scan);
@@ -47,6 +49,7 @@ public class SamComplianceService {
         // 获取所有活跃许可证
         List<SoftwareLicense> licenses = licenseMapper.selectList(
                 new LambdaQueryWrapper<SoftwareLicense>()
+                        .eq(SoftwareLicense::getTenantId, tenantId)
                         .eq(SoftwareLicense::getDeleted, 0)
         );
 
@@ -80,7 +83,7 @@ public class SamComplianceService {
                 recommendation = "无限席位许可，无需调整";
                 compliant++;
             } else {
-                usedSeats = assignmentMapper.countActiveByLicense(lic.getId());
+                usedSeats = assignmentMapper.countActiveByLicense(tenantId, lic.getId());
 
                 if (usedSeats > lic.getTotalSeats()) {
                     complianceStatus = "OVERUSED";
@@ -102,6 +105,7 @@ public class SamComplianceService {
             }
 
             SamComplianceDetail detail = new SamComplianceDetail();
+            detail.setTenantId(tenantId);
             detail.setScanId(scanId);
             detail.setLicenseId(lic.getId());
             detail.setSoftwareName(lic.getLicenseName());
@@ -152,7 +156,9 @@ public class SamComplianceService {
      * 获取最新一次扫描结果
      */
     public Map<String, Object> getLatestScan() {
+        String tenantId = TenantContext.requireTenantId();
         LambdaQueryWrapper<SamComplianceScan> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(SamComplianceScan::getTenantId, tenantId);
         wrapper.orderByDesc(SamComplianceScan::getId);
         wrapper.last("LIMIT 1");
         SamComplianceScan scan = scanMapper.selectOne(wrapper);
@@ -161,7 +167,7 @@ public class SamComplianceService {
             return Map.of("scan", null, "details", Collections.emptyList(), "highRiskCount", 0);
         }
 
-        List<SamComplianceDetail> details = detailMapper.findByScanId(scan.getId());
+        List<SamComplianceDetail> details = detailMapper.findByScanId(tenantId, scan.getId());
         long highRiskCount = details.stream().filter(d -> "HIGH".equals(d.getRiskLevel())).count();
 
         // 按合规状态分组统计
@@ -182,7 +188,9 @@ public class SamComplianceService {
      * 获取扫描历史（分页）
      */
     public Page<SamComplianceScan> getScanHistory(Integer page, Integer pageSize) {
+        String tenantId = TenantContext.requireTenantId();
         LambdaQueryWrapper<SamComplianceScan> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(SamComplianceScan::getTenantId, tenantId);
         wrapper.orderByDesc(SamComplianceScan::getId);
         return scanMapper.selectPage(new Page<>(page, pageSize), wrapper);
     }
@@ -191,11 +199,14 @@ public class SamComplianceService {
      * 获取指定扫描的详情
      */
     public Map<String, Object> getScanDetails(Long scanId) {
-        SamComplianceScan scan = scanMapper.selectById(scanId);
+        String tenantId = TenantContext.requireTenantId();
+        SamComplianceScan scan = scanMapper.selectOne(new LambdaQueryWrapper<SamComplianceScan>()
+                .eq(SamComplianceScan::getId, scanId)
+                .eq(SamComplianceScan::getTenantId, tenantId));
         if (scan == null) {
             return Map.of("scan", null, "details", Collections.emptyList());
         }
-        List<SamComplianceDetail> details = detailMapper.findByScanId(scanId);
+        List<SamComplianceDetail> details = detailMapper.findByScanId(tenantId, scanId);
         Map<String, Object> result = new LinkedHashMap<>();
         result.put("scan", scan);
         result.put("details", details);
@@ -206,8 +217,10 @@ public class SamComplianceService {
      * 获取合规仪表盘汇总数据
      */
     public Map<String, Object> getDashboardData() {
+        String tenantId = TenantContext.requireTenantId();
         // 最新扫描
         LambdaQueryWrapper<SamComplianceScan> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(SamComplianceScan::getTenantId, tenantId);
         wrapper.orderByDesc(SamComplianceScan::getId);
         wrapper.last("LIMIT 1");
         SamComplianceScan latestScan = scanMapper.selectOne(wrapper);
@@ -227,7 +240,7 @@ public class SamComplianceService {
             return data;
         }
 
-        List<SamComplianceDetail> details = detailMapper.findByScanId(latestScan.getId());
+        List<SamComplianceDetail> details = detailMapper.findByScanId(tenantId, latestScan.getId());
 
         // 高风险项
         List<SamComplianceDetail> highRiskItems = details.stream()

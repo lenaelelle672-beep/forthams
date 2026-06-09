@@ -7,9 +7,9 @@ import java.util.List;
 
 @Mapper
 public interface SamComplianceDetailMapper extends BaseMapper<SamComplianceDetail> {
-    @Select("SELECT * FROM sam_compliance_detail WHERE scan_id = #{scanId} ORDER BY created_at DESC")
-    List<SamComplianceDetail> findByScanId(Long scanId);
+    @Select("SELECT * FROM sam_compliance_detail WHERE tenant_id = #{tenantId} AND scan_id = #{scanId} ORDER BY created_at DESC")
+    List<SamComplianceDetail> findByScanId(String tenantId, Long scanId);
 
-    @Select("SELECT * FROM sam_compliance_detail WHERE scan_id = #{scanId} AND risk_level = 'HIGH' ORDER BY created_at DESC")
-    List<SamComplianceDetail> findHighRiskByScanId(Long scanId);
+    @Select("SELECT * FROM sam_compliance_detail WHERE tenant_id = #{tenantId} AND scan_id = #{scanId} AND risk_level = 'HIGH' ORDER BY created_at DESC")
+    List<SamComplianceDetail> findHighRiskByScanId(String tenantId, Long scanId);
 }

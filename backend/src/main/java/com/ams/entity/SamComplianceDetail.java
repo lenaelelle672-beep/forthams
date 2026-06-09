@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 public class SamComplianceDetail {
     @TableId(type = IdType.AUTO)
     private Long id;
+    private String tenantId;
     private Long scanId;
     private Long licenseId;
     private String softwareName;

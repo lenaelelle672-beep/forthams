@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 public class LicenseAssignment {
     @TableId(type = IdType.AUTO)
     private Long id;
+    private String tenantId;
     private Long licenseId;
     private Long assetId;
     private Long userId;
