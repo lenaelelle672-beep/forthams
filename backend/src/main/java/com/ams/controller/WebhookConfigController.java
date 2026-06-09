@@ -17,7 +17,7 @@ public class WebhookConfigController {
 
     private final WebhookConfigService webhookConfigService;
 
-    @PreAuthorize("@ss.hasPermi('system:config')")
+    @PreAuthorize("@ss.hasPermi('system:config:query')")
     @GetMapping
     public Result<Map<String, Object>> list(
             @RequestParam(defaultValue = "1") Integer page,
@@ -27,25 +27,25 @@ public class WebhookConfigController {
         return Result.success(Map.of("records", result.getRecords(), "total", result.getTotal()));
     }
 
-    @PreAuthorize("@ss.hasPermi('system:config')")
+    @PreAuthorize("@ss.hasPermi('system:config:query')")
     @GetMapping("/{id}")
     public Result<WebhookConfig> detail(@PathVariable Long id) {
         return Result.success(webhookConfigService.getById(id));
     }
 
-    @PreAuthorize("@ss.hasPermi('system:config')")
+    @PreAuthorize("@ss.hasPermi('system:config:edit')")
     @PostMapping
     public Result<WebhookConfig> create(@RequestBody WebhookConfig config) {
         return Result.success(webhookConfigService.create(config));
     }
 
-    @PreAuthorize("@ss.hasPermi('system:config')")
+    @PreAuthorize("@ss.hasPermi('system:config:edit')")
     @PutMapping("/{id}")
     public Result<WebhookConfig> update(@PathVariable Long id, @RequestBody WebhookConfig config) {
         return Result.success(webhookConfigService.update(id, config));
     }
 
-    @PreAuthorize("@ss.hasPermi('system:config')")
+    @PreAuthorize("@ss.hasPermi('system:config:edit')")
     @DeleteMapping("/{id}")
     public Result<Void> delete(@PathVariable Long id) {
         webhookConfigService.delete(id);

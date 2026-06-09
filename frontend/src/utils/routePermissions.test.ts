@@ -31,6 +31,9 @@ describe('routePermissions', () => {
     expect(canAccessRoute('/settings/notif-template', { roles: ['USER'], permissions: ['notification:template:list'] })).toBe(true);
     expect(canAccessRoute('/settings/notif-template', { roles: ['USER'], permissions: ['system:config:query'] })).toBe(false);
     expect(canAccessRoute('/settings/sysconfig', { roles: ['USER'], permissions: ['system:config:query'] })).toBe(true);
+    expect(canAccessRoute('/settings/webhook', { roles: ['USER'], permissions: ['system:config:query'] })).toBe(true);
+    expect(canAccessRoute('/settings/webhook', { roles: ['USER'], permissions: ['system:config:edit'] })).toBe(true);
+    expect(canAccessRoute('/settings/webhook', { roles: ['USER'], permissions: ['system:config'] })).toBe(false);
   });
 
   it('requires specific disposal action permissions for action entry routes', () => {
