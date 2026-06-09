@@ -160,7 +160,7 @@ public class InspectionServiceImpl implements InspectionService {
         if (assetIds == null || assetIds.isEmpty()) {
             // 按资产类别生成
             if (assetCategoryId != null) {
-                log.warn("按资产类别生成检验任务功能待实现: categoryId={}", assetCategoryId);
+                return batchGenerateByCategory(assetCategoryId);
             }
             return generatedInspections;
         }
