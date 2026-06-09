@@ -1,6 +1,7 @@
 package com.ams.service;
 
 import com.ams.common.exception.BusinessException;
+import com.ams.context.TenantContext;
 import com.ams.dto.PurchaseOrderCreateDTO;
 import com.ams.dto.PurchaseOrderUpdateDTO;
 import com.ams.entity.PurchaseOrder;
@@ -80,6 +81,7 @@ public class PurchaseOrderService {
 
     @Transactional(rollbackFor = Exception.class)
     public PurchaseOrder create(PurchaseOrderCreateDTO dto) {
+        String tenantId = TenantContext.requireTenantId();
         Long count = purchaseOrderMapper.selectCount(
                 new LambdaQueryWrapper<PurchaseOrder>()
                         .eq(PurchaseOrder::getOrderNo, dto.getOrderNo()));
@@ -88,6 +90,7 @@ public class PurchaseOrderService {
         }
 
         PurchaseOrder order = new PurchaseOrder();
+        order.setTenantId(tenantId);
         order.setOrderNo(dto.getOrderNo());
         order.setOrderName(dto.getOrderName());
         order.setVendorId(dto.getVendorId());
@@ -112,6 +115,7 @@ public class PurchaseOrderService {
             for (PurchaseOrderItem item : dto.getItems()) {
                 item.setId(null);
                 item.setOrderId(order.getId());
+                item.setTenantId(tenantId);
                 purchaseOrderItemMapper.insert(item);
             }
         }

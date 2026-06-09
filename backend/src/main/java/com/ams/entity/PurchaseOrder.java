@@ -19,6 +19,8 @@ public class PurchaseOrder {
     @TableId(type = IdType.AUTO)
     private Long id;
 
+    private String tenantId;
+
     private String orderNo;
 
     private String orderName;

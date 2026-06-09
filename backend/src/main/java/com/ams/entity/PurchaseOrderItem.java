@@ -15,6 +15,8 @@ public class PurchaseOrderItem {
     @TableId(type = IdType.AUTO)
     private Long id;
 
+    private String tenantId;
+
     private Long orderId;
 
     private String assetName;

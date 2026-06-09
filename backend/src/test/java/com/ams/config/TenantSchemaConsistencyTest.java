@@ -102,6 +102,18 @@ class TenantSchemaConsistencyTest {
     }
 
     @Test
+    void purchaseOrderTenantMigrationShouldScopeOrdersAndItems() throws IOException {
+        String migration = Files.readString(MIGRATION_DIR.resolve("V2_80__purchase_order_tenant_scope.sql"));
+
+        assertThat(migration).contains("ALTER TABLE purchase_order ADD COLUMN tenant_id VARCHAR(64)");
+        assertThat(migration).contains("ALTER TABLE purchase_order_item ADD COLUMN tenant_id VARCHAR(64)");
+        assertThat(migration).contains("UPDATE purchase_order");
+        assertThat(migration).contains("UPDATE purchase_order_item poi");
+        assertThat(migration).contains("ADD UNIQUE KEY uk_po_tenant_order_no (tenant_id, order_no)");
+        assertThat(migration).contains("ADD INDEX idx_poi_tenant_order (tenant_id, order_id)");
+    }
+
+    @Test
     void legacyTenantIdMigrationsShouldBePatchedForwardWithoutChecksumChanges() throws IOException {
         String v236 = Files.readString(MIGRATION_DIR.resolve("V2_36__asset_parent_child.sql"));
         String v258 = Files.readString(MIGRATION_DIR.resolve("V2_58__inspection_template_and_record.sql"));
