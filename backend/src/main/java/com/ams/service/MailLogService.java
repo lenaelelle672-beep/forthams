@@ -131,7 +131,9 @@ public class MailLogService {
      * 查询待重试的日志（状态为 FAILED，重试次数未达上限）
      */
     public List<MailLog> getPendingRetry(int maxRetryCount) {
+        String tenantId = TenantContext.requireTenantId();
         return mailLogMapper.selectList(new LambdaQueryWrapper<MailLog>()
+                .eq(MailLog::getTenantId, tenantId)
                 .eq(MailLog::getSendStatus, "FAILED")
                 .lt(MailLog::getRetryCount, maxRetryCount));
     }
