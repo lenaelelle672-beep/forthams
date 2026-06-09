@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
@@ -18,6 +19,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Slf4j
@@ -148,32 +150,68 @@ public class OAuth2Controller {
      * 获取已启用的第三方登录列表（前端用）
      */
     @GetMapping("/providers")
-    public Result<List<OAuthConfig>> getProviders() {
-        return Result.success(oauthConfigService.getEnabled());
+    public Result<List<OAuthConfigView>> getProviders() {
+        return Result.success(oauthConfigService.getEnabled().stream()
+                .map(OAuthConfigView::from)
+                .toList());
     }
 
     /**
      * OAuth2 配置 CRUD（管理员）
      */
+    @PreAuthorize("@ss.hasPermi('system:config:query')")
     @GetMapping("/config")
-    public Result<List<OAuthConfig>> listConfig() {
-        return Result.success(oauthConfigService.listAll());
+    public Result<List<OAuthConfigView>> listConfig() {
+        return Result.success(oauthConfigService.listAll().stream()
+                .map(OAuthConfigView::from)
+                .toList());
     }
 
+    @PreAuthorize("@ss.hasPermi('system:config:edit')")
     @PostMapping("/config")
-    public Result<OAuthConfig> createConfig(@RequestBody OAuthConfig config) {
-        return Result.success(oauthConfigService.create(config));
+    public Result<OAuthConfigView> createConfig(@RequestBody OAuthConfig config) {
+        return Result.success(OAuthConfigView.from(oauthConfigService.create(config)));
     }
 
+    @PreAuthorize("@ss.hasPermi('system:config:edit')")
     @PutMapping("/config/{id}")
-    public Result<OAuthConfig> updateConfig(@PathVariable Long id, @RequestBody OAuthConfig config) {
-        return Result.success(oauthConfigService.update(id, config));
+    public Result<OAuthConfigView> updateConfig(@PathVariable Long id, @RequestBody OAuthConfig config) {
+        return Result.success(OAuthConfigView.from(oauthConfigService.update(id, config)));
     }
 
+    @PreAuthorize("@ss.hasPermi('system:config:edit')")
     @DeleteMapping("/config/{id}")
     public Result<Void> deleteConfig(@PathVariable Long id) {
         oauthConfigService.delete(id);
         return Result.success();
+    }
+
+    public record OAuthConfigView(
+            Long id,
+            String provider,
+            String appId,
+            String redirectUrl,
+            Integer enabled,
+            String remark,
+            Boolean secretConfigured,
+            LocalDateTime createdAt,
+            LocalDateTime updatedAt
+    ) {
+        static OAuthConfigView from(OAuthConfig config) {
+            if (config == null) {
+                return null;
+            }
+            return new OAuthConfigView(
+                    config.getId(),
+                    config.getProvider(),
+                    config.getAppId(),
+                    config.getRedirectUrl(),
+                    config.getEnabled(),
+                    config.getRemark(),
+                    config.getAppSecret() != null && !config.getAppSecret().isBlank(),
+                    config.getCreatedAt(),
+                    config.getUpdatedAt());
+        }
     }
 
     // ==================== 私有方法 ====================

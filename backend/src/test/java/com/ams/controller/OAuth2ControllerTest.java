@@ -5,6 +5,7 @@ import com.ams.entity.User;
 import com.ams.mapper.UserMapper;
 import com.ams.service.OAuthConfigService;
 import com.ams.utils.JwtUtil;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,12 +13,17 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
 
+import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
@@ -36,6 +42,40 @@ class OAuth2ControllerTest {
     private JwtUtil jwtUtil;
     @Mock
     private RestTemplate restTemplate;
+
+    @Test
+    @DisplayName("OAuth config management endpoints require seeded system config permissions")
+    void configManagementEndpointsRequireSystemConfigPermissions() throws Exception {
+        Map<String, String> expected = Map.of(
+                "listConfig", "@ss.hasPermi('system:config:query')",
+                "createConfig", "@ss.hasPermi('system:config:edit')",
+                "updateConfig", "@ss.hasPermi('system:config:edit')",
+                "deleteConfig", "@ss.hasPermi('system:config:edit')");
+
+        for (Map.Entry<String, String> entry : expected.entrySet()) {
+            Method method = findMethod(entry.getKey());
+            PreAuthorize preAuthorize = method.getAnnotation(PreAuthorize.class);
+            assertNotNull(preAuthorize, entry.getKey() + " should declare @PreAuthorize");
+            assertEquals(entry.getValue(), preAuthorize.value());
+        }
+    }
+
+    @Test
+    @DisplayName("Provider list never exposes OAuth app secrets")
+    void providersShouldNotExposeAppSecret() throws Exception {
+        OAuth2Controller controller = controller();
+        OAuthConfig config = oauthConfig();
+        config.setId(1L);
+        config.setEnabled(1);
+        config.setRemark("钉钉登录");
+        when(oauthConfigService.getEnabled()).thenReturn(List.of(config));
+
+        var result = controller.getProviders();
+        String json = new ObjectMapper().writeValueAsString(result.getData());
+
+        assertThat(json).contains("DINGTALK", "secretConfigured");
+        assertThat(json).doesNotContain("app-secret", "appSecret");
+    }
 
     @Test
     @DisplayName("Callback signs JWT with department tenant id")
@@ -79,6 +119,15 @@ class OAuth2ControllerTest {
         OAuth2Controller controller = new OAuth2Controller(oauthConfigService, userMapper, jwtUtil, restTemplate);
         ReflectionTestUtils.setField(controller, "frontendUrl", "http://localhost:5173");
         return controller;
+    }
+
+    private Method findMethod(String methodName) throws Exception {
+        for (Method method : OAuth2Controller.class.getDeclaredMethods()) {
+            if (method.getName().equals(methodName)) {
+                return method;
+            }
+        }
+        throw new NoSuchMethodException("OAuth2Controller." + methodName);
     }
 
     private OAuthConfig oauthConfig() {

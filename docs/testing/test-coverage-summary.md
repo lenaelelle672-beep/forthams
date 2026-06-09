@@ -9,7 +9,7 @@
 | 前端构建 | `cd frontend && npm run build` | 通过；仅保留既有 `three` chunk >1000 kB 警告 |
 | 桌面浏览器回归 | `cd frontend && npx playwright test --project=browser-regression-smoke` | 25 个测试通过，含核心路由、工作流新建保存、工作流列表/设计器只读权限、报表/审批空态、3D 大屏降级 |
 | 真实后端 E2E | `cd backend && mvn spring-boot:test-run -Dspring-boot.run.profiles=e2e` 后执行 `cd frontend && npm run e2e:real -- --reporter=line` | 9 个测试通过；覆盖真实 Spring Boot 后端、Vite proxy、登录、流程设计器、工单审批、退役申请、折旧计算、审计查询、审批列表、报表与大屏 |
-| 后端测试 | `cd backend && mvn test -DfailIfNoTests=false` | 621 个测试通过，0 失败，0 错误 |
+| 后端测试 | `cd backend && mvn test -DfailIfNoTests=false` | 623 个测试通过，0 失败，0 错误 |
 | 流程定义服务测试 | `cd backend && mvn -q -Dtest=WorkflowDefinitionServiceTest test` | 6 个测试通过，覆盖默认列表、保存草稿、发布、启停、未发布拦截 |
 | 赔偿流程发布与估值 | `cd backend && mvn -q -Dtest=CompensationServiceTest,WorkflowDefinitionServiceTest test` | 通过，赔偿提交必须存在已发布 `ASSET_COMPENSATION` 流程；缺金额时按资产当前价值/原值自动估值 |
 | WorkOrder/Retirement 闭环 | `cd backend && mvn -q -Dtest=WorkOrderServiceTest,WorkOrderControllerTest,ApprovalServiceTest,RetirementApplicationServiceTest,RetirementControllerTest,AssetLifecycleServiceTest test` | 通过 |
@@ -66,6 +66,8 @@
 本轮新增桌面核心路由回归覆盖：`core-routes-smoke.spec.ts` 已纳入 `browser-regression-smoke` 项目，当前覆盖 `/`、`/assets`、`/equipment`、`/depreciation`、`/inventory`、`/idle`、`/disposals`、`/approvals`、`/workflows`、`/analytics`、`/audit`、`/settings`，并断言页面没有进入“页面加载失败”兜底。
 
 本轮补强工作流保存权限体验：`WorkflowCenterPage` 在账号只有 `workflow:definition:query`、缺少 `workflow:definition:edit` 时进入只读模式，禁用新建/发布/设计器写入口；`WorkflowDesignerPage` 对直达深链也进入只读预览并禁用保存/发布，避免用户进入设计器后保存接口 403 造成“新建流程无法保存”的误导；`browser-regression-smoke` 新增列表与设计器只读权限路径覆盖。
+
+本轮补强 OAuth2 配置安全：`OAuth2Controller` 的配置 CRUD 复用 `system:config:query/edit` 若依权限表达式，provider/config 响应改为脱敏视图，不再回传 `appSecret` 明文；`OAuth2ControllerTest` 覆盖权限注解和 provider 列表脱敏序列化。
 
 本轮修复数据分析页国际化缺口：新增 `analytics` namespace 的中英文资源并注册到 i18n，`/analytics` 不再显示 `module.title`、`kpi.totalAssets` 等裸 key。
 
