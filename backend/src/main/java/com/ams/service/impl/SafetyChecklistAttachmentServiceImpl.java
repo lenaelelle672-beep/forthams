@@ -6,9 +6,14 @@ import com.ams.service.SafetyChecklistAttachmentService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -25,6 +30,9 @@ public class SafetyChecklistAttachmentServiceImpl implements SafetyChecklistAtta
     private static final long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
     private final SysAttachmentMapper sysAttachmentMapper;
+
+    @Value("${file.upload-dir:./uploads}")
+    private String uploadDir;
 
     @Override
     public List<SysAttachment> getAttachments(Long resultId) {
@@ -105,6 +113,7 @@ public class SafetyChecklistAttachmentServiceImpl implements SafetyChecklistAtta
         }
 
         sysAttachmentMapper.deleteById(attachmentId);
+        deletePhysicalFile(attachment.getFilePath());
         log.info("安全检查表照片已删除: attachmentId={}, fileName={}", attachmentId, attachment.getFileName());
     }
 
@@ -118,5 +127,42 @@ public class SafetyChecklistAttachmentServiceImpl implements SafetyChecklistAtta
         return fileType.startsWith("image/jpeg") ||
                 fileType.startsWith("image/png") ||
                 fileType.startsWith("image/jpg");
+    }
+
+    private void deletePhysicalFile(String filePath) {
+        if (filePath == null || filePath.isBlank()) {
+            return;
+        }
+
+        String filename = extractFilename(filePath);
+        if (filename == null || filename.isBlank()) {
+            return;
+        }
+
+        try {
+            Path uploadRoot = Paths.get(uploadDir).toAbsolutePath().normalize();
+            Path targetPath = uploadRoot.resolve(filename).normalize();
+            if (!targetPath.startsWith(uploadRoot)) {
+                log.warn("安全检查表照片物理文件路径不合法，跳过删除: filePath={}", filePath);
+                return;
+            }
+            if (Files.deleteIfExists(targetPath)) {
+                log.info("安全检查表照片物理文件已删除: filePath={}", targetPath);
+            }
+        } catch (IOException e) {
+            log.warn("安全检查表照片物理文件删除失败: filePath={}, error={}", filePath, e.getMessage());
+        }
+    }
+
+    private String extractFilename(String filePath) {
+        String normalized = filePath.replace('\\', '/');
+        int queryIndex = normalized.indexOf('?');
+        if (queryIndex >= 0) {
+            normalized = normalized.substring(0, queryIndex);
+        }
+        if (normalized.startsWith("/api/file/")) {
+            normalized = normalized.substring("/api/file/".length());
+        }
+        return Paths.get(normalized).getFileName().toString();
     }
 }

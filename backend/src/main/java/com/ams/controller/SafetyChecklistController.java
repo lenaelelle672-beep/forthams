@@ -12,6 +12,7 @@ import com.ams.service.SafetyChecklistService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpHeaders;
@@ -19,9 +20,13 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/safety-checklists")
@@ -29,6 +34,9 @@ import java.util.Map;
 public class SafetyChecklistController {
     private final SafetyChecklistService safetyChecklistService;
     private final SafetyChecklistAttachmentService safetyChecklistAttachmentService;
+
+    @Value("${file.upload-dir:./uploads}")
+    private String uploadDir;
 
     // ── 模板 ───────────────────────────────────────────────────────────────────
 
@@ -214,15 +222,19 @@ public class SafetyChecklistController {
                 return Result.error("文件大小不能超过 5MB");
             }
 
-            // 生成文件名：时间戳_原始文件名
-            String originalFilename = file.getOriginalFilename();
-            String fileName = System.currentTimeMillis() + "_" + (originalFilename != null ? originalFilename : "photo.jpg");
+            String originalFilename = sanitizeFileName(file.getOriginalFilename());
+            String fileName = "safety-checklist-" + executionId + "-" + UUID.randomUUID()
+                    + resolveImageExtension(originalFilename, contentType);
 
-            // 生成文件存储路径：/uploads/safety-checklist/{executionId}/{fileName}
-            String filePath = "/uploads/safety-checklist/" + executionId + "/" + fileName;
+            Path uploadRoot = Paths.get(uploadDir).toAbsolutePath().normalize();
+            Path targetPath = uploadRoot.resolve(fileName).normalize();
+            if (!targetPath.startsWith(uploadRoot)) {
+                return Result.error("文件名不合法");
+            }
+            Files.createDirectories(uploadRoot);
+            file.transferTo(targetPath.toFile());
 
-            // TODO: 实际项目中应将文件保存到文件系统或对象存储（如 OSS）
-            // 这里仅记录路径，实际文件存储需要额外的文件服务
+            String filePath = "/api/file/" + fileName;
 
             // 调用附件服务创建附件记录
             SysAttachment attachment = safetyChecklistAttachmentService.addAttachment(
@@ -285,6 +297,23 @@ public class SafetyChecklistController {
         } catch (Exception e) {
             return Result.error("删除照片失败：" + e.getMessage());
         }
+    }
+
+    private static String sanitizeFileName(String originalFilename) {
+        if (originalFilename == null || originalFilename.isBlank()) {
+            return "photo";
+        }
+        return Paths.get(originalFilename).getFileName().toString();
+    }
+
+    private static String resolveImageExtension(String originalFilename, String contentType) {
+        if (originalFilename != null) {
+            String lower = originalFilename.toLowerCase();
+            if (lower.endsWith(".jpg")) return ".jpg";
+            if (lower.endsWith(".jpeg")) return ".jpeg";
+            if (lower.endsWith(".png")) return ".png";
+        }
+        return "image/png".equals(contentType) ? ".png" : ".jpg";
     }
 
     // ── PDF 报告 ───────────────────────────────────────────────────────────────

@@ -1,5 +1,22 @@
 # goon.md — 交接笔记（Cowork → Claude Code）
 
+## 2026-06-09 21:36 最新状态（Codex GAI2 安全检查照片文件闭环）
+
+### 当前事实
+- `SafetyChecklistController.uploadPhoto` 不再只写附件记录；现在会把图片真实保存到 `file.upload-dir`，并写入可通过 `FileController` 访问的 `/api/file/{filename}` 路径。
+- 上传文件名使用 `safety-checklist-{executionId}-{uuid}` 前缀与白名单扩展名，避免原始文件名穿越路径或覆盖已有文件。
+- `SafetyChecklistAttachmentServiceImpl.deleteAttachment` 删除附件记录后会根据 `/api/file/{filename}` 同步删除物理文件；`SafetyChecklistServiceImpl.deleteExecution` 级联删除附件时也自动获得物理清理能力。
+
+### 最新验证
+- GitNexus impact：`SafetyChecklistController`、`SafetyChecklistServiceImpl`、`SafetyChecklistAttachmentServiceImpl` 风险均为 `LOW`，无受影响流程。
+- Targeted 后端：`mvn test -Dtest=SafetyChecklistControllerTest,SafetyChecklistAttachmentServiceImplTest -DfailIfNoTests=false` 通过，`10` 个测试通过。
+- 后端全量：`mvn test` 通过，`593` 个测试，0 failure/error/skip。
+
+### 剩余动作
+- P0：原生 Docker/Nginx 验证仍无法在当前机器执行，`docker` 与 `nginx` 命令均不存在。
+- P1：`.DS_Store` tracked 元数据清理仍需用户明确确认。
+- P1：移动端继续冻结；不纳入当前桌面/后端质量闭环。
+
 ## 2026-06-09 21:30 最新状态（Codex GAI2 工单挂起操作者审计收敛）
 
 ### 当前事实

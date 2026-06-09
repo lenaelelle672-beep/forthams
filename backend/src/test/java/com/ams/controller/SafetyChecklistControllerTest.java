@@ -7,22 +7,33 @@ import com.ams.service.SafetyChecklistAttachmentService;
 import com.ams.service.SafetyChecklistService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
 import static org.hamcrest.Matchers.containsString;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -38,6 +49,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles("test")
+@TestPropertySource(properties = "file.upload-dir=${java.io.tmpdir}/forthams-safety-checklist-controller-test")
 class SafetyChecklistControllerTest {
 
     @Autowired
@@ -51,6 +63,9 @@ class SafetyChecklistControllerTest {
 
     @MockBean
     private SafetyChecklistAttachmentService safetyChecklistAttachmentService;
+
+    @Value("${file.upload-dir}")
+    private String uploadDir;
 
     private SafetyChecklistTemplate template;
     private SafetyChecklistExecution execution;
@@ -66,6 +81,24 @@ class SafetyChecklistControllerTest {
         execution.setTemplateId(1L);
         execution.setAssetId(100L);
         execution.setExecutorId(1L);
+    }
+
+    @AfterEach
+    void tearDown() throws IOException {
+        Path uploadRoot = Paths.get(uploadDir);
+        if (!Files.exists(uploadRoot)) {
+            return;
+        }
+        try (var paths = Files.walk(uploadRoot)) {
+            paths.sorted(Comparator.reverseOrder())
+                    .forEach(path -> {
+                        try {
+                            Files.deleteIfExists(path);
+                        } catch (IOException ignored) {
+                            // 测试清理失败不影响业务断言。
+                        }
+                    });
+        }
     }
 
     // ── 照片上传测试 ─────────────────────────────────────────────────────────
@@ -94,6 +127,20 @@ class SafetyChecklistControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data.fileName").value("photo.jpg"));
+
+        ArgumentCaptor<String> fileNameCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<String> filePathCaptor = ArgumentCaptor.forClass(String.class);
+        verify(safetyChecklistAttachmentService).addAttachment(
+                eq(1L),
+                fileNameCaptor.capture(),
+                filePathCaptor.capture(),
+                eq(file.getSize()),
+                eq("image/jpeg"),
+                eq(1L));
+        assertTrue(fileNameCaptor.getValue().startsWith("safety-checklist-1-"));
+        assertTrue(filePathCaptor.getValue().startsWith("/api/file/safety-checklist-1-"));
+        String storedFilename = filePathCaptor.getValue().substring("/api/file/".length());
+        assertTrue(Files.exists(Paths.get(uploadDir, storedFilename)));
     }
 
     @Test

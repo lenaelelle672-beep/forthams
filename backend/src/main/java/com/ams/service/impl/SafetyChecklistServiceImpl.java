@@ -263,8 +263,6 @@ public class SafetyChecklistServiceImpl implements SafetyChecklistService {
                     safetyChecklistAttachmentService.getAttachments(result.getId());
             for (com.ams.entity.SysAttachment attachment : attachments) {
                 safetyChecklistAttachmentService.deleteAttachment(attachment.getId());
-                // TODO: 删除物理文件（从文件系统或对象存储中删除）
-                log.info("[文件清理] 已删除照片: filePath={}", attachment.getFilePath());
             }
         }
 
