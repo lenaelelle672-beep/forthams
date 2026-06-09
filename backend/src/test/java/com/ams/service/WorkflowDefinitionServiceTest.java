@@ -28,6 +28,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -36,6 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -60,7 +62,7 @@ class WorkflowDefinitionServiceTest {
 
     @BeforeEach
     void setUp() {
-        TenantContext.setTenantId("T001");
+        TenantContext.setTenantId("dept:1");
         objectMapper = new ObjectMapper();
         // 初始化 MyBatis-Plus 实体元数据，LambdaUpdateWrapper 需要
         TableInfoHelper.initTableInfo(new MapperBuilderAssistant(new MybatisConfiguration(), ""), WorkflowDefinition.class);
@@ -104,7 +106,7 @@ class WorkflowDefinitionServiceTest {
         ArgumentCaptor<WorkflowDefinition> captor = ArgumentCaptor.forClass(WorkflowDefinition.class);
         verify(workflowDefinitionMapper).insert(captor.capture());
         WorkflowDefinition definition = captor.getValue();
-        assertEquals("T001", definition.getTenantId());
+        assertEquals("dept:1", definition.getTenantId());
         assertEquals("ASSET_TRANSFER", definition.getBusinessType());
         assertEquals("DRAFT", definition.getStatus());
         assertEquals(0, definition.getVersion());
@@ -165,6 +167,40 @@ class WorkflowDefinitionServiceTest {
         assertEquals(11L, published.getPublishedBy());
         assertNotNull(published.getPublishedAt());
         verify(workflowDefinitionMapper).update(isNull(), any(LambdaUpdateWrapper.class));
+    }
+
+    @Test
+    void shouldSavePublishAndReadDefinitionRoundtrip() throws Exception {
+        AtomicReference<WorkflowDefinition> stored = new AtomicReference<>();
+        when(workflowDefinitionMapper.selectOne(any(LambdaQueryWrapper.class))).thenAnswer(invocation -> stored.get());
+        doAnswer(invocation -> {
+            WorkflowDefinition definition = invocation.getArgument(0);
+            definition.setId(500L);
+            stored.set(definition);
+            return 1;
+        }).when(workflowDefinitionMapper).insert(any(WorkflowDefinition.class));
+        when(workflowDefinitionMapper.update(isNull(), any(LambdaUpdateWrapper.class))).thenReturn(1);
+
+        Map<String, Object> definition = fullWorkflowDefinition();
+        WorkflowDefinitionSaveDTO dto = new WorkflowDefinitionSaveDTO();
+        dto.setName("桌面端保存发布闭环");
+        dto.setDescription("覆盖 saveDraft -> publish -> getDefinition");
+        dto.setDefinition(definition);
+        dto.setOperatorId(21L);
+
+        WorkflowDefinitionDTO draft = workflowDefinitionService.saveDraft("ASSET_TRANSFER", dto, 21L);
+        WorkflowDefinitionDTO published = workflowDefinitionService.publish("ASSET_TRANSFER", 22L);
+        WorkflowDefinitionDTO fetched = workflowDefinitionService.getDefinition("ASSET_TRANSFER");
+
+        assertEquals("DRAFT", draft.getStatus());
+        assertEquals("PUBLISHED", published.getStatus());
+        assertEquals(1, published.getVersion());
+        assertEquals(22L, published.getPublishedBy());
+        assertNotNull(published.getPublishedAt());
+        assertEquals("PUBLISHED", fetched.getStatus());
+        assertEquals(1, fetched.getVersion());
+        assertEquals("桌面端保存发布闭环", fetched.getName());
+        assertWorkflowDefinitionFields(definition, fetched.getDefinition());
     }
 
     @Test
@@ -401,7 +437,7 @@ class WorkflowDefinitionServiceTest {
     private WorkflowDefinition definition(String status, Integer version) {
         WorkflowDefinition definition = new WorkflowDefinition();
         definition.setId(1L);
-        definition.setTenantId("T001");
+        definition.setTenantId("dept:1");
         definition.setBusinessType("ASSET_TRANSFER");
         definition.setName("资产转移流程");
         definition.setDescription("用于资产转移审批");

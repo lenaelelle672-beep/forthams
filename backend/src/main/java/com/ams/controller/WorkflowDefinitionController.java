@@ -6,12 +6,15 @@ import com.ams.dto.CreateCustomDefinitionRequest;
 import com.ams.dto.WorkflowDefinitionDTO;
 import com.ams.dto.WorkflowDefinitionSaveDTO;
 import com.ams.dto.WorkflowStatusUpdateDTO;
+import com.ams.security.LoginUser;
 import com.ams.service.WorkflowDefinitionService;
 import com.ams.utils.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -45,7 +48,7 @@ public class WorkflowDefinitionController {
     }
 
     @PutMapping("/{businessType}/draft")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("@ss.hasPermi('workflow:definition:edit')")
     public Result<WorkflowDefinitionDTO> saveDraft(
             @PathVariable String businessType,
             @Valid @RequestBody WorkflowDefinitionSaveDTO dto,
@@ -55,7 +58,7 @@ public class WorkflowDefinitionController {
     }
 
     @PostMapping("/{businessType}/publish")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("@ss.hasPermi('workflow:definition:edit')")
     public Result<WorkflowDefinitionDTO> publish(
             @PathVariable String businessType,
             HttpServletRequest request) {
@@ -64,7 +67,7 @@ public class WorkflowDefinitionController {
     }
 
     @PostMapping("/{businessType}/status")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("@ss.hasPermi('workflow:definition:edit')")
     public Result<WorkflowDefinitionDTO> updateStatus(
             @PathVariable String businessType,
             @Valid @RequestBody WorkflowStatusUpdateDTO dto,
@@ -74,7 +77,7 @@ public class WorkflowDefinitionController {
     }
 
     @PostMapping("/custom")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("@ss.hasPermi('workflow:definition:edit')")
     public Result<WorkflowDefinitionDTO> createCustomDefinition(
             @Valid @RequestBody CreateCustomDefinitionRequest req,
             HttpServletRequest request) {
@@ -84,13 +87,19 @@ public class WorkflowDefinitionController {
     }
 
     @DeleteMapping("/{businessType}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    @PreAuthorize("@ss.hasPermi('workflow:definition:edit')")
     public Result<Void> deleteDefinition(@PathVariable String businessType) {
         workflowDefinitionService.deleteDefinition(businessType);
         return Result.success(null);
     }
 
     private Long getCurrentUserId(HttpServletRequest request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof LoginUser loginUser
+                && loginUser.getUserId() != null) {
+            return loginUser.getUserId();
+        }
+
         String authHeader = request.getHeader("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             throw new BusinessException("未获取到当前用户");

@@ -431,7 +431,7 @@ export default function WorkflowCenterPage() {
         )}
         {err && (
           <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 flex items-center justify-between gap-2 animate-in fade-in slide-in-from-top-1 duration-300">
-            <span className="truncate">{err}；页面仍展示本地草稿状态。</span>
+            <span className="truncate">{err}</span>
             <button type="button" onClick={() => setErr(null)} className="text-amber-500 hover:text-amber-700 flex-shrink-0"><X className="h-4 w-4" /></button>
           </div>
         )}

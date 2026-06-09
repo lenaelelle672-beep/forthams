@@ -39,7 +39,10 @@ function VendorPortalContent() {
     setContractsLoading(true);
     setContractsError(null);
     try {
-      const res: any = await http.get('/vendor-portal/contracts', { params: { vendorId } });
+      const res: any = await http.get('/vendor-portal/contracts', {
+        params: { vendorId },
+        headers: token ? { 'X-Vendor-Token': token } : undefined,
+      });
       setContracts(res || []);
     } catch {
       toast.error('获取合同失败');

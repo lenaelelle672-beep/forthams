@@ -43,7 +43,7 @@ public class VendorPortalController {
             return Result.error("密码错误");
         }
         String token = jwtUtil.generateToken("vendor_" + vendor.getId(), vendor.getId(),
-                "default");
+                "vendor-portal");
         Map<String, Object> result = new HashMap<>();
         result.put("token", token);
         result.put("vendorId", vendor.getId());
@@ -55,7 +55,11 @@ public class VendorPortalController {
      * 供应商信息（需登录后通过 token 获取 vendorId）
      */
     @GetMapping("/profile")
-    public Result<Vendor> getProfile(@RequestParam Long vendorId) {
+    public Result<Vendor> getProfile(@RequestParam Long vendorId,
+                                     @RequestHeader(value = "X-Vendor-Token", required = false) String token) {
+        if (!isValidVendorToken(vendorId, token)) {
+            return Result.error(401, "供应商登录已过期");
+        }
         Vendor vendor = vendorMapper.selectById(vendorId);
         if (vendor != null) vendor.setPassword(null);
         return Result.success(vendor);
@@ -65,7 +69,11 @@ public class VendorPortalController {
      * 查看自己的合同列表
      */
     @GetMapping("/contracts")
-    public Result<List<Contract>> getContracts(@RequestParam Long vendorId) {
+    public Result<List<Contract>> getContracts(@RequestParam Long vendorId,
+                                               @RequestHeader(value = "X-Vendor-Token", required = false) String token) {
+        if (!isValidVendorToken(vendorId, token)) {
+            return Result.error(401, "供应商登录已过期");
+        }
         List<Contract> contracts = contractMapper.selectList(new LambdaQueryWrapper<Contract>()
                 .eq(Contract::getVendorId, vendorId)
                 .orderByDesc(Contract::getCreatedAt));
@@ -76,11 +84,32 @@ public class VendorPortalController {
      * 查看合同详情
      */
     @GetMapping("/contracts/{id}")
-    public Result<Contract> getContractDetail(@PathVariable Long id, @RequestParam Long vendorId) {
+    public Result<Contract> getContractDetail(@PathVariable Long id,
+                                              @RequestParam Long vendorId,
+                                              @RequestHeader(value = "X-Vendor-Token", required = false) String token) {
+        if (!isValidVendorToken(vendorId, token)) {
+            return Result.error(401, "供应商登录已过期");
+        }
         Contract contract = contractMapper.selectOne(new LambdaQueryWrapper<Contract>()
                 .eq(Contract::getId, id)
                 .eq(Contract::getVendorId, vendorId));
         if (contract == null) return Result.error("合同不存在或无权查看");
         return Result.success(contract);
+    }
+
+    private boolean isValidVendorToken(Long vendorId, String token) {
+        if (vendorId == null || token == null || token.isBlank()) {
+            return false;
+        }
+        try {
+            String normalizedToken = token.startsWith("Bearer ") ? token.substring(7) : token;
+            String username = "vendor_" + vendorId;
+            return username.equals(jwtUtil.getUsernameFromToken(normalizedToken))
+                    && "vendor-portal".equals(jwtUtil.getTenantIdFromToken(normalizedToken))
+                    && jwtUtil.validateToken(normalizedToken, username);
+        } catch (RuntimeException e) {
+            log.warn("供应商门户 token 校验失败: vendorId={}", vendorId);
+            return false;
+        }
     }
 }
