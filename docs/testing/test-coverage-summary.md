@@ -4,7 +4,7 @@
 
 | 类型 | 命令 | 结果 |
 |---|---|---:|
-| 前端单元测试 | `cd frontend && npm test -- --run --reporter=dot` | 88 个测试文件，871 个测试通过 |
+| 前端单元测试 | `cd frontend && npm test -- --run --reporter=dot` | 89 个测试文件，883 个测试通过 |
 | 前端类型检查 | `cd frontend && npx tsc -p tsconfig.json --noEmit --pretty false` | 通过 |
 | 前端构建 | `cd frontend && npm run build` | 通过；仅保留既有 `three` chunk >1000 kB 警告 |
 | 桌面浏览器回归 | `cd frontend && npx playwright test --project=browser-regression-smoke` | 23 个测试通过，含核心路由、工作流新建保存、报表/审批空态、3D 大屏降级 |
@@ -17,7 +17,7 @@
 | PRD多租户测试 | `cd backend && mvn -q -Dtest=TenantIsolationIntegrationTest test` | 通过 |
 | WorkOrder/Approval 租户隔离 | `cd backend && mvn -q -Dtest=WorkOrderServiceTest,ApprovalServiceTest,TenantIsolationIntegrationTest test` | 通过 |
 | 主业务租户隔离扩展 | `cd backend && mvn -q -Dtest=CompensationServiceTest,TenantIsolationIntegrationTest test` | 通过 |
-| 前端覆盖率门禁 | `cd frontend && npm run test:coverage -- --run` | 本轮未复跑；上一轮记录为 14 个测试文件，634 个测试通过，行覆盖率 100% |
+| 前端覆盖率门禁 | `cd frontend && npm run test:coverage -- --run` | 89 个测试文件，883 个测试通过；All files statements/lines 93.91%，branches 86.77%，functions 91.17%，通过全局阈值 |
 | 前端安全审计 | `cd frontend && npm audit --audit-level=high` | 0 vulnerabilities |
 | Node 版本 | `cd frontend && node -v` | `v22.22.2`，满足 `.nvmrc`、`frontend/package.json engines.node` 和 `happy-dom@20.9.0` 的 Node `>=20` 要求 |
 

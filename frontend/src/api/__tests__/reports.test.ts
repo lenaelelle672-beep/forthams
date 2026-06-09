@@ -8,12 +8,13 @@
  * - getReportTrend: 端点、参数传递、错误处理
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { afterEach, describe, it, expect, vi, beforeEach } from 'vitest';
 
 // Mock http utility
 vi.mock('@/utils/http', () => ({
   default: {
     get: vi.fn(),
+    post: vi.fn(),
   },
 }));
 
@@ -27,6 +28,8 @@ import {
   getRetirementStats,
   getWorkOrderDeptPending,
   getWorkOrderStatusDistribution,
+  exportReportPdf,
+  downloadBlob,
 } from '@/api/reports';
 
 const mockedHttp = vi.mocked(http);
@@ -34,6 +37,11 @@ const mockedHttp = vi.mocked(http);
 describe('api/reports — 报表 API 调用测试', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
   });
 
   // ── getReportSummary ──────────────────────────────────────────────────
@@ -195,5 +203,46 @@ describe('api/reports — 报表 API 调用测试', () => {
     expect(mockedHttp.get).toHaveBeenNthCalledWith(3, '/reports/retirement-stats');
     expect(mockedHttp.get).toHaveBeenNthCalledWith(4, '/workorders/status-distribution');
     expect(mockedHttp.get).toHaveBeenNthCalledWith(5, '/workorders/dept-pending');
+  });
+
+  it('应按模板类型导出 PDF Blob', async () => {
+    const blob = new Blob(['pdf'], { type: 'application/pdf' });
+    mockedHttp.post.mockResolvedValueOnce(blob);
+
+    await expect(exportReportPdf('asset-register', { tenantId: 1 })).resolves.toBe(blob);
+
+    expect(mockedHttp.post).toHaveBeenCalledWith('/reports/asset-register/export-pdf', { tenantId: 1 }, {
+      responseType: 'blob',
+    });
+  });
+
+  it('未传 PDF 参数时应发送空对象', async () => {
+    const blob = new Blob(['pdf'], { type: 'application/pdf' });
+    mockedHttp.post.mockResolvedValueOnce(blob);
+
+    await exportReportPdf('summary');
+
+    expect(mockedHttp.post).toHaveBeenCalledWith('/reports/summary/export-pdf', {}, {
+      responseType: 'blob',
+    });
+  });
+
+  it('downloadBlob 应创建临时链接并释放 Object URL', () => {
+    const createObjectURL = vi.fn((_blob: Blob) => 'blob:report-pdf');
+    const revokeObjectURL = vi.fn((_url: string) => undefined);
+    vi.stubGlobal('URL', {
+      ...URL,
+      createObjectURL,
+      revokeObjectURL,
+    });
+    vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => undefined);
+
+    const blob = new Blob(['pdf'], { type: 'application/pdf' });
+    downloadBlob(blob, 'summary.pdf');
+
+    expect(createObjectURL).toHaveBeenCalledWith(blob);
+    expect(HTMLAnchorElement.prototype.click).toHaveBeenCalledTimes(1);
+    expect(revokeObjectURL).toHaveBeenCalledWith('blob:report-pdf');
+    expect(document.querySelector('a[download="summary.pdf"]')).not.toBeInTheDocument();
   });
 });

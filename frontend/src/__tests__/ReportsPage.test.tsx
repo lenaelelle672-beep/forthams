@@ -309,6 +309,80 @@ describe('ReportsPage', () => {
       expect(titles.length).toBeGreaterThanOrEqual(2);
     });
   });
+
+  it('should show empty chart preview for an empty category report', async () => {
+    vi.mocked(getReportSummary).mockResolvedValue(emptySummary);
+    vi.mocked(getReportByCategory).mockResolvedValue(emptyCategory);
+
+    const user = userEvent.setup();
+    render(<ReportsPage />, { wrapper: createWrapper() });
+
+    await waitFor(() => {
+      expect(screen.getByText('资产分类统计')).toBeInTheDocument();
+    });
+
+    await user.click(screen.getByText('资产分类统计'));
+
+    await waitFor(() => {
+      expect(screen.getByText('暂无图表数据')).toBeInTheDocument();
+    });
+  });
+
+  it('should map financial, maintenance, and work order datasets into chart previews', async () => {
+    vi.mocked(getReportSummary).mockResolvedValue(sampleSummary);
+    vi.mocked(getReportByCategory).mockResolvedValue(sampleCategory);
+    vi.mocked(getReportTrend).mockResolvedValue([
+      { month: '2026-01', assetCount: 100, totalValue: 5000000 },
+      { month: '2026-02', assetCount: 120, totalValue: 7000000 },
+    ]);
+    vi.mocked(getDepreciationStats).mockResolvedValue([{ month: '6月', value: 8 }]);
+    vi.mocked(getMaintenanceStats).mockResolvedValue([{ month: '6月', value: 12 }]);
+    vi.mocked(getRetirementStats).mockResolvedValue([{ month: '6月', value: 2 }]);
+    vi.mocked(getWorkOrderStatusDistribution).mockResolvedValue([{ name: '已完成', value: 9 }]);
+    vi.mocked(getWorkOrderDeptPending).mockResolvedValue([{ name: '设备部', value: 3 }]);
+
+    const user = userEvent.setup();
+    render(<ReportsPage />, { wrapper: createWrapper() });
+
+    await waitFor(() => {
+      expect(screen.getByText('资产汇总表')).toBeInTheDocument();
+    });
+
+    await user.click(screen.getByText('部门资产排行'));
+    await waitFor(() => {
+      expect(screen.getAllByText('部门资产排行').length).toBeGreaterThanOrEqual(2);
+    });
+
+    await user.click(screen.getByRole('button', { name: '财务报表' }));
+    await user.click(screen.getByText('分类价值分布'));
+    await waitFor(() => {
+      expect(screen.getAllByText('分类价值分布').length).toBeGreaterThanOrEqual(2);
+    });
+    await user.click(screen.getByText('折旧统计'));
+    await waitFor(() => {
+      expect(screen.getAllByText('折旧统计').length).toBeGreaterThanOrEqual(2);
+    });
+
+    await user.click(screen.getByRole('button', { name: '运维报表' }));
+    await user.click(screen.getByText('维保统计'));
+    await waitFor(() => {
+      expect(screen.getAllByText('维保统计').length).toBeGreaterThanOrEqual(2);
+    });
+    await user.click(screen.getByText('退役处置统计'));
+    await waitFor(() => {
+      expect(screen.getAllByText('退役处置统计').length).toBeGreaterThanOrEqual(2);
+    });
+
+    await user.click(screen.getByRole('button', { name: '工单报表' }));
+    await user.click(screen.getByText('工单完成率'));
+    await waitFor(() => {
+      expect(screen.getAllByText('工单完成率').length).toBeGreaterThanOrEqual(2);
+    });
+    await user.click(screen.getByText('待处理工单'));
+    await waitFor(() => {
+      expect(screen.getAllByText('待处理工单').length).toBeGreaterThanOrEqual(2);
+    });
+  });
 });
 
 // ── 导出功能测试 ──────────────────────────────────────────────────────────────
