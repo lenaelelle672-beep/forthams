@@ -4,11 +4,12 @@
 
 | 类型 | 命令 | 结果 |
 |---|---|---:|
-| 前端单元测试 | `cd frontend && npm test -- --run` | 14 个测试文件，634 个测试通过 |
-| 前端构建 | `cd frontend && npm run build` | 通过 |
-| 浏览器冒烟测试 | `cd frontend && npm run e2e -- --reporter=line` | 15 个测试通过 |
-| 真实后端 E2E | `cd frontend && npm run e2e:real -- --reporter=line` | 6 个测试通过，含核心导航、顶栏点击、流程中心、流程定义保存/发布、工单审批与资产退役 API 闭环 |
-| 后端测试 | `cd backend && mvn test` | 98 个测试通过 |
+| 前端单元测试 | `cd frontend && npm test -- --run --reporter=dot` | 87 个测试文件，868 个测试通过 |
+| 前端类型检查 | `cd frontend && npx tsc -p tsconfig.json --noEmit --pretty false` | 通过 |
+| 前端构建 | `cd frontend && npm run build` | 通过；仅保留既有 `three` chunk >1000 kB 警告 |
+| 桌面浏览器回归 | `cd frontend && npx playwright test --project=browser-regression-smoke` | 23 个测试通过，含核心路由、工作流新建保存、报表/审批空态、3D 大屏降级 |
+| 真实后端 E2E | `cd frontend && npm run e2e:real -- --reporter=line` | 历史记录 6 个测试通过；本轮未复跑，当前本机 `127.0.0.1:8080` 未监听 |
+| 后端测试 | `cd backend && mvn test -DfailIfNoTests=false` | 597 个测试通过，0 失败，0 错误 |
 | 流程定义服务测试 | `cd backend && mvn -q -Dtest=WorkflowDefinitionServiceTest test` | 6 个测试通过，覆盖默认列表、保存草稿、发布、启停、未发布拦截 |
 | 赔偿流程发布与估值 | `cd backend && mvn -q -Dtest=CompensationServiceTest,WorkflowDefinitionServiceTest test` | 通过，赔偿提交必须存在已发布 `ASSET_COMPENSATION` 流程；缺金额时按资产当前价值/原值自动估值 |
 | WorkOrder/Retirement 闭环 | `cd backend && mvn -q -Dtest=WorkOrderServiceTest,WorkOrderControllerTest,ApprovalServiceTest,RetirementApplicationServiceTest,RetirementControllerTest,AssetLifecycleServiceTest test` | 通过 |
@@ -16,7 +17,7 @@
 | PRD多租户测试 | `cd backend && mvn -q -Dtest=TenantIsolationIntegrationTest test` | 通过 |
 | WorkOrder/Approval 租户隔离 | `cd backend && mvn -q -Dtest=WorkOrderServiceTest,ApprovalServiceTest,TenantIsolationIntegrationTest test` | 通过 |
 | 主业务租户隔离扩展 | `cd backend && mvn -q -Dtest=CompensationServiceTest,TenantIsolationIntegrationTest test` | 通过 |
-| 前端覆盖率门禁 | `cd frontend && npm run test:coverage -- --run` | 14 个测试文件，634 个测试通过，行覆盖率 100% |
+| 前端覆盖率门禁 | `cd frontend && npm run test:coverage -- --run` | 本轮未复跑；上一轮记录为 14 个测试文件，634 个测试通过，行覆盖率 100% |
 | 前端安全审计 | `cd frontend && npm audit --audit-level=high` | 0 vulnerabilities |
 | Node 版本 | `cd frontend && node -v` | `v22.22.2`，满足 `.nvmrc`、`frontend/package.json engines.node` 和 `happy-dom@20.9.0` 的 Node `>=20` 要求 |
 
@@ -25,8 +26,8 @@
 | 范围 | 命令 | 当前结果 |
 |---|---|---|
 | Node 版本一致性 | `cd frontend && node -v` | 本机为 `v22.22.2`；CI/部署需保持 Node `>=20` |
-| 折旧生产链路 | 待补 Java Controller/Service/API 测试 | 当前仅有资产折旧字段与自包含算法测试，未形成 Spring Boot API 闭环 |
-| 审计/操作日志生产链路 | 待补 Java Controller/Service/schema/API 测试 | 当前后端审计组件仍是 marker/占位实现，前端页面未挂主路由 |
+| 折旧生产链路 | `DepreciationController` / `DepreciationService` / `frontend/src/api/depreciation.ts` / `/depreciation` | 已形成 Spring Boot API、前端主路由与桌面 smoke 覆盖；后续可补真实后端 E2E 写入/计算闭环 |
+| 审计/操作日志生产链路 | `AuditDashboardController` / `AuditService` / `frontend/src/api/audit.ts` / `/audit` | 已形成 Spring Boot API、前端主路由与桌面 smoke 覆盖；后续可补真实后端 E2E 的审计写入来源验证 |
 
 ## 模块文档清单
 
@@ -48,6 +49,10 @@
 ## 覆盖结论
 
 核心模块的按钮、搜索、提交、保存、删除、审批、扫描等交互均已在文档中标注对应代码路径和验证命令。当前自动化测试以服务/控制器/状态/API 层为主，真实浏览器端逐按钮 E2E 可在 Playwright 场景中继续扩展。
+
+本轮新增桌面核心路由回归覆盖：`core-routes-smoke.spec.ts` 已纳入 `browser-regression-smoke` 项目，当前覆盖 `/`、`/assets`、`/equipment`、`/depreciation`、`/inventory`、`/idle`、`/disposals`、`/approvals`、`/workflows`、`/analytics`、`/audit`、`/settings`，并断言页面没有进入“页面加载失败”兜底。
+
+本轮修复数据分析页国际化缺口：新增 `analytics` namespace 的中英文资源并注册到 i18n，`/analytics` 不再显示 `module.title`、`kpi.totalAssets` 等裸 key。
 
 本轮新增流程定义服务覆盖：默认 4 条业务流程列表、按租户保存草稿、发布版本递增、空节点发布拦截、启用/停用状态切换、未发布流程提交拦截。
 
