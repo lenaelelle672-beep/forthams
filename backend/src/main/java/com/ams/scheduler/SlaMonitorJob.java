@@ -1,8 +1,10 @@
 package com.ams.scheduler;
 
+import com.ams.context.TenantContext;
 import com.ams.service.NotificationService;
 import com.ams.service.SlaService;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.ams.service.TenantService;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ams.entity.WorkOrder;
 import com.ams.mapper.WorkOrderMapper;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +30,7 @@ public class SlaMonitorJob {
     private final SlaService slaService;
     private final WorkOrderMapper workOrderMapper;
     private final NotificationService notificationService;
+    private final TenantService tenantService;
 
     /**
      * 每小时整点执行 SLA 状态刷新。
@@ -35,7 +38,24 @@ public class SlaMonitorJob {
     @Scheduled(cron = "0 0 * * * ?")
     public void refreshSlaStatuses() {
         log.info("sla_monitor_start");
-        try {
+        int totalUpdated = 0;
+        int totalNewBreached = 0;
+        for (String tenantId : tenantService.getActiveTenantIds()) {
+            try {
+                TenantContext.setTenantId(tenantId);
+                SlaRefreshResult result = refreshSlaStatusesForCurrentTenant();
+                totalUpdated += result.updated();
+                totalNewBreached += result.newBreached();
+            } catch (Exception e) {
+                log.error("sla_monitor_tenant_failed tenantId={} error={}", tenantId, e.getMessage(), e);
+            } finally {
+                TenantContext.clear();
+            }
+        }
+        log.info("sla_monitor_done updated={} new_breached={}", totalUpdated, totalNewBreached);
+    }
+
+    private SlaRefreshResult refreshSlaStatusesForCurrentTenant() {
             // 先捕获刷新前的 BREACHED 集合，用于判断"新增"违约
             List<String> preBreachedIds = getBreachedWorkOrderIds();
 
@@ -51,17 +71,14 @@ public class SlaMonitorJob {
                 }
             }
 
-            log.info("sla_monitor_done updated={} new_breached={}", updated, newBreached);
-        } catch (Exception e) {
-            log.error("sla_monitor_fatal error={}", e.getMessage(), e);
-        }
+            return new SlaRefreshResult(updated, newBreached);
     }
 
     private List<String> getBreachedWorkOrderIds() {
-        LambdaQueryWrapper<WorkOrder> wrapper = new LambdaQueryWrapper<WorkOrder>()
-                .select(WorkOrder::getId)
-                .eq(WorkOrder::getSlaStatus, "BREACHED")
-                .in(WorkOrder::getStatus, List.of("PENDING", "APPROVING_LEVEL_1",
+        QueryWrapper<WorkOrder> wrapper = new QueryWrapper<WorkOrder>()
+                .select("id")
+                .eq("sla_status", "BREACHED")
+                .in("status", List.of("PENDING", "APPROVING_LEVEL_1",
                         "APPROVING_LEVEL_2", "APPROVED", "EXECUTING"));
         return workOrderMapper.selectList(wrapper).stream()
                 .map(wo -> String.valueOf(wo.getId()))
@@ -92,5 +109,8 @@ public class SlaMonitorJob {
         } catch (Exception e) {
             log.warn("sla_breach_notification_failed workOrderId={} error={}", workOrderId, e.getMessage());
         }
+    }
+
+    private record SlaRefreshResult(int updated, int newBreached) {
     }
 }
