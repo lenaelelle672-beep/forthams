@@ -14,45 +14,45 @@ import {
 import http from '@/utils/http';
 import AssetMapChart from '@/components/bigscreen/AssetMapChart';
 
-const fallbackStats = {
-  totalAssets: 57,
-  inUseAssets: 21,
-  idleAssets: 25,
-  scrapAssets: 9,
-  utilizationRate: 36.8,
-  totalValue: 60000,
-  netValue: 49000,
-  pendingApprovals: 3,
-  pendingWorkOrders: 24,
-  inventoryProgress: 70,
-  criticalAlerts: 7,
+const emptyStats = {
+  totalAssets: 0,
+  inUseAssets: 0,
+  idleAssets: 0,
+  scrapAssets: 0,
+  utilizationRate: 0,
+  totalValue: 0,
+  netValue: 0,
+  pendingApprovals: 0,
+  pendingWorkOrders: 0,
+  inventoryProgress: 0,
+  criticalAlerts: 0,
 };
 
-type Stats = typeof fallbackStats;
+type Stats = typeof emptyStats;
 type StyleVars = CSSProperties & Record<`--${string}`, string | number>;
 
 function normalizeStats(input: Partial<Stats> | null | undefined): Stats {
   const raw = (input ?? {}) as Partial<Stats>;
-  const total = typeof raw.totalAssets === 'number' ? raw.totalAssets : fallbackStats.totalAssets;
-  const inUse = typeof raw.inUseAssets === 'number' ? raw.inUseAssets : fallbackStats.inUseAssets;
+  const total = typeof raw.totalAssets === 'number' ? raw.totalAssets : emptyStats.totalAssets;
+  const inUse = typeof raw.inUseAssets === 'number' ? raw.inUseAssets : emptyStats.inUseAssets;
 
   return {
-    ...fallbackStats,
+    ...emptyStats,
     totalAssets: total,
     inUseAssets: inUse,
-    idleAssets: typeof raw.idleAssets === 'number' ? raw.idleAssets : fallbackStats.idleAssets,
-    scrapAssets: typeof raw.scrapAssets === 'number' ? raw.scrapAssets : fallbackStats.scrapAssets,
+    idleAssets: typeof raw.idleAssets === 'number' ? raw.idleAssets : emptyStats.idleAssets,
+    scrapAssets: typeof raw.scrapAssets === 'number' ? raw.scrapAssets : emptyStats.scrapAssets,
     utilizationRate: typeof raw.utilizationRate === 'number'
       ? raw.utilizationRate
       : total > 0
         ? Math.round((inUse / total) * 1000) / 10
-        : fallbackStats.utilizationRate,
-    totalValue: typeof raw.totalValue === 'number' ? raw.totalValue : fallbackStats.totalValue,
-    netValue: typeof raw.netValue === 'number' ? raw.netValue : fallbackStats.netValue,
-    pendingApprovals: typeof raw.pendingApprovals === 'number' ? raw.pendingApprovals : fallbackStats.pendingApprovals,
-    pendingWorkOrders: typeof raw.pendingWorkOrders === 'number' ? raw.pendingWorkOrders : fallbackStats.pendingWorkOrders,
-    inventoryProgress: typeof raw.inventoryProgress === 'number' ? raw.inventoryProgress : fallbackStats.inventoryProgress,
-    criticalAlerts: typeof raw.criticalAlerts === 'number' ? raw.criticalAlerts : fallbackStats.criticalAlerts,
+        : emptyStats.utilizationRate,
+    totalValue: typeof raw.totalValue === 'number' ? raw.totalValue : emptyStats.totalValue,
+    netValue: typeof raw.netValue === 'number' ? raw.netValue : emptyStats.netValue,
+    pendingApprovals: typeof raw.pendingApprovals === 'number' ? raw.pendingApprovals : emptyStats.pendingApprovals,
+    pendingWorkOrders: typeof raw.pendingWorkOrders === 'number' ? raw.pendingWorkOrders : emptyStats.pendingWorkOrders,
+    inventoryProgress: typeof raw.inventoryProgress === 'number' ? raw.inventoryProgress : emptyStats.inventoryProgress,
+    criticalAlerts: typeof raw.criticalAlerts === 'number' ? raw.criticalAlerts : emptyStats.criticalAlerts,
   };
 }
 
@@ -725,15 +725,15 @@ export default function BigScreenPage() {
       } catch (err: any) {
         // 区分 403 权限不足与网络错误
         if (err?.response?.status === 403) {
-          console.warn('[BigScreen] 权限不足，使用 fallback 数据');
+          console.warn('[BigScreen] 权限不足，展示空统计数据');
         }
-        return fallbackStats;
+        return emptyStats;
       }
     },
     refetchInterval: 30000,
     refetchOnWindowFocus: false,
     throwOnError: false,
-    initialData: fallbackStats,
+    initialData: emptyStats,
   });
 
   const stats = normalizeStats(apiStats);
@@ -745,7 +745,7 @@ export default function BigScreenPage() {
   }, []);
 
   const view = useMemo(() => {
-    const maintenance = Math.max(6, stats.pendingWorkOrders ?? 0);
+    const maintenance = Math.max(0, stats.pendingWorkOrders ?? 0);
     return {
       totalText: formatNumber(stats.totalAssets),
       valueWan: formatWan(stats.totalValue),
