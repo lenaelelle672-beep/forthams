@@ -1,5 +1,24 @@
 # goon.md — 交接笔记（Cowork → Claude Code）
 
+## 2026-06-09 21:25 最新状态（Codex GAI2 检验任务到期通知收敛）
+
+### 当前事实
+- `InspectionTaskServiceImpl.checkExpiringForTenant` 不再只记录“发送任务到期提醒”日志；现在会为有 `assignedTo` 的即将到期检验任务创建站内通知。
+- 通知类型为 `INSPECTION_TASK`，分类为 `OPERATION`，引用 `refType=INSPECTION_TASK`、`refId=taskId`，内容包含任务名称、任务编号与剩余到期天数。
+- 通知发送失败会被捕获并记录 warn，不中断后续任务扫描，也不影响多租户调度循环继续执行。
+- 新增 `InspectionTaskServiceImplTest`，覆盖租户上下文设置与清理、到期任务扫描、通知创建参数。
+
+### 最新验证
+- GitNexus impact：`InspectionTaskServiceImpl` class 风险 `LOW`；`checkExpiringForTenant` 风险 `LOW`，直接调用者为 `remindExpiringTasks`，无受影响流程。
+- Targeted 后端：`mvn test -Dtest=InspectionTaskServiceImplTest -DfailIfNoTests=false` 通过，`1` 个测试通过。
+- 后端全量：`mvn test` 通过，`590` 个测试，0 failure/error/skip。
+- `git diff --check` 通过；旧检验任务通知 TODO 已扫不到。
+
+### 剩余动作
+- P0：原生 Docker/Nginx 验证仍无法在当前机器执行，`docker` 与 `nginx` 命令均不存在。
+- P1：`.DS_Store` tracked 元数据清理仍需用户明确确认。
+- P1：移动端继续冻结；不纳入当前桌面/后端质量闭环。
+
 ## 2026-06-09 21:20 最新状态（Codex GAI2 资产借用逾期通知收敛）
 
 ### 当前事实

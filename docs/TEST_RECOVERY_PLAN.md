@@ -101,7 +101,7 @@ mvn -q test                  # 跑全部启用的测试
 
 - 前端全量测试：`85` 个测试文件，`861` 个测试全部通过。
 - 前端构建：`npm run build` 通过，仅剩 chunk 体积 warning。
-- 后端全量测试：`mvn test` 通过，`589` 个测试通过，0 failure/error/skip。
+- 后端全量测试：`mvn test` 通过，`590` 个测试通过，0 failure/error/skip。
 - 后端 D 批次 targeted gate 通过，覆盖资产导入、盘点、审批、通知事件与 ABC 分类，`82` 个测试通过。
 - 前端 E 批次 targeted gate 通过，覆盖 API wrapper、报表、全局搜索、评论用户提及、折旧卡片、故障码选择器、工单验收与表单 mapper，`35` 个文件、`92` 个测试通过。
 - workflow 保存链路已补充认证兼容测试和前端 API 契约测试。
@@ -110,6 +110,7 @@ mvn -q test                  # 跑全部启用的测试
 - 检验模板备用列表页已清除“复制功能开发中”占位，复用真实 `inspectionTemplateApi.copy` 并刷新列表。
 - 审批通知待办已从占位 service 收敛为真实 `sys_todo` 持久化：补齐创建、分页、未读数、已读、完成、转交、按引用完成逻辑，并新增 `sys_todo` fresh install/schema 与迁移脚本。
 - 资产借用到期提醒已接入站内通知：`checkOverdue` 标记 `OVERDUE` 后给借用人创建 `ASSET_BORROW` 通知，通知失败不回滚逾期状态。
+- 检验任务即将到期提醒已接入站内通知：`remindExpiringTasks` 针对 `assignedTo` 创建 `INSPECTION_TASK` 通知，通知失败不阻断租户调度。
 - 桌面浏览器回归：`npx playwright test src/e2e/browser-regression-smoke.spec.ts --project=browser-regression-smoke --reporter=line` 通过，`11/11`；覆盖 `/workflows` 保存失败提示和新建模板流程保存草稿后进入设计器。
 - JaCoCo 报告已验证生成：`backend/target/jacoco.exec`、`backend/target/site/jacoco/index.html`、`backend/target/site/jacoco/jacoco.xml` 均存在且 XML counter 非空。
 - 当前剩余日志主要来自测试刻意触发的业务异常路径，不再是定时任务或操作日志切面对测试库的副作用。

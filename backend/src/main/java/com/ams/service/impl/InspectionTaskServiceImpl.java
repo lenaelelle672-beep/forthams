@@ -3,8 +3,10 @@ package com.ams.service.impl;
 import com.ams.common.exception.BusinessException;
 import com.ams.context.TenantContext;
 import com.ams.entity.InspectionTask;
+import com.ams.entity.NotificationRecord;
 import com.ams.mapper.InspectionTaskMapper;
 import com.ams.service.InspectionTaskService;
+import com.ams.service.NotificationService;
 import com.ams.service.TenantService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -28,6 +30,7 @@ import java.util.UUID;
 public class InspectionTaskServiceImpl implements InspectionTaskService {
     private final InspectionTaskMapper taskMapper;
     private final TenantService tenantService;
+    private final NotificationService notificationService;
 
     @Override
     public Page<InspectionTask> listTasks(String keyword, String status, String taskType,
@@ -233,7 +236,7 @@ public class InspectionTaskServiceImpl implements InspectionTaskService {
 
             if (daysRemaining <= 0 || daysRemaining > 30) continue;
 
-            // TODO: 发送通知
+            sendExpiringNotification(task, daysRemaining);
             log.info("发送任务到期提醒: taskNo={}, taskName={}, daysRemaining={}",
                     task.getTaskNo(), task.getTaskName(), daysRemaining);
         }
@@ -265,5 +268,28 @@ public class InspectionTaskServiceImpl implements InspectionTaskService {
     private List<String> getActiveTenantIds() {
         // 从 TenantService 获取配置化租户 ID 列表（阶段 1 占位实现）
         return tenantService.getActiveTenantIds();
+    }
+
+    private void sendExpiringNotification(InspectionTask task, int daysRemaining) {
+        if (task.getAssignedTo() == null || task.getAssignedTo() <= 0) {
+            log.debug("检验任务到期提醒跳过: taskId={}, assignedTo为空", task.getId());
+            return;
+        }
+
+        try {
+            NotificationRecord notification = new NotificationRecord();
+            notification.setUserId(task.getAssignedTo());
+            notification.setTitle("检验任务即将到期");
+            notification.setContent("检验任务「" + task.getTaskName() + "」（编号：" + task.getTaskNo()
+                    + "）将在 " + daysRemaining + " 天后到期，请及时处理。");
+            notification.setType("INSPECTION_TASK");
+            notification.setCategory("OPERATION");
+            notification.setRefId(task.getId());
+            notification.setRefType("INSPECTION_TASK");
+            notificationService.create(notification);
+        } catch (RuntimeException e) {
+            log.warn("检验任务到期提醒发送失败: taskId={}, assignedTo={}, error={}",
+                    task.getId(), task.getAssignedTo(), e.getMessage());
+        }
     }
 }
