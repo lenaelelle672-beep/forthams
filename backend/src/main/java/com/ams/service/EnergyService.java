@@ -12,6 +12,7 @@ import com.ams.mapper.EnergyMeterMapper;
 import com.ams.mapper.LocationMapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,6 +42,7 @@ public class EnergyService {
 
     @Transactional(rollbackFor = Exception.class)
     public EnergyMeter addReading(EnergyMeter meter) {
+        requireTenantAsset(meter.getAssetId());
         if (meter.getUnit() == null) {
             meter.setUnit("kWh");
         }
@@ -295,7 +297,10 @@ public class EnergyService {
     private List<EnergyConsumption> loadConsumptionInRange(LocalDate start, LocalDate end,
                                                              String periodType, Long locationId) {
         if (locationId == null) {
+            List<Long> tenantAssetIds = resolveTenantAssetIds();
+            if (tenantAssetIds.isEmpty()) return List.of();
             LambdaQueryWrapper<EnergyConsumption> wrapper = new LambdaQueryWrapper<EnergyConsumption>()
+                    .in(EnergyConsumption::getAssetId, tenantAssetIds)
                     .eq(EnergyConsumption::getPeriodType, periodType)
                     .ge(EnergyConsumption::getPeriodStart, start)
                     .le(EnergyConsumption::getPeriodStart, end);
@@ -321,6 +326,19 @@ public class EnergyService {
             ).stream().map(Asset::getId).collect(Collectors.toList());
         } catch (Exception e) {
             return List.of();
+        }
+    }
+
+    private void requireTenantAsset(Long assetId) {
+        if (assetId == null) {
+            throw new AccessDeniedException("Missing energy asset identifier");
+        }
+        String tenantId = TenantContext.requireTenantId();
+        Long count = assetMapper.selectCount(new LambdaQueryWrapper<Asset>()
+                .eq(Asset::getId, assetId)
+                .eq(Asset::getTenantId, tenantId));
+        if (count == null || count <= 0) {
+            throw new AccessDeniedException("Energy asset is outside current tenant");
         }
     }
 
@@ -551,8 +569,11 @@ public class EnergyService {
      */
     private Map<String, BigDecimal> bucketByPeriod(LocalDate start, LocalDate end, String periodType) {
         if (start == null || end == null) return Map.of();
+        List<Long> tenantAssetIds = resolveTenantAssetIds();
+        if (tenantAssetIds.isEmpty()) return Map.of();
         String pt = PeriodType.of(periodType).name();
         LambdaQueryWrapper<EnergyConsumption> wrapper = new LambdaQueryWrapper<EnergyConsumption>()
+                .in(EnergyConsumption::getAssetId, tenantAssetIds)
                 .eq(EnergyConsumption::getPeriodType, pt)
                 .ge(EnergyConsumption::getPeriodStart, start)
                 .le(EnergyConsumption::getPeriodStart, end);

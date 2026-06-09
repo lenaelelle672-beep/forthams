@@ -53,6 +53,8 @@ class EnergyServiceTest {
         TableInfoHelper.initTableInfo(assistant, Asset.class);
         TableInfoHelper.initTableInfo(assistant, EnergyMeter.class);
         TableInfoHelper.initTableInfo(assistant, EnergyConsumption.class);
+        lenient().when(assetMapper.selectCount(any(LambdaQueryWrapper.class))).thenReturn(1L);
+        lenient().when(assetMapper.selectList(any(LambdaQueryWrapper.class))).thenReturn(List.of(asset(1L), asset(2L)));
         // 显式构造，避免 @InjectMocks 漏注入 assetMapper（与本仓其它 service 单测一致）
         energyService = new EnergyService(
                 energyMeterMapper, energyConsumptionMapper, locationMapper, locationService, assetMapper);
@@ -82,6 +84,14 @@ class EnergyServiceTest {
         @Test void addReading_shouldPreserveUnit() {
             EnergyMeter m = meter(null, 1L, BigDecimal.valueOf(100), LocalDate.now()); m.setUnit("m³");
             energyService.addReading(m); assertEquals("m³", m.getUnit()); verify(energyMeterMapper).insert(m);
+        }
+        @Test void addReading_assetOutsideTenant_shouldReject() {
+            when(assetMapper.selectCount(any(LambdaQueryWrapper.class))).thenReturn(0L);
+            EnergyMeter m = meter(null, 999L, BigDecimal.valueOf(100), LocalDate.now());
+
+            assertThrows(org.springframework.security.access.AccessDeniedException.class,
+                    () -> energyService.addReading(m));
+            verify(energyMeterMapper, never()).insert(any(EnergyMeter.class));
         }
         @Test void getReadings_emptyTenantAssets_shouldReturnEmpty() {
             when(assetMapper.selectList(any(LambdaQueryWrapper.class))).thenReturn(Collections.emptyList());
