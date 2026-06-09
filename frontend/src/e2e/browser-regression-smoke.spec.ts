@@ -281,6 +281,38 @@ test.describe('浏览器回归 smoke', () => {
     expect(errors).toEqual([]);
   });
 
+  test('/approvals/:id 只有当前节点审批人可见审批操作', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+
+    await page.goto('/approvals/1');
+    await page.waitForLoadState('networkidle');
+    await expect(page.getByText('APP-MODULE-001').first()).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByRole('button', { name: '审批通过' })).toBeVisible();
+    await expect(page.getByRole('button', { name: '驳回申请' })).toBeVisible();
+
+    await page.goto('/');
+    await page.evaluate((user) => {
+      window.localStorage.setItem('auth_token', 'browser-regression-smoke-token');
+      window.localStorage.setItem('user_info', JSON.stringify(user));
+      window.sessionStorage.setItem('auth_token', 'browser-regression-smoke-token');
+      window.sessionStorage.setItem('user_info', JSON.stringify(user));
+    }, {
+      userId: 2,
+      username: 'observer',
+      realName: '旁观用户',
+      roles: ['USER'],
+      permissions: ['approval:process:approve', 'approval:process:reject', 'approval:process:query'],
+    });
+
+    await page.goto('/approvals/1');
+    await page.waitForLoadState('networkidle');
+    await expect(page.getByText('当前账号无需处理此节点')).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByRole('button', { name: '审批通过' })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: '驳回申请' })).toHaveCount(0);
+    await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
+    expect(errors).toEqual([]);
+  });
+
   test('/reports 空态与权限拒绝态可解释且不崩溃', async ({ page }) => {
     const errors = collectBrowserErrors(page);
 
@@ -357,9 +389,20 @@ async function mockApi(route: Route) {
     return fulfill(route, []);
   }
 
+  if (path === '/user-management/list') {
+    return fulfill(route, paged([
+      { id: 1, realName: '当前审批人', username: 'approver', status: 1 },
+      { id: 2, realName: '旁观用户', username: 'observer', status: 1 },
+    ]));
+  }
+
   if (path.startsWith('/approvals')) {
     if (approvalScenario === 'forbidden') {
       return fulfillError(route, 403, '权限不足，无法访问审批数据');
+    }
+
+    if (path === '/approvals/1') {
+      return fulfill(route, approvalDetail());
     }
 
     if (approvalScenario === 'empty') {
@@ -659,6 +702,37 @@ function paged<T>(records: T[]) {
     size: 10,
     current: 1,
     pages: 1,
+  };
+}
+
+function approvalDetail() {
+  return {
+    process: {
+      id: 1,
+      processNo: 'APP-MODULE-001',
+      processType: 'WORK_ORDER',
+      businessId: 1,
+      businessData: JSON.stringify({ title: '模块验收审批单', reason: '浏览器回归验证' }),
+      applicantId: 1,
+      applicantName: '系统管理员',
+      status: 'PENDING',
+      currentStep: 1,
+      createTime: '2026-05-31T09:00:00',
+      version: 1,
+    },
+    records: [],
+    workflowRuntimePath: [
+      {
+        stepNo: 1,
+        nodeId: 'approval-1',
+        nodeCode: 'APP-USER',
+        label: '当前审批人确认',
+        approverType: 'user',
+        approverId: '1',
+        approvalMode: 'sequence',
+      },
+    ],
+    workflowResultAction: '完成审批',
   };
 }
 

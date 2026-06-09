@@ -51,6 +51,7 @@ import {
 } from '@/components/ui/Dialog';
 import ApprovalFlowTracker, { type FlowStep } from '@/components/ApprovalFlowTracker';
 import { getUserList } from '@/api/base';
+import { useAuth, type AuthUser } from '@/context/AuthContext';
 
 // ── 状态配置 ──────────────────────────────────────────────────────────────────
 
@@ -81,6 +82,62 @@ function getStatusCfg(status: string) {
 
 function getTypeCfg(type: string) {
   return TYPE_LABELS[type] ?? { label: type || '未知类型', color: 'bg-slate-50 text-slate-600 border-slate-200' };
+}
+
+const ACTIVE_APPROVAL_STATUSES = new Set(['PENDING', 'APPROVING', 'IN_PROGRESS']);
+
+function hasAnyPermission(user: AuthUser | null, permissions: string[]) {
+  if (!user) return false;
+  const userPermissions = user.permissions ?? [];
+  if (userPermissions.length === 0) return true;
+  return userPermissions.includes('*') || userPermissions.includes('*:*:*') ||
+    permissions.some((permission) => userPermissions.includes(permission));
+}
+
+function normalizeRole(role: string | undefined) {
+  return (role ?? '').trim().toUpperCase();
+}
+
+function hasRole(user: AuthUser | null, role: string | undefined) {
+  const expected = normalizeRole(role);
+  if (!user || !expected) return false;
+  const roles = user.roles ?? [];
+  return roles.some((item) => {
+    const actual = normalizeRole(item);
+    return actual === 'SUPER_ADMIN' || actual === expected;
+  });
+}
+
+function numericValue(value: unknown): number | null {
+  if (typeof value === 'number' && Number.isFinite(value)) return value;
+  if (typeof value === 'string' && value.trim() !== '') {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+  return null;
+}
+
+function stringValue(value: unknown) {
+  return typeof value === 'string' ? value.trim() : '';
+}
+
+function canActOnCurrentWorkflowStep(
+  user: AuthUser | null,
+  workflowPath: Record<string, unknown>[],
+  currentStep: number | undefined,
+) {
+  if (!user || currentStep == null || workflowPath.length === 0) return Boolean(user);
+  const currentNode = workflowPath.find((node) => numericValue(node.stepNo) === currentStep);
+  if (!currentNode) return true;
+
+  const approverType = stringValue(currentNode.approverType).toLowerCase();
+  if (approverType === 'user') {
+    return numericValue(currentNode.approverId) === user.userId;
+  }
+
+  const approverRole = stringValue(currentNode.approverRole);
+  if (!approverRole) return true;
+  return hasRole(user, approverRole);
 }
 
 // ── 业务数据字段映射与格式化 ─────────────────────────────────────────────────
@@ -230,6 +287,7 @@ function NestedValue({ value, depth = 0 }: { value: unknown; depth?: number }) {
 export default function ApprovalDetailPage() {
   const { t } = useTranslation(['approval', 'common']);
   const { id } = useParams<{ id: string }>();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const qc = useQueryClient();
   const approvalId = Number(id);
@@ -329,8 +387,13 @@ export default function ApprovalDetailPage() {
   });
 
   // ── 计算可操作状态 ──────────────────────────────────────────────────────
-  const canApprove = detail && (detail.status === 'PENDING' || detail.status === 'APPROVING' || detail.status === 'IN_PROGRESS');
-  const canCancel = detail && (detail.status === 'PENDING' || detail.status === 'DRAFT');
+  const isActiveApproval = detail ? ACTIVE_APPROVAL_STATUSES.has(detail.status) : false;
+  const canActOnCurrentStep = detail ? canActOnCurrentWorkflowStep(user, workflowPath, detail.currentStep) : false;
+  const canApprove = Boolean(isActiveApproval && canActOnCurrentStep && hasAnyPermission(user, ['approval:process:approve']));
+  const canReject = Boolean(isActiveApproval && canActOnCurrentStep && hasAnyPermission(user, ['approval:process:reject']));
+  const showApprovalActions = canApprove || canReject;
+  const canCancel = Boolean(detail && (detail.status === 'PENDING' || detail.status === 'DRAFT') &&
+    detail.applicantId === user?.userId && hasAnyPermission(user, ['approval:process:cancel']));
   const isTerminal = detail && (detail.status === 'APPROVED' || detail.status === 'REJECTED' || detail.status === 'CANCELLED');
 
   const statusCfg = detail ? getStatusCfg(detail.status) : null;
@@ -575,32 +638,46 @@ export default function ApprovalDetailPage() {
           <div className="space-y-4 lg:sticky lg:top-4 lg:self-start">
 
             {/* 快速操作卡 */}
-            {canApprove && (
+            {showApprovalActions && (
               <Card className="overflow-hidden rounded-2xl border-blue-200/60 shadow-sm shadow-blue-100/50">
                 <div className="border-b border-blue-100 bg-gradient-to-r from-blue-50 to-indigo-50 px-5 py-3">
                   <h3 className="text-sm font-bold text-blue-900">审批操作</h3>
                   <p className="mt-0.5 text-xs text-blue-600/80">此流程等待您的审批</p>
                 </div>
                 <div className="space-y-3 p-5">
-                  <Button
-                    className="w-full justify-center bg-emerald-600 text-white hover:bg-emerald-700"
-                    size="lg"
-                    disabled={approveMutation.isPending}
-                    onClick={() => setApproveDialogOpen(true)}
-                  >
-                    {approveMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CheckCircle2 className="mr-2 h-4 w-4" />}
-                    审批通过
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="w-full justify-center border-red-200 text-red-600 hover:bg-red-50"
-                    size="lg"
-                    disabled={rejectMutation.isPending}
-                    onClick={() => setRejectDialogOpen(true)}
-                  >
-                    <XCircle className="mr-2 h-4 w-4" />
-                    驳回申请
-                  </Button>
+                  {canApprove && (
+                    <Button
+                      className="w-full justify-center bg-emerald-600 text-white hover:bg-emerald-700"
+                      size="lg"
+                      disabled={approveMutation.isPending}
+                      onClick={() => setApproveDialogOpen(true)}
+                    >
+                      {approveMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CheckCircle2 className="mr-2 h-4 w-4" />}
+                      审批通过
+                    </Button>
+                  )}
+                  {canReject && (
+                    <Button
+                      variant="outline"
+                      className="w-full justify-center border-red-200 text-red-600 hover:bg-red-50"
+                      size="lg"
+                      disabled={rejectMutation.isPending}
+                      onClick={() => setRejectDialogOpen(true)}
+                    >
+                      <XCircle className="mr-2 h-4 w-4" />
+                      驳回申请
+                    </Button>
+                  )}
+                </div>
+              </Card>
+            )}
+
+            {isActiveApproval && !showApprovalActions && (
+              <Card className="overflow-hidden rounded-2xl border-slate-200/80 shadow-sm">
+                <div className="p-5 text-center">
+                  <ShieldCheck className="mx-auto h-8 w-8 text-slate-300" />
+                  <p className="mt-2 text-sm font-bold text-slate-700">当前账号无需处理此节点</p>
+                  <p className="mt-0.5 text-xs text-slate-500">审批操作仅对当前节点审批人开放</p>
                 </div>
               </Card>
             )}
@@ -701,24 +778,28 @@ export default function ApprovalDetailPage() {
       </div>
 
       {/* ── 底部固定操作栏（移动端/审批中时展示） ── */}
-      {canApprove && (
+      {showApprovalActions && (
         <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-slate-200 bg-white/95 px-4 py-3 shadow-[0_-2px_10px_rgba(0,0,0,0.06)] backdrop-blur-sm lg:hidden">
           <div className="mx-auto flex max-w-[600px] items-center gap-3">
-            <Button
-              className="flex-1 justify-center bg-emerald-600 text-white hover:bg-emerald-700"
-              disabled={approveMutation.isPending}
-              onClick={() => setApproveDialogOpen(true)}
-            >
-              <CheckCircle2 className="mr-1.5 h-4 w-4" />通过
-            </Button>
-            <Button
-              variant="outline"
-              className="flex-1 justify-center border-red-200 text-red-600 hover:bg-red-50"
-              disabled={rejectMutation.isPending}
-              onClick={() => setRejectDialogOpen(true)}
-            >
-              <XCircle className="mr-1.5 h-4 w-4" />驳回
-            </Button>
+            {canApprove && (
+              <Button
+                className="flex-1 justify-center bg-emerald-600 text-white hover:bg-emerald-700"
+                disabled={approveMutation.isPending}
+                onClick={() => setApproveDialogOpen(true)}
+              >
+                <CheckCircle2 className="mr-1.5 h-4 w-4" />通过
+              </Button>
+            )}
+            {canReject && (
+              <Button
+                variant="outline"
+                className="flex-1 justify-center border-red-200 text-red-600 hover:bg-red-50"
+                disabled={rejectMutation.isPending}
+                onClick={() => setRejectDialogOpen(true)}
+              >
+                <XCircle className="mr-1.5 h-4 w-4" />驳回
+              </Button>
+            )}
           </div>
         </div>
       )}

@@ -7,7 +7,7 @@
 | 前端单元测试 | `cd frontend && npm test -- --run --reporter=dot` | 89 个测试文件，883 个测试通过 |
 | 前端类型检查 | `cd frontend && npx tsc -p tsconfig.json --noEmit --pretty false` | 通过 |
 | 前端构建 | `cd frontend && npm run build` | 通过；仅保留既有 `three` chunk >1000 kB 警告 |
-| 桌面浏览器回归 | `cd frontend && npx playwright test --project=browser-regression-smoke` | 25 个测试通过，含核心路由、工作流新建保存、工作流列表/设计器只读权限、报表/审批空态、3D 大屏降级 |
+| 桌面浏览器回归 | `cd frontend && npx playwright test --project=browser-regression-smoke` | 26 个测试通过，含核心路由、工作流新建保存、工作流列表/设计器只读权限、审批详情当前节点权限、报表/审批空态、3D 大屏降级 |
 | 真实后端 E2E | `cd backend && mvn spring-boot:test-run -Dspring-boot.run.profiles=e2e` 后执行 `cd frontend && npm run e2e:real -- --reporter=line` | 9 个测试通过；覆盖真实 Spring Boot 后端、Vite proxy、登录、流程设计器、工单审批、退役申请、折旧计算、审计查询、审批列表、报表与大屏 |
 | 后端测试 | `cd backend && mvn test -DfailIfNoTests=false` | 628 个测试通过，0 失败，0 错误 |
 | 流程定义服务测试 | `cd backend && mvn -q -Dtest=WorkflowDefinitionServiceTest test` | 6 个测试通过，覆盖默认列表、保存草稿、发布、启停、未发布拦截 |
@@ -72,6 +72,8 @@
 本轮补强角色管理权限边界：`RoleManagementController` 的 `/roles/all` 补齐 `system:role:query` 权限，`RoleService` 新建角色未显式指定 `dataScope` 时默认使用本部门数据范围，避免新角色默认获得全部数据权限；`RoleControllerTest`/`UserManagementServiceTest` 覆盖权限注解和默认数据范围。
 
 本轮补强自助注册租户边界：`AuthService#register` 默认关闭匿名自助注册；显式开启时也拒绝请求体 `deptId`，必须由服务端配置 `AMS_AUTH_REGISTRATION_DEFAULT_DEPT_ID` 作为默认部门后才创建用户并签发 `dept:{deptId}` 租户令牌；`AuthServiceTest` 覆盖默认拒绝、拒绝客户端部门和服务端默认部门发令牌。
+
+本轮补强审批详情操作边界：`ApprovalDetailPage` 的通过/驳回按钮不再只按流程状态展示，还会校验当前账号的 `approval:process:approve/reject` 权限，并匹配当前工作流节点的指定审批人或审批角色；`browser-regression-smoke` 新增 `/approvals/:id` 当前审批人与旁观用户路径覆盖。
 
 本轮修复数据分析页国际化缺口：新增 `analytics` namespace 的中英文资源并注册到 i18n，`/analytics` 不再显示 `module.title`、`kpi.totalAssets` 等裸 key。
 
