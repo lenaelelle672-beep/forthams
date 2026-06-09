@@ -17,7 +17,7 @@ import java.util.List;
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/abc")
+@RequestMapping("/abc")
 @RequiredArgsConstructor
 public class ABCClassificationController {
 
@@ -27,7 +27,7 @@ public class ABCClassificationController {
      * 批量重新分类所有资产
      */
     @PostMapping("/reclassify")
-    @PreAuthorize("hasAuthority('abc:reclassify')")
+    @PreAuthorize("@ss.hasPermi('abc:reclassify')")
     public Result<BatchResult> reclassifyAll() {
         String tenantId = TenantContext.requireTenantId();
         log.info("[ABC分类] 批量重新分类请求 [tenantId={}]", tenantId);
@@ -40,7 +40,7 @@ public class ABCClassificationController {
      * 单个资产重新分类
      */
     @PostMapping("/reclassify/{assetId}")
-    @PreAuthorize("hasAuthority('abc:reclassify')")
+    @PreAuthorize("@ss.hasPermi('abc:reclassify')")
     public Result<String> reclassifyAsset(@PathVariable Long assetId) {
         String tenantId = TenantContext.requireTenantId();
         log.info("[ABC分类] 单个资产重新分类请求 [tenantId={}, assetId={}]", tenantId, assetId);
@@ -53,7 +53,7 @@ public class ABCClassificationController {
      * 按分类 ID 批量重新分类
      */
     @PostMapping("/reclassify/by-category")
-    @PreAuthorize("hasAuthority('abc:reclassify')")
+    @PreAuthorize("@ss.hasPermi('abc:reclassify')")
     public Result<BatchResult> reclassifyByCategoryIds(@RequestBody List<Long> categoryIds) {
         String tenantId = TenantContext.requireTenantId();
         log.info("[ABC分类] 按分类 ID 批量重新分类请求 [tenantId={}, categoryIds={}]", tenantId, categoryIds);
@@ -66,7 +66,7 @@ public class ABCClassificationController {
      * 获取分类统计
      */
     @GetMapping("/statistics")
-    @PreAuthorize("hasAuthority('abc:query')")
+    @PreAuthorize("@ss.hasPermi('abc:query')")
     public Result<ClassificationStatistics> getStatistics() {
         String tenantId = TenantContext.requireTenantId();
         log.info("[ABC分类] 获取分类统计请求 [tenantId={}]", tenantId);
@@ -79,7 +79,7 @@ public class ABCClassificationController {
      * 查询资产当前分类
      */
     @GetMapping("/{assetId}")
-    @PreAuthorize("hasAuthority('abc:query')")
+    @PreAuthorize("@ss.hasPermi('abc:query')")
     public Result<String> getByAssetId(@PathVariable Long assetId) {
         String tenantId = TenantContext.requireTenantId();
         log.info("[ABC分类] 查询资产分类请求 [tenantId={}, assetId={}]", tenantId, assetId);

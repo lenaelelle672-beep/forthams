@@ -120,7 +120,7 @@ public class ApprovalService {
             wrapper.eq("status", status);
         }
         if (processType != null && !processType.isEmpty()) {
-            wrapper.eq("business_type", processType);
+            wrapper.eq("process_type", processType);
         }
         if (applicantId != null) {
             wrapper.eq("applicant_id", applicantId);
@@ -128,7 +128,7 @@ public class ApprovalService {
         if (keyword != null && !keyword.isBlank()) {
             String trimmedKeyword = keyword.trim();
             wrapper.and(w -> w.like("process_no", trimmedKeyword)
-                    .or().like("business_type", trimmedKeyword)
+                    .or().like("process_type", trimmedKeyword)
                     .or().like("business_data", trimmedKeyword));
         }
         wrapper.orderByDesc("create_time");
@@ -392,14 +392,14 @@ public class ApprovalService {
         // 使用 SQL GROUP BY 替代全量 selectList + 内存 HashMap 分组，避免 OOM
         QueryWrapper<ApprovalProcess> qw = new QueryWrapper<>();
         qw.eq("tenant_id", tenantId)
-                .select("business_type, status, COUNT(*) as cnt")
-                .groupBy("business_type", "status");
+                .select("process_type, status, COUNT(*) as cnt")
+                .groupBy("process_type", "status");
         List<Map<String, Object>> rows = approvalProcessMapper.selectMaps(qw);
 
         Map<String, Map<String, Object>> grouped = new LinkedHashMap<>();
         for (Map<String, Object> row : rows) {
-            if (row.get("business_type") == null) continue;
-            String type = row.get("business_type").toString();
+            if (row.get("process_type") == null) continue;
+            String type = row.get("process_type").toString();
             String status = row.get("status") != null ? row.get("status").toString() : "UNKNOWN";
             long cnt = row.get("cnt") != null ? ((Number) row.get("cnt")).longValue() : 0L;
 
@@ -588,13 +588,10 @@ public class ApprovalService {
             try {
                 List<Role> roles = roleMapper.selectList(
                         new QueryWrapper<Role>().in("role_code", uncached));
-                for (Role role : roles) {
-                    if (role != null && role.getRoleCode() != null) {
+                for (Role role : roles == null ? Collections.<Role>emptyList() : roles) {
+                    if (role != null && role.getRoleCode() != null && role.getRoleName() != null) {
                         roleNameCache.put(role.getRoleCode(), role.getRoleName());
                     }
-                }
-                for (String code : uncached) {
-                    roleNameCache.put(code, null);
                 }
             } catch (Exception e) {
                 log.warn("批量查询角色中文名失败", e);

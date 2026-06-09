@@ -6,6 +6,7 @@ import com.ams.dto.AssetClearanceDTO;
 import com.ams.entity.ApprovalProcess;
 import com.ams.entity.ApprovalRecord;
 import com.ams.entity.AssetCompensation;
+import com.ams.entity.Role;
 import com.ams.entity.WorkflowDefinition;
 import com.ams.context.TenantContext;
 import com.ams.mapper.ApprovalProcessMapper;
@@ -28,7 +29,9 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -80,7 +83,7 @@ class ApprovalServiceTest {
 
     @BeforeEach
     void setUp() {
-        TenantContext.setTenantId("T001");
+        TenantContext.setTenantId("dept:1");
         approvalService = new ApprovalService(
                 approvalProcessMapper,
                 approvalRecordMapper,
@@ -107,7 +110,7 @@ class ApprovalServiceTest {
     void shouldCompleteWorkOrderApprovalInOneStepAndUpdateWorkOrder() {
         ApprovalProcess process = new ApprovalProcess();
         process.setId(5L);
-        process.setTenantId("T001");
+        process.setTenantId("dept:1");
         process.setProcessType("WORK_ORDER");
         process.setBusinessId(9L);
         process.setStatus("PENDING");
@@ -119,7 +122,7 @@ class ApprovalServiceTest {
         assertEquals("APPROVED", result.getStatus());
         var recordCaptor = forClass(ApprovalRecord.class);
         verify(approvalRecordMapper).insert(recordCaptor.capture());
-        assertEquals("T001", recordCaptor.getValue().getTenantId());
+        assertEquals("dept:1", recordCaptor.getValue().getTenantId());
         verify(approvalProcessMapper).updateById(process);
         verify(workOrderService).applyApprovalOutcome(9L, "APPROVED", "ok");
     }
@@ -143,6 +146,37 @@ class ApprovalServiceTest {
         assertEquals(7L, ((Number) businessData.get("_workflowDefinitionId")).longValue());
         assertEquals(3, ((Number) businessData.get("_workflowVersion")).intValue());
         assertEquals("ASSET_TRANSFER", ((Map<?, ?>) businessData.get("_workflowDefinition")).get("businessType"));
+    }
+
+    @Test
+    void queryProcessesShouldFilterAndSearchByProcessTypeColumn() {
+        approvalService.queryProcesses(1, 20, "PENDING", "WORK_ORDER", 7L, "WORK_ORDER");
+
+        @SuppressWarnings("unchecked")
+        var wrapperCaptor = forClass(QueryWrapper.class);
+        verify(approvalProcessMapper).selectPage(any(), wrapperCaptor.capture());
+
+        String sqlSegment = wrapperCaptor.getValue().getSqlSegment();
+        assertTrue(sqlSegment.contains("process_type"));
+        assertTrue(!sqlSegment.contains("business_type"));
+    }
+
+    @Test
+    void processTypeStatsShouldGroupByProcessTypeColumn() {
+        when(approvalProcessMapper.selectMaps(any(QueryWrapper.class))).thenReturn(List.of(Map.of(
+                "process_type", "WORK_ORDER",
+                "status", "APPROVED",
+                "cnt", 2L)));
+
+        List<Map<String, Object>> stats = approvalService.getProcessTypeStats();
+
+        @SuppressWarnings("unchecked")
+        var wrapperCaptor = forClass(QueryWrapper.class);
+        verify(approvalProcessMapper).selectMaps(wrapperCaptor.capture());
+        assertEquals("WORK_ORDER", stats.get(0).get("processType"));
+        assertEquals(2L, stats.get(0).get("approved"));
+        assertTrue(wrapperCaptor.getValue().getSqlSelect().contains("process_type"));
+        assertTrue(!wrapperCaptor.getValue().getSqlSelect().contains("business_type"));
     }
 
     @Test
@@ -198,6 +232,10 @@ class ApprovalServiceTest {
         when(approvalProcessMapper.selectOne(any(QueryWrapper.class))).thenReturn(process);
         when(approvalRecordMapper.selectList(any(QueryWrapper.class))).thenReturn(List.of());
         when(workflowDefinitionService.requireRuntimePlan(anyString(), anyString())).thenReturn(plan);
+        Role superAdminRole = new Role();
+        superAdminRole.setRoleCode("SUPER_ADMIN");
+        superAdminRole.setRoleName("超级管理员");
+        when(roleMapper.selectList(any(QueryWrapper.class))).thenReturn(List.of(superAdminRole));
 
         Map<String, Object> detail = approvalService.getProcessById(5L);
 
@@ -207,8 +245,10 @@ class ApprovalServiceTest {
         assertEquals(1, runtimePath.get(0).get("stepNo"));
         assertEquals("approval-1", runtimePath.get(0).get("nodeId"));
         assertEquals("SUPER_ADMIN", runtimePath.get(0).get("approverRole"));
+        assertEquals("超级管理员", runtimePath.get(0).get("approverRoleName"));
         assertEquals("role", runtimePath.get(0).get("approverType"));
         assertEquals("approval-2", runtimePath.get(1).get("nodeId"));
+        assertNull(runtimePath.get(1).get("approverRoleName"));
         assertEquals("user", runtimePath.get(1).get("approverType"));
         assertEquals("88", runtimePath.get(1).get("approverId"));
         assertEquals("审批完成并归档", detail.get("workflowResultAction"));
@@ -340,7 +380,7 @@ class ApprovalServiceTest {
         ApprovalProcess process = workflowProcess(5L, 1, "{\"assetId\":1}");
         ApprovalRecord firstApproval = new ApprovalRecord();
         firstApproval.setProcessId(5L);
-        firstApproval.setTenantId("T001");
+        firstApproval.setTenantId("dept:1");
         firstApproval.setStepNo(1);
         firstApproval.setApproverId(42L);
         firstApproval.setApproveResult("APPROVED");
@@ -364,7 +404,7 @@ class ApprovalServiceTest {
         ApprovalProcess process = workflowProcess(5L, 2, "{\"assetId\":1}");
         ApprovalRecord previousStepApproval = new ApprovalRecord();
         previousStepApproval.setProcessId(5L);
-        previousStepApproval.setTenantId("T001");
+        previousStepApproval.setTenantId("dept:1");
         previousStepApproval.setStepNo(1);
         previousStepApproval.setApproverId(42L);
         previousStepApproval.setApproveResult("APPROVED");
@@ -448,7 +488,7 @@ class ApprovalServiceTest {
     void shouldRejectDuplicateApprovalWhenProcessAlreadyApproved() {
         ApprovalProcess process = new ApprovalProcess();
         process.setId(5L);
-        process.setTenantId("T001");
+        process.setTenantId("dept:1");
         process.setProcessType("WORK_ORDER");
         process.setBusinessId(9L);
         process.setStatus("APPROVED");
@@ -466,7 +506,7 @@ class ApprovalServiceTest {
     void shouldRejectApprovalWhenProcessAlreadyRejected() {
         ApprovalProcess process = new ApprovalProcess();
         process.setId(5L);
-        process.setTenantId("T001");
+        process.setTenantId("dept:1");
         process.setProcessType("WORK_ORDER");
         process.setBusinessId(9L);
         process.setStatus("REJECTED");
@@ -484,7 +524,7 @@ class ApprovalServiceTest {
     void shouldRejectApprovalWhenProcessCancelled() {
         ApprovalProcess process = new ApprovalProcess();
         process.setId(5L);
-        process.setTenantId("T001");
+        process.setTenantId("dept:1");
         process.setProcessType("WORK_ORDER");
         process.setBusinessId(9L);
         process.setStatus("CANCELLED");
@@ -523,7 +563,7 @@ class ApprovalServiceTest {
     void shouldCancelPendingProcess() {
         ApprovalProcess process = new ApprovalProcess();
         process.setId(5L);
-        process.setTenantId("T001");
+        process.setTenantId("dept:1");
         process.setProcessType("WORK_ORDER");
         process.setBusinessId(9L);
         process.setStatus("PENDING");
@@ -541,7 +581,7 @@ class ApprovalServiceTest {
     void shouldRejectCancellationWhenProcessNotPending() {
         ApprovalProcess process = new ApprovalProcess();
         process.setId(5L);
-        process.setTenantId("T001");
+        process.setTenantId("dept:1");
         process.setProcessType("WORK_ORDER");
         process.setBusinessId(9L);
         process.setStatus("APPROVED");
@@ -754,7 +794,7 @@ class ApprovalServiceTest {
     private ApprovalProcess workflowProcess(Long id, Integer currentStep, String processType, String businessData) {
         ApprovalProcess process = new ApprovalProcess();
         process.setId(id);
-        process.setTenantId("T001");
+        process.setTenantId("dept:1");
         process.setProcessType(processType);
         process.setBusinessId(12L);
         process.setBusinessData(businessData);

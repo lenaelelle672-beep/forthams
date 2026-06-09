@@ -7,10 +7,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/stocktaking/tasks")
+@RequestMapping("/stocktaking/tasks")
 @RequiredArgsConstructor
 @Tag(name = "盘点任务管理", description = "盘点任务扫描、照片上传、差异调整")
 public class StocktakingTaskController {
@@ -29,12 +30,14 @@ public class StocktakingTaskController {
     }
 
     @Operation(summary = "获取任务详情")
+    @PreAuthorize("@ss.hasPermi('stocktaking:cycle:query')")
     @GetMapping("/{id}")
     public Result<StocktakingTask> get(@PathVariable Long id) {
         return Result.success(stocktakingService.getTaskById(id));
     }
 
     @Operation(summary = "扫码录入盘点结果")
+    @PreAuthorize("@ss.hasPermi('stocktaking:cycle:edit')")
     @PostMapping("/{id}/scan")
     public Result<Void> scan(
             @PathVariable Long id,
@@ -47,6 +50,7 @@ public class StocktakingTaskController {
     }
 
     @Operation(summary = "调整盘点差异")
+    @PreAuthorize("@ss.hasPermi('stocktaking:cycle:edit')")
     @PostMapping("/{id}/adjust")
     public Result<Void> adjust(
             @PathVariable Long id,

@@ -23,6 +23,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -92,5 +93,35 @@ class NotificationServiceTest {
         ArgumentCaptor<NotificationRecord> captor = ArgumentCaptor.forClass(NotificationRecord.class);
         verify(notificationMapper).insert(captor.capture());
         assertThat(captor.getValue().getUserId()).isEqualTo(42L);
+    }
+
+    @Test
+    @DisplayName("站内渠道持久化未保存通知")
+    void inAppChannelCreatesUnpersistedRecord() {
+        InAppChannel channel = new InAppChannel(notificationService);
+        NotificationRecord record = new NotificationRecord();
+        record.setUserId(42L);
+        record.setTitle("待办提醒");
+
+        channel.send(record);
+
+        ArgumentCaptor<NotificationRecord> captor = ArgumentCaptor.forClass(NotificationRecord.class);
+        verify(notificationMapper).insert(captor.capture());
+        assertThat(captor.getValue().getUserId()).isEqualTo(42L);
+        assertThat(captor.getValue().getIsRead()).isZero();
+        assertThat(captor.getValue().getCreatedAt()).isNotNull();
+    }
+
+    @Test
+    @DisplayName("站内渠道跳过已持久化通知，避免重复插入同一主键")
+    void inAppChannelSkipsPersistedRecord() {
+        InAppChannel channel = new InAppChannel(notificationService);
+        NotificationRecord record = new NotificationRecord();
+        record.setId(1L);
+        record.setUserId(42L);
+
+        channel.send(record);
+
+        verify(notificationMapper, never()).insert(any(NotificationRecord.class));
     }
 }

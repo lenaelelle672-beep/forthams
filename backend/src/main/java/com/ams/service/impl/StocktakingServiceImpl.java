@@ -2,6 +2,7 @@ package com.ams.service.impl;
 
 import com.ams.common.exception.BusinessException;
 import com.ams.context.TenantContext;
+import com.ams.dto.StocktakingCycleStatsDTO;
 import com.ams.entity.Asset;
 import com.ams.entity.StocktakingCycle;
 import com.ams.entity.StocktakingTask;
@@ -31,6 +32,18 @@ public class StocktakingServiceImpl implements StocktakingService {
     private final TenantService tenantService;
 
     @Override
+    public List<StocktakingCycle> listCycles(String status) {
+        String tenantId = TenantContext.requireTenantId();
+        LambdaQueryWrapper<StocktakingCycle> wrapper = new LambdaQueryWrapper<StocktakingCycle>()
+                .eq(StocktakingCycle::getTenantId, tenantId);
+        if (status != null && !status.isBlank()) {
+            wrapper.eq(StocktakingCycle::getStatus, status);
+        }
+        wrapper.orderByDesc(StocktakingCycle::getCreateTime);
+        return cycleMapper.selectList(wrapper);
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public void startCycle(StocktakingCycle cycle) {
         String tenantId = TenantContext.requireTenantId();
@@ -55,13 +68,47 @@ public class StocktakingServiceImpl implements StocktakingService {
     }
 
     @Override
+    public StocktakingCycle getCycleById(Long cycleId) {
+        return requireCycleInTenant(cycleId, TenantContext.requireTenantId());
+    }
+
+    @Override
+    public StocktakingCycleStatsDTO getCycleStats(Long cycleId) {
+        String tenantId = TenantContext.requireTenantId();
+        requireCycleInTenant(cycleId, tenantId);
+
+        List<StocktakingTask> tasks = taskMapper.selectList(
+                new LambdaQueryWrapper<StocktakingTask>()
+                        .eq(StocktakingTask::getCycleId, cycleId)
+                        .eq(StocktakingTask::getTenantId, tenantId)
+        );
+
+        long pendingCount = tasks.stream()
+                .filter(task -> "PENDING".equals(task.getStatus())
+                        || "ASSIGNED".equals(task.getStatus())
+                        || "OVERDUE".equals(task.getStatus()))
+                .count();
+        long countedCount = tasks.stream()
+                .filter(task -> "COUNTED".equals(task.getStatus()))
+                .count();
+        long adjustedCount = tasks.stream()
+                .filter(task -> "ADJUSTED".equals(task.getStatus()))
+                .count();
+
+        return new StocktakingCycleStatsDTO(
+                tasks.size(),
+                pendingCount,
+                countedCount,
+                adjustedCount,
+                countedCount + adjustedCount
+        );
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public void assignTasks(Long cycleId, String abcFilter, String strategy) {
         String tenantId = TenantContext.requireTenantId();
-        StocktakingCycle cycle = cycleMapper.selectById(cycleId);
-        if (cycle == null) {
-            throw new BusinessException("盘点周期不存在");
-        }
+        StocktakingCycle cycle = requireCycleInTenant(cycleId, tenantId);
         if (!"PLANNED".equals(cycle.getStatus())) {
             throw new BusinessException("只能为已计划状态的周期分配任务");
         }
@@ -116,10 +163,7 @@ public class StocktakingServiceImpl implements StocktakingService {
     @Transactional(rollbackFor = Exception.class)
     public void pauseCycle(Long cycleId) {
         String tenantId = TenantContext.requireTenantId();
-        StocktakingCycle cycle = cycleMapper.selectById(cycleId);
-        if (cycle == null) {
-            throw new BusinessException("盘点周期不存在");
-        }
+        StocktakingCycle cycle = requireCycleInTenant(cycleId, tenantId);
         if (!"IN_PROGRESS".equals(cycle.getStatus())) {
             throw new BusinessException("只能暂停进行中的周期");
         }
@@ -132,10 +176,7 @@ public class StocktakingServiceImpl implements StocktakingService {
     @Transactional(rollbackFor = Exception.class)
     public void resumeCycle(Long cycleId) {
         String tenantId = TenantContext.requireTenantId();
-        StocktakingCycle cycle = cycleMapper.selectById(cycleId);
-        if (cycle == null) {
-            throw new BusinessException("盘点周期不存在");
-        }
+        StocktakingCycle cycle = requireCycleInTenant(cycleId, tenantId);
         if (!"PAUSED".equals(cycle.getStatus())) {
             throw new BusinessException("只能恢复已暂停的周期");
         }
@@ -148,10 +189,7 @@ public class StocktakingServiceImpl implements StocktakingService {
     @Transactional(rollbackFor = Exception.class)
     public void completeCycle(Long cycleId) {
         String tenantId = TenantContext.requireTenantId();
-        StocktakingCycle cycle = cycleMapper.selectById(cycleId);
-        if (cycle == null) {
-            throw new BusinessException("盘点周期不存在");
-        }
+        StocktakingCycle cycle = requireCycleInTenant(cycleId, tenantId);
         if (!"IN_PROGRESS".equals(cycle.getStatus())) {
             throw new BusinessException("只能完成进行中的周期");
         }
@@ -181,6 +219,9 @@ public class StocktakingServiceImpl implements StocktakingService {
         StocktakingTask task = taskMapper.selectById(taskId);
         if (task == null) {
             throw new BusinessException("盘点任务不存在");
+        }
+        if (!tenantId.equals(task.getTenantId())) {
+            throw new BusinessException("无权访问该任务");
         }
         if (!"COUNTED".equals(task.getStatus())) {
             throw new BusinessException("只能调整已盘点状态的任务");
@@ -238,6 +279,17 @@ public class StocktakingServiceImpl implements StocktakingService {
         return task;
     }
 
+    private StocktakingCycle requireCycleInTenant(Long cycleId, String tenantId) {
+        StocktakingCycle cycle = cycleMapper.selectById(cycleId);
+        if (cycle == null) {
+            throw new BusinessException("盘点周期不存在");
+        }
+        if (!tenantId.equals(cycle.getTenantId())) {
+            throw new BusinessException("无权访问该盘点周期");
+        }
+        return cycle;
+    }
+
     /**
      * 定时任务 1：每天凌晨 2 点生成盘点任务
      * 查找所有启用的盘点周期规则，为符合条件资产创建盘点任务
@@ -252,9 +304,12 @@ public class StocktakingServiceImpl implements StocktakingService {
         List<String> tenantIds = getActiveTenantIds();
         for (String tenantId : tenantIds) {
             try {
+                TenantContext.setTenantId(tenantId);
                 generateTasksForTenant(tenantId, now);
             } catch (RuntimeException e) {
                 log.error("租户 {} 定时任务生成失败: {}", tenantId, e.getMessage(), e);
+            } finally {
+                TenantContext.clear();
             }
         }
 
@@ -276,9 +331,12 @@ public class StocktakingServiceImpl implements StocktakingService {
         List<String> tenantIds = getActiveTenantIds();
         for (String tenantId : tenantIds) {
             try {
+                TenantContext.setTenantId(tenantId);
                 checkOverdueTasksForTenant(tenantId, overdueThreshold, now);
             } catch (RuntimeException e) {
                 log.error("租户 {} 逾期检查失败: {}", tenantId, e.getMessage(), e);
+            } finally {
+                TenantContext.clear();
             }
         }
 
@@ -299,9 +357,12 @@ public class StocktakingServiceImpl implements StocktakingService {
         List<String> tenantIds = getActiveTenantIds();
         for (String tenantId : tenantIds) {
             try {
+                TenantContext.setTenantId(tenantId);
                 calculateCompletionRateForTenant(tenantId, now);
             } catch (RuntimeException e) {
                 log.error("租户 {} 完成率统计失败: {}", tenantId, e.getMessage(), e);
+            } finally {
+                TenantContext.clear();
             }
         }
 

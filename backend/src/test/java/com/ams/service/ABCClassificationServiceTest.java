@@ -16,6 +16,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -56,6 +58,16 @@ class ABCClassificationServiceTest {
     @AfterEach
     void tearDown() {
         TenantContext.remove();
+    }
+
+    @Test
+    void classifyAssetShouldRunInIndependentTransaction() throws NoSuchMethodException {
+        Transactional transactional = ABCClassificationServiceImpl.class
+                .getMethod("classifyAsset", Long.class)
+                .getAnnotation(Transactional.class);
+
+        assertNotNull(transactional);
+        assertEquals(Propagation.REQUIRES_NEW, transactional.propagation());
     }
 
     @Test

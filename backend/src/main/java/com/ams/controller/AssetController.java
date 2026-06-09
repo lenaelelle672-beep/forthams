@@ -15,11 +15,21 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import com.ams.entity.SysAttachment;
 import com.ams.service.AssetAttachmentService;
 import org.springframework.web.multipart.MultipartFile;
+import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.io.File;
@@ -95,6 +105,120 @@ public class AssetController {
     public Result<Void> delete(@PathVariable Long id) {
         assetService.deleteAsset(id);
         return Result.success();
+    }
+
+    // ── 导入导出 ───────────────────────────────────────────────────────────
+
+    @Operation(summary = "下载资产导入模板", description = "返回 CSV 模板，字段与导入解析接口一致")
+    @PreAuthorize("@ss.hasPermi('asset:ledger:query')")
+    @GetMapping("/import/template")
+    public ResponseEntity<byte[]> downloadImportTemplate() {
+        String template = "\uFEFFassetNo,assetName,categoryId,status,deptId,locationId,originalValue,remark\n"
+                + "AST-2026-0001,示例资产,1,IDLE,1,1,1000.00,可删除此示例行\n";
+        return csvResponse("asset_import_template.csv", template);
+    }
+
+    @Operation(summary = "解析资产导入文件", description = "解析 CSV 文件并返回预览行与行级错误")
+    @PreAuthorize("@ss.hasPermi('asset:ledger:create')")
+    @PostMapping("/import/parse")
+    public Result<Map<String, Object>> parseImportFile(@RequestParam("file") MultipartFile file) throws IOException {
+        if (file == null || file.isEmpty()) {
+            return Result.error(400, "上传文件不能为空");
+        }
+        String filename = file.getOriginalFilename() == null ? "" : file.getOriginalFilename().toLowerCase();
+        if (!filename.endsWith(".csv")) {
+            return Result.error(400, "当前导入接口支持 CSV 文件，请先下载模板填写后上传");
+        }
+
+        List<Map<String, Object>> rows = new ArrayList<>();
+        List<Map<String, Object>> errors = new ArrayList<>();
+        String content = new String(file.getBytes(), StandardCharsets.UTF_8).replace("\uFEFF", "");
+        String[] lines = content.split("\\R");
+        if (lines.length == 0 || lines[0].isBlank()) {
+            return Result.error(400, "文件缺少表头");
+        }
+
+        String[] headers = splitCsvLine(lines[0]);
+        for (int i = 1; i < lines.length; i++) {
+            if (lines[i].isBlank()) {
+                continue;
+            }
+            Map<String, Object> row = new LinkedHashMap<>();
+            row.put("rowNumber", i + 1);
+            String[] values = splitCsvLine(lines[i]);
+            for (int j = 0; j < headers.length; j++) {
+                String header = headers[j].trim();
+                row.put(header, j < values.length ? values[j].trim() : "");
+            }
+            validateImportRow(row, errors);
+            rows.add(row);
+        }
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("parseId", "csv-" + UUID.randomUUID());
+        result.put("rows", rows);
+        result.put("errors", errors);
+        return Result.success(result);
+    }
+
+    @Operation(summary = "提交资产导入", description = "将前端确认后的 CSV 预览行写入资产台账")
+    @PreAuthorize("@ss.hasPermi('asset:ledger:create')")
+    @PostMapping("/import/commit")
+    public Result<Map<String, Object>> commitImport(@RequestBody Map<String, Object> payload) {
+        Object rawRows = payload.get("rows");
+        if (!(rawRows instanceof List<?> rows)) {
+            return Result.error(400, "导入数据不能为空");
+        }
+
+        int importedCount = 0;
+        List<Map<String, Object>> errors = new ArrayList<>();
+        for (Object item : rows) {
+            if (!(item instanceof Map<?, ?> rawRow)) {
+                continue;
+            }
+            Map<String, Object> row = normalizeRow(rawRow);
+            try {
+                assetService.createAsset(toAssetCreateDTO(row));
+                importedCount++;
+            } catch (Exception ex) {
+                Map<String, Object> error = new LinkedHashMap<>();
+                error.put("rowNumber", row.getOrDefault("rowNumber", importedCount + 1));
+                error.put("field", "row");
+                error.put("message", ex.getMessage());
+                errors.add(error);
+            }
+        }
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("success", errors.isEmpty());
+        result.put("importedCount", importedCount);
+        result.put("failedCount", errors.size());
+        result.put("errors", errors);
+        return Result.success(result);
+    }
+
+    @Operation(summary = "导出资产 CSV", description = "按当前筛选条件导出资产台账 CSV")
+    @PreAuthorize("@ss.hasPermi('asset:ledger:query')")
+    @PostMapping("/export")
+    public ResponseEntity<byte[]> exportAssets(@RequestBody(required = false) AssetQueryDTO queryDTO) {
+        AssetQueryDTO exportQuery = queryDTO == null ? new AssetQueryDTO() : queryDTO;
+        exportQuery.setPage(1);
+        exportQuery.setPageSize(50000);
+        List<Asset> records = assetService.queryAssets(exportQuery).getRecords();
+
+        StringBuilder csv = new StringBuilder("\uFEFFassetNo,assetName,categoryId,status,deptId,locationId,originalValue,remark\n");
+        for (Asset asset : records) {
+            csv.append(csv(asset.getAssetNo())).append(',')
+                    .append(csv(asset.getAssetName())).append(',')
+                    .append(csv(asset.getCategoryId())).append(',')
+                    .append(csv(asset.getStatus())).append(',')
+                    .append(csv(asset.getDeptId())).append(',')
+                    .append(csv(asset.getLocationId())).append(',')
+                    .append(csv(asset.getOriginalValue())).append(',')
+                    .append(csv(asset.getRemark()))
+                    .append('\n');
+        }
+        return csvResponse("assets_export.csv", csv.toString());
     }
 
     // ── 附件管理 ───────────────────────────────────────────────────────────
@@ -236,6 +360,82 @@ public class AssetController {
             return ((com.ams.security.LoginUser) principal).getUserId();
         }
         return null;
+    }
+
+    private ResponseEntity<byte[]> csvResponse(String filename, String content) {
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        ContentDisposition.attachment().filename(filename, StandardCharsets.UTF_8).build().toString())
+                .contentType(new MediaType("text", "csv", StandardCharsets.UTF_8))
+                .body(content.getBytes(StandardCharsets.UTF_8));
+    }
+
+    private String[] splitCsvLine(String line) {
+        return line.split(",", -1);
+    }
+
+    private void validateImportRow(Map<String, Object> row, List<Map<String, Object>> errors) {
+        requireImportValue(row, errors, "assetNo", "资产编号不能为空");
+        requireImportValue(row, errors, "assetName", "资产名称不能为空");
+    }
+
+    private void requireImportValue(Map<String, Object> row, List<Map<String, Object>> errors, String field, String message) {
+        Object value = row.get(field);
+        if (value == null || value.toString().isBlank()) {
+            Map<String, Object> error = new LinkedHashMap<>();
+            error.put("rowNumber", row.get("rowNumber"));
+            error.put("field", field);
+            error.put("message", message);
+            errors.add(error);
+        }
+    }
+
+    private Map<String, Object> normalizeRow(Map<?, ?> rawRow) {
+        Map<String, Object> row = new LinkedHashMap<>();
+        rawRow.forEach((key, value) -> {
+            if (key != null) {
+                row.put(key.toString(), value);
+            }
+        });
+        return row;
+    }
+
+    private AssetCreateDTO toAssetCreateDTO(Map<String, Object> row) {
+        AssetCreateDTO dto = new AssetCreateDTO();
+        dto.setAssetNo(stringValue(row.get("assetNo")));
+        dto.setAssetName(stringValue(row.get("assetName")));
+        dto.setCategoryId(longValue(row.get("categoryId")));
+        dto.setStatus(stringValue(row.get("status")));
+        dto.setDeptId(longValue(row.get("deptId")));
+        dto.setLocationId(longValue(row.get("locationId")));
+        dto.setOriginalValue(decimalValue(row.get("originalValue")));
+        dto.setRemark(stringValue(row.get("remark")));
+        return dto;
+    }
+
+    private String stringValue(Object value) {
+        return value == null || value.toString().isBlank() ? null : value.toString().trim();
+    }
+
+    private Long longValue(Object value) {
+        String str = stringValue(value);
+        return str == null ? null : Long.valueOf(str);
+    }
+
+    private BigDecimal decimalValue(Object value) {
+        String str = stringValue(value);
+        return str == null ? null : new BigDecimal(str);
+    }
+
+    private String csv(Object value) {
+        if (value == null) {
+            return "";
+        }
+        String text = value.toString();
+        if (text.contains(",") || text.contains("\"") || text.contains("\n")) {
+            return "\"" + text.replace("\"", "\"\"") + "\"";
+        }
+        return text;
     }
 
     // ── ABC 分类管理 ───────────────────────────────────────────────────────────────

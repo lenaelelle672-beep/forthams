@@ -20,6 +20,9 @@ public class InAppChannel implements NotificationChannel {
 
     @Override
     public void send(NotificationRecord record) {
+        if (record == null || record.getId() != null) {
+            return;
+        }
         notificationService.create(record);
     }
 }
