@@ -25,33 +25,6 @@ import { FloorPlanCanvas } from './components/FloorPlanCanvas';
 import { ExternalLink, Plus } from 'lucide-react';
 import { cn } from '@/utils/cn';
 
-/* ── Mock 兜底数据（后端未就绪时展示） ───────────────────────────────────── */
-const MOCK_PLANS: FloorPlan[] = [
-  { id: 1, name: 'A栋1层平面图', building: 'A栋', floor: '1F', imageUrl: '', imageWidth: 800, imageHeight: 600, description: '北京总部A栋1层大厅及办公区' },
-  { id: 2, name: 'A栋2层平面图', building: 'A栋', floor: '2F', imageUrl: '', imageWidth: 800, imageHeight: 600, description: '北京总部A栋2层研发区' },
-  { id: 3, name: 'B栋1层平面图', building: 'B栋', floor: '1F', imageUrl: '', imageWidth: 800, imageHeight: 600, description: '北京总部B栋1层会议及接待区' },
-];
-
-const MOCK_PLAN_ASSETS: Record<number, PlanAsset[]> = {
-  1: [
-    { id: 1, planId: 1, assetId: 1, posX: 120, posY: 180, label: '前台电脑', assetNo: 'AST-2024-001', assetName: '前台电脑', assetStatus: 'IN_USE' },
-    { id: 2, planId: 1, assetId: 6, posX: 350, posY: 100, label: '监控摄像头', assetNo: 'AST-2024-006', assetName: '监控摄像头-F10', assetStatus: 'SCRAPPED' },
-    { id: 3, planId: 1, assetId: 12, posX: 600, posY: 250, label: '消防报警器', assetNo: 'AST-2024-012', assetName: '消防报警器-L08', assetStatus: 'IN_USE' },
-    { id: 4, planId: 1, assetId: 15, posX: 450, posY: 400, label: '温湿度传感器', assetNo: 'AST-2024-015', assetName: '温湿度传感器-O20', assetStatus: 'IN_USE' },
-  ],
-  2: [
-    { id: 5, planId: 2, assetId: 2, posX: 200, posY: 150, label: '交换机', assetNo: 'AST-2024-002', assetName: '交换机-B03', assetStatus: 'IN_USE' },
-    { id: 6, planId: 2, assetId: 10, posX: 500, posY: 300, label: '路由器', assetNo: 'AST-2024-010', assetName: '路由器-J03', assetStatus: 'IDLE' },
-    { id: 7, planId: 2, assetId: 9, posX: 300, posY: 350, label: '笔记本电脑', assetNo: 'AST-2024-009', assetName: '笔记本电脑-I15', assetStatus: 'IN_USE' },
-  ],
-  3: [
-    { id: 8, planId: 3, assetId: 3, posX: 150, posY: 200, label: 'UPS电源', assetNo: 'AST-2024-003', assetName: 'UPS电源-C01', assetStatus: 'IDLE' },
-    { id: 9, planId: 3, assetId: 8, posX: 400, posY: 180, label: '投影仪', assetNo: 'AST-2024-008', assetName: '投影仪-H02', assetStatus: 'PENDING' },
-    { id: 10, planId: 3, assetId: 14, posX: 650, posY: 320, label: '门禁系统', assetNo: 'AST-2024-014', assetName: '门禁系统-N06', assetStatus: 'PENDING' },
-    { id: 11, planId: 3, assetId: 11, posX: 250, posY: 450, label: '发电机组', assetNo: 'AST-2024-011', assetName: '发电机组-K01', assetStatus: 'MAINTENANCE' },
-  ],
-};
-
 const FloorPlanPage: React.FC = () => {
   const navigate = useNavigate();
   const { query, setSpatialTime } = useSpatialTime();
@@ -69,11 +42,16 @@ const FloorPlanPage: React.FC = () => {
     try {
       const data = await floorplanService.list({ pageSize: 100 });
       const records = data.records || [];
-      // Mock 兜底：API 返回空时使用 mock 数据
-      setPlans(records.length > 0 ? records : MOCK_PLANS);
-    } catch {
-      // 请求失败时也使用 mock 数据
-      setPlans(MOCK_PLANS);
+      setPlans(records);
+      if (records.length === 0) {
+        setSelectedPlan(null);
+        setPlanAssets([]);
+      }
+    } catch (err) {
+      setPlans([]);
+      setSelectedPlan(null);
+      setPlanAssets([]);
+      setError(err instanceof Error ? err.message : '加载平面图失败');
     } finally {
       setLoading(false);
     }
@@ -83,11 +61,9 @@ const FloorPlanPage: React.FC = () => {
     try {
       const list = await floorplanService.getAssets(planId);
       const result = Array.isArray(list) ? list : [];
-      // Mock 兜底：API 返回空时使用 mock 数据
-      setPlanAssets(result.length > 0 ? result : (MOCK_PLAN_ASSETS[planId] || []));
+      setPlanAssets(result);
     } catch {
-      // 请求失败时也使用 mock 数据
-      setPlanAssets(MOCK_PLAN_ASSETS[planId] || []);
+      setPlanAssets([]);
     }
   };
 

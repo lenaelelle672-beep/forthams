@@ -33,7 +33,7 @@ vi.mock('@/components/ui', () => ({
 vi.mock('../components/FloorPlanCanvas', () => ({
   FloorPlanCanvas: ({ plan, assets }: any) =>
     React.createElement('div', { 'data-testid': 'floorplan-canvas' },
-      `画布: ${plan?.name}`,
+      `画布: ${plan?.name}，资产: ${assets.length}`,
     ),
 }));
 
@@ -62,7 +62,7 @@ describe('FloorPlanPage', () => {
     mockedService.list.mockResolvedValueOnce({ records: [], total: 0 });
     renderPage();
     expect(screen.getByText('2D/3D 平面图')).toBeInTheDocument();
-    await screen.findByText('A栋1层平面图');
+    await screen.findByText('暂无平面图');
   });
 
   it('should render plan list from API', async () => {
@@ -80,34 +80,38 @@ describe('FloorPlanPage', () => {
     });
   });
 
-  it('should show fallback plans when api returns no plans', async () => {
+  it('should show empty state when api returns no plans', async () => {
     mockedService.list.mockResolvedValueOnce({ records: [], total: 0 });
     renderPage();
     await waitFor(() => {
-      expect(screen.getByText('A栋1层平面图')).toBeInTheDocument();
-      expect(screen.getByText('B栋1层平面图')).toBeInTheDocument();
+      expect(screen.getByText('暂无平面图')).toBeInTheDocument();
+      expect(screen.queryByText('A栋1层平面图')).not.toBeInTheDocument();
     });
   });
 
-  it('should show fallback plans on API failure', async () => {
+  it('should show error state on API failure', async () => {
     mockedService.list.mockRejectedValueOnce(new Error('网络错误'));
     renderPage();
     await waitFor(() => {
-      expect(screen.getByText('A栋1层平面图')).toBeInTheDocument();
+      expect(screen.getByTestId('error-state')).toBeInTheDocument();
     });
-    expect(screen.queryByTestId('error-state')).not.toBeInTheDocument();
+    expect(screen.getByText('加载失败')).toBeInTheDocument();
+    expect(screen.getByText('网络错误')).toBeInTheDocument();
   });
 
-  it('should open fallback plan after API failure', async () => {
-    mockedService.list.mockRejectedValueOnce(new Error('网络错误'));
+  it('should render selected plan with empty asset markers when asset API returns no data', async () => {
+    mockedService.list.mockResolvedValueOnce({
+      records: [{ id: 1, name: 'A栋平面图', building: 'A栋', floor: '1F', imageUrl: '/plans/a.jpg' }],
+      total: 1,
+    });
     mockedService.getAssets.mockResolvedValueOnce([]);
     renderPage();
     await waitFor(() => {
-      expect(screen.getByText('A栋1层平面图')).toBeInTheDocument();
+      expect(screen.getByText('A栋平面图')).toBeInTheDocument();
     });
-    await userEvent.click(screen.getByText('A栋1层平面图'));
+    await userEvent.click(screen.getByText('A栋平面图'));
     await waitFor(() => {
-      expect(screen.getByTestId('floorplan-canvas')).toBeInTheDocument();
+      expect(screen.getByText('画布: A栋平面图，资产: 0')).toBeInTheDocument();
     });
   });
 
@@ -125,7 +129,7 @@ describe('FloorPlanPage', () => {
     });
     await userEvent.click(screen.getByText('A栋平面图'));
     await waitFor(() => {
-      expect(screen.getByTestId('floorplan-canvas')).toBeInTheDocument();
+      expect(screen.getByText('画布: A栋平面图，资产: 1')).toBeInTheDocument();
     });
   });
 
@@ -145,7 +149,7 @@ describe('FloorPlanPage', () => {
     mockedService.list.mockResolvedValueOnce({ records: [], total: 0 });
     renderPage();
     expect(screen.getByTestId('location-cascader')).toBeInTheDocument();
-    await screen.findByText('A栋1层平面图');
+    await screen.findByText('暂无平面图');
   });
 
   it('should show default placeholder when no plan selected', async () => {
