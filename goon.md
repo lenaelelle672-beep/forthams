@@ -1,5 +1,25 @@
 # goon.md — 交接笔记（Cowork → Claude Code）
 
+## 2026-06-09 20:31 最新状态（Codex GAI2 资产导出筛选闭环）
+
+### 当前事实
+- 已修复桌面端 `frontend/src/pages/AssetImportExport/AssetImportExportPage.tsx`：导出资产时不再丢弃页面已选择的分类筛选，`categoryCodes` 改为传递当前选择的分类数组。
+- 同页“资产状态”下拉框补齐 `label htmlFor` / `select id` 关联，让状态筛选既可测试也可被辅助技术识别。
+- 新增 `frontend/src/pages/AssetImportExport/AssetImportExportPage.test.tsx`，覆盖选择分类与状态后调用导出 API 的请求参数。
+
+### 最新验证
+- GitNexus impact：`AssetImportExportPage` upstream 风险 `LOW`，`direct=0`、`processes_affected=0`。
+- Targeted 前端：`npm test -- --run src/pages/AssetImportExport/AssetImportExportPage.test.tsx src/api/__tests__/assetImport.test.ts --reporter=dot` 通过，`2` 个文件、`2` 个测试通过。
+- 类型检查：`npx tsc -p tsconfig.json --noEmit --pretty false` 通过。
+- 前端全量：`npm test -- --run --reporter=dot` 通过，`84` 个文件、`858` 个测试通过。
+- 前端构建：`npm run build` 通过，仅保留既有 `three-Caxi2su_.js` 大 chunk warning。
+- 桌面浏览器回归：`npx playwright test src/e2e/browser-regression-smoke.spec.ts --project=browser-regression-smoke --reporter=line` 通过，`11/11`。
+
+### 剩余动作
+- P0：原生 Docker/Nginx 验证仍无法在当前机器执行，`docker` 与 `nginx` 命令均不存在。
+- P1：`.DS_Store` tracked 元数据清理仍需用户明确确认。
+- P1：移动端继续冻结；不纳入当前桌面/后端质量闭环。
+
 ## 2026-06-09 20:26 最新状态（Codex GAI2 桌面浏览器验证补强）
 
 ### 当前事实

@@ -56,7 +56,7 @@ export default function AssetImportExportPage() {
   const exportMutation = useMutation({
     mutationFn: async (filters: { categories: string[]; statuses: string[] }) => {
       return exportAssets({
-        categoryCodes: [],
+        categoryCodes: filters.categories,
         statusCodes: filters.statuses,
         locationCodes: [],
       });
@@ -363,10 +363,14 @@ export default function AssetImportExportPage() {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <label className="block text-xs font-semibold text-[#424753] uppercase tracking-wider">
+                    <label
+                      htmlFor="asset-export-status"
+                      className="block text-xs font-semibold text-[#424753] uppercase tracking-wider"
+                    >
                       资产状态
                     </label>
                     <select
+                      id="asset-export-status"
                       value={exportStatus}
                       onChange={(e) => setExportStatus(e.target.value)}
                       className="w-full appearance-none rounded-lg border border-[var(--surface-border)] bg-white p-3 text-sm focus:ring-2 focus:ring-[#004191]/20"
