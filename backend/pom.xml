@@ -24,7 +24,7 @@
         <jwt.version>0.12.5</jwt.version>
         <hutool.version>5.8.26</hutool.version>
         <lombok.version>1.18.34</lombok.version>
-        <surefire.argLine>-Xmx2048m -XX:+UseParallelGC</surefire.argLine>
+        <surefire.argLine>-Xmx2048m -XX:+UseParallelGC -javaagent:${settings.localRepository}/net/bytebuddy/byte-buddy-agent/${byte-buddy.version}/byte-buddy-agent-${byte-buddy.version}.jar</surefire.argLine>
     </properties>
 
     <dependencies>

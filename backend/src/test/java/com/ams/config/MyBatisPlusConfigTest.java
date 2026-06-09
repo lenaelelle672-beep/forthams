@@ -84,7 +84,6 @@ class MyBatisPlusConfigTest {
         assertTrue(handler.ignoreTable("location"));
         assertTrue(handler.ignoreTable("asset_category"));
         assertTrue(handler.ignoreTable("vendor"));
-        assertTrue(handler.ignoreTable("contract"));
         assertTrue(handler.ignoreTable("workflow_node"));
         assertTrue(handler.ignoreTable("workflow_edge"));
         assertTrue(handler.ignoreTable("sys_permission"));
@@ -98,6 +97,7 @@ class MyBatisPlusConfigTest {
         assertFalse(handler.ignoreTable("asset"));
         assertFalse(handler.ignoreTable("work_order"));
         assertFalse(handler.ignoreTable("workflow_definition"));
+        assertFalse(handler.ignoreTable("contract"));
         assertFalse(handler.ignoreTable("purchase_order"));
         assertFalse(handler.ignoreTable("asset_usage_log"));
         assertFalse(handler.ignoreTable("sys_custom_field_value"));

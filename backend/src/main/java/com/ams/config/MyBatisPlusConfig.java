@@ -75,7 +75,6 @@ public class MyBatisPlusConfig {
             "notification",
             "manufacturer",
             "vendor",
-            "contract",
             "workflow_node",
             "workflow_edge",
             "bpm_mail_config",
