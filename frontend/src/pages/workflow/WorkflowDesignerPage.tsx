@@ -8,6 +8,7 @@ import { FlowCanvas } from '@/components/flow/FlowCanvas';
 import { NodeConfigPanel } from '@/components/flow/NodeConfigPanel';
 import { NodePanel } from '@/components/flow/NodePanel';
 import { workflowApi, roleApi, type RoleRecord, type WorkflowDefinitionDTO } from '@/api/workflow';
+import { useAuth, type AuthUser } from '@/context/AuthContext';
 import { businessFlowOptions, getDraftStorageKey, isBusinessType, isCustomBusinessType } from '@/constants/workflowBusiness';
 import { normalizeWorkflowDefinition, validateWorkflowDefinition } from '@/utils/workflowDefinition';
 import { createFlowEdge, initialFlowEdges, initialFlowNodes, type FlowEdge, type FlowDefinition, type FlowNode, type FlowNodeData, type FlowNodeType } from '@/types/flow';
@@ -77,8 +78,16 @@ function isInputFocused(): boolean {
   return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || el.isContentEditable;
 }
 
+function canEditWorkflowDefinitions(user: AuthUser | null) {
+  if (!user) return false;
+  const permissions = user.permissions ?? [];
+  if (permissions.length === 0) return true;
+  return permissions.includes('*') || permissions.includes('*:*:*') || permissions.includes('workflow:definition:edit');
+}
+
 export default function WorkflowDesignerPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [sp, setSp] = useSearchParams();
   const reqBt = sp.get('businessType');
   const reqBtStr = reqBt || '';
@@ -103,6 +112,7 @@ export default function WorkflowDesignerPage() {
   const [srvDesc, setSrvDesc] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [publishing, setPublishing] = useState(false);
+  const canEditWorkflow = useMemo(() => canEditWorkflowDefinitions(user), [user]);
 
   /* ---- undo / redo 历史栈 ---- */
   const pastStates = useRef<DesignerSnapshot[]>([]);
@@ -176,6 +186,7 @@ export default function WorkflowDesignerPage() {
 
   useEffect(() => {
     let cancelled = false;
+    if (!canEditWorkflow) return () => { cancelled = true; };
     (async () => {
       try {
         const res = await roleApi.getAll();
@@ -191,7 +202,7 @@ export default function WorkflowDesignerPage() {
       } catch { if (!cancelled) { setApproverRoles([]); setRoleDetails([]); } }
     })();
     return () => { cancelled = true; };
-  }, []);
+  }, [canEditWorkflow]);
 
   const selNode = useMemo(() => nodes.find((n) => n.id === selId) ?? null, [nodes, selId]);
   const flowDef = useMemo<FlowDefinition>(() => ({
@@ -211,28 +222,32 @@ export default function WorkflowDesignerPage() {
 
   /* ---- 流程修改操作（每个操作前保存快照以支持撤销） ---- */
   const handleAddNode = useCallback((type: FlowNodeType, pos?: { x: number; y: number }) => {
+    if (!canEditWorkflow) return;
     pushSnapshot();
     setNodes((cur) => { const n = createFlowNode(type, pos ?? autoPos(cur.length)); setSelId(n.id); return [...cur, n]; });
-  }, [setNodes, pushSnapshot]);
+  }, [canEditWorkflow, setNodes, pushSnapshot]);
 
   const handleConnect = useCallback((conn: Connection) => {
+    if (!canEditWorkflow) return;
     const edge = createFlowEdge(conn);
     if (!edge || edge.source === edge.target) { if (edge?.source === edge.target) { setSaveMsg(null); setSaveErr('同一节点不能连接自身'); } return; }
     pushSnapshot();
     setEdges((cur) => cur.some((e) => e.source === edge.source && e.target === edge.target && e.sourceHandle === edge.sourceHandle) ? cur : addEdge(edge, cur));
-  }, [setEdges, pushSnapshot]);
+  }, [canEditWorkflow, setEdges, pushSnapshot]);
 
   const handleUpdate = useCallback((id: string, patch: Partial<FlowNodeData>) => {
+    if (!canEditWorkflow) return;
     pushSnapshot();
     setNodes((cur) => cur.map((n) => n.id === id ? { ...n, data: { ...n.data, ...patch } } : n));
-  }, [setNodes, pushSnapshot]);
+  }, [canEditWorkflow, setNodes, pushSnapshot]);
 
   const handleDelete = useCallback((id: string) => {
+    if (!canEditWorkflow) return;
     pushSnapshot();
     setNodes((cur) => cur.filter((n) => n.id !== id));
     setEdges((cur) => cur.filter((e) => e.source !== id && e.target !== id));
     setSelId((prev) => prev === id ? (nodes.find((n) => n.id !== id)?.id ?? null) : prev);
-  }, [nodes, setEdges, setNodes, pushSnapshot]);
+  }, [canEditWorkflow, nodes, setEdges, setNodes, pushSnapshot]);
 
   /* ---- 保存 / 发布 ---- */
   const defPayload = useMemo(() => {
@@ -245,6 +260,11 @@ export default function WorkflowDesignerPage() {
   }, [normDef, formSource]);
 
   const handleSaveDraft = useCallback(async () => {
+    if (!canEditWorkflow) {
+      setSaveMsg(null);
+      setSaveErr('当前账号只有流程查看权限，无法保存流程草稿。');
+      return;
+    }
     setSaving(true);
     try {
       const raw = await workflowApi.saveDraft(businessType, { name: normDef.name, description: normDef.description, definition: defPayload });
@@ -256,9 +276,14 @@ export default function WorkflowDesignerPage() {
       localStorage.setItem(getDraftStorageKey(businessType), JSON.stringify({ ...normDef, formSource, savedAt: new Date().toISOString() }));
       setSaveMsg(null); setSaveErr(`${flow.name}仅保存为本地草稿，后端未同步，请稍后重试`);
     } finally { setSaving(false); }
-  }, [businessType, flow.name, normDef, defPayload, formSource, valErrors.length]);
+  }, [businessType, canEditWorkflow, flow.name, normDef, defPayload, formSource, valErrors.length]);
 
   const handlePublish = useCallback(async () => {
+    if (!canEditWorkflow) {
+      setSaveMsg(null);
+      setSaveErr('当前账号只有流程查看权限，无法发布流程。');
+      return;
+    }
     if (!ensureValid('发布')) return;
     setPublishing(true);
     try {
@@ -270,7 +295,7 @@ export default function WorkflowDesignerPage() {
       setSaveMsg(`${flow.name}已发布为 v${pub.version}`);
     } catch (e) { setSaveMsg(null); setSaveErr(e instanceof Error ? e.message : '发布失败'); }
     finally { setPublishing(false); }
-  }, [businessType, ensureValid, flow.name, normDef, defPayload, formSource]);
+  }, [businessType, canEditWorkflow, ensureValid, flow.name, normDef, defPayload, formSource]);
 
   const statusStyle = STATUS_STYLES[srvStatus] ?? STATUS_STYLES.UNCONFIGURED;
 
@@ -280,32 +305,32 @@ export default function WorkflowDesignerPage() {
       // ⌘Z / Ctrl+Z → 撤销
       if ((e.metaKey || e.ctrlKey) && e.key === 'z' && !e.shiftKey) {
         e.preventDefault();
-        handleUndo();
+        if (canEditWorkflow) handleUndo();
         return;
       }
       // ⌘⇧Z / Ctrl+Shift+Z → 重做
       if ((e.metaKey || e.ctrlKey) && e.key === 'z' && e.shiftKey) {
         e.preventDefault();
-        handleRedo();
+        if (canEditWorkflow) handleRedo();
         return;
       }
       // ⌘S / Ctrl+S → 保存
       if ((e.metaKey || e.ctrlKey) && e.key === 's') {
         e.preventDefault();
-        handleSaveDraft();
+        if (canEditWorkflow) handleSaveDraft();
         return;
       }
       // Del / Backspace → 删除选中节点（仅当不在输入框中时）
       if ((e.key === 'Delete' || e.key === 'Backspace') && !isInputFocused()) {
         if (selId) {
           e.preventDefault();
-          handleDelete(selId);
+          if (canEditWorkflow) handleDelete(selId);
         }
       }
     };
     document.addEventListener('keydown', onKeyDown);
     return () => document.removeEventListener('keydown', onKeyDown);
-  }, [handleUndo, handleRedo, handleSaveDraft, handleDelete, selId]);
+  }, [canEditWorkflow, handleUndo, handleRedo, handleSaveDraft, handleDelete, selId]);
 
   return (
     <div className="flex flex-col h-full -m-6">
@@ -355,15 +380,17 @@ export default function WorkflowDesignerPage() {
           <div className="flex items-center gap-2 flex-shrink-0">
             <button
               onClick={handleSaveDraft}
-              disabled={saving}
+              disabled={saving || !canEditWorkflow}
+              title={!canEditWorkflow ? '缺少 workflow:definition:edit 权限' : undefined}
               className="inline-flex items-center gap-1.5 h-9 rounded-lg border border-gray-200 bg-white px-4 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50"
             >
               {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-              保存草稿
+              {canEditWorkflow ? '保存草稿' : '只读模式'}
             </button>
             <button
               onClick={handlePublish}
-              disabled={publishing}
+              disabled={publishing || !canEditWorkflow}
+              title={!canEditWorkflow ? '缺少 workflow:definition:edit 权限' : undefined}
               className="inline-flex items-center gap-1.5 h-9 rounded-lg bg-green-600 px-4 text-sm font-medium text-white hover:bg-green-700 transition-colors shadow-sm disabled:opacity-50"
             >
               {publishing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
@@ -373,6 +400,11 @@ export default function WorkflowDesignerPage() {
         </div>
 
         {/* Messages */}
+        {!canEditWorkflow && (
+          <div className="mt-2 rounded-lg border border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-800">
+            当前账号只有流程查看权限，无法保存、发布或编辑流程。请返回流程列表查看已配置流程，或联系管理员授予 workflow:definition:edit 权限。
+          </div>
+        )}
         {saveMsg && (
           <div className="mt-2 rounded-lg border border-green-200 bg-green-50 px-4 py-2 text-sm text-green-700 flex items-center justify-between gap-2">
             <span className="flex items-center gap-2"><Play className="w-3.5 h-3.5" /> {saveMsg}</span>
@@ -397,7 +429,7 @@ export default function WorkflowDesignerPage() {
         <div className="flex items-center gap-4 text-[11px] text-gray-400">
           <span className="flex items-center gap-1">
             <kbd className="inline-flex items-center justify-center h-5 min-w-[20px] px-1 border border-gray-200 bg-gray-50 rounded text-[10px] font-mono text-gray-500">Del</kbd>
-            删除节点
+            {canEditWorkflow ? '删除节点' : '只读'}
           </span>
           <span className="flex items-center gap-1">
             <kbd className="inline-flex items-center justify-center h-5 min-w-[20px] px-1 border border-gray-200 bg-gray-50 rounded text-[10px] font-mono text-gray-500">⌘S</kbd>
@@ -435,14 +467,23 @@ export default function WorkflowDesignerPage() {
 
       {/* 3-column layout */}
       <div className="flex-1 min-h-0 grid grid-cols-[280px_minmax(0,1fr)_340px] divide-x divide-gray-200">
-        <NodePanel onAddNode={(type) => handleAddNode(type)} />
+        {canEditWorkflow ? (
+          <NodePanel onAddNode={(type) => handleAddNode(type)} />
+        ) : (
+          <div className="h-full bg-slate-50 p-4">
+            <div className="rounded-xl border border-slate-200 bg-white p-4 text-sm leading-6 text-slate-600">
+              <div className="mb-2 font-semibold text-slate-900">只读预览</div>
+              当前账号可查看流程结构，但不能新增节点、调整连线或修改节点属性。
+            </div>
+          </div>
+        )}
         <FlowCanvas
           nodes={nodes} edges={edges}
-          onNodesChange={onNodesChange} onEdgesChange={onEdgesChange}
+          onNodesChange={canEditWorkflow ? onNodesChange : () => undefined} onEdgesChange={canEditWorkflow ? onEdgesChange : () => undefined}
           onConnect={handleConnect}
           onNodeSelect={(n) => setSelId(n?.id ?? null)}
           onAddNodeAtPosition={handleAddNode}
-          onNodeDragStart={pushSnapshot}
+          onNodeDragStart={canEditWorkflow ? pushSnapshot : () => undefined}
         />
         <div className="flex flex-col min-h-0">
           <div className="flex-shrink-0 flex border-b border-gray-200">
@@ -466,6 +507,7 @@ export default function WorkflowDesignerPage() {
                 className="flex-1 w-full min-h-[200px] rounded-lg border border-gray-200 bg-gray-50 p-3 text-xs font-mono text-gray-800 outline-none resize-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
                 placeholder={`<form>\n  <label>字段名</label>\n  <input name="field" />\n  <button type="submit">提交</button>\n</form>`}
                 value={formSource}
+                disabled={!canEditWorkflow}
                 onChange={(e) => setFormSource(e.target.value)}
               />
               <p className="text-[10px] text-gray-400 mt-2 leading-relaxed">
@@ -474,7 +516,16 @@ export default function WorkflowDesignerPage() {
             </div>
           ) : (
             <div className="flex-1 min-h-0 overflow-auto">
-              <NodeConfigPanel selectedNode={selNode} edges={edges} approverRoles={approverRoles} roleDetails={roleDetails} onUpdateNode={handleUpdate} onDeleteNode={handleDelete} />
+              {canEditWorkflow ? (
+                <NodeConfigPanel selectedNode={selNode} edges={edges} approverRoles={approverRoles} roleDetails={roleDetails} onUpdateNode={handleUpdate} onDeleteNode={handleDelete} />
+              ) : (
+                <div className="p-4">
+                  <div className="rounded-xl border border-slate-200 bg-white p-4 text-sm leading-6 text-slate-600">
+                    <div className="mb-2 font-semibold text-slate-900">节点属性</div>
+                    只读权限下节点属性面板已锁定，避免误以为修改后可以保存。
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>

@@ -10,6 +10,7 @@ import { NodePanel } from "../components/flow/NodePanel";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import { Card, CardContent } from "../components/ui/card";
+import { useAuth, type AuthUser } from "@/context/AuthContext";
 import { businessFlowOptions, getDraftStorageKey, isBusinessType, type BusinessType } from "../constants/workflowBusiness";
 import { roleService, type RoleRecord } from "../services/roleService";
 import { userService, type UserRecord } from "../services/userService";
@@ -91,6 +92,13 @@ function normalizeApproverRoles(response: unknown) {
   return Array.from(new Set(["SUPER_ADMIN", ...roles]));
 }
 
+function canEditWorkflowDefinitions(user: AuthUser | null) {
+  if (!user) return false;
+  const permissions = user.permissions ?? [];
+  if (permissions.length === 0) return true;
+  return permissions.includes("*") || permissions.includes("*:*:*") || permissions.includes("workflow:definition:edit");
+}
+
 const designerTokens = {
   "--workflow-surface": "#f8f9ff",
   "--workflow-panel": "#eff4ff",
@@ -108,6 +116,7 @@ const designerTokens = {
 
 export function WorkflowDesigner() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const requestedBusinessType = searchParams.get("businessType");
   const businessType = isBusinessType(requestedBusinessType) ? requestedBusinessType : "ASSET_TRANSFER";
@@ -121,6 +130,7 @@ export function WorkflowDesigner() {
   const [serverVersion, setServerVersion] = useState(0);
   const [approverRoleOptions, setApproverRoleOptions] = useState<string[]>(["SUPER_ADMIN"]);
   const [roleDetailOptions, setRoleDetailOptions] = useState<Array<{ roleCode: string; roleName: string }>>([]);
+  const canEditWorkflow = useMemo(() => canEditWorkflowDefinitions(user), [user]);
 
   useEffect(() => {
     if (!isBusinessType(requestedBusinessType)) {
@@ -190,11 +200,13 @@ export function WorkflowDesigner() {
       }
     }
 
-    loadApproverRoles();
+    if (canEditWorkflow) {
+      loadApproverRoles();
+    }
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [canEditWorkflow]);
 
   const selectedNode = useMemo(
     () => nodes.find((node) => node.id === selectedNodeId) ?? null,
@@ -242,6 +254,9 @@ export function WorkflowDesigner() {
 
   const handleAddNodeAtPosition = useCallback(
     (type: FlowNodeType, position?: { x: number; y: number }) => {
+      if (!canEditWorkflow) {
+        return;
+      }
       setNodes((currentNodes) => {
         const newNode = createFlowNode(type, position ?? getAutoPosition(currentNodes.length), {
           data: {
@@ -252,11 +267,14 @@ export function WorkflowDesigner() {
         return [...currentNodes, newNode];
       });
     },
-    [setNodes],
+    [canEditWorkflow, setNodes],
   );
 
   const handleConnect = useCallback(
     (connection: Connection) => {
+      if (!canEditWorkflow) {
+        return;
+      }
       const edge = createFlowEdge(connection);
       if (!edge) {
         return;
@@ -277,11 +295,14 @@ export function WorkflowDesigner() {
         return duplicated ? currentEdges : addEdge(edge, currentEdges);
       });
     },
-    [setEdges],
+    [canEditWorkflow, setEdges],
   );
 
   const handleUpdateNode = useCallback(
     (nodeId: string, patch: Partial<FlowNodeData>) => {
+      if (!canEditWorkflow) {
+        return;
+      }
       setNodes((currentNodes) =>
         currentNodes.map((node) =>
           node.id === nodeId
@@ -296,11 +317,14 @@ export function WorkflowDesigner() {
         ),
       );
     },
-    [setNodes],
+    [canEditWorkflow, setNodes],
   );
 
   const handleDeleteNode = useCallback(
     (nodeId: string) => {
+      if (!canEditWorkflow) {
+        return;
+      }
       setNodes((currentNodes) => currentNodes.filter((node) => node.id !== nodeId));
       setEdges((currentEdges) =>
         currentEdges.filter((edge) => edge.source !== nodeId && edge.target !== nodeId),
@@ -311,10 +335,15 @@ export function WorkflowDesigner() {
         return nodes.find((node) => node.id !== nodeId)?.id ?? null;
       });
     },
-    [nodes, setEdges, setNodes],
+    [canEditWorkflow, nodes, setEdges, setNodes],
   );
 
   const handleSaveDraft = useCallback(async () => {
+    if (!canEditWorkflow) {
+      setSaveMessage(null);
+      setSaveError("当前账号只有流程查看权限，无法保存流程草稿。");
+      return;
+    }
     try {
       const savedDefinition = await workflowDefinitionService.saveDraft(businessType, {
         name: normalizedFlowDefinition.name,
@@ -338,9 +367,14 @@ export function WorkflowDesigner() {
         setSaveError(storageError instanceof Error ? storageError.message : "保存流程草稿失败");
       }
     }
-  }, [businessFlow.name, businessType, normalizedFlowDefinition, validationErrors.length]);
+  }, [businessFlow.name, businessType, canEditWorkflow, normalizedFlowDefinition, validationErrors.length]);
 
   const handlePublish = useCallback(async () => {
+    if (!canEditWorkflow) {
+      setSaveMessage(null);
+      setSaveError("当前账号只有流程查看权限，无法发布流程。");
+      return;
+    }
     if (!ensureValidDefinition("发布")) {
       return;
     }
@@ -366,7 +400,7 @@ export function WorkflowDesigner() {
         console.warn("[WorkflowDesigner] 发布校验失败，请检查审批节点配置:", message);
       }
     }
-  }, [businessFlow.name, businessType, ensureValidDefinition, normalizedFlowDefinition]);
+  }, [businessFlow.name, businessType, canEditWorkflow, ensureValidDefinition, normalizedFlowDefinition]);
 
   return (
     <div className="space-y-6" style={designerTokens}>
@@ -407,17 +441,33 @@ export function WorkflowDesigner() {
             <Workflow className="size-4" />
             {serverStatus} v{serverVersion}
           </Button>
-          <Button onClick={handleSaveDraft} className="bg-gradient-to-r from-primary to-[var(--workflow-approval)] text-primary-foreground hover:opacity-90">
+          <Button
+            onClick={handleSaveDraft}
+            disabled={!canEditWorkflow}
+            title={!canEditWorkflow ? "缺少 workflow:definition:edit 权限" : undefined}
+            className="bg-gradient-to-r from-primary to-[var(--workflow-approval)] text-primary-foreground hover:opacity-90"
+          >
             <Sparkles className="size-4" />
-            保存流程草稿
+            {canEditWorkflow ? "保存流程草稿" : "只读模式"}
           </Button>
-          <Button onClick={handlePublish} variant="outline" className="border-green-200 bg-green-50 text-green-700 hover:bg-green-100">
+          <Button
+            onClick={handlePublish}
+            disabled={!canEditWorkflow}
+            title={!canEditWorkflow ? "缺少 workflow:definition:edit 权限" : undefined}
+            variant="outline"
+            className="border-green-200 bg-green-50 text-green-700 hover:bg-green-100"
+          >
             <Workflow className="size-4" />
             发布并启用
           </Button>
         </div>
       </div>
 
+      {!canEditWorkflow ? (
+        <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-800">
+          当前账号只有流程查看权限，无法保存、发布或编辑流程。请返回流程列表查看已配置流程，或联系管理员授予 workflow:definition:edit 权限。
+        </div>
+      ) : null}
       {saveMessage ? <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">{saveMessage}</div> : null}
       {saveError ? <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{saveError}</div> : null}
       {validationErrors.length > 0 ? (
@@ -460,24 +510,42 @@ export function WorkflowDesigner() {
           </div>
 
           <div className="grid h-[calc(100vh-14rem)] min-h-[720px] grid-cols-1 gap-4 xl:grid-cols-[280px_minmax(0,1fr)_340px]">
-            <NodePanel onAddNode={(type) => handleAddNodeAtPosition(type)} />
+            {canEditWorkflow ? (
+              <NodePanel onAddNode={(type) => handleAddNodeAtPosition(type)} />
+            ) : (
+              <div className="flex h-full flex-col gap-4 rounded-[1.5rem] bg-[var(--workflow-panel)] p-4">
+                <div className="rounded-[1.25rem] bg-white/90 p-5 text-sm leading-6 text-muted-foreground shadow-sm">
+                  <div className="mb-2 font-semibold text-foreground">只读预览</div>
+                  当前账号可查看流程结构，但不能新增节点、调整连线或修改节点属性。
+                </div>
+              </div>
+            )}
             <FlowCanvas
               nodes={nodes}
               edges={edges}
-              onNodesChange={onNodesChange}
-              onEdgesChange={onEdgesChange}
+              onNodesChange={canEditWorkflow ? onNodesChange : () => undefined}
+              onEdgesChange={canEditWorkflow ? onEdgesChange : () => undefined}
               onConnect={handleConnect}
               onNodeSelect={(node) => setSelectedNodeId(node?.id ?? null)}
               onAddNodeAtPosition={handleAddNodeAtPosition}
             />
-            <NodeConfigPanel
-              selectedNode={selectedNode}
-              edges={edges}
-              approverRoles={approverRoleOptions}
-              roleDetails={roleDetailOptions}
-              onUpdateNode={handleUpdateNode}
-              onDeleteNode={handleDeleteNode}
-            />
+            {canEditWorkflow ? (
+              <NodeConfigPanel
+                selectedNode={selectedNode}
+                edges={edges}
+                approverRoles={approverRoleOptions}
+                roleDetails={roleDetailOptions}
+                onUpdateNode={handleUpdateNode}
+                onDeleteNode={handleDeleteNode}
+              />
+            ) : (
+              <div className="flex h-full flex-col gap-4 rounded-[1.5rem] bg-[var(--workflow-panel)] p-4">
+                <div className="rounded-[1.25rem] bg-white/90 p-5 text-sm leading-6 text-muted-foreground shadow-sm">
+                  <div className="mb-2 font-semibold text-foreground">节点属性</div>
+                  只读权限下节点属性面板已锁定，避免误以为修改后可以保存。
+                </div>
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>

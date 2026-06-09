@@ -203,6 +203,35 @@ test.describe('浏览器回归 smoke', () => {
     expect(errors).toEqual([]);
   });
 
+  test('/workflow-designer 仅查询权限账号直达时保持只读且不保存', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+
+    await page.goto('/');
+    await page.evaluate((user) => {
+      window.localStorage.setItem('auth_token', 'browser-regression-smoke-token');
+      window.localStorage.setItem('user_info', JSON.stringify(user));
+      window.sessionStorage.setItem('auth_token', 'browser-regression-smoke-token');
+      window.sessionStorage.setItem('user_info', JSON.stringify(user));
+    }, {
+      userId: 2,
+      username: 'readonly',
+      realName: '只读用户',
+      roles: ['USER'],
+      permissions: ['workflow:definition:query'],
+    });
+
+    await page.goto('/workflow-designer?businessType=ASSET_TRANSFER');
+    await page.waitForLoadState('networkidle');
+
+    await expect(page.getByText('当前账号只有流程查看权限，无法保存、发布或编辑流程。')).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByRole('button', { name: /只读模式/ })).toBeDisabled();
+    await expect(page.getByRole('button', { name: /发布流程/ })).toBeDisabled();
+    await expect(page.getByText('当前账号可查看流程结构，但不能新增节点、调整连线或修改节点属性。')).toBeVisible();
+    expect(workflowDraftSaveCount).toBe(0);
+    await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
+    expect(errors).toEqual([]);
+  });
+
   test('模块验收 smoke：资产、处置、报表和工单详情路径可交互', async ({ page }) => {
     const errors = collectBrowserErrors(page);
 
