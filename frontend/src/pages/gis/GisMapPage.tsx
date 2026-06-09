@@ -77,40 +77,6 @@ const PROVINCES = [
 
 const ASSET_CATEGORIES = ['全部', 'IT设备', '办公设备', '生产设备', '交通工具', '家具'];
 
-/* ── Mock 兜底数据（后端未就绪时展示，覆盖多城市） ──────────────────────── */
-const MOCK_GIS_ASSETS: GisAsset[] = [
-  // 北京
-  { id: 1, assetName: '服务器-A01', assetNo: 'AST-2024-001', status: 'IN_USE', locationLat: 39.9142, locationLng: 116.4074, locationId: 1, location: '北京总部A栋1层' },
-  { id: 2, assetName: '交换机-B03', assetNo: 'AST-2024-002', status: 'IN_USE', locationLat: 39.9162, locationLng: 116.4274, locationId: 1, location: '北京总部A栋2层' },
-  { id: 3, assetName: 'UPS电源-C01', assetNo: 'AST-2024-003', status: 'IDLE', locationLat: 39.9042, locationLng: 116.3974, locationId: 2, location: '北京总部B栋1层' },
-  { id: 4, assetName: '空调主机-D02', assetNo: 'AST-2024-004', status: 'MAINTENANCE', locationLat: 39.9242, locationLng: 116.4174, locationId: 2, location: '北京总部B栋机房' },
-  // 上海
-  { id: 5, assetName: '配电柜-E01', assetNo: 'AST-2024-005', status: 'IN_USE', locationLat: 31.2304, locationLng: 121.4737, locationId: 4, location: '上海分公司浦东办公区' },
-  { id: 6, assetName: '监控摄像头-F10', assetNo: 'AST-2024-006', status: 'SCRAPPED', locationLat: 31.2354, locationLng: 121.4687, locationId: 4, location: '上海分公司大厅' },
-  { id: 7, assetName: '打印机-G05', assetNo: 'AST-2024-007', status: 'IN_USE', locationLat: 31.2254, locationLng: 121.4787, locationId: 4, location: '上海分公司3层开放区' },
-  // 广州/深圳
-  { id: 8, assetName: '投影仪-H02', assetNo: 'AST-2024-008', status: 'PENDING', locationLat: 23.1291, locationLng: 113.2644, locationId: 5, location: '广州分公司会议室' },
-  { id: 9, assetName: '笔记本电脑-I15', assetNo: 'AST-2024-009', status: 'IN_USE', locationLat: 22.5431, locationLng: 114.0579, locationId: 6, location: '深圳研发中心工位' },
-  { id: 10, assetName: '路由器-J03', assetNo: 'AST-2024-010', status: 'IDLE', locationLat: 23.1391, locationLng: 113.2744, locationId: 5, location: '广州分公司弱电间' },
-  // 成都
-  { id: 11, assetName: '发电机组-K01', assetNo: 'AST-2024-011', status: 'MAINTENANCE', locationLat: 30.5728, locationLng: 104.0668, locationId: 7, location: '成都分公司地下室' },
-  { id: 12, assetName: '消防报警器-L08', assetNo: 'AST-2024-012', status: 'IN_USE', locationLat: 30.5778, locationLng: 104.0618, locationId: 7, location: '成都分公司消防通道' },
-  // 杭州
-  { id: 13, assetName: '电梯控制器-M02', assetNo: 'AST-2024-013', status: 'IDLE', locationLat: 30.2741, locationLng: 120.1551, locationId: 8, location: '杭州分公司电梯间' },
-  { id: 14, assetName: '门禁系统-N06', assetNo: 'AST-2024-014', status: 'PENDING', locationLat: 30.2791, locationLng: 120.1501, locationId: 8, location: '杭州分公司入口' },
-  // 南京
-  { id: 15, assetName: '温湿度传感器-O20', assetNo: 'AST-2024-015', status: 'IN_USE', locationLat: 32.0603, locationLng: 118.7969, locationId: 9, location: '南京分公司机房' },
-  // 武汉
-  { id: 16, assetName: '视频会议终端-P03', assetNo: 'AST-2024-016', status: 'IN_USE', locationLat: 30.5928, locationLng: 114.3055, locationId: 10, location: '武汉分公司会议室A' },
-  { id: 17, assetName: 'NAS存储-Q01', assetNo: 'AST-2024-017', status: 'IDLE', locationLat: 30.5978, locationLng: 114.3005, locationId: 10, location: '武汉分公司机房' },
-  // 重庆
-  { id: 18, assetName: '工业机器人-R05', assetNo: 'AST-2024-018', status: 'IN_USE', locationLat: 29.5630, locationLng: 106.5516, locationId: 11, location: '重庆工厂车间' },
-  // 济南
-  { id: 19, assetName: '叉车-S02', assetNo: 'AST-2024-019', status: 'MAINTENANCE', locationLat: 36.6683, locationLng: 116.9972, locationId: 12, location: '济南仓库区' },
-  // 福州
-  { id: 20, assetName: '办公桌-T10', assetNo: 'AST-2024-020', status: 'IN_USE', locationLat: 26.0745, locationLng: 119.2965, locationId: 13, location: '福州分公司办公区' },
-];
-
 function MapInfoDisplay() {
   const map = useMap();
   const [center, setCenter] = useState(map.getCenter());
@@ -248,13 +214,9 @@ const GisMapPage: React.FC = () => {
     locationId: query.locationId,
   });
 
-  // Mock 兜底：当真实数据为空（含加载失败后 refetch 仍空）时使用 mock 数据，加上本地新建的资产
   const effectiveAssets = useMemo(
-    () => {
-      const base = assets.length > 0 ? assets : !isLoading ? MOCK_GIS_ASSETS : assets;
-      return [...base, ...localAssets];
-    },
-    [assets, isLoading, localAssets],
+    () => [...assets, ...localAssets],
+    [assets, localAssets],
   );
 
   const selectedAsset = useMemo(

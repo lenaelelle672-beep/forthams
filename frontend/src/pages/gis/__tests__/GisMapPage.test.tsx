@@ -85,11 +85,12 @@ describe('GisMapPage', () => {
     expect(screen.getByText('Failed to load')).toBeInTheDocument();
   });
 
-  it('should show fallback assets when api returns empty data', async () => {
+  it('should show empty state when api returns empty data', async () => {
     mockedUseGisAssets.mockReturnValue({ data: [], isLoading: false, isError: false, error: null, refetch: vi.fn() } as any);
     await act(async () => { renderPage(); });
-    expect(screen.getByText('定位资产总数')).toBeInTheDocument();
-    expect(screen.getByText(/20\/20 个定位资产/)).toBeInTheDocument();
+    expect(screen.getByText('暂无资产定位数据')).toBeInTheDocument();
+    expect(screen.getByText('没有已定位的资产可在地图上显示')).toBeInTheDocument();
+    expect(screen.queryByText('定位资产总数')).not.toBeInTheDocument();
   });
 
   it('should show cards when assets exist', async () => {
