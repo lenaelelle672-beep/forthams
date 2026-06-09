@@ -223,6 +223,27 @@ class AssetControllerTest {
     }
 
     @Test
+    @DisplayName("Should parse escaped CSV fields with commas and quotes")
+    void parseImportFileHandlesEscapedCsvFields() throws Exception {
+        MockMultipartFile file = new MockMultipartFile(
+                "file",
+                "assets.csv",
+                "text/csv",
+                ("assetNo,assetName,categoryId,status,remark\n"
+                        + "AST-2,\"测试,资产\",1,IDLE,\"备注包含\"\"引号\"\"和,逗号\"\n")
+                        .getBytes(java.nio.charset.StandardCharsets.UTF_8));
+
+        mockMvc.perform(multipart("/api/assets/import/parse")
+                .file(file)
+                .contextPath("/api"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.code").value(200))
+            .andExpect(jsonPath("$.data.rows[0].assetName").value("测试,资产"))
+            .andExpect(jsonPath("$.data.rows[0].remark").value("备注包含\"引号\"和,逗号"))
+            .andExpect(jsonPath("$.data.errors").isArray());
+    }
+
+    @Test
     @DisplayName("Should reject non CSV import files with controlled response")
     void parseImportFileRejectsUnsupportedFile() throws Exception {
         MockMultipartFile file = new MockMultipartFile(

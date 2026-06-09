@@ -1,5 +1,22 @@
 # goon.md — 交接笔记（Cowork → Claude Code）
 
+## 2026-06-09 20:42 最新状态（Codex GAI2 CSV 导入解析兼容性收敛）
+
+### 当前事实
+- 已修复 `AssetController.parseImportFile` 的 CSV 解析：不再按行后简单 `split(",")`，改为一次性解析 CSV records，支持双引号包裹字段、字段内逗号、`""` 双引号转义，以及字段内换行。
+- 新增 `AssetControllerTest.parseImportFileHandlesEscapedCsvFields`，覆盖导出端可能生成的逗号/引号字段再导入场景。
+- 变更范围只限资产导入 CSV 预览解析；导入提交、资产创建、权限与导出接口未改。
+
+### 最新验证
+- GitNexus impact：`splitCsvLine` upstream 风险 `LOW`，直接调用者仅 `parseImportFile`，无受影响流程。
+- Targeted 后端：`mvn test -Dtest=AssetControllerTest -DfailIfNoTests=false` 通过，`15` 个测试通过。
+- 后端全量：`mvn test` 通过，`582` 个测试，0 failure/error/skip。
+
+### 剩余动作
+- P0：原生 Docker/Nginx 验证仍无法在当前机器执行，`docker` 与 `nginx` 命令均不存在。
+- P1：`.DS_Store` tracked 元数据清理仍需用户明确确认。
+- P1：移动端继续冻结；不纳入当前桌面/后端质量闭环。
+
 ## 2026-06-09 20:38 最新状态（Codex GAI2 Webhook 权限口径收敛）
 
 ### 当前事实

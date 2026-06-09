@@ -133,19 +133,19 @@ public class AssetController {
         List<Map<String, Object>> rows = new ArrayList<>();
         List<Map<String, Object>> errors = new ArrayList<>();
         String content = new String(file.getBytes(), StandardCharsets.UTF_8).replace("\uFEFF", "");
-        String[] lines = content.split("\\R");
-        if (lines.length == 0 || lines[0].isBlank()) {
+        List<String[]> records = parseCsvRecords(content);
+        if (records.isEmpty() || isBlankRecord(records.get(0))) {
             return Result.error(400, "文件缺少表头");
         }
 
-        String[] headers = splitCsvLine(lines[0]);
-        for (int i = 1; i < lines.length; i++) {
-            if (lines[i].isBlank()) {
+        String[] headers = records.get(0);
+        for (int i = 1; i < records.size(); i++) {
+            String[] values = records.get(i);
+            if (isBlankRecord(values)) {
                 continue;
             }
             Map<String, Object> row = new LinkedHashMap<>();
             row.put("rowNumber", i + 1);
-            String[] values = splitCsvLine(lines[i]);
             for (int j = 0; j < headers.length; j++) {
                 String header = headers[j].trim();
                 row.put(header, j < values.length ? values[j].trim() : "");
@@ -370,8 +370,63 @@ public class AssetController {
                 .body(content.getBytes(StandardCharsets.UTF_8));
     }
 
-    private String[] splitCsvLine(String line) {
-        return line.split(",", -1);
+    private List<String[]> parseCsvRecords(String content) {
+        List<String[]> records = new ArrayList<>();
+        List<String> record = new ArrayList<>();
+        StringBuilder field = new StringBuilder();
+        boolean inQuotes = false;
+
+        for (int i = 0; i < content.length(); i++) {
+            char c = content.charAt(i);
+            if (inQuotes) {
+                if (c == '"') {
+                    if (i + 1 < content.length() && content.charAt(i + 1) == '"') {
+                        field.append('"');
+                        i++;
+                    } else {
+                        inQuotes = false;
+                    }
+                } else {
+                    field.append(c);
+                }
+                continue;
+            }
+
+            if (c == '"') {
+                inQuotes = true;
+            } else if (c == ',') {
+                record.add(field.toString());
+                field.setLength(0);
+            } else if (c == '\r' || c == '\n') {
+                record.add(field.toString());
+                records.add(record.toArray(String[]::new));
+                record = new ArrayList<>();
+                field.setLength(0);
+                if (c == '\r' && i + 1 < content.length() && content.charAt(i + 1) == '\n') {
+                    i++;
+                }
+            } else {
+                field.append(c);
+            }
+        }
+
+        if (field.length() > 0 || !record.isEmpty() || content.endsWith(",")) {
+            record.add(field.toString());
+            records.add(record.toArray(String[]::new));
+        }
+        return records;
+    }
+
+    private boolean isBlankRecord(String[] values) {
+        if (values == null || values.length == 0) {
+            return true;
+        }
+        for (String value : values) {
+            if (value != null && !value.isBlank()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private void validateImportRow(Map<String, Object> row, List<Map<String, Object>> errors) {
