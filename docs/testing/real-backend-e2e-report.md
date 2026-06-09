@@ -47,7 +47,7 @@ npm run e2e:real -- --reporter=line
 ## 执行结果
 
 ```text
-8 passed (13.4s)
+9 passed (13.9s)
 ```
 
 ## 覆盖项
@@ -66,6 +66,10 @@ npm run e2e:real -- --reporter=line
 | 顶栏操作 | 点击通知、全局搜索、退出登录 | 通过 |
 | 工单审批 API 闭环 | 创建资产、创建工单、提交工单、审批通过，断言状态 `DRAFT -> PENDING -> APPROVED` | 通过 |
 | 资产退役 API 闭环 | 创建资产、提交退役申请、审批、完成，断言申请完成且资产状态为 `SCRAPPED` | 通过 |
+| 折旧计算 API 闭环 | 创建资产、查询折旧方法与计划、执行折旧计算、查询折旧记录，并断言资产当前价值下降 | 通过 |
+| 折旧管理页面 | 打开 `/depreciation`，断言桌面页面可见且无 401/403/500 兜底错误 | 通过 |
+| 审计查询 API | 查询 `/audit-logs` 与 `/audit-logs/stats`，断言分页记录与趋势数据结构可用 | 通过 |
+| 审计日志页面 | 打开 `/audit`，断言桌面页面可见且无 401/403/500 兜底错误 | 通过 |
 | 浏览器错误 | 监听 `console.error` 与 `pageerror` | 通过 |
 
 ## 本轮发现并修复的问题
@@ -82,7 +86,10 @@ npm run e2e:real -- --reporter=line
 | e2e profile 启动缺少若依整合列 | H2 初始化无法执行 MySQL 动态 ALTER，`sys_user`、`sys_role`、`asset`、`work_order`、`approval_process` 等表存在新旧 schema 差异 | 新增 `application-e2e.properties` 与 `e2e-h2-fixes.sql`，将本地真实后端 E2E 固化为可复现 profile |
 | 部门分布接口在 H2 返回 500 | 聚合查询返回 `DEPT_ID`/`CNT` 大写键，服务只读取 `dept_id`/`cnt` | `DashboardService#getDeptDistribution` 兼容 H2/MySQL 聚合别名，并补充单测 |
 | 位置级联接口在 H2 返回 500 | H2 对递归 CTE 未显式列名时无法解析 `cte.id` | `LocationMapper` 递归 CTE 改为显式列清单 `cte(id, name, parent_id)` |
+| 折旧计算真实 E2E 返回 500 | e2e H2 schema 缺少 `depreciation_record` 表 | `e2e-h2-fixes.sql` 补充折旧记录表，覆盖折旧计算与记录查询 |
+| 审计统计真实 E2E 返回 500 | H2 不支持 MySQL `DATE_FORMAT` 函数 | 新增测试侧 `H2Functions#dateFormat` 并在 e2e H2 初始化中注册别名 |
+| 异步通知日志噪声 | 若依整合后的通知通道表在 e2e H2 schema 中缺失 | `e2e-h2-fixes.sql` 补充 `sys_channel_config` 最小表结构 |
 
 ## 结论
 
-无 mock 的真实后端浏览器冒烟、核心点击、流程中心、流程定义保存/发布、工单审批、资产退役、审批列表、报表与大屏链路已通过。当前核心链路已经从“代码测试”推进到“浏览器 + 真实 Spring Boot API”的可复现验证。
+无 mock 的真实后端浏览器冒烟、核心点击、流程中心、流程定义保存/发布、工单审批、资产退役、折旧计算、审计查询、审批列表、报表与大屏链路已通过。当前核心链路已经从“代码测试”推进到“浏览器 + 真实 Spring Boot API”的可复现验证。

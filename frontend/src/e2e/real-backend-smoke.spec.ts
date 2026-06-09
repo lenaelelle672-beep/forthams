@@ -269,6 +269,71 @@ test('真实后端：审批列表与报表查询 API 和页面可用', async ({ 
   expect(errors).toEqual([]);
 });
 
+test('真实后端：折旧计算与审计查询 API 和页面可用', async ({ page, request }) => {
+  await verifyBackendReady(request);
+
+  const auth = await loginThroughRequest(request);
+  const headers = authHeaders(auth.token);
+  const suffix = Date.now().toString(36);
+
+  const depreciationAsset = await createAsset(request, headers, {
+    code: `E2E-DEP-${suffix}`,
+    name: `真实E2E折旧资产-${suffix}`,
+    status: 'IN_USE',
+    originalValue: 1200,
+    currentValue: 1200,
+    depreciationRate: 0.12,
+    depreciationMethod: 'STRAIGHT_LINE',
+  });
+  const depreciationAssetNo = depreciationAsset.assetNo ?? depreciationAsset.code;
+
+  const methods = await apiData(await request.get(`${apiBase}/depreciation/methods`, { headers }), '查询折旧方法');
+  expect(methods.some((method) => method.code === 'STRAIGHT_LINE')).toBe(true);
+
+  const schedulePage = await apiData(await request.get(`${apiBase}/depreciation/schedules`, {
+    headers,
+    params: { assetNo: depreciationAssetNo, page: 1, size: 10 },
+  }), '查询折旧计划');
+  expect(schedulePage.data.some((item) => item.assetId === depreciationAsset.id)).toBe(true);
+
+  const calculation = await apiData(await request.post(`${apiBase}/depreciation/calculate`, {
+    headers,
+    data: { assetIds: [depreciationAsset.id] },
+  }), '执行折旧计算');
+  expect(calculation.processedCount).toBe(1);
+
+  const records = await apiData(await request.get(`${apiBase}/depreciation/records`, {
+    headers,
+    params: { assetId: depreciationAsset.id, page: 1, size: 10 },
+  }), '查询折旧记录');
+  const depreciationRecords = pageRecords(records);
+  expect(depreciationRecords.some((record) => record.assetId === depreciationAsset.id && Number(record.depreciationAmount) > 0)).toBe(true);
+
+  const assetAfterDepreciation = await apiData(await request.get(`${apiBase}/assets/${depreciationAsset.id}`, { headers }), '查询折旧后资产详情');
+  expect(Number(assetAfterDepreciation.currentValue)).toBeLessThan(Number(depreciationAsset.currentValue ?? 1200));
+
+  const auditLogs = await apiData(await request.get(`${apiBase}/audit-logs`, {
+    headers,
+    params: { page: 0, size: 5 },
+  }), '查询审计日志列表');
+  expect(Array.isArray(pageRecords(auditLogs)), '审计日志应返回分页记录或数组').toBe(true);
+  const auditStats = await apiData(await request.get(`${apiBase}/audit-logs/stats`, { headers }), '查询审计统计');
+  expect(Array.isArray(auditStats.trendData), '审计统计应返回趋势数组').toBe(true);
+
+  const errors = collectBrowserErrors(page);
+  await loginThroughApi(page, request);
+
+  await page.goto('/depreciation');
+  await expect(page.getByRole('heading', { name: /折旧管理/ }).first()).toBeVisible({ timeout: 15_000 });
+  await expect(page.locator('body')).not.toContainText(/401|403|500|Unexpected Application Error/);
+
+  await page.goto('/audit');
+  await expect(page.getByRole('heading', { name: /审计日志/ }).first()).toBeVisible({ timeout: 15_000 });
+  await expect(page.locator('body')).not.toContainText(/401|403|500|Unexpected Application Error/);
+
+  expect(errors).toEqual([]);
+});
+
 test('真实后端：大屏页面可访问', async ({ page, request }) => {
   await verifyBackendReady(request);
 
@@ -321,6 +386,10 @@ async function createAsset(request: APIRequestContext, headers: Record<string, s
   code: string;
   name: string;
   status: string;
+  originalValue?: number;
+  currentValue?: number;
+  depreciationRate?: number;
+  depreciationMethod?: string;
 }) {
   return apiData(await request.post(`${apiBase}/assets`, {
     headers,
@@ -329,11 +398,13 @@ async function createAsset(request: APIRequestContext, headers: Record<string, s
       name: asset.name,
       categoryId: 1,
       deptId: 1,
-      originalValue: 1000,
-      currentValue: 1000,
+      originalValue: asset.originalValue ?? 1000,
+      currentValue: asset.currentValue ?? 1000,
       purchaseDate: '2026-01-01',
       location: 'E2E测试库位',
       status: asset.status,
+      depreciationRate: asset.depreciationRate,
+      depreciationMethod: asset.depreciationMethod,
     },
   }), `创建真实资产 ${asset.code}`);
 }

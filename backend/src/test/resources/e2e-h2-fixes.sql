@@ -1,3 +1,5 @@
+CREATE ALIAS IF NOT EXISTS DATE_FORMAT FOR "com.ams.test.H2Functions.dateFormat";
+
 ALTER TABLE sys_user ADD COLUMN IF NOT EXISTS avatar VARCHAR(255);
 ALTER TABLE sys_user ADD COLUMN IF NOT EXISTS login_ip VARCHAR(128);
 ALTER TABLE sys_user ADD COLUMN IF NOT EXISTS login_date DATETIME;
@@ -71,11 +73,39 @@ ALTER TABLE asset_category ADD COLUMN IF NOT EXISTS fieldset_id BIGINT;
 
 ALTER TABLE approval_process ADD COLUMN IF NOT EXISTS version INT DEFAULT 0;
 
+CREATE TABLE IF NOT EXISTS depreciation_record (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    tenant_id VARCHAR(64) NOT NULL,
+    asset_id BIGINT NOT NULL,
+    method VARCHAR(32) NOT NULL,
+    period_start DATE NOT NULL,
+    period_end DATE NOT NULL,
+    depreciation_amount DECIMAL(12,2) NOT NULL DEFAULT 0.00,
+    book_value_before DECIMAL(12,2),
+    book_value_after DECIMAL(12,2),
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+    update_time DATETIME,
+    deleted TINYINT DEFAULT 0
+);
+
 ALTER TABLE work_order ADD COLUMN IF NOT EXISTS collaborators TEXT;
 ALTER TABLE work_order ADD COLUMN IF NOT EXISTS attachments TEXT;
 ALTER TABLE work_order ADD COLUMN IF NOT EXISTS fault_code_id BIGINT;
 ALTER TABLE work_order ADD COLUMN IF NOT EXISTS sla_deadline DATETIME;
 ALTER TABLE work_order ADD COLUMN IF NOT EXISTS sla_status VARCHAR(32) DEFAULT 'NORMAL';
+
+CREATE TABLE IF NOT EXISTS sys_channel_config (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    tenant_id VARCHAR(64) NOT NULL DEFAULT 'dept:1',
+    channel_type VARCHAR(32) NOT NULL,
+    config_name VARCHAR(128) NOT NULL,
+    webhook_url VARCHAR(512) NOT NULL,
+    secret VARCHAR(256),
+    enabled TINYINT DEFAULT 1,
+    description VARCHAR(512),
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME
+);
 
 CREATE TABLE IF NOT EXISTS maintenance_record (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
