@@ -13,6 +13,7 @@ import com.ams.security.SecurityUserCacheService;
 import com.ams.utils.JwtUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -35,6 +36,12 @@ public class AuthService {
     private final SysMenuMapper sysMenuMapper;
     private final SecurityUserCacheService securityUserCacheService;
 
+    @Value("${ams.auth.registration-enabled:false}")
+    private boolean registrationEnabled;
+
+    @Value("${ams.auth.registration-default-dept-id:}")
+    private String registrationDefaultDeptId;
+
     public AuthResponse login(LoginRequest request) {
         authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
@@ -53,6 +60,8 @@ public class AuthService {
 
     @Transactional(rollbackFor = Exception.class)
     public AuthResponse register(RegisterRequest request) {
+        Long deptId = resolveRegistrationDeptId(request);
+
         User existingUser = userMapper.selectOne(
             new LambdaQueryWrapper<User>().eq(User::getUsername, request.getUsername())
         );
@@ -67,7 +76,7 @@ public class AuthService {
         user.setRealName(request.getRealName());
         user.setEmail(request.getEmail());
         user.setPhone(request.getPhone());
-        user.setDeptId(request.getDeptId());
+        user.setDeptId(deptId);
         user.setStatus(1);
 
         userMapper.insert(user);
@@ -107,6 +116,27 @@ public class AuthService {
             throw new BusinessException("用户未绑定部门，无法生成租户令牌");
         }
         return "dept:" + user.getDeptId();
+    }
+
+    private Long resolveRegistrationDeptId(RegisterRequest request) {
+        if (!registrationEnabled) {
+            throw new BusinessException(400, "系统未开放自助注册");
+        }
+        if (request.getDeptId() != null) {
+            throw new BusinessException(400, "自助注册不允许指定部门");
+        }
+        if (!StringUtils.hasText(registrationDefaultDeptId)) {
+            throw new BusinessException(400, "自助注册未配置默认部门");
+        }
+        try {
+            long deptId = Long.parseLong(registrationDefaultDeptId.trim());
+            if (deptId <= 0) {
+                throw new NumberFormatException("deptId must be positive");
+            }
+            return deptId;
+        } catch (NumberFormatException e) {
+            throw new BusinessException(400, "自助注册默认部门配置无效");
+        }
     }
 
     /**
