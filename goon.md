@@ -1,5 +1,22 @@
 # goon.md — 交接笔记（Cowork → Claude Code）
 
+## 2026-06-09 20:26 最新状态（Codex GAI2 桌面浏览器验证补强）
+
+### 当前事实
+- 非移动端代码与部署配置最近提交仍是 `8cd95c821 docs: record database bootstrap policy`、`743c32f7f fix: make database bootstrap explicit`、`928d93505 fix: align split docker deployment checks`、`eb84fd139 fix: repair production web container routing` 等批次。
+- 工作树当前仅保留 `.DS_Store` 与移动端冻结差异；移动端文件和 `frontend/src/router/index.tsx` 中移动相关改动继续不纳入本轮质量闭环。
+- 前端 TypeScript 桌面/共享代码已补静态证据：`npx tsc -p tsconfig.json --noEmit --pretty false` 通过。
+
+### 最新验证
+- 桌面浏览器回归：`npx playwright test src/e2e/browser-regression-smoke.spec.ts --project=browser-regression-smoke --reporter=line` 通过，`11/11`。
+- 本次浏览器 smoke 覆盖 `/workflows` 两条关键路径：保存失败提示不误导，以及“新建模板流程会保存草稿并进入设计器”；同时覆盖赔偿、3D 大屏降级、盘点、闲置、资产/处置/报表/工单、审批、报表空态/权限拒绝态。
+- 首次普通沙箱执行 Playwright 因无法监听 `127.0.0.1:5173` 返回 `listen EPERM`；按规则提权重跑同一命令后通过，判定为沙箱端口权限问题，不是业务失败。
+
+### 剩余动作
+- P0：仍需在有 Docker/Nginx 的机器上补原生镜像构建与容器 smoke；当前已有等价 Node 代理 smoke，但缺少真实 `docker build` / `docker compose build` 证据。
+- P1：`.DS_Store` 仍为 tracked 本机元数据改动，是否 `git rm --cached .DS_Store` 需要用户明确确认。
+- P1：移动端继续冻结；恢复移动端时应单独审计并提交，不要混入桌面/后端批次。
+
 ## 2026-06-09 20:22 最新状态（Codex GAI2 数据库启动策略收敛）
 
 ### 当前事实
