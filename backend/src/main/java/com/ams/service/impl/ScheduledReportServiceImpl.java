@@ -6,6 +6,7 @@ import com.ams.entity.ScheduledReport;
 import com.ams.mapper.ScheduledReportMapper;
 import com.ams.service.EmailService;
 import com.ams.service.ScheduledReportService;
+import com.ams.service.TenantService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,7 @@ public class ScheduledReportServiceImpl implements ScheduledReportService {
 
     private final ScheduledReportMapper scheduledReportMapper;
     private final EmailService emailService;
+    private final TenantService tenantService;
 
     @Override
     public Page<ScheduledReport> list(Integer pageNum, Integer pageSize, String status, String keyword) {
@@ -106,35 +108,46 @@ public class ScheduledReportServiceImpl implements ScheduledReportService {
     @Transactional(rollbackFor = Exception.class)
     public void scanAndExecute() {
         LocalDateTime now = LocalDateTime.now();
-        List<ScheduledReport> dueReports = scheduledReportMapper.selectList(
-                new LambdaQueryWrapper<ScheduledReport>()
-                        .eq(ScheduledReport::getStatus, "ACTIVE")
-                        .le(ScheduledReport::getNextRunAt, now)
-                        .isNotNull(ScheduledReport::getRecipientEmails)
-        );
-
-        for (ScheduledReport report : dueReports) {
+        for (String tenantId : tenantService.getActiveTenantIds()) {
             try {
-                log.info("Executing scheduled report: id={}, cron={}", report.getId(), report.getCronExpr());
+                TenantContext.setTenantId(tenantId);
+                List<ScheduledReport> dueReports = scheduledReportMapper.selectList(
+                        new LambdaQueryWrapper<ScheduledReport>()
+                                .eq(ScheduledReport::getTenantId, tenantId)
+                                .eq(ScheduledReport::getStatus, "ACTIVE")
+                                .le(ScheduledReport::getNextRunAt, now)
+                                .isNotNull(ScheduledReport::getRecipientEmails)
+                );
 
-                // 发送邮件（此处为简化实现，实际可调用 PdfExportService 生成 PDF 附件）
-                String[] recipients = report.getRecipientEmails()
-                        .replaceAll("[\\[\\]\"]", "").split(",");
-                for (String email : recipients) {
-                    String trimmed = email.trim();
-                    if (!trimmed.isEmpty()) {
-                        emailService.sendEmail(trimmed,
-                                report.getSubject() != null ? report.getSubject() : "定时报表",
-                                "请在系统中查看定时报表（报表ID: " + report.getSavedReportId() + "）");
+                for (ScheduledReport report : dueReports) {
+                    try {
+                        log.info("Executing scheduled report: tenantId={}, id={}, cron={}",
+                                tenantId, report.getId(), report.getCronExpr());
+
+                        // 发送邮件（此处为简化实现，实际可调用 PdfExportService 生成 PDF 附件）
+                        String[] recipients = report.getRecipientEmails()
+                                .replaceAll("[\\[\\]\"]", "").split(",");
+                        for (String email : recipients) {
+                            String trimmed = email.trim();
+                            if (!trimmed.isEmpty()) {
+                                emailService.sendEmail(trimmed,
+                                        report.getSubject() != null ? report.getSubject() : "定时报表",
+                                        "请在系统中查看定时报表（报表ID: " + report.getSavedReportId() + "）");
+                            }
+                        }
+
+                        report.setLastRunAt(now);
+                        report.setNextRunAt(calculateNextRun(report.getCronExpr()));
+                        scheduledReportMapper.updateById(report);
+                        log.info("Scheduled report executed successfully: tenantId={}, id={}", tenantId, report.getId());
+                    } catch (RuntimeException e) {
+                        log.error("Failed to execute scheduled report: tenantId={}, id={}", tenantId, report.getId(), e);
                     }
                 }
-
-                report.setLastRunAt(now);
-                report.setNextRunAt(calculateNextRun(report.getCronExpr()));
-                scheduledReportMapper.updateById(report);
-                log.info("Scheduled report executed successfully: id={}", report.getId());
             } catch (RuntimeException e) {
-                log.error("Failed to execute scheduled report: id={}", report.getId(), e);
+                log.error("Scheduled report scan failed: tenantId={}", tenantId, e);
+            } finally {
+                TenantContext.clear();
             }
         }
     }
