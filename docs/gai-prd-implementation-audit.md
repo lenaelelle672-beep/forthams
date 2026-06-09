@@ -2,18 +2,18 @@
 
 ## 审计结论
 
-根目录 `prd.md` 的多租户隔离需求已经完成了认证上下文、资产域强制过滤、缺失 tenant 拒绝和跨租户审计日志的核心链路，但尚未达到“所有数据访问强制租户隔离”的 PRD 完成标准。
+根目录 `prd.md` 的多租户隔离需求已经完成了认证上下文、主要业务域强制过滤、缺失 tenant 拒绝、跨租户审计日志和 MyBatis-Plus TenantLine 统一 SQL 防漏的核心链路。
 
-当前状态应判定为：核心安全链路已打通，Asset 与 Retirement 具备较强隔离，其他业务域仍存在行级隔离缺口。
+当前状态应判定为：核心安全链路已打通，主要业务表具备 Service 手写过滤与 TenantLine 双层防护；剩余工作集中在基础字典/系统表的产品归属确认、白名单持续治理和异步任务上下文传播专项验证。
 
 ## PRD 条目状态
 
 | PRD 项 | 要求 | 当前状态 | 证据 | 缺口 |
 | --- | --- | --- | --- | --- |
 | F1 TenantContext 构建 | JWT 解析 `tenant_id` 并注入 ThreadLocal | 已实现 | `JwtAuthenticationFilter`、`TenantContext`、`JwtUtil` | 需关注异步任务/后台任务上下文传播策略 |
-| F2 AssetController 强制拦截 | 资源租户不匹配直接拒绝 | 已实现于主要业务资源关键路径 | `AssetService`、`RetirementApplicationService`、`AssetLifecycleService`、`WorkOrderService`、`ApprovalService`、`InventoryService`、`CompensationService`、`IdleAssetService`、`MaintenanceService` | 仍建议后续引入统一 MyBatis tenant interceptor 防漏 |
-| F3 数据库隔离查询 | 所有数据访问带 tenant 条件 | 主要业务域已实现 | 资产、退役、工单、审批、盘点、赔偿、闲置、维护均使用 tenant 条件 | 全局字典/系统表仍需明确哪些按租户隔离、哪些全局共享 |
-| F4 缺失 TenantID 回退保护 | 缺 tenant 默认拒绝 | 请求层已实现 | `JwtAuthenticationFilter#isTenantProtectedRequest`、`TenantContext#requireTenantId` | Service 若未调用 `requireTenantId`，仍可能执行非 tenant 查询 |
+| F2 AssetController 强制拦截 | 资源租户不匹配直接拒绝 | 已实现于主要业务资源关键路径 | `AssetService`、`RetirementApplicationService`、`AssetLifecycleService`、`WorkOrderService`、`ApprovalService`、`InventoryService`、`CompensationService`、`IdleAssetService`、`MaintenanceService` | 仍需持续维护白名单与新增业务表归属 |
+| F3 数据库隔离查询 | 所有数据访问带 tenant 条件 | 主要业务域已实现双层防护 | 资产、退役、工单、审批、盘点、赔偿、闲置、维护均使用 tenant 条件；`MyBatisPlusConfig` 注册 `TenantLineInnerInterceptor` | 全局字典/系统表仍需明确哪些按租户隔离、哪些全局共享 |
+| F4 缺失 TenantID 回退保护 | 缺 tenant 默认拒绝 | 请求层与 SQL 拦截层均已实现 | `JwtAuthenticationFilter#isTenantProtectedRequest`、`TenantContext#requireTenantId`、`MyBatisPlusConfig#getTenantId` | 异步任务必须显式设置 TenantContext，避免后台业务表 SQL 被拒绝 |
 | F5 操作审计日志增强 | 记录跨租户尝试 | 已实现于手动校验路径 | `TenantSecurityAudit#logCrossTenantAttempt` | 没有统一拦截器级别审计，未覆盖无 tenant 字段业务表 |
 
 ## 数据模型覆盖
@@ -60,8 +60,8 @@
 | 方案 | 内容 | 优点 | 缺点 | 建议 |
 | --- | --- | --- | --- | --- |
 | A：逐 Service 补 tenant 字段和条件 | 给业务表逐个加 `tenant_id`，Service 手写 `.eq(tenant_id)` | 改动直观，低框架风险 | 容易漏，长期维护成本高 | 适合作为短期修复 |
-| B：MyBatis-Plus TenantLineInnerInterceptor | 建立统一 tenant 拦截器，自动给租户表注入 tenant 条件 | 最贴近 PRD“不可绕过” | 需要设计忽略表、迁移历史数据、修测试 | 推荐作为中期目标 |
-| C：混合方案 | 先对高风险业务表补字段和测试，再引入统一拦截器 | 风险可控，能分批落地 | 需要维护过渡期边界 | 推荐采用 |
+| B：MyBatis-Plus TenantLineInnerInterceptor | 建立统一 tenant 拦截器，自动给租户表注入 tenant 条件 | 最贴近 PRD“不可绕过” | 需要持续维护忽略表、历史数据和测试 | 已落地，继续治理白名单 |
+| C：混合方案 | 先对高风险业务表补字段和测试，再引入统一拦截器 | 风险可控，能分批落地 | 需要维护过渡期边界 | 当前采用 |
 
 ## 推荐实施切片
 
@@ -193,13 +193,36 @@ mvn -q test
 
 优先级：P1。
 
+状态：已完成核心落地，并补强缺租户显式拒绝。
+
 原因：长期防漏，满足 PRD “所有数据访问必须携带 tenant” 的架构要求。
 
 前置条件：
 
-- 明确哪些表是全局字典表，例如 `sys_permission`、部分 `sys_role`、基础 category 是否全局共享。
-- 为租户业务表完成历史数据补 tenant。
-- 建立忽略表白名单和集成测试。
+已落地：
+
+- `MyBatisPlusConfig` 注册 `TenantLineInnerInterceptor`，并固定拦截器顺序为 OptimisticLocker / DataPermission / Pagination / TenantLine。
+- `TENANT_IGNORE_TABLES` 白名单覆盖系统表、Quartz、位置树、资产分类、供应商/合同、workflow node/edge、CTE 派生表等当前全局或无 tenant 表。
+- 租户业务表缺 TenantContext 时由 `TenantContext.requireTenantId()` 显式拒绝，不再生成 `tenant_id = ''` 的静默空结果。
+- `MyBatisPlusConfigTest` 覆盖拦截器顺序、字符串 tenantId、白名单、insert tenant_id 自动注入策略和缺租户拒绝。
+
+本轮已执行：
+
+```bash
+cd backend
+env MAVEN_OPTS=-Djdk.attach.allowAttachSelf=true mvn -q -Dtest=MyBatisPlusConfigTest,TenantSchemaConsistencyTest test
+env MAVEN_OPTS=-Djdk.attach.allowAttachSelf=true mvn -q -Dtest=AssetServiceTest,DashboardServiceTest,WorkOrderServiceTest,ApprovalServiceTest,CompensationServiceTest test
+env MAVEN_OPTS=-Djdk.attach.allowAttachSelf=true mvn test -DfailIfNoTests=false
+cd frontend && npm run e2e:real -- --reporter=line
+```
+
+结果：后端全量 598 个测试通过；真实后端 E2E 9 个测试通过。
+
+仍需持续治理：
+
+- 明确哪些基础表是全局字典表，例如 `AssetCategory`、`Dept`、`Role`、`Vendor`、`Location`。
+- 新增业务表时同步维护 tenant 字段、白名单和 schema consistency 测试。
+- 对异步任务/后台调度补充 TenantContext 传播或显式租户遍历测试。
 
 ## 当前不建议做的事
 
@@ -209,4 +232,4 @@ mvn -q test
 
 ## 下一步建议
 
-先执行切片 1：修复 `DashboardService` 的资产统计全表读取。这一项风险最高、范围最小，并且能直接加强根 PRD 的验收标准。
+继续做“白名单/异步任务治理”切片：优先梳理 `TENANT_IGNORE_TABLES` 中的基础数据表归属，并为新增或高风险后台任务补充 TenantContext 传播测试。

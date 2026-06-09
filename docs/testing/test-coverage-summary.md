@@ -14,9 +14,10 @@
 | 赔偿流程发布与估值 | `cd backend && mvn -q -Dtest=CompensationServiceTest,WorkflowDefinitionServiceTest test` | 通过，赔偿提交必须存在已发布 `ASSET_COMPENSATION` 流程；缺金额时按资产当前价值/原值自动估值 |
 | WorkOrder/Retirement 闭环 | `cd backend && mvn -q -Dtest=WorkOrderServiceTest,WorkOrderControllerTest,ApprovalServiceTest,RetirementApplicationServiceTest,RetirementControllerTest,AssetLifecycleServiceTest test` | 通过 |
 | 后端编译 | `cd backend && mvn -q -DskipTests compile` | 通过 |
-| PRD多租户测试 | `cd backend && mvn -q -Dtest=TenantIsolationIntegrationTest test` | 通过 |
-| WorkOrder/Approval 租户隔离 | `cd backend && mvn -q -Dtest=WorkOrderServiceTest,ApprovalServiceTest,TenantIsolationIntegrationTest test` | 通过 |
-| 主业务租户隔离扩展 | `cd backend && mvn -q -Dtest=CompensationServiceTest,TenantIsolationIntegrationTest test` | 通过 |
+| PRD多租户基础 | `cd backend && env MAVEN_OPTS=-Djdk.attach.allowAttachSelf=true mvn -q -Dtest=MyBatisPlusConfigTest,TenantSchemaConsistencyTest,TenantServiceTest test` | 通过；覆盖 TenantLine、schema 与当前租户查询 |
+| WorkOrder/Approval 租户隔离 | `cd backend && env MAVEN_OPTS=-Djdk.attach.allowAttachSelf=true mvn -q -Dtest=WorkOrderServiceTest,ApprovalServiceTest,MyBatisPlusConfigTest test` | 通过 |
+| 主业务租户隔离扩展 | `cd backend && env MAVEN_OPTS=-Djdk.attach.allowAttachSelf=true mvn -q -Dtest=AssetServiceTest,DashboardServiceTest,CompensationServiceTest,IdleAssetServiceTest,StocktakingServiceTest test` | 通过 |
+| TenantLine SQL 防漏 | `cd backend && env MAVEN_OPTS=-Djdk.attach.allowAttachSelf=true mvn -q -Dtest=MyBatisPlusConfigTest,TenantSchemaConsistencyTest test` | 通过；覆盖 MyBatis-Plus 拦截器顺序、租户白名单、字符串 tenantId、缺租户显式拒绝 |
 | 前端覆盖率门禁 | `cd frontend && npm run test:coverage -- --run` | 89 个测试文件，883 个测试通过；All files statements/lines 93.91%，branches 86.77%，functions 91.17%，通过全局阈值 |
 | 前端安全审计 | `cd frontend && npm audit --audit-level=high` | 0 vulnerabilities |
 | Node 版本 | `cd frontend && node -v` | `v22.22.2`，满足 `.nvmrc`、`frontend/package.json engines.node` 和 `happy-dom@20.9.0` 的 Node `>=20` 要求 |
@@ -65,3 +66,5 @@
 本轮新增认证闭环浏览器覆盖：未登录访问受保护页面会跳转登录页；退出登录会清理本地会话并返回登录页。该测试曾发现退出后 URL 已到 `/login` 但旧布局仍渲染的问题，已通过 `AuthContext#logout` 改为由 auth state 驱动路由跳转修复。
 
 本轮新增若依操作日志覆盖：资产新增/修改/删除、资产导入/导出、折旧计算、工单新增/修改/删除/提交/审批/挂起/验收等主业务写操作已接入 `@OperLog`；真实后端 E2E profile 开启 `ams.oper-log.enabled=true`，并断言“资产新增”“折旧计算”可从 `/audit-logs` 查询到 `sys_operate_log` 落库记录。
+
+本轮补强多租户 SQL 防漏：`TenantLineInnerInterceptor` 对租户业务表缺少 TenantContext 的 SQL 改为显式拒绝，不再生成 `tenant_id = ''` 的静默空结果；后端全量 598 个测试通过，真实后端 E2E 9 个测试通过。

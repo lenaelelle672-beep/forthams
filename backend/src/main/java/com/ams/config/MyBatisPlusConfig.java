@@ -137,9 +137,9 @@ public class MyBatisPlusConfig {
         return new TenantLineInnerInterceptor(new com.baomidou.mybatisplus.extension.plugins.handler.TenantLineHandler() {
             @Override
             public Expression getTenantId() {
-                String tenantId = TenantContext.getTenantId();
+                String tenantId = TenantContext.requireTenantId();
                 // VARCHAR 适配：asset.tenant_id = "dept:1"（不可 fallback 到数字 0，否则 WHERE 永远 false）
-                return new StringValue(tenantId == null ? "" : tenantId);
+                return new StringValue(tenantId);
             }
 
             @Override

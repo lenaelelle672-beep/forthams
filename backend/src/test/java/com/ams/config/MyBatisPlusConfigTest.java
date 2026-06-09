@@ -20,12 +20,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.security.access.AccessDeniedException;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(MockitoExtension.class)
@@ -96,7 +98,7 @@ class MyBatisPlusConfigTest {
 
         TenantContext.clear();
         assertTrue(handler.ignoreInsert(List.of(new Column("tenant_id")), "tenant_id"));
-        assertEquals("''", handler.getTenantId().toString());
+        assertThrows(AccessDeniedException.class, handler::getTenantId);
 
         TenantContext.setTenantId("dept:42");
         assertTrue(handler.ignoreInsert(List.of(new Column("tenant_id")), "tenant_id"));
