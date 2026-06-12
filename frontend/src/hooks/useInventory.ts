@@ -148,11 +148,10 @@ const API_BASE = '/inventory/tasks';
 async function fetchTasks(
   params?: TaskFilterParams,
 ): Promise<PaginatedResponse<InventoryTask>> {
-  const { data } = await http.get<PaginatedResponse<InventoryTask>>(
+  return http.get<PaginatedResponse<InventoryTask>>(
     API_BASE,
     { params },
   );
-  return data;
 }
 
 /**
@@ -162,8 +161,7 @@ async function fetchTasks(
  * @returns 新创建的任务对象
  */
 async function createTask(payload: CreateTaskParams): Promise<InventoryTask> {
-  const { data } = await http.post<InventoryTask>(API_BASE, payload);
-  return data;
+  return http.post<InventoryTask>(API_BASE, payload);
 }
 
 /**
@@ -173,8 +171,7 @@ async function createTask(payload: CreateTaskParams): Promise<InventoryTask> {
  * @returns 任务详情对象（含统计数据）
  */
 async function fetchTaskDetail(taskId: string): Promise<InventoryTaskDetail> {
-  const { data } = await http.get<InventoryTaskDetail>(`${API_BASE}/${taskId}`);
-  return data;
+  return http.get<InventoryTaskDetail>(`${API_BASE}/${taskId}`);
 }
 
 /**
@@ -188,11 +185,10 @@ async function updateTaskStatus(
   taskId: string,
   status: TaskStatus,
 ): Promise<InventoryTask> {
-  const { data } = await http.patch<InventoryTask>(
+  return http.patch<InventoryTask>(
     `${API_BASE}/${taskId}/status`,
     { status },
   );
-  return data;
 }
 
 /**
@@ -206,11 +202,10 @@ async function fetchTaskAssets(
   taskId: string,
   params?: AssetQueryParams,
 ): Promise<PaginatedResponse<InventoryAsset>> {
-  const { data } = await http.get<PaginatedResponse<InventoryAsset>>(
+  return http.get<PaginatedResponse<InventoryAsset>>(
     `${API_BASE}/${taskId}/assets`,
     { params },
   );
-  return data;
 }
 
 /**
@@ -255,10 +250,9 @@ async function batchConfirmAssets(
  * @returns 盘盈盘亏汇总对象
  */
 async function fetchTaskSummary(taskId: string): Promise<InventorySummary> {
-  const { data } = await http.get<InventorySummary>(
+  return http.get<InventorySummary>(
     `${API_BASE}/${taskId}/summary`,
   );
-  return data;
 }
 
 /**
