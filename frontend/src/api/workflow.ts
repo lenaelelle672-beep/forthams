@@ -1,4 +1,5 @@
 import http from '@/utils/http';
+import type { ApiResponse } from '@/types/common';
 
 export interface WorkflowDefinitionDTO {
   id?: number;
@@ -13,6 +14,20 @@ export interface WorkflowDefinitionDTO {
   publishedAt?: string;
   createTime?: string;
   updateTime?: string;
+}
+
+type MaybeApiResponse<T> = T | ApiResponse<T>;
+
+function unwrapData<T>(response: MaybeApiResponse<T>): T {
+  if (
+    response &&
+    typeof response === 'object' &&
+    'code' in response &&
+    'data' in response
+  ) {
+    return (response as ApiResponse<T>).data;
+  }
+  return response as T;
 }
 
 /**
@@ -31,20 +46,20 @@ function getOperatorId(): number | undefined {
 }
 
 export const workflowApi = {
-  list: () =>
-    http.get<WorkflowDefinitionDTO[]>('/workflows'),
+  list: async () =>
+    unwrapData(await http.get<MaybeApiResponse<WorkflowDefinitionDTO[]>>('/workflows')),
 
-  get: (businessType: string) =>
-    http.get<WorkflowDefinitionDTO>(`/workflows/${businessType}`),
+  get: async (businessType: string) =>
+    unwrapData(await http.get<MaybeApiResponse<WorkflowDefinitionDTO>>(`/workflows/${businessType}`)),
 
-  saveDraft: (businessType: string, payload: { name: string; description: string; definition: Record<string, unknown> }) =>
-    http.put<WorkflowDefinitionDTO>(`/workflows/${businessType}/draft`, { ...payload, operatorId: getOperatorId() }),
+  saveDraft: async (businessType: string, payload: { name: string; description: string; definition: Record<string, unknown> }) =>
+    unwrapData(await http.put<MaybeApiResponse<WorkflowDefinitionDTO>>(`/workflows/${businessType}/draft`, { ...payload, operatorId: getOperatorId() })),
 
-  publish: (businessType: string) =>
-    http.post<WorkflowDefinitionDTO>(`/workflows/${businessType}/publish`, { operatorId: getOperatorId() }),
+  publish: async (businessType: string) =>
+    unwrapData(await http.post<MaybeApiResponse<WorkflowDefinitionDTO>>(`/workflows/${businessType}/publish`, { operatorId: getOperatorId() })),
 
-  updateStatus: (businessType: string, status: string) =>
-    http.post<WorkflowDefinitionDTO>(`/workflows/${businessType}/status`, { status, operatorId: getOperatorId() }),
+  updateStatus: async (businessType: string, status: string) =>
+    unwrapData(await http.post<MaybeApiResponse<WorkflowDefinitionDTO>>(`/workflows/${businessType}/status`, { status, operatorId: getOperatorId() })),
 };
 
 export interface RoleRecord {
@@ -55,8 +70,8 @@ export interface RoleRecord {
 }
 
 export const roleApi = {
-  getAll: () =>
-    http.get<RoleRecord[]>('/roles/all'),
+  getAll: async () =>
+    unwrapData(await http.get<MaybeApiResponse<RoleRecord[]>>('/roles/all')),
 };
 
 export interface UserRecord {
@@ -69,7 +84,7 @@ export interface UserRecord {
 
 export const userApi = {
   search: (keyword?: string) =>
-    http.get<UserRecord[]>('/users/search', { params: keyword ? { keyword } : {} }),
+    http.get<MaybeApiResponse<UserRecord[]>>('/users/search', { params: keyword ? { keyword } : {} }).then(unwrapData),
   getById: (id: string | number) =>
-    http.get<UserRecord>(`/users/${id}`),
+    http.get<MaybeApiResponse<UserRecord>>(`/users/${id}`).then(unwrapData),
 };
