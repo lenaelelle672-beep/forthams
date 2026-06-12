@@ -106,6 +106,8 @@ class DeploymentConfigConsistencyTest {
         assertThat(workflow).contains("docker build -t forthams-single:ci .");
         assertThat(workflow).contains("Single Container Runtime Smoke");
         assertThat(workflow).contains("docker compose -p forthams-single-ci up -d mysql redis");
+        assertThat(workflow).contains("docker run --rm --network forthams-single-ci_default mysql:8.0");
+        assertThat(workflow).contains("mysql -h mysql -u \"${DB_USERNAME}\" -p\"${DB_PASSWORD}\" ams_db -e \"SELECT 1\"");
         assertThat(workflow).contains("docker run -d --name forthams-single-ci");
         assertThat(workflow).contains("--network forthams-single-ci_default");
         assertThat(workflow).contains("-p 18080:8080");

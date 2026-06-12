@@ -150,7 +150,9 @@ jobs:
           docker compose -p forthams-single-ci up -d mysql redis
 
           for attempt in {1..60}; do
-            if docker compose -p forthams-single-ci exec -T mysql mysqladmin ping -h localhost -u root -p"${MYSQL_ROOT_PASSWORD}" --silent; then
+            if docker compose -p forthams-single-ci exec -T mysql mysqladmin ping -h localhost -u root -p"${MYSQL_ROOT_PASSWORD}" --silent \
+              && docker run --rm --network forthams-single-ci_default mysql:8.0 \
+                mysql -h mysql -u "${DB_USERNAME}" -p"${DB_PASSWORD}" ams_db -e "SELECT 1" >/dev/null; then
               break
             fi
             if [ "${attempt}" -eq 60 ]; then
