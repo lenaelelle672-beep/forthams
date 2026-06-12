@@ -9,7 +9,6 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, Check, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { getWorkOrderDetail, approveWorkOrder, rejectWorkOrder } from '@/api/workorder';
-import type { ApiResponse } from '@/types/common';
 import type { WorkOrderDetailResponse } from '@/types/workorder';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -47,18 +46,18 @@ export default function WorkOrderDetailPage() {
     staleTime: 1000 * 30,
   });
 
-  const detail = (res as ApiResponse<WorkOrderDetailResponse> | undefined)?.data;
-  const workOrder = detail?.workOrder ?? detail;
+  const detail: WorkOrderDetailResponse | undefined = res?.data;
+  const workOrder = detail?.workOrder;
   const approvalRecords = detail?.approvalRecords ?? [];
 
   const approveMutation = useMutation({
-    mutationFn: (data: { version?: number }) => approveWorkOrder(orderId, data),
+    mutationFn: (data: { version: number }) => approveWorkOrder(orderId, data),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['workorders'] }),
     onError: (err: Error) => toast.error(err.message || '操作失败，请重试'),
   });
 
   const rejectMutation = useMutation({
-    mutationFn: (data: { version?: number; rejectionReason: string }) => rejectWorkOrder(orderId, data),
+    mutationFn: (data: { version: number; rejectionReason: string }) => rejectWorkOrder(orderId, data),
     onSuccess: () => { setRejectDialog(false); qc.invalidateQueries({ queryKey: ['workorders'] }); },
     onError: (err: Error) => toast.error(err.message || '操作失败，请重试'),
   });
@@ -163,8 +162,9 @@ export default function WorkOrderDetailPage() {
             <Button
               loading={approveMutation.isPending}
               onClick={() => {
+                if (!workOrder) return;
                 approveMutation.mutate(
-                  { version: workOrder?.version },
+                  { version: workOrder.version },
                   { onSuccess: () => setApproveDialog(false) },
                 );
               }}
@@ -201,10 +201,13 @@ export default function WorkOrderDetailPage() {
               variant="destructive"
               disabled={!rejectReason.trim()}
               loading={rejectMutation.isPending}
-              onClick={() => rejectMutation.mutate({
-                version: workOrder?.version,
-                rejectionReason: rejectReason,
-              })}
+              onClick={() => {
+                if (!workOrder) return;
+                rejectMutation.mutate({
+                  version: workOrder.version,
+                  rejectionReason: rejectReason,
+                });
+              }}
             >
               确认驳回
             </Button>
