@@ -46,6 +46,9 @@ const FloorPlanPage: React.FC = () => {
       if (records.length === 0) {
         setSelectedPlan(null);
         setPlanAssets([]);
+      } else if (!selectedPlan) {
+        setSelectedPlan(records[0]);
+        fetchPlanAssets(records[0].id);
       }
     } catch (err) {
       setPlans([]);
@@ -101,8 +104,8 @@ const FloorPlanPage: React.FC = () => {
 
   return (
     <PageTransition>
-      <div className="min-h-full bg-[var(--app-background)] px-4 py-5 sm:px-6 lg:px-8">
-        <div className="mx-auto flex w-full max-w-[1480px] flex-col gap-6">
+      <div className="min-h-full overflow-x-auto bg-[var(--app-background)] px-4 py-5 sm:px-6 lg:px-8">
+        <div className="mx-auto flex w-full min-w-[980px] max-w-[1480px] flex-col gap-6">
 
           {/* ── Compact header with stat bar ─────────────────────────────────── */}
           <section className="rounded-2xl border border-[var(--surface-border)] bg-white shadow-sm">
@@ -130,9 +133,9 @@ const FloorPlanPage: React.FC = () => {
           </div>
 
           {/* ── Two-column layout ────────────────────────────────────────────── */}
-          <div className="flex gap-4">
+          <div className="grid gap-4 xl:grid-cols-[18rem_minmax(0,1fr)]">
             {/* Left: plan list */}
-            <Card className="w-72 shrink-0 overflow-hidden rounded-2xl border-slate-200/80 shadow-sm">
+            <Card className="w-full overflow-hidden rounded-2xl border-slate-200/80 shadow-sm">
               <CardHeader className="bg-gradient-to-r from-white to-slate-50/70">
                 <div className="flex justify-between items-center w-full">
                   <CardTitle className="text-sm">平面图列表</CardTitle>
@@ -173,7 +176,7 @@ const FloorPlanPage: React.FC = () => {
             </Card>
 
             {/* Right: plan canvas */}
-            <Card className="flex-1 overflow-hidden rounded-2xl border-slate-200/80 shadow-sm">
+            <Card className="min-w-0 overflow-hidden rounded-2xl border-slate-200/80 shadow-sm">
               <CardHeader className="bg-gradient-to-r from-white to-slate-50/70">
                 <div>
                   <CardTitle>{selectedPlan?.name || '请选择平面图'}</CardTitle>

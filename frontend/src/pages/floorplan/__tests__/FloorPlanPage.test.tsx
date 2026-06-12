@@ -75,7 +75,7 @@ describe('FloorPlanPage', () => {
     });
     renderPage();
     await waitFor(() => {
-      expect(screen.getByText('A栋平面图')).toBeInTheDocument();
+      expect(screen.getAllByText('A栋平面图').length).toBeGreaterThan(0);
       expect(screen.getByText('B栋平面图')).toBeInTheDocument();
     });
   });
@@ -107,9 +107,8 @@ describe('FloorPlanPage', () => {
     mockedService.getAssets.mockResolvedValueOnce([]);
     renderPage();
     await waitFor(() => {
-      expect(screen.getByText('A栋平面图')).toBeInTheDocument();
+      expect(screen.getAllByText('A栋平面图').length).toBeGreaterThan(0);
     });
-    await userEvent.click(screen.getByText('A栋平面图'));
     await waitFor(() => {
       expect(screen.getByText('画布: A栋平面图，资产: 0')).toBeInTheDocument();
     });
@@ -125,9 +124,8 @@ describe('FloorPlanPage', () => {
     ]);
     renderPage();
     await waitFor(() => {
-      expect(screen.getByText('A栋平面图')).toBeInTheDocument();
+      expect(screen.getAllByText('A栋平面图').length).toBeGreaterThan(0);
     });
-    await userEvent.click(screen.getByText('A栋平面图'));
     await waitFor(() => {
       expect(screen.getByText('画布: A栋平面图，资产: 1')).toBeInTheDocument();
     });
