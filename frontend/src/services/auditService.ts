@@ -32,17 +32,11 @@ function serializeFilterParams(params: AuditFilterParams): Record<string, string
   const query: Record<string, string> = {};
 
   if (params.startTime != null && params.startTime !== '') {
-    query.startTime =
-      typeof params.startTime === 'string'
-        ? params.startTime
-        : params.startTime.toISOString();
+    query.startTime = params.startTime;
   }
 
   if (params.endTime != null && params.endTime !== '') {
-    query.endTime =
-      typeof params.endTime === 'string'
-        ? params.endTime
-        : params.endTime.toISOString();
+    query.endTime = params.endTime;
   }
 
   if (params.operationType != null && params.operationType !== '') {
