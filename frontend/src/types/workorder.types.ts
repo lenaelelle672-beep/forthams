@@ -200,8 +200,20 @@ export interface CreateWorkOrderRequest {
   type: WorkOrderType;
   /** 优先级 */
   priority: WorkOrderPriority;
+  /** 关联资产 ID（后端 WorkOrderDTO 字段） */
+  assetId?: number;
+  /** 关联资产名称（后端 WorkOrderDTO 字段） */
+  assetName?: string;
+  /** 关联资产编号（后端 WorkOrderDTO 字段） */
+  assetCode?: string;
   /** 关联资产 ID 列表 */
   assetIds?: number[];
+  /** 负责人 ID（后端 WorkOrderDTO 字段） */
+  assigneeId?: number;
+  /** 预计费用 */
+  estimatedCost?: number;
+  /** 计划完成时间（ISO 8601） */
+  plannedEndDate?: string;
   /** 附件 URL 列表 */
   attachments?: string[];
 }
