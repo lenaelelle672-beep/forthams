@@ -1,6 +1,5 @@
 import React, { useCallback } from 'react';
 import { Tree, Card, Empty, Spin, Typography, Tag } from 'antd';
-import type { TreeProps } from 'antd';
 
 const { Text } = Typography;
 
@@ -58,6 +57,17 @@ export interface InventoryScopeSelectorProps {
   className?: string;
 }
 
+type CheckedTreeKeys =
+  | React.Key[]
+  | {
+      checked: React.Key[];
+      halfChecked?: React.Key[];
+    };
+
+interface CheckedTreeInfo {
+  checkedNodes: IInventoryScopeNode[];
+}
+
 /**
  * InventoryScopeSelector —— 资产盘点范围选择器
  *
@@ -111,7 +121,7 @@ const InventoryScopeSelector: React.FC<InventoryScopeSelectorProps> = React.memo
      * 从 Ant Design Tree 的 onCheck 回调中提取选中的 keys 和节点数据，
      * 并统一标注节点类型后通过 onChange 向上传递。
      */
-    const handleCheck: TreeProps['onCheck'] = useCallback(
+    const handleCheck = useCallback(
       (checkedKeys, info) => {
         if (!onChange) return;
 
@@ -131,7 +141,7 @@ const InventoryScopeSelector: React.FC<InventoryScopeSelectorProps> = React.memo
         onChange(keys, selectedNodes);
       },
       [onChange, type]
-    );
+    ) as (checkedKeys: CheckedTreeKeys, info: CheckedTreeInfo) => void;
 
     /**
      * 自定义树节点渲染函数。
