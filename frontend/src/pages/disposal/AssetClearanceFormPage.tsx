@@ -11,22 +11,29 @@ import { Button } from '@/components/ui/Button';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { getAssetList } from '@/api/asset';
 import { submitClearanceApplication, saveClearanceDraft } from '@/api/disposal';
+import type { ClearanceDraftData } from '@/api/disposal';
 import type { AssetListItem } from '@/types/asset';
 import type { ApiResponse, PageData } from '@/types/common';
+
+const optionalResidualValueSchema = z.preprocess(
+  (value) => (value === '' || value == null ? undefined : value),
+  z.coerce.number().nonnegative('残值不能为负数').optional(),
+);
 
 const schema = z.object({
   clearanceNo: z.string(),
   applicant: z.string(),
   applicationDate: z.string().min(1, '请选择申请日期'),
   clearanceReason: z.string().min(1, '请选择清退原因'),
-  disposalMethod: z.enum(['storage', 'sell', 'donate'], { required_error: '请选择处理方式' }),
-  estimatedResidualValue: z.coerce.number().nonnegative('残值不能为负数').optional(),
+  disposalMethod: z.enum(['storage', 'sell', 'donate'], { message: '请选择处理方式' }),
+  estimatedResidualValue: optionalResidualValueSchema,
   approvalFlow: z.string().min(1, '请选择审批流程'),
-  urgency: z.enum(['normal', 'urgent'], { required_error: '请选择紧急程度' }),
+  urgency: z.enum(['normal', 'urgent'], { message: '请选择紧急程度' }),
   remark: z.string().max(500).optional(),
 });
 
-type FormValues = z.infer<typeof schema>;
+type FormInput = z.input<typeof schema>;
+type FormValues = z.output<typeof schema>;
 
 const CLEARANCE_REASONS = ['设备老化', '技术淘汰', '闲置超过期限', '其他'] as const;
 const APPROVAL_FLOWS = ['标准清退审批流 v2.1', '紧急资产清退流程', '高价值资产清退流程'] as const;
@@ -103,7 +110,7 @@ export default function AssetClearanceFormPage() {
     setValue,
     getValues,
     formState: { errors, isSubmitting },
-  } = useForm<FormValues>({
+  } = useForm<FormInput, unknown, FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
       clearanceNo: 'CLR-20231124-001',
@@ -175,16 +182,25 @@ export default function AssetClearanceFormPage() {
 
   const handleSaveDraft = useCallback(() => {
     const values = getValues();
-    const draft = {
+    const residualValue = optionalResidualValueSchema.safeParse(values.estimatedResidualValue);
+    if (!residualValue.success) {
+      toast.error(residualValue.error.issues[0]?.message ?? '残值格式不正确');
+      return;
+    }
+
+    const draft: ClearanceDraftData = {
       clearanceReason: values.clearanceReason,
       disposalMethod: values.disposalMethod,
-      estimatedResidualValue: values.estimatedResidualValue,
       approvalFlow: values.approvalFlow,
       urgency: values.urgency,
       remark: values.remark ?? '',
       applicationDate: values.applicationDate,
       assetIds: Array.from(selectedAssetIds),
     };
+    if (residualValue.data !== undefined) {
+      draft.estimatedResidualValue = residualValue.data;
+    }
+
     const ok = saveClearanceDraft(draft);
     if (ok) {
       toast.success('草稿保存成功');
