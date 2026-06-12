@@ -17,10 +17,9 @@
  */
 
 import React, { useMemo, useState, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router';
 import {
   Button,
-  Breadcrumb,
   Space,
   Typography,
   Alert,
@@ -64,9 +63,52 @@ import type {
 } from '../../types/inventory';
 
 // --- 国际化文案 ---
-import { t } from '../../locales/zh-CN/inventory';
+import inventoryLocale from '../../locales/zh-CN/inventory';
 
 const { Title, Text } = Typography;
+
+const TRANSLATIONS: Record<string, string> = {
+  actualStatusLabel: inventoryLocale.batchConfirmDialog.actualStatusLabel,
+  assetTableSectionLabel: inventoryLocale.assetTable.title,
+  backToList: '返回列表',
+  batchConfirmDialogTitle: inventoryLocale.batchConfirmDialog.title,
+  batchConfirmError: inventoryLocale.messages.batchConfirmFailed,
+  batchConfirmLimitWarning: '单次批量确认上限 {limit} 条，已自动截断',
+  batchConfirmStatusTip: inventoryLocale.batchConfirmDialog.actualStatusRequired,
+  batchConfirmSuccess: inventoryLocale.messages.batchConfirmSuccess,
+  batchSelectedInfo: '将对 {count} 条资产统一设置实盘状态',
+  breadcrumbDetail: inventoryLocale.module.breadcrumb.detail,
+  breadcrumbRoot: inventoryLocale.module.breadcrumb.root,
+  cancel: inventoryLocale.batchConfirmDialog.actions.cancel,
+  confirm: inventoryLocale.batchConfirmDialog.actions.confirm,
+  confirmBatch: inventoryLocale.assetTable.batchToolbar.batchConfirmBtn,
+  diffSummarySectionLabel: inventoryLocale.differencePanel.title,
+  draftStatusMessage: inventoryLocale.readOnly.draftHint,
+  draftWarning: inventoryLocale.readOnly.draftHint,
+  draftWarningTip: inventoryLocale.readOnly.draftHint,
+  loadFailed: inventoryLocale.messages.loadFailed,
+  loading: inventoryLocale.messages.loading,
+  pleaseSelectActualStatus: inventoryLocale.batchConfirmDialog.actualStatusRequired,
+  progressSectionLabel: inventoryLocale.progressSummary.progressLabel,
+  readOnlyBadge: '只读',
+  readOnlyTip: inventoryLocale.readOnly.draftHint,
+  remarkLabel: inventoryLocale.batchConfirmDialog.remarkLabel,
+  remarkPlaceholder: inventoryLocale.batchConfirmDialog.remarkPlaceholder,
+  selectedAssetsCount: inventoryLocale.assetTable.batchToolbar.selectedCount,
+  submitApproval: inventoryLocale.submitApprovalDialog.actions.confirm,
+  submitConfirmMessage: inventoryLocale.submitApprovalDialog.message,
+  submitConfirmTitle: inventoryLocale.submitApprovalDialog.title,
+  submitError: inventoryLocale.messages.submitFailed,
+  submitSuccess: inventoryLocale.messages.submitSuccess,
+  taskNotFound: '未找到盘点任务',
+};
+
+function t(key: string, params: Record<string, string | number> = {}): string {
+  const template = TRANSLATIONS[key] ?? key;
+  return template.replace(/\{(\w+)\}/g, (_match, name: string) =>
+    String(params[name] ?? `{${name}}`),
+  );
+}
 
 // ---------------------------------------------------------------------------
 // 常量
@@ -141,9 +183,9 @@ export default function TaskDetailPage() {
   } = useSummary(taskId);
 
   // --- React Query 变更 mutations ---
-  const confirmMutation = useConfirmMutation(taskId);
-  const batchConfirmMutation = useBatchConfirmMutation(taskId);
-  const submitMutation = useSubmitMutation(taskId);
+  const confirmMutation = useConfirmMutation();
+  const batchConfirmMutation = useBatchConfirmMutation();
+  const submitMutation = useSubmitMutation();
 
   // --- 只读级别 ---
   const readOnlyLevel = useMemo(
@@ -188,7 +230,14 @@ export default function TaskDetailPage() {
       }
 
       batchConfirmMutation.mutate(
-        { assetIds, actualStatus, remark },
+        {
+          taskId,
+          payload: {
+            assetIds,
+            actualStatus,
+            remark,
+          },
+        },
         {
           onSuccess: () => {
             message.success(t('batchConfirmSuccess'));
@@ -253,20 +302,24 @@ export default function TaskDetailPage() {
   return (
     <div className="max-w-7xl mx-auto p-6 pb-20">
       {/* ---- 面包屑导航 ---- */}
-      <Breadcrumb
-        className="mb-4"
-        items={[
-          {
-            title: (
-              <a onClick={() => navigate('/inventory')}>
-                <HomeOutlined /> {t('breadcrumbRoot')}
-              </a>
-            ),
-          },
-          { title: t('breadcrumbDetail') },
-          { title: task.taskName },
-        ]}
-      />
+      <nav className="mb-4 text-sm text-gray-500" aria-label="breadcrumb">
+        <ol className="flex flex-wrap items-center gap-2">
+          <li>
+            <button
+              type="button"
+              className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-700"
+              onClick={() => navigate('/inventory')}
+            >
+              <HomeOutlined />
+              <span>{t('breadcrumbRoot')}</span>
+            </button>
+          </li>
+          <li aria-hidden="true">/</li>
+          <li>{t('breadcrumbDetail')}</li>
+          <li aria-hidden="true">/</li>
+          <li className="text-gray-700">{task.taskName}</li>
+        </ol>
+      </nav>
 
       {/* ---- 页头：返回 + 标题 + 操作按钮 ---- */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
@@ -357,10 +410,10 @@ export default function TaskDetailPage() {
       <section aria-label={t('assetTableSectionLabel')} className="mb-6">
         {!isReadOnly && !isDraft && (
           <AssetTableToolbar
-            taskId={taskId}
-            selectedCount={selectedAssetIds.length}
+            selectedAssetIds={selectedAssetIds}
+            readOnly={isReadOnly || !!isDraft}
             onBatchConfirm={() => setBatchDialogOpen(true)}
-            batchConfirmLoading={batchConfirmMutation.isPending}
+            loading={batchConfirmMutation.isPending}
           />
         )}
         <AssetTable

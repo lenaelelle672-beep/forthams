@@ -30,9 +30,9 @@ import type { TableRowSelection } from 'antd/es/table/interface';
 
 import type { InventoryAsset, ActualStatus } from '../../types/inventory';
 import {
-  useInventoryAssets,
-  useConfirmAsset,
-  useBatchConfirmAssets,
+  useAssets,
+  useConfirmMutation,
+  useBatchConfirmMutation,
 } from '../../hooks/useInventory';
 import { useInventoryStore } from '../../stores/useInventoryStore';
 
@@ -166,16 +166,16 @@ const AssetTable: React.FC<AssetTableProps> = ({
   // =========================================================================
 
   /** 获取任务下资产清单（分页） */
-  const { data: assetsResponse, isLoading } = useInventoryAssets(taskId, {
+  const { data: assetsResponse, isLoading } = useAssets(taskId, {
     page: pagination.current,
     pageSize: pagination.pageSize,
   });
 
   /** 逐条确认 mutation */
-  const confirmMutation = useConfirmAsset();
+  const confirmMutation = useConfirmMutation();
 
   /** 批量确认 mutation */
-  const batchConfirmMutation = useBatchConfirmAssets();
+  const batchConfirmMutation = useBatchConfirmMutation();
 
   // =========================================================================
   // Derived state
@@ -245,21 +245,23 @@ const AssetTable: React.FC<AssetTableProps> = ({
    */
   const handleConfirm = useCallback(
     (asset: InventoryAsset) => {
-      const edit = getRowEdit(asset.id);
+      const edit = getRowEdit(asset.assetId);
 
       if (!edit.actualStatus) {
         message.warning('请先选择实盘状态');
         return;
       }
 
-      setConfirmingAssetId(asset.id);
+      setConfirmingAssetId(asset.assetId);
 
       confirmMutation.mutate(
         {
           taskId,
-          assetId: asset.id,
-          actualStatus: edit.actualStatus,
-          remark: edit.remark,
+          assetId: asset.assetId,
+          payload: {
+            actualStatus: edit.actualStatus,
+            remark: edit.remark,
+          },
         },
         {
           onSuccess: () => {
@@ -267,7 +269,7 @@ const AssetTable: React.FC<AssetTableProps> = ({
             // 清除该行临时编辑状态
             setRowEdits((prev) => {
               const next = { ...prev };
-              delete next[asset.id];
+              delete next[asset.assetId];
               return next;
             });
           },
@@ -325,9 +327,11 @@ const AssetTable: React.FC<AssetTableProps> = ({
     batchConfirmMutation.mutate(
       {
         taskId,
-        assetIds,
-        actualStatus: batchActualStatus,
-        remark: batchRemark,
+        payload: {
+          assetIds,
+          actualStatus: batchActualStatus,
+          remark: batchRemark,
+        },
       },
       {
         onSuccess: () => {
@@ -420,7 +424,7 @@ const AssetTable: React.FC<AssetTableProps> = ({
           }
 
           // ---- 可编辑：下拉选择 ----
-          const edit = getRowEdit(record.id);
+          const edit = getRowEdit(record.assetId);
           return (
             <Select
               placeholder="请选择"
@@ -429,7 +433,7 @@ const AssetTable: React.FC<AssetTableProps> = ({
               options={ACTUAL_STATUS_OPTIONS}
               value={edit.actualStatus}
               onChange={(val: ActualStatus) =>
-                updateRowEdit(record.id, { actualStatus: val })
+                updateRowEdit(record.assetId, { actualStatus: val })
               }
               aria-label={`实盘状态选择-${record.assetCode}`}
             />
@@ -452,7 +456,7 @@ const AssetTable: React.FC<AssetTableProps> = ({
           }
 
           // ---- 可编辑：输入框（0-200 字符） ----
-          const edit = getRowEdit(record.id);
+          const edit = getRowEdit(record.assetId);
           return (
             <Input
               size="small"
@@ -460,7 +464,7 @@ const AssetTable: React.FC<AssetTableProps> = ({
               maxLength={200}
               value={edit.remark}
               onChange={(e) =>
-                updateRowEdit(record.id, { remark: e.target.value })
+                updateRowEdit(record.assetId, { remark: e.target.value })
               }
               aria-label={`备注输入-${record.assetCode}`}
             />
@@ -478,7 +482,7 @@ const AssetTable: React.FC<AssetTableProps> = ({
             return null;
           }
 
-          const isConfirming = confirmingAssetId === record.id;
+          const isConfirming = confirmingAssetId === record.assetId;
 
           return (
             <Button
@@ -579,7 +583,7 @@ const AssetTable: React.FC<AssetTableProps> = ({
       <Table<InventoryAsset>
         columns={columns}
         dataSource={assets}
-        rowKey="id"
+        rowKey="assetId"
         loading={isLoading}
         rowSelection={rowSelection}
         scroll={
