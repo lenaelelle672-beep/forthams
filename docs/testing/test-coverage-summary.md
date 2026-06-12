@@ -7,7 +7,7 @@
 | 前端单元测试 | `cd frontend && npm test -- --run` | 14 个测试文件，634 个测试通过 |
 | 前端构建 | `cd frontend && npm run build` | 通过 |
 | 浏览器冒烟测试 | `cd frontend && npm run e2e -- --reporter=line` | 15 个测试通过 |
-| 真实后端 E2E | `cd frontend && npm run e2e:real -- --reporter=line` | 6 个测试通过，含核心导航、顶栏点击、流程中心、流程定义保存/发布、工单审批与资产退役 API 闭环 |
+| 真实后端 E2E | `cd frontend && npm run e2e:real -- --reporter=line` | 8 个测试通过，含核心导航、顶栏点击、流程中心、流程定义保存/发布、工单审批、资产退役 API 闭环、赔偿页面与大屏页面 |
 | 后端测试 | `cd backend && mvn test` | 98 个测试通过 |
 | 流程定义服务测试 | `cd backend && mvn -q -Dtest=WorkflowDefinitionServiceTest test` | 6 个测试通过，覆盖默认列表、保存草稿、发布、启停、未发布拦截 |
 | 赔偿流程发布与估值 | `cd backend && mvn -q -Dtest=CompensationServiceTest,WorkflowDefinitionServiceTest test` | 通过，赔偿提交必须存在已发布 `ASSET_COMPENSATION` 流程；缺金额时按资产当前价值/原值自动估值 |
