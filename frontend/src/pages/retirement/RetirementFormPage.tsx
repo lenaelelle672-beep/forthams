@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useNavigate, useLocation } from 'react-router';
@@ -31,7 +31,8 @@ const schema = z.object({
   notes: z.string().max(1000).optional(),
 });
 
-type FormValues = z.infer<typeof schema>;
+type FormInput = z.input<typeof schema>;
+type FormValues = z.output<typeof schema>;
 
 const DEPRECIATION_BARS = [
   90, 80, 70, 60, 50, 45, 40, 35, 30, 28, 25, 20,
@@ -49,7 +50,7 @@ export default function RetirementFormPage() {
     handleSubmit,
     watch,
     formState: { errors, isSubmitting },
-  } = useForm<FormValues>({
+  } = useForm<FormInput, unknown, FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
       assetId: prefilledAssetId ?? undefined,
@@ -77,7 +78,7 @@ export default function RetirementFormPage() {
   const assetResults = (assetRes as PaginatedResponse<AssetListItem> | undefined)?.data?.records ?? [];
   const foundAsset: AssetListItem | null = assetResults[0] ?? null;
 
-  const onSubmit = (values: FormValues) => {
+  const onSubmit: SubmitHandler<FormValues> = (values) => {
     mutation.mutate({
       assetId: values.assetId,
       reason: values.reason,

@@ -11,7 +11,8 @@ import { toast } from 'sonner';
 import { getWorkOrderList } from '@/api/workorder';
 import http from '@/utils/http';
 import type { PaginatedResponse } from '@/types/common';
-import type { WorkOrderListItem } from '@/types/workorder';
+import { WorkOrderStatus } from '@/types/workorder';
+import type { WorkOrderListItem, WorkOrderListQuery } from '@/types/workorder';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { FilterBar } from '@/components/ui/FilterBar';
@@ -20,14 +21,12 @@ import { Badge } from '@/components/ui/Badge';
 import { PageHeader } from '@/components/ui/PageHeader';
 
 const WO_STATUS_OPTIONS = [
-  { key: 'PENDING',           label: '待审批'   },
-  { key: 'APPROVING_LEVEL_1', label: '一级审批中' },
-  { key: 'APPROVING_LEVEL_2', label: '二级审批中' },
-  { key: 'APPROVED',          label: '已通过'   },
-  { key: 'IN_PROGRESS',       label: '进行中'   },
-  { key: 'COMPLETED',         label: '已完成'   },
-  { key: 'REJECTED',          label: '已驳回'   },
-  { key: 'CANCELLED',         label: '已取消'   },
+  { key: WorkOrderStatus.PENDING,           label: '待审批'   },
+  { key: WorkOrderStatus.APPROVING_LEVEL_1, label: '一级审批中' },
+  { key: WorkOrderStatus.APPROVING_LEVEL_2, label: '二级审批中' },
+  { key: WorkOrderStatus.APPROVED,          label: '已通过'   },
+  { key: WorkOrderStatus.REJECTED,          label: '已驳回'   },
+  { key: WorkOrderStatus.CANCELLED,         label: '已取消'   },
 ];
 
 const STATUS_BADGE: Record<string, { label: string; variant: 'default' | 'success' | 'warning' | 'danger' | 'gray' }> = {
@@ -48,7 +47,7 @@ const PRIORITY_LABEL: Record<string, string> = {
 
 export default function WorkOrderListPage() {
   const navigate = useNavigate();
-  const [params, setParams] = useState<{ page: number; pageSize: number; keyword?: string; status?: string }>({ page: 1, pageSize: 20 });
+  const [params, setParams] = useState<WorkOrderListQuery>({ page: 1, pageSize: 20 });
   const [exporting, setExporting] = useState(false);
 
   const { data: res, isLoading } = useQuery({
@@ -173,11 +172,11 @@ export default function WorkOrderListPage() {
             placeholder="搜索工单号、标题..."
             onSearch={(keyword) => setParams((p) => ({ ...p, keyword, page: 1 }))}
             quickFilters={WO_STATUS_OPTIONS}
-            activeFilter={params.status}
+            activeFilter={Array.isArray(params.status) ? undefined : params.status}
             onFilterChange={(key) =>
               setParams((p) => ({
                 ...p,
-                status: key === 'all' ? undefined : key,
+                status: key === 'all' ? undefined : (key as WorkOrderStatus),
                 page: 1,
               }))
             }
