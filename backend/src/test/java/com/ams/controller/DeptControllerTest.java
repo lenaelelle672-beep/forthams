@@ -41,6 +41,21 @@ class DeptControllerTest {
     private DeptService deptService;
 
     @Test
+    @DisplayName("Should return dept list from root endpoint")
+    void testRootList() throws Exception {
+        Map<String, Object> deptMap = Map.of("id", 1, "deptName", "IT Department");
+        when(deptService.queryDepts(null)).thenReturn(List.of(deptMap));
+
+        mockMvc.perform(get("/depts")
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.code").value(200))
+            .andExpect(jsonPath("$.data").isArray());
+
+        verify(deptService).queryDepts(null);
+    }
+
+    @Test
     @DisplayName("Should return dept list with keyword filter")
     void testList() throws Exception {
         Map<String, Object> deptMap = Map.of("id", 1, "name", "IT Department");

@@ -151,7 +151,7 @@ export default function InventoryTasksPage() {
       },
     },
     {
-      key: 'scopeType',
+      key: 'scopeName',
       title: '范围',
       width: 140,
       render: (v, row) => (
@@ -207,7 +207,7 @@ export default function InventoryTasksPage() {
       },
     },
     {
-      key: 'taskId',
+      key: 'actions',
       title: '操作',
       width: 100,
       align: 'right',

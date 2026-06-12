@@ -21,7 +21,7 @@ public class ApprovalController {
     private final ApprovalService approvalService;
     private final JwtUtil jwtUtil;
 
-    @GetMapping("/list")
+    @GetMapping({"", "/list"})
     public Result<Page<ApprovalProcess>> list(
             @RequestParam(defaultValue = "1") Integer page,
             @RequestParam(defaultValue = "10") Integer pageSize,

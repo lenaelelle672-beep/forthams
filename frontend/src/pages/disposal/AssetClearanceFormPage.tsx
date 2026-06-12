@@ -230,9 +230,14 @@ export default function AssetClearanceFormPage() {
           { label: '清退申请' },
         ]}
         actions={
-          <Button variant="ghost" size="md" onClick={() => navigate(-1)}>
-            <ArrowLeft className="w-4 h-4" /> 返回
-          </Button>
+          <>
+            <Button variant="outline" size="md" type="button" onClick={() => navigate('/workflow-designer?businessType=ASSET_CLEARANCE')}>
+              配置流程
+            </Button>
+            <Button variant="ghost" size="md" type="button" onClick={() => navigate(-1)}>
+              <ArrowLeft className="w-4 h-4" /> 返回
+            </Button>
+          </>
         }
       />
 

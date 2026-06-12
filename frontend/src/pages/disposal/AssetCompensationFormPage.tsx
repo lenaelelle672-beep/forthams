@@ -242,13 +242,18 @@ export default function AssetCompensationFormPage() {
       <PageHeader
         title="资产赔偿申请"
         breadcrumbs={[
-          { label: '资产处置', href: '/disposal' },
+          { label: '资产处置', href: '/disposals' },
           { label: '赔偿申请' },
         ]}
         actions={
-          <Button variant="ghost" size="md" onClick={() => navigate(-1)}>
-            返回
-          </Button>
+          <>
+            <Button variant="outline" size="md" type="button" onClick={() => navigate('/workflow-designer?businessType=ASSET_COMPENSATION')}>
+              配置流程
+            </Button>
+            <Button variant="ghost" size="md" type="button" onClick={() => navigate(-1)}>
+              返回
+            </Button>
+          </>
         }
       />
 
