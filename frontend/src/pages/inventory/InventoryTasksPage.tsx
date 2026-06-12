@@ -15,7 +15,7 @@ import {
   BarChart3,
 } from 'lucide-react';
 import { getInventoryTasks, createInventoryTask } from '@/api/inventory';
-import type { InventoryTaskStatus, CreateTaskPayload, InventoryTask } from '@/types/inventory';
+import type { InventoryTaskStatus, InventoryTask, ScopeType } from '@/types/inventory';
 import type { PaginatedResponse } from '@/types/common';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -50,6 +50,18 @@ const SUMMARY_CARDS = [
   { label: '待开始', statusKey: 'draft' as const, color: 'text-[#727784]', bg: 'bg-slate-50', icon: Clock },
 ] as const;
 
+type InventoryTaskRow = InventoryTask & {
+  id?: string | number;
+  scopeName?: string;
+  endDate?: string;
+};
+
+interface CreateTaskDraft {
+  taskName: string;
+  scopeType: ScopeType;
+  scopeIds: string[];
+}
+
 function ProgressBar({ value }: { value: number }) {
   const pct = Math.min(Math.max(value, 0), 100);
   return (
@@ -72,7 +84,7 @@ export default function InventoryTasksPage() {
   const [params, setParams] = useState<{ page: number; pageSize: number; status?: string }>({ page: 1, pageSize: 20 });
   const [filterOpen, setFilterOpen] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
-  const [newTask, setNewTask] = useState<Partial<CreateTaskPayload>>({
+  const [newTask, setNewTask] = useState<CreateTaskDraft>({
     taskName: '', scopeType: 'all', scopeIds: [],
   });
 
@@ -92,8 +104,8 @@ export default function InventoryTasksPage() {
     },
   });
 
-  const records = (res as PaginatedResponse<InventoryTask> | undefined)?.data?.records ?? [];
-  const total = (res as PaginatedResponse<InventoryTask> | undefined)?.data?.total ?? 0;
+  const records = (res as PaginatedResponse<InventoryTaskRow> | undefined)?.data?.records ?? [];
+  const total = (res as PaginatedResponse<InventoryTaskRow> | undefined)?.data?.total ?? 0;
 
   const statusCounts = records.reduce<Record<string, number>>((acc, r) => {
     acc[r.status] = (acc[r.status] || 0) + 1;
@@ -434,8 +446,19 @@ export default function InventoryTasksPage() {
               onClick={() =>
                 createMutation.mutate({
                   taskName: newTask.taskName!,
-                  scopeType: newTask.scopeType ?? 'all',
-                  scopeIds: newTask.scopeIds ?? [],
+                  inventoryType: newTask.scopeType,
+                  scope:
+                    newTask.scopeType === 'all'
+                      ? 'all'
+                      : newTask.scopeIds.join(','),
+                  location:
+                    newTask.scopeType === 'location'
+                      ? newTask.scopeIds.join(',')
+                      : undefined,
+                  deptIds:
+                    newTask.scopeType === 'category'
+                      ? newTask.scopeIds.join(',')
+                      : undefined,
                 })
               }
             >
