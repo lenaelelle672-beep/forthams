@@ -223,7 +223,7 @@ export default function DisposalListPage() {
     <div className="space-y-6">
       <PageHeader
         title="资产处置管理"
-        description="统一管理资产调拨、清退、报废、赔偿等全生命周期处置流程"
+        subtitle="统一管理资产调拨、清退、报废、赔偿等全生命周期处置流程"
         actions={
           <Button
             variant="primary"
