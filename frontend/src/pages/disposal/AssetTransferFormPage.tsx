@@ -53,14 +53,14 @@ const PRIORITY_LABELS: Record<string, string> = {
 };
 
 /** Flatten tree nodes into a flat list for dropdown rendering */
-function flattenTree<T extends { children?: T[]; id: number; [key: string]: unknown }>(
+function flattenTree<T extends { children?: T[]; id: number }>(
   nodes: T[],
-  labelKey: string,
+  labelKey: keyof T,
   depth = 0,
 ): Array<{ id: number; label: string; depth: number }> {
   const result: Array<{ id: number; label: string; depth: number }> = [];
   for (const node of nodes) {
-    const label = (node as Record<string, unknown>)[labelKey] as string;
+    const label = String(node[labelKey] ?? '');
     result.push({ id: node.id, label, depth });
     if (node.children?.length) {
       result.push(...flattenTree(node.children, labelKey, depth + 1));

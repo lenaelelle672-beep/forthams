@@ -186,7 +186,7 @@ export default function ReportsPage() {
   );
 
   // ── 图表数据映射 ────────────────────────────────────────────────────────────
-  const chartData = useMemo(() => {
+  const chartData = useMemo<Record<string, unknown>[]>(() => {
     if (!selectedReportData) return [];
 
     switch (selectedReportData.id) {
@@ -259,7 +259,7 @@ export default function ReportsPage() {
         // AC-2: 从后端获取真实工单状态分布数据
         const statusData = (workOrderStatusRes as ApiResponse<NameValueItem[]> | undefined)?.data;
         if (statusData && statusData.length > 0) {
-          return statusData;
+          return statusData.map((item) => ({ name: item.name, value: item.value }));
         }
         return [];
       }
@@ -267,7 +267,7 @@ export default function ReportsPage() {
         // AC-2: 从后端获取真实部门待处理工单数据
         const deptData = (workOrderDeptPendingRes as ApiResponse<NameValueItem[]> | undefined)?.data;
         if (deptData && deptData.length > 0) {
-          return deptData;
+          return deptData.map((item) => ({ name: item.name, value: item.value }));
         }
         return [];
       }
