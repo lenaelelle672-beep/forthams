@@ -37,6 +37,12 @@ import { Select, SelectItem } from '@/components/ui/Select';
 import { Input } from '@/components/ui/Input';
 import { Skeleton } from '@/components/ui/Skeleton';
 
+type InventoryTaskView = InventoryTask & {
+  assigneeName?: string;
+  executorName?: string;
+  executorId?: string | number | null;
+};
+
 const ACTUAL_STATUS_OPTIONS: Array<{ value: ActualStatus; label: string; variant: any }> = [
   { value: 'normal', label: '正常', variant: 'success' },
   { value: 'surplus', label: '盘盈', variant: 'default' },
@@ -125,7 +131,7 @@ export default function InventoryDetailPage() {
     },
   });
 
-  const task = (taskRes as ApiResponse<InventoryTask> | undefined)?.data;
+  const task = (taskRes as ApiResponse<InventoryTaskView> | undefined)?.data;
   const records = (assetsRes as PaginatedResponse<InventoryAsset> | undefined)?.data?.records ?? [];
   const total = (assetsRes as PaginatedResponse<InventoryAsset> | undefined)?.data?.total ?? 0;
   const summary = (summaryRes as ApiResponse<InventorySummary> | undefined)?.data;
@@ -134,8 +140,12 @@ export default function InventoryDetailPage() {
   const progressPct = task?.progress ?? 0;
   const countedAssets = task?.countedAssets ?? 0;
   const totalAssets = task?.totalAssets ?? 0;
-  const normalCount = summary?.normalCount ?? 0;
-  const abnormalCount = summary?.abnormalCount ?? 0;
+  const abnormalCount = (summary?.surplusCount ?? 0) + (summary?.deficitCount ?? 0);
+  const normalCount = Math.max(countedAssets - abnormalCount, 0);
+  const assigneeLabel =
+    task?.assigneeName ??
+    task?.executorName ??
+    (task?.executorId != null ? `执行人 #${task.executorId}` : '—');
 
   const columns: Column<any>[] = [
     {
@@ -421,7 +431,7 @@ export default function InventoryDetailPage() {
           <div className="h-10 w-px bg-[#e5e7eb]" />
           <div className="flex flex-col">
             <span className="text-[10px] text-[#64748b] uppercase tracking-wider">当前盘点人</span>
-            <span className="text-[13px] text-[#161c27]">{task?.assigneeName ?? '—'} 等人正在作业</span>
+            <span className="text-[13px] text-[#161c27]">{assigneeLabel} 等人正在作业</span>
           </div>
         </div>
         <div className="flex gap-6">
