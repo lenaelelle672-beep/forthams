@@ -18,29 +18,73 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import type { AxiosResponse, AxiosError } from 'axios';
-import { approvalService } from './approvalService';
-import type {
-  OrderStatus,
-  WorkOrder,
-  ApprovalRecord,
-  ApprovalActionResponse,
-} from '../types/approval';
+import type { AxiosError } from 'axios';
+import { approvalService as approvalServiceRaw } from './approvalService';
 
 // ---------------------------------------------------------------------------
 // Type aliases for test compatibility — map old names to actual types
 // ---------------------------------------------------------------------------
 
-/** @deprecated Use ApprovalListItem from workorder.types instead */
-type PendingApprovalItem = any;
-/** @deprecated Use ApproveWorkOrderRequest instead */
-type ApprovalActionRequest = { version: number; comment?: string };
-/** @deprecated Use RejectWorkOrderRequest instead */
-type RejectActionRequest = { version: number; rejectionReason: string };
-/** @deprecated Use PaginatedResponse<ApprovalListItem> instead */
-type ApprovalListResponse = { items: PendingApprovalItem[]; total: number; page: number; pageSize: number };
-/** @deprecated Use WorkOrderDetailResponse instead */
+type OrderStatus =
+  | 'PENDING'
+  | 'APPROVING_LEVEL_1'
+  | 'APPROVING_LEVEL_2'
+  | 'APPROVED'
+  | 'REJECTED'
+  | 'CANCELLED';
+type ApprovalAction = 'APPROVE' | 'REJECT' | 'CANCEL';
+type ApprovalLevel = 1 | 2;
+type WorkOrder = {
+  id: string;
+  orderNo: string;
+  title: string;
+  status: OrderStatus;
+  version: number;
+  applicantId: string;
+  applicantName: string;
+  departmentId: string;
+  submittedAt: string;
+  createdAt: string;
+  updatedAt: string;
+};
+type ApprovalRecord = {
+  id: string;
+  orderId: string;
+  operatorId: string;
+  operatorName: string;
+  action: ApprovalAction;
+  level?: ApprovalLevel;
+  comment: string;
+  createdAt: string;
+};
+type PendingApprovalItem = {
+  id: string;
+  orderNo: string;
+  applicantName: string;
+  submittedAt: string;
+  status: Extract<OrderStatus, 'APPROVING_LEVEL_1' | 'APPROVING_LEVEL_2'>;
+};
+type ApprovalListResponse = {
+  items: PendingApprovalItem[];
+  total: number;
+  page?: number;
+  pageSize?: number;
+};
 type ApprovalDetailResponse = { workOrder: WorkOrder; approvalRecords: ApprovalRecord[] };
+type ApprovalActionResponse = { workOrder: WorkOrder; approvalRecord: ApprovalRecord };
+type ApprovalServiceTestAdapter = {
+  getPendingApprovals(role: string, query?: Record<string, unknown>): Promise<ApprovalListResponse>;
+  getApprovalDetail(orderId: string | number): Promise<ApprovalDetailResponse>;
+  approveOrder(orderId: string | number, version: number): Promise<ApprovalActionResponse>;
+  rejectOrder(
+    orderId: string | number,
+    version: number,
+    rejectionReason: string,
+  ): Promise<ApprovalActionResponse>;
+  cancelOrder(orderId: string | number, version: number): Promise<ApprovalActionResponse>;
+};
+
+const approvalService = approvalServiceRaw as ApprovalServiceTestAdapter;
 
 // ---------------------------------------------------------------------------
 // Mock setup
