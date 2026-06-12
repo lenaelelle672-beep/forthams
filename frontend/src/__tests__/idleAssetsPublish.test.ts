@@ -19,6 +19,8 @@ const publishSchema = z.object({
   }, '认领截止日期必须在今天之后'),
 });
 
+type PublishParseResult = ReturnType<typeof publishSchema.safeParse>;
+
 // Helper to get far-future date string (always valid)
 function futureDateStr(daysFromNow = 30): string {
   const d = new Date();
@@ -27,7 +29,7 @@ function futureDateStr(daysFromNow = 30): string {
 }
 
 // Helper to find a field error by path
-function findFieldError(result: z.SafeParseReturnType<any, any>, field: string) {
+function findFieldError(result: PublishParseResult, field: string) {
   if (result.success) return undefined;
   return result.error.issues.find(i => i.path[0] === field);
 }
