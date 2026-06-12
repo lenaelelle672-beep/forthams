@@ -1,7 +1,14 @@
 import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
-import type { AuditLog } from '@/types/audit.types';
 import type { GraphifyNode } from '@/components/audit/GraphifyKnowledgeGraph';
 import { useAuditLog } from './useAuditLog';
+
+export interface AuditLog {
+  id: string | number;
+  timestamp: string;
+  operationType: string;
+  operator: string;
+  changes?: Record<string, { oldValue?: unknown; newValue?: unknown } | unknown>;
+}
 
 interface UseAuditLogsOptions {
   autoLoad?: boolean;
@@ -367,4 +374,4 @@ export function useAuditLogs(
   };
 }
 
-export type { AuditLog, GraphifyNode };
+export type { GraphifyNode };
