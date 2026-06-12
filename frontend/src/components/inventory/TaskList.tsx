@@ -13,9 +13,8 @@
  */
 
 import React, { useState, useCallback } from 'react';
-import {
+import AntdComponents, {
   Card,
-  List,
   Tag,
   Button,
   Input,
@@ -25,7 +24,6 @@ import {
   Spin,
   Space,
   Select,
-  Pagination,
   Tooltip,
 } from 'antd';
 import {
@@ -35,7 +33,6 @@ import {
   ClockCircleOutlined,
   SyncOutlined,
   CheckCircleOutlined,
-  SendOutlined,
   EnvironmentOutlined,
   AppstoreOutlined,
   GlobalOutlined,
@@ -103,6 +100,11 @@ export interface TaskListProps {
 /** 每页条数 — 对齐 SPEC 交互约束 1（每页 20 条） */
 const PAGE_SIZE = 20;
 
+const { List, Pagination } = AntdComponents as {
+  List: any;
+  Pagination: any;
+};
+
 /** 状态配置映射 */
 const STATUS_MAP: Record<
   TaskStatus,
@@ -126,7 +128,7 @@ const STATUS_MAP: Record<
   submitted: {
     label: '已提交',
     color: 'purple',
-    icon: <SendOutlined />,
+    icon: <CheckCircleOutlined />,
   },
 };
 
