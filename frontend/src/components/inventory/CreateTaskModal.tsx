@@ -1,7 +1,8 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Modal, Form, Input, message } from 'antd';
 import ScopeSelector from './ScopeSelector';
-import { createTask } from '@/api/inventory';
+import { createInventoryTask, type InventoryTaskRecord } from '@/api/inventory';
+import type { ApiResponse } from '@/types/common';
 import type { ScopeType } from '@/types/inventory';
 
 // ---------------------------------------------------------------------------
@@ -19,6 +20,10 @@ interface TaskFormValues {
   taskName: string;
   scope: ScopeValue;
 }
+
+type CreatedTaskResponse =
+  | ApiResponse<Partial<InventoryTaskRecord> & { taskId?: string | number }>
+  | (Partial<InventoryTaskRecord> & { taskId?: string | number });
 
 /** 新建盘点任务弹窗组件属性 */
 export interface CreateTaskModalProps {
@@ -87,8 +92,12 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
   onClose,
   onSuccess,
 }) => {
-  const [form] = Form.useForm<TaskFormValues>();
+  const [form] = Form.useForm();
   const [submitting, setSubmitting] = useState(false);
+  const [scope, setScope] = useState<ScopeValue>({
+    scopeType: 'location',
+    scopeIds: [],
+  });
 
   /**
    * 使用 ref 配合 state 实现防重复提交。
@@ -98,6 +107,22 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
    * ref 的赋值是同步的，可覆盖这一竞态窗口。
    */
   const submittingRef = useRef(false);
+
+  useEffect(() => {
+    if (!open) return;
+
+    const initialScope: ScopeValue = { scopeType: 'location', scopeIds: [] };
+    setScope(initialScope);
+    form.setFieldsValue({ taskName: '', scope: initialScope });
+  }, [form, open]);
+
+  const handleScopeChange = useCallback(
+    (nextScope: ScopeValue) => {
+      setScope(nextScope);
+      form.setFieldsValue({ scope: nextScope });
+    },
+    [form],
+  );
 
   /**
    * 处理"确定"按钮点击
@@ -112,20 +137,34 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
     if (submittingRef.current) return;
 
     try {
-      const values = await form.validateFields();
+      const values = (await form.validateFields()) as TaskFormValues;
 
       // 校验通过后才锁定，避免校验失败时也进入 loading
       submittingRef.current = true;
       setSubmitting(true);
 
-      const result = await createTask({
+      const result = (await createInventoryTask({
         taskName: values.taskName.trim(),
-        scopeType: values.scope.scopeType,
-        scopeIds: values.scope.scopeIds,
-      });
+        inventoryType: values.scope.scopeType,
+        scope:
+          values.scope.scopeType === 'all'
+            ? 'all'
+            : values.scope.scopeIds.join(','),
+        location:
+          values.scope.scopeType === 'location'
+            ? values.scope.scopeIds.join(',')
+            : undefined,
+        deptIds:
+          values.scope.scopeType === 'category'
+            ? values.scope.scopeIds.join(',')
+            : undefined,
+      })) as CreatedTaskResponse;
+      const createdTask = 'data' in result ? result.data : result;
+      const createdTaskId =
+        createdTask.taskId ?? createdTask.id ?? createdTask.taskNo ?? '';
 
       message.success('盘点任务创建成功');
-      onSuccess(result.taskId);
+      onSuccess(String(createdTaskId));
       onClose();
     } catch (error: unknown) {
       if (isFormValidationError(error)) {
@@ -210,7 +249,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
             },
           ]}
         >
-          <ScopeSelector />
+          <ScopeSelector value={scope} onChange={handleScopeChange} />
         </Form.Item>
       </Form>
     </Modal>
