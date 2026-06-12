@@ -23,6 +23,16 @@ const STATUS_LABEL: Record<DisposalStatus, string> = {
   COMPLETED: '已完成',
 };
 
+type ApprovalStepStatus = 'done' | 'active' | 'pending';
+
+interface ApprovalStep {
+  label: string;
+  time: string;
+  operator: string;
+  comment?: string;
+  status: ApprovalStepStatus;
+}
+
 function StatusBadge({ status }: { status: string }) {
   if (status === '待审批') {
     return (
@@ -48,7 +58,7 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
-function ApprovalTimeline({ steps }: { steps: { label: string; time: string; operator: string; comment?: string; status: 'done' | 'active' | 'pending' }[] }) {
+function ApprovalTimeline({ steps }: { steps: ApprovalStep[] }) {
   return (
     <div className="relative space-y-8 before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-[2px] before:bg-[#c2c6d5]">
       {steps.map((step) => (
@@ -101,11 +111,11 @@ function ApprovalTimeline({ steps }: { steps: { label: string; time: string; ope
  * 根据处置状态推导审批步骤时间线
  */
 function buildApprovalSteps(status: DisposalStatus) {
-  const steps = [
-    { label: '申请提交', time: '', operator: '', status: 'pending' as const },
-    { label: '部门审批', time: '', operator: '', status: 'pending' as const },
-    { label: '财务审批', time: '', operator: '', status: 'pending' as const },
-    { label: '执行完成', time: '', operator: '', status: 'pending' as const },
+  const steps: ApprovalStep[] = [
+    { label: '申请提交', time: '', operator: '', status: 'pending' },
+    { label: '部门审批', time: '', operator: '', status: 'pending' },
+    { label: '财务审批', time: '', operator: '', status: 'pending' },
+    { label: '执行完成', time: '', operator: '', status: 'pending' },
   ];
 
   if (status === 'PENDING') {
@@ -136,7 +146,7 @@ export default function DisposalDetailPage() {
     queryKey: ['disposal', id],
     queryFn: async () => {
       const res = await getDisposalDetail(Number(id));
-      return res.data.data;
+      return res.data;
     },
     enabled: !!id,
   });
