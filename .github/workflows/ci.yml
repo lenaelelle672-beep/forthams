@@ -62,7 +62,6 @@ jobs:
 
       # ---- TypeScript baseline audit ----
       - name: TypeScript Baseline Audit
-        continue-on-error: true
         run: npx tsc -p tsconfig.json --noEmit --pretty false
         working-directory: frontend
 
