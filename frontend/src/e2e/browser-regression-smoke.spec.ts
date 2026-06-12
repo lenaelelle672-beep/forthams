@@ -101,7 +101,7 @@ test.describe('浏览器回归 smoke', () => {
     await page.goto('/inventory');
     await page.waitForLoadState('networkidle');
 
-    await expect(page.getByRole('heading', { name: '盘点管理' })).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByRole('heading', { name: '盘点管理', exact: true })).toBeVisible({ timeout: 10_000 });
     await expect(page.getByRole('heading', { name: '暂无盘点任务' })).toBeVisible();
     await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
     expect(errors).toEqual([]);
