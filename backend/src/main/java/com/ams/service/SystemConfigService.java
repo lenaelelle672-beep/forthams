@@ -27,6 +27,8 @@ public class SystemConfigService {
 
     private final SystemConfigMapper systemConfigMapper;
 
+    private static final String GLOBAL_TENANT_ID = "GLOBAL";
+
     /** 系统配置分组 */
     public static final String GROUP_SYSTEM = "SYSTEM";
     /** 安全配置分组 */
@@ -60,10 +62,10 @@ public class SystemConfigService {
 
     public SystemConfig getByKey(String key) {
         String tenantId = TenantContext.requireTenantId();
-        SystemConfig config = systemConfigMapper.selectOne(new QueryWrapper<SystemConfig>()
-                .eq("tenant_id", tenantId)
-                .eq("config_key", key)
-                .last("limit 1"));
+        SystemConfig config = findByKey(tenantId, key);
+        if (config == null && !GLOBAL_TENANT_ID.equals(tenantId)) {
+            config = findByKey(GLOBAL_TENANT_ID, key);
+        }
         if (config == null) {
             throw new BusinessException("系统参数不存在");
         }
@@ -119,17 +121,11 @@ public class SystemConfigService {
      */
     public Map<String, String> getConfigMap(String configGroup) {
         String tenantId = TenantContext.requireTenantId();
-        List<SystemConfig> configs = systemConfigMapper.selectList(
-                new QueryWrapper<SystemConfig>()
-                        .eq("tenant_id", tenantId)
-                        .eq("config_group", configGroup));
-
         Map<String, String> result = new HashMap<>();
-        if (configs != null) {
-            for (SystemConfig c : configs) {
-                result.put(c.getConfigKey(), c.getConfigValue());
-            }
+        if (!GLOBAL_TENANT_ID.equals(tenantId)) {
+            mergeConfigValues(result, listByGroup(GLOBAL_TENANT_ID, configGroup));
         }
+        mergeConfigValues(result, listByGroup(tenantId, configGroup));
         return result;
     }
 
@@ -177,12 +173,42 @@ public class SystemConfigService {
      */
     public String getConfigValue(String configGroup, String configKey) {
         String tenantId = TenantContext.requireTenantId();
-        SystemConfig config = systemConfigMapper.selectOne(
+        SystemConfig config = findByGroupAndKey(tenantId, configGroup, configKey);
+        if (config == null && !GLOBAL_TENANT_ID.equals(tenantId)) {
+            config = findByGroupAndKey(GLOBAL_TENANT_ID, configGroup, configKey);
+        }
+        return config == null ? null : config.getConfigValue();
+    }
+
+    private List<SystemConfig> listByGroup(String tenantId, String configGroup) {
+        return systemConfigMapper.selectList(
+                new QueryWrapper<SystemConfig>()
+                        .eq("tenant_id", tenantId)
+                        .eq("config_group", configGroup));
+    }
+
+    private SystemConfig findByKey(String tenantId, String key) {
+        return systemConfigMapper.selectOne(new QueryWrapper<SystemConfig>()
+                .eq("tenant_id", tenantId)
+                .eq("config_key", key)
+                .last("limit 1"));
+    }
+
+    private SystemConfig findByGroupAndKey(String tenantId, String configGroup, String configKey) {
+        return systemConfigMapper.selectOne(
                 new QueryWrapper<SystemConfig>()
                         .eq("tenant_id", tenantId)
                         .eq("config_group", configGroup)
                         .eq("config_key", configKey)
                         .last("limit 1"));
-        return config == null ? null : config.getConfigValue();
+    }
+
+    private void mergeConfigValues(Map<String, String> result, List<SystemConfig> configs) {
+        if (configs == null) {
+            return;
+        }
+        for (SystemConfig config : configs) {
+            result.put(config.getConfigKey(), config.getConfigValue());
+        }
     }
 }
