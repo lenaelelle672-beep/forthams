@@ -40,8 +40,10 @@ npm run e2e:real -- --reporter=line
 ## 执行结果
 
 ```text
-6 passed (8.7s)
+8 passed (12.0s)
 ```
+
+本次结果对应 `frontend/src/e2e/real-backend-smoke.spec.ts` 中 8 个真实后端 Playwright 用例，执行后 `frontend/test-results/.last-run.json` 状态为 `passed` 且 `failedTests` 为空。
 
 ## 覆盖项
 
@@ -59,6 +61,8 @@ npm run e2e:real -- --reporter=line
 | 顶栏操作 | 点击通知、全局搜索、退出登录 | 通过 |
 | 工单审批 API 闭环 | 创建资产、创建工单、提交工单、审批通过，断言状态 `DRAFT -> PENDING -> APPROVED` | 通过 |
 | 资产退役 API 闭环 | 创建资产、提交退役申请、审批、完成，断言申请完成且资产状态为 `SCRAPPED` | 通过 |
+| 赔偿页面 | 打开赔偿业务入口并确认页面可用 | 通过 |
+| 大屏页面 | 打开 3D 大屏页面并确认首屏可访问 | 通过 |
 | 浏览器错误 | 监听 `console.error` 与 `pageerror` | 通过 |
 
 ## 本轮发现并修复的问题
