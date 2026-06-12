@@ -447,6 +447,8 @@ declare module "@/components/ui/card" {
 }
 declare module "@/components/ui/Badge" {
   export const Badge: any;
+  export const StatusBadge: any;
+  export const WorkOrderStatusBadge: any;
   export default Badge;
 }
 declare module "@/components/ui/badge" {
@@ -508,6 +510,8 @@ declare module "@/components/ui/input" {
 }
 declare module "@/components/ui/Skeleton" {
   export const Skeleton: any;
+  export const SkeletonCard: any;
+  export const SkeletonTable: any;
   export default Skeleton;
 }
 declare module "@/components/ui/skeleton" {

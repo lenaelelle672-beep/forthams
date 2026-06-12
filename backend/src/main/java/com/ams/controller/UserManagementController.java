@@ -21,7 +21,7 @@ public class UserManagementController {
     private final UserManagementService userManagementService;
 
     /** 分页查询用户列表（管理后台使用） */
-    @GetMapping("/list")
+    @GetMapping({"", "/list"})
     public Result<Page<User>> list(
             @RequestParam(defaultValue = "1") Integer page,
             @RequestParam(defaultValue = "10") Integer pageSize,

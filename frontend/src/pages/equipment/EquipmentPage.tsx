@@ -196,7 +196,7 @@ export default function EquipmentPage() {
     queryKey: ['asset', 'detail', detailItem?.id],
     queryFn: async () => {
       const resp = await getAssetById(Number(detailItem!.id));
-      const asset = resp.data?.data ?? resp.data as unknown as Asset;
+      const asset = resp.data;
       setDetailAsset(asset);
       return asset;
     },
@@ -259,7 +259,7 @@ export default function EquipmentPage() {
   // ── 维保记录表格数据（从 API 获取） ──────────────────────────────────────────
   const maintenanceRecords = rawRecords.slice(0, 20).map((r) => ({
     id: r.id,
-    equipment: String((r as Record<string, unknown>).equipmentName ?? (r as Record<string, unknown>).assetName ?? r.assetId),
+    equipment: String(r.equipmentName ?? r.assetName ?? r.assetId),
     date: r.maintenanceDate?.substring(0, 10) ?? '—',
     type: r.maintenanceType ?? '—',
     technician: r.executor ?? '—',

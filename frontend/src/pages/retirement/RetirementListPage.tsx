@@ -67,8 +67,17 @@ const QUICK_FILTERS = [
   { key: 'COMPLETED', label: '已完成' },
 ];
 
+type RetirementPageParams = RetirementListQuery & {
+  department?: string;
+  dateRange?: string;
+};
+
+type RetirementApplicationWithValue = RetirementApplication & {
+  originalValue?: unknown;
+};
+
 function buildMetricCards(records: RetirementApplication[]) {
-  const totalValue = records.reduce((sum, r) => sum + (Number((r as Record<string, unknown>).originalValue) || 0), 0);
+  const totalValue = records.reduce((sum, r) => sum + (Number((r as RetirementApplicationWithValue).originalValue) || 0), 0);
   const pendingCount = records.filter((r) => r.status === 'PENDING').length;
   const totalResidual = records.reduce((sum, r) => sum + (Number(r.residualValue) || 0), 0);
   const residualRate = totalValue > 0 ? ((totalResidual / totalValue) * 100).toFixed(0) : '0';
@@ -97,11 +106,17 @@ function buildMetricCards(records: RetirementApplication[]) {
 
 export default function RetirementListPage() {
   const navigate = useNavigate();
-  const [params, setParams] = useState<{ page: number; pageSize: number; keyword?: string; status?: string; department?: string; dateRange?: string }>({ page: 1, pageSize: 20 });
+  const [params, setParams] = useState<RetirementPageParams>({ page: 1, pageSize: 20 });
+  const queryParams: RetirementListQuery = {
+    page: params.page,
+    pageSize: params.pageSize,
+    keyword: params.keyword,
+    status: params.status,
+  };
 
   const { data: res, isLoading } = useQuery({
     queryKey: ['retirement', 'list', params],
-    queryFn: () => getRetirementList(params),
+    queryFn: () => getRetirementList(queryParams),
     staleTime: 1000 * 30,
     placeholderData: (p) => p,
   });
@@ -248,7 +263,7 @@ export default function RetirementListPage() {
               onChange={(e) =>
                 setParams((p) => ({
                   ...p,
-                  status: e.target.value || undefined,
+                  status: (e.target.value || undefined) as RetirementStatus | undefined,
                   page: 1,
                 }))
               }

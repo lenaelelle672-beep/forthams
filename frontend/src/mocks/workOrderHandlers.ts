@@ -12,10 +12,44 @@
  */
 
 import { http, HttpResponse, delay } from 'msw';
-import { WorkOrder, WorkOrderStatus, WorkOrderOperation } from '../types/workorder.types';
 
 /** 工单操作类型枚举 */
 export type OperationType = 'submit' | 'approve' | 'reject' | 'return' | 'resubmit' | 'cancel';
+
+/** Mock 审批流程使用旧版 SPEC DTO，避免与当前真实 WorkOrder 表结构耦合 */
+export type MockWorkOrderStatus = 'DRAFT' | 'PENDING' | 'RETURNED' | 'APPROVED' | 'REJECTED' | 'CANCELLED';
+export type MockWorkOrderPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+
+export interface MockApprovalHistoryEntry {
+  id: string;
+  work_order_id: string;
+  operation: OperationType;
+  operator_id: string;
+  comment: string;
+  created_at: string;
+  previous_status: MockWorkOrderStatus;
+  new_status: MockWorkOrderStatus;
+}
+
+export interface MockWorkOrder {
+  id: string;
+  title: string;
+  description: string;
+  status: MockWorkOrderStatus;
+  priority: MockWorkOrderPriority;
+  requester_id: string;
+  assignee_id: string;
+  created_at: string;
+  updated_at: string;
+  approval_history: MockApprovalHistoryEntry[];
+}
+
+interface NotificationTriggerRequest {
+  work_order_id?: string;
+  status?: MockWorkOrderStatus;
+  operator_id?: string;
+  created_at?: string;
+}
 
 /** 审批操作请求参数 */
 export interface ApprovalOperationRequest {
@@ -27,13 +61,13 @@ export interface ApprovalOperationRequest {
 /** 审批操作响应 */
 export interface ApprovalOperationResponse {
   success: boolean;
-  work_order: WorkOrder;
+  work_order: MockWorkOrder;
   notification_sent: boolean;
   message?: string;
 }
 
 /** 状态转换映射表 */
-const STATE_TRANSITIONS: Record<string, { targetStatus: WorkOrderStatus; allowedOperations: string[] }> = {
+const STATE_TRANSITIONS: Record<string, { targetStatus: MockWorkOrderStatus; allowedOperations: string[] }> = {
   'DRAFT': { targetStatus: 'DRAFT', allowedOperations: ['submit'] },
   'PENDING': { targetStatus: 'PENDING', allowedOperations: ['approve', 'reject', 'return', 'cancel'] },
   'RETURNED': { targetStatus: 'RETURNED', allowedOperations: ['resubmit'] },
@@ -43,13 +77,13 @@ const STATE_TRANSITIONS: Record<string, { targetStatus: WorkOrderStatus; allowed
 };
 
 /** 终态枚举 */
-const TERMINAL_STATES: WorkOrderStatus[] = ['APPROVED', 'REJECTED', 'CANCELLED'];
+const TERMINAL_STATES: MockWorkOrderStatus[] = ['APPROVED', 'REJECTED', 'CANCELLED'];
 
 /** 需要触发通知的状态 */
-const NOTIFICATION_TRIGGER_STATES: WorkOrderStatus[] = ['APPROVED', 'REJECTED', 'RETURNED'];
+const NOTIFICATION_TRIGGER_STATES: MockWorkOrderStatus[] = ['APPROVED', 'REJECTED', 'RETURNED'];
 
 /** 模拟工单数据存储 */
-let mockWorkOrders: Map<string, WorkOrder> = new Map();
+let mockWorkOrders: Map<string, MockWorkOrder> = new Map();
 
 /** 幂等性缓存 */
 const idempotencyCache: Map<string, { result: ApprovalOperationResponse; timestamp: number }> = new Map();
@@ -84,7 +118,7 @@ function isValidTransition(currentStatus: string, operation: string): boolean {
  * @param operation 操作类型
  * @returns 目标状态
  */
-function getTargetStatus(operation: OperationType): WorkOrderStatus {
+function getTargetStatus(operation: OperationType): MockWorkOrderStatus {
   switch (operation) {
     case 'submit':
     case 'resubmit':
@@ -111,7 +145,7 @@ function getTargetStatus(operation: OperationType): WorkOrderStatus {
  * @returns 审批操作响应
  */
 function executeApprovalOperation(
-  workOrder: WorkOrder,
+  workOrder: MockWorkOrder,
   operation: OperationType,
   operatorId: string,
   comment?: string
@@ -140,7 +174,7 @@ function executeApprovalOperation(
   const targetStatus = getTargetStatus(operation);
 
   // 更新工单状态
-  const updatedWorkOrder: WorkOrder = {
+  const updatedWorkOrder: MockWorkOrder = {
     ...workOrder,
     status: targetStatus,
     updated_at: new Date().toISOString(),
@@ -223,7 +257,7 @@ export const workOrderApproveHandler = http.post<
         id: workOrderId,
         title: `工单-${workOrderId}`,
         description: '测试工单',
-        status: 'PENDING' as WorkOrderStatus,
+        status: 'PENDING',
         priority: 'MEDIUM',
         requester_id: 'user-001',
         assignee_id: operator_id,
@@ -386,7 +420,7 @@ export const notificationTriggerHandler = http.post(
   async ({ request }) => {
     await delay(50);
 
-    const body = await request.json();
+    const body = await request.json() as NotificationTriggerRequest;
     const { work_order_id, status, operator_id, created_at } = body;
 
     // ATB-4.1-4.4: 验证通知内容
@@ -424,10 +458,10 @@ export const notificationTriggerHandler = http.post(
  * 初始化测试工单数据
  * 用于集成测试前初始化状态
  */
-export function initializeMockWorkOrders(testData?: WorkOrder[]): void {
+export function initializeMockWorkOrders(testData?: MockWorkOrder[]): void {
   mockWorkOrders.clear();
   
-  const defaultWorkOrders: WorkOrder[] = testData || [
+  const defaultWorkOrders: MockWorkOrder[] = testData || [
     {
       id: 'WO-2025-0001',
       title: '测试工单-待审批',

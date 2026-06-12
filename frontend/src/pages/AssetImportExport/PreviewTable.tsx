@@ -17,7 +17,6 @@ import {
   CheckCircleOutlined,
   CloseCircleOutlined,
   EditOutlined,
-  SendOutlined,
   UndoOutlined,
 } from '@ant-design/icons';
 import { FixedSizeList as FixedList } from 'react-window';
@@ -414,7 +413,7 @@ const VirtualPreviewList: React.FC<VirtualPreviewListProps> = ({
       </div>
 
       {/* 虚拟列表主体 */}
-      <FixedSizeList
+      <FixedList
         height={listHeight}
         itemCount={data.length}
         itemSize={rowHeight}
@@ -422,7 +421,7 @@ const VirtualPreviewList: React.FC<VirtualPreviewListProps> = ({
         overscanCount={5}
       >
         {RowRenderer}
-      </FixedSizeList>
+      </FixedList>
     </div>
   );
 };
@@ -622,7 +621,7 @@ const PreviewTable: React.FC<PreviewTableProps> = ({
           )}
           <Button
             type="primary"
-            icon={<SendOutlined />}
+            icon={<CheckCircleOutlined />}
             loading={submitting}
             disabled={hasErrors || submitting || data.length === 0}
             onClick={handleResubmit}

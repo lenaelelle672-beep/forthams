@@ -39,9 +39,13 @@ export interface GraphifyNode {
   /** 节点唯一标识 */
   id: string;
   /** 节点名称 */
-  name: string;
-  /** 节点类型：asset | category | location | user */
-  type: 'asset' | 'category' | 'location' | 'user';
+  name?: string;
+  /** 节点类型：asset | category | location | user | change | operator | operation */
+  type: 'asset' | 'category' | 'location' | 'user' | 'change' | 'operator' | 'operation';
+  /** Legacy display label used by audit-log graph generators. */
+  label?: string;
+  /** Extra metadata used by audit-log graph generators. */
+  properties?: Record<string, unknown>;
   /** 资产类型（仅 type=asset 时有效） */
   assetType?: 'HardwareAsset' | 'SoftwareAsset' | 'DigitalAsset';
   /** 资产状态 */
@@ -56,6 +60,10 @@ export interface GraphifyNode {
   description?: string;
   /** 关联资产ID */
   assetId?: string;
+  /** Runtime X coordinate assigned by the force-graph layout engine. */
+  x?: number;
+  /** Runtime Y coordinate assigned by the force-graph layout engine. */
+  y?: number;
 }
 
 export interface GraphifyEdge {
@@ -154,7 +162,7 @@ const GraphifyKnowledgeGraph: React.FC<GraphifyKnowledgeGraphProps> = ({
   initialZoom = 1,
   nodeTypeColors,
 }) => {
-  const graphRef = useRef<ForceGraphMethods<GraphifyNode, GraphifyEdge>>();
+  const graphRef = useRef<ForceGraphMethods>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [hoveredNode, setHoveredNode] = useState<GraphifyNode | null>(null);
   const [dimensions, setDimensions] = useState({ width, height });
@@ -192,7 +200,7 @@ const GraphifyKnowledgeGraph: React.FC<GraphifyKnowledgeGraphProps> = ({
 
   // 节点渲染回调
   const renderNode = useCallback((node: GraphifyNode, ctx: CanvasRenderingContext2D, globalScale: number) => {
-    const label = node.name;
+    const label = node.name ?? node.label ?? node.id;
     const fontSize = 12 / globalScale;
     const nodeSize = (node.size || 8) / globalScale;
     const nodeColor = getNodeColor(node, nodeTypeColors);
@@ -448,7 +456,7 @@ const GraphifyKnowledgeGraph: React.FC<GraphifyKnowledgeGraphProps> = ({
             className="graphify-container relative bg-gray-50 rounded-lg overflow-hidden"
             style={{ height: dimensions.height - 80 }}
           >
-            <ForceGraph2D<GraphifyNode, GraphifyEdge>
+            <ForceGraph2D
               ref={graphRef}
               graphData={{ nodes, links: edges.map(e => ({
                 ...e,
@@ -466,7 +474,7 @@ const GraphifyKnowledgeGraph: React.FC<GraphifyKnowledgeGraphProps> = ({
               onEngineStop={handleEngineStop}
               nodeLabel={(node) => `
                 <div class="graphify-tooltip">
-                  <strong>${node.name}</strong>
+                  <strong>${node.name ?? node.label ?? node.id}</strong>
                   <br/>
                   <span>类型: ${node.type}</span>
                   ${node.assetType ? `<br/><span>资产类型: ${node.assetType}</span>` : ''}

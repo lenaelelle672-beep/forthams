@@ -177,6 +177,7 @@ const router = createBrowserRouter([
           { path: 'disposals/transfer/new',  element: S(AssetTransferFormPage) },
           { path: 'disposals/clearance/new', element: S(AssetClearanceFormPage) },
           { path: 'disposals/scrap/new',     element: S(AssetScrapFormPage) },
+          { path: 'disposals/compensation/new', element: S(AssetCompensationFormPage) },
 
           // 闲置资产
           { path: 'idle', element: S(IdleAssetsPage) },

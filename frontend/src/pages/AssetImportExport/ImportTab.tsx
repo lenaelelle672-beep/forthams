@@ -40,13 +40,12 @@ import {
   UploadOutlined,
   DownloadOutlined,
   FileExcelOutlined,
-  CheckCircleFilled,
-  CloseCircleFilled,
+  CheckCircleOutlined,
+  CloseCircleOutlined,
   InboxOutlined,
   ReloadOutlined,
   EditOutlined,
 } from '@ant-design/icons';
-import type { UploadProps, FormInstance } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 
 /* ------------------------------------------------------------------ */
@@ -79,6 +78,23 @@ interface ExportFilterValues {
   category?: string;
   status?: string;
   location?: string;
+}
+
+interface ExportFormInstance {
+  validateFields: () => Promise<ExportFilterValues>;
+}
+
+interface ImportUploadRequest {
+  file: File | Blob | string;
+}
+
+interface ImportUploadProps {
+  accept: string;
+  multiple: boolean;
+  maxCount: number;
+  showUploadList: boolean;
+  beforeUpload: (file: File) => boolean | unknown;
+  customRequest: (options: ImportUploadRequest) => void;
 }
 
 /* ------------------------------------------------------------------ */
@@ -283,11 +299,11 @@ const VirtualPreviewTable: React.FC<VirtualTableProps> = ({
                 {/* 校验状态 */}
                 <div style={{ width: 140, flexShrink: 0, textAlign: 'center' }}>
                   {hasError ? (
-                    <Tag color="error" icon={<CloseCircleFilled />}>
+                    <Tag color="error" icon={<CloseCircleOutlined />}>
                       {row.errors.length} 项错误
                     </Tag>
                   ) : (
-                    <Tag color="success" icon={<CheckCircleFilled />}>
+                    <Tag color="success" icon={<CheckCircleOutlined />}>
                       通过
                     </Tag>
                   )}
@@ -329,7 +345,7 @@ const ImportTab: React.FC = () => {
   const [isExporting, setIsExporting] = useState(false);
 
   /** 导出表单引用 */
-  const [exportForm] = Form.useForm<FormInstance<ExportFilterValues>>();
+  const [exportForm] = Form.useForm() as [ExportFormInstance];
 
   /** 存储 objectURL 以便卸载时释放 */
   const objectUrlRef = useRef<string | null>(null);
@@ -376,11 +392,11 @@ const ImportTab: React.FC = () => {
         fixed: 'right',
         render: (_: unknown, record: ImportPreviewRow) =>
           record.errors.length > 0 ? (
-            <Tag color="error" icon={<CloseCircleFilled />}>
+            <Tag color="error" icon={<CloseCircleOutlined />}>
               {record.errors.length} 项错误
             </Tag>
           ) : (
-            <Tag color="success" icon={<CheckCircleFilled />}>
+            <Tag color="success" icon={<CheckCircleOutlined />}>
               通过
             </Tag>
           ),
@@ -623,7 +639,7 @@ const ImportTab: React.FC = () => {
 
   /* ======================== Upload config ======================== */
 
-  const uploadProps: UploadProps = useMemo<UploadProps>(
+  const uploadProps = useMemo<ImportUploadProps>(
     () => ({
       accept: '.xlsx',
       multiple: false,
@@ -728,9 +744,8 @@ const ImportTab: React.FC = () => {
                 </Button>
                 <Button
                   type="primary"
-                  icon={<CheckCircleFilled />}
+                  icon={<CheckCircleOutlined />}
                   disabled={hasErrors}
-                  loading={phase === 'submitting'}
                   onClick={handleReSubmit}
                 >
                   {hasErrors ? '存在错误，禁止入库' : '确认入库'}

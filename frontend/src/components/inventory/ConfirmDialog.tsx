@@ -22,7 +22,7 @@ import {
   Typography,
   Space,
 } from 'antd';
-import { ExclamationCircleFilled } from '@ant-design/icons';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
 
 // ---------------------------------------------------------------------------
 // 类型定义
@@ -175,7 +175,7 @@ const BatchConfirmForm: React.FC<{ selectedCount: number }> = ({
  */
 const SubmitApprovalContent: React.FC = () => (
   <Space align="start" size={12}>
-    <ExclamationCircleFilled
+    <ExclamationCircleOutlined
       style={{ color: '#faad14', fontSize: 22, marginTop: 2 }}
       aria-hidden="true"
     />

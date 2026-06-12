@@ -52,15 +52,25 @@ const PRIORITY_LABELS: Record<string, string> = {
   HIGH: '高',
 };
 
+const NO_LOCATION_VALUE = '__NO_LOCATION__';
+
+function toLocationSelectValue(value?: string) {
+  return value && value.length > 0 ? value : NO_LOCATION_VALUE;
+}
+
+function fromLocationSelectValue(value: string) {
+  return value === NO_LOCATION_VALUE ? undefined : value;
+}
+
 /** Flatten tree nodes into a flat list for dropdown rendering */
-function flattenTree<T extends { children?: T[]; id: number; [key: string]: unknown }>(
+function flattenTree<T extends { children?: T[]; id: number }>(
   nodes: T[],
-  labelKey: string,
+  labelKey: keyof T,
   depth = 0,
 ): Array<{ id: number; label: string; depth: number }> {
   const result: Array<{ id: number; label: string; depth: number }> = [];
   for (const node of nodes) {
-    const label = (node as Record<string, unknown>)[labelKey] as string;
+    const label = String(node[labelKey] ?? '');
     result.push({ id: node.id, label, depth });
     if (node.children?.length) {
       result.push(...flattenTree(node.children, labelKey, depth + 1));
@@ -138,8 +148,8 @@ export default function AssetTransferFormPage() {
         transferType: data.transferType,
         fromDept: data.fromDept,
         toDept: data.toDept,
-        fromLocation: data.fromLocation,
-        toLocation: data.toLocation,
+        fromLocation: fromLocationSelectValue(data.fromLocation ?? NO_LOCATION_VALUE),
+        toLocation: fromLocationSelectValue(data.toLocation ?? NO_LOCATION_VALUE),
         workflow: data.workflow,
         priority: data.priority,
         notes: data.notes,
@@ -194,9 +204,14 @@ export default function AssetTransferFormPage() {
           { label: '新建' },
         ]}
         actions={
-          <Button variant="ghost" size="md" onClick={() => navigate(-1)}>
-            <ArrowLeft className="w-4 h-4" /> 返回
-          </Button>
+          <>
+            <Button variant="outline" size="md" type="button" onClick={() => navigate('/workflow-designer?businessType=ASSET_TRANSFER')}>
+              配置流程
+            </Button>
+            <Button variant="ghost" size="md" type="button" onClick={() => navigate(-1)}>
+              <ArrowLeft className="w-4 h-4" /> 返回
+            </Button>
+          </>
         }
       />
 
@@ -284,8 +299,13 @@ export default function AssetTransferFormPage() {
                 name="fromLocation"
                 control={control}
                 render={({ field }) => (
-                  <Select label="调出位置" value={field.value ?? ''} onValueChange={field.onChange} error={errors.fromLocation?.message}>
-                    <SelectItem value="">不限</SelectItem>
+                  <Select
+                    label="调出位置"
+                    value={toLocationSelectValue(field.value)}
+                    onValueChange={(value) => field.onChange(fromLocationSelectValue(value))}
+                    error={errors.fromLocation?.message}
+                  >
+                    <SelectItem value={NO_LOCATION_VALUE}>不限</SelectItem>
                     {locationOptions.map((loc) => (
                       <SelectItem key={loc.id} value={String(loc.id)}>
                         {'　'.repeat(loc.depth)}{loc.label}
@@ -298,8 +318,13 @@ export default function AssetTransferFormPage() {
                 name="toLocation"
                 control={control}
                 render={({ field }) => (
-                  <Select label="调入位置" value={field.value ?? ''} onValueChange={field.onChange} error={errors.toLocation?.message}>
-                    <SelectItem value="">不限</SelectItem>
+                  <Select
+                    label="调入位置"
+                    value={toLocationSelectValue(field.value)}
+                    onValueChange={(value) => field.onChange(fromLocationSelectValue(value))}
+                    error={errors.toLocation?.message}
+                  >
+                    <SelectItem value={NO_LOCATION_VALUE}>不限</SelectItem>
                     {locationOptions.map((loc) => (
                       <SelectItem key={loc.id} value={String(loc.id)}>
                         {'　'.repeat(loc.depth)}{loc.label}

@@ -14,7 +14,12 @@
 import http from '@/utils/http';
 // Alias for compatibility
 const apiClient = http;
-import type { Asset, AssetDetail, AssetQuery, AssetListResponse } from '@/types/asset';
+import type { PaginatedResponse } from '@/types/common';
+import type { Asset, AssetListQuery } from '@/types/asset';
+
+type AssetDetail = Asset;
+type AssetQuery = AssetListQuery;
+type AssetListResponse = PaginatedResponse<Asset>;
 
 /**
  * Query parameters for asset listing

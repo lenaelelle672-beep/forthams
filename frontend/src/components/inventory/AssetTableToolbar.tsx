@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
 import { Button, Space, Typography, Tooltip, message } from 'antd';
-import { CheckSquareOutlined } from '@ant-design/icons';
+import { CheckOutlined } from '@ant-design/icons';
 
 const { Text } = Typography;
 
@@ -75,7 +75,7 @@ const AssetTableToolbar: React.FC<AssetTableToolbarProps> = ({
           title={selectedCount === 0 ? '请先勾选需要确认的资产行' : undefined}
         >
           <Button
-            icon={<CheckSquareOutlined />}
+            icon={<CheckOutlined />}
             disabled={selectedCount === 0 || loading}
             loading={loading}
             onClick={handleBatchConfirm}

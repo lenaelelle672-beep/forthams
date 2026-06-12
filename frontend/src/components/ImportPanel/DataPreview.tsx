@@ -15,7 +15,7 @@
 
 import React, { useMemo } from 'react';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Box, Typography, Chip } from '@mui/material';
-import { Alert, AlertTitle } from '@mui/material';
+import { Alert } from '@mui/material';
 import WarningIcon from '@mui/icons-material/Warning';
 
 export interface ValidationError {
@@ -177,7 +177,9 @@ export const DataPreview: React.FC<DataPreviewProps> = ({
       {/* 错误汇总 */}
       {errors.length > 0 && (
         <Alert severity="warning" sx={{ mb: 2 }}>
-          <AlertTitle>数据校验警告</AlertTitle>
+          <Typography component="div" sx={{ fontWeight: 600, mb: 0.5 }}>
+            数据校验警告
+          </Typography>
           发现 {errors.length} 个校验错误，请查看下表中高亮行。如需下载完整错误报告，请点击"下载错误报告"按钮。
         </Alert>
       )}

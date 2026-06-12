@@ -10,7 +10,7 @@ import { NodePanel } from '@/components/flow/NodePanel';
 import { workflowApi, roleApi, type RoleRecord } from '@/api/workflow';
 import { businessFlowOptions, getDraftStorageKey, isBusinessType, type BusinessType } from '@/constants/workflowBusiness';
 import { normalizeWorkflowDefinition, validateWorkflowDefinition } from '@/utils/workflowDefinition';
-import { createFlowEdge, initialFlowEdges, initialFlowNodes, type FlowEdge, type FlowDefinition, type FlowNode, type FlowNodeData, type FlowNodeType } from '@/types/flow';
+import { createFlowEdge, createFlowNode, initialFlowEdges, initialFlowNodes, type FlowEdge, type FlowDefinition, type FlowNode, type FlowNodeData, type FlowNodeType } from '@/types/flow';
 
 function cloneNodes() { return initialFlowNodes.map((n) => ({ ...n, position: { ...n.position }, data: { ...n.data } })); }
 function cloneEdges() { return initialFlowEdges.map((e) => ({ ...e, data: e.data ? { ...e.data } : e.data })); }

@@ -21,10 +21,14 @@
  */
 
 import React, { useState, useMemo, useCallback } from 'react';
-import { ChevronDown, Search, X } from 'lucide-react';
-import { useAssets } from '@/hooks/useAssetById';
-import { Asset } from '@/types/asset';
-import { Spinner } from '@/components/ui/Spinner';
+import { ChevronDown, Loader2, Search, X } from 'lucide-react';
+import { useAssetList } from '@/hooks/asset/useAssets';
+import {
+  ASSET_STATUS_CONFIG,
+  AssetStatus,
+  type AssetListItem,
+  type AssetListQuery,
+} from '@/types/asset';
 
 export interface AssetSelectorProps {
   /** Currently selected asset ID */
@@ -39,18 +43,6 @@ export interface AssetSelectorProps {
   placeholder?: string;
   /** Additional CSS classes */
   className?: string;
-}
-
-/**
- * Asset option type for internal use
- */
-interface AssetOption {
-  id: string;
-  assetCode: string;
-  name: string;
-  categoryName: string;
-  location: string;
-  status: Asset['status'];
 }
 
 /**
@@ -72,14 +64,23 @@ export const AssetSelector: React.FC<AssetSelectorProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+
+  const assetListQuery = useMemo<AssetListQuery>(() => ({
+    page: 1,
+    pageSize: 500,
+    status: AssetStatus.IN_USE,
+  }), []);
   
   // Fetch all assets
-  const { data: assets, isLoading, error: fetchError } = useAssets();
+  const { data: assetsResponse, isLoading, error: fetchError } = useAssetList(assetListQuery);
+  const assets = useMemo(
+    () => assetsResponse?.data?.records ?? [],
+    [assetsResponse],
+  );
   
   // Filter assets to show only IN_USE status (BC-003)
   const eligibleAssets = useMemo(() => {
-    if (!assets) return [];
-    return assets.filter((asset) => asset.status === 'IN_USE');
+    return assets.filter((asset) => asset.status === AssetStatus.IN_USE);
   }, [assets]);
   
   // Filter by search term
@@ -89,24 +90,24 @@ export const AssetSelector: React.FC<AssetSelectorProps> = ({
     const term = searchTerm.toLowerCase();
     return eligibleAssets.filter(
       (asset) =>
-        asset.assetCode.toLowerCase().includes(term) ||
-        asset.name.toLowerCase().includes(term) ||
+        asset.assetNo.toLowerCase().includes(term) ||
+        asset.assetName.toLowerCase().includes(term) ||
         (asset.categoryName && asset.categoryName.toLowerCase().includes(term))
     );
   }, [eligibleAssets, searchTerm]);
   
   // Find selected asset details
   const selectedAsset = useMemo(() => {
-    if (!value || !assets) return null;
-    return assets.find((asset) => asset.id === value);
+    if (!value) return null;
+    return assets.find((asset) => String(asset.id) === value) ?? null;
   }, [value, assets]);
   
   /**
    * Handle selection of an asset
    * @param asset - Selected asset object
    */
-  const handleSelect = useCallback((asset: Asset) => {
-    onChange(asset.id);
+  const handleSelect = useCallback((asset: AssetListItem) => {
+    onChange(String(asset.id));
     setIsOpen(false);
     setSearchTerm('');
   }, [onChange]);
@@ -142,24 +143,24 @@ export const AssetSelector: React.FC<AssetSelectorProps> = ({
   /**
    * Render asset option in dropdown
    */
-  const renderAssetOption = (asset: Asset) => (
+  const renderAssetOption = (asset: AssetListItem) => (
     <div
       key={asset.id}
       className="px-3 py-2 cursor-pointer hover:bg-blue-50 border-b border-gray-200 last:border-b-0 transition-colors"
       onClick={() => handleSelect(asset)}
       role="option"
-      aria-selected={value === asset.id}
+      aria-selected={value === String(asset.id)}
     >
       <div className="flex items-center justify-between">
         <div>
-          <div className="font-medium text-gray-900">{asset.name}</div>
+          <div className="font-medium text-gray-900">{asset.assetName}</div>
           <div className="text-sm text-gray-400">
-            {asset.assetCode}
+            {asset.assetNo}
             {asset.categoryName && ` · ${asset.categoryName}`}
           </div>
         </div>
         <span className="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded">
-          {asset.status}
+          {ASSET_STATUS_CONFIG[asset.status]?.label ?? asset.status}
         </span>
       </div>
       {asset.location && (
@@ -173,7 +174,7 @@ export const AssetSelector: React.FC<AssetSelectorProps> = ({
     return (
       <div className={`relative ${className}`}>
         <div className="h-10 px-3 flex items-center border border-gray-200 rounded-md bg-gray-50">
-          <Spinner size="sm" />
+          <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
           <span className="ml-2 text-gray-400 text-sm">加载资产中...</span>
         </div>
       </div>
@@ -226,10 +227,10 @@ export const AssetSelector: React.FC<AssetSelectorProps> = ({
             <div className="flex items-center justify-between">
               <div className="min-w-0">
                 <div className="font-medium text-gray-900 truncate">
-                  {selectedAsset.name}
+                  {selectedAsset.assetName}
                 </div>
                 <div className="text-xs text-gray-400 truncate">
-                  {selectedAsset.assetCode}
+                  {selectedAsset.assetNo}
                 </div>
               </div>
               <button

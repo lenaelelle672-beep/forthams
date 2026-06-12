@@ -64,6 +64,27 @@ class UserManagementControllerTest {
     }
 
     @Test
+    @DisplayName("Should return paginated user list from root endpoint")
+    void testRootList() throws Exception {
+        Page<User> mockPage = new Page<>(1, 10);
+        User u1 = new User();
+        u1.setId(1L);
+        u1.setUsername("admin");
+        mockPage.setRecords(List.of(u1));
+
+        when(userManagementService.queryUsers(anyInt(), anyInt(), any(), any(), any())).thenReturn(mockPage);
+
+        mockMvc.perform(get("/user-management")
+                .param("page", "1")
+                .param("pageSize", "10")
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.code").value(200));
+
+        verify(userManagementService).queryUsers(1, 10, null, null, null);
+    }
+
+    @Test
     @DisplayName("Should search users by keyword")
     void testSearch() throws Exception {
         User u1 = new User();

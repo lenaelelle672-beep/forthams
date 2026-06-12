@@ -17,7 +17,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Table, Tag, Space, Button, Select, Input, Card, Typography, Empty, Spin, message } from 'antd';
 import { SearchOutlined, ReloadOutlined, EyeOutlined, CheckOutlined, CloseOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
-import type { WorkOrder, WorkOrderStatus, WorkOrderType, WorkOrderQuery } from '../../types/workorder.types';
+import { WorkOrderPriority, WorkOrderStatus, WorkOrderType } from '../../types/workorder.types';
+import type { WorkOrder, WorkOrderListQuery } from '../../types/workorder.types';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -26,20 +27,24 @@ const { Option } = Select;
  * 工单状态枚举映射
  */
 const STATUS_MAP: Record<WorkOrderStatus, { label: string; color: string }> = {
-  DRAFT: { label: '草稿', color: 'default' },
-  PENDING: { label: '待审批', color: 'orange' },
-  APPROVED: { label: '已通过', color: 'green' },
-  REJECTED: { label: '已拒绝', color: 'red' },
-  CLOSED: { label: '已关闭', color: 'gray' },
+  [WorkOrderStatus.DRAFT]: { label: '草稿', color: 'default' },
+  [WorkOrderStatus.PENDING]: { label: '待进入审批', color: 'blue' },
+  [WorkOrderStatus.APPROVING_LEVEL_1]: { label: '一级审批中', color: 'orange' },
+  [WorkOrderStatus.APPROVING_LEVEL_2]: { label: '二级审批中', color: 'gold' },
+  [WorkOrderStatus.APPROVED]: { label: '已通过', color: 'green' },
+  [WorkOrderStatus.REJECTED]: { label: '已拒绝', color: 'red' },
+  [WorkOrderStatus.CANCELLED]: { label: '已取消', color: 'gray' },
 };
 
 /**
  * 工单类型枚举映射
  */
 const TYPE_MAP: Record<WorkOrderType, string> = {
-  IT_SUPPORT: 'IT 支持',
-  PURCHASE: '采购申请',
-  PERMISSION: '权限申请',
+  [WorkOrderType.PURCHASE]: '采购申请',
+  [WorkOrderType.REPAIR]: '维修申请',
+  [WorkOrderType.TRANSFER]: '调拨申请',
+  [WorkOrderType.DISPOSAL]: '处置申请',
+  [WorkOrderType.OTHER]: '其他申请',
 };
 
 /**
@@ -59,7 +64,7 @@ const DEFAULT_PAGINATION = {
  */
 export interface WorkOrderListProps {
   /** 初始查询参数 */
-  initialQuery?: Partial<WorkOrderQuery>;
+  initialQuery?: Partial<WorkOrderListQuery>;
   /** 是否显示操作列 */
   showActions?: boolean;
   /** 操作列回调 */
@@ -99,7 +104,7 @@ export const WorkOrderList: React.FC<WorkOrderListProps> = ({
   const [loading, setLoading] = useState<boolean>(false);
   const [workOrders, setWorkOrders] = useState<WorkOrder[]>([]);
   const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
-  const [queryParams, setQueryParams] = useState<WorkOrderQuery>({
+  const [queryParams, setQueryParams] = useState<WorkOrderListQuery>({
     page: 1,
     pageSize: 10,
     ...initialQuery,
@@ -123,7 +128,8 @@ export const WorkOrderList: React.FC<WorkOrderListProps> = ({
       let filteredData = mockData;
       
       if (queryParams.status) {
-        filteredData = filteredData.filter(wo => wo.status === queryParams.status);
+        const statusFilter = Array.isArray(queryParams.status) ? queryParams.status : [queryParams.status];
+        filteredData = filteredData.filter(wo => statusFilter.includes(wo.status));
       }
       
       if (queryParams.type) {
@@ -133,6 +139,7 @@ export const WorkOrderList: React.FC<WorkOrderListProps> = ({
       if (searchKeyword) {
         const keyword = searchKeyword.toLowerCase();
         filteredData = filteredData.filter(wo => 
+          wo.orderNo.toLowerCase().includes(keyword) ||
           wo.title.toLowerCase().includes(keyword) ||
           wo.description.toLowerCase().includes(keyword)
         );
@@ -161,30 +168,59 @@ export const WorkOrderList: React.FC<WorkOrderListProps> = ({
    * @param count - 数据条数
    */
   const generateMockData = (count: number): WorkOrder[] => {
-    const statuses: WorkOrderStatus[] = ['DRAFT', 'PENDING', 'APPROVED', 'REJECTED', 'CLOSED'];
-    const types: WorkOrderType[] = ['IT_SUPPORT', 'PURCHASE', 'PERMISSION'];
+    const statuses: WorkOrderStatus[] = [
+      WorkOrderStatus.DRAFT,
+      WorkOrderStatus.PENDING,
+      WorkOrderStatus.APPROVING_LEVEL_1,
+      WorkOrderStatus.APPROVING_LEVEL_2,
+      WorkOrderStatus.APPROVED,
+      WorkOrderStatus.REJECTED,
+      WorkOrderStatus.CANCELLED,
+    ];
+    const types: WorkOrderType[] = [
+      WorkOrderType.PURCHASE,
+      WorkOrderType.REPAIR,
+      WorkOrderType.TRANSFER,
+      WorkOrderType.DISPOSAL,
+      WorkOrderType.OTHER,
+    ];
     
-    const titles = {
-      IT_SUPPORT: ['电脑蓝屏问题', '网络连接异常', '打印机无法使用', '软件安装请求', '账号无法登录'],
-      PURCHASE: ['办公桌椅采购', '显示器采购', '键鼠套装采购', '笔记本电脑采购', '服务器采购'],
-      PERMISSION: ['数据库访问权限', '管理员权限申请', '系统配置权限', '文件共享权限', 'VPN访问权限'],
+    const titles: Record<WorkOrderType, string[]> = {
+      [WorkOrderType.PURCHASE]: ['办公桌椅采购', '显示器采购', '键鼠套装采购', '笔记本电脑采购', '服务器采购'],
+      [WorkOrderType.REPAIR]: ['空调维修申请', '投影仪维修', '门禁设备维修', '会议屏检修', '打印机维修'],
+      [WorkOrderType.TRANSFER]: ['电脑调拨申请', '会议设备调拨', '办公家具调拨', '网络设备调拨', '车辆调拨'],
+      [WorkOrderType.DISPOSAL]: ['旧电脑处置', '报废显示器处置', '闲置资产处置', '损坏设备处置', '批量资产处置'],
+      [WorkOrderType.OTHER]: ['资产标签补打', '资料补录申请', '盘点异常处理', '配置调整申请', '其他工单事项'],
     };
 
     return Array.from({ length: count }, (_, index) => {
       const type = types[index % types.length];
       const status = statuses[index % statuses.length];
       const titleOptions = titles[type];
+      const createdAt = new Date(Date.now() - index * 86400000).toISOString();
+      const updatedAt = new Date(Date.now() - index * 43200000).toISOString();
       
       return {
-        id: `WO-${String(index + 1).padStart(6, '0')}`,
+        id: index + 1,
+        orderNo: `WO-${String(index + 1).padStart(6, '0')}`,
         title: titleOptions[index % titleOptions.length],
         type,
         description: `这是第 ${index + 1} 条工单的详细描述信息，描述了用户提交的具体需求内容。`,
+        priority: WorkOrderPriority.MEDIUM,
         status,
-        creatorId: `user-${(index % 5) + 1}`,
-        creatorName: ['张三', '李四', '王五', '赵六', '钱七'][index % 5],
-        createdAt: new Date(Date.now() - index * 86400000).toISOString(),
-        updatedAt: new Date(Date.now() - index * 43200000).toISOString(),
+        version: 1,
+        applicantId: (index % 5) + 1,
+        applicantName: ['张三', '李四', '王五', '赵六', '钱七'][index % 5],
+        departmentId: (index % 3) + 1,
+        departmentName: ['行政部', '财务部', '信息部'][index % 3],
+        currentApprovalLevel: null,
+        rejectionReason: status === WorkOrderStatus.REJECTED ? '审批意见未通过' : null,
+        assetIds: [],
+        attachments: [],
+        createdAt,
+        updatedAt,
+        submittedAt: status === WorkOrderStatus.DRAFT ? null : createdAt,
+        completedAt: status === WorkOrderStatus.APPROVED ? updatedAt : null,
       };
     });
   };
@@ -242,13 +278,13 @@ export const WorkOrderList: React.FC<WorkOrderListProps> = ({
   const columns: ColumnsType<WorkOrder> = [
     {
       title: '工单编号',
-      dataIndex: 'id',
-      key: 'id',
+      dataIndex: 'orderNo',
+      key: 'orderNo',
       width: 120,
       fixed: 'left',
-      render: (id: string) => (
-        <Text strong copyable={{ text: id }}>
-          {id}
+      render: (orderNo: string) => (
+        <Text strong copyable={{ text: orderNo }}>
+          {orderNo}
         </Text>
       ),
     },
@@ -284,8 +320,8 @@ export const WorkOrderList: React.FC<WorkOrderListProps> = ({
     },
     {
       title: '创建人',
-      dataIndex: 'creatorName',
-      key: 'creatorName',
+      dataIndex: 'applicantName',
+      key: 'applicantName',
       width: 100,
     },
     {
@@ -319,7 +355,7 @@ export const WorkOrderList: React.FC<WorkOrderListProps> = ({
                 >
                   查看
                 </Button>
-                {record.status === 'PENDING' && (
+                {record.status === WorkOrderStatus.PENDING && (
                   <>
                     <Button
                       type="link"

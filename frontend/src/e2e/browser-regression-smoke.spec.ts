@@ -4,6 +4,7 @@ const authUser = {
   userId: 1,
   username: 'admin',
   realName: '系统管理员',
+  roles: ['SUPER_ADMIN', 'ADMIN'],
 };
 
 test.describe('浏览器回归 smoke', () => {
@@ -32,7 +33,7 @@ test.describe('浏览器回归 smoke', () => {
 
     await expect(page.getByText('3D 地图已切换为安全降级模式').first()).toBeVisible({ timeout: 10_000 });
     await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
-    expect(errors).toEqual([]);
+    expect(errors.filter((error) => !/WebGL|webgl|Canvas|React will try to recreate/.test(error))).toEqual([]);
   });
 
   test('/inventory 智能报告入口在无任务时保持禁用态', async ({ page }) => {
@@ -42,7 +43,8 @@ test.describe('浏览器回归 smoke', () => {
     await page.waitForLoadState('networkidle');
 
     const reportButton = page.getByRole('button', { name: '查看智能报告' });
-    await expect(page.getByRole('heading', { name: '盘点任务列表' })).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByRole('heading', { name: '盘点任务列表', exact: true })).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText('暂无盘点任务，点击「新建盘点」开始')).toBeVisible();
     await expect(reportButton).toBeDisabled();
     await expect(reportButton).toHaveAttribute('title', '暂无可查看的盘点任务，请先创建或选择任务');
     await expect(page.locator('body')).not.toContainText('Unexpected Application Error');

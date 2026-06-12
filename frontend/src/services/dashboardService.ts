@@ -12,9 +12,9 @@ import type {
   AssetStatistics,
   CategoryDistribution,
   MaintenanceAlert,
-  DashboardStatisticsResponse,
+  AssetStatisticsResponse,
   CategoryDistributionResponse,
-  MaintenanceAlertsResponse
+  MaintenanceAlertResponse
 } from '../types/dashboard.types';
 
 /** Base API URL for dashboard endpoints */
@@ -38,11 +38,10 @@ const REFRESH_INTERVAL_MS = 60000;
  */
 export async function getAssetStatistics(): Promise<AssetStatistics> {
   try {
-    const response = await http.get<DashboardStatisticsResponse>(
+    const response = await http.get<AssetStatisticsResponse>(
       `${API_BASE_URL}/assets/statistics`
     );
-    // http 拦截器已解包 response.data，response 现在就是 DashboardStatisticsResponse
-    return (response as any).data;
+    return response;
   } catch (error) {
     console.error('[DashboardService] Failed to fetch asset statistics:', error);
     throw error;
@@ -55,7 +54,7 @@ export async function getAssetStatistics(): Promise<AssetStatistics> {
  * used for rendering pie/donut charts on the dashboard.
  * @async
  * @function getCategoryDistribution
- * @returns {Promise<CategoryDistribution>} A promise resolving to category distribution data.
+ * @returns {Promise<CategoryDistribution[]>} A promise resolving to category distribution data.
  * @throws {Error} Throws an error if the API request fails or response is invalid.
  * @example
  * ```typescript
@@ -65,12 +64,12 @@ export async function getAssetStatistics(): Promise<AssetStatistics> {
  * });
  * ```
  */
-export async function getCategoryDistribution(): Promise<CategoryDistribution> {
+export async function getCategoryDistribution(): Promise<CategoryDistribution[]> {
   try {
     const response = await http.get<CategoryDistributionResponse>(
       `${API_BASE_URL}/assets/categories/distribution`
     );
-    return (response as any).data;
+    return response;
   } catch (error) {
     console.error('[DashboardService] Failed to fetch category distribution:', error);
     throw error;
@@ -97,10 +96,10 @@ export async function getCategoryDistribution(): Promise<CategoryDistribution> {
  */
 export async function getMaintenanceAlerts(): Promise<MaintenanceAlert[]> {
   try {
-    const response = await http.get<MaintenanceAlertsResponse>(
+    const response = await http.get<MaintenanceAlertResponse>(
       `${API_BASE_URL}/maintenance/alerts`
     );
-    return (response as any).data;
+    return response;
   } catch (error) {
     console.error('[DashboardService] Failed to fetch maintenance alerts:', error);
     throw error;
@@ -113,7 +112,7 @@ export async function getMaintenanceAlerts(): Promise<MaintenanceAlert[]> {
  * into a single async operation for efficient data loading.
  * @async
  * @function fetchDashboardData
- * @returns {Promise<{ statistics: AssetStatistics; distribution: CategoryDistribution; alerts: MaintenanceAlert[] }>}
+ * @returns {Promise<{ statistics: AssetStatistics; distribution: CategoryDistribution[]; alerts: MaintenanceAlert[] }>}
  * A promise resolving to an object containing all dashboard data.
  * @throws {Error} Throws an error if any of the API requests fail.
  * @example
@@ -124,7 +123,7 @@ export async function getMaintenanceAlerts(): Promise<MaintenanceAlert[]> {
  */
 export async function fetchDashboardData(): Promise<{
   statistics: AssetStatistics;
-  distribution: CategoryDistribution;
+  distribution: CategoryDistribution[];
   alerts: MaintenanceAlert[];
 }> {
   const [statistics, distribution, alerts] = await Promise.all([
@@ -180,9 +179,9 @@ export function filterAlertsByUrgency(alerts: MaintenanceAlert[]): {
   urgent: MaintenanceAlert[];
   warning: MaintenanceAlert[];
 } {
-  const urgent = alerts.filter(alert => alert.daysUntilExpiration <= 7);
+  const urgent = alerts.filter(alert => alert.daysUntilDue <= 7);
   const warning = alerts.filter(
-    alert => alert.daysUntilExpiration > 7 && alert.daysUntilExpiration <= 30
+    alert => alert.daysUntilDue > 7 && alert.daysUntilDue <= 30
   );
 
   return { urgent, warning };
@@ -202,7 +201,7 @@ export function filterAlertsByUrgency(alerts: MaintenanceAlert[]): {
  * ```
  */
 export function transformCategoryForChart(
-  distribution: CategoryDistribution
+  distribution: CategoryDistribution[]
 ): Array<{ name: string; value: number }> {
   return distribution.map(item => ({
     name: item.categoryName,

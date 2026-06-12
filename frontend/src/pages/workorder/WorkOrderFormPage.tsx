@@ -24,18 +24,27 @@ import { getUserList } from '@/api/base';
 import type { UserItem } from '@/api/base';
 import type { PaginatedResponse, ApiResponse, PageData } from '@/types/common';
 import type { AssetListItem } from '@/types/asset';
+import {
+  WorkOrderPriority,
+  WorkOrderType,
+  type CreateWorkOrderRequest,
+} from '@/types/workorder';
 
 const schema = z.object({
   title: z.string().min(5, '标题至少 5 个字').max(100),
-  type: z.enum(['PURCHASE', 'REPAIR', 'TRANSFER', 'DISPOSAL', 'OTHER']),
-  priority: z.enum(['LOW', 'MEDIUM', 'HIGH', 'CRITICAL']),
+  type: z.nativeEnum(WorkOrderType),
+  priority: z.nativeEnum(WorkOrderPriority),
   description: z.string().max(1000).optional(),
-  estimatedCost: z.coerce.number().min(0).optional(),
+  estimatedCost: z.preprocess(
+    (value) => (value === '' || value == null ? undefined : value),
+    z.coerce.number().min(0).optional(),
+  ),
   dueDate: z.string().optional(),
   assignee: z.string().optional(),
 });
 
-type FormValues = z.infer<typeof schema>;
+type FormInput = z.input<typeof schema>;
+type FormValues = z.output<typeof schema>;
 
 const TYPE_OPTIONS = [
   { value: 'PURCHASE', label: '采购' },
@@ -63,6 +72,7 @@ export default function WorkOrderFormPage() {
   const params = useParams<{ id: string }>();
   const qc = useQueryClient();
   const prefill = (location.state as Record<string, unknown> | null) ?? {};
+  const prefillTitle = typeof prefill.title === 'string' ? prefill.title : '';
   const [collabInput, setCollabInput] = useState('');
   const [collaboratorsList, setCollaboratorsList] = useState<string[]>(collaborators);
   const [assigneeOptions, setAssigneeOptions] = useState(ASSIGNEE_DEFAULT);
@@ -137,23 +147,34 @@ export default function WorkOrderFormPage() {
     control,
     watch,
     formState: { errors, isSubmitting },
-  } = useForm<FormValues>({
+  } = useForm<FormInput, unknown, FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
-      type: 'REPAIR',
-      priority: 'MEDIUM',
-      title: prefill.title ?? '',
+      type: WorkOrderType.REPAIR,
+      priority: WorkOrderPriority.MEDIUM,
+      title: prefillTitle,
     },
   });
 
   const saveMutation = useMutation({
     mutationFn: async (data: FormValues) => {
-      // 合并选中的资产信息
-      const payload = {
-        ...data,
-        assetId: selectedAsset?.id ?? null,
-        assetName: selectedAsset?.assetName ?? null,
-        assetCode: selectedAsset?.assetNo ?? null,
+      const assigneeId = data.assignee ? Number(data.assignee) : undefined;
+      const payload: CreateWorkOrderRequest = {
+        title: data.title,
+        description: data.description ?? '',
+        type: data.type,
+        priority: data.priority,
+        ...(selectedAsset
+          ? {
+              assetId: selectedAsset.id,
+              assetName: selectedAsset.assetName,
+              assetCode: selectedAsset.assetNo,
+              assetIds: [selectedAsset.id],
+            }
+          : {}),
+        ...(Number.isFinite(assigneeId) ? { assigneeId } : {}),
+        ...(data.estimatedCost !== undefined ? { estimatedCost: data.estimatedCost } : {}),
+        ...(data.dueDate ? { plannedEndDate: `${data.dueDate}T23:59:59` } : {}),
       };
       if (isEdit && editId) {
         return updateWorkOrder(editId, payload);

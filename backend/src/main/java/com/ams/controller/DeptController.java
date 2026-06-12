@@ -17,6 +17,11 @@ import java.util.Map;
 public class DeptController {
     private final DeptService deptService;
 
+    @GetMapping
+    public Result<List<Map<String, Object>>> all(@RequestParam(required = false) String keyword) {
+        return Result.success(deptService.queryDepts(keyword));
+    }
+
     @GetMapping("/list")
     public Result<List<Map<String, Object>>> list(@RequestParam(required = false) String keyword) {
         return Result.success(deptService.queryDepts(keyword));

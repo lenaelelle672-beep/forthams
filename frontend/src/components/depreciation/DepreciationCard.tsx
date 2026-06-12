@@ -448,14 +448,5 @@ const DepreciationCard: React.FC<DepreciationCardProps> = ({
 
 export default DepreciationCard;
 
-// 导出类型和工具函数供外部使用
+// 保留命名组件导出；类型和工具函数已在声明处导出。
 export { DepreciationCard };
-export type {
-  DepreciationMethod,
-  MonthlyDepreciation,
-  DepreciationData,
-  DepreciationRequestParams,
-  DepreciationApiResponse,
-  DepreciationCardProps,
-};
-export { formatCurrency, formatPercentage, transformApiResponse, fetchDepreciationData };

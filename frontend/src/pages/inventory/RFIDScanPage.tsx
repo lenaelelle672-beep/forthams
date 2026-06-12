@@ -33,13 +33,29 @@ import { Button } from '@/components/ui/Button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { inventoryService } from '@/api/inventory';
 import {
+  type InventoryTaskRecord,
+  type InventoryDetailRecord,
   getTaskAssets,
   confirmAsset,
   batchConfirmAssets,
   submitTask,
   getTaskSummary,
 } from '@/api/inventory';
-import type { ActualStatus } from '@/types/inventory';
+import type { ApiResponse, PaginatedResponse } from '@/types/common';
+import type { ActualStatus, InventoryAsset, InventorySummary } from '@/types/inventory';
+
+type RFIDInventoryTaskRecord = InventoryTaskRecord & {
+  scannedCount?: number | null;
+};
+
+type RFIDTaskPayload = RFIDInventoryTaskRecord | {
+  task: RFIDInventoryTaskRecord;
+};
+
+function unwrapTaskPayload(payload?: RFIDTaskPayload): RFIDInventoryTaskRecord | undefined {
+  if (!payload) return undefined;
+  return 'task' in payload ? payload.task : payload;
+}
 
 // ── 任务进度条 ────────────────────────────────────────────────────────────────
 function ProgressBar({ value, className }: { value: number; className?: string }) {
@@ -148,26 +164,34 @@ export default function RFIDScanPage() {
   });
 
   // ── 派生数据 ────────────────────────────────────────────────────────────────
-  const assets = assetsResponse?.data?.records ?? [];
-  const summary = summaryResponse?.data;
+  const taskPayload = (taskDetail as ApiResponse<RFIDTaskPayload> | undefined)?.data;
+  const taskRecord = unwrapTaskPayload(taskPayload);
+  const assetRecords = (assetsResponse as PaginatedResponse<InventoryAsset> | undefined)?.data?.records ?? [];
+  const summary = (summaryResponse as ApiResponse<InventorySummary> | undefined)?.data;
+  const detailRecordPayload = (detailRecords as ApiResponse<InventoryDetailRecord[]> | InventoryDetailRecord[] | undefined);
+  const inventoryDetailRecords = Array.isArray(detailRecordPayload)
+    ? detailRecordPayload
+    : detailRecordPayload?.data ?? [];
+
+  const assets = assetRecords;
   const unconfirmedAssets = assets.filter((a) => !a.confirmed);
 
   // 获取任务数据（纯 API，无 MOCK 兜底）
-  const task = taskDetail?.task
+  const task = taskRecord
     ? {
-        id: String(taskDetail.task.id),
-        taskNo: taskDetail.task.taskNo,
-        taskName: taskDetail.task.taskName ?? 'RFID扫描任务',
-        location: (taskDetail.task as Record<string, unknown>).location ?? '—',
-        responsible: String(taskDetail.task.executorId ?? '—'),
-        totalAssets: taskDetail.task.totalCount ?? 0,
-        scanned: taskDetail.task.scannedCount ?? 0,
-        progress: taskDetail.task.totalCount
-          ? Math.round(((taskDetail.task.scannedCount ?? 0) / taskDetail.task.totalCount) * 100)
+        id: String(taskRecord.id),
+        taskNo: taskRecord.taskNo,
+        taskName: taskRecord.taskName ?? 'RFID扫描任务',
+        location: taskRecord.location ?? '—',
+        responsible: String(taskRecord.executorId ?? '—'),
+        totalAssets: taskRecord.totalCount ?? 0,
+        scanned: taskRecord.scannedCount ?? 0,
+        progress: taskRecord.totalCount
+          ? Math.round(((taskRecord.scannedCount ?? 0) / taskRecord.totalCount) * 100)
           : 0,
-        status: taskDetail.task.status,
-        startDate: taskDetail.task.startDate ?? '—',
-        endDate: taskDetail.task.endDate ?? '—',
+        status: taskRecord.status,
+        startDate: taskRecord.startDate ?? '—',
+        endDate: taskRecord.endDate ?? '—',
       }
     : null;
 
@@ -182,8 +206,8 @@ export default function RFIDScanPage() {
         confirmed: a.confirmed,
         assetId: a.assetId,
       }))
-    : detailRecords && detailRecords.length > 0
-      ? detailRecords.slice(0, 5).map((r) => ({
+    : inventoryDetailRecords.length > 0
+      ? inventoryDetailRecords.slice(0, 5).map((r) => ({
           id: String(r.id),
           assetNo: String(r.assetId),
           name: r.rfidTag ?? '未知资产',

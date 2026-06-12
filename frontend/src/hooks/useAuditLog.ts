@@ -4,7 +4,43 @@
 // ============================================================
 
 import { useState, useCallback, useMemo } from 'react';
-import type { AuditLogEntry, GraphifyNode, GraphifyEdge, AuditLogFilter } from './types';
+
+export interface AuditLogEntry {
+  id?: string;
+  timestamp: string;
+  userId?: string;
+  operation?: string;
+  assetId?: string;
+  field?: string;
+  oldValue?: string;
+  newValue?: string;
+  riskLevel?: RiskLevel;
+}
+
+export interface GraphifyNode {
+  id: string;
+  type: NodeType;
+  label?: string;
+  x?: number;
+  y?: number;
+  properties?: Record<string, unknown>;
+}
+
+export interface GraphifyEdge {
+  source: string;
+  target: string;
+  type: EdgeType;
+  properties?: Record<string, unknown>;
+}
+
+export interface AuditLogFilter {
+  operation?: string;
+  userId?: string;
+  startDate?: string;
+  endDate?: string;
+  riskLevel?: RiskLevel;
+  [key: string]: unknown;
+}
 
 /**
  * Audit log conversion options

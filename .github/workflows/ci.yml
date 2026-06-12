@@ -1,0 +1,192 @@
+name: CI Pipeline
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'backend/**'
+      - 'frontend/**'
+      - 'Dockerfile'
+      - 'docker-compose.yml'
+      - 'docker/**'
+      - 'scripts/**'
+      - '.github/workflows/**'
+  workflow_dispatch:
+
+env:
+  JAVA_VERSION: '17'
+  NODE_VERSION: '20'
+  MYSQL_ROOT_PASSWORD: ci-root-password
+  DB_USERNAME: ams_user
+  DB_PASSWORD: ci-db-password
+  JWT_SECRET: ci-jwt-secret-for-container-build-only
+
+jobs:
+  build-and-test:
+    name: Build & Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      # ---- Java 17 ----
+      - name: Setup Java ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v5
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: 'temurin'
+          cache: 'maven'
+          cache-dependency-path: backend/pom.xml
+
+      # ---- Node 20 ----
+      - name: Setup Node ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      # ---- Frontend: install dependencies ----
+      - name: Install Frontend Dependencies
+        run: npm ci
+        working-directory: frontend
+
+      # ---- Frontend: install browser runtime for Playwright smoke ----
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+        working-directory: frontend
+
+      # ---- Frontend: build ----
+      - name: Frontend Build
+        run: npm run build
+        working-directory: frontend
+
+      # ---- TypeScript baseline audit ----
+      - name: TypeScript Baseline Audit
+        run: npx tsc -p tsconfig.json --noEmit --pretty false
+        working-directory: frontend
+
+      # ---- Frontend: unit tests ----
+      - name: Frontend Test
+        run: npm test -- --run
+        working-directory: frontend
+
+      # ---- Frontend: browser smoke ----
+      - name: Browser Regression Smoke
+        run: npm run e2e:browser-regression
+        working-directory: frontend
+
+      # ---- Backend: deployment and workflow guards ----
+      - name: Backend Deployment & Workflow Guards
+        run: mvn -q -Dtest=DeploymentConfigConsistencyTest,TenantSchemaConsistencyTest,PermissionSeedSchemaTest,WorkflowDefinitionControllerTest,WorkflowDefinitionServiceTest test
+        working-directory: backend
+
+      # ---- Backend: unit tests ----
+      - name: Backend Test
+        run: mvn test -q
+        working-directory: backend
+
+  docker-config-build:
+    name: Docker Config & Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+
+      # ---- Deployment: Docker/Compose build guards ----
+      - name: Docker Compose Config
+        run: docker compose config --quiet
+
+      - name: Docker Compose Build
+        run: docker compose build backend frontend
+
+      - name: Docker Compose Runtime Smoke
+        timeout-minutes: 10
+        run: |
+          set -euo pipefail
+
+          cleanup() {
+            docker compose -p forthams-ci down -v --remove-orphans || true
+          }
+          cleanup
+          trap cleanup EXIT
+
+          docker compose -p forthams-ci up -d mysql redis backend frontend
+
+          for attempt in {1..60}; do
+            if curl -fsS http://localhost:8080/api/health > /tmp/backend-health.json \
+              && curl -fsS http://localhost:3000/ > /tmp/frontend-root.html \
+              && curl -fsS http://localhost:3000/workflows > /tmp/frontend-workflows.html \
+              && curl -fsS http://localhost:3000/api/health > /tmp/frontend-api-health.json; then
+              grep -q '<div id="root"' /tmp/frontend-root.html
+              grep -q '<div id="root"' /tmp/frontend-workflows.html
+              exit 0
+            fi
+
+            echo "Waiting for Docker runtime smoke (${attempt}/60)..."
+            docker compose -p forthams-ci ps
+            sleep 5
+          done
+
+          echo "Docker Compose runtime smoke failed"
+          docker compose -p forthams-ci logs --no-color --tail=200 mysql redis backend frontend
+          exit 1
+
+      - name: Single Container Docker Build
+        run: docker build -t forthams-single:ci .
+
+      - name: Single Container Runtime Smoke
+        timeout-minutes: 10
+        run: |
+          set -euo pipefail
+
+          cleanup() {
+            docker rm -f forthams-single-ci 2>/dev/null || true
+            docker compose -p forthams-single-ci down -v --remove-orphans || true
+          }
+          cleanup
+          trap cleanup EXIT
+
+          docker compose -p forthams-single-ci up -d mysql redis
+
+          for attempt in {1..60}; do
+            if docker compose -p forthams-single-ci exec -T mysql mysqladmin ping -h localhost -u root -p"${MYSQL_ROOT_PASSWORD}" --silent \
+              && docker run --rm --network forthams-single-ci_default mysql:8.0 \
+                mysql -h mysql -u "${DB_USERNAME}" -p"${DB_PASSWORD}" ams_db -e "SELECT 1" >/dev/null; then
+              break
+            fi
+            if [ "${attempt}" -eq 60 ]; then
+              echo "Single-container dependencies failed to become ready"
+              docker compose -p forthams-single-ci ps
+              docker compose -p forthams-single-ci logs --no-color --tail=200 mysql redis
+              exit 1
+            fi
+            echo "Waiting for single-container dependencies (${attempt}/60)..."
+            sleep 2
+          done
+
+          docker run -d --name forthams-single-ci \
+            --network forthams-single-ci_default \
+            -p 18080:8080 \
+            -e DB_URL="jdbc:mysql://mysql:3306/ams_db?useUnicode=true&characterEncoding=utf8&connectionCollation=utf8mb4_unicode_ci&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true" \
+            -e DB_USERNAME="${DB_USERNAME}" \
+            -e DB_PASSWORD="${DB_PASSWORD}" \
+            -e JWT_SECRET="${JWT_SECRET}" \
+            forthams-single:ci
+
+          for attempt in {1..60}; do
+            if curl -fsS http://localhost:18080/api/health > /tmp/single-health.json \
+              && curl -fsS http://localhost:18080/ > /tmp/single-root.html \
+              && curl -fsS http://localhost:18080/workflows > /tmp/single-workflows.html; then
+              grep -q '<div id="root"' /tmp/single-root.html
+              grep -q '<div id="root"' /tmp/single-workflows.html
+              exit 0
+            fi
+
+            echo "Waiting for single-container runtime smoke (${attempt}/60)..."
+            docker ps --filter name=forthams-single-ci
+            sleep 5
+          done
+
+          echo "Single-container runtime smoke failed"
+          docker logs forthams-single-ci
+          exit 1

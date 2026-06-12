@@ -11,22 +11,22 @@
  */
 
 import { useState, useCallback } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/app/components/ui/button';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Calendar } from '@/components/ui/calendar';
+} from '@/app/components/ui/select';
+import { Calendar } from '@/app/components/ui/calendar';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '@/components/ui/popover';
+} from '@/app/components/ui/popover';
 import { CalendarIcon, Download, FileSpreadsheet, FileText } from 'lucide-react';
-import { format } from 'date-fns';
+import { format as formatDate } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
@@ -102,7 +102,7 @@ export function FormatSelector({
     setIsExporting(true);
     try {
       // 生成带时间戳的文件名
-      const timestamp = format(new Date(), 'yyyyMMdd_HHmmss');
+      const timestamp = formatDate(new Date(), 'yyyyMMdd_HHmmss');
       const filename = `asset_export_${timestamp}.${format === 'csv' ? 'csv' : 'xlsx'}`;
 
       // 记录导出的文件名（用于测试断言）
@@ -117,10 +117,10 @@ export function FormatSelector({
           ...(filters.assetType && { asset_type: filters.assetType }),
           ...(filters.status && { status: filters.status }),
           ...(filters.startDate && {
-            start_date: format(filters.startDate, 'yyyy-MM-dd'),
+            start_date: formatDate(filters.startDate, 'yyyy-MM-dd'),
           }),
           ...(filters.endDate && {
-            end_date: format(filters.endDate, 'yyyy-MM-dd'),
+            end_date: formatDate(filters.endDate, 'yyyy-MM-dd'),
           }),
         });
 
@@ -257,7 +257,7 @@ export function FormatSelector({
                 disabled={disabled}
               >
                 <CalendarIcon className="mr-2 h-4 w-4" />
-                {filters.startDate ? format(filters.startDate, 'yyyy-MM-dd') : '选择日期'}
+                {filters.startDate ? formatDate(filters.startDate, 'yyyy-MM-dd') : '选择日期'}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
@@ -293,7 +293,7 @@ export function FormatSelector({
                 disabled={disabled}
               >
                 <CalendarIcon className="mr-2 h-4 w-4" />
-                {filters.endDate ? format(filters.endDate, 'yyyy-MM-dd') : '选择日期'}
+                {filters.endDate ? formatDate(filters.endDate, 'yyyy-MM-dd') : '选择日期'}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">

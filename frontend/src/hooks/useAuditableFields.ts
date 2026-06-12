@@ -1,6 +1,67 @@
 import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
-import type { AuditableFieldMetadata, AuditEvent, AuditBindingConfig } from '../types/audit.types';
-import { auditService } from '../services/auditService';
+
+interface AuditEvent {
+  id?: string;
+  fieldId?: string;
+  fieldName?: string;
+  timestamp: string | number | Date;
+  oldValue?: unknown;
+  newValue?: unknown;
+  metadata?: Record<string, unknown>;
+}
+
+interface AuditableFieldMetadata {
+  fieldId: string;
+  fieldName?: string;
+  displayName?: string;
+  defaultValue?: unknown;
+  metadata?: Record<string, unknown>;
+}
+
+interface AuditBindingConfig {
+  assetId: string;
+  entityType: string;
+  enableRealtime: boolean;
+  enableGraphify: boolean;
+  cacheTimeout: number;
+  maxRetries: number;
+  retryDelay: number;
+}
+
+interface GraphifyNodeCandidate {
+  id: string;
+  confidence?: number;
+  relatedEvents?: AuditEvent[];
+  metadata?: Record<string, unknown>;
+}
+
+// Root audit service does not expose field-level binding APIs yet, so this
+// adapter keeps the hook usable and type-safe until the backend contract lands.
+const fieldAuditAdapter = {
+  async getFieldMetadata(
+    _entityType: string,
+    _fieldId: string
+  ): Promise<AuditableFieldMetadata | null> {
+    return null;
+  },
+  async searchGraphifyNodes(
+    _params: Record<string, unknown>
+  ): Promise<GraphifyNodeCandidate[]> {
+    return [];
+  },
+  async getFieldAuditHistory(
+    _params: Record<string, unknown>
+  ): Promise<AuditEvent[]> {
+    return [];
+  },
+  subscribeToFieldUpdates(
+    _assetId: string,
+    _fieldId: string,
+    _callback: (event: AuditEvent) => void
+  ): () => void {
+    return () => {};
+  },
+};
 
 const DEFAULT_BINDING_CONFIG: Required<AuditBindingConfig> = {
   assetId: '',
@@ -128,7 +189,7 @@ export function useAuditableFields(
     }
 
     try {
-      const metadata = await auditService.getFieldMetadata(entityType, fieldId);
+      const metadata = await fieldAuditAdapter.getFieldMetadata(entityType, fieldId);
 
       if (metadata && mountedRef.current) {
         metadataCacheRef.current.set(cacheKey, {
@@ -157,7 +218,7 @@ export function useAuditableFields(
     }
 
     try {
-      const nodes = await auditService.searchGraphifyNodes({
+      const nodes = await fieldAuditAdapter.searchGraphifyNodes({
         query: fieldName,
         entityType: config.entityType,
         assetId: config.assetId,
@@ -189,7 +250,7 @@ export function useAuditableFields(
 
   async function fetchFieldEvents(fieldId: string): Promise<AuditEvent[]> {
     try {
-      const events = await auditService.getFieldAuditHistory({
+      const events = await fieldAuditAdapter.getFieldAuditHistory({
         assetId: config.assetId,
         entityType: config.entityType,
         fieldId,
@@ -214,7 +275,7 @@ export function useAuditableFields(
       return () => {};
     }
 
-    const unsubscribe = auditService.subscribeToFieldUpdates(
+    const unsubscribe = fieldAuditAdapter.subscribeToFieldUpdates(
       config.assetId,
       fieldId,
       (event) => {
@@ -455,10 +516,3 @@ export function useAuditableFields(
     exportAuditTrail,
   };
 }
-
-export type {
-  FieldBinding,
-  GraphifyNodeMatch,
-  UseAuditableFieldsOptions,
-  UseAuditableFieldsReturn,
-};

@@ -242,6 +242,11 @@ export default function AssetScrapFormPage() {
           { label: '资产报废', href: '/disposals' },
           { label: '新建申请' },
         ]}
+        actions={
+          <Button variant="outline" size="md" type="button" onClick={() => navigate('/workflow-designer?businessType=ASSET_SCRAP')}>
+            配置流程
+          </Button>
+        }
       />
 
       <StepIndicator currentStep={currentStep} />

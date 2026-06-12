@@ -17,6 +17,7 @@ import { toast } from 'sonner';
 import {
   FileBarChart, BarChart3, PieChart, TrendingUp,
   Package, DollarSign, ClipboardList, Plus,
+  type LucideIcon,
 } from 'lucide-react';
 import { getReportSummary, getReportByCategory, type ReportSummary, type CategoryReport } from '@/api/stats';
 import type { ApiResponse } from '@/types/common';
@@ -44,7 +45,7 @@ interface ReportTemplate {
   title: string;
   description: string;
   lastUpdated: string;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: LucideIcon;
   iconColor: string;
 }
 

@@ -24,10 +24,9 @@
  */
 
 import React, { useCallback } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
+import { Button } from '@/components/ui/Button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
+import { Badge } from '@/components/ui/Badge';
 import {
   Download,
   CheckCircle2,
@@ -48,6 +47,8 @@ export type ImportTaskStatus =
   | 'completed'   // 已完成
   | 'failed'      // 失败
   | 'partial';    // 部分成功
+
+type BadgeVariant = React.ComponentProps<typeof Badge>['variant'];
 
 /** 单行错误信息 */
 export interface ImportError {
@@ -90,17 +91,30 @@ export interface ImportResultProps {
 /** 状态配置映射 */
 const STATUS_CONFIG: Record<
   ImportTaskStatus,
-  { label: string; variant: 'default' | 'success' | 'destructive' | 'warning' | 'secondary'; icon: React.ElementType }
+  { label: string; variant: BadgeVariant; icon: React.ElementType }
 > = {
-  pending: { label: '待处理', variant: 'secondary', icon: Clock },
+  pending: { label: '待处理', variant: 'gray', icon: Clock },
   processing: { label: '处理中', variant: 'default', icon: Clock },
   completed: { label: '已完成', variant: 'success', icon: CheckCircle2 },
-  failed: { label: '失败', variant: 'destructive', icon: XCircle },
+  failed: { label: '失败', variant: 'danger', icon: XCircle },
   partial: { label: '部分成功', variant: 'warning', icon: AlertCircle },
 };
 
 /** 最大显示错误条数 */
 const MAX_DISPLAY_ERRORS = 50;
+
+function ImportProgress({ value, className }: { value: number; className?: string }) {
+  const normalizedValue = Math.max(0, Math.min(100, value));
+
+  return (
+    <div className={`h-2 w-full overflow-hidden rounded-full bg-[#e5e7eb] ${className ?? ''}`}>
+      <div
+        className="h-full rounded-full bg-[#3b82f6] transition-all"
+        style={{ width: `${normalizedValue}%` }}
+      />
+    </div>
+  );
+}
 
 // ============================================================================
 // Component
@@ -192,7 +206,7 @@ export const ImportResult: React.FC<ImportResultProps> = ({
               <span className="text-muted-foreground">导入进度</span>
               <span className="font-medium">{progress}%</span>
             </div>
-            <Progress value={progress} className="h-2" />
+            <ImportProgress value={progress} className="h-2" />
           </div>
         )}
 

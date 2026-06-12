@@ -14,6 +14,7 @@
     "test:coverage": "vitest --coverage",
     "test:coverage:full": "vitest --coverage --coverage.all=true --coverage.include='src/**/*.{ts,tsx}'",
     "e2e": "playwright test",
+    "e2e:browser-regression": "playwright test --project=browser-regression-smoke --reporter=line",
     "e2e:real": "AMS_E2E_REAL_BACKEND=true playwright test --project=real-backend-smoke",
     "e2e:ui": "playwright test --ui",
     "stitch": "node --input-type=module ../scripts/stitch-cli.js",

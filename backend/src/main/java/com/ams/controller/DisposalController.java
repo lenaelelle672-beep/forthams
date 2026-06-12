@@ -12,6 +12,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/disposals")
 public class DisposalController {
@@ -35,6 +37,27 @@ public class DisposalController {
     @PostMapping("/scrap")
     public Result<Asset> scrap(@Valid @RequestBody AssetScrapDTO dto) {
         throw new BusinessException("资产报废必须通过审批流程提交");
+    }
+
+    @GetMapping
+    public Result<Page<AssetChangeLog>> list(
+        @RequestParam(defaultValue = "1") Integer page,
+        @RequestParam(defaultValue = "10") Integer pageSize,
+        @RequestParam(name = "type", required = false) String type
+    ) {
+        return Result.success(disposalService.getDisposalHistory(page, pageSize, type));
+    }
+
+    @GetMapping("/stats")
+    public Result<Map<String, Object>> stats() {
+        long total = disposalService.getDisposalHistory(1, 1, null).getTotal();
+        return Result.success(Map.of(
+            "totalThisMonth", total,
+            "monthOverMonthDelta", 0,
+            "pendingCount", 0,
+            "completedCount", total,
+            "recoveredValue", 0
+        ));
     }
 
     @GetMapping("/history")

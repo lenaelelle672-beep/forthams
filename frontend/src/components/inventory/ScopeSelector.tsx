@@ -20,7 +20,6 @@ import {
   DeleteOutlined,
   ReloadOutlined,
 } from '@ant-design/icons';
-import type { TreeProps } from 'antd';
 
 import { TOKEN_STORAGE_KEY } from '../../app/utils/api';
 
@@ -57,6 +56,13 @@ interface RawTreeNodeData extends Record<string, unknown> {
   locationName?: string;
   children?: RawTreeNodeData[];
 }
+
+type CheckedTreeKeys =
+  | React.Key[]
+  | {
+      checked: React.Key[];
+      halfChecked?: React.Key[];
+    };
 
 // ---------------------------------------------------------------------------
 // 工具函数
@@ -228,7 +234,7 @@ const ScopeSelector: React.FC<ScopeSelectorProps> = ({ value, onChange }) => {
    *
    * @param checkedKeys - Ant Design Tree 返回的已勾选 key 集合
    */
-  const handleTreeCheck: TreeProps['onCheck'] = useCallback(
+  const handleTreeCheck = useCallback(
     (checkedKeys) => {
       const keys = Array.isArray(checkedKeys)
         ? checkedKeys
@@ -239,7 +245,7 @@ const ScopeSelector: React.FC<ScopeSelectorProps> = ({ value, onChange }) => {
       });
     },
     [value.scopeType, onChange],
-  );
+  ) as (checkedKeys: CheckedTreeKeys) => void;
 
   /**
    * 移除单个已选节点

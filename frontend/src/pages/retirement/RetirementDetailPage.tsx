@@ -267,7 +267,7 @@ export default function RetirementDetailPage() {
                     <Package className="w-8 h-8 text-gray-300" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-base font-semibold text-gray-900">{asset.assetName ?? asset.name ?? '—'}</h3>
+                    <h3 className="text-base font-semibold text-gray-900">{asset.assetName ?? '—'}</h3>
                     <p className="text-sm text-blue-600 font-medium">{asset.assetNo ?? '—'}</p>
                     <span className="inline-block mt-1 text-[10px] font-semibold uppercase tracking-wider text-gray-500 bg-gray-100 px-2 py-0.5 rounded">
                       {asset.categoryName ?? '未分类'}
@@ -279,7 +279,7 @@ export default function RetirementDetailPage() {
                     <MapPin className="w-3.5 h-3.5 text-gray-400" />
                     <div>
                       <p className="text-[10px] uppercase tracking-wider text-gray-400">存放位置</p>
-                      <p className="text-sm text-gray-900">{asset.locationName ?? '—'}</p>
+                      <p className="text-sm text-gray-900">{asset.location ?? '—'}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
@@ -287,7 +287,7 @@ export default function RetirementDetailPage() {
                     <div>
                       <p className="text-[10px] uppercase tracking-wider text-gray-400">购入价格</p>
                       <p className="text-sm text-gray-900">
-                        {asset.purchasePrice != null ? `¥${Number(asset.purchasePrice).toLocaleString()}` : '—'}
+                        {asset.originalValue != null ? `¥${Number(asset.originalValue).toLocaleString()}` : '—'}
                       </p>
                     </div>
                   </div>

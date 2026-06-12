@@ -47,6 +47,7 @@ const schema = z.object({
 });
 
 type FormValues = z.infer<typeof schema>;
+type FormInput = z.input<typeof schema>;
 
 export default function AssetFormPage() {
   const { id } = useParams<{ id: string }>();
@@ -71,7 +72,7 @@ export default function AssetFormPage() {
   const {
     register, handleSubmit, control, reset, watch,
     formState: { errors, isSubmitting },
-  } = useForm<FormValues>({
+  } = useForm<FormInput, unknown, FormValues>({
     resolver: zodResolver(schema),
     defaultValues: { status: AssetStatus.IN_USE, isImportant: 0 },
   });
@@ -109,11 +110,33 @@ export default function AssetFormPage() {
 
   const onSubmit = async (values: FormValues) => {
     setSubmitError(null);
+    const payload: CreateAssetRequest = {
+      assetName: values.assetName,
+      assetNo: values.assetNo,
+      categoryId: values.categoryId,
+      brand: values.brand,
+      model: values.model,
+      serialNo: values.serialNo,
+      supplier: values.supplier,
+      originalValue: values.originalValue,
+      currentValue: values.currentValue,
+      purchaseDate: values.purchaseDate,
+      warrantyPeriod: values.warrantyPeriod,
+      depreciationRate: values.depreciationRate,
+      status: values.status,
+      deptId: values.deptId,
+      location: values.location,
+      rfidTag: values.rfidTag,
+      isImportant: values.isImportant,
+      description: values.description,
+      remark: values.remark,
+    };
+
     try {
       if (isEdit && assetId) {
-        await updateMutation.mutateAsync({ id: assetId, ...values } as CreateAssetRequest & { id: number });
+        await updateMutation.mutateAsync({ id: assetId, ...payload });
       } else {
-        await createMutation.mutateAsync(values as CreateAssetRequest);
+        await createMutation.mutateAsync(payload);
       }
       queryClient.invalidateQueries({ queryKey: ['assets'] });
       navigate('/assets');
@@ -218,14 +241,17 @@ export default function AssetFormPage() {
                 <div className="space-y-1">
                   <label className="block text-sm font-medium text-gray-700">使用部门</label>
                   <select
-                    {...field}
+                    name={field.name}
+                    ref={field.ref}
+                    onBlur={field.onBlur}
+                    value={field.value == null ? '' : String(field.value)}
                     onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
                     className="w-full h-10 px-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="">请选择部门</option>
                     {departments.map((d) => (
-                      <option key={d.id ?? d.deptId} value={d.id ?? d.deptId}>
-                        {d.deptName ?? d.name}
+                      <option key={d.id} value={d.id}>
+                        {d.deptName}
                       </option>
                     ))}
                   </select>

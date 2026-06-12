@@ -112,6 +112,21 @@ class ApprovalControllerTest {
     }
 
     @Test
+    @DisplayName("Should list approvals from root endpoint")
+    void rootListReturnsApprovals() throws Exception {
+        when(approvalService.queryProcesses(eq(1), eq(10), eq("PENDING"), eq(null)))
+                .thenReturn(new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>());
+
+        mockMvc.perform(get("/api/approvals")
+                        .contextPath("/api")
+                        .param("status", "PENDING"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200));
+
+        verify(approvalService).queryProcesses(1, 10, "PENDING", null);
+    }
+
+    @Test
     @DisplayName("Should get approval detail by id")
     void getByIdReturnsProcessDetail() throws Exception {
         when(approvalService.getProcessById(eq(7L))).thenReturn(Map.of(

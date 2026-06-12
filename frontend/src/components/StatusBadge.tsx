@@ -25,7 +25,7 @@
  */
 
 import React from 'react';
-import { cn } from '../lib/utils';
+import { cn } from '@/utils/cn';
 
 /**
  * 资产报废流程状态枚举

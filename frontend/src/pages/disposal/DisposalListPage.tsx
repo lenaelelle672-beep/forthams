@@ -39,7 +39,7 @@ const TABS = [
   { id: 'TRANSFER',     label: '资产调拨', icon: ArrowRightLeft, color: '#3b82f6', route: '/disposals/transfer/new' },
   { id: 'CLEARANCE',    label: '资产清退', icon: LogOut,         color: '#f59e0b', route: '/disposals/clearance/new' },
   { id: 'SCRAP',        label: '报废转让', icon: Trash2,         color: '#ef4444', route: '/disposals/scrap/new' },
-  { id: 'COMPENSATION', label: '资产赔偿', icon: DollarSign,     color: '#10b981', route: '/compensation/new' },
+  { id: 'COMPENSATION', label: '资产赔偿', icon: DollarSign,     color: '#10b981', route: '/disposals/compensation/new' },
 ] as const;
 
 type TabId = typeof TABS[number]['id'];
@@ -223,7 +223,7 @@ export default function DisposalListPage() {
     <div className="space-y-6">
       <PageHeader
         title="资产处置管理"
-        description="统一管理资产调拨、清退、报废、赔偿等全生命周期处置流程"
+        subtitle="统一管理资产调拨、清退、报废、赔偿等全生命周期处置流程"
         actions={
           <Button
             variant="primary"

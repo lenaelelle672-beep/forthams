@@ -8,15 +8,93 @@
  * @version 1.0.0
  */
 
-import type {
-  Asset,
-  AssetAuditLog,
-  ApprovalProcess,
-  ApprovalRecord,
-  GraphifyNodeResult,
-  GraphifyEdgeResult,
-  AuditFieldChange,
-} from '../app/types/audit.types';
+export interface Asset {
+  id: string;
+  assetName: string;
+  assetCode: string;
+  categoryId: string;
+  categoryName: string;
+  serialNumber: string;
+  purchaseDate: string;
+  purchasePrice: number;
+  currentValue: number;
+  status: string;
+  location: string;
+  custodian: string;
+  department: string;
+  supplier: string;
+  warrantyPeriod: number;
+  maintenanceStatus: string;
+  remarks: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AssetAuditLog {
+  id: string;
+  assetId: string;
+  action: string;
+  operator: string;
+  operatorDept: string;
+  timestamp: string;
+  field: string | null;
+  oldValue: string | null;
+  newValue: string | null;
+  reason: string;
+}
+
+export interface ApprovalStage {
+  stage: number;
+  approver: string;
+  approverRole: string;
+  status: 'approved' | 'pending' | 'rejected';
+  comment: string | null;
+  actionDate: string | null;
+}
+
+export interface ApprovalProcess {
+  id: string;
+  assetId: string;
+  processType: string;
+  currentStage: number;
+  totalStages: number;
+  status: string;
+  applicant: string;
+  applicantDept: string;
+  applyDate: string;
+  estimatedCompletionDate: string;
+  actualCompletionDate: string | null;
+  remarks: string;
+  approvalStages: ApprovalStage[];
+}
+
+export interface ApprovalRecord {
+  id: string;
+  processId: string;
+  stage: number;
+  approver: string;
+  action: string;
+  comment: string;
+  timestamp: string;
+}
+
+export interface GraphifyNodeResult {
+  id: string;
+  label: string;
+  nodeType: MockGraphifyNode['nodeType'];
+  x: number;
+  y: number;
+  metadata: Record<string, unknown>;
+}
+
+export interface GraphifyEdgeResult {
+  id: string;
+  source: string;
+  target: string;
+  label: string;
+  edgeType: MockGraphifyEdge['edgeType'];
+  metadata: Record<string, unknown>;
+}
 
 // ============================================================================
 // Mock Asset IDs
