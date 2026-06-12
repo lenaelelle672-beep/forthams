@@ -9,8 +9,7 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
-import { httpClient } from '../utils/http';
-import type { Asset } from '../types/asset.types';
+import httpClient from '../utils/http';
 
 /**
  * 折旧计算方法枚举
@@ -100,6 +99,13 @@ export interface DepreciationDetails {
   estimated_end_date: string | null;
 }
 
+interface DepreciationAssetInfo {
+  purchase_price?: number;
+  purchase_date?: string;
+  useful_life_years?: number;
+  salvage_value?: number;
+}
+
 /**
  * Hook 配置参数
  */
@@ -131,7 +137,7 @@ export interface UseDepreciationReturn {
   /** 当前使用的计算方法 */
   currentMethod: DepreciationMethod;
   /** 资产基础信息（从Asset对象提取） */
-  assetInfo: Partial<Pick<Asset, 'purchase_price' | 'purchase_date' | 'useful_life_years' | 'salvage_value'>> | null;
+  assetInfo: DepreciationAssetInfo | null;
 }
 
 /**
@@ -243,14 +249,14 @@ export function useDepreciation(
   const [currentMethod, setCurrentMethod] = useState<DepreciationMethod>(
     DepreciationMethod.STRAIGHT_LINE
   );
-  const [assetInfo, setAssetInfo] = useState<Partial<Pick<Asset, 'purchase_price' | 'purchase_date' | 'useful_life_years' | 'salvage_value'>> | null>(null);
+  const [assetInfo, setAssetInfo] = useState<DepreciationAssetInfo | null>(null);
 
   /**
    * 转换原始API结果为详情格式
    */
   const transformToDetails = useCallback((
     result: DepreciationResult,
-    asset?: Partial<Pick<Asset, 'purchase_price' | 'purchase_date' | 'useful_life_years' | 'salvage_value'>>
+    asset?: DepreciationAssetInfo
   ): DepreciationDetails => {
     const now = new Date();
     const referenceDateObj = new Date(result.reference_date);
