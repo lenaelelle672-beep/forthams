@@ -29,10 +29,9 @@
 import React, { useState, useCallback, useRef } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Upload, FileText, X, AlertCircle, CheckCircle, Download, Loader2 } from 'lucide-react';
-import { Button } from '../ui/button';
-import { Progress } from '../ui/progress';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../ui/card';
-import { Badge } from '../ui/badge';
+import { Button } from '../ui/Button';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../ui/Card';
+import { Badge } from '../ui/Badge';
 import { cn } from '@/lib/utils';
 
 // 文件大小限制：10MB
@@ -48,6 +47,21 @@ const ALLOWED_MIME_TYPES = [
 
 // 导入状态枚举
 type ImportStatus = 'idle' | 'uploading' | 'validating' | 'importing' | 'success' | 'error';
+
+type BadgeVariant = React.ComponentProps<typeof Badge>['variant'];
+
+function UploadProgress({ value, className }: { value: number; className?: string }) {
+  const normalizedValue = Math.max(0, Math.min(100, value));
+
+  return (
+    <div className={cn('h-2 w-full overflow-hidden rounded-full bg-[#e5e7eb]', className)}>
+      <div
+        className="h-full rounded-full bg-[#3b82f6] transition-all"
+        style={{ width: `${normalizedValue}%` }}
+      />
+    </div>
+  );
+}
 
 // 错误行数据结构
 interface ValidationError {
@@ -379,13 +393,13 @@ export function FileUploader({
    * @returns 徽章配置
    */
   const getStatusBadge = (currentStatus: ImportStatus) => {
-    const badges: Record<ImportStatus, { label: string; variant: 'default' | 'success' | 'error' | 'warning' | 'secondary' }> = {
-      idle: { label: '等待上传', variant: 'secondary' },
+    const badges: Record<ImportStatus, { label: string; variant: BadgeVariant }> = {
+      idle: { label: '等待上传', variant: 'gray' },
       uploading: { label: '上传中', variant: 'default' },
       validating: { label: '校验中', variant: 'warning' },
       importing: { label: '导入中', variant: 'default' },
       success: { label: '导入成功', variant: 'success' },
-      error: { label: '导入失败', variant: 'error' }
+      error: { label: '导入失败', variant: 'danger' }
     };
     return badges[currentStatus];
   };
@@ -476,7 +490,7 @@ export function FileUploader({
                 {Math.round(uploadProgress)}%
               </Badge>
             </div>
-            <Progress value={uploadProgress} className="h-2" />
+            <UploadProgress value={uploadProgress} className="h-2" />
           </div>
         )}
 
