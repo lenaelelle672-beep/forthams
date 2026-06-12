@@ -33,6 +33,7 @@ import type {
   InventorySummary,
   InventoryAsset,
 } from '@/types/inventory';
+import type { ApiResponse, PageData } from '@/types/common';
 
 // ─── 类型与常量 ──────────────────────────────────────────────────────────────
 
@@ -82,7 +83,7 @@ function KpiCard({
   sub?: string;
   trend?: string;
   trendColor?: string;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: React.ComponentType<{ className?: string; style?: React.CSSProperties }>;
   accentColor: string;
 }) {
   return (
@@ -206,9 +207,9 @@ export default function SmartReportPage() {
     enabled: !!taskId,
   });
 
-  const task: InventoryTask | undefined = taskResponse?.data?.data;
-  const summary: InventorySummary | undefined = summaryResponse?.data?.data;
-  const assets: InventoryAsset[] = assetsResponse?.data?.data?.records ?? [];
+  const task = (taskResponse as ApiResponse<InventoryTask> | undefined)?.data;
+  const summary = (summaryResponse as ApiResponse<InventorySummary> | undefined)?.data;
+  const assets = (assetsResponse as ApiResponse<PageData<InventoryAsset>> | undefined)?.data?.records ?? [];
 
   // ── 衍生数据 ────────────────────────────────────────────────────────────────
 
