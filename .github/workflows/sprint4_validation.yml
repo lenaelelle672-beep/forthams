@@ -54,7 +54,7 @@ jobs:
       has_python_src: ${{ steps.detect.outputs.has_python_src }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Detect root Python src package
         id: detect
@@ -77,10 +77,10 @@ jobs:
     if: ${{ needs.detect_python_scope.outputs.has_python_src == 'true' }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
@@ -193,7 +193,7 @@ jobs:
 
       # 上传静态分析报告
       - name: Upload static analysis reports
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: static-analysis-reports
@@ -212,10 +212,10 @@ jobs:
     if: ${{ needs.detect_python_scope.outputs.has_python_src == 'true' }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
@@ -256,7 +256,7 @@ jobs:
 
       # 上传 docstring 报告
       - name: Upload docstring report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: docstring-coverage-report
@@ -275,10 +275,10 @@ jobs:
     if: ${{ needs.detect_python_scope.outputs.has_python_src == 'true' && github.event.inputs.skip_tests != 'true' }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
@@ -430,7 +430,7 @@ jobs:
 
       # 上传测试报告
       - name: Upload test reports
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: test-reports
@@ -451,10 +451,10 @@ jobs:
     if: ${{ always() && needs.detect_python_scope.outputs.has_python_src == 'true' }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
@@ -488,7 +488,7 @@ jobs:
           fi
 
       - name: Upload coverage reports
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: coverage-reports
@@ -513,10 +513,10 @@ jobs:
     if: always()
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Download all reports
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           path: reports
 
@@ -570,7 +570,7 @@ jobs:
           fi
 
       - name: Upload acceptance report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: sprint4-acceptance-report
