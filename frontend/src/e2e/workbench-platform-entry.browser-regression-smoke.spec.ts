@@ -72,9 +72,9 @@ test.describe('Workbench 正式入口浏览器回归', () => {
     await operationsHub.click();
     await expect(page).toHaveURL(/\/fixed-assets\/workbench\?menu=home$/);
     await expect(page.getByText('固定资产平台', { exact: true })).toBeVisible();
-    await expect(page.getByRole('button', { name: '运营首页', exact: true })).toBeVisible();
-    await expect(page.getByRole('button', { name: '流程待办', exact: true })).toBeVisible();
-    await expect(page.getByRole('button', { name: '基础维护', exact: true })).toBeVisible();
+    await expect(page.getByLabel('工作台菜单').getByRole('button', { name: '运营首页', exact: true })).toBeVisible();
+    await expect(page.getByLabel('工作台菜单').getByRole('button', { name: '流程待办', exact: true })).toBeVisible();
+    await expect(page.getByLabel('工作台菜单').getByRole('button', { name: '基础维护', exact: true })).toBeVisible();
 
     for (const tab of ['智能制造总览', '数据监控中心', '资产运维中心', '安全态势工作台']) {
       await expect(page.getByRole('button', { name: tab, exact: true })).toBeVisible();
@@ -222,7 +222,12 @@ test.describe('Workbench 正式入口浏览器回归', () => {
       await expect(page.getByLabel(`${pageLabel}真实产品页`)).toBeVisible();
       await expect(page.locator('.workspace-product-page')).toHaveCount(0);
       await expect(page.locator('.workspace-orders-page')).toBeVisible();
-      await expect(page.locator('.workspace-orders-table')).toBeVisible();
+      if (pageLabel === '运营首页') {
+        await expect(page.locator('.workspace-orders-shell')).toHaveCount(0);
+        await expect(page.getByLabel('运营首页任务墙')).toBeVisible();
+      } else {
+        await expect(page.locator('.workspace-orders-table')).toBeVisible();
+      }
     }
 
     await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
@@ -238,15 +243,26 @@ test.describe('Workbench 正式入口浏览器回归', () => {
 
     await expect(page.getByLabel('运营首页真实产品页')).toBeVisible();
     await expect(page.locator('.workspace-product-page')).toHaveCount(0);
-    await expect(page.getByRole('heading', { name: '运营首页' })).toBeVisible();
+    await expect(page.locator('.workspace-orders-shell')).toHaveCount(0);
+    await expect(page.getByLabel('运营首页产品页主体').getByRole('heading', { name: '运营首页' })).toBeVisible();
     await expect(page.getByText('KPI 下钻 · 待办联动 · 维保预警')).toBeVisible();
+    await expect(page.getByLabel('运营首页指挥入口')).toContainText('运营驾驶舱');
+    await expect(page.getByLabel('运营首页运营域')).toContainText('维保预警');
+    await expect(page.getByLabel('运营首页二级运营域')).toContainText('资产健康');
+    await expect(page.getByLabel('运营首页状态反馈')).toContainText('暂无运营待办');
+    await expect(page.getByLabel('运营首页状态反馈')).toContainText('聚合刷新失败');
+    await expect(page.getByLabel('运营首页状态反馈')).toContainText('运营操作受限');
     await expect(page.getByLabel('运营首页核心指标')).toContainText('资产健康');
     await expect(page.getByLabel('运营首页流程阶段')).toContainText('聚合');
     await expect(page.getByLabel('运营首页顶部操作')).toContainText('新建预测工单');
+    await expect(page.getByLabel('运营首页快捷发起')).toContainText('处理流程待办');
     await expect(page.getByLabel('运营首页查询筛选栏')).toContainText('处理时间');
-    await expect(page.getByLabel('运营首页列表')).toContainText('OPS-20240614-001');
+    await expect(page.getByLabel('运营首页任务墙')).toContainText('OPS-20240614-001');
     await expect(page.getByLabel('运营首页详情抽屉')).toContainText('主轴振动异常');
+    await expect(page.getByLabel('当前运营事项信息')).toContainText('数控车床 CN-301');
+    await expect(page.getByLabel('维保预警队列')).toContainText('CN-301');
     await expect(page.getByLabel('运营首页详情标签')).toContainText('维保预警');
+    await expect(page.getByLabel('运营首页权限反馈')).toContainText('关键操作入口可用');
     await expect(page.getByLabel('运营首页详情操作')).toContainText('查看报表');
     await expect(page.locator('body')).not.toContainText('workbench-menu-home-v1');
 
@@ -260,7 +276,7 @@ test.describe('Workbench 正式入口浏览器回归', () => {
     await page.getByRole('button', { name: 'OPS-20240614-002', exact: true }).click();
     const detailDialog = page.getByRole('dialog', { name: '打开运营首页详情' });
     await expect(detailDialog).toBeVisible();
-    await expect(detailDialog.locator('.workspace-action-route strong')).toContainText('/fixed-assets/workbench/OPS-20240614-002');
+    await expect(detailDialog.locator('.workspace-action-route strong')).toContainText('/approvals/OPS-20240614-002/process?source=workbench');
     await page.keyboard.press('Escape');
     await expect(detailDialog).toHaveCount(0);
     await expect(page.getByLabel('运营首页详情抽屉')).toContainText('CN-301 跨车间调拨');

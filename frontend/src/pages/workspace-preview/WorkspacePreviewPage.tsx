@@ -3479,6 +3479,153 @@ const workbenchHomeRows = [
 
 const workbenchHomeDetailTabs = ['运营信息', '待办联动', '维保预警', '数据刷新', '报表复盘'] as const;
 
+const workbenchHomeDomains = [
+  {
+    id: 'command',
+    label: '运营驾驶舱',
+    value: '86',
+    note: '资产健康 / KPI 下钻',
+    icon: Gauge,
+    route: '/fixed-assets/workbench?menu=home&domain=command',
+    children: ['资产健康', '流程待办', '今日工单'],
+  },
+  {
+    id: 'maintenance',
+    label: '维保预警',
+    value: '5',
+    note: '2h 内到期',
+    icon: AlertTriangle,
+    route: '/workorders?source=workbench&view=predictive',
+    children: ['主轴振动', '温度异常', 'SLA 风险'],
+  },
+  {
+    id: 'approval',
+    label: '审批派发',
+    value: '18',
+    note: '跨模块待办',
+    icon: ClipboardList,
+    route: '/approvals?source=workbench&status=PENDING',
+    children: ['资产调拨', '跨部门审批', '备件低储'],
+  },
+  {
+    id: 'report',
+    label: '经营复盘',
+    value: '14',
+    note: '报表订阅',
+    icon: BarChart3,
+    route: '/reports?source=workbench&view=operations-home',
+    children: ['价值趋势', '部门统计', '成本分析'],
+  },
+] as const;
+
+const workbenchHomeTasks = [
+  {
+    id: 'OPS-20240614-001',
+    category: '维保预警',
+    object: '数控车床 CN-301',
+    location: '机加车间 / CNC 区域 A线',
+    title: '主轴振动异常，建议今日派发预测维保',
+    priority: 'P1',
+    status: '待派工',
+    sla: '1.2h',
+    owner: '张三丰',
+    context: '工单/告警联动',
+    nextAction: '创建预测工单',
+    route: buildWorkOrderPrefillPath({
+      source: 'quick-action',
+      title: '数控车床 CN-301 主轴振动异常预测维保',
+      assetName: '数控车床 CN-301',
+      assetLocation: '机加车间 / CNC 区域 A线',
+      riskState: '主轴振动异常',
+      riskScore: 91,
+      priority: 'HIGH',
+      dueDate: '2026-06-16',
+      description: '来自 Workbench 运营首页：主轴振动异常，建议今日派发预测维保。',
+    }),
+    tone: 'red',
+  },
+  {
+    id: 'OPS-20240614-002',
+    category: '流程待办',
+    object: 'CN-301 跨车间调拨',
+    location: '制造一部 -> 制造二部',
+    title: '数控车床 CN-301 跨车间调拨等待负责人审批',
+    priority: 'P1',
+    status: '待审批',
+    sla: '2.0h',
+    owner: '张经理',
+    context: '资产调拨',
+    nextAction: '处理审批',
+    route: '/approvals/OPS-20240614-002/process?source=workbench&status=PENDING',
+    tone: 'orange',
+  },
+  {
+    id: 'OPS-20240614-003',
+    category: '数据刷新',
+    object: 'MES 批次同步',
+    location: 'A 区 / MES',
+    title: '产线与设备采集数据已同步，3 条异常待确认',
+    priority: 'P2',
+    status: '待确认',
+    sla: '95ms',
+    owner: '平台运维',
+    context: '数据监控',
+    nextAction: '查看链路',
+    route: '/energy?source=workbench&scope=data-monitoring&event=OPS-20240614-003',
+    tone: 'green',
+  },
+  {
+    id: 'OPS-20240614-004',
+    category: '报表订阅',
+    object: '资产价值月报',
+    location: '经营分析',
+    title: '资产价值趋势和部门统计已生成，待订阅确认',
+    priority: 'P3',
+    status: '待确认',
+    sla: '今日',
+    owner: '财务部',
+    context: '报表分析',
+    nextAction: '查看报表',
+    route: '/reports?source=workbench&view=operations-home',
+    tone: 'blue',
+  },
+] as const;
+
+const workbenchHomeQuickActions = [
+  {
+    label: '新建预测工单',
+    route: workbenchHomeTasks[0].route,
+    description: '从运营首页维保预警发起预测工单，预填设备、位置、风险、优先级和截止时间。',
+    icon: Wrench,
+    primary: true,
+  },
+  {
+    label: '处理流程待办',
+    route: '/approvals?source=workbench&status=PENDING',
+    description: '进入审批中心，保留运营首页来源和待处理状态。',
+    icon: ClipboardList,
+  },
+  {
+    label: '查看经营报表',
+    route: '/reports?source=workbench&view=operations-home',
+    description: '进入报表分析，承接资产健康、价值趋势和部门统计。',
+    icon: BarChart3,
+  },
+] as const;
+
+const workbenchHomeStateCards = [
+  { label: '空态', value: '暂无运营待办', note: '筛选无结果时保留新建工单和报表入口' },
+  { label: '异常态', value: '聚合刷新失败', note: '保留上次刷新结果并允许手动重试' },
+  { label: '无权限态', value: '运营操作受限', note: '缺少业务权限时展示预览并引导申请' },
+] as const;
+
+const workbenchHomeSignals = [
+  { label: '资产健康', value: '86', note: '较昨日 +2', tone: 'blue' },
+  { label: '流程待办', value: '18', note: 'P1 4 项', tone: 'orange' },
+  { label: '今日工单', value: '42', note: '派工 24 单', tone: 'cyan' },
+  { label: '维保预警', value: '5', note: '2h 内到期', tone: 'red' },
+] as const;
+
 const workbenchEnergySummaryCards = [
   { label: '链路健康度', value: '98.6%', delta: 'MES/IoT 正常', icon: Activity, tone: 'green' },
   { label: '接入系统', value: '12', delta: '2 个异常', icon: Database, tone: 'blue' },
@@ -4583,9 +4730,447 @@ function WorkbenchCommandPage({
   );
 }
 
-const WorkbenchHomePage = (props: WorkbenchMenuPageProps) => (
-  <WorkbenchCommandPage {...props} config={workbenchHomeConfig} />
-);
+function WorkbenchHomePage({
+  item,
+  context,
+  meta,
+  onPreviewAction,
+}: WorkbenchMenuPageProps) {
+  const { user } = useAuth();
+  const [selectedDomain, setSelectedDomain] = useState<(typeof workbenchHomeDomains)[number]['id']>('command');
+  const [selectedTaskId, setSelectedTaskId] = useState(workbenchHomeTasks[0].id);
+  const [detailTab, setDetailTab] = useState<(typeof workbenchHomeDetailTabs)[number]>('运营信息');
+  const selectedDomainMeta =
+    workbenchHomeDomains.find((domain) => domain.id === selectedDomain) ?? workbenchHomeDomains[0];
+  const selectedTask = workbenchHomeTasks.find((task) => task.id === selectedTaskId) ?? workbenchHomeTasks[0];
+  const canCreateWorkOrder = canAccessRoute('/workorders/new', user);
+  const canOpenReports = canAccessRoute('/reports', user);
+
+  const openHomePreview = (
+    title: string,
+    routeTarget: string,
+    description: string,
+    primaryLabel: string,
+    icon: LucideIcon = Home,
+  ) => {
+    onPreviewAction({
+      title,
+      source: '运营首页页面',
+      routeTarget,
+      description,
+      primaryLabel,
+      icon,
+      visual: meta.imageSrc,
+      stats: context.stats,
+    });
+  };
+
+  const openTask = (task: (typeof workbenchHomeTasks)[number]) => {
+    setSelectedTaskId(task.id);
+    openHomePreview(
+      '打开运营首页详情',
+      task.route,
+      `打开 ${task.object}，带入 ${task.category}、${task.status}、${task.context} 和责任人 ${task.owner}。`,
+      task.nextAction,
+      task.category === '维保预警' ? Wrench : ClipboardList,
+    );
+  };
+
+  return (
+    <section className="workspace-orders-page workspace-home-page workspace-home-product" aria-label={`${item.label}真实产品页`}>
+      <aside className="workspace-home-command" aria-label="运营首页指挥入口">
+        <header>
+          <span><Home /></span>
+          <div>
+            <h2>运营首页</h2>
+            <p>KPI 下钻 · 待办联动 · 维保预警</p>
+          </div>
+        </header>
+        <section className="workspace-home-domain-list" aria-label="运营首页运营域">
+          {workbenchHomeDomains.map((domain) => {
+            const DomainIcon = domain.icon;
+            return (
+              <button
+                key={domain.id}
+                type="button"
+                className={domain.id === selectedDomain ? 'is-active' : ''}
+                onClick={() => setSelectedDomain(domain.id)}
+              >
+                <DomainIcon />
+                <span>
+                  <strong>{domain.label}</strong>
+                  <small>{domain.note}</small>
+                </span>
+                <b>{domain.value}</b>
+              </button>
+            );
+          })}
+        </section>
+        <section className="workspace-home-domain-children" aria-label="运营首页二级运营域">
+          <span>{selectedDomainMeta.label}二级项</span>
+          {selectedDomainMeta.children.map((child) => (
+            <button
+              key={child}
+              type="button"
+              onClick={() =>
+                openHomePreview(
+                  `${child}下钻`,
+                  `${selectedDomainMeta.route}&node=${encodeURIComponent(child)}`,
+                  `进入 ${child} 视角，保留 Workbench 运营首页来源和当前运营域。`,
+                  '进入下钻',
+                  selectedDomainMeta.icon,
+                )
+              }
+            >
+              {child}
+              <ArrowRight />
+            </button>
+          ))}
+        </section>
+        <section className="workspace-home-states" aria-label="运营首页状态反馈">
+          {workbenchHomeStateCards.map((state) => (
+            <article key={state.label}>
+              <span>{state.label}</span>
+              <strong>{state.value}</strong>
+              <p>{state.note}</p>
+            </article>
+          ))}
+        </section>
+      </aside>
+
+      <section className="workspace-home-center" aria-label="运营首页产品页主体">
+        <header className="workspace-home-header">
+          <div>
+            <span>资产运营中枢</span>
+            <h2>运营首页</h2>
+            <p>把 Dashboard KPI、待办、最近工单和维保预警收敛成默认入口，先研判再进入业务页处理。</p>
+          </div>
+          <div className="workspace-orders-toolbar" aria-label="运营首页顶部操作">
+            {workbenchHomeQuickActions.map((action) => {
+              const ActionIcon = action.icon;
+              const disabled = action.label === '新建预测工单' && !canCreateWorkOrder;
+              return (
+                <button
+                  key={action.label}
+                  type="button"
+                  className={action.primary ? 'is-primary' : 'is-secondary'}
+                  disabled={disabled}
+                  onClick={() =>
+                    openHomePreview(
+                      action.label,
+                      action.route,
+                      disabled ? '当前账号暂无新建工单权限，可先查看详情或申请权限。' : action.description,
+                      disabled ? '暂无权限' : action.label,
+                      ActionIcon,
+                    )
+                  }
+                >
+                  <ActionIcon />
+                  {disabled ? '暂无权限' : action.label}
+                </button>
+              );
+            })}
+          </div>
+        </header>
+
+        <div className="workspace-home-kpis" aria-label="运营首页核心指标">
+          {workbenchHomeSignals.map((signal) => (
+            <button
+              key={signal.label}
+              type="button"
+              className={`is-${signal.tone}`}
+              onClick={() =>
+                openHomePreview(
+                  `${signal.label}下钻`,
+                  `/fixed-assets/workbench?menu=home&metric=${encodeURIComponent(signal.label)}`,
+                  `按 ${signal.label} 下钻运营首页，保留资产运营中枢来源和当前筛选。`,
+                  '查看指标',
+                  Gauge,
+                )
+              }
+            >
+              <span>{signal.label}</span>
+              <strong>{signal.value}</strong>
+              <small>{signal.note}</small>
+            </button>
+          ))}
+        </div>
+
+        <div className="workspace-home-stage-row" aria-label="运营首页流程阶段">
+          {workbenchHomeStages.map((stage) => (
+            <button
+              key={stage.label}
+              type="button"
+              className={`is-${stage.tone}`}
+              onClick={() =>
+                openHomePreview(
+                  `${stage.label}阶段`,
+                  `/fixed-assets/workbench?menu=home&stage=${encodeURIComponent(stage.label)}`,
+                  `按 ${stage.label} 阶段查看运营事项、待办和闭环状态。`,
+                  '查看阶段',
+                  ArrowRight,
+                )
+              }
+            >
+              <span>{stage.label}</span>
+              <strong>{stage.value}</strong>
+              <small>{stage.note}</small>
+            </button>
+          ))}
+        </div>
+
+        <section className="workspace-home-launcher" aria-label="运营首页快捷发起">
+          {workbenchHomeQuickActions.map((action) => {
+            const ActionIcon = action.icon;
+            const disabled = action.label === '新建预测工单' && !canCreateWorkOrder;
+            return (
+              <button
+                key={action.label}
+                type="button"
+                className={action.primary ? 'is-primary' : ''}
+                disabled={disabled}
+                onClick={() =>
+                  openHomePreview(
+                    action.label,
+                    action.route,
+                    disabled ? '当前账号暂无新建工单权限，可在详情中申请权限。' : action.description,
+                    disabled ? '暂无权限' : action.label,
+                    ActionIcon,
+                  )
+                }
+              >
+                <ActionIcon />
+                <span>
+                  <strong>{disabled ? '暂无权限' : action.label}</strong>
+                  <small>{action.description}</small>
+                </span>
+              </button>
+            );
+          })}
+        </section>
+
+        <div className="workspace-home-filterbar" aria-label="运营首页查询筛选栏">
+          <label>
+            <Search />
+            <input readOnly value="搜索待办号 / 资产 / 工单 / 责任人" aria-label="运营首页搜索" />
+          </label>
+          {['类型 全部', '优先级 全部', '责任人 全部'].map((filter) => (
+            <button
+              key={filter}
+              type="button"
+              onClick={() =>
+                openHomePreview(
+                  '筛选运营事项',
+                  `/fixed-assets/workbench?menu=home&filter=${encodeURIComponent(filter)}`,
+                  `按 ${filter} 筛选运营事项，保留当前运营域。`,
+                  '打开筛选',
+                  SlidersHorizontal,
+                )
+              }
+            >
+              {filter}
+              <ArrowRight />
+            </button>
+          ))}
+          <button
+            type="button"
+            onClick={() =>
+              openHomePreview(
+                '运营首页时间筛选',
+                '/fixed-assets/workbench?menu=home&date=today',
+                '查看今日运营事项，保留当前筛选上下文。',
+                '查看今日',
+                CalendarDays,
+              )
+            }
+          >
+            处理时间
+            <CalendarDays />
+          </button>
+          <button
+            type="button"
+            className="is-reset"
+            onClick={() =>
+              openHomePreview(
+                '运营首页空态预览',
+                '/fixed-assets/workbench?menu=home&empty=true',
+                '当前筛选下暂无运营待办，可清空条件或新建预测工单。',
+                '清空筛选',
+                Search,
+              )
+            }
+          >
+            空态预览
+          </button>
+        </div>
+
+        <div className="workspace-home-task-wall" aria-label="运营首页任务墙">
+          <header>
+            <strong>跨模块任务墙</strong>
+            <span>可发起 · 可查询 · 可打开</span>
+          </header>
+          <div className="workspace-home-task-head">
+            <span>待办号</span>
+            <span>事项</span>
+            <span>优先级</span>
+            <span>状态</span>
+            <span>SLA</span>
+            <span>责任人</span>
+            <span>操作</span>
+          </div>
+          {workbenchHomeTasks.map((task) => (
+            <div
+              key={task.id}
+              className={`workspace-home-task-row is-${task.tone} ${task.id === selectedTask.id ? 'is-selected' : ''}`}
+            >
+              <button type="button" className="is-link" onClick={() => openTask(task)}>{task.id}</button>
+              <span>
+                <strong>{task.title}</strong>
+                <small>{task.object} · {task.context}</small>
+              </span>
+              <span><b>{task.priority}</b></span>
+              <span><i>{task.status}</i></span>
+              <span>{task.sla}</span>
+              <span>{task.owner}</span>
+              <span>
+                <button type="button" onClick={() => openTask(task)}>{task.nextAction}</button>
+              </span>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <aside className="workspace-home-detail" aria-label="运营首页详情抽屉">
+        <header>
+          <strong>运营事项详情</strong>
+          <span>{selectedTask.status}</span>
+        </header>
+        <section className="workspace-home-detail-card" aria-label="当前运营事项信息">
+          <b>{selectedTask.priority}</b>
+          <div>
+            <span>{selectedTask.id}</span>
+            <h3>{selectedTask.title}</h3>
+            <p>{selectedTask.object} · {selectedTask.location}</p>
+          </div>
+          <dl>
+            <div><dt>类型</dt><dd>{selectedTask.category}</dd></div>
+            <div><dt>责任人</dt><dd>{selectedTask.owner}</dd></div>
+            <div><dt>SLA</dt><dd>{selectedTask.sla}</dd></div>
+            <div><dt>上下文</dt><dd>{selectedTask.context}</dd></div>
+          </dl>
+        </section>
+
+        <section className="workspace-home-alerts" aria-label="维保预警队列">
+          <header>
+            <span>维保预警队列</span>
+            <strong>5 项</strong>
+          </header>
+          {workbenchHomeTasks.filter((task) => task.category !== '报表订阅').map((task) => (
+            <button
+              key={task.id}
+              type="button"
+              className={`is-${task.tone}`}
+              onClick={() => openTask(task)}
+            >
+              <span>{task.category}</span>
+              <strong>{task.object}</strong>
+              <small>{task.status} · {task.sla}</small>
+            </button>
+          ))}
+        </section>
+
+        <nav className="workspace-home-tabs" aria-label="运营首页详情标签">
+          {workbenchHomeDetailTabs.map((tab) => (
+            <button
+              key={tab}
+              type="button"
+              className={tab === detailTab ? 'is-active' : ''}
+              onClick={() => setDetailTab(tab)}
+            >
+              {tab}
+            </button>
+          ))}
+        </nav>
+
+        <section className="workspace-home-tab-panel" aria-label={`${detailTab}内容`}>
+          <article>
+            <span>处理摘要</span>
+            <p>{selectedTask.title}，当前状态为 {selectedTask.status}，下一步建议：{selectedTask.nextAction}。</p>
+          </article>
+          <article>
+            <span>预填上下文</span>
+            <ul>
+              <li>{selectedTask.object} <b>已带入</b></li>
+              <li>{selectedTask.location} <b>已定位</b></li>
+              <li>{selectedTask.context} <b className="is-warning">需确认</b></li>
+            </ul>
+          </article>
+        </section>
+
+        <section className="workspace-home-permission" aria-label="运营首页权限反馈">
+          <AlertTriangle />
+          <div>
+            <strong>{canCreateWorkOrder ? '关键操作入口可用' : '新建工单权限受限'}</strong>
+            <p>{canCreateWorkOrder ? '可从运营首页直接发起预测工单、处理待办并打开报表。' : '当前账号可浏览运营态势，但新建预测工单需要申请权限。'}</p>
+          </div>
+        </section>
+
+        <footer className="workspace-home-actions" aria-label="运营首页详情操作">
+          <button type="button" onClick={() => openTask(selectedTask)}>
+            打开详情
+          </button>
+          <button
+            type="button"
+            onClick={() =>
+              openHomePreview(
+                '处理流程待办',
+                selectedTask.category === '流程待办'
+                  ? selectedTask.route
+                  : `/approvals?source=workbench&status=PENDING&ref=${encodeURIComponent(selectedTask.id)}`,
+                `处理 ${selectedTask.id}，保留运营首页和 ${selectedTask.context} 上下文。`,
+                '进入待办',
+                ClipboardList,
+              )
+            }
+          >
+            处理待办
+          </button>
+          <button
+            type="button"
+            disabled={!canOpenReports}
+            onClick={() =>
+              openHomePreview(
+                '查看经营报表',
+                '/reports?source=workbench&view=operations-home',
+                '进入报表分析，查看资产健康、价值趋势和部门统计。',
+                canOpenReports ? '进入报表' : '暂无权限',
+                BarChart3,
+              )
+            }
+          >
+            查看报表
+          </button>
+          <button
+            type="button"
+            className="is-primary"
+            disabled={!canCreateWorkOrder}
+            onClick={() =>
+              openHomePreview(
+                '新建预测工单',
+                workbenchHomeTasks[0].route,
+                '从运营首页维保预警创建预测工单，预填设备、位置、风险和 SLA。',
+                canCreateWorkOrder ? '创建工单' : '暂无权限',
+                Wrench,
+              )
+            }
+          >
+            新建工单
+          </button>
+        </footer>
+      </aside>
+    </section>
+  );
+}
 
 const WorkbenchEnergyPage = (props: WorkbenchMenuPageProps) => (
   <WorkbenchCommandPage {...props} config={workbenchEnergyConfig} />
