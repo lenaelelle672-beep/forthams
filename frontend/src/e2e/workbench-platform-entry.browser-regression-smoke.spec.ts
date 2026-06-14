@@ -196,71 +196,81 @@ test.describe('Workbench 正式入口浏览器回归', () => {
     expect(errors).toEqual([]);
   });
 
-  test('Workbench 未独立替换菜单产品页呈现业务操作台、CRUD 矩阵和页面级跳转', async ({ page }) => {
+  test('Workbench 左侧菜单均渲染真实页面级组件而非通用产品壳', async ({ page }) => {
     const errors = collectBrowserErrors(page);
     await seedAuthenticatedSession(page, operationsUser);
 
     const pageCases = [
-      {
-        route: '/fixed-assets/workbench?menu=home',
-        pageLabel: '运营首页',
-        heading: '资产运营总览与快捷任务',
-        action: '新建预测工单',
-        targetIncludes: ['/workorders/new?', 'source=quick-action', 'riskScore=91'],
-      },
-      {
-        route: '/fixed-assets/workbench/analytics?menu=energy',
-        pageLabel: '数据监控',
-        heading: 'MES 与 IoT 数据链路',
-        action: '重试采集任务',
-        targetIncludes: ['/energy?source=workbench&scope=data-monitoring&event=delay&retry=true'],
-      },
-      {
-        route: '/fixed-assets/workbench/security?menu=policy',
-        pageLabel: '组织策略',
-        heading: '风险规则与策略治理',
-        action: '新建风险评估',
-        targetIncludes: ['/risk-assessments/new?source=workbench&scope=policy'],
-      },
-      {
-        route: '/fixed-assets/workbench/assets?menu=settings',
-        pageLabel: '基础维护',
-        heading: '组织与集成配置',
-        action: '维护资产分类',
-        targetIncludes: ['/categories?source=workbench'],
-      },
+      ['运营首页', '/fixed-assets/workbench?menu=home'],
+      ['流程待办', '/fixed-assets/workbench?menu=todo'],
+      ['资产总览', '/fixed-assets/workbench/assets?menu=asset'],
+      ['设备管理', '/fixed-assets/workbench/assets?menu=device'],
+      ['工单管理', '/fixed-assets/workbench/assets?menu=orders'],
+      ['巡检管理', '/fixed-assets/workbench/assets?menu=inspection'],
+      ['备件管理', '/fixed-assets/workbench/assets?menu=spares'],
+      ['数据监控', '/fixed-assets/workbench/analytics?menu=energy'],
+      ['报表分析', '/fixed-assets/workbench/analytics?menu=report'],
+      ['告警中心', '/fixed-assets/workbench/security?menu=alarm'],
+      ['组织策略', '/fixed-assets/workbench/security?menu=policy'],
+      ['基础维护', '/fixed-assets/workbench/assets?menu=settings'],
     ];
 
-    for (const pageCase of pageCases) {
-      await page.goto(pageCase.route);
+    for (const [pageLabel, route] of pageCases) {
+      await page.goto(route);
       await page.waitForLoadState('networkidle');
 
-      await expect(page.getByRole('heading', { name: pageCase.heading })).toBeVisible();
-      await expect(page.getByLabel(`${pageCase.pageLabel}业务操作台`)).toBeVisible();
-      await expect(page.getByLabel(`${pageCase.pageLabel}筛选条件`)).toBeVisible();
-      await expect(page.getByLabel(`${pageCase.pageLabel}可处理业务队列`)).toBeVisible();
-      const crudMatrix = page.getByLabel(`${pageCase.pageLabel}CRUD操作矩阵`);
-      await expect(crudMatrix.getByText('新建/发起')).toBeVisible();
-      await expect(crudMatrix.getByText('查询/筛选')).toBeVisible();
-      await expect(crudMatrix.getByText('打开详情')).toBeVisible();
-      await expect(crudMatrix.getByText('编辑/维护')).toBeVisible();
-      await expect(crudMatrix.locator('small').filter({ hasText: '危险操作' })).toBeVisible();
-      await expect(crudMatrix.getByRole('button', { name: new RegExp(`${pageCase.pageLabel}停用|撤销|停用/撤销`) })).toBeDisabled();
-      const stateMatrix = page.getByLabel(`${pageCase.pageLabel}页面状态矩阵`);
-      await expect(stateMatrix.getByText('空态')).toBeVisible();
-      await expect(stateMatrix.getByText('异常态')).toBeVisible();
-      await expect(stateMatrix.getByText('无权限态')).toBeVisible();
-
-      await page.getByLabel(`${pageCase.pageLabel}页面跳转`).getByRole('button', { name: new RegExp(pageCase.action) }).click();
-      const dialog = page.getByRole('dialog', { name: pageCase.action });
-      await expect(dialog).toBeVisible();
-      const routeTarget = await dialog.locator('.workspace-action-route strong').innerText();
-      for (const expectedFragment of pageCase.targetIncludes) {
-        expect(routeTarget).toContain(expectedFragment);
-      }
-      await page.keyboard.press('Escape');
-      await expect(dialog).toHaveCount(0);
+      await expect(page.getByLabel(`${pageLabel}真实产品页`)).toBeVisible();
+      await expect(page.locator('.workspace-product-page')).toHaveCount(0);
+      await expect(page.locator('.workspace-orders-page')).toBeVisible();
+      await expect(page.locator('.workspace-orders-table')).toBeVisible();
     }
+
+    await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
+    expect(errors).toEqual([]);
+  });
+
+  test('运营首页左侧菜单渲染真实页面级组件而非通用产品壳', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await seedAuthenticatedSession(page, operationsUser);
+
+    await page.goto('/fixed-assets/workbench?menu=home');
+    await page.waitForLoadState('networkidle');
+
+    await expect(page.getByLabel('运营首页真实产品页')).toBeVisible();
+    await expect(page.locator('.workspace-product-page')).toHaveCount(0);
+    await expect(page.getByRole('heading', { name: '运营首页' })).toBeVisible();
+    await expect(page.getByText('KPI 下钻 · 待办联动 · 维保预警')).toBeVisible();
+    await expect(page.getByLabel('运营首页核心指标')).toContainText('资产健康');
+    await expect(page.getByLabel('运营首页流程阶段')).toContainText('聚合');
+    await expect(page.getByLabel('运营首页顶部操作')).toContainText('新建预测工单');
+    await expect(page.getByLabel('运营首页查询筛选栏')).toContainText('处理时间');
+    await expect(page.getByLabel('运营首页列表')).toContainText('OPS-20240614-001');
+    await expect(page.getByLabel('运营首页详情抽屉')).toContainText('主轴振动异常');
+    await expect(page.getByLabel('运营首页详情标签')).toContainText('维保预警');
+    await expect(page.getByLabel('运营首页详情操作')).toContainText('查看报表');
+    await expect(page.locator('body')).not.toContainText('workbench-menu-home-v1');
+
+    await page.getByLabel('运营首页顶部操作').getByRole('button', { name: '新建预测工单' }).click();
+    const createDialog = page.getByRole('dialog', { name: '新建预测工单' });
+    await expect(createDialog).toBeVisible();
+    await expect(createDialog.locator('.workspace-action-route strong')).toContainText('/workorders/new?');
+    await page.keyboard.press('Escape');
+    await expect(createDialog).toHaveCount(0);
+
+    await page.getByRole('button', { name: 'OPS-20240614-002', exact: true }).click();
+    const detailDialog = page.getByRole('dialog', { name: '打开运营首页详情' });
+    await expect(detailDialog).toBeVisible();
+    await expect(detailDialog.locator('.workspace-action-route strong')).toContainText('/fixed-assets/workbench/OPS-20240614-002');
+    await page.keyboard.press('Escape');
+    await expect(detailDialog).toHaveCount(0);
+    await expect(page.getByLabel('运营首页详情抽屉')).toContainText('CN-301 跨车间调拨');
+
+    await page.getByLabel('运营首页详情操作').getByRole('button', { name: '查看报表' }).click();
+    const reportDialog = page.getByRole('dialog', { name: '查看经营报表' });
+    await expect(reportDialog).toBeVisible();
+    await expect(reportDialog.locator('.workspace-action-route strong')).toContainText('/reports?source=workbench&view=operations-home');
+    await page.keyboard.press('Escape');
+    await expect(reportDialog).toHaveCount(0);
 
     await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
     expect(errors).toEqual([]);
@@ -548,6 +558,53 @@ test.describe('Workbench 正式入口浏览器回归', () => {
     expect(errors).toEqual([]);
   });
 
+  test('数据监控左侧菜单渲染真实页面级组件而非通用产品壳', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await seedAuthenticatedSession(page, operationsUser);
+
+    await page.goto('/fixed-assets/workbench/analytics?menu=energy');
+    await page.waitForLoadState('networkidle');
+
+    await expect(page.getByLabel('数据监控真实产品页')).toBeVisible();
+    await expect(page.locator('.workspace-product-page')).toHaveCount(0);
+    await expect(page.getByRole('heading', { name: '数据监控' })).toBeVisible();
+    await expect(page.getByText('数据链路 · 采集事件 · 指标服务')).toBeVisible();
+    await expect(page.getByLabel('数据监控核心指标')).toContainText('链路健康度');
+    await expect(page.getByLabel('数据监控流程阶段')).toContainText('采集');
+    await expect(page.getByLabel('数据监控顶部操作')).toContainText('重试采集任务');
+    await expect(page.getByLabel('数据监控查询筛选栏')).toContainText('处理时间');
+    await expect(page.getByLabel('数据监控列表')).toContainText('DATA-IOT-GW-A01');
+    await expect(page.getByLabel('数据监控详情抽屉')).toContainText('设备点位采集延迟');
+    await expect(page.getByLabel('数据监控详情标签')).toContainText('异常事件');
+    await expect(page.getByLabel('数据监控详情操作')).toContainText('重试任务');
+    await expect(page.locator('body')).not.toContainText('workbench-menu-energy-v1');
+
+    await page.getByLabel('数据监控顶部操作').getByRole('button', { name: '重试采集任务' }).click();
+    const retryDialog = page.getByRole('dialog', { name: '重试采集任务' });
+    await expect(retryDialog).toBeVisible();
+    await expect(retryDialog.locator('.workspace-action-route strong')).toContainText('retry=true');
+    await page.keyboard.press('Escape');
+    await expect(retryDialog).toHaveCount(0);
+
+    await page.getByRole('button', { name: 'DATA-MES-SYNC-08', exact: true }).click();
+    const detailDialog = page.getByRole('dialog', { name: '打开数据监控详情' });
+    await expect(detailDialog).toBeVisible();
+    await expect(detailDialog.locator('.workspace-action-route strong')).toContainText('/energy/DATA-MES-SYNC-08');
+    await page.keyboard.press('Escape');
+    await expect(detailDialog).toHaveCount(0);
+    await expect(page.getByLabel('数据监控详情抽屉')).toContainText('工单状态与设备采集批次');
+
+    await page.getByLabel('数据监控详情操作').getByRole('button', { name: '重试任务' }).click();
+    const detailRetryDialog = page.getByRole('dialog', { name: '重试采集任务' });
+    await expect(detailRetryDialog).toBeVisible();
+    await expect(detailRetryDialog.locator('.workspace-action-route strong')).toContainText('retry=true');
+    await page.keyboard.press('Escape');
+    await expect(detailRetryDialog).toHaveCount(0);
+
+    await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
+    expect(errors).toEqual([]);
+  });
+
   test('报表分析左侧菜单渲染真实页面级组件而非通用产品壳', async ({ page }) => {
     const errors = collectBrowserErrors(page);
     await seedAuthenticatedSession(page, operationsUser);
@@ -638,6 +695,100 @@ test.describe('Workbench 正式入口浏览器回归', () => {
     await expect(workOrderDialog.locator('.workspace-action-route strong')).toContainText('/workorders/new?');
     await page.keyboard.press('Escape');
     await expect(workOrderDialog).toHaveCount(0);
+
+    await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
+    expect(errors).toEqual([]);
+  });
+
+  test('组织策略左侧菜单渲染真实页面级组件而非通用产品壳', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await seedAuthenticatedSession(page, operationsUser);
+
+    await page.goto('/fixed-assets/workbench/security?menu=policy');
+    await page.waitForLoadState('networkidle');
+
+    await expect(page.getByLabel('组织策略真实产品页')).toBeVisible();
+    await expect(page.locator('.workspace-product-page')).toHaveCount(0);
+    await expect(page.getByRole('heading', { name: '组织策略' })).toBeVisible();
+    await expect(page.getByText('风险规则 · 角色策略 · 审批边界')).toBeVisible();
+    await expect(page.getByLabel('组织策略核心指标')).toContainText('风险规则');
+    await expect(page.getByLabel('组织策略流程阶段')).toContainText('定义');
+    await expect(page.getByLabel('组织策略顶部操作')).toContainText('新建风险评估');
+    await expect(page.getByLabel('组织策略查询筛选栏')).toContainText('处理时间');
+    await expect(page.getByLabel('组织策略列表')).toContainText('POL-RISK-PORT-001');
+    await expect(page.getByLabel('组织策略详情抽屉')).toContainText('端口暴露命中高危策略');
+    await expect(page.getByLabel('组织策略详情标签')).toContainText('审批边界');
+    await expect(page.getByLabel('组织策略详情操作')).toContainText('新建评估');
+    await expect(page.locator('body')).not.toContainText('workbench-menu-policy-v1');
+
+    await page.getByLabel('组织策略顶部操作').getByRole('button', { name: '新建风险评估' }).click();
+    const createDialog = page.getByRole('dialog', { name: '新建风险评估' });
+    await expect(createDialog).toBeVisible();
+    await expect(createDialog.locator('.workspace-action-route strong')).toContainText('/risk-assessments/new?source=workbench&scope=policy');
+    await page.keyboard.press('Escape');
+    await expect(createDialog).toHaveCount(0);
+
+    await page.getByRole('button', { name: 'POL-MAINT-SLA-008', exact: true }).click();
+    const detailDialog = page.getByRole('dialog', { name: '打开组织策略详情' });
+    await expect(detailDialog).toBeVisible();
+    await expect(detailDialog.locator('.workspace-action-route strong')).toContainText('/risk-matrix/POL-MAINT-SLA-008');
+    await page.keyboard.press('Escape');
+    await expect(detailDialog).toHaveCount(0);
+    await expect(page.getByLabel('组织策略详情抽屉')).toContainText('逾期维保自动转工单');
+
+    await page.getByLabel('组织策略详情操作').getByRole('button', { name: '权限申请' }).click();
+    const applyDialog = page.getByRole('dialog', { name: '申请策略权限' });
+    await expect(applyDialog).toBeVisible();
+    await expect(applyDialog.locator('.workspace-action-route strong')).toContainText('/approvals/new?source=workbench&type=policy');
+    await page.keyboard.press('Escape');
+    await expect(applyDialog).toHaveCount(0);
+
+    await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
+    expect(errors).toEqual([]);
+  });
+
+  test('基础维护左侧菜单渲染真实页面级组件而非通用产品壳', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await seedAuthenticatedSession(page, operationsUser);
+
+    await page.goto('/fixed-assets/workbench/assets?menu=settings');
+    await page.waitForLoadState('networkidle');
+
+    await expect(page.getByLabel('基础维护真实产品页')).toBeVisible();
+    await expect(page.locator('.workspace-product-page')).toHaveCount(0);
+    await expect(page.getByRole('heading', { name: '基础维护' })).toBeVisible();
+    await expect(page.getByText('分类位置 · 供应商 · 集成配置')).toBeVisible();
+    await expect(page.getByLabel('基础维护核心指标')).toContainText('资产分类');
+    await expect(page.getByLabel('基础维护流程阶段')).toContainText('分类');
+    await expect(page.getByLabel('基础维护顶部操作')).toContainText('维护资产分类');
+    await expect(page.getByLabel('基础维护查询筛选栏')).toContainText('处理时间');
+    await expect(page.getByLabel('基础维护列表')).toContainText('CFG-CAT-ASSET');
+    await expect(page.getByLabel('基础维护详情抽屉')).toContainText('生产设备、动力设备');
+    await expect(page.getByLabel('基础维护详情标签')).toContainText('集成源');
+    await expect(page.getByLabel('基础维护详情操作')).toContainText('供应商');
+    await expect(page.locator('body')).not.toContainText('workbench-menu-settings-v1');
+
+    await page.getByLabel('基础维护顶部操作').getByRole('button', { name: '维护资产分类' }).click();
+    const categoryDialog = page.getByRole('dialog', { name: '维护资产分类' });
+    await expect(categoryDialog).toBeVisible();
+    await expect(categoryDialog.locator('.workspace-action-route strong')).toContainText('/categories?source=workbench');
+    await page.keyboard.press('Escape');
+    await expect(categoryDialog).toHaveCount(0);
+
+    await page.getByRole('button', { name: 'CFG-VDR-SPARE', exact: true }).click();
+    const detailDialog = page.getByRole('dialog', { name: '打开基础维护详情' });
+    await expect(detailDialog).toBeVisible();
+    await expect(detailDialog.locator('.workspace-action-route strong')).toContainText('/settings/sysconfig/CFG-VDR-SPARE');
+    await page.keyboard.press('Escape');
+    await expect(detailDialog).toHaveCount(0);
+    await expect(page.getByLabel('基础维护详情抽屉')).toContainText('备件供应商资质');
+
+    await page.getByLabel('基础维护详情操作').getByRole('button', { name: '供应商' }).click();
+    const vendorDialog = page.getByRole('dialog', { name: '维护供应商' });
+    await expect(vendorDialog).toBeVisible();
+    await expect(vendorDialog.locator('.workspace-action-route strong')).toContainText('/vendors?source=workbench');
+    await page.keyboard.press('Escape');
+    await expect(vendorDialog).toHaveCount(0);
 
     await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
     expect(errors).toEqual([]);

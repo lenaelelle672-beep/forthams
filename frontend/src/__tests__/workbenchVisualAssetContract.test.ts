@@ -186,6 +186,12 @@ describe('Workbench visual asset contract', () => {
       expect(existsSync(toPublicFile(item.stitchScreenshot)), `${item.name}: ${item.stitchScreenshot}`).toBe(true);
       expect(existsSync(toPublicFile(item.image2ModuleAsset)), `${item.name}: ${item.image2ModuleAsset}`).toBe(true);
 
+      const stitchSize = readImageSize(item.stitchScreenshot);
+      const image2Size = readImageSize(item.image2ModuleAsset);
+      expect(stitchSize.width).toBeGreaterThanOrEqual(1024);
+      expect(stitchSize.height).toBeGreaterThanOrEqual(640);
+      expect(stitchSize).toMatchObject(image2Size);
+
       for (const assetPath of item.detailAssets) {
         expect(assetPath).toMatch(/^\/mock\/workspace-preview\/asset-kit-v6\/details\/.+-v1\.png$/);
         expect(existsSync(toPublicFile(assetPath)), `${item.name}: ${assetPath}`).toBe(true);
@@ -212,6 +218,12 @@ describe('Workbench visual asset contract', () => {
       expect(item.businessUse.length).toBeGreaterThan(20);
       expect(existsSync(toPublicFile(item.stitchScreenshot)), `${item.name}: ${item.stitchScreenshot}`).toBe(true);
       expect(existsSync(toPublicFile(item.image2ModuleAsset)), `${item.name}: ${item.image2ModuleAsset}`).toBe(true);
+
+      const stitchSize = readImageSize(item.stitchScreenshot);
+      const image2Size = readImageSize(item.image2ModuleAsset);
+      expect(stitchSize.width).toBeGreaterThanOrEqual(1024);
+      expect(stitchSize.height).toBeGreaterThanOrEqual(640);
+      expect(stitchSize).toMatchObject(image2Size);
     }
 
     expect(deliveryManifest.stitchIntegration.authEvidence.workbenchRound2BatchGenerate).toContain('seven page-level screens');

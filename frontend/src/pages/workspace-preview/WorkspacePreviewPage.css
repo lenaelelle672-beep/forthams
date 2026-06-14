@@ -2078,6 +2078,82 @@
   background: #d97706;
 }
 
+.workspace-home-page {
+  background:
+    linear-gradient(180deg, rgba(247, 251, 255, .98), rgba(236, 247, 255, .96)),
+    #edf7ff;
+}
+
+.workspace-home-page .workspace-orders-icon {
+  color: #176de8;
+  background: #edf5ff;
+}
+
+.workspace-home-page .workspace-orders-toolbar .is-primary {
+  background: linear-gradient(180deg, #338bff, #0f67ef);
+}
+
+.workspace-home-page .workspace-orders-detail-card b {
+  background: #176de8;
+}
+
+.workspace-energy-page {
+  background:
+    linear-gradient(180deg, rgba(245, 253, 255, .98), rgba(235, 249, 252, .96)),
+    #eefaff;
+}
+
+.workspace-energy-page .workspace-orders-icon {
+  color: #0a8fa5;
+  background: #e9fbff;
+}
+
+.workspace-energy-page .workspace-orders-toolbar .is-primary {
+  background: linear-gradient(180deg, #24b9cf, #1175e8);
+}
+
+.workspace-energy-page .workspace-orders-detail-card b {
+  background: #0a8fa5;
+}
+
+.workspace-policy-page {
+  background:
+    linear-gradient(180deg, rgba(248, 250, 255, .98), rgba(240, 245, 255, .96)),
+    #f3f6ff;
+}
+
+.workspace-policy-page .workspace-orders-icon {
+  color: #5b50d9;
+  background: #f2f0ff;
+}
+
+.workspace-policy-page .workspace-orders-toolbar .is-primary {
+  background: linear-gradient(180deg, #7a6cff, #5549d8);
+}
+
+.workspace-policy-page .workspace-orders-detail-card b {
+  background: #5b50d9;
+}
+
+.workspace-settings-page {
+  background:
+    linear-gradient(180deg, rgba(249, 252, 255, .98), rgba(242, 247, 252, .96)),
+    #f6f9fc;
+}
+
+.workspace-settings-page .workspace-orders-icon {
+  color: #415a77;
+  background: #eef3f8;
+}
+
+.workspace-settings-page .workspace-orders-toolbar .is-primary {
+  background: linear-gradient(180deg, #56708f, #344b67);
+}
+
+.workspace-settings-page .workspace-orders-detail-card b {
+  background: #415a77;
+}
+
 .workspace-product-page {
   display: grid;
   gap: 12px;
