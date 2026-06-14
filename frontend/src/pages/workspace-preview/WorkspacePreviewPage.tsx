@@ -3973,6 +3973,143 @@ const workbenchSettingsConfig = buildWorkbenchCommandConfig(
   ],
 );
 
+const workbenchSettingsDomains = [
+  {
+    id: 'category',
+    label: '资产分类',
+    value: '256',
+    note: '生产/动力/物流/备件',
+    icon: Layers,
+    route: '/categories?source=workbench',
+    children: ['生产设备', '动力设备', '检测仪器'],
+  },
+  {
+    id: 'location',
+    label: '位置管理',
+    value: '86',
+    note: '厂区/车间/点位',
+    icon: MapPin,
+    route: '/locations?source=workbench',
+    children: ['A 厂区', '机加车间', 'CNC 区域 A线'],
+  },
+  {
+    id: 'vendor',
+    label: '供应商',
+    value: '128',
+    note: '资质/ETA/联系人',
+    icon: UserCircle,
+    route: '/vendors?source=workbench',
+    children: ['备件供应商', '维保服务商', '设备厂商'],
+  },
+  {
+    id: 'numbering',
+    label: '编号规则',
+    value: '18',
+    note: '资产/备件/工单',
+    icon: FileText,
+    route: '/settings/sysconfig?source=workbench&group=numbering',
+    children: ['资产编码', '工单编码', '备件编码'],
+  },
+  {
+    id: 'integration',
+    label: '集成源',
+    value: '7',
+    note: 'MES/IoT/财务',
+    icon: Database,
+    route: '/settings/webhook?source=workbench',
+    children: ['MES 同步', 'IoT 网关', '财务折旧'],
+  },
+] as const;
+
+const workbenchSettingsObjects = [
+  {
+    id: 'CFG-CAT-ASSET',
+    domain: 'category',
+    type: '资产分类',
+    name: '生产设备分类体系',
+    owner: '系统管理员',
+    status: '启用',
+    scope: '资产台账 / 报表分析',
+    impact: '关联资产 4,286 台',
+    lastSync: '今天 10:24',
+    health: '99.2%',
+    risk: '低',
+    change: '新增检测仪器三级分类，影响资产录入与折旧报表口径。',
+    route: '/categories?source=workbench&category=CFG-CAT-ASSET',
+    tone: 'blue',
+  },
+  {
+    id: 'CFG-LOC-CNC-A',
+    domain: 'location',
+    type: '位置管理',
+    name: 'CNC 区域 A线点位',
+    owner: '运维主管',
+    status: '启用',
+    scope: '巡检路线 / 设备台账',
+    impact: '关联设备 68 台',
+    lastSync: '今天 09:48',
+    health: '98.8%',
+    risk: '低',
+    change: '点位坐标已同步至巡检路线，移动设备需复核二维码位置。',
+    route: '/locations?source=workbench&node=CFG-LOC-CNC-A',
+    tone: 'green',
+  },
+  {
+    id: 'CFG-VDR-SPARE',
+    domain: 'vendor',
+    type: '供应商',
+    name: 'UNIVIEW 备件仓资质',
+    owner: '采购员',
+    status: '待复核',
+    scope: '备件采购 / 工单备件',
+    impact: '关联工单 12 张',
+    lastSync: '昨天 17:10',
+    health: '84.5%',
+    risk: '中',
+    change: '供应商资质证照即将到期，ETA 规则影响低储补货建议。',
+    route: '/vendors?source=workbench&vendor=CFG-VDR-SPARE',
+    tone: 'orange',
+  },
+  {
+    id: 'CFG-NO-ASSET',
+    domain: 'numbering',
+    type: '编号规则',
+    name: '资产编码规则',
+    owner: '平台运维',
+    status: '启用',
+    scope: '资产新建 / 导入',
+    impact: '今日生成 126 个编号',
+    lastSync: '今天 08:30',
+    health: '100%',
+    risk: '低',
+    change: '编码前缀按厂区 + 类别生成，导入模板已锁定重复校验。',
+    route: '/settings/sysconfig?source=workbench&rule=CFG-NO-ASSET',
+    tone: 'cyan',
+  },
+  {
+    id: 'CFG-INT-MES',
+    domain: 'integration',
+    type: '集成源',
+    name: 'MES 同步账号',
+    owner: '平台运维',
+    status: '同步异常',
+    scope: '数据监控 / 设备状态',
+    impact: '影响采集设备 42 台',
+    lastSync: '5 分钟前',
+    health: '91.6%',
+    risk: '高',
+    change: 'MES Token 即将轮换，部分设备采集延迟升高，需要复核同步频率。',
+    route: '/settings/webhook?source=workbench&integration=CFG-INT-MES',
+    tone: 'red',
+  },
+] as const;
+
+const workbenchSettingsStateCards = [
+  { label: '空态', value: '暂无待维护配置', note: '筛选无结果时保留新建和导入入口' },
+  { label: '异常态', value: '同步异常 1 项', note: 'MES 集成源需复核频率和凭证' },
+  { label: '无权限态', value: '供应商资质受限', note: '缺少供应商权限时只展示预览和申请入口' },
+] as const;
+
 function WorkbenchCommandPage({
   item,
   context,
@@ -4335,9 +4472,379 @@ const WorkbenchPolicyPage = (props: WorkbenchMenuPageProps) => (
   <WorkbenchCommandPage {...props} config={workbenchPolicyConfig} />
 );
 
-const WorkbenchSettingsPage = (props: WorkbenchMenuPageProps) => (
-  <WorkbenchCommandPage {...props} config={workbenchSettingsConfig} />
-);
+function WorkbenchSettingsPage({
+  item,
+  context,
+  meta,
+  onPreviewAction,
+}: WorkbenchMenuPageProps) {
+  const [selectedDomain, setSelectedDomain] = useState<(typeof workbenchSettingsDomains)[number]['id']>('category');
+  const [selectedConfigId, setSelectedConfigId] = useState(workbenchSettingsObjects[0].id);
+  const selectedConfig =
+    workbenchSettingsObjects.find((config) => config.id === selectedConfigId) ?? workbenchSettingsObjects[0];
+  const filteredConfigs = workbenchSettingsObjects.filter((config) => config.domain === selectedDomain);
+
+  const openSettingsPreview = (
+    title: string,
+    routeTarget: string,
+    description: string,
+    primaryLabel: string,
+    icon: LucideIcon = Settings,
+  ) => {
+    onPreviewAction({
+      title,
+      source: '基础维护页面',
+      routeTarget,
+      description,
+      primaryLabel,
+      icon,
+      visual: meta.imageSrc,
+      stats: context.stats,
+    });
+  };
+
+  const openConfig = (config: (typeof workbenchSettingsObjects)[number]) => {
+    setSelectedConfigId(config.id);
+    setSelectedDomain(config.domain);
+    openSettingsPreview(
+      '打开基础维护详情',
+      `${config.route}&detail=${encodeURIComponent(config.id)}`,
+      `打开 ${config.name}，带入 ${config.type}、${config.scope}、${config.impact} 和最后同步 ${config.lastSync}。`,
+      '打开详情',
+      Settings,
+    );
+  };
+
+  const selectedDomainMeta =
+    workbenchSettingsDomains.find((domain) => domain.id === selectedDomain) ?? workbenchSettingsDomains[0];
+
+  return (
+    <section className="workspace-orders-page workspace-settings-page workspace-settings-product" aria-label={`${item.label}真实产品页`}>
+      <aside className="workspace-settings-tree" aria-label="基础维护分类树">
+        <header>
+          <span><Settings /></span>
+          <div>
+            <h2>基础维护</h2>
+            <p>分类树 · 数据字典 · 集成源</p>
+          </div>
+        </header>
+        <div className="workspace-settings-tree-list">
+          {workbenchSettingsDomains.map((domain) => {
+            const DomainIcon = domain.icon;
+            return (
+              <button
+                key={domain.id}
+                type="button"
+                className={domain.id === selectedDomain ? 'is-active' : ''}
+                onClick={() => {
+                  setSelectedDomain(domain.id);
+                  const nextConfig = workbenchSettingsObjects.find((config) => config.domain === domain.id);
+                  if (nextConfig) {
+                    setSelectedConfigId(nextConfig.id);
+                  }
+                }}
+              >
+                <DomainIcon />
+                <span>
+                  <strong>{domain.label}</strong>
+                  <small>{domain.note}</small>
+                </span>
+                <b>{domain.value}</b>
+              </button>
+            );
+          })}
+        </div>
+        <section className="workspace-settings-tree-children" aria-label="基础维护二级目录">
+          <span>{selectedDomainMeta.label}二级项</span>
+          {selectedDomainMeta.children.map((child) => (
+            <button
+              key={child}
+              type="button"
+              onClick={() =>
+                openSettingsPreview(
+                  `${child}维护`,
+                  `${selectedDomainMeta.route}&node=${encodeURIComponent(child)}`,
+                  `进入 ${child} 的维护视图，保留基础维护来源和当前分类树上下文。`,
+                  '进入维护',
+                  selectedDomainMeta.icon,
+                )
+              }
+            >
+              {child}
+              <ArrowRight />
+            </button>
+          ))}
+        </section>
+        <section className="workspace-settings-states" aria-label="基础维护状态反馈">
+          {workbenchSettingsStateCards.map((state) => (
+            <article key={state.label}>
+              <span>{state.label}</span>
+              <strong>{state.value}</strong>
+              <p>{state.note}</p>
+            </article>
+          ))}
+        </section>
+      </aside>
+
+      <section className="workspace-settings-center" aria-label="基础维护产品页主体">
+        <header className="workspace-settings-header">
+          <div>
+            <span>基础维护</span>
+            <h2>{selectedDomainMeta.label}维护台</h2>
+            <p>统一维护分类、位置、供应商、编号规则和集成源，所有变更先预览影响再进入业务页。</p>
+          </div>
+          <div className="workspace-orders-toolbar" aria-label="基础维护顶部操作">
+            <button
+              type="button"
+              onClick={() =>
+                openSettingsPreview(
+                  '导入基础字典',
+                  '/settings/sysconfig/import?source=workbench',
+                  '导入分类、位置和编号规则字典，进入后校验重复项和影响范围。',
+                  '进入导入',
+                  FileText,
+                )
+              }
+            >
+              <FileText />
+              导入字典
+            </button>
+            <button
+              type="button"
+              onClick={() =>
+                openSettingsPreview(
+                  '同步集成源',
+                  '/settings/webhook?source=workbench&sync=true',
+                  '同步 MES、IoT 和财务集成源，进入后查看异常明细和重试记录。',
+                  '进入同步',
+                  Database,
+                )
+              }
+            >
+              <Database />
+              同步集成源
+            </button>
+            <button
+              type="button"
+              className="is-primary"
+              onClick={() =>
+                openSettingsPreview(
+                  '新建基础配置',
+                  `/settings/sysconfig/new?source=workbench&domain=${selectedDomain}`,
+                  `新建 ${selectedDomainMeta.label} 配置，预填当前厂区、责任人和二级目录。`,
+                  '新建配置',
+                  Settings,
+                )
+              }
+            >
+              <Settings />
+              新建配置
+            </button>
+          </div>
+        </header>
+
+        <div className="workspace-settings-metrics" aria-label="基础维护核心指标">
+          {workbenchSettingsSummaryCards.slice(0, 5).map((card) => {
+            const CardIcon = card.icon;
+            return (
+              <button
+                key={card.label}
+                type="button"
+                className={`is-${card.tone}`}
+                onClick={() =>
+                  openSettingsPreview(
+                    `${card.label}维护`,
+                    `/settings/sysconfig?source=workbench&metric=${encodeURIComponent(card.label)}`,
+                    `按 ${card.label} 下钻基础维护对象，保留当前分类树和筛选上下文。`,
+                    '查看维护项',
+                    CardIcon,
+                  )
+                }
+              >
+                <CardIcon />
+                <span>{card.label}</span>
+                <strong>{card.value}</strong>
+                <small>{card.delta}</small>
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="workspace-settings-filterbar" aria-label="基础维护查询筛选栏">
+          <label>
+            <Search />
+            <input readOnly value="搜索配置编号 / 名称 / 影响范围 / 责任人" aria-label="基础维护搜索" />
+          </label>
+          {['状态 全部', '影响范围 全部', '最后同步 今天'].map((filter) => (
+            <button
+              key={filter}
+              type="button"
+              onClick={() =>
+                openSettingsPreview(
+                  '筛选基础配置',
+                  `/settings/sysconfig?source=workbench&filter=${encodeURIComponent(filter)}`,
+                  `按 ${filter} 筛选基础维护配置，保留当前分类树。`,
+                  '打开筛选',
+                  SlidersHorizontal,
+                )
+              }
+            >
+              {filter}
+              <ArrowRight />
+            </button>
+          ))}
+          <button
+            type="button"
+            className="is-reset"
+            onClick={() =>
+              openSettingsPreview(
+                '空筛选结果',
+                '/settings/sysconfig?source=workbench&empty=true',
+                '当前筛选下暂无待维护配置，可清空条件或新建配置。',
+                '清空筛选',
+                Search,
+              )
+            }
+          >
+            空态预览
+          </button>
+        </div>
+
+        <div className="workspace-orders-table workspace-settings-table" aria-label="基础维护配置对象列表">
+          <div className="workspace-settings-table-head">
+            <span>配置编号</span>
+            <span>对象名称</span>
+            <span>影响范围</span>
+            <span>最后同步</span>
+            <span>健康度</span>
+            <span>状态</span>
+            <span>操作</span>
+          </div>
+          {(filteredConfigs.length ? filteredConfigs : workbenchSettingsObjects).map((config) => (
+            <div
+              key={config.id}
+              className={`workspace-settings-table-row is-${config.tone} ${config.id === selectedConfig.id ? 'is-selected' : ''}`}
+            >
+              <button type="button" className="is-link" onClick={() => openConfig(config)}>{config.id}</button>
+              <span>
+                <strong>{config.name}</strong>
+                <small>{config.type} · {config.owner}</small>
+              </span>
+              <span>{config.impact}</span>
+              <span>{config.lastSync}</span>
+              <span><b>{config.health}</b></span>
+              <span><i>{config.status}</i></span>
+              <span>
+                <button type="button" onClick={() => openConfig(config)}>打开</button>
+              </span>
+            </div>
+          ))}
+        </div>
+
+        <footer className="workspace-orders-pagination" aria-label="基础维护分页">
+          <span>共 {workbenchSettingsObjects.length * 18} 条</span>
+          <button type="button">10条/页</button>
+          <button type="button" disabled>‹</button>
+          <button type="button" className="is-current">1</button>
+          <button type="button">2</button>
+          <button type="button">›</button>
+        </footer>
+      </section>
+
+      <aside className="workspace-settings-detail" aria-label="基础维护详情抽屉">
+        <header>
+          <strong>基础维护详情</strong>
+          <span>{selectedConfig.status}</span>
+        </header>
+        <section className="workspace-settings-detail-card" aria-label="当前基础维护信息">
+          <b>{selectedConfig.risk}</b>
+          <div>
+            <span>{selectedConfig.id}</span>
+            <h3>{selectedConfig.name}</h3>
+            <p>{selectedConfig.change}</p>
+          </div>
+          <dl>
+            <div><dt>关联资产</dt><dd>{selectedConfig.impact}</dd></div>
+            <div><dt>最后同步</dt><dd>{selectedConfig.lastSync}</dd></div>
+            <div><dt>变更影响</dt><dd>{selectedConfig.scope}</dd></div>
+            <div><dt>责任人</dt><dd>{selectedConfig.owner}</dd></div>
+            <div><dt>供应商资质</dt><dd>{selectedConfig.domain === 'vendor' ? '证照待复核' : '无供应商依赖'}</dd></div>
+            <div><dt>集成健康</dt><dd>{selectedConfig.health}</dd></div>
+          </dl>
+        </section>
+        <section className="workspace-settings-impact" aria-label="基础维护变更影响">
+          {[
+            ['字段变更', selectedConfig.change],
+            ['关联资产', selectedConfig.impact],
+            ['审计要求', selectedConfig.risk === '高' ? '危险变更需二次确认' : '普通变更自动记录审计'],
+          ].map(([label, value]) => (
+            <article key={label}>
+              <span>{label}</span>
+              <p>{value}</p>
+            </article>
+          ))}
+        </section>
+        <nav className="workspace-settings-tabs" aria-label="基础维护详情标签">
+          {['字段变更', '关联资产', '供应商资质', '编号规则', '集成健康'].map((tab, index) => (
+            <button key={tab} type="button" className={index === 0 ? 'is-active' : ''}>{tab}</button>
+          ))}
+        </nav>
+        <section className="workspace-settings-confirm" aria-label="基础维护危险变更确认">
+          <AlertTriangle />
+          <div>
+            <strong>危险变更需二次确认</strong>
+            <p>停用规则、删除分类、修改集成凭证会影响资产录入、工单派发和报表口径。</p>
+          </div>
+        </section>
+        <footer className="workspace-orders-detail-actions workspace-settings-actions" aria-label="基础维护详情操作">
+          <button
+            type="button"
+            onClick={() =>
+              openSettingsPreview(
+                '打开基础维护',
+                `${selectedConfig.route}&detail=${encodeURIComponent(selectedConfig.id)}`,
+                `进入 ${selectedConfig.name}，保留关联资产、最后同步和变更影响上下文。`,
+                '进入维护',
+                Settings,
+              )
+            }
+          >
+            打开维护
+          </button>
+          <button
+            type="button"
+            onClick={() =>
+              openSettingsPreview(
+                '危险变更确认',
+                `/settings/sysconfig/danger?source=workbench&config=${encodeURIComponent(selectedConfig.id)}`,
+                `对 ${selectedConfig.name} 执行危险变更前，需要二次确认并写入审计记录。`,
+                '进入确认',
+                AlertTriangle,
+              )
+            }
+          >
+            危险变更
+          </button>
+          <button
+            type="button"
+            className="is-primary"
+            onClick={() =>
+              openSettingsPreview(
+                '维护供应商资质',
+                `/vendors?source=workbench&config=${encodeURIComponent(selectedConfig.id)}`,
+                `查看 ${selectedConfig.name} 的供应商资质。若当前账号无供应商权限，则只展示无权限态。`,
+                '进入供应商',
+                UserCircle,
+              )
+            }
+          >
+            供应商资质
+          </button>
+        </footer>
+      </aside>
+    </section>
+  );
+}
 
 function WorkbenchAssetPage({
   item,
