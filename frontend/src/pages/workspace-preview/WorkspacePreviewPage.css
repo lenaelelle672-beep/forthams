@@ -1982,6 +1982,102 @@
   background: #176de8;
 }
 
+.workspace-asset-page {
+  background:
+    linear-gradient(180deg, rgba(249, 252, 255, .97), rgba(239, 248, 255, .96)),
+    #f1f8ff;
+}
+
+.workspace-asset-page .workspace-orders-icon {
+  color: #176de8;
+  background: #edf5ff;
+}
+
+.workspace-asset-page .workspace-orders-toolbar .is-primary {
+  background: linear-gradient(180deg, #338bff, #176de8);
+}
+
+.workspace-asset-page .workspace-orders-detail-card b {
+  background: #176de8;
+}
+
+.workspace-asset-page .workspace-orders-table-row.is-red b {
+  background: #f03649;
+}
+
+.workspace-asset-page .workspace-orders-table-row.is-orange b {
+  background: #f08a20;
+}
+
+.workspace-asset-page .workspace-orders-table-row.is-green b,
+.workspace-asset-page .workspace-orders-table-row.is-blue b {
+  background: #176de8;
+}
+
+.workspace-inspection-page {
+  background:
+    linear-gradient(180deg, rgba(247, 252, 255, .97), rgba(238, 250, 247, .96)),
+    #f0fbf6;
+}
+
+.workspace-inspection-page .workspace-orders-icon {
+  color: #0d9a6a;
+  background: #e9fff7;
+}
+
+.workspace-inspection-page .workspace-orders-toolbar .is-primary {
+  background: linear-gradient(180deg, #25c88d, #0d9a6a);
+}
+
+.workspace-inspection-page .workspace-orders-detail-card b {
+  background: #0d9a6a;
+}
+
+.workspace-inspection-page .workspace-orders-table-row.is-red b {
+  background: #f03649;
+}
+
+.workspace-inspection-page .workspace-orders-table-row.is-orange b {
+  background: #f08a20;
+}
+
+.workspace-inspection-page .workspace-orders-table-row.is-green b,
+.workspace-inspection-page .workspace-orders-table-row.is-blue b {
+  background: #0d9a6a;
+}
+
+.workspace-spares-page {
+  background:
+    linear-gradient(180deg, rgba(255, 252, 248, .97), rgba(241, 248, 255, .96)),
+    #fff9ef;
+}
+
+.workspace-spares-page .workspace-orders-icon {
+  color: #d97706;
+  background: #fff4d6;
+}
+
+.workspace-spares-page .workspace-orders-toolbar .is-primary {
+  background: linear-gradient(180deg, #ffad42, #d97706);
+}
+
+.workspace-spares-page .workspace-orders-detail-card b {
+  background: #d97706;
+}
+
+.workspace-spares-page .workspace-orders-table-row.is-red b {
+  background: #f03649;
+}
+
+.workspace-spares-page .workspace-orders-table-row.is-orange b {
+  background: #f08a20;
+}
+
+.workspace-spares-page .workspace-orders-table-row.is-green b,
+.workspace-spares-page .workspace-orders-table-row.is-blue b {
+  background: #d97706;
+}
+
 .workspace-product-page {
   display: grid;
   gap: 12px;

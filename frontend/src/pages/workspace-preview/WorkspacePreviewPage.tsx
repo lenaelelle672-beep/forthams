@@ -2993,6 +2993,1297 @@ const workbenchTodoRows = [
 
 const workbenchTodoDetailTabs = ['待办信息', '上下文', '处理建议', '流转记录', '关联单据'] as const;
 
+const workbenchAssetSummaryCards = [
+  { label: '资产总数', value: '12,856', delta: '较上月 +1.56%', icon: Layers, tone: 'blue' },
+  { label: '在用资产', value: '10,842', delta: '在线可追踪', icon: CheckCircle2, tone: 'green' },
+  { label: '风险资产', value: '356', delta: '需转派处置', icon: AlertTriangle, tone: 'red' },
+  { label: '健康评分', value: '86', delta: '平台均值', icon: Gauge, tone: 'cyan' },
+  { label: '处置申请', value: '18', delta: '调拨/报废/清退', icon: Archive, tone: 'orange' },
+  { label: '使用流转', value: '42', delta: '领用/借用/归还', icon: UserCircle, tone: 'violet' },
+] as const;
+
+const workbenchAssetStages = [
+  { label: '建账', value: '12,856', note: '统一编码', tone: 'blue' },
+  { label: '在用', value: '10,842', note: '责任到人', tone: 'green' },
+  { label: '风险', value: '356', note: '健康低分', tone: 'red' },
+  { label: '流转', value: '42', note: '领用/调拨', tone: 'cyan' },
+  { label: '处置', value: '18', note: '审批中', tone: 'orange' },
+] as const;
+
+const workbenchAssetRows = [
+  {
+    id: 'FA-CN-301',
+    type: '生产设备',
+    asset: '数控车床 CN-301',
+    location: '机加车间 / CNC 区域 A线',
+    title: '主轴振动异常，建议转预测维保',
+    health: '91',
+    status: '高风险',
+    owner: '张三丰',
+    lifecycle: '在用',
+    value: '¥126.8万',
+    tone: 'red',
+  },
+  {
+    id: 'FA-M-201',
+    type: '生产设备',
+    asset: '注塑机 M-201',
+    location: '一车间 / A线',
+    title: '温度边界触发巡检复核',
+    health: '88',
+    status: '关注',
+    owner: '王班组',
+    lifecycle: '在用',
+    value: '¥86.2万',
+    tone: 'orange',
+  },
+  {
+    id: 'FA-CP-101',
+    type: '动力设备',
+    asset: '空压机 CP-101',
+    location: '动力站',
+    title: '油滤保养窗口待确认',
+    health: '94',
+    status: '正常',
+    owner: '王技师',
+    lifecycle: '维保中',
+    value: '¥42.5万',
+    tone: 'green',
+  },
+  {
+    id: 'FA-RB-501',
+    type: '生产设备',
+    asset: '焊接机器人 RB-501',
+    location: '焊接线 A',
+    title: '减速机温升趋势预警',
+    health: '86',
+    status: '关注',
+    owner: '赵技师',
+    lifecycle: '在用',
+    value: '¥68.9万',
+    tone: 'orange',
+  },
+  {
+    id: 'FA-AGV-05',
+    type: '物流设备',
+    asset: 'AGV-05',
+    location: '物流区',
+    title: '位置漂移待复核',
+    health: '90',
+    status: '待复核',
+    owner: '物流运维',
+    lifecycle: '流转中',
+    value: '¥18.6万',
+    tone: 'blue',
+  },
+  {
+    id: 'FA-PDB-01',
+    type: '电气设备',
+    asset: '配电柜 PDB-01',
+    location: '动力站',
+    title: '局部过热已转告警',
+    health: '83',
+    status: '处理中',
+    owner: '陈电工',
+    lifecycle: '在用',
+    value: '¥24.1万',
+    tone: 'orange',
+  },
+] as const;
+
+const workbenchAssetDetailTabs = ['资产信息', '健康评分', '生命周期', '处置流转', '关联工单'] as const;
+
+const workbenchInspectionSummaryCards = [
+  { label: '今日计划', value: '36', delta: '18 条已完成', icon: CheckCircle2, tone: 'blue' },
+  { label: '异常点位', value: '5', delta: '待复核', icon: AlertTriangle, tone: 'red' },
+  { label: '按时完成率', value: '92%', delta: '较昨日 +6%', icon: TrendingUp, tone: 'green' },
+  { label: '待转工单', value: '7', delta: '异常复核后转派', icon: Wrench, tone: 'orange' },
+  { label: '路线数量', value: '12', delta: '按风险排程', icon: MapPin, tone: 'cyan' },
+  { label: '证据上传', value: '86%', delta: '图片/读数齐全', icon: FileText, tone: 'violet' },
+] as const;
+
+const workbenchInspectionStages = [
+  { label: '排程', value: '36', note: '今日计划', tone: 'blue' },
+  { label: '签到', value: '28', note: '扫码确认', tone: 'cyan' },
+  { label: '执行', value: '18', note: '现场采集', tone: 'green' },
+  { label: '异常', value: '5', note: '待复核', tone: 'red' },
+  { label: '闭环', value: '92%', note: '按时完成', tone: 'orange' },
+] as const;
+
+const workbenchInspectionRows = [
+  {
+    id: 'INSP-20260614-M201',
+    route: '产线 A 温度巡检',
+    asset: '注塑机 M-201',
+    point: '温度 / 振动 / 电流',
+    title: '高温点位连续越限',
+    priority: 'P1',
+    status: '待复核',
+    progress: '12/18',
+    owner: '李巡检',
+    evidence: '3 张图片',
+    tone: 'red',
+  },
+  {
+    id: 'INSP-20260614-CN301',
+    route: 'CNC 主轴巡检',
+    asset: '数控车床 CN-301',
+    point: '主轴振动 / 润滑',
+    title: '主轴振动读数偏高',
+    priority: 'P1',
+    status: '执行中',
+    progress: '8/12',
+    owner: '张三丰',
+    evidence: '读数已采集',
+    tone: 'orange',
+  },
+  {
+    id: 'INSP-20260614-CP101',
+    route: '动力站压力巡检',
+    asset: '空压机 CP-101',
+    point: '压力 / 油滤',
+    title: '油滤窗口待复查',
+    priority: 'P2',
+    status: '已完成',
+    progress: '10/10',
+    owner: '王技师',
+    evidence: '已上传',
+    tone: 'green',
+  },
+  {
+    id: 'INSP-20260614-RB501',
+    route: '焊接线温升巡检',
+    asset: '焊接机器人 RB-501',
+    point: '减速机温度',
+    title: '温升趋势需复核',
+    priority: 'P2',
+    status: '待执行',
+    progress: '0/8',
+    owner: '赵技师',
+    evidence: '待上传',
+    tone: 'blue',
+  },
+  {
+    id: 'INSP-20260614-PDB01',
+    route: '动力配电巡检',
+    asset: '配电柜 PDB-01',
+    point: '红外测温',
+    title: '柜体局部过热报警',
+    priority: 'P2',
+    status: '已转派',
+    progress: '6/6',
+    owner: '陈电工',
+    evidence: '热成像已上传',
+    tone: 'orange',
+  },
+] as const;
+
+const workbenchInspectionDetailTabs = ['巡检信息', '路线点位', '现场证据', '异常处理', '关联工单'] as const;
+
+const workbenchSparesSummaryCards = [
+  { label: '备件总数', value: '3,256', delta: '较昨日 +48', icon: PackageCheck, tone: 'blue' },
+  { label: '低储备件', value: '126', delta: '需补货', icon: AlertTriangle, tone: 'orange' },
+  { label: '缺货备件', value: '28', delta: '影响工单', icon: Box, tone: 'red' },
+  { label: '供应商 ETA', value: '3天', delta: '轴承优先', icon: CalendarDays, tone: 'cyan' },
+  { label: '关联工单', value: '12', delta: '预测维保优先', icon: Wrench, tone: 'violet' },
+  { label: '成本回写', value: '82%', delta: '本月完成率', icon: BarChart3, tone: 'green' },
+] as const;
+
+const workbenchSparesStages = [
+  { label: '识别', value: '126', note: '低储预警', tone: 'orange' },
+  { label: '申请', value: '48', note: '领用/采购', tone: 'blue' },
+  { label: '采购', value: '28', note: '缺货影响', tone: 'red' },
+  { label: '到货', value: '72%', note: 'ETA 达成', tone: 'cyan' },
+  { label: '回写', value: '82%', note: '工单成本', tone: 'green' },
+] as const;
+
+const workbenchSparesRows = [
+  {
+    id: 'SP-6205-2RS',
+    category: '轴承',
+    part: '轴承 6205-2RS',
+    stock: '6',
+    state: '低储',
+    supplier: 'UNIVIEW 备件仓',
+    workOrder: 'WO-20240614-0012',
+    eta: '2026-06-18',
+    owner: '备件员',
+    tone: 'orange',
+  },
+  {
+    id: 'SP-PT100-M201',
+    category: '传感器',
+    part: '温控模块传感器',
+    stock: '2',
+    state: '缺货风险',
+    supplier: '华南传感器',
+    workOrder: 'WO-20240614-0011',
+    eta: '2026-06-20',
+    owner: '采购员',
+    tone: 'red',
+  },
+  {
+    id: 'SP-LGHP-2',
+    category: '润滑',
+    part: '润滑脂 LGHP-2',
+    stock: '18',
+    state: '已就绪',
+    supplier: '设备维保仓',
+    workOrder: 'WO-20240614-0012',
+    eta: '已到位',
+    owner: '王技师',
+    tone: 'green',
+  },
+  {
+    id: 'SP-B-320',
+    category: '皮带',
+    part: '皮带 B-320',
+    stock: '12',
+    state: '安全库存',
+    supplier: '包装线仓',
+    workOrder: 'WO-20240614-0005',
+    eta: '可保障 7 天',
+    owner: '周技师',
+    tone: 'blue',
+  },
+  {
+    id: 'SP-SEAL-35627',
+    category: '密封',
+    part: '密封圈 35×62×7',
+    stock: '1',
+    state: '待采购',
+    supplier: '待询价',
+    workOrder: 'WO-20240614-0012',
+    eta: '待确认',
+    owner: '采购员',
+    tone: 'red',
+  },
+] as const;
+
+const workbenchSparesDetailTabs = ['备件信息', '库存流水', '供应商 ETA', '关联工单', '成本回写'] as const;
+
+function WorkbenchAssetPage({
+  item,
+  context,
+  meta,
+  onPreviewAction,
+}: WorkbenchMenuPageProps) {
+  const [selectedAssetId, setSelectedAssetId] = useState(workbenchAssetRows[0].id);
+  const [detailTab, setDetailTab] = useState<(typeof workbenchAssetDetailTabs)[number]>('资产信息');
+  const [detailOpen, setDetailOpen] = useState(true);
+  const selectedAsset = workbenchAssetRows.find((asset) => asset.id === selectedAssetId) ?? workbenchAssetRows[0];
+  const primaryAction = meta.actions[0];
+  const createAction = meta.actions[1] ?? primaryAction;
+  const riskAction = meta.actions[2] ?? primaryAction;
+  const transferAction = meta.actions[3] ?? primaryAction;
+
+  const openAssetPreview = (
+    title: string,
+    routeTarget: string,
+    description: string,
+    primaryLabel: string,
+    icon: LucideIcon = Layers,
+  ) => {
+    onPreviewAction({
+      title,
+      source: '资产总览页面',
+      routeTarget,
+      description,
+      primaryLabel,
+      icon,
+      visual: meta.imageSrc,
+      stats: context.stats,
+    });
+  };
+
+  const openAsset = (asset: (typeof workbenchAssetRows)[number]) => {
+    setSelectedAssetId(asset.id);
+    setDetailOpen(true);
+    openAssetPreview(
+      '打开资产详情',
+      `/assets/${asset.id}?source=workbench&menu=asset`,
+      `打开 ${asset.asset}，带入位置、健康分、生命周期和 Workbench 资产总览来源。`,
+      '打开详情',
+      Layers,
+    );
+  };
+
+  return (
+    <section className="workspace-orders-page workspace-asset-page" aria-label={`${item.label}真实产品页`}>
+      <div className="workspace-orders-main">
+        <section className="workspace-orders-shell" aria-label="资产总览产品页主体">
+          <header className="workspace-orders-header">
+            <div className="workspace-orders-title">
+              <span className="workspace-orders-icon"><Layers /></span>
+              <div>
+                <h2>资产总览</h2>
+                <p>健康台账 · 生命周期 · 处置流转</p>
+              </div>
+            </div>
+            <div className="workspace-orders-toolbar" aria-label="资产总览顶部操作">
+              <button type="button" className="is-secondary" onClick={() => onPreviewAction(primaryAction)}>
+                <Layers />
+                查看资产清单
+              </button>
+              <button type="button" className="is-secondary" onClick={() => onPreviewAction(createAction)}>
+                <Archive />
+                新增资产
+              </button>
+              <button type="button" className="is-primary" onClick={() => onPreviewAction(riskAction)}>
+                <Wrench />
+                生成风险工单
+              </button>
+            </div>
+          </header>
+
+          <div className="workspace-orders-kpis" aria-label="资产总览核心指标">
+            {workbenchAssetSummaryCards.map((card) => {
+              const CardIcon = card.icon;
+              return (
+                <button
+                  key={card.label}
+                  type="button"
+                  className={`is-${card.tone}`}
+                  onClick={() =>
+                    openAssetPreview(
+                      `${card.label}资产`,
+                      `/assets?source=workbench&metric=${encodeURIComponent(card.label)}`,
+                      `按 ${card.label} 下钻资产台账，保留组织、分类和健康状态筛选。`,
+                      '查看资产',
+                      CardIcon,
+                    )
+                  }
+                >
+                  <CardIcon />
+                  <span>{card.label}</span>
+                  <strong>{card.value}</strong>
+                  <small>{card.delta}</small>
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="workspace-orders-stage-row" aria-label="资产生命周期">
+            {workbenchAssetStages.map((stage) => (
+              <button
+                key={stage.label}
+                type="button"
+                className={`is-${stage.tone}`}
+                onClick={() =>
+                  openAssetPreview(
+                    `${stage.label}资产`,
+                    `/assets?source=workbench&lifecycle=${encodeURIComponent(stage.label)}`,
+                    `按 ${stage.label} 生命周期查看资产，并保留 Workbench 来源。`,
+                    '查看阶段',
+                    ArrowRight,
+                  )
+                }
+              >
+                <span>{stage.label}</span>
+                <strong>{stage.value}</strong>
+                <small>{stage.note}</small>
+              </button>
+            ))}
+          </div>
+
+          <div className="workspace-orders-filterbar" aria-label="资产总览查询筛选栏">
+            <label>
+              <Search />
+              <input readOnly value="搜索资产编号 / 名称 / 位置 / 责任人" aria-label="资产搜索" />
+            </label>
+            {['组织 全部', '资产状态 全部', '资产分类 全部', '健康状态 全部'].map((filter) => (
+              <button key={filter} type="button" onClick={() => onPreviewAction(primaryAction)}>
+                {filter}
+                <ArrowRight />
+              </button>
+            ))}
+            <button type="button" className="is-date" onClick={() => onPreviewAction(transferAction)}>
+              处置流转
+              <CalendarDays />
+            </button>
+            <button type="button" className="is-reset" onClick={() => onPreviewAction(primaryAction)}>
+              重置
+            </button>
+          </div>
+
+          <div className="workspace-orders-table" aria-label="资产总览列表">
+            <div className="workspace-orders-table-head">
+              <span><input type="checkbox" aria-label="选择全部资产" readOnly /></span>
+              <span>资产编号</span>
+              <span>类型</span>
+              <span>资产信息</span>
+              <span>风险/任务</span>
+              <span>健康分</span>
+              <span>状态</span>
+              <span>价值</span>
+              <span>责任人</span>
+              <span>生命周期</span>
+              <span>操作</span>
+            </div>
+            {workbenchAssetRows.map((asset) => (
+              <div
+                key={asset.id}
+                className={`workspace-orders-table-row is-${asset.tone} ${
+                  asset.id === selectedAsset.id ? 'is-selected' : ''
+                }`}
+              >
+                <span><input type="checkbox" aria-label={`选择${asset.id}`} readOnly /></span>
+                <button type="button" className="is-link" onClick={() => openAsset(asset)}>{asset.id}</button>
+                <span><em>{asset.type}</em></span>
+                <span>
+                  <strong>{asset.asset}</strong>
+                  <small>{asset.location}</small>
+                </span>
+                <button type="button" className="is-title" onClick={() => openAsset(asset)}>{asset.title}</button>
+                <span><b>{asset.health}</b></span>
+                <span><i>{asset.status}</i></span>
+                <span>{asset.value}</span>
+                <span>{asset.owner}</span>
+                <span><em className="is-spare">{asset.lifecycle}</em></span>
+                <span>
+                  <button
+                    type="button"
+                    className="is-process"
+                    onClick={() => {
+                      setSelectedAssetId(asset.id);
+                      setDetailOpen(true);
+                      openAssetPreview(
+                        '生成资产风险工单',
+                        buildWorkOrderPrefillPath({
+                          source: 'asset-risk',
+                          title: `${asset.asset} 健康风险处置工单`,
+                          assetName: asset.asset,
+                          assetLocation: asset.location,
+                          riskState: asset.status,
+                          riskScore: Number(asset.health),
+                          riskLevel: asset.status,
+                          priority: asset.tone === 'red' ? 'HIGH' : 'MEDIUM',
+                          dueDate: '2026-06-16',
+                          description: `来自 Workbench 资产总览：${asset.title}，需要承接到工单闭环。`,
+                        }),
+                        `为 ${asset.asset} 创建健康风险处置工单。`,
+                        '创建工单',
+                        Wrench,
+                      );
+                    }}
+                  >
+                    处置
+                  </button>
+                  <button type="button" className="is-more" aria-label={`${asset.id}更多操作`} onClick={() => openAsset(asset)}>
+                    ···
+                  </button>
+                </span>
+              </div>
+            ))}
+          </div>
+
+          <footer className="workspace-orders-pagination" aria-label="资产分页">
+            <span>共 12,856 台</span>
+            <button type="button">10条/页</button>
+            <button type="button" disabled>‹</button>
+            {[1, 2, 3, 4, 5].map((pageNo) => (
+              <button key={pageNo} type="button" className={pageNo === 1 ? 'is-current' : ''}>{pageNo}</button>
+            ))}
+            <span>...</span>
+            <button type="button">1286</button>
+            <button type="button">›</button>
+          </footer>
+        </section>
+      </div>
+
+      <aside className="workspace-orders-detail" aria-label="资产详情抽屉">
+        {detailOpen ? (
+          <>
+            <header className="workspace-orders-detail-head">
+              <strong>资产详情</strong>
+              <button type="button" aria-label="关闭资产详情" onClick={() => setDetailOpen(false)}>
+                <X />
+              </button>
+            </header>
+            <section className="workspace-orders-detail-card" aria-label="当前资产信息">
+              <div>
+                <b>{selectedAsset.health}</b>
+                <span>
+                  <strong>{selectedAsset.id}</strong>
+                  <small>{selectedAsset.status}</small>
+                </span>
+              </div>
+              <h3>{selectedAsset.asset}</h3>
+              <dl>
+                <div><dt>类型</dt><dd>{selectedAsset.type}</dd></div>
+                <div><dt>健康分</dt><dd>{selectedAsset.health}</dd></div>
+                <div><dt>位置</dt><dd>{selectedAsset.location}</dd></div>
+                <div><dt>资产价值</dt><dd>{selectedAsset.value}</dd></div>
+                <div><dt>责任人</dt><dd>{selectedAsset.owner}</dd></div>
+                <div><dt>生命周期</dt><dd>{selectedAsset.lifecycle}</dd></div>
+                <div><dt>最近同步</dt><dd>2026-06-14 10:30</dd></div>
+                <div><dt>处置状态</dt><dd>{selectedAsset.status}</dd></div>
+              </dl>
+            </section>
+
+            <section className="workspace-orders-flow" aria-label="资产生命周期流转">
+              {['建账', '在用', '风险', '处置', '闭环'].map((step, index) => (
+                <span key={step} className={index < 2 ? 'is-done' : index === 2 ? 'is-active' : ''}>
+                  <CheckCircle2 />
+                  <strong>{step}</strong>
+                  <small>{index < 2 ? '已完成' : index === 2 ? '需研判' : '待流转'}</small>
+                </span>
+              ))}
+            </section>
+
+            <nav className="workspace-orders-tabs" aria-label="资产详情标签">
+              {workbenchAssetDetailTabs.map((tab) => (
+                <button
+                  key={tab}
+                  type="button"
+                  className={tab === detailTab ? 'is-active' : ''}
+                  onClick={() => setDetailTab(tab)}
+                >
+                  {tab}
+                </button>
+              ))}
+            </nav>
+
+            <section className="workspace-orders-tab-panel" aria-label={`${detailTab}内容`}>
+              <article>
+                <span>资产摘要</span>
+                <p>{selectedAsset.title}，当前生命周期为 {selectedAsset.lifecycle}。</p>
+              </article>
+              <article>
+                <span>健康评分</span>
+                <ul>
+                  <li>健康分 {selectedAsset.health} <b>已计算</b></li>
+                  <li>责任人 {selectedAsset.owner} <b>已绑定</b></li>
+                  <li>风险状态 {selectedAsset.status} <b className="is-warning">需关注</b></li>
+                </ul>
+              </article>
+              <article>
+                <span>处置建议</span>
+                <p>高风险资产优先生成工单；流转类资产进入调拨/领用表单，并保留审批上下文。</p>
+              </article>
+              <article>
+                <span>关联记录</span>
+                <ul>
+                  <li>WO-20240614-0012 <small>派工中</small></li>
+                  <li>TR-20240614-08 <small>调拨审批</small></li>
+                  <li>INSP-20260614-M201 <small>待复核</small></li>
+                </ul>
+              </article>
+            </section>
+
+            <footer className="workspace-orders-detail-actions" aria-label="资产详情操作">
+              <button
+                type="button"
+                onClick={() =>
+                  openAssetPreview(
+                    '发起资产调拨',
+                    `/disposals/transfer/new?source=workbench&assetId=${encodeURIComponent(selectedAsset.id)}`,
+                    `为 ${selectedAsset.asset} 发起调拨，预填位置、责任人和资产来源。`,
+                    '发起调拨',
+                    ArrowRight,
+                  )
+                }
+              >
+                发起调拨
+              </button>
+              <button
+                type="button"
+                onClick={() =>
+                  openAssetPreview(
+                    '发起使用流转',
+                    `/assignments/new?source=workbench&assetId=${encodeURIComponent(selectedAsset.id)}`,
+                    `为 ${selectedAsset.asset} 发起领用/借用/归还流转。`,
+                    '发起流转',
+                    UserCircle,
+                  )
+                }
+              >
+                使用流转
+              </button>
+              <button
+                type="button"
+                className="is-primary"
+                onClick={() => onPreviewAction(riskAction)}
+              >
+                创建工单
+              </button>
+            </footer>
+          </>
+        ) : (
+          <button type="button" className="workspace-orders-detail-empty" onClick={() => setDetailOpen(true)}>
+            <Layers />
+            <strong>选择左侧资产打开详情</strong>
+            <span>详情抽屉会展示健康评分、生命周期、处置流转和关联工单。</span>
+          </button>
+        )}
+      </aside>
+    </section>
+  );
+}
+
+function WorkbenchInspectionPage({
+  item,
+  context,
+  meta,
+  onPreviewAction,
+}: WorkbenchMenuPageProps) {
+  const [selectedInspectionId, setSelectedInspectionId] = useState(workbenchInspectionRows[0].id);
+  const [detailTab, setDetailTab] = useState<(typeof workbenchInspectionDetailTabs)[number]>('巡检信息');
+  const [detailOpen, setDetailOpen] = useState(true);
+  const selectedInspection =
+    workbenchInspectionRows.find((inspection) => inspection.id === selectedInspectionId) ?? workbenchInspectionRows[0];
+  const planAction = meta.actions[0];
+  const safetyAction = meta.actions[1] ?? planAction;
+  const transferAction = meta.actions[2] ?? planAction;
+
+  const openInspectionPreview = (
+    title: string,
+    routeTarget: string,
+    description: string,
+    primaryLabel: string,
+    icon: LucideIcon = CheckCircle2,
+  ) => {
+    onPreviewAction({
+      title,
+      source: '巡检管理页面',
+      routeTarget,
+      description,
+      primaryLabel,
+      icon,
+      visual: meta.imageSrc,
+      stats: context.stats,
+    });
+  };
+
+  const openInspection = (inspection: (typeof workbenchInspectionRows)[number]) => {
+    setSelectedInspectionId(inspection.id);
+    setDetailOpen(true);
+    openInspectionPreview(
+      '打开巡检详情',
+      `/inspections/${inspection.id}?source=workbench&menu=inspection`,
+      `打开 ${inspection.id}，带入路线、点位、现场证据和异常处理上下文。`,
+      '打开详情',
+      CheckCircle2,
+    );
+  };
+
+  return (
+    <section className="workspace-orders-page workspace-inspection-page" aria-label={`${item.label}真实产品页`}>
+      <div className="workspace-orders-main">
+        <section className="workspace-orders-shell" aria-label="巡检管理产品页主体">
+          <header className="workspace-orders-header">
+            <div className="workspace-orders-title">
+              <span className="workspace-orders-icon"><CheckCircle2 /></span>
+              <div>
+                <h2>巡检管理</h2>
+                <p>路线排程 · 扫码执行 · 异常转派</p>
+              </div>
+            </div>
+            <div className="workspace-orders-toolbar" aria-label="巡检管理顶部操作">
+              <button type="button" className="is-secondary" onClick={() => onPreviewAction(planAction)}>
+                <CheckCircle2 />
+                生成巡检计划
+              </button>
+              <button type="button" className="is-secondary" onClick={() => onPreviewAction(safetyAction)}>
+                <ClipboardList />
+                执行安全点检
+              </button>
+              <button type="button" className="is-primary" onClick={() => onPreviewAction(transferAction)}>
+                <Wrench />
+                转派巡检异常
+              </button>
+            </div>
+          </header>
+
+          <div className="workspace-orders-kpis" aria-label="巡检管理核心指标">
+            {workbenchInspectionSummaryCards.map((card) => {
+              const CardIcon = card.icon;
+              return (
+                <button
+                  key={card.label}
+                  type="button"
+                  className={`is-${card.tone}`}
+                  onClick={() =>
+                    openInspectionPreview(
+                      `${card.label}巡检`,
+                      `/inspections?source=workbench&metric=${encodeURIComponent(card.label)}`,
+                      `按 ${card.label} 下钻巡检任务，保留路线、点位和执行人筛选。`,
+                      '查看巡检',
+                      CardIcon,
+                    )
+                  }
+                >
+                  <CardIcon />
+                  <span>{card.label}</span>
+                  <strong>{card.value}</strong>
+                  <small>{card.delta}</small>
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="workspace-orders-stage-row" aria-label="巡检执行阶段">
+            {workbenchInspectionStages.map((stage) => (
+              <button
+                key={stage.label}
+                type="button"
+                className={`is-${stage.tone}`}
+                onClick={() =>
+                  openInspectionPreview(
+                    `${stage.label}巡检`,
+                    `/inspections?source=workbench&stage=${encodeURIComponent(stage.label)}`,
+                    `按 ${stage.label} 阶段查看巡检路线和异常闭环。`,
+                    '查看阶段',
+                    ArrowRight,
+                  )
+                }
+              >
+                <span>{stage.label}</span>
+                <strong>{stage.value}</strong>
+                <small>{stage.note}</small>
+              </button>
+            ))}
+          </div>
+
+          <div className="workspace-orders-filterbar" aria-label="巡检管理查询筛选栏">
+            <label>
+              <Search />
+              <input readOnly value="搜索巡检号 / 路线 / 资产 / 执行人" aria-label="巡检搜索" />
+            </label>
+            {['路线 全部', '点位 全部', '状态 全部', '执行人 全部'].map((filter) => (
+              <button key={filter} type="button" onClick={() => onPreviewAction(planAction)}>
+                {filter}
+                <ArrowRight />
+              </button>
+            ))}
+            <button type="button" className="is-date" onClick={() => onPreviewAction(safetyAction)}>
+              执行时间
+              <CalendarDays />
+            </button>
+            <button type="button" className="is-reset" onClick={() => onPreviewAction(planAction)}>
+              重置
+            </button>
+          </div>
+
+          <div className="workspace-orders-table" aria-label="巡检管理列表">
+            <div className="workspace-orders-table-head">
+              <span><input type="checkbox" aria-label="选择全部巡检" readOnly /></span>
+              <span>巡检号</span>
+              <span>路线</span>
+              <span>资产点位</span>
+              <span>异常/任务</span>
+              <span>优先级</span>
+              <span>状态</span>
+              <span>进度</span>
+              <span>执行人</span>
+              <span>证据</span>
+              <span>操作</span>
+            </div>
+            {workbenchInspectionRows.map((inspection) => (
+              <div
+                key={inspection.id}
+                className={`workspace-orders-table-row is-${inspection.tone} ${
+                  inspection.id === selectedInspection.id ? 'is-selected' : ''
+                }`}
+              >
+                <span><input type="checkbox" aria-label={`选择${inspection.id}`} readOnly /></span>
+                <button type="button" className="is-link" onClick={() => openInspection(inspection)}>{inspection.id}</button>
+                <span><em>{inspection.route}</em></span>
+                <span>
+                  <strong>{inspection.asset}</strong>
+                  <small>{inspection.point}</small>
+                </span>
+                <button type="button" className="is-title" onClick={() => openInspection(inspection)}>{inspection.title}</button>
+                <span><b>{inspection.priority}</b></span>
+                <span><i>{inspection.status}</i></span>
+                <span>{inspection.progress}</span>
+                <span>{inspection.owner}</span>
+                <span><em className="is-spare">{inspection.evidence}</em></span>
+                <span>
+                  <button
+                    type="button"
+                    className="is-process"
+                    onClick={() => {
+                      setSelectedInspectionId(inspection.id);
+                      setDetailOpen(true);
+                      openInspectionPreview(
+                        '执行巡检任务',
+                        `/inspections/${inspection.id}/execute?source=workbench`,
+                        `执行 ${inspection.id}，带入路线、点位和现场证据要求。`,
+                        '进入执行',
+                        ClipboardList,
+                      );
+                    }}
+                  >
+                    执行
+                  </button>
+                  <button type="button" className="is-more" aria-label={`${inspection.id}更多操作`} onClick={() => openInspection(inspection)}>
+                    ···
+                  </button>
+                </span>
+              </div>
+            ))}
+          </div>
+
+          <footer className="workspace-orders-pagination" aria-label="巡检分页">
+            <span>共 36 条</span>
+            <button type="button">10条/页</button>
+            <button type="button" disabled>‹</button>
+            {[1, 2, 3, 4].map((pageNo) => (
+              <button key={pageNo} type="button" className={pageNo === 1 ? 'is-current' : ''}>{pageNo}</button>
+            ))}
+            <button type="button">›</button>
+          </footer>
+        </section>
+      </div>
+
+      <aside className="workspace-orders-detail" aria-label="巡检详情抽屉">
+        {detailOpen ? (
+          <>
+            <header className="workspace-orders-detail-head">
+              <strong>巡检详情</strong>
+              <button type="button" aria-label="关闭巡检详情" onClick={() => setDetailOpen(false)}>
+                <X />
+              </button>
+            </header>
+            <section className="workspace-orders-detail-card" aria-label="当前巡检信息">
+              <div>
+                <b>{selectedInspection.priority}</b>
+                <span>
+                  <strong>{selectedInspection.id}</strong>
+                  <small>{selectedInspection.status}</small>
+                </span>
+              </div>
+              <h3>{selectedInspection.title}</h3>
+              <dl>
+                <div><dt>路线</dt><dd>{selectedInspection.route}</dd></div>
+                <div><dt>进度</dt><dd>{selectedInspection.progress}</dd></div>
+                <div><dt>资产</dt><dd>{selectedInspection.asset}</dd></div>
+                <div><dt>点位</dt><dd>{selectedInspection.point}</dd></div>
+                <div><dt>执行人</dt><dd>{selectedInspection.owner}</dd></div>
+                <div><dt>证据</dt><dd>{selectedInspection.evidence}</dd></div>
+                <div><dt>计划时间</dt><dd>2026-06-14 14:00</dd></div>
+                <div><dt>异常状态</dt><dd>{selectedInspection.status}</dd></div>
+              </dl>
+            </section>
+
+            <section className="workspace-orders-flow" aria-label="巡检流转">
+              {['排程', '签到', '执行', '异常', '闭环'].map((step, index) => (
+                <span key={step} className={index < 2 ? 'is-done' : index === 2 ? 'is-active' : ''}>
+                  <CheckCircle2 />
+                  <strong>{step}</strong>
+                  <small>{index < 2 ? '已完成' : index === 2 ? '进行中' : '待流转'}</small>
+                </span>
+              ))}
+            </section>
+
+            <nav className="workspace-orders-tabs" aria-label="巡检详情标签">
+              {workbenchInspectionDetailTabs.map((tab) => (
+                <button
+                  key={tab}
+                  type="button"
+                  className={tab === detailTab ? 'is-active' : ''}
+                  onClick={() => setDetailTab(tab)}
+                >
+                  {tab}
+                </button>
+              ))}
+            </nav>
+
+            <section className="workspace-orders-tab-panel" aria-label={`${detailTab}内容`}>
+              <article>
+                <span>路线摘要</span>
+                <p>{selectedInspection.route} 覆盖 {selectedInspection.asset}，点位为 {selectedInspection.point}。</p>
+              </article>
+              <article>
+                <span>现场证据</span>
+                <ul>
+                  <li>{selectedInspection.evidence} <b>已记录</b></li>
+                  <li>扫码签到 <b>已完成</b></li>
+                  <li>异常说明 <b className="is-warning">需复核</b></li>
+                </ul>
+              </article>
+              <article>
+                <span>异常处理</span>
+                <p>读数异常可直接转派工单，安全点检结果回写到设备和资产健康评分。</p>
+              </article>
+              <article>
+                <span>关联工单</span>
+                <ul>
+                  <li>WO-20240614-0012 <small>派工中</small></li>
+                  <li>ALM-20240614-0011 <small>处置中</small></li>
+                  <li>SP-6205-2RS <small>备件已关联</small></li>
+                </ul>
+              </article>
+            </section>
+
+            <footer className="workspace-orders-detail-actions" aria-label="巡检详情操作">
+              <button type="button" onClick={() => onPreviewAction(safetyAction)}>
+                安全点检
+              </button>
+              <button
+                type="button"
+                onClick={() =>
+                  openInspectionPreview(
+                    '上传巡检证据',
+                    `/inspections/${selectedInspection.id}/upload?source=workbench`,
+                    `上传 ${selectedInspection.id} 的图片、读数和异常说明。`,
+                    '上传证据',
+                    FileText,
+                  )
+                }
+              >
+                上传证据
+              </button>
+              <button type="button" className="is-primary" onClick={() => onPreviewAction(transferAction)}>
+                转工单
+              </button>
+            </footer>
+          </>
+        ) : (
+          <button type="button" className="workspace-orders-detail-empty" onClick={() => setDetailOpen(true)}>
+            <CheckCircle2 />
+            <strong>选择左侧巡检打开详情</strong>
+            <span>详情抽屉会展示路线点位、现场证据、异常处理和关联工单。</span>
+          </button>
+        )}
+      </aside>
+    </section>
+  );
+}
+
+function WorkbenchSparesPage({
+  item,
+  context,
+  meta,
+  onPreviewAction,
+}: WorkbenchMenuPageProps) {
+  const [selectedSpareId, setSelectedSpareId] = useState(workbenchSparesRows[0].id);
+  const [detailTab, setDetailTab] = useState<(typeof workbenchSparesDetailTabs)[number]>('备件信息');
+  const [detailOpen, setDetailOpen] = useState(true);
+  const selectedSpare = workbenchSparesRows.find((spare) => spare.id === selectedSpareId) ?? workbenchSparesRows[0];
+  const requestAction = meta.actions[0];
+  const stockAction = meta.actions[1] ?? requestAction;
+  const purchaseAction = meta.actions[2] ?? requestAction;
+
+  const openSparesPreview = (
+    title: string,
+    routeTarget: string,
+    description: string,
+    primaryLabel: string,
+    icon: LucideIcon = PackageCheck,
+  ) => {
+    onPreviewAction({
+      title,
+      source: '备件管理页面',
+      routeTarget,
+      description,
+      primaryLabel,
+      icon,
+      visual: meta.imageSrc,
+      stats: context.stats,
+    });
+  };
+
+  const openSpare = (spare: (typeof workbenchSparesRows)[number]) => {
+    setSelectedSpareId(spare.id);
+    setDetailOpen(true);
+    openSparesPreview(
+      '打开备件详情',
+      `/spare-parts/${spare.id}?source=workbench&menu=spares`,
+      `打开 ${spare.part}，带入库存、供应商、关联工单和成本回写上下文。`,
+      '打开详情',
+      PackageCheck,
+    );
+  };
+
+  return (
+    <section className="workspace-orders-page workspace-spares-page" aria-label={`${item.label}真实产品页`}>
+      <div className="workspace-orders-main">
+        <section className="workspace-orders-shell" aria-label="备件管理产品页主体">
+          <header className="workspace-orders-header">
+            <div className="workspace-orders-title">
+              <span className="workspace-orders-icon"><PackageCheck /></span>
+              <div>
+                <h2>备件管理</h2>
+                <p>低储预警 · 采购领用 · 工单回写</p>
+              </div>
+            </div>
+            <div className="workspace-orders-toolbar" aria-label="备件管理顶部操作">
+              <button type="button" className="is-secondary" onClick={() => onPreviewAction(requestAction)}>
+                <PackageCheck />
+                申请低储备件
+              </button>
+              <button type="button" className="is-secondary" onClick={() => onPreviewAction(stockAction)}>
+                <Box />
+                查看备件库存
+              </button>
+              <button type="button" className="is-primary" onClick={() => onPreviewAction(purchaseAction)}>
+                <Archive />
+                采购申请
+              </button>
+            </div>
+          </header>
+
+          <div className="workspace-orders-kpis" aria-label="备件管理核心指标">
+            {workbenchSparesSummaryCards.map((card) => {
+              const CardIcon = card.icon;
+              return (
+                <button
+                  key={card.label}
+                  type="button"
+                  className={`is-${card.tone}`}
+                  onClick={() =>
+                    openSparesPreview(
+                      `${card.label}备件`,
+                      `/spare-parts?source=workbench&metric=${encodeURIComponent(card.label)}`,
+                      `按 ${card.label} 下钻备件库存，保留低储和关联工单上下文。`,
+                      '查看备件',
+                      CardIcon,
+                    )
+                  }
+                >
+                  <CardIcon />
+                  <span>{card.label}</span>
+                  <strong>{card.value}</strong>
+                  <small>{card.delta}</small>
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="workspace-orders-stage-row" aria-label="备件保障流程">
+            {workbenchSparesStages.map((stage) => (
+              <button
+                key={stage.label}
+                type="button"
+                className={`is-${stage.tone}`}
+                onClick={() =>
+                  openSparesPreview(
+                    `${stage.label}备件`,
+                    `/spare-parts?source=workbench&stage=${encodeURIComponent(stage.label)}`,
+                    `按 ${stage.label} 阶段查看备件保障、采购和成本回写。`,
+                    '查看阶段',
+                    ArrowRight,
+                  )
+                }
+              >
+                <span>{stage.label}</span>
+                <strong>{stage.value}</strong>
+                <small>{stage.note}</small>
+              </button>
+            ))}
+          </div>
+
+          <div className="workspace-orders-filterbar" aria-label="备件管理查询筛选栏">
+            <label>
+              <Search />
+              <input readOnly value="搜索备件号 / 名称 / 供应商 / 关联工单" aria-label="备件搜索" />
+            </label>
+            {['分类 全部', '库存状态 全部', '供应商 全部', '关联工单 全部'].map((filter) => (
+              <button key={filter} type="button" onClick={() => onPreviewAction(stockAction)}>
+                {filter}
+                <ArrowRight />
+              </button>
+            ))}
+            <button type="button" className="is-date" onClick={() => onPreviewAction(purchaseAction)}>
+              到货时间
+              <CalendarDays />
+            </button>
+            <button type="button" className="is-reset" onClick={() => onPreviewAction(stockAction)}>
+              重置
+            </button>
+          </div>
+
+          <div className="workspace-orders-table" aria-label="备件管理列表">
+            <div className="workspace-orders-table-head">
+              <span><input type="checkbox" aria-label="选择全部备件" readOnly /></span>
+              <span>备件号</span>
+              <span>分类</span>
+              <span>备件信息</span>
+              <span>关联工单</span>
+              <span>库存</span>
+              <span>状态</span>
+              <span>ETA</span>
+              <span>责任人</span>
+              <span>供应商</span>
+              <span>操作</span>
+            </div>
+            {workbenchSparesRows.map((spare) => (
+              <div
+                key={spare.id}
+                className={`workspace-orders-table-row is-${spare.tone} ${
+                  spare.id === selectedSpare.id ? 'is-selected' : ''
+                }`}
+              >
+                <span><input type="checkbox" aria-label={`选择${spare.id}`} readOnly /></span>
+                <button type="button" className="is-link" onClick={() => openSpare(spare)}>{spare.id}</button>
+                <span><em>{spare.category}</em></span>
+                <span>
+                  <strong>{spare.part}</strong>
+                  <small>{spare.supplier}</small>
+                </span>
+                <button type="button" className="is-title" onClick={() => openSpare(spare)}>{spare.workOrder}</button>
+                <span><b>{spare.stock}</b></span>
+                <span><i>{spare.state}</i></span>
+                <span>{spare.eta}</span>
+                <span>{spare.owner}</span>
+                <span><em className="is-spare">{spare.supplier}</em></span>
+                <span>
+                  <button
+                    type="button"
+                    className="is-process"
+                    onClick={() => {
+                      setSelectedSpareId(spare.id);
+                      setDetailOpen(true);
+                      openSparesPreview(
+                        '发起备件采购',
+                        `/spare-parts/new?source=workbench&partNo=${encodeURIComponent(spare.id)}&mode=purchase`,
+                        `为 ${spare.part} 发起采购申请，预填库存、供应商和关联工单。`,
+                        '采购申请',
+                        Archive,
+                      );
+                    }}
+                  >
+                    采购
+                  </button>
+                  <button type="button" className="is-more" aria-label={`${spare.id}更多操作`} onClick={() => openSpare(spare)}>
+                    ···
+                  </button>
+                </span>
+              </div>
+            ))}
+          </div>
+
+          <footer className="workspace-orders-pagination" aria-label="备件分页">
+            <span>共 3,256 件</span>
+            <button type="button">10条/页</button>
+            <button type="button" disabled>‹</button>
+            {[1, 2, 3, 4, 5].map((pageNo) => (
+              <button key={pageNo} type="button" className={pageNo === 1 ? 'is-current' : ''}>{pageNo}</button>
+            ))}
+            <span>...</span>
+            <button type="button">326</button>
+            <button type="button">›</button>
+          </footer>
+        </section>
+      </div>
+
+      <aside className="workspace-orders-detail" aria-label="备件详情抽屉">
+        {detailOpen ? (
+          <>
+            <header className="workspace-orders-detail-head">
+              <strong>备件详情</strong>
+              <button type="button" aria-label="关闭备件详情" onClick={() => setDetailOpen(false)}>
+                <X />
+              </button>
+            </header>
+            <section className="workspace-orders-detail-card" aria-label="当前备件信息">
+              <div>
+                <b>{selectedSpare.stock}</b>
+                <span>
+                  <strong>{selectedSpare.id}</strong>
+                  <small>{selectedSpare.state}</small>
+                </span>
+              </div>
+              <h3>{selectedSpare.part}</h3>
+              <dl>
+                <div><dt>分类</dt><dd>{selectedSpare.category}</dd></div>
+                <div><dt>库存</dt><dd>{selectedSpare.stock}</dd></div>
+                <div><dt>供应商</dt><dd>{selectedSpare.supplier}</dd></div>
+                <div><dt>到货 ETA</dt><dd>{selectedSpare.eta}</dd></div>
+                <div><dt>关联工单</dt><dd>{selectedSpare.workOrder}</dd></div>
+                <div><dt>责任人</dt><dd>{selectedSpare.owner}</dd></div>
+                <div><dt>成本状态</dt><dd>待回写</dd></div>
+                <div><dt>库存状态</dt><dd>{selectedSpare.state}</dd></div>
+              </dl>
+            </section>
+
+            <section className="workspace-orders-flow" aria-label="备件保障流转">
+              {['识别', '申请', '采购', '到货', '回写'].map((step, index) => (
+                <span key={step} className={index < 2 ? 'is-done' : index === 2 ? 'is-active' : ''}>
+                  <CheckCircle2 />
+                  <strong>{step}</strong>
+                  <small>{index < 2 ? '已完成' : index === 2 ? '跟进中' : '待流转'}</small>
+                </span>
+              ))}
+            </section>
+
+            <nav className="workspace-orders-tabs" aria-label="备件详情标签">
+              {workbenchSparesDetailTabs.map((tab) => (
+                <button
+                  key={tab}
+                  type="button"
+                  className={tab === detailTab ? 'is-active' : ''}
+                  onClick={() => setDetailTab(tab)}
+                >
+                  {tab}
+                </button>
+              ))}
+            </nav>
+
+            <section className="workspace-orders-tab-panel" aria-label={`${detailTab}内容`}>
+              <article>
+                <span>库存摘要</span>
+                <p>{selectedSpare.part} 当前库存 {selectedSpare.stock}，状态为 {selectedSpare.state}。</p>
+              </article>
+              <article>
+                <span>供应商 ETA</span>
+                <ul>
+                  <li>{selectedSpare.supplier} <b>{selectedSpare.eta}</b></li>
+                  <li>关联工单 {selectedSpare.workOrder} <b>已绑定</b></li>
+                  <li>成本回写 <b className="is-warning">待确认</b></li>
+                </ul>
+              </article>
+              <article>
+                <span>保障建议</span>
+                <p>低储和缺货备件优先进入采购申请，已到位备件回写到预测维保工单。</p>
+              </article>
+              <article>
+                <span>关联记录</span>
+                <ul>
+                  <li>{selectedSpare.workOrder} <small>预测维保</small></li>
+                  <li>PO-20240614-08 <small>采购申请</small></li>
+                  <li>RPT-SPARE-COST-015 <small>成本报表</small></li>
+                </ul>
+              </article>
+            </section>
+
+            <footer className="workspace-orders-detail-actions" aria-label="备件详情操作">
+              <button type="button" onClick={() => onPreviewAction(stockAction)}>
+                库存列表
+              </button>
+              <button
+                type="button"
+                onClick={() =>
+                  openSparesPreview(
+                    '领用备件',
+                    `/spare-parts/${selectedSpare.id}/request?source=workbench`,
+                    `领用 ${selectedSpare.part}，保留关联工单和成本回写上下文。`,
+                    '进入领用',
+                    PackageCheck,
+                  )
+                }
+              >
+                领用
+              </button>
+              <button type="button" className="is-primary" onClick={() => onPreviewAction(purchaseAction)}>
+                采购申请
+              </button>
+            </footer>
+          </>
+        ) : (
+          <button type="button" className="workspace-orders-detail-empty" onClick={() => setDetailOpen(true)}>
+            <PackageCheck />
+            <strong>选择左侧备件打开详情</strong>
+            <span>详情抽屉会展示库存、供应商 ETA、关联工单和成本回写。</span>
+          </button>
+        )}
+      </aside>
+    </section>
+  );
+}
+
 const workbenchDeviceSummaryCards = [
   { label: '在线设备', value: '5,102', delta: '在线率 98.6%', icon: Cpu, tone: 'green' },
   { label: '温度异常', value: '12', delta: '超过阈值', icon: Gauge, tone: 'orange' },
@@ -7217,7 +8508,15 @@ export default function WorkspacePreviewPage() {
           </div>
 
           <WorkspaceContextStrip item={activeItem} context={activeContext} onAction={handleContextAction} />
-          {activeModuleMock && activeProductPageMeta && activeItem.id === 'device' ? (
+          {activeModuleMock && activeProductPageMeta && activeItem.id === 'asset' ? (
+            <WorkbenchAssetPage
+              item={activeItem}
+              context={activeContext}
+              mock={activeModuleMock}
+              meta={activeProductPageMeta}
+              onPreviewAction={setRoutePreview}
+            />
+          ) : activeModuleMock && activeProductPageMeta && activeItem.id === 'device' ? (
             <WorkbenchDevicePage
               item={activeItem}
               context={activeContext}
@@ -7235,6 +8534,22 @@ export default function WorkspacePreviewPage() {
             />
           ) : activeModuleMock && activeProductPageMeta && activeItem.id === 'orders' ? (
             <WorkbenchOrdersPage
+              item={activeItem}
+              context={activeContext}
+              mock={activeModuleMock}
+              meta={activeProductPageMeta}
+              onPreviewAction={setRoutePreview}
+            />
+          ) : activeModuleMock && activeProductPageMeta && activeItem.id === 'inspection' ? (
+            <WorkbenchInspectionPage
+              item={activeItem}
+              context={activeContext}
+              mock={activeModuleMock}
+              meta={activeProductPageMeta}
+              onPreviewAction={setRoutePreview}
+            />
+          ) : activeModuleMock && activeProductPageMeta && activeItem.id === 'spares' ? (
+            <WorkbenchSparesPage
               item={activeItem}
               context={activeContext}
               mock={activeModuleMock}

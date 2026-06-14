@@ -209,27 +209,6 @@ test.describe('Workbench 正式入口浏览器回归', () => {
         targetIncludes: ['/workorders/new?', 'source=quick-action', 'riskScore=91'],
       },
       {
-        route: '/fixed-assets/workbench/assets?menu=asset',
-        pageLabel: '资产总览',
-        heading: '资产健康与生命周期总览',
-        action: '发起资产调拨',
-        targetIncludes: ['/disposals/transfer/new?source=workbench&assetId=201'],
-      },
-      {
-        route: '/fixed-assets/workbench/assets?menu=inspection',
-        pageLabel: '巡检管理',
-        heading: '点检路线与异常复核',
-        action: '转派巡检异常',
-        targetIncludes: ['/workorders/new?', 'source=asset-risk', 'riskState='],
-      },
-      {
-        route: '/fixed-assets/workbench/assets?menu=spares',
-        pageLabel: '备件管理',
-        heading: '备件保障与低储预警',
-        action: '采购申请',
-        targetIncludes: ['/spare-parts/new?source=workbench&mode=purchase&stock=LOW'],
-      },
-      {
         route: '/fixed-assets/workbench/analytics?menu=energy',
         pageLabel: '数据监控',
         heading: 'MES 与 IoT 数据链路',
@@ -282,6 +261,53 @@ test.describe('Workbench 正式入口浏览器回归', () => {
       await page.keyboard.press('Escape');
       await expect(dialog).toHaveCount(0);
     }
+
+    await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
+    expect(errors).toEqual([]);
+  });
+
+  test('资产总览左侧菜单渲染真实页面级组件而非通用产品壳', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await seedAuthenticatedSession(page, operationsUser);
+
+    await page.goto('/fixed-assets/workbench/assets?menu=asset');
+    await page.waitForLoadState('networkidle');
+
+    await expect(page.getByLabel('资产总览真实产品页')).toBeVisible();
+    await expect(page.locator('.workspace-product-page')).toHaveCount(0);
+    await expect(page.getByRole('heading', { name: '资产总览' })).toBeVisible();
+    await expect(page.getByText('健康台账 · 生命周期 · 处置流转')).toBeVisible();
+    await expect(page.getByLabel('资产总览核心指标')).toContainText('资产总数');
+    await expect(page.getByLabel('资产生命周期', { exact: true })).toContainText('建账');
+    await expect(page.getByLabel('资产总览顶部操作')).toContainText('生成风险工单');
+    await expect(page.getByLabel('资产总览查询筛选栏')).toContainText('处置流转');
+    await expect(page.getByLabel('资产总览列表')).toContainText('FA-CN-301');
+    await expect(page.getByLabel('资产详情抽屉')).toContainText('数控车床 CN-301');
+    await expect(page.getByLabel('资产详情标签')).toContainText('生命周期');
+    await expect(page.getByLabel('资产详情操作')).toContainText('发起调拨');
+    await expect(page.locator('body')).not.toContainText('workbench-menu-asset-v1');
+
+    await page.getByRole('button', { name: /生成风险工单/ }).click();
+    const riskDialog = page.getByRole('dialog', { name: '生成风险工单' });
+    await expect(riskDialog).toBeVisible();
+    await expect(riskDialog.locator('.workspace-action-route strong')).toContainText('/workorders/new?');
+    await page.keyboard.press('Escape');
+    await expect(riskDialog).toHaveCount(0);
+
+    await page.getByRole('button', { name: 'FA-M-201', exact: true }).click();
+    const detailDialog = page.getByRole('dialog', { name: '打开资产详情' });
+    await expect(detailDialog).toBeVisible();
+    await expect(detailDialog.locator('.workspace-action-route strong')).toContainText('/assets/FA-M-201');
+    await page.keyboard.press('Escape');
+    await expect(detailDialog).toHaveCount(0);
+    await expect(page.getByLabel('资产详情抽屉')).toContainText('注塑机 M-201');
+
+    await page.getByRole('button', { name: '发起调拨' }).click();
+    const transferDialog = page.getByRole('dialog', { name: '发起资产调拨' });
+    await expect(transferDialog).toBeVisible();
+    await expect(transferDialog.locator('.workspace-action-route strong')).toContainText('/disposals/transfer/new?source=workbench&assetId=FA-M-201');
+    await page.keyboard.press('Escape');
+    await expect(transferDialog).toHaveCount(0);
 
     await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
     expect(errors).toEqual([]);
@@ -423,6 +449,100 @@ test.describe('Workbench 正式入口浏览器回归', () => {
     await expect(executeDialog.locator('.workspace-action-route strong')).toContainText('/execute?source=workbench');
     await page.keyboard.press('Escape');
     await expect(executeDialog).toHaveCount(0);
+
+    await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
+    expect(errors).toEqual([]);
+  });
+
+  test('巡检管理左侧菜单渲染真实页面级组件而非通用产品壳', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await seedAuthenticatedSession(page, operationsUser);
+
+    await page.goto('/fixed-assets/workbench/assets?menu=inspection');
+    await page.waitForLoadState('networkidle');
+
+    await expect(page.getByLabel('巡检管理真实产品页')).toBeVisible();
+    await expect(page.locator('.workspace-product-page')).toHaveCount(0);
+    await expect(page.getByRole('heading', { name: '巡检管理' })).toBeVisible();
+    await expect(page.getByText('路线排程 · 扫码执行 · 异常转派')).toBeVisible();
+    await expect(page.getByLabel('巡检管理核心指标')).toContainText('今日计划');
+    await expect(page.getByLabel('巡检执行阶段')).toContainText('排程');
+    await expect(page.getByLabel('巡检管理顶部操作')).toContainText('转派巡检异常');
+    await expect(page.getByLabel('巡检管理查询筛选栏')).toContainText('执行时间');
+    await expect(page.getByLabel('巡检管理列表')).toContainText('INSP-20260614-M201');
+    await expect(page.getByLabel('巡检详情抽屉')).toContainText('高温点位连续越限');
+    await expect(page.getByLabel('巡检详情标签')).toContainText('现场证据');
+    await expect(page.getByLabel('巡检详情操作')).toContainText('转工单');
+    await expect(page.locator('body')).not.toContainText('workbench-menu-inspection-v1');
+
+    await page.getByRole('button', { name: /转派巡检异常/ }).click();
+    const transferDialog = page.getByRole('dialog', { name: '转派巡检异常' });
+    await expect(transferDialog).toBeVisible();
+    await expect(transferDialog.locator('.workspace-action-route strong')).toContainText('/workorders/new?');
+    await page.keyboard.press('Escape');
+    await expect(transferDialog).toHaveCount(0);
+
+    await page.getByRole('button', { name: 'INSP-20260614-CN301', exact: true }).click();
+    const detailDialog = page.getByRole('dialog', { name: '打开巡检详情' });
+    await expect(detailDialog).toBeVisible();
+    await expect(detailDialog.locator('.workspace-action-route strong')).toContainText('/inspections/INSP-20260614-CN301');
+    await page.keyboard.press('Escape');
+    await expect(detailDialog).toHaveCount(0);
+    await expect(page.getByLabel('巡检详情抽屉')).toContainText('主轴振动读数偏高');
+
+    await page.getByRole('button', { name: '转工单', exact: true }).click();
+    const workOrderDialog = page.getByRole('dialog', { name: '转派巡检异常' });
+    await expect(workOrderDialog).toBeVisible();
+    await expect(workOrderDialog.locator('.workspace-action-route strong')).toContainText('/workorders/new?');
+    await page.keyboard.press('Escape');
+    await expect(workOrderDialog).toHaveCount(0);
+
+    await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
+    expect(errors).toEqual([]);
+  });
+
+  test('备件管理左侧菜单渲染真实页面级组件而非通用产品壳', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await seedAuthenticatedSession(page, operationsUser);
+
+    await page.goto('/fixed-assets/workbench/assets?menu=spares');
+    await page.waitForLoadState('networkidle');
+
+    await expect(page.getByLabel('备件管理真实产品页')).toBeVisible();
+    await expect(page.locator('.workspace-product-page')).toHaveCount(0);
+    await expect(page.getByRole('heading', { name: '备件管理' })).toBeVisible();
+    await expect(page.getByText('低储预警 · 采购领用 · 工单回写')).toBeVisible();
+    await expect(page.getByLabel('备件管理核心指标')).toContainText('低储备件');
+    await expect(page.getByLabel('备件保障流程')).toContainText('识别');
+    await expect(page.getByLabel('备件管理顶部操作')).toContainText('采购申请');
+    await expect(page.getByLabel('备件管理查询筛选栏')).toContainText('到货时间');
+    await expect(page.getByLabel('备件管理列表')).toContainText('SP-6205-2RS');
+    await expect(page.getByLabel('备件详情抽屉')).toContainText('轴承 6205-2RS');
+    await expect(page.getByLabel('备件详情标签')).toContainText('供应商 ETA');
+    await expect(page.getByLabel('备件详情操作')).toContainText('采购申请');
+    await expect(page.locator('body')).not.toContainText('workbench-menu-spares-v1');
+
+    await page.getByLabel('备件管理顶部操作').getByRole('button', { name: '采购申请' }).click();
+    const purchaseDialog = page.getByRole('dialog', { name: '采购申请' });
+    await expect(purchaseDialog).toBeVisible();
+    await expect(purchaseDialog.locator('.workspace-action-route strong')).toContainText('/spare-parts/new?source=workbench&mode=purchase&stock=LOW');
+    await page.keyboard.press('Escape');
+    await expect(purchaseDialog).toHaveCount(0);
+
+    await page.getByRole('button', { name: 'SP-PT100-M201', exact: true }).click();
+    const detailDialog = page.getByRole('dialog', { name: '打开备件详情' });
+    await expect(detailDialog).toBeVisible();
+    await expect(detailDialog.locator('.workspace-action-route strong')).toContainText('/spare-parts/SP-PT100-M201');
+    await page.keyboard.press('Escape');
+    await expect(detailDialog).toHaveCount(0);
+    await expect(page.getByLabel('备件详情抽屉')).toContainText('温控模块传感器');
+
+    await page.getByLabel('备件详情操作').getByRole('button', { name: '领用', exact: true }).click();
+    const requestDialog = page.getByRole('dialog', { name: '领用备件' });
+    await expect(requestDialog).toBeVisible();
+    await expect(requestDialog.locator('.workspace-action-route strong')).toContainText('/spare-parts/SP-PT100-M201/request?source=workbench');
+    await page.keyboard.press('Escape');
+    await expect(requestDialog).toHaveCount(0);
 
     await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
     expect(errors).toEqual([]);
