@@ -196,7 +196,7 @@ test.describe('Workbench 正式入口浏览器回归', () => {
     expect(errors).toEqual([]);
   });
 
-  test('Workbench 菜单级产品页呈现业务操作台、CRUD 矩阵和页面级跳转', async ({ page }) => {
+  test('Workbench 非工单菜单产品页呈现业务操作台、CRUD 矩阵和页面级跳转', async ({ page }) => {
     const errors = collectBrowserErrors(page);
     await seedAuthenticatedSession(page, operationsUser);
 
@@ -228,13 +228,6 @@ test.describe('Workbench 正式入口浏览器回归', () => {
         heading: '机台在线与温度监控',
         action: '打开设备台账',
         targetIncludes: ['/equipment?source=workbench&status=ONLINE'],
-      },
-      {
-        route: '/fixed-assets/workbench/assets?menu=orders',
-        pageLabel: '工单管理',
-        heading: '预测维保工单闭环',
-        action: '创建预测工单',
-        targetIncludes: ['/workorders/new?', 'source=quick-action', 'riskScore=92'],
       },
       {
         route: '/fixed-assets/workbench/assets?menu=inspection',
@@ -317,6 +310,53 @@ test.describe('Workbench 正式入口浏览器回归', () => {
       await page.keyboard.press('Escape');
       await expect(dialog).toHaveCount(0);
     }
+
+    await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
+    expect(errors).toEqual([]);
+  });
+
+  test('工单管理左侧菜单渲染真实页面级组件而非通用产品壳', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await seedAuthenticatedSession(page, operationsUser);
+
+    await page.goto('/fixed-assets/workbench/assets?menu=orders');
+    await page.waitForLoadState('networkidle');
+
+    await expect(page.getByLabel('工单管理真实产品页')).toBeVisible();
+    await expect(page.locator('.workspace-product-page')).toHaveCount(0);
+    await expect(page.getByRole('heading', { name: '工单管理' })).toBeVisible();
+    await expect(page.getByText('预测工单 · 派工执行 · 验收闭环')).toBeVisible();
+    await expect(page.getByLabel('工单管理核心指标')).toContainText('全部工单');
+    await expect(page.getByLabel('工单流程阶段')).toContainText('预测');
+    await expect(page.getByLabel('工单管理顶部操作')).toContainText('高级筛选');
+    await expect(page.getByLabel('工单查询筛选栏')).toContainText('创建时间');
+    await expect(page.getByLabel('工单管理列表')).toContainText('WO-20240614-0012');
+    await expect(page.getByLabel('工单详情抽屉')).toContainText('主轴振动异常预测维保');
+    await expect(page.getByLabel('工单详情标签')).toContainText('备件与物料');
+    await expect(page.getByLabel('工单详情操作')).toContainText('开始执行');
+    await expect(page.locator('body')).not.toContainText('workbench-menu-orders-v1');
+
+    await page.getByRole('button', { name: /新建工单/ }).click();
+    const createDialog = page.getByRole('dialog', { name: '创建预测工单' });
+    await expect(createDialog).toBeVisible();
+    await expect(createDialog.locator('.workspace-action-route strong')).toContainText('/workorders/new?');
+    await page.keyboard.press('Escape');
+    await expect(createDialog).toHaveCount(0);
+
+    await page.getByRole('button', { name: 'WO-20240614-0011', exact: true }).click();
+    const detailDialog = page.getByRole('dialog', { name: '打开工单详情' });
+    await expect(detailDialog).toBeVisible();
+    await expect(detailDialog.locator('.workspace-action-route strong')).toContainText('/workorders/WO-20240614-0011');
+    await page.keyboard.press('Escape');
+    await expect(detailDialog).toHaveCount(0);
+    await expect(page.getByLabel('工单详情抽屉')).toContainText('换刀机构卡滞');
+
+    await page.getByRole('button', { name: '开始执行' }).click();
+    const executeDialog = page.getByRole('dialog', { name: '开始执行' });
+    await expect(executeDialog).toBeVisible();
+    await expect(executeDialog.locator('.workspace-action-route strong')).toContainText('/execute?source=workbench');
+    await page.keyboard.press('Escape');
+    await expect(executeDialog).toHaveCount(0);
 
     await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
     expect(errors).toEqual([]);

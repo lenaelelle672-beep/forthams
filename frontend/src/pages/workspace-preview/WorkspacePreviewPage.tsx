@@ -125,6 +125,14 @@ type WorkbenchOperationItem = {
   tone?: 'normal' | 'warning' | 'danger';
 };
 
+type WorkbenchMenuPageProps = {
+  item: WorkspaceMenuItem;
+  context: MenuContext;
+  mock: ModuleMock;
+  meta: WorkbenchProductPageMeta;
+  onPreviewAction: (preview: RouteActionPreview) => void;
+};
+
 type WorkOrderPrefillParams = {
   source: 'asset-risk' | 'predictive-maintenance' | 'quick-action';
   title: string;
@@ -2765,19 +2773,529 @@ function WorkspaceModuleMock({
   );
 }
 
+const workbenchOrderSummaryCards = [
+  { label: '全部工单', value: '216', delta: '较昨日 +18', icon: ClipboardList, tone: 'blue' },
+  { label: '预测工单', value: '46', delta: '较昨日 +7', icon: Gauge, tone: 'blue' },
+  { label: '执行中', value: '78', delta: '较昨日 +12', icon: Wrench, tone: 'green' },
+  { label: '待验收', value: '32', delta: '较昨日 -3', icon: FileText, tone: 'violet' },
+  { label: 'SLA 逾期', value: '9', delta: '较昨日 +2', icon: AlertTriangle, tone: 'red' },
+  { label: '今日闭环', value: '51', delta: '较昨日 +9', icon: CheckCircle2, tone: 'green' },
+] as const;
+
+const workbenchOrderStages = [
+  { label: '预测', value: '46', note: '较昨日 +7', tone: 'blue' },
+  { label: '派工', value: '38', note: '较昨日 +6', tone: 'cyan' },
+  { label: '执行', value: '78', note: '较昨日 +12', tone: 'green' },
+  { label: '验收', value: '32', note: '较昨日 -3', tone: 'violet' },
+  { label: '闭环', value: '51', note: '较昨日 +9', tone: 'orange' },
+] as const;
+
+const workbenchOrderRows = [
+  {
+    id: 'WO-20240614-0012',
+    type: '预测维保',
+    device: '数控车床 CN-301',
+    location: '机加车间',
+    title: '主轴振动异常预测维保',
+    priority: 'P1',
+    status: '派工中',
+    sla: '-1.2h',
+    owner: '张三丰',
+    spare: '已就绪',
+    tone: 'red',
+  },
+  {
+    id: 'WO-20240614-0011',
+    type: '故障报修',
+    device: '立式铣床 VM-205',
+    location: '加工中心',
+    title: '换刀机构卡滞',
+    priority: 'P2',
+    status: '执行中',
+    sla: '2.5h',
+    owner: '李巡检',
+    spare: '缺件 2',
+    tone: 'orange',
+  },
+  {
+    id: 'WO-20240614-0010',
+    type: '预防性维护',
+    device: '空压机 CP-101',
+    location: '动力站',
+    title: '油滤更换保养',
+    priority: 'P3',
+    status: '待验收',
+    sla: '4.8h',
+    owner: '王技师',
+    spare: '已就绪',
+    tone: 'blue',
+  },
+  {
+    id: 'WO-20240614-0009',
+    type: '预测维保',
+    device: '焊接机器人 RB-501',
+    location: '焊接线 A',
+    title: '减速机温升趋势预警维保',
+    priority: 'P2',
+    status: '执行中',
+    sla: '1.0h',
+    owner: '赵技师',
+    spare: '部分到位',
+    tone: 'orange',
+  },
+  {
+    id: 'WO-20240614-0008',
+    type: '故障报修',
+    device: '数控车床 CN-305',
+    location: '机加车间',
+    title: '冷却泵异响',
+    priority: 'P1',
+    status: '派工中',
+    sla: '-0.3h',
+    owner: '刘班组长',
+    spare: '缺件 1',
+    tone: 'red',
+  },
+  {
+    id: 'WO-20240614-0007',
+    type: '巡检异常',
+    device: '配电柜 PDB-01',
+    location: '动力站',
+    title: '柜体局部过热报警',
+    priority: 'P2',
+    status: '执行中',
+    sla: '3.2h',
+    owner: '陈电工',
+    spare: '无需备件',
+    tone: 'orange',
+  },
+  {
+    id: 'WO-20240614-0006',
+    type: '预防性维护',
+    device: '冷干机 RD-201',
+    location: '动力站',
+    title: '冷凝器清洁保养',
+    priority: 'P3',
+    status: '待验收',
+    sla: '5.1h',
+    owner: '孙技师',
+    spare: '已就绪',
+    tone: 'blue',
+  },
+  {
+    id: 'WO-20240614-0005',
+    type: '预测维保',
+    device: '传送线 CV-302',
+    location: '包装线',
+    title: '链条磨损趋势预警维保',
+    priority: 'P3',
+    status: '闭环',
+    sla: '--',
+    owner: '周技师',
+    spare: '已消耗',
+    tone: 'green',
+  },
+] as const;
+
+const workbenchOrderDetailTabs = ['工单信息', '设备状态', '备件与物料', '处理记录', '关联告警'] as const;
+
+function WorkbenchOrdersPage({
+  item,
+  context,
+  meta,
+  onPreviewAction,
+}: WorkbenchMenuPageProps) {
+  const [selectedOrderId, setSelectedOrderId] = useState(workbenchOrderRows[0].id);
+  const [detailTab, setDetailTab] = useState<(typeof workbenchOrderDetailTabs)[number]>('工单信息');
+  const [detailOpen, setDetailOpen] = useState(true);
+  const selectedOrder = workbenchOrderRows.find((order) => order.id === selectedOrderId) ?? workbenchOrderRows[0];
+  const primaryAction = meta.actions[0];
+  const secondaryAction = meta.actions[1] ?? primaryAction;
+
+  const openOrderPreview = (
+    title: string,
+    routeTarget: string,
+    description: string,
+    primaryLabel: string,
+    icon: LucideIcon = ClipboardList,
+  ) => {
+    onPreviewAction({
+      title,
+      source: '工单管理页面',
+      routeTarget,
+      description,
+      primaryLabel,
+      icon,
+      visual: meta.imageSrc,
+      stats: context.stats,
+    });
+  };
+
+  const openRow = (order: (typeof workbenchOrderRows)[number]) => {
+    setSelectedOrderId(order.id);
+    setDetailOpen(true);
+    openOrderPreview(
+      '打开工单详情',
+      `/workorders/${order.id}?source=workbench&menu=orders`,
+      `打开 ${order.id}，带入设备、SLA、备件状态和 Workbench 工单管理来源。`,
+      '打开详情',
+      FileText,
+    );
+  };
+
+  return (
+    <section className="workspace-orders-page" aria-label={`${item.label}真实产品页`}>
+      <div className="workspace-orders-main">
+        <section className="workspace-orders-shell" aria-label="工单管理产品页主体">
+          <header className="workspace-orders-header">
+            <div className="workspace-orders-title">
+              <span className="workspace-orders-icon"><ClipboardList /></span>
+              <div>
+                <h2>工单管理</h2>
+                <p>预测工单 · 派工执行 · 验收闭环</p>
+              </div>
+            </div>
+            <div className="workspace-orders-toolbar" aria-label="工单管理顶部操作">
+              <button
+                type="button"
+                className="is-secondary"
+                onClick={() =>
+                  openOrderPreview(
+                    '高级筛选',
+                    '/workorders?source=workbench&filter=advanced&status=PENDING',
+                    '打开工单列表并保留高级筛选上下文，支持类型、优先级、状态、责任人和创建时间组合查询。',
+                    '打开筛选',
+                    SlidersHorizontal,
+                  )
+                }
+              >
+                <SlidersHorizontal />
+                高级筛选
+              </button>
+              <button
+                type="button"
+                className="is-secondary"
+                onClick={() =>
+                  openOrderPreview(
+                    '导出工单',
+                    '/reports?source=workbench&view=workorders&export=xlsx',
+                    '按当前筛选条件导出预测维保、派工、执行和验收闭环工单。',
+                    '进入导出',
+                    FileText,
+                  )
+                }
+              >
+                <FileText />
+                导出
+              </button>
+              <button type="button" className="is-primary" onClick={() => onPreviewAction(primaryAction)}>
+                <ClipboardList />
+                新建工单
+              </button>
+            </div>
+          </header>
+
+          <div className="workspace-orders-kpis" aria-label="工单管理核心指标">
+            {workbenchOrderSummaryCards.map((card) => {
+              const CardIcon = card.icon;
+              return (
+                <button
+                  key={card.label}
+                  type="button"
+                  className={`is-${card.tone}`}
+                  onClick={() =>
+                    openOrderPreview(
+                      `${card.label}筛选`,
+                      `/workorders?source=workbench&metric=${encodeURIComponent(card.label)}`,
+                      `按 ${card.label} 指标下钻工单队列，保留 Workbench 来源和当前厂区上下文。`,
+                      '查看队列',
+                      CardIcon,
+                    )
+                  }
+                >
+                  <CardIcon />
+                  <span>{card.label}</span>
+                  <strong>{card.value}</strong>
+                  <small>{card.delta}</small>
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="workspace-orders-stage-row" aria-label="工单流程阶段">
+            {workbenchOrderStages.map((stage) => (
+              <button
+                key={stage.label}
+                type="button"
+                className={`is-${stage.tone}`}
+                onClick={() =>
+                  openOrderPreview(
+                    `${stage.label}阶段工单`,
+                    `/workorders?source=workbench&stage=${encodeURIComponent(stage.label)}`,
+                    `按 ${stage.label} 阶段查看工单，进入列表后保留阶段筛选。`,
+                    '查看阶段',
+                    ArrowRight,
+                  )
+                }
+              >
+                <span>{stage.label}</span>
+                <strong>{stage.value}</strong>
+                <small>{stage.note}</small>
+              </button>
+            ))}
+          </div>
+
+          <div className="workspace-orders-filterbar" aria-label="工单查询筛选栏">
+            <label>
+              <Search />
+              <input readOnly value="搜索工单号 / 设备 / 标题 / 报修人" aria-label="工单搜索" />
+            </label>
+            {['类型 全部', '优先级 全部', '状态 全部', '责任人 全部'].map((filter) => (
+              <button key={filter} type="button" onClick={() => onPreviewAction(secondaryAction)}>
+                {filter}
+                <ArrowRight />
+              </button>
+            ))}
+            <button
+              type="button"
+              className="is-date"
+              onClick={() =>
+                openOrderPreview(
+                  '按创建时间筛选',
+                  '/workorders?source=workbench&createdAt=today',
+                  '打开工单列表并预填今日创建时间范围。',
+                  '查看今日工单',
+                  CalendarDays,
+                )
+              }
+            >
+              创建时间
+              <CalendarDays />
+            </button>
+            <button type="button" className="is-reset" onClick={() => onPreviewAction(secondaryAction)}>
+              重置
+            </button>
+          </div>
+
+          <div className="workspace-orders-table" aria-label="工单管理列表">
+            <div className="workspace-orders-table-head">
+              <span><input type="checkbox" aria-label="选择全部工单" readOnly /></span>
+              <span>工单号</span>
+              <span>类型</span>
+              <span>设备信息</span>
+              <span>标题</span>
+              <span>优先级</span>
+              <span>状态</span>
+              <span>SLA</span>
+              <span>责任人</span>
+              <span>备件状态</span>
+              <span>操作</span>
+            </div>
+            {workbenchOrderRows.map((order) => (
+              <div
+                key={order.id}
+                className={`workspace-orders-table-row is-${order.tone} ${
+                  order.id === selectedOrder.id ? 'is-selected' : ''
+                }`}
+              >
+                <span><input type="checkbox" aria-label={`选择${order.id}`} readOnly /></span>
+                <button type="button" className="is-link" onClick={() => openRow(order)}>{order.id}</button>
+                <span><em>{order.type}</em></span>
+                <span>
+                  <strong>{order.device}</strong>
+                  <small>{order.location}</small>
+                </span>
+                <button type="button" className="is-title" onClick={() => openRow(order)}>{order.title}</button>
+                <span><b>{order.priority}</b></span>
+                <span><i>{order.status}</i></span>
+                <span className={order.sla.startsWith('-') ? 'is-danger' : ''}>{order.sla}</span>
+                <span>{order.owner}</span>
+                <span><em className="is-spare">{order.spare}</em></span>
+                <span>
+                  <button
+                    type="button"
+                    className="is-process"
+                    onClick={() => {
+                      setSelectedOrderId(order.id);
+                      setDetailOpen(true);
+                      openOrderPreview(
+                        '处理工单',
+                        `/workorders/${order.id}?source=workbench&action=process`,
+                        `处理 ${order.id}，带入当前状态 ${order.status}、SLA ${order.sla} 和责任人 ${order.owner}。`,
+                        '进入处理',
+                        Wrench,
+                      );
+                    }}
+                  >
+                    处理
+                  </button>
+                  <button type="button" className="is-more" aria-label={`${order.id}更多操作`} onClick={() => openRow(order)}>
+                    ···
+                  </button>
+                </span>
+              </div>
+            ))}
+          </div>
+
+          <footer className="workspace-orders-pagination" aria-label="工单分页">
+            <span>共 216 条</span>
+            <button type="button">10条/页</button>
+            <button type="button" disabled>‹</button>
+            {[1, 2, 3, 4, 5].map((pageNo) => (
+              <button key={pageNo} type="button" className={pageNo === 1 ? 'is-current' : ''}>{pageNo}</button>
+            ))}
+            <span>...</span>
+            <button type="button">22</button>
+            <button type="button">›</button>
+          </footer>
+        </section>
+      </div>
+
+      <aside className="workspace-orders-detail" aria-label="工单详情抽屉">
+        {detailOpen ? (
+          <>
+            <header className="workspace-orders-detail-head">
+              <strong>工单详情</strong>
+              <button type="button" aria-label="关闭工单详情" onClick={() => setDetailOpen(false)}>
+                <X />
+              </button>
+            </header>
+            <section className="workspace-orders-detail-card" aria-label="当前工单信息">
+              <div>
+                <b>{selectedOrder.priority}</b>
+                <span>
+                  <strong>{selectedOrder.id}</strong>
+                  <small>{selectedOrder.status}</small>
+                </span>
+              </div>
+              <h3>{selectedOrder.title}</h3>
+              <dl>
+                <div><dt>设备</dt><dd>{selectedOrder.device}</dd></div>
+                <div><dt>SLA 限时</dt><dd>2026-06-14 10:30</dd></div>
+                <div><dt>位置</dt><dd>{selectedOrder.location} · CNC 区域 A线</dd></div>
+                <div><dt>剩余/逾期</dt><dd className={selectedOrder.sla.startsWith('-') ? 'is-danger' : ''}>{selectedOrder.sla}</dd></div>
+                <div><dt>报修人</dt><dd>系统预测</dd></div>
+                <div><dt>优先级</dt><dd>{selectedOrder.priority} 紧急</dd></div>
+                <div><dt>创建时间</dt><dd>2026-06-14 09:12</dd></div>
+                <div><dt>责任人</dt><dd>{selectedOrder.owner}</dd></div>
+              </dl>
+            </section>
+
+            <section className="workspace-orders-flow" aria-label="工单流程">
+              {['预测', '派工', '执行', '验收', '闭环'].map((step, index) => (
+                <span key={step} className={index < 2 ? 'is-done' : index === 2 ? 'is-active' : ''}>
+                  <CheckCircle2 />
+                  <strong>{step}</strong>
+                  <small>{index < 2 ? '06-14 09:12' : index === 2 ? '待执行' : '待流转'}</small>
+                </span>
+              ))}
+            </section>
+
+            <nav className="workspace-orders-tabs" aria-label="工单详情标签">
+              {workbenchOrderDetailTabs.map((tab) => (
+                <button
+                  key={tab}
+                  type="button"
+                  className={tab === detailTab ? 'is-active' : ''}
+                  onClick={() => setDetailTab(tab)}
+                >
+                  {tab}
+                </button>
+              ))}
+            </nav>
+
+            <section className="workspace-orders-tab-panel" aria-label={`${detailTab}内容`}>
+              <article>
+                <span>故障描述</span>
+                <p>主轴轴承振动 RMS 持续上升，预测未来 3 天存在故障风险。</p>
+              </article>
+              <article>
+                <span>备件需求</span>
+                <ul>
+                  <li>轴承 6205-2RS × 2 <b>已到位</b></li>
+                  <li>润滑脂 LGHP-2 × 1 <b>已到位</b></li>
+                  <li>密封圈 35×62×7 × 1 <b className="is-warning">待采购</b></li>
+                </ul>
+              </article>
+              <article>
+                <span>处理建议</span>
+                <p>更换主轴轴承，检查润滑系统，并在试运行后回写验收记录。</p>
+              </article>
+              <article>
+                <span>附件</span>
+                <ul>
+                  <li>振动趋势图.pdf <small>1.8 MB</small></li>
+                  <li>设备点检记录.xlsx <small>86 KB</small></li>
+                  <li>历史维保记录.pdf <small>1.2 MB</small></li>
+                </ul>
+              </article>
+            </section>
+
+            <footer className="workspace-orders-detail-actions" aria-label="工单详情操作">
+              <button
+                type="button"
+                onClick={() =>
+                  openOrderPreview(
+                    '转派工单',
+                    `/workorders/${selectedOrder.id}/assign?source=workbench`,
+                    `转派 ${selectedOrder.id}，保留当前工单详情和备件状态。`,
+                    '进入转派',
+                    UserCircle,
+                  )
+                }
+              >
+                转派
+              </button>
+              <button
+                type="button"
+                onClick={() =>
+                  openOrderPreview(
+                    '挂起工单',
+                    `/workorders/${selectedOrder.id}/suspend?source=workbench`,
+                    `挂起 ${selectedOrder.id} 并要求填写原因，不在 Workbench 内直接提交危险操作。`,
+                    '进入挂起',
+                    AlertTriangle,
+                  )
+                }
+              >
+                挂起
+              </button>
+              <button
+                type="button"
+                className="is-primary"
+                onClick={() =>
+                  openOrderPreview(
+                    '开始执行',
+                    `/workorders/${selectedOrder.id}/execute?source=workbench`,
+                    `开始执行 ${selectedOrder.id}，带入设备、处理建议和附件上下文。`,
+                    '开始执行',
+                    Wrench,
+                  )
+                }
+              >
+                开始执行
+              </button>
+            </footer>
+          </>
+        ) : (
+          <button type="button" className="workspace-orders-detail-empty" onClick={() => setDetailOpen(true)}>
+            <FileText />
+            <strong>选择左侧工单打开详情</strong>
+            <span>详情抽屉会展示流程、备件、处理记录和关联告警。</span>
+          </button>
+        )}
+      </aside>
+    </section>
+  );
+}
+
 function WorkbenchProductPage({
   item,
   context,
   mock,
   meta,
   onPreviewAction,
-}: {
-  item: WorkspaceMenuItem;
-  context: MenuContext;
-  mock: ModuleMock;
-  meta: WorkbenchProductPageMeta;
-  onPreviewAction: (preview: RouteActionPreview) => void;
-}) {
+}: WorkbenchMenuPageProps) {
   const Icon = item.icon;
   const [primaryAction, secondaryAction = primaryAction] = meta.actions;
   const PrimaryActionIcon = primaryAction.icon;
@@ -4756,7 +5274,15 @@ export default function WorkspacePreviewPage() {
           </div>
 
           <WorkspaceContextStrip item={activeItem} context={activeContext} onAction={handleContextAction} />
-          {activeModuleMock && activeProductPageMeta ? (
+          {activeModuleMock && activeProductPageMeta && activeItem.id === 'orders' ? (
+            <WorkbenchOrdersPage
+              item={activeItem}
+              context={activeContext}
+              mock={activeModuleMock}
+              meta={activeProductPageMeta}
+              onPreviewAction={setRoutePreview}
+            />
+          ) : activeModuleMock && activeProductPageMeta ? (
             <WorkbenchProductPage
               item={activeItem}
               context={activeContext}
