@@ -721,30 +721,53 @@ test.describe('Workbench 正式入口浏览器回归', () => {
     await expect(page.locator('.workspace-product-page')).toHaveCount(0);
     await expect(page.getByRole('heading', { name: '组织策略' })).toBeVisible();
     await expect(page.getByText('风险规则 · 角色策略 · 审批边界')).toBeVisible();
+    await expect(page.getByLabel('组织策略治理域')).toContainText('风险规则');
+    await expect(page.getByLabel('组织策略治理域')).toContainText('角色策略');
+    await expect(page.getByLabel('组织策略治理域')).toContainText('审批边界');
+    await expect(page.getByLabel('组织策略二级策略域')).toContainText('端口暴露');
+    await expect(page.getByLabel('组织策略状态反馈')).toContainText('暂无策略命中');
+    await expect(page.getByLabel('组织策略状态反馈')).toContainText('规则同步异常');
+    await expect(page.getByLabel('组织策略状态反馈')).toContainText('风险评估受限');
     await expect(page.getByLabel('组织策略核心指标')).toContainText('风险规则');
-    await expect(page.getByLabel('组织策略流程阶段')).toContainText('定义');
     await expect(page.getByLabel('组织策略顶部操作')).toContainText('新建风险评估');
-    await expect(page.getByLabel('组织策略查询筛选栏')).toContainText('处理时间');
-    await expect(page.getByLabel('组织策略列表')).toContainText('POL-RISK-PORT-001');
+    await expect(page.getByLabel('组织策略查询筛选栏')).toContainText('空态预览');
+    await expect(page.getByLabel('组织策略规则列表')).toContainText('POL-RISK-PORT-001');
+    await expect(page.getByLabel('组织策略规则列表')).toContainText('开放高危端口');
     await expect(page.getByLabel('组织策略详情抽屉')).toContainText('端口暴露命中高危策略');
+    await expect(page.getByLabel('当前组织策略规则信息')).toContainText('角色策略');
+    await expect(page.getByLabel('角色策略矩阵')).toContainText('安全运营');
+    await expect(page.getByLabel('审批边界')).toContainText('高危安全复核');
+    await expect(page.getByLabel('策略命中样本')).toContainText('ALM-20240614-0012');
     await expect(page.getByLabel('组织策略详情标签')).toContainText('审批边界');
+    await expect(page.getByLabel('策略权限申请')).toContainText('风险评估权限受限');
     await expect(page.getByLabel('组织策略详情操作')).toContainText('新建评估');
+    await expect(page.getByLabel('组织策略详情操作')).toContainText('权限申请');
     await expect(page.locator('body')).not.toContainText('workbench-menu-policy-v1');
 
     await page.getByLabel('组织策略顶部操作').getByRole('button', { name: '新建风险评估' }).click();
     const createDialog = page.getByRole('dialog', { name: '新建风险评估' });
     await expect(createDialog).toBeVisible();
     await expect(createDialog.locator('.workspace-action-route strong')).toContainText('/risk-assessments/new?source=workbench&scope=policy');
+    await expect(createDialog.getByRole('status')).toContainText('当前账号缺少访问该业务页面的权限');
+    await expect(createDialog.getByRole('button', { name: /暂无权限/ })).toBeDisabled();
     await page.keyboard.press('Escape');
     await expect(createDialog).toHaveCount(0);
 
     await page.getByRole('button', { name: 'POL-MAINT-SLA-008', exact: true }).click();
     const detailDialog = page.getByRole('dialog', { name: '打开组织策略详情' });
     await expect(detailDialog).toBeVisible();
-    await expect(detailDialog.locator('.workspace-action-route strong')).toContainText('/risk-matrix/POL-MAINT-SLA-008');
+    await expect(detailDialog.locator('.workspace-action-route strong')).toContainText('/risk-matrix?source=workbench&scope=policy&rule=POL-MAINT-SLA-008');
     await page.keyboard.press('Escape');
     await expect(detailDialog).toHaveCount(0);
     await expect(page.getByLabel('组织策略详情抽屉')).toContainText('逾期维保自动转工单');
+    await expect(page.getByLabel('当前组织策略规则信息')).toContainText('预测维保工单逾期 24h');
+
+    await page.getByLabel('组织策略详情操作').getByRole('button', { name: '停用规则' }).click();
+    const dangerDialog = page.getByRole('dialog', { name: '停用策略规则' });
+    await expect(dangerDialog).toBeVisible();
+    await expect(dangerDialog.locator('.workspace-action-route strong')).toContainText('/risk-matrix?source=workbench&scope=policy&danger=disable');
+    await page.keyboard.press('Escape');
+    await expect(dangerDialog).toHaveCount(0);
 
     await page.getByLabel('组织策略详情操作').getByRole('button', { name: '权限申请' }).click();
     const applyDialog = page.getByRole('dialog', { name: '申请策略权限' });

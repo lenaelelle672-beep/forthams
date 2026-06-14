@@ -3627,6 +3627,129 @@ const workbenchPolicyRows = [
 
 const workbenchPolicyDetailTabs = ['规则信息', '角色策略', '审批边界', '命中记录', '权限申请'] as const;
 
+const workbenchPolicyDomains = [
+  {
+    id: 'rules',
+    label: '风险规则',
+    value: '68',
+    note: '阈值/范围/动作',
+    icon: ShieldCheck,
+    route: '/risk-matrix?source=workbench&scope=policy&domain=rules',
+    children: ['端口暴露', '维保逾期', '位置漂移'],
+  },
+  {
+    id: 'roles',
+    label: '角色策略',
+    value: '128',
+    note: '查看/编辑/审批',
+    icon: UserCircle,
+    route: '/system/roles?source=workbench&scope=policy',
+    children: ['安全运营', '运维主管', '组织管理员'],
+  },
+  {
+    id: 'boundaries',
+    label: '审批边界',
+    value: '46',
+    note: '金额/风险/跨部门',
+    icon: ClipboardList,
+    route: '/approvals?source=workbench&scope=policy-boundary',
+    children: ['高危复核', '资产处置', '跨部门调拨'],
+  },
+  {
+    id: 'hits',
+    label: '命中样本',
+    value: '238',
+    note: '近 7 天',
+    icon: Bell,
+    route: '/risk-matrix?source=workbench&scope=policy&view=hits',
+    children: ['安全告警', '维保工单', '巡检异常'],
+  },
+  {
+    id: 'access',
+    label: '权限申请',
+    value: '9',
+    note: '待审批',
+    icon: Shield,
+    route: '/approvals/new?source=workbench&type=policy',
+    children: ['规则查看', '规则编辑', '高危停用'],
+  },
+] as const;
+
+const workbenchPolicyRuleDetails = [
+  {
+    id: 'POL-RISK-PORT-001',
+    condition: '开放高危端口且 IoT 网关暴露到非白名单网段',
+    trigger: '安全告警 / IoT 网关',
+    boundary: 'P1 直接进入安全复核',
+    rolePolicy: '安全运营可编辑，运维主管只读',
+    approval: '安全运营 + 资产负责人',
+    hit: 'ALM-20240614-0012',
+    suggestion: '确认端口白名单，生成告警处置工单并复盘策略命中。',
+    danger: '停用后高危端口告警不再自动拦截，需要二次确认。',
+    route: '/risk-matrix?source=workbench&scope=policy&rule=POL-RISK-PORT-001',
+  },
+  {
+    id: 'POL-MAINT-SLA-008',
+    condition: '预测维保工单逾期 24h 且设备健康分低于 82',
+    trigger: '工单管理 / 资产运维',
+    boundary: 'P2 自动转派班组并要求复核',
+    rolePolicy: '运维主管可编辑，班组长可处理',
+    approval: '运维主管 + 设备负责人',
+    hit: 'WO-20240614-0012',
+    suggestion: '自动创建补救工单，带入 SLA 风险和备件需求。',
+    danger: '停用后逾期维保不再自动转派，需人工巡检。',
+    route: '/risk-matrix?source=workbench&scope=policy&rule=POL-MAINT-SLA-008',
+  },
+  {
+    id: 'POL-ROLE-ASSET-012',
+    condition: '高价值资产处置金额超过 50 万或跨部门流转',
+    trigger: '资产处置 / 财务复核',
+    boundary: '跨部门审批边界',
+    rolePolicy: '组织管理员可维护，财务部可审批',
+    approval: '制造一部 + 财务部',
+    hit: 'APP-20240614-0038',
+    suggestion: '补齐处置原因、残值口径和财务复核记录。',
+    danger: '变更审批边界会影响高价值资产处置链路。',
+    route: '/risk-matrix?source=workbench&scope=policy&rule=POL-ROLE-ASSET-012',
+  },
+  {
+    id: 'POL-POSITION-006',
+    condition: 'AGV 区域资产定位漂移超过 12 米且持续 15 分钟',
+    trigger: '巡检管理 / 物流区定位',
+    boundary: 'P2 自动生成巡检复核',
+    rolePolicy: '物流运维可处理，安全运营可复盘',
+    approval: '物流运维 + 巡检主管',
+    hit: 'INSP-20240614-0066',
+    suggestion: '生成巡检任务并校准点位，必要时联动位置维护。',
+    danger: '停用后位置漂移不再自动生成巡检任务。',
+    route: '/risk-matrix?source=workbench&scope=policy&rule=POL-POSITION-006',
+  },
+] as const;
+
+const workbenchPolicyRoleMatrix = [
+  { role: '安全运营', department: '安全态势', visible: '全部风险', editable: '高危规则', approval: 'P1 复核', status: '已授权' },
+  { role: '运维主管', department: '资产运维', visible: '维保/工单', editable: 'SLA 边界', approval: 'P2 转派', status: '已授权' },
+  { role: '组织管理员', department: '平台治理', visible: '角色策略', editable: '审批边界', approval: '权限申请', status: '待复核' },
+] as const;
+
+const workbenchPolicyBoundaryCards = [
+  { label: '高危安全复核', value: 'P1', note: '端口暴露、越权访问、凭证异常直接进入安全复核。' },
+  { label: '资产处置边界', value: '50万+', note: '高价值处置需制造、财务和资产负责人共同审批。' },
+  { label: '跨部门调拨', value: '双负责人', note: '调出/调入部门同时确认，保留 Workbench 来源。' },
+] as const;
+
+const workbenchPolicyHitSamples = [
+  { id: 'ALM-20240614-0012', source: '告警中心', rule: 'POL-RISK-PORT-001', result: '已转处置工单', tone: 'red' },
+  { id: 'WO-20240614-0012', source: '工单管理', rule: 'POL-MAINT-SLA-008', result: 'SLA 复核中', tone: 'orange' },
+  { id: 'APP-20240614-0038', source: '流程待办', rule: 'POL-ROLE-ASSET-012', result: '跨部门审批', tone: 'blue' },
+] as const;
+
+const workbenchPolicyStateCards = [
+  { label: '空态', value: '暂无策略命中', note: '筛选无结果时保留新建评估和权限申请入口' },
+  { label: '异常态', value: '规则同步异常 2 条', note: '策略引擎延迟时保留上次命中和重试入口' },
+  { label: '无权限态', value: '风险评估受限', note: '缺少 risk:query 时只允许申请策略权限' },
+] as const;
+
 const workbenchSettingsSummaryCards = [
   { label: '资产分类', value: '256', delta: '启用中', icon: Layers, tone: 'blue' },
   { label: '位置节点', value: '86', delta: '厂区/楼层/点位', icon: MapPin, tone: 'cyan' },
@@ -4468,9 +4591,435 @@ const WorkbenchEnergyPage = (props: WorkbenchMenuPageProps) => (
   <WorkbenchCommandPage {...props} config={workbenchEnergyConfig} />
 );
 
-const WorkbenchPolicyPage = (props: WorkbenchMenuPageProps) => (
-  <WorkbenchCommandPage {...props} config={workbenchPolicyConfig} />
-);
+function WorkbenchPolicyPage({
+  item,
+  context,
+  meta,
+  onPreviewAction,
+}: WorkbenchMenuPageProps) {
+  const { user } = useAuth();
+  const [selectedDomain, setSelectedDomain] = useState<(typeof workbenchPolicyDomains)[number]['id']>('rules');
+  const [selectedRuleId, setSelectedRuleId] = useState(workbenchPolicyRows[0].id);
+  const selectedRow = workbenchPolicyRows.find((row) => row.id === selectedRuleId) ?? workbenchPolicyRows[0];
+  const selectedRule =
+    workbenchPolicyRuleDetails.find((rule) => rule.id === selectedRuleId) ?? workbenchPolicyRuleDetails[0];
+  const selectedDomainMeta =
+    workbenchPolicyDomains.find((domain) => domain.id === selectedDomain) ?? workbenchPolicyDomains[0];
+  const canCreateRiskAssessment = canAccessRoute('/risk-assessments/new', user);
+
+  const openPolicyPreview = (
+    title: string,
+    routeTarget: string,
+    description: string,
+    primaryLabel: string,
+    icon: LucideIcon = ShieldCheck,
+  ) => {
+    onPreviewAction({
+      title,
+      source: '组织策略页面',
+      routeTarget,
+      description,
+      primaryLabel,
+      icon,
+      visual: meta.imageSrc,
+      stats: context.stats,
+    });
+  };
+
+  const openPolicyRule = (row: (typeof workbenchPolicyRows)[number]) => {
+    const rule = workbenchPolicyRuleDetails.find((detail) => detail.id === row.id) ?? workbenchPolicyRuleDetails[0];
+    setSelectedRuleId(row.id);
+    openPolicyPreview(
+      '打开组织策略详情',
+      rule.route,
+      `打开 ${row.entity}，带入规则条件、角色策略、审批边界和命中样本。`,
+      '打开规则',
+      ShieldCheck,
+    );
+  };
+
+  return (
+    <section className="workspace-orders-page workspace-policy-page workspace-policy-product" aria-label={`${item.label}真实产品页`}>
+      <aside className="workspace-policy-rail" aria-label="组织策略治理域">
+        <header>
+          <span><ShieldCheck /></span>
+          <div>
+            <h2>组织策略</h2>
+            <p>风险规则 · 角色策略 · 审批边界</p>
+          </div>
+        </header>
+        <div className="workspace-policy-domain-list">
+          {workbenchPolicyDomains.map((domain) => {
+            const DomainIcon = domain.icon;
+            return (
+              <button
+                key={domain.id}
+                type="button"
+                className={domain.id === selectedDomain ? 'is-active' : ''}
+                onClick={() => setSelectedDomain(domain.id)}
+              >
+                <DomainIcon />
+                <span>
+                  <strong>{domain.label}</strong>
+                  <small>{domain.note}</small>
+                </span>
+                <b>{domain.value}</b>
+              </button>
+            );
+          })}
+        </div>
+        <section className="workspace-policy-domain-children" aria-label="组织策略二级策略域">
+          <span>{selectedDomainMeta.label}二级项</span>
+          {selectedDomainMeta.children.map((child) => (
+            <button
+              key={child}
+              type="button"
+              onClick={() =>
+                openPolicyPreview(
+                  `${child}策略查询`,
+                  `${selectedDomainMeta.route}&node=${encodeURIComponent(child)}`,
+                  `进入 ${child} 策略域，保留 Workbench 组织策略来源和当前筛选。`,
+                  '进入策略域',
+                  selectedDomainMeta.icon,
+                )
+              }
+            >
+              {child}
+              <ArrowRight />
+            </button>
+          ))}
+        </section>
+        <section className="workspace-policy-states" aria-label="组织策略状态反馈">
+          {workbenchPolicyStateCards.map((state) => (
+            <article key={state.label}>
+              <span>{state.label}</span>
+              <strong>{state.value}</strong>
+              <p>{state.note}</p>
+            </article>
+          ))}
+        </section>
+      </aside>
+
+      <section className="workspace-policy-center" aria-label="组织策略产品页主体">
+        <header className="workspace-policy-header">
+          <div>
+            <span>组织策略</span>
+            <h2>风险规则配置台</h2>
+            <p>把风险阈值、角色权限、审批边界和命中样本放到同一治理页，进入业务页前先确认上下文。</p>
+          </div>
+          <div className="workspace-orders-toolbar" aria-label="组织策略顶部操作">
+            <button
+              type="button"
+              onClick={() =>
+                openPolicyPreview(
+                  '查看策略规则',
+                  '/risk-matrix?source=workbench&scope=policy',
+                  '查看组织策略规则台，保留风险规则、角色策略和审批边界上下文。',
+                  '进入规则台',
+                  ShieldCheck,
+                )
+              }
+            >
+              <ShieldCheck />
+              查看策略规则
+            </button>
+            <button
+              type="button"
+              onClick={() =>
+                openPolicyPreview(
+                  '复核高危规则',
+                  '/risk-matrix?source=workbench&scope=policy&severity=high',
+                  '筛选高危规则和近 7 天命中样本，进入后优先处理 P1/P2 策略。',
+                  '进入复核',
+                  AlertTriangle,
+                )
+              }
+            >
+              <AlertTriangle />
+              复核高危规则
+            </button>
+            <button
+              type="button"
+              className="is-primary"
+              onClick={() =>
+                openPolicyPreview(
+                  '新建风险评估',
+                  '/risk-assessments/new?source=workbench&scope=policy',
+                  '进入风险评估新建页，预填组织策略、规则来源和审批边界。',
+                  '新建评估',
+                  Shield,
+                )
+              }
+            >
+              <Shield />
+              新建风险评估
+            </button>
+          </div>
+        </header>
+
+        <div className="workspace-policy-kpis" aria-label="组织策略核心指标">
+          {workbenchPolicySummaryCards.map((card) => {
+            const CardIcon = card.icon;
+            return (
+              <button
+                key={card.label}
+                type="button"
+                className={`is-${card.tone}`}
+                onClick={() =>
+                  openPolicyPreview(
+                    `${card.label}策略下钻`,
+                    `/risk-matrix?source=workbench&scope=policy&metric=${encodeURIComponent(card.label)}`,
+                    `按 ${card.label} 下钻组织策略规则，保留当前厂区和角色上下文。`,
+                    '查看指标',
+                    CardIcon,
+                  )
+                }
+              >
+                <CardIcon />
+                <span>{card.label}</span>
+                <strong>{card.value}</strong>
+                <small>{card.delta}</small>
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="workspace-policy-filterbar" aria-label="组织策略查询筛选栏">
+          <label>
+            <Search />
+            <input readOnly value="搜索策略编号 / 规则名称 / 上下文 / 责任人" aria-label="组织策略搜索" />
+          </label>
+          {['范围 全部', '状态 全部', '责任人 全部', '优先级 全部'].map((filter) => (
+            <button
+              key={filter}
+              type="button"
+              onClick={() =>
+                openPolicyPreview(
+                  '查询组织策略',
+                  `/risk-matrix?source=workbench&scope=policy&filter=${encodeURIComponent(filter)}`,
+                  `按 ${filter} 查询组织策略规则，保留当前治理域。`,
+                  '打开查询',
+                  SlidersHorizontal,
+                )
+              }
+            >
+              {filter}
+              <ArrowRight />
+            </button>
+          ))}
+          <button
+            type="button"
+            className="is-reset"
+            onClick={() =>
+              openPolicyPreview(
+                '组织策略空态预览',
+                '/risk-matrix?source=workbench&scope=policy&empty=true',
+                '当前筛选下暂无策略命中，可清空筛选或新建风险评估。',
+                '清空筛选',
+                Search,
+              )
+            }
+          >
+            空态预览
+          </button>
+        </div>
+
+        <div className="workspace-orders-table workspace-policy-table" aria-label="组织策略规则列表">
+          <div className="workspace-policy-table-head">
+            <span>策略编号</span>
+            <span>规则对象</span>
+            <span>触发条件</span>
+            <span>审批边界</span>
+            <span>命中样本</span>
+            <span>状态</span>
+            <span>操作</span>
+          </div>
+          {workbenchPolicyRows.map((row) => {
+            const detail = workbenchPolicyRuleDetails.find((rule) => rule.id === row.id) ?? workbenchPolicyRuleDetails[0];
+            return (
+              <div
+                key={row.id}
+                className={`workspace-policy-table-row is-${row.tone} ${row.id === selectedRow.id ? 'is-selected' : ''}`}
+              >
+                <button type="button" className="is-link" onClick={() => openPolicyRule(row)}>{row.id}</button>
+                <span>
+                  <strong>{row.entity}</strong>
+                  <small>{row.type} · {row.owner}</small>
+                </span>
+                <span>{detail.condition}</span>
+                <span>{detail.boundary}</span>
+                <span><i>{detail.hit}</i></span>
+                <span><b>{row.status}</b></span>
+                <span>
+                  <button type="button" onClick={() => openPolicyRule(row)}>打开</button>
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      <aside className="workspace-policy-detail" aria-label="组织策略详情抽屉">
+        <header>
+          <strong>组织策略详情</strong>
+          <span>{selectedRow.status}</span>
+        </header>
+        <section className="workspace-policy-detail-card" aria-label="当前组织策略规则信息">
+          <b>{selectedRow.score}</b>
+          <div>
+            <span>{selectedRow.id}</span>
+            <h3>{selectedRow.title}</h3>
+            <p>{selectedRule.condition}</p>
+          </div>
+          <dl>
+            <div><dt>规则对象</dt><dd>{selectedRow.entity}</dd></div>
+            <div><dt>角色策略</dt><dd>{selectedRule.rolePolicy}</dd></div>
+            <div><dt>审批边界</dt><dd>{selectedRule.boundary}</dd></div>
+            <div><dt>命中来源</dt><dd>{selectedRule.trigger}</dd></div>
+            <div><dt>审批人</dt><dd>{selectedRule.approval}</dd></div>
+            <div><dt>命中样本</dt><dd>{selectedRule.hit}</dd></div>
+          </dl>
+        </section>
+
+        <section className="workspace-policy-role-matrix" aria-label="角色策略矩阵">
+          <header>
+            <span>角色策略矩阵</span>
+            <strong>可见 / 编辑 / 审批</strong>
+          </header>
+          {workbenchPolicyRoleMatrix.map((role) => (
+            <article key={role.role}>
+              <b>{role.role}</b>
+              <span>{role.department}</span>
+              <small>{role.visible} · {role.editable} · {role.approval}</small>
+              <em>{role.status}</em>
+            </article>
+          ))}
+        </section>
+
+        <section className="workspace-policy-boundaries" aria-label="审批边界">
+          {workbenchPolicyBoundaryCards.map((boundary) => (
+            <article key={boundary.label}>
+              <span>{boundary.label}</span>
+              <strong>{boundary.value}</strong>
+              <p>{boundary.note}</p>
+            </article>
+          ))}
+        </section>
+
+        <section className="workspace-policy-hit-samples" aria-label="策略命中样本">
+          {workbenchPolicyHitSamples.map((sample) => (
+            <button
+              key={sample.id}
+              type="button"
+              className={`is-${sample.tone}`}
+              onClick={() =>
+                openPolicyPreview(
+                  '打开策略命中样本',
+                  `/risk-matrix?source=workbench&scope=policy&hit=${encodeURIComponent(sample.id)}`,
+                  `查看 ${sample.id}，来源 ${sample.source}，命中规则 ${sample.rule}。`,
+                  '打开样本',
+                  Bell,
+                )
+              }
+            >
+              <span>{sample.source}</span>
+              <strong>{sample.id}</strong>
+              <small>{sample.result}</small>
+            </button>
+          ))}
+        </section>
+
+        <nav className="workspace-policy-tabs" aria-label="组织策略详情标签">
+          {workbenchPolicyDetailTabs.map((tab, index) => (
+            <button key={tab} type="button" className={index === 2 ? 'is-active' : ''}>{tab}</button>
+          ))}
+        </nav>
+
+        <section className="workspace-policy-permission" aria-label="策略权限申请">
+          <AlertTriangle />
+          <div>
+            <strong>{canCreateRiskAssessment ? '风险评估入口可用' : '风险评估权限受限'}</strong>
+            <p>{canCreateRiskAssessment ? selectedRule.suggestion : '当前账号缺少 risk:query，仍可通过 Workbench 发起策略权限申请。'}</p>
+          </div>
+          <button
+            type="button"
+            onClick={() =>
+              openPolicyPreview(
+                '申请策略权限',
+                `/approvals/new?source=workbench&type=policy&rule=${encodeURIComponent(selectedRow.id)}`,
+                `为 ${selectedRow.entity} 发起策略权限申请，带入角色策略和审批边界。`,
+                '发起申请',
+                ClipboardList,
+              )
+            }
+          >
+            申请策略权限
+          </button>
+        </section>
+
+        <footer className="workspace-policy-actions" aria-label="组织策略详情操作">
+          <button
+            type="button"
+            onClick={() =>
+              openPolicyPreview(
+                '查看策略规则',
+                selectedRule.route,
+                `进入 ${selectedRow.entity} 规则详情，保留命中样本和审批边界。`,
+                '进入规则',
+                ShieldCheck,
+              )
+            }
+          >
+            规则详情
+          </button>
+          <button
+            type="button"
+            onClick={() =>
+              openPolicyPreview(
+                '申请策略权限',
+                `/approvals/new?source=workbench&type=policy&rule=${encodeURIComponent(selectedRow.id)}`,
+                `为 ${selectedRow.entity} 申请策略权限，带入角色策略、审批边界和当前命中样本。`,
+                '发起申请',
+                ClipboardList,
+              )
+            }
+          >
+            权限申请
+          </button>
+          <button
+            type="button"
+            onClick={() =>
+              openPolicyPreview(
+                '停用策略规则',
+                `/risk-matrix?source=workbench&scope=policy&danger=disable&rule=${encodeURIComponent(selectedRow.id)}`,
+                selectedRule.danger,
+                '进入确认',
+                AlertTriangle,
+              )
+            }
+          >
+            停用规则
+          </button>
+          <button
+            type="button"
+            className="is-primary"
+            onClick={() =>
+              openPolicyPreview(
+                '新建风险评估',
+                `/risk-assessments/new?source=workbench&scope=policy&rule=${encodeURIComponent(selectedRow.id)}`,
+                `新建风险评估，预填 ${selectedRow.entity} 的规则条件、命中样本和审批边界。`,
+                '新建评估',
+                Shield,
+              )
+            }
+          >
+            新建评估
+          </button>
+        </footer>
+      </aside>
+    </section>
+  );
+}
 
 function WorkbenchSettingsPage({
   item,
