@@ -382,13 +382,23 @@ test.describe('Workbench 正式入口浏览器回归', () => {
     await expect(page.getByRole('heading', { name: '流程待办' })).toBeVisible();
     await expect(page.getByText('审批 · 派工 · 预警队列')).toBeVisible();
     await expect(page.getByLabel('流程待办核心指标')).toContainText('待审批');
-    await expect(page.getByLabel('流程待办阶段')).toContainText('收敛');
+    await expect(page.getByLabel('流程待办核心指标').locator('button')).toHaveCount(5);
+    await expect(page.getByLabel('流程待办核心指标')).toContainText('今日完成');
+    await expect(page.getByLabel('流程待办状态切换')).toContainText('全部待办');
+    await expect(page.getByLabel('流程待办状态切换')).toContainText('逾期');
+    await expect(page.getByLabel('流程待办状态切换')).not.toContainText('收敛');
     await expect(page.getByLabel('流程待办顶部操作')).toContainText('批量处理');
-    await expect(page.getByLabel('流程待办查询筛选栏')).toContainText('截止时间');
-    await expect(page.getByLabel('流程待办列表')).toContainText('TD-20240614-018');
-    await expect(page.getByLabel('流程待办详情抽屉')).toContainText('数控车床 CN-301 跨车间调拨审批');
-    await expect(page.getByLabel('流程待办详情标签')).toContainText('关联单据');
-    await expect(page.getByLabel('流程待办详情操作')).toContainText('开始处理');
+    await expect(page.getByLabel('流程待办查询筛选栏')).toContainText('创建时间');
+    await expect(page.getByLabel('流程待办查询筛选栏')).toContainText('筛选');
+    await expect(page.getByLabel('流程待办列表')).toContainText('APR-20240614-0012');
+    await expect(page.getByLabel('流程待办列表')).toContainText('设备维修费用报销申请');
+    await expect(page.getByLabel('流程待办列表')).toContainText('关联对象');
+    await expect(page.getByLabel('流程待办详情抽屉')).toContainText('待处理项详情');
+    await expect(page.getByLabel('流程待办详情抽屉')).toContainText('设备维修费用报销申请');
+    await expect(page.getByLabel('流程待办详情抽屉')).toContainText('数控车床 CN-301');
+    await expect(page.getByLabel('流程待办详情标签')).toContainText('附件');
+    await expect(page.getByLabel('流程待办详情操作')).toContainText('同意');
+    await expect(page.getByLabel('流程待办详情操作')).toBeInViewport();
     await expect(page.locator('body')).not.toContainText('workbench-menu-todo-v1');
 
     await page.getByRole('button', { name: /创建预测工单/ }).click();
@@ -398,18 +408,18 @@ test.describe('Workbench 正式入口浏览器回归', () => {
     await page.keyboard.press('Escape');
     await expect(createDialog).toHaveCount(0);
 
-    await page.getByRole('button', { name: 'TD-20240614-017', exact: true }).click();
+    await page.getByLabel('流程待办列表').getByRole('button', { name: /预测维保工单待派工.*PM-20240614-0021/ }).click();
     const detailDialog = page.getByRole('dialog', { name: '打开待办详情' });
     await expect(detailDialog).toBeVisible();
-    await expect(detailDialog.locator('.workspace-action-route strong')).toContainText('/approvals/TD-20240614-017');
+    await expect(detailDialog.locator('.workspace-action-route strong')).toContainText('/approvals/PM-20240614-0021');
     await page.keyboard.press('Escape');
     await expect(detailDialog).toHaveCount(0);
-    await expect(page.getByLabel('流程待办详情抽屉')).toContainText('注塑机 M-201 温度异常建议派工');
+    await expect(page.getByLabel('流程待办详情抽屉')).toContainText('加工中心 MC-502');
 
-    await page.getByRole('button', { name: '开始处理' }).click();
-    const processDialog = page.getByRole('dialog', { name: '开始处理' });
+    await page.getByRole('button', { name: '同意' }).click();
+    const processDialog = page.getByRole('dialog', { name: '同意待办' });
     await expect(processDialog).toBeVisible();
-    await expect(processDialog.locator('.workspace-action-route strong')).toContainText('/process?source=workbench');
+    await expect(processDialog.locator('.workspace-action-route strong')).toContainText('/approve?source=workbench');
     await page.keyboard.press('Escape');
     await expect(processDialog).toHaveCount(0);
 

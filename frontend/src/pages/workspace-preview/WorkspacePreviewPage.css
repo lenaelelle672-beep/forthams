@@ -1825,9 +1825,27 @@
 }
 
 .workspace-todo-page {
+  grid-template-rows: minmax(0, 1fr);
+  height: calc(100vh - 172px);
+  min-height: 520px;
+  max-height: 760px;
+  overflow: hidden;
   background:
     linear-gradient(180deg, rgba(247, 251, 255, .96), rgba(236, 248, 255, .96)),
     #edf7ff;
+}
+
+.workspace-todo-page .workspace-orders-main,
+.workspace-todo-page .workspace-orders-shell,
+.workspace-todo-page .workspace-orders-detail {
+  height: 100%;
+  min-height: 0;
+}
+
+.workspace-todo-page .workspace-orders-shell {
+  gap: 14px;
+  grid-template-rows: auto auto auto auto minmax(0, 1fr) auto;
+  padding: 20px 18px 14px;
 }
 
 .workspace-todo-page .workspace-orders-icon {
@@ -1839,16 +1857,182 @@
   letter-spacing: 0;
 }
 
-.workspace-todo-page .workspace-orders-stage-row button {
-  border-top-color: #1f75ee;
+.workspace-todo-page .workspace-orders-kpis {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
 }
 
-.workspace-todo-page .workspace-orders-stage-row .is-orange {
-  border-top-color: #0d9a6a;
+.workspace-todo-page .workspace-orders-kpis button {
+  min-height: 108px;
+  grid-template-columns: 46px minmax(0, 1fr);
+  padding: 18px 16px;
+}
+
+.workspace-todo-queue-tabs {
+  display: flex;
+  min-width: 0;
+  overflow: hidden;
+  border-bottom: 1px solid #dbe8f8;
+}
+
+.workspace-todo-queue-tabs button {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  height: 44px;
+  padding: 0 22px;
+  border: 1px solid #dbe8f8;
+  border-right: 0;
+  border-bottom: 0;
+  color: #304a69;
+  background: linear-gradient(180deg, #fff, #f8fbff);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 920;
+  white-space: nowrap;
+}
+
+.workspace-todo-queue-tabs button:first-child {
+  border-top-left-radius: 8px;
+}
+
+.workspace-todo-queue-tabs button:last-child {
+  border-right: 1px solid #dbe8f8;
+}
+
+.workspace-todo-queue-tabs button.is-active {
+  color: #176de8;
+  border-top: 2px solid #176de8;
+  background: #fff;
+}
+
+.workspace-todo-queue-tabs small {
+  color: inherit;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.workspace-todo-page .workspace-orders-filterbar {
+  grid-template-columns: minmax(230px, 1.35fr) repeat(3, minmax(110px, .72fr)) minmax(132px, .86fr) 86px 38px;
+}
+
+.workspace-todo-page .workspace-orders-filterbar .is-icon {
+  justify-content: center;
+  padding: 0;
+}
+
+.workspace-todo-page .workspace-orders-table-head,
+.workspace-todo-page .workspace-orders-table-row {
+  grid-template-columns: 76px 96px minmax(230px, 1.35fr) minmax(132px, .85fr) 94px 112px 86px 88px 96px;
+  min-width: 1040px;
+}
+
+.workspace-todo-page .workspace-orders-table-row {
+  min-height: 61px;
+}
+
+.workspace-todo-page .workspace-orders-table {
+  min-height: 0;
+  overflow: auto;
+}
+
+.workspace-todo-page .workspace-orders-table-row .is-title {
+  display: grid;
+  gap: 3px;
+}
+
+.workspace-todo-page .workspace-orders-table-row .is-title strong {
+  color: #122d58;
+  font-size: 13px;
+  font-weight: 950;
+}
+
+.workspace-todo-page .workspace-orders-table-row .is-title small {
+  color: #7b8da6;
+  font-size: 11px;
+  font-weight: 820;
+}
+
+.workspace-todo-page .workspace-orders-detail {
+  position: relative;
+  grid-template-rows: auto auto auto auto minmax(0, 1fr);
+  padding-bottom: 62px;
+}
+
+.workspace-todo-page .workspace-orders-detail-card {
+  gap: 6px;
+  margin: 12px 14px;
+  padding: 10px 12px;
+}
+
+.workspace-todo-page .workspace-orders-detail-card p {
+  margin: -4px 0 0;
+  color: #5d6f8a;
+  font-size: 12px;
+  font-weight: 860;
+}
+
+.workspace-todo-detail-summary {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.workspace-todo-detail-summary span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.workspace-todo-detail-summary img {
+  width: 88px;
+  height: 56px;
+  object-fit: contain;
+  border-radius: 8px;
+  background: #f5f9ff;
 }
 
 .workspace-todo-page .workspace-orders-detail-card b {
-  background: #f08a20;
+  background: #f03649;
+}
+
+.workspace-todo-page .workspace-orders-detail-card dl {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px 12px;
+}
+
+.workspace-todo-page .workspace-orders-detail-card dl div {
+  grid-template-columns: 58px minmax(0, 1fr);
+}
+
+.workspace-todo-page .workspace-orders-flow {
+  padding: 0 14px 10px;
+}
+
+.workspace-todo-page .workspace-orders-flow span:not(.is-active) svg {
+  background: #ccd7e8;
+}
+
+.workspace-todo-page .workspace-orders-tab-panel {
+  grid-template-columns: 1fr;
+  gap: 8px;
+  max-height: 118px;
+  padding: 8px 14px;
+}
+
+.workspace-todo-page .workspace-orders-tab-panel article {
+  min-height: 46px;
+  padding: 8px 10px;
+}
+
+.workspace-todo-page .workspace-orders-detail-actions {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: #fff;
+  padding: 10px 14px;
 }
 
 .workspace-todo-page .workspace-orders-table-row.is-red b {
@@ -1862,6 +2046,10 @@
 .workspace-todo-page .workspace-orders-table-row.is-green b,
 .workspace-todo-page .workspace-orders-table-row.is-blue b {
   background: #176de8;
+}
+
+.workspace-todo-page .workspace-orders-table-row.is-slate b {
+  background: #a5b4c7;
 }
 
 .workspace-device-page {

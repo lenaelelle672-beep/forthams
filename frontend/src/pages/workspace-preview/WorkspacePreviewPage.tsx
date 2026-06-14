@@ -2900,98 +2900,161 @@ const workbenchOrderRows = [
 const workbenchOrderDetailTabs = ['工单信息', '设备状态', '备件与物料', '处理记录', '关联告警'] as const;
 
 const workbenchTodoSummaryCards = [
-  { label: '待审批', value: '18', delta: '较昨日 +4', icon: ClipboardList, tone: 'orange' },
-  { label: '待派工', value: '24', delta: '今日建议派发', icon: Wrench, tone: 'blue' },
-  { label: '预警待办', value: '36', delta: '策略命中', icon: Bell, tone: 'red' },
-  { label: '巡检异常', value: '9', delta: '待复核点位', icon: CheckCircle2, tone: 'violet' },
-  { label: '备件低储', value: '18', delta: '关联 7 张工单', icon: PackageCheck, tone: 'cyan' },
-  { label: 'SLA 风险', value: '7', delta: '2h 内到期', icon: AlertTriangle, tone: 'red' },
+  { label: '待审批', value: '18', delta: '较昨日 +3', icon: ClipboardList, tone: 'blue' },
+  { label: '待派工', value: '24', delta: '较昨日 +5', icon: UserCircle, tone: 'blue' },
+  { label: '预警', value: '36', delta: '较昨日 +8', icon: AlertTriangle, tone: 'orange' },
+  { label: 'SLA 逾期', value: '7', delta: '较昨日 +2', icon: Activity, tone: 'red' },
+  { label: '今日完成', value: '42', delta: '较昨日 +6', icon: CheckCircle2, tone: 'green' },
 ] as const;
 
-const workbenchTodoStages = [
-  { label: '收敛', value: '105', note: '跨模块事件', tone: 'blue' },
-  { label: '分派', value: '42', note: '责任人待确认', tone: 'cyan' },
-  { label: '处理', value: '31', note: '进行中', tone: 'green' },
-  { label: '复核', value: '16', note: '验收/审批', tone: 'violet' },
-  { label: '关闭', value: '91.8%', note: '本周闭环率', tone: 'orange' },
+const workbenchTodoTabs = [
+  { label: '全部待办', value: '78' },
+  { label: '待审批', value: '18' },
+  { label: '待派工', value: '24' },
+  { label: '预警', value: '36' },
+  { label: '逾期', value: '7' },
 ] as const;
 
 const workbenchTodoRows = [
   {
-    id: 'TD-20240614-018',
-    type: '审批',
-    source: '资产转移',
-    title: '数控车床 CN-301 跨车间调拨审批',
+    id: 'APR-20240614-0012',
+    type: '待审批',
+    source: '维修费用',
+    title: '设备维修费用报销申请',
+    relatedObject: '数控车床 CN-301',
+    initiator: '张三丰',
     priority: 'P1',
     status: '待审批',
-    sla: '1.2h',
-    owner: '张经理',
-    context: '资产调拨',
+    sla: '已逾期 2h',
+    createdAt: '今天 09:12',
+    context: '计划外维修',
+    amount: '¥ 2,850.00',
+    description: '主轴异响，振动超限，需要更换轴承。',
+    assetImage: iconAsset('cnc-machine'),
     tone: 'red',
   },
   {
-    id: 'TD-20240614-017',
+    id: 'PM-20240614-0021',
     type: '预测维保',
     source: '工单模型',
-    title: '注塑机 M-201 温度异常建议派工',
+    title: '预测维保工单待派工',
+    relatedObject: '加工中心 MC-502',
+    initiator: '系统预警',
     priority: 'P1',
     status: '待派工',
-    sla: '2.0h',
-    owner: '王班组',
-    context: '高风险资产',
+    sla: '剩余 1h',
+    createdAt: '今天 08:45',
+    context: '预测维保',
+    amount: '自动派工',
+    description: '温度波动超过模型阈值，建议安排班组现场复核。',
+    assetImage: iconAsset('production-equipment'),
     tone: 'red',
   },
   {
-    id: 'TD-20240614-016',
-    type: '巡检异常',
+    id: 'INSP-20240614-0045',
+    type: '预警',
     source: '点检路线',
-    title: '焊接线 A 机器人减速机温升复核',
+    title: '巡检异常：振动超限',
+    relatedObject: '立式铣床 VM-205',
+    initiator: '李巡检',
     priority: 'P2',
-    status: '待复核',
-    sla: '3.5h',
-    owner: '李巡检',
-    context: '异常点位',
+    status: '待处理',
+    sla: '剩余 3h',
+    createdAt: '今天 07:58',
+    context: '巡检管理',
+    amount: '异常点位',
+    description: '减速机点位振动值超过巡检标准，需要复测并转工单。',
+    assetImage: iconAsset('inspection-equipment'),
     tone: 'orange',
   },
   {
-    id: 'TD-20240614-015',
-    type: '备件低储',
-    source: '备件仓',
-    title: '轴承 6205-2RS 低储采购确认',
+    id: 'INV-20240614-0088',
+    type: '预警',
+    source: '备件管理',
+    title: '备件低储预警',
+    relatedObject: '轴承 6205-2RS',
+    initiator: '系统预警',
     priority: 'P2',
-    status: '待确认',
-    sla: '4.0h',
-    owner: '备件员',
-    context: '关联 3 单',
+    status: '待处理',
+    sla: '剩余 5h',
+    createdAt: '今天 06:30',
+    context: '备件管理',
+    amount: '库存 12',
+    description: '安全库存低于阈值，关联 3 张预测维保工单。',
+    assetImage: iconAsset('auxiliary-equipment'),
     tone: 'orange',
   },
   {
-    id: 'TD-20240614-014',
-    type: '告警处置',
-    source: '告警中心',
-    title: '冷干机 RD-201 冷凝压力告警转派',
-    priority: 'P2',
-    status: '处理中',
-    sla: '5.1h',
-    owner: '陈电工',
-    context: '联动工单',
+    id: 'PM-20240613-0099',
+    type: '待派工',
+    source: '预测维保',
+    title: '预测维保工单待派工',
+    relatedObject: '磨床 GR-101',
+    initiator: '系统预警',
+    priority: 'P3',
+    status: '待派工',
+    sla: '剩余 8h',
+    createdAt: '昨天 18:20',
+    context: '预测维保',
+    amount: '建议派发',
+    description: '磨削主轴负载上升，建议纳入本周计划。',
+    assetImage: iconAsset('cnc-cluster'),
     tone: 'blue',
   },
   {
-    id: 'TD-20240614-013',
-    type: '报表订阅',
-    source: '报表分析',
-    title: '月度资产价值报表订阅确认',
+    id: 'PUR-20240613-0033',
+    type: '待审批',
+    source: '采购部',
+    title: '备件采购申请',
+    relatedObject: '导轨滑块 HGH25',
+    initiator: '王采购',
     priority: 'P3',
-    status: '待确认',
-    sla: '8.0h',
-    owner: '财务部',
-    context: '导出审计',
-    tone: 'green',
+    status: '待审批',
+    sla: '剩余 10h',
+    createdAt: '昨天 17:10',
+    context: '采购申请',
+    amount: '¥ 8,600.00',
+    description: '关联包装线维修工单，库存不足需补采。',
+    assetImage: iconAsset('auxiliary-equipment'),
+    tone: 'blue',
+  },
+  {
+    id: 'WO-20240613-0077',
+    type: '预警',
+    source: '工单管理',
+    title: '工单接单超时预警',
+    relatedObject: '液压机 HP-10T',
+    initiator: '系统预警',
+    priority: 'P4',
+    status: '待处理',
+    sla: '剩余 12h',
+    createdAt: '昨天 16:05',
+    context: '工单管理',
+    amount: '超时风险',
+    description: '工单超过接单 SLA，建议转派负责人。',
+    assetImage: iconAsset('public-equipment'),
+    tone: 'slate',
+  },
+  {
+    id: 'DATA-20240613-0022',
+    type: '预警',
+    source: '数据监控',
+    title: '数据采集延迟',
+    relatedObject: '加工中心 MC-301',
+    initiator: '系统预警',
+    priority: 'P4',
+    status: '待处理',
+    sla: '剩余 14h',
+    createdAt: '昨天 15:40',
+    context: '数据监控',
+    amount: '延迟 4.3s',
+    description: '设备采集链路延迟超过阈值，影响设备状态时效性。',
+    assetImage: iconAsset('it-equipment'),
+    tone: 'slate',
   },
 ] as const;
 
-const workbenchTodoDetailTabs = ['待办信息', '上下文', '处理建议', '流转记录', '关联单据'] as const;
+const workbenchTodoDetailTabs = ['基本信息', '审批流程', '附件', '处理建议'] as const;
 
 const workbenchAssetSummaryCards = [
   { label: '资产总数', value: '12,856', delta: '较上月 +1.56%', icon: Layers, tone: 'blue' },
@@ -6010,7 +6073,7 @@ function WorkbenchTodoPage({
   onPreviewAction,
 }: WorkbenchMenuPageProps) {
   const [selectedTodoId, setSelectedTodoId] = useState(workbenchTodoRows[0].id);
-  const [detailTab, setDetailTab] = useState<(typeof workbenchTodoDetailTabs)[number]>('待办信息');
+  const [detailTab, setDetailTab] = useState<(typeof workbenchTodoDetailTabs)[number]>('基本信息');
   const [detailOpen, setDetailOpen] = useState(true);
   const selectedTodo = workbenchTodoRows.find((todo) => todo.id === selectedTodoId) ?? workbenchTodoRows[0];
   const primaryAction = meta.actions[0];
@@ -6118,35 +6181,34 @@ function WorkbenchTodoPage({
             })}
           </div>
 
-          <div className="workspace-orders-stage-row" aria-label="流程待办阶段">
-            {workbenchTodoStages.map((stage) => (
+          <nav className="workspace-todo-queue-tabs" aria-label="流程待办状态切换">
+            {workbenchTodoTabs.map((tab, index) => (
               <button
-                key={stage.label}
+                key={tab.label}
                 type="button"
-                className={`is-${stage.tone}`}
+                className={index === 0 ? 'is-active' : ''}
                 onClick={() =>
                   openTodoPreview(
-                    `${stage.label}阶段待办`,
-                    `/approvals?source=workbench&stage=${encodeURIComponent(stage.label)}`,
-                    `查看 ${stage.label} 阶段的跨模块待办事项。`,
-                    '查看阶段',
-                    ArrowRight,
+                    `${tab.label}队列`,
+                    `/approvals?source=workbench&queue=${encodeURIComponent(tab.label)}`,
+                    `按 ${tab.label} 查看流程待办，保留当前 Workbench 来源。`,
+                    '查看队列',
+                    ClipboardList,
                   )
                 }
               >
-                <span>{stage.label}</span>
-                <strong>{stage.value}</strong>
-                <small>{stage.note}</small>
+                {tab.label}
+                <small>({tab.value})</small>
               </button>
             ))}
-          </div>
+          </nav>
 
           <div className="workspace-orders-filterbar" aria-label="流程待办查询筛选栏">
             <label>
               <Search />
               <input readOnly value="搜索待办号 / 来源 / 标题 / 责任人" aria-label="流程待办搜索" />
             </label>
-            {['类型 全部', '优先级 全部', '状态 全部', '责任人 全部'].map((filter) => (
+            {['类型 全部', '优先级 全部', '状态 全部'].map((filter) => (
               <button key={filter} type="button" onClick={() => onPreviewAction(secondaryAction)}>
                 {filter}
                 <ArrowRight />
@@ -6157,34 +6219,48 @@ function WorkbenchTodoPage({
               className="is-date"
               onClick={() =>
                 openTodoPreview(
-                  '按截止时间筛选',
-                  '/approvals?source=workbench&due=today',
-                  '查看今日到期和 SLA 风险待办。',
-                  '查看今日待办',
+                  '按创建时间筛选',
+                  '/approvals?source=workbench&createdAt=today',
+                  '按创建时间筛选待办，保留类型、优先级和状态条件。',
+                  '查看今日创建',
                   CalendarDays,
                 )
               }
             >
-              截止时间
+              创建时间
               <CalendarDays />
             </button>
-            <button type="button" className="is-reset" onClick={() => onPreviewAction(secondaryAction)}>
-              重置
+            <button
+              type="button"
+              className="is-reset"
+              onClick={() =>
+                openTodoPreview(
+                  '筛选待办',
+                  '/approvals?source=workbench&filter=drawer',
+                  '打开流程待办筛选抽屉，预填当前厂区、状态和优先级。',
+                  '打开筛选',
+                  SlidersHorizontal,
+                )
+              }
+            >
+              <SlidersHorizontal />
+              筛选
+            </button>
+            <button type="button" className="is-icon" aria-label="刷新流程待办" onClick={() => onPreviewAction(secondaryAction)}>
+              <Activity />
             </button>
           </div>
 
           <div className="workspace-orders-table" aria-label="流程待办列表">
             <div className="workspace-orders-table-head">
-              <span><input type="checkbox" aria-label="选择全部待办" readOnly /></span>
-              <span>待办号</span>
-              <span>类型</span>
-              <span>来源模块</span>
-              <span>标题</span>
               <span>优先级</span>
-              <span>状态</span>
+              <span>类型</span>
+              <span>标题</span>
+              <span>关联对象</span>
+              <span>发起人</span>
+              <span>创建时间</span>
               <span>SLA</span>
-              <span>责任人</span>
-              <span>上下文</span>
+              <span>状态</span>
               <span>操作</span>
             </div>
             {workbenchTodoRows.map((todo) => (
@@ -6192,19 +6268,20 @@ function WorkbenchTodoPage({
                 key={todo.id}
                 className={`workspace-orders-table-row is-${todo.tone} ${todo.id === selectedTodo.id ? 'is-selected' : ''}`}
               >
-                <span><input type="checkbox" aria-label={`选择${todo.id}`} readOnly /></span>
-                <button type="button" className="is-link" onClick={() => openTodo(todo)}>{todo.id}</button>
-                <span><em>{todo.type}</em></span>
-                <span>
-                  <strong>{todo.source}</strong>
-                  <small>{todo.context}</small>
-                </span>
-                <button type="button" className="is-title" onClick={() => openTodo(todo)}>{todo.title}</button>
                 <span><b>{todo.priority}</b></span>
+                <span><em>{todo.type}</em></span>
+                <button type="button" className="is-title" onClick={() => openTodo(todo)}>
+                  <strong>{todo.title}</strong>
+                  <small>单号 {todo.id}</small>
+                </button>
+                <span>{todo.relatedObject}</span>
+                <span>
+                  <strong>{todo.initiator}</strong>
+                  <small>{todo.source}</small>
+                </span>
+                <span>{todo.createdAt}</span>
+                <span className={todo.sla.includes('逾期') ? 'is-danger' : ''}>{todo.sla}</span>
                 <span><i>{todo.status}</i></span>
-                <span>{todo.sla}</span>
-                <span>{todo.owner}</span>
-                <span><em className="is-spare">{todo.context}</em></span>
                 <span>
                   <button
                     type="button"
@@ -6215,7 +6292,7 @@ function WorkbenchTodoPage({
                       openTodoPreview(
                         '处理待办',
                         `/approvals/${todo.id}/process?source=workbench`,
-                        `处理 ${todo.id}，带入 ${todo.type}、${todo.source} 和 SLA ${todo.sla}。`,
+                        `处理 ${todo.id}，带入 ${todo.type}、${todo.relatedObject} 和 SLA ${todo.sla}。`,
                         '进入处理',
                         ClipboardList,
                       );
@@ -6249,38 +6326,38 @@ function WorkbenchTodoPage({
         {detailOpen ? (
           <>
             <header className="workspace-orders-detail-head">
-              <strong>待办详情</strong>
+              <strong>待处理项详情</strong>
               <button type="button" aria-label="关闭待办详情" onClick={() => setDetailOpen(false)}>
                 <X />
               </button>
             </header>
             <section className="workspace-orders-detail-card" aria-label="当前待办信息">
-              <div>
-                <b>{selectedTodo.priority}</b>
+              <div className="workspace-todo-detail-summary">
                 <span>
-                  <strong>{selectedTodo.id}</strong>
+                  <b>{selectedTodo.priority}</b>
                   <small>{selectedTodo.status}</small>
                 </span>
+                <img src={selectedTodo.assetImage} alt="" />
               </div>
+              <p>单号 {selectedTodo.id}</p>
               <h3>{selectedTodo.title}</h3>
               <dl>
-                <div><dt>类型</dt><dd>{selectedTodo.type}</dd></div>
-                <div><dt>SLA</dt><dd>{selectedTodo.sla}</dd></div>
-                <div><dt>来源</dt><dd>{selectedTodo.source}</dd></div>
-                <div><dt>上下文</dt><dd>{selectedTodo.context}</dd></div>
-                <div><dt>责任人</dt><dd>{selectedTodo.owner}</dd></div>
-                <div><dt>优先级</dt><dd>{selectedTodo.priority} 紧急</dd></div>
-                <div><dt>创建时间</dt><dd>2026-06-14 09:18</dd></div>
-                <div><dt>截止时间</dt><dd>2026-06-14 11:30</dd></div>
+                <div><dt>关联设备</dt><dd>{selectedTodo.relatedObject}</dd></div>
+                <div><dt>申请人</dt><dd>{selectedTodo.initiator}</dd></div>
+                <div><dt>所在位置</dt><dd>机加车间 · CNC 区域 A线</dd></div>
+                <div><dt>申请时间</dt><dd>2026-06-14 09:12</dd></div>
+                <div><dt>维修类型</dt><dd>{selectedTodo.context}</dd></div>
+                <div><dt>申请金额</dt><dd>{selectedTodo.amount}</dd></div>
+                <div><dt>故障描述</dt><dd>{selectedTodo.description}</dd></div>
               </dl>
             </section>
 
             <section className="workspace-orders-flow" aria-label="流程待办流转">
-              {['收敛', '分派', '处理', '复核', '关闭'].map((step, index) => (
-                <span key={step} className={index < 2 ? 'is-done' : index === 2 ? 'is-active' : ''}>
+              {['申请人提交', '部门主管审核', '设备经理审核', '财务审核', '完成'].map((step, index) => (
+                <span key={step} className={index === 0 ? 'is-active' : ''}>
                   <CheckCircle2 />
                   <strong>{step}</strong>
-                  <small>{index < 2 ? '06-14 09:20' : index === 2 ? '待处理' : '待流转'}</small>
+                  <small>{index === 0 ? '06-14 09:12' : index === 1 ? '审核' : '待流转'}</small>
                 </span>
               ))}
             </section>
@@ -6300,28 +6377,27 @@ function WorkbenchTodoPage({
 
             <section className="workspace-orders-tab-panel" aria-label={`${detailTab}内容`}>
               <article>
-                <span>处理摘要</span>
-                <p>聚合审批、派工、巡检异常和备件低储，按 SLA 与风险优先级排序。</p>
+                <span>基本信息</span>
+                <p>来源于 {selectedTodo.source}，关联对象为 {selectedTodo.relatedObject}，当前状态为 {selectedTodo.status}。</p>
               </article>
               <article>
-                <span>预填上下文</span>
+                <span>审批流程</span>
                 <ul>
-                  <li>{selectedTodo.source} <b>已带入</b></li>
-                  <li>{selectedTodo.context} <b>已关联</b></li>
-                  <li>{selectedTodo.priority} 优先级 <b className="is-warning">需确认</b></li>
+                  <li>申请人提交 <b>已完成</b></li>
+                  <li>部门主管审核 <b className="is-warning">待处理</b></li>
+                  <li>设备经理审核 <small>待流转</small></li>
+                </ul>
+              </article>
+              <article>
+                <span>附件</span>
+                <ul>
+                  <li>维修报告.pdf <small>1.2 MB</small></li>
+                  <li>费用明细.xlsx <small>82 KB</small></li>
                 </ul>
               </article>
               <article>
                 <span>处理建议</span>
-                <p>优先处理 SLA 风险项，预测维保可直接生成工单，审批项进入审批中心完成。</p>
-              </article>
-              <article>
-                <span>关联单据</span>
-                <ul>
-                  <li>审批单 AP-20240614-08 <small>待处理</small></li>
-                  <li>预测工单 WO-20240614-0012 <small>已草稿</small></li>
-                  <li>备件申请 SP-20240614-021 <small>待采购</small></li>
-                </ul>
+                <p>建议同意申请，并批准 {selectedTodo.amount} 维修费用；高风险项优先转交设备经理复核。</p>
               </article>
             </section>
 
@@ -6330,44 +6406,44 @@ function WorkbenchTodoPage({
                 type="button"
                 onClick={() =>
                   openTodoPreview(
-                    '转派待办',
-                    `/approvals/${selectedTodo.id}/assign?source=workbench`,
-                    `转派 ${selectedTodo.id}，保留待办来源和处理上下文。`,
-                    '进入转派',
-                    UserCircle,
+                    '驳回待办',
+                    `/approvals/${selectedTodo.id}/reject?source=workbench`,
+                    `驳回 ${selectedTodo.id}，要求填写处理意见并回写审批中心。`,
+                    '进入驳回',
+                    X,
                   )
                 }
               >
-                转派
+                驳回
               </button>
               <button
                 type="button"
                 onClick={() =>
                   openTodoPreview(
-                    '挂起待办',
-                    `/approvals/${selectedTodo.id}/suspend?source=workbench`,
-                    `挂起 ${selectedTodo.id} 并要求填写原因，不在 Workbench 内直接提交危险操作。`,
-                    '进入挂起',
-                    AlertTriangle,
+                    '转交待办',
+                    `/approvals/${selectedTodo.id}/assign?source=workbench`,
+                    `转交 ${selectedTodo.id}，保留待办来源和处理上下文。`,
+                    '进入转交',
+                    UserCircle,
                   )
                 }
               >
-                挂起
+                转交
               </button>
               <button
                 type="button"
                 className="is-primary"
                 onClick={() =>
                   openTodoPreview(
-                    '开始处理',
-                    `/approvals/${selectedTodo.id}/process?source=workbench`,
-                    `开始处理 ${selectedTodo.id}，带入 SLA、来源模块和业务上下文。`,
-                    '开始处理',
+                    '同意待办',
+                    `/approvals/${selectedTodo.id}/approve?source=workbench`,
+                    `同意 ${selectedTodo.id}，带入 SLA、来源模块和业务上下文。`,
+                    '进入同意',
                     ClipboardList,
                   )
                 }
               >
-                开始处理
+                同意
               </button>
             </footer>
           </>
