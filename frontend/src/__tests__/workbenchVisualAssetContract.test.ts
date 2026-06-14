@@ -116,6 +116,7 @@ describe('Workbench visual asset contract', () => {
       expect(binding.route).toBe(sections[binding.name]);
       expect(binding.route).toMatch(/^\/fixed-assets\/workbench/);
       expect(binding.route).not.toContain('/workspace-preview');
+      expect(binding.route).not.toContain('?menu=');
       expect(binding.stitchScreen).toMatch(/^(overview|analytics|assets|security)$/);
       expect(binding.businessUse.length).toBeGreaterThan(20);
       expect(binding.sourcePolicy).toContain('formal Workbench route');
@@ -134,6 +135,39 @@ describe('Workbench visual asset contract', () => {
     expect(deliveryManifest.connectedRoutes.designBoard).toBe('/workspace-preview');
     expect(deliveryManifest.connectedRoutes.designBoardDeepLink).toBe('/workspace-preview?tab=stitch');
     expect(deliveryManifest.stitchIntegration.authEvidence.mcpToolListProjects).toContain('Auth required');
+  });
+
+  it('keeps generated Workbench menu Stitch pages visible in the design board source', () => {
+    const menuPages = [
+      ...deliveryManifest.workbenchP0PageAssetMap,
+      ...deliveryManifest.workbenchRound2PageAssetMap,
+    ];
+
+    expect(menuPages).toHaveLength(12);
+
+    const escapeRegex = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+    for (const item of menuPages) {
+      const stitchAssetKey = item.stitchScreenshot
+        .replace('/mock/workspace-preview/stitch-suite/', '')
+        .replace(/\.png$/, '');
+
+      expect(workspacePage).toMatch(
+        new RegExp(
+          [
+            `title: '${escapeRegex(item.name)}'`,
+            `imageSrc: stitchAsset\\('${escapeRegex(stitchAssetKey)}'\\)`,
+            `route: '${escapeRegex(item.route)}'`,
+            "linkLabel: '进入业务菜单'",
+          ].join('[\\s\\S]*?'),
+        ),
+      );
+    }
+
+    expect(workspacePage).toContain("route: '/fixed-assets/workbench'");
+    expect(workspacePage).toContain("route: '/fixed-assets/workbench/analytics'");
+    expect(workspacePage).toContain("route: '/fixed-assets/workbench/assets'");
+    expect(workspacePage).toContain("route: '/fixed-assets/workbench/security'");
   });
 
   it('binds Round 1 Workbench product pages to IMAGE2 v6 and Stitch page-level evidence', () => {

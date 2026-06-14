@@ -2238,6 +2238,7 @@ const stitchScreens: Array<{
   note: string;
   imageSrc: string;
   page?: WorkbenchPage;
+  route?: string;
   href?: string;
   linkLabel?: string;
 }> = [
@@ -2247,6 +2248,7 @@ const stitchScreens: Array<{
     note: '产线大图、四中心入口与产品总览逻辑',
     imageSrc: stitchAsset('overview'),
     page: 'overview',
+    route: '/fixed-assets/workbench',
   },
   {
     title: '资产运维中心',
@@ -2254,6 +2256,7 @@ const stitchScreens: Array<{
     note: '健康指数、资产分类、风险 TOP10 与工单闭环',
     imageSrc: stitchAsset('assets'),
     page: 'assets',
+    route: '/fixed-assets/workbench/assets',
   },
   {
     title: '数据监控中心',
@@ -2261,6 +2264,7 @@ const stitchScreens: Array<{
     note: '98.6% 圆环、设备波动、台站统计与异常列表',
     imageSrc: stitchAsset('analytics'),
     page: 'analytics',
+    route: '/fixed-assets/workbench/analytics',
   },
   {
     title: '安全态势工作台',
@@ -2268,6 +2272,103 @@ const stitchScreens: Array<{
     note: '深色态势图、安全评分、风险列表与趋势',
     imageSrc: stitchAsset('security'),
     page: 'security',
+    route: '/fixed-assets/workbench/security',
+  },
+  {
+    title: '运营首页',
+    status: 'Round 2',
+    note: 'KPI 下钻、待办、最近工单、维保预警与快捷入口',
+    imageSrc: stitchAsset('workbench-round2/workbench-menu-home-v1'),
+    route: '/fixed-assets/workbench?menu=home',
+    linkLabel: '进入业务菜单',
+  },
+  {
+    title: '流程待办',
+    status: 'Round 1',
+    note: '待审批、预测维保、巡检异常、备件低储与 SLA 队列',
+    imageSrc: stitchAsset('workbench-p0/workbench-menu-todo-v1'),
+    route: '/fixed-assets/workbench?menu=todo',
+    linkLabel: '进入业务菜单',
+  },
+  {
+    title: '资产总览',
+    status: 'Round 2',
+    note: '资产台账、健康、生命周期、风险 TOP 与二级处置/流转入口',
+    imageSrc: stitchAsset('workbench-round2/workbench-menu-asset-v1'),
+    route: '/fixed-assets/workbench/assets?menu=asset',
+    linkLabel: '进入业务菜单',
+  },
+  {
+    title: '设备管理',
+    status: 'Round 1',
+    note: '设备在线、温度、振动、采集延迟与异常派工',
+    imageSrc: stitchAsset('workbench-p0/workbench-menu-device-v1'),
+    route: '/fixed-assets/workbench/assets?menu=device',
+    linkLabel: '进入业务菜单',
+  },
+  {
+    title: '工单管理',
+    status: 'Round 1',
+    note: '预测、派工、执行、验收、SLA 与备件保障闭环',
+    imageSrc: stitchAsset('workbench-p0/workbench-menu-orders-v1'),
+    route: '/fixed-assets/workbench/assets?menu=orders',
+    linkLabel: '进入业务菜单',
+  },
+  {
+    title: '巡检管理',
+    status: 'Round 2',
+    note: '路线日历、点位核验、异常队列、证据上传与转工单',
+    imageSrc: stitchAsset('workbench-round2/workbench-menu-inspection-v1'),
+    route: '/fixed-assets/workbench/assets?menu=inspection',
+    linkLabel: '进入业务菜单',
+  },
+  {
+    title: '备件管理',
+    status: 'Round 2',
+    note: '低储预警、供应商 ETA、关联工单、领用采购与成本回写',
+    imageSrc: stitchAsset('workbench-round2/workbench-menu-spares-v1'),
+    route: '/fixed-assets/workbench/assets?menu=spares',
+    linkLabel: '进入业务菜单',
+  },
+  {
+    title: '数据监控',
+    status: 'Round 2',
+    note: 'MES/IoT 链路、采集延迟、异常流水、订阅导出和重试',
+    imageSrc: stitchAsset('workbench-round2/workbench-menu-energy-v1'),
+    route: '/fixed-assets/workbench/analytics?menu=energy',
+    linkLabel: '进入业务菜单',
+  },
+  {
+    title: '报表分析',
+    status: 'Round 1',
+    note: '模板选择、趋势分析、导出订阅、失败重试和审计链路',
+    imageSrc: stitchAsset('workbench-p0/workbench-menu-report-v1'),
+    route: '/fixed-assets/workbench/analytics?menu=report',
+    linkLabel: '进入业务菜单',
+  },
+  {
+    title: '告警中心',
+    status: 'Round 1',
+    note: '等级筛选、策略命中、处置建议、转工单和复盘闭环',
+    imageSrc: stitchAsset('workbench-p0/workbench-menu-alert-v1'),
+    route: '/fixed-assets/workbench/security?menu=alarm',
+    linkLabel: '进入业务菜单',
+  },
+  {
+    title: '组织策略',
+    status: 'Round 2',
+    note: '风险规则、角色策略、审批边界、策略命中和高危复核',
+    imageSrc: stitchAsset('workbench-round2/workbench-menu-policy-v1'),
+    route: '/fixed-assets/workbench/security?menu=policy',
+    linkLabel: '进入业务菜单',
+  },
+  {
+    title: '基础维护',
+    status: 'Round 2',
+    note: '分类、位置、供应商、资产型号、编号规则、集成源和系统配置',
+    imageSrc: stitchAsset('workbench-round2/workbench-menu-settings-v1'),
+    route: '/fixed-assets/workbench/assets?menu=settings',
+    linkLabel: '进入业务菜单',
   },
   {
     title: '设计稿登录页',
@@ -3598,16 +3699,16 @@ function StitchSuiteDashboard() {
           <p>首批产品套页面已形成设计资产、截图资产和路由入口，作为当前前端 demo 的复刻来源。</p>
           <div className="workspace-stitch-stats" aria-label="设计稿状态">
             <span>
-              <strong>8</strong>
+              <strong>21</strong>
               设计稿
             </span>
             <span>
-              <strong>6</strong>
+              <strong>18</strong>
               页面稿
             </span>
             <span>
-              <strong>5</strong>
-              已接入入口
+              <strong>12</strong>
+              业务菜单
             </span>
           </div>
         </div>
@@ -3643,11 +3744,11 @@ function StitchSuiteDashboard() {
               <em>{screen.status}</em>
             </div>
             <img src={screen.imageSrc} alt={`${screen.title} 设计稿`} loading="eager" decoding="async" />
-            {screen.page ? (
+            {screen.route ? (
               <>
-                <small className="workspace-stitch-route">{buildWorkbenchPagePath(screen.page)}</small>
-                <a href={buildWorkbenchPagePath(screen.page)}>
-                  进入正式路由
+                <small className="workspace-stitch-route">{screen.route}</small>
+                <a href={screen.route}>
+                  {screen.linkLabel ?? '进入正式路由'}
                 </a>
               </>
             ) : null}

@@ -271,7 +271,7 @@
   "formalWorkbenchAssetMap": [
     {
       "name": "智能制造总览",
-      "route": "/fixed-assets/workbench?menu=home",
+      "route": "/fixed-assets/workbench",
       "stitchScreen": "overview",
       "primaryAsset": "/mock/workspace-preview/stitch-suite/overview.png",
       "moduleAsset": "/mock/workspace-preview/asset-kit-v4/modules/module-machining-cluster.png",
@@ -279,12 +279,12 @@
         "/mock/workspace-preview/asset-kit-v5/details/work-order-flow-v1.png",
         "/mock/workspace-preview/asset-kit-v5/details/data-sync-pipeline-v1.png"
       ],
-      "businessUse": "运营首页承接智能制造总览、产线态势、流程待办和跨中心入口。",
+      "businessUse": "顶部智能制造总览作为独立主视角承接产线态势和跨中心入口；运营首页作为左侧业务菜单另行承接 KPI、待办和快捷任务。",
       "sourcePolicy": "Stitch screen plus IMAGE2 module/detail assets must resolve to the formal Workbench route, not a detached demo route."
     },
     {
       "name": "数据监控中心",
-      "route": "/fixed-assets/workbench/analytics?menu=energy",
+      "route": "/fixed-assets/workbench/analytics",
       "stitchScreen": "analytics",
       "primaryAsset": "/mock/workspace-preview/stitch-suite/analytics.png",
       "moduleAsset": "/mock/workspace-preview/asset-kit-v4/modules/module-data-monitoring.png",
@@ -292,12 +292,12 @@
         "/mock/workspace-preview/asset-kit-v5/details/data-sync-pipeline-v1.png",
         "/mock/workspace-preview/asset-kit-v5/details/temperature-monitoring-v1.png"
       ],
-      "businessUse": "数据监控中心承接采集链路、在线率、同步延迟和异常数据预警。",
+      "businessUse": "顶部数据监控中心作为独立主视角承接采集链路和数据质量态势；左侧数据监控菜单另行承接采集事件、订阅导出和重试处理。",
       "sourcePolicy": "Stitch screen plus IMAGE2 module/detail assets must resolve to the formal Workbench route, not a detached demo route."
     },
     {
       "name": "资产运维中心",
-      "route": "/fixed-assets/workbench/assets?menu=asset",
+      "route": "/fixed-assets/workbench/assets",
       "stitchScreen": "assets",
       "primaryAsset": "/mock/workspace-preview/stitch-suite/assets.png",
       "moduleAsset": "/mock/workspace-preview/asset-kit-v4/modules/module-asset-ops.png",
@@ -306,12 +306,12 @@
         "/mock/workspace-preview/asset-kit-v5/details/spare-parts-support-v1.png",
         "/mock/workspace-preview/asset-kit-v5/details/asset-status-distribution-v1.png"
       ],
-      "businessUse": "资产运维中心承接资产总览、健康指数、维保工单、备件保障和风险 TOP10。",
+      "businessUse": "顶部资产运维中心作为独立主视角承接资产健康、维保和风险态势；左侧资产总览菜单另行承接台账、处置和使用流转。",
       "sourcePolicy": "Stitch screen plus IMAGE2 module/detail assets must resolve to the formal Workbench route, not a detached demo route."
     },
     {
       "name": "安全态势工作台",
-      "route": "/fixed-assets/workbench/security?menu=alarm",
+      "route": "/fixed-assets/workbench/security",
       "stitchScreen": "security",
       "primaryAsset": "/mock/workspace-preview/stitch-suite/security.png",
       "moduleAsset": "/mock/workspace-preview/asset-kit-v4/modules/module-security-posture-map-wide.png",
@@ -319,7 +319,7 @@
         "/mock/workspace-preview/asset-kit-v5/details/risk-level-tags-v1.png",
         "/mock/workspace-preview/asset-kit-v5/details/work-order-flow-v1.png"
       ],
-      "businessUse": "安全态势工作台承接告警队列、组织策略、风险矩阵和联动处置闭环。",
+      "businessUse": "顶部安全态势工作台作为独立主视角承接安全评分和态势图；左侧告警中心与组织策略菜单另行承接处置和规则治理。",
       "sourcePolicy": "Stitch screen plus IMAGE2 module/detail assets must resolve to the formal Workbench route, not a detached demo route."
     }
   ],
@@ -374,10 +374,10 @@
     "designBoardDeepLink": "/workspace-preview?tab=stitch",
     "workbench": "/fixed-assets/workbench",
     "workbenchSections": {
-      "智能制造总览": "/fixed-assets/workbench?menu=home",
-      "数据监控中心": "/fixed-assets/workbench/analytics?menu=energy",
-      "资产运维中心": "/fixed-assets/workbench/assets?menu=asset",
-      "安全态势工作台": "/fixed-assets/workbench/security?menu=alarm"
+      "智能制造总览": "/fixed-assets/workbench",
+      "数据监控中心": "/fixed-assets/workbench/analytics",
+      "资产运维中心": "/fixed-assets/workbench/assets",
+      "安全态势工作台": "/fixed-assets/workbench/security"
     },
     "loginRoutes": {
       "当前版登录页": "/login4",
@@ -388,25 +388,25 @@
     {
       "name": "智能制造总览",
       "status": "已接入",
-      "route": "/fixed-assets/workbench?menu=home",
+      "route": "/fixed-assets/workbench",
       "focus": "产线总览、机加设备集群、四中心入口和产品套导航"
     },
     {
       "name": "数据监控中心",
       "status": "细节增强中",
-      "route": "/fixed-assets/workbench/analytics?menu=energy",
+      "route": "/fixed-assets/workbench/analytics",
       "focus": "在线率圆环、设备波动、采集链路、数据质量、异常列表和趋势图"
     },
     {
       "name": "资产运维中心",
       "status": "细节增强中",
-      "route": "/fixed-assets/workbench/assets?menu=asset",
+      "route": "/fixed-assets/workbench/assets",
       "focus": "健康指数、在线/位置/温度/维保/告警维度、资产分类、风险 TOP10、预测维保工单和生命周期闭环"
     },
     {
       "name": "安全态势工作台",
       "status": "细节增强中",
-      "route": "/fixed-assets/workbench/security?menu=alarm",
+      "route": "/fixed-assets/workbench/security",
       "focus": "安全评分、地图态势、处置闭环、主机风险、告警列表和联动工单"
     },
     {

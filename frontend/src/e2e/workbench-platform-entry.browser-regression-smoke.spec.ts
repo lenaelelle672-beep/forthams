@@ -322,6 +322,47 @@ test.describe('Workbench 正式入口浏览器回归', () => {
     expect(errors).toEqual([]);
   });
 
+  test('设计稿总览展示 Round 1/2 业务菜单设计页并对应正式路由', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+
+    await page.goto('/workspace-preview?tab=stitch');
+    await page.waitForLoadState('networkidle');
+
+    await expect(page.locator('.workspace-stitch-grid')).toBeVisible({ timeout: 10_000 });
+    await expect(page.locator('.workspace-stitch-stats')).toContainText('12');
+    await expect(page.locator('.workspace-stitch-stats')).toContainText('业务菜单');
+
+    const designCards = [
+      ['运营首页', '/fixed-assets/workbench?menu=home'],
+      ['流程待办', '/fixed-assets/workbench?menu=todo'],
+      ['资产总览', '/fixed-assets/workbench/assets?menu=asset'],
+      ['设备管理', '/fixed-assets/workbench/assets?menu=device'],
+      ['工单管理', '/fixed-assets/workbench/assets?menu=orders'],
+      ['巡检管理', '/fixed-assets/workbench/assets?menu=inspection'],
+      ['备件管理', '/fixed-assets/workbench/assets?menu=spares'],
+      ['数据监控', '/fixed-assets/workbench/analytics?menu=energy'],
+      ['报表分析', '/fixed-assets/workbench/analytics?menu=report'],
+      ['告警中心', '/fixed-assets/workbench/security?menu=alarm'],
+      ['组织策略', '/fixed-assets/workbench/security?menu=policy'],
+      ['基础维护', '/fixed-assets/workbench/assets?menu=settings'],
+    ];
+
+    for (const [title, route] of designCards) {
+      const card = page.locator('.workspace-stitch-card').filter({ hasText: route });
+      await expect(card).toBeVisible();
+      await expect(card.getByText(title, { exact: true })).toBeVisible();
+      await expect(card.getByText(route, { exact: true })).toBeVisible();
+      await expect(card.getByRole('link', { name: '进入业务菜单' })).toHaveAttribute('href', route);
+      await expect(card.locator('img')).toBeVisible();
+    }
+
+    const overviewCard = page.locator('.workspace-stitch-card').filter({ hasText: '智能制造总览' }).first();
+    await expect(overviewCard.getByText('/fixed-assets/workbench', { exact: true })).toBeVisible();
+    await expect(overviewCard).not.toContainText('/fixed-assets/workbench?menu=home');
+
+    expect(errors).toEqual([]);
+  });
+
   test('Workbench 抽屉对缺少业务权限的目标给出禁用反馈', async ({ page }) => {
     const errors = collectBrowserErrors(page);
     await seedAuthenticatedSession(page, workbenchOnlyUser);
