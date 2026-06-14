@@ -84,6 +84,11 @@ test.describe('Workbench 正式入口浏览器回归', () => {
       await expect(page.getByRole('button', { name: duplicateMenu, exact: true })).toHaveCount(0);
     }
 
+    await page.getByRole('button', { name: '安全态势工作台', exact: true }).click();
+    await expect(page).toHaveURL(/\/fixed-assets\/workbench\/security$/);
+    await expect(page.getByText('安全态势总览')).toBeVisible();
+    await expect(page.getByRole('heading', { name: '安全告警研判处置' })).toHaveCount(0);
+
     await page.getByRole('button', { name: '旧版仪表板' }).click();
     await expect(page).toHaveURL(/\/dashboard$/);
     await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
@@ -225,11 +230,11 @@ test.describe('Workbench 正式入口浏览器回归', () => {
         targetIncludes: ['/reports?source=workbench&view=operations'],
       },
       {
-        route: '/fixed-assets/workbench/assets?menu=asset',
-        pageLabel: '资产总览',
-        heading: '资产健康与生命周期总览',
-        action: '生成风险工单',
-        targetIncludes: ['/workorders/new?', 'source=asset-risk', 'riskLevel='],
+        route: '/fixed-assets/workbench/security?menu=alarm',
+        pageLabel: '告警中心',
+        heading: '安全告警研判处置',
+        action: '转派处置工单',
+        targetIncludes: ['/workorders/new?', 'source=asset-risk', 'riskState=', 'priority=CRITICAL'],
       },
     ];
 

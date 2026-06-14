@@ -104,6 +104,11 @@ type ModuleMock = {
 type WorkbenchProductPageMeta = {
   position: string;
   imageSrc: string;
+  stitchScreen?: string;
+  assetPurpose?: string;
+  filters?: string[];
+  lanes?: Array<{ label: string; value: string; note: string; tone: 'blue' | 'cyan' | 'green' | 'orange' | 'red' }>;
+  insights?: Array<{ label: string; value: string; note: string }>;
   actions: RouteActionPreview[];
   emptyState: string;
   errorState: string;
@@ -242,6 +247,8 @@ const illustrationAsset = (name: string) => `${assetBase}/illustrations/${name}.
 const moduleAsset = (name: string) => `${assetBase}/asset-kit-v4/modules/${name}.png`;
 const assetKitV4 = (name: string) => `${assetBase}/asset-kit-v4/${name}.png`;
 const detailAsset = (name: string) => `${assetBase}/asset-kit-v5/details/${name}.png`;
+const moduleV6Asset = (name: string) => `${assetBase}/asset-kit-v6/modules/${name}.png`;
+const detailV6Asset = (name: string) => `${assetBase}/asset-kit-v6/details/${name}.png`;
 const stitchAsset = (name: string) => `${assetBase}/stitch-suite/${name}.png`;
 const securityPostureThumb = moduleAsset('module-security-posture');
 const securityPostureMapWide = moduleAsset('module-security-posture-map-wide');
@@ -955,7 +962,7 @@ const moduleMockByMenuId: Record<string, ModuleMock> = {
     summary: '把待审批、预测维保、巡检异常和备件低储合并成一个运营队列，进入后分别承接到审批、工单和维保页面。',
     routeTarget: '/approvals?source=workbench&status=PENDING',
     icon: ClipboardList,
-    visual: detailAsset('work-order-flow-v1'),
+    visual: moduleV6Asset('module-flow-todo-console'),
     action: '进入待办队列',
     stats: menuContextById.todo.stats,
     rows: [
@@ -975,7 +982,7 @@ const moduleMockByMenuId: Record<string, ModuleMock> = {
     summary: '把设备在线、所在位置、温度边界、振动趋势和采集延迟放到一个现场运维看板中，模拟二期对接 MES 后的设备状态页。',
     routeTarget: '/equipment?source=workbench',
     icon: Cpu,
-    visual: detailAsset('temperature-monitoring-v1'),
+    visual: moduleV6Asset('module-device-ops-console'),
     action: '进入设备状态看板',
     stats: menuContextById.device.stats,
     rows: [
@@ -1005,7 +1012,7 @@ const moduleMockByMenuId: Record<string, ModuleMock> = {
       description: '来自固定资产工作台工单管理：健康指数与风险 TOP 自动触发预测维保。',
     }),
     icon: ClipboardList,
-    visual: detailAsset('work-order-flow-v1'),
+    visual: moduleV6Asset('module-workorder-dispatch-console'),
     action: '进入工单闭环台',
     stats: menuContextById.orders.stats,
     rows: [
@@ -1109,7 +1116,7 @@ const moduleMockByMenuId: Record<string, ModuleMock> = {
     summary: '汇总资产、设备、维保、巡检、备件和安全态势，形成经营分析、月报导出和订阅任务的 mock 页面。',
     routeTarget: '/reports?source=workbench&view=operations',
     icon: BarChart3,
-    visual: iconAsset('report-bars'),
+    visual: moduleV6Asset('module-report-analysis-console'),
     action: '进入报表中心',
     stats: menuContextById.report.stats,
     rows: [
@@ -1139,7 +1146,7 @@ const moduleMockByMenuId: Record<string, ModuleMock> = {
       description: '来自固定资产工作台告警中心：聚合资产异常、安全策略命中和联动工单。',
     }),
     icon: Bell,
-    visual: detailAsset('risk-level-tags-v1'),
+    visual: moduleV6Asset('module-alert-center-console'),
     action: '进入告警处置台',
     stats: menuContextById.alarm.stats,
     rows: [
@@ -1238,7 +1245,21 @@ const workbenchProductPageMetaByMenuId: Record<string, WorkbenchProductPageMeta>
   },
   todo: {
     position: 'Dashboard 待审批、最近工单、维保预警迁移后的统一流程队列。',
-    imageSrc: detailAsset('work-order-flow-v1'),
+    imageSrc: moduleV6Asset('module-flow-todo-console'),
+    stitchScreen: 'workbench-menu-todo-v1',
+    assetPurpose: 'IMAGE2 页面级业务图：混合待办队列、SLA 排序、详情抽屉和跨模块处理入口。',
+    filters: ['全部待办', '待审批', '待派工', '巡检异常', '低储备件', 'SLA超时'],
+    lanes: [
+      { label: '审批处理', value: '18', note: '资产转移/报废/退库', tone: 'orange' },
+      { label: '预测派工', value: '24', note: '今日建议派发', tone: 'blue' },
+      { label: '巡检异常', value: '9', note: '待复核点位', tone: 'red' },
+      { label: '备件低储', value: '18', note: '关联 7 张工单', tone: 'cyan' },
+    ],
+    insights: [
+      { label: '最高优先级', value: 'CRITICAL', note: '注塑机 M-201 温度异常' },
+      { label: '批量处理', value: '6 项', note: '同部门审批可合并' },
+      { label: '异常承接', value: '4 条', note: '可直接转工单' },
+    ],
     emptyState: '当前角色暂无待审批或待派工事项时，显示已清空队列并保留工单入口。',
     errorState: '审批中心或工单中心接口异常时，展示队列不可用并允许进入对应业务页处理。',
     deniedState: '缺少 approval:process:query 或 workorder:order:query 时，对应处理按钮禁用。',
@@ -1270,14 +1291,28 @@ const workbenchProductPageMetaByMenuId: Record<string, WorkbenchProductPageMeta>
         description: '把待办队列中的风险资产、优先级和截止时间预填到新建工单。',
         primaryLabel: '创建预测工单',
         icon: Wrench,
-        visual: detailAsset('maintenance-level-v1'),
+        visual: detailV6Asset('todo-approval-flow-v1'),
         stats: menuContextById.orders.stats,
       },
     ],
   },
   device: {
     position: '设备在线、温度、振动、采集延迟的现场运维承接页。',
-    imageSrc: detailAsset('temperature-monitoring-v1'),
+    imageSrc: moduleV6Asset('module-device-ops-console'),
+    stitchScreen: 'workbench-menu-device-v1',
+    assetPurpose: 'IMAGE2 页面级业务图：设备列表、遥测趋势、异常设备队列和派工/巡检入口。',
+    filters: ['全部设备', '在线', '温度异常', '振动异常', '采集延迟', 'A线'],
+    lanes: [
+      { label: '在线设备', value: '5,102', note: '在线率 98.6%', tone: 'green' },
+      { label: '温度异常', value: '12', note: '超过阈值', tone: 'orange' },
+      { label: '振动异常', value: '6', note: '动力站优先', tone: 'red' },
+      { label: '采集延迟', value: '95.2ms', note: 'IoT 平均', tone: 'cyan' },
+    ],
+    insights: [
+      { label: '联动建议', value: '派工', note: '异常设备进入预测维保' },
+      { label: '巡检点位', value: '18', note: '温度/振动/电流' },
+      { label: '采集链路', value: '稳定', note: 'MES 已同步' },
+    ],
     emptyState: '当前产线筛选下暂无异常设备时，展示在线设备概览和资产台账入口。',
     errorState: 'IoT 网关掉线或采集超时时，显示链路异常并提供数据监控跳转。',
     deniedState: '缺少 asset:query 或 dashboard:query 时，设备状态和台账入口禁用。',
@@ -1289,7 +1324,7 @@ const workbenchProductPageMetaByMenuId: Record<string, WorkbenchProductPageMeta>
         description: '进入设备台账，保留在线设备、WorkBench 来源和现场运维上下文。',
         primaryLabel: '进入设备台账',
         icon: Cpu,
-        visual: detailAsset('temperature-monitoring-v1'),
+        visual: detailV6Asset('device-telemetry-v1'),
         stats: menuContextById.device.stats,
       },
       {
@@ -1309,14 +1344,28 @@ const workbenchProductPageMetaByMenuId: Record<string, WorkbenchProductPageMeta>
         description: '把设备温度异常、位置和风险评分预填到新建工单。',
         primaryLabel: '创建复核工单',
         icon: Wrench,
-        visual: detailAsset('temperature-monitoring-v1'),
+        visual: moduleV6Asset('module-device-ops-console'),
         stats: menuContextById.orders.stats,
       },
     ],
   },
   orders: {
     position: '预测维保、派工执行、验收闭环和 SLA 的工单管理承接页。',
-    imageSrc: detailAsset('maintenance-level-v1'),
+    imageSrc: moduleV6Asset('module-workorder-dispatch-console'),
+    stitchScreen: 'workbench-menu-orders-v1',
+    assetPurpose: 'IMAGE2 页面级业务图：预测、派工、执行、验收和备件保障的工单闭环。',
+    filters: ['全部工单', '预测', '待派工', '执行中', '待验收', 'SLA风险'],
+    lanes: [
+      { label: '预测生成', value: '36', note: '风险模型触发', tone: 'blue' },
+      { label: '待派工', value: '24', note: '班组待确认', tone: 'orange' },
+      { label: '执行中', value: '42', note: '现场处理中', tone: 'cyan' },
+      { label: '待验收', value: '11', note: '需复核回写', tone: 'green' },
+    ],
+    insights: [
+      { label: 'SLA 风险', value: '4 单', note: '24h 内到期' },
+      { label: '备件就绪', value: '82%', note: '低储项自动提醒' },
+      { label: '闭环率', value: '91.8%', note: '本周维保' },
+    ],
     emptyState: '当前筛选下暂无待办工单时，展示最近闭环记录和新建工单入口。',
     errorState: '工单服务不可用时，保留预填上下文并提示稍后重试或进入列表。',
     deniedState: '缺少 workorder:order:query 时，工单列表和新建工单入口在抽屉中禁用。',
@@ -1328,7 +1377,7 @@ const workbenchProductPageMetaByMenuId: Record<string, WorkbenchProductPageMeta>
         description: '用 Workbench 工单管理上下文预填资产、风险、优先级和截止时间。',
         primaryLabel: '新建工单',
         icon: ClipboardList,
-        visual: detailAsset('maintenance-level-v1'),
+        visual: moduleV6Asset('module-workorder-dispatch-console'),
         stats: menuContextById.orders.stats,
       },
       {
@@ -1338,7 +1387,7 @@ const workbenchProductPageMetaByMenuId: Record<string, WorkbenchProductPageMeta>
         description: '进入工单列表，保留待派工状态和 Workbench 来源筛选。',
         primaryLabel: '进入工单列表',
         icon: FileText,
-        visual: detailAsset('work-order-flow-v1'),
+        visual: detailV6Asset('spare-maintenance-link-v1'),
         stats: menuContextById.orders.stats,
       },
     ],
@@ -1442,7 +1491,21 @@ const workbenchProductPageMetaByMenuId: Record<string, WorkbenchProductPageMeta>
   },
   report: {
     position: 'Dashboard 趋势、分类分布、部门统计和导出能力迁移后的报表页。',
-    imageSrc: stitchAsset('analytics'),
+    imageSrc: moduleV6Asset('module-report-analysis-console'),
+    stitchScreen: 'workbench-menu-report-v1',
+    assetPurpose: 'IMAGE2 页面级业务图：模板选择、趋势分析、导出订阅、失败重试和审计链路。',
+    filters: ['经营月报', '资产价值', '分类分布', '部门统计', '维保成本', '导出历史'],
+    lanes: [
+      { label: '资产价值', value: '12月', note: '趋势已更新', tone: 'blue' },
+      { label: '分类分布', value: '9 类', note: '可下钻筛选', tone: 'cyan' },
+      { label: '部门统计', value: 'Top 10', note: '支持审计', tone: 'green' },
+      { label: '导出异常', value: '2', note: '可重试', tone: 'orange' },
+    ],
+    insights: [
+      { label: '订阅任务', value: '14', note: '每周自动推送' },
+      { label: '导出格式', value: 'CSV/PDF', note: '保留筛选条件' },
+      { label: '审计链路', value: '完整', note: '来源字段可追溯' },
+    ],
     emptyState: '暂无匹配报表数据时，展示模板库、订阅任务和导出入口。',
     errorState: '报表聚合失败时，保留上次生成结果并提示重试或进入报表中心。',
     deniedState: '缺少 report:query 时，经营报表与导出入口在抽屉中禁用。',
@@ -1454,7 +1517,7 @@ const workbenchProductPageMetaByMenuId: Record<string, WorkbenchProductPageMeta>
         description: '进入报表中心，承接资产价值趋势、分类分布和部门资产统计。',
         primaryLabel: '进入报表中心',
         icon: BarChart3,
-        visual: iconAsset('report-bars'),
+        visual: moduleV6Asset('module-report-analysis-console'),
         stats: menuContextById.report.stats,
       },
       {
@@ -1464,14 +1527,28 @@ const workbenchProductPageMetaByMenuId: Record<string, WorkbenchProductPageMeta>
         description: '进入报表导出视角，预填资产价值趋势和 CSV 导出意图。',
         primaryLabel: '进入导出页',
         icon: FileText,
-        visual: iconAsset('report-bars'),
+        visual: detailV6Asset('report-export-lineage-v1'),
         stats: menuContextById.report.stats,
       },
     ],
   },
   alarm: {
     position: '安全态势工作台内的告警发现、研判、处置和复盘承接页。',
-    imageSrc: stitchAsset('security'),
+    imageSrc: moduleV6Asset('module-alert-center-console'),
+    stitchScreen: 'workbench-menu-alert-v1',
+    assetPurpose: 'IMAGE2 页面级业务图：等级筛选、策略命中、处置建议、转工单和复盘闭环。',
+    filters: ['全部告警', '高危', '中危', '低危', '策略命中', '待复盘'],
+    lanes: [
+      { label: '高危事件', value: '3', note: '需立即处置', tone: 'red' },
+      { label: '策略命中', value: '27', note: '自动聚合', tone: 'orange' },
+      { label: '处理中', value: '12', note: '工单联动', tone: 'blue' },
+      { label: '已闭环', value: '91.8%', note: '本周', tone: 'green' },
+    ],
+    insights: [
+      { label: '处置建议', value: '转工单', note: '高危资产优先' },
+      { label: '复盘范围', value: '4 条', note: '策略需复核' },
+      { label: '平均响应', value: '2.3h', note: '本周统计' },
+    ],
     emptyState: '暂无待研判告警时，展示安全评分、最近处置和规则入口。',
     errorState: '告警流聚合失败时，提示进入通知中心并保留筛选参数。',
     deniedState: '缺少 notification:query 时，告警队列与处置入口禁用。',
@@ -1483,7 +1560,7 @@ const workbenchProductPageMetaByMenuId: Record<string, WorkbenchProductPageMeta>
         description: '进入通知中心，预填高危告警、资产位置和建议处置动作。',
         primaryLabel: '进入告警处置',
         icon: Bell,
-        visual: detailAsset('risk-level-tags-v1'),
+        visual: moduleV6Asset('module-alert-center-console'),
         stats: menuContextById.alarm.stats,
       },
       {
@@ -1504,7 +1581,7 @@ const workbenchProductPageMetaByMenuId: Record<string, WorkbenchProductPageMeta>
         description: '把告警等级、资产、位置和处置建议预填到工单创建页。',
         primaryLabel: '创建处置工单',
         icon: AlertTriangle,
-        visual: detailAsset('risk-level-tags-v1'),
+        visual: detailV6Asset('todo-approval-flow-v1'),
         stats: menuContextById.orders.stats,
       },
     ],
@@ -2337,6 +2414,7 @@ function WorkbenchProductPage({
   const PrimaryActionIcon = primaryAction.icon;
   const SecondaryActionIcon = secondaryAction.icon;
   const operations = buildWorkbenchOperations(item, context, meta);
+  const filters = meta.filters?.length ? meta.filters : ['全部', ...context.stats.map((stat) => stat.label)];
 
   return (
     <section className="workspace-product-page" aria-label={`${item.label}产品页`}>
@@ -2346,6 +2424,13 @@ function WorkbenchProductPage({
           <h2>{mock.title}</h2>
           <p>{meta.position}</p>
           <small>{mock.summary}</small>
+          <figure className="workspace-product-visual-card">
+            <img src={meta.imageSrc} alt={`${item.label} IMAGE2 页面级产品图`} loading="eager" decoding="async" />
+            <figcaption>
+              <strong>{meta.stitchScreen ?? `${item.id}-workbench-screen`}</strong>
+              <small>{meta.assetPurpose ?? '页面级 IMAGE2 资产，服务 Workbench 内容区业务操作。'}</small>
+            </figcaption>
+          </figure>
           <div className="workspace-product-metrics" aria-label={`${item.label}关键指标`}>
             {context.stats.map((stat) => (
               <div key={stat.label}>
@@ -2378,9 +2463,8 @@ function WorkbenchProductPage({
             </button>
           </div>
           <div className="workspace-product-filter-row" aria-label={`${item.label}筛选条件`}>
-            <span>全部</span>
-            {context.stats.map((stat) => (
-              <span key={stat.label}>{stat.label}</span>
+            {filters.map((filter, index) => (
+              <span key={filter} className={index === 0 ? 'is-current' : ''}>{filter}</span>
             ))}
           </div>
           <div className="workspace-product-console-list" aria-label={`${item.label}可处理业务队列`}>
@@ -2426,6 +2510,50 @@ function WorkbenchProductPage({
           );
         })}
       </section>
+
+      {meta.lanes?.length || meta.insights?.length ? (
+        <section className="workspace-product-ia" aria-label={`${item.label}页面信息架构`}>
+          {meta.lanes?.length ? (
+            <div className="workspace-product-lanes">
+              <div className="workspace-product-panel-head">
+                <span>业务泳道</span>
+                <strong>可处理</strong>
+              </div>
+              <div className="workspace-product-lane-grid">
+                {meta.lanes.map((lane) => (
+                  <button
+                    key={lane.label}
+                    type="button"
+                    className={`is-${lane.tone}`}
+                    onClick={() => onPreviewAction(primaryAction)}
+                  >
+                    <span>{lane.label}</span>
+                    <strong>{lane.value}</strong>
+                    <small>{lane.note}</small>
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : null}
+          {meta.insights?.length ? (
+            <div className="workspace-product-insights">
+              <div className="workspace-product-panel-head">
+                <span>运营洞察</span>
+                <strong>带上下文</strong>
+              </div>
+              <div className="workspace-product-insight-grid">
+                {meta.insights.map((insight) => (
+                  <div key={insight.label}>
+                    <span>{insight.label}</span>
+                    <strong>{insight.value}</strong>
+                    <small>{insight.note}</small>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : null}
+        </section>
+      ) : null}
 
       <div className="workspace-product-grid">
         <section className="workspace-product-panel workspace-product-list" aria-label={`${item.label}业务承接清单`}>
@@ -3987,8 +4115,9 @@ export default function WorkspacePreviewPage() {
   );
 
   const activeContext = menuContextById[activeItem.id] ?? menuContextById.home;
-  const activeModuleMock = moduleMockByMenuId[activeItem.id];
-  const activeProductPageMeta = isWorkbenchRoute ? workbenchProductPageMetaByMenuId[activeItem.id] : undefined;
+  const shouldRenderMenuModule = !isWorkbenchRoute || Boolean(routeMenuId);
+  const activeModuleMock = shouldRenderMenuModule ? moduleMockByMenuId[activeItem.id] : undefined;
+  const activeProductPageMeta = isWorkbenchRoute && routeMenuId ? workbenchProductPageMetaByMenuId[activeItem.id] : undefined;
   const canAccessRoutePreview = routePreview
     ? canAccessRoute(getRoutePathname(routePreview.routeTarget), user)
     : true;
@@ -3998,7 +4127,7 @@ export default function WorkspacePreviewPage() {
     setScreenPreview(null);
 
     if (isWorkbenchRoute && page !== 'stitch') {
-      navigate(buildWorkbenchPath(page, getDefaultMenuIdForPage(page, true)));
+      navigate(buildWorkbenchPath(page));
       return;
     }
 

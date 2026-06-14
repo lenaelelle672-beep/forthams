@@ -20,6 +20,8 @@ describe('Workbench visual asset contract', () => {
       ...helperReferences('moduleAsset', `${assetBase}/asset-kit-v4/modules`),
       ...helperReferences('assetKitV4', `${assetBase}/asset-kit-v4`),
       ...helperReferences('detailAsset', `${assetBase}/asset-kit-v5/details`),
+      ...helperReferences('moduleV6Asset', `${assetBase}/asset-kit-v6/modules`),
+      ...helperReferences('detailV6Asset', `${assetBase}/asset-kit-v6/details`),
       ...helperReferences('stitchAsset', `${assetBase}/stitch-suite`),
       `${assetBase}/scene/login5-stitch-factory-cn-v4.png`,
       `${assetBase}/stitch-suite/login5-stitch-refresh.png`,
@@ -49,6 +51,29 @@ describe('Workbench visual asset contract', () => {
       expect(size.height).toBeGreaterThanOrEqual(1024);
       expect(Math.abs(size.width - size.height)).toBeLessThanOrEqual(4);
     }
+
+    for (const assetPath of listAssets('/mock/workspace-preview/asset-kit-v6/modules')) {
+      expect(basename(assetPath)).toMatch(/^module-[a-z0-9-]+\.png$/);
+      const size = readImageSize(assetPath);
+      expect(size.type).toBe('png');
+      expect(size.width).toBeGreaterThanOrEqual(1024);
+      expect(size.height).toBeGreaterThanOrEqual(640);
+      expect(size.width).toBeGreaterThan(size.height);
+    }
+
+    for (const assetPath of listAssets('/mock/workspace-preview/asset-kit-v6/details')) {
+      expect(basename(assetPath)).toMatch(/^[a-z0-9-]+-v1\.png$/);
+      const size = readImageSize(assetPath);
+      expect(size.type).toBe('png');
+      expect(size.width).toBeGreaterThanOrEqual(1024);
+      expect(size.height).toBeGreaterThanOrEqual(1024);
+    }
+
+    expect(existsSync(toPublicFile('/mock/workspace-preview/asset-kit-v6/modules/module-flow-todo-console.png'))).toBe(true);
+    expect(existsSync(toPublicFile('/mock/workspace-preview/asset-kit-v6/modules/module-device-ops-console.png'))).toBe(true);
+    expect(existsSync(toPublicFile('/mock/workspace-preview/asset-kit-v6/modules/module-workorder-dispatch-console.png'))).toBe(true);
+    expect(existsSync(toPublicFile('/mock/workspace-preview/asset-kit-v6/modules/module-report-analysis-console.png'))).toBe(true);
+    expect(existsSync(toPublicFile('/mock/workspace-preview/asset-kit-v6/modules/module-alert-center-console.png'))).toBe(true);
 
     const loginHero = readImageSize('/mock/workspace-preview/scene/login5-stitch-factory-cn-v4.png');
     expect(loginHero.width).toBeGreaterThanOrEqual(1600);
@@ -110,6 +135,32 @@ describe('Workbench visual asset contract', () => {
     expect(deliveryManifest.connectedRoutes.designBoardDeepLink).toBe('/workspace-preview?tab=stitch');
     expect(deliveryManifest.stitchIntegration.authEvidence.mcpToolListProjects).toContain('Auth required');
   });
+
+  it('binds Round 1 Workbench product pages to IMAGE2 v6 and Stitch page-level evidence', () => {
+    const p0Map = deliveryManifest.workbenchP0PageAssetMap;
+    const expectedNames = ['流程待办', '设备管理', '工单管理', '报表分析', '告警中心'];
+
+    expect(p0Map).toHaveLength(expectedNames.length);
+    expect(p0Map.map((item) => item.name)).toEqual(expectedNames);
+
+    for (const item of p0Map) {
+      expect(item.route).toMatch(/^\/fixed-assets\/workbench/);
+      expect(item.stitchScreen).toMatch(/^workbench-menu-(todo|device|orders|report|alert)-v1$/);
+      expect(item.stitchScreenshot).toMatch(/^\/mock\/workspace-preview\/stitch-suite\/workbench-p0\/workbench-menu-.+-v1\.png$/);
+      expect(item.image2ModuleAsset).toMatch(/^\/mock\/workspace-preview\/asset-kit-v6\/modules\/module-.+\.png$/);
+      expect(item.businessUse.length).toBeGreaterThan(20);
+      expect(existsSync(toPublicFile(item.stitchScreenshot)), `${item.name}: ${item.stitchScreenshot}`).toBe(true);
+      expect(existsSync(toPublicFile(item.image2ModuleAsset)), `${item.name}: ${item.image2ModuleAsset}`).toBe(true);
+
+      for (const assetPath of item.detailAssets) {
+        expect(assetPath).toMatch(/^\/mock\/workspace-preview\/asset-kit-v6\/details\/.+-v1\.png$/);
+        expect(existsSync(toPublicFile(assetPath)), `${item.name}: ${assetPath}`).toBe(true);
+      }
+    }
+
+    expect(deliveryManifest.stitchAuthRetryPolicy.rule).toContain('every 10 minutes');
+    expect(deliveryManifest.stitchIntegration.authEvidence.workbenchP0BatchGenerate).toContain('five page-level screens');
+  });
 });
 
 type WorkbenchAssetBinding = {
@@ -130,9 +181,22 @@ type DeliveryManifest = {
     workbenchSections: Record<string, string>;
   };
   formalWorkbenchAssetMap: WorkbenchAssetBinding[];
+  workbenchP0PageAssetMap: Array<{
+    name: string;
+    route: string;
+    stitchScreen: string;
+    stitchScreenshot: string;
+    image2ModuleAsset: string;
+    detailAssets: string[];
+    businessUse: string;
+  }>;
+  stitchAuthRetryPolicy: {
+    rule: string;
+  };
   stitchIntegration: {
     authEvidence: {
       mcpToolListProjects: string;
+      workbenchP0BatchGenerate: string;
     };
   };
 };

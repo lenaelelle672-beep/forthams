@@ -10,6 +10,8 @@ This blueprint recalibrates the forthAMS Workbench formal-entry work. The existi
 
 New integrated pages and functions must be designed as real Workbench content-area experiences with IMAGE2 and Stitch page-level design artifacts before React implementation. They must not be reduced to route lists, detached contact sheets, static posters, or isolated demo pages.
 
+Product navigation decision: the four top tabs are independent platform scene views, not one-to-one mappings of the left navigation. The left navigation is the formal business first-level menu set; deeper capabilities such as create, query, detail, dispatch, export, subscription, approval, and maintenance should appear as second-level pages, embedded modules, or drawers under the relevant left-nav menu.
+
 ## Evidence Sources
 
 | Evidence | Path |
@@ -38,8 +40,8 @@ New integrated pages and functions must be designed as real Workbench content-ar
 | Public preview | `/workspace-preview` remains public design/demo preview only. It is not the formal business entry. | Improve design governance and artifact review only. |
 | Global nav | `资产运营中枢` stays before `旧版仪表板` in the global overview group. | Minor icon or wording polish only. |
 | Workbench shell | Existing dark brand/top bar, left navigation, context strip, and light-blue B-end layout stay. | Improve density, hover/focus, responsive behavior, and microstructure. |
-| Top tabs | Keep `智能制造总览`, `数据监控中心`, `资产运维中心`, `安全态势工作台`. | Improve in-tab content and operation affordances. |
-| Left nav | Keep the 12 formal business menus below. Do not add duplicate first-level menus. | Add second-level blocks, quick actions, drawers, and state handling inside content. |
+| Top tabs | Keep `智能制造总览`, `数据监控中心`, `资产运维中心`, `安全态势工作台` as independent scene views. Do not replace these approved main pages with left-menu product pages. | Improve only when necessary to expose entry points or context. |
+| Left nav | Keep the 12 formal business menus below. Do not add duplicate first-level menus. | Add second-level pages, embedded modules, quick actions, drawers, and state handling inside content. |
 | Formal/preview split | The formal route must not expose `设计稿` or Stitch production workflow. | Formal content may consume final IMAGE2/Stitch assets and evidence. |
 | Permissions | Do not bypass `ProtectedRoute`, `canAccessRoute`, or route-level permission rules. | Add Workbench-internal button/menu permission matrix where useful. |
 | Mobile scope | Do not touch `frontend/src/pages/mobile/**` or mobile routes. | None in this round. |

@@ -26,16 +26,20 @@ These rules apply to every round.
 
 1. Keep the existing Workbench shell, top bar, left navigation, four top tabs, route structure, and confirmed light-blue B-end visual system.
 2. Do not rebuild the Workbench shell. Only improve the content area, action flows, states, assets, and evidence.
-3. Do not touch `frontend/src/pages/mobile/**` or mobile routes.
-4. Do not add duplicate first-level menus such as `报表大屏`, `平台配置`, or `维保计划`.
-5. Do not use contact sheets, asset boards, login images, or static posters as page bodies.
-6. New integrated pages must be designed through IMAGE2 assets plus Stitch page-level screens before React landing.
-7. Every implemented page must support create/launch, search/filter, display/list, open detail, edit/maintain, no-permission feedback, empty/error states, and dangerous-action disabled or confirmation behavior.
-8. Reuse existing business routes and APIs as real landings after Workbench preview/drawer interactions. Do not duplicate existing CRUD modules inside Workbench.
-9. Do not output, search for, reuse, or commit token/key/password/secret values.
-10. Before editing functions, classes, or methods, follow `AGENTS.md` and run GitNexus impact analysis.
-11. Before committing, run `gitnexus_detect_changes(scope=staged)`.
-12. Every round must end with `PASS`, `PARTIAL`, or `FAIL`, with evidence and remaining gaps.
+3. Keep the four top-tab primary pages as the approved main views. New product work should land as left-navigation business pages, second-level pages, drawers, or embedded modules unless a top-tab page must change to expose a necessary entry.
+4. Treat top tabs as platform scene views and left navigation as formal business first-level menus. They may cross-link, but must not be forced into one-to-one mapping.
+5. Put create/query/detail/dispatch/export/subscription/approval/maintenance as second-level pages, drawers, or embedded modules under the relevant left-nav menu.
+6. Do not touch `frontend/src/pages/mobile/**` or mobile routes.
+7. Do not add duplicate first-level menus such as `报表大屏`, `平台配置`, or `维保计划`.
+8. Do not use contact sheets, asset boards, login images, or static posters as page bodies.
+9. New integrated pages must be designed through IMAGE2 assets plus Stitch page-level screens before React landing.
+10. Every implemented page must support create/launch, search/filter, display/list, open detail, edit/maintain, no-permission feedback, empty/error states, and dangerous-action disabled or confirmation behavior.
+11. Reuse existing business routes and APIs as real landings after Workbench preview/drawer interactions. Do not duplicate existing CRUD modules inside Workbench.
+12. Do not output, search for, reuse, or commit token/key/password/secret values.
+13. If Stitch cannot connect or returns auth errors, record a redacted blocker, then re-run redacted auth checks every 10 minutes until Stitch access is healthy. After access recovers, continue the pending Stitch page-level generation instead of replacing it with docs-only evidence.
+14. Before editing functions, classes, or methods, follow `AGENTS.md` and run GitNexus impact analysis.
+15. Before committing, run `gitnexus_detect_changes(scope=staged)`.
+16. Every round must end with `PASS`, `PARTIAL`, or `FAIL`, with evidence and remaining gaps.
 
 ## Round 1
 
@@ -85,10 +89,11 @@ Required sequence:
    - `npm run stitch:auth`
    - `npm run stitch:projects`
    - `npm run stitch:proxy-check`
-8. Record Stitch evidence or the exact auth blocker without secrets.
-9. Update manifest mapping so each P0 menu maps to its IMAGE2 and Stitch evidence.
-10. Implement React content-area components only inside existing Workbench structure.
-11. Each page must include:
+8. If Stitch is still unavailable, record the exact auth/connectivity blocker without secrets, wait 10 minutes, then repeat the same redacted Stitch auth checks. Continue this loop until Stitch can list projects/generate screens, then resume page-level generation.
+9. Record Stitch evidence or the exact auth blocker without secrets.
+10. Update manifest mapping so each P0 menu maps to its IMAGE2 and Stitch evidence.
+11. Implement React content-area components only inside existing Workbench structure.
+12. Each page must include:
     - page title and business positioning
     - IMAGE2 visual integrated into the operation layout
     - operation console
@@ -101,14 +106,14 @@ Required sequence:
     - error state
     - no-permission state
     - dangerous action disabled or confirmation behavior
-12. Browser-verify these routes:
+13. Browser-verify these routes:
     - `/fixed-assets/workbench?menu=todo`
     - `/fixed-assets/workbench/assets?menu=device`
     - `/fixed-assets/workbench/assets?menu=orders`
     - `/fixed-assets/workbench/analytics?menu=report`
     - `/fixed-assets/workbench/security?menu=alarm`
-13. Run targeted Workbench tests, browser regression, `npm run build`, and `gitnexus_detect_changes(scope=staged)`.
-14. Commit and push to `origin/codex/workbench-platform-entry`.
+14. Run targeted Workbench tests, browser regression, `npm run build`, and `gitnexus_detect_changes(scope=staged)`.
+15. Commit and push to `origin/codex/workbench-platform-entry`.
 
 Expected commit message:
 
@@ -172,7 +177,7 @@ Required sequence:
    - `usage-flow-return-v1.png`
    - `config-governance-v1.png`
    - `spare-maintenance-link-v1.png`
-7. Generate Stitch page-level screens or embedded module screens for remaining menus/modules.
+7. Generate Stitch page-level screens or embedded module screens for remaining menus/modules. If Stitch is unavailable, use the 10-minute redacted auth-check loop from Global Rules until access recovers, then continue generation.
 8. Land React content-area improvements without changing the Workbench shell.
 9. Expand browser regression to all 12 formal menus.
 10. Add or update tests/contracts so 12 menus have:
