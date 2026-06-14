@@ -161,6 +161,27 @@ describe('Workbench visual asset contract', () => {
     expect(deliveryManifest.stitchAuthRetryPolicy.rule).toContain('every 10 minutes');
     expect(deliveryManifest.stitchIntegration.authEvidence.workbenchP0BatchGenerate).toContain('five page-level screens');
   });
+
+  it('binds Round 2 remaining Workbench menus to IMAGE2 v6 and Stitch page-level evidence', () => {
+    const round2Map = deliveryManifest.workbenchRound2PageAssetMap;
+    const expectedNames = ['运营首页', '资产总览', '巡检管理', '备件管理', '数据监控', '组织策略', '基础维护'];
+
+    expect(round2Map).toHaveLength(expectedNames.length);
+    expect(round2Map.map((item) => item.name)).toEqual(expectedNames);
+
+    for (const item of round2Map) {
+      expect(item.route).toMatch(/^\/fixed-assets\/workbench/);
+      expect(item.stitchScreen).toMatch(/^workbench-menu-(home|asset|inspection|spares|energy|policy|settings)-v1$/);
+      expect(item.stitchScreenshot).toMatch(/^\/mock\/workspace-preview\/stitch-suite\/workbench-round2\/workbench-menu-.+-v1\.png$/);
+      expect(item.image2ModuleAsset).toMatch(/^\/mock\/workspace-preview\/asset-kit-v6\/modules\/module-.+\.png$/);
+      expect(item.secondLevelCapabilities.length).toBeGreaterThanOrEqual(3);
+      expect(item.businessUse.length).toBeGreaterThan(20);
+      expect(existsSync(toPublicFile(item.stitchScreenshot)), `${item.name}: ${item.stitchScreenshot}`).toBe(true);
+      expect(existsSync(toPublicFile(item.image2ModuleAsset)), `${item.name}: ${item.image2ModuleAsset}`).toBe(true);
+    }
+
+    expect(deliveryManifest.stitchIntegration.authEvidence.workbenchRound2BatchGenerate).toContain('seven page-level screens');
+  });
 });
 
 type WorkbenchAssetBinding = {
@@ -190,6 +211,15 @@ type DeliveryManifest = {
     detailAssets: string[];
     businessUse: string;
   }>;
+  workbenchRound2PageAssetMap: Array<{
+    name: string;
+    route: string;
+    stitchScreen: string;
+    stitchScreenshot: string;
+    image2ModuleAsset: string;
+    secondLevelCapabilities: string[];
+    businessUse: string;
+  }>;
   stitchAuthRetryPolicy: {
     rule: string;
   };
@@ -197,6 +227,7 @@ type DeliveryManifest = {
     authEvidence: {
       mcpToolListProjects: string;
       workbenchP0BatchGenerate: string;
+      workbenchRound2BatchGenerate: string;
     };
   };
 };

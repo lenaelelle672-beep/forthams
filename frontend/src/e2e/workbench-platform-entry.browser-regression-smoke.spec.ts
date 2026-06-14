@@ -202,11 +202,25 @@ test.describe('Workbench 正式入口浏览器回归', () => {
 
     const pageCases = [
       {
+        route: '/fixed-assets/workbench?menu=home',
+        pageLabel: '运营首页',
+        heading: '资产运营总览与快捷任务',
+        action: '新建预测工单',
+        targetIncludes: ['/workorders/new?', 'source=quick-action', 'riskScore=91'],
+      },
+      {
         route: '/fixed-assets/workbench?menu=todo',
         pageLabel: '流程待办',
         heading: '审批与运维待办队列',
         action: '处理审批队列',
         targetIncludes: ['/approvals?source=workbench&status=PENDING'],
+      },
+      {
+        route: '/fixed-assets/workbench/assets?menu=asset',
+        pageLabel: '资产总览',
+        heading: '资产健康与生命周期总览',
+        action: '发起资产调拨',
+        targetIncludes: ['/disposals/transfer/new?source=workbench&assetId=201'],
       },
       {
         route: '/fixed-assets/workbench/assets?menu=device',
@@ -223,6 +237,27 @@ test.describe('Workbench 正式入口浏览器回归', () => {
         targetIncludes: ['/workorders/new?', 'source=quick-action', 'riskScore=92'],
       },
       {
+        route: '/fixed-assets/workbench/assets?menu=inspection',
+        pageLabel: '巡检管理',
+        heading: '点检路线与异常复核',
+        action: '转派巡检异常',
+        targetIncludes: ['/workorders/new?', 'source=asset-risk', 'riskState='],
+      },
+      {
+        route: '/fixed-assets/workbench/assets?menu=spares',
+        pageLabel: '备件管理',
+        heading: '备件保障与低储预警',
+        action: '采购申请',
+        targetIncludes: ['/spare-parts/new?source=workbench&mode=purchase&stock=LOW'],
+      },
+      {
+        route: '/fixed-assets/workbench/analytics?menu=energy',
+        pageLabel: '数据监控',
+        heading: 'MES 与 IoT 数据链路',
+        action: '重试采集任务',
+        targetIncludes: ['/energy?source=workbench&scope=data-monitoring&event=delay&retry=true'],
+      },
+      {
         route: '/fixed-assets/workbench/analytics?menu=report',
         pageLabel: '报表分析',
         heading: '经营分析与审计报表',
@@ -235,6 +270,20 @@ test.describe('Workbench 正式入口浏览器回归', () => {
         heading: '安全告警研判处置',
         action: '转派处置工单',
         targetIncludes: ['/workorders/new?', 'source=asset-risk', 'riskState=', 'priority=CRITICAL'],
+      },
+      {
+        route: '/fixed-assets/workbench/security?menu=policy',
+        pageLabel: '组织策略',
+        heading: '风险规则与策略治理',
+        action: '新建风险评估',
+        targetIncludes: ['/risk-assessments/new?source=workbench&scope=policy'],
+      },
+      {
+        route: '/fixed-assets/workbench/assets?menu=settings',
+        pageLabel: '基础维护',
+        heading: '组织与集成配置',
+        action: '维护资产分类',
+        targetIncludes: ['/categories?source=workbench'],
       },
     ];
 
