@@ -45,6 +45,6 @@ export const DEMO_ACCOUNTS: DemoAccount[] = isDev
 export const FEATURES = [
   { title: '统一资产台账', description: '资产、位置、供应商与责任人信息在一个视图中保持同步' },
   { title: '审批流程闭环', description: '处置、折旧、报废等关键操作进入可追踪的审批链路' },
-  { title: '实时运营看板', description: '登录后直达仪表板，快速识别待办、风险和资产价值变化' },
+  { title: '实时运营看板', description: '登录后直达资产运营中枢，快速识别待办、风险和资产价值变化' },
   { title: '审计合规留痕', description: '全链路操作日志审计，满足等保与行业合规要求' },
 ] as const;

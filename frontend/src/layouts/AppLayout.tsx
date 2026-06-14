@@ -66,7 +66,7 @@ const NAV_GROUPS: NavGroup[] = [
   {
     group: '概览',
     items: [
-      { path: '/dashboard', label: '仪表板', icon: LayoutDashboard },
+      { path: '/dashboard', label: '旧版仪表板', icon: LayoutDashboard },
       { path: '/analytics', label: '数据分析', icon: BarChart3 },
     ],
   },
@@ -465,7 +465,7 @@ export default function AppLayout() {
                       className="flex w-full items-center gap-2.5 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
                     >
                       <Settings className="w-4 h-4 text-slate-400" />
-                      系统设置
+                      基础维护
                     </button>
                   </div>
                   {/* 退出 */}

@@ -114,8 +114,9 @@ describe('GlobalSearch', () => {
     triggerCmdK();
 
     await waitFor(() => {
-      const dashboard = screen.queryByText('仪表板');
-      expect(dashboard).toBeTruthy();
+      const workbench = screen.queryByText('资产运营中枢');
+      const legacyDashboard = screen.queryByText('旧版仪表板');
+      expect(workbench && legacyDashboard).toBeTruthy();
     }, { timeout: 2000 });
   });
 
@@ -125,9 +126,9 @@ describe('GlobalSearch', () => {
     triggerCmdK();
 
     await waitFor(() => {
-      const dashboard = screen.queryByText('仪表板');
-      if (dashboard) {
-        fireEvent.click(dashboard);
+      const workbench = screen.queryByText('资产运营中枢');
+      if (workbench) {
+        fireEvent.click(workbench);
       }
     }, { timeout: 2000 });
 

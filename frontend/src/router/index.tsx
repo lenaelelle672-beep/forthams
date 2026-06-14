@@ -11,8 +11,9 @@
 
 import React, { Component, Suspense, useEffect, type ErrorInfo, type ReactNode } from 'react';
 import { createBrowserRouter, Navigate, Outlet, useLocation, useNavigate } from 'react-router';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth, type AuthUser } from '@/context/AuthContext';
 import ForbiddenPage from '@/pages/ForbiddenPage';
+import { canAccessRoute } from '@/utils/routePermissions';
 
 // ── Lazy 加载错误边界 ─────────────────────────────────────────────────────
 interface ErrorBoundaryProps { children: ReactNode; }
@@ -68,9 +69,34 @@ const S = (C: React.LazyExoticComponent<any>) => (
   <LazyErrorBoundary><Suspense fallback={<PageLoader />}><C /></Suspense></LazyErrorBoundary>
 );
 
+function readStoredAuthUser(): AuthUser | null {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
+  const storedUser = window.sessionStorage.getItem('user_info') || window.localStorage.getItem('user_info');
+  if (!storedUser) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(storedUser) as AuthUser;
+  } catch {
+    return null;
+  }
+}
+
+function readStoredAuthToken() {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
+  return window.sessionStorage.getItem('auth_token') || window.localStorage.getItem('auth_token');
+}
+
 // ── 路由守卫 ──────────────────────────────────────────────────────────────────
 function ProtectedRoute() {
-  const { isAuthenticated, loading } = useAuth();
+  const { user, isAuthenticated, loading } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -90,12 +116,16 @@ function ProtectedRoute() {
     return <PageLoader />;
   }
 
+  const storedToken = readStoredAuthToken();
+  const permissionUser = user ?? readStoredAuthUser();
+  const routeTarget = `${location.pathname}${location.search}`;
+  if (!canAccessRoute(routeTarget, permissionUser)) {
+    return <ForbiddenPage />;
+  }
+
   if (!isAuthenticated) {
     // 双保险：同步检查 storage（覆盖 LoginPage 直接写 sessionStorage 或测试 seed 场景）
-    const token = typeof window !== 'undefined'
-      ? (window.sessionStorage.getItem('auth_token') || window.localStorage.getItem('auth_token'))
-      : null;
-    if (token) {
+    if (storedToken) {
       return <Outlet />;
     }
     return <Navigate to="/login" state={{ from: location }} replace />;
@@ -309,17 +339,9 @@ const router = createBrowserRouter([
     path: '/sso-callback',
     element: S(SsoCallbackPage),
   },
-  // ── 桌面工作台预览（公开 Demo，不套 AppLayout，不影响正式 Dashboard）──────────────
+  // ── 桌面工作台设计预览（公开 Demo，不作为正式业务入口）────────────────────────────
   {
     path: '/workspace-preview',
-    element: S(WorkspacePreviewPage),
-  },
-  {
-    path: '/fixed-assets/workbench',
-    element: S(WorkspacePreviewPage),
-  },
-  {
-    path: '/fixed-assets/workbench/:section',
     element: S(WorkspacePreviewPage),
   },
   // ── 供应商门户（无需认证，自带登录逻辑） ──────────────────────────────────────────────
@@ -356,12 +378,15 @@ const router = createBrowserRouter([
       // 大屏路由（全屏无侧边栏，需要 ADMIN 或 SUPER_ADMIN 角色）
       { path: 'bigscreen',    element: <PermissionGuard roles={['ADMIN', 'SUPER_ADMIN']}>{S(BigScreenPage)}</PermissionGuard> },
       { path: 'bigscreen-3d', element: <PermissionGuard roles={['ADMIN', 'SUPER_ADMIN']}>{S(BigScreen3DPage)}</PermissionGuard> },
+      // 固定资产平台正式工作台入口（受保护，不套旧 AppLayout）
+      { path: 'fixed-assets/workbench', element: S(WorkspacePreviewPage) },
+      { path: 'fixed-assets/workbench/:section', element: S(WorkspacePreviewPage) },
       {
         element: S(AppLayout),
         children: [
-          { index: true, element: <Navigate to="/dashboard" replace /> },
+          { index: true, element: <Navigate to="/fixed-assets/workbench?menu=home" replace /> },
 
-          // 仪表板
+          // 旧版仪表板（过渡期保留）
           { path: 'dashboard', element: S(DashboardPage) },
           { path: 'profile',   element: S(UserProfilePage) },
 

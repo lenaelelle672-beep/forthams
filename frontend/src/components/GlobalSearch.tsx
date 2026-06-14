@@ -29,7 +29,8 @@ interface SearchablePage {
 
 const SEARCHABLE_PAGES: SearchablePage[] = [
   // 概览
-  { path: '/dashboard',   label: '仪表板',     group: '概览' },
+  { path: '/fixed-assets/workbench?menu=home', label: '资产运营中枢', group: '概览' },
+  { path: '/dashboard',   label: '旧版仪表板', group: '概览' },
   { path: '/analytics',   label: '数据分析',    group: '概览' },
   // 资产管理
   { path: '/assets',             label: '资产台账',   group: '资产管理' },

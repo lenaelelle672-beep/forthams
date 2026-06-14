@@ -208,7 +208,7 @@ export default function Login4Page() {
             ) : null}
 
             <footer className="login5-footer">
-              <a href="/fixed-assets/workbench">
+              <a href="/workspace-preview">
                 查看工作台预览
                 <ArrowRight />
               </a>
@@ -937,7 +937,7 @@ export default function Login4Page() {
             ) : null}
 
             <footer className="login4-pro-footer">
-              <a href="/fixed-assets/workbench">
+              <a href="/workspace-preview">
                 查看工作台预览
                 <ArrowRight />
               </a>

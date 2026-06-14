@@ -38,7 +38,7 @@ export default function OAuth2CallbackPage() {
       permissions: [],
     }));
 
-    navigate('/dashboard', { replace: true });
+    navigate('/fixed-assets/workbench?menu=home', { replace: true });
   }, [searchParams, navigate]);
 
   if (error) {

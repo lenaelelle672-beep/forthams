@@ -28,7 +28,7 @@ export default function SsoCallbackPage() {
       permissions: [],
     }));
 
-    navigate('/dashboard', { replace: true });
+    navigate('/fixed-assets/workbench?menu=home', { replace: true });
   }, [searchParams, navigate]);
 
   if (error) {

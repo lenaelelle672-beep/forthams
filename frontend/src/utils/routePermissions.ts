@@ -12,6 +12,7 @@ type RoutePermissionRule = {
 const SUPER_ROLES = new Set(['ADMIN', 'SUPER_ADMIN']);
 
 const ROUTE_PERMISSION_RULES: RoutePermissionRule[] = [
+  { prefix: '/fixed-assets/workbench', any: ['dashboard:query', 'asset:ledger:query'] },
   { prefix: '/dashboard', any: ['dashboard:query'] },
   { exact: '/analytics/reliability', any: ['analytics:reliability:query'] },
   { exact: '/analytics/tco', any: ['tco:query'] },
@@ -94,10 +95,11 @@ const ROUTE_PERMISSION_RULES: RoutePermissionRule[] = [
 ];
 
 function normalizePath(path: string) {
-  if (path.length > 1 && path.endsWith('/')) {
-    return path.slice(0, -1);
+  const pathname = path.split(/[?#]/)[0] || '/';
+  if (pathname.length > 1 && pathname.endsWith('/')) {
+    return pathname.slice(0, -1);
   }
-  return path;
+  return pathname;
 }
 
 function hasSuperRole(user: PermissionUser) {

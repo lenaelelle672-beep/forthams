@@ -15,6 +15,12 @@ describe('routePermissions', () => {
     expect(canAccessRoute('/workflows', { roles: ['USER'], permissions: ['asset:ledger:query'] })).toBe(false);
   });
 
+  it('protects the formal Workbench entry and ignores query strings when matching rules', () => {
+    expect(canAccessRoute('/fixed-assets/workbench?menu=home', { roles: ['USER'], permissions: ['asset:ledger:query'] })).toBe(true);
+    expect(canAccessRoute('/fixed-assets/workbench/assets?menu=asset', { roles: ['USER'], permissions: ['dashboard:query'] })).toBe(true);
+    expect(canAccessRoute('/fixed-assets/workbench/security?menu=alarm', { roles: ['USER'], permissions: ['report:query'] })).toBe(false);
+  });
+
   it('requires workflow edit permission for designer route', () => {
     expect(canAccessRoute('/workflow-designer', { roles: ['USER'], permissions: ['workflow:definition:edit'] })).toBe(true);
     expect(canAccessRoute('/workflow-designer', { roles: ['USER'], permissions: ['workflow:definition:query'] })).toBe(false);

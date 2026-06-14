@@ -52,7 +52,7 @@ export function useLoginForm() {
       } else {
         localStorage.removeItem('remembered_username');
       }
-      navigate('/dashboard', { replace: true });
+      navigate('/fixed-assets/workbench?menu=home', { replace: true });
     },
     onError: (err: any) => {
       const msg = err?.message || '网络错误，请检查网络后重试';
