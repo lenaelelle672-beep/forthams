@@ -160,6 +160,7 @@ Playwright browser regression evidence:
 | Legacy dashboard transition | `/dashboard` exposes `资产运营中枢` and `旧版仪表板`; clicking `资产运营中枢` lands on `/fixed-assets/workbench?menu=home` |
 | Workbench shell | Formal Workbench renders `运营首页`, `流程待办`, `基础维护`, the four approved top tabs, and excludes `报表大屏`, `平台配置`, `维保计划` |
 | Business action closure | `查看流程待办` opens the operation drawer with `/approvals?source=workbench&status=PENDING`, prefill fields, and enabled primary navigation |
+| Full action matrix preview | Asset, device, work order, inspection, spare, data, report, alert, policy, and basic-maintenance actions open drawers with real targets, prefill fields, and enabled primary actions |
 | No-permission handling | A user with only Workbench access can open Workbench but sees the report drawer warning and disabled `暂无权限` primary action for `/reports?source=workbench&view=operations` |
 | Route guard | A user with `report:query` but without Workbench permissions gets `无访问权限`; the Workbench shell does not render |
 

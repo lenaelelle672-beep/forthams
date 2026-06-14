@@ -111,6 +111,86 @@ test.describe('Workbench 正式入口浏览器回归', () => {
     expect(errors).toEqual([]);
   });
 
+  test('Workbench 左侧菜单关键动作均展示真实目标和预填上下文', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await seedAuthenticatedSession(page, operationsUser);
+
+    const actionCases = [
+      {
+        route: '/fixed-assets/workbench/assets?menu=asset',
+        action: '查看资产清单',
+        targetIncludes: ['/assets?source=workbench&view=asset-overview'],
+      },
+      {
+        route: '/fixed-assets/workbench/assets?menu=device',
+        action: '查看设备状态',
+        targetIncludes: ['/equipment?source=workbench'],
+      },
+      {
+        route: '/fixed-assets/workbench/assets?menu=orders',
+        action: '查看预测工单',
+        targetIncludes: ['/workorders/new?', 'source=quick-action', 'riskScore=92', 'priority=HIGH'],
+      },
+      {
+        route: '/fixed-assets/workbench/assets?menu=inspection',
+        action: '查看巡检计划',
+        targetIncludes: ['/inspections/new?', 'source=quick-inspection', 'assetId=201'],
+      },
+      {
+        route: '/fixed-assets/workbench/assets?menu=spares',
+        action: '查看备件库存',
+        targetIncludes: ['/spare-parts/new?', 'source=spare-request', 'partNo=SP-TEMP-201'],
+      },
+      {
+        route: '/fixed-assets/workbench/analytics?menu=energy',
+        action: '查看数据链路',
+        targetIncludes: ['/energy?source=workbench&scope=data-monitoring'],
+      },
+      {
+        route: '/fixed-assets/workbench/analytics?menu=report',
+        action: '生成经营报表',
+        targetIncludes: ['/reports?source=workbench&view=operations'],
+      },
+      {
+        route: '/fixed-assets/workbench/security?menu=alarm',
+        action: '查看告警队列',
+        targetIncludes: ['/notifications?', 'source=quick-alert', 'severity='],
+      },
+      {
+        route: '/fixed-assets/workbench/security?menu=policy',
+        action: '查看策略规则',
+        targetIncludes: ['/risk-matrix?source=workbench&scope=policy'],
+      },
+      {
+        route: '/fixed-assets/workbench/assets?menu=settings',
+        action: '打开基础维护',
+        targetIncludes: ['/settings/sysconfig?source=workbench'],
+      },
+    ];
+
+    for (const actionCase of actionCases) {
+      await page.goto(actionCase.route);
+      await page.waitForLoadState('networkidle');
+
+      await page.getByRole('button', { name: actionCase.action }).click();
+      const dialog = page.getByRole('dialog', { name: actionCase.action });
+      await expect(dialog).toBeVisible();
+      await expect(dialog.getByText('预填字段')).toBeVisible();
+
+      const routeTarget = await dialog.locator('.workspace-action-route strong').innerText();
+      for (const expectedFragment of actionCase.targetIncludes) {
+        expect(routeTarget).toContain(expectedFragment);
+      }
+
+      await expect(dialog.getByRole('button', { name: /进入业务页面|进入处理/ })).toBeEnabled();
+      await page.keyboard.press('Escape');
+      await expect(dialog).toHaveCount(0);
+    }
+
+    await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
+    expect(errors).toEqual([]);
+  });
+
   test('Workbench 抽屉对缺少业务权限的目标给出禁用反馈', async ({ page }) => {
     const errors = collectBrowserErrors(page);
     await seedAuthenticatedSession(page, workbenchOnlyUser);
