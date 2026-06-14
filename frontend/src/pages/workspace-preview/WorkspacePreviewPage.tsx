@@ -6556,7 +6556,7 @@ function WorkbenchAssetPage({
   return (
     <section className="workspace-orders-page workspace-asset-page" aria-label={`${item.label}真实产品页`}>
       <div className="workspace-orders-main">
-        <section className="workspace-orders-shell" aria-label="资产总览产品页主体">
+        <section className="workspace-menu-product-shell workspace-asset-product-shell" aria-label="资产总览产品页主体">
           <header className="workspace-orders-header">
             <div className="workspace-orders-title">
               <span className="workspace-orders-icon"><Layers /></span>
@@ -6915,7 +6915,7 @@ function WorkbenchInspectionPage({
   return (
     <section className="workspace-orders-page workspace-inspection-page" aria-label={`${item.label}真实产品页`}>
       <div className="workspace-orders-main">
-        <section className="workspace-orders-shell" aria-label="巡检管理产品页主体">
+        <section className="workspace-menu-product-shell workspace-inspection-product-shell" aria-label="巡检管理产品页主体">
           <header className="workspace-orders-header">
             <div className="workspace-orders-title">
               <span className="workspace-orders-icon"><CheckCircle2 /></span>
@@ -7245,7 +7245,7 @@ function WorkbenchSparesPage({
   return (
     <section className="workspace-orders-page workspace-spares-page" aria-label={`${item.label}真实产品页`}>
       <div className="workspace-orders-main">
-        <section className="workspace-orders-shell" aria-label="备件管理产品页主体">
+        <section className="workspace-menu-product-shell workspace-spares-product-shell" aria-label="备件管理产品页主体">
           <header className="workspace-orders-header">
             <div className="workspace-orders-title">
               <span className="workspace-orders-icon"><PackageCheck /></span>
@@ -7883,7 +7883,7 @@ function WorkbenchDevicePage({
   return (
     <section className="workspace-orders-page workspace-device-page" aria-label={`${item.label}真实产品页`}>
       <div className="workspace-orders-main">
-        <section className="workspace-orders-shell" aria-label="设备管理产品页主体">
+        <section className="workspace-menu-product-shell workspace-device-product-shell" aria-label="设备管理产品页主体">
           <header className="workspace-orders-header">
             <div className="workspace-orders-title">
               <span className="workspace-orders-icon"><Cpu /></span>
@@ -8281,7 +8281,7 @@ function WorkbenchTodoPage({
   return (
     <section className="workspace-orders-page workspace-todo-page" aria-label={`${item.label}真实产品页`}>
       <div className="workspace-orders-main">
-        <section className="workspace-orders-shell" aria-label="流程待办产品页主体">
+        <section className="workspace-menu-product-shell workspace-todo-product-shell" aria-label="流程待办产品页主体">
           <header className="workspace-orders-header">
             <div className="workspace-orders-title">
               <span className="workspace-orders-icon"><ClipboardList /></span>
@@ -8672,9 +8672,9 @@ function WorkbenchOrdersPage({
   };
 
   return (
-    <section className="workspace-orders-page" aria-label={`${item.label}真实产品页`}>
+    <section className="workspace-orders-page workspace-workorder-page" aria-label={`${item.label}真实产品页`}>
       <div className="workspace-orders-main">
-        <section className="workspace-orders-shell" aria-label="工单管理产品页主体">
+        <section className="workspace-menu-product-shell workspace-workorder-product-shell" aria-label="工单管理产品页主体">
           <header className="workspace-orders-header">
             <div className="workspace-orders-title">
               <span className="workspace-orders-icon"><ClipboardList /></span>
@@ -9065,7 +9065,7 @@ function WorkbenchReportPage({
   return (
     <section className="workspace-orders-page workspace-report-page" aria-label={`${item.label}真实产品页`}>
       <div className="workspace-orders-main">
-        <section className="workspace-orders-shell" aria-label="报表分析产品页主体">
+        <section className="workspace-menu-product-shell workspace-report-product-shell" aria-label="报表分析产品页主体">
           <header className="workspace-orders-header">
             <div className="workspace-orders-title">
               <span className="workspace-orders-icon"><BarChart3 /></span>
@@ -9441,7 +9441,7 @@ function WorkbenchAlarmPage({
   return (
     <section className="workspace-orders-page workspace-alarm-page" aria-label={`${item.label}真实产品页`}>
       <div className="workspace-orders-main">
-        <section className="workspace-orders-shell" aria-label="告警中心产品页主体">
+        <section className="workspace-menu-product-shell workspace-alarm-product-shell" aria-label="告警中心产品页主体">
           <header className="workspace-orders-header">
             <div className="workspace-orders-title">
               <span className="workspace-orders-icon"><Bell /></span>

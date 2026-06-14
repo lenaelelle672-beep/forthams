@@ -964,11 +964,13 @@
 
 .workspace-orders-main,
 .workspace-orders-shell,
+.workspace-menu-product-shell,
 .workspace-orders-detail {
   min-width: 0;
 }
 
 .workspace-orders-shell,
+.workspace-menu-product-shell,
 .workspace-orders-detail {
   overflow: hidden;
   border: 1px solid #dbe8f8;
@@ -981,6 +983,32 @@
   display: grid;
   gap: 12px;
   padding: 16px 16px 12px;
+}
+
+.workspace-menu-product-shell {
+  display: grid;
+  gap: 12px;
+  padding: 16px 16px 12px;
+}
+
+.workspace-asset-product-shell,
+.workspace-device-product-shell {
+  border-color: #d5e8ff;
+}
+
+.workspace-todo-product-shell,
+.workspace-workorder-product-shell {
+  border-color: #d9e7ff;
+}
+
+.workspace-inspection-product-shell,
+.workspace-spares-product-shell {
+  border-color: #d8ecf1;
+}
+
+.workspace-report-product-shell,
+.workspace-alarm-product-shell {
+  border-color: #dce5ff;
 }
 
 .workspace-orders-header {
@@ -1836,13 +1864,13 @@
 }
 
 .workspace-todo-page .workspace-orders-main,
-.workspace-todo-page .workspace-orders-shell,
+.workspace-todo-page .workspace-todo-product-shell,
 .workspace-todo-page .workspace-orders-detail {
   height: 100%;
   min-height: 0;
 }
 
-.workspace-todo-page .workspace-orders-shell {
+.workspace-todo-page .workspace-todo-product-shell {
   gap: 14px;
   grid-template-rows: auto auto auto auto minmax(0, 1fr) auto;
   padding: 20px 18px 14px;
@@ -12065,7 +12093,8 @@
     grid-template-columns: 1fr;
   }
 
-  .workspace-orders-shell {
+  .workspace-orders-shell,
+  .workspace-menu-product-shell {
     padding: 12px;
   }
 

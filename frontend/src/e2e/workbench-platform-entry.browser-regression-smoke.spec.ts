@@ -220,13 +220,13 @@ test.describe('Workbench 正式入口浏览器回归', () => {
       await page.waitForLoadState('networkidle');
 
       await expect(page.getByLabel(`${pageLabel}真实产品页`)).toBeVisible();
+      await expect(page.getByLabel(`${pageLabel}产品页主体`)).toBeVisible();
       await expect(page.locator('.workspace-product-page')).toHaveCount(0);
+      await expect(page.locator('.workspace-orders-shell')).toHaveCount(0);
       await expect(page.locator('.workspace-orders-page')).toBeVisible();
       if (pageLabel === '运营首页') {
-        await expect(page.locator('.workspace-orders-shell')).toHaveCount(0);
         await expect(page.getByLabel('运营首页任务墙')).toBeVisible();
       } else if (pageLabel === '数据监控') {
-        await expect(page.locator('.workspace-orders-shell')).toHaveCount(0);
         await expect(page.getByLabel('数据监控列表')).toBeVisible();
       } else {
         await expect(page.locator('.workspace-orders-table')).toBeVisible();
