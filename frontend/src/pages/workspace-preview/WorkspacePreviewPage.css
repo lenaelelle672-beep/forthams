@@ -1136,6 +1136,9 @@
 .workspace-orders-kpis .is-green svg { color: #0e9b6d; background: #e9fff7; }
 .workspace-orders-kpis .is-red svg { color: #e5384c; background: #fff0f2; }
 .workspace-orders-kpis .is-violet svg { color: #714df5; background: #f3f0ff; }
+.workspace-orders-kpis .is-cyan svg { color: #0a8fa5; background: #e9fbff; }
+.workspace-orders-kpis .is-orange svg { color: #d97706; background: #fff6e5; }
+.workspace-orders-kpis .is-blue svg { color: #176de8; background: #edf5ff; }
 
 .workspace-orders-kpis span,
 .workspace-orders-kpis small,
@@ -1203,6 +1206,7 @@
 .workspace-orders-stage-row .is-green { border-top-color: #14aa78; }
 .workspace-orders-stage-row .is-violet { border-top-color: #7857f4; }
 .workspace-orders-stage-row .is-orange { border-top-color: #f08a20; }
+.workspace-orders-stage-row .is-red { border-top-color: #f03649; }
 
 .workspace-orders-stage-row button:not(:last-child)::after {
   content: '';
@@ -1404,6 +1408,8 @@
 .workspace-orders-table-row.is-red b { background: #f03649; }
 .workspace-orders-table-row.is-orange b { background: #f08a20; }
 .workspace-orders-table-row.is-green b { background: #17a977; }
+.workspace-orders-table-row.is-blue b { background: #176de8; }
+.workspace-orders-table-row.is-cyan b { background: #0a8fa5; }
 
 .workspace-orders-table-row i {
   color: #176de8;
@@ -1896,6 +1902,84 @@
 .workspace-device-page .workspace-orders-table-row.is-green b,
 .workspace-device-page .workspace-orders-table-row.is-blue b {
   background: #0a8fa5;
+}
+
+.workspace-report-page {
+  background:
+    linear-gradient(180deg, rgba(248, 252, 255, .97), rgba(239, 248, 255, .96)),
+    #f0f7ff;
+}
+
+.workspace-report-page .workspace-orders-icon {
+  color: #176de8;
+  background: #edf5ff;
+}
+
+.workspace-report-page .workspace-orders-toolbar .is-primary {
+  background: linear-gradient(180deg, #247fff, #0f67ef);
+}
+
+.workspace-report-page .workspace-orders-detail-card b {
+  width: auto;
+  min-width: 56px;
+  max-width: 150px;
+  padding: 0 9px;
+  background: #176de8;
+  font-size: 12px;
+}
+
+.workspace-report-page .workspace-orders-table-row b {
+  width: auto;
+  max-width: 100%;
+  color: #176de8;
+  background: #edf5ff;
+}
+
+.workspace-report-page .workspace-orders-table-row.is-orange b {
+  color: #d97706;
+  background: #fff4d6;
+}
+
+.workspace-report-page .workspace-orders-table-row.is-green b {
+  color: #0d9a6a;
+  background: #e9fff7;
+}
+
+.workspace-report-page .workspace-orders-table-row.is-cyan b {
+  color: #0a8fa5;
+  background: #e9fbff;
+}
+
+.workspace-alarm-page {
+  background:
+    linear-gradient(180deg, rgba(255, 250, 250, .96), rgba(241, 248, 255, .96)),
+    #fff6f7;
+}
+
+.workspace-alarm-page .workspace-orders-icon {
+  color: #e5384c;
+  background: #fff0f2;
+}
+
+.workspace-alarm-page .workspace-orders-toolbar .is-primary {
+  background: linear-gradient(180deg, #ff5b69, #e02f44);
+}
+
+.workspace-alarm-page .workspace-orders-detail-card b {
+  background: #f03649;
+}
+
+.workspace-alarm-page .workspace-orders-table-row.is-red b {
+  background: #f03649;
+}
+
+.workspace-alarm-page .workspace-orders-table-row.is-orange b {
+  background: #f08a20;
+}
+
+.workspace-alarm-page .workspace-orders-table-row.is-green b,
+.workspace-alarm-page .workspace-orders-table-row.is-blue b {
+  background: #176de8;
 }
 
 .workspace-product-page {

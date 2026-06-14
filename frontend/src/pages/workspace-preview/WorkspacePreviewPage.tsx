@@ -3093,6 +3093,212 @@ const workbenchDeviceRows = [
 
 const workbenchDeviceDetailTabs = ['设备信息', '实时遥测', '维保建议', '工单记录', '采集链路'] as const;
 
+const workbenchReportSummaryCards = [
+  { label: '资产总价值', value: '¥98,760.25万', delta: '较上期 +3.42%', icon: Layers, tone: 'blue' },
+  { label: '在用资产价值', value: '¥86,320.45万', delta: '较上期 +2.89%', icon: TrendingUp, tone: 'green' },
+  { label: '闲置资产价值', value: '¥8,640.12万', delta: '较上期 -1.24%', icon: Archive, tone: 'cyan' },
+  { label: '风险资产价值', value: '¥3,799.68万', delta: '较上期 +6.35%', icon: AlertTriangle, tone: 'orange' },
+  { label: '资产数量', value: '12,856', delta: '台 · +1.56%', icon: BarChart3, tone: 'violet' },
+  { label: '导出任务', value: '14', delta: '2 个待重试', icon: FileText, tone: 'red' },
+] as const;
+
+const workbenchReportStages = [
+  { label: '模板', value: '26', note: '资产/维保/安全', tone: 'blue' },
+  { label: '计算', value: '98.6%', note: '数据源健康', tone: 'green' },
+  { label: '分析', value: '12', note: '部门统计', tone: 'cyan' },
+  { label: '导出', value: '312', note: '本月任务', tone: 'orange' },
+  { label: '订阅', value: '14', note: '自动推送', tone: 'violet' },
+] as const;
+
+const workbenchReportRows = [
+  {
+    id: 'RPT-ASSET-VALUE-001',
+    type: '资产价值',
+    name: '资产价值信息总览',
+    owner: '张三丰',
+    title: '总价值趋势、分类分布与部门 Top 5',
+    metric: '¥98,760.25万',
+    status: '已生成',
+    range: '2026-05-15 ~ 2026-06-14',
+    dataSource: 'ASSET_DB / FIN_DB',
+    exportState: '已完成',
+    tone: 'green',
+  },
+  {
+    id: 'RPT-MAINT-COST-008',
+    type: '维保成本',
+    name: '预测维保成本分析',
+    owner: '李巡检',
+    title: '工单成本、备件消耗与停机损失',
+    metric: '¥286.45万',
+    status: '订阅中',
+    range: '最近 30 天',
+    dataSource: 'WORKORDER_DB',
+    exportState: '每周一',
+    tone: 'blue',
+  },
+  {
+    id: 'RPT-DEPT-ASSET-012',
+    type: '部门统计',
+    name: '部门资产统计明细',
+    owner: '质量管理部',
+    title: '部门资产数量、原值、净值和风险资产',
+    metric: '12 部门',
+    status: '已生成',
+    range: '本月',
+    dataSource: 'ASSET_DB',
+    exportState: '已完成',
+    tone: 'green',
+  },
+  {
+    id: 'RPT-RISK-ASSET-021',
+    type: '风险资产',
+    name: '风险资产明细',
+    owner: '安全运营',
+    title: '高风险设备、告警命中与转派工单',
+    metric: '356 台',
+    status: '待复核',
+    range: '近 7 天',
+    dataSource: 'ALARM_DB',
+    exportState: '待重试',
+    tone: 'orange',
+  },
+  {
+    id: 'RPT-SPARE-COST-015',
+    type: '备件成本',
+    name: '备件消耗与低储影响',
+    owner: '备件员',
+    title: '低储备件、供应商 ETA 与关联工单',
+    metric: '¥68.12万',
+    status: '已生成',
+    range: '本月',
+    dataSource: 'SPARE_DB',
+    exportState: '已完成',
+    tone: 'cyan',
+  },
+  {
+    id: 'RPT-SAFETY-REVIEW-006',
+    type: '安全复盘',
+    name: '安全态势复盘',
+    owner: '安全委员会',
+    title: '告警响应、策略命中和闭环率',
+    metric: '91.8%',
+    status: '待确认',
+    range: '本周',
+    dataSource: 'ALARM_DB',
+    exportState: '审批中',
+    tone: 'orange',
+  },
+] as const;
+
+const workbenchReportDetailTabs = ['报表信息', '趋势分析', '导出记录', '审计追溯', '数据来源'] as const;
+
+const workbenchAlarmSummaryCards = [
+  { label: '安全评分', value: '92', delta: '分 · 较上周 +4', icon: ShieldCheck, tone: 'green' },
+  { label: '高危事件', value: '3', delta: '需立即处置', icon: AlertTriangle, tone: 'red' },
+  { label: '策略命中', value: '27', delta: '自动聚合', icon: Shield, tone: 'orange' },
+  { label: '处理中', value: '12', delta: '工单联动', icon: Wrench, tone: 'blue' },
+  { label: '已闭环', value: '91.8%', delta: '本周', icon: CheckCircle2, tone: 'green' },
+  { label: '平均响应', value: '2.3h', delta: '本周统计', icon: Activity, tone: 'cyan' },
+] as const;
+
+const workbenchAlarmStages = [
+  { label: '发现', value: '36', note: '资产/策略告警', tone: 'red' },
+  { label: '研判', value: '27', note: '自动聚合', tone: 'orange' },
+  { label: '处置', value: '12', note: '工单联动', tone: 'blue' },
+  { label: '复盘', value: '4', note: '策略需复核', tone: 'cyan' },
+  { label: '闭环', value: '91.8%', note: '本周', tone: 'green' },
+] as const;
+
+const workbenchAlarmRows = [
+  {
+    id: 'ALM-20240614-0012',
+    level: '高危',
+    strategy: '熔断策略-12',
+    asset: '数控车床 CN-301',
+    location: '机加车间 / CNC 区域 A线',
+    title: '主轴振动异常触发高危策略',
+    score: 'P1',
+    status: '待研判',
+    response: '1.2h',
+    owner: '安全运营',
+    suggestion: '转派工单',
+    tone: 'red',
+  },
+  {
+    id: 'ALM-20240614-0011',
+    level: '中危',
+    strategy: '拦截白名单-08',
+    asset: '注塑机 M-201',
+    location: '一车间 / A线',
+    title: '温度边界连续越限',
+    score: 'P2',
+    status: '处置中',
+    response: '2.5h',
+    owner: '王班组',
+    suggestion: '现场复核',
+    tone: 'orange',
+  },
+  {
+    id: 'ALM-20240614-0010',
+    level: '低危',
+    strategy: '端口扫描-03',
+    asset: 'IoT 网关 GW-A01',
+    location: '数据采集间',
+    title: '采集网关异常探测',
+    score: 'P3',
+    status: '已归档',
+    response: '4.8h',
+    owner: '平台运维',
+    suggestion: '策略复盘',
+    tone: 'blue',
+  },
+  {
+    id: 'ALM-20240614-0009',
+    level: '高危',
+    strategy: '维保逾期联动',
+    asset: '空压机 CP-101',
+    location: '动力站',
+    title: '油滤保养逾期叠加振动异常',
+    score: 'P1',
+    status: '待转派',
+    response: '0.8h',
+    owner: '王技师',
+    suggestion: '创建工单',
+    tone: 'red',
+  },
+  {
+    id: 'ALM-20240614-0008',
+    level: '中危',
+    strategy: '位置漂移复核',
+    asset: 'AGV-05',
+    location: '物流区',
+    title: '资产定位漂移超过阈值',
+    score: 'P2',
+    status: '待复核',
+    response: '3.2h',
+    owner: '物流运维',
+    suggestion: '巡检确认',
+    tone: 'orange',
+  },
+  {
+    id: 'ALM-20240614-0007',
+    level: '低危',
+    strategy: '账号异常登录',
+    asset: '报表服务账号',
+    location: '平台服务',
+    title: '非工作时段导出任务触发复核',
+    score: 'P3',
+    status: '已关闭',
+    response: '6.1h',
+    owner: '审计员',
+    suggestion: '审计留痕',
+    tone: 'green',
+  },
+] as const;
+
+const workbenchAlarmDetailTabs = ['告警信息', '策略命中', '处置建议', '处理记录', '关联工单'] as const;
+
 function WorkbenchDevicePage({
   item,
   context,
@@ -4255,6 +4461,770 @@ function WorkbenchOrdersPage({
             <FileText />
             <strong>选择左侧工单打开详情</strong>
             <span>详情抽屉会展示流程、备件、处理记录和关联告警。</span>
+          </button>
+        )}
+      </aside>
+    </section>
+  );
+}
+
+function WorkbenchReportPage({
+  item,
+  context,
+  meta,
+  onPreviewAction,
+}: WorkbenchMenuPageProps) {
+  const [selectedReportId, setSelectedReportId] = useState(workbenchReportRows[0].id);
+  const [detailTab, setDetailTab] = useState<(typeof workbenchReportDetailTabs)[number]>('报表信息');
+  const [detailOpen, setDetailOpen] = useState(true);
+  const selectedReport =
+    workbenchReportRows.find((report) => report.id === selectedReportId) ?? workbenchReportRows[0];
+  const primaryAction = meta.actions[0];
+  const exportAction = meta.actions[1] ?? primaryAction;
+
+  const openReportPreview = (
+    title: string,
+    routeTarget: string,
+    description: string,
+    primaryLabel: string,
+    icon: LucideIcon = BarChart3,
+  ) => {
+    onPreviewAction({
+      title,
+      source: '报表分析页面',
+      routeTarget,
+      description,
+      primaryLabel,
+      icon,
+      visual: meta.imageSrc,
+      stats: context.stats,
+    });
+  };
+
+  const openReport = (report: (typeof workbenchReportRows)[number]) => {
+    setSelectedReportId(report.id);
+    setDetailOpen(true);
+    openReportPreview(
+      '打开报表详情',
+      `/reports/${report.id}?source=workbench&menu=report`,
+      `打开 ${report.name}，带入模板、时间范围、数据源和导出审计上下文。`,
+      '打开详情',
+      FileText,
+    );
+  };
+
+  return (
+    <section className="workspace-orders-page workspace-report-page" aria-label={`${item.label}真实产品页`}>
+      <div className="workspace-orders-main">
+        <section className="workspace-orders-shell" aria-label="报表分析产品页主体">
+          <header className="workspace-orders-header">
+            <div className="workspace-orders-title">
+              <span className="workspace-orders-icon"><BarChart3 /></span>
+              <div>
+                <h2>报表分析</h2>
+                <p>模板中心 · 分析视图 · 导出订阅</p>
+              </div>
+            </div>
+            <div className="workspace-orders-toolbar" aria-label="报表分析顶部操作">
+              <button type="button" className="is-secondary" onClick={() => onPreviewAction(primaryAction)}>
+                <BarChart3 />
+                打开经营报表
+              </button>
+              <button type="button" className="is-primary" onClick={() => onPreviewAction(exportAction)}>
+                <FileText />
+                导出资产趋势
+              </button>
+              <button
+                type="button"
+                className="is-secondary"
+                onClick={() =>
+                  openReportPreview(
+                    '订阅经营报表',
+                    '/reports?source=workbench&view=operations&subscribe=true',
+                    '进入报表订阅配置，预填资产价值、部门统计和导出频率。',
+                    '进入订阅',
+                    Bell,
+                  )
+                }
+              >
+                <Bell />
+                订阅报表
+              </button>
+            </div>
+          </header>
+
+          <div className="workspace-orders-kpis" aria-label="报表分析核心指标">
+            {workbenchReportSummaryCards.map((card) => {
+              const CardIcon = card.icon;
+              return (
+                <button
+                  key={card.label}
+                  type="button"
+                  className={`is-${card.tone}`}
+                  onClick={() =>
+                    openReportPreview(
+                      `${card.label}报表`,
+                      `/reports?source=workbench&metric=${encodeURIComponent(card.label)}`,
+                      `按 ${card.label} 下钻经营分析，保留当前报表模板和时间范围。`,
+                      '查看报表',
+                      CardIcon,
+                    )
+                  }
+                >
+                  <CardIcon />
+                  <span>{card.label}</span>
+                  <strong>{card.value}</strong>
+                  <small>{card.delta}</small>
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="workspace-orders-stage-row" aria-label="报表分析流程">
+            {workbenchReportStages.map((stage) => (
+              <button
+                key={stage.label}
+                type="button"
+                className={`is-${stage.tone}`}
+                onClick={() =>
+                  openReportPreview(
+                    `${stage.label}报表任务`,
+                    `/reports?source=workbench&stage=${encodeURIComponent(stage.label)}`,
+                    `按 ${stage.label} 阶段查看报表任务、导出记录和订阅状态。`,
+                    '查看阶段',
+                    ArrowRight,
+                  )
+                }
+              >
+                <span>{stage.label}</span>
+                <strong>{stage.value}</strong>
+                <small>{stage.note}</small>
+              </button>
+            ))}
+          </div>
+
+          <div className="workspace-orders-filterbar" aria-label="报表分析查询筛选栏">
+            <label>
+              <Search />
+              <input readOnly value="搜索报表名称 / 模板 / 创建人 / 数据源" aria-label="报表搜索" />
+            </label>
+            {['模板 全部', '时间范围 30天', '数据源 全部', '状态 全部'].map((filter) => (
+              <button key={filter} type="button" onClick={() => onPreviewAction(primaryAction)}>
+                {filter}
+                <ArrowRight />
+              </button>
+            ))}
+            <button
+              type="button"
+              className="is-date"
+              onClick={() =>
+                openReportPreview(
+                  '按生成时间筛选',
+                  '/reports?source=workbench&view=operations&generatedAt=today',
+                  '查看今日生成、导出和订阅推送的报表任务。',
+                  '查看今日报表',
+                  CalendarDays,
+                )
+              }
+            >
+              生成时间
+              <CalendarDays />
+            </button>
+            <button type="button" className="is-reset" onClick={() => onPreviewAction(primaryAction)}>
+              重置
+            </button>
+          </div>
+
+          <div className="workspace-orders-table" aria-label="报表分析列表">
+            <div className="workspace-orders-table-head">
+              <span><input type="checkbox" aria-label="选择全部报表" readOnly /></span>
+              <span>报表编号</span>
+              <span>类型</span>
+              <span>报表信息</span>
+              <span>分析内容</span>
+              <span>指标</span>
+              <span>状态</span>
+              <span>时间范围</span>
+              <span>创建人</span>
+              <span>数据源</span>
+              <span>操作</span>
+            </div>
+            {workbenchReportRows.map((report) => (
+              <div
+                key={report.id}
+                className={`workspace-orders-table-row is-${report.tone} ${
+                  report.id === selectedReport.id ? 'is-selected' : ''
+                }`}
+              >
+                <span><input type="checkbox" aria-label={`选择${report.id}`} readOnly /></span>
+                <button type="button" className="is-link" onClick={() => openReport(report)}>{report.id}</button>
+                <span><em>{report.type}</em></span>
+                <span>
+                  <strong>{report.name}</strong>
+                  <small>{report.exportState}</small>
+                </span>
+                <button type="button" className="is-title" onClick={() => openReport(report)}>{report.title}</button>
+                <span><b>{report.metric}</b></span>
+                <span><i>{report.status}</i></span>
+                <span>{report.range}</span>
+                <span>{report.owner}</span>
+                <span><em className="is-spare">{report.dataSource}</em></span>
+                <span>
+                  <button
+                    type="button"
+                    className="is-process"
+                    onClick={() => {
+                      setSelectedReportId(report.id);
+                      setDetailOpen(true);
+                      openReportPreview(
+                        '重新导出报表',
+                        `/reports/${report.id}/export?source=workbench&format=xlsx`,
+                        `重新导出 ${report.name}，保留模板、时间范围和数据源审计记录。`,
+                        '重新导出',
+                        FileText,
+                      );
+                    }}
+                  >
+                    导出
+                  </button>
+                  <button type="button" className="is-more" aria-label={`${report.id}更多操作`} onClick={() => openReport(report)}>
+                    ···
+                  </button>
+                </span>
+              </div>
+            ))}
+          </div>
+
+          <footer className="workspace-orders-pagination" aria-label="报表分页">
+            <span>共 26 个模板</span>
+            <button type="button">10条/页</button>
+            <button type="button" disabled>‹</button>
+            {[1, 2, 3].map((pageNo) => (
+              <button key={pageNo} type="button" className={pageNo === 1 ? 'is-current' : ''}>{pageNo}</button>
+            ))}
+            <button type="button">›</button>
+          </footer>
+        </section>
+      </div>
+
+      <aside className="workspace-orders-detail" aria-label="报表详情抽屉">
+        {detailOpen ? (
+          <>
+            <header className="workspace-orders-detail-head">
+              <strong>订阅 / 导出详情</strong>
+              <button type="button" aria-label="关闭报表详情" onClick={() => setDetailOpen(false)}>
+                <X />
+              </button>
+            </header>
+            <section className="workspace-orders-detail-card" aria-label="当前报表信息">
+              <div>
+                <b>{selectedReport.metric}</b>
+                <span>
+                  <strong>{selectedReport.id}</strong>
+                  <small>{selectedReport.status}</small>
+                </span>
+              </div>
+              <h3>{selectedReport.name}</h3>
+              <dl>
+                <div><dt>报表类型</dt><dd>{selectedReport.type}</dd></div>
+                <div><dt>导出状态</dt><dd>{selectedReport.exportState}</dd></div>
+                <div><dt>时间范围</dt><dd>{selectedReport.range}</dd></div>
+                <div><dt>创建人</dt><dd>{selectedReport.owner}</dd></div>
+                <div><dt>数据源</dt><dd>{selectedReport.dataSource}</dd></div>
+                <div><dt>生成时间</dt><dd>2026-06-14 10:28</dd></div>
+                <div><dt>审计状态</dt><dd>已留痕</dd></div>
+                <div><dt>分发方式</dt><dd>XLSX / PDF / 订阅</dd></div>
+              </dl>
+            </section>
+
+            <section className="workspace-orders-flow" aria-label="报表生成流程">
+              {['任务开始', '数据准备', '数据计算', '报告生成', '分发审计'].map((step, index) => (
+                <span key={step} className={index < 4 ? 'is-done' : 'is-active'}>
+                  <CheckCircle2 />
+                  <strong>{step}</strong>
+                  <small>{index < 4 ? '已完成' : '可订阅'}</small>
+                </span>
+              ))}
+            </section>
+
+            <nav className="workspace-orders-tabs" aria-label="报表详情标签">
+              {workbenchReportDetailTabs.map((tab) => (
+                <button
+                  key={tab}
+                  type="button"
+                  className={tab === detailTab ? 'is-active' : ''}
+                  onClick={() => setDetailTab(tab)}
+                >
+                  {tab}
+                </button>
+              ))}
+            </nav>
+
+            <section className="workspace-orders-tab-panel" aria-label={`${detailTab}内容`}>
+              <article>
+                <span>分析摘要</span>
+                <p>{selectedReport.title}，当前核心指标为 {selectedReport.metric}。</p>
+              </article>
+              <article>
+                <span>导出记录</span>
+                <ul>
+                  <li>{selectedReport.name}_20260614.xlsx <b>{selectedReport.exportState}</b></li>
+                  <li>{selectedReport.name}_20260614.pdf <b>已完成</b></li>
+                  <li>审计链路 {selectedReport.dataSource} <b>成功</b></li>
+                </ul>
+              </article>
+              <article>
+                <span>订阅配置</span>
+                <p>支持按周推送给设备、财务和安全角色，并保留 Workbench 来源与筛选条件。</p>
+              </article>
+              <article>
+                <span>数据来源</span>
+                <ul>
+                  <li>资产主数据 ASSET_DB <small>成功</small></li>
+                  <li>工单数据 WORKORDER_DB <small>成功</small></li>
+                  <li>巡检数据 INSPECTION_DB <small>成功</small></li>
+                </ul>
+              </article>
+            </section>
+
+            <footer className="workspace-orders-detail-actions" aria-label="报表详情操作">
+              <button
+                type="button"
+                onClick={() =>
+                  openReportPreview(
+                    '关闭报表详情',
+                    '/reports?source=workbench&view=operations',
+                    '回到报表中心，保留当前模板和筛选条件。',
+                    '返回报表',
+                    X,
+                  )
+                }
+              >
+                关闭
+              </button>
+              <button
+                type="button"
+                onClick={() =>
+                  openReportPreview(
+                    '重新导出报表',
+                    `/reports/${selectedReport.id}/export?source=workbench&format=xlsx`,
+                    `重新导出 ${selectedReport.name} 并记录审计链路。`,
+                    '重新导出',
+                    FileText,
+                  )
+                }
+              >
+                重新导出
+              </button>
+              <button
+                type="button"
+                className="is-primary"
+                onClick={() =>
+                  openReportPreview(
+                    '订阅此报表',
+                    `/reports/${selectedReport.id}/subscribe?source=workbench`,
+                    `订阅 ${selectedReport.name}，预填模板、时间范围和接收角色。`,
+                    '订阅报表',
+                    Bell,
+                  )
+                }
+              >
+                订阅此报表
+              </button>
+            </footer>
+          </>
+        ) : (
+          <button type="button" className="workspace-orders-detail-empty" onClick={() => setDetailOpen(true)}>
+            <BarChart3 />
+            <strong>选择左侧报表打开详情</strong>
+            <span>详情抽屉会展示趋势、导出、订阅、审计和数据源状态。</span>
+          </button>
+        )}
+      </aside>
+    </section>
+  );
+}
+
+function WorkbenchAlarmPage({
+  item,
+  context,
+  meta,
+  onPreviewAction,
+}: WorkbenchMenuPageProps) {
+  const [selectedAlarmId, setSelectedAlarmId] = useState(workbenchAlarmRows[0].id);
+  const [detailTab, setDetailTab] = useState<(typeof workbenchAlarmDetailTabs)[number]>('告警信息');
+  const [detailOpen, setDetailOpen] = useState(true);
+  const selectedAlarm = workbenchAlarmRows.find((alarm) => alarm.id === selectedAlarmId) ?? workbenchAlarmRows[0];
+  const primaryAction = meta.actions[0];
+  const dispatchAction = meta.actions[1] ?? primaryAction;
+
+  const openAlarmPreview = (
+    title: string,
+    routeTarget: string,
+    description: string,
+    primaryLabel: string,
+    icon: LucideIcon = Bell,
+  ) => {
+    onPreviewAction({
+      title,
+      source: '告警中心页面',
+      routeTarget,
+      description,
+      primaryLabel,
+      icon,
+      visual: meta.imageSrc,
+      stats: context.stats,
+    });
+  };
+
+  const openAlarm = (alarm: (typeof workbenchAlarmRows)[number]) => {
+    setSelectedAlarmId(alarm.id);
+    setDetailOpen(true);
+    openAlarmPreview(
+      '打开告警详情',
+      `/notifications/${alarm.id}?source=workbench&menu=alarm`,
+      `打开 ${alarm.id}，带入等级、策略、资产、处置建议和 Workbench 告警来源。`,
+      '打开详情',
+      Bell,
+    );
+  };
+
+  return (
+    <section className="workspace-orders-page workspace-alarm-page" aria-label={`${item.label}真实产品页`}>
+      <div className="workspace-orders-main">
+        <section className="workspace-orders-shell" aria-label="告警中心产品页主体">
+          <header className="workspace-orders-header">
+            <div className="workspace-orders-title">
+              <span className="workspace-orders-icon"><Bell /></span>
+              <div>
+                <h2>告警中心</h2>
+                <p>等级研判 · 策略命中 · 处置复盘</p>
+              </div>
+            </div>
+            <div className="workspace-orders-toolbar" aria-label="告警中心顶部操作">
+              <button type="button" className="is-secondary" onClick={() => onPreviewAction(primaryAction)}>
+                <Bell />
+                查看告警队列
+              </button>
+              <button
+                type="button"
+                className="is-secondary"
+                onClick={() =>
+                  openAlarmPreview(
+                    '查看策略命中',
+                    '/risk-matrix?source=workbench&scope=alarm&hit=true',
+                    '进入风险矩阵，按告警策略命中、等级和资产影响范围筛选。',
+                    '进入策略',
+                    ShieldCheck,
+                  )
+                }
+              >
+                <ShieldCheck />
+                策略命中
+              </button>
+              <button type="button" className="is-primary" onClick={() => onPreviewAction(dispatchAction)}>
+                <AlertTriangle />
+                转派处置工单
+              </button>
+            </div>
+          </header>
+
+          <div className="workspace-orders-kpis" aria-label="告警中心核心指标">
+            {workbenchAlarmSummaryCards.map((card) => {
+              const CardIcon = card.icon;
+              return (
+                <button
+                  key={card.label}
+                  type="button"
+                  className={`is-${card.tone}`}
+                  onClick={() =>
+                    openAlarmPreview(
+                      `${card.label}告警`,
+                      `/notifications?source=workbench&metric=${encodeURIComponent(card.label)}`,
+                      `按 ${card.label} 下钻告警队列，保留安全态势、策略和资产上下文。`,
+                      '查看告警',
+                      CardIcon,
+                    )
+                  }
+                >
+                  <CardIcon />
+                  <span>{card.label}</span>
+                  <strong>{card.value}</strong>
+                  <small>{card.delta}</small>
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="workspace-orders-stage-row" aria-label="告警处置流程">
+            {workbenchAlarmStages.map((stage) => (
+              <button
+                key={stage.label}
+                type="button"
+                className={`is-${stage.tone}`}
+                onClick={() =>
+                  openAlarmPreview(
+                    `${stage.label}告警`,
+                    `/notifications?source=workbench&stage=${encodeURIComponent(stage.label)}`,
+                    `按 ${stage.label} 阶段查看告警处置和复盘记录。`,
+                    '查看阶段',
+                    ArrowRight,
+                  )
+                }
+              >
+                <span>{stage.label}</span>
+                <strong>{stage.value}</strong>
+                <small>{stage.note}</small>
+              </button>
+            ))}
+          </div>
+
+          <div className="workspace-orders-filterbar" aria-label="告警中心查询筛选栏">
+            <label>
+              <Search />
+              <input readOnly value="搜索告警号 / 策略 / 资产 / 责任人" aria-label="告警搜索" />
+            </label>
+            {['等级 全部', '状态 全部', '策略 全部', '责任人 全部'].map((filter) => (
+              <button key={filter} type="button" onClick={() => onPreviewAction(primaryAction)}>
+                {filter}
+                <ArrowRight />
+              </button>
+            ))}
+            <button
+              type="button"
+              className="is-date"
+              onClick={() =>
+                openAlarmPreview(
+                  '按响应时间筛选',
+                  '/notifications?source=workbench&respondedAt=today',
+                  '查看今日响应、处置和复盘的告警记录。',
+                  '查看响应',
+                  CalendarDays,
+                )
+              }
+            >
+              响应时间
+              <CalendarDays />
+            </button>
+            <button type="button" className="is-reset" onClick={() => onPreviewAction(primaryAction)}>
+              重置
+            </button>
+          </div>
+
+          <div className="workspace-orders-table" aria-label="告警中心列表">
+            <div className="workspace-orders-table-head">
+              <span><input type="checkbox" aria-label="选择全部告警" readOnly /></span>
+              <span>告警号</span>
+              <span>等级</span>
+              <span>资产信息</span>
+              <span>告警标题</span>
+              <span>优先级</span>
+              <span>状态</span>
+              <span>响应</span>
+              <span>责任人</span>
+              <span>处置建议</span>
+              <span>操作</span>
+            </div>
+            {workbenchAlarmRows.map((alarm) => (
+              <div
+                key={alarm.id}
+                className={`workspace-orders-table-row is-${alarm.tone} ${
+                  alarm.id === selectedAlarm.id ? 'is-selected' : ''
+                }`}
+              >
+                <span><input type="checkbox" aria-label={`选择${alarm.id}`} readOnly /></span>
+                <button type="button" className="is-link" onClick={() => openAlarm(alarm)}>{alarm.id}</button>
+                <span><em>{alarm.level}</em></span>
+                <span>
+                  <strong>{alarm.asset}</strong>
+                  <small>{alarm.location}</small>
+                </span>
+                <button type="button" className="is-title" onClick={() => openAlarm(alarm)}>{alarm.title}</button>
+                <span><b>{alarm.score}</b></span>
+                <span><i>{alarm.status}</i></span>
+                <span>{alarm.response}</span>
+                <span>{alarm.owner}</span>
+                <span><em className="is-spare">{alarm.suggestion}</em></span>
+                <span>
+                  <button
+                    type="button"
+                    className="is-process"
+                    onClick={() => {
+                      setSelectedAlarmId(alarm.id);
+                      setDetailOpen(true);
+                      openAlarmPreview(
+                        '处理告警',
+                        `/notifications/${alarm.id}/process?source=workbench`,
+                        `处理 ${alarm.id}，带入等级 ${alarm.level}、策略 ${alarm.strategy} 和处置建议。`,
+                        '进入处理',
+                        AlertTriangle,
+                      );
+                    }}
+                  >
+                    处理
+                  </button>
+                  <button type="button" className="is-more" aria-label={`${alarm.id}更多操作`} onClick={() => openAlarm(alarm)}>
+                    ···
+                  </button>
+                </span>
+              </div>
+            ))}
+          </div>
+
+          <footer className="workspace-orders-pagination" aria-label="告警分页">
+            <span>共 36 条</span>
+            <button type="button">10条/页</button>
+            <button type="button" disabled>‹</button>
+            {[1, 2, 3, 4].map((pageNo) => (
+              <button key={pageNo} type="button" className={pageNo === 1 ? 'is-current' : ''}>{pageNo}</button>
+            ))}
+            <button type="button">›</button>
+          </footer>
+        </section>
+      </div>
+
+      <aside className="workspace-orders-detail" aria-label="告警详情抽屉">
+        {detailOpen ? (
+          <>
+            <header className="workspace-orders-detail-head">
+              <strong>告警研判详情</strong>
+              <button type="button" aria-label="关闭告警详情" onClick={() => setDetailOpen(false)}>
+                <X />
+              </button>
+            </header>
+            <section className="workspace-orders-detail-card" aria-label="当前告警信息">
+              <div>
+                <b>{selectedAlarm.score}</b>
+                <span>
+                  <strong>{selectedAlarm.id}</strong>
+                  <small>{selectedAlarm.status}</small>
+                </span>
+              </div>
+              <h3>{selectedAlarm.title}</h3>
+              <dl>
+                <div><dt>告警等级</dt><dd>{selectedAlarm.level}</dd></div>
+                <div><dt>策略命中</dt><dd>{selectedAlarm.strategy}</dd></div>
+                <div><dt>资产</dt><dd>{selectedAlarm.asset}</dd></div>
+                <div><dt>位置</dt><dd>{selectedAlarm.location}</dd></div>
+                <div><dt>响应时长</dt><dd>{selectedAlarm.response}</dd></div>
+                <div><dt>责任人</dt><dd>{selectedAlarm.owner}</dd></div>
+                <div><dt>处置建议</dt><dd>{selectedAlarm.suggestion}</dd></div>
+                <div><dt>最近触发</dt><dd>2026-06-14 10:18</dd></div>
+              </dl>
+            </section>
+
+            <section className="workspace-orders-flow" aria-label="告警研判流转">
+              {['发现', '聚合', '研判', '处置', '复盘'].map((step, index) => (
+                <span key={step} className={index < 2 ? 'is-done' : index === 2 ? 'is-active' : ''}>
+                  <CheckCircle2 />
+                  <strong>{step}</strong>
+                  <small>{index < 2 ? '已完成' : index === 2 ? '待研判' : '待流转'}</small>
+                </span>
+              ))}
+            </section>
+
+            <nav className="workspace-orders-tabs" aria-label="告警详情标签">
+              {workbenchAlarmDetailTabs.map((tab) => (
+                <button
+                  key={tab}
+                  type="button"
+                  className={tab === detailTab ? 'is-active' : ''}
+                  onClick={() => setDetailTab(tab)}
+                >
+                  {tab}
+                </button>
+              ))}
+            </nav>
+
+            <section className="workspace-orders-tab-panel" aria-label={`${detailTab}内容`}>
+              <article>
+                <span>告警摘要</span>
+                <p>{selectedAlarm.asset} 命中 {selectedAlarm.strategy}，当前建议为 {selectedAlarm.suggestion}。</p>
+              </article>
+              <article>
+                <span>策略命中</span>
+                <ul>
+                  <li>{selectedAlarm.strategy} <b>{selectedAlarm.level}</b></li>
+                  <li>资产影响范围 {selectedAlarm.location} <b>已识别</b></li>
+                  <li>响应 SLA {selectedAlarm.response} <b className="is-warning">需跟进</b></li>
+                </ul>
+              </article>
+              <article>
+                <span>处置建议</span>
+                <p>先完成远程研判，再按风险等级转派工单或巡检；复盘时回写策略命中效果。</p>
+              </article>
+              <article>
+                <span>关联工单</span>
+                <ul>
+                  <li>WO-20240614-0012 <small>派工中</small></li>
+                  <li>INSP-20260614-M201 <small>待现场复核</small></li>
+                  <li>复盘任务 RV-20240614-03 <small>待启动</small></li>
+                </ul>
+              </article>
+            </section>
+
+            <footer className="workspace-orders-detail-actions" aria-label="告警详情操作">
+              <button
+                type="button"
+                onClick={() =>
+                  openAlarmPreview(
+                    '转派告警',
+                    `/notifications/${selectedAlarm.id}/assign?source=workbench`,
+                    `转派 ${selectedAlarm.id}，保留策略、资产和响应 SLA。`,
+                    '进入转派',
+                    UserCircle,
+                  )
+                }
+              >
+                转派
+              </button>
+              <button
+                type="button"
+                onClick={() =>
+                  openAlarmPreview(
+                    '发起复盘',
+                    `/notifications/${selectedAlarm.id}/review?source=workbench`,
+                    `对 ${selectedAlarm.id} 发起策略复盘，带入策略命中和处置记录。`,
+                    '进入复盘',
+                    ShieldCheck,
+                  )
+                }
+              >
+                复盘
+              </button>
+              <button
+                type="button"
+                className="is-primary"
+                onClick={() =>
+                  openAlarmPreview(
+                    '创建告警处置工单',
+                    buildWorkOrderPrefillPath({
+                      source: 'asset-risk',
+                      title: `${selectedAlarm.asset} 告警处置工单`,
+                      assetName: selectedAlarm.asset,
+                      assetLocation: selectedAlarm.location,
+                      riskState: selectedAlarm.level,
+                      riskScore: selectedAlarm.score === 'P1' ? 92 : selectedAlarm.score === 'P2' ? 78 : 62,
+                      riskLevel: selectedAlarm.level,
+                      priority: selectedAlarm.level === '高危' ? 'CRITICAL' : 'HIGH',
+                      dueDate: '2026-06-15',
+                      description: `来自 Workbench 告警中心：${selectedAlarm.title}，建议 ${selectedAlarm.suggestion}。`,
+                    }),
+                    `为 ${selectedAlarm.asset} 创建告警处置工单。`,
+                    '创建工单',
+                    AlertTriangle,
+                  )
+                }
+              >
+                创建工单
+              </button>
+            </footer>
+          </>
+        ) : (
+          <button type="button" className="workspace-orders-detail-empty" onClick={() => setDetailOpen(true)}>
+            <Bell />
+            <strong>选择左侧告警打开详情</strong>
+            <span>详情抽屉会展示等级、策略命中、处置建议、处理记录和关联工单。</span>
           </button>
         )}
       </aside>
@@ -6265,6 +7235,22 @@ export default function WorkspacePreviewPage() {
             />
           ) : activeModuleMock && activeProductPageMeta && activeItem.id === 'orders' ? (
             <WorkbenchOrdersPage
+              item={activeItem}
+              context={activeContext}
+              mock={activeModuleMock}
+              meta={activeProductPageMeta}
+              onPreviewAction={setRoutePreview}
+            />
+          ) : activeModuleMock && activeProductPageMeta && activeItem.id === 'report' ? (
+            <WorkbenchReportPage
+              item={activeItem}
+              context={activeContext}
+              mock={activeModuleMock}
+              meta={activeProductPageMeta}
+              onPreviewAction={setRoutePreview}
+            />
+          ) : activeModuleMock && activeProductPageMeta && activeItem.id === 'alarm' ? (
+            <WorkbenchAlarmPage
               item={activeItem}
               context={activeContext}
               mock={activeModuleMock}

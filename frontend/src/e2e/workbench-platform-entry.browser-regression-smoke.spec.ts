@@ -237,20 +237,6 @@ test.describe('Workbench 正式入口浏览器回归', () => {
         targetIncludes: ['/energy?source=workbench&scope=data-monitoring&event=delay&retry=true'],
       },
       {
-        route: '/fixed-assets/workbench/analytics?menu=report',
-        pageLabel: '报表分析',
-        heading: '经营分析与审计报表',
-        action: '打开经营报表',
-        targetIncludes: ['/reports?source=workbench&view=operations'],
-      },
-      {
-        route: '/fixed-assets/workbench/security?menu=alarm',
-        pageLabel: '告警中心',
-        heading: '安全告警研判处置',
-        action: '转派处置工单',
-        targetIncludes: ['/workorders/new?', 'source=asset-risk', 'riskState=', 'priority=CRITICAL'],
-      },
-      {
         route: '/fixed-assets/workbench/security?menu=policy',
         pageLabel: '组织策略',
         heading: '风险规则与策略治理',
@@ -437,6 +423,101 @@ test.describe('Workbench 正式入口浏览器回归', () => {
     await expect(executeDialog.locator('.workspace-action-route strong')).toContainText('/execute?source=workbench');
     await page.keyboard.press('Escape');
     await expect(executeDialog).toHaveCount(0);
+
+    await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
+    expect(errors).toEqual([]);
+  });
+
+  test('报表分析左侧菜单渲染真实页面级组件而非通用产品壳', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await seedAuthenticatedSession(page, operationsUser);
+
+    await page.goto('/fixed-assets/workbench/analytics?menu=report');
+    await page.waitForLoadState('networkidle');
+
+    await expect(page.getByLabel('报表分析真实产品页')).toBeVisible();
+    await expect(page.locator('.workspace-product-page')).toHaveCount(0);
+    await expect(page.getByRole('heading', { name: '报表分析' })).toBeVisible();
+    await expect(page.getByText('模板中心 · 分析视图 · 导出订阅')).toBeVisible();
+    await expect(page.getByLabel('报表分析核心指标')).toContainText('资产总价值');
+    await expect(page.getByLabel('报表分析流程')).toContainText('模板');
+    await expect(page.getByLabel('报表分析顶部操作')).toContainText('导出资产趋势');
+    await expect(page.getByLabel('报表分析查询筛选栏')).toContainText('生成时间');
+    await expect(page.getByLabel('报表分析列表')).toContainText('RPT-ASSET-VALUE-001');
+    await expect(page.getByLabel('报表详情抽屉')).toContainText('资产价值信息总览');
+    await expect(page.getByLabel('报表详情标签')).toContainText('审计追溯');
+    await expect(page.getByLabel('报表详情操作')).toContainText('订阅此报表');
+    await expect(page.locator('body')).not.toContainText('workbench-menu-report-v1');
+
+    await page.getByRole('button', { name: /导出资产趋势/ }).click();
+    const exportDialog = page.getByRole('dialog', { name: '导出资产趋势' });
+    await expect(exportDialog).toBeVisible();
+    await expect(exportDialog.locator('.workspace-action-route strong')).toContainText('/reports?source=workbench&view=asset-trend&export=csv');
+    await page.keyboard.press('Escape');
+    await expect(exportDialog).toHaveCount(0);
+
+    await page.getByRole('button', { name: 'RPT-MAINT-COST-008', exact: true }).click();
+    const detailDialog = page.getByRole('dialog', { name: '打开报表详情' });
+    await expect(detailDialog).toBeVisible();
+    await expect(detailDialog.locator('.workspace-action-route strong')).toContainText('/reports/RPT-MAINT-COST-008');
+    await page.keyboard.press('Escape');
+    await expect(detailDialog).toHaveCount(0);
+    await expect(page.getByLabel('报表详情抽屉')).toContainText('预测维保成本分析');
+
+    await page.getByRole('button', { name: '订阅此报表' }).click();
+    const subscribeDialog = page.getByRole('dialog', { name: '订阅此报表' });
+    await expect(subscribeDialog).toBeVisible();
+    await expect(subscribeDialog.locator('.workspace-action-route strong')).toContainText('/subscribe?source=workbench');
+    await page.keyboard.press('Escape');
+    await expect(subscribeDialog).toHaveCount(0);
+
+    await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
+    expect(errors).toEqual([]);
+  });
+
+  test('告警中心左侧菜单渲染真实页面级组件而非通用产品壳', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await seedAuthenticatedSession(page, operationsUser);
+
+    await page.goto('/fixed-assets/workbench/security?menu=alarm');
+    await page.waitForLoadState('networkidle');
+
+    await expect(page.getByLabel('告警中心真实产品页')).toBeVisible();
+    await expect(page.locator('.workspace-product-page')).toHaveCount(0);
+    await expect(page.getByRole('heading', { name: '告警中心' })).toBeVisible();
+    await expect(page.getByText('等级研判 · 策略命中 · 处置复盘')).toBeVisible();
+    await expect(page.getByLabel('告警中心核心指标')).toContainText('安全评分');
+    await expect(page.getByLabel('告警处置流程')).toContainText('发现');
+    await expect(page.getByLabel('告警中心顶部操作')).toContainText('转派处置工单');
+    await expect(page.getByLabel('告警中心查询筛选栏')).toContainText('响应时间');
+    await expect(page.getByLabel('告警中心列表')).toContainText('ALM-20240614-0012');
+    await expect(page.getByLabel('告警详情抽屉')).toContainText('主轴振动异常触发高危策略');
+    await expect(page.getByLabel('告警详情标签')).toContainText('策略命中');
+    await expect(page.getByLabel('告警详情操作')).toContainText('创建工单');
+    await expect(page.locator('body')).not.toContainText('workbench-menu-alert-v1');
+
+    await page.getByRole('button', { name: /转派处置工单/ }).click();
+    const dispatchDialog = page.getByRole('dialog', { name: '转派处置工单' });
+    await expect(dispatchDialog).toBeVisible();
+    await expect(dispatchDialog.locator('.workspace-action-route strong')).toContainText('/workorders/new?');
+    await expect(dispatchDialog.locator('.workspace-action-route strong')).toContainText('priority=CRITICAL');
+    await page.keyboard.press('Escape');
+    await expect(dispatchDialog).toHaveCount(0);
+
+    await page.getByRole('button', { name: 'ALM-20240614-0011', exact: true }).click();
+    const detailDialog = page.getByRole('dialog', { name: '打开告警详情' });
+    await expect(detailDialog).toBeVisible();
+    await expect(detailDialog.locator('.workspace-action-route strong')).toContainText('/notifications/ALM-20240614-0011');
+    await page.keyboard.press('Escape');
+    await expect(detailDialog).toHaveCount(0);
+    await expect(page.getByLabel('告警详情抽屉')).toContainText('温度边界连续越限');
+
+    await page.getByRole('button', { name: '创建工单' }).click();
+    const workOrderDialog = page.getByRole('dialog', { name: '创建告警处置工单' });
+    await expect(workOrderDialog).toBeVisible();
+    await expect(workOrderDialog.locator('.workspace-action-route strong')).toContainText('/workorders/new?');
+    await page.keyboard.press('Escape');
+    await expect(workOrderDialog).toHaveCount(0);
 
     await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
     expect(errors).toEqual([]);
