@@ -2899,6 +2899,480 @@ const workbenchOrderRows = [
 
 const workbenchOrderDetailTabs = ['工单信息', '设备状态', '备件与物料', '处理记录', '关联告警'] as const;
 
+const workbenchTodoSummaryCards = [
+  { label: '待审批', value: '18', delta: '较昨日 +4', icon: ClipboardList, tone: 'orange' },
+  { label: '待派工', value: '24', delta: '今日建议派发', icon: Wrench, tone: 'blue' },
+  { label: '预警待办', value: '36', delta: '策略命中', icon: Bell, tone: 'red' },
+  { label: '巡检异常', value: '9', delta: '待复核点位', icon: CheckCircle2, tone: 'violet' },
+  { label: '备件低储', value: '18', delta: '关联 7 张工单', icon: PackageCheck, tone: 'cyan' },
+  { label: 'SLA 风险', value: '7', delta: '2h 内到期', icon: AlertTriangle, tone: 'red' },
+] as const;
+
+const workbenchTodoStages = [
+  { label: '收敛', value: '105', note: '跨模块事件', tone: 'blue' },
+  { label: '分派', value: '42', note: '责任人待确认', tone: 'cyan' },
+  { label: '处理', value: '31', note: '进行中', tone: 'green' },
+  { label: '复核', value: '16', note: '验收/审批', tone: 'violet' },
+  { label: '关闭', value: '91.8%', note: '本周闭环率', tone: 'orange' },
+] as const;
+
+const workbenchTodoRows = [
+  {
+    id: 'TD-20240614-018',
+    type: '审批',
+    source: '资产转移',
+    title: '数控车床 CN-301 跨车间调拨审批',
+    priority: 'P1',
+    status: '待审批',
+    sla: '1.2h',
+    owner: '张经理',
+    context: '资产调拨',
+    tone: 'red',
+  },
+  {
+    id: 'TD-20240614-017',
+    type: '预测维保',
+    source: '工单模型',
+    title: '注塑机 M-201 温度异常建议派工',
+    priority: 'P1',
+    status: '待派工',
+    sla: '2.0h',
+    owner: '王班组',
+    context: '高风险资产',
+    tone: 'red',
+  },
+  {
+    id: 'TD-20240614-016',
+    type: '巡检异常',
+    source: '点检路线',
+    title: '焊接线 A 机器人减速机温升复核',
+    priority: 'P2',
+    status: '待复核',
+    sla: '3.5h',
+    owner: '李巡检',
+    context: '异常点位',
+    tone: 'orange',
+  },
+  {
+    id: 'TD-20240614-015',
+    type: '备件低储',
+    source: '备件仓',
+    title: '轴承 6205-2RS 低储采购确认',
+    priority: 'P2',
+    status: '待确认',
+    sla: '4.0h',
+    owner: '备件员',
+    context: '关联 3 单',
+    tone: 'orange',
+  },
+  {
+    id: 'TD-20240614-014',
+    type: '告警处置',
+    source: '告警中心',
+    title: '冷干机 RD-201 冷凝压力告警转派',
+    priority: 'P2',
+    status: '处理中',
+    sla: '5.1h',
+    owner: '陈电工',
+    context: '联动工单',
+    tone: 'blue',
+  },
+  {
+    id: 'TD-20240614-013',
+    type: '报表订阅',
+    source: '报表分析',
+    title: '月度资产价值报表订阅确认',
+    priority: 'P3',
+    status: '待确认',
+    sla: '8.0h',
+    owner: '财务部',
+    context: '导出审计',
+    tone: 'green',
+  },
+] as const;
+
+const workbenchTodoDetailTabs = ['待办信息', '上下文', '处理建议', '流转记录', '关联单据'] as const;
+
+function WorkbenchTodoPage({
+  item,
+  context,
+  meta,
+  onPreviewAction,
+}: WorkbenchMenuPageProps) {
+  const [selectedTodoId, setSelectedTodoId] = useState(workbenchTodoRows[0].id);
+  const [detailTab, setDetailTab] = useState<(typeof workbenchTodoDetailTabs)[number]>('待办信息');
+  const [detailOpen, setDetailOpen] = useState(true);
+  const selectedTodo = workbenchTodoRows.find((todo) => todo.id === selectedTodoId) ?? workbenchTodoRows[0];
+  const primaryAction = meta.actions[0];
+  const secondaryAction = meta.actions[1] ?? primaryAction;
+
+  const openTodoPreview = (
+    title: string,
+    routeTarget: string,
+    description: string,
+    primaryLabel: string,
+    icon: LucideIcon = ClipboardList,
+  ) => {
+    onPreviewAction({
+      title,
+      source: '流程待办页面',
+      routeTarget,
+      description,
+      primaryLabel,
+      icon,
+      visual: meta.imageSrc,
+      stats: context.stats,
+    });
+  };
+
+  const openTodo = (todo: (typeof workbenchTodoRows)[number]) => {
+    setSelectedTodoId(todo.id);
+    setDetailOpen(true);
+    openTodoPreview(
+      '打开待办详情',
+      `/approvals/${todo.id}?source=workbench&queue=todo`,
+      `打开 ${todo.id}，带入来源模块、优先级、SLA 和处理上下文。`,
+      '打开详情',
+      FileText,
+    );
+  };
+
+  return (
+    <section className="workspace-orders-page workspace-todo-page" aria-label={`${item.label}真实产品页`}>
+      <div className="workspace-orders-main">
+        <section className="workspace-orders-shell" aria-label="流程待办产品页主体">
+          <header className="workspace-orders-header">
+            <div className="workspace-orders-title">
+              <span className="workspace-orders-icon"><ClipboardList /></span>
+              <div>
+                <h2>流程待办</h2>
+                <p>审批 · 派工 · 预警队列</p>
+              </div>
+            </div>
+            <div className="workspace-orders-toolbar" aria-label="流程待办顶部操作">
+              <button
+                type="button"
+                className="is-secondary"
+                onClick={() => onPreviewAction(primaryAction)}
+              >
+                <ClipboardList />
+                批量处理
+              </button>
+              <button
+                type="button"
+                className="is-secondary"
+                onClick={() =>
+                  openTodoPreview(
+                    '刷新待办队列',
+                    '/approvals?source=workbench&refresh=true',
+                    '刷新审批、预测维保、巡检异常和备件低储队列。',
+                    '刷新队列',
+                    Activity,
+                  )
+                }
+              >
+                <Activity />
+                刷新队列
+              </button>
+              <button type="button" className="is-primary" onClick={() => onPreviewAction(secondaryAction)}>
+                <Wrench />
+                创建预测工单
+              </button>
+            </div>
+          </header>
+
+          <div className="workspace-orders-kpis" aria-label="流程待办核心指标">
+            {workbenchTodoSummaryCards.map((card) => {
+              const CardIcon = card.icon;
+              return (
+                <button
+                  key={card.label}
+                  type="button"
+                  className={`is-${card.tone}`}
+                  onClick={() =>
+                    openTodoPreview(
+                      `${card.label}队列`,
+                      `/approvals?source=workbench&queue=${encodeURIComponent(card.label)}`,
+                      `按 ${card.label} 下钻流程待办，保留当前厂区和 Workbench 来源。`,
+                      '查看队列',
+                      CardIcon,
+                    )
+                  }
+                >
+                  <CardIcon />
+                  <span>{card.label}</span>
+                  <strong>{card.value}</strong>
+                  <small>{card.delta}</small>
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="workspace-orders-stage-row" aria-label="流程待办阶段">
+            {workbenchTodoStages.map((stage) => (
+              <button
+                key={stage.label}
+                type="button"
+                className={`is-${stage.tone}`}
+                onClick={() =>
+                  openTodoPreview(
+                    `${stage.label}阶段待办`,
+                    `/approvals?source=workbench&stage=${encodeURIComponent(stage.label)}`,
+                    `查看 ${stage.label} 阶段的跨模块待办事项。`,
+                    '查看阶段',
+                    ArrowRight,
+                  )
+                }
+              >
+                <span>{stage.label}</span>
+                <strong>{stage.value}</strong>
+                <small>{stage.note}</small>
+              </button>
+            ))}
+          </div>
+
+          <div className="workspace-orders-filterbar" aria-label="流程待办查询筛选栏">
+            <label>
+              <Search />
+              <input readOnly value="搜索待办号 / 来源 / 标题 / 责任人" aria-label="流程待办搜索" />
+            </label>
+            {['类型 全部', '优先级 全部', '状态 全部', '责任人 全部'].map((filter) => (
+              <button key={filter} type="button" onClick={() => onPreviewAction(secondaryAction)}>
+                {filter}
+                <ArrowRight />
+              </button>
+            ))}
+            <button
+              type="button"
+              className="is-date"
+              onClick={() =>
+                openTodoPreview(
+                  '按截止时间筛选',
+                  '/approvals?source=workbench&due=today',
+                  '查看今日到期和 SLA 风险待办。',
+                  '查看今日待办',
+                  CalendarDays,
+                )
+              }
+            >
+              截止时间
+              <CalendarDays />
+            </button>
+            <button type="button" className="is-reset" onClick={() => onPreviewAction(secondaryAction)}>
+              重置
+            </button>
+          </div>
+
+          <div className="workspace-orders-table" aria-label="流程待办列表">
+            <div className="workspace-orders-table-head">
+              <span><input type="checkbox" aria-label="选择全部待办" readOnly /></span>
+              <span>待办号</span>
+              <span>类型</span>
+              <span>来源模块</span>
+              <span>标题</span>
+              <span>优先级</span>
+              <span>状态</span>
+              <span>SLA</span>
+              <span>责任人</span>
+              <span>上下文</span>
+              <span>操作</span>
+            </div>
+            {workbenchTodoRows.map((todo) => (
+              <div
+                key={todo.id}
+                className={`workspace-orders-table-row is-${todo.tone} ${todo.id === selectedTodo.id ? 'is-selected' : ''}`}
+              >
+                <span><input type="checkbox" aria-label={`选择${todo.id}`} readOnly /></span>
+                <button type="button" className="is-link" onClick={() => openTodo(todo)}>{todo.id}</button>
+                <span><em>{todo.type}</em></span>
+                <span>
+                  <strong>{todo.source}</strong>
+                  <small>{todo.context}</small>
+                </span>
+                <button type="button" className="is-title" onClick={() => openTodo(todo)}>{todo.title}</button>
+                <span><b>{todo.priority}</b></span>
+                <span><i>{todo.status}</i></span>
+                <span>{todo.sla}</span>
+                <span>{todo.owner}</span>
+                <span><em className="is-spare">{todo.context}</em></span>
+                <span>
+                  <button
+                    type="button"
+                    className="is-process"
+                    onClick={() => {
+                      setSelectedTodoId(todo.id);
+                      setDetailOpen(true);
+                      openTodoPreview(
+                        '处理待办',
+                        `/approvals/${todo.id}/process?source=workbench`,
+                        `处理 ${todo.id}，带入 ${todo.type}、${todo.source} 和 SLA ${todo.sla}。`,
+                        '进入处理',
+                        ClipboardList,
+                      );
+                    }}
+                  >
+                    处理
+                  </button>
+                  <button type="button" className="is-more" aria-label={`${todo.id}更多操作`} onClick={() => openTodo(todo)}>
+                    ···
+                  </button>
+                </span>
+              </div>
+            ))}
+          </div>
+
+          <footer className="workspace-orders-pagination" aria-label="流程待办分页">
+            <span>共 105 条</span>
+            <button type="button">10条/页</button>
+            <button type="button" disabled>‹</button>
+            {[1, 2, 3, 4, 5].map((pageNo) => (
+              <button key={pageNo} type="button" className={pageNo === 1 ? 'is-current' : ''}>{pageNo}</button>
+            ))}
+            <span>...</span>
+            <button type="button">11</button>
+            <button type="button">›</button>
+          </footer>
+        </section>
+      </div>
+
+      <aside className="workspace-orders-detail" aria-label="流程待办详情抽屉">
+        {detailOpen ? (
+          <>
+            <header className="workspace-orders-detail-head">
+              <strong>待办详情</strong>
+              <button type="button" aria-label="关闭待办详情" onClick={() => setDetailOpen(false)}>
+                <X />
+              </button>
+            </header>
+            <section className="workspace-orders-detail-card" aria-label="当前待办信息">
+              <div>
+                <b>{selectedTodo.priority}</b>
+                <span>
+                  <strong>{selectedTodo.id}</strong>
+                  <small>{selectedTodo.status}</small>
+                </span>
+              </div>
+              <h3>{selectedTodo.title}</h3>
+              <dl>
+                <div><dt>类型</dt><dd>{selectedTodo.type}</dd></div>
+                <div><dt>SLA</dt><dd>{selectedTodo.sla}</dd></div>
+                <div><dt>来源</dt><dd>{selectedTodo.source}</dd></div>
+                <div><dt>上下文</dt><dd>{selectedTodo.context}</dd></div>
+                <div><dt>责任人</dt><dd>{selectedTodo.owner}</dd></div>
+                <div><dt>优先级</dt><dd>{selectedTodo.priority} 紧急</dd></div>
+                <div><dt>创建时间</dt><dd>2026-06-14 09:18</dd></div>
+                <div><dt>截止时间</dt><dd>2026-06-14 11:30</dd></div>
+              </dl>
+            </section>
+
+            <section className="workspace-orders-flow" aria-label="流程待办流转">
+              {['收敛', '分派', '处理', '复核', '关闭'].map((step, index) => (
+                <span key={step} className={index < 2 ? 'is-done' : index === 2 ? 'is-active' : ''}>
+                  <CheckCircle2 />
+                  <strong>{step}</strong>
+                  <small>{index < 2 ? '06-14 09:20' : index === 2 ? '待处理' : '待流转'}</small>
+                </span>
+              ))}
+            </section>
+
+            <nav className="workspace-orders-tabs" aria-label="流程待办详情标签">
+              {workbenchTodoDetailTabs.map((tab) => (
+                <button
+                  key={tab}
+                  type="button"
+                  className={tab === detailTab ? 'is-active' : ''}
+                  onClick={() => setDetailTab(tab)}
+                >
+                  {tab}
+                </button>
+              ))}
+            </nav>
+
+            <section className="workspace-orders-tab-panel" aria-label={`${detailTab}内容`}>
+              <article>
+                <span>处理摘要</span>
+                <p>聚合审批、派工、巡检异常和备件低储，按 SLA 与风险优先级排序。</p>
+              </article>
+              <article>
+                <span>预填上下文</span>
+                <ul>
+                  <li>{selectedTodo.source} <b>已带入</b></li>
+                  <li>{selectedTodo.context} <b>已关联</b></li>
+                  <li>{selectedTodo.priority} 优先级 <b className="is-warning">需确认</b></li>
+                </ul>
+              </article>
+              <article>
+                <span>处理建议</span>
+                <p>优先处理 SLA 风险项，预测维保可直接生成工单，审批项进入审批中心完成。</p>
+              </article>
+              <article>
+                <span>关联单据</span>
+                <ul>
+                  <li>审批单 AP-20240614-08 <small>待处理</small></li>
+                  <li>预测工单 WO-20240614-0012 <small>已草稿</small></li>
+                  <li>备件申请 SP-20240614-021 <small>待采购</small></li>
+                </ul>
+              </article>
+            </section>
+
+            <footer className="workspace-orders-detail-actions" aria-label="流程待办详情操作">
+              <button
+                type="button"
+                onClick={() =>
+                  openTodoPreview(
+                    '转派待办',
+                    `/approvals/${selectedTodo.id}/assign?source=workbench`,
+                    `转派 ${selectedTodo.id}，保留待办来源和处理上下文。`,
+                    '进入转派',
+                    UserCircle,
+                  )
+                }
+              >
+                转派
+              </button>
+              <button
+                type="button"
+                onClick={() =>
+                  openTodoPreview(
+                    '挂起待办',
+                    `/approvals/${selectedTodo.id}/suspend?source=workbench`,
+                    `挂起 ${selectedTodo.id} 并要求填写原因，不在 Workbench 内直接提交危险操作。`,
+                    '进入挂起',
+                    AlertTriangle,
+                  )
+                }
+              >
+                挂起
+              </button>
+              <button
+                type="button"
+                className="is-primary"
+                onClick={() =>
+                  openTodoPreview(
+                    '开始处理',
+                    `/approvals/${selectedTodo.id}/process?source=workbench`,
+                    `开始处理 ${selectedTodo.id}，带入 SLA、来源模块和业务上下文。`,
+                    '开始处理',
+                    ClipboardList,
+                  )
+                }
+              >
+                开始处理
+              </button>
+            </footer>
+          </>
+        ) : (
+          <button type="button" className="workspace-orders-detail-empty" onClick={() => setDetailOpen(true)}>
+            <FileText />
+            <strong>选择左侧待办打开详情</strong>
+            <span>详情抽屉会展示上下文、处理建议、流转记录和关联单据。</span>
+          </button>
+        )}
+      </aside>
+    </section>
+  );
+}
+
 function WorkbenchOrdersPage({
   item,
   context,
@@ -5274,7 +5748,15 @@ export default function WorkspacePreviewPage() {
           </div>
 
           <WorkspaceContextStrip item={activeItem} context={activeContext} onAction={handleContextAction} />
-          {activeModuleMock && activeProductPageMeta && activeItem.id === 'orders' ? (
+          {activeModuleMock && activeProductPageMeta && activeItem.id === 'todo' ? (
+            <WorkbenchTodoPage
+              item={activeItem}
+              context={activeContext}
+              mock={activeModuleMock}
+              meta={activeProductPageMeta}
+              onPreviewAction={setRoutePreview}
+            />
+          ) : activeModuleMock && activeProductPageMeta && activeItem.id === 'orders' ? (
             <WorkbenchOrdersPage
               item={activeItem}
               context={activeContext}

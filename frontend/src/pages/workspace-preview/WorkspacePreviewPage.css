@@ -1818,6 +1818,46 @@
   line-height: 1.5;
 }
 
+.workspace-todo-page {
+  background:
+    linear-gradient(180deg, rgba(247, 251, 255, .96), rgba(236, 248, 255, .96)),
+    #edf7ff;
+}
+
+.workspace-todo-page .workspace-orders-icon {
+  color: #176de8;
+  background: #edf6ff;
+}
+
+.workspace-todo-page .workspace-orders-title h2 {
+  letter-spacing: 0;
+}
+
+.workspace-todo-page .workspace-orders-stage-row button {
+  border-top-color: #1f75ee;
+}
+
+.workspace-todo-page .workspace-orders-stage-row .is-orange {
+  border-top-color: #0d9a6a;
+}
+
+.workspace-todo-page .workspace-orders-detail-card b {
+  background: #f08a20;
+}
+
+.workspace-todo-page .workspace-orders-table-row.is-red b {
+  background: #f03649;
+}
+
+.workspace-todo-page .workspace-orders-table-row.is-orange b {
+  background: #f08a20;
+}
+
+.workspace-todo-page .workspace-orders-table-row.is-green b,
+.workspace-todo-page .workspace-orders-table-row.is-blue b {
+  background: #176de8;
+}
+
 .workspace-product-page {
   display: grid;
   gap: 12px;

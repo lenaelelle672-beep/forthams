@@ -196,7 +196,7 @@ test.describe('Workbench 正式入口浏览器回归', () => {
     expect(errors).toEqual([]);
   });
 
-  test('Workbench 非工单菜单产品页呈现业务操作台、CRUD 矩阵和页面级跳转', async ({ page }) => {
+  test('Workbench 未独立替换菜单产品页呈现业务操作台、CRUD 矩阵和页面级跳转', async ({ page }) => {
     const errors = collectBrowserErrors(page);
     await seedAuthenticatedSession(page, operationsUser);
 
@@ -207,13 +207,6 @@ test.describe('Workbench 正式入口浏览器回归', () => {
         heading: '资产运营总览与快捷任务',
         action: '新建预测工单',
         targetIncludes: ['/workorders/new?', 'source=quick-action', 'riskScore=91'],
-      },
-      {
-        route: '/fixed-assets/workbench?menu=todo',
-        pageLabel: '流程待办',
-        heading: '审批与运维待办队列',
-        action: '处理审批队列',
-        targetIncludes: ['/approvals?source=workbench&status=PENDING'],
       },
       {
         route: '/fixed-assets/workbench/assets?menu=asset',
@@ -310,6 +303,53 @@ test.describe('Workbench 正式入口浏览器回归', () => {
       await page.keyboard.press('Escape');
       await expect(dialog).toHaveCount(0);
     }
+
+    await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
+    expect(errors).toEqual([]);
+  });
+
+  test('流程待办左侧菜单渲染真实页面级组件而非通用产品壳', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await seedAuthenticatedSession(page, operationsUser);
+
+    await page.goto('/fixed-assets/workbench?menu=todo');
+    await page.waitForLoadState('networkidle');
+
+    await expect(page.getByLabel('流程待办真实产品页')).toBeVisible();
+    await expect(page.locator('.workspace-product-page')).toHaveCount(0);
+    await expect(page.getByRole('heading', { name: '流程待办' })).toBeVisible();
+    await expect(page.getByText('审批 · 派工 · 预警队列')).toBeVisible();
+    await expect(page.getByLabel('流程待办核心指标')).toContainText('待审批');
+    await expect(page.getByLabel('流程待办阶段')).toContainText('收敛');
+    await expect(page.getByLabel('流程待办顶部操作')).toContainText('批量处理');
+    await expect(page.getByLabel('流程待办查询筛选栏')).toContainText('截止时间');
+    await expect(page.getByLabel('流程待办列表')).toContainText('TD-20240614-018');
+    await expect(page.getByLabel('流程待办详情抽屉')).toContainText('数控车床 CN-301 跨车间调拨审批');
+    await expect(page.getByLabel('流程待办详情标签')).toContainText('关联单据');
+    await expect(page.getByLabel('流程待办详情操作')).toContainText('开始处理');
+    await expect(page.locator('body')).not.toContainText('workbench-menu-todo-v1');
+
+    await page.getByRole('button', { name: /创建预测工单/ }).click();
+    const createDialog = page.getByRole('dialog', { name: '派发预测工单' });
+    await expect(createDialog).toBeVisible();
+    await expect(createDialog.locator('.workspace-action-route strong')).toContainText('/workorders/new?');
+    await page.keyboard.press('Escape');
+    await expect(createDialog).toHaveCount(0);
+
+    await page.getByRole('button', { name: 'TD-20240614-017', exact: true }).click();
+    const detailDialog = page.getByRole('dialog', { name: '打开待办详情' });
+    await expect(detailDialog).toBeVisible();
+    await expect(detailDialog.locator('.workspace-action-route strong')).toContainText('/approvals/TD-20240614-017');
+    await page.keyboard.press('Escape');
+    await expect(detailDialog).toHaveCount(0);
+    await expect(page.getByLabel('流程待办详情抽屉')).toContainText('注塑机 M-201 温度异常建议派工');
+
+    await page.getByRole('button', { name: '开始处理' }).click();
+    const processDialog = page.getByRole('dialog', { name: '开始处理' });
+    await expect(processDialog).toBeVisible();
+    await expect(processDialog.locator('.workspace-action-route strong')).toContainText('/process?source=workbench');
+    await page.keyboard.press('Escape');
+    await expect(processDialog).toHaveCount(0);
 
     await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
     expect(errors).toEqual([]);
