@@ -132,6 +132,8 @@ This iteration reuses the confirmed visual direction and existing assets first. 
 
 2026-06-14 continuation added `frontend/src/__tests__/workbenchPlatformEntry.contract.test.ts` so the formal-entry decision is protected by automated checks instead of only manual screenshots.
 
+2026-06-14 continuation also added `frontend/src/e2e/workbench-platform-entry.browser-regression-smoke.spec.ts` so the browser verification record is repeatable through the existing Playwright `browser-regression-smoke` project.
+
 | Contract area | Automated evidence |
 | --- | --- |
 | Desktop formal entry | `AppLayout` keeps `资产运营中枢` before `旧版仪表板` |
@@ -140,5 +142,15 @@ This iteration reuses the confirmed visual direction and existing assets first. 
 | Dashboard migration | Pending approvals, work orders, inspections, spare parts, reports, policies, and basic maintenance target real project routes |
 | Backend menu governance | Schema and V2_84 migration keep ids `310/311`, query param `menu=home`, and legacy dashboard id `186` |
 | Evidence hygiene | Matrix sections for navigation conclusions, click matrix, browser verification, and IMAGE2/Stitch governance remain present |
+
+Playwright browser regression evidence:
+
+| Browser path | Automated evidence |
+| --- | --- |
+| Legacy dashboard transition | `/dashboard` exposes `资产运营中枢` and `旧版仪表板`; clicking `资产运营中枢` lands on `/fixed-assets/workbench?menu=home` |
+| Workbench shell | Formal Workbench renders `运营首页`, `流程待办`, `基础维护`, the four approved top tabs, and excludes `报表大屏`, `平台配置`, `维保计划` |
+| Business action closure | `查看流程待办` opens the operation drawer with `/approvals?source=workbench&status=PENDING`, prefill fields, and enabled primary navigation |
+| No-permission handling | A user with only Workbench access can open Workbench but sees the report drawer warning and disabled `暂无权限` primary action for `/reports?source=workbench&view=operations` |
+| Route guard | A user with `report:query` but without Workbench permissions gets `无访问权限`; the Workbench shell does not render |
 
 Stitch MCP preflight on 2026-06-14 returned `Auth required` for `list_projects`, so this continuation does not claim a new Stitch generation. Existing `stitch-suite` and `asset-kit-v4/v5` assets remain the current visual source of truth until Stitch authentication is restored.

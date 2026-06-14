@@ -1,0 +1,273 @@
+import { expect, test, type Page, type Route } from '@playwright/test';
+
+type SmokeUser = {
+  userId: number;
+  username: string;
+  realName: string;
+  roles: string[];
+  permissions: string[];
+};
+
+const adminUser: SmokeUser = {
+  userId: 1,
+  username: 'admin',
+  realName: '系统管理员',
+  roles: ['SUPER_ADMIN', 'ADMIN'],
+  permissions: [],
+};
+
+const operationsUser: SmokeUser = {
+  userId: 2,
+  username: 'operator',
+  realName: '运营专员',
+  roles: ['USER'],
+  permissions: [
+    'dashboard:query',
+    'approval:process:query',
+    'report:query',
+    'asset:ledger:query',
+    'asset:query',
+    'workorder:order:query',
+    'inspection:query',
+    'inventory:sparepart:query',
+    'notification:query',
+    'risk:matrix:query',
+    'system:config:query',
+  ],
+};
+
+const workbenchOnlyUser: SmokeUser = {
+  userId: 3,
+  username: 'workbench-readonly',
+  realName: '工作台只读',
+  roles: ['USER'],
+  permissions: ['dashboard:query'],
+};
+
+const reportOnlyUser: SmokeUser = {
+  userId: 4,
+  username: 'report-only',
+  realName: '报表只读',
+  roles: ['USER'],
+  permissions: ['report:query'],
+};
+
+test.describe('Workbench 正式入口浏览器回归', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+  });
+
+  test('旧版仪表板侧边栏提升资产运营中枢并能进入正式 Workbench', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await seedAuthenticatedSession(page, adminUser);
+
+    await page.goto('/dashboard');
+    await page.waitForLoadState('networkidle');
+
+    const operationsHub = page.getByRole('link', { name: '资产运营中枢' });
+    const legacyDashboard = page.getByRole('link', { name: '旧版仪表板' });
+    await expect(operationsHub).toBeVisible({ timeout: 10_000 });
+    await expect(legacyDashboard).toBeVisible();
+
+    await operationsHub.click();
+    await expect(page).toHaveURL(/\/fixed-assets\/workbench\?menu=home$/);
+    await expect(page.getByText('固定资产平台', { exact: true })).toBeVisible();
+    await expect(page.getByRole('button', { name: '运营首页', exact: true })).toBeVisible();
+    await expect(page.getByRole('button', { name: '流程待办', exact: true })).toBeVisible();
+    await expect(page.getByRole('button', { name: '基础维护', exact: true })).toBeVisible();
+
+    for (const tab of ['智能制造总览', '数据监控中心', '资产运维中心', '安全态势工作台']) {
+      await expect(page.getByRole('button', { name: tab, exact: true })).toBeVisible();
+    }
+
+    for (const duplicateMenu of ['报表大屏', '平台配置', '维保计划']) {
+      await expect(page.getByRole('button', { name: duplicateMenu, exact: true })).toHaveCount(0);
+    }
+
+    await page.getByRole('button', { name: '旧版仪表板' }).click();
+    await expect(page).toHaveURL(/\/dashboard$/);
+    await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
+    expect(errors).toEqual([]);
+  });
+
+  test('Workbench 关键动作展示真实目标、预填上下文并进入业务页', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await seedAuthenticatedSession(page, operationsUser);
+
+    await page.goto('/fixed-assets/workbench?menu=todo');
+    await page.waitForLoadState('networkidle');
+
+    await expect(page.getByRole('button', { name: '流程待办', exact: true })).toHaveClass(/is-active/);
+    await page.getByRole('button', { name: '查看流程待办' }).click();
+    const todoDialog = page.getByRole('dialog', { name: '查看流程待办' });
+    await expect(todoDialog).toBeVisible();
+    await expect(todoDialog.getByText('/approvals?source=workbench&status=PENDING').first()).toBeVisible();
+    await expect(todoDialog.getByText('预填字段')).toBeVisible();
+    const todoPrimaryButton = todoDialog.getByRole('button', { name: /进入业务页面|进入处理/ });
+    await expect(todoPrimaryButton).toBeEnabled();
+    await todoPrimaryButton.click();
+    await expect(page).toHaveURL(/\/approvals\?source=workbench&status=PENDING$/);
+    await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
+    expect(errors).toEqual([]);
+  });
+
+  test('Workbench 抽屉对缺少业务权限的目标给出禁用反馈', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await seedAuthenticatedSession(page, workbenchOnlyUser);
+
+    await page.goto('/fixed-assets/workbench/analytics?menu=report');
+    await page.waitForLoadState('networkidle');
+
+    await page.getByRole('button', { name: '生成经营报表' }).click();
+    const reportDialog = page.getByRole('dialog', { name: '生成经营报表' });
+    await expect(reportDialog).toBeVisible();
+    await expect(reportDialog.getByText('/reports?source=workbench&view=operations').first()).toBeVisible();
+    await expect(reportDialog.getByRole('status')).toContainText('当前账号缺少访问该业务页面的权限');
+    await expect(reportDialog.getByRole('button', { name: /暂无权限/ })).toBeDisabled();
+    await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
+    expect(errors).toEqual([]);
+  });
+
+  test('缺少 Workbench 权限时受保护正式入口不渲染平台壳', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await seedAuthenticatedSession(page, reportOnlyUser);
+
+    await page.goto('/fixed-assets/workbench?menu=home');
+    await page.waitForLoadState('networkidle');
+
+    await expect(page.getByRole('heading', { name: '无访问权限' })).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByRole('button', { name: '运营首页' })).toHaveCount(0);
+    expect(errors).toEqual([]);
+  });
+});
+
+async function seedAuthenticatedSession(page: Page, user: SmokeUser) {
+  await page.addInitScript(({ nextUser }) => {
+    window.localStorage.setItem('auth_token', 'workbench-platform-entry-smoke-token');
+    window.localStorage.setItem('user_info', JSON.stringify(nextUser));
+    window.sessionStorage.setItem('auth_token', 'workbench-platform-entry-smoke-token');
+    window.sessionStorage.setItem('user_info', JSON.stringify(nextUser));
+  }, { nextUser: user });
+}
+
+function collectBrowserErrors(page: Page) {
+  const errors: string[] = [];
+
+  page.on('console', (message) => {
+    if (message.type() === 'error') {
+      const text = message.text();
+      if (!text.includes('Failed to load resource') && !text.startsWith('Warning:')) {
+        errors.push(text);
+      }
+    }
+  });
+
+  page.on('pageerror', (error) => {
+    errors.push(error.message);
+  });
+
+  return errors;
+}
+
+async function mockApi(route: Route) {
+  const url = new URL(route.request().url());
+  if (!url.pathname.startsWith('/api/')) {
+    return route.continue();
+  }
+
+  const path = url.pathname.replace(/^\/api/, '');
+
+  if (path === '/menus/current') {
+    return fulfill(route, {
+      menus: [],
+      permissions: operationsUser.permissions,
+      roles: operationsUser.roles,
+    });
+  }
+
+  if (path === '/dashboard/stats') {
+    return fulfill(route, {
+      totalAssets: 6842,
+      inUseAssets: 5102,
+      idleAssets: 268,
+      maintenanceAssets: 97,
+      scrapAssets: 21,
+      totalValue: 48600000,
+      netValue: 38200000,
+      categoryDistribution: { 生产设备: 43, IT设备: 27, 安防设备: 18, 办公设备: 12 },
+      pendingApprovals: 9,
+      overdueMaintenance: 4,
+    });
+  }
+
+  if (path === '/dashboard/trends') {
+    return fulfill(route, [
+      { date: '2026-01', totalValue: 45000000, netValue: 37100000 },
+      { date: '2026-02', totalValue: 45800000, netValue: 37400000 },
+      { date: '2026-03', totalValue: 46600000, netValue: 37700000 },
+      { date: '2026-04', totalValue: 47600000, netValue: 38100000 },
+      { date: '2026-05', totalValue: 48600000, netValue: 38200000 },
+    ]);
+  }
+
+  if (path === '/dashboard/dept-distribution') {
+    return fulfill(route, [
+      { deptId: 1, deptName: 'A 厂区', assetCount: 2840, totalValue: 21000000 },
+      { deptId: 2, deptName: 'B 厂区', assetCount: 1935, totalValue: 14800000 },
+      { deptId: 3, deptName: '研发中心', assetCount: 1120, totalValue: 9600000 },
+    ]);
+  }
+
+  if (path === '/dashboard/maintenance-stats') {
+    return fulfill(route, {
+      totalMaintenanceCount: 36,
+      upcomingCount: 12,
+      overdueCount: 4,
+      avgMaintenanceCost: 1280,
+      monthlyMaintenanceCount: 8,
+      alerts: [
+        { id: 1, assetName: 'AOI 光学检测仪', level: 'warning', message: '维保即将到期' },
+      ],
+    });
+  }
+
+  if (path === '/dashboard/pending-approvals') {
+    return fulfill(route, 9);
+  }
+
+  if (path.startsWith('/approvals')) {
+    return fulfill(route, paged([
+      { id: 1, processNo: 'APR-WB-001', processType: '工单审批', status: 'PENDING', applicantName: '运营专员' },
+    ]));
+  }
+
+  if (path.startsWith('/workorders')) {
+    return fulfill(route, paged([
+      { id: 1, orderNo: 'WO-WB-001', title: '预测性保养工单', status: 'PENDING', priority: 'HIGH' },
+    ]));
+  }
+
+  if (path.startsWith('/notifications')) {
+    return fulfill(route, paged([]));
+  }
+
+  return fulfill(route, paged([]));
+}
+
+function paged<T>(records: T[]) {
+  return {
+    records,
+    total: records.length,
+    size: 10,
+    current: 1,
+    pages: 1,
+  };
+}
+
+async function fulfill(route: Route, data: unknown) {
+  await route.fulfill({
+    status: 200,
+    contentType: 'application/json',
+    body: JSON.stringify({ code: 200, message: 'OK', data }),
+  });
+}
