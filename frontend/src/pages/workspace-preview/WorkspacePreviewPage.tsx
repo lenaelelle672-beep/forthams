@@ -3700,6 +3700,58 @@ const workbenchEnergyRows = [
 
 const workbenchEnergyDetailTabs = ['链路信息', '采集任务', '异常事件', '重试记录', '订阅导出'] as const;
 
+const workbenchEnergyDomains = [
+  {
+    id: 'ingestion',
+    label: '采集链路',
+    value: '12',
+    note: 'MES / IoT / PLC',
+    icon: Activity,
+    route: '/energy?source=workbench&scope=data-monitoring&domain=ingestion',
+    children: ['IoT 网关', 'MES 同步', 'PLC 点位'],
+  },
+  {
+    id: 'quality',
+    label: '数据质量',
+    value: '98.6%',
+    note: '清洗 / 去重 / 回补',
+    icon: Gauge,
+    route: '/energy?source=workbench&scope=data-monitoring&domain=quality',
+    children: ['采集延迟', '缺失补偿', '质量规则'],
+  },
+  {
+    id: 'events',
+    label: '异常事件',
+    value: '32',
+    note: '待处理 / 待重试',
+    icon: AlertTriangle,
+    route: '/energy?source=workbench&scope=data-monitoring&domain=events',
+    children: ['延迟事件', '同步失败', '告警联动'],
+  },
+  {
+    id: 'service',
+    label: '指标服务',
+    value: '14',
+    note: '订阅 / 导出 / API',
+    icon: Database,
+    route: '/energy?source=workbench&scope=data-monitoring&domain=service',
+    children: ['报表订阅', '接口推送', '导出队列'],
+  },
+] as const;
+
+const workbenchEnergyStateCards = [
+  { label: '空态', value: '暂无异常事件', note: '筛选无结果时保留链路拓扑、采集任务和订阅入口' },
+  { label: '异常态', value: '采集链路异常 2 项', note: 'IoT 网关和 MES 回写延迟时保留上次成功批次' },
+  { label: '无权限态', value: '数据重试受限', note: '缺少 dashboard:query 时只能查看摘要并发起权限申请' },
+] as const;
+
+const workbenchEnergyServiceCards = [
+  { label: '今日吞吐', value: '86.5GB', note: '批量 + 实时数据', tone: 'blue' },
+  { label: '回补任务', value: '7', note: '自动补偿中', tone: 'orange' },
+  { label: '订阅导出', value: '14', note: '服务在线', tone: 'green' },
+  { label: '告警联动', value: '32', note: '关联工单/告警', tone: 'red' },
+] as const;
+
 const workbenchPolicySummaryCards = [
   { label: '风险规则', value: '68', delta: '启用 54', icon: ShieldCheck, tone: 'blue' },
   { label: '角色策略', value: '128', delta: '110 个启用', icon: UserCircle, tone: 'cyan' },
@@ -5172,9 +5224,484 @@ function WorkbenchHomePage({
   );
 }
 
-const WorkbenchEnergyPage = (props: WorkbenchMenuPageProps) => (
-  <WorkbenchCommandPage {...props} config={workbenchEnergyConfig} />
-);
+function WorkbenchEnergyPage({
+  item,
+  context,
+  meta,
+  onPreviewAction,
+}: WorkbenchMenuPageProps) {
+  const { user } = useAuth();
+  const [selectedDomain, setSelectedDomain] = useState<(typeof workbenchEnergyDomains)[number]['id']>('ingestion');
+  const [selectedRowId, setSelectedRowId] = useState(workbenchEnergyRows[0].id);
+  const [detailTab, setDetailTab] = useState<(typeof workbenchEnergyDetailTabs)[number]>('链路信息');
+  const selectedDomainMeta =
+    workbenchEnergyDomains.find((domain) => domain.id === selectedDomain) ?? workbenchEnergyDomains[0];
+  const selectedRow = workbenchEnergyRows.find((row) => row.id === selectedRowId) ?? workbenchEnergyRows[0];
+  const canOpenEnergy = canAccessRoute('/energy', user);
+  const canOpenReports = canAccessRoute('/reports', user);
+
+  const openEnergyPreview = (
+    title: string,
+    routeTarget: string,
+    description: string,
+    primaryLabel: string,
+    icon: LucideIcon = Activity,
+  ) => {
+    onPreviewAction({
+      title,
+      source: '数据监控页面',
+      routeTarget,
+      description,
+      primaryLabel,
+      icon,
+      visual: meta.imageSrc,
+      stats: context.stats,
+    });
+  };
+
+  const runEnergyAction = (actionIndex: number) => {
+    const action = meta.actions[actionIndex];
+    if (action) {
+      onPreviewAction(action);
+      return;
+    }
+    openEnergyPreview(
+      '查看数据链路',
+      '/energy?source=workbench&scope=data-monitoring',
+      '进入数据监控页面，保留 MES/IoT 链路和 Workbench 来源。',
+      '进入数据链路',
+      Activity,
+    );
+  };
+
+  const openEnergyEvent = (row: (typeof workbenchEnergyRows)[number]) => {
+    setSelectedRowId(row.id);
+    openEnergyPreview(
+      '打开数据监控详情',
+      `/energy/${encodeURIComponent(row.id)}?source=workbench&menu=energy`,
+      `打开 ${row.entity}，带入 ${row.type}、${row.status}、${row.contextLabel} 和责任方 ${row.owner}。`,
+      '打开详情',
+      Activity,
+    );
+  };
+
+  return (
+    <section className="workspace-orders-page workspace-energy-page workspace-energy-product" aria-label={`${item.label}真实产品页`}>
+      <aside className="workspace-energy-rail" aria-label="数据监控链路域">
+        <header>
+          <span><Activity /></span>
+          <div>
+            <h2>数据监控</h2>
+            <p>数据链路 · 采集事件 · 指标服务</p>
+          </div>
+        </header>
+        <div className="workspace-energy-domain-list" aria-label="数据监控一级链路域">
+          {workbenchEnergyDomains.map((domain) => {
+            const DomainIcon = domain.icon;
+            return (
+              <button
+                key={domain.id}
+                type="button"
+                className={domain.id === selectedDomain ? 'is-active' : ''}
+                onClick={() => setSelectedDomain(domain.id)}
+              >
+                <DomainIcon />
+                <span>
+                  <strong>{domain.label}</strong>
+                  <small>{domain.note}</small>
+                </span>
+                <b>{domain.value}</b>
+              </button>
+            );
+          })}
+        </div>
+        <section className="workspace-energy-domain-children" aria-label="数据监控二级链路">
+          <span>{selectedDomainMeta.label}二级项</span>
+          {selectedDomainMeta.children.map((child) => (
+            <button
+              key={child}
+              type="button"
+              onClick={() =>
+                openEnergyPreview(
+                  `${child}链路查询`,
+                  `${selectedDomainMeta.route}&node=${encodeURIComponent(child)}`,
+                  `进入 ${child} 数据链路，保留 Workbench 数据监控来源和当前域。`,
+                  '进入链路',
+                  selectedDomainMeta.icon,
+                )
+              }
+            >
+              {child}
+              <ArrowRight />
+            </button>
+          ))}
+        </section>
+        <section className="workspace-energy-states" aria-label="数据监控状态反馈">
+          {workbenchEnergyStateCards.map((state) => (
+            <article key={state.label}>
+              <span>{state.label}</span>
+              <strong>{state.value}</strong>
+              <p>{state.note}</p>
+            </article>
+          ))}
+        </section>
+      </aside>
+
+      <section className="workspace-energy-center" aria-label="数据监控产品页主体">
+        <header className="workspace-energy-header">
+          <div>
+            <span>业务操作台</span>
+            <h2>数据监控</h2>
+            <p>把 MES、IoT、设备点位和异常流水合并为可查询、可重试、可订阅的链路工作台。</p>
+          </div>
+        </header>
+        <div className="workspace-energy-toolbar workspace-orders-toolbar" aria-label="数据监控顶部操作">
+          <button type="button" onClick={() => runEnergyAction(0)}>
+            <Activity />
+            查看数据链路
+          </button>
+          <button
+            type="button"
+            disabled={!canOpenReports}
+            onClick={() =>
+              canOpenReports
+                ? runEnergyAction(1)
+                : openEnergyPreview(
+                    '订阅异常报表',
+                    '/reports?source=workbench&view=data-monitoring&subscribe=true',
+                    '当前账号暂无报表订阅权限，可先查看链路详情或发起权限申请。',
+                    '暂无权限',
+                    BarChart3,
+                  )
+            }
+          >
+            <Bell />
+            {canOpenReports ? '订阅异常报表' : '订阅受限'}
+          </button>
+          <button type="button" className="is-primary" onClick={() => runEnergyAction(2)}>
+            <Zap />
+            重试采集任务
+          </button>
+        </div>
+
+        <section className="workspace-energy-visual" aria-label="数据监控链路拓扑">
+          <div>
+            <span>实时链路拓扑</span>
+            <strong>MES / IoT / 设备点位</strong>
+            <p>左侧选择链路域，右侧事件队列保留对应系统、点位、延迟、责任方和重试意图。</p>
+          </div>
+          <div className="workspace-data-visual">
+            <span className="workspace-data-scanline" />
+            <img src={meta.imageSrc} alt="数据监控链路拓扑" />
+            <article className="workspace-data-live-card">
+              <span>链路健康度</span>
+              <strong>98.6%</strong>
+              <i />
+              <small>P95 延迟 2.1s</small>
+            </article>
+          </div>
+        </section>
+
+        <div className="workspace-energy-kpis" aria-label="数据监控核心指标">
+          {workbenchEnergySummaryCards.map((card) => {
+            const CardIcon = card.icon;
+            return (
+              <button
+                key={card.label}
+                type="button"
+                className={`is-${card.tone}`}
+                onClick={() =>
+                  openEnergyPreview(
+                    `${card.label}下钻`,
+                    `/energy?source=workbench&scope=data-monitoring&metric=${encodeURIComponent(card.label)}`,
+                    `按 ${card.label} 下钻数据监控，保留当前链路域和 Workbench 来源。`,
+                    '查看指标',
+                    CardIcon,
+                  )
+                }
+              >
+                <CardIcon />
+                <span>{card.label}</span>
+                <strong>{card.value}</strong>
+                <small>{card.delta}</small>
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="workspace-energy-stage-row" aria-label="数据监控流程阶段">
+          {workbenchEnergyStages.map((stage) => (
+            <button
+              key={stage.label}
+              type="button"
+              className={`is-${stage.tone}`}
+              onClick={() =>
+                openEnergyPreview(
+                  `${stage.label}阶段`,
+                  `/energy?source=workbench&scope=data-monitoring&stage=${encodeURIComponent(stage.label)}`,
+                  `按 ${stage.label} 阶段查看采集任务、异常流水和指标服务状态。`,
+                  '查看阶段',
+                  ArrowRight,
+                )
+              }
+            >
+              <span>{stage.label}</span>
+              <strong>{stage.value}</strong>
+              <small>{stage.note}</small>
+            </button>
+          ))}
+        </div>
+
+        <div className="workspace-energy-filterbar" aria-label="数据监控查询筛选栏">
+          <label>
+            <Search />
+            <input readOnly value="搜索链路编号 / 系统源 / 点位 / 责任方" aria-label="数据监控搜索" />
+          </label>
+          {['链路 全部', '状态 全部', '责任方 全部'].map((filter) => (
+            <button
+              key={filter}
+              type="button"
+              onClick={() =>
+                openEnergyPreview(
+                  '筛选数据监控',
+                  `/energy?source=workbench&scope=data-monitoring&filter=${encodeURIComponent(filter)}`,
+                  `按 ${filter} 筛选数据监控事件，保留当前链路域。`,
+                  '打开筛选',
+                  SlidersHorizontal,
+                )
+              }
+            >
+              {filter}
+              <ArrowRight />
+            </button>
+          ))}
+          <button
+            type="button"
+            onClick={() =>
+              openEnergyPreview(
+                '数据监控时间筛选',
+                '/energy?source=workbench&scope=data-monitoring&date=today',
+                '查看今日采集任务和异常事件，保留当前链路域。',
+                '查看今日',
+                CalendarDays,
+              )
+            }
+          >
+            处理时间
+            <CalendarDays />
+          </button>
+          <button
+            type="button"
+            className="is-reset"
+            onClick={() =>
+              openEnergyPreview(
+                '数据监控空态预览',
+                '/energy?source=workbench&scope=data-monitoring&empty=true',
+                '当前筛选下暂无异常流水，可清空条件或订阅异常报表。',
+                '清空筛选',
+                Search,
+              )
+            }
+          >
+            空态预览
+          </button>
+        </div>
+
+        <div className="workspace-energy-table" aria-label="数据监控列表">
+          <div className="workspace-energy-table-head">
+            <span>链路编号</span>
+            <span>来源类型</span>
+            <span>监控对象</span>
+            <span>业务事件</span>
+            <span>质量/延迟</span>
+            <span>状态</span>
+            <span>责任方</span>
+            <span>上下文</span>
+            <span>操作</span>
+          </div>
+          {workbenchEnergyRows.map((row) => (
+            <div
+              key={row.id}
+              className={`workspace-energy-table-row is-${row.tone} ${row.id === selectedRow.id ? 'is-selected' : ''}`}
+            >
+              <button type="button" className="is-link" onClick={() => openEnergyEvent(row)}>{row.id}</button>
+              <span><em>{row.type}</em></span>
+              <span>
+                <strong>{row.entity}</strong>
+                <small>{row.location}</small>
+              </span>
+              <button type="button" className="is-title" onClick={() => openEnergyEvent(row)}>{row.title}</button>
+              <span><b>{row.score}</b></span>
+              <span><i>{row.status}</i></span>
+              <span>{row.owner}</span>
+              <span><em>{row.contextLabel}</em></span>
+              <span>
+                <button
+                  type="button"
+                  onClick={() =>
+                    openEnergyPreview(
+                      '处理数据事件',
+                      `/energy?source=workbench&scope=data-monitoring&event=${encodeURIComponent(row.id)}`,
+                      `处理 ${row.entity}，保留链路、异常事件和责任方上下文。`,
+                      '进入事件',
+                      Zap,
+                    )
+                  }
+                >
+                  处理
+                </button>
+              </span>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <aside className="workspace-energy-detail" aria-label="数据监控详情抽屉">
+        <header>
+          <strong>数据链路详情</strong>
+          <span>{selectedRow.status}</span>
+        </header>
+        <section className="workspace-energy-detail-card" aria-label="当前数据监控信息">
+          <b>{selectedRow.score}</b>
+          <div>
+            <span>{selectedRow.id}</span>
+            <h3>{selectedRow.title}</h3>
+            <p>{selectedRow.entity} · {selectedRow.location}</p>
+          </div>
+          <dl>
+            <div><dt>来源类型</dt><dd>{selectedRow.type}</dd></div>
+            <div><dt>责任方</dt><dd>{selectedRow.owner}</dd></div>
+            <div><dt>采集质量</dt><dd>{selectedRow.score}</dd></div>
+            <div><dt>采集时效</dt><dd>{selectedRow.timing}</dd></div>
+            <div><dt>上下文</dt><dd>{selectedRow.contextLabel}</dd></div>
+            <div><dt>状态</dt><dd>{selectedRow.status}</dd></div>
+          </dl>
+        </section>
+
+        <section className="workspace-energy-service-cards" aria-label="数据监控服务摘要">
+          {workbenchEnergyServiceCards.map((card) => (
+            <article key={card.label} className={`is-${card.tone}`}>
+              <span>{card.label}</span>
+              <strong>{card.value}</strong>
+              <small>{card.note}</small>
+            </article>
+          ))}
+        </section>
+
+        <section className="workspace-energy-event-flow" aria-label="数据监控异常流水">
+          {[
+            ['采集任务', selectedRow.type, '已带入'],
+            ['异常事件', selectedRow.status, selectedRow.tone === 'green' ? '正常' : '需处理'],
+            ['重试记录', selectedRow.timing, '可回溯'],
+          ].map(([label, value, status]) => (
+            <article key={label}>
+              <span>{label}</span>
+              <strong>{value}</strong>
+              <small>{status}</small>
+            </article>
+          ))}
+        </section>
+
+        <nav className="workspace-energy-tabs" aria-label="数据监控详情标签">
+          {workbenchEnergyDetailTabs.map((tab) => (
+            <button
+              key={tab}
+              type="button"
+              className={tab === detailTab ? 'is-active' : ''}
+              onClick={() => setDetailTab(tab)}
+            >
+              {tab}
+            </button>
+          ))}
+        </nav>
+
+        <section className="workspace-energy-tab-panel" aria-label={`${detailTab}内容`}>
+          <article>
+            <span>事件摘要</span>
+            <p>{selectedRow.title}，当前状态为 {selectedRow.status}，上下文为 {selectedRow.contextLabel}。</p>
+          </article>
+          <article>
+            <span>预填上下文</span>
+            <ul>
+              <li>{selectedRow.entity} <b>已带入</b></li>
+              <li>{selectedRow.location} <b>已定位</b></li>
+              <li>{selectedRow.owner} <b className="is-warning">需确认</b></li>
+            </ul>
+          </article>
+        </section>
+
+        <section className="workspace-energy-permission" aria-label="数据监控权限反馈">
+          <AlertTriangle />
+          <div>
+            <strong>{canOpenEnergy ? '链路操作入口可用' : '数据重试权限受限'}</strong>
+            <p>{canOpenEnergy ? '可从 Workbench 打开链路、重试采集任务并订阅异常报表。' : '当前账号可查看摘要，重试和订阅需进入权限申请。'}</p>
+          </div>
+        </section>
+
+        <footer className="workspace-energy-actions" aria-label="数据监控详情操作">
+          <button
+            type="button"
+            onClick={() =>
+              openEnergyPreview(
+                '查看数据链路',
+                `/energy?source=workbench&scope=data-monitoring&link=${encodeURIComponent(selectedRow.id)}`,
+                `查看 ${selectedRow.entity} 的采集延迟、质量分和异常流水。`,
+                '进入链路',
+                Activity,
+              )
+            }
+          >
+            链路详情
+          </button>
+          <button
+            type="button"
+            onClick={() =>
+              openEnergyPreview(
+                '重试采集任务',
+                `/energy?source=workbench&scope=data-monitoring&event=${encodeURIComponent(selectedRow.id)}&retry=true`,
+                `重试 ${selectedRow.entity}，保留事件、责任方和采集任务上下文。`,
+                '重试采集',
+                Zap,
+              )
+            }
+          >
+            重试任务
+          </button>
+          <button
+            type="button"
+            disabled={!canOpenReports}
+            onClick={() =>
+              openEnergyPreview(
+                '订阅异常报表',
+                '/reports?source=workbench&view=data-monitoring&subscribe=true',
+                '订阅数据监控异常报表，保留链路和事件筛选。',
+                canOpenReports ? '进入订阅' : '暂无权限',
+                BarChart3,
+              )
+            }
+          >
+            订阅报表
+          </button>
+          <button
+            type="button"
+            className="is-primary"
+            onClick={() =>
+              openEnergyPreview(
+                '申请数据权限',
+                `/approvals/new?source=workbench&type=data-monitoring&event=${encodeURIComponent(selectedRow.id)}`,
+                `为 ${selectedRow.entity} 发起数据监控权限申请，带入链路和异常事件上下文。`,
+                '发起申请',
+                ClipboardList,
+              )
+            }
+          >
+            申请权限
+          </button>
+        </footer>
+      </aside>
+    </section>
+  );
+}
 
 function WorkbenchPolicyPage({
   item,

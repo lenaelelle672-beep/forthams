@@ -225,6 +225,9 @@ test.describe('Workbench 正式入口浏览器回归', () => {
       if (pageLabel === '运营首页') {
         await expect(page.locator('.workspace-orders-shell')).toHaveCount(0);
         await expect(page.getByLabel('运营首页任务墙')).toBeVisible();
+      } else if (pageLabel === '数据监控') {
+        await expect(page.locator('.workspace-orders-shell')).toHaveCount(0);
+        await expect(page.getByLabel('数据监控列表')).toBeVisible();
       } else {
         await expect(page.locator('.workspace-orders-table')).toBeVisible();
       }
@@ -593,15 +596,23 @@ test.describe('Workbench 正式入口浏览器回归', () => {
 
     await expect(page.getByLabel('数据监控真实产品页')).toBeVisible();
     await expect(page.locator('.workspace-product-page')).toHaveCount(0);
-    await expect(page.getByRole('heading', { name: '数据监控' })).toBeVisible();
+    await expect(page.locator('.workspace-orders-shell')).toHaveCount(0);
+    await expect(page.locator('.workspace-energy-product')).toBeVisible();
+    await expect(page.getByLabel('数据监控产品页主体').getByRole('heading', { name: '数据监控' })).toBeVisible();
     await expect(page.getByText('数据链路 · 采集事件 · 指标服务')).toBeVisible();
+    await expect(page.getByLabel('数据监控链路域')).toContainText('采集链路');
+    await expect(page.getByLabel('数据监控二级链路')).toContainText('IoT 网关');
+    await expect(page.getByLabel('数据监控状态反馈')).toContainText('采集链路异常 2 项');
+    await expect(page.getByLabel('数据监控链路拓扑')).toContainText('实时链路拓扑');
     await expect(page.getByLabel('数据监控核心指标')).toContainText('链路健康度');
     await expect(page.getByLabel('数据监控流程阶段')).toContainText('采集');
     await expect(page.getByLabel('数据监控顶部操作')).toContainText('重试采集任务');
     await expect(page.getByLabel('数据监控查询筛选栏')).toContainText('处理时间');
     await expect(page.getByLabel('数据监控列表')).toContainText('DATA-IOT-GW-A01');
     await expect(page.getByLabel('数据监控详情抽屉')).toContainText('设备点位采集延迟');
+    await expect(page.getByLabel('数据监控异常流水')).toContainText('重试记录');
     await expect(page.getByLabel('数据监控详情标签')).toContainText('异常事件');
+    await expect(page.getByLabel('数据监控权限反馈')).toContainText('链路操作入口可用');
     await expect(page.getByLabel('数据监控详情操作')).toContainText('重试任务');
     await expect(page.locator('body')).not.toContainText('workbench-menu-energy-v1');
 
