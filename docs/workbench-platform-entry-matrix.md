@@ -128,6 +128,16 @@ Naming/use policy for new or refreshed assets:
 
 This iteration reuses the confirmed visual direction and existing assets first. Generate new IMAGE2/Stitch assets only for missing product visuals that cannot be covered by the current kit.
 
+Visual asset contract automation:
+
+| Asset contract | Automated evidence |
+| --- | --- |
+| Workbench references | `frontend/src/__tests__/workbenchVisualAssetContract.test.ts` reads `WorkspacePreviewPage.tsx` helper calls and verifies each referenced `/mock/workspace-preview/**` asset exists |
+| IMAGE2 module package | Verifies `asset-kit-v4/modules/module-*.png` naming and readable dimensions for Workbench module cards |
+| IMAGE2 detail package | Verifies `asset-kit-v5/details/*-v1.png` naming, square format, and high-resolution detail-card dimensions |
+| Stitch suite package | Verifies manifest and `stitch-suite` image references exist while keeping the current `Auth required` MCP status explicit |
+| Login product hero | Verifies `scene/login5-stitch-factory-cn-v4.png` remains a high-resolution product image source |
+
 ## Continuation Contract Automation
 
 2026-06-14 continuation added `frontend/src/__tests__/workbenchPlatformEntry.contract.test.ts` so the formal-entry decision is protected by automated checks instead of only manual screenshots.
