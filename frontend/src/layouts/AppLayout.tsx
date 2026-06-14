@@ -66,6 +66,7 @@ const NAV_GROUPS: NavGroup[] = [
   {
     group: '概览',
     items: [
+      { path: '/fixed-assets/workbench?menu=home', label: '资产运营中枢', icon: Shield },
       { path: '/dashboard', label: '旧版仪表板', icon: LayoutDashboard },
       { path: '/analytics', label: '数据分析', icon: BarChart3 },
     ],

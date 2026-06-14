@@ -91,9 +91,31 @@ Validated locally on 2026-06-14 with the Vite dev server at `http://127.0.0.1:51
 | Legacy dashboard transition | `旧版仪表板` targets `/dashboard`; in local smoke it is still protected and the legacy page's backend 401 path can redirect to `/login` with a fake token |
 | Browser console | No browser `error` logs during Workbench smoke checks |
 
+Continuation verification on 2026-06-14 used the Vite dev server at `http://127.0.0.1:5177/` with Playwright and mocked backend responses only for `/api/*` requests.
+
+| Check | Result |
+| --- | --- |
+| Desktop global sidebar | `/dashboard` rendered `资产运营中枢` as the first overview entry and kept `旧版仪表板` as the legacy transition entry |
+| Workbench formal jump | Clicking `资产运营中枢` navigated to `/fixed-assets/workbench?menu=home` and rendered `运营首页` |
+| Workbench shell | `运营首页`, `流程待办`, `基础维护`, and the four top tabs were visible |
+| Legacy transition | Clicking Workbench `旧版仪表板` navigated back to `/dashboard` |
+| Todo view | `/fixed-assets/workbench?menu=todo` rendered the `流程待办` view |
+| Screenshot evidence | `/tmp/forthams-workbench-verification-20260614/dashboard-sidebar-entry.png`, `/tmp/forthams-workbench-verification-20260614/workbench-home.png`, `/tmp/forthams-workbench-verification-20260614/workbench-todo.png` |
+| Browser console | No relevant console/page errors after API mock shape matched Dashboard data contracts |
+
 ## IMAGE2 / Stitch Asset Governance
 
 Existing product assets live under `frontend/public/mock/workspace-preview/` and are referenced by `WorkspacePreviewPage.tsx`.
+
+## Menu Governance Continuation
+
+The formal Workbench entry is now also represented in the desktop global navigation and backend menu metadata:
+
+| Surface | Implementation | Governance note |
+| --- | --- | --- |
+| Desktop global sidebar | `AppLayout` 概览 group first item: `资产运营中枢` -> `/fixed-assets/workbench?menu=home` | Makes Workbench the formal first entry outside the legacy dashboard shell |
+| Backend menu seed | `V2_84__workbench_platform_menu_entry.sql` ids `310/311` | Adds Workbench as a visible menu child of 报表统计 without creating a duplicate page |
+| Legacy dashboard | id `186` renamed to `旧版仪表板` and sorted after Workbench | Keeps `/dashboard` as transition-only |
 
 Naming/use policy for new or refreshed assets:
 

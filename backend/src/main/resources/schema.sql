@@ -1211,15 +1211,17 @@ INSERT INTO sys_menu (id, menu_name, parent_id, sort_order, menu_type, perms, ic
     (179, '供应商编辑', 176, 3, 'F', 'vendor:vendor:edit', NULL, 1, 1),
     (180, '供应商删除', 176, 4, 'F', 'vendor:vendor:delete', NULL, 1, 1),
     (185, '报表统计', 0, 6, 'M', NULL, 'bar-chart', 1, 1),
-    (186, '仪表盘', 185, 1, 'C', 'dashboard:query', 'gauge', 1, 1),
-    (187, '仪表盘查询', 186, 1, 'F', 'dashboard:query', NULL, 1, 1),
-    (188, '报表中心', 185, 2, 'C', 'report:query', 'file-bar-chart', 1, 1),
+    (310, '资产运营中枢', 185, 1, 'C', 'dashboard:query', 'shield-check', 1, 1),
+    (311, '资产运营中枢查询', 310, 1, 'F', 'dashboard:query', NULL, 1, 1),
+    (186, '旧版仪表板', 185, 2, 'C', 'dashboard:query', 'layout-dashboard', 1, 1),
+    (187, '旧版仪表板查询', 186, 1, 'F', 'dashboard:query', NULL, 1, 1),
+    (188, '报表中心', 185, 3, 'C', 'report:query', 'file-bar-chart', 1, 1),
     (189, '报表查询', 188, 1, 'F', 'report:query', NULL, 1, 1),
-    (190, '统计概览', 185, 3, 'C', 'stats:query', 'pie-chart', 1, 1),
+    (190, '统计概览', 185, 4, 'C', 'stats:query', 'pie-chart', 1, 1),
     (191, '统计查询', 190, 1, 'F', 'stats:query', NULL, 1, 1),
-    (192, '大屏展示', 185, 4, 'C', 'bigscreen:query', 'monitor', 1, 1),
+    (192, '大屏展示', 185, 5, 'C', 'bigscreen:query', 'monitor', 1, 1),
     (193, '大屏查询', 192, 1, 'F', 'bigscreen:query', NULL, 1, 1),
-    (194, '审计日志', 185, 5, 'C', 'audit:query', 'search-code', 1, 1),
+    (194, '审计日志', 185, 6, 'C', 'audit:query', 'search-code', 1, 1),
     (195, '审计查询', 194, 1, 'F', 'audit:query', NULL, 1, 1),
     (200, '其他功能', 0, 7, 'M', NULL, 'more-horizontal', 1, 1),
     (201, '通知管理', 200, 1, 'C', NULL, 'bell', 1, 1),
@@ -1263,6 +1265,7 @@ SET path = CASE id
     WHEN 171 THEN 'locations'
     WHEN 176 THEN 'vendors'
     WHEN 186 THEN 'dashboard'
+    WHEN 310 THEN 'fixed-assets/workbench'
     WHEN 188 THEN 'reports'
     WHEN 190 THEN 'analytics'
     WHEN 192 THEN 'bigscreen'
@@ -1292,6 +1295,7 @@ component = CASE id
     WHEN 171 THEN 'locations/LocationsPage'
     WHEN 176 THEN 'vendors/VendorsPage'
     WHEN 186 THEN 'dashboard/DashboardPage'
+    WHEN 310 THEN 'workspace-preview/WorkspacePreviewPage'
     WHEN 188 THEN 'reports/ReportsPage'
     WHEN 190 THEN 'analytics/AnalyticsPage'
     WHEN 192 THEN 'bigscreen/BigScreenPage'
@@ -1301,11 +1305,15 @@ component = CASE id
     WHEN 212 THEN 'maintenance/execution/MaintenanceExecutionPage'
     WHEN 300 THEN 'inventory/ABCClassificationPage'
     ELSE component
+END,
+query_param = CASE id
+    WHEN 310 THEN 'menu=home'
+    ELSE query_param
 END
 WHERE id IN (
     2, 7, 12, 17,
     101, 106, 111, 116, 125, 130, 136, 141, 144, 151, 161, 171, 176,
-    186, 188, 190, 192, 194, 201, 206, 212, 300
+    186, 188, 190, 192, 194, 201, 206, 212, 300, 310
 );
 
 -- SUPER_ADMIN 角色绑定所有业务菜单节点 (role_id=1)
@@ -1392,6 +1400,8 @@ INSERT INTO sys_role_menu (role_id, menu_id) VALUES
     (1, 179),
     (1, 180),
     (1, 185),
+    (1, 310),
+    (1, 311),
     (1, 186),
     (1, 187),
     (1, 188),
