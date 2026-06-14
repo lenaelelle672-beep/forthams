@@ -172,7 +172,7 @@ test.describe('Workbench 正式入口浏览器回归', () => {
       await page.goto(actionCase.route);
       await page.waitForLoadState('networkidle');
 
-      await page.getByRole('button', { name: actionCase.action }).click();
+      await page.locator('.workspace-context-action').filter({ hasText: actionCase.action }).click();
       const dialog = page.getByRole('dialog', { name: actionCase.action });
       await expect(dialog).toBeVisible();
       await expect(dialog.getByText('预填字段')).toBeVisible();
@@ -183,6 +183,83 @@ test.describe('Workbench 正式入口浏览器回归', () => {
       }
 
       await expect(dialog.getByRole('button', { name: /进入业务页面|进入处理/ })).toBeEnabled();
+      await page.keyboard.press('Escape');
+      await expect(dialog).toHaveCount(0);
+    }
+
+    await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
+    expect(errors).toEqual([]);
+  });
+
+  test('Workbench 菜单级产品页呈现业务操作台、CRUD 矩阵和页面级跳转', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await seedAuthenticatedSession(page, operationsUser);
+
+    const pageCases = [
+      {
+        route: '/fixed-assets/workbench?menu=todo',
+        pageLabel: '流程待办',
+        heading: '审批与运维待办队列',
+        action: '处理审批队列',
+        targetIncludes: ['/approvals?source=workbench&status=PENDING'],
+      },
+      {
+        route: '/fixed-assets/workbench/assets?menu=device',
+        pageLabel: '设备管理',
+        heading: '机台在线与温度监控',
+        action: '打开设备台账',
+        targetIncludes: ['/equipment?source=workbench&status=ONLINE'],
+      },
+      {
+        route: '/fixed-assets/workbench/assets?menu=orders',
+        pageLabel: '工单管理',
+        heading: '预测维保工单闭环',
+        action: '创建预测工单',
+        targetIncludes: ['/workorders/new?', 'source=quick-action', 'riskScore=92'],
+      },
+      {
+        route: '/fixed-assets/workbench/analytics?menu=report',
+        pageLabel: '报表分析',
+        heading: '经营分析与审计报表',
+        action: '打开经营报表',
+        targetIncludes: ['/reports?source=workbench&view=operations'],
+      },
+      {
+        route: '/fixed-assets/workbench/assets?menu=asset',
+        pageLabel: '资产总览',
+        heading: '资产健康与生命周期总览',
+        action: '生成风险工单',
+        targetIncludes: ['/workorders/new?', 'source=asset-risk', 'riskLevel='],
+      },
+    ];
+
+    for (const pageCase of pageCases) {
+      await page.goto(pageCase.route);
+      await page.waitForLoadState('networkidle');
+
+      await expect(page.getByRole('heading', { name: pageCase.heading })).toBeVisible();
+      await expect(page.getByLabel(`${pageCase.pageLabel}业务操作台`)).toBeVisible();
+      await expect(page.getByLabel(`${pageCase.pageLabel}筛选条件`)).toBeVisible();
+      await expect(page.getByLabel(`${pageCase.pageLabel}可处理业务队列`)).toBeVisible();
+      const crudMatrix = page.getByLabel(`${pageCase.pageLabel}CRUD操作矩阵`);
+      await expect(crudMatrix.getByText('新建/发起')).toBeVisible();
+      await expect(crudMatrix.getByText('查询/筛选')).toBeVisible();
+      await expect(crudMatrix.getByText('打开详情')).toBeVisible();
+      await expect(crudMatrix.getByText('编辑/维护')).toBeVisible();
+      await expect(crudMatrix.locator('small').filter({ hasText: '危险操作' })).toBeVisible();
+      await expect(crudMatrix.getByRole('button', { name: new RegExp(`${pageCase.pageLabel}停用|撤销|停用/撤销`) })).toBeDisabled();
+      const stateMatrix = page.getByLabel(`${pageCase.pageLabel}页面状态矩阵`);
+      await expect(stateMatrix.getByText('空态')).toBeVisible();
+      await expect(stateMatrix.getByText('异常态')).toBeVisible();
+      await expect(stateMatrix.getByText('无权限态')).toBeVisible();
+
+      await page.getByLabel(`${pageCase.pageLabel}页面跳转`).getByRole('button', { name: new RegExp(pageCase.action) }).click();
+      const dialog = page.getByRole('dialog', { name: pageCase.action });
+      await expect(dialog).toBeVisible();
+      const routeTarget = await dialog.locator('.workspace-action-route strong').innerText();
+      for (const expectedFragment of pageCase.targetIncludes) {
+        expect(routeTarget).toContain(expectedFragment);
+      }
       await page.keyboard.press('Escape');
       await expect(dialog).toHaveCount(0);
     }

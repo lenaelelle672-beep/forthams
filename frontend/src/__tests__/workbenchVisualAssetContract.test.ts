@@ -7,7 +7,7 @@ const workspacePage = readText('../pages/workspace-preview/WorkspacePreviewPage.
 const matrix = readText('../../../docs/workbench-platform-entry-matrix.md');
 const deliveryManifest = JSON.parse(
   readText('../../public/mock/workspace-preview/stitch-suite/delivery-manifest.json'),
-) as Record<string, unknown>;
+) as DeliveryManifest;
 
 const currentDir = dirname(fileURLToPath(import.meta.url));
 const assetBase = '/mock/workspace-preview';
@@ -53,6 +53,7 @@ describe('Workbench visual asset contract', () => {
     const loginHero = readImageSize('/mock/workspace-preview/scene/login5-stitch-factory-cn-v4.png');
     expect(loginHero.width).toBeGreaterThanOrEqual(1600);
     expect(loginHero.height).toBeGreaterThanOrEqual(900);
+
   });
 
   it('keeps Stitch suite and manifest image references present without claiming fresh MCP generation', () => {
@@ -78,17 +79,73 @@ describe('Workbench visual asset contract', () => {
     expect(matrix).toContain('Visual asset contract automation');
     expect(matrix).toContain('Stitch MCP preflight on 2026-06-14 returned `Auth required`');
   });
+
+  it('binds Stitch and IMAGE2 assets to the formal Workbench routes', () => {
+    const sections = deliveryManifest.connectedRoutes.workbenchSections;
+    const bindings = deliveryManifest.formalWorkbenchAssetMap;
+
+    expect(bindings).toHaveLength(4);
+    expect(bindings.map((item) => item.name).sort()).toEqual(Object.keys(sections).sort());
+
+    for (const binding of bindings) {
+      expect(binding.route).toBe(sections[binding.name]);
+      expect(binding.route).toMatch(/^\/fixed-assets\/workbench/);
+      expect(binding.route).not.toContain('/workspace-preview');
+      expect(binding.stitchScreen).toMatch(/^(overview|analytics|assets|security)$/);
+      expect(binding.businessUse.length).toBeGreaterThan(20);
+      expect(binding.sourcePolicy).toContain('formal Workbench route');
+
+      const assets = [
+        binding.primaryAsset,
+        binding.moduleAsset,
+        ...binding.detailAssets,
+      ];
+      for (const assetPath of assets) {
+        expect(assetPath).toMatch(/^\/mock\/workspace-preview\/.+\.(png|jpe?g)$/);
+        expect(existsSync(toPublicFile(assetPath)), `${binding.name}: ${assetPath}`).toBe(true);
+      }
+    }
+
+    expect(deliveryManifest.connectedRoutes.designBoard).toBe('/workspace-preview');
+    expect(deliveryManifest.connectedRoutes.designBoardDeepLink).toBe('/workspace-preview?tab=stitch');
+    expect(deliveryManifest.stitchIntegration.authEvidence.mcpToolListProjects).toContain('Auth required');
+  });
 });
+
+type WorkbenchAssetBinding = {
+  name: string;
+  route: string;
+  stitchScreen: string;
+  primaryAsset: string;
+  moduleAsset: string;
+  detailAssets: string[];
+  businessUse: string;
+  sourcePolicy: string;
+};
+
+type DeliveryManifest = {
+  connectedRoutes: {
+    designBoard: string;
+    designBoardDeepLink: string;
+    workbenchSections: Record<string, string>;
+  };
+  formalWorkbenchAssetMap: WorkbenchAssetBinding[];
+  stitchIntegration: {
+    authEvidence: {
+      mcpToolListProjects: string;
+    };
+  };
+};
 
 function readText(relativePath: string) {
   return readFileSync(new URL(relativePath, import.meta.url), 'utf8');
 }
 
-function helperReferences(helperName: string, basePath: string) {
+function helperReferences(helperName: string, basePath: string, suffix = '') {
   const pattern = new RegExp(`${helperName}\\('([^']+)'\\)`, 'g');
   const refs: string[] = [];
   for (const match of workspacePage.matchAll(pattern)) {
-    refs.push(`${basePath}/${match[1]}.png`);
+    refs.push(`${basePath}/${match[1]}${suffix}.png`);
   }
   return refs;
 }

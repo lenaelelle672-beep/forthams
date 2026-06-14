@@ -136,6 +136,7 @@ Visual asset contract automation:
 | IMAGE2 module package | Verifies `asset-kit-v4/modules/module-*.png` naming and readable dimensions for Workbench module cards |
 | IMAGE2 detail package | Verifies `asset-kit-v5/details/*-v1.png` naming, square format, and high-resolution detail-card dimensions |
 | Stitch suite package | Verifies manifest and `stitch-suite` image references exist while keeping the current `Auth required` MCP status explicit |
+| Stitch-to-Workbench binding | Verifies `delivery-manifest.json` maps each Stitch/IMAGE2 package to the four formal Workbench routes instead of detached demo routes |
 | Login product hero | Verifies `scene/login5-stitch-factory-cn-v4.png` remains a high-resolution product image source |
 
 ## Continuation Contract Automation

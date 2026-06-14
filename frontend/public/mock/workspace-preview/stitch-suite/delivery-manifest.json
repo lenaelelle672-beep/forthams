@@ -112,6 +112,61 @@
     ],
     "image2RefineQueue": []
   },
+  "formalWorkbenchAssetMap": [
+    {
+      "name": "智能制造总览",
+      "route": "/fixed-assets/workbench?menu=home",
+      "stitchScreen": "overview",
+      "primaryAsset": "/mock/workspace-preview/stitch-suite/overview.png",
+      "moduleAsset": "/mock/workspace-preview/asset-kit-v4/modules/module-machining-cluster.png",
+      "detailAssets": [
+        "/mock/workspace-preview/asset-kit-v5/details/work-order-flow-v1.png",
+        "/mock/workspace-preview/asset-kit-v5/details/data-sync-pipeline-v1.png"
+      ],
+      "businessUse": "运营首页承接智能制造总览、产线态势、流程待办和跨中心入口。",
+      "sourcePolicy": "Stitch screen plus IMAGE2 module/detail assets must resolve to the formal Workbench route, not a detached demo route."
+    },
+    {
+      "name": "数据监控中心",
+      "route": "/fixed-assets/workbench/analytics?menu=energy",
+      "stitchScreen": "analytics",
+      "primaryAsset": "/mock/workspace-preview/stitch-suite/analytics.png",
+      "moduleAsset": "/mock/workspace-preview/asset-kit-v4/modules/module-data-monitoring.png",
+      "detailAssets": [
+        "/mock/workspace-preview/asset-kit-v5/details/data-sync-pipeline-v1.png",
+        "/mock/workspace-preview/asset-kit-v5/details/temperature-monitoring-v1.png"
+      ],
+      "businessUse": "数据监控中心承接采集链路、在线率、同步延迟和异常数据预警。",
+      "sourcePolicy": "Stitch screen plus IMAGE2 module/detail assets must resolve to the formal Workbench route, not a detached demo route."
+    },
+    {
+      "name": "资产运维中心",
+      "route": "/fixed-assets/workbench/assets?menu=asset",
+      "stitchScreen": "assets",
+      "primaryAsset": "/mock/workspace-preview/stitch-suite/assets.png",
+      "moduleAsset": "/mock/workspace-preview/asset-kit-v4/modules/module-asset-ops.png",
+      "detailAssets": [
+        "/mock/workspace-preview/asset-kit-v5/details/health-gear-ring-v1.png",
+        "/mock/workspace-preview/asset-kit-v5/details/spare-parts-support-v1.png",
+        "/mock/workspace-preview/asset-kit-v5/details/asset-status-distribution-v1.png"
+      ],
+      "businessUse": "资产运维中心承接资产总览、健康指数、维保工单、备件保障和风险 TOP10。",
+      "sourcePolicy": "Stitch screen plus IMAGE2 module/detail assets must resolve to the formal Workbench route, not a detached demo route."
+    },
+    {
+      "name": "安全态势工作台",
+      "route": "/fixed-assets/workbench/security?menu=alarm",
+      "stitchScreen": "security",
+      "primaryAsset": "/mock/workspace-preview/stitch-suite/security.png",
+      "moduleAsset": "/mock/workspace-preview/asset-kit-v4/modules/module-security-posture-map-wide.png",
+      "detailAssets": [
+        "/mock/workspace-preview/asset-kit-v5/details/risk-level-tags-v1.png",
+        "/mock/workspace-preview/asset-kit-v5/details/work-order-flow-v1.png"
+      ],
+      "businessUse": "安全态势工作台承接告警队列、组织策略、风险矩阵和联动处置闭环。",
+      "sourcePolicy": "Stitch screen plus IMAGE2 module/detail assets must resolve to the formal Workbench route, not a detached demo route."
+    }
+  ],
   "stitchIntegration": {
     "status": "connected_via_cli_oauth",
     "projectId": "9943060219435296513",

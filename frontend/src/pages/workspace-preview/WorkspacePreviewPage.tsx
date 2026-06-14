@@ -101,6 +101,25 @@ type ModuleMock = {
   steps: Array<{ label: string; note: string }>;
 };
 
+type WorkbenchProductPageMeta = {
+  position: string;
+  imageSrc: string;
+  actions: RouteActionPreview[];
+  emptyState: string;
+  errorState: string;
+  deniedState: string;
+};
+
+type WorkbenchOperationItem = {
+  kind: '新建/发起' | '查询/筛选' | '打开详情' | '编辑/维护' | '危险操作';
+  title: string;
+  description: string;
+  icon: LucideIcon;
+  preview?: RouteActionPreview;
+  disabledReason?: string;
+  tone?: 'normal' | 'warning' | 'danger';
+};
+
 type WorkOrderPrefillParams = {
   source: 'asset-risk' | 'predictive-maintenance' | 'quick-action';
   title: string;
@@ -910,6 +929,26 @@ const quickActions = [
 ];
 
 const moduleMockByMenuId: Record<string, ModuleMock> = {
+  asset: {
+    eyebrow: '资产总览',
+    title: '资产健康与生命周期总览',
+    summary: '把资产台账、健康评分、风险 TOP、生命周期节点和 MES 状态同步整合成资产运营中心主视角。',
+    routeTarget: '/assets?source=workbench&view=asset-overview',
+    icon: Layers,
+    visual: detailAsset('health-gear-ring-v1'),
+    action: '进入资产清单',
+    stats: menuContextById.asset.stats,
+    rows: [
+      { label: '注塑机 M-201', value: '92分', note: '一车间 / 高风险', tone: 'red' },
+      { label: '空压机 KQ-03', value: '88分', note: '动力站 / 振动偏高', tone: 'orange' },
+      { label: 'AGV-05', value: '在线', note: '物流区 / 状态稳定', tone: 'green' },
+    ],
+    steps: [
+      { label: '建账', note: '台账与编码统一' },
+      { label: '同步', note: 'MES/IoT 状态回写' },
+      { label: '治理', note: '健康评分与风险闭环' },
+    ],
+  },
   todo: {
     eyebrow: '流程待办',
     title: '审批与运维待办队列',
@@ -1044,6 +1083,26 @@ const moduleMockByMenuId: Record<string, ModuleMock> = {
       { label: '回写', note: '成本同步到维保工单' },
     ],
   },
+  energy: {
+    eyebrow: '数据监控',
+    title: 'MES 与 IoT 数据链路',
+    summary: '汇聚设备采集、MES 工单、产线节拍和异常流水，展示采集延迟、吞吐、链路质量与异常补偿。',
+    routeTarget: '/energy?source=workbench&scope=data-monitoring',
+    icon: Activity,
+    visual: detailAsset('data-sync-pipeline-v1'),
+    action: '进入数据链路台',
+    stats: menuContextById.energy.stats,
+    rows: [
+      { label: 'IoT 网关 A-01', value: '95ms', note: '1,256 点在线', tone: 'blue' },
+      { label: 'MES 批次同步', value: '18条', note: '产线与工单回写', tone: 'green' },
+      { label: '异常流水回补', value: '3项', note: '等待人工确认', tone: 'orange' },
+    ],
+    steps: [
+      { label: '采集', note: '网关与设备点位' },
+      { label: '清洗', note: '异常补偿与去重' },
+      { label: '服务', note: '指标订阅和报表' },
+    ],
+  },
   report: {
     eyebrow: '报表分析',
     title: '经营分析与审计报表',
@@ -1135,6 +1194,547 @@ const moduleMockByMenuId: Record<string, ModuleMock> = {
     ],
   },
 };
+
+const workbenchProductPageMetaByMenuId: Record<string, WorkbenchProductPageMeta> = {
+  asset: {
+    position: 'Dashboard KPI 与资产态势迁移后的正式资产运营承接页。',
+    imageSrc: stitchAsset('assets'),
+    emptyState: '筛选条件下暂无高风险资产时，保留资产清单入口与健康评分总览。',
+    errorState: 'MES/IoT 状态同步失败时，提示回到资产台账并重试同步任务。',
+    deniedState: '缺少 asset:query 权限时，资产清单与明细跳转在抽屉中禁用。',
+    actions: [
+      {
+        title: '查看资产清单',
+        source: '资产总览产品页',
+        routeTarget: '/assets?source=workbench&view=asset-overview',
+        description: '进入资产台账，保留 Workbench 来源、资产总览视角和风险筛选上下文。',
+        primaryLabel: '进入资产清单',
+        icon: Layers,
+        visual: detailAsset('health-gear-ring-v1'),
+        stats: menuContextById.asset.stats,
+      },
+      {
+        title: '生成风险工单',
+        source: '资产总览产品页',
+        routeTarget: buildWorkOrderPrefillPath({
+          source: 'asset-risk',
+          title: '资产健康风险处置工单',
+          assetName: '注塑机 M-201',
+          assetLocation: '一车间 / A线',
+          riskState: '温度异常',
+          riskScore: 92,
+          riskLevel: '高风险',
+          priority: 'HIGH',
+          dueDate: '2026-06-16',
+          description: '来自 Workbench 资产总览：健康评分 92 分且温度异常，建议转预测维保工单。',
+        }),
+        description: '把资产健康异常、位置、风险等级和到期时间预填到工单创建页。',
+        primaryLabel: '创建工单',
+        icon: ClipboardList,
+        visual: detailAsset('work-order-flow-v1'),
+        stats: menuContextById.orders.stats,
+      },
+    ],
+  },
+  todo: {
+    position: 'Dashboard 待审批、最近工单、维保预警迁移后的统一流程队列。',
+    imageSrc: detailAsset('work-order-flow-v1'),
+    emptyState: '当前角色暂无待审批或待派工事项时，显示已清空队列并保留工单入口。',
+    errorState: '审批中心或工单中心接口异常时，展示队列不可用并允许进入对应业务页处理。',
+    deniedState: '缺少 approval:process:query 或 workorder:order:query 时，对应处理按钮禁用。',
+    actions: [
+      {
+        title: '处理审批队列',
+        source: '流程待办产品页',
+        routeTarget: '/approvals?source=workbench&status=PENDING',
+        description: '进入审批中心，保留 Workbench 来源与 PENDING 状态筛选。',
+        primaryLabel: '进入审批处理',
+        icon: ClipboardList,
+        visual: detailAsset('work-order-flow-v1'),
+        stats: menuContextById.todo.stats,
+      },
+      {
+        title: '派发预测工单',
+        source: '流程待办产品页',
+        routeTarget: buildWorkOrderPrefillPath({
+          source: 'predictive-maintenance',
+          title: '流程待办触发预测维保派工',
+          assetName: '注塑机 M-201',
+          assetLocation: '一车间 / A线',
+          riskState: '温度异常',
+          riskScore: 92,
+          priority: 'HIGH',
+          dueDate: '2026-06-16',
+          description: '来自 Workbench 流程待办：预测维保队列命中高风险资产，需要派工。',
+        }),
+        description: '把待办队列中的风险资产、优先级和截止时间预填到新建工单。',
+        primaryLabel: '创建预测工单',
+        icon: Wrench,
+        visual: detailAsset('maintenance-level-v1'),
+        stats: menuContextById.orders.stats,
+      },
+    ],
+  },
+  device: {
+    position: '设备在线、温度、振动、采集延迟的现场运维承接页。',
+    imageSrc: detailAsset('temperature-monitoring-v1'),
+    emptyState: '当前产线筛选下暂无异常设备时，展示在线设备概览和资产台账入口。',
+    errorState: 'IoT 网关掉线或采集超时时，显示链路异常并提供数据监控跳转。',
+    deniedState: '缺少 asset:query 或 dashboard:query 时，设备状态和台账入口禁用。',
+    actions: [
+      {
+        title: '打开设备台账',
+        source: '设备管理产品页',
+        routeTarget: '/equipment?source=workbench&status=ONLINE',
+        description: '进入设备台账，保留在线设备、WorkBench 来源和现场运维上下文。',
+        primaryLabel: '进入设备台账',
+        icon: Cpu,
+        visual: detailAsset('temperature-monitoring-v1'),
+        stats: menuContextById.device.stats,
+      },
+      {
+        title: '创建温度复核工单',
+        source: '设备管理产品页',
+        routeTarget: buildWorkOrderPrefillPath({
+          source: 'quick-action',
+          title: '设备温度异常复核工单',
+          assetName: '注塑机 M-201',
+          assetLocation: '一车间 / A线',
+          riskState: '温度异常',
+          riskScore: 92,
+          priority: 'HIGH',
+          dueDate: '2026-06-16',
+          description: '来自 Workbench 设备管理：温度边界触发复核，需要创建现场维保工单。',
+        }),
+        description: '把设备温度异常、位置和风险评分预填到新建工单。',
+        primaryLabel: '创建复核工单',
+        icon: Wrench,
+        visual: detailAsset('temperature-monitoring-v1'),
+        stats: menuContextById.orders.stats,
+      },
+    ],
+  },
+  orders: {
+    position: '预测维保、派工执行、验收闭环和 SLA 的工单管理承接页。',
+    imageSrc: detailAsset('maintenance-level-v1'),
+    emptyState: '当前筛选下暂无待办工单时，展示最近闭环记录和新建工单入口。',
+    errorState: '工单服务不可用时，保留预填上下文并提示稍后重试或进入列表。',
+    deniedState: '缺少 workorder:order:query 时，工单列表和新建工单入口在抽屉中禁用。',
+    actions: [
+      {
+        title: '创建预测工单',
+        source: '工单管理产品页',
+        routeTarget: menuContextById.orders.routeTarget,
+        description: '用 Workbench 工单管理上下文预填资产、风险、优先级和截止时间。',
+        primaryLabel: '新建工单',
+        icon: ClipboardList,
+        visual: detailAsset('maintenance-level-v1'),
+        stats: menuContextById.orders.stats,
+      },
+      {
+        title: '查看工单队列',
+        source: '工单管理产品页',
+        routeTarget: '/workorders?source=workbench&status=PENDING',
+        description: '进入工单列表，保留待派工状态和 Workbench 来源筛选。',
+        primaryLabel: '进入工单列表',
+        icon: FileText,
+        visual: detailAsset('work-order-flow-v1'),
+        stats: menuContextById.orders.stats,
+      },
+    ],
+  },
+  inspection: {
+    position: '点检路线、扫码执行、异常复核的巡检闭环承接页。',
+    imageSrc: detailAsset('location-tracking-v1'),
+    emptyState: '暂无今日巡检任务时，展示下次排程和按风险生成计划入口。',
+    errorState: '巡检模板或路线拉取失败时，提示使用预填任务进入巡检页面。',
+    deniedState: '缺少 inspection:query 时，巡检计划和执行入口禁用。',
+    actions: [
+      {
+        title: '生成巡检计划',
+        source: '巡检管理产品页',
+        routeTarget: menuContextById.inspection.routeTarget,
+        description: '进入巡检新建页，预填设备、巡检类型、日期和现场发现。',
+        primaryLabel: '进入巡检计划',
+        icon: CheckCircle2,
+        visual: detailAsset('location-tracking-v1'),
+        stats: menuContextById.inspection.stats,
+      },
+      {
+        title: '执行安全点检',
+        source: '巡检管理产品页',
+        routeTarget: buildSafetyPrefillPath({
+          source: 'quick-safety',
+          templateId: 1,
+          assetId: 201,
+          executorId: 1,
+          assetName: '注塑机 M-201',
+          focusItem: '温度 / 振动 / 电流',
+          readingHint: '18 个高温点位待确认',
+          riskLevel: '高温点位',
+          note: '来自 Workbench 巡检管理：高温点位需要现场点检并上传证据。',
+        }),
+        description: '进入点检执行台，预填高温点位、执行人和风险说明。',
+        primaryLabel: '进入点检执行',
+        icon: ClipboardList,
+        visual: detailAsset('temperature-monitoring-v1'),
+        stats: menuContextById.inspection.stats,
+      },
+    ],
+  },
+  spares: {
+    position: '低储预警、领用申请、采购联动和工单成本回写的备件承接页。',
+    imageSrc: detailAsset('spare-parts-support-v1'),
+    emptyState: '暂无低储备件时，展示安全库存达标和最近领用记录。',
+    errorState: '库存服务异常时，提示进入备件申请页保留工单上下文。',
+    deniedState: '缺少 inventory:sparepart:query 时，备件库存与申请入口禁用。',
+    actions: [
+      {
+        title: '申请低储备件',
+        source: '备件管理产品页',
+        routeTarget: menuContextById.spares.routeTarget,
+        description: '进入备件申请页，预填缺件、库存下限、供应商和关联工单。',
+        primaryLabel: '进入备件申请',
+        icon: PackageCheck,
+        visual: detailAsset('spare-parts-support-v1'),
+        stats: menuContextById.spares.stats,
+      },
+      {
+        title: '查看备件库存',
+        source: '备件管理产品页',
+        routeTarget: '/spare-parts?source=workbench&stock=LOW',
+        description: '进入备件库存列表，保留低储筛选和工单关联上下文。',
+        primaryLabel: '进入库存列表',
+        icon: Box,
+        visual: detailAsset('spare-parts-support-v1'),
+        stats: menuContextById.spares.stats,
+      },
+    ],
+  },
+  energy: {
+    position: '数据监控中心内的采集链路、异常流水和指标服务承接页。',
+    imageSrc: stitchAsset('analytics'),
+    emptyState: '当前产线暂无异常流水时，展示采集链路和吞吐趋势。',
+    errorState: 'MES 或 IoT 连接异常时，展示错误态并保留数据链路入口。',
+    deniedState: '缺少 dashboard:query 时，数据监控链路和指标服务入口禁用。',
+    actions: [
+      {
+        title: '查看数据链路',
+        source: '数据监控产品页',
+        routeTarget: '/energy?source=workbench&scope=data-monitoring',
+        description: '进入数据监控页面，保留 MES/IoT 链路和 Workbench 来源。',
+        primaryLabel: '进入数据链路',
+        icon: Activity,
+        visual: detailAsset('data-sync-pipeline-v1'),
+        stats: menuContextById.energy.stats,
+      },
+      {
+        title: '订阅异常报表',
+        source: '数据监控产品页',
+        routeTarget: '/reports?source=workbench&view=data-monitoring&subscribe=true',
+        description: '进入报表中心，预填数据链路异常订阅和监控视角。',
+        primaryLabel: '进入报表订阅',
+        icon: BarChart3,
+        visual: detailAsset('data-sync-pipeline-v1'),
+        stats: menuContextById.report.stats,
+      },
+    ],
+  },
+  report: {
+    position: 'Dashboard 趋势、分类分布、部门统计和导出能力迁移后的报表页。',
+    imageSrc: stitchAsset('analytics'),
+    emptyState: '暂无匹配报表数据时，展示模板库、订阅任务和导出入口。',
+    errorState: '报表聚合失败时，保留上次生成结果并提示重试或进入报表中心。',
+    deniedState: '缺少 report:query 时，经营报表与导出入口在抽屉中禁用。',
+    actions: [
+      {
+        title: '打开经营报表',
+        source: '报表分析产品页',
+        routeTarget: '/reports?source=workbench&view=operations',
+        description: '进入报表中心，承接资产价值趋势、分类分布和部门资产统计。',
+        primaryLabel: '进入报表中心',
+        icon: BarChart3,
+        visual: iconAsset('report-bars'),
+        stats: menuContextById.report.stats,
+      },
+      {
+        title: '导出资产趋势',
+        source: '报表分析产品页',
+        routeTarget: '/reports?source=workbench&view=asset-trend&export=csv',
+        description: '进入报表导出视角，预填资产价值趋势和 CSV 导出意图。',
+        primaryLabel: '进入导出页',
+        icon: FileText,
+        visual: iconAsset('report-bars'),
+        stats: menuContextById.report.stats,
+      },
+    ],
+  },
+  alarm: {
+    position: '安全态势工作台内的告警发现、研判、处置和复盘承接页。',
+    imageSrc: stitchAsset('security'),
+    emptyState: '暂无待研判告警时，展示安全评分、最近处置和规则入口。',
+    errorState: '告警流聚合失败时，提示进入通知中心并保留筛选参数。',
+    deniedState: '缺少 notification:query 时，告警队列与处置入口禁用。',
+    actions: [
+      {
+        title: '查看告警队列',
+        source: '告警中心产品页',
+        routeTarget: menuContextById.alarm.routeTarget,
+        description: '进入通知中心，预填高危告警、资产位置和建议处置动作。',
+        primaryLabel: '进入告警处置',
+        icon: Bell,
+        visual: detailAsset('risk-level-tags-v1'),
+        stats: menuContextById.alarm.stats,
+      },
+      {
+        title: '转派处置工单',
+        source: '告警中心产品页',
+        routeTarget: buildWorkOrderPrefillPath({
+          source: 'asset-risk',
+          title: '告警转派处置工单',
+          assetName: '注塑机 M-201',
+          assetLocation: '一车间 / A线',
+          riskState: '高危告警',
+          riskScore: 92,
+          riskLevel: '高危',
+          priority: 'CRITICAL',
+          dueDate: '2026-06-15',
+          description: '来自 Workbench 告警中心：高危告警需要转派处置工单并复盘。',
+        }),
+        description: '把告警等级、资产、位置和处置建议预填到工单创建页。',
+        primaryLabel: '创建处置工单',
+        icon: AlertTriangle,
+        visual: detailAsset('risk-level-tags-v1'),
+        stats: menuContextById.orders.stats,
+      },
+    ],
+  },
+  policy: {
+    position: '组织策略、风险阈值、告警规则和审批边界的治理承接页。',
+    imageSrc: detailAsset('asset-status-distribution-v1'),
+    emptyState: '暂无待复核策略时，展示已启用规则和最近命中记录。',
+    errorState: '策略规则服务异常时，提示进入风险矩阵并保留策略范围。',
+    deniedState: '缺少 risk:matrix:query 时，策略规则入口禁用。',
+    actions: [
+      {
+        title: '查看策略规则',
+        source: '组织策略产品页',
+        routeTarget: '/risk-matrix?source=workbench&scope=policy',
+        description: '进入风险矩阵，保留组织策略、阈值和审批边界上下文。',
+        primaryLabel: '进入策略规则',
+        icon: ShieldCheck,
+        visual: detailAsset('asset-status-distribution-v1'),
+        stats: menuContextById.policy.stats,
+      },
+      {
+        title: '复核高危规则',
+        source: '组织策略产品页',
+        routeTarget: '/risk-matrix?source=workbench&scope=policy&severity=HIGH',
+        description: '进入风险矩阵高危规则视角，预填策略范围和风险等级。',
+        primaryLabel: '进入高危复核',
+        icon: Shield,
+        visual: detailAsset('asset-status-distribution-v1'),
+        stats: menuContextById.policy.stats,
+      },
+    ],
+  },
+  settings: {
+    position: '组织、角色、数据字典、MES/IoT 集成账号和平台参数的基础维护承接页。',
+    imageSrc: detailAsset('data-sync-pipeline-v1'),
+    emptyState: '暂无待维护配置时，展示集成源、角色组和字典健康状态。',
+    errorState: '配置服务或集成源异常时，提示进入系统配置页处理。',
+    deniedState: '缺少 system:config:query 时，基础维护入口在抽屉中禁用。',
+    actions: [
+      {
+        title: '打开基础维护',
+        source: '基础维护产品页',
+        routeTarget: '/settings/sysconfig?source=workbench',
+        description: '进入系统配置，保留 Workbench 来源并聚焦组织、角色、集成源维护。',
+        primaryLabel: '进入基础维护',
+        icon: Settings,
+        visual: detailAsset('data-sync-pipeline-v1'),
+        stats: menuContextById.settings.stats,
+      },
+      {
+        title: '查看集成链路',
+        source: '基础维护产品页',
+        routeTarget: '/energy?source=workbench&scope=integration-config',
+        description: '进入数据监控链路视角，复核 MES/IoT 集成源和同步质量。',
+        primaryLabel: '进入链路监控',
+        icon: Database,
+        visual: detailAsset('data-sync-pipeline-v1'),
+        stats: menuContextById.energy.stats,
+      },
+    ],
+  },
+};
+
+const workbenchCreateRouteByMenuId: Record<string, string> = {
+  asset: '/assets/new?source=workbench',
+  todo: buildWorkOrderPrefillPath({
+    source: 'predictive-maintenance',
+    title: '流程待办触发预测维保派工',
+    assetName: '注塑机 M-201',
+    assetLocation: '一车间 / A线',
+    riskState: '温度异常',
+    riskScore: 92,
+    priority: 'HIGH',
+    dueDate: '2026-06-16',
+    description: '来自 Workbench 流程待办：预测维保队列命中高风险资产，需要派工。',
+  }),
+  device: buildWorkOrderPrefillPath({
+    source: 'quick-action',
+    title: '设备温度异常复核工单',
+    assetName: '注塑机 M-201',
+    assetLocation: '一车间 / A线',
+    riskState: '温度异常',
+    riskScore: 92,
+    priority: 'HIGH',
+    dueDate: '2026-06-16',
+    description: '来自 Workbench 设备管理：温度边界触发复核，需要创建现场维保工单。',
+  }),
+  orders: menuContextById.orders.routeTarget,
+  inspection: menuContextById.inspection.routeTarget,
+  spares: menuContextById.spares.routeTarget,
+  energy: '/reports?source=workbench&view=data-monitoring&subscribe=true',
+  report: '/reports/scheduled?source=workbench&view=operations',
+  alarm: buildWorkOrderPrefillPath({
+    source: 'asset-risk',
+    title: '告警转派处置工单',
+    assetName: '注塑机 M-201',
+    assetLocation: '一车间 / A线',
+    riskState: '高危告警',
+    riskScore: 92,
+    riskLevel: '高危',
+    priority: 'CRITICAL',
+    dueDate: '2026-06-15',
+    description: '来自 Workbench 告警中心：高危告警需要转派处置工单并复盘。',
+  }),
+  policy: '/risk-assessments/new?source=workbench&scope=policy',
+  settings: '/settings/sysconfig?source=workbench&mode=edit',
+};
+
+const workbenchDetailRouteByMenuId: Record<string, string> = {
+  asset: '/assets/201?source=workbench',
+  todo: '/approvals/1?source=workbench',
+  device: '/equipment/201?source=workbench',
+  orders: '/workorders/1?source=workbench',
+  inspection: '/inspections/1?source=workbench',
+  spares: '/spare-parts/1?source=workbench',
+  energy: '/energy?source=workbench&scope=data-monitoring&device=201',
+  report: '/reports?source=workbench&view=operations&dept=A',
+  alarm: '/notifications?source=workbench&severity=HIGH',
+  policy: '/risk-matrix?source=workbench&scope=policy&severity=HIGH',
+  settings: '/settings/sysconfig?source=workbench&tab=integration',
+};
+
+const workbenchEditRouteByMenuId: Record<string, string> = {
+  asset: '/assets/201/edit?source=workbench',
+  todo: '/approvals/1?source=workbench&mode=process',
+  device: '/equipment/201?source=workbench&mode=maintain',
+  orders: '/workorders/1/acceptance?source=workbench',
+  inspection: '/inspections/1/edit?source=workbench',
+  spares: '/spare-parts/1?source=workbench&mode=edit',
+  energy: '/settings/sysconfig?source=workbench&tab=integration',
+  report: '/reports/scheduled?source=workbench&mode=edit',
+  alarm: '/notifications?source=workbench&action=resolve',
+  policy: '/risk-matrix?source=workbench&scope=policy&mode=edit',
+  settings: '/settings/sysconfig?source=workbench&mode=edit',
+};
+
+function buildWorkbenchOperationPreview({
+  title,
+  source,
+  routeTarget,
+  description,
+  primaryLabel,
+  icon,
+  visual,
+  stats,
+}: RouteActionPreview): RouteActionPreview {
+  return { title, source, routeTarget, description, primaryLabel, icon, visual, stats };
+}
+
+function findCreateAction(actions: RouteActionPreview[]) {
+  return actions.find((action) => /新建|创建|生成|申请|派发|转派|订阅/.test(action.title)) ?? actions[1] ?? actions[0];
+}
+
+function buildWorkbenchOperations(
+  item: WorkspaceMenuItem,
+  context: MenuContext,
+  meta: WorkbenchProductPageMeta,
+): WorkbenchOperationItem[] {
+  const queryAction = meta.actions[0];
+  const createAction = findCreateAction(meta.actions);
+  const detailRoute = workbenchDetailRouteByMenuId[item.id] ?? queryAction.routeTarget;
+  const editRoute = workbenchEditRouteByMenuId[item.id] ?? detailRoute;
+  const createRoute = workbenchCreateRouteByMenuId[item.id] ?? createAction.routeTarget;
+
+  return [
+    {
+      kind: '新建/发起',
+      title: createAction.title.includes('查看') || createAction.title.includes('打开') ? `发起${item.label}` : createAction.title,
+      description: '进入真实业务页创建或发起处理，并带入 Workbench 上下文。',
+      icon: createAction.icon,
+      preview: buildWorkbenchOperationPreview({
+        ...createAction,
+        routeTarget: createRoute,
+        primaryLabel: createAction.primaryLabel || '发起处理',
+      }),
+    },
+    {
+      kind: '查询/筛选',
+      title: queryAction.title,
+      description: '按当前菜单、状态和来源查询列表，保留 source=workbench。',
+      icon: Search,
+      preview: buildWorkbenchOperationPreview({
+        ...queryAction,
+        title: queryAction.title,
+        description: `${queryAction.description} 支持按状态、来源和业务对象继续筛选。`,
+      }),
+    },
+    {
+      kind: '打开详情',
+      title: `打开${item.label}详情`,
+      description: '从队列或列表进入单据/资产/配置详情，继续处理当前对象。',
+      icon: FileText,
+      preview: buildWorkbenchOperationPreview({
+        title: `打开${item.label}详情`,
+        source: `${item.label}详情入口`,
+        routeTarget: detailRoute,
+        description: `打开 ${item.label} 的示例详情或业务列表定位结果，保留 Workbench 来源。`,
+        primaryLabel: '打开详情',
+        icon: FileText,
+        visual: meta.imageSrc,
+        stats: context.stats,
+      }),
+    },
+    {
+      kind: '编辑/维护',
+      title: `维护${item.label}`,
+      description: '进入现有编辑、验收、配置或维护入口，不在 Workbench 内重复造页面。',
+      icon: Wrench,
+      preview: buildWorkbenchOperationPreview({
+        title: `维护${item.label}`,
+        source: `${item.label}维护入口`,
+        routeTarget: editRoute,
+        description: `进入 ${item.label} 的维护/编辑/验收承接页，保留当前业务上下文。`,
+        primaryLabel: '进入维护',
+        icon: Wrench,
+        visual: meta.imageSrc,
+        stats: context.stats,
+      }),
+    },
+    {
+      kind: '危险操作',
+      title: `${item.label}停用/撤销`,
+      description: '删除、停用、撤销等高风险操作必须回到详情页二次确认并校验权限。',
+      icon: X,
+      disabledReason: 'Workbench 仅展示危险操作反馈；实际执行需进入详情页二次确认。',
+      tone: 'danger',
+    },
+  ];
+}
 
 function getActionWorkflow(preview: RouteActionPreview): ActionWorkflow {
   const routeTarget = preview.routeTarget;
@@ -1715,6 +2315,185 @@ function WorkspaceModuleMock({
           </span>
         ))}
       </div>
+    </section>
+  );
+}
+
+function WorkbenchProductPage({
+  item,
+  context,
+  mock,
+  meta,
+  onPreviewAction,
+}: {
+  item: WorkspaceMenuItem;
+  context: MenuContext;
+  mock: ModuleMock;
+  meta: WorkbenchProductPageMeta;
+  onPreviewAction: (preview: RouteActionPreview) => void;
+}) {
+  const Icon = item.icon;
+  const [primaryAction, secondaryAction = primaryAction] = meta.actions;
+  const PrimaryActionIcon = primaryAction.icon;
+  const SecondaryActionIcon = secondaryAction.icon;
+  const operations = buildWorkbenchOperations(item, context, meta);
+
+  return (
+    <section className="workspace-product-page" aria-label={`${item.label}产品页`}>
+      <div className="workspace-product-hero">
+        <div className="workspace-product-copy">
+          <span>{mock.eyebrow}</span>
+          <h2>{mock.title}</h2>
+          <p>{meta.position}</p>
+          <small>{mock.summary}</small>
+          <div className="workspace-product-metrics" aria-label={`${item.label}关键指标`}>
+            {context.stats.map((stat) => (
+              <div key={stat.label}>
+                <span>{stat.label}</span>
+                <strong>{stat.value}</strong>
+                <small>{stat.note}</small>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="workspace-product-console" aria-label={`${item.label}业务操作台`}>
+          <div className="workspace-product-console-head">
+            <div>
+              <IsoIcon icon={Icon} src={meta.imageSrc} alt="" />
+              <span>
+                <small>业务操作台</small>
+                <strong>{mock.title}</strong>
+              </span>
+            </div>
+            <em>实时</em>
+          </div>
+          <div className="workspace-product-command-row">
+            <button type="button" onClick={() => onPreviewAction(primaryAction)}>
+              <PrimaryActionIcon />
+              <span>{primaryAction.title}</span>
+            </button>
+            <button type="button" onClick={() => onPreviewAction(secondaryAction)}>
+              <SecondaryActionIcon />
+              <span>{secondaryAction.title}</span>
+            </button>
+          </div>
+          <div className="workspace-product-filter-row" aria-label={`${item.label}筛选条件`}>
+            <span>全部</span>
+            {context.stats.map((stat) => (
+              <span key={stat.label}>{stat.label}</span>
+            ))}
+          </div>
+          <div className="workspace-product-console-list" aria-label={`${item.label}可处理业务队列`}>
+            {mock.rows.map((row, index) => {
+              const action = meta.actions[index % meta.actions.length];
+              return (
+                <button key={row.label} type="button" className={`is-${row.tone}`} onClick={() => onPreviewAction(action)}>
+                  <span>
+                    <strong>{row.label}</strong>
+                    <small>{row.note}</small>
+                  </span>
+                  <b>{row.value}</b>
+                  <ArrowRight />
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      <section className="workspace-product-operations" aria-label={`${item.label}CRUD操作矩阵`}>
+        {operations.map((operation) => {
+          const OperationIcon = operation.icon;
+          return (
+            <button
+              key={operation.kind}
+              type="button"
+              className={`${operation.tone ? `is-${operation.tone}` : ''}`}
+              disabled={!operation.preview}
+              onClick={() => {
+                if (operation.preview) {
+                  onPreviewAction(operation.preview);
+                }
+              }}
+            >
+              <OperationIcon />
+              <span>
+                <small>{operation.kind}</small>
+                <strong>{operation.title}</strong>
+                <em>{operation.disabledReason ?? operation.description}</em>
+              </span>
+            </button>
+          );
+        })}
+      </section>
+
+      <div className="workspace-product-grid">
+        <section className="workspace-product-panel workspace-product-list" aria-label={`${item.label}业务承接清单`}>
+          <div className="workspace-product-panel-head">
+            <span>业务承接</span>
+            <strong>真实入口</strong>
+          </div>
+          {mock.rows.map((row) => (
+            <div key={row.label} className={`is-${row.tone}`}>
+              <span>{row.label}</span>
+              <strong>{row.value}</strong>
+              <small>{row.note}</small>
+            </div>
+          ))}
+        </section>
+
+        <section className="workspace-product-panel workspace-product-flow" aria-label={`${item.label}流程闭环`}>
+          <div className="workspace-product-panel-head">
+            <span>流程闭环</span>
+            <strong>可追溯</strong>
+          </div>
+          {mock.steps.map((step, index) => (
+            <div key={step.label}>
+              <em>{String(index + 1).padStart(2, '0')}</em>
+              <span>{step.label}</span>
+              <small>{step.note}</small>
+            </div>
+          ))}
+        </section>
+
+        <section className="workspace-product-panel workspace-product-actions" aria-label={`${item.label}页面跳转`}>
+          <div className="workspace-product-panel-head">
+            <span>关键跳转</span>
+            <strong>带上下文</strong>
+          </div>
+          {meta.actions.map((action) => {
+            const ActionIcon = action.icon;
+            return (
+              <button key={action.title} type="button" onClick={() => onPreviewAction(action)}>
+                <IsoIcon icon={ActionIcon} src={action.visual} alt="" />
+                <span>
+                  <strong>{action.title}</strong>
+                  <small>{action.routeTarget}</small>
+                </span>
+                <ArrowRight />
+              </button>
+            );
+          })}
+        </section>
+      </div>
+
+      <section className="workspace-product-states" aria-label={`${item.label}页面状态矩阵`}>
+        <article>
+          <Archive />
+          <span>空态</span>
+          <p>{meta.emptyState}</p>
+        </article>
+        <article>
+          <X />
+          <span>异常态</span>
+          <p>{meta.errorState}</p>
+        </article>
+        <article>
+          <ShieldCheck />
+          <span>无权限态</span>
+          <p>{meta.deniedState}</p>
+        </article>
+      </section>
     </section>
   );
 }
@@ -3209,6 +3988,7 @@ export default function WorkspacePreviewPage() {
 
   const activeContext = menuContextById[activeItem.id] ?? menuContextById.home;
   const activeModuleMock = moduleMockByMenuId[activeItem.id];
+  const activeProductPageMeta = isWorkbenchRoute ? workbenchProductPageMetaByMenuId[activeItem.id] : undefined;
   const canAccessRoutePreview = routePreview
     ? canAccessRoute(getRoutePathname(routePreview.routeTarget), user)
     : true;
@@ -3478,10 +4258,20 @@ export default function WorkspacePreviewPage() {
           </div>
 
           <WorkspaceContextStrip item={activeItem} context={activeContext} onAction={handleContextAction} />
-          {activeModuleMock ? <WorkspaceModuleMock mock={activeModuleMock} onPreviewAction={setRoutePreview} /> : null}
+          {activeModuleMock && activeProductPageMeta ? (
+            <WorkbenchProductPage
+              item={activeItem}
+              context={activeContext}
+              mock={activeModuleMock}
+              meta={activeProductPageMeta}
+              onPreviewAction={setRoutePreview}
+            />
+          ) : activeModuleMock ? (
+            <WorkspaceModuleMock mock={activeModuleMock} onPreviewAction={setRoutePreview} />
+          ) : null}
 
-          {activePage === 'overview' ? <OverviewDashboard onSelectPage={selectPage} /> : null}
-          {activePage === 'assets' ? (
+          {!activeProductPageMeta && activePage === 'overview' ? <OverviewDashboard onSelectPage={selectPage} /> : null}
+          {!activeProductPageMeta && activePage === 'assets' ? (
             <AssetDashboard
               onSelectPage={selectPage}
               onOpenRoute={openRouteTarget}
@@ -3489,10 +4279,10 @@ export default function WorkspacePreviewPage() {
               isWorkbenchRoute={isWorkbenchRoute}
             />
           ) : null}
-          {activePage === 'security' ? (
+          {!activeProductPageMeta && activePage === 'security' ? (
             <SecurityDashboard onPreviewAction={setRoutePreview} onOpenBigScreen={() => navigate('/bigscreen-3d')} />
           ) : null}
-          {activePage === 'analytics' ? <AnalyticsDashboard onPreviewAction={setRoutePreview} /> : null}
+          {!activeProductPageMeta && activePage === 'analytics' ? <AnalyticsDashboard onPreviewAction={setRoutePreview} /> : null}
           {!isWorkbenchRoute && activePage === 'stitch' ? (
             <StitchSuiteDashboard />
           ) : null}
