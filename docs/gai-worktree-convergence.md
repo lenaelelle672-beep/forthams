@@ -143,7 +143,9 @@ git diff --check
 
 当前结论：WorkOrder 与 Retirement 可以作为后续“可提交候选”继续分拣，但仍不应直接提交整个工作区。进入提交前仍需确认 DDL/config、`.gsd`、Python benchmark/Sprint4、legacy test 删除等非 AMS 主线内容的处置策略。
 
-## 12. 最新验证补充
+## 12. 历史验证补充
+
+以下记录是 2026-05-01 的历史状态，已被 `docs/testing/*` 与 `goon.md` 顶部最新块取代，不应再作为当前测试数量或真实后端 E2E 覆盖范围引用。
 
 记录日期：2026-05-01
 

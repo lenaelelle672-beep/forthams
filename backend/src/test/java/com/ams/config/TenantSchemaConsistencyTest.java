@@ -138,6 +138,27 @@ class TenantSchemaConsistencyTest {
     }
 
     @Test
+    void workflowDefinitionMigrationShouldCreateRuntimeDefinitionTable() throws IOException {
+        String migration = Files.readString(MIGRATION_DIR.resolve("V2_83__workflow_definition_table.sql"));
+        String schema = Files.readString(Path.of("src/main/resources/schema.sql"));
+        String workflowDefinitionSchema = tableDefinition(schema, "workflow_definition");
+
+        assertThat(migration).contains("CREATE TABLE IF NOT EXISTS workflow_definition");
+        assertThat(migration).contains("tenant_id VARCHAR(64) NOT NULL DEFAULT 'dept:1'");
+        assertThat(migration).contains("business_type VARCHAR(64) NOT NULL");
+        assertThat(migration).contains("definition_json LONGTEXT NOT NULL");
+        assertThat(migration).contains("UNIQUE KEY uk_workflow_tenant_business (tenant_id, business_type)");
+        assertThat(migration).contains("ADD INDEX idx_workflow_tenant_status (tenant_id, status)");
+        assertThat(migration).contains("SET tenant_id = 'dept:1'");
+        assertThat(migration).contains("ALTER TABLE workflow_definition MODIFY COLUMN definition_json LONGTEXT NOT NULL");
+
+        assertThat(workflowDefinitionSchema).contains("CREATE TABLE IF NOT EXISTS workflow_definition");
+        assertThat(workflowDefinitionSchema).contains("tenant_id VARCHAR(64) NOT NULL DEFAULT 'dept:1'");
+        assertThat(workflowDefinitionSchema).contains("UNIQUE KEY uk_workflow_tenant_business (tenant_id, business_type)");
+        assertThat(workflowDefinitionSchema).contains("INDEX idx_workflow_tenant_status (tenant_id, status)");
+    }
+
+    @Test
     void legacyTenantIdMigrationsShouldBePatchedForwardWithoutChecksumChanges() throws IOException {
         String v236 = Files.readString(MIGRATION_DIR.resolve("V2_36__asset_parent_child.sql"));
         String v258 = Files.readString(MIGRATION_DIR.resolve("V2_58__inspection_template_and_record.sql"));
@@ -160,6 +181,15 @@ class TenantSchemaConsistencyTest {
         } catch (IOException e) {
             throw new IllegalStateException("Failed to read " + path, e);
         }
+    }
+
+    private static String tableDefinition(String schema, String tableName) {
+        String marker = "CREATE TABLE IF NOT EXISTS " + tableName + " (";
+        int start = schema.indexOf(marker);
+        assertThat(start).as(tableName + " table should exist in schema.sql").isGreaterThanOrEqualTo(0);
+        int end = schema.indexOf("\n) ENGINE=", start);
+        assertThat(end).as(tableName + " table should include an ENGINE clause").isGreaterThan(start);
+        return schema.substring(start, end);
     }
 
     private record TenantColumnType(String fileName, String definition) {

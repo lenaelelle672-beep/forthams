@@ -19,8 +19,10 @@ npx playwright test --project=browser-regression-smoke
 ## 执行结果
 
 ```text
-23 passed (32.9s)
+26 tests in 2 files
 ```
+
+当前清单由 `npx playwright test --project=browser-regression-smoke --list` 确认；最近桌面浏览器回归通过结果记录在 `docs/testing/test-coverage-summary.md`。
 
 ## 覆盖项
 
@@ -35,7 +37,10 @@ npx playwright test --project=browser-regression-smoke
 | 按钮交互 | 新增资产、创建盘点任务、流程管理/流程设计器入口 | 通过 |
 | API 可控性 | 使用 Playwright route mock `/api/**`，隔离本地 MySQL 是否启动对前端冒烟的影响 | 通过 |
 | 工作流新建保存 | `/workflows` 新建模板流程会保存草稿并进入设计器 | 通过 |
+| 工作流保存失败提示 | `/workflows` 草稿后端保存失败时只提示“本地草稿未同步”，不误报后端保存成功 | 通过 |
+| 工作流只读权限 | `/workflows` 仅查询权限账号禁用新建/发布/设计器写入口；`/workflow-designer` 直达时保持只读且不保存 | 通过 |
 | 空态/拒绝态 | `/approvals`、`/reports` 的空态和 403 权限拒绝态可解释且不崩溃 | 通过 |
+| 审批详情权限 | `/approvals/:id` 只有当前节点审批人可见审批操作 | 通过 |
 | 大屏降级 | `/bigscreen-3d` 在无 WebGL 时展示安全降级且不加载 3D chunk | 通过 |
 
 ## 本轮发现并处理的问题

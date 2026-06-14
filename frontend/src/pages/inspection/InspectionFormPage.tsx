@@ -1,14 +1,83 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { useNavigate, useParams } from 'react-router';
+import React, { useEffect, useMemo, useState, useRef } from 'react';
+import { useNavigate, useParams, useSearchParams } from 'react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { inspectionApi } from '../../api/inspection';
 import type { Inspection } from '../../types/inspection';
-import { Card, Form, Input, Select, DatePicker, Button, Space, message, Modal } from 'antd';
+import { Alert, Card, Form, Input, Select, DatePicker, Button, Space, message, Modal, Tag } from 'antd';
 import InputNumber from 'antd/es/input-number';
 import Image from 'antd/es/image';
 import { QrcodeOutlined, CameraOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import http from '@/utils/http';
+
+type WorkbenchInspectionPrefill = {
+  hasPrefill: boolean;
+  sourceLabel: string;
+  values: Record<string, unknown>;
+  tags: string[];
+};
+
+const WORKBENCH_INSPECTION_SOURCE_LABELS: Record<string, string> = {
+  'quick-inspection': '设备巡检快捷入口',
+  'temperature-check': '温度异常点检',
+  'asset-risk': '资产风险巡检',
+};
+
+function getSearchValue(searchParams: URLSearchParams, key: string) {
+  return searchParams.get(key)?.trim() ?? '';
+}
+
+function parseAssetId(searchParams: URLSearchParams): number | undefined {
+  const assetId = Number(getSearchValue(searchParams, 'assetId'));
+  return Number.isFinite(assetId) && assetId > 0 ? assetId : undefined;
+}
+
+function getWorkbenchInspectionPrefill(searchParams: URLSearchParams): WorkbenchInspectionPrefill {
+  const source = getSearchValue(searchParams, 'source');
+  const assetName = getSearchValue(searchParams, 'assetName');
+  const inspectionNo = getSearchValue(searchParams, 'inspectionNo');
+  const inspectionType = getSearchValue(searchParams, 'inspectionType') || 'SPECIAL';
+  const inspectionDate = getSearchValue(searchParams, 'inspectionDate');
+  const nextInspectionDate = getSearchValue(searchParams, 'nextInspectionDate');
+  const inspectorName = getSearchValue(searchParams, 'inspectorName');
+  const findings = getSearchValue(searchParams, 'findings');
+  const assetId = parseAssetId(searchParams);
+  const hasPrefill = Boolean(source || assetId || assetName || inspectionNo || findings);
+
+  if (!hasPrefill) {
+    return {
+      hasPrefill: false,
+      sourceLabel: '',
+      values: {},
+      tags: [],
+    };
+  }
+
+  const sourceLabel = WORKBENCH_INSPECTION_SOURCE_LABELS[source] ?? '固定资产工作台巡检';
+  const generatedFindings = findings ||
+    [
+      `来源：${sourceLabel}`,
+      assetName ? `资产：${assetName}` : '',
+      '请现场核验在线状态、所在位置、温度与维保等级。',
+    ].filter(Boolean).join('；');
+
+  return {
+    hasPrefill,
+    sourceLabel,
+    values: {
+      inspectionNo: inspectionNo || `INSP-${dayjs().format('YYYYMMDD-HHmm')}`,
+      assetId,
+      inspectionType,
+      inspectionDate: inspectionDate ? dayjs(inspectionDate) : dayjs(),
+      nextInspectionDate: nextInspectionDate ? dayjs(nextInspectionDate) : undefined,
+      inspectorName,
+      result: 'PENDING',
+      findings: generatedFindings,
+    },
+    tags: [assetName, assetId ? `资产ID ${assetId}` : '', inspectionType, inspectionDate, nextInspectionDate]
+      .filter(Boolean),
+  };
+}
 
 // 简单的 PhotoUpload 组件（使用 Ant Design）
 const PhotoUpload: React.FC<{ value?: string; onChange?: (value: string) => void }> = ({ value, onChange }) => {
@@ -103,10 +172,12 @@ const InspectionFormPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const isEdit = !!id;
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const queryClient = useQueryClient();
   const [form] = Form.useForm();
   const [scanModalVisible, setScanModalVisible] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const workbenchPrefill = useMemo(() => getWorkbenchInspectionPrefill(searchParams), [searchParams]);
 
   const { data: inspectionData } = useQuery({
     queryKey: ['inspection', id],
@@ -125,6 +196,11 @@ const InspectionFormPage: React.FC = () => {
       });
     }
   }, [inspectionData, form]);
+
+  useEffect(() => {
+    if (isEdit || !workbenchPrefill.hasPrefill) return;
+    form.setFieldsValue(workbenchPrefill.values);
+  }, [form, isEdit, workbenchPrefill]);
 
   const mutation = useMutation({
     mutationFn: (values: Inspection) =>
@@ -181,6 +257,25 @@ const InspectionFormPage: React.FC = () => {
 
   return (
     <div className="p-6">
+      {!isEdit && workbenchPrefill.hasPrefill && (
+        <Alert
+          data-testid="workbench-inspection-prefill"
+          type="info"
+          showIcon
+          className="mb-4"
+          message={workbenchPrefill.sourceLabel}
+          description={
+            <div className="space-y-2">
+              <div>已从固定资产工作台带入资产、巡检编号、计划日期和检查发现，提交前可继续调整模板、检验人、照片和证书信息。</div>
+              <div className="flex flex-wrap gap-2">
+                {workbenchPrefill.tags.map((tag) => (
+                  <Tag key={String(tag)} color="blue">{String(tag)}</Tag>
+                ))}
+              </div>
+            </div>
+          }
+        />
+      )}
       <Card title={isEdit ? '编辑检验记录' : '新增检验记录'}>
         <Form
           form={form}
@@ -192,13 +287,15 @@ const InspectionFormPage: React.FC = () => {
             <Input placeholder="自动生成或手动输入" />
           </Form.Item>
 
-          <Form.Item name="assetId" label="资产ID" rules={[{ required: true, message: '请选择资产' }]}>
+          <Form.Item label="资产ID" required>
             <Space.Compact style={{ width: '100%' }}>
-              <InputNumber
-                placeholder="输入资产ID"
-                min={1}
-                style={{ flex: 1 }}
-              />
+              <Form.Item name="assetId" noStyle rules={[{ required: true, message: '请选择资产' }]}>
+                <InputNumber
+                  placeholder="输入资产ID"
+                  min={1}
+                  style={{ flex: 1 }}
+                />
+              </Form.Item>
               <Button icon={<QrcodeOutlined />} onClick={handleScan}>
                 扫码
               </Button>

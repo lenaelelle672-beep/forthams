@@ -17,11 +17,14 @@
     "e2e:browser-regression": "playwright test --project=browser-regression-smoke --reporter=line",
     "e2e:real": "AMS_E2E_REAL_BACKEND=true playwright test --project=real-backend-smoke",
     "e2e:ui": "playwright test --ui",
-    "stitch": "node --input-type=module ../scripts/stitch-cli.js",
-    "stitch:projects": "node --input-type=module ../scripts/stitch-cli.js projects",
-    "stitch:generate": "node --input-type=module ../scripts/stitch-cli.js generate",
-    "stitch:screens": "node --input-type=module ../scripts/stitch-cli.js screens",
-    "stitch:export": "node --input-type=module ../scripts/stitch-cli.js export"
+    "stitch": "node ../scripts/stitch-cli.js",
+    "stitch:auth": "node ../scripts/stitch-cli.js auth",
+    "stitch:projects": "node ../scripts/stitch-cli.js projects",
+    "stitch:generate": "node ../scripts/stitch-cli.js generate",
+    "stitch:screens": "node ../scripts/stitch-cli.js screens",
+    "stitch:export": "node ../scripts/stitch-cli.js export",
+    "stitch:mcp-proxy": "node ../scripts/stitch-oauth-mcp-proxy.js",
+    "stitch:proxy-check": "node ../scripts/stitch-cli.js proxy-check"
   },
   "dependencies": {
     "@ant-design/icons": "^6.2.5",

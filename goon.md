@@ -1,5 +1,43 @@
 # goon.md — 交接笔记（Cowork → Claude Code）
 
+## 2026-06-12 最新状态（Codex GAI2 工作流保存与蜂群路由收敛）
+
+### 当前事实
+- `/workflows` 新建流程无法稳定保存的根因已收敛到旧库缺少运行时根表 `workflow_definition`：新增 `backend/src/main/resources/migration/V2_83__workflow_definition_table.sql` patch-forward 迁移，`schema.sql` fresh install 表结构也已对齐 `tenant_id VARCHAR(64) NOT NULL DEFAULT 'dept:1'`。
+- 真实 MySQL 临时库 `ams_v283_verify` 已连续执行两遍 V2_83 成功，并确认 `workflow_definition` 最终包含 `uk_workflow_tenant_business` 与 `idx_workflow_tenant_status`；临时库已删除，未触碰 `ams_db`。
+- `frontend/src/e2e/real-backend-smoke.spec.ts` 已补真实后端保存草稿断言：点击“保存草稿”后必须出现“已保存草稿”，且不能出现“仅保存为本地草稿”。
+- 当前真实后端 E2E 清单为 `9 tests in 1 file`；它覆盖保存草稿，不覆盖发布动作。发布能力由 `WorkflowDefinitionServiceTest` 与 `WorkflowDefinitionControllerTest` 覆盖。
+- 当前桌面浏览器回归 smoke 为 `26 passed`；workflow 专项覆盖保存失败提示、新建模板保存后进设计器、列表只读权限、设计器直达只读且不保存。
+- `WorkflowDefinitionServiceTest` 当前 19 个 `@Test`，`WorkflowDefinitionControllerTest` 当前 7 个 `@Test`，前端 `workflow.test.ts` 当前 3 个 API 契约测试。
+- 已新增并更新 `docs/gai2-subagent-routing-design.md`：后续 GAI2 蜂群按 S0-S4 档位选择模型、推理强度、fork_context、并发和关闭策略；当前按 Pro 策略默认从 `gpt-5.5` 起步，存在性确认/汇总用 `low` 推理，旁路审计用 `medium`，高风险迁移/权限/安全复核用 `high/xhigh`。已补回原 Opencode GAI2 角色层：`gai2-orchestrator` 是 Medium+ 必经调度器，`gai2-triage/audit/debate/drafter/refiner/builder/reviewer` 是阶段/专家角色；专家子 agent 先按角色映射到 S0-S4 档位，再套用该模型/推理配置。GAI2 对子 agent 的编排调度已恢复为“主线程 manager 自主调度 + 受控并发 + 写权限隔离 + 完成即关闭”，不再因侧栏历史残留暂停蜂群。
+- 已真实启用 4 个子 agent 做只读审计：Sagan (`019ebc05-f987-75e1-ab20-c655b5c6beda`) 审计 CI gate 配置，Turing (`019ebc10-f8af-7723-b84d-15532f7a7b83`) 审计 browser smoke 升级，Fermat (`019ebc1a-eeac-79e0-9800-2f5a3dcea899`) 审计 Docker/Nginx CI gate 最小闭环，Goodall (`019ebc20-f7c5-7502-931b-db432bacfdc1`) 复核 Docker/CI 实现与文档漂移；均已关闭，缺口均由主线程补证或同步。
+- 用户追问后已补上真实 `gai2-orchestrator` 调度判断：调度器 Planck (`019ebc84-3e30-76a0-9f54-02b3a58089b9`) 判定当前 P0 是 Docker/Nginx 运行态证据与脏工作区边界；随后 Curie、Sagan、Peirce 分别审计 Docker runtime、dirty tree 与 completion review，Bacon 起草 CI runtime smoke 方案；结果均已消费并关闭。
+- 已新增并更新 `DeploymentConfigConsistencyTest`：在本机没有 Docker/Nginx 原生命令时，先把根单容器 Dockerfile、单容器 Nginx、entrypoint、分体前后端 Dockerfile、前端 Nginx 与 compose 的端口、健康检查、SPA fallback、API 反代、schema 初始化挂载、compose MySQL 应用用户创建和 GitHub Actions Docker config/build/runtime smoke 命令写入静态/CI 门禁。
+- `.github/workflows/ci.yml` 与 `scripts/ci-gate.sh` 已补强：CI 触发范围覆盖 Docker/compose/scripts，门禁顺序包含前端构建、TypeScript、前端单测、浏览器回归 smoke 真实执行、后端部署/工作流 targeted gate、后端全量和工作树状态；CI 已新增 `npx playwright install --with-deps`，并新增独立 `docker-config-build` job 执行 `docker compose config --quiet`、`docker compose build backend frontend`、分体容器 runtime smoke（8080 `/api/health`、3000 `/`、`/workflows`、`/api/health`）、根 Dockerfile `docker build -t forthams-single:ci .` 和单容器 runtime smoke（18080 `/api/health`、`/`、`/workflows`）。
+- 移动端仍按用户要求冻结，未纳入本轮修改、验证、暂存或提交。
+
+### 最新验证
+- GitNexus impact：`TenantSchemaConsistencyTest` 风险 `LOW`；`workflow_definition` SQL 表名不在符号索引中。
+- 后端 targeted：`mvn -q -Dtest=TenantSchemaConsistencyTest,PermissionSeedSchemaTest,WorkflowDefinitionControllerTest,WorkflowDefinitionServiceTest test` 通过。
+- 前端 workflow targeted：`npm run test -- --run src/api/__tests__/workflow.test.ts tests/unit/workflowDefinitionService.test.ts tests/unit/workflowBusinessForms.test.tsx tests/unit/workflowDefinitionValidation.test.ts` 通过，`22` 个测试。
+- 真实后端 E2E：`npm run e2e:real -- --reporter=line` 最近通过，`9 passed (17.2s)`；当前 `--list` 确认为 `9 tests in 1 file`。
+- 前端全量最近通过：`89` 个测试文件、`883` 个测试。
+- 后端全量最近通过：`mvn -q test` 退出码 0；Surefire XML 汇总 `662` 个测试，0 failure/error/skip。
+- 部署配置 targeted：`mvn -q -Dtest=DeploymentConfigConsistencyTest test` 通过，4 个测试。
+- CI/local gate：`env SKIP_BUILD=1 ./scripts/ci-gate.sh` 通过，`6 passed, 0 failed, 190s`；该 gate 先捕获 `ApprovalListPage.tsx` 的 TypeScript 谓词类型问题，已在 `ApprovalListPage` 做最小类型标注修复后复跑通过；后续已把浏览器回归从 `--list` 升级为真实 smoke 执行。
+- 浏览器回归 smoke：`cd frontend && npm run e2e:browser-regression` 首次真实执行发现 `/inventory` 标题选择器非精确匹配导致 25/26，修复 `exact: true` 后复跑通过，`26 passed (36.3s)`。
+- 后端部署/工作流 targeted gate：`cd backend && mvn -q -Dtest=DeploymentConfigConsistencyTest,TenantSchemaConsistencyTest,PermissionSeedSchemaTest,WorkflowDefinitionControllerTest,WorkflowDefinitionServiceTest test` 通过。
+- 前端构建最近通过，仅保留 Vite 大 chunk warning。
+- `git diff --check` 通过。
+
+### 剩余动作
+- P0：原生 Docker/Nginx 验证仍无法在当前机器执行，`docker` 与 `nginx` 命令均不存在；当前已补 CI Docker config/build/runtime smoke 门禁与静态部署配置门禁，真实容器启动、Nginx runtime 加载、`/api/health` 与 SPA fallback 的证据需要由 GitHub Actions 或具备 Docker/Nginx 的机器跑出。
+- P1：当前工作树混有 unrelated/既有改动，提交前必须按边界分组，不能整树提交；移动端文件继续冻结。
+- P1：`.DS_Store` tracked 元数据清理仍需用户明确确认。
+- P1：若要把“发布流程”也纳入真实浏览器 E2E，需要新增独立发布用例，并避免共享业务流程草稿互相覆盖。
+
+> 下面 2026-06-09 及更早段落为历史记录，测试数量、Docker 剩余动作和移动端状态以当时批次为准；当前判断请看顶部最新状态。
+
 ## 2026-06-09 22:00 最新状态（Codex GAI2 桌面真实数据闭环推进）
 
 ### 当前事实
@@ -285,7 +323,7 @@
 - 首次普通沙箱执行 Playwright 因无法监听 `127.0.0.1:5173` 返回 `listen EPERM`；按规则提权重跑同一命令后通过，判定为沙箱端口权限问题，不是业务失败。
 
 ### 剩余动作
-- P0：仍需在有 Docker/Nginx 的机器上补原生镜像构建与容器 smoke；当前已有等价 Node 代理 smoke，但缺少真实 `docker build` / `docker compose build` 证据。
+- P0（历史记录）：当时仍需在有 Docker/Nginx 的机器上补原生镜像构建与容器 smoke；截至 2026-06-12 最新状态，CI 已补 `docker compose build`、根 Dockerfile build、分体容器 runtime smoke 与单容器 runtime smoke，仍需 GitHub Actions 或具备 Docker/Nginx 的机器产出一次真实运行结果。
 - P1：`.DS_Store` 仍为 tracked 本机元数据改动，是否 `git rm --cached .DS_Store` 需要用户明确确认。
 - P1：移动端继续冻结；恢复移动端时应单独审计并提交，不要混入桌面/后端批次。
 

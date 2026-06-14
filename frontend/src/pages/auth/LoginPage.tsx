@@ -1,9 +1,9 @@
 /**
  * @file pages/auth/LoginPage.tsx
- * @description forthAMS 品牌导向登录页 — 宇视科技统一资产管理平台入口
+ * @description UNIVIEW 固定资产品牌导向登录页 — 固定资产平台入口
  *
  * 设计原则:
- *   - 品牌优先：左侧突出 Uniview 品牌 + forthAMS 产品名 + 核心能力
+ *   - 品牌优先：左侧突出 UNIVIEW 品牌 + 固定资产产品名 + 核心能力
  *   - 简洁专业：无 Canvas / Three.js 重动效，纯 CSS 轻量渐变
  *   - 响应式：桌面双栏，移动端单栏居中
  *   - 代码清晰：表单逻辑拆入 hooks，UI 拆入 components
@@ -68,21 +68,21 @@ export default function LoginPage() {
             <div className="inline-flex w-fit items-center gap-2 rounded-full border border-white/[0.12] bg-white/[0.06] px-4 py-1.5 backdrop-blur-md">
               <Package className="h-3.5 w-3.5 text-blue-300" />
               <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-blue-100/90">
-                Uniview · 宇视科技
+                UNIVIEW · 宇视科技
               </span>
             </div>
 
             {/* Middle: headline */}
             <div className="max-w-[520px]">
               <h1 className="text-[2.75rem] font-bold leading-[1.15] tracking-[-0.03em] text-white drop-shadow-lg xl:text-[3.25rem]">
-                统一资产管理的
+                固定资产平台的
                 <span className="block bg-gradient-to-r from-blue-300 to-cyan-200 bg-clip-text text-transparent">
-                  智能运营入口
+                  智能运维入口
                 </span>
               </h1>
               <p className="mt-5 max-w-[440px] text-[15px] leading-relaxed text-slate-300/90 drop-shadow">
-                forthAMS 为资产台账、流程审批、盘点巡检和运营分析提供一站式管理平台，
-                帮助团队高效进入核心工作台。
+                UNIVIEW 固定资产连接资产台账、流程审批、盘点巡检和运营分析，
+                帮助团队高效进入固定资产工作台。
               </p>
 
               {/* Tagline chips */}
@@ -117,8 +117,8 @@ export default function LoginPage() {
               <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-600/90 shadow-lg shadow-blue-600/25 ring-1 ring-blue-400/20">
                 <Package className="h-6 w-6 text-white" />
               </div>
-              <h2 className="text-xl font-bold text-white">forthAMS</h2>
-              <p className="mt-1 text-[13px] text-slate-500">宇视科技 · 统一资产管理平台</p>
+              <h2 className="text-xl font-bold text-white">UNIVIEW 固定资产</h2>
+              <p className="mt-1 text-[13px] text-slate-500">宇视科技 · 固定资产平台</p>
             </div>
 
             {/* ── Login card ── */}
@@ -139,15 +139,15 @@ export default function LoginPage() {
                     <Shield className="h-5 w-5 text-white" />
                   </div>
                   <div>
-                    <p className="text-lg font-bold tracking-tight text-white">forthAMS</p>
-                    <p className="text-[11px] tracking-wide text-slate-500">统一资产管理平台</p>
+                    <p className="text-lg font-bold tracking-tight text-white">UNIVIEW 固定资产</p>
+                    <p className="text-[11px] tracking-wide text-slate-500">固定资产平台</p>
                   </div>
                 </div>
                 <h1 className="text-[22px] font-semibold leading-snug text-white">
                   欢迎回来
                 </h1>
                 <p className="mt-1 text-[13px] text-slate-500">
-                  使用组织账号登录，进入资产管理工作台
+                  使用组织账号登录，进入固定资产工作台
                 </p>
               </header>
 

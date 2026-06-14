@@ -47,8 +47,10 @@ npm run e2e:real -- --reporter=line
 ## 执行结果
 
 ```text
-9 passed (13.9s)
+9 passed (17.2s)
 ```
+
+当前测试清单：`AMS_E2E_REAL_BACKEND=true npx playwright test --project=real-backend-smoke --list` 返回 `9 tests in 1 file`。
 
 ## 覆盖项
 
@@ -58,10 +60,10 @@ npm run e2e:real -- --reporter=line
 | 仪表板真实接口 | 页面加载真实 `/dashboard/stats`、趋势、部门分布、待审批 | 通过 |
 | 资产台账真实接口 | 打开 `/assets` 并展示真实资产数据 | 通过 |
 | 资产搜索框 | 在真实后端环境下输入搜索关键词 | 通过 |
-| 流程设计器 | 登录态下打开 `/workflow-designer` 并检查节点面板 | 通过 |
+| 流程设计器 | 登录态下打开 `/workflow-designer`，检查节点面板，点击保存草稿并断言出现“已保存草稿”且没有“仅保存为本地草稿”降级提示 | 通过 |
 | 流程中心 | 打开 `/workflows`，检查 4 条业务流程入口与状态展示 | 通过 |
 | 业务表单流程入口 | 资产转移、清退、报废、赔偿表单均可跳转对应流程设计器 | 通过 |
-| 流程定义持久化 | 保存草稿、发布流程、独立业务草稿保存调用真实后端 API | 通过 |
+| 流程定义保存草稿 | 设计器保存草稿调用真实后端 `/workflows/{businessType}/draft`；发布流程由 `WorkflowDefinitionServiceTest` 与 `WorkflowDefinitionControllerTest` 覆盖，不在当前真实浏览器 E2E 中断言 | 通过 |
 | 核心导航点击 | 依次点击资产台账、重要设备、RFID盘点、闲置资产、资产处置、审批流程、流程设计器、数据分析、系统设置 | 通过 |
 | 顶栏操作 | 点击通知、全局搜索、退出登录 | 通过 |
 | 工单审批 API 闭环 | 创建资产、创建工单、提交工单、审批通过，断言状态 `DRAFT -> PENDING -> APPROVED` | 通过 |
@@ -92,7 +94,8 @@ npm run e2e:real -- --reporter=line
 | 异步通知日志噪声 | 若依整合后的通知通道表在 e2e H2 schema 中缺失 | `e2e-h2-fixes.sql` 补充 `sys_channel_config` 最小表结构 |
 | 真实 E2E 无法验证若依操作日志落库 | `application-e2e.properties` 关闭了 `ams.oper-log.enabled`，`@OperLog` AOP 未启用 | e2e profile 改为启用操作日志，并对资产新增、折旧计算增加真实落库断言 |
 | 退役通知真实 E2E 出现缺表日志 | e2e H2 schema 缺少 `notification_template` 与 `sys_webhook_config` | `e2e-h2-fixes.sql` 补齐通知模板与 Webhook 配置最小表结构 |
+| `/workflows` 新建流程只能落本地草稿 | 旧库应用增量脚本时缺少运行时根表 `workflow_definition`，设计器保存接口无法持久化草稿 | 新增 `V2_83__workflow_definition_table.sql` patch-forward 迁移；`schema.sql` fresh install 表结构对齐；真实 MySQL 临时库连续执行两遍 V2_83 成功，确认幂等补表、唯一键和状态索引 |
 
 ## 结论
 
-无 mock 的真实后端浏览器冒烟、核心点击、流程中心、流程定义保存/发布、工单审批、资产退役、折旧计算、若依操作日志落库、审计查询、审批列表、报表与大屏链路已通过。当前核心链路已经从“代码测试”推进到“浏览器 + 真实 Spring Boot API”的可复现验证。
+无 mock 的真实后端浏览器冒烟、核心点击、流程中心、流程定义保存草稿、工单审批、资产退役、折旧计算、若依操作日志落库、审计查询、审批列表、报表与大屏链路已通过。流程发布能力由后端 service/controller 测试覆盖；若要把发布也纳入真实浏览器 E2E，需要新增独立发布用例并隔离共享流程草稿数据。

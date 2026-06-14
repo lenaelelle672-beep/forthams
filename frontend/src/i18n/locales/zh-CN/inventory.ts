@@ -2,6 +2,16 @@ const inventoryLocale = {
   /** 模块标题 */
   title: '盘点管理',
   pageTitle: '盘点任务',
+  unnamedTask: '未命名任务',
+  assetCountUnit: '项',
+
+  module: {
+    title: '资产盘点管理',
+    breadcrumb: {
+      root: '盘点管理',
+      detail: '任务详情',
+    },
+  },
 
   /** 任务列表 */
   taskList: {
@@ -35,6 +45,56 @@ const inventoryLocale = {
     },
   },
 
+  scopeType: {
+    all: '全部资产',
+    location: '按位置',
+    category: '按分类',
+  },
+
+  columns: {
+    scopeType: '盘点范围',
+    createdAt: '创建时间',
+    actions: '操作',
+  },
+
+  statCards: {
+    totalTasks: '任务总数',
+    taskUnit: '个',
+    avgProgress: '平均进度',
+    countedAssets: '已盘资产',
+    assetUnit: '项',
+    deficitWarnings: '盘亏预警',
+    deficitUnit: '项',
+  },
+
+  actions: {
+    continueScan: '继续扫描',
+    scan: '扫描',
+    detail: '详情',
+    edit: '编辑',
+    summary: '决策摘要',
+    trend: '进度趋势',
+    filter: '筛选',
+    reset: '重置',
+    refresh: '刷新中',
+    viewReport: '查看报告',
+    focusInProgress: '聚焦进行中',
+  },
+
+  summary: {
+    deficit: '盘亏 {{count}} 项',
+    surplus: '盘盈 {{count}} 项',
+    filterLabel: '状态：{{label}}',
+    totalTasks: '共 {{count}} 个盘点任务',
+    counted: '已盘',
+    noDifference: '暂无盘盈盘亏差异',
+    noReport: '暂无可生成报告的盘点任务',
+    chartTitle: '任务进度趋势',
+    chartRecent: '最近 {{count}} 个任务',
+    chartEmpty: '暂无趋势数据',
+    chartTooltip: '盘点进度',
+  },
+
   /** 创建任务弹窗 */
   createTaskModal: {
     title: '新建盘点任务',
@@ -55,6 +115,19 @@ const inventoryLocale = {
       cancel: '取消',
       confirm: '确认',
     },
+  },
+
+  dialog: {
+    createTitle: '新建盘点任务',
+    createDescription: '配置盘点范围后，可立即进入 RFID 扫描或人工复核流程。',
+    taskName: '任务名称',
+    taskNamePlaceholder: '请输入盘点任务名称',
+    scopeType: '盘点范围',
+    selectScopeAll: '全部资产',
+    selectScopeLocation: '按位置',
+    selectScopeCategory: '按分类',
+    scopeIds: '范围 ID',
+    scopeIdsPlaceholder: '多个 ID 请用英文逗号分隔',
   },
 
   /** 进度概览 */

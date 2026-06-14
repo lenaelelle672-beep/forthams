@@ -90,7 +90,11 @@ test('真实后端：登录页可见且流程设计器配置校验有效', async
   await expect(page.getByRole('heading', { name: /流程|资产转移流程/ }).first()).toBeVisible({ timeout: 15_000 });
 
   await expect(page.getByText(/节点面板|开始节点|审批节点/).first()).toBeVisible();
-  await expect(page.getByRole('button', { name: /保存(?:流程)?草稿/ }).first()).toBeVisible();
+  const saveDraft = page.getByRole('button', { name: /保存(?:流程)?草稿/ }).first();
+  await expect(saveDraft).toBeVisible();
+  await saveDraft.click();
+  await expect(page.getByText(/已保存草稿/).first()).toBeVisible({ timeout: 15_000 });
+  await expect(page.getByText(/仅保存为本地草稿/)).toHaveCount(0);
 
   expect(errors).toEqual([]);
 });

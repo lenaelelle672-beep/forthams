@@ -9,8 +9,13 @@
 | 前端构建 | `cd frontend && npm run build` | 通过；仅保留既有 `three` chunk >1000 kB 警告 |
 | 桌面浏览器回归 | `cd frontend && npx playwright test --project=browser-regression-smoke` | 26 个测试通过，含核心路由、工作流新建保存、工作流列表/设计器只读权限、审批详情当前节点权限、报表/审批空态、3D 大屏降级 |
 | 真实后端 E2E | `cd backend && mvn spring-boot:test-run -Dspring-boot.run.profiles=e2e` 后执行 `cd frontend && npm run e2e:real -- --reporter=line` | 9 个测试通过；覆盖真实 Spring Boot 后端、Vite proxy、登录、流程设计器、工单审批、退役申请、折旧计算、审计查询、审批列表、报表与大屏 |
-| 后端测试 | `cd backend && mvn test -DfailIfNoTests=false` | 629 个测试通过，0 失败，0 错误 |
-| 流程定义服务测试 | `cd backend && mvn -q -Dtest=WorkflowDefinitionServiceTest test` | 6 个测试通过，覆盖默认列表、保存草稿、发布、启停、未发布拦截 |
+| 后端测试 | `cd backend && mvn test -DfailIfNoTests=false` | 662 个测试通过，0 失败，0 错误，0 跳过 |
+| 流程定义服务测试 | `cd backend && mvn -q -Dtest=WorkflowDefinitionServiceTest test` | 19 个测试通过，覆盖默认列表、按租户保存草稿、完整设计器字段持久化、`saveDraft -> publish -> getDefinition` 回读、发布校验、启停、未发布拦截、审批人/角色/条件分支校验 |
+| 流程定义 Controller/API 契约 | `cd backend && mvn -q -Dtest=WorkflowDefinitionControllerTest test`、`cd frontend && npm run test -- --run src/api/__tests__/workflow.test.ts` | Controller 7 个测试覆盖若依权限注解、列表/详情/保存草稿/发布/状态；前端 API 3 个测试覆盖 `/workflows` 草稿、发布、状态和自定义流程端点 |
+| 流程定义迁移护栏 | `cd backend && mvn -q -Dtest=TenantSchemaConsistencyTest,PermissionSeedSchemaTest test`、本机 MySQL 临时库连续执行两遍 `V2_83__workflow_definition_table.sql` | 通过；`workflow_definition` fresh schema 与增量迁移均包含 `tenant_id DEFAULT 'dept:1'`、`uk_workflow_tenant_business`、`idx_workflow_tenant_status` |
+| 部署配置静态/CI 门禁 | `cd backend && mvn -q -Dtest=DeploymentConfigConsistencyTest test` | 4 个测试通过；覆盖根单容器 Dockerfile、`docker/single-container-nginx.conf`、entrypoint、`backend/Dockerfile`、`frontend/Dockerfile`、`frontend/nginx.conf` 与 `docker-compose.yml` 的端口、健康检查、SPA fallback、API 反代、schema 初始化挂载、compose MySQL 应用用户创建，以及 CI Docker config/build/runtime smoke 命令 |
+| 本地 CI 总门禁 | `env SKIP_BUILD=1 ./scripts/ci-gate.sh` | 通过，`6 passed, 0 failed, 190s`；覆盖 TypeScript、前端单测、浏览器回归 smoke 执行、后端部署/工作流 targeted gate、后端全量与工作树状态记录 |
+| CI 工作流配置护栏 | `.github/workflows/ci.yml` | 已把 Dockerfile、compose、`docker/**`、`scripts/**` 纳入触发路径；新增 Playwright browser 安装、browser regression smoke 执行、后端部署/工作流 targeted gate，以及独立 `docker-config-build` job，执行 `docker compose config --quiet`、`docker compose build backend frontend`、分体容器启动 smoke（8080 `/api/health`、3000 `/`、`/workflows`、`/api/health`）和根 Dockerfile `docker build -t forthams-single:ci .` 后的单容器 runtime smoke（18080 `/api/health`、`/`、`/workflows`） |
 | 赔偿流程发布与估值 | `cd backend && mvn -q -Dtest=CompensationServiceTest,WorkflowDefinitionServiceTest test` | 通过，赔偿提交必须存在已发布 `ASSET_COMPENSATION` 流程；缺金额时按资产当前价值/原值自动估值 |
 | WorkOrder/Retirement 闭环 | `cd backend && mvn -q -Dtest=WorkOrderServiceTest,WorkOrderControllerTest,ApprovalServiceTest,RetirementApplicationServiceTest,RetirementControllerTest,AssetLifecycleServiceTest test` | 通过 |
 | 后端编译 | `cd backend && mvn -q -DskipTests compile` | 通过 |
@@ -79,7 +84,9 @@
 
 本轮修复数据分析页国际化缺口：新增 `analytics` namespace 的中英文资源并注册到 i18n，`/analytics` 不再显示 `module.title`、`kpi.totalAssets` 等裸 key。
 
-本轮新增流程定义服务覆盖：默认 4 条业务流程列表、按租户保存草稿、发布版本递增、空节点发布拦截、启用/停用状态切换、未发布流程提交拦截。
+本轮新增流程定义服务覆盖：默认业务流程列表、按租户保存草稿、完整设计器字段持久化、`saveDraft -> publish -> getDefinition` 回读、发布版本递增、空节点发布拦截、启用/停用状态切换、未发布流程提交拦截、审批人/角色/条件分支校验。`V2_83__workflow_definition_table.sql` 已补齐旧库运行时根表，真实 MySQL 临时库连续执行两遍通过，fresh schema 与增量迁移保持一致。
+
+本轮补强 CI/local gate：`scripts/ci-gate.sh` 现在把 TypeScript、前端单测、浏览器回归 smoke 执行、后端部署/工作流 targeted gate、后端全量串成单入口；本轮先捕获 `ApprovalListPage.tsx` 类型谓词问题，完成最小类型修复后复跑通过。随后将 browser regression 从 `--list` 清单升级为真实执行，首次真实执行发现 `/inventory` 标题选择器非精确匹配导致 25/26，通过 `exact: true` 最小修复后 `npm run e2e:browser-regression` 复跑 26/26 通过。`.github/workflows/ci.yml` 已在 Dockerfile、compose、`docker/**`、`scripts/**` 变化时触发，先安装 Playwright browsers，再执行 browser regression smoke 与后端部署/工作流 targeted gate；同时新增独立 `docker-config-build` job，对 compose 配置、分体前后端镜像构建、分体容器 runtime smoke、根单容器 Dockerfile 构建和单容器 runtime smoke 做 CI 侧真实 Docker 门禁。`docker-compose.yml` 已显式创建 `${DB_USERNAME}`/`${DB_PASSWORD}` 对应的 MySQL 应用用户，避免 CI 容器启动后后端使用 `ams_user` 连接失败。
 
 本轮关闭赔偿流程残留风险：`CompensationService#createCompensation` 已接入 `WorkflowDefinitionService#requirePublishedDefinition("ASSET_COMPENSATION")`，并新增未发布流程拦截测试。
 

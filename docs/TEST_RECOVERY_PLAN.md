@@ -99,12 +99,12 @@ mvn -q test                  # 跑全部启用的测试
 
 ## 10. 2026-06-09 最新验证记录
 
-- 前端全量测试：`85` 个测试文件，`861` 个测试全部通过。
+- 前端全量测试：`89` 个测试文件，`883` 个测试全部通过。
 - 前端构建：`npm run build` 通过，仅剩 chunk 体积 warning。
-- 后端全量测试：`mvn test` 通过，`593` 个测试通过，0 failure/error/skip。
+- 后端全量测试：`mvn test` 通过，`662` 个测试通过，0 failure/error/skip。
 - 后端 D 批次 targeted gate 通过，覆盖资产导入、盘点、审批、通知事件与 ABC 分类，`82` 个测试通过。
 - 前端 E 批次 targeted gate 通过，覆盖 API wrapper、报表、全局搜索、评论用户提及、折旧卡片、故障码选择器、工单验收与表单 mapper，`35` 个文件、`92` 个测试通过。
-- workflow 保存链路已补充认证兼容测试和前端 API 契约测试。
+- workflow 保存链路已补充认证兼容测试、前端 API 契约测试、真实后端 E2E 保存草稿断言和旧库 `workflow_definition` patch-forward 迁移。
 - 检验/年检自动生成入口已补齐类别分支：`autoGenerateInspections` 传 `assetCategoryId` 时会复用已存在的按类别批量生成逻辑，新增 targeted 单测覆盖。
 - 检验模板复制闭环已补齐：后端新增 `/inspection-templates/{id}/copy` 与 service 复制逻辑，桌面模板页新增复制按钮，新增 service targeted 单测覆盖。
 - 检验模板备用列表页已清除“复制功能开发中”占位，复用真实 `inspectionTemplateApi.copy` 并刷新列表。
@@ -113,9 +113,15 @@ mvn -q test                  # 跑全部启用的测试
 - 检验任务即将到期提醒已接入站内通知：`remindExpiringTasks` 针对 `assignedTo` 创建 `INSPECTION_TASK` 通知，通知失败不阻断租户调度。
 - 工单挂起/恢复审计操作者已从占位 `0L` 收敛为按当前登录用户名反查启用 `sys_user.id`，用于写入 `heldBy` / `resumedBy`，查不到用户时仍安全兜底 `0L`。
 - 安全检查表照片上传已真实落盘到 `file.upload-dir`，附件路径写入 `/api/file/{filename}`；删除附件时同步清理物理文件，执行记录级联删除不再遗留照片文件。
-- 桌面浏览器回归：`npx playwright test src/e2e/browser-regression-smoke.spec.ts --project=browser-regression-smoke --reporter=line` 通过，`11/11`；覆盖 `/workflows` 保存失败提示和新建模板流程保存草稿后进入设计器。
+- 桌面浏览器回归：`npm run e2e:browser-regression` 当前真实执行通过，`26 passed (36.3s)`；workflow 专项覆盖 `/workflows` 保存失败提示、新建模板流程保存草稿后进入设计器、列表只读权限、设计器直达只读且不保存。旧 `11/11` 为历史批次记录。
+- 流程定义后端覆盖：`WorkflowDefinitionServiceTest` 当前 19 个测试，`WorkflowDefinitionControllerTest` 当前 7 个测试；发布流程由后端 service/controller 覆盖，真实后端浏览器 E2E 当前只断言保存草稿。
+- 部署配置静态/CI 门禁已新增并更新：`DeploymentConfigConsistencyTest` 4 个测试通过，锁定根单容器 Nginx+Spring Boot 拓扑、分体前端 Nginx 反代、健康检查、SPA fallback、compose 端口、MySQL schema 初始化挂载、compose MySQL 应用用户创建，以及 GitHub Actions 的 Docker config/build/runtime smoke 命令；原生 `docker`/`nginx` 命令仍需在具备运行时的机器或 GitHub Actions 上补真实启动与 smoke 结果。
+- CI/local gate 已补强：`scripts/ci-gate.sh` 串联 TypeScript、前端单测、浏览器回归 smoke 执行、后端部署/工作流 targeted gate、后端全量与工作树状态；`env SKIP_BUILD=1 ./scripts/ci-gate.sh` 已通过，`6 passed, 0 failed, 190s`。
+- GitHub Actions 已补强：`.github/workflows/ci.yml` 把 Dockerfile、compose、`docker/**`、`scripts/**` 纳入触发路径，并新增 Playwright browser 安装、browser regression smoke 执行、后端部署/工作流 targeted gate，以及独立 `docker-config-build` job（`docker compose config --quiet`、`docker compose build backend frontend`、分体容器 runtime smoke、`docker build -t forthams-single:ci .`、单容器 runtime smoke）。
+- 浏览器回归从清单升级为真实 smoke：`npm run e2e:browser-regression` 已通过，`26 passed (36.2s)`；本轮真实执行先发现 `/inventory` 标题选择器非精确匹配，已用 `exact: true` 最小修复。
+- GAI2 子 agent 路由已按 Pro 策略更新并恢复受控编排：后续默认 `gpt-5.5`，存在性确认/汇总用 `low` 推理，旁路审计用 `medium`，高风险迁移/权限/安全复核用 `high/xhigh`；已补回原 Opencode GAI2 角色层，`gai2-orchestrator` 作为 Medium+ 必经调度器，`gai2-triage/audit/debate/drafter/refiner/builder/reviewer` 作为阶段/专家角色生效。专家子 agent 先映射到 S0-S4 档位，再套用该模型/推理配置。主线程 manager 可自主调度并行/串行子 agent，但按并发阈值、写权限隔离、模型路由和完成后关闭策略执行。本轮 Sagan、Turing、Fermat、Goodall 均为历史只读旁路审计，完成后关闭。
 - JaCoCo 报告已验证生成：`backend/target/jacoco.exec`、`backend/target/site/jacoco/index.html`、`backend/target/site/jacoco/jacoco.xml` 均存在且 XML counter 非空。
 - 当前剩余日志主要来自测试刻意触发的业务异常路径，不再是定时任务或操作日志切面对测试库的副作用。
 - GAI2 拆批提交补充记录：已提交 `4178cb375 fix: harden backend runtime operations`、`2e688c6b4 fix: align desktop frontend api contracts`、`eb84fd139 fix: repair production web container routing`、`928d93505 fix: align split docker deployment checks`、`743c32f7f fix: make database bootstrap explicit`、`b7b523560 fix: preserve asset export category filter`、`b607c2b6c fix: normalize asset attachment preview urls`、`9d5f936c3 fix: align webhook config permissions`、`0e8cf71f9 fix: parse escaped asset import csv` 等批次。
 - 最新 GitNexus `detect_changes(scope=all)` 已降为 `low`、`affected_count=0`；剩余可见工作树主要是移动端冻结文件、移动入口路由和 tracked `.DS_Store` 元数据改动。
-- 仍未达到 100 分的外部阻断：当前机器无原生 `docker` 与 `nginx` 命令，不能补真实镜像构建、Nginx 配置加载和容器 smoke；`.DS_Store` 的 tracked 清理需要用户明确确认；移动端按用户要求暂不继续。
+- 仍未达到 100 分的外部阻断：当前机器无原生 `docker` 与 `nginx` 命令，不能补本机真实容器启动、Nginx 配置加载和 `/api/health`/SPA fallback smoke；CI 已新增真实镜像构建与运行态 smoke 门禁，但还需要 GitHub Actions 或具备 Docker/Nginx 的机器产出一次实际运行结果。`.DS_Store` 的 tracked 清理需要用户明确确认；移动端按用户要求暂不继续。

@@ -1,6 +1,6 @@
 /**
  * @file router/index.tsx
- * @description forthAMS 唯一路由配置 — 权威版本
+ * @description 固定资产平台唯一路由配置 — 权威版本
  *
  * 规则：
  * - 全项目只有此文件定义路由
@@ -11,7 +11,7 @@
 
 import React, { Component, Suspense, useEffect, type ErrorInfo, type ReactNode } from 'react';
 import { createBrowserRouter, Navigate, Outlet, useLocation, useNavigate } from 'react-router';
-import { useAuth } from '@/app/context/AuthContext';
+import { useAuth } from '@/context/AuthContext';
 import ForbiddenPage from '@/pages/ForbiddenPage';
 
 // ── Lazy 加载错误边界 ─────────────────────────────────────────────────────
@@ -137,10 +137,12 @@ const AppLayout     = React.lazy(() => import('@/layouts/AppLayout'));
 const LoginPage     = React.lazy(() => import('@/pages/auth/LoginPage'));
 const Login2Page    = React.lazy(() => import('@/pages/auth/Login2Page'));
 const Login3Page    = React.lazy(() => import('@/pages/auth/Login3Page'));
+const Login4Page    = React.lazy(() => import('@/pages/auth/Login4Page'));
 const BigScreenPage = React.lazy(() => import('@/pages/bigscreen/BigScreenPage'));
 const BigScreen3DPage = React.lazy(() => import('@/pages/bigscreen/BigScreen3DPage'));
 // ── 新建完成的页面（直接导入）──────────────────────────────────────────────────
 const DashboardPage         = React.lazy(() => import('@/pages/dashboard/DashboardPage'));
+const WorkspacePreviewPage  = React.lazy(() => import('@/pages/workspace-preview/WorkspacePreviewPage'));
 const AnalyticsPage         = React.lazy(() => import('@/pages/analytics/AnalyticsPage'));
 const AssetListPage         = React.lazy(() => import('@/pages/asset/AssetListPage'));
 const AssetDetailPage       = React.lazy(() => import('@/pages/asset/AssetDetailPage'));
@@ -256,8 +258,11 @@ const MenuManagementPage = React.lazy(() => import('@/pages/system/MenuManagemen
 const MobileLayout           = React.lazy(() => import('@/pages/mobile/MobileLayout'));
 const MobileDashboardPage    = React.lazy(() => import('@/pages/mobile/MobileDashboardPage'));
 const MobileAssetListPage    = React.lazy(() => import('@/pages/mobile/MobileAssetListPage'));
+const MobileAssetDetailPage  = React.lazy(() => import('@/pages/mobile/MobileAssetDetailPage'));
 const MobileScanPage         = React.lazy(() => import('@/pages/mobile/MobileScanPage'));
 const MobileProfilePage      = React.lazy(() => import('@/pages/mobile/MobileProfilePage'));
+const MobileWorkOrdersPage   = React.lazy(() => import('@/pages/mobile/MobileWorkOrdersPage'));
+const MobileNotificationsPage = React.lazy(() => import('@/pages/mobile/MobileNotificationsPage'));
 
 // ── 供应商门户 ──────────────────────────────────────────────────────────────
 const VendorPortalPage = React.lazy(() => import('@/pages/vendor-portal/VendorPortalPage'));
@@ -289,12 +294,33 @@ const router = createBrowserRouter([
     element: S(Login3Page),
   },
   {
+    path: '/login4',
+    element: S(Login4Page),
+  },
+  {
+    path: '/login5',
+    element: S(Login4Page),
+  },
+  {
     path: '/forbidden',
     element: <ForbiddenPage />,
   },
   {
     path: '/sso-callback',
     element: S(SsoCallbackPage),
+  },
+  // ── 桌面工作台预览（公开 Demo，不套 AppLayout，不影响正式 Dashboard）──────────────
+  {
+    path: '/workspace-preview',
+    element: S(WorkspacePreviewPage),
+  },
+  {
+    path: '/fixed-assets/workbench',
+    element: S(WorkspacePreviewPage),
+  },
+  {
+    path: '/fixed-assets/workbench/:section',
+    element: S(WorkspacePreviewPage),
   },
   // ── 供应商门户（无需认证，自带登录逻辑） ──────────────────────────────────────────────
   {
@@ -312,8 +338,11 @@ const router = createBrowserRouter([
           { index: true, element: <Navigate to="/m/index" replace /> },
           { path: 'index',  element: S(MobileDashboardPage) },
           { path: 'assets', element: S(MobileAssetListPage) },
+          { path: 'assets/:id', element: S(MobileAssetDetailPage) },
           { path: 'scan',   element: S(MobileScanPage) },
           { path: 'profile', element: S(MobileProfilePage) },
+          { path: 'work-orders', element: S(MobileWorkOrdersPage) },
+          { path: 'notifications', element: S(MobileNotificationsPage) },
           { path: 'stocktaking-tasks/:taskId', element: S(StocktakingTaskPage) },
         ],
       },

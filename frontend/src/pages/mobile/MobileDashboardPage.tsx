@@ -69,8 +69,7 @@ function MobileDashboardContent() {
   const { data: dashData, isLoading: dashLoading, isError: dashError, error: dashErr } = useQuery({
     queryKey: ['mobile', 'dashboard'],
     queryFn: async () => {
-      const res = await http.get<any, any>('/mobile/dashboard');
-      return res.data as DashboardData;
+      return http.get<DashboardData>('/mobile/dashboard');
     },
     staleTime: 1000 * 60 * 2,
   });
@@ -78,8 +77,8 @@ function MobileDashboardContent() {
   const { data: workOrders, isLoading: woLoading, isError: woError } = useQuery({
     queryKey: ['mobile', 'work-orders'],
     queryFn: async () => {
-      const res = await http.get<any, any>('/mobile/work-orders', { params: { page: 1, pageSize: 5 } });
-      return res.data.records as WorkOrderItem[];
+      const res = await http.get<{ records: WorkOrderItem[] }>('/mobile/work-orders', { params: { page: 1, pageSize: 5 } });
+      return res.records;
     },
     staleTime: 1000 * 60 * 2,
   });
@@ -87,8 +86,7 @@ function MobileDashboardContent() {
   const { data: notifications, isLoading: notifLoading, isError: notifError } = useQuery({
     queryKey: ['mobile', 'notifications'],
     queryFn: async () => {
-      const res = await http.get<any, any>('/mobile/notifications');
-      return res.data as NotificationItem[];
+      return http.get<NotificationItem[]>('/mobile/notifications');
     },
     staleTime: 1000 * 60 * 1,
   });
@@ -272,7 +270,7 @@ function MobileDashboardContent() {
       </Section>
 
       {/* 最近通知 */}
-      <Section title="最近通知" onMore={() => navigate('/notifications')}>
+      <Section title="最近通知" onMore={() => navigate('/m/notifications')}>
         {notifLoading ? (
           <div className="space-y-4 py-4">
             {[1, 2].map(i => <SkeletonCard key={i} />)}

@@ -1,8 +1,8 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useNavigate, useLocation, useParams } from 'react-router';
+import { useNavigate, useLocation, useParams, useSearchParams } from 'react-router';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
@@ -117,6 +117,107 @@ const ASSIGNEE_DEFAULT = [{ value: '', label: '请选择负责人' }];
 
 const collaborators: string[] = [];
 
+const WORKBENCH_PREFILL_SOURCE_LABELS: Record<string, string> = {
+  'asset-risk': '资产风险 TOP10',
+  'predictive-maintenance': '预测维保工单',
+  'quick-action': '工作台快捷入口',
+};
+
+const WORKBENCH_PREFILL_ASSET_ID = 0;
+const WORKBENCH_PREFILL_ASSET_NO = '工作台预填';
+const WORK_ORDER_PRIORITIES = new Set<FormValues['priority']>(['LOW', 'MEDIUM', 'HIGH', 'CRITICAL']);
+
+type QueryWorkOrderPrefill = {
+  hasPrefill: boolean;
+  sourceLabel: string;
+  values: Partial<FormValues>;
+  selectedAsset: SelectedWorkOrderAsset | null;
+  tags: string[];
+};
+
+function getSearchValue(searchParams: URLSearchParams, key: string) {
+  return searchParams.get(key)?.trim() ?? '';
+}
+
+function getWorkbenchPrefillPriority(searchParams: URLSearchParams): FormValues['priority'] {
+  const priority = getSearchValue(searchParams, 'priority');
+  if (WORK_ORDER_PRIORITIES.has(priority as FormValues['priority'])) {
+    return priority as FormValues['priority'];
+  }
+
+  const riskScore = Number(getSearchValue(searchParams, 'riskScore'));
+  if (Number.isFinite(riskScore)) {
+    if (riskScore >= 90) return 'CRITICAL';
+    if (riskScore >= 85) return 'HIGH';
+  }
+
+  const riskLevel = getSearchValue(searchParams, 'riskLevel');
+  if (riskLevel.includes('高') || riskLevel.includes('中')) return 'HIGH';
+  if (riskLevel.includes('低')) return 'MEDIUM';
+  return 'MEDIUM';
+}
+
+function getWorkOrderQueryPrefill(searchParams: URLSearchParams): QueryWorkOrderPrefill {
+  const source = getSearchValue(searchParams, 'source');
+  const assetName = getSearchValue(searchParams, 'assetName') || getSearchValue(searchParams, 'asset');
+  const assetNo = getSearchValue(searchParams, 'assetNo') || getSearchValue(searchParams, 'assetCode');
+  const assetLocation = getSearchValue(searchParams, 'assetLocation');
+  const riskState = getSearchValue(searchParams, 'riskState');
+  const riskScore = getSearchValue(searchParams, 'riskScore');
+  const riskLevel = getSearchValue(searchParams, 'riskLevel');
+  const action = getSearchValue(searchParams, 'action');
+  const workOrder = getSearchValue(searchParams, 'workOrder');
+  const dueDate = getSearchValue(searchParams, 'dueDate').slice(0, 10);
+  const description = getSearchValue(searchParams, 'description');
+  const hasPrefill = Boolean(source || assetName || riskState || action || workOrder || description);
+
+  if (!hasPrefill) {
+    return {
+      hasPrefill: false,
+      sourceLabel: '',
+      values: {},
+      selectedAsset: null,
+      tags: [],
+    };
+  }
+
+  const sourceLabel = WORKBENCH_PREFILL_SOURCE_LABELS[source] ?? '工作台预填';
+  const title = getSearchValue(searchParams, 'title') ||
+    (assetName ? `${assetName}${riskState || action || '预测维保'}工单` : `${sourceLabel}工单`);
+  const generatedDescription = description ||
+    [
+      `来源：${sourceLabel}`,
+      assetName ? `资产：${assetName}` : '',
+      assetLocation ? `位置：${assetLocation}` : '',
+      riskState ? `异常：${riskState}` : '',
+      riskScore ? `风险指数：${riskScore}` : '',
+      riskLevel ? `风险等级：${riskLevel}` : '',
+      action ? `建议动作：${action}` : '',
+      workOrder ? `关联预测工单：${workOrder}` : '',
+    ].filter(Boolean).join('；');
+
+  return {
+    hasPrefill,
+    sourceLabel,
+    values: {
+      title,
+      type: 'REPAIR',
+      priority: getWorkbenchPrefillPriority(searchParams),
+      description: generatedDescription,
+      dueDate,
+    },
+    selectedAsset: assetName
+      ? {
+          id: WORKBENCH_PREFILL_ASSET_ID,
+          assetName,
+          assetNo: assetNo || WORKBENCH_PREFILL_ASSET_NO,
+        }
+      : null,
+    tags: [assetLocation, riskState || riskLevel, action, workOrder, dueDate ? `计划 ${dueDate}` : '']
+      .filter(Boolean),
+  };
+}
+
 const fieldControlClass = "w-full h-11 rounded-xl border border-[#d7deea] text-sm px-3 bg-white/95 shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20 focus:border-[#2563eb]";
 const textAreaClass = "w-full border border-[#d7deea] rounded-xl text-sm py-3 px-3 bg-white/95 shadow-sm resize-none transition-colors focus:outline-none focus:ring-2 focus:ring-[#2563eb]/20 focus:border-[#2563eb] placeholder:text-[#94a3b8]";
 const sectionHeaderClass = "px-6 py-4 border-b border-[#e5e7eb] flex items-center gap-3 bg-gradient-to-r from-white to-[#f8fafc] rounded-t-xl";
@@ -127,8 +228,12 @@ export default function WorkOrderFormPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const params = useParams<{ id: string }>();
+  const [searchParams] = useSearchParams();
   const qc = useQueryClient();
   const prefill = (location.state as Record<string, unknown> | null) ?? {};
+  const queryPrefill = useMemo(() => getWorkOrderQueryPrefill(searchParams), [searchParams]);
+  const editId = params.id ? Number(params.id) : null;
+  const isEdit = editId !== null;
   const [collabInput, setCollabInput] = useState('');
   const [collaboratorsList, setCollaboratorsList] = useState<string[]>(collaborators);
   const [assigneeOptions, setAssigneeOptions] = useState(ASSIGNEE_DEFAULT);
@@ -139,8 +244,6 @@ export default function WorkOrderFormPage() {
   const [selectedAsset, setSelectedAsset] = useState<SelectedWorkOrderAsset | null>(null);
   const assetSearchRef = useRef<HTMLDivElement>(null);
   const assetSearchTimer = useRef<ReturnType<typeof setTimeout>>();
-  const editId = params.id ? Number(params.id) : null;
-  const isEdit = editId !== null;
 
   // ── 附件状态 ────────────────────────────────────────────────
   const [attachmentList, setAttachmentList] = useState<string[]>([]);
@@ -223,15 +326,32 @@ export default function WorkOrderFormPage() {
   } = useForm<FormInput, unknown, FormValues>({
     resolver: zodResolver(schema as never) as never,
     defaultValues: {
-      type: 'REPAIR',
-      priority: 'MEDIUM',
-      title: typeof prefill.title === 'string' ? prefill.title : '',
-      description: '',
+      type: queryPrefill.values.type ?? 'REPAIR',
+      priority: queryPrefill.values.priority ?? 'MEDIUM',
+      title: queryPrefill.values.title ?? (typeof prefill.title === 'string' ? prefill.title : ''),
+      description: queryPrefill.values.description ?? '',
       estimatedCost: undefined,
-      dueDate: '',
+      dueDate: queryPrefill.values.dueDate ?? '',
       assignee: '',
     } satisfies Partial<FormValues>,
   });
+
+  useEffect(() => {
+    if (isEdit || !queryPrefill.hasPrefill) return;
+    reset({
+      type: queryPrefill.values.type ?? 'REPAIR',
+      priority: queryPrefill.values.priority ?? 'MEDIUM',
+      title: queryPrefill.values.title ?? '',
+      description: queryPrefill.values.description ?? '',
+      estimatedCost: undefined,
+      dueDate: queryPrefill.values.dueDate ?? '',
+      assignee: '',
+    });
+    setSelectedAsset(queryPrefill.selectedAsset);
+    setAssetSearch('');
+    setAssetResults([]);
+    setShowAssetDropdown(false);
+  }, [isEdit, queryPrefill, reset]);
 
   useEffect(() => {
     if (!editingWorkOrder) return;
@@ -329,6 +449,35 @@ export default function WorkOrderFormPage() {
             { label: isEdit ? '编辑工单' : '新建工单' },
           ]}
         />
+
+        {!isEdit && queryPrefill.hasPrefill && (
+          <section
+            className="mb-5 rounded-2xl border border-[#bfdbfe] bg-gradient-to-r from-[#eff6ff] via-white to-[#f0fdfa] p-4 shadow-sm"
+            data-testid="workbench-prefill-summary"
+          >
+            <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+              <div className="min-w-0">
+                <span className="text-xs font-black uppercase tracking-[0.18em] text-[#2563eb]">工作台预填</span>
+                <h2 className="mt-1 text-lg font-black text-[#172033]">{queryPrefill.sourceLabel}</h2>
+                <p className="mt-1 text-sm font-semibold leading-6 text-[#526276]">
+                  已从固定资产工作台带入资产、风险、计划窗口和处置建议，提交前可继续调整负责人、附件和故障代码。
+                </p>
+              </div>
+              {queryPrefill.tags.length > 0 && (
+                <div className="flex flex-wrap gap-2 lg:justify-end">
+                  {queryPrefill.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="rounded-full border border-[#cfe0fb] bg-white/85 px-3 py-1 text-xs font-extrabold text-[#2c5da8]"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+          </section>
+        )}
 
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="grid grid-cols-12 gap-4 lg:gap-6">

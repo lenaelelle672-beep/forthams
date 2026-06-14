@@ -34,9 +34,12 @@ export default function MobileLayout() {
   const getTitle = () => {
     const path = location.pathname;
     if (path === '/m' || path === '/m/') return '资产管理系统';
+    if (/^\/m\/assets\/[^/]+/.test(path)) return '资产详情';
     if (path.startsWith('/m/assets')) return '资产列表';
     if (path.startsWith('/m/scan')) return '扫码查询';
     if (path.startsWith('/m/profile')) return '个人中心';
+    if (path.startsWith('/m/work-orders')) return '待办工单';
+    if (path.startsWith('/m/notifications')) return '消息通知';
     return '资产管理系统';
   };
 

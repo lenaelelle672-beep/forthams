@@ -17,6 +17,15 @@ import { Modal } from 'antd';
 import { toast } from 'sonner';
 import { downloadCsvRows } from '@/utils/fileDownloader';
 
+function toNumber(value: unknown) {
+  const n = Number(value ?? 0);
+  return Number.isFinite(n) ? n : 0;
+}
+
+function formatCurrencyValue(value: unknown) {
+  return toNumber(value).toFixed(2);
+}
+
 const ABCClassificationPage: React.FC = () => {
   const queryClient = useQueryClient();
   const [reclassifyDialogOpen, setReclassifyDialogOpen] = useState(false);
@@ -60,13 +69,18 @@ const ABCClassificationPage: React.FC = () => {
     }
 
     // 准备统计数据
+    const aCount = toNumber(stats.A_count);
+    const bCount = toNumber(stats.B_count);
+    const cCount = toNumber(stats.C_count);
+    const uncategorizedCount = toNumber(stats.CATEGORY_count);
+
     const statsData = [
       ['分类', '数量', '总价值'],
-      ['A 类', stats.A_count, stats.A_total_value?.toFixed(2) || 0],
-      ['B 类', stats.B_count, stats.B_total_value?.toFixed(2) || 0],
-      ['C 类', stats.C_count, stats.C_total_value?.toFixed(2) || 0],
-      ['CATEGORY 类', stats.CATEGORY_count, stats.CATEGORY_total_value?.toFixed(2) || 0],
-      ['总计', stats.A_count + stats.B_count + stats.C_count + stats.CATEGORY_count, stats.total_value?.toFixed(2) || 0],
+      ['A 类', aCount, formatCurrencyValue(stats.A_total_value)],
+      ['B 类', bCount, formatCurrencyValue(stats.B_total_value)],
+      ['C 类', cCount, formatCurrencyValue(stats.C_total_value)],
+      ['未分类', uncategorizedCount, formatCurrencyValue(stats.CATEGORY_total_value)],
+      ['总计', aCount + bCount + cCount + uncategorizedCount, formatCurrencyValue(stats.total_value)],
     ];
 
     // 准备资产列表数据
@@ -74,7 +88,7 @@ const ABCClassificationPage: React.FC = () => {
       asset.assetNo,
       asset.assetName,
       asset.abcClassification || '未分类',
-      asset.originalValue?.toFixed(2) || 0,
+      formatCurrencyValue(asset.originalValue),
       asset.categoryName || '-',
     ]);
 
@@ -142,7 +156,7 @@ const ABCClassificationPage: React.FC = () => {
       title: '原值',
       dataIndex: 'originalValue',
       key: 'originalValue',
-      render: (val: number) => `¥${val?.toFixed(2) || '0.00'}`,
+      render: (val: unknown) => `¥${formatCurrencyValue(val)}`,
     },
   ];
 
@@ -170,7 +184,7 @@ const ABCClassificationPage: React.FC = () => {
           <CardContent>
             <div className="text-2xl font-bold">{stats?.A_count || 0}</div>
             <p className="text-xs text-gray-500 mt-1">
-              总价值：¥{stats?.A_total_value?.toFixed(2) || '0.00'}
+              总价值：¥{formatCurrencyValue(stats?.A_total_value)}
             </p>
           </CardContent>
         </Card>
@@ -182,7 +196,7 @@ const ABCClassificationPage: React.FC = () => {
           <CardContent>
             <div className="text-2xl font-bold">{stats?.B_count || 0}</div>
             <p className="text-xs text-gray-500 mt-1">
-              总价值：¥{stats?.B_total_value?.toFixed(2) || '0.00'}
+              总价值：¥{formatCurrencyValue(stats?.B_total_value)}
             </p>
           </CardContent>
         </Card>
@@ -194,7 +208,7 @@ const ABCClassificationPage: React.FC = () => {
           <CardContent>
             <div className="text-2xl font-bold">{stats?.C_count || 0}</div>
             <p className="text-xs text-gray-500 mt-1">
-              总价值：¥{stats?.C_total_value?.toFixed(2) || '0.00'}
+              总价值：¥{formatCurrencyValue(stats?.C_total_value)}
             </p>
           </CardContent>
         </Card>
@@ -206,7 +220,7 @@ const ABCClassificationPage: React.FC = () => {
           <CardContent>
             <div className="text-2xl font-bold">{stats?.CATEGORY_count || 0}</div>
             <p className="text-xs text-gray-500 mt-1">
-              总价值：¥{stats?.CATEGORY_total_value?.toFixed(2) || '0.00'}
+              总价值：¥{formatCurrencyValue(stats?.CATEGORY_total_value)}
             </p>
           </CardContent>
         </Card>
@@ -218,7 +232,7 @@ const ABCClassificationPage: React.FC = () => {
           <p className="text-sm text-gray-600">
             <strong>ABC 分类规则：</strong>根据资产原值和分类规则自动分类。
             A 类（高价值）需月度盘点，B 类（中价值）需季度盘点，C 类（低价值）需年度盘点。
-            未匹配任何规则的资产标记为 CATEGORY（未分类）。
+            未匹配任何规则的资产会标记为未分类。
           </p>
         </CardContent>
       </Card>

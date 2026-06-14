@@ -52,13 +52,16 @@ export function buildWorkOrderPayload(
     ? context.assigneeUsers.find((user) => user.id === assigneeId)
     : undefined;
   const estimatedCost = Number.isFinite(values.estimatedCost) ? values.estimatedCost : undefined;
+  const assetId = context.selectedAsset && context.selectedAsset.id > 0
+    ? context.selectedAsset.id
+    : undefined;
 
   return {
     title: values.title,
     description: values.description,
     type: values.type,
     priority: values.priority,
-    assetId: context.selectedAsset?.id,
+    assetId,
     assetName: context.selectedAsset?.assetName,
     assetCode: context.selectedAsset?.assetNo,
     assigneeId,

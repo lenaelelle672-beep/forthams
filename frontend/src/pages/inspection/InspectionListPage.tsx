@@ -430,14 +430,14 @@ const InspectionListPage: React.FC = () => {
 
               {/* Result select */}
               <Select
-                value={params.result || ''}
+                value={params.result || 'all'}
                 onValueChange={(v) =>
-                  setParams({ ...params, result: v || undefined, pageNum: 1 })
+                  setParams({ ...params, result: v === 'all' ? undefined : v, pageNum: 1 })
                 }
                 placeholder="检验结果"
                 className="w-[130px]"
               >
-                <SelectItem value="">全部结果</SelectItem>
+                <SelectItem value="all">全部结果</SelectItem>
                 <SelectItem value="PASS">通过</SelectItem>
                 <SelectItem value="FAIL">不通过</SelectItem>
                 <SelectItem value="CONDITIONAL">附条件通过</SelectItem>

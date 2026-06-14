@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-label="点测总部一层资产平面图">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f8fbff"/>
+      <stop offset="1" stop-color="#e9f1fb"/>
+    </linearGradient>
+    <linearGradient id="core" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#e8f3ff"/>
+      <stop offset="1" stop-color="#ffffff"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="12" stdDeviation="14" flood-color="#1f4f82" flood-opacity="0.16"/>
+    </filter>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#d6e3f2" stroke-width="1"/>
+    </pattern>
+    <style>
+      .wall { fill: #ffffff; stroke: #25456b; stroke-width: 8; stroke-linejoin: round; }
+      .room { fill: url(#core); stroke: #7ea6d8; stroke-width: 3; rx: 18; }
+      .room-soft { fill: #f7fbff; stroke: #bfd3ea; stroke-width: 2; rx: 14; }
+      .label { fill: #17324d; font: 700 32px Arial, "PingFang SC", sans-serif; letter-spacing: 0; }
+      .sub { fill: #5b728a; font: 500 20px Arial, "PingFang SC", sans-serif; letter-spacing: 0; }
+      .tiny { fill: #637b94; font: 500 17px Arial, "PingFang SC", sans-serif; letter-spacing: 0; }
+      .asset { fill: #0f62fe; stroke: #ffffff; stroke-width: 8; }
+      .asset-green { fill: #24a148; stroke: #ffffff; stroke-width: 8; }
+      .asset-blue { fill: #4589ff; stroke: #ffffff; stroke-width: 8; }
+      .lane { stroke: #a7bdd5; stroke-width: 18; stroke-linecap: round; opacity: 0.55; }
+      .dash { stroke: #0f62fe; stroke-width: 3; stroke-dasharray: 12 10; opacity: 0.6; fill: none; }
+    </style>
+  </defs>
+
+  <rect width="1600" height="900" fill="url(#bg)"/>
+  <rect width="1600" height="900" fill="url(#grid)" opacity="0.55"/>
+
+  <g filter="url(#shadow)">
+    <path class="wall" d="M130 105 H1470 V785 H130 Z"/>
+    <path d="M220 215 H1390 V675 H220 Z" fill="#f3f8ff" stroke="#d7e4f2" stroke-width="4"/>
+
+    <line class="lane" x1="250" y1="455" x2="1350" y2="455"/>
+    <line class="lane" x1="810" y1="215" x2="810" y2="675"/>
+
+    <rect class="room" x="250" y="245" width="500" height="170"/>
+    <text class="label" x="285" y="320">数据中心 A 区</text>
+    <text class="sub" x="285" y="360">核心服务器 / 网络设备 / UPS</text>
+    <rect class="room-soft" x="285" y="382" width="122" height="22"/>
+    <rect class="room-soft" x="425" y="382" width="122" height="22"/>
+    <rect class="room-soft" x="565" y="382" width="122" height="22"/>
+
+    <rect class="room" x="870" y="245" width="480" height="170"/>
+    <text class="label" x="905" y="320">运营监控区</text>
+    <text class="sub" x="905" y="360">大屏值守 / 告警联动 / 远程会商</text>
+    <path class="dash" d="M1120 382 C1190 350 1250 350 1318 382"/>
+
+    <rect class="room" x="250" y="500" width="330" height="145"/>
+    <text class="label" x="285" y="565">财务共享中心</text>
+    <text class="sub" x="285" y="605">票据终端 / 共享笔记本</text>
+
+    <rect class="room" x="620" y="500" width="305" height="145"/>
+    <text class="label" x="655" y="565">会议协同区</text>
+    <text class="sub" x="655" y="605">显示终端 / 会议网关</text>
+
+    <rect class="room" x="965" y="500" width="385" height="145"/>
+    <text class="label" x="1000" y="565">综合办公区</text>
+    <text class="sub" x="1000" y="605">员工终端 / 打印设备 / 访客位</text>
+
+    <rect class="room-soft" x="250" y="690" width="245" height="58"/>
+    <text class="sub" x="285" y="727">仓储与备件柜</text>
+    <rect class="room-soft" x="530" y="690" width="245" height="58"/>
+    <text class="sub" x="565" y="727">弱电间</text>
+    <rect class="room-soft" x="810" y="690" width="245" height="58"/>
+    <text class="sub" x="845" y="727">安全检查点</text>
+    <rect class="room-soft" x="1090" y="690" width="260" height="58"/>
+    <text class="sub" x="1125" y="727">访客与交付区</text>
+  </g>
+
+  <g>
+    <circle class="asset-green" cx="680" cy="326" r="26"/>
+    <text class="tiny" x="720" y="333">PT-ASSET-001 核心服务器</text>
+    <circle class="asset" cx="930" cy="326" r="26"/>
+    <text class="tiny" x="970" y="333">PT-ASSET-002 边缘网关</text>
+    <circle class="asset-blue" cx="1090" cy="575" r="26"/>
+    <text class="tiny" x="1130" y="582">PT-ASSET-004 会议终端</text>
+    <circle fill="#f1c21b" stroke="#ffffff" stroke-width="8" cx="430" cy="575" r="26"/>
+    <text class="tiny" x="470" y="582">PT-ASSET-003 共享笔记本</text>
+  </g>
+
+  <g>
+    <rect x="130" y="42" width="400" height="44" rx="22" fill="#e8f1ff" stroke="#bdd0ea"/>
+    <circle cx="166" cy="64" r="11" fill="#0f62fe"/>
+    <text class="sub" x="190" y="72">点测总部一层资产平面图</text>
+    <text class="tiny" x="1185" y="72">蓝色=在用  绿色=重点资产  黄色=闲置/待调拨</text>
+  </g>
+</svg>

@@ -1,0 +1,482 @@
+{
+  "productTitle": "UNIVIEW 固定资产产品套预览",
+  "manifestVersion": "2026-06-14.product-demo",
+  "securityNote": "本清单仅保留产品套交付状态与路由说明；鉴权凭据、会话凭据、下载地址与调试响应均已脱敏。",
+  "deliveryStatus": {
+    "overall": "in_progress",
+    "summary": "首批产品图资产、工作台复刻页、当前登录页与设计稿登录页已接入前端 demo；资产运维中心、数据监控中心和安全态势工作台已完成阶段性细节增强，资产健康指数环已完成圆形融合与去方形贴图感处理，智能制造总览首屏模块入口已按笔记本视口收紧并补齐悬浮状态标签，后续继续做逐页高保真细化。",
+    "checkedAt": "2026-06-14"
+  },
+  "designSources": {
+    "brand": "UNIVIEW",
+    "productLine": "固定资产平台",
+    "visualDirection": [
+      "浅蓝白智能制造产品图",
+      "无重阴影信息卡片",
+      "精细图标与模块缩略图统一风格",
+      "工作台级导航与真实业务入口对齐"
+    ],
+    "assetPrinciples": [
+      "产品图优先用于主视觉、中心入口与关键卡片",
+      "图标用于指标、分类、设备状态、告警和运维动作",
+      "登录页不展示资产总数、在线运行、待保数等底部 KPI",
+      "设计稿版登录页使用整块产品图与明确分割线"
+    ]
+  },
+  "assetPackage": {
+    "status": "ready_for_demo",
+    "screenCount": 9,
+    "previewImageCount": 14,
+    "contactSheet": "/mock/workspace-preview/stitch-suite/contact-sheet.png",
+    "curatedChineseContactSheet": "/mock/workspace-preview/stitch-suite/contact-sheet-cn-v2.png",
+    "moduleThumbnailSheet": "/mock/workspace-preview/asset-kit-v4/module-thumbnail-sheet.png",
+    "healthRingImage": "/mock/workspace-preview/asset-kit-v4/asset-health-ring-v2.png",
+    "login5ProductImage": "/mock/workspace-preview/scene/login5-stitch-factory-cn-v4.png?v=20260614-cn-v4",
+    "login5StitchRefreshImage": "/mock/workspace-preview/stitch-suite/login5-stitch-refresh.png",
+    "login5StitchRefreshProductImage": "/mock/workspace-preview/stitch-suite/login5-product-refresh.jpg",
+    "reactRouteAuditSheet": "/mock/workspace-preview/stitch-suite/react-route-audit-sheet.png",
+    "stitchBaselineImage": "/mock/workspace-preview/stitch-suite/stitch-baseline-generated.png",
+    "stitchFullSuiteContactSheet": "/mock/workspace-preview/stitch-suite/contact-sheet.png",
+    "stitchCuratedChineseSheet": "/mock/workspace-preview/stitch-suite/contact-sheet-cn-v2.png",
+    "catalogRoute": "/workspace-preview",
+    "catalogDeepLink": "/workspace-preview?tab=stitch",
+    "catalogStatus": "rendered_in_design_board",
+    "catalogGroups": [
+      "主视觉",
+      "模块图",
+      "核心图标",
+      "状态素材",
+      "健康图"
+    ],
+    "catalogItems": [
+      "登录中文工厂图",
+      "产线总览",
+      "数据监控中心",
+      "资产运维中心",
+      "安全态势工作台",
+      "资产总数",
+      "在线运行",
+      "维保工单",
+      "异常预警",
+      "资产健康指数环"
+    ],
+    "detailCatalogStatus": "rendered_in_design_board",
+    "detailCatalogItems": [
+      "温度监测",
+      "位置追踪",
+      "维保等级",
+      "资产状态分布",
+      "风险等级标签",
+      "采集同步延迟",
+      "备件保障",
+      "健康齿轮",
+      "工单流转"
+    ],
+    "image2RefinedItems": [
+      {
+        "name": "温度监测",
+        "path": "/mock/workspace-preview/asset-kit-v5/details/temperature-monitoring-v1.png"
+      },
+      {
+        "name": "位置追踪",
+        "path": "/mock/workspace-preview/asset-kit-v5/details/location-tracking-v1.png"
+      },
+      {
+        "name": "维保等级",
+        "path": "/mock/workspace-preview/asset-kit-v5/details/maintenance-level-v1.png"
+      },
+      {
+        "name": "资产状态分布",
+        "path": "/mock/workspace-preview/asset-kit-v5/details/asset-status-distribution-v1.png"
+      },
+      {
+        "name": "风险等级标签",
+        "path": "/mock/workspace-preview/asset-kit-v5/details/risk-level-tags-v1.png"
+      },
+      {
+        "name": "采集同步延迟",
+        "path": "/mock/workspace-preview/asset-kit-v5/details/data-sync-pipeline-v1.png"
+      },
+      {
+        "name": "备件保障",
+        "path": "/mock/workspace-preview/asset-kit-v5/details/spare-parts-support-v1.png"
+      },
+      {
+        "name": "健康齿轮",
+        "path": "/mock/workspace-preview/asset-kit-v5/details/health-gear-ring-v1.png"
+      },
+      {
+        "name": "工单流转",
+        "path": "/mock/workspace-preview/asset-kit-v5/details/work-order-flow-v1.png"
+      }
+    ],
+    "image2RefineQueue": []
+  },
+  "stitchIntegration": {
+    "status": "connected_via_cli_oauth",
+    "projectId": "9943060219435296513",
+    "projectTitle": "forthAMS UNIVIEW Product Suite Preview",
+    "projectUrl": "https://stitch.withgoogle.com/projects/9943060219435296513",
+    "latestSessionId": "13592338839517561367",
+    "latestLocalExport": ".stitch/exports/9943060219435296513-13592338839517561367",
+    "latestRetrievableScreenId": "177c3c197aae471baa5575c004e72670",
+    "latestRetrievableScreenExport": ".stitch/exports/177c3c197aae471baa5575c004e72670",
+    "generatedScreens": [
+      "screen-01 UNIVIEW Logo",
+      "screen-02 登录页智能工厂产品图",
+      "screen-03 产线总览产品图",
+      "screen-04 Login - UNIVIEW 固定资产平台",
+      "screen-05 数据监控中心 - UNIVIEW",
+      "screen-06 智能制造总览 - UNIVIEW",
+      "screen-07 安全态势工作台 - UNIVIEW",
+      "screen-08 资产运维中心 - UNIVIEW",
+      "screen-09 LOGIN5 中文产品图回归",
+      "screen-10 LOGIN5 中文登录页回归"
+    ],
+    "authEvidence": {
+      "cliOauthListProjects": "passed",
+      "apiKeyLowLevelInitialize": "passed on 2026-06-14 via redacted config header; status 200, server StatelessServer protocol 2025-03-26",
+      "apiKeyLowLevelToolsList": "passed on 2026-06-14; 14 tools are discoverable, including create_project, generate_screen_from_text and list_projects",
+      "apiKeyLowLevelListProjects": "still returns 401 on 2026-06-14; API Key can reach MCP protocol but project tools require OAuth/login credentials",
+      "apiKeyLowLevelCreateProject": "not retried as a mutating API Key call after list_projects 401; no project name returned",
+      "apiKeyLowLevelGenerateScreen": "not retried as a mutating API Key call after list_projects 401; no session or screen id returned",
+      "apiKeyProtocolHandshake": "passed on 2026-06-14 via initialize; server StatelessServer protocol 2025-03-26",
+      "apiKeyToolsList": "passed on 2026-06-14 via tools/list; 14 tools discovered",
+      "apiKeyToolCall": "2026-06-14 npm run stitch:auth recheck: list_projects returns 401 for header/query/both API Key transports; OAuth succeeds with 1 project",
+      "apiKeyWithUserProjectHeader": "2026-06-14 low-level recheck: API Key with X-Goog-User-Project still returns 401 for list_projects; this rules out missing quota project header as the cause",
+      "mcpToolListProjects": "mcp__stitch.list_projects still returns Auth required in current Codex MCP tool environment on 2026-06-14",
+      "mcpToolCreateProject": "not retried after mcp__stitch list_projects auth required",
+      "localOAuthMcpProxy": "passed on 2026-06-14: scripts/stitch-oauth-mcp-proxy.js accepted the local API-Key-protected MCP request, forwarded upstream with OAuth, tools/list returned 14 tools and list_projects returned 1 project",
+      "localOAuthMcpProxyCheck": "passed on 2026-06-14 via npm run stitch:proxy-check; command starts the local API-Key-protected proxy, verifies tools/list=14 and list_projects=1 project, then stops the proxy",
+      "latestAuthRecheck": "2026-06-14 current continuation recheck: npm run stitch:projects lists project 9943060219435296513 (forthAMS UNIVIEW Product Suite Preview); npm run stitch:auth reports OAuth projectCount=1 and API Key initialize=200/tools-list=14, but API Key list_projects remains 401 for header/query/both transports; mcp__stitch.list_projects still Auth required; npm run stitch:proxy-check passes tools/list=14 and list_projects=1 through the local API-Key-protected OAuth proxy",
+      "cliOauthBatchGenerate": "passed",
+      "cliOauthListScreens": "returns 0 screen instances for the project canvas; generated session output contains 2 screen ids",
+      "cliOauthGetScreen": "passed for LOGIN5 page screen 177c3c197aae471baa5575c004e72670; HTML and screenshot exported"
+    },
+    "security": "未记录、未展示任何 API Key、OAuth Token、下载地址或会话凭据。"
+  },
+  "connectedRoutes": {
+    "designBoard": "/workspace-preview",
+    "designBoardDeepLink": "/workspace-preview?tab=stitch",
+    "workbench": "/fixed-assets/workbench",
+    "workbenchSections": {
+      "智能制造总览": "/fixed-assets/workbench?menu=home",
+      "数据监控中心": "/fixed-assets/workbench/analytics?menu=energy",
+      "资产运维中心": "/fixed-assets/workbench/assets?menu=asset",
+      "安全态势工作台": "/fixed-assets/workbench/security?menu=alarm"
+    },
+    "loginRoutes": {
+      "当前版登录页": "/login4",
+      "设计稿登录页": "/login5"
+    }
+  },
+  "pageSet": [
+    {
+      "name": "智能制造总览",
+      "status": "已接入",
+      "route": "/fixed-assets/workbench?menu=home",
+      "focus": "产线总览、机加设备集群、四中心入口和产品套导航"
+    },
+    {
+      "name": "数据监控中心",
+      "status": "细节增强中",
+      "route": "/fixed-assets/workbench/analytics?menu=energy",
+      "focus": "在线率圆环、设备波动、采集链路、数据质量、异常列表和趋势图"
+    },
+    {
+      "name": "资产运维中心",
+      "status": "细节增强中",
+      "route": "/fixed-assets/workbench/assets?menu=asset",
+      "focus": "健康指数、在线/位置/温度/维保/告警维度、资产分类、风险 TOP10、预测维保工单和生命周期闭环"
+    },
+    {
+      "name": "安全态势工作台",
+      "status": "细节增强中",
+      "route": "/fixed-assets/workbench/security?menu=alarm",
+      "focus": "安全评分、地图态势、处置闭环、主机风险、告警列表和联动工单"
+    },
+    {
+      "name": "当前版登录页",
+      "status": "已接入",
+      "route": "/login4",
+      "focus": "面向当前实现路线的专业登录入口，不展示底部 KPI 数据"
+    },
+    {
+      "name": "设计稿登录页",
+      "status": "已精修",
+      "route": "/login5",
+      "focus": "整块中文产品图、明确分割线、右侧专业登录面板和统一身份入口"
+    }
+  ],
+  "quickActionRoutes": {
+    "新增工单": "/workorders/new",
+    "设备巡检": "/inspections/new?source=quick-inspection&assetId=201",
+    "点检执行": "/safety-checklists/execute?source=quick-safety&templateId=1&assetId=201",
+    "备件申请": "/spare-parts/new?source=spare-request&partNo=SP-TEMP-201",
+    "维保计划": "/maintenance/plans",
+    "报表中心": "/reports",
+    "告警处理": "/notifications?source=quick-alert"
+  },
+  "acceptanceMatrix": {
+    "updatedAt": "2026-06-14",
+    "method": "源码核对 + 1366x768/1440x900 浏览器抽检 + 工单/告警/巡检/点检/备件预填验证 + Stitch 鉴权脱敏诊断",
+    "routeSample": [
+      "/login4",
+      "/login5",
+      "/workspace-preview?tab=stitch",
+      "/fixed-assets/workbench",
+      "/fixed-assets/workbench/assets?menu=asset",
+      "/fixed-assets/workbench/analytics?menu=energy",
+      "/fixed-assets/workbench/security?menu=alarm"
+    ],
+    "items": [
+      {
+        "id": "AC-LOGIN4",
+        "requirement": "login4 是专业登录入口，且不展示资产总数、在线运行、待保数等登录页底部 KPI",
+        "status": "passed",
+        "evidence": [
+          "1440x900 浏览器抽检 /login4 无横向溢出",
+          "DOM 文本未命中资产总数、在线运行、待保数"
+        ]
+      },
+      {
+        "id": "AC-LOGIN5",
+        "requirement": "login5 使用整块中文产品图、明确左右分割线，并与产品图资产保持一致",
+        "status": "passed",
+        "evidence": [
+          "login5 引用 /mock/workspace-preview/scene/login5-stitch-factory-cn-v4.png?v=20260614-cn-v4，规避旧英文底图缓存",
+          "1366x768、1440x900、1920x1080 浏览器抽检 /login5 无横向溢出且不出现禁用 KPI"
+        ]
+      },
+      {
+        "id": "AC-BRAND",
+        "requirement": "前台演示入口统一使用 UNIVIEW 与固定资产产品口径，不再展示 SEELINK 或 forthAMS 旧品牌",
+        "status": "passed",
+        "evidence": [
+          "2026-06-14 /login、/login2、/login4、/login5、/workspace-preview?tab=stitch 在 1440x900 浏览器 DOM 验证中均命中 UNIVIEW 与固定资产，且 SEELINK/SeeLink/seelink/forthAMS/forthams/ForthAMS/FORTHAMS 命中为 0",
+          "默认 /login 已从 forthAMS/统一资产管理平台改为 UNIVIEW 固定资产/固定资产平台；/login2 已从 forthAMS 改为 UNIVIEW 固定资产",
+          "设计稿总览已替换为 contact-sheet-cn-v2.png 原生中文总稿，图片内不再包含 forthAMS 旧品牌、旧短路由、Stitch 项目编号或会话信息",
+          "1440x900 截图已落盘：qa-shots/brand-audit-login-1440x900.png 与 qa-shots/brand-audit-workspace-preview-tab-stitch-1440x900.png"
+        ]
+      },
+      {
+        "id": "AC-DESIGN-BOARD",
+        "requirement": "设计稿总览可直接审查产品图资产、Stitch 链路和复刻状态",
+        "status": "passed",
+        "evidence": [
+          "/workspace-preview?tab=stitch 直达设计稿总览",
+          "浏览器抽检命中 IMAGE2、产品图资产包、项目可追溯、受控访问和复刻能力等产品化交付状态；OAuth/API Key/MCP/401/Auth required 等底层边界仅保留在交付清单诊断证据中",
+          "1366x768 与 1440x900 验证 /workspace-preview?tab=stitch 进入 is-stitch-route 沉浸审查态，外层大标题 display=none，首屏总稿引用 /mock/workspace-preview/stitch-suite/contact-sheet-cn-v2.png 且无横向溢出",
+          "2026-06-14 前台交付链路卡已二次产品化：展示设计来源、安全链路、页面生成、复刻能力、登录套稿和稿件取回等交付语义，不直出 OAuth/API Key/MCP、工具数量、项目画布或底层错误码",
+          "2026-06-14 重新输出中文产品套总稿 contact-sheet-cn-v2.png：卡片路径改为 /fixed-assets/workbench、/fixed-assets/workbench/analytics、/fixed-assets/workbench/assets、/fixed-assets/workbench/security 系列正式路由，前台不再依赖 CSS 遮罩修正图片内容；1366x768、1440x900、1920x1080 截图已落盘到 qa-shots/contact-sheet-v2-stitch-*.png",
+          "2026-06-14 设计稿列表外部制作后台入口已收束为产品 demo 内部路径：登录页设计稿回归打开 /login5，完整产品套稿打开 /workspace-preview?tab=stitch；前端源码不再包含 stitch.withgoogle.com 或“查看设计项目”按钮文案；1440x900 验证截图已落盘到 qa-shots/stitch-internal-demo-links-1440x900.png"
+        ]
+      },
+      {
+        "id": "AC-WORKBENCH-PAGES",
+        "requirement": "智能制造总览、资产运维、数据监控、安全态势四类工作台入口都可作为真实演示路径",
+        "status": "passed",
+        "evidence": [
+          "1440x900 抽检四条 /fixed-assets/workbench 路由均无横向溢出",
+          "智能制造总览已补齐产线关键指标前眉和产线图状态浮层，1366x768 与 1440x900 均无横向溢出",
+          "智能制造总览首屏模块入口已按正式路由收紧高度并补齐图片悬浮状态标签，1366x768 可见模块产品图与指标标签，1440x900 可完整审查整排模块卡",
+          "安全态势工作台已补齐攻击面构成明细，1366x768 与 1440x900 均无横向溢出",
+          "资产运维中心健康指数环已完成圆形裁切、融合混合和柔光处理，1366x768 与 1440x900 复验无横向溢出、无可见断图",
+          "总览命中产线总览/机加设备集群，资产页命中健康指数/温度/维保，数据页命中 MES/数据清洗/异常，安全页命中安全评分/处置/高危"
+        ]
+      },
+      {
+        "id": "AC-ASSET-PACKAGE",
+        "requirement": "IMAGE2 产品图和配套图标覆盖主视觉、模块图、核心图标和二期 MES/资产运维细分状态",
+        "status": "passed",
+        "evidence": [
+          "asset-kit-v4、icons-v2、asset-kit-v5/details 已落盘并在设计稿总览登记",
+          "九类细分素材覆盖温度、位置、维保等级、状态分布、风险标签、同步延迟、备件保障、健康齿轮、工单流转"
+        ]
+      },
+      {
+        "id": "AC-DRAWER-FLOW",
+        "requirement": "关键业务入口先展示真实业务预览抽屉，再进入项目真实路由，抽屉需包含流程、预填字段和处置核对",
+        "status": "passed",
+        "evidence": [
+          "1440x900 浏览器抽检资产风险 TOP10：10 个触发器可打开抽屉，命中业务流程、预填字段、处置核对和预测维保闭环",
+          "1440x900 浏览器抽检预测维保工单：5 个触发器可打开抽屉，命中业务流程、预填字段、处置核对和预测维保闭环",
+          "两次抽检 document scrollWidth 均等于 clientWidth 1440，无横向溢出"
+        ]
+      },
+      {
+        "id": "AC-WORKORDER-PREFILL",
+        "requirement": "资产风险 TOP10 与预测维保工单确认后进入真实工单新建页，并自动带入来源、资产、优先级、计划日期、标题和描述",
+        "status": "passed",
+        "evidence": [
+          "资产风险 TOP10 首行确认路径生成 source=asset-risk、assetName=注塑机 M-201、riskScore=92、priority=CRITICAL、dueDate=2026-06-15 等查询参数",
+          "1440x900 浏览器验证 /workorders/new 显示工作台预填摘要，标题为注塑机 M-201温度异常风险处置工单，类型为 REPAIR，优先级为 CRITICAL，日期为 2026-06-15，资产为注塑机 M-201",
+          "预测维保工单首行确认路径生成 source=predictive-maintenance、workOrder=WO-20250612001、priority=HIGH、dueDate=2026-06-16 等查询参数",
+          "1440x900 浏览器验证预测维保入口显示工作台预填摘要，标题为注塑机 M-201温控模块复核预测维保工单，类型为 REPAIR，优先级为 HIGH，日期为 2026-06-16，资产为注塑机 M-201",
+          "预填资产使用工作台占位编号，不向新建工单 payload 写入伪造 assetId，只保留 assetName 和 assetCode"
+        ]
+      },
+      {
+        "id": "AC-ALERT-PREFILL",
+        "requirement": "工作台告警处理、安全告警处置和数据异常告警进入通知中心时自动带入来源、事件、等级、状态、资产和处置建议",
+        "status": "passed",
+        "evidence": [
+          "工作台告警处理快捷入口生成 /notifications?source=quick-alert 查询参数",
+          "安全告警处置明细行生成 source=security-event、eventName、severity、occurredAt、state 和 suggestedAction 查询参数",
+          "数据异常告警明细行生成 source=data-alert、alertCode、eventName、severity、state 和 suggestedAction 查询参数",
+          "1440x900 Playwright 验证 NotificationsPage 读取查询参数后自动切到预警通知，并显示 data-testid=workbench-alert-context 的工作台带入横幅，无横向溢出"
+        ]
+      },
+      {
+        "id": "AC-INSPECTION-PREFILL",
+        "requirement": "设备巡检快捷入口进入真实巡检新建页，并自动带入巡检编号、资产、巡检类型、计划日期、下次日期、检验人和检查发现",
+        "status": "passed",
+        "evidence": [
+          "设备巡检快捷入口生成 /inspections/new?source=quick-inspection&inspectionNo=INSP-20260614-M201&assetId=201 等查询参数",
+          "InspectionFormPage 读取查询参数并显示 data-testid=workbench-inspection-prefill 的工作台预填提示",
+          "1440x900 Playwright 验证巡检表单自动写入 inspectionNo=INSP-20260614-M201、assetId=201、inspectionType=SPECIAL、inspectionDate=2026-06-14、nextInspectionDate=2026-06-21、inspectorName=智能巡检组、result=PENDING、findings，无横向溢出"
+        ]
+      },
+      {
+        "id": "AC-SAFETY-PREFILL",
+        "requirement": "点检执行快捷入口进入真实安全点检执行页，并自动带入模板、资产、执行人、重点点位、风险等级和现场说明",
+        "status": "passed",
+        "evidence": [
+          "点检执行快捷入口生成 /safety-checklists/execute?source=quick-safety&templateId=1&assetId=201 等查询参数",
+          "SafetyChecklistExecutionPage 读取查询参数并显示 data-testid=workbench-safety-prefill 的工作台点检上下文",
+          "1366x768 浏览器验证点检页显示固定资产工作台 / 点检执行、注塑机 M-201、温度 / 振动 / 电流、18 个高温点位待确认和开始执行检查，页面无横向溢出",
+          "开始执行检查时使用查询参数中的 templateId、assetId、executorId，不再固定写入资产 1"
+        ]
+      },
+      {
+        "id": "AC-SPARE-PREFILL",
+        "requirement": "备件申请快捷入口进入真实备件新建页，并自动带入备件编码、名称、规格、库存、安全库存、单价、关联工单、资产、供应商和到货日",
+        "status": "passed",
+        "evidence": [
+          "备件申请快捷入口生成 /spare-parts/new?source=spare-request&partNo=SP-TEMP-201 等查询参数",
+          "SparePartDetailPage 在 /spare-parts/new 静态路由下进入新建模式，不再显示备件不存在",
+          "1440x900 浏览器验证 data-testid=workbench-spare-prefill 可见，表单自动写入 SP-TEMP-201、温控模块传感器、PT100-M201 / 0-120°C、库存 2、安全库存 8、单价 680，关联 WO-20250612001、UNIVIEW 备件仓、2026-06-18，页面无横向溢出",
+          "1366x768 浏览器复验备件申请上下文和温控模块传感器可见，页面无横向溢出"
+        ]
+      },
+      {
+        "id": "AC-STITCH-CHAIN",
+        "requirement": "Stitch 负责复刻生成链路，且新 API Key 鉴权边界必须真实可追溯",
+        "status": "partial",
+        "evidence": [
+          "OAuth 通道可访问项目并已完成 LOGIN5 中文回归生成",
+          "API Key 可 initialize/tools-list，但直接上游项目级 list/create/generate 仍需 OAuth；mcp__stitch.list_projects 仍 Auth required",
+          "本地 OAuth MCP proxy 已验证通过：以 API Key 保护本地入口，代理上游使用 OAuth，tools/list 返回 14 个工具，list_projects 返回 1 个项目",
+          "2026-06-14 已新增 npm run stitch:proxy-check，一键启动受控代理并验证 tools/list=14 与 list_projects=1，验证后自动停止代理"
+        ],
+        "gap": "直接 API Key 尚不能作为上游项目级生成通道使用；当前可用闭环是 OAuth 生成通道，以及 API-Key-protected local proxy -> OAuth upstream 的受控 MCP 通道"
+      },
+      {
+        "id": "AC-FINAL-FIDELITY",
+        "requirement": "整套产品达到 100 分高保真，可正式作为项目产品套演示",
+        "status": "partial",
+        "evidence": [
+          "当前四类工作台和两套登录页已可演示",
+          "关键业务入口已具备流程、预填字段和处置核对的预览抽屉",
+          "资产风险 TOP10 与预测维保工单已完成确认后进入真实工单新建页并预填字段",
+          "告警处理、数据异常告警和安全告警处置已完成通知中心上下文承接",
+          "设备巡检快捷入口已完成巡检新建页字段预填",
+          "点检执行快捷入口已完成安全点检执行页上下文承接",
+          "备件申请快捷入口已完成备件新建页上下文承接",
+          "2026-06-14 已刷新前端路由验收总览 /mock/workspace-preview/stitch-suite/react-route-audit-sheet.png，覆盖 LOGIN4、LOGIN5 v4 中文设计稿、设计稿总览与四个工作台入口的 1440x900 真实截图，并接入设计稿总览卡片；7 个入口均无断图、无横向溢出",
+          "2026-06-14 数据监控中心完成评分圆环、分项指标、折线图例和台站统计摘要细节增强；1366x768 与 1440x900 验证无横向溢出、无可见断图，截图见 /mock/workspace-preview/qa-shots/formal-analytics-score-polish-1366x768.png 与 /mock/workspace-preview/qa-shots/formal-analytics-score-polish-1440x900.png",
+          "2026-06-14 安全态势工作台完成安全告警处置卡片细节增强：移除被裁切的通用折线图，改为闭环进度、处置数据和发现/研判/处置/闭环阶段条；1366x768 与 1440x900 验证无横向溢出、无可见断图且阶段条完整落入卡片，截图见 /mock/workspace-preview/qa-shots/formal-security-alert-polish-1366x768.png 与 /mock/workspace-preview/qa-shots/formal-security-alert-polish-1440x900.png",
+          "2026-06-14 设计稿总览完成产品图资产包与细分图标清单可审查化：产品图资产包改为 3 张带标题、用途和状态的产品资产卡，统一资产清单 10 张图和二期 MES 细分状态 9 张图完成放大展示；1366x768 与 1440x900 验证无横向溢出、无可见断图，截图见 /mock/workspace-preview/qa-shots/formal-stitch-assets-polish-1366x768.png、/mock/workspace-preview/qa-shots/formal-stitch-assets-polish-1440x900.png、/mock/workspace-preview/qa-shots/formal-stitch-detail-assets-polish-section-1440x900.png",
+          "2026-06-14 数据监控中心数据健康评分完成环形指数细节增强：评分环补齐多层轨道、刻度网格、扫描光、MES/IoT/同步浮标、分项指标和健康等级刻度；1366x768 与 1440x900 验证无横向溢出、无可见断图且环图完整落入卡片，截图见 /mock/workspace-preview/qa-shots/formal-analytics-ring-polish-1366x768.png 与 /mock/workspace-preview/qa-shots/formal-analytics-ring-polish-1440x900.png",
+          "仍需逐页做与原图同等级的图标细节、卡片微结构和最终设计评审"
+        ],
+        "gap": "视觉最终验收和 Stitch API Key 项目级生成通道尚未完全闭环，不能声明整体目标 complete"
+      }
+    ]
+  },
+  "verification": {
+    "latestBrowserCheck": {
+      "date": "2026-06-14",
+      "viewports": [
+        "1280x720",
+        "1366x768",
+        "1440x900",
+        "1920x1080",
+        "2560x1440"
+      ],
+      "status": "passed",
+      "evidence": [
+        "1440x900 视口下 /fixed-assets/workbench/assets 无横向溢出",
+        "智能制造总览正式路径已增强产品化前眉：/fixed-assets/workbench?menu=home 在 1366x768 与 1440x900 下显示在线产线、采集设备、今日产量、异常预警四张 KPI 卡，产线图叠加加工单元、检测中心、AGV 调度三组状态浮层，页面无横向溢出",
+        "资产运维中心健康指数环、在线/位置/温度/维保/告警维度可见",
+        "资产运维中心已补齐健康信号、风险处置建议、预测维保闭环和资产生命周期链路",
+        "风险 TOP10 已显示资产所在位置与异常状态",
+        "预测维保工单已显示资产对象、处理动作和本周计划摘要",
+        "1440x900 视口下 /fixed-assets/workbench/analytics 页面总高收敛至 900px，数据图区、采集链路和异常列表均可在笔记本首屏审查",
+        "数据监控中心已显示 MES/IoT/清洗/指标服务链路与异常告警实时列表",
+        "安全态势工作台已显示处置闭环、发现-研判-处置-闭环流程和主机风险二级信息",
+        "login5 使用中文产品图文案与明确左右分割",
+        "login4/login5 不出现禁用 KPI 文案",
+        "工作台导航和快捷操作映射到项目真实业务路由",
+        "设计稿总览使用产品化交付语言，不展示内部调试说明",
+        "设计稿总览已渲染统一产品图、模块图、卡片图标和健康指数环资产清单",
+        "设计稿总览已补齐二期 MES/资产运维细分状态资产清单，覆盖温度、位置、维保等级、状态分布、风险标签、同步延迟、备件保障、健康齿轮和工单流转",
+        "温度监测、位置追踪、维保等级、资产状态分布、风险等级标签、采集同步延迟、备件保障、健康齿轮、工单流转九类细分素材已由 IMAGE2 精绘并落盘到 asset-kit-v5/details",
+        "资产运维中心真实页面已接入位置、温度、维保、状态分布等 IMAGE2 细分图，覆盖健康信号、风险处置和资产生命周期卡片局部",
+        "数据监控中心真实页面已接入采集同步与状态分布 IMAGE2 细分图，覆盖 MES、IoT、清洗和指标服务链路",
+        "数据监控中心已增强产品化细节：主图淡网格/扫描线、核心指标状态条、采集链路贯穿连接线和四色状态语义已在 1366x768 与 1440x900 视口验证",
+        "2026-06-14 数据监控中心正式路径已统一导航命名：/fixed-assets/workbench/analytics?menu=energy 的侧栏与上下文前眉显示“数据监控”，说明、按钮和 KPI 从能耗单点改为 MES、IoT、采集设备和同步延迟的监控口径",
+        "安全态势工作台真实页面已接入风险标签、状态分布和工单流转 IMAGE2 细分图，覆盖策略信号与处置闭环",
+        "安全态势工作台已增强产品化细节：攻击面综合安全指数叠加 IMAGE2 健康齿轮环，态势总览补充淡网格、扫描线、四角定位线和策略状态条，1366x768 与 1440x900 视口均无横向溢出",
+        "安全态势工作台攻击面综合安全指数卡已补齐策略检查、暴露主机、对象检查、高危端口四组构成明细和进度条；/fixed-assets/workbench/security?menu=alarm 在 1366x768 与 1440x900 下无横向溢出",
+        "资产运维中心正式路径已从设计板长页收敛为工作台密集态：/fixed-assets/workbench/assets 不再渲染设计稿头部、其他工作台预览与产品价值说明；1366x768 与 1440x900 下总高约 1494px，TOP10 与工单列表保留完整数据并在卡片内滚动",
+        "2026-06-14 资产运维中心健康指数环已去除方形贴图感：.workspace-health-ring 使用圆形裁切与隔离层，.workspace-health-ring-asset 使用径向 mask、multiply 融合与柔和 drop-shadow；1366x768 与 1440x900 复验无横向溢出、无可见断图",
+        "2026-06-14 智能制造总览正式首页已完成笔记本首屏压缩：.is-workbench-route .workspace-stage-overview 收紧 KPI/产线总览高度，四个模块入口在 1366x768 下露出约 201px 卡片内容、产品图和悬浮指标标签，在 1440x900 下整排模块卡完整可见；两视口均无横向溢出、无可见断图",
+        "三条正式工作台路径已补齐统一交互层：资产/数据/安全在 1366x768 与 1440x900 下均无横向溢出；列表行、信号卡、采集链路卡具备统一 hover 反馈，按钮/链接具备 focus-visible 焦点环，长列表使用轻量自定义滚动条，并支持 prefers-reduced-motion 降级",
+        "工作台上下文动作与资产快捷入口已补齐操作预览抽屉：先展示真实目标路径、业务说明、关联指标和 IMAGE2 配套图，再由确认按钮进入项目真实路由；支持点击遮罩、关闭按钮和 Escape 关闭",
+        "操作预览抽屉已扩展到关键明细行：资产风险 TOP10、预测维保工单、数据异常告警、安全主机风险和安全告警处置均可点击预览；1440x900 全量点选验证通过，1366x768 抽屉无横向溢出",
+        "1440x900 与 1366x768 视口下三条真实业务路由均无横向溢出，细分图自然尺寸加载正常",
+        "login5 当前渲染引用 /mock/workspace-preview/scene/login5-stitch-factory-cn-v4.png?v=20260614-cn-v4，图片自然尺寸 1672x941，中文产品图主标题、能力标签和仪表面板均为中文，标题固定在左侧可视区，右侧登录栏收敛到 440px 并保留明确分割线；1366x768、1440x900、1920x1080 均无横向溢出；最新截图已落盘到 qa-shots/login5-cn-v4-1366x768.png、login5-cn-v4-1440x900.png、login5-cn-v4-1920x1080.png",
+        "前端路由验收总览 react-route-audit-sheet.png 已用最新 1440x900 截图重建：LOGIN4、LOGIN5 v4 中文设计稿、设计稿总览、智能制造总览、资产运维中心、数据监控中心、安全态势工作台均无断图、无横向溢出；登录页 DOM 未命中资产总数、在线运行、待保数等禁用 KPI",
+        "login4 登录框按笔记本视口继续右移并恢复非 KPI 信任标识：1366x768 右边距约 68px、1440x900 右边距约 72px、1920x1080 右边距约 96px；左侧品牌文案离底部约 155/194/207px，不再贴底；安全单点登录、设备健康预警、运维闭环协同三枚轻量标识可见；均无横向溢出且不展示资产总数、在线运行、待保数等登录页底部 KPI",
+        "设计稿总览的主视觉资产清单已统一引用 /mock/workspace-preview/scene/login5-stitch-factory-cn-v4.png?v=20260614-cn-v4，避免 /workspace-preview 与 /login5 看到不同登录产品图，并通过版本号规避浏览器缓存中的旧英文底图",
+        "设计稿总览已补齐正式深链 /workspace-preview?tab=stitch；左侧“设计稿”和顶部“设计稿总览”均通过 buildPreviewPath 同步到同一复刻审查路径，1440x900 直达验证无横向溢出",
+        "设计稿总览已进入沉浸审查态：/workspace-preview?tab=stitch 隐藏外层“固定资产 工作台设计”大标题，首屏主视觉切换为中文策展总稿 contact-sheet-cn-v2.png；1366x768 与 1440x900 均无横向溢出",
+        "设计稿总览页面卡片的“进入复刻页”已改为可复制/可新开页的正式 href：/fixed-assets/workbench?menu=home、/fixed-assets/workbench/assets?menu=asset、/fixed-assets/workbench/analytics?menu=energy、/fixed-assets/workbench/security?menu=alarm；页面卡片同步显示真实路径，旧 button 入口数量为 0",
+        "设计稿总览拼图与页面卡片图片均使用 object-fit: contain，1440x900 浏览器验证 heroObjectFit=contain、卡片 imgFit=contain，避免产品图和总稿被裁切影响审视",
+        "2026-06-14 笔记本视口复验后，设计稿总览首屏总稿、页面设计稿缩略图、产品图资产包、资产/安全工作台关键产品图改为 eager 加载并补齐 async decoding；/login4、/login5、/workspace-preview?tab=stitch、/fixed-assets/workbench?menu=home、/fixed-assets/workbench/assets?menu=asset、/fixed-assets/workbench/analytics?menu=energy、/fixed-assets/workbench/security?menu=alarm 在 1366x768 与 1440x900 下均无横向溢出、无可见断图、关键文案不缺失，login4/login5 未出现资产总数/在线运行/待保数等禁用 KPI",
+        "2026-06-14 设计稿总览的二期 MES 与资产运维细分图标区已移除“待 IMAGE2 精绘/后续替换”等内部阶段文案，九类细分状态素材统一呈现为已精绘、可复刻、可落地的正式交付资产",
+        "2026-06-14 设计稿总览前台交付链路卡已移除项目级 401、Auth required 等内部错误码直出，改为项目可追溯、受控访问、登录稿完成、复刻能力就绪等产品化交付语言；详细 API Key 受限事实仍保留在 authEvidence 和 AC-STITCH-CHAIN 中",
+        "2026-06-14 设计稿总览前台已继续清理 OAuth/API Key/MCP、14 工具 / 1 项目、项目画布暂未同步实例、会话编号等制作链路痕迹；这些细节仅保留在交付清单诊断证据中",
+        "设计稿总览的 Stitch 状态卡已区分 OAuth 生成链路与 API Key 链路：OAuth 可访问/生成/取回；API Key 在 2026-06-14 通过 initialize 与 tools/list，但项目级 list/create/generate 仍返回 401",
+        "2026-06-14 重新执行 npm run stitch:auth：OAuth projectCount=1；API Key initialize=200、tools/list=14；header/query/both 三种 API Key transport 的 list_projects 均为 401",
+        "2026-06-14 重新调用 mcp__stitch.list_projects：当前 Codex MCP 封装仍返回 Auth required，未执行 create/generate 等写入型项目操作",
+        "2026-06-14 当前续跑复验 npm run stitch:auth 与 mcp__stitch.list_projects：结论未变化，OAuth 仍可访问 1 个项目，API Key 仍仅协议握手/工具发现可用，项目级 list_projects 仍 401/Auth required",
+        "2026-06-14 本地 OAuth MCP proxy 只读验证通过：npm run stitch:mcp-proxy -- 17923 启动后，使用本地 API Key 保护入口调用 tools/list 返回 14 个工具，调用 list_projects 返回 1 个项目 forthAMS UNIVIEW Product Suite Preview；验证后已停止代理进程",
+        "2026-06-14 低层组合复验确认 API Key 即使附带 X-Goog-User-Project 仍无法调用 list_projects，排除缺少配额项目头导致 401 的可能；OAuth CLI 可列出项目 9943060219435296513 forthAMS UNIVIEW Product Suite Preview",
+        "Stitch CLI OAuth 通道完成 LOGIN5 中文回归生成，会话 13592338839517561367 已导出 screen-01 产品背景图和 screen-02 登录页设计稿",
+        "Stitch API Key 低层复验通过 initialize 与 tools/list，可发现 14 个工具；header/query/both 三种 API Key transport 的 list_projects 均返回 401；当前 mcp__stitch 封装工具 list_projects 仍为 auth required",
+        "2026-06-14 新增并执行 npm run stitch:proxy-check：本地 API-Key 保护入口启动成功，tools/list 返回 14 个工具，list_projects 返回 1 个项目 forthAMS UNIVIEW Product Suite Preview，验证后进程停止；未记录或展示密钥",
+        "Stitch 生成会话输出 2 个 screenId；项目 list_screens 返回 0 个画布实例，但 LOGIN5 页面稿 177c3c197aae471baa5575c004e72670 可通过 get_screen 取回 HTML 与截图",
+        "1440x900 浏览器抽检资产风险 TOP10：10 个 data-preview-kind=asset-risk 触发器可打开业务预览抽屉，抽屉显示业务流程、预填字段、处置核对和预测维保闭环，抽屉宽 424px 且页面无横向溢出",
+        "1440x900 浏览器抽检预测维保工单：5 个 data-preview-kind=workorder 触发器可打开业务预览抽屉，抽屉显示业务流程、预填字段、处置核对和预测维保闭环，页面无横向溢出",
+        "1440x900 浏览器验证资产风险 TOP10 首行确认后进入 /workorders/new，页面显示工作台预填摘要，自动带入标题、REPAIR 类型、CRITICAL 优先级、2026-06-15 计划日期、注塑机 M-201 资产和风险处置描述",
+        "1440x900 浏览器验证预测维保工单首行确认后进入 /workorders/new，页面显示工作台预填摘要，自动带入标题、REPAIR 类型、HIGH 优先级、2026-06-16 计划日期、注塑机 M-201 资产和 WO-20250612001 描述",
+        "1440x900 Playwright 验证告警处理入口进入 /notifications?source=quick-alert 后显示工作台带入横幅，包含标题、事件、等级和处置建议，页面无横向溢出",
+        "1440x900 Playwright 验证设备巡检入口进入 /inspections/new?source=quick-inspection 后显示工作台预填提示，巡检编号、资产ID、巡检类型、日期、检验人和检查发现均已写入表单，页面无横向溢出",
+        "1366x768 浏览器验证点检执行入口进入 /safety-checklists/execute?source=quick-safety 后显示工作台点检上下文，资产、重点点位、风险等级、读数提示和开始执行检查均可见，页面无横向溢出",
+        "1440x900 与 1366x768 浏览器验证备件申请入口进入 /spare-parts/new?source=spare-request 后显示备件申请上下文，编码、名称、规格、库存、安全库存、单价、工单、供应商和到货日均已带入，页面无横向溢出",
+        "浏览器验证过程中使用本地演示 SSO 回调建立前端会话；未提交新建工单，未记录真实 token 或业务凭据"
+      ]
+    },
+    "build": {
+      "status": "passed",
+      "command": "npm run build",
+      "note": "构建通过；仍保留项目既有大体积 chunk 提醒。"
+    }
+  },
+  "nextPolishBacklog": [
+    "继续把更多目标业务子页补成查询参数预填；工单新建、告警中心、巡检新建、点检执行、备件申请已完成首批上下文承接",
+    "把九类细分素材扩展到更多业务子页、弹层和列表行局部，形成完整产品套视觉规范"
+  ]
+}

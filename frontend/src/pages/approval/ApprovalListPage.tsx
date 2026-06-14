@@ -37,9 +37,15 @@ import {
 } from '@/components/ui/Dialog';
 import { workflowApi } from '@/api/workflow';
 import type { WorkflowDefinitionDTO } from '@/api/workflow';
-import { isCustomBusinessType } from '@/constants/workflowBusiness';
+import { businessFlowOptions, isCustomBusinessType } from '@/constants/workflowBusiness';
 
 type ApprovalTab = 'pending' | 'submitted' | 'completed';
+type LaunchableFlow = WorkflowDefinitionDTO & {
+  launchPath: string;
+  launchBadge: string;
+};
+
+const ACTIVE_WORKFLOW_STATUSES = new Set<WorkflowDefinitionDTO['status']>(['ENABLED', 'PUBLISHED']);
 
 const TABS: { key: ApprovalTab; label: string }[] = [
   { key: 'pending', label: '待我审批' },
@@ -167,19 +173,37 @@ export default function ApprovalListPage() {
   const [page, setPage] = useState(1);
   const [launchOpen, setLaunchOpen] = useState(false);
 
-  // ── ENABLED 自定义流程列表（发起申请用）──
+  // ── ENABLED/PUBLISHED 流程列表（发起申请用）──
   const { data: allWorkflows, isError: workflowsError, isLoading: workflowsLoading } = useQuery({
     queryKey: ['workflows', 'list', 'launch'],
     queryFn: () => workflowApi.list(),
     enabled: launchOpen,
     staleTime: 30_000,
   });
-  const launchableFlows: WorkflowDefinitionDTO[] = Array.isArray(allWorkflows)
-    ? (allWorkflows as WorkflowDefinitionDTO[]).filter(
-        w => isCustomBusinessType(w.businessType) &&
-             (w.status === 'ENABLED' || w.status === 'PUBLISHED')
-      )
-    : [];
+  const workflowDefinitions = Array.isArray(allWorkflows) ? (allWorkflows as WorkflowDefinitionDTO[]) : [];
+  const workflowByBusinessType = new Map(workflowDefinitions.map(workflow => [workflow.businessType, workflow]));
+  const launchableBuiltInFlows: LaunchableFlow[] = businessFlowOptions
+    .map((option): LaunchableFlow | null => {
+      const workflow = workflowByBusinessType.get(option.businessType);
+      if (!workflow || !ACTIVE_WORKFLOW_STATUSES.has(workflow.status)) return null;
+
+      return {
+        ...workflow,
+        name: workflow.name || option.name,
+        description: workflow.description || option.description,
+        launchPath: option.formPath,
+        launchBadge: option.businessName,
+      };
+    })
+    .filter((flow): flow is LaunchableFlow => flow !== null);
+  const launchableCustomFlows: LaunchableFlow[] = workflowDefinitions
+    .filter(workflow => isCustomBusinessType(workflow.businessType) && ACTIVE_WORKFLOW_STATUSES.has(workflow.status))
+    .map(workflow => ({
+      ...workflow,
+      launchPath: `/workflow-form/${workflow.businessType}`,
+      launchBadge: '自定义',
+    }));
+  const launchableFlows = [...launchableBuiltInFlows, ...launchableCustomFlows];
 
   // Derive the status query param from activeTab + filterStatus
   const queryStatus = activeTab === 'pending' ? 'PENDING' : activeTab === 'completed' ? 'APPROVED' : filterStatus !== 'all' ? filterStatus.toUpperCase() : undefined;
@@ -686,8 +710,8 @@ export default function ApprovalListPage() {
             ) : launchableFlows.length === 0 ? (
               <div className="py-8 text-center text-sm text-slate-500">
                 <GitBranch className="mx-auto mb-3 h-8 w-8 text-slate-300" />
-                <p>暂无可发起的自定义流程</p>
-                <p className="mt-1 text-xs text-slate-400">请在工作流中心发布自定义流程后再来发起</p>
+                <p>暂无可发起的流程</p>
+                <p className="mt-1 text-xs text-slate-400">请在工作流中心发布流程后再来发起</p>
               </div>
             ) : (
               <ul className="space-y-2">
@@ -695,14 +719,19 @@ export default function ApprovalListPage() {
                   <li key={flow.businessType}>
                     <button
                       type="button"
-                      onClick={() => { setLaunchOpen(false); navigate(`/workflow-form/${flow.businessType}`); }}
+                      onClick={() => { setLaunchOpen(false); navigate(flow.launchPath); }}
                       className="group flex w-full items-center gap-4 rounded-lg border border-slate-200 px-4 py-3 text-left transition-all hover:border-blue-200 hover:bg-blue-50/50"
                     >
                       <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-blue-50">
                         <GitBranch className="h-4 w-4 text-blue-600" />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-semibold text-slate-900 group-hover:text-blue-600">{flow.name}</p>
+                        <div className="flex min-w-0 items-center gap-2">
+                          <p className="truncate text-sm font-semibold text-slate-900 group-hover:text-blue-600">{flow.name}</p>
+                          <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-500">
+                            {flow.launchBadge}
+                          </span>
+                        </div>
                         {flow.description && <p className="mt-0.5 truncate text-xs text-slate-500">{flow.description}</p>}
                       </div>
                       <span className="flex-shrink-0 text-xs font-medium text-blue-600">发起 &rarr;</span>

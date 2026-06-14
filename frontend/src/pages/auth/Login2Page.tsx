@@ -9,7 +9,7 @@ import { useLoginForm } from './hooks/useLoginForm';
 import { LoginFormFields, DemoAccounts, SsoButton } from './components';
 
 /* ════════════════════════════════════════════════════════════════════════════════
-   forthAMS Login2 — 宇视科技全息指挥中心 (Uniview Holographic Command Center)
+   UNIVIEW 固定资产 Login2 — 宇视科技全息指挥中心
    ────────────────────────────────────────────────────────────────────────────────
    Three.js 3D 背景 + 宇视摄像机行星公转 + 中央品牌展示 + 点击交互
 
@@ -625,10 +625,10 @@ export default function Login2Page() {
                 </div>
               </div>
               <h1 className="bg-gradient-to-r from-white via-cyan-100 to-blue-200 bg-clip-text text-2xl font-bold tracking-tight text-transparent">
-                forthAMS
+                UNIVIEW 固定资产
               </h1>
               <p className="mt-1.5 text-[13px] text-slate-400">
-                资产管理全息指挥中心
+                固定资产全息指挥中心
               </p>
               <div className="mx-auto mt-2 flex w-fit items-center gap-1.5 rounded-full border border-cyan-400/20 bg-cyan-500/5 px-2.5 py-0.5">
                 <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />

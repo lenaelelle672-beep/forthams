@@ -1,24 +1,71 @@
-import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useParams, useNavigate, useSearchParams } from 'react-router';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { safetyApi } from '../../api/safety';
 import type { SafetyChecklistItem, SafetyChecklistExecution, SafetyChecklistResult, SysAttachment } from '../../types/safety';
-import { Card, Form, Button, Radio, Input, InputNumber, Upload, Space, message, Spin, Steps, Tag, Divider } from 'antd';
+import { Alert, Card, Form, Button, Radio, Input, InputNumber, Upload, Space, message, Spin, Steps, Tag, Divider } from 'antd';
 import { UploadOutlined, CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import type { UploadFile, UploadProps } from 'antd/es/upload/interface';
+
+type WorkbenchSafetyPrefill = {
+  source: string;
+  sourceLabel: string;
+  templateId?: number;
+  assetId: number;
+  executorId: number;
+  assetName: string;
+  focusItem: string;
+  readingHint: string;
+  riskLevel: string;
+  note: string;
+};
+
+const SAFETY_SOURCE_LABELS: Record<string, string> = {
+  'quick-safety': '固定资产工作台 / 点检执行',
+};
+
+const getSearchValue = (params: URLSearchParams, key: string, fallback = '') =>
+  params.get(key)?.trim() || fallback;
+
+const parsePositiveInt = (value?: string | null) => {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : undefined;
+};
+
+const getWorkbenchSafetyPrefill = (params: URLSearchParams): WorkbenchSafetyPrefill | null => {
+  const source = getSearchValue(params, 'source');
+
+  if (!source) {
+    return null;
+  }
+
+  return {
+    source,
+    sourceLabel: SAFETY_SOURCE_LABELS[source] ?? '工作台带入',
+    templateId: parsePositiveInt(params.get('templateId')),
+    assetId: parsePositiveInt(params.get('assetId')) ?? 1,
+    executorId: parsePositiveInt(params.get('executorId')) ?? 1,
+    assetName: getSearchValue(params, 'assetName', '注塑机 M-201'),
+    focusItem: getSearchValue(params, 'focusItem', '温度 / 振动 / 电流'),
+    readingHint: getSearchValue(params, 'readingHint', '18 个高温点位待确认'),
+    riskLevel: getSearchValue(params, 'riskLevel', '高温点位'),
+    note: getSearchValue(params, 'note', '来自固定资产工作台快捷入口，建议优先核对温度、振动、电流和现场安全规则命中点位。'),
+  };
+};
 
 const SafetyChecklistExecutionPage: React.FC = () => {
   const { executionId } = useParams<{ executionId: string }>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [form] = Form.useForm();
   const [currentStep, setCurrentStep] = useState(0);
+  const workbenchPrefill = useMemo(() => getWorkbenchSafetyPrefill(searchParams), [searchParams]);
 
   // If no executionId, it's a new execution from template
   const isNew = !executionId || executionId === 'new';
 
   // Get template ID from URL params
-  const queryParams = new URLSearchParams(window.location.search);
-  const templateIdParam = queryParams.get('templateId');
+  const templateIdParam = searchParams.get('templateId');
 
   const { data: template, isLoading: templateLoading } = useQuery({
     queryKey: ['safetyTemplate', templateIdParam],
@@ -147,14 +194,16 @@ const SafetyChecklistExecutionPage: React.FC = () => {
   }, [savedResults, form]);
 
   const handleStart = () => {
-    if (!templateIdParam) {
+    const templateId = parsePositiveInt(templateIdParam);
+
+    if (!templateId) {
       message.error('缺少模板ID');
       return;
     }
     startMutation.mutate({
-      templateId: Number(templateIdParam),
-      assetId: 1, // 实际应从资产选择器获取
-      executorId: 1 // 实际应从当前用户获取
+      templateId,
+      assetId: workbenchPrefill?.assetId ?? 1,
+      executorId: workbenchPrefill?.executorId ?? 1
     });
   };
 
@@ -286,10 +335,33 @@ const SafetyChecklistExecutionPage: React.FC = () => {
     return <div className="p-6 text-center"><Spin size="large" /></div>;
   }
 
+  const workbenchPrefillBanner = workbenchPrefill ? (
+    <div data-testid="workbench-safety-prefill" className="mb-4">
+      <Alert
+        className="text-left"
+        type="info"
+        showIcon
+        message={`${workbenchPrefill.sourceLabel} 已带入点检上下文`}
+        description={
+          <div className="space-y-2">
+            <div className="flex flex-wrap gap-2">
+              <Tag color="blue">资产：{workbenchPrefill.assetName}</Tag>
+              <Tag color="orange">重点：{workbenchPrefill.focusItem}</Tag>
+              <Tag color="red">风险：{workbenchPrefill.riskLevel}</Tag>
+              <Tag color="cyan">{workbenchPrefill.readingHint}</Tag>
+            </div>
+            <div>{workbenchPrefill.note}</div>
+          </div>
+        }
+      />
+    </div>
+  ) : null;
+
   // 如果未开始执行（新执行），显示开始页面
   if (isNew && executionData?.status !== 'IN_PROGRESS') {
     return (
       <div className="p-6">
+        {workbenchPrefillBanner}
         <Card title="开始安全检查" className="text-center">
           <div className="py-8">
             <h3 className="text-lg mb-4">{templateLoading ? '加载中...' : (template as any)?.templateName || '安全检查'}</h3>
@@ -305,6 +377,7 @@ const SafetyChecklistExecutionPage: React.FC = () => {
 
   return (
     <div className="p-6">
+      {workbenchPrefillBanner}
       <Card
         title={(template as any)?.templateName || '安全检查执行'}
         extra={

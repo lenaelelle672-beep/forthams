@@ -59,14 +59,10 @@ function MobileScanContent() {
     setResult(null);
 
     try {
-      const res = await http.post<any, any>('/mobile/scan', { code: trimmed });
-      if (res.code === 200 && res.data) {
-        setResult(res.data);
-      } else {
-        setError(res.message || '未找到匹配的资产');
-      }
+      const data = await http.post<ScanResult>('/mobile/scan', { code: trimmed });
+      setResult(data);
     } catch (err: any) {
-      setError(err?.response?.data?.message || '查询失败，请检查网络');
+      setError(err?.message || '查询失败，请检查网络');
     } finally {
       setScanning(false);
     }
@@ -272,7 +268,7 @@ function MobileScanContent() {
           </div>
 
           <button
-            onClick={() => navigate(`/assets/${result.id}`)}
+            onClick={() => navigate(`/m/assets/${result.id}`)}
             style={{
               width: '100%',
               marginTop: '14px',

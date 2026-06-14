@@ -843,7 +843,7 @@ PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 
 CREATE TABLE IF NOT EXISTS workflow_definition (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    tenant_id VARCHAR(64) NOT NULL,
+    tenant_id VARCHAR(64) NOT NULL DEFAULT 'dept:1',
     business_type VARCHAR(64) NOT NULL,
     name VARCHAR(128) NOT NULL,
     description TEXT,

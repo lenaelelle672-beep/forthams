@@ -13,6 +13,8 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { RouterProvider } from 'react-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ConfigProvider } from 'antd';
+import zhCN from 'antd/locale/zh_CN';
 import { TooltipProvider } from '@/components/ui/Tooltip';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { AuthProvider } from '@/context/AuthContext';
@@ -36,9 +38,11 @@ createRoot(document.getElementById('root')!).render(
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <TooltipProvider>
-            <RouterProvider router={router} />
-          </TooltipProvider>
+          <ConfigProvider locale={zhCN}>
+            <TooltipProvider>
+              <RouterProvider router={router} />
+            </TooltipProvider>
+          </ConfigProvider>
         </AuthProvider>
       </QueryClientProvider>
     </ErrorBoundary>

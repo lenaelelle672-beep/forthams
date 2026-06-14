@@ -1,5 +1,5 @@
-import { useState, useCallback } from 'react';
-import { useNavigate } from 'react-router';
+import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useNavigate, useSearchParams } from 'react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Bell,
@@ -63,6 +63,72 @@ const PRIORITY_FROM_TYPE: Record<string, { label: string; dot: string; bg: strin
 
 const PAGE_SIZE = 10;
 
+type WorkbenchAlertContext = {
+  hasContext: boolean;
+  sourceLabel: string;
+  title: string;
+  description: string;
+  tags: string[];
+  suggestedAction: string;
+};
+
+const WORKBENCH_ALERT_SOURCE_LABELS: Record<string, string> = {
+  'quick-alert': '工作台告警处理',
+  'security-event': '安全告警处置',
+  'data-alert': '异常告警实时列表',
+};
+
+function getSearchValue(searchParams: URLSearchParams, key: string) {
+  return searchParams.get(key)?.trim() ?? '';
+}
+
+function getWorkbenchAlertContext(searchParams: URLSearchParams): WorkbenchAlertContext {
+  const source = getSearchValue(searchParams, 'source');
+  const title = getSearchValue(searchParams, 'title');
+  const eventName = getSearchValue(searchParams, 'eventName') || getSearchValue(searchParams, 'event');
+  const alertCode = getSearchValue(searchParams, 'alertCode') || getSearchValue(searchParams, 'dataAlert');
+  const severity = getSearchValue(searchParams, 'severity');
+  const assetName = getSearchValue(searchParams, 'assetName');
+  const assetLocation = getSearchValue(searchParams, 'assetLocation');
+  const state = getSearchValue(searchParams, 'state');
+  const occurredAt = getSearchValue(searchParams, 'occurredAt');
+  const suggestedAction = getSearchValue(searchParams, 'suggestedAction');
+  const description = getSearchValue(searchParams, 'description');
+  const hasContext = Boolean(source || eventName || alertCode || title || description);
+
+  if (!hasContext) {
+    return {
+      hasContext: false,
+      sourceLabel: '',
+      title: '',
+      description: '',
+      tags: [],
+      suggestedAction: '',
+    };
+  }
+
+  const sourceLabel = WORKBENCH_ALERT_SOURCE_LABELS[source] ?? '工作台告警上下文';
+  const displayTitle = title || eventName || alertCode || '告警处置上下文';
+  const generatedDescription = description ||
+    [
+      eventName ? `事件：${eventName}` : '',
+      alertCode ? `编号：${alertCode}` : '',
+      assetName ? `资产：${assetName}` : '',
+      severity ? `等级：${severity}` : '',
+      state ? `状态：${state}` : '',
+    ].filter(Boolean).join('；');
+
+  return {
+    hasContext,
+    sourceLabel,
+    title: displayTitle,
+    description: generatedDescription,
+    suggestedAction: suggestedAction || '核对告警来源、影响资产和处置动作，必要时转预测维保工单。',
+    tags: [alertCode, eventName, severity, state, assetName, assetLocation, occurredAt]
+      .filter(Boolean),
+  };
+}
+
 /** Map API Notification type to display type used in TYPE_CONFIG */
 function mapNotificationType(n: Notification): string {
   const t = n.type?.toUpperCase();
@@ -125,11 +191,22 @@ function getSourceKey(n: Notification): string {
 
 export default function NotificationsPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const qc = useQueryClient();
-  const [activeTab, setActiveTab] = useState<NotificationTab>('all');
+  const workbenchAlertContext = useMemo(() => getWorkbenchAlertContext(searchParams), [searchParams]);
+  const [activeTab, setActiveTab] = useState<NotificationTab>(
+    workbenchAlertContext.hasContext ? 'alert' : 'all',
+  );
   const [page, setPage] = useState(1);
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [batchMode, setBatchMode] = useState(false);
+
+  useEffect(() => {
+    if (workbenchAlertContext.hasContext) {
+      setActiveTab('alert');
+      setPage(1);
+    }
+  }, [workbenchAlertContext.hasContext]);
 
   const { data, isLoading } = useQuery({
     queryKey: ['notifications', activeTab, page],
@@ -269,6 +346,43 @@ export default function NotificationsPage() {
             </div>
           </div>
         </section>
+
+        {workbenchAlertContext.hasContext && (
+          <section
+            data-testid="workbench-alert-context"
+            className="rounded-2xl border border-blue-200 bg-gradient-to-r from-blue-50 via-white to-cyan-50 px-5 py-4 shadow-sm"
+          >
+            <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+              <div className="min-w-0">
+                <span className="text-xs font-black uppercase tracking-[0.18em] text-blue-600">
+                  工作台带入
+                </span>
+                <h2 className="mt-1 text-lg font-black text-slate-900">
+                  {workbenchAlertContext.title}
+                </h2>
+                <p className="mt-1 text-sm font-semibold leading-6 text-slate-600">
+                  {workbenchAlertContext.description}
+                </p>
+                <p className="mt-2 text-sm font-bold text-blue-700">
+                  处置建议：{workbenchAlertContext.suggestedAction}
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-2 lg:max-w-[46%] lg:justify-end">
+                <span className="rounded-full border border-blue-200 bg-white px-3 py-1 text-xs font-extrabold text-blue-700">
+                  {workbenchAlertContext.sourceLabel}
+                </span>
+                {workbenchAlertContext.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="rounded-full border border-slate-200 bg-white/90 px-3 py-1 text-xs font-bold text-slate-600"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
 
         {/* ── Main content ── */}
         <Card className="overflow-hidden rounded-2xl border-slate-200/80 shadow-sm">
