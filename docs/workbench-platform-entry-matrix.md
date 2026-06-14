@@ -127,3 +127,18 @@ Naming/use policy for new or refreshed assets:
 | QA shots | `qa-shots/workbench-platform-*.png` | Browser viewport | Verification evidence |
 
 This iteration reuses the confirmed visual direction and existing assets first. Generate new IMAGE2/Stitch assets only for missing product visuals that cannot be covered by the current kit.
+
+## Continuation Contract Automation
+
+2026-06-14 continuation added `frontend/src/__tests__/workbenchPlatformEntry.contract.test.ts` so the formal-entry decision is protected by automated checks instead of only manual screenshots.
+
+| Contract area | Automated evidence |
+| --- | --- |
+| Desktop formal entry | `AppLayout` keeps `资产运营中枢` before `旧版仪表板` |
+| Formal route governance | `/fixed-assets/workbench` routes stay protected while `/workspace-preview` remains the public design preview |
+| Left navigation scope | Required Workbench menu labels exist and duplicate menu labels `报表大屏`, `平台配置`, `维保计划` remain absent |
+| Dashboard migration | Pending approvals, work orders, inspections, spare parts, reports, policies, and basic maintenance target real project routes |
+| Backend menu governance | Schema and V2_84 migration keep ids `310/311`, query param `menu=home`, and legacy dashboard id `186` |
+| Evidence hygiene | Matrix sections for navigation conclusions, click matrix, browser verification, and IMAGE2/Stitch governance remain present |
+
+Stitch MCP preflight on 2026-06-14 returned `Auth required` for `list_projects`, so this continuation does not claim a new Stitch generation. Existing `stitch-suite` and `asset-kit-v4/v5` assets remain the current visual source of truth until Stitch authentication is restored.
