@@ -2993,6 +2993,505 @@ const workbenchTodoRows = [
 
 const workbenchTodoDetailTabs = ['待办信息', '上下文', '处理建议', '流转记录', '关联单据'] as const;
 
+const workbenchDeviceSummaryCards = [
+  { label: '在线设备', value: '5,102', delta: '在线率 98.6%', icon: Cpu, tone: 'green' },
+  { label: '温度异常', value: '12', delta: '超过阈值', icon: Gauge, tone: 'orange' },
+  { label: '振动异常', value: '6', delta: '动力站优先', icon: Activity, tone: 'red' },
+  { label: '采集延迟', value: '95.2ms', delta: 'IoT 平均', icon: Database, tone: 'cyan' },
+  { label: '离线设备', value: '28', delta: '需复核', icon: Monitor, tone: 'violet' },
+  { label: '待派工', value: '18', delta: '设备异常转工单', icon: Wrench, tone: 'blue' },
+] as const;
+
+const workbenchDeviceStages = [
+  { label: '接入', value: '5,420', note: '设备台账', tone: 'blue' },
+  { label: '在线', value: '5,102', note: '实时采集', tone: 'green' },
+  { label: '预警', value: '36', note: '温度/振动', tone: 'orange' },
+  { label: '派工', value: '18', note: '复核处理中', tone: 'cyan' },
+  { label: '恢复', value: '96.4%', note: '本周闭环', tone: 'violet' },
+] as const;
+
+const workbenchDeviceRows = [
+  {
+    id: 'DEV-CN-301',
+    type: '数控车床',
+    device: '数控车床 CN-301',
+    location: '机加车间 / CNC 区域 A线',
+    title: '主轴振动 RMS 持续上升',
+    health: '91',
+    status: '预警',
+    delay: '88ms',
+    owner: '张三丰',
+    telemetry: '温度 68°C / 振动 4.2mm/s',
+    tone: 'red',
+  },
+  {
+    id: 'DEV-M-201',
+    type: '注塑机',
+    device: '注塑机 M-201',
+    location: '一车间 / A线',
+    title: '温度边界触发复核',
+    health: '88',
+    status: '待派工',
+    delay: '102ms',
+    owner: '王班组',
+    telemetry: '温度 82°C / 压力 14MPa',
+    tone: 'orange',
+  },
+  {
+    id: 'DEV-CP-101',
+    type: '空压机',
+    device: '空压机 CP-101',
+    location: '动力站',
+    title: '油滤更换保养窗口',
+    health: '94',
+    status: '正常',
+    delay: '76ms',
+    owner: '王技师',
+    telemetry: '压力 0.72MPa / 电流 18A',
+    tone: 'green',
+  },
+  {
+    id: 'DEV-RB-501',
+    type: '焊接机器人',
+    device: '焊接机器人 RB-501',
+    location: '焊接线 A',
+    title: '减速机温升趋势预警',
+    health: '86',
+    status: '预警',
+    delay: '114ms',
+    owner: '赵技师',
+    telemetry: '温度 74°C / 振动 3.1mm/s',
+    tone: 'orange',
+  },
+  {
+    id: 'DEV-PDB-01',
+    type: '配电柜',
+    device: '配电柜 PDB-01',
+    location: '动力站',
+    title: '柜体局部过热报警',
+    health: '83',
+    status: '处理中',
+    delay: '91ms',
+    owner: '陈电工',
+    telemetry: '温度 71°C / 负载 82%',
+    tone: 'orange',
+  },
+  {
+    id: 'DEV-CV-302',
+    type: '传送线',
+    device: '传送线 CV-302',
+    location: '包装线',
+    title: '链条磨损趋势预警',
+    health: '90',
+    status: '观察',
+    delay: '84ms',
+    owner: '周技师',
+    telemetry: '速度 1.8m/s / 振动 2.5mm/s',
+    tone: 'blue',
+  },
+] as const;
+
+const workbenchDeviceDetailTabs = ['设备信息', '实时遥测', '维保建议', '工单记录', '采集链路'] as const;
+
+function WorkbenchDevicePage({
+  item,
+  context,
+  meta,
+  onPreviewAction,
+}: WorkbenchMenuPageProps) {
+  const [selectedDeviceId, setSelectedDeviceId] = useState(workbenchDeviceRows[0].id);
+  const [detailTab, setDetailTab] = useState<(typeof workbenchDeviceDetailTabs)[number]>('设备信息');
+  const [detailOpen, setDetailOpen] = useState(true);
+  const selectedDevice =
+    workbenchDeviceRows.find((device) => device.id === selectedDeviceId) ?? workbenchDeviceRows[0];
+  const primaryAction = meta.actions[0];
+  const secondaryAction = meta.actions[1] ?? primaryAction;
+
+  const openDevicePreview = (
+    title: string,
+    routeTarget: string,
+    description: string,
+    primaryLabel: string,
+    icon: LucideIcon = Cpu,
+  ) => {
+    onPreviewAction({
+      title,
+      source: '设备管理页面',
+      routeTarget,
+      description,
+      primaryLabel,
+      icon,
+      visual: meta.imageSrc,
+      stats: context.stats,
+    });
+  };
+
+  const openDevice = (device: (typeof workbenchDeviceRows)[number]) => {
+    setSelectedDeviceId(device.id);
+    setDetailOpen(true);
+    openDevicePreview(
+      '打开设备详情',
+      `/equipment/${device.id}?source=workbench&menu=device`,
+      `打开 ${device.device}，带入位置、健康分、遥测状态和 Workbench 设备管理来源。`,
+      '打开详情',
+      Cpu,
+    );
+  };
+
+  return (
+    <section className="workspace-orders-page workspace-device-page" aria-label={`${item.label}真实产品页`}>
+      <div className="workspace-orders-main">
+        <section className="workspace-orders-shell" aria-label="设备管理产品页主体">
+          <header className="workspace-orders-header">
+            <div className="workspace-orders-title">
+              <span className="workspace-orders-icon"><Cpu /></span>
+              <div>
+                <h2>设备管理</h2>
+                <p>在线监测 · 遥测异常 · 现场派工</p>
+              </div>
+            </div>
+            <div className="workspace-orders-toolbar" aria-label="设备管理顶部操作">
+              <button type="button" className="is-secondary" onClick={() => onPreviewAction(primaryAction)}>
+                <Cpu />
+                打开设备台账
+              </button>
+              <button
+                type="button"
+                className="is-secondary"
+                onClick={() =>
+                  openDevicePreview(
+                    '采集链路诊断',
+                    '/energy?source=workbench&scope=data-monitoring&device=all',
+                    '进入数据监控中心，按设备采集延迟、网关状态和最近异常筛选。',
+                    '进入数据监控',
+                    Database,
+                  )
+                }
+              >
+                <Database />
+                链路诊断
+              </button>
+              <button type="button" className="is-primary" onClick={() => onPreviewAction(secondaryAction)}>
+                <Wrench />
+                创建复核工单
+              </button>
+            </div>
+          </header>
+
+          <div className="workspace-orders-kpis" aria-label="设备管理核心指标">
+            {workbenchDeviceSummaryCards.map((card) => {
+              const CardIcon = card.icon;
+              return (
+                <button
+                  key={card.label}
+                  type="button"
+                  className={`is-${card.tone}`}
+                  onClick={() =>
+                    openDevicePreview(
+                      `${card.label}设备`,
+                      `/equipment?source=workbench&metric=${encodeURIComponent(card.label)}`,
+                      `按 ${card.label} 下钻设备台账，保留厂区、产线和 Workbench 来源。`,
+                      '查看设备',
+                      CardIcon,
+                    )
+                  }
+                >
+                  <CardIcon />
+                  <span>{card.label}</span>
+                  <strong>{card.value}</strong>
+                  <small>{card.delta}</small>
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="workspace-orders-stage-row" aria-label="设备运维阶段">
+            {workbenchDeviceStages.map((stage) => (
+              <button
+                key={stage.label}
+                type="button"
+                className={`is-${stage.tone}`}
+                onClick={() =>
+                  openDevicePreview(
+                    `${stage.label}设备`,
+                    `/equipment?source=workbench&stage=${encodeURIComponent(stage.label)}`,
+                    `按 ${stage.label} 阶段查看设备状态和运维动作。`,
+                    '查看阶段',
+                    ArrowRight,
+                  )
+                }
+              >
+                <span>{stage.label}</span>
+                <strong>{stage.value}</strong>
+                <small>{stage.note}</small>
+              </button>
+            ))}
+          </div>
+
+          <div className="workspace-orders-filterbar" aria-label="设备管理查询筛选栏">
+            <label>
+              <Search />
+              <input readOnly value="搜索设备编号 / 名称 / 位置 / 责任人" aria-label="设备搜索" />
+            </label>
+            {['类型 全部', '在线状态 全部', '健康状态 全部', '产线 全部'].map((filter) => (
+              <button key={filter} type="button" onClick={() => onPreviewAction(primaryAction)}>
+                {filter}
+                <ArrowRight />
+              </button>
+            ))}
+            <button
+              type="button"
+              className="is-date"
+              onClick={() =>
+                openDevicePreview(
+                  '按采集时间筛选',
+                  '/equipment?source=workbench&telemetry=latest',
+                  '查看最近采集时间和链路延迟异常设备。',
+                  '查看采集状态',
+                  CalendarDays,
+                )
+              }
+            >
+              采集时间
+              <CalendarDays />
+            </button>
+            <button type="button" className="is-reset" onClick={() => onPreviewAction(primaryAction)}>
+              重置
+            </button>
+          </div>
+
+          <div className="workspace-orders-table" aria-label="设备管理列表">
+            <div className="workspace-orders-table-head">
+              <span><input type="checkbox" aria-label="选择全部设备" readOnly /></span>
+              <span>设备号</span>
+              <span>类型</span>
+              <span>设备信息</span>
+              <span>异常/任务</span>
+              <span>健康分</span>
+              <span>状态</span>
+              <span>延迟</span>
+              <span>责任人</span>
+              <span>遥测</span>
+              <span>操作</span>
+            </div>
+            {workbenchDeviceRows.map((device) => (
+              <div
+                key={device.id}
+                className={`workspace-orders-table-row is-${device.tone} ${
+                  device.id === selectedDevice.id ? 'is-selected' : ''
+                }`}
+              >
+                <span><input type="checkbox" aria-label={`选择${device.id}`} readOnly /></span>
+                <button type="button" className="is-link" onClick={() => openDevice(device)}>{device.id}</button>
+                <span><em>{device.type}</em></span>
+                <span>
+                  <strong>{device.device}</strong>
+                  <small>{device.location}</small>
+                </span>
+                <button type="button" className="is-title" onClick={() => openDevice(device)}>{device.title}</button>
+                <span><b>{device.health}</b></span>
+                <span><i>{device.status}</i></span>
+                <span>{device.delay}</span>
+                <span>{device.owner}</span>
+                <span><em className="is-spare">{device.telemetry}</em></span>
+                <span>
+                  <button
+                    type="button"
+                    className="is-process"
+                    onClick={() => {
+                      setSelectedDeviceId(device.id);
+                      setDetailOpen(true);
+                      openDevicePreview(
+                        '创建设备复核工单',
+                        buildWorkOrderPrefillPath({
+                          source: 'quick-action',
+                          title: `${device.device} 设备异常复核工单`,
+                          assetName: device.device,
+                          assetLocation: device.location,
+                          riskState: device.title,
+                          riskScore: Number(device.health),
+                          priority: device.tone === 'red' ? 'HIGH' : 'MEDIUM',
+                          dueDate: '2026-06-16',
+                          description: `来自 Workbench 设备管理：${device.telemetry}，需要现场复核。`,
+                        }),
+                        `为 ${device.device} 创建复核工单，预填位置、遥测和健康分。`,
+                        '创建工单',
+                        Wrench,
+                      );
+                    }}
+                  >
+                    派工
+                  </button>
+                  <button type="button" className="is-more" aria-label={`${device.id}更多操作`} onClick={() => openDevice(device)}>
+                    ···
+                  </button>
+                </span>
+              </div>
+            ))}
+          </div>
+
+          <footer className="workspace-orders-pagination" aria-label="设备分页">
+            <span>共 5,420 台</span>
+            <button type="button">10条/页</button>
+            <button type="button" disabled>‹</button>
+            {[1, 2, 3, 4, 5].map((pageNo) => (
+              <button key={pageNo} type="button" className={pageNo === 1 ? 'is-current' : ''}>{pageNo}</button>
+            ))}
+            <span>...</span>
+            <button type="button">542</button>
+            <button type="button">›</button>
+          </footer>
+        </section>
+      </div>
+
+      <aside className="workspace-orders-detail" aria-label="设备详情抽屉">
+        {detailOpen ? (
+          <>
+            <header className="workspace-orders-detail-head">
+              <strong>设备详情</strong>
+              <button type="button" aria-label="关闭设备详情" onClick={() => setDetailOpen(false)}>
+                <X />
+              </button>
+            </header>
+            <section className="workspace-orders-detail-card" aria-label="当前设备信息">
+              <div>
+                <b>{selectedDevice.health}</b>
+                <span>
+                  <strong>{selectedDevice.id}</strong>
+                  <small>{selectedDevice.status}</small>
+                </span>
+              </div>
+              <h3>{selectedDevice.device}</h3>
+              <dl>
+                <div><dt>类型</dt><dd>{selectedDevice.type}</dd></div>
+                <div><dt>健康分</dt><dd>{selectedDevice.health}</dd></div>
+                <div><dt>位置</dt><dd>{selectedDevice.location}</dd></div>
+                <div><dt>采集延迟</dt><dd>{selectedDevice.delay}</dd></div>
+                <div><dt>责任人</dt><dd>{selectedDevice.owner}</dd></div>
+                <div><dt>状态</dt><dd>{selectedDevice.status}</dd></div>
+                <div><dt>最近采集</dt><dd>2026-06-14 10:28</dd></div>
+                <div><dt>遥测</dt><dd>{selectedDevice.telemetry}</dd></div>
+              </dl>
+            </section>
+
+            <section className="workspace-orders-flow" aria-label="设备运维流转">
+              {['接入', '在线', '预警', '派工', '恢复'].map((step, index) => (
+                <span key={step} className={index < 2 ? 'is-done' : index === 2 ? 'is-active' : ''}>
+                  <CheckCircle2 />
+                  <strong>{step}</strong>
+                  <small>{index < 2 ? '已完成' : index === 2 ? '待复核' : '待流转'}</small>
+                </span>
+              ))}
+            </section>
+
+            <nav className="workspace-orders-tabs" aria-label="设备详情标签">
+              {workbenchDeviceDetailTabs.map((tab) => (
+                <button
+                  key={tab}
+                  type="button"
+                  className={tab === detailTab ? 'is-active' : ''}
+                  onClick={() => setDetailTab(tab)}
+                >
+                  {tab}
+                </button>
+              ))}
+            </nav>
+
+            <section className="workspace-orders-tab-panel" aria-label={`${detailTab}内容`}>
+              <article>
+                <span>异常摘要</span>
+                <p>{selectedDevice.title}，当前遥测为 {selectedDevice.telemetry}。</p>
+              </article>
+              <article>
+                <span>实时遥测</span>
+                <ul>
+                  <li>采集延迟 {selectedDevice.delay} <b>已同步</b></li>
+                  <li>{selectedDevice.telemetry} <b className="is-warning">需关注</b></li>
+                  <li>MES 设备状态 <b>在线</b></li>
+                </ul>
+              </article>
+              <article>
+                <span>维保建议</span>
+                <p>优先复核温度、振动和主轴负载；必要时生成预测维保工单并联动备件保障。</p>
+              </article>
+              <article>
+                <span>采集链路</span>
+                <ul>
+                  <li>IoT 网关 GW-A01 <small>正常</small></li>
+                  <li>MES 同步任务 MES-SYNC-08 <small>成功</small></li>
+                  <li>最近异常 EVT-20240614-09 <small>已记录</small></li>
+                </ul>
+              </article>
+            </section>
+
+            <footer className="workspace-orders-detail-actions" aria-label="设备详情操作">
+              <button
+                type="button"
+                onClick={() =>
+                  openDevicePreview(
+                    '打开设备台账',
+                    `/equipment/${selectedDevice.id}?source=workbench`,
+                    `打开 ${selectedDevice.device} 的设备台账详情。`,
+                    '打开台账',
+                    Cpu,
+                  )
+                }
+              >
+                台账
+              </button>
+              <button
+                type="button"
+                onClick={() =>
+                  openDevicePreview(
+                    '发起巡检',
+                    `/inspections/new?source=workbench&assetCode=${encodeURIComponent(selectedDevice.id)}`,
+                    `为 ${selectedDevice.device} 发起巡检任务，预填设备编号和位置。`,
+                    '发起巡检',
+                    CheckCircle2,
+                  )
+                }
+              >
+                巡检
+              </button>
+              <button
+                type="button"
+                className="is-primary"
+                onClick={() =>
+                  openDevicePreview(
+                    '创建复核工单',
+                    buildWorkOrderPrefillPath({
+                      source: 'quick-action',
+                      title: `${selectedDevice.device} 设备异常复核工单`,
+                      assetName: selectedDevice.device,
+                      assetLocation: selectedDevice.location,
+                      riskState: selectedDevice.title,
+                      riskScore: Number(selectedDevice.health),
+                      priority: selectedDevice.tone === 'red' ? 'HIGH' : 'MEDIUM',
+                      dueDate: '2026-06-16',
+                      description: `来自 Workbench 设备详情：${selectedDevice.telemetry}，需要现场复核。`,
+                    }),
+                    `为 ${selectedDevice.device} 创建现场复核工单。`,
+                    '创建工单',
+                    Wrench,
+                  )
+                }
+              >
+                创建工单
+              </button>
+            </footer>
+          </>
+        ) : (
+          <button type="button" className="workspace-orders-detail-empty" onClick={() => setDetailOpen(true)}>
+            <Cpu />
+            <strong>选择左侧设备打开详情</strong>
+            <span>详情抽屉会展示遥测、维保建议、工单记录和采集链路。</span>
+          </button>
+        )}
+      </aside>
+    </section>
+  );
+}
+
 function WorkbenchTodoPage({
   item,
   context,
@@ -5748,7 +6247,15 @@ export default function WorkspacePreviewPage() {
           </div>
 
           <WorkspaceContextStrip item={activeItem} context={activeContext} onAction={handleContextAction} />
-          {activeModuleMock && activeProductPageMeta && activeItem.id === 'todo' ? (
+          {activeModuleMock && activeProductPageMeta && activeItem.id === 'device' ? (
+            <WorkbenchDevicePage
+              item={activeItem}
+              context={activeContext}
+              mock={activeModuleMock}
+              meta={activeProductPageMeta}
+              onPreviewAction={setRoutePreview}
+            />
+          ) : activeModuleMock && activeProductPageMeta && activeItem.id === 'todo' ? (
             <WorkbenchTodoPage
               item={activeItem}
               context={activeContext}

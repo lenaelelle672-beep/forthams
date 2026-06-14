@@ -216,13 +216,6 @@ test.describe('Workbench 正式入口浏览器回归', () => {
         targetIncludes: ['/disposals/transfer/new?source=workbench&assetId=201'],
       },
       {
-        route: '/fixed-assets/workbench/assets?menu=device',
-        pageLabel: '设备管理',
-        heading: '机台在线与温度监控',
-        action: '打开设备台账',
-        targetIncludes: ['/equipment?source=workbench&status=ONLINE'],
-      },
-      {
         route: '/fixed-assets/workbench/assets?menu=inspection',
         pageLabel: '巡检管理',
         heading: '点检路线与异常复核',
@@ -303,6 +296,53 @@ test.describe('Workbench 正式入口浏览器回归', () => {
       await page.keyboard.press('Escape');
       await expect(dialog).toHaveCount(0);
     }
+
+    await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
+    expect(errors).toEqual([]);
+  });
+
+  test('设备管理左侧菜单渲染真实页面级组件而非通用产品壳', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await seedAuthenticatedSession(page, operationsUser);
+
+    await page.goto('/fixed-assets/workbench/assets?menu=device');
+    await page.waitForLoadState('networkidle');
+
+    await expect(page.getByLabel('设备管理真实产品页')).toBeVisible();
+    await expect(page.locator('.workspace-product-page')).toHaveCount(0);
+    await expect(page.getByRole('heading', { name: '设备管理' })).toBeVisible();
+    await expect(page.getByText('在线监测 · 遥测异常 · 现场派工')).toBeVisible();
+    await expect(page.getByLabel('设备管理核心指标')).toContainText('在线设备');
+    await expect(page.getByLabel('设备运维阶段')).toContainText('接入');
+    await expect(page.getByLabel('设备管理顶部操作')).toContainText('链路诊断');
+    await expect(page.getByLabel('设备管理查询筛选栏')).toContainText('采集时间');
+    await expect(page.getByLabel('设备管理列表')).toContainText('DEV-CN-301');
+    await expect(page.getByLabel('设备详情抽屉')).toContainText('数控车床 CN-301');
+    await expect(page.getByLabel('设备详情标签')).toContainText('采集链路');
+    await expect(page.getByLabel('设备详情操作')).toContainText('创建工单');
+    await expect(page.locator('body')).not.toContainText('workbench-menu-device-v1');
+
+    await page.getByRole('button', { name: /创建复核工单/ }).click();
+    const createDialog = page.getByRole('dialog', { name: '创建温度复核工单' });
+    await expect(createDialog).toBeVisible();
+    await expect(createDialog.locator('.workspace-action-route strong')).toContainText('/workorders/new?');
+    await page.keyboard.press('Escape');
+    await expect(createDialog).toHaveCount(0);
+
+    await page.getByRole('button', { name: 'DEV-M-201', exact: true }).click();
+    const detailDialog = page.getByRole('dialog', { name: '打开设备详情' });
+    await expect(detailDialog).toBeVisible();
+    await expect(detailDialog.locator('.workspace-action-route strong')).toContainText('/equipment/DEV-M-201');
+    await page.keyboard.press('Escape');
+    await expect(detailDialog).toHaveCount(0);
+    await expect(page.getByLabel('设备详情抽屉')).toContainText('注塑机 M-201');
+
+    await page.getByRole('button', { name: '创建工单' }).click();
+    const workOrderDialog = page.getByRole('dialog', { name: '创建复核工单' });
+    await expect(workOrderDialog).toBeVisible();
+    await expect(workOrderDialog.locator('.workspace-action-route strong')).toContainText('/workorders/new?');
+    await page.keyboard.press('Escape');
+    await expect(workOrderDialog).toHaveCount(0);
 
     await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
     expect(errors).toEqual([]);

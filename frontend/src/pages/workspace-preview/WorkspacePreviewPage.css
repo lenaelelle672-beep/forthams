@@ -1858,6 +1858,46 @@
   background: #176de8;
 }
 
+.workspace-device-page {
+  background:
+    linear-gradient(180deg, rgba(246, 252, 255, .96), rgba(235, 249, 252, .96)),
+    #eefaff;
+}
+
+.workspace-device-page .workspace-orders-icon {
+  color: #0a8fa5;
+  background: #e9fbff;
+}
+
+.workspace-device-page .workspace-orders-toolbar .is-primary {
+  background: linear-gradient(180deg, #25b9cf, #1175e8);
+}
+
+.workspace-device-page .workspace-orders-stage-row .is-green {
+  border-top-color: #0d9a6a;
+}
+
+.workspace-device-page .workspace-orders-stage-row .is-orange {
+  border-top-color: #f08a20;
+}
+
+.workspace-device-page .workspace-orders-detail-card b {
+  background: #0a8fa5;
+}
+
+.workspace-device-page .workspace-orders-table-row.is-red b {
+  background: #f03649;
+}
+
+.workspace-device-page .workspace-orders-table-row.is-orange b {
+  background: #f08a20;
+}
+
+.workspace-device-page .workspace-orders-table-row.is-green b,
+.workspace-device-page .workspace-orders-table-row.is-blue b {
+  background: #0a8fa5;
+}
+
 .workspace-product-page {
   display: grid;
   gap: 12px;
