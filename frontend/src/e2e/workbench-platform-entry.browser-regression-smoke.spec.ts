@@ -26,6 +26,7 @@ const operationsUser: SmokeUser = {
     'approval:process:query',
     'report:query',
     'asset:ledger:query',
+    'asset:ledger:create',
     'asset:query',
     'workorder:order:query',
     'inspection:query',
@@ -124,9 +125,9 @@ test.describe('Workbench 正式入口浏览器回归', () => {
       {
         label: '资产总览',
         route: '/fixed-assets/workbench/assets?menu=asset',
-        action: '查看资产清单',
-        dialogName: '查看资产清单',
-        targetIncludes: ['/assets?source=workbench&view=asset-overview'],
+        action: '新建资产',
+        dialogName: '新增资产',
+        targetIncludes: ['/assets/new?source=workbench&from=asset-overview'],
       },
       {
         label: '设备管理',
@@ -334,16 +335,20 @@ test.describe('Workbench 正式入口浏览器回归', () => {
     await expect(page.getByRole('heading', { name: '资产总览' })).toBeVisible();
     await expect(page.getByText('资产健康与生命周期管理')).toBeVisible();
     await expect(page.getByLabel('资产总览查询筛选栏')).toContainText('更多筛选');
-    await expect(page.getByLabel('资产总览核心指标')).toContainText('资产总数');
+    await expect(page.getByLabel('资产总览核心指标')).toContainText('资产总价值');
+    await expect(page.getByLabel('资产总览核心指标')).toContainText('12,856 台');
     await expect(page.getByLabel('资产生命周期', { exact: true })).toHaveCount(0);
-    await expect(page.getByLabel('资产总览图表')).toContainText('部门资产价值 Top 5');
-    await expect(page.getByLabel('资产总览图表')).toContainText('制造一部');
-    await expect(page.getByLabel('资产总览顶部操作')).toContainText('生成风险工单');
-    await expect(page.getByLabel('资产总览列表')).toContainText('FA-CN-301');
-    await expect(page.getByLabel('资产总览列表')).toContainText('处置');
+    await expect(page.getByLabel('资产总览图表')).toContainText('资产健康分布');
+    await expect(page.getByLabel('资产总览图表')).toContainText('资产生命周期分布');
+    await expect(page.getByLabel('资产总览图表')).toContainText('资产分类分布（按价值）');
+    await expect(page.getByLabel('资产总览图表')).toContainText('生产设备');
+    await expect(page.getByLabel('资产总览顶部操作')).toContainText('新建资产');
+    await expect(page.getByLabel('资产总览列表')).toContainText('AS-2024-06014-0001');
+    await expect(page.getByLabel('资产总览列表')).toContainText('数控车床 CN-301');
+    await expect(page.getByLabel('资产总览列表')).toContainText('详情');
     await expect(page.getByLabel('资产详情抽屉')).toContainText('数控车床 CN-301');
-    await expect(page.getByLabel('资产详情标签')).toContainText('生命周期');
-    await expect(page.getByLabel('资产详情操作')).toContainText('发起调拨');
+    await expect(page.getByLabel('资产详情标签')).toContainText('资产信息');
+    await expect(page.getByLabel('资产详情操作')).toContainText('调拨/转移');
     await expect(page.locator('body')).not.toContainText('workbench-menu-asset-v1');
 
     await page.getByRole('button', { name: /生成风险工单/ }).click();
@@ -353,18 +358,18 @@ test.describe('Workbench 正式入口浏览器回归', () => {
     await page.keyboard.press('Escape');
     await expect(riskDialog).toHaveCount(0);
 
-    await page.getByRole('button', { name: 'FA-M-201', exact: true }).click();
+    await page.getByRole('button', { name: 'AS-2024-06014-0002', exact: true }).click();
     const detailDialog = page.getByRole('dialog', { name: '打开资产详情' });
     await expect(detailDialog).toBeVisible();
-    await expect(detailDialog.locator('.workspace-action-route strong')).toContainText('/assets/FA-M-201');
+    await expect(detailDialog.locator('.workspace-action-route strong')).toContainText('/assets/AS-2024-06014-0002');
     await page.keyboard.press('Escape');
     await expect(detailDialog).toHaveCount(0);
-    await expect(page.getByLabel('资产详情抽屉')).toContainText('注塑机 M-201');
+    await expect(page.getByLabel('资产详情抽屉')).toContainText('立式加工中心 VM-205');
 
-    await page.getByRole('button', { name: '发起调拨' }).click();
-    const transferDialog = page.getByRole('dialog', { name: '发起资产调拨' });
+    await page.getByRole('button', { name: '调拨/转移' }).click();
+    const transferDialog = page.getByRole('dialog', { name: '调拨/转移' });
     await expect(transferDialog).toBeVisible();
-    await expect(transferDialog.locator('.workspace-action-route strong')).toContainText('/disposals/transfer/new?source=workbench&assetId=FA-M-201');
+    await expect(transferDialog.locator('.workspace-action-route strong')).toContainText('/disposals/transfer/new?source=workbench&assetId=AS-2024-06014-0002');
     await page.keyboard.press('Escape');
     await expect(transferDialog).toHaveCount(0);
 

@@ -3058,107 +3058,152 @@ const workbenchTodoRows = [
 const workbenchTodoDetailTabs = ['基本信息', '审批流程', '附件', '处理建议'] as const;
 
 const workbenchAssetSummaryCards = [
-  { label: '资产总数', value: '6,842', delta: '建账总量', icon: Layers, tone: 'blue' },
-  { label: '在用资产', value: '5,102', delta: '在线可追踪', icon: CheckCircle2, tone: 'green' },
-  { label: '闲置资产', value: '268', delta: '待盘活', icon: Archive, tone: 'cyan' },
-  { label: '风险资产', value: '36', delta: '需转派处置', icon: AlertTriangle, tone: 'red' },
-  { label: '健康指数', value: '86', delta: '平台均值', icon: Gauge, tone: 'violet' },
-  { label: '本月新增', value: '18', delta: '本月入账', icon: UserCircle, tone: 'orange' },
-] as const;
-
-// 资产总览图表数据（对齐设计稿：饼图资产分类分布 / 柱图健康分布）
-const workbenchAssetCategoryDistribution = [
-  { name: '生产设备', value: 43, color: '#3b82f6' },
-  { name: 'IT设备', value: 27, color: '#10b981' },
-  { name: '安防设备', value: 18, color: '#f59e0b' },
-  { name: '办公设备', value: 12, color: '#8b5cf6' },
+  { label: '资产总价值', value: '¥ 98,760.25 万', delta: '较上期 ↑ 3.42%', icon: Layers, tone: 'blue' },
+  { label: '在用资产', value: '12,856 台', delta: '较上期 ↑ 2.89%', icon: CheckCircle2, tone: 'green' },
+  { label: '闲置资产', value: '1,236 台', delta: '较上期 ↓ 1.24%', icon: Archive, tone: 'cyan' },
+  { label: '风险资产', value: '356 台', delta: '较上期 ↑ 6.35%', icon: AlertTriangle, tone: 'red' },
+  { label: '资产健康度', value: '92.4 分', delta: '较上期 ↑ 1.56%', icon: Gauge, tone: 'violet' },
+  { label: '本月新增资产', value: '128 台', delta: '较上期 ↑ 18.75%', icon: UserCircle, tone: 'orange' },
 ] as const;
 
 const workbenchAssetHealthDistribution = [
-  { name: '优(90+)', value: 3856, color: '#10b981' },
-  { name: '良(80-89)', value: 1980, color: '#3b82f6' },
-  { name: '中(70-79)', value: 768, color: '#f59e0b' },
-  { name: '差(<70)', value: 238, color: '#ef4444' },
+  { name: '优秀（90-100）', value: '5,122', percent: '39.9%', color: '#43b5ff' },
+  { name: '良好（75-90）', value: '4,356', percent: '33.8%', color: '#50c7b8' },
+  { name: '一般（60-75）', value: '2,012', percent: '15.6%', color: '#99d46b' },
+  { name: '较差（40-60）', value: '986', percent: '7.7%', color: '#f7c55f' },
+  { name: '很差（0-40）', value: '380', percent: '3.0%', color: '#ff6b72' },
+] as const;
+
+const workbenchAssetLifeDistribution = [
+  { name: '投产期', value: '2,856', percent: '22.2%', color: '#4d8dff' },
+  { name: '成长期', value: '4,125', percent: '32.1%', color: '#51c1e8' },
+  { name: '成熟期', value: '3,245', percent: '25.2%', color: '#40c4a4' },
+  { name: '衰退期', value: '1,450', percent: '11.3%', color: '#f4a13d' },
+  { name: '报废期', value: '1,180', percent: '9.2%', color: '#9b6cff' },
+] as const;
+
+const workbenchAssetCategoryValueDistribution = [
+  { name: '生产设备', value: '34,620.45', width: 100 },
+  { name: '检测设备', value: '18,517.26', width: 54 },
+  { name: '辅助设备', value: '12,144.30', width: 35 },
+  { name: 'IT设备', value: '9,681.23', width: 28 },
+  { name: '车辆', value: '6,130.59', width: 18 },
+  { name: '房屋建筑', value: '4,288.52', width: 12 },
+  { name: '其他', value: '2,945.00', width: 9 },
 ] as const;
 
 const workbenchAssetRows = [
   {
-    id: 'FA-CN-301',
-    type: '生产设备',
+    id: 'AS-2024-06014-0001',
+    category: '生产设备',
+    model: 'CN-301',
     asset: '数控车床 CN-301',
-    location: '机加车间 / CNC 区域 A线',
-    title: '主轴振动异常，建议转预测维保',
-    health: '91',
-    status: '高风险',
+    location: '机加车间 A 区',
+    title: '核心加工设备',
+    health: '优秀 96',
+    status: '在用',
     owner: '张三丰',
-    lifecycle: '在用',
-    value: '¥126.8万',
-    tone: 'red',
-  },
-  {
-    id: 'FA-M-201',
-    type: '生产设备',
-    asset: '注塑机 M-201',
-    location: '一车间 / A线',
-    title: '温度边界触发巡检复核',
-    health: '88',
-    status: '关注',
-    owner: '王班组',
-    lifecycle: '在用',
-    value: '¥86.2万',
-    tone: 'orange',
-  },
-  {
-    id: 'FA-CP-101',
-    type: '动力设备',
-    asset: '空压机 CP-101',
-    location: '动力站',
-    title: '油滤保养窗口待确认',
-    health: '94',
-    status: '正常',
-    owner: '王技师',
-    lifecycle: '维保中',
-    value: '¥42.5万',
+    value: '286.50',
+    image: iconAsset('cnc-machine'),
     tone: 'green',
   },
   {
-    id: 'FA-RB-501',
-    type: '生产设备',
+    id: 'AS-2024-06014-0002',
+    category: '生产设备',
+    model: 'VM-205',
+    asset: '立式加工中心 VM-205',
+    location: '加工中心',
+    title: '关键生产设备',
+    health: '良好 88',
+    status: '在用',
+    owner: '李巡检',
+    value: '512.80',
+    image: iconAsset('production-equipment'),
+    tone: 'green',
+  },
+  {
+    id: 'AS-2024-06014-0003',
+    category: '辅助设备',
+    model: 'CP-101',
+    asset: '空压机 CP-101',
+    location: '动力站',
+    title: '动力辅助设备',
+    health: '一般 72',
+    status: '在用',
+    owner: '王技师',
+    value: '98.60',
+    image: iconAsset('auxiliary-equipment'),
+    tone: 'green',
+  },
+  {
+    id: 'AS-2024-06014-0004',
+    category: '生产设备',
+    model: 'RB-501',
     asset: '焊接机器人 RB-501',
     location: '焊接线 A',
-    title: '减速机温升趋势预警',
-    health: '86',
-    status: '关注',
+    title: '自动焊接设备',
+    health: '较差 58',
+    status: '维修中',
     owner: '赵技师',
-    lifecycle: '在用',
-    value: '¥68.9万',
+    value: '156.30',
+    image: iconAsset('production-equipment'),
     tone: 'orange',
   },
   {
-    id: 'FA-AGV-05',
-    type: '物流设备',
-    asset: 'AGV-05',
-    location: '物流区',
-    title: '位置漂移待复核',
-    health: '90',
-    status: '待复核',
-    owner: '物流运维',
-    lifecycle: '流转中',
-    value: '¥18.6万',
-    tone: 'blue',
+    id: 'AS-2024-06014-0005',
+    category: '辅助设备',
+    model: 'P-302',
+    asset: '冷却泵 P-302',
+    location: '冷却系统',
+    title: '辅助冷却设备',
+    health: '良好 85',
+    status: '在用',
+    owner: '刘班组长',
+    value: '45.80',
+    image: iconAsset('auxiliary-equipment'),
+    tone: 'green',
   },
   {
-    id: 'FA-PDB-01',
-    type: '电气设备',
-    asset: '配电柜 PDB-01',
-    location: '动力站',
-    title: '局部过热已转告警',
-    health: '83',
-    status: '处理中',
+    id: 'AS-2024-06014-0006',
+    category: '辅助设备',
+    model: 'DG-150',
+    asset: '发电机组 DG-150',
+    location: '配电房',
+    title: '应急电力设备',
+    health: '一般 70',
+    status: '闲置',
     owner: '陈电工',
-    lifecycle: '在用',
-    value: '¥24.1万',
+    value: '78.00',
+    image: iconAsset('public-equipment'),
     tone: 'orange',
+  },
+  {
+    id: 'AS-2024-06014-0007',
+    category: '车辆',
+    model: 'FD-10',
+    asset: '叉车 FD-10',
+    location: '物流仓库',
+    title: '厂内物流车辆',
+    health: '优秀 94',
+    status: '在用',
+    owner: '周技师',
+    value: '26.40',
+    image: iconAsset('auxiliary-equipment'),
+    tone: 'green',
+  },
+  {
+    id: 'AS-2024-06014-0008',
+    category: 'IT设备',
+    model: 'SRV-202',
+    asset: '服务器 SRV-202',
+    location: '机房 A',
+    title: '平台服务设备',
+    health: '良好 80',
+    status: '在用',
+    owner: '系统管理员',
+    value: '32.10',
+    image: iconAsset('it-equipment'),
+    tone: 'green',
   },
 ] as const;
 
@@ -7076,7 +7121,6 @@ function WorkbenchAssetPage({
   const selectedAsset = workbenchAssetRows.find((asset) => asset.id === selectedAssetId) ?? workbenchAssetRows[0];
   const primaryAction = meta.actions[0];
   const createAction = meta.actions[1] ?? primaryAction;
-  const riskAction = meta.actions[2] ?? primaryAction;
   const transferAction = meta.actions[3] ?? primaryAction;
 
   const openAssetPreview = (
@@ -7123,17 +7167,41 @@ function WorkbenchAssetPage({
               </div>
             </div>
             <div className="workspace-orders-toolbar" aria-label="资产总览顶部操作">
-              <button type="button" className="is-secondary" onClick={() => onPreviewAction(primaryAction)}>
-                <Layers />
-                查看资产清单
+              <button
+                type="button"
+                className="is-secondary"
+                onClick={() =>
+                  openAssetPreview(
+                    '刷新资产总览',
+                    '/assets?source=workbench&menu=asset&refresh=true',
+                    '刷新资产健康、生命周期、分类价值和台账列表，保留当前筛选上下文。',
+                    '刷新数据',
+                    RefreshCw,
+                  )
+                }
+              >
+                <RefreshCw />
+                刷新
               </button>
-              <button type="button" className="is-secondary" onClick={() => onPreviewAction(createAction)}>
+              <button
+                type="button"
+                className="is-secondary"
+                onClick={() =>
+                  openAssetPreview(
+                    '导出资产清单',
+                    '/reports?source=workbench&view=asset-ledger&export=xlsx',
+                    '导出当前资产总览筛选结果，带入组织、分类、状态和健康筛选上下文。',
+                    '开始导出',
+                    FileText,
+                  )
+                }
+              >
+                <FileText />
+                导出
+              </button>
+              <button type="button" className="is-primary" onClick={() => onPreviewAction(createAction)}>
                 <Archive />
-                新增资产
-              </button>
-              <button type="button" className="is-primary" onClick={() => onPreviewAction(riskAction)}>
-                <Wrench />
-                生成风险工单
+                新建资产
               </button>
             </div>
           </header>
@@ -7183,68 +7251,64 @@ function WorkbenchAssetPage({
           </div>
 
           <div className="workspace-orders-charts" aria-label="资产总览图表">
-            <section className="workspace-orders-chart-card" aria-label="资产分类分布">
-              <header><h3>资产分类分布</h3><small>按资产大类占比</small></header>
+            <section className="workspace-orders-chart-card" aria-label="资产健康分布">
+              <header><h3>资产健康分布</h3><small>按健康状态占比</small></header>
               <div className="workspace-orders-chart-body">
-                <div className="workspace-orders-donut" role="img" aria-label="生产设备 43%，IT设备 27%，安防设备 18%，办公设备 12%">
-                  <strong>6,842</strong>
-                  <span>总资产</span>
+                <div className="workspace-orders-donut workspace-asset-health-donut" role="img" aria-label="资产健康分布">
+                  <strong>12,856</strong>
+                  <span>总数</span>
                 </div>
                 <ul className="workspace-orders-chart-legend">
-                  {workbenchAssetCategoryDistribution.map((entry) => (
+                  {workbenchAssetHealthDistribution.map((entry) => (
                     <li key={entry.name}>
                       <i style={{ backgroundColor: entry.color }} />
                       <span>{entry.name}</span>
-                      <strong>{entry.value}%</strong>
+                      <strong>{entry.value}（{entry.percent}）</strong>
                     </li>
                   ))}
                 </ul>
               </div>
             </section>
 
-            <section className="workspace-orders-chart-card" aria-label="健康分布">
-              <header><h3>健康分布</h3><small>按健康分区间统计</small></header>
+            <section className="workspace-orders-chart-card" aria-label="资产生命周期分布">
+              <header><h3>资产生命周期分布</h3><small>按投产周期统计</small></header>
               <div className="workspace-orders-chart-body">
-                <ResponsiveContainer width="100%" height={220}>
-                  <RechartsBarChart data={[...workbenchAssetHealthDistribution]}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
-                    <XAxis dataKey="name" tick={{ fontSize: 12 }} stroke="#94a3b8" />
-                    <YAxis tick={{ fontSize: 12 }} stroke="#94a3b8" />
-                    <Tooltip />
-                    {workbenchAssetHealthDistribution.map((entry) => (
-                      <Bar key={entry.name} dataKey="value" fill={entry.color} radius={[4, 4, 0, 0]} />
-                    ))}
-                  </RechartsBarChart>
-                </ResponsiveContainer>
+                <div className="workspace-orders-donut workspace-asset-life-donut" role="img" aria-label="资产生命周期分布">
+                  <strong>12,856</strong>
+                  <span>总数</span>
+                </div>
+                <ul className="workspace-orders-chart-legend">
+                  {workbenchAssetLifeDistribution.map((entry) => (
+                    <li key={entry.name}>
+                      <i style={{ backgroundColor: entry.color }} />
+                      <span>{entry.name}</span>
+                      <strong>{entry.value}（{entry.percent}）</strong>
+                    </li>
+                  ))}
+                </ul>
               </div>
             </section>
 
-            <section className="workspace-orders-chart-card workspace-asset-rank-card" aria-label="部门资产价值 Top 5">
-              <header><h3>部门资产价值 Top 5</h3><small>单位：万元</small></header>
+            <section className="workspace-orders-chart-card workspace-asset-rank-card" aria-label="资产分类分布（按价值）">
+              <header><h3>资产分类分布（按价值）</h3><small>单位：万元</small></header>
               <div className="workspace-asset-rank-list">
-                {[
-                  ['制造一部', '18,620.45', 100],
-                  ['制造二部', '15,842.30', 85],
-                  ['设备管理部', '12,356.78', 66],
-                  ['质量管理部', '8,975.60', 48],
-                  ['技术研发部', '6,532.12', 35],
-                ].map(([label, value, width]) => (
+                {workbenchAssetCategoryValueDistribution.map((entry) => (
                   <button
-                    key={label}
+                    key={entry.name}
                     type="button"
                     onClick={() =>
                       openAssetPreview(
-                        `${label}资产价值`,
-                        `/assets?source=workbench&department=${encodeURIComponent(label)}`,
-                        `查看 ${label} 的资产原值、净值、风险资产和在用率。`,
-                        '查看部门',
+                        `${entry.name}资产价值`,
+                        `/assets?source=workbench&category=${encodeURIComponent(entry.name)}`,
+                        `查看 ${entry.name} 的资产价值、健康状态和生命周期分布。`,
+                        '查看分类',
                         Layers,
                       )
                     }
                   >
-                    <span>{label}</span>
-                    <i><em style={{ width: `${width}%` }} /></i>
-                    <strong>{value}</strong>
+                    <span>{entry.name}</span>
+                    <i><em style={{ width: `${entry.width}%` }} /></i>
+                    <strong>{entry.value}</strong>
                   </button>
                 ))}
               </div>
@@ -7255,14 +7319,14 @@ function WorkbenchAssetPage({
             <div className="workspace-orders-table-head">
               <span><input type="checkbox" aria-label="选择全部资产" readOnly /></span>
               <span>资产编号</span>
-              <span>类型</span>
-              <span>资产信息</span>
-              <span>风险/任务</span>
-              <span>健康分</span>
-              <span>状态</span>
-              <span>价值</span>
+              <span>资产名称</span>
+              <span>资产分类</span>
+              <span>规格型号</span>
+              <span>位置</span>
               <span>责任人</span>
-              <span>生命周期</span>
+              <span>健康状态</span>
+              <span>状态</span>
+              <span>价值（万元）</span>
               <span>操作</span>
             </div>
             {workbenchAssetRows.map((asset) => (
@@ -7274,17 +7338,16 @@ function WorkbenchAssetPage({
               >
                 <span><input type="checkbox" aria-label={`选择${asset.id}`} readOnly /></span>
                 <button type="button" className="is-link" onClick={() => openAsset(asset)}>{asset.id}</button>
-                <span><em>{asset.type}</em></span>
+                <button type="button" className="is-title" onClick={() => openAsset(asset)}>{asset.asset}</button>
+                <span>{asset.category}</span>
+                <span>{asset.model}</span>
                 <span>
-                  <strong>{asset.asset}</strong>
                   <small>{asset.location}</small>
                 </span>
-                <button type="button" className="is-title" onClick={() => openAsset(asset)}>{asset.title}</button>
-                <span><b>{asset.health}</b></span>
-                <span><i>{asset.status}</i></span>
-                <span>{asset.value}</span>
                 <span>{asset.owner}</span>
-                <span><em className="is-spare">{asset.lifecycle}</em></span>
+                <span>{asset.health}</span>
+                <span><em className="is-spare">{asset.status}</em></span>
+                <span>{asset.value}</span>
                 <span>
                   <button
                     type="button"
@@ -7292,27 +7355,10 @@ function WorkbenchAssetPage({
                     onClick={() => {
                       setSelectedAssetId(asset.id);
                       setDetailOpen(true);
-                      openAssetPreview(
-                        '生成资产风险工单',
-                        buildWorkOrderPrefillPath({
-                          source: 'asset-risk',
-                          title: `${asset.asset} 健康风险处置工单`,
-                          assetName: asset.asset,
-                          assetLocation: asset.location,
-                          riskState: asset.status,
-                          riskScore: Number(asset.health),
-                          riskLevel: asset.status,
-                          priority: asset.tone === 'red' ? 'HIGH' : 'MEDIUM',
-                          dueDate: '2026-06-16',
-                          description: `来自 Workbench 资产总览：${asset.title}，需要承接到工单闭环。`,
-                        }),
-                        `为 ${asset.asset} 创建健康风险处置工单。`,
-                        '创建工单',
-                        Wrench,
-                      );
+                      openAsset(asset);
                     }}
                   >
-                    处置
+                    详情
                   </button>
                   <button type="button" className="is-more" aria-label={`${asset.id}更多操作`} onClick={() => openAsset(asset)}>
                     ···
@@ -7323,7 +7369,7 @@ function WorkbenchAssetPage({
           </div>
 
           <footer className="workspace-orders-pagination" aria-label="资产分页">
-            <span>共 6,842 台</span>
+            <span>共 12,856 条</span>
             <button type="button">10条/页</button>
             <button type="button" disabled>‹</button>
             {[1, 2, 3, 4, 5].map((pageNo) => (
@@ -7346,23 +7392,25 @@ function WorkbenchAssetPage({
               </button>
             </header>
             <section className="workspace-orders-detail-card" aria-label="当前资产信息">
-              <div>
-                <b>{selectedAsset.health}</b>
+              <div className="workspace-asset-detail-hero">
+                <img src={selectedAsset.image} alt="" />
                 <span>
-                  <strong>{selectedAsset.id}</strong>
+                  <b>{selectedAsset.tone === 'orange' ? 'P1' : 'P0'}</b>
+                  <strong>{selectedAsset.asset}</strong>
                   <small>{selectedAsset.status}</small>
                 </span>
               </div>
-              <h3>{selectedAsset.asset}</h3>
               <dl>
-                <div><dt>类型</dt><dd>{selectedAsset.type}</dd></div>
-                <div><dt>健康分</dt><dd>{selectedAsset.health}</dd></div>
+                <div><dt>资产编号</dt><dd>{selectedAsset.id}</dd></div>
+                <div><dt>负责人</dt><dd>{selectedAsset.owner}</dd></div>
+                <div><dt>资产分类</dt><dd>{selectedAsset.category}</dd></div>
+                <div><dt>规格型号</dt><dd>{selectedAsset.model}</dd></div>
                 <div><dt>位置</dt><dd>{selectedAsset.location}</dd></div>
-                <div><dt>资产价值</dt><dd>{selectedAsset.value}</dd></div>
-                <div><dt>责任人</dt><dd>{selectedAsset.owner}</dd></div>
-                <div><dt>生命周期</dt><dd>{selectedAsset.lifecycle}</dd></div>
-                <div><dt>最近同步</dt><dd>2026-06-14 10:30</dd></div>
-                <div><dt>处置状态</dt><dd>{selectedAsset.status}</dd></div>
+                <div><dt>启用日期</dt><dd>2023-08-15</dd></div>
+                <div><dt>资产价值</dt><dd>{selectedAsset.value} 万元</dd></div>
+                <div><dt>健康状态</dt><dd>{selectedAsset.health}</dd></div>
+                <div><dt>状态</dt><dd>{selectedAsset.status}</dd></div>
+                <div><dt>备注</dt><dd>{selectedAsset.title}</dd></div>
               </dl>
             </section>
 
@@ -7371,7 +7419,7 @@ function WorkbenchAssetPage({
                 <span key={step} className={index < 2 ? 'is-done' : index === 2 ? 'is-active' : ''}>
                   <CheckCircle2 />
                   <strong>{step}</strong>
-                  <small>{index < 2 ? '已完成' : index === 2 ? '需研判' : '待流转'}</small>
+                  <small>{index < 2 ? '已完成' : index === 2 ? '需关注' : '待流转'}</small>
                 </span>
               ))}
             </section>
@@ -7392,7 +7440,7 @@ function WorkbenchAssetPage({
             <section className="workspace-orders-tab-panel" aria-label={`${detailTab}内容`}>
               <article>
                 <span>资产摘要</span>
-                <p>{selectedAsset.title}，当前生命周期为 {selectedAsset.lifecycle}。</p>
+                <p>{selectedAsset.title}，当前状态为 {selectedAsset.status}。</p>
               </article>
               <article>
                 <span>健康评分</span>
@@ -7404,7 +7452,7 @@ function WorkbenchAssetPage({
               </article>
               <article>
                 <span>处置建议</span>
-                <p>高风险资产优先生成工单；流转类资产进入调拨/领用表单，并保留审批上下文。</p>
+                <p>高风险资产优先生成风险工单；在用资产可进入编辑、调拨/转移或停用流程。</p>
               </article>
               <article>
                 <span>关联记录</span>
@@ -7421,36 +7469,55 @@ function WorkbenchAssetPage({
                 type="button"
                 onClick={() =>
                   openAssetPreview(
-                    '发起资产调拨',
-                    `/disposals/transfer/new?source=workbench&assetId=${encodeURIComponent(selectedAsset.id)}`,
-                    `为 ${selectedAsset.asset} 发起调拨，预填位置、责任人和资产来源。`,
-                    '发起调拨',
-                    ArrowRight,
+                    '编辑资产',
+                    `/assets/${selectedAsset.id}/edit?source=workbench`,
+                    `编辑 ${selectedAsset.asset}，保留资产总览上下文。`,
+                    '编辑资产',
+                    FileText,
                   )
                 }
               >
-                发起调拨
+                编辑资产
               </button>
               <button
                 type="button"
                 onClick={() =>
                   openAssetPreview(
-                    '发起使用流转',
-                    `/assignments/new?source=workbench&assetId=${encodeURIComponent(selectedAsset.id)}`,
-                    `为 ${selectedAsset.asset} 发起领用/借用/归还流转。`,
-                    '发起流转',
-                    UserCircle,
+                    '生成风险工单',
+                    buildWorkOrderPrefillPath({
+                      source: 'asset-risk',
+                      title: `${selectedAsset.asset} 风险处置工单`,
+                      assetName: selectedAsset.asset,
+                      assetLocation: selectedAsset.location,
+                      riskState: selectedAsset.status,
+                      riskScore: Number.parseInt(selectedAsset.health.replace(/\D/g, ''), 10),
+                      riskLevel: selectedAsset.status,
+                      priority: selectedAsset.tone === 'orange' ? 'HIGH' : 'MEDIUM',
+                      dueDate: '2026-06-16',
+                      description: `来自 Workbench 资产总览：${selectedAsset.title}。`,
+                    }),
+                    `为 ${selectedAsset.asset} 生成风险工单，带入健康状态、位置和负责人。`,
+                    '生成工单',
+                    AlertTriangle,
                   )
                 }
               >
-                使用流转
+                生成风险工单
               </button>
               <button
                 type="button"
                 className="is-primary"
-                onClick={() => onPreviewAction(riskAction)}
+                onClick={() =>
+                  openAssetPreview(
+                    '调拨/转移',
+                    `/disposals/transfer/new?source=workbench&assetId=${encodeURIComponent(selectedAsset.id)}`,
+                    `为 ${selectedAsset.asset} 发起调拨/转移，预填资产编号、位置和责任人。`,
+                    '调拨/转移',
+                    ArrowRight,
+                  )
+                }
               >
-                创建工单
+                调拨/转移
               </button>
             </footer>
           </>
