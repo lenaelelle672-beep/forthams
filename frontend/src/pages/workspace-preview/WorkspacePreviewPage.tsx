@@ -3678,6 +3678,21 @@ const workbenchEnergyServiceCards = [
   { label: '告警联动', value: '32', note: '关联工单/告警', tone: 'red' },
 ] as const;
 
+const workbenchEnergyTrendPoints = '0,94 72,72 144,76 216,48 288,54 360,34 432,42 504,24';
+
+const workbenchEnergySourceHealth = [
+  { label: 'MES 同步', value: '99.2%', percent: 99, note: '95ms', tone: 'green' },
+  { label: 'IoT 网关', value: '96.8%', percent: 97, note: '2.1s', tone: 'cyan' },
+  { label: 'PLC 点位', value: '94.6%', percent: 95, note: '1,256 点', tone: 'blue' },
+  { label: '事件流', value: '91.8%', percent: 92, note: '32 待处理', tone: 'orange' },
+] as const;
+
+const workbenchEnergyExceptionRank = [
+  { label: 'GW-A01 采集延迟', value: '18', note: 'P95 2.1s', tone: 'orange' },
+  { label: '告警事件待确认', value: '12', note: '待联动工单', tone: 'red' },
+  { label: 'MES 回写重试', value: '7', note: '自动补偿中', tone: 'blue' },
+] as const;
+
 const workbenchPolicySummaryCards = [
   { label: '风险规则', value: '68', delta: '启用 54', icon: ShieldCheck, tone: 'blue' },
   { label: '角色策略', value: '128', delta: '110 个启用', icon: UserCircle, tone: 'cyan' },
@@ -5354,6 +5369,109 @@ function WorkbenchEnergyPage({
             );
           })}
         </div>
+
+        <section className="workspace-energy-monitor-grid" aria-label="数据监控驾驶舱">
+          <article className="workspace-energy-trend-card" aria-label="数据监控趋势图">
+            <header>
+              <span>采集健康趋势</span>
+              <strong>98.6%</strong>
+            </header>
+            <svg viewBox="0 0 504 118" role="img" aria-label="数据监控采集健康趋势折线">
+              <defs>
+                <linearGradient id="energyTrendFill" x1="0" x2="0" y1="0" y2="1">
+                  <stop offset="0%" stopColor="#10a7bd" stopOpacity=".24" />
+                  <stop offset="100%" stopColor="#10a7bd" stopOpacity="0" />
+                </linearGradient>
+              </defs>
+              <path d={`M ${workbenchEnergyTrendPoints} L 504 118 L 0 118 Z`} fill="url(#energyTrendFill)" />
+              <polyline points={workbenchEnergyTrendPoints} fill="none" stroke="#0c8da6" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+              <g>
+                <circle cx="360" cy="34" r="5" fill="#0c8da6" />
+                <circle cx="504" cy="24" r="5" fill="#176de8" />
+              </g>
+            </svg>
+            <footer>
+              <span>08:00</span>
+              <span>12:00</span>
+              <span>16:00</span>
+              <span>当前</span>
+            </footer>
+          </article>
+
+          <article className="workspace-energy-health-card" aria-label="数据源健康分布">
+            <header>
+              <span>数据源健康分布</span>
+              <button
+                type="button"
+                onClick={() =>
+                  openEnergyPreview(
+                    '查看数据源健康',
+                    '/energy?source=workbench&scope=data-monitoring&view=source-health',
+                    '查看 MES、IoT、PLC 和事件流的健康度、延迟与补偿状态。',
+                    '查看健康分布',
+                    Database,
+                  )
+                }
+              >
+                查看
+              </button>
+            </header>
+            <div>
+              {workbenchEnergySourceHealth.map((source) => (
+                <button
+                  key={source.label}
+                  type="button"
+                  className={`is-${source.tone}`}
+                  onClick={() =>
+                    openEnergyPreview(
+                      `${source.label}健康详情`,
+                      `/energy?source=workbench&scope=data-monitoring&source=${encodeURIComponent(source.label)}`,
+                      `下钻 ${source.label}，带入健康度 ${source.value} 和当前延迟 ${source.note}。`,
+                      '打开来源',
+                      Database,
+                    )
+                  }
+                >
+                  <span>
+                    <strong>{source.label}</strong>
+                    <small>{source.note}</small>
+                  </span>
+                  <em>{source.value}</em>
+                  <i style={{ '--source-health-width': `${source.percent}%` } as CSSProperties} />
+                </button>
+              ))}
+            </div>
+          </article>
+
+          <article className="workspace-energy-rank-card" aria-label="采集异常排行">
+            <header>
+              <span>采集异常排行</span>
+              <strong>32 待处理</strong>
+            </header>
+            {workbenchEnergyExceptionRank.map((event) => (
+              <button
+                key={event.label}
+                type="button"
+                className={`is-${event.tone}`}
+                onClick={() =>
+                  openEnergyPreview(
+                    `${event.label}处理`,
+                    `/energy?source=workbench&scope=data-monitoring&exception=${encodeURIComponent(event.label)}`,
+                    `进入 ${event.label} 异常队列，保留数据监控来源和处理上下文。`,
+                    '处理异常',
+                    AlertTriangle,
+                  )
+                }
+              >
+                <span>
+                  <strong>{event.label}</strong>
+                  <small>{event.note}</small>
+                </span>
+                <b>{event.value}</b>
+              </button>
+            ))}
+          </article>
+        </section>
 
         <div className="workspace-energy-stage-row" aria-label="数据监控流程阶段">
           {workbenchEnergyStages.map((stage) => (
@@ -7362,6 +7480,29 @@ const workbenchReportRows = [
 
 const workbenchReportDetailTabs = ['报表信息', '趋势分析', '导出记录', '审计追溯', '数据来源'] as const;
 
+const workbenchReportTrendPoints = '0,84 68,78 136,62 204,68 272,48 340,54 408,38 476,28';
+
+const workbenchReportCategoryShare = [
+  { label: '生产设备', value: '45.60%', amount: '45,052.35', color: '#176de8' },
+  { label: '检测仪器', value: '18.75%', amount: '18,517.26', color: '#12b6cf' },
+  { label: '辅助设备', value: '12.30%', amount: '12,144.30', color: '#48c59c' },
+  { label: 'IT 设备', value: '9.80%', amount: '9,681.23', color: '#f4a52b' },
+  { label: '其他', value: '13.55%', amount: '13,365.11', color: '#8a63f6' },
+] as const;
+
+const workbenchReportDepartmentRank = [
+  { label: '制造一部', value: '18,620.45', percent: 100 },
+  { label: '制造二部', value: '15,842.30', percent: 85 },
+  { label: '设备管理部', value: '12,356.78', percent: 66 },
+  { label: '质量管理部', value: '8,975.60', percent: 48 },
+] as const;
+
+const workbenchReportExportHistory = [
+  { name: '资产价值总览_20260614.xlsx', owner: '张三丰', status: '已完成', tone: 'green' },
+  { name: '资产分类分布_20260614.pdf', owner: '张三丰', status: '已完成', tone: 'green' },
+  { name: '部门资产统计_20260613.xlsx', owner: '李巡检', status: '失败', tone: 'red' },
+] as const;
+
 const workbenchAlarmSummaryCards = [
   { label: '安全评分', value: '92', delta: '分 · 较上周 +4', icon: ShieldCheck, tone: 'green' },
   { label: '高危事件', value: '3', delta: '需立即处置', icon: AlertTriangle, tone: 'red' },
@@ -8761,6 +8902,137 @@ function WorkbenchReportPage({
               );
             })}
           </div>
+
+          <section className="workspace-report-analytics-grid" aria-label="报表分析图表区">
+            <article className="workspace-report-trend-card" aria-label="报表趋势图">
+              <header>
+                <span>资产价值趋势（万元）</span>
+                <button
+                  type="button"
+                  onClick={() =>
+                    openReportPreview(
+                      '查看资产价值趋势',
+                      '/reports?source=workbench&view=asset-trend&period=30d',
+                      '打开资产价值趋势分析，带入最近 30 天、总值、净值和风险资产口径。',
+                      '查看趋势',
+                      TrendingUp,
+                    )
+                  }
+                >
+                  按日
+                </button>
+              </header>
+              <svg viewBox="0 0 476 118" role="img" aria-label="资产价值趋势折线">
+                <defs>
+                  <linearGradient id="reportTrendFill" x1="0" x2="0" y1="0" y2="1">
+                    <stop offset="0%" stopColor="#176de8" stopOpacity=".22" />
+                    <stop offset="100%" stopColor="#176de8" stopOpacity="0" />
+                  </linearGradient>
+                </defs>
+                <path d={`M ${workbenchReportTrendPoints} L 476 118 L 0 118 Z`} fill="url(#reportTrendFill)" />
+                <polyline points={workbenchReportTrendPoints} fill="none" stroke="#176de8" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+                <polyline points="0,98 68,92 136,86 204,90 272,78 340,72 408,76 476,64" fill="none" stroke="#12b6cf" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              <footer>
+                <span>资产总价值</span>
+                <span>在用资产净值</span>
+                <strong>¥98,760.25 万</strong>
+              </footer>
+            </article>
+
+            <article className="workspace-report-donut-card" aria-label="资产分类环图">
+              <header>
+                <span>资产分类分布</span>
+                <strong>98,760.25</strong>
+              </header>
+              <div className="workspace-report-donut-wrap">
+                <div className="workspace-report-donut" role="img" aria-label="资产分类占比环图">
+                  <span>总资产净值</span>
+                  <b>98,760.25</b>
+                </div>
+                <ul>
+                  {workbenchReportCategoryShare.map((category) => (
+                    <li key={category.label} style={{ '--report-category-color': category.color } as CSSProperties}>
+                      <span>{category.label}</span>
+                      <em>{category.value}</em>
+                      <strong>{category.amount}</strong>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </article>
+
+            <article className="workspace-report-rank-card" aria-label="部门资产排行">
+              <header>
+                <span>部门资产价值 Top 4</span>
+                <button
+                  type="button"
+                  onClick={() =>
+                    openReportPreview(
+                      '查看部门资产统计',
+                      '/reports?source=workbench&view=department-assets',
+                      '打开部门资产统计，带入资产数量、净值、风险资产和在用率。',
+                      '查看明细',
+                      BarChart3,
+                    )
+                  }
+                >
+                  按价值
+                </button>
+              </header>
+              <div>
+                {workbenchReportDepartmentRank.map((rank) => (
+                  <button
+                    key={rank.label}
+                    type="button"
+                    onClick={() =>
+                      openReportPreview(
+                        `${rank.label}资产明细`,
+                        `/reports?source=workbench&view=department-assets&department=${encodeURIComponent(rank.label)}`,
+                        `查看 ${rank.label} 的资产价值、风险资产和部门统计明细。`,
+                        '查看部门',
+                        BarChart3,
+                      )
+                    }
+                  >
+                    <span>{rank.label}</span>
+                    <i><b style={{ '--report-rank-width': `${rank.percent}%` } as CSSProperties} /></i>
+                    <strong>{rank.value}</strong>
+                  </button>
+                ))}
+              </div>
+            </article>
+
+            <article className="workspace-report-export-card" aria-label="导出历史摘要">
+              <header>
+                <span>导出历史</span>
+                <button type="button" onClick={() => onPreviewAction(exportAction)}>更多</button>
+              </header>
+              {workbenchReportExportHistory.map((history) => (
+                <button
+                  key={history.name}
+                  type="button"
+                  className={`is-${history.tone}`}
+                  onClick={() =>
+                    openReportPreview(
+                      `${history.name}导出记录`,
+                      `/reports/export-history?source=workbench&file=${encodeURIComponent(history.name)}`,
+                      `打开 ${history.name} 的导出记录，带入创建人 ${history.owner} 和状态 ${history.status}。`,
+                      history.status === '失败' ? '重试导出' : '查看记录',
+                      FileText,
+                    )
+                  }
+                >
+                  <FileText />
+                  <span>
+                    <strong>{history.name}</strong>
+                    <small>{history.owner}</small>
+                  </span>
+                  <em>{history.status}</em>
+                </button>
+              ))}
+            </article>
+          </section>
 
           <div className="workspace-orders-stage-row" aria-label="报表分析流程">
             {workbenchReportStages.map((stage) => (

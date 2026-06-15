@@ -566,6 +566,10 @@ test.describe('Workbench 正式入口浏览器回归', () => {
     await expect(page.getByLabel('数据监控产品页主体').getByRole('heading', { name: '数据监控' })).toBeVisible();
     await expect(page.getByText('数据链路 · 采集事件 · 指标服务')).toBeVisible();
     await expect(page.getByLabel('数据监控核心指标')).toContainText('数据链路总览');
+    await expect(page.getByLabel('数据监控驾驶舱')).toContainText('采集健康趋势');
+    await expect(page.getByLabel('数据监控趋势图')).toContainText('98.6%');
+    await expect(page.getByLabel('数据源健康分布')).toContainText('MES 同步');
+    await expect(page.getByLabel('采集异常排行')).toContainText('GW-A01 采集延迟');
     await expect(page.getByLabel('数据监控流程阶段')).toContainText('采集');
     await expect(page.getByLabel('数据监控顶部操作')).toContainText('重试采集任务');
     await expect(page.getByLabel('数据监控查询筛选栏')).toContainText('处理时间');
@@ -613,6 +617,11 @@ test.describe('Workbench 正式入口浏览器回归', () => {
     await expect(page.getByRole('heading', { name: '报表分析' })).toBeVisible();
     await expect(page.getByText('模板中心 · 分析视图 · 导出订阅')).toBeVisible();
     await expect(page.getByLabel('报表分析核心指标')).toContainText('资产总价值');
+    await expect(page.getByLabel('报表分析图表区')).toContainText('资产价值趋势');
+    await expect(page.getByLabel('报表趋势图')).toContainText('¥98,760.25 万');
+    await expect(page.getByLabel('资产分类环图')).toContainText('生产设备');
+    await expect(page.getByLabel('部门资产排行')).toContainText('制造一部');
+    await expect(page.getByLabel('导出历史摘要')).toContainText('资产价值总览_20260614.xlsx');
     await expect(page.getByLabel('报表分析流程')).toContainText('模板');
     await expect(page.getByLabel('报表分析顶部操作')).toContainText('导出资产趋势');
     await expect(page.getByLabel('报表分析查询筛选栏')).toContainText('生成时间');
