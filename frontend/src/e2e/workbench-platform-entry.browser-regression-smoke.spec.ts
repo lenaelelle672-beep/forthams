@@ -532,6 +532,9 @@ test.describe('Workbench 正式入口浏览器回归', () => {
     await expect(page.getByLabel('备件管理查询筛选栏')).toContainText('到货时间');
     await expect(page.getByLabel('备件管理列表')).toContainText('SP-6205-2RS');
     await expect(page.getByLabel('备件详情抽屉')).toContainText('轴承 6205-2RS');
+    await expect(page.getByLabel('备件库存概览')).toContainText('最小库存');
+    await expect(page.getByLabel('备件快捷操作')).toContainText('申请备件');
+    await expect(page.getByLabel('备件危险操作')).toContainText('删除备件会影响库存');
     await expect(page.getByLabel('备件详情标签')).toContainText('供应商 ETA');
     await expect(page.getByLabel('备件详情操作')).toContainText('采购申请');
     await expect(page.locator('body')).not.toContainText('workbench-menu-spares-v1');
@@ -682,6 +685,9 @@ test.describe('Workbench 正式入口浏览器回归', () => {
     await expect(page.getByLabel('告警中心查询筛选栏')).toContainText('响应时间');
     await expect(page.getByLabel('告警中心列表')).toContainText('ALM-20240614-0012');
     await expect(page.getByLabel('告警详情抽屉')).toContainText('主轴振动异常触发高危策略');
+    await expect(page.getByLabel('告警策略命中分析')).toContainText('趋势预览');
+    await expect(page.getByLabel('告警处置动作')).toContainText('转工单');
+    await expect(page.getByLabel('告警闭环进度')).toContainText('25%');
     await expect(page.getByLabel('告警详情标签')).toContainText('策略命中');
     await expect(page.getByLabel('告警详情操作')).toContainText('创建工单');
     await expect(page.locator('body')).not.toContainText('workbench-menu-alert-v1');
@@ -798,7 +804,8 @@ test.describe('Workbench 正式入口浏览器回归', () => {
     await expect(settingsTreeList).toBeVisible();
     await expect(settingsTreeList.getByRole('button', { name: /资产分类/ })).toBeVisible();
     const settingsTreeListBox = await settingsTreeList.boundingBox();
-    expect(settingsTreeListBox?.height ?? 0).toBeGreaterThan(220);
+    expect(settingsTreeListBox?.width ?? 0).toBeGreaterThan(500);
+    expect(settingsTreeListBox?.height ?? 0).toBeLessThan(80);
     await expect(page.getByLabel('基础维护分类树')).toContainText('资产分类');
     await expect(page.getByLabel('基础维护分类树')).toContainText('位置管理');
     await expect(page.getByLabel('基础维护分类树')).toContainText('供应商');
@@ -810,6 +817,8 @@ test.describe('Workbench 正式入口浏览器回归', () => {
     await expect(page.getByLabel('基础维护顶部操作')).toContainText('新建配置');
     await expect(page.getByLabel('基础维护查询筛选栏')).toContainText('空态预览');
     await expect(page.getByLabel('基础维护配置对象列表')).toContainText('CFG-CAT-ASSET');
+    await expect(page.getByLabel('基础维护配置对象列表')).toContainText('CFG-CAT-POWER');
+    await expect(page.getByLabel('配置健康总览')).toContainText('待处理变更');
     await expect(page.getByLabel('基础维护详情抽屉')).toContainText('生产设备分类体系');
     await expect(page.getByLabel('基础维护详情抽屉')).toContainText('关联资产');
     await expect(page.getByLabel('基础维护详情抽屉')).toContainText('最后同步');
@@ -828,13 +837,13 @@ test.describe('Workbench 正式入口浏览器回归', () => {
 
     await page.getByLabel('基础维护分类树').getByRole('button', { name: /供应商/ }).click();
     await expect(page.getByLabel('基础维护配置对象列表')).toContainText('CFG-VDR-SPARE');
-    await page.getByRole('button', { name: 'CFG-VDR-SPARE', exact: true }).click();
-    const detailDialog = page.getByRole('dialog', { name: '打开基础维护详情' });
+    await expect(page.getByLabel('基础维护详情抽屉')).toContainText('UNIVIEW 备件仓资质');
+    await page.getByLabel('基础维护详情操作').getByRole('button', { name: '打开维护' }).click();
+    const detailDialog = page.getByRole('dialog', { name: '打开基础维护' });
     await expect(detailDialog).toBeVisible();
     await expect(detailDialog.locator('.workspace-action-route strong')).toContainText('/vendors?source=workbench&vendor=CFG-VDR-SPARE');
     await page.keyboard.press('Escape');
     await expect(detailDialog).toHaveCount(0);
-    await expect(page.getByLabel('基础维护详情抽屉')).toContainText('UNIVIEW 备件仓资质');
     await expect(page.getByLabel('基础维护详情抽屉')).toContainText('证照待复核');
 
     await page.getByLabel('基础维护详情操作').getByRole('button', { name: '危险变更' }).click();

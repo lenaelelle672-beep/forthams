@@ -3251,6 +3251,20 @@ const workbenchSparesRows = [
 
 const workbenchSparesDetailTabs = ['备件信息', '库存流水', '供应商 ETA', '关联工单', '成本回写'] as const;
 
+const workbenchSparesInventoryBands = [
+  { label: '最小库存', value: '20' },
+  { label: '最大库存', value: '100' },
+  { label: '安全库存', value: '30' },
+  { label: '在途数量', value: '15' },
+] as const;
+
+const workbenchSparesFastActions = [
+  { label: '申请备件', route: '/spare-parts/new?source=workbench&mode=request', icon: PackageCheck, primary: true },
+  { label: '采购申请', route: '/spare-parts/new?source=workbench&mode=purchase', icon: Archive },
+  { label: '领用出库', route: '/spare-parts/new?source=workbench&mode=outbound', icon: Box },
+  { label: '采购记录', route: '/spare-parts?source=workbench&view=purchase-records', icon: FileText },
+] as const;
+
 type WorkbenchCommandRow = {
   id: string;
   type: string;
@@ -4320,6 +4334,70 @@ const workbenchSettingsObjects = [
     tone: 'blue',
   },
   {
+    id: 'CFG-CAT-POWER',
+    domain: 'category',
+    type: '资产分类',
+    name: '动力设备分类体系',
+    owner: '设备管理员',
+    status: '启用',
+    scope: '资产台账 / 数据监控',
+    impact: '关联资产 1,268 台',
+    lastSync: '今天 10:18',
+    health: '98.7%',
+    risk: '低',
+    change: '动力站、空压机和冷干机分类已对齐设备采集模型。',
+    route: '/categories?source=workbench&category=CFG-CAT-POWER',
+    tone: 'green',
+  },
+  {
+    id: 'CFG-CAT-MEASURE',
+    domain: 'category',
+    type: '资产分类',
+    name: '检测仪器分类体系',
+    owner: '质量管理员',
+    status: '启用',
+    scope: '质检台账 / 折旧报表',
+    impact: '关联资产 2,145 台',
+    lastSync: '今天 09:56',
+    health: '99.0%',
+    risk: '低',
+    change: '检测仪器分类新增校准周期字段，影响折旧和年检提醒。',
+    route: '/categories?source=workbench&category=CFG-CAT-MEASURE',
+    tone: 'blue',
+  },
+  {
+    id: 'CFG-CAT-AUX',
+    domain: 'category',
+    type: '资产分类',
+    name: '辅助设备分类体系',
+    owner: '资产管理员',
+    status: '启用',
+    scope: '资产台账 / 工单派发',
+    impact: '关联资产 1,856 台',
+    lastSync: '今天 09:42',
+    health: '97.6%',
+    risk: '低',
+    change: '辅助设备分类已绑定默认责任班组和维修 SLA。',
+    route: '/categories?source=workbench&category=CFG-CAT-AUX',
+    tone: 'cyan',
+  },
+  {
+    id: 'CFG-CAT-SECURITY',
+    domain: 'category',
+    type: '资产分类',
+    name: '安防设备分类体系',
+    owner: '安全运营',
+    status: '停用待审',
+    scope: '安全态势 / 资产台账',
+    impact: '关联资产 342 台',
+    lastSync: '昨天 18:22',
+    health: '86.4%',
+    risk: '中',
+    change: '旧安防分类拟停用，需确认关联资产迁移后再执行。',
+    route: '/categories?source=workbench&category=CFG-CAT-SECURITY',
+    tone: 'orange',
+  },
+  {
     id: 'CFG-LOC-CNC-A',
     domain: 'location',
     type: '位置管理',
@@ -4389,6 +4467,15 @@ const workbenchSettingsStateCards = [
   { label: '空态', value: '暂无待维护配置', note: '筛选无结果时保留新建和导入入口' },
   { label: '异常态', value: '同步异常 1 项', note: 'MES 集成源需复核频率和凭证' },
   { label: '无权限态', value: '供应商资质受限', note: '缺少供应商权限时只展示预览和申请入口' },
+] as const;
+
+const workbenchSettingsHealthCards = [
+  { label: '编号规则', value: '健康', note: '5 个规则正常', tone: 'green' },
+  { label: '集成源', value: '告警', note: '2 个源异常', tone: 'orange' },
+  { label: '数据字典', value: '健康', note: '1,256 项', tone: 'green' },
+  { label: '系统配置', value: '健康', note: '运行正常', tone: 'green' },
+  { label: '缓存状态', value: '健康', note: '命中率 98.6%', tone: 'green' },
+  { label: '待处理变更', value: '3 项', note: '需执行或审批', tone: 'red' },
 ] as const;
 
 function WorkbenchCommandPage({
@@ -6536,6 +6623,29 @@ function WorkbenchSettingsPage({
           ))}
         </div>
 
+        <section className="workspace-settings-health-strip" aria-label="配置健康总览">
+          {workbenchSettingsHealthCards.map((card) => (
+            <button
+              key={card.label}
+              type="button"
+              className={`is-${card.tone}`}
+              onClick={() =>
+                openSettingsPreview(
+                  `${card.label}健康详情`,
+                  `/settings/sysconfig?source=workbench&health=${encodeURIComponent(card.label)}`,
+                  `查看 ${card.label} 的健康状态、异常明细和修复入口。`,
+                  '查看健康',
+                  card.tone === 'orange' || card.tone === 'red' ? AlertTriangle : CheckCircle2,
+                )
+              }
+            >
+              <span>{card.label}</span>
+              <strong>{card.value}</strong>
+              <small>{card.note}</small>
+            </button>
+          ))}
+        </section>
+
         <footer className="workspace-orders-pagination" aria-label="基础维护分页">
           <span>共 {workbenchSettingsObjects.length * 18} 条</span>
           <button type="button">10条/页</button>
@@ -7285,6 +7395,69 @@ function WorkbenchSparesPage({
               </dl>
             </section>
 
+            <section className="workspace-spares-inventory-overview" aria-label="备件库存概览">
+              <div className="workspace-spares-stock-ring" aria-label={`${selectedSpare.part}库存数量`}>
+                <i />
+                <strong>{selectedSpare.stock}</strong>
+                <span>库存数量</span>
+              </div>
+              <div className="workspace-spares-stock-bands">
+                {workbenchSparesInventoryBands.map((band) => (
+                  <article key={band.label}>
+                    <span>{band.label}</span>
+                    <strong>{band.value}</strong>
+                  </article>
+                ))}
+              </div>
+            </section>
+
+            <section className="workspace-spares-quick-grid" aria-label="备件快捷操作">
+              {workbenchSparesFastActions.map((action) => {
+                const ActionIcon = action.icon;
+                return (
+                  <button
+                    key={action.label}
+                    type="button"
+                    className={action.primary ? 'is-primary' : ''}
+                    onClick={() =>
+                      openSparesPreview(
+                        action.label,
+                        `${action.route}&partNo=${encodeURIComponent(selectedSpare.id)}`,
+                        `${action.label}，预填 ${selectedSpare.part}、库存 ${selectedSpare.stock}、供应商 ${selectedSpare.supplier} 和关联工单 ${selectedSpare.workOrder}。`,
+                        action.label,
+                        ActionIcon,
+                      )
+                    }
+                  >
+                    <ActionIcon />
+                    {action.label}
+                  </button>
+                );
+              })}
+            </section>
+
+            <section className="workspace-spares-danger-zone" aria-label="备件危险操作">
+              <AlertTriangle />
+              <div>
+                <strong>删除备件会影响库存、采购、领用及成本数据</strong>
+                <p>Workbench 仅展示危险操作反馈，实际执行需进入备件主数据页二次确认。</p>
+              </div>
+              <button
+                type="button"
+                onClick={() =>
+                  openSparesPreview(
+                    '删除备件确认',
+                    `/spare-parts/${selectedSpare.id}/danger?source=workbench`,
+                    `删除 ${selectedSpare.part} 前需要校验库存、采购、领用和成本回写影响。`,
+                    '进入确认',
+                    AlertTriangle,
+                  )
+                }
+              >
+                删除
+              </button>
+            </section>
+
             <section className="workspace-orders-flow" aria-label="备件保障流转">
               {['识别', '申请', '采购', '到货', '回写'].map((step, index) => (
                 <span key={step} className={index < 2 ? 'is-done' : index === 2 ? 'is-active' : ''}>
@@ -7720,6 +7893,16 @@ const workbenchAlarmRows = [
 ] as const;
 
 const workbenchAlarmDetailTabs = ['告警信息', '策略命中', '处置建议', '处理记录', '关联工单'] as const;
+
+const workbenchAlarmTrendPoints = '0,94 46,82 92,88 138,58 184,70 230,44 276,52 322,38 368,46';
+
+const workbenchAlarmProgressSteps = [
+  { label: '确认告警', state: 'done' },
+  { label: '原因分析', state: 'active' },
+  { label: '处置执行', state: 'next' },
+  { label: '验证结果', state: 'next' },
+  { label: '复盘总结', state: 'next' },
+] as const;
 
 function WorkbenchDevicePage({
   item,
@@ -9803,6 +9986,53 @@ function WorkbenchAlarmPage({
               </dl>
             </section>
 
+            <section className="workspace-alarm-decision-grid" aria-label="告警策略命中分析">
+              <article className="workspace-alarm-trend-card" aria-label="告警趋势预览">
+                <header>
+                  <span>趋势预览（近 30 分钟）</span>
+                  <strong>{selectedAlarm.response}</strong>
+                </header>
+                <svg viewBox="0 0 368 112" role="img" aria-label={`${selectedAlarm.asset}告警趋势`}>
+                  <path d={`M ${workbenchAlarmTrendPoints} L 368 112 L 0 112 Z`} />
+                  <polyline points={workbenchAlarmTrendPoints} />
+                  <line x1="0" x2="368" y1="66" y2="66" />
+                </svg>
+                <footer>
+                  <span>阈值 7.5</span>
+                  <b>当前 12.8</b>
+                </footer>
+              </article>
+              <article className="workspace-alarm-action-card" aria-label="告警处置动作">
+                <span>处置动作</span>
+                {[
+                  ['转工单', AlertTriangle, 'workorder'],
+                  ['派工', UserCircle, 'dispatch'],
+                  ['静音', Bell, 'mute'],
+                  ['复盘', ShieldCheck, 'review'],
+                ].map(([label, ActionIcon, mode]) => {
+                  const Icon = ActionIcon as LucideIcon;
+                  return (
+                    <button
+                      key={label as string}
+                      type="button"
+                      onClick={() =>
+                        openAlarmPreview(
+                          `${label}告警`,
+                          `/notifications/${selectedAlarm.id}/process?source=workbench&mode=${mode}`,
+                          `${label} ${selectedAlarm.id}，保留策略 ${selectedAlarm.strategy} 和资产 ${selectedAlarm.asset}。`,
+                          label as string,
+                          Icon,
+                        )
+                      }
+                    >
+                      <Icon />
+                      {label as string}
+                    </button>
+                  );
+                })}
+              </article>
+            </section>
+
             <section className="workspace-orders-flow" aria-label="告警研判流转">
               {['发现', '聚合', '研判', '处置', '复盘'].map((step, index) => (
                 <span key={step} className={index < 2 ? 'is-done' : index === 2 ? 'is-active' : ''}>
@@ -9811,6 +10041,22 @@ function WorkbenchAlarmPage({
                   <small>{index < 2 ? '已完成' : index === 2 ? '待研判' : '待流转'}</small>
                 </span>
               ))}
+            </section>
+
+            <section className="workspace-alarm-close-progress" aria-label="告警闭环进度">
+              <div>
+                <strong>25%</strong>
+                <span>处理中</span>
+                <small>预计完成：1h 35m</small>
+              </div>
+              <ol>
+                {workbenchAlarmProgressSteps.map((step) => (
+                  <li key={step.label} className={`is-${step.state}`}>
+                    <CheckCircle2 />
+                    {step.label}
+                  </li>
+                ))}
+              </ol>
             </section>
 
             <nav className="workspace-orders-tabs" aria-label="告警详情标签">
