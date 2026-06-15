@@ -152,9 +152,9 @@ test.describe('Workbench 正式入口浏览器回归', () => {
       {
         label: '数据监控',
         route: '/fixed-assets/workbench/analytics?menu=energy',
-        action: '查看数据链路',
-        dialogName: '查看数据链路',
-        targetIncludes: ['/energy?source=workbench&scope=data-monitoring'],
+        action: '刷新',
+        dialogName: '刷新数据链路',
+        targetIncludes: ['/energy?source=workbench&scope=data-monitoring&refresh=true'],
       },
       {
         label: '报表分析',
@@ -190,7 +190,7 @@ test.describe('Workbench 正式入口浏览器回归', () => {
       await page.goto(actionCase.route);
       await page.waitForLoadState('networkidle');
 
-      await page.getByLabel(`${actionCase.label}顶部操作`).getByRole('button', { name: actionCase.action }).click();
+      await page.getByLabel(`${actionCase.label}顶部操作`).getByRole('button', { name: actionCase.action, exact: true }).click();
       const dialog = page.getByRole('dialog', { name: actionCase.dialogName });
       await expect(dialog).toBeVisible();
       await expect(dialog.getByText('预填字段')).toBeVisible();
@@ -591,38 +591,43 @@ test.describe('Workbench 正式入口浏览器回归', () => {
     await expect(page.locator('.workspace-product-page')).toHaveCount(0);
     await expect(page.getByLabel('数据监控产品页主体').getByRole('heading', { name: '数据监控' })).toBeVisible();
     await expect(page.getByLabel('数据监控链路域')).toBeHidden();
-    await expect(page.getByLabel('数据监控页面分栏')).toContainText('采集链路');
+    await expect(page.getByLabel('数据监控页面分栏')).toContainText('数据链路总览');
+    await expect(page.getByLabel('数据监控页面分栏')).toContainText('数据源管理');
     await expect(page.getByLabel('数据监控页面分栏')).toContainText('数据事件');
-    await expect(page.getByLabel('数据监控核心指标')).toContainText('数据链路总览');
-    await expect(page.getByLabel('数据监控驾驶舱')).toContainText('采集健康趋势');
-    await expect(page.getByLabel('数据监控趋势图')).toContainText('98.6%');
-    await expect(page.getByLabel('数据源健康分布')).toContainText('MES 同步');
-    await expect(page.getByLabel('采集异常排行')).toContainText('GW-A01 采集延迟');
+    await expect(page.getByLabel('数据监控核心指标')).toContainText('数据链路状态');
+    await expect(page.getByLabel('数据监控核心指标')).toContainText('今日数据量');
+    await expect(page.getByLabel('数据监控驾驶舱')).toContainText('数据链路状态');
+    await expect(page.getByLabel('数据链路状态')).toContainText('IoT 连接层');
+    await expect(page.getByLabel('数据源健康 TOP5')).toContainText('设备运行数据源');
+    await expect(page.getByLabel('数据监控趋势图')).toContainText('4.3s');
     await expect(page.getByLabel('数据监控流程阶段')).toBeHidden();
-    await expect(page.getByLabel('数据监控顶部操作')).toContainText('重试采集任务');
-    await expect(page.getByLabel('数据监控查询筛选栏')).toContainText('处理时间');
-    await expect(page.getByLabel('数据监控列表')).toContainText('DATA-IOT-GW-A01');
-    await expect(page.getByLabel('数据监控详情抽屉')).toContainText('设备点位采集延迟');
-    await expect(page.getByLabel('数据监控详情标签')).toContainText('异常事件');
-    await expect(page.getByLabel('数据监控详情操作')).toContainText('重试任务');
+    await expect(page.getByLabel('数据监控顶部操作')).toContainText('订阅 / 导出');
+    await expect(page.getByLabel('数据监控顶部操作')).toContainText('自动刷新 30s');
+    await expect(page.getByLabel('数据监控查询筛选栏')).toContainText('2026-06-14');
+    await expect(page.getByLabel('数据监控列表')).toContainText('采集延迟超过阈值');
+    await expect(page.getByLabel('数据监控详情抽屉')).toContainText('采集延迟事件');
+    await expect(page.getByLabel('当前数据监控信息')).toContainText('EVT-20240614-0001');
+    await expect(page.getByLabel('数据监控详情抽屉')).toContainText('影响范围');
+    await expect(page.getByLabel('数据监控详情标签')).toContainText('趋势图');
+    await expect(page.getByLabel('数据监控详情操作')).toContainText('重试采集');
     await expect(page.locator('body')).not.toContainText('workbench-menu-energy-v1');
 
-    await page.getByLabel('数据监控顶部操作').getByRole('button', { name: '重试采集任务' }).click();
-    const retryDialog = page.getByRole('dialog', { name: '重试采集任务' });
-    await expect(retryDialog).toBeVisible();
-    await expect(retryDialog.locator('.workspace-action-route strong')).toContainText('retry=true');
+    await page.getByLabel('数据监控顶部操作').getByRole('button', { name: '刷新', exact: true }).click();
+    const refreshDialog = page.getByRole('dialog', { name: '刷新数据链路' });
+    await expect(refreshDialog).toBeVisible();
+    await expect(refreshDialog.locator('.workspace-action-route strong')).toContainText('refresh=true');
     await page.keyboard.press('Escape');
-    await expect(retryDialog).toHaveCount(0);
+    await expect(refreshDialog).toHaveCount(0);
 
-    await page.getByLabel('数据监控列表').getByRole('button', { name: 'DATA-MES-SYNC-08', exact: true }).click();
+    await page.getByLabel('数据监控列表').getByRole('button', { name: '2026-06-14 10:26:01', exact: true }).click();
     const detailDialog = page.getByRole('dialog', { name: '打开数据监控详情' });
     await expect(detailDialog).toBeVisible();
-    await expect(detailDialog.locator('.workspace-action-route strong')).toContainText('/energy/DATA-MES-SYNC-08?source=workbench&menu=energy');
+    await expect(detailDialog.locator('.workspace-action-route strong')).toContainText('/energy/EVT-20240614-0002?source=workbench&menu=energy');
     await page.keyboard.press('Escape');
     await expect(detailDialog).toHaveCount(0);
-    await expect(page.getByLabel('数据监控详情抽屉')).toContainText('工单状态与设备采集批次');
+    await expect(page.getByLabel('数据监控详情抽屉')).toContainText('能耗数据源');
 
-    await page.getByLabel('数据监控详情操作').getByRole('button', { name: '重试任务' }).click();
+    await page.getByLabel('数据监控详情操作').getByRole('button', { name: '重试采集' }).click();
     const detailRetryDialog = page.getByRole('dialog', { name: '重试采集任务' });
     await expect(detailRetryDialog).toBeVisible();
     await expect(detailRetryDialog.locator('.workspace-action-route strong')).toContainText('retry=true');

@@ -3615,12 +3615,12 @@ const workbenchHomeRightInsights = [
 ] as const;
 
 const workbenchEnergySummaryCards = [
-  { label: '数据链路总览', value: '98.6%', delta: 'MES/IoT 健康', icon: Activity, tone: 'green' },
-  { label: '数据源管理', value: '12', delta: '2 个异常', icon: Database, tone: 'blue' },
-  { label: '设备点位', value: '5,102', delta: '实时在线', icon: Server, tone: 'violet' },
-  { label: '采集任务', value: '7', delta: '自动补偿', icon: Zap, tone: 'orange' },
-  { label: '监控配置', value: '36', delta: '阈值规则', icon: Gauge, tone: 'cyan' },
-  { label: '数据事件', value: '32', delta: '未处理', icon: AlertTriangle, tone: 'red' },
+  { label: '数据链路状态', value: '良好', delta: '链路健康度 98.6%', icon: ShieldCheck, tone: 'green' },
+  { label: '接入系统', value: '12', delta: '正常 10 / 异常 2', icon: Database, tone: 'blue' },
+  { label: '设备点位', value: '18,920', delta: '在线 17,562', icon: Server, tone: 'violet' },
+  { label: '采集延迟', value: '0.8s', delta: 'P95 2.1s / P99 4.3s', icon: Activity, tone: 'cyan' },
+  { label: '异常事件', value: '32', delta: '未处理', icon: AlertTriangle, tone: 'red' },
+  { label: '今日数据量', value: '86.5GB', delta: '较昨日 +12.4%', icon: Gauge, tone: 'orange' },
 ] as const;
 
 const workbenchEnergyStages = [
@@ -3633,65 +3633,78 @@ const workbenchEnergyStages = [
 
 const workbenchEnergyRows = [
   {
-    id: 'DATA-IOT-GW-A01',
-    type: 'IoT 网关',
-    entity: 'GW-A01 采集链路',
-    location: '机加车间 / CNC 区域 A线',
-    title: '设备点位采集延迟高于 P95',
-    score: '2.1s',
-    status: '待重试',
-    timing: '10:24',
-    owner: '平台运维',
-    contextLabel: '1,256 点位',
-    tone: 'orange',
-  },
-  {
-    id: 'DATA-MES-SYNC-08',
-    type: 'MES 同步',
-    entity: 'MES 批次同步',
-    location: '制造一部',
-    title: '工单状态与设备采集批次已完成回写',
-    score: '99.2%',
-    status: '正常',
-    timing: '95ms',
-    owner: 'MES 接口',
-    contextLabel: '工单回写',
-    tone: 'green',
-  },
-  {
-    id: 'DATA-ALARM-STREAM',
-    type: '事件流',
-    entity: '告警事件流',
-    location: '安全态势',
-    title: '高危告警聚合后等待工单联动确认',
-    score: '32',
-    status: '待处理',
-    timing: '3.2h',
-    owner: '安全运营',
-    contextLabel: '告警中心',
+    id: 'EVT-20240614-0001',
+    type: '采集延迟',
+    entity: '设备运行数据源',
+    location: 'CN-301 等 124 台设备',
+    title: '采集延迟超过阈值，当前延迟 4.3s',
+    score: '高',
+    status: '未处理',
+    timing: '2026-06-14 10:28:42',
+    owner: '设备管理部',
+    contextLabel: '影响 12,560 个点位',
     tone: 'red',
   },
   {
-    id: 'DATA-RPT-SUB',
-    type: '指标服务',
-    entity: '经营报表订阅',
-    location: '报表分析',
-    title: '资产价值和维保成本指标已推送订阅任务',
-    score: '14',
-    status: '已推送',
-    timing: '今日',
-    owner: '财务部',
-    contextLabel: '报表订阅',
+    id: 'EVT-20240614-0002',
+    type: '数据缺失',
+    entity: '能耗数据源',
+    location: '能耗仪表 23 台',
+    title: '10:20 ~ 10:25 数据缺失 5 分钟',
+    score: '中',
+    status: '处理中',
+    timing: '2026-06-14 10:26:01',
+    owner: '能源管理部',
+    contextLabel: '持续 5 分钟',
+    tone: 'orange',
+  },
+  {
+    id: 'EVT-20240614-0003',
+    type: '连接断开',
+    entity: '视频事件数据源',
+    location: '网关 GW-210',
+    title: '与边缘网关连接断开',
+    score: '中',
+    status: '处理中',
+    timing: '2026-06-14 10:24:43',
+    owner: '安全运营',
+    contextLabel: '网关 GW-210',
+    tone: 'orange',
+  },
+  {
+    id: 'EVT-20240614-0004',
+    type: '写入延迟',
+    entity: '工单数据源',
+    location: '工单服务',
+    title: '数据写入延迟升高，P95 2.1s',
+    score: '低',
+    status: '已恢复',
+    timing: '2026-06-14 10:24:07',
+    owner: '工单服务',
+    contextLabel: 'P95 2.1s',
+    tone: 'green',
+  },
+  {
+    id: 'EVT-20240614-0005',
+    type: '采集延迟',
+    entity: '环境监测数据源',
+    location: '温湿度传感器 56 台',
+    title: '采集延迟 2.8s',
+    score: '低',
+    status: '待处理',
+    timing: '2026-06-14 10:23:19',
+    owner: '环境监测',
+    contextLabel: '温湿度 56 台',
     tone: 'blue',
   },
 ] as const;
 
-const workbenchEnergyDetailTabs = ['链路信息', '采集任务', '异常事件', '重试记录', '订阅导出'] as const;
+const workbenchEnergyDetailTabs = ['基本信息', '描述', '影响范围', '趋势图', '处理建议'] as const;
 
 const workbenchEnergyDomains = [
   {
     id: 'ingestion',
-    label: '采集链路',
+    label: '数据链路总览',
     value: '12',
     note: 'MES / IoT / PLC',
     icon: Activity,
@@ -3700,7 +3713,7 @@ const workbenchEnergyDomains = [
   },
   {
     id: 'quality',
-    label: '数据质量',
+    label: '数据源管理',
     value: '98.6%',
     note: '清洗 / 去重 / 回补',
     icon: Gauge,
@@ -3709,7 +3722,7 @@ const workbenchEnergyDomains = [
   },
   {
     id: 'events',
-    label: '异常事件',
+    label: '设备点位',
     value: '32',
     note: '待处理 / 待重试',
     icon: AlertTriangle,
@@ -3718,12 +3731,39 @@ const workbenchEnergyDomains = [
   },
   {
     id: 'service',
-    label: '指标服务',
+    label: '采集任务',
     value: '14',
     note: '订阅 / 导出 / API',
     icon: Database,
     route: '/energy?source=workbench&scope=data-monitoring&domain=service',
     children: ['报表订阅', '接口推送', '导出队列'],
+  },
+  {
+    id: 'monitor',
+    label: '监控配置',
+    value: '36',
+    note: '阈值 / 规则 / 告警',
+    icon: Gauge,
+    route: '/energy?source=workbench&scope=data-monitoring&domain=monitor',
+    children: ['阈值规则', '告警策略', '联动配置'],
+  },
+  {
+    id: 'subscribe',
+    label: '订阅管理',
+    value: '14',
+    note: '报表 / 导出 / 推送',
+    icon: Bell,
+    route: '/reports?source=workbench&view=data-monitoring&subscribe=true',
+    children: ['日报订阅', '异常推送', '导出历史'],
+  },
+  {
+    id: 'event',
+    label: '数据事件',
+    value: '32',
+    note: '未处理 / 处理中 / 已恢复',
+    icon: AlertTriangle,
+    route: '/energy?source=workbench&scope=data-monitoring&domain=event',
+    children: ['采集延迟', '数据缺失', '连接断开'],
   },
 ] as const;
 
@@ -3734,19 +3774,33 @@ const workbenchEnergyStateCards = [
 ] as const;
 
 const workbenchEnergyServiceCards = [
-  { label: '今日吞吐', value: '86.5GB', note: '批量 + 实时数据', tone: 'blue' },
-  { label: '回补任务', value: '7', note: '自动补偿中', tone: 'orange' },
-  { label: '订阅导出', value: '14', note: '服务在线', tone: 'green' },
-  { label: '告警联动', value: '32', note: '关联工单/告警', tone: 'red' },
+  { label: '数据源', value: '全部', note: '当前视图', tone: 'blue' },
+  { label: '状态', value: '全部', note: '事件状态', tone: 'green' },
+  { label: '时间', value: '今日', note: '2026-06-14', tone: 'orange' },
 ] as const;
 
 const workbenchEnergyTrendPoints = '0,94 72,72 144,76 216,48 288,54 360,34 432,42 504,24';
 
 const workbenchEnergySourceHealth = [
-  { label: 'MES 同步', value: '99.2%', percent: 99, note: '95ms', tone: 'green' },
-  { label: 'IoT 网关', value: '96.8%', percent: 97, note: '2.1s', tone: 'cyan' },
-  { label: 'PLC 点位', value: '94.6%', percent: 95, note: '1,256 点', tone: 'blue' },
-  { label: '事件流', value: '91.8%', percent: 92, note: '32 待处理', tone: 'orange' },
+  { label: '设备运行数据源', value: '99.2%', percent: 99, note: '链路健康', tone: 'green' },
+  { label: '环境监测数据源', value: '98.4%', percent: 98, note: '链路健康', tone: 'cyan' },
+  { label: '能耗数据源', value: '97.1%', percent: 97, note: '链路健康', tone: 'blue' },
+  { label: '工单数据源', value: '92.3%', percent: 92, note: '轻微延迟', tone: 'orange' },
+  { label: '视频事件数据源', value: '78.6%', percent: 79, note: '连接异常', tone: 'red' },
+] as const;
+
+const workbenchEnergyPipelineNodes: Array<{
+  label: string;
+  status: string;
+  delay: string;
+  note: string;
+  icon: LucideIcon;
+}> = [
+  { label: 'MES', status: '正常', delay: '延迟 0.4s', note: '吞吐 1,235 条/s', icon: Database },
+  { label: 'IoT 连接层', status: '正常', delay: '延迟 0.6s', note: '吞吐 2,856 条/s', icon: Activity },
+  { label: '数据采集层', status: '正常', delay: '延迟 0.8s', note: '吞吐 3,421 条/s', icon: Server },
+  { label: '时序存储', status: '正常', delay: '写入 18,920 点位', note: '延迟 1.2s', icon: Layers },
+  { label: '应用服务层', status: '正常', delay: '延迟 0.7s', note: '服务 8 项', icon: Box },
 ] as const;
 
 const workbenchEnergyExceptionRank = [
@@ -4140,9 +4194,9 @@ const workbenchEnergyConfig = buildWorkbenchCommandConfig(
   workbenchEnergyRows,
   workbenchEnergyDetailTabs,
   [
-    { label: '查看数据链路', actionIndex: 0, icon: Activity },
-    { label: '订阅异常报表', actionIndex: 1, icon: Bell },
-    { label: '重试采集任务', actionIndex: 2, icon: Zap, primary: true },
+    { label: '查看链路拓扑', actionIndex: 0, icon: Activity },
+    { label: '订阅 / 导出', actionIndex: 1, icon: Bell },
+    { label: '刷新数据链路', actionIndex: 2, icon: Zap, primary: true },
   ],
   {
     label: '处理',
@@ -4154,15 +4208,15 @@ const workbenchEnergyConfig = buildWorkbenchCommandConfig(
   },
   [
     {
-      label: '链路详情',
-      title: '查看数据链路',
-      route: (row) => `/energy?source=workbench&scope=data-monitoring&link=${encodeURIComponent(row.id)}`,
-      description: (row) => `查看 ${row.entity} 的采集延迟、质量分和异常流水。`,
-      primaryLabel: '进入链路',
-      icon: Activity,
+      label: '忽略',
+      title: '忽略数据事件',
+      route: (row) => `/energy?source=workbench&scope=data-monitoring&event=${encodeURIComponent(row.id)}&ignore=true`,
+      description: (row) => `忽略 ${row.entity} 的当前事件，保留审计记录和 Workbench 来源。`,
+      primaryLabel: '确认忽略',
+      icon: X,
     },
     {
-      label: '重试任务',
+      label: '重试采集',
       title: '重试采集任务',
       route: (row) => `/energy?source=workbench&scope=data-monitoring&event=${encodeURIComponent(row.id)}&retry=true`,
       description: (row) => `重试 ${row.entity}，保留事件和采集任务上下文。`,
@@ -4171,12 +4225,13 @@ const workbenchEnergyConfig = buildWorkbenchCommandConfig(
       primary: true,
     },
     {
-      label: '订阅报表',
-      title: '订阅异常报表',
-      route: () => '/reports?source=workbench&view=data-monitoring&subscribe=true',
-      description: () => '订阅数据监控异常报表，保留链路和事件筛选。',
-      primaryLabel: '进入订阅',
-      icon: BarChart3,
+      label: '创建工单',
+      title: '创建数据事件工单',
+      route: (row) =>
+        `/workorders/new?source=workbench&from=data-monitoring&event=${encodeURIComponent(row.id)}&priority=${encodeURIComponent(row.score)}`,
+      description: (row) => `为 ${row.entity} 创建数据事件处理工单，带入影响范围和处理建议。`,
+      primaryLabel: '创建工单',
+      icon: ClipboardList,
     },
   ],
 );
@@ -5498,7 +5553,7 @@ function WorkbenchEnergyPage({
   const { user } = useAuth();
   const [selectedDomain, setSelectedDomain] = useState<(typeof workbenchEnergyDomains)[number]['id']>('ingestion');
   const [selectedRowId, setSelectedRowId] = useState(workbenchEnergyRows[0].id);
-  const [detailTab, setDetailTab] = useState<(typeof workbenchEnergyDetailTabs)[number]>('链路信息');
+  const [detailTab, setDetailTab] = useState<(typeof workbenchEnergyDetailTabs)[number]>('基本信息');
   const selectedDomainMeta =
     workbenchEnergyDomains.find((domain) => domain.id === selectedDomain) ?? workbenchEnergyDomains[0];
   const selectedRow = workbenchEnergyRows.find((row) => row.id === selectedRowId) ?? workbenchEnergyRows[0];
@@ -5615,9 +5670,45 @@ function WorkbenchEnergyPage({
       <section className="workspace-energy-center" aria-label="数据监控产品页主体">
         <header className="workspace-energy-header">
           <div>
-            <span>业务操作台</span>
+            <span>数据监控</span>
             <h2>数据监控</h2>
-            <p>把 MES、IoT、设备点位和异常流水合并为可查询、可重试、可订阅的链路工作台。</p>
+            <p>实时掌握数据链路与资产数据质量</p>
+          </div>
+          <div className="workspace-energy-header-actions" aria-label="数据监控顶部操作">
+            <button type="button" onClick={() => runEnergyAction(1)}>
+              <Bell />
+              订阅 / 导出
+            </button>
+            <button
+              type="button"
+              onClick={() =>
+                openEnergyPreview(
+                  '刷新数据链路',
+                  '/energy?source=workbench&scope=data-monitoring&refresh=true',
+                  '刷新数据链路状态、异常事件和右侧事件详情。',
+                  '立即刷新',
+                  Activity,
+                )
+              }
+            >
+              <Activity />
+              刷新
+            </button>
+            <button
+              type="button"
+              onClick={() =>
+                openEnergyPreview(
+                  '自动刷新配置',
+                  '/energy?source=workbench&scope=data-monitoring&autoRefresh=30s',
+                  '设置自动刷新 30s，保留数据监控来源和当前筛选条件。',
+                  '自动刷新',
+                  Gauge,
+                )
+              }
+            >
+              自动刷新 30s
+              <ChevronDown />
+            </button>
           </div>
         </header>
         <nav className="workspace-energy-section-tabs" aria-label="数据监控页面分栏">
@@ -5640,70 +5731,7 @@ function WorkbenchEnergyPage({
               {domain.label}
             </button>
           ))}
-          {['设备点位', '采集任务', '订阅管理', '数据事件'].map((tab) => (
-            <button
-              key={tab}
-              type="button"
-              onClick={() =>
-                openEnergyPreview(
-                  `${tab}视图`,
-                  `/energy?source=workbench&scope=data-monitoring&view=${encodeURIComponent(tab)}`,
-                  `进入 ${tab}，保留数据监控上下文。`,
-                  '打开视图',
-                  Database,
-                )
-              }
-            >
-              {tab}
-            </button>
-          ))}
         </nav>
-        <div className="workspace-energy-toolbar workspace-orders-toolbar" aria-label="数据监控顶部操作">
-          <button type="button" onClick={() => runEnergyAction(0)}>
-            <Activity />
-            查看数据链路
-          </button>
-          <button
-            type="button"
-            disabled={!canOpenReports}
-            onClick={() =>
-              canOpenReports
-                ? runEnergyAction(1)
-                : openEnergyPreview(
-                    '订阅异常报表',
-                    '/reports?source=workbench&view=data-monitoring&subscribe=true',
-                    '当前账号暂无报表订阅权限，可先查看链路详情或发起权限申请。',
-                    '暂无权限',
-                    BarChart3,
-                  )
-            }
-          >
-            <Bell />
-            {canOpenReports ? '订阅异常报表' : '订阅受限'}
-          </button>
-          <button type="button" className="is-primary" onClick={() => runEnergyAction(2)}>
-            <Zap />
-            重试采集任务
-          </button>
-        </div>
-
-        <section className="workspace-energy-visual" aria-label="数据监控链路拓扑">
-          <div>
-            <span>实时链路拓扑</span>
-            <strong>MES / IoT / 设备点位</strong>
-            <p>左侧选择链路域，右侧事件队列保留对应系统、点位、延迟、责任方和重试意图。</p>
-          </div>
-          <div className="workspace-data-visual">
-            <span className="workspace-data-scanline" />
-            <img src={meta.imageSrc} alt="数据监控链路拓扑" />
-            <article className="workspace-data-live-card">
-              <span>链路健康度</span>
-              <strong>98.6%</strong>
-              <i />
-              <small>P95 延迟 2.1s</small>
-            </article>
-          </div>
-        </section>
 
         <div className="workspace-energy-kpis" aria-label="数据监控核心指标">
           {workbenchEnergySummaryCards.map((card) => {
@@ -5733,49 +5761,74 @@ function WorkbenchEnergyPage({
         </div>
 
         <section className="workspace-energy-monitor-grid" aria-label="数据监控驾驶舱">
-          <article className="workspace-energy-trend-card" aria-label="数据监控趋势图">
+          <article className="workspace-energy-pipeline-card" aria-label="数据链路状态">
             <header>
-              <span>采集健康趋势</span>
-              <strong>98.6%</strong>
-            </header>
-            <svg viewBox="0 0 504 118" role="img" aria-label="数据监控采集健康趋势折线">
-              <defs>
-                <linearGradient id="energyTrendFill" x1="0" x2="0" y1="0" y2="1">
-                  <stop offset="0%" stopColor="#10a7bd" stopOpacity=".24" />
-                  <stop offset="100%" stopColor="#10a7bd" stopOpacity="0" />
-                </linearGradient>
-              </defs>
-              <path d={`M ${workbenchEnergyTrendPoints} L 504 118 L 0 118 Z`} fill="url(#energyTrendFill)" />
-              <polyline points={workbenchEnergyTrendPoints} fill="none" stroke="#0c8da6" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
-              <g>
-                <circle cx="360" cy="34" r="5" fill="#0c8da6" />
-                <circle cx="504" cy="24" r="5" fill="#176de8" />
-              </g>
-            </svg>
-            <footer>
-              <span>08:00</span>
-              <span>12:00</span>
-              <span>16:00</span>
-              <span>当前</span>
-            </footer>
-          </article>
-
-          <article className="workspace-energy-health-card" aria-label="数据源健康分布">
-            <header>
-              <span>数据源健康分布</span>
+              <span>数据链路状态</span>
               <button
                 type="button"
                 onClick={() =>
                   openEnergyPreview(
-                    '查看数据源健康',
+                    '查看链路拓扑',
+                    '/energy?source=workbench&scope=data-monitoring&topology=true',
+                    '查看 MES、IoT、数据采集层、时序存储和应用服务层的链路拓扑。',
+                    '查看拓扑',
+                    Activity,
+                  )
+                }
+              >
+                查看链路拓扑
+              </button>
+            </header>
+            <div className="workspace-energy-pipeline">
+              {workbenchEnergyPipelineNodes.map((node, index) => {
+                const PipelineIcon = node.icon;
+                return (
+                  <button
+                    key={node.label}
+                    type="button"
+                    className={index === 4 ? 'is-last' : ''}
+                    onClick={() =>
+                      openEnergyPreview(
+                        `${node.label}链路详情`,
+                        `/energy?source=workbench&scope=data-monitoring&node=${encodeURIComponent(node.label)}`,
+                        `打开 ${node.label} 的状态、延迟和吞吐详情。`,
+                        '进入链路',
+                        PipelineIcon,
+                      )
+                    }
+                  >
+                    <span>{node.label}</span>
+                    <PipelineIcon />
+                    <strong>{node.status}</strong>
+                    <small>{node.delay}</small>
+                    <small>{node.note}</small>
+                  </button>
+                );
+              })}
+            </div>
+            <footer>
+              <span><i /> 正常</span>
+              <span><i /> 警告</span>
+              <span><i /> 异常</span>
+            </footer>
+          </article>
+
+          <article className="workspace-energy-health-card" aria-label="数据源健康 TOP5">
+            <header>
+              <span>数据源健康度 TOP5</span>
+              <button
+                type="button"
+                onClick={() =>
+                  openEnergyPreview(
+                    '查看全部数据源',
                     '/energy?source=workbench&scope=data-monitoring&view=source-health',
-                    '查看 MES、IoT、PLC 和事件流的健康度、延迟与补偿状态。',
-                    '查看健康分布',
+                    '查看全部数据源的健康度、延迟和异常事件。',
+                    '查看全部',
                     Database,
                   )
                 }
               >
-                查看
+                全部
               </button>
             </header>
             <div>
@@ -5788,7 +5841,7 @@ function WorkbenchEnergyPage({
                     openEnergyPreview(
                       `${source.label}健康详情`,
                       `/energy?source=workbench&scope=data-monitoring&source=${encodeURIComponent(source.label)}`,
-                      `下钻 ${source.label}，带入健康度 ${source.value} 和当前延迟 ${source.note}。`,
+                      `下钻 ${source.label}，带入健康度 ${source.value} 和当前状态 ${source.note}。`,
                       '打开来源',
                       Database,
                     )
@@ -5798,41 +5851,13 @@ function WorkbenchEnergyPage({
                     <strong>{source.label}</strong>
                     <small>{source.note}</small>
                   </span>
-                  <em>{source.value}</em>
                   <i style={{ '--source-health-width': `${source.percent}%` } as CSSProperties} />
+                  <em>{source.value}</em>
                 </button>
               ))}
             </div>
           </article>
 
-          <article className="workspace-energy-rank-card" aria-label="采集异常排行">
-            <header>
-              <span>采集异常排行</span>
-              <strong>32 待处理</strong>
-            </header>
-            {workbenchEnergyExceptionRank.map((event) => (
-              <button
-                key={event.label}
-                type="button"
-                className={`is-${event.tone}`}
-                onClick={() =>
-                  openEnergyPreview(
-                    `${event.label}处理`,
-                    `/energy?source=workbench&scope=data-monitoring&exception=${encodeURIComponent(event.label)}`,
-                    `进入 ${event.label} 异常队列，保留数据监控来源和处理上下文。`,
-                    '处理异常',
-                    AlertTriangle,
-                  )
-                }
-              >
-                <span>
-                  <strong>{event.label}</strong>
-                  <small>{event.note}</small>
-                </span>
-                <b>{event.value}</b>
-              </button>
-            ))}
-          </article>
         </section>
 
         <div className="workspace-energy-stage-row" aria-label="数据监控流程阶段">
@@ -5859,41 +5884,41 @@ function WorkbenchEnergyPage({
         </div>
 
         <div className="workspace-energy-filterbar" aria-label="数据监控查询筛选栏">
-          <label>
-            <Search />
-            <input readOnly value="搜索链路编号 / 系统源 / 点位 / 责任方" aria-label="数据监控搜索" />
-          </label>
-          {['链路 全部', '状态 全部', '责任方 全部'].map((filter) => (
+          {['数据源 全部', '状态 全部'].map((filter) => (
             <button
               key={filter}
               type="button"
               onClick={() =>
                 openEnergyPreview(
-                  '筛选数据监控',
+                  '筛选数据事件',
                   `/energy?source=workbench&scope=data-monitoring&filter=${encodeURIComponent(filter)}`,
-                  `按 ${filter} 筛选数据监控事件，保留当前链路域。`,
+                  `按 ${filter} 筛选数据事件，保留当前时间范围。`,
                   '打开筛选',
                   SlidersHorizontal,
                 )
               }
             >
               {filter}
-              <ArrowRight />
+              <ChevronDown />
             </button>
           ))}
+          <label>
+            <Search />
+            <input readOnly value="搜索数据源名称 / 编码" aria-label="数据监控搜索" />
+          </label>
           <button
             type="button"
             onClick={() =>
               openEnergyPreview(
                 '数据监控时间筛选',
-                '/energy?source=workbench&scope=data-monitoring&date=today',
+                '/energy?source=workbench&scope=data-monitoring&date=2026-06-14',
                 '查看今日采集任务和异常事件，保留当前链路域。',
                 '查看今日',
                 CalendarDays,
               )
             }
           >
-            处理时间
+            2026-06-14 00:00 ~ 2026-06-14 23:59
             <CalendarDays />
           </button>
           <button
@@ -5915,14 +5940,13 @@ function WorkbenchEnergyPage({
 
         <div className="workspace-energy-table" aria-label="数据监控列表">
           <div className="workspace-energy-table-head">
-            <span>链路编号</span>
-            <span>来源类型</span>
-            <span>监控对象</span>
-            <span>业务事件</span>
-            <span>质量/延迟</span>
+            <span>时间</span>
+            <span>级别</span>
+            <span>数据源</span>
+            <span>事件类型</span>
+            <span>描述</span>
+            <span>影响范围</span>
             <span>状态</span>
-            <span>责任方</span>
-            <span>上下文</span>
             <span>操作</span>
           </div>
           {workbenchEnergyRows.map((row) => (
@@ -5930,17 +5954,13 @@ function WorkbenchEnergyPage({
               key={row.id}
               className={`workspace-energy-table-row is-${row.tone} ${row.id === selectedRow.id ? 'is-selected' : ''}`}
             >
-              <button type="button" className="is-link" onClick={() => openEnergyEvent(row)}>{row.id}</button>
-              <span><em>{row.type}</em></span>
-              <span>
-                <strong>{row.entity}</strong>
-                <small>{row.location}</small>
-              </span>
-              <button type="button" className="is-title" onClick={() => openEnergyEvent(row)}>{row.title}</button>
+              <button type="button" className="is-link" onClick={() => openEnergyEvent(row)}>{row.timing}</button>
               <span><b>{row.score}</b></span>
+              <span>{row.entity}</span>
+              <span>{row.type}</span>
+              <button type="button" className="is-title" onClick={() => openEnergyEvent(row)}>{row.title}</button>
+              <span>{row.location}</span>
               <span><i>{row.status}</i></span>
-              <span>{row.owner}</span>
-              <span><em>{row.contextLabel}</em></span>
               <span>
                 <button
                   type="button"
@@ -5959,53 +5979,76 @@ function WorkbenchEnergyPage({
               </span>
             </div>
           ))}
+          <footer className="workspace-energy-table-footer" aria-label="数据监控分页">
+            <span>共 32 条</span>
+            <div>
+              <button type="button">10条/页</button>
+              <button type="button" aria-label="上一页">‹</button>
+              <button type="button" className="is-active">1</button>
+              <button type="button">2</button>
+              <button type="button">3</button>
+              <button type="button" aria-label="下一页">›</button>
+              <span>跳至</span>
+              <button type="button">1</button>
+              <span>页</span>
+            </div>
+          </footer>
         </div>
       </section>
 
       <aside className="workspace-energy-detail" aria-label="数据监控详情抽屉">
         <header>
-          <strong>数据链路详情</strong>
+          <strong>事件详情</strong>
           <span>{selectedRow.status}</span>
         </header>
         <section className="workspace-energy-detail-card" aria-label="当前数据监控信息">
           <b>{selectedRow.score}</b>
           <div>
-            <span>{selectedRow.id}</span>
-            <h3>{selectedRow.title}</h3>
-            <p>{selectedRow.entity} · {selectedRow.location}</p>
+            <span>{selectedRow.type}事件</span>
+            <h3>{selectedRow.type}事件</h3>
+            <p>{selectedRow.title}</p>
           </div>
           <dl>
-            <div><dt>来源类型</dt><dd>{selectedRow.type}</dd></div>
-            <div><dt>责任方</dt><dd>{selectedRow.owner}</dd></div>
-            <div><dt>采集质量</dt><dd>{selectedRow.score}</dd></div>
-            <div><dt>采集时效</dt><dd>{selectedRow.timing}</dd></div>
-            <div><dt>上下文</dt><dd>{selectedRow.contextLabel}</dd></div>
+            <div><dt>事件编号</dt><dd>{selectedRow.id}</dd></div>
+            <div><dt>发生时间</dt><dd>{selectedRow.timing}</dd></div>
+            <div><dt>数据源</dt><dd>{selectedRow.entity}</dd></div>
+            <div><dt>事件类型</dt><dd>{selectedRow.type}</dd></div>
+            <div><dt>级别</dt><dd>{selectedRow.score}</dd></div>
             <div><dt>状态</dt><dd>{selectedRow.status}</dd></div>
           </dl>
         </section>
 
         <section className="workspace-energy-service-cards" aria-label="数据监控服务摘要">
-          {workbenchEnergyServiceCards.map((card) => (
-            <article key={card.label} className={`is-${card.tone}`}>
-              <span>{card.label}</span>
-              <strong>{card.value}</strong>
-              <small>{card.note}</small>
-            </article>
-          ))}
+          <article className="is-blue">
+            <span>影响范围</span>
+            <strong>{selectedRow.location}</strong>
+            <small>{selectedRow.contextLabel}</small>
+          </article>
         </section>
 
-        <section className="workspace-energy-event-flow" aria-label="数据监控异常流水">
-          {[
-            ['采集任务', selectedRow.type, '已带入'],
-            ['异常事件', selectedRow.status, selectedRow.tone === 'green' ? '正常' : '需处理'],
-            ['重试记录', selectedRow.timing, '可回溯'],
-          ].map(([label, value, status]) => (
-            <article key={label}>
-              <span>{label}</span>
-              <strong>{value}</strong>
-              <small>{status}</small>
-            </article>
-          ))}
+        <section className="workspace-energy-trend-card workspace-energy-detail-trend" aria-label="数据监控趋势图">
+          <header>
+            <span>趋势图（延迟秒）</span>
+            <strong>4.3s</strong>
+          </header>
+          <svg viewBox="0 0 504 118" role="img" aria-label="数据监控采集健康趋势折线">
+            <defs>
+              <linearGradient id="energyTrendFillDetail" x1="0" x2="0" y1="0" y2="1">
+                <stop offset="0%" stopColor="#176de8" stopOpacity=".2" />
+                <stop offset="100%" stopColor="#176de8" stopOpacity="0" />
+              </linearGradient>
+            </defs>
+            <path d={`M ${workbenchEnergyTrendPoints} L 504 118 L 0 118 Z`} fill="url(#energyTrendFillDetail)" />
+            <polyline points={workbenchEnergyTrendPoints} fill="none" stroke="#176de8" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+            <line x1="0" x2="504" y1="62" y2="62" stroke="#ef4444" strokeDasharray="8 8" strokeWidth="2" />
+            <circle cx="504" cy="24" r="5" fill="#176de8" />
+          </svg>
+          <footer>
+            <span>09:58</span>
+            <span>10:08</span>
+            <span>10:18</span>
+            <span>10:28</span>
+          </footer>
         </section>
 
         <nav className="workspace-energy-tabs" aria-label="数据监控详情标签">
@@ -6023,16 +6066,12 @@ function WorkbenchEnergyPage({
 
         <section className="workspace-energy-tab-panel" aria-label={`${detailTab}内容`}>
           <article>
-            <span>事件摘要</span>
-            <p>{selectedRow.title}，当前状态为 {selectedRow.status}，上下文为 {selectedRow.contextLabel}。</p>
+            <span>描述</span>
+            <p>{selectedRow.title}，影响资产数据时效性，当前状态为 {selectedRow.status}。</p>
           </article>
           <article>
-            <span>预填上下文</span>
-            <ul>
-              <li>{selectedRow.entity} <b>已带入</b></li>
-              <li>{selectedRow.location} <b>已定位</b></li>
-              <li>{selectedRow.owner} <b className="is-warning">需确认</b></li>
-            </ul>
+            <span>处理建议</span>
+            <p>1. 检查边缘网关网络状态；2. 确认设备上报频率是否异常；3. 必要时重启采集任务。</p>
           </article>
         </section>
 
@@ -6049,59 +6088,59 @@ function WorkbenchEnergyPage({
             type="button"
             onClick={() =>
               openEnergyPreview(
-                '查看数据链路',
-                `/energy?source=workbench&scope=data-monitoring&link=${encodeURIComponent(selectedRow.id)}`,
-                `查看 ${selectedRow.entity} 的采集延迟、质量分和异常流水。`,
-                '进入链路',
-                Activity,
+                '忽略数据事件',
+                `/energy?source=workbench&scope=data-monitoring&event=${encodeURIComponent(selectedRow.id)}&ignore=true`,
+                `忽略 ${selectedRow.entity} 的当前事件，保留审计记录和 Workbench 来源。`,
+                '确认忽略',
+                X,
               )
             }
           >
-            链路详情
+            忽略
           </button>
           <button
             type="button"
             onClick={() =>
               openEnergyPreview(
-                '重试采集任务',
-                `/energy?source=workbench&scope=data-monitoring&event=${encodeURIComponent(selectedRow.id)}&retry=true`,
-                `重试 ${selectedRow.entity}，保留事件、责任方和采集任务上下文。`,
-                '重试采集',
-                Zap,
+                '稍后处理数据事件',
+                `/energy?source=workbench&scope=data-monitoring&event=${encodeURIComponent(selectedRow.id)}&snooze=true`,
+                `将 ${selectedRow.entity} 的当前事件稍后处理，保留提醒和责任人上下文。`,
+                '稍后处理',
+                CalendarDays,
               )
             }
           >
-            重试任务
+            稍后处理
           </button>
           <button
             type="button"
             disabled={!canOpenReports}
             onClick={() =>
               openEnergyPreview(
-                '订阅异常报表',
-                '/reports?source=workbench&view=data-monitoring&subscribe=true',
-                '订阅数据监控异常报表，保留链路和事件筛选。',
-                canOpenReports ? '进入订阅' : '暂无权限',
-                BarChart3,
+                '重试采集任务',
+                `/energy?source=workbench&scope=data-monitoring&event=${encodeURIComponent(selectedRow.id)}&retry=true`,
+                `重试 ${selectedRow.entity}，保留事件、责任方和采集任务上下文。`,
+                canOpenReports ? '重试采集' : '暂无权限',
+                Zap,
               )
             }
           >
-            订阅报表
+            重试采集
           </button>
           <button
             type="button"
             className="is-primary"
             onClick={() =>
               openEnergyPreview(
-                '申请数据权限',
-                `/approvals/new?source=workbench&type=data-monitoring&event=${encodeURIComponent(selectedRow.id)}`,
-                `为 ${selectedRow.entity} 发起数据监控权限申请，带入链路和异常事件上下文。`,
-                '发起申请',
+                '创建数据事件工单',
+                `/workorders/new?source=workbench&from=data-monitoring&event=${encodeURIComponent(selectedRow.id)}&priority=${encodeURIComponent(selectedRow.score)}`,
+                `为 ${selectedRow.entity} 创建数据事件处理工单，带入影响范围和处理建议。`,
+                '创建工单',
                 ClipboardList,
               )
             }
           >
-            申请权限
+            创建工单
           </button>
         </footer>
       </aside>
