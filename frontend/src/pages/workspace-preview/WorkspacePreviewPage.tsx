@@ -3240,6 +3240,42 @@ const workbenchSparesRows = [
     owner: '采购员',
     tone: 'red',
   },
+  {
+    id: 'SP-HY-010',
+    category: '液压件',
+    part: '液压油滤芯 HY-010',
+    stock: '8',
+    state: '低储预警',
+    supplier: '贺德克',
+    workOrder: 'WO-20240614-0009',
+    eta: '2026-06-19',
+    owner: '维保员',
+    tone: 'orange',
+  },
+  {
+    id: 'SP-M12-30',
+    category: '紧固件',
+    part: '紧固螺栓 M12×30',
+    stock: '120',
+    state: '正常',
+    supplier: '标准件库',
+    workOrder: '—',
+    eta: '—',
+    owner: '仓库员',
+    tone: 'green',
+  },
+  {
+    id: 'SP-PR08-2DN',
+    category: '传感器',
+    part: '传感器 PR08-2DN',
+    stock: '2',
+    state: '低储预警',
+    supplier: '欧姆龙',
+    workOrder: 'WO-20240614-0012',
+    eta: '2026-06-21',
+    owner: '采购员',
+    tone: 'orange',
+  },
 ] as const;
 
 const workbenchSparesDetailTabs = ['备件信息', '库存流水', '供应商 ETA', '关联工单', '成本回写'] as const;
@@ -7337,6 +7373,58 @@ function WorkbenchSparesPage({
             </button>
             <button type="button" className="is-reset" onClick={() => onPreviewAction(stockAction)}>
               重置
+            </button>
+          </div>
+
+          <div className="workspace-spares-action-strip" aria-label="备件管理批量操作">
+            <button type="button" className="is-primary" onClick={() => onPreviewAction(requestAction)}>
+              <PackageCheck />
+              申请备件
+            </button>
+            <button type="button" onClick={() => onPreviewAction(purchaseAction)}>
+              <Archive />
+              采购申请
+            </button>
+            <button
+              type="button"
+              onClick={() =>
+                openSparesPreview(
+                  '领用出库',
+                  '/spare-parts/issue/new?source=workbench&mode=issue',
+                  `从 Workbench 备件管理发起领用出库，预填 ${selectedSpare.part}、库存 ${selectedSpare.stock} 和关联工单 ${selectedSpare.workOrder}。`,
+                  '领用出库',
+                  Box,
+                )
+              }
+            >
+              <Box />
+              领用出库
+            </button>
+            <button type="button" disabled>
+              <Database />
+              批量归集成本
+            </button>
+            <button
+              type="button"
+              onClick={() =>
+                openSparesPreview(
+                  '导出备件清单',
+                  '/spare-parts/export?source=workbench&scope=spares',
+                  '导出当前筛选下的备件库存、采购、领用和成本回写数据。',
+                  '导出',
+                  FileText,
+                )
+              }
+            >
+              <FileText />
+              导出
+            </button>
+            <button type="button" className="is-filter" onClick={() => onPreviewAction(stockAction)}>
+              <SlidersHorizontal />
+              高级筛选
+            </button>
+            <button type="button" className="is-icon" aria-label="备件字段设置" onClick={() => onPreviewAction(stockAction)}>
+              <Settings />
             </button>
           </div>
 

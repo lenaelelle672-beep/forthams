@@ -246,6 +246,12 @@ test.describe('Workbench 正式入口浏览器回归', () => {
       } else {
         await expect(page.locator('.workspace-orders-table')).toBeVisible();
       }
+
+      if (pageLabel === '备件管理') {
+        await expect(page.getByLabel('备件管理批量操作')).toBeVisible();
+        await expect(page.getByLabel('备件保障流程')).toBeHidden();
+        await expect(page.locator('.workspace-orders-table-row')).toHaveCount(8);
+      }
     }
 
     await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
