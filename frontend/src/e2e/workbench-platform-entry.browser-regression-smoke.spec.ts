@@ -174,9 +174,9 @@ test.describe('Workbench 正式入口浏览器回归', () => {
       {
         label: '组织策略',
         route: '/fixed-assets/workbench/security?menu=policy',
-        action: '查看策略规则',
-        dialogName: '查看策略规则',
-        targetIncludes: ['/risk-matrix?source=workbench&scope=policy'],
+        action: '导出',
+        dialogName: '导出组织策略',
+        targetIncludes: ['/risk-matrix?source=workbench&scope=policy&export=rules'],
       },
       {
         label: '基础维护',
@@ -788,25 +788,26 @@ test.describe('Workbench 正式入口浏览器回归', () => {
     await expect(page.getByLabel('组织策略规则标签')).toContainText('风险规则');
     await expect(page.getByLabel('组织策略规则标签')).toContainText('角色策略');
     await expect(page.getByLabel('组织策略规则标签')).toContainText('审批边界');
-    await expect(page.getByLabel('组织策略顶部操作')).toContainText('新建风险评估');
-    await expect(page.getByLabel('组织策略查询筛选栏')).toContainText('空态预览');
-    await expect(page.getByLabel('组织策略规则列表')).toContainText('POL-RISK-PORT-001');
-    await expect(page.getByLabel('组织策略规则列表')).toContainText('开放高危端口');
-    await expect(page.getByLabel('组织策略规则列表')).toContainText('命中次数');
+    await expect(page.getByLabel('组织策略顶部操作')).toContainText('新建规则');
+    await expect(page.getByLabel('组织策略查询筛选栏')).toContainText('查询');
+    await expect(page.getByLabel('组织策略查询筛选栏')).toContainText('重置');
+    await expect(page.getByLabel('组织策略规则列表')).toContainText('RR-2024-00068');
+    await expect(page.getByLabel('组织策略规则列表')).toContainText('设备停机超过阈值');
+    await expect(page.getByLabel('组织策略规则列表')).toContainText('命中次数（近7天）');
     await expect(page.getByLabel('组织策略规则列表')).toContainText('查看');
-    await expect(page.getByLabel('组织策略详情抽屉')).toContainText('端口暴露命中高危策略');
-    await expect(page.getByLabel('当前组织策略规则信息')).toContainText('角色策略');
-    await expect(page.getByLabel('角色策略矩阵')).toContainText('安全运营');
-    await expect(page.getByLabel('审批边界')).toContainText('高危安全复核');
-    await expect(page.getByLabel('策略命中样本')).toContainText('ALM-20240614-0012');
-    await expect(page.getByLabel('组织策略详情标签')).toContainText('审批边界');
-    await expect(page.getByLabel('策略权限申请')).toContainText('风险评估权限受限');
-    await expect(page.getByLabel('组织策略详情操作')).toContainText('新建评估');
-    await expect(page.getByLabel('组织策略详情操作')).toContainText('权限申请');
+    await expect(page.getByLabel('组织策略详情抽屉')).toContainText('设备停机超过阈值');
+    await expect(page.getByLabel('当前组织策略规则信息')).toContainText('2026-06-14 10:20');
+    await expect(page.getByLabel('适用范围')).toContainText('关键设备，生产设备');
+    await expect(page.getByLabel('审批策略')).toContainText('三级审批');
+    await expect(page.getByLabel('策略命中趋势')).toContainText('32 次');
+    await expect(page.getByLabel('组织策略详情标签')).toContainText('触发条件');
+    await expect(page.getByLabel('策略权限申请')).toContainText('高危规则变更需通过审批流程');
+    await expect(page.getByLabel('组织策略详情操作')).toContainText('编辑规则');
+    await expect(page.getByLabel('组织策略详情操作')).toContainText('发起复核');
     await expect(page.locator('body')).not.toContainText('workbench-menu-policy-v1');
 
-    await page.getByLabel('组织策略顶部操作').getByRole('button', { name: '新建风险评估' }).click();
-    const createDialog = page.getByRole('dialog', { name: '新建风险评估' });
+    await page.getByLabel('组织策略顶部操作').getByRole('button', { name: '新建规则' }).click();
+    const createDialog = page.getByRole('dialog', { name: '新建规则' });
     await expect(createDialog).toBeVisible();
     await expect(createDialog.locator('.workspace-action-route strong')).toContainText('/risk-assessments/new?source=workbench&scope=policy');
     await expect(createDialog.getByRole('status')).toContainText('当前账号缺少访问该业务页面的权限');
@@ -814,14 +815,14 @@ test.describe('Workbench 正式入口浏览器回归', () => {
     await page.keyboard.press('Escape');
     await expect(createDialog).toHaveCount(0);
 
-    await page.getByRole('button', { name: 'POL-MAINT-SLA-008', exact: true }).click();
+    await page.getByRole('button', { name: 'RR-2024-00065', exact: true }).click();
     const detailDialog = page.getByRole('dialog', { name: '打开组织策略详情' });
     await expect(detailDialog).toBeVisible();
-    await expect(detailDialog.locator('.workspace-action-route strong')).toContainText('/risk-matrix?source=workbench&scope=policy&rule=POL-MAINT-SLA-008');
+    await expect(detailDialog.locator('.workspace-action-route strong')).toContainText('/risk-matrix?source=workbench&scope=policy&rule=RR-2024-00065');
     await page.keyboard.press('Escape');
     await expect(detailDialog).toHaveCount(0);
-    await expect(page.getByLabel('组织策略详情抽屉')).toContainText('逾期维保自动转工单');
-    await expect(page.getByLabel('当前组织策略规则信息')).toContainText('预测维保工单逾期 24h');
+    await expect(page.getByLabel('组织策略详情抽屉')).toContainText('工单超期未处理');
+    await expect(page.getByLabel('当前组织策略规则信息')).toContainText('超期时长 > 2 小时');
 
     await page.getByLabel('组织策略详情操作').getByRole('button', { name: '停用规则' }).click();
     const dangerDialog = page.getByRole('dialog', { name: '停用策略规则' });
@@ -830,7 +831,7 @@ test.describe('Workbench 正式入口浏览器回归', () => {
     await page.keyboard.press('Escape');
     await expect(dangerDialog).toHaveCount(0);
 
-    await page.getByLabel('组织策略详情操作').getByRole('button', { name: '权限申请' }).click();
+    await page.getByLabel('策略权限申请').getByRole('button', { name: '申请权限' }).click();
     const applyDialog = page.getByRole('dialog', { name: '申请策略权限' });
     await expect(applyDialog).toBeVisible();
     await expect(applyDialog.locator('.workspace-action-route strong')).toContainText('/approvals/new?source=workbench&type=policy');
