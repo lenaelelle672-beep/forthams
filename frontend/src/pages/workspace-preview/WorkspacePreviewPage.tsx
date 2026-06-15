@@ -3552,6 +3552,24 @@ const workbenchHomeSignals = [
   { label: '维保预警', value: '5', note: '2h 内到期', tone: 'red' },
 ] as const;
 
+const workbenchHomeInsightCards = [
+  { label: '流程待办', value: '18', note: '待审批 9 / 待派工 6', tone: 'orange', route: '/approvals?source=workbench&status=PENDING' },
+  { label: '最近工单', value: '42', note: '今日派工 24 / 闭环 18', tone: 'blue', route: '/workorders?source=workbench&view=recent' },
+  { label: '维保预警', value: '5', note: '2h 内到期 3 / P1 2', tone: 'red', route: '/workorders?source=workbench&view=predictive' },
+] as const;
+
+const workbenchHomeHealthRings = [
+  { label: '资产在线率', value: '98.6%', percent: 98.6, color: '#176de8' },
+  { label: '工单闭环率', value: '91.8%', percent: 91.8, color: '#0d9a6a' },
+  { label: '预警收敛率', value: '76.4%', percent: 76.4, color: '#f08a20' },
+] as const;
+
+const workbenchHomeRightInsights = [
+  { label: '今日运营洞察', value: 'CN-301 振动异常优先派工', tone: 'red' },
+  { label: '价值趋势', value: '资产净值较上期 +3.42%', tone: 'green' },
+  { label: '常用报表', value: '资产价值、部门统计、维保成本', tone: 'blue' },
+] as const;
+
 const workbenchEnergySummaryCards = [
   { label: '数据链路总览', value: '98.6%', delta: 'MES/IoT 健康', icon: Activity, tone: 'green' },
   { label: '数据源管理', value: '12', delta: '2 个异常', icon: Database, tone: 'blue' },
@@ -4889,6 +4907,29 @@ function WorkbenchHomePage({
           ))}
         </div>
 
+        <section className="workspace-home-dashboard-grid" aria-label="运营首页洞察看板">
+          {workbenchHomeInsightCards.map((card) => (
+            <button
+              key={card.label}
+              type="button"
+              className={`is-${card.tone}`}
+              onClick={() =>
+                openHomePreview(
+                  `${card.label}洞察`,
+                  card.route,
+                  `进入 ${card.label}，保留运营首页筛选和资产运营中枢来源。`,
+                  '打开洞察',
+                  card.label === '流程待办' ? ClipboardList : card.label === '最近工单' ? Wrench : AlertTriangle,
+                )
+              }
+            >
+              <span>{card.label}</span>
+              <strong>{card.value}</strong>
+              <small>{card.note}</small>
+            </button>
+          ))}
+        </section>
+
         <div className="workspace-home-stage-row" aria-label="运营首页流程阶段">
           {workbenchHomeStages.map((stage) => (
             <button
@@ -4940,6 +4981,29 @@ function WorkbenchHomePage({
               </button>
             );
           })}
+        </section>
+
+        <section className="workspace-home-chart-row" aria-label="运营首页运营图表">
+          {workbenchHomeHealthRings.map((ring) => (
+            <button
+              key={ring.label}
+              type="button"
+              style={{ '--home-ring-percent': `${ring.percent}%`, '--home-ring-color': ring.color } as CSSProperties}
+              onClick={() =>
+                openHomePreview(
+                  `${ring.label}趋势`,
+                  `/fixed-assets/workbench?menu=home&chart=${encodeURIComponent(ring.label)}`,
+                  `查看 ${ring.label} 的趋势、异常和关联业务对象。`,
+                  '查看趋势',
+                  Gauge,
+                )
+              }
+            >
+              <i />
+              <span>{ring.label}</span>
+              <strong>{ring.value}</strong>
+            </button>
+          ))}
         </section>
 
         <div className="workspace-home-filterbar" aria-label="运营首页查询筛选栏">
@@ -5051,6 +5115,32 @@ function WorkbenchHomePage({
             <div><dt>SLA</dt><dd>{selectedTask.sla}</dd></div>
             <div><dt>上下文</dt><dd>{selectedTask.context}</dd></div>
           </dl>
+        </section>
+
+        <section className="workspace-home-insight-panel" aria-label="今日运营洞察">
+          <header>
+            <span>今日运营洞察</span>
+            <strong>3 条</strong>
+          </header>
+          {workbenchHomeRightInsights.map((insight) => (
+            <button
+              key={insight.label}
+              type="button"
+              className={`is-${insight.tone}`}
+              onClick={() =>
+                openHomePreview(
+                  insight.label,
+                  `/fixed-assets/workbench?menu=home&insight=${encodeURIComponent(insight.label)}`,
+                  `打开 ${insight.label}，带入当前运营首页上下文。`,
+                  '打开洞察',
+                  BarChart3,
+                )
+              }
+            >
+              <span>{insight.label}</span>
+              <strong>{insight.value}</strong>
+            </button>
+          ))}
         </section>
 
         <section className="workspace-home-alerts" aria-label="维保预警队列">
@@ -7380,6 +7470,28 @@ const workbenchDeviceRows = [
 
 const workbenchDeviceDetailTabs = ['设备信息', '实时遥测', '维保建议', '工单记录', '采集链路'] as const;
 
+const workbenchDeviceTrendPoints = '0,82 58,70 116,76 174,52 232,58 290,38 348,46 406,28';
+
+const workbenchDeviceStatusMix = [
+  { label: 'CNC 区域 A线', value: '1,260', percent: 100, tone: 'blue' },
+  { label: '注塑车间', value: '920', percent: 73, tone: 'orange' },
+  { label: '动力站', value: '680', percent: 54, tone: 'green' },
+  { label: '焊接线 A', value: '520', percent: 41, tone: 'cyan' },
+] as const;
+
+const workbenchDeviceExceptionQueue = [
+  { label: '主轴振动 RMS 上升', value: 'DEV-CN-301', note: 'P1 · 88ms', tone: 'red' },
+  { label: '温度边界触发复核', value: 'DEV-M-201', note: 'P2 · 102ms', tone: 'orange' },
+  { label: '减速机温升趋势', value: 'DEV-RB-501', note: 'P2 · 114ms', tone: 'orange' },
+] as const;
+
+const workbenchDeviceQuickOps = [
+  { label: '创建设备工单', route: '/workorders/new?source=workbench&menu=device', icon: Wrench, tone: 'blue' },
+  { label: '查看采集链路', route: '/energy?source=workbench&scope=data-monitoring&menu=device', icon: Database, tone: 'cyan' },
+  { label: '发起现场巡检', route: '/inspections/new?source=workbench&menu=device', icon: CheckCircle2, tone: 'green' },
+  { label: '导出设备清单', route: '/equipment?source=workbench&export=xlsx', icon: FileText, tone: 'orange' },
+] as const;
+
 const workbenchReportSummaryCards = [
   { label: '资产总价值', value: '¥3,820万', delta: '净值', icon: Layers, tone: 'blue' },
   { label: '资产增长趋势', value: '+3.42%', delta: '较上期', icon: TrendingUp, tone: 'green' },
@@ -7720,6 +7832,130 @@ function WorkbenchDevicePage({
               );
             })}
           </div>
+
+          <section className="workspace-device-monitor-grid" aria-label="设备实时监测">
+            <article className="workspace-device-trend-card" aria-label="设备健康趋势">
+              <header>
+                <span>选中设备实时监测</span>
+                <strong>{selectedDevice.health}</strong>
+              </header>
+              <svg viewBox="0 0 406 112" role="img" aria-label={`${selectedDevice.device} 健康趋势`}>
+                <defs>
+                  <linearGradient id="deviceTrendFill" x1="0" x2="0" y1="0" y2="1">
+                    <stop offset="0%" stopColor="#0a8fa5" stopOpacity=".24" />
+                    <stop offset="100%" stopColor="#0a8fa5" stopOpacity="0" />
+                  </linearGradient>
+                </defs>
+                <path d={`M ${workbenchDeviceTrendPoints} L 406 112 L 0 112 Z`} fill="url(#deviceTrendFill)" />
+                <polyline points={workbenchDeviceTrendPoints} fill="none" stroke="#0a8fa5" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+                <circle cx="406" cy="28" r="5" fill="#176de8" />
+              </svg>
+              <footer>
+                <span>{selectedDevice.device}</span>
+                <b>{selectedDevice.telemetry}</b>
+              </footer>
+            </article>
+
+            <article className="workspace-device-status-card" aria-label="产线设备状态分布">
+              <header>
+                <span>产线设备状态</span>
+                <button
+                  type="button"
+                  onClick={() =>
+                    openDevicePreview(
+                      '查看产线设备状态',
+                      '/equipment?source=workbench&view=line-status',
+                      '按产线查看在线、预警、离线和采集延迟状态。',
+                      '查看产线',
+                      Factory,
+                    )
+                  }
+                >
+                  查看
+                </button>
+              </header>
+              {workbenchDeviceStatusMix.map((line) => (
+                <button
+                  key={line.label}
+                  type="button"
+                  className={`is-${line.tone}`}
+                  onClick={() =>
+                    openDevicePreview(
+                      `${line.label}设备`,
+                      `/equipment?source=workbench&line=${encodeURIComponent(line.label)}`,
+                      `查看 ${line.label} 的设备在线率、异常和责任人分布。`,
+                      '打开产线',
+                      Factory,
+                    )
+                  }
+                >
+                  <span>{line.label}</span>
+                  <i><b style={{ '--device-line-width': `${line.percent}%` } as CSSProperties} /></i>
+                  <strong>{line.value}</strong>
+                </button>
+              ))}
+            </article>
+
+            <article className="workspace-device-exception-card" aria-label="异常设备队列">
+              <header>
+                <span>异常设备队列</span>
+                <strong>18 待处理</strong>
+              </header>
+              {workbenchDeviceExceptionQueue.map((event) => (
+                <button
+                  key={event.value}
+                  type="button"
+                  className={`is-${event.tone}`}
+                  onClick={() =>
+                    openDevicePreview(
+                      `${event.value}异常详情`,
+                      `/equipment/${event.value}?source=workbench&queue=exception`,
+                      `打开 ${event.value}，带入 ${event.label}、${event.note} 和 Workbench 来源。`,
+                      '打开异常',
+                      AlertTriangle,
+                    )
+                  }
+                >
+                  <span>
+                    <strong>{event.label}</strong>
+                    <small>{event.note}</small>
+                  </span>
+                  <b>{event.value}</b>
+                </button>
+              ))}
+            </article>
+
+            <article className="workspace-device-quickops-card" aria-label="设备快捷操作">
+              <header>
+                <span>快捷操作</span>
+                <strong>可执行</strong>
+              </header>
+              <div>
+                {workbenchDeviceQuickOps.map((op) => {
+                  const OpIcon = op.icon;
+                  return (
+                    <button
+                      key={op.label}
+                      type="button"
+                      className={`is-${op.tone}`}
+                      onClick={() =>
+                        openDevicePreview(
+                          op.label,
+                          op.route,
+                          `${op.label}，保留当前选中设备 ${selectedDevice.device} 和设备管理来源。`,
+                          op.label,
+                          OpIcon,
+                        )
+                      }
+                    >
+                      <OpIcon />
+                      <span>{op.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </article>
+          </section>
 
           <div className="workspace-orders-stage-row" aria-label="设备运维阶段">
             {workbenchDeviceStages.map((stage) => (

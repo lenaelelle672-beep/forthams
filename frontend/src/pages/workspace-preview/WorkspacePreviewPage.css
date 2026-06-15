@@ -2225,6 +2225,240 @@
   background: #0a8fa5;
 }
 
+.workspace-device-monitor-grid {
+  display: grid;
+  grid-template-columns: minmax(280px, 1fr) minmax(250px, .9fr) minmax(250px, .9fr) minmax(220px, .78fr);
+  gap: 10px;
+  min-width: 0;
+}
+
+.workspace-device-monitor-grid article {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid #d7e9f8;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #fff, #f7fdff);
+  box-shadow: 0 8px 20px rgba(25, 110, 142, .06);
+}
+
+.workspace-device-monitor-grid header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 36px;
+  padding: 0 12px;
+  border-bottom: 1px solid #e3f1f8;
+}
+
+.workspace-device-monitor-grid header span,
+.workspace-device-monitor-grid header strong {
+  color: #14344d;
+  font-size: 12px;
+  font-weight: 950;
+}
+
+.workspace-device-monitor-grid header button {
+  height: 24px;
+  padding: 0 9px;
+  border: 1px solid #bee6ef;
+  border-radius: 6px;
+  color: #0a8fa5;
+  background: #f1fcff;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.workspace-device-trend-card {
+  display: grid;
+  grid-template-rows: auto minmax(110px, 1fr) auto;
+}
+
+.workspace-device-trend-card svg {
+  width: 100%;
+  min-height: 110px;
+  padding: 8px 12px 0;
+}
+
+.workspace-device-trend-card footer {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  padding: 0 12px 10px;
+  color: #60718c;
+  font-size: 11px;
+  font-weight: 850;
+}
+
+.workspace-device-trend-card footer b {
+  max-width: 160px;
+  overflow: hidden;
+  color: #0a8fa5;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workspace-device-status-card,
+.workspace-device-exception-card,
+.workspace-device-quickops-card {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+.workspace-device-status-card > button,
+.workspace-device-exception-card > button,
+.workspace-device-quickops-card button {
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+}
+
+.workspace-device-status-card > button {
+  display: grid;
+  grid-template-columns: 78px minmax(52px, 1fr) 52px;
+  align-items: center;
+  gap: 8px;
+  min-height: 28px;
+  margin: 0 12px;
+  color: #4d6582;
+  font-size: 11px;
+  font-weight: 880;
+}
+
+.workspace-device-status-card > button:first-of-type,
+.workspace-device-exception-card > button:first-of-type {
+  margin-top: 10px;
+}
+
+.workspace-device-status-card i {
+  display: block;
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #e3f2f7;
+}
+
+.workspace-device-status-card i b {
+  display: block;
+  width: var(--device-line-width);
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #40d1df, #0a8fa5);
+}
+
+.workspace-device-status-card strong {
+  min-width: 0;
+  overflow: hidden;
+  color: #0a8fa5;
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workspace-device-exception-card {
+  gap: 7px;
+  padding-bottom: 10px;
+}
+
+.workspace-device-exception-card > button {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  min-height: 39px;
+  margin: 0 10px;
+  padding: 7px 8px;
+  border: 1px solid #e2f0f8;
+  border-radius: 7px;
+  background: #fff;
+}
+
+.workspace-device-exception-card strong,
+.workspace-device-exception-card small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workspace-device-exception-card strong {
+  color: #14344d;
+  font-size: 12px;
+  font-weight: 920;
+}
+
+.workspace-device-exception-card small {
+  color: #70879e;
+  font-size: 10px;
+  font-weight: 820;
+}
+
+.workspace-device-exception-card b {
+  min-width: 70px;
+  overflow: hidden;
+  padding: 4px 7px;
+  border-radius: 6px;
+  color: #0a8fa5;
+  background: #e9fbff;
+  font-size: 11px;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workspace-device-exception-card .is-red b {
+  color: #e02f44;
+  background: #fff0f2;
+}
+
+.workspace-device-exception-card .is-orange b {
+  color: #d97706;
+  background: #fff5e3;
+}
+
+.workspace-device-quickops-card > div {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  padding: 10px;
+}
+
+.workspace-device-quickops-card button {
+  display: grid;
+  gap: 6px;
+  min-height: 54px;
+  padding: 8px;
+  border: 1px solid #dceaf6;
+  border-radius: 8px;
+  color: #17335c;
+  background: #fff;
+  font-size: 11px;
+  font-weight: 920;
+}
+
+.workspace-device-quickops-card svg {
+  width: 17px;
+  height: 17px;
+  color: #0a8fa5;
+}
+
+.workspace-device-page .workspace-orders-stage-row {
+  background:
+    linear-gradient(90deg, #176de8 0 20%, #0d9a6a 20% 40%, #f08a20 40% 60%, #22b6d3 60% 80%, #7857f4 80% 100%) top / 100% 3px no-repeat,
+    #fff;
+}
+
+.workspace-device-page .workspace-orders-stage-row button {
+  border-top: 0;
+  background: linear-gradient(180deg, #fff, #f9fcff);
+}
+
+.workspace-device-page .workspace-orders-stage-row button::after {
+  background: linear-gradient(112deg, transparent 48.5%, rgba(10, 143, 165, .18) 50%, transparent 51.5%);
+}
+
 .workspace-report-page {
   background:
     linear-gradient(180deg, rgba(248, 252, 255, .97), rgba(239, 248, 255, .96)),
@@ -2911,9 +3145,10 @@
 
 .workspace-home-center {
   display: grid;
-  grid-template-rows: auto auto auto auto auto minmax(150px, 1fr);
-  gap: 12px;
-  padding: 16px;
+  grid-template-rows: auto auto auto auto auto auto auto minmax(140px, 1fr);
+  gap: 9px;
+  overflow: auto;
+  padding: 14px;
 }
 
 .workspace-home-header {
@@ -2943,7 +3178,9 @@
 
 .workspace-home-kpis,
 .workspace-home-stage-row,
-.workspace-home-launcher {
+.workspace-home-launcher,
+.workspace-home-dashboard-grid,
+.workspace-home-chart-row {
   display: grid;
   gap: 10px;
 }
@@ -2952,8 +3189,15 @@
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
+.workspace-home-dashboard-grid,
+.workspace-home-chart-row {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .workspace-home-kpis button,
-.workspace-home-stage-row button {
+.workspace-home-stage-row button,
+.workspace-home-dashboard-grid button,
+.workspace-home-chart-row button {
   min-width: 0;
   border: 1px solid #dbe8f8;
   border-radius: 8px;
@@ -2970,29 +3214,59 @@
 
 .workspace-home-kpis button *,
 .workspace-home-stage-row button *,
-.workspace-home-launcher button * {
+.workspace-home-launcher button *,
+.workspace-home-dashboard-grid button *,
+.workspace-home-chart-row button * {
   pointer-events: none;
 }
 
 .workspace-home-kpis span,
-.workspace-home-stage-row span {
+.workspace-home-stage-row span,
+.workspace-home-dashboard-grid span,
+.workspace-home-chart-row span {
   color: #60718c;
   font-size: 12px;
   font-weight: 900;
 }
 
 .workspace-home-kpis strong,
-.workspace-home-stage-row strong {
+.workspace-home-stage-row strong,
+.workspace-home-dashboard-grid strong,
+.workspace-home-chart-row strong {
   color: #176de8;
   font-size: 24px;
   font-weight: 950;
 }
 
 .workspace-home-kpis small,
-.workspace-home-stage-row small {
+.workspace-home-stage-row small,
+.workspace-home-dashboard-grid small {
   color: #52647d;
   font-size: 11px;
   font-weight: 800;
+}
+
+.workspace-home-dashboard-grid button {
+  display: grid;
+  min-height: 74px;
+  padding: 11px 13px;
+  box-shadow: inset 3px 0 0 #176de8;
+}
+
+.workspace-home-dashboard-grid .is-red {
+  box-shadow: inset 3px 0 0 #e84444;
+}
+
+.workspace-home-dashboard-grid .is-orange {
+  box-shadow: inset 3px 0 0 #e77917;
+}
+
+.workspace-home-dashboard-grid .is-red strong {
+  color: #e84444;
+}
+
+.workspace-home-dashboard-grid .is-orange strong {
+  color: #e77917;
 }
 
 .workspace-home-kpis .is-red strong,
@@ -3027,14 +3301,14 @@
 
 .workspace-home-launcher {
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  min-height: 64px;
+  min-height: 58px;
 }
 
 .workspace-home-launcher button {
   display: flex;
   align-items: center;
   gap: 10px;
-  min-height: 64px;
+  min-height: 58px;
   padding: 10px;
   color: #17335c;
   text-align: left;
@@ -3069,6 +3343,39 @@
   font-size: 11px;
   font-weight: 800;
   line-height: 1.35;
+}
+
+.workspace-home-chart-row button {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr);
+  grid-template-areas:
+    "ring label"
+    "ring value";
+  align-items: center;
+  min-height: 72px;
+  padding: 10px 12px;
+}
+
+.workspace-home-chart-row i {
+  grid-area: ring;
+  display: grid;
+  width: 46px;
+  aspect-ratio: 1;
+  place-items: center;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle, #fff 0 53%, transparent 54%),
+    conic-gradient(var(--home-ring-color) 0 var(--home-ring-percent), #e5effb var(--home-ring-percent) 100%);
+}
+
+.workspace-home-chart-row span {
+  grid-area: label;
+}
+
+.workspace-home-chart-row strong {
+  grid-area: value;
+  color: var(--home-ring-color);
+  font-size: 20px;
 }
 
 .workspace-home-filterbar {
@@ -3214,9 +3521,10 @@
 
 .workspace-home-detail {
   display: grid;
-  grid-template-rows: auto auto minmax(132px, auto) auto minmax(126px, 1fr) auto auto;
-  gap: 10px;
-  padding: 14px;
+  grid-template-rows: auto auto auto minmax(112px, auto) auto minmax(96px, 1fr) auto auto;
+  gap: 8px;
+  overflow: auto;
+  padding: 12px;
 }
 
 .workspace-home-detail > header strong {
@@ -3301,6 +3609,60 @@
 .workspace-home-alerts {
   display: grid;
   gap: 7px;
+}
+
+.workspace-home-insight-panel {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid #dbe8f8;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #fff, #f8fbff);
+}
+
+.workspace-home-insight-panel header {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  color: #12233f;
+  font-size: 12px;
+  font-weight: 950;
+}
+
+.workspace-home-insight-panel button {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  padding: 8px;
+  border: 1px solid #e2edf9;
+  border-radius: 7px;
+  background: #fff;
+  cursor: pointer;
+  text-align: left;
+}
+
+.workspace-home-insight-panel span {
+  color: #60718c;
+  font-size: 11px;
+  font-weight: 850;
+}
+
+.workspace-home-insight-panel strong {
+  overflow: hidden;
+  color: #17335c;
+  font-size: 12px;
+  font-weight: 950;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workspace-home-insight-panel .is-red strong {
+  color: #e84444;
+}
+
+.workspace-home-insight-panel .is-green strong {
+  color: #0aa36f;
 }
 
 .workspace-home-alerts button {

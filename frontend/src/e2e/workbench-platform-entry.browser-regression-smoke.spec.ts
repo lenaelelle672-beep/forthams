@@ -270,6 +270,8 @@ test.describe('Workbench 正式入口浏览器回归', () => {
     await expect(page.getByLabel('运营首页状态反馈')).toContainText('聚合刷新失败');
     await expect(page.getByLabel('运营首页状态反馈')).toContainText('运营操作受限');
     await expect(page.getByLabel('运营首页核心指标')).toContainText('资产健康');
+    await expect(page.getByLabel('运营首页洞察看板')).toContainText('最近工单');
+    await expect(page.getByLabel('运营首页运营图表')).toContainText('资产在线率');
     await expect(page.getByLabel('运营首页流程阶段')).toContainText('聚合');
     await expect(page.getByLabel('运营首页顶部操作')).toContainText('新建预测工单');
     await expect(page.getByLabel('运营首页快捷发起')).toContainText('处理流程待办');
@@ -277,6 +279,7 @@ test.describe('Workbench 正式入口浏览器回归', () => {
     await expect(page.getByLabel('运营首页任务墙')).toContainText('OPS-20240614-001');
     await expect(page.getByLabel('运营首页详情抽屉')).toContainText('主轴振动异常');
     await expect(page.getByLabel('当前运营事项信息')).toContainText('数控车床 CN-301');
+    await expect(page.getByLabel('今日运营洞察')).toContainText('CN-301 振动异常优先派工');
     await expect(page.getByLabel('维保预警队列')).toContainText('CN-301');
     await expect(page.getByLabel('运营首页详情标签')).toContainText('维保预警');
     await expect(page.getByLabel('运营首页权限反馈')).toContainText('关键操作入口可用');
@@ -368,6 +371,11 @@ test.describe('Workbench 正式入口浏览器回归', () => {
     await expect(page.getByRole('heading', { name: '设备管理' })).toBeVisible();
     await expect(page.getByText('在线监测 · 遥测异常 · 现场派工')).toBeVisible();
     await expect(page.getByLabel('设备管理核心指标')).toContainText('在线设备');
+    await expect(page.getByLabel('设备实时监测')).toContainText('选中设备实时监测');
+    await expect(page.getByLabel('设备健康趋势')).toContainText('数控车床 CN-301');
+    await expect(page.getByLabel('产线设备状态分布')).toContainText('CNC 区域 A线');
+    await expect(page.getByLabel('异常设备队列')).toContainText('DEV-CN-301');
+    await expect(page.getByLabel('设备快捷操作')).toContainText('创建设备工单');
     await expect(page.getByLabel('设备运维阶段')).toContainText('接入');
     await expect(page.getByLabel('设备管理顶部操作')).toContainText('链路诊断');
     await expect(page.getByLabel('设备管理查询筛选栏')).toContainText('采集时间');
