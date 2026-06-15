@@ -2774,12 +2774,12 @@ function WorkspaceModuleMock({
 }
 
 const workbenchOrderSummaryCards = [
-  { label: '待维保', value: '248', delta: '待派工设备', icon: Gauge, tone: 'blue' },
-  { label: '今日派工', value: '42', delta: '较昨日 +6', icon: ClipboardList, tone: 'cyan' },
+  { label: '全部工单', value: '216', delta: '较昨日 +18', icon: ClipboardList, tone: 'blue' },
+  { label: '预测工单', value: '46', delta: '较昨日 +7', icon: Gauge, tone: 'blue' },
   { label: '执行中', value: '78', delta: '较昨日 +12', icon: Wrench, tone: 'green' },
   { label: '待验收', value: '32', delta: '较昨日 -3', icon: FileText, tone: 'violet' },
-  { label: '逾期工单', value: '9', delta: '较昨日 +2', icon: AlertTriangle, tone: 'red' },
-  { label: '闭环率', value: '91.8%', delta: '本周闭环', icon: CheckCircle2, tone: 'green' },
+  { label: 'SLA 逾期', value: '9', delta: '较昨日 +2', icon: AlertTriangle, tone: 'red' },
+  { label: '今日闭环', value: '51', delta: '较昨日 +9', icon: CheckCircle2, tone: 'green' },
 ] as const;
 
 const workbenchOrderStages = [
@@ -9543,17 +9543,17 @@ function WorkbenchOrdersPage({
                 <div><dt>剩余/逾期</dt><dd className={selectedOrder.sla.startsWith('-') ? 'is-danger' : ''}>{selectedOrder.sla}</dd></div>
                 <div><dt>报修人</dt><dd>系统预测</dd></div>
                 <div><dt>优先级</dt><dd>{selectedOrder.priority} 紧急</dd></div>
-                <div><dt>创建时间</dt><dd>2026-06-14 09:12</dd></div>
+                <div><dt>计划开始</dt><dd>2026-06-14 10:00</dd></div>
                 <div><dt>责任人</dt><dd>{selectedOrder.owner}</dd></div>
               </dl>
             </section>
 
             <section className="workspace-orders-flow" aria-label="工单流程">
               {['预测', '派工', '执行', '验收', '闭环'].map((step, index) => (
-                <span key={step} className={index < 2 ? 'is-done' : index === 2 ? 'is-active' : ''}>
+                <span key={step} className={index < 2 ? 'is-done' : ''}>
                   <CheckCircle2 />
                   <strong>{step}</strong>
-                  <small>{index < 2 ? '06-14 09:12' : index === 2 ? '待执行' : '待流转'}</small>
+                  <small>{index === 0 ? '06-14 08:45' : index === 1 ? '06-14 09:12' : '待流转'}</small>
                 </span>
               ))}
             </section>

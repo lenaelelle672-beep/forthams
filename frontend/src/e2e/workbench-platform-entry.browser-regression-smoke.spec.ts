@@ -494,7 +494,10 @@ test.describe('Workbench 正式入口浏览器回归', () => {
     await expect(page.locator('.workspace-product-page')).toHaveCount(0);
     await expect(page.getByRole('heading', { name: '工单管理' })).toBeVisible();
     await expect(page.getByText('预测工单 · 派工执行 · 验收闭环')).toBeVisible();
-    await expect(page.getByLabel('工单管理核心指标')).toContainText('待维保');
+    await expect(page.getByLabel('工单管理核心指标')).toContainText('全部工单');
+    await expect(page.getByLabel('工单管理核心指标')).toContainText('预测工单');
+    await expect(page.getByLabel('工单管理核心指标')).toContainText('SLA 逾期');
+    await expect(page.getByLabel('工单管理核心指标')).toContainText('今日闭环');
     await expect(page.getByLabel('工单流程阶段')).toContainText('预测');
     await expect(page.getByLabel('工单管理顶部操作')).toContainText('高级筛选');
     await expect(page.getByLabel('工单查询筛选栏')).toContainText('创建时间');
