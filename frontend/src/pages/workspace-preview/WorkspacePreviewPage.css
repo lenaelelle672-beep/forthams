@@ -2110,14 +2110,14 @@
 
 .workspace-todo-page .workspace-orders-detail {
   position: relative;
-  grid-template-rows: auto auto auto auto minmax(0, 1fr);
-  padding-bottom: 62px;
+  grid-template-rows: auto auto auto minmax(0, 1fr) auto;
+  padding-bottom: 0;
 }
 
 .workspace-todo-page .workspace-orders-detail-card {
-  gap: 6px;
-  margin: 12px 14px;
-  padding: 10px 12px;
+  gap: 5px;
+  margin: 10px 14px;
+  padding: 9px 12px;
 }
 
 .workspace-todo-page .workspace-orders-detail-card p {
@@ -2141,11 +2141,12 @@
 }
 
 .workspace-todo-detail-summary img {
-  width: 88px;
-  height: 56px;
+  width: 102px;
+  height: 64px;
   object-fit: contain;
   border-radius: 8px;
-  background: #f5f9ff;
+  background: linear-gradient(180deg, #f6fbff, #edf5ff);
+  box-shadow: 0 10px 22px rgba(23, 109, 232, .12);
 }
 
 .workspace-todo-page .workspace-orders-detail-card b {
@@ -2169,26 +2170,127 @@
   background: #ccd7e8;
 }
 
-.workspace-todo-page .workspace-orders-tab-panel {
-  grid-template-columns: 1fr;
-  gap: 8px;
-  max-height: 220px;
-  overflow: auto;
-  padding: 8px 14px;
-}
-
-.workspace-todo-page .workspace-orders-tab-panel article {
-  min-height: 46px;
-  padding: 8px 10px;
-}
-
 .workspace-todo-page .workspace-orders-detail-actions {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  left: 0;
+  position: static;
   background: #fff;
   padding: 10px 14px;
+}
+
+.workspace-todo-detail-stack {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  min-height: 0;
+  overflow: auto;
+  padding: 0 14px 12px;
+}
+
+.workspace-todo-detail-stack article {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  padding: 9px 10px;
+  border: 1px solid #e0ebf8;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #fff, #f9fcff);
+}
+
+.workspace-todo-detail-stack h4 {
+  margin: 0;
+  color: #174072;
+  font-size: 13px;
+  font-weight: 950;
+}
+
+.workspace-todo-detail-stack dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 5px 12px;
+  margin: 0;
+}
+
+.workspace-todo-detail-stack dl div {
+  display: grid;
+  grid-template-columns: 58px minmax(0, 1fr);
+  gap: 8px;
+  min-width: 0;
+}
+
+.workspace-todo-detail-stack dt,
+.workspace-todo-detail-stack dd,
+.workspace-todo-detail-stack p {
+  overflow: hidden;
+  margin: 0;
+  text-overflow: ellipsis;
+}
+
+.workspace-todo-detail-stack dt {
+  color: #7890ac;
+  font-size: 12px;
+  font-weight: 880;
+  white-space: nowrap;
+}
+
+.workspace-todo-detail-stack dd,
+.workspace-todo-detail-stack p {
+  color: #263a57;
+  font-size: 12px;
+  font-weight: 840;
+  line-height: 1.45;
+}
+
+.workspace-todo-detail-stack dd {
+  white-space: nowrap;
+}
+
+.workspace-todo-check-list,
+.workspace-todo-file-list {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.workspace-todo-check-list li,
+.workspace-todo-file-list li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  color: #263a57;
+  font-size: 12px;
+  font-weight: 860;
+}
+
+.workspace-todo-check-list b,
+.workspace-todo-check-list small {
+  justify-self: end;
+  color: #0d9a6a;
+  font-size: 12px;
+  font-weight: 920;
+}
+
+.workspace-todo-check-list .is-warning {
+  color: #f08a20;
+}
+
+.workspace-todo-file-list li {
+  grid-template-columns: 18px minmax(0, 1fr) auto 18px;
+  min-height: 26px;
+}
+
+.workspace-todo-file-list svg {
+  width: 16px;
+  height: 16px;
+  color: #176de8;
+}
+
+.workspace-todo-file-list small {
+  color: #647895;
+  font-size: 11px;
+  font-weight: 820;
 }
 
 .workspace-todo-page .workspace-orders-table-row.is-red b {

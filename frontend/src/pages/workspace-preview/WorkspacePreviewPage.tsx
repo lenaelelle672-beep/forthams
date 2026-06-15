@@ -13,9 +13,11 @@ import {
   CalendarDays,
   ChevronDown,
   CheckCircle2,
+  Clock,
   ClipboardList,
   Cpu,
   Database,
+  Download,
   Factory,
   FileText,
   Gauge,
@@ -2903,16 +2905,16 @@ const workbenchOrderDetailTabs = ['工单信息', '设备状态', '备件与物�
 const workbenchTodoSummaryCards = [
   { label: '待审批', value: '18', delta: '较昨日 +3', icon: ClipboardList, tone: 'blue' },
   { label: '待派工', value: '24', delta: '较昨日 +5', icon: UserCircle, tone: 'cyan' },
-  { label: '预警待办', value: '36', delta: '较昨日 +8', icon: AlertTriangle, tone: 'orange' },
-  { label: '待完工', value: '42', delta: '执行中', icon: Activity, tone: 'green' },
-  { label: '逾期', value: '7', delta: '较昨日 +2', icon: CheckCircle2, tone: 'red' },
+  { label: '预警', value: '36', delta: '较昨日 +8', icon: AlertTriangle, tone: 'orange' },
+  { label: 'SLA 逾期', value: '7', delta: '较昨日 +2', icon: Clock, tone: 'red' },
+  { label: '今日完成', value: '42', delta: '较昨日 +6', icon: CheckCircle2, tone: 'green' },
 ] as const;
 
 const workbenchTodoTabs = [
   { label: '全部待办', value: '78' },
   { label: '待审批', value: '18' },
   { label: '待派工', value: '24' },
-  { label: '预警待办', value: '36' },
+  { label: '预警', value: '36' },
   { label: '逾期', value: '7' },
 ] as const;
 
@@ -3054,8 +3056,6 @@ const workbenchTodoRows = [
     tone: 'slate',
   },
 ] as const;
-
-const workbenchTodoDetailTabs = ['基本信息', '审批流程', '附件', '处理建议'] as const;
 
 const workbenchAssetSummaryCards = [
   { label: '资产总价值', value: '¥ 98,760.25 万', delta: '较上期 ↑ 3.42%', icon: Layers, tone: 'blue' },
@@ -8982,7 +8982,6 @@ function WorkbenchTodoPage({
   onPreviewAction,
 }: WorkbenchMenuPageProps) {
   const [selectedTodoId, setSelectedTodoId] = useState(workbenchTodoRows[0].id);
-  const [detailTab, setDetailTab] = useState<(typeof workbenchTodoDetailTabs)[number]>('基本信息');
   const [detailOpen, setDetailOpen] = useState(true);
   const selectedTodo = workbenchTodoRows.find((todo) => todo.id === selectedTodoId) ?? workbenchTodoRows[0];
   const primaryAction = meta.actions[0];
@@ -9250,15 +9249,6 @@ function WorkbenchTodoPage({
               </div>
               <p>单号 {selectedTodo.id}</p>
               <h3>{selectedTodo.title}</h3>
-              <dl>
-                <div><dt>关联设备</dt><dd>{selectedTodo.relatedObject}</dd></div>
-                <div><dt>申请人</dt><dd>{selectedTodo.initiator}</dd></div>
-                <div><dt>所在位置</dt><dd>机加车间 · CNC 区域 A线</dd></div>
-                <div><dt>申请时间</dt><dd>2026-06-14 09:12</dd></div>
-                <div><dt>维修类型</dt><dd>{selectedTodo.context}</dd></div>
-                <div><dt>申请金额</dt><dd>{selectedTodo.amount}</dd></div>
-                <div><dt>故障描述</dt><dd>{selectedTodo.description}</dd></div>
-              </dl>
             </section>
 
             <section className="workspace-orders-flow" aria-label="流程待办流转">
@@ -9271,41 +9261,36 @@ function WorkbenchTodoPage({
               ))}
             </section>
 
-            <nav className="workspace-orders-tabs" aria-label="流程待办详情标签">
-              {workbenchTodoDetailTabs.map((tab) => (
-                <button
-                  key={tab}
-                  type="button"
-                  className={tab === detailTab ? 'is-active' : ''}
-                  onClick={() => setDetailTab(tab)}
-                >
-                  {tab}
-                </button>
-              ))}
-            </nav>
-
-            <section className="workspace-orders-tab-panel" aria-label={`${detailTab}内容`}>
-              <article>
-                <span>基本信息</span>
-                <p>来源于 {selectedTodo.source}，关联对象为 {selectedTodo.relatedObject}，当前状态为 {selectedTodo.status}。</p>
+            <section className="workspace-todo-detail-stack" aria-label="流程待办详情卡片">
+              <article aria-label="流程待办基本信息">
+                <h4>基本信息</h4>
+                <dl>
+                  <div><dt>关联设备</dt><dd>{selectedTodo.relatedObject}</dd></div>
+                  <div><dt>所在位置</dt><dd>机加车间 · CNC 区域 A线</dd></div>
+                  <div><dt>申请人</dt><dd>{selectedTodo.initiator}（{selectedTodo.source}）</dd></div>
+                  <div><dt>申请时间</dt><dd>2026-06-14 09:12</dd></div>
+                  <div><dt>维修类型</dt><dd>{selectedTodo.context}</dd></div>
+                  <div><dt>申请金额</dt><dd>{selectedTodo.amount}</dd></div>
+                  <div><dt>故障描述</dt><dd>{selectedTodo.description}</dd></div>
+                </dl>
               </article>
-              <article>
-                <span>审批流程</span>
-                <ul>
-                  <li>申请人提交 <b>已完成</b></li>
-                  <li>部门主管审核 <b className="is-warning">待处理</b></li>
-                  <li>设备经理审核 <small>待流转</small></li>
+              <article aria-label="流程待办审批流程">
+                <h4>审批流程</h4>
+                <ul className="workspace-todo-check-list">
+                  <li><span>申请人提交</span><b>已完成</b></li>
+                  <li><span>部门主管审核</span><b className="is-warning">待处理</b></li>
+                  <li><span>设备经理审核</span><small>待流转</small></li>
                 </ul>
               </article>
-              <article>
-                <span>附件</span>
-                <ul>
-                  <li>维修报告.pdf <small>1.2 MB</small></li>
-                  <li>费用明细.xlsx <small>82 KB</small></li>
+              <article aria-label="流程待办附件">
+                <h4>附件</h4>
+                <ul className="workspace-todo-file-list">
+                  <li><FileText /><span>维修报告.pdf</span><small>1.2 MB</small><Download /></li>
+                  <li><FileText /><span>费用明细.xlsx</span><small>82 KB</small><Download /></li>
                 </ul>
               </article>
-              <article>
-                <span>处理建议</span>
+              <article aria-label="流程待办处理建议">
+                <h4>处理建议</h4>
                 <p>建议同意申请，并批准 {selectedTodo.amount} 维修费用；高风险项优先转交设备经理复核。</p>
               </article>
             </section>

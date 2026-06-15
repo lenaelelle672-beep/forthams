@@ -444,7 +444,7 @@ test.describe('Workbench 正式入口浏览器回归', () => {
     await expect(page.getByText('审批 · 派工 · 预警队列')).toBeVisible();
     await expect(page.getByLabel('流程待办核心指标')).toContainText('待审批');
     await expect(page.getByLabel('流程待办核心指标').locator('button')).toHaveCount(5);
-    await expect(page.getByLabel('流程待办核心指标')).toContainText('待完工');
+    await expect(page.getByLabel('流程待办核心指标')).toContainText('今日完成');
     await expect(page.getByLabel('流程待办状态切换')).toContainText('全部待办');
     await expect(page.getByLabel('流程待办状态切换')).toContainText('逾期');
     await expect(page.getByLabel('流程待办状态切换')).not.toContainText('收敛');
@@ -457,7 +457,9 @@ test.describe('Workbench 正式入口浏览器回归', () => {
     await expect(page.getByLabel('流程待办详情抽屉')).toContainText('待处理项详情');
     await expect(page.getByLabel('流程待办详情抽屉')).toContainText('设备维修费用报销申请');
     await expect(page.getByLabel('流程待办详情抽屉')).toContainText('数控车床 CN-301');
-    await expect(page.getByLabel('流程待办详情标签')).toContainText('附件');
+    await expect(page.getByLabel('流程待办详情卡片')).toContainText('基本信息');
+    await expect(page.getByLabel('流程待办详情卡片')).toContainText('审批流程');
+    await expect(page.getByLabel('流程待办详情卡片')).toContainText('维修报告.pdf');
     await expect(page.getByLabel('流程待办详情操作')).toContainText('同意');
     await expect(page.getByLabel('流程待办详情操作')).toBeInViewport();
     await expect(page.locator('body')).not.toContainText('workbench-menu-todo-v1');
@@ -483,6 +485,20 @@ test.describe('Workbench 正式入口浏览器回归', () => {
     await expect(processDialog.locator('.workspace-action-route strong')).toContainText('/approve?source=workbench');
     await page.keyboard.press('Escape');
     await expect(processDialog).toHaveCount(0);
+
+    await page.getByRole('button', { name: '转交' }).click();
+    const assignDialog = page.getByRole('dialog', { name: '转交待办' });
+    await expect(assignDialog).toBeVisible();
+    await expect(assignDialog.locator('.workspace-action-route strong')).toContainText('/assign?source=workbench');
+    await page.keyboard.press('Escape');
+    await expect(assignDialog).toHaveCount(0);
+
+    await page.getByRole('button', { name: '驳回' }).click();
+    const rejectDialog = page.getByRole('dialog', { name: '驳回待办' });
+    await expect(rejectDialog).toBeVisible();
+    await expect(rejectDialog.locator('.workspace-action-route strong')).toContainText('/reject?source=workbench');
+    await page.keyboard.press('Escape');
+    await expect(rejectDialog).toHaveCount(0);
 
     await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
     expect(errors).toEqual([]);
