@@ -3593,6 +3593,7 @@ const workbenchHomeSignals = [
   { label: '流程待办', value: '18', note: 'P1 4 项', tone: 'orange' },
   { label: '今日工单', value: '42', note: '派工 24 单', tone: 'cyan' },
   { label: '维保预警', value: '5', note: '2h 内到期', tone: 'red' },
+  { label: '资产价值', value: '¥8,632万', note: '较上月 +2.89%', tone: 'green' },
 ] as const;
 
 const workbenchHomeInsightCards = [

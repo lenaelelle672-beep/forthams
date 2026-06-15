@@ -271,6 +271,15 @@ test.describe('Workbench 正式入口浏览器回归', () => {
     await expect(page.getByText('上午好，张三丰')).toBeVisible();
     await expect(page.getByLabel('运营首页指挥入口')).toBeHidden();
     await expect(page.getByLabel('运营首页核心指标')).toContainText('资产健康');
+    await expect(page.getByLabel('运营首页核心指标').getByRole('button')).toHaveCount(5);
+    await expect(page.getByLabel('运营首页核心指标')).toContainText('资产价值');
+    await expect(page.getByLabel('运营首页搜索')).toHaveValue(/搜索待办号/);
+    const filterBeforeKpi = await page.evaluate(() => {
+      const filterTop = document.querySelector('[aria-label="运营首页查询筛选栏"]')?.getBoundingClientRect().top ?? 0;
+      const kpiTop = document.querySelector('[aria-label="运营首页核心指标"]')?.getBoundingClientRect().top ?? 0;
+      return filterTop < kpiTop;
+    });
+    expect(filterBeforeKpi).toBe(true);
     await expect(page.getByLabel('运营首页洞察看板')).toContainText('最近工单');
     await expect(page.getByLabel('运营首页运营图表')).toContainText('资产在线率');
     await expect(page.getByLabel('运营首页流程阶段')).toBeHidden();
