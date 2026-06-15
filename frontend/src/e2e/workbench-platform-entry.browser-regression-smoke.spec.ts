@@ -368,13 +368,15 @@ test.describe('Workbench 正式入口浏览器回归', () => {
     await expect(page.locator('.workspace-product-page')).toHaveCount(0);
     await expect(page.getByRole('heading', { name: '设备管理' })).toBeVisible();
     await expect(page.getByText('在线监测 · 遥测异常 · 现场派工')).toBeVisible();
+    await expect(page.getByLabel('设备筛选条件')).toContainText('设备名称');
+    await expect(page.getByLabel('设备筛选条件')).toContainText('采集延迟');
     await expect(page.getByLabel('设备管理核心指标')).toContainText('在线设备');
     await expect(page.getByLabel('设备实时监测')).toContainText('选中设备实时监测');
     await expect(page.getByLabel('设备健康趋势')).toContainText('数控车床 CN-301');
     await expect(page.getByLabel('产线设备状态分布')).toContainText('CNC 区域 A线');
     await expect(page.getByLabel('异常设备队列')).toContainText('DEV-CN-301');
     await expect(page.getByLabel('设备快捷操作')).toContainText('创建设备工单');
-    await expect(page.getByLabel('设备运维阶段')).toContainText('接入');
+    await expect(page.getByLabel('设备运维阶段')).toBeHidden();
     await expect(page.getByLabel('设备管理顶部操作')).toContainText('链路诊断');
     await expect(page.getByLabel('设备管理查询筛选栏')).toContainText('采集时间');
     await expect(page.getByLabel('设备管理列表')).toContainText('DEV-CN-301');

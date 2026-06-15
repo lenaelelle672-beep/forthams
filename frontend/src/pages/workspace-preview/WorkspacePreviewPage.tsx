@@ -11,6 +11,7 @@ import {
   Bell,
   Box,
   CalendarDays,
+  ChevronDown,
   CheckCircle2,
   ClipboardList,
   Cpu,
@@ -8000,6 +8001,74 @@ function WorkbenchDevicePage({
   return (
     <section className="workspace-orders-page workspace-device-page" aria-label={`${item.label}真实产品页`}>
       <div className="workspace-orders-main">
+        <aside className="workspace-device-filter-panel" aria-label="设备筛选条件">
+          <header>
+            <strong>筛选条件</strong>
+            <button
+              type="button"
+              onClick={() =>
+                openDevicePreview(
+                  '收起设备筛选',
+                  '/equipment?source=workbench&filters=collapsed',
+                  '收起筛选条件，保留当前设备列表和 Workbench 来源。',
+                  '收起筛选',
+                  SlidersHorizontal,
+                )
+              }
+            >
+              收起
+            </button>
+          </header>
+          {[
+            ['设备名称', '请输入设备名称'],
+            ['设备类型', '全部类型'],
+            ['位置/产线', '全部位置'],
+            ['在线状态', '全部状态'],
+            ['采集延迟', '全部'],
+          ].map(([label, value]) => (
+            <label key={label}>
+              <span>{label}</span>
+              <button
+                type="button"
+                onClick={() =>
+                  openDevicePreview(
+                    `${label}筛选`,
+                    `/equipment?source=workbench&filter=${encodeURIComponent(label)}`,
+                    `按 ${label} 筛选设备列表，保留当前 Workbench 上下文。`,
+                    '应用筛选',
+                    SlidersHorizontal,
+                  )
+                }
+              >
+                {value}
+                <ChevronDown />
+              </button>
+            </label>
+          ))}
+          <button
+            type="button"
+            onClick={() =>
+              openDevicePreview(
+                '展开更多设备筛选',
+                '/equipment?source=workbench&advanced=true',
+                '打开更多筛选项，包括健康分、供应商、采集网关和责任人。',
+                '更多筛选',
+                SlidersHorizontal,
+              )
+            }
+          >
+            更多筛选
+            <ChevronDown />
+          </button>
+          <footer>
+            <button type="button" onClick={() => onPreviewAction(primaryAction)}>
+              重置
+            </button>
+            <button type="button" className="is-primary" onClick={() => onPreviewAction(primaryAction)}>
+              查询
+            </button>
+          </footer>
+        </aside>
         <section className="workspace-menu-product-shell workspace-device-product-shell" aria-label="设备管理产品页主体">
           <header className="workspace-orders-header">
             <div className="workspace-orders-title">
