@@ -103,12 +103,12 @@ test.describe('Workbench 正式入口浏览器回归', () => {
     await page.waitForLoadState('networkidle');
 
     await expect(page.getByRole('button', { name: '流程待办', exact: true })).toHaveClass(/is-active/);
-    await page.getByRole('button', { name: '查看流程待办' }).click();
-    const todoDialog = page.getByRole('dialog', { name: '查看流程待办' });
+    await page.getByLabel('流程待办顶部操作').getByRole('button', { name: '批量处理' }).click();
+    const todoDialog = page.getByRole('dialog', { name: '处理审批队列' });
     await expect(todoDialog).toBeVisible();
     await expect(todoDialog.getByText('/approvals?source=workbench&status=PENDING').first()).toBeVisible();
     await expect(todoDialog.getByText('预填字段')).toBeVisible();
-    const todoPrimaryButton = todoDialog.getByRole('button', { name: /进入业务页面|进入处理/ });
+    const todoPrimaryButton = todoDialog.locator('.workspace-action-buttons button').last();
     await expect(todoPrimaryButton).toBeEnabled();
     await todoPrimaryButton.click();
     await expect(page).toHaveURL(/\/approvals\?source=workbench&status=PENDING$/);
@@ -122,54 +122,67 @@ test.describe('Workbench 正式入口浏览器回归', () => {
 
     const actionCases = [
       {
+        label: '资产总览',
         route: '/fixed-assets/workbench/assets?menu=asset',
         action: '查看资产清单',
+        dialogName: '查看资产清单',
         targetIncludes: ['/assets?source=workbench&view=asset-overview'],
       },
       {
+        label: '设备管理',
         route: '/fixed-assets/workbench/assets?menu=device',
-        action: '查看设备状态',
+        action: '打开设备台账',
+        dialogName: '打开设备台账',
         targetIncludes: ['/equipment?source=workbench'],
       },
       {
+        label: '工单管理',
         route: '/fixed-assets/workbench/assets?menu=orders',
-        action: '查看预测工单',
+        action: '新建工单',
+        dialogName: '创建预测工单',
         targetIncludes: ['/workorders/new?', 'source=quick-action', 'riskScore=92', 'priority=HIGH'],
       },
       {
-        route: '/fixed-assets/workbench/assets?menu=inspection',
-        action: '查看巡检计划',
-        targetIncludes: ['/inspections/new?', 'source=quick-inspection', 'assetId=201'],
-      },
-      {
+        label: '备件管理',
         route: '/fixed-assets/workbench/assets?menu=spares',
         action: '查看备件库存',
-        targetIncludes: ['/spare-parts/new?', 'source=spare-request', 'partNo=SP-TEMP-201'],
+        dialogName: '查看备件库存',
+        targetIncludes: ['/spare-parts?source=workbench&stock=LOW'],
       },
       {
+        label: '数据监控',
         route: '/fixed-assets/workbench/analytics?menu=energy',
         action: '查看数据链路',
+        dialogName: '查看数据链路',
         targetIncludes: ['/energy?source=workbench&scope=data-monitoring'],
       },
       {
+        label: '报表分析',
         route: '/fixed-assets/workbench/analytics?menu=report',
-        action: '生成经营报表',
+        action: '打开经营报表',
+        dialogName: '打开经营报表',
         targetIncludes: ['/reports?source=workbench&view=operations'],
       },
       {
+        label: '告警中心',
         route: '/fixed-assets/workbench/security?menu=alarm',
         action: '查看告警队列',
+        dialogName: '查看告警队列',
         targetIncludes: ['/notifications?', 'source=quick-alert', 'severity='],
       },
       {
+        label: '组织策略',
         route: '/fixed-assets/workbench/security?menu=policy',
         action: '查看策略规则',
+        dialogName: '查看策略规则',
         targetIncludes: ['/risk-matrix?source=workbench&scope=policy'],
       },
       {
+        label: '基础维护',
         route: '/fixed-assets/workbench/assets?menu=settings',
-        action: '打开基础维护',
-        targetIncludes: ['/settings/sysconfig?source=workbench'],
+        action: '新建配置',
+        dialogName: '新建基础配置',
+        targetIncludes: ['/settings/sysconfig/new?source=workbench'],
       },
     ];
 
@@ -177,8 +190,8 @@ test.describe('Workbench 正式入口浏览器回归', () => {
       await page.goto(actionCase.route);
       await page.waitForLoadState('networkidle');
 
-      await page.locator('.workspace-context-action').filter({ hasText: actionCase.action }).click();
-      const dialog = page.getByRole('dialog', { name: actionCase.action });
+      await page.getByLabel(`${actionCase.label}顶部操作`).getByRole('button', { name: actionCase.action }).click();
+      const dialog = page.getByRole('dialog', { name: actionCase.dialogName });
       await expect(dialog).toBeVisible();
       await expect(dialog.getByText('预填字段')).toBeVisible();
 
@@ -187,7 +200,7 @@ test.describe('Workbench 正式入口浏览器回归', () => {
         expect(routeTarget).toContain(expectedFragment);
       }
 
-      await expect(dialog.getByRole('button', { name: /进入业务页面|进入处理/ })).toBeEnabled();
+      await expect(dialog.locator('.workspace-action-buttons button').last()).toBeEnabled();
       await page.keyboard.press('Escape');
       await expect(dialog).toHaveCount(0);
     }
@@ -206,7 +219,6 @@ test.describe('Workbench 正式入口浏览器回归', () => {
       ['资产总览', '/fixed-assets/workbench/assets?menu=asset'],
       ['设备管理', '/fixed-assets/workbench/assets?menu=device'],
       ['工单管理', '/fixed-assets/workbench/assets?menu=orders'],
-      ['巡检管理', '/fixed-assets/workbench/assets?menu=inspection'],
       ['备件管理', '/fixed-assets/workbench/assets?menu=spares'],
       ['数据监控', '/fixed-assets/workbench/analytics?menu=energy'],
       ['报表分析', '/fixed-assets/workbench/analytics?menu=report'],
@@ -222,12 +234,15 @@ test.describe('Workbench 正式入口浏览器回归', () => {
       await expect(page.getByLabel(`${pageLabel}真实产品页`)).toBeVisible();
       await expect(page.getByLabel(`${pageLabel}产品页主体`)).toBeVisible();
       await expect(page.locator('.workspace-product-page')).toHaveCount(0);
-      await expect(page.locator('.workspace-orders-shell')).toHaveCount(0);
       await expect(page.locator('.workspace-orders-page')).toBeVisible();
       if (pageLabel === '运营首页') {
         await expect(page.getByLabel('运营首页任务墙')).toBeVisible();
       } else if (pageLabel === '数据监控') {
         await expect(page.getByLabel('数据监控列表')).toBeVisible();
+      } else if (pageLabel === '组织策略') {
+        await expect(page.getByLabel('组织策略规则列表')).toBeVisible();
+      } else if (pageLabel === '基础维护') {
+        await expect(page.getByLabel('基础维护配置对象列表')).toBeVisible();
       } else {
         await expect(page.locator('.workspace-orders-table')).toBeVisible();
       }
@@ -246,7 +261,6 @@ test.describe('Workbench 正式入口浏览器回归', () => {
 
     await expect(page.getByLabel('运营首页真实产品页')).toBeVisible();
     await expect(page.locator('.workspace-product-page')).toHaveCount(0);
-    await expect(page.locator('.workspace-orders-shell')).toHaveCount(0);
     await expect(page.getByLabel('运营首页产品页主体').getByRole('heading', { name: '运营首页' })).toBeVisible();
     await expect(page.getByText('KPI 下钻 · 待办联动 · 维保预警')).toBeVisible();
     await expect(page.getByLabel('运营首页指挥入口')).toContainText('运营驾驶舱');
@@ -305,7 +319,7 @@ test.describe('Workbench 正式入口浏览器回归', () => {
     await expect(page.getByLabel('资产总览真实产品页')).toBeVisible();
     await expect(page.locator('.workspace-product-page')).toHaveCount(0);
     await expect(page.getByRole('heading', { name: '资产总览' })).toBeVisible();
-    await expect(page.getByText('健康台账 · 生命周期 · 处置流转')).toBeVisible();
+    await expect(page.getByText('资产健康与生命周期管理')).toBeVisible();
     await expect(page.getByLabel('资产总览核心指标')).toContainText('资产总数');
     await expect(page.getByLabel('资产生命周期', { exact: true })).toContainText('建账');
     await expect(page.getByLabel('资产总览顶部操作')).toContainText('生成风险工单');
@@ -402,7 +416,7 @@ test.describe('Workbench 正式入口浏览器回归', () => {
     await expect(page.getByText('审批 · 派工 · 预警队列')).toBeVisible();
     await expect(page.getByLabel('流程待办核心指标')).toContainText('待审批');
     await expect(page.getByLabel('流程待办核心指标').locator('button')).toHaveCount(5);
-    await expect(page.getByLabel('流程待办核心指标')).toContainText('今日完成');
+    await expect(page.getByLabel('流程待办核心指标')).toContainText('待完工');
     await expect(page.getByLabel('流程待办状态切换')).toContainText('全部待办');
     await expect(page.getByLabel('流程待办状态切换')).toContainText('逾期');
     await expect(page.getByLabel('流程待办状态切换')).not.toContainText('收敛');
@@ -457,7 +471,7 @@ test.describe('Workbench 正式入口浏览器回归', () => {
     await expect(page.locator('.workspace-product-page')).toHaveCount(0);
     await expect(page.getByRole('heading', { name: '工单管理' })).toBeVisible();
     await expect(page.getByText('预测工单 · 派工执行 · 验收闭环')).toBeVisible();
-    await expect(page.getByLabel('工单管理核心指标')).toContainText('全部工单');
+    await expect(page.getByLabel('工单管理核心指标')).toContainText('待维保');
     await expect(page.getByLabel('工单流程阶段')).toContainText('预测');
     await expect(page.getByLabel('工单管理顶部操作')).toContainText('高级筛选');
     await expect(page.getByLabel('工单查询筛选栏')).toContainText('创建时间');
@@ -488,53 +502,6 @@ test.describe('Workbench 正式入口浏览器回归', () => {
     await expect(executeDialog.locator('.workspace-action-route strong')).toContainText('/execute?source=workbench');
     await page.keyboard.press('Escape');
     await expect(executeDialog).toHaveCount(0);
-
-    await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
-    expect(errors).toEqual([]);
-  });
-
-  test('巡检管理左侧菜单渲染真实页面级组件而非通用产品壳', async ({ page }) => {
-    const errors = collectBrowserErrors(page);
-    await seedAuthenticatedSession(page, operationsUser);
-
-    await page.goto('/fixed-assets/workbench/assets?menu=inspection');
-    await page.waitForLoadState('networkidle');
-
-    await expect(page.getByLabel('巡检管理真实产品页')).toBeVisible();
-    await expect(page.locator('.workspace-product-page')).toHaveCount(0);
-    await expect(page.getByRole('heading', { name: '巡检管理' })).toBeVisible();
-    await expect(page.getByText('路线排程 · 扫码执行 · 异常转派')).toBeVisible();
-    await expect(page.getByLabel('巡检管理核心指标')).toContainText('今日计划');
-    await expect(page.getByLabel('巡检执行阶段')).toContainText('排程');
-    await expect(page.getByLabel('巡检管理顶部操作')).toContainText('转派巡检异常');
-    await expect(page.getByLabel('巡检管理查询筛选栏')).toContainText('执行时间');
-    await expect(page.getByLabel('巡检管理列表')).toContainText('INSP-20260614-M201');
-    await expect(page.getByLabel('巡检详情抽屉')).toContainText('高温点位连续越限');
-    await expect(page.getByLabel('巡检详情标签')).toContainText('现场证据');
-    await expect(page.getByLabel('巡检详情操作')).toContainText('转工单');
-    await expect(page.locator('body')).not.toContainText('workbench-menu-inspection-v1');
-
-    await page.getByRole('button', { name: /转派巡检异常/ }).click();
-    const transferDialog = page.getByRole('dialog', { name: '转派巡检异常' });
-    await expect(transferDialog).toBeVisible();
-    await expect(transferDialog.locator('.workspace-action-route strong')).toContainText('/workorders/new?');
-    await page.keyboard.press('Escape');
-    await expect(transferDialog).toHaveCount(0);
-
-    await page.getByRole('button', { name: 'INSP-20260614-CN301', exact: true }).click();
-    const detailDialog = page.getByRole('dialog', { name: '打开巡检详情' });
-    await expect(detailDialog).toBeVisible();
-    await expect(detailDialog.locator('.workspace-action-route strong')).toContainText('/inspections/INSP-20260614-CN301');
-    await page.keyboard.press('Escape');
-    await expect(detailDialog).toHaveCount(0);
-    await expect(page.getByLabel('巡检详情抽屉')).toContainText('主轴振动读数偏高');
-
-    await page.getByRole('button', { name: '转工单', exact: true }).click();
-    const workOrderDialog = page.getByRole('dialog', { name: '转派巡检异常' });
-    await expect(workOrderDialog).toBeVisible();
-    await expect(workOrderDialog.locator('.workspace-action-route strong')).toContainText('/workorders/new?');
-    await page.keyboard.press('Escape');
-    await expect(workOrderDialog).toHaveCount(0);
 
     await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
     expect(errors).toEqual([]);
@@ -596,23 +563,15 @@ test.describe('Workbench 正式入口浏览器回归', () => {
 
     await expect(page.getByLabel('数据监控真实产品页')).toBeVisible();
     await expect(page.locator('.workspace-product-page')).toHaveCount(0);
-    await expect(page.locator('.workspace-orders-shell')).toHaveCount(0);
-    await expect(page.locator('.workspace-energy-product')).toBeVisible();
     await expect(page.getByLabel('数据监控产品页主体').getByRole('heading', { name: '数据监控' })).toBeVisible();
     await expect(page.getByText('数据链路 · 采集事件 · 指标服务')).toBeVisible();
-    await expect(page.getByLabel('数据监控链路域')).toContainText('采集链路');
-    await expect(page.getByLabel('数据监控二级链路')).toContainText('IoT 网关');
-    await expect(page.getByLabel('数据监控状态反馈')).toContainText('采集链路异常 2 项');
-    await expect(page.getByLabel('数据监控链路拓扑')).toContainText('实时链路拓扑');
-    await expect(page.getByLabel('数据监控核心指标')).toContainText('链路健康度');
+    await expect(page.getByLabel('数据监控核心指标')).toContainText('数据链路总览');
     await expect(page.getByLabel('数据监控流程阶段')).toContainText('采集');
     await expect(page.getByLabel('数据监控顶部操作')).toContainText('重试采集任务');
     await expect(page.getByLabel('数据监控查询筛选栏')).toContainText('处理时间');
     await expect(page.getByLabel('数据监控列表')).toContainText('DATA-IOT-GW-A01');
     await expect(page.getByLabel('数据监控详情抽屉')).toContainText('设备点位采集延迟');
-    await expect(page.getByLabel('数据监控异常流水')).toContainText('重试记录');
     await expect(page.getByLabel('数据监控详情标签')).toContainText('异常事件');
-    await expect(page.getByLabel('数据监控权限反馈')).toContainText('链路操作入口可用');
     await expect(page.getByLabel('数据监控详情操作')).toContainText('重试任务');
     await expect(page.locator('body')).not.toContainText('workbench-menu-energy-v1');
 
@@ -623,10 +582,10 @@ test.describe('Workbench 正式入口浏览器回归', () => {
     await page.keyboard.press('Escape');
     await expect(retryDialog).toHaveCount(0);
 
-    await page.getByRole('button', { name: 'DATA-MES-SYNC-08', exact: true }).click();
+    await page.getByLabel('数据监控列表').getByRole('button', { name: 'DATA-MES-SYNC-08', exact: true }).click();
     const detailDialog = page.getByRole('dialog', { name: '打开数据监控详情' });
     await expect(detailDialog).toBeVisible();
-    await expect(detailDialog.locator('.workspace-action-route strong')).toContainText('/energy/DATA-MES-SYNC-08');
+    await expect(detailDialog.locator('.workspace-action-route strong')).toContainText('/energy/DATA-MES-SYNC-08?source=workbench&menu=energy');
     await page.keyboard.press('Escape');
     await expect(detailDialog).toHaveCount(0);
     await expect(page.getByLabel('数据监控详情抽屉')).toContainText('工单状态与设备采集批次');
@@ -888,7 +847,7 @@ test.describe('Workbench 正式入口浏览器回归', () => {
     await page.waitForLoadState('networkidle');
 
     await expect(page.locator('.workspace-stitch-grid')).toBeVisible({ timeout: 10_000 });
-    await expect(page.locator('.workspace-stitch-stats')).toContainText('12');
+    await expect(page.locator('.workspace-stitch-stats')).toContainText('11');
     await expect(page.locator('.workspace-stitch-stats')).toContainText('业务菜单');
 
     const designCards = [
@@ -897,7 +856,6 @@ test.describe('Workbench 正式入口浏览器回归', () => {
       ['资产总览', '/fixed-assets/workbench/assets?menu=asset'],
       ['设备管理', '/fixed-assets/workbench/assets?menu=device'],
       ['工单管理', '/fixed-assets/workbench/assets?menu=orders'],
-      ['巡检管理', '/fixed-assets/workbench/assets?menu=inspection'],
       ['备件管理', '/fixed-assets/workbench/assets?menu=spares'],
       ['数据监控', '/fixed-assets/workbench/analytics?menu=energy'],
       ['报表分析', '/fixed-assets/workbench/analytics?menu=report'],
@@ -929,8 +887,8 @@ test.describe('Workbench 正式入口浏览器回归', () => {
     await page.goto('/fixed-assets/workbench/analytics?menu=report');
     await page.waitForLoadState('networkidle');
 
-    await page.getByRole('button', { name: '生成经营报表' }).click();
-    const reportDialog = page.getByRole('dialog', { name: '生成经营报表' });
+    await page.getByRole('button', { name: '打开经营报表' }).click();
+    const reportDialog = page.getByRole('dialog', { name: '打开经营报表' });
     await expect(reportDialog).toBeVisible();
     await expect(reportDialog.getByText('/reports?source=workbench&view=operations').first()).toBeVisible();
     await expect(reportDialog.getByRole('status')).toContainText('当前账号缺少访问该业务页面的权限');

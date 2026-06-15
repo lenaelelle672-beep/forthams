@@ -39,6 +39,7 @@ import {
   Zap,
   type LucideIcon,
 } from 'lucide-react';
+import { BarChart as RechartsBarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import './WorkspacePreviewPage.css';
 
 type PreviewPage = 'overview' | 'security' | 'analytics' | 'assets' | 'stitch';
@@ -314,6 +315,11 @@ const menuItems: WorkspaceMenuItem[] = [
   { id: 'settings', label: '基础维护', icon: Settings, page: 'assets' },
 ];
 
+const workbenchRouteHiddenMenuIds = new Set(['design', 'inspection']);
+
+const isVisibleWorkbenchRouteMenuItem = (item: WorkspaceMenuItem) =>
+  !workbenchRouteHiddenMenuIds.has(item.id);
+
 const getWorkbenchPageFromSection = (section?: string): WorkbenchPage =>
   section ? workbenchPageBySection[section] ?? 'overview' : 'overview';
 
@@ -324,8 +330,8 @@ const getDefaultMenuIdForPage = (page: PreviewPage, isWorkbenchRoute = false) =>
   ).id;
 
 const getRouteMenuItem = (page: WorkbenchPage, menuId?: string) =>
-  menuItems.find((item) => item.id === menuId && item.page === page && item.id !== 'design') ??
-  menuItems.find((item) => item.page === page && item.id !== 'design') ??
+  menuItems.find((item) => item.id === menuId && item.page === page && isVisibleWorkbenchRouteMenuItem(item)) ??
+  menuItems.find((item) => item.page === page && isVisibleWorkbenchRouteMenuItem(item)) ??
   menuItems[0];
 
 const buildWorkbenchPath = (page: WorkbenchPage, menuId?: string) => {
@@ -2323,14 +2329,6 @@ const stitchScreens: Array<{
     linkLabel: '进入业务菜单',
   },
   {
-    title: '巡检管理',
-    status: 'Round 2',
-    note: '路线日历、点位核验、异常队列、证据上传与转工单',
-    imageSrc: stitchAsset('workbench-round2/workbench-menu-inspection-v1'),
-    route: '/fixed-assets/workbench/assets?menu=inspection',
-    linkLabel: '进入业务菜单',
-  },
-  {
     title: '备件管理',
     status: 'Round 2',
     note: '低储预警、供应商 ETA、关联工单、领用采购与成本回写',
@@ -2774,12 +2772,12 @@ function WorkspaceModuleMock({
 }
 
 const workbenchOrderSummaryCards = [
-  { label: '全部工单', value: '216', delta: '较昨日 +18', icon: ClipboardList, tone: 'blue' },
-  { label: '预测工单', value: '46', delta: '较昨日 +7', icon: Gauge, tone: 'blue' },
+  { label: '待维保', value: '248', delta: '待派工设备', icon: Gauge, tone: 'blue' },
+  { label: '今日派工', value: '42', delta: '较昨日 +6', icon: ClipboardList, tone: 'cyan' },
   { label: '执行中', value: '78', delta: '较昨日 +12', icon: Wrench, tone: 'green' },
   { label: '待验收', value: '32', delta: '较昨日 -3', icon: FileText, tone: 'violet' },
-  { label: 'SLA 逾期', value: '9', delta: '较昨日 +2', icon: AlertTriangle, tone: 'red' },
-  { label: '今日闭环', value: '51', delta: '较昨日 +9', icon: CheckCircle2, tone: 'green' },
+  { label: '逾期工单', value: '9', delta: '较昨日 +2', icon: AlertTriangle, tone: 'red' },
+  { label: '闭环率', value: '91.8%', delta: '本周闭环', icon: CheckCircle2, tone: 'green' },
 ] as const;
 
 const workbenchOrderStages = [
@@ -2901,17 +2899,17 @@ const workbenchOrderDetailTabs = ['工单信息', '设备状态', '备件与物�
 
 const workbenchTodoSummaryCards = [
   { label: '待审批', value: '18', delta: '较昨日 +3', icon: ClipboardList, tone: 'blue' },
-  { label: '待派工', value: '24', delta: '较昨日 +5', icon: UserCircle, tone: 'blue' },
-  { label: '预警', value: '36', delta: '较昨日 +8', icon: AlertTriangle, tone: 'orange' },
-  { label: 'SLA 逾期', value: '7', delta: '较昨日 +2', icon: Activity, tone: 'red' },
-  { label: '今日完成', value: '42', delta: '较昨日 +6', icon: CheckCircle2, tone: 'green' },
+  { label: '待派工', value: '24', delta: '较昨日 +5', icon: UserCircle, tone: 'cyan' },
+  { label: '预警待办', value: '36', delta: '较昨日 +8', icon: AlertTriangle, tone: 'orange' },
+  { label: '待完工', value: '42', delta: '执行中', icon: Activity, tone: 'green' },
+  { label: '逾期', value: '7', delta: '较昨日 +2', icon: CheckCircle2, tone: 'red' },
 ] as const;
 
 const workbenchTodoTabs = [
   { label: '全部待办', value: '78' },
   { label: '待审批', value: '18' },
   { label: '待派工', value: '24' },
-  { label: '预警', value: '36' },
+  { label: '预警待办', value: '36' },
   { label: '逾期', value: '7' },
 ] as const;
 
@@ -3057,20 +3055,35 @@ const workbenchTodoRows = [
 const workbenchTodoDetailTabs = ['基本信息', '审批流程', '附件', '处理建议'] as const;
 
 const workbenchAssetSummaryCards = [
-  { label: '资产总数', value: '12,856', delta: '较上月 +1.56%', icon: Layers, tone: 'blue' },
-  { label: '在用资产', value: '10,842', delta: '在线可追踪', icon: CheckCircle2, tone: 'green' },
-  { label: '风险资产', value: '356', delta: '需转派处置', icon: AlertTriangle, tone: 'red' },
-  { label: '健康评分', value: '86', delta: '平台均值', icon: Gauge, tone: 'cyan' },
-  { label: '处置申请', value: '18', delta: '调拨/报废/清退', icon: Archive, tone: 'orange' },
-  { label: '使用流转', value: '42', delta: '领用/借用/归还', icon: UserCircle, tone: 'violet' },
+  { label: '资产总数', value: '6,842', delta: '建账总量', icon: Layers, tone: 'blue' },
+  { label: '在用资产', value: '5,102', delta: '在线可追踪', icon: CheckCircle2, tone: 'green' },
+  { label: '闲置资产', value: '268', delta: '待盘活', icon: Archive, tone: 'cyan' },
+  { label: '风险资产', value: '36', delta: '需转派处置', icon: AlertTriangle, tone: 'red' },
+  { label: '健康指数', value: '86', delta: '平台均值', icon: Gauge, tone: 'violet' },
+  { label: '本月新增', value: '18', delta: '本月入账', icon: UserCircle, tone: 'orange' },
 ] as const;
 
 const workbenchAssetStages = [
-  { label: '建账', value: '12,856', note: '统一编码', tone: 'blue' },
-  { label: '在用', value: '10,842', note: '责任到人', tone: 'green' },
-  { label: '风险', value: '356', note: '健康低分', tone: 'red' },
+  { label: '建账', value: '6,842', note: '统一编码', tone: 'blue' },
+  { label: '在用', value: '5,102', note: '责任到人', tone: 'green' },
+  { label: '风险', value: '36', note: '健康低分', tone: 'red' },
   { label: '流转', value: '42', note: '领用/调拨', tone: 'cyan' },
   { label: '处置', value: '18', note: '审批中', tone: 'orange' },
+] as const;
+
+// 资产总览图表数据（对齐设计稿：饼图资产分类分布 / 柱图健康分布）
+const workbenchAssetCategoryDistribution = [
+  { name: '生产设备', value: 43, color: '#3b82f6' },
+  { name: 'IT设备', value: 27, color: '#10b981' },
+  { name: '安防设备', value: 18, color: '#f59e0b' },
+  { name: '办公设备', value: 12, color: '#8b5cf6' },
+] as const;
+
+const workbenchAssetHealthDistribution = [
+  { name: '优(90+)', value: 3856, color: '#10b981' },
+  { name: '良(80-89)', value: 1980, color: '#3b82f6' },
+  { name: '中(70-79)', value: 768, color: '#f59e0b' },
+  { name: '差(<70)', value: 238, color: '#ef4444' },
 ] as const;
 
 const workbenchAssetRows = [
@@ -3156,100 +3169,13 @@ const workbenchAssetRows = [
 
 const workbenchAssetDetailTabs = ['资产信息', '健康评分', '生命周期', '处置流转', '关联工单'] as const;
 
-const workbenchInspectionSummaryCards = [
-  { label: '今日计划', value: '36', delta: '18 条已完成', icon: CheckCircle2, tone: 'blue' },
-  { label: '异常点位', value: '5', delta: '待复核', icon: AlertTriangle, tone: 'red' },
-  { label: '按时完成率', value: '92%', delta: '较昨日 +6%', icon: TrendingUp, tone: 'green' },
-  { label: '待转工单', value: '7', delta: '异常复核后转派', icon: Wrench, tone: 'orange' },
-  { label: '路线数量', value: '12', delta: '按风险排程', icon: MapPin, tone: 'cyan' },
-  { label: '证据上传', value: '86%', delta: '图片/读数齐全', icon: FileText, tone: 'violet' },
-] as const;
-
-const workbenchInspectionStages = [
-  { label: '排程', value: '36', note: '今日计划', tone: 'blue' },
-  { label: '签到', value: '28', note: '扫码确认', tone: 'cyan' },
-  { label: '执行', value: '18', note: '现场采集', tone: 'green' },
-  { label: '异常', value: '5', note: '待复核', tone: 'red' },
-  { label: '闭环', value: '92%', note: '按时完成', tone: 'orange' },
-] as const;
-
-const workbenchInspectionRows = [
-  {
-    id: 'INSP-20260614-M201',
-    route: '产线 A 温度巡检',
-    asset: '注塑机 M-201',
-    point: '温度 / 振动 / 电流',
-    title: '高温点位连续越限',
-    priority: 'P1',
-    status: '待复核',
-    progress: '12/18',
-    owner: '李巡检',
-    evidence: '3 张图片',
-    tone: 'red',
-  },
-  {
-    id: 'INSP-20260614-CN301',
-    route: 'CNC 主轴巡检',
-    asset: '数控车床 CN-301',
-    point: '主轴振动 / 润滑',
-    title: '主轴振动读数偏高',
-    priority: 'P1',
-    status: '执行中',
-    progress: '8/12',
-    owner: '张三丰',
-    evidence: '读数已采集',
-    tone: 'orange',
-  },
-  {
-    id: 'INSP-20260614-CP101',
-    route: '动力站压力巡检',
-    asset: '空压机 CP-101',
-    point: '压力 / 油滤',
-    title: '油滤窗口待复查',
-    priority: 'P2',
-    status: '已完成',
-    progress: '10/10',
-    owner: '王技师',
-    evidence: '已上传',
-    tone: 'green',
-  },
-  {
-    id: 'INSP-20260614-RB501',
-    route: '焊接线温升巡检',
-    asset: '焊接机器人 RB-501',
-    point: '减速机温度',
-    title: '温升趋势需复核',
-    priority: 'P2',
-    status: '待执行',
-    progress: '0/8',
-    owner: '赵技师',
-    evidence: '待上传',
-    tone: 'blue',
-  },
-  {
-    id: 'INSP-20260614-PDB01',
-    route: '动力配电巡检',
-    asset: '配电柜 PDB-01',
-    point: '红外测温',
-    title: '柜体局部过热报警',
-    priority: 'P2',
-    status: '已转派',
-    progress: '6/6',
-    owner: '陈电工',
-    evidence: '热成像已上传',
-    tone: 'orange',
-  },
-] as const;
-
-const workbenchInspectionDetailTabs = ['巡检信息', '路线点位', '现场证据', '异常处理', '关联工单'] as const;
-
 const workbenchSparesSummaryCards = [
-  { label: '备件总数', value: '3,256', delta: '较昨日 +48', icon: PackageCheck, tone: 'blue' },
-  { label: '低储备件', value: '126', delta: '需补货', icon: AlertTriangle, tone: 'orange' },
+  { label: '库存 SKU', value: '1,420', delta: '在库品种', icon: PackageCheck, tone: 'blue' },
+  { label: '低储备件', value: '18', delta: '需补货', icon: AlertTriangle, tone: 'orange' },
+  { label: '周转率', value: '4.8', delta: '次/月', icon: TrendingUp, tone: 'green' },
   { label: '缺货备件', value: '28', delta: '影响工单', icon: Box, tone: 'red' },
   { label: '供应商 ETA', value: '3天', delta: '轴承优先', icon: CalendarDays, tone: 'cyan' },
   { label: '关联工单', value: '12', delta: '预测维保优先', icon: Wrench, tone: 'violet' },
-  { label: '成本回写', value: '82%', delta: '本月完成率', icon: BarChart3, tone: 'green' },
 ] as const;
 
 const workbenchSparesStages = [
@@ -3406,11 +3332,11 @@ type WorkbenchCommandPageConfig = {
 };
 
 const workbenchHomeSummaryCards = [
-  { label: '资产健康', value: '86', delta: '平台均值', icon: Gauge, tone: 'cyan' },
-  { label: '流程待办', value: '18', delta: '审批/派工/异常', icon: ClipboardList, tone: 'orange' },
-  { label: '今日工单', value: '42', delta: '派工与验收', icon: Wrench, tone: 'blue' },
-  { label: '维保预警', value: '5', delta: '2h 内到期', icon: AlertTriangle, tone: 'red' },
-  { label: '数据刷新', value: '10:24', delta: 'MES 已同步', icon: Database, tone: 'green' },
+  { label: '资产总数', value: '6,842', delta: '建账总量', icon: Layers, tone: 'blue' },
+  { label: '资产健康度', value: '86', delta: '平台均值', icon: Gauge, tone: 'cyan' },
+  { label: '故障设备', value: '36', delta: '需处置', icon: AlertTriangle, tone: 'red' },
+  { label: '在保资产价值', value: '¥3,820万', delta: '净值', icon: Database, tone: 'green' },
+  { label: '当月维保费用', value: '¥46万', delta: '本月', icon: Wrench, tone: 'orange' },
   { label: '安全评分', value: '92', delta: '较上周 +4', icon: ShieldCheck, tone: 'violet' },
 ] as const;
 
@@ -3627,12 +3553,12 @@ const workbenchHomeSignals = [
 ] as const;
 
 const workbenchEnergySummaryCards = [
-  { label: '链路健康度', value: '98.6%', delta: 'MES/IoT 正常', icon: Activity, tone: 'green' },
-  { label: '接入系统', value: '12', delta: '2 个异常', icon: Database, tone: 'blue' },
-  { label: '采集延迟', value: '0.8s', delta: 'P95 2.1s', icon: Gauge, tone: 'cyan' },
-  { label: '异常事件', value: '32', delta: '未处理', icon: AlertTriangle, tone: 'red' },
-  { label: '采集点位', value: '5,102', delta: '实时在线', icon: Server, tone: 'violet' },
-  { label: '重试任务', value: '7', delta: '自动补偿', icon: Zap, tone: 'orange' },
+  { label: '数据链路总览', value: '98.6%', delta: 'MES/IoT 健康', icon: Activity, tone: 'green' },
+  { label: '数据源管理', value: '12', delta: '2 个异常', icon: Database, tone: 'blue' },
+  { label: '设备点位', value: '5,102', delta: '实时在线', icon: Server, tone: 'violet' },
+  { label: '采集任务', value: '7', delta: '自动补偿', icon: Zap, tone: 'orange' },
+  { label: '监控配置', value: '36', delta: '阈值规则', icon: Gauge, tone: 'cyan' },
+  { label: '数据事件', value: '32', delta: '未处理', icon: AlertTriangle, tone: 'red' },
 ] as const;
 
 const workbenchEnergyStages = [
@@ -3756,8 +3682,8 @@ const workbenchPolicySummaryCards = [
   { label: '风险规则', value: '68', delta: '启用 54', icon: ShieldCheck, tone: 'blue' },
   { label: '角色策略', value: '128', delta: '110 个启用', icon: UserCircle, tone: 'cyan' },
   { label: '审批边界', value: '46', delta: '覆盖 23 部门', icon: ClipboardList, tone: 'green' },
-  { label: '高危复核', value: '23', delta: '较昨日 +6', icon: AlertTriangle, tone: 'red' },
   { label: '策略命中', value: '238', delta: '近 7 天', icon: Bell, tone: 'orange' },
+  { label: '高风险待复核', value: '23', delta: '较昨日 +6', icon: AlertTriangle, tone: 'red' },
   { label: '权限申请', value: '9', delta: '待审批', icon: Shield, tone: 'violet' },
 ] as const;
 
@@ -6562,7 +6488,7 @@ function WorkbenchAssetPage({
               <span className="workspace-orders-icon"><Layers /></span>
               <div>
                 <h2>资产总览</h2>
-                <p>健康台账 · 生命周期 · 处置流转</p>
+                <p>资产健康与生命周期管理</p>
               </div>
             </div>
             <div className="workspace-orders-toolbar" aria-label="资产总览顶部操作">
@@ -6651,6 +6577,44 @@ function WorkbenchAssetPage({
             </button>
           </div>
 
+          <div className="workspace-orders-charts" aria-label="资产总览图表">
+            <section className="workspace-orders-chart-card" aria-label="资产分类分布">
+              <header><h3>资产分类分布</h3><small>按资产大类占比</small></header>
+              <div className="workspace-orders-chart-body">
+                <div className="workspace-orders-donut" role="img" aria-label="生产设备 43%，IT设备 27%，安防设备 18%，办公设备 12%">
+                  <strong>6,842</strong>
+                  <span>总资产</span>
+                </div>
+                <ul className="workspace-orders-chart-legend">
+                  {workbenchAssetCategoryDistribution.map((entry) => (
+                    <li key={entry.name}>
+                      <i style={{ backgroundColor: entry.color }} />
+                      <span>{entry.name}</span>
+                      <strong>{entry.value}%</strong>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </section>
+
+            <section className="workspace-orders-chart-card" aria-label="健康分布">
+              <header><h3>健康分布</h3><small>按健康分区间统计</small></header>
+              <div className="workspace-orders-chart-body">
+                <ResponsiveContainer width="100%" height={220}>
+                  <RechartsBarChart data={[...workbenchAssetHealthDistribution]}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
+                    <XAxis dataKey="name" tick={{ fontSize: 12 }} stroke="#94a3b8" />
+                    <YAxis tick={{ fontSize: 12 }} stroke="#94a3b8" />
+                    <Tooltip />
+                    {workbenchAssetHealthDistribution.map((entry) => (
+                      <Bar key={entry.name} dataKey="value" fill={entry.color} radius={[4, 4, 0, 0]} />
+                    ))}
+                  </RechartsBarChart>
+                </ResponsiveContainer>
+              </div>
+            </section>
+          </div>
+
           <div className="workspace-orders-table" aria-label="资产总览列表">
             <div className="workspace-orders-table-head">
               <span><input type="checkbox" aria-label="选择全部资产" readOnly /></span>
@@ -6723,14 +6687,14 @@ function WorkbenchAssetPage({
           </div>
 
           <footer className="workspace-orders-pagination" aria-label="资产分页">
-            <span>共 12,856 台</span>
+            <span>共 6,842 台</span>
             <button type="button">10条/页</button>
             <button type="button" disabled>‹</button>
             {[1, 2, 3, 4, 5].map((pageNo) => (
               <button key={pageNo} type="button" className={pageNo === 1 ? 'is-current' : ''}>{pageNo}</button>
             ))}
             <span>...</span>
-            <button type="button">1286</button>
+            <button type="button">685</button>
             <button type="button">›</button>
           </footer>
         </section>
@@ -6859,337 +6823,6 @@ function WorkbenchAssetPage({
             <Layers />
             <strong>选择左侧资产打开详情</strong>
             <span>详情抽屉会展示健康评分、生命周期、处置流转和关联工单。</span>
-          </button>
-        )}
-      </aside>
-    </section>
-  );
-}
-
-function WorkbenchInspectionPage({
-  item,
-  context,
-  meta,
-  onPreviewAction,
-}: WorkbenchMenuPageProps) {
-  const [selectedInspectionId, setSelectedInspectionId] = useState(workbenchInspectionRows[0].id);
-  const [detailTab, setDetailTab] = useState<(typeof workbenchInspectionDetailTabs)[number]>('巡检信息');
-  const [detailOpen, setDetailOpen] = useState(true);
-  const selectedInspection =
-    workbenchInspectionRows.find((inspection) => inspection.id === selectedInspectionId) ?? workbenchInspectionRows[0];
-  const planAction = meta.actions[0];
-  const safetyAction = meta.actions[1] ?? planAction;
-  const transferAction = meta.actions[2] ?? planAction;
-
-  const openInspectionPreview = (
-    title: string,
-    routeTarget: string,
-    description: string,
-    primaryLabel: string,
-    icon: LucideIcon = CheckCircle2,
-  ) => {
-    onPreviewAction({
-      title,
-      source: '巡检管理页面',
-      routeTarget,
-      description,
-      primaryLabel,
-      icon,
-      visual: meta.imageSrc,
-      stats: context.stats,
-    });
-  };
-
-  const openInspection = (inspection: (typeof workbenchInspectionRows)[number]) => {
-    setSelectedInspectionId(inspection.id);
-    setDetailOpen(true);
-    openInspectionPreview(
-      '打开巡检详情',
-      `/inspections/${inspection.id}?source=workbench&menu=inspection`,
-      `打开 ${inspection.id}，带入路线、点位、现场证据和异常处理上下文。`,
-      '打开详情',
-      CheckCircle2,
-    );
-  };
-
-  return (
-    <section className="workspace-orders-page workspace-inspection-page" aria-label={`${item.label}真实产品页`}>
-      <div className="workspace-orders-main">
-        <section className="workspace-menu-product-shell workspace-inspection-product-shell" aria-label="巡检管理产品页主体">
-          <header className="workspace-orders-header">
-            <div className="workspace-orders-title">
-              <span className="workspace-orders-icon"><CheckCircle2 /></span>
-              <div>
-                <h2>巡检管理</h2>
-                <p>路线排程 · 扫码执行 · 异常转派</p>
-              </div>
-            </div>
-            <div className="workspace-orders-toolbar" aria-label="巡检管理顶部操作">
-              <button type="button" className="is-secondary" onClick={() => onPreviewAction(planAction)}>
-                <CheckCircle2 />
-                生成巡检计划
-              </button>
-              <button type="button" className="is-secondary" onClick={() => onPreviewAction(safetyAction)}>
-                <ClipboardList />
-                执行安全点检
-              </button>
-              <button type="button" className="is-primary" onClick={() => onPreviewAction(transferAction)}>
-                <Wrench />
-                转派巡检异常
-              </button>
-            </div>
-          </header>
-
-          <div className="workspace-orders-kpis" aria-label="巡检管理核心指标">
-            {workbenchInspectionSummaryCards.map((card) => {
-              const CardIcon = card.icon;
-              return (
-                <button
-                  key={card.label}
-                  type="button"
-                  className={`is-${card.tone}`}
-                  onClick={() =>
-                    openInspectionPreview(
-                      `${card.label}巡检`,
-                      `/inspections?source=workbench&metric=${encodeURIComponent(card.label)}`,
-                      `按 ${card.label} 下钻巡检任务，保留路线、点位和执行人筛选。`,
-                      '查看巡检',
-                      CardIcon,
-                    )
-                  }
-                >
-                  <CardIcon />
-                  <span>{card.label}</span>
-                  <strong>{card.value}</strong>
-                  <small>{card.delta}</small>
-                </button>
-              );
-            })}
-          </div>
-
-          <div className="workspace-orders-stage-row" aria-label="巡检执行阶段">
-            {workbenchInspectionStages.map((stage) => (
-              <button
-                key={stage.label}
-                type="button"
-                className={`is-${stage.tone}`}
-                onClick={() =>
-                  openInspectionPreview(
-                    `${stage.label}巡检`,
-                    `/inspections?source=workbench&stage=${encodeURIComponent(stage.label)}`,
-                    `按 ${stage.label} 阶段查看巡检路线和异常闭环。`,
-                    '查看阶段',
-                    ArrowRight,
-                  )
-                }
-              >
-                <span>{stage.label}</span>
-                <strong>{stage.value}</strong>
-                <small>{stage.note}</small>
-              </button>
-            ))}
-          </div>
-
-          <div className="workspace-orders-filterbar" aria-label="巡检管理查询筛选栏">
-            <label>
-              <Search />
-              <input readOnly value="搜索巡检号 / 路线 / 资产 / 执行人" aria-label="巡检搜索" />
-            </label>
-            {['路线 全部', '点位 全部', '状态 全部', '执行人 全部'].map((filter) => (
-              <button key={filter} type="button" onClick={() => onPreviewAction(planAction)}>
-                {filter}
-                <ArrowRight />
-              </button>
-            ))}
-            <button type="button" className="is-date" onClick={() => onPreviewAction(safetyAction)}>
-              执行时间
-              <CalendarDays />
-            </button>
-            <button type="button" className="is-reset" onClick={() => onPreviewAction(planAction)}>
-              重置
-            </button>
-          </div>
-
-          <div className="workspace-orders-table" aria-label="巡检管理列表">
-            <div className="workspace-orders-table-head">
-              <span><input type="checkbox" aria-label="选择全部巡检" readOnly /></span>
-              <span>巡检号</span>
-              <span>路线</span>
-              <span>资产点位</span>
-              <span>异常/任务</span>
-              <span>优先级</span>
-              <span>状态</span>
-              <span>进度</span>
-              <span>执行人</span>
-              <span>证据</span>
-              <span>操作</span>
-            </div>
-            {workbenchInspectionRows.map((inspection) => (
-              <div
-                key={inspection.id}
-                className={`workspace-orders-table-row is-${inspection.tone} ${
-                  inspection.id === selectedInspection.id ? 'is-selected' : ''
-                }`}
-              >
-                <span><input type="checkbox" aria-label={`选择${inspection.id}`} readOnly /></span>
-                <button type="button" className="is-link" onClick={() => openInspection(inspection)}>{inspection.id}</button>
-                <span><em>{inspection.route}</em></span>
-                <span>
-                  <strong>{inspection.asset}</strong>
-                  <small>{inspection.point}</small>
-                </span>
-                <button type="button" className="is-title" onClick={() => openInspection(inspection)}>{inspection.title}</button>
-                <span><b>{inspection.priority}</b></span>
-                <span><i>{inspection.status}</i></span>
-                <span>{inspection.progress}</span>
-                <span>{inspection.owner}</span>
-                <span><em className="is-spare">{inspection.evidence}</em></span>
-                <span>
-                  <button
-                    type="button"
-                    className="is-process"
-                    onClick={() => {
-                      setSelectedInspectionId(inspection.id);
-                      setDetailOpen(true);
-                      openInspectionPreview(
-                        '执行巡检任务',
-                        `/inspections/${inspection.id}/execute?source=workbench`,
-                        `执行 ${inspection.id}，带入路线、点位和现场证据要求。`,
-                        '进入执行',
-                        ClipboardList,
-                      );
-                    }}
-                  >
-                    执行
-                  </button>
-                  <button type="button" className="is-more" aria-label={`${inspection.id}更多操作`} onClick={() => openInspection(inspection)}>
-                    ···
-                  </button>
-                </span>
-              </div>
-            ))}
-          </div>
-
-          <footer className="workspace-orders-pagination" aria-label="巡检分页">
-            <span>共 36 条</span>
-            <button type="button">10条/页</button>
-            <button type="button" disabled>‹</button>
-            {[1, 2, 3, 4].map((pageNo) => (
-              <button key={pageNo} type="button" className={pageNo === 1 ? 'is-current' : ''}>{pageNo}</button>
-            ))}
-            <button type="button">›</button>
-          </footer>
-        </section>
-      </div>
-
-      <aside className="workspace-orders-detail" aria-label="巡检详情抽屉">
-        {detailOpen ? (
-          <>
-            <header className="workspace-orders-detail-head">
-              <strong>巡检详情</strong>
-              <button type="button" aria-label="关闭巡检详情" onClick={() => setDetailOpen(false)}>
-                <X />
-              </button>
-            </header>
-            <section className="workspace-orders-detail-card" aria-label="当前巡检信息">
-              <div>
-                <b>{selectedInspection.priority}</b>
-                <span>
-                  <strong>{selectedInspection.id}</strong>
-                  <small>{selectedInspection.status}</small>
-                </span>
-              </div>
-              <h3>{selectedInspection.title}</h3>
-              <dl>
-                <div><dt>路线</dt><dd>{selectedInspection.route}</dd></div>
-                <div><dt>进度</dt><dd>{selectedInspection.progress}</dd></div>
-                <div><dt>资产</dt><dd>{selectedInspection.asset}</dd></div>
-                <div><dt>点位</dt><dd>{selectedInspection.point}</dd></div>
-                <div><dt>执行人</dt><dd>{selectedInspection.owner}</dd></div>
-                <div><dt>证据</dt><dd>{selectedInspection.evidence}</dd></div>
-                <div><dt>计划时间</dt><dd>2026-06-14 14:00</dd></div>
-                <div><dt>异常状态</dt><dd>{selectedInspection.status}</dd></div>
-              </dl>
-            </section>
-
-            <section className="workspace-orders-flow" aria-label="巡检流转">
-              {['排程', '签到', '执行', '异常', '闭环'].map((step, index) => (
-                <span key={step} className={index < 2 ? 'is-done' : index === 2 ? 'is-active' : ''}>
-                  <CheckCircle2 />
-                  <strong>{step}</strong>
-                  <small>{index < 2 ? '已完成' : index === 2 ? '进行中' : '待流转'}</small>
-                </span>
-              ))}
-            </section>
-
-            <nav className="workspace-orders-tabs" aria-label="巡检详情标签">
-              {workbenchInspectionDetailTabs.map((tab) => (
-                <button
-                  key={tab}
-                  type="button"
-                  className={tab === detailTab ? 'is-active' : ''}
-                  onClick={() => setDetailTab(tab)}
-                >
-                  {tab}
-                </button>
-              ))}
-            </nav>
-
-            <section className="workspace-orders-tab-panel" aria-label={`${detailTab}内容`}>
-              <article>
-                <span>路线摘要</span>
-                <p>{selectedInspection.route} 覆盖 {selectedInspection.asset}，点位为 {selectedInspection.point}。</p>
-              </article>
-              <article>
-                <span>现场证据</span>
-                <ul>
-                  <li>{selectedInspection.evidence} <b>已记录</b></li>
-                  <li>扫码签到 <b>已完成</b></li>
-                  <li>异常说明 <b className="is-warning">需复核</b></li>
-                </ul>
-              </article>
-              <article>
-                <span>异常处理</span>
-                <p>读数异常可直接转派工单，安全点检结果回写到设备和资产健康评分。</p>
-              </article>
-              <article>
-                <span>关联工单</span>
-                <ul>
-                  <li>WO-20240614-0012 <small>派工中</small></li>
-                  <li>ALM-20240614-0011 <small>处置中</small></li>
-                  <li>SP-6205-2RS <small>备件已关联</small></li>
-                </ul>
-              </article>
-            </section>
-
-            <footer className="workspace-orders-detail-actions" aria-label="巡检详情操作">
-              <button type="button" onClick={() => onPreviewAction(safetyAction)}>
-                安全点检
-              </button>
-              <button
-                type="button"
-                onClick={() =>
-                  openInspectionPreview(
-                    '上传巡检证据',
-                    `/inspections/${selectedInspection.id}/upload?source=workbench`,
-                    `上传 ${selectedInspection.id} 的图片、读数和异常说明。`,
-                    '上传证据',
-                    FileText,
-                  )
-                }
-              >
-                上传证据
-              </button>
-              <button type="button" className="is-primary" onClick={() => onPreviewAction(transferAction)}>
-                转工单
-              </button>
-            </footer>
-          </>
-        ) : (
-          <button type="button" className="workspace-orders-detail-empty" onClick={() => setDetailOpen(true)}>
-            <CheckCircle2 />
-            <strong>选择左侧巡检打开详情</strong>
-            <span>详情抽屉会展示路线点位、现场证据、异常处理和关联工单。</span>
           </button>
         )}
       </aside>
@@ -7530,12 +7163,12 @@ function WorkbenchSparesPage({
 }
 
 const workbenchDeviceSummaryCards = [
-  { label: '在线设备', value: '5,102', delta: '在线率 98.6%', icon: Cpu, tone: 'green' },
-  { label: '温度异常', value: '12', delta: '超过阈值', icon: Gauge, tone: 'orange' },
-  { label: '振动异常', value: '6', delta: '动力站优先', icon: Activity, tone: 'red' },
-  { label: '采集延迟', value: '95.2ms', delta: 'IoT 平均', icon: Database, tone: 'cyan' },
-  { label: '离线设备', value: '28', delta: '需复核', icon: Monitor, tone: 'violet' },
-  { label: '待派工', value: '18', delta: '设备异常转工单', icon: Wrench, tone: 'blue' },
+  { label: '设备总数', value: '5,420', delta: '接入台账', icon: Cpu, tone: 'blue' },
+  { label: '在线设备', value: '5,102', delta: '在线率 98.6%', icon: Monitor, tone: 'green' },
+  { label: '离线设备', value: '28', delta: '需复核', icon: Database, tone: 'cyan' },
+  { label: '异常设备', value: '18', delta: '温度/振动', icon: AlertTriangle, tone: 'red' },
+  { label: '温度预警', value: '12', delta: '超过阈值', icon: Gauge, tone: 'orange' },
+  { label: '待派工', value: '18', delta: '异常转工单', icon: Wrench, tone: 'violet' },
 ] as const;
 
 const workbenchDeviceStages = [
@@ -7630,12 +7263,12 @@ const workbenchDeviceRows = [
 const workbenchDeviceDetailTabs = ['设备信息', '实时遥测', '维保建议', '工单记录', '采集链路'] as const;
 
 const workbenchReportSummaryCards = [
-  { label: '资产总价值', value: '¥98,760.25万', delta: '较上期 +3.42%', icon: Layers, tone: 'blue' },
-  { label: '在用资产价值', value: '¥86,320.45万', delta: '较上期 +2.89%', icon: TrendingUp, tone: 'green' },
-  { label: '闲置资产价值', value: '¥8,640.12万', delta: '较上期 -1.24%', icon: Archive, tone: 'cyan' },
-  { label: '风险资产价值', value: '¥3,799.68万', delta: '较上期 +6.35%', icon: AlertTriangle, tone: 'orange' },
-  { label: '资产数量', value: '12,856', delta: '台 · +1.56%', icon: BarChart3, tone: 'violet' },
-  { label: '导出任务', value: '14', delta: '2 个待重试', icon: FileText, tone: 'red' },
+  { label: '资产总价值', value: '¥3,820万', delta: '净值', icon: Layers, tone: 'blue' },
+  { label: '资产增长趋势', value: '+3.42%', delta: '较上期', icon: TrendingUp, tone: 'green' },
+  { label: '部门资产统计', value: '3 厂区', delta: 'A/B/研发', icon: BarChart3, tone: 'cyan' },
+  { label: '维保成本分析', value: '¥46万', delta: '本月', icon: Wrench, tone: 'orange' },
+  { label: '风险资产统计', value: '36', delta: '需处置', icon: AlertTriangle, tone: 'red' },
+  { label: '资产分类分布', value: '4 类', delta: '生产/IT/安防/办公', icon: FileText, tone: 'violet' },
 ] as const;
 
 const workbenchReportStages = [
@@ -7732,10 +7365,10 @@ const workbenchReportDetailTabs = ['报表信息', '趋势分析', '导出记录
 const workbenchAlarmSummaryCards = [
   { label: '安全评分', value: '92', delta: '分 · 较上周 +4', icon: ShieldCheck, tone: 'green' },
   { label: '高危事件', value: '3', delta: '需立即处置', icon: AlertTriangle, tone: 'red' },
-  { label: '策略命中', value: '27', delta: '自动聚合', icon: Shield, tone: 'orange' },
-  { label: '处理中', value: '12', delta: '工单联动', icon: Wrench, tone: 'blue' },
-  { label: '已闭环', value: '91.8%', delta: '本周', icon: CheckCircle2, tone: 'green' },
-  { label: '平均响应', value: '2.3h', delta: '本周统计', icon: Activity, tone: 'cyan' },
+  { label: '中危事件', value: '12', delta: '处理中', icon: Shield, tone: 'orange' },
+  { label: '平均响应时间', value: '2.3h', delta: '本周统计', icon: Activity, tone: 'cyan' },
+  { label: '已处置', value: '91.8%', delta: '本周闭环', icon: CheckCircle2, tone: 'green' },
+  { label: '待处置', value: '8', delta: '待研判', icon: Wrench, tone: 'blue' },
 ] as const;
 
 const workbenchAlarmStages = [
@@ -10717,7 +10350,7 @@ function StitchSuiteDashboard() {
               页面稿
             </span>
             <span>
-              <strong>12</strong>
+              <strong>11</strong>
               业务菜单
             </span>
           </div>
@@ -11434,7 +11067,7 @@ export default function WorkspacePreviewPage() {
   const [screenPreview, setScreenPreview] = useState<ScreenPreview | null>(null);
 
   const visibleMenuItems = useMemo(
-    () => (isWorkbenchRoute ? menuItems.filter((item) => item.id !== 'design') : menuItems),
+    () => (isWorkbenchRoute ? menuItems.filter(isVisibleWorkbenchRouteMenuItem) : menuItems),
     [isWorkbenchRoute],
   );
 
@@ -11765,7 +11398,9 @@ export default function WorkspacePreviewPage() {
             </div>
           </div>
 
-          <WorkspaceContextStrip item={activeItem} context={activeContext} onAction={handleContextAction} />
+          {!isWorkbenchRoute ? (
+            <WorkspaceContextStrip item={activeItem} context={activeContext} onAction={handleContextAction} />
+          ) : null}
           {activeModuleMock && activeProductPageMeta && activeItem.id === 'home' ? (
             <WorkbenchHomePage
               item={activeItem}
@@ -11800,14 +11435,6 @@ export default function WorkspacePreviewPage() {
             />
           ) : activeModuleMock && activeProductPageMeta && activeItem.id === 'orders' ? (
             <WorkbenchOrdersPage
-              item={activeItem}
-              context={activeContext}
-              mock={activeModuleMock}
-              meta={activeProductPageMeta}
-              onPreviewAction={setRoutePreview}
-            />
-          ) : activeModuleMock && activeProductPageMeta && activeItem.id === 'inspection' ? (
-            <WorkbenchInspectionPage
               item={activeItem}
               context={activeContext}
               mock={activeModuleMock}

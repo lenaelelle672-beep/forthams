@@ -5,6 +5,7 @@ const readText = (relativePath: string) =>
   readFileSync(new URL(relativePath, import.meta.url), 'utf8');
 
 const workspacePage = readText('../pages/workspace-preview/WorkspacePreviewPage.tsx');
+const workspacePageStyles = readText('../pages/workspace-preview/WorkspacePreviewPage.css');
 const appLayout = readText('../layouts/AppLayout.tsx');
 const router = readText('../router/index.tsx');
 const routePermissions = readText('../utils/routePermissions.ts');
@@ -22,7 +23,6 @@ const requiredWorkbenchMenus = [
   '资产总览',
   '设备管理',
   '工单管理',
-  '巡检管理',
   '备件管理',
   '数据监控',
   '报表分析',
@@ -31,6 +31,7 @@ const requiredWorkbenchMenus = [
   '基础维护',
 ];
 
+const hiddenFormalWorkbenchMenus = ['design', 'inspection'];
 const duplicateMenus = ['报表大屏', '平台配置', '维保计划'];
 
 describe('Workbench platform entry contract', () => {
@@ -55,18 +56,36 @@ describe('Workbench platform entry contract', () => {
     );
   });
 
-  it('preserves the approved Workbench side navigation and filters design-only tabs from formal routes', () => {
+  it('preserves the approved Workbench side navigation and filters preview-only or unbuilt modules from formal routes', () => {
     for (const label of requiredWorkbenchMenus) {
       expect(menuItemsBlock).toContain(`label: '${label}'`);
       expect(matrix).toContain(`| ${label} |`);
     }
 
+    expect(menuItemsBlock).toContain("label: '巡检管理'");
+
     for (const label of duplicateMenus) {
       expect(menuItemsBlock).not.toContain(`label: '${label}'`);
     }
 
-    expect(workspacePage).toContain("menuItems.filter((item) => item.id !== 'design')");
+    for (const menuId of hiddenFormalWorkbenchMenus) {
+      expect(workspacePage).toContain(`'${menuId}'`);
+    }
+
+    expect(workspacePage).toContain('workbenchRouteHiddenMenuIds');
+    expect(workspacePage).toContain('menuItems.filter(isVisibleWorkbenchRouteMenuItem)');
     expect(workspacePage).toContain("pageTabs.filter((tab) => tab.id !== 'stitch')");
+  });
+
+  it('keeps the approved Workbench shell untouched while page content evolves', () => {
+    expect(workspacePage).not.toContain('workspace-menu-badge');
+    expect(workspacePage).not.toContain('workspace-side-footer');
+    expect(workspacePage).not.toContain('版本 v2.8.0');
+    expect(workspacePage).not.toContain('版权 © 2026 UNIVIEW 固定资产平台');
+
+    expect(workspacePageStyles).toContain('grid-template-columns: 166px minmax(0, 1fr)');
+    expect(workspacePageStyles).not.toContain('.workspace-menu-badge');
+    expect(workspacePageStyles).not.toContain('.workspace-side-footer');
   });
 
   it('maps Dashboard capabilities to real Workbench business targets', () => {
