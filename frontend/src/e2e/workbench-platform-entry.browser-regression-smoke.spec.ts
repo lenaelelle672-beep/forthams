@@ -180,8 +180,8 @@ test.describe('Workbench 正式入口浏览器回归', () => {
       {
         label: '基础维护',
         route: '/fixed-assets/workbench/assets?menu=settings',
-        action: '新建配置',
-        dialogName: '新建基础配置',
+        action: '新建分类',
+        dialogName: '新建基础分类',
         targetIncludes: ['/settings/sysconfig/new?source=workbench'],
       },
     ];
@@ -820,56 +820,61 @@ test.describe('Workbench 正式入口浏览器回归', () => {
     await expect(page.getByLabel('基础维护分类树')).toBeHidden();
     await expect(page.getByLabel('基础维护页面分栏')).toContainText('资产分类');
     await expect(page.getByLabel('基础维护页面分栏')).toContainText('位置管理');
-    await expect(page.getByLabel('基础维护页面分栏')).toContainText('供应商');
+    await expect(page.getByLabel('基础维护页面分栏')).toContainText('供应商管理');
+    await expect(page.getByLabel('基础维护页面分栏')).toContainText('资产型号');
+    await expect(page.getByLabel('基础维护页面分栏')).toContainText('编号规则');
+    await expect(page.getByLabel('基础维护页面分栏')).toContainText('集成源管理');
     await expect(page.getByLabel('基础维护页面分栏')).toContainText('系统配置');
-    await expect(page.getByLabel('基础维护核心指标')).toContainText('编号规则');
-    await expect(page.getByLabel('基础维护顶部操作')).toContainText('新建配置');
-    await expect(page.getByLabel('基础维护查询筛选栏')).toContainText('空态预览');
-    await expect(page.getByLabel('基础维护配置对象列表')).toContainText('CFG-CAT-ASSET');
-    await expect(page.getByLabel('基础维护配置对象列表')).toContainText('CFG-CAT-POWER');
+    await expect(page.getByLabel('基础维护核心指标')).toContainText('全部分类');
+    await expect(page.getByLabel('基础维护核心指标')).toContainText('关联资产');
+    await expect(page.getByLabel('基础维护顶部操作')).toContainText('新建分类');
+    await expect(page.getByLabel('基础维护顶部操作')).toContainText('批量导入');
+    await expect(page.getByLabel('基础维护顶部操作')).toContainText('批量删除');
+    await expect(page.getByLabel('基础维护顶部操作').getByRole('button', { name: '批量删除' })).toBeDisabled();
+    await expect(page.getByLabel('基础维护查询筛选栏')).toContainText('父级分类');
+    await expect(page.getByLabel('基础维护配置对象列表')).toContainText('生产设备');
+    await expect(page.getByLabel('基础维护配置对象列表')).toContainText('交通设备');
+    await expect(page.getByLabel('基础维护配置对象列表').locator('.workspace-settings-table-row')).toHaveCount(8);
     await expect(page.getByLabel('配置健康总览')).toContainText('待处理变更');
-    await expect(page.getByLabel('基础维护详情抽屉')).toContainText('生产设备分类体系');
+    await expect(page.getByLabel('基础维护详情抽屉')).toContainText('生产设备分类配置');
     await expect(page.getByLabel('基础维护详情抽屉')).toContainText('关联资产');
-    await expect(page.getByLabel('基础维护详情抽屉')).toContainText('最后同步');
-    await expect(page.getByLabel('基础维护详情抽屉')).toContainText('变更影响');
-    await expect(page.getByLabel('基础维护详情标签')).toContainText('供应商资质');
-    await expect(page.getByLabel('基础维护危险变更确认')).toContainText('危险变更需二次确认');
-    await expect(page.getByLabel('基础维护详情操作')).toContainText('供应商资质');
+    await expect(page.getByLabel('基础维护详情抽屉')).toContainText('资产型号 Top 5');
+    await expect(page.getByLabel('基础维护详情标签')).toContainText('变更记录');
+    await expect(page.getByLabel('基础维护危险变更确认')).toContainText('停用分类将影响关联资产');
+    await expect(page.getByLabel('基础维护详情操作')).toContainText('停用');
+    await expect(page.getByLabel('基础维护详情操作')).toContainText('删除');
     await expect(page.locator('body')).not.toContainText('workbench-menu-settings-v1');
 
-    await page.getByLabel('基础维护顶部操作').getByRole('button', { name: '新建配置' }).click();
-    const categoryDialog = page.getByRole('dialog', { name: '新建基础配置' });
+    await page.getByLabel('基础维护顶部操作').getByRole('button', { name: '新建分类' }).click();
+    const categoryDialog = page.getByRole('dialog', { name: '新建基础分类' });
     await expect(categoryDialog).toBeVisible();
     await expect(categoryDialog.locator('.workspace-action-route strong')).toContainText('/settings/sysconfig/new?source=workbench');
     await page.keyboard.press('Escape');
     await expect(categoryDialog).toHaveCount(0);
 
     await page.getByLabel('基础维护页面分栏').getByRole('button', { name: /供应商/ }).click();
-    await expect(page.getByLabel('基础维护配置对象列表')).toContainText('CFG-VDR-SPARE');
+    await expect(page.getByLabel('基础维护配置对象列表')).toContainText('VDR-018');
     await expect(page.getByLabel('基础维护详情抽屉')).toContainText('UNIVIEW 备件仓资质');
-    await page.getByLabel('基础维护详情操作').getByRole('button', { name: '打开维护' }).click();
-    const detailDialog = page.getByRole('dialog', { name: '打开基础维护' });
+    await page.getByLabel('基础维护详情操作').getByRole('button', { name: '复制' }).click();
+    const detailDialog = page.getByRole('dialog', { name: '复制基础维护配置' });
     await expect(detailDialog).toBeVisible();
-    await expect(detailDialog.locator('.workspace-action-route strong')).toContainText('/vendors?source=workbench&vendor=CFG-VDR-SPARE');
+    await expect(detailDialog.locator('.workspace-action-route strong')).toContainText('/settings/sysconfig/copy?source=workbench');
     await page.keyboard.press('Escape');
     await expect(detailDialog).toHaveCount(0);
-    await expect(page.getByLabel('基础维护详情抽屉')).toContainText('证照待复核');
 
-    await page.getByLabel('基础维护详情操作').getByRole('button', { name: '危险变更' }).click();
+    await page.getByLabel('基础维护详情操作').getByRole('button', { name: '停用' }).click();
     const dangerDialog = page.getByRole('dialog', { name: '危险变更确认' });
     await expect(dangerDialog).toBeVisible();
     await expect(dangerDialog.locator('.workspace-action-route strong')).toContainText('/settings/sysconfig/danger?source=workbench');
     await page.keyboard.press('Escape');
     await expect(dangerDialog).toHaveCount(0);
 
-    await page.getByLabel('基础维护详情操作').getByRole('button', { name: '供应商资质' }).click();
-    const vendorDialog = page.getByRole('dialog', { name: '维护供应商资质' });
-    await expect(vendorDialog).toBeVisible();
-    await expect(vendorDialog.locator('.workspace-action-route strong')).toContainText('/vendors?source=workbench&config=CFG-VDR-SPARE');
-    await expect(vendorDialog.getByRole('status')).toContainText('当前账号缺少访问该业务页面的权限');
-    await expect(vendorDialog.getByRole('button', { name: /暂无权限/ })).toBeDisabled();
+    await page.getByLabel('基础维护危险变更确认').getByRole('button', { name: '确认停用' }).click();
+    const confirmDialog = page.getByRole('dialog', { name: '危险变更确认' });
+    await expect(confirmDialog).toBeVisible();
+    await expect(confirmDialog.locator('.workspace-action-route strong')).toContainText('/settings/sysconfig/danger?source=workbench');
     await page.keyboard.press('Escape');
-    await expect(vendorDialog).toHaveCount(0);
+    await expect(confirmDialog).toHaveCount(0);
 
     await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
     expect(errors).toEqual([]);
