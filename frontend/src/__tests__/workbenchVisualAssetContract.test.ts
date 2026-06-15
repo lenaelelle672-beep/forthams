@@ -143,7 +143,7 @@ describe('Workbench visual asset contract', () => {
       ...deliveryManifest.workbenchRound2PageAssetMap,
     ];
 
-    expect(menuPages).toHaveLength(12);
+    expect(menuPages).toHaveLength(11);
 
     const escapeRegex = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
@@ -204,14 +204,14 @@ describe('Workbench visual asset contract', () => {
 
   it('binds Round 2 remaining Workbench menus to IMAGE2 v6 and Stitch page-level evidence', () => {
     const round2Map = deliveryManifest.workbenchRound2PageAssetMap;
-    const expectedNames = ['运营首页', '资产总览', '巡检管理', '备件管理', '数据监控', '组织策略', '基础维护'];
+    const expectedNames = ['运营首页', '资产总览', '备件管理', '数据监控', '组织策略', '基础维护'];
 
     expect(round2Map).toHaveLength(expectedNames.length);
     expect(round2Map.map((item) => item.name)).toEqual(expectedNames);
 
     for (const item of round2Map) {
       expect(item.route).toMatch(/^\/fixed-assets\/workbench/);
-      expect(item.stitchScreen).toMatch(/^workbench-menu-(home|asset|inspection|spares|energy|policy|settings)-v1$/);
+      expect(item.stitchScreen).toMatch(/^workbench-menu-(home|asset|spares|energy|policy|settings)-v1$/);
       expect(item.stitchScreenshot).toMatch(/^\/mock\/workspace-preview\/stitch-suite\/workbench-round2\/workbench-menu-.+-v1\.png$/);
       expect(item.image2ModuleAsset).toMatch(/^\/mock\/workspace-preview\/asset-kit-v6\/modules\/module-.+\.png$/);
       expect(item.secondLevelCapabilities.length).toBeGreaterThanOrEqual(3);
@@ -226,7 +226,7 @@ describe('Workbench visual asset contract', () => {
       expect(stitchSize).toMatchObject(image2Size);
     }
 
-    expect(deliveryManifest.stitchIntegration.authEvidence.workbenchRound2BatchGenerate).toContain('seven page-level screens');
+    expect(deliveryManifest.stitchIntegration.authEvidence.workbenchRound2BatchGenerate).toContain('six formal page-level screens');
   });
 });
 

@@ -1240,12 +1240,12 @@
   content: '';
   position: absolute;
   top: 0;
-  right: -12px;
+  right: 0;
   z-index: 1;
-  width: 24px;
+  width: 1px;
   height: 100%;
   border: 0;
-  background: linear-gradient(112deg, transparent 48.5%, #dbe8f8 50%, transparent 51.5%);
+  background: #dbe8f8;
   pointer-events: none;
 }
 
@@ -1995,9 +1995,9 @@
 }
 
 .workspace-todo-page .workspace-orders-kpis button {
-  min-height: 108px;
+  min-height: 92px;
   grid-template-columns: 46px minmax(0, 1fr);
-  padding: 18px 16px;
+  padding: 14px 16px;
 }
 
 .workspace-todo-queue-tabs {
@@ -2061,7 +2061,7 @@
 }
 
 .workspace-todo-page .workspace-orders-table-row {
-  min-height: 61px;
+  min-height: 54px;
 }
 
 .workspace-todo-page .workspace-orders-table {
@@ -2150,7 +2150,8 @@
 .workspace-todo-page .workspace-orders-tab-panel {
   grid-template-columns: 1fr;
   gap: 8px;
-  max-height: 118px;
+  max-height: 220px;
+  overflow: auto;
   padding: 8px 14px;
 }
 
@@ -3035,6 +3036,84 @@
 .workspace-asset-page .workspace-orders-table-row.is-green b,
 .workspace-asset-page .workspace-orders-table-row.is-blue b {
   background: #176de8;
+}
+
+.workspace-asset-page .workspace-orders-table-head,
+.workspace-asset-page .workspace-orders-table-row {
+  grid-template-columns: 32px minmax(110px, .76fr) 72px minmax(142px, .95fr) minmax(158px, 1.06fr) 58px 68px 68px 72px 72px 86px;
+  min-width: 950px;
+}
+
+.workspace-asset-page .workspace-orders-charts {
+  grid-template-columns: minmax(260px, .95fr) minmax(300px, 1.1fr) minmax(280px, .95fr);
+  gap: 10px;
+  margin-top: 0;
+}
+
+.workspace-asset-page .workspace-orders-chart-card {
+  min-width: 0;
+}
+
+.workspace-asset-page .workspace-orders-chart-body {
+  min-height: 198px;
+}
+
+.workspace-asset-page .workspace-orders-donut {
+  width: 150px;
+  height: 150px;
+  flex-basis: 150px;
+}
+
+.workspace-asset-rank-list {
+  display: grid;
+  gap: 12px;
+  min-height: 198px;
+  align-content: center;
+}
+
+.workspace-asset-rank-list button {
+  display: grid;
+  grid-template-columns: 78px minmax(0, 1fr) 78px;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  min-height: 28px;
+  border: 0;
+  color: #284260;
+  background: transparent;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 880;
+  text-align: left;
+}
+
+.workspace-asset-rank-list span,
+.workspace-asset-rank-list strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workspace-asset-rank-list i {
+  display: block;
+  height: 10px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #eef5ff;
+}
+
+.workspace-asset-rank-list em {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #2f80ff, #176de8);
+}
+
+.workspace-asset-rank-list strong {
+  color: #235186;
+  font-size: 12px;
+  font-weight: 950;
+  text-align: right;
 }
 
 .workspace-inspection-page {
@@ -4180,7 +4259,7 @@
 }
 
 .workspace-policy-product {
-  grid-template-columns: minmax(220px, .68fr) minmax(520px, 1.36fr) minmax(360px, .96fr);
+  grid-template-columns: minmax(760px, 1fr) minmax(360px, 430px);
   height: calc(100vh - 172px);
   min-height: 560px;
   max-height: 780px;
@@ -4375,7 +4454,7 @@
 
 .workspace-policy-center {
   display: grid;
-  grid-template-rows: auto auto auto minmax(0, 1fr);
+  grid-template-rows: auto auto auto auto minmax(0, 1fr) auto;
   gap: 12px;
   padding: 16px;
 }
@@ -4404,7 +4483,7 @@
 
 .workspace-policy-kpis {
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 10px;
 }
 
@@ -4465,6 +4544,56 @@
   font-weight: 850;
 }
 
+.workspace-policy-domain-tabs {
+  display: flex;
+  min-width: 0;
+  overflow: hidden;
+  border-bottom: 1px solid #dbe8f8;
+}
+
+.workspace-policy-domain-tabs button {
+  display: inline-grid;
+  grid-template-columns: 18px auto auto;
+  align-items: center;
+  gap: 6px;
+  min-width: 116px;
+  height: 38px;
+  padding: 0 15px;
+  border: 1px solid #dbe8f8;
+  border-right: 0;
+  border-bottom: 0;
+  color: #304a69;
+  background: linear-gradient(180deg, #fff, #f8fbff);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.workspace-policy-domain-tabs button:first-child {
+  border-top-left-radius: 8px;
+}
+
+.workspace-policy-domain-tabs button:last-child {
+  border-right: 1px solid #dbe8f8;
+}
+
+.workspace-policy-domain-tabs button.is-active {
+  color: #176de8;
+  border-top: 2px solid #176de8;
+  background: #fff;
+}
+
+.workspace-policy-domain-tabs svg {
+  width: 15px;
+  height: 15px;
+}
+
+.workspace-policy-domain-tabs strong {
+  color: inherit;
+  font-size: 12px;
+  font-weight: 950;
+}
+
 .workspace-policy-filterbar {
   display: grid;
   grid-template-columns: minmax(240px, 1fr) repeat(4, minmax(112px, .48fr)) minmax(92px, .42fr);
@@ -4517,9 +4646,9 @@
 .workspace-policy-table-head,
 .workspace-policy-table-row {
   display: grid;
-  grid-template-columns: minmax(128px, .82fr) minmax(150px, .95fr) minmax(210px, 1.25fr) minmax(150px, .9fr) minmax(118px, .72fr) 70px 70px;
+  grid-template-columns: 34px minmax(120px, .72fr) minmax(138px, .86fr) 62px 82px minmax(190px, 1fr) 76px 64px 66px 78px;
   align-items: center;
-  min-width: 930px;
+  min-width: 950px;
 }
 
 .workspace-policy-table-head {
@@ -4578,7 +4707,8 @@
 }
 
 .workspace-policy-table-row b,
-.workspace-policy-table-row i {
+.workspace-policy-table-row i,
+.workspace-policy-table-row em {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -4597,6 +4727,58 @@
 .workspace-policy-table-row i {
   color: #176de8;
   background: #edf5ff;
+}
+
+.workspace-policy-table-row em {
+  color: #f03649;
+  background: #fff0f2;
+  font-style: normal;
+}
+
+.workspace-policy-table-row > span:last-child {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.workspace-policy-table-row > span:last-child button {
+  border: 0;
+  color: #176de8;
+  background: transparent;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 920;
+}
+
+.workspace-policy-table-footer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 0 2px;
+  color: #27415f;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.workspace-policy-table-footer span:first-child {
+  margin-right: auto;
+}
+
+.workspace-policy-table-footer button {
+  min-width: 32px;
+  height: 30px;
+  border: 1px solid #dbe8f8;
+  border-radius: 6px;
+  color: #174072;
+  background: #fff;
+  font-weight: 850;
+}
+
+.workspace-policy-table-footer .is-current {
+  color: #fff;
+  border-color: transparent;
+  background: #176de8;
 }
 
 .workspace-policy-detail {

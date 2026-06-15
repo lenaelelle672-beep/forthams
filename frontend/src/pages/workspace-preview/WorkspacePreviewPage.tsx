@@ -3063,14 +3063,6 @@ const workbenchAssetSummaryCards = [
   { label: '本月新增', value: '18', delta: '本月入账', icon: UserCircle, tone: 'orange' },
 ] as const;
 
-const workbenchAssetStages = [
-  { label: '建账', value: '6,842', note: '统一编码', tone: 'blue' },
-  { label: '在用', value: '5,102', note: '责任到人', tone: 'green' },
-  { label: '风险', value: '36', note: '健康低分', tone: 'red' },
-  { label: '流转', value: '42', note: '领用/调拨', tone: 'cyan' },
-  { label: '处置', value: '18', note: '审批中', tone: 'orange' },
-] as const;
-
 // 资产总览图表数据（对齐设计稿：饼图资产分类分布 / 柱图健康分布）
 const workbenchAssetCategoryDistribution = [
   { name: '生产设备', value: 43, color: '#3b82f6' },
@@ -3731,7 +3723,6 @@ const workbenchPolicySummaryCards = [
   { label: '审批边界', value: '46', delta: '覆盖 23 部门', icon: ClipboardList, tone: 'green' },
   { label: '策略命中', value: '238', delta: '近 7 天', icon: Bell, tone: 'orange' },
   { label: '高风险待复核', value: '23', delta: '较昨日 +6', icon: AlertTriangle, tone: 'red' },
-  { label: '权限申请', value: '9', delta: '待审批', icon: Shield, tone: 'violet' },
 ] as const;
 
 const workbenchPolicyStages = [
@@ -3914,12 +3905,6 @@ const workbenchPolicyHitSamples = [
   { id: 'ALM-20240614-0012', source: '告警中心', rule: 'POL-RISK-PORT-001', result: '已转处置工单', tone: 'red' },
   { id: 'WO-20240614-0012', source: '工单管理', rule: 'POL-MAINT-SLA-008', result: 'SLA 复核中', tone: 'orange' },
   { id: 'APP-20240614-0038', source: '流程待办', rule: 'POL-ROLE-ASSET-012', result: '跨部门审批', tone: 'blue' },
-] as const;
-
-const workbenchPolicyStateCards = [
-  { label: '空态', value: '暂无策略命中', note: '筛选无结果时保留新建评估和权限申请入口' },
-  { label: '异常态', value: '规则同步异常 2 条', note: '策略引擎延迟时保留上次命中和重试入口' },
-  { label: '无权限态', value: '风险评估受限', note: '缺少 risk:query 时只允许申请策略权限' },
 ] as const;
 
 const workbenchSettingsSummaryCards = [
@@ -5936,8 +5921,6 @@ function WorkbenchPolicyPage({
   const selectedRow = workbenchPolicyRows.find((row) => row.id === selectedRuleId) ?? workbenchPolicyRows[0];
   const selectedRule =
     workbenchPolicyRuleDetails.find((rule) => rule.id === selectedRuleId) ?? workbenchPolicyRuleDetails[0];
-  const selectedDomainMeta =
-    workbenchPolicyDomains.find((domain) => domain.id === selectedDomain) ?? workbenchPolicyDomains[0];
   const canCreateRiskAssessment = canAccessRoute('/risk-assessments/new', user);
 
   const openPolicyPreview = (
@@ -5973,72 +5956,12 @@ function WorkbenchPolicyPage({
 
   return (
     <section className="workspace-orders-page workspace-policy-page workspace-policy-product" aria-label={`${item.label}真实产品页`}>
-      <aside className="workspace-policy-rail" aria-label="组织策略治理域">
-        <header>
-          <span><ShieldCheck /></span>
-          <div>
-            <h2>组织策略</h2>
-            <p>风险规则 · 角色策略 · 审批边界</p>
-          </div>
-        </header>
-        <div className="workspace-policy-domain-list">
-          {workbenchPolicyDomains.map((domain) => {
-            const DomainIcon = domain.icon;
-            return (
-              <button
-                key={domain.id}
-                type="button"
-                className={domain.id === selectedDomain ? 'is-active' : ''}
-                onClick={() => setSelectedDomain(domain.id)}
-              >
-                <DomainIcon />
-                <span>
-                  <strong>{domain.label}</strong>
-                  <small>{domain.note}</small>
-                </span>
-                <b>{domain.value}</b>
-              </button>
-            );
-          })}
-        </div>
-        <section className="workspace-policy-domain-children" aria-label="组织策略二级策略域">
-          <span>{selectedDomainMeta.label}二级项</span>
-          {selectedDomainMeta.children.map((child) => (
-            <button
-              key={child}
-              type="button"
-              onClick={() =>
-                openPolicyPreview(
-                  `${child}策略查询`,
-                  `${selectedDomainMeta.route}&node=${encodeURIComponent(child)}`,
-                  `进入 ${child} 策略域，保留 Workbench 组织策略来源和当前筛选。`,
-                  '进入策略域',
-                  selectedDomainMeta.icon,
-                )
-              }
-            >
-              {child}
-              <ArrowRight />
-            </button>
-          ))}
-        </section>
-        <section className="workspace-policy-states" aria-label="组织策略状态反馈">
-          {workbenchPolicyStateCards.map((state) => (
-            <article key={state.label}>
-              <span>{state.label}</span>
-              <strong>{state.value}</strong>
-              <p>{state.note}</p>
-            </article>
-          ))}
-        </section>
-      </aside>
-
       <section className="workspace-policy-center" aria-label="组织策略产品页主体">
         <header className="workspace-policy-header">
           <div>
-            <span>组织策略</span>
-            <h2>风险规则配置台</h2>
-            <p>把风险阈值、角色权限、审批边界和命中样本放到同一治理页，进入业务页前先确认上下文。</p>
+            <span>基础维护 / 组织策略</span>
+            <h2>组织策略</h2>
+            <p>统一管理风险规则、角色策略与审批边界，识别高风险操作并推送策略命中。</p>
           </div>
           <div className="workspace-orders-toolbar" aria-label="组织策略顶部操作">
             <button
@@ -6117,6 +6040,33 @@ function WorkbenchPolicyPage({
           })}
         </div>
 
+        <nav className="workspace-policy-domain-tabs" aria-label="组织策略规则标签">
+          {workbenchPolicyDomains.map((domain) => {
+            const DomainIcon = domain.icon;
+            return (
+              <button
+                key={domain.id}
+                type="button"
+                className={domain.id === selectedDomain ? 'is-active' : ''}
+                onClick={() => {
+                  setSelectedDomain(domain.id);
+                  openPolicyPreview(
+                    `${domain.label}策略查询`,
+                    domain.route,
+                    `切换到 ${domain.label} 策略域，保留 Workbench 组织策略来源和当前筛选。`,
+                    '进入策略域',
+                    DomainIcon,
+                  );
+                }}
+              >
+                <DomainIcon />
+                <span>{domain.label}</span>
+                <strong>{domain.value}</strong>
+              </button>
+            );
+          })}
+        </nav>
+
         <div className="workspace-policy-filterbar" aria-label="组织策略查询筛选栏">
           <label>
             <Search />
@@ -6159,37 +6109,60 @@ function WorkbenchPolicyPage({
 
         <div className="workspace-orders-table workspace-policy-table" aria-label="组织策略规则列表">
           <div className="workspace-policy-table-head">
+            <span><input type="checkbox" aria-label="选择全部策略" readOnly /></span>
             <span>策略编号</span>
-            <span>规则对象</span>
+            <span>规则名称</span>
+            <span>风险等级</span>
+            <span>规则类型</span>
             <span>触发条件</span>
-            <span>审批边界</span>
-            <span>命中样本</span>
+            <span>责任部门</span>
             <span>状态</span>
+            <span>命中次数</span>
             <span>操作</span>
           </div>
           {workbenchPolicyRows.map((row) => {
             const detail = workbenchPolicyRuleDetails.find((rule) => rule.id === row.id) ?? workbenchPolicyRuleDetails[0];
+            const hitCount =
+              row.id === 'POL-RISK-PORT-001' ? '32' :
+              row.id === 'POL-MAINT-SLA-008' ? '28' :
+              row.id === 'POL-ROLE-ASSET-012' ? '18' : '12';
             return (
               <div
                 key={row.id}
                 className={`workspace-policy-table-row is-${row.tone} ${row.id === selectedRow.id ? 'is-selected' : ''}`}
               >
+                <span><input type="checkbox" aria-label={`选择${row.id}`} readOnly /></span>
                 <button type="button" className="is-link" onClick={() => openPolicyRule(row)}>{row.id}</button>
                 <span>
                   <strong>{row.entity}</strong>
-                  <small>{row.type} · {row.owner}</small>
+                  <small>{row.location}</small>
                 </span>
+                <span><em>{row.score}</em></span>
+                <span>{row.type}</span>
                 <span>{detail.condition}</span>
-                <span>{detail.boundary}</span>
-                <span><i>{detail.hit}</i></span>
+                <span>{row.owner}</span>
                 <span><b>{row.status}</b></span>
+                <span><i>{hitCount}</i></span>
                 <span>
-                  <button type="button" onClick={() => openPolicyRule(row)}>打开</button>
+                  <button type="button" onClick={() => openPolicyRule(row)}>查看</button>
+                  <button type="button" onClick={() => openPolicyRule(row)}>编辑</button>
                 </span>
               </div>
             );
           })}
         </div>
+
+        <footer className="workspace-policy-table-footer" aria-label="组织策略分页">
+          <span>共 68 条</span>
+          <button type="button">10条/页</button>
+          <button type="button" disabled>‹</button>
+          {[1, 2, 3, 4, 5].map((pageNo) => (
+            <button key={pageNo} type="button" className={pageNo === 1 ? 'is-current' : ''}>{pageNo}</button>
+          ))}
+          <span>...</span>
+          <button type="button">7</button>
+          <button type="button">›</button>
+        </footer>
       </section>
 
       <aside className="workspace-policy-detail" aria-label="组织策略详情抽屉">
@@ -6825,6 +6798,23 @@ function WorkbenchAssetPage({
             </div>
           </header>
 
+          <div className="workspace-orders-filterbar" aria-label="资产总览查询筛选栏">
+            <label>
+              <Search />
+              <input readOnly value="搜索资产编号 / 名称 / 规格型号 / 位置 / 负责人" aria-label="资产搜索" />
+            </label>
+            {['资产状态 全部', '资产分类 全部', '健康状态 全部', '责任人 全部'].map((filter) => (
+              <button key={filter} type="button" onClick={() => onPreviewAction(primaryAction)}>
+                {filter}
+                <ArrowRight />
+              </button>
+            ))}
+            <button type="button" className="is-date" onClick={() => onPreviewAction(transferAction)}>
+              更多筛选
+              <SlidersHorizontal />
+            </button>
+          </div>
+
           <div className="workspace-orders-kpis" aria-label="资产总览核心指标">
             {workbenchAssetSummaryCards.map((card) => {
               const CardIcon = card.icon;
@@ -6850,49 +6840,6 @@ function WorkbenchAssetPage({
                 </button>
               );
             })}
-          </div>
-
-          <div className="workspace-orders-stage-row" aria-label="资产生命周期">
-            {workbenchAssetStages.map((stage) => (
-              <button
-                key={stage.label}
-                type="button"
-                className={`is-${stage.tone}`}
-                onClick={() =>
-                  openAssetPreview(
-                    `${stage.label}资产`,
-                    `/assets?source=workbench&lifecycle=${encodeURIComponent(stage.label)}`,
-                    `按 ${stage.label} 生命周期查看资产，并保留 Workbench 来源。`,
-                    '查看阶段',
-                    ArrowRight,
-                  )
-                }
-              >
-                <span>{stage.label}</span>
-                <strong>{stage.value}</strong>
-                <small>{stage.note}</small>
-              </button>
-            ))}
-          </div>
-
-          <div className="workspace-orders-filterbar" aria-label="资产总览查询筛选栏">
-            <label>
-              <Search />
-              <input readOnly value="搜索资产编号 / 名称 / 位置 / 责任人" aria-label="资产搜索" />
-            </label>
-            {['组织 全部', '资产状态 全部', '资产分类 全部', '健康状态 全部'].map((filter) => (
-              <button key={filter} type="button" onClick={() => onPreviewAction(primaryAction)}>
-                {filter}
-                <ArrowRight />
-              </button>
-            ))}
-            <button type="button" className="is-date" onClick={() => onPreviewAction(transferAction)}>
-              处置流转
-              <CalendarDays />
-            </button>
-            <button type="button" className="is-reset" onClick={() => onPreviewAction(primaryAction)}>
-              重置
-            </button>
           </div>
 
           <div className="workspace-orders-charts" aria-label="资产总览图表">
@@ -6929,6 +6876,37 @@ function WorkbenchAssetPage({
                     ))}
                   </RechartsBarChart>
                 </ResponsiveContainer>
+              </div>
+            </section>
+
+            <section className="workspace-orders-chart-card workspace-asset-rank-card" aria-label="部门资产价值 Top 5">
+              <header><h3>部门资产价值 Top 5</h3><small>单位：万元</small></header>
+              <div className="workspace-asset-rank-list">
+                {[
+                  ['制造一部', '18,620.45', 100],
+                  ['制造二部', '15,842.30', 85],
+                  ['设备管理部', '12,356.78', 66],
+                  ['质量管理部', '8,975.60', 48],
+                  ['技术研发部', '6,532.12', 35],
+                ].map(([label, value, width]) => (
+                  <button
+                    key={label}
+                    type="button"
+                    onClick={() =>
+                      openAssetPreview(
+                        `${label}资产价值`,
+                        `/assets?source=workbench&department=${encodeURIComponent(label)}`,
+                        `查看 ${label} 的资产原值、净值、风险资产和在用率。`,
+                        '查看部门',
+                        Layers,
+                      )
+                    }
+                  >
+                    <span>{label}</span>
+                    <i><em style={{ width: `${width}%` }} /></i>
+                    <strong>{value}</strong>
+                  </button>
+                ))}
               </div>
             </section>
           </div>

@@ -199,19 +199,6 @@
       "businessUse": "资产台账、健康、生命周期、风险 TOP 与资产处置/使用流转二级能力承接页。"
     },
     {
-      "name": "巡检管理",
-      "route": "/fixed-assets/workbench/assets?menu=inspection",
-      "stitchScreen": "workbench-menu-inspection-v1",
-      "stitchScreenshot": "/mock/workspace-preview/stitch-suite/workbench-round2/workbench-menu-inspection-v1.png",
-      "image2ModuleAsset": "/mock/workspace-preview/asset-kit-v6/modules/module-inspection-route-console.png",
-      "secondLevelCapabilities": [
-        "巡检计划",
-        "点检执行",
-        "异常转工单"
-      ],
-      "businessUse": "巡检路线、点位、扫码核验、异常复核、证据上传与转派工单的巡检闭环页。"
-    },
-    {
       "name": "备件管理",
       "route": "/fixed-assets/workbench/assets?menu=spares",
       "stitchScreen": "workbench-menu-spares-v1",
@@ -362,7 +349,7 @@
       "latestAuthRecheck": "2026-06-14 current continuation recheck: npm run stitch:projects lists project 9943060219435296513 (forthAMS UNIVIEW Product Suite Preview); npm run stitch:auth reports OAuth projectCount=1 and API Key initialize=200/tools-list=14, but API Key list_projects remains 401 for header/query/both transports; mcp__stitch.list_projects still Auth required; npm run stitch:proxy-check passes tools/list=14 and list_projects=1 through the local API-Key-protected OAuth proxy",
       "authRetryRule": "2026-06-14 runbook updated: if Stitch cannot connect or returns auth errors, record a redacted blocker and repeat npm run stitch:auth, npm run stitch:projects, and npm run stitch:proxy-check every 10 minutes until access is healthy, then continue pending page-level generation.",
       "workbenchP0BatchGenerate": "passed on 2026-06-14 via CLI OAuth; session 14414246277810652370 exported five page-level screens for todo, device, orders, report, and alert into /mock/workspace-preview/stitch-suite/workbench-p0/; raw download URLs and credentials are not committed.",
-      "workbenchRound2BatchGenerate": "passed on 2026-06-14 via CLI OAuth; session 13689550548278506100 exported seven page-level screens for home, asset, inspection, spares, energy, policy, and settings into /mock/workspace-preview/stitch-suite/workbench-round2/; raw download URLs and credentials are not committed.",
+      "workbenchRound2BatchGenerate": "passed on 2026-06-14 via CLI OAuth; session 13689550548278506100 exported six formal page-level screens for home, asset, spares, energy, policy, and settings into /mock/workspace-preview/stitch-suite/workbench-round2/; inspection assets remain stored but are out of this formal left-navigation scope; raw download URLs and credentials are not committed.",
       "cliOauthBatchGenerate": "passed",
       "cliOauthListScreens": "returns 0 screen instances for the project canvas; generated session output contains 2 screen ids",
       "cliOauthGetScreen": "passed for LOGIN5 page screen 177c3c197aae471baa5575c004e72670; HTML and screenshot exported"
