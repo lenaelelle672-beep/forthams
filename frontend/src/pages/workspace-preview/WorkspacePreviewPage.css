@@ -3101,8 +3101,182 @@
   background: linear-gradient(180deg, #ff5b69, #e02f44);
 }
 
+.workspace-alarm-page .workspace-orders-toolbar .is-refresh {
+  border: 0;
+  color: #284464;
+  background: transparent;
+  box-shadow: none;
+}
+
+.workspace-alarm-live-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #18b778;
+  box-shadow: 0 0 0 4px rgba(24, 183, 120, .12);
+}
+
+.workspace-alarm-page .workspace-orders-kpis {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.workspace-alarm-page .workspace-orders-kpis button {
+  min-height: 100px;
+}
+
+.workspace-alarm-page .workspace-orders-kpis strong {
+  color: #126ce9;
+}
+
+.workspace-alarm-page .workspace-orders-kpis .is-red strong {
+  color: #f03649;
+}
+
+.workspace-alarm-page .workspace-orders-kpis .is-orange strong {
+  color: #f08a20;
+}
+
+.workspace-alarm-status-tabs {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid #dbe8f8;
+  border-radius: 8px;
+  background: #f8fbff;
+}
+
+.workspace-alarm-status-tabs button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 0;
+  min-height: 36px;
+  border: 0;
+  border-right: 1px solid #dbe8f8;
+  color: #24435f;
+  background: transparent;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 920;
+}
+
+.workspace-alarm-status-tabs button:last-child {
+  border-right: 0;
+}
+
+.workspace-alarm-status-tabs button.is-active {
+  color: #176de8;
+  background: #fff;
+  box-shadow: inset 0 0 0 1px #79b3ff;
+}
+
+.workspace-alarm-status-tabs strong {
+  font-size: 13px;
+  font-weight: 950;
+}
+
+.workspace-alarm-filter-row,
+.workspace-alarm-search-row {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.workspace-alarm-filter-row {
+  grid-template-columns: repeat(4, minmax(112px, .8fr)) minmax(230px, 1.5fr) minmax(98px, .7fr);
+}
+
+.workspace-alarm-search-row {
+  grid-template-columns: minmax(320px, 1fr) 96px 38px;
+}
+
+.workspace-alarm-filter-row button,
+.workspace-alarm-search-row button,
+.workspace-alarm-search-row label {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+  height: 36px;
+  border: 1px solid #dbe8f8;
+  border-radius: 6px;
+  background: #fff;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.workspace-alarm-filter-row button,
+.workspace-alarm-search-row button {
+  justify-content: space-between;
+  gap: 7px;
+  padding: 0 10px;
+  color: #50667f;
+  cursor: pointer;
+}
+
+.workspace-alarm-filter-row .is-primary-filter,
+.workspace-alarm-search-row .is-advanced {
+  justify-content: center;
+  color: #176de8;
+  background: #f3f8ff;
+}
+
+.workspace-alarm-search-row label {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  gap: 7px;
+  padding: 0 11px;
+  color: #8a9bb2;
+}
+
+.workspace-alarm-filter-row svg,
+.workspace-alarm-search-row svg {
+  width: 15px;
+  height: 15px;
+}
+
+.workspace-alarm-search-row input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  color: #72849d;
+  background: transparent;
+  font-size: 12px;
+  font-weight: 820;
+}
+
+.workspace-alarm-search-row .is-icon {
+  justify-content: center;
+  padding: 0;
+}
+
+.workspace-alarm-table .workspace-orders-table-head,
+.workspace-alarm-table .workspace-orders-table-row {
+  grid-template-columns: 92px minmax(160px, 1.2fr) minmax(140px, 1fr) minmax(150px, 1.05fr) 112px 96px 86px;
+  min-width: 940px;
+}
+
+.workspace-alarm-table .workspace-orders-table-row {
+  min-height: 58px;
+}
+
+.workspace-alarm-table .workspace-orders-table-row > span,
+.workspace-alarm-table .workspace-orders-table-row > button,
+.workspace-alarm-table .workspace-orders-table-head span {
+  padding: 0 12px;
+}
+
 .workspace-alarm-page .workspace-orders-detail-card b {
   background: #f03649;
+}
+
+.workspace-alarm-alert-id {
+  margin: -4px 0 0;
+  color: #5c728c;
+  font-size: 12px;
+  font-weight: 900;
 }
 
 .workspace-alarm-page .workspace-orders-table-row.is-red b {

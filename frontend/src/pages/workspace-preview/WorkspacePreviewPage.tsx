@@ -27,6 +27,7 @@ import {
   Monitor,
   PackageCheck,
   PieChart,
+  RefreshCw,
   Search,
   Server,
   Settings,
@@ -8167,106 +8168,140 @@ const workbenchReportDepartmentRows = [
 ] as const;
 
 const workbenchAlarmSummaryCards = [
-  { label: '安全评分', value: '92', delta: '分 · 较上周 +4', icon: ShieldCheck, tone: 'green' },
-  { label: '高危事件', value: '3', delta: '需立即处置', icon: AlertTriangle, tone: 'red' },
-  { label: '中危事件', value: '12', delta: '处理中', icon: Shield, tone: 'orange' },
-  { label: '平均响应时间', value: '2.3h', delta: '本周统计', icon: Activity, tone: 'cyan' },
-  { label: '已处置', value: '91.8%', delta: '本周闭环', icon: CheckCircle2, tone: 'green' },
-  { label: '待处置', value: '8', delta: '待研判', icon: Wrench, tone: 'blue' },
+  { label: '高危', value: '28', delta: '未处理 18', icon: Bell, tone: 'red' },
+  { label: '中危', value: '56', delta: '未处理 37', icon: Bell, tone: 'orange' },
+  { label: '低危', value: '96', delta: '未处理 72', icon: Bell, tone: 'orange' },
+  { label: '已解决', value: '142', delta: '今日闭环 64', icon: CheckCircle2, tone: 'green' },
+  { label: '策略命中', value: '128', delta: '今日新增 42', icon: Activity, tone: 'blue' },
 ] as const;
 
-const workbenchAlarmStages = [
-  { label: '发现', value: '36', note: '资产/策略告警', tone: 'red' },
-  { label: '研判', value: '27', note: '自动聚合', tone: 'orange' },
-  { label: '处置', value: '12', note: '工单联动', tone: 'blue' },
-  { label: '复盘', value: '4', note: '策略需复核', tone: 'cyan' },
-  { label: '闭环', value: '91.8%', note: '本周', tone: 'green' },
+const workbenchAlarmTabs = [
+  { label: '全部告警', value: '180' },
+  { label: '未处理', value: '127' },
+  { label: '处理中', value: '26' },
+  { label: '已解决', value: '27' },
 ] as const;
 
 const workbenchAlarmRows = [
   {
-    id: 'ALM-20240614-0012',
+    id: 'ALT-20240614-0001',
     level: '高危',
-    strategy: '熔断策略-12',
+    strategy: '振动超限策略 P-VIB-001',
     asset: '数控车床 CN-301',
-    location: '机加车间 / CNC 区域 A线',
-    title: '主轴振动异常触发高危策略',
+    location: '数控车床 CN-301',
+    title: '主轴异常振动',
     score: 'P1',
-    status: '待研判',
-    response: '1.2h',
-    owner: '安全运营',
-    suggestion: '转派工单',
+    status: '未处理',
+    response: '36 分钟',
+    owner: '系统自动',
+    suggestion: '转工单',
+    createdAt: '今天 09:12',
     tone: 'red',
   },
   {
-    id: 'ALM-20240614-0011',
-    level: '中危',
-    strategy: '拦截白名单-08',
-    asset: '注塑机 M-201',
-    location: '一车间 / A线',
-    title: '温度边界连续越限',
+    id: 'ALT-20240614-0002',
+    level: '高危',
+    strategy: '温度预警策略 P-TMP-002',
+    asset: '加工中心 MC-502',
+    location: '加工中心 MC-502',
+    title: '主电机过温报警',
     score: 'P2',
     status: '处置中',
-    response: '2.5h',
-    owner: '王班组',
-    suggestion: '现场复核',
+    response: '52 分钟',
+    owner: '系统自动',
+    suggestion: '派工',
+    createdAt: '今天 08:48',
+    tone: 'red',
+  },
+  {
+    level: '中危',
+    id: 'ALT-20240614-0003',
+    strategy: '油压监测策略 P-OIL-001',
+    asset: '立式铣床 VM-205',
+    location: '立式铣床 VM-205',
+    title: '润滑油压低',
+    score: 'P2',
+    status: '处理中',
+    response: '1h 14m',
+    owner: '设备管理',
+    suggestion: '派工',
+    createdAt: '今天 07:58',
     tone: 'orange',
   },
   {
-    id: 'ALM-20240614-0010',
+    id: 'ALT-20240614-0004',
+    level: '中危',
+    strategy: '安全互锁策略 P-SAF-003',
+    asset: '激光切割机 LC-101',
+    location: '激光切割机 LC-101',
+    title: '门禁长时间未关闭',
+    score: 'P2',
+    status: '未处理',
+    response: '2h 39m',
+    owner: '安全运营',
+    suggestion: '静音',
+    createdAt: '今天 06:33',
+    tone: 'orange',
+  },
+  {
+    id: 'ALT-20240614-0005',
     level: '低危',
-    strategy: '端口扫描-03',
-    asset: 'IoT 网关 GW-A01',
-    location: '数据采集间',
-    title: '采集网关异常探测',
+    strategy: '采集延迟策略 P-LAT-001',
+    asset: '冲压机 PR-202',
+    location: '冲压机 PR-202',
+    title: '采集延迟偏高',
     score: 'P3',
-    status: '已归档',
-    response: '4.8h',
+    status: '处理中',
+    response: '3h 51m',
     owner: '平台运维',
-    suggestion: '策略复盘',
+    suggestion: '复盘',
+    createdAt: '今天 05:21',
     tone: 'blue',
   },
   {
-    id: 'ALM-20240614-0009',
+    id: 'ALT-20240613-0006',
+    level: '低危',
+    strategy: '液位监测策略 P-LEV-001',
+    asset: '加工中心 MC-502',
+    location: '加工中心 MC-502',
+    title: '冷却液液位偏低',
+    score: 'P3',
+    status: '已解决',
+    response: '5h 20m',
+    owner: '班组长',
+    suggestion: '查看',
+    createdAt: '昨天 22:10',
+    tone: 'green',
+  },
+  {
+    id: 'ALT-20240613-0007',
     level: '高危',
-    strategy: '维保逾期联动',
-    asset: '空压机 CP-101',
-    location: '动力站',
-    title: '油滤保养逾期叠加振动异常',
+    strategy: '电流超限策略 P-AMP-001',
+    asset: '数控车床 CN-302',
+    location: '数控车床 CN-302',
+    title: '变频器过载停机',
     score: 'P1',
-    status: '待转派',
-    response: '0.8h',
-    owner: '王技师',
-    suggestion: '创建工单',
+    status: '已闭环',
+    response: '6h 06m',
+    owner: '设备管理',
+    suggestion: '复盘',
+    createdAt: '昨天 21:45',
     tone: 'red',
   },
   {
-    id: 'ALM-20240614-0008',
+    id: 'ALT-20240613-0008',
     level: '中危',
-    strategy: '位置漂移复核',
-    asset: 'AGV-05',
-    location: '物流区',
-    title: '资产定位漂移超过阈值',
+    strategy: '压差监测策略 P-DIF-001',
+    asset: '空压机 CP-301',
+    location: '空压机 CP-301',
+    title: '滤芯压差偏高',
     score: 'P2',
-    status: '待复核',
-    response: '3.2h',
-    owner: '物流运维',
-    suggestion: '巡检确认',
+    status: '已解决',
+    response: '7h 02m',
+    owner: '动力站',
+    suggestion: '查看',
+    createdAt: '昨天 20:30',
     tone: 'orange',
-  },
-  {
-    id: 'ALM-20240614-0007',
-    level: '低危',
-    strategy: '账号异常登录',
-    asset: '报表服务账号',
-    location: '平台服务',
-    title: '非工作时段导出任务触发复核',
-    score: 'P3',
-    status: '已关闭',
-    response: '6.1h',
-    owner: '审计员',
-    suggestion: '审计留痕',
-    tone: 'green',
   },
 ] as const;
 
@@ -10209,7 +10244,6 @@ function WorkbenchAlarmPage({
   const [detailOpen, setDetailOpen] = useState(true);
   const selectedAlarm = workbenchAlarmRows.find((alarm) => alarm.id === selectedAlarmId) ?? workbenchAlarmRows[0];
   const primaryAction = meta.actions[0];
-  const dispatchAction = meta.actions[1] ?? primaryAction;
 
   const openAlarmPreview = (
     title: string,
@@ -10251,33 +10285,41 @@ function WorkbenchAlarmPage({
               <span className="workspace-orders-icon"><Bell /></span>
               <div>
                 <h2>告警中心</h2>
-                <p>等级研判 · 策略命中 · 处置复盘</p>
+                <p>告警识别 · 策略命中 · 处置闭环</p>
               </div>
             </div>
             <div className="workspace-orders-toolbar" aria-label="告警中心顶部操作">
-              <button type="button" className="is-secondary" onClick={() => onPreviewAction(primaryAction)}>
-                <Bell />
-                查看告警队列
+              <button
+                type="button"
+                className="is-refresh"
+                onClick={() =>
+                  openAlarmPreview(
+                    '自动刷新告警',
+                    '/notifications?source=workbench&menu=alarm&refresh=30s',
+                    '按 30 秒频率刷新告警列表，保留当前等级、状态和策略筛选。',
+                    '开启刷新',
+                    Activity,
+                  )
+                }
+              >
+                <span className="workspace-alarm-live-dot" />
+                自动刷新（30s）
               </button>
               <button
                 type="button"
                 className="is-secondary"
                 onClick={() =>
                   openAlarmPreview(
-                    '查看策略命中',
-                    '/risk-matrix?source=workbench&scope=alarm&hit=true',
-                    '进入风险矩阵，按告警策略命中、等级和资产影响范围筛选。',
-                    '进入策略',
-                    ShieldCheck,
+                    '告警设置',
+                    '/notifications/settings?source=workbench&menu=alarm',
+                    '进入告警设置，保留安全态势工作台和告警中心来源。',
+                    '打开设置',
+                    SlidersHorizontal,
                   )
                 }
               >
-                <ShieldCheck />
-                策略命中
-              </button>
-              <button type="button" className="is-primary" onClick={() => onPreviewAction(dispatchAction)}>
-                <AlertTriangle />
-                转派处置工单
+                <SlidersHorizontal />
+                设置
               </button>
             </div>
           </header>
@@ -10309,35 +10351,29 @@ function WorkbenchAlarmPage({
             })}
           </div>
 
-          <div className="workspace-orders-stage-row" aria-label="告警处置流程">
-            {workbenchAlarmStages.map((stage) => (
+          <div className="workspace-alarm-status-tabs" aria-label="告警状态分组">
+            {workbenchAlarmTabs.map((tab, index) => (
               <button
-                key={stage.label}
+                key={tab.label}
                 type="button"
-                className={`is-${stage.tone}`}
+                className={index === 0 ? 'is-active' : ''}
                 onClick={() =>
                   openAlarmPreview(
-                    `${stage.label}告警`,
-                    `/notifications?source=workbench&stage=${encodeURIComponent(stage.label)}`,
-                    `按 ${stage.label} 阶段查看告警处置和复盘记录。`,
-                    '查看阶段',
+                    `${tab.label}列表`,
+                    `/notifications?source=workbench&menu=alarm&status=${encodeURIComponent(tab.label)}`,
+                    `按 ${tab.label} 查看告警列表，保留当前策略、资产类型和时间范围。`,
+                    '查看分组',
                     ArrowRight,
                   )
                 }
               >
-                <span>{stage.label}</span>
-                <strong>{stage.value}</strong>
-                <small>{stage.note}</small>
+                {tab.label} <strong>{tab.value}</strong>
               </button>
             ))}
           </div>
 
-          <div className="workspace-orders-filterbar" aria-label="告警中心查询筛选栏">
-            <label>
-              <Search />
-              <input readOnly value="搜索告警号 / 策略 / 资产 / 责任人" aria-label="告警搜索" />
-            </label>
-            {['等级 全部', '状态 全部', '策略 全部', '责任人 全部'].map((filter) => (
+          <div className="workspace-alarm-filter-row" aria-label="告警中心查询筛选栏">
+            {['全部级别', '全部状态', '全部策略', '全部资产类型'].map((filter) => (
               <button key={filter} type="button" onClick={() => onPreviewAction(primaryAction)}>
                 {filter}
                 <ArrowRight />
@@ -10348,34 +10384,68 @@ function WorkbenchAlarmPage({
               className="is-date"
               onClick={() =>
                 openAlarmPreview(
-                  '按响应时间筛选',
-                  '/notifications?source=workbench&respondedAt=today',
-                  '查看今日响应、处置和复盘的告警记录。',
-                  '查看响应',
+                  '按创建时间筛选',
+                  '/notifications?source=workbench&menu=alarm&createdFrom=2025-06-13&createdTo=2025-06-14',
+                  '查看指定创建时间范围内的告警记录。',
+                  '查看时间范围',
                   CalendarDays,
                 )
               }
             >
-              响应时间
+              创建时间：2025-06-13 → 2025-06-14
               <CalendarDays />
             </button>
-            <button type="button" className="is-reset" onClick={() => onPreviewAction(primaryAction)}>
-              重置
+            <button
+              type="button"
+              className="is-primary-filter"
+              onClick={() =>
+                openAlarmPreview(
+                  '高级筛据',
+                  '/notifications?source=workbench&menu=alarm&advanced=true',
+                  '打开告警高级筛据，组合等级、状态、策略、资产类型和创建时间。',
+                  '高级筛据',
+                  SlidersHorizontal,
+                )
+              }
+            >
+              <SlidersHorizontal />
+              高级筛据
             </button>
           </div>
 
-          <div className="workspace-orders-table" aria-label="告警中心列表">
+          <div className="workspace-alarm-search-row" aria-label="告警中心搜索栏">
+            <label>
+              <Search />
+              <input readOnly value="搜索告警标题 / 设备编号 / 策略" aria-label="告警搜索" />
+            </label>
+            <button
+              type="button"
+              className="is-advanced"
+              onClick={() =>
+                openAlarmPreview(
+                  '高级筛选告警',
+                  '/notifications?source=workbench&menu=alarm&filter=advanced',
+                  '进入告警列表高级筛选，保留搜索关键词和当前分组。',
+                  '高级筛选',
+                  SlidersHorizontal,
+                )
+              }
+            >
+              高级筛选
+            </button>
+            <button type="button" className="is-icon" aria-label="刷新告警" onClick={() => onPreviewAction(primaryAction)}>
+              <RefreshCw />
+            </button>
+          </div>
+
+          <div className="workspace-orders-table workspace-alarm-table" aria-label="告警中心列表">
             <div className="workspace-orders-table-head">
-              <span><input type="checkbox" aria-label="选择全部告警" readOnly /></span>
-              <span>告警号</span>
               <span>等级</span>
-              <span>资产信息</span>
               <span>告警标题</span>
-              <span>优先级</span>
+              <span>关联资产</span>
+              <span>策略 / 规则</span>
+              <span>创建时间</span>
               <span>状态</span>
-              <span>响应</span>
-              <span>责任人</span>
-              <span>处置建议</span>
               <span>操作</span>
             </div>
             {workbenchAlarmRows.map((alarm) => (
@@ -10385,19 +10455,15 @@ function WorkbenchAlarmPage({
                   alarm.id === selectedAlarm.id ? 'is-selected' : ''
                 }`}
               >
-                <span><input type="checkbox" aria-label={`选择${alarm.id}`} readOnly /></span>
-                <button type="button" className="is-link" onClick={() => openAlarm(alarm)}>{alarm.id}</button>
                 <span><em>{alarm.level}</em></span>
-                <span>
-                  <strong>{alarm.asset}</strong>
-                  <small>{alarm.location}</small>
-                </span>
                 <button type="button" className="is-title" onClick={() => openAlarm(alarm)}>{alarm.title}</button>
-                <span><b>{alarm.score}</b></span>
+                <span>{alarm.asset}</span>
+                <span>
+                  <strong>{alarm.strategy.split(' ')[0]}</strong>
+                  <small>{alarm.strategy.split(' ')[1] ?? alarm.strategy}</small>
+                </span>
+                <span>{alarm.createdAt}</span>
                 <span><i>{alarm.status}</i></span>
-                <span>{alarm.response}</span>
-                <span>{alarm.owner}</span>
-                <span><em className="is-spare">{alarm.suggestion}</em></span>
                 <span>
                   <button
                     type="button"
@@ -10414,10 +10480,7 @@ function WorkbenchAlarmPage({
                       );
                     }}
                   >
-                    处理
-                  </button>
-                  <button type="button" className="is-more" aria-label={`${alarm.id}更多操作`} onClick={() => openAlarm(alarm)}>
-                    ···
+                    {alarm.status === '已解决' || alarm.status === '已闭环' ? '复盘' : '查看'}
                   </button>
                 </span>
               </div>
@@ -10425,12 +10488,14 @@ function WorkbenchAlarmPage({
           </div>
 
           <footer className="workspace-orders-pagination" aria-label="告警分页">
-            <span>共 36 条</span>
+            <span>共 180 条</span>
             <button type="button">10条/页</button>
             <button type="button" disabled>‹</button>
-            {[1, 2, 3, 4].map((pageNo) => (
+            {[1, 2, 3, 4, 5].map((pageNo) => (
               <button key={pageNo} type="button" className={pageNo === 1 ? 'is-current' : ''}>{pageNo}</button>
             ))}
+            <span>...</span>
+            <button type="button">18</button>
             <button type="button">›</button>
           </footer>
         </section>
@@ -10440,7 +10505,7 @@ function WorkbenchAlarmPage({
         {detailOpen ? (
           <>
             <header className="workspace-orders-detail-head">
-              <strong>告警研判详情</strong>
+              <strong>告警详情</strong>
               <button type="button" aria-label="关闭告警详情" onClick={() => setDetailOpen(false)}>
                 <X />
               </button>
@@ -10454,15 +10519,12 @@ function WorkbenchAlarmPage({
                 </span>
               </div>
               <h3>{selectedAlarm.title}</h3>
+              <p className="workspace-alarm-alert-id">告警ID：{selectedAlarm.id}</p>
               <dl>
-                <div><dt>告警等级</dt><dd>{selectedAlarm.level}</dd></div>
-                <div><dt>策略命中</dt><dd>{selectedAlarm.strategy}</dd></div>
-                <div><dt>资产</dt><dd>{selectedAlarm.asset}</dd></div>
-                <div><dt>位置</dt><dd>{selectedAlarm.location}</dd></div>
-                <div><dt>响应时长</dt><dd>{selectedAlarm.response}</dd></div>
-                <div><dt>责任人</dt><dd>{selectedAlarm.owner}</dd></div>
-                <div><dt>处置建议</dt><dd>{selectedAlarm.suggestion}</dd></div>
-                <div><dt>最近触发</dt><dd>2026-06-14 10:18</dd></div>
+                <div><dt>创建时间</dt><dd>2025-06-14 09:12:32</dd></div>
+                <div><dt>持续时长</dt><dd>{selectedAlarm.response}</dd></div>
+                <div><dt>策略规则</dt><dd>{selectedAlarm.strategy}</dd></div>
+                <div><dt>告警ID</dt><dd>{selectedAlarm.id}</dd></div>
               </dl>
             </section>
 

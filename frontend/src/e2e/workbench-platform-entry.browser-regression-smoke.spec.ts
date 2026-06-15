@@ -166,9 +166,9 @@ test.describe('Workbench 正式入口浏览器回归', () => {
       {
         label: '告警中心',
         route: '/fixed-assets/workbench/security?menu=alarm',
-        action: '查看告警队列',
-        dialogName: '查看告警队列',
-        targetIncludes: ['/notifications?', 'source=quick-alert', 'severity='],
+        action: '自动刷新（30s）',
+        dialogName: '自动刷新告警',
+        targetIncludes: ['/notifications?source=workbench&menu=alarm&refresh=30s'],
       },
       {
         label: '组织策略',
@@ -707,13 +707,15 @@ test.describe('Workbench 正式入口浏览器回归', () => {
     await expect(page.getByLabel('告警中心真实产品页')).toBeVisible();
     await expect(page.locator('.workspace-product-page')).toHaveCount(0);
     await expect(page.getByRole('heading', { name: '告警中心' })).toBeVisible();
-    await expect(page.getByText('等级研判 · 策略命中 · 处置复盘')).toBeVisible();
-    await expect(page.getByLabel('告警中心核心指标')).toContainText('安全评分');
-    await expect(page.getByLabel('告警处置流程')).toContainText('发现');
-    await expect(page.getByLabel('告警中心顶部操作')).toContainText('转派处置工单');
-    await expect(page.getByLabel('告警中心查询筛选栏')).toContainText('响应时间');
-    await expect(page.getByLabel('告警中心列表')).toContainText('ALM-20240614-0012');
-    await expect(page.getByLabel('告警详情抽屉')).toContainText('主轴振动异常触发高危策略');
+    await expect(page.getByText('告警识别 · 策略命中 · 处置闭环')).toBeVisible();
+    await expect(page.getByLabel('告警中心核心指标')).toContainText('高危');
+    await expect(page.getByLabel('告警中心核心指标')).toContainText('策略命中');
+    await expect(page.getByLabel('告警状态分组')).toContainText('全部告警');
+    await expect(page.getByLabel('告警中心顶部操作')).toContainText('自动刷新');
+    await expect(page.getByLabel('告警中心查询筛选栏')).toContainText('高级筛据');
+    await expect(page.getByLabel('告警中心列表')).toContainText('主轴异常振动');
+    await expect(page.getByLabel('告警详情抽屉')).toContainText('主轴异常振动');
+    await expect(page.getByLabel('告警详情抽屉')).toContainText('ALT-20240614-0001');
     await expect(page.getByLabel('告警策略命中分析')).toContainText('趋势预览');
     await expect(page.getByLabel('告警处置动作')).toContainText('转工单');
     await expect(page.getByLabel('告警闭环进度')).toContainText('25%');
@@ -721,21 +723,21 @@ test.describe('Workbench 正式入口浏览器回归', () => {
     await expect(page.getByLabel('告警详情操作')).toContainText('创建工单');
     await expect(page.locator('body')).not.toContainText('workbench-menu-alert-v1');
 
-    await page.getByRole('button', { name: /转派处置工单/ }).click();
-    const dispatchDialog = page.getByRole('dialog', { name: '转派处置工单' });
+    await page.getByLabel('告警处置动作').getByRole('button', { name: '转工单' }).click();
+    const dispatchDialog = page.getByRole('dialog', { name: '转工单告警' });
     await expect(dispatchDialog).toBeVisible();
-    await expect(dispatchDialog.locator('.workspace-action-route strong')).toContainText('/workorders/new?');
-    await expect(dispatchDialog.locator('.workspace-action-route strong')).toContainText('priority=CRITICAL');
+    await expect(dispatchDialog.locator('.workspace-action-route strong')).toContainText('/notifications/ALT-20240614-0001/process?');
+    await expect(dispatchDialog.locator('.workspace-action-route strong')).toContainText('mode=workorder');
     await page.keyboard.press('Escape');
     await expect(dispatchDialog).toHaveCount(0);
 
-    await page.getByRole('button', { name: 'ALM-20240614-0011', exact: true }).click();
+    await page.getByRole('button', { name: '主电机过温报警', exact: true }).click();
     const detailDialog = page.getByRole('dialog', { name: '打开告警详情' });
     await expect(detailDialog).toBeVisible();
-    await expect(detailDialog.locator('.workspace-action-route strong')).toContainText('/notifications/ALM-20240614-0011');
+    await expect(detailDialog.locator('.workspace-action-route strong')).toContainText('/notifications/ALT-20240614-0002');
     await page.keyboard.press('Escape');
     await expect(detailDialog).toHaveCount(0);
-    await expect(page.getByLabel('告警详情抽屉')).toContainText('温度边界连续越限');
+    await expect(page.getByLabel('告警详情抽屉')).toContainText('主电机过温报警');
 
     await page.getByRole('button', { name: '创建工单' }).click();
     const workOrderDialog = page.getByRole('dialog', { name: '创建告警处置工单' });
