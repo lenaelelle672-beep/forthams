@@ -1011,6 +1011,15 @@
   border-color: #dce5ff;
 }
 
+.workspace-report-product-shell {
+  display: grid;
+  grid-template-rows: auto 38px auto auto minmax(190px, .72fr) minmax(210px, 1fr) auto;
+  gap: 10px;
+  padding: 14px 16px 12px;
+  min-height: 0;
+  overflow: auto;
+}
+
 .workspace-orders-header {
   display: flex;
   align-items: center;
@@ -2592,6 +2601,9 @@
   background:
     linear-gradient(180deg, rgba(248, 252, 255, .97), rgba(239, 248, 255, .96)),
     #f0f7ff;
+  height: calc(100vh - 80px);
+  min-height: 820px;
+  overflow: hidden;
 }
 
 .workspace-report-page .workspace-orders-icon {
@@ -2601,6 +2613,97 @@
 
 .workspace-report-page .workspace-orders-toolbar .is-primary {
   background: linear-gradient(180deg, #247fff, #0f67ef);
+}
+
+.workspace-report-section-tabs {
+  display: flex;
+  gap: 30px;
+  min-width: 0;
+  overflow-x: auto;
+  border-bottom: 1px solid #dce8f8;
+  scrollbar-width: none;
+}
+
+.workspace-report-section-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.workspace-report-section-tabs button {
+  flex: 0 0 auto;
+  height: 38px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  color: #274767;
+  background: transparent;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 930;
+}
+
+.workspace-report-section-tabs button.is-active {
+  color: #176de8;
+  border-bottom-color: #176de8;
+}
+
+.workspace-report-criteria {
+  display: grid;
+  grid-template-columns: minmax(210px, 1fr) minmax(260px, 1.1fr) repeat(4, minmax(70px, .32fr)) minmax(92px, .36fr);
+  gap: 8px;
+  min-width: 0;
+}
+
+.workspace-report-criteria button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 0;
+  height: 38px;
+  padding: 0 11px;
+  border: 1px solid #d5e4f7;
+  border-radius: 6px;
+  color: #284866;
+  background: #fff;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 880;
+}
+
+.workspace-report-criteria button:nth-child(-n+2) {
+  justify-content: space-between;
+}
+
+.workspace-report-criteria button.is-active {
+  color: #fff;
+  border-color: #176de8;
+  background: #176de8;
+}
+
+.workspace-report-criteria span,
+.workspace-report-criteria strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workspace-report-criteria span {
+  color: #6b7f98;
+  font-weight: 840;
+}
+
+.workspace-report-criteria button.is-active span {
+  color: #fff;
+}
+
+.workspace-report-criteria strong {
+  color: #1a3b60;
+  font-weight: 930;
+}
+
+.workspace-report-criteria svg {
+  flex: 0 0 auto;
+  width: 15px;
+  height: 15px;
 }
 
 .workspace-report-page .workspace-orders-detail-card b {
@@ -2634,12 +2737,70 @@
   background: #e9fbff;
 }
 
+.workspace-report-page .workspace-orders-kpis {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.workspace-report-page .workspace-orders-kpis button {
+  min-height: 100px;
+}
+
+.workspace-report-page .workspace-orders-table-head,
+.workspace-report-page .workspace-orders-table-row {
+  grid-template-columns: minmax(110px, .9fr) minmax(90px, .72fr) minmax(120px, .9fr) minmax(120px, .9fr) 82px minmax(96px, .78fr) 92px 92px;
+  min-width: 850px;
+}
+
+.workspace-report-page .workspace-orders-table-row {
+  min-height: 50px;
+}
+
+.workspace-report-page .workspace-orders-table-row > span:first-child {
+  color: #193b61;
+  font-weight: 920;
+}
+
+.workspace-report-page .workspace-orders-table-row i {
+  color: #0d9a6a;
+  background: transparent;
+}
+
+.workspace-report-page .workspace-orders-table-row b {
+  color: #e02f44;
+  background: transparent;
+}
+
+.workspace-report-page .workspace-orders-table-row.is-orange b {
+  color: #f08a20;
+  background: transparent;
+}
+
+.workspace-report-page .workspace-orders-table-row.is-green b {
+  color: #0d9a6a;
+  background: transparent;
+}
+
+.workspace-report-sparkline {
+  width: 78px;
+  height: 26px;
+  color: #176de8;
+}
+
+.workspace-report-page .workspace-orders-table-row.is-orange .workspace-report-sparkline {
+  color: #f08a20;
+}
+
+.workspace-report-page .workspace-orders-table-row.is-green .workspace-report-sparkline {
+  color: #0d9a6a;
+}
+
 .workspace-report-analytics-grid {
   display: grid;
-  grid-template-columns: minmax(300px, 1.08fr) minmax(230px, .82fr) minmax(240px, .82fr) minmax(230px, .78fr);
+  grid-template-columns: minmax(300px, 1.12fr) minmax(230px, .86fr) minmax(240px, .86fr) minmax(230px, .8fr);
   gap: 10px;
   min-width: 0;
-  margin: 12px 0;
+  margin: 0;
 }
 
 .workspace-report-analytics-grid article {
@@ -2681,7 +2842,7 @@
 
 .workspace-report-trend-card {
   display: grid;
-  grid-template-rows: auto minmax(118px, 1fr) auto;
+  grid-template-rows: auto minmax(104px, 1fr) auto;
   overflow: hidden;
 }
 
@@ -2707,7 +2868,7 @@
 
 .workspace-report-donut-card {
   display: grid;
-  grid-template-rows: auto minmax(118px, 1fr);
+  grid-template-rows: auto minmax(104px, 1fr);
 }
 
 .workspace-report-donut-wrap {
@@ -2807,6 +2968,16 @@
 
 .workspace-report-rank-card > div,
 .workspace-report-export-card {
+  display: flex;
+  flex-direction: column;
+  align-content: stretch;
+}
+
+.workspace-report-export-card > button:nth-of-type(n+4) {
+  display: none;
+}
+
+.workspace-report-export-card {
   gap: 8px;
 }
 
@@ -2868,7 +3039,7 @@
   grid-template-columns: 24px minmax(0, 1fr) auto;
   align-items: center;
   gap: 9px;
-  min-height: 39px;
+  min-height: 38px;
   margin: 0 12px;
   padding: 0 0 8px;
   border-bottom: 1px solid #edf3fb;

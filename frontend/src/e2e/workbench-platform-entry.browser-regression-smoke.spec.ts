@@ -159,9 +159,9 @@ test.describe('Workbench 正式入口浏览器回归', () => {
       {
         label: '报表分析',
         route: '/fixed-assets/workbench/analytics?menu=report',
-        action: '打开经营报表',
-        dialogName: '打开经营报表',
-        targetIncludes: ['/reports?source=workbench&view=operations'],
+        action: '导出',
+        dialogName: '导出资产趋势',
+        targetIncludes: ['/reports?source=workbench&view=asset-trend&export=csv'],
       },
       {
         label: '告警中心',
@@ -649,35 +649,39 @@ test.describe('Workbench 正式入口浏览器回归', () => {
     await expect(page.locator('.workspace-product-page')).toHaveCount(0);
     await expect(page.getByRole('heading', { name: '报表分析' })).toBeVisible();
     await expect(page.getByText('模板中心 · 分析视图 · 导出订阅')).toBeVisible();
+    await expect(page.getByLabel('报表分析页面分栏')).toContainText('模板中心');
+    await expect(page.getByLabel('报表分析查询筛选栏')).toContainText('资产价值信息总览');
+    await expect(page.getByLabel('报表分析查询筛选栏')).toContainText('近30天');
     await expect(page.getByLabel('报表分析核心指标')).toContainText('资产总价值');
+    await expect(page.getByLabel('报表分析核心指标')).toContainText('¥98,760.25 万');
     await expect(page.getByLabel('报表分析图表区')).toContainText('资产价值趋势');
     await expect(page.getByLabel('报表趋势图')).toContainText('¥98,760.25 万');
     await expect(page.getByLabel('资产分类环图')).toContainText('生产设备');
     await expect(page.getByLabel('部门资产排行')).toContainText('制造一部');
     await expect(page.getByLabel('导出历史摘要')).toContainText('资产价值总览_20260614.xlsx');
-    await expect(page.getByLabel('报表分析流程')).toContainText('模板');
-    await expect(page.getByLabel('报表分析顶部操作')).toContainText('导出资产趋势');
-    await expect(page.getByLabel('报表分析查询筛选栏')).toContainText('生成时间');
-    await expect(page.getByLabel('报表分析列表')).toContainText('RPT-ASSET-VALUE-001');
+    await expect(page.getByLabel('报表分析流程')).toHaveCount(0);
+    await expect(page.getByLabel('报表分析顶部操作')).toContainText('导出');
+    await expect(page.getByLabel('报表分析列表')).toContainText('制造一部');
+    await expect(page.getByLabel('报表分析列表')).toContainText('风险资产');
     await expect(page.getByLabel('报表详情抽屉')).toContainText('资产价值信息总览');
     await expect(page.getByLabel('报表详情标签')).toContainText('审计追溯');
     await expect(page.getByLabel('报表详情操作')).toContainText('订阅此报表');
     await expect(page.locator('body')).not.toContainText('workbench-menu-report-v1');
 
-    await page.getByRole('button', { name: /导出资产趋势/ }).click();
+    await page.getByRole('button', { name: '导出', exact: true }).click();
     const exportDialog = page.getByRole('dialog', { name: '导出资产趋势' });
     await expect(exportDialog).toBeVisible();
     await expect(exportDialog.locator('.workspace-action-route strong')).toContainText('/reports?source=workbench&view=asset-trend&export=csv');
     await page.keyboard.press('Escape');
     await expect(exportDialog).toHaveCount(0);
 
-    await page.getByRole('button', { name: 'RPT-MAINT-COST-008', exact: true }).click();
-    const detailDialog = page.getByRole('dialog', { name: '打开报表详情' });
-    await expect(detailDialog).toBeVisible();
-    await expect(detailDialog.locator('.workspace-action-route strong')).toContainText('/reports/RPT-MAINT-COST-008');
+    await page.getByLabel('报表分析列表').getByRole('button', { name: '查看详情' }).first().click();
+    const departmentDialog = page.getByRole('dialog', { name: '制造一部资产统计详情' });
+    await expect(departmentDialog).toBeVisible();
+    await expect(departmentDialog.locator('.workspace-action-route strong')).toContainText('department=');
     await page.keyboard.press('Escape');
-    await expect(detailDialog).toHaveCount(0);
-    await expect(page.getByLabel('报表详情抽屉')).toContainText('预测维保成本分析');
+    await expect(departmentDialog).toHaveCount(0);
+    await expect(page.getByLabel('报表详情抽屉')).toContainText('资产价值信息总览');
 
     await page.getByRole('button', { name: '订阅此报表' }).click();
     const subscribeDialog = page.getByRole('dialog', { name: '订阅此报表' });
@@ -932,10 +936,10 @@ test.describe('Workbench 正式入口浏览器回归', () => {
     await page.goto('/fixed-assets/workbench/analytics?menu=report');
     await page.waitForLoadState('networkidle');
 
-    await page.getByRole('button', { name: '打开经营报表' }).click();
-    const reportDialog = page.getByRole('dialog', { name: '打开经营报表' });
+    await page.getByRole('button', { name: '导出', exact: true }).click();
+    const reportDialog = page.getByRole('dialog', { name: '导出资产趋势' });
     await expect(reportDialog).toBeVisible();
-    await expect(reportDialog.getByText('/reports?source=workbench&view=operations').first()).toBeVisible();
+    await expect(reportDialog.getByText('/reports?source=workbench&view=asset-trend&export=csv').first()).toBeVisible();
     await expect(reportDialog.getByRole('status')).toContainText('当前账号缺少访问该业务页面的权限');
     await expect(reportDialog.getByRole('button', { name: /暂无权限/ })).toBeDisabled();
     await expect(page.locator('body')).not.toContainText('Unexpected Application Error');

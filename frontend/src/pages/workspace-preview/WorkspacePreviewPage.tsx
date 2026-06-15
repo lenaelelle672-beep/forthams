@@ -26,6 +26,7 @@ import {
   Maximize2,
   Monitor,
   PackageCheck,
+  PieChart,
   Search,
   Server,
   Settings,
@@ -8034,12 +8035,11 @@ const workbenchDeviceQuickOps = [
 ] as const;
 
 const workbenchReportSummaryCards = [
-  { label: '资产总价值', value: '¥3,820万', delta: '净值', icon: Layers, tone: 'blue' },
-  { label: '资产增长趋势', value: '+3.42%', delta: '较上期', icon: TrendingUp, tone: 'green' },
-  { label: '部门资产统计', value: '3 厂区', delta: 'A/B/研发', icon: BarChart3, tone: 'cyan' },
-  { label: '维保成本分析', value: '¥46万', delta: '本月', icon: Wrench, tone: 'orange' },
-  { label: '风险资产统计', value: '36', delta: '需处置', icon: AlertTriangle, tone: 'red' },
-  { label: '资产分类分布', value: '4 类', delta: '生产/IT/安防/办公', icon: FileText, tone: 'violet' },
+  { label: '资产总价值', value: '¥98,760.25 万', delta: '较上期 ↑ 3.42%', icon: Layers, tone: 'blue' },
+  { label: '在用资产价值', value: '¥86,320.45 万', delta: '较上期 ↑ 2.89%', icon: TrendingUp, tone: 'green' },
+  { label: '闲置资产价值', value: '¥8,640.12 万', delta: '较上期 ↓ 1.24%', icon: ShieldCheck, tone: 'cyan' },
+  { label: '风险资产价值', value: '¥3,799.68 万', delta: '较上期 ↑ 6.35%', icon: AlertTriangle, tone: 'orange' },
+  { label: '资产数量', value: '12,856 台', delta: '较上期 ↑ 1.56%', icon: PieChart, tone: 'violet' },
 ] as const;
 
 const workbenchReportStages = [
@@ -8131,7 +8131,7 @@ const workbenchReportRows = [
   },
 ] as const;
 
-const workbenchReportDetailTabs = ['报表信息', '趋势分析', '导出记录', '审计追溯', '数据来源'] as const;
+const workbenchReportDetailTabs = ['订阅配置', '导出记录', '审计追溯'] as const;
 
 const workbenchReportTrendPoints = '0,84 68,78 136,62 204,68 272,48 340,54 408,38 476,28';
 
@@ -8154,6 +8154,16 @@ const workbenchReportExportHistory = [
   { name: '资产价值总览_20260614.xlsx', owner: '张三丰', status: '已完成', tone: 'green' },
   { name: '资产分类分布_20260614.pdf', owner: '张三丰', status: '已完成', tone: 'green' },
   { name: '部门资产统计_20260613.xlsx', owner: '李巡检', status: '失败', tone: 'red' },
+  { name: '闲置资产清单_20260613.xlsx', owner: '王采购', status: '已完成', tone: 'green' },
+  { name: '风险资产明细_20260612.xlsx', owner: '系统', status: '已完成', tone: 'green' },
+] as const;
+
+const workbenchReportDepartmentRows = [
+  { department: '制造一部', count: '2,856', original: '20,542.80', net: '18,620.45', inUse: '93.6%', risk: '45', tone: 'red', points: '0,18 18,10 36,16 54,6 72,14' },
+  { department: '制造二部', count: '2,342', original: '17,280.30', net: '15,842.30', inUse: '91.7%', risk: '38', tone: 'red', points: '0,20 18,12 36,18 54,11 72,17' },
+  { department: '设备管理部', count: '1,856', original: '13,654.20', net: '12,354.78', inUse: '95.1%', risk: '26', tone: 'orange', points: '0,16 18,7 36,14 54,9 72,13' },
+  { department: '质量管理部', count: '1,580', original: '9,856.30', net: '8,975.60', inUse: '92.4%', risk: '28', tone: 'orange', points: '0,19 18,8 36,15 54,6 72,16' },
+  { department: '技术研发部', count: '1,236', original: '7,120.80', net: '6,532.12', inUse: '96.3%', risk: '18', tone: 'green', points: '0,17 18,11 36,9 54,15 72,8' },
 ] as const;
 
 const workbenchAlarmSummaryCards = [
@@ -9653,7 +9663,7 @@ function WorkbenchReportPage({
   onPreviewAction,
 }: WorkbenchMenuPageProps) {
   const [selectedReportId, setSelectedReportId] = useState(workbenchReportRows[0].id);
-  const [detailTab, setDetailTab] = useState<(typeof workbenchReportDetailTabs)[number]>('报表信息');
+  const [detailTab, setDetailTab] = useState<(typeof workbenchReportDetailTabs)[number]>('审计追溯');
   const [detailOpen, setDetailOpen] = useState(true);
   const selectedReport =
     workbenchReportRows.find((report) => report.id === selectedReportId) ?? workbenchReportRows[0];
@@ -9704,13 +9714,9 @@ function WorkbenchReportPage({
               </div>
             </div>
             <div className="workspace-orders-toolbar" aria-label="报表分析顶部操作">
-              <button type="button" className="is-secondary" onClick={() => onPreviewAction(primaryAction)}>
-                <BarChart3 />
-                打开经营报表
-              </button>
               <button type="button" className="is-primary" onClick={() => onPreviewAction(exportAction)}>
                 <FileText />
-                导出资产趋势
+                导出
               </button>
               <button
                 type="button"
@@ -9726,10 +9732,115 @@ function WorkbenchReportPage({
                 }
               >
                 <Bell />
-                订阅报表
+                订阅
+              </button>
+              <button
+                type="button"
+                className="is-secondary"
+                onClick={() =>
+                  openReportPreview(
+                    '更多报表操作',
+                    '/reports?source=workbench&view=operations&more=true',
+                    '打开更多报表操作，保留模板中心、分析视图和导出历史上下文。',
+                    '查看更多',
+                    ChevronDown,
+                  )
+                }
+              >
+                更多
+                <ChevronDown />
               </button>
             </div>
           </header>
+
+          <nav className="workspace-report-section-tabs" aria-label="报表分析页面分栏">
+            {['模板中心', '分析视图', '导出历史'].map((tab) => (
+              <button
+                key={tab}
+                type="button"
+                className={tab === '模板中心' ? 'is-active' : ''}
+                onClick={() =>
+                  openReportPreview(
+                    `${tab}视图`,
+                    `/reports?source=workbench&view=${encodeURIComponent(tab)}`,
+                    `切换到 ${tab}，保留 Workbench 报表分析来源。`,
+                    '切换视图',
+                    BarChart3,
+                  )
+                }
+              >
+                {tab}
+              </button>
+            ))}
+          </nav>
+
+          <div className="workspace-report-criteria" aria-label="报表分析查询筛选栏">
+            <button
+              type="button"
+              onClick={() =>
+                openReportPreview(
+                  '选择报表模板',
+                  '/reports?source=workbench&template=asset-value',
+                  '切换报表模板，默认带入资产价值信息总览。',
+                  '选择模板',
+                  FileText,
+                )
+              }
+            >
+              <span>报表模板</span>
+              <strong>资产价值信息总览</strong>
+              <ChevronDown />
+            </button>
+            <button
+              type="button"
+              onClick={() =>
+                openReportPreview(
+                  '选择时间范围',
+                  '/reports?source=workbench&range=2026-05-15_2026-06-14',
+                  '按 2026-05-15 到 2026-06-14 重新计算资产价值视图。',
+                  '选择时间',
+                  CalendarDays,
+                )
+              }
+            >
+              <span>时间范围</span>
+              <strong>2026-05-15 ~ 2026-06-14</strong>
+              <CalendarDays />
+            </button>
+            {['今日', '近7天', '近30天', '自定义'].map((range) => (
+              <button
+                key={range}
+                type="button"
+                className={range === '近30天' ? 'is-active' : ''}
+                onClick={() =>
+                  openReportPreview(
+                    `${range}报表分析`,
+                    `/reports?source=workbench&range=${encodeURIComponent(range)}`,
+                    `按 ${range} 查看报表分析，保留当前模板和数据源。`,
+                    '应用时间',
+                    CalendarDays,
+                  )
+                }
+              >
+                {range}
+              </button>
+            ))}
+            <button
+              type="button"
+              onClick={() =>
+                openReportPreview(
+                  '筛选报表数据',
+                  '/reports?source=workbench&filter=true',
+                  '打开高级筛选，按资产范围、部门、分类和数据源过滤。',
+                  '筛选',
+                  SlidersHorizontal,
+                )
+              }
+            >
+              <SlidersHorizontal />
+              筛选
+            </button>
+          </div>
 
           <div className="workspace-orders-kpis" aria-label="报表分析核心指标">
             {workbenchReportSummaryCards.map((card) => {
@@ -9889,115 +10000,48 @@ function WorkbenchReportPage({
             </article>
           </section>
 
-          <div className="workspace-orders-stage-row" aria-label="报表分析流程">
-            {workbenchReportStages.map((stage) => (
-              <button
-                key={stage.label}
-                type="button"
-                className={`is-${stage.tone}`}
-                onClick={() =>
-                  openReportPreview(
-                    `${stage.label}报表任务`,
-                    `/reports?source=workbench&stage=${encodeURIComponent(stage.label)}`,
-                    `按 ${stage.label} 阶段查看报表任务、导出记录和订阅状态。`,
-                    '查看阶段',
-                    ArrowRight,
-                  )
-                }
-              >
-                <span>{stage.label}</span>
-                <strong>{stage.value}</strong>
-                <small>{stage.note}</small>
-              </button>
-            ))}
-          </div>
-
-          <div className="workspace-orders-filterbar" aria-label="报表分析查询筛选栏">
-            <label>
-              <Search />
-              <input readOnly value="搜索报表名称 / 模板 / 创建人 / 数据源" aria-label="报表搜索" />
-            </label>
-            {['模板 全部', '时间范围 30天', '数据源 全部', '状态 全部'].map((filter) => (
-              <button key={filter} type="button" onClick={() => onPreviewAction(primaryAction)}>
-                {filter}
-                <ArrowRight />
-              </button>
-            ))}
-            <button
-              type="button"
-              className="is-date"
-              onClick={() =>
-                openReportPreview(
-                  '按生成时间筛选',
-                  '/reports?source=workbench&view=operations&generatedAt=today',
-                  '查看今日生成、导出和订阅推送的报表任务。',
-                  '查看今日报表',
-                  CalendarDays,
-                )
-              }
-            >
-              生成时间
-              <CalendarDays />
-            </button>
-            <button type="button" className="is-reset" onClick={() => onPreviewAction(primaryAction)}>
-              重置
-            </button>
-          </div>
-
           <div className="workspace-orders-table" aria-label="报表分析列表">
             <div className="workspace-orders-table-head">
-              <span><input type="checkbox" aria-label="选择全部报表" readOnly /></span>
-              <span>报表编号</span>
-              <span>类型</span>
-              <span>报表信息</span>
-              <span>分析内容</span>
-              <span>指标</span>
-              <span>状态</span>
-              <span>时间范围</span>
-              <span>创建人</span>
-              <span>数据源</span>
+              <span>部门</span>
+              <span>资产数量（台）</span>
+              <span>资产原值（万元）</span>
+              <span>资产净值（万元）</span>
+              <span>在用率</span>
+              <span>风险资产（台）</span>
+              <span>趋势</span>
               <span>操作</span>
             </div>
-            {workbenchReportRows.map((report) => (
+            {workbenchReportDepartmentRows.map((row) => (
               <div
-                key={report.id}
-                className={`workspace-orders-table-row is-${report.tone} ${
-                  report.id === selectedReport.id ? 'is-selected' : ''
-                }`}
+                key={row.department}
+                className={`workspace-orders-table-row is-${row.tone}`}
               >
-                <span><input type="checkbox" aria-label={`选择${report.id}`} readOnly /></span>
-                <button type="button" className="is-link" onClick={() => openReport(report)}>{report.id}</button>
-                <span><em>{report.type}</em></span>
+                <span>{row.department}</span>
+                <span>{row.count}</span>
+                <span>{row.original}</span>
+                <span>{row.net}</span>
+                <span><i>{row.inUse}</i></span>
+                <span><b>{row.risk}</b></span>
                 <span>
-                  <strong>{report.name}</strong>
-                  <small>{report.exportState}</small>
+                  <svg className="workspace-report-sparkline" viewBox="0 0 72 24" role="img" aria-label={`${row.department}趋势`}>
+                    <polyline points={row.points} fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
                 </span>
-                <button type="button" className="is-title" onClick={() => openReport(report)}>{report.title}</button>
-                <span><b>{report.metric}</b></span>
-                <span><i>{report.status}</i></span>
-                <span>{report.range}</span>
-                <span>{report.owner}</span>
-                <span><em className="is-spare">{report.dataSource}</em></span>
                 <span>
                   <button
                     type="button"
                     className="is-process"
-                    onClick={() => {
-                      setSelectedReportId(report.id);
-                      setDetailOpen(true);
+                    onClick={() =>
                       openReportPreview(
-                        '重新导出报表',
-                        `/reports/${report.id}/export?source=workbench&format=xlsx`,
-                        `重新导出 ${report.name}，保留模板、时间范围和数据源审计记录。`,
-                        '重新导出',
-                        FileText,
-                      );
-                    }}
+                        `${row.department}资产统计详情`,
+                        `/reports?source=workbench&view=department-assets&department=${encodeURIComponent(row.department)}`,
+                        `查看 ${row.department} 的资产数量、原值、净值、在用率和风险资产明细。`,
+                        '查看详情',
+                        BarChart3,
+                      )
+                    }
                   >
-                    导出
-                  </button>
-                  <button type="button" className="is-more" aria-label={`${report.id}更多操作`} onClick={() => openReport(report)}>
-                    ···
+                    查看详情
                   </button>
                 </span>
               </div>
@@ -10005,10 +10049,10 @@ function WorkbenchReportPage({
           </div>
 
           <footer className="workspace-orders-pagination" aria-label="报表分页">
-            <span>共 26 个模板</span>
+            <span>共 12 条</span>
             <button type="button">10条/页</button>
             <button type="button" disabled>‹</button>
-            {[1, 2, 3].map((pageNo) => (
+            {[1, 2].map((pageNo) => (
               <button key={pageNo} type="button" className={pageNo === 1 ? 'is-current' : ''}>{pageNo}</button>
             ))}
             <button type="button">›</button>
