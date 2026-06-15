@@ -4924,9 +4924,9 @@ function WorkbenchHomePage({
       <section className="workspace-home-center" aria-label="运营首页产品页主体">
         <header className="workspace-home-header">
           <div>
-            <span>资产运营中枢</span>
+            <span>上午好，张三丰</span>
             <h2>运营首页</h2>
-            <p>把 Dashboard KPI、待办、最近工单和维保预警收敛成默认入口，先研判再进入业务页处理。</p>
+            <p>汇总资产态势、流程待办、最近工单和维保预警，进入左侧业务页前先完成运营研判。</p>
           </div>
           <div className="workspace-orders-toolbar" aria-label="运营首页顶部操作">
             {workbenchHomeQuickActions.map((action) => {
@@ -5171,7 +5171,7 @@ function WorkbenchHomePage({
 
       <aside className="workspace-home-detail" aria-label="运营首页详情抽屉">
         <header>
-          <strong>运营事项详情</strong>
+          <strong>今日运营洞察</strong>
           <span>{selectedTask.status}</span>
         </header>
         <section className="workspace-home-detail-card" aria-label="当前运营事项信息">
@@ -5458,6 +5458,44 @@ function WorkbenchEnergyPage({
             <p>把 MES、IoT、设备点位和异常流水合并为可查询、可重试、可订阅的链路工作台。</p>
           </div>
         </header>
+        <nav className="workspace-energy-section-tabs" aria-label="数据监控页面分栏">
+          {workbenchEnergyDomains.map((domain) => (
+            <button
+              key={domain.id}
+              type="button"
+              className={domain.id === selectedDomain ? 'is-active' : ''}
+              onClick={() => {
+                setSelectedDomain(domain.id);
+                openEnergyPreview(
+                  `${domain.label}视图`,
+                  domain.route,
+                  `切换到 ${domain.label}，保留数据监控页面和 Workbench 来源。`,
+                  '切换视图',
+                  domain.icon,
+                );
+              }}
+            >
+              {domain.label}
+            </button>
+          ))}
+          {['设备点位', '采集任务', '订阅管理', '数据事件'].map((tab) => (
+            <button
+              key={tab}
+              type="button"
+              onClick={() =>
+                openEnergyPreview(
+                  `${tab}视图`,
+                  `/energy?source=workbench&scope=data-monitoring&view=${encodeURIComponent(tab)}`,
+                  `进入 ${tab}，保留数据监控上下文。`,
+                  '打开视图',
+                  Database,
+                )
+              }
+            >
+              {tab}
+            </button>
+          ))}
+        </nav>
         <div className="workspace-energy-toolbar workspace-orders-toolbar" aria-label="数据监控顶部操作">
           <button type="button" onClick={() => runEnergyAction(0)}>
             <Activity />
@@ -6445,8 +6483,8 @@ function WorkbenchSettingsPage({
         <header className="workspace-settings-header">
           <div>
             <span>基础维护</span>
-            <h2>{selectedDomainMeta.label}维护台</h2>
-            <p>统一维护分类、位置、供应商、编号规则和集成源，所有变更先预览影响再进入业务页。</p>
+            <h2>基础维护</h2>
+            <p>维护基础数据与系统配置，保障平台数据标准与稳定运行。</p>
           </div>
           <div className="workspace-orders-toolbar" aria-label="基础维护顶部操作">
             <button
@@ -6497,6 +6535,38 @@ function WorkbenchSettingsPage({
             </button>
           </div>
         </header>
+        <nav className="workspace-settings-section-tabs" aria-label="基础维护页面分栏">
+          {workbenchSettingsDomains.map((domain) => (
+            <button
+              key={domain.id}
+              type="button"
+              className={domain.id === selectedDomain ? 'is-active' : ''}
+              onClick={() => {
+                setSelectedDomain(domain.id);
+                const nextConfig = workbenchSettingsObjects.find((config) => config.domain === domain.id);
+                if (nextConfig) {
+                  setSelectedConfigId(nextConfig.id);
+                }
+              }}
+            >
+              {domain.label}
+            </button>
+          ))}
+          <button
+            type="button"
+            onClick={() =>
+              openSettingsPreview(
+                '系统配置维护',
+                '/settings/sysconfig?source=workbench&tab=system',
+                '进入系统配置，保留基础维护来源和配置上下文。',
+                '进入配置',
+                Settings,
+              )
+            }
+          >
+            系统配置
+          </button>
+        </nav>
 
         <div className="workspace-settings-metrics" aria-label="基础维护核心指标">
           {workbenchSettingsSummaryCards.slice(0, 5).map((card) => {
