@@ -88,6 +88,8 @@ test.describe('Workbench 正式入口浏览器回归', () => {
 
     await page.getByRole('button', { name: '安全态势工作台', exact: true }).click();
     await expect(page).toHaveURL(/\/fixed-assets\/workbench\/security$/);
+    await expect(page.locator('.workspace-topbar-title strong')).toHaveText('安全态势工作台');
+    await expect(page.getByLabel('工作台菜单').getByRole('button', { name: '告警中心', exact: true })).not.toHaveClass(/is-active/);
     await expect(page.getByText('安全态势总览')).toBeVisible();
     await expect(page.getByRole('heading', { name: '安全告警研判处置' })).toHaveCount(0);
 

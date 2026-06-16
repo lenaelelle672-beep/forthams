@@ -12861,6 +12861,9 @@ export default function WorkspacePreviewPage() {
   );
 
   const activeContext = menuContextById[activeItem.id] ?? menuContextById.home;
+  const activePageTab = pageTabs.find((tab) => tab.id === activePage);
+  const shouldUsePageShellContext = isWorkbenchRoute && !routeMenuId;
+  const topbarTitle = shouldUsePageShellContext ? activePageTab?.label ?? activeItem.label : activeItem.label;
   const shouldRenderMenuModule = !isWorkbenchRoute || Boolean(routeMenuId);
   const activeModuleMock = shouldRenderMenuModule ? moduleMockByMenuId[activeItem.id] : undefined;
   const activeProductPageMeta = isWorkbenchRoute && routeMenuId ? workbenchProductPageMetaByMenuId[activeItem.id] : undefined;
@@ -13055,7 +13058,7 @@ export default function WorkspacePreviewPage() {
           <nav className="workspace-menu" aria-label="工作台菜单">
             {visibleMenuItems.map((item) => {
               const Icon = item.icon;
-              const active = item.id === activeMenu;
+              const active = item.id === activeMenu && !shouldUsePageShellContext;
               return (
                 <button
                   key={item.id}
@@ -13076,7 +13079,7 @@ export default function WorkspacePreviewPage() {
           <div className="workspace-topbar">
             <div className="workspace-topbar-title">
               <span>固定资产平台</span>
-              <strong>{activeItem.label}</strong>
+              <strong>{topbarTitle}</strong>
               <small>UNIVIEW · A 厂区 · MES 已同步</small>
             </div>
             {isWorkbenchRoute ? (
