@@ -109,24 +109,28 @@ test.describe('Workbench 正式入口浏览器回归', () => {
         title: '智能制造总览',
         bridge: '智能制造总览产品承接区',
         forbiddenHeading: '运营首页',
+        assetPath: '/mock/workspace-preview/asset-kit-v7/top-nav/top-nav-manufacturing-overview-v1.png',
       },
       {
         route: '/fixed-assets/workbench/analytics',
         title: '数据监控中心',
         bridge: '数据监控中心产品承接区',
         forbiddenHeading: '数据监控',
+        assetPath: '/mock/workspace-preview/asset-kit-v7/top-nav/top-nav-data-monitoring-v1.png',
       },
       {
         route: '/fixed-assets/workbench/assets',
         title: '资产运维中心',
         bridge: '资产运维中心产品承接区',
         forbiddenHeading: '资产总览',
+        assetPath: '/mock/workspace-preview/asset-kit-v7/top-nav/top-nav-asset-operations-v1.png',
       },
       {
         route: '/fixed-assets/workbench/security',
         title: '安全态势工作台',
         bridge: '安全态势工作台产品承接区',
         forbiddenHeading: '告警中心',
+        assetPath: '/mock/workspace-preview/asset-kit-v7/top-nav/top-nav-security-posture-v1.png',
       },
     ];
 
@@ -135,9 +139,13 @@ test.describe('Workbench 正式入口浏览器回归', () => {
       await page.waitForLoadState('networkidle');
 
       await expect(page.locator('.workspace-topbar-title strong')).toHaveText(item.title);
+      await expect(page.locator('.workspace-brand-mark img')).toHaveAttribute(
+        'src',
+        '/mock/workspace-preview/asset-kit-v7/top-nav/workbench-brand-badge-v1.png',
+      );
       await expect(page.getByLabel(item.bridge)).toBeVisible();
       await expect(page.getByLabel(item.bridge)).toContainText(item.title);
-      await expect(page.getByLabel(item.bridge).locator('.workspace-stage-bridge-visual img')).toBeVisible();
+      await expect(page.getByLabel(item.bridge).locator('.workspace-stage-bridge-visual img')).toHaveAttribute('src', item.assetPath);
       await expect(page.getByRole('heading', { name: item.forbiddenHeading, exact: true })).toHaveCount(0);
       await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
     }

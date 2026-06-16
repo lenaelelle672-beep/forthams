@@ -202,8 +202,8 @@
   border: 1px solid rgba(158, 222, 255, .54);
   border-radius: 50%;
   color: #eaf8ff;
-  background:
-    radial-gradient(circle at 50% 20%, rgba(92, 192, 255, .35), rgba(25, 93, 170, .24) 58%, rgba(5, 21, 46, .62) 100%);
+  overflow: hidden;
+  background: #061a37;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, .22),
     0 0 0 6px rgba(63, 161, 255, .08),
@@ -213,6 +213,14 @@
 .workspace-brand-mark svg {
   width: 24px;
   height: 24px;
+}
+
+.workspace-brand-mark img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
 }
 
 .workspace-brand strong {
@@ -10632,7 +10640,7 @@
 
 .workspace-stage-bridge-body {
   display: grid;
-  grid-template-columns: minmax(220px, .82fr) minmax(260px, 1.1fr) minmax(220px, .78fr) minmax(200px, .72fr);
+  grid-template-columns: minmax(340px, 1.28fr) minmax(260px, 1fr) minmax(220px, .7fr) minmax(200px, .62fr);
   gap: 10px;
   min-width: 0;
   min-height: 0;
@@ -10664,11 +10672,11 @@
   object-position: center;
 }
 
+.workspace-stage-bridge-overview .workspace-stage-bridge-visual img,
 .workspace-stage-bridge-assets .workspace-stage-bridge-visual img,
 .workspace-stage-bridge-analytics .workspace-stage-bridge-visual img {
-  padding: 12px;
   background: #f4faff;
-  object-fit: contain;
+  object-fit: cover;
 }
 
 .workspace-stage-bridge-security .workspace-stage-bridge-visual img {

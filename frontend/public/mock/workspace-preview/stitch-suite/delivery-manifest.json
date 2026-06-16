@@ -110,7 +110,43 @@
         "path": "/mock/workspace-preview/asset-kit-v5/details/work-order-flow-v1.png"
       }
     ],
-    "image2RefineQueue": []
+    "image2RefineQueue": [],
+    "topNavV7Refresh": {
+      "status": "ready_for_react",
+      "checkedAt": "2026-06-16",
+      "source": "IMAGE2 generated assets + Stitch CLI OAuth page-level screens",
+      "assets": [
+        {
+          "name": "智能制造总览",
+          "image2Asset": "/mock/workspace-preview/asset-kit-v7/top-nav/top-nav-manufacturing-overview-v1.png",
+          "stitchScreenshot": "/mock/workspace-preview/stitch-suite/top-nav-v7/stitch-top-nav-manufacturing-overview-v1.png",
+          "route": "/fixed-assets/workbench"
+        },
+        {
+          "name": "数据监控中心",
+          "image2Asset": "/mock/workspace-preview/asset-kit-v7/top-nav/top-nav-data-monitoring-v1.png",
+          "stitchScreenshot": "/mock/workspace-preview/stitch-suite/top-nav-v7/stitch-top-nav-data-monitoring-v1.png",
+          "route": "/fixed-assets/workbench/analytics"
+        },
+        {
+          "name": "资产运维中心",
+          "image2Asset": "/mock/workspace-preview/asset-kit-v7/top-nav/top-nav-asset-operations-v1.png",
+          "stitchScreenshot": "/mock/workspace-preview/stitch-suite/top-nav-v7/stitch-top-nav-asset-operations-v1.png",
+          "route": "/fixed-assets/workbench/assets"
+        },
+        {
+          "name": "安全态势工作台",
+          "image2Asset": "/mock/workspace-preview/asset-kit-v7/top-nav/top-nav-security-posture-v1.png",
+          "stitchScreenshot": "/mock/workspace-preview/stitch-suite/top-nav-v7/stitch-top-nav-security-posture-v1.png",
+          "route": "/fixed-assets/workbench/security"
+        },
+        {
+          "name": "左上角品牌徽章",
+          "image2Asset": "/mock/workspace-preview/asset-kit-v7/top-nav/workbench-brand-badge-v1.png",
+          "usage": "Workbench shell brand mark"
+        }
+      ]
+    }
   },
   "workbenchP0PageAssetMap": [
     {
@@ -259,9 +295,9 @@
     {
       "name": "智能制造总览",
       "route": "/fixed-assets/workbench",
-      "stitchScreen": "overview",
-      "primaryAsset": "/mock/workspace-preview/stitch-suite/overview.png",
-      "moduleAsset": "/mock/workspace-preview/asset-kit-v4/modules/module-machining-cluster.png",
+      "stitchScreen": "top-nav-manufacturing-overview-v1",
+      "primaryAsset": "/mock/workspace-preview/stitch-suite/top-nav-v7/stitch-top-nav-manufacturing-overview-v1.png",
+      "moduleAsset": "/mock/workspace-preview/asset-kit-v7/top-nav/top-nav-manufacturing-overview-v1.png",
       "detailAssets": [
         "/mock/workspace-preview/asset-kit-v5/details/work-order-flow-v1.png",
         "/mock/workspace-preview/asset-kit-v5/details/data-sync-pipeline-v1.png"
@@ -272,9 +308,9 @@
     {
       "name": "数据监控中心",
       "route": "/fixed-assets/workbench/analytics",
-      "stitchScreen": "analytics",
-      "primaryAsset": "/mock/workspace-preview/stitch-suite/analytics.png",
-      "moduleAsset": "/mock/workspace-preview/asset-kit-v4/modules/module-data-monitoring.png",
+      "stitchScreen": "top-nav-data-monitoring-v1",
+      "primaryAsset": "/mock/workspace-preview/stitch-suite/top-nav-v7/stitch-top-nav-data-monitoring-v1.png",
+      "moduleAsset": "/mock/workspace-preview/asset-kit-v7/top-nav/top-nav-data-monitoring-v1.png",
       "detailAssets": [
         "/mock/workspace-preview/asset-kit-v5/details/data-sync-pipeline-v1.png",
         "/mock/workspace-preview/asset-kit-v5/details/temperature-monitoring-v1.png"
@@ -285,9 +321,9 @@
     {
       "name": "资产运维中心",
       "route": "/fixed-assets/workbench/assets",
-      "stitchScreen": "assets",
-      "primaryAsset": "/mock/workspace-preview/stitch-suite/assets.png",
-      "moduleAsset": "/mock/workspace-preview/asset-kit-v4/modules/module-asset-ops.png",
+      "stitchScreen": "top-nav-asset-operations-v1",
+      "primaryAsset": "/mock/workspace-preview/stitch-suite/top-nav-v7/stitch-top-nav-asset-operations-v1.png",
+      "moduleAsset": "/mock/workspace-preview/asset-kit-v7/top-nav/top-nav-asset-operations-v1.png",
       "detailAssets": [
         "/mock/workspace-preview/asset-kit-v5/details/health-gear-ring-v1.png",
         "/mock/workspace-preview/asset-kit-v5/details/spare-parts-support-v1.png",
@@ -299,9 +335,9 @@
     {
       "name": "安全态势工作台",
       "route": "/fixed-assets/workbench/security",
-      "stitchScreen": "security",
-      "primaryAsset": "/mock/workspace-preview/stitch-suite/security.png",
-      "moduleAsset": "/mock/workspace-preview/asset-kit-v4/modules/module-security-posture-map-wide.png",
+      "stitchScreen": "top-nav-security-posture-v1",
+      "primaryAsset": "/mock/workspace-preview/stitch-suite/top-nav-v7/stitch-top-nav-security-posture-v1.png",
+      "moduleAsset": "/mock/workspace-preview/asset-kit-v7/top-nav/top-nav-security-posture-v1.png",
       "detailAssets": [
         "/mock/workspace-preview/asset-kit-v5/details/risk-level-tags-v1.png",
         "/mock/workspace-preview/asset-kit-v5/details/work-order-flow-v1.png"

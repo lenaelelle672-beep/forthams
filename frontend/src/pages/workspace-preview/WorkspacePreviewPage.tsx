@@ -278,7 +278,9 @@ const assetKitV4 = (name: string) => `${assetBase}/asset-kit-v4/${name}.png`;
 const detailAsset = (name: string) => `${assetBase}/asset-kit-v5/details/${name}.png`;
 const moduleV6Asset = (name: string) => `${assetBase}/asset-kit-v6/modules/${name}.png`;
 const detailV6Asset = (name: string) => `${assetBase}/asset-kit-v6/details/${name}.png`;
+const topNavV7Asset = (name: string) => `${assetBase}/asset-kit-v7/top-nav/${name}.png`;
 const stitchAsset = (name: string) => `${assetBase}/stitch-suite/${name}.png`;
+const workbenchBrandBadge = topNavV7Asset('workbench-brand-badge-v1');
 const securityPostureThumb = moduleAsset('module-security-posture');
 const securityPostureMapWide = moduleAsset('module-security-posture-map-wide');
 const login5ProductHero = `${assetBase}/scene/login5-stitch-factory-cn-v4.png?v=20260614-cn-v4`;
@@ -2271,8 +2273,8 @@ const stageBridgeConfigs: Record<Exclude<PreviewPage, 'stitch'>, StageBridgeConf
     page: 'overview',
     eyebrow: '当前模块',
     title: '智能制造总览',
-    summary: '保留总览主入口布局，统一承接产线态势、数据链路、资产运维和安全态势，作为进入四个中心前的经营研判区。',
-    imageSrc: illustrationAsset('production-line-clean'),
+    summary: '以新一代 IMAGE2 产线运营主视觉承接四中心入口，保留总览主入口布局，先完成产线态势、数据链路、资产运维和安全态势的经营研判。',
+    imageSrc: topNavV7Asset('top-nav-manufacturing-overview-v1'),
     actionLabel: '打开智能制造总览',
     routeTarget: '/fixed-assets/workbench',
     icon: Factory,
@@ -2296,8 +2298,8 @@ const stageBridgeConfigs: Record<Exclude<PreviewPage, 'stitch'>, StageBridgeConf
     page: 'analytics',
     eyebrow: '当前模块',
     title: '数据监控中心',
-    summary: '恢复顶部产品承接区，集中展示 MES/IoT 链路、采集延迟、指标服务和异常流水，进入下方监控看板前先完成链路判断。',
-    imageSrc: moduleAsset('module-data-monitoring'),
+    summary: '以新一代 IMAGE2 数据链路主视觉承接采集、清洗、指标服务和异常流水，进入下方监控看板前先完成链路质量判断。',
+    imageSrc: topNavV7Asset('top-nav-data-monitoring-v1'),
     actionLabel: '打开数据监控台',
     routeTarget: '/fixed-assets/workbench/analytics?menu=energy',
     icon: Activity,
@@ -2321,8 +2323,8 @@ const stageBridgeConfigs: Record<Exclude<PreviewPage, 'stitch'>, StageBridgeConf
     page: 'assets',
     eyebrow: '当前模块',
     title: '资产运维中心',
-    summary: '补回资产运维主视角产品承接区，连接资产健康、风险 TOP、工单闭环和备件保障，保持原有看板布局继续向下展开。',
-    imageSrc: moduleAsset('module-asset-ops'),
+    summary: '以新一代 IMAGE2 资产运维主视觉连接资产健康、预测维保、风险 TOP、工单闭环和备件保障，原有看板结构继续向下展开。',
+    imageSrc: topNavV7Asset('top-nav-asset-operations-v1'),
     actionLabel: '打开资产总览',
     routeTarget: '/fixed-assets/workbench/assets?menu=asset',
     icon: Layers,
@@ -2346,8 +2348,8 @@ const stageBridgeConfigs: Record<Exclude<PreviewPage, 'stitch'>, StageBridgeConf
     page: 'security',
     eyebrow: '当前模块',
     title: '安全态势工作台',
-    summary: '改回顶部主导航页的产品承接布局，聚合攻击面风险、策略命中、告警研判和闭环进度，下方保留原有安全态势看板。',
-    imageSrc: securityPostureMapWide,
+    summary: '以新一代 IMAGE2 安全态势地图主视觉聚合安全评分、高危事件、策略命中、告警研判和闭环进度，下方保留原有态势看板。',
+    imageSrc: topNavV7Asset('top-nav-security-posture-v1'),
     actionLabel: '查看安全态势大屏',
     routeTarget: '/bigscreen-3d',
     icon: ShieldCheck,
@@ -13330,7 +13332,7 @@ export default function WorkspacePreviewPage() {
         <aside className="workspace-side">
           <div className="workspace-brand">
             <div className="workspace-brand-mark">
-              <Shield />
+              <img src={workbenchBrandBadge} alt="" loading="eager" decoding="async" />
             </div>
             <strong>UNIVIEW</strong>
           </div>
