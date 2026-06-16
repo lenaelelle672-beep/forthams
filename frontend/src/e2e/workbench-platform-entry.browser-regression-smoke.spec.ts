@@ -99,6 +99,52 @@ test.describe('Workbench 正式入口浏览器回归', () => {
     expect(errors).toEqual([]);
   });
 
+  test('顶部主导航页保留产品承接区且不误落入左侧业务页', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await seedAuthenticatedSession(page, operationsUser);
+
+    const stageCases = [
+      {
+        route: '/fixed-assets/workbench',
+        title: '智能制造总览',
+        bridge: '智能制造总览产品承接区',
+        forbiddenHeading: '运营首页',
+      },
+      {
+        route: '/fixed-assets/workbench/analytics',
+        title: '数据监控中心',
+        bridge: '数据监控中心产品承接区',
+        forbiddenHeading: '数据监控',
+      },
+      {
+        route: '/fixed-assets/workbench/assets',
+        title: '资产运维中心',
+        bridge: '资产运维中心产品承接区',
+        forbiddenHeading: '资产总览',
+      },
+      {
+        route: '/fixed-assets/workbench/security',
+        title: '安全态势工作台',
+        bridge: '安全态势工作台产品承接区',
+        forbiddenHeading: '告警中心',
+      },
+    ];
+
+    for (const item of stageCases) {
+      await page.goto(item.route);
+      await page.waitForLoadState('networkidle');
+
+      await expect(page.locator('.workspace-topbar-title strong')).toHaveText(item.title);
+      await expect(page.getByLabel(item.bridge)).toBeVisible();
+      await expect(page.getByLabel(item.bridge)).toContainText(item.title);
+      await expect(page.getByLabel(item.bridge).locator('.workspace-stage-bridge-visual img')).toBeVisible();
+      await expect(page.getByRole('heading', { name: item.forbiddenHeading, exact: true })).toHaveCount(0);
+      await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
+    }
+
+    expect(errors).toEqual([]);
+  });
+
   test('Workbench 关键动作展示真实目标、预填上下文并进入业务页', async ({ page }) => {
     const errors = collectBrowserErrors(page);
     await seedAuthenticatedSession(page, operationsUser);

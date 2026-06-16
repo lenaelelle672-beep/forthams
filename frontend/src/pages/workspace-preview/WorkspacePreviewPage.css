@@ -10481,6 +10481,368 @@
   padding: 14px;
 }
 
+.workspace-stage-bridge {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 12px;
+  min-width: 0;
+  padding: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(205, 224, 248, .96);
+  border-radius: 14px;
+  background:
+    radial-gradient(circle at 72% 18%, rgba(53, 171, 255, .1), transparent 30%),
+    linear-gradient(180deg, rgba(255, 255, 255, .98), rgba(247, 252, 255, .96));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .92);
+}
+
+.workspace-stage-bridge-head {
+  display: grid;
+  grid-template-columns: minmax(170px, .72fr) minmax(260px, 1fr) minmax(320px, 1.08fr) auto;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.workspace-stage-bridge-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.workspace-stage-bridge-title > span {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid #cfe4fb;
+  border-radius: 8px;
+  color: #176de8;
+  background: #edf6ff;
+}
+
+.workspace-stage-bridge-title svg,
+.workspace-stage-bridge-action svg {
+  width: 16px;
+  height: 16px;
+}
+
+.workspace-stage-bridge-title p {
+  margin: 0 0 2px;
+  color: #6f8198;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.workspace-stage-bridge-title strong {
+  display: block;
+  overflow: hidden;
+  color: #142a45;
+  font-size: 18px;
+  font-weight: 950;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workspace-stage-bridge-head > p {
+  margin: 0;
+  color: #50677f;
+  font-size: 12px;
+  font-weight: 850;
+  line-height: 1.45;
+}
+
+.workspace-stage-bridge-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  min-width: 0;
+}
+
+.workspace-stage-bridge-stats button,
+.workspace-stage-bridge-copy button,
+.workspace-stage-bridge-queue button,
+.workspace-stage-bridge-steps button,
+.workspace-stage-bridge-visual {
+  font: inherit;
+}
+
+.workspace-stage-bridge-stats button {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "label value"
+    "note value";
+  align-items: center;
+  gap: 2px 8px;
+  min-width: 0;
+  min-height: 50px;
+  padding: 8px 10px;
+  border: 1px solid #d8e8fa;
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+  text-align: left;
+}
+
+.workspace-stage-bridge-stats span {
+  grid-area: label;
+}
+
+.workspace-stage-bridge-stats small {
+  grid-area: note;
+}
+
+.workspace-stage-bridge-stats span,
+.workspace-stage-bridge-stats small {
+  overflow: hidden;
+  color: #6a7d95;
+  font-size: 11px;
+  font-weight: 850;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workspace-stage-bridge-stats strong {
+  grid-area: value;
+  color: #176de8;
+  font-size: 18px;
+  font-weight: 950;
+}
+
+.workspace-stage-bridge-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-width: 132px;
+  height: 40px;
+  padding: 0 14px;
+  border: 1px solid #b9d6fb;
+  border-radius: 8px;
+  color: #176de8;
+  background: #f5faff;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 950;
+  white-space: nowrap;
+}
+
+.workspace-stage-bridge-body {
+  display: grid;
+  grid-template-columns: minmax(220px, .82fr) minmax(260px, 1.1fr) minmax(220px, .78fr) minmax(200px, .72fr);
+  gap: 10px;
+  min-width: 0;
+  min-height: 0;
+}
+
+.workspace-stage-bridge-visual,
+.workspace-stage-bridge-copy,
+.workspace-stage-bridge-queue,
+.workspace-stage-bridge-steps {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid #d9e8fa;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, .92);
+}
+
+.workspace-stage-bridge-visual {
+  display: block;
+  padding: 0;
+  cursor: pointer;
+}
+
+.workspace-stage-bridge-visual img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 188px;
+  object-fit: cover;
+  object-position: center;
+}
+
+.workspace-stage-bridge-assets .workspace-stage-bridge-visual img,
+.workspace-stage-bridge-analytics .workspace-stage-bridge-visual img {
+  padding: 12px;
+  background: #f4faff;
+  object-fit: contain;
+}
+
+.workspace-stage-bridge-security .workspace-stage-bridge-visual img {
+  background: #061a37;
+  object-fit: cover;
+}
+
+.workspace-stage-bridge-copy {
+  display: grid;
+  align-content: center;
+  gap: 10px;
+  padding: 16px;
+}
+
+.workspace-stage-bridge-copy > span {
+  color: #176de8;
+  font-size: 12px;
+  font-weight: 950;
+}
+
+.workspace-stage-bridge-copy h2 {
+  margin: 0;
+  color: #142a45;
+  font-size: 20px;
+  font-weight: 950;
+}
+
+.workspace-stage-bridge-copy p {
+  margin: 0;
+  color: #4f6680;
+  font-size: 12px;
+  font-weight: 840;
+  line-height: 1.55;
+}
+
+.workspace-stage-bridge-copy > div {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.workspace-stage-bridge-copy button {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  min-height: 60px;
+  padding: 8px;
+  border: 1px solid #dbe8f8;
+  border-radius: 8px;
+  background: #f9fcff;
+  cursor: pointer;
+  text-align: left;
+}
+
+.workspace-stage-bridge-copy button span,
+.workspace-stage-bridge-copy button small {
+  overflow: hidden;
+  color: #6a7d95;
+  font-size: 10px;
+  font-weight: 850;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workspace-stage-bridge-copy button strong {
+  color: #176de8;
+  font-size: 18px;
+  font-weight: 950;
+}
+
+.workspace-stage-bridge-queue {
+  display: grid;
+  align-content: center;
+  gap: 8px;
+  padding: 12px;
+}
+
+.workspace-stage-bridge-queue button {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+  min-height: 52px;
+  padding: 9px 10px;
+  border: 1px solid #dbe8f8;
+  border-left: 3px solid #176de8;
+  border-radius: 8px;
+  background: #f9fcff;
+  cursor: pointer;
+  text-align: left;
+}
+
+.workspace-stage-bridge-queue button.is-orange {
+  border-left-color: #f08a20;
+}
+
+.workspace-stage-bridge-queue button.is-green {
+  border-left-color: #17a977;
+}
+
+.workspace-stage-bridge-queue button.is-cyan {
+  border-left-color: #0a8fa5;
+}
+
+.workspace-stage-bridge-queue button span,
+.workspace-stage-bridge-queue button strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workspace-stage-bridge-queue button span {
+  color: #1d3552;
+  font-size: 12px;
+  font-weight: 950;
+}
+
+.workspace-stage-bridge-queue button strong {
+  color: #6a7d95;
+  font-size: 11px;
+  font-weight: 850;
+}
+
+.workspace-stage-bridge-steps {
+  display: grid;
+  align-content: center;
+  gap: 10px;
+  padding: 14px 16px;
+}
+
+.workspace-stage-bridge-steps button {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+}
+
+.workspace-stage-bridge-steps em {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border-radius: 8px;
+  color: #fff;
+  background: linear-gradient(180deg, #4ba0ff, #176de8);
+  font-style: normal;
+  font-weight: 950;
+}
+
+.workspace-stage-bridge-steps strong,
+.workspace-stage-bridge-steps small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workspace-stage-bridge-steps strong {
+  color: #1d3552;
+  font-size: 13px;
+  font-weight: 950;
+}
+
+.workspace-stage-bridge-steps small {
+  margin-top: 2px;
+  color: #6a7d95;
+  font-size: 11px;
+  font-weight: 850;
+}
+
 .workspace-stage-assets {
   display: grid;
   gap: 14px;
@@ -13160,7 +13522,7 @@
 
 .workspace-stage-compact {
   display: grid;
-  grid-template-rows: 108px auto;
+  grid-template-rows: auto 108px auto;
   align-content: start;
   gap: 14px;
 }
@@ -13195,7 +13557,7 @@
 }
 
 .workspace-stage-analytics {
-  grid-template-rows: 96px auto;
+  grid-template-rows: auto 96px auto;
   gap: 10px;
   padding-top: 12px;
   padding-bottom: 10px;
@@ -15882,7 +16244,26 @@
   }
 
   .workspace-stage-compact {
-    grid-template-rows: auto auto;
+    grid-template-rows: auto auto auto;
+  }
+
+  .workspace-stage-bridge {
+    overflow: visible;
+  }
+
+  .workspace-stage-bridge-head,
+  .workspace-stage-bridge-body {
+    grid-template-columns: 1fr;
+  }
+
+  .workspace-stage-bridge-stats,
+  .workspace-stage-bridge-copy > div {
+    grid-template-columns: 1fr;
+  }
+
+  .workspace-stage-bridge-visual img {
+    height: auto;
+    min-height: 180px;
   }
 
   .workspace-stage-security .workspace-compact-grid,

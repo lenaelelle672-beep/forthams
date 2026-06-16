@@ -220,6 +220,20 @@ type KpiItem = {
   visual: string;
 };
 
+type StageBridgeConfig = {
+  page: Exclude<PreviewPage, 'stitch'>;
+  eyebrow: string;
+  title: string;
+  summary: string;
+  imageSrc: string;
+  actionLabel: string;
+  routeTarget: string;
+  icon: LucideIcon;
+  stats: Array<{ label: string; value: string; note: string }>;
+  queues: Array<{ title: string; note: string; tone: Accent }>;
+  steps: Array<{ index: string; title: string; note: string }>;
+};
+
 type AssetCategory = {
   icon: LucideIcon;
   label: string;
@@ -2251,6 +2265,109 @@ const overviewModules: Array<{
     imageSrc: securityPostureThumb,
   },
 ];
+
+const stageBridgeConfigs: Record<Exclude<PreviewPage, 'stitch'>, StageBridgeConfig> = {
+  overview: {
+    page: 'overview',
+    eyebrow: '当前模块',
+    title: '智能制造总览',
+    summary: '保留总览主入口布局，统一承接产线态势、数据链路、资产运维和安全态势，作为进入四个中心前的经营研判区。',
+    imageSrc: illustrationAsset('production-line-clean'),
+    actionLabel: '打开智能制造总览',
+    routeTarget: '/fixed-assets/workbench',
+    icon: Factory,
+    stats: [
+      { label: '在线设备', value: '5,102', note: '台' },
+      { label: '今日产量', value: '1.2万', note: '件' },
+      { label: '异常待办', value: '36', note: '条' },
+    ],
+    queues: [
+      { title: '产线联动', note: '机加 A 线 · AGV 协同', tone: 'blue' },
+      { title: '设备健康', note: '数控车床 CN-301 需关注', tone: 'cyan' },
+      { title: '运营闭环', note: '预测工单 42 单', tone: 'green' },
+    ],
+    steps: [
+      { index: '01', title: '感知', note: '产线实时汇聚' },
+      { index: '02', title: '研判', note: '指标联动分析' },
+      { index: '03', title: '处置', note: '转入业务中心' },
+    ],
+  },
+  analytics: {
+    page: 'analytics',
+    eyebrow: '当前模块',
+    title: '数据监控中心',
+    summary: '恢复顶部产品承接区，集中展示 MES/IoT 链路、采集延迟、指标服务和异常流水，进入下方监控看板前先完成链路判断。',
+    imageSrc: moduleAsset('module-data-monitoring'),
+    actionLabel: '打开数据监控台',
+    routeTarget: '/fixed-assets/workbench/analytics?menu=energy',
+    icon: Activity,
+    stats: [
+      { label: '链路健康', value: '98.6%', note: '在线' },
+      { label: '采集延迟', value: '4.3s', note: 'P95' },
+      { label: '异常事件', value: '32', note: '条' },
+    ],
+    queues: [
+      { title: 'MES 主数据', note: '同步成功率 99.2%', tone: 'green' },
+      { title: 'IoT 网关', note: '2 条采集延迟', tone: 'orange' },
+      { title: '指标服务', note: '订阅任务 8 个', tone: 'blue' },
+    ],
+    steps: [
+      { index: '01', title: '接入', note: '采集源管理' },
+      { index: '02', title: '清洗', note: '质量校验' },
+      { index: '03', title: '服务', note: '报表订阅' },
+    ],
+  },
+  assets: {
+    page: 'assets',
+    eyebrow: '当前模块',
+    title: '资产运维中心',
+    summary: '补回资产运维主视角产品承接区，连接资产健康、风险 TOP、工单闭环和备件保障，保持原有看板布局继续向下展开。',
+    imageSrc: moduleAsset('module-asset-ops'),
+    actionLabel: '打开资产总览',
+    routeTarget: '/fixed-assets/workbench/assets?menu=asset',
+    icon: Layers,
+    stats: [
+      { label: '资产健康', value: '86', note: '分' },
+      { label: '待维保', value: '248', note: '台' },
+      { label: '风险资产', value: '36', note: '台' },
+    ],
+    queues: [
+      { title: '生命周期', note: '在用资产 5,102 台', tone: 'blue' },
+      { title: '风险预测', note: 'TOP10 已生成', tone: 'orange' },
+      { title: '工单闭环', note: '本周闭环 91.8%', tone: 'green' },
+    ],
+    steps: [
+      { index: '01', title: '建账', note: '统一编码' },
+      { index: '02', title: '在用', note: '责任到人' },
+      { index: '03', title: '处置', note: '审批闭环' },
+    ],
+  },
+  security: {
+    page: 'security',
+    eyebrow: '当前模块',
+    title: '安全态势工作台',
+    summary: '改回顶部主导航页的产品承接布局，聚合攻击面风险、策略命中、告警研判和闭环进度，下方保留原有安全态势看板。',
+    imageSrc: securityPostureMapWide,
+    actionLabel: '查看安全态势大屏',
+    routeTarget: '/bigscreen-3d',
+    icon: ShieldCheck,
+    stats: [
+      { label: '安全评分', value: '92', note: '分' },
+      { label: '高危事件', value: '3', note: '条' },
+      { label: '平均响应', value: '2.3h', note: '本周' },
+    ],
+    queues: [
+      { title: '熔断策略-12', note: '待阻断', tone: 'orange' },
+      { title: '拦截白名单-08', note: '待复核', tone: 'orange' },
+      { title: '端口扫描-03', note: '已归档', tone: 'blue' },
+    ],
+    steps: [
+      { index: '01', title: '发现', note: '策略/资产异常聚合' },
+      { index: '02', title: '研判', note: '风险等级与影响范围' },
+      { index: '03', title: '闭环', note: '转派工单并复盘' },
+    ],
+  },
+};
 
 const stitchScreens: Array<{
   title: string;
@@ -12066,6 +12183,155 @@ function OverviewModuleCard({
   );
 }
 
+function WorkspaceStageBridge({
+  config,
+  onPreviewAction,
+}: {
+  config: StageBridgeConfig;
+  onPreviewAction: (preview: RouteActionPreview) => void;
+}) {
+  const Icon = config.icon;
+
+  const openBridgePreview = (title: string, routeTarget: string, description: string, primaryLabel = config.actionLabel) => {
+    onPreviewAction({
+      title,
+      source: `${config.title}产品承接区`,
+      routeTarget,
+      description,
+      primaryLabel,
+      icon: Icon,
+      visual: config.imageSrc,
+      stats: config.stats,
+    });
+  };
+
+  return (
+    <section className={`workspace-stage-bridge workspace-stage-bridge-${config.page}`} aria-label={`${config.title}产品承接区`}>
+      <header className="workspace-stage-bridge-head">
+        <div className="workspace-stage-bridge-title">
+          <span>
+            <Icon />
+          </span>
+          <div>
+            <p>{config.eyebrow}</p>
+            <strong>{config.title}</strong>
+          </div>
+        </div>
+        <p>{config.summary}</p>
+        <div className="workspace-stage-bridge-stats">
+          {config.stats.map((stat) => (
+            <button
+              key={stat.label}
+              type="button"
+              onClick={() =>
+                openBridgePreview(
+                  `${stat.label}下钻`,
+                  `${config.routeTarget}${config.routeTarget.includes('?') ? '&' : '?'}metric=${encodeURIComponent(stat.label)}`,
+                  `按 ${stat.label} 查看 ${config.title} 的关键状态，并保留 Workbench 顶部导航上下文。`,
+                  '查看指标',
+                )
+              }
+            >
+              <span>{stat.label}</span>
+              <strong>{stat.value}</strong>
+              <small>{stat.note}</small>
+            </button>
+          ))}
+        </div>
+        <button
+          type="button"
+          className="workspace-stage-bridge-action"
+          onClick={() => openBridgePreview(config.actionLabel, config.routeTarget, config.summary)}
+        >
+          {config.actionLabel}
+          <ArrowRight />
+        </button>
+      </header>
+
+      <div className="workspace-stage-bridge-body">
+        <button
+          type="button"
+          className="workspace-stage-bridge-visual"
+          onClick={() => openBridgePreview(config.actionLabel, config.routeTarget, config.summary)}
+          aria-label={`${config.title}主视觉入口`}
+        >
+          <img src={config.imageSrc} alt="" loading="eager" decoding="async" />
+        </button>
+
+        <article className="workspace-stage-bridge-copy">
+          <span>{config.title}</span>
+          <h2>{config.title}</h2>
+          <p>{config.summary}</p>
+          <div>
+            {config.stats.map((stat) => (
+              <button
+                key={stat.label}
+                type="button"
+                onClick={() =>
+                  openBridgePreview(
+                    `${stat.label}指标`,
+                    `${config.routeTarget}${config.routeTarget.includes('?') ? '&' : '?'}stat=${encodeURIComponent(stat.label)}`,
+                    `${stat.label} 当前为 ${stat.value}${stat.note}，进入后保留 ${config.title} 上下文。`,
+                    '查看指标',
+                  )
+                }
+              >
+                <span>{stat.label}</span>
+                <strong>{stat.value}</strong>
+                <small>{stat.note}</small>
+              </button>
+            ))}
+          </div>
+        </article>
+
+        <article className="workspace-stage-bridge-queue" aria-label={`${config.title}关键队列`}>
+          {config.queues.map((item) => (
+            <button
+              key={item.title}
+              type="button"
+              className={`is-${item.tone}`}
+              onClick={() =>
+                openBridgePreview(
+                  item.title,
+                  `${config.routeTarget}${config.routeTarget.includes('?') ? '&' : '?'}queue=${encodeURIComponent(item.title)}`,
+                  `${item.title}：${item.note}。进入后保留 ${config.title} 顶部导航来源。`,
+                  '打开队列',
+                )
+              }
+            >
+              <span>{item.title}</span>
+              <strong>{item.note}</strong>
+            </button>
+          ))}
+        </article>
+
+        <article className="workspace-stage-bridge-steps" aria-label={`${config.title}处理流程`}>
+          {config.steps.map((step) => (
+            <button
+              key={step.index}
+              type="button"
+              onClick={() =>
+                openBridgePreview(
+                  `${step.title}阶段`,
+                  `${config.routeTarget}${config.routeTarget.includes('?') ? '&' : '?'}stage=${encodeURIComponent(step.title)}`,
+                  `${step.title}：${step.note}。`,
+                  '查看阶段',
+                )
+              }
+            >
+              <em>{step.index}</em>
+              <span>
+                <strong>{step.title}</strong>
+                <small>{step.note}</small>
+              </span>
+            </button>
+          ))}
+        </article>
+      </div>
+    </section>
+  );
+}
+
 function StitchSuiteDashboard() {
   return (
     <section className="workspace-stage workspace-stage-stitch" aria-label="设计复刻总览">
@@ -12201,9 +12467,17 @@ function StitchSuiteDashboard() {
   );
 }
 
-function OverviewDashboard({ onSelectPage }: { onSelectPage: (page: PreviewPage) => void }) {
+function OverviewDashboard({
+  onSelectPage,
+  onPreviewAction,
+}: {
+  onSelectPage: (page: PreviewPage) => void;
+  onPreviewAction: (preview: RouteActionPreview) => void;
+}) {
   return (
     <section className="workspace-stage workspace-stage-overview" aria-label="智能制造总览">
+      <WorkspaceStageBridge config={stageBridgeConfigs.overview} onPreviewAction={onPreviewAction} />
+
       <section className="workspace-kpis workspace-overview-kpis" aria-label="产线关键指标">
         {overviewKpis.map((item) => (
           <KpiCard key={item.label} item={item} />
@@ -12250,6 +12524,8 @@ function AssetDashboard({
 
   return (
     <section className="workspace-stage workspace-stage-assets" aria-label="资产运维中心">
+      <WorkspaceStageBridge config={stageBridgeConfigs.assets} onPreviewAction={onPreviewAction} />
+
       <section className="workspace-kpis" aria-label="资产关键指标">
         {assetKpis.map((item) => (
           <KpiCard key={item.label} item={item} />
@@ -12350,6 +12626,8 @@ function SecurityDashboard({
 }) {
   return (
     <section className="workspace-stage workspace-stage-compact workspace-stage-security" aria-label="安全态势工作台">
+      <WorkspaceStageBridge config={stageBridgeConfigs.security} onPreviewAction={onPreviewAction} />
+
       <section className="workspace-kpis">
         {securityKpis.map((item) => (
           <KpiCard key={item.label} item={item} />
@@ -12482,6 +12760,8 @@ function SecurityDashboard({
 function AnalyticsDashboard({ onPreviewAction }: { onPreviewAction: (preview: RouteActionPreview) => void }) {
   return (
     <section className="workspace-stage workspace-stage-compact workspace-stage-analytics" aria-label="数据监控中心">
+      <WorkspaceStageBridge config={stageBridgeConfigs.analytics} onPreviewAction={onPreviewAction} />
+
       <section className="workspace-kpis">
         {analyticsKpis.map((item) => (
           <KpiCard key={item.label} item={item} />
@@ -13246,7 +13526,9 @@ export default function WorkspacePreviewPage() {
             <WorkspaceModuleMock mock={activeModuleMock} onPreviewAction={setRoutePreview} />
           ) : null}
 
-          {!activeProductPageMeta && activePage === 'overview' ? <OverviewDashboard onSelectPage={selectPage} /> : null}
+          {!activeProductPageMeta && activePage === 'overview' ? (
+            <OverviewDashboard onSelectPage={selectPage} onPreviewAction={setRoutePreview} />
+          ) : null}
           {!activeProductPageMeta && activePage === 'assets' ? (
             <AssetDashboard
               onSelectPage={selectPage}
