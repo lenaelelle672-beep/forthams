@@ -1265,9 +1265,9 @@
   z-index: 1;
   width: 1px;
   height: calc(100% - 4px);
-  background: #cfe0f5;
-  box-shadow: 1px 0 0 rgba(255, 255, 255, .82);
-  transform: skewX(-16deg);
+  background: linear-gradient(180deg, #cfe0f5, #e6f0fb);
+  box-shadow: 1px 0 0 rgba(255, 255, 255, .9);
+  transform: none;
   transform-origin: top center;
   pointer-events: none;
 }
@@ -3884,6 +3884,685 @@
 .workspace-inspection-page .workspace-orders-table-row.is-green b,
 .workspace-inspection-page .workspace-orders-table-row.is-blue b {
   background: #0d9a6a;
+}
+
+.workspace-inspection-board {
+  display: grid;
+  grid-template-columns: minmax(980px, 1fr) minmax(390px, 480px);
+  gap: 10px;
+  height: calc(100vh - 92px);
+  min-height: 760px;
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, rgba(247, 252, 255, .98), rgba(238, 246, 255, .96)),
+    #eef6ff;
+}
+
+.workspace-inspection-main,
+.workspace-inspection-detail {
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  border: 1px solid #dbe8f8;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .96);
+  box-shadow: 0 8px 24px rgba(48, 93, 151, .08);
+}
+
+.workspace-inspection-main {
+  display: grid;
+  grid-template-rows: auto auto auto minmax(292px, .92fr) minmax(300px, 1fr);
+  gap: 12px;
+  padding: 16px 18px 14px;
+}
+
+.workspace-inspection-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  min-width: 0;
+  border-bottom: 1px solid #dbe8f8;
+}
+
+.workspace-inspection-nav nav,
+.workspace-inspection-actions {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.workspace-inspection-nav nav {
+  gap: 18px;
+  overflow: hidden;
+}
+
+.workspace-inspection-nav nav button {
+  height: 40px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  color: #314b6a;
+  background: transparent;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 920;
+}
+
+.workspace-inspection-nav nav button.is-active {
+  color: #176de8;
+  border-bottom-color: #176de8;
+}
+
+.workspace-inspection-actions {
+  flex: 0 0 auto;
+  gap: 8px;
+}
+
+.workspace-inspection-actions button,
+.workspace-inspection-filterbar button,
+.workspace-inspection-filterbar label,
+.workspace-inspection-detail-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-width: 0;
+  height: 34px;
+  padding: 0 12px;
+  border: 1px solid #cfe0f5;
+  border-radius: 6px;
+  color: #176de8;
+  background: #fff;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.workspace-inspection-actions button svg,
+.workspace-inspection-filterbar svg {
+  width: 15px;
+  height: 15px;
+}
+
+.workspace-inspection-actions .is-primary,
+.workspace-inspection-detail-actions .is-primary {
+  color: #fff;
+  border-color: transparent;
+  background: linear-gradient(180deg, #176de8, #075fd0);
+  box-shadow: 0 8px 18px rgba(23, 109, 232, .24);
+}
+
+.workspace-inspection-kpis {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.workspace-inspection-kpis button {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  min-height: 92px;
+  padding: 14px 16px;
+  border: 1px solid #dbe8f8;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #fff, #f8fbff);
+  cursor: pointer;
+  text-align: left;
+}
+
+.workspace-inspection-kpis span,
+.workspace-inspection-kpis small {
+  overflow: hidden;
+  color: #5d6f8a;
+  font-size: 12px;
+  font-weight: 860;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workspace-inspection-kpis strong {
+  color: #176de8;
+  font-size: 24px;
+  font-weight: 950;
+}
+
+.workspace-inspection-kpis .is-red strong,
+.workspace-inspection-table button span:nth-child(7),
+.workspace-inspection-routes mark {
+  color: #f03649;
+}
+
+.workspace-inspection-kpis .is-green strong {
+  color: #0d9a6a;
+}
+
+.workspace-inspection-filterbar {
+  display: grid;
+  grid-template-columns: minmax(260px, 1fr) repeat(4, minmax(112px, .42fr)) minmax(126px, .48fr) 72px;
+  gap: 8px;
+}
+
+.workspace-inspection-filterbar label {
+  justify-content: flex-start;
+  color: #7f90a8;
+}
+
+.workspace-inspection-filterbar label input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  outline: none;
+  color: #71829a;
+  background: transparent;
+  font-size: 12px;
+  font-weight: 820;
+}
+
+.workspace-inspection-filterbar .is-date {
+  justify-content: space-between;
+}
+
+.workspace-inspection-filterbar .is-reset {
+  color: #176de8;
+  background: #f6fbff;
+}
+
+.workspace-inspection-grid,
+.workspace-inspection-bottom {
+  display: grid;
+  grid-template-columns: minmax(300px, .78fr) minmax(520px, 1.42fr);
+  gap: 10px;
+  min-height: 0;
+}
+
+.workspace-inspection-calendar,
+.workspace-inspection-routes,
+.workspace-inspection-task-list,
+.workspace-inspection-anomalies,
+.workspace-inspection-info,
+.workspace-inspection-checkpoints,
+.workspace-inspection-point {
+  min-width: 0;
+  min-height: 0;
+  border: 1px solid #dbe8f8;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.workspace-inspection-calendar,
+.workspace-inspection-routes,
+.workspace-inspection-task-list,
+.workspace-inspection-anomalies {
+  padding: 12px;
+}
+
+.workspace-inspection-calendar header,
+.workspace-inspection-routes header,
+.workspace-inspection-task-list header,
+.workspace-inspection-anomalies header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+  color: #142b4a;
+  font-size: 13px;
+  font-weight: 950;
+}
+
+.workspace-inspection-routes header button,
+.workspace-inspection-anomalies header button {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: 0;
+  color: #176de8;
+  background: transparent;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.workspace-inspection-days {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 8px;
+  color: #273f5f;
+  font-size: 12px;
+  font-weight: 850;
+  text-align: center;
+}
+
+.workspace-inspection-days span {
+  display: grid;
+  place-items: center;
+  min-height: 28px;
+  border-radius: 999px;
+}
+
+.workspace-inspection-days .is-week {
+  color: #8a9bb2;
+  font-size: 11px;
+}
+
+.workspace-inspection-days .is-today {
+  color: #fff;
+  background: #176de8;
+}
+
+.workspace-inspection-calendar footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+  margin-top: 12px;
+  color: #6d819b;
+  font-size: 10px;
+  font-weight: 850;
+}
+
+.workspace-inspection-routes {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+}
+
+.workspace-inspection-routes > button {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) 64px 72px 70px 42px;
+  align-items: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 8px 12px;
+  border: 1px solid #e3edf8;
+  border-radius: 7px;
+  background: linear-gradient(180deg, #fff, #f8fbff);
+  cursor: pointer;
+  text-align: left;
+}
+
+.workspace-inspection-routes b,
+.workspace-inspection-routes small,
+.workspace-inspection-routes em,
+.workspace-inspection-routes strong,
+.workspace-inspection-routes i,
+.workspace-inspection-routes mark {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workspace-inspection-routes b {
+  display: block;
+  color: #142b4a;
+  font-size: 12px;
+  font-weight: 950;
+}
+
+.workspace-inspection-routes small,
+.workspace-inspection-routes em,
+.workspace-inspection-routes strong {
+  color: #5d6f8a;
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 850;
+}
+
+.workspace-inspection-routes i,
+.workspace-inspection-routes mark {
+  font-style: normal;
+  font-weight: 950;
+  background: transparent;
+}
+
+.workspace-inspection-bottom {
+  grid-template-columns: minmax(560px, 1.12fr) minmax(340px, .88fr);
+}
+
+.workspace-inspection-task-list {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  padding: 12px;
+}
+
+.workspace-inspection-table {
+  min-height: 0;
+  overflow: auto;
+}
+
+.workspace-inspection-table > div,
+.workspace-inspection-table > button {
+  display: grid;
+  grid-template-columns: minmax(118px, .9fr) minmax(150px, 1.1fr) 82px 64px 62px 58px 42px 48px;
+  align-items: center;
+  gap: 8px;
+  min-width: 760px;
+}
+
+.workspace-inspection-table > div {
+  min-height: 34px;
+  color: #5d6f8a;
+  font-size: 11px;
+  font-weight: 950;
+}
+
+.workspace-inspection-table > button {
+  min-height: 42px;
+  border: 0;
+  border-top: 1px solid #edf3fb;
+  color: #263a57;
+  background: transparent;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 850;
+  text-align: left;
+}
+
+.workspace-inspection-task-list footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-top: 10px;
+  color: #27415f;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.workspace-inspection-task-list footer span {
+  margin-right: auto;
+}
+
+.workspace-inspection-task-list footer button {
+  min-width: 30px;
+  height: 28px;
+  border: 1px solid #dbe8f8;
+  border-radius: 6px;
+  color: #174072;
+  background: #fff;
+  font-weight: 850;
+}
+
+.workspace-inspection-task-list footer .is-current {
+  color: #fff;
+  background: #176de8;
+}
+
+.workspace-inspection-anomalies {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+}
+
+.workspace-inspection-anomalies > button,
+.workspace-inspection-checkpoints > button {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 10px;
+  min-height: 54px;
+  padding: 8px 10px;
+  border: 1px solid #e3edf8;
+  border-radius: 7px;
+  background: #fff;
+  cursor: pointer;
+  text-align: left;
+}
+
+.workspace-inspection-anomalies b,
+.workspace-inspection-anomalies small,
+.workspace-inspection-checkpoints b,
+.workspace-inspection-checkpoints small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workspace-inspection-anomalies b,
+.workspace-inspection-checkpoints b {
+  color: #142b4a;
+  font-size: 12px;
+  font-weight: 950;
+}
+
+.workspace-inspection-anomalies small,
+.workspace-inspection-checkpoints small {
+  margin-top: 2px;
+  color: #6f829b;
+  font-size: 11px;
+  font-weight: 820;
+}
+
+.workspace-inspection-anomalies em {
+  color: #7f90a8;
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 850;
+}
+
+.workspace-inspection-anomalies strong,
+.workspace-inspection-checkpoints em {
+  padding: 4px 8px;
+  border-radius: 6px;
+  color: #176de8;
+  background: #edf5ff;
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 900;
+}
+
+.workspace-inspection-anomalies .is-red strong,
+.workspace-inspection-checkpoints .is-red em {
+  color: #f03649;
+  background: #fff0f2;
+}
+
+.workspace-inspection-anomalies .is-orange strong {
+  color: #c46a08;
+  background: #fff4e2;
+}
+
+.workspace-inspection-detail {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto auto auto minmax(186px, .95fr) minmax(188px, 1fr) auto;
+  gap: 10px;
+  padding-bottom: 60px;
+}
+
+.workspace-inspection-detail > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 52px;
+  padding: 0 18px;
+  border-bottom: 1px solid #e3edf8;
+}
+
+.workspace-inspection-detail > header strong,
+.workspace-inspection-info h3,
+.workspace-inspection-point h3 {
+  color: #142b4a;
+  font-size: 15px;
+  font-weight: 950;
+}
+
+.workspace-inspection-detail > header button {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  color: #55708f;
+  background: transparent;
+  cursor: pointer;
+}
+
+.workspace-inspection-info {
+  display: grid;
+  gap: 8px;
+  margin: 0 14px;
+  padding: 12px;
+}
+
+.workspace-inspection-info h3,
+.workspace-inspection-point h3 {
+  margin: 0;
+}
+
+.workspace-inspection-info dl,
+.workspace-inspection-point dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 14px;
+  margin: 0;
+}
+
+.workspace-inspection-info dl div,
+.workspace-inspection-point dl div {
+  display: grid;
+  grid-template-columns: 68px minmax(0, 1fr);
+  gap: 8px;
+}
+
+.workspace-inspection-info dt,
+.workspace-inspection-info dd,
+.workspace-inspection-point dt,
+.workspace-inspection-point dd {
+  overflow: hidden;
+  margin: 0;
+  color: #263a57;
+  font-size: 12px;
+  font-weight: 850;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workspace-inspection-info dt,
+.workspace-inspection-point dt {
+  color: #7890ac;
+}
+
+.workspace-inspection-info > div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 34px;
+  align-items: center;
+  gap: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #e4edf8;
+}
+
+.workspace-inspection-info > div span {
+  height: 8px;
+  border-radius: inherit;
+  background: #176de8;
+}
+
+.workspace-inspection-info > div small {
+  color: #5d6f8a;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.workspace-inspection-detail-tabs {
+  display: flex;
+  gap: 16px;
+  min-width: 0;
+  overflow: hidden;
+  padding: 0 14px;
+  border-top: 1px solid #e3edf8;
+  border-bottom: 1px solid #e3edf8;
+}
+
+.workspace-inspection-detail-tabs button {
+  height: 34px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  color: #5d6f8a;
+  background: transparent;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 920;
+}
+
+.workspace-inspection-detail-tabs .is-active {
+  color: #176de8;
+  border-bottom-color: #176de8;
+}
+
+.workspace-inspection-checkpoints {
+  display: grid;
+  align-content: start;
+  gap: 7px;
+  margin: 0 14px;
+  padding: 10px;
+}
+
+.workspace-inspection-checkpoints > div {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  color: #5d6f8a;
+  font-size: 12px;
+  font-weight: 900;
+  text-align: center;
+}
+
+.workspace-inspection-point {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 150px;
+  gap: 10px;
+  margin: 0 14px;
+  padding: 12px;
+}
+
+.workspace-inspection-point h3 {
+  grid-column: 1 / -1;
+}
+
+.workspace-inspection-point dd.is-danger {
+  color: #f03649;
+}
+
+.workspace-inspection-point > div {
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #eef4fb;
+}
+
+.workspace-inspection-point img {
+  width: 100%;
+  height: 100%;
+  min-height: 120px;
+  object-fit: cover;
+}
+
+.workspace-inspection-point > div span {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  padding: 5px 9px;
+  border-radius: 999px;
+  color: #fff;
+  background: #f03649;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.workspace-inspection-detail-actions {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  padding: 10px 14px;
+  border-top: 1px solid #e3edf8;
+  background: #fff;
 }
 
 .workspace-spares-page {

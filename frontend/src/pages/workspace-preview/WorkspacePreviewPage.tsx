@@ -321,7 +321,7 @@ const menuItems: WorkspaceMenuItem[] = [
   { id: 'settings', label: '基础维护', icon: Settings, page: 'assets' },
 ];
 
-const workbenchRouteHiddenMenuIds = new Set(['design', 'inspection']);
+const workbenchRouteHiddenMenuIds = new Set(['design']);
 
 const isVisibleWorkbenchRouteMenuItem = (item: WorkspaceMenuItem) =>
   !workbenchRouteHiddenMenuIds.has(item.id);
@@ -2332,6 +2332,14 @@ const stitchScreens: Array<{
     note: '预测、派工、执行、验收、SLA 与备件保障闭环',
     imageSrc: stitchAsset('workbench-p0/workbench-menu-orders-v1'),
     route: '/fixed-assets/workbench/assets?menu=orders',
+    linkLabel: '进入业务菜单',
+  },
+  {
+    title: '巡检管理',
+    status: 'Round 2',
+    note: '巡检计划、执行日历、路线进度、异常转派和点位详情闭环',
+    imageSrc: stitchAsset('workbench-round2/workbench-menu-inspection-v1'),
+    route: '/fixed-assets/workbench/assets?menu=inspection',
     linkLabel: '进入业务菜单',
   },
   {
@@ -6271,6 +6279,300 @@ function WorkbenchEnergyPage({
           >
             创建工单
           </button>
+        </footer>
+      </aside>
+    </section>
+  );
+}
+
+const workbenchInspectionTabs = ['巡检计划', '巡检执行', '巡检点位', '巡检统计', '异常管理', '巡检设置'] as const;
+
+const workbenchInspectionSummaryCards = [
+  { label: '今日计划', value: '36', note: '已完成 18 条　进行中 8 条', tone: 'blue' },
+  { label: '异常数量', value: '5', note: '较昨日 +2', tone: 'red' },
+  { label: '按时完成率', value: '92%', note: '较昨日 +6%', tone: 'green' },
+  { label: '逾期任务', value: '3', note: '较昨日 -1', tone: 'cyan' },
+  { label: '待转工单', value: '7', note: '较昨日 +3', tone: 'orange' },
+] as const;
+
+const workbenchInspectionRoutes = [
+  { id: 'XR-20260614-0001', name: '生产一部日常巡检路线', team: '张三丰', plan: '06-14 08:00', status: '进行中', points: '6 / 12', rate: '50%', errors: '2', tone: 'blue' },
+  { id: 'XR-20260614-0002', name: '动力站设备巡检路线', team: '李巡检', plan: '06-14 09:00', status: '已完成', points: '12 / 12', rate: '100%', errors: '0', tone: 'green' },
+  { id: 'XR-20260614-0003', name: '包装线设备巡检路线', team: '王技师', plan: '06-14 10:00', status: '进行中', points: '8 / 10', rate: '80%', errors: '1', tone: 'blue' },
+  { id: 'XR-20260614-0004', name: '空压站巡检路线', team: '赵技师', plan: '06-14 10:30', status: '逾期', points: '4 / 10', rate: '40%', errors: '2', tone: 'red' },
+  { id: 'XR-20260614-0005', name: '立体库安全巡检路线', team: '陈电工', plan: '06-14 11:00', status: '未开始', points: '0 / 12', rate: '0%', errors: '0', tone: 'gray' },
+] as const;
+
+const workbenchInspectionAnomalies = [
+  { point: '空压机 CP-101', issue: '运行温度偏高 > 85℃', time: '06-14 10:24', status: '待处理', tone: 'red' },
+  { point: '配电柜 PDB-01', issue: '柜体异常发热', time: '06-14 09:58', status: '处理中', tone: 'orange' },
+  { point: '包装线 VM-205', issue: '皮带张力异常', time: '06-14 09:40', status: '待转工单', tone: 'orange' },
+  { point: '电机 MTR-302', issue: '振动值偏高', time: '06-14 08:55', status: '待确认', tone: 'blue' },
+] as const;
+
+const workbenchInspectionCheckpoints = [
+  { name: '机加车间入口', type: '环境检查', status: '正常', tone: 'green' },
+  { name: '数控车床 CN-301', type: '设备运行检查', status: '正常', tone: 'green' },
+  { name: '主轴振动传感器', type: '运行参数检查', status: '异常', tone: 'red' },
+  { name: '液压站 HP-201', type: '油温检查', status: '正常', tone: 'green' },
+  { name: '刀库刀位检测', type: '功能检查', status: '未巡', tone: 'gray' },
+] as const;
+
+function WorkbenchInspectionPage({
+  item,
+  context,
+  meta,
+  onPreviewAction,
+}: WorkbenchMenuPageProps) {
+  const [selectedRouteId, setSelectedRouteId] = useState(workbenchInspectionRoutes[0].id);
+  const selectedRoute = workbenchInspectionRoutes.find((route) => route.id === selectedRouteId) ?? workbenchInspectionRoutes[0];
+
+  const openInspectionPreview = (
+    title: string,
+    routeTarget: string,
+    description: string,
+    primaryLabel: string,
+    icon: LucideIcon = CheckCircle2,
+  ) => {
+    onPreviewAction({
+      title,
+      source: '巡检管理页面',
+      routeTarget,
+      description,
+      primaryLabel,
+      icon,
+      visual: meta.imageSrc,
+      stats: context.stats,
+    });
+  };
+
+  const openRoute = (route: (typeof workbenchInspectionRoutes)[number]) => {
+    setSelectedRouteId(route.id);
+    openInspectionPreview(
+      '打开巡检详情',
+      `/inspections/${encodeURIComponent(route.id)}?source=workbench&menu=inspection`,
+      `打开 ${route.name}，带入路线、执行人、点位和异常记录。`,
+      '打开巡检',
+      CheckCircle2,
+    );
+  };
+
+  return (
+    <section className="workspace-orders-page workspace-inspection-board" aria-label={`${item.label}真实产品页`}>
+      <section className="workspace-inspection-main" aria-label="巡检管理产品页主体">
+        <header className="workspace-inspection-nav">
+          <nav aria-label="巡检管理二级菜单">
+            {workbenchInspectionTabs.map((tab, index) => (
+              <button key={tab} type="button" className={index === 0 ? 'is-active' : ''}>{tab}</button>
+            ))}
+          </nav>
+          <div className="workspace-inspection-actions" aria-label="巡检管理顶部操作">
+            <button
+              type="button"
+              onClick={() =>
+                openInspectionPreview(
+                  '扫码签到',
+                  `/inspections/${encodeURIComponent(selectedRoute.id)}/scan?source=workbench`,
+                  `进入 ${selectedRoute.name} 扫码签到，保留点位和执行人上下文。`,
+                  '扫码签到',
+                  Maximize2,
+                )
+              }
+            >
+              <Maximize2 />扫码签到
+            </button>
+            <button
+              type="button"
+              onClick={() =>
+                openInspectionPreview(
+                  '导出巡检计划',
+                  '/inspections?source=workbench&export=plan',
+                  '导出今日巡检计划、路线执行概览和异常队列。',
+                  '导出',
+                  Download,
+                )
+              }
+            >
+              <Download />导出
+            </button>
+            <button
+              type="button"
+              className="is-primary"
+              onClick={() =>
+                openInspectionPreview(
+                  '新建巡检任务',
+                  menuContextById.inspection.routeTarget,
+                  '进入巡检新建页，预填设备、巡检类型、日期和现场发现。',
+                  '新建任务',
+                  Plus,
+                )
+              }
+            >
+              <Plus />新建巡检任务
+            </button>
+          </div>
+        </header>
+
+        <div className="workspace-inspection-kpis" aria-label="巡检管理核心指标">
+          {workbenchInspectionSummaryCards.map((card) => (
+            <button
+              key={card.label}
+              type="button"
+              className={`is-${card.tone}`}
+              onClick={() =>
+                openInspectionPreview(
+                  `${card.label}巡检下钻`,
+                  `/inspections?source=workbench&menu=inspection&metric=${encodeURIComponent(card.label)}`,
+                  `按 ${card.label} 下钻巡检计划和异常点位。`,
+                  '查看指标',
+                  CheckCircle2,
+                )
+              }
+            >
+              <span>{card.label}</span>
+              <strong>{card.value}</strong>
+              <small>{card.note}</small>
+            </button>
+          ))}
+        </div>
+
+        <div className="workspace-inspection-filterbar" aria-label="巡检管理查询筛选栏">
+          <label>
+            <Search />
+            <input readOnly value="搜索路线名称 / 点位名称 / 巡检人" aria-label="巡检管理搜索" />
+          </label>
+          {['路线全部', '点位全部', '状态全部', '执行人全部'].map((filter) => (
+            <button
+              key={filter}
+              type="button"
+              onClick={() =>
+                openInspectionPreview(
+                  '筛选巡检任务',
+                  `/inspections?source=workbench&menu=inspection&filter=${encodeURIComponent(filter)}`,
+                  `按 ${filter} 筛选巡检路线、任务和点位。`,
+                  '筛选',
+                  SlidersHorizontal,
+                )
+              }
+            >
+              {filter}<ChevronDown />
+            </button>
+          ))}
+          <label className="is-date">
+            <span>2026-06-14</span>
+            <CalendarDays />
+          </label>
+          <button type="button" className="is-reset">重置</button>
+        </div>
+
+        <div className="workspace-inspection-grid">
+          <section className="workspace-inspection-calendar" aria-label="巡检日历">
+            <header><strong>巡检日历</strong><span>2026年6月</span></header>
+            <div className="workspace-inspection-days">
+              {['日','一','二','三','四','五','六','31','1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','1','2','3','4'].map((day, index) => (
+                <span key={`${day}-${index}`} className={day === '14' ? 'is-today' : index < 7 ? 'is-week' : ''}>{day}</span>
+              ))}
+            </div>
+            <footer><span>计划</span><span>进行中</span><span>已完成</span><span>异常</span><span>逾期</span></footer>
+          </section>
+
+          <section className="workspace-inspection-routes" aria-label="路线执行概览">
+            <header><strong>路线执行概览</strong><button type="button">查看全部路线 <ArrowRight /></button></header>
+            {workbenchInspectionRoutes.slice(0, 4).map((route) => (
+              <button key={route.id} type="button" className={`is-${route.tone}`} onClick={() => openRoute(route)}>
+                <span><b>{route.name}</b><small>{route.status}</small></span>
+                <em>{route.points}</em>
+                <strong>{route.team}</strong>
+                <i>{route.rate}</i>
+                <mark>{route.errors}</mark>
+              </button>
+            ))}
+          </section>
+        </div>
+
+        <div className="workspace-inspection-bottom">
+          <section className="workspace-inspection-task-list" aria-label="巡检任务列表">
+            <header><strong>巡检任务列表（36）</strong><span>全部 36　进行中 8　已完成 18　异常 5　逾期 3</span></header>
+            <div className="workspace-inspection-table">
+              <div><span>任务编号</span><span>路线名称</span><span>计划时间</span><span>执行人</span><span>状态</span><span>进度</span><span>异常</span><span>操作</span></div>
+              {workbenchInspectionRoutes.map((route) => (
+                <button key={route.id} type="button" onClick={() => openRoute(route)}>
+                  <span>{route.id}</span><span>{route.name}</span><span>{route.plan}</span><span>{route.team}</span><span>{route.status}</span><span>{route.points}</span><span>{route.errors}</span><span>{route.status === '未开始' ? '开始' : '执行'}</span>
+                </button>
+              ))}
+            </div>
+            <footer><span>共 36 条</span><button type="button">10条/页</button><button type="button">‹</button><button type="button" className="is-current">1</button><button type="button">2</button><button type="button">3</button><button type="button">4</button></footer>
+          </section>
+
+          <section className="workspace-inspection-anomalies" aria-label="巡检异常队列">
+            <header><strong>异常队列（5）</strong><button type="button">全部异常 <ArrowRight /></button></header>
+            {workbenchInspectionAnomalies.map((item) => (
+              <button
+                key={item.point}
+                type="button"
+                className={`is-${item.tone}`}
+                onClick={() =>
+                  openInspectionPreview(
+                    '打开巡检异常',
+                    `/inspections/anomalies?source=workbench&point=${encodeURIComponent(item.point)}`,
+                    `打开 ${item.point} 异常，带入读数、路线和处理状态。`,
+                    '打开异常',
+                    AlertTriangle,
+                  )
+                }
+              >
+                <span><b>点位：{item.point}</b><small>{item.issue}</small></span>
+                <em>{item.time}</em>
+                <strong>{item.status}</strong>
+              </button>
+            ))}
+          </section>
+        </div>
+      </section>
+
+      <aside className="workspace-inspection-detail" aria-label="巡检详情抽屉">
+        <header><strong>巡检详情</strong><button type="button" aria-label="关闭巡检详情"><X /></button></header>
+        <section className="workspace-inspection-info" aria-label="巡检任务信息">
+          <h3>任务信息</h3>
+          <dl>
+            <div><dt>任务编号</dt><dd>{selectedRoute.id}</dd></div>
+            <div><dt>路线名称</dt><dd>{selectedRoute.name}</dd></div>
+            <div><dt>计划时间</dt><dd>2026-06-14 08:00 ~ 12:00</dd></div>
+            <div><dt>执行人</dt><dd>{selectedRoute.team}</dd></div>
+            <div><dt>状态</dt><dd>{selectedRoute.status}</dd></div>
+            <div><dt>完成进度</dt><dd>{selectedRoute.points}</dd></div>
+          </dl>
+          <div><span style={{ width: selectedRoute.rate }} /><small>{selectedRoute.rate}</small></div>
+        </section>
+        <nav className="workspace-inspection-detail-tabs" aria-label="巡检详情标签">
+          {['点位清单', '异常记录(2)', '附件记录', '操作记录'].map((tab, index) => <button key={tab} type="button" className={index === 0 ? 'is-active' : ''}>{tab}</button>)}
+        </nav>
+        <section className="workspace-inspection-checkpoints" aria-label="点位清单">
+          <div><span>正常 6</span><span>异常 2</span><span>未巡 4</span></div>
+          {workbenchInspectionCheckpoints.map((point) => (
+            <button key={point.name} type="button" className={`is-${point.tone}`}>
+              <span><b>{point.name}</b><small>{point.type}</small></span>
+              <em>{point.status}</em>
+            </button>
+          ))}
+        </section>
+        <section className="workspace-inspection-point" aria-label="点位详情">
+          <h3>点位详情</h3>
+          <dl>
+            <div><dt>点位名称</dt><dd>主轴振动传感器</dd></div>
+            <div><dt>设备编号</dt><dd>CN-301-SZ01</dd></div>
+            <div><dt>点位类型</dt><dd>关键点位</dd></div>
+            <div><dt>巡检标准</dt><dd>振动值 ≤ 4.5 mm/s</dd></div>
+            <div><dt>本次读数</dt><dd className="is-danger">6.2 mm/s</dd></div>
+            <div><dt>结果判定</dt><dd className="is-danger">异常</dd></div>
+          </dl>
+          <div><img src={iconAsset('inspection-equipment')} alt="" /><span>振动异常</span></div>
+        </section>
+        <footer className="workspace-inspection-detail-actions" aria-label="巡检详情操作">
+          <button type="button" onClick={() => openInspectionPreview('编辑巡检任务', `/inspections/${encodeURIComponent(selectedRoute.id)}/edit?source=workbench`, `编辑 ${selectedRoute.name}，保留路线和点位上下文。`, '编辑', FileText)}>编辑</button>
+          <button type="button" onClick={() => openInspectionPreview('转派巡检任务', `/inspections/${encodeURIComponent(selectedRoute.id)}/assign?source=workbench`, `转派 ${selectedRoute.name} 给现场班组。`, '转派', UserCircle)}>转派</button>
+          <button type="button" onClick={() => openInspectionPreview('巡检异常转工单', buildWorkOrderPrefillPath({ source: 'asset-risk', title: '巡检异常转派工单', assetName: '主轴振动传感器', assetLocation: '机加车间 / CNC 区域 A线', riskState: '巡检异常', riskScore: 88, riskLevel: '中高风险', priority: 'HIGH', dueDate: '2026-06-15', description: '来自 Workbench 巡检管理：点位读数异常，需要转派工单并上传处理记录。' }), '把点位异常、读数和处理建议预填到工单创建页。', '转工单', Wrench)}>转工单</button>
+          <button type="button" className="is-primary" onClick={() => openInspectionPreview('保存巡检记录', `/inspections/${encodeURIComponent(selectedRoute.id)}/save?source=workbench`, `保存 ${selectedRoute.name} 的点位读数、附件和处理记录。`, '保存', CheckCircle2)}>保存</button>
         </footer>
       </aside>
     </section>
@@ -11782,7 +12084,7 @@ function StitchSuiteDashboard() {
               页面稿
             </span>
             <span>
-              <strong>11</strong>
+              <strong>12</strong>
               业务菜单
             </span>
           </div>
@@ -12867,6 +13169,14 @@ export default function WorkspacePreviewPage() {
             />
           ) : activeModuleMock && activeProductPageMeta && activeItem.id === 'orders' ? (
             <WorkbenchOrdersPage
+              item={activeItem}
+              context={activeContext}
+              mock={activeModuleMock}
+              meta={activeProductPageMeta}
+              onPreviewAction={setRoutePreview}
+            />
+          ) : activeModuleMock && activeProductPageMeta && activeItem.id === 'inspection' ? (
+            <WorkbenchInspectionPage
               item={activeItem}
               context={activeContext}
               mock={activeModuleMock}

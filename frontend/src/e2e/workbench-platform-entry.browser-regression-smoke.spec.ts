@@ -75,6 +75,7 @@ test.describe('Workbench 正式入口浏览器回归', () => {
     await expect(page.getByText('固定资产平台', { exact: true })).toBeVisible();
     await expect(page.getByLabel('工作台菜单').getByRole('button', { name: '运营首页', exact: true })).toBeVisible();
     await expect(page.getByLabel('工作台菜单').getByRole('button', { name: '流程待办', exact: true })).toBeVisible();
+    await expect(page.getByLabel('工作台菜单').getByRole('button', { name: '巡检管理', exact: true })).toBeVisible();
     await expect(page.getByLabel('工作台菜单').getByRole('button', { name: '基础维护', exact: true })).toBeVisible();
 
     for (const tab of ['智能制造总览', '数据监控中心', '资产运维中心', '安全态势工作台']) {
@@ -142,6 +143,13 @@ test.describe('Workbench 正式入口浏览器回归', () => {
         action: '新建工单',
         dialogName: '创建预测工单',
         targetIncludes: ['/workorders/new?', 'source=quick-action', 'riskScore=92', 'priority=HIGH'],
+      },
+      {
+        label: '巡检管理',
+        route: '/fixed-assets/workbench/assets?menu=inspection',
+        action: '导出',
+        dialogName: '导出巡检计划',
+        targetIncludes: ['/inspections?source=workbench&export=plan'],
       },
       {
         label: '备件管理',
@@ -220,6 +228,7 @@ test.describe('Workbench 正式入口浏览器回归', () => {
       ['资产总览', '/fixed-assets/workbench/assets?menu=asset'],
       ['设备管理', '/fixed-assets/workbench/assets?menu=device'],
       ['工单管理', '/fixed-assets/workbench/assets?menu=orders'],
+      ['巡检管理', '/fixed-assets/workbench/assets?menu=inspection'],
       ['备件管理', '/fixed-assets/workbench/assets?menu=spares'],
       ['数据监控', '/fixed-assets/workbench/analytics?menu=energy'],
       ['报表分析', '/fixed-assets/workbench/analytics?menu=report'],
@@ -244,6 +253,8 @@ test.describe('Workbench 正式入口浏览器回归', () => {
         await expect(page.getByLabel('组织策略规则列表')).toBeVisible();
       } else if (pageLabel === '基础维护') {
         await expect(page.getByLabel('基础维护配置对象列表')).toBeVisible();
+      } else if (pageLabel === '巡检管理') {
+        await expect(page.getByLabel('巡检任务列表')).toBeVisible();
       } else {
         await expect(page.locator('.workspace-orders-table')).toBeVisible();
       }
@@ -549,6 +560,59 @@ test.describe('Workbench 正式入口浏览器回归', () => {
     await expect(executeDialog.locator('.workspace-action-route strong')).toContainText('/execute?source=workbench');
     await page.keyboard.press('Escape');
     await expect(executeDialog).toHaveCount(0);
+
+    await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
+    expect(errors).toEqual([]);
+  });
+
+  test('巡检管理左侧菜单按产品图渲染任务、路线、异常和详情闭环', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await seedAuthenticatedSession(page, operationsUser);
+
+    await page.goto('/fixed-assets/workbench/assets?menu=inspection');
+    await page.waitForLoadState('networkidle');
+
+    await expect(page.getByLabel('巡检管理真实产品页')).toBeVisible();
+    await expect(page.locator('.workspace-product-page')).toHaveCount(0);
+    await expect(page.getByLabel('巡检管理产品页主体')).toBeVisible();
+    await expect(page.getByLabel('巡检管理二级菜单')).toContainText('巡检计划');
+    await expect(page.getByLabel('巡检管理二级菜单')).toContainText('异常管理');
+    await expect(page.getByLabel('巡检管理顶部操作')).toContainText('扫码签到');
+    await expect(page.getByLabel('巡检管理顶部操作')).toContainText('新建巡检任务');
+    await expect(page.getByLabel('巡检管理核心指标')).toContainText('今日计划');
+    await expect(page.getByLabel('巡检管理核心指标')).toContainText('待转工单');
+    await expect(page.getByLabel('巡检管理查询筛选栏')).toContainText('路线全部');
+    await expect(page.getByLabel('巡检日历')).toContainText('2026年6月');
+    await expect(page.getByLabel('路线执行概览')).toContainText('生产一部日常巡检路线');
+    await expect(page.getByLabel('巡检任务列表')).toContainText('XR-20260614-0001');
+    await expect(page.getByLabel('巡检异常队列')).toContainText('空压机 CP-101');
+    await expect(page.getByLabel('巡检详情抽屉')).toContainText('巡检详情');
+    await expect(page.getByLabel('点位清单')).toContainText('主轴振动传感器');
+    await expect(page.getByLabel('点位详情')).toContainText('6.2 mm/s');
+    await expect(page.locator('body')).not.toContainText('workbench-menu-inspection-v1');
+
+    await page.getByLabel('巡检管理顶部操作').getByRole('button', { name: '导出' }).click();
+    const exportDialog = page.getByRole('dialog', { name: '导出巡检计划' });
+    await expect(exportDialog).toBeVisible();
+    await expect(exportDialog.locator('.workspace-action-route strong')).toContainText('/inspections?source=workbench&export=plan');
+    await page.keyboard.press('Escape');
+    await expect(exportDialog).toHaveCount(0);
+
+    await page.getByRole('button', { name: /动力站设备巡检路线/ }).first().click();
+    const routeDialog = page.getByRole('dialog', { name: '打开巡检详情' });
+    await expect(routeDialog).toBeVisible();
+    await expect(routeDialog.locator('.workspace-action-route strong')).toContainText('/inspections/XR-20260614-0002?source=workbench&menu=inspection');
+    await page.keyboard.press('Escape');
+    await expect(routeDialog).toHaveCount(0);
+    await expect(page.getByLabel('巡检详情抽屉')).toContainText('动力站设备巡检路线');
+
+    await page.getByLabel('巡检详情操作').getByRole('button', { name: '转工单' }).click();
+    const workOrderDialog = page.getByRole('dialog', { name: '巡检异常转工单' });
+    await expect(workOrderDialog).toBeVisible();
+    await expect(workOrderDialog.locator('.workspace-action-route strong')).toContainText('/workorders/new?');
+    await expect(workOrderDialog.locator('.workspace-action-route strong')).toContainText('source=asset-risk');
+    await page.keyboard.press('Escape');
+    await expect(workOrderDialog).toHaveCount(0);
 
     await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
     expect(errors).toEqual([]);
@@ -923,7 +987,7 @@ test.describe('Workbench 正式入口浏览器回归', () => {
     await page.waitForLoadState('networkidle');
 
     await expect(page.locator('.workspace-stitch-grid')).toBeVisible({ timeout: 10_000 });
-    await expect(page.locator('.workspace-stitch-stats')).toContainText('11');
+    await expect(page.locator('.workspace-stitch-stats')).toContainText('12');
     await expect(page.locator('.workspace-stitch-stats')).toContainText('业务菜单');
 
     const designCards = [
@@ -932,6 +996,7 @@ test.describe('Workbench 正式入口浏览器回归', () => {
       ['资产总览', '/fixed-assets/workbench/assets?menu=asset'],
       ['设备管理', '/fixed-assets/workbench/assets?menu=device'],
       ['工单管理', '/fixed-assets/workbench/assets?menu=orders'],
+      ['巡检管理', '/fixed-assets/workbench/assets?menu=inspection'],
       ['备件管理', '/fixed-assets/workbench/assets?menu=spares'],
       ['数据监控', '/fixed-assets/workbench/analytics?menu=energy'],
       ['报表分析', '/fixed-assets/workbench/analytics?menu=report'],
