@@ -334,6 +334,42 @@ test.describe('Workbench 正式入口浏览器回归', () => {
     expect(errors).toEqual([]);
   });
 
+  test('运营首页在窄屏分辨率下不裁切主体信息', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.setViewportSize({ width: 794, height: 890 });
+    await seedAuthenticatedSession(page, operationsUser);
+
+    await page.goto('/fixed-assets/workbench?menu=home');
+    await page.waitForLoadState('networkidle');
+
+    await expect(page.getByLabel('运营首页产品页主体')).toBeVisible();
+    await expect(page.getByLabel('运营首页任务墙')).toBeVisible();
+    await page.getByLabel('维保预警队列').scrollIntoViewIfNeeded();
+    await expect(page.getByLabel('维保预警队列')).toBeVisible();
+    await page.getByLabel('运营首页详情操作').scrollIntoViewIfNeeded();
+    await expect(page.getByLabel('运营首页详情操作')).toContainText('新建工单');
+
+    const responsiveState = await page.evaluate(() => {
+      const center = document.querySelector('[aria-label="运营首页产品页主体"]');
+      const product = document.querySelector('.workspace-home-product');
+      const centerStyle = center ? getComputedStyle(center) : null;
+      const productStyle = product ? getComputedStyle(product) : null;
+      return {
+        centerOverflowY: centerStyle?.overflowY,
+        productOverflow: productStyle?.overflow,
+        pageCanScroll: document.documentElement.scrollHeight > window.innerHeight,
+        centerHeight: center?.getBoundingClientRect().height ?? 0,
+      };
+    });
+
+    expect(responsiveState.centerOverflowY).toBe('visible');
+    expect(responsiveState.productOverflow).toBe('visible');
+    expect(responsiveState.pageCanScroll).toBe(true);
+    expect(responsiveState.centerHeight).toBeGreaterThan(900);
+    await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
+    expect(errors).toEqual([]);
+  });
+
   test('资产总览左侧菜单渲染真实页面级组件而非通用产品壳', async ({ page }) => {
     const errors = collectBrowserErrors(page);
     await seedAuthenticatedSession(page, operationsUser);

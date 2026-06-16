@@ -15770,6 +15770,44 @@
     min-height: 0;
   }
 
+  .workspace-home-product {
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .workspace-home-center {
+    grid-template-rows: none;
+    overflow: visible;
+  }
+
+  .workspace-home-kpis,
+  .workspace-home-dashboard-grid,
+  .workspace-home-chart-row,
+  .workspace-home-launcher {
+    grid-template-columns: 1fr;
+  }
+
+  .workspace-home-filterbar {
+    grid-template-columns: 1fr;
+  }
+
+  .workspace-home-task-wall {
+    overflow-x: auto;
+    overflow-y: visible;
+  }
+
+  .workspace-home-task-head,
+  .workspace-home-task-row {
+    min-width: 760px;
+  }
+
+  .workspace-home-detail {
+    max-height: none;
+    overflow: visible;
+  }
+
   .workspace-orders-flow {
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 12px;
