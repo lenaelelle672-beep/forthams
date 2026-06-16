@@ -6800,8 +6800,8 @@
 
 .workspace-energy-product {
   grid-template-columns: minmax(900px, 1fr) minmax(360px, .34fr);
-  height: calc(100vh - 154px);
-  min-height: 720px;
+  height: calc(100vh - 80px);
+  min-height: 820px;
   max-height: none;
   overflow: hidden;
 }
@@ -6997,10 +6997,12 @@
 .workspace-energy-center {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  grid-template-rows: auto 38px minmax(106px, auto) minmax(220px, .84fr) 34px minmax(250px, 1fr);
+  grid-template-rows: auto 38px 106px minmax(220px, .7fr) 34px minmax(0, 1fr);
   gap: 10px;
+  min-height: 0;
+  height: 100%;
   padding: 14px 16px 12px;
-  overflow: auto;
+  overflow: hidden;
 }
 
 .workspace-energy-center > * {

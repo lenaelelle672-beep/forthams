@@ -520,7 +520,7 @@ test.describe('Workbench 正式入口浏览器回归', () => {
     expect(errors).toEqual([]);
   });
 
-  test('资产设备告警桌面承载不被固定高度截断', async ({ page }) => {
+  test('资产设备告警数据监控桌面承载不被固定高度截断', async ({ page }) => {
     const errors = collectBrowserErrors(page);
     await page.setViewportSize({ width: 1796, height: 1000 });
     await seedAuthenticatedSession(page, operationsUser);
@@ -546,6 +546,13 @@ test.describe('Workbench 正式入口浏览器回归', () => {
         shell: '[aria-label="告警中心产品页主体"]',
         detail: '[aria-label="告警详情抽屉"]',
         table: '[aria-label="告警中心列表"]',
+      },
+      {
+        url: '/fixed-assets/workbench/analytics?menu=energy',
+        root: '.workspace-energy-page',
+        shell: '[aria-label="数据监控产品页主体"]',
+        detail: '[aria-label="数据监控详情抽屉"]',
+        table: '[aria-label="数据监控列表"]',
       },
     ];
 
