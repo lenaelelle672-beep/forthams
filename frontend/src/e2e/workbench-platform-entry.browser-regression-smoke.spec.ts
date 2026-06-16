@@ -520,6 +520,87 @@ test.describe('Workbench 正式入口浏览器回归', () => {
     expect(errors).toEqual([]);
   });
 
+  test('资产设备告警桌面承载不被固定高度截断', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.setViewportSize({ width: 1796, height: 1000 });
+    await seedAuthenticatedSession(page, operationsUser);
+
+    const cases = [
+      {
+        url: '/fixed-assets/workbench/assets?menu=asset',
+        root: '.workspace-asset-page',
+        shell: '[aria-label="资产总览产品页主体"]',
+        detail: '[aria-label="资产详情抽屉"]',
+        table: '[aria-label="资产总览列表"]',
+      },
+      {
+        url: '/fixed-assets/workbench/assets?menu=device',
+        root: '.workspace-device-page',
+        shell: '[aria-label="设备管理产品页主体"]',
+        detail: '[aria-label="设备详情抽屉"]',
+        table: '[aria-label="设备管理列表"]',
+      },
+      {
+        url: '/fixed-assets/workbench/security?menu=alarm',
+        root: '.workspace-alarm-page',
+        shell: '[aria-label="告警中心产品页主体"]',
+        detail: '[aria-label="告警详情抽屉"]',
+        table: '[aria-label="告警中心列表"]',
+      },
+    ];
+
+    for (const layoutCase of cases) {
+      await page.goto(layoutCase.url);
+      await page.waitForLoadState('networkidle');
+      await page.locator(layoutCase.root).waitFor({ state: 'visible' });
+
+      const metrics = await page.evaluate((selectors) => {
+        const getRect = (selector: string) => document.querySelector(selector)?.getBoundingClientRect();
+        const getStyle = (selector: string) => {
+          const element = document.querySelector(selector);
+          return element ? getComputedStyle(element) : null;
+        };
+        const product = getRect(selectors.root);
+        const shell = getRect(selectors.shell);
+        const detail = getRect(selectors.detail);
+        const table = getRect(selectors.table);
+        const viewport = window.innerHeight;
+
+        return {
+          productHeight: product?.height ?? 0,
+          productBottomGap: viewport - (product?.bottom ?? 0),
+          productOverflow: getStyle(selectors.root)?.overflow ?? '',
+          shellHeight: shell?.height ?? 0,
+          shellBottomGap: viewport - (shell?.bottom ?? 0),
+          shellOverflow: getStyle(selectors.shell)?.overflow ?? '',
+          detailHeight: detail?.height ?? 0,
+          detailBottomGap: viewport - (detail?.bottom ?? 0),
+          detailOverflow: getStyle(selectors.detail)?.overflow ?? '',
+          tableHeight: table?.height ?? 0,
+          tableOverflow: getStyle(selectors.table)?.overflow ?? '',
+        };
+      }, layoutCase);
+
+      expect(metrics.productHeight).toBeGreaterThan(880);
+      expect(metrics.productBottomGap).toBeGreaterThanOrEqual(0);
+      expect(metrics.productBottomGap).toBeLessThan(32);
+      expect(metrics.productOverflow).toBe('hidden');
+      expect(metrics.shellHeight).toBeGreaterThan(880);
+      expect(metrics.shellBottomGap).toBeGreaterThanOrEqual(0);
+      expect(metrics.shellBottomGap).toBeLessThan(40);
+      expect(metrics.shellOverflow).toBe('hidden');
+      expect(metrics.detailHeight).toBeGreaterThan(880);
+      expect(metrics.detailBottomGap).toBeGreaterThanOrEqual(0);
+      expect(metrics.detailBottomGap).toBeLessThan(40);
+      expect(metrics.detailOverflow).toBe('hidden');
+      expect(metrics.tableHeight).toBeGreaterThan(320);
+      expect(metrics.tableOverflow).toMatch(/auto|scroll/);
+      await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
+    }
+
+    expect(errors).toEqual([]);
+  });
+
   test('流程待办左侧菜单渲染真实页面级组件而非通用产品壳', async ({ page }) => {
     const errors = collectBrowserErrors(page);
     await seedAuthenticatedSession(page, operationsUser);
