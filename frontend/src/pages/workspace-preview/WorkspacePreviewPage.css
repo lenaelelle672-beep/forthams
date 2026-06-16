@@ -3856,23 +3856,26 @@
 
 .workspace-asset-rank-list {
   display: grid;
-  gap: 12px;
-  min-height: 198px;
-  align-content: center;
+  flex: 1 1 auto;
+  align-content: start;
+  gap: 4px;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 2px;
 }
 
 .workspace-asset-rank-list button {
   display: grid;
-  grid-template-columns: 78px minmax(0, 1fr) 78px;
+  grid-template-columns: 70px minmax(0, 1fr) 72px;
   align-items: center;
-  gap: 10px;
+  gap: 7px;
   min-width: 0;
-  min-height: 28px;
+  min-height: 18px;
   border: 0;
   color: #284260;
   background: transparent;
   cursor: pointer;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 880;
   text-align: left;
 }
