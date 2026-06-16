@@ -15782,17 +15782,6 @@
     overflow: visible;
   }
 
-  .workspace-home-kpis,
-  .workspace-home-dashboard-grid,
-  .workspace-home-chart-row,
-  .workspace-home-launcher {
-    grid-template-columns: 1fr;
-  }
-
-  .workspace-home-filterbar {
-    grid-template-columns: 1fr;
-  }
-
   .workspace-home-task-wall {
     overflow-x: auto;
     overflow-y: visible;
@@ -15806,6 +15795,128 @@
   .workspace-home-detail {
     max-height: none;
     overflow: visible;
+  }
+
+  .workspace-home-kpis,
+  .workspace-home-dashboard-grid,
+  .workspace-home-chart-row,
+  .workspace-home-launcher,
+  .workspace-home-filterbar {
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 680px) {
+    .workspace-home-product {
+      gap: 8px;
+    }
+
+    .workspace-home-center,
+    .workspace-home-detail {
+      padding: 10px;
+    }
+
+    .workspace-home-center {
+      gap: 8px;
+    }
+
+    .workspace-home-header {
+      align-items: start;
+    }
+
+    .workspace-home-header h2 {
+      font-size: 20px;
+    }
+
+    .workspace-home-header p {
+      max-width: 560px;
+      line-height: 1.45;
+    }
+
+    .workspace-home-header .workspace-orders-toolbar {
+      max-width: 180px;
+    }
+
+    .workspace-home-kpis {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .workspace-home-kpis button {
+      min-height: 74px;
+      padding: 9px 10px;
+    }
+
+    .workspace-home-kpis button::after {
+      width: 30px;
+      height: 30px;
+    }
+
+    .workspace-home-kpis strong {
+      font-size: 20px;
+    }
+
+    .workspace-home-dashboard-grid,
+    .workspace-home-chart-row,
+    .workspace-home-launcher {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .workspace-home-dashboard-grid button {
+      min-height: 104px;
+      padding: 10px 12px;
+    }
+
+    .workspace-home-dashboard-grid button::after {
+      height: 26px;
+      margin-top: 8px;
+    }
+
+    .workspace-home-dashboard-grid strong,
+    .workspace-home-chart-row strong {
+      font-size: 18px;
+    }
+
+    .workspace-home-launcher button {
+      min-height: 52px;
+      padding: 8px 10px;
+    }
+
+    .workspace-home-launcher small {
+      line-height: 1.25;
+    }
+
+    .workspace-home-filterbar {
+      grid-template-columns: minmax(220px, 1.2fr) repeat(2, minmax(110px, .7fr));
+    }
+
+    .workspace-home-filterbar label {
+      grid-column: 1 / -1;
+    }
+
+    .workspace-home-filterbar label,
+    .workspace-home-filterbar button {
+      height: 34px;
+    }
+
+    .workspace-home-task-wall header {
+      padding: 9px 12px;
+    }
+
+    .workspace-home-task-head {
+      padding: 7px 12px;
+    }
+
+    .workspace-home-task-row {
+      min-height: 50px;
+      padding: 7px 12px;
+    }
+
+    .workspace-home-detail-card {
+      padding: 10px;
+    }
+
+    .workspace-home-detail {
+      gap: 7px;
+    }
   }
 
   .workspace-orders-flow {
