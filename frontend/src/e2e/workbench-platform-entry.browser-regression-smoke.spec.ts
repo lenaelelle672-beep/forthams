@@ -370,6 +370,48 @@ test.describe('Workbench 正式入口浏览器回归', () => {
     expect(errors).toEqual([]);
   });
 
+  test('运营首页在桌面分辨率下不被固定高度截断', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.setViewportSize({ width: 1796, height: 1000 });
+    await seedAuthenticatedSession(page, operationsUser);
+
+    await page.goto('/fixed-assets/workbench?menu=home');
+    await page.waitForLoadState('networkidle');
+
+    await expect(page.getByLabel('运营首页产品页主体')).toBeVisible();
+    await expect(page.getByLabel('运营首页任务墙')).toBeVisible();
+    await expect(page.getByLabel('运营首页详情抽屉')).toContainText('主轴振动异常');
+
+    const desktopState = await page.evaluate(() => {
+      const product = document.querySelector('.workspace-home-product');
+      const taskWall = document.querySelector('[aria-label="运营首页任务墙"]');
+      const detail = document.querySelector('[aria-label="运营首页详情抽屉"]');
+      const productRect = product?.getBoundingClientRect();
+      const taskRect = taskWall?.getBoundingClientRect();
+      const detailRect = detail?.getBoundingClientRect();
+      const productStyle = product ? getComputedStyle(product) : null;
+
+      return {
+        productHeight: productRect?.height ?? 0,
+        productBottomGap: productRect ? window.innerHeight - productRect.bottom : 0,
+        productMaxHeight: productStyle?.maxHeight,
+        productOverflow: productStyle?.overflow,
+        taskHeight: taskRect?.height ?? 0,
+        detailHeight: detailRect?.height ?? 0,
+      };
+    });
+
+    expect(desktopState.productHeight).toBeGreaterThan(900);
+    expect(desktopState.productBottomGap).toBeGreaterThanOrEqual(0);
+    expect(desktopState.productBottomGap).toBeLessThan(24);
+    expect(desktopState.productMaxHeight).toBe('none');
+    expect(desktopState.productOverflow).toBe('hidden');
+    expect(desktopState.taskHeight).toBeGreaterThan(220);
+    expect(desktopState.detailHeight).toBeGreaterThan(880);
+    await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
+    expect(errors).toEqual([]);
+  });
+
   test('资产总览左侧菜单渲染真实页面级组件而非通用产品壳', async ({ page }) => {
     const errors = collectBrowserErrors(page);
     await seedAuthenticatedSession(page, operationsUser);

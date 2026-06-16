@@ -4773,9 +4773,9 @@
 
 .workspace-home-product {
   grid-template-columns: minmax(840px, 1fr) minmax(300px, .34fr);
-  height: calc(100vh - 172px);
+  height: calc(100vh - 76px);
   min-height: 580px;
-  max-height: 800px;
+  max-height: none;
   overflow: hidden;
 }
 
@@ -4987,7 +4987,7 @@
 
 .workspace-home-center {
   display: grid;
-  grid-template-rows: auto auto auto auto auto minmax(128px, .72fr) minmax(120px, .6fr);
+  grid-template-rows: auto auto auto auto auto auto minmax(260px, 1fr);
   gap: 10px;
   overflow: auto;
   padding: 14px 16px 16px;
@@ -4995,6 +4995,7 @@
 
 .workspace-home-header {
   position: relative;
+  grid-row: 1;
   z-index: 2;
 }
 
@@ -5033,6 +5034,7 @@
 
 .workspace-home-kpis {
   grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-row: 3;
   order: 2;
 }
 
@@ -5042,10 +5044,12 @@
 }
 
 .workspace-home-dashboard-grid {
+  grid-row: 4;
   order: 3;
 }
 
 .workspace-home-chart-row {
+  grid-row: 5;
   order: 4;
 }
 
@@ -5236,6 +5240,7 @@
 
 .workspace-home-launcher {
   grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-row: 6;
   min-height: 58px;
   order: 5;
 }
@@ -5318,6 +5323,7 @@
   display: grid;
   grid-template-columns: minmax(260px, 1.3fr) repeat(5, minmax(96px, .64fr));
   gap: 8px;
+  grid-row: 2;
   min-width: 0;
   order: 1;
 }
@@ -5366,6 +5372,7 @@
 }
 
 .workspace-home-task-wall {
+  grid-row: 7;
   order: 6;
   overflow: auto;
   border: 1px solid #dbe8f8;
