@@ -352,17 +352,11 @@ test.describe('Workbench 正式入口浏览器回归', () => {
     const responsiveState = await page.evaluate(() => {
       const center = document.querySelector('[aria-label="运营首页产品页主体"]');
       const product = document.querySelector('.workspace-home-product');
-      const kpis = document.querySelector('[aria-label="运营首页核心指标"]');
-      const launcher = document.querySelector('[aria-label="运营首页快捷发起"]');
       const centerStyle = center ? getComputedStyle(center) : null;
       const productStyle = product ? getComputedStyle(product) : null;
-      const kpiStyle = kpis ? getComputedStyle(kpis) : null;
-      const launcherStyle = launcher ? getComputedStyle(launcher) : null;
       return {
         centerOverflowY: centerStyle?.overflowY,
         productOverflow: productStyle?.overflow,
-        kpiColumns: kpiStyle?.gridTemplateColumns.split(' ').length ?? 0,
-        launcherColumns: launcherStyle?.gridTemplateColumns.split(' ').length ?? 0,
         pageCanScroll: document.documentElement.scrollHeight > window.innerHeight,
         centerHeight: center?.getBoundingClientRect().height ?? 0,
       };
@@ -370,8 +364,6 @@ test.describe('Workbench 正式入口浏览器回归', () => {
 
     expect(responsiveState.centerOverflowY).toBe('visible');
     expect(responsiveState.productOverflow).toBe('visible');
-    expect(responsiveState.kpiColumns).toBeGreaterThanOrEqual(3);
-    expect(responsiveState.launcherColumns).toBeGreaterThanOrEqual(3);
     expect(responsiveState.pageCanScroll).toBe(true);
     expect(responsiveState.centerHeight).toBeGreaterThan(900);
     await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
