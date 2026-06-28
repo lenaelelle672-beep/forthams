@@ -7,7 +7,19 @@
 
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Pencil, Trash2, RefreshCw, Send, Play } from 'lucide-react';
+import {
+  Activity,
+  AlertTriangle,
+  CheckCircle2,
+  Link2,
+  Pencil,
+  Play,
+  Plus,
+  RefreshCw,
+  Send,
+  ShieldCheck,
+  Trash2,
+} from 'lucide-react';
 import { toast } from 'sonner';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -28,6 +40,8 @@ const CHANNEL_TYPE_OPTIONS = [
   ...Object.entries(CHANNEL_TYPE_LABELS).map(([key, label]) => ({ key, label })),
 ];
 
+const TESTABLE_CHANNEL_TYPES = new Set(['DINGTALK', 'WECHAT']);
+
 const EMPTY_FORM: CreateChannelConfigRequest = {
   channelType: 'DINGTALK',
   configName: '',
@@ -36,6 +50,48 @@ const EMPTY_FORM: CreateChannelConfigRequest = {
   enabled: 1,
   description: '',
 };
+
+export function buildChannelConfigPayload<T extends CreateChannelConfigRequest | UpdateChannelConfigRequest>(data: T): T {
+  const payload: CreateChannelConfigRequest | UpdateChannelConfigRequest = {
+    ...data,
+    configName: data.configName?.trim(),
+    webhookUrl: data.webhookUrl?.trim(),
+    description: data.description?.trim(),
+  };
+  if (!payload.webhookUrl) {
+    delete payload.webhookUrl;
+  }
+  const secret = data.secret?.trim();
+
+  if (secret) {
+    payload.secret = secret;
+  } else {
+    delete payload.secret;
+  }
+
+  return payload as T;
+}
+
+function getWebhookDisplay(config: ChannelConfig) {
+  return config.webhookUrlMasked || (config.webhookUrlConfigured ? '已配置（已脱敏）' : '未配置');
+}
+
+function getChannelGuardState(config: ChannelConfig) {
+  const webhookReady = config.webhookUrlConfigured === true;
+  const typeReady = TESTABLE_CHANNEL_TYPES.has(config.channelType);
+  const canTest = config.enabled === 1 && webhookReady && typeReady;
+
+  if (!typeReady) {
+    return { canTest, tone: 'muted', text: '待接入测试通道' };
+  }
+  if (!webhookReady) {
+    return { canTest, tone: 'danger', text: '缺少 Webhook' };
+  }
+  if (config.enabled !== 1) {
+    return { canTest, tone: 'muted', text: '停用中' };
+  }
+  return { canTest, tone: 'ready', text: '可测试' };
+}
 
 function ChannelFormDialog({
   open, config, submitting, onClose, onSubmit,
@@ -54,8 +110,8 @@ function ChannelFormDialog({
         setForm({
           channelType: config.channelType,
           configName: config.configName,
-          webhookUrl: config.webhookUrl,
-          secret: config.secret || '',
+          webhookUrl: '',
+          secret: '',
           enabled: config.enabled,
           description: config.description || '',
         });
@@ -72,8 +128,12 @@ function ChannelFormDialog({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.configName.trim() || !form.webhookUrl.trim()) {
-      toast.error('配置名称和 Webhook URL 为必填项');
+    if (!form.configName.trim()) {
+      toast.error('请填写配置名称');
+      return;
+    }
+    if (!config && !form.webhookUrl.trim()) {
+      toast.error('新增渠道必须填写 Webhook URL');
       return;
     }
     onSubmit(form);
@@ -87,7 +147,7 @@ function ChannelFormDialog({
           {config ? '编辑通知渠道' : '新增通知渠道'}
         </h3>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="flex flex-col gap-1.5">
               <label className="text-sm font-medium text-[#374151]">渠道类型 *</label>
               <select
@@ -111,20 +171,21 @@ function ChannelFormDialog({
           </div>
 
           <Input
-            label="Webhook URL *"
-            placeholder="https://oapi.dingtalk.com/robot/send?access_token=..."
+            label={config ? 'Webhook URL（留空保持原地址）' : 'Webhook URL *'}
+            placeholder={config ? '需要替换地址时再填写新 Webhook URL' : '粘贴机器人 Webhook URL'}
             value={form.webhookUrl}
             onChange={e => set('webhookUrl', e.target.value)}
-            required
+            required={!config}
+            hint={config ? `当前地址：${getWebhookDisplay(config)}` : '保存后列表仅显示脱敏地址'}
           />
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Input
-              label="签名密钥（Secret）"
-              placeholder="钉钉签名模式需要填写"
+              label="签名密钥"
+              placeholder={config ? '留空保持原密钥，仅轮换时填写' : '钉钉签名模式需要填写'}
               value={form.secret || ''}
               onChange={e => set('secret', e.target.value)}
-              hint="钉钉签名模式需要填写，企业微信不需要"
+              hint={config ? '留空保持原密钥，仅轮换时填写' : '钉钉签名模式需要填写，企业微信不需要'}
             />
             <div className="flex flex-col gap-1.5">
               <label className="text-sm font-medium text-[#374151]">状态</label>
@@ -145,6 +206,10 @@ function ChannelFormDialog({
             value={form.description || ''}
             onChange={e => set('description', e.target.value)}
           />
+
+          <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs leading-5 text-amber-800">
+            维护提示：新增或改动后先发送测试消息再启用；列表只展示脱敏 Webhook；签名密钥仅用于授权维护，不要在工单、截图或聊天中共享。
+          </div>
 
           <div className="flex justify-end gap-3 pt-2">
             <Button type="button" variant="secondary" onClick={onClose} disabled={submitting}>
@@ -200,6 +265,7 @@ export default function NotificationChannelTab() {
   const [channelType, setChannelType] = useState('');
   const [keyword, setKeyword] = useState('');
   const [searchInput, setSearchInput] = useState('');
+  const [testingChannelTypes, setTestingChannelTypes] = useState<string[]>([]);
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingConfig, setEditingConfig] = useState<ChannelConfig | null>(null);
@@ -213,17 +279,36 @@ export default function NotificationChannelTab() {
     keyword: keyword || undefined,
   };
 
-  const { data, isLoading, isFetching } = useQuery({
+  const { data, isLoading, isFetching, isError, error, refetch } = useQuery({
     queryKey: ['channel-configs', queryParams],
     queryFn: async () => {
       const res = await channelConfigApi.list(queryParams);
       return res as unknown as PageResponse<ChannelConfig>;
     },
+    retry: false,
   });
 
   const records = data?.records ?? [];
   const total = data?.total ?? 0;
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const enabledRecords = records.filter(record => record.enabled === 1);
+  const disabledCount = records.length - enabledRecords.length;
+  const readyRecords = records.filter(record => getChannelGuardState(record).canTest);
+  const missingWebhookCount = records.filter(record => record.webhookUrlConfigured !== true).length;
+  const unsupportedTypeCount = records.filter(record => !TESTABLE_CHANNEL_TYPES.has(record.channelType)).length;
+  const enabledChannelTypes = Array.from(new Set(readyRecords.map(record => record.channelType)));
+  const coveredChannelTypes = Array.from(new Set(records.map(record => record.channelType)));
+  const coveredChannelText = coveredChannelTypes.length
+    ? coveredChannelTypes.map(type => CHANNEL_TYPE_LABELS[type] || type).join('、')
+    : '无';
+  const testingChannelText = testingChannelTypes
+    .map(type => CHANNEL_TYPE_LABELS[type] || type)
+    .join('、');
+  const hasActiveFilters = Boolean(keyword || channelType);
+  const selectedTypeLabel = channelType ? (CHANNEL_TYPE_LABELS[channelType] || channelType) : '';
+  const emptyStateText = hasActiveFilters
+    ? `当前搜索${keyword ? `「${keyword}」` : ''}${selectedTypeLabel ? `、类型「${selectedTypeLabel}」` : ''}下没有通知渠道记录。`
+    : '暂无通知渠道配置，请先新增渠道并完成测试后再启用。';
 
   const createMut = useMutation({
     mutationFn: (data: CreateChannelConfigRequest) => channelConfigApi.create(data),
@@ -261,11 +346,18 @@ export default function NotificationChannelTab() {
 
   const testMut = useMutation({
     mutationFn: (channelType: string) => channelConfigApi.test(channelType),
-    onSuccess: (res: any) => {
-      const msg = (res as unknown as string) || '测试消息发送成功';
-      toast.success(msg);
+    onMutate: (channelType: string) => {
+      setTestingChannelTypes(prev => (prev.includes(channelType) ? prev : [...prev, channelType]));
     },
-    onError: (err: any) => toast.error(err?.message || '测试发送失败'),
+    onSuccess: (res: any, channelType: string) => {
+      const msg = (res as unknown as string) || '测试消息发送成功';
+      toast.success(`${CHANNEL_TYPE_LABELS[channelType] || channelType}：${msg}`);
+    },
+    onError: (err: any, channelType: string) =>
+      toast.error(`${CHANNEL_TYPE_LABELS[channelType] || channelType}：${err?.message || '测试发送失败'}`),
+    onSettled: (_res, _err, channelType: string) => {
+      setTestingChannelTypes(prev => prev.filter(type => type !== channelType));
+    },
   });
 
   const handleSearch = () => {
@@ -274,10 +366,11 @@ export default function NotificationChannelTab() {
   };
 
   const handleSubmit = (data: CreateChannelConfigRequest | UpdateChannelConfigRequest) => {
+    const payload = buildChannelConfigPayload(data);
     if (editingConfig) {
-      updateMut.mutate({ id: editingConfig.id, data: data as UpdateChannelConfigRequest });
+      updateMut.mutate({ id: editingConfig.id, data: payload as UpdateChannelConfigRequest });
     } else {
-      createMut.mutate(data as CreateChannelConfigRequest);
+      createMut.mutate(payload as CreateChannelConfigRequest);
     }
   };
 
@@ -286,7 +379,16 @@ export default function NotificationChannelTab() {
   };
 
   const handleTest = (channelType: string) => {
+    if (testingChannelTypes.includes(channelType)) return;
     testMut.mutate(channelType);
+  };
+
+  const handleTestAll = () => {
+    if (enabledChannelTypes.length === 0) {
+      toast.info('当前页没有可测试的启用渠道');
+      return;
+    }
+    enabledChannelTypes.forEach(type => handleTest(type));
   };
 
   const submitting = createMut.isPending || updateMut.isPending;
@@ -304,20 +406,28 @@ export default function NotificationChannelTab() {
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>通知渠道配置</CardTitle>
-        <div className="flex items-center gap-2">
+      <CardHeader className="flex-wrap items-start bg-[linear-gradient(120deg,#ffffff_0%,#f8fafc_52%,#eef6ff_100%)]">
+        <div className="min-w-0">
+          <CardTitle className="flex items-center gap-2">
+            <Activity className="h-4 w-4 text-[#2563eb]" />
+            通知渠道连接台
+          </CardTitle>
+          <div className="mt-2 flex flex-wrap gap-2 text-xs">
+            <span className="rounded-full bg-[#ecfeff] px-2 py-0.5 font-medium text-[#0e7490]">真实测试端点</span>
+            <span className="rounded-full bg-[#f0fdf4] px-2 py-0.5 font-medium text-[#15803d]">Webhook 脱敏</span>
+            <span className="rounded-full bg-[#fff7ed] px-2 py-0.5 font-medium text-[#c2410c]">编辑留空不轮换</span>
+          </div>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
           <Button
             variant="outline"
             size="sm"
-            onClick={() => {
-              const types = ['DINGTALK', 'WECHAT'];
-              types.forEach(t => handleTest(t));
-            }}
-            disabled={testMut.isPending}
+            onClick={handleTestAll}
+            disabled={testingChannelTypes.length > 0 || enabledChannelTypes.length === 0}
+            title={enabledChannelTypes.length === 0 ? '当前页没有可测试的启用渠道' : '测试当前页可测试渠道'}
           >
             <Play className="w-4 h-4" />
-            测试所有渠道
+            测试可用渠道
           </Button>
           <Button variant="primary" size="sm" onClick={() => { setEditingConfig(null); setDialogOpen(true); }}>
             <Plus className="w-4 h-4" />
@@ -325,7 +435,66 @@ export default function NotificationChannelTab() {
           </Button>
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-4">
+        <div className="border-l-4 border-[#2563eb] bg-[#f8fbff] px-4 py-3">
+          <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+            <div>
+              <div className="text-xs font-semibold uppercase text-[#1d4ed8]">后端契约</div>
+              <div className="mt-2 flex flex-wrap gap-2 text-xs">
+                <code className="rounded-md border border-[#bfdbfe] bg-white px-2 py-1 font-mono text-[#1e3a8a]">
+                  GET /system/channel-configs
+                </code>
+                <code className="rounded-md border border-[#bfdbfe] bg-white px-2 py-1 font-mono text-[#1e3a8a]">
+                  POST /system/channel-configs/:type/test
+                </code>
+              </div>
+            </div>
+            <div className="text-sm leading-6 text-[#475569]">
+              当前页面只展示脱敏后的 Webhook 地址；钉钉和企业微信支持按渠道类型测试，点击测试会发送到该类型全部已启用配置。
+            </div>
+          </div>
+        </div>
+
+        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+          {[
+            { label: '筛选总数', value: total, hint: '全部匹配', icon: Activity, tone: 'text-[#2563eb]' },
+            { label: '可测类型', value: enabledChannelTypes.length, hint: '按类型去重', icon: CheckCircle2, tone: 'text-emerald-600' },
+            { label: '缺少地址', value: missingWebhookCount, hint: '需补齐 Webhook', icon: Link2, tone: 'text-amber-600' },
+            { label: '待接入测试', value: unsupportedTypeCount, hint: '后端未开放', icon: ShieldCheck, tone: 'text-[#7c3aed]' },
+          ].map(item => {
+            const Icon = item.icon;
+            return (
+              <div key={item.label} className="rounded-lg border border-[#e2e8f0] bg-white px-4 py-3">
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-xs font-medium text-[#64748b]">{item.label}</span>
+                  <Icon className={`h-4 w-4 ${item.tone}`} />
+                </div>
+                <div className="mt-2 text-2xl font-semibold tabular-nums text-[#0f172a]">{item.value}</div>
+                <div className="mt-1 text-xs text-[#94a3b8]">{item.hint}</div>
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="rounded-lg border border-[#e2e8f0] bg-[#f8fafc] px-4 py-3">
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm">
+            <span className="font-medium text-[#0f172a]">当前页操作预检</span>
+            <span className="text-[#64748b]">本页 <b className="text-[#0f172a]">{records.length}</b></span>
+            <span className="text-[#64748b]">启用 <b className="text-emerald-700">{enabledRecords.length}</b></span>
+            <span className="text-[#64748b]">停用 <b className="text-slate-500">{disabledCount}</b></span>
+            <span className="min-w-0 text-[#64748b]">
+              类型覆盖 <b className="text-[#0f172a]">{coveredChannelTypes.length}</b>
+              <span className="ml-1 break-words">（{coveredChannelText}）</span>
+            </span>
+          </div>
+          <p className="mt-2 text-xs text-[#64748b]">
+            {enabledChannelTypes.length > 0
+              ? `批量测试将按类型发送，覆盖当前页可测试的 ${enabledChannelTypes.length} 类渠道；每类会触发后端全部已启用配置。`
+              : '当前页没有可测试的启用渠道，需先补齐地址、启用配置并确认测试通道已接入。'}
+            {testingChannelText ? ` 正在测试：${testingChannelText}。` : ''}
+          </p>
+        </div>
+
         <div className="flex items-center gap-3 mb-4 flex-wrap">
           <div className="relative flex-1 min-w-[180px] max-w-xs">
             <input
@@ -349,7 +518,7 @@ export default function NotificationChannelTab() {
             ))}
           </select>
           <Button variant="outline" size="md" onClick={handleSearch}>搜索</Button>
-          <Button variant="outline" size="md" onClick={() => qc.invalidateQueries({ queryKey: ['channel-configs'] })} disabled={isFetching}>
+          <Button variant="outline" size="md" onClick={() => refetch()} disabled={isFetching}>
             <RefreshCw className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} />
             刷新
           </Button>
@@ -362,10 +531,30 @@ export default function NotificationChannelTab() {
           </div>
         )}
 
-        {!isLoading && (
+        {!isLoading && isError && (
+          <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-6 text-center">
+            <p className="text-sm font-medium text-red-700">通知渠道配置加载失败</p>
+            <p className="mt-1 text-xs text-red-600">
+              {(error as Error)?.message || '请稍后重试或联系管理员。'}
+            </p>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => refetch()}
+              disabled={isFetching}
+              className="mt-3"
+            >
+              <RefreshCw className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} />
+              重试
+            </Button>
+          </div>
+        )}
+
+        {!isLoading && !isError && (
           <>
             {records.length === 0 ? (
-              <div className="py-12 text-center text-[#94a3b8] text-sm">暂无通知渠道配置</div>
+              <div className="py-12 text-center text-[#64748b] text-sm">{emptyStateText}</div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
@@ -374,54 +563,88 @@ export default function NotificationChannelTab() {
                       <th className="px-4 py-3 text-left text-xs font-medium text-[#94a3b8] uppercase">类型</th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-[#94a3b8] uppercase">名称</th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-[#94a3b8] uppercase">Webhook</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-[#94a3b8] uppercase">门禁</th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-[#94a3b8] uppercase">状态</th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-[#94a3b8] uppercase">操作</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[#f1f5f9]">
-                    {records.map(c => (
-                      <tr key={c.id} className="hover:bg-[#f8fafc]">
-                        <td className="px-4 py-3">
-                          <span className={`px-2 py-0.5 text-xs rounded-full ${TYPE_BADGE[c.channelType] ?? 'bg-gray-100 text-gray-700'}`}>
-                            {CHANNEL_TYPE_LABELS[c.channelType] || c.channelType}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3 font-medium text-[#0f172a]">{c.configName}</td>
-                        <td className="px-4 py-3">
-                          <span className="text-xs text-[#64748b] font-mono truncate max-w-[200px] inline-block align-middle">
-                            {c.webhookUrl}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3">
-                          <span className={`px-2 py-0.5 text-xs rounded-full ${STATUS_BADGE[c.enabled] ?? STATUS_BADGE[0]}`}>
-                            {c.enabled === 1 ? '启用' : '停用'}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3">
-                          <button
-                            onClick={() => { setEditingConfig(c); setDialogOpen(true); }}
-                            className="p-1.5 rounded text-[#64748b] hover:bg-[#f1f5f9] hover:text-[#3b82f6] transition-colors mr-1"
-                            title="编辑"
-                          >
-                            <Pencil className="w-3.5 h-3.5" />
-                          </button>
-                          <button
-                            onClick={() => handleTest(c.channelType)}
-                            className="p-1.5 rounded text-[#64748b] hover:bg-[#f1f5f9] hover:text-[#16a34a] transition-colors mr-1"
-                            title="发送测试"
-                          >
-                            <Send className="w-3.5 h-3.5" />
-                          </button>
-                          <button
-                            onClick={() => { setDeletingConfig(c); setDeleteDialogOpen(true); }}
-                            className="p-1.5 rounded text-[#64748b] hover:bg-red-50 hover:text-red-600 transition-colors"
-                            title="删除"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
+                    {records.map(c => {
+                      const isTestingThisType = testingChannelTypes.includes(c.channelType);
+                      const channelLabel = CHANNEL_TYPE_LABELS[c.channelType] || c.channelType;
+                      const guard = getChannelGuardState(c);
+                      const webhookDisplay = getWebhookDisplay(c);
+                      const guardClass = guard.tone === 'ready'
+                        ? 'bg-emerald-50 text-emerald-700'
+                        : guard.tone === 'danger'
+                          ? 'bg-red-50 text-red-700'
+                          : 'bg-slate-100 text-slate-600';
+                      return (
+                        <tr key={c.id} className="hover:bg-[#f8fafc]">
+                          <td className="px-4 py-3">
+                            <span className={`px-2 py-0.5 text-xs rounded-full ${TYPE_BADGE[c.channelType] ?? 'bg-gray-100 text-gray-700'}`}>
+                              {channelLabel}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 font-medium text-[#0f172a]">{c.configName}</td>
+                          <td className="px-4 py-3">
+                            <div className="min-w-[180px] max-w-[260px]">
+                              <div className="truncate rounded-md bg-[#f8fafc] px-2 py-1 font-mono text-xs text-[#475569]" title={webhookDisplay}>
+                                {webhookDisplay}
+                              </div>
+                              <div className="mt-1 flex flex-wrap gap-1.5 text-[11px]">
+                                <span className={`rounded-full px-1.5 py-0.5 ${c.webhookUrlConfigured ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}`}>
+                                  {c.webhookUrlConfigured ? '地址已配置' : '地址缺失'}
+                                </span>
+                                <span className={`rounded-full px-1.5 py-0.5 ${c.signatureConfigured ? 'bg-[#eef2ff] text-[#4338ca]' : 'bg-slate-100 text-slate-500'}`}>
+                                  {c.signatureConfigured ? '签名已配置' : '无签名'}
+                                </span>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-4 py-3">
+                            <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs ${guardClass}`}>
+                              {guard.tone === 'danger' ? <AlertTriangle className="h-3 w-3" /> : <ShieldCheck className="h-3 w-3" />}
+                              {guard.text}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3">
+                            <span className={`px-2 py-0.5 text-xs rounded-full ${STATUS_BADGE[c.enabled] ?? STATUS_BADGE[0]}`}>
+                              {c.enabled === 1 ? '启用' : '停用'}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3">
+                            <button
+                              onClick={() => { setEditingConfig(c); setDialogOpen(true); }}
+                              className="p-1.5 rounded text-[#64748b] hover:bg-[#f1f5f9] hover:text-[#3b82f6] transition-colors mr-1"
+                              title="编辑"
+                            >
+                              <Pencil className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              onClick={() => handleTest(c.channelType)}
+                              disabled={isTestingThisType || !guard.canTest}
+                              className="inline-flex h-7 min-w-[76px] items-center justify-center gap-1.5 rounded px-2 text-xs text-[#64748b] hover:bg-[#f1f5f9] hover:text-[#16a34a] transition-colors mr-1 disabled:cursor-not-allowed disabled:text-[#94a3b8]"
+                              title={guard.canTest ? `测试全部已启用的${channelLabel}渠道` : guard.text}
+                            >
+                              {isTestingThisType ? (
+                                <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                              ) : (
+                                <Send className="w-3.5 h-3.5" />
+                              )}
+                              {isTestingThisType ? '测试中' : '测类型'}
+                            </button>
+                            <button
+                              onClick={() => { setDeletingConfig(c); setDeleteDialogOpen(true); }}
+                              className="p-1.5 rounded text-[#64748b] hover:bg-red-50 hover:text-red-600 transition-colors"
+                              title="删除"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>

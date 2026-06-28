@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>流程设计器</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<style data-purpose="custom-utilities">
+    @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      overflow: hidden; /* No document scroll */
+    }
+
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background-color: #cbd5e1;
+      border-radius: 3px;
+    }
+
+    /* Swimlane specific backgrounds */
+    .canvas-dot-bg {
+      background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
+      background-size: 20px 20px;
+    }
+
+    /* Selection handles */
+    .resize-handle {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      background: white;
+      border: 1px solid #3b82f6;
+      border-radius: 50%;
+    }
+
+    /* specific layout fixing */
+    .app-container {
+      width: 1568px;
+      height: 1003px;
+      position: relative;
+      background-color: #f3f4f6; /* Gray background for areas outside main layout if any */
+      overflow: hidden;
+    }
+    
+    .switch-toggle-on {
+      background-color: #2563eb;
+    }
+    .switch-toggle-off {
+      background-color: #d1d5db;
+    }
+  </style>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'nav-dark': '#1e293b',
+            'nav-darker': '#0f172a',
+            'nav-active': '#1e3a8a',
+            'app-bg': '#f8fafc',
+            'border-light': '#e2e8f0',
+            'text-main': '#334155',
+            'text-muted': '#64748b',
+            'primary-blue': '#2563eb',
+            'success-green': '#10b981',
+          },
+          fontSize: {
+            'xxs': '0.65rem',
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen m-0">
+<!-- BEGIN: AppContainer -->
+<div class="app-container flex flex-col bg-app-bg border border-gray-300 shadow-xl overflow-hidden text-[13px] text-text-main">
+<!-- BEGIN: TopHeader -->
+<header class="h-[56px] bg-[#001529] flex items-center px-4 text-white shrink-0 justify-between">
+<div class="flex items-center">
+<!-- Logo Icon Placeholder -->
+<div class="w-8 h-8 bg-blue-600 rounded flex items-center justify-center mr-3">
+<i class="fa-solid fa-cube text-white"></i>
+</div>
+<span class="text-lg font-semibold tracking-wider">固定资产管理系统</span>
+<nav class="ml-10 flex h-full">
+<a class="px-4 flex items-center h-full text-gray-300 hover:text-white hover:bg-gray-800 transition-colors" href="#">
+<i class="fa-solid fa-chart-pie mr-2 text-gray-400"></i> 资产运营总览
+          </a>
+<a class="px-4 flex items-center h-full text-gray-300 hover:text-white hover:bg-gray-800 transition-colors" href="#">
+<i class="fa-solid fa-desktop mr-2 text-gray-400"></i> 数据监控中心
+          </a>
+<a class="px-4 flex items-center h-full text-gray-300 hover:text-white hover:bg-gray-800 transition-colors" href="#">
+<i class="fa-solid fa-wrench mr-2 text-gray-400"></i> 资产运维中心
+          </a>
+<a class="px-4 flex items-center h-full text-gray-300 hover:text-white hover:bg-gray-800 transition-colors" href="#">
+<i class="fa-solid fa-shield-halved mr-2 text-gray-400"></i> 风险预警中心
+          </a>
+<a class="px-4 flex items-center h-full bg-[#1890ff] text-white" href="#">
+<i class="fa-solid fa-gear mr-2 text-white"></i> 系统运营中枢
+          </a>
+</nav>
+</div>
+<div class="flex items-center space-x-5 pr-2">
+<i class="fa-solid fa-magnifying-glass cursor-pointer text-gray-300 hover:text-white"></i>
+<i class="fa-regular fa-bell cursor-pointer text-gray-300 hover:text-white"></i>
+<i class="fa-regular fa-circle-question cursor-pointer text-gray-300 hover:text-white"></i>
+<i class="fa-regular fa-circle-user cursor-pointer text-gray-300 hover:text-white text-lg"></i>
+</div>
+</header>
+<!-- END: TopHeader -->
+<div class="flex flex-1 overflow-hidden">
+<!-- BEGIN: LeftSidebar -->
+<aside class="w-[174px] bg-[#001529] flex flex-col shrink-0 custom-scrollbar overflow-y-auto">
+<div class="flex items-center justify-center h-10 border-b border-gray-700 text-gray-400 cursor-pointer hover:text-white">
+<i class="fa-solid fa-bars"></i>
+</div>
+<nav class="flex-1 py-2 text-[13px]">
+<!-- Menu Group 1 -->
+<div class="mb-1">
+<div class="flex items-center px-4 py-2.5 text-gray-300 cursor-pointer hover:text-white">
+<i class="fa-solid fa-gear w-6 text-center"></i>
+<span class="flex-1">系统设置</span>
+<i class="fa-solid fa-angle-down text-xs"></i>
+</div>
+<div class="pl-10 py-1 text-gray-400">
+<div class="py-2 cursor-pointer hover:text-white">组织架构</div>
+<div class="py-2 cursor-pointer hover:text-white">权限管理</div>
+<div class="py-2 cursor-pointer hover:text-white">字典管理</div>
+<div class="py-2 cursor-pointer hover:text-white">编码规则</div>
+<div class="py-2 cursor-pointer hover:text-white">系统配置</div>
+</div>
+</div>
+<!-- Menu Group 2 (Active) -->
+<div class="mb-1">
+<div class="flex items-center px-4 py-2.5 text-white cursor-pointer">
+<i class="fa-solid fa-sitemap w-6 text-center"></i>
+<span class="flex-1">流程平台</span>
+<i class="fa-solid fa-angle-up text-xs"></i>
+</div>
+<div class="py-1 text-gray-400 font-medium">
+<div class="py-2.5 pl-10 cursor-pointer bg-[#1890ff] text-white">流程设计器</div>
+<div class="py-2.5 pl-10 cursor-pointer hover:text-white flex items-center"><i class="fa-regular fa-calendar-days w-5 mr-1 text-center"></i>流程管理</div>
+<div class="py-2.5 pl-10 cursor-pointer hover:text-white flex items-center"><i class="fa-solid fa-list-check w-5 mr-1 text-center"></i>流程实例</div>
+<div class="py-2.5 pl-10 cursor-pointer hover:text-white flex items-center"><i class="fa-regular fa-clipboard w-5 mr-1 text-center"></i>任务管理</div>
+<div class="py-2.5 pl-10 cursor-pointer hover:text-white flex items-center"><i class="fa-regular fa-file-lines w-5 mr-1 text-center"></i>表单管理</div>
+<div class="py-2.5 pl-10 cursor-pointer hover:text-white flex items-center"><i class="fa-regular fa-circle-play w-5 mr-1 text-center"></i>流程监控</div>
+</div>
+</div>
+<!-- Other Menu Groups -->
+<div class="flex items-center px-4 py-2.5 text-gray-300 cursor-pointer hover:text-white mt-1">
+<i class="fa-solid fa-cubes w-6 text-center"></i>
+<span class="flex-1">集成平台</span>
+<i class="fa-solid fa-angle-down text-xs"></i>
+</div>
+<div class="flex items-center px-4 py-2.5 text-gray-300 cursor-pointer hover:text-white">
+<i class="fa-regular fa-message w-6 text-center"></i>
+<span class="flex-1">消息平台</span>
+<i class="fa-solid fa-angle-down text-xs"></i>
+</div>
+<div class="flex items-center px-4 py-2.5 text-gray-300 cursor-pointer hover:text-white">
+<i class="fa-solid fa-file-shield w-6 text-center"></i>
+<span class="flex-1">日志审计</span>
+</div>
+<div class="flex items-center px-4 py-2.5 text-gray-300 cursor-pointer hover:text-white">
+<i class="fa-solid fa-wrench w-6 text-center"></i>
+<span class="flex-1">系统工具</span>
+<i class="fa-solid fa-angle-down text-xs"></i>
+</div>
+</nav>
+</aside>
+<!-- END: LeftSidebar -->
+<!-- BEGIN: MainContent -->
+<main class="flex-1 flex flex-col bg-white overflow-hidden relative">
+<!-- Page Title -->
+<div class="h-[47px] border-b border-border-light flex items-center px-6 shrink-0 text-base font-medium text-gray-800">
+          流程设计器
+        </div>
+<!-- Toolbar -->
+<div class="h-[65px] border-b border-border-light flex items-center px-6 shrink-0 justify-between bg-white">
+<div class="flex items-center space-x-3">
+<div class="flex rounded-md shadow-sm">
+<button class="bg-primary-blue text-white px-4 py-1.5 rounded-l-md border border-primary-blue hover:bg-blue-700 focus:outline-none flex items-center">
+                新建流程图
+              </button>
+<button class="bg-primary-blue text-white px-2 py-1.5 rounded-r-md border border-l-0 border-blue-700 hover:bg-blue-700 focus:outline-none">
+<i class="fa-solid fa-angle-down"></i>
+</button>
+</div>
+<button class="bg-white border border-gray-300 text-gray-700 px-4 py-1.5 rounded-md hover:bg-gray-50 focus:outline-none flex items-center">
+<i class="fa-regular fa-floppy-disk text-primary-blue mr-2"></i> 保存草稿
+            </button>
+<button class="bg-white border border-gray-300 text-gray-700 px-4 py-1.5 rounded-md hover:bg-gray-50 focus:outline-none flex items-center">
+<i class="fa-regular fa-circle-check text-blue-500 mr-2"></i> 提交校验
+            </button>
+<button class="bg-white border border-gray-300 text-gray-700 px-4 py-1.5 rounded-md hover:bg-gray-50 focus:outline-none flex items-center">
+<i class="fa-regular fa-paper-plane text-blue-500 mr-2"></i> 发布流程
+            </button>
+</div>
+<div class="flex items-center space-x-4">
+<div class="flex border border-gray-300 rounded-md bg-white">
+<button class="px-3 py-1.5 text-gray-400 hover:text-gray-600 border-r border-gray-300 disabled"><i class="fa-solid fa-rotate-left"></i></button>
+<button class="px-3 py-1.5 text-gray-600 hover:text-gray-800"><i class="fa-solid fa-rotate-right"></i></button>
+</div>
+<div class="flex border border-gray-300 rounded-md bg-white items-center">
+<button class="px-3 py-1.5 text-gray-500 hover:text-gray-700 border-r border-gray-300"><i class="fa-solid fa-minus"></i></button>
+<div class="px-3 py-1.5 text-gray-700 flex items-center cursor-pointer w-[70px] justify-center">100% <i class="fa-solid fa-angle-down ml-1 text-xs text-gray-400"></i></div>
+<button class="px-3 py-1.5 text-gray-500 hover:text-gray-700 border-l border-gray-300"><i class="fa-solid fa-plus"></i></button>
+</div>
+<button class="bg-white border border-gray-300 text-gray-700 px-4 py-1.5 rounded-md hover:bg-gray-50 focus:outline-none flex items-center">
+<i class="fa-solid fa-sitemap mr-2 text-gray-500"></i> 自动布局
+            </button>
+<button class="text-gray-500 hover:text-gray-700 px-2">
+<i class="fa-solid fa-ellipsis"></i>
+</button>
+</div>
+</div>
+<!-- Status Strip -->
+<div class="px-6 py-3 shrink-0 bg-white">
+<div class="bg-[#f6ffed] border border-[#b7eb8f] rounded px-4 py-2 flex items-center justify-between">
+<div class="flex items-center text-[#52c41a]">
+<i class="fa-solid fa-circle-check mr-2"></i>
+<span class="text-[13px]">流程图草稿已创建，节点配置已保存</span>
+</div>
+<i class="fa-solid fa-xmark text-gray-400 cursor-pointer hover:text-gray-600"></i>
+</div>
+</div>
+<!-- Designer Workspace & Panel -->
+<div class="flex-1 flex border-t border-border-light relative overflow-hidden">
+<!-- Left Node Library -->
+<div class="w-[220px] shrink-0 border-r border-border-light bg-white flex flex-col">
+<div class="h-10 border-b border-border-light flex items-center justify-between px-4 text-gray-700 font-medium bg-gray-50/50">
+<span>节点库</span>
+<i class="fa-solid fa-angles-left text-gray-400 text-xs cursor-pointer"></i>
+</div>
+<div class="p-3 flex-1 overflow-y-auto custom-scrollbar space-y-2">
+<div class="border border-gray-200 rounded-md p-2.5 flex items-center bg-white hover:border-blue-400 cursor-grab shadow-sm">
+<div class="w-7 h-7 rounded-full border border-green-500 flex items-center justify-center mr-3 bg-green-50">
+<i class="fa-solid fa-play text-green-500 text-xs"></i>
+</div>
+<span class="flex-1 text-gray-700">开始节点</span>
+<i class="fa-solid fa-grip-vertical text-gray-300"></i>
+</div>
+<div class="border border-gray-200 rounded-md p-2.5 flex items-center bg-white hover:border-blue-400 cursor-grab shadow-sm">
+<div class="w-7 h-7 rounded flex items-center justify-center mr-3 bg-blue-50 text-blue-500 border border-blue-200">
+<i class="fa-regular fa-user"></i>
+</div>
+<span class="flex-1 text-gray-700">审批节点</span>
+<i class="fa-solid fa-grip-vertical text-gray-300"></i>
+</div>
+<div class="border border-gray-200 rounded-md p-2.5 flex items-center bg-white hover:border-blue-400 cursor-grab shadow-sm">
+<div class="w-7 h-7 flex items-center justify-center mr-3 text-orange-400">
+<svg fill="none" height="24" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="24"><polygon points="12 2 22 12 12 22 2 12 12 2"></polygon></svg>
+</div>
+<span class="flex-1 text-gray-700">条件分支</span>
+<i class="fa-solid fa-grip-vertical text-gray-300"></i>
+</div>
+<div class="border border-gray-200 rounded-md p-2.5 flex items-center bg-white hover:border-blue-400 cursor-grab shadow-sm">
+<div class="w-7 h-7 rounded flex items-center justify-center mr-3 bg-purple-50 text-purple-500 border border-purple-200">
+<i class="fa-solid fa-cloud-arrow-up"></i>
+</div>
+<span class="flex-1 text-gray-700">ERP推送</span>
+<i class="fa-solid fa-grip-vertical text-gray-300"></i>
+</div>
+<div class="border border-gray-200 rounded-md p-2.5 flex items-center bg-white hover:border-blue-400 cursor-grab shadow-sm">
+<div class="w-7 h-7 rounded flex items-center justify-center mr-3 bg-teal-50 text-teal-500 border border-teal-200">
+<i class="fa-solid fa-users"></i>
+</div>
+<span class="flex-1 text-gray-700">EHR同步</span>
+<i class="fa-solid fa-grip-vertical text-gray-300"></i>
+</div>
+<div class="border border-gray-200 rounded-md p-2.5 flex items-center bg-white hover:border-blue-400 cursor-grab shadow-sm">
+<div class="w-7 h-7 rounded flex items-center justify-center mr-3 bg-blue-50 text-blue-500 border border-blue-200">
+<i class="fa-solid fa-box-archive"></i>
+</div>
+<span class="flex-1 text-gray-700">归档节点</span>
+<i class="fa-solid fa-grip-vertical text-gray-300"></i>
+</div>
+<div class="border border-gray-200 rounded-md p-2.5 flex items-center bg-white hover:border-blue-400 cursor-grab shadow-sm">
+<div class="w-7 h-7 rounded flex items-center justify-center mr-3 bg-orange-50 text-orange-400 border border-orange-200">
+<i class="fa-regular fa-bell"></i>
+</div>
+<span class="flex-1 text-gray-700">通知节点</span>
+<i class="fa-solid fa-grip-vertical text-gray-300"></i>
+</div>
+</div>
+<div class="p-3 text-xs text-gray-400 border-t border-border-light bg-gray-50/30">
+              拖拽节点到画布中进行设计
+            </div>
+</div>
+<!-- Center Canvas -->
+<div class="flex-1 relative overflow-hidden bg-white canvas-dot-bg flex flex-col">
+<!-- Fullscreen icon -->
+<div class="absolute top-3 right-3 w-8 h-8 bg-white border border-gray-200 rounded flex items-center justify-center cursor-pointer hover:bg-gray-50 shadow-sm z-10 text-gray-500">
+<i class="fa-solid fa-expand"></i>
+</div>
+<!-- Swimlanes Container -->
+<div class="flex-1 overflow-auto p-6 relative custom-scrollbar">
+<!-- Grid background lines for swimlanes -->
+<div class="absolute inset-0 pt-6 px-6 pointer-events-none z-0">
+<div class="border-t border-l border-r border-gray-200 h-full flex flex-col">
+<div class="flex-1 border-b border-gray-200 flex">
+<div class="w-[120px] border-r border-gray-200 flex items-center justify-center bg-gray-50/50 font-medium text-gray-700">发起人</div>
+<div class="flex-1"></div>
+</div>
+<div class="flex-1 border-b border-gray-200 flex">
+<div class="w-[120px] border-r border-gray-200 flex items-center justify-center bg-gray-50/50 font-medium text-gray-700">CIP专员</div>
+<div class="flex-1"></div>
+</div>
+<div class="flex-1 border-b border-gray-200 flex">
+<div class="w-[120px] border-r border-gray-200 flex items-center justify-center bg-gray-50/50 font-medium text-gray-700">资产会计</div>
+<div class="flex-1"></div>
+</div>
+<div class="flex-1 border-b border-gray-200 flex">
+<div class="w-[120px] border-r border-gray-200 flex items-center justify-center bg-gray-50/50 font-medium text-gray-700">系统集成</div>
+<div class="flex-1"></div>
+</div>
+<div class="flex-1 border-b border-gray-200 flex">
+<div class="w-[120px] border-r border-gray-200 flex items-center justify-center bg-gray-50/50 font-medium text-gray-700">归档与结束</div>
+<div class="flex-1"></div>
+</div>
+</div>
+</div>
+<!-- Nodes & Connections Layer -->
+<div class="relative w-full h-full z-10 pl-[120px]">
+<!-- SVG Connections -->
+<svg class="absolute inset-0 w-full h-full pointer-events-none" style="min-width: 800px; min-height: 600px;">
+<defs>
+<marker id="arrowhead" markerheight="7" markerwidth="10" orient="auto" refx="9" refy="3.5">
+<polygon fill="#94a3b8" points="0 0, 10 3.5, 0 7"></polygon>
+</marker>
+<marker id="arrowhead-selected" markerheight="7" markerwidth="10" orient="auto" refx="9" refy="3.5">
+<polygon fill="#3b82f6" points="0 0, 10 3.5, 0 7"></polygon>
+</marker>
+</defs>
+<!-- Connectors -->
+<line marker-end="url(#arrowhead)" stroke="#94a3b8" stroke-width="1.5" x1="220" x2="220" y1="55" y2="85"></line>
+<line marker-end="url(#arrowhead)" stroke="#94a3b8" stroke-width="1.5" x1="220" x2="220" y1="125" y2="155"></line>
+<line marker-end="url(#arrowhead-selected)" stroke="#3b82f6" stroke-width="1.5" x1="220" x2="220" y1="195" y2="225"></line> <!-- selected connection -->
+<line marker-end="url(#arrowhead)" stroke="#94a3b8" stroke-width="1.5" x1="220" x2="220" y1="265" y2="295"></line>
+<line marker-end="url(#arrowhead)" stroke="#94a3b8" stroke-width="1.5" x1="220" x2="220" y1="335" y2="365"></line>
+<!-- Dashed connector to placeholder -->
+<path d="M 285 175 L 350 175 C 360 175, 360 185, 360 195 L 360 265 C 360 275, 370 275, 380 275 L 420 275" fill="none" marker-end="url(#arrowhead)" stroke="#64748b" stroke-dasharray="5,5" stroke-width="1.5"></path>
+</svg>
+<!-- Nodes -->
+<!-- Start Node -->
+<div class="absolute left-[140px] top-[15px] w-[160px] h-[40px] bg-white border border-green-500 rounded-full flex items-center justify-center shadow-sm cursor-pointer hover:shadow-md">
+<i class="fa-solid fa-play text-green-500 text-xs mr-2"></i>
+<span class="text-gray-700">开始</span>
+</div>
+<!-- Node 2 -->
+<div class="absolute left-[140px] top-[85px] w-[160px] h-[40px] bg-blue-50/50 border border-blue-300 rounded flex items-center shadow-sm cursor-pointer hover:shadow-md pl-3">
+<i class="fa-solid fa-user text-blue-500 mr-2"></i>
+<span class="text-gray-700">发起人提交</span>
+</div>
+<!-- Node 3 (Selected) -->
+<div class="absolute left-[138px] top-[153px] w-[164px] h-[44px] bg-blue-50 border-2 border-primary-blue border-dashed rounded flex items-center shadow-md cursor-pointer pl-3">
+<i class="fa-solid fa-user text-blue-600 mr-2"></i>
+<span class="text-blue-700 font-medium">CIP专员审核</span>
+<!-- Selection Handles -->
+<div class="resize-handle top-[-4px] left-[50%] ml-[-3px]"></div>
+<div class="resize-handle bottom-[-4px] left-[50%] ml-[-3px]"></div>
+<div class="resize-handle left-[-4px] top-[50%] mt-[-3px]"></div>
+<div class="resize-handle right-[-4px] top-[50%] mt-[-3px]"></div>
+<!-- Connection Points -->
+<div class="absolute w-[10px] h-[10px] bg-white border border-gray-400 rounded-full left-[-20px] top-[15px] flex items-center justify-center"></div>
+<div class="absolute w-[10px] h-[10px] bg-white border border-gray-400 rounded-full right-[-20px] top-[15px] flex items-center justify-center"></div>
+</div>
+<!-- Node 4 -->
+<div class="absolute left-[140px] top-[225px] w-[160px] h-[40px] bg-white border border-blue-300 rounded flex items-center shadow-sm cursor-pointer hover:shadow-md pl-3">
+<i class="fa-solid fa-user text-blue-500 mr-2"></i>
+<span class="text-gray-700">资产会计审核</span>
+</div>
+<!-- Node 5 -->
+<div class="absolute left-[140px] top-[295px] w-[160px] h-[40px] bg-white border border-purple-300 rounded flex items-center shadow-sm cursor-pointer hover:shadow-md pl-3">
+<i class="fa-solid fa-cloud-arrow-up text-purple-500 mr-2"></i>
+<span class="text-gray-700">ERP回执归档</span>
+</div>
+<!-- Node 6 -->
+<div class="absolute left-[140px] top-[365px] w-[160px] h-[40px] bg-blue-50 border border-blue-300 rounded flex items-center shadow-sm cursor-pointer hover:shadow-md pl-3">
+<i class="fa-solid fa-box-archive text-blue-500 mr-2"></i>
+<span class="text-gray-700">完成</span>
+</div>
+<!-- Placeholder Node -->
+<div class="absolute left-[420px] top-[255px] w-[130px] h-[50px] bg-white border border-gray-400 border-dashed rounded flex items-center justify-center text-gray-500 bg-gray-50/50">
+                  拖拽节点到此处
+                </div>
+</div>
+</div>
+</div>
+<!-- Right Properties Panel -->
+<div class="w-[300px] shrink-0 border-l border-border-light bg-white flex flex-col z-20 shadow-[-2px_0_10px_rgba(0,0,0,0.05)]">
+<div class="h-10 border-b border-border-light flex items-center justify-between px-4 text-gray-800 font-medium bg-gray-50/50">
+<span>节点配置</span>
+<i class="fa-solid fa-angles-right text-gray-400 text-xs cursor-pointer"></i>
+</div>
+<div class="flex-1 p-3 flex flex-col text-[12px] space-y-1.5">
+<!-- Form Group -->
+<div>
+<label class="block text-gray-500 mb-0.5 flex items-center">节点名称 <span class="text-red-500 ml-1">*</span></label>
+<input class="w-full border border-gray-300 rounded px-2 py-0.5 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none text-gray-700" type="text" value="CIP专员审核"/>
+</div>
+<div>
+<label class="block text-gray-500 mb-0.5 flex items-center">节点类型 <span class="text-red-500 ml-1">*</span></label>
+<div class="relative">
+<select class="w-full border border-gray-300 rounded px-2 py-0.5 appearance-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none text-gray-700 bg-white">
+<option>审批节点</option>
+</select>
+<i class="fa-solid fa-angle-down absolute right-2 top-1.5 text-gray-400 text-xs"></i>
+</div>
+</div>
+<div>
+<label class="block text-gray-500 mb-0.5 flex items-center">处理人规则 <span class="text-red-500 ml-1">*</span></label>
+<div class="relative mb-1">
+<select class="w-full border border-gray-300 rounded px-2 py-0.5 appearance-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none text-gray-700 bg-white">
+<option>角色</option>
+</select>
+<i class="fa-solid fa-angle-down absolute right-2 top-1.5 text-gray-400 text-xs"></i>
+</div>
+<div class="bg-gray-100 px-2 py-0.5 rounded inline-flex items-center border border-gray-200">
+<span class="text-gray-700 mr-2 text-[11px]">CIP专员</span>
+<i class="fa-solid fa-xmark text-gray-400 cursor-pointer hover:text-gray-600 text-[10px]"></i>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center text-gray-700">
+                  跳过重复处理人 <i class="fa-regular fa-circle-question text-gray-400 ml-1"></i>
+</div>
+<div class="w-8 h-4 bg-blue-500 rounded-full relative cursor-pointer switch-toggle-on">
+<div class="w-3.5 h-3.5 bg-white rounded-full absolute right-0.5 top-0.5 shadow-sm"></div>
+</div>
+</div>
+<div>
+<label class="block text-gray-500 mb-0.5 flex items-center">离职交接规则 <span class="text-red-500 ml-1">*</span></label>
+<div class="relative">
+<select class="w-full border border-gray-300 rounded px-2 py-0.5 appearance-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none text-gray-700 bg-white">
+<option>交接给上级</option>
+</select>
+<i class="fa-solid fa-angle-down absolute right-2 top-1.5 text-gray-400 text-xs"></i>
+</div>
+</div>
+<div class="border-t border-gray-200 pt-1.5">
+<div class="flex items-center justify-between mb-1">
+<div class="flex items-center text-gray-700 font-medium">
+                    表单字段 <i class="fa-regular fa-circle-question text-gray-400 ml-1 font-normal"></i>
+</div>
+<div class="text-[11px]">
+<span class="text-gray-500 mr-2">4/7</span>
+<a class="text-primary-blue hover:underline" href="#">全选</a>
+</div>
+</div>
+<div class="border border-gray-200 rounded bg-gray-50/50 p-1.5 grid grid-cols-2 gap-y-1 gap-x-2 text-[11px]">
+<label class="flex items-center cursor-pointer">
+<input checked="" class="w-3 h-3 text-blue-600 rounded border-gray-300 focus:ring-blue-500" type="checkbox"/>
+<span class="ml-1.5 text-gray-700">资产名称</span>
+</label>
+<label class="flex items-center cursor-pointer">
+<input checked="" class="w-3 h-3 text-blue-600 rounded border-gray-300 focus:ring-blue-500" type="checkbox"/>
+<span class="ml-1.5 text-gray-700">资产编码</span>
+</label>
+<label class="flex items-center cursor-pointer">
+<input checked="" class="w-3 h-3 text-blue-600 rounded border-gray-300 focus:ring-blue-500" type="checkbox"/>
+<span class="ml-1.5 text-gray-700">资产类别</span>
+</label>
+<label class="flex items-center cursor-pointer">
+<input checked="" class="w-3 h-3 text-blue-600 rounded border-gray-300 focus:ring-blue-500" type="checkbox"/>
+<span class="ml-1.5 text-gray-700">使用部门</span>
+</label>
+<label class="flex items-center cursor-pointer">
+<input class="w-3 h-3 text-blue-600 rounded border-gray-300 focus:ring-blue-500" type="checkbox"/>
+<span class="ml-1.5 text-gray-700">购置日期</span>
+</label>
+<label class="flex items-center cursor-pointer">
+<input class="w-3 h-3 text-blue-600 rounded border-gray-300 focus:ring-blue-500" type="checkbox"/>
+<span class="ml-1.5 text-gray-700">原值</span>
+</label>
+<label class="flex items-center cursor-pointer">
+<input class="w-3 h-3 text-blue-600 rounded border-gray-300 focus:ring-blue-500" type="checkbox"/>
+<span class="ml-1.5 text-gray-700">备注</span>
+</label>
+</div>
+</div>
+<div>
+<label class="block text-gray-700 mb-0.5 flex items-center">
+                  SLA时限 <i class="fa-regular fa-circle-question text-gray-400 ml-1"></i>
+</label>
+<div class="flex space-x-2">
+<input class="w-2/3 border border-gray-300 rounded px-2 py-0.5 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none text-gray-700" type="text" value="2"/>
+<div class="relative w-1/3">
+<select class="w-full border border-gray-300 rounded px-2 py-0.5 appearance-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none text-gray-700 bg-white">
+<option>工作日</option>
+</select>
+<i class="fa-solid fa-angle-down absolute right-2 top-1.5 text-gray-400 text-xs"></i>
+</div>
+</div>
+</div>
+<div>
+<label class="block text-gray-700 mb-0.5 flex items-center">
+                  外部系统推送 <i class="fa-regular fa-circle-question text-gray-400 ml-1"></i>
+</label>
+<div class="space-y-1 border border-gray-200 rounded p-1.5 bg-gray-50/50">
+<div class="flex items-center justify-between">
+<label class="flex items-center cursor-pointer">
+<input checked="" class="w-3 h-3 text-blue-600 rounded border-gray-300 focus:ring-blue-500" type="checkbox"/>
+<span class="ml-1.5 text-gray-700">ERP系统</span>
+</label>
+<div class="relative w-24">
+<select class="w-full border border-gray-300 rounded px-1.5 py-0.5 text-[11px] appearance-none focus:border-blue-500 outline-none text-gray-600 bg-white">
+<option>推送回执</option>
+</select>
+<i class="fa-solid fa-angle-down absolute right-1.5 top-1 text-gray-400 text-[9px]"></i>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<label class="flex items-center cursor-pointer">
+<input class="w-3 h-3 text-blue-600 rounded border-gray-300 focus:ring-blue-500" type="checkbox"/>
+<span class="ml-1.5 text-gray-700">EHR系统</span>
+</label>
+<div class="relative w-24">
+<select class="w-full border border-gray-200 rounded px-1.5 py-0.5 text-[11px] appearance-none bg-gray-100 text-gray-400 outline-none" disabled="">
+<option>请选择</option>
+</select>
+<i class="fa-solid fa-angle-down absolute right-1.5 top-1 text-gray-300 text-[9px]"></i>
+</div>
+</div>
+</div>
+</div>
+<div class="pt-1 mt-auto">
+<button class="w-full bg-primary-blue text-white rounded py-1.5 text-center hover:bg-blue-700 focus:outline-none transition-colors">
+                  保存节点
+                </button>
+</div>
+</div>
+</div>
+</div>
+<!-- END Designer Workspace -->
+<!-- BEGIN: Operation Logs -->
+<div class="border-t border-border-light bg-white flex flex-col shrink-0">
+<div class="h-10 border-b border-gray-100 flex items-center justify-between px-6 text-gray-700 font-medium bg-gray-50/50 shrink-0">
+<span>操作日志</span>
+<a class="text-primary-blue hover:text-blue-700 flex items-center text-xs font-normal" href="#">
+<i class="fa-regular fa-trash-can mr-1"></i> 清空日志
+            </a>
+</div>
+<div class="px-6 py-1">
+<table class="w-full text-[12px]">
+<tbody>
+<tr class="border-b border-gray-50 hover:bg-gray-50">
+<td class="py-0.5 text-gray-500 w-24">10:45:21</td>
+<td class="py-0.5 w-6"><i class="fa-solid fa-circle-info text-blue-500"></i></td>
+<td class="py-0.5 text-gray-700">节点已放入画布</td>
+<td class="py-0.5 text-right w-6 text-gray-400"><i class="fa-solid fa-angle-right"></i></td>
+</tr>
+<tr class="border-b border-gray-50 hover:bg-gray-50">
+<td class="py-0.5 text-gray-500">10:45:22</td>
+<td class="py-0.5"><i class="fa-solid fa-circle-check text-green-500"></i></td>
+<td class="py-0.5 text-gray-700">节点配置已保存</td>
+<td class="py-0.5 text-right text-gray-400"><i class="fa-solid fa-angle-right"></i></td>
+</tr>
+<tr class="border-b border-gray-50 hover:bg-gray-50">
+<td class="py-0.5 text-gray-500">10:45:35</td>
+<td class="py-0.5"><i class="fa-solid fa-circle-check text-green-500"></i></td>
+<td class="py-0.5 text-gray-700">流程草稿已保存</td>
+<td class="py-0.5 text-right text-gray-400"><i class="fa-solid fa-angle-right"></i></td>
+</tr>
+<tr class="hover:bg-gray-50">
+<td class="py-0.5 text-gray-500">10:46:02</td>
+<td class="py-0.5"><i class="fa-solid fa-circle-check text-green-500"></i></td>
+<td class="py-0.5 text-gray-700">校验通过 <span class="text-green-500 ml-1">5/6</span></td>
+<td class="py-0.5 text-right text-gray-400"><i class="fa-solid fa-angle-right"></i></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- END: Operation Logs -->
+</main>
+<!-- END: MainContent -->
+</div>
+</div>
+<!-- END: AppContainer -->
+</body></html>

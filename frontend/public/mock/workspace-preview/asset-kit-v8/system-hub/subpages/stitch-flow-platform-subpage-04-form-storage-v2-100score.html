@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>UNIVIEW - 表单存储映射与归档策略</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<style data-purpose="custom-utilities">
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f5f7fa;
+      overflow: hidden; /* No body scroll */
+      font-size: 12px;
+      color: #334155;
+    }
+
+    /* Custom Scrollbar for inner areas if needed, though instruction says no body/document scroll */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+
+    .border-custom { border-color: #d7e2ef; }
+    .bg-custom-sidebar { background-color: #1e293b; } /* Adjusted to match typical dark sidebar, original asked for #061b38 for top, will use that */
+    
+    /* Specific overrides for exact pixel pushing */
+    .h-table-row { height: 30px; }
+    .text-xxs { font-size: 11px; }
+  </style>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'top-nav': '#061b38',
+            'sidebar-bg': '#1e293b',
+            'sidebar-active': '#2563eb',
+            'sidebar-hover': '#334155',
+            'primary': '#1d4ed8',
+            'success': '#16a34a',
+            'warning': '#d97706',
+            'danger': '#dc2626',
+            'border-light': '#e2e8f0',
+            'bg-light': '#f8fafc',
+            'text-main': '#334155',
+            'text-muted': '#64748b'
+          },
+          fontSize: {
+            '11px': '11px',
+            '12px': '12px',
+            '13px': '13px',
+            '14px': '14px',
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="w-[1586px] h-[992px] flex flex-col bg-white overflow-hidden text-12px">
+<!-- BEGIN: Top Navigation Shell -->
+<header class="h-[48px] bg-top-nav text-white flex items-center px-4 shrink-0 shadow-sm z-20">
+<div class="flex items-center space-x-2 w-[220px]">
+<svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span class="text-lg font-bold tracking-wider">UNIVIEW</span>
+</div>
+<nav class="flex h-full ml-4">
+<a class="px-6 flex items-center text-gray-300 hover:text-white hover:bg-white/10 transition-colors" href="#">固定资产工作台</a>
+<a class="px-6 flex items-center text-gray-300 hover:text-white hover:bg-white/10 transition-colors" href="#">资产全景视图</a>
+<a class="px-6 flex items-center text-gray-300 hover:text-white hover:bg-white/10 transition-colors" href="#">大屏态势</a>
+<a class="px-6 flex items-center text-gray-300 hover:text-white hover:bg-white/10 transition-colors" href="#">流程协同</a>
+<a class="px-6 flex items-center text-white bg-blue-600/20 border-b-2 border-blue-500 font-medium" href="#">系统运营中枢</a>
+</nav>
+</header>
+<!-- END: Top Navigation Shell -->
+<div class="flex flex-1 overflow-hidden">
+<!-- BEGIN: Left Sidebar -->
+<aside class="w-[200px] bg-sidebar-bg text-gray-300 flex flex-col shrink-0">
+<div class="h-12 flex items-center px-4 font-semibold text-white border-b border-gray-700">系统运营中枢</div>
+<div class="flex-1 overflow-y-auto py-2">
+<!-- 流程平台 Section -->
+<div class="mb-2">
+<div class="px-4 py-2 flex items-center justify-between hover:bg-sidebar-hover cursor-pointer text-white">
+<div class="flex items-center space-x-2">
+<svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>流程平台</span>
+</div>
+<svg class="w-3 h-3" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M5 15l7-7 7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div class="flex flex-col text-12px">
+<a class="pl-10 py-2 hover:bg-sidebar-hover" href="#">流程定义</a>
+<a class="pl-10 py-2 hover:bg-sidebar-hover" href="#">表单管理</a>
+<a class="pl-10 py-2 hover:bg-sidebar-hover" href="#">流程监控</a>
+<a class="pl-10 py-2 hover:bg-sidebar-hover" href="#">流程授权</a>
+<a class="pl-10 py-2 bg-sidebar-active text-white font-medium border-r-2 border-white" href="#">表单存储</a>
+</div>
+</div>
+<!-- Other Sections -->
+<a class="px-4 py-2 flex items-center space-x-2 hover:bg-sidebar-hover text-gray-300" href="#">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>组织权限</span>
+<svg class="w-3 h-3 ml-auto" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</a>
+<a class="px-4 py-2 flex items-center space-x-2 hover:bg-sidebar-hover text-gray-300" href="#">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>基础资料</span>
+<svg class="w-3 h-3 ml-auto" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</a>
+<a class="px-4 py-2 flex items-center space-x-2 hover:bg-sidebar-hover text-gray-300" href="#">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>集成配置</span>
+<svg class="w-3 h-3 ml-auto" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</a>
+<a class="px-4 py-2 flex items-center space-x-2 hover:bg-sidebar-hover text-gray-300" href="#">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>消息与通知</span>
+<svg class="w-3 h-3 ml-auto" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</a>
+<a class="px-4 py-2 flex items-center space-x-2 hover:bg-sidebar-hover text-gray-300" href="#">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>系统参数</span>
+<svg class="w-3 h-3 ml-auto" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</a>
+</div>
+<div class="p-4 border-t border-gray-700 hover:bg-sidebar-hover cursor-pointer flex items-center space-x-2">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>收起菜单</span>
+</div>
+</aside>
+<!-- END: Left Sidebar -->
+<!-- BEGIN: Main Content Area -->
+<main class="flex-1 flex flex-col bg-[#f5f7fa] overflow-hidden h-[944px]">
+<!-- Top Content Header -->
+<div class="px-6 py-4 bg-white border-b border-border-light shrink-0" style="height: 150px; padding-top: 16px; padding-bottom: 16px;">
+<div class="text-text-muted text-xs mb-1 flex items-center space-x-1">
+<span>系统运营中枢</span>
+<span>/</span>
+<span>流程平台</span>
+<span>/</span>
+<span class="text-text-main font-medium">表单存储</span>
+</div>
+<h1 class="text-xl font-bold text-gray-900 mb-1">表单存储映射与归档策略</h1>
+<p class="text-text-muted text-xs mb-3">管理表单定义版本、字段值快照、附件索引、归档目标、查询审计和发布校验。</p>
+<div class="flex space-x-3">
+<button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded text-xs flex items-center space-x-1 h-8">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 4v16m8-8H4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>新建存储方案</span>
+</button>
+<button class="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-1.5 rounded text-xs flex items-center space-x-1 h-8">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>新增映射</span>
+</button>
+<button class="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-1.5 rounded text-xs flex items-center space-x-1 h-8">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>保存草稿</span>
+</button>
+<button class="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-1.5 rounded text-xs flex items-center space-x-1 h-8">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>归档预演</span>
+</button>
+<button class="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-1.5 rounded text-xs flex items-center space-x-1 h-8">
+<svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>提交校验</span>
+</button>
+</div>
+</div>
+<!-- Success Alert Banner -->
+<div class="px-6 pt-3 pb-0 shrink-0" style="height: 47px; padding-top: 12px;">
+<div class="bg-green-50 border border-green-200 text-green-800 rounded px-4 py-2 text-xs flex items-center justify-between">
+<div class="flex items-center space-x-2">
+<svg class="w-4 h-4 text-green-500" fill="currentColor" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" fill-rule="evenodd"></path></svg>
+<span>归档预演已完成 · 48 条 CIP 转固实例可归档，附件索引与审计链路通过</span>
+</div>
+<button class="text-green-600 hover:text-green-800">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+</div>
+</div>
+<!-- Main Layout Grid -->
+<div class="flex-1 flex overflow-hidden p-6 gap-6 pt-4" style="padding-top: 15px; height: 747px;">
+<!-- Left Panel: Form Objects -->
+<div class="w-[215px] bg-white border border-border-light rounded-lg flex flex-col shrink-0">
+<div class="p-3 border-b border-border-light font-medium text-gray-800">表单对象</div>
+<div class="p-3 border-b border-border-light">
+<div class="relative">
+<svg class="w-4 h-4 absolute left-2.5 top-1.5 text-gray-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<input class="w-full pl-8 pr-2 py-1.5 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 bg-gray-50" placeholder="搜索表单 / 编码 / 业务对象" type="text"/>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto p-2 space-y-2">
+<!-- Active Card -->
+<div class="border border-blue-500 bg-blue-50 rounded p-3 cursor-pointer relative shadow-sm">
+<div class="flex justify-between items-start mb-1">
+<div class="font-medium text-gray-900 text-13px">CIP 转固验收表单</div>
+<span class="bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded text-[10px]">v2.1</span>
+</div>
+<div class="text-xs text-gray-500 mb-2">FORM-CIP-CAP</div>
+<div class="flex items-center text-xs text-blue-600">
+<span class="w-1.5 h-1.5 rounded-full bg-blue-500 mr-1.5"></span>
+                校验中
+              </div>
+</div>
+<!-- Inactive Cards -->
+<div class="border border-gray-200 hover:border-gray-300 rounded p-3 cursor-pointer">
+<div class="flex justify-between items-start mb-1">
+<div class="font-medium text-gray-900 text-13px">待建资产入账表单</div>
+<span class="bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded text-[10px]">v1.3</span>
+</div>
+<div class="text-xs text-gray-500 mb-2">FORM-FA-POST</div>
+<div class="flex items-center text-xs text-green-600">
+<span class="w-1.5 h-1.5 rounded-full bg-green-500 mr-1.5"></span>
+                已发布
+              </div>
+</div>
+<div class="border border-gray-200 hover:border-gray-300 rounded p-3 cursor-pointer">
+<div class="flex justify-between items-start mb-1">
+<div class="font-medium text-gray-900 text-13px">采购变更审批表</div>
+<span class="bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded text-[10px]">v1.2</span>
+</div>
+<div class="text-xs text-gray-500 mb-2">FORM-PO-CHANGE</div>
+<div class="flex items-center text-xs text-green-600">
+<span class="w-1.5 h-1.5 rounded-full bg-green-500 mr-1.5"></span>
+                已发布
+              </div>
+</div>
+<div class="border border-gray-200 hover:border-gray-300 rounded p-3 cursor-pointer opacity-80">
+<div class="flex justify-between items-start mb-1">
+<div class="font-medium text-gray-900 text-13px">资产移交表单</div>
+<span class="bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded text-[10px]">v1.0</span>
+</div>
+<div class="text-xs text-gray-500 mb-2">FORM-TRANSFER</div>
+<div class="flex items-center text-xs text-orange-500">
+<span class="w-1.5 h-1.5 rounded-full bg-orange-400 mr-1.5"></span>
+                草稿
+              </div>
+</div>
+</div>
+<div class="p-2 border-t border-border-light flex justify-between items-center text-xs text-gray-500">
+<span>共 4 条</span>
+<div class="flex items-center space-x-1">
+<button class="w-5 h-5 flex items-center justify-center bg-blue-600 text-white rounded rounded-sm">1</button>
+<button class="w-5 h-5 flex items-center justify-center hover:bg-gray-100 rounded text-gray-400 rounded-sm"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></button>
+<select class="border border-gray-300 rounded text-xs py-0.5 px-1 focus:outline-none">
+<option>20 条/页</option>
+</select>
+</div>
+</div>
+</div>
+<!-- Center Workspace -->
+<div class="flex-1 flex flex-col min-w-0 space-y-4 overflow-y-auto pr-2">
+<!-- KPI Row -->
+<div class="flex gap-4 shrink-0 h-[68px]">
+<div class="flex-1 bg-white border border-border-light rounded flex items-center p-4">
+<div class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center mr-3">
+<svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div>
+<div class="text-text-muted text-xs mb-0.5">存储方案</div>
+<div class="text-xl font-semibold text-gray-800 leading-none">4</div>
+</div>
+</div>
+<div class="flex-1 bg-white border border-border-light rounded flex items-center p-4">
+<div class="w-10 h-10 rounded-full bg-green-50 flex items-center justify-center mr-3">
+<svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div>
+<div class="text-text-muted text-xs mb-0.5">已启用</div>
+<div class="text-xl font-semibold text-gray-800 leading-none">3</div>
+</div>
+</div>
+<div class="flex-1 bg-white border border-border-light rounded flex items-center p-4">
+<div class="w-10 h-10 rounded-full bg-indigo-50 flex items-center justify-center mr-3">
+<svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div>
+<div class="text-text-muted text-xs mb-0.5">脱敏字段</div>
+<div class="text-xl font-semibold text-gray-800 leading-none">12</div>
+</div>
+</div>
+<div class="flex-1 bg-white border border-border-light rounded flex items-center p-4">
+<div class="w-10 h-10 rounded-full bg-orange-50 flex items-center justify-center mr-3">
+<svg class="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div>
+<div class="text-text-muted text-xs mb-0.5">待补映射</div>
+<div class="text-xl font-semibold text-gray-800 leading-none">1</div>
+</div>
+</div>
+</div>
+<!-- Field Mapping Table -->
+<div class="bg-white border border-border-light rounded shrink-0" style="height: 236px; overflow: hidden;">
+<div class="px-4 py-3 border-b border-border-light font-medium text-gray-800">字段存储映射</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-gray-50 text-text-muted text-xs border-b border-border-light">
+<th class="px-4 py-2 font-medium whitespace-nowrap">字段名称</th>
+<th class="px-4 py-2 font-medium whitespace-nowrap">字段编码</th>
+<th class="px-4 py-2 font-medium whitespace-nowrap">类型</th>
+<th class="px-4 py-2 font-medium whitespace-nowrap">存储表</th>
+<th class="px-4 py-2 font-medium whitespace-nowrap">存储字段</th>
+<th class="px-4 py-2 font-medium whitespace-nowrap">索引</th>
+<th class="px-4 py-2 font-medium whitespace-nowrap">脱敏</th>
+<th class="px-4 py-2 font-medium whitespace-nowrap">归档策略</th>
+<th class="px-4 py-2 font-medium whitespace-nowrap">状态</th>
+<th class="px-4 py-2 font-medium text-center whitespace-nowrap">操作</th>
+</tr>
+</thead>
+<tbody class="text-xs">
+<tr class="border-b border-border-light h-table-row hover:bg-gray-50">
+<td class="px-4 text-gray-800 whitespace-nowrap">工程编号</td>
+<td class="px-4 text-gray-500 whitespace-nowrap">project_no</td>
+<td class="px-4 text-gray-500 whitespace-nowrap">字符串</td>
+<td class="px-4 text-gray-500 whitespace-nowrap">AMS_CIP_CAPITALIZATION</td>
+<td class="px-4 text-gray-500 whitespace-nowrap">project_no</td>
+<td class="px-4 text-gray-500 whitespace-nowrap">普通索引</td>
+<td class="px-4 text-gray-500 whitespace-nowrap">否</td>
+<td class="px-4 text-gray-500 whitespace-nowrap">项目完结后 T+30</td>
+<td class="px-4 whitespace-nowrap"><span class="flex items-center text-green-600"><svg class="w-3.5 h-3.5 mr-1" fill="currentColor" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" fill-rule="evenodd"></path></svg>通过</span></td>
+<td class="px-4 text-center text-gray-400 whitespace-nowrap">
+<button class="hover:text-blue-600 mx-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></button>
+<button class="hover:text-blue-600 mx-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></button>
+</td>
+</tr>
+<tr class="border-b border-border-light h-table-row bg-blue-50/50">
+<td class="px-4 font-medium text-blue-700 whitespace-nowrap">转固金额</td>
+<td class="px-4 text-gray-500 whitespace-nowrap">cap_amount</td>
+<td class="px-4 text-gray-500 whitespace-nowrap">Decimal(18,2)</td>
+<td class="px-4 text-gray-500 whitespace-nowrap">AMS_CIP_CAPITALIZATION</td>
+<td class="px-4 text-gray-500 whitespace-nowrap">capitalization_amount</td>
+<td class="px-4 text-gray-500 whitespace-nowrap">普通索引</td>
+<td class="px-4 text-gray-500 whitespace-nowrap">金额脱敏</td>
+<td class="px-4 text-gray-500 whitespace-nowrap">项目完结后 T+30</td>
+<td class="px-4 whitespace-nowrap"><span class="flex items-center text-green-600"><svg class="w-3.5 h-3.5 mr-1" fill="currentColor" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" fill-rule="evenodd"></path></svg>通过</span></td>
+<td class="px-4 text-center text-gray-400 whitespace-nowrap">
+<button class="hover:text-blue-600 mx-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></button>
+<button class="hover:text-blue-600 mx-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></button>
+</td>
+</tr>
+<tr class="border-b border-border-light h-table-row hover:bg-gray-50">
+<td class="px-4 text-gray-800 whitespace-nowrap">验收日期</td>
+<td class="px-4 text-gray-500 whitespace-nowrap">accept_date</td>
+<td class="px-4 text-gray-500 whitespace-nowrap">日期</td>
+<td class="px-4 text-gray-500 whitespace-nowrap">AMS_CIP_CAPITALIZATION</td>
+<td class="px-4 text-gray-500 whitespace-nowrap">accept_date</td>
+<td class="px-4 text-gray-500 whitespace-nowrap">普通索引</td>
+<td class="px-4 text-gray-500 whitespace-nowrap">否</td>
+<td class="px-4 text-gray-500 whitespace-nowrap">项目完结后 T+30</td>
+<td class="px-4 whitespace-nowrap"><span class="flex items-center text-green-600"><svg class="w-3.5 h-3.5 mr-1" fill="currentColor" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" fill-rule="evenodd"></path></svg>通过</span></td>
+<td class="px-4 text-center text-gray-400 whitespace-nowrap">
+<button class="hover:text-blue-600 mx-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></button>
+<button class="hover:text-blue-600 mx-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></button>
+</td>
+</tr>
+<tr class="border-b border-border-light h-table-row hover:bg-gray-50">
+<td class="px-4 text-gray-800 whitespace-nowrap">附件清单</td>
+<td class="px-4 text-gray-500 whitespace-nowrap">attachments</td>
+<td class="px-4 text-gray-500 whitespace-nowrap">附件</td>
+<td class="px-4 text-gray-500 whitespace-nowrap">AMS_ATTACHMENT</td>
+<td class="px-4 text-gray-500 whitespace-nowrap">file_id</td>
+<td class="px-4 text-gray-500 whitespace-nowrap">唯一索引</td>
+<td class="px-4 text-gray-500 whitespace-nowrap">否</td>
+<td class="px-4 text-gray-500 whitespace-nowrap">项目完结后 T+30</td>
+<td class="px-4 whitespace-nowrap"><span class="flex items-center text-green-600"><svg class="w-3.5 h-3.5 mr-1" fill="currentColor" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" fill-rule="evenodd"></path></svg>通过</span></td>
+<td class="px-4 text-center text-gray-400 whitespace-nowrap">
+<button class="hover:text-blue-600 mx-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></button>
+<button class="hover:text-blue-600 mx-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></button>
+</td>
+</tr>
+<tr class="border-b border-border-light h-table-row hover:bg-gray-50">
+<td class="px-4 text-gray-800 whitespace-nowrap">ERP凭证号</td>
+<td class="px-4 text-gray-500 whitespace-nowrap">erp_voucher</td>
+<td class="px-4 text-gray-500 whitespace-nowrap">字符串</td>
+<td class="px-4 text-gray-500 whitespace-nowrap">AMS_CIP_CAPITALIZATION</td>
+<td class="px-4 text-gray-500 whitespace-nowrap">erp_voucher_no</td>
+<td class="px-4 text-gray-500 whitespace-nowrap">普通索引</td>
+<td class="px-4 text-gray-500 whitespace-nowrap">否</td>
+<td class="px-4 text-gray-500 whitespace-nowrap">项目完结后 T+30</td>
+<td class="px-4 whitespace-nowrap"><span class="flex items-center text-orange-500"><svg class="w-3.5 h-3.5 mr-1" fill="currentColor" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" fill-rule="evenodd"></path></svg>待确认</span></td>
+<td class="px-4 text-center text-gray-400 whitespace-nowrap">
+<button class="hover:text-blue-600 mx-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></button>
+<button class="hover:text-blue-600 mx-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></button>
+</td>
+</tr>
+<tr class="h-table-row hover:bg-gray-50">
+<td class="px-4 text-gray-800 whitespace-nowrap">项目负责人</td>
+<td class="px-4 text-gray-500 whitespace-nowrap">owner</td>
+<td class="px-4 text-gray-500 whitespace-nowrap">字符串</td>
+<td class="px-4 text-gray-500 whitespace-nowrap">AMS_CIP_CAPITALIZATION</td>
+<td class="px-4 text-gray-500 whitespace-nowrap">owner_name</td>
+<td class="px-4 text-gray-500 whitespace-nowrap">普通索引</td>
+<td class="px-4 text-gray-500 whitespace-nowrap">否</td>
+<td class="px-4 text-gray-500 whitespace-nowrap">项目完结后 T+30</td>
+<td class="px-4 whitespace-nowrap"><span class="flex items-center text-green-600"><svg class="w-3.5 h-3.5 mr-1" fill="currentColor" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" fill-rule="evenodd"></path></svg>通过</span></td>
+<td class="px-4 text-center text-gray-400 whitespace-nowrap">
+<button class="hover:text-blue-600 mx-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></button>
+<button class="hover:text-blue-600 mx-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Storage Model Preview -->
+<div class="bg-white border border-border-light rounded p-4 shrink-0 h-[195px] flex flex-col" style="height: 206px;">
+<div class="font-medium text-gray-800 mb-4">存储模型预览</div>
+<div class="flex-1 flex items-center justify-between px-8 relative">
+<!-- Nodes -->
+<div class="border border-border-light rounded flex flex-col w-[160px] bg-white z-10 shadow-sm text-xxs">
+<div class="bg-gray-50 border-b border-border-light px-2 py-1 font-medium text-gray-700 text-center">AMS_FORM_INSTANCE</div>
+<div class="p-2 text-gray-500 font-mono leading-relaxed">
+                  id (PK)<br/>
+                  form_code<br/>
+                  form_version<br/>
+                  business_object_id<br/>
+                  created_at
+                </div>
+</div>
+<div class="border border-border-light rounded flex flex-col w-[160px] bg-white z-10 shadow-sm text-xxs">
+<div class="bg-gray-50 border-b border-border-light px-2 py-1 font-medium text-gray-700 text-center">AMS_FORM_FIELD_VALUE</div>
+<div class="p-2 text-gray-500 font-mono leading-relaxed">
+                  id (PK)<br/>
+                  instance_id (FK)<br/>
+                  field_code<br/>
+                  field_value<br/>
+                  data_type<br/>
+                  created_at
+                </div>
+</div>
+<div class="border border-border-light rounded flex flex-col w-[160px] bg-white z-10 shadow-sm text-xxs">
+<div class="bg-gray-50 border-b border-border-light px-2 py-1 font-medium text-gray-700 text-center">AMS_ATTACHMENT</div>
+<div class="p-2 text-gray-500 font-mono leading-relaxed">
+                  id (PK)<br/>
+                  instance_id (FK)<br/>
+                  file_id<br/>
+                  file_name<br/>
+                  file_size<br/>
+                  created_at
+                </div>
+</div>
+<div class="border border-border-light rounded flex flex-col w-[160px] bg-white z-10 shadow-sm text-xxs">
+<div class="bg-gray-50 border-b border-border-light px-2 py-1 font-medium text-gray-700 text-center">AMS_CIP_CAPITALIZATION</div>
+<div class="p-2 text-gray-500 font-mono leading-relaxed">
+                  id (PK)<br/>
+                  instance_id (FK)<br/>
+                  project_no<br/>
+                  capitalization_amount<br/>
+                  accept_date<br/>
+                  erp_voucher_no<br/>
+                  owner_name<br/>
+                  created_at
+                </div>
+</div>
+<!-- Lines & Labels -->
+<!-- Line 1 -->
+<div class="absolute left-[195px] top-1/2 -translate-y-1/2 w-[70px] border-t-2 border-dashed border-gray-300 z-0"></div>
+<span class="absolute left-[200px] top-[calc(50%-18px)] text-xxs text-gray-500 font-mono">1</span>
+<span class="absolute left-[255px] top-[calc(50%-18px)] text-xxs text-gray-500 font-mono">N</span>
+<div class="absolute left-[215px] top-[calc(50%+4px)] text-xs text-gray-700 text-center w-[30px]">实例主表</div>
+<!-- Line 2 -->
+<div class="absolute left-[445px] top-1/2 -translate-y-1/2 w-[70px] border-t-2 border-dashed border-gray-300 z-0"></div>
+<span class="absolute left-[450px] top-[calc(50%-18px)] text-xxs text-gray-500 font-mono">1</span>
+<span class="absolute left-[505px] top-[calc(50%-18px)] text-xxs text-gray-500 font-mono">N</span>
+<div class="absolute left-[465px] top-[calc(50%+4px)] text-xs text-gray-700 text-center w-[30px]">字段值表</div>
+<!-- Line 3 -->
+<div class="absolute left-[695px] top-1/2 -translate-y-1/2 w-[70px] border-t-2 border-dashed border-gray-300 z-0"></div>
+<span class="absolute left-[700px] top-[calc(50%-18px)] text-xxs text-gray-500 font-mono">1</span>
+<span class="absolute left-[755px] top-[calc(50%-18px)] text-xxs text-gray-500 font-mono">N</span>
+<div class="absolute left-[715px] top-[calc(50%+4px)] text-xs text-gray-700 text-center w-[30px]">附件索引</div>
+<!-- Rightmost label -->
+<div class="absolute left-[885px] top-[calc(50%+65px)] text-xs text-gray-700 w-[160px] text-center">转固归档</div>
+</div>
+</div>
+<!-- Archive Preview Results -->
+<div class="bg-white border border-border-light rounded p-4 shrink-0 h-[115px]" style="height: 141px;">
+<div class="font-medium text-gray-800 mb-3">归档预演结果</div>
+<div class="flex gap-4">
+<div class="flex-1 border border-border-light rounded p-3 flex items-center">
+<div class="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center mr-3 shrink-0">
+<svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div>
+<div class="text-base font-semibold text-gray-800">48 条</div>
+<div class="text-xs text-gray-500">待归档实例</div>
+</div>
+</div>
+<div class="flex-1 border border-border-light rounded p-3 flex items-center">
+<div class="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center mr-3 shrink-0">
+<svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div>
+<div class="text-base font-semibold text-gray-800">126 个</div>
+<div class="text-xs text-gray-500">附件索引</div>
+</div>
+</div>
+<div class="flex-1 border border-border-light rounded p-3 flex items-center">
+<div class="w-8 h-8 rounded-full bg-orange-50 flex items-center justify-center mr-3 shrink-0">
+<svg class="w-4 h-4 text-orange-500" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div>
+<div class="text-base font-semibold text-gray-800">8 年</div>
+<div class="text-xs text-gray-500">保留</div>
+</div>
+</div>
+<div class="flex-1 border border-border-light rounded p-3 flex items-center">
+<div class="w-8 h-8 rounded-full bg-green-50 flex items-center justify-center mr-3 shrink-0">
+<svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div>
+<div class="text-xs text-gray-500 mb-0.5">资产卡片关联</div>
+<div class="text-sm font-medium text-gray-800">已建立</div>
+</div>
+</div>
+<div class="flex-1 border border-border-light rounded p-3 flex items-center">
+<div class="w-8 h-8 rounded-full bg-orange-50 flex items-center justify-center mr-3 shrink-0">
+<svg class="w-4 h-4 text-orange-500" fill="currentColor" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" fill-rule="evenodd"></path></svg>
+</div>
+<div>
+<div class="text-xs text-gray-500 mb-0.5">ERP 回执字段</div>
+<div class="text-sm font-medium text-orange-600">待确认</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Panel: Properties & Validation -->
+<div class="w-[260px] flex flex-col space-y-4 shrink-0 pb-4">
+<!-- Mapping Properties -->
+<div class="bg-white border border-border-light rounded p-4" style="height: 452px; overflow-y: auto;">
+<div class="font-medium text-gray-800 mb-4">映射属性</div>
+<div class="space-y-3">
+<div class="flex justify-between items-center text-xs">
+<span class="text-gray-600">当前字段</span>
+<span class="text-blue-600 font-medium">转固金额 (cap_amount)</span>
+</div>
+<div>
+<label class="block text-xs text-gray-500 mb-1">表单版本</label>
+<select class="w-full border border-gray-300 rounded px-2 py-1.5 text-xs text-gray-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none">
+<option>v2.1</option>
+</select>
+</div>
+<div>
+<label class="block text-xs text-gray-500 mb-1">存储表</label>
+<select class="w-full border border-gray-300 rounded px-2 py-1.5 text-xs text-gray-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none">
+<option>AMS_CIP_CAPITALIZATION</option>
+</select>
+</div>
+<div>
+<label class="block text-xs text-gray-500 mb-1">存储字段</label>
+<select class="w-full border border-gray-300 rounded px-2 py-1.5 text-xs text-gray-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none">
+<option>capitalization_amount</option>
+</select>
+</div>
+<div>
+<label class="block text-xs text-gray-500 mb-1">字段类型</label>
+<select class="w-full border border-gray-200 bg-gray-50 rounded px-2 py-1.5 text-xs text-gray-500 outline-none" disabled="">
+<option>Decimal(18,2)</option>
+</select>
+</div>
+<div>
+<label class="block text-xs text-gray-500 mb-1">索引策略</label>
+<select class="w-full border border-gray-300 rounded px-2 py-1.5 text-xs text-gray-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none">
+<option>普通索引</option>
+</select>
+</div>
+<div>
+<label class="block text-xs text-gray-500 mb-1">加密/脱敏</label>
+<select class="w-full border border-gray-300 rounded px-2 py-1.5 text-xs text-gray-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none">
+<option>金额脱敏</option>
+</select>
+</div>
+<div>
+<label class="block text-xs text-gray-500 mb-1">归档周期</label>
+<select class="w-full border border-gray-300 rounded px-2 py-1.5 text-xs text-gray-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none">
+<option>项目完结后 T+30</option>
+</select>
+</div>
+<div>
+<label class="block text-xs text-gray-500 mb-1">数据保留</label>
+<select class="w-full border border-gray-300 rounded px-2 py-1.5 text-xs text-gray-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none">
+<option>8 年</option>
+</select>
+</div>
+<div>
+<label class="block text-xs text-gray-500 mb-1">审计要求</label>
+<select class="w-full border border-gray-300 rounded px-2 py-1.5 text-xs text-gray-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none">
+<option>字段变更留痕</option>
+</select>
+</div>
+<div class="flex space-x-2 pt-2">
+<button class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-1.5 rounded text-xs">保存映射</button>
+<button class="flex-1 bg-white border border-blue-200 text-blue-600 hover:bg-blue-50 py-1.5 rounded text-xs">校验影响</button>
+<button class="flex-1 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 py-1.5 rounded text-xs">查看审计</button>
+</div>
+</div>
+</div>
+<!-- Publish Validation -->
+<div class="bg-white border border-border-light rounded p-4" style="height: 275px;">
+<div class="flex justify-between items-center mb-4">
+<div class="font-medium text-gray-800">发布校验 <span class="text-gray-500 text-xs font-normal ml-1">5/6</span></div>
+</div>
+<div class="space-y-3 text-xs">
+<div class="flex justify-between items-center">
+<div class="flex items-center text-gray-700">
+<svg class="w-3.5 h-3.5 text-green-500 mr-2" fill="currentColor" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" fill-rule="evenodd"></path></svg>
+                  字段映射完整
+                </div>
+<div class="flex items-center text-green-600">通过 <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></div>
+</div>
+<div class="flex justify-between items-center">
+<div class="flex items-center text-gray-700">
+<svg class="w-3.5 h-3.5 text-green-500 mr-2" fill="currentColor" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" fill-rule="evenodd"></path></svg>
+                  类型兼容
+                </div>
+<div class="flex items-center text-green-600">通过 <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></div>
+</div>
+<div class="flex justify-between items-center">
+<div class="flex items-center text-gray-700">
+<svg class="w-3.5 h-3.5 text-green-500 mr-2" fill="currentColor" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" fill-rule="evenodd"></path></svg>
+                  索引策略通过
+                </div>
+<div class="flex items-center text-green-600">通过 <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></div>
+</div>
+<div class="flex justify-between items-center">
+<div class="flex items-center text-gray-700">
+<svg class="w-3.5 h-3.5 text-green-500 mr-2" fill="currentColor" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" fill-rule="evenodd"></path></svg>
+                  敏感字段已脱敏
+                </div>
+<div class="flex items-center text-green-600">通过 <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></div>
+</div>
+<div class="flex justify-between items-center">
+<div class="flex items-center text-gray-700">
+<svg class="w-3.5 h-3.5 text-green-500 mr-2" fill="currentColor" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" fill-rule="evenodd"></path></svg>
+                  附件归档已绑定
+                </div>
+<div class="flex items-center text-green-600">通过 <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></div>
+</div>
+<div class="flex justify-between items-center">
+<div class="flex items-center text-gray-700">
+<svg class="w-3.5 h-3.5 text-orange-500 mr-2" fill="currentColor" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" fill-rule="evenodd"></path></svg>
+                  ERP 回执字段
+                </div>
+<div class="flex items-center text-orange-500">待确认 <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- END: Main Content Area -->
+</div>
+</body></html>

@@ -1,6 +1,7 @@
 package com.ams.controller;
 
 import com.ams.common.Result;
+import com.ams.dto.ChannelConfigResponse;
 import com.ams.entity.ChannelConfig;
 import com.ams.service.ChannelConfigService;
 import com.ams.service.DingTalkChannel;
@@ -10,6 +11,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/system/channel-configs")
@@ -22,30 +25,36 @@ public class ChannelConfigController {
 
     @PreAuthorize("@ss.hasPermi('channel:config:list')")
     @GetMapping
-    public Result<Page<ChannelConfig>> list(
+    public Result<Page<ChannelConfigResponse>> list(
             @RequestParam(defaultValue = "1") Integer page,
             @RequestParam(defaultValue = "10") Integer pageSize,
             @RequestParam(required = false) String channelType,
             @RequestParam(required = false) String keyword) {
-        return Result.success(channelConfigService.queryPage(page, pageSize, channelType, keyword));
+        Page<ChannelConfig> result = channelConfigService.queryPage(page, pageSize, channelType, keyword);
+        Page<ChannelConfigResponse> response = new Page<>(result.getCurrent(), result.getSize(), result.getTotal());
+        List<ChannelConfigResponse> records = result.getRecords().stream()
+                .map(ChannelConfigResponse::from)
+                .toList();
+        response.setRecords(records);
+        return Result.success(response);
     }
 
     @PreAuthorize("@ss.hasPermi('channel:config:list')")
     @GetMapping("/{id}")
-    public Result<ChannelConfig> getById(@PathVariable Long id) {
-        return Result.success(channelConfigService.getById(id));
+    public Result<ChannelConfigResponse> getById(@PathVariable Long id) {
+        return Result.success(ChannelConfigResponse.from(channelConfigService.getById(id)));
     }
 
     @PreAuthorize("@ss.hasPermi('channel:config:add')")
     @PostMapping
-    public Result<ChannelConfig> create(@Valid @RequestBody ChannelConfig config) {
-        return Result.success(channelConfigService.create(config));
+    public Result<ChannelConfigResponse> create(@Valid @RequestBody ChannelConfig config) {
+        return Result.success(ChannelConfigResponse.from(channelConfigService.create(config)));
     }
 
     @PreAuthorize("@ss.hasPermi('channel:config:edit')")
     @PutMapping("/{id}")
-    public Result<ChannelConfig> update(@PathVariable Long id, @Valid @RequestBody ChannelConfig config) {
-        return Result.success(channelConfigService.update(id, config));
+    public Result<ChannelConfigResponse> update(@PathVariable Long id, @Valid @RequestBody ChannelConfig config) {
+        return Result.success(ChannelConfigResponse.from(channelConfigService.update(id, config)));
     }
 
     @PreAuthorize("@ss.hasPermi('channel:config:remove')")

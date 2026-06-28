@@ -3,7 +3,8 @@
  * @description 编号规则配置 — 业务管理员可直接修改各流程的编号模板
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { Plus, RefreshCw, Save, Trash2 } from 'lucide-react';
 import { workflowApi, type WorkflowDefinitionDTO } from '@/api/workflow';
@@ -41,13 +42,13 @@ const VARIABLE_HINTS = [
   { var: '{SEQ}',  desc: '序号（自动递增）' },
 ];
 
+const QUERY_KEYS = {
+  rules: ['numbering-rules'] as const,
+  workflows: ['numbering-workflows'] as const,
+};
+
 export default function NumberingRulesTab() {
-  const [rules, setRules] = useState<RuleItem[]>([]);
-  const [workflows, setWorkflows] = useState<WorkflowDefinitionDTO[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [creating, setCreating] = useState(false);
-  const [deletingKey, setDeletingKey] = useState<string | null>(null);
+  const queryClient = useQueryClient();
   const [showCreate, setShowCreate] = useState(false);
   const [editValues, setEditValues] = useState<Record<string, string>>({});
   const [newRule, setNewRule] = useState({
@@ -56,43 +57,119 @@ export default function NumberingRulesTab() {
     value: 'WF-{YYYYMMDD}-{SEQ}',
   });
 
-  const fetchRules = async () => {
-    setLoading(true);
-    try {
-      const res = await getSysConfigList({ page: 1, pageSize: 50, configKey: 'numbering.rule.' });
-      const list = ((res as any)?.records ?? (res as any)?.data ?? []) as any[];
-      const fetchedItems = list.map((r: any) => ({
-        id: r.id,
-        key: r.configKey,
-        name: r.configName,
-        value: r.configValue ?? '',
-      }));
-      const fetchedByKey = new Map(fetchedItems.map((item) => [item.key, item]));
-      const items = [
-        ...DEFAULT_RULES.map((rule) => ({ ...rule, ...fetchedByKey.get(rule.key) })),
-        ...fetchedItems.filter((item) => !DEFAULT_RULE_KEYS.has(item.key)).sort((a, b) => a.key.localeCompare(b.key)),
-      ];
-      setRules(items);
-      const vals: Record<string, string> = {};
-      items.forEach(i => { vals[i.key] = i.value; });
-      setEditValues(vals);
-    } catch {
-      toast.error('加载编号规则失败');
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { data: rules = [], isLoading, isFetching } = useQuery({
+    queryKey: QUERY_KEYS.rules,
+    queryFn: async () => {
+      try {
+        const res = await getSysConfigList({ page: 1, pageSize: 50, configKey: 'numbering.rule.' });
+        const list = ((res as any)?.records ?? (res as any)?.data ?? []) as any[];
+        const fetchedItems = list.map((r: any) => ({
+          id: r.id,
+          key: r.configKey,
+          name: r.configName,
+          value: r.configValue ?? '',
+        }));
+        const fetchedByKey = new Map(fetchedItems.map((item) => [item.key, item]));
+        return [
+          ...DEFAULT_RULES.map((rule) => ({ ...rule, ...fetchedByKey.get(rule.key) })),
+          ...fetchedItems.filter((item) => !DEFAULT_RULE_KEYS.has(item.key)).sort((a, b) => a.key.localeCompare(b.key)),
+        ];
+      } catch (error) {
+        toast.error('加载编号规则失败');
+        throw error;
+      }
+    },
+    retry: false,
+    refetchOnWindowFocus: false,
+  });
 
-  const fetchWorkflows = async () => {
-    try {
-      const list = await workflowApi.list();
-      setWorkflows((Array.isArray(list) ? list : []).filter((item) => item.businessType?.startsWith('CUSTOM_')));
-    } catch {
-      setWorkflows([]);
-    }
-  };
+  const { data: workflows = [] } = useQuery({
+    queryKey: QUERY_KEYS.workflows,
+    queryFn: async () => {
+      try {
+        const list = await workflowApi.list();
+        return (Array.isArray(list) ? list : []).filter((item) => item.businessType?.startsWith('CUSTOM_'));
+      } catch {
+        return [];
+      }
+    },
+  });
 
-  useEffect(() => { fetchRules(); fetchWorkflows(); }, []);
+  useEffect(() => {
+    const vals: Record<string, string> = {};
+    rules.forEach((item) => { vals[item.key] = item.value; });
+    setEditValues(vals);
+  }, [rules]);
+
+  const pendingChangeCount = useMemo(
+    () => rules.filter((rule) => !rule.id || (editValues[rule.key] ?? '') !== rule.value).length,
+    [editValues, rules],
+  );
+
+  const createMutation = useMutation({
+    mutationFn: ({ configKey, name, value }: { configKey: string; name: string; value: string }) =>
+      createSysConfig({
+        configGroup: 'SYSTEM',
+        configKey,
+        configName: name,
+        configValue: value,
+        configType: 'N',
+        remark: '业务编号生成规则',
+        status: 0,
+      } as any),
+    onSuccess: async () => {
+      toast.success('编号规则已新增');
+      setNewRule({ key: '', name: '', value: 'WF-{YYYYMMDD}-{SEQ}' });
+      setShowCreate(false);
+      await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.rules });
+    },
+    onError: () => toast.error('新增编号规则失败'),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (rule: RuleItem) => deleteSysConfig(rule.id!),
+    onSuccess: async () => {
+      toast.success('编号规则已删除');
+      await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.rules });
+    },
+    onError: () => toast.error('删除编号规则失败'),
+  });
+
+  const saveMutation = useMutation({
+    mutationFn: async () => {
+      let success = 0;
+      let fail = 0;
+      for (const rule of rules) {
+        const newVal = editValues[rule.key] ?? '';
+        if (!rule.id || newVal !== rule.value) {
+          try {
+            if (rule.id) {
+              await updateSysConfig(rule.id, { configValue: newVal } as any);
+            } else {
+              await createSysConfig({
+                configGroup: 'SYSTEM',
+                configKey: rule.key,
+                configName: rule.name,
+                configValue: newVal,
+                configType: 'Y',
+                remark: '业务编号生成规则',
+                status: 0,
+              } as any);
+            }
+            success++;
+          } catch {
+            fail++;
+          }
+        }
+      }
+      return { success, fail };
+    },
+    onSuccess: async ({ success, fail }) => {
+      if (success > 0) toast.success(`已保存 ${success} 条规则${fail > 0 ? `，${fail} 条失败` : ''}`);
+      else if (fail > 0) toast.error('保存失败');
+      await queryClient.invalidateQueries({ queryKey: QUERY_KEYS.rules });
+    },
+  });
 
   const resolveConfigKey = (input: string) => {
     const trimmed = input.trim();
@@ -109,7 +186,7 @@ export default function NumberingRulesTab() {
     });
   };
 
-  const handleCreate = async () => {
+  const handleCreate = () => {
     const configKey = resolveConfigKey(newRule.key);
     if (!newRule.key.trim() || !newRule.name.trim() || !newRule.value.trim()) {
       toast.error('规则编码、名称和模板不能为空');
@@ -123,75 +200,27 @@ export default function NumberingRulesTab() {
       toast.error('该编号规则已存在');
       return;
     }
-    setCreating(true);
-    try {
-      await createSysConfig({
-        configGroup: 'SYSTEM',
-        configKey,
-        configName: newRule.name.trim(),
-        configValue: newRule.value.trim(),
-        configType: 'N',
-        remark: '业务编号生成规则',
-        status: 0,
-      } as any);
-      toast.success('编号规则已新增');
-      setNewRule({ key: '', name: '', value: 'WF-{YYYYMMDD}-{SEQ}' });
-      setShowCreate(false);
-      await fetchRules();
-    } catch {
-      toast.error('新增编号规则失败');
-    } finally {
-      setCreating(false);
-    }
+    createMutation.mutate({
+      configKey,
+      name: newRule.name.trim(),
+      value: newRule.value.trim(),
+    });
   };
 
-  const handleDelete = async (rule: RuleItem) => {
+  const handleDelete = (rule: RuleItem) => {
     if (!rule.id || DEFAULT_RULE_KEYS.has(rule.key)) {
       return;
     }
-    setDeletingKey(rule.key);
-    try {
-      await deleteSysConfig(rule.id);
-      toast.success('编号规则已删除');
-      await fetchRules();
-    } catch {
-      toast.error('删除编号规则失败');
-    } finally {
-      setDeletingKey(null);
-    }
+    deleteMutation.mutate(rule);
   };
 
-  const handleSave = async () => {
-    setSaving(true);
-    let success = 0;
-    let fail = 0;
-    for (const rule of rules) {
-      const newVal = editValues[rule.key] ?? '';
-      if (!rule.id || newVal !== rule.value) {
-        try {
-          if (rule.id) {
-            await updateSysConfig(rule.id, { configValue: newVal } as any);
-          } else {
-            await createSysConfig({
-              configGroup: 'SYSTEM',
-              configKey: rule.key,
-              configName: rule.name,
-              configValue: newVal,
-              configType: 'Y',
-              remark: '业务编号生成规则',
-              status: 0,
-            } as any);
-          }
-          success++;
-        } catch {
-          fail++;
-        }
-      }
+  const isDeletingRule = (rule: RuleItem) => deleteMutation.isPending && deleteMutation.variables === rule;
+
+  const handleSave = () => {
+    if (pendingChangeCount === 0 || isLoading || isFetching || saveMutation.isPending) {
+      return;
     }
-    if (success > 0) toast.success(`已保存 ${success} 条规则${fail > 0 ? `，${fail} 条失败` : ''}`);
-    else if (fail > 0) toast.error('保存失败');
-    await fetchRules();
-    setSaving(false);
+    saveMutation.mutate();
   };
 
   return (
@@ -200,16 +229,21 @@ export default function NumberingRulesTab() {
         <p className="text-sm text-[#64748b]">
           设置资产、工单、审批、退役、赔偿、盘点等业务编号模板。修改后立即生效，新建单据时按新规则生成。
         </p>
-        <div className="flex gap-2">
-          <Button variant="secondary" onClick={fetchRules} disabled={loading}>
-            <RefreshCw className={`w-4 h-4 mr-1 ${loading ? 'animate-spin' : ''}`} />
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-[#94a3b8]">待保存 {pendingChangeCount} 条</span>
+          <Button variant="secondary" onClick={() => queryClient.invalidateQueries({ queryKey: QUERY_KEYS.rules })} disabled={isFetching}>
+            <RefreshCw className={`w-4 h-4 mr-1 ${isFetching ? 'animate-spin' : ''}`} />
             刷新
           </Button>
           <Button variant="secondary" onClick={() => setShowCreate((value) => !value)}>
             <Plus className="w-4 h-4 mr-1" />
             新增规则
           </Button>
-          <Button onClick={handleSave} loading={saving}>
+          <Button
+            onClick={handleSave}
+            loading={saveMutation.isPending}
+            disabled={pendingChangeCount === 0 || isLoading || isFetching || saveMutation.isPending}
+          >
             <Save className="w-4 h-4 mr-1" />
             保存修改
           </Button>
@@ -267,7 +301,7 @@ export default function NumberingRulesTab() {
               <p className="text-xs text-[#94a3b8]">
                 自定义流程专属审批编号请使用 <code className="bg-[#f1f5f9] px-1 rounded">approval.CUSTOM_xxx</code>，系统会保存为 <code className="bg-[#f1f5f9] px-1 rounded">numbering.rule.approval.CUSTOM_xxx</code>。
               </p>
-              <Button onClick={handleCreate} loading={creating}>
+              <Button onClick={handleCreate} loading={createMutation.isPending}>
                 <Plus className="w-4 h-4 mr-1" />
                 确认新增
               </Button>
@@ -279,7 +313,7 @@ export default function NumberingRulesTab() {
       <Card>
         <CardHeader><CardTitle>编号规则列表</CardTitle></CardHeader>
         <CardContent>
-          {loading ? (
+          {isLoading ? (
             <div className="flex items-center justify-center py-12 text-[#94a3b8] text-sm">
               <RefreshCw className="w-4 h-4 animate-spin mr-2" />
               加载中...
@@ -312,11 +346,11 @@ export default function NumberingRulesTab() {
                     <button
                       type="button"
                       className="mt-2 inline-flex h-8 w-8 items-center justify-center rounded-lg text-[#94a3b8] hover:bg-red-50 hover:text-red-600 disabled:opacity-50"
-                      disabled={deletingKey === rule.key}
+                      disabled={isDeletingRule(rule)}
                       onClick={() => handleDelete(rule)}
                       title="删除规则"
                     >
-                      <Trash2 className="w-4 h-4" />
+                      {isDeletingRule(rule) ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
                     </button>
                   )}
                 </div>

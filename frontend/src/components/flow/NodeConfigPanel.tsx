@@ -5,6 +5,7 @@ import { FLOW_NODE_CATALOG, type FlowEdge, type FlowNode, type FlowNodeData } fr
 
 const badgeClass: Record<string, string> = {
   start: 'bg-green-100 text-green-700', approval: 'bg-blue-100 text-blue-700',
+  task: 'bg-cyan-100 text-cyan-700', cc: 'bg-violet-100 text-violet-700',
   condition: 'bg-amber-100 text-amber-700', end: 'bg-red-100 text-red-700',
 };
 
@@ -65,9 +66,9 @@ export function NodeConfigPanel({ selectedNode, edges, approverRoles = [], roleD
           <div className="text-base font-semibold text-gray-900 mb-2">节点属性</div>
           <div className="text-xs text-gray-500 mb-4">请选择画布中的节点，在这里编辑属性</div>
           <div className="grid grid-cols-2 gap-3">
-            {(['开始', '审批', '条件', '结束'] as const).map((label, i) => {
-              const cls = ['bg-green-50 text-green-700', 'bg-blue-50 text-blue-700', 'bg-amber-50 text-amber-700', 'bg-red-50 text-red-700'][i];
-              const sub = ['流程触发', '审批决策', '条件分流', '流程收口'][i];
+            {(['开始', '审批', '办理', '抄送', '条件', '结束'] as const).map((label, i) => {
+              const cls = ['bg-green-50 text-green-700', 'bg-blue-50 text-blue-700', 'bg-cyan-50 text-cyan-700', 'bg-violet-50 text-violet-700', 'bg-amber-50 text-amber-700', 'bg-red-50 text-red-700'][i];
+              const sub = ['流程触发', '审批决策', '阻塞处理', '非阻塞通知', '条件分流', '流程收口'][i];
               return <div key={label} className={`rounded-xl p-3 ${cls}`}><div className="text-xs font-semibold">{label}</div><div className="text-[11px] mt-1 opacity-70">{sub}</div></div>;
             })}
           </div>
@@ -77,6 +78,8 @@ export function NodeConfigPanel({ selectedNode, edges, approverRoles = [], roleD
   }
 
   const t = selectedNode.type;
+  const isExecutableNode = t === 'approval' || t === 'task';
+  const assigneeNoun = t === 'task' ? '办理' : '审批';
   const edgeCount = edges.filter((e) => e.source === selectedNode.id || e.target === selectedNode.id).length;
 
   return (
@@ -101,10 +104,31 @@ export function NodeConfigPanel({ selectedNode, edges, approverRoles = [], roleD
             <div className="space-y-1.5"><label className="text-xs font-medium text-gray-700">触发方式</label><select className={selectCls} value={selectedNode.data.triggerType} onChange={(e) => onUpdateNode(selectedNode.id, { triggerType: e.target.value })}><option value="表单提交">表单提交</option><option value="定时触发">定时触发</option><option value="接口调用">接口调用</option><option value="手动发起">手动发起</option></select></div>
           )}
 
-          {t === 'approval' && (
+          {(t === 'start' || t === 'approval') && (
+            <div className="space-y-3 rounded-xl border border-gray-100 bg-gray-50/70 p-3">
+              <div>
+                <div className="text-xs font-semibold text-gray-800">环节子表单/区段</div>
+                <div className="mt-0.5 text-[11px] text-gray-400">用于发起页渲染和审批详情快照展示</div>
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-gray-700">区段名称</label>
+                <input className="flex h-9 w-full rounded-md border border-gray-200 bg-white px-3 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100" value={selectedNode.data.formSectionName ?? ''} onChange={(e) => onUpdateNode(selectedNode.id, { formSectionName: e.target.value })} />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-gray-700">历史摘要字段</label>
+                <input className="flex h-9 w-full rounded-md border border-gray-200 bg-white px-3 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100" placeholder="reason,amount" value={selectedNode.data.formSummaryFields ?? ''} onChange={(e) => onUpdateNode(selectedNode.id, { formSummaryFields: e.target.value })} />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-gray-700">子表单 HTML</label>
+                <textarea rows={5} className="flex w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-xs font-mono outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 resize-y" value={selectedNode.data.formSource ?? ''} onChange={(e) => onUpdateNode(selectedNode.id, { formSource: e.target.value })} />
+              </div>
+            </div>
+          )}
+
+          {isExecutableNode && (
             <>
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-gray-700">审批人类型</label>
+                <label className="text-xs font-medium text-gray-700">{assigneeNoun}人类型</label>
                 <div className="flex gap-4">
                   <label className="flex items-center gap-1.5 text-sm text-gray-700 cursor-pointer"><input type="radio" name={`at-${selectedNode.id}`} checked={approverType === 'role'} onChange={() => onUpdateNode(selectedNode.id, { approverType: 'role', approverId: '', approverRole: '', approverRoleName: '' })} className="text-blue-600" />按角色</label>
                   <label className="flex items-center gap-1.5 text-sm text-gray-700 cursor-pointer"><input type="radio" name={`at-${selectedNode.id}`} checked={approverType === 'user'} onChange={() => onUpdateNode(selectedNode.id, { approverType: 'user', approverId: '', approverRole: '', approverRoleName: '' })} className="text-blue-600" />指定用户</label>
@@ -112,7 +136,7 @@ export function NodeConfigPanel({ selectedNode, edges, approverRoles = [], roleD
               </div>
               {approverType === 'role' ? (
                 <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-gray-700">审批角色</label>
+                  <label className="text-xs font-medium text-gray-700">{assigneeNoun}角色</label>
                   <select className={selectCls} value={selectedNode.data.approverRole} onChange={(e) => {
                     if (e.target.value) {
                       const selectedRole = roleDetails.find(r => r.roleCode === e.target.value);
@@ -125,7 +149,7 @@ export function NodeConfigPanel({ selectedNode, edges, approverRoles = [], roleD
                 </div>
               ) : (
                 <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-gray-700">指定审批用户</label>
+                  <label className="text-xs font-medium text-gray-700">指定{assigneeNoun}用户</label>
                   {approverId && selectedUserName && (
                     <div className="flex items-center gap-2 rounded-md border border-gray-200 px-3 py-2 text-sm">
                       <UserCheck className="size-4 text-blue-500" /><span className="text-gray-900">{selectedUserName}</span>
@@ -154,12 +178,29 @@ export function NodeConfigPanel({ selectedNode, edges, approverRoles = [], roleD
                 </div>
               )}
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-gray-700">审批模式</label>
+                <label className="text-xs font-medium text-gray-700">{assigneeNoun}模式</label>
                 <select className={selectCls} value={selectedNode.data.approvalMode} onChange={(e) => onUpdateNode(selectedNode.id, { approvalMode: e.target.value as FlowNodeData['approvalMode'] })}>
-                  <option value="sequence">依次审批</option><option value="all">会签（全部通过）</option><option value="any">或签（任一通过）</option>
+                  <option value="sequence">依次{assigneeNoun}</option><option value="all">会签（全部通过）</option><option value="any">或签（任一通过）</option>
                 </select>
               </div>
             </>
+          )}
+
+          {t === 'cc' && (
+            <div className="space-y-3 rounded-xl border border-violet-100 bg-violet-50/50 p-3">
+              <div>
+                <div className="text-xs font-semibold text-gray-800">抄送收件人</div>
+                <div className="mt-0.5 text-[11px] text-gray-400">至少配置抄送角色编码或抄送用户 ID 其中一项，多个值用英文逗号分隔</div>
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-gray-700">抄送角色编码</label>
+                <input className="flex h-9 w-full rounded-md border border-gray-200 bg-white px-3 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100" placeholder="SUPER_ADMIN,FINANCE" value={selectedNode.data.ccRoleCodes ?? ''} onChange={(e) => onUpdateNode(selectedNode.id, { ccRoleCodes: e.target.value })} />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-gray-700">抄送用户 ID</label>
+                <input className="flex h-9 w-full rounded-md border border-gray-200 bg-white px-3 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100" placeholder="7,9" value={selectedNode.data.ccUserIds ?? ''} onChange={(e) => onUpdateNode(selectedNode.id, { ccUserIds: e.target.value })} />
+              </div>
+            </div>
           )}
 
           {t === 'condition' && (

@@ -1,6 +1,6 @@
 # GAI2 子智能体模型路由设计
 
-> 适用范围：forthAMS 在 Codex 中使用 GAI2/蜂群推进桌面端与后端质量闭环。全局契约以 `/Users/feigao/.codex/skills/gai/SKILL.md` 为唯一权威来源；本文只覆盖 forthAMS 的模型路由、GitNexus 门禁、冻结范围和项目级调度细节。移动端当前冻结：禁止子智能体写入或路由变更，但允许只读边界审计以确认冻结未被破坏。
+> 适用范围：forthAMS 在 Codex 中使用 GAI2/蜂群推进桌面端与后端质量闭环。全局契约以 `/Users/feigao/.codex/skills/gai/SKILL.md` 为唯一权威来源；每个 GAI2 agent 的 Dedicated Role Instruction Contracts / 专属角色指令合同也以该全局文件为准。本文只覆盖 forthAMS 的模型路由、GitNexus 门禁、冻结范围和项目级调度细节。移动端当前冻结：禁止子智能体写入或路由变更，但允许只读边界审计以确认冻结未被破坏。
 
 ## 1. 调研结论
 
@@ -16,13 +16,15 @@
 - CrewAI 允许每个 agent 配置 `llm`、`function_calling_llm`、`max_iter`、`max_rpm`、`max_execution_time`、`reasoning` 等，并推荐用 YAML 维护 agent 配置。参考：[CrewAI - Agents](https://docs.crewai.com/en/concepts/agents)。
 - 近期研究也支持资源化调度：AgentRM 把 agent 看成类似 OS 资源，强调 admission control、zombie reaping、上下文生命周期；AMRO-S 强调用轻量意图推断做路由；Agent Capsules 强调把 agent 粒度和质量门禁绑定，能合并就合并，质量不够再拆分。参考：[AgentRM](https://arxiv.org/abs/2603.13110)、[AMRO-S](https://arxiv.org/abs/2603.12933)、[Agent Capsules](https://arxiv.org/abs/2605.00410)。
 
-因此，forthAMS 的 GAI2 蜂群采用“主线程 `gai2-orchestrator` + 受控子 agent”的策略：主线程负责计划、编辑、验证整合和调度判断；Medium+ 完成权威默认交给独立 `gai2-reviewer`，子智能体只做边界清楚的旁路探索、审计、复核或独立实现。
+因此，forthAMS 的 GAI2 蜂群采用“主线程 `gai2-orchestrator` + 硬分工子 agent”的策略：主线程只负责调度、分诊、模型路由、子 agent admission、等待/消费/关闭结果、MINIONS adjudication 和最终汇总；凡 GAI2 实现/修复/文档规则落地且需要写文件，必须交给 `gai2-builder`，在 Codex 中映射为 `worker` 子 agent，并带明确 allowlist。Medium+ 和任何声称 `PASS` 的 GAI2 closeout 必须消费独立 `gai2-reviewer` verdict。
 
 补充校准：原 Opencode GAI2 的角色命名必须保留，不能只用泛化专家名替代。此前文档把 `gai2-orchestrator` 折叠成“主线程 manager”，这是调研遗漏；自本节起，forthAMS 明确恢复 `gai2-orchestrator` 作为必经调度角色。
 
-### 编排项目调研补充（2026-06-13）
+### 编排项目调研补充（2026-06-13 / 2026-06-26）
 
 本轮在继续落地 GAI2 前，已先调研当前主流多智能体/蜂群编排项目；结论是：成熟项目普遍采用“中心调度 + 明确状态 + 有界上下文 + 质量门禁”，而不是无条件大量并发。
+
+2026-06-26 已为本轮硬分工规则校准刷新/补充外部编排证据；2026-06-13 的历史调研说明继续保留。
 
 | 来源 | 可借鉴点 | forthAMS/Codex 落地 |
 |---|---|---|
@@ -43,6 +45,9 @@
 | auto/flash 家族 | `gai2-auto-*`、`gai2-flash-*`、sticky auto mode、fallback direct route | 不照搬 agent 家族；保留 `mode_intent` / `model route` 字段，用 `gpt-5.5` 默认和 reasoning_effort 分层表达速度/深度 |
 | artifact 文件强制落盘 | Opencode 要求 `.omc/gai2/*.json` read-verify | 不强制落盘；但必须有等价结构化 evidence。若某任务要求文件产物，则要 read-verify |
 | 权限与安全 | 只读角色不能写、写入 worker 必须 allowlist、敏感路径/API key 不可复制、工具 trace 需脱敏 | 借鉴为硬规则：delegated prompt 必须写 allowed/denied actions，closeout 必须有 tool trace/redaction check |
+| Opencode 硬分工与真实产物链 | `gai2-orchestrator` 只调度，`gai2-builder` 写入，`gai2-reviewer` 判定完成；MINIONS 有 drafter/refiner 真实产物链 | 借鉴角色边界和产物链；适配为 Codex `worker`/独立 reviewer 子 agent、coordination ledger 和 reviewer verdict；拒绝主线程自写自评、文本模拟 MINIONS、`.omc` runtime 迁移 |
+
+本机 Opencode GAI2 补充证据：专属角色指令位于 `/Users/feigao/.config/opencode/agent/gai2*.md`。`gai2.md` 是入口，`gai2-orchestrator.md` 是 `mode: subagent` 调度器，`gai2-drafter.md`/`gai2-refiner.md` 负责 MINIONS 真实链路，`gai2-builder.md` 明确 builder 不自批，`gai2-reviewer.md` 核验 drafter -> refiner -> adjudication -> builder/reviewer 链路，`gai2-audit.md`、`gai2-triage.md`、`gai2-debate.md` 也都是专属 role MD。未发现独立 `gai2-research.md`；它是 Codex 扩展角色。Codex 自定义 agent 适配器不等于完整 Opencode 角色文件，因此后续 handoff 必须显式携带 role identity、权限边界、模型/推理和产物要求。
 
 ### Codex-native 状态与证据包
 
@@ -68,7 +73,7 @@ forthAMS 的 native goal 如果在 objective 中包含 `GAI2`、`gai2`、`$gai`�
 3. 写出当前事实 vs 需要变化。
 4. 建立或刷新 workcard：`write_scope`、allowed paths、`research_decision`、`research_plan`、delegation、acceptance checks、evidence、open risks、GitNexus gates。
 5. 先做调研 gate：由 `gai2-orchestrator` 自主判断调研是 required/useful/skip；当任务涉及外部资料、社区/竞品、最新信息、官方文档、上游仓库、论文、模型/工具选型、不稳定事实，或要修改 GAI2 编排规则本身时，优先创建只读 `gai2-research`，并在落地前输出 borrow/adapt/reject。
-6. 默认开启自主分配：由 `gai2-orchestrator` 自主决定是否创建子智能体。调研/事实确认用 S1/S2，旁路审计用 S2，高风险复核用 S4，写入型 worker 只用于互不重叠的 allowlist 文件。
+6. 默认开启自主分配：由 `gai2-orchestrator` 自主决定是否创建子智能体。调研/事实确认用 S1/S2，旁路审计用 S2，高风险复核用 S4；所有 GAI2 写入型实现/修复/文档规则落地必须由 `gai2-builder` 作为 `worker` 执行，且只用于明确 allowlist 文件。
 7. 输出“调度判定”：分类、当前事实、需要变化、本地主线程动作、子智能体判定、选中/跳过角色及理由、并发预算/当前并发/依据、调研判定/来源/预算、编排模式/借鉴判定、模型/推理/fork_context、写入范围、policy_state/gap_history、等待点、关闭点、下一步。
 8. 子 agent 结果被消费后必须关闭，并在交接记录里登记中文别名、agent id、工具 nickname、模型、推理强度、结果、是否采纳和是否关闭。
 
@@ -100,10 +105,10 @@ forthAMS 的 GAI2 使用“默认开启、自主分配、受控回收”的子�
 
 默认开启不等于每轮都硬开 agent。调度器必须执行 admission control：
 
-- 任务简单或阻塞主线时，主线程本地完成。
+- 非 GAI2、纯只读、低风险小问题可以由主线程本地回答；GAI2 写入工作即使简单，也必须走 `gai2-builder` worker + allowlist，除非工具不可用并记录降级。
 - 审计、事实确认、复核、辩论、起草、精修可自主创建只读子智能体。
 - 涉及外部、最新、社区、官方、上游、模型/工具选型或不稳定事实时，可自主创建只读 `gai2-research`；纯本地、机械、已有证据或稳定事实可跳过，但必须记录跳过原因。
-- 写入型 worker 只允许在明确 allowlist、文件 ownership 不重叠、不会触碰冻结移动端范围时创建。
+- 写入型 worker 只允许在明确 allowlist、文件 ownership 不重叠、不会触碰冻结移动端范围时创建；没有 worker 时，主线程本地降级不得声称 `PASS`，除非用户显式接受本地执行。
 - forthAMS GAI2 写入默认只使用 `readonly` 或 `allowlist`；`unrestricted` 必须由用户在当前任务中显式授权。
 - 改任何函数、类、方法或共享符号前，workcard 必须记录 GitNexus impact 结果；提交前必须记录 `gitnexus_detect_changes` 结果。
 - 不为 read-only reviewer/audit/debate/drafter/refiner 额外询问用户确认。
@@ -141,7 +146,7 @@ forthAMS 的 GAI2 使用“默认开启、自主分配、受控回收”的子�
 - 宽范围文件巡检、调研、事实确认、风险审计、reviewer 复核、方案辩论、MINIONS 起草/精修，默认优先考虑只读 sidecar。
 - 子智能体的中间上下文不展开塞回主线程；主线程只消费结构化摘要、文件/行号证据、verdict、风险和下一步。
 - 子智能体任务单必须要求紧凑结构化输出，默认不超过 20 行、证据不超过 8 条，禁止倾倒长篇原文；优先返回路径、行号、结论和建议，而不是复制文件正文。
-- 紧急阻塞动作、最终综合判断和高耦合编辑仍由主线程承担。
+- 最终综合判断和高耦合调度仍由主线程承担；紧急阻塞写入和高耦合编辑在 GAI2 下仍必须交给 `gai2-builder` worker。工具不可用时只能记录本地降级，closeout 不超过 `PARTIAL`，除非用户显式接受本地执行。
 - Medium+ 宽范围审计/探索/复核如果没有创建 sidecar，必须在调度判定中解释为什么主线程更快且不会撑大上下文。
 
 ## 2. 当前 Codex 能力
@@ -154,7 +159,7 @@ forthAMS 的 GAI2 使用“默认开启、自主分配、受控回收”的子�
 - `fork_context`: 只有需要继承当前长上下文时才开启；摘要、文档审计、独立检索默认关闭。
 - `service_tier`: 默认继承，不主动改，除非用户明确要求。
 
-默认原则：当前账号按 Pro 资源使用策略处理，forthAMS 自主 GAI2 manager 的普通子 agent 默认从 `gpt-5.5` 起步；MINIONS 双推理例外，固定使用 `gpt-5.4 -> gpt-5.5`，即 `gai2-drafter` 用 `gpt-5.4 + medium` 起草，`gai2-refiner` 用 `gpt-5.5 + medium/high` 精修。成本、速度和深度主要通过 `reasoning_effort` 分层控制：机械确认和汇总用 `low`，旁路审计用 `medium`，迁移、权限、安全、跨模块 reviewer 用 `high/xhigh`。用户已明确确认“双推理改为 5.4+5.5”，因此以下路由表作为后续 GAI2 执行依据。
+默认原则：当前账号按 Pro 资源使用策略处理，forthAMS 自主 GAI2 子 agent 默认从 `gpt-5.5` 起步；MINIONS 双推理例外，固定使用真实 `gai2-drafter` 和 `gai2-refiner` 子 agent 链：`gai2-drafter` 用 `gpt-5.4 + xhigh` 起草，`gai2-refiner` 用 `gpt-5.5 + high` 精修，随后由 `gai2-orchestrator` 只做 adjudication。成本、速度和深度主要通过 `reasoning_effort` 分层控制：机械确认和汇总用 `low`，旁路审计用 `medium`，迁移、权限、安全、跨模块 reviewer 用 `high/xhigh`。用户已明确确认 Codex 全局和 forthAMS 覆盖 Opencode 的 Spark lane + inherit-current-session-model 默认，不再把 Spark lane 写成 MINIONS 默认；因此以下路由表作为后续 GAI2 执行依据。
 
 执行口径：轻任务不再默认使用 spark/mini 或 `gpt-5.4`；默认使用 `gpt-5.5 + low`。`gpt-5.4` 的常规默认用途是 MINIONS drafter。只有强实时、极低风险、可由主线程马上复核的任务才考虑 `gpt-5.4-mini` 或 `gpt-5.3-codex-spark`。
 
@@ -172,7 +177,7 @@ forthAMS 的 GAI2 使用“默认开启、自主分配、受控回收”的子�
 禁止项：
 
 - 不给 S0/S1 开 `fork_context=true`，除非任务必须依赖当前长上下文。
-- 不把阻塞主线的关键修复交给子 agent 等待；主线程自己做关键路径。
+- 不把调度和最终综合外包给子 agent；但 GAI2 关键修复只要写文件，仍必须由 `gai2-builder` worker 在 allowlist 内执行。工具不可用时记录降级，closeout 不超过 `PARTIAL`，除非用户显式接受本地执行。
 - 不同时开启多个写入型 worker，除非文件 ownership 完全不重叠。
 - 不让子 agent 碰 `frontend/src/pages/mobile/**` 或移动端路由，直到用户解除移动端冻结。
 
@@ -180,8 +185,8 @@ forthAMS 的 GAI2 使用“默认开启、自主分配、受控回收”的子�
 
 每次创建子 agent 前，主线程先完成 9 个判断：
 
-1. **必要性**：这个任务是否真的需要 agent？如果主线程 1-2 个 `rg/sed` 就能完成，不创建。
-2. **并行性**：它是否能与主线程下一步并行？如果主线程必须等结果才能继续，优先主线程自己做。
+1. **必要性**：这个任务是否真的需要 agent？如果是非 GAI2、纯只读、低风险检查，且主线程 1-2 个 `rg/sed` 就能完成，可以不创建；GAI2 写入、PASS 审查和 MINIONS 强制链路不适用此豁免。
+2. **并行性**：它是否能与主线程下一步并行？如果主线程必须等结果才能继续，仍按角色门禁判断：只读小检查可本地完成，写入交 `gai2-builder`，PASS 审查交 `gai2-reviewer`，工具不可用则记录降级。
 3. **边界**：是否能用 1-3 个文件、路径、命令或问题定义清楚？不能定义清楚就先缩小问题。
 4. **调研**：是否涉及外部资料、社区/竞品、最新信息、官方文档、上游仓库、论文、模型/工具选型或不稳定事实？如果是，创建或模拟 `gai2-research`，并记录来源预算；如果跳过，记录原因。
 5. **编排模式**：如果任务要改 GAI2/蜂群/模型路由/子 agent 规则，先选择 supervisor/subagents、handoff、workflow/checkpoint、council/swarm 或 hybrid，并输出 borrow/adapt/reject；不能先落地再补调研。
@@ -241,9 +246,9 @@ forthAMS 的 GAI2 使用“默认开启、自主分配、受控回收”的子�
 3. **Wait sparingly**：只有主线程被结果阻塞时才 `wait_agent`；否则主线程继续做不重叠工作。
 4. **收束策略**：超时或输出发散时，立即 `send_input(interrupt=true)`，要求“停止扩展读取，返回当前证据”。
 5. **关闭策略**：子 agent 完成或被判定无效后立刻 `close_agent`，避免侧栏累计和资源占用。
-6. **升级策略**：低档 agent 返回 `PARTIAL` 时，只允许一次升级重试；仍不足则主线程接管。
+6. **升级策略**：低档 agent 返回 `PARTIAL` 时，只允许一次升级重试；仍不足则进入 repair、blocked、用户输入或工具缺口 `PARTIAL`，不得让主线程静默接管 builder/reviewer 职责。
 7. **质量门禁**：没有文件/命令/行号证据的结论不能作为完成证据，只能作为线索。
-8. **独立审查**：Medium+ closeout 默认创建独立 `gai2-reviewer`；如果工具不可用或用户明确接受本地审查，必须记录原因，否则 verdict 不能超过 `PARTIAL`。
+8. **独立审查**：Medium+ closeout 和任何声称 `PASS` 的 GAI2 run 必须创建并消费独立 `gai2-reviewer` verdict；如果工具不可用，必须记录原因且 verdict 不能超过 `PARTIAL`，除非用户显式接受本地审查。
 9. **策略状态**：每次 Medium+ closeout 记录 `policy_state` 和 `gap_history`；同一 `gap_fingerprint` 多次重复且无新证据时，不继续盲目派 agent，转为 repair、blocked 或请求用户输入。
 10. **脱敏审计**：如果读取配置、日志、插件、权限文件或命令输出中出现密钥/令牌/密码，只总结存在性与风险，不复制值；closeout 必须记录 redaction status。
 
@@ -252,17 +257,17 @@ forthAMS 的 GAI2 使用“默认开启、自主分配、受控回收”的子�
 | 原 Opencode 角色 | 中文显示 | Codex/forthAMS 适配 | 默认模型/推理 |
 |---|---|---|---|
 | `gai2` | GAI2 总入口 | `gai` 技能 + Codex native goal；不创建独立 agent | 主线程 |
-| `gai2-orchestrator` | GAI2 调度器 | 必经调度角色；默认由主线程扮演，负责分诊、阶段推进、子 agent admission、模型路由、并发、收束和关闭；只有环境支持且确有价值时才创建独立调度子 agent | 主线程或 `gpt-5.5` / `high` |
+| `gai2-orchestrator` | GAI2 调度器 | 必经调度角色；默认由主线程扮演，只负责分诊、阶段推进、模型路由、子 agent admission、等待/消费/关闭结果、MINIONS adjudication 和最终汇总；不得实现业务/规则文件改动、不得把自己的工具调用或测试当完成证据、不得自评 `PASS` | 主线程或 `gpt-5.5` / `high` |
 | `gai2-triage` | 分诊专家 | 判断复杂度、范围、风险、write_scope 和证据需求 | `gpt-5.5` / `low` 或 `medium` |
 | `gai2-research` | 调研专家 | 只读调研外部/最新/社区/官方/上游/论文/模型工具证据，或确认可跳过调研并说明原因 | `gpt-5.5` / `low` 或 `medium` |
-| `gai2-audit` | 实施前审计专家 | 审计当前代码、测试、配置、GitNexus 风险与用户脏改 | `gpt-5.5` / `medium` |
-| `gai2-debate` | 方案辩论专家 | 对 2-3 个方案做取舍，给出推荐与风险 | `gpt-5.5` / `medium` |
-| `gai2-drafter` | MINIONS 起草专家 | 起草方案、补丁草图、测试策略或文档结构 | `gpt-5.4` / `medium` |
-| `gai2-refiner` | MINIONS 精修专家 | 反驳/精修 drafter 输出，压缩范围、补证据和边界 | `gpt-5.5` / `medium` 或 `high` |
-| `gai2-builder` | 执行变更专家 | 在明确 allowlist 下执行代码/测试/文档变更 | `gpt-5.5` / `medium` 或 `high` |
-| `gai2-reviewer` | 最终审查专家 | closeout 前做 PASS/PARTIAL/FAIL、gap fingerprint、证据映射 | `gpt-5.5` / `high` 或 `xhigh` |
+| `gai2-audit` | 实施前审计专家 | 审计当前代码、测试、配置、GitNexus 风险与用户脏改 | 模型 `gpt-5.5`；推理 `medium` |
+| `gai2-debate` | 方案辩论专家 | 对 2-3 个方案做取舍，给出推荐与风险 | 模型 `gpt-5.5`；推理 `medium` |
+| `gai2-drafter` | MINIONS 起草专家 | 真实子 agent；起草方案、补丁草图、测试策略或文档结构，并产出可消费 artifact/result | `gpt-5.4` / `xhigh` |
+| `gai2-refiner` | MINIONS 精修专家 | 真实子 agent；反驳/精修 drafter 输出，压缩范围、补证据和边界，并产出可消费 artifact/result；`gai2-refine` 只作为此 role id 的别名 | `gpt-5.5` / `high` |
+| `gai2-builder` | 执行变更专家 | Codex `worker` 子 agent；在明确 allowlist 下执行代码/测试/文档变更 | 模型 `gpt-5.5`；推理 `medium` 或 `high` |
+| `gai2-reviewer` | 最终审查专家 | 独立只读子 agent；closeout 前做 PASS/PARTIAL/FAIL、gap fingerprint、证据映射；`PASS` 必须消费其 verdict | `gpt-5.5` / `high` 或 `xhigh` |
 
-注意：Codex 当前优先采用“主线程 orchestrator + 扁平子 agent”的模式，避免嵌套调度失控。`gai2-orchestrator` 必须出现在 Medium+ workcard 中；它可以是主线程逻辑角色，不必每次实际创建一个同名子 agent。GAI2 触发后，调度器默认拥有自主分配子智能体的权限。
+注意：Codex 当前优先采用“主线程 orchestrator + 扁平子 agent”的模式，避免嵌套调度失控。`gai2-orchestrator` 必须出现在 Medium+ workcard 中；它可以是主线程逻辑角色，不必每次实际创建一个同名子 agent。GAI2 触发后，调度器默认拥有自主分配子智能体的权限，但不能接管 builder/reviewer，也不能用文本声明替代 MINIONS drafter/refiner 真实链路。
 
 ## 8. forthAMS 领域专家映射
 
@@ -272,10 +277,10 @@ forthAMS 的 GAI2 使用“默认开启、自主分配、受控回收”的子�
 |---|---|---|---|
 | `verification-ops` | S0/S2 | `gpt-5.5` / `low` 或 `medium` | 汇总测试、核对报告、查证据漂移 |
 | `external-research` | S1/S2 | `gpt-5.5` / `low` 或 `medium` | 官方文档、上游仓库、社区/竞品、最新事实、模型/工具选型证据 |
-| `data-model` | S2/S4 | `gpt-5.5` / `medium` 或 `high` | SQL、迁移、schema/fresh install 一致性 |
+| `data-model` | S2/S4 | 模型 `gpt-5.5`；推理 `medium` 或 `high` | SQL、迁移、schema/fresh install 一致性 |
 | `risk-security` | S4 | `gpt-5.5` / `high` 或 `xhigh` | 权限、认证、越权、审计日志 |
 | `product-ux` | S1/S2 | `gpt-5.5` / `low` 或 `medium` | 桌面端路径、只读/失败提示、入口可达 |
-| `delivery-minimal-change` | S2/S3 | `gpt-5.5` / `medium` 或 `high` | 检查补丁是否过宽，或做窄范围实现 |
+| `delivery-minimal-change` | S2/S3 | 模型 `gpt-5.5`；推理 `medium` 或 `high` | 检查补丁是否过宽，或做窄范围实现 |
 | `architecture-integration` | S3/S4 | `gpt-5.5` / `high` | 跨模块接口、若依整合、服务边界 |
 
 命名 lens 落地示例：
@@ -286,7 +291,7 @@ GAI2 role: gai2-debate 或 gai2-reviewer
 档位: S2 readonly，必要时升级 S3 allowlist worker
 prompt: 检查补丁是否超过 AC-1/AC-2 的最小范围，返回 evidence_map 和 repair_recommendation
 ledger: 中文别名、agent id/nickname、role id、档位、model/reasoning、fork_context、verdict、是否关闭、是否采纳
-close: 结果消费后立即 close_agent；PARTIAL 只允许一次升级，仍不足则主线程接管
+close: 结果消费后立即 close_agent；PARTIAL 只允许一次升级，仍不足则进入 repair、blocked、用户输入或工具缺口 PARTIAL
 ```
 
 ## 9. 示例
@@ -328,7 +333,7 @@ close: 结果消费后立即 close_agent；PARTIAL 只允许一次升级，仍�
 }
 ```
 
-适用：明确 allowlist 的单模块测试补齐。只有任务必须继承当前长上下文时才改为 `fork_context:true`，并在调度判定中说明理由。worker 返回后主线程必须 review diff，并独立运行验证。
+适用：明确 allowlist 的单模块测试补齐或文档规则落地。只有任务必须继承当前长上下文时才改为 `fork_context:true`，并在调度判定中说明理由。worker 返回后主线程只消费结果、汇总证据和调度后续 reviewer；完成权威来自独立 `gai2-reviewer` verdict。
 
 ## 10. 记录指标
 
@@ -371,4 +376,4 @@ close: 结果消费后立即 close_agent；PARTIAL 只允许一次升级，仍�
 - 外部资料、社区/竞品、官方/上游、模型/工具选型、最新事实核验：S1/S2，`gpt-5.5` + `low/medium`，优先只读 `gai2-research`。
 - 桌面路径可达性和只读 UX 审计：S1/S2，`gpt-5.5` + `low/medium`。
 - SQL 迁移、若依权限、安全边界：S4，`gpt-5.5` + `high/xhigh`。
-- 主线程保留最终调度、整合和验证执行；Medium+ 完成判断默认由独立 `gai2-reviewer` 按 AC-ID 证据映射给出。子 agent 默认作为只读证据/旁路审计侧车，写入型 worker 仅在明确 allowlist、ownership 不重叠且不触碰冻结范围时使用。
+- 主线程保留最终调度、整合、MINIONS adjudication 和汇总；不保留 GAI2 写入实现、完成审查或自评 `PASS` 权限。所有 GAI2 写入实现/修复/文档规则落地由 `gai2-builder` worker 在明确 allowlist、ownership 不重叠且不触碰冻结范围时执行；Medium+ 和任何 `PASS` 由独立 `gai2-reviewer` 按 AC-ID 证据映射给出。

@@ -1,0 +1,31 @@
+{
+  "name": "gai2-native-guard",
+  "version": "0.1.0+codex.20260627043046",
+  "description": "Project-level GAI2 guard hooks for risky tool use.",
+  "author": {
+    "name": "forthAMS"
+  },
+  "license": "MIT",
+  "hooks": "./hooks/hooks.json",
+  "keywords": [
+    "gai2",
+    "hooks",
+    "guardrails",
+    "codex"
+  ],
+  "interface": {
+    "displayName": "GAI2 Native Guard",
+    "shortDescription": "Project-local hook guardrails for risky commands and paths.",
+    "longDescription": "Blocks high-risk tool calls before execution and reports minimal non-secret evidence for GAI2 review. This hook-bearing candidate is not enabled until explicitly installed by the user.",
+    "developerName": "forthAMS",
+    "category": "Productivity",
+    "capabilities": [
+      "Instructions",
+      "Lifecycle hooks"
+    ],
+    "defaultPrompt": [
+      "Use GAI2 Native Guard for project-level risky tool checks."
+    ],
+    "brandColor": "#0F766E"
+  }
+}

@@ -1,5 +1,7 @@
 package com.ams.controller;
 
+import com.ams.annotation.OperBusinessType;
+import com.ams.annotation.OperLog;
 import com.ams.dto.ApprovalCreateDTO;
 import com.ams.entity.ApprovalProcess;
 import com.ams.service.ApprovalService;
@@ -16,10 +18,13 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -43,6 +48,29 @@ class ApprovalControllerTest {
 
     @MockBean
     private JwtUtil jwtUtil;
+
+    @Test
+    @DisplayName("Should annotate approval mutations with operation logs")
+    void shouldAnnotateMutationsWithOperLog() throws Exception {
+        Map<String, String> expectedTitles = Map.of(
+                "create", "审批发起",
+                "approve", "审批通过",
+                "reject", "审批驳回",
+                "cancel", "审批取消");
+        Map<String, OperBusinessType> expectedTypes = Map.of(
+                "create", OperBusinessType.INSERT,
+                "approve", OperBusinessType.UPDATE,
+                "reject", OperBusinessType.UPDATE,
+                "cancel", OperBusinessType.UPDATE);
+
+        for (Map.Entry<String, String> entry : expectedTitles.entrySet()) {
+            Method method = findMethod(entry.getKey());
+            OperLog operLog = method.getAnnotation(OperLog.class);
+            assertNotNull(operLog, entry.getKey() + " should declare @OperLog");
+            assertEquals(entry.getValue(), operLog.title());
+            assertEquals(expectedTypes.get(entry.getKey()), operLog.businessType());
+        }
+    }
 
     @Test
     @DisplayName("Should create approval with applicant id from JWT")
@@ -174,5 +202,14 @@ class ApprovalControllerTest {
                 .andExpect(jsonPath("$.code").value(200));
 
         verify(approvalService).cancelProcess(7L, 42L);
+    }
+
+    private Method findMethod(String name) {
+        for (Method method : ApprovalController.class.getDeclaredMethods()) {
+            if (method.getName().equals(name)) {
+                return method;
+            }
+        }
+        throw new AssertionError("Method not found: " + name);
     }
 }

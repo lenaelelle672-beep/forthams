@@ -29,7 +29,7 @@ const DEFAULT_NODE_W = 240;
 const DEFAULT_NODE_H = 140;
 
 function mmColor(node: FlowNode) {
-  const map: Record<string, string> = { start: '#16a34a', approval: '#2563eb', condition: '#f59e0b', end: '#dc2626' };
+  const map: Record<string, string> = { start: '#16a34a', approval: '#2563eb', task: '#0891b2', cc: '#7c3aed', condition: '#f59e0b', end: '#dc2626' };
   return map[node.type ?? ''] ?? '#3b82f6';
 }
 

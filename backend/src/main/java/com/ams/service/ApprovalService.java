@@ -188,6 +188,7 @@ public class ApprovalService {
                 throw new BusinessException("业务流程类型与审批流程类型不一致");
             }
             WorkflowDefinition definition = workflowDefinitionService.requirePublishedDefinition(dto.getProcessType());
+            ensureExpectedWorkflowVersion(dto, definition);
             dto.setBusinessType(dto.getProcessType());
             dto.setBusinessData(bindWorkflowSnapshot(dto.getBusinessData(), definition));
         }
@@ -572,6 +573,8 @@ public class ApprovalService {
                     item.put("approvalMode", node.approvalMode());
                     item.put("approverType", node.approverType());
                     item.put("approverId", node.approverId());
+                    item.put("ccRoleCodes", node.ccRoleCodes());
+                    item.put("ccUserIds", node.ccUserIds());
                     return item;
                 })
                 .toList();
@@ -813,6 +816,17 @@ public class ApprovalService {
         wrapped.put(WORKFLOW_VERSION_KEY, definition.getVersion());
         wrapped.put(WORKFLOW_DEFINITION_KEY, parseJsonValue(definition.getDefinitionJson(), "流程定义解析失败"));
         return toJson(wrapped, "审批业务数据序列化失败");
+    }
+
+    private void ensureExpectedWorkflowVersion(ApprovalCreateDTO dto, WorkflowDefinition definition) {
+        Long expectedDefinitionId = dto.getExpectedWorkflowDefinitionId();
+        if (expectedDefinitionId != null && !expectedDefinitionId.equals(definition.getId())) {
+            throw new BusinessException("流程发布版本已更新，请刷新后重新提交");
+        }
+        Integer expectedVersion = dto.getExpectedWorkflowVersion();
+        if (expectedVersion != null && !expectedVersion.equals(definition.getVersion())) {
+            throw new BusinessException("流程发布版本已更新，请刷新后重新提交");
+        }
     }
 
     private String extractWorkflowPayloadJson(String businessData) {

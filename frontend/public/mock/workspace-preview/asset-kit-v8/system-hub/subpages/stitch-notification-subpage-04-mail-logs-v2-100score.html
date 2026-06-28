@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=1586, height=992, initial-scale=1.0" name="viewport"/>
+<title>邮件日志与重试策略台</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style data-purpose="layout">
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 1586px;
+      height: 992px;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+      background-color: #f0f2f5;
+      font-size: 12px;
+      color: #333;
+    }
+    .text-xs { font-size: 12px; }
+    .text-sm { font-size: 14px; }
+    .text-base { font-size: 16px; }
+    
+    /* Scrollbar hiding for internal scrollable areas if any */
+    ::-webkit-scrollbar {
+      width: 0px;
+      height: 0px;
+      background: transparent;
+    }
+
+    .material-symbols-outlined {
+      font-size: 16px;
+      vertical-align: text-bottom;
+    }
+  </style>
+<style data-purpose="components">
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px 12px;
+      border-radius: 4px;
+      border: 1px solid #d9d9d9;
+      background: #fff;
+      cursor: pointer;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    .btn-primary {
+      background: #1890ff;
+      border-color: #1890ff;
+      color: #fff;
+    }
+    .btn-icon {
+      margin-right: 4px;
+      display: inline-flex;
+      align-items: center;
+    }
+    .card {
+      background: #fff;
+      border-radius: 4px;
+      border: 1px solid #e8e8e8;
+    }
+    .table th {
+      background: #fafafa;
+      font-weight: 500;
+      color: #666;
+      border-bottom: 1px solid #e8e8e8;
+      padding: 6px 8px;
+      text-align: left;
+      font-size: 11px;
+      white-space: nowrap;
+    }
+    .table td {
+      padding: 6px 8px;
+      border-bottom: 1px solid #e8e8e8;
+      color: #333;
+      font-size: 11px;
+      white-space: nowrap;
+    }
+    .table-hover tr:hover {
+      background-color: #fafafa;
+    }
+    .status-badge {
+      padding: 0 6px;
+      border-radius: 2px;
+      font-size: 11px;
+      line-height: 20px;
+      border: 1px solid transparent;
+      white-space: nowrap;
+      display: inline-block;
+    }
+    .status-fail { color: #f5222d; background: #fff1f0; border-color: #ffa39e; }
+    .status-retry { color: #fa8c16; background: #fff7e6; border-color: #ffd591; }
+    .status-success { color: #52c41a; background: #f6ffed; border-color: #b7eb8f; }
+    .table tr { height: 47px; }
+  </style>
+</head>
+<body>
+<!-- BEGIN: TopNav -->
+<header style="position: absolute; top: 0; left: 0; width: 1586px; height: 51px; background: #001529; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; box-sizing: border-box; z-index: 10;">
+<div style="display: flex; align-items: center; color: white;">
+<span style="font-size: 18px; font-weight: bold; letter-spacing: 1px;">UNIVIEW</span>
+<span style="margin: 0 12px; color: #405367;">|</span>
+<span style="font-size: 16px; font-weight: 500;">固定资产管理系统</span>
+<nav style="display: flex; margin-left: 40px; height: 51px;">
+<div style="padding: 0 20px; display: flex; align-items: center; color: rgba(255,255,255,0.65); cursor: pointer;"><span class="material-symbols-outlined mr-2">inventory_2</span>资产管理</div>
+<div style="padding: 0 20px; display: flex; align-items: center; color: rgba(255,255,255,0.65); cursor: pointer;"><span class="material-symbols-outlined mr-2">account_balance_wallet</span>财务管理</div>
+<div style="padding: 0 20px; display: flex; align-items: center; color: rgba(255,255,255,0.65); cursor: pointer;"><span class="material-symbols-outlined mr-2">description</span>报表中心</div>
+<div style="padding: 0 20px; display: flex; align-items: center; color: rgba(255,255,255,0.65); cursor: pointer;"><span class="material-symbols-outlined mr-2">settings</span>系统设置</div>
+<div style="padding: 0 20px; display: flex; align-items: center; background: #1890ff; color: white; cursor: pointer;"><span class="material-symbols-outlined mr-2">admin_panel_settings</span>系统运营中枢</div>
+</nav>
+</div>
+<div style="display: flex; align-items: center; color: white;">
+<div style="position: relative; margin-right: 20px; cursor: pointer;">
+<span class="material-symbols-outlined">notifications</span>
+<span style="position: absolute; top: -6px; right: -8px; background: #f5222d; color: white; font-size: 10px; padding: 0 4px; border-radius: 10px; line-height: 14px;">12</span>
+</div>
+<div style="margin-right: 20px; cursor: pointer;"><span class="material-symbols-outlined">help</span></div>
+<div style="display: flex; align-items: center; cursor: pointer;">
+<div style="width: 24px; height: 24px; border-radius: 50%; background: #ccc; margin-right: 8px;"></div>
+<span>平台运维 ▾</span>
+</div>
+</div>
+</header>
+<!-- END: TopNav -->
+<!-- BEGIN: Sidebar -->
+<aside style="position: absolute; top: 51px; left: 0; width: 217px; height: 941px; background: #001529; overflow: hidden;">
+<div style="padding: 16px 20px; color: white; font-size: 14px; font-weight: bold; border-bottom: 1px solid #00284d; display: flex; align-items: center;">
+<span class="material-symbols-outlined mr-2">admin_panel_settings</span>系统运营中枢
+    </div>
+<div style="color: rgba(255,255,255,0.65);">
+<div style="padding: 12px 20px; display: flex; justify-content: space-between; cursor: pointer;"><span>流程平台</span><span class="material-symbols-outlined">expand_less</span></div>
+<div style="padding: 8px 20px 8px 40px; cursor: pointer;">流程设计</div>
+<div style="padding: 8px 20px 8px 40px; cursor: pointer;">流程监控</div>
+<div style="padding: 8px 20px 8px 40px; cursor: pointer;">流程日志</div>
+<div style="padding: 8px 20px 8px 40px; cursor: pointer;">流程委托</div>
+<div style="padding: 12px 20px; display: flex; justify-content: space-between; cursor: pointer;"><span>组织权限</span><span class="material-symbols-outlined">expand_less</span></div>
+<div style="padding: 8px 20px 8px 40px; cursor: pointer;">组织管理</div>
+<div style="padding: 8px 20px 8px 40px; cursor: pointer;">角色管理</div>
+<div style="padding: 8px 20px 8px 40px; cursor: pointer;">权限管理</div>
+<div style="padding: 8px 20px 8px 40px; cursor: pointer;">用户管理</div>
+<div style="padding: 12px 20px; display: flex; justify-content: space-between; cursor: pointer;"><span>基础资料</span><span class="material-symbols-outlined">expand_less</span></div>
+<div style="padding: 8px 20px 8px 40px; cursor: pointer;">资产分类</div>
+<div style="padding: 8px 20px 8px 40px; cursor: pointer;">资产属性</div>
+<div style="padding: 8px 20px 8px 40px; cursor: pointer;">编码规则</div>
+<div style="padding: 8px 20px 8px 40px; cursor: pointer;">枚举值管理</div>
+<div style="padding: 12px 20px; display: flex; justify-content: space-between; cursor: pointer;"><span>集成配置</span><span class="material-symbols-outlined">expand_less</span></div>
+<div style="padding: 8px 20px 8px 40px; cursor: pointer;">系统集成</div>
+<div style="padding: 8px 20px 8px 40px; cursor: pointer;">接口管理</div>
+<div style="padding: 8px 20px 8px 40px; cursor: pointer;">数据映射</div>
+<div style="padding: 8px 20px 8px 40px; cursor: pointer;">调度任务</div>
+<div style="padding: 12px 20px; display: flex; justify-content: space-between; cursor: pointer;"><span>消息与通知</span><span class="material-symbols-outlined">expand_less</span></div>
+<div style="padding: 8px 20px 8px 40px; cursor: pointer;">通知渠道</div>
+<div style="padding: 8px 20px 8px 40px; cursor: pointer;">消息模板</div>
+<div style="padding: 8px 20px 8px 40px; cursor: pointer;">邮件模板</div>
+<div style="padding: 8px 20px 8px 40px; cursor: pointer;">短信模板</div>
+<div style="padding: 8px 20px 8px 40px; background: #1890ff; color: white; cursor: pointer;">邮件日志</div>
+<div style="padding: 12px 20px; display: flex; justify-content: space-between; cursor: pointer;"><span>系统参数</span><span class="material-symbols-outlined">expand_less</span></div>
+<div style="padding: 8px 20px 8px 40px; cursor: pointer;">全局参数</div>
+<div style="padding: 8px 20px 8px 40px; cursor: pointer;">业务参数</div>
+<div style="padding: 8px 20px 8px 40px; cursor: pointer;">参数日志</div>
+</div>
+</aside>
+<!-- END: Sidebar -->
+<!-- BEGIN: Upper Workspace -->
+<main style="position: absolute; top: 67px; left: 237px; width: 1331px; height: 629px; overflow: hidden;">
+<!-- Header -->
+<div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 16px;">
+<div>
+<h1 style="font-size: 20px; font-weight: 500; margin: 0 0 4px 0; color: rgba(0,0,0,0.85);">邮件日志与重试策略台</h1>
+<p style="margin: 0; color: rgba(0,0,0,0.45);">追踪流程邮件发送批次、失败原因、重试队列、备用网关和审计取证。</p>
+</div>
+<div style="display: flex; gap: 8px;">
+<div style="font-size: 12px; color: #666; margin-right: 20px; display: flex; align-items: center; gap: 16px;">
+<span>待处理失败 <span style="color: #f5222d; background: #fff1f0; padding: 0 4px; border-radius: 10px;">5</span></span>
+<span>今日发送 <strong style="color: #333;">1,286</strong></span>
+<span>成功率 <strong style="color: #52c41a;">98.7%</strong></span>
+<span>重试队列 <a style="color: #1890ff;">3</a></span>
+<span>审计留痕 <span style="color: #52c41a;">已启用</span></span>
+<span>最近同步 2026-06-18 15:32</span>
+</div>
+</div>
+</div>
+<!-- Action Bar -->
+<div style="display: flex; gap: 8px; margin-bottom: 16px;">
+<button class="btn btn-primary"><span class="btn-icon material-symbols-outlined" style="font-size: 14px;">add</span> 新建重试策略</button>
+<button class="btn"><span class="btn-icon material-symbols-outlined text-blue-500" style="font-size: 14px;">save</span> 保存草稿</button>
+<button class="btn"><span class="btn-icon material-symbols-outlined text-blue-500" style="font-size: 14px;">check_circle</span> 提交校验</button>
+<button class="btn"><span class="btn-icon material-symbols-outlined text-blue-500" style="font-size: 14px;">play_circle</span> 重试预演</button>
+<button class="btn"><span class="btn-icon material-symbols-outlined text-blue-500" style="font-size: 14px;">file_download</span> 导出取证包</button>
+</div>
+<!-- Filter Bar -->
+<div class="card" style="padding: 12px; margin-bottom: 16px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center;">
+<div style="position: relative; width: 200px;">
+<input placeholder="搜索批次号 / 模板 / 收件人 / 失败原因 / 流程来源" style="width: 100%; padding: 4px 24px 4px 8px; border: 1px solid #d9d9d9; border-radius: 4px; font-size: 12px;" type="text"/>
+<span class="material-symbols-outlined" style="position: absolute; right: 8px; top: 6px; color: #bfbfbf; font-size: 16px;">search</span>
+</div>
+<div style="display: flex; align-items: center; gap: 4px;">
+<span style="color: #666;">状态</span>
+<select style="padding: 4px 8px; border: 1px solid #d9d9d9; border-radius: 4px; font-size: 12px; width: 80px;"><option>全部</option></select>
+</div>
+<div style="display: flex; align-items: center; gap: 4px;">
+<span style="color: #666;">来源流程</span>
+<select style="padding: 4px 8px; border: 1px solid #d9d9d9; border-radius: 4px; font-size: 12px; width: 90px;"><option>全部</option></select>
+</div>
+<div style="display: flex; align-items: center; gap: 4px;">
+<span style="color: #666;">邮件模板</span>
+<select style="padding: 4px 8px; border: 1px solid #d9d9d9; border-radius: 4px; font-size: 12px; width: 90px;"><option>全部</option></select>
+</div>
+<div style="display: flex; align-items: center; gap: 4px;">
+<span style="color: #666;">网关</span>
+<select style="padding: 4px 8px; border: 1px solid #d9d9d9; border-radius: 4px; font-size: 12px; width: 80px;"><option>全部</option></select>
+</div>
+<div style="display: flex; align-items: center; gap: 4px;">
+<span style="color: #666;">时间范围</span>
+<select style="padding: 4px 8px; border: 1px solid #d9d9d9; border-radius: 4px; font-size: 12px; width: 100px;"><option>近 24 小时</option></select>
+</div>
+<div style="display: flex; align-items: center; gap: 4px;">
+<span style="color: #666;">重试次数</span>
+<select style="padding: 4px 8px; border: 1px solid #d9d9d9; border-radius: 4px; font-size: 12px; width: 80px;"><option>全部</option></select>
+</div>
+<div style="margin-left: auto; display: flex; gap: 8px;">
+<button class="btn"><span class="material-symbols-outlined" style="font-size: 14px; margin-right: 4px;">refresh</span> 重置</button>
+<button class="btn" style="color: #1890ff; border-color: #1890ff;">高级筛选 ▾</button>
+</div>
+</div>
+<!-- Main Content Area (Rail + Center + Right) -->
+<div style="display: flex; gap: 16px; height: 456px; overflow: hidden;">
+<!-- Left Rail (x=237..447) -->
+<div class="card" style="width: 210px; display: flex; flex-direction: column; overflow: hidden;">
+<div style="padding: 12px; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; background: #fafafa;">
+<strong style="color: #333;">邮件日志规则 / 快速队列</strong>
+<span class="material-symbols-outlined" style="color: #999; cursor: pointer;">settings</span>
+</div>
+<div style="padding: 12px; flex: 1; display: flex; flex-direction: column; gap: 12px; background: #f9fbfd; overflow: hidden;">
+<div style="background: #fff; border: 1px solid #1890ff; border-radius: 4px; padding: 12px; box-shadow: 0 2px 4px rgba(24,144,255,0.1);">
+<div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+<strong style="color: #333;">SMTP 认证失败批次</strong>
+<span class="status-badge status-fail">待重试</span>
+</div>
+<div style="font-size: 11px; color: #666; margin-bottom: 4px;">适用场景: 认证失败账号异常</div>
+<div style="font-size: 11px; color: #666; display: flex; justify-content: space-between;">
+<span>策略: 自动重试 3 次, 切换备用网关</span>
+<span style="color: #f5222d; font-weight: bold; font-size: 14px;">3</span>
+</div>
+</div>
+<div style="background: #fff; border: 1px solid #e8e8e8; border-radius: 4px; padding: 12px;">
+<div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+<strong style="color: #333;">SLA 超时提醒发送记录</strong>
+<span class="status-badge status-retry">需升级</span>
+</div>
+<div style="font-size: 11px; color: #666; margin-bottom: 4px;">适用场景: SLA 提醒类邮件</div>
+<div style="font-size: 11px; color: #666; display: flex; justify-content: space-between;">
+<span>策略: 延迟重试 2 次, 升级处理</span>
+<span style="color: #fa8c16; font-weight: bold; font-size: 14px;">1</span>
+</div>
+</div>
+<div style="background: #fff; border: 1px solid #e8e8e8; border-radius: 4px; padding: 12px;">
+<div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+<strong style="color: #333;">CIP 邮件回执追踪</strong>
+<span class="status-badge" style="color: #666; background: #f5f5f5; border: 1px solid #d9d9d9;">已归档</span>
+</div>
+<div style="font-size: 11px; color: #666; margin-bottom: 4px;">适用场景: CIP 流程邮件回执</div>
+<div style="font-size: 11px; color: #666; display: flex; justify-content: space-between;">
+<span>策略: 记录回执, 失败标记人工</span>
+<span style="color: #333; font-weight: bold; font-size: 14px;">12</span>
+</div>
+</div>
+<div style="background: #fff; border: 1px solid #e8e8e8; border-radius: 4px; padding: 12px;">
+<div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+<strong style="color: #333;">ERP 回执失败通知</strong>
+<span class="status-badge" style="color: #1890ff; background: #e6f7ff; border: 1px solid #91d5ff;">自动重试</span>
+</div>
+<div style="font-size: 11px; color: #666; margin-bottom: 4px;">适用场景: ERP 回执失败类</div>
+<div style="font-size: 11px; color: #666; display: flex; justify-content: space-between;">
+<span>策略: 自动重试 5 次, 人工升级</span>
+<span style="color: #1890ff; font-weight: bold; font-size: 14px;">2</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Center Card (x=455..1203) -->
+<div class="card" style="flex: 1; display: flex; flex-direction: column; overflow: hidden;">
+<div style="padding: 12px 16px; border-bottom: 1px solid #e8e8e8;">
+<strong style="color: #333;">邮件发送日志</strong>
+</div>
+<div style="flex: 1; overflow: hidden;">
+<table class="table table-hover" style="width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 9px;"><colgroup><col style="width: 132px;"/><col style="width: 72px;"/><col style="width: 98px;"/><col style="width: 62px;"/><col style="width: 46px;"/><col style="width: 42px;"/><col style="width: 82px;"/><col style="width: 36px;"/><col style="width: 78px;"/><col style="width: 48px;"/></colgroup><thead><tr><th class="overflow-hidden whitespace-nowrap text-ellipsis">批次号</th><th class="overflow-hidden whitespace-nowrap text-ellipsis">模板/场景</th><th class="overflow-hidden whitespace-nowrap text-ellipsis">收件人</th><th class="overflow-hidden whitespace-nowrap text-ellipsis">来源流程</th><th class="overflow-hidden whitespace-nowrap text-ellipsis">网关</th><th class="overflow-hidden whitespace-nowrap text-ellipsis">状态</th><th class="overflow-hidden whitespace-nowrap text-ellipsis">失败原因</th><th class="overflow-hidden whitespace-nowrap text-ellipsis">重试次数</th><th class="overflow-hidden whitespace-nowrap text-ellipsis">最近发送</th><th class="overflow-hidden whitespace-nowrap text-ellipsis">操作</th></tr></thead><tbody><tr style="background-color: #f0f7ff;"><td class="overflow-hidden whitespace-nowrap text-ellipsis">BATCH-20260618-0931</td><td class="overflow-hidden whitespace-nowrap text-ellipsis">CIP 转固审批通知</td><td class="overflow-hidden whitespace-nowrap text-ellipsis">zhangsan@uniview.com <a style="color:#1890ff;">+3</a></td><td class="overflow-hidden whitespace-nowrap text-ellipsis">CIP 转固流程</td><td class="overflow-hidden whitespace-nowrap text-ellipsis">SMTP-01</td><td class="overflow-hidden whitespace-nowrap text-ellipsis"><span class="status-badge status-fail">失败</span></td><td class="overflow-hidden whitespace-nowrap text-ellipsis" style="overflow: hidden; text-overflow: ellipsis;">553 Authentication Failed</td><td class="overflow-hidden whitespace-nowrap text-ellipsis">1/3</td><td class="overflow-hidden whitespace-nowrap text-ellipsis">2026-06-18 15:28:31</td><td class="overflow-hidden whitespace-nowrap text-ellipsis"><a style="color:#1890ff;cursor:pointer;">查看</a> | <a style="color:#1890ff;cursor:pointer;">重试</a> | <a style="color:#1890ff;cursor:pointer;">更多</a></td></tr><tr><td class="overflow-hidden whitespace-nowrap text-ellipsis">BATCH-20260618-0928</td><td class="overflow-hidden whitespace-nowrap text-ellipsis">ERP 回执失败模板</td><td class="overflow-hidden whitespace-nowrap text-ellipsis">lisa.li@uniview.com <a style="color:#1890ff;">+5</a></td><td class="overflow-hidden whitespace-nowrap text-ellipsis">ERP 回执</td><td class="overflow-hidden whitespace-nowrap text-ellipsis">SMTP-01</td><td class="overflow-hidden whitespace-nowrap text-ellipsis"><span class="status-badge status-retry">重试中</span></td><td class="overflow-hidden whitespace-nowrap text-ellipsis" style="overflow: hidden; text-overflow: ellipsis;">Connection timed out</td><td class="overflow-hidden whitespace-nowrap text-ellipsis">2/5</td><td class="overflow-hidden whitespace-nowrap text-ellipsis">2026-06-18 15:22:17</td><td class="overflow-hidden whitespace-nowrap text-ellipsis"><a style="color:#1890ff;cursor:pointer;">查看</a> | <a style="color:#1890ff;cursor:pointer;">重试</a> | <a style="color:#1890ff;cursor:pointer;">更多</a></td></tr><tr><td class="overflow-hidden whitespace-nowrap text-ellipsis">BATCH-20260618-0925</td><td class="overflow-hidden whitespace-nowrap text-ellipsis">SLA 超时升级模板</td><td class="overflow-hidden whitespace-nowrap text-ellipsis">ops@uniview.com <a style="color:#1890ff;">+2</a></td><td class="overflow-hidden whitespace-nowrap text-ellipsis">SLA 升级</td><td class="overflow-hidden whitespace-nowrap text-ellipsis">SMTP-02</td><td class="overflow-hidden whitespace-nowrap text-ellipsis"><span class="status-badge status-fail">失败</span></td><td class="overflow-hidden whitespace-nowrap text-ellipsis" style="overflow: hidden; text-overflow: ellipsis;">5.7.1 Relay access denied</td><td class="overflow-hidden whitespace-nowrap text-ellipsis">0/2</td><td class="overflow-hidden whitespace-nowrap text-ellipsis">2026-06-18 15:15:06</td><td class="overflow-hidden whitespace-nowrap text-ellipsis"><a style="color:#1890ff;cursor:pointer;">查看</a> | <a style="color:#1890ff;cursor:pointer;">重试</a> | <a style="color:#1890ff;cursor:pointer;">更多</a></td></tr><tr><td class="overflow-hidden whitespace-nowrap text-ellipsis">BATCH-20260618-0912</td><td class="overflow-hidden whitespace-nowrap text-ellipsis">资产入账完成通知</td><td class="overflow-hidden whitespace-nowrap text-ellipsis">caiwu@uniview.com <a style="color:#1890ff;">+8</a></td><td class="overflow-hidden whitespace-nowrap text-ellipsis">FA 入账流程</td><td class="overflow-hidden whitespace-nowrap text-ellipsis">SMTP-01</td><td class="overflow-hidden whitespace-nowrap text-ellipsis"><span class="status-badge status-success">成功</span></td><td class="overflow-hidden whitespace-nowrap text-ellipsis">-</td><td class="overflow-hidden whitespace-nowrap text-ellipsis">0/0</td><td class="overflow-hidden whitespace-nowrap text-ellipsis">2026-06-18 14:58:33</td><td class="overflow-hidden whitespace-nowrap text-ellipsis"><a style="color:#1890ff;cursor:pointer;">查看</a> | <a style="color:#1890ff;cursor:pointer;">重试</a> | <a style="color:#1890ff;cursor:pointer;">更多</a></td></tr><tr><td class="overflow-hidden whitespace-nowrap text-ellipsis">BATCH-20260618-0907</td><td class="overflow-hidden whitespace-nowrap text-ellipsis">CIP 转固审批通知</td><td class="overflow-hidden whitespace-nowrap text-ellipsis">wangwu@uniview.com <a style="color:#1890ff;">+1</a></td><td class="overflow-hidden whitespace-nowrap text-ellipsis">CIP 转固流程</td><td class="overflow-hidden whitespace-nowrap text-ellipsis">SMTP-01</td><td class="overflow-hidden whitespace-nowrap text-ellipsis"><span class="status-badge status-fail">失败</span></td><td class="overflow-hidden whitespace-nowrap text-ellipsis" style="overflow: hidden; text-overflow: ellipsis;">550 5.1.1 User unknown</td><td class="overflow-hidden whitespace-nowrap text-ellipsis">3/3</td><td class="overflow-hidden whitespace-nowrap text-ellipsis">2026-06-18 14:41:09</td><td class="overflow-hidden whitespace-nowrap text-ellipsis"><a style="color:#1890ff;cursor:pointer;">查看</a> | <a style="color:#1890ff;cursor:pointer;">重试</a> | <a style="color:#1890ff;cursor:pointer;">更多</a></td></tr><tr><td class="overflow-hidden whitespace-nowrap text-ellipsis">BATCH-20260618-0886</td><td class="overflow-hidden whitespace-nowrap text-ellipsis">资产入账完成通知</td><td class="overflow-hidden whitespace-nowrap text-ellipsis">finance@uniview.com <a style="color:#1890ff;">+6</a></td><td class="overflow-hidden whitespace-nowrap text-ellipsis">FA 入账流程</td><td class="overflow-hidden whitespace-nowrap text-ellipsis">SMTP-02</td><td class="overflow-hidden whitespace-nowrap text-ellipsis"><span class="status-badge status-success">成功</span></td><td class="overflow-hidden whitespace-nowrap text-ellipsis">-</td><td class="overflow-hidden whitespace-nowrap text-ellipsis">0/0</td><td class="overflow-hidden whitespace-nowrap text-ellipsis">2026-06-18 14:25:12</td><td class="overflow-hidden whitespace-nowrap text-ellipsis"><a style="color:#1890ff;cursor:pointer;">查看</a> | <a style="color:#1890ff;cursor:pointer;">重试</a> | <a style="color:#1890ff;cursor:pointer;">更多</a></td></tr></tbody></table>
+</div>
+<div style="padding: 12px 16px; border-top: 1px solid #e8e8e8; display: flex; justify-content: space-between; align-items: center; color: #666;">
+<span>共 286 条</span>
+<div style="display: flex; align-items: center; gap: 4px;">
+<button class="btn" style="padding: 2px 6px;">&lt;</button>
+<button class="btn btn-primary" style="padding: 2px 8px;">1</button>
+<button class="btn" style="padding: 2px 8px; border:none; background:transparent;">2</button>
+<button class="btn" style="padding: 2px 8px; border:none; background:transparent;">3</button>
+<button class="btn" style="padding: 2px 8px; border:none; background:transparent;">4</button>
+<button class="btn" style="padding: 2px 8px; border:none; background:transparent;">5</button>
+<span>...</span>
+<button class="btn" style="padding: 2px 8px; border:none; background:transparent;">29</button>
+<button class="btn" style="padding: 2px 6px;">&gt;</button>
+<select style="padding: 2px; border: 1px solid #d9d9d9; border-radius: 4px; font-size: 12px; margin-left:8px;"><option>10 条 / 页</option></select>
+<span style="margin-left:8px;">跳至</span>
+<input style="width: 30px; padding: 2px; text-align: center; border: 1px solid #d9d9d9; border-radius: 4px; font-size: 12px;" type="text" value="1"/>
+<span>页</span>
+</div>
+</div>
+</div>
+<!-- Right Panel (x=1212..1568) -->
+<div class="card" style="width: 356px; display: flex; flex-direction: column; overflow: hidden;">
+<div style="padding: 12px 16px; border-bottom: 1px solid #e8e8e8;">
+<strong style="color: #333;">失败详情与重试策略</strong>
+</div>
+<div style="padding: 16px; flex: 1; font-size: 11px; overflow: hidden;">
+<div style="display: grid; grid-template-columns: 80px 1fr; gap: 8px; margin-bottom: 20px;">
+<div style="color: #666;">当前批次</div><div style="color: #f5222d;">BATCH-20260618-0931</div>
+<div style="color: #666;">日志名称</div><div>CIP 转固审批通知</div>
+<div style="color: #666;">日志编码</div><div>MAIL_LOG_20260618_0931</div>
+<div style="color: #666;">日志来源</div><div>系统自动触发</div>
+<div style="color: #666;">触发节点</div><div>Node_Approve (CIP 转固审批)</div>
+<div style="color: #666;">收件人</div><div>zhangsan@uniview.com 等 4 人</div>
+<div style="color: #666;">失败触发</div><div>2026-06-18 15:26:12</div>
+<div style="color: #666;">重试通道</div><div>SMTP-01 主通道</div>
+<div style="color: #666;">备用网关</div><div>SMTP-02 备用</div>
+<div style="color: #666;">处理策略</div><div>自动重试 3 次，切换备用网关</div>
+<div style="color: #666;">负责人</div><div>平台运维</div>
+<div style="color: #666;">审计说明</div><div>SMTP 认证失败，凭证可能过期或配置错误。</div>
+</div>
+<div style="font-weight: 500; color: #333; margin-bottom: 12px; font-size: 12px;">处理进度</div>
+<div style="position: relative; padding-left: 16px; border-left: 1px solid #e8e8e8; margin-left: 8px;">
+<div style="position: relative; margin-bottom: 16px;">
+<span style="position: absolute; left: -22px; top: 0; color: #52c41a; background: #fff;">●</span>
+<div style="display: flex; justify-content: space-between;">
+<span style="color: #333;">触发邮件</span>
+<span style="color: #999;">2026-06-18 15:26:12</span>
+</div>
+</div>
+<div style="position: relative; margin-bottom: 16px;">
+<span style="position: absolute; left: -22px; top: 0; color: #f5222d; background: #fff;">⊗</span>
+<div style="display: flex; justify-content: space-between;">
+<span style="color: #333;">SMTP 失败 (553 Authentication Failed)</span>
+<span style="color: #999;">2026-06-18 15:28:31</span>
+</div>
+</div>
+<div style="position: relative; margin-bottom: 16px;">
+<span style="position: absolute; left: -22px; top: 0; color: #1890ff; background: #fff;">○</span>
+<div style="display: flex; justify-content: space-between;">
+<span style="color: #333;">加入重试队列 (第 1 次)</span>
+<span style="color: #999;">2026-06-18 15:28:32</span>
+</div>
+</div>
+<div style="position: relative;">
+<span style="position: absolute; left: -22px; top: 0; color: #d9d9d9; background: #fff;">○</span>
+<div style="display: flex; justify-content: space-between;">
+<span style="color: #999;">备用网关待执行</span>
+<span style="color: #999;">-</span>
+</div>
+</div>
+</div>
+</div>
+<div style="padding: 12px 16px; border-top: 1px solid #e8e8e8; display: flex; gap: 8px;">
+<button class="btn btn-primary" style="flex: 1;"><span class="material-symbols-outlined" style="font-size: 14px; margin-right: 4px;">refresh</span> 执行重试</button>
+<button class="btn" style="color: #1890ff; border-color: #1890ff; flex: 1;"><span class="material-symbols-outlined" style="font-size: 14px; margin-right: 4px;">check_box</span> 标记已处理</button>
+<button class="btn" style="flex: 1;"><span class="material-symbols-outlined" style="font-size: 14px; margin-right: 4px;">content_copy</span> 导出取证包</button>
+</div>
+</div>
+</div>
+</main>
+<!-- END: Upper Workspace -->
+<!-- BEGIN: Bottom Workspace -->
+<footer style="position: absolute; top: 707px; left: 237px; width: 1331px; height: 234px; display: flex; gap: 16px; overflow: hidden;">
+<!-- Left Card: x=237..836 (width approx 599px) -->
+<div class="card" style="width: 599px; display: flex; flex-direction: column; overflow: hidden;">
+<div style="padding: 12px 16px; border-bottom: 1px solid #e8e8e8;">
+<strong style="color: #333;">失败重试队列</strong>
+</div>
+<div style="flex: 1; overflow: hidden;">
+<table class="table" style="width: 100%; border-collapse: collapse;">
+<thead>
+<tr>
+<th>批次号</th>
+<th>失败原因</th>
+<th>重试次数</th>
+<th>下次重试时间</th>
+<th>备用网关</th>
+<th>升级负责人</th>
+<th>操作</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BATCH-20260618-0931</td>
+<td>553 Authentication Failed</td>
+<td>1/3</td>
+<td>2026-06-18 15:33:31</td>
+<td>SMTP-02 备用</td>
+<td>平台运维</td>
+<td><a style="color:#1890ff;cursor:pointer;">重试发送</a> | <a style="color:#1890ff;cursor:pointer;">详情</a></td>
+</tr>
+<tr>
+<td>BATCH-20260618-0928</td>
+<td>Connection timed out</td>
+<td>2/5</td>
+<td>2026-06-18 15:36:17</td>
+<td>SMTP-02 备用</td>
+<td>平台运维</td>
+<td><a style="color:#1890ff;cursor:pointer;">重试发送</a> | <a style="color:#1890ff;cursor:pointer;">详情</a></td>
+</tr>
+<tr>
+<td>BATCH-20260618-0907</td>
+<td>550 5.1.1 User unknown</td>
+<td>3/3</td>
+<td>2026-06-18 15:20:09</td>
+<td>SMTP-02 备用</td>
+<td>itops</td>
+<td><a style="color:#1890ff;cursor:pointer;">升级处理</a> | <a style="color:#1890ff;cursor:pointer;">详情</a></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div style="padding: 8px 16px; border-top: 1px solid #e8e8e8; display: flex; justify-content: space-between; align-items: center; color: #666;">
+<span>共 3 条</span>
+<div style="display: flex; align-items: center; gap: 4px;">
+<button class="btn" style="padding: 2px 6px;">&lt;</button>
+<button class="btn btn-primary" style="padding: 2px 8px;">1</button>
+<button class="btn" style="padding: 2px 6px;">&gt;</button>
+<select style="padding: 2px; border: 1px solid #d9d9d9; border-radius: 4px; font-size: 12px; margin-left:8px;"><option>10 条 / 页</option></select>
+</div>
+</div>
+</div>
+<!-- Right Card: x=847..1568 (width approx 716px) -->
+<div class="card" style="flex: 1; display: flex; flex-direction: column; overflow: hidden;">
+<div style="padding: 12px 16px; border-bottom: 1px solid #e8e8e8;">
+<strong style="color: #333;">审计取证包</strong>
+</div>
+<div style="flex: 1; overflow: hidden;">
+<table class="table" style="width: 100%; border-collapse: collapse;">
+<thead>
+<tr>
+<th>批次号</th>
+<th>Payload Hash</th>
+<th>模板版本</th>
+<th>变量快照</th>
+<th>SMTP 响应</th>
+<th>操作人</th>
+<th>导出状态</th>
+<th>操作</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BATCH-20260618-0931</td>
+<td>e8b6f2d3d9b4...</td>
+<td>V3</td>
+<td><a style="color:#1890ff;cursor:pointer;">查看快照</a></td>
+<td>553 Authentication Failed</td>
+<td>平台运维</td>
+<td>未导出</td>
+<td><a style="color:#1890ff;cursor:pointer;">生成取证包</a></td>
+</tr>
+<tr>
+<td>BATCH-20260618-0928</td>
+<td>a47c9e92f6d1...</td>
+<td>V2</td>
+<td><a style="color:#1890ff;cursor:pointer;">查看快照</a></td>
+<td>Connection timed out</td>
+<td>平台运维</td>
+<td><span class="material-symbols-outlined" style="color:#52c41a;">check</span> 已导出</td>
+<td><a style="color:#1890ff;cursor:pointer;"><span class="material-symbols-outlined" style="font-size: 12px;">download</span> 下载</a></td>
+</tr>
+<tr>
+<td>BATCH-20260618-0907</td>
+<td>3c1ae7b6f4a0...</td>
+<td>V2</td>
+<td><a style="color:#1890ff;cursor:pointer;">查看快照</a></td>
+<td>550 5.1.1 User unknown</td>
+<td>itops</td>
+<td><span class="material-symbols-outlined" style="color:#52c41a;">check</span> 已导出</td>
+<td><a style="color:#1890ff;cursor:pointer;"><span class="material-symbols-outlined" style="font-size: 12px;">download</span> 下载</a></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div style="padding: 8px 16px; border-top: 1px solid #e8e8e8; display: flex; justify-content: space-between; align-items: center; color: #666;">
+<span>共 3 条</span>
+<div style="display: flex; align-items: center; gap: 4px;">
+<button class="btn" style="padding: 2px 6px;">&lt;</button>
+<button class="btn btn-primary" style="padding: 2px 8px;">1</button>
+<button class="btn" style="padding: 2px 6px;">&gt;</button>
+<select style="padding: 2px; border: 1px solid #d9d9d9; border-radius: 4px; font-size: 12px; margin-left:8px;"><option>10 条 / 页</option></select>
+</div>
+</div>
+</div>
+</footer>
+<!-- END: Bottom Workspace -->
+</body></html>

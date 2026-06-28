@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>基础参数运行配置台 - 1:1 像素级复刻版</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<style data-purpose="custom-styles">
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: #F4F6F8;
+      color: #1D2129;
+      overflow: hidden; /* Fixed frame */
+      height: 981px;
+      width: 1603px;
+    }
+    
+    .text-xxs {
+      font-size: 10px;
+      line-height: 12px;
+    }
+
+    /* Custom Scrollbar for inner elements if needed, though mostly fixed */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #c9cdd4;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .shadow-card {
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02), 0 2px 4px rgba(0,0,0,0.02);
+    }
+    
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+    }
+    .status-badge.low { background-color: #E8FFEA; color: #00B42A; border: 1px solid #00B42A; }
+    .status-badge.medium { background-color: #FFF7E8; color: #FF7D00; border: 1px solid #FF7D00; }
+    .status-badge.high { background-color: #FFECE8; color: #F53F3F; border: 1px solid #F53F3F; }
+    .status-badge.published { background-color: #E8FFEA; color: #00B42A; }
+    .status-badge.pending { background-color: #FFF7E8; color: #FF7D00; }
+    .status-badge.draft { background-color: #E8F3FF; color: #165DFF; }
+
+    .nav-item.active {
+      background-color: #E8F3FF;
+      color: #165DFF;
+    }
+    .nav-item.active::after {
+      content: '';
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background-color: #165DFF;
+    }
+
+    /* Arrow icon helper */
+    .arrow-down {
+      width: 0; 
+      height: 0; 
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+      border-top: 4px solid currentColor;
+    }
+  </style>
+</head>
+<body class="flex flex-col text-[12px] h-[981px] w-[1603px] overflow-hidden">
+<!-- BEGIN: Top Navigation -->
+<header class="h-[64px] bg-[#001529] text-white flex items-center justify-between px-[24px] shrink-0">
+<div class="flex items-center space-x-[32px]">
+<div class="flex items-center">
+<span class="text-[20px] font-bold tracking-wide mr-[12px]">UNIVIEW</span>
+<span class="text-[#86909C] text-[14px]">|</span>
+<span class="ml-[12px] text-[14px]">固定资产管理系统</span>
+</div>
+<nav class="flex space-x-[24px] text-[14px] text-[#C9CDD4]">
+<a class="hover:text-white transition-colors" href="#">资产管理</a>
+<a class="hover:text-white transition-colors" href="#">CIP 转固管理</a>
+<a class="hover:text-white transition-colors" href="#">盘点管理</a>
+<a class="hover:text-white transition-colors" href="#">报表中心</a>
+<a class="text-white relative font-medium" href="#">系统运营中枢
+          <div class="absolute bottom-[-22px] left-0 right-0 h-[2px] bg-[#165DFF]"></div>
+</a>
+</nav>
+</div>
+<div class="flex items-center space-x-[16px]">
+<div class="relative cursor-pointer">
+<svg class="text-white" fill="none" height="18" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="18"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+<div class="absolute -top-1 -right-1 bg-[#F53F3F] text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center transform scale-90">12</div>
+</div>
+<svg class="text-white cursor-pointer" fill="none" height="18" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="18"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" x2="12.01" y1="17" y2="17"></line></svg>
+<div class="flex items-center space-x-2 cursor-pointer ml-2">
+<div class="w-7 h-7 rounded-full bg-[#165DFF] flex items-center justify-center">
+<svg fill="none" height="14" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="14"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+</div>
+<span class="text-[14px]">运营管理员</span>
+<div class="arrow-down ml-1"></div>
+</div>
+</div>
+</header>
+<!-- END: Top Navigation -->
+<div class="flex flex-1 overflow-hidden">
+<!-- BEGIN: Left Sidebar -->
+<aside class="w-[240px] bg-white border-r border-[#E5E6EB] flex flex-col shrink-0">
+<div class="h-[60px] flex items-center px-[20px] border-b border-[#E5E6EB]">
+<svg class="mr-2" fill="none" height="16" stroke="#1D2129" stroke-width="2" viewbox="0 0 24 24" width="16"><rect height="18" rx="2" ry="2" width="18" x="3" y="3"></rect><line x1="3" x2="21" y1="9" y2="9"></line><line x1="9" x2="9" y1="21" y2="9"></line></svg>
+<span class="text-[14px] font-medium text-[#1D2129]">系统运营中枢</span>
+</div>
+<div class="py-[8px]">
+<!-- Nav Item 1 -->
+<div class="px-[12px]">
+<div class="flex items-center justify-between px-[12px] py-[10px] cursor-pointer text-[#165DFF]">
+<div class="flex items-center">
+<svg class="mr-2" fill="none" height="16" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="16"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+<span class="text-[14px]">系统参数</span>
+</div>
+<svg class="transform rotate-180" fill="none" height="14" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="14"><polyline points="6 9 12 15 18 9"></polyline></svg>
+</div>
+<!-- Submenu -->
+<div class="pl-[24px] py-[4px]">
+<div class="nav-item active h-[40px] flex items-center px-[12px] relative rounded-[2px] cursor-pointer mb-1 text-[14px]">
+              基础参数
+            </div>
+<div class="h-[40px] flex items-center px-[12px] text-[#4E5969] hover:bg-[#F2F3F5] rounded-[2px] cursor-pointer mb-1 text-[14px]">参数域管理</div>
+<div class="h-[40px] flex items-center px-[12px] text-[#4E5969] hover:bg-[#F2F3F5] rounded-[2px] cursor-pointer mb-1 text-[14px]">参数分组</div>
+<div class="h-[40px] flex items-center px-[12px] text-[#4E5969] hover:bg-[#F2F3F5] rounded-[2px] cursor-pointer mb-1 text-[14px]">参数变更记录</div>
+<div class="h-[40px] flex items-center px-[12px] text-[#4E5969] hover:bg-[#F2F3F5] rounded-[2px] cursor-pointer mb-1 text-[14px]">参数模板</div>
+<div class="h-[40px] flex items-center px-[12px] text-[#4E5969] hover:bg-[#F2F3F5] rounded-[2px] cursor-pointer mb-1 text-[14px]">参数导入导出</div>
+</div>
+</div>
+<!-- Other Nav Items -->
+<div class="px-[12px]">
+<div class="flex items-center justify-between px-[12px] py-[10px] cursor-pointer text-[#4E5969] hover:bg-[#F2F3F5] rounded-[2px]">
+<div class="flex items-center">
+<svg class="mr-2" fill="none" height="16" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="16"><rect height="11" rx="2" ry="2" width="18" x="3" y="11"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+<span class="text-[14px]">权限与安全</span>
+</div>
+<svg fill="none" height="14" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="14"><polyline points="6 9 12 15 18 9"></polyline></svg>
+</div>
+</div>
+<div class="px-[12px]">
+<div class="flex items-center justify-between px-[12px] py-[10px] cursor-pointer text-[#4E5969] hover:bg-[#F2F3F5] rounded-[2px]">
+<div class="flex items-center">
+<svg class="mr-2" fill="none" height="16" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+<span class="text-[14px]">审计与日志</span>
+</div>
+<svg fill="none" height="14" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="14"><polyline points="6 9 12 15 18 9"></polyline></svg>
+</div>
+</div>
+<div class="px-[12px]">
+<div class="flex items-center justify-between px-[12px] py-[10px] cursor-pointer text-[#4E5969] hover:bg-[#F2F3F5] rounded-[2px]">
+<div class="flex items-center">
+<svg class="mr-2" fill="none" height="16" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="16"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+<span class="text-[14px]">通知与消息</span>
+</div>
+<svg fill="none" height="14" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="14"><polyline points="6 9 12 15 18 9"></polyline></svg>
+</div>
+</div>
+<div class="px-[12px]">
+<div class="flex items-center justify-between px-[12px] py-[10px] cursor-pointer text-[#4E5969] hover:bg-[#F2F3F5] rounded-[2px]">
+<div class="flex items-center">
+<svg class="mr-2" fill="none" height="16" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="16"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
+<span class="text-[14px]">系统工具</span>
+</div>
+<svg fill="none" height="14" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="14"><polyline points="6 9 12 15 18 9"></polyline></svg>
+</div>
+</div>
+</div>
+</aside>
+<!-- END: Left Sidebar -->
+<!-- BEGIN: Main Content Area -->
+<main class="flex-1 flex flex-col p-[24px] pr-[0] overflow-y-auto">
+<div class="pr-[24px] pb-[24px]"> <!-- Inner container for padding -->
+<!-- BEGIN: Page Header -->
+<div class="flex justify-between items-center mb-[20px] h-[38px]">
+<h1 class="text-[20px] font-bold text-[#1D2129]">基础参数运行配置台</h1>
+<div class="flex space-x-[12px]">
+<button class="bg-[#165DFF] text-white px-[16px] py-[6px] rounded-[4px] flex items-center shadow-sm">
+<svg class="mr-1" fill="none" height="14" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="14"><line x1="12" x2="12" y1="5" y2="19"></line><line x1="5" x2="19" y1="12" y2="12"></line></svg>
+              新建参数
+            </button>
+<button class="bg-white text-[#4E5969] border border-[#E5E6EB] px-[16px] py-[6px] rounded-[4px] flex items-center hover:bg-[#F2F3F5]">
+<svg class="mr-1" fill="none" height="14" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="14"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+              保存草稿
+            </button>
+<button class="bg-white text-[#165DFF] border border-[#165DFF] px-[16px] py-[6px] rounded-[4px] flex items-center hover:bg-[#E8F3FF]">
+<svg class="mr-1" fill="none" height="14" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="14"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+              提交校验
+            </button>
+<button class="bg-white text-[#165DFF] border border-[#E5E6EB] px-[16px] py-[6px] rounded-[4px] flex items-center hover:bg-[#F2F3F5]">
+<svg class="mr-1" fill="none" height="14" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="14"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+              影响预览
+            </button>
+</div>
+</div>
+<!-- END: Page Header -->
+<!-- BEGIN: KPI Cards Row -->
+<div class="flex space-x-[16px] mb-[16px]">
+<div class="flex-1 bg-white p-[20px] rounded-[8px] border border-[#E5E6EB] shadow-card flex items-center">
+<div class="w-[48px] h-[48px] rounded-full bg-[#E8F3FF] flex items-center justify-center mr-[16px]">
+<svg fill="none" height="24" stroke="#165DFF" stroke-width="2" viewbox="0 0 24 24" width="24"><line x1="8" x2="21" y1="6" y2="6"></line><line x1="8" x2="21" y1="12" y2="12"></line><line x1="8" x2="21" y1="18" y2="18"></line><line x1="3" x2="3.01" y1="6" y2="6"></line><line x1="3" x2="3.01" y1="12" y2="12"></line><line x1="3" x2="3.01" y1="18" y2="18"></line></svg>
+</div>
+<div>
+<div class="text-[#86909C] mb-[4px]">参数项</div>
+<div class="text-[28px] font-bold text-[#1D2129] leading-none">64</div>
+</div>
+</div>
+<div class="flex-1 bg-white p-[20px] rounded-[8px] border border-[#E5E6EB] shadow-card flex items-center">
+<div class="w-[48px] h-[48px] rounded-full bg-[#FFF7E8] flex items-center justify-center mr-[16px]">
+<svg fill="none" height="24" stroke="#FF7D00" stroke-width="2" viewbox="0 0 24 24" width="24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+</div>
+<div>
+<div class="text-[#86909C] mb-[4px]">待复核</div>
+<div class="text-[28px] font-bold text-[#1D2129] leading-none">6</div>
+</div>
+</div>
+<div class="flex-1 bg-white p-[20px] rounded-[8px] border border-[#E5E6EB] shadow-card flex items-center">
+<div class="w-[48px] h-[48px] rounded-full bg-[#E8FFEA] flex items-center justify-center mr-[16px]">
+<svg fill="none" height="24" stroke="#00B42A" stroke-width="2" viewbox="0 0 24 24" width="24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+</div>
+<div>
+<div class="text-[#86909C] mb-[4px]">回滚点</div>
+<div class="text-[24px] font-bold text-[#00B42A] leading-none">全部开启</div>
+</div>
+</div>
+<div class="flex-1 bg-white p-[20px] rounded-[8px] border border-[#E5E6EB] shadow-card flex items-center">
+<div class="w-[48px] h-[48px] rounded-full bg-[#E8F3FF] flex items-center justify-center mr-[16px]">
+<svg fill="none" height="24" stroke="#165DFF" stroke-width="2" viewbox="0 0 24 24" width="24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+</div>
+<div>
+<div class="text-[#86909C] mb-[4px]">最近发布</div>
+<div class="text-[24px] font-bold text-[#1D2129] leading-none">06-16 12:26</div>
+</div>
+</div>
+</div>
+<!-- END: KPI Cards Row -->
+<!-- BEGIN: Middle Row (Table & Form) -->
+<div class="flex space-x-[16px] mb-[16px] h-[436px]">
+<!-- Left Panel: Table -->
+<div class="w-[798px] bg-white rounded-[8px] border border-[#E5E6EB] flex flex-col shadow-card">
+<div class="p-[16px] border-b border-[#E5E6EB]">
+<h2 class="text-[16px] font-bold text-[#1D2129]">基础参数列表</h2>
+</div>
+<!-- Filters -->
+<div class="p-[16px] flex justify-between items-center bg-white z-10 relative">
+<div class="flex space-x-[16px]">
+<div class="flex items-center">
+<span class="text-[#4E5969] mr-2">参数域</span>
+<div class="w-[100px] h-[32px] border border-[#E5E6EB] rounded-[4px] flex items-center justify-between px-[12px] bg-white cursor-pointer hover:border-[#165DFF]">
+<span>全部</span>
+<svg fill="none" height="12" stroke="#86909C" stroke-width="2" viewbox="0 0 24 24" width="12"><polyline points="6 9 12 15 18 9"></polyline></svg>
+</div>
+</div>
+<div class="flex items-center">
+<span class="text-[#4E5969] mr-2">状态</span>
+<div class="w-[100px] h-[32px] border border-[#E5E6EB] rounded-[4px] flex items-center justify-between px-[12px] bg-white cursor-pointer hover:border-[#165DFF]">
+<span>全部</span>
+<svg fill="none" height="12" stroke="#86909C" stroke-width="2" viewbox="0 0 24 24" width="12"><polyline points="6 9 12 15 18 9"></polyline></svg>
+</div>
+</div>
+<div class="flex items-center">
+<span class="text-[#4E5969] mr-2">风险</span>
+<div class="w-[100px] h-[32px] border border-[#E5E6EB] rounded-[4px] flex items-center justify-between px-[12px] bg-white cursor-pointer hover:border-[#165DFF]">
+<span>全部</span>
+<svg fill="none" height="12" stroke="#86909C" stroke-width="2" viewbox="0 0 24 24" width="12"><polyline points="6 9 12 15 18 9"></polyline></svg>
+</div>
+</div>
+</div>
+<div class="w-[200px] h-[32px] border border-[#E5E6EB] rounded-[4px] flex items-center px-[12px] bg-[#F2F3F5] hover:bg-[#E5E6EB] focus-within:bg-white focus-within:border-[#165DFF]">
+<input class="bg-transparent outline-none w-full text-[12px]" placeholder="搜索参数名称/参数键" type="text"/>
+<svg fill="none" height="14" stroke="#86909C" stroke-width="2" viewbox="0 0 24 24" width="14"><circle cx="11" cy="11" r="8"></circle><line x1="21" x2="16.65" y1="21" y2="16.65"></line></svg>
+</div>
+</div>
+<!-- Table -->
+<div class="flex-1 overflow-auto">
+<table class="w-full text-left border-collapse">
+<thead class="bg-[#F2F3F5] text-[#4E5969]">
+<tr>
+<th class="py-[8px] px-[16px] font-normal border-b border-[#E5E6EB] whitespace-nowrap">参数名称</th>
+<th class="py-[8px] px-[16px] font-normal border-b border-[#E5E6EB] whitespace-nowrap">参数键</th>
+<th class="py-[8px] px-[16px] font-normal border-b border-[#E5E6EB] whitespace-nowrap">参数域</th>
+<th class="py-[8px] px-[16px] font-normal border-b border-[#E5E6EB]">参数值</th>
+<th class="py-[8px] px-[16px] font-normal border-b border-[#E5E6EB] whitespace-nowrap">风险等级</th>
+<th class="py-[8px] px-[16px] font-normal border-b border-[#E5E6EB] whitespace-nowrap">状态</th>
+<th class="py-[8px] px-[16px] font-normal border-b border-[#E5E6EB] whitespace-nowrap">操作</th>
+</tr>
+</thead>
+<tbody class="text-[#1D2129]">
+<tr class="hover:bg-[#F2F3F5] border-b border-[#E5E6EB] bg-[#E8F3FF]">
+<td class="py-[12px] px-[16px] text-[#165DFF]">附件大小与格式</td>
+<td class="py-[12px] px-[16px]">att.size.format</td>
+<td class="py-[12px] px-[16px]">附件管理</td>
+<td class="py-[12px] px-[16px] truncate max-w-[150px]" title="10MB; jpg.png.pdf">10MB; jpg.png.pdf</td>
+<td class="py-[12px] px-[16px]"><span class="status-badge low">低</span></td>
+<td class="py-[12px] px-[16px]"><span class="status-badge published text-xxs">已发布</span></td>
+<td class="py-[12px] px-[16px]">
+<div class="flex space-x-[12px] text-[#86909C]">
+<svg class="cursor-pointer hover:text-[#165DFF]" fill="none" height="14" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="14"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+<svg class="cursor-pointer hover:text-[#165DFF]" fill="none" height="14" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="14"><rect height="13" rx="2" ry="2" width="13" x="9" y="9"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+<svg class="cursor-pointer hover:text-[#165DFF]" fill="none" height="14" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="14"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-[#F2F3F5] border-b border-[#E5E6EB]">
+<td class="py-[12px] px-[16px]">编号预览默认策略</td>
+<td class="py-[12px] px-[16px]">no.preview.strategy</td>
+<td class="py-[12px] px-[16px]">编码规则</td>
+<td class="py-[12px] px-[16px] truncate max-w-[150px]">按规则预览</td>
+<td class="py-[12px] px-[16px]"><span class="status-badge medium">中</span></td>
+<td class="py-[12px] px-[16px]"><span class="status-badge pending text-xxs">待复核</span></td>
+<td class="py-[12px] px-[16px]">
+<div class="flex space-x-[12px] text-[#86909C]">
+<svg class="cursor-pointer hover:text-[#165DFF]" fill="none" height="14" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="14"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+<svg class="cursor-pointer hover:text-[#165DFF]" fill="none" height="14" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="14"><rect height="13" rx="2" ry="2" width="13" x="9" y="9"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+<svg class="cursor-pointer hover:text-[#165DFF]" fill="none" height="14" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="14"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-[#F2F3F5] border-b border-[#E5E6EB]">
+<td class="py-[12px] px-[16px]">工作台表格密度</td>
+<td class="py-[12px] px-[16px]">ui.table.density</td>
+<td class="py-[12px] px-[16px]">界面设置</td>
+<td class="py-[12px] px-[16px] truncate max-w-[150px]">标准</td>
+<td class="py-[12px] px-[16px]"><span class="status-badge low">低</span></td>
+<td class="py-[12px] px-[16px]"><span class="status-badge published text-xxs">已发布</span></td>
+<td class="py-[12px] px-[16px]">
+<div class="flex space-x-[12px] text-[#86909C]">
+<svg class="cursor-pointer hover:text-[#165DFF]" fill="none" height="14" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="14"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+<svg class="cursor-pointer hover:text-[#165DFF]" fill="none" height="14" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="14"><rect height="13" rx="2" ry="2" width="13" x="9" y="9"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+<svg class="cursor-pointer hover:text-[#165DFF]" fill="none" height="14" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="14"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-[#F2F3F5] border-b border-[#E5E6EB]">
+<td class="py-[12px] px-[16px]">盘点周期默认值</td>
+<td class="py-[12px] px-[16px]">inventory.cycle.days</td>
+<td class="py-[12px] px-[16px]">盘点管理</td>
+<td class="py-[12px] px-[16px] truncate max-w-[150px]">90</td>
+<td class="py-[12px] px-[16px]"><span class="status-badge medium">中</span></td>
+<td class="py-[12px] px-[16px]"><span class="status-badge draft text-xxs">草稿</span></td>
+<td class="py-[12px] px-[16px]">
+<div class="flex space-x-[12px] text-[#86909C]">
+<svg class="cursor-pointer hover:text-[#165DFF]" fill="none" height="14" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="14"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+<svg class="cursor-pointer hover:text-[#165DFF]" fill="none" height="14" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="14"><rect height="13" rx="2" ry="2" width="13" x="9" y="9"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+<svg class="cursor-pointer hover:text-[#165DFF]" fill="none" height="14" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="14"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-[#F2F3F5] border-b border-[#E5E6EB]">
+<td class="py-[12px] px-[16px]">CIP 转固附件上限</td>
+<td class="py-[12px] px-[16px]">cip.attach.limit</td>
+<td class="py-[12px] px-[16px]">CIP 转固</td>
+<td class="py-[12px] px-[16px] truncate max-w-[150px]">20MB</td>
+<td class="py-[12px] px-[16px]"><span class="status-badge high">高</span></td>
+<td class="py-[12px] px-[16px]"><span class="status-badge pending text-xxs">待复核</span></td>
+<td class="py-[12px] px-[16px]">
+<div class="flex space-x-[12px] text-[#86909C]">
+<svg class="cursor-pointer hover:text-[#165DFF]" fill="none" height="14" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="14"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+<svg class="cursor-pointer hover:text-[#165DFF]" fill="none" height="14" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="14"><rect height="13" rx="2" ry="2" width="13" x="9" y="9"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+<svg class="cursor-pointer hover:text-[#165DFF]" fill="none" height="14" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="14"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination -->
+<div class="p-[12px] border-t border-[#E5E6EB] flex justify-between items-center bg-white mt-auto z-10 relative">
+<span class="text-[#4E5969]">共 5 条</span>
+<div class="flex items-center space-x-[8px]">
+<div class="border border-[#E5E6EB] rounded-[4px] px-[8px] py-[4px] flex items-center cursor-pointer hover:border-[#165DFF]">
+                  10 条/页 <svg class="ml-1" fill="none" height="12" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="12"><polyline points="6 9 12 15 18 9"></polyline></svg>
+</div>
+<div class="flex space-x-[4px]">
+<button class="w-[28px] h-[28px] border border-[#E5E6EB] rounded-[4px] flex items-center justify-center text-[#C9CDD4] cursor-not-allowed">
+<svg fill="none" height="14" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="14"><polyline points="15 18 9 12 15 6"></polyline></svg>
+</button>
+<button class="w-[28px] h-[28px] bg-[#165DFF] text-white rounded-[4px] flex items-center justify-center">1</button>
+<button class="w-[28px] h-[28px] border border-[#E5E6EB] rounded-[4px] flex items-center justify-center text-[#C9CDD4] cursor-not-allowed">
+<svg fill="none" height="14" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="14"><polyline points="9 18 15 12 9 6"></polyline></svg>
+</button>
+</div>
+<div class="flex items-center text-[#4E5969]">
+                  前往 <input class="w-[32px] h-[28px] border border-[#E5E6EB] rounded-[4px] mx-[8px] text-center outline-none focus:border-[#165DFF]" type="text" value="1"/> 页
+                </div>
+</div>
+</div>
+</div>
+<!-- Right Panel: Edit Form -->
+<div class="w-[502px] bg-white rounded-[8px] border border-[#E5E6EB] flex flex-col shadow-card">
+<div class="p-[16px] border-b border-[#E5E6EB]">
+<h2 class="text-[16px] font-bold text-[#1D2129]">基础参数编辑区</h2>
+</div>
+<div class="p-[16px] flex flex-col flex-1">
+<form class="space-y-[4px] flex-1 flex flex-col">
+<div class="flex items-center">
+<label class="w-[70px] text-right text-[#4E5969] mr-[12px] shrink-0 text-[11px]">参数名称 <span class="text-[#F53F3F]">*</span></label>
+<input class="flex-1 h-[22px] border border-[#E5E6EB] rounded-[4px] px-[8px] bg-[#F2F3F5] text-[#1D2129] outline-none text-[11px]" type="text" value="附件大小与格式"/>
+</div>
+<div class="flex items-center">
+<label class="w-[70px] text-right text-[#4E5969] mr-[12px] shrink-0 text-[11px]">参数域 <span class="text-[#F53F3F]">*</span></label>
+<div class="flex-1 h-[22px] border border-[#E5E6EB] rounded-[4px] px-[8px] bg-white flex items-center justify-between cursor-pointer hover:border-[#165DFF]">
+<span class="text-[#1D2129] text-[11px]">附件管理</span>
+<svg fill="none" height="12" stroke="#86909C" stroke-width="2" viewbox="0 0 24 24" width="12"><polyline points="6 9 12 15 18 9"></polyline></svg>
+</div>
+</div>
+<div class="flex items-center">
+<label class="w-[70px] text-right text-[#4E5969] mr-[12px] shrink-0 text-[11px]">参数键 <span class="text-[#F53F3F]">*</span></label>
+<input class="flex-1 h-[22px] border border-[#E5E6EB] rounded-[4px] px-[8px] bg-[#F2F3F5] text-[#1D2129] outline-none text-[11px]" type="text" value="att.size.format"/>
+</div>
+<div class="flex items-center">
+<label class="w-[70px] text-right text-[#4E5969] mr-[12px] shrink-0 text-[11px]">默认值 <span class="text-[#F53F3F]">*</span></label>
+<input class="flex-1 h-[22px] border border-[#E5E6EB] rounded-[4px] px-[8px] bg-white text-[#1D2129] outline-none focus:border-[#165DFF] text-[11px]" type="text" value="10MB ; jpg.png.pdf"/>
+</div>
+<div class="flex items-start">
+<label class="w-[70px] text-right text-[#4E5969] mr-[12px] shrink-0 mt-[4px] text-[11px]">允许值</label>
+<div class="flex-1 border border-[#E5E6EB] rounded-[4px] p-[2px] bg-white flex flex-wrap gap-[4px] min-h-[22px] focus-within:border-[#165DFF]">
+<div class="bg-[#F2F3F5] rounded-[2px] px-[6px] py-[2px] flex items-center text-[11px]">
+                      10MB <svg class="ml-[4px] cursor-pointer" fill="none" height="10" stroke="#86909C" stroke-width="2" viewbox="0 0 24 24" width="10"><line x1="18" x2="6" y1="6" y2="18"></line><line x1="6" x2="18" y1="6" y2="18"></line></svg>
+</div>
+<div class="bg-[#F2F3F5] rounded-[2px] px-[6px] py-[2px] flex items-center text-[11px]">
+                      20MB <svg class="ml-[4px] cursor-pointer" fill="none" height="10" stroke="#86909C" stroke-width="2" viewbox="0 0 24 24" width="10"><line x1="18" x2="6" y1="6" y2="18"></line><line x1="6" x2="18" y1="6" y2="18"></line></svg>
+</div>
+<div class="bg-[#F2F3F5] rounded-[2px] px-[6px] py-[2px] flex items-center text-[11px]">
+                      50MB <svg class="ml-[4px] cursor-pointer" fill="none" height="10" stroke="#86909C" stroke-width="2" viewbox="0 0 24 24" width="10"><line x1="18" x2="6" y1="6" y2="18"></line><line x1="6" x2="18" y1="6" y2="18"></line></svg>
+</div>
+<div class="bg-[#F2F3F5] rounded-[2px] px-[6px] py-[2px] flex items-center text-[11px]">
+                      jpg.png.pdf <svg class="ml-[4px] cursor-pointer" fill="none" height="10" stroke="#86909C" stroke-width="2" viewbox="0 0 24 24" width="10"><line x1="18" x2="6" y1="6" y2="18"></line><line x1="6" x2="18" y1="6" y2="18"></line></svg>
+</div>
+<div class="bg-[#F2F3F5] rounded-[2px] px-[6px] py-[2px] flex items-center text-[11px]">
+                      docx,xlsx <svg class="ml-[4px] cursor-pointer" fill="none" height="10" stroke="#86909C" stroke-width="2" viewbox="0 0 24 24" width="10"><line x1="18" x2="6" y1="6" y2="18"></line><line x1="6" x2="18" y1="6" y2="18"></line></svg>
+</div>
+</div>
+</div>
+<div class="flex items-start">
+<label class="w-[70px] text-right text-[#4E5969] mr-[12px] shrink-0 mt-[4px] text-[11px]">影响范围</label>
+<div class="flex-1 border border-[#E5E6EB] rounded-[4px] p-[2px] bg-white flex flex-wrap gap-[4px] min-h-[22px] focus-within:border-[#165DFF]">
+<div class="bg-[#F2F3F5] rounded-[2px] px-[6px] py-[2px] flex items-center text-[11px]">
+                      资产附件上传 <svg class="ml-[4px] cursor-pointer" fill="none" height="10" stroke="#86909C" stroke-width="2" viewbox="0 0 24 24" width="10"><line x1="18" x2="6" y1="6" y2="18"></line><line x1="6" x2="18" y1="6" y2="18"></line></svg>
+</div>
+<div class="bg-[#F2F3F5] rounded-[2px] px-[6px] py-[2px] flex items-center text-[11px]">
+                      CIP 转固 <svg class="ml-[4px] cursor-pointer" fill="none" height="10" stroke="#86909C" stroke-width="2" viewbox="0 0 24 24" width="10"><line x1="18" x2="6" y1="6" y2="18"></line><line x1="6" x2="18" y1="6" y2="18"></line></svg>
+</div>
+<div class="bg-[#F2F3F5] rounded-[2px] px-[6px] py-[2px] flex items-center text-[11px]">
+                      导入导出 <svg class="ml-[4px] cursor-pointer" fill="none" height="10" stroke="#86909C" stroke-width="2" viewbox="0 0 24 24" width="10"><line x1="18" x2="6" y1="6" y2="18"></line><line x1="6" x2="18" y1="6" y2="18"></line></svg>
+</div>
+</div>
+</div>
+<div class="flex items-center">
+<label class="w-[70px] text-right text-[#4E5969] mr-[12px] shrink-0 text-[11px]">发布门禁</label>
+<div class="flex-1 h-[22px] border border-[#E5E6EB] rounded-[4px] px-[8px] bg-white flex items-center justify-between cursor-pointer hover:border-[#165DFF]">
+<span class="text-[#1D2129] text-[11px]">需校验通过且影响可控</span>
+<svg fill="none" height="12" stroke="#86909C" stroke-width="2" viewbox="0 0 24 24" width="12"><polyline points="6 9 12 15 18 9"></polyline></svg>
+</div>
+</div>
+<div class="flex items-center">
+<label class="w-[70px] text-right text-[#4E5969] mr-[12px] shrink-0 text-[11px]">负责人复核</label>
+<div class="flex-1 h-[22px] border border-[#E5E6EB] rounded-[4px] px-[8px] bg-white flex items-center justify-between cursor-pointer hover:border-[#165DFF]">
+<span class="text-[#1D2129] text-[11px]">张三（资产运营负责人）</span>
+<svg fill="none" height="12" stroke="#86909C" stroke-width="2" viewbox="0 0 24 24" width="12"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+</div>
+</div>
+<div class="flex items-start">
+<label class="w-[70px] text-right text-[#4E5969] mr-[12px] shrink-0 mt-[4px] text-[11px]">审计说明</label>
+<div class="flex-1 relative">
+<textarea class="w-full h-[38px] border border-[#E5E6EB] rounded-[4px] p-[6px] bg-white text-[#1D2129] outline-none focus:border-[#165DFF] resize-none text-[11px]">附件大小和格式的全局限制参数。</textarea>
+<span class="absolute bottom-[4px] right-[6px] text-[10px] text-[#C9CDD4]">15/200</span>
+</div>
+</div>
+<!-- Actions at bottom of right panel -->
+<div class="flex justify-end space-x-[12px] mt-auto pt-[16px]">
+<button class="bg-white text-[#4E5969] border border-[#E5E6EB] px-[16px] py-[6px] rounded-[4px] flex items-center hover:bg-[#F2F3F5] text-[12px]">
+<svg class="mr-1" fill="none" height="14" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="14"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                保存草稿
+              </button>
+<button class="bg-[#165DFF] text-white px-[16px] py-[6px] rounded-[4px] flex items-center shadow-sm text-[12px]">
+<svg class="mr-1" fill="none" height="14" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="14"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                提交校验
+              </button>
+</div>
+</form>
+</div>
+</div>
+</div>
+<!-- END: Middle Row -->
+<!-- BEGIN: Bottom Quartet -->
+<div class="flex space-x-[16px] h-[231px]">
+<!-- Panel 1: 影响拓扑 -->
+<div class="flex-1 bg-white rounded-[8px] border border-[#E5E6EB] flex flex-col shadow-card">
+<div class="px-[16px] py-[12px] border-b border-[#E5E6EB]">
+<h3 class="text-[14px] font-bold text-[#1D2129]">影响拓扑</h3>
+</div>
+<div class="flex-1 p-[16px] flex items-center justify-center relative overflow-hidden bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjgiPgoJPHJlY3Qgd2lkdGg9IjgiIGhlaWdodD0iOCIgZmlsbD0iI2ZmZiI+PC9yZWN0PgoJPHBhdGggZD0iTTAgMEw4IDhaTTAgOEw4IDBaIiBzdHJva2U9IiNmMmYzZjUiIHN0cm9rZS13aWR0aD0iMSI+PC9wYXRoPgo8L3N2Zz4=')]">
+<!-- A rough simulation of the diagram using absolute positioning and SVG lines -->
+<div class="relative w-full h-full max-w-[220px] max-h-[140px]">
+<!-- Central Node -->
+<div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#165DFF] text-white px-[12px] py-[6px] rounded-[4px] z-10 shadow-sm border border-[#165DFF]">
+                        基础参数
+                    </div>
+<!-- Top Left Node -->
+<div class="absolute left-0 top-[10%] bg-white text-[#00B42A] border border-[#00B42A] px-[8px] py-[4px] rounded-[4px] z-10 flex items-center">
+<svg class="mr-1" fill="none" height="12" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="12"><rect height="14" rx="2" ry="2" width="20" x="2" y="3"></rect><line x1="8" x2="16" y1="21" y2="21"></line><line x1="12" x2="12" y1="17" y2="21"></line></svg>
+                        Workbench
+                    </div>
+<!-- Top Right Node -->
+<div class="absolute right-0 top-[10%] bg-white text-[#FF7D00] border border-[#FF7D00] px-[8px] py-[4px] rounded-[4px] z-10 flex items-center">
+<svg class="mr-1" fill="none" height="12" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="12"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+                        CIP 转固
+                    </div>
+<!-- Bottom Left Node -->
+<div class="absolute left-0 bottom-[10%] bg-white text-[#00B42A] border border-[#00B42A] px-[8px] py-[4px] rounded-[4px] z-10 flex items-center">
+<svg class="mr-1" fill="none" height="12" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="12"><rect height="14" rx="2" ry="2" width="20" x="2" y="3"></rect><line x1="8" x2="16" y1="21" y2="21"></line><line x1="12" x2="12" y1="17" y2="21"></line></svg>
+                        导入导出
+                    </div>
+<!-- Bottom Right Node -->
+<div class="absolute right-0 bottom-[10%] bg-white text-[#722ED1] border border-[#722ED1] px-[8px] py-[4px] rounded-[4px] z-10 flex items-center">
+<svg class="mr-1" fill="none" height="12" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="12"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                        钉钉 H5
+                    </div>
+<!-- Connecting Lines (approximate with SVG) -->
+<svg class="absolute inset-0 w-full h-full pointer-events-none" style="z-index: 1;">
+<line marker-end="url(#arrow)" stroke="#C9CDD4" stroke-width="2" x1="70" x2="110" y1="25" y2="70"></line>
+<line marker-end="url(#arrow)" stroke="#C9CDD4" stroke-width="2" x1="150" x2="110" y1="25" y2="70"></line>
+<line marker-end="url(#arrow)" stroke="#C9CDD4" stroke-width="2" x1="70" x2="110" y1="115" y2="70"></line>
+<line marker-end="url(#arrow)" stroke="#C9CDD4" stroke-width="2" x1="150" x2="110" y1="115" y2="70"></line>
+<defs>
+<marker id="arrow" markerheight="6" markerwidth="6" orient="auto-start-reverse" refx="5" refy="5" viewbox="0 0 10 10">
+<path d="M 0 0 L 10 5 L 0 10 z" fill="#C9CDD4"></path>
+</marker>
+</defs>
+</svg>
+</div>
+</div>
+</div>
+<!-- Panel 2: 发布校验清单 -->
+<div class="flex-1 bg-white rounded-[8px] border border-[#E5E6EB] flex flex-col shadow-card">
+<div class="px-[16px] py-[12px] border-b border-[#E5E6EB]">
+<h3 class="text-[14px] font-bold text-[#1D2129]">发布校验清单</h3>
+</div>
+<div class="p-[16px] flex-1 flex flex-col justify-between">
+<div class="space-y-[8px]">
+<div class="flex justify-between items-center">
+<div class="flex items-center text-[#4E5969]">
+<svg class="mr-[8px] rounded-full" fill="#00B42A" height="14" stroke="white" stroke-width="2" viewbox="0 0 24 24" width="14"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    参数键唯一性校验
+                  </div>
+<span class="text-[#00B42A]">通过</span>
+</div>
+<div class="flex justify-between items-center">
+<div class="flex items-center text-[#4E5969]">
+<svg class="mr-[8px] rounded-full" fill="#00B42A" height="14" stroke="white" stroke-width="2" viewbox="0 0 24 24" width="14"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    参数域有效性校验
+                  </div>
+<span class="text-[#00B42A]">通过</span>
+</div>
+<div class="flex justify-between items-center">
+<div class="flex items-center text-[#4E5969]">
+<svg class="mr-[8px] rounded-full" fill="#00B42A" height="14" stroke="white" stroke-width="2" viewbox="0 0 24 24" width="14"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    允许值合法性校验
+                  </div>
+<span class="text-[#00B42A]">通过</span>
+</div>
+<div class="flex justify-between items-center">
+<div class="flex items-center text-[#4E5969]">
+<svg class="mr-[8px] rounded-full" fill="#FF7D00" height="14" stroke="white" stroke-width="2" viewbox="0 0 24 24" width="14"><line x1="12" x2="12" y1="8" y2="12"></line><line x1="12" x2="12.01" y1="16" y2="16"></line></svg>
+                    影响范围变更校验
+                  </div>
+<span class="text-[#FF7D00]">警告</span>
+</div>
+<div class="flex justify-between items-center">
+<div class="flex items-center text-[#4E5969]">
+<svg class="mr-[8px] rounded-full" fill="#F53F3F" height="14" stroke="white" stroke-width="2" viewbox="0 0 24 24" width="14"><line x1="18" x2="6" y1="6" y2="18"></line><line x1="6" x2="18" y1="6" y2="18"></line></svg>
+                    发布门禁校验
+                  </div>
+<span class="text-[#F53F3F]">不通过</span>
+</div>
+</div>
+<div class="mt-auto pt-[8px]">
+<a class="text-[#165DFF] hover:underline" href="#">查看详情 &gt;</a>
+</div>
+</div>
+</div>
+<!-- Panel 3: 参数版本记录 -->
+<div class="flex-1 bg-white rounded-[8px] border border-[#E5E6EB] flex flex-col shadow-card">
+<div class="px-[16px] py-[12px] border-b border-[#E5E6EB]">
+<h3 class="text-[14px] font-bold text-[#1D2129]">参数版本记录</h3>
+</div>
+<div class="p-[16px] flex-1 flex flex-col">
+<table class="w-full text-left border-collapse mb-[8px]">
+<thead>
+<tr class="text-[#86909C]">
+<th class="font-normal pb-[8px]">版本号</th>
+<th class="font-normal pb-[8px]">状态</th>
+<th class="font-normal pb-[8px]">发布人</th>
+<th class="font-normal pb-[8px]">发布时间</th>
+<th class="font-normal pb-[8px]">操作</th>
+</tr>
+</thead>
+<tbody class="text-[#1D2129]">
+<tr>
+<td class="py-[4px]">V1.2.0</td>
+<td class="py-[4px]"><span class="status-badge low text-xxs px-[6px] py-[0px]">已发布</span></td>
+<td class="py-[4px]">运营管理员</td>
+<td class="py-[4px] text-[#4E5969]">06-16 12:26</td>
+<td class="py-[4px]"><a class="text-[#165DFF]" href="#">查看</a></td>
+</tr>
+<tr>
+<td class="py-[4px]">V1.1.0</td>
+<td class="py-[4px]"><span class="status-badge low text-xxs px-[6px] py-[0px]">已发布</span></td>
+<td class="py-[4px]">运营管理员</td>
+<td class="py-[4px] text-[#4E5969]">06-02 09:14</td>
+<td class="py-[4px]"><a class="text-[#165DFF]" href="#">查看</a></td>
+</tr>
+<tr>
+<td class="py-[4px]">V1.0.0</td>
+<td class="py-[4px]"><span class="status-badge low text-xxs px-[6px] py-[0px]">已发布</span></td>
+<td class="py-[4px]">系统管理员</td>
+<td class="py-[4px] text-[#4E5969]">05-20 15:30</td>
+<td class="py-[4px]"><a class="text-[#165DFF]" href="#">查看</a></td>
+</tr>
+</tbody>
+</table>
+<div class="mt-auto">
+<a class="text-[#165DFF] hover:underline" href="#">查看全部版本 &gt;</a>
+</div>
+</div>
+</div>
+<!-- Panel 4: 回滚预案 -->
+<div class="flex-1 bg-white rounded-[8px] border border-[#E5E6EB] flex flex-col shadow-card">
+<div class="px-[16px] py-[12px] border-b border-[#E5E6EB]">
+<h3 class="text-[14px] font-bold text-[#1D2129]">回滚预案</h3>
+</div>
+<div class="p-[16px] flex-1 flex flex-col justify-between">
+<div class="space-y-[8px]">
+<div class="flex">
+<span class="w-[80px] text-[#86909C]">最新稳定版本</span>
+<span class="text-[#00B42A]">V1.2.0</span>
+</div>
+<div class="flex">
+<span class="w-[80px] text-[#86909C]">发布日期</span>
+<span class="text-[#1D2129]">06-16 12:26</span>
+</div>
+<div class="flex">
+<span class="w-[80px] text-[#86909C]">发布人</span>
+<span class="text-[#1D2129]">运营管理员</span>
+</div>
+<div class="flex">
+<span class="w-[80px] text-[#86909C]">回滚说明</span>
+<span class="flex-1 text-[#1D2129] leading-[1.5]">回滚后将恢复至最新稳定版本配置。</span>
+</div>
+</div>
+<button class="w-full mt-[12px] bg-white text-[#165DFF] border border-[#165DFF] py-[6px] rounded-[4px] flex items-center justify-center hover:bg-[#E8F3FF]">
+<svg class="mr-1" fill="none" height="14" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24" width="14"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                执行回滚
+              </button>
+</div>
+</div>
+</div>
+<!-- END: Bottom Quartet -->
+</div>
+</main>
+<!-- END: Main Content Area -->
+</div>
+</body></html>

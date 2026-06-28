@@ -282,7 +282,8 @@ export interface TransferApplicationPayload {
   toDept: string;
   fromLocation?: string;
   toLocation?: string;
-  workflow: string;
+  expectedWorkflowDefinitionId?: number;
+  expectedWorkflowVersion?: number;
   priority: string;
   notes?: string;
 }
@@ -300,10 +301,12 @@ export const submitTransferApplication = (data: TransferApplicationPayload) =>
       `调入部门：${data.toDept}`,
       data.fromLocation ? `调出位置：${data.fromLocation}` : null,
       data.toLocation ? `调入位置：${data.toLocation}` : null,
-      `审批流程：${data.workflow}`,
+      data.expectedWorkflowVersion ? `发布流程：ASSET_TRANSFER v${data.expectedWorkflowVersion}` : '发布流程：ASSET_TRANSFER',
       `紧急程度：${data.priority}`,
       data.notes ? `备注：${data.notes}` : null,
     ].filter(Boolean).join('；'),
+    ...(data.expectedWorkflowDefinitionId != null ? { expectedWorkflowDefinitionId: data.expectedWorkflowDefinitionId } : {}),
+    ...(data.expectedWorkflowVersion != null ? { expectedWorkflowVersion: data.expectedWorkflowVersion } : {}),
     // businessData 必须对齐后端 AssetTransferDTO: { assetId, targetDeptId, targetUserId, targetLocation, reason }
     businessData: JSON.stringify({
       assetId: Number(data.assetIds[0]) || 0,

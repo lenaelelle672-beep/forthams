@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { addEdge, type Connection, useEdgesState, useNodesState } from '@xyflow/react';
+import { addEdge, type Connection, type EdgeChange, type NodeChange, useEdgesState, useNodesState } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import { ArrowLeft, Code, Layers3, Loader2, Play, Redo, Save, Send, Undo, X } from 'lucide-react';
+import { ArrowLeft, Code, Layers3, Loader2, Play, Redo, RefreshCw, Save, Send, Undo, UserCheck, X } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router';
 
 import { FlowCanvas } from '@/components/flow/FlowCanvas';
 import { NodeConfigPanel } from '@/components/flow/NodeConfigPanel';
 import { NodePanel } from '@/components/flow/NodePanel';
-import { workflowApi, roleApi, type RoleRecord, type WorkflowDefinitionDTO } from '@/api/workflow';
+import { workflowApi, roleApi, type RoleRecord, type WorkflowAssigneePreviewResponse, type WorkflowDefinitionDTO } from '@/api/workflow';
 import { useAuth, type AuthUser } from '@/context/AuthContext';
 import { businessFlowOptions, getDraftStorageKey, isBusinessType, isCustomBusinessType } from '@/constants/workflowBusiness';
 import { normalizeWorkflowDefinition, validateWorkflowDefinition } from '@/utils/workflowDefinition';
@@ -33,13 +33,29 @@ function readDraft(bt: string): Pick<FlowDefinition, 'nodes' | 'edges'> | null {
     if (!raw) return null;
     const p = JSON.parse(raw);
     if (!Array.isArray(p.nodes) || !Array.isArray(p.edges)) return null;
-    return normalizeWorkflowDefinition(p, bt);
+    return syncLegacyFormSource(normalizeWorkflowDefinition(p, bt), typeof p.formSource === 'string' ? p.formSource : '');
   } catch { return null; }
 }
 
 function fromApi(val: Record<string, unknown> | undefined, bt: string): Pick<FlowDefinition, 'nodes' | 'edges'> | null {
   if (!val || !Array.isArray(val.nodes) || val.nodes.length === 0 || !Array.isArray(val.edges)) return null;
-  return normalizeWorkflowDefinition(val as unknown as FlowDefinition, bt);
+  return syncLegacyFormSource(normalizeWorkflowDefinition(val as unknown as FlowDefinition, bt), typeof val.formSource === 'string' ? val.formSource : '');
+}
+
+function syncLegacyFormSource(definition: Pick<FlowDefinition, 'nodes' | 'edges'>, legacyFormSource: string): Pick<FlowDefinition, 'nodes' | 'edges'> {
+  if (!legacyFormSource.trim()) return definition;
+  return {
+    ...definition,
+    nodes: definition.nodes.map((node) => {
+      if (node.type !== 'start' || (typeof node.data.formSource === 'string' && node.data.formSource.trim())) return node;
+      return { ...node, data: { ...node.data, formSource: legacyFormSource, formSectionName: node.data.formSectionName || '申请信息' } };
+    }),
+  };
+}
+
+function nodeFormSource(nodes: FlowNode[], type: FlowNodeType) {
+  const source = nodes.find((node) => node.type === type)?.data.formSource;
+  return typeof source === 'string' ? source : '';
 }
 
 function autoPos(i: number) { return { x: 220 + (i % 2) * 220, y: 120 + Math.floor(i / 2) * 160 }; }
@@ -56,6 +72,10 @@ const STATUS_STYLES: Record<string, { label: string; cls: string }> = {
   ENABLED:      { label: '已启用', cls: 'bg-green-50 text-green-700' },
   DISABLED:     { label: '已停用', cls: 'bg-red-50 text-red-700' },
 };
+
+function workflowStatusLabel(status: string) {
+  return STATUS_STYLES[status]?.label ?? status;
+}
 
 /* ---------- undo/redo 快照 ---------- */
 interface DesignerSnapshot {
@@ -85,6 +105,137 @@ function canEditWorkflowDefinitions(user: AuthUser | null) {
   return permissions.includes('*') || permissions.includes('*:*:*') || permissions.includes('workflow:definition:edit');
 }
 
+type AssigneePreviewSource = 'auto' | 'manual' | null;
+type PreviewMode = Exclude<AssigneePreviewSource, null>;
+
+function parsePreviewBusinessData(value: string): { ok: true; businessData: Record<string, unknown> } | { ok: false; error: string } {
+  const trimmed = value.trim();
+  if (!trimmed) return { ok: true, businessData: {} };
+  try {
+    const parsed = JSON.parse(trimmed);
+    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+      return { ok: true, businessData: parsed as Record<string, unknown> };
+    }
+    return { ok: false, error: '业务数据 JSON 必须是对象' };
+  } catch {
+    return { ok: false, error: '业务数据 JSON 格式无效' };
+  }
+}
+
+function createAssigneePreviewKey(
+  businessType: string,
+  status: string,
+  version: number,
+  nodes: FlowNode[],
+  edges: FlowEdge[],
+  formSourceValue: string,
+) {
+  return JSON.stringify({
+    businessType,
+    status,
+    version,
+    formSource: formSourceValue,
+    nodes: nodes.map((node) => ({ id: node.id, type: node.type, data: node.data })),
+    edges: edges.map((edge) => ({
+      id: edge.id,
+      source: edge.source,
+      target: edge.target,
+      sourceHandle: edge.sourceHandle,
+      targetHandle: edge.targetHandle,
+      data: edge.data,
+      label: edge.label,
+    })),
+  });
+}
+
+function AssigneePreviewPanel({
+  preview,
+  source,
+  previewing,
+  businessData,
+  onBusinessDataChange,
+  onPreview,
+}: {
+  preview: WorkflowAssigneePreviewResponse | null;
+  source: AssigneePreviewSource;
+  previewing: boolean;
+  businessData: string;
+  onBusinessDataChange: (value: string) => void;
+  onPreview: () => void;
+}) {
+  const missingFields = preview?.missingFields ?? [];
+  const nodes = preview?.nodes ?? [];
+  const unresolvedNodes = nodes.filter((node) => !node.resolved || node.reason);
+  const sourceText = source === 'auto'
+    ? (preview?.calculable ? '已自动计算处理人' : '自动计算已运行')
+    : '手动计算结果';
+
+  return (
+    <div className="rounded-lg border border-gray-200 bg-white p-3" aria-label="处理人预览面板">
+      <div className="mb-2 flex items-center justify-between gap-2">
+        <div className="text-xs font-semibold text-gray-700">处理人预览</div>
+        <button
+          type="button"
+          onClick={onPreview}
+          disabled={previewing}
+          className="inline-flex items-center gap-1 rounded-md bg-blue-600 px-2 py-1 text-xs font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+        >
+          {previewing ? <Loader2 className="h-3 w-3 animate-spin" /> : <UserCheck className="h-3 w-3" />}
+          {preview ? '重新计算' : '计算处理人'}
+        </button>
+      </div>
+      <textarea
+        className="h-20 w-full resize-none rounded-md border border-gray-200 bg-gray-50 p-2 font-mono text-xs text-gray-700 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+        value={businessData}
+        onChange={(e) => onBusinessDataChange(e.target.value)}
+        aria-label="业务数据 JSON"
+      />
+      {preview && (
+        <div className={`mt-3 rounded-md border p-2 text-xs ${preview.calculable ? 'border-green-200 bg-green-50 text-green-800' : 'border-amber-200 bg-amber-50 text-amber-800'}`}>
+          <div className="flex items-center justify-between gap-2">
+            <div className="font-medium">{preview.calculable ? '已解析处理人' : '不可计算'}</div>
+            <div className="text-[11px] opacity-80">{sourceText}</div>
+          </div>
+          {!preview.calculable && (
+            <div className="mt-2 space-y-1">
+              {preview.reason && <div>{preview.reason}</div>}
+              {missingFields.length > 0 && <div>缺少字段：{missingFields.join('、')}</div>}
+              {unresolvedNodes.length > 0 ? (
+                unresolvedNodes.map((node) => (
+                  <div key={node.nodeId} className="rounded border border-white/70 bg-white/70 px-2 py-1">
+                    <div className="font-medium text-gray-800">{node.stepNo}. {node.label || node.nodeCode || node.nodeId}</div>
+                    <div className="mt-0.5 text-amber-700">{node.reason || '节点未解析，请补全条件字段后重新计算'}</div>
+                  </div>
+                ))
+              ) : (
+                <div className="text-amber-700">处理人名单已隐藏，补全条件字段后再计算。</div>
+              )}
+            </div>
+          )}
+          {preview.calculable && (
+            <div className="mt-2 space-y-1">
+              {nodes.map((node) => (
+                <div key={node.nodeId} className="rounded border border-white/70 bg-white/70 px-2 py-1">
+                  <div className="font-medium text-gray-800">{node.stepNo}. {node.label || node.nodeCode || node.nodeId}</div>
+                  {node.resolved ? (
+                    <div className="mt-0.5 text-gray-600">
+                      <div>已解析 {node.assigneeCount ?? (Array.isArray(node.assignees) ? node.assignees.length : 0)} 名候选处理人</div>
+                      <div className="mt-0.5 text-gray-500">具体处理人名单已隐藏</div>
+                    </div>
+                  ) : (
+                    <div className="mt-0.5 text-amber-700">{node.reason || '未解析'}</div>
+                  )}
+                </div>
+              ))}
+              {nodes.length === 0 && <div className="text-gray-500">未返回可展示节点</div>}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function WorkflowDesignerPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -112,11 +263,44 @@ export default function WorkflowDesignerPage() {
   const [srvDesc, setSrvDesc] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [publishing, setPublishing] = useState(false);
+  const [reloadingBackend, setReloadingBackend] = useState(false);
+  const [previewingAssignees, setPreviewingAssignees] = useState(false);
+  const [assigneePreview, setAssigneePreview] = useState<WorkflowAssigneePreviewResponse | null>(null);
+  const [assigneePreviewSource, setAssigneePreviewSource] = useState<AssigneePreviewSource>(null);
+  const [previewBusinessData, setPreviewBusinessData] = useState('{}');
+  const [loadedAssigneePreviewKey, setLoadedAssigneePreviewKey] = useState('');
   const canEditWorkflow = useMemo(() => canEditWorkflowDefinitions(user), [user]);
 
   /* ---- undo / redo 历史栈 ---- */
   const pastStates = useRef<DesignerSnapshot[]>([]);
   const futureStates = useRef<DesignerSnapshot[]>([]);
+  const autoPreviewedKeyRef = useRef<string | null>(null);
+
+  const applyLoadedDefinition = useCallback((def: WorkflowDefinitionDTO, message: string | null) => {
+    const defData = def.definition as Record<string, unknown> | undefined;
+    const parsed = fromApi(defData, businessType);
+    const nn = parsed?.nodes ?? cloneNodes();
+    const ne = parsed?.edges ?? cloneEdges();
+    const loadedFormSource = (typeof defData?.formSource === 'string' ? defData.formSource : '') || nodeFormSource(nn, 'start');
+    setAssigneePreview(null);
+    setNodes(nn);
+    setEdges(ne);
+    setSelId(nn.find((n) => n.type === 'approval')?.id ?? 'approval-1');
+    setSrvStatus(def.status);
+    setSrvVersion(def.version);
+    setSrvName(def.name ?? null);
+    setSrvDesc(def.description ?? null);
+    setFormSource(loadedFormSource);
+    setLoadedAssigneePreviewKey(createAssigneePreviewKey(businessType, def.status, def.version, nn, ne, loadedFormSource));
+    pastStates.current = [];
+    futureStates.current = [];
+    setSaveErr(null);
+    setSaveMsg(message);
+  }, [businessType, setEdges, setNodes]);
+
+  useEffect(() => {
+    if (!assigneePreview) setAssigneePreviewSource(null);
+  }, [assigneePreview]);
 
   const pushSnapshot = useCallback(() => {
     pastStates.current.push(deepCloneSnapshot(nodes, edges, selId));
@@ -127,6 +311,7 @@ export default function WorkflowDesignerPage() {
   const handleUndo = useCallback(() => {
     const prev = pastStates.current.pop();
     if (!prev) return;
+    setAssigneePreview(null);
     // 保存当前状态到 future 栈
     const cur = deepCloneSnapshot(nodes, edges, selId);
     futureStates.current.push(cur);
@@ -140,6 +325,7 @@ export default function WorkflowDesignerPage() {
   const handleRedo = useCallback(() => {
     const next = futureStates.current.pop();
     if (!next) return;
+    setAssigneePreview(null);
     // 保存当前状态到 past 栈
     const cur = deepCloneSnapshot(nodes, edges, selId);
     pastStates.current.push(cur);
@@ -160,29 +346,25 @@ export default function WorkflowDesignerPage() {
         const raw = await workflowApi.get(businessType);
         const def = raw as WorkflowDefinitionDTO;
         if (cancelled) return;
-        const defData = def.definition as Record<string, unknown> | undefined;
-        const parsed = fromApi(defData, businessType);
-        const nn = parsed?.nodes ?? cloneNodes();
-        const ne = parsed?.edges ?? cloneEdges();
-        setNodes(nn); setEdges(ne);
-        setSelId(nn.find((n) => n.type === 'approval')?.id ?? 'approval-1');
-        setSrvStatus(def.status); setSrvVersion(def.version);
-        setSrvName(def.name ?? null); setSrvDesc(def.description ?? null);
-        setFormSource((defData?.formSource as string) || '');
-        setSaveMsg(def.id ? '已从后端恢复流程定义' : null);
+        applyLoadedDefinition(def, def.id ? `已读取后端定义：${workflowStatusLabel(def.status)} v${def.version}` : null);
       } catch {
         if (cancelled) return;
         const draft = readDraft(businessType);
         const nn = draft?.nodes ?? cloneNodes();
         const ne = draft?.edges ?? cloneEdges();
+        const draftFormSource = nodeFormSource(nn, 'start');
+        setAssigneePreview(null);
         setNodes(nn); setEdges(ne);
         setSelId(nn.find((n) => n.type === 'approval')?.id ?? 'approval-1');
         setSrvStatus('UNCONFIGURED'); setSrvVersion(0);
+        setSrvName(null); setSrvDesc(null);
+        setFormSource(draftFormSource);
+        setLoadedAssigneePreviewKey(createAssigneePreviewKey(businessType, 'UNCONFIGURED', 0, nn, ne, draftFormSource));
         setSaveMsg(draft ? '后端不可用，已恢复本地草稿' : null);
       }
     })();
     return () => { cancelled = true; };
-  }, [businessType, setEdges, setNodes]);
+  }, [applyLoadedDefinition, businessType, setEdges, setNodes]);
 
   useEffect(() => {
     let cancelled = false;
@@ -223,6 +405,7 @@ export default function WorkflowDesignerPage() {
   /* ---- 流程修改操作（每个操作前保存快照以支持撤销） ---- */
   const handleAddNode = useCallback((type: FlowNodeType, pos?: { x: number; y: number }) => {
     if (!canEditWorkflow) return;
+    setAssigneePreview(null);
     pushSnapshot();
     setNodes((cur) => { const n = createFlowNode(type, pos ?? autoPos(cur.length)); setSelId(n.id); return [...cur, n]; });
   }, [canEditWorkflow, setNodes, pushSnapshot]);
@@ -231,18 +414,21 @@ export default function WorkflowDesignerPage() {
     if (!canEditWorkflow) return;
     const edge = createFlowEdge(conn);
     if (!edge || edge.source === edge.target) { if (edge?.source === edge.target) { setSaveMsg(null); setSaveErr('同一节点不能连接自身'); } return; }
+    setAssigneePreview(null);
     pushSnapshot();
     setEdges((cur) => cur.some((e) => e.source === edge.source && e.target === edge.target && e.sourceHandle === edge.sourceHandle) ? cur : addEdge(edge, cur));
   }, [canEditWorkflow, setEdges, pushSnapshot]);
 
   const handleUpdate = useCallback((id: string, patch: Partial<FlowNodeData>) => {
     if (!canEditWorkflow) return;
+    setAssigneePreview(null);
     pushSnapshot();
     setNodes((cur) => cur.map((n) => n.id === id ? { ...n, data: { ...n.data, ...patch } } : n));
   }, [canEditWorkflow, setNodes, pushSnapshot]);
 
   const handleDelete = useCallback((id: string) => {
     if (!canEditWorkflow) return;
+    setAssigneePreview(null);
     pushSnapshot();
     setNodes((cur) => cur.filter((n) => n.id !== id));
     setEdges((cur) => cur.filter((e) => e.source !== id && e.target !== id));
@@ -252,12 +438,44 @@ export default function WorkflowDesignerPage() {
   /* ---- 保存 / 发布 ---- */
   const defPayload = useMemo(() => {
     const base = normDef as unknown as Record<string, unknown>;
-    if (formSource) {
-      return { ...base, formSource };
+    const startFormSource = nodeFormSource(normDef.nodes, 'start');
+    const topLevelFormSource = formSource || startFormSource;
+    if (topLevelFormSource) {
+      const nodes = normDef.nodes.map((node) => {
+        if (node.type !== 'start') return node;
+        return { ...node, data: { ...node.data, formSource: topLevelFormSource } };
+      });
+      return { ...base, formSource: topLevelFormSource, nodes };
     }
     const { formSource: _, ...rest } = base;
     return rest;
   }, [normDef, formSource]);
+
+  const handleNodesChange = useCallback((changes: NodeChange<FlowNode>[]) => {
+    setAssigneePreview(null);
+    onNodesChange(changes);
+  }, [onNodesChange]);
+
+  const handleEdgesChange = useCallback((changes: EdgeChange<FlowEdge>[]) => {
+    setAssigneePreview(null);
+    onEdgesChange(changes);
+  }, [onEdgesChange]);
+
+  const handleReloadBackendDefinition = useCallback(async () => {
+    setReloadingBackend(true);
+    setSaveMsg(null);
+    setSaveErr(null);
+    try {
+      const raw = await workflowApi.get(businessType);
+      const def = raw as WorkflowDefinitionDTO;
+      applyLoadedDefinition(def, `已重新读取后端定义：${workflowStatusLabel(def.status)} v${def.version}`);
+    } catch (e) {
+      setSaveMsg(null);
+      setSaveErr(e instanceof Error ? e.message : '重新读取后端定义失败');
+    } finally {
+      setReloadingBackend(false);
+    }
+  }, [applyLoadedDefinition, businessType]);
 
   const handleSaveDraft = useCallback(async () => {
     if (!canEditWorkflow) {
@@ -289,13 +507,47 @@ export default function WorkflowDesignerPage() {
     try {
       await workflowApi.saveDraft(businessType, { name: normDef.name, description: normDef.description, definition: defPayload });
       localStorage.setItem(getDraftStorageKey(businessType), JSON.stringify({ ...normDef, formSource, savedAt: new Date().toISOString() }));
-      const raw = await workflowApi.publish(businessType);
+      await workflowApi.publish(businessType);
+      const raw = await workflowApi.get(businessType);
       const pub = raw as WorkflowDefinitionDTO;
-      setSrvStatus(pub.status); setSrvVersion(pub.version); setSaveErr(null);
-      setSaveMsg(`${flow.name}已发布为 v${pub.version}`);
+      applyLoadedDefinition(pub, `${flow.name}已发布为 v${pub.version}`);
     } catch (e) { setSaveMsg(null); setSaveErr(e instanceof Error ? e.message : '发布失败'); }
     finally { setPublishing(false); }
-  }, [businessType, canEditWorkflow, ensureValid, flow.name, normDef, defPayload, formSource]);
+  }, [applyLoadedDefinition, businessType, canEditWorkflow, ensureValid, flow.name, normDef, defPayload, formSource]);
+
+  const handlePreviewAssignees = useCallback(async (mode: PreviewMode = 'manual') => {
+    const parsedBusinessData = parsePreviewBusinessData(previewBusinessData);
+    if (!parsedBusinessData.ok) {
+      if (mode === 'manual') {
+        setAssigneePreview(null);
+        setSaveMsg(null);
+        setSaveErr('error' in parsedBusinessData ? parsedBusinessData.error : '业务数据 JSON 格式无效');
+      }
+      return;
+    }
+    setPreviewingAssignees(true);
+    try {
+      const result = await workflowApi.previewAssignees(businessType, { definition: defPayload, businessData: parsedBusinessData.businessData });
+      setAssigneePreview(result);
+      setAssigneePreviewSource(mode);
+      setSaveErr(null);
+      if (mode === 'manual') setSaveMsg(result.calculable ? '处理人计算完成' : null);
+    } catch (e) {
+      setAssigneePreview(null);
+      if (mode === 'manual') {
+        setSaveMsg(null);
+        setSaveErr(e instanceof Error ? e.message : '处理人计算失败');
+      }
+    } finally {
+      setPreviewingAssignees(false);
+    }
+  }, [businessType, defPayload, previewBusinessData]);
+
+  useEffect(() => {
+    if (!loadedAssigneePreviewKey || autoPreviewedKeyRef.current === loadedAssigneePreviewKey) return;
+    autoPreviewedKeyRef.current = loadedAssigneePreviewKey;
+    void handlePreviewAssignees('auto');
+  }, [handlePreviewAssignees, loadedAssigneePreviewKey]);
 
   const statusStyle = STATUS_STYLES[srvStatus] ?? STATUS_STYLES.UNCONFIGURED;
 
@@ -379,6 +631,23 @@ export default function WorkflowDesignerPage() {
           {/* Right: actions */}
           <div className="flex items-center gap-2 flex-shrink-0">
             <button
+              onClick={() => handlePreviewAssignees('manual')}
+              disabled={previewingAssignees}
+              className="inline-flex items-center gap-1.5 h-9 rounded-lg border border-blue-200 bg-blue-50 px-4 text-sm font-medium text-blue-700 hover:bg-blue-100 transition-colors disabled:opacity-50"
+            >
+              {previewingAssignees ? <Loader2 className="w-4 h-4 animate-spin" /> : <UserCheck className="w-4 h-4" />}
+              {assigneePreview ? '重新计算' : '计算处理人'}
+            </button>
+            <button
+              onClick={handleReloadBackendDefinition}
+              disabled={reloadingBackend || saving || publishing}
+              title="从后端重新读取当前业务类型的流程定义"
+              className="inline-flex items-center gap-1.5 h-9 rounded-lg border border-gray-200 bg-white px-4 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50"
+            >
+              {reloadingBackend ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+              重新读取后端定义
+            </button>
+            <button
               onClick={handleSaveDraft}
               disabled={saving || !canEditWorkflow}
               title={!canEditWorkflow ? '缺少 workflow:definition:edit 权限' : undefined}
@@ -414,7 +683,7 @@ export default function WorkflowDesignerPage() {
         {saveErr && (
           <div className="mt-2 rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-700 flex items-center justify-between gap-2">
             <span>{saveErr}</span>
-            <button type="button" onClick={() => setSaveMsg(null)} className="text-green-500 hover:text-green-700 flex-shrink-0"><X className="w-4 h-4" /></button>
+            <button type="button" onClick={() => setSaveErr(null)} className="text-red-500 hover:text-red-700 flex-shrink-0"><X className="w-4 h-4" /></button>
           </div>
         )}
         {valErrors.length > 0 && (
@@ -479,7 +748,7 @@ export default function WorkflowDesignerPage() {
         )}
         <FlowCanvas
           nodes={nodes} edges={edges}
-          onNodesChange={canEditWorkflow ? onNodesChange : () => undefined} onEdgesChange={canEditWorkflow ? onEdgesChange : () => undefined}
+          onNodesChange={canEditWorkflow ? handleNodesChange : () => undefined} onEdgesChange={canEditWorkflow ? handleEdgesChange : () => undefined}
           onConnect={handleConnect}
           onNodeSelect={(n) => setSelId(n?.id ?? null)}
           onAddNodeAtPosition={handleAddNode}
@@ -508,7 +777,7 @@ export default function WorkflowDesignerPage() {
                 placeholder={`<form>\n  <label>字段名</label>\n  <input name="field" />\n  <button type="submit">提交</button>\n</form>`}
                 value={formSource}
                 disabled={!canEditWorkflow}
-                onChange={(e) => setFormSource(e.target.value)}
+                onChange={(e) => { setAssigneePreview(null); setFormSource(e.target.value); }}
               />
               <p className="text-[10px] text-gray-400 mt-2 leading-relaxed">
                 表单源码会保存在流程定义中。自定义流程卡片上的"查看业务表单"按钮会渲染此 HTML。
@@ -517,13 +786,33 @@ export default function WorkflowDesignerPage() {
           ) : (
             <div className="flex-1 min-h-0 overflow-auto">
               {canEditWorkflow ? (
-                <NodeConfigPanel selectedNode={selNode} edges={edges} approverRoles={approverRoles} roleDetails={roleDetails} onUpdateNode={handleUpdate} onDeleteNode={handleDelete} />
+                <div className="space-y-3">
+                  <NodeConfigPanel selectedNode={selNode} edges={edges} approverRoles={approverRoles} roleDetails={roleDetails} onUpdateNode={handleUpdate} onDeleteNode={handleDelete} />
+                  <div className="mx-3 mb-3">
+                    <AssigneePreviewPanel
+                      preview={assigneePreview}
+                      source={assigneePreviewSource}
+                      previewing={previewingAssignees}
+                      businessData={previewBusinessData}
+                      onBusinessDataChange={(value) => { setAssigneePreview(null); setPreviewBusinessData(value); }}
+                      onPreview={() => handlePreviewAssignees('manual')}
+                    />
+                  </div>
+                </div>
               ) : (
-                <div className="p-4">
+                <div className="space-y-3 p-4">
                   <div className="rounded-xl border border-slate-200 bg-white p-4 text-sm leading-6 text-slate-600">
                     <div className="mb-2 font-semibold text-slate-900">节点属性</div>
                     只读权限下节点属性面板已锁定，避免误以为修改后可以保存。
                   </div>
+                  <AssigneePreviewPanel
+                    preview={assigneePreview}
+                    source={assigneePreviewSource}
+                    previewing={previewingAssignees}
+                    businessData={previewBusinessData}
+                    onBusinessDataChange={(value) => { setAssigneePreview(null); setPreviewBusinessData(value); }}
+                    onPreview={() => handlePreviewAssignees('manual')}
+                  />
                 </div>
               )}
             </div>

@@ -295,7 +295,7 @@
     {
       "name": "智能制造总览",
       "route": "/fixed-assets/workbench",
-      "stitchScreen": "top-nav-manufacturing-overview-v1",
+      "stitchScreen": "overview",
       "primaryAsset": "/mock/workspace-preview/stitch-suite/top-nav-v7/stitch-top-nav-manufacturing-overview-v1.png",
       "moduleAsset": "/mock/workspace-preview/asset-kit-v7/top-nav/top-nav-manufacturing-overview-v1.png",
       "detailAssets": [
@@ -308,7 +308,7 @@
     {
       "name": "数据监控中心",
       "route": "/fixed-assets/workbench/analytics",
-      "stitchScreen": "top-nav-data-monitoring-v1",
+      "stitchScreen": "analytics",
       "primaryAsset": "/mock/workspace-preview/stitch-suite/top-nav-v7/stitch-top-nav-data-monitoring-v1.png",
       "moduleAsset": "/mock/workspace-preview/asset-kit-v7/top-nav/top-nav-data-monitoring-v1.png",
       "detailAssets": [
@@ -321,7 +321,7 @@
     {
       "name": "资产运维中心",
       "route": "/fixed-assets/workbench/assets",
-      "stitchScreen": "top-nav-asset-operations-v1",
+      "stitchScreen": "assets",
       "primaryAsset": "/mock/workspace-preview/stitch-suite/top-nav-v7/stitch-top-nav-asset-operations-v1.png",
       "moduleAsset": "/mock/workspace-preview/asset-kit-v7/top-nav/top-nav-asset-operations-v1.png",
       "detailAssets": [
@@ -335,7 +335,7 @@
     {
       "name": "安全态势工作台",
       "route": "/fixed-assets/workbench/security",
-      "stitchScreen": "top-nav-security-posture-v1",
+      "stitchScreen": "security",
       "primaryAsset": "/mock/workspace-preview/stitch-suite/top-nav-v7/stitch-top-nav-security-posture-v1.png",
       "moduleAsset": "/mock/workspace-preview/asset-kit-v7/top-nav/top-nav-security-posture-v1.png",
       "detailAssets": [

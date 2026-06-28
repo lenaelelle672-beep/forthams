@@ -24,7 +24,11 @@
     "stitch:screens": "node ../scripts/stitch-cli.js screens",
     "stitch:export": "node ../scripts/stitch-cli.js export",
     "stitch:mcp-proxy": "node ../scripts/stitch-oauth-mcp-proxy.js",
-    "stitch:proxy-check": "node ../scripts/stitch-cli.js proxy-check"
+    "stitch:proxy-check": "node ../scripts/stitch-cli.js proxy-check",
+    "verify:system-hub": "node scripts/verify-system-hub-usability.mjs",
+    "verify:system-hub-layout": "node scripts/verify-system-hub-layout.mjs",
+    "verify:system-hub-assets": "node scripts/verify-system-hub-assets.mjs",
+    "verify:system-hub-interactions": "playwright test --project=browser-regression-smoke --reporter=line src/e2e/workbench-platform-entry.browser-regression-smoke.spec.ts"
   },
   "dependencies": {
     "@ant-design/icons": "^6.2.5",

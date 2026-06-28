@@ -8,6 +8,7 @@
 
 import { describe, it, expect } from 'vitest';
 import { z } from 'zod';
+import { buildAssetTransferRuntimeBusinessData } from '@/pages/disposal/AssetTransferFormPage';
 
 // Replicate the schema from AssetTransferFormPage.tsx
 const transferSchema = z.object({
@@ -16,7 +17,6 @@ const transferSchema = z.object({
   toDept: z.string().min(1, '请选择调入部门'),
   fromLocation: z.string().optional(),
   toLocation: z.string().optional(),
-  workflow: z.string().min(1, '请选择审批流程'),
   priority: z.enum(['LOW', 'NORMAL', 'HIGH']),
   notes: z.string().optional(),
 });
@@ -32,7 +32,6 @@ describe('AssetTransferFormPage schema validation', () => {
       transferType: '',
       fromDept: '',
       toDept: '',
-      workflow: '',
       priority: '' as any,
     });
     expect(result.success).toBe(false);
@@ -41,7 +40,6 @@ describe('AssetTransferFormPage schema validation', () => {
       expect(paths).toContain('transferType');
       expect(paths).toContain('fromDept');
       expect(paths).toContain('toDept');
-      expect(paths).toContain('workflow');
       expect(paths).toContain('priority');
     }
   });
@@ -51,7 +49,6 @@ describe('AssetTransferFormPage schema validation', () => {
       transferType: '内部调拨',
       fromDept: '1',
       toDept: '2',
-      workflow: 'w1',
       priority: 'INVALID' as any,
     });
     expect(result.success).toBe(false);
@@ -62,7 +59,6 @@ describe('AssetTransferFormPage schema validation', () => {
       transferType: '内部调拨',
       fromDept: '1',
       toDept: '2',
-      workflow: 'w1',
       priority: 'LOW',
     });
     expect(result.success).toBe(true);
@@ -73,7 +69,6 @@ describe('AssetTransferFormPage schema validation', () => {
       transferType: '内部调拨',
       fromDept: '1',
       toDept: '2',
-      workflow: 'w1',
       priority: 'NORMAL',
     });
     expect(result.success).toBe(true);
@@ -84,7 +79,6 @@ describe('AssetTransferFormPage schema validation', () => {
       transferType: '内部调拨',
       fromDept: '1',
       toDept: '2',
-      workflow: 'w1',
       priority: 'HIGH',
     });
     expect(result.success).toBe(true);
@@ -97,7 +91,6 @@ describe('AssetTransferFormPage schema validation', () => {
       toDept: '2',
       fromLocation: 'A栋3楼',
       toLocation: 'B栋5楼',
-      workflow: 'w1',
       priority: 'NORMAL',
       notes: '加急处理',
     });
@@ -109,7 +102,6 @@ describe('AssetTransferFormPage schema validation', () => {
       transferType: '内部调拨',
       fromDept: '1',
       toDept: '2',
-      workflow: 'w1',
       priority: 'HIGH',
     });
     expect(result.success).toBe(true);
@@ -120,7 +112,6 @@ describe('AssetTransferFormPage schema validation', () => {
       transferType: '',
       fromDept: '1',
       toDept: '2',
-      workflow: 'w1',
       priority: 'NORMAL',
     });
     expect(result.success).toBe(false);
@@ -131,19 +122,41 @@ describe('AssetTransferFormPage schema validation', () => {
     }
   });
 
-  it('should require workflow field with specific error message', () => {
+  it('should not require a user-selected workflow field', () => {
     const result = transferSchema.safeParse({
       transferType: '内部调拨',
       fromDept: '1',
       toDept: '2',
-      workflow: '',
       priority: 'NORMAL',
     });
-    expect(result.success).toBe(false);
-    if (!result.success) {
-      const workflowErr = result.error.issues.find(i => i.path[0] === 'workflow');
-      expect(workflowErr).toBeDefined();
-      expect(workflowErr!.message).toBe('请选择审批流程');
-    }
+    expect(result.success).toBe(true);
+  });
+
+  it('should map runtime preview business data without faking amount', () => {
+    const result = buildAssetTransferRuntimeBusinessData({
+      transferType: 'INTERNAL',
+      fromDept: '1',
+      toDept: '2',
+      fromLocation: '10',
+      toLocation: '20',
+      priority: 'HIGH',
+      notes: '跨部门调拨',
+    }, [{ id: 'A-1' }, { id: 2 }]);
+
+    expect(result).toMatchObject({
+      transferType: 'INTERNAL',
+      fromDept: '1',
+      toDept: '2',
+      fromLocation: '10',
+      toLocation: '20',
+      priority: 'HIGH',
+      notes: '跨部门调拨',
+      assetIds: ['A-1', '2'],
+      assetCount: 2,
+      targetDeptId: '2',
+      reason: '跨部门调拨',
+      description: '跨部门调拨',
+    });
+    expect(result).not.toHaveProperty('amount');
   });
 });

@@ -73,6 +73,33 @@ ALTER TABLE asset_category ADD COLUMN IF NOT EXISTS fieldset_id BIGINT;
 
 ALTER TABLE approval_process ADD COLUMN IF NOT EXISTS version INT DEFAULT 0;
 
+CREATE TABLE IF NOT EXISTS workflow_definition_version (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    tenant_id VARCHAR(64) NOT NULL,
+    definition_id BIGINT NOT NULL,
+    business_type VARCHAR(64) NOT NULL,
+    version INT NOT NULL,
+    action_type VARCHAR(32) NOT NULL DEFAULT 'PUBLISH',
+    status VARCHAR(32) NOT NULL DEFAULT 'PUBLISHED',
+    name VARCHAR(128) NOT NULL,
+    description TEXT,
+    definition_json LONGTEXT NOT NULL,
+    publish_note VARCHAR(512),
+    impact_scope VARCHAR(512),
+    rollback_plan VARCHAR(512),
+    rollback_source_version BIGINT,
+    operator_id BIGINT,
+    published_at DATETIME NOT NULL,
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS uk_workflow_version_tenant_business_version
+    ON workflow_definition_version (tenant_id, business_type, version);
+CREATE INDEX IF NOT EXISTS idx_workflow_version_definition
+    ON workflow_definition_version (definition_id);
+CREATE INDEX IF NOT EXISTS idx_workflow_version_tenant_business_time
+    ON workflow_definition_version (tenant_id, business_type, published_at);
+
 CREATE TABLE IF NOT EXISTS depreciation_record (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     tenant_id VARCHAR(64) NOT NULL,

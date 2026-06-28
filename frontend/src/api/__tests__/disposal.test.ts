@@ -117,7 +117,8 @@ describe('api/disposal', () => {
       transferType: '部门调拨',
       fromDept: '1',
       toDept: '2',
-      workflow: 'default',
+      expectedWorkflowDefinitionId: 7,
+      expectedWorkflowVersion: 3,
       priority: 'NORMAL',
     });
 
@@ -127,6 +128,11 @@ describe('api/disposal', () => {
     expect(mockedHttp.put).toHaveBeenCalledWith('/compensation/9', { description: '更新说明' });
     expect(mockedHttp.post).toHaveBeenNthCalledWith(2, '/approvals', expect.objectContaining({ processType: 'ASSET_SCRAP' }));
     expect(mockedHttp.post).toHaveBeenNthCalledWith(3, '/approvals', expect.objectContaining({ processType: 'ASSET_CLEARANCE' }));
-    expect(mockedHttp.post).toHaveBeenNthCalledWith(4, '/approvals', expect.objectContaining({ processType: 'ASSET_TRANSFER' }));
+    expect(mockedHttp.post).toHaveBeenNthCalledWith(4, '/approvals', expect.objectContaining({
+      processType: 'ASSET_TRANSFER',
+      expectedWorkflowDefinitionId: 7,
+      expectedWorkflowVersion: 3,
+      description: expect.stringContaining('发布流程：ASSET_TRANSFER v3'),
+    }));
   });
 });

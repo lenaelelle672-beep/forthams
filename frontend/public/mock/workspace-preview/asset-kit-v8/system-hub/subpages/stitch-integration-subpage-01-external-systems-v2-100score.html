@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>外部系统接入配置台</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+<style data-purpose="layout">
+    body {
+      margin: 0;
+      padding: 0;
+      width: 1586px;
+      height: 992px;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: #f3f4f6;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .layout-container {
+      display: flex;
+      flex: 1;
+      height: calc(100vh - 56px);
+      overflow: hidden;
+    }
+
+    .sidebar {
+      width: 193px;
+      background-color: #ffffff;
+      border-right: 1px solid #e5e7eb;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background-color: #f8fafc;
+      padding: 20px 24px;
+    }
+  </style>
+<style data-purpose="header">
+    .top-bar {
+      height: 56px;
+      background-color: #0b1f41; /* Dark navy */
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      color: white;
+      flex-shrink: 0;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: bold;
+      font-size: 16px;
+      letter-spacing: 0.5px;
+      width: 280px;
+    }
+    .top-nav {
+      display: flex;
+      height: 100%;
+    }
+    .top-nav-item {
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      color: #cbd5e1;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .top-nav-item.active {
+      color: #ffffff;
+      background-color: #1e3a8a;
+      font-weight: 500;
+    }
+    .top-actions {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .top-icon {
+      color: #cbd5e1;
+      cursor: pointer;
+      font-size: 16px;
+      position: relative;
+    }
+    .badge {
+      position: absolute;
+      top: -4px;
+      right: -6px;
+      background-color: #ef4444;
+      color: white;
+      font-size: 10px;
+      border-radius: 9999px;
+      padding: 1px 4px;
+      line-height: 1;
+    }
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      color: #cbd5e1;
+      margin-left: 8px;
+    }
+  </style>
+<style data-purpose="sidebar">
+    .sidebar-title {
+      height: 56px;
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      font-size: 16px;
+      font-weight: 600;
+      color: #1e293b;
+      border-bottom: 1px solid #f1f5f9;
+    }
+    .sidebar-menu {
+      flex: 1;
+      overflow: hidden;
+      padding: 8px 0;
+    }
+    .menu-group {
+      margin-bottom: 4px;
+    }
+    .menu-group-header {
+      display: flex;
+      align-items: center;
+      padding: 8px 16px;
+      color: #475569;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    .menu-group-header i {
+      width: 20px;
+      text-align: center;
+      margin-right: 8px;
+      font-size: 14px;
+    }
+    .menu-group-header .fa-chevron-up,
+    .menu-group-header .fa-chevron-down {
+      margin-left: auto;
+      margin-right: 0;
+      font-size: 10px;
+      color: #94a3b8;
+    }
+    .menu-group-header.active {
+      color: #2563eb;
+    }
+    .menu-items {
+      padding: 4px 0;
+    }
+    .menu-item {
+      padding: 8px 16px 8px 44px;
+      color: #64748b;
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+    }
+    .menu-item:hover {
+      background-color: #f8fafc;
+      color: #334155;
+    }
+    .menu-item.active {
+      background-color: #eff6ff;
+      color: #2563eb;
+      font-weight: 500;
+      position: relative;
+    }
+    .menu-item.active::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background-color: #2563eb;
+    }
+  </style>
+<style data-purpose="content-layout">
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 16px;
+    }
+    .page-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: #0f172a;
+      margin-bottom: 4px;
+    }
+    .page-subtitle {
+      font-size: 12px;
+      color: #64748b;
+    }
+    .header-actions {
+      display: flex;
+      gap: 8px;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px 12px;
+      font-size: 13px;
+      border-radius: 4px;
+      cursor: pointer;
+      border: 1px solid transparent;
+      gap: 6px;
+    }
+    .btn-primary {
+      background-color: #2563eb;
+      color: white;
+      border-color: #2563eb;
+    }
+    .btn-primary:hover { background-color: #1d4ed8; }
+    .btn-outline {
+      background-color: white;
+      color: #2563eb;
+      border-color: #bfdbfe;
+    }
+    .btn-outline:hover { background-color: #eff6ff; }
+    
+    .content-body {
+      display: flex;
+      gap: 16px;
+      flex: 1;
+    }
+
+    .left-main-area {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .status-strip {
+      background-color: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 8px 16px;
+      height: 39px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      font-size: 13px;
+      color: #475569;
+      flex-shrink: 0;
+    }
+    .status-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .left-center-grid {
+      display: grid;
+      grid-template-columns: 218px 1fr;
+      gap: 16px;
+      flex: 1;
+    }
+
+    .card {
+      background-color: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      display: flex;
+      flex-direction: column;
+    }
+    .card-header {
+      padding: 10px 16px;
+      border-bottom: 1px solid #e2e8f0;
+      font-weight: 600;
+      font-size: 14px;
+      color: #1e293b;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    /* Left Rail */
+    .system-rail {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .search-box {
+      position: relative;
+    }
+    .search-input {
+      width: 100%;
+      padding: 6px 12px 6px 30px;
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+      font-size: 13px;
+      color: #475569;
+      outline: none;
+    }
+    .search-icon {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #94a3b8;
+      font-size: 12px;
+    }
+    .system-card {
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 10px;
+      background-color: white;
+      cursor: pointer;
+      position: relative;
+    }
+    .system-card.active {
+      border-color: #3b82f6;
+      background-color: #eff6ff;
+    }
+    .system-card-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+    .system-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 12px;
+      font-weight: bold;
+    }
+    .system-name {
+      font-size: 14px;
+      font-weight: 500;
+      color: #1e293b;
+      flex: 1;
+    }
+    .system-status {
+      font-size: 11px;
+      padding: 2px 6px;
+      border-radius: 9999px;
+      background-color: #dcfce7;
+      color: #166534;
+    }
+    .system-status.warning { background-color: #fef08a; color: #854d0e; }
+    .system-status.gray { background-color: #f1f5f9; color: #64748b; }
+    .system-card-details {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2px 8px;
+      font-size: 12px;
+      color: #64748b;
+    }
+
+    /* Center Content */
+    .center-col {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      height: 76px;
+      flex-shrink: 0;
+    }
+    .kpi-card {
+      background-color: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .kpi-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+    .kpi-info { flex: 1; }
+    .kpi-label { font-size: 13px; color: #64748b; margin-bottom: 2px; }
+    .kpi-value { font-size: 20px; font-weight: 600; color: #0f172a; line-height: 1; }
+
+    .data-table-wrapper {
+      height: 394px;
+      display: flex;
+      flex-direction: column;
+    }
+    .data-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 12px; line-height: 16px; }
+    .data-table th { background-color: #f8fafc; padding: 6px 12px; font-weight: 500; color: #475569; border-bottom: 1px solid #e2e8f0; height: 38px; }
+    .data-table td { padding: 6px 12px; border-bottom: 1px solid #f1f5f9; color: #334155; height: 41px; }
+    .data-table tr:last-child td { border-bottom: none; }
+    .status-dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; margin-right: 4px; }
+    .status-dot.green { background-color: #10b981; }
+    .status-dot.orange { background-color: #f59e0b; }
+    .status-dot.red { background-color: #ef4444; }
+    .status-dot.blue { background-color: #3b82f6; }
+    
+    .table-actions a { color: #2563eb; text-decoration: none; margin-right: 6px; }
+    
+    .pagination {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 8px 16px;
+      border-top: 1px solid #e2e8f0;
+      gap: 12px;
+      font-size: 13px;
+      color: #64748b;
+      margin-top: auto;
+    }
+
+    .bottom-panels {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      height: 232px;
+      flex-shrink: 0;
+    }
+
+    /* Right Panel */
+    .right-panel {
+      width: 365px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    
+    .system-props-card {
+      height: 491px;
+      flex-shrink: 0;
+    }
+
+    .validation-card {
+      height: 275px;
+      flex-shrink: 0;
+    }
+
+    .form-group {
+      display: flex;
+      align-items: center;
+      margin-bottom: 6px;
+      font-size: 12px;
+      height: 34px;
+    }
+    .form-label {
+      width: 70px;
+      color: #475569;
+      text-align: right;
+      margin-right: 12px;
+      flex-shrink: 0;
+    }
+    .form-label.required::after { content: " *"; color: #ef4444; }
+    .form-control {
+      flex: 1;
+      padding: 4px 8px;
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+      font-size: 12px;
+      color: #334155;
+      outline: none;
+      height: 28px;
+    }
+    select.form-control {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+      background-position: right 0.5rem center;
+      background-repeat: no-repeat;
+      background-size: 1.2em 1.2em;
+      padding-right: 2rem;
+    }
+    .form-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .form-actions .btn { flex: 1; padding: 6px 8px; font-size: 12px; }
+    
+    .checklist {
+      padding: 0 16px;
+    }
+    .check-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #f1f5f9;
+      font-size: 12px;
+    }
+    .check-item:last-child { border-bottom: none; }
+    .check-label { display: flex; align-items: center; gap: 8px; color: #334155; }
+    .check-status.success { color: #64748b; }
+    .check-status.warning { color: #f59e0b; font-weight: 500; }
+  </style>
+</head>
+<body>
+<!-- BEGIN: MainHeader -->
+<header class="top-bar">
+<div class="brand">
+<span class="text-xl font-bold tracking-wider">UNIVIEW</span>
+<span class="text-sm font-normal pl-2 border-l border-gray-600">固定资产管理系统</span>
+</div>
+<nav class="top-nav">
+<div class="top-nav-item">固定资产工作台</div>
+<div class="top-nav-item">资产全景视图</div>
+<div class="top-nav-item">大屏态势</div>
+<div class="top-nav-item">流程协同</div>
+<div class="top-nav-item active">系统运营中枢</div>
+</nav>
+<div class="top-actions">
+<div class="top-icon">
+<i class="fa-regular fa-bell"></i>
+<span class="badge">12</span>
+</div>
+<div class="top-icon"><i class="fa-regular fa-circle-question"></i></div>
+<div class="top-icon"><i class="fa-solid fa-border-all"></i></div>
+<div class="user-profile">
+<div class="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs">
+<i class="fa-solid fa-user"></i>
+</div>
+<span>系统管理员</span>
+<i class="fa-solid fa-chevron-down text-[10px]"></i>
+</div>
+</div>
+</header>
+<!-- END: MainHeader -->
+<!-- BEGIN: Layout Container -->
+<div class="layout-container">
+<!-- BEGIN: Sidebar -->
+<aside class="sidebar">
+<div class="sidebar-title">系统运营中枢</div>
+<div class="sidebar-menu">
+<div class="menu-group">
+<div class="menu-group-header">
+<i class="fa-solid fa-network-wired"></i>
+<span>流程平台</span>
+<i class="fa-solid fa-chevron-up"></i>
+</div>
+<div class="menu-items hidden"></div>
+</div>
+<div class="menu-group">
+<div class="menu-group-header">
+<i class="fa-solid fa-sitemap"></i>
+<span>组织权限</span>
+<i class="fa-solid fa-chevron-up"></i>
+</div>
+<div class="menu-items hidden"></div>
+</div>
+<div class="menu-group">
+<div class="menu-group-header">
+<i class="fa-solid fa-database"></i>
+<span>基础资料</span>
+<i class="fa-solid fa-chevron-up"></i>
+</div>
+<div class="menu-items hidden"></div>
+</div>
+<div class="menu-group">
+<div class="menu-group-header active">
+<i class="fa-solid fa-plug"></i>
+<span>集成配置</span>
+<i class="fa-solid fa-chevron-up"></i>
+</div>
+<div class="menu-items">
+<div class="menu-item active">外部系统配置</div>
+<div class="menu-item">接口配置</div>
+<div class="menu-item">字段映射</div>
+<div class="menu-item">同步规则</div>
+<div class="menu-item">Webhook 配置</div>
+</div>
+</div>
+<div class="menu-group">
+<div class="menu-group-header">
+<i class="fa-solid fa-message"></i>
+<span>消息与通知</span>
+<i class="fa-solid fa-chevron-down"></i>
+</div>
+</div>
+<div class="menu-group">
+<div class="menu-group-header">
+<i class="fa-solid fa-gear"></i>
+<span>系统参数</span>
+<i class="fa-solid fa-chevron-down"></i>
+</div>
+</div>
+</div>
+</aside>
+<!-- END: Sidebar -->
+<!-- BEGIN: Main Content -->
+<main class="main-content">
+<!-- Content Header -->
+<div class="page-header">
+<div>
+<h1 class="page-title">外部系统接入配置台</h1>
+<p class="page-subtitle">统一管理 MES、ERP、EHR、PO/合同和未来数据源的系统档案、认证方式、接口端点、同步方向、失败处理和审计留痕。</p>
+</div>
+<div class="header-actions">
+<button class="btn btn-outline"><i class="fa-solid fa-plus"></i> 新建系统</button>
+<button class="btn btn-outline"><i class="fa-solid fa-link"></i> 测试连接</button>
+<button class="btn btn-outline"><i class="fa-solid fa-floppy-disk"></i> 保存草稿</button>
+<button class="btn btn-outline"><i class="fa-solid fa-paper-plane"></i> 提交校验</button>
+<button class="btn btn-outline"><i class="fa-regular fa-file-lines"></i> 查看日志</button>
+</div>
+</div>
+<!-- Content Body Grid Layout -->
+<div class="content-body">
+<!-- Left and Center Area -->
+<div class="left-main-area">
+<!-- Status Strip -->
+<div class="status-strip">
+<div class="status-item text-green-600">
+<i class="fa-regular fa-circle-check"></i>
+<span>MES 设备台账连接测试通过</span>
+</div>
+<div class="text-gray-300">|</div>
+<div class="status-item text-orange-500">
+<i class="fa-solid fa-circle-exclamation"></i>
+<span>ERP/EHR 回写待补 1 项</span>
+</div>
+<div class="text-gray-300">|</div>
+<div class="status-item text-green-600">
+<i class="fa-regular fa-circle-check"></i>
+<span>PO/合同同步规则已启用</span>
+</div>
+</div>
+<!-- Grid Layout -->
+<div class="left-center-grid">
+<!-- Left System Rail -->
+<div class="system-rail">
+<div class="search-box">
+<i class="fa-solid fa-magnifying-glass search-icon"></i>
+<input class="search-input" placeholder="搜索系统 / 类型 / 负责人" type="text"/>
+</div>
+<div class="system-card active">
+<div class="system-card-header">
+<div class="system-icon bg-blue-500"><i class="fa-solid fa-plug"></i></div>
+<div class="system-name">MES 设备台账</div>
+<div class="system-status">已启用</div>
+</div>
+<div class="system-card-details">
+<div>类型: MES</div>
+<div>负责人: 张三</div>
+<div>状态: <span class="text-green-600">在线</span></div>
+<div>最近同步: 2 分钟前</div>
+</div>
+</div>
+<div class="system-card">
+<div class="system-card-header">
+<div class="system-icon bg-purple-500"><i class="fa-solid fa-e"></i></div>
+<div class="system-name">ERP 固资总账</div>
+<div class="system-status">已启用</div>
+</div>
+<div class="system-card-details">
+<div>类型: ERP</div>
+<div>负责人: 李四</div>
+<div>状态: <span class="text-green-600">在线</span></div>
+<div>最近同步: 5 分钟前</div>
+</div>
+</div>
+<div class="system-card">
+<div class="system-card-header">
+<div class="system-icon bg-teal-500"><i class="fa-solid fa-user-group"></i></div>
+<div class="system-name">EHR 人员组织</div>
+<div class="system-status warning">待认证</div>
+</div>
+<div class="system-card-details">
+<div>类型: EHR</div>
+<div>负责人: 王五</div>
+<div>状态: <span class="text-orange-500">待认证</span></div>
+<div>最近同步: --</div>
+</div>
+</div>
+<div class="system-card">
+<div class="system-card-header">
+<div class="system-icon bg-blue-400"><i class="fa-solid fa-file-contract"></i></div>
+<div class="system-name">PO/合同平台</div>
+<div class="system-status">已启用</div>
+</div>
+<div class="system-card-details">
+<div>类型: PO/合同</div>
+<div>负责人: 赵六</div>
+<div>状态: <span class="text-green-600">在线</span></div>
+<div>最近同步: 8 分钟前</div>
+</div>
+</div>
+<div class="system-card">
+<div class="system-card-header">
+<div class="system-icon bg-green-500"><i class="fa-solid fa-user-tie"></i></div>
+<div class="system-name">供应商门户</div>
+<div class="system-status bg-blue-100 text-blue-600">试运行</div>
+</div>
+<div class="system-card-details">
+<div>类型: 门户</div>
+<div>负责人: 钱七</div>
+<div>状态: <span class="text-blue-600">试运行</span></div>
+<div>最近同步: 15 分钟前</div>
+</div>
+</div>
+<div class="system-card border-dashed flex flex-col items-center justify-center py-3 text-blue-600">
+<i class="fa-solid fa-plus mb-1"></i>
+<span class="font-medium text-xs">新建外部系统</span>
+<div class="flex justify-between w-full text-[11px] text-gray-500 mt-1 px-2">
+<span>类型: --</span>
+<span>负责人: --</span>
+</div>
+<div class="flex justify-between w-full text-[11px] text-gray-500 px-2">
+<span>状态: 未创建</span>
+<span>最近同步: --</span>
+</div>
+</div>
+</div>
+<!-- Center Column -->
+<div class="center-col">
+<!-- KPI Row -->
+<div class="kpi-row">
+<div class="kpi-card">
+<div class="kpi-icon bg-blue-100 text-blue-500"><i class="fa-solid fa-file-lines"></i></div>
+<div class="kpi-info">
+<div class="kpi-label">接入系统</div>
+<div class="kpi-value">5</div>
+</div>
+</div>
+<div class="kpi-card">
+<div class="kpi-icon bg-green-100 text-green-500"><i class="fa-solid fa-circle-check"></i></div>
+<div class="kpi-info">
+<div class="kpi-label">已启用</div>
+<div class="kpi-value">4</div>
+</div>
+</div>
+<div class="kpi-card">
+<div class="kpi-icon bg-orange-100 text-orange-500"><i class="fa-solid fa-triangle-exclamation"></i></div>
+<div class="kpi-info">
+<div class="kpi-label">待认证</div>
+<div class="kpi-value">1</div>
+</div>
+</div>
+<div class="kpi-card">
+<div class="kpi-icon bg-purple-100 text-purple-500"><i class="fa-solid fa-rotate"></i></div>
+<div class="kpi-info">
+<div class="kpi-label">今日同步</div>
+<div class="kpi-value">1260</div>
+</div>
+</div>
+</div>
+<!-- Main Table Card -->
+<div class="card data-table-wrapper">
+<div class="card-header">接入系统清单</div>
+<table class="data-table">
+<thead>
+<tr>
+<th>系统名称</th>
+<th>类型</th>
+<th>认证方式</th>
+<th>同步方向</th>
+<th>接口端点</th>
+<th>最近同步</th>
+<th>成功率</th>
+<th>状态</th>
+<th>操作</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MES 设备台账</td>
+<td>MES</td>
+<td>OAuth2</td>
+<td>读入</td>
+<td>/api/v1/devices</td>
+<td>2 分钟前</td>
+<td class="text-green-600">99.52%</td>
+<td><span class="status-dot green"></span>在线</td>
+<td class="table-actions">
+<a href="#">编辑</a> <a href="#">复制</a> <a href="#">更多 <i class="fa-solid fa-caret-down text-[10px]"></i></a>
+</td>
+</tr>
+<tr>
+<td>ERP 固资总账</td>
+<td>ERP</td>
+<td>JWT</td>
+<td>双向</td>
+<td>/api/v1/assets</td>
+<td>5 分钟前</td>
+<td class="text-green-600">98.21%</td>
+<td><span class="status-dot green"></span>在线</td>
+<td class="table-actions">
+<a href="#">编辑</a> <a href="#">复制</a> <a href="#">更多 <i class="fa-solid fa-caret-down text-[10px]"></i></a>
+</td>
+</tr>
+<tr>
+<td>EHR 人员组织</td>
+<td>EHR</td>
+<td>Basic Auth</td>
+<td>读入</td>
+<td>/api/v1/employees</td>
+<td>--</td>
+<td>--</td>
+<td><span class="status-dot orange"></span>待认证</td>
+<td class="table-actions">
+<a href="#">编辑</a> <a href="#">复制</a> <a href="#">更多 <i class="fa-solid fa-caret-down text-[10px]"></i></a>
+</td>
+</tr>
+<tr>
+<td>PO/合同平台</td>
+<td>PO/合同</td>
+<td>OAuth2</td>
+<td>双向</td>
+<td>/api/v1/po</td>
+<td>8 分钟前</td>
+<td class="text-green-600">97.86%</td>
+<td><span class="status-dot green"></span>在线</td>
+<td class="table-actions">
+<a href="#">编辑</a> <a href="#">复制</a> <a href="#">更多 <i class="fa-solid fa-caret-down text-[10px]"></i></a>
+</td>
+</tr>
+<tr>
+<td>供应商门户</td>
+<td>门户</td>
+<td>API Key</td>
+<td>读入</td>
+<td>/api/v1/suppliers</td>
+<td>15 分钟前</td>
+<td class="text-green-600">96.75%</td>
+<td><span class="status-dot blue"></span>试运行</td>
+<td class="table-actions">
+<a href="#">编辑</a> <a href="#">复制</a> <a href="#">更多 <i class="fa-solid fa-caret-down text-[10px]"></i></a>
+</td>
+</tr>
+<tr>
+<td>异常队列 Webhook</td>
+<td>Webhook</td>
+<td>签名认证</td>
+<td>推送</td>
+<td>/webhook/exception</td>
+<td>1 分钟前</td>
+<td class="text-red-500">92.13%</td>
+<td><span class="status-dot red"></span>异常</td>
+<td class="table-actions">
+<a href="#">编辑</a> <a href="#">复制</a> <a href="#">更多 <i class="fa-solid fa-caret-down text-[10px]"></i></a>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="pagination">
+<span>共 6 条</span>
+<button class="text-gray-400"><i class="fa-solid fa-angle-left"></i></button>
+<button class="w-6 h-6 rounded bg-blue-50 text-blue-600 border border-blue-200 flex items-center justify-center">1</button>
+<button class="text-gray-600"><i class="fa-solid fa-angle-right"></i></button>
+<select class="border border-gray-300 rounded px-2 py-1 outline-none text-xs">
+<option>10 条/页</option>
+</select>
+</div>
+</div>
+<!-- Bottom Panels -->
+<div class="bottom-panels">
+<div class="card">
+<div class="card-header">接入链路预览</div>
+<div class="p-3 flex flex-col gap-3 text-xs">
+<!-- Row 1 -->
+<div class="flex items-center gap-2">
+<div class="bg-blue-500 text-white w-6 h-6 rounded flex items-center justify-center"><i class="fa-solid fa-plug"></i></div>
+<div class="w-20 font-medium">MES 设备台账</div>
+<div class="flex-1 flex items-center">
+<span class="text-blue-500 mr-1">读入</span>
+<div class="flex-1 border-t border-blue-400 relative">
+<div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-white px-1">设备运行数据</div>
+<i class="fa-solid fa-caret-right absolute -right-1 -top-1.5 text-blue-400"></i>
+</div>
+</div>
+<div class="border border-blue-200 bg-blue-50 px-2 py-1 rounded text-blue-700">固定资产台账</div>
+</div>
+<!-- Row 2 -->
+<div class="flex items-center gap-2">
+<div class="bg-purple-500 text-white w-6 h-6 rounded flex items-center justify-center"><i class="fa-solid fa-e"></i></div>
+<div class="w-20 font-medium">ERP 固资总账</div>
+<div class="flex-1 flex items-center">
+<span class="text-blue-500 mr-1">双向</span>
+<div class="flex-1 border-t border-blue-400 relative">
+<i class="fa-solid fa-caret-left absolute -left-1 -top-1.5 text-blue-400"></i>
+<div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-white px-1">财务总账回写</div>
+<i class="fa-solid fa-caret-right absolute -right-1 -top-1.5 text-blue-400"></i>
+</div>
+</div>
+</div>
+<!-- Row 3 -->
+<div class="flex items-center gap-2">
+<div class="bg-teal-500 text-white w-6 h-6 rounded flex items-center justify-center"><i class="fa-solid fa-user-group"></i></div>
+<div class="w-20 font-medium">EHR 人员组织</div>
+<div class="flex-1 flex items-center">
+<span class="text-blue-500 mr-1">读入</span>
+<div class="flex-1 border-t border-blue-400 relative">
+<div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-white px-1">人员扣款字段</div>
+<i class="fa-solid fa-caret-right absolute -right-1 -top-1.5 text-blue-400"></i>
+</div>
+</div>
+</div>
+<!-- Row 4 -->
+<div class="flex items-center gap-2">
+<div class="bg-blue-400 text-white w-6 h-6 rounded flex items-center justify-center"><i class="fa-solid fa-file-contract"></i></div>
+<div class="w-20 font-medium">PO/合同平台</div>
+<div class="flex-1 flex items-center">
+<span class="text-blue-500 mr-1">双向</span>
+<div class="flex-1 border-t border-blue-400 relative">
+<i class="fa-solid fa-caret-left absolute -left-1 -top-1.5 text-blue-400"></i>
+<div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-white px-1">金额变更同步</div>
+<i class="fa-solid fa-caret-right absolute -right-1 -top-1.5 text-blue-400"></i>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="card">
+<div class="card-header">同步策略</div>
+<div class="px-3 py-2 flex flex-col"><div class="flex flex-col gap-1">
+<div class="flex items-start gap-3 py-1">
+<div class="w-6 h-6 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center shrink-0 mt-0.5"><i class="fa-solid fa-house text-xs"></i></div>
+<div>
+<div class="text-[13px] font-medium text-gray-800 leading-[13px]">全量初始化</div>
+<div class="text-[11px] leading-[13px] text-gray-500 mt-0.5">首次接入或结构变更时执行全量拉取</div>
+</div>
+</div>
+<div class="flex items-start gap-3 py-1">
+<div class="w-6 h-6 rounded-full bg-green-50 text-green-500 flex items-center justify-center shrink-0 mt-0.5"><i class="fa-solid fa-clock-rotate-left text-xs"></i></div>
+<div>
+<div class="text-[13px] font-medium text-gray-800 leading-[13px]">增量同步</div>
+<div class="text-[11px] leading-[13px] text-gray-500 mt-0.5">基于时间戳/ID 增量拉取变更数据</div>
+</div>
+</div>
+<div class="flex items-start gap-3 py-1">
+<div class="w-6 h-6 rounded-full bg-orange-50 text-orange-500 flex items-center justify-center shrink-0 mt-0.5"><i class="fa-solid fa-rotate-right text-xs"></i></div>
+<div>
+<div class="text-[13px] font-medium text-gray-800 leading-[13px]">失败重试</div>
+<div class="text-[11px] leading-[13px] text-gray-500 mt-0.5">失败自动重试 3 次，间隔 5 分钟</div>
+</div>
+</div>
+<div class="flex items-start gap-3 py-1">
+<div class="w-6 h-6 rounded-full bg-purple-50 text-purple-500 flex items-center justify-center shrink-0 mt-0.5"><i class="fa-solid fa-file-shield text-xs"></i></div>
+<div>
+<div class="text-[13px] font-medium text-gray-800 leading-[13px]">审计归档</div>
+<div class="text-[11px] leading-[13px] text-gray-500 mt-0.5">同步记录与变更日志长期留存</div>
+</div>
+</div>
+</div></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Panel -->
+<div class="right-panel">
+<div class="card system-props-card">
+<div class="card-header">系统属性</div>
+<div class="p-3">
+<div class="form-group">
+<label class="form-label required">系统名称</label>
+<input class="form-control" type="text" value="MES 设备台账"/>
+</div>
+<div class="form-group">
+<label class="form-label required">系统编码</label>
+<input class="form-control bg-gray-50" readonly="" type="text" value="MES_ASSET"/>
+</div>
+<div class="form-group">
+<label class="form-label required">系统类型</label>
+<select class="form-control">
+<option>MES</option>
+</select>
+</div>
+<div class="form-group">
+<label class="form-label required">认证方式</label>
+<select class="form-control">
+<option>OAuth2 Client Credential</option>
+</select>
+</div>
+<div class="form-group">
+<label class="form-label required">Base URL</label>
+<input class="form-control" type="text" value="https://mes.uniview.com/api"/>
+</div>
+<div class="form-group">
+<label class="form-label required">健康检查路径</label>
+<input class="form-control" type="text" value="/api/health"/>
+</div>
+<div class="form-group">
+<label class="form-label required">同步方向</label>
+<select class="form-control">
+<option>读入设备运行/状态</option>
+</select>
+</div>
+<div class="form-group">
+<label class="form-label required">负责人</label>
+<div class="relative flex-1">
+<input class="form-control w-full pr-8" type="text" value="张三"/>
+<i class="fa-regular fa-user absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+</div>
+</div>
+<div class="form-group">
+<label class="form-label">数据范围</label>
+<select class="form-control">
+<option>全部组织</option>
+</select>
+</div>
+<div class="form-group">
+<label class="form-label required">失败处理</label>
+<select class="form-control">
+<option>重试 3 次后进入人工队列</option>
+</select>
+</div>
+<div class="form-actions">
+<button class="btn btn-primary">保存系统</button>
+<button class="btn btn-outline">测试连接</button>
+<button class="btn btn-outline">查看审计</button>
+</div>
+</div>
+</div>
+<div class="card validation-card">
+<div class="card-header">
+<span>发布校验 5/6</span>
+</div>
+<div class="checklist">
+<div class="check-item">
+<div class="check-label"><i class="fa-regular fa-circle-check text-green-500"></i> 系统编码</div>
+<div class="check-status success">通过</div>
+</div>
+<div class="check-item">
+<div class="check-label"><i class="fa-regular fa-circle-check text-green-500"></i> 认证方式</div>
+<div class="check-status success">通过</div>
+</div>
+<div class="check-item">
+<div class="check-label"><i class="fa-regular fa-circle-check text-green-500"></i> 接口端点</div>
+<div class="check-status success">通过</div>
+</div>
+<div class="check-item">
+<div class="check-label"><i class="fa-solid fa-triangle-exclamation text-orange-500"></i> 字段映射</div>
+<div class="check-status warning">待确认</div>
+</div>
+<div class="check-item">
+<div class="check-label"><i class="fa-regular fa-circle-check text-green-500"></i> 失败处理</div>
+<div class="check-status success">通过</div>
+</div>
+<div class="check-item">
+<div class="check-label"><i class="fa-regular fa-circle-check text-green-500"></i> 审计留痕</div>
+<div class="check-status success">通过</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- END: Main Content -->
+</div>
+<!-- END: Layout Container -->
+</body></html>

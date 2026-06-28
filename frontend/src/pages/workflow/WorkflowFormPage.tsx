@@ -5,6 +5,17 @@ import DOMPurify from 'dompurify';
 import { workflowApi, type WorkflowDefinitionDTO } from '@/api/workflow';
 import { submitApproval } from '@/api/approval';
 
+function startNodeFormSource(definition: Record<string, unknown> | undefined) {
+  const nodes = Array.isArray(definition?.nodes) ? definition.nodes : [];
+  const startNode = nodes.find((node) => {
+    if (!node || typeof node !== 'object') return false;
+    const item = node as Record<string, unknown>;
+    return item.type === 'start' || (item.data as Record<string, unknown> | undefined)?.type === 'start';
+  }) as Record<string, unknown> | undefined;
+  const data = startNode?.data as Record<string, unknown> | undefined;
+  return typeof data?.formSource === 'string' ? data.formSource : '';
+}
+
 export default function WorkflowFormPage() {
   const { businessType } = useParams<{ businessType: string }>();
   const navigate = useNavigate();
@@ -29,7 +40,7 @@ export default function WorkflowFormPage() {
         const def = raw as WorkflowDefinitionDTO;
         const defData = def.definition as Record<string, unknown> | undefined;
         setFlowName(def.name || businessType);
-        setFormSource((defData?.formSource as string) || '');
+        setFormSource(startNodeFormSource(defData) || (defData?.formSource as string) || '');
       } catch (e) {
         setError(e instanceof Error ? e.message : '加载流程定义失败');
       } finally {
@@ -57,7 +68,7 @@ export default function WorkflowFormPage() {
         if (firstInput?.value) titleExtra = ` - ${firstInput.value.slice(0, 30)}`;
       }
 
-      await submitApproval({
+      const submitted = await submitApproval({
         businessType,
         title: `${flowName}${titleExtra}`,
         description: JSON.stringify(businessData),
@@ -65,8 +76,9 @@ export default function WorkflowFormPage() {
       });
 
       setSuccessMsg('申请已提交，请等待审批');
-      // 延迟跳转，让用户看到成功提示
-      setTimeout(() => navigate('/approvals'), 1500);
+      const nextId = (submitted as { id?: number; processId?: number } | undefined)?.id
+        ?? (submitted as { processId?: number } | undefined)?.processId;
+      setTimeout(() => navigate(nextId ? `/approvals/${nextId}` : '/approvals'), 800);
     } catch (e) {
       setError(e instanceof Error ? e.message : '提交失败，请重试');
     } finally {

@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>系统操作审计配置台</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#1890ff',
+            'primary-hover': '#40a9ff',
+            sidebar: '#1e293b',
+            'sidebar-hover': '#334155',
+            'sidebar-active': '#1e40af',
+            topbar: '#0f172a',
+            bg: '#f1f5f9',
+            card: '#ffffff',
+            border: '#e2e8f0',
+            text: {
+              main: '#334155',
+              secondary: '#64748b',
+              muted: '#94a3b8'
+            },
+            danger: '#ef4444',
+            warning: '#f59e0b',
+            success: '#10b981',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+          },
+          fontSize: {
+            'xxs': '0.65rem',
+            'xs': '0.75rem',
+            'sm': '0.8125rem',
+            'base': '0.875rem',
+          }
+        }
+      }
+    }
+  </script>
+<style data-purpose="custom-utilities">
+    body {
+      width: 1595px;
+      height: 986px;
+      overflow: hidden;
+      background-color: #f1f5f9;
+      color: #334155;
+      font-size: 13px;
+    }
+    
+    .sidebar-scroll::-webkit-scrollbar {
+      width: 4px;
+    }
+    .sidebar-scroll::-webkit-scrollbar-thumb {
+      background-color: rgba(255,255,255,0.2);
+      border-radius: 4px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background-color: #cbd5e1;
+      border-radius: 4px;
+    }
+
+    .table-header th {
+      background-color: #f8fafc;
+      font-weight: 500;
+      color: #475569;
+      text-align: left;
+      padding: 8px 10px;
+      border-bottom: 1px solid #e2e8f0;
+      white-space: nowrap;
+      font-size: 12px;
+    }
+    .table-row td {
+      padding: 8px 10px;
+      border-bottom: 1px solid #f1f5f9;
+      white-space: nowrap;
+      font-size: 12px;
+    }
+    .table-row:last-child td {
+      border-bottom: none;
+    }
+    
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .status-high { color: #ef4444; background: #fee2e2; border: 1px solid #fca5a5; }
+    .status-medium { color: #d97706; background: #fef3c7; border: 1px solid #fcd34d; }
+    .status-success { color: #10b981; }
+    .status-warning { color: #ef4444; }
+
+    .btn-outline {
+      border: 1px solid #cbd5e1;
+      background: white;
+      color: #334155;
+    }
+    .btn-outline-primary {
+      border: 1px solid #93c5fd;
+      background: white;
+      color: #2563eb;
+    }
+    
+    .form-input {
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+      padding: 4px 8px;
+      font-size: 12px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .form-input:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+    }
+    
+    /* Toggle Switch */
+    .toggle-checkbox:checked {
+      right: 0;
+      border-color: #68D391;
+    }
+    .toggle-checkbox:checked + .toggle-label {
+      background-color: #3b82f6;
+    }
+    .toggle-checkbox.danger:checked + .toggle-label {
+      background-color: #ef4444;
+    }
+    
+    .timeline-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #3b82f6;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+      position: relative;
+      z-index: 10;
+    }
+    .timeline-line {
+      position: absolute;
+      left: 6.5px;
+      top: 14px;
+      bottom: -14px;
+      width: 1px;
+      border-left: 1px dashed #cbd5e1;
+      z-index: 0;
+    }
+    .timeline-item:last-child .timeline-line {
+      display: none;
+    }
+  </style>
+</head>
+<body class="flex flex-col antialiased">
+<!-- BEGIN: Top Navigation -->
+<header class="h-[52px] bg-topbar text-white flex items-center justify-between px-4 shrink-0 shadow-md z-20 relative">
+<div class="flex items-center space-x-6">
+<div class="flex items-center text-lg font-bold tracking-wider">
+<span class="text-white">UNIVÍEW</span>
+<span class="mx-3 text-slate-500 text-sm opacity-50">|</span>
+<span class="text-white text-base font-medium">固定资产管理系统</span>
+</div>
+<nav class="flex space-x-1 ml-8">
+<a class="px-4 py-2 rounded text-slate-300 hover:text-white hover:bg-slate-800 flex items-center space-x-2 text-sm transition-colors" href="#">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>资产作业台</span>
+</a>
+<a class="px-4 py-2 rounded text-slate-300 hover:text-white hover:bg-slate-800 flex items-center space-x-2 text-sm transition-colors" href="#">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>资产管理中枢</span>
+</a>
+<a class="px-4 py-2 rounded text-slate-300 hover:text-white hover:bg-slate-800 flex items-center space-x-2 text-sm transition-colors" href="#">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>风险预警中心</span>
+</a>
+<a class="px-4 py-2 rounded text-slate-300 hover:text-white hover:bg-slate-800 flex items-center space-x-2 text-sm transition-colors" href="#">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path><path d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>数据分析中心</span>
+</a>
+<a class="px-4 py-2 rounded bg-blue-600 text-white flex items-center space-x-2 text-sm" href="#">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>系统运营中枢</span>
+</a>
+</nav>
+</div>
+<div class="flex items-center space-x-4">
+<div class="flex items-center space-x-2 cursor-pointer">
+<div class="w-7 h-7 rounded-full bg-slate-300 flex items-center justify-center text-slate-700 font-bold text-xs">
+<svg class="w-4 h-4" fill="currentColor" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" fill-rule="evenodd"></path></svg>
+</div>
+<span class="text-sm">系统管理员</span>
+<svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+</div>
+</header>
+<!-- END: Top Navigation -->
+<div class="flex flex-1 h-[calc(986px-52px)]">
+<!-- BEGIN: Left Sidebar -->
+<aside class="w-[200px] bg-sidebar text-slate-300 flex flex-col shrink-0 sidebar-scroll overflow-y-auto">
+<nav class="flex-1 py-4">
+<a class="flex items-center px-6 py-3 hover:bg-sidebar-hover transition-colors group" href="#">
+<svg class="w-5 h-5 mr-3 text-slate-400 group-hover:text-white" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span class="text-sm group-hover:text-white">系统概览</span>
+</a>
+<div class="mt-1">
+<div class="flex items-center justify-between px-6 py-3 hover:bg-sidebar-hover cursor-pointer transition-colors group">
+<div class="flex items-center">
+<svg class="w-5 h-5 mr-3 text-slate-400 group-hover:text-white" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span class="text-sm group-hover:text-white">组织与权限</span>
+</div>
+<svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+</div>
+<div class="mt-1">
+<div class="flex items-center justify-between px-6 py-3 hover:bg-sidebar-hover cursor-pointer transition-colors group">
+<div class="flex items-center">
+<svg class="w-5 h-5 mr-3 text-slate-400 group-hover:text-white" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span class="text-sm group-hover:text-white">流程与规则</span>
+</div>
+<svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+</div>
+<div class="mt-1">
+<div class="flex items-center justify-between px-6 py-3 hover:bg-sidebar-hover cursor-pointer transition-colors group">
+<div class="flex items-center">
+<svg class="w-5 h-5 mr-3 text-slate-400 group-hover:text-white" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span class="text-sm group-hover:text-white">主数据管理</span>
+</div>
+<svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+</div>
+<div class="mt-1">
+<div class="flex items-center justify-between px-6 py-3 hover:bg-sidebar-hover cursor-pointer transition-colors group">
+<div class="flex items-center">
+<svg class="w-5 h-5 mr-3 text-slate-400 group-hover:text-white" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span class="text-sm group-hover:text-white">集成与接口</span>
+</div>
+<svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+</div>
+<div class="mt-1">
+<div class="flex items-center justify-between px-6 py-3 bg-sidebar-hover cursor-pointer transition-colors group text-white">
+<div class="flex items-center">
+<svg class="w-5 h-5 mr-3 text-blue-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span class="text-sm font-medium">系统参数</span>
+</div>
+<svg class="w-4 h-4 text-slate-300" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M5 15l7-7 7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div class="bg-sidebar py-1">
+<a class="block px-12 py-2 text-sm hover:text-white transition-colors" href="#">参数总览</a>
+<a class="block px-12 py-2 text-sm hover:text-white transition-colors" href="#">基础参数</a>
+<a class="block px-12 py-2 text-sm hover:text-white transition-colors" href="#">编码规则</a>
+<a class="block px-12 py-2 text-sm hover:text-white transition-colors" href="#">消息通知</a>
+<a class="block px-12 py-2 text-sm hover:text-white transition-colors" href="#">审计策略</a>
+<a class="block pl-12 pr-4 py-2 text-sm bg-blue-600 text-white font-medium rounded-r-full mr-2 shadow-sm" href="#">操作审计</a>
+<a class="block px-12 py-2 text-sm hover:text-white transition-colors" href="#">留存策略</a>
+<a class="block px-12 py-2 text-sm hover:text-white transition-colors" href="#">脱敏规则</a>
+<a class="block px-12 py-2 text-sm hover:text-white transition-colors" href="#">水印管理</a>
+<a class="block px-12 py-2 text-sm hover:text-white transition-colors" href="#">日志配置</a>
+</div>
+</div>
+<div class="mt-1">
+<div class="flex items-center justify-between px-6 py-3 hover:bg-sidebar-hover cursor-pointer transition-colors group">
+<div class="flex items-center">
+<svg class="w-5 h-5 mr-3 text-slate-400 group-hover:text-white" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span class="text-sm group-hover:text-white">任务调度</span>
+</div>
+</div>
+</div>
+<div class="mt-1">
+<div class="flex items-center justify-between px-6 py-3 hover:bg-sidebar-hover cursor-pointer transition-colors group">
+<div class="flex items-center">
+<svg class="w-5 h-5 mr-3 text-slate-400 group-hover:text-white" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span class="text-sm group-hover:text-white">系统运维</span>
+</div>
+<svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+</div>
+</nav>
+</aside>
+<!-- END: Left Sidebar -->
+<!-- BEGIN: Main Content Area -->
+<main class="flex-1 flex flex-col min-w-0 bg-bg overflow-y-auto custom-scrollbar relative">
+<!-- Content Header -->
+<div class="px-6 py-3 flex items-center justify-between shrink-0 absolute top-0 left-0 right-0 h-[50px] z-10">
+<h1 class="text-xl font-bold text-slate-800 tracking-tight">系统操作审计配置台</h1>
+<div class="flex space-x-2">
+<button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded text-sm font-medium shadow-sm transition-colors">新建审计策略</button>
+<button class="btn-outline-primary px-4 py-1.5 rounded text-sm font-medium flex items-center space-x-1 shadow-sm transition-colors hover:bg-blue-50">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>保存草稿</span>
+</button>
+<button class="btn-outline-primary px-4 py-1.5 rounded text-sm font-medium flex items-center shadow-sm transition-colors hover:bg-blue-50">提交校验</button>
+<button class="btn-outline-primary px-4 py-1.5 rounded text-sm font-medium flex items-center space-x-1 shadow-sm transition-colors hover:bg-blue-50">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>审计查询</span>
+</button>
+<button class="btn-outline-primary px-4 py-1.5 rounded text-sm font-medium flex items-center space-x-1 shadow-sm transition-colors hover:bg-blue-50">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>导出取证包</span>
+</button>
+</div>
+</div>
+<div class="px-6 pb-6 pt-[63px] space-y-4 flex-1">
+<!-- BEGIN: KPI Cards Row -->
+<div class="grid grid-cols-4 gap-4 h-[85px]">
+<!-- Card 1 -->
+<div class="bg-card rounded-lg p-4 shadow-sm border border-border flex items-center">
+<div class="w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center mr-4 text-white shadow-sm">
+<svg class="w-6 h-6" fill="currentColor" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" fill-rule="evenodd"></path></svg>
+</div>
+<div>
+<div class="text-xs text-slate-500 mb-1">审计事件</div>
+<div class="text-xl font-bold text-slate-800">9,842</div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="bg-card rounded-lg p-4 shadow-sm border border-border flex items-center">
+<div class="w-12 h-12 rounded-full bg-red-500 flex items-center justify-center mr-4 text-white shadow-sm">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div>
+<div class="text-xs text-slate-500 mb-1">高危操作</div>
+<div class="text-xl font-bold text-slate-800">42</div>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="bg-card rounded-lg p-4 shadow-sm border border-border flex items-center">
+<div class="w-12 h-12 rounded-full bg-green-500 flex items-center justify-center mr-4 text-white shadow-sm">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div>
+<div class="text-xs text-slate-500 mb-1">取证包</div>
+<div class="text-xl font-bold text-slate-800">18</div>
+</div>
+</div>
+<!-- Card 4 -->
+<div class="bg-card rounded-lg p-4 shadow-sm border border-border flex items-center">
+<div class="w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center mr-4 text-white shadow-sm">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div>
+<div class="text-xs text-slate-500 mb-1">留存策略</div>
+<div class="text-xl font-bold text-slate-800">3<span class="text-sm font-normal ml-1">年</span></div>
+</div>
+</div>
+</div>
+<!-- END: KPI Cards Row -->
+<div class="flex gap-4 h-[411px]">
+<!-- BEGIN: Main Table Card -->
+<div class="bg-card rounded-lg border border-border shadow-sm flex-1 flex flex-col overflow-hidden min-w-[800px]">
+<div class="px-4 py-3 border-b border-border font-bold text-slate-800">审计事件查询工作台</div>
+<!-- Filters -->
+<div class="px-4 py-3 space-y-3">
+<div class="flex items-center space-x-4">
+<div class="flex items-center">
+<label class="text-slate-600 mr-2 w-12 text-right text-xs">操作人</label>
+<div class="relative w-40">
+<input class="form-input w-full pr-8" placeholder="请选择操作人" type="text"/>
+<svg class="w-4 h-4 text-slate-400 absolute right-2.5 top-1.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+</div>
+<div class="flex items-center">
+<label class="text-slate-600 mr-2 w-14 text-right text-xs">对象范围</label>
+<div class="relative w-48">
+<input class="form-input w-full pr-8" placeholder="请选择对象范围" type="text"/>
+<svg class="w-4 h-4 text-slate-400 absolute right-2.5 top-1.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+</div>
+<div class="flex items-center">
+<label class="text-slate-600 mr-2 w-14 text-right text-xs">风险等级</label>
+<div class="relative w-40">
+<select class="form-input w-full pr-8 appearance-none bg-white text-slate-500">
+<option>请选择风险等级</option>
+</select>
+<svg class="w-4 h-4 text-slate-400 absolute right-2.5 top-1.5 pointer-events-none" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center">
+<label class="text-slate-600 mr-2 w-12 text-right text-xs">时间范围</label>
+<div class="relative flex items-center border border-slate-300 rounded px-2 bg-white h-[26px]">
+<svg class="w-4 h-4 text-slate-400 mr-1" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<input class="w-32 outline-none py-1 text-xs" type="text" value="2025-05-15 00:00:00"/>
+<span class="text-slate-400 mx-1 text-xs">~</span>
+<input class="w-32 outline-none py-1 text-xs" type="text" value="2025-05-21 23:59:59"/>
+</div>
+<button class="ml-3 bg-blue-600 hover:bg-blue-700 text-white px-4 py-1 rounded text-xs font-medium transition-colors h-[26px]">审计查询</button>
+</div>
+<div class="flex items-center space-x-3">
+<span class="text-slate-500 text-xs">已查询 1/4 条命中</span>
+<button class="btn-outline px-3 py-1 rounded text-xs h-[26px]">重置</button>
+</div>
+</div>
+</div>
+<!-- Table -->
+<div class="overflow-x-auto flex-1 border-t border-border">
+<table class="w-full text-left border-collapse">
+<thead class="table-header">
+<tr>
+<th>时间</th>
+<th>操作人</th>
+<th>操作对象</th>
+<th>操作类型</th>
+<th>来源模块</th>
+<th>风险等级</th>
+<th>结果</th>
+<th>操作</th>
+</tr>
+</thead>
+<tbody class="text-xs">
+<tr class="table-row hover:bg-slate-50">
+<td class="text-slate-500">2025-05-21 10:23:45</td>
+<td>张三</td>
+<td>资产CIP-2025-000123</td>
+<td>CIP 转固发布</td>
+<td>CIP管理</td>
+<td><span class="status-badge status-high">高危</span></td>
+<td class="text-green-500 flex items-center"><svg class="w-3.5 h-3.5 mr-1" fill="currentColor" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" fill-rule="evenodd"></path></svg>成功</td>
+<td class="text-blue-600 whitespace-nowrap">
+<a class="hover:underline mr-2" href="#">查看详情</a>
+<a class="hover:underline mr-2" href="#">追溯链路</a>
+<a class="hover:underline" href="#">下载取证包</a>
+</td>
+</tr>
+<tr class="table-row hover:bg-slate-50">
+<td class="text-slate-500">2025-05-21 09:58:12</td>
+<td>李四</td>
+<td>ERP凭证VCH-20250521-001</td>
+<td>ERP 回执归档</td>
+<td>集成中心</td>
+<td><span class="status-badge status-medium">中危</span></td>
+<td class="text-green-500 flex items-center"><svg class="w-3.5 h-3.5 mr-1" fill="currentColor" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" fill-rule="evenodd"></path></svg>成功</td>
+<td class="text-blue-600 whitespace-nowrap">
+<a class="hover:underline mr-2" href="#">查看详情</a>
+<a class="hover:underline mr-2" href="#">追溯链路</a>
+<a class="hover:underline" href="#">下载取证包</a>
+</td>
+</tr>
+<tr class="table-row hover:bg-slate-50">
+<td class="text-slate-500">2025-05-20 18:14:33</td>
+<td>王五</td>
+<td>资产权限策略-AdminRole</td>
+<td>权限策略变更</td>
+<td>权限管理</td>
+<td><span class="status-badge status-high">高危</span></td>
+<td class="text-red-500 flex items-center"><svg class="w-3.5 h-3.5 mr-1" fill="currentColor" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" fill-rule="evenodd"></path></svg>警告</td>
+<td class="text-blue-600 whitespace-nowrap">
+<a class="hover:underline mr-2" href="#">查看详情</a>
+<a class="hover:underline mr-2" href="#">追溯链路</a>
+<a class="hover:underline" href="#">下载取证包</a>
+</td>
+</tr>
+<tr class="table-row hover:bg-slate-50">
+<td class="text-slate-500">2025-05-20 17:42:08</td>
+<td>赵六</td>
+<td>缓存键：AssetCacheAll</td>
+<td>缓存刷新回滚</td>
+<td>系统运维</td>
+<td><span class="status-badge status-medium">中危</span></td>
+<td class="text-green-500 flex items-center"><svg class="w-3.5 h-3.5 mr-1" fill="currentColor" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" fill-rule="evenodd"></path></svg>成功</td>
+<td class="text-blue-600 whitespace-nowrap">
+<a class="hover:underline mr-2" href="#">查看详情</a>
+<a class="hover:underline mr-2" href="#">追溯链路</a>
+<a class="hover:underline" href="#">下载取证包</a>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination -->
+<div class="px-4 py-2 border-t border-border flex items-center justify-end text-xs text-slate-500">
+<span class="mr-3">共 4 条</span>
+<select class="border border-slate-300 rounded px-2 py-1 mr-3 text-xs outline-none focus:border-blue-500">
+<option>10 条/页</option>
+</select>
+<div class="flex items-center space-x-1 mr-3">
+<button class="px-2 py-1 border border-slate-200 rounded text-slate-300 cursor-not-allowed bg-slate-50 flex items-center"><svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M15 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>上一页</button>
+<button class="px-2.5 py-1 border border-blue-500 bg-blue-600 text-white rounded">1</button>
+<button class="px-2 py-1 border border-slate-200 rounded text-slate-400 hover:border-slate-300 flex items-center">下一页<svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></button>
+</div>
+<div class="flex items-center">
+<span class="mr-1">前往</span>
+<input class="w-8 border border-slate-300 rounded text-center py-1 text-xs outline-none focus:border-blue-500" type="text" value="1"/>
+<span class="ml-1">页</span>
+</div>
+</div>
+</div>
+<!-- END: Main Table Card -->
+<!-- BEGIN: Edit Strategy Card -->
+<div class="bg-card rounded-lg border border-border shadow-sm w-[400px] flex flex-col shrink-0 overflow-hidden">
+<div class="px-4 py-3 border-b border-border font-bold text-slate-800 shrink-0">审计策略编排</div>
+<div class="p-4 space-y-2 flex-1 text-xs overflow-y-auto">
+<div class="flex items-center">
+<label class="w-20 text-slate-600 text-right pr-3">策略名称</label>
+<input class="form-input flex-1 bg-slate-50 h-[28px]" readonly="" type="text" value="CIP 转固高危操作审计"/>
+</div>
+<div class="flex items-center">
+<label class="w-20 text-slate-600 text-right pr-3">采集范围</label>
+<div class="relative flex-1">
+<input class="form-input w-full pr-8 h-[28px]" type="text" value="CIP管理、资产管理、集成中心、权限管理"/>
+<svg class="w-3.5 h-3.5 text-slate-400 absolute right-2.5 top-2" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+</div>
+<div class="flex items-center">
+<label class="w-20 text-slate-600 text-right pr-3">留存周期</label>
+<div class="relative flex-1">
+<select class="form-input w-full appearance-none bg-white h-[28px] py-0">
+<option>3年</option>
+</select>
+<svg class="w-3.5 h-3.5 text-slate-400 absolute right-2.5 top-2 pointer-events-none" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+</div>
+<div class="flex items-center justify-between h-[28px]">
+<label class="w-20 text-slate-600 text-right pr-3 shrink-0">高危标记</label>
+<div class="flex-1 text-slate-700 flex justify-between items-center">
+<span>勾选的操作类型判定为高危</span>
+<div class="relative inline-block w-8 mr-1 align-middle select-none transition duration-200 ease-in">
+<input checked="" class="toggle-checkbox danger absolute block w-4 h-4 rounded-full bg-white border-4 appearance-none cursor-pointer" id="toggle1" name="toggle1" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-4 rounded-full bg-slate-300 cursor-pointer" for="toggle1"></label>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-between h-[28px]">
+<label class="w-20 text-slate-600 text-right pr-3 shrink-0">导出水印</label>
+<div class="flex-1 text-slate-700 flex justify-between items-center">
+<span>启用水印：公司全称 + 时间戳 + 用户</span>
+<div class="relative inline-block w-8 mr-1 align-middle select-none transition duration-200 ease-in">
+<input checked="" class="toggle-checkbox absolute block w-4 h-4 rounded-full bg-white border-4 appearance-none cursor-pointer" id="toggle2" name="toggle2" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-4 rounded-full bg-slate-300 cursor-pointer" for="toggle2"></label>
+</div>
+</div>
+</div>
+<div class="flex items-center">
+<label class="w-20 text-slate-600 text-right pr-3">脱敏规则</label>
+<div class="relative flex-1">
+<input class="form-input w-full pr-8 text-slate-500 bg-slate-50 h-[28px]" readonly="" type="text" value="默认脱敏规则 - 管理员（部分字段脱敏）"/>
+<svg class="w-3.5 h-3.5 text-slate-400 absolute right-2.5 top-2" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+</div>
+<div class="flex items-center justify-between h-[28px]">
+<label class="w-20 text-slate-600 text-right pr-3 shrink-0">不可删除策略</label>
+<div class="flex-1 text-slate-700 flex justify-between items-center">
+<span>启用（普通管理员不可删除）</span>
+<div class="relative inline-block w-8 mr-1 align-middle select-none transition duration-200 ease-in">
+<input checked="" class="toggle-checkbox absolute block w-4 h-4 rounded-full bg-white border-4 appearance-none cursor-pointer" id="toggle3" name="toggle3" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-4 rounded-full bg-slate-300 cursor-pointer" for="toggle3"></label>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-between h-[28px]">
+<label class="w-20 text-slate-600 text-right pr-3 shrink-0">取证审批</label>
+<div class="flex-1 text-slate-700 flex justify-between items-center">
+<span>启用（需审计管理员审批）</span>
+<div class="relative inline-block w-8 mr-1 align-middle select-none transition duration-200 ease-in">
+<input checked="" class="toggle-checkbox absolute block w-4 h-4 rounded-full bg-white border-4 appearance-none cursor-pointer" id="toggle4" name="toggle4" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-4 rounded-full bg-slate-300 cursor-pointer" for="toggle4"></label>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-between h-[28px]">
+<label class="w-20 text-slate-600 text-right pr-3 shrink-0">告警通知</label>
+<div class="flex-1 text-slate-700 flex justify-between items-center">
+<span>高危操作实时告警（邮件 + 短信）</span>
+<div class="relative inline-block w-8 mr-1 align-middle select-none transition duration-200 ease-in">
+<input checked="" class="toggle-checkbox absolute block w-4 h-4 rounded-full bg-white border-4 appearance-none cursor-pointer" id="toggle5" name="toggle5" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-4 rounded-full bg-slate-300 cursor-pointer" for="toggle5"></label>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- END: Edit Strategy Card -->
+</div>
+<!-- BEGIN: Bottom Cards Row -->
+<div class="flex gap-4 h-[290px]">
+<!-- Card: 导出取证包预览 -->
+<div class="bg-card rounded-lg border border-border shadow-sm flex-1 flex flex-col w-[320px] relative pb-12">
+<div class="px-4 py-3 border-b border-border font-bold text-slate-800">导出取证包预览</div>
+<div class="p-4 text-xs space-y-2 flex-1">
+<div class="flex">
+<span class="text-slate-500 w-24 shrink-0">取证包编号</span>
+<span class="text-slate-700 font-mono">EVP-20250521-102345-001</span>
+</div>
+<div class="flex">
+<span class="text-slate-500 w-24 shrink-0">事件数量</span>
+<span class="text-slate-700">4 条</span>
+</div>
+<div class="flex">
+<span class="text-slate-500 w-24 shrink-0">完整性哈希 (SHA256)</span>
+<span class="text-slate-700 font-mono break-all leading-tight text-slate-500 max-w-[200px]">7f1a6b6c9d8e4d2f0b5a3c9d6e7f8a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7</span>
+</div>
+<div class="flex pt-1">
+<span class="text-slate-500 w-24 shrink-0">水印信息</span>
+<span class="text-slate-500 leading-relaxed">UNIVIEW 固定资产管理系统 | 2025-05-21 10:23:45<br/>申请人：张三</span>
+</div>
+<div class="flex items-start pt-1">
+<span class="text-slate-500 w-24 shrink-0">下载审批状态</span>
+<span class="flex flex-col text-green-600 font-medium">
+<div class="flex items-center"><svg class="w-3.5 h-3.5 mr-1" fill="currentColor" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" fill-rule="evenodd"></path></svg>已批准</div>
+<span class="text-green-500 ml-4 font-normal">(审计管理员-刘工，2025-05-21 10:25:01)</span>
+</span>
+</div>
+</div>
+<div class="absolute bottom-4 right-4">
+<button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded text-xs font-medium flex items-center shadow-sm">
+<svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                  下载取证包
+                </button>
+</div>
+</div>
+<!-- Card: 留存保护策略 -->
+<div class="bg-card rounded-lg border border-border shadow-sm w-[260px] flex flex-col shrink-0">
+<div class="px-4 py-3 border-b border-border font-bold text-slate-800">留存保护策略</div>
+<div class="p-4 text-xs space-y-3 flex-1">
+<div class="flex justify-between items-center border-b border-dashed border-slate-200 pb-2">
+<span class="text-slate-600">在线存储 (热存)</span>
+<span class="text-green-600 font-medium">180天</span>
+</div>
+<div class="flex justify-between items-center border-b border-dashed border-slate-200 pb-2">
+<span class="text-slate-600">归档存储 (冷存)</span>
+<span class="text-blue-600 font-medium">3年</span>
+</div>
+<div class="flex justify-between items-center border-b border-dashed border-slate-200 pb-2">
+<span class="text-slate-600">普通管理员不可删除</span>
+<span class="text-green-600 font-medium">已启用</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="text-slate-600">强制留存策略</span>
+<span class="text-blue-600 font-medium">启用 (不可覆盖)</span>
+</div>
+<div class="mt-3 bg-blue-50 border border-blue-100 rounded p-2.5 flex items-start">
+<svg class="w-3.5 h-3.5 text-blue-500 mt-0.5 mr-1.5 shrink-0" fill="currentColor" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" fill-rule="evenodd"></path></svg>
+<div class="text-[11px] text-slate-600">
+<div class="font-medium text-slate-700 mb-0.5">策略生效范围：系统所有审计日志与取证包</div>
+                  策略最后更新时间：2025-03-12 14:30:22
+                </div>
+</div>
+</div>
+</div>
+<!-- Card: 风险事件趋势 -->
+<div class="bg-card rounded-lg border border-border shadow-sm flex-1 flex flex-col w-[320px]">
+<div class="px-4 py-3 border-b border-border font-bold text-slate-800">风险事件趋势 <span class="text-slate-500 font-normal text-[11px] ml-1">(近 7 天)</span></div>
+<div class="p-4 flex-1 flex flex-col relative">
+<div class="flex justify-center space-x-6 text-[11px] mb-2">
+<div class="flex items-center"><span class="w-2.5 h-1 bg-red-500 mr-1.5 rounded-sm inline-block relative before:content-[''] before:w-1.5 before:h-1.5 before:bg-red-500 before:rounded-full before:absolute before:-top-[1px] before:left-[2px]"></span>高危事件</div>
+<div class="flex items-center"><span class="w-2.5 h-1 bg-orange-400 mr-1.5 rounded-sm inline-block relative before:content-[''] before:w-1.5 before:h-1.5 before:bg-orange-400 before:rounded-full before:absolute before:-top-[1px] before:left-[2px]"></span>中危事件</div>
+</div>
+<!-- Simplified Chart representation -->
+<div class="flex-1 relative mt-1 text-slate-400 text-[10px]">
+<!-- Y-axis -->
+<div class="absolute left-0 top-0 bottom-5 flex flex-col justify-between items-end pr-2 border-r border-slate-200 w-5">
+<span>40</span>
+<span>30</span>
+<span>20</span>
+<span>10</span>
+<span>0</span>
+</div>
+<!-- Graph Area -->
+<div class="absolute left-5 right-0 top-0 bottom-5">
+<!-- Grid lines -->
+<div class="w-full h-1/4 border-t border-slate-100 border-dashed"></div>
+<div class="w-full h-1/4 border-t border-slate-100 border-dashed"></div>
+<div class="w-full h-1/4 border-t border-slate-100 border-dashed"></div>
+<div class="w-full h-1/4 border-t border-slate-100 border-dashed"></div>
+<!-- SVG for precise lines -->
+<svg class="absolute inset-0 w-full h-full" preserveaspectratio="none">
+<!-- High risk line (Red) -->
+<polyline fill="none" points="20,110 60,100 100,120 140,85 180,60 220,40 260,25" stroke="#ef4444" stroke-width="1.5"></polyline>
+<circle cx="20" cy="110" fill="#ef4444" r="2.5"></circle>
+<circle cx="60" cy="100" fill="#ef4444" r="2.5"></circle>
+<circle cx="100" cy="120" fill="#ef4444" r="2.5"></circle>
+<circle cx="140" cy="85" fill="#ef4444" r="2.5"></circle>
+<circle cx="180" cy="60" fill="#ef4444" r="2.5"></circle>
+<circle cx="220" cy="40" fill="#ef4444" r="2.5"></circle>
+<circle cx="260" cy="25" fill="#ef4444" r="2.5"></circle>
+<!-- Medium risk line (Orange) -->
+<polyline fill="none" points="20,130 60,135 100,140 140,135 180,130 220,125 260,110" stroke="#fb923c" stroke-width="1.5"></polyline>
+<circle cx="20" cy="130" fill="#fb923c" r="2.5"></circle>
+<circle cx="60" cy="135" fill="#fb923c" r="2.5"></circle>
+<circle cx="100" cy="140" fill="#fb923c" r="2.5"></circle>
+<circle cx="140" cy="135" fill="#fb923c" r="2.5"></circle>
+<circle cx="180" cy="130" fill="#fb923c" r="2.5"></circle>
+<circle cx="220" cy="125" fill="#fb923c" r="2.5"></circle>
+<circle cx="260" cy="110" fill="#fb923c" r="2.5"></circle>
+</svg>
+<!-- Data Labels (Approximate positioning) -->
+<div class="absolute left-[16px] top-[97px] text-red-500 font-medium">12</div>
+<div class="absolute left-[56px] top-[87px] text-red-500 font-medium">15</div>
+<div class="absolute left-[97px] top-[107px] text-red-500 font-medium">9</div>
+<div class="absolute left-[136px] top-[72px] text-red-500 font-medium">18</div>
+<div class="absolute left-[176px] top-[47px] text-red-500 font-medium">21</div>
+<div class="absolute left-[216px] top-[27px] text-red-500 font-medium">28</div>
+<div class="absolute left-[256px] top-[12px] text-red-500 font-medium">32</div>
+<div class="absolute left-[18px] top-[135px] text-orange-400 font-medium">6</div>
+<div class="absolute left-[58px] top-[140px] text-orange-400 font-medium">5</div>
+<div class="absolute left-[98px] top-[145px] text-orange-400 font-medium">4</div>
+<div class="absolute left-[138px] top-[140px] text-orange-400 font-medium">7</div>
+<div class="absolute left-[178px] top-[135px] text-orange-400 font-medium">8</div>
+<div class="absolute left-[216px] top-[130px] text-orange-400 font-medium">12</div>
+<div class="absolute left-[256px] top-[115px] text-orange-400 font-medium">14</div>
+</div>
+<!-- X-axis labels -->
+<div class="absolute left-5 right-0 bottom-0 h-5 flex justify-between items-end border-t border-slate-200 pt-1 px-2">
+<span>5/15</span>
+<span>5/16</span>
+<span>5/17</span>
+<span>5/18</span>
+<span>5/19</span>
+<span>5/20</span>
+<span>5/21</span>
+</div>
+</div>
+<!-- Summary below chart -->
+<div class="mt-4 flex justify-between items-center text-xs">
+<div>高危事件 <span class="text-lg font-bold text-red-500 ml-1">32</span> <span class="text-[10px] text-red-400">(↑14)</span></div>
+<div>中危事件 <span class="text-lg font-bold text-orange-400 ml-1">14</span> <span class="text-[10px] text-orange-400">(↑2)</span></div>
+</div>
+</div>
+</div>
+<!-- Card: 审计链路追溯 -->
+<div class="bg-card rounded-lg border border-border shadow-sm w-[300px] flex flex-col shrink-0 overflow-hidden">
+<div class="px-4 py-3 border-b border-border font-bold text-slate-800 shrink-0">审计链路追溯 <span class="text-slate-500 font-normal text-[11px] ml-1">(示例)</span></div>
+<div class="p-4 flex-1 relative pl-7 py-3 overflow-y-auto">
+<!-- Timeline Container -->
+<div class="space-y-3">
+<div class="timeline-item relative">
+<div class="absolute -left-5 top-0.5">
+<div class="timeline-dot">1</div>
+<div class="timeline-line"></div>
+</div>
+<div>
+<div class="flex items-center text-[10px] text-slate-500 mb-0.5">
+<span>2025-05-21 10:23:45</span>
+</div>
+<div class="text-xs text-blue-600 font-medium mb-0.5">作业台发起操作</div>
+<div class="text-[10px] text-slate-500 flex flex-wrap gap-x-2 gap-y-0.5">
+<span>用户：张三</span>
+<span>模块：CIP 管理</span>
+<span>操作：CIP 转固发布</span>
+</div>
+</div>
+</div>
+<div class="timeline-item relative">
+<div class="absolute -left-5 top-0.5">
+<div class="timeline-dot">2</div>
+<div class="timeline-line"></div>
+</div>
+<div>
+<div class="flex items-center text-[10px] text-slate-500 mb-0.5">
+<span>2025-05-21 10:24:03</span>
+</div>
+<div class="text-xs text-blue-600 font-medium mb-0.5">工作流审批通过</div>
+<div class="text-[10px] text-slate-500 flex flex-wrap gap-x-2 gap-y-0.5">
+<span>审批流：CIP-转固审批流</span>
+<span>审批人：李四</span>
+<span>结果：通过</span>
+</div>
+</div>
+</div>
+<div class="timeline-item relative">
+<div class="absolute -left-5 top-0.5">
+<div class="timeline-dot">3</div>
+<div class="timeline-line"></div>
+</div>
+<div>
+<div class="flex items-center text-[10px] text-slate-500 mb-0.5">
+<span>2025-05-21 10:24:18</span>
+</div>
+<div class="text-xs text-blue-600 font-medium mb-0.5">系统回执（ERP/EHR/MES）</div>
+<div class="text-[10px] text-slate-500 flex flex-wrap gap-x-2 gap-y-0.5">
+<span>系统：ERP</span>
+<span>接口：资产转固回执</span>
+<span>结果：成功</span>
+</div>
+</div>
+</div>
+<div class="timeline-item relative">
+<div class="absolute -left-5 top-0.5">
+<div class="timeline-dot">4</div>
+<div class="timeline-line"></div>
+</div>
+<div>
+<div class="flex items-center text-[10px] text-slate-500 mb-0.5">
+<span>2025-05-21 10:24:26</span>
+</div>
+<div class="text-xs text-blue-600 font-medium mb-0.5">审计归档入库</div>
+<div class="text-[10px] text-slate-500 flex flex-wrap gap-x-2 gap-y-0.5">
+<span>存储位置：归档库</span>
+<span>哈希校验：通过</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- END: Bottom Cards Row -->
+</div>
+</main>
+<!-- END: Main Content Area -->
+</div>
+</body></html>

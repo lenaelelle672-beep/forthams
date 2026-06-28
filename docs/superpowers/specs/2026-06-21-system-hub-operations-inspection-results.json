@@ -1,0 +1,954 @@
+{
+  "objective": "后台设置 / 资产运营中枢运营台式统一重排逐页巡检结果",
+  "date": "2026-06-21",
+  "status": "partial-implementation-pending-verification",
+  "scope": {
+    "included": [
+      "desktop system-mode settings pages",
+      "asset operations hub navigation pages",
+      "admin-workbench/configurator/console/large-page layouts"
+    ],
+    "excluded": [
+      "frontend/src/pages/mobile/**",
+      "backend APIs",
+      "menu additions or removals",
+      "non-settings visual redesign"
+    ]
+  },
+  "scale_requirements": {
+    "users": "7000+",
+    "departments": "200+",
+    "required_behavior": [
+      "search/filter/pagination-first user management",
+      "lazy or scrollable department navigation",
+      "no full flattening of all users or departments",
+      "dense tables with scroll or horizontal overflow instead of nested cards"
+    ]
+  },
+  "acceptance_checks": [
+    {
+      "id": "AC-1",
+      "name": "后台设置页整体低噪声",
+      "required_evidence": [
+        "manual_visual_check",
+        "browser_regression_or_screenshot"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AC-2",
+      "name": "7000+ 人员规模可承载",
+      "required_evidence": [
+        "user_scale_copy",
+        "search_visible",
+        "pagination_or_table_scroll"
+      ],
+      "status": "partial",
+      "evidence": [
+        "implementation updated user scale copy and search/table guardrails",
+        "pending browser verification for visible search, pagination, and table scroll"
+      ]
+    },
+    {
+      "id": "AC-3",
+      "name": "200+ 部门规模可承载",
+      "required_evidence": [
+        "department_scale_copy",
+        "tree_scroll",
+        "path_overflow_guardrail"
+      ],
+      "status": "partial",
+      "evidence": [
+        "implementation updated department scale copy and department tree/table guardrails",
+        "pending browser verification for tree scroll and path overflow behavior"
+      ]
+    },
+    {
+      "id": "AC-4",
+      "name": "六类后台导航页共享运营台骨架",
+      "required_evidence": [
+        "inspection_matrix",
+        "representative_page_checks"
+      ],
+      "status": "partial",
+      "evidence": [
+        "all 39 formal system settings menu routes extracted from system hub usability manifest",
+        "pending representative browser checks for each navigation group"
+      ]
+    },
+    {
+      "id": "AC-5",
+      "name": "操作可达性不下降",
+      "required_evidence": [
+        "search_controls_visible",
+        "focus_visible",
+        "selected_disabled_states"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AC-6",
+      "name": "构建和系统中枢回归通过",
+      "required_evidence": [
+        "build",
+        "verify_system_hub",
+        "verify_system_hub_interactions"
+      ],
+      "status": "pending"
+    }
+  ],
+  "navigation_groups": [
+    {
+      "group": "组织权限",
+      "expected_count": 7,
+      "priority": "highest",
+      "pages": [
+        {
+          "index": 1,
+          "page": "用户管理",
+          "route_key": "system-user-management",
+          "manifest_id": "org-permission-subpage-01-user-management-v2",
+          "focus": "用户授权搜索",
+          "status": "partial",
+          "checks": {
+            "low_noise_structure": "partial",
+            "primary_actions_visible": "pending",
+            "data_region_scrolls": "pending",
+            "secondary_context_muted": "partial"
+          },
+          "evidence": [
+            "copy and CSS guardrails updated for 7000+ user-scale operation",
+            "pending browser verification that 搜索用户授权任务 remains visible and usable"
+          ],
+          "repair_needed": [],
+          "url": "/fixed-assets/workbench?menu=system-user-management"
+        },
+        {
+          "index": 2,
+          "page": "角色权限",
+          "route_key": "system-role-permissions",
+          "manifest_id": "org-permission-subpage-02-role-permissions-v2",
+          "focus": "角色权限范围",
+          "status": "partial",
+          "checks": {
+            "low_noise_structure": "partial",
+            "primary_actions_visible": "pending",
+            "data_region_scrolls": "pending",
+            "secondary_context_muted": "partial"
+          },
+          "evidence": [
+            "role admin workbench included in low-noise system-mode CSS scope",
+            "pending browser verification for permission range readability"
+          ],
+          "repair_needed": [],
+          "url": "/fixed-assets/workbench?menu=system-role-permissions"
+        },
+        {
+          "index": 3,
+          "page": "菜单权限",
+          "route_key": "system-menu-permissions",
+          "manifest_id": "org-permission-subpage-03-menu-permissions-v2",
+          "focus": "菜单树/路径",
+          "status": "partial",
+          "checks": {
+            "low_noise_structure": "partial",
+            "primary_actions_visible": "pending",
+            "data_region_scrolls": "pending",
+            "secondary_context_muted": "partial"
+          },
+          "evidence": [
+            "menu admin workbench and menu tree/table/inspector included in compact operations CSS scope",
+            "pending browser verification for menu tree scroll and path overflow"
+          ],
+          "repair_needed": [],
+          "url": "/fixed-assets/workbench?menu=system-menu-permissions"
+        },
+        {
+          "index": 4,
+          "page": "数据权限",
+          "route_key": "system-data-permissions",
+          "manifest_id": "org-permission-subpage-04-data-permissions-v2",
+          "focus": "数据权限范围",
+          "status": "partial",
+          "checks": {
+            "low_noise_structure": "partial",
+            "primary_actions_visible": "pending",
+            "data_region_scrolls": "pending",
+            "secondary_context_muted": "partial"
+          },
+          "evidence": [
+            "data admin workbench included in system-mode operations CSS scope",
+            "pending browser verification for permission scope readability"
+          ],
+          "repair_needed": [],
+          "url": "/fixed-assets/workbench?menu=system-data-permissions"
+        },
+        {
+          "index": 5,
+          "page": "工作交接",
+          "route_key": "system-handover",
+          "manifest_id": "org-permission-subpage-05-handover-v2",
+          "focus": "工作交接任务",
+          "status": "partial",
+          "checks": {
+            "low_noise_structure": "partial",
+            "primary_actions_visible": "pending",
+            "data_region_scrolls": "pending",
+            "secondary_context_muted": "partial"
+          },
+          "evidence": [
+            "handover page identified from manifest as the seventh organization-permission route",
+            "pending browser verification for task queue and handover context density"
+          ],
+          "repair_needed": [],
+          "url": "/fixed-assets/workbench?menu=system-handover"
+        },
+        {
+          "index": 6,
+          "page": "部门组织",
+          "route_key": "system-dept-org",
+          "manifest_id": "org-permission-subpage-06-dept-org-v2",
+          "focus": "200+ 部门树",
+          "status": "partial",
+          "checks": {
+            "low_noise_structure": "partial",
+            "primary_actions_visible": "pending",
+            "data_region_scrolls": "pending",
+            "secondary_context_muted": "partial"
+          },
+          "evidence": [
+            "department scale copy updated for 200+ departments",
+            "department tree/table/inspector included in scroll and overflow guardrails",
+            "pending browser verification for department tree behavior"
+          ],
+          "repair_needed": [],
+          "url": "/fixed-assets/workbench?menu=system-dept-org"
+        },
+        {
+          "index": 7,
+          "page": "岗位管理",
+          "route_key": "system-post-management",
+          "manifest_id": "org-permission-subpage-07-post-management-v2",
+          "focus": "岗位列表",
+          "status": "partial",
+          "checks": {
+            "low_noise_structure": "partial",
+            "primary_actions_visible": "pending",
+            "data_region_scrolls": "pending",
+            "secondary_context_muted": "partial"
+          },
+          "evidence": [
+            "post admin workbench included in system-mode operations CSS scope",
+            "pending browser verification for list density and primary actions"
+          ],
+          "repair_needed": [],
+          "url": "/fixed-assets/workbench?menu=system-post-management"
+        }
+      ]
+    },
+    {
+      "group": "基础资料",
+      "expected_count": 6,
+      "priority": "high",
+      "pages": [
+        {
+          "index": 1,
+          "page": "资产分类",
+          "route_key": "system-asset-category",
+          "manifest_id": "master-data-subpage-01-asset-category-v2",
+          "focus": "资产分类树/表",
+          "status": "pending",
+          "checks": {
+            "low_noise_structure": "pending",
+            "primary_actions_visible": "pending",
+            "data_region_scrolls": "pending",
+            "secondary_context_muted": "pending"
+          },
+          "evidence": [
+            "route identified from system hub usability subpages manifest",
+            "pending implementation-specific browser verification"
+          ],
+          "repair_needed": [],
+          "url": "/fixed-assets/workbench?menu=system-asset-category"
+        },
+        {
+          "index": 2,
+          "page": "编号规则",
+          "route_key": "system-numbering-rules",
+          "manifest_id": "master-data-subpage-02-numbering-rules-v2",
+          "focus": "编号规则试算",
+          "status": "pending",
+          "checks": {
+            "low_noise_structure": "pending",
+            "primary_actions_visible": "pending",
+            "data_region_scrolls": "pending",
+            "secondary_context_muted": "pending"
+          },
+          "evidence": [
+            "route identified from system hub usability subpages manifest",
+            "pending implementation-specific browser verification"
+          ],
+          "repair_needed": [],
+          "url": "/fixed-assets/workbench?menu=system-numbering-rules"
+        },
+        {
+          "index": 3,
+          "page": "位置管理",
+          "route_key": "system-location-management",
+          "manifest_id": "master-data-subpage-03-location-management-v2",
+          "focus": "位置树/表",
+          "status": "pending",
+          "checks": {
+            "low_noise_structure": "pending",
+            "primary_actions_visible": "pending",
+            "data_region_scrolls": "pending",
+            "secondary_context_muted": "pending"
+          },
+          "evidence": [
+            "route identified from system hub usability subpages manifest",
+            "pending implementation-specific browser verification"
+          ],
+          "repair_needed": [],
+          "url": "/fixed-assets/workbench?menu=system-location-management"
+        },
+        {
+          "index": 4,
+          "page": "供应商管理",
+          "route_key": "system-vendor-management",
+          "manifest_id": "master-data-subpage-04-vendor-management-v2",
+          "focus": "供应商列表",
+          "status": "pending",
+          "checks": {
+            "low_noise_structure": "pending",
+            "primary_actions_visible": "pending",
+            "data_region_scrolls": "pending",
+            "secondary_context_muted": "pending"
+          },
+          "evidence": [
+            "route identified from system hub usability subpages manifest",
+            "pending implementation-specific browser verification"
+          ],
+          "repair_needed": [],
+          "url": "/fixed-assets/workbench?menu=system-vendor-management"
+        },
+        {
+          "index": 5,
+          "page": "自定义字段",
+          "route_key": "system-custom-fields",
+          "manifest_id": "master-data-subpage-05-custom-fields-v2",
+          "focus": "自定义字段配置",
+          "status": "pending",
+          "checks": {
+            "low_noise_structure": "pending",
+            "primary_actions_visible": "pending",
+            "data_region_scrolls": "pending",
+            "secondary_context_muted": "pending"
+          },
+          "evidence": [
+            "route identified from system hub usability subpages manifest",
+            "pending implementation-specific browser verification"
+          ],
+          "repair_needed": [],
+          "url": "/fixed-assets/workbench?menu=system-custom-fields"
+        },
+        {
+          "index": 6,
+          "page": "自定义字段集",
+          "route_key": "system-custom-field-sets",
+          "manifest_id": "master-data-subpage-06-custom-field-sets-v2",
+          "focus": "字段集配置",
+          "status": "pending",
+          "checks": {
+            "low_noise_structure": "pending",
+            "primary_actions_visible": "pending",
+            "data_region_scrolls": "pending",
+            "secondary_context_muted": "pending"
+          },
+          "evidence": [
+            "route identified from system hub usability subpages manifest",
+            "pending implementation-specific browser verification"
+          ],
+          "repair_needed": [],
+          "url": "/fixed-assets/workbench?menu=system-custom-field-sets"
+        }
+      ]
+    },
+    {
+      "group": "流程平台",
+      "expected_count": 7,
+      "priority": "medium",
+      "pages": [
+        {
+          "index": 1,
+          "page": "流程定义",
+          "route_key": "system-flow-definition",
+          "manifest_id": "flow-platform-subpage-01-flow-definition-v2",
+          "focus": "流程定义表",
+          "status": "pending",
+          "checks": {
+            "low_noise_structure": "pending",
+            "primary_actions_visible": "pending",
+            "data_region_scrolls": "pending",
+            "secondary_context_muted": "pending"
+          },
+          "evidence": [
+            "route identified from system hub usability subpages manifest",
+            "pending implementation-specific browser verification"
+          ],
+          "repair_needed": [],
+          "url": "/fixed-assets/workbench?menu=system-flow-definition"
+        },
+        {
+          "index": 2,
+          "page": "流程设计器",
+          "route_key": "system-flow-designer",
+          "manifest_id": "flow-platform-subpage-02-flow-designer-v2",
+          "focus": "设计器主画布",
+          "status": "pending",
+          "checks": {
+            "low_noise_structure": "pending",
+            "primary_actions_visible": "pending",
+            "data_region_scrolls": "pending",
+            "secondary_context_muted": "pending"
+          },
+          "evidence": [
+            "route identified from system hub usability subpages manifest",
+            "pending implementation-specific browser verification"
+          ],
+          "repair_needed": [],
+          "url": "/fixed-assets/workbench?menu=system-flow-designer"
+        },
+        {
+          "index": 3,
+          "page": "表单配置",
+          "route_key": "system-form-config",
+          "manifest_id": "flow-platform-subpage-03-form-config-v2",
+          "focus": "表单设计区",
+          "status": "pending",
+          "checks": {
+            "low_noise_structure": "pending",
+            "primary_actions_visible": "pending",
+            "data_region_scrolls": "pending",
+            "secondary_context_muted": "pending"
+          },
+          "evidence": [
+            "route identified from system hub usability subpages manifest",
+            "pending implementation-specific browser verification"
+          ],
+          "repair_needed": [],
+          "url": "/fixed-assets/workbench?menu=system-form-config"
+        },
+        {
+          "index": 4,
+          "page": "表单存储",
+          "route_key": "system-form-storage",
+          "manifest_id": "flow-platform-subpage-04-form-storage-v2",
+          "focus": "表单存储记录",
+          "status": "pending",
+          "checks": {
+            "low_noise_structure": "pending",
+            "primary_actions_visible": "pending",
+            "data_region_scrolls": "pending",
+            "secondary_context_muted": "pending"
+          },
+          "evidence": [
+            "route identified from system hub usability subpages manifest",
+            "pending implementation-specific browser verification"
+          ],
+          "repair_needed": [],
+          "url": "/fixed-assets/workbench?menu=system-form-storage"
+        },
+        {
+          "index": 5,
+          "page": "审批规则",
+          "route_key": "system-approval-rules",
+          "manifest_id": "flow-platform-subpage-05-approval-rules-v2",
+          "focus": "审批规则",
+          "status": "pending",
+          "checks": {
+            "low_noise_structure": "pending",
+            "primary_actions_visible": "pending",
+            "data_region_scrolls": "pending",
+            "secondary_context_muted": "pending"
+          },
+          "evidence": [
+            "route identified from system hub usability subpages manifest",
+            "pending implementation-specific browser verification"
+          ],
+          "repair_needed": [],
+          "url": "/fixed-assets/workbench?menu=system-approval-rules"
+        },
+        {
+          "index": 6,
+          "page": "待办字段配置",
+          "route_key": "system-todo-fields",
+          "manifest_id": "flow-platform-subpage-06-todo-fields-v2",
+          "focus": "待办字段配置",
+          "status": "pending",
+          "checks": {
+            "low_noise_structure": "pending",
+            "primary_actions_visible": "pending",
+            "data_region_scrolls": "pending",
+            "secondary_context_muted": "pending"
+          },
+          "evidence": [
+            "route identified from system hub usability subpages manifest",
+            "pending implementation-specific browser verification"
+          ],
+          "repair_needed": [],
+          "url": "/fixed-assets/workbench?menu=system-todo-fields"
+        },
+        {
+          "index": 7,
+          "page": "SLA 配置",
+          "route_key": "system-sla-config",
+          "manifest_id": "flow-platform-subpage-07-sla-config-v2",
+          "focus": "SLA/规则预览",
+          "status": "pending",
+          "checks": {
+            "low_noise_structure": "pending",
+            "primary_actions_visible": "pending",
+            "data_region_scrolls": "pending",
+            "secondary_context_muted": "pending"
+          },
+          "evidence": [
+            "route identified from system hub usability subpages manifest",
+            "pending implementation-specific browser verification"
+          ],
+          "repair_needed": [],
+          "url": "/fixed-assets/workbench?menu=system-sla-config"
+        }
+      ]
+    },
+    {
+      "group": "集成配置",
+      "expected_count": 5,
+      "priority": "medium",
+      "pages": [
+        {
+          "index": 1,
+          "page": "外部系统配置",
+          "route_key": "system-external-systems",
+          "manifest_id": "integration-subpage-01-external-systems-v2",
+          "focus": "外部系统选择器",
+          "status": "pending",
+          "checks": {
+            "low_noise_structure": "pending",
+            "primary_actions_visible": "pending",
+            "data_region_scrolls": "pending",
+            "secondary_context_muted": "pending"
+          },
+          "evidence": [
+            "route identified from system hub usability subpages manifest",
+            "pending implementation-specific browser verification"
+          ],
+          "repair_needed": [],
+          "url": "/fixed-assets/workbench?menu=system-external-systems"
+        },
+        {
+          "index": 2,
+          "page": "接口配置",
+          "route_key": "system-interfaces",
+          "manifest_id": "integration-subpage-02-interfaces-v2",
+          "focus": "接口配置",
+          "status": "pending",
+          "checks": {
+            "low_noise_structure": "pending",
+            "primary_actions_visible": "pending",
+            "data_region_scrolls": "pending",
+            "secondary_context_muted": "pending"
+          },
+          "evidence": [
+            "route identified from system hub usability subpages manifest",
+            "pending implementation-specific browser verification"
+          ],
+          "repair_needed": [],
+          "url": "/fixed-assets/workbench?menu=system-interfaces"
+        },
+        {
+          "index": 3,
+          "page": "字段映射",
+          "route_key": "system-field-mapping",
+          "manifest_id": "integration-subpage-03-field-mapping-v2",
+          "focus": "同步映射",
+          "status": "pending",
+          "checks": {
+            "low_noise_structure": "pending",
+            "primary_actions_visible": "pending",
+            "data_region_scrolls": "pending",
+            "secondary_context_muted": "pending"
+          },
+          "evidence": [
+            "route identified from system hub usability subpages manifest",
+            "pending implementation-specific browser verification"
+          ],
+          "repair_needed": [],
+          "url": "/fixed-assets/workbench?menu=system-field-mapping"
+        },
+        {
+          "index": 4,
+          "page": "同步规则",
+          "route_key": "system-sync-rules",
+          "manifest_id": "integration-subpage-04-sync-rules-v2",
+          "focus": "同步规则/日志",
+          "status": "pending",
+          "checks": {
+            "low_noise_structure": "pending",
+            "primary_actions_visible": "pending",
+            "data_region_scrolls": "pending",
+            "secondary_context_muted": "pending"
+          },
+          "evidence": [
+            "route identified from system hub usability subpages manifest",
+            "pending implementation-specific browser verification"
+          ],
+          "repair_needed": [],
+          "url": "/fixed-assets/workbench?menu=system-sync-rules"
+        },
+        {
+          "index": 5,
+          "page": "Webhook 配置",
+          "route_key": "system-webhook-config",
+          "manifest_id": "integration-subpage-05-webhook-config-v2",
+          "focus": "Webhook 证据/测试连接",
+          "status": "pending",
+          "checks": {
+            "low_noise_structure": "pending",
+            "primary_actions_visible": "pending",
+            "data_region_scrolls": "pending",
+            "secondary_context_muted": "pending"
+          },
+          "evidence": [
+            "route identified from system hub usability subpages manifest",
+            "pending implementation-specific browser verification"
+          ],
+          "repair_needed": [],
+          "url": "/fixed-assets/workbench?menu=system-webhook-config"
+        }
+      ]
+    },
+    {
+      "group": "消息与通知",
+      "expected_count": 8,
+      "priority": "medium",
+      "pages": [
+        {
+          "index": 1,
+          "page": "邮件网关配置",
+          "route_key": "system-mail-gateway",
+          "manifest_id": "notification-subpage-01-mail-gateway-v2",
+          "focus": "邮件网关配置",
+          "status": "pending",
+          "checks": {
+            "low_noise_structure": "pending",
+            "primary_actions_visible": "pending",
+            "data_region_scrolls": "pending",
+            "secondary_context_muted": "pending"
+          },
+          "evidence": [
+            "route identified from system hub usability subpages manifest",
+            "pending implementation-specific browser verification"
+          ],
+          "repair_needed": [],
+          "url": "/fixed-assets/workbench?menu=system-mail-gateway"
+        },
+        {
+          "index": 2,
+          "page": "流程邮件配置",
+          "route_key": "system-workflow-mail",
+          "manifest_id": "notification-subpage-02-workflow-mail-v2",
+          "focus": "流程邮件规则",
+          "status": "pending",
+          "checks": {
+            "low_noise_structure": "pending",
+            "primary_actions_visible": "pending",
+            "data_region_scrolls": "pending",
+            "secondary_context_muted": "pending"
+          },
+          "evidence": [
+            "route identified from system hub usability subpages manifest",
+            "pending implementation-specific browser verification"
+          ],
+          "repair_needed": [],
+          "url": "/fixed-assets/workbench?menu=system-workflow-mail"
+        },
+        {
+          "index": 3,
+          "page": "邮件模板",
+          "route_key": "system-mail-templates",
+          "manifest_id": "notification-subpage-03-mail-templates-v2",
+          "focus": "邮件模板列表",
+          "status": "pending",
+          "checks": {
+            "low_noise_structure": "pending",
+            "primary_actions_visible": "pending",
+            "data_region_scrolls": "pending",
+            "secondary_context_muted": "pending"
+          },
+          "evidence": [
+            "route identified from system hub usability subpages manifest",
+            "pending implementation-specific browser verification"
+          ],
+          "repair_needed": [],
+          "url": "/fixed-assets/workbench?menu=system-mail-templates"
+        },
+        {
+          "index": 4,
+          "page": "邮件日志",
+          "route_key": "system-mail-logs",
+          "manifest_id": "notification-subpage-04-mail-logs-v2",
+          "focus": "发送日志",
+          "status": "pending",
+          "checks": {
+            "low_noise_structure": "pending",
+            "primary_actions_visible": "pending",
+            "data_region_scrolls": "pending",
+            "secondary_context_muted": "pending"
+          },
+          "evidence": [
+            "route identified from system hub usability subpages manifest",
+            "pending implementation-specific browser verification"
+          ],
+          "repair_needed": [],
+          "url": "/fixed-assets/workbench?menu=system-mail-logs"
+        },
+        {
+          "index": 5,
+          "page": "通知模板",
+          "route_key": "system-notification-templates",
+          "manifest_id": "notification-subpage-05-notification-templates-v2",
+          "focus": "通知模板",
+          "status": "pending",
+          "checks": {
+            "low_noise_structure": "pending",
+            "primary_actions_visible": "pending",
+            "data_region_scrolls": "pending",
+            "secondary_context_muted": "pending"
+          },
+          "evidence": [
+            "route identified from system hub usability subpages manifest",
+            "pending implementation-specific browser verification"
+          ],
+          "repair_needed": [],
+          "url": "/fixed-assets/workbench?menu=system-notification-templates"
+        },
+        {
+          "index": 6,
+          "page": "通知渠道",
+          "route_key": "system-notification-channels",
+          "manifest_id": "notification-subpage-06-notification-channels-v2",
+          "focus": "渠道配置",
+          "status": "pending",
+          "checks": {
+            "low_noise_structure": "pending",
+            "primary_actions_visible": "pending",
+            "data_region_scrolls": "pending",
+            "secondary_context_muted": "pending"
+          },
+          "evidence": [
+            "route identified from system hub usability subpages manifest",
+            "pending implementation-specific browser verification"
+          ],
+          "repair_needed": [],
+          "url": "/fixed-assets/workbench?menu=system-notification-channels"
+        },
+        {
+          "index": 7,
+          "page": "通知偏好",
+          "route_key": "system-notification-preferences",
+          "manifest_id": "notification-subpage-07-notification-preferences-v2",
+          "focus": "订阅/偏好规则",
+          "status": "pending",
+          "checks": {
+            "low_noise_structure": "pending",
+            "primary_actions_visible": "pending",
+            "data_region_scrolls": "pending",
+            "secondary_context_muted": "pending"
+          },
+          "evidence": [
+            "route identified from system hub usability subpages manifest",
+            "pending implementation-specific browser verification"
+          ],
+          "repair_needed": [],
+          "url": "/fixed-assets/workbench?menu=system-notification-preferences"
+        },
+        {
+          "index": 8,
+          "page": "流程通知开关",
+          "route_key": "system-workflow-notification-switch",
+          "manifest_id": "notification-subpage-08-workflow-notification-switch-v2",
+          "focus": "流程通知开关",
+          "status": "pending",
+          "checks": {
+            "low_noise_structure": "pending",
+            "primary_actions_visible": "pending",
+            "data_region_scrolls": "pending",
+            "secondary_context_muted": "pending"
+          },
+          "evidence": [
+            "route identified from system hub usability subpages manifest",
+            "pending implementation-specific browser verification"
+          ],
+          "repair_needed": [],
+          "url": "/fixed-assets/workbench?menu=system-workflow-notification-switch"
+        }
+      ]
+    },
+    {
+      "group": "系统参数",
+      "expected_count": 6,
+      "priority": "medium",
+      "pages": [
+        {
+          "index": 1,
+          "page": "基础参数",
+          "route_key": "system-base-params",
+          "manifest_id": "system-params-subpage-01-base-params-v2",
+          "focus": "基础参数",
+          "status": "pending",
+          "checks": {
+            "low_noise_structure": "pending",
+            "primary_actions_visible": "pending",
+            "data_region_scrolls": "pending",
+            "secondary_context_muted": "pending"
+          },
+          "evidence": [
+            "route identified from system hub usability subpages manifest",
+            "pending implementation-specific browser verification"
+          ],
+          "repair_needed": [],
+          "url": "/fixed-assets/workbench?menu=system-base-params"
+        },
+        {
+          "index": 2,
+          "page": "安全策略",
+          "route_key": "system-security-policy",
+          "manifest_id": "system-params-subpage-02-security-policy-v2",
+          "focus": "安全策略",
+          "status": "pending",
+          "checks": {
+            "low_noise_structure": "pending",
+            "primary_actions_visible": "pending",
+            "data_region_scrolls": "pending",
+            "secondary_context_muted": "pending"
+          },
+          "evidence": [
+            "route identified from system hub usability subpages manifest",
+            "pending implementation-specific browser verification"
+          ],
+          "repair_needed": [],
+          "url": "/fixed-assets/workbench?menu=system-security-policy"
+        },
+        {
+          "index": 3,
+          "page": "文件存储配置",
+          "route_key": "system-file-storage",
+          "manifest_id": "system-params-subpage-03-file-storage-v2",
+          "focus": "文件存储",
+          "status": "pending",
+          "checks": {
+            "low_noise_structure": "pending",
+            "primary_actions_visible": "pending",
+            "data_region_scrolls": "pending",
+            "secondary_context_muted": "pending"
+          },
+          "evidence": [
+            "route identified from system hub usability subpages manifest",
+            "pending implementation-specific browser verification"
+          ],
+          "repair_needed": [],
+          "url": "/fixed-assets/workbench?menu=system-file-storage"
+        },
+        {
+          "index": 4,
+          "page": "导入导出配置",
+          "route_key": "system-import-export",
+          "manifest_id": "system-params-subpage-04-import-export-v2",
+          "focus": "导入导出",
+          "status": "pending",
+          "checks": {
+            "low_noise_structure": "pending",
+            "primary_actions_visible": "pending",
+            "data_region_scrolls": "pending",
+            "secondary_context_muted": "pending"
+          },
+          "evidence": [
+            "route identified from system hub usability subpages manifest",
+            "pending implementation-specific browser verification"
+          ],
+          "repair_needed": [],
+          "url": "/fixed-assets/workbench?menu=system-import-export"
+        },
+        {
+          "index": 5,
+          "page": "缓存管理",
+          "route_key": "system-cache-management",
+          "manifest_id": "system-params-subpage-05-cache-management-v2",
+          "focus": "缓存管理",
+          "status": "pending",
+          "checks": {
+            "low_noise_structure": "pending",
+            "primary_actions_visible": "pending",
+            "data_region_scrolls": "pending",
+            "secondary_context_muted": "pending"
+          },
+          "evidence": [
+            "route identified from system hub usability subpages manifest",
+            "pending implementation-specific browser verification"
+          ],
+          "repair_needed": [],
+          "url": "/fixed-assets/workbench?menu=system-cache-management"
+        },
+        {
+          "index": 6,
+          "page": "操作审计",
+          "route_key": "system-audit-log",
+          "manifest_id": "system-params-subpage-06-audit-log-v2",
+          "focus": "审计/执行记录",
+          "status": "pending",
+          "checks": {
+            "low_noise_structure": "pending",
+            "primary_actions_visible": "pending",
+            "data_region_scrolls": "pending",
+            "secondary_context_muted": "pending"
+          },
+          "evidence": [
+            "route identified from system hub usability subpages manifest",
+            "pending implementation-specific browser verification"
+          ],
+          "repair_needed": [],
+          "url": "/fixed-assets/workbench?menu=system-audit-log"
+        }
+      ]
+    }
+  ],
+  "commands": {
+    "build": {
+      "command": "npm --prefix frontend run build",
+      "status": "not_run"
+    },
+    "system_hub_static": {
+      "command": "npm --prefix frontend run verify:system-hub",
+      "status": "not_run"
+    },
+    "system_hub_interactions": {
+      "command": "npm --prefix frontend run verify:system-hub-interactions",
+      "status": "not_run"
+    }
+  },
+  "review": {
+    "independent_reviewer": "not_run",
+    "reason": "requires explicit subagent/delegation authorization in current tool policy"
+  },
+  "manifest_source": {
+    "path": "frontend/public/mock/workspace-preview/asset-kit-v8/system-hub/subpages/system-hub-usability-subpages-manifest.json",
+    "formal_menu_count": 39,
+    "navigation_console_menu_id": "system-hub-navigation-console",
+    "extracted_at": "2026-06-21"
+  },
+  "url_checklist": {
+    "path": "docs/superpowers/specs/2026-06-21-system-hub-operations-url-checklist.md",
+    "base_path": "/fixed-assets/workbench?menu=<menuId>",
+    "status": "generated-from-manifest"
+  }
+}

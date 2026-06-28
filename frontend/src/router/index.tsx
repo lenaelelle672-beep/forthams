@@ -232,6 +232,7 @@ const DepreciationListPage = React.lazy(() => import('@/pages/depreciation/Depre
 
 // ── 工作流新版页面 ────────────────────────────────────────────────────────────
 const WorkflowCenterPage  = React.lazy(() => import('@/pages/workflow/WorkflowCenterPage'));
+const WorkflowDefinitionV2Page = React.lazy(() => import('@/pages/workflow/WorkflowDefinitionV2Page'));
 const WorkflowDesignerPage = React.lazy(() => import('@/pages/workflow/WorkflowDesignerPage'));
 const WorkflowFormPage = React.lazy(() => import('@/pages/workflow/WorkflowFormPage'));
 
@@ -381,6 +382,8 @@ const router = createBrowserRouter([
       // 固定资产平台正式工作台入口（受保护，不套旧 AppLayout）
       { path: 'fixed-assets/workbench', element: S(WorkspacePreviewPage) },
       { path: 'fixed-assets/workbench/:section', element: S(WorkspacePreviewPage) },
+      // 流程定义 2 灰度入口：Stitch 整页预览，不切换正式 /workflows
+      { path: 'workflows-v2', element: S(WorkflowDefinitionV2Page) },
       {
         element: S(AppLayout),
         children: [

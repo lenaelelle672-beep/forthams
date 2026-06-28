@@ -17,8 +17,9 @@ export interface ChannelConfig {
   id: number;
   channelType: string;
   configName: string;
-  webhookUrl: string;
-  secret?: string;
+  webhookUrlMasked?: string;
+  webhookUrlConfigured?: boolean;
+  signatureConfigured?: boolean;
   enabled: number;
   description?: string;
   createdAt: string;

@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>流程定义发布台</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<style data-purpose="layout">
+    body {
+      margin: 0;
+      padding: 0;
+      width: 1586px;
+      height: 992px;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: #f4f6f8;
+      color: #333;
+      font-size: 12px;
+    }
+    #app {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      height: 100%;
+    }
+    .layout-content {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+    .sidebar {
+      width: 198px;
+      background-color: #fff;
+      border-right: 1px solid #d7e2ef;
+      display: flex;
+      flex-direction: column;
+    }
+    .main-workspace {
+      position: absolute;
+      left: 216px;
+      top: 64px;
+      width: 1014px;
+      height: 912px;
+    }
+    .right-panel {
+      position: absolute;
+      left: 1248px;
+      top: 64px;
+      width: 320px;
+      height: 912px;
+      background-color: #fff;
+      border: 1px solid #d7e2ef;
+      border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+    }
+  </style>
+<style data-purpose="components">
+    /* Top Nav */
+    .top-nav {
+      height: 48px;
+      background-color: #061b38;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+    }
+    .nav-link {
+      color: #b0bec5;
+      text-decoration: none;
+      padding: 0 16px;
+      font-size: 14px;
+    }
+    .nav-link.active {
+      color: #fff;
+      font-weight: bold;
+    }
+
+    /* Sidebar */
+    .menu-group {
+      padding: 12px 0;
+    }
+    .menu-item {
+      display: flex;
+      align-items: center;
+      padding: 8px 16px;
+      color: #555;
+      cursor: pointer;
+    }
+    .menu-item:hover {
+      background-color: #f0f4f8;
+    }
+    .menu-item.active {
+      background-color: #e6f0fa;
+      color: #1890ff;
+      border-right: 2px solid #1890ff;
+    }
+    .menu-sub {
+      padding-left: 40px;
+    }
+
+    /* Buttons */
+    .btn {
+      height: 28px;
+      padding: 0 12px;
+      border-radius: 2px;
+      font-size: 12px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid transparent;
+    }
+    .btn-primary {
+      background-color: #1890ff;
+      color: #fff;
+    }
+    .btn-outline {
+      border-color: #d9d9d9;
+      color: #333;
+      background: #fff;
+    }
+    .btn-outline:hover {
+      border-color: #1890ff;
+      color: #1890ff;
+    }
+
+    /* Forms & Inputs */
+    .input, .select {
+      height: 26px;
+      border: 1px solid #d9d9d9;
+      border-radius: 2px;
+      padding: 0 8px;
+      font-size: 12px;
+      width: 100%;
+    }
+    .form-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .form-label {
+      width: 80px;
+      text-align: right;
+      margin-right: 12px;
+      color: #555;
+    }
+    .form-label.required::before {
+      content: "*";
+      color: #f5222d;
+      margin-right: 4px;
+    }
+
+    /* Cards & Panels */
+    .card {
+      background: #fff;
+      border: 1px solid #d7e2ef;
+      border-radius: 4px;
+    }
+    .kpi-card {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 64px;
+      border: 1px solid #d7e2ef;
+      border-radius: 4px;
+      background: #fff;
+    }
+    .kpi-value {
+      font-size: 24px;
+      margin-left: 12px;
+    }
+
+    /* Table */
+    .table-container {
+      border: 1px solid #d7e2ef;
+      border-radius: 4px;
+      background: #fff;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+    th, td {
+      padding: 8px 12px;
+      border-bottom: 1px solid #e8e8e8;
+    }
+    th {
+      background: #fafafa;
+      color: #555;
+      font-weight: 500;
+    }
+    .status-tag {
+      padding: 2px 6px;
+      border-radius: 2px;
+      font-size: 12px;
+    }
+    .status-draft { background: #e6f7ff; color: #1890ff; border: 1px solid #91d5ff; }
+    .status-published { background: #f6ffed; color: #52c41a; border: 1px solid #b7eb8f; }
+    .status-warning { background: #fffbe6; color: #faad14; border: 1px solid #ffe58f; }
+
+    /* Right Panel Details */
+    .panel-header {
+      padding: 12px 16px;
+      border-bottom: 1px solid #e8e8e8;
+      font-weight: bold;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .panel-section {
+      padding: 12px 16px;
+      border-bottom: 1px solid #e8e8e8;
+    }
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .detail-label {
+      color: #888;
+    }
+    .page-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 18px;
+      height: 54px;
+      margin-bottom: 16px;
+    }
+    .page-header h1 {
+      margin: 0 0 4px;
+      font-size: 24px;
+      font-weight: 800;
+      color: #17233d;
+    }
+    .page-header p {
+      margin: 0;
+      color: #65748a;
+      font-size: 12px;
+    }
+    .page-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 0 0 auto;
+    }
+    .status-strip {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-height: 34px;
+      margin-bottom: 16px;
+      padding: 7px 12px;
+      border: 1px solid #b7ebc6;
+      border-radius: 4px;
+      color: #237a3b;
+      background: #f0fff4;
+      font-size: 12px;
+    }
+    .status-strip .status-title {
+      font-weight: 800;
+    }
+    .status-strip .status-meta {
+      color: #5f7488;
+    }
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+      margin-bottom: 14px;
+    }
+    .summary-grid .kpi-card {
+      justify-content: space-between;
+      padding: 0 18px;
+      box-shadow: 0 8px 18px rgba(20, 48, 84, .06);
+    }
+    .filter-card.filter-card {
+      display: grid !important;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      border: 1px solid #d7e2ef;
+      border-radius: 4px;
+      background: #fff;
+    }
+    .filter-card .relative {
+      position: relative;
+      grid-column: 1 / -1;
+      min-width: 0;
+    }
+    .filter-card .relative .input {
+      padding-left: 32px;
+    }
+    .filter-card .relative span {
+      position: absolute;
+      top: 5px;
+      left: 8px;
+      color: #8a98a8;
+    }
+    .filter-card .select {
+      width: 100%;
+      min-width: 0;
+    }
+    .result-count {
+      grid-column: 1 / -1;
+      justify-self: end;
+      min-width: 104px;
+      color: #60758b;
+      font-weight: 600;
+      text-align: right;
+    }
+    .flow-row {
+      cursor: pointer;
+    }
+    .flow-row:hover {
+      background: #f6fbff;
+    }
+    .flow-row.is-selected {
+      background: #eaf4ff;
+      box-shadow: inset 3px 0 0 #1890ff;
+    }
+    .table-container.table-container {
+      display: flex !important;
+      flex-direction: column;
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+    .table-container > div:first-child,
+    .table-container > div:last-child {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex: 0 0 auto;
+    }
+    .table-container > div:nth-child(2) {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow: hidden;
+    }
+    .table-container > div:last-child {
+      padding: 8px 16px;
+      border-top: 1px solid #e5edf6;
+      background: #fff;
+      position: relative;
+      z-index: 2;
+    }
+    .table-container th,
+    .table-container td {
+      padding: 7px 10px;
+      vertical-align: middle;
+    }
+    .table-container table {
+      table-layout: fixed;
+    }
+    .pagination-button {
+      min-width: 28px;
+      height: 24px;
+      padding: 0 8px;
+      border: 1px solid #d9d9d9;
+      border-radius: 3px;
+      color: #52677c;
+      background: #fff;
+      font-weight: 600;
+    }
+    .pagination-button.is-active {
+      border-color: #1890ff;
+      color: #fff;
+      background: #1890ff;
+    }
+    .pagination-button:disabled {
+      color: #a9b7c5;
+      background: #f5f7fa;
+      cursor: not-allowed;
+    }
+    .detail-metrics {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+    .detail-metric-card {
+      padding: 8px;
+      border: 1px solid #e2eaf3;
+      border-radius: 4px;
+      background: #f8fbff;
+    }
+    .detail-metric-card span {
+      display: block;
+      margin-bottom: 4px;
+      color: #7a8fa5;
+      font-size: 11px;
+    }
+    .detail-metric-card strong {
+      color: #1d3552;
+      font-size: 12px;
+    }
+    .pill-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .pill-list span {
+      padding: 3px 7px;
+      border: 1px solid #d7e7fb;
+      border-radius: 999px;
+      color: #1d5fa8;
+      background: #f0f7ff;
+      font-size: 11px;
+    }
+    .detail-list {
+      display: grid;
+      gap: 7px;
+    }
+    .detail-list li {
+      list-style: none;
+      color: #4d6075;
+      line-height: 1.45;
+    }
+    .detail-list li::before {
+      content: "•";
+      margin-right: 6px;
+      color: #1890ff;
+      font-weight: 900;
+    }
+  </style>
+</head>
+<body>
+<div id="app">
+<!-- BEGIN: TopNav -->
+<header class="top-nav" data-purpose="top-navigation">
+<div class="flex items-center">
+<span class="text-lg font-bold mr-8">UNIVIEW</span>
+<span class="text-sm mr-8">固定资产管理系统</span>
+</div>
+<div class="flex">
+<a class="nav-link" href="#">固定资产工作台</a>
+<a class="nav-link" href="#">资产全景视图</a>
+<a class="nav-link" href="#">大屏态势</a>
+<a class="nav-link" href="#">流程协同</a>
+<a class="nav-link active" href="#">系统运营中枢</a>
+</div>
+<div class="ml-auto flex items-center space-x-4">
+<span>🔔 12</span>
+<span>❓</span>
+<span>系统管理员 ▾</span>
+</div>
+</header>
+<!-- END: TopNav -->
+<div class="layout-content">
+<!-- BEGIN: Sidebar -->
+<aside class="sidebar" data-purpose="sidebar-menu">
+<div class="menu-group">
+<div class="menu-item font-bold">系统运营中枢</div>
+</div>
+<div class="menu-group">
+<div class="menu-item justify-between">组织权限 <span class="text-xs">▼</span></div>
+</div>
+<div class="menu-group">
+<div class="menu-item justify-between text-blue-600">流程平台 <span class="text-xs">▲</span></div>
+<div class="menu-sub">
+<div class="menu-item active">流程定义 2</div>
+<div class="menu-item">流程设计器</div>
+<div class="menu-item">表单配置</div>
+<div class="menu-item">表单存储</div>
+<div class="menu-item">审批规则</div>
+<div class="menu-item">待办字段配置</div>
+<div class="menu-item">SLA 配置</div>
+</div>
+</div>
+<div class="menu-group">
+<div class="menu-item justify-between">基础资料 <span class="text-xs">▼</span></div>
+<div class="menu-item justify-between">集成网关 <span class="text-xs">▼</span></div>
+<div class="menu-item justify-between">消息与安全 <span class="text-xs">▼</span></div>
+<div class="menu-item justify-between">审计运维 <span class="text-xs">▼</span></div>
+</div>
+<div class="mt-auto p-4 text-gray-400 text-xs cursor-pointer">
+          &lt;&lt; 收起侧栏
+        </div>
+</aside>
+<!-- END: Sidebar -->
+<!-- BEGIN: MainWorkspace -->
+<main class="main-workspace" data-purpose="main-content-area">
+<!-- 1. Page Header -->
+<div class="page-header">
+<div>
+<h1 class="text-2xl font-bold mb-1">流程定义 2</h1>
+<p class="text-gray-500 text-xs">集中维护固定资产、CIP、合同/PO变更等流程定义版本，发布前校验业务对象、表单、节点和外部推送关系。</p>
+<div class="flex items-center space-x-2 mt-2"><span class="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-[10px] border border-gray-200">/workflows-v2</span><span class="bg-orange-50 text-orange-600 px-2 py-0.5 rounded text-[10px] border border-orange-200">正式入口未切换</span><span class="text-gray-400 text-[10px] ml-2">正式 /workflows 保持不变</span></div></div>
+<div class="page-actions"><button class="btn btn-outline">保存草稿</button><button class="btn btn-primary">提交校验</button><button class="btn btn-primary">发布流程</button></div>
+</div>
+<!-- 2. Status Strip -->
+<div class="status-strip">
+<span class="mr-2">✔️</span>
+<span class="status-title">流程定义草稿已保存</span>
+<span class="status-meta">时间: 2025-05-15 10:24:31</span>
+<span class="status-meta">备注: 可提交发布前校验</span>
+</div>
+<!-- 3. KPI Row -->
+<div aria-label="流程定义摘要卡" class="summary-grid">
+<div class="kpi-card text-blue-600">
+<span>🔀 流程定义</span><span class="kpi-value font-bold">18</span>
+</div>
+<div class="kpi-card text-orange-500">
+<span>📤 待发布</span><span class="kpi-value font-bold">4</span>
+</div>
+<div class="kpi-card text-green-600">
+<span>📄 表单对象</span><span class="kpi-value font-bold">14</span>
+</div>
+<div class="kpi-card text-purple-600">
+<span>🕒 SLA规则</span><span class="kpi-value font-bold">9</span>
+</div>
+</div>
+<!-- 4. Filter Row -->
+<div aria-label="流程定义筛选栏" class="filter-card flex items-center space-x-3 mb-4">
+<div class="relative flex-1">
+<input aria-label="流程定义搜索" class="input pl-8" id="flowSearchInput" placeholder="搜索流程名称 / 编码 / 业务对象 / 版本 / 负责人" type="text"/>
+<span class="absolute left-2 top-1 text-gray-400">🔍</span>
+</div>
+<select aria-label="流程定义状态筛选" class="select w-32" id="flowStatusFilter"><option value="">状态: 全部</option><option value="已发布">已发布</option><option value="草稿">草稿</option><option value="待校验">待校验</option><option value="已停用">已停用</option></select>
+<select aria-label="流程定义业务域筛选" class="select w-32" id="flowDomainFilter"><option value="">业务域: 全部</option><option value="固定资产">固定资产</option><option value="在建工程">在建工程</option><option value="合同/采购">合同/采购</option><option value="运维管理">运维管理</option></select>
+<select aria-label="流程定义版本筛选" class="select w-32"><option>版本: 最新</option></select>
+<select aria-label="流程定义负责人筛选" class="select w-32"><option>负责人: 全部</option></select>
+<span aria-label="流程定义筛选结果" class="result-count" id="flowResultCount">8/18 · 第 1/3 页</span>
+</div>
+<!-- 5. Table -->
+<div aria-label="流程平台流程列表" class="table-container mb-4 flex flex-col" style="height: 292px;">
+<div class="flex justify-between items-center px-4 py-2 border-b border-gray-200 bg-gray-50">
+<span class="font-bold">流程定义列表</span>
+<span class="text-gray-400 cursor-pointer">⚙️</span>
+</div>
+<div class="flex-1 overflow-hidden">
+<table>
+<thead>
+<tr>
+<th class="w-8"></th>
+<th>流程名称</th>
+<th>流程编码</th>
+<th>业务对象</th>
+<th>版本</th>
+<th>状态</th>
+<th>启停</th>
+<th>更新时间</th>
+<th>操作</th>
+</tr>
+</thead>
+<tbody id="flowTableBody">
+</tbody>
+</table>
+</div>
+<div class="flex justify-between items-center px-4 py-2 border-t border-gray-200 text-gray-500 text-xs">
+<span id="flowPaginationSummary">共 8 条 · 每页 3 条</span>
+<div aria-label="流程定义分页" class="flex items-center space-x-2" id="flowPagination">
+</div>
+</div>
+</div>
+<!-- 6. Bottom Editor -->
+<div class="card p-4 relative" style="height: 368px;">
+<div class="flex justify-between items-center mb-4 border-b pb-2">
+<span class="font-bold">流程定义草稿编辑 (在建工程转固流程 / CIP-CAP-001 / V2.1)</span>
+<span>^</span>
+</div>
+<div class="flex space-x-6 h-64">
+<!-- Col 1 -->
+<div class="w-1/3">
+<div class="form-row"><label class="form-label required">流程名称</label><input class="input" type="text" value="在建工程转固流程"/></div>
+<div class="form-row"><label class="form-label required">流程编码</label><input class="input" type="text" value="CIP-CAP-001"/></div>
+<div class="form-row">
+<label class="form-label required">版本号</label>
+<input class="input w-24 mr-2" type="text" value="V2.1"/>
+<label class="flex items-center text-xs"><input checked="" class="mr-1" type="checkbox"/>设为最新版本</label>
+</div>
+<div class="form-row relative">
+<label class="form-label required">绑定表单</label>
+<select class="select"><option>在建工程转固单 (CIP_CAP_FORM)</option></select>
+<a class="text-blue-600 absolute right-0 -bottom-5 text-xs" href="#">预览表单</a>
+</div>
+<div class="form-row mt-6">
+<label class="form-label required">所有人</label>
+<div class="relative flex-1">
+<input class="input" type="text" value="李明"/>
+<span class="absolute right-2 top-1 text-gray-400">🔍</span>
+</div>
+</div>
+<div class="form-row">
+<label class="form-label required">发布范围</label>
+<div class="flex space-x-2 text-xs">
+<label><input checked="" name="scope" type="radio"/> 全集团</label>
+<label><input name="scope" type="radio"/> 事业部</label>
+<label><input name="scope" type="radio"/> 自定义范围</label>
+</div>
+</div>
+<div class="form-row items-start">
+<label class="form-label">备注</label>
+<textarea class="border rounded p-1 w-full text-xs" placeholder="请输入备注信息 (选填)" rows="2"></textarea>
+</div>
+</div>
+<!-- Col 2 -->
+<div class="w-1/3 border-l border-r px-4">
+<div class="font-bold mb-2 flex items-center text-xs"><span class="text-red-500 mr-1">*</span> 节点顺序 (按审批流向)</div>
+<div class="text-xs space-y-2 text-gray-700 h-48 overflow-y-auto pl-2 border border-transparent hover:border-gray-200">
+<div>1. 提交申请 (发起人)</div>
+<div>2. 项目负责人审核</div>
+<div>3. 技术验收</div>
+<div>4. 财务复核</div>
+<div>5. 资产管理部审核</div>
+<div>6. 总经理审批</div>
+<div>7. 完成归档</div>
+</div>
+<button class="btn btn-outline w-full mt-2 text-blue-600 border-blue-200 bg-blue-50">调整顺序</button>
+</div>
+<!-- Col 3 -->
+<div class="w-1/3 pl-2">
+<div class="form-row">
+<label class="form-label required w-16">超时策略</label>
+<select class="select flex-1"><option>按节点设置</option></select>
+<span class="ml-2 text-gray-400">ℹ️</span>
+</div>
+<div class="form-row">
+<label class="form-label w-16">会签策略</label>
+<select class="select flex-1"><option>任一通过</option></select>
+</div>
+<div class="form-row items-start mt-6">
+<label class="form-label w-16">外部推送</label>
+<div class="flex flex-wrap gap-1 flex-1">
+<span class="bg-gray-100 border rounded px-1 flex items-center text-xs">ERP凭证归档 ✕</span>
+<span class="bg-gray-100 border rounded px-1 flex items-center text-xs">OA消息通知 ✕</span>
+<select class="select w-8 mt-1"><option>▾</option></select>
+</div>
+</div>
+</div>
+</div>
+<!-- Editor Footer -->
+<div class="absolute bottom-4 right-4 flex space-x-2">
+<button class="btn btn-outline">取消</button>
+<button class="btn btn-outline text-blue-600 border-blue-200">保存草稿</button>
+<button class="btn btn-primary">提交校验</button>
+</div>
+</div>
+</main>
+<!-- END: MainWorkspace -->
+<!-- BEGIN: RightPanel -->
+<aside aria-label="在建工程转固流程右侧详情" class="right-panel" data-purpose="right-detail-panel" id="flowDetailPanel">
+<div class="panel-header">
+<span id="flowDetailTitle">流程详情 (在建工程转固流程)</span>
+<span class="text-gray-400 cursor-pointer">^</span>
+</div>
+<div class="flex-1 overflow-y-auto" id="flowDetailBody"></div>
+<!-- Footer -->
+<div class="p-3 border-t flex space-x-2 bg-gray-50 shrink-0">
+<button class="btn btn-outline flex-1 text-blue-600 border-blue-200">查看流程图</button>
+<button class="btn btn-outline flex-1 text-blue-600 border-blue-200">进入设计器</button>
+<button class="btn btn-outline flex-1 text-blue-600 border-blue-200">查看审计</button>
+</div>
+</aside>
+<!-- END: RightPanel -->
+</div>
+</div>
+<script>
+(() => {
+  const FLOW_TOTAL = 18;
+  const PAGE_SIZE = 3;
+  const flowRows = [
+    {
+      name: '固定资产入账流程',
+      code: 'FA-POST-001',
+      object: '固定资产',
+      version: 'V1.2',
+      status: '已发布',
+      enabled: true,
+      updatedAt: '2024-05-28 10:21:33',
+      owner: '资产管理员',
+      scope: '资产建卡、编号预览、ERP 回写',
+      baseline: ['V1.2 (已发布)', 'V1.1 (2024-05-10 发布)', '启用资产补类后自动进入财务入账。'],
+      nodes: [['提交申请', '发起人'], ['资产管理员初审', '资产管理员'], ['资产会计复核', '资产会计'], ['ERP 回写', '系统任务'], ['完成归档', '归档员']],
+      form: ['固定资产入账单', 'FA_POST_FORM_V2'],
+      todoFields: ['资产名称', '资产分类', '入账日期', 'ERP 回写状态'],
+      triggers: ['资产建卡提交', '编号规则预览通过', '财务字段完整'],
+      sla: ['管理员审核 1 天', '资产会计复核 1 天', 'ERP 回写自动'],
+      checks: ['流程节点完整性', '表单绑定检查', '权限配置检查', 'ERP 回写字段检查'],
+      audit: ['2024-05-28 资产管理员发布 V1.2', '2024-05-27 财务字段校验通过'],
+    },
+    {
+      name: '在建工程转固流程',
+      code: 'CIP-CAP-001',
+      object: '在建工程',
+      version: 'V2.1',
+      status: '草稿',
+      enabled: true,
+      updatedAt: '2025-05-15 10:24:31',
+      owner: '李明',
+      scope: 'CIP 转固、验收附件、资产建卡、ERP 回执',
+      baseline: ['V2.1 (草稿)', 'V2.0 (2024-05-10 发布)', '优化财务复核节点规则及集成校验。'],
+      nodes: [['提交申请', '发起人'], ['项目负责人审核', '项目负责人'], ['CIP 专员审核', 'CIP 专员'], ['资产会计复核', '资产会计'], ['资产管理部审核', '资产管理员'], ['ERP 回执归档', '系统任务']],
+      form: ['在建工程转固单', 'CIP_CAP_FORM'],
+      todoFields: ['CIP 项目号', '验收结论', '转固金额', 'ERP 回执状态'],
+      triggers: ['CIP 项目达到完工状态', '验收附件齐全', '财务复核字段完整'],
+      sla: ['项目负责人 1 天', 'CIP 专员 1 天', '资产会计 2 天'],
+      checks: ['流程节点完整性', '表单绑定检查', '权限配置检查', 'SLA 规则检查', '外部推送检查', '集成配置检查'],
+      audit: ['2025-05-15 李明保存草稿', '2025-05-12 技术验收节点补充附件校验'],
+    },
+    {
+      name: '合同/PO变更流程',
+      code: 'PO-CHG-001',
+      object: '合同/采购',
+      version: 'V1.1',
+      status: '已发布',
+      enabled: true,
+      updatedAt: '2024-05-27 16:44:18',
+      owner: '采购管理员',
+      scope: 'PO 金额变更、合同附件、同步规则',
+      baseline: ['V1.1 (已发布)', 'V1.0 (2024-03-18 发布)', '审批通过后触发 PO/合同同步。'],
+      nodes: [['变更申请', '采购专员'], ['采购经理审核', '采购经理'], ['财务复核', '财务共享'], ['合同归档', '系统任务']],
+      form: ['合同 PO 变更单', 'PO_CHANGE_FORM'],
+      todoFields: ['PO 编号', '合同版本', '变更金额', '核销状态'],
+      triggers: ['合同或 PO 金额变更', '差异超过审批阈值', '同步规则待确认'],
+      sla: ['采购经理 1 天', '财务复核 2 天', '同步自动'],
+      checks: ['核销保护检查', '合同附件完整', '同步规则检查'],
+      audit: ['2024-05-27 采购管理员发布 V1.1', '2024-05-26 财务共享确认核销字段'],
+    },
+    {
+      name: '资产转移流程',
+      code: 'AST-TRF-001',
+      object: '固定资产',
+      version: 'V1.0',
+      status: '待校验',
+      enabled: false,
+      updatedAt: '2025-05-14 09:18:02',
+      owner: '资产管理员',
+      scope: '资产位置、责任人、调出调入部门',
+      baseline: ['V1.0 (待校验)', 'BL-DRAFT-AST-TRF', '转移记录发布前需要责任人授权检查。'],
+      nodes: [['转移申请', '资产责任人'], ['调出部门确认', '调出部门'], ['调入部门确认', '调入部门'], ['资产管理员复核', '资产管理员']],
+      form: ['资产调拨转移单', 'ASSET_TRANSFER_FORM'],
+      todoFields: ['资产编号', '调出部门', '调入部门', '接收人'],
+      triggers: ['资产责任人提交转移', '调出调入部门均需确认', '资产管理员复核位置'],
+      sla: ['部门确认 1 天', '资产管理员 1 天'],
+      checks: ['责任人授权检查', '位置字段检查', '部门权限检查'],
+      audit: ['2025-05-14 资产管理员创建待校验版本'],
+    },
+    {
+      name: '报废清退流程',
+      code: 'AST-DIS-001',
+      object: '固定资产',
+      version: 'V1.3',
+      status: '已发布',
+      enabled: true,
+      updatedAt: '2025-04-30 11:02:07',
+      owner: '资产会计',
+      scope: '资产快照、财务处置、ERP 推送',
+      baseline: ['V1.3 (已发布)', 'V1.2 (2025-03-28 发布)', '保留报废时点资产快照和 ERP 回执。'],
+      nodes: [['报废申请', '资产责任人'], ['资产管理员审核', '资产管理员'], ['财务确认', '资产会计'], ['ERP 推送', '系统任务']],
+      form: ['资产报废申请单', 'ASSET_DISPOSE_FORM'],
+      todoFields: ['处置原因', '账面净值', '财务意见', 'ERP 回执'],
+      triggers: ['资产责任人提交报废', '财务确认处置价值', 'ERP 推送归档'],
+      sla: ['管理员审核 1 天', '财务确认 2 天', 'ERP 推送自动'],
+      checks: ['资产快照完整', '财务字段已审计', 'ERP 回执归档'],
+      audit: ['2025-04-30 资产会计发布 V1.3'],
+    },
+    {
+      name: '盘点差异审批流程',
+      code: 'INV-DIFF-001',
+      object: '固定资产',
+      version: 'V0.9',
+      status: '待校验',
+      enabled: true,
+      updatedAt: '2025-05-20 15:43:10',
+      owner: '盘点负责人',
+      scope: '盘点差异、实物确认、财务调整',
+      baseline: ['V0.9 (待校验)', 'BL-DRAFT-INV-DIFF', '补齐差异责任人与财务调整闭环。'],
+      nodes: [['差异提交', '盘点员'], ['责任部门确认', '部门负责人'], ['资产管理员复核', '资产管理员'], ['财务调整', '资产会计']],
+      form: ['盘点差异处理单', 'INVENTORY_DIFF_FORM'],
+      todoFields: ['盘点任务号', '差异类型', '责任部门', '调整金额'],
+      triggers: ['盘点任务完成', '差异金额超过阈值', '责任部门确认完成'],
+      sla: ['部门确认 2 天', '管理员复核 1 天', '财务调整 2 天'],
+      checks: ['盘点任务引用', '差异阈值检查', '财务凭证字段检查'],
+      audit: ['2025-05-20 盘点负责人提交待校验版本'],
+    },
+    {
+      name: '维修工单闭环流程',
+      code: 'MAINT-CLOSE-001',
+      object: '运维管理',
+      version: 'V1.4',
+      status: '已发布',
+      enabled: true,
+      updatedAt: '2025-05-06 08:40:59',
+      owner: '运维主管',
+      scope: '维修派工、验收确认、备件核销',
+      baseline: ['V1.4 (已发布)', 'V1.3 (2025-04-12 发布)', '增加备件核销和验收照片门禁。'],
+      nodes: [['维修派工', '运维主管'], ['现场处理', '维修工程师'], ['验收确认', '资产责任人'], ['备件核销', '仓库管理员']],
+      form: ['维修工单闭环表', 'MAINT_CLOSE_FORM'],
+      todoFields: ['工单编号', '维修结论', '验收照片', '备件核销状态'],
+      triggers: ['维修工单完成', '验收照片上传', '备件领用存在核销项'],
+      sla: ['现场处理 2 天', '验收确认 1 天', '核销 1 天'],
+      checks: ['验收附件检查', '备件核销检查', '通知模板检查'],
+      audit: ['2025-05-06 运维主管发布 V1.4'],
+    },
+    {
+      name: '供应商准入审批流程',
+      code: 'VENDOR-APP-001',
+      object: '合同/采购',
+      version: 'V1.0',
+      status: '草稿',
+      enabled: true,
+      updatedAt: '2025-05-22 17:12:26',
+      owner: '供应链管理员',
+      scope: '供应商资质、合同准入、黑名单校验',
+      baseline: ['V1.0 (草稿)', 'BL-DRAFT-VENDOR-APP', '首版接入供应商准入和黑名单校验。'],
+      nodes: [['准入申请', '采购专员'], ['资质复核', '供应链管理员'], ['法务审核', '法务'], ['准入发布', '系统任务']],
+      form: ['供应商准入申请单', 'VENDOR_APPROVAL_FORM'],
+      todoFields: ['供应商编码', '资质文件', '准入类型', '黑名单状态'],
+      triggers: ['供应商资料提交', '资质文件齐全', '黑名单校验通过'],
+      sla: ['资质复核 2 天', '法务审核 2 天', '发布自动'],
+      checks: ['资质附件完整', '黑名单接口可用', '法务意见必填'],
+      audit: ['2025-05-22 供应链管理员保存草稿'],
+    },
+  ];
+
+  let currentPage = 1;
+  let selectedCode = 'CIP-CAP-001';
+
+  const tableBody = document.getElementById('flowTableBody');
+  const pagination = document.getElementById('flowPagination');
+  const resultCount = document.getElementById('flowResultCount');
+  const paginationSummary = document.getElementById('flowPaginationSummary');
+  const searchInput = document.getElementById('flowSearchInput');
+  const statusFilter = document.getElementById('flowStatusFilter');
+  const domainFilter = document.getElementById('flowDomainFilter');
+  const detailPanel = document.getElementById('flowDetailPanel');
+  const detailTitle = document.getElementById('flowDetailTitle');
+  const detailBody = document.getElementById('flowDetailBody');
+
+  const statusClass = {
+    '已发布': 'status-published',
+    '草稿': 'status-draft',
+    '待校验': 'status-warning',
+    '已停用': 'status-warning',
+  };
+
+  const textOf = (row) => [
+    row.name,
+    row.code,
+    row.object,
+    row.version,
+    row.status,
+    row.owner,
+    row.scope,
+    row.form.join(' '),
+    ...row.nodes.flat(),
+    ...row.todoFields,
+    ...row.triggers,
+  ].join(' ').toLowerCase();
+
+  const getFilteredRows = () => {
+    const keyword = (searchInput.value || '').trim().toLowerCase();
+    const status = statusFilter.value;
+    const domain = domainFilter.value;
+    return flowRows.filter((row) => {
+      if (keyword && !textOf(row).includes(keyword)) return false;
+      if (status && row.status !== status) return false;
+      if (domain && row.object !== domain) return false;
+      return true;
+    });
+  };
+
+  const makeSwitch = (enabled) =>
+    `<div class="w-8 h-4 ${enabled ? 'bg-blue-500' : 'bg-gray-300'} rounded-full relative"><div class="w-3 h-3 bg-white rounded-full absolute ${enabled ? 'right-0.5' : 'left-0.5'} top-0.5"></div></div>`;
+
+  const renderDetail = (row) => {
+    if (!row) {
+      detailPanel.setAttribute('aria-label', '流程定义右侧详情空态');
+      detailTitle.textContent = '流程详情';
+      detailBody.innerHTML = `
+        <div class="panel-section">
+          <div class="font-bold mb-2">请选择流程定义</div>
+          <p class="text-gray-500 leading-5">当前筛选没有可查看的流程定义，请清空搜索或切换筛选条件。</p>
+        </div>
+      `;
+      return;
+    }
+
+    detailPanel.setAttribute('aria-label', `${row.name}右侧详情`);
+    detailTitle.textContent = `流程详情 (${row.name})`;
+    detailBody.innerHTML = `
+      <div class="panel-section">
+        <div class="font-bold mb-2">概览</div>
+        <div class="detail-metrics">
+          <div class="detail-metric-card"><span>业务对象</span><strong>${row.object}</strong></div>
+          <div class="detail-metric-card"><span>负责人</span><strong>${row.owner}</strong></div>
+          <div class="detail-metric-card"><span>发布范围</span><strong>${row.scope}</strong></div>
+          <div class="detail-metric-card"><span>绑定表单</span><strong>${row.form[0]}</strong></div>
+        </div>
+      </div>
+      <div class="panel-section">
+        <div class="font-bold mb-2">版本与基线</div>
+        <div class="detail-row"><span class="detail-label">当前版本</span><span>${row.baseline[0]}</span></div>
+        <div class="detail-row"><span class="detail-label">基线版本</span><span>${row.baseline[1]}</span></div>
+        <div class="detail-row items-start"><span class="detail-label">版本说明</span><span class="w-48 text-right">${row.baseline[2]}</span></div>
+        <a class="text-blue-600 mt-2 inline-block" href="#">版本对比</a>
+      </div>
+      <div class="panel-section">
+        <div class="font-bold mb-2">节点顺序 (${row.nodes.length})</div>
+        <div class="space-y-2">
+          ${row.nodes.map(([label, role], index) => `
+            <div class="detail-row">
+              <span class="flex items-center"><span class="w-4 h-4 rounded-full border border-blue-500 text-blue-500 flex items-center justify-center mr-2 text-[10px]">${index + 1}</span>${label}</span>
+              <span class="text-gray-500">${role}</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+      <div class="panel-section">
+        <div class="font-bold mb-2">表单与待办字段</div>
+        <div class="detail-row"><span class="detail-label">表单编码</span><span>${row.form[1]}</span></div>
+        <div class="pill-list">${row.todoFields.map((field) => `<span>${field}</span>`).join('')}</div>
+      </div>
+      <div class="panel-section">
+        <div class="font-bold mb-2">触发条件</div>
+        <ul class="detail-list">${row.triggers.map((item) => `<li>${item}</li>`).join('')}</ul>
+      </div>
+      <div class="panel-section bg-gray-50">
+        <div class="flex justify-between items-center mb-2">
+          <span class="font-bold">发布检查 <span class="text-gray-500 font-normal">(上次结果: 通过)</span></span>
+          <a class="text-blue-600" href="#">查看详情</a>
+        </div>
+        <div class="space-y-1">
+          ${row.checks.map((check) => `<div class="flex justify-between"><span class="text-green-600 flex items-center">✔️ ${check}</span><span class="text-green-600">✔️ 通过</span></div>`).join('')}
+        </div>
+      </div>
+      <div class="panel-section">
+        <div class="font-bold mb-2">SLA 与审计记录</div>
+        <ul class="detail-list mb-3">${row.sla.map((item) => `<li>${item}</li>`).join('')}</ul>
+        <ul class="detail-list">${row.audit.map((item) => `<li>${item}</li>`).join('')}</ul>
+      </div>
+    `;
+  };
+
+  const renderPagination = (filteredRows, totalPages) => {
+    const buttons = [
+      `<button class="pagination-button" type="button" data-page="prev" ${currentPage <= 1 ? 'disabled' : ''}>上一页</button>`,
+      ...Array.from({ length: totalPages }, (_, index) => {
+        const pageNo = index + 1;
+        return `<button class="pagination-button ${pageNo === currentPage ? 'is-active' : ''}" type="button" data-page="${pageNo}" ${pageNo === currentPage ? 'aria-current="page"' : ''}>${pageNo}</button>`;
+      }),
+      `<button class="pagination-button" type="button" data-page="next" ${currentPage >= totalPages ? 'disabled' : ''}>下一页</button>`,
+      '<select class="border rounded px-1 h-6" aria-label="流程定义每页条数"><option>3 条/页</option></select>',
+    ];
+    pagination.innerHTML = buttons.join('');
+    resultCount.textContent = `${filteredRows.length}/${FLOW_TOTAL} · 第 ${currentPage}/${totalPages} 页`;
+    paginationSummary.textContent = `当前 ${filteredRows.length} 条 / 企业库 ${FLOW_TOTAL} 条 · 每页 ${PAGE_SIZE} 条`;
+  };
+
+  const renderTable = () => {
+    const filteredRows = getFilteredRows();
+    const totalPages = Math.max(1, Math.ceil(filteredRows.length / PAGE_SIZE));
+    currentPage = Math.min(Math.max(currentPage, 1), totalPages);
+    const start = (currentPage - 1) * PAGE_SIZE;
+    const pageRows = filteredRows.slice(start, start + PAGE_SIZE);
+
+    if (pageRows.length > 0 && !pageRows.some((row) => row.code === selectedCode)) {
+      selectedCode = pageRows[0].code;
+    }
+    if (filteredRows.length === 0) {
+      selectedCode = '';
+    }
+
+    if (pageRows.length === 0) {
+      tableBody.innerHTML = `
+        <tr>
+          <td colspan="9" class="text-center text-gray-500 py-8">没有匹配的流程定义，请调整搜索或筛选条件。</td>
+        </tr>
+      `;
+    } else {
+      tableBody.innerHTML = pageRows.map((row) => `
+        <tr class="flow-row ${row.code === selectedCode ? 'is-selected' : ''}" data-code="${row.code}">
+          <td class="text-center"><input ${row.code === selectedCode ? 'checked' : ''} name="row-select" type="radio" aria-label="选择${row.name}"/></td>
+          <td>${row.name}</td>
+          <td>${row.code}</td>
+          <td>${row.object}</td>
+          <td>${row.version}</td>
+          <td><span class="status-tag ${statusClass[row.status]}">${row.status}</span></td>
+          <td>${makeSwitch(row.enabled)}</td>
+          <td>${row.updatedAt}</td>
+          <td class="text-blue-600"><button class="text-blue-600 mr-1" type="button">详情</button><button class="text-blue-600 mr-1" type="button">复制</button><button class="text-blue-600" type="button">更多 ▾</button></td>
+        </tr>
+      `).join('');
+    }
+
+    renderPagination(filteredRows, totalPages);
+    renderDetail(flowRows.find((row) => row.code === selectedCode));
+  };
+
+  tableBody.addEventListener('click', (event) => {
+    const row = event.target.closest('.flow-row');
+    if (!row) return;
+    selectedCode = row.dataset.code || selectedCode;
+    renderTable();
+  });
+
+  pagination.addEventListener('click', (event) => {
+    const button = event.target.closest('button[data-page]');
+    if (!button || button.disabled) return;
+    const target = button.dataset.page;
+    if (target === 'prev') currentPage -= 1;
+    else if (target === 'next') currentPage += 1;
+    else currentPage = Number(target);
+    renderTable();
+  });
+
+  [searchInput, statusFilter, domainFilter].forEach((control) => {
+    control.addEventListener('input', () => {
+      currentPage = 1;
+      renderTable();
+    });
+    control.addEventListener('change', () => {
+      currentPage = 1;
+      renderTable();
+    });
+  });
+
+  renderTable();
+})();
+</script>
+</body></html>

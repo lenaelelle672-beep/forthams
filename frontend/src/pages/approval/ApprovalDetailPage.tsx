@@ -13,6 +13,7 @@ import { useParams, useNavigate } from 'react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
+import DOMPurify from 'dompurify';
 import {
   ArrowLeft,
   CheckCircle2,
@@ -32,6 +33,8 @@ import {
   FileSpreadsheet,
   ChevronDown,
   ChevronRight,
+  Users,
+  RefreshCw,
 } from 'lucide-react';
 import {
   getApprovalDetail,
@@ -40,6 +43,8 @@ import {
   cancelApproval,
 } from '@/api/approval';
 import type { ApprovalItem } from '@/api/approval';
+import { workflowApi, type WorkflowAssigneePreviewResponse } from '@/api/workflow';
+import { ApprovalFlowChart, type ApprovalFlowChartProps } from '@/components/approval/ApprovalFlowChart';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import {
@@ -52,6 +57,10 @@ import {
 import ApprovalFlowTracker, { type FlowStep } from '@/components/ApprovalFlowTracker';
 import { getUserList } from '@/api/base';
 import { useAuth, type AuthUser } from '@/context/AuthContext';
+
+type FlowChartHistory = ApprovalFlowChartProps['approvalHistory'];
+type FlowChartRuntimePath = NonNullable<ApprovalFlowChartProps['workflowRuntimePath']>;
+type RuntimeAssigneePreviewNode = WorkflowAssigneePreviewResponse['nodes'][number];
 
 // ── 状态配置 ──────────────────────────────────────────────────────────────────
 
@@ -214,6 +223,171 @@ function formatBusinessValue(key: string, value: unknown): string {
   return String(value);
 }
 
+function unwrapApprovalPayload(value: unknown): Record<string, unknown> | null {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
+  const data = value as Record<string, unknown>;
+  const payload = data._approvalPayload;
+  if (payload && typeof payload === 'object' && !Array.isArray(payload)) {
+    return payload as Record<string, unknown>;
+  }
+  return data;
+}
+
+type WorkflowSectionStatus = 'completed' | 'current' | 'rejected' | 'future';
+
+type WorkflowSnapshotSection = {
+  id: string;
+  type: string;
+  label: string;
+  summaryFields: string[];
+  stepNo: number | null;
+  formSource: string;
+  status: WorkflowSectionStatus;
+  statusLabel: string;
+  muted: boolean;
+  defaultOpen: boolean;
+  handlerSummary: string;
+  record?: Record<string, unknown>;
+};
+
+function approvalResultLabel(value: unknown) {
+  const result = String(value ?? '');
+  if (result === 'APPROVED') return '已通过';
+  if (result === 'REJECTED') return '已驳回';
+  return result || '—';
+}
+
+function formatDateTime(value: unknown) {
+  const text = String(value ?? '').trim();
+  return text ? text.replace('T', ' ').substring(0, 16) : '—';
+}
+
+function approverSummary(node: Record<string, unknown> | undefined, record: Record<string, unknown> | undefined, userNameMap?: Map<number, string>) {
+  if (record?.approverId != null) {
+    const approverId = numericValue(record.approverId);
+    return approverId != null ? (userNameMap?.get(approverId) ?? `用户${approverId}`) : String(record.approverId);
+  }
+  if (!node) return '处理人待解析';
+  const approverType = stringValue(node.approverType).toLowerCase();
+  if (approverType === 'user') {
+    const approverId = numericValue(node.approverId);
+    return approverId != null ? (userNameMap?.get(approverId) ?? `用户${approverId}`) : '指定用户';
+  }
+  const roleName = stringValue(node.approverRoleName) || stringValue(node.approverRole);
+  return roleName ? `角色：${roleName}` : '处理人待解析';
+}
+
+function sectionStatus(
+  type: string,
+  stepNo: number | null,
+  record: Record<string, unknown> | undefined,
+  currentStep: number | undefined,
+  detailStatus: string | undefined,
+): Pick<WorkflowSnapshotSection, 'status' | 'statusLabel' | 'muted' | 'defaultOpen'> {
+  if (type === 'start') {
+    return { status: 'completed', statusLabel: '已完成', muted: false, defaultOpen: false };
+  }
+  const result = String(record?.approveResult ?? '');
+  if (result === 'REJECTED') {
+    return { status: 'rejected', statusLabel: '已驳回', muted: false, defaultOpen: false };
+  }
+  if (record || (stepNo != null && currentStep != null && stepNo < currentStep)) {
+    return { status: 'completed', statusLabel: '已完成', muted: false, defaultOpen: false };
+  }
+  if (stepNo != null && currentStep != null && stepNo === currentStep && ACTIVE_APPROVAL_STATUSES.has(detailStatus ?? '')) {
+    return { status: 'current', statusLabel: '当前环节', muted: false, defaultOpen: true };
+  }
+  return { status: 'future', statusLabel: '待流转/未到达', muted: true, defaultOpen: false };
+}
+
+function sectionSummaryValue(section: WorkflowSnapshotSection, key: string, businessData: Record<string, unknown> | null) {
+  if (businessData && Object.prototype.hasOwnProperty.call(businessData, key)) {
+    return formatBusinessValue(key, businessData[key]);
+  }
+  if (key === 'approvalComment' || key === 'approveOpinion') {
+    return formatBusinessValue(key, section.record?.approveOpinion);
+  }
+  if (key === 'approvalResult' || key === 'approveResult') {
+    return approvalResultLabel(section.record?.approveResult);
+  }
+  if (key === 'approvalTime' || key === 'approveTime') {
+    return formatDateTime(section.record?.approveTime);
+  }
+  return '—';
+}
+
+function workflowSectionBadgeClass(status: WorkflowSectionStatus) {
+  if (status === 'completed') return 'border-emerald-200 bg-emerald-50 text-emerald-700';
+  if (status === 'current') return 'border-blue-200 bg-blue-50 text-blue-700';
+  if (status === 'rejected') return 'border-red-200 bg-red-50 text-red-700';
+  return 'border-slate-200 bg-slate-50 text-slate-400';
+}
+
+function runtimePreviewNodeLabel(node: RuntimeAssigneePreviewNode) {
+  return node.label || node.nodeCode || node.nodeId || `第 ${node.stepNo} 步`;
+}
+
+function runtimePreviewRuleSummary(node: RuntimeAssigneePreviewNode) {
+  const role = stringValue(node.approverRole);
+  if (role) return `角色：${role}`;
+  const approverType = stringValue(node.approverType).toLowerCase();
+  if (approverType === 'user') return '指定用户';
+  return '流程规则';
+}
+
+function runtimePreviewSafeSummary(node: RuntimeAssigneePreviewNode) {
+  if (!node.resolved) return node.reason || '当前节点暂不可计算';
+  const count = numericValue(node.assigneeCount) ?? (Array.isArray(node.assignees) ? node.assignees.length : 0);
+  return count > 0 ? `已解析 ${count} 名候选处理人` : '已解析，暂无候选处理人';
+}
+
+function workflowSnapshotSections(
+  value: unknown,
+  workflowPath: Record<string, unknown>[],
+  detailRecords: Record<string, unknown>[],
+  currentStep: number | undefined,
+  detailStatus: string | undefined,
+  applicantName: string,
+  userNameMap?: Map<number, string>,
+): WorkflowSnapshotSection[] {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return [];
+  const definition = (value as Record<string, unknown>)._workflowDefinition;
+  if (!definition || typeof definition !== 'object' || Array.isArray(definition)) return [];
+  const rawNodes = (definition as Record<string, unknown>).nodes;
+  const nodes: unknown[] = Array.isArray(rawNodes) ? rawNodes : [];
+  const pathByNodeId = new Map(workflowPath.map((node) => [String(node.nodeId ?? ''), node]));
+  const recordByStep = new Map(detailRecords.map((record) => [numericValue(record.stepNo), record]));
+  return nodes
+    .filter((node): node is Record<string, unknown> => Boolean(node && typeof node === 'object' && !Array.isArray(node)))
+    .filter((node) => {
+      const type = String(node.type ?? (node.data as Record<string, unknown> | undefined)?.type ?? '');
+      return type === 'start' || (type === 'approval' && pathByNodeId.has(String(node.id ?? '')));
+    })
+    .map((node) => {
+      const data = (node.data ?? {}) as Record<string, unknown>;
+      const type = String(node.type ?? data.type ?? '');
+      const label = String(data.formSectionName || data.label || node.id || '');
+      const summaryFields = typeof data.formSummaryFields === 'string'
+        ? data.formSummaryFields.split(/[,，]/).map((item) => item.trim()).filter(Boolean)
+        : [];
+      const runtimeNode = pathByNodeId.get(String(node.id ?? ''));
+      const stepNo = type === 'start' ? 0 : numericValue(runtimeNode?.stepNo);
+      const record = stepNo == null ? undefined : recordByStep.get(stepNo);
+      const status = sectionStatus(type, stepNo, record, currentStep, detailStatus);
+      return {
+        id: String(node.id ?? ''),
+        type,
+        label,
+        summaryFields,
+        stepNo,
+        formSource: stringValue(data.formSource),
+        ...status,
+        handlerSummary: type === 'start' ? `发起人：${applicantName}` : approverSummary(runtimeNode, record, userNameMap),
+        record,
+      };
+    });
+}
+
 /** 可展开的嵌套对象/数组展示组件 */
 function NestedValue({ value, depth = 0 }: { value: unknown; depth?: number }) {
   const [expanded, setExpanded] = useState(depth < 1);
@@ -353,6 +527,43 @@ export default function ApprovalDetailPage() {
     });
   }, [workflowPath, detailRecords, userNameMapRes]);
 
+  const flowChartHistory: FlowChartHistory = useMemo(() => {
+    return detailRecords.map((record, index) => {
+      const stepNo = numericValue(record.stepNo) ?? index + 1;
+      const approverId = numericValue(record.approverId);
+      const approverName = approverId != null ? userNameMapRes?.get(approverId) : undefined;
+      const approveTime = stringValue(record.approveTime);
+      const approveOpinion = stringValue(record.approveOpinion);
+      return {
+        id: record.id == null ? `${detail?.id ?? approvalId}-${stepNo}-${index}` : String(record.id),
+        processId: detail?.id ?? approvalId,
+        stepNo,
+        operator: approverId ?? stringValue(record.approverId),
+        status: stringValue(record.approveResult) || 'PENDING',
+        ...(approverName ? { operatorName: approverName } : {}),
+        ...(approveTime ? { operatedAt: approveTime } : {}),
+        ...(approveOpinion ? { comment: approveOpinion } : {}),
+      };
+    });
+  }, [approvalId, detail?.id, detailRecords, userNameMapRes]);
+
+  const flowChartRuntimePath: FlowChartRuntimePath = useMemo(() => {
+    return workflowPath.map((node, index) => {
+      const stepNo = numericValue(node.stepNo) ?? index + 1;
+      return {
+        stepNo,
+        nodeId: stringValue(node.nodeId),
+        nodeCode: stringValue(node.nodeCode),
+        label: stringValue(node.label) || `第${stepNo}步审批`,
+        approverRole: stringValue(node.approverRole),
+        approverRoleName: stringValue(node.approverRoleName),
+        approverType: stringValue(node.approverType),
+        approvalMode: stringValue(node.approvalMode),
+        ...(node.approverId == null ? {} : { approverId: String(node.approverId) }),
+      };
+    });
+  }, [workflowPath]);
+
   // ── 审批操作 mutations ──────────────────────────────────────────────────
   const approveMutation = useMutation({
     mutationFn: () => approveItem(approvalId, { version: detail?.version ?? 0, comment: approveComment }),
@@ -400,7 +611,7 @@ export default function ApprovalDetailPage() {
   const typeCfg = detail ? getTypeCfg(detail.processType ?? detail.businessType ?? '') : null;
 
   // ── 解析业务数据 ────────────────────────────────────────────────────────
-  const businessData = useMemo(() => {
+  const rawBusinessData = useMemo(() => {
     if (!detail?.businessData) return null;
     try {
       return JSON.parse(detail.businessData);
@@ -408,6 +619,65 @@ export default function ApprovalDetailPage() {
       return null;
     }
   }, [detail?.businessData]);
+
+  const businessData = useMemo(() => unwrapApprovalPayload(rawBusinessData), [rawBusinessData]);
+  const workflowSections = useMemo(() => workflowSnapshotSections(
+    rawBusinessData,
+    workflowPath,
+    detailRecords,
+    detail?.currentStep,
+    detail?.status,
+    detail?.applicantName ?? (detail?.applicantId ? `用户${detail.applicantId}` : '—'),
+    userNameMapRes,
+  ), [rawBusinessData, workflowPath, detailRecords, detail?.currentStep, detail?.status, detail?.applicantName, detail?.applicantId, userNameMapRes]);
+
+  const runtimeAssigneeBusinessType = stringValue(detail?.processType ?? detail?.businessType);
+  const runtimeAssigneeBusinessData = useMemo(() => businessData ?? {}, [businessData]);
+  const showRuntimeAssigneePreview = Boolean(detail && isActiveApproval);
+  const canPreviewRuntimeAssignees = Boolean(runtimeAssigneeBusinessType);
+  const {
+    data: runtimeAssigneePreview,
+    isFetching: isRuntimeAssigneePreviewLoading,
+    isError: isRuntimeAssigneePreviewError,
+    error: runtimeAssigneePreviewError,
+    refetch: refetchRuntimeAssignees,
+  } = useQuery({
+    queryKey: ['workflow-runtime', 'approval-detail-assignees-preview', approvalId, runtimeAssigneeBusinessType, runtimeAssigneeBusinessData, detail?.currentStep],
+    queryFn: () => workflowApi.previewRuntimeAssignees(runtimeAssigneeBusinessType, {
+      businessData: runtimeAssigneeBusinessData,
+      currentStep: detail?.currentStep,
+    }),
+    enabled: showRuntimeAssigneePreview && canPreviewRuntimeAssignees,
+    retry: false,
+    staleTime: 1000 * 30,
+  });
+  const currentRuntimeAssigneeNodes = useMemo(() => {
+    const currentStep = numericValue(detail?.currentStep);
+    if (currentStep == null || !runtimeAssigneePreview?.nodes?.length) return [];
+    return runtimeAssigneePreview.nodes.filter((node) => numericValue(node.stepNo) === currentStep);
+  }, [detail?.currentStep, runtimeAssigneePreview?.nodes]);
+  const futureRuntimeAssigneeCount = useMemo(() => {
+    const currentStep = numericValue(detail?.currentStep);
+    if (currentStep == null || !runtimeAssigneePreview?.nodes?.length) return 0;
+    return runtimeAssigneePreview.nodes.filter((node) => {
+      const stepNo = numericValue(node.stepNo);
+      return stepNo != null && stepNo > currentStep;
+    }).length;
+  }, [detail?.currentStep, runtimeAssigneePreview?.nodes]);
+  const runtimeAssigneePreviewReason = !canPreviewRuntimeAssignees
+    ? '当前流程缺少业务类型，处理人名单已隐藏'
+    : isRuntimeAssigneePreviewError
+      ? (runtimeAssigneePreviewError instanceof Error ? runtimeAssigneePreviewError.message : '处理人计算服务暂不可用')
+      : runtimeAssigneePreview?.calculable === false
+        ? (runtimeAssigneePreview.reason || '处理人暂不可计算')
+        : runtimeAssigneePreview?.calculable && currentRuntimeAssigneeNodes.length === 0
+          ? '当前节点暂未返回可计算处理人'
+          : '';
+  const showRuntimeAssigneeResult = Boolean(
+    runtimeAssigneePreview?.calculable &&
+    !isRuntimeAssigneePreviewError &&
+    currentRuntimeAssigneeNodes.length > 0,
+  );
 
   // ── Loading ──────────────────────────────────────────────────────────────
   if (isLoading) {
@@ -568,17 +838,123 @@ export default function ApprovalDetailPage() {
               </Card>
             )}
 
+            {workflowSections.length > 0 && (
+              <Card className="overflow-hidden rounded-2xl border-slate-200/80 shadow-sm">
+                <div className="border-b border-slate-100 px-6 py-4">
+                  <h2 className="text-sm font-bold text-slate-900">环节区段</h2>
+                </div>
+                <div className="divide-y divide-slate-100">
+                  {workflowSections.map((section) => (
+                    <details
+                      key={section.id}
+                      id={section.id ? `workflow-section-${section.id}` : undefined}
+                      open={section.defaultOpen}
+                      className={`group px-6 py-4 ${section.muted ? 'bg-slate-50/60' : 'bg-white'}`}
+                    >
+                      <summary className="flex cursor-pointer list-none items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className={`text-sm font-semibold ${section.muted ? 'text-slate-500' : 'text-slate-900'}`}>
+                              {section.label}
+                            </span>
+                            <span className={`inline-flex rounded-full border px-2 py-0.5 text-[11px] font-bold ${workflowSectionBadgeClass(section.status)}`}>
+                              {section.statusLabel}
+                            </span>
+                          </div>
+                          <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-500">
+                            <span>{section.type === 'start' ? '发起环节' : `第 ${section.stepNo ?? '-'} 步`}</span>
+                            <span>{section.handlerSummary}</span>
+                          </div>
+                        </div>
+                        <ChevronDown className="mt-0.5 h-4 w-4 flex-shrink-0 text-slate-400 transition-transform group-open:rotate-180" />
+                      </summary>
+
+                      <div className={`mt-4 space-y-4 ${section.muted ? 'opacity-70' : ''}`}>
+                        <div className="grid grid-cols-2 gap-x-8 gap-y-3 sm:grid-cols-3">
+                          {(section.summaryFields.length > 0 ? section.summaryFields : Object.keys(businessData ?? {}).slice(0, 3)).map((key) => (
+                            <div key={key}>
+                              <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">{getFieldLabel(key)}</p>
+                              <div className="mt-0.5 text-sm text-slate-800">{sectionSummaryValue(section, key, businessData)}</div>
+                            </div>
+                          ))}
+                        </div>
+
+                        <div>
+                          <p className="mb-2 text-xs font-semibold text-slate-500">环节表单</p>
+                          {section.status === 'future' ? (
+                            <div className="rounded-lg border border-dashed border-slate-200 bg-white px-3 py-3 text-xs text-slate-400">
+                              到达该环节后加载
+                            </div>
+                          ) : section.formSource ? (
+                            <div
+                              className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-3 text-xs text-slate-700 [&_input]:mt-1 [&_input]:block [&_input]:w-full [&_input]:rounded [&_input]:border [&_input]:border-slate-200 [&_input]:bg-white [&_input]:px-2 [&_input]:py-1 [&_label]:mb-1 [&_label]:block [&_label]:font-medium [&_textarea]:mt-1 [&_textarea]:block [&_textarea]:w-full [&_textarea]:rounded [&_textarea]:border [&_textarea]:border-slate-200 [&_textarea]:bg-white [&_textarea]:px-2 [&_textarea]:py-1"
+                              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(section.formSource) }}
+                            />
+                          ) : (
+                            <div className="rounded-lg border border-dashed border-slate-200 bg-white px-3 py-3 text-xs text-slate-400">
+                              未配置环节表单
+                            </div>
+                          )}
+                        </div>
+
+                        {section.type === 'approval' && (
+                          <div className="rounded-lg border border-slate-100 bg-white px-3 py-3">
+                            {section.record ? (
+                              <div className="grid gap-2 text-xs text-slate-600 sm:grid-cols-3">
+                                <div>
+                                  <p className="text-[10px] font-semibold text-slate-400">处理人</p>
+                                  <p className="mt-0.5 font-medium text-slate-800">{approverSummary(undefined, section.record, userNameMapRes)}</p>
+                                </div>
+                                <div>
+                                  <p className="text-[10px] font-semibold text-slate-400">处理时间</p>
+                                  <p className="mt-0.5 text-slate-700">{formatDateTime(section.record.approveTime)}</p>
+                                </div>
+                                <div>
+                                  <p className="text-[10px] font-semibold text-slate-400">审批意见</p>
+                                  <p className="mt-0.5 text-slate-700">{formatBusinessValue('approveOpinion', section.record.approveOpinion)}</p>
+                                </div>
+                              </div>
+                            ) : section.status === 'current' ? (
+                              <div className="flex items-center gap-2 text-xs text-blue-600">
+                                <Clock className="h-3.5 w-3.5" />
+                                <span>等待当前处理人处理</span>
+                              </div>
+                            ) : (
+                              <div className="text-xs text-slate-400">尚未生成审批记录</div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </details>
+                  ))}
+                </div>
+              </Card>
+            )}
+
             {/* 审批流转卡片 */}
             <Card className="overflow-hidden rounded-2xl border-slate-200/80 shadow-sm">
               <div className="border-b border-slate-100 px-6 py-4">
                 <h2 className="text-sm font-bold text-slate-900">审批流转</h2>
               </div>
               <div className="px-6 py-5">
-                <ApprovalFlowTracker
-                  currentStep={detail.currentStep ?? 1}
-                  status={detail.status}
-                  steps={flowSteps}
+                <ApprovalFlowChart
+                  approval={detail}
+                  approvalHistory={flowChartHistory}
+                  workflowRuntimePath={flowChartRuntimePath}
+                  title="运行态流程图"
                 />
+                <details className="mt-5 rounded-lg border border-slate-100 bg-slate-50/70 px-4 py-3">
+                  <summary className="cursor-pointer text-xs font-semibold text-slate-500">
+                    紧凑流转摘要
+                  </summary>
+                  <div className="mt-4">
+                    <ApprovalFlowTracker
+                      currentStep={detail.currentStep ?? 1}
+                      status={detail.status}
+                      steps={flowSteps}
+                    />
+                  </div>
+                </details>
               </div>
             </Card>
 
@@ -636,6 +1012,77 @@ export default function ApprovalDetailPage() {
 
           {/* ── 右侧：操作面板（sticky） ── */}
           <div className="space-y-4 lg:sticky lg:top-4 lg:self-start">
+
+            {showRuntimeAssigneePreview && (
+              <Card
+                aria-label="运行页处理人计算/预览"
+                data-testid="runtime-assignee-preview-card"
+                className="overflow-hidden rounded-2xl border-slate-200/80 shadow-sm"
+              >
+                <div className="space-y-3 p-5">
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div className="flex min-w-0 items-start gap-2">
+                      <Users className="mt-0.5 h-4 w-4 flex-shrink-0 text-blue-500" />
+                      <div className="min-w-0">
+                        <h3 className="text-sm font-bold text-slate-900">处理人计算/预览</h3>
+                        <p className="mt-0.5 text-xs text-slate-500">当前节点安全摘要</p>
+                      </div>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      loading={isRuntimeAssigneePreviewLoading}
+                      disabled={!canPreviewRuntimeAssignees}
+                      onClick={() => refetchRuntimeAssignees()}
+                    >
+                      <RefreshCw className="h-3.5 w-3.5" />
+                      {runtimeAssigneePreview ? '重新计算' : '计算处理人'}
+                    </Button>
+                  </div>
+
+                  {isRuntimeAssigneePreviewLoading && !runtimeAssigneePreview ? (
+                    <p className="text-xs text-slate-500">正在计算处理人</p>
+                  ) : null}
+
+                  {showRuntimeAssigneeResult ? (
+                    <div
+                      data-testid="runtime-assignee-preview-result"
+                      className="space-y-2"
+                    >
+                      {currentRuntimeAssigneeNodes.map((node) => (
+                        <div
+                          key={`${node.stepNo}-${node.nodeId}`}
+                          className="rounded-lg border border-blue-100 bg-blue-50/60 px-3 py-2 text-xs text-slate-600"
+                        >
+                          <div className="flex flex-wrap items-center justify-between gap-2">
+                            <span className="font-semibold text-slate-800">{runtimePreviewNodeLabel(node)}</span>
+                            <span className="font-medium text-blue-700">第 {node.stepNo} 步</span>
+                          </div>
+                          <p className="mt-1 text-slate-600">{runtimePreviewRuleSummary(node)}</p>
+                          <p className="mt-1 font-semibold text-blue-700">{runtimePreviewSafeSummary(node)}</p>
+                          <p className="mt-1 text-slate-500">具体处理人名单已隐藏</p>
+                        </div>
+                      ))}
+                      {futureRuntimeAssigneeCount > 0 ? (
+                        <p className="text-xs text-slate-500">后续 {futureRuntimeAssigneeCount} 个未来节点具体处理人已隐藏</p>
+                      ) : null}
+                    </div>
+                  ) : (
+                    <div
+                      data-testid="runtime-assignee-preview-hidden"
+                      className="rounded-lg border border-amber-100 bg-amber-50/70 px-3 py-2 text-xs text-amber-800"
+                    >
+                      <p>{runtimeAssigneePreviewReason || '处理人暂不可计算'}</p>
+                      {runtimeAssigneePreview?.missingFields?.length ? (
+                        <p className="mt-1">缺少字段：{runtimeAssigneePreview.missingFields.join('、')}</p>
+                      ) : null}
+                      <p className="mt-1">具体处理人名单已隐藏</p>
+                    </div>
+                  )}
+                </div>
+              </Card>
+            )}
 
             {/* 快速操作卡 */}
             {showApprovalActions && (

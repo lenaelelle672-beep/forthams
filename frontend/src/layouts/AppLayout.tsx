@@ -44,7 +44,6 @@ import {
   HelpCircle,
 } from 'lucide-react';
 
-import GlobalSearch from '@/components/GlobalSearch';
 import { SpatialTimeProvider } from '@/components/shared/SpatialTimeContext';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { canAccessRoute } from '@/utils/routePermissions';
@@ -54,6 +53,7 @@ type NavItem = {
   label: string;
   icon: React.ComponentType<{ className?: string }>;
   external?: boolean;
+  permissionPath?: string;
 };
 
 type NavGroup = {
@@ -89,6 +89,7 @@ const NAV_GROUPS: NavGroup[] = [
       { path: '/maintenance/plans', label: '维保计划', icon: Calendar },
       { path: '/approvals',         label: '审批流程', icon: CheckSquare },
       { path: '/workflows',         label: '工作流',   icon: Workflow },
+      { path: '/workflows-v2',      label: '流程定义 2', icon: Workflow, permissionPath: '/workflows' },
     ],
   },
   {
@@ -163,11 +164,11 @@ export default function AppLayout() {
     const groups = NAV_GROUPS
       .map((group) => ({
         ...group,
-        items: group.items.filter((item) => canAccessRoute(item.path, user)),
+        items: group.items.filter((item) => canAccessRoute(item.permissionPath ?? item.path, user)),
       }))
       .filter((group) => group.items.length > 0);
     if (hasRole('ADMIN') || hasRole('SUPER_ADMIN')) {
-      const systemItems = SYSTEM_NAV_ITEMS.filter((item) => canAccessRoute(item.path, user));
+      const systemItems = SYSTEM_NAV_ITEMS.filter((item) => canAccessRoute(item.permissionPath ?? item.path, user));
       groups.push({
         group: '系统管理',
         items: systemItems,
@@ -184,7 +185,7 @@ export default function AppLayout() {
   }, [hasRole, user]);
 
   const bottomItems = useMemo(
-    () => NAV_BOTTOM_ITEMS.filter((item) => canAccessRoute(item.path, user)),
+    () => NAV_BOTTOM_ITEMS.filter((item) => canAccessRoute(item.permissionPath ?? item.path, user)),
     [user],
   );
 
@@ -390,12 +391,9 @@ export default function AppLayout() {
       {/* ── 右侧主区 ────────────────────────────────────────────────────────── */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* 顶栏 */}
-        <header className="z-10 flex h-16 flex-none items-center justify-between border-b border-[var(--surface-border)] bg-[var(--surface-card-glass)] px-6 shadow-[var(--shadow-card)] backdrop-blur-xl">
-          {/* 左：搜索 */}
-          <div className="flex items-center gap-3">
-            <GlobalSearch />
-          </div>
-
+        <header
+          className="z-10 flex h-16 flex-none items-center justify-end border-b border-[var(--surface-border)] bg-[var(--surface-card-glass)] px-6 shadow-[var(--shadow-card)] backdrop-blur-xl"
+        >
           {/* 右：主题切换 + 通知 + 用户 */}
           <div className="flex items-center gap-3">
             {/* 深色模式切换按钮（三态：light → dark → system） */}

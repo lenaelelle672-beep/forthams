@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>用户管理</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#1677ff',
+            'primary-hover': '#4096ff',
+            'primary-active': '#0958d9',
+            surface: '#f9f9f9',
+            'surface-container-lowest': '#ffffff',
+            'surface-container-low': '#f3f3f3',
+            'on-surface': '#111111',
+            'on-surface-variant': '#555555',
+            outline: '#d9d9d9',
+            'outline-variant': '#f0f0f0',
+            success: '#52c41a',
+            warning: '#faad14',
+            error: '#ff4d4f',
+            nav: '#001529',
+            'nav-selected': '#1677ff',
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          },
+          borderRadius: {
+            DEFAULT: '4px',
+            'md': '6px',
+            'lg': '8px',
+          },
+          boxShadow: {
+            'card': '0 1px 2px 0 rgba(0, 0, 0, 0.03), 0 1px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px 0 rgba(0, 0, 0, 0.02)',
+          }
+        }
+      }
+    }
+  </script>
+<style type="text/tailwindcss">
+    @layer utilities {
+      .text-ellipsis-single {
+        @apply whitespace-nowrap overflow-hidden text-ellipsis;
+      }
+      .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+      }
+      .scrollbar-hide {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+    }
+  </style>
+<style data-purpose="custom-overrides">
+    body {
+      background-color: theme('colors.surface');
+      color: theme('colors.on-surface');
+      overflow: hidden; /* Prevent body scroll per requirements */
+    }
+    
+    /* Layout heights based on constraints */
+    .top-nav { height: 60px; }
+    .header-area { height: 66px; } /* y=60-126 */
+    .filter-area { height: 64px; } /* y=126-190 */
+    .main-workspace { height: 535px; } /* y=200-735 */
+    .bottom-table { height: 212px; } /* y=744-956 */
+    
+    .ant-input {
+      @apply w-full px-3 py-1 text-sm border border-outline rounded bg-surface-container-lowest text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors;
+    }
+    .ant-select {
+      @apply w-full px-3 py-1 pr-8 text-sm border border-outline rounded bg-surface-container-lowest text-on-surface appearance-none focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors bg-no-repeat bg-[right_8px_center];
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%23bfbfbf'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd'/%3E%3C/svg%3E");
+    }
+    .ant-btn {
+      @apply inline-flex items-center justify-center px-4 py-1.5 text-sm font-medium border rounded transition-colors cursor-pointer;
+    }
+    .ant-btn-primary {
+      @apply bg-primary border-primary text-white hover:bg-primary-hover hover:border-primary-hover active:bg-primary-active active:border-primary-active;
+    }
+    .ant-btn-default {
+      @apply bg-surface-container-lowest border-outline text-on-surface hover:text-primary hover:border-primary;
+    }
+    
+    .status-badge {
+      @apply inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border;
+    }
+    .status-success { @apply bg-green-50 text-success border-green-200; }
+    .status-warning { @apply bg-orange-50 text-warning border-orange-200; }
+    .status-error { @apply bg-red-50 text-error border-red-200; }
+    .status-default { @apply bg-gray-50 text-on-surface-variant border-outline; }
+    .status-blue { @apply bg-blue-50 text-primary border-blue-200; }
+  </style>
+</head>
+<body class="flex h-screen w-screen overflow-hidden antialiased font-sans text-sm">
+<!-- BEGIN: Sidebar -->
+<aside class="w-[200px] flex-shrink-0 bg-nav flex flex-col h-full text-white/65" style="background-color: #061b38;">
+<div class="h-[60px] flex items-center px-4 shrink-0 border-b border-white/10">
+<div class="font-bold text-white text-lg tracking-wide">UNIVIEW <span class="text-xs font-normal opacity-70 ml-1">固定资产管理系统</span></div>
+</div>
+<div class="flex-1 overflow-y-auto py-2 scrollbar-hide">
+<!-- Menu Items -->
+<div class="px-2 py-2 hover:text-white cursor-pointer flex items-center gap-2"><i class="w-4 h-4 rounded bg-white/20"></i>系统运营中枢</div>
+<div class="px-2 py-2 hover:text-white cursor-pointer flex items-center justify-between gap-2">
+<div class="flex items-center gap-2"><i class="w-4 h-4 rounded bg-white/20"></i>流程平台</div>
+<svg class="w-3 h-3" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div class="mt-2">
+<div class="px-2 py-2 hover:text-white cursor-pointer flex items-center justify-between gap-2 text-white">
+<div class="flex items-center gap-2"><i class="w-4 h-4 rounded bg-white/20"></i>组织权限</div>
+<svg class="w-3 h-3 transform rotate-180" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<!-- Submenu -->
+<div class="pl-8 pr-2 py-1 space-y-1">
+<div class="py-2 px-3 rounded bg-nav-selected text-white cursor-pointer">用户管理</div>
+<div class="py-2 px-3 hover:text-white cursor-pointer rounded">角色权限</div>
+<div class="py-2 px-3 hover:text-white cursor-pointer rounded">菜单权限</div>
+<div class="py-2 px-3 hover:text-white cursor-pointer rounded">数据权限</div>
+<div class="py-2 px-3 hover:text-white cursor-pointer rounded">工作交接</div>
+<div class="py-2 px-3 hover:text-white cursor-pointer rounded">部门组织</div>
+<div class="py-2 px-3 hover:text-white cursor-pointer rounded">岗位管理</div>
+</div>
+</div>
+<div class="px-2 py-2 mt-2 hover:text-white cursor-pointer flex items-center justify-between gap-2">
+<div class="flex items-center gap-2"><i class="w-4 h-4 rounded bg-white/20"></i>集成配置</div>
+<svg class="w-3 h-3" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div class="px-2 py-2 hover:text-white cursor-pointer flex items-center justify-between gap-2">
+<div class="flex items-center gap-2"><i class="w-4 h-4 rounded bg-white/20"></i>系统配置</div>
+<svg class="w-3 h-3" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div class="px-2 py-2 hover:text-white cursor-pointer flex items-center justify-between gap-2">
+<div class="flex items-center gap-2"><i class="w-4 h-4 rounded bg-white/20"></i>操作审计</div>
+<svg class="w-3 h-3" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div class="px-2 py-2 hover:text-white cursor-pointer flex items-center justify-between gap-2">
+<div class="flex items-center gap-2"><i class="w-4 h-4 rounded bg-white/20"></i>安全中心</div>
+<svg class="w-3 h-3" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+</div>
+<div class="h-12 border-t border-white/10 shrink-0 flex items-center px-4 cursor-pointer hover:text-white">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+</aside>
+<!-- END: Sidebar -->
+<!-- BEGIN: Main Content Container -->
+<div class="flex-1 flex flex-col min-w-0 bg-surface">
+<!-- BEGIN: Top Navigation -->
+<header class="top-nav bg-nav shrink-0 flex items-center justify-between px-6 border-b border-[#001529]" style="background-color: #061b38;">
+<div class="flex items-center h-full text-white/80 space-x-1">
+<div class="px-4 h-full flex items-center hover:text-white cursor-pointer gap-2"><i class="w-4 h-4 rounded bg-white/20"></i>资产运营总览</div>
+<div class="px-4 h-full flex items-center hover:text-white cursor-pointer gap-2"><i class="w-4 h-4 rounded bg-white/20"></i>数据监控中心</div>
+<div class="px-4 h-full flex items-center hover:text-white cursor-pointer gap-2"><i class="w-4 h-4 rounded bg-white/20"></i>资产运维中心</div>
+<div class="px-4 h-full flex items-center hover:text-white cursor-pointer gap-2"><i class="w-4 h-4 rounded bg-white/20"></i>风险预警中心</div>
+<div class="px-4 h-full flex items-center text-primary bg-[#e6f4ff]/10 cursor-pointer gap-2 border-b-2 border-primary"><i class="w-4 h-4 rounded bg-primary/80"></i>系统运营中枢</div>
+</div>
+<div class="flex items-center gap-4 text-white/80">
+<div class="relative cursor-pointer hover:text-white">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span class="absolute -top-1 -right-1 bg-error text-white text-[10px] leading-none px-1 rounded-full border border-nav">12</span>
+</div>
+<div class="cursor-pointer hover:text-white">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div class="flex items-center gap-2 cursor-pointer hover:text-white">
+<div class="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center overflow-hidden">
+<svg class="w-4 h-4" fill="currentColor" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" fill-rule="evenodd"></path></svg>
+</div>
+<span class="text-sm">超级管理员</span>
+<svg class="w-3 h-3" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+</div>
+</header>
+<!-- END: Top Navigation -->
+<!-- BEGIN: Content Scroll Area -->
+<main class="flex-1 overflow-hidden flex flex-col p-4 pt-0 gap-3">
+<!-- BEGIN: Header Title & Actions -->
+<div class="header-area shrink-0 flex items-end justify-between pb-2 border-b border-outline-variant mt-2">
+<h1 class="text-xl font-semibold text-on-surface">用户账号与外部身份配置</h1>
+<div class="flex items-center gap-2"><button class="ant-btn ant-btn-primary h-8 px-4 flex items-center gap-1.5 bg-primary border-primary text-white rounded"><span class="material-symbols-outlined text-sm">add</span>新建用户</button><button class="ant-btn ant-btn-default h-8 px-4 flex items-center gap-1.5 bg-white border-outline rounded hover:text-primary hover:border-primary"><span class="material-symbols-outlined text-sm">sync</span>批量同步</button><button class="ant-btn ant-btn-default h-8 px-4 flex items-center gap-1.5 bg-white border-outline rounded hover:text-primary hover:border-primary"><span class="material-symbols-outlined text-sm">swap_horiz</span>发起交接</button><button class="ant-btn ant-btn-default h-8 px-4 flex items-center gap-1.5 bg-white border-outline rounded hover:text-primary hover:border-primary"><span class="material-symbols-outlined text-sm">save</span>保存草稿</button><button class="ant-btn ant-btn-primary h-8 px-4 flex items-center gap-1.5 bg-primary border-primary text-white rounded"><span class="material-symbols-outlined text-sm">check</span>提交校验</button></div>
+</div>
+<!-- END: Header Title & Actions -->
+<!-- BEGIN: Filter Row -->
+<div class="filter-area shrink-0 bg-surface-container-lowest border border-outline-variant rounded-lg p-3 flex items-center justify-between shadow-sm">
+<div class="flex items-center gap-4 flex-1">
+<div class="relative w-72">
+<input class="ant-input pl-8 h-8" placeholder="搜索姓名 / 工号 / 钉钉 userid / EHR 编号" type="text"/>
+<svg class="w-4 h-4 absolute left-2.5 top-2 text-on-surface-variant" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-on-surface-variant shrink-0">账号状态</span>
+<select class="ant-select w-28 h-8"><option>全部</option></select>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-on-surface-variant shrink-0">组织范围</span>
+<select class="ant-select w-32 h-8"><option>全部组织</option></select>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-on-surface-variant shrink-0">角色包</span>
+<select class="ant-select w-28 h-8"><option>全部</option></select>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-on-surface-variant shrink-0">同步状态</span>
+<select class="ant-select w-28 h-8"><option>全部</option></select>
+</div>
+</div>
+<div class="shrink-0 ml-4 px-3 py-1 bg-surface-container-low rounded border border-outline-variant text-sm">
+<span class="text-primary font-medium">5</span> <span class="text-on-surface-variant">/ 128</span>
+</div>
+</div>
+<!-- END: Filter Row -->
+<!-- BEGIN: Main Upper Workspace -->
+<div class="main-workspace shrink-0 flex gap-3 h-[500px]">
+<!-- Left: User Table -->
+<div class="flex-1 bg-surface-container-lowest border border-outline-variant rounded-lg shadow-sm flex flex-col overflow-hidden min-w-[380px]">
+<div class="flex-1 overflow-auto">
+<table class="w-full text-left border-collapse">
+<thead class="sticky top-0 bg-surface-container-low/50 z-10 shadow-sm backdrop-blur-sm">
+<tr>
+<th class="py-2.5 px-3 font-medium text-on-surface-variant border-b border-outline-variant w-20">姓名</th>
+<th class="py-2.5 px-3 font-medium text-on-surface-variant border-b border-outline-variant w-20">工号</th>
+<th class="py-2.5 px-3 font-medium text-on-surface-variant border-b border-outline-variant w-32">部门岗位</th>
+<th class="py-2.5 px-3 font-medium text-on-surface-variant border-b border-outline-variant w-24">账号状态</th>
+<th class="py-2.5 px-2 font-medium text-on-surface-variant border-b border-outline-variant w-14 text-center">钉钉</th>
+<th class="py-2.5 px-2 font-medium text-on-surface-variant border-b border-outline-variant w-14 text-center">EHR</th>
+<th class="py-2.5 px-3 font-medium text-on-surface-variant border-b border-outline-variant">角色包</th>
+<th class="py-2.5 px-3 font-medium text-on-surface-variant border-b border-outline-variant w-10">
+<svg class="w-4 h-4 text-on-surface-variant cursor-pointer hover:text-primary" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<!-- Row 1 -->
+<tr class="hover:bg-primary/5 group cursor-pointer h-14">
+<td class="py-2 px-3">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-blue-100 text-primary flex items-center justify-center text-xs shrink-0">张</div>
+<span class="font-medium text-on-surface">张敏</span>
+</div>
+</td>
+<td class="py-2 px-3 text-on-surface-variant">ZQ0005</td>
+<td class="py-2 px-3">
+<div class="text-sm">财务部</div>
+<div class="text-xs text-on-surface-variant">资产会计</div>
+</td>
+<td class="py-2 px-3"><span class="status-badge status-success">启用</span></td>
+<td class="py-2 px-2 text-center"><svg class="w-4 h-4 text-primary inline-block" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></td>
+<td class="py-2 px-2 text-center text-xs text-on-surface-variant">10002111</td>
+<td class="py-2 px-3 text-on-surface-variant text-ellipsis-single max-w-[120px]">固定资产专员</td>
+<td class="py-2 px-3"></td>
+</tr>
+<!-- Row 2 (Selected) -->
+<tr class="bg-[#e6f4ff] hover:bg-[#e6f4ff] border-l-2 border-l-primary shadow-[inset_0_1px_0_0_#bae0ff,inset_0_-1px_0_0_#bae0ff] h-14">
+<td class="py-2 px-3">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center text-xs shrink-0">高</div>
+<span class="font-medium text-on-surface">高志明</span>
+</div>
+</td>
+<td class="py-2 px-3 text-on-surface-variant">GZM0007</td>
+<td class="py-2 px-3">
+<div class="text-sm">行政管理部</div>
+<div class="text-xs text-on-surface-variant">固定资产专员</div>
+</td>
+<td class="py-2 px-3"><span class="status-badge status-success">启用</span></td>
+<td class="py-2 px-2 text-center"><svg class="w-4 h-4 text-primary inline-block" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></td>
+<td class="py-2 px-2 text-center text-xs text-on-surface-variant">10001876</td>
+<td class="py-2 px-3 text-on-surface-variant">
+<div class="text-ellipsis-single max-w-[120px]">固定资产专员</div>
+<div class="text-xs text-on-surface-variant">(标准版)</div>
+</td>
+<td class="py-2 px-3"></td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-primary/5 group cursor-pointer h-14">
+<td class="py-2 px-3">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-blue-100 text-primary flex items-center justify-center text-xs shrink-0">王</div>
+<span class="font-medium text-on-surface">王佳</span>
+</div>
+</td>
+<td class="py-2 px-3 text-on-surface-variant">WJ0012</td>
+<td class="py-2 px-3">
+<div class="text-sm">采购部</div>
+<div class="text-xs text-on-surface-variant">采购专员</div>
+</td>
+<td class="py-2 px-3"><span class="status-badge status-warning">待交接</span></td>
+<td class="py-2 px-2 text-center"><svg class="w-4 h-4 text-primary inline-block" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></td>
+<td class="py-2 px-2 text-center text-xs text-on-surface-variant">10002456</td>
+<td class="py-2 px-3 text-on-surface-variant text-ellipsis-single max-w-[120px]">采购专员</td>
+<td class="py-2 px-3"></td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-primary/5 group cursor-pointer h-14">
+<td class="py-2 px-3">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-blue-100 text-primary flex items-center justify-center text-xs shrink-0">陈</div>
+<span class="font-medium text-on-surface">陈立</span>
+</div>
+</td>
+<td class="py-2 px-3 text-on-surface-variant">CL0003</td>
+<td class="py-2 px-3">
+<div class="text-sm">运维管理部</div>
+<div class="text-xs text-on-surface-variant">运维工程师</div>
+</td>
+<td class="py-2 px-3"><span class="status-badge status-default">停用保护</span></td>
+<td class="py-2 px-2 text-center text-on-surface-variant">—</td>
+<td class="py-2 px-2 text-center text-xs text-on-surface-variant">10001555</td>
+<td class="py-2 px-3 text-on-surface-variant text-ellipsis-single max-w-[120px]">运维工程师</td>
+<td class="py-2 px-3"></td>
+</tr>
+<!-- Row 5 -->
+<tr class="hover:bg-primary/5 group cursor-pointer h-14">
+<td class="py-2 px-3">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-blue-100 text-primary flex items-center justify-center text-xs shrink-0">李</div>
+<span class="font-medium text-on-surface">李伟</span>
+</div>
+</td>
+<td class="py-2 px-3 text-on-surface-variant">LW0002</td>
+<td class="py-2 px-3">
+<div class="text-sm">信息技术部</div>
+<div class="text-xs text-on-surface-variant">系统管理员</div>
+</td>
+<td class="py-2 px-3"><span class="status-badge status-error bg-red-50 text-error border-red-200">同步异常</span></td>
+<td class="py-2 px-2 text-center text-on-surface-variant">—</td>
+<td class="py-2 px-2 text-center text-on-surface-variant">—</td>
+<td class="py-2 px-3 text-on-surface-variant text-ellipsis-single max-w-[120px]">系统管理员</td>
+<td class="py-2 px-3"></td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination -->
+<div class="h-12 border-t border-outline-variant shrink-0 flex items-center justify-between px-4 bg-surface-container-lowest">
+<span class="text-on-surface-variant">共 128 条</span>
+<div class="flex items-center gap-1">
+<button class="w-8 h-8 flex items-center justify-center border border-outline-variant rounded text-on-surface-variant hover:text-primary hover:border-primary disabled:opacity-50 disabled:cursor-not-allowed" disabled="">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M15 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+<button class="w-8 h-8 flex items-center justify-center border border-primary text-primary rounded bg-primary/5">1</button>
+<button class="w-8 h-8 flex items-center justify-center rounded text-on-surface-variant hover:bg-surface-container-low">2</button>
+<button class="w-8 h-8 flex items-center justify-center rounded text-on-surface-variant hover:bg-surface-container-low">3</button>
+<span class="px-1 text-on-surface-variant">...</span>
+<button class="w-8 h-8 flex items-center justify-center rounded text-on-surface-variant hover:bg-surface-container-low">13</button>
+<button class="w-8 h-8 flex items-center justify-center border border-outline-variant rounded text-on-surface-variant hover:text-primary hover:border-primary">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+<select class="ant-select w-24 h-8 ml-2"><option>10 条/页</option></select>
+</div>
+</div>
+</div>
+<!-- Middle: Profile Card -->
+<div class="w-[340px] shrink-0 bg-surface-container-lowest border border-outline-variant rounded-lg shadow-sm p-4 flex flex-col gap-3 overflow-y-auto scrollbar-hide">
+<div class="flex items-center gap-3">
+<h2 class="text-lg font-semibold">高志明</h2>
+<div class="w-2 h-2 rounded-full bg-success"></div>
+<span class="text-success text-xs">启用</span>
+<span class="status-badge status-blue text-[10px] ml-auto">已同步</span>
+</div>
+<div class="text-xs text-on-surface-variant flex gap-2">
+<span>工号: GZM0007</span>
+<span class="text-outline-variant">|</span>
+<span>行政管理部 / 固定资产专员</span>
+</div>
+<!-- Status Tiles -->
+<div class="grid grid-cols-1 gap-2 mt-2">
+<!-- EHR Status -->
+<div class="border border-outline-variant rounded-lg p-3 flex gap-3 relative overflow-hidden bg-gradient-to-r from-green-50/30 to-transparent">
+<div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center shrink-0">
+<svg class="w-5 h-5 text-success" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-center mb-1">
+<span class="font-medium">EHR 状态</span>
+<span class="text-xs text-on-surface-variant">EHR 编号: 10001876</span>
+</div>
+<div class="flex justify-between items-end">
+<span class="text-success text-sm">已同步</span>
+<span class="text-[10px] text-on-surface-variant">最后同步: 2025-05-20 09:15</span>
+</div>
+</div>
+</div>
+<!-- DingTalk Status -->
+<div class="border border-outline-variant rounded-lg p-3 flex gap-3 relative overflow-hidden">
+<div class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center shrink-0">
+<svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div class="flex-1 min-w-0 flex flex-col justify-center">
+<div class="flex justify-between items-center mb-1">
+<span class="font-medium">钉钉 userId</span>
+<span class="text-success text-sm">已绑定</span>
+</div>
+<div class="text-right text-[10px] text-on-surface-variant mt-1">
+                  最后同步: 2025-05-20 09:15
+                </div>
+</div>
+</div>
+<!-- Org/Role -->
+<div class="border border-outline-variant rounded-lg p-3 flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-blue-50 flex items-center justify-center shrink-0">
+<svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div class="flex-1 text-sm min-w-0">
+<div class="text-on-surface-variant">组织岗位 / <span class="text-on-surface">固定资产专员</span></div>
+</div>
+<div class="text-xs text-on-surface-variant shrink-0">有效期: 长期有效</div>
+</div>
+<!-- Scope -->
+<div class="border border-outline-variant rounded-lg p-3 flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-blue-50 flex items-center justify-center shrink-0">
+<svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div class="flex-1 text-sm min-w-0">
+<div class="text-on-surface-variant">待办范围 <span class="text-on-surface ml-2">本人及下级部门 (3个部门)</span></div>
+</div>
+<a class="text-primary text-sm hover:underline shrink-0" href="#">查看</a>
+</div>
+<!-- Permission Scope -->
+<div class="border border-outline-variant rounded-lg p-3 flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-blue-50 flex items-center justify-center shrink-0">
+<svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div class="flex-1 text-sm min-w-0">
+<div class="text-on-surface-variant text-ellipsis-single">角色权限包 <span class="text-on-surface ml-2">固定资产专员 (标准版)</span></div>
+</div>
+<a class="text-primary text-sm hover:underline shrink-0" href="#">查看权限</a>
+</div>
+</div>
+<!-- Progress -->
+<div class="mt-2">
+<div class="flex justify-between text-xs mb-1">
+<span class="text-on-surface-variant">配置完成度</span>
+<span><span class="font-medium text-on-surface">85%</span> <span class="text-on-surface-variant">已完成 17 / 20 项</span></span>
+</div>
+<div class="w-full bg-surface-container-low rounded-full h-1.5">
+<div class="bg-primary h-1.5 rounded-full" style="width: 85%"></div>
+</div>
+</div>
+<!-- Mini Table -->
+<div class="mt-2 flex-1 flex flex-col min-h-0">
+<h3 class="font-medium mb-2 text-sm">用户权限与交接数据</h3>
+<div class="border border-outline-variant rounded overflow-hidden flex-1">
+<table class="w-full text-left text-xs">
+<thead class="bg-surface-container-low">
+<tr>
+<th class="py-1.5 px-2 font-medium text-on-surface-variant border-b border-outline-variant w-1/4">项目</th>
+<th class="py-1.5 px-2 font-medium text-on-surface-variant border-b border-outline-variant w-1/3">当前配置</th>
+<th class="py-1.5 px-2 font-medium text-on-surface-variant border-b border-outline-variant w-1/4">生效时间</th>
+<th class="py-1.5 px-2 font-medium text-on-surface-variant border-b border-outline-variant">来源</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<tr>
+<td class="py-1.5 px-2 text-on-surface-variant">组织岗位</td>
+<td class="py-1.5 px-2 text-ellipsis-single max-w-[80px]" title="行政管理部 / 固定资产专员">行政管理部 / 固定...</td>
+<td class="py-1.5 px-2 text-on-surface-variant">2024-03-11</td>
+<td class="py-1.5 px-2 text-on-surface-variant">系统同步</td>
+</tr>
+<tr>
+<td class="py-1.5 px-2 text-on-surface-variant">工作交接</td>
+<td class="py-1.5 px-2">已配置 (3项)</td>
+<td class="py-1.5 px-2 text-on-surface-variant">2024-03-11</td>
+<td class="py-1.5 px-2 text-on-surface-variant">管理员配置</td>
+</tr>
+<tr>
+<td class="py-1.5 px-2 text-on-surface-variant">权限回收</td>
+<td class="py-1.5 px-2 text-error">未配置</td>
+<td class="py-1.5 px-2 text-on-surface-variant">—</td>
+<td class="py-1.5 px-2 text-on-surface-variant">—</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<!-- Right: Property Editor -->
+<div class="w-[320px] shrink-0 bg-surface-container-lowest border border-outline-variant rounded-lg shadow-sm p-5 flex flex-col relative">
+<h3 class="font-medium text-base mb-4 shrink-0">用户字段维护</h3>
+<div class="flex-1 overflow-y-auto space-y-3 pr-1 scrollbar-hide">
+<!-- Form Item -->
+<div class="flex items-center gap-3">
+<label class="w-20 text-right text-on-surface-variant text-sm shrink-0"><span class="text-error mr-1">*</span>用户姓名</label>
+<input class="ant-input h-8" type="text" value="高志明"/>
+</div>
+<!-- Form Item -->
+<div class="flex items-center gap-3">
+<label class="w-20 text-right text-on-surface-variant text-sm shrink-0"><span class="text-error mr-1">*</span>工号 / 外部编码</label>
+<input class="ant-input h-8" type="text" value="GZM0007"/>
+</div>
+<!-- Form Item -->
+<div class="flex items-center gap-3">
+<label class="w-20 text-right text-on-surface-variant text-sm shrink-0"><span class="text-error mr-1">*</span>组织岗位</label>
+<select class="ant-select h-8"><option>行政管理部 / 固定资产专员</option></select>
+</div>
+<!-- Form Item with link -->
+<div class="flex items-center gap-3">
+<label class="w-20 text-right text-on-surface-variant text-sm shrink-0"><span class="text-error mr-1">*</span>钉钉 userid</label>
+<div class="flex-1 flex items-center gap-2">
+<input class="ant-input h-8" type="text" value="zhiming.gao"/>
+<span class="text-success text-xs shrink-0 whitespace-nowrap">已绑定</span>
+</div>
+</div>
+<!-- Form Item with action -->
+<div class="flex items-center gap-3">
+<label class="w-20 text-right text-on-surface-variant text-sm shrink-0"><span class="text-error mr-1">*</span>角色权限包</label>
+<div class="flex-1 flex items-center gap-2">
+<select class="ant-select h-8"><option>固定资产专员 (标准版)</option></select>
+<a class="text-primary text-xs shrink-0 whitespace-nowrap hover:underline" href="#">查看权限</a>
+</div>
+</div>
+<!-- Form Item -->
+<div class="flex items-center gap-3">
+<label class="w-20 text-right text-on-surface-variant text-sm shrink-0"><span class="text-error mr-1">*</span>交接策略</label>
+<select class="ant-select h-8"><option>默认交接 (按岗位)</option></select>
+</div>
+<!-- Form Item Switch -->
+<div class="flex items-center gap-3">
+<label class="w-20 text-right text-on-surface-variant text-sm shrink-0">账号状态</label>
+<div class="flex items-center gap-2">
+<button aria-checked="true" class="w-11 h-6 bg-primary rounded-full relative transition-colors cursor-pointer" role="switch">
+<span class="absolute left-[22px] top-1 w-4 h-4 bg-white rounded-full shadow-sm transition-all"></span>
+</button>
+<span class="text-sm">启用</span>
+</div>
+</div>
+<!-- Form Item Date -->
+<div class="flex items-center gap-3">
+<label class="w-20 text-right text-on-surface-variant text-sm shrink-0">生效时间</label>
+<div class="relative flex-1">
+<input class="ant-input h-8 pr-8" type="text" value="2025-05-21 09:00"/>
+<svg class="w-4 h-4 absolute right-2.5 top-2 text-on-surface-variant" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+</div>
+<!-- Form Item Textarea -->
+<div class="flex items-start gap-3">
+<label class="w-20 text-right text-on-surface-variant text-sm shrink-0 mt-1">备注</label>
+<div class="flex-1 relative">
+<textarea class="ant-input h-20 resize-none py-2 text-sm" placeholder="请输入备注（选填）"></textarea>
+<span class="absolute bottom-2 right-2 text-xs text-on-surface-variant/50">0/100</span>
+</div>
+</div>
+</div>
+<!-- Bottom Actions -->
+<div class="pt-4 border-t border-outline-variant mt-2 flex justify-end gap-2 shrink-0 bg-surface-container-lowest z-10">
+<button class="ant-btn ant-btn-default border-none text-primary bg-primary/5 hover:bg-primary/10">同步外部身份</button>
+<button class="ant-btn ant-btn-primary">发起交接</button>
+</div>
+</div>
+</div>
+<!-- END: Main Upper Workspace -->
+<!-- BEGIN: Bottom Audit Table -->
+<div class="bottom-table shrink-0 bg-surface-container-lowest border border-outline-variant rounded-lg shadow-sm p-4 flex flex-col h-[265px]">
+<div class="flex justify-between items-center mb-3 shrink-0">
+<h3 class="font-medium text-base">交接与审计记录</h3>
+<a class="text-primary text-sm flex items-center hover:underline" href="#">查看更多 <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></a>
+</div>
+<div class="flex-1 overflow-auto">
+<table class="w-full text-left border-collapse">
+<thead class="sticky top-0 bg-surface-container-lowest z-10">
+<tr>
+<th class="py-2 px-3 font-medium text-on-surface-variant border-b border-outline-variant">批次</th>
+<th class="py-2 px-3 font-medium text-on-surface-variant border-b border-outline-variant">来源用户</th>
+<th class="py-2 px-3 font-medium text-on-surface-variant border-b border-outline-variant">对象</th>
+<th class="py-2 px-3 font-medium text-on-surface-variant border-b border-outline-variant">状态</th>
+<th class="py-2 px-3 font-medium text-on-surface-variant border-b border-outline-variant">审批单</th>
+<th class="py-2 px-3 font-medium text-on-surface-variant border-b border-outline-variant">更新时间</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant"><tr class="hover:bg-surface-container-low transition-colors h-7"><td class="py-1 px-3 text-on-surface-variant text-xs">JQ20250521003</td><td class="py-1 px-3 text-xs">王佳 (WJ0012)</td><td class="py-1 px-3 text-xs">高志明 (GZM0007)</td><td class="py-1 px-3"><span class="status-badge status-warning text-[10px] py-0 px-1.5">审批中</span></td><td class="py-1 px-3 text-on-surface-variant text-xs">SQ20250521008</td><td class="py-1 px-3 text-on-surface-variant text-xs">2025-05-21 10:18:23</td></tr><tr class="hover:bg-surface-container-low transition-colors h-7"><td class="py-1 px-3 text-on-surface-variant text-xs">JQ20250515002</td><td class="py-1 px-3 text-xs">李伟 (LW0002)</td><td class="py-1 px-3 text-xs">陈立 (CL0003)</td><td class="py-1 px-3"><span class="status-badge status-success text-[10px] py-0 px-1.5">已完成</span></td><td class="py-1 px-3 text-on-surface-variant text-xs">SQ20250515007</td><td class="py-1 px-3 text-on-surface-variant text-xs">2025-05-15 16:43:11</td></tr><tr class="hover:bg-surface-container-low transition-colors h-7"><td class="py-1 px-3 text-on-surface-variant text-xs">JQ20250508001</td><td class="py-1 px-3 text-xs">孙强 (SQ0006)</td><td class="py-1 px-3 text-xs">王佳 (WJ0012)</td><td class="py-1 px-3"><span class="status-badge status-success text-[10px] py-0 px-1.5">已完成</span></td><td class="py-1 px-3 text-on-surface-variant text-xs">SQ20250508005</td><td class="py-1 px-3 text-on-surface-variant text-xs">2025-05-08 11:09:22</td></tr><tr class="hover:bg-surface-container-low transition-colors h-7"><td class="py-1 px-3 text-on-surface-variant text-xs">JQ20250430002</td><td class="py-1 px-3 text-xs">系统批量同步</td><td class="py-1 px-3 text-xs">张敏 (ZQ0005) 等 5 人</td><td class="py-1 px-3"><span class="status-badge status-error text-[10px] py-0 px-1.5">失败</span></td><td class="py-1 px-3 text-on-surface-variant text-xs">—</td><td class="py-1 px-3 text-on-surface-variant text-xs">2025-04-30 09:32:41</td></tr></tbody>
+</table>
+</div>
+</div>
+<!-- END: Bottom Audit Table -->
+</main>
+<!-- END: Content Scroll Area -->
+</div>
+<!-- END: Main Content Container -->
+</body></html>

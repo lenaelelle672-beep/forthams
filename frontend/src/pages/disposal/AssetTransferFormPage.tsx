@@ -1,11 +1,11 @@
-import { useState, useMemo } from 'react';
-import { useForm, Controller } from 'react-hook-form';
+import { useEffect, useMemo, useState } from 'react';
+import { useForm, Controller, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useNavigate } from 'react-router';
+import { useNavigate, useSearchParams } from 'react-router';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { ArrowLeft, Plus, Trash2, Info, Package, GitBranch, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, Info, Package, GitBranch, CheckCircle, Users, RefreshCw } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -13,6 +13,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { Select, SelectItem } from '@/components/ui/Select';
 import { getAssetList } from '@/api/asset';
 import { submitTransferApplication } from '@/api/disposal';
+import { workflowApi, type WorkflowStartAvailability } from '@/api/workflow';
 import { getDeptTree, getLocationCascade } from '@/api/base';
 import AssetPickerModal from '@/components/AssetPickerModal';
 import type { AssetListItem } from '@/types/asset';
@@ -24,7 +25,6 @@ const schema = z.object({
   toDept: z.string().min(1, '请选择调入部门'),
   fromLocation: z.string().optional(),
   toLocation: z.string().optional(),
-  workflow: z.string().min(1, '请选择审批流程'),
   priority: z.enum(['LOW', 'NORMAL', 'HIGH']),
   notes: z.string().optional(),
 });
@@ -40,6 +40,17 @@ interface SelectedAsset {
   status: string;
 }
 
+function toSelectedAsset(asset: AssetListItem): SelectedAsset {
+  return {
+    id: String(asset.id),
+    assetNo: asset.assetNo ?? '',
+    name: asset.assetName ?? '',
+    category: asset.categoryName ?? '',
+    location: asset.location ?? '',
+    status: asset.status ?? '',
+  };
+}
+
 const STEPS = [
   { num: 1, title: '基本信息', subtitle: '基础信息填写' },
   { num: 2, title: '选择资产', subtitle: '选择调拨资产' },
@@ -53,6 +64,45 @@ const PRIORITY_LABELS: Record<string, string> = {
   HIGH: '高',
 };
 
+const ASSET_TRANSFER_WORKFLOW = 'ASSET_TRANSFER';
+const WORKFLOW_PERMISSION_BLOCKED: WorkflowStartAvailability = {
+  businessType: ASSET_TRANSFER_WORKFLOW,
+  canStart: false,
+  status: 'FORBIDDEN',
+  version: 0,
+  definitionId: null,
+  entryUrl: '/disposals/transfer/new',
+  blockReason: '无审批发起权限或资产转移流程不可用',
+};
+
+type RuntimeBusinessDataValues = Partial<Record<
+  'transferType' | 'fromDept' | 'toDept' | 'fromLocation' | 'toLocation' | 'priority' | 'notes',
+  string | undefined
+>>;
+
+export function buildAssetTransferRuntimeBusinessData(
+  values: RuntimeBusinessDataValues,
+  assets: Array<{ id: string | number }>,
+) {
+  const notes = values.notes ?? '';
+  const toDept = values.toDept ?? '';
+  const assetIds = assets.map((asset) => String(asset.id));
+  return {
+    transferType: values.transferType ?? '',
+    fromDept: values.fromDept ?? '',
+    toDept,
+    fromLocation: values.fromLocation ?? '',
+    toLocation: values.toLocation ?? '',
+    priority: values.priority ?? 'NORMAL',
+    notes,
+    assetIds,
+    assetCount: assetIds.length,
+    targetDeptId: toDept,
+    reason: notes,
+    description: notes,
+  };
+}
+
 /** Flatten tree nodes into a flat list for dropdown rendering */
 function flattenTree<T extends { children?: T[]; id: number; [key: string]: unknown }>(
   nodes: T[],
@@ -61,8 +111,11 @@ function flattenTree<T extends { children?: T[]; id: number; [key: string]: unkn
 ): Array<{ id: number; label: string; depth: number }> {
   const result: Array<{ id: number; label: string; depth: number }> = [];
   for (const node of nodes) {
+    const id = Number((node as Record<string, unknown>).id);
     const label = (node as Record<string, unknown>)[labelKey] as string;
-    result.push({ id: node.id, label, depth });
+    if (Number.isFinite(id)) {
+      result.push({ id, label, depth });
+    }
     if (node.children?.length) {
       result.push(...flattenTree(node.children, labelKey, depth + 1));
     }
@@ -72,11 +125,16 @@ function flattenTree<T extends { children?: T[]; id: number; [key: string]: unkn
 
 export default function AssetTransferFormPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const qc = useQueryClient();
   const [currentStep, setCurrentStep] = useState(0);
   const [selectedAssets, setSelectedAssets] = useState<SelectedAsset[]>([]);
+  const [appliedPreselectKey, setAppliedPreselectKey] = useState<string | null>(null);
   const [draftSavedAt] = useState(new Date().toLocaleTimeString('zh-CN', { hour12: false }));
   const [showAssetPicker, setShowAssetPicker] = useState(false);
+  const preselectAssetId = searchParams.get('assetId')?.trim();
+  const preselectAssetNo = (searchParams.get('assetNo') ?? searchParams.get('assetCode'))?.trim();
+  const preselectKey = preselectAssetId ? `id:${preselectAssetId}` : preselectAssetNo ? `code:${preselectAssetNo}` : '';
 
   // Fetch available assets from real API
   const { data: assetListData } = useQuery({
@@ -85,6 +143,49 @@ export default function AssetTransferFormPage() {
   });
 
   const availableAssets: AssetListItem[] = (assetListData as PageData<AssetListItem> | undefined)?.records ?? [];
+
+  useEffect(() => {
+    if (!preselectKey || appliedPreselectKey === preselectKey || availableAssets.length === 0) {
+      return;
+    }
+
+    const matchedAsset = availableAssets.find((asset) => {
+      const assetCodes = asset as AssetListItem & { assetCode?: string; code?: string };
+      const idMatches = preselectAssetId ? String(asset.id) === preselectAssetId : false;
+      const codeMatches = preselectAssetNo
+        ? [asset.assetNo, assetCodes.assetCode, assetCodes.code].some((code) => String(code ?? '') === preselectAssetNo)
+        : false;
+      return idMatches || codeMatches;
+    });
+
+    if (matchedAsset) {
+      setSelectedAssets((current) => {
+        const selected = toSelectedAsset(matchedAsset);
+        if (current.some((asset) => asset.id === selected.id)) {
+          return current;
+        }
+        return [...current, selected];
+      });
+    }
+
+    setAppliedPreselectKey(preselectKey);
+  }, [appliedPreselectKey, availableAssets, preselectAssetId, preselectAssetNo, preselectKey]);
+
+  const {
+    data: startAvailability,
+    isLoading: isStartAvailabilityLoading,
+    isError: isStartAvailabilityError,
+  } = useQuery({
+    queryKey: ['workflow-runtime', 'start-availability', ASSET_TRANSFER_WORKFLOW],
+    queryFn: () => workflowApi.getStartAvailability(ASSET_TRANSFER_WORKFLOW),
+    retry: false,
+  });
+  const workflowAvailability = startAvailability ?? (isStartAvailabilityError ? WORKFLOW_PERMISSION_BLOCKED : undefined);
+  const workflowCanStart = Boolean(workflowAvailability?.canStart);
+  const workflowBlockReason = isStartAvailabilityLoading
+    ? '正在校验资产转移流程发布状态'
+    : workflowAvailability?.blockReason || (workflowCanStart ? '' : '请先发布资产转移流程后再提交审批');
+  const submitBlocked = isStartAvailabilityLoading || !workflowCanStart;
 
   // Fetch department tree
   const { data: deptData } = useQuery({
@@ -115,13 +216,51 @@ export default function AssetTransferFormPage() {
     resolver: zodResolver(schema),
     defaultValues: {
       transferType: 'INTERNAL',
-      workflow: 'STANDARD_V2',
       priority: 'NORMAL',
     },
   });
+  const [transferType, fromDept, toDept, fromLocation, toLocation, priority, notes] = useWatch({
+    control,
+    name: ['transferType', 'fromDept', 'toDept', 'fromLocation', 'toLocation', 'priority', 'notes'],
+  });
+  const runtimePreviewBusinessData = useMemo(
+    () => buildAssetTransferRuntimeBusinessData({
+      transferType,
+      fromDept,
+      toDept,
+      fromLocation,
+      toLocation,
+      priority,
+      notes,
+    }, selectedAssets),
+    [transferType, fromDept, toDept, fromLocation, toLocation, priority, notes, selectedAssets],
+  );
+  const {
+    data: assigneePreview,
+    isFetching: isAssigneePreviewLoading,
+    isError: isAssigneePreviewError,
+    error: assigneePreviewError,
+    refetch: refetchAssigneePreview,
+  } = useQuery({
+    queryKey: ['workflow-runtime', 'assignees-preview', ASSET_TRANSFER_WORKFLOW, runtimePreviewBusinessData],
+    queryFn: () => workflowApi.previewRuntimeAssignees(ASSET_TRANSFER_WORKFLOW, {
+      businessData: runtimePreviewBusinessData,
+    }),
+    enabled: workflowCanStart,
+    retry: false,
+  });
+  const assigneePreviewReason = !workflowCanStart
+    ? workflowBlockReason
+    : isAssigneePreviewError
+      ? (assigneePreviewError instanceof Error ? assigneePreviewError.message : '处理人预览服务暂不可用')
+      : assigneePreview?.reason;
+  const shouldHideAssigneeList = !workflowCanStart || isAssigneePreviewError || (assigneePreview != null && !assigneePreview.calculable);
 
   const mutation = useMutation({
     mutationFn: async (data: FormValues) => {
+      if (!workflowAvailability?.canStart || workflowAvailability.definitionId == null || workflowAvailability.version == null) {
+        throw new Error(workflowBlockReason || '请先发布资产转移流程后再提交审批');
+      }
       return submitTransferApplication({
         assetIds: selectedAssets.map((a) => a.id),
         transferType: data.transferType,
@@ -129,7 +268,8 @@ export default function AssetTransferFormPage() {
         toDept: data.toDept,
         fromLocation: data.fromLocation,
         toLocation: data.toLocation,
-        workflow: data.workflow,
+        expectedWorkflowDefinitionId: workflowAvailability.definitionId,
+        expectedWorkflowVersion: workflowAvailability.version,
         priority: data.priority,
         notes: data.notes,
       });
@@ -151,6 +291,10 @@ export default function AssetTransferFormPage() {
       toast.error('请至少选择一项资产');
       return;
     }
+    if (submitBlocked) {
+      toast.error(workflowBlockReason);
+      return;
+    }
     mutation.mutate(values);
   };
 
@@ -162,16 +306,7 @@ export default function AssetTransferFormPage() {
   /** Add asset from picker into selected list */
   const addAsset = (ids: Set<string>) => {
     const newAssets = availableAssets.filter((a) => ids.has(String(a.id)));
-    setSelectedAssets(
-      newAssets.map((a) => ({
-        id: String(a.id),
-        assetNo: a.assetNo ?? '',
-        name: a.assetName ?? '',
-        category: a.categoryName ?? '',
-        location: a.location ?? '',
-        status: a.status ?? '',
-      })),
-    );
+    setSelectedAssets(newAssets.map(toSelectedAsset));
   };
 
   return (
@@ -276,8 +411,8 @@ export default function AssetTransferFormPage() {
                     render={({ field }) => (
                       <div className="flex flex-col gap-1">
                         <Select label="调出部门" value={field.value} onValueChange={field.onChange} error={errors.fromDept?.message}>
-                          {deptOptions.map((d) => (
-                            <SelectItem key={d.id} value={String(d.id)}>
+                          {deptOptions.map((d, index) => (
+                            <SelectItem key={`${d.id}-${d.depth}-${index}`} value={String(d.id)}>
                               {'　'.repeat(d.depth)}{d.label}
                             </SelectItem>
                           ))}
@@ -292,8 +427,8 @@ export default function AssetTransferFormPage() {
                     render={({ field }) => (
                       <Select label="调出位置" value={field.value ?? '__none__'} onValueChange={v => field.onChange(v === '__none__' ? undefined : v)} error={errors.fromLocation?.message}>
                         <SelectItem value="__none__">不限</SelectItem>
-                        {locationOptions.map((loc) => (
-                          <SelectItem key={loc.id} value={String(loc.id)}>
+                        {locationOptions.map((loc, index) => (
+                          <SelectItem key={`${loc.id}-${loc.depth}-${index}`} value={String(loc.id)}>
                             {'　'.repeat(loc.depth)}{loc.label}
                           </SelectItem>
                         ))}
@@ -314,8 +449,8 @@ export default function AssetTransferFormPage() {
                     render={({ field }) => (
                       <div className="flex flex-col gap-1">
                         <Select label="调入部门" value={field.value} onValueChange={field.onChange} error={errors.toDept?.message}>
-                          {deptOptions.map((d) => (
-                            <SelectItem key={d.id} value={String(d.id)}>
+                          {deptOptions.map((d, index) => (
+                            <SelectItem key={`${d.id}-${d.depth}-${index}`} value={String(d.id)}>
                               {'　'.repeat(d.depth)}{d.label}
                             </SelectItem>
                           ))}
@@ -330,8 +465,8 @@ export default function AssetTransferFormPage() {
                     render={({ field }) => (
                       <Select label="调入位置" value={field.value ?? '__none__'} onValueChange={v => field.onChange(v === '__none__' ? undefined : v)} error={errors.toLocation?.message}>
                         <SelectItem value="__none__">不限</SelectItem>
-                        {locationOptions.map((loc) => (
-                          <SelectItem key={loc.id} value={String(loc.id)}>
+                        {locationOptions.map((loc, index) => (
+                          <SelectItem key={`${loc.id}-${loc.depth}-${index}`} value={String(loc.id)}>
                             {'　'.repeat(loc.depth)}{loc.label}
                           </SelectItem>
                         ))}
@@ -436,26 +571,26 @@ export default function AssetTransferFormPage() {
           </CardHeader>
           <CardContent className="space-y-5">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
-              {/* 审批流程 */}
-              <Controller
-                name="workflow"
-                control={control}
-                render={({ field }) => (
-                  <div className="flex flex-col gap-1.5">
-                    <Select
-                      label="审批流程"
-                      value={field.value}
-                      onValueChange={field.onChange}
-                      error={errors.workflow?.message}
-                    >
-                      <SelectItem value="STANDARD_V2">标准资产调拨流程 v2.1</SelectItem>
-                      <SelectItem value="FAST_TRACK">快速审批通道</SelectItem>
-                      <SelectItem value="CROSS_ENTITY">跨实体调拨流程</SelectItem>
-                    </Select>
-                    <p className="text-xs text-[#94a3b8]">选择此申请类型的预定义审批流程。标准流程需部门经理 → 资产管理员二级审批。</p>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-sm font-medium text-[#374151]">发布流程</label>
+                <div className={`min-h-16 rounded-lg border px-3 py-2 text-sm ${
+                  workflowCanStart
+                    ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
+                    : 'border-amber-200 bg-amber-50 text-amber-800'
+                }`}>
+                  <div className="flex items-center justify-between gap-3 flex-wrap">
+                    <span className="font-semibold">资产转移流程</span>
+                    <span className="font-mono text-xs">
+                      {workflowCanStart ? `v${workflowAvailability?.version ?? 0}` : (workflowAvailability?.status ?? 'CHECKING')}
+                    </span>
                   </div>
-                )}
-              />
+                  <p className="mt-1 text-xs leading-5 break-words">
+                    {workflowCanStart
+                      ? `按已发布版本 ${workflowAvailability?.definitionId ?? '-'} / v${workflowAvailability?.version ?? 0} 发起审批`
+                      : workflowBlockReason}
+                  </p>
+                </div>
+              </div>
 
               {/* 紧急程度 */}
               <div className="flex flex-col gap-1.5">
@@ -491,6 +626,67 @@ export default function AssetTransferFormPage() {
 
             {/* Divider */}
             <div className="border-t border-[#f1f5f9]" />
+
+            <div
+              aria-label="处理人预览面板"
+              className="rounded-lg border border-[#e5e7eb] bg-[#f8fafc] p-4 space-y-3"
+            >
+              <div className="flex items-center justify-between gap-3 flex-wrap">
+                <div className="flex items-center gap-2 text-sm font-semibold text-[#374151]">
+                  <Users className="w-4 h-4 text-[#3b82f6]" />
+                  处理人预览
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  disabled={!workflowCanStart || isAssigneePreviewLoading}
+                  loading={isAssigneePreviewLoading}
+                  onClick={() => refetchAssigneePreview()}
+                >
+                  <RefreshCw className="w-4 h-4" />
+                  {assigneePreview ? '重新计算处理人' : '计算处理人'}
+                </Button>
+              </div>
+
+              {isAssigneePreviewLoading && !assigneePreview ? (
+                <p className="text-xs text-[#64748b]">正在计算处理人</p>
+              ) : null}
+
+              {assigneePreview?.calculable && !isAssigneePreviewError ? (
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-emerald-700">已解析处理人</p>
+                  <div className="space-y-2">
+                    {assigneePreview.nodes.map((node) => {
+                      const assigneeCount = node.assigneeCount ?? (Array.isArray(node.assignees) ? node.assignees.length : 0);
+                      return (
+                        <div
+                          key={`${node.stepNo}-${node.nodeId}`}
+                          className="rounded-md border border-emerald-100 bg-white px-3 py-2 text-xs text-[#374151]"
+                        >
+                          <div className="flex items-center justify-between gap-2 flex-wrap">
+                            <span className="font-medium">{node.label || node.nodeCode || node.nodeId}</span>
+                            <span className="text-[#64748b]">第 {node.stepNo} 步</span>
+                          </div>
+                          <p className="mt-1 font-semibold text-[#0f766e]">
+                            已解析 {assigneeCount} 名候选处理人
+                          </p>
+                          <p className="mt-1 text-[#64748b]">具体处理人名单已隐藏</p>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ) : (
+                <div className="rounded-md border border-amber-100 bg-white px-3 py-2 text-xs text-amber-800 space-y-1">
+                  <p>{assigneePreviewReason || '处理人暂不可计算'}</p>
+                  {assigneePreview?.missingFields?.length ? (
+                    <p>缺少字段：{assigneePreview.missingFields.join('、')}</p>
+                  ) : null}
+                  {shouldHideAssigneeList ? <p>处理人名单已隐藏</p> : null}
+                </div>
+              )}
+            </div>
 
             {/* 备注 */}
             <div className="flex flex-col gap-1.5">
@@ -543,6 +739,7 @@ export default function AssetTransferFormPage() {
             <Button
               type="button"
               size="sm"
+              disabled={submitBlocked}
               loading={isSubmitting || mutation.isPending}
               onClick={handleSubmit(onSubmit)}
               className="sm:hidden"
@@ -551,6 +748,7 @@ export default function AssetTransferFormPage() {
             </Button>
             <Button
               type="button"
+              disabled={submitBlocked}
               loading={isSubmitting || mutation.isPending}
               onClick={handleSubmit(onSubmit)}
               className="hidden sm:inline-flex"

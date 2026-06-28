@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>同步规则工作台</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<style data-purpose="custom-styles">
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f5f7fb;
+      width: 1586px;
+      height: 992px;
+      overflow: hidden;
+      color: #333;
+      font-size: 12px;
+    }
+    
+    .text-xxs {
+      font-size: 11px;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* Layout specific */
+    .app-header {
+      height: 48px;
+      background-color: #001529; /* Placeholder for UNIVIEW dark theme */
+      color: white;
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      justify-content: space-between;
+    }
+    .app-sidebar {
+      width: 200px;
+      background-color: #ffffff;
+      border-right: 1px solid #d7e2ef;
+      height: calc(992px - 48px);
+      display: flex;
+      flex-direction: column;
+    }
+    .main-content {
+      width: calc(1586px - 200px);
+      height: calc(992px - 48px);
+      padding: 12px 16px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    
+    .panel {
+      background: #fff;
+      border-radius: 8px;
+      border: 1px solid #d7e2ef;
+      box-sizing: border-box;
+    }
+    .panel-header {
+      padding: 10px 16px;
+      border-bottom: 1px solid #f0f0f0;
+      font-weight: 600;
+      font-size: 14px;
+    }
+    .panel-body {
+      padding: 12px 16px;
+    }
+
+    /* Custom UI Elements */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px 12px;
+      border-radius: 4px;
+      font-size: 12px;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.2s;
+      height: 28px;
+      white-space: nowrap;
+    }
+    .btn-primary {
+      background-color: #1677ff;
+      color: #fff;
+    }
+    .btn-primary:hover {
+      background-color: #4096ff;
+    }
+    .btn-default {
+      background-color: #fff;
+      border-color: #d9d9d9;
+      color: rgba(0, 0, 0, 0.88);
+    }
+    .btn-default:hover {
+      border-color: #1677ff;
+      color: #1677ff;
+    }
+    .btn-text {
+      background: transparent;
+      border: none;
+      color: #1677ff;
+      padding: 0 4px;
+    }
+    .btn-text:hover {
+      background-color: rgba(0,0,0,0.04);
+    }
+    
+    .btn-disabled {
+      background-color: #f5f5f5;
+      border-color: #d9d9d9;
+      color: rgba(0, 0, 0, 0.25);
+      cursor: not-allowed;
+    }
+
+    .status-tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 0 6px;
+      border-radius: 4px;
+      font-size: 11px;
+      line-height: 18px;
+      height: 20px;
+    }
+    .status-tag-green {
+      background-color: #f6ffed;
+      border: 1px solid #b7eb8f;
+      color: #52c41a;
+    }
+
+    /* Form & Input Styles */
+    .form-item {
+      display: flex;
+      margin-bottom: 10px;
+      align-items: flex-start;
+    }
+    .form-item-label {
+      width: 80px;
+      text-align: left;
+      line-height: 28px;
+      color: #666;
+      flex-shrink: 0;
+    }
+    .form-item-label.required::after {
+      content: '*';
+      color: #ff4d4f;
+      margin-left: 2px;
+    }
+    .form-item-control {
+      flex: 1;
+      min-width: 0;
+    }
+    .input-box {
+      width: 100%;
+      height: 28px;
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      padding: 0 8px;
+      font-size: 12px;
+      box-sizing: border-box;
+      outline: none;
+      transition: all 0.2s;
+      color: #333;
+    }
+    .input-box:focus {
+      border-color: #1677ff;
+      box-shadow: 0 0 0 2px rgba(22, 119, 255, 0.1);
+    }
+    select.input-box {
+      padding-right: 24px;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 1024 1024' xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='rgba(0,0,0,0.45)'%3E%3Cpath d='M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 8px center;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+    
+    /* Table Styles */
+    .table-container {
+      width: 100%;
+      border: 1px solid #f0f0f0;
+      border-radius: 4px 4px 0 0;
+      border-bottom: none;
+    }
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+    .data-table th, .data-table td {
+      padding: 6px 12px;
+      border-bottom: 1px solid #f0f0f0;
+      word-break: break-all;
+    }
+    .data-table th {
+      background-color: #fafafa;
+      font-weight: 500;
+      color: #333;
+    }
+    .data-table tr.active {
+      background-color: #e6f4ff;
+    }
+    .data-table tr:hover:not(.active) {
+      background-color: #fafafa;
+    }
+
+    /* Timeline Styles */
+    .timeline {
+      position: relative;
+      padding-left: 20px;
+    }
+    .timeline-item {
+      position: relative;
+      padding-bottom: 16px;
+    }
+    .timeline-item:last-child {
+      padding-bottom: 0;
+    }
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: 6px;
+      top: 18px;
+      bottom: -6px;
+      width: 2px;
+      background-color: #f0f0f0;
+    }
+    .timeline-item:last-child::before {
+      display: none;
+    }
+    .timeline-icon {
+      position: absolute;
+      left: 0;
+      top: 4px;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #fff;
+    }
+    .timeline-icon.success { border: 2px solid #52c41a; }
+    .timeline-icon.success::after { content: ''; width: 6px; height: 6px; background: #52c41a; border-radius: 50%; }
+    .timeline-icon.processing { border: 2px solid #1677ff; }
+    .timeline-icon.processing::after { content: ''; width: 6px; height: 6px; background: #1677ff; border-radius: 50%; }
+    .timeline-icon.pending { border: 2px solid #d9d9d9; background: #f5f5f5;}
+    
+    .timeline-content {
+      margin-left: 12px;
+    }
+    .timeline-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 2px;
+    }
+    .timeline-title {
+      font-weight: 500;
+      color: #333;
+    }
+    .timeline-time {
+      color: #999;
+      font-size: 11px;
+    }
+    .timeline-desc {
+      color: #666;
+      font-size: 11px;
+      line-height: 1.4;
+    }
+
+    /* Top Cards */
+    .rule-card {
+      background: #fff;
+      border: 1px solid #d7e2ef;
+      border-radius: 8px;
+      padding: 10px;
+      display: flex;
+      gap: 12px;
+      cursor: pointer;
+      flex: 1;
+      min-width: 0;
+    }
+    .rule-card.active {
+      border-color: #1677ff;
+      box-shadow: 0 2px 8px rgba(22, 119, 255, 0.15);
+    }
+    .rule-card-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    
+    /* Metrics */
+    .metric-item {
+      text-align: center;
+      flex: 1;
+    }
+    .metric-value {
+      font-size: 18px;
+      font-weight: 600;
+      color: #333;
+      margin-top: 2px;
+    }
+    .metric-label {
+      font-size: 11px;
+      color: #666;
+    }
+
+  </style>
+</head>
+<body>
+<!-- BEGIN: MainHeader -->
+<header class="app-header">
+<div class="flex items-center gap-4">
+<div class="font-bold text-lg tracking-wide">UNIVIEW 固定资产管理系统</div>
+<nav class="flex gap-6 ml-8 text-sm">
+<a class="text-gray-300 hover:text-white" href="#">固定资产工作台</a>
+<a class="text-gray-300 hover:text-white" href="#">资产全景视图</a>
+<a class="text-gray-300 hover:text-white" href="#">大屏态势</a>
+<a class="text-gray-300 hover:text-white" href="#">流程协同</a>
+<a class="text-white font-medium border-b-2 border-blue-500 pb-[13px] pt-[15px]" href="#">系统运营中枢</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] rounded-full h-4 w-4 flex items-center justify-center">12</span>
+</div>
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-xs">U</div>
+<span>系统管理员 ∨</span>
+</div>
+</div>
+</header>
+<!-- END: MainHeader -->
+<div class="flex">
+<!-- BEGIN: Sidebar -->
+<aside class="app-sidebar">
+<div class="p-4 font-bold text-sm border-b border-gray-100">系统运营中枢</div>
+<div class="flex-1 py-2">
+<!-- Sidebar Menu Items -->
+<div class="mb-1">
+<div class="px-4 py-2 flex items-center justify-between text-gray-700 hover:bg-gray-50 cursor-pointer">
+<div class="flex items-center gap-2">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 6h16M4 10h16M4 14h16M4 18h16" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>流程平台</span>
+</div>
+<span class="text-xs">^</span>
+</div>
+</div>
+<div class="mb-1">
+<div class="px-4 py-2 flex items-center justify-between text-gray-700 hover:bg-gray-50 cursor-pointer">
+<div class="flex items-center gap-2">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>组织权限</span>
+</div>
+<span class="text-xs">^</span>
+</div>
+</div>
+<div class="mb-1">
+<div class="px-4 py-2 flex items-center justify-between text-gray-700 hover:bg-gray-50 cursor-pointer">
+<div class="flex items-center gap-2">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>基础资料</span>
+</div>
+<span class="text-xs">^</span>
+</div>
+</div>
+<div class="mb-1">
+<div class="px-4 py-2 flex items-center justify-between text-blue-600 bg-blue-50 font-medium cursor-pointer">
+<div class="flex items-center gap-2">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>集成配置</span>
+</div>
+<span class="text-xs transform rotate-180">^</span>
+</div>
+<div class="py-1">
+<a class="block px-10 py-1.5 text-gray-600 hover:text-blue-600 hover:bg-blue-50" href="#">外部系统配置</a>
+<a class="block px-10 py-1.5 text-gray-600 hover:text-blue-600 hover:bg-blue-50" href="#">接口配置</a>
+<a class="block px-10 py-1.5 text-gray-600 hover:text-blue-600 hover:bg-blue-50" href="#">字段映射</a>
+<a class="block px-10 py-1.5 text-white bg-blue-600 font-medium rounded-r-full mr-2" href="#">同步规则</a>
+<a class="block px-10 py-1.5 text-gray-600 hover:text-blue-600 hover:bg-blue-50" href="#">Webhook 配置</a>
+</div>
+</div>
+<div class="mb-1">
+<div class="px-4 py-2 flex items-center justify-between text-gray-700 hover:bg-gray-50 cursor-pointer">
+<div class="flex items-center gap-2">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>消息与通知</span>
+</div>
+<span class="text-xs">^</span>
+</div>
+</div>
+<div class="mb-1">
+<div class="px-4 py-2 flex items-center justify-between text-gray-700 hover:bg-gray-50 cursor-pointer">
+<div class="flex items-center gap-2">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>系统参数</span>
+</div>
+<span class="text-xs">^</span>
+</div>
+</div>
+</div>
+</aside>
+<!-- END: Sidebar -->
+<!-- BEGIN: MainContent -->
+<main class="main-content">
+<!-- Top Action Bar -->
+<div class="flex items-center justify-between pb-1">
+<h1 class="text-xl font-semibold">同步规则工作台</h1>
+<div class="flex gap-2">
+<button class="btn btn-default text-blue-600 border-blue-200">
+<svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 4v16m8-8H4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>新建规则
+          </button>
+<button class="btn btn-default text-blue-600 border-blue-200">
+<svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>试跑规则
+          </button>
+<button class="btn btn-default text-blue-600 border-blue-200">
+<svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>异常队列
+          </button>
+<button class="btn btn-default text-blue-600 border-blue-200">
+<svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>人工补发
+          </button>
+<button class="btn btn-default text-blue-600 border-blue-200">
+<svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>保存草稿
+          </button>
+<button class="btn btn-primary">
+<svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>提交校验
+          </button>
+</div>
+</div>
+<!-- Filter Bar -->
+<div class="panel p-2 flex items-center gap-4 bg-white">
+<div class="flex items-center gap-2 flex-1">
+<span class="text-gray-500 whitespace-nowrap">规则名称</span>
+<input class="input-box w-48" placeholder="请输入规则名称" type="text"/>
+</div>
+<div class="flex items-center gap-2 flex-1">
+<span class="text-gray-500 whitespace-nowrap">外部系统</span>
+<select class="input-box w-48 text-gray-400">
+<option>请选择</option>
+</select>
+</div>
+<div class="flex items-center gap-2 flex-1">
+<span class="text-gray-500 whitespace-nowrap">触发事件</span>
+<select class="input-box w-48 text-gray-400">
+<option>请选择</option>
+</select>
+</div>
+<div class="flex items-center gap-2 flex-1">
+<span class="text-gray-500 whitespace-nowrap">失败处理</span>
+<select class="input-box w-48 text-gray-400">
+<option>请选择</option>
+</select>
+</div>
+<div class="flex items-center gap-2 flex-1">
+<span class="text-gray-500 whitespace-nowrap">状态</span>
+<select class="input-box w-32 text-gray-400">
+<option>请选择</option>
+</select>
+</div>
+<div class="flex gap-2">
+<button class="btn btn-primary">查询</button>
+<button class="btn btn-default">重置</button>
+</div>
+</div>
+<!-- Rule Cards Row -->
+<div class="flex gap-4 h-[76px]">
+<!-- Card 1 -->
+<div class="rule-card">
+<div class="rule-card-icon bg-blue-500">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start">
+<h3 class="font-bold text-sm">MES 状态定时拉取</h3>
+<span class="status-tag status-tag-green">启用</span>
+</div>
+<div class="text-[11px] text-gray-500 mt-1">外部系统: MES</div>
+<div class="text-[11px] text-gray-500 mt-0.5">每 5 分钟 | 定时触发</div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="rule-card">
+<div class="rule-card-icon bg-purple-500">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start">
+<h3 class="font-bold text-sm">ERP 报废推送</h3>
+<span class="status-tag status-tag-green">启用</span>
+</div>
+<div class="text-[11px] text-gray-500 mt-1">外部系统: ERP</div>
+<div class="text-[11px] text-gray-500 mt-0.5">报废审批通过 | 事件触发</div>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="rule-card">
+<div class="rule-card-icon bg-emerald-500">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start">
+<h3 class="font-bold text-sm">EHR 赔偿扣款</h3>
+<span class="status-tag status-tag-green">启用</span>
+</div>
+<div class="text-[11px] text-gray-500 mt-1">外部系统: EHR</div>
+<div class="text-[11px] text-gray-500 mt-0.5">赔偿审批通过 | 事件触发</div>
+</div>
+</div>
+<!-- Card 4 (Active) -->
+<div class="rule-card active">
+<div class="rule-card-icon bg-orange-500">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start">
+<h3 class="font-bold text-sm text-blue-600">PO/合同金额变更同步</h3>
+<span class="status-tag status-tag-green">启用</span>
+</div>
+<div class="text-[11px] text-gray-500 mt-1">外部系统: ERP/采购合同系统</div>
+<div class="text-[11px] text-gray-500 mt-0.5 truncate">金额变更审批通过 | 事件触发</div>
+</div>
+</div>
+<!-- Add New Button -->
+<button class="rule-card justify-center items-center border-dashed hover:border-blue-500 hover:text-blue-500 text-gray-500 transition-colors">
+<svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 4v16m8-8H4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          新建同步规则
+        </button>
+</div>
+<!-- BEGIN: Workspace Area (y=260..675) -->
+<div class="flex gap-4 h-[445px]">
+<!-- Left: Rule List Table (625px) -->
+<div class="panel flex flex-col w-[625px]">
+<div class="panel-header">同步规则视图</div>
+<div class="flex-1 overflow-hidden relative">
+<div class="table-container h-[calc(100%-40px)] overflow-y-auto">
+<table class="data-table text-[11px]" style="line-height: 1.1;">
+<thead>
+<tr>
+<th class="w-[120px]" style="padding-top: 4px; padding-bottom: 4px;">规则名称</th>
+<th class="w-[70px]" style="padding-top: 4px; padding-bottom: 4px;">外部系统</th>
+<th class="w-[90px]" style="padding-top: 4px; padding-bottom: 4px;">触发事件</th>
+<th class="w-[90px]" style="padding-top: 4px; padding-bottom: 4px;">触发条件</th>
+<th class="w-[70px]" style="padding-top: 4px; padding-bottom: 4px;">重试策略</th>
+<th class="w-[80px]" style="padding-top: 4px; padding-bottom: 4px;">幂等键</th>
+<th class="w-[70px]" style="padding-top: 4px; padding-bottom: 4px;">失败处理</th>
+<th class="w-[50px]" style="padding-top: 4px; padding-bottom: 4px;">状态</th>
+<th class="w-[60px]" style="padding-top: 4px; padding-bottom: 4px;">操作</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="padding-top: 4px; padding-bottom: 4px;">MES 在线状态拉取</td>
+<td style="padding-top: 4px; padding-bottom: 4px;">MES</td>
+<td style="padding-top: 4px; padding-bottom: 4px;">定时拉取</td>
+<td style="padding-top: 4px; padding-bottom: 4px;">每 5 分钟</td>
+<td style="padding-top: 4px; padding-bottom: 4px;">3 次/30 秒</td>
+<td style="padding-top: 4px; padding-bottom: 4px;">asset_no+时间</td>
+<td style="padding-top: 4px; padding-bottom: 4px;">记录异常</td>
+<td style="padding-top: 4px; padding-bottom: 4px;"><span class="status-tag status-tag-green">启用</span></td>
+<td class="text-blue-600 cursor-pointer" style="padding-top: 4px; padding-bottom: 4px;">编辑 禁用<br/>复制 更多 v</td>
+</tr>
+<tr>
+<td style="padding-top: 4px; padding-bottom: 4px;">ERP 报废结果推送</td>
+<td style="padding-top: 4px; padding-bottom: 4px;">ERP</td>
+<td style="padding-top: 4px; padding-bottom: 4px;">报废审批通过</td>
+<td style="padding-top: 4px; padding-bottom: 4px;">状态=已通过</td>
+<td style="padding-top: 4px; padding-bottom: 4px;">3 次/60 秒</td>
+<td style="padding-top: 4px; padding-bottom: 4px;">asset_id+版本号</td>
+<td style="padding-top: 4px; padding-bottom: 4px;">进入异常队列</td>
+<td style="padding-top: 4px; padding-bottom: 4px;"><span class="status-tag status-tag-green">启用</span></td>
+<td class="text-blue-600 cursor-pointer" style="padding-top: 4px; padding-bottom: 4px;">编辑 禁用<br/>复制 更多 v</td>
+</tr>
+<tr>
+<td style="padding-top: 4px; padding-bottom: 4px;">EHR 赔偿扣款</td>
+<td style="padding-top: 4px; padding-bottom: 4px;">EHR</td>
+<td style="padding-top: 4px; padding-bottom: 4px;">赔偿审批通过</td>
+<td style="padding-top: 4px; padding-bottom: 4px;">金额&gt;0</td>
+<td style="padding-top: 4px; padding-bottom: 4px;">3 次/60 秒</td>
+<td style="padding-top: 4px; padding-bottom: 4px;">claim_id+版本号</td>
+<td style="padding-top: 4px; padding-bottom: 4px;">人工补发</td>
+<td style="padding-top: 4px; padding-bottom: 4px;"><span class="status-tag status-tag-green">启用</span></td>
+<td class="text-blue-600 cursor-pointer" style="padding-top: 4px; padding-bottom: 4px;">编辑 禁用<br/>复制 更多 v</td>
+</tr>
+<tr class="active">
+<td class="text-blue-600 font-medium" style="padding-top: 4px; padding-bottom: 4px;">PO/合同金额变更同步</td>
+<td style="padding-top: 4px; padding-bottom: 4px;">ERP/采购合同系统</td>
+<td style="padding-top: 4px; padding-bottom: 4px;">PO 变更审批通过、合同金额变更审批通过</td>
+<td style="padding-top: 4px; padding-bottom: 4px;">已核销只读保护;金额差异阈值&gt;0</td>
+<td style="padding-top: 4px; padding-bottom: 4px;">5 次/60 秒</td>
+<td style="padding-top: 4px; padding-bottom: 4px;">contract_id+版本号</td>
+<td style="padding-top: 4px; padding-bottom: 4px;">人工补发</td>
+<td style="padding-top: 4px; padding-bottom: 4px;"><span class="status-tag status-tag-green">启用</span></td>
+<td class="text-blue-600 cursor-pointer" style="padding-top: 4px; padding-bottom: 4px;">编辑 禁用<br/>复制 更多 v</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="flex justify-between items-center px-4 py-2 border-t border-gray-100 bg-white absolute bottom-0 w-full">
+<span class="text-gray-500">共 4 条</span>
+<div class="flex items-center gap-2">
+<select class="input-box w-[80px] h-[24px] py-0"><option>20 条/页</option></select>
+<button class="btn btn-default h-[24px] px-2 text-gray-400">&lt;</button>
+<button class="btn btn-primary h-[24px] px-3">1</button>
+<button class="btn btn-default h-[24px] px-2 text-gray-400">&gt;</button>
+<span class="text-gray-500">前往</span>
+<input class="input-box w-[40px] h-[24px] text-center" type="text" value="1"/>
+<span class="text-gray-500">页</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Center: Timeline (345px) -->
+<div class="panel flex flex-col w-[345px]">
+<div class="panel-header">事件流程时间线（PO/合同金额变更同步）</div>
+<div class="panel-body flex-1 overflow-y-auto pt-4">
+<div class="timeline">
+<!-- Item 1 -->
+<div class="timeline-item">
+<div class="timeline-icon success"></div>
+<div class="timeline-content">
+<div class="timeline-header">
+<span class="timeline-title">审批通过</span>
+<span class="timeline-time">2025-05-20 10:15:23</span>
+</div>
+<div class="timeline-desc">PO 变更审批通过 / 合同金额变更审批通过</div>
+</div>
+</div>
+<!-- Item 2 -->
+<div class="timeline-item">
+<div class="timeline-icon success"></div>
+<div class="timeline-content">
+<div class="timeline-header">
+<span class="timeline-title">条件校验</span>
+<span class="timeline-time">2025-05-20 10:15:24</span>
+</div>
+<div class="timeline-desc">已核销只读保护: 未核销<br/>金额差异阈值 &gt; 0: 5,000 &gt; 0</div>
+</div>
+</div>
+<!-- Item 3 -->
+<div class="timeline-item">
+<div class="timeline-icon processing"></div>
+<div class="timeline-content">
+<div class="timeline-header">
+<span class="timeline-title text-blue-600">调用接口</span>
+<span class="timeline-time">2025-05-20 10:15:25</span>
+</div>
+<div class="timeline-desc bg-gray-50 p-2 rounded mt-1 border border-gray-100">
+<div class="text-gray-700 font-mono mb-1">POST /api/contract/amount/change</div>
+<div class="flex gap-2 mt-1">
+<span class="text-blue-600 border border-blue-200 bg-blue-50 px-2 py-0.5 rounded text-[10px]">第 1 次重试</span>
+<span class="text-blue-600 border border-blue-200 bg-blue-50 px-2 py-0.5 rounded text-[10px]">耗时 1.23s</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Item 4 -->
+<div class="timeline-item">
+<div class="timeline-icon success"></div>
+<div class="timeline-content">
+<div class="timeline-header">
+<span class="timeline-title">接收回执</span>
+<span class="timeline-time">2025-05-20 10:15:26</span>
+</div>
+<div class="timeline-desc">HTTP 200 OK<br/>业务编码: 0000 <span class="text-green-500">成功</span></div>
+</div>
+</div>
+<!-- Item 5 -->
+<div class="timeline-item">
+<div class="timeline-icon pending"></div>
+<div class="timeline-content">
+<div class="timeline-header">
+<span class="timeline-title text-gray-500">归档/异常队列</span>
+<span class="timeline-time">待归档</span>
+</div>
+<div class="timeline-desc text-gray-400">归档到同步日志</div>
+</div>
+</div>
+</div>
+<div class="flex gap-4 mt-2 justify-center text-[10px] text-gray-500">
+<div class="flex items-center gap-1"><div class="w-1.5 h-1.5 bg-green-500 rounded-full"></div>成功</div>
+<div class="flex items-center gap-1"><div class="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>进行中</div>
+<div class="flex items-center gap-1"><div class="w-1.5 h-1.5 bg-orange-500 rounded-full"></div>警告</div>
+<div class="flex items-center gap-1"><div class="w-1.5 h-1.5 bg-red-500 rounded-full"></div>失败</div>
+<div class="flex items-center gap-1"><div class="w-1.5 h-1.5 bg-gray-400 rounded-full"></div>待处理</div>
+</div>
+</div>
+</div>
+<!-- Right: Editor (370px) -->
+<div class="panel flex flex-col w-[370px] relative">
+<div class="panel-header">同步规则配置编辑区</div>
+<div class="panel-body flex-1 pb-16">
+<div class="form-item" style="margin-bottom: 6px;">
+<div class="form-item-label required" style="height: 24px; line-height: 24px;">配置名称</div>
+<div class="form-item-control">
+<input class="input-box" style="height: 24px; line-height: 24px;" type="text" value="PO/合同金额变更同步"/>
+</div>
+</div>
+<div class="form-item" style="margin-bottom: 6px;">
+<div class="form-item-label required" style="height: 24px; line-height: 24px;">外部系统</div>
+<div class="form-item-control">
+<select class="input-box" style="height: 24px; line-height: 24px;"><option>ERP/采购合同系统</option></select>
+</div>
+</div>
+<div class="form-item" style="margin-bottom: 6px;">
+<div class="form-item-label required" style="height: 24px; line-height: 24px;">接口端点</div>
+<div class="form-item-control relative">
+<input class="input-box pr-6" style="height: 24px; line-height: 24px;" type="text" value="/api/contract/amount/change"/>
+<svg class="w-3.5 h-3.5 text-gray-400 absolute right-2 top-1.5 cursor-pointer" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+</div>
+<div class="form-item" style="margin-bottom: 6px;">
+<div class="form-item-label required" style="height: 24px; line-height: 24px;">触发事件</div>
+<div class="form-item-control">
+<select class="input-box" style="height: 24px; line-height: 24px;"><option>PO 变更审批通过、合同金额变更审批通过</option></select>
+</div>
+</div>
+<div class="form-item" style="margin-bottom: 6px;">
+<div class="form-item-label required" style="height: 24px; line-height: 24px;">触发条件</div>
+<div class="form-item-control">
+<textarea class="input-box h-[44px] py-1 resize-none" style="height: 36px;">已核销只读保护: 已核销则只读不推送;
+金额差异阈值&gt;0 时才推送变更。</textarea>
+</div>
+</div>
+<div class="form-item" style="margin-bottom: 6px;">
+<div class="form-item-label required" style="height: 24px; line-height: 24px;">重试次数</div>
+<div class="form-item-control">
+<select class="input-box" style="height: 24px; line-height: 24px;"><option>5 次</option></select>
+</div>
+</div>
+<div class="form-item" style="margin-bottom: 6px;">
+<div class="form-item-label required" style="height: 24px; line-height: 24px;">重试间隔</div>
+<div class="form-item-control">
+<select class="input-box" style="height: 24px; line-height: 24px;"><option>60 秒</option></select>
+</div>
+</div>
+<div class="form-item" style="margin-bottom: 6px;">
+<div class="form-item-label required" style="height: 24px; line-height: 24px;">幂等键</div>
+<div class="form-item-control">
+<select class="input-box" style="height: 24px; line-height: 24px;"><option>contract_id+版本号</option></select>
+</div>
+</div>
+<div class="form-item" style="margin-bottom: 6px;">
+<div class="form-item-label required" style="height: 24px; line-height: 24px;">失败处理</div>
+<div class="form-item-control">
+<select class="input-box" style="height: 24px; line-height: 24px;"><option>人工补发</option></select>
+</div>
+</div>
+<div class="form-item mb-0" style="margin-bottom: 6px;">
+<div class="form-item-label required" style="height: 24px; line-height: 24px;">审计要求</div>
+<div class="form-item-control">
+<select class="input-box" style="height: 24px; line-height: 24px;"><option>记录变更明细 (操作人、金额、差异值、版本号)</option></select>
+</div>
+</div>
+</div>
+<!-- Editor Bottom Actions -->
+<div class="absolute bottom-0 w-full p-3 border-t border-gray-100 bg-white rounded-b-lg flex justify-between gap-2">
+<button class="btn btn-default flex-1">保存草稿</button>
+<button class="btn btn-primary flex-1">提交校验</button>
+<button class="btn btn-default flex-1 text-blue-600 border-blue-600">试跑规则</button>
+</div>
+</div>
+</div>
+<!-- END: Workspace Area -->
+<!-- BEGIN: Bottom Dashboard (y=690..955) -->
+<div class="flex gap-4 h-[253px]">
+<!-- Left: Error Queue -->
+<div class="panel flex flex-col w-[480px]">
+<div class="panel-header flex justify-between items-center border-none pb-0">
+<span>异常队列与人工补发</span>
+</div>
+<div class="panel-body pt-2 flex-1 relative">
+<table class="data-table text-[11px] text-center">
+<thead>
+<tr>
+<th class="text-center w-[120px]">发生时间</th>
+<th class="text-center w-[90px]">规则名称</th>
+<th class="text-center w-[110px]">业务标识</th>
+<th class="text-center w-[80px]">错误信息</th>
+<th class="text-center w-[60px]">失败处理</th>
+<th class="text-center w-[60px]">重试次数</th>
+<th class="text-center w-[80px]">操作</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="text-gray-500">2025-05-20 09:45:12</td>
+<td>ERP 报废结果推送</td>
+<td>ASSET202505200012</td>
+<td>远端系统超时</td>
+<td>人工补发</td>
+<td>2/3</td>
+<td><button class="btn-text">补发</button> <button class="btn-text">详情</button></td>
+</tr>
+<tr>
+<td class="text-gray-500">2025-05-20 08:32:45</td>
+<td>EHR 赔偿扣款</td>
+<td>CLAIM202505200021</td>
+<td>接口返回 500</td>
+<td>人工补发</td>
+<td>1/3</td>
+<td><button class="btn-text">补发</button> <button class="btn-text">详情</button></td>
+</tr>
+</tbody>
+</table>
+<div class="absolute bottom-2 right-4">
+<a class="text-blue-600 text-xs" href="#">查看全部 (2)</a>
+</div>
+</div>
+</div>
+<!-- Center: Monitoring -->
+<div class="panel flex flex-col flex-1">
+<div class="panel-header flex justify-between items-center border-none pb-0">
+<span>幂等与重试监控 <span class="text-gray-400 font-normal">（近 24 小时）</span></span>
+</div>
+<div class="panel-body pt-2 flex-1 relative flex flex-col">
+<!-- Metrics -->
+<div class="flex mb-2">
+<div class="metric-item">
+<div class="metric-label">总调用数</div>
+<div class="metric-value">1,286</div>
+</div>
+<div class="metric-item">
+<div class="metric-label">成功</div>
+<div class="metric-value">1,214</div>
+</div>
+<div class="metric-item">
+<div class="metric-label">失败</div>
+<div class="metric-value">20</div>
+</div>
+<div class="metric-item">
+<div class="metric-label">重试次数</div>
+<div class="metric-value">52</div>
+</div>
+<div class="metric-item">
+<div class="metric-label">幂等拦截</div>
+<div class="metric-value">37</div>
+</div>
+</div>
+<!-- Table -->
+<table class="data-table text-[11px] text-center border-t border-gray-100 flex-1">
+<thead>
+<tr>
+<th class="text-left w-[140px] pl-4">规则名称</th>
+<th class="text-center">调用数</th>
+<th class="text-center">成功数</th>
+<th class="text-center">失败数</th>
+<th class="text-center">重试次数</th>
+<th class="text-center">幂等拦截</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="text-left pl-4">MES 在线状态拉取</td>
+<td>288</td><td>288</td><td>0</td><td>0</td><td>12</td>
+</tr>
+<tr>
+<td class="text-left pl-4">ERP 报废结果推送</td>
+<td>356</td><td>342</td><td>4</td><td>18</td><td>9</td>
+</tr>
+<tr>
+<td class="text-left pl-4">EHR 赔偿扣款</td>
+<td>298</td><td>280</td><td>6</td><td>16</td><td>8</td>
+</tr>
+<tr>
+<td class="text-left pl-4">PO/合同金额变更同步</td>
+<td>344</td><td>384</td><td>10</td><td>18</td><td>8</td>
+</tr>
+</tbody>
+</table>
+<div class="absolute bottom-2 right-4">
+<a class="text-blue-600 text-xs" href="#">查看监控详情</a>
+</div>
+</div>
+</div>
+<!-- Right: Publish Gate -->
+<div class="panel flex flex-col w-[300px]">
+<div class="panel-header border-none pb-0">发布门禁</div>
+<div class="panel-body pt-2 flex-1 flex flex-col">
+<div class="flex-1 space-y-2">
+<div class="flex items-center justify-between text-[11px]">
+<div class="flex items-center gap-2">
+<div class="w-4 h-4 rounded-full bg-green-100 flex items-center justify-center text-green-500"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"></path></svg></div>
+<span class="text-gray-700">字段映射已确认</span>
+</div>
+<span class="text-green-500">通过</span>
+</div>
+<div class="flex items-center justify-between text-[11px]">
+<div class="flex items-center gap-2">
+<div class="w-4 h-4 rounded-full bg-green-100 flex items-center justify-center text-green-500"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"></path></svg></div>
+<span class="text-gray-700">核销状态只读保护</span>
+</div>
+<span class="text-green-500">通过</span>
+</div>
+<div class="flex items-center justify-between text-[11px]">
+<div class="flex items-center gap-2">
+<div class="w-4 h-4 rounded-full bg-green-100 flex items-center justify-center text-green-500"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"></path></svg></div>
+<span class="text-gray-700">样例试跑通过</span>
+</div>
+<span class="text-green-500">通过</span>
+</div>
+<div class="flex items-center justify-between text-[11px]">
+<div class="flex items-center gap-2">
+<div class="w-4 h-4 rounded-full bg-green-100 flex items-center justify-center text-green-500"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"></path></svg></div>
+<span class="text-gray-700">审计字段完整</span>
+</div>
+<span class="text-green-500">通过</span>
+</div>
+<div class="flex items-center justify-between text-[11px]">
+<div class="flex items-center gap-2">
+<div class="w-4 h-4 rounded-full bg-orange-100 flex items-center justify-center text-orange-500 font-bold">!</div>
+<span class="text-gray-700">金额差异阈值待复核</span>
+</div>
+<span class="text-orange-500">待复核</span>
+</div>
+</div>
+<div class="mt-auto pt-2 flex flex-col items-center">
+<button class="btn btn-disabled w-full h-7 mb-1">发布</button>
+<span class="text-gray-400 text-[10px]">存在待复核项，发布按钮已禁用</span>
+</div>
+</div>
+</div>
+</div>
+<!-- END: Bottom Dashboard -->
+</main>
+<!-- END: MainContent -->
+</div>
+</body></html>

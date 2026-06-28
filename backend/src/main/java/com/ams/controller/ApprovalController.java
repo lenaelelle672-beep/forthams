@@ -1,6 +1,9 @@
 package com.ams.controller;
 
+import com.ams.annotation.OperBusinessType;
+import com.ams.annotation.OperLog;
 import com.ams.common.exception.BusinessException;
+import com.ams.common.Result;
 import com.ams.dto.ApprovalActionDTO;
 import com.ams.dto.ApprovalCreateDTO;
 import com.ams.entity.ApprovalProcess;
@@ -8,11 +11,10 @@ import com.ams.service.ApprovalService;
 import com.ams.utils.JwtUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.validation.Valid;
-import com.ams.common.Result;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -51,6 +53,7 @@ public class ApprovalController {
     }
 
     @PreAuthorize("@ss.hasPermi('approval:process:create')")
+    @OperLog(title = "审批发起", businessType = OperBusinessType.INSERT)
     @PostMapping
     public Result<ApprovalProcess> create(@Valid @RequestBody ApprovalCreateDTO dto, HttpServletRequest request) {
         dto.setApplicantId(getCurrentUserId(request));
@@ -58,6 +61,7 @@ public class ApprovalController {
     }
 
     @PreAuthorize("@ss.hasPermi('approval:process:approve')")
+    @OperLog(title = "审批通过", businessType = OperBusinessType.UPDATE)
     @PostMapping("/{id}/approve")
     public Result<ApprovalProcess> approve(@PathVariable Long id, @Valid @RequestBody ApprovalActionDTO dto,
                                            HttpServletRequest request) {
@@ -66,6 +70,7 @@ public class ApprovalController {
 
     /** 驳回审批 */
     @PreAuthorize("@ss.hasPermi('approval:process:reject')")
+    @OperLog(title = "审批驳回", businessType = OperBusinessType.UPDATE)
     @PostMapping("/{id}/reject")
     public Result<ApprovalProcess> reject(@PathVariable Long id, @Valid @RequestBody ApprovalActionDTO dto,
                                           HttpServletRequest request) {
@@ -73,6 +78,7 @@ public class ApprovalController {
     }
 
     @PreAuthorize("@ss.hasPermi('approval:process:cancel')")
+    @OperLog(title = "审批取消", businessType = OperBusinessType.UPDATE)
     @PostMapping("/{id}/cancel")
     public Result<ApprovalProcess> cancel(@PathVariable Long id, HttpServletRequest request) {
         return Result.success(approvalService.cancelProcess(id, getCurrentUserId(request)));

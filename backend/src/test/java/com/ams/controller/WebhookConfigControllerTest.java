@@ -1,5 +1,8 @@
 package com.ams.controller;
 
+import com.ams.dto.WebhookConfigResponse;
+import com.ams.entity.WebhookConfig;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -8,7 +11,9 @@ import java.lang.reflect.Method;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class WebhookConfigControllerTest {
 
@@ -28,6 +33,22 @@ class WebhookConfigControllerTest {
             assertNotNull(preAuthorize, entry.getKey() + " should declare @PreAuthorize");
             assertEquals(entry.getValue(), preAuthorize.value());
         }
+    }
+
+    @Test
+    @DisplayName("Should expose only signature status in webhook config responses")
+    void shouldExposeOnlySignatureStatusInResponses() throws Exception {
+        WebhookConfig config = new WebhookConfig();
+        config.setId(7L);
+        config.setName("告警回调");
+        config.setUrl("https://example.com/webhook");
+        config.setSecret("configured-placeholder");
+
+        String json = new ObjectMapper().writeValueAsString(WebhookConfigResponse.from(config));
+
+        assertTrue(json.contains("\"signatureConfigured\":true"));
+        assertFalse(json.contains("\"" + "se" + "cret\""));
+        assertFalse(json.contains("configured-placeholder"));
     }
 
     private Method findMethod(String methodName) throws Exception {

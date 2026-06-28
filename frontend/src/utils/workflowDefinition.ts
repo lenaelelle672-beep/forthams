@@ -11,9 +11,21 @@ const defaultNodeData: FlowNodeData = {
   type: 'approval', label: '', description: '', nodeCode: '', triggerType: '',
   approverType: 'role', approverRole: '', approverRoleName: '', approverId: '', approvalMode: 'sequence',
   conditionExpression: '', trueLabel: '', falseLabel: '', resultAction: '',
+  formSource: '', formSectionName: '', formSummaryFields: '', ccRoleCodes: '', ccUserIds: '',
 };
 
 function text(v: unknown) { return typeof v === 'string' ? v.trim() : ''; }
+function isPresent(v: unknown) { return v != null && v !== ''; }
+function csvValues(value: string) { return value.split(',').map((v) => v.trim()).filter(Boolean); }
+
+const MAX_FORM_SOURCE_LENGTH = 50_000;
+const MAX_FORM_META_LENGTH = 1_000;
+const CONDITION_EXPRESSION_PATTERN = /^[\u4e00-\u9fffA-Za-z0-9_.-]+\s*(>=|<=|==|!=|>(?!=)|<(?!=))\s*\S.*$/;
+const COMPOUND_CONDITION_PATTERN = /\s+(AND|OR)(\s+|$)/i;
+const NODE_TYPES = new Set<FlowNodeType>(['start', 'approval', 'task', 'cc', 'condition', 'end']);
+const EXECUTABLE_NODE_TYPES = new Set<FlowNodeType>(['approval', 'task']);
+const CC_ROLE_PATTERN = /^[A-Za-z0-9_.:-]+$/;
+const CC_USER_ID_PATTERN = /^\d+$/;
 
 function normalizeNode(node: FlowNode): FlowNode {
   const type = (node.type ?? node.data.type) as FlowNodeType;
@@ -29,6 +41,11 @@ function normalizeEdge(edge: FlowEdge): FlowEdge {
     style: edge.style ?? defaultStyle, labelStyle: edge.labelStyle ?? defaultLabelStyle,
     labelBgStyle: edge.labelBgStyle ?? defaultLabelBgStyle,
   };
+}
+
+export function isValidSimpleConditionExpression(value: unknown) {
+  const expression = text(value);
+  return Boolean(expression) && CONDITION_EXPRESSION_PATTERN.test(expression) && !COMPOUND_CONDITION_PATTERN.test(expression);
 }
 
 export function normalizeWorkflowDefinition(definition: FlowDefinition, businessType: string): WorkflowDefinitionPayload {
@@ -52,25 +69,62 @@ export function validateWorkflowDefinition(definition: WorkflowDefinitionPayload
   if (!text(definition.businessType)) errors.push('业务流程类型不能为空');
   if (definition.nodes.length === 0) errors.push('流程定义至少需要一个节点');
 
+  const validateCcRecipients = (node: FlowNode, required: boolean) => {
+    const ccRoleCodes = text((node.data as Record<string, unknown>).ccRoleCodes);
+    const ccUserIds = text((node.data as Record<string, unknown>).ccUserIds);
+    if (!ccRoleCodes && !ccUserIds) {
+      if (required) errors.push(`抄送节点${node.id}必须配置抄送角色或抄送用户`);
+      return;
+    }
+    for (const roleCode of csvValues(ccRoleCodes)) {
+      if (!CC_ROLE_PATTERN.test(roleCode)) errors.push(`抄送节点${node.id}抄送角色格式无效：${roleCode}`);
+    }
+    for (const userId of csvValues(ccUserIds)) {
+      if (!CC_USER_ID_PATTERN.test(userId)) errors.push(`抄送节点${node.id}抄送用户ID格式无效：${userId}`);
+    }
+  };
+
   for (const node of definition.nodes) {
     if (!text(node.id)) { errors.push('流程节点ID不能为空'); continue; }
     if (nodeById.has(node.id)) errors.push(`流程节点ID重复：${node.id}`);
     nodeById.set(node.id, node);
     if (!node.type) errors.push(`节点${node.id}类型不能为空`);
+    else if (!NODE_TYPES.has(node.type as FlowNodeType)) errors.push(`不支持的流程节点类型：${node.type}`);
     if (!Number.isFinite(node.position.x) || !Number.isFinite(node.position.y)) errors.push(`节点${node.id}坐标不能为空`);
     if (node.data.type !== node.type) errors.push(`节点${node.id}的类型与数据类型不一致`);
     if (!text(node.data.label)) errors.push(`节点${node.id}名称不能为空`);
     if (!text(node.data.description)) errors.push(`节点${node.id}说明不能为空`);
     if (!text(node.data.nodeCode)) errors.push(`节点${node.id}编码不能为空`);
     if (node.type === 'start' && !text(node.data.triggerType)) errors.push('开始节点触发方式不能为空');
-    if (node.type === 'approval') {
+    if (node.type === 'start' || node.type === 'approval') {
+      const data = node.data as Record<string, unknown>;
+      if (typeof data.formSource !== 'string') {
+        errors.push(`节点${node.id}的环节子表单必须是字符串`);
+      } else if (!text(data.formSource)) {
+        errors.push(`节点${node.id}必须配置环节子表单 HTML`);
+      } else if (data.formSource.length > MAX_FORM_SOURCE_LENGTH) {
+        errors.push(`节点${node.id}的环节子表单 HTML 不能超过 ${MAX_FORM_SOURCE_LENGTH} 字符`);
+      }
+      for (const key of ['formSectionName', 'formSummaryFields']) {
+        const value = data[key];
+        if (isPresent(value) && typeof value !== 'string') errors.push(`节点${node.id}的${key}必须是字符串`);
+        if (typeof value === 'string' && value.length > MAX_FORM_META_LENGTH) errors.push(`节点${node.id}的${key}不能超过 ${MAX_FORM_META_LENGTH} 字符`);
+      }
+    }
+    if (EXECUTABLE_NODE_TYPES.has(node.type as FlowNodeType)) {
+      const noun = node.type === 'task' ? '办理' : '审批';
       const at = (node.data as Record<string, unknown>).approverType;
-      if (at === 'user') { if (!text((node.data as Record<string, unknown>).approverId)) errors.push(`审批节点${node.id}指定用户审批时审批人不能为空`); }
-      else { if (!text(node.data.approverRole)) errors.push(`审批节点${node.id}审批角色不能为空`); }
-      if (!['sequence', 'all', 'any'].includes(node.data.approvalMode)) errors.push(`审批节点${node.id}审批模式无效`);
+      if (at === 'user') { if (!text((node.data as Record<string, unknown>).approverId)) errors.push(`${noun}节点${node.id}指定用户${noun}时${noun}人不能为空`); }
+      else { if (!text(node.data.approverRole)) errors.push(`${noun}节点${node.id}${noun}角色不能为空`); }
+      if (!['sequence', 'all', 'any'].includes(node.data.approvalMode)) errors.push(`${noun}节点${node.id}${noun}模式仅支持 sequence/all/any`);
+      validateCcRecipients(node, false);
+    }
+    if (node.type === 'cc') {
+      validateCcRecipients(node, true);
     }
     if (node.type === 'condition') {
       if (!text(node.data.conditionExpression)) errors.push(`条件节点${node.id}表达式不能为空`);
+      else if (!isValidSimpleConditionExpression(node.data.conditionExpression)) errors.push(`条件节点${node.id}表达式仅支持简单表达式：字段名 操作符 值`);
       if (!text(node.data.trueLabel)) errors.push(`条件节点${node.id}满足标签不能为空`);
       if (!text(node.data.falseLabel)) errors.push(`条件节点${node.id}不满足标签不能为空`);
     }
@@ -78,10 +132,10 @@ export function validateWorkflowDefinition(definition: WorkflowDefinitionPayload
   }
 
   const starts = definition.nodes.filter((n) => n.type === 'start');
-  const approvals = definition.nodes.filter((n) => n.type === 'approval');
+  const executableNodes = definition.nodes.filter((n) => EXECUTABLE_NODE_TYPES.has(n.type as FlowNodeType));
   const ends = definition.nodes.filter((n) => n.type === 'end');
   if (starts.length !== 1) errors.push('流程必须且只能包含一个开始节点');
-  if (approvals.length === 0) errors.push('流程至少需要一个审批节点');
+  if (executableNodes.length === 0) errors.push('流程至少需要一个审批或办理节点');
   if (ends.length !== 1) errors.push('流程必须且只能包含一个结束节点');
 
   for (const edge of definition.edges) {
@@ -100,7 +154,12 @@ export function validateWorkflowDefinition(definition: WorkflowDefinitionPayload
     if (src.type === 'condition') {
       const h = String(edge.sourceHandle ?? '');
       if (h !== 'condition-true' && h !== 'condition-false') errors.push(`条件节点${src.id}连线必须使用满足或不满足出口`);
-      const hs = condHandles.get(src.id) ?? new Set<string>(); hs.add(h); condHandles.set(src.id, hs);
+      const hs = condHandles.get(src.id) ?? new Set<string>();
+      if (h === 'condition-true' || h === 'condition-false') {
+        if (hs.has(h)) errors.push(`条件节点${src.id}只能配置一条${h === 'condition-true' ? '满足' : '不满足'}分支`);
+        hs.add(h);
+      }
+      condHandles.set(src.id, hs);
     }
   }
 

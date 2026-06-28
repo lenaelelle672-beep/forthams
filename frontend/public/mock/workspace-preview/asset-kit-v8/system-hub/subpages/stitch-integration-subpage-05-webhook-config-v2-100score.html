@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=1586, height=992, initial-scale=1.0" name="viewport"/>
+<title>Webhook 配置工作台</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+<style data-purpose="custom-utilities">
+    :root {
+      --primary: #1677ff;
+      --border: #f0f0f0;
+      --text-main: #333;
+      --text-secondary: #666;
+      --bg-light: #fafafa;
+    }
+    body {
+      width: 1586px;
+      height: 992px;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      font-size: 13px;
+      color: var(--text-main);
+      background-color: #f5f7fa;
+    }
+    .scrollbar-hide::-webkit-scrollbar {
+      display: none;
+    }
+    .scrollbar-hide {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    .ant-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 15px;
+      height: 30px;
+      border-radius: 4px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .ant-btn-primary {
+      background-color: var(--primary);
+      color: white;
+      border: 1px solid var(--primary);
+    }
+    .ant-btn-default {
+      background-color: white;
+      color: var(--text-main);
+      border: 1px solid #d9d9d9;
+    }
+    .ant-btn-dashed {
+      background-color: white;
+      color: var(--text-main);
+      border: 1px dashed #d9d9d9;
+    }
+    .ant-input {
+      height: 30px;
+      padding: 4px 11px;
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      width: 100%;
+    }
+    .ant-select {
+      height: 30px;
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      padding: 0 11px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: white;
+      cursor: pointer;
+    }
+    .card-panel {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+    }
+    .compact-table th, .compact-table td {
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+    }
+    .compact-table th {
+      background: var(--bg-light);
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+    .form-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .form-label {
+      width: 80px;
+      text-align: right;
+      padding-right: 12px;
+      color: var(--text-secondary);
+    }
+    .form-label::before {
+      content: '*';
+      color: #ff4d4f;
+      margin-right: 4px;
+    }
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 6px;
+    }
+    .bg-success { background-color: #52c41a; }
+    .bg-error { background-color: #ff4d4f; }
+    .bg-warning { background-color: #faad14; }
+    .text-success { color: #52c41a; }
+    .text-error { color: #ff4d4f; }
+    .text-warning { color: #faad14; }
+  </style>
+</head>
+<body class="flex flex-col">
+<!-- BEGIN: Top Navigation -->
+<header class="h-[52px] bg-[#001529] text-white flex items-center px-4 shrink-0 justify-between">
+<div class="flex items-center space-x-8">
+<div class="flex items-center space-x-2 text-lg font-bold">
+<span>uniview | 固定资产管理系统</span>
+</div>
+<nav class="flex space-x-1">
+<a class="px-4 py-1.5 text-gray-300 hover:text-white rounded" href="#">固定资产工作台</a>
+<a class="px-4 py-1.5 text-gray-300 hover:text-white rounded" href="#">资产全景视图</a>
+<a class="px-4 py-1.5 text-gray-300 hover:text-white rounded" href="#">大屏态势</a>
+<a class="px-4 py-1.5 text-gray-300 hover:text-white rounded" href="#">流程协同</a>
+<a class="px-4 py-1.5 bg-[#1677ff] text-white rounded" href="#">系统运营中枢</a>
+</nav>
+</div>
+<div class="flex items-center space-x-4 text-gray-300">
+<div class="relative cursor-pointer hover:text-white">
+<i class="fa-regular fa-bell text-lg"></i>
+<span class="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[10px] px-1 rounded-full border border-[#001529]">12</span>
+</div>
+<i class="fa-regular fa-circle-question text-lg cursor-pointer hover:text-white"></i>
+<i class="fa-solid fa-gear text-lg cursor-pointer hover:text-white"></i>
+<div class="flex items-center space-x-2 cursor-pointer hover:text-white">
+<div class="w-7 h-7 bg-gray-400 rounded-full flex items-center justify-center text-white text-xs">A</div>
+<span class="text-sm">系统管理员 <i class="fa-solid fa-caret-down text-xs ml-1"></i></span>
+</div>
+</div>
+</header>
+<!-- END: Top Navigation -->
+<div class="flex flex-1 overflow-hidden">
+<!-- BEGIN: Left Sidebar -->
+<aside class="w-[222px] bg-white border-r border-[#f0f0f0] flex flex-col shrink-0">
+<div class="p-4 font-bold text-gray-800">系统设置</div>
+<nav class="flex-1 overflow-y-auto scrollbar-hide py-2">
+<a class="flex items-center px-4 py-2.5 text-gray-600 hover:bg-gray-50" href="#">
+<i class="fa-regular fa-sitemap w-6 text-center"></i> 组织与权限
+        </a>
+<a class="flex items-center px-4 py-2.5 text-gray-600 hover:bg-gray-50" href="#">
+<i class="fa-regular fa-user w-6 text-center"></i> 用户与角色
+        </a>
+<div class="group">
+<a class="flex items-center justify-between px-4 py-2.5 text-gray-600 hover:bg-gray-50" href="#">
+<div class="flex items-center"><i class="fa-regular fa-database w-6 text-center"></i> 基础数据</div>
+<i class="fa-solid fa-angle-down text-xs"></i>
+</a>
+</div>
+<a class="flex items-center px-4 py-2.5 text-gray-600 hover:bg-gray-50" href="#">
+<i class="fa-solid fa-barcode w-6 text-center"></i> 编码规则
+        </a>
+<a class="flex items-center px-4 py-2.5 text-gray-600 hover:bg-gray-50" href="#">
+<i class="fa-solid fa-code-branch w-6 text-center"></i> 流程配置
+        </a>
+<a class="flex items-center px-4 py-2.5 text-gray-600 hover:bg-gray-50" href="#">
+<i class="fa-regular fa-bell w-6 text-center"></i> 消息通知
+        </a>
+<div class="group">
+<a class="flex items-center justify-between px-4 py-2.5 text-[#1677ff] bg-[#e6f4ff]" href="#">
+<div class="flex items-center"><i class="fa-solid fa-link w-6 text-center"></i> 集成配置</div>
+<i class="fa-solid fa-angle-up text-xs"></i>
+</a>
+<div class="pl-10 py-1 space-y-1">
+<a class="block py-1.5 text-gray-600 hover:text-[#1677ff]" href="#">外部系统档案</a>
+<a class="block py-1.5 text-gray-600 hover:text-[#1677ff]" href="#">接口配置</a>
+<a class="block py-1.5 text-[#1677ff] font-medium" href="#">Webhook 配置</a>
+<a class="block py-1.5 text-gray-600 hover:text-[#1677ff]" href="#">字段映射</a>
+<a class="block py-1.5 text-gray-600 hover:text-[#1677ff]" href="#">同步规则</a>
+</div>
+</div>
+<div class="group">
+<a class="flex items-center justify-between px-4 py-2.5 text-gray-600 hover:bg-gray-50" href="#">
+<div class="flex items-center"><i class="fa-solid fa-shield-halved w-6 text-center"></i> 安全与审计</div>
+<i class="fa-solid fa-angle-down text-xs"></i>
+</a>
+</div>
+<div class="group">
+<a class="flex items-center justify-between px-4 py-2.5 text-gray-600 hover:bg-gray-50" href="#">
+<div class="flex items-center"><i class="fa-solid fa-gear w-6 text-center"></i> 系统运维</div>
+<i class="fa-solid fa-angle-down text-xs"></i>
+</a>
+</div>
+</nav>
+</aside>
+<!-- END: Left Sidebar -->
+<!-- BEGIN: Main Content -->
+<main class="flex-1 flex flex-col p-4 space-y-3 overflow-hidden relative">
+<!-- Top Actions & Filters -->
+<div class="flex justify-between items-start shrink-0">
+<div>
+<h1 class="text-xl font-bold text-gray-800 mb-1">Webhook 配置工作台</h1>
+<p class="text-gray-500 text-xs">统一维护外部回调订阅、签名校验、幂等键、回调日志和失败重放。</p>
+</div>
+<div class="flex space-x-2">
+<button class="ant-btn ant-btn-primary"><i class="fa-solid fa-plus mr-1"></i> 新建 Webhook</button>
+<button class="ant-btn ant-btn-default"><i class="fa-regular fa-paper-plane mr-1"></i> 发送测试事件</button>
+<button class="ant-btn ant-btn-default"><i class="fa-solid fa-check-double mr-1"></i> 签名校验</button>
+<button class="ant-btn ant-btn-default"><i class="fa-solid fa-rotate-right mr-1"></i> 重试队列</button>
+<button class="ant-btn ant-btn-default text-[#1677ff] border-[#1677ff]"><i class="fa-regular fa-floppy-disk mr-1"></i> 保存草稿</button>
+<button class="ant-btn ant-btn-primary">提交校验</button>
+</div>
+</div>
+<div class="card-panel p-3 flex space-x-3 items-center shrink-0">
+<div class="flex items-center space-x-2">
+<span class="text-gray-600 w-20 text-right">Webhook名称</span>
+<input class="ant-input w-40" placeholder="请输入" type="text"/>
+</div>
+<div class="flex items-center space-x-2">
+<span class="text-gray-600 w-16 text-right">外部系统</span>
+<div class="ant-select w-32 text-gray-400">请选择 <i class="fa-solid fa-angle-down text-xs"></i></div>
+</div>
+<div class="flex items-center space-x-2">
+<span class="text-gray-600 w-16 text-right">事件类型</span>
+<div class="ant-select w-32 text-gray-400">请选择 <i class="fa-solid fa-angle-down text-xs"></i></div>
+</div>
+<div class="flex items-center space-x-2">
+<span class="text-gray-600 w-16 text-right">签名状态</span>
+<div class="ant-select w-32 text-gray-400">请选择 <i class="fa-solid fa-angle-down text-xs"></i></div>
+</div>
+<div class="flex items-center space-x-2">
+<span class="text-gray-600 w-12 text-right">状态</span>
+<div class="ant-select w-32 text-gray-400">请选择 <i class="fa-solid fa-angle-down text-xs"></i></div>
+</div>
+<div class="flex-1 flex justify-end space-x-2">
+<button class="ant-btn ant-btn-primary w-16">查询</button>
+<button class="ant-btn ant-btn-default w-16">重置</button>
+</div>
+</div>
+<div class="flex flex-1 space-x-3 overflow-hidden">
+<!-- Left Column: Cards, Table, Event Chain -->
+<div class="flex-1 flex flex-col space-y-3 overflow-hidden">
+<!-- Cards -->
+<div class="flex space-x-3 shrink-0 h-[84px]">
+<div class="flex-1 card-panel p-3 border-[#1677ff] relative cursor-pointer shadow-sm">
+<div class="flex justify-between items-start mb-1">
+<span class="font-bold text-gray-800">ERP 回执接收</span>
+<i class="fa-solid fa-circle-check text-[#1677ff]"></i>
+</div>
+<div class="text-gray-500 text-xs mb-1">ERP 系统</div>
+<div class="text-gray-500 text-xs">报废回执接收</div>
+</div>
+<div class="flex-1 card-panel p-3 relative cursor-pointer hover:border-[#1677ff]">
+<div class="flex justify-between items-start mb-1">
+<span class="font-bold text-gray-800">MES 设备事件回调</span>
+<span class="text-[10px] bg-green-50 text-green-600 border border-green-200 px-1 rounded">已启用</span>
+</div>
+<div class="text-gray-500 text-xs mb-1">MES 系统</div>
+<div class="text-gray-500 text-xs">设备状态回调</div>
+</div>
+<div class="flex-1 card-panel p-3 relative cursor-pointer hover:border-[#1677ff]">
+<div class="flex justify-between items-start mb-1">
+<span class="font-bold text-gray-800">EHR 扣款回执</span>
+<span class="text-[10px] bg-orange-50 text-orange-600 border border-orange-200 px-1 rounded">待发布</span>
+</div>
+<div class="text-gray-500 text-xs mb-1">EHR 系统</div>
+<div class="text-gray-500 text-xs">扣款回执</div>
+</div>
+<div class="flex-1 card-panel p-3 relative cursor-pointer hover:border-[#1677ff]">
+<div class="flex justify-between items-start mb-1">
+<span class="font-bold text-gray-800 text-[13px] leading-tight">PO/合同变更通知</span>
+<span class="text-[10px] bg-green-50 text-green-600 border border-green-200 px-1 rounded">已启用</span>
+</div>
+<div class="text-gray-500 text-xs mb-1">合同系统</div>
+<div class="text-gray-500 text-xs">合同变更通知</div>
+</div>
+<div class="w-[120px] card-panel border-dashed flex flex-col items-center justify-center text-gray-400 cursor-pointer hover:border-[#1677ff] hover:text-[#1677ff]">
+<span class="text-xs mb-1">新建 Webhook</span>
+<i class="fa-solid fa-plus text-xl"></i>
+</div>
+</div>
+<!-- Main Table Panel -->
+<div class="card-panel flex flex-col shrink-0 h-[235px]">
+<div class="px-4 py-2 border-b border-[#f0f0f0] font-bold text-gray-800">Webhook 订阅清单</div>
+<table class="w-full compact-table text-xs">
+<thead>
+<tr>
+<th>Webhook名称</th>
+<th>外部系统</th>
+<th>事件类型</th>
+<th>回调地址</th>
+<th>签名算法</th>
+<th>重试策略</th>
+<th>最近状态</th>
+<th>操作</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ERP 报废回执接收</td>
+<td>ERP 系统</td>
+<td>资产报废回执</td>
+<td class="truncate max-w-[150px]" title="https://erp.uniview.com/api/callback/asset/...">https://erp.uniview.com/api/callback/asset/...</td>
+<td>HMAC-SHA256</td>
+<td>3 次 / 指数退避</td>
+<td><span class="status-dot bg-success"></span>成功 <span class="text-gray-400 ml-1">5分钟前</span></td>
+<td class="text-[#1677ff] space-x-1"><a href="#">编辑</a> <span class="text-gray-300">|</span> <a href="#">测试</a> <span class="text-gray-300">|</span> <a href="#">日志</a></td>
+</tr>
+<tr>
+<td>MES 设备状态回调</td>
+<td>MES 系统</td>
+<td>设备状态变更</td>
+<td class="truncate max-w-[150px]">https://mes.uniview.com/hook/asset/state</td>
+<td>RSA-SHA256</td>
+<td>5 次 / 固定间隔</td>
+<td><span class="status-dot bg-success"></span>成功 <span class="text-gray-400 ml-1">2分钟前</span></td>
+<td class="text-[#1677ff] space-x-1"><a href="#">编辑</a> <span class="text-gray-300">|</span> <a href="#">测试</a> <span class="text-gray-300">|</span> <a href="#">日志</a></td>
+</tr>
+<tr>
+<td>EHR 扣款回执</td>
+<td>EHR 系统</td>
+<td>扣款结果回执</td>
+<td class="truncate max-w-[150px]">https://ehr.uniview.com/callback/deduct</td>
+<td>HMAC-SHA256</td>
+<td>3 次 / 指数退避</td>
+<td><span class="status-dot bg-error"></span>失败 <span class="text-gray-400 ml-1">1分钟前</span></td>
+<td class="text-[#1677ff] space-x-1"><a href="#">编辑</a> <span class="text-gray-300">|</span> <a href="#">测试</a> <span class="text-gray-300">|</span> <a href="#">日志</a></td>
+</tr>
+<tr>
+<td>PO/合同变更通知</td>
+<td>合同系统</td>
+<td>合同变更通知</td>
+<td class="truncate max-w-[150px]">https://contract.uniview.com/hook/po/change</td>
+<td>RSA-SHA256</td>
+<td>3 次 / 固定间隔</td>
+<td><span class="status-dot bg-success"></span>成功 <span class="text-gray-400 ml-1">10分钟前</span></td>
+<td class="text-[#1677ff] space-x-1"><a href="#">编辑</a> <span class="text-gray-300">|</span> <a href="#">测试</a> <span class="text-gray-300">|</span> <a href="#">日志</a></td>
+</tr>
+</tbody>
+</table>
+<div class="flex justify-end items-center px-4 py-2 mt-auto text-xs text-gray-500">
+<span class="mr-4">共 4 条</span>
+<div class="flex items-center space-x-1">
+<button class="w-6 h-6 border rounded text-gray-400 hover:border-[#1677ff] hover:text-[#1677ff] flex items-center justify-center"><i class="fa-solid fa-angle-left"></i></button>
+<button class="w-6 h-6 border rounded bg-[#1677ff] text-white border-[#1677ff] flex items-center justify-center">1</button>
+<button class="w-6 h-6 border rounded text-gray-400 hover:border-[#1677ff] hover:text-[#1677ff] flex items-center justify-center"><i class="fa-solid fa-angle-right"></i></button>
+</div>
+<div class="ant-select ml-2 w-[80px] h-[24px] text-xs">10 条/页 <i class="fa-solid fa-angle-down text-[10px]"></i></div>
+</div>
+</div>
+<!-- Event Chain Panel -->
+<div class="card-panel p-4 shrink-0 h-[128px]">
+<div class="font-bold text-gray-800 mb-3 text-xs">事件订阅与回调链路</div>
+<div class="flex items-center justify-between px-2">
+<div class="flex flex-col items-center relative w-[130px] p-2 border border-blue-100 rounded bg-blue-50/50">
+<span class="text-[10px] text-gray-500 mb-1">事件源（外部系统）</span>
+<div class="flex items-center space-x-2">
+<i class="fa-solid fa-server text-gray-700 text-lg"></i>
+<div class="text-xs">
+<div class="font-medium">ERP 系统</div>
+<div class="text-[10px] text-gray-500">推送事件</div>
+</div>
+</div>
+<div class="absolute -bottom-1.5 -right-1.5 bg-white rounded-full"><i class="fa-solid fa-circle-check text-green-500 text-sm"></i></div>
+</div>
+<i class="fa-solid fa-arrow-right text-gray-300"></i>
+<div class="flex flex-col items-center relative w-[130px] p-2 border border-gray-200 rounded">
+<span class="text-[10px] text-gray-500 mb-1">签名校验</span>
+<div class="flex items-center space-x-2">
+<i class="fa-solid fa-shield-check text-gray-700 text-lg"></i>
+<div class="text-xs">
+<div class="font-medium">HMAC-SHA256</div>
+<div class="text-[10px] text-gray-500">签名验证通过</div>
+</div>
+</div>
+<div class="absolute -bottom-1.5 -right-1.5 bg-white rounded-full"><i class="fa-solid fa-circle-check text-green-500 text-sm"></i></div>
+</div>
+<i class="fa-solid fa-arrow-right text-gray-300"></i>
+<div class="flex flex-col items-center relative w-[130px] p-2 border border-gray-200 rounded">
+<span class="text-[10px] text-gray-500 mb-1">幂等性校验</span>
+<div class="flex items-center space-x-2">
+<i class="fa-solid fa-fingerprint text-gray-700 text-lg"></i>
+<div class="text-xs">
+<div class="font-medium">幂等键: event_id</div>
+<div class="text-[10px] text-gray-500">去重通过</div>
+</div>
+</div>
+<div class="absolute -bottom-1.5 -right-1.5 bg-white rounded-full"><i class="fa-solid fa-circle-check text-green-500 text-sm"></i></div>
+</div>
+<i class="fa-solid fa-arrow-right text-gray-300"></i>
+<div class="flex flex-col items-center relative w-[130px] p-2 border border-blue-100 rounded bg-blue-50/50">
+<span class="text-[10px] text-gray-500 mb-1">业务处理</span>
+<div class="flex items-center space-x-2">
+<i class="fa-solid fa-gear text-[#1677ff] text-lg"></i>
+<div class="text-xs">
+<div class="font-medium">资产服务</div>
+<div class="text-[10px] text-gray-500">执行业务逻辑</div>
+</div>
+</div>
+<div class="absolute -bottom-1.5 -right-1.5 bg-white rounded-full"><i class="fa-solid fa-circle-check text-green-500 text-sm"></i></div>
+</div>
+<i class="fa-solid fa-arrow-right text-gray-300"></i>
+<div class="flex flex-col items-center relative w-[130px] p-2 border border-gray-200 rounded">
+<span class="text-[10px] text-gray-500 mb-1">归档 / 异常队列</span>
+<div class="flex items-center space-x-2">
+<i class="fa-solid fa-box-archive text-gray-700 text-lg"></i>
+<div class="text-xs">
+<div class="font-medium">归档留存</div>
+<div class="text-[10px] text-gray-500">异常入队重试</div>
+</div>
+</div>
+<div class="absolute -bottom-1.5 -right-1.5 bg-white rounded-full"><i class="fa-solid fa-circle-check text-green-500 text-sm"></i></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Editor Panel -->
+<div class="w-[371px] card-panel flex flex-col shrink-0">
+<div class="px-4 py-3 border-b border-[#f0f0f0] flex justify-between items-center">
+<span class="font-bold text-gray-800">Webhook 配置编辑区</span>
+<i class="fa-solid fa-angle-up text-gray-400 cursor-pointer"></i>
+</div>
+<div class="p-4 flex-1 scrollbar-hide text-[13px]">
+<div class="form-item">
+<div class="form-label">配置名称</div>
+<input class="ant-input flex-1" type="text" value="ERP 回执接收"/>
+</div>
+<div class="form-item">
+<div class="form-label">外部系统</div>
+<div class="ant-select flex-1">ERP 系统 <i class="fa-solid fa-angle-down text-xs"></i></div>
+</div>
+<div class="form-item">
+<div class="form-label">事件类型</div>
+<div class="ant-select flex-1">资产报废回执 <i class="fa-solid fa-angle-down text-xs"></i></div>
+</div>
+<div class="form-item">
+<div class="form-label whitespace-nowrap">回调地址</div>
+<div class="ant-select flex-1 relative bg-white">
+<span class="truncate w-[90%]">https://erp.uniview.com/api/callback/asset/disposal</span>
+<i class="fa-solid fa-circle-check text-green-500 absolute right-2 bg-white"></i>
+</div>
+</div>
+<div class="form-item">
+<div class="form-label">签名算法</div>
+<div class="ant-select flex-1">HMAC-SHA256 <i class="fa-solid fa-angle-down text-xs"></i></div>
+</div>
+<div class="form-item items-start">
+<div class="form-label mt-1.5">密钥引用</div>
+<div class="flex-1">
+<div class="ant-select w-full mb-1">ERP 回调签名密钥（当前生效） <i class="fa-solid fa-angle-down text-xs"></i></div>
+<div class="text-success text-xs">密钥引用有效</div>
+</div>
+</div>
+<div class="form-item">
+<div class="form-label">幂等键</div>
+<input class="ant-input flex-1 bg-gray-50 text-gray-600" readonly="" type="text" value="event_id"/>
+</div>
+<div class="form-item">
+<div class="form-label">重试次数</div>
+<div class="flex items-center space-x-2 flex-1">
+<div class="ant-select w-20 px-2 justify-center bg-gray-50">3 <div class="flex flex-col ml-2"><i class="fa-solid fa-caret-up text-[8px] text-gray-400 leading-none"></i><i class="fa-solid fa-caret-down text-[8px] text-gray-400 leading-none mt-0.5"></i></div></div>
+<span class="text-gray-500">次 (1-10)</span>
+</div>
+</div>
+<div class="form-item">
+<div class="form-label whitespace-nowrap">超时设置</div>
+<div class="flex items-center space-x-2 flex-1">
+<div class="ant-select w-20 px-2 justify-center bg-gray-50">10 <div class="flex flex-col ml-2"><i class="fa-solid fa-caret-up text-[8px] text-gray-400 leading-none"></i><i class="fa-solid fa-caret-down text-[8px] text-gray-400 leading-none mt-0.5"></i></div></div>
+<span class="text-gray-500">秒 (5-60) <i class="fa-solid fa-angle-down text-xs ml-1"></i></span>
+</div>
+</div>
+<div class="form-item items-start">
+<div class="form-label mt-1.5">审计要求</div>
+<div class="flex-1">
+<div class="ant-select w-full mb-1">强制记录 <i class="fa-solid fa-angle-down text-xs"></i></div>
+<div class="text-gray-400 text-xs">将记录全部事件元数据与处理结果到审计日志。</div>
+</div>
+</div>
+</div>
+<div class="p-4 border-t border-[#f0f0f0] flex justify-between space-x-2 bg-white rounded-b-md">
+<button class="ant-btn ant-btn-default flex-1 text-[#1677ff] border-[#1677ff]">保存草稿</button>
+<button class="ant-btn ant-btn-primary flex-1">提交校验</button>
+<button class="ant-btn ant-btn-default flex-1"><i class="fa-regular fa-paper-plane mr-1"></i> 发送测试事件</button>
+</div>
+</div>
+</div>
+<!-- Bottom Dashboard Row -->
+<div class="flex space-x-3 shrink-0 h-[256px]">
+<!-- Payload Preview -->
+<div class="card-panel flex flex-col w-[300px]">
+<div class="px-3 py-2 border-b border-[#f0f0f0] flex justify-between items-center text-xs font-bold text-gray-800">
+<span>测试事件 Payload preview</span>
+<span class="px-2 py-0.5 bg-gray-100 border rounded cursor-pointer hover:bg-gray-200">复制</span>
+</div>
+<div class="p-3 bg-[#f8f9fa] flex-1 overflow-auto text-xs font-mono text-gray-600 leading-relaxed whitespace-pre" style="font-size: 10px; line-height: 1.2; overflow: hidden;">
+<span class="text-gray-400"> 1</span> {
+<span class="text-gray-400"> 2</span> <span class="text-red-500">"event_id"</span>: <span class="text-green-600">"EVT202505210001"</span>,
+<span class="text-gray-400"> 3</span> <span class="text-red-500">"event_type"</span>: <span class="text-green-600">"asset.disposal.receipt"</span>,
+<span class="text-gray-400"> 4</span> <span class="text-red-500">"occurred_at"</span>: <span class="text-green-600">"2025-05-21T08:35:12Z"</span>,
+<span class="text-gray-400"> 5</span> <span class="text-red-500">"source_system"</span>: <span class="text-green-600">"ERP"</span>,
+<span class="text-gray-400"> 6</span> <span class="text-red-500">"data"</span>: {
+<span class="text-gray-400"> 7</span> <span class="text-red-500">"asset_code"</span>: <span class="text-green-600">"FA202405210045"</span>,
+<span class="text-gray-400"> 8</span> <span class="text-red-500">"disposal_id"</span>: <span class="text-green-600">"DISP202505210012"</span>,
+<span class="text-gray-400"> 9</span> <span class="text-red-500">"status"</span>: <span class="text-green-600">"approved"</span>,
+<span class="text-gray-400">10</span> <span class="text-red-500">"disposed_at"</span>: <span class="text-green-600">"2025-05-21"</span>
+<span class="text-gray-400">11</span>   }
+<span class="text-gray-400">12</span> }</div>
+</div>
+<!-- Signature Log -->
+<div class="card-panel flex flex-col flex-1">
+<div class="px-4 py-2 border-b border-[#f0f0f0] text-xs font-bold text-gray-800">签名校验日志</div>
+<div class="p-4 flex-1 space-y-4 text-xs">
+<div class="flex items-center text-gray-600">
+<i class="fa-solid fa-circle-check text-green-500 mr-2"></i>
+<span class="w-[140px]">2025-05-21 08:35:12</span>
+<span class="w-[100px]">签名校验通过</span>
+<span class="text-gray-400">算法: HMAC-SHA256</span>
+</div>
+<div class="flex items-center text-gray-600">
+<i class="fa-solid fa-circle-check text-green-500 mr-2"></i>
+<span class="w-[140px]">2025-05-21 08:32:45</span>
+<span class="w-[100px]">签名校验通过</span>
+<span class="text-gray-400">算法: HMAC-SHA256</span>
+</div>
+<div class="flex items-center text-gray-600">
+<i class="fa-solid fa-circle-check text-green-500 mr-2"></i>
+<span class="w-[140px]">2025-05-21 08:30:10</span>
+<span class="w-[100px]">签名校验通过</span>
+<span class="text-gray-400">算法: HMAC-SHA256</span>
+</div>
+<div class="flex items-center text-gray-600">
+<i class="fa-solid fa-circle-check text-green-500 mr-2"></i>
+<span class="w-[140px]">2025-05-21 08:28:01</span>
+<span class="w-[100px]">签名校验通过</span>
+<span class="text-gray-400">算法: HMAC-SHA256</span>
+</div>
+<div class="flex items-center text-gray-600">
+<i class="fa-solid fa-circle-check text-green-500 mr-2"></i>
+<span class="w-[140px]">2025-05-21 08:25:33</span>
+<span class="w-[100px]">签名校验通过</span>
+<span class="text-gray-400">算法: HMAC-SHA256</span>
+</div>
+</div>
+<div class="px-4 py-2 border-t border-[#f0f0f0] text-center text-[#1677ff] cursor-pointer hover:bg-gray-50 text-xs">
+            查看全部日志
+          </div>
+</div>
+<!-- Retry Queue -->
+<div class="card-panel flex flex-col flex-1">
+<div class="px-4 py-2 border-b border-[#f0f0f0] text-xs font-bold text-gray-800 flex items-center justify-between">
+<span>重试队列</span>
+<div class="flex space-x-3 text-gray-500 font-normal">
+<span class="text-[#1677ff] bg-blue-50 px-2 py-0.5 rounded border border-blue-200">全部 3</span>
+<span>等待中 2</span>
+<span>重试中 1</span>
+<span>已放弃 0</span>
+</div>
+</div>
+<div class="p-2 flex-1 space-y-2 scrollbar-hide text-xs">
+<div class="p-2 border border-gray-100 rounded bg-gray-50 flex justify-between items-center">
+<div>
+<div class="font-medium text-gray-800"><i class="fa-solid fa-circle-arrow-down text-orange-400 mr-1"></i> EHR 扣款回执</div>
+<div class="text-gray-400 text-[10px] mt-1 ml-5">第 2 次重试（共 3 次）</div>
+</div>
+<div class="text-gray-500">下次重试: 12 秒后</div>
+</div>
+<div class="p-2 border border-gray-100 rounded bg-gray-50 flex justify-between items-center">
+<div>
+<div class="font-medium text-gray-800"><i class="fa-solid fa-circle-arrow-down text-orange-400 mr-1"></i> EHR 扣款回执</div>
+<div class="text-gray-400 text-[10px] mt-1 ml-5">第 1 次重试（共 3 次）</div>
+</div>
+<div class="text-gray-500">下次重试: 58 秒后</div>
+</div>
+<div class="p-2 border border-gray-100 rounded bg-gray-50 flex justify-between items-center">
+<div>
+<div class="font-medium text-gray-800"><i class="fa-solid fa-circle-play text-blue-500 mr-1"></i> PO/合同变更通知</div>
+<div class="text-gray-400 text-[10px] mt-1 ml-5">第 1 次重试（共 3 次）</div>
+</div>
+<div class="text-gray-500">下次重试: 1 分 15 秒后</div>
+</div>
+</div>
+<div class="px-4 py-2 border-t border-[#f0f0f0] text-center text-[#1677ff] cursor-pointer hover:bg-gray-50 text-xs">
+            进入重试队列
+          </div>
+</div>
+<!-- Publish Gate -->
+<div class="card-panel flex flex-col w-[320px]">
+<div class="px-4 py-2 border-b border-[#f0f0f0] text-xs font-bold text-gray-800">发布门禁</div>
+<div class="p-4 flex-1 space-y-2.5 text-xs">
+<div class="flex justify-between items-center text-gray-600">
+<div><i class="fa-solid fa-circle-check text-green-500 mr-2"></i> HTTPS 地址</div>
+<span class="text-green-500">已通过</span>
+</div>
+<div class="flex justify-between items-center text-gray-600">
+<div><i class="fa-solid fa-circle-check text-green-500 mr-2"></i> 签名算法已配置</div>
+<span class="text-green-500">已通过</span>
+</div>
+<div class="flex justify-between items-center text-gray-600">
+<div><i class="fa-solid fa-circle-check text-green-500 mr-2"></i> 密钥引用有效</div>
+<span class="text-green-500">已通过</span>
+</div>
+<div class="flex justify-between items-center text-gray-600">
+<div><i class="fa-solid fa-circle-check text-green-500 mr-2"></i> 样例事件通过</div>
+<span class="text-green-500">已通过</span>
+</div>
+<div class="flex justify-between items-center text-gray-600">
+<div><i class="fa-solid fa-circle-check text-green-500 mr-2"></i> 审计字段完整</div>
+<span class="text-green-500">已通过</span>
+</div>
+<div class="flex justify-between items-center text-gray-800 font-medium">
+<div><i class="fa-solid fa-triangle-exclamation text-orange-400 mr-2"></i> 失败回调负责人待确认</div>
+<div class="flex items-center space-x-2">
+<span class="text-orange-400">待处理</span>
+<button class="px-2 py-0.5 border border-orange-400 text-orange-400 rounded hover:bg-orange-50">去处理</button>
+</div>
+</div>
+</div>
+<div class="p-3 bg-[#fafafa] border-t border-[#f0f0f0] flex justify-between items-center rounded-b-md">
+<div class="text-orange-500 text-xs flex items-center">
+<i class="fa-solid fa-lock mr-1.5"></i> 未满足全部门禁条件，暂不可发布
+            </div>
+<button class="px-4 py-1.5 bg-gray-200 text-gray-400 cursor-not-allowed rounded text-xs">发布上线</button>
+</div>
+</div>
+</div>
+</main>
+<!-- END: Main Content -->
+</div>
+</body></html>

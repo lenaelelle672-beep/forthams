@@ -9,7 +9,7 @@ export interface WebhookConfig {
   id: number;
   name: string;
   url: string;
-  secret?: string;
+  signatureConfigured?: boolean;
   events: string[];
   description?: string;
   enabled: number;

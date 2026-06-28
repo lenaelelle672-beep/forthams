@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=1609, height=977, initial-scale=1.0" name="viewport"/>
+<title>登录会话与敏感字段策略</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+    
+    body {
+      font-family: 'PingFang SC', 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      width: 1609px;
+      height: 977px;
+      overflow: hidden;
+      margin: 0;
+      background-color: #f5f7fb;
+      font-size: 14px;
+      color: #333;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      display: none; /* No scrollbars allowed */
+    }
+
+    /* Status Badges */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .status-high { background-color: #fee2e2; color: #ef4444; border: 1px solid #fca5a5; }
+    .status-medium { background-color: #ffedd5; color: #f97316; border: 1px solid #fdba74; }
+    .status-low { background-color: #dcfce7; color: #22c55e; border: 1px solid #86efac; }
+    .status-published { background-color: #dcfce7; color: #16a34a; border: 1px solid #86efac; }
+    .status-pending { background-color: #fef08a; color: #ca8a04; border: 1px solid #fde047; }
+    .status-draft { background-color: #e0f2fe; color: #0284c7; border: 1px solid #bae6fd; }
+
+    /* Icons */
+    .icon {
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
+    }
+
+    /* Table Styles */
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+    th {
+      background-color: #fafafa;
+      color: #333;
+      font-weight: 600;
+      text-align: left;
+      padding: 10px 12px;
+      border-bottom: 1px solid #d7e2ef;
+      border-top: 1px solid #d7e2ef;
+      white-space: nowrap;
+    }
+    td {
+      padding: 8px 12px;
+      border-bottom: 1px solid #d7e2ef;
+      color: #333;
+      white-space: nowrap;
+    }
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* Form Elements */
+    .form-select, .form-input {
+      font-size: 13px;
+      padding: 4px 8px;
+      border: 1px solid #d7e2ef;
+      border-radius: 6px;
+      background-color: #fff;
+    }
+    .form-select:focus, .form-input:focus {
+      outline: none;
+      border-color: #1677ff;
+      box-shadow: 0 0 0 2px rgba(22, 119, 255, 0.2);
+    }
+    
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px 16px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 400;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-primary {
+      background-color: #1677ff;
+      color: white;
+      border: 1px solid #1677ff;
+    }
+    .btn-primary:hover { background-color: #4096ff; border-color: #4096ff; }
+    .btn-default {
+      background-color: white;
+      color: #333;
+      border: 1px solid #d7e2ef;
+    }
+    .btn-default:hover { color: #1677ff; border-color: #1677ff; }
+
+    /* Panels */
+    .panel {
+      background-color: white;
+      border-radius: 8px;
+      border: 1px solid #d7e2ef;
+      overflow: hidden;
+    }
+    .panel-header {
+      padding: 12px 16px;
+      font-weight: 600;
+      font-size: 15px;
+      color: #333;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #d7e2ef;
+    }
+    .panel-body {
+      padding: 12px 16px;
+    }
+
+    /* Layout specific adjustments to fit exactly within 977px */
+    .main-container {
+      height: calc(977px - 60px); /* Total height minus header */
+      display: flex;
+    }
+    .sidebar {
+      width: 226px;
+      height: 100%;
+      background: white;
+      border-right: 1px solid #d7e2ef;
+      display: flex;
+      flex-direction: column;
+    }
+    .content-area {
+      flex: 1;
+      height: 100%;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      overflow: hidden; /* Prevent scrolling */
+    }
+
+    /* Top Row Layout */
+    .top-row {
+      display: flex;
+      gap: 16px;
+      height: 80px; /* Fixed height for KPI cards */
+    }
+    
+    /* Middle Layout */
+    .middle-layout {
+      display: flex;
+      gap: 16px;
+      height: 430px; /* Fixed height to accommodate 5 rows table and form */
+    }
+    .table-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .form-panel {
+      width: 480px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Bottom Row Layout */
+    .bottom-row {
+      display: flex;
+      gap: 16px;
+      height: 265px; /* Fixed height for bottom panels */
+      margin-bottom: 0; /* Remove bottom margin to fit in 977px */
+    }
+    .bottom-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+  </style>
+</head>
+<body>
+<!-- BEGIN: Top Header -->
+<header style="height: 60px; background-color: #001529; color: white; display: flex; align-items: center; padding: 0 24px; justify-content: space-between;">
+<div style="display: flex; align-items: center; gap: 24px;">
+<div style="display: flex; align-items: center; gap: 12px;">
+<div style="font-size: 20px; font-weight: 700; letter-spacing: 1px; font-family: sans-serif;">UNIVIEW</div>
+<div style="width: 1px; height: 16px; background-color: rgba(255,255,255,0.4);"></div>
+<div style="font-size: 16px;">固定资产管理系统</div>
+</div>
+<nav style="display: flex; margin-left: 24px; height: 60px;">
+<a href="#" style="padding: 0 20px; color: rgba(255,255,255,0.65); text-decoration: none; display: flex; align-items: center; font-size: 14px;">资产管理</a>
+<a href="#" style="padding: 0 20px; color: rgba(255,255,255,0.65); text-decoration: none; display: flex; align-items: center; font-size: 14px;">CIP 转固管理</a>
+<a href="#" style="padding: 0 20px; color: rgba(255,255,255,0.65); text-decoration: none; display: flex; align-items: center; font-size: 14px;">盘点管理</a>
+<a href="#" style="padding: 0 20px; color: rgba(255,255,255,0.65); text-decoration: none; display: flex; align-items: center; font-size: 14px;">报表中心</a>
+<a href="#" style="padding: 0 20px; color: white; background-color: #1677ff; text-decoration: none; display: flex; align-items: center; font-size: 14px; font-weight: 500;">系统运营中枢</a>
+</nav>
+</div>
+<div style="display: flex; align-items: center; gap: 20px;">
+<div style="position: relative; cursor: pointer;">
+<svg style="width: 20px; height: 20px; fill: white;" viewbox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"></path></svg>
+<div style="position: absolute; top: -6px; right: -8px; background: #ff4d4f; color: white; font-size: 12px; border-radius: 12px; padding: 0 5px; line-height: 16px; font-weight: 500;">12</div>
+</div>
+<svg style="width: 20px; height: 20px; fill: white; cursor: pointer;" viewbox="0 0 24 24"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"></path></svg>
+<div style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+<div style="width: 28px; height: 28px; border-radius: 50%; background: #1677ff; display: flex; align-items: center; justify-content: center; color: white; font-size: 14px;">运</div>
+<span style="font-size: 14px; color: rgba(255,255,255,0.85);">运营管理员</span>
+<svg style="width: 16px; height: 16px; fill: white;" viewbox="0 0 24 24"><path d="M7 10l5 5 5-5z"></path></svg>
+</div>
+</div>
+</header>
+<!-- END: Top Header -->
+<div class="main-container">
+<!-- BEGIN: Sidebar -->
+<aside class="sidebar">
+<div style="padding: 16px 24px; font-weight: 600; font-size: 16px; color: #333; display: flex; align-items: center; gap: 12px;">
+<svg style="width: 18px; height: 18px; fill: #333;" viewbox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"></path></svg>
+        系统运营中枢
+      </div>
+<div style="padding: 8px 0; overflow-y: auto; overflow-x: hidden;">
+<!-- Menu Item -->
+<div>
+<div style="padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; color: #1677ff;">
+<div style="display: flex; align-items: center; gap: 12px;">
+<svg style="width: 18px; height: 18px; fill: currentColor;" viewbox="0 0 24 24"><path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.06-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.73,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.06,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.43-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.49-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"></path></svg>
+<span style="font-size: 14px;">系统参数</span>
+</div>
+<svg style="width: 16px; height: 16px; fill: currentColor;" viewbox="0 0 24 24"><path d="M12 8l-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z"></path></svg>
+</div>
+<div style="background-color: white;">
+<div style="padding: 12px 24px 12px 54px; color: #666; cursor: pointer; font-size: 14px;">基础参数</div>
+<div style="padding: 12px 24px 12px 54px; color: #1677ff; background-color: #e6f4ff; cursor: pointer; font-size: 14px; font-weight: 500;">安全策略</div>
+<div style="padding: 12px 24px 12px 54px; color: #666; cursor: pointer; font-size: 14px;">文件存储配置</div>
+<div style="padding: 12px 24px 12px 54px; color: #666; cursor: pointer; font-size: 14px;">导入导出配置</div>
+<div style="padding: 12px 24px 12px 54px; color: #666; cursor: pointer; font-size: 14px;">缓存管理</div>
+<div style="padding: 12px 24px 12px 54px; color: #666; cursor: pointer; font-size: 14px;">操作审计</div>
+</div>
+</div>
+<!-- Other Menu Items (Collapsed) -->
+<div style="padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; color: #333;">
+<div style="display: flex; align-items: center; gap: 12px;">
+<svg style="width: 18px; height: 18px; fill: #666;" viewbox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"></path></svg>
+<span style="font-size: 14px;">流程平台</span>
+</div>
+<svg style="width: 16px; height: 16px; fill: #999;" viewbox="0 0 24 24"><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"></path></svg>
+</div>
+<div style="padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; color: #333;">
+<div style="display: flex; align-items: center; gap: 12px;">
+<svg style="width: 18px; height: 18px; fill: #666;" viewbox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"></path></svg>
+<span style="font-size: 14px;">组织权限</span>
+</div>
+<svg style="width: 16px; height: 16px; fill: #999;" viewbox="0 0 24 24"><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"></path></svg>
+</div>
+<div style="padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; color: #333;">
+<div style="display: flex; align-items: center; gap: 12px;">
+<svg style="width: 18px; height: 18px; fill: #666;" viewbox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"></path></svg>
+<span style="font-size: 14px;">基础资料</span>
+</div>
+<svg style="width: 16px; height: 16px; fill: #999;" viewbox="0 0 24 24"><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"></path></svg>
+</div>
+<div style="padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; color: #333;">
+<div style="display: flex; align-items: center; gap: 12px;">
+<svg style="width: 18px; height: 18px; fill: #666;" viewbox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"></path></svg>
+<span style="font-size: 14px;">集成配置</span>
+</div>
+<svg style="width: 16px; height: 16px; fill: #999;" viewbox="0 0 24 24"><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"></path></svg>
+</div>
+<div style="padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; color: #333;">
+<div style="display: flex; align-items: center; gap: 12px;">
+<svg style="width: 18px; height: 18px; fill: #666;" viewbox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"></path></svg>
+<span style="font-size: 14px;">消息与通知</span>
+</div>
+<svg style="width: 16px; height: 16px; fill: #999;" viewbox="0 0 24 24"><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"></path></svg>
+</div>
+</div>
+</aside>
+<!-- END: Sidebar -->
+<!-- BEGIN: Main Content Area -->
+<main class="content-area">
+<!-- Top Action Bar -->
+<div style="display: flex; justify-content: space-between; align-items: center;">
+<h1 style="font-size: 20px; font-weight: 600; margin: 0; color: #333;">
+          登录会话与敏感字段策略
+        </h1>
+<div style="display: flex; gap: 12px;">
+<button class="btn btn-primary" style="gap: 8px; padding: 6px 12px;">
+<svg style="width: 14px; height: 14px; fill: currentColor;" viewbox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path></svg>
+            新建策略
+          </button>
+<button class="btn btn-default" style="gap: 8px; padding: 6px 12px; color: #1677ff; border-color: #1677ff;">
+<svg style="width: 14px; height: 14px; fill: currentColor;" viewbox="0 0 24 24"><path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"></path></svg>
+            保存草稿
+          </button>
+<button class="btn btn-default" style="gap: 8px; padding: 6px 12px; color: #16a34a; border-color: #16a34a;">
+<svg style="width: 14px; height: 14px; fill: currentColor;" viewbox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"></path></svg>
+            提交校验
+          </button>
+<button class="btn btn-default" style="gap: 8px; padding: 6px 12px; color: #1677ff; border-color: #1677ff;">
+<svg style="width: 14px; height: 14px; fill: currentColor;" viewbox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"></path></svg>
+            安全演练
+          </button>
+</div>
+</div>
+<!-- BEGIN: KPI Row -->
+<div class="top-row">
+<div class="panel" style="flex: 1; padding: 16px; display: flex; align-items: center; gap: 16px;">
+<div style="width: 40px; height: 40px; border-radius: 8px; background-color: #e6f4ff; display: flex; align-items: center; justify-content: center; color: #1677ff;">
+<svg style="width: 20px; height: 20px; fill: currentColor;" viewbox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"></path></svg>
+</div>
+<div>
+<div style="font-size: 13px; color: #666; margin-bottom: 4px;">安全策略</div>
+<div style="font-size: 24px; font-weight: 600; line-height: 1;">12</div>
+</div>
+</div>
+<div class="panel" style="flex: 1; padding: 16px; display: flex; align-items: center; gap: 16px;">
+<div style="width: 40px; height: 40px; border-radius: 8px; background-color: #fff7e6; display: flex; align-items: center; justify-content: center; color: #fa8c16;">
+<svg style="width: 20px; height: 20px; fill: currentColor;" viewbox="0 0 24 24"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"></path></svg>
+</div>
+<div>
+<div style="font-size: 13px; color: #666; margin-bottom: 4px;">高危操作</div>
+<div style="font-size: 24px; font-weight: 600; line-height: 1;">7</div>
+</div>
+</div>
+<div class="panel" style="flex: 1; padding: 16px; display: flex; align-items: center; gap: 16px;">
+<div style="width: 40px; height: 40px; border-radius: 8px; background-color: #f6ffed; display: flex; align-items: center; justify-content: center; color: #52c41a;">
+<svg style="width: 20px; height: 20px; fill: currentColor;" viewbox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"></path></svg>
+</div>
+<div>
+<div style="font-size: 13px; color: #666; margin-bottom: 4px;">脱敏字段</div>
+<div style="font-size: 24px; font-weight: 600; line-height: 1;">18</div>
+</div>
+</div>
+<div class="panel" style="flex: 1; padding: 16px; display: flex; align-items: center; gap: 16px;">
+<div style="width: 40px; height: 40px; border-radius: 8px; background-color: #f0f5ff; display: flex; align-items: center; justify-content: center; color: #2f54eb;">
+<svg style="width: 20px; height: 20px; fill: currentColor;" viewbox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"></path></svg>
+</div>
+<div>
+<div style="font-size: 13px; color: #666; margin-bottom: 4px;">异常登录</div>
+<div style="font-size: 24px; font-weight: 600; line-height: 1;">3</div>
+</div>
+</div>
+</div>
+<!-- END: KPI Row -->
+<!-- BEGIN: Middle Layout -->
+<div class="middle-layout">
+<!-- Table Panel -->
+<div class="panel table-panel">
+<div class="panel-header" style="border-bottom: none; padding-bottom: 8px;">安全策略列表</div>
+<div class="panel-body" style="display: flex; flex-direction: column; height: 100%; padding-top: 0; padding-bottom: 12px;">
+<!-- Filters -->
+<div style="display: flex; gap: 16px; margin-bottom: 12px; align-items: center; font-size: 13px;">
+<div style="display: flex; align-items: center; gap: 8px;">
+<span style="color: #666;">安全域</span>
+<select class="form-select" style="width: 90px; height: 28px; padding: 2px 8px;">
+<option>全部</option>
+</select>
+</div>
+<div style="display: flex; align-items: center; gap: 8px;">
+<span style="color: #666;">状态</span>
+<select class="form-select" style="width: 90px; height: 28px; padding: 2px 8px;">
+<option>全部</option>
+</select>
+</div>
+<div style="display: flex; align-items: center; gap: 8px;">
+<span style="color: #666;">风险</span>
+<select class="form-select" style="width: 90px; height: 28px; padding: 2px 8px;">
+<option>全部</option>
+</select>
+</div>
+<div style="margin-left: auto; position: relative;">
+<input class="form-input" placeholder="搜索策略名称/策略键" style="width: 220px; padding-right: 28px; height: 28px; padding: 2px 8px;" type="text"/>
+<svg style="width: 14px; height: 14px; fill: #999; position: absolute; right: 8px; top: 7px;" viewbox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"></path></svg>
+</div>
+</div>
+<!-- Table -->
+<div style="flex: 1; overflow: hidden;">
+<table style="font-size: 13px;">
+<thead>
+<tr>
+<th style="width: 22%;">策略名称</th>
+<th style="width: 20%;">策略键</th>
+<th style="width: 12%;">安全域</th>
+<th style="width: 26%;">策略值</th>
+<th style="width: 10%; text-align: center;">风险等级</th>
+<th style="width: 10%; text-align: right;">操作</th>
+</tr>
+</thead>
+<tbody>
+<tr style="height: 38px;">
+<td>会话与敏感字段策略</td>
+<td style="color: #666; font-family: monospace;">session.sensitive.policy</td>
+<td>会话安全</td>
+<td style="color: #666;">见策略详情</td>
+<td style="text-align: center;"><span class="status-badge status-high">高</span></td>
+<td style="text-align: right; color: #1677ff;">
+<div style="display: flex; gap: 8px; justify-content: flex-end;">
+<svg class="icon" style="cursor: pointer; width: 14px; height: 14px;" viewbox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"></path></svg>
+<svg class="icon" style="cursor: pointer; width: 14px; height: 14px;" viewbox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"></path></svg>
+<svg class="icon" style="cursor: pointer; width: 14px; height: 14px;" viewbox="0 0 24 24"><path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"></path></svg>
+</div>
+</td>
+</tr>
+<tr style="height: 38px;">
+<td>钉钉 H5 入口校验</td>
+<td style="color: #666; font-family: monospace;">dingtalk.h5.verify</td>
+<td>身份校验</td>
+<td style="color: #666;">强校验（跳转校验+签名）</td>
+<td style="text-align: center;"><span class="status-badge status-medium">中</span></td>
+<td style="text-align: right; color: #1677ff;">
+<div style="display: flex; gap: 8px; justify-content: flex-end;">
+<svg class="icon" style="cursor: pointer; width: 14px; height: 14px;" viewbox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"></path></svg>
+<svg class="icon" style="cursor: pointer; width: 14px; height: 14px;" viewbox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"></path></svg>
+<svg class="icon" style="cursor: pointer; width: 14px; height: 14px;" viewbox="0 0 24 24"><path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"></path></svg>
+</div>
+</td>
+</tr>
+<tr style="height: 38px;">
+<td>高危操作确认</td>
+<td style="color: #666; font-family: monospace;">high.risk.confirm</td>
+<td>操作安全</td>
+<td style="color: #666;">二次确认 + 短信通知</td>
+<td style="text-align: center;"><span class="status-badge status-high">高</span></td>
+<td style="text-align: right; color: #1677ff;">
+<div style="display: flex; gap: 8px; justify-content: flex-end;">
+<svg class="icon" style="cursor: pointer; width: 14px; height: 14px;" viewbox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"></path></svg>
+<svg class="icon" style="cursor: pointer; width: 14px; height: 14px;" viewbox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"></path></svg>
+<svg class="icon" style="cursor: pointer; width: 14px; height: 14px;" viewbox="0 0 24 24"><path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"></path></svg>
+</div>
+</td>
+</tr>
+<tr style="height: 38px;">
+<td>接口密钥轮换</td>
+<td style="color: #666; font-family: monospace;">api.key.rotate</td>
+<td>接口安全</td>
+<td style="color: #666;">90天轮换</td>
+<td style="text-align: center;"><span class="status-badge status-medium">中</span></td>
+<td style="text-align: right; color: #1677ff;">
+<div style="display: flex; gap: 8px; justify-content: flex-end;">
+<svg class="icon" style="cursor: pointer; width: 14px; height: 14px;" viewbox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"></path></svg>
+<svg class="icon" style="cursor: pointer; width: 14px; height: 14px;" viewbox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"></path></svg>
+<svg class="icon" style="cursor: pointer; width: 14px; height: 14px;" viewbox="0 0 24 24"><path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"></path></svg>
+</div>
+</td>
+</tr>
+<tr style="height: 38px;">
+<td>CIP 转固敏感字段策略</td>
+<td style="color: #666; font-family: monospace;">cip.sensitive.policy</td>
+<td>数据脱敏</td>
+<td style="color: #666;">按角色脱敏（3级）</td>
+<td style="text-align: center;"><span class="status-badge status-low">低</span></td>
+<td style="text-align: right; color: #1677ff;">
+<div style="display: flex; gap: 8px; justify-content: flex-end;">
+<svg class="icon" style="cursor: pointer; width: 14px; height: 14px;" viewbox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"></path></svg>
+<svg class="icon" style="cursor: pointer; width: 14px; height: 14px;" viewbox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"></path></svg>
+<svg class="icon" style="cursor: pointer; width: 14px; height: 14px;" viewbox="0 0 24 24"><path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"></path></svg>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination -->
+<div style="display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: 12px; color: #666; font-size: 13px;">
+<div>共 5 条</div>
+<div style="display: flex; align-items: center; gap: 8px;">
+<select class="form-select" style="width: 90px; height: 28px; padding: 2px 8px;">
+<option>10 条/页</option>
+</select>
+<div style="display: flex; gap: 4px;">
+<button class="btn btn-default" disabled="" style="padding: 2px 8px; height: 28px; border-color: #d7e2ef;"><svg style="width: 14px; height: 14px; fill: currentColor;" viewbox="0 0 24 24"><path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"></path></svg></button>
+<button class="btn btn-primary" style="padding: 2px 10px; height: 28px;">1</button>
+<button class="btn btn-default" disabled="" style="padding: 2px 8px; height: 28px; border-color: #d7e2ef;"><svg style="width: 14px; height: 14px; fill: currentColor;" viewbox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"></path></svg></button>
+</div>
+<span style="margin-left: 8px;">前往</span>
+<input class="form-input" style="width: 40px; text-align: center; height: 28px; padding: 2px 8px;" type="text" value="1"/>
+<span>页</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Editor Panel -->
+<div class="panel form-panel">
+<div class="panel-header" style="border-bottom: none; padding-bottom: 8px;">安全策略编排</div>
+<div class="panel-body" style="display: flex; flex-direction: column; gap: 10px; height: 100%; padding-top: 0; padding-bottom: 12px;">
+<div style="display: flex; align-items: center;">
+<div style="width: 90px; color: #666; font-size: 13px;">策略名称 <span style="color: #ff4d4f;">*</span></div>
+<input class="form-input" style="flex: 1; height: 30px;" type="text" value="会话与敏感字段策略"/>
+</div>
+<div style="display: flex; align-items: center;">
+<div style="width: 90px; color: #666; font-size: 13px;">策略键 <span style="color: #ff4d4f;">*</span></div>
+<input class="form-input" style="flex: 1; height: 30px;" type="text" value="session.sensitive.policy"/>
+</div>
+<div style="display: flex; align-items: center;">
+<div style="width: 90px; color: #666; font-size: 13px;">会话策略</div>
+<select class="form-select" style="flex: 1; height: 30px;">
+<option>会话超时 30 分钟，空闲 15 分钟强制下线</option>
+</select>
+</div>
+<div style="display: flex; align-items: center;">
+<div style="width: 90px; color: #666; font-size: 13px;">登录限制</div>
+<select class="form-select" style="flex: 1; height: 30px;">
+<option>单账号多地登录限制：最多 2 处</option>
+</select>
+</div>
+<div style="display: flex; align-items: center;">
+<div style="width: 90px; color: #666; font-size: 13px;">敏感字段脱敏</div>
+<select class="form-select" style="flex: 1; height: 30px;"><option>按角色脱敏（3级）</option></select>
+</div>
+<div style="display: flex; align-items: center;">
+<div style="width: 90px; color: #666; font-size: 13px;">H5 身份校验</div>
+<select class="form-select" style="flex: 1; height: 30px;">
+<option>启用（签名校验 + 时间戳校验）</option>
+</select>
+</div>
+<div style="display: flex; align-items: center;">
+<div style="width: 90px; color: #666; font-size: 13px;">高危操作确认</div>
+<select class="form-select" style="flex: 1; height: 30px;">
+<option>启用二次确认 + 短信通知</option>
+</select>
+</div>
+<div style="display: flex; align-items: center;">
+<div style="width: 90px; color: #666; font-size: 13px;">审计留痕</div>
+<select class="form-select" style="flex: 1; height: 30px;">
+<option>全量记录（含请求参数与结果）</option>
+</select>
+</div>
+<div style="display: flex; align-items: center;">
+<div style="width: 90px; color: #666; font-size: 13px;">应急解锁</div>
+<select class="form-select" style="flex: 1; height: 30px;">
+<option>需双人审批 + 动态口令验证</option>
+</select>
+</div>
+<div style="margin-top: auto; display: flex; gap: 12px; justify-content: center; padding-top: 8px;">
+<button class="btn btn-default" style="flex: 1; color: #1677ff; border-color: #1677ff; display: flex; gap: 8px; height: 32px;">
+<svg style="width: 14px; height: 14px; fill: currentColor;" viewbox="0 0 24 24"><path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"></path></svg>
+<span>保存草稿</span>
+</button>
+<button class="btn btn-primary" style="flex: 1; height: 32px; display: flex; gap: 8px;">
+<svg style="width: 14px; height: 14px; fill: currentColor;" viewbox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"></path></svg>
+<span>提交校验</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- END: Middle Layout -->
+<!-- BEGIN: Bottom Row -->
+<div class="bottom-row">
+<!-- Panel 1: 安全策略地图 -->
+<div class="panel bottom-panel">
+<div class="panel-header" style="font-size: 14px; padding: 10px 16px;">安全策略地图</div>
+<div class="panel-body" style="display: flex; justify-content: center; align-items: center; position: relative; padding: 12px; flex: 1;">
+<!-- Simplified Map Representation to fit space -->
+<div style="display: flex; flex-direction: column; align-items: center; gap: 16px; transform: scale(0.9);">
+<div style="padding: 4px 12px; border: 1px solid #52c41a; border-radius: 4px; color: #52c41a; display: flex; align-items: center; gap: 6px; background: white; font-size: 13px;">
+<svg style="width: 14px; height: 14px; fill: currentColor;" viewbox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"></path></svg>
+                  登录会话
+                </div>
+<div style="display: flex; gap: 24px; align-items: center;">
+<div style="padding: 4px 12px; border: 1px solid #1677ff; border-radius: 4px; color: #1677ff; display: flex; align-items: center; gap: 6px; background: white; font-size: 13px;">
+<svg style="width: 14px; height: 14px; fill: currentColor;" viewbox="0 0 24 24"><path d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z"></path></svg>
+                    H5 身份
+                  </div>
+<div style="padding: 12px 20px; background: #1677ff; border-radius: 8px; color: white; display: flex; flex-direction: column; align-items: center; font-weight: 600; font-size: 14px;">
+<svg style="width: 20px; height: 20px; fill: currentColor; margin-bottom: 4px;" viewbox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"></path></svg>
+                    安全策略
+                  </div>
+<div style="padding: 4px 12px; border: 1px solid #fa8c16; border-radius: 4px; color: #fa8c16; display: flex; align-items: center; gap: 6px; background: white; font-size: 13px;">
+<svg style="width: 14px; height: 14px; fill: currentColor;" viewbox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"></path></svg>
+                    敏感字段
+                  </div>
+</div>
+<div style="display: flex; gap: 24px;">
+<div style="padding: 4px 12px; border: 1px solid #722ed1; border-radius: 4px; color: #722ed1; display: flex; align-items: center; gap: 6px; background: #f9f0ff; font-size: 13px;">
+<svg style="width: 14px; height: 14px; fill: currentColor;" viewbox="0 0 24 24"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"></path></svg>
+                    高危确认
+                  </div>
+<div style="padding: 4px 12px; border: 1px solid #13c2c2; border-radius: 4px; color: #13c2c2; display: flex; align-items: center; gap: 6px; background: #e6fffb; font-size: 13px;">
+<svg style="width: 14px; height: 14px; fill: currentColor;" viewbox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"></path></svg>
+                    审计留痕
+                  </div>
+</div>
+</div>
+</div>
+</div>
+<!-- Panel 2: 高危操作清单 -->
+<div class="panel bottom-panel">
+<div class="panel-header" style="font-size: 14px; padding: 10px 16px;">高危操作清单</div>
+<div class="panel-body" style="padding: 0; display: flex; flex-direction: column; flex: 1;">
+<table style="font-size: 12px;">
+<thead>
+<tr>
+<th style="padding: 8px 12px; font-weight: 400; color: #666; border-top: none;">操作名称</th>
+<th style="padding: 8px 12px; font-weight: 400; color: #666; border-top: none;">触发条件</th>
+<th style="padding: 8px 12px; text-align: center; font-weight: 400; color: #666; border-top: none;">风险等级</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="padding: 8px 12px; border-bottom: none;">越权访问</td>
+<td style="padding: 8px 12px; color: #666; border-bottom: none;">访问未授权数据</td>
+<td style="padding: 8px 12px; text-align: center; color: #ef4444; border-bottom: none;">高</td>
+</tr>
+<tr>
+<td style="padding: 8px 12px; border-bottom: none;">批量导出</td>
+<td style="padding: 8px 12px; color: #666; border-bottom: none;">单次导出 &gt; 5000 条</td>
+<td style="padding: 8px 12px; text-align: center; color: #ef4444; border-bottom: none;">高</td>
+</tr>
+<tr>
+<td style="padding: 8px 12px; border-bottom: none;">删除附件</td>
+<td style="padding: 8px 12px; color: #666; border-bottom: none;">附件批量删除</td>
+<td style="padding: 8px 12px; text-align: center; color: #f97316; border-bottom: none;">中</td>
+</tr>
+<tr>
+<td style="padding: 8px 12px; border-bottom: none;">修改配置</td>
+<td style="padding: 8px 12px; color: #666; border-bottom: none;">关键配置变更</td>
+<td style="padding: 8px 12px; text-align: center; color: #ef4444; border-bottom: none;">高</td>
+</tr>
+</tbody>
+</table>
+<div style="padding: 10px 16px; text-align: left; margin-top: auto; border-top: 1px solid #d7e2ef;">
+<a href="#" style="color: #1677ff; text-decoration: none; font-size: 13px; display: inline-flex; align-items: center;">查看全部高危操作 <svg style="width: 14px; height: 14px; fill: currentColor; margin-left: 4px;" viewbox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"></path></svg></a>
+</div>
+</div>
+</div>
+<!-- Panel 3: 发布复核门禁 -->
+<div class="panel bottom-panel">
+<div class="panel-header" style="font-size: 14px; padding: 10px 16px;">发布复核门禁</div>
+<div class="panel-body" style="display: flex; flex-direction: column; gap: 12px; flex: 1; padding: 12px 16px;">
+<div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px;">
+<div style="display: flex; align-items: center; gap: 8px;">
+<svg style="width: 16px; height: 16px; fill: #52c41a;" viewbox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"></path></svg>
+<span>策略完整性</span>
+</div>
+<span style="color: #52c41a;">通过</span>
+</div>
+<div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px;">
+<div style="display: flex; align-items: center; gap: 8px;">
+<svg style="width: 16px; height: 16px; fill: #52c41a;" viewbox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"></path></svg>
+<span>脱敏覆盖</span>
+</div>
+<span style="color: #52c41a;">通过</span>
+</div>
+<div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px;">
+<div style="display: flex; align-items: center; gap: 8px;">
+<svg style="width: 16px; height: 16px; fill: #52c41a;" viewbox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"></path></svg>
+<span>审计链路</span>
+</div>
+<span style="color: #52c41a;">通过</span>
+</div>
+<div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px;">
+<div style="display: flex; align-items: center; gap: 8px;">
+<svg style="width: 16px; height: 16px; fill: #52c41a;" viewbox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"></path></svg>
+<span>应急回滚</span>
+</div>
+<span style="color: #52c41a;">通过</span>
+</div>
+<div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px;">
+<div style="display: flex; align-items: center; gap: 8px;">
+<svg style="width: 16px; height: 16px; fill: #fa8c16;" viewbox="0 0 24 24"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"></path></svg>
+<span>异常登录演练</span>
+</div>
+<span style="color: #fa8c16;">警告</span>
+</div>
+<div style="margin-top: auto; border-top: 1px solid #d7e2ef; margin: auto -16px -12px -16px; padding: 10px 16px;">
+<a href="#" style="color: #1677ff; text-decoration: none; font-size: 13px; display: inline-flex; align-items: center;">查看复核详情 <svg style="width: 14px; height: 14px; fill: currentColor; margin-left: 4px;" viewbox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"></path></svg></a>
+</div>
+</div>
+</div>
+<!-- Panel 4: 异常登录趋势 -->
+<div class="panel bottom-panel">
+<div class="panel-header" style="font-size: 14px; padding: 10px 16px; display: flex; align-items: center;">
+            异常登录趋势（最近 7 天）
+</div>
+<div class="panel-body" style="padding: 12px 16px 10px; display: flex; flex-direction: column; flex: 1;">
+<div style="display: flex; gap: 16px; margin-bottom: 8px; font-size: 11px;">
+<div style="display: flex; align-items: center; gap: 6px;">
+<div style="width: 10px; height: 2px; background: #1677ff; position: relative;">
+<div style="width: 4px; height: 4px; border-radius: 50%; background: #1677ff; position: absolute; top: -1px; left: 3px;"></div>
+</div>
+<span>异常登录次数</span>
+</div>
+<div style="display: flex; align-items: center; gap: 6px;">
+<div style="width: 10px; height: 10px; background: #00b96b;"></div>
+<span>阻断次数</span>
+</div>
+</div>
+<div style="flex: 1; position: relative; min-height: 80px;">
+<canvas id="trendChart"></canvas>
+</div>
+<div style="margin-top: auto; border-top: 1px solid #d7e2ef; margin: auto -16px -10px -16px; padding: 10px 16px;">
+<a href="#" style="color: #1677ff; text-decoration: none; font-size: 13px; display: inline-flex; align-items: center;">查看全部趋势 <svg style="width: 14px; height: 14px; fill: currentColor; margin-left: 4px;" viewbox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"></path></svg></a>
+</div>
+</div>
+</div>
+</div>
+<!-- END: Bottom Row -->
+</main>
+<!-- END: Main Content Area -->
+</div>
+<script data-purpose="chart-setup">
+    document.addEventListener('DOMContentLoaded', function() {
+      const ctx = document.getElementById('trendChart').getContext('2d');
+      
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: ['06-10', '06-11', '06-12', '06-13', '06-14', '06-15', '06-16'],
+          datasets: [
+            {
+              label: '异常登录次数',
+              data: [20, 32, 18, 22, 18, 28, 18],
+              borderColor: '#1677ff',
+              backgroundColor: '#1677ff',
+              borderWidth: 2,
+              pointRadius: 3,
+              pointBackgroundColor: '#1677ff',
+              tension: 0,
+              yAxisID: 'y'
+            },
+            {
+              type: 'bar',
+              label: '阻断次数',
+              data: [8, 14, 8, 10, 12, 18, 10],
+              backgroundColor: '#00b96b',
+              barPercentage: 0.4,
+              yAxisID: 'y'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            },
+            tooltip: {
+              enabled: false
+            }
+          },
+          scales: {
+            y: {
+              min: 0,
+              max: 40,
+              ticks: {
+                stepSize: 10,
+                font: { size: 9, color: '#999' }
+              },
+              grid: {
+                color: '#f0f0f0',
+                drawBorder: false
+              }
+            },
+            x: {
+              grid: {
+                display: false
+              },
+              ticks: {
+                font: { size: 9, color: '#999' }
+              }
+            }
+          },
+          layout: {
+            padding: 0
+          }
+        }
+      });
+    });
+  </script>
+</body></html>

@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -114,12 +115,14 @@ public class WorkflowRuntimePlanner {
         Set<String> visited = new HashSet<>();
         int guard = 0;
         int maxSteps = Math.max(1, nodeById.size() + edgesBySource.values().stream().mapToInt(List::size).sum() + 1);
+        String pendingCcRoleCodes = "";
+        String pendingCcUserIds = "";
 
         // 预缓存审批角色-成员映射，避免循环内重复查询
         Map<String, List<Long>> roleMemberCache = new HashMap<>();
         if (userRoleMapper != null) {
             for (Map.Entry<String, Map<String, Object>> entry : nodeById.entrySet()) {
-                if ("approval".equals(nodeType(entry.getValue()))) {
+                if (isExecutableNode(nodeType(entry.getValue()))) {
                     Map<String, Object> nd = nodeData(entry.getValue());
                     String approverRole = textValue(nd.get("approverRole"));
                     if (approverRole != null && !approverRole.isBlank() && !roleMemberCache.containsKey(approverRole)) {
@@ -138,7 +141,7 @@ public class WorkflowRuntimePlanner {
             Map<String, Object> node = nodeById.get(currentNodeId);
             Map<String, Object> data = nodeData(node);
             String type = nodeType(node);
-            if ("approval".equals(type)) {
+            if (isExecutableNode(type)) {
                 String approvalMode = firstPresent(textValue(data.get("approvalMode")), "sequence");
                 // 运行时校验 count 模式的 countThreshold 合法性
                 if ("count".equals(approvalMode)) {
@@ -156,6 +159,8 @@ public class WorkflowRuntimePlanner {
                 }
                 String nodeApproverType = textValue(data.get("approverType"));
                 String nodeApproverId = textValue(data.get("approverId"));
+                String mergedCcRoleCodes = mergeCsv(pendingCcRoleCodes, textValue(data.get("ccRoleCodes")));
+                String mergedCcUserIds = mergeCsv(pendingCcUserIds, textValue(data.get("ccUserIds")));
                 approvalNodes.add(new WorkflowDefinitionService.WorkflowApprovalNode(
                         approvalNodes.size() + 1,
                         currentNodeId,
@@ -165,12 +170,20 @@ public class WorkflowRuntimePlanner {
                         approvalMode,
                         "user".equals(nodeApproverType) ? "user" : "role",
                         "user".equals(nodeApproverType) ? nodeApproverId : "",
-                        textValue(data.get("ccRoleCodes")),
-                        textValue(data.get("ccUserIds")),
+                        mergedCcRoleCodes,
+                        mergedCcUserIds,
                         parseIntValue(data.get("orderIndex"), 0),
                         parseIntValue(data.get("countThreshold"), 0)
                 ));
+                pendingCcRoleCodes = "";
+                pendingCcUserIds = "";
+            } else if ("cc".equals(type)) {
+                pendingCcRoleCodes = mergeCsv(pendingCcRoleCodes, textValue(data.get("ccRoleCodes")));
+                pendingCcUserIds = mergeCsv(pendingCcUserIds, textValue(data.get("ccUserIds")));
             } else if ("end".equals(type)) {
+                if ((!pendingCcRoleCodes.isBlank() || !pendingCcUserIds.isBlank()) && !approvalNodes.isEmpty()) {
+                    appendCcToLastApprovalNode(approvalNodes, pendingCcRoleCodes, pendingCcUserIds);
+                }
                 resultAction = textValue(data.get("resultAction"));
                 break;
             }
@@ -413,6 +426,50 @@ public class WorkflowRuntimePlanner {
     // -------------------------------------------------------------------------
     // Node helpers
     // -------------------------------------------------------------------------
+
+    private boolean isExecutableNode(String type) {
+        return "approval".equals(type) || "task".equals(type);
+    }
+
+    private String mergeCsv(String left, String right) {
+        LinkedHashSet<String> values = new LinkedHashSet<>();
+        addCsvValues(values, left);
+        addCsvValues(values, right);
+        return String.join(",", values);
+    }
+
+    private void addCsvValues(Set<String> values, String raw) {
+        if (raw == null || raw.isBlank()) {
+            return;
+        }
+        for (String part : raw.split(",")) {
+            String trimmed = part.trim();
+            if (!trimmed.isEmpty()) {
+                values.add(trimmed);
+            }
+        }
+    }
+
+    private void appendCcToLastApprovalNode(List<WorkflowDefinitionService.WorkflowApprovalNode> approvalNodes,
+                                            String ccRoleCodes,
+                                            String ccUserIds) {
+        int lastIndex = approvalNodes.size() - 1;
+        WorkflowDefinitionService.WorkflowApprovalNode last = approvalNodes.get(lastIndex);
+        approvalNodes.set(lastIndex, new WorkflowDefinitionService.WorkflowApprovalNode(
+                last.stepNo(),
+                last.nodeId(),
+                last.nodeCode(),
+                last.label(),
+                last.approverRole(),
+                last.approvalMode(),
+                last.approverType(),
+                last.approverId(),
+                mergeCsv(last.ccRoleCodes(), ccRoleCodes),
+                mergeCsv(last.ccUserIds(), ccUserIds),
+                last.orderIndex(),
+                last.countThreshold()
+        ));
+    }
 
     /**
      * 将对象转为去空格的字符串，null 返回空字符串。

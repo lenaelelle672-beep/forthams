@@ -20,4 +20,6 @@ public class ApprovalCreateDTO {
     @NotNull(message = "申请人不能为空")
     private Long applicantId;
     private String businessData;
+    private Long expectedWorkflowDefinitionId;
+    private Integer expectedWorkflowVersion;
 }

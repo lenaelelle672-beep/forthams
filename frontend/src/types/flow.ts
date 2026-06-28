@@ -1,6 +1,6 @@
 import { type Connection, type Edge, MarkerType, type Node, type XYPosition } from '@xyflow/react';
 
-export type FlowNodeType = 'start' | 'approval' | 'condition' | 'end';
+export type FlowNodeType = 'start' | 'approval' | 'task' | 'cc' | 'condition' | 'end';
 
 export interface FlowNodeData extends Record<string, unknown> {
   type: FlowNodeType;
@@ -17,6 +17,11 @@ export interface FlowNodeData extends Record<string, unknown> {
   trueLabel: string;
   falseLabel: string;
   resultAction: string;
+  formSource?: string;
+  formSectionName?: string;
+  formSummaryFields?: string;
+  ccRoleCodes?: string;
+  ccUserIds?: string;
 }
 
 export type FlowNode = Node<FlowNodeData, FlowNodeType>;
@@ -30,19 +35,23 @@ export interface FlowDefinition {
   edges: FlowEdge[];
 }
 
-export const FLOW_NODE_ORDER: FlowNodeType[] = ['start', 'approval', 'condition', 'end'];
+export const FLOW_NODE_ORDER: FlowNodeType[] = ['start', 'approval', 'task', 'cc', 'condition', 'end'];
 export const FLOW_NODE_DND_TYPE = 'application/forthams-flow-node';
 
 export const FLOW_NODE_CATALOG: Record<FlowNodeType, { label: string; description: string; helper: string }> = {
   start: { label: '开始节点', description: '流程入口与触发条件', helper: '适合表单提交、批量导入、定时任务' },
   approval: { label: '审批节点', description: '指派审批人并定义会签规则', helper: '支持按岗位、部门负责人、固定审批人配置' },
+  task: { label: '办理节点', description: '指派办理人完成阻塞处理步骤', helper: '复用角色或指定用户配置办理人' },
+  cc: { label: '抄送节点', description: '向角色或用户发送非阻塞通知', helper: '不计入审批步骤，可挂载到后续处理节点' },
   condition: { label: '条件分支', description: '按金额、类别或字段值分流', helper: '支持通过/驳回、满足/不满足双向分支' },
   end: { label: '结束节点', description: '流程收口与结果归档', helper: '适合结束审批、归档单据、推送通知' },
 };
 
 const NODE_DEFAULTS: Record<FlowNodeType, Omit<FlowNodeData, 'type'>> = {
-  start: { label: '开始节点', description: '从资产申请单提交开始', nodeCode: 'START-001', triggerType: '表单提交', approverType: 'role', approverRole: '', approverRoleName: '', approverId: '', approvalMode: 'sequence', conditionExpression: '', trueLabel: '', falseLabel: '', resultAction: '' },
-  approval: { label: '审批节点', description: '由部门负责人审核资产申请', nodeCode: 'APP-001', triggerType: '', approverType: 'role', approverRole: 'SUPER_ADMIN', approverRoleName: '', approverId: '', approvalMode: 'sequence', conditionExpression: '', trueLabel: '', falseLabel: '', resultAction: '' },
+  start: { label: '开始节点', description: '从资产申请单提交开始', nodeCode: 'START-001', triggerType: '表单提交', approverType: 'role', approverRole: '', approverRoleName: '', approverId: '', approvalMode: 'sequence', conditionExpression: '', trueLabel: '', falseLabel: '', resultAction: '', formSectionName: '申请信息', formSummaryFields: 'reason,amount', formSource: '<form><label>申请事由</label><input name="reason" /><label>申请金额</label><input name="amount" type="number" /></form>' },
+  approval: { label: '审批节点', description: '由部门负责人审核资产申请', nodeCode: 'APP-001', triggerType: '', approverType: 'role', approverRole: 'SUPER_ADMIN', approverRoleName: '', approverId: '', approvalMode: 'sequence', conditionExpression: '', trueLabel: '', falseLabel: '', resultAction: '', formSectionName: '审批意见', formSummaryFields: 'approvalComment,approvalResult', formSource: '<form><label>审批意见</label><textarea name="approvalComment"></textarea></form>' },
+  task: { label: '办理节点', description: '由指定办理人处理当前事项', nodeCode: 'TASK-001', triggerType: '', approverType: 'role', approverRole: 'SUPER_ADMIN', approverRoleName: '', approverId: '', approvalMode: 'sequence', conditionExpression: '', trueLabel: '', falseLabel: '', resultAction: '' },
+  cc: { label: '抄送节点', description: '抄送相关角色或用户知会进度', nodeCode: 'CC-001', triggerType: '', approverType: 'role', approverRole: '', approverRoleName: '', approverId: '', approvalMode: 'sequence', conditionExpression: '', trueLabel: '', falseLabel: '', resultAction: '', ccRoleCodes: 'SUPER_ADMIN', ccUserIds: '' },
   condition: { label: '条件分支', description: '根据金额或字段命中不同路径', nodeCode: 'COND-001', triggerType: '', approverType: 'role', approverRole: '', approverRoleName: '', approverId: '', approvalMode: 'sequence', conditionExpression: '申请金额 >= 5000', trueLabel: '满足条件', falseLabel: '不满足条件', resultAction: '' },
   end: { label: '结束节点', description: '流程结束并同步审批结果', nodeCode: 'END-001', triggerType: '', approverType: 'role', approverRole: '', approverRoleName: '', approverId: '', approvalMode: 'sequence', conditionExpression: '', trueLabel: '', falseLabel: '', resultAction: '审批完成并归档' },
 };

@@ -12,6 +12,7 @@
  *   GET    /mail-logs/list               — 分页查询日志
  *   GET    /mail-logs/{id}               — 日志详情
  *   GET    /mail-logs/biz                — 按业务查询
+ *   POST   /mail-logs/{id}/retry         — 重试发送
  */
 
 import http from '@/utils/http';
@@ -69,5 +70,10 @@ export const mailLogApi = {
   /** 按业务查询 */
   getByBiz(bizType: string, bizId: number) {
     return http.get<MailLog[]>('/mail-logs/biz', { params: { bizType, bizId } });
+  },
+
+  /** 重试发送 */
+  retry(id: number) {
+    return http.post<void>(`/mail-logs/${id}/retry`);
   },
 };

@@ -1,0 +1,20 @@
+{
+  "name": "forthams-project",
+  "interface": {
+    "displayName": "forthAMS Project Plugins"
+  },
+  "plugins": [
+    {
+      "name": "gai2-native-guard",
+      "source": {
+        "source": "local",
+        "path": "./plugins/gai2-native-guard"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

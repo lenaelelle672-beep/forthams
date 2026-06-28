@@ -14,6 +14,9 @@
  *   PUT    /notification-preferences             — 保存单条
  *   PUT    /notification-preferences/batch       — 批量保存
  *   DELETE /notification-preferences/{id}        — 删除
+ *   GET    /notification-switches/list           — 流程通知开关列表
+ *   GET    /notification-switches/biz-type/{type} — 按业务类型查询流程通知开关
+ *   PUT    /notification-switches/{id}           — 更新流程通知开关启停
  */
 
 import http from '@/utils/http';
@@ -80,16 +83,15 @@ export const notificationPreferenceApi = {
   },
 };
 
-// ---------------------------------------------------------------------------
-// 以下为向后兼容 API（供旧的 NotificationBizSwitchTab.tsx 使用）
-// ---------------------------------------------------------------------------
-
-/** @deprecated 流程通知开关 API（旧版） */
+/** 流程通知开关 API */
 export const notificationSwitchApi = {
   list() {
-    return http.get<NotificationBizSwitch[]>('/notification-biz-switches');
+    return http.get<NotificationBizSwitch[]>('/notification-switches/list');
+  },
+  getByBizType(bizType: string) {
+    return http.get<NotificationBizSwitch[]>(`/notification-switches/biz-type/${bizType}`);
   },
   updateEnabled(id: number, enabled: number) {
-    return http.put<void>(`/notification-biz-switches/${id}/enabled`, { enabled });
+    return http.put<void>(`/notification-switches/${id}`, null, { params: { enabled } });
   },
 };

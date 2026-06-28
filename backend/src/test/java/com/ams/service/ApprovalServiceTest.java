@@ -136,6 +136,8 @@ class ApprovalServiceTest {
         dto.setBusinessType("ASSET_TRANSFER");
         dto.setBusinessId(12L);
         dto.setBusinessData("{\"assetId\":12,\"amount\":6000}");
+        dto.setExpectedWorkflowDefinitionId(7L);
+        dto.setExpectedWorkflowVersion(3);
 
         approvalService.createProcess(dto);
 
@@ -146,6 +148,24 @@ class ApprovalServiceTest {
         assertEquals(7L, ((Number) businessData.get("_workflowDefinitionId")).longValue());
         assertEquals(3, ((Number) businessData.get("_workflowVersion")).intValue());
         assertEquals("ASSET_TRANSFER", ((Map<?, ?>) businessData.get("_workflowDefinition")).get("businessType"));
+    }
+
+    @Test
+    void shouldRejectManagedProcessWhenExpectedWorkflowVersionIsStale() throws Exception {
+        WorkflowDefinition definition = workflowDefinition("ASSET_TRANSFER");
+        when(workflowDefinitionService.requirePublishedDefinition("ASSET_TRANSFER")).thenReturn(definition);
+        ApprovalCreateDTO dto = new ApprovalCreateDTO();
+        dto.setProcessType("ASSET_TRANSFER");
+        dto.setBusinessType("ASSET_TRANSFER");
+        dto.setBusinessId(12L);
+        dto.setBusinessData("{\"assetId\":12}");
+        dto.setExpectedWorkflowDefinitionId(7L);
+        dto.setExpectedWorkflowVersion(2);
+
+        BusinessException exception = assertThrows(BusinessException.class, () -> approvalService.createProcess(dto));
+
+        assertEquals("流程发布版本已更新，请刷新后重新提交", exception.getMessage());
+        verify(approvalProcessMapper, never()).insert(any(ApprovalProcess.class));
     }
 
     @Test
@@ -227,7 +247,7 @@ class ApprovalServiceTest {
         )));
         WorkflowDefinitionService.WorkflowRuntimePlan plan = new WorkflowDefinitionService.WorkflowRuntimePlan(List.of(
                 workflowNode(1, "approval-1", "SUPER_ADMIN", "sequence"),
-                workflowUserNode(2, "approval-2", 88L, "all")
+                workflowUserNodeWithCc(2, "approval-2", 88L, "all", "FINANCE", "7,9")
         ), "审批完成并归档");
         when(approvalProcessMapper.selectOne(any(QueryWrapper.class))).thenReturn(process);
         when(approvalRecordMapper.selectList(any(QueryWrapper.class))).thenReturn(List.of());
@@ -251,6 +271,8 @@ class ApprovalServiceTest {
         assertNull(runtimePath.get(1).get("approverRoleName"));
         assertEquals("user", runtimePath.get(1).get("approverType"));
         assertEquals("88", runtimePath.get(1).get("approverId"));
+        assertEquals("FINANCE", runtimePath.get(1).get("ccRoleCodes"));
+        assertEquals("7,9", runtimePath.get(1).get("ccUserIds"));
         assertEquals("审批完成并归档", detail.get("workflowResultAction"));
         verify(workflowDefinitionService).requireRuntimePlan(anyString(), anyString());
         verify(workflowDefinitionService, never()).requirePublishedRuntimePlan(anyString(), anyString());
@@ -858,5 +880,9 @@ class ApprovalServiceTest {
 
     private WorkflowDefinitionService.WorkflowApprovalNode workflowUserNode(int stepNo, String nodeId, Long approverId, String approvalMode) {
         return new WorkflowDefinitionService.WorkflowApprovalNode(stepNo, nodeId, nodeId.toUpperCase(), "审批节点", "", approvalMode, "user", String.valueOf(approverId), null, null, 0, 0);
+    }
+
+    private WorkflowDefinitionService.WorkflowApprovalNode workflowUserNodeWithCc(int stepNo, String nodeId, Long approverId, String approvalMode, String ccRoleCodes, String ccUserIds) {
+        return new WorkflowDefinitionService.WorkflowApprovalNode(stepNo, nodeId, nodeId.toUpperCase(), "审批节点", "", approvalMode, "user", String.valueOf(approverId), ccRoleCodes, ccUserIds, 0, 0);
     }
 }

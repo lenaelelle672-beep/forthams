@@ -1,12 +1,14 @@
 import { type DragEvent, useState } from 'react';
-import { ArrowRight, Flag, GitBranch, MoveRight, Play, ShieldCheck } from 'lucide-react';
+import { ArrowRight, Bell, ClipboardCheck, Flag, GitBranch, MoveRight, Play, ShieldCheck } from 'lucide-react';
 import { cn } from '@/utils/cn';
 import { FLOW_NODE_CATALOG, FLOW_NODE_DND_TYPE, FLOW_NODE_ORDER, type FlowNodeType } from '@/types/flow';
 
-const icons = { start: Play, approval: ShieldCheck, condition: GitBranch, end: Flag } satisfies Record<FlowNodeType, typeof Play>;
+const icons = { start: Play, approval: ShieldCheck, task: ClipboardCheck, cc: Bell, condition: GitBranch, end: Flag } satisfies Record<FlowNodeType, typeof Play>;
 const colors: Record<FlowNodeType, string> = {
   start: 'bg-green-100 text-green-600',
   approval: 'bg-blue-100 text-blue-600',
+  task: 'bg-cyan-100 text-cyan-700',
+  cc: 'bg-violet-100 text-violet-700',
   condition: 'bg-amber-100 text-amber-600',
   end: 'bg-red-100 text-red-600',
 };

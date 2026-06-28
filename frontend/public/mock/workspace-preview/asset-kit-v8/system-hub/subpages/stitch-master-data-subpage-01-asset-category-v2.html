@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>资产分类 - 企业资产管理系统</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary": "#565f70",
+                    "surface-container-low": "#f3f3f3",
+                    "on-primary-fixed-variant": "#004398",
+                    "on-primary": "#ffffff",
+                    "primary-fixed-dim": "#afc6ff",
+                    "outline-variant": "#c1c6d7",
+                    "outline": "#727786",
+                    "on-secondary-fixed-variant": "#3e4758",
+                    "inverse-primary": "#afc6ff",
+                    "on-secondary-fixed": "#131c2a",
+                    "on-error-container": "#93000a",
+                    "tertiary-fixed-dim": "#ffb695",
+                    "tertiary-container": "#c64f00",
+                    "error": "#ba1a1a",
+                    "on-tertiary-container": "#fffbff",
+                    "on-secondary": "#ffffff",
+                    "inverse-surface": "#2f3131",
+                    "primary-container": "#006ef2",
+                    "on-tertiary-fixed": "#351000",
+                    "secondary-fixed-dim": "#bec7db",
+                    "secondary-container": "#d7e0f4",
+                    "on-tertiary-fixed-variant": "#7c2e00",
+                    "on-primary-fixed": "#001a43",
+                    "surface-container": "#eeeeee",
+                    "primary-fixed": "#d9e2ff",
+                    "inverse-on-surface": "#f1f1f1",
+                    "on-surface": "#1a1c1c",
+                    "background": "#f9f9f9",
+                    "surface-container-high": "#e8e8e8",
+                    "surface-dim": "#dadada",
+                    "surface-variant": "#e2e2e2",
+                    "tertiary": "#9e3d00",
+                    "tertiary-fixed": "#ffdbcc",
+                    "on-primary-container": "#fefcff",
+                    "on-background": "#1a1c1c",
+                    "surface-bright": "#f9f9f9",
+                    "primary": "#0057c2",
+                    "on-secondary-container": "#5a6374",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-container-highest": "#e2e2e2",
+                    "on-surface-variant": "#414755",
+                    "surface-tint": "#0059c7",
+                    "surface": "#f9f9f9",
+                    "error-container": "#ffdad6",
+                    "on-error": "#ffffff",
+                    "on-tertiary": "#ffffff",
+                    "secondary-fixed": "#dae3f7"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "md": "16px",
+                    "sm": "12px",
+                    "unit": "4px",
+                    "sidebar-width": "208px",
+                    "xs": "8px",
+                    "header-height": "64px",
+                    "xl": "32px",
+                    "lg": "24px"
+            },
+            "fontFamily": {
+                    "label-caps": [
+                            "\"Inter, PingFang SC, Microsoft YaHei, sans-serif\""
+                    ],
+                    "title-sm": [
+                            "\"Inter, PingFang SC, Microsoft YaHei, sans-serif\""
+                    ],
+                    "body-md": [
+                            "\"Noto Sans, PingFang SC, Microsoft YaHei, sans-serif\""
+                    ],
+                    "headline-md": [
+                            "\"Inter, PingFang SC, Microsoft YaHei, sans-serif\""
+                    ],
+                    "body-sm": [
+                            "\"Noto Sans, PingFang SC, Microsoft YaHei, sans-serif\""
+                    ],
+                    "display-lg": [
+                            "\"Inter, PingFang SC, Microsoft YaHei, sans-serif\""
+                    ]
+            },
+            "fontSize": {
+                    "label-caps": [
+                            "12px",
+                            {
+                                    "lineHeight": "18px",
+                                    "letterSpacing": "0.05em",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "title-sm": [
+                            "16px",
+                            {
+                                    "lineHeight": "24px",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "body-md": [
+                            "14px",
+                            {
+                                    "lineHeight": "22px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "headline-md": [
+                            "24px",
+                            {
+                                    "lineHeight": "32px",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "body-sm": [
+                            "12px",
+                            {
+                                    "lineHeight": "20px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "display-lg": [
+                            "30px",
+                            {
+                                    "lineHeight": "38px",
+                                    "fontWeight": "600"
+                            }
+                    ]
+            }
+    },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Custom scrollbar for compactness */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #d9d9d9;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #bfbfbf;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md h-screen overflow-hidden flex">
+<!-- Sidebar -->
+<aside class="fixed left-0 top-0 h-full w-sidebar-width bg-on-secondary-fixed text-on-secondary shadow-md flex flex-col py-md px-sm z-20">
+<!-- Brand -->
+<div class="flex items-center gap-3 px-sm mb-lg">
+<div class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-on-primary fill text-[20px]">domain</span>
+</div>
+<div class="flex flex-col overflow-hidden">
+<span class="font-title-sm text-title-sm font-bold text-inverse-on-surface truncate">企业资产管理系统</span>
+<span class="font-body-sm text-body-sm text-secondary-fixed-dim truncate">Enterprise Admin</span>
+</div>
+</div>
+<!-- Navigation -->
+<nav class="flex-1 overflow-y-auto pr-1">
+<ul class="space-y-1">
+<li>
+<a class="flex items-center gap-3 px-sm py-2 rounded-lg text-secondary-fixed-dim hover:bg-primary-container/20 hover:text-white transition-colors duration-200 cursor-pointer active:opacity-80" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="dashboard">dashboard</span>
+<span class="font-body-md text-body-md">仪表盘</span>
+</a>
+</li>
+<li>
+<!-- Expanded Group -->
+<div class="flex items-center justify-between px-sm py-2 rounded-lg text-secondary-fixed-dim hover:bg-primary-container/20 hover:text-white transition-colors duration-200 cursor-pointer">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[20px]">folder_open</span>
+<span class="font-body-md text-body-md">基础资料</span>
+</div>
+<span class="material-symbols-outlined text-[16px]">expand_more</span>
+</div>
+<ul class="mt-1 space-y-1 pl-[36px]">
+<li>
+<!-- Active Item -->
+<a class="flex items-center gap-3 px-sm py-2 bg-primary text-on-primary font-bold rounded-lg cursor-pointer active:opacity-80" href="#">
+<span class="material-symbols-outlined text-[20px] fill" data-icon="category">category</span>
+<span class="font-body-md text-body-md">资产分类</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-sm py-2 text-secondary-fixed-dim hover:text-white transition-colors duration-200 cursor-pointer" href="#">
+<span class="font-body-md text-body-md">资产台账</span>
+</a>
+</li>
+</ul>
+</li>
+<li>
+<a class="flex items-center gap-3 px-sm py-2 rounded-lg text-secondary-fixed-dim hover:bg-primary-container/20 hover:text-white transition-colors duration-200 cursor-pointer active:opacity-80" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="inventory">inventory</span>
+<span class="font-body-md text-body-md">资产台账</span>
+</a>
+</li>
+</ul>
+</nav>
+</aside>
+<!-- Main Wrapper -->
+<div class="flex-1 ml-sidebar-width flex flex-col h-full bg-surface-container-low min-w-0">
+<!-- Top Header -->
+<header class="h-header-height bg-surface-container-lowest border-b border-outline-variant flex items-center justify-between px-lg shrink-0 z-10 relative">
+<div class="flex flex-col justify-center">
+<nav class="flex text-on-surface-variant font-body-sm text-body-sm mb-1">
+<span>系统管理</span>
+<span class="mx-2">/</span>
+<span>基础资料</span>
+<span class="mx-2">/</span>
+<span class="text-on-surface font-semibold">资产分类</span>
+</nav>
+<div class="flex items-center gap-4">
+<h1 class="font-headline-md text-headline-md font-bold text-on-surface tracking-tight">资产分类策略配置台</h1>
+<div class="flex items-center gap-2">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-[#f6ffed] text-[#389e0d] border border-[#b7eb8f]">
+<span class="w-1.5 h-1.5 rounded-full bg-[#389e0d] mr-1.5"></span>
+                            当前草稿已保存
+                        </span>
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-[#fffbe6] text-[#d46b08] border border-[#ffe58f]">
+                            待建资产池 23 条待补类
+                        </span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<button class="px-4 py-1.5 border border-outline text-on-surface rounded font-body-md text-body-md hover:border-primary hover:text-primary transition-colors bg-white">
+                    影响预览
+                </button>
+<button class="px-4 py-1.5 border border-outline text-on-surface rounded font-body-md text-body-md hover:border-primary hover:text-primary transition-colors bg-white">
+                    保存草稿
+                </button>
+<button class="px-4 py-1.5 border border-primary text-primary rounded font-body-md text-body-md hover:bg-primary/5 transition-colors bg-white">
+                    批量分类
+                </button>
+<button class="px-4 py-1.5 bg-primary text-white rounded font-body-md text-body-md hover:bg-primary/90 transition-colors shadow-sm">
+                    提交校验
+                </button>
+<button class="px-4 py-1.5 bg-primary text-white rounded font-body-md text-body-md hover:bg-primary/90 transition-colors shadow-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                    新建资产分类
+                </button>
+<div class="w-px h-6 bg-outline-variant mx-2"></div>
+<div class="flex items-center gap-2 text-on-surface-variant cursor-pointer">
+<img alt="Administrator" class="w-8 h-8 rounded-full border border-outline-variant object-cover" data-alt="A detailed 50-100 word prompt for a professional corporate headshot of a system administrator in an enterprise environment, clean white background, high quality lighting, professional attire, subtle smile." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAB3y7lOd2O9XQgrRRy6lKFOwpfOPydDqgQdPiy5M_NcmnVKkWm824QiYa68-FVqpJ5kAJpf2WXPLVqV5_NLIS5Vp6YLyjItCMNlK3Stt7pwOJClWFk84lyaYkcRLj-6TXMBLY0GiJYwS9SvVstCNUy1_jLI5yY8lw7G_rUsNL9iZlEbTp-cQmj-vuBxYvzp32NYPXARDalJp9l3Cg0yXTAa9Jh_U58OFj-d-ESHg4BfqClnKnDsR8ivJku-TamtlgAwOtjq8XpcVI"/>
+</div>
+</div>
+</header>
+<!-- Content Area -->
+<main class="flex-1 flex overflow-hidden p-md gap-md">
+<!-- Left Panel: Tree -->
+<div class="w-[260px] bg-surface-container-lowest border border-outline-variant rounded-lg flex flex-col shrink-0 overflow-hidden shadow-sm">
+<div class="p-sm border-b border-outline-variant bg-surface-bright">
+<h2 class="font-title-sm text-title-sm font-semibold text-on-surface mb-3">资产分类树</h2>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">search</span>
+<input class="w-full pl-8 pr-3 py-1.5 text-sm border border-outline-variant rounded focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-shadow" placeholder="搜索分类名称/编码" type="text"/>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto p-2">
+<!-- Tree Node -->
+<div class="flex flex-col">
+<div class="flex items-center py-1.5 px-1 hover:bg-surface-container cursor-pointer rounded group">
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant mr-1">arrow_drop_down</span>
+<div class="w-4 h-4 border border-outline-variant rounded flex items-center justify-center mr-2 bg-white"></div>
+<span class="material-symbols-outlined text-[16px] text-[#faad14] mr-1.5">folder</span>
+<span class="text-sm text-on-surface">生产设备 (12)</span>
+</div>
+<div class="ml-6 flex flex-col">
+<div class="flex items-center py-1.5 px-1 hover:bg-surface-container cursor-pointer rounded">
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant mr-1">arrow_right</span>
+<div class="w-4 h-4 border border-outline-variant rounded flex items-center justify-center mr-2 bg-white"></div>
+<span class="material-symbols-outlined text-[16px] text-[#faad14] mr-1.5">folder</span>
+<span class="text-sm text-on-surface">加工设备 (5)</span>
+</div>
+<!-- Selected Node -->
+<div class="flex items-center py-1.5 px-1 bg-[#e6f7ff] cursor-pointer rounded">
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant mr-1">arrow_drop_down</span>
+<div class="w-4 h-4 border border-primary rounded flex items-center justify-center mr-2 bg-primary">
+<span class="material-symbols-outlined text-white text-[12px] font-bold">check</span>
+</div>
+<span class="material-symbols-outlined text-[16px] text-[#faad14] mr-1.5 fill">folder_open</span>
+<span class="text-sm text-primary font-medium">检测设备 (7)</span>
+</div>
+<!-- Checked Child -->
+<div class="ml-6 flex flex-col">
+<div class="flex items-center py-1.5 px-1 hover:bg-surface-container cursor-pointer rounded text-sm text-on-surface">
+<span class="material-symbols-outlined text-[18px] text-transparent mr-1">arrow_right</span>
+<div class="w-4 h-4 border border-primary rounded flex items-center justify-center mr-2 bg-primary">
+<span class="material-symbols-outlined text-white text-[12px] font-bold">check</span>
+</div>
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant mr-1.5">description</span>
+                                    AOI (3)
+                                </div>
+<div class="flex items-center py-1.5 px-1 hover:bg-surface-container cursor-pointer rounded text-sm text-on-surface">
+<span class="material-symbols-outlined text-[18px] text-transparent mr-1">arrow_right</span>
+<div class="w-4 h-4 border border-outline-variant rounded flex items-center justify-center mr-2 bg-white"></div>
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant mr-1.5">description</span>
+                                    X-Ray (2)
+                                </div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Middle Panel: Table -->
+<div class="flex-1 bg-surface-container-lowest border border-outline-variant rounded-lg flex flex-col overflow-hidden shadow-sm min-w-[500px]">
+<div class="p-sm border-b border-outline-variant bg-surface-bright flex justify-between items-center shrink-0">
+<h2 class="font-title-sm text-title-sm font-semibold text-on-surface">分类明细表 <span class="text-sm font-normal text-on-surface-variant ml-2">(已选: 检测设备/AOI)</span></h2>
+</div>
+<!-- Filter Bar -->
+<div class="p-sm border-b border-outline-variant bg-white shrink-0 flex flex-wrap gap-4 items-end">
+<div class="flex flex-col gap-1 w-48">
+<label class="text-xs text-on-surface-variant">分类名称</label>
+<input class="w-full px-3 py-1.5 text-sm border border-outline-variant rounded focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-shadow h-[32px]" placeholder="请输入" type="text"/>
+</div>
+<div class="flex flex-col gap-1 w-48">
+<label class="text-xs text-on-surface-variant">分类编码</label>
+<input class="w-full px-3 py-1.5 text-sm border border-outline-variant rounded focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-shadow h-[32px]" placeholder="请输入" type="text"/>
+</div>
+<div class="flex gap-2">
+<button class="px-4 h-[32px] bg-primary text-white rounded text-sm hover:bg-primary/90 transition-colors">查询</button>
+<button class="px-4 h-[32px] border border-outline text-on-surface rounded text-sm hover:border-primary hover:text-primary transition-colors bg-white">重置</button>
+</div>
+</div>
+<!-- Actions -->
+<div class="p-sm border-b border-outline-variant bg-white shrink-0 flex justify-between items-center">
+<div class="flex gap-2">
+<button class="px-3 py-1 bg-white border border-outline text-on-surface rounded text-sm hover:border-primary hover:text-primary transition-colors flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">add</span>新增下级
+                        </button>
+<button class="px-3 py-1 bg-white border border-outline text-on-surface rounded text-sm hover:border-error hover:text-error transition-colors flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">block</span>批量停用
+                        </button>
+</div>
+<button class="px-3 py-1 bg-white border border-outline text-on-surface rounded text-sm hover:border-primary hover:text-primary transition-colors flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">download</span>导出
+                    </button>
+</div>
+<!-- Table -->
+<div class="flex-1 overflow-auto">
+<table class="w-full text-left border-collapse whitespace-nowrap">
+<thead class="bg-[#fafafa] sticky top-0 z-10 shadow-[0_1px_0_#f0f0f0]">
+<tr>
+<th class="py-3 px-4 font-semibold text-sm text-on-surface border-b border-[#f0f0f0] w-12 text-center">
+<input class="rounded border-outline-variant text-primary focus:ring-primary" type="checkbox"/>
+</th>
+<th class="py-3 px-4 font-semibold text-sm text-on-surface border-b border-[#f0f0f0]">分类编码</th>
+<th class="py-3 px-4 font-semibold text-sm text-on-surface border-b border-[#f0f0f0]">分类名称</th>
+<th class="py-3 px-4 font-semibold text-sm text-on-surface border-b border-[#f0f0f0]">折旧年限</th>
+<th class="py-3 px-4 font-semibold text-sm text-on-surface border-b border-[#f0f0f0]">状态</th>
+<th class="py-3 px-4 font-semibold text-sm text-on-surface border-b border-[#f0f0f0] text-right">操作</th>
+</tr>
+</thead>
+<tbody class="text-sm text-on-surface-variant divide-y divide-[#f0f0f0] bg-white">
+<tr class="hover:bg-[#fafafa] transition-colors">
+<td class="py-2.5 px-4 text-center">
+<input class="rounded border-outline-variant text-primary focus:ring-primary" type="checkbox"/>
+</td>
+<td class="py-2.5 px-4 font-mono text-xs">C02.01.01</td>
+<td class="py-2.5 px-4 text-on-surface">AOI光学检测仪</td>
+<td class="py-2.5 px-4">5年</td>
+<td class="py-2.5 px-4">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-[#f6ffed] text-[#389e0d] border border-[#b7eb8f]">正常</span>
+</td>
+<td class="py-2.5 px-4 text-right">
+<a class="text-primary hover:text-primary-container mx-1" href="#">编辑</a>
+<a class="text-primary hover:text-primary-container mx-1" href="#">影响</a>
+<a class="text-[#ff4d4f] hover:text-[#cf1322] mx-1" href="#">停用</a>
+</td>
+</tr>
+<tr class="hover:bg-[#fafafa] transition-colors">
+<td class="py-2.5 px-4 text-center">
+<input class="rounded border-outline-variant text-primary focus:ring-primary" type="checkbox"/>
+</td>
+<td class="py-2.5 px-4 font-mono text-xs">C02.01.02</td>
+<td class="py-2.5 px-4 text-on-surface">自动光学检测机</td>
+<td class="py-2.5 px-4">5年</td>
+<td class="py-2.5 px-4">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-[#f6ffed] text-[#389e0d] border border-[#b7eb8f]">正常</span>
+</td>
+<td class="py-2.5 px-4 text-right">
+<a class="text-primary hover:text-primary-container mx-1" href="#">编辑</a>
+<a class="text-primary hover:text-primary-container mx-1" href="#">影响</a>
+<a class="text-[#ff4d4f] hover:text-[#cf1322] mx-1" href="#">停用</a>
+</td>
+</tr>
+<tr class="hover:bg-[#fafafa] transition-colors">
+<td class="py-2.5 px-4 text-center">
+<input class="rounded border-outline-variant text-primary focus:ring-primary" type="checkbox"/>
+</td>
+<td class="py-2.5 px-4 font-mono text-xs">C02.01.03</td>
+<td class="py-2.5 px-4 text-on-surface">三维光学检测</td>
+<td class="py-2.5 px-4">8年</td>
+<td class="py-2.5 px-4">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-[#fff1f0] text-[#cf1322] border border-[#ffa39e]">停用</span>
+</td>
+<td class="py-2.5 px-4 text-right">
+<a class="text-primary hover:text-primary-container mx-1" href="#">编辑</a>
+<a class="text-primary hover:text-primary-container mx-1" href="#">影响</a>
+<a class="text-primary hover:text-primary-container mx-1" href="#">启用</a>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination -->
+<div class="p-sm border-t border-outline-variant bg-white shrink-0 flex justify-end items-center gap-4 text-sm text-on-surface-variant">
+<span>共 3 条记录</span>
+<div class="flex items-center gap-1">
+<button class="w-8 h-8 flex items-center justify-center border border-outline-variant rounded bg-white hover:border-primary text-on-surface-variant disabled:opacity-50"><span class="material-symbols-outlined text-[18px]">chevron_left</span></button>
+<button class="w-8 h-8 flex items-center justify-center border border-primary bg-primary text-white rounded">1</button>
+<button class="w-8 h-8 flex items-center justify-center border border-outline-variant rounded bg-white hover:border-primary text-on-surface-variant disabled:opacity-50"><span class="material-symbols-outlined text-[18px]">chevron_right</span></button>
+</div>
+</div>
+</div>
+<!-- Right Panel: Form -->
+<div class="w-[300px] bg-[#fafafa] border border-outline-variant rounded-lg flex flex-col shrink-0 overflow-hidden shadow-sm">
+<div class="p-sm border-b border-outline-variant bg-white shrink-0 flex justify-between items-center">
+<h2 class="font-title-sm text-title-sm font-semibold text-on-surface">分类属性编辑区</h2>
+</div>
+<div class="p-sm border-b border-outline-variant bg-surface-container-low shrink-0 text-sm">
+<span class="text-on-surface-variant">当前编辑:</span> <span class="font-medium text-primary ml-1">AOI光学检测仪</span>
+</div>
+<div class="flex-1 overflow-y-auto p-4 space-y-4">
+<div class="flex flex-col gap-1.5">
+<label class="text-sm font-medium text-on-surface flex items-center gap-1">
+<span class="text-error">*</span>分类名称
+                        </label>
+<input class="w-full px-3 py-1.5 text-sm border border-outline-variant rounded focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-white" type="text" value="AOI光学检测仪"/>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="text-sm font-medium text-on-surface flex items-center gap-1">
+<span class="text-error">*</span>分类编码
+                        </label>
+<input class="w-full px-3 py-1.5 text-sm border border-outline-variant rounded bg-surface-container text-on-surface-variant cursor-not-allowed" disabled="" type="text" value="C02.01.01"/>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="text-sm font-medium text-on-surface">上级分类</label>
+<div class="relative">
+<input class="w-full pl-3 pr-8 py-1.5 text-sm border border-outline-variant rounded bg-white cursor-pointer focus:border-primary focus:ring-1 focus:ring-primary outline-none" readonly="" type="text" value="检测设备/AOI"/>
+<span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px] pointer-events-none">expand_more</span>
+</div>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="text-sm font-medium text-on-surface flex items-center gap-1">
+<span class="text-error">*</span>折旧年限 (年)
+                        </label>
+<input class="w-full px-3 py-1.5 text-sm border border-outline-variant rounded focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-white" type="number" value="5"/>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="text-sm font-medium text-on-surface">编号前缀</label>
+<input class="w-full px-3 py-1.5 text-sm border border-outline-variant rounded focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-white" type="text" value="AOI-"/>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="text-sm font-medium text-on-surface">状态</label>
+<div class="flex items-center gap-4 mt-1">
+<label class="flex items-center gap-2 cursor-pointer">
+<input checked="" class="text-primary focus:ring-primary border-outline-variant" name="status" type="radio"/>
+<span class="text-sm text-on-surface">正常</span>
+</label>
+<label class="flex items-center gap-2 cursor-pointer">
+<input class="text-primary focus:ring-primary border-outline-variant" name="status" type="radio"/>
+<span class="text-sm text-on-surface">停用</span>
+</label>
+</div>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="text-sm font-medium text-on-surface">备注说明</label>
+<textarea class="w-full px-3 py-2 text-sm border border-outline-variant rounded focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-white resize-none" placeholder="请输入备注信息" rows="3"></textarea>
+</div>
+</div>
+<div class="p-4 border-t border-outline-variant bg-white shrink-0 flex justify-end gap-3">
+<button class="px-4 py-1.5 border border-outline text-on-surface rounded text-sm hover:border-primary hover:text-primary transition-colors bg-white">取消</button>
+<button class="px-4 py-1.5 bg-primary text-white rounded text-sm hover:bg-primary/90 transition-colors shadow-sm">保存</button>
+</div>
+</div>
+</main>
+</div>
+</body></html>

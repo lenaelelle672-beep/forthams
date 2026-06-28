@@ -179,6 +179,9 @@ public class WorkflowTemplateRegistry {
         data.put("trueLabel", "");
         data.put("falseLabel", "");
         data.put("resultAction", "end".equals(type) ? "审批完成并同步业务状态" : "");
+        data.put("formSource", defaultFormSource(type));
+        data.put("formSectionName", defaultFormSectionName(type));
+        data.put("formSummaryFields", "start".equals(type) ? "reason,amount" : "approvalComment,approvalResult");
 
         Map<String, Object> position = new LinkedHashMap<>();
         position.put("x", x);
@@ -190,6 +193,27 @@ public class WorkflowTemplateRegistry {
         node.put("position", position);
         node.put("data", data);
         return node;
+    }
+
+    private String defaultFormSource(String type) {
+        if ("start".equals(type)) {
+            return "<form><label>申请事由</label><input name=\"reason\" />"
+                    + "<label>申请金额</label><input name=\"amount\" type=\"number\" /></form>";
+        }
+        if ("approval".equals(type)) {
+            return "<form><label>审批意见</label><textarea name=\"approvalComment\"></textarea></form>";
+        }
+        return "";
+    }
+
+    private String defaultFormSectionName(String type) {
+        if ("start".equals(type)) {
+            return "申请信息";
+        }
+        if ("approval".equals(type)) {
+            return "审批意见";
+        }
+        return "";
     }
 
     /**

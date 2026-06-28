@@ -860,6 +860,29 @@ CREATE TABLE IF NOT EXISTS workflow_definition (
     INDEX idx_workflow_tenant_status (tenant_id, status)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+CREATE TABLE IF NOT EXISTS workflow_definition_version (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    tenant_id VARCHAR(64) NOT NULL,
+    definition_id BIGINT NOT NULL,
+    business_type VARCHAR(64) NOT NULL,
+    version INT NOT NULL,
+    action_type VARCHAR(32) NOT NULL DEFAULT 'PUBLISH',
+    status VARCHAR(32) NOT NULL DEFAULT 'PUBLISHED',
+    name VARCHAR(128) NOT NULL,
+    description TEXT,
+    definition_json LONGTEXT NOT NULL,
+    publish_note VARCHAR(512),
+    impact_scope VARCHAR(512),
+    rollback_plan VARCHAR(512),
+    rollback_source_version BIGINT,
+    operator_id BIGINT,
+    published_at DATETIME NOT NULL,
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uk_workflow_version_tenant_business_version (tenant_id, business_type, version),
+    INDEX idx_workflow_version_definition (definition_id),
+    INDEX idx_workflow_version_tenant_business_time (tenant_id, business_type, published_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 CREATE TABLE IF NOT EXISTS sys_attachment (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     tenant_id VARCHAR(64) NOT NULL DEFAULT 'dept:1',

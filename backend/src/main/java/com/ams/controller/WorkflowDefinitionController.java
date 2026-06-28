@@ -1,10 +1,17 @@
 package com.ams.controller;
 
 import com.ams.common.Result;
+import com.ams.annotation.OperBusinessType;
+import com.ams.annotation.OperLog;
 import com.ams.common.exception.BusinessException;
 import com.ams.dto.CreateCustomDefinitionRequest;
+import com.ams.dto.WorkflowAssigneePreviewRequest;
+import com.ams.dto.WorkflowAssigneePreviewResponse;
 import com.ams.dto.WorkflowDefinitionDTO;
 import com.ams.dto.WorkflowDefinitionSaveDTO;
+import com.ams.dto.WorkflowDefinitionVersionDTO;
+import com.ams.dto.WorkflowPublishRequest;
+import com.ams.dto.WorkflowRollbackRequest;
 import com.ams.dto.WorkflowStatusUpdateDTO;
 import com.ams.security.LoginUser;
 import com.ams.service.WorkflowDefinitionService;
@@ -47,8 +54,32 @@ public class WorkflowDefinitionController {
         return Result.success(workflowDefinitionService.getDefinition(businessType));
     }
 
+    @PreAuthorize("@ss.hasPermi('workflow:definition:query')")
+    @GetMapping("/{businessType}/versions")
+    public Result<List<WorkflowDefinitionVersionDTO>> listVersions(@PathVariable String businessType) {
+        return Result.success(workflowDefinitionService.listVersionHistory(businessType));
+    }
+
+    @PreAuthorize("@ss.hasPermi('workflow:definition:query')")
+    @GetMapping("/{businessType}/versions/{version}")
+    public Result<WorkflowDefinitionVersionDTO> getVersion(
+            @PathVariable String businessType,
+            @PathVariable Integer version) {
+        return Result.success(workflowDefinitionService.getVersion(businessType, version));
+    }
+
+    @PreAuthorize("@ss.hasPermi('workflow:definition:query')")
+    @PostMapping("/{businessType}/assignees/preview")
+    @OperLog(title = "处理人预览", businessType = OperBusinessType.OTHER)
+    public Result<WorkflowAssigneePreviewResponse> previewAssignees(
+            @PathVariable String businessType,
+            @Valid @RequestBody WorkflowAssigneePreviewRequest request) {
+        return Result.success(workflowDefinitionService.previewAssignees(businessType, request));
+    }
+
     @PutMapping("/{businessType}/draft")
     @PreAuthorize("@ss.hasPermi('workflow:definition:edit')")
+    @OperLog(title = "流程草稿保存", businessType = OperBusinessType.UPDATE)
     public Result<WorkflowDefinitionDTO> saveDraft(
             @PathVariable String businessType,
             @Valid @RequestBody WorkflowDefinitionSaveDTO dto,
@@ -59,15 +90,30 @@ public class WorkflowDefinitionController {
 
     @PostMapping("/{businessType}/publish")
     @PreAuthorize("@ss.hasPermi('workflow:definition:edit')")
+    @OperLog(title = "流程发布", businessType = OperBusinessType.UPDATE)
     public Result<WorkflowDefinitionDTO> publish(
             @PathVariable String businessType,
+            @RequestBody(required = false) WorkflowPublishRequest publishRequest,
             HttpServletRequest request) {
         Long operatorId = getCurrentUserId(request);
-        return Result.success(workflowDefinitionService.publish(businessType, operatorId));
+        return Result.success(workflowDefinitionService.publish(businessType, publishRequest, operatorId));
+    }
+
+    @PostMapping("/{businessType}/versions/{version}/rollback")
+    @PreAuthorize("@ss.hasPermi('workflow:definition:edit')")
+    @OperLog(title = "流程回滚", businessType = OperBusinessType.UPDATE)
+    public Result<WorkflowDefinitionDTO> rollbackToVersion(
+            @PathVariable String businessType,
+            @PathVariable Integer version,
+            @RequestBody(required = false) WorkflowRollbackRequest rollbackRequest,
+            HttpServletRequest request) {
+        Long operatorId = getCurrentUserId(request);
+        return Result.success(workflowDefinitionService.rollbackToVersion(businessType, version, rollbackRequest, operatorId));
     }
 
     @PostMapping("/{businessType}/status")
     @PreAuthorize("@ss.hasPermi('workflow:definition:edit')")
+    @OperLog(title = "流程状态更新", businessType = OperBusinessType.UPDATE)
     public Result<WorkflowDefinitionDTO> updateStatus(
             @PathVariable String businessType,
             @Valid @RequestBody WorkflowStatusUpdateDTO dto,
@@ -88,6 +134,7 @@ public class WorkflowDefinitionController {
 
     @DeleteMapping("/{businessType}")
     @PreAuthorize("@ss.hasPermi('workflow:definition:edit')")
+    @OperLog(title = "流程定义删除", businessType = OperBusinessType.DELETE)
     public Result<Void> deleteDefinition(@PathVariable String businessType) {
         workflowDefinitionService.deleteDefinition(businessType);
         return Result.success(null);

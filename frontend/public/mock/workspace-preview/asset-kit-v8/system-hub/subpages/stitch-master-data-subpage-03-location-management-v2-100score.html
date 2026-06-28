@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>固定资产管理系统 - 位置管理</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
+<style data-purpose="layout">
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: #f5f7fb;
+      margin: 0;
+      padding: 0;
+      width: 1586px;
+      height: 992px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      color: #333;
+    }
+    .main-container {
+      display: flex;
+      flex: 1;
+      height: calc(992px - 52px);
+    }
+    .content-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 16px;
+      gap: 16px;
+      overflow: hidden;
+    }
+    .top-section {
+      display: flex;
+      gap: 16px;
+      flex: 1;
+      height: calc(100% - 280px); /* Leave room for bottom band */
+    }
+    .bottom-band {
+      display: flex;
+      gap: 16px;
+      height: 260px;
+    }
+    .card {
+      background: white;
+      border-radius: 4px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      border: 1px solid #e5e7eb;
+      display: flex;
+      flex-direction: column;
+    }
+    .card-header {
+      padding: 12px 16px;
+      border-bottom: 1px solid #e5e7eb;
+      font-weight: 600;
+      font-size: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .table-container {
+      flex: 1;
+      overflow: hidden;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+    th, td {
+      padding: 8px 12px;
+      text-align: left;
+      border-bottom: 1px solid #f3f4f6;
+    }
+    th {
+      background-color: #f9fafb;
+      color: #6b7280;
+      font-weight: 500;
+    }
+    .status-badge {
+      padding: 2px 6px;
+      border-radius: 2px;
+      font-size: 12px;
+    }
+    .status-normal { background: #e6f4ea; color: #1e8e3e; }
+    .status-warning { background: #fef7e0; color: #ea8600; }
+    .status-error { background: #fce8e6; color: #d93025; }
+    .btn {
+      padding: 4px 12px;
+      border-radius: 4px;
+      font-size: 13px;
+      cursor: pointer;
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+    .btn-primary { background: #1677ff; color: white; }
+    .btn-default { border-color: #d9d9d9; background: white; color: rgba(0,0,0,0.85); }
+    .btn-link { color: #1677ff; padding: 0; background: transparent; }
+    
+    /* Scrollbar styling for a cleaner look if needed, though strictly we shouldn't have any per constraints */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #ddd; border-radius: 3px; }
+  </style>
+</head>
+<body>
+<!-- BEGIN: Top Navigation -->
+<header class="bg-[#061b38] text-white h-[52px] flex items-center justify-between px-4 shrink-0" style="z-index: 10;">
+<div class="flex items-center">
+<div class="flex items-center text-lg font-bold mr-8">
+<span class="tracking-wider">UNIVIEW</span>
+<span class="mx-3 text-gray-500">|</span>
+<span class="text-base font-normal">固定资产管理系统</span>
+</div>
+<nav class="flex h-full">
+<a class="px-4 flex items-center text-gray-300 hover:text-white text-sm" href="#">资产作业台</a>
+<a class="px-4 flex items-center text-gray-300 hover:text-white text-sm" href="#">资产管理中枢</a>
+<a class="px-4 flex items-center text-gray-300 hover:text-white text-sm" href="#">风险预警中心</a>
+<a class="px-4 flex items-center text-gray-300 hover:text-white text-sm" href="#">数据分析中心</a>
+<a class="px-4 flex items-center text-white border-b-2 border-[#1677ff] font-medium text-sm h-full" href="#">系统运营中枢</a>
+</nav>
+</div>
+<div class="flex items-center gap-4 text-gray-300">
+<div class="relative">
+<i class="fa-regular fa-bell text-lg"></i>
+<span class="absolute -top-1.5 -right-2 bg-red-500 text-white text-[10px] rounded-full px-1.5 py-0.5 border border-[#061b38]">12</span>
+</div>
+<i class="fa-regular fa-circle-question text-lg"></i>
+<div class="flex items-center gap-2 cursor-pointer hover:text-white">
+<div class="w-6 h-6 rounded-full bg-gray-500 flex items-center justify-center text-xs text-white">
+<i class="fa-solid fa-user"></i>
+</div>
+<span class="text-sm">管理员</span>
+<i class="fa-solid fa-chevron-down text-xs"></i>
+</div>
+</div>
+</header>
+<!-- END: Top Navigation -->
+<div class="main-container">
+<!-- BEGIN: Left Sidebar -->
+<aside class="w-[200px] bg-white border-r border-gray-200 flex flex-col shrink-0">
+<div class="p-4 border-b border-gray-100 flex justify-between items-center text-sm font-medium">
+<span>系统运营中枢</span>
+<i class="fa-solid fa-angles-left text-gray-400 cursor-pointer text-xs hover:text-gray-600"></i>
+</div>
+<nav class="flex-1 overflow-y-auto py-2">
+<a class="flex items-center px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50" href="#">
+<i class="fa-solid fa-sitemap w-5 text-center text-gray-400 mr-2"></i>流程平台
+        </a>
+<a class="flex items-center justify-between px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50" href="#">
+<div class="flex items-center">
+<i class="fa-regular fa-user w-5 text-center text-gray-400 mr-2"></i>组织权限
+          </div>
+<i class="fa-solid fa-angle-right text-xs text-gray-400"></i>
+</a>
+<div class="bg-blue-50/30">
+<a class="flex items-center justify-between px-4 py-2.5 text-sm text-[#1677ff] font-medium" href="#">
+<div class="flex items-center">
+<i class="fa-regular fa-folder-open w-5 text-center text-[#1677ff] mr-2"></i>基础资料
+            </div>
+<i class="fa-solid fa-angle-down text-xs text-[#1677ff]"></i>
+</a>
+<div class="pl-11 py-1">
+<a class="block py-2 text-sm text-gray-600 hover:text-[#1677ff]" href="#">资产分类</a>
+<a class="block py-2 text-sm text-white bg-[#1677ff] rounded mr-2 px-3 -ml-3" href="#">位置管理</a>
+<a class="block py-2 text-sm text-gray-600 hover:text-[#1677ff]" href="#">资产编码规则</a>
+<a class="block py-2 text-sm text-gray-600 hover:text-[#1677ff]" href="#">计量单位</a>
+<a class="block py-2 text-sm text-gray-600 hover:text-[#1677ff]" href="#">资产状态</a>
+<a class="block py-2 text-sm text-gray-600 hover:text-[#1677ff]" href="#">字典管理</a>
+</div>
+</div>
+<a class="flex items-center justify-between px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 mt-1" href="#">
+<div class="flex items-center">
+<i class="fa-solid fa-layer-group w-5 text-center text-gray-400 mr-2"></i>集成配置
+          </div>
+<i class="fa-solid fa-angle-right text-xs text-gray-400"></i>
+</a>
+<a class="flex items-center justify-between px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50" href="#">
+<div class="flex items-center">
+<i class="fa-regular fa-bell w-5 text-center text-gray-400 mr-2"></i>消息与通知
+          </div>
+<i class="fa-solid fa-angle-right text-xs text-gray-400"></i>
+</a>
+<a class="flex items-center justify-between px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50" href="#">
+<div class="flex items-center">
+<i class="fa-solid fa-gear w-5 text-center text-gray-400 mr-2"></i>系统参数
+          </div>
+<i class="fa-solid fa-angle-right text-xs text-gray-400"></i>
+</a>
+</nav>
+</aside>
+<!-- END: Left Sidebar -->
+<!-- BEGIN: Main Content Area -->
+<main class="content-area pb-4">
+<div class="top-section" style="height: 580px; flex: none;">
+<!-- BEGIN: Location Tree (Left Column) -->
+<div class="card w-[220px] shrink-0">
+<div class="card-header border-b-0 pb-2">
+<span>位置树</span>
+<div class="flex gap-2 text-gray-400">
+<i class="fa-solid fa-gear cursor-pointer hover:text-gray-600"></i>
+<i class="fa-solid fa-angles-left cursor-pointer hover:text-gray-600"></i>
+</div>
+</div>
+<div class="p-3 pt-0 flex-1 overflow-y-auto text-sm">
+<div class="flex items-center gap-1 py-1.5">
+<i class="fa-solid fa-angle-down text-gray-400 w-4 text-center cursor-pointer text-xs"></i>
+<i class="fa-regular fa-building text-blue-500 mr-1 text-xs"></i>
+<span class="text-gray-700">总部园区</span>
+<span class="status-badge status-normal ml-auto text-[10px] scale-90 origin-right">资产 842</span>
+</div>
+<div class="pl-4 border-l border-gray-100 ml-2">
+<div class="flex items-center gap-1 py-1.5">
+<i class="fa-solid fa-angle-down text-gray-400 w-4 text-center cursor-pointer text-xs"></i>
+<i class="fa-regular fa-file-lines text-blue-500 mr-1 text-xs"></i>
+<span class="text-gray-700">A 厂区</span>
+<span class="status-badge status-normal ml-auto text-[10px] scale-90 origin-right">资产 512</span>
+</div>
+<div class="pl-4 border-l border-gray-100 ml-2">
+<div class="flex items-center gap-1 py-1.5">
+<i class="fa-solid fa-angle-down text-gray-400 w-4 text-center cursor-pointer text-xs"></i>
+<i class="fa-regular fa-file-lines text-blue-500 mr-1 text-xs"></i>
+<span class="text-gray-700">A-01 楼</span>
+<span class="status-badge status-normal ml-auto text-[10px] scale-90 origin-right">资产 256</span>
+</div>
+<div class="pl-4 border-l border-gray-100 ml-2">
+<div class="flex items-center gap-1 py-1.5">
+<i class="fa-solid fa-angle-down text-gray-400 w-4 text-center cursor-pointer text-xs"></i>
+<i class="fa-regular fa-file-lines text-blue-500 mr-1 text-xs"></i>
+<span class="text-gray-700">2F</span>
+<span class="status-badge status-normal ml-auto text-[10px] scale-90 origin-right">资产 128</span>
+</div>
+<div class="pl-4 border-l border-gray-100 ml-2">
+<div class="flex items-center gap-1 py-1.5 bg-blue-50 rounded px-1 -mx-1">
+<i class="fa-solid fa-angle-right text-transparent w-4 text-center text-xs"></i>
+<i class="fa-regular fa-file-lines text-blue-500 mr-1 text-xs"></i>
+<span class="text-gray-700 font-medium">设备间 2F-18</span>
+<span class="status-badge status-normal ml-auto text-[10px] scale-90 origin-right bg-green-100">资产 48</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-1 py-1.5">
+<i class="fa-solid fa-angle-right text-gray-400 w-4 text-center cursor-pointer text-xs"></i>
+<i class="fa-regular fa-file-lines text-blue-500 mr-1 text-xs"></i>
+<span class="text-gray-700">A 仓库</span>
+<span class="status-badge status-normal ml-auto text-[10px] scale-90 origin-right">资产 64</span>
+</div>
+<div class="flex items-center gap-1 py-1.5">
+<i class="fa-solid fa-angle-right text-gray-400 w-4 text-center cursor-pointer text-xs"></i>
+<i class="fa-regular fa-file-lines text-blue-500 mr-1 text-xs"></i>
+<span class="text-gray-700">CIP 临时仓</span>
+<span class="status-badge status-warning ml-auto text-[10px] scale-90 origin-right bg-orange-50 text-orange-500 border border-orange-100">CIP 37</span>
+</div>
+</div>
+<div class="flex items-center gap-1 py-1.5">
+<i class="fa-solid fa-angle-right text-gray-400 w-4 text-center cursor-pointer text-xs"></i>
+<i class="fa-regular fa-file-lines text-blue-500 mr-1 text-xs"></i>
+<span class="text-gray-700">B 机房</span>
+<span class="status-badge status-normal ml-auto text-[10px] scale-90 origin-right mr-1">资产 98</span>
+<span class="status-badge status-error text-[10px] scale-90 origin-right border border-red-200">异常 2</span>
+</div>
+</div>
+</div>
+</div>
+<!-- END: Location Tree -->
+<!-- BEGIN: Center Workspace (Main Table) -->
+<div class="flex-1 flex flex-col gap-4 min-w-0">
+<!-- Header Actions -->
+<div class="flex justify-between items-start">
+<div>
+<h1 class="text-lg font-bold text-gray-800 mb-1">位置管理与资产空间绑定</h1>
+<p class="text-xs text-gray-500">园区、楼栋、楼层、房间、仓库、机房和 CIP 临时位置统一维护，供台账、盘点、维保、权限和转固引用。</p>
+</div>
+<div class="flex gap-2 shrink-0">
+<button class="btn btn-primary h-8 px-4 rounded flex items-center">新建位置</button>
+<button class="btn btn-default h-8 px-4 rounded flex items-center">保存草稿</button>
+<button class="btn btn-default h-8 px-4 rounded flex items-center text-blue-500 border-blue-200 bg-blue-50">提交校验</button>
+<button class="btn btn-default h-8 px-4 rounded flex items-center">发布位置</button>
+<button class="btn btn-default h-8 px-4 rounded flex items-center">导入楼层</button>
+</div>
+</div>
+<!-- Status Strip -->
+<div class="bg-white border border-gray-200 rounded px-4 py-2.5 flex items-center text-sm gap-6 shadow-sm">
+<div class="flex items-center text-green-600 font-medium text-xs">
+<i class="fa-solid fa-circle-check mr-2 text-sm"></i>草稿已保存 09:42
+            </div>
+<div class="text-orange-500 font-medium text-xs flex items-center">
+<i class="fa-solid fa-triangle-exclamation mr-2 text-sm"></i>待提交校验 3 项
+            </div>
+<a class="text-blue-500 hover:text-blue-600 text-xs flex items-center" href="#">
+              发布影响 1842 台资产
+            </a>
+</div>
+<!-- Main Table Card -->
+<div class="card flex-1 h-full" style="max-height: 420px;">
+<div class="p-3 border-b flex justify-between items-center gap-4">
+<div class="flex gap-2 flex-1 items-center">
+<div class="relative w-[280px]">
+<i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-gray-400 text-xs"></i>
+<input class="w-full pl-8 pr-3 py-1.5 text-sm border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 outline-none" placeholder="搜索位置名称 / 编码 / 负责人" type="text"/>
+</div>
+<button class="btn btn-primary text-xs py-1.5">全部位置</button>
+<button class="btn btn-default text-xs py-1.5 border-gray-200 text-gray-600">正常</button>
+<button class="btn btn-default text-xs py-1.5 text-orange-500 border-orange-200 bg-orange-50">CIP 临时</button>
+<button class="btn btn-default text-xs py-1.5 text-orange-500 border-orange-200">待校验</button>
+<button class="btn btn-default text-xs py-1.5 border-gray-200 text-gray-600">停用</button>
+</div>
+<div class="flex gap-3 text-gray-400 text-sm">
+<i class="fa-solid fa-filter cursor-pointer hover:text-gray-600"></i>
+<i class="fa-solid fa-rotate-right cursor-pointer hover:text-gray-600"></i>
+<i class="fa-solid fa-list cursor-pointer hover:text-gray-600"></i>
+<i class="fa-solid fa-gear cursor-pointer hover:text-gray-600"></i>
+</div>
+</div>
+<div class="table-container overflow-hidden">
+<table>
+<thead>
+<tr>
+<th class="w-10 text-center py-2"><input class="rounded border-gray-300" type="checkbox"/></th>
+<th class="py-2">位置编码</th>
+<th class="py-2">位置名称</th>
+<th class="py-2">层级</th>
+<th class="py-2">上级位置</th>
+<th class="py-2">负责人</th>
+<th class="py-2">资产数</th>
+<th class="py-2">CIP数</th>
+<th class="py-2">状态</th>
+<th class="py-2">操作</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="text-center py-2"><input class="rounded border-gray-300" type="checkbox"/></td>
+<td class="font-mono text-gray-600 py-2">LOC_A_2F18</td>
+<td class="py-2">设备间 2F-18</td>
+<td class="py-2">5</td>
+<td class="py-2">2F</td>
+<td class="py-2">张三</td>
+<td class="py-2">48</td>
+<td class="py-2">0</td>
+<td class="py-2"><span class="status-badge status-normal">正常</span></td>
+<td class="py-2">
+<button class="btn-link text-xs mr-2">编辑</button>
+<button class="btn-link text-xs mr-2">影响</button>
+<button class="btn-link text-xs">停用</button>
+</td>
+</tr>
+<tr>
+<td class="text-center py-2"><input class="rounded border-gray-300" type="checkbox"/></td>
+<td class="font-mono text-gray-600 py-2">LOC_CIP_TEMP</td>
+<td class="py-2">CIP 项目临时仓</td>
+<td class="py-2">2</td>
+<td class="py-2">A 厂区</td>
+<td class="py-2">李四</td>
+<td class="py-2">0</td>
+<td class="py-2">37</td>
+<td class="py-2"><span class="status-badge status-warning bg-orange-50 text-orange-500 border border-orange-100">CIP 临时</span></td>
+<td class="py-2">
+<button class="btn-link text-xs mr-2">编辑</button>
+<button class="btn-link text-xs mr-2">影响</button>
+<button class="btn-link text-xs">停用</button>
+</td>
+</tr>
+<tr>
+<td class="text-center py-2"><input class="rounded border-gray-300" type="checkbox"/></td>
+<td class="font-mono text-gray-600 py-2">LOC_IDC_B02</td>
+<td class="py-2">机房 B-02</td>
+<td class="py-2">3</td>
+<td class="py-2">B 机房</td>
+<td class="py-2">王五</td>
+<td class="py-2">32</td>
+<td class="py-2">5</td>
+<td class="py-2"><span class="status-badge status-normal">正常</span></td>
+<td class="py-2">
+<button class="btn-link text-xs mr-2">编辑</button>
+<button class="btn-link text-xs mr-2">影响</button>
+<button class="btn-link text-xs">停用</button>
+</td>
+</tr>
+<tr>
+<td class="text-center py-2"><input class="rounded border-gray-300" type="checkbox"/></td>
+<td class="font-mono text-gray-600 py-2">LOC_A_SPARE</td>
+<td class="py-2">A 仓库备件区</td>
+<td class="py-2">3</td>
+<td class="py-2">A 仓库</td>
+<td class="py-2">赵六</td>
+<td class="py-2">64</td>
+<td class="py-2">0</td>
+<td class="py-2"><span class="status-badge status-normal">正常</span></td>
+<td class="py-2">
+<button class="btn-link text-xs mr-2">编辑</button>
+<button class="btn-link text-xs mr-2">影响</button>
+<button class="btn-link text-xs">停用</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-3 border-t flex justify-between items-center text-sm text-gray-600 mt-auto bg-white">
+<div class="text-xs">共 4 条</div>
+<div class="flex items-center gap-3">
+<select class="border border-gray-300 rounded py-1 pl-2 pr-6 text-xs outline-none focus:border-blue-500"><option>20 条/页</option></select>
+<div class="flex gap-1">
+<button class="w-7 h-7 border rounded flex items-center justify-center text-gray-400 bg-gray-50 hover:bg-gray-100"><i class="fa-solid fa-angle-left text-xs"></i></button>
+<button class="w-7 h-7 border border-blue-500 rounded flex items-center justify-center bg-blue-500 text-white text-xs">1</button>
+<button class="w-7 h-7 border rounded flex items-center justify-center text-gray-600 hover:bg-gray-50 text-xs"><i class="fa-solid fa-angle-right"></i></button>
+</div>
+<div class="flex items-center gap-1 text-xs">
+                  前往 <input class="w-10 border border-gray-300 rounded py-1 px-2 text-center text-xs outline-none focus:border-blue-500" type="text" value="1"/> 页
+                </div>
+</div>
+</div>
+</div>
+</div>
+<!-- END: Center Workspace -->
+<!-- BEGIN: Right Property Panel -->
+<div class="w-[280px] shrink-0 flex flex-col gap-4 h-full">
+<!-- Property Form -->
+<div class="card flex-1 h-[580px]">
+<div class="card-header pb-3">
+<span>位置信息</span>
+<i class="fa-solid fa-angle-up text-gray-400 cursor-pointer text-xs"></i>
+</div>
+<div class="p-4 flex-1 flex flex-col gap-3.5 text-sm overflow-hidden">
+<div class="flex items-center">
+<label class="w-24 text-gray-600 text-xs">位置名称 <span class="text-red-500 ml-0.5">*</span></label>
+<input class="flex-1 border border-gray-300 rounded py-1 px-2 text-xs outline-none focus:border-blue-500" type="text" value="设备间 2F-18"/>
+</div>
+<div class="flex items-center">
+<label class="w-24 text-gray-600 text-xs">位置编码 <span class="text-red-500 ml-0.5">*</span></label>
+<input class="flex-1 border border-gray-300 rounded py-1 px-2 text-xs outline-none focus:border-blue-500" type="text" value="LOC_A_2F18"/>
+</div>
+<div class="flex items-center">
+<label class="w-24 text-gray-600 text-xs">上级位置 <span class="text-red-500 ml-0.5">*</span></label>
+<select class="flex-1 border border-gray-300 rounded py-1 pl-2 pr-6 text-xs outline-none focus:border-blue-500"><option>2F</option></select>
+</div>
+<div class="flex items-center">
+<label class="w-24 text-gray-600 text-xs">位置类型 <span class="text-red-500 ml-0.5">*</span></label>
+<select class="flex-1 border border-gray-300 rounded py-1 pl-2 pr-6 text-xs outline-none focus:border-blue-500"><option>设备间</option></select>
+</div>
+<div class="flex items-center">
+<label class="w-24 text-gray-600 text-xs">责任部门</label>
+<select class="flex-1 border border-gray-300 rounded py-1 pl-2 pr-6 text-xs outline-none focus:border-blue-500"><option>设备部</option></select>
+</div>
+<div class="flex items-center">
+<label class="w-24 text-gray-600 text-xs">负责人</label>
+<select class="flex-1 border border-gray-300 rounded py-1 pl-2 pr-6 text-xs outline-none focus:border-blue-500"><option>张三</option></select>
+</div>
+<div class="flex items-center">
+<label class="w-24 text-gray-600 text-xs">容量</label>
+<div class="flex-1 flex items-center gap-2">
+<input class="w-16 border border-gray-300 rounded py-1 px-2 text-xs text-right outline-none focus:border-blue-500" type="text" value="120"/>
+<span class="text-gray-500 text-xs">台位</span>
+</div>
+</div>
+<div class="w-full border-t border-gray-100 my-1"></div>
+<div class="flex items-center">
+<label class="w-24 text-gray-600 text-[11px] leading-tight pr-2">资产绑定策略</label>
+<select class="flex-1 border border-gray-300 rounded py-1 pl-2 pr-6 text-xs outline-none focus:border-blue-500"><option>按位置绑定</option></select>
+</div>
+<div class="flex items-center">
+<label class="w-24 text-gray-600 text-[11px] leading-tight pr-2">盘点策略</label>
+<select class="flex-1 border border-gray-300 rounded py-1 pl-2 pr-6 text-xs outline-none focus:border-blue-500"><option>按位置盘点</option></select>
+</div>
+<div class="flex items-center">
+<label class="w-24 text-gray-600 text-[11px] leading-tight pr-2">MES/ERP 映射码</label>
+<input class="flex-1 border border-gray-300 rounded py-1 px-2 text-xs outline-none focus:border-blue-500" type="text" value="LOC-A-2F18"/>
+</div>
+<div class="flex items-center">
+<label class="w-24 text-gray-600 text-[11px] leading-tight pr-2">启停状态</label>
+<select class="flex-1 border border-gray-300 rounded py-1 pl-2 pr-6 text-xs outline-none focus:border-blue-500"><option>正常</option></select>
+</div>
+<div class="flex items-center">
+<label class="w-24 text-gray-600 text-[11px] leading-tight pr-2">审计策略</label>
+<select class="flex-1 border border-gray-300 rounded py-1 pl-2 pr-6 text-xs outline-none focus:border-blue-500"><option>标准审计策略</option></select>
+</div>
+</div>
+</div>
+</div>
+<!-- END: Right Property Panel -->
+</div>
+<!-- BEGIN: Bottom Analysis Band -->
+<div class="bottom-band" style="height: 300px; gap: 16px;">
+<div class="card" style="width: 255px; flex: none;">
+<div class="card-header border-b-0 pb-2">
+<span class="flex items-center gap-1">资产绑定预览 <i class="fa-regular fa-circle-question text-gray-400 font-normal text-xs ml-1"></i></span>
+</div>
+<div class="flex-1 p-0 flex flex-col">
+<table class="mt-0">
+<thead><tr><th class="py-1.5 pl-4 bg-transparent border-b border-gray-100 font-medium">资产类别</th><th class="text-right py-1.5 bg-transparent border-b border-gray-100 font-medium">资产数</th><th class="text-right py-1.5 pr-4 bg-transparent border-b border-gray-100 font-medium">占比</th></tr></thead>
+<tbody>
+<tr><td class="py-2 pl-4 text-xs border-0">生产设备</td><td class="text-right font-mono py-2 text-xs border-0">816</td><td class="text-right py-2 pr-4 text-xs border-0 text-gray-500">44.3%</td></tr>
+<tr><td class="py-2 pl-4 text-xs border-0">动力设备</td><td class="text-right font-mono py-2 text-xs border-0">482</td><td class="text-right py-2 pr-4 text-xs border-0 text-gray-500">26.2%</td></tr>
+<tr><td class="py-2 pl-4 text-xs border-0">电子设备</td><td class="text-right font-mono py-2 text-xs border-0">290</td><td class="text-right py-2 pr-4 text-xs border-0 text-gray-500">15.7%</td></tr>
+<tr><td class="py-2 pl-4 text-xs border-0">运输设备</td><td class="text-right font-mono py-2 text-xs border-0">142</td><td class="text-right py-2 pr-4 text-xs border-0 text-gray-500">7.7%</td></tr>
+<tr><td class="py-2 pl-4 text-xs border-0">工装模具</td><td class="text-right font-mono py-2 text-xs border-0">112</td><td class="text-right py-2 pr-4 text-xs border-0 text-gray-500">6.1%</td></tr>
+</tbody>
+</table>
+<div class="mt-auto px-4 py-3 flex justify-between font-bold text-sm bg-gray-50 border-t border-gray-100 rounded-b">
+<span>合计</span><span class="font-mono ml-auto mr-8">1,842</span><span>100%</span>
+</div>
+</div>
+</div>
+<div class="card" style="width: 300px; flex: none;">
+<div class="card-header border-b-0 pb-2">CIP 在建工程占用</div>
+<div class="flex-1 p-0 flex flex-col">
+<table class="mt-0 table-fixed">
+<colgroup>
+<col class="w-20"/>
+<col class="w-24"/>
+<col class="w-20"/>
+<col class="w-12"/>
+</colgroup>
+<thead><tr><th class="py-1.5 pl-4 bg-transparent border-b border-gray-100 font-medium">项目编码</th><th class="py-1.5 bg-transparent border-b border-gray-100 font-medium">项目名称</th><th class="py-1.5 bg-transparent border-b border-gray-100 font-medium">占用位置</th><th class="text-right py-1.5 pr-4 bg-transparent border-b border-gray-100 font-medium">占用资产</th></tr></thead>
+<tbody>
+<tr><td class="font-mono text-xs py-2 pl-4 border-0 truncate" title="CIP2207">CIP2207</td><td class="py-2 text-xs border-0 truncate" title="线体升级改造">线体升级改造</td><td class="py-2 text-xs border-0 truncate" title="CIP 临时仓">CIP 临时仓</td><td class="text-right font-mono py-2 pr-4 text-xs border-0">18</td></tr>
+<tr><td class="font-mono text-xs py-2 pl-4 border-0 truncate" title="CIP2303">CIP2303</td><td class="py-2 text-xs border-0 truncate" title="环保设施改造">环保设施改造</td><td class="py-2 text-xs border-0 truncate" title="CIP 临时仓">CIP 临时仓</td><td class="text-right font-mono py-2 pr-4 text-xs border-0">9</td></tr>
+<tr><td class="font-mono text-xs py-2 pl-4 border-0 truncate" title="CIP2401">CIP2401</td><td class="py-2 text-xs border-0 truncate" title="能源优化项目">能源优化项目</td><td class="py-2 text-xs border-0 truncate" title="设备间 2F-18">设备间 2F-18</td><td class="text-right font-mono py-2 pr-4 text-xs border-0">5</td></tr>
+<tr><td class="font-mono text-xs py-2 pl-4 border-0 truncate" title="CIP2404">CIP2404</td><td class="py-2 text-xs border-0 truncate" title="自动化提升项目">自动化提升项目</td><td class="py-2 text-xs border-0 truncate" title="机房 B-02">机房 B-02</td><td class="text-right font-mono py-2 pr-4 text-xs border-0">5</td></tr>
+</tbody>
+</table>
+<div class="mt-auto px-4 py-3 flex justify-between font-bold text-sm bg-gray-50 border-t border-gray-100 rounded-b">
+<span>合计 4 项</span><span class="font-mono">37</span>
+</div>
+</div>
+</div>
+<div class="card" style="width: 250px; flex: none;">
+<div class="card-header border-b-0 pb-2 flex justify-between w-full pr-4 items-center">
+<span>移动影响分析</span>
+<div class="flex gap-3 text-[11px] font-normal">
+<span class="text-blue-600 border-b-2 border-blue-600 pb-0.5 cursor-pointer">按位置</span>
+<span class="text-gray-500 cursor-pointer hover:text-gray-700">按资产</span>
+</div>
+</div>
+<div class="flex-1 p-0 flex flex-col">
+<table class="mt-0">
+<thead><tr><th class="py-1.5 pl-4 bg-transparent border-b border-gray-100 font-medium">目标位置</th><th class="text-right py-1.5 bg-transparent border-b border-gray-100 font-medium">影响资产</th><th class="py-1.5 pr-4 pl-4 bg-transparent border-b border-gray-100 font-medium">影响类型</th></tr></thead>
+<tbody>
+<tr><td class="py-2 pl-4 text-xs border-0 text-gray-700">A 仓库备件区</td><td class="text-right font-mono py-2 text-xs border-0">34</td><td class="py-2 pl-4 pr-4 text-[11px] border-0 text-gray-500">资产迁移</td></tr>
+<tr><td class="py-2 pl-4 text-xs border-0 text-gray-700">设备间 2F-18</td><td class="text-right font-mono py-2 text-xs border-0">12</td><td class="py-2 pl-4 pr-4 text-[11px] border-0 text-gray-500">资产关联变更</td></tr>
+<tr><td class="py-2 pl-4 text-xs border-0 text-gray-700">机房 B-02</td><td class="text-right font-mono py-2 text-xs border-0">8</td><td class="py-2 pl-4 pr-4 text-[11px] border-0 text-gray-500">权限范围变更</td></tr>
+<tr><td class="py-2 pl-4 text-xs border-0 text-gray-700">CIP 临时仓</td><td class="text-right font-mono py-2 text-xs border-0">5</td><td class="py-2 pl-4 pr-4 text-[11px] border-0 text-gray-500">CIP 占用调整</td></tr>
+</tbody>
+</table>
+<div class="mt-auto px-4 py-3 flex justify-between font-bold text-sm bg-gray-50 border-t border-gray-100 rounded-b items-center">
+<span>合计</span><span class="font-mono mx-auto">59</span><span class="w-12"></span>
+</div>
+</div>
+</div>
+<div class="card" style="width: 275px; flex: none;">
+<div class="card-header border-b-0 pb-2">导入校验冲突</div>
+<div class="flex-1 p-0 flex flex-col">
+<table class="mt-0">
+<thead><tr><th class="py-1.5 pl-4 bg-transparent border-b border-gray-100 font-medium">冲突类型</th><th class="text-right py-1.5 bg-transparent border-b border-gray-100 font-medium">数量</th><th class="py-1.5 pr-4 pl-4 bg-transparent border-b border-gray-100 font-medium">示例</th></tr></thead>
+<tbody>
+<tr><td class="py-2 pl-4 text-[11px] border-0 text-gray-700">编码重复</td><td class="text-right font-mono py-2 text-xs border-0">2</td><td class="font-mono text-[10px] py-2 pl-4 pr-4 border-0 text-gray-500">LOC_A_2F18</td></tr>
+<tr><td class="py-2 pl-4 text-[11px] border-0 text-gray-700">上级位置不存在</td><td class="text-right font-mono py-2 text-xs border-0">1</td><td class="font-mono text-[10px] py-2 pl-4 pr-4 border-0 text-gray-500">LOC_X_999</td></tr>
+<tr><td class="py-2 pl-4 text-[11px] border-0 text-gray-700">层级不连续</td><td class="text-right font-mono py-2 text-xs border-0">1</td><td class="font-mono text-[10px] py-2 pl-4 pr-4 border-0 text-gray-500">LOC_A_01_01</td></tr>
+<tr><td class="py-2 pl-4 text-[11px] border-0 text-gray-700">位置类型不匹配</td><td class="text-right font-mono py-2 text-xs border-0">1</td><td class="font-mono text-[10px] py-2 pl-4 pr-4 border-0 text-gray-500">LOC_CIP_001</td></tr>
+</tbody>
+</table>
+<div class="mt-auto px-4 py-3 flex justify-between font-bold text-sm bg-gray-50 border-t border-gray-100 rounded-b items-center">
+<span>合计</span><span class="font-mono ml-10">5</span><a class="text-blue-500 font-normal text-[11px] ml-auto hover:text-blue-600" href="#">查看明细</a>
+</div>
+</div>
+</div>
+<!-- Checklist Card aligned with right panel -->
+<div class="card w-[280px] shrink-0" style="width: 220px; flex: none;">
+<div class="card-header border-b-0 pb-2">
+<span>发布门禁 <span class="text-gray-400 font-normal text-[11px] ml-1">（待通过 2 项）</span></span>
+</div>
+<div class="p-4 pt-1 flex-1 flex flex-col gap-3 text-sm">
+<div class="flex justify-between items-center text-xs">
+<div class="flex items-center gap-2 text-gray-700"><i class="fa-solid fa-circle-check text-green-500"></i> 编码唯一</div>
+<span class="text-green-600">通过</span>
+</div>
+<div class="flex justify-between items-center text-xs">
+<div class="flex items-center gap-2 text-gray-700"><i class="fa-solid fa-triangle-exclamation text-orange-400"></i> 层级合法</div>
+<span class="text-orange-500">待处理</span>
+</div>
+<div class="flex justify-between items-center text-xs">
+<div class="flex items-center gap-2 text-gray-700"><i class="fa-solid fa-triangle-exclamation text-orange-400"></i> 资产引用影响</div>
+<span class="text-orange-500">待处理</span>
+</div>
+<div class="flex justify-between items-center text-xs">
+<div class="flex items-center gap-2 text-gray-700"><i class="fa-solid fa-circle-check text-green-500"></i> CIP 临时策略</div>
+<span class="text-green-600">通过</span>
+</div>
+<div class="flex justify-between items-center text-xs">
+<div class="flex items-center gap-2 text-gray-700"><i class="fa-solid fa-circle-check text-green-500"></i> 权限范围</div>
+<span class="text-green-600">通过</span>
+</div>
+<div class="flex justify-between items-center text-xs">
+<div class="flex items-center gap-2 text-gray-700"><i class="fa-solid fa-circle-check text-green-500"></i> 审计策略</div>
+<span class="text-green-600">通过</span>
+</div>
+</div>
+</div>
+</div>
+<!-- END: Bottom Analysis Band -->
+</main>
+<!-- END: Main Content Area -->
+</div>
+</body></html>

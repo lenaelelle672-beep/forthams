@@ -47,6 +47,42 @@ class PermissionSeedSchemaTest {
     }
 
     @Test
+    void auditSchemaInitializerShouldRepairWorkflowDefinitionVersionSchema() throws Exception {
+        String initializer = Files.readString(Path.of("src/main/java/com/ams/config/AuditSchemaInitializer.java"));
+        int sourceTableGuard = initializer.indexOf("if (tableExists(\"workflow_definition\"))");
+        int sourceTableRead = initializer.indexOf("FROM workflow_definition wd");
+
+        assertTrue(initializer.contains("ensureWorkflowDefinitionVersionSchema();"),
+                "runtime initializer should repair workflow definition version schema during startup");
+        assertTrue(initializer.contains("CREATE TABLE IF NOT EXISTS workflow_definition_version"),
+                "runtime initializer should create the workflow definition version table when Flyway is disabled");
+        assertTrue(initializer.contains("tenant_id VARCHAR(64) NOT NULL"),
+                "workflow definition version table should keep the schema tenant column shape");
+        assertTrue(initializer.contains("definition_json LONGTEXT NOT NULL"),
+                "workflow definition version table should keep the schema definition_json column shape");
+        assertTrue(initializer.contains("published_at DATETIME NOT NULL"),
+                "workflow definition version table should keep the schema published_at column shape");
+        assertTrue(initializer.contains("UNIQUE KEY uk_workflow_version_tenant_business_version (tenant_id, business_type, version)"),
+                "workflow definition version table should keep the published version uniqueness rule");
+        assertTrue(initializer.contains("INDEX idx_workflow_version_definition (definition_id)"),
+                "workflow definition version table should keep the definition lookup index");
+        assertTrue(initializer.contains("INDEX idx_workflow_version_tenant_business_time (tenant_id, business_type, published_at)"),
+                "workflow definition version table should keep the tenant/business/time lookup index");
+        assertTrue(initializer.contains("FROM information_schema.tables"),
+                "runtime initializer should check table existence with the existing information_schema style");
+        assertTrue(sourceTableGuard >= 0,
+                "runtime initializer should check workflow_definition exists before backfill");
+        assertTrue(sourceTableRead > sourceTableGuard,
+                "runtime initializer must not unconditionally read the workflow_definition source table");
+        assertTrue(initializer.contains("INSERT INTO workflow_definition_version"),
+                "runtime initializer should backfill historical published snapshots");
+        assertTrue(initializer.contains("LEFT JOIN workflow_definition_version wdv"),
+                "runtime initializer should use an anti-join to avoid duplicate snapshot inserts");
+        assertTrue(initializer.contains("AND wdv.id IS NULL"),
+                "runtime initializer should skip already backfilled workflow definition versions");
+    }
+
+    @Test
     void shouldProvideWorkflowMenuAlignmentMigrationForExistingDatabases() throws Exception {
         String migration = Files.readString(Path.of("src/main/resources/migration/V2_73__workflow_menu_alignment.sql"));
 

@@ -697,6 +697,10 @@ async function batchGenerate(projectId, prompt) {
 }
 
 function buildPrompt(userPrompt) {
+  if (process.env.STITCH_RAW_PROMPT === "1") {
+    return userPrompt;
+  }
+
   const context = `
 UNIVIEW 固定资产平台 product-suite design direction.
 

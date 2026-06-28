@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<title>接口配置工作台</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: '#002868',
+            primary: '#165DFF',
+            primaryHover: '#4080FF',
+            bg: '#F2F3F5',
+            panel: '#FFFFFF',
+            border: '#E5E6EB',
+            textMain: '#1D2129',
+            textSub: '#4E5969',
+            textMuted: '#86909C',
+            success: '#00B42A',
+            warning: '#FF7D00',
+            danger: '#F53F3F'
+          },
+          fontFamily: {
+            sans: ['Inter', 'PingFang SC', 'Microsoft YaHei', 'sans-serif'],
+            mono: ['Fira Code', 'Menlo', 'Monaco', 'Courier New', 'monospace']
+          },
+          fontSize: {
+            'xs': ['12px', '16px'],
+            'sm': ['13px', '20px'],
+            'base': ['14px', '22px'],
+            'lg': ['16px', '24px'],
+            'xl': ['18px', '28px'],
+            '2xl': ['20px', '28px']
+          }
+        }
+      }
+    }
+  </script>
+<style data-purpose="layout-constraints">
+    html, body {
+      width: 1586px;
+      height: 992px;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background-color: #F2F3F5;
+      font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      color: #1D2129;
+    }
+    
+    /* Scrollbar hiding but functional if forced */
+    ::-webkit-scrollbar {
+      width: 0px;
+      height: 0px;
+    }
+
+    .sidebar-menu-item {
+      height: 32px;
+      display: flex;
+      align-items: center;
+      padding-left: 44px;
+      font-size: 13px;
+      color: #4E5969;
+      cursor: pointer;
+    }
+    .sidebar-menu-item:hover {
+      background-color: #F2F3F5;
+      color: #165DFF;
+    }
+    .sidebar-menu-item.active {
+      background-color: #E8F3FF;
+      color: #165DFF;
+      font-weight: 500;
+      position: relative;
+    }
+    .sidebar-menu-item.active::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background-color: #165DFF;
+    }
+
+    .table-header th {
+      background-color: #F2F3F5;
+      color: #4E5969;
+      font-weight: 500;
+      font-size: 13px;
+      padding: 8px 12px;
+      text-align: left;
+      border-bottom: 1px solid #E5E6EB;
+    }
+    
+    .table-body td {
+      padding: 5px 12px; /* Compressed for 30px height */
+      font-size: 13px;
+      color: #1D2129;
+      border-bottom: 1px solid #F2F3F5;
+      white-space: nowrap;
+    }
+    
+    .table-body tr:last-child td {
+      border-bottom: none;
+    }
+
+    .form-label {
+      width: 80px;
+      font-size: 13px;
+      color: #4E5969;
+      text-align: right;
+      padding-right: 12px;
+    }
+    
+    .form-control {
+      height: 32px;
+      border: 1px solid #E5E6EB;
+      border-radius: 2px;
+      padding: 0 12px;
+      font-size: 13px;
+      color: #1D2129;
+      outline: none;
+      transition: all 0.2s;
+    }
+    
+    .form-control:focus {
+      border-color: #165DFF;
+      box-shadow: 0 0 0 2px rgba(22, 93, 255, 0.2);
+    }
+
+    .btn {
+      height: 32px;
+      padding: 0 16px;
+      font-size: 13px;
+      border-radius: 2px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .btn-primary {
+      background-color: #165DFF;
+      color: white;
+      border: 1px solid #165DFF;
+    }
+    
+    .btn-primary:hover {
+      background-color: #4080FF;
+      border-color: #4080FF;
+    }
+    
+    .btn-outline {
+      background-color: white;
+      color: #165DFF;
+      border: 1px solid #165DFF;
+    }
+    
+    .btn-outline:hover {
+      background-color: #E8F3FF;
+    }
+
+    .btn-default {
+      background-color: white;
+      color: #4E5969;
+      border: 1px solid #E5E6EB;
+    }
+    
+    .btn-default:hover {
+      color: #165DFF;
+      border-color: #165DFF;
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 6px;
+    }
+
+    .tag-method {
+      display: inline-block;
+      padding: 0 6px;
+      height: 20px;
+      line-height: 20px;
+      border-radius: 2px;
+      font-size: 12px;
+      font-family: 'Fira Code', monospace;
+    }
+    .tag-post { background: #E8F7EC; color: #00B42A; }
+    .tag-get { background: #E8F3FF; color: #165DFF; }
+
+    /* Custom overrides for specific tight layouts */
+    .logs-table td {
+      padding: 3px 8px;
+      font-size: 11px;
+    }
+  </style>
+</head>
+<body class="flex flex-col relative overflow-hidden">
+<!-- BEGIN: TopHeader -->
+<header class="h-[52px] bg-brand text-white flex items-center justify-between px-6 shrink-0 z-10 relative">
+<div class="flex items-center">
+<div class="font-bold text-[18px] tracking-wide mr-10 flex items-center">UNIVIEW 固定资产管理系统</div>
+<nav class="flex h-full">
+<a class="px-5 h-full flex items-center text-sm text-gray-300 hover:text-white transition-colors" href="#">固定资产工作台</a>
+<a class="px-5 h-full flex items-center text-sm text-gray-300 hover:text-white transition-colors" href="#">资产全景视图</a>
+<a class="px-5 h-full flex items-center text-sm text-gray-300 hover:text-white transition-colors" href="#">大屏态势</a>
+<a class="px-5 h-full flex items-center text-sm text-gray-300 hover:text-white transition-colors" href="#">流程协同</a>
+<a class="px-5 h-full flex items-center text-sm font-medium bg-blue-800/50 text-white relative" href="#">
+          系统运营中枢
+          <div class="absolute bottom-0 left-0 w-full h-[3px] bg-blue-500"></div>
+</a>
+</nav>
+</div>
+<div class="flex items-center space-x-5 text-gray-200">
+<div class="relative cursor-pointer hover:text-white">
+<i class="fa-regular fa-bell text-lg"></i>
+<span class="absolute -top-1 -right-2 bg-danger text-white text-[10px] px-[4px] py-[1px] rounded-full leading-none border border-brand">12</span>
+</div>
+<i class="fa-regular fa-circle-question text-lg cursor-pointer hover:text-white"></i>
+<i class="fa-solid fa-border-all text-lg cursor-pointer hover:text-white"></i>
+<div class="flex items-center space-x-2 cursor-pointer hover:text-white ml-2">
+<div class="w-7 h-7 rounded-full bg-blue-500 flex items-center justify-content-center overflow-hidden">
+<i class="fa-solid fa-user text-white ml-[6px] mt-1"></i>
+</div>
+<span class="text-sm">系统管理员</span>
+<i class="fa-solid fa-caret-down text-xs"></i>
+</div>
+</div>
+</header>
+<!-- END: TopHeader -->
+<div class="flex flex-1 overflow-hidden relative">
+<!-- BEGIN: Sidebar -->
+<aside class="w-[194px] bg-panel border-r border-border shrink-0 flex flex-col py-3 overflow-hidden z-10 shadow-[2px_0_8px_rgba(0,0,0,0.02)] relative">
+<div class="px-4 mb-2 text-[15px] font-bold text-textMain">系统运营中枢</div>
+<!-- Menu Group 1 -->
+<div class="mt-2">
+<div class="flex items-center justify-between px-4 h-[34px] cursor-pointer hover:bg-gray-50 text-textMain group">
+<div class="flex items-center text-[13px] font-medium">
+<i class="fa-solid fa-diagram-project w-5 text-center text-gray-500 group-hover:text-primary"></i>
+<span class="ml-1">流程平台</span>
+</div>
+<i class="fa-solid fa-angle-down text-xs text-gray-400"></i>
+</div>
+<div class="py-1">
+<div class="sidebar-menu-item">流程设计</div>
+<div class="sidebar-menu-item">流程实例</div>
+<div class="sidebar-menu-item">流程监控</div>
+</div>
+</div>
+<!-- Menu Group 2 -->
+<div>
+<div class="flex items-center justify-between px-4 h-[34px] cursor-pointer hover:bg-gray-50 text-textMain group">
+<div class="flex items-center text-[13px] font-medium">
+<i class="fa-solid fa-users w-5 text-center text-gray-500 group-hover:text-primary"></i>
+<span class="ml-1">组织权限</span>
+</div>
+<i class="fa-solid fa-angle-down text-xs text-gray-400"></i>
+</div>
+<div class="py-1 hidden">
+<div class="sidebar-menu-item">组织架构</div>
+</div>
+</div>
+<!-- Menu Group 3 -->
+<div>
+<div class="flex items-center justify-between px-4 h-[34px] cursor-pointer hover:bg-gray-50 text-textMain group">
+<div class="flex items-center text-[13px] font-medium">
+<i class="fa-solid fa-database w-5 text-center text-gray-500 group-hover:text-primary"></i>
+<span class="ml-1">基础资料</span>
+</div>
+<i class="fa-solid fa-angle-down text-xs text-gray-400"></i>
+</div>
+<div class="py-1 hidden">
+<div class="sidebar-menu-item">字典管理</div>
+</div>
+</div>
+<!-- Menu Group 4 (Active) -->
+<div>
+<div class="flex items-center justify-between px-4 h-[34px] cursor-pointer hover:bg-gray-50 text-primary group">
+<div class="flex items-center text-[13px] font-medium">
+<i class="fa-solid fa-plug w-5 text-center"></i>
+<span class="ml-1">集成配置</span>
+</div>
+<i class="fa-solid fa-angle-up text-xs"></i>
+</div>
+<div class="py-1">
+<div class="sidebar-menu-item">外部系统配置</div>
+<div class="sidebar-menu-item active">接口配置</div>
+<div class="sidebar-menu-item">字段映射</div>
+<div class="sidebar-menu-item">同步规则</div>
+<div class="sidebar-menu-item">Webhook 配置</div>
+</div>
+</div>
+<!-- Menu Group 5 -->
+<div>
+<div class="flex items-center justify-between px-4 h-[34px] cursor-pointer hover:bg-gray-50 text-textMain group">
+<div class="flex items-center text-[13px] font-medium">
+<i class="fa-solid fa-comment-dots w-5 text-center text-gray-500 group-hover:text-primary"></i>
+<span class="ml-1">消息与通知</span>
+</div>
+<i class="fa-solid fa-angle-down text-xs text-gray-400"></i>
+</div>
+</div>
+<!-- Menu Group 6 -->
+<div>
+<div class="flex items-center justify-between px-4 h-[34px] cursor-pointer hover:bg-gray-50 text-textMain group">
+<div class="flex items-center text-[13px] font-medium">
+<i class="fa-solid fa-gear w-5 text-center text-gray-500 group-hover:text-primary"></i>
+<span class="ml-1">系统参数</span>
+</div>
+<i class="fa-solid fa-angle-down text-xs text-gray-400"></i>
+</div>
+</div>
+</aside>
+<!-- END: Sidebar -->
+<!-- BEGIN: Main Content Area -->
+<main class="flex-1 p-5 overflow-hidden flex flex-col relative w-[1392px]">
+<!-- Workstation Header -->
+<div class="bg-panel p-5 rounded border border-border shadow-sm mb-4 shrink-0">
+<div class="flex justify-between items-start mb-4">
+<div>
+<h1 class="text-xl font-bold text-textMain mb-1">接口配置工作台</h1>
+<p class="text-[13px] text-textMuted">在外部系统档案之下维护入站、出站、定时任务和流程触发端点，认证策略只引用系统配置，不暴露密钥。</p>
+</div>
+<div class="flex space-x-3">
+<button class="btn btn-outline"><i class="fa-solid fa-plus mr-1"></i> 新建接口</button>
+<button class="btn btn-default"><i class="fa-solid fa-heart-pulse mr-1 text-primary"></i> 健康检查</button>
+<button class="btn btn-default"><i class="fa-solid fa-flask mr-1 text-primary"></i> 试跑配置</button>
+<button class="btn btn-default"><i class="fa-regular fa-floppy-disk mr-1 text-primary"></i> 保存草稿</button>
+<button class="btn btn-primary"><i class="fa-solid fa-paper-plane mr-1"></i> 提交校验</button>
+</div>
+</div>
+<!-- Filter Form -->
+<div class="flex items-center space-x-6">
+<div class="flex items-center">
+<label class="text-[13px] text-textSub mr-3">接口名称</label>
+<input class="form-control w-[180px]" placeholder="请输入接口名称" type="text"/>
+</div>
+<div class="flex items-center">
+<label class="text-[13px] text-textSub mr-3">外部系统</label>
+<div class="relative">
+<select class="form-control w-[160px] appearance-none pr-8 bg-white">
+<option value="">请选择</option>
+</select>
+<i class="fa-solid fa-angle-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-[12px] pointer-events-none"></i>
+</div>
+</div>
+<div class="flex items-center">
+<label class="text-[13px] text-textSub mr-3">方向</label>
+<div class="relative">
+<select class="form-control w-[140px] appearance-none pr-8 bg-white">
+<option value="">请选择</option>
+</select>
+<i class="fa-solid fa-angle-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-[12px] pointer-events-none"></i>
+</div>
+</div>
+<div class="flex items-center">
+<label class="text-[13px] text-textSub mr-3">认证引用</label>
+<div class="relative">
+<select class="form-control w-[160px] appearance-none pr-8 bg-white">
+<option value="">请选择</option>
+</select>
+<i class="fa-solid fa-angle-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-[12px] pointer-events-none"></i>
+</div>
+</div>
+<div class="flex items-center">
+<label class="text-[13px] text-textSub mr-3">状态</label>
+<div class="relative">
+<select class="form-control w-[120px] appearance-none pr-8 bg-white">
+<option value="">请选择</option>
+</select>
+<i class="fa-solid fa-angle-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-[12px] pointer-events-none"></i>
+</div>
+</div>
+<div class="flex-1 flex justify-end space-x-3">
+<button class="btn btn-default w-[72px]">重置</button>
+<button class="btn btn-primary w-[72px]">查询</button>
+</div>
+</div>
+</div>
+<!-- Quick Stats Cards Row -->
+<div class="flex space-x-4 mb-4 shrink-0 h-[80px]">
+<!-- Card 1 -->
+<div class="flex-1 bg-panel border border-border rounded flex items-center p-4 cursor-pointer hover:shadow-md transition-shadow">
+<div class="w-10 h-10 rounded bg-blue-50 flex items-center justify-center text-primary text-lg mr-3">
+<i class="fa-solid fa-robot"></i>
+</div>
+<div class="flex-1">
+<div class="font-medium text-[14px] text-textMain mb-1">MES 设备状态源</div>
+<div class="flex space-x-4 text-[12px] text-textSub">
+<span>接口数 8</span>
+<span>运行中 6</span>
+<span>告警 1</span>
+</div>
+</div>
+</div>
+<!-- Card 2 (Active) -->
+<div class="flex-1 bg-panel border-2 border-primary rounded flex items-center p-4 cursor-pointer relative shadow-[0_2px_8px_rgba(22,93,255,0.15)]">
+<div class="absolute top-0 right-0 w-0 h-0 border-t-[16px] border-r-[16px] border-t-primary border-r-transparent"></div>
+<i class="fa-solid fa-check absolute top-[2px] right-[2px] text-white text-[8px]"></i>
+<div class="w-10 h-10 rounded bg-blue-600 flex items-center justify-center text-white font-bold text-sm mr-3">
+            ERP
+          </div>
+<div class="flex-1">
+<div class="font-medium text-[14px] text-textMain mb-1">ERP 固资推送接口</div>
+<div class="flex space-x-4 text-[12px] text-textSub">
+<span>接口数 12</span>
+<span>运行中 9</span>
+<span class="text-danger font-medium">告警 2</span>
+</div>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="flex-1 bg-panel border border-border rounded flex items-center p-4 cursor-pointer hover:shadow-md transition-shadow">
+<div class="w-10 h-10 rounded bg-emerald-500 flex items-center justify-center text-white text-lg mr-3">
+<i class="fa-regular fa-user"></i>
+</div>
+<div class="flex-1">
+<div class="font-medium text-[14px] text-textMain mb-1">EHR 扣款接口</div>
+<div class="flex space-x-4 text-[12px] text-textSub">
+<span>接口数 6</span>
+<span>运行中 4</span>
+<span>告警 0</span>
+</div>
+</div>
+</div>
+<!-- Card 4 -->
+<div class="flex-1 bg-panel border border-border rounded flex items-center p-4 cursor-pointer hover:shadow-md transition-shadow">
+<div class="w-10 h-10 rounded bg-purple-500 flex items-center justify-center text-white text-lg mr-3">
+<i class="fa-solid fa-file-invoice"></i>
+</div>
+<div class="flex-1">
+<div class="font-medium text-[14px] text-textMain mb-1">PO/合同同步</div>
+<div class="flex space-x-4 text-[12px] text-textSub">
+<span>接口数 6</span>
+<span>运行中 3</span>
+<span>告警 1</span>
+</div>
+</div>
+</div>
+<!-- Card 5 -->
+<div class="flex-1 bg-panel border border-border rounded flex items-center p-4 cursor-pointer hover:shadow-md transition-shadow">
+<div class="w-10 h-10 rounded bg-blue-50 flex items-center justify-center text-primary text-lg mr-3">
+<i class="fa-solid fa-link"></i>
+</div>
+<div class="flex-1">
+<div class="font-medium text-[14px] text-textMain mb-1">异常队列 Webhook</div>
+<div class="flex space-x-4 text-[12px] text-textSub">
+<span>接口数 3</span>
+<span>运行中 2</span>
+<span>告警 1</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Middle Layout: Table & Editor -->
+<div class="flex space-x-4 mb-4 shrink-0 h-[424px]">
+<!-- Left Table: 接口端点视图 -->
+<div class="w-[792px] bg-panel border border-border rounded shadow-sm flex flex-col relative">
+<div class="p-4 border-b border-border flex justify-between items-center shrink-0 h-[48px]">
+<h2 class="font-bold text-[15px] text-textMain">接口端点视图</h2>
+</div>
+<div class="flex-1 overflow-hidden">
+<table class="w-full text-left border-collapse table-fixed">
+<thead class="table-header">
+<tr>
+<th class="w-[140px]">接口名称</th>
+<th class="w-[70px]">方法</th>
+<th class="w-[50px]">方向</th>
+<th class="w-[100px]">触发方式</th>
+<th class="w-[120px]">认证引用</th>
+<th class="w-[60px]">超时</th>
+<th class="w-[80px]">状态</th>
+<th class="w-[150px]">操作</th>
+</tr>
+</thead>
+<tbody class="table-body">
+<tr class="h-[31px]">
+<td>固资信息推送</td>
+<td><span class="tag-method tag-post">POST</span></td>
+<td><i class="fa-solid fa-arrow-right text-primary"></i></td>
+<td>定时(5m)</td>
+<td>OAuth2 - ERP</td>
+<td>30s</td>
+<td><span class="status-dot bg-success"></span>运行中</td>
+<td class="text-primary text-[13px] space-x-2">
+<a class="hover:underline" href="#">编辑</a>
+<a class="hover:underline" href="#">复制</a>
+<a class="hover:underline text-textMain" href="#">更多 <i class="fa-solid fa-angle-down text-[10px]"></i></a>
+</td>
+</tr>
+<tr class="h-[31px]">
+<td>资产变更推送</td>
+<td><span class="tag-method tag-post">POST</span></td>
+<td><i class="fa-solid fa-arrow-right text-primary"></i></td>
+<td>定时(10m)</td>
+<td>OAuth2 - ERP</td>
+<td>30s</td>
+<td><span class="status-dot bg-success"></span>运行中</td>
+<td class="text-primary text-[13px] space-x-2">
+<a class="hover:underline" href="#">编辑</a>
+<a class="hover:underline" href="#">复制</a>
+<a class="hover:underline text-textMain" href="#">更多 <i class="fa-solid fa-angle-down text-[10px]"></i></a>
+</td>
+</tr>
+<tr class="h-[31px] bg-blue-50/50">
+<td class="font-medium text-primary">报废结果推送</td>
+<td><span class="tag-method tag-post">POST</span></td>
+<td><i class="fa-solid fa-arrow-right text-primary"></i></td>
+<td>事件驱动</td>
+<td>OAuth2 - ERP</td>
+<td>30s</td>
+<td><span class="status-dot bg-warning"></span>警告</td>
+<td class="text-primary text-[13px] space-x-2">
+<a class="hover:underline" href="#">编辑</a>
+<a class="hover:underline" href="#">复制</a>
+<a class="hover:underline text-textMain" href="#">更多 <i class="fa-solid fa-angle-down text-[10px]"></i></a>
+</td>
+</tr>
+<tr class="h-[31px]">
+<td>折旧信息推送</td>
+<td><span class="tag-method tag-post">POST</span></td>
+<td><i class="fa-solid fa-arrow-right text-primary"></i></td>
+<td>定时(1d)</td>
+<td>OAuth2 - ERP</td>
+<td>60s</td>
+<td><span class="status-dot bg-success"></span>运行中</td>
+<td class="text-primary text-[13px] space-x-2">
+<a class="hover:underline" href="#">编辑</a>
+<a class="hover:underline" href="#">复制</a>
+<a class="hover:underline text-textMain" href="#">更多 <i class="fa-solid fa-angle-down text-[10px]"></i></a>
+</td>
+</tr>
+<tr class="h-[31px]">
+<td>采购单同步</td>
+<td><span class="tag-method tag-post">POST</span></td>
+<td><i class="fa-solid fa-arrow-left text-primary"></i></td>
+<td>事件驱动</td>
+<td>OAuth2 - ERP</td>
+<td>30s</td>
+<td><span class="status-dot bg-success"></span>运行中</td>
+<td class="text-primary text-[13px] space-x-2">
+<a class="hover:underline" href="#">编辑</a>
+<a class="hover:underline" href="#">复制</a>
+<a class="hover:underline text-textMain" href="#">更多 <i class="fa-solid fa-angle-down text-[10px]"></i></a>
+</td>
+</tr>
+<tr class="h-[31px]">
+<td>供应商信息同步</td>
+<td><span class="tag-method tag-post">POST</span></td>
+<td><i class="fa-solid fa-arrow-left text-primary"></i></td>
+<td>定时(1d)</td>
+<td>OAuth2 - ERP</td>
+<td>60s</td>
+<td><span class="status-dot bg-success"></span>运行中</td>
+<td class="text-primary text-[13px] space-x-2">
+<a class="hover:underline" href="#">编辑</a>
+<a class="hover:underline" href="#">复制</a>
+<a class="hover:underline text-textMain" href="#">更多 <i class="fa-solid fa-angle-down text-[10px]"></i></a>
+</td>
+</tr>
+<tr class="h-[31px]">
+<td>报废结果回执接收</td>
+<td><span class="tag-method tag-post">POST</span></td>
+<td><i class="fa-solid fa-arrow-left text-primary"></i></td>
+<td>事件驱动</td>
+<td>OAuth2 - ERP</td>
+<td>30s</td>
+<td><span class="status-dot bg-warning"></span>警告</td>
+<td class="text-primary text-[13px] space-x-2">
+<a class="hover:underline" href="#">编辑</a>
+<a class="hover:underline" href="#">复制</a>
+<a class="hover:underline text-textMain" href="#">更多 <i class="fa-solid fa-angle-down text-[10px]"></i></a>
+</td>
+</tr>
+<tr class="h-[31px]">
+<td>资产分类同步</td>
+<td><span class="tag-method tag-get">GET</span></td>
+<td><i class="fa-solid fa-arrow-left text-primary"></i></td>
+<td>定时(6h)</td>
+<td>OAuth2 - ERP</td>
+<td>30s</td>
+<td><span class="status-dot bg-success"></span>运行中</td>
+<td class="text-primary text-[13px] space-x-2">
+<a class="hover:underline" href="#">编辑</a>
+<a class="hover:underline" href="#">复制</a>
+<a class="hover:underline text-textMain" href="#">更多 <i class="fa-solid fa-angle-down text-[10px]"></i></a>
+</td>
+</tr>
+<tr class="h-[31px]">
+<td>EHR 扣款字段同步</td>
+<td><span class="tag-method tag-post">POST</span></td>
+<td><i class="fa-solid fa-arrow-left text-primary"></i></td>
+<td>事件驱动</td>
+<td>OAuth2 - EHR</td>
+<td>30s</td>
+<td><span class="status-dot bg-danger"></span>停用</td>
+<td class="text-primary text-[13px] space-x-2">
+<a class="hover:underline" href="#">编辑</a>
+<a class="hover:underline" href="#">复制</a>
+<a class="hover:underline text-textMain" href="#">更多 <i class="fa-solid fa-angle-down text-[10px]"></i></a>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination -->
+<div class="h-[44px] border-t border-border flex items-center justify-end px-4 text-[13px] text-textSub shrink-0 bg-white">
+<span class="mr-3">共 12 条</span>
+<div class="flex items-center space-x-1 mr-3">
+<button class="w-7 h-7 rounded border border-border flex items-center justify-center text-gray-400 cursor-not-allowed"><i class="fa-solid fa-angle-left"></i></button>
+<button class="w-7 h-7 rounded bg-blue-50 text-primary font-medium flex items-center justify-center">1</button>
+<button class="w-7 h-7 rounded hover:bg-gray-50 flex items-center justify-center">2</button>
+<button class="w-7 h-7 rounded border border-border hover:bg-gray-50 flex items-center justify-center"><i class="fa-solid fa-angle-right"></i></button>
+</div>
+<div class="relative mr-3">
+<select class="form-control w-[80px] h-[28px] appearance-none pr-6 bg-white text-[13px]">
+<option>20 条/页</option>
+</select>
+<i class="fa-solid fa-angle-down absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 text-[10px] pointer-events-none"></i>
+</div>
+<div class="flex items-center">
+<span class="mr-2">跳至</span>
+<input class="form-control w-[40px] h-[28px] text-center mr-2" type="text" value="1"/>
+<span>页</span>
+</div>
+</div>
+</div>
+<!-- Right Form: 接口配置编辑区 -->
+<div class="w-[584px] bg-panel border border-border rounded shadow-sm flex flex-col relative">
+<div class="p-4 border-b border-border flex justify-between items-center shrink-0 h-[48px]">
+<h2 class="font-bold text-[15px] text-textMain">接口配置编辑区</h2>
+</div>
+<div class="flex-1 p-5 overflow-hidden flex">
+<!-- Form Fields -->
+<div class="flex-1 flex flex-col space-y-4">
+<div class="flex items-center">
+<label class="form-label w-[90px]"><span class="text-danger mr-1">*</span>配置名称</label>
+<input class="form-control flex-1" type="text" value="报废结果推送"/>
+</div>
+<div class="flex items-center">
+<label class="form-label w-[90px]"><span class="text-danger mr-1">*</span>外部系统</label>
+<div class="relative flex-1">
+<select class="form-control w-full appearance-none pr-8 bg-white">
+<option>ERP 固资推送接口</option>
+</select>
+<i class="fa-solid fa-angle-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-[12px] pointer-events-none"></i>
+</div>
+</div>
+<div class="flex items-center">
+<label class="form-label w-[90px]"><span class="text-danger mr-1">*</span>接口端点</label>
+<div class="relative flex-1 flex items-center">
+<input class="form-control flex-1 pr-10 font-mono text-[9px] px-2 text-textMain" style="font-size: 7.5px; padding-left: 4px; padding-right: 18px;" type="text" value="https://erp.uniview.com/api/asset/scrap/result"/>
+<i class="fa-regular fa-copy absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer hover:text-primary text-[12px] right-2"></i>
+</div>
+</div>
+<div class="flex items-center">
+<label class="form-label w-[90px]"><span class="text-danger mr-1">*</span>方法</label>
+<div class="relative flex-1">
+<select class="form-control w-full appearance-none pr-8 bg-white">
+<option>POST</option>
+</select>
+<i class="fa-solid fa-angle-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-[12px] pointer-events-none"></i>
+</div>
+</div>
+<div class="flex items-center">
+<label class="form-label w-[90px]"><span class="text-danger mr-1">*</span>方向</label>
+<div class="relative flex-1">
+<select class="form-control w-full appearance-none pr-8 bg-white">
+<option>推送(内部到外部)</option>
+</select>
+<i class="fa-solid fa-angle-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-[12px] pointer-events-none"></i>
+</div>
+</div>
+<div class="flex items-center">
+<label class="form-label w-[90px]"><span class="text-danger mr-1">*</span>认证引用</label>
+<div class="flex-1 flex items-center space-x-2">
+<div class="relative flex-1">
+<select class="form-control w-full appearance-none pr-8 bg-white">
+<option>OAuth2 - ERP</option>
+</select>
+<i class="fa-solid fa-angle-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-[12px] pointer-events-none"></i>
+</div>
+<a class="text-primary text-[13px] whitespace-nowrap hover:underline" href="#">查看详情</a>
+</div>
+</div>
+<div class="flex items-center">
+<label class="form-label w-[90px]"><span class="text-danger mr-1">*</span>触发事件</label>
+<div class="relative flex-1">
+<select class="form-control w-full appearance-none pr-8 bg-white">
+<option>资产报废审批通过</option>
+</select>
+<i class="fa-solid fa-angle-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-[12px] pointer-events-none"></i>
+</div>
+</div>
+<div class="flex items-center">
+<label class="form-label w-[90px]"><span class="text-danger mr-1">*</span>失败处理</label>
+<div class="relative flex-1">
+<select class="form-control w-full appearance-none pr-8 bg-white">
+<option>重试3次，仍失败则进入异常队列</option>
+</select>
+<i class="fa-solid fa-angle-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-[12px] pointer-events-none"></i>
+</div>
+</div>
+<div class="flex items-center">
+<label class="form-label w-[90px]"><span class="text-danger mr-1">*</span>审计要求</label>
+<div class="relative flex-1">
+<select class="form-control w-full appearance-none pr-8 bg-white">
+<option>记录请求与响应全文</option>
+</select>
+<i class="fa-solid fa-angle-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-[12px] pointer-events-none"></i>
+</div>
+</div>
+</div>
+<!-- Publish Gate (Right Side) -->
+<div class="w-[140px] pl-5 ml-5 border-l border-border flex flex-col pt-2">
+<div class="text-[13px] font-bold text-textMain mb-3">发布门禁</div>
+<ul class="space-y-3 text-[12px] text-textSub">
+<li class="flex items-center"><i class="fa-regular fa-circle-check text-success mr-2"></i> 认证引用通过</li>
+<li class="flex items-center"><i class="fa-regular fa-circle-check text-success mr-2"></i> 端点格式通过</li>
+<li class="flex items-center"><i class="fa-regular fa-circle-check text-success mr-2"></i> 触发事件通过</li>
+<li class="flex items-center"><i class="fa-regular fa-circle-check text-success mr-2"></i> 失败处理通过</li>
+<li class="flex items-center"><i class="fa-regular fa-circle-check text-success mr-2"></i> 审计留痕通过</li>
+</ul>
+</div>
+</div>
+<!-- Actions -->
+<div class="p-4 border-t border-border flex justify-center space-x-4 shrink-0 bg-white">
+<button class="btn btn-outline w-[100px]">保存草稿</button>
+<button class="btn btn-primary w-[100px]">提交校验</button>
+<button class="btn btn-outline w-[100px]">试跑</button>
+</div>
+</div>
+</div>
+<!-- Bottom Layout: Cards Row -->
+<div class="flex space-x-4 shrink-0 h-[224px]">
+<!-- Bottom Card 1: 健康检查结果 -->
+<div class="flex-1 bg-panel border border-border rounded shadow-sm flex flex-col p-4 relative">
+<h3 class="font-bold text-[14px] text-textMain mb-4">健康检查结果</h3>
+<div class="flex items-start mb-6">
+<div class="w-10 h-10 rounded-full bg-success flex items-center justify-center text-white text-xl mr-4 shrink-0">
+<i class="fa-solid fa-check"></i>
+</div>
+<div class="flex-1">
+<div class="flex items-center text-[14px] mb-2">
+<span class="text-textSub mr-2">整体状态:</span>
+<span class="text-success font-medium">正常</span>
+</div>
+<div class="grid grid-cols-[100px_1fr] gap-y-2 text-[12px] text-textSub">
+<div>最后检查:</div>
+<div class="text-textMain">2025-05-20 10:15:30</div>
+<div>平均响应时间:</div>
+<div class="text-textMain">126ms</div>
+<div>成功率:</div>
+<div class="text-textMain">99.12%</div>
+</div>
+</div>
+</div>
+<div class="mt-auto">
+<button class="btn btn-outline w-[100px]">立即检查</button>
+</div>
+</div>
+<!-- Bottom Card 2: 认证引用策略 -->
+<div class="flex-1 bg-panel border border-border rounded shadow-sm flex flex-col p-4 relative">
+<h3 class="font-bold text-[14px] text-textMain mb-4">认证引用策略</h3>
+<div class="flex justify-between items-center mb-3">
+<div class="font-bold text-[15px] text-textMain">OAuth2 - ERP</div>
+<span class="bg-green-50 text-success text-[12px] px-2 py-[2px] rounded border border-green-200">使用中</span>
+</div>
+<div class="grid grid-cols-[70px_1fr] gap-y-2 text-[12px] text-textSub mb-4">
+<div>授权类型</div>
+<div class="text-textMain">OAuth2 Client Credentials</div>
+<div>客户端 ID</div>
+<div class="text-textMain">erp-client-01</div>
+<div>令牌作用域</div>
+<div class="text-textMain">asset.write / asset.read</div>
+<div>令牌有效期</div>
+<div class="text-textMain">2025-05-20 11:15:30</div>
+</div>
+<div class="mt-auto text-right">
+<a class="text-primary text-[13px] hover:underline" href="#">查看详情</a>
+</div>
+</div>
+<!-- Bottom Card 3: 异常队列 -->
+<div class="flex-1 bg-panel border border-border rounded shadow-sm flex flex-col p-4 relative">
+<div class="flex items-center mb-4">
+<h3 class="font-bold text-[14px] text-textMain mr-2">异常队列</h3>
+<span class="bg-danger text-white text-[11px] px-[6px] py-[1px] rounded-full">5</span>
+</div>
+<div class="flex-1 overflow-hidden" style="gap: 6px; display: flex; flex-direction: column;"><div class="flex justify-between items-center text-[10px] h-[18px]"><div class="flex items-center text-textMain w-[130px] truncate"><span class="w-[6px] h-[6px] rounded-full bg-danger mr-2 shrink-0"></span>报废结果推送</div><div class="text-textSub w-[60px]">重试 2/3</div><div class="text-textMuted">2025-05-20 10:14:22</div></div><div class="flex justify-between items-center text-[10px] h-[18px]"><div class="flex items-center text-textMain w-[130px] truncate"><span class="w-[6px] h-[6px] rounded-full bg-warning mr-2 shrink-0"></span>报废结果推送</div><div class="text-textSub w-[60px]">重试 1/3</div><div class="text-textMuted">2025-05-20 10:09:11</div></div><div class="flex justify-between items-center text-[10px] h-[18px]"><div class="flex items-center text-textMain w-[130px] truncate"><span class="w-[6px] h-[6px] rounded-full bg-danger mr-2 shrink-0"></span>固资信息推送</div><div class="text-textSub w-[60px]">重试 3/3</div><div class="text-textMuted">2025-05-20 09:58:33</div></div><div class="flex justify-between items-center text-[10px] h-[18px]"><div class="flex items-center text-textMain w-[130px] truncate"><span class="w-[6px] h-[6px] rounded-full bg-danger mr-2 shrink-0"></span>资产变更推送</div><div class="text-textSub w-[60px]">重试 1/3</div><div class="text-textMuted">2025-05-20 09:44:10</div></div><div class="flex justify-between items-center text-[10px] h-[18px]"><div class="flex items-center text-textMain w-[130px] truncate"><span class="w-[6px] h-[6px] rounded-full bg-danger mr-2 shrink-0"></span>折旧信息推送</div><div class="text-textSub w-[60px]">重试 2/3</div><div class="text-textMuted">2025-05-20 09:30:05</div></div></div>
+<div class="mt-3 text-center border-t border-gray-100 pt-2">
+<a class="text-primary text-[13px] hover:underline" href="#">进入异常队列</a>
+</div>
+</div>
+<!-- Bottom Card 4: 最近调用日志 -->
+<div class="w-[428px] bg-panel border border-border rounded shadow-sm flex flex-col p-4 relative shrink-0">
+<div class="flex justify-between items-center mb-3">
+<h3 class="font-bold text-[14px] text-textMain">最近调用日志</h3>
+<a class="text-primary text-[12px] hover:underline flex items-center" href="#">查看更多 <i class="fa-solid fa-angle-right ml-1"></i></a>
+</div>
+<div class="flex-1 overflow-hidden">
+<table class="w-full text-left logs-table table-fixed text-[11px]">
+<thead>
+<tr class="text-textSub border-b border-border">
+<th class="w-[120px] font-normal pb-2 pb-1">接口名称</th>
+<th class="w-[140px] font-normal pb-2 pb-1">调用时间</th>
+<th class="w-[60px] font-normal pb-2 pb-1">状态</th>
+<th class="font-normal pb-2 text-right pb-1">耗时</th>
+</tr>
+</thead>
+<tbody class="text-textMain"><tr class="h-[18px] text-[10px]"><td class="truncate">报废结果推送</td><td class="text-textMuted">2025-05-20 10:15:20</td><td class="text-success">成功</td><td class="text-right">132ms</td></tr><tr class="h-[18px] text-[10px]"><td class="truncate">固资信息推送</td><td class="text-textMuted">2025-05-20 10:15:10</td><td class="text-success">成功</td><td class="text-right">118ms</td></tr><tr class="h-[18px] text-[10px]"><td class="truncate">采购单同步</td><td class="text-textMuted">2025-05-20 10:15:05</td><td class="text-success">成功</td><td class="text-right">256ms</td></tr><tr class="h-[18px] text-[10px]"><td class="truncate">资产变更推送</td><td class="text-textMuted">2025-05-20 10:14:58</td><td class="text-success">成功</td><td class="text-right">121ms</td></tr><tr class="h-[18px] text-[10px]"><td class="truncate">供应商信息同步</td><td class="text-textMuted">2025-05-20 10:14:50</td><td class="text-success">成功</td><td class="text-right">143ms</td></tr></tbody>
+</table>
+</div>
+<div class="mt-2 text-center border-t border-gray-100 pt-2">
+<a class="text-primary text-[13px] hover:underline" href="#">查看全部日志</a>
+</div>
+</div>
+</div>
+</main>
+<!-- END: Main Content Area -->
+</div>
+</body></html>

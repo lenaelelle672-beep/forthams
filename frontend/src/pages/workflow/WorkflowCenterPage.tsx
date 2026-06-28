@@ -1,19 +1,61 @@
-import { ArrowRight, Workflow, FileText, CheckCircle, Clock, XCircle, GitBranch, Plus, AlertTriangle, ChevronDown, X, Trash2 } from 'lucide-react';
-import { useEffect, useMemo, useState, useRef } from 'react';
+import {
+  AlertTriangle,
+  ArrowRight,
+  CheckCircle,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  Clock,
+  ExternalLink,
+  FileText,
+  GitBranch,
+  History,
+  Layers3,
+  ListFilter,
+  Plus,
+  RefreshCw,
+  RotateCcw,
+  Search,
+  Trash2,
+  Workflow,
+  X,
+  XCircle,
+} from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
-import { workflowApi, type WorkflowDefinitionDTO } from '@/api/workflow';
-import { businessFlowOptions, getDraftStorageKey, isBusinessType, isCustomBusinessType } from '@/constants/workflowBusiness';
-import { useAuth, type AuthUser } from '@/context/AuthContext';
-import { initialFlowNodes, initialFlowEdges } from '@/types/flow';
+
+import {
+  workflowApi,
+  type WorkflowDefinitionDTO,
+  type WorkflowDefinitionVersionDTO,
+  type WorkflowStartAvailability,
+} from '@/api/workflow';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from '@/components/ui/Dialog';
+import { businessFlowOptions, getDraftStorageKey, isBusinessType, isCustomBusinessType } from '@/constants/workflowBusiness';
+import { useAuth, type AuthUser } from '@/context/AuthContext';
+import { initialFlowEdges, initialFlowNodes } from '@/types/flow';
+
+type WorkflowFilter = 'all' | 'PUBLISHED' | 'DRAFT' | 'DISABLED';
+
+type WorkflowListItem = {
+  businessType: string;
+  name: string;
+  description: string;
+  businessName: string;
+  formPath: string;
+  stepCount: number;
+  draft: { savedAt: string | null; nodeCount: number | null };
+  server?: WorkflowDefinitionDTO;
+  isCustom: boolean;
+};
 
 function readDraft(bt: string) {
   try {
@@ -21,22 +63,22 @@ function readDraft(bt: string) {
     if (!raw) return { savedAt: null, nodeCount: null };
     const p = JSON.parse(raw);
     return { savedAt: p.savedAt ?? null, nodeCount: Array.isArray(p.nodes) ? p.nodes.length : null };
-  } catch { return { savedAt: null, nodeCount: null }; }
+  } catch {
+    return { savedAt: null, nodeCount: null };
+  }
 }
 
-function fmtDate(v: string | null) {
-  if (!v) return '未保存本地草稿';
+function fmtDate(v?: string | null) {
+  if (!v) return '未记录';
   const d = new Date(v);
-  return Number.isNaN(d.getTime()) ? '已保存本地草稿' : `最近保存：${d.toLocaleString('zh-CN', { hour12: false })}`;
+  return Number.isNaN(d.getTime()) ? '已记录' : d.toLocaleString('zh-CN', { hour12: false });
 }
 
-/** 从流程定义 nodes 中统计审批节点数 */
 function countApprovalNodes(definition: Record<string, unknown> | undefined): number {
   if (!definition?.nodes || !Array.isArray(definition.nodes)) return 0;
-  return definition.nodes.filter((n: any) => n.type === 'approval').length;
+  return definition.nodes.filter((n: any) => n.type === 'approval' || n.type === 'task').length;
 }
 
-/** 从流程定义 nodes 中统计总节点数 */
 function countTotalNodes(definition: Record<string, unknown> | undefined): number {
   if (!definition?.nodes || !Array.isArray(definition.nodes)) return 0;
   return definition.nodes.length;
@@ -44,37 +86,32 @@ function countTotalNodes(definition: Record<string, unknown> | undefined): numbe
 
 function statusLabel(s?: string) {
   const map: Record<string, string> = {
-    UNCONFIGURED: '未配置', DRAFT: '草稿中', PUBLISHED: '已发布',
-    DISABLED: '已停用', ENABLED: '已启用',
+    UNCONFIGURED: '未配置',
+    DRAFT: '草稿中',
+    PUBLISHED: '已发布',
+    ENABLED: '已启用',
+    DISABLED: '已停用',
+    FORBIDDEN: '无权限',
   };
   return map[s ?? ''] ?? s ?? '未知';
 }
 
-// ── Benchmark status badge: colored dot + ring-inset ──────────────────────────
+function versionActionLabel(action?: string) {
+  if (action === 'ROLLBACK') return '回滚发布';
+  if (action === 'PUBLISH') return '正式发布';
+  return action || '版本快照';
+}
+
 function statusBadge(s?: string) {
-  const map: Record<string, { dot: string; ring: string; text: string }> = {
-    UNCONFIGURED: { dot: 'bg-gray-400',  ring: 'ring-gray-300',   text: 'text-gray-700' },
-    DRAFT:        { dot: 'bg-amber-400', ring: 'ring-amber-300',  text: 'text-amber-700' },
-    PUBLISHED:    { dot: 'bg-green-400', ring: 'ring-green-300',  text: 'text-green-700' },
-    DISABLED:     { dot: 'bg-gray-400',  ring: 'ring-gray-300',   text: 'text-gray-500' },
-    ENABLED:      { dot: 'bg-emerald-400', ring: 'ring-emerald-300', text: 'text-emerald-700' },
+  const map: Record<string, { dot: string; ring: string; text: string; bg: string }> = {
+    UNCONFIGURED: { dot: 'bg-gray-400', ring: 'ring-gray-300', text: 'text-gray-700', bg: 'bg-gray-50' },
+    DRAFT: { dot: 'bg-amber-400', ring: 'ring-amber-300', text: 'text-amber-700', bg: 'bg-amber-50' },
+    PUBLISHED: { dot: 'bg-green-400', ring: 'ring-green-300', text: 'text-green-700', bg: 'bg-green-50' },
+    ENABLED: { dot: 'bg-emerald-400', ring: 'ring-emerald-300', text: 'text-emerald-700', bg: 'bg-emerald-50' },
+    DISABLED: { dot: 'bg-gray-400', ring: 'ring-gray-300', text: 'text-gray-500', bg: 'bg-gray-50' },
   };
   return map[s ?? ''] ?? map.UNCONFIGURED;
 }
-
-// accent color top bar for each business type
-const ACCENT_COLORS: Record<string, string> = {
-  ASSET_TRANSFER: 'bg-blue-500',
-  ASSET_CLEARANCE: 'bg-emerald-500',
-  ASSET_SCRAP: 'bg-amber-500',
-  ASSET_COMPENSATION: 'bg-red-500',
-  RETIREMENT: 'bg-purple-500',
-};
-
-// ── Quick filter pill base classes ────────────────────────────────────────────
-const FILTER_PILL_BASE = 'rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-colors';
-const FILTER_PILL_ACTIVE = 'border-blue-600 bg-blue-600 text-white shadow-sm';
-const FILTER_PILL_INACTIVE = 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50';
 
 function canEditWorkflowDefinitions(user: AuthUser | null) {
   if (!user) return true;
@@ -85,9 +122,54 @@ function canEditWorkflowDefinitions(user: AuthUser | null) {
   return permissions.includes('*') || permissions.includes('*:*:*') || permissions.includes('workflow:definition:edit');
 }
 
+function matchesStatus(flow: WorkflowListItem, filter: WorkflowFilter) {
+  if (filter === 'all') return true;
+  const status = flow.server?.status;
+  if (filter === 'PUBLISHED') return status === 'PUBLISHED' || status === 'ENABLED';
+  if (filter === 'DRAFT') return status === 'DRAFT' || (!flow.server && flow.draft.savedAt);
+  return status === filter;
+}
+
+function workflowSearchText(flow: WorkflowListItem) {
+  return [
+    flow.name,
+    flow.businessType,
+    flow.description,
+    flow.businessName,
+    flow.server?.status,
+    flow.server?.version,
+  ].filter(Boolean).join(' ').toLowerCase();
+}
+
+const PAGE_SIZE_OPTIONS = [10, 20, 50];
+const VERSION_PAGE_SIZE = 5;
+const FILTER_OPTIONS: Array<{ key: WorkflowFilter; label: string }> = [
+  { key: 'all', label: '全部' },
+  { key: 'PUBLISHED', label: '已发布' },
+  { key: 'DRAFT', label: '草稿中' },
+  { key: 'DISABLED', label: '已停用' },
+];
+
+const ACCENT_COLORS: Record<string, string> = {
+  ASSET_TRANSFER: 'bg-blue-500',
+  ASSET_CLEARANCE: 'bg-emerald-500',
+  ASSET_SCRAP: 'bg-amber-500',
+  ASSET_COMPENSATION: 'bg-red-500',
+  RETIREMENT: 'bg-purple-500',
+};
+
+function buildPageWindow(current: number, total: number) {
+  const windowSize = 5;
+  if (total <= windowSize) return Array.from({ length: total }, (_, index) => index + 1);
+  const half = Math.floor(windowSize / 2);
+  const start = Math.max(1, Math.min(current - half, total - windowSize + 1));
+  return Array.from({ length: windowSize }, (_, index) => start + index);
+}
+
 export default function WorkflowCenterPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const [defs, setDefs] = useState<WorkflowDefinitionDTO[]>([]);
   const [loading, setLoading] = useState(true);
   const [msg, setMsg] = useState<string | null>(null);
@@ -98,15 +180,32 @@ export default function WorkflowCenterPage() {
   const [customCode, setCustomCode] = useState('');
   const [customDesc, setCustomDesc] = useState('');
   const [creating, setCreating] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  const [activeFilter, setActiveFilter] = useState<'all' | 'PUBLISHED' | 'DRAFT' | 'DISABLED'>('all');
+  const [activeFilter, setActiveFilter] = useState<WorkflowFilter>('all');
+  const [query, setQuery] = useState('');
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [selectedBusinessType, setSelectedBusinessType] = useState<string | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<{ businessType: string; name: string } | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [detailVersions, setDetailVersions] = useState<WorkflowDefinitionVersionDTO[]>([]);
+  const [detailAvailability, setDetailAvailability] = useState<WorkflowStartAvailability | null>(null);
+  const [detailLoading, setDetailLoading] = useState(false);
+  const [detailErr, setDetailErr] = useState<string | null>(null);
+  const [versionPage, setVersionPage] = useState(1);
+  const [selectedVersionDetail, setSelectedVersionDetail] = useState<WorkflowDefinitionVersionDTO | null>(null);
+  const [versionDetailLoading, setVersionDetailLoading] = useState(false);
+  const [versionDetailErr, setVersionDetailErr] = useState<string | null>(null);
+  const [selectedVersionNumber, setSelectedVersionNumber] = useState<number | null>(null);
+  const [rollbackTarget, setRollbackTarget] = useState<WorkflowDefinitionVersionDTO | null>(null);
+  const [rollbackReason, setRollbackReason] = useState('');
+  const [rollbackPlan, setRollbackPlan] = useState('');
+  const [rollingBack, setRollingBack] = useState(false);
   const canEditWorkflow = useMemo(() => canEditWorkflowDefinitions(user), [user]);
 
   const load = async () => {
     try {
-      setLoading(true); setErr(null);
+      setLoading(true);
+      setErr(null);
       const list = await workflowApi.list();
       setDefs(Array.isArray(list) ? list : []);
     } catch (e) {
@@ -118,7 +217,6 @@ export default function WorkflowCenterPage() {
 
   useEffect(() => { load(); }, []);
 
-  // 点击外部关闭下拉菜单
   useEffect(() => {
     function handleClick(e: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
@@ -129,14 +227,13 @@ export default function WorkflowCenterPage() {
     return () => document.removeEventListener('mousedown', handleClick);
   }, []);
 
-  const flows = useMemo(() => {
+  const flows = useMemo<WorkflowListItem[]>(() => {
     const predefined = businessFlowOptions.map((f) => ({
       ...f,
       draft: readDraft(f.businessType),
       server: defs.find((d) => d.businessType === f.businessType),
-      isCustom: false as const,
+      isCustom: false,
     }));
-    // 自定义流程（不在预定义模板中的数据库记录）
     const customDefs = defs.filter((d) => d.businessType && !isBusinessType(d.businessType) && isCustomBusinessType(d.businessType));
     const custom = customDefs.map((d) => ({
       businessType: d.businessType,
@@ -145,30 +242,177 @@ export default function WorkflowCenterPage() {
       businessName: '自定义',
       formPath: '',
       stepCount: countApprovalNodes(d.definition) || 4,
-      accentClass: 'from-gray-500 to-slate-500',
       draft: { savedAt: null, nodeCount: null },
       server: d,
-      isCustom: true as const,
+      isCustom: true,
     }));
     return [...predefined, ...custom];
   }, [defs]);
 
-  const kpiCards: { label: string; value: number; sub: string; icon: typeof GitBranch; iconClass: string; filterKey: 'all' | 'PUBLISHED' | 'DRAFT' | 'DISABLED' | null }[] = [
-    { label: '流程总数', value: flows.length, sub: '业务流程', icon: GitBranch, iconClass: 'text-blue-500 bg-blue-50', filterKey: null },
-    { label: '已发布', value: flows.filter(f => f.server?.status === 'PUBLISHED' || f.server?.status === 'ENABLED').length, sub: '线上运行中', icon: CheckCircle, iconClass: 'text-green-600 bg-green-50', filterKey: 'PUBLISHED' },
-    { label: '草稿中', value: flows.filter(f => f.server?.status === 'DRAFT' || (!f.server && f.draft.savedAt)).length, sub: '待发布', icon: Clock, iconClass: 'text-amber-600 bg-amber-50', filterKey: 'DRAFT' },
-    { label: '已停用', value: flows.filter(f => f.server?.status === 'DISABLED').length, sub: '暂停使用', icon: XCircle, iconClass: 'text-gray-500 bg-gray-100', filterKey: 'DISABLED' },
-  ];
+  const kpiCards = useMemo(() => [
+    { label: '流程总数', value: flows.length, sub: '全部业务流程', icon: GitBranch, iconClass: 'text-blue-600 bg-blue-50', filterKey: 'all' as WorkflowFilter },
+    { label: '已发布', value: flows.filter((f) => f.server?.status === 'PUBLISHED' || f.server?.status === 'ENABLED').length, sub: '可用于发起', icon: CheckCircle, iconClass: 'text-green-600 bg-green-50', filterKey: 'PUBLISHED' as WorkflowFilter },
+    { label: '草稿中', value: flows.filter((f) => f.server?.status === 'DRAFT' || (!f.server && f.draft.savedAt)).length, sub: '待完善发布', icon: Clock, iconClass: 'text-amber-600 bg-amber-50', filterKey: 'DRAFT' as WorkflowFilter },
+    { label: '已停用', value: flows.filter((f) => f.server?.status === 'DISABLED').length, sub: '暂停发起', icon: XCircle, iconClass: 'text-slate-500 bg-slate-100', filterKey: 'DISABLED' as WorkflowFilter },
+  ], [flows]);
+
+  const filteredFlows = useMemo(() => {
+    const normalized = query.trim().toLowerCase();
+    return flows
+      .filter((flow) => matchesStatus(flow, activeFilter))
+      .filter((flow) => !normalized || workflowSearchText(flow).includes(normalized));
+  }, [activeFilter, flows, query]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredFlows.length / pageSize));
+  const safePage = Math.min(page, totalPages);
+  const pagedFlows = useMemo(() => {
+    const start = (safePage - 1) * pageSize;
+    return filteredFlows.slice(start, start + pageSize);
+  }, [filteredFlows, pageSize, safePage]);
+  const resultStart = filteredFlows.length === 0 ? 0 : (safePage - 1) * pageSize + 1;
+  const resultEnd = filteredFlows.length === 0 ? 0 : Math.min(filteredFlows.length, safePage * pageSize);
+  const pageNumbers = useMemo(() => buildPageWindow(safePage, totalPages), [safePage, totalPages]);
+  const selectedFlow = useMemo(() => {
+    if (!pagedFlows.length) return null;
+    return pagedFlows.find((flow) => flow.businessType === selectedBusinessType) ?? pagedFlows[0];
+  }, [pagedFlows, selectedBusinessType]);
+  const selectedVersionFromList = useMemo(() => (
+    detailVersions.find((version) => version.version === selectedVersionNumber) ?? detailVersions[0] ?? null
+  ), [detailVersions, selectedVersionNumber]);
+  const selectedVersion = useMemo(() => {
+    if (selectedVersionDetail && selectedVersionDetail.version === selectedVersionFromList?.version) {
+      return selectedVersionDetail;
+    }
+    return selectedVersionFromList;
+  }, [selectedVersionDetail, selectedVersionFromList]);
+  const versionTotalPages = Math.max(1, Math.ceil(detailVersions.length / VERSION_PAGE_SIZE));
+  const safeVersionPage = Math.min(versionPage, versionTotalPages);
+  const pagedVersions = useMemo(() => {
+    const start = (safeVersionPage - 1) * VERSION_PAGE_SIZE;
+    return detailVersions.slice(start, start + VERSION_PAGE_SIZE);
+  }, [detailVersions, safeVersionPage]);
+
+  useEffect(() => {
+    if (page !== safePage) setPage(safePage);
+  }, [page, safePage]);
+
+  useEffect(() => {
+    if (!selectedFlow) {
+      setSelectedBusinessType(null);
+      return;
+    }
+    if (selectedBusinessType !== selectedFlow.businessType) {
+      setSelectedBusinessType(selectedFlow.businessType);
+    }
+  }, [selectedBusinessType, selectedFlow]);
+
+  useEffect(() => {
+    let cancelled = false;
+    setDetailVersions([]);
+    setDetailAvailability(null);
+    setSelectedVersionNumber(null);
+    setVersionPage(1);
+    setDetailErr(null);
+    if (!selectedFlow?.server) {
+      setDetailLoading(false);
+      return () => { cancelled = true; };
+    }
+    setDetailLoading(true);
+    Promise.allSettled([
+      workflowApi.listVersions(selectedFlow.businessType),
+      workflowApi.getStartAvailability(selectedFlow.businessType),
+    ]).then(([versionsResult, availabilityResult]) => {
+      if (cancelled) return;
+      if (versionsResult.status === 'fulfilled') {
+        const versions = Array.isArray(versionsResult.value) ? versionsResult.value : [];
+        setDetailVersions(versions);
+        setSelectedVersionNumber(versions[0]?.version ?? null);
+        setVersionPage(1);
+      }
+      if (availabilityResult.status === 'fulfilled') setDetailAvailability(availabilityResult.value);
+      if (versionsResult.status === 'rejected' || availabilityResult.status === 'rejected') {
+        setDetailErr('部分流程详情暂不可用');
+      }
+    }).finally(() => {
+      if (!cancelled) setDetailLoading(false);
+    });
+    return () => { cancelled = true; };
+  }, [selectedFlow?.businessType, selectedFlow?.server]);
+
+  useEffect(() => {
+    if (versionPage !== safeVersionPage) setVersionPage(safeVersionPage);
+  }, [safeVersionPage, versionPage]);
+
+  useEffect(() => {
+    let cancelled = false;
+    setSelectedVersionDetail(null);
+    setVersionDetailErr(null);
+    if (!selectedFlow?.server || selectedVersionNumber == null) {
+      setVersionDetailLoading(false);
+      return () => { cancelled = true; };
+    }
+    setVersionDetailLoading(true);
+    workflowApi.getVersion(selectedFlow.businessType, selectedVersionNumber)
+      .then((version) => {
+        if (!cancelled) setSelectedVersionDetail(version);
+      })
+      .catch(() => {
+        if (!cancelled) setVersionDetailErr('版本完整快照暂不可用');
+      })
+      .finally(() => {
+        if (!cancelled) setVersionDetailLoading(false);
+      });
+    return () => { cancelled = true; };
+  }, [selectedFlow?.businessType, selectedFlow?.server, selectedVersionNumber]);
+
+  const resetFilters = () => {
+    setActiveFilter('all');
+    setQuery('');
+    setPage(1);
+  };
+
+  const setFilter = (filter: WorkflowFilter) => {
+    setActiveFilter(filter);
+    setPage(1);
+  };
+
+  const setVersionHistoryPage = (nextPage: number) => {
+    const normalized = Math.max(1, Math.min(nextPage, versionTotalPages));
+    setVersionPage(normalized);
+    const firstVersion = detailVersions[(normalized - 1) * VERSION_PAGE_SIZE];
+    if (firstVersion) setSelectedVersionNumber(firstVersion.version);
+  };
 
   const handlePublish = async (bt: string, name: string) => {
     try {
       setErr(null);
       const result = await workflowApi.publish(bt);
       setMsg(`${name}已发布，当前版本 v${result.version}`);
-
       await load();
     } catch (e) {
       setErr(e instanceof Error ? e.message : '发布失败');
+    }
+  };
+
+  const handleRollback = async () => {
+    if (!rollbackTarget || !selectedFlow) return;
+    setRollingBack(true);
+    try {
+      setErr(null);
+      const result = await workflowApi.rollback(selectedFlow.businessType, rollbackTarget.version, {
+        reason: rollbackReason.trim() || `回滚到 v${rollbackTarget.version}`,
+        impactScope: '影响后续新发起审批，已发起实例保持原版本快照',
+        rollbackPlan: rollbackPlan.trim() || '如回滚后发现问题，可在版本历史中再次回滚到其他已发布快照',
+      });
+      setMsg(`${selectedFlow.name}已回滚，当前版本 v${result.version}`);
+      setRollbackTarget(null);
+      setRollbackReason('');
+      setRollbackPlan('');
+      await load();
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : '回滚失败');
+    } finally {
+      setRollingBack(false);
     }
   };
 
@@ -200,36 +444,17 @@ export default function WorkflowCenterPage() {
     }
   };
 
-  // ── Benchmark stat bar items (inline in header) ────────────────────────────
-  const statBarItems = [
-    { label: '全部', count: flows.length, filterKey: 'all' as const, color: 'bg-slate-400' },
-    { label: '已发布', count: kpiCards[1].value, filterKey: 'PUBLISHED' as const, color: 'bg-green-400' },
-    { label: '草稿', count: kpiCards[2].value, filterKey: 'DRAFT' as const, color: 'bg-amber-400' },
-    { label: '停用', count: kpiCards[3].value, filterKey: 'DISABLED' as const, color: 'bg-gray-400' },
-  ];
-
   return (
     <div className="min-h-full bg-[var(--app-background)] px-4 py-5 sm:px-6 lg:px-8">
-      <div className="mx-auto flex w-full max-w-[1480px] flex-col gap-6">
-
-        {/* ── Compact header with stat bar ───────────────────────────────────── */}
-        <section className="rounded-2xl border border-[var(--surface-border)] bg-white shadow-sm">
+      <div className="mx-auto flex w-full max-w-[1480px] flex-col gap-5">
+        <section className="rounded-xl border border-[var(--surface-border)] bg-white shadow-sm">
           <div className="flex flex-wrap items-center justify-between gap-4 p-5">
-            {/* Left: title + subtitle */}
             <div className="min-w-0">
               <h1 className="text-xl font-bold tracking-tight text-slate-900">业务流程管理</h1>
-              <p className="mt-1 text-sm text-slate-500">
-                集中维护审批流程、发布状态和本地草稿，保持处置业务链路可控。
-              </p>
+              <p className="mt-1 text-sm text-slate-500">集中维护审批流程、发布状态、版本快照和业务入口。</p>
             </div>
-
-            {/* Right: action buttons */}
             <div className="flex items-center gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => navigate('/disposals')}
-              >
+              <Button type="button" variant="outline" onClick={() => navigate('/disposals')}>
                 <FileText className="h-4 w-4" />
                 返回资产处置
               </Button>
@@ -252,26 +477,31 @@ export default function WorkflowCenterPage() {
                         key={f.businessType}
                         type="button"
                         className="flex w-full items-center gap-3 px-3 py-2 text-sm text-gray-700 transition-colors hover:bg-blue-50"
-                        onClick={async () => { setShowNewDropdown(false);
-                        try {
-                          await workflowApi.saveDraft(f.businessType, { name: f.name, description: f.description, definition: { nodes: initialFlowNodes, edges: initialFlowEdges } });
-                          setMsg(`"${f.name}"草稿已创建，跳转设计器中…`);
-                          navigate(`/workflow-designer?businessType=${f.businessType}`);
-                        } catch (e) {
-                          const errMsg = e instanceof Error ? e.message : String(e);
-                          console.warn(`[WorkflowCenterPage] 从模板创建"${f.name}"失败:`, e);
-                          setErr(`"${f.name}"初始化失败${errMsg ? '：' + errMsg : '，请稍后手动发布'}`);
-                        } }}
+                        onClick={async () => {
+                          setShowNewDropdown(false);
+                          try {
+                            await workflowApi.saveDraft(f.businessType, {
+                              name: f.name,
+                              description: f.description,
+                              definition: { nodes: initialFlowNodes, edges: initialFlowEdges },
+                            });
+                            setMsg(`"${f.name}"草稿已创建，跳转设计器中...`);
+                            navigate(`/workflow-designer?businessType=${f.businessType}`);
+                          } catch (e) {
+                            const errMsg = e instanceof Error ? e.message : String(e);
+                            setErr(`"${f.name}"初始化失败${errMsg ? '：' + errMsg : '，请稍后手动发布'}`);
+                          }
+                        }}
                       >
-                        <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                        <span className="h-1.5 w-1.5 rounded-full bg-blue-500" />
                         {f.name}
                       </button>
                     ))}
-                    <div className="border-t border-gray-100 my-1" />
+                    <div className="my-1 border-t border-gray-100" />
                     <button
                       type="button"
                       className="flex w-full items-center gap-3 px-3 py-2 text-sm font-medium text-blue-600 transition-colors hover:bg-blue-50"
-                      onClick={async () => { setShowNewDropdown(false); setShowCustomDialog(true); }}
+                      onClick={() => { setShowNewDropdown(false); setShowCustomDialog(true); }}
                     >
                       <Plus className="h-4 w-4" />
                       自定义流程
@@ -281,31 +511,16 @@ export default function WorkflowCenterPage() {
               </div>
             </div>
           </div>
-
-          {/* Stat bar divider */}
-          <div className="border-t border-slate-100 px-5 py-3">
-            <div className="flex flex-wrap items-center gap-6">
-              {statBarItems.map((item) => {
-                const isActive = activeFilter === item.filterKey;
-                return (
-                  <button
-                    key={item.label}
-                    type="button"
-                    onClick={() => setActiveFilter(isActive && item.filterKey !== 'all' ? 'all' : item.filterKey)}
-                    className={`flex items-center gap-2 transition-colors ${isActive ? 'opacity-100' : 'opacity-70 hover:opacity-100'}`}
-                  >
-                    <span className={`inline-block h-2 w-2 rounded-full ${item.color}`} />
-                    <span className="text-sm font-semibold text-slate-700">{item.count}</span>
-                    <span className="text-xs text-slate-400">{item.label}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
         </section>
 
-        {/* ── Custom workflow creation dialog (benchmark Dialog) ─────────────── */}
-        <Dialog open={showCustomDialog} onOpenChange={(open) => { if (!open) { setShowCustomDialog(false); setCustomName(''); setCustomCode(''); setCustomDesc(''); } }}>
+        <Dialog open={showCustomDialog} onOpenChange={(open) => {
+          if (!open) {
+            setShowCustomDialog(false);
+            setCustomName('');
+            setCustomCode('');
+            setCustomDesc('');
+          }
+        }}>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>创建自定义流程</DialogTitle>
@@ -334,7 +549,7 @@ export default function WorkflowCenterPage() {
                 <label className="text-sm font-medium text-gray-700">流程描述</label>
                 <textarea
                   rows={2}
-                  className="flex w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 resize-none"
+                  className="flex w-full resize-none rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
                   placeholder="请描述流程用途（可选）"
                   value={customDesc}
                   onChange={(e) => setCustomDesc(e.target.value)}
@@ -352,10 +567,9 @@ export default function WorkflowCenterPage() {
               <button
                 type="button"
                 disabled={creating || customCode.trim().length < 2}
-                className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
                 onClick={async () => {
-                  if (!customCode.trim()) return;
-                  if (!canEditWorkflow) return;
+                  if (!customCode.trim() || !canEditWorkflow) return;
                   setCreating(true);
                   try {
                     setErr(null);
@@ -381,20 +595,17 @@ export default function WorkflowCenterPage() {
           </DialogContent>
         </Dialog>
 
-        {/* ── Delete confirmation dialog (benchmark Dialog) ──────────────────── */}
         <Dialog open={!!deleteTarget} onOpenChange={(open) => { if (!open && !deleting) setDeleteTarget(null); }}>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>确认删除</DialogTitle>
             </DialogHeader>
             <div className="px-6 py-4">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-red-50">
+              <div className="mb-4 flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-50">
                   <Trash2 className="h-5 w-5 text-red-600" />
                 </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-900">此操作不可撤销</p>
-                </div>
+                <p className="text-sm font-medium text-gray-900">此操作不可撤销</p>
               </div>
               <p className="text-sm text-gray-600">
                 即将删除流程「<span className="font-medium text-gray-900">{deleteTarget?.name}</span>」，删除后无法恢复。
@@ -406,48 +617,98 @@ export default function WorkflowCenterPage() {
                 disabled={deleting}
                 className="flex-1 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
                 onClick={() => setDeleteTarget(null)}
-              >取消</button>
+              >
+                取消
+              </button>
               <button
                 type="button"
                 disabled={deleting}
-                className="flex-1 rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 shadow-sm disabled:opacity-50"
+                className="flex-1 rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-red-700 disabled:opacity-50"
                 onClick={handleDelete}
-              >{deleting ? '删除中...' : '确认删除'}</button>
+              >
+                {deleting ? '删除中...' : '确认删除'}
+              </button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
 
-        {/* ── Toast / Loading messages ───────────────────────────────────────── */}
-        {loading && (
-          <div className="space-y-3">
-            <div className="flex items-center gap-2 rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-400 shadow-sm">
-              <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-blue-500" />
-              正在加载流程定义...
+        <Dialog open={!!rollbackTarget} onOpenChange={(open) => {
+          if (!open && !rollingBack) {
+            setRollbackTarget(null);
+            setRollbackReason('');
+            setRollbackPlan('');
+          }
+        }}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>回滚流程版本</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 px-6 py-4">
+              <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+                即将把「{selectedFlow?.name ?? '-'}」按 v{rollbackTarget?.version ?? '-'} 快照重新发布为新版本，已发起实例保持原版本快照。
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-gray-700">回滚原因</label>
+                <textarea
+                  aria-label="回滚原因"
+                  rows={2}
+                  value={rollbackReason}
+                  onChange={(e) => setRollbackReason(e.target.value)}
+                  className="flex w-full resize-none rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+                  placeholder="例如：恢复上一个稳定发布版本"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-gray-700">回滚后预案</label>
+                <textarea
+                  aria-label="回滚后预案"
+                  rows={2}
+                  value={rollbackPlan}
+                  onChange={(e) => setRollbackPlan(e.target.value)}
+                  className="flex w-full resize-none rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+                  placeholder="例如：观察新发起实例，异常时回滚到其他快照"
+                />
+              </div>
             </div>
-            {/* Skeleton cards */}
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {[1, 2, 3, 4].map((i) => (
-                <Card key={i} className="h-28 p-5 animate-pulse">
-                  <div className="flex justify-between items-start">
-                    <div className="h-4 w-16 bg-gray-200 rounded" />
-                    <div className="h-8 w-8 bg-gray-200 rounded-lg" />
-                  </div>
-                  <div className="mt-4 h-7 w-12 bg-gray-200 rounded" />
-                </Card>
-              ))}
-            </div>
-          </div>
-        )}
+            <DialogFooter>
+              <button
+                type="button"
+                disabled={rollingBack}
+                className="flex-1 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+                onClick={() => {
+                  setRollbackTarget(null);
+                  setRollbackReason('');
+                  setRollbackPlan('');
+                }}
+              >
+                取消
+              </button>
+              <button
+                type="button"
+                disabled={rollingBack}
+                className="flex-1 rounded-lg bg-amber-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-amber-700 disabled:opacity-50"
+                onClick={handleRollback}
+              >
+                {rollingBack ? '回滚中...' : '确认回滚'}
+              </button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
         {msg && (
-          <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700 flex items-center justify-between gap-2 animate-in fade-in slide-in-from-top-1 duration-300">
+          <div className="flex items-center justify-between gap-2 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
             <span className="truncate">{msg}</span>
-            <button type="button" onClick={() => setMsg(null)} className="text-green-500 hover:text-green-700 flex-shrink-0"><X className="h-4 w-4" /></button>
+            <button type="button" onClick={() => setMsg(null)} className="flex-shrink-0 text-green-500 hover:text-green-700">
+              <X className="h-4 w-4" />
+            </button>
           </div>
         )}
         {err && (
-          <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 flex items-center justify-between gap-2 animate-in fade-in slide-in-from-top-1 duration-300">
+          <div className="flex items-center justify-between gap-2 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
             <span className="truncate">{err}</span>
-            <button type="button" onClick={() => setErr(null)} className="text-amber-500 hover:text-amber-700 flex-shrink-0"><X className="h-4 w-4" /></button>
+            <button type="button" onClick={() => setErr(null)} className="flex-shrink-0 text-amber-500 hover:text-amber-700">
+              <X className="h-4 w-4" />
+            </button>
           </div>
         )}
         {!canEditWorkflow && (
@@ -456,222 +717,633 @@ export default function WorkflowCenterPage() {
           </div>
         )}
 
-        {/* ── Quick filter pills ─────────────────────────────────────────────── */}
-        <div className="flex flex-wrap items-center gap-2">
-          <button
-            type="button"
-            onClick={() => setActiveFilter('all')}
-            className={`${FILTER_PILL_BASE} ${activeFilter === 'all' ? FILTER_PILL_ACTIVE : FILTER_PILL_INACTIVE}`}
-          >
-            全部
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveFilter(activeFilter === 'PUBLISHED' ? 'all' : 'PUBLISHED')}
-            className={`${FILTER_PILL_BASE} ${activeFilter === 'PUBLISHED' ? FILTER_PILL_ACTIVE : FILTER_PILL_INACTIVE}`}
-          >
-            <span className="mr-1.5 inline-block h-1.5 w-1.5 rounded-full bg-green-400 align-middle" />
-            已发布
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveFilter(activeFilter === 'DRAFT' ? 'all' : 'DRAFT')}
-            className={`${FILTER_PILL_BASE} ${activeFilter === 'DRAFT' ? FILTER_PILL_ACTIVE : FILTER_PILL_INACTIVE}`}
-          >
-            <span className="mr-1.5 inline-block h-1.5 w-1.5 rounded-full bg-amber-400 align-middle" />
-            草稿中
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveFilter(activeFilter === 'DISABLED' ? 'all' : 'DISABLED')}
-            className={`${FILTER_PILL_BASE} ${activeFilter === 'DISABLED' ? FILTER_PILL_ACTIVE : FILTER_PILL_INACTIVE}`}
-          >
-            <span className="mr-1.5 inline-block h-1.5 w-1.5 rounded-full bg-gray-400 align-middle" />
-            已停用
-          </button>
-        </div>
-
-        {/* ── Active filter indicator ────────────────────────────────────────── */}
-        {activeFilter !== 'all' && (
-          <div className="flex items-center gap-2 text-sm text-gray-500">
-            {activeFilter === 'PUBLISHED' && <CheckCircle className="h-4 w-4 text-green-500" />}
-            {activeFilter === 'DRAFT' && <Clock className="h-4 w-4 text-amber-500" />}
-            {activeFilter === 'DISABLED' && <XCircle className="h-4 w-4 text-gray-400" />}
-            <span>仅显示{activeFilter === 'PUBLISHED' ? '已发布' : activeFilter === 'DRAFT' ? '草稿中' : '已停用'}流程</span>
-            <button type="button" onClick={() => setActiveFilter('all')} className="text-blue-600 hover:underline ml-1">查看全部</button>
-          </div>
-        )}
-
-        {/* ── Workflow Cards Grid ────────────────────────────────────────────── */}
-        <div className="grid grid-cols-1 gap-5 xl:grid-cols-2">
-          {flows.filter(flow => {
-            if (activeFilter === 'all') return true;
-            if (activeFilter === 'PUBLISHED') return flow.server?.status === 'PUBLISHED' || flow.server?.status === 'ENABLED';
-            return flow.server?.status === activeFilter;
-          }).map((flow) => {
-            const status = flow.server?.status;
-            const version = flow.server?.version;
-            const isUnconfigured = !flow.server || status === 'UNCONFIGURED';
-            const isDraft = status === 'DRAFT';
-            const isDisabled = status === 'DISABLED';
-            const accentColor = ACCENT_COLORS[flow.businessType] ?? 'bg-gray-400';
-            const badge = statusBadge(status);
-
+        <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          {kpiCards.map((card) => {
+            const Icon = card.icon;
+            const active = activeFilter === card.filterKey;
             return (
-              <Card
-                key={flow.businessType}
-                className={`overflow-hidden rounded-2xl border-slate-200/80 shadow-sm transition duration-200
-                  ${isDisabled ? 'opacity-65' : 'hover:-translate-y-0.5 hover:shadow-[var(--shadow-card-hover)]'}`}
+              <button
+                key={card.label}
+                type="button"
+                onClick={() => setFilter(card.filterKey)}
+                className={`rounded-xl border bg-white p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${active ? 'border-blue-400 ring-2 ring-blue-100' : 'border-slate-200'}`}
               >
-                {/* Colored top accent bar */}
-                <div className={`h-1.5 w-full ${isDisabled ? 'bg-gray-300' : accentColor}`} />
-                {flow.server?.status === 'ENABLED' && (
-                  <span className="absolute top-3 right-3 flex h-2.5 w-2.5">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
-                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500" />
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="text-xs font-medium text-slate-500">{card.label}</p>
+                    <p className="mt-2 text-3xl font-semibold text-slate-900">{card.value}</p>
+                    <p className="mt-1 text-xs text-slate-400">{card.sub}</p>
+                  </div>
+                  <span className={`flex h-10 w-10 items-center justify-center rounded-lg ${card.iconClass}`}>
+                    <Icon className="h-5 w-5" />
                   </span>
-                )}
+                </div>
+              </button>
+            );
+          })}
+        </section>
 
-                <div className="flex flex-1 flex-col space-y-4 bg-gradient-to-b from-white to-[#fbfdff] p-6">
-                  {/* Header: type badge + name + status */}
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1">
-                      <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wider bg-gray-100 px-2 py-0.5 rounded">
-                        {flow.businessType}
-                      </span>
-                      <h3 className="mt-2 text-lg font-semibold text-gray-900 line-clamp-1">{flow.name}</h3>
-                      <p className="mt-1 text-sm text-gray-500 leading-relaxed line-clamp-2">{flow.description}</p>
-                    </div>
-                    <div className="flex items-center gap-2 flex-shrink-0">
-                      {flow.server ? (
-                        <>
-                          {/* Benchmark status badge */}
-                          <span className={`inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-2.5 py-0.5 text-xs font-semibold ring-1 ring-inset ${badge.ring} ${badge.text}`}>
-                            <span className={`h-1.5 w-1.5 rounded-full ${badge.dot}`} />
-                            {statusLabel(status)}
-                          </span>
-                          <span className="text-xs font-mono text-gray-400 bg-gray-50 px-1.5 py-0.5 rounded border border-gray-200">
-                            v{version}
-                          </span>
-                        </>
-                      ) : (
-                        <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-2.5 py-0.5 text-xs font-semibold text-gray-500 ring-1 ring-inset ring-gray-300">
-                          <span className="h-1.5 w-1.5 rounded-full bg-gray-400" />
-                          未配置
+        <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex flex-1 flex-col gap-3 sm:flex-row">
+              <div className="relative flex-1">
+                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <input
+                  value={query}
+                  onChange={(e) => { setQuery(e.target.value); setPage(1); }}
+                  placeholder="搜索流程名称、编码、说明或业务对象"
+                  className="h-10 w-full rounded-lg border border-slate-200 bg-white pl-9 pr-9 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+                />
+                {query && (
+                  <button
+                    type="button"
+                    onClick={() => { setQuery(''); setPage(1); }}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
+              <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3">
+                <ListFilter className="h-4 w-4 text-slate-400" />
+                <select
+                  value={activeFilter}
+                  onChange={(e) => setFilter(e.target.value as WorkflowFilter)}
+                  className="h-10 bg-transparent text-sm text-slate-700 outline-none"
+                >
+                  {FILTER_OPTIONS.map((option) => <option key={option.key} value={option.key}>{option.label}</option>)}
+                </select>
+              </div>
+              <select
+                value={pageSize}
+                onChange={(e) => { setPageSize(Number(e.target.value)); setPage(1); }}
+                className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
+              >
+                {PAGE_SIZE_OPTIONS.map((size) => <option key={size} value={size}>每页 {size}</option>)}
+              </select>
+            </div>
+            <div className="text-sm text-slate-500">
+              共 <span className="font-semibold text-slate-800">{filteredFlows.length}</span> 条结果
+            </div>
+          </div>
+        </section>
+
+        {loading ? (
+          <div className="rounded-xl border border-gray-200 bg-white px-4 py-6 text-sm text-gray-400 shadow-sm">
+            <span className="mr-2 inline-block h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-blue-500 align-[-2px]" />
+            正在加载流程定义...
+          </div>
+        ) : (
+          <div className="space-y-5">
+            {selectedFlow ? (
+              <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+                <div className={`h-1.5 w-full ${ACCENT_COLORS[selectedFlow.businessType] ?? 'bg-slate-400'}`} />
+                <div className="p-5">
+                  <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="inline-flex items-center gap-1.5 rounded-lg bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700">
+                          <Workflow className="h-3.5 w-3.5" />
+                          当前选中流程
                         </span>
+                        <span className="rounded bg-slate-100 px-2 py-1 font-mono text-xs text-slate-500">{selectedFlow.businessType}</span>
+                        <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ring-inset ${statusBadge(selectedFlow.server?.status).bg} ${statusBadge(selectedFlow.server?.status).ring} ${statusBadge(selectedFlow.server?.status).text}`}>
+                          <span className={`h-1.5 w-1.5 rounded-full ${statusBadge(selectedFlow.server?.status).dot}`} />
+                          {statusLabel(selectedFlow.server?.status)}
+                        </span>
+                      </div>
+                      <h2 className="mt-3 break-words text-2xl font-semibold text-slate-950">{selectedFlow.name}</h2>
+                      <p className="mt-2 max-w-5xl break-words text-sm leading-6 text-slate-600">{selectedFlow.description || '未填写流程描述'}</p>
+                    </div>
+
+                    <div className="flex flex-wrap gap-2 xl:justify-end">
+                      {!selectedFlow.server || selectedFlow.server.status === 'UNCONFIGURED' ? (
+                        <button
+                          type="button"
+                          disabled={!canEditWorkflow}
+                          onClick={() => handlePublish(selectedFlow.businessType, selectedFlow.name)}
+                          className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-medium text-white shadow-sm hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                          {canEditWorkflow ? '创建并发布默认流程' : '需要编辑权限'}
+                        </button>
+                      ) : (
+                        <>
+                          {canEditWorkflow && (
+                            <button
+                              type="button"
+                              onClick={() => navigate(`/workflow-designer?businessType=${selectedFlow.businessType}`)}
+                              className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-medium text-white shadow-sm hover:bg-blue-700"
+                            >
+                              <Layers3 className="h-4 w-4" />
+                              打开设计器
+                            </button>
+                          )}
+                          {detailAvailability?.canStart && detailAvailability.entryUrl && (
+                            <button
+                              type="button"
+                              onClick={() => navigate(detailAvailability.entryUrl)}
+                              className="inline-flex items-center gap-2 rounded-lg border border-blue-200 bg-blue-50 px-3 py-1.5 text-sm font-medium text-blue-700 hover:bg-blue-100"
+                            >
+                              <ExternalLink className="h-4 w-4" />
+                              打开发起入口
+                            </button>
+                          )}
+                          {(selectedFlow.formPath || (selectedFlow.isCustom && selectedFlow.server?.definition && (selectedFlow.server.definition as Record<string, unknown>)?.formSource)) ? (
+                            <button
+                              type="button"
+                              onClick={() => navigate(selectedFlow.formPath || `/workflow-form/${selectedFlow.businessType}`)}
+                              className="inline-flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                            >
+                              <FileText className="h-4 w-4" />
+                              查看业务表单
+                            </button>
+                          ) : selectedFlow.isCustom && canEditWorkflow && (
+                            <button
+                              type="button"
+                              onClick={() => navigate(`/workflow-designer?businessType=${selectedFlow.businessType}`)}
+                              className="inline-flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                            >
+                              配置表单源码
+                            </button>
+                          )}
+                          {canEditWorkflow && selectedFlow.server?.status !== 'DISABLED' && (
+                            <button
+                              type="button"
+                              onClick={() => handlePublish(selectedFlow.businessType, selectedFlow.name)}
+                              className="inline-flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 px-3 py-1.5 text-sm font-medium text-green-700 hover:bg-green-100"
+                            >
+                              {selectedFlow.server?.status === 'DRAFT' ? '发布流程' : '重新发布'}
+                            </button>
+                          )}
+                          {canEditWorkflow && selectedFlow.server && selectedFlow.server.version > 0 && (
+                            <button
+                              type="button"
+                              onClick={() => handleToggle(selectedFlow.businessType, selectedFlow.name, selectedFlow.server?.status === 'DISABLED')}
+                              className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-50"
+                            >
+                              {selectedFlow.server?.status === 'DISABLED' ? '启用流程' : '停用流程'}
+                            </button>
+                          )}
+                        </>
                       )}
                     </div>
                   </div>
 
-                  {/* Info chips */}
-                  <div className="flex flex-wrap items-center gap-2 text-xs text-gray-500">
-                    <span className="flex items-center gap-1">
-                      <Workflow className="h-3.5 w-3.5" />
-                      {flow.businessName}
-                    </span>
-                    <span className="bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full font-medium">
-                      {flow.stepCount} 审批节点
-                    </span>
-                    {flow.server?.definition && (
-                      <span className="bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-full">
-                        {countTotalNodes(flow.server.definition as Record<string, unknown>)} 总节点
-                      </span>
-                    )}
-                    {flow.server?.updateTime && (
-                      <span className="text-gray-400 hidden sm:inline">
-                        更新：{fmtDate(flow.server.updateTime)}
-                      </span>
-                    )}
-                    {!flow.server && (
-                      <span className="text-gray-400">{fmtDate(flow.draft.savedAt)}</span>
-                    )}
+                  <div className="mt-5 grid grid-cols-2 gap-3 md:grid-cols-4 xl:grid-cols-6">
+                    <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+                      <p className="text-xs text-slate-400">当前版本</p>
+                      <p className="mt-1 text-lg font-semibold text-slate-900">v{selectedFlow.server?.version ?? 0}</p>
+                    </div>
+                    <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+                      <p className="text-xs text-slate-400">发布快照</p>
+                      <p className="mt-1 text-lg font-semibold text-slate-900">{detailVersions.length}</p>
+                    </div>
+                    <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+                      <p className="text-xs text-slate-400">审批/办理</p>
+                      <p className="mt-1 text-lg font-semibold text-slate-900">{countApprovalNodes(selectedFlow.server?.definition as Record<string, unknown>) || selectedFlow.stepCount}</p>
+                    </div>
+                    <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+                      <p className="text-xs text-slate-400">总节点</p>
+                      <p className="mt-1 text-lg font-semibold text-slate-900">{countTotalNodes(selectedFlow.server?.definition as Record<string, unknown>) || selectedFlow.draft.nodeCount || '-'}</p>
+                    </div>
+                    <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+                      <p className="text-xs text-slate-400">本地草稿</p>
+                      <p className="mt-1 truncate text-sm font-semibold text-slate-900">{fmtDate(selectedFlow.draft.savedAt)}</p>
+                    </div>
+                    <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+                      <p className="text-xs text-slate-400">可发起状态</p>
+                      <p className={`mt-1 truncate text-sm font-semibold ${detailAvailability?.canStart ? 'text-green-700' : 'text-amber-700'}`}>
+                        {detailLoading ? '读取中' : detailAvailability ? (detailAvailability.canStart ? '可发起' : detailAvailability.blockReason || '不可发起') : '未读取'}
+                      </p>
+                    </div>
                   </div>
 
-                  {/* Unconfigured warning */}
-                  {isUnconfigured && (
-                    <div className="flex items-start gap-2 rounded-xl border border-red-100 bg-red-50 p-3 text-sm text-red-700 shadow-sm">
-                      <AlertTriangle className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                      该核心业务缺失对应的审批工作流定义，可能导致业务阻塞。
+                  <div className="mt-5 grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1.1fr)_minmax(320px,0.9fr)]">
+                    <div className="rounded-xl border border-slate-200">
+                      <div className="border-b border-slate-100 px-4 py-3">
+                        <h3 className="text-sm font-semibold text-slate-900">流程信息</h3>
+                      </div>
+                      <dl className="grid grid-cols-1 gap-x-6 gap-y-3 p-4 text-sm sm:grid-cols-2 xl:grid-cols-3">
+                        <div>
+                          <dt className="text-xs text-slate-400">业务对象</dt>
+                          <dd className="mt-1 break-words font-medium text-slate-700">{selectedFlow.businessName}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-xs text-slate-400">更新时间</dt>
+                          <dd className="mt-1 break-words text-slate-700">{fmtDate(selectedFlow.server?.updateTime ?? selectedFlow.draft.savedAt)}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-xs text-slate-400">发布时间</dt>
+                          <dd className="mt-1 break-words text-slate-700">{fmtDate(selectedFlow.server?.publishedAt)}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-xs text-slate-400">创建时间</dt>
+                          <dd className="mt-1 break-words text-slate-700">{fmtDate(selectedFlow.server?.createTime)}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-xs text-slate-400">更新人</dt>
+                          <dd className="mt-1 break-words text-slate-700">{selectedFlow.server?.updatedBy ?? '-'}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-xs text-slate-400">发布人</dt>
+                          <dd className="mt-1 break-words text-slate-700">{selectedFlow.server?.publishedBy ?? '-'}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-xs text-slate-400">发起入口</dt>
+                          <dd className="mt-1 break-words font-medium text-slate-700">{detailAvailability?.entryUrl || selectedFlow.formPath || '-'}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-xs text-slate-400">契约状态</dt>
+                          <dd className="mt-1 break-words text-slate-700">
+                            {detailAvailability ? `${statusLabel(detailAvailability.status)} · v${detailAvailability.version ?? 0}` : '未读取'}
+                          </dd>
+                        </div>
+                        <div>
+                          <dt className="text-xs text-slate-400">阻断原因</dt>
+                          <dd className="mt-1 break-words text-slate-700">
+                            {detailAvailability?.blockReason || (detailAvailability?.canStart ? '无阻断，可发起' : '-')}
+                          </dd>
+                        </div>
+                      </dl>
+                      {(detailErr || !selectedFlow.server || selectedFlow.server.status === 'UNCONFIGURED') && (
+                        <div className="border-t border-slate-100 p-4">
+                          {detailErr && (
+                            <div className="mb-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+                              {detailErr}
+                            </div>
+                          )}
+                          {(!selectedFlow.server || selectedFlow.server.status === 'UNCONFIGURED') && (
+                            <div className="flex gap-2 rounded-lg border border-red-100 bg-red-50 px-3 py-2 text-sm text-red-700">
+                              <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0" />
+                              <span>该流程尚未形成可发布版本，业务入口会被阻断。</span>
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
-                  )}
 
-                  {/* Action buttons */}
-                  <div className="mt-auto flex flex-wrap gap-2 border-t border-gray-100 pt-3">
-                    {isUnconfigured ? (
-                      <button
-                        type="button"
-                        disabled={!canEditWorkflow}
-                        onClick={() => handlePublish(flow.businessType, flow.name)}
-                        className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
-                      >
-                        {canEditWorkflow ? '创建并发布默认流程' : '需要编辑权限'}
-                      </button>
-                    ) : (
-                      <>
-                        {canEditWorkflow && (
-                          <button
-                            type="button"
-                            onClick={() => navigate(`/workflow-designer?businessType=${flow.businessType}`)}
-                            className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700 shadow-sm"
-                          >
-                            打开设计器
-                            <ArrowRight className="h-4 w-4" />
-                          </button>
+                    <div className="rounded-xl border border-slate-200" aria-label="流程版本历史与回滚">
+                      <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3">
+                        <h3 className="flex items-center gap-2 text-sm font-semibold text-slate-900">
+                          <History className="h-4 w-4 text-slate-500" />
+                          版本历史与回滚
+                        </h3>
+                        {detailLoading && <RefreshCw className="h-4 w-4 animate-spin text-slate-400" />}
+                      </div>
+                      <div className="space-y-4 p-4">
+                        <div className="max-h-64 space-y-2 overflow-y-auto pr-1">
+                          {pagedVersions.map((version) => {
+                            const canRollbackVersion = canEditWorkflow && selectedFlow.server
+                              && version.version < (selectedFlow.server.version ?? 0);
+                            const activeVersion = selectedVersion?.version === version.version;
+                            return (
+                              <div
+                                key={`${version.version}-${version.actionType}`}
+                                className={`rounded-lg border text-sm ${activeVersion ? 'border-blue-300 bg-blue-50/60' : 'border-slate-200 bg-white'}`}
+                              >
+                                <button
+                                  type="button"
+                                  aria-label={`查看版本 v${version.version} ${versionActionLabel(version.actionType)}`}
+                                  onClick={() => setSelectedVersionNumber(version.version)}
+                                  className="flex w-full items-center justify-between gap-3 px-3 py-2 text-left"
+                                >
+                                  <div className="min-w-0">
+                                    <p className="truncate font-medium text-slate-700">v{version.version} · {versionActionLabel(version.actionType)}</p>
+                                    <p className="text-xs text-slate-400">{fmtDate(version.publishedAt ?? version.createTime)}</p>
+                                  </div>
+                                  {version.rollbackSourceVersion != null && (
+                                    <span className="flex-shrink-0 rounded bg-amber-50 px-2 py-0.5 text-xs text-amber-700">源 v{version.rollbackSourceVersion}</span>
+                                  )}
+                                </button>
+                                {canRollbackVersion && (
+                                  <div className="border-t border-slate-100 px-3 py-2">
+                                    <button
+                                      type="button"
+                                      aria-label={`回滚到版本 v${version.version}`}
+                                      onClick={() => {
+                                        setSelectedVersionNumber(version.version);
+                                        setRollbackTarget(version);
+                                      }}
+                                      className="inline-flex items-center gap-1.5 rounded-md border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-700 hover:bg-amber-100"
+                                    >
+                                      <RotateCcw className="h-3.5 w-3.5" />
+                                      回滚到此版本
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
+                          {!detailLoading && detailVersions.length === 0 && (
+                            <div className="rounded-lg border border-dashed border-slate-200 px-3 py-6 text-center text-sm text-slate-400">
+                              暂无发布快照
+                            </div>
+                          )}
+                        </div>
+
+                        {detailVersions.length > VERSION_PAGE_SIZE && (
+                          <div className="flex items-center justify-between rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-500">
+                            <span>版本第 {safeVersionPage} / {versionTotalPages} 页 · 共 {detailVersions.length} 个快照</span>
+                            <div className="flex items-center gap-2">
+                              <button
+                                type="button"
+                                disabled={safeVersionPage <= 1}
+                                onClick={() => setVersionHistoryPage(safeVersionPage - 1)}
+                                className="rounded-md border border-slate-200 px-2 py-1 font-medium text-slate-600 disabled:cursor-not-allowed disabled:opacity-40"
+                              >
+                                上一页
+                              </button>
+                              <button
+                                type="button"
+                                disabled={safeVersionPage >= versionTotalPages}
+                                onClick={() => setVersionHistoryPage(safeVersionPage + 1)}
+                                className="rounded-md border border-slate-200 px-2 py-1 font-medium text-slate-600 disabled:cursor-not-allowed disabled:opacity-40"
+                              >
+                                下一页
+                              </button>
+                            </div>
+                          </div>
                         )}
-                        {(flow.formPath || (flow.isCustom && flow.server?.definition && (flow.server.definition as Record<string, unknown>)?.formSource)) ? (
-                          <button
-                            type="button"
-                            onClick={() => navigate(flow.formPath || `/workflow-form/${flow.businessType}`)}
-                            className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
-                          >
-                            查看业务表单
-                          </button>
-                        ) : flow.isCustom && canEditWorkflow && (
-                          <button
-                            type="button"
-                            onClick={() => navigate(`/workflow-designer?businessType=${flow.businessType}`)}
-                            className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
-                          >
-                            配置表单源码
-                          </button>
+
+                        {selectedVersion && (
+                          <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+                            <div className="flex flex-wrap items-center justify-between gap-2">
+                              <div>
+                                <p className="font-medium text-slate-900">v{selectedVersion.version} · {versionActionLabel(selectedVersion.actionType)}</p>
+                                <p className="mt-0.5 text-xs text-slate-400">{fmtDate(selectedVersion.publishedAt ?? selectedVersion.createTime)}</p>
+                              </div>
+                              {selectedFlow.server && selectedVersion.version === selectedFlow.server.version ? (
+                                <span className="rounded bg-green-50 px-2 py-1 text-xs font-medium text-green-700">当前发布头</span>
+                              ) : canEditWorkflow && selectedFlow.server && selectedVersion.version < (selectedFlow.server.version ?? 0) ? (
+                                <button
+                                  type="button"
+                                  aria-label={`回滚到版本 v${selectedVersion.version}`}
+                                  onClick={() => setRollbackTarget(selectedVersion)}
+                                  className="inline-flex items-center gap-1.5 rounded-md border border-amber-200 bg-white px-2.5 py-1 text-xs font-medium text-amber-700 hover:bg-amber-50"
+                                >
+                                  <RotateCcw className="h-3.5 w-3.5" />
+                                  回滚
+                                </button>
+                              ) : null}
+                            </div>
+                            {(versionDetailLoading || versionDetailErr || selectedVersion.definition) && (
+                              <div className="mt-3 rounded-md border border-slate-200 bg-white px-3 py-2 text-xs text-slate-600">
+                                {versionDetailLoading ? (
+                                  <span>正在读取完整版本快照...</span>
+                                ) : versionDetailErr ? (
+                                  <span className="text-amber-700">{versionDetailErr}</span>
+                                ) : (
+                                  <span>完整快照已回读，可核对节点模型。</span>
+                                )}
+                              </div>
+                            )}
+                            <dl className="mt-3 space-y-2 text-xs">
+                              <div>
+                                <dt className="text-slate-400">发布说明</dt>
+                                <dd className="mt-0.5 break-words text-slate-700">{selectedVersion.publishNote || '-'}</dd>
+                              </div>
+                              <div>
+                                <dt className="text-slate-400">影响范围</dt>
+                                <dd className="mt-0.5 break-words text-slate-700">{selectedVersion.impactScope || '-'}</dd>
+                              </div>
+                              <div>
+                                <dt className="text-slate-400">回滚预案</dt>
+                                <dd className="mt-0.5 break-words text-slate-700">{selectedVersion.rollbackPlan || '-'}</dd>
+                              </div>
+                              <div className="grid grid-cols-2 gap-2">
+                                <div>
+                                  <dt className="text-slate-400">操作人</dt>
+                                  <dd className="mt-0.5 text-slate-700">{selectedVersion.operatorId ?? '-'}</dd>
+                                </div>
+                                <div>
+                                  <dt className="text-slate-400">状态</dt>
+                                  <dd className="mt-0.5 text-slate-700">{statusLabel(selectedVersion.status)}</dd>
+                                </div>
+                                <div>
+                                  <dt className="text-slate-400">快照总节点</dt>
+                                  <dd className="mt-0.5 text-slate-700">{countTotalNodes(selectedVersion.definition as Record<string, unknown>) || '-'}</dd>
+                                </div>
+                                <div>
+                                  <dt className="text-slate-400">审批/办理节点</dt>
+                                  <dd className="mt-0.5 text-slate-700">{countApprovalNodes(selectedVersion.definition as Record<string, unknown>) || '-'}</dd>
+                                </div>
+                              </div>
+                            </dl>
+                          </div>
                         )}
-                        {canEditWorkflow && !isDisabled && (
-                          <button
-                            type="button"
-                            onClick={() => handlePublish(flow.businessType, flow.name)}
-                            className="inline-flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 px-3 py-1.5 text-sm font-medium text-green-700 hover:bg-green-100"
-                          >
-                            {isDraft ? '发布流程' : '重新发布'}
-                          </button>
-                        )}
-                        {canEditWorkflow && flow.server && flow.server.version > 0 && (
-                          <button
-                            type="button"
-                            onClick={() => handleToggle(flow.businessType, flow.name, isDisabled)}
-                            className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-50"
-                          >
-                            {isDisabled ? '启用流程' : '停用流程'}
-                          </button>
-                        )}
-                        {canEditWorkflow && (isDisabled || isDraft) && flow.isCustom && (
-                          <button
-                            type="button"
-                            onClick={() => setDeleteTarget({ businessType: flow.businessType, name: flow.name })}
-                            className="inline-flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-100"
-                          >
-                            <Trash2 className="h-3.5 w-3.5" />
-                            删除
-                          </button>
-                        )}
-                      </>
-                    )}
+                      </div>
+                    </div>
                   </div>
                 </div>
+              </section>
+            ) : (
+              <Card className="rounded-xl border-slate-200 p-8 text-center text-sm text-slate-400">
+                请选择一个流程查看详情
               </Card>
-            );
-          })}
-        </div>
+            )}
 
+            <section className="space-y-3">
+              <div className="flex flex-col gap-2 rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <h2 className="text-sm font-semibold text-slate-900">流程定义</h2>
+                  <p className="mt-1 text-xs text-slate-500">显示第 {resultStart}-{resultEnd} 条 / 共 {filteredFlows.length} 条</p>
+                </div>
+                <div className="text-xs text-slate-500">第 {safePage} / {totalPages} 页</div>
+              </div>
+
+              {pagedFlows.length === 0 ? (
+                <Card className="rounded-xl border-slate-200 p-8 text-center">
+                  <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-slate-100">
+                    <Search className="h-5 w-5 text-slate-400" />
+                  </div>
+                  <p className="text-sm font-medium text-slate-800">没有匹配的流程</p>
+                  <p className="mt-1 text-sm text-slate-500">调整关键词或状态筛选后重试。</p>
+                  <button type="button" onClick={resetFilters} className="mt-4 rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50">
+                    清除筛选
+                  </button>
+                </Card>
+              ) : pagedFlows.map((flow) => {
+                const status = flow.server?.status;
+                const version = flow.server?.version ?? 0;
+                const isUnconfigured = !flow.server || status === 'UNCONFIGURED';
+                const isDraft = status === 'DRAFT';
+                const isDisabled = status === 'DISABLED';
+                const badge = statusBadge(status);
+                const selected = selectedFlow?.businessType === flow.businessType;
+                return (
+                  <Card
+                    key={flow.businessType}
+                    className={`relative overflow-hidden rounded-xl border p-0 shadow-sm transition ${selected ? 'border-blue-400 ring-2 ring-blue-100' : 'border-slate-200 hover:border-blue-200 hover:shadow-md'} ${isDisabled ? 'opacity-70' : ''}`}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => setSelectedBusinessType(flow.businessType)}
+                      className="block w-full text-left"
+                    >
+                      <div className={`h-1.5 w-full ${isDisabled ? 'bg-gray-300' : ACCENT_COLORS[flow.businessType] ?? 'bg-slate-400'}`} />
+                      <div className="p-4">
+                        <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+                          <div className="min-w-0">
+                            <div className="flex flex-wrap items-center gap-2">
+                              <h3 className="break-words text-base font-semibold text-slate-900">{flow.name}</h3>
+                              <span className="rounded bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-500">{flow.businessType}</span>
+                            </div>
+                            <p className="mt-1 line-clamp-2 text-sm text-slate-500">{flow.description}</p>
+                          </div>
+                          <div className="flex flex-shrink-0 items-center gap-2">
+                            <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ring-inset ${badge.bg} ${badge.ring} ${badge.text}`}>
+                              <span className={`h-1.5 w-1.5 rounded-full ${badge.dot}`} />
+                              {statusLabel(status)}
+                            </span>
+                            <span className="rounded border border-slate-200 bg-white px-1.5 py-0.5 font-mono text-xs text-slate-400">v{version}</span>
+                          </div>
+                        </div>
+                        <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-slate-500 md:grid-cols-4">
+                          <span className="rounded-lg bg-slate-50 px-2 py-1">业务：{flow.businessName}</span>
+                          <span className="rounded-lg bg-slate-50 px-2 py-1">审批/办理：{countApprovalNodes(flow.server?.definition as Record<string, unknown>) || flow.stepCount}</span>
+                          <span className="rounded-lg bg-slate-50 px-2 py-1">总节点：{countTotalNodes(flow.server?.definition as Record<string, unknown>) || flow.draft.nodeCount || '-'}</span>
+                          <span className="rounded-lg bg-slate-50 px-2 py-1">更新：{fmtDate(flow.server?.updateTime ?? flow.draft.savedAt)}</span>
+                        </div>
+                      </div>
+                    </button>
+                    <div className="flex flex-wrap gap-2 border-t border-slate-100 px-4 py-3">
+                      {isUnconfigured ? (
+                        <button
+                          type="button"
+                          disabled={!canEditWorkflow}
+                          onClick={() => handlePublish(flow.businessType, flow.name)}
+                          className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-medium text-white shadow-sm hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                          {canEditWorkflow ? '创建并发布默认流程' : '需要编辑权限'}
+                        </button>
+                      ) : (
+                        <>
+                          {canEditWorkflow && (
+                            <button
+                              type="button"
+                              onClick={() => navigate(`/workflow-designer?businessType=${flow.businessType}`)}
+                              className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-medium text-white shadow-sm hover:bg-blue-700"
+                            >
+                              打开设计器
+                              <ArrowRight className="h-4 w-4" />
+                            </button>
+                          )}
+                          {(flow.formPath || (flow.isCustom && flow.server?.definition && (flow.server.definition as Record<string, unknown>)?.formSource)) ? (
+                            <button
+                              type="button"
+                              onClick={() => navigate(flow.formPath || `/workflow-form/${flow.businessType}`)}
+                              className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                            >
+                              查看业务表单
+                            </button>
+                          ) : flow.isCustom && canEditWorkflow && (
+                            <button
+                              type="button"
+                              onClick={() => navigate(`/workflow-designer?businessType=${flow.businessType}`)}
+                              className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                            >
+                              配置表单源码
+                            </button>
+                          )}
+                          {canEditWorkflow && !isDisabled && (
+                            <button
+                              type="button"
+                              onClick={() => handlePublish(flow.businessType, flow.name)}
+                              className="inline-flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 px-3 py-1.5 text-sm font-medium text-green-700 hover:bg-green-100"
+                            >
+                              {isDraft ? '发布流程' : '重新发布'}
+                            </button>
+                          )}
+                          {canEditWorkflow && flow.server && flow.server.version > 0 && (
+                            <button
+                              type="button"
+                              onClick={() => handleToggle(flow.businessType, flow.name, isDisabled)}
+                              className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-50"
+                            >
+                              {isDisabled ? '启用流程' : '停用流程'}
+                            </button>
+                          )}
+                          {canEditWorkflow && (isDisabled || isDraft) && flow.isCustom && (
+                            <button
+                              type="button"
+                              onClick={() => setDeleteTarget({ businessType: flow.businessType, name: flow.name })}
+                              className="inline-flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-100"
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                              删除
+                            </button>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  </Card>
+                );
+              })}
+
+              <div className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-600 shadow-sm lg:flex-row lg:items-center lg:justify-between">
+                <span>第 {resultStart}-{resultEnd} 条 / 共 {filteredFlows.length} 条，当前页 {safePage} / {totalPages}</span>
+                <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    disabled={safePage <= 1}
+                    onClick={() => setPage(1)}
+                    className="inline-flex items-center rounded-lg border border-slate-200 px-3 py-1.5 disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    首页
+                  </button>
+                  <button
+                    type="button"
+                    disabled={safePage <= 1}
+                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    className="inline-flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-1.5 disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                    上一页
+                  </button>
+                  {pageNumbers[0] > 1 && (
+                    <>
+                      <button type="button" onClick={() => setPage(1)} className="h-8 min-w-8 rounded-lg border border-slate-200 px-2 text-sm hover:bg-slate-50">1</button>
+                      {pageNumbers[0] > 2 && <span className="px-1 text-slate-400">...</span>}
+                    </>
+                  )}
+                  {pageNumbers.map((pageNumber) => (
+                    <button
+                      key={pageNumber}
+                      type="button"
+                      onClick={() => setPage(pageNumber)}
+                      className={`h-8 min-w-8 rounded-lg border px-2 text-sm ${pageNumber === safePage ? 'border-blue-500 bg-blue-600 text-white' : 'border-slate-200 hover:bg-slate-50'}`}
+                    >
+                      {pageNumber}
+                    </button>
+                  ))}
+                  {pageNumbers[pageNumbers.length - 1] < totalPages && (
+                    <>
+                      {pageNumbers[pageNumbers.length - 1] < totalPages - 1 && <span className="px-1 text-slate-400">...</span>}
+                      <button type="button" onClick={() => setPage(totalPages)} className="h-8 min-w-8 rounded-lg border border-slate-200 px-2 text-sm hover:bg-slate-50">{totalPages}</button>
+                    </>
+                  )}
+                  <button
+                    type="button"
+                    disabled={safePage >= totalPages}
+                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                    className="inline-flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-1.5 disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    下一页
+                    <ChevronRight className="h-4 w-4" />
+                  </button>
+                  <button
+                    type="button"
+                    disabled={safePage >= totalPages}
+                    onClick={() => setPage(totalPages)}
+                    className="inline-flex items-center rounded-lg border border-slate-200 px-3 py-1.5 disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    末页
+                  </button>
+                </div>
+              </div>
+            </section>
+          </div>
+        )}
       </div>
     </div>
   );

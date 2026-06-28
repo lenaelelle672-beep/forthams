@@ -1,12 +1,14 @@
 import { Handle, Position, type NodeProps } from '@xyflow/react';
-import { Flag, GitBranch, Play, ShieldCheck } from 'lucide-react';
+import { Bell, ClipboardCheck, Flag, GitBranch, Play, ShieldCheck } from 'lucide-react';
 import { cn } from '@/utils/cn';
 import type { FlowNodeData, FlowNodeType } from '@/types/flow';
 
-const icons = { start: Play, approval: ShieldCheck, condition: GitBranch, end: Flag } satisfies Record<FlowNodeType, typeof Play>;
+const icons = { start: Play, approval: ShieldCheck, task: ClipboardCheck, cc: Bell, condition: GitBranch, end: Flag } satisfies Record<FlowNodeType, typeof Play>;
 const tokens = {
   start:     { color: '#16a34a', soft: '#dcfce7', badge: '开始' },
   approval:  { color: '#2563eb', soft: '#dbeafe', badge: '审批' },
+  task:      { color: '#0891b2', soft: '#cffafe', badge: '办理' },
+  cc:        { color: '#7c3aed', soft: '#ede9fe', badge: '抄送' },
   condition: { color: '#f59e0b', soft: '#ffedd5', badge: '条件' },
   end:       { color: '#dc2626', soft: '#fee2e2', badge: '结束' },
 } satisfies Record<FlowNodeType, { color: string; soft: string; badge: string }>;
@@ -15,6 +17,8 @@ function getMeta(type: FlowNodeType, data: FlowNodeData) {
   switch (type) {
     case 'start': return `触发方式 · ${data.triggerType || '手动触发'}`;
     case 'approval': return `审批人 · ${data.approverRoleName || data.approverRole || '待配置'}`;
+    case 'task': return `办理人 · ${data.approverRoleName || data.approverRole || data.approverId || '待配置'}`;
+    case 'cc': return `抄送 · ${data.ccRoleCodes || data.ccUserIds || '待配置'}`;
     case 'condition': return data.conditionExpression || '请配置分支条件';
     case 'end': return `结束动作 · ${data.resultAction || '流程收口'}`;
     default: return '';
@@ -68,4 +72,4 @@ function FlowCustomNode({ data, type, selected }: NodeProps) {
   );
 }
 
-export const flowNodeTypes = { start: FlowCustomNode, approval: FlowCustomNode, condition: FlowCustomNode, end: FlowCustomNode };
+export const flowNodeTypes = { start: FlowCustomNode, approval: FlowCustomNode, task: FlowCustomNode, cc: FlowCustomNode, condition: FlowCustomNode, end: FlowCustomNode };

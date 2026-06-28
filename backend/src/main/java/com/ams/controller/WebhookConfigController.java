@@ -1,6 +1,7 @@
 package com.ams.controller;
 
 import com.ams.common.Result;
+import com.ams.dto.WebhookConfigResponse;
 import com.ams.entity.WebhookConfig;
 import com.ams.service.WebhookConfigService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -8,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -24,25 +26,28 @@ public class WebhookConfigController {
             @RequestParam(defaultValue = "10") Integer pageSize,
             @RequestParam(required = false) String keyword) {
         Page<WebhookConfig> result = webhookConfigService.queryPage(page, pageSize, keyword);
-        return Result.success(Map.of("records", result.getRecords(), "total", result.getTotal()));
+        List<WebhookConfigResponse> records = result.getRecords().stream()
+                .map(WebhookConfigResponse::from)
+                .toList();
+        return Result.success(Map.of("records", records, "total", result.getTotal()));
     }
 
     @PreAuthorize("@ss.hasPermi('system:config:query')")
     @GetMapping("/{id}")
-    public Result<WebhookConfig> detail(@PathVariable Long id) {
-        return Result.success(webhookConfigService.getById(id));
+    public Result<WebhookConfigResponse> detail(@PathVariable Long id) {
+        return Result.success(WebhookConfigResponse.from(webhookConfigService.getById(id)));
     }
 
     @PreAuthorize("@ss.hasPermi('system:config:edit')")
     @PostMapping
-    public Result<WebhookConfig> create(@RequestBody WebhookConfig config) {
-        return Result.success(webhookConfigService.create(config));
+    public Result<WebhookConfigResponse> create(@RequestBody WebhookConfig config) {
+        return Result.success(WebhookConfigResponse.from(webhookConfigService.create(config)));
     }
 
     @PreAuthorize("@ss.hasPermi('system:config:edit')")
     @PutMapping("/{id}")
-    public Result<WebhookConfig> update(@PathVariable Long id, @RequestBody WebhookConfig config) {
-        return Result.success(webhookConfigService.update(id, config));
+    public Result<WebhookConfigResponse> update(@PathVariable Long id, @RequestBody WebhookConfig config) {
+        return Result.success(WebhookConfigResponse.from(webhookConfigService.update(id, config)));
     }
 
     @PreAuthorize("@ss.hasPermi('system:config:edit')")

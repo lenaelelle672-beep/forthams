@@ -72,7 +72,7 @@ test.describe('浏览器回归 smoke', () => {
     await page.waitForLoadState('networkidle');
 
     await page.getByRole('button', { name: /新建流程/ }).click();
-    await page.getByRole('button', { name: '资产转移流程' }).click();
+    await page.getByRole('button', { name: /^资产转移流程$/ }).click();
 
     await expect(page).toHaveURL(/\/workflows$/);
     await expect(page.getByText(/"资产转移流程"初始化失败：工作流草稿保存失败/)).toBeVisible({ timeout: 10_000 });
@@ -85,12 +85,20 @@ test.describe('浏览器回归 smoke', () => {
 
   test('/bigscreen-3d 无 WebGL 时展示安全降级且不加载 3D chunk', async ({ page }) => {
     const errors = collectBrowserErrors(page);
+    const requested3DChunks: string[] = [];
+    page.on('request', (request) => {
+      const url = request.url();
+      if (url.includes('BigScreen3DCanvas')) {
+        requested3DChunks.push(url);
+      }
+    });
     await disableWebGL(page);
 
-    await page.goto('/bigscreen-3d');
-    await page.waitForLoadState('networkidle');
+    await page.goto('/bigscreen-3d', { waitUntil: 'domcontentloaded' });
 
     await expect(page.getByText('3D 地图已切换为安全降级模式').first()).toBeVisible({ timeout: 10_000 });
+    expect(requested3DChunks).toEqual([]);
+    await expect(page.locator('.ams3d-map-layer canvas')).toHaveCount(0);
     await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
     expect(errors.filter((error) => !/WebGL|webgl|Canvas|React will try to recreate/.test(error))).toEqual([]);
   });
@@ -165,7 +173,7 @@ test.describe('浏览器回归 smoke', () => {
     await expect(page.getByText('资产转移流程').first()).toBeVisible();
 
     await page.getByRole('button', { name: /新建流程/ }).click();
-    await page.getByRole('button', { name: '资产转移流程' }).click();
+    await page.getByRole('button', { name: /^资产转移流程$/ }).click();
 
     await expect(page).toHaveURL(/\/workflow-designer\?businessType=ASSET_TRANSFER$/);
     await expect(page.getByText('资产转移流程').first()).toBeVisible({ timeout: 10_000 });
@@ -203,7 +211,7 @@ test.describe('浏览器回归 smoke', () => {
     expect(errors).toEqual([]);
   });
 
-  test('/workflow-designer 仅查询权限账号直达时保持只读且不保存', async ({ page }) => {
+  test('/workflow-designer 仅查询权限账号直达时由路由守卫拦截且不保存', async ({ page }) => {
     const errors = collectBrowserErrors(page);
 
     await page.goto('/');
@@ -223,10 +231,10 @@ test.describe('浏览器回归 smoke', () => {
     await page.goto('/workflow-designer?businessType=ASSET_TRANSFER');
     await page.waitForLoadState('networkidle');
 
-    await expect(page.getByText('当前账号只有流程查看权限，无法保存、发布或编辑流程。')).toBeVisible({ timeout: 10_000 });
-    await expect(page.getByRole('button', { name: /只读模式/ })).toBeDisabled();
-    await expect(page.getByRole('button', { name: /发布流程/ })).toBeDisabled();
-    await expect(page.getByText('当前账号可查看流程结构，但不能新增节点、调整连线或修改节点属性。')).toBeVisible();
+    await expect(page.getByRole('heading', { name: '无访问权限' })).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText('您没有访问此页面的权限。')).toBeVisible();
+    await expect(page.getByText('请联系管理员获取相应角色权限后再尝试访问。')).toBeVisible();
+    await expect(page.getByRole('button', { name: /只读模式|发布流程|保存草稿/ })).toHaveCount(0);
     expect(workflowDraftSaveCount).toBe(0);
     await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
     expect(errors).toEqual([]);

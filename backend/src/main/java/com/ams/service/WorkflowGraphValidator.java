@@ -21,6 +21,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 /**
  * 工作流图结构验证器。
@@ -39,8 +40,17 @@ public class WorkflowGraphValidator {
 
     private static final Logger log = LoggerFactory.getLogger(WorkflowGraphValidator.class);
 
-    private static final Set<String> NODE_TYPES = Set.of("start", "approval", "condition", "end");
-    private static final Set<String> APPROVAL_MODES = Set.of("sequence", "all", "any", "count");
+    private static final Set<String> NODE_TYPES = Set.of("start", "approval", "task", "cc", "condition", "end");
+    private static final Set<String> EXECUTABLE_NODE_TYPES = Set.of("approval", "task");
+    private static final Set<String> APPROVAL_MODES = Set.of("sequence", "all", "any");
+    private static final Pattern RECIPIENT_ROLE_PATTERN = Pattern.compile("^[A-Za-z0-9_.:-]+$");
+    private static final Pattern RECIPIENT_USER_PATTERN = Pattern.compile("^\\d+$");
+    private static final Pattern CONDITION_EXPRESSION_PATTERN =
+            Pattern.compile("^[\\p{IsHan}A-Za-z0-9_.-]+\\s*(>=|<=|==|!=|>(?!=)|<(?!=))\\s*\\S.*$");
+    private static final Pattern COMPOUND_CONDITION_PATTERN =
+            Pattern.compile("(?i).*\\s+(AND|OR)(\\s+|$).*");
+    private static final int MAX_FORM_SOURCE_LENGTH = 50_000;
+    private static final int MAX_FORM_META_LENGTH = 1_000;
 
     @Nullable
     private final UserRoleMapper userRoleMapper;
@@ -92,7 +102,7 @@ public class WorkflowGraphValidator {
 
         Map<String, Map<String, Object>> nodeById = new HashMap<>();
         int startCount = 0;
-        int approvalCount = 0;
+        int executableCount = 0;
         int endCount = 0;
         for (Object item : nodeList) {
             if (!(item instanceof Map<?, ?> rawNode)) {
@@ -112,8 +122,8 @@ public class WorkflowGraphValidator {
             nodeById.put(id, node);
             if ("start".equals(type)) {
                 startCount++;
-            } else if ("approval".equals(type)) {
-                approvalCount++;
+            } else if (EXECUTABLE_NODE_TYPES.contains(type)) {
+                executableCount++;
             } else if ("end".equals(type)) {
                 endCount++;
             }
@@ -122,8 +132,8 @@ public class WorkflowGraphValidator {
         if (startCount != 1) {
             throw new BusinessException("流程必须且只能包含一个开始节点");
         }
-        if (approvalCount == 0) {
-            throw new BusinessException("流程至少需要一个审批节点");
+        if (executableCount == 0) {
+            throw new BusinessException("流程至少需要一个审批或办理节点");
         }
         if (endCount != 1) {
             throw new BusinessException("流程必须且只能包含一个结束节点");
@@ -170,44 +180,136 @@ public class WorkflowGraphValidator {
 
         if ("start".equals(type)) {
             requireText(nodeData.get("triggerType"), "开始节点触发方式不能为空");
+            validateNodeFormConfig(nodeData, id);
         }
         if ("approval".equals(type)) {
+            validateNodeFormConfig(nodeData, id);
+        }
+        if (EXECUTABLE_NODE_TYPES.contains(type)) {
             String approverType = textValue(nodeData.get("approverType"));
             if ("user".equals(approverType)) {
                 String approverIdStr = textValue(nodeData.get("approverId"));
-                validateApproverUser(approverIdStr, id);
+                validateApproverUser(approverIdStr, id, "task".equals(type));
             } else {
-                String approverRole = requireText(nodeData.get("approverRole"), "审批节点审批角色不能为空");
+                String approverRole = requireText(nodeData.get("approverRole"),
+                        "task".equals(type) ? "办理节点办理角色不能为空" : "审批节点审批角色不能为空");
                 validateApproverRole(approverRole, id);
             }
-            String approvalMode = requireText(nodeData.get("approvalMode"), "审批节点审批模式不能为空");
+            String approvalMode = requireText(nodeData.get("approvalMode"),
+                    "task".equals(type) ? "办理节点办理模式不能为空" : "审批节点审批模式不能为空");
             if (!APPROVAL_MODES.contains(approvalMode)) {
-                throw new BusinessException("审批节点审批模式仅支持 sequence/all/any/count");
+                throw new BusinessException(("task".equals(type) ? "办理节点办理模式" : "审批节点审批模式") + "仅支持 sequence/all/any");
             }
-            // count 模式需要校验 countThreshold 配置合法性
-            if ("count".equals(approvalMode)) {
-                int countThreshold = parseIntValue(nodeData.get("countThreshold"), 0);
-                if (countThreshold <= 0) {
-                    throw new BusinessException("节点" + id + "的 count 模式需要配置 countThreshold 且值必须大于 0");
-                }
-                // 验证 countThreshold 不能超过审批人数量
-                String approverRole = textValue(nodeData.get("approverRole"));
-                if (approverRole != null && !approverRole.isBlank() && userRoleMapper != null) {
-                    List<Long> approverIds = userRoleMapper.selectActiveUserIdsByRole(approverRole);
-                    if (approverIds != null && countThreshold > approverIds.size()) {
-                        throw new BusinessException("节点" + id + "的 countThreshold(" + countThreshold + ")不能超过审批人数量(" + approverIds.size() + ")");
-                    }
-                }
-            }
+            validateOptionalCcRecipients(nodeData, id);
+        }
+        if ("cc".equals(type)) {
+            validateCcRecipients(nodeData, id);
         }
         if ("condition".equals(type)) {
-            requireText(nodeData.get("conditionExpression"), "条件节点表达式不能为空");
+            String conditionExpression = requireText(nodeData.get("conditionExpression"), "条件节点表达式不能为空");
+            validateConditionExpression(conditionExpression, id);
             requireText(nodeData.get("trueLabel"), "条件节点满足标签不能为空");
             requireText(nodeData.get("falseLabel"), "条件节点不满足标签不能为空");
         }
         if ("end".equals(type)) {
             requireText(nodeData.get("resultAction"), "结束节点动作不能为空");
         }
+    }
+
+    private void validateNodeFormConfig(Map<String, Object> nodeData, String id) {
+        Object formSource = nodeData.get("formSource");
+        if (!(formSource instanceof String source)) {
+            throw new BusinessException("节点" + id + "环节子表单必须为字符串");
+        }
+        if (source.isBlank()) {
+            throw new BusinessException("节点" + id + "必须配置环节子表单");
+        }
+        if (source.length() > MAX_FORM_SOURCE_LENGTH) {
+            throw new BusinessException("节点" + id + "环节子表单不能超过" + MAX_FORM_SOURCE_LENGTH + "字符");
+        }
+        validateOptionalText(nodeData.get("formSectionName"), "节点" + id + "区段名称");
+        validateOptionalText(nodeData.get("formSummaryFields"), "节点" + id + "历史摘要字段");
+    }
+
+    private void validateOptionalText(Object value, String fieldName) {
+        if (value == null) {
+            return;
+        }
+        if (!(value instanceof String text)) {
+            throw new BusinessException(fieldName + "必须为字符串");
+        }
+        if (text.length() > MAX_FORM_META_LENGTH) {
+            throw new BusinessException(fieldName + "不能超过" + MAX_FORM_META_LENGTH + "字符");
+        }
+    }
+
+    private void validateCcRecipients(Map<String, Object> nodeData, String id) {
+        validateCcRecipients(nodeData, id, true);
+    }
+
+    private void validateOptionalCcRecipients(Map<String, Object> nodeData, String id) {
+        validateCcRecipients(nodeData, id, false);
+    }
+
+    private void validateCcRecipients(Map<String, Object> nodeData, String id, boolean required) {
+        String ccRoleCodes = textValue(nodeData.get("ccRoleCodes"));
+        String ccUserIds = textValue(nodeData.get("ccUserIds"));
+        if (ccRoleCodes.isBlank() && ccUserIds.isBlank()) {
+            if (required) {
+                throw new BusinessException("抄送节点" + id + "必须配置抄送角色或抄送用户");
+            }
+            return;
+        }
+        for (String roleCode : splitCsv(ccRoleCodes)) {
+            if (!RECIPIENT_ROLE_PATTERN.matcher(roleCode).matches()) {
+                throw new BusinessException("抄送节点" + id + "抄送角色格式无效: " + roleCode);
+            }
+            validateCcRole(roleCode, id);
+        }
+        for (String userId : splitCsv(ccUserIds)) {
+            if (!RECIPIENT_USER_PATTERN.matcher(userId).matches()) {
+                throw new BusinessException("抄送节点" + id + "抄送用户ID格式无效: " + userId);
+            }
+            validateCcUser(userId, id);
+        }
+    }
+
+    private void validateCcRole(String roleCode, String nodeId) {
+        if (userRoleMapper == null) {
+            return;
+        }
+        int roleCount = userRoleMapper.countActiveByRoleCode(roleCode);
+        if (roleCount == 0) {
+            throw new BusinessException("抄送节点" + nodeId + "抄送角色不存在或已禁用: " + roleCode);
+        }
+        List<Long> userIds = userRoleMapper.selectActiveUserIdsByRole(roleCode);
+        if (userIds == null || userIds.isEmpty()) {
+            throw new BusinessException("抄送节点" + nodeId + "抄送角色未配置有效用户: " + roleCode);
+        }
+    }
+
+    private void validateCcUser(String userId, String nodeId) {
+        if (userMapper == null) {
+            return;
+        }
+        User user = userMapper.selectById(Long.parseLong(userId));
+        if (user == null || (user.getStatus() != null && user.getStatus() != 1)) {
+            throw new BusinessException("抄送节点" + nodeId + "抄送用户不存在或已禁用: userId=" + userId);
+        }
+    }
+
+    private List<String> splitCsv(String value) {
+        if (value == null || value.isBlank()) {
+            return List.of();
+        }
+        List<String> result = new ArrayList<>();
+        for (String part : value.split(",")) {
+            String trimmed = part.trim();
+            if (!trimmed.isEmpty()) {
+                result.add(trimmed);
+            }
+        }
+        return result;
     }
 
     // ──────────────────────────────────────────────────────────────
@@ -260,12 +362,16 @@ public class WorkflowGraphValidator {
             if ("condition".equals(sourceNode.get("type"))) {
                 String handle = String.valueOf(sourceHandle);
                 if (!"condition-true".equals(handle) && !"condition-false".equals(handle)) {
-                    throw new BusinessException("条件节点连线必须使用满足或不满足出口");
+                    throw new BusinessException("条件节点" + source + "连线必须使用满足或不满足出口");
                 }
                 if ("condition-true".equals(handle)) {
-                    conditionTrueSources.add(source);
+                    if (!conditionTrueSources.add(source)) {
+                        throw new BusinessException("条件节点" + source + "只能配置一条满足分支");
+                    }
                 } else {
-                    conditionFalseSources.add(source);
+                    if (!conditionFalseSources.add(source)) {
+                        throw new BusinessException("条件节点" + source + "只能配置一条不满足分支");
+                    }
                 }
             }
 
@@ -297,7 +403,7 @@ public class WorkflowGraphValidator {
 
             if ("condition".equals(type)) {
                 if (!conditionTrueSources.contains(nodeId) || !conditionFalseSources.contains(nodeId)) {
-                    throw new BusinessException("条件节点必须同时配置满足和不满足两条分支");
+                    throw new BusinessException("条件节点" + nodeId + "必须同时配置满足和不满足两条分支");
                 }
             }
         }
@@ -367,19 +473,25 @@ public class WorkflowGraphValidator {
 
     /** 校验 approverType=user 时 approverId 指向有效用户 */
     public void validateApproverUser(String approverId, String nodeId) {
+        validateApproverUser(approverId, nodeId, false);
+    }
+
+    private void validateApproverUser(String approverId, String nodeId, boolean taskNode) {
         if (approverId == null || approverId.isBlank()) {
-            throw new BusinessException("节点" + nodeId + "指定用户审批时审批人ID不能为空");
+            throw new BusinessException(taskNode
+                    ? "节点" + nodeId + "指定用户办理时办理人ID不能为空"
+                    : "节点" + nodeId + "指定用户审批时审批人ID不能为空");
         }
         long userId;
         try {
             userId = Long.parseLong(approverId.trim());
         } catch (NumberFormatException ex) {
-            throw new BusinessException("节点" + nodeId + "审批人ID格式无效: " + approverId);
+            throw new BusinessException("节点" + nodeId + (taskNode ? "办理人ID格式无效: " : "审批人ID格式无效: ") + approverId);
         }
         if (userMapper != null) {
             User user = userMapper.selectById(userId);
             if (user == null || (user.getStatus() != null && user.getStatus() != 1)) {
-                throw new BusinessException("节点" + nodeId + "审批人不存在或已禁用: userId=" + userId);
+                throw new BusinessException("节点" + nodeId + (taskNode ? "办理人不存在或已禁用: userId=" : "审批人不存在或已禁用: userId=") + userId);
             }
         }
     }
@@ -424,6 +536,14 @@ public class WorkflowGraphValidator {
 
     public String textValue(Object value) {
         return value == null ? "" : String.valueOf(value).trim();
+    }
+
+    private void validateConditionExpression(String expression, String nodeId) {
+        String normalized = expression.trim();
+        if (!CONDITION_EXPRESSION_PATTERN.matcher(normalized).matches()
+                || COMPOUND_CONDITION_PATTERN.matcher(normalized).matches()) {
+            throw new BusinessException("条件节点" + nodeId + "表达式仅支持简单表达式：字段名 操作符 值");
+        }
     }
 
     public void requireNumber(Object value, String message) {

@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>菜单权限配置</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<style data-purpose="custom-utilities">
+    :root {
+      --bg-app: #f0f2f5;
+      --bg-panel: #ffffff;
+      --text-main: #333333;
+      --text-secondary: #666666;
+      --text-muted: #999999;
+      --border-color: #d7e2ef;
+      --primary-color: #1677ff;
+      --primary-hover: #4096ff;
+      --danger-color: #ff4d4f;
+      --warning-color: #faad14;
+      --success-color: #52c41a;
+      --sidebar-bg: #001529;
+      --sidebar-hover: #162c40;
+      --sidebar-active: #1677ff;
+      --header-bg: #001529;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: var(--bg-app);
+      color: var(--text-main);
+      font-size: 12px;
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #a8a8a8;
+    }
+
+    /* Form Elements */
+    .app-input, .app-select {
+      height: 28px;
+      font-size: 12px;
+      border-radius: 4px;
+      border-color: var(--border-color);
+    }
+    .app-input:focus, .app-select:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 2px rgba(22, 119, 255, 0.2);
+    }
+
+    /* Buttons */
+    .app-btn {
+      height: 28px;
+      padding: 0 12px;
+      font-size: 12px;
+      border-radius: 4px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.2s;
+    }
+    .app-btn-primary {
+      background-color: var(--primary-color);
+      color: white;
+    }
+    .app-btn-primary:hover {
+      background-color: var(--primary-hover);
+    }
+    .app-btn-default {
+      background-color: white;
+      border-color: var(--border-color);
+      color: var(--text-main);
+    }
+    .app-btn-default:hover {
+      border-color: var(--primary-color);
+      color: var(--primary-color);
+    }
+
+    /* Badges & Tags */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0 6px;
+      height: 20px;
+      border-radius: 4px;
+      font-size: 11px;
+      border: 1px solid transparent;
+    }
+    .status-success { background: #f6ffed; border-color: #b7eb8f; color: var(--success-color); }
+    .status-warning { background: #fffbe6; border-color: #ffe58f; color: var(--warning-color); }
+    .status-danger { background: #fff2f0; border-color: #ffccc7; color: var(--danger-color); }
+
+    /* Layout specific heights to fit 992px */
+    .main-workspace-h { height: calc(100vh - 60px - 72px - 52px - 180px - 24px); } /* Header - AppHeader - Filter - BottomPanel - margins */
+  </style>
+</head>
+<body>
+<!-- BEGIN: GlobalHeader -->
+<header class="h-[60px] bg-[#001529] text-white flex items-center px-4 shrink-0 shadow-sm relative z-10" data-purpose="global-header">
+<div class="flex items-center space-x-2 mr-8">
+<span class="text-xl font-bold tracking-wider">UNIVIEW</span>
+<span class="text-sm border-l border-gray-600 pl-2 text-gray-300">固定资产管理系统</span>
+</div>
+<nav class="flex-1 flex items-center h-full space-x-1" data-purpose="top-navigation">
+<a class="h-full flex items-center px-4 hover:bg-white/10 text-gray-300 transition-colors" href="#">
+<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+        资产运营总览
+      </a>
+<a class="h-full flex items-center px-4 hover:bg-white/10 text-gray-300 transition-colors" href="#">
+<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+        数据监控中心
+      </a>
+<a class="h-full flex items-center px-4 hover:bg-white/10 text-gray-300 transition-colors" href="#">
+<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+        资产运维中心
+      </a>
+<a class="h-full flex items-center px-4 hover:bg-white/10 text-gray-300 transition-colors" href="#">
+<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+        风险预警中心
+      </a>
+<a class="h-full flex items-center px-4 bg-[#1677ff] text-white relative" href="#">
+<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+        系统运营中枢
+        <div class="absolute bottom-0 left-0 w-full h-0.5 bg-white"></div>
+</a>
+</nav>
+<div class="flex items-center space-x-4">
+<button class="relative hover:text-gray-300">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] rounded-full h-4 w-4 flex items-center justify-center border border-[#001529]">12</span>
+</button>
+<button class="hover:text-gray-300">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+<div class="flex items-center space-x-2 cursor-pointer hover:text-gray-300">
+<div class="w-6 h-6 bg-gray-600 rounded-full flex items-center justify-center">
+<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<span class="text-sm">系统管理员</span>
+</div>
+</div>
+</header>
+<!-- END: GlobalHeader -->
+<div class="flex flex-1 overflow-hidden">
+<!-- BEGIN: Sidebar -->
+<aside class="w-[200px] bg-[#001529] text-gray-300 flex flex-col shrink-0" data-purpose="sidebar">
+<div class="h-12 flex items-center px-4 bg-[#000c17] text-white text-sm font-medium">
+        系统运营中枢
+      </div>
+<div class="flex-1 overflow-y-auto py-2">
+<div class="mb-1">
+<div class="px-4 py-2 flex items-center justify-between cursor-pointer hover:text-white">
+<div class="flex items-center">
+<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+              组织权限
+            </div>
+<svg class="w-4 h-4 transform rotate-180" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div class="pl-10 space-y-1">
+<a class="block py-2 pr-4 hover:text-white transition-colors" href="#">用户管理</a>
+<a class="block py-2 pr-4 hover:text-white transition-colors" href="#">角色权限</a>
+<a class="block py-2 pr-4 bg-[#1677ff] text-white rounded-l-full -ml-4 pl-8 relative" href="#">菜单权限</a>
+<a class="block py-2 pr-4 hover:text-white transition-colors" href="#">数据权限</a>
+<a class="block py-2 pr-4 hover:text-white transition-colors" href="#">工作交接</a>
+<a class="block py-2 pr-4 hover:text-white transition-colors" href="#">部门组织</a>
+<a class="block py-2 pr-4 hover:text-white transition-colors" href="#">岗位管理</a>
+</div>
+</div>
+</div>
+<div class="h-10 flex items-center px-4 border-t border-gray-800 cursor-pointer hover:text-white transition-colors">
+<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M11 19l-7-7 7-7m8 14l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+        收起
+      </div>
+</aside>
+<!-- END: Sidebar -->
+<!-- BEGIN: MainContent -->
+<main class="flex-1 flex flex-col min-w-0 p-4 space-y-4 overflow-hidden relative">
+<!-- App Header -->
+<div class="bg-white p-4 rounded shadow-sm shrink-0 flex justify-between items-center" data-purpose="app-header">
+<div>
+<h1 class="text-lg font-bold text-gray-800 flex items-center">
+            菜单与按钮权限配置
+          </h1>
+<p class="text-gray-500 mt-1">维护顶部入口、业务左侧导航、系统设置导航和页面按钮/API权限，发布前必须预览影响范围。</p>
+</div>
+<div class="flex space-x-2">
+<button class="app-btn app-btn-primary">新建权限点</button>
+<button class="app-btn app-btn-default">授权预览</button>
+<button class="app-btn app-btn-default">发布校验</button>
+<button class="app-btn app-btn-default">保存草稿</button>
+<button class="app-btn app-btn-primary">提交校验</button>
+</div>
+</div>
+<!-- Filter Row -->
+<div class="bg-white p-3 rounded shadow-sm shrink-0 flex items-center justify-between" data-purpose="filter-bar">
+<div class="flex items-center space-x-3">
+<div class="relative w-64">
+<input class="app-input w-full pl-8" placeholder="搜索菜单、按钮、权限编码、角色" type="text"/>
+<svg class="w-4 h-4 absolute left-2 top-2 text-gray-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div class="flex items-center space-x-2">
+<span class="text-gray-500">入口类型</span>
+<select class="app-select w-28"><option>全部</option></select>
+</div>
+<div class="flex items-center space-x-2">
+<span class="text-gray-500">发布状态</span>
+<select class="app-select w-28"><option>全部</option></select>
+</div>
+<div class="flex items-center space-x-2">
+<span class="text-gray-500">角色范围</span>
+<select class="app-select w-28"><option>全部</option></select>
+</div>
+<div class="flex items-center space-x-2">
+<span class="text-gray-500">风险等级</span>
+<select class="app-select w-28"><option>全部</option></select>
+</div>
+</div>
+<div class="px-3 py-1 bg-blue-50 text-blue-600 rounded-full border border-blue-100 font-medium">
+          9 / 12
+        </div>
+</div>
+<!-- Main Workspace Panels -->
+<div class="flex-1 flex space-x-4 min-h-0 main-workspace-h" data-purpose="workspace">
+<!-- Left Panel: Tree -->
+<div class="w-[240px] bg-white rounded shadow-sm flex flex-col border border-[var(--border-color)] shrink-0">
+<div class="p-3 border-b border-[var(--border-color)] flex justify-between items-center font-medium">
+<span>权限点结构树</span>
+<div class="flex space-x-1 text-gray-400">
+<svg class="w-4 h-4 cursor-pointer hover:text-gray-600" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<svg class="w-4 h-4 cursor-pointer hover:text-gray-600" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<svg class="w-4 h-4 cursor-pointer hover:text-gray-600" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto p-2 text-[13px]">
+<!-- Tree Content -->
+<div class="space-y-1">
+<div class="flex items-center justify-between py-1 px-2 hover:bg-gray-50 rounded cursor-pointer">
+<div class="flex items-center"><svg class="w-4 h-4 mr-1 text-gray-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg><svg class="w-4 h-4 mr-1 text-blue-500" fill="currentColor" viewbox="0 0 20 20"><path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"></path></svg>顶部入口</div>
+<div class="flex items-center space-x-2"><span class="text-gray-400">3</span><span class="status-badge status-success">已发布</span></div>
+</div>
+<div class="flex items-center justify-between py-1 px-2 hover:bg-gray-50 rounded cursor-pointer">
+<div class="flex items-center"><svg class="w-4 h-4 mr-1 text-gray-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg><svg class="w-4 h-4 mr-1 text-blue-500" fill="currentColor" viewbox="0 0 20 20"><path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"></path></svg>业务左侧导航</div>
+<div class="flex items-center space-x-2"><span class="text-gray-400">28</span><span class="status-badge status-success">已发布</span></div>
+</div>
+<div class="flex items-center justify-between py-1 px-2 hover:bg-gray-50 rounded cursor-pointer">
+<div class="flex items-center"><svg class="w-4 h-4 mr-1 text-gray-400 transform rotate-90" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg><svg class="w-4 h-4 mr-1 text-blue-500" fill="currentColor" viewbox="0 0 20 20"><path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"></path></svg>系统设置导航</div>
+<div class="flex items-center space-x-2"><span class="text-gray-400">16</span><span class="status-badge status-warning">待复核</span></div>
+</div>
+<div class="pl-4 space-y-1">
+<div class="flex items-center justify-between py-1 px-2 bg-blue-50 rounded cursor-pointer border border-blue-100">
+<div class="flex items-center"><svg class="w-4 h-4 mr-1 text-gray-400 transform rotate-90" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg><svg class="w-4 h-4 mr-1 text-blue-600" fill="currentColor" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M2 6a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1H8a3 3 0 00-3 3v5H4a2 2 0 01-2-2V6zm10 2a2 2 0 012-2h2a2 2 0 012 2v6a2 2 0 01-2 2h-6a2 2 0 01-2-2v-6z" fill-rule="evenodd"></path></svg><span class="text-blue-600 font-medium">系统运营中枢</span></div>
+<div class="flex items-center space-x-2"><span class="text-blue-400">7</span><span class="status-badge status-warning">待复核</span></div>
+</div>
+<div class="pl-5 space-y-1 border-l ml-3 border-gray-200 mt-1 mb-1">
+<div class="flex items-center justify-between py-1 px-2 hover:bg-gray-50 rounded cursor-pointer relative">
+<div class="absolute w-3 h-px bg-gray-200 -left-3 top-1/2"></div>
+<div class="flex items-center"><svg class="w-4 h-4 mr-1 text-blue-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>流程平台</div>
+<div class="flex items-center space-x-2"><span class="text-gray-400">3</span><span class="status-badge status-success">已发布</span></div>
+</div>
+<div class="flex items-center justify-between py-1 px-2 hover:bg-gray-50 rounded cursor-pointer relative">
+<div class="absolute w-3 h-px bg-gray-200 -left-3 top-1/2"></div>
+<div class="flex items-center"><svg class="w-4 h-4 mr-1 text-blue-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>组织权限</div>
+<div class="flex items-center space-x-2"><span class="text-gray-400">4</span><span class="status-badge status-warning">待复核</span></div>
+</div>
+<div class="flex items-center justify-between py-1 px-2 hover:bg-gray-50 rounded cursor-pointer relative">
+<div class="absolute w-3 h-px bg-gray-200 -left-3 top-1/2"></div>
+<div class="flex items-center"><svg class="w-4 h-4 mr-1 text-blue-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>集成配置</div>
+<div class="flex items-center space-x-2"><span class="text-gray-400">2</span><span class="status-badge text-gray-500 bg-gray-100 border-gray-200">未发布</span></div>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-between py-1 px-2 hover:bg-gray-50 rounded cursor-pointer">
+<div class="flex items-center"><svg class="w-4 h-4 mr-1 text-gray-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg><svg class="w-4 h-4 mr-1 text-blue-500" fill="currentColor" viewbox="0 0 20 20"><path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"></path></svg>页面操作按钮</div>
+<div class="flex items-center space-x-2"><span class="text-gray-400">15</span><span class="status-badge status-success">已发布</span></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Center Panel: Table -->
+<div class="flex-1 bg-white rounded shadow-sm flex flex-col border border-[var(--border-color)] overflow-hidden">
+<div class="p-3 border-b border-[var(--border-color)] flex justify-between items-center font-medium">
+<div class="flex items-center space-x-2">
+<span>菜单按钮权限清单</span>
+<span class="text-gray-400 font-normal">共 7 条</span>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto">
+<table class="w-full text-left border-collapse">
+<thead class="bg-gray-50 sticky top-0 z-10">
+<tr class="text-gray-500 border-b border-[var(--border-color)]">
+<th class="p-2 w-10 text-center"><input class="rounded border-gray-300" type="checkbox"/></th>
+<th class="p-2 font-medium">权限点</th>
+<th class="p-2 font-medium">编码</th>
+<th class="p-2 font-medium">入口路径</th>
+<th class="p-2 font-medium">父级分组</th>
+<th class="p-2 font-medium">可见角色</th>
+<th class="p-2 font-medium">按钮/API</th>
+<th class="p-2 font-medium">状态</th>
+<th class="p-2 font-medium">风险</th>
+<th class="p-2 font-medium">操作</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-[var(--border-color)]">
+<tr class="hover:bg-gray-50">
+<td class="p-2 text-center"><input class="rounded border-gray-300" type="checkbox"/></td>
+<td class="p-2">系统运营中枢</td>
+<td class="p-2 text-gray-500">SYS_OP_HUB</td>
+<td class="p-2 text-gray-500">/sys-hub</td>
+<td class="p-2 text-gray-500">系统设置导航</td>
+<td class="p-2">5</td>
+<td class="p-2">菜单</td>
+<td class="p-2"><span class="status-badge status-warning">待复核</span></td>
+<td class="p-2"><span class="status-badge status-success">低风险</span></td>
+<td class="p-2 text-blue-600 space-x-1"><a href="#">编辑</a> <a href="#">预览</a></td>
+</tr>
+<tr class="hover:bg-gray-50">
+<td class="p-2 text-center"><input class="rounded border-gray-300" type="checkbox"/></td>
+<td class="p-2">流程平台左侧菜单</td>
+<td class="p-2 text-gray-500">SYS_OP_HUB_FLOW</td>
+<td class="p-2 text-gray-500">/sys-hub/flow</td>
+<td class="p-2 text-gray-500">系统运营中枢</td>
+<td class="p-2">3</td>
+<td class="p-2">菜单</td>
+<td class="p-2"><span class="status-badge status-success">已发布</span></td>
+<td class="p-2"><span class="status-badge status-success">低风险</span></td>
+<td class="p-2 text-blue-600 space-x-1"><a href="#">编辑</a> <a href="#">预览</a></td>
+</tr>
+<tr class="bg-blue-50">
+<td class="p-2 text-center"><input checked="" class="rounded border-blue-500 text-blue-600 focus:ring-blue-500" type="checkbox"/></td>
+<td class="p-2 font-medium text-blue-700">发布按钮</td>
+<td class="p-2 text-gray-600">SYS_OP_PUBLISH</td>
+<td class="p-2 text-gray-600">/sys-hub/publish</td>
+<td class="p-2 text-gray-600">系统运营中枢</td>
+<td class="p-2">4</td>
+<td class="p-2">按钮</td>
+<td class="p-2"><span class="status-badge status-warning">待复核</span></td>
+<td class="p-2"><span class="status-badge status-danger">高风险</span></td>
+<td class="p-2 text-blue-600 space-x-1"><a href="#">编辑</a> <a href="#">预览</a></td>
+</tr>
+<tr class="hover:bg-gray-50">
+<td class="p-2 text-center"><input class="rounded border-gray-300" type="checkbox"/></td>
+<td class="p-2">导出按钮</td>
+<td class="p-2 text-gray-500">SYS_OP_EXPORT</td>
+<td class="p-2 text-gray-500">/sys-hub/export</td>
+<td class="p-2 text-gray-500">系统运营中枢</td>
+<td class="p-2">4</td>
+<td class="p-2">按钮</td>
+<td class="p-2"><span class="status-badge status-success">已发布</span></td>
+<td class="p-2"><span class="status-badge status-success">低风险</span></td>
+<td class="p-2 text-blue-600 space-x-1"><a href="#">编辑</a> <a href="#">预览</a></td>
+</tr>
+<tr class="hover:bg-gray-50">
+<td class="p-2 text-center"><input class="rounded border-gray-300" type="checkbox"/></td>
+<td class="p-2">审计入口</td>
+<td class="p-2 text-gray-500">SYS_OP_AUDIT</td>
+<td class="p-2 text-gray-500">/sys-hub/audit</td>
+<td class="p-2 text-gray-500">系统运营中枢</td>
+<td class="p-2">5</td>
+<td class="p-2">菜单</td>
+<td class="p-2"><span class="status-badge status-success">已发布</span></td>
+<td class="p-2"><span class="status-badge status-success">低风险</span></td>
+<td class="p-2 text-blue-600 space-x-1"><a href="#">编辑</a> <a href="#">预览</a></td>
+</tr>
+<tr class="hover:bg-gray-50">
+<td class="p-2 text-center"><input class="rounded border-gray-300" type="checkbox"/></td>
+<td class="p-2">角色权限</td>
+<td class="p-2 text-gray-500">SYS_OP_ROLE</td>
+<td class="p-2 text-gray-500">/sys-hub/org/role</td>
+<td class="p-2 text-gray-500">组织权限</td>
+<td class="p-2">4</td>
+<td class="p-2">菜单</td>
+<td class="p-2"><span class="status-badge status-warning">待复核</span></td>
+<td class="p-2"><span class="status-badge status-success">低风险</span></td>
+<td class="p-2 text-blue-600 space-x-1"><a href="#">编辑</a> <a href="#">预览</a></td>
+</tr>
+<tr class="hover:bg-gray-50">
+<td class="p-2 text-center"><input class="rounded border-gray-300" type="checkbox"/></td>
+<td class="p-2">菜单权限</td>
+<td class="p-2 text-gray-500">SYS_OP_MENU</td>
+<td class="p-2 text-gray-500">/sys-hub/org/menu</td>
+<td class="p-2 text-gray-500">组织权限</td>
+<td class="p-2">4</td>
+<td class="p-2">菜单</td>
+<td class="p-2"><span class="status-badge status-warning">待复核</span></td>
+<td class="p-2"><span class="status-badge status-success">低风险</span></td>
+<td class="p-2 text-blue-600 space-x-1"><a href="#">编辑</a> <a href="#">预览</a></td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination -->
+<div class="p-2 border-t border-[var(--border-color)] flex justify-between items-center text-gray-500 bg-white shrink-0">
+<span>共 7 条</span>
+<div class="flex items-center space-x-2">
+<button class="w-6 h-6 border border-gray-300 rounded flex items-center justify-center hover:border-blue-500 hover:text-blue-500">&lt;</button>
+<button class="w-6 h-6 border border-blue-500 text-blue-500 bg-blue-50 rounded flex items-center justify-center">1</button>
+<button class="w-6 h-6 border border-gray-300 rounded flex items-center justify-center hover:border-blue-500 hover:text-blue-500">&gt;</button>
+<select class="app-select w-20 h-6 py-0"><option>20 条/页</option></select>
+<span>跳至</span>
+<input class="app-input w-10 h-6 text-center py-0" type="text" value="1"/>
+<span>页</span>
+</div>
+</div>
+</div>
+<!-- Right Panel: Properties -->
+<div class="w-[320px] bg-white rounded shadow-sm flex flex-col border border-[var(--border-color)] shrink-0 overflow-hidden">
+<div class="p-3 border-b border-[var(--border-color)] flex justify-between items-center font-medium bg-gray-50 shrink-0">
+<span class="text-[14px]">权限点属性</span>
+<svg class="w-4 h-4 text-gray-400 cursor-pointer" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M13 5l7 7-7 7M5 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div class="p-4 flex-1 overflow-y-auto space-y-4">
+<div class="text-gray-500 pb-2 border-b border-dashed border-gray-200">当前对象：发布按钮</div>
+<div class="space-y-3">
+<div class="flex items-center">
+<div class="w-20 text-gray-600 before:content-['*'] before:text-red-500 before:mr-1">权限点名称</div>
+<input class="app-input flex-1" type="text" value="发布按钮"/>
+</div>
+<div class="flex items-center">
+<div class="w-20 text-gray-600 before:content-['*'] before:text-red-500 before:mr-1">权限编码</div>
+<input class="app-input flex-1" type="text" value="SYS_OP_PUBLISH"/>
+</div>
+<div class="flex items-center">
+<div class="w-20 text-gray-600 before:content-['*'] before:text-red-500 before:mr-1">入口路径</div>
+<input class="app-input flex-1" type="text" value="/sys-hub/publish"/>
+</div>
+<div class="flex items-center">
+<div class="w-20 text-gray-600 before:content-['*'] before:text-red-500 before:mr-1">父级分组</div>
+<select class="app-select flex-1"><option>系统运营中枢</option></select>
+</div>
+<div class="flex items-start">
+<div class="w-20 text-gray-600 pt-1 before:content-['*'] before:text-red-500 before:mr-1">可见角色</div>
+<div class="flex-1 min-h-[60px] p-1 border border-gray-300 rounded flex flex-wrap gap-1">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs bg-gray-100 text-gray-600 border border-gray-200">系统管理员<svg class="w-3 h-3 ml-1 cursor-pointer" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></span>
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs bg-gray-100 text-gray-600 border border-gray-200">平台运维<svg class="w-3 h-3 ml-1 cursor-pointer" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></span>
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs bg-gray-100 text-gray-600 border border-gray-200">流程管理员<svg class="w-3 h-3 ml-1 cursor-pointer" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></span>
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs bg-gray-100 text-gray-600 border border-gray-200">审计员<svg class="w-3 h-3 ml-1 cursor-pointer" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></span>
+</div>
+</div>
+<div class="flex items-center">
+<div class="w-20 text-gray-600 before:content-['*'] before:text-red-500 before:mr-1">按钮权限点</div>
+<select class="app-select flex-1"><option>发布</option></select>
+</div>
+<div class="flex items-center">
+<div class="w-20 text-gray-600 before:content-['*'] before:text-red-500 before:mr-1">发布策略</div>
+<select class="app-select flex-1"><option>发布前需校验并预览影响范围</option></select>
+</div>
+<div class="flex items-center">
+<div class="w-20 text-gray-600 before:content-['*'] before:text-red-500 before:mr-1">预览角色</div>
+<div class="flex-1 p-1 border border-gray-300 rounded flex flex-wrap gap-1">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs bg-gray-100 text-gray-600 border border-gray-200">系统管理员<svg class="w-3 h-3 ml-1 cursor-pointer" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></span>
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs bg-gray-100 text-gray-600 border border-gray-200">流程管理员<svg class="w-3 h-3 ml-1 cursor-pointer" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></span>
+</div>
+</div>
+<div class="flex items-center">
+<div class="w-20 text-gray-600 before:content-['*'] before:text-red-500 before:mr-1">风险控制</div>
+<select class="app-select flex-1"><option>高风险 (敏感操作)</option></select>
+</div>
+<div class="flex items-center">
+<div class="w-20 text-gray-600">是否启用</div>
+<div class="w-10 h-5 bg-blue-500 rounded-full relative cursor-pointer shadow-inner">
+<div class="absolute right-1 top-0.5 w-4 h-4 bg-white rounded-full shadow"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="p-3 border-t border-[var(--border-color)] flex space-x-2 shrink-0 bg-gray-50 justify-between">
+<button class="app-btn app-btn-primary w-24">保存权限点</button>
+<div class="flex space-x-2">
+<button class="app-btn app-btn-default">角色菜单预览</button>
+<button class="app-btn app-btn-default">查看审计</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Review Panel -->
+<div class="bg-white rounded shadow-sm border border-[var(--border-color)] shrink-0 h-[180px] flex flex-col" data-purpose="bottom-review-panel">
+<div class="p-3 border-b border-[var(--border-color)] font-medium text-[14px]">授权预览与发布校验</div>
+<div class="flex-1 flex p-4 space-x-4 overflow-hidden">
+<!-- Overview Card -->
+<div class="w-[200px] bg-gray-50 rounded p-3 border border-gray-100 flex flex-col justify-center shrink-0">
+<div class="font-medium mb-2">影响范围概览</div>
+<div class="space-y-1.5 text-gray-600">
+<div class="flex"><span class="w-16">变更类型：</span><span>按钮权限</span></div>
+<div class="flex"><span class="w-16">当前状态：</span><span class="text-orange-500 font-medium">待复核</span></div>
+<div class="flex"><span class="w-16">涉及角色：</span><span>4 个</span></div>
+<div class="flex"><span class="w-16">影响菜单：</span><span>1 个</span></div>
+<div class="flex items-center"><span class="w-16">预计影响用户：</span><span>26 人</span><svg class="w-3 h-3 ml-1 text-gray-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></div>
+</div>
+</div>
+<!-- Role Cards -->
+<div class="flex space-x-3 overflow-x-auto shrink-0 pb-1">
+<div class="w-[180px] bg-white rounded border border-blue-100 p-3 flex flex-col relative shadow-sm">
+<div class="flex items-center font-medium text-blue-600 mb-2">
+<svg class="w-4 h-4 mr-1" fill="currentColor" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" fill-rule="evenodd"></path></svg>系统管理员
+              </div>
+<div class="space-y-1 text-gray-600 flex-1">
+<div class="flex justify-between"><span>当前权限：</span><span class="status-badge status-success bg-green-50 text-green-600 border-green-200">可见</span></div>
+<div class="flex justify-between"><span>菜单可见性：</span><span>完全可见</span></div>
+<div class="flex justify-between"><span>按钮权限：</span><span>可操作</span></div>
+<div class="flex justify-between"><span>影响用户数：</span><span>8 人</span></div>
+</div>
+<div class="mt-2 text-right"><a class="text-blue-500 hover:text-blue-600 flex items-center justify-end" href="#">查看预览详情 <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M14 5l7 7m0 0l-7 7m7-7H3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></a></div>
+</div>
+<div class="w-[180px] bg-white rounded border border-gray-200 p-3 flex flex-col relative shadow-sm">
+<div class="flex items-center font-medium text-blue-600 mb-2">
+<svg class="w-4 h-4 mr-1" fill="currentColor" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" fill-rule="evenodd"></path></svg>平台运维
+              </div>
+<div class="space-y-1 text-gray-600 flex-1">
+<div class="flex justify-between"><span>当前权限：</span><span class="text-orange-500 border border-orange-200 px-1 rounded bg-orange-50">部分可见</span></div>
+<div class="flex justify-between"><span>菜单可见性：</span><span>完全可见</span></div>
+<div class="flex justify-between"><span>按钮权限：</span><span class="text-orange-500 border border-orange-200 px-1 rounded bg-orange-50">需复核</span></div>
+<div class="flex justify-between"><span>影响用户数：</span><span>12 人</span></div>
+</div>
+<div class="mt-2 text-right"><a class="text-blue-500 hover:text-blue-600 flex items-center justify-end" href="#">查看预览详情 <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M14 5l7 7m0 0l-7 7m7-7H3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></a></div>
+</div>
+<div class="w-[180px] bg-white rounded border border-gray-200 p-3 flex flex-col relative shadow-sm">
+<div class="flex items-center font-medium text-blue-600 mb-2">
+<svg class="w-4 h-4 mr-1" fill="currentColor" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" fill-rule="evenodd"></path></svg>流程管理员
+              </div>
+<div class="space-y-1 text-gray-600 flex-1">
+<div class="flex justify-between"><span>当前权限：</span><span class="text-orange-500 border border-orange-200 px-1 rounded bg-orange-50">需复核</span></div>
+<div class="flex justify-between"><span>菜单可见性：</span><span>完全可见</span></div>
+<div class="flex justify-between"><span>按钮权限：</span><span class="text-orange-500 border border-orange-200 px-1 rounded bg-orange-50">需复核</span></div>
+<div class="flex justify-between"><span>影响用户数：</span><span>6 人</span></div>
+</div>
+<div class="mt-2 text-right"><a class="text-blue-500 hover:text-blue-600 flex items-center justify-end" href="#">查看预览详情 <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M14 5l7 7m0 0l-7 7m7-7H3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></a></div>
+</div>
+</div>
+<!-- Divider -->
+<div class="w-px bg-gray-200 mx-2 shrink-0"></div>
+<!-- Checklist -->
+<div class="flex-1 flex justify-between pr-4">
+<div class="flex flex-col justify-center">
+<div class="font-medium mb-2">发布校验清单</div>
+<div class="space-y-1.5">
+<div class="flex items-center w-48 justify-between"><div class="flex items-center"><svg class="w-3.5 h-3.5 text-green-500 mr-2 bg-green-100 rounded-full" fill="currentColor" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" fill-rule="evenodd"></path></svg>权限编码完整</div><span class="text-green-600">通过</span></div>
+<div class="flex items-center w-48 justify-between"><div class="flex items-center"><svg class="w-3.5 h-3.5 text-green-500 mr-2 bg-green-100 rounded-full" fill="currentColor" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" fill-rule="evenodd"></path></svg>角色已绑定</div><span class="text-green-600">通过</span></div>
+<div class="flex items-center w-48 justify-between"><div class="flex items-center"><svg class="w-3.5 h-3.5 text-red-500 mr-2 bg-red-100 rounded-full" fill="currentColor" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" fill-rule="evenodd"></path></svg>敏感按钮复核</div><span class="text-orange-500">需处理</span></div>
+<div class="flex items-center w-48 justify-between"><div class="flex items-center"><svg class="w-3.5 h-3.5 text-green-500 mr-2 bg-green-100 rounded-full" fill="currentColor" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" fill-rule="evenodd"></path></svg>审计已开启</div><span class="text-green-600">通过</span></div>
+<div class="flex items-center w-48 justify-between"><div class="flex items-center"><svg class="w-3.5 h-3.5 text-green-500 mr-2 bg-green-100 rounded-full" fill="currentColor" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" fill-rule="evenodd"></path></svg>API权限已绑定</div><span class="text-green-600">通过</span></div>
+</div>
+</div>
+<!-- Notice Card -->
+<div class="w-[220px] bg-orange-50 border border-orange-200 rounded p-3 flex flex-col justify-between shrink-0">
+<div>
+<div class="flex items-center font-medium text-orange-600 mb-1">
+<svg class="w-4 h-4 mr-1" fill="currentColor" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" fill-rule="evenodd"></path></svg> 注意事项
+                </div>
+<div class="text-gray-600 text-xs leading-relaxed">
+                  后台入口发布前需保留影响范围快照，以便审计与回溯。
+                </div>
+</div>
+<button class="w-full mt-2 app-btn bg-white border border-orange-300 text-orange-500 hover:bg-orange-100">生成影响范围快照</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- END: MainContent -->
+</div>
+</body></html>

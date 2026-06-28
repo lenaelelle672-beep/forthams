@@ -8,7 +8,7 @@ const authUser = {
 };
 
 const coreRoutes = [
-  { path: '/', heading: /仪表板与数据分析|仪表板/, landmark: '总资产数' },
+  { path: '/', heading: /运营首页/, landmark: '固定资产平台' },
   { path: '/assets', heading: /资产台账/, landmark: '笔记本电脑' },
   { path: '/equipment', heading: '重要设备管理', landmark: '总设备数' },
   { path: '/depreciation', heading: '折旧管理', landmark: '本月折旧总额' },
@@ -19,7 +19,7 @@ const coreRoutes = [
   { path: '/workflows', heading: /业务流程管理|业务流程列表/, landmark: '资产转移流程' },
   { path: '/analytics', heading: '数据分析', landmark: '资产价值趋势' },
   { path: '/audit', heading: '审计日志', landmark: '总操作数' },
-  { path: '/settings', heading: '系统设置', landmark: '系统参数' },
+  { path: '/settings', heading: '后台设置 OS', landmark: '系统参数' },
 ];
 
 test.describe('核心受保护路由 smoke', () => {

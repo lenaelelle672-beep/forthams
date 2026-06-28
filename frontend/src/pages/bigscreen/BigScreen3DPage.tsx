@@ -23,6 +23,12 @@ const BigScreen3DCanvas = lazy(() => import('./BigScreen3DCanvas'));
 
 type Stats = typeof emptyStats;
 type StyleVars = CSSProperties & Record<`--${string}`, string | number>;
+type WebglState = {
+  status: 'checking' | 'supported' | 'unsupported';
+  reason: string;
+};
+
+const WEBGL_UNSUPPORTED_REASON = '当前环境无法创建 WebGL 渲染上下文，已阻止 3D 资源加载。';
 
 function normalizeStats(input: Partial<Stats> | null | undefined): Stats {
   const raw = (input ?? {}) as Partial<Stats>;
@@ -604,9 +610,9 @@ export default function BigScreen3DPage() {
   const [selectedCity, setSelectedCity] = useState<string | null>(null);
   const [mapReady, setMapReady] = useState(false);
   const [time, setTime] = useState(new Date());
-  const [webglState, setWebglState] = useState<{ supported: boolean; reason: string }>({
-    supported: true,
-    reason: 'WebGL 渲染初始化失败，已使用可访问降级视图。',
+  const [webglState, setWebglState] = useState<WebglState>({
+    status: 'checking',
+    reason: '正在检测 WebGL 渲染能力，请稍候。',
   });
 
   const { data: apiStats } = useQuery<Stats>({
@@ -630,6 +636,12 @@ export default function BigScreen3DPage() {
     return () => window.clearInterval(timer);
   }, []);
 
+  useEffect(() => {
+    setWebglState(canCreateWebGLContext()
+      ? { status: 'supported', reason: '' }
+      : { status: 'unsupported', reason: WEBGL_UNSUPPORTED_REASON });
+  }, []);
+
   const stats = normalizeStats(apiStats);
   const cityMetrics = useMemo(() => buildCityMetrics(stats), [stats]);
   const selectedMetric = cityMetrics.find((item) => item.name === selectedCity) ?? cityMetrics.find((item) => item.name.includes('成都')) ?? cityMetrics[0];
@@ -641,19 +653,19 @@ export default function BigScreen3DPage() {
     <div className="ams3d-page">
       <style>{CSS}</style>
       <div className="ams3d-map-layer">
-        {webglState.supported ? (
-          <WebGLBoundary onError={(message) => setWebglState({ supported: false, reason: message })}>
+        {webglState.status === 'supported' ? (
+          <WebGLBoundary onError={(message) => setWebglState({ status: 'unsupported', reason: message || WEBGL_UNSUPPORTED_REASON })}>
             <Suspense fallback={<WebGLFallback reason="3D 地图资源加载中，请稍候。" />}>
               <BigScreen3DCanvas
                 selectedCity={selectedCity}
                 onSelectCity={setSelectedCity}
                 onIntroComplete={() => setMapReady(true)}
-                onError={(message) => setWebglState({ supported: false, reason: message || 'WebGL 渲染初始化失败' })}
+                onError={(message) => setWebglState({ status: 'unsupported', reason: message || 'WebGL 渲染初始化失败' })}
               />
             </Suspense>
           </WebGLBoundary>
         ) : (
-          <WebGLFallback reason={webglState.reason} />
+          <WebGLFallback reason={webglState.reason || WEBGL_UNSUPPORTED_REASON} />
         )}
       </div>
 
