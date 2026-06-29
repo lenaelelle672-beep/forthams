@@ -7,7 +7,7 @@ const authUser = {
   roles: ['SUPER_ADMIN', 'ADMIN'],
 };
 
-const coreRoutes = [
+const coreRoutes: Array<{ path: string; heading: string | RegExp; landmark: string; futureSystemFrame?: boolean }> = [
   { path: '/', heading: /运营首页/, landmark: '固定资产平台' },
   { path: '/assets', heading: /资产台账/, landmark: '笔记本电脑' },
   { path: '/equipment', heading: '重要设备管理', landmark: '总设备数' },
@@ -19,7 +19,7 @@ const coreRoutes = [
   { path: '/workflows', heading: /业务流程管理|业务流程列表/, landmark: '资产转移流程' },
   { path: '/analytics', heading: '数据分析', landmark: '资产价值趋势' },
   { path: '/audit', heading: '审计日志', landmark: '总操作数' },
-  { path: '/settings', heading: '后台设置 OS', landmark: '系统参数' },
+  { path: '/settings', heading: /基础参数配置|后台设置 OS/, landmark: '系统参数', futureSystemFrame: true },
 ];
 
 test.describe('核心受保护路由 smoke', () => {
@@ -36,8 +36,15 @@ test.describe('核心受保护路由 smoke', () => {
       await page.waitForLoadState('networkidle');
 
       await expect(page.locator('body')).not.toContainText('页面加载失败');
-      await expect(page.getByRole('heading', { name: route.heading }).first()).toBeVisible({ timeout: 10_000 });
-      await expect(page.getByText(route.landmark).first()).toBeVisible({ timeout: 10_000 });
+      if (route.futureSystemFrame) {
+        await expect(page).toHaveURL(/\/fixed-assets\/workbench\?menu=system-base-params$/);
+        const frame = page.frameLocator('.workspace-system-html-frame-canvas iframe');
+        await expect(frame.getByRole('heading', { name: route.heading }).first()).toBeVisible({ timeout: 10_000 });
+        await expect(frame.getByText(route.landmark).first()).toBeVisible({ timeout: 10_000 });
+      } else {
+        await expect(page.getByRole('heading', { name: route.heading }).first()).toBeVisible({ timeout: 10_000 });
+        await expect(page.getByText(route.landmark).first()).toBeVisible({ timeout: 10_000 });
+      }
       expect(errors).toEqual([]);
     });
   }

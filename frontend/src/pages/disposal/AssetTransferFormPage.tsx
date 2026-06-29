@@ -277,7 +277,7 @@ export default function AssetTransferFormPage() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['transfers'] });
       qc.invalidateQueries({ queryKey: ['disposals'] });
-      toast.success('调拨申请提交成功');
+      toast.success('资产转移申请提交成功');
       navigate('/disposals');
     },
     onError: (error: unknown) => {
@@ -312,11 +312,11 @@ export default function AssetTransferFormPage() {
   return (
     <div className="p-4 sm:p-6 pb-28 space-y-6">
       <PageHeader
-        title="资产调拨申请"
-        subtitle="发起部门或位置之间的正式资产调拨申请。"
+        title="资产转移申请"
+        subtitle="发起部门或位置之间的正式资产转移申请。"
         breadcrumbs={[
           { label: '资产管理', href: '/assets' },
-          { label: '调拨申请', href: '/disposals' },
+          { label: '资产转移申请', href: '/disposals' },
           { label: '新建' },
         ]}
         actions={
@@ -577,7 +577,8 @@ export default function AssetTransferFormPage() {
                   workflowCanStart
                     ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
                     : 'border-amber-200 bg-amber-50 text-amber-800'
-                }`}>
+                }`}
+                data-testid="asset-transfer-workflow-status">
                   <div className="flex items-center justify-between gap-3 flex-wrap">
                     <span className="font-semibold">资产转移流程</span>
                     <span className="font-mono text-xs">
@@ -629,6 +630,7 @@ export default function AssetTransferFormPage() {
 
             <div
               aria-label="处理人预览面板"
+              data-testid="asset-transfer-assignee-preview"
               className="rounded-lg border border-[#e5e7eb] bg-[#f8fafc] p-4 space-y-3"
             >
               <div className="flex items-center justify-between gap-3 flex-wrap">
@@ -713,7 +715,10 @@ export default function AssetTransferFormPage() {
       </form>
 
       {/* ── Sticky Footer: Submit Area ─────────────────────────────── */}
-      <footer className="fixed bottom-0 left-0 right-0 bg-white border-t border-[#e5e7eb] z-50 shadow-[0_-4px_20px_-5px_rgba(0,0,0,0.05)]">
+      <footer
+        data-testid="asset-transfer-action-area"
+        className="fixed bottom-0 left-0 right-0 bg-white border-t border-[#e5e7eb] z-50 shadow-[0_-4px_20px_-5px_rgba(0,0,0,0.05)]"
+      >
         <div className="flex items-center justify-between px-4 sm:px-10 h-20 gap-4">
           {/* Draft info */}
           <div className="flex items-center gap-2 text-xs sm:text-sm text-[#94a3b8] shrink-0">
@@ -737,6 +742,7 @@ export default function AssetTransferFormPage() {
               保存草稿
             </Button>
             <Button
+              data-testid="asset-transfer-submit-compact"
               type="button"
               size="sm"
               disabled={submitBlocked}
@@ -747,6 +753,7 @@ export default function AssetTransferFormPage() {
               提交
             </Button>
             <Button
+              data-testid="asset-transfer-submit"
               type="button"
               disabled={submitBlocked}
               loading={isSubmitting || mutation.isPending}

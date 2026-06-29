@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+
+<html class="light" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>UNIVIEW | 系统设置中心</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;family=JetBrains+Mono:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "status-cyan": "#00A8D8",
+                      "primary-fixed": "#d9e2ff",
+                      "surface-container": "#ebeef2",
+                      "secondary-fixed-dim": "#b6c7e8",
+                      "secondary-fixed": "#d5e3ff",
+                      "on-primary-fixed": "#001945",
+                      "tertiary-container": "#c75000",
+                      "tertiary": "#9f3e00",
+                      "outline": "#727786",
+                      "on-secondary-fixed-variant": "#374762",
+                      "on-error-container": "#93000a",
+                      "inverse-on-surface": "#eef1f5",
+                      "surface-container-highest": "#e0e3e7",
+                      "primary-fixed-dim": "#b0c6ff",
+                      "background": "#f7fafe",
+                      "status-green": "#16A34A",
+                      "secondary": "#4e5f7b",
+                      "status-purple": "#7C3AED",
+                      "surface-bright": "#f7fafe",
+                      "on-primary-container": "#fffdff",
+                      "primary-container": "#1d6ef2",
+                      "surface-container-low": "#f1f4f8",
+                      "error": "#ba1a1a",
+                      "inverse-primary": "#b0c6ff",
+                      "border-subtle": "#D7E2F0",
+                      "on-tertiary-fixed": "#351000",
+                      "on-primary-fixed-variant": "#00419c",
+                      "on-secondary": "#ffffff",
+                      "on-error": "#ffffff",
+                      "surface-container-lowest": "#ffffff",
+                      "surface": "#f7fafe",
+                      "surface-variant": "#e0e3e7",
+                      "text-secondary": "#64748B",
+                      "outline-variant": "#c2c6d7",
+                      "on-secondary-fixed": "#091c35",
+                      "surface-tint": "#0057cc",
+                      "surface-container-high": "#e5e8ec",
+                      "error-container": "#ffdad6",
+                      "surface-dim": "#d7dade",
+                      "status-red": "#DC2626",
+                      "on-secondary-container": "#51617e",
+                      "secondary-container": "#ccddff",
+                      "inverse-surface": "#2d3134",
+                      "on-tertiary": "#ffffff",
+                      "on-surface": "#181c1f",
+                      "on-primary": "#ffffff",
+                      "status-amber": "#F59E0B",
+                      "primary": "#0056c9",
+                      "tertiary-fixed": "#ffdbcc",
+                      "on-tertiary-container": "#fffdff",
+                      "on-tertiary-fixed-variant": "#7b2f00",
+                      "tertiary-fixed-dim": "#ffb695",
+                      "on-background": "#181c1f",
+                      "text-primary": "#0F172A",
+                      "on-surface-variant": "#424654"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "topbar-height": "48px",
+                      "sidebar-width": "196px",
+                      "grid-gutter": "12px",
+                      "inspector-width": "320px",
+                      "container-gap": "20px",
+                      "card-padding": "16px"
+              },
+              "fontFamily": {
+                      "body-sm": [
+                              "Inter"
+                      ],
+                      "code-meta": [
+                              "JetBrains Mono"
+                      ],
+                      "section-header": [
+                              "Inter"
+                      ],
+                      "page-title": [
+                              "Inter"
+                      ],
+                      "status-label": [
+                              "Inter"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "body-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "18px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "code-meta": [
+                              "11px",
+                              {
+                                      "lineHeight": "16px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "section-header": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "page-title": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "status-label": [
+                              "11px",
+                              {
+                                      "lineHeight": "16px",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-md": [
+                              "13px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "500"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+</head>
+<body class="bg-background text-on-surface font-body-sm antialiased h-screen overflow-hidden flex flex-col">
+<!-- Top Navigation -->
+<header class="fixed top-0 w-full h-[56px] bg-[#051424] border-b border-[#1D6EF2] z-50 flex items-center justify-between px-6 shrink-0">
+<div class="flex items-center gap-8">
+<h1 class="font-page-title text-page-title text-white tracking-tight">UNIVIEW | 系统设置中心</h1>
+<nav class="hidden md:flex items-center gap-6 h-full">
+<a class="h-[56px] flex items-center text-primary-fixed-dim font-bold border-b-2 border-primary-fixed-dim px-2" href="#">流程平台</a><a class="h-[56px] flex items-center text-secondary-fixed-dim hover:text-white transition-colors px-2" href="#">组织权限</a>
+<a class="h-[56px] flex items-center text-secondary-fixed-dim hover:text-white transition-colors px-2" href="#">基础资料</a>
+<a class="h-[56px] flex items-center text-secondary-fixed-dim hover:text-white transition-colors px-2" href="#">集成配置</a>
+<a class="h-[56px] flex items-center text-secondary-fixed-dim hover:text-white transition-colors px-2" href="#">消息与通知</a>
+<a class="h-[56px] flex items-center text-secondary-fixed-dim hover:text-white transition-colors px-2" href="#">系统参数</a>
+</nav>
+</div>
+<div class="flex items-center gap-4 text-secondary-fixed-dim font-body-sm text-body-sm">
+
+<button class="hover:text-white flex items-center gap-1 transition-colors"><span class="material-symbols-outlined text-[18px]">keyboard_return</span> 返回业务工作台</button>
+<div class="flex items-center gap-2 pl-4 border-l border-on-secondary-fixed-variant">
+<div class="w-6 h-6 rounded-full bg-surface-tint text-white flex items-center justify-center font-bold text-[10px]">A</div>
+<span class="text-white">运营管理员</span>
+</div>
+</div>
+</header>
+<div class="flex flex-1 pt-[56px] h-full overflow-hidden">
+<!-- Side Navigation -->
+<aside class="w-[240px] bg-surface-container-lowest border-r border-border-subtle shrink-0 h-full overflow-y-auto flex flex-col">
+<nav class="flex-1 py-4 flex flex-col gap-1 px-3">
+<a class="flex items-center gap-3 px-3 py-2 rounded-DEFAULT text-text-secondary hover:bg-surface-container-low transition-all" href="#">
+<span class="material-symbols-outlined text-[20px]">dashboard</span>
+<span class="font-body-md text-body-md">导航控制台</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-DEFAULT bg-primary/10 text-primary font-bold border-l-2 border-primary" href="#">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">settings</span>
+<span class="font-body-md text-body-md">设置中心</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-DEFAULT text-text-secondary hover:bg-surface-container-low transition-all" href="#">
+<span class="material-symbols-outlined text-[20px]">monitor_heart</span>
+<span class="font-body-md text-body-md">运行监测</span>
+</a>
+<div class="my-2 border-t border-border-subtle mx-3"></div>
+<a class="flex items-center gap-3 px-3 py-2 rounded-DEFAULT text-text-secondary hover:bg-surface-container-low transition-all" href="#">
+<span class="material-symbols-outlined text-[20px]">account_tree</span>
+<span class="font-body-md text-body-md">流程设计器</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-DEFAULT text-text-secondary hover:bg-surface-container-low transition-all" href="#">
+<span class="material-symbols-outlined text-[20px]">dynamic_form</span>
+<span class="font-body-md text-body-md">表单配置</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-DEFAULT text-text-secondary hover:bg-surface-container-low transition-all" href="#">
+<span class="material-symbols-outlined text-[20px]">dataset</span>
+<span class="font-body-md text-body-md">表单存储</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-DEFAULT text-text-secondary hover:bg-surface-container-low transition-all" href="#">
+<span class="material-symbols-outlined text-[20px]">rule</span>
+<span class="font-body-md text-body-md">审批规则</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-DEFAULT text-text-secondary hover:bg-surface-container-low transition-all" href="#">
+<span class="material-symbols-outlined text-[20px]">list_alt</span>
+<span class="font-body-md text-body-md">待办字段配置</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-DEFAULT text-text-secondary hover:bg-surface-container-low transition-all" href="#">
+<span class="material-symbols-outlined text-[20px]">timer</span>
+<span class="font-body-md text-body-md">SLA 配置</span>
+</a>
+</nav>
+</aside>
+<!-- Main Workspace -->
+<main class="flex-1 bg-surface flex flex-col h-full overflow-hidden relative">
+<div class="px-8 py-6 border-b border-border-subtle bg-surface-container-lowest shrink-0 flex items-center justify-between">
+<div>
+<h2 class="font-page-title text-page-title text-text-primary">设置中心</h2>
+<p class="font-body-sm text-body-sm text-text-secondary mt-1">全局流程引擎参数与规则配置</p>
+</div>
+<div class="flex items-center gap-3">
+<button class="px-4 py-2 bg-surface-container-lowest border border-border-subtle rounded-DEFAULT font-body-md text-body-md text-text-primary hover:bg-surface-container-low transition-colors">恢复默认</button>
+<button class="px-4 py-2 bg-primary-container text-on-primary rounded-DEFAULT font-body-md text-body-md hover:bg-surface-tint transition-colors shadow-sm">保存配置</button>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto p-8">
+<div class="max-w-5xl mx-auto flex gap-8">
+<!-- Configuration Form -->
+<div class="flex-1 flex flex-col gap-6">
+<!-- Section 1 -->
+<div class="bg-surface-container-lowest border border-border-subtle rounded-lg p-6 shadow-sm">
+<h3 class="font-section-header text-section-header text-text-primary mb-6 pb-2 border-b border-border-subtle flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[20px]">settings_suggest</span>
+                                基础运行参数
+                            </h3>
+<div class="grid grid-cols-2 gap-x-8 gap-y-6">
+<div class="flex flex-col gap-2">
+<label class="font-body-md text-body-md text-text-primary font-bold">默认审批时效 (SLA)</label>
+<div class="flex items-center gap-2">
+<input class="w-24 px-3 py-2 border border-border-subtle rounded-DEFAULT font-code-meta text-code-meta focus:border-primary focus:ring-1 focus:ring-primary outline-none" type="number" value="24"/>
+<span class="text-text-secondary font-body-sm">小时</span>
+</div>
+</div>
+<div class="flex flex-col gap-2">
+<label class="font-body-md text-body-md text-text-primary font-bold">加签/转办权限默认状态</label>
+<select class="w-full px-3 py-2 border border-border-subtle rounded-DEFAULT font-body-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none bg-surface-container-lowest">
+<option>开启 (允许所有人)</option>
+<option selected="">限制 (仅限同级及以上)</option>
+<option>关闭</option>
+</select>
+</div>
+<div class="col-span-2 flex items-center justify-between py-3 border-t border-border-subtle border-dashed mt-2">
+<div>
+<p class="font-body-md text-body-md text-text-primary font-bold">启用流程仿真模式</p>
+<p class="font-body-sm text-body-sm text-text-secondary mt-1">允许在生产环境进行不产生实际数据的流程测试</p>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox" value=""/>
+<div class="w-11 h-6 bg-surface-container-high peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-container"></div>
+</label>
+</div>
+</div>
+</div>
+<!-- Section 2 -->
+<div class="bg-surface-container-lowest border border-border-subtle rounded-lg p-6 shadow-sm">
+<h3 class="font-section-header text-section-header text-text-primary mb-6 pb-2 border-b border-border-subtle flex items-center gap-2">
+<span class="material-symbols-outlined text-status-cyan text-[20px]">api</span>
+                                外部集成配置
+                            </h3>
+<div class="flex flex-col gap-5">
+<div class="flex items-center justify-between bg-surface p-4 rounded-DEFAULT border border-border-subtle">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-DEFAULT bg-status-cyan/10 flex items-center justify-center text-status-cyan">
+<span class="material-symbols-outlined">message</span>
+</div>
+<div>
+<p class="font-body-md text-body-md text-text-primary font-bold">企业微信消息推送</p>
+<p class="font-code-meta text-code-meta text-text-secondary mt-1">Webhook: https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=***</p>
+</div>
+</div>
+<button class="px-3 py-1.5 text-primary border border-primary/30 rounded-DEFAULT font-body-sm hover:bg-primary/5 transition-colors">配置</button>
+</div>
+<div class="flex items-center justify-between bg-surface p-4 rounded-DEFAULT border border-border-subtle">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-DEFAULT bg-status-purple/10 flex items-center justify-center text-status-purple">
+<span class="material-symbols-outlined">database</span>
+</div>
+<div>
+<p class="font-body-md text-body-md text-text-primary font-bold">主数据同步接口 (ERP)</p>
+<p class="font-code-meta text-code-meta text-text-secondary mt-1">Status: <span class="text-status-green">● Connected</span> (Last sync: 2 mins ago)</p>
+</div>
+</div>
+<button class="px-3 py-1.5 text-primary border border-primary/30 rounded-DEFAULT font-body-sm hover:bg-primary/5 transition-colors">配置</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Side Panel: Activity Log -->
+<div class="w-[320px] shrink-0">
+<div class="bg-surface-container-lowest border border-border-subtle rounded-lg shadow-sm h-[500px] flex flex-col">
+<div class="p-4 border-b border-border-subtle bg-surface-container-low/50 rounded-t-lg">
+<h3 class="font-section-header text-section-header text-text-primary flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">history</span>
+                                    最近变更记录
+                                </h3>
+</div>
+<div class="flex-1 overflow-y-auto p-4 flex flex-col gap-4 relative">
+<div class="absolute left-[27px] top-4 bottom-4 w-px bg-border-subtle"></div>
+<!-- Log Item -->
+<div class="flex gap-4 relative z-10">
+<div class="w-[10px] h-[10px] rounded-full bg-status-green border-2 border-white mt-1.5 shadow-sm"></div>
+<div>
+<p class="font-body-sm text-body-sm text-text-primary font-bold">修改默认审批时效</p>
+<p class="font-body-sm text-body-sm text-text-secondary mt-0.5">将 "48小时" 更改为 "24小时"</p>
+<p class="font-code-meta text-code-meta text-outline mt-1">Admin • 10分钟前</p>
+</div>
+</div>
+<!-- Log Item -->
+<div class="flex gap-4 relative z-10">
+<div class="w-[10px] h-[10px] rounded-full bg-surface-dim border-2 border-white mt-1.5 shadow-sm"></div>
+<div>
+<p class="font-body-sm text-body-sm text-text-primary font-bold">停用企业微信节点推送</p>
+<p class="font-body-sm text-body-sm text-text-secondary mt-0.5">系统参数 &gt; 消息配置</p>
+<p class="font-code-meta text-code-meta text-outline mt-1">System • 2小时前</p>
+</div>
+</div>
+<!-- Log Item -->
+<div class="flex gap-4 relative z-10">
+<div class="w-[10px] h-[10px] rounded-full bg-surface-dim border-2 border-white mt-1.5 shadow-sm"></div>
+<div>
+<p class="font-body-sm text-body-sm text-text-primary font-bold">ERP主数据连接测试</p>
+<p class="font-body-sm text-body-sm text-status-green mt-0.5">测试通过 (Ping: 12ms)</p>
+<p class="font-code-meta text-code-meta text-outline mt-1">Admin • 昨天 14:30</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

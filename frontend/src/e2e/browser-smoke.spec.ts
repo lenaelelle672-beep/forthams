@@ -16,7 +16,7 @@ const protectedPages = [
   { path: '/approval', heading: '审批流程管理' },
   { path: '/workflows', heading: '业务流程列表' },
   { path: '/analytics', heading: '数据统计分析' },
-  { path: '/settings', heading: '系统设置' },
+  { path: '/settings', heading: /后台设置 OS|系统设置/ },
   { path: '/workflow-designer', heading: '审批流程可视化设计器' },
 ];
 

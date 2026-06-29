@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Future Settings OS · 全量页面导航中心</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                "primary-container": "#1d6ef2",
+                "inverse-surface": "#2d3134",
+                "on-tertiary": "#ffffff",
+                "surface-bright": "#f7fafe",
+                "on-tertiary-fixed-variant": "#7b2f00",
+                "surface-container": "#ebeef2",
+                "primary-fixed-dim": "#b0c6ff",
+                "on-background": "#181c1f",
+                "surface-tint": "#0057cc",
+                "error-container": "#ffdad6",
+                "status-red": "#DC2626",
+                "tertiary-fixed": "#ffdbcc",
+                "surface": "#f7fafe",
+                "error": "#ba1a1a",
+                "on-primary-container": "#fffdff",
+                "text-primary": "#0F172A",
+                "tertiary-container": "#c75000",
+                "surface-container-lowest": "#ffffff",
+                "tertiary-fixed-dim": "#ffb695",
+                "tertiary": "#9f3e00",
+                "on-error": "#ffffff",
+                "surface-variant": "#e0e3e7",
+                "on-surface": "#181c1f",
+                "on-secondary-container": "#51617e",
+                "on-error-container": "#93000a",
+                "primary": "#0056c9",
+                "surface-container-low": "#f1f4f8",
+                "inverse-on-surface": "#eef1f5",
+                "secondary": "#4e5f7b",
+                "border-subtle": "#D7E2F0",
+                "surface-container-high": "#e5e8ec",
+                "status-green": "#16A34A",
+                "secondary-fixed": "#d5e3ff",
+                "on-secondary": "#ffffff",
+                "on-primary": "#ffffff",
+                "text-secondary": "#64748B",
+                "on-secondary-fixed-variant": "#374762",
+                "secondary-fixed-dim": "#b6c7e8",
+                "inverse-primary": "#b0c6ff",
+                "surface-container-highest": "#e0e3e7",
+                "status-amber": "#F59E0B",
+                "outline": "#727786",
+                "outline-variant": "#c2c6d7",
+                "on-surface-variant": "#424654",
+                "primary-fixed": "#d9e2ff",
+                "surface-dim": "#d7dade",
+                "on-tertiary-container": "#fffdff",
+                "on-primary-fixed-variant": "#00419c",
+                "on-primary-fixed": "#001945",
+                "secondary-container": "#ccddff",
+                "on-tertiary-fixed": "#351000",
+                "status-cyan": "#00A8D8",
+                "background": "#f7fafe",
+                "status-purple": "#7C3AED",
+                "on-secondary-fixed": "#091c35"
+            },
+            "borderRadius": {
+                "DEFAULT": "0.125rem",
+                "lg": "0.25rem",
+                "xl": "0.5rem",
+                "full": "0.75rem"
+            },
+            "spacing": {
+                "container-gap": "20px",
+                "sidebar-width": "196px",
+                "inspector-width": "320px",
+                "card-padding": "16px",
+                "topbar-height": "48px",
+                "grid-gutter": "12px"
+            },
+            "fontFamily": {
+                "sans": ["Inter", "PingFang SC", "sans-serif"],
+                "mono": ["JetBrains Mono", "monospace"]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        body {
+            background-color: #f7fafe;
+            color: #181c1f;
+            -webkit-font-smoothing: antialiased;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+            font-size: 20px;
+        }
+        .nav-card {
+            background: #ffffff;
+            border: 1px solid #D7E2F0;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        .nav-card:hover {
+            border-color: #1d6ef2;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(29, 110, 242, 0.08);
+        }
+        .nav-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 3px;
+            height: 100%;
+            background: transparent;
+            transition: background 0.2s;
+        }
+        .nav-card:hover::after {
+            background: #1d6ef2;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #D7E2F0;
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #c2c6d7;
+        }
+    </style>
+</head>
+<body class="overflow-hidden h-screen flex flex-col font-sans">
+<!-- Top Navigation Bar -->
+<header class="bg-[#051424] border-b border-white/10 flex justify-between items-center px-6 w-full h-[56px] z-50 sticky top-0 text-white"><div class="flex items-center gap-8"><div class="flex items-center gap-3"><span class="font-bold text-lg tracking-tight text-white">UNIVIEW | 系统设置中心</span><span class="text-white/40 mx-1">/</span><a class="text-sm font-medium text-white" href="#">导航中心</a></div><nav class="hidden lg:flex items-center gap-6 text-sm font-medium text-white/70"><a class="hover:text-white transition-colors" href="#">流程平台</a><a class="hover:text-white transition-colors" href="#">组织权限</a><a class="hover:text-white transition-colors" href="#">基础资料</a><a class="hover:text-white transition-colors" href="#">集成配置</a><a class="hover:text-white transition-colors" href="#">消息与通知</a><a class="hover:text-white transition-colors" href="#">系统参数</a></nav></div><div class="flex items-center gap-6"><div class="flex items-center gap-4"><button class="text-sm text-white/70 hover:text-white">← 返回业务工作台</button><div class="flex items-center gap-2 px-3 py-1 bg-white/10 rounded-full"><span class="material-symbols-outlined text-xs">person</span><span class="text-xs">运营管理员</span></div></div></div></header>
+<!-- Main Scrollable Content -->
+<main class="flex-1 overflow-y-auto p-8 custom-scrollbar bg-[#F5F8FC]">
+<div class="max-w-[1600px] mx-auto space-y-12 pb-16"><div class="mb-10"><div><nav class="flex items-center gap-2 text-xs text-text-secondary mb-2"><span>系统设置中心</span><span class="material-symbols-outlined text-[10px]">chevron_right</span><span class="text-primary">导航中心</span></nav><h1 class="text-2xl font-bold text-text-primary mb-1">全量页面导航中心</h1><p class="text-sm text-text-secondary">集中进入流程、权限、资料、集成、通知与系统参数配置。</p></div></div><div class="grid grid-cols-1 lg:grid-cols-3 gap-6"><div class="bg-white border border-border-subtle rounded-lg p-6 hover:shadow-lg transition-all group flex flex-col"><div class="flex items-start gap-4 mb-4"><img class="w-12 h-12 rounded-lg object-cover shrink-0" alt="流程平台图标" src="../assets/navigation-icons/module-flow-platform.png"/><div><h3 class="font-bold text-base text-text-primary">流程平台</h3><p class="text-xs text-text-secondary/70 mt-0.5">管理流程建模、运行监测、审批规则和待办字段配置。</p></div></div><div class="grid grid-cols-2 gap-y-3 gap-x-4 border-t border-border-subtle/50 pt-4 flex-1"><a class="flex items-center gap-2 text-sm text-text-secondary hover:text-primary transition-colors" href="#"><span class="w-1 h-1 bg-primary rounded-full"></span>导航控制台</a><a class="flex items-center gap-2 text-sm text-text-secondary hover:text-primary transition-colors" href="#"><span class="w-1 h-1 bg-primary rounded-full"></span>设置中心</a><a class="flex items-center gap-2 text-sm text-text-secondary hover:text-primary transition-colors" href="#"><span class="w-1 h-1 bg-primary rounded-full"></span>运行监测</a><a class="flex items-center gap-2 text-sm text-text-secondary hover:text-primary transition-colors" href="#"><span class="w-1 h-1 bg-primary rounded-full"></span>流程设计器</a><a class="flex items-center gap-2 text-sm text-text-secondary hover:text-primary transition-colors" href="#"><span class="w-1 h-1 bg-primary rounded-full"></span>表单配置</a><a class="flex items-center gap-2 text-sm text-text-secondary hover:text-primary transition-colors" href="#"><span class="w-1 h-1 bg-primary rounded-full"></span>表单存储</a><a class="flex items-center gap-2 text-sm text-text-secondary hover:text-primary transition-colors" href="#"><span class="w-1 h-1 bg-primary rounded-full"></span>审批规则</a><a class="flex items-center gap-2 text-sm text-text-secondary hover:text-primary transition-colors" href="#"><span class="w-1 h-1 bg-primary rounded-full"></span>待办字段配置</a><a class="flex items-center gap-2 text-sm text-text-secondary hover:text-primary transition-colors" href="#"><span class="w-1 h-1 bg-primary rounded-full"></span>SLA 配置</a></div></div><div class="bg-white border border-border-subtle rounded-lg p-6 hover:shadow-lg transition-all group flex flex-col"><div class="flex items-start gap-4 mb-4"><img class="w-12 h-12 rounded-lg object-cover shrink-0" alt="组织权限图标" src="../assets/navigation-icons/module-org-permission.png"/><div><h3 class="font-bold text-base text-text-primary">组织权限</h3><p class="text-xs text-text-secondary/70 mt-0.5">维护用户、角色、菜单、组织与数据权限边界。</p></div></div><div class="grid grid-cols-2 gap-y-3 gap-x-4 border-t border-border-subtle/50 pt-4 flex-1"><a class="flex items-center gap-2 text-sm text-text-secondary hover:text-primary transition-colors" href="#"><span class="w-1 h-1 bg-primary rounded-full"></span>用户管理</a><a class="flex items-center gap-2 text-sm text-text-secondary hover:text-primary transition-colors" href="#"><span class="w-1 h-1 bg-primary rounded-full"></span>角色权限</a><a class="flex items-center gap-2 text-sm text-text-secondary hover:text-primary transition-colors" href="#"><span class="w-1 h-1 bg-primary rounded-full"></span>菜单权限</a><a class="flex items-center gap-2 text-sm text-text-secondary hover:text-primary transition-colors" href="#"><span class="w-1 h-1 bg-primary rounded-full"></span>部门组织</a><a class="flex items-center gap-2 text-sm text-text-secondary hover:text-primary transition-colors" href="#"><span class="w-1 h-1 bg-primary rounded-full"></span>岗位管理</a><a class="flex items-center gap-2 text-sm text-text-secondary hover:text-primary transition-colors" href="#"><span class="w-1 h-1 bg-primary rounded-full"></span>数据权限</a><a class="flex items-center gap-2 text-sm text-text-secondary hover:text-primary transition-colors" href="#"><span class="w-1 h-1 bg-primary rounded-full"></span>工作交接</a><a class="flex items-center gap-2 text-sm text-text-secondary hover:text-primary transition-colors" href="#"><span class="w-1 h-1 bg-primary rounded-full"></span>租户管理</a></div></div><div class="bg-white border border-border-subtle rounded-lg p-6 hover:shadow-lg transition-all group flex flex-col"><div class="flex items-start gap-4 mb-4"><img class="w-12 h-12 rounded-lg object-cover shrink-0" alt="基础资料图标" src="../assets/navigation-icons/module-master-data.png"/><div><h3 class="font-bold text-base text-text-primary">基础资料</h3><p class="text-xs text-text-secondary/70 mt-0.5">统一资产分类、编号、位置、供应商和自定义字段。</p></div></div><div class="grid grid-cols-2 gap-y-3 gap-x-4 border-t border-border-subtle/50 pt-4 flex-1"><a class="flex items-center gap-2 text-sm text-text-secondary hover:text-primary transition-colors" href="#"><span class="w-1 h-1 bg-primary rounded-full"></span>资产分类</a><a class="flex items-center gap-2 text-sm text-text-secondary hover:text-primary transition-colors" href="#"><span class="w-1 h-1 bg-primary rounded-full"></span>编号规则</a><a class="flex items-center gap-2 text-sm text-text-secondary hover:text-primary transition-colors" href="#"><span class="w-1 h-1 bg-primary rounded-full"></span>位置管理</a><a class="flex items-center gap-2 text-sm text-text-secondary hover:text-primary transition-colors" href="#"><span class="w-1 h-1 bg-primary rounded-full"></span>供应商管理</a><a class="flex items-center gap-2 text-sm text-text-secondary hover:text-primary transition-colors" href="#"><span class="w-1 h-1 bg-primary rounded-full"></span>自定义字段</a><a class="flex items-center gap-2 text-sm text-text-secondary hover:text-primary transition-colors" href="#"><span class="w-1 h-1 bg-primary rounded-full"></span>自定义字段集</a></div></div><div class="bg-white border border-border-subtle rounded-lg p-6 hover:shadow-lg transition-all group flex flex-col"><div class="flex items-start gap-4 mb-4"><img class="w-12 h-12 rounded-lg object-cover shrink-0" alt="集成配置图标" src="../assets/navigation-icons/module-integration.png"/><div><h3 class="font-bold text-base text-text-primary">集成配置</h3><p class="text-xs text-text-secondary/70 mt-0.5">配置外部系统、接口、字段映射、同步规则和 Webhook。</p></div></div><div class="grid grid-cols-2 gap-y-3 gap-x-4 border-t border-border-subtle/50 pt-4 flex-1"><a class="flex items-center gap-2 text-sm text-text-secondary hover:text-primary transition-colors" href="#"><span class="w-1 h-1 bg-primary rounded-full"></span>外部系统配置</a><a class="flex items-center gap-2 text-sm text-text-secondary hover:text-primary transition-colors" href="#"><span class="w-1 h-1 bg-primary rounded-full"></span>接口配置</a><a class="flex items-center gap-2 text-sm text-text-secondary hover:text-primary transition-colors" href="#"><span class="w-1 h-1 bg-primary rounded-full"></span>字段映射</a><a class="flex items-center gap-2 text-sm text-text-secondary hover:text-primary transition-colors" href="#"><span class="w-1 h-1 bg-primary rounded-full"></span>同步规则</a><a class="flex items-center gap-2 text-sm text-text-secondary hover:text-primary transition-colors" href="#"><span class="w-1 h-1 bg-primary rounded-full"></span>Webhook 配置</a></div></div><div class="bg-white border border-border-subtle rounded-lg p-6 hover:shadow-lg transition-all group flex flex-col"><div class="flex items-start gap-4 mb-4"><img class="w-12 h-12 rounded-lg object-cover shrink-0" alt="消息与通知图标" src="../assets/navigation-icons/module-notification.png"/><div><h3 class="font-bold text-base text-text-primary">消息与通知</h3><p class="text-xs text-text-secondary/70 mt-0.5">管理邮件网关、模板、日志、通知渠道和偏好。</p></div></div><div class="grid grid-cols-2 gap-y-3 gap-x-4 border-t border-border-subtle/50 pt-4 flex-1"><a class="flex items-center gap-2 text-sm text-text-secondary hover:text-primary transition-colors" href="#"><span class="w-1 h-1 bg-primary rounded-full"></span>邮件网关配置</a><a class="flex items-center gap-2 text-sm text-text-secondary hover:text-primary transition-colors" href="#"><span class="w-1 h-1 bg-primary rounded-full"></span>流程邮件配置</a><a class="flex items-center gap-2 text-sm text-text-secondary hover:text-primary transition-colors" href="#"><span class="w-1 h-1 bg-primary rounded-full"></span>邮件模板</a><a class="flex items-center gap-2 text-sm text-text-secondary hover:text-primary transition-colors" href="#"><span class="w-1 h-1 bg-primary rounded-full"></span>邮件日志</a><a class="flex items-center gap-2 text-sm text-text-secondary hover:text-primary transition-colors" href="#"><span class="w-1 h-1 bg-primary rounded-full"></span>通知模板</a><a class="flex items-center gap-2 text-sm text-text-secondary hover:text-primary transition-colors" href="#"><span class="w-1 h-1 bg-primary rounded-full"></span>通知渠道</a><a class="flex items-center gap-2 text-sm text-text-secondary hover:text-primary transition-colors" href="#"><span class="w-1 h-1 bg-primary rounded-full"></span>通知偏好</a><a class="flex items-center gap-2 text-sm text-text-secondary hover:text-primary transition-colors" href="#"><span class="w-1 h-1 bg-primary rounded-full"></span>流程通知开关</a></div></div><div class="bg-white border border-border-subtle rounded-lg p-6 hover:shadow-lg transition-all group flex flex-col"><div class="flex items-start gap-4 mb-4"><img class="w-12 h-12 rounded-lg object-cover shrink-0" alt="系统参数图标" src="../assets/navigation-icons/module-system-params.png"/><div><h3 class="font-bold text-base text-text-primary">系统参数</h3><p class="text-xs text-text-secondary/70 mt-0.5">维护基础参数、安全策略、文件存储、缓存与审计工具。</p></div></div><div class="grid grid-cols-2 gap-y-3 gap-x-4 border-t border-border-subtle/50 pt-4 flex-1"><a class="flex items-center gap-2 text-sm text-text-secondary hover:text-primary transition-colors" href="#"><span class="w-1 h-1 bg-primary rounded-full"></span>基础参数</a><a class="flex items-center gap-2 text-sm text-text-secondary hover:text-primary transition-colors" href="#"><span class="w-1 h-1 bg-primary rounded-full"></span>安全策略</a><a class="flex items-center gap-2 text-sm text-text-secondary hover:text-primary transition-colors" href="#"><span class="w-1 h-1 bg-primary rounded-full"></span>文件存储配置</a><a class="flex items-center gap-2 text-sm text-text-secondary hover:text-primary transition-colors" href="#"><span class="w-1 h-1 bg-primary rounded-full"></span>导入导出配置</a><a class="flex items-center gap-2 text-sm text-text-secondary hover:text-primary transition-colors" href="#"><span class="w-1 h-1 bg-primary rounded-full"></span>缓存管理</a><a class="flex items-center gap-2 text-sm text-text-secondary hover:text-primary transition-colors" href="#"><span class="w-1 h-1 bg-primary rounded-full"></span>操作审计</a><a class="flex items-center gap-2 text-sm text-text-secondary hover:text-primary transition-colors" href="#"><span class="w-1 h-1 bg-primary rounded-full"></span>文档中心</a><a class="flex items-center gap-2 text-sm text-text-secondary hover:text-primary transition-colors" href="#"><span class="w-1 h-1 bg-primary rounded-full"></span>技术支持</a></div></div></div></div>
+</main>
+<!-- Footer Status Bar -->
+</body></html>

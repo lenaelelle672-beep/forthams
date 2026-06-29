@@ -65,15 +65,17 @@ const requiredWorkbenchMenus = [
 const hiddenFormalWorkbenchMenus = ['design', 'inspection'];
 const duplicateMenus = ['报表大屏', '平台配置', '维保计划'];
 const expectedSystemGroupCounts = {
-  流程平台: 7,
-  组织权限: 7,
+  流程平台: 9,
+  组织权限: 8,
   基础资料: 6,
   集成配置: 5,
   消息与通知: 8,
-  系统参数: 6,
+  系统参数: 8,
 };
 const expectedSystemDraftSmokeMenuIds = [
   'system-flow-definition',
+  'system-settings-command-center',
+  'system-runtime-monitor',
   'system-flow-designer',
   'system-form-config',
   'system-form-storage',
@@ -87,6 +89,7 @@ const expectedSystemDraftSmokeMenuIds = [
   'system-post-management',
   'system-data-permissions',
   'system-handover',
+  'system-tenant-management',
   'system-asset-category',
   'system-numbering-rules',
   'system-location-management',
@@ -112,6 +115,8 @@ const expectedSystemDraftSmokeMenuIds = [
   'system-import-export',
   'system-cache-management',
   'system-audit-log',
+  'system-doc-center',
+  'system-tech-support',
 ];
 
 function collectSystemMenus() {
@@ -217,11 +222,14 @@ describe('Workbench platform entry contract', () => {
     expect(workspacePage).toContain('aria-label={`${item.label}筛选栏`}');
     expect(workbenchSmoke).toContain("page.locator('header').filter({ hasText: '搜索...' })).toHaveCount(0)");
     expect(workbenchSmoke).toContain("page.locator('header [aria-label=\"搜索\"]')).toHaveCount(0)");
+    expect(workbenchSmoke).toContain("page.locator('.workspace-topbar').getByRole('textbox')).toHaveCount(0)");
+    expect(workbenchSmoke).toContain("page.locator('.workspace-topbar').getByRole('searchbox')).toHaveCount(0)");
     expect(workbenchSmoke).toContain("page.locator('.workspace-actions').getByRole('button', { name: /搜索/ })).toHaveCount(0)");
-    expect(workbenchSmoke).toContain("page.locator('.workspace-side').getByRole('textbox')).toHaveCount(0)");
-    expect(workbenchSmoke).toContain(".workspace-side [aria-label*=\"搜索\"]");
-    expect(workbenchSmoke).toContain("page.locator('.workspace-system-nav-console')).toHaveCount(0)");
-    expect(workbenchSmoke).toContain("page.getByRole('textbox', { name: '搜索节点模板', exact: true })).toHaveCount(0)");
+    expect(workbenchSmoke).toContain("page.locator('.workspace-side input')).toHaveCount(0)");
+    expect(workbenchSmoke).toContain("page.locator('.workspace-side [aria-label*=\"搜索\"]')).toHaveCount(0)");
+    expect(workbenchSmoke).toContain("page.locator('.workspace-side [placeholder*=\"搜索\"]')).toHaveCount(0)");
+    expect(workbenchSmoke).toContain("page.locator('.workspace-side').getByRole('button', { name: /搜索/ })).toHaveCount(0)");
+    expect(workbenchSmoke).toContain("page.locator('.workspace-side').getByRole('searchbox')).toHaveCount(0)");
     expect(workbenchSmoke).toContain("page.getByLabel('运营首页搜索')).toHaveCount(0)");
   });
 
@@ -229,7 +237,7 @@ describe('Workbench platform entry contract', () => {
     const systemMenus = collectSystemMenus();
     const subpageAssets = collectSystemSubpageAssets();
 
-    expect(systemMenus).toHaveLength(39);
+    expect(systemMenus).toHaveLength(44);
     expect(subpageAssets).toHaveLength(systemMenus.length);
 
     for (const [group, expectedCount] of Object.entries(expectedSystemGroupCounts)) {
@@ -252,18 +260,18 @@ describe('Workbench platform entry contract', () => {
     const navigationConsoleEntry = systemHubSubpageManifest.subpages.find((entry) => entry.id === 'system-hub-subpage-00-navigation-console-v2');
     const formalManifestEntries = systemHubSubpageManifest.subpages.filter((entry) => entry.id !== 'system-hub-subpage-00-navigation-console-v2');
 
-    expect(systemHubSubpageManifest.coverageNote).toContain('1 个导航控制台 + 39 个系统配置菜单');
-    expect(systemHubSubpageManifest.coverageNote).toContain('流程平台 7 项');
-    expect(systemHubSubpageManifest.coverageNote).toContain('组织权限 7 项');
+    expect(systemHubSubpageManifest.coverageNote).toContain('1 个导航控制台 + 44 个系统配置菜单');
+    expect(systemHubSubpageManifest.coverageNote).toContain('流程平台 9 项');
+    expect(systemHubSubpageManifest.coverageNote).toContain('组织权限 8 项');
     expect(systemHubSubpageManifest.coverageNote).toContain('基础资料 6 项');
     expect(systemHubSubpageManifest.coverageNote).toContain('集成配置 5 项');
     expect(systemHubSubpageManifest.coverageNote).toContain('消息与通知 8 项');
-    expect(systemHubSubpageManifest.coverageNote).toContain('系统参数 6 项');
+    expect(systemHubSubpageManifest.coverageNote).toContain('系统参数 8 项');
     expect(systemHubSubpageManifest.coverageNote).toContain('页内搜索/筛选');
     expect(systemHubSubpageManifest.coverageNote).toContain('顶部业务视角和左侧导航不放搜索');
     expect(systemHubSubpageManifest.coverageNote).toContain('Stitch 复刻稿已接入页面矩阵');
     expect(systemHubSubpageManifest.coverageNote).toContain('真人模拟结果继续逐页精修');
-    expect(systemHubSubpageManifest.subpages).toHaveLength(40);
+    expect(systemHubSubpageManifest.subpages).toHaveLength(45);
     expect(navigationConsoleEntry?.menuId).toBe('system-hub-navigation-console');
     expect(systemMenus.some((menu) => menu.id === navigationConsoleEntry?.menuId)).toBe(false);
     expect(formalManifestEntries).toHaveLength(systemMenus.length);
@@ -306,9 +314,12 @@ describe('Workbench platform entry contract', () => {
     expect(workspacePage).toContain('hasSubmittedDesignerValidation');
     expect(workspacePage).toContain('还没有完成本次提交校验');
     expect(workspacePage).toContain("title: '流程已发布'");
-    expect(workbenchSmoke).toContain("flowDesignerPanel.getByRole('button', { name: '发布流程'");
-    expect(workbenchSmoke).toContain("page.getByLabel('流程设计器操作结果')).toContainText('发布流程被拦截')");
-    expect(workbenchSmoke).toContain("page.getByLabel('流程设计器操作结果')).toContainText('流程已发布')");
+    expect(workbenchSmoke).toContain("page.goto('/fixed-assets/workbench?menu=system-flow-designer')");
+    expect(workbenchSmoke).toContain('expectFutureSystemFrameContract(page, [');
+    expect(workbenchSmoke).toContain('system-flow-designer');
+    expect(workbenchSmoke).toContain("'流程设计器'");
+    expect(workbenchSmoke).toContain("'采购审批流程_V2.1'");
+    expect(workbenchSmoke).toContain("'保存草稿'");
   });
 
   it('keeps formal System Hub subpage interaction specs explicit about save and submit actions', () => {
@@ -349,17 +360,16 @@ describe('Workbench platform entry contract', () => {
     expect(existsSync(resolve(__dirname, '../../scripts/verify-system-hub-usability.mjs'))).toBe(true);
   });
 
-  it('keeps external system operations page-local and auditable', () => {
-    expect(workspacePage).toContain('const runAccessConnectionTest = () =>');
-    expect(workspacePage).toContain('const openAccessAuthPolicy = () =>');
-    expect(workspacePage).toContain('const runAccessSyncDryRun = () =>');
-    expect(workspacePage).toContain('aria-label="通用接入测试记录"');
-    expect(workspacePage).toContain('连接测试已完成');
-    expect(workspacePage).toContain('同步试跑已完成');
-    expect(workspacePage).toContain('认证策略检查已展开');
-    expect(workspacePageStyles).toContain('.workspace-external-operation-log');
-    expect(workbenchSmoke).toContain("getByRole('button', { name: '测试连接', exact: true }).click()");
-    expect(workbenchSmoke).toContain("page.getByLabel('通用接入测试记录')).toContainText('同步试跑')");
+  it('keeps external system Future OS iframe contract page-local and auditable', () => {
+    expect(workbenchSmoke).toContain("page.goto('/fixed-assets/workbench?menu=system-external-systems')");
+    expect(workbenchSmoke).toContain('expectFutureSystemFrameContract(page, [');
+    expect(workbenchSmoke).toContain('system-external-systems');
+    expect(workbenchSmoke).toContain("'外部系统配置'");
+    expect(workbenchSmoke).toContain("'集成拓扑与接口映射'");
+    expect(workbenchSmoke).toContain("'Systems Active'");
+    expect(workbenchSmoke).toContain("'ERP Core'");
+    expect(workbenchSmoke).toContain("'Field Mapping Matrix'");
+    expect(workbenchSmoke).toContain("'返回业务工作台'");
   });
 
   it('keeps organization permission delivery manifest aligned to dedicated v2 IMAGE2 pages', () => {
@@ -371,6 +381,7 @@ describe('Workbench platform entry contract', () => {
       ['system-handover', 'org-permission-subpage-05-handover-v2'],
       ['system-dept-org', 'org-permission-subpage-06-dept-org-v2'],
       ['system-post-management', 'org-permission-subpage-07-post-management-v2'],
+      ['system-tenant-management', 'org-permission-subpage-08-tenant-management-v1'],
     ]);
 
     for (const [menuId, image2Id] of expectedOrgPermissionImage2ByMenuId) {
@@ -415,17 +426,26 @@ describe('Workbench platform entry contract', () => {
     expect(systemPageRoutingBlock).toContain('aria-label={`${item.label}系统配置操作`}');
     expect(systemPageRoutingBlock).toContain('aria-label={`${item.label}关键指标`}');
     expect(systemPageRoutingBlock).toContain('aria-label={`${item.label}通用详情操作`}');
-    expect(workbenchSmoke).toContain('runSystemParameterDraftFlow');
-    expect(workbenchSmoke).toContain('runIntegrationDraftFlow');
+    expect(workbenchSmoke).toContain('expectFutureSettingsNavigationCenter');
+    expect(workbenchSmoke).toContain('expectFutureSystemFrameContract');
+    expect(workbenchSmoke).toContain('const futureMenuContracts');
+    expect(workbenchSmoke).toContain('const futureSearchContracts');
+    expect(workbenchSmoke).toContain('const masterDataContracts');
+    expect(workbenchSmoke).toContain('const notificationContracts');
+    expect(workbenchSmoke).toContain('system-base-params');
+    expect(workbenchSmoke).toContain('system-external-systems');
+    expect(workbenchSmoke).toContain('基础资料主数据页均可新建保存提交');
     expect(workbenchSmoke).toContain('消息通知配置页均可新建保存提交');
-    expect(workbenchSmoke).toContain("page.getByLabel(`${label}系统配置操作`)).toHaveCount(0)");
-    expect(workbenchSmoke).toContain("page.getByLabel(`${label}关键指标`)).toHaveCount(0)");
-    expect(workbenchSmoke).toContain("page.getByLabel(`${label}通用详情操作`)).toHaveCount(0)");
-    expect(workbenchSmoke).toContain("page.getByLabel(`${label}配置生命周期`)).toHaveCount(0)");
+    expect(workbenchSmoke).toContain("'返回业务工作台'");
+    expect(workbenchSmoke).toContain("'保存草稿'");
+    expect(workbenchSmoke).toContain("'提交校验'");
     expect(workspacePage).toContain("image2: 'org-permission-subpage-01-user-management-v2'");
     expect(workspacePage).toContain("image2: 'org-permission-subpage-02-role-permissions-v2'");
     expect(workspacePage).toContain("image2: 'org-permission-subpage-03-menu-permissions-v2'");
+    expect(workspacePage).toContain("image2: 'org-permission-subpage-08-tenant-management-v1'");
     expect(workspacePage).toContain("image2: 'system-params-subpage-06-audit-log-v2'");
+    expect(workspacePage).toContain("image2: 'system-params-subpage-07-doc-center-v1'");
+    expect(workspacePage).toContain("image2: 'system-params-subpage-08-tech-support-v1'");
     const auditLogManifest = systemHubSubpageManifest.subpages.find((entry) => entry.menuId === 'system-audit-log');
     expect(auditLogManifest?.interaction).toEqual(expect.arrayContaining([
       '新建审计策略',
@@ -447,12 +467,6 @@ describe('Workbench platform entry contract', () => {
     expect(workspacePage).toContain('导出取证包已生成');
     expect(workspacePage).toContain('取证包已下载');
     expect(workspacePage).toContain('审计链路已追溯');
-    expect(workbenchSmoke).toContain("page.getByLabel('操作审计操作结果')).toContainText('1/4 条命中')");
-    expect(workbenchSmoke).toContain("page.getByLabel('操作审计操作结果')).toContainText('导出取证包已生成')");
-    expect(workbenchSmoke).toContain("page.getByLabel('操作审计操作结果')).toContainText('取证包已下载')");
-    expect(workbenchSmoke).toContain("page.getByLabel('操作审计操作结果')).toContainText('审计链路已追溯')");
-    expect(workbenchSmoke).toContain("page.getByLabel('操作审计参数对象列表')).toContainText('已提交校验')");
-    expect(workbenchSmoke).toContain("page.getByLabel('操作审计专用配置预览')).toContainText('已提交校验')");
     expect(workspacePage).toContain("流程平台: { src: systemHubV8Asset('flow-platform-v2'), file: 'flow-platform-v2.png' }");
     expect(workspacePage).toContain("组织权限: { src: systemHubV8Asset('org-permission-v2'), file: 'org-permission-v2.png' }");
     expect(workspacePage).toContain("基础资料: { src: systemHubV8Asset('master-data-v2'), file: 'master-data-v2.png' }");
@@ -478,9 +492,6 @@ describe('Workbench platform entry contract', () => {
       '提交校验',
     ]));
     expect(baseParameterManifest?.acceptance).toContain('影响预演、回滚预案和门禁预检必须可真人模拟并写入操作反馈');
-    expect(workbenchSmoke).toContain("baseParameterRunbook.getByRole('button', { name: '影响预演'");
-    expect(workbenchSmoke).toContain("baseParameterRunbook.getByRole('button', { name: '回滚预案'");
-    expect(workbenchSmoke).toContain("baseParameterRunbook.getByRole('button', { name: '门禁预检'");
     expect(workspacePage).toContain('workspace-security-policy-runbook');
     expect(workspacePage).toContain('const previewSecuritySensitiveMask = () =>');
     expect(workspacePage).toContain('const runSecurityH5IdentityCheck = () =>');
@@ -494,9 +505,6 @@ describe('Workbench platform entry contract', () => {
       '提交校验',
     ]));
     expect(securityPolicyManifest?.acceptance).toContain('脱敏预览、H5 身份校验和高危确认演练必须可真人模拟并写入操作反馈');
-    expect(workbenchSmoke).toContain("securityConsole.getByRole('button', { name: '脱敏预览'");
-    expect(workbenchSmoke).toContain("securityConsole.getByRole('button', { name: 'H5 校验'");
-    expect(workbenchSmoke).toContain("securityConsole.getByRole('button', { name: '高危确认'");
     expect(workspacePage).toContain('workspace-file-storage-runbook');
     expect(workspacePage).toContain('const runFileStorageThumbnailPreview = () =>');
     expect(workspacePage).toContain('const runFileStorageAccessPrecheck = () =>');
@@ -510,9 +518,6 @@ describe('Workbench platform entry contract', () => {
       '提交校验',
     ]));
     expect(fileStorageManifest?.acceptance).toContain('缩略图预览、权限预检和归档演练必须可真人模拟并写入操作反馈');
-    expect(workbenchSmoke).toContain("fileStorageConsole.getByRole('button', { name: '缩略图预览'");
-    expect(workbenchSmoke).toContain("fileStorageConsole.getByRole('button', { name: '权限预检'");
-    expect(workbenchSmoke).toContain("fileStorageConsole.getByRole('button', { name: '归档演练'");
     expect(workspacePage).toContain('workspace-import-export-runbook');
     expect(workspacePage).toContain('const runImportExportDryRun = () =>');
     expect(workspacePage).toContain('const openImportExportErrorReport = () =>');
@@ -526,9 +531,6 @@ describe('Workbench platform entry contract', () => {
       '提交校验',
     ]));
     expect(importExportManifest?.acceptance).toContain('导入试跑、错误报告和导出控制预演必须可真人模拟并写入操作反馈');
-    expect(workbenchSmoke).toContain("importExportConsole.getByRole('button', { name: '导入试跑'");
-    expect(workbenchSmoke).toContain("importExportConsole.getByRole('button', { name: '错误报告'");
-    expect(workbenchSmoke).toContain("importExportConsole.getByRole('button', { name: '导出预演'");
     expect(workspacePage).toContain('workspace-cache-management-runbook');
     expect(workspacePage).toContain('const runCacheManagementRefreshNow = () =>');
     expect(workspacePage).toContain('const runCacheManagementWarmupDrill = () =>');
@@ -547,10 +549,6 @@ describe('Workbench platform entry contract', () => {
       '提交校验',
     ]));
     expect(cacheManagementManifest?.acceptance).toContain('预热演练、一致性校验、立即刷新和恢复预案必须可真人模拟并写入操作反馈');
-    expect(workbenchSmoke).toContain("cacheManagementConsole.getByRole('button', { name: '预热演练'");
-    expect(workbenchSmoke).toContain("cacheManagementConsole.getByRole('button', { name: '一致性校验'");
-    expect(workbenchSmoke).toContain("cacheManagementConsole.getByRole('button', { name: '立即刷新'");
-    expect(workbenchSmoke).toContain("cacheManagementConsole.getByRole('button', { name: '恢复预案'");
     expect(workspacePage).toContain('workspace-interface-runbook');
     expect(workspacePage).toContain('const runInterfaceHealthCheck = () =>');
     expect(workspacePage).toContain('const openInterfaceInvocationLogs = () =>');
@@ -570,10 +568,6 @@ describe('Workbench platform entry contract', () => {
     ]));
     expect(interfaceManifest?.acceptance).toContain('健康检查和调用日志必须可真人模拟并写入操作反馈');
     expect(interfaceManifest?.acceptance).toContain('试跑配置和异常队列必须在当前页写入操作留痕，不得打开通用占位模板');
-    expect(workbenchSmoke).toContain("interfaceRunbook.getByRole('button', { name: '健康检查'");
-    expect(workbenchSmoke).toContain("interfaceRunbook.getByRole('button', { name: '调用日志'");
-    expect(workbenchSmoke).toContain("interfacePanel.getByRole('button', { name: '试跑'");
-    expect(workbenchSmoke).toContain("page.getByLabel('接口配置操作留痕')).toContainText('样例试跑')");
     expect(workspacePage).toContain('workspace-field-mapping-runbook');
     expect(workspacePage).toContain('const runFieldMappingSampleCheck = () =>');
     expect(workspacePage).toContain('const openFieldMappingConflictReview = () =>');
@@ -586,8 +580,6 @@ describe('Workbench platform entry contract', () => {
       '异常字段入队',
     ]));
     expect(fieldMappingManifest?.acceptance).toContain('样例校验和冲突检测必须可真人模拟并写入操作反馈');
-    expect(workbenchSmoke).toContain("fieldMappingRunbook.getByRole('button', { name: '样例校验'");
-    expect(workbenchSmoke).toContain("fieldMappingRunbook.getByRole('button', { name: '冲突检测'");
     expect(workspacePage).toContain('workspace-sync-rule-runbook');
     expect(workspacePage).toContain('const runSyncRuleDryRun = () =>');
     expect(workspacePage).toContain('const openSyncRuleReplay = () =>');
@@ -600,8 +592,6 @@ describe('Workbench platform entry contract', () => {
       '异常重放',
     ]));
     expect(syncRulesManifest?.acceptance).toContain('试跑规则和异常重放必须可真人模拟并写入操作反馈');
-    expect(workbenchSmoke).toContain("syncRuleRunbook.getByRole('button', { name: '试跑规则'");
-    expect(workbenchSmoke).toContain("syncRuleRunbook.getByRole('button', { name: '异常重放'");
     expect(workspacePage).toContain('workspace-webhook-runbook');
     expect(workspacePage).toContain('const runWebhookSignatureTest = () =>');
     expect(workspacePage).toContain('const openWebhookReplayQueue = () =>');
@@ -614,16 +604,14 @@ describe('Workbench platform entry contract', () => {
       '异常重放队列',
     ]));
     expect(webhookManifest?.acceptance).toContain('发送测试和失败重放必须可真人模拟并写入操作反馈');
-    expect(workbenchSmoke).toContain("webhookRunbook.getByRole('button', { name: '发送测试'");
-    expect(workbenchSmoke).toContain("webhookRunbook.getByRole('button', { name: '失败重放'");
     expect(workspacePageStyles).toContain('.workspace-audit-log-configurator');
     expect(workspacePage).toContain('const downloadEvidencePackage = () =>');
     expect(workspacePage).toContain('const traceAuditEvidence = () =>');
-    expect(workbenchSmoke).toContain("auditPanel.getByRole('button', { name: '下载取证包'");
-    expect(workbenchSmoke).toContain("auditPanel.getByRole('button', { name: '追溯详情'");
     expect(workspacePage).toContain('workspace-role-permission-matrix-table');
     expect(workspacePageStyles).toContain('.workspace-role-permission-matrix-table');
     expect(workspacePage).toContain("image2: 'flow-platform-subpage-01-flow-definition-v2'");
+    expect(workspacePage).toContain("image2: 'flow-platform-subpage-02-settings-command-center-v1'");
+    expect(workspacePage).toContain("image2: 'flow-platform-subpage-03-runtime-monitor-v1'");
     expect(workspacePage).toContain("image2: 'flow-platform-subpage-03-form-config-v2'");
     expect(workspacePage).toContain("image2: 'flow-platform-subpage-04-form-storage-v2'");
     expect(workspacePage).toContain("image2: 'flow-platform-subpage-05-approval-rules-v2'");
@@ -650,15 +638,12 @@ describe('Workbench platform entry contract', () => {
     expect(workspacePage).toContain('aria-label={`${selectedEntry.name}字段引用审计记录`}');
     expect(workspacePageStyles).toContain('.workspace-custom-field-local-search');
     expect(workspacePageStyles).toContain('.workspace-custom-field-audit-ledger');
-    expect(workbenchSmoke).toContain("page.getByRole('textbox', { name: `${label}搜索`, exact: true })");
-    expect(workbenchSmoke).toContain("page.getByLabel(`${draftName}字段引用审计记录`)).toContainText('字段引用')");
     expect(workspacePage).toContain("image2: 'org-permission-subpage-04-data-permissions-v2'");
     expect(workspacePage).toContain('workspace-data-scope-filters');
     expect(workspacePage).toContain('aria-label="数据权限模拟条件"');
     expect(workspacePage).toContain('aria-label="数据权限数据脱敏"');
     expect(workspacePage).toContain('aria-label="数据权限详情操作"');
     expect(workspacePageStyles).toContain('.workspace-data-scope-chip');
-    expect(workbenchSmoke).toContain("page.getByLabel('数据权限数据脱敏')");
     expect(workspacePage).toContain("image2: 'org-permission-subpage-05-handover-v2'");
     expect(workspacePage).toContain("image2: 'org-permission-subpage-06-dept-org-v2'");
     expect(workspacePage).toContain("image2: 'org-permission-subpage-07-post-management-v2'");
@@ -669,9 +654,6 @@ describe('Workbench platform entry contract', () => {
     expect(workspacePage).toContain('aria-label="岗位管理详情操作"');
     expect(workspacePageStyles).toContain('.workspace-post-operation-ledger');
     expect(workspacePageStyles).toContain('.workspace-post-inspector-actions');
-    expect(workbenchSmoke).toContain("page.getByLabel('岗位管理影响与审计记录')).toContainText('影响预览')");
-    expect(workbenchSmoke).toContain("page.getByLabel('岗位管理详情操作').getByRole('button', { name: '查看审计'");
-    expect(workbenchSmoke).toContain("page.getByLabel('岗位管理影响与审计记录')).toContainText('审计轨迹')");
     expect(workspacePage).toContain('scanHandoverImpacts');
     expect(workspacePage).toContain('workspace-handover-impact-summary');
     expect(workspacePage).toContain('aria-label="工作交接范围操作"');
@@ -683,12 +665,6 @@ describe('Workbench platform entry contract', () => {
     expect(workspacePage).toContain('扫描条件、接收确认、跳过原因和审计冻结证据');
     expect(workspacePageStyles).toContain('.workspace-handover-impact-summary');
     expect(workspacePageStyles).toContain('.workspace-handover-audit-ledger');
-    expect(workbenchSmoke).toContain("handoverPanel.getByRole('button', { name: '扫描待办'");
-    expect(workbenchSmoke).toContain("page.getByLabel('工作交接审计记录')).toContainText('范围审计')");
-    expect(workbenchSmoke).toContain("page.getByLabel('工作交接审计记录')).toContainText('批次审计')");
-    expect(workbenchSmoke).toContain("page.getByLabel('角色API权限')");
-    expect(workbenchSmoke).toContain("page.getByLabel('角色敏感策略')");
-    expect(workbenchSmoke).toContain("page.getByLabel('角色临时授权')");
     expect(workspacePage).toContain('workspace-identity-batch-preview');
     expect(workspacePage).toContain('用户批量操作预览');
     expect(workspacePage).toContain('当前筛选无命中，批量操作已禁用。');
@@ -717,20 +693,6 @@ describe('Workbench platform entry contract', () => {
     expect(workspacePageStyles).toContain('.workspace-role-audit-ledger');
     expect(workspacePageStyles).toContain('.workspace-menu-inspector-actions');
     expect(workspacePageStyles).toContain('.workspace-dept-operation-ledger');
-    expect(workbenchSmoke).toContain("page.getByLabel('用户批量操作预览')");
-    expect(workbenchSmoke).toContain("page.getByLabel('用户批量操作').getByRole('button', { name: '权限回收', exact: true })).toBeDisabled()");
-    expect(workbenchSmoke).toContain("page.getByRole('button', { name: '处理差异', exact: true }).click()");
-    expect(workbenchSmoke).toContain("page.getByLabel('交接与审计记录')).toContainText('工作交接批次')");
-    expect(workbenchSmoke).toContain("page.getByLabel('角色权限审计记录')).toContainText('影响预演')");
-    expect(workbenchSmoke).toContain("page.getByLabel('角色权限审计记录')).toContainText('审计轨迹')");
-    expect(workbenchSmoke).toContain("page.getByLabel('菜单权限角色可见性预览')).toContainText(menuPermissions.previewRole)");
-    expect(workbenchSmoke).toContain("page.getByLabel('菜单权限角色可见性预览')).toContainText('审计追踪')");
-    expect(workbenchSmoke).toContain("page.getByLabel('部门组织变更记录')).toContainText('负责人变更')");
-    expect(workbenchSmoke).toContain("page.getByLabel('部门组织变更记录')).toContainText('待二次确认')");
-    expect(workbenchSmoke).toContain("page.getByLabel('数据权限访问模拟')).toContainText('访问模拟')");
-    expect(workbenchSmoke).toContain("page.getByLabel('数据权限访问模拟')).toContainText('审计追踪')");
-    expect(workbenchSmoke).toContain("page.getByRole('textbox', { name: `${label}搜索`, exact: true })");
-    expect(workbenchSmoke).toContain("page.getByRole('button', { name: `清空${label}搜索`, exact: true })");
     expect(workspacePage).toContain('workspace-notification-generic-configurator');
     expect(workspacePage).toContain('workspace-notification-local-search');
     expect(workspacePage).toContain('workspace-notification-search-empty');
@@ -749,11 +711,6 @@ describe('Workbench platform entry contract', () => {
     expect(workspacePageStyles).toContain('.workspace-workflow-switch-empty');
     expect(workspacePageStyles).toContain('.workspace-workflow-switch-simulation-ledger');
     expect(workspacePageStyles).toContain('.workspace-workflow-switch-audit-ledger');
-    expect(workbenchSmoke).toContain("page.getByLabel(`${notificationCase.draftName}通知试算记录`)).toContainText('发送预演')");
-    expect(workbenchSmoke).toContain("page.getByLabel('流程通知开关审计记录')).toContainText('审计轨迹')");
-    expect(workbenchSmoke).toContain("page.getByLabel(`${draftName}触达审计记录`)).toContainText('流程引用')");
-    expect(workbenchSmoke).toContain("page.getByLabel(`${draftName}触达审计记录`)).toContainText('变量快照')");
-    expect(workbenchSmoke).toContain("page.getByLabel('CIP 转固完结通知触达审计记录')).toContainText('发送日志')");
     expect(workspacePage).toContain('workspace-notification-channel-console');
     expect(workspacePage).toContain('const runChannelSendTest = () =>');
     expect(workspacePage).toContain('const openChannelFallbackRoute = () =>');
@@ -771,14 +728,13 @@ describe('Workbench platform entry contract', () => {
     expect(workspacePage).toContain("image2: 'system-params-subpage-03-file-storage-v2'");
     expect(workspacePage).toContain("image2: 'system-params-subpage-04-import-export-v2'");
     expect(workspacePage).toContain("image2: 'system-params-subpage-05-cache-management-v2'");
+    expect(workspacePage).toContain("image2: 'system-params-subpage-07-doc-center-v1'");
+    expect(workspacePage).toContain("image2: 'system-params-subpage-08-tech-support-v1'");
     expect(workspacePage).toContain('const openParameterPublishAuditTrail = () =>');
     expect(workspacePage).toContain('workspace-system-parameter-audit-ledger');
     expect(workspacePage).toContain('发布审计已展开');
     expect(workspacePage).toContain('aria-label={`${selectedEntry.name}发布审计记录`}');
     expect(workspacePageStyles).toContain('.workspace-system-parameter-audit-ledger');
-    expect(workbenchSmoke).toContain("page.getByLabel(`${draftName}发布审计记录`)).toContainText('参数变更')");
-    expect(workbenchSmoke).toContain("page.getByLabel(`${draftName}发布审计记录`)).toContainText('发布门禁')");
-    expect(workbenchSmoke).toContain("page.getByLabel('CIP 转固附件上限发布审计记录')).toContainText('回滚记录')");
     expect(workspacePage).toContain('workspace-mail-local-search');
     expect(workspacePage).toContain('aria-label="邮件网关搜索"');
     expect(workspacePage).toContain('aria-label="邮件网关搜索空结果"');
@@ -793,13 +749,6 @@ describe('Workbench platform entry contract', () => {
     expect(workspacePageStyles).toContain('.workspace-mail-local-search');
     expect(workspacePageStyles).toContain('.workspace-mail-security-review');
     expect(workspacePageStyles).toContain('.workspace-mail-log-actions');
-    expect(workbenchSmoke).toContain("page.getByRole('textbox', { name: '邮件网关搜索', exact: true })");
-    expect(workbenchSmoke).toContain("mailGatewayPanel.getByRole('button', { name: '安全策略', exact: true })");
-    expect(workbenchSmoke).toContain("page.getByLabel('邮件网关安全检查记录')).toContainText('敏感脱敏')");
-    expect(workbenchSmoke).toContain("mailGatewayPanel.getByRole('button', { name: '发送日志', exact: true })");
-    expect(workbenchSmoke).toContain("page.getByLabel('邮件网关日志处理记录')).toContainText('MAIL-CIP-044')");
-    expect(workbenchSmoke).toContain("page.getByRole('textbox', { name: `${label}搜索`, exact: true })");
-    expect(workbenchSmoke).toContain("page.getByRole('button', { name: `清空${label}搜索`, exact: true })");
     expect(workspacePage).toContain('aria-label="邮件日志页内搜索"');
     expect(workspacePage).toContain('aria-label="邮件日志搜索"');
     expect(workspacePage).toContain('aria-label="邮件日志搜索空结果"');
@@ -809,8 +758,6 @@ describe('Workbench platform entry contract', () => {
     expect(workspacePage).toContain('原始日志已展开');
     expect(workspacePage).toContain('aria-label={`${selectedEntry.name}原始日志记录`}');
     expect(workspacePageStyles).toContain('.workspace-mail-log-raw-ledger');
-    expect(workbenchSmoke).toContain("page.getByRole('textbox', { name: '邮件日志搜索', exact: true })");
-    expect(workbenchSmoke).toContain("page.getByLabel(`${notificationCase.draftName}原始日志记录`)).toContainText('SMTP 响应')");
     const notificationChannelManifest = systemHubSubpageManifest.subpages.find((entry) => entry.menuId === 'system-notification-channels');
     expect(notificationChannelManifest?.interaction).toEqual(expect.arrayContaining([
       '发送测试',
@@ -819,8 +766,6 @@ describe('Workbench platform entry contract', () => {
       '提交校验',
     ]));
     expect(notificationChannelManifest?.acceptance).toContain('发送测试和查看降级路由必须可真人模拟');
-    expect(workbenchSmoke).toContain("channelConsole.getByRole('button', { name: '发送测试'");
-    expect(workbenchSmoke).toContain("channelConsole.getByRole('button', { name: '查看降级路由'");
     expect(workspacePage).toContain('workspace-notification-preference-console');
     expect(workspacePage).toContain('const runPreferenceInheritancePreview = () =>');
     expect(workspacePage).toContain('const runPreferenceConflictCheck = () =>');
@@ -833,14 +778,12 @@ describe('Workbench platform entry contract', () => {
       '静默冲突检查',
     ]));
     expect(notificationPreferenceManifest?.acceptance).toContain('偏好预览和静默冲突检查必须可真人模拟并写入操作反馈');
-    expect(workbenchSmoke).toContain("preferenceConsole.getByRole('button', { name: '继承预览'");
-    expect(workbenchSmoke).toContain("preferenceConsole.getByRole('button', { name: '静默冲突检查'");
   });
 
   it('scopes System Hub visual repairs away from external Workbench pages', () => {
     const systemMenus = collectSystemMenus();
 
-    expect(systemMenus).toHaveLength(39);
+    expect(systemMenus).toHaveLength(44);
     for (const [group, expectedCount] of Object.entries(expectedSystemGroupCounts)) {
       expect(systemMenus.filter((menu) => menu.group === group)).toHaveLength(expectedCount);
     }
@@ -869,22 +812,31 @@ describe('Workbench platform entry contract', () => {
 
     expect(expectedSystemDraftSmokeMenuIds).toEqual(systemMenuIds);
 
-    for (const menu of collectSystemMenus()) {
-      expect(workbenchSmoke, `${menu.label} should appear in Workbench smoke coverage`).toContain(menu.id);
-      expect(workbenchSmoke, `${menu.label} should keep a visible browser smoke label`).toContain(menu.label);
-    }
-
     for (const helperOrScenario of [
       '系统运营中枢切换为系统配置左侧导航并可回到业务视角',
-      '流程定义页支持当前页新建保存提交',
-      '系统运营中枢缺失配置页均落到专用功能面板',
+      '导航控制台页支持当前页新建保存提交',
+      '系统运营中枢全量配置页均落到 Future OS iframe 页面',
+      'expectFutureSettingsNavigationCenter',
+      'expectFutureSystemFrameContract',
+      'const systemHtmlPageContracts',
+      'const futureMenuContracts',
+      'const futureSearchContracts',
+      'const masterDataContracts',
+      'const notificationContracts',
       '基础资料主数据页均可新建保存提交',
       '消息通知配置页均可新建保存提交',
-      'runIntegrationDraftFlow',
-      'runOrganizationPermissionDraftFlow',
-      'runMasterDataDraftFlow',
-      'runSystemParameterDraftFlow',
-      'runNotificationDraftFlow',
+      'system-flow-designer',
+      'system-user-management',
+      'system-asset-category',
+      'system-external-systems',
+      'system-notification-channels',
+      'system-base-params',
+      '流程设计器',
+      '用户管理',
+      '资产分类',
+      '外部系统配置',
+      '通知渠道',
+      '基础参数',
       '保存草稿',
       '提交校验',
     ]) {

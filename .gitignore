@@ -52,6 +52,21 @@ videos/
 hud_test.png
 gsd_vibe_coding_presentation_v2_副本*.html
 
+# Local browser/visual-audit artifacts; not release candidates.
+.stitch/tmp-chrome-*/
+frontend/system-visual-audit/
+stitch-output/
+/*.png
+/frontend/*.png
+/file-storage-current-audit.json
+/file-storage-point-samples.json
+/system-file-storage-*.json
+/system-flow-definition-runtime-metrics.json
+/flow-definition-console.txt
+/frontend/public/mock/workspace-preview/asset-kit-v8/system-hub/subpages/stitch-mcp-settings-*.html
+/frontend/public/mock/workspace-preview/asset-kit-v8/system-hub/subpages/stitch-*-subpage-*.png
+/frontend/public/mock/workspace-preview/asset-kit-v8/system-hub/subpages/*-subpage-*-v1.png
+
 # Backend
 target/
 backend/target/
@@ -118,6 +133,10 @@ spec.md
 .omc/
 .gai/
 .gai2/
+
+# Local workflow scratch state; keep release/evidence candidates visible.
+.superpowers/brainstorm/
+tmp/
 
 # User uploads and runtime artifacts
 backend/uploads/

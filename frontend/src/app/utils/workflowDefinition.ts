@@ -9,6 +9,7 @@ const defaultMarkerEnd = { type: MarkerType.ArrowClosed, color: "var(--color-pri
 const defaultStyle = { stroke: "var(--color-primary)", strokeWidth: 2 };
 const defaultLabelStyle = { fill: "var(--color-foreground)", fontSize: 12, fontWeight: 600 };
 const defaultLabelBgStyle = { fill: "var(--workflow-surface)", fillOpacity: 1 };
+const CYCLE_ERROR_MESSAGE = "流程存在循环路径，请检查节点连线";
 
 const defaultNodeData: FlowNodeData = {
   type: "approval",
@@ -71,7 +72,7 @@ export function normalizeWorkflowDefinition(
   const nodeIds = new Set(nodes.map((node) => node.id).filter(Boolean));
   const edges = (Array.isArray(definition.edges) ? definition.edges : [])
     .map(normalizeEdge)
-    .filter((edge) => nodeIds.has(edge.source) && nodeIds.has(edge.target) && edge.source !== edge.target);
+    .filter((edge) => nodeIds.has(edge.source) && nodeIds.has(edge.target));
 
   return {
     ...definition,
@@ -91,6 +92,7 @@ export function validateWorkflowDefinition(definition: WorkflowDefinitionPayload
   const outgoingCounts = new Map<string, number>();
   const conditionHandles = new Map<string, Set<string>>();
   const adjacency = new Map<string, string[]>();
+  let hasCycle = false;
 
   if (!text(definition.id)) errors.push("流程定义ID不能为空");
   if (!text(definition.name)) errors.push("流程名称不能为空");
@@ -162,6 +164,10 @@ export function validateWorkflowDefinition(definition: WorkflowDefinitionPayload
 
     if (source.type === "end") errors.push("结束节点不能作为连线来源");
     if (target.type === "start") errors.push("开始节点不能作为连线目标");
+    if (edge.source === edge.target) {
+      hasCycle = true;
+      continue;
+    }
     incomingCounts.set(edge.target, (incomingCounts.get(edge.target) ?? 0) + 1);
     outgoingCounts.set(edge.source, (outgoingCounts.get(edge.source) ?? 0) + 1);
     adjacency.set(edge.source, [...(adjacency.get(edge.source) ?? []), edge.target]);
@@ -176,6 +182,27 @@ export function validateWorkflowDefinition(definition: WorkflowDefinitionPayload
       conditionHandles.set(source.id, handles);
     }
   }
+
+  const colors = new Map<string, "visiting" | "visited">();
+  const visit = (nodeId: string): boolean => {
+    const color = colors.get(nodeId);
+    if (color === "visiting") return true;
+    if (color === "visited") return false;
+    colors.set(nodeId, "visiting");
+    for (const next of adjacency.get(nodeId) ?? []) {
+      if (visit(next)) return true;
+    }
+    colors.set(nodeId, "visited");
+    return false;
+  };
+
+  for (const node of definition.nodes) {
+    if (visit(node.id)) {
+      hasCycle = true;
+      break;
+    }
+  }
+  if (hasCycle) errors.push(CYCLE_ERROR_MESSAGE);
 
   for (const node of definition.nodes) {
     if (node.type !== "start" && (incomingCounts.get(node.id) ?? 0) === 0) {

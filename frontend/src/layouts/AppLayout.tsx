@@ -6,7 +6,7 @@
  */
 
 import { useState, useEffect, useMemo, useRef } from 'react';
-import { NavLink, Outlet, useNavigate } from 'react-router';
+import { NavLink, Outlet, useLocation, useNavigate } from 'react-router';
 import { useAuth } from '@/context/AuthContext';
 import { useQuery } from '@tanstack/react-query';
 import { getUnreadCount } from '@/api/notification';
@@ -54,6 +54,7 @@ type NavItem = {
   icon: React.ComponentType<{ className?: string }>;
   external?: boolean;
   permissionPath?: string;
+  activePrefix?: string;
 };
 
 type NavGroup = {
@@ -142,7 +143,13 @@ const SYSTEM_NAV_ITEMS: NavItem[] = [
   { path: '/system/posts', label: '岗位管理', icon: Workflow },
   { path: '/system/custom-fields', label: '自定义字段', icon: Settings },
   { path: '/system/custom-fieldsets', label: '字段集', icon: FolderTree },
-  { path: '/settings/sysconfig', label: '参数配置', icon: Settings },
+  {
+    path: '/settings',
+    label: '后台设置 OS',
+    icon: Settings,
+    permissionPath: '/settings/sysconfig',
+    activePrefix: '/settings',
+  },
 ];
 
 const NAV_BOTTOM_ITEMS: NavItem[] = [
@@ -156,6 +163,7 @@ const NAV_BOTTOM_ITEMS: NavItem[] = [
 export default function AppLayout() {
   const [collapsed, setCollapsed] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const { hasRole, user } = useAuth();
 
@@ -282,6 +290,9 @@ export default function AppLayout() {
               )}
               {group.items.map((item) => {
                 const { path, label, icon: Icon } = item;
+                const activeByPrefix = item.activePrefix
+                  ? location.pathname.startsWith(item.activePrefix)
+                  : false;
                 if (item.external) {
                   return (
                     <a
@@ -305,7 +316,7 @@ export default function AppLayout() {
                     end
                     className={({ isActive }) =>
                       `flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-all duration-150 ${
-                        isActive
+                        isActive || activeByPrefix
                           ? 'bg-gradient-to-r from-white/[0.15] to-white/[0.05] text-white ring-1 ring-white/[0.15] shadow-inner shadow-black/10'
                           : 'text-[#94a3b8] hover:bg-white/[0.08] hover:text-white hover:translate-x-0.5 motion-reduce:hover:translate-x-0'
                       }`
@@ -460,11 +471,11 @@ export default function AppLayout() {
                       个人信息
                     </button>
                     <button
-                      onClick={() => { setUserMenuOpen(false); navigate('/settings/sysconfig'); }}
+                      onClick={() => { setUserMenuOpen(false); navigate('/settings'); }}
                       className="flex w-full items-center gap-2.5 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
                     >
                       <Settings className="w-4 h-4 text-slate-400" />
-                      基础维护
+                      后台设置 OS
                     </button>
                   </div>
                   {/* 退出 */}

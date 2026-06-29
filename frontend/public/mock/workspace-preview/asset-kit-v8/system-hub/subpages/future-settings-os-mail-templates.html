@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>UNIVIEW - 邮件模板</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-background": "#d4e4fa",
+                      "outline": "#8c90a0",
+                      "tertiary-fixed": "#f0dbff",
+                      "on-error-container": "#ffdad6",
+                      "surface-dim": "#051424",
+                      "tertiary": "#ddb7ff",
+                      "secondary-container": "#00a8d8",
+                      "surface-container-high": "#1c2b3c",
+                      "surface-container-lowest": "#010f1f",
+                      "primary": "#b0c6ff",
+                      "on-primary-container": "#fffdff",
+                      "secondary": "#6bd2ff",
+                      "surface-container-low": "#0d1c2d",
+                      "outline-variant": "#424654",
+                      "on-tertiary": "#490080",
+                      "primary-fixed-dim": "#b0c6ff",
+                      "surface-bright": "#2c3a4c",
+                      "on-tertiary-container": "#fffdff",
+                      "inverse-primary": "#0057cc",
+                      "on-secondary-fixed": "#001f2a",
+                      "inverse-on-surface": "#233143",
+                      "tertiary-fixed-dim": "#ddb7ff",
+                      "on-primary-fixed-variant": "#00419c",
+                      "primary-container": "#1d6ef2",
+                      "tertiary-container": "#9c49eb",
+                      "error": "#ffb4ab",
+                      "secondary-fixed-dim": "#6bd2ff",
+                      "primary-fixed": "#d9e2ff",
+                      "on-secondary-container": "#00384a",
+                      "on-secondary": "#003547",
+                      "inverse-surface": "#d4e4fa",
+                      "on-tertiary-fixed": "#2c0051",
+                      "on-primary": "#002c6f",
+                      "surface-tint": "#b0c6ff",
+                      "on-secondary-fixed-variant": "#004d65",
+                      "surface-variant": "#273647",
+                      "error-container": "#93000a",
+                      "secondary-fixed": "#bfe9ff",
+                      "surface-container-highest": "#273647",
+                      "background": "#051424",
+                      "on-surface": "#d4e4fa",
+                      "on-primary-fixed": "#001945",
+                      "surface-container": "#122131",
+                      "on-error": "#690005",
+                      "surface": "#051424",
+                      "on-tertiary-fixed-variant": "#6900b3",
+                      "on-surface-variant": "#c2c6d7"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "gutter": "24px",
+                      "xs": "4px",
+                      "unit": "4px",
+                      "lg": "24px",
+                      "xl": "40px",
+                      "sm": "8px",
+                      "md": "16px",
+                      "margin-mobile": "16px",
+                      "xxl": "64px",
+                      "margin-desktop": "48px",
+                      "topbar-height": "56px",
+                      "sidebar-width": "240px"
+              },
+              "fontFamily": {
+                      "display-lg": [
+                              "Geist"
+                      ],
+                      "title-md": [
+                              "Geist"
+                      ],
+                      "label-md": [
+                              "Geist"
+                      ],
+                      "headline-lg": [
+                              "Geist"
+                      ],
+                      "body-md": [
+                              "Geist"
+                      ],
+                      "body-lg": [
+                              "Geist"
+                      ],
+                      "headline-lg-mobile": [
+                              "Geist"
+                      ],
+                      "mono-code": [
+                              "JetBrains Mono"
+                      ]
+              },
+              "fontSize": {
+                      "display-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "56px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "title-md": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "label-md": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-lg": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-lg-mobile": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "mono-code": [
+                              "13px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ]
+              }
+            },
+          }
+        }
+      </script>
+<style>
+        body { background-color: #051424; color: #d4e4fa; }
+        .glass-panel { backdrop-filter: blur(24px); }
+        .glow-active { box-shadow: 0 0 8px rgba(176, 198, 255, 0.4); }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+      </style>
+</head>
+<body class="font-body-md text-body-md bg-background text-on-background flex h-screen overflow-hidden">
+<!-- TopNavBar -->
+<header class="fixed top-0 left-0 w-full z-50 flex items-center justify-between px-gutter h-topbar-height bg-[#051424] border-b dark:border-outline-variant flat no shadows transition-colors duration-200 ease-in-out border-primary">
+<div class="flex items-center gap-xl">
+<div class="font-title-md text-title-md text-surface-lowest dark:text-surface-bright tracking-tight font-bold whitespace-nowrap">
+                UNIVIEW | 系统设置中心
+            </div><nav class="hidden md:flex gap-lg">
+<a class="text-surface-variant dark:text-outline-variant hover:text-primary-fixed hover:bg-on-secondary-fixed-variant/20 px-3 py-2 rounded-lg transition-colors duration-200 ease-in-out whitespace-nowrap" href="#">流程平台</a>
+<a class="text-surface-variant dark:text-outline-variant hover:text-primary-fixed hover:bg-on-secondary-fixed-variant/20 px-3 py-2 rounded-lg transition-colors duration-200 ease-in-out whitespace-nowrap" href="#">组织权限</a>
+<a class="text-surface-variant dark:text-outline-variant hover:text-primary-fixed hover:bg-on-secondary-fixed-variant/20 px-3 py-2 rounded-lg transition-colors duration-200 ease-in-out whitespace-nowrap" href="#">基础资料</a>
+<a class="text-surface-variant dark:text-outline-variant hover:text-primary-fixed hover:bg-on-secondary-fixed-variant/20 px-3 py-2 rounded-lg transition-colors duration-200 ease-in-out whitespace-nowrap" href="#">集成配置</a>
+<a class="text-primary-fixed-dim border-b-2 border-primary-fixed-dim pb-1 font-semibold px-3 py-2 whitespace-nowrap" href="#">消息与通知</a>
+<a class="text-surface-variant dark:text-outline-variant hover:text-primary-fixed hover:bg-on-secondary-fixed-variant/20 px-3 py-2 rounded-lg transition-colors duration-200 ease-in-out whitespace-nowrap" href="#">系统参数</a>
+</nav>
+</div>
+<div class="flex items-center gap-md text-primary dark:text-inverse-primary whitespace-nowrap">
+
+<button class="px-3 py-1.5 hover:bg-on-secondary-fixed-variant/20 rounded-lg transition-colors duration-200 ease-in-out font-label-md">
+    返回业务工作台
+</button>
+<div class="flex items-center gap-2 pl-4 border-l border-outline-variant">
+<div class="w-8 h-8 rounded-full bg-surface-container-high overflow-hidden border border-outline-variant">
+<img alt="User Profile Avatar" class="w-full h-full object-cover" data-alt="A high-tech digital avatar of a futuristic system administrator, rendered in a sleek, glowing blue and deep indigo palette, conveying authority and precision in a dark mode UI environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC-Xx7TItRAVy6RRcZFqST3oBcA6YKMlPLK-5xrWDrU9_3kdVNJfYA6KY5t0ePA5SNmO2hgjkg7use2RaGVTs3pq7lQND-3uZUZQuaR4xuF5Evctcy8wvkE9O4UN_i32_fEL1XMYfemrAJyu5NV6ASeFrVjWkt6V8c585QnbH9svmZBJXj7Yui3bMJBjuiWVX-lE_TMeg0X1izEPIRNgp7ARlm-m4Z3f3_-HttQIioOLB4ZWsQYYoWV8i4mydtRhjSuf7pGCkWVb7eR"/>
+</div>
+<span class="font-label-md text-on-surface">运营管理员</span>
+</div>
+</div>
+</header>
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-topbar-height w-sidebar-width h-[calc(100vh-topbar-height)] flex flex-col p-4 bg-surface-container-lowest dark:bg-surface-dim border-r border-border-subtle dark:border-outline-variant flat no shadows z-40 transition-all duration-150">
+<div class="mb-xl px-2">
+<div class="font-title-md text-title-md text-on-surface mb-1">System Node 01</div>
+<div class="font-label-md text-label-md text-primary flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary glow-active"></span> Healthy
+            </div>
+</div>
+<nav class="flex-1 space-y-1"><a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant dark:text-outline hover:text-on-surface hover:bg-surface-container-low dark:hover:bg-surface-container-highest rounded-lg transition-all duration-150" href="#"><span class="material-symbols-outlined text-lg">mail_lock</span><span>邮件网关配置</span></a><a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant dark:text-outline hover:text-on-surface hover:bg-surface-container-low dark:hover:bg-surface-container-highest rounded-lg transition-all duration-150" href="#"><span class="material-symbols-outlined text-lg">forward_to_inbox</span><span>流程邮件配置</span></a><a class="flex items-center gap-3 px-3 py-2 text-primary font-bold bg-secondary-container dark:bg-on-secondary-fixed-variant/30 rounded-lg transition-all duration-150 glow-active" href="#"><span class="material-symbols-outlined text-lg">mail</span><span>邮件模板</span></a><a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant dark:text-outline hover:text-on-surface hover:bg-surface-container-low dark:hover:bg-surface-container-highest rounded-lg transition-all duration-150" href="#"><span class="material-symbols-outlined text-lg">list_alt</span><span>邮件日志</span></a><a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant dark:text-outline hover:text-on-surface hover:bg-surface-container-low dark:hover:bg-surface-container-highest rounded-lg transition-all duration-150" href="#"><span class="material-symbols-outlined text-lg">description</span><span>通知模板</span></a><a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant dark:text-outline hover:text-on-surface hover:bg-surface-container-low dark:hover:bg-surface-container-highest rounded-lg transition-all duration-150" href="#"><span class="material-symbols-outlined text-lg">hub</span><span>通知渠道</span></a><a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant dark:text-outline hover:text-on-surface hover:bg-surface-container-low dark:hover:bg-surface-container-highest rounded-lg transition-all duration-150" href="#"><span class="material-symbols-outlined text-lg">settings_suggest</span><span>通知偏好</span></a><a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant dark:text-outline hover:text-on-surface hover:bg-surface-container-low dark:hover:bg-surface-container-highest rounded-lg transition-all duration-150" href="#"><span class="material-symbols-outlined text-lg">toggle_on</span><span>流程通知开关</span></a></nav>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 ml-sidebar-width mt-topbar-height h-[calc(100vh-topbar-height)] overflow-hidden bg-surface relative flex">
+<div class="flex-1 p-gutter overflow-y-auto">
+<!-- Breadcrumbs & Header -->
+<div class="mb-xl">
+<div class="flex items-center gap-2 font-label-md text-label-md text-outline mb-2">
+<span>系统设置中心</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span>消息与通知</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="text-primary-fixed-dim">邮件模板</span>
+</div>
+<div class="flex items-center justify-between">
+<h1 class="font-display-lg text-display-lg text-on-surface font-bold">邮件模板</h1>
+<div class="flex gap-4">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="bg-surface-container-low border-b-2 border-outline-variant focus:border-primary focus:outline-none pl-10 pr-4 py-2 w-64 text-on-surface font-body-md transition-colors bg-transparent h-10" placeholder="搜索模板ID/名称" type="text"/>
+</div>
+<button class="bg-primary text-on-primary px-6 py-2 rounded-lg font-label-md text-label-md hover:bg-primary-fixed transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                            新建模板
+                        </button>
+</div>
+</div>
+</div>
+<!-- Filters -->
+<div class="flex gap-4 mb-lg border-b border-outline-variant pb-4">
+<button class="px-4 py-1.5 rounded-full border border-primary text-primary bg-primary/10 font-label-md text-label-md hover:bg-primary/20 transition-colors">全部域</button>
+<button class="px-4 py-1.5 rounded-full border border-outline-variant text-outline hover:text-on-surface hover:border-outline transition-colors font-label-md text-label-md">资产入库</button>
+<button class="px-4 py-1.5 rounded-full border border-outline-variant text-outline hover:text-on-surface hover:border-outline transition-colors font-label-md text-label-md">借用归还</button>
+<button class="px-4 py-1.5 rounded-full border border-outline-variant text-outline hover:text-on-surface hover:border-outline transition-colors font-label-md text-label-md">盘点任务</button>
+<button class="px-4 py-1.5 rounded-full border border-outline-variant text-outline hover:text-on-surface hover:border-outline transition-colors font-label-md text-label-md">报废审批</button>
+</div>
+<!-- Data Table / Matrix -->
+<div class="bg-surface-container-low rounded-xl border border-outline-variant overflow-hidden">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b border-outline-variant bg-surface-container-highest/50">
+<th class="p-4 font-label-md text-label-md text-outline uppercase tracking-wider font-semibold">模板 ID</th>
+<th class="p-4 font-label-md text-label-md text-outline uppercase tracking-wider font-semibold">模板名称</th>
+<th class="p-4 font-label-md text-label-md text-outline uppercase tracking-wider font-semibold">业务分类</th>
+<th class="p-4 font-label-md text-label-md text-outline uppercase tracking-wider font-semibold">版本号</th>
+<th class="p-4 font-label-md text-label-md text-outline uppercase tracking-wider font-semibold">最后更新时间</th>
+<th class="p-4 font-label-md text-label-md text-outline uppercase tracking-wider font-semibold text-right">操作</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/50 font-mono-code text-mono-code text-on-surface-variant">
+<!-- Row 1 -->
+<tr class="hover:bg-surface-container-highest/30 transition-colors group cursor-pointer bg-primary/5">
+<td class="p-4"><span class="text-primary-fixed-dim">TPL-AST-001</span></td>
+<td class="p-4 font-body-md text-body-md text-on-surface">新资产入库通知</td>
+<td class="p-4">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-secondary-container/20 text-secondary-fixed-dim font-label-md text-[10px]">
+<span class="w-1 h-1 rounded-full bg-secondary-fixed-dim"></span> 资产入库
+                                </span>
+</td>
+<td class="p-4"><span class="px-2 py-1 rounded bg-surface-variant text-outline">V1.2.0</span></td>
+<td class="p-4 text-outline">2023-10-25 14:30:22</td>
+<td class="p-4 text-right">
+<button class="text-outline hover:text-primary transition-colors p-1"><span class="material-symbols-outlined text-[20px]">edit</span></button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-surface-container-highest/30 transition-colors group cursor-pointer">
+<td class="p-4">TPL-BRW-042</td>
+<td class="p-4 font-body-md text-body-md text-on-surface">借用逾期催还</td>
+<td class="p-4">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-error/20 text-error font-label-md text-[10px]">
+<span class="w-1 h-1 rounded-full bg-error"></span> 借用归还
+                                </span>
+</td>
+<td class="p-4"><span class="px-2 py-1 rounded bg-surface-variant text-outline">V2.0.1</span></td>
+<td class="p-4 text-outline">2023-10-24 09:15:00</td>
+<td class="p-4 text-right opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="text-outline hover:text-primary transition-colors p-1"><span class="material-symbols-outlined text-[20px]">edit</span></button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-surface-container-highest/30 transition-colors group cursor-pointer">
+<td class="p-4">TPL-INV-011</td>
+<td class="p-4 font-body-md text-body-md text-on-surface">月度盘点任务下发</td>
+<td class="p-4">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-tertiary-container/20 text-tertiary-fixed-dim font-label-md text-[10px]">
+<span class="w-1 h-1 rounded-full bg-tertiary-fixed-dim"></span> 盘点任务
+                                </span>
+</td>
+<td class="p-4"><span class="px-2 py-1 rounded bg-surface-variant text-outline">V1.0.5</span></td>
+<td class="p-4 text-outline">2023-10-20 16:45:11</td>
+<td class="p-4 text-right opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="text-outline hover:text-primary transition-colors p-1"><span class="material-symbols-outlined text-[20px]">edit</span></button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Right Inspector -->
+<aside class="w-[600px] h-full bg-surface-container-lowest border-l border-outline-variant shadow-2xl flex flex-col flex-shrink-0 z-10">
+<!-- Inspector Header -->
+<div class="p-6 border-b border-outline-variant flex justify-between items-start bg-surface-container-low">
+<div>
+<div class="flex items-center gap-3 mb-2">
+<span class="font-mono-code text-mono-code text-primary-fixed-dim bg-primary/10 px-2 py-1 rounded">TPL-AST-001</span>
+<span class="px-2 py-1 rounded bg-surface-variant text-outline font-mono-code text-[12px]">V1.2.0</span>
+</div>
+<h2 class="font-title-md text-title-md text-on-surface">新资产入库通知</h2>
+</div>
+<button class="text-outline hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<!-- Inspector Content -->
+<div class="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-hide">
+<!-- Preview Area -->
+<div class="space-y-3">
+<div class="flex justify-between items-center">
+<h3 class="font-label-md text-label-md text-outline uppercase tracking-wider">HTML 预览</h3>
+<button class="text-primary hover:text-primary-fixed text-sm flex items-center gap-1 transition-colors">
+<span class="material-symbols-outlined text-[16px]">code</span> 源文件
+                            </button>
+</div>
+<div class="bg-surface-container-highest rounded-lg border border-outline-variant p-6 min-h-[300px] shadow-inner relative overflow-hidden">
+<!-- Faux Email Content -->
+<div class="bg-white text-gray-800 p-6 rounded-md shadow-sm font-sans">
+<h4 class="text-xl font-bold mb-4 text-[#0057cc] border-b pb-2 border-gray-200">UNIVIEW 资产入库通知</h4>
+<p class="mb-4">尊敬的 <strong><span class="text-blue-600 bg-blue-50 px-1 rounded">${user_name}</span></strong>，</p>
+<p class="mb-4">您申请的资产已完成入库登记，详情如下：</p>
+<table class="w-full text-sm text-left border-collapse border border-gray-200 mb-4">
+<tbody><tr class="bg-gray-50"><th class="border border-gray-200 p-2 w-1/3">资产编号</th><td class="border border-gray-200 p-2 font-mono text-blue-600 bg-blue-50"><strong>${asset_id}</strong></td></tr>
+<tr><th class="border border-gray-200 p-2">资产名称</th><td class="border border-gray-200 p-2 font-mono text-blue-600 bg-blue-50">${asset_name}</td></tr>
+<tr class="bg-gray-50"><th class="border border-gray-200 p-2">入库时间</th><td class="border border-gray-200 p-2 font-mono text-blue-600 bg-blue-50">${inbound_time}</td></tr>
+</tbody></table>
+<p class="text-xs text-gray-500 mt-6 pt-4 border-t border-gray-200">此邮件由系统自动发送，请勿回复。</p>
+</div>
+</div>
+</div>
+<!-- Variables List -->
+<div class="space-y-3">
+<h3 class="font-label-md text-label-md text-outline uppercase tracking-wider">变量占位符</h3>
+<div class="grid grid-cols-2 gap-3">
+<div class="bg-surface-container-low border border-outline-variant rounded p-3 flex justify-between items-center group hover:border-primary-fixed-dim transition-colors cursor-pointer">
+<span class="font-mono-code text-mono-code text-primary-fixed-dim">${user_name}</span>
+<span class="material-symbols-outlined text-[16px] text-outline opacity-0 group-hover:opacity-100 transition-opacity">content_copy</span>
+</div>
+<div class="bg-surface-container-low border border-outline-variant rounded p-3 flex justify-between items-center group hover:border-primary-fixed-dim transition-colors cursor-pointer">
+<span class="font-mono-code text-mono-code text-primary-fixed-dim">${asset_id}</span>
+<span class="material-symbols-outlined text-[16px] text-outline opacity-0 group-hover:opacity-100 transition-opacity">content_copy</span>
+</div>
+<div class="bg-surface-container-low border border-outline-variant rounded p-3 flex justify-between items-center group hover:border-primary-fixed-dim transition-colors cursor-pointer">
+<span class="font-mono-code text-mono-code text-primary-fixed-dim">${asset_name}</span>
+<span class="material-symbols-outlined text-[16px] text-outline opacity-0 group-hover:opacity-100 transition-opacity">content_copy</span>
+</div>
+<div class="bg-surface-container-low border border-outline-variant rounded p-3 flex justify-between items-center group hover:border-primary-fixed-dim transition-colors cursor-pointer">
+<span class="font-mono-code text-mono-code text-primary-fixed-dim">${inbound_time}</span>
+<span class="material-symbols-outlined text-[16px] text-outline opacity-0 group-hover:opacity-100 transition-opacity">content_copy</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Inspector Footer / Actions -->
+<div class="p-6 border-t border-outline-variant bg-surface-container-low flex justify-between items-center">
+<button class="text-outline hover:text-on-surface font-label-md flex items-center gap-2 transition-colors">
+<span class="material-symbols-outlined text-[18px]">history</span> 版本比对
+                    </button>
+<div class="flex gap-3">
+<button class="px-6 py-2 rounded-lg border border-outline-variant text-outline hover:bg-surface-container-highest transition-colors font-label-md">测试发送</button>
+<button class="px-6 py-2 rounded-lg bg-primary text-on-primary hover:bg-primary-fixed transition-colors font-label-md flex items-center gap-2 shadow-[0_0_8px_rgba(176,198,255,0.4)]">
+                            编辑模板
+                         </button>
+</div>
+</div>
+</aside>
+</main>
+</body></html>

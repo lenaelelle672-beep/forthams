@@ -10,7 +10,7 @@
  */
 
 import React, { Component, Suspense, useEffect, type ErrorInfo, type ReactNode } from 'react';
-import { createBrowserRouter, Navigate, Outlet, useLocation, useNavigate } from 'react-router';
+import { createBrowserRouter, Navigate, Outlet, useLocation, useNavigate, useParams } from 'react-router';
 import { useAuth, type AuthUser } from '@/context/AuthContext';
 import ForbiddenPage from '@/pages/ForbiddenPage';
 import { canAccessRoute } from '@/utils/routePermissions';
@@ -160,6 +160,12 @@ function PermissionGuard({ roles, children }: { roles: string[]; children: React
   }
 
   return <>{children}</>;
+}
+
+function SettingsV2Redirect() {
+  const { tab } = useParams();
+  const location = useLocation();
+  return <Navigate to={`/settings/${tab ?? 'mail-template'}${location.search}`} replace />;
 }
 
 // ── 布局 ──────────────────────────────────────────────────────────────────────
@@ -589,6 +595,8 @@ const router = createBrowserRouter([
           { path: 'settings/system', element: <Navigate to="/settings/sysconfig" replace /> },
           { path: 'settings/users', element: <Navigate to="/system/users" replace /> },
           { path: 'settings/departments', element: <Navigate to="/system/depts" replace /> },
+          { path: 'settings-v2', element: <SettingsV2Redirect /> },
+          { path: 'settings-v2/:tab', element: <SettingsV2Redirect /> },
           { path: 'settings/:tab', element: S(SettingsPage) },
 
           // 错误页

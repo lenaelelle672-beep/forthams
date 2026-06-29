@@ -3,6 +3,8 @@ import { describe, expect, it } from 'vitest';
 import { normalizeWorkflowDefinition, validateWorkflowDefinition } from '../../src/app/utils/workflowDefinition';
 import type { FlowDefinition } from '../../src/app/types/flow';
 
+const CYCLE_ERROR_MESSAGE = '流程存在循环路径，请检查节点连线';
+
 function validDefinition(): FlowDefinition {
   return {
     id: 'WF-ASSET_TRANSFER',
@@ -119,6 +121,21 @@ describe('workflow definition validation', () => {
     }
   });
 
+  it('keeps self-loop edges during normalization so validation can reject them', () => {
+    const normalized = normalizeWorkflowDefinition(
+      {
+        ...validDefinition(),
+        edges: [
+          ...validDefinition().edges,
+          { id: 'edge-self-loop', source: 'approval-1', target: 'approval-1', type: 'smoothstep' },
+        ],
+      },
+      'ASSET_TRANSFER',
+    );
+
+    expect(normalized.edges.some((edge) => edge.source === edge.target && edge.id === 'edge-self-loop')).toBe(true);
+  });
+
   it('accepts a complete workflow and rejects missing required fields or branches', () => {
     const normalized = normalizeWorkflowDefinition(validDefinition(), 'ASSET_TRANSFER');
     expect(validateWorkflowDefinition(normalized)).toEqual([]);
@@ -138,6 +155,41 @@ describe('workflow definition validation', () => {
 
     expect(validateWorkflowDefinition(invalid)).toContain('审批节点approval-1审批角色不能为空');
     expect(validateWorkflowDefinition(invalid)).toContain('条件节点condition-1必须同时配置满足和不满足两条分支');
+  });
+
+  it('rejects direct self-loop edges with a cycle error', () => {
+    const normalized = normalizeWorkflowDefinition(
+      {
+        ...validDefinition(),
+        edges: [
+          ...validDefinition().edges,
+          { id: 'edge-self-loop', source: 'approval-1', target: 'approval-1', type: 'smoothstep' },
+        ],
+      },
+      'ASSET_TRANSFER',
+    );
+
+    const errors = validateWorkflowDefinition(normalized);
+    expect(errors).toContain(CYCLE_ERROR_MESSAGE);
+    expect(errors.filter((error) => error === CYCLE_ERROR_MESSAGE)).toHaveLength(1);
+  });
+
+  it('rejects directed cycles across multiple nodes', () => {
+    const normalized = normalizeWorkflowDefinition(
+      {
+        ...validDefinition(),
+        edges: validDefinition().edges.map((edge) =>
+          edge.id === 'edge-condition-true'
+            ? { ...edge, target: 'approval-1' }
+            : edge,
+        ),
+      },
+      'ASSET_TRANSFER',
+    );
+
+    const errors = validateWorkflowDefinition(normalized);
+    expect(errors).toContain(CYCLE_ERROR_MESSAGE);
+    expect(errors.filter((error) => error === CYCLE_ERROR_MESSAGE)).toHaveLength(1);
   });
 
   it('rejects approval node with whitespace-only approverRole', () => {

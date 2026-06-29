@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+
+<html class="light" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>自定义字段集 - Future Settings OS</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-container": "#fffdff",
+                        "status-green": "#16A34A",
+                        "on-secondary-container": "#51617e",
+                        "inverse-primary": "#b0c6ff",
+                        "on-tertiary-fixed-variant": "#7b2f00",
+                        "surface-container-lowest": "#ffffff",
+                        "status-amber": "#F59E0B",
+                        "surface-container-high": "#e5e8ec",
+                        "on-primary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "surface-variant": "#e0e3e7",
+                        "on-primary-fixed": "#001945",
+                        "status-cyan": "#00A8D8",
+                        "on-error-container": "#93000a",
+                        "secondary-fixed": "#d5e3ff",
+                        "outline-variant": "#c2c6d7",
+                        "text-secondary": "#64748B",
+                        "primary-container": "#1d6ef2",
+                        "tertiary": "#9f3e00",
+                        "tertiary-fixed-dim": "#ffb695",
+                        "primary-fixed": "#d9e2ff",
+                        "on-tertiary-fixed": "#351000",
+                        "on-tertiary-container": "#fffdff",
+                        "on-tertiary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "secondary-container": "#ccddff",
+                        "surface-container": "#ebeef2",
+                        "inverse-on-surface": "#eef1f5",
+                        "text-primary": "#0F172A",
+                        "inverse-surface": "#2d3134",
+                        "secondary": "#4e5f7b",
+                        "background": "#f7fafe",
+                        "surface-dim": "#d7dade",
+                        "border-subtle": "#D7E2F0",
+                        "on-secondary": "#ffffff",
+                        "on-secondary-fixed-variant": "#374762",
+                        "primary-fixed-dim": "#b0c6ff",
+                        "surface-bright": "#f7fafe",
+                        "primary": "#0056c9",
+                        "status-red": "#DC2626",
+                        "on-background": "#181c1f",
+                        "tertiary-fixed": "#ffdbcc",
+                        "secondary-fixed-dim": "#b6c7e8",
+                        "surface": "#f7fafe",
+                        "on-surface": "#181c1f",
+                        "on-surface-variant": "#424654",
+                        "surface-container-low": "#f1f4f8",
+                        "surface-tint": "#0057cc",
+                        "outline": "#727786",
+                        "surface-container-highest": "#e0e3e7",
+                        "status-purple": "#7C3AED",
+                        "error": "#ba1a1a",
+                        "on-secondary-fixed": "#091c35",
+                        "tertiary-container": "#c75000",
+                        "on-primary-fixed-variant": "#00419c"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "container-gap": "20px",
+                        "sidebar-width": "196px",
+                        "topbar-height": "48px",
+                        "inspector-width": "320px",
+                        "card-padding": "16px",
+                        "grid-gutter": "12px"
+                    },
+                    "fontFamily": {
+                        "section-header": ["Inter"],
+                        "page-title": ["Inter"],
+                        "body-md": ["Inter"],
+                        "code-meta": ["JetBrains Mono"],
+                        "status-label": ["Inter"],
+                        "body-sm": ["Inter"]
+                    },
+                    "fontSize": {
+                        "section-header": ["14px", { "lineHeight": "20px", "fontWeight": "700" }],
+                        "page-title": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-md": ["13px", { "lineHeight": "20px", "fontWeight": "500" }],
+                        "code-meta": ["11px", { "lineHeight": "16px", "fontWeight": "400" }],
+                        "status-label": ["11px", { "lineHeight": "16px", "fontWeight": "700" }],
+                        "body-sm": ["12px", { "lineHeight": "18px", "fontWeight": "500" }]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-text-primary font-body-md antialiased min-h-screen">
+<!-- TopNavBar -->
+<nav class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-6 h-[56px] bg-[#051424] border-b border-[#1D6EF2]">
+<div class="flex items-center gap-8">
+<div class="font-page-title text-page-title font-black text-white tracking-tight flex items-center gap-2">
+                UNIVIEW
+                <span class="text-secondary-fixed-dim font-medium text-sm">| 系统设置中心</span></div>
+<div class="hidden md:flex items-center gap-6 h-full">
+<a class="font-body-md text-body-md text-secondary-fixed-dim font-medium hover:text-primary-fixed transition-colors duration-200 h-full flex items-center" href="#">流程平台</a>
+<a class="font-body-md text-body-md text-secondary-fixed-dim font-medium hover:text-primary-fixed transition-colors duration-200 h-full flex items-center" href="#">组织权限</a>
+<a class="font-body-md text-body-md text-primary-fixed border-b-2 border-primary-fixed pb-1 font-bold hover:text-primary-fixed transition-colors duration-200 h-full flex items-center mt-[2px]" href="#">基础资料</a>
+<a class="font-body-md text-body-md text-secondary-fixed-dim font-medium hover:text-primary-fixed transition-colors duration-200 h-full flex items-center" href="#">集成配置</a>
+<a class="font-body-md text-body-md text-secondary-fixed-dim font-medium hover:text-primary-fixed transition-colors duration-200 h-full flex items-center" href="#">消息与通知</a>
+<a class="font-body-md text-body-md text-secondary-fixed-dim font-medium hover:text-primary-fixed transition-colors duration-200 h-full flex items-center" href="#">系统参数</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+
+<button class="font-body-md text-body-md text-secondary-fixed-dim font-medium hover:text-primary-fixed transition-colors duration-200">
+                返回业务工作台
+            </button>
+<div class="flex items-center gap-2 text-secondary-fixed-dim pl-4 border-l border-on-secondary-fixed-variant">
+<div class="w-6 h-6 rounded-full bg-primary-container flex items-center justify-center text-on-primary text-xs font-bold">运</div>
+<span class="font-body-md text-body-md">运营管理员</span>
+</div>
+</div>
+</nav>
+<!-- SideNavBar & Main Content Wrapper -->
+<div class="flex h-screen pt-[56px]">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-[56px] w-[240px] h-[calc(100vh-56px)] bg-surface-container-lowest dark:bg-inverse-surface border-r border-outline-variant dark:border-outline flex flex-col z-40">
+<div class="p-6 border-b border-border-subtle shrink-0">
+<h2 class="font-section-header text-section-header font-bold text-on-surface">系统参数</h2>
+<p class="font-code-meta text-code-meta text-text-secondary mt-1 tracking-wider uppercase">SYSTEM PARAMETERS</p>
+</div>
+<div class="flex-1 overflow-y-auto p-4 flex flex-col gap-1">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors group" href="#">
+<span class="material-symbols-outlined text-[20px] text-outline group-hover:text-primary transition-colors">category</span>
+<span class="font-body-sm text-body-sm">资产分类</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors group" href="#">
+<span class="material-symbols-outlined text-[20px] text-outline group-hover:text-primary transition-colors">pin</span>
+<span class="font-body-sm text-body-sm">编号规则</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors group" href="#">
+<span class="material-symbols-outlined text-[20px] text-outline group-hover:text-primary transition-colors">location_on</span>
+<span class="font-body-sm text-body-sm">位置管理</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors group" href="#">
+<span class="material-symbols-outlined text-[20px] text-outline group-hover:text-primary transition-colors">storefront</span>
+<span class="font-body-sm text-body-sm">供应商管理</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors group" href="#">
+<span class="material-symbols-outlined text-[20px] text-outline group-hover:text-primary transition-colors">input</span>
+<span class="font-body-sm text-body-sm">自定义字段</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary-container text-on-primary-container font-bold shadow-sm translate-x-1 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined text-[20px] text-on-primary-container">format_list_bulleted</span>
+<span class="font-body-sm text-body-sm">自定义字段集</span>
+</a>
+</div>
+<div class="p-4 border-t border-border-subtle shrink-0 flex flex-col gap-1">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">settings</span>
+<span class="font-body-sm text-body-sm">设置</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">help</span>
+<span class="font-body-sm text-body-sm">帮助</span>
+</a>
+</div>
+</aside>
+<!-- Main Workspace -->
+<main class="ml-[240px] flex-1 bg-surface-bright overflow-y-auto">
+<div class="max-w-[1586px] mx-auto p-6 flex gap-6">
+<!-- Center Column -->
+<div class="flex-1 flex flex-col gap-6">
+<!-- Page Header -->
+<header class="flex justify-between items-end pb-4 border-b border-border-subtle"><div>
+<h1 class="font-page-title text-page-title text-text-primary">自定义字段集配置矩阵</h1>
+<p class="font-body-sm text-body-sm text-text-secondary mt-1">管理各业务场景下的自定义字段展示权重、必填项规则及渲染顺序。</p>
+</div>
+<div class="flex gap-3">
+<button class="px-4 py-2 rounded border border-border-subtle bg-surface-container-lowest text-text-primary font-body-md text-body-md hover:border-primary-container transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">history</span>
+                                配置审计
+                            </button>
+<button class="px-4 py-2 rounded bg-primary-container text-on-primary font-body-md text-body-md hover:bg-primary transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">save</span>
+                                立即发布
+                            </button>
+</div>
+</header>
+<!-- Content Grid -->
+<div class="grid grid-cols-1 gap-6">
+<!-- Matrix Card -->
+<div class="bg-surface-container-lowest border border-border-subtle rounded-xl shadow-sm flex flex-col overflow-hidden">
+<div class="p-4 border-b border-border-subtle bg-surface-container-low flex justify-between items-center">
+<h3 class="font-section-header text-section-header text-text-primary flex items-center gap-2">
+<span class="material-symbols-outlined text-[20px] text-primary-container">grid_on</span>
+                                    设备台账场景
+                                </h3>
+<span class="px-2 py-1 bg-secondary-container text-on-secondary-container rounded font-status-label text-status-label">SYS_EQ_MGT</span>
+</div>
+<div class="p-4">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b border-border-subtle font-body-sm text-body-sm text-text-secondary">
+<th class="pb-3 font-medium w-8">#</th>
+<th class="pb-3 font-medium pl-2">字段键名</th>
+<th class="pb-3 font-medium">显示名称</th>
+<th class="pb-3 font-medium">数据类型</th>
+<th class="pb-3 font-medium">展示组</th>
+<th class="pb-3 font-medium text-center">状态</th>
+</tr>
+</thead>
+<tbody class="font-body-md text-body-md">
+<tr class="border-b border-surface-container-highest hover:bg-surface-container-low transition-colors group">
+<td class="py-3 text-text-secondary cursor-move">
+<span class="material-symbols-outlined text-[16px]">drag_indicator</span>
+</td>
+<td class="py-3 pl-2 font-code-meta text-code-meta">ext_warranty_date</td>
+<td class="py-3 text-text-primary">延保到期日</td>
+<td class="py-3">
+<span class="inline-flex items-center gap-1 text-secondary">
+<span class="material-symbols-outlined text-[16px]">calendar_today</span>
+                                                    Date
+                                                </span>
+</td>
+<td class="py-3">基础信息</td>
+<td class="py-3 text-center">
+<div class="w-8 h-4 bg-primary-container rounded-full relative mx-auto">
+<div class="w-3 h-3 bg-white rounded-full absolute right-0.5 top-0.5"></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+<!-- Inspector Panel (Right) -->
+<aside class="w-[320px] shrink-0 flex flex-col gap-4">
+<!-- Preview Card -->
+<div class="bg-surface-container-lowest border border-border-subtle rounded-xl p-4 shadow-sm relative overflow-hidden group">
+<div class="absolute inset-0 bg-primary-container/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<h4 class="font-section-header text-section-header text-text-primary border-b border-border-subtle pb-2 mb-3">展示权重与排序预览</h4>
+<div class="space-y-3 relative z-10">
+<div class="p-3 border border-border-subtle rounded-lg bg-surface-bright flex items-center gap-3">
+<div class="w-6 h-6 rounded-full bg-surface-container-high flex items-center justify-center font-status-label text-status-label text-text-secondary">1</div>
+<div class="flex-1">
+<div class="font-body-sm text-body-sm text-text-primary font-medium">设备识别码</div>
+<div class="font-code-meta text-code-meta text-text-secondary text-[10px]">STRING(32) • 必填</div>
+</div>
+</div>
+</div>
+</div>
+</aside>
+</div>
+</main>
+</div>
+</body></html>

@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+
+<html class="light" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>审批规则 - 流程平台 - Future Settings OS</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;family=JetBrains+Mono:wght@400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "status-cyan": "#00A8D8",
+                        "primary-fixed": "#d9e2ff",
+                        "surface-container": "#ebeef2",
+                        "secondary-fixed-dim": "#b6c7e8",
+                        "secondary-fixed": "#d5e3ff",
+                        "on-primary-fixed": "#001945",
+                        "tertiary-container": "#c75000",
+                        "tertiary": "#9f3e00",
+                        "outline": "#727786",
+                        "on-secondary-fixed-variant": "#374762",
+                        "on-error-container": "#93000a",
+                        "inverse-on-surface": "#eef1f5",
+                        "surface-container-highest": "#e0e3e7",
+                        "primary-fixed-dim": "#b0c6ff",
+                        "background": "#f7fafe",
+                        "status-green": "#16A34A",
+                        "secondary": "#4e5f7b",
+                        "status-purple": "#7C3AED",
+                        "surface-bright": "#f7fafe",
+                        "on-primary-container": "#fffdff",
+                        "primary-container": "#1d6ef2",
+                        "surface-container-low": "#f1f4f8",
+                        "error": "#ba1a1a",
+                        "inverse-primary": "#b0c6ff",
+                        "border-subtle": "#D7E2F0",
+                        "on-tertiary-fixed": "#351000",
+                        "on-primary-fixed-variant": "#00419c",
+                        "on-secondary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "surface": "#f7fafe",
+                        "surface-variant": "#e0e3e7",
+                        "text-secondary": "#64748B",
+                        "outline-variant": "#c2c6d7",
+                        "on-secondary-fixed": "#091c35",
+                        "surface-tint": "#0057cc",
+                        "surface-container-high": "#e5e8ec",
+                        "error-container": "#ffdad6",
+                        "surface-dim": "#d7dade",
+                        "status-red": "#DC2626",
+                        "on-secondary-container": "#51617e",
+                        "secondary-container": "#ccddff",
+                        "inverse-surface": "#2d3134",
+                        "on-tertiary": "#ffffff",
+                        "on-surface": "#181c1f",
+                        "on-primary": "#ffffff",
+                        "status-amber": "#F59E0B",
+                        "primary": "#0056c9",
+                        "tertiary-fixed": "#ffdbcc",
+                        "on-tertiary-container": "#fffdff",
+                        "on-tertiary-fixed-variant": "#7b2f00",
+                        "tertiary-fixed-dim": "#ffb695",
+                        "on-background": "#181c1f",
+                        "text-primary": "#0F172A",
+                        "on-surface-variant": "#424654"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "topbar-height": "48px",
+                        "sidebar-width": "196px",
+                        "grid-gutter": "12px",
+                        "inspector-width": "320px",
+                        "container-gap": "20px",
+                        "card-padding": "16px"
+                    },
+                    "fontFamily": {
+                        "body-sm": ["Inter"],
+                        "code-meta": ["JetBrains Mono"],
+                        "section-header": ["Inter"],
+                        "page-title": ["Inter"],
+                        "status-label": ["Inter"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-sm": ["12px", { "lineHeight": "18px", "fontWeight": "500" }],
+                        "code-meta": ["11px", { "lineHeight": "16px", "fontWeight": "400" }],
+                        "section-header": ["14px", { "lineHeight": "20px", "fontWeight": "700" }],
+                        "page-title": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "status-label": ["11px", { "lineHeight": "16px", "fontWeight": "700" }],
+                        "body-md": ["13px", { "lineHeight": "20px", "fontWeight": "500" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 3px; }
+        .custom-scrollbar:hover::-webkit-scrollbar-thumb { background-color: #94a3b8; }
+    </style>
+</head>
+<body class="bg-background text-text-primary font-body-sm text-body-sm overflow-hidden h-screen w-screen flex flex-col">
+<!-- Top Navigation (Shell Override) -->
+<header class="fixed top-0 left-0 w-full h-[56px] bg-[#051424] border-b border-[#1D6EF2] z-50 flex justify-between items-center px-6">
+<div class="flex items-center gap-8">
+<div class="font-page-title text-page-title text-white tracking-tight flex items-center gap-2">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">widgets</span>
+                UNIVIEW | 系统设置中心
+            </div><nav class="hidden md:flex items-center h-full gap-1">
+<a class="h-[56px] flex items-center px-4 text-white border-b-2 border-primary-container font-bold transition-colors" href="#">流程平台</a>
+<a class="h-[56px] flex items-center px-4 text-gray-400 hover:text-white transition-colors" href="#">组织权限</a>
+<a class="h-[56px] flex items-center px-4 text-gray-400 hover:text-white transition-colors" href="#">基础资料</a>
+<a class="h-[56px] flex items-center px-4 text-gray-400 hover:text-white transition-colors" href="#">集成配置</a>
+<a class="h-[56px] flex items-center px-4 text-gray-400 hover:text-white transition-colors" href="#">消息与通知</a>
+<a class="h-[56px] flex items-center px-4 text-gray-400 hover:text-white transition-colors" href="#">系统参数</a>
+</nav>
+</div>
+<div class="flex items-center gap-4 text-gray-300">
+
+<button class="flex items-center gap-1 hover:text-white transition-colors">
+<span class="material-symbols-outlined text-[18px]">reply</span> 返回业务工作台
+            </button>
+<div class="flex items-center gap-2 ml-4 pl-4 border-l border-gray-700 cursor-pointer hover:text-white transition-colors">
+<div class="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface font-bold">运</div>
+<span>运营管理员</span>
+<span class="material-symbols-outlined text-[16px]">arrow_drop_down</span>
+</div>
+</div>
+</header>
+<div class="flex flex-1 mt-[56px] h-[calc(100vh-56px)] overflow-hidden">
+<!-- Sidebar Navigation (Shell Override) -->
+<aside class="fixed left-0 top-[56px] w-[240px] h-full bg-surface-container-lowest border-r border-border-subtle z-40 flex flex-col pt-4">
+<nav class="flex-1 overflow-y-auto custom-scrollbar px-3 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 text-text-secondary hover:bg-surface-container-low rounded-DEFAULT transition-all" href="#">
+<span class="material-symbols-outlined">dashboard</span> 导航控制台
+                </a>
+<a class="flex items-center gap-3 px-3 py-2 text-text-secondary hover:bg-surface-container-low rounded-DEFAULT transition-all" href="#">
+<span class="material-symbols-outlined">settings</span> 设置中心
+                </a>
+<a class="flex items-center gap-3 px-3 py-2 text-text-secondary hover:bg-surface-container-low rounded-DEFAULT transition-all" href="#">
+<span class="material-symbols-outlined">monitoring</span> 运行监测
+                </a>
+<a class="flex items-center gap-3 px-3 py-2 text-text-secondary hover:bg-surface-container-low rounded-DEFAULT transition-all" href="#">
+<span class="material-symbols-outlined">account_tree</span> 流程设计器
+                </a>
+<a class="flex items-center gap-3 px-3 py-2 text-text-secondary hover:bg-surface-container-low rounded-DEFAULT transition-all" href="#">
+<span class="material-symbols-outlined">dynamic_form</span> 表单配置
+                </a>
+<a class="flex items-center gap-3 px-3 py-2 text-text-secondary hover:bg-surface-container-low rounded-DEFAULT transition-all" href="#">
+<span class="material-symbols-outlined">database</span> 表单存储
+                </a>
+<a class="flex items-center gap-3 px-3 py-2 text-primary bg-primary/10 font-bold border-l-2 border-primary transition-all" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">rule</span> 审批规则
+                </a>
+<a class="flex items-center gap-3 px-3 py-2 text-text-secondary hover:bg-surface-container-low rounded-DEFAULT transition-all" href="#">
+<span class="material-symbols-outlined">format_list_bulleted</span> 待办字段配置
+                </a>
+<a class="flex items-center gap-3 px-3 py-2 text-text-secondary hover:bg-surface-container-low rounded-DEFAULT transition-all" href="#">
+<span class="material-symbols-outlined">timer</span> SLA 配置
+                </a>
+</nav>
+</aside>
+<!-- Main Workspace -->
+<main class="flex-1 ml-[240px] bg-background overflow-y-auto custom-scrollbar p-6">
+<!-- Page Header -->
+<div class="flex justify-between items-center mb-6">
+<div>
+<h1 class="font-page-title text-page-title text-text-primary">审批规则 (Approval Rules)</h1>
+<p class="text-text-secondary mt-1">Configure automated routing and validation rules for process flows.</p>
+</div>
+<div class="flex gap-3">
+<button class="px-4 py-2 bg-surface-container-lowest border border-border-subtle text-text-primary rounded-DEFAULT hover:border-primary transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">upload</span> Import Rules
+                    </button>
+<button class="px-4 py-2 bg-primary-container text-white rounded-DEFAULT hover:opacity-90 transition-opacity shadow-sm flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">add</span> Create Rule
+                    </button>
+</div>
+</div>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-12 gap-5">
+<!-- Filters / Search (Col 1-12) -->
+<div class="col-span-12 bg-surface-container-lowest border border-border-subtle rounded-lg p-4 flex gap-4 items-end">
+<div class="flex-1">
+<label class="block text-text-secondary mb-1">Rule Name / Code</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-2 text-text-secondary">search</span>
+<input class="w-full pl-10 pr-4 py-2 border border-border-subtle rounded-DEFAULT bg-background focus:outline-none focus:border-primary font-code-meta text-code-meta" placeholder="Search rules..." type="text"/>
+</div>
+</div>
+<div class="w-64">
+<label class="block text-text-secondary mb-1">Process Type</label>
+<select class="w-full px-3 py-2 border border-border-subtle rounded-DEFAULT bg-background focus:outline-none focus:border-primary appearance-none">
+<option>All Types</option>
+<option>Financial Approval</option>
+<option>HR Request</option>
+</select>
+</div>
+<button class="px-6 py-2 bg-surface-container-lowest border border-border-subtle rounded-DEFAULT hover:bg-surface-container-low transition-colors">
+                        Reset
+                    </button>
+</div>
+<!-- Rules List (Col 1-8) -->
+<div class="col-span-12 xl:col-span-8 bg-surface-container-lowest border border-border-subtle rounded-lg flex flex-col h-[600px]">
+<div class="p-4 border-b border-border-subtle flex justify-between items-center bg-surface-container-low/50">
+<h2 class="font-section-header text-section-header">Active Rule Sets</h2>
+<span class="bg-primary/10 text-primary px-2 py-1 rounded text-xs font-bold">12 Total</span>
+</div>
+<div class="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-3">
+<!-- Rule Card 1 -->
+<div class="border border-status-amber rounded-DEFAULT p-4 hover:shadow-md transition-shadow cursor-pointer bg-background relative overflow-hidden group">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-status-amber"></div>
+<div class="flex justify-between items-start mb-2">
+<div>
+<h3 class="font-bold text-[14px]">High-Value Expense Routing (RULE-EXP-001)</h3>
+<p class="text-text-secondary font-code-meta text-code-meta mt-1">IF amount &gt; 10000 THEN require_vp_approval</p>
+</div>
+<span class="px-2 py-1 bg-status-amber/10 text-status-amber border border-status-amber/20 rounded font-status-label text-status-label">Review Required</span>
+</div>
+<div class="flex gap-4 mt-4 text-text-secondary">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">account_tree</span> Expense Process</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">update</span> Modified: 2 hours ago</span>
+</div>
+</div>
+<!-- Rule Card 2 -->
+<div class="border border-border-subtle rounded-DEFAULT p-4 hover:border-primary transition-colors cursor-pointer bg-background relative overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-status-green"></div>
+<div class="flex justify-between items-start mb-2">
+<div>
+<h3 class="font-bold text-[14px]">Standard Leave Auto-Approve (RULE-HR-042)</h3>
+<p class="text-text-secondary font-code-meta text-code-meta mt-1">IF duration &lt;= 2 AND type == 'Annual' THEN auto_approve</p>
+</div>
+<span class="px-2 py-1 bg-status-green/10 text-status-green border border-status-green/20 rounded font-status-label text-status-label">Active</span>
+</div>
+<div class="flex gap-4 mt-4 text-text-secondary">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">account_tree</span> HR Leave Process</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">update</span> Modified: 3 days ago</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Inspector Panel (Col 9-12) -->
+<div class="col-span-12 xl:col-span-4 bg-surface-container-lowest border border-border-subtle rounded-lg flex flex-col h-[600px] shadow-[0_0_15px_rgba(29,110,242,0.05)]">
+<div class="p-4 border-b border-border-subtle flex justify-between items-center">
+<h2 class="font-section-header text-section-header flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">info</span> Rule Inspector
+                        </h2>
+<button class="text-text-secondary hover:text-primary"><span class="material-symbols-outlined">close</span></button>
+</div>
+<div class="flex-1 overflow-y-auto custom-scrollbar p-4">
+<div class="mb-6">
+<h3 class="text-text-secondary mb-2 uppercase tracking-wider text-[10px] font-bold">Selected Rule</h3>
+<div class="font-code-meta text-code-meta text-primary bg-primary/5 p-2 border border-primary/20 rounded">RULE-EXP-001</div>
+</div>
+<div class="space-y-4">
+<div>
+<label class="text-text-secondary text-[11px] block mb-1">Conditions (AND)</label>
+<div class="bg-surface-container-low p-3 rounded border border-border-subtle font-code-meta text-code-meta space-y-2">
+<div class="flex justify-between items-center">
+<span>expense.amount &gt; 10000</span>
+<span class="material-symbols-outlined text-[14px] text-status-amber">warning</span>
+</div>
+<div class="flex justify-between items-center">
+<span>expense.department == 'IT'</span>
+<span class="material-symbols-outlined text-[14px] text-status-green">check_circle</span>
+</div>
+</div>
+</div>
+<div>
+<label class="text-text-secondary text-[11px] block mb-1">Actions</label>
+<div class="bg-surface-container-low p-3 rounded border border-border-subtle font-code-meta text-code-meta">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[14px] text-primary">add_moderator</span>
+<span>require_approval(role: 'VP_IT')</span>
+</div>
+</div>
+</div>
+</div>
+<!-- AI Assistant Box -->
+<div class="mt-6 bg-[#F5F8FC] border border-primary/20 rounded p-4 relative overflow-hidden">
+<div class="absolute -right-4 -top-4 text-primary/10">
+<span class="material-symbols-outlined text-6xl">smart_toy</span>
+</div>
+<h4 class="font-bold flex items-center gap-1 mb-2 text-primary">
+<span class="material-symbols-outlined text-[16px]">lightbulb</span> AI Suggestion
+                            </h4>
+<p class="text-text-secondary leading-relaxed">This rule overlaps with 'RULE-EXP-005'. Consider merging them to reduce evaluation latency.</p>
+<button class="mt-3 text-primary font-bold hover:underline">Review Conflict →</button>
+</div>
+</div>
+<div class="p-4 border-t border-border-subtle bg-surface-container-low/50 flex gap-2">
+<button class="flex-1 py-2 bg-surface-container-lowest border border-border-subtle rounded text-text-secondary hover:text-primary transition-colors">Edit</button>
+<button class="flex-1 py-2 bg-primary-container text-white rounded hover:opacity-90 transition-opacity">Deploy</button>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

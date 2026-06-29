@@ -473,10 +473,11 @@ export default function ApprovalDetailPage() {
   const [rejectReason, setRejectReason] = useState('');
 
   // ── 加载审批详情 ──────────────────────────────────────────────────────────
-  const { data: detailRes, isLoading } = useQuery({
+  const { data: detailRes, isLoading, isError: isDetailError, error: detailError } = useQuery({
     queryKey: ['approvals', 'detail', approvalId],
     queryFn: () => getApprovalDetail(approvalId),
     enabled: !!approvalId,
+    retry: false,
     staleTime: 1000 * 15,
   });
 
@@ -687,6 +688,25 @@ export default function ApprovalDetailPage() {
           <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
           <p className="text-sm text-slate-500">{t('approval:list.loading')}</p>
         </div>
+      </div>
+    );
+  }
+
+  if (isDetailError) {
+    const message = detailError instanceof Error ? detailError.message : '请稍后重试';
+    return (
+      <div
+        data-testid="approval-detail-load-error"
+        className="flex flex-col items-center justify-center min-h-[60vh] gap-4 px-4 text-center"
+      >
+        <XCircle className="h-12 w-12 text-red-300" />
+        <div>
+          <p className="text-base font-semibold text-red-700">审批详情加载失败</p>
+          <p className="mt-1 max-w-md text-sm text-slate-500">{message}</p>
+        </div>
+        <Button variant="outline" onClick={() => navigate('/approvals')}>
+          <ArrowLeft className="mr-2 h-4 w-4" />返回审批列表
+        </Button>
       </div>
     );
   }
@@ -1086,7 +1106,10 @@ export default function ApprovalDetailPage() {
 
             {/* 快速操作卡 */}
             {showApprovalActions && (
-              <Card className="overflow-hidden rounded-2xl border-blue-200/60 shadow-sm shadow-blue-100/50">
+              <Card
+                data-testid="approval-action-area-current-assignee"
+                className="overflow-hidden rounded-2xl border-blue-200/60 shadow-sm shadow-blue-100/50"
+              >
                 <div className="border-b border-blue-100 bg-gradient-to-r from-blue-50 to-indigo-50 px-5 py-3">
                   <h3 className="text-sm font-bold text-blue-900">审批操作</h3>
                   <p className="mt-0.5 text-xs text-blue-600/80">此流程等待您的审批</p>
@@ -1120,7 +1143,10 @@ export default function ApprovalDetailPage() {
             )}
 
             {isActiveApproval && !showApprovalActions && (
-              <Card className="overflow-hidden rounded-2xl border-slate-200/80 shadow-sm">
+              <Card
+                data-testid="approval-action-area-no-current-step"
+                className="overflow-hidden rounded-2xl border-slate-200/80 shadow-sm"
+              >
                 <div className="p-5 text-center">
                   <ShieldCheck className="mx-auto h-8 w-8 text-slate-300" />
                   <p className="mt-2 text-sm font-bold text-slate-700">当前账号无需处理此节点</p>
@@ -1148,11 +1174,14 @@ export default function ApprovalDetailPage() {
 
             {/* 终态提示 */}
             {isTerminal && (
-              <Card className={`overflow-hidden rounded-2xl border shadow-sm ${
-                detail.status === 'APPROVED' ? 'border-emerald-200' :
-                detail.status === 'REJECTED' ? 'border-red-200' :
-                'border-slate-200'
-              }`}>
+              <Card
+                data-testid="approval-action-area-terminal"
+                className={`overflow-hidden rounded-2xl border shadow-sm ${
+                  detail.status === 'APPROVED' ? 'border-emerald-200' :
+                  detail.status === 'REJECTED' ? 'border-red-200' :
+                  'border-slate-200'
+                }`}
+              >
                 <div className={`px-5 py-4 text-center ${
                   detail.status === 'APPROVED' ? 'bg-emerald-50' :
                   detail.status === 'REJECTED' ? 'bg-red-50' :

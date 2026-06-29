@@ -40,6 +40,8 @@ describe('routePermissions', () => {
     expect(canAccessRoute('/settings/webhook', { roles: ['USER'], permissions: ['system:config:query'] })).toBe(true);
     expect(canAccessRoute('/settings/webhook', { roles: ['USER'], permissions: ['system:config:edit'] })).toBe(true);
     expect(canAccessRoute('/settings/webhook', { roles: ['USER'], permissions: ['system:config'] })).toBe(false);
+    expect(canAccessRoute('/settings-v2/mail-template', { roles: ['USER'], permissions: ['mail:template:list'] })).toBe(true);
+    expect(canAccessRoute('/settings-v2/mail-template', { roles: ['USER'], permissions: ['system:config:query'] })).toBe(false);
   });
 
   it('requires specific disposal action permissions for action entry routes', () => {

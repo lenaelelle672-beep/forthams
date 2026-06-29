@@ -10,7 +10,7 @@
  */
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useParams, useNavigate } from 'react-router';
+import { Navigate, useParams, useNavigate } from 'react-router';
 import {
   Activity,
   AlertTriangle,
@@ -138,6 +138,19 @@ const TAB_COMPONENTS: Record<TabKey, React.ComponentType> = {
   'mail-log':       MailLogTab,
   'webhook':        WebhookConfigTab,
   'sla-config':     SlaConfigTab,
+};
+
+const SETTINGS_WORKBENCH_MENU_BY_TAB: Record<TabKey, string> = {
+  sysconfig: 'system-base-params',
+  numbering: 'system-numbering-rules',
+  'notif-pref': 'system-notification-preferences',
+  'notif-template': 'system-notification-templates',
+  'notif-channel': 'system-notification-channels',
+  'notif-switch': 'system-workflow-notification-switch',
+  'mail-template': 'system-mail-templates',
+  'mail-log': 'system-mail-logs',
+  webhook: 'system-webhook-config',
+  'sla-config': 'system-sla-config',
 };
 
 const GATE_STYLES: Record<GateState, { icon: string; badge: string; label: string }> = {
@@ -275,7 +288,11 @@ function copyRecentDraft(item: RecentSettingsOsItem): RecentSettingsOsDraft {
 // ─── 主页面组件 ──────────────────────────────────────────────────────────────
 
 export default function SettingsPage() {
-  return <SettingsOsWorkspace />;
+  const { tab } = useParams<{ tab?: string }>();
+  const activeTab = getValidTab(tab);
+  const menuId = SETTINGS_WORKBENCH_MENU_BY_TAB[activeTab] ?? 'system-flow-definition';
+
+  return <Navigate to={`/fixed-assets/workbench?menu=${menuId}`} replace />;
 }
 
 function SettingsOsWorkspace() {

@@ -220,7 +220,43 @@ test('真实后端：托管流程发布回读节点表单并发起审批', async
     await expect(previewRouteTarget).not.toContainText('/assets/transfer');
     await transferPreview.getByRole('button', { name: /去调拨/ }).click();
     await expect(page).toHaveURL(/\/disposals\/transfer\/new\?.*source=workbench.*menu=my-assets/, { timeout: 15_000 });
-    await expect(page.getByRole('heading', { name: /资产调拨申请|新建资产转移申请/ }).first()).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByRole('heading', { name: /资产转移申请/ }).first()).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByTestId('asset-transfer-workflow-status')).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByTestId('asset-transfer-assignee-preview')).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByTestId('asset-transfer-action-area')).toBeVisible({ timeout: 15_000 });
+    await test.info().attach('asset-transfer-form-full-page', {
+      body: await page.screenshot({ fullPage: true }),
+      contentType: 'image/png',
+    });
+    await test.info().attach('asset-transfer-form-workflow-status', {
+      body: await page.getByTestId('asset-transfer-workflow-status').screenshot(),
+      contentType: 'image/png',
+    });
+    await test.info().attach('asset-transfer-form-assignee-preview', {
+      body: await page.getByTestId('asset-transfer-assignee-preview').screenshot(),
+      contentType: 'image/png',
+    });
+
+    const originalFormViewport = page.viewportSize() ?? { width: 1280, height: 720 };
+    await page.setViewportSize({ width: 390, height: 844 });
+    try {
+      await expect(page.getByRole('heading', { name: /资产转移申请/ }).first()).toBeVisible({ timeout: 15_000 });
+      await expect(page.getByTestId('asset-transfer-workflow-status')).toBeVisible({ timeout: 15_000 });
+      await expect(page.getByTestId('asset-transfer-assignee-preview')).toBeVisible({ timeout: 15_000 });
+      const mobileActionArea = page.getByTestId('asset-transfer-action-area');
+      await mobileActionArea.scrollIntoViewIfNeeded();
+      await expect(mobileActionArea).toBeVisible({ timeout: 15_000 });
+      await test.info().attach('asset-transfer-form-mobile-full-page', {
+        body: await page.screenshot({ fullPage: true }),
+        contentType: 'image/png',
+      });
+      await test.info().attach('asset-transfer-form-mobile-action-area', {
+        body: await mobileActionArea.screenshot(),
+        contentType: 'image/png',
+      });
+    } finally {
+      await page.setViewportSize(originalFormViewport);
+    }
 
     await page.route(startAvailabilityRoutePattern, async (route) => {
       await route.fulfill({
@@ -622,6 +658,31 @@ test('真实后端：资产转移四审批节点停在第 3 步可回看历史�
     await expect(runtimeSummaryPanel).toContainText('待流转后确认');
     await expect(runtimeSummaryPanel.locator('a[href="#workflow-section-approval-4"]')).toContainText('四级审批');
     await expect(runtimeSummaryPanel).not.toContainText('指定用户 #');
+    await test.info().attach('asset-transfer-runtime-flow-chart-step-3', {
+      body: await runtimeFlowChart.screenshot(),
+      contentType: 'image/png',
+    });
+    await test.info().attach('asset-transfer-runtime-detail-page-step-3', {
+      body: await page.screenshot({ fullPage: true }),
+      contentType: 'image/png',
+    });
+    const originalRuntimeViewport = page.viewportSize() ?? { width: 1280, height: 720 };
+    await page.setViewportSize({ width: 390, height: 844 });
+    try {
+      await runtimeFlowChart.scrollIntoViewIfNeeded();
+      await expect(runtimeFlowChart).toBeVisible({ timeout: 15_000 });
+      await expect(runtimeFlowChart.getByTestId('approval-flow-node-state-current-step-3')).toBeVisible({ timeout: 15_000 });
+      await test.info().attach('asset-transfer-runtime-flow-chart-step-3-mobile', {
+        body: await runtimeFlowChart.screenshot(),
+        contentType: 'image/png',
+      });
+      await test.info().attach('asset-transfer-runtime-detail-page-step-3-mobile', {
+        body: await page.screenshot({ fullPage: true }),
+        contentType: 'image/png',
+      });
+    } finally {
+      await page.setViewportSize(originalRuntimeViewport);
+    }
 
     const firstSection = page.getByText(firstSectionName).locator('xpath=ancestor::details[1]');
     const secondSection = page.getByText(secondSectionName).locator('xpath=ancestor::details[1]');
@@ -666,7 +727,7 @@ test('真实后端：资产处置四类业务可打开对应流程设计器', as
   await loginThroughApi(page, request);
 
   const businessLinks = [
-    { path: '/disposals/transfer/new', title: /资产调拨申请|新建资产转移申请/ },
+    { path: '/disposals/transfer/new', title: /资产转移申请|资产调拨申请|新建资产转移申请/ },
     { path: '/disposals/clearance/new', title: /资产清退申请/ },
     { path: '/disposals/scrap/new', title: /资产报废转让电子流|资产报废/ },
     { path: '/compensation/new', title: /资产赔偿电子流|资产赔偿申请/ },

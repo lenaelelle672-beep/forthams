@@ -26,6 +26,7 @@ const NODE_TYPES = new Set<FlowNodeType>(['start', 'approval', 'task', 'cc', 'co
 const EXECUTABLE_NODE_TYPES = new Set<FlowNodeType>(['approval', 'task']);
 const CC_ROLE_PATTERN = /^[A-Za-z0-9_.:-]+$/;
 const CC_USER_ID_PATTERN = /^\d+$/;
+const CYCLE_ERROR_MESSAGE = '流程存在循环路径，请检查节点连线';
 
 function normalizeNode(node: FlowNode): FlowNode {
   const type = (node.type ?? node.data.type) as FlowNodeType;
@@ -51,7 +52,7 @@ export function isValidSimpleConditionExpression(value: unknown) {
 export function normalizeWorkflowDefinition(definition: FlowDefinition, businessType: string): WorkflowDefinitionPayload {
   const nodes = (Array.isArray(definition.nodes) ? definition.nodes : []).map(normalizeNode);
   const nodeIds = new Set(nodes.map((n) => n.id).filter(Boolean));
-  const edges = (Array.isArray(definition.edges) ? definition.edges : []).map(normalizeEdge).filter((e) => nodeIds.has(e.source) && nodeIds.has(e.target) && e.source !== e.target);
+  const edges = (Array.isArray(definition.edges) ? definition.edges : []).map(normalizeEdge).filter((e) => nodeIds.has(e.source) && nodeIds.has(e.target));
   return { ...definition, businessType, id: definition.id || `WF-${businessType}`, name: definition.name, description: definition.description, nodes, edges };
 }
 
@@ -62,6 +63,7 @@ export function validateWorkflowDefinition(definition: WorkflowDefinitionPayload
   const outgoing = new Map<string, number>();
   const condHandles = new Map<string, Set<string>>();
   const adj = new Map<string, string[]>();
+  let hasCycle = false;
 
   if (!text(definition.id)) errors.push('流程定义ID不能为空');
   if (!text(definition.name)) errors.push('流程名称不能为空');
@@ -148,6 +150,10 @@ export function validateWorkflowDefinition(definition: WorkflowDefinitionPayload
     if (!src || !tgt) continue;
     if (src.type === 'end') errors.push('结束节点不能作为连线来源');
     if (tgt.type === 'start') errors.push('开始节点不能作为连线目标');
+    if (edge.source === edge.target) {
+      hasCycle = true;
+      continue;
+    }
     incoming.set(edge.target, (incoming.get(edge.target) ?? 0) + 1);
     outgoing.set(edge.source, (outgoing.get(edge.source) ?? 0) + 1);
     adj.set(edge.source, [...(adj.get(edge.source) ?? []), edge.target]);
@@ -162,6 +168,27 @@ export function validateWorkflowDefinition(definition: WorkflowDefinitionPayload
       condHandles.set(src.id, hs);
     }
   }
+
+  const colors = new Map<string, 'visiting' | 'visited'>();
+  const visit = (nodeId: string): boolean => {
+    const color = colors.get(nodeId);
+    if (color === 'visiting') return true;
+    if (color === 'visited') return false;
+    colors.set(nodeId, 'visiting');
+    for (const next of adj.get(nodeId) ?? []) {
+      if (visit(next)) return true;
+    }
+    colors.set(nodeId, 'visited');
+    return false;
+  };
+
+  for (const node of definition.nodes) {
+    if (visit(node.id)) {
+      hasCycle = true;
+      break;
+    }
+  }
+  if (hasCycle) errors.push(CYCLE_ERROR_MESSAGE);
 
   for (const node of definition.nodes) {
     if (node.type !== 'start' && (incoming.get(node.id) ?? 0) === 0) errors.push(`节点${node.id}缺少入线`);

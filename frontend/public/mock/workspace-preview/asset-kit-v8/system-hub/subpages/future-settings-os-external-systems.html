@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>External System Integration - Future Settings OS</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              colors: {
+                "primary-container": "#1d6ef2",
+                "tertiary": "#ddb7ff",
+                "surface-container-low": "#0d1c2d",
+                "on-tertiary-fixed": "#2c0051",
+                "on-tertiary-container": "#fffdff",
+                "tertiary-fixed-dim": "#ddb7ff",
+                "surface-tint": "#b0c6ff",
+                "primary-fixed": "#d9e2ff",
+                "on-error-container": "#ffdad6",
+                "secondary-fixed": "#bfe9ff",
+                "outline-variant": "#424654",
+                "on-surface": "#d4e4fa",
+                "on-surface-variant": "#c2c6d7",
+                "on-secondary-fixed": "#001f2a",
+                "tertiary-container": "#9c49eb",
+                "on-primary-fixed-variant": "#00419c",
+                "surface-container-highest": "#273647",
+                "secondary-container": "#00a8d8",
+                "on-tertiary": "#490080",
+                "error-container": "#93000a",
+                "outline": "#8c90a0",
+                "inverse-on-surface": "#233143",
+                "error": "#ffb4ab",
+                "surface-container": "#122131",
+                "surface-dim": "#051424",
+                "on-tertiary-fixed-variant": "#6900b3",
+                "on-secondary-fixed-variant": "#004d65",
+                "inverse-primary": "#0057cc",
+                "on-secondary": "#003547",
+                "on-primary-container": "#fffdff",
+                "inverse-surface": "#d4e4fa",
+                "on-secondary-container": "#00384a",
+                "secondary": "#6bd2ff",
+                "background": "#051424",
+                "secondary-fixed-dim": "#6bd2ff",
+                "on-primary": "#002c6f",
+                "on-background": "#d4e4fa",
+                "tertiary-fixed": "#f0dbff",
+                "surface-container-high": "#1c2b3c",
+                "surface": "#051424",
+                "on-error": "#690005",
+                "surface-variant": "#273647",
+                "on-primary-fixed": "#001945",
+                "primary": "#b0c6ff",
+                "surface-container-lowest": "#010f1f",
+                "primary-fixed-dim": "#b0c6ff",
+                "surface-bright": "#2c3a4c"
+              },
+              borderRadius: {
+                DEFAULT: "0.125rem",
+                lg: "0.25rem",
+                xl: "0.5rem",
+                full: "0.75rem"
+              },
+              spacing: {
+                xl: "40px",
+                xs: "4px",
+                xxl: "64px",
+                "margin-desktop": "48px",
+                md: "16px",
+                "margin-mobile": "16px",
+                unit: "4px",
+                sm: "8px",
+                lg: "24px",
+                gutter: "24px",
+                "sidebar-width": "240px",
+                "topbar-height": "64px"
+              },
+              fontFamily: {
+                "title-md": ["Geist"],
+                "label-md": ["Geist"],
+                "body-lg": ["Geist"],
+                "display-lg": ["Geist"],
+                "headline-lg": ["Geist"],
+                "mono-code": ["JetBrains Mono"],
+                "headline-lg-mobile": ["Geist"],
+                "body-md": ["Geist"]
+              },
+              fontSize: {
+                "title-md": ["20px", { lineHeight: "28px", fontWeight: "600" }],
+                "label-md": ["12px", { lineHeight: "16px", letterSpacing: "0.05em", fontWeight: "500" }],
+                "body-lg": ["16px", { lineHeight: "24px", fontWeight: "400" }],
+                "display-lg": ["48px", { lineHeight: "56px", letterSpacing: "-0.02em", fontWeight: "700" }],
+                "headline-lg": ["32px", { lineHeight: "40px", letterSpacing: "-0.01em", fontWeight: "600" }],
+                "mono-code": ["13px", { lineHeight: "20px", fontWeight: "400" }],
+                "headline-lg-mobile": ["24px", { lineHeight: "32px", fontWeight: "600" }],
+                "body-md": ["14px", { lineHeight: "20px", fontWeight: "400" }]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+        body { background-color: #051424; color: #d4e4fa; font-family: 'Geist', sans-serif; }
+        .glass-panel { background: rgba(28, 43, 60, 0.8); backdrop-filter: blur(24px); border: 1px solid rgba(140, 144, 160, 0.2); }
+        .pulse-line { stroke-dasharray: 4; animation: dash 20s linear infinite; }
+        @keyframes dash { to { stroke-dashoffset: -100; } }
+        .grid-bg { background-image: linear-gradient(to right, rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.02) 1px, transparent 1px); background-size: 20px 20px; }
+
+        /* Layout */
+        .app-layout { display: flex; flex-direction: column; height: 100vh; overflow: hidden; padding-top: 56px; }
+        .app-body { display: grid; grid-template-columns: 240px 1fr 400px; flex: 1; overflow: hidden; }
+        .main-content { overflow-y: auto; overflow-x: hidden; }
+        .inspector-panel { overflow-y: auto; border-left: 1px solid #424654; }
+    </style>
+</head>
+<body class="text-body-md font-body-md h-screen w-full overflow-hidden bg-background">
+<!-- Header -->
+<header class="fixed top-0 left-0 w-full h-[56px] bg-[#051424] border-b border-[#1D6EF2] flex items-center justify-between px-4 z-50">
+<div class="flex items-center gap-6 h-full">
+<div class="flex items-center gap-3">
+<a class="text-on-surface hover:text-primary transition-colors flex items-center" href="http://localhost:5173/fixed-assets/workbench?menu=system-flow-definition">
+<span class="material-symbols-outlined text-[20px]">arrow_back</span>
+</a>
+<span class="font-title-md text-title-md text-on-surface flex items-center">UNIVIEW <span class="text-outline mx-2 text-lg font-light">|</span> 系统设置中心</span></div>
+<nav class="flex items-center gap-1 h-full">
+<a class="px-3 py-1.5 rounded-md text-body-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container-highest transition-colors" href="#">流程平台</a>
+<a class="px-3 py-1.5 rounded-md text-body-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container-highest transition-colors" href="#">组织权限</a>
+<a class="px-3 py-1.5 rounded-md text-body-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container-highest transition-colors" href="#">基础资料</a>
+<a class="px-3 h-full flex items-center text-body-md text-primary font-medium border-b-2 border-primary transition-colors" href="#">集成配置</a>
+<a class="px-3 py-1.5 rounded-md text-body-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container-highest transition-colors" href="#">消息与通知</a>
+<a class="px-3 py-1.5 rounded-md text-body-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container-highest transition-colors" href="#">系统参数</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<a class="text-on-surface-variant hover:text-on-surface transition-colors flex items-center gap-1 text-sm" href="#" title="导航中心">
+<span class="material-symbols-outlined">apps</span>
+</a>
+<a class="text-on-surface-variant hover:text-on-surface transition-colors flex items-center gap-1 text-sm" href="#" title="返回业务工作台">
+<span class="material-symbols-outlined">laptop_mac</span>
+</a>
+<div class="flex items-center gap-2 border-l border-surface-container-highest pl-4 ml-2">
+<div class="w-6 h-6 rounded-full bg-primary/20 text-primary flex items-center justify-center font-bold text-xs">
+                    运
+                </div>
+<span class="text-sm text-on-surface-variant">运营管理员</span>
+</div>
+</div>
+</header>
+<div class="app-layout">
+<div class="app-body">
+<!-- Sidebar -->
+<nav class="bg-surface-container-lowest border-r border-outline-variant flex flex-col p-4 z-40 relative h-full w-[240px]">
+<div class="flex-1 flex flex-col gap-1">
+<a class="text-primary font-bold bg-on-secondary-fixed-variant/30 rounded-lg p-3 flex items-center gap-3 transition-all duration-150" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">hub</span>
+                    外部系统配置
+                </a>
+<a class="text-on-surface-variant hover:text-on-surface hover:bg-surface-container-highest rounded-lg p-3 flex items-center gap-3 transition-all duration-150" href="#">
+<span class="material-symbols-outlined">api</span>
+                    接口配置
+                </a>
+<a class="text-on-surface-variant hover:text-on-surface hover:bg-surface-container-highest rounded-lg p-3 flex items-center gap-3 transition-all duration-150" href="#">
+<span class="material-symbols-outlined">schema</span>
+                    字段映射
+                </a>
+<a class="text-on-surface-variant hover:text-on-surface hover:bg-surface-container-highest rounded-lg p-3 flex items-center gap-3 transition-all duration-150" href="#">
+<span class="material-symbols-outlined">rule</span>
+                    同步规则
+                </a>
+<a class="text-on-surface-variant hover:text-on-surface hover:bg-surface-container-highest rounded-lg p-3 flex items-center gap-3 transition-all duration-150" href="#">
+<span class="material-symbols-outlined">webhook</span>
+                    Webhook 配置
+                </a>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="main-content bg-surface flex flex-col relative z-10">
+<!-- Header -->
+<header class="px-8 py-6 border-b border-surface-container-highest bg-surface-container-low/80 backdrop-blur sticky top-0 z-30 flex justify-between items-center">
+<div>
+<div class="flex items-center gap-2 text-on-surface-variant font-label-md text-label-md mb-1 uppercase tracking-wider">
+<span>系统设置中心</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span>集成配置</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="text-primary">外部系统配置</span>
+</div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface m-0 tracking-tight">集成拓扑与接口映射</h2>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2 bg-surface-container-high px-3 py-1.5 rounded border border-outline-variant/30">
+<span class="w-2 h-2 rounded-full bg-[#16A34A] shadow-[0_0_8px_#16A34A]"></span>
+<span class="font-label-md text-label-md text-on-surface">Systems Active</span>
+</div>
+<button class="bg-primary-container text-on-primary-container hover:bg-primary-container/90 px-4 py-2 rounded font-label-md text-label-md transition-colors shadow-[0_0_12px_rgba(29,110,242,0.3)]">
+                        Deploy Changes
+                    </button>
+</div>
+</header>
+<div class="p-8 flex flex-col gap-8">
+<!-- Topology Graph Area -->
+<section class="w-full bg-surface-container-low border border-surface-container-highest rounded-lg overflow-hidden relative" style="height: 400px;">
+<div class="absolute inset-0 grid-bg opacity-30 z-0"></div>
+<div class="absolute top-4 left-4 z-10 flex gap-2">
+<span class="bg-surface-container-high px-2 py-1 rounded font-label-md text-label-md text-on-surface-variant border border-outline-variant/50">Topology Map</span>
+</div>
+<!-- SVG SVG SVG -->
+<svg class="absolute inset-0 w-full h-full z-10" pointer-events="none">
+<!-- Lines -->
+<path d="M 250 200 C 400 200, 400 100, 600 100" fill="none" stroke="#424654" stroke-width="2"></path>
+<path class="pulse-line" d="M 250 200 C 400 200, 400 100, 600 100" fill="none" stroke="#1D6EF2" stroke-width="2"></path>
+<path d="M 250 200 C 400 200, 400 300, 600 300" fill="none" stroke="#424654" stroke-width="2"></path>
+<path d="M 600 100 C 750 100, 750 200, 900 200" fill="none" stroke="#424654" stroke-width="2"></path>
+<path d="M 600 300 C 750 300, 750 200, 900 200" fill="none" stroke="#424654" stroke-width="2"></path>
+</svg>
+<!-- Nodes -->
+<div class="absolute inset-0 z-20 pointer-events-auto">
+<!-- Hub -->
+<div class="absolute left-[150px] top-[160px] w-[180px] bg-surface-container-high border border-outline-variant p-4 rounded-lg shadow-lg hover:border-primary cursor-pointer transition-colors group">
+<div class="flex items-center gap-3 mb-2">
+<span class="material-symbols-outlined text-primary">hub</span>
+<span class="font-title-md text-title-md text-on-surface text-sm">Integration Hub</span>
+</div>
+<div class="font-label-md text-label-md text-on-surface-variant text-xs">Central Gateway</div>
+<div class="absolute -right-1 top-1/2 w-2 h-2 bg-primary rounded-full shadow-[0_0_8px_#1D6EF2]"></div>
+</div>
+<!-- Nodes Group 1 -->
+<div class="absolute left-[550px] top-[60px] w-[180px] bg-surface-container-high border border-outline-variant p-4 rounded-lg shadow-lg hover:border-primary cursor-pointer transition-colors group">
+<div class="flex items-center justify-between mb-2">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-secondary">database</span>
+<span class="font-title-md text-title-md text-on-surface text-sm">ERP Core</span>
+</div>
+<span class="w-2 h-2 rounded-full bg-[#16A34A] shadow-[0_0_5px_#16A34A]"></span>
+</div>
+<div class="font-label-md text-label-md text-on-surface-variant text-xs">v14.2.0 Syncing</div>
+</div>
+<div class="absolute left-[550px] top-[260px] w-[180px] bg-surface-container-high border border-outline-variant p-4 rounded-lg shadow-lg hover:border-primary cursor-pointer transition-colors group">
+<div class="flex items-center justify-between mb-2">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[#7C3AED]">account_balance</span>
+<span class="font-title-md text-title-md text-on-surface text-sm">Financial Sys</span>
+</div>
+<span class="w-2 h-2 rounded-full bg-[#F59E0B] shadow-[0_0_5px_#F59E0B]"></span>
+</div>
+<div class="font-label-md text-label-md text-on-surface-variant text-xs">Batch Pending</div>
+</div>
+<!-- Endpoint -->
+<div class="absolute left-[900px] top-[160px] w-[180px] bg-surface-container-high border border-outline-variant p-4 rounded-lg shadow-lg hover:border-primary cursor-pointer transition-colors group">
+<div class="flex items-center justify-between mb-2">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-tertiary">inventory_2</span>
+<span class="font-title-md text-title-md text-on-surface text-sm">Fixed Asset Ledger</span>
+</div>
+<span class="w-2 h-2 rounded-full bg-[#16A34A] shadow-[0_0_5px_#16A34A]"></span>
+</div>
+<div class="font-label-md text-label-md text-on-surface-variant text-xs">System of Record</div>
+</div>
+</div>
+</section>
+<!-- Interface Listing Table -->
+<section>
+<h3 class="font-title-md text-title-md text-on-surface mb-4 border-b border-surface-container-highest pb-2">Active Interfaces</h3>
+<div class="w-full bg-surface-container-lowest border border-surface-container-highest rounded">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low border-b border-surface-container-highest text-label-md font-label-md text-on-surface-variant">
+<th class="p-3 font-medium uppercase tracking-wider">Interface Name</th>
+<th class="p-3 font-medium uppercase tracking-wider">Target System</th>
+<th class="p-3 font-medium uppercase tracking-wider">Protocol</th>
+<th class="p-3 font-medium uppercase tracking-wider">Sync Rule</th>
+<th class="p-3 font-medium uppercase tracking-wider">Status</th>
+</tr>
+</thead>
+<tbody class="font-mono-code text-mono-code">
+<tr class="border-b border-surface-container-highest hover:bg-surface-container-high/50 transition-colors cursor-pointer bg-surface-container-high/20">
+<td class="p-3 text-on-surface">sync_asset_master</td>
+<td class="p-3 text-secondary">ERP Core</td>
+<td class="p-3 text-[#7C3AED]">REST (POST)</td>
+<td class="p-3 text-on-surface-variant">Real-time</td>
+<td class="p-3 flex items-center gap-2 text-[#16A34A]"><span class="w-1.5 h-1.5 rounded-full bg-[#16A34A]"></span> Active</td>
+</tr>
+<tr class="border-b border-surface-container-highest hover:bg-surface-container-high/50 transition-colors cursor-pointer">
+<td class="p-3 text-on-surface">push_depreciation_log</td>
+<td class="p-3 text-secondary">Financial Sys</td>
+<td class="p-3 text-[#7C3AED]">REST (PUT)</td>
+<td class="p-3 text-on-surface-variant">Batch (Nightly)</td>
+<td class="p-3 flex items-center gap-2 text-[#F59E0B]"><span class="w-1.5 h-1.5 rounded-full bg-[#F59E0B]"></span> Syncing</td>
+</tr>
+<tr class="hover:bg-surface-container-high/50 transition-colors cursor-pointer">
+<td class="p-3 text-on-surface">webhook_iot_telemetry</td>
+<td class="p-3 text-secondary">IoT Gateway</td>
+<td class="p-3 text-[#7C3AED]">Webhook</td>
+<td class="p-3 text-on-surface-variant">Real-time</td>
+<td class="p-3 flex items-center gap-2 text-[#DC2626]"><span class="w-1.5 h-1.5 rounded-full bg-[#DC2626]"></span> Blocked</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<!-- Field Mapping Matrix -->
+<section>
+<div class="flex justify-between items-end mb-4 border-b border-surface-container-highest pb-2">
+<h3 class="font-title-md text-title-md text-on-surface">Field Mapping Matrix: sync_asset_master</h3>
+<button class="bg-surface-container-low text-primary border border-primary/30 hover:bg-surface-container-high px-3 py-1.5 rounded font-label-md text-label-md transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">sync</span> Push Mapping
+                        </button>
+</div>
+<div class="grid grid-cols-[1fr_50px_1fr_1fr] gap-4 items-center bg-surface-container-low p-3 border-b border-surface-container-highest text-label-md font-label-md text-on-surface-variant uppercase tracking-wider">
+<div>Local Field (Hub)</div>
+<div></div>
+<div>Target Field (ERP)</div>
+<div>Transformation Logic</div>
+</div>
+<div class="flex flex-col">
+<!-- Row 1 -->
+<div class="grid grid-cols-[1fr_50px_1fr_1fr] gap-4 items-center p-3 border-b border-surface-container-highest hover:bg-surface-container-high/30 font-mono-code text-mono-code">
+<div class="bg-surface-container-lowest border border-outline-variant/50 p-2 rounded text-on-surface">asset_id</div>
+<div class="flex justify-center text-outline-variant"><span class="material-symbols-outlined">arrow_right_alt</span></div>
+<div class="bg-surface-container-lowest border border-outline-variant/50 p-2 rounded text-secondary">ERP_ASSET_NUM</div>
+<div class="text-on-surface-variant text-xs">Direct Map (String)</div>
+</div>
+<!-- Row 2 -->
+<div class="grid grid-cols-[1fr_50px_1fr_1fr] gap-4 items-center p-3 border-b border-surface-container-highest hover:bg-surface-container-high/30 font-mono-code text-mono-code">
+<div class="bg-surface-container-lowest border border-outline-variant/50 p-2 rounded text-on-surface">acquisition_date</div>
+<div class="flex justify-center text-outline-variant"><span class="material-symbols-outlined">arrow_right_alt</span></div>
+<div class="bg-surface-container-lowest border border-outline-variant/50 p-2 rounded text-secondary">ACQ_DT</div>
+<div class="text-[#F59E0B] text-xs">formatDate(ISO8601 -&gt; YYYYMMDD)</div>
+</div>
+<!-- Row 3 -->
+<div class="grid grid-cols-[1fr_50px_1fr_1fr] gap-4 items-center p-3 border-b border-surface-container-highest hover:bg-surface-container-high/30 font-mono-code text-mono-code">
+<div class="bg-surface-container-lowest border border-outline-variant/50 p-2 rounded text-on-surface">status_code</div>
+<div class="flex justify-center text-outline-variant"><span class="material-symbols-outlined">arrow_right_alt</span></div>
+<div class="bg-surface-container-lowest border border-outline-variant/50 p-2 rounded text-secondary">STATUS_FLAG</div>
+<div class="text-primary text-xs">lookupMap('status_matrix_v2')</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- Right Inspector (Glassmorphism) -->
+<aside class="inspector-panel glass-panel z-20 flex flex-col p-6 w-[400px]">
+<div class="flex justify-between items-center mb-6">
+<h3 class="font-title-md text-title-md text-on-surface">Interface Details</h3>
+<span class="material-symbols-outlined text-outline-variant hover:text-on-surface cursor-pointer">close</span>
+</div>
+<!-- Overview -->
+<div class="mb-8">
+<div class="text-label-md font-label-md text-on-surface-variant uppercase tracking-wider mb-3">Security &amp; Auth</div>
+<div class="bg-surface-container-lowest p-3 rounded border border-outline-variant/30 flex flex-col gap-2">
+<div class="flex justify-between text-sm">
+<span class="text-on-surface-variant">Method</span>
+<span class="font-mono-code text-secondary">OAuth 2.0 (Client Creds)</span>
+</div>
+<div class="flex justify-between text-sm border-t border-outline-variant/20 pt-2">
+<span class="text-on-surface-variant">Signature</span>
+<span class="font-mono-code text-on-surface">HMAC-SHA256</span>
+</div>
+</div>
+</div>
+<!-- Performance metrics -->
+<div class="mb-8">
+<div class="text-label-md font-label-md text-on-surface-variant uppercase tracking-wider mb-3">SLA Metrics (24h)</div>
+<div class="grid grid-cols-2 gap-3">
+<div class="bg-surface-container-lowest p-3 rounded border border-outline-variant/30">
+<div class="text-xs text-on-surface-variant mb-1">Uptime</div>
+<div class="font-headline-lg text-headline-lg text-[#16A34A]">99.98%</div>
+</div>
+<div class="bg-surface-container-lowest p-3 rounded border border-outline-variant/30">
+<div class="text-xs text-on-surface-variant mb-1">Avg Latency</div>
+<div class="font-headline-lg text-headline-lg text-on-surface">142<span class="text-sm text-outline-variant ml-1">ms</span></div>
+</div>
+</div>
+</div>
+<!-- Retry Strategy -->
+<div class="mb-8">
+<div class="text-label-md font-label-md text-on-surface-variant uppercase tracking-wider mb-3">Retry Policy</div>
+<div class="bg-surface-container-lowest p-3 rounded border border-outline-variant/30 text-sm flex flex-col gap-2">
+<div class="flex justify-between">
+<span class="text-on-surface-variant">Strategy</span>
+<span class="text-on-surface">Exponential Backoff</span>
+</div>
+<div class="flex justify-between border-t border-outline-variant/20 pt-2">
+<span class="text-on-surface-variant">Max Retries</span>
+<span class="font-mono-code text-secondary">5</span>
+</div>
+<div class="flex justify-between border-t border-outline-variant/20 pt-2">
+<span class="text-on-surface-variant">Base Delay</span>
+<span class="font-mono-code text-on-surface">2000ms</span>
+</div>
+</div>
+</div>
+<!-- Real-time Terminal Log -->
+<div class="mt-auto flex-1 flex flex-col">
+<div class="flex justify-between items-center mb-3">
+<div class="text-label-md font-label-md text-on-surface-variant uppercase tracking-wider">Real-time Diagnostics</div>
+<span class="w-2 h-2 rounded-full bg-[#16A34A] shadow-[0_0_5px_#16A34A] animate-pulse"></span>
+</div>
+<div class="bg-[#010f1f] border border-outline-variant/50 rounded p-3 flex-1 overflow-y-auto font-mono-code text-[11px] leading-relaxed text-outline-variant">
+<div class="text-[#16A34A] mb-2">&gt; tail -f /var/log/integration/erp_sync.log</div>
+<div class="mb-1"><span class="text-surface-variant">[14:32:01]</span> <span class="text-[#7C3AED]">POST</span> /api/v2/assets/sync <span class="text-[#16A34A]">200 OK</span> 145ms</div>
+<div class="mb-1 text-on-surface-variant pl-4">{"req_id": "8f92-a1", "processed": 42}</div>
+<div class="mb-1"><span class="text-surface-variant">[14:32:45]</span> <span class="text-[#7C3AED]">POST</span> /api/v2/assets/sync <span class="text-[#16A34A]">200 OK</span> 132ms</div>
+<div class="mb-1 text-on-surface-variant pl-4">{"req_id": "8f93-b2", "processed": 1}</div>
+<div class="mb-1"><span class="text-surface-variant">[14:35:10]</span> <span class="text-[#7C3AED]">POST</span> /api/v2/assets/sync <span class="text-[#F59E0B]">429 Ratelimit</span></div>
+<div class="mb-1 text-on-surface-variant pl-4">{"error": "Too many requests", "retry_after": 2000}</div>
+<div class="mb-1"><span class="text-surface-variant">[14:35:12]</span> <span class="text-secondary">INFO</span> Initiating exponential backoff (retry 1/5)</div>
+<div class="mb-1"><span class="text-surface-variant">[14:35:14]</span> <span class="text-[#7C3AED]">POST</span> /api/v2/assets/sync <span class="text-[#16A34A]">200 OK</span> 180ms</div>
+<div class="mb-1 text-on-surface-variant pl-4">{"req_id": "8f94-c3", "processed": 18}</div>
+</div>
+<button class="w-full mt-4 bg-surface-container-high border border-outline-variant/50 hover:bg-surface-container-highest hover:text-primary py-2 rounded font-label-md text-label-md text-on-surface transition-colors flex justify-center items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">terminal</span> Test Connection
+                </button>
+</div>
+</aside>
+</div>
+</div>
+</body></html>

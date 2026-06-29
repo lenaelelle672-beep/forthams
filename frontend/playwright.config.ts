@@ -2,6 +2,46 @@ import { defineConfig, devices } from '@playwright/test';
 
 const includeLegacyFlows = process.env.AMS_E2E_INCLUDE_LEGACY_FLOWS === 'true';
 const includeSerialLegacyFlows = process.env.AMS_E2E_INCLUDE_SERIAL_FLOWS === 'true';
+const includeDeviceMatrix = process.env.AMS_E2E_INCLUDE_DEVICE_MATRIX === 'true';
+
+const browserRegressionDeviceMatrixProjects = [
+  {
+    name: 'browser-regression-chromium',
+    testDir: './src/e2e',
+    testMatch: /workbench-platform-entry\.browser-regression-smoke\.spec\.ts/,
+    use: { ...devices['Desktop Chrome'] },
+  },
+  {
+    name: 'browser-regression-firefox',
+    testDir: './src/e2e',
+    testMatch: /workbench-platform-entry\.browser-regression-smoke\.spec\.ts/,
+    use: { ...devices['Desktop Firefox'] },
+  },
+  {
+    name: 'browser-regression-webkit',
+    testDir: './src/e2e',
+    testMatch: /workbench-platform-entry\.browser-regression-smoke\.spec\.ts/,
+    use: { ...devices['Desktop Safari'] },
+  },
+  {
+    name: 'browser-regression-mobile-safari',
+    testDir: './src/e2e',
+    testMatch: /workbench-platform-entry\.browser-regression-smoke\.spec\.ts/,
+    use: { ...devices['iPhone 14'] },
+  },
+  {
+    name: 'browser-regression-tablet-chrome',
+    testDir: './src/e2e',
+    testMatch: /workbench-platform-entry\.browser-regression-smoke\.spec\.ts/,
+    use: {
+      ...devices['Desktop Chrome'],
+      viewport: { width: 1024, height: 1366 },
+      deviceScaleFactor: 2,
+      hasTouch: true,
+      isMobile: true,
+    },
+  },
+];
 
 export default defineConfig({
   testDir: './e2e',
@@ -34,6 +74,7 @@ export default defineConfig({
       testMatch: /auth\.setup\.ts/,
       use: { ...devices['Desktop Chrome'] },
     },
+    ...(includeDeviceMatrix ? browserRegressionDeviceMatrixProjects : []),
     // 旧版真实后端 flows 依赖已过期 data-testid、固定数据和跨用例状态。
     // 默认 npm run e2e 只保留稳定 smoke 与登录 storageState 验证；
     // 需要专项排查旧 flows 时显式设置 AMS_E2E_INCLUDE_LEGACY_FLOWS=true。

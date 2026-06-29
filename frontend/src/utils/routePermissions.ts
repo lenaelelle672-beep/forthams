@@ -34,6 +34,8 @@ const ROUTE_PERMISSION_RULES: RoutePermissionRule[] = [
   { prefix: '/settings/mail-log', any: ['mail:log:list'] },
   { prefix: '/settings/webhook', any: ['system:config:query', 'system:config:edit'] },
   { prefix: '/settings', any: ['system:config', 'system:config:query'] },
+  { prefix: '/settings-v2/mail-template', any: ['mail:template:list'] },
+  { prefix: '/settings-v2', any: ['system:config', 'system:config:query'] },
   { exact: '/workflows', any: ['workflow:definition:query'] },
   { prefix: '/workflow-designer', any: ['workflow:definition:edit'] },
   { prefix: '/workflow-form', any: ['workflow:definition:query'] },

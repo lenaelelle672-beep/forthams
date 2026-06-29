@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>通知渠道 - UNIVIEW</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "error": "#ba1a1a",
+                        "inverse-primary": "#b0c6ff",
+                        "on-surface-variant": "#424654",
+                        "secondary": "#712ae2",
+                        "primary-fixed": "#d9e2ff",
+                        "outline-variant": "#c2c6d7",
+                        "secondary-fixed-dim": "#d2bbff",
+                        "tertiary-fixed": "#ffdbcc",
+                        "secondary-fixed": "#eaddff",
+                        "inverse-on-surface": "#eaf1ff",
+                        "secondary-container": "#8a4cfc",
+                        "on-tertiary-fixed": "#351000",
+                        "surface-dim": "#ccdbf2",
+                        "surface-container-high": "#dbe9ff",
+                        "primary-container": "#1d6ef2",
+                        "surface": "#f8f9ff",
+                        "on-tertiary-container": "#fffdff",
+                        "on-secondary": "#ffffff",
+                        "primary-fixed-dim": "#b0c6ff",
+                        "on-secondary-fixed": "#25005a",
+                        "on-secondary-fixed-variant": "#5a00c6",
+                        "tertiary": "#9f3e00",
+                        "primary": "#0056c9",
+                        "on-background": "#0e1c2d",
+                        "on-tertiary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "outline": "#727786",
+                        "on-tertiary-fixed-variant": "#7b2f00",
+                        "on-error-container": "#93000a",
+                        "surface-container": "#e5eeff",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-surface": "#233143",
+                        "on-surface": "#0e1c2d",
+                        "surface-variant": "#d5e4fa",
+                        "surface-container-low": "#eef4ff",
+                        "on-primary-fixed-variant": "#00419c",
+                        "on-primary": "#ffffff",
+                        "on-primary-fixed": "#001945",
+                        "surface-container-highest": "#d5e4fa",
+                        "error-container": "#ffdad6",
+                        "on-primary-container": "#fffdff",
+                        "tertiary-container": "#c75000",
+                        "background": "#f8f9ff",
+                        "surface-tint": "#0057cc",
+                        "tertiary-fixed-dim": "#ffb695",
+                        "surface-bright": "#f8f9ff",
+                        "on-secondary-container": "#fffbff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "stack_sm": "8px",
+                        "stack_md": "16px",
+                        "sidebar_width": "240px",
+                        "gutter": "16px",
+                        "inspector_width": "320px",
+                        "topbar_height": "56px",
+                        "container_padding": "24px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Geist"],
+                        "mono-code": ["JetBrains Mono"],
+                        "title-sm": ["Geist"],
+                        "label-caps": ["Geist"],
+                        "body-md": ["Geist"],
+                        "headline-md": ["Geist"],
+                        "body-sm": ["Geist"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                        "mono-code": ["13px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "title-sm": ["18px", {"lineHeight": "24px", "fontWeight": "500"}],
+                        "label-caps": ["11px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "body-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { background-color: #F5F8FC; }
+    </style>
+</head>
+<body class="font-body-md text-on-surface antialiased bg-[#F5F8FC] min-h-screen">
+<!-- TopNavBar -->
+<header class="fixed top-0 left-0 w-full z-50 h-[56px] flex justify-between items-center px-gutter border-b border-[#1D6EF2] bg-[#051424]">
+<div class="flex items-center gap-6 h-full">
+<span class="font-display-lg text-[20px] font-bold text-on-primary tracking-wide">UNIVIEW | 系统设置中心</span><nav class="hidden md:flex gap-6 h-full items-center ml-4">
+<a class="text-outline-variant font-body-md text-body-md hover:text-primary-fixed-dim transition-colors cursor-pointer" href="#">流程平台</a>
+<a class="text-outline-variant font-body-md text-body-md hover:text-primary-fixed-dim transition-colors cursor-pointer" href="#">组织权限</a>
+<a class="text-outline-variant font-body-md text-body-md hover:text-primary-fixed-dim transition-colors cursor-pointer" href="#">基础资料</a>
+<a class="text-outline-variant font-body-md text-body-md hover:text-primary-fixed-dim transition-colors cursor-pointer" href="#">集成配置</a>
+<a class="text-primary-fixed font-bold border-b-2 border-primary-fixed pb-1 font-body-md text-body-md hover:text-primary-fixed-dim transition-colors cursor-pointer h-full flex items-center mt-[2px]" href="#">消息与通知</a>
+<a class="text-outline-variant font-body-md text-body-md hover:text-primary-fixed-dim transition-colors cursor-pointer" href="#">系统参数</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+
+<button class="text-on-primary font-body-sm text-body-sm bg-transparent border border-outline-variant rounded px-3 py-1.5 hover:bg-inverse-surface transition-colors">
+            返回业务工作台
+        </button>
+<img alt="运营管理员" class="w-8 h-8 rounded-full object-cover border border-outline-variant cursor-pointer" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCN4FRMHOIesKzgsojx6_Ytd7j-hjulzbkJqPzkUIt0_Yxj0mnD2iUsAKdj6v-R3KSSSyofW_OIvu4KPjRyNCoeKZOuVLxZS2ESk6gnDfzuiLwGkMg8m4bUbi55TDlIA4ywNwX_-USXV5Px_D81FG4lr0FpBv4taPCOZEWWEQOd5t9Vwtgk_oS95PKHalc1pP8NZQzvFpoLR2CcAn9j0xMH0p61QdjbDHczeA7d-5o9i5YuimqI37INGxB_-vU-fhih28tVVFuQ_7pM"/>
+</div>
+</header>
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-[56px] w-sidebar_width h-[calc(100vh-56px)] border-r border-outline-variant flex flex-col py-stack_md bg-surface z-40">
+<div class="px-gutter mb-6">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded bg-primary-container text-on-primary flex items-center justify-center">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">notifications_active</span>
+</div>
+<div>
+<h2 class="font-title-sm text-title-sm font-bold text-on-surface">消息与通知</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">通知系统配置</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 overflow-y-auto">
+<ul class="flex flex-col">
+<li>
+<a class="flex items-center gap-3 px-gutter py-3 text-on-surface-variant font-body-md text-body-md hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">settings_input_component</span>
+                    邮件网关配置
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-gutter py-3 text-on-surface-variant font-body-md text-body-md hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">mail</span>
+                    流程邮件配置
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-gutter py-3 text-on-surface-variant font-body-md text-body-md hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">description</span>
+                    邮件模板
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-gutter py-3 text-on-surface-variant font-body-md text-body-md hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">history</span>
+                    邮件日志
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-gutter py-3 text-on-surface-variant font-body-md text-body-md hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">notifications_active</span>
+                    通知模板
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-gutter py-3 border-l-4 border-primary bg-primary-fixed/20 text-primary font-bold font-body-md text-body-md hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">settings_ethernet</span>
+                    通知渠道
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-gutter py-3 text-on-surface-variant font-body-md text-body-md hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">tune</span>
+                    通知偏好
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-gutter py-3 text-on-surface-variant font-body-md text-body-md hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">toggle_on</span>
+                    流程通知开关
+                </a>
+</li>
+</ul>
+</nav>
+</aside>
+<!-- Main Content Area with Inspector -->
+<main class="ml-[240px] mt-[56px] min-h-[calc(100vh-56px)] flex">
+<!-- Canvas -->
+<div class="flex-1 p-container_padding flex flex-col gap-6 mr-[320px]">
+<!-- Page Header -->
+<div class="flex justify-between items-center">
+<div>
+<h1 class="font-headline-md text-headline-md text-on-surface">通知渠道管理</h1>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">配置和管理系统消息下发的通道链路</p>
+</div>
+<button class="bg-[#1D6EF2] text-white font-body-sm text-body-sm font-medium px-4 py-2 rounded-[6px] hover:bg-primary transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                新建渠道
+            </button>
+</div>
+<!-- Channels Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+<!-- Card 1 -->
+<div class="bg-white rounded-[6px] border border-[#E2E8F0] p-5 shadow-[0_1px_3px_rgba(0,0,0,0.05)] hover:bg-[#F1F5F9] transition-colors cursor-pointer group">
+<div class="flex justify-between items-start mb-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded bg-[#EAF1FF] text-[#1D6EF2] flex items-center justify-center">
+<span class="material-symbols-outlined">mail</span>
+</div>
+<div>
+<h3 class="font-title-sm text-title-sm text-on-surface group-hover:text-[#1D6EF2] transition-colors">SMTP 邮件服务</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">核心业务触达</p>
+</div>
+</div>
+<span class="bg-[#E5F6EB] text-[#0A7A38] font-label-caps text-label-caps px-2 py-1 rounded-sm border border-[#C3E8D1]">Running</span>
+</div>
+<div class="space-y-2 mb-4 border-t border-[#E2E8F0] pt-4">
+<div class="flex justify-between font-body-sm text-body-sm">
+<span class="text-outline">服务器</span>
+<span class="text-on-surface font-mono-code text-mono-code">smtp.exmail.qq.com:465</span>
+</div>
+<div class="flex justify-between font-body-sm text-body-sm">
+<span class="text-outline">每日限额</span>
+<span class="text-on-surface">50,000 条</span>
+</div>
+</div>
+<div class="flex justify-end gap-2">
+<button class="text-[#727786] hover:text-[#1D6EF2] p-1"><span class="material-symbols-outlined text-[18px]">edit</span></button>
+<button class="text-[#727786] hover:text-error p-1"><span class="material-symbols-outlined text-[18px]">delete</span></button>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="bg-white rounded-[6px] border border-[#E2E8F0] p-5 shadow-[0_1px_3px_rgba(0,0,0,0.05)] hover:bg-[#F1F5F9] transition-colors cursor-pointer group border-l-4 border-l-[#1D6EF2]">
+<div class="flex justify-between items-start mb-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded bg-[#EAF1FF] text-[#1D6EF2] flex items-center justify-center">
+<span class="material-symbols-outlined">webhook</span>
+</div>
+<div>
+<h3 class="font-title-sm text-title-sm text-on-surface group-hover:text-[#1D6EF2] transition-colors">企业微信 Webhook</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">内部告警与协同</p>
+</div>
+</div>
+<span class="bg-[#E5F6EB] text-[#0A7A38] font-label-caps text-label-caps px-2 py-1 rounded-sm border border-[#C3E8D1]">Running</span>
+</div>
+<div class="space-y-2 mb-4 border-t border-[#E2E8F0] pt-4">
+<div class="flex justify-between font-body-sm text-body-sm">
+<span class="text-outline">URL</span>
+<span class="text-on-surface font-mono-code text-mono-code truncate max-w-[120px]" title="qyapi.weixin.qq.com/cgi-bin/webhook">qyapi.weixin...</span>
+</div>
+<div class="flex justify-between font-body-sm text-body-sm">
+<span class="text-outline">并发限制</span>
+<span class="text-on-surface">100 req/s</span>
+</div>
+</div>
+<div class="flex justify-end gap-2">
+<button class="text-[#1D6EF2] p-1"><span class="material-symbols-outlined text-[18px]">edit</span></button>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="bg-white rounded-[6px] border border-[#E2E8F0] p-5 shadow-[0_1px_3px_rgba(0,0,0,0.05)] hover:bg-[#F1F5F9] transition-colors cursor-pointer group">
+<div class="flex justify-between items-start mb-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded bg-[#FFF0F0] text-[#D92D20] flex items-center justify-center">
+<span class="material-symbols-outlined">sms</span>
+</div>
+<div>
+<h3 class="font-title-sm text-title-sm text-on-surface group-hover:text-[#1D6EF2] transition-colors">阿里云 SMS</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">验证码及紧急通知</p>
+</div>
+</div>
+<span class="bg-[#FFF0F0] text-[#D92D20] font-label-caps text-label-caps px-2 py-1 rounded-sm border border-[#FEE4E2]">Error</span>
+</div>
+<div class="space-y-2 mb-4 border-t border-[#E2E8F0] pt-4">
+<div class="flex justify-between font-body-sm text-body-sm">
+<span class="text-outline">Region</span>
+<span class="text-on-surface font-mono-code text-mono-code">cn-hangzhou</span>
+</div>
+<div class="flex justify-between font-body-sm text-body-sm">
+<span class="text-outline">错误详情</span>
+<span class="text-error">Balance Insufficient</span>
+</div>
+</div>
+<div class="flex justify-end gap-2">
+<button class="text-[#727786] hover:text-[#1D6EF2] p-1"><span class="material-symbols-outlined text-[18px]">sync</span></button>
+<button class="text-[#727786] hover:text-[#1D6EF2] p-1"><span class="material-symbols-outlined text-[18px]">edit</span></button>
+</div>
+</div>
+</div>
+<!-- Routing Fallback Strategy -->
+<div class="mt-8">
+<h2 class="font-title-sm text-title-sm text-on-surface font-semibold mb-4">路由降级策略</h2>
+<div class="bg-[#FFFAF0] border border-[#FDE68A] rounded-[6px] p-4 flex gap-4 items-start shadow-[0_1px_3px_rgba(0,0,0,0.05)]">
+<span class="material-symbols-outlined text-[#D97706]">warning</span>
+<div>
+<h4 class="font-body-md text-body-md font-semibold text-[#92400E]">自动切换告警</h4>
+<p class="font-body-sm text-body-sm text-[#B45309] mt-1">当主通道连续发生 3 次失败，或响应延迟超过 2000ms 时，系统将自动降级至备用通道。当前已配置 SMS -&gt; 邮件 的降级规则。</p>
+<button class="mt-3 text-[#D97706] font-body-sm text-body-sm font-medium hover:underline">配置规则详情 →</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Inspector -->
+<aside class="fixed right-0 top-[56px] w-[320px] h-[calc(100vh-56px)] border-l border-outline-variant bg-white z-30 flex flex-col shadow-[0_10px_15px_rgba(0,0,0,0.05)]">
+<div class="p-4 border-b border-outline-variant flex justify-between items-center bg-[#F8F9FF]">
+<h2 class="font-title-sm text-title-sm font-semibold text-on-surface">实时链路诊断</h2>
+<span class="material-symbols-outlined text-outline cursor-pointer hover:text-on-surface">close</span>
+</div>
+<div class="flex-1 overflow-y-auto p-4 space-y-6">
+<!-- Chart Area Placeholder -->
+<div>
+<h3 class="font-body-sm text-body-sm font-semibold text-on-surface mb-2">成功率趋势 (近1小时)</h3>
+<div class="h-32 bg-[#F1F5F9] rounded border border-[#E2E8F0] flex items-center justify-center relative overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-t from-[#EAF1FF] to-transparent opacity-50"></div>
+<svg class="w-full h-full" preserveaspectratio="none" viewbox="0 0 100 100">
+<path d="M0,80 L20,75 L40,85 L60,40 L80,50 L100,20 L100,100 L0,100 Z" fill="#D9E2FF" opacity="0.5"></path>
+<path d="M0,80 L20,75 L40,85 L60,40 L80,50 L100,20" fill="none" stroke="#1D6EF2" stroke-width="2"></path>
+</svg>
+</div>
+</div>
+<!-- Health Status -->
+<div>
+<h3 class="font-body-sm text-body-sm font-semibold text-on-surface mb-2">节点健康状态</h3>
+<ul class="space-y-3">
+<li class="flex justify-between items-center text-body-sm">
+<span class="flex items-center gap-2 text-on-surface-variant"><span class="w-2 h-2 rounded-full bg-[#0A7A38]"></span> 网关连通性</span>
+<span class="font-mono-code text-on-surface">12ms</span>
+</li>
+<li class="flex justify-between items-center text-body-sm">
+<span class="flex items-center gap-2 text-on-surface-variant"><span class="w-2 h-2 rounded-full bg-[#0A7A38]"></span> 队列处理积压</span>
+<span class="font-mono-code text-on-surface">0 cmds</span>
+</li>
+<li class="flex justify-between items-center text-body-sm">
+<span class="flex items-center gap-2 text-on-surface-variant"><span class="w-2 h-2 rounded-full bg-[#D97706]"></span> API 限流状态</span>
+<span class="font-mono-code text-[#D97706]">85%</span>
+</li>
+</ul>
+</div>
+<!-- Recent Events -->
+<div>
+<h3 class="font-body-sm text-body-sm font-semibold text-on-surface mb-2">近期诊断事件</h3>
+<div class="border-l-2 border-[#E2E8F0] ml-2 pl-4 space-y-4">
+<div class="relative">
+<span class="absolute -left-[21px] top-1 w-2.5 h-2.5 rounded-full bg-[#E2E8F0] border-2 border-white"></span>
+<p class="font-body-sm text-body-sm text-on-surface">Webhook 延迟告警恢复</p>
+<p class="font-label-caps text-label-caps text-outline mt-1">10:42 AM</p>
+</div>
+<div class="relative">
+<span class="absolute -left-[21px] top-1 w-2.5 h-2.5 rounded-full bg-[#D92D20] border-2 border-white"></span>
+<p class="font-body-sm text-body-sm text-on-surface">SMS 渠道发送失败率突增</p>
+<p class="font-label-caps text-label-caps text-outline mt-1">10:35 AM</p>
+</div>
+<div class="relative">
+<span class="absolute -left-[21px] top-1 w-2.5 h-2.5 rounded-full bg-[#1D6EF2] border-2 border-white"></span>
+<p class="font-body-sm text-body-sm text-on-surface">配置更新：企业微信 Token</p>
+<p class="font-label-caps text-label-caps text-outline mt-1">09:15 AM</p>
+</div>
+</div>
+</div>
+</div>
+<div class="p-4 border-t border-outline-variant bg-[#F8F9FF]">
+<button class="w-full bg-white border border-[#1D6EF2] text-[#1D6EF2] font-body-sm text-body-sm font-medium py-2 rounded-[6px] hover:bg-[#EAF1FF] transition-colors">
+                运行完整检测
+            </button>
+</div>
+</aside>
+</main>
+</body></html>

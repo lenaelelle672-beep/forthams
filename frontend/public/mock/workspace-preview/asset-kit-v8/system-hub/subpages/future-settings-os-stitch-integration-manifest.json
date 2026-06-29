@@ -1,0 +1,817 @@
+{
+  "projectId": "11462082228439399504",
+  "targetScreenId": "f73c0fe6f0e34404b1a57375e646867a",
+  "generatedAt": "2026-06-29T08:07:21.557Z",
+  "menuHtmlCount": 44,
+  "menuHtml": [
+    {
+      "menuId": "system-flow-definition",
+      "file": "future-settings-os-navigation-center.html",
+      "sourceType": "stitch-native-shell",
+      "screenId": "f73c0fe6f0e34404b1a57375e646867a",
+      "title": "Future Settings OS · 全量页面导航中心 (精准聚合版)",
+      "bytes": 19794,
+      "localScreenshot": "future-settings-os-navigation-center-native-shell.png"
+    },
+    {
+      "menuId": "system-settings-command-center",
+      "file": "future-settings-os-settings-command-center.html",
+      "sourceType": "stitch-native-shell",
+      "screenId": "75ebcb3fb5854895b82f27184c53dec3",
+      "title": "设置中心 · Future Settings OS",
+      "bytes": 18978,
+      "localScreenshot": "future-settings-os-settings-command-center-native-shell.png"
+    },
+    {
+      "menuId": "system-runtime-monitor",
+      "file": "future-settings-os-runtime-monitor.html",
+      "sourceType": "stitch-native-shell",
+      "screenId": "7f2f175176bc4db794de035a8a09e7eb",
+      "title": "运行监测 · Future Settings OS",
+      "bytes": 20581,
+      "localScreenshot": "future-settings-os-runtime-monitor-native-shell.png"
+    },
+    {
+      "menuId": "system-flow-designer",
+      "file": "future-settings-os-flow-designer.html",
+      "sourceType": "stitch-native-shell",
+      "sourceFile": "stitch-flow-platform-subpage-02-flow-designer-v2-100score.html",
+      "title": "流程设计器 · Future Settings OS",
+      "bytes": 21253,
+      "screenId": "7739aa4e9e454ac194eaa68084d5d514",
+      "localScreenshot": "future-settings-os-flow-designer-native-shell.png"
+    },
+    {
+      "menuId": "system-form-config",
+      "file": "future-settings-os-form-config.html",
+      "sourceType": "stitch-native-shell",
+      "sourceFile": "stitch-flow-platform-subpage-03-form-config-v2-100score.html",
+      "title": "表单配置 · Future Settings OS",
+      "bytes": 24380,
+      "screenId": "d35500c827594d8d97cc78096725e744",
+      "localScreenshot": "future-settings-os-form-config-native-shell.png"
+    },
+    {
+      "menuId": "system-form-storage",
+      "file": "future-settings-os-form-storage.html",
+      "sourceType": "stitch-native-shell",
+      "screenId": "4b330b51c2c74bd0a1bf2ef615116fc9",
+      "title": "表单存储 · Future Settings OS",
+      "bytes": 26733,
+      "localScreenshot": "future-settings-os-form-storage-native-shell.png"
+    },
+    {
+      "menuId": "system-approval-rules",
+      "file": "future-settings-os-approval-rules.html",
+      "sourceType": "stitch-native-shell",
+      "sourceFile": "stitch-flow-platform-subpage-05-approval-rules-v2-100score.html",
+      "title": "审批规则 · Future Settings OS",
+      "bytes": 18291,
+      "screenId": "da7485bd94a84124a54980dd75e9ffa0",
+      "localScreenshot": "future-settings-os-approval-rules-native-shell.png"
+    },
+    {
+      "menuId": "system-todo-fields",
+      "file": "future-settings-os-todo-fields.html",
+      "sourceType": "stitch-native-shell",
+      "screenId": "063dd9cdfe764542b04c64bc4eee711e",
+      "title": "待办字段配置 · Future Settings OS",
+      "bytes": 23219,
+      "localScreenshot": "future-settings-os-todo-fields-native-shell.png"
+    },
+    {
+      "menuId": "system-sla-config",
+      "file": "future-settings-os-sla-config.html",
+      "sourceType": "stitch-native-shell",
+      "screenId": "31ea9f1f1b4a46e7a833ef58999c4902",
+      "title": "SLA 配置 · Future Settings OS",
+      "bytes": 25956,
+      "localScreenshot": "future-settings-os-sla-config-native-shell.png"
+    },
+    {
+      "menuId": "system-user-management",
+      "file": "future-settings-os-user-management.html",
+      "sourceType": "stitch-native-shell",
+      "sourceFile": "stitch-mcp-settings-user-management-v1.html",
+      "title": "用户管理 · Future Settings OS 全宽版",
+      "bytes": 23947,
+      "screenId": "6426cc7a5139461e94233f4733bfbdda",
+      "localScreenshot": "future-settings-os-user-management-native-shell.png"
+    },
+    {
+      "menuId": "system-role-permissions",
+      "file": "future-settings-os-role-permissions.html",
+      "sourceType": "stitch-native-shell",
+      "sourceFile": "stitch-mcp-settings-role-permission-matrix-v1.html",
+      "title": "角色权限 · Future Settings OS 全宽版",
+      "bytes": 22897,
+      "screenId": "8a30407a964b411d917a081094e81b24",
+      "localScreenshot": "future-settings-os-role-permissions-native-shell.png"
+    },
+    {
+      "menuId": "system-menu-permissions",
+      "file": "future-settings-os-menu-permissions.html",
+      "sourceType": "stitch-native-shell",
+      "screenId": "ccf9f27757314b25aed018d0e371d972",
+      "title": "菜单权限 · Future Settings OS 全宽版",
+      "bytes": 29554,
+      "localScreenshot": "future-settings-os-menu-permissions-native-shell.png"
+    },
+    {
+      "menuId": "system-dept-org",
+      "file": "future-settings-os-dept-org.html",
+      "sourceType": "stitch-native-shell",
+      "sourceFile": "stitch-mcp-settings-org-positions-v1.html",
+      "title": "部门组织 · Future Settings OS 全宽版 (文案修复)",
+      "bytes": 25565,
+      "screenId": "03d517588f2f479e9c646d310a4519c5",
+      "localScreenshot": "future-settings-os-dept-org-native-shell.png"
+    },
+    {
+      "menuId": "system-post-management",
+      "file": "future-settings-os-post-management.html",
+      "sourceType": "stitch-native-shell",
+      "screenId": "4afa914e439a41be9f47d42bbccc3891",
+      "title": "岗位管理 · Future Settings OS 全宽版 (文案修复)",
+      "bytes": 23750,
+      "localScreenshot": "future-settings-os-post-management-native-shell.png"
+    },
+    {
+      "menuId": "system-data-permissions",
+      "file": "future-settings-os-data-permissions.html",
+      "sourceType": "stitch-native-shell",
+      "screenId": "5521c7f851144186b53385e03a77ff7f",
+      "title": "数据权限 · Future Settings OS 全宽版",
+      "bytes": 21493,
+      "localScreenshot": "future-settings-os-data-permissions-native-shell.png"
+    },
+    {
+      "menuId": "system-handover",
+      "file": "future-settings-os-handover.html",
+      "sourceType": "stitch-native-shell",
+      "screenId": "627bb998dcbc41eb887543a1ef96d0c2",
+      "title": "工作交接 · Future Settings OS 全宽版",
+      "bytes": 22338,
+      "localScreenshot": "future-settings-os-handover-native-shell.png"
+    },
+    {
+      "menuId": "system-tenant-management",
+      "file": "future-settings-os-tenant-management.html",
+      "sourceType": "stitch-native-shell",
+      "sourceFile": "stitch-mcp-settings-tenant-contract-v1.html",
+      "title": "租户管理 · Future Settings OS 全宽版",
+      "bytes": 24368,
+      "screenId": "b81768c644af434e9f8dce0c38b4529f",
+      "localScreenshot": "future-settings-os-tenant-management-native-shell.png"
+    },
+    {
+      "menuId": "system-asset-category",
+      "file": "future-settings-os-asset-category.html",
+      "sourceType": "stitch-native-shell",
+      "screenId": "ed8b5924dd174829ae37ef3f385bb4dc",
+      "title": "资产分类 · Future Settings OS 全宽版 (壳层修复)",
+      "bytes": 22198,
+      "localScreenshot": "future-settings-os-asset-category-native-shell.png"
+    },
+    {
+      "menuId": "system-numbering-rules",
+      "file": "future-settings-os-numbering-rules.html",
+      "sourceType": "stitch-native-shell",
+      "sourceFile": "stitch-mcp-settings-numbering-rules-v1.html",
+      "title": "编号规则 · Future Settings OS 全宽版 (壳层修复)",
+      "bytes": 18973,
+      "screenId": "edad732480174568a165f758f491eddf",
+      "localScreenshot": "future-settings-os-numbering-rules-native-shell.png"
+    },
+    {
+      "menuId": "system-location-management",
+      "file": "future-settings-os-location-management.html",
+      "sourceType": "stitch-native-shell",
+      "screenId": "3e3afb97a2a34ea2a93823620293d881",
+      "title": "位置管理 · Future Settings OS 全宽版 (壳层修复)",
+      "bytes": 25497,
+      "localScreenshot": "future-settings-os-location-management-native-shell.png"
+    },
+    {
+      "menuId": "system-vendor-management",
+      "file": "future-settings-os-vendor-management.html",
+      "sourceType": "stitch-native-shell",
+      "screenId": "727056e07f2746368537c622f8abb83c",
+      "title": "供应商管理 · Future Settings OS 全宽版 (壳层修复)",
+      "bytes": 21313,
+      "localScreenshot": "future-settings-os-vendor-management-native-shell.png"
+    },
+    {
+      "menuId": "system-custom-fields",
+      "file": "future-settings-os-custom-fields.html",
+      "sourceType": "stitch-native-shell",
+      "sourceFile": "stitch-mcp-settings-custom-fields-v1.html",
+      "title": "自定义字段 · Future Settings OS 全宽版 (壳层修复)",
+      "bytes": 25326,
+      "screenId": "b7387ebc62864fceb72298c2f1e6d78c",
+      "localScreenshot": "future-settings-os-custom-fields-native-shell.png"
+    },
+    {
+      "menuId": "system-custom-field-sets",
+      "file": "future-settings-os-custom-field-sets.html",
+      "sourceType": "stitch-native-shell",
+      "screenId": "c8381f8a66cb44f39b44f55916fcdb5a",
+      "title": "自定义字段集 · Future Settings OS 全宽版 (壳层修复)",
+      "bytes": 15769,
+      "localScreenshot": "future-settings-os-custom-field-sets-native-shell.png"
+    },
+    {
+      "menuId": "system-external-systems",
+      "file": "future-settings-os-external-systems.html",
+      "sourceType": "stitch-native-shell",
+      "sourceFile": "stitch-mcp-settings-integration-topology-v1.html",
+      "title": "外部系统配置 · Future Settings OS 全宽版",
+      "bytes": 25414,
+      "screenId": "253f4fe45d814514a42390cc09f107f3",
+      "localScreenshot": "future-settings-os-external-systems-native-shell.png"
+    },
+    {
+      "menuId": "system-interfaces",
+      "file": "future-settings-os-interfaces.html",
+      "sourceType": "stitch-native-shell",
+      "screenId": "21d70277fad34b19bb3887c306d1323e",
+      "title": "接口配置 · Future Settings OS 全宽版",
+      "bytes": 22493,
+      "localScreenshot": "future-settings-os-interfaces-native-shell.png"
+    },
+    {
+      "menuId": "system-field-mapping",
+      "file": "future-settings-os-field-mapping.html",
+      "sourceType": "stitch-native-shell",
+      "screenId": "cfeb1655e29547a49a0ee74b76e2ac25",
+      "title": "字段映射 · Future Settings OS 全宽版",
+      "bytes": 22392,
+      "localScreenshot": "future-settings-os-field-mapping-native-shell.png"
+    },
+    {
+      "menuId": "system-sync-rules",
+      "file": "future-settings-os-sync-rules.html",
+      "sourceType": "stitch-native-shell",
+      "screenId": "b0d8f95465544e96b95023c7bc080d90",
+      "title": "同步规则 · Future Settings OS 全宽版",
+      "bytes": 23552,
+      "localScreenshot": "future-settings-os-sync-rules-native-shell.png"
+    },
+    {
+      "menuId": "system-webhook-config",
+      "file": "future-settings-os-webhook-config.html",
+      "sourceType": "stitch-native-shell",
+      "sourceFile": "stitch-mcp-settings-webhook-debug-v1.html",
+      "title": "Webhook 配置 · Future Settings OS 全宽版",
+      "bytes": 22285,
+      "screenId": "44270f330325498180352f59e463695f",
+      "localScreenshot": "future-settings-os-webhook-config-native-shell.png"
+    },
+    {
+      "menuId": "system-mail-gateway",
+      "file": "future-settings-os-mail-gateway.html",
+      "sourceType": "stitch-native-shell",
+      "screenId": "9ed9d7e7eafa4909925528cb0b60f0aa",
+      "title": "邮件网关配置 · Future Settings OS (原生壳层精准版)",
+      "bytes": 17512,
+      "localScreenshot": "future-settings-os-mail-gateway-native-shell.png"
+    },
+    {
+      "menuId": "system-workflow-mail",
+      "file": "future-settings-os-workflow-mail.html",
+      "sourceType": "stitch-native-shell",
+      "screenId": "9e26cc5593bf4ee29bb40f550f743807",
+      "title": "流程邮件配置 · Future Settings OS (合同对齐版)",
+      "bytes": 17937,
+      "localScreenshot": "future-settings-os-workflow-mail-native-shell.png"
+    },
+    {
+      "menuId": "system-mail-templates",
+      "file": "future-settings-os-mail-templates.html",
+      "sourceType": "stitch-native-shell",
+      "screenId": "f3942143b561472a983964243fc449b6",
+      "title": "邮件模板 · Future Settings OS (合同对齐版)",
+      "bytes": 25935,
+      "localScreenshot": "future-settings-os-mail-templates-native-shell.png"
+    },
+    {
+      "menuId": "system-mail-logs",
+      "file": "future-settings-os-mail-logs.html",
+      "sourceType": "stitch-native-shell",
+      "screenId": "4c53a36f7f8a49139f359fb6bae93a15",
+      "title": "邮件日志 · Future Settings OS (合同对齐最终版)",
+      "bytes": 24156,
+      "localScreenshot": "future-settings-os-mail-logs-native-shell.png"
+    },
+    {
+      "menuId": "system-notification-templates",
+      "file": "future-settings-os-notification-templates.html",
+      "sourceType": "stitch-native-shell",
+      "sourceFile": "stitch-mcp-settings-notification-template-v1.html",
+      "title": "通知模板 · Future Settings OS (合同对齐版)",
+      "bytes": 25156,
+      "screenId": "221c52f2cde44818b9f7bd1c94495770",
+      "localScreenshot": "future-settings-os-notification-templates-native-shell.png"
+    },
+    {
+      "menuId": "system-notification-channels",
+      "file": "future-settings-os-notification-channels.html",
+      "sourceType": "stitch-native-shell",
+      "sourceFile": "stitch-mcp-settings-notification-channels-v1.html",
+      "title": "通知渠道 · Future Settings OS (合同对齐最终版)",
+      "bytes": 20952,
+      "screenId": "89eef735f7e34ae78ce53516da43440a",
+      "localScreenshot": "future-settings-os-notification-channels-native-shell.png"
+    },
+    {
+      "menuId": "system-notification-preferences",
+      "file": "future-settings-os-notification-preferences.html",
+      "sourceType": "stitch-native-shell",
+      "sourceFile": "stitch-mcp-settings-notification-settings-v1.html",
+      "title": "通知偏好 · Future Settings OS (定位修复版)",
+      "bytes": 26490,
+      "screenId": "027d210361c74ee984c5483ef054f0bc",
+      "localScreenshot": "future-settings-os-notification-preferences-native-shell.png"
+    },
+    {
+      "menuId": "system-workflow-notification-switch",
+      "file": "future-settings-os-workflow-notification-switch.html",
+      "sourceType": "stitch-native-shell",
+      "screenId": "a0ded6bfeb90484b8bf7a417a4b2562b",
+      "title": "流程通知开关 · Future Settings OS (合同对齐版)",
+      "bytes": 19608,
+      "localScreenshot": "future-settings-os-workflow-notification-switch-native-shell.png"
+    },
+    {
+      "menuId": "system-base-params",
+      "file": "future-settings-os-base-params.html",
+      "sourceType": "stitch-native-shell",
+      "sourceFile": "stitch-mcp-settings-system-params-v1.html",
+      "title": "基础参数 · Future Settings OS 全宽版",
+      "bytes": 24728,
+      "screenId": "81d238150f19442580507f0812fd2512",
+      "localScreenshot": "future-settings-os-base-params-native-shell.png"
+    },
+    {
+      "menuId": "system-security-policy",
+      "file": "future-settings-os-security-policy.html",
+      "sourceType": "stitch-native-shell",
+      "sourceFile": "stitch-mcp-settings-security-gates-v1.html",
+      "title": "安全策略 · Future Settings OS 全宽版",
+      "bytes": 23377,
+      "screenId": "0594a8c049a5445bb58fd532eecbcc4b",
+      "localScreenshot": "future-settings-os-security-policy-native-shell.png"
+    },
+    {
+      "menuId": "system-file-storage",
+      "file": "future-settings-os-file-storage.html",
+      "sourceType": "stitch-native-shell",
+      "screenId": "387ac6ea970749eb9008a4ce0f07373b",
+      "title": "文件存储配置 · Future Settings OS 全宽版",
+      "bytes": 29869,
+      "localScreenshot": "future-settings-os-file-storage-native-shell.png"
+    },
+    {
+      "menuId": "system-import-export",
+      "file": "future-settings-os-import-export.html",
+      "sourceType": "stitch-native-shell",
+      "screenId": "dd5064319de74faaad3f38648e4089e7",
+      "title": "导入导出配置 · Future Settings OS 全宽版",
+      "bytes": 28674,
+      "localScreenshot": "future-settings-os-import-export-native-shell.png"
+    },
+    {
+      "menuId": "system-cache-management",
+      "file": "future-settings-os-cache-management.html",
+      "sourceType": "stitch-native-shell",
+      "screenId": "af63df05b26647c0bd6c7bf441fb16e9",
+      "title": "缓存管理 · Future Settings OS 全宽版",
+      "bytes": 25798,
+      "localScreenshot": "future-settings-os-cache-management-native-shell.png"
+    },
+    {
+      "menuId": "system-audit-log",
+      "file": "future-settings-os-audit-log.html",
+      "sourceType": "stitch-native-shell",
+      "sourceFile": "stitch-mcp-settings-audit-log-v1.html",
+      "title": "操作审计 · Future Settings OS 全宽版",
+      "bytes": 23989,
+      "screenId": "47a9496f3f864675b0d14f9bd2d0ea6a",
+      "localScreenshot": "future-settings-os-audit-log-native-shell.png"
+    },
+    {
+      "menuId": "system-doc-center",
+      "file": "future-settings-os-doc-center.html",
+      "sourceType": "stitch-native-shell",
+      "sourceFile": "stitch-mcp-settings-doc-center-v1.html",
+      "title": "文档中心 · Future Settings OS 全宽版",
+      "bytes": 27666,
+      "screenId": "7e15c437fd81415f8b8177b929b356bd",
+      "localScreenshot": "future-settings-os-doc-center-native-shell.png"
+    },
+    {
+      "menuId": "system-tech-support",
+      "file": "future-settings-os-tech-support.html",
+      "sourceType": "stitch-native-shell",
+      "sourceFile": "stitch-mcp-settings-support-diagnostics-v1.html",
+      "title": "技术支持 · Future Settings OS 全宽版",
+      "bytes": 30490,
+      "screenId": "a513c00158fa4a9c9c0727cb56eb94dc",
+      "localScreenshot": "future-settings-os-tech-support-native-shell.png"
+    }
+  ],
+  "imageDownloads": [
+    {
+      "file": "flow-platform-subpage-02-settings-command-center-v1.png",
+      "bytes": 60306
+    },
+    {
+      "file": "stitch-flow-platform-subpage-02-settings-command-center-v1.png",
+      "bytes": 60306
+    },
+    {
+      "file": "flow-platform-subpage-03-runtime-monitor-v1.png",
+      "bytes": 64248
+    },
+    {
+      "file": "stitch-flow-platform-subpage-03-runtime-monitor-v1.png",
+      "bytes": 64248
+    },
+    {
+      "file": "org-permission-subpage-08-tenant-management-v1.png",
+      "bytes": 42925
+    },
+    {
+      "file": "stitch-org-permission-subpage-08-tenant-management-v1.png",
+      "bytes": 42925
+    },
+    {
+      "file": "system-params-subpage-07-doc-center-v1.png",
+      "bytes": 76204
+    },
+    {
+      "file": "stitch-system-params-subpage-07-doc-center-v1.png",
+      "bytes": 76204
+    },
+    {
+      "file": "system-params-subpage-08-tech-support-v1.png",
+      "bytes": 100798
+    },
+    {
+      "file": "stitch-system-params-subpage-08-tech-support-v1.png",
+      "bytes": 100798
+    },
+    {
+      "menuId": "system-mail-gateway",
+      "file": "future-settings-os-mail-gateway-native-shell.png",
+      "sourceType": "stitch-native-shell",
+      "screenId": "9ed9d7e7eafa4909925528cb0b60f0aa",
+      "title": "邮件网关配置 · Future Settings OS (原生壳层精准版)",
+      "bytes": 46992
+    },
+    {
+      "menuId": "system-workflow-mail",
+      "file": "future-settings-os-workflow-mail-native-shell.png",
+      "sourceType": "stitch-native-shell",
+      "screenId": "9e26cc5593bf4ee29bb40f550f743807",
+      "title": "流程邮件配置 · Future Settings OS (合同对齐版)",
+      "bytes": 49958
+    },
+    {
+      "menuId": "system-mail-templates",
+      "file": "future-settings-os-mail-templates-native-shell.png",
+      "sourceType": "stitch-native-shell",
+      "screenId": "f3942143b561472a983964243fc449b6",
+      "title": "邮件模板 · Future Settings OS (合同对齐版)",
+      "bytes": 66628
+    },
+    {
+      "menuId": "system-mail-logs",
+      "file": "future-settings-os-mail-logs-native-shell.png",
+      "sourceType": "stitch-native-shell",
+      "screenId": "4c53a36f7f8a49139f359fb6bae93a15",
+      "title": "邮件日志 · Future Settings OS (合同对齐最终版)",
+      "bytes": 49217
+    },
+    {
+      "menuId": "system-notification-templates",
+      "file": "future-settings-os-notification-templates-native-shell.png",
+      "sourceType": "stitch-native-shell",
+      "screenId": "221c52f2cde44818b9f7bd1c94495770",
+      "title": "通知模板 · Future Settings OS (合同对齐版)",
+      "bytes": 50856
+    },
+    {
+      "menuId": "system-notification-channels",
+      "file": "future-settings-os-notification-channels-native-shell.png",
+      "sourceType": "stitch-native-shell",
+      "screenId": "89eef735f7e34ae78ce53516da43440a",
+      "title": "通知渠道 · Future Settings OS (合同对齐最终版)",
+      "bytes": 54610
+    },
+    {
+      "menuId": "system-notification-preferences",
+      "file": "future-settings-os-notification-preferences-native-shell.png",
+      "sourceType": "stitch-native-shell",
+      "screenId": "027d210361c74ee984c5483ef054f0bc",
+      "title": "通知偏好 · Future Settings OS (定位修复版)",
+      "bytes": 68829
+    },
+    {
+      "menuId": "system-workflow-notification-switch",
+      "file": "future-settings-os-workflow-notification-switch-native-shell.png",
+      "sourceType": "stitch-native-shell",
+      "screenId": "a0ded6bfeb90484b8bf7a417a4b2562b",
+      "title": "流程通知开关 · Future Settings OS (合同对齐版)",
+      "bytes": 43361
+    },
+    {
+      "menuId": "system-settings-command-center",
+      "file": "future-settings-os-settings-command-center-native-shell.png",
+      "sourceType": "stitch-native-shell",
+      "screenId": "75ebcb3fb5854895b82f27184c53dec3",
+      "title": "设置中心 · Future Settings OS",
+      "bytes": 41228
+    },
+    {
+      "menuId": "system-flow-definition",
+      "file": "future-settings-os-navigation-center-native-shell.png",
+      "sourceType": "stitch-native-shell",
+      "screenId": "f73c0fe6f0e34404b1a57375e646867a",
+      "title": "Future Settings OS · 全量页面导航中心 (精准聚合版)",
+      "bytes": 33035
+    },
+    {
+      "menuId": "system-runtime-monitor",
+      "file": "future-settings-os-runtime-monitor-native-shell.png",
+      "sourceType": "stitch-native-shell",
+      "screenId": "7f2f175176bc4db794de035a8a09e7eb",
+      "title": "运行监测 · Future Settings OS",
+      "bytes": 49690
+    },
+    {
+      "menuId": "system-flow-designer",
+      "file": "future-settings-os-flow-designer-native-shell.png",
+      "sourceType": "stitch-native-shell",
+      "screenId": "7739aa4e9e454ac194eaa68084d5d514",
+      "title": "流程设计器 · Future Settings OS",
+      "bytes": 39664
+    },
+    {
+      "menuId": "system-form-config",
+      "file": "future-settings-os-form-config-native-shell.png",
+      "sourceType": "stitch-native-shell",
+      "screenId": "d35500c827594d8d97cc78096725e744",
+      "title": "表单配置 · Future Settings OS",
+      "bytes": 49183
+    },
+    {
+      "menuId": "system-form-storage",
+      "file": "future-settings-os-form-storage-native-shell.png",
+      "sourceType": "stitch-native-shell",
+      "screenId": "4b330b51c2c74bd0a1bf2ef615116fc9",
+      "title": "表单存储 · Future Settings OS",
+      "bytes": 76708
+    },
+    {
+      "menuId": "system-approval-rules",
+      "file": "future-settings-os-approval-rules-native-shell.png",
+      "sourceType": "stitch-native-shell",
+      "screenId": "da7485bd94a84124a54980dd75e9ffa0",
+      "title": "审批规则 · Future Settings OS",
+      "bytes": 49797
+    },
+    {
+      "menuId": "system-todo-fields",
+      "file": "future-settings-os-todo-fields-native-shell.png",
+      "sourceType": "stitch-native-shell",
+      "screenId": "063dd9cdfe764542b04c64bc4eee711e",
+      "title": "待办字段配置 · Future Settings OS",
+      "bytes": 43417
+    },
+    {
+      "menuId": "system-sla-config",
+      "file": "future-settings-os-sla-config-native-shell.png",
+      "sourceType": "stitch-native-shell",
+      "screenId": "31ea9f1f1b4a46e7a833ef58999c4902",
+      "title": "SLA 配置 · Future Settings OS",
+      "bytes": 62492
+    },
+    {
+      "menuId": "system-user-management",
+      "file": "future-settings-os-user-management-native-shell.png",
+      "sourceType": "stitch-native-shell",
+      "screenId": "6426cc7a5139461e94233f4733bfbdda",
+      "title": "用户管理 · Future Settings OS 全宽版",
+      "bytes": 39245
+    },
+    {
+      "menuId": "system-menu-permissions",
+      "file": "future-settings-os-menu-permissions-native-shell.png",
+      "sourceType": "stitch-native-shell",
+      "screenId": "ccf9f27757314b25aed018d0e371d972",
+      "title": "菜单权限 · Future Settings OS 全宽版",
+      "bytes": 63417
+    },
+    {
+      "menuId": "system-role-permissions",
+      "file": "future-settings-os-role-permissions-native-shell.png",
+      "sourceType": "stitch-native-shell",
+      "screenId": "8a30407a964b411d917a081094e81b24",
+      "title": "角色权限 · Future Settings OS 全宽版",
+      "bytes": 43159
+    },
+    {
+      "menuId": "system-dept-org",
+      "file": "future-settings-os-dept-org-native-shell.png",
+      "sourceType": "stitch-native-shell",
+      "screenId": "03d517588f2f479e9c646d310a4519c5",
+      "title": "部门组织 · Future Settings OS 全宽版 (文案修复)",
+      "bytes": 42600
+    },
+    {
+      "menuId": "system-post-management",
+      "file": "future-settings-os-post-management-native-shell.png",
+      "sourceType": "stitch-native-shell",
+      "screenId": "4afa914e439a41be9f47d42bbccc3891",
+      "title": "岗位管理 · Future Settings OS 全宽版 (文案修复)",
+      "bytes": 42737
+    },
+    {
+      "menuId": "system-data-permissions",
+      "file": "future-settings-os-data-permissions-native-shell.png",
+      "sourceType": "stitch-native-shell",
+      "screenId": "5521c7f851144186b53385e03a77ff7f",
+      "title": "数据权限 · Future Settings OS 全宽版",
+      "bytes": 49741
+    },
+    {
+      "menuId": "system-tenant-management",
+      "file": "future-settings-os-tenant-management-native-shell.png",
+      "sourceType": "stitch-native-shell",
+      "screenId": "b81768c644af434e9f8dce0c38b4529f",
+      "title": "租户管理 · Future Settings OS 全宽版",
+      "bytes": 46105
+    },
+    {
+      "menuId": "system-handover",
+      "file": "future-settings-os-handover-native-shell.png",
+      "sourceType": "stitch-native-shell",
+      "screenId": "627bb998dcbc41eb887543a1ef96d0c2",
+      "title": "工作交接 · Future Settings OS 全宽版",
+      "bytes": 52066
+    },
+    {
+      "menuId": "system-asset-category",
+      "file": "future-settings-os-asset-category-native-shell.png",
+      "sourceType": "stitch-native-shell",
+      "screenId": "ed8b5924dd174829ae37ef3f385bb4dc",
+      "title": "资产分类 · Future Settings OS 全宽版 (壳层修复)",
+      "bytes": 41573
+    },
+    {
+      "menuId": "system-numbering-rules",
+      "file": "future-settings-os-numbering-rules-native-shell.png",
+      "sourceType": "stitch-native-shell",
+      "screenId": "edad732480174568a165f758f491eddf",
+      "title": "编号规则 · Future Settings OS 全宽版 (壳层修复)",
+      "bytes": 41960
+    },
+    {
+      "menuId": "system-location-management",
+      "file": "future-settings-os-location-management-native-shell.png",
+      "sourceType": "stitch-native-shell",
+      "screenId": "3e3afb97a2a34ea2a93823620293d881",
+      "title": "位置管理 · Future Settings OS 全宽版 (壳层修复)",
+      "bytes": 42492
+    },
+    {
+      "menuId": "system-vendor-management",
+      "file": "future-settings-os-vendor-management-native-shell.png",
+      "sourceType": "stitch-native-shell",
+      "screenId": "727056e07f2746368537c622f8abb83c",
+      "title": "供应商管理 · Future Settings OS 全宽版 (壳层修复)",
+      "bytes": 51987
+    },
+    {
+      "menuId": "system-custom-fields",
+      "file": "future-settings-os-custom-fields-native-shell.png",
+      "sourceType": "stitch-native-shell",
+      "screenId": "b7387ebc62864fceb72298c2f1e6d78c",
+      "title": "自定义字段 · Future Settings OS 全宽版 (壳层修复)",
+      "bytes": 72222
+    },
+    {
+      "menuId": "system-custom-field-sets",
+      "file": "future-settings-os-custom-field-sets-native-shell.png",
+      "sourceType": "stitch-native-shell",
+      "screenId": "c8381f8a66cb44f39b44f55916fcdb5a",
+      "title": "自定义字段集 · Future Settings OS 全宽版 (壳层修复)",
+      "bytes": 28193
+    },
+    {
+      "menuId": "system-sync-rules",
+      "file": "future-settings-os-sync-rules-native-shell.png",
+      "sourceType": "stitch-native-shell",
+      "screenId": "b0d8f95465544e96b95023c7bc080d90",
+      "title": "同步规则 · Future Settings OS 全宽版",
+      "bytes": 44670
+    },
+    {
+      "menuId": "system-interfaces",
+      "file": "future-settings-os-interfaces-native-shell.png",
+      "sourceType": "stitch-native-shell",
+      "screenId": "21d70277fad34b19bb3887c306d1323e",
+      "title": "接口配置 · Future Settings OS 全宽版",
+      "bytes": 43718
+    },
+    {
+      "menuId": "system-field-mapping",
+      "file": "future-settings-os-field-mapping-native-shell.png",
+      "sourceType": "stitch-native-shell",
+      "screenId": "cfeb1655e29547a49a0ee74b76e2ac25",
+      "title": "字段映射 · Future Settings OS 全宽版",
+      "bytes": 60401
+    },
+    {
+      "menuId": "system-webhook-config",
+      "file": "future-settings-os-webhook-config-native-shell.png",
+      "sourceType": "stitch-native-shell",
+      "screenId": "44270f330325498180352f59e463695f",
+      "title": "Webhook 配置 · Future Settings OS 全宽版",
+      "bytes": 54598
+    },
+    {
+      "menuId": "system-external-systems",
+      "file": "future-settings-os-external-systems-native-shell.png",
+      "sourceType": "stitch-native-shell",
+      "screenId": "253f4fe45d814514a42390cc09f107f3",
+      "title": "外部系统配置 · Future Settings OS 全宽版",
+      "bytes": 84637
+    },
+    {
+      "menuId": "system-base-params",
+      "file": "future-settings-os-base-params-native-shell.png",
+      "sourceType": "stitch-native-shell",
+      "screenId": "81d238150f19442580507f0812fd2512",
+      "title": "基础参数 · Future Settings OS 全宽版",
+      "bytes": 51965
+    },
+    {
+      "menuId": "system-security-policy",
+      "file": "future-settings-os-security-policy-native-shell.png",
+      "sourceType": "stitch-native-shell",
+      "screenId": "0594a8c049a5445bb58fd532eecbcc4b",
+      "title": "安全策略 · Future Settings OS 全宽版",
+      "bytes": 92432
+    },
+    {
+      "menuId": "system-file-storage",
+      "file": "future-settings-os-file-storage-native-shell.png",
+      "sourceType": "stitch-native-shell",
+      "screenId": "387ac6ea970749eb9008a4ce0f07373b",
+      "title": "文件存储配置 · Future Settings OS 全宽版",
+      "bytes": 75137
+    },
+    {
+      "menuId": "system-import-export",
+      "file": "future-settings-os-import-export-native-shell.png",
+      "sourceType": "stitch-native-shell",
+      "screenId": "dd5064319de74faaad3f38648e4089e7",
+      "title": "导入导出配置 · Future Settings OS 全宽版",
+      "bytes": 61092
+    },
+    {
+      "menuId": "system-cache-management",
+      "file": "future-settings-os-cache-management-native-shell.png",
+      "sourceType": "stitch-native-shell",
+      "screenId": "af63df05b26647c0bd6c7bf441fb16e9",
+      "title": "缓存管理 · Future Settings OS 全宽版",
+      "bytes": 49160
+    },
+    {
+      "menuId": "system-audit-log",
+      "file": "future-settings-os-audit-log-native-shell.png",
+      "sourceType": "stitch-native-shell",
+      "screenId": "47a9496f3f864675b0d14f9bd2d0ea6a",
+      "title": "操作审计 · Future Settings OS 全宽版",
+      "bytes": 54696
+    },
+    {
+      "menuId": "system-doc-center",
+      "file": "future-settings-os-doc-center-native-shell.png",
+      "sourceType": "stitch-native-shell",
+      "screenId": "7e15c437fd81415f8b8177b929b356bd",
+      "title": "文档中心 · Future Settings OS 全宽版",
+      "bytes": 74752
+    },
+    {
+      "menuId": "system-tech-support",
+      "file": "future-settings-os-tech-support-native-shell.png",
+      "sourceType": "stitch-native-shell",
+      "screenId": "a513c00158fa4a9c9c0727cb56eb94dc",
+      "title": "技术支持 · Future Settings OS 全宽版",
+      "bytes": 101357
+    }
+  ]
+}

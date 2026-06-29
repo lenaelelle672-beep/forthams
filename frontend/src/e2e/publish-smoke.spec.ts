@@ -71,7 +71,7 @@ test('关键业务页面可渲染且无运行时错误', async ({ page }) => {
 
   const smokeTargets = [
     { path: '/assets', heading: '资产台账' },
-    { path: '/settings', heading: '系统设置' },
+    { path: '/settings', heading: /后台设置 OS|系统设置/ },
   ];
 
   for (const target of smokeTargets) {

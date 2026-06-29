@@ -15,6 +15,7 @@
     "test:coverage:full": "vitest --coverage --coverage.all=true --coverage.include='src/**/*.{ts,tsx}'",
     "e2e": "playwright test",
     "e2e:browser-regression": "playwright test --project=browser-regression-smoke --reporter=line",
+    "e2e:device-matrix": "AMS_E2E_INCLUDE_DEVICE_MATRIX=true playwright test --project=browser-regression-chromium --project=browser-regression-firefox --project=browser-regression-webkit --project=browser-regression-mobile-safari --project=browser-regression-tablet-chrome --reporter=line src/e2e/workbench-platform-entry.browser-regression-smoke.spec.ts -g '系统运营中枢全量配置页均落到 Future OS iframe 页面|流程设计器在窄屏下保持大画布建模态|表单配置在窄屏下保持设计画布与H5预览可读|审批规则在窄屏下保持命中编排和门禁矩阵可读'",
     "e2e:real": "AMS_E2E_REAL_BACKEND=true playwright test --project=real-backend-smoke",
     "e2e:ui": "playwright test --ui",
     "stitch": "node ../scripts/stitch-cli.js",

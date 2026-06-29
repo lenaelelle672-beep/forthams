@@ -17,6 +17,25 @@
 - 前端已有流程/审批相关页面和服务，包括 `frontend/src/pages/workflow/WorkflowDesignerPage.tsx`、`frontend/src/pages/workflow/WorkflowCenterPage.tsx`、`frontend/src/pages/approval/ApprovalDetailPage.tsx`、`frontend/src/app/components/approval/ApprovalFlowChart.tsx`、`frontend/src/services/approvalFlowService.ts`。
 - `frontend/src/pages/mobile/**` 继续冻结，除非用户明确重新打开 mobile scope。
 
+### 2.1 Stitch 设计稿事实源
+
+后续查找流程平台和后台设置新整合页面时，Stitch 风格/设计系统事实源固定为 **Future Settings OS**，不要误用 `UAMS System Hub Pages`。
+
+| 用途 | Stitch 项目 / 屏幕 |
+| --- | --- |
+| 项目 ID | `11462082228439399504` |
+| 当前 MCP project title | `Next-Gen Doc-to-UI` |
+| 设计系统 / Design MD 名称 | `Future Settings OS`，高密度后台设置 OS 风格 |
+| 流程平台导航中枢 | `流程平台 · 资产导航中心 (精修版)` / `61f7e22a060a46d38774b9134a53da85` |
+| 流程定义 | `流程定义 · 全宽沉浸版` / `27bbd67bdb8d4318abd4495dfb84d1f1` |
+| 生产级流程设计器 | `可视化流程设计 · 极致全宽生产级精修版 (交互增强)` / `4bbe87574c90478c8edb91739d95c291` |
+| 环节子表单矩阵 | `环节表单矩阵 · 权限级联配置版` / `f6b52701c4304e319f486ebd626f8fc6` |
+| 环节表单逻辑 | `环节表单逻辑 · 深度细化配置版` / `e8a84f0d02b743bb8884ccd158d7810c` |
+| 运行监测 / 流程实例 | `业务执行看板 · 流程实例监控 (全宽沉浸版)` / `ecf5acbe12c34fe6a2c281ee7078dcee` |
+| 发布门禁 / 发布策略 | `安全门禁与发布策略 · 生产级治理中枢` / `c388e2b7767348029cf2e5617e5d9667` |
+
+`UAMS System Hub Pages` 只能作为旧系统页面资料排查，不得作为本轮 Future OS 页面风格、流程平台 PRD 或前端落地主依据。
+
 ## 3. 硬目标与硬验收
 
 ### 3.1 完整目标

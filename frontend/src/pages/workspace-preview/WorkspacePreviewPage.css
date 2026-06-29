@@ -227,6 +227,29 @@
   background: #f0f2f5;
 }
 
+.workspace-system-html-frame-shell.is-native-stitch-shell.has-native-topbar {
+  --system-shell-nav-width: 240px;
+  --system-shell-top-height: 56px;
+  background: #f5f8fc;
+}
+
+.workspace-system-html-frame-shell.is-native-stitch-shell.has-native-topbar .workspace-system-html-frame-stage,
+.workspace-system-html-frame-shell.is-native-stitch-shell.has-native-topbar .workspace-system-html-frame-canvas {
+  background: #f5f8fc;
+}
+
+.workspace-system-html-frame-shell.is-native-stitch-shell.has-native-topbar .workspace-system-html-frame.is-native-stitch-shell {
+  top: var(--system-shell-top-height);
+  height: calc(100% - var(--system-shell-top-height));
+  background: #f5f8fc;
+}
+
+.workspace-system-nav-overlay.is-topbar-only::before,
+.workspace-system-nav-overlay.is-topbar-only::after {
+  display: none;
+  content: none;
+}
+
 .workspace-system-nav-overlay {
   position: absolute;
   inset: 0;
@@ -412,6 +435,17 @@
   color: #fff;
   border-color: rgba(83, 198, 255, .78);
   background: rgba(71, 164, 255, .2);
+}
+
+.workspace-system-nav-center {
+  border-color: rgba(96, 210, 255, .62);
+}
+
+.workspace-system-nav-center.is-active {
+  color: #fff;
+  border-color: rgba(83, 198, 255, .82);
+  background: rgba(71, 164, 255, .24);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .14), 0 0 12px rgba(83, 198, 255, .14);
 }
 
 .workspace-system-nav-user {
@@ -61154,6 +61188,15 @@ html body .workspace-preview-page.is-workbench-route .workspace-window.workspace
   color: #fff !important;
   border-color: rgba(83, 198, 255, 0.78) !important;
   background: rgba(71, 164, 255, 0.2) !important;
+}
+
+html body .workspace-preview-page.is-workbench-route .workspace-window.workspace-window-overview.is-system-mode[data-active-menu] .workspace-system-nav-overlay .workspace-system-nav-center.is-active {
+  color: #fff !important;
+  border-color: rgba(83, 198, 255, 0.82) !important;
+  background: rgba(71, 164, 255, 0.24) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    0 0 12px rgba(83, 198, 255, 0.14) !important;
 }
 
 /* GAI2 repair: department organization page must expose lead-change tasks for search and review. */

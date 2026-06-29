@@ -11,7 +11,7 @@ const authUser = {
 let submitCount = 0;
 let workflowDraftSaveCount = 0;
 type WorkflowDraftScenario = 'success' | 'failure';
-type ApprovalScenario = 'default' | 'empty' | 'forbidden';
+type ApprovalScenario = 'default' | 'empty' | 'forbidden' | 'approved' | 'detail-error';
 type ReportsScenario = 'default' | 'empty' | 'forbidden';
 let workflowDraftScenario: WorkflowDraftScenario = 'success';
 let approvalScenario: ApprovalScenario = 'default';
@@ -297,6 +297,12 @@ test.describe('浏览器回归 smoke', () => {
     await expect(page.getByText('APP-MODULE-001').first()).toBeVisible({ timeout: 10_000 });
     await expect(page.getByRole('button', { name: '审批通过' })).toBeVisible();
     await expect(page.getByRole('button', { name: '驳回申请' })).toBeVisible();
+    const currentApproverActionArea = page.getByTestId('approval-action-area-current-assignee');
+    await expect(currentApproverActionArea).toBeVisible();
+    await test.info().attach('approval-action-area-current-assignee', {
+      body: await currentApproverActionArea.screenshot(),
+      contentType: 'image/png',
+    });
 
     await page.goto('/');
     await page.evaluate((user) => {
@@ -309,16 +315,66 @@ test.describe('浏览器回归 smoke', () => {
       username: 'observer',
       realName: '旁观用户',
       roles: ['USER'],
-      permissions: ['approval:process:approve', 'approval:process:reject', 'approval:process:query'],
+      permissions: ['approval:process:query'],
     });
 
     await page.goto('/approvals/1');
     await page.waitForLoadState('networkidle');
     await expect(page.getByText('当前账号无需处理此节点')).toBeVisible({ timeout: 10_000 });
-    await expect(page.getByRole('button', { name: '审批通过' })).toHaveCount(0);
-    await expect(page.getByRole('button', { name: '驳回申请' })).toHaveCount(0);
+    const observerNoCurrentStepArea = page.getByTestId('approval-action-area-no-current-step');
+    await expect(observerNoCurrentStepArea).toBeVisible();
+    await test.info().attach('approval-action-area-observer-no-permission-no-current-step', {
+      body: await observerNoCurrentStepArea.screenshot(),
+      contentType: 'image/png',
+    });
+    await expect(page.getByRole('button', { name: /审批通过|approve/i })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: /驳回申请|reject/i })).toHaveCount(0);
     await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
     expect(errors).toEqual([]);
+  });
+
+  test('/approvals/:id 终态与详情服务失败展示稳定证据', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+
+    approvalScenario = 'approved';
+    await page.goto('/approvals/1');
+    await page.waitForLoadState('networkidle');
+    await expect(page.getByText('APP-MODULE-001').first()).toBeVisible({ timeout: 10_000 });
+    const terminalActionArea = page.getByTestId('approval-action-area-terminal');
+    await expect(terminalActionArea).toBeVisible();
+    await expect(page.getByRole('button', { name: /审批通过|approve/i })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: /驳回申请|reject/i })).toHaveCount(0);
+    await test.info().attach('approval-action-area-terminal', {
+      body: await terminalActionArea.screenshot(),
+      contentType: 'image/png',
+    });
+    const originalTerminalViewport = page.viewportSize() ?? { width: 1280, height: 720 };
+    await page.setViewportSize({ width: 390, height: 844 });
+    try {
+      await terminalActionArea.scrollIntoViewIfNeeded();
+      await expect(terminalActionArea).toBeVisible();
+      await test.info().attach('approval-action-area-terminal-mobile', {
+        body: await terminalActionArea.screenshot(),
+        contentType: 'image/png',
+      });
+    } finally {
+      await page.setViewportSize(originalTerminalViewport);
+    }
+
+    approvalScenario = 'detail-error';
+    await page.goto('/approvals/1');
+    await page.waitForLoadState('networkidle');
+    const detailLoadError = page.getByTestId('approval-detail-load-error');
+    await expect(detailLoadError).toBeVisible({ timeout: 10_000 });
+    await expect(detailLoadError).toContainText('审批详情加载失败');
+    await expect(page.getByRole('button', { name: /审批通过|approve/i })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: /驳回申请|reject/i })).toHaveCount(0);
+    await test.info().attach('approval-detail-load-error', {
+      body: await detailLoadError.screenshot(),
+      contentType: 'image/png',
+    });
+    await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
+    expect(errors.filter((error) => !error.includes('[HTTP 5xx] 服务端错误: 500 审批详情服务异常'))).toEqual([]);
   });
 
   test('/reports 空态与权限拒绝态可解释且不崩溃', async ({ page }) => {
@@ -410,7 +466,10 @@ async function mockApi(route: Route) {
     }
 
     if (path === '/approvals/1') {
-      return fulfill(route, approvalDetail());
+      if (approvalScenario === 'detail-error') {
+        return fulfillError(route, 500, '审批详情服务异常');
+      }
+      return fulfill(route, approvalDetail(approvalScenario === 'approved' ? 'APPROVED' : 'PENDING'));
     }
 
     if (approvalScenario === 'empty') {
@@ -713,7 +772,7 @@ function paged<T>(records: T[]) {
   };
 }
 
-function approvalDetail() {
+function approvalDetail(status: 'PENDING' | 'APPROVED' = 'PENDING') {
   return {
     process: {
       id: 1,
@@ -723,12 +782,21 @@ function approvalDetail() {
       businessData: JSON.stringify({ title: '模块验收审批单', reason: '浏览器回归验证' }),
       applicantId: 1,
       applicantName: '系统管理员',
-      status: 'PENDING',
+      status,
       currentStep: 1,
       createTime: '2026-05-31T09:00:00',
       version: 1,
     },
-    records: [],
+    records: status === 'APPROVED' ? [
+      {
+        id: 1,
+        stepNo: 1,
+        approverId: 1,
+        approveResult: 'APPROVED',
+        approveOpinion: '审批通过',
+        approveTime: '2026-05-31T09:10:00',
+      },
+    ] : [],
     workflowRuntimePath: [
       {
         stepNo: 1,

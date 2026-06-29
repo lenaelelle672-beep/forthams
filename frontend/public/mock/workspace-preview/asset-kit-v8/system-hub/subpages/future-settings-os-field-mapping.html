@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+
+<html lang="zh"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>UNIVIEW | 系统设置中心 - 字段映射</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;family=JetBrains+Mono:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-primary": "#ffffff",
+                      "tertiary-fixed-dim": "#ffb695",
+                      "border-subtle": "#D7E2F0",
+                      "on-tertiary-fixed-variant": "#7b2f00",
+                      "status-green": "#16A34A",
+                      "on-secondary-container": "#51617e",
+                      "error-container": "#ffdad6",
+                      "primary-fixed": "#d9e2ff",
+                      "primary-container": "#1d6ef2",
+                      "secondary-fixed": "#d5e3ff",
+                      "on-surface-variant": "#424654",
+                      "on-tertiary-fixed": "#351000",
+                      "on-error-container": "#93000a",
+                      "surface-container": "#ebeef2",
+                      "on-primary-container": "#fffdff",
+                      "inverse-primary": "#b0c6ff",
+                      "surface-tint": "#0057cc",
+                      "on-tertiary-container": "#fffdff",
+                      "surface-variant": "#e0e3e7",
+                      "status-purple": "#7C3AED",
+                      "outline-variant": "#c2c6d7",
+                      "on-primary-fixed": "#001945",
+                      "tertiary-container": "#c75000",
+                      "outline": "#727786",
+                      "surface": "#f7fafe",
+                      "on-primary-fixed-variant": "#00419c",
+                      "inverse-on-surface": "#eef1f5",
+                      "tertiary-fixed": "#ffdbcc",
+                      "surface-container-highest": "#e0e3e7",
+                      "on-secondary-fixed": "#091c35",
+                      "on-error": "#ffffff",
+                      "on-background": "#181c1f",
+                      "inverse-surface": "#2d3134",
+                      "surface-container-high": "#e5e8ec",
+                      "surface-container-low": "#f1f4f8",
+                      "surface-container-lowest": "#ffffff",
+                      "status-red": "#DC2626",
+                      "text-secondary": "#64748B",
+                      "primary-fixed-dim": "#b0c6ff",
+                      "surface-dim": "#d7dade",
+                      "secondary": "#4e5f7b",
+                      "on-secondary-fixed-variant": "#374762",
+                      "on-secondary": "#ffffff",
+                      "secondary-fixed-dim": "#b6c7e8",
+                      "status-cyan": "#00A8D8",
+                      "secondary-container": "#ccddff",
+                      "status-amber": "#F59E0B",
+                      "error": "#ba1a1a",
+                      "on-surface": "#181c1f",
+                      "background": "#f7fafe",
+                      "tertiary": "#9f3e00",
+                      "text-primary": "#0F172A",
+                      "surface-bright": "#f7fafe",
+                      "on-tertiary": "#ffffff",
+                      "primary": "#0056c9"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "sidebar-width": "240px",
+                      "inspector-width": "320px",
+                      "topbar-height": "56px",
+                      "card-padding": "16px",
+                      "container-gap": "20px",
+                      "grid-gutter": "12px"
+              },
+              "fontFamily": {
+                      "code-meta": ["JetBrains Mono"],
+                      "status-label": ["Inter"],
+                      "section-header": ["Inter"],
+                      "body-sm": ["Inter"],
+                      "body-md": ["Inter"],
+                      "page-title": ["Inter"]
+              },
+              "fontSize": {
+                      "code-meta": ["11px", {"lineHeight": "16px", "fontWeight": "400"}],
+                      "status-label": ["11px", {"lineHeight": "16px", "fontWeight": "700"}],
+                      "section-header": ["14px", {"lineHeight": "20px", "fontWeight": "700"}],
+                      "body-sm": ["12px", {"lineHeight": "18px", "fontWeight": "500"}],
+                      "body-md": ["13px", {"lineHeight": "20px", "fontWeight": "500"}],
+                      "page-title": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+              }
+            },
+          },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .glass-panel { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(8px); }
+        .code-font { font-family: 'JetBrains Mono', monospace; }
+
+        /* Custom scrollbar for dense data areas */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #c2c6d7; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #727786; }
+    </style>
+</head>
+<body class="bg-background text-on-surface antialiased min-h-screen">
+<!-- TopNavBar -->
+<header class="flex justify-between items-center px-4 w-full fixed top-0 z-50 bg-[#051424] border-b-2 border-[#1D6EF2] h-topbar-height font-body-md text-body-md shadow-sm">
+<div class="flex items-center gap-8 h-full">
+<span class="text-white font-bold text-lg tracking-wide shrink-0">UNIVIEW | 系统设置中心</span><nav class="hidden md:flex h-full items-end gap-6 text-sm">
+<a class="text-white/70 hover:text-white transition-colors pb-3 border-b-2 border-transparent" href="#">流程平台</a>
+<a class="text-white/70 hover:text-white transition-colors pb-3 border-b-2 border-transparent" href="#">组织权限</a>
+<a class="text-white/70 hover:text-white transition-colors pb-3 border-b-2 border-transparent" href="#">基础资料</a>
+<a class="text-white font-medium border-b-2 border-[#1D6EF2] pb-3" href="#">集成配置</a>
+<a class="text-white/70 hover:text-white transition-colors pb-3 border-b-2 border-transparent" href="#">消息与通知</a>
+<a class="text-white/70 hover:text-white transition-colors pb-3 border-b-2 border-transparent" href="#">系统参数</a>
+</nav>
+</div>
+<div class="flex items-center gap-4 text-white/80">
+
+<a class="hover:text-white transition-colors text-sm flex items-center gap-1" href="#">
+<span class="material-symbols-outlined text-[18px]">exit_to_app</span>
+    返回业务工作台
+</a>
+<div class="flex items-center gap-2 border-l border-white/20 pl-4">
+<span class="text-sm">运营管理员</span>
+<div class="w-8 h-8 rounded-full bg-white/20 overflow-hidden border border-white/30">
+<img alt="Administrator profile" class="w-full h-full object-cover" data-alt="Administrator profile picture showing a professional headshot in a high-tech control room environment, sharp focus, cool lighting, corporate modern aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDa5Hxh98H4-keUICXulC5rmZnCD4BjzPX20aK796ewop5XrlhlxzXABixw2RZCv-8yS496xA4oEEfeYlGjKsWNGVP-Aw6pFVom67yhtT8SyDp_tgVNdd6tXuepEyDmotmbRsncnFbGHe7TBBfd7AKXtz5uK2V1xYumpn0Ezvaksktr8hy9E20KjYwUGs4K5i6e_aCkb4lmPX41494WWwNIl-rO-0fEfcoUtIVei8llgFADRrpxzF1L67a6kvKpluADybbLbHUD7I_U"/>
+</div>
+</div>
+</div>
+</header>
+<!-- SideNavBar (Product Navigation) -->
+<aside class="fixed left-0 top-topbar-height w-sidebar-width flex flex-col z-40 bg-surface-container-lowest dark:bg-surface-dim h-[calc(100vh-56px)] border-r border-border-subtle">
+<nav class="flex-1 py-4 flex flex-col gap-1 px-2 overflow-y-auto">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded text-on-surface-variant hover:bg-surface-container-high transition-colors font-body-sm text-body-sm" href="#">
+                外部系统配置
+            </a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded text-on-surface-variant hover:bg-surface-container-high transition-colors font-body-sm text-body-sm" href="#">
+                接口配置
+            </a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded text-primary font-bold bg-primary-fixed/20 font-body-sm text-body-sm" href="#">
+                字段映射
+            </a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded text-on-surface-variant hover:bg-surface-container-high transition-colors font-body-sm text-body-sm" href="#">
+                同步规则
+            </a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded text-on-surface-variant hover:bg-surface-container-high transition-colors font-body-sm text-body-sm" href="#">
+                Webhook 配置
+            </a>
+</nav>
+</aside>
+<!-- Main Workspace -->
+<main class="ml-sidebar-width pt-topbar-height pr-[320px] min-h-screen bg-background">
+<div class="p-6 pb-20 max-w-6xl mx-auto space-y-container-gap">
+<!-- Breadcrumbs & Header -->
+<div class="mb-8">
+<div class="flex items-center text-code-meta font-code-meta text-outline mb-2 space-x-2">
+<span>系统设置中心</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span>集成配置</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="text-primary font-bold">字段映射</span>
+</div>
+<div class="flex justify-between items-end">
+<h1 class="font-page-title text-page-title text-on-surface">SAP ERP Asset Integration</h1>
+<div class="flex gap-2">
+<button class="px-4 py-2 border border-border-subtle rounded text-body-sm font-body-sm text-on-surface-variant hover:bg-surface-container transition-colors bg-surface-container-lowest">Cancel</button>
+<button class="px-4 py-2 bg-primary-container text-on-primary rounded text-body-sm font-body-sm hover:bg-primary transition-colors flex items-center gap-2 shadow-sm">
+<span class="material-symbols-outlined text-[16px]">save</span>
+                            Save Mapping
+                        </button>
+</div>
+</div>
+</div>
+<!-- Dashboard / KPI / Status -->
+<div class="grid grid-cols-3 gap-grid-gutter">
+<div class="bg-surface-container-lowest border border-border-subtle rounded-lg p-card-padding flex flex-col justify-between h-[100px] border-l-4 border-l-status-green">
+<span class="font-body-sm text-body-sm text-outline">Active Mappings</span>
+<div class="flex items-end gap-2">
+<span class="text-2xl font-bold font-section-header">142</span>
+<span class="font-code-meta text-code-meta text-status-green mb-1 flex items-center"><span class="material-symbols-outlined text-[12px]">arrow_upward</span> 12%</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest border border-border-subtle rounded-lg p-card-padding flex flex-col justify-between h-[100px] border-l-4 border-l-status-amber">
+<span class="font-body-sm text-body-sm text-outline">Review Required</span>
+<div class="flex items-end gap-2">
+<span class="text-2xl font-bold font-section-header">8</span>
+<span class="font-code-meta text-code-meta text-status-amber mb-1">Pending validation</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest border border-border-subtle rounded-lg p-card-padding flex flex-col justify-between h-[100px] border-l-4 border-l-status-cyan">
+<span class="font-body-sm text-body-sm text-outline">Data Sync Rate</span>
+<div class="flex items-end gap-2">
+<span class="text-2xl font-bold font-section-header">99.8%</span>
+<span class="font-code-meta text-code-meta text-outline mb-1">Last 24h</span>
+</div>
+</div>
+</div>
+<!-- Field Mapping Matrix -->
+<div class="bg-surface-container-lowest border border-border-subtle rounded-lg overflow-hidden">
+<div class="border-b border-border-subtle bg-surface-container-low p-card-padding flex justify-between items-center">
+<h3 class="font-section-header text-section-header flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">data_object</span>
+                        外部系统字段与本地资产字段映射矩阵
+                    </h3>
+<div class="relative w-64">
+<span class="material-symbols-outlined absolute left-2 top-1.5 text-outline text-[18px]">search</span>
+<input class="w-full pl-8 pr-3 py-1.5 border border-border-subtle rounded bg-background text-body-sm font-body-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none font-code-meta placeholder:font-code-meta" placeholder="Search fields..." type="text"/>
+</div>
+</div>
+<div class="overflow-x-auto max-h-[400px]">
+<table class="w-full text-left border-collapse">
+<thead class="sticky top-0 bg-surface-container-low z-10 font-body-sm text-body-sm text-on-surface-variant border-b border-border-subtle shadow-sm">
+<tr>
+<th class="p-3 font-medium border-r border-border-subtle w-1/3">SAP ERP Source Field (External)</th>
+<th class="p-3 font-medium w-8 text-center border-r border-border-subtle">Dir</th>
+<th class="p-3 font-medium w-1/3 border-r border-border-subtle">Future OS Target Field (Local)</th>
+<th class="p-3 font-medium">Status / Transform</th>
+</tr>
+</thead>
+<tbody class="font-code-meta text-code-meta divide-y divide-border-subtle">
+<tr class="hover:bg-surface-bright transition-colors group">
+<td class="p-3 border-r border-border-subtle">
+<div class="flex flex-col">
+<span class="font-bold text-on-surface">EQUI.EQUNR</span>
+<span class="text-outline text-[10px]">Equipment Number (CHAR 18)</span>
+</div>
+</td>
+<td class="p-3 border-r border-border-subtle text-center text-outline">
+<span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</td>
+<td class="p-3 border-r border-border-subtle">
+<select class="w-full bg-transparent border-none p-0 focus:ring-0 font-code-meta text-code-meta font-bold text-primary cursor-pointer">
+<option>asset.external_id</option>
+<option>asset.id</option>
+</select>
+</td>
+<td class="p-3 flex items-center justify-between">
+<span class="bg-status-green/10 text-status-green px-2 py-0.5 rounded font-status-label text-status-label flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]">check_circle</span> Valid
+                                    </span>
+<button class="opacity-0 group-hover:opacity-100 p-1 text-outline hover:text-primary transition-all"><span class="material-symbols-outlined text-[16px]">edit</span></button>
+</td>
+</tr>
+<tr class="hover:bg-surface-bright transition-colors group bg-error-container/20">
+<td class="p-3 border-r border-border-subtle">
+<div class="flex flex-col">
+<span class="font-bold text-on-surface">EQUI.DATBI</span>
+<span class="text-outline text-[10px]">Valid To Date (DATS 8)</span>
+</div>
+</td>
+<td class="p-3 border-r border-border-subtle text-center text-outline">
+<span class="material-symbols-outlined text-[16px]">sync_alt</span>
+</td>
+<td class="p-3 border-r border-border-subtle">
+<select class="w-full bg-transparent border-none p-0 focus:ring-0 font-code-meta text-code-meta font-bold text-error cursor-pointer">
+<option>asset.lifecycle.end_date</option>
+</select>
+</td>
+<td class="p-3 flex items-center justify-between">
+<span class="bg-error-container text-on-error-container px-2 py-0.5 rounded font-status-label text-status-label flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]">error</span> Format Mismatch
+                                    </span>
+<button class="p-1 text-primary hover:bg-primary-fixed rounded transition-all"><span class="material-symbols-outlined text-[16px]">code</span></button>
+</td>
+</tr>
+<tr class="hover:bg-surface-bright transition-colors group">
+<td class="p-3 border-r border-border-subtle">
+<div class="flex flex-col">
+<span class="font-bold text-on-surface">ILOA.TPLNR</span>
+<span class="text-outline text-[10px]">Functional Location (CHAR 30)</span>
+</div>
+</td>
+<td class="p-3 border-r border-border-subtle text-center text-outline">
+<span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</td>
+<td class="p-3 border-r border-border-subtle">
+<select class="w-full bg-transparent border-none p-0 focus:ring-0 font-code-meta text-code-meta font-bold text-primary cursor-pointer">
+<option>location.hierarchy_path</option>
+</select>
+</td>
+<td class="p-3 flex items-center justify-between">
+<span class="bg-surface-variant text-on-surface-variant px-2 py-0.5 rounded font-status-label text-status-label flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]">transform</span> Script Active
+                                    </span>
+<button class="opacity-100 p-1 text-primary bg-primary-fixed rounded transition-all"><span class="material-symbols-outlined text-[16px]">edit</span></button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Transformation Script Editor -->
+<div class="bg-surface-container-lowest border border-primary/30 rounded-lg overflow-hidden shadow-sm relative">
+<div class="absolute inset-0 pointer-events-none border border-primary/20 rounded-lg animate-pulse"></div>
+<div class="border-b border-border-subtle bg-surface-container-low p-card-padding flex justify-between items-center">
+<h3 class="font-section-header text-section-header flex items-center gap-2">
+<span class="material-symbols-outlined text-status-purple">terminal</span>
+                        转换脚本内嵌编辑器: ILOA.TPLNR
+                    </h3>
+<div class="flex gap-2">
+<button class="px-2 py-1 text-code-meta font-code-meta border border-border-subtle rounded hover:bg-surface-container transition-colors">Test Run</button>
+<button class="px-2 py-1 text-code-meta font-code-meta bg-primary-container text-on-primary rounded hover:bg-primary transition-colors">Apply Script</button>
+</div>
+</div>
+<div class="p-4 bg-[#1e1e1e] text-[#d4d4d4] font-code-meta text-code-meta overflow-x-auto">
+<pre><code><span class="text-[#569cd6]">function</span> <span class="text-[#dcdcaa]">transform</span>(sourceValue, context) {
+    <span class="text-[#6a9955]">// Format SAP functional location to hierarchical path</span>
+    <span class="text-[#569cd6]">if</span> (!sourceValue) <span class="text-[#569cd6]">return</span> <span class="text-[#ce9178]">"ROOT"</span>;
+
+    <span class="text-[#569cd6]">const</span> parts = sourceValue.<span class="text-[#dcdcaa]">split</span>(<span class="text-[#ce9178]">"-"</span>);
+    <span class="text-[#569cd6]">if</span> (parts.<span class="text-[#9cdcfe]">length</span> &lt; <span class="text-[#b5cea8]">2</span>) <span class="text-[#569cd6]">return</span> sourceValue;
+
+    <span class="text-[#569cd6]">return</span> <span class="text-[#ce9178]">`/`</span> + parts.<span class="text-[#dcdcaa]">join</span>(<span class="text-[#ce9178]">'/'</span>);
+}</code></pre>
+</div>
+</div>
+</div>
+</main>
+<!-- Contextual Inspector Panel (Right) -->
+<aside class="fixed right-0 top-topbar-height w-inspector-width h-[calc(100vh-56px)] bg-surface-container-lowest border-l border-border-subtle z-30 flex flex-col shadow-[-4px_0_15px_rgba(29,110,242,0.05)] glass-panel">
+<div class="p-4 border-b border-border-subtle flex justify-between items-center bg-surface">
+<h3 class="font-section-header text-section-header flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">analytics</span> 影响范围分析
+            </h3>
+<button class="text-outline hover:text-on-surface"><span class="material-symbols-outlined text-[18px]">close</span></button>
+</div>
+<div class="flex-1 overflow-y-auto p-4 space-y-6">
+<!-- Topology Flow (Placeholder for visual flow) -->
+<div>
+<h4 class="font-body-sm text-body-sm text-outline mb-2 uppercase tracking-wide">Data Flow Topology</h4>
+<div class="bg-surface-container border border-border-subtle rounded p-3 text-center relative overflow-hidden h-32">
+<div class="relative z-10 font-code-meta text-[10px] flex justify-between items-center h-full text-on-surface">
+<div class="bg-surface p-1 rounded border border-border-subtle">SAP ERP</div>
+<span class="material-symbols-outlined text-primary text-[16px] animate-pulse">sync</span>
+<div class="bg-surface p-1 rounded border border-primary text-primary font-bold">Future OS</div>
+</div>
+</div>
+</div>
+<!-- Impact Gates -->
+<div>
+<h4 class="font-body-sm text-body-sm text-outline mb-2 uppercase tracking-wide">Downstream Impact</h4>
+<ul class="space-y-2">
+<li class="flex items-start gap-2 border border-border-subtle p-2 rounded bg-surface">
+<span class="material-symbols-outlined text-status-amber text-[16px] mt-0.5">warning</span>
+<div>
+<p class="font-body-sm text-body-sm text-on-surface">Reporting Module</p>
+<p class="font-code-meta text-code-meta text-outline">3 dashboards depend on ILOA.TPLNR mapping.</p>
+</div>
+</li>
+<li class="flex items-start gap-2 border border-border-subtle p-2 rounded bg-surface">
+<span class="material-symbols-outlined text-status-green text-[16px] mt-0.5">check_circle</span>
+<div>
+<p class="font-body-sm text-body-sm text-on-surface">Asset Registry</p>
+<p class="font-code-meta text-code-meta text-outline">No breaking schema changes detected.</p>
+</div>
+</li>
+</ul>
+</div>
+<!-- AI Helper -->
+<div class="bg-inverse-on-surface border border-primary-fixed rounded p-3 relative">
+<span class="material-symbols-outlined absolute top-2 right-2 text-primary-fixed-dim text-[16px]">auto_awesome</span>
+<h4 class="font-body-sm text-body-sm text-on-surface mb-1 font-bold">AI Helper Suggestion</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-2">Detected Date Format anomaly for `EQUI.DATBI`. Suggesting ISO-8601 conversion script.</p>
+<button class="text-code-meta font-code-meta text-primary hover:underline">Apply Fix</button>
+</div>
+</div>
+</aside>
+</body></html>

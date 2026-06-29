@@ -45,6 +45,357 @@
       ]
     },
     {
+      "id": "flow-platform-subpage-01-flow-definition-v2",
+      "menuId": "system-flow-definition",
+      "label": "导航控制台",
+      "businessObject": "流程模板、版本基线、绑定表单、节点顺序、发布检查、ERP 归档集成",
+      "image2": {
+        "path": "/mock/workspace-preview/asset-kit-v8/system-hub/subpages/flow-platform-subpage-01-flow-definition-v2.png",
+        "width": 1586,
+        "height": 992,
+        "status": "complete",
+        "note": "v2 流程定义专属 IMAGE2 产品图，统一当前五个顶部入口；顶部和左侧导航不放搜索，只在页面内容区提供流程搜索，强调表格主导、草稿编辑、右侧详情、保存草稿和提交校验。"
+      },
+      "stitch": {
+        "path": "/mock/workspace-preview/asset-kit-v8/system-hub/subpages/stitch-flow-platform-subpage-01-flow-definition-v1.png",
+        "screenId": "fd0d0c5511904a7bbb2831dd8934934c",
+        "sessionId": "12530500457949857258",
+        "width": 512,
+        "height": 469,
+        "status": "ready",
+        "localExport": ".stitch/exports/9943060219435296513-12530500457949857258",
+        "note": "流程定义 Stitch 复刻稿已接入当前可交互 Workbench；以 IMAGE2 v2 和本地真人模拟为验收基准，后续只做逐页精修。"
+      },
+      "promptFile": ".stitch/prompts/system-hub-flow-definition-subpage.md",
+      "interaction": [
+        "页面内流程搜索",
+        "流程表格选择",
+        "右侧详情联动",
+        "流程草稿编辑",
+        "保存草稿",
+        "提交校验",
+        "发布检查"
+      ],
+      "acceptance": [
+        "流程定义必须表格主导并显示右侧详情",
+        "草稿编辑和发布检查必须同屏可见",
+        "搜索只能出现在流程定义表格筛选栏",
+        "新建流程、流程草稿编辑、保存草稿、提交校验和发布检查必须可真人模拟并写入当前页操作反馈",
+        "流程表格、右侧详情、草稿编辑和发布检查必须同屏联动，不得复用通用配置占位模板"
+      ]
+    },
+    {
+      "id": "flow-platform-subpage-02-settings-command-center-v1",
+      "menuId": "system-settings-command-center",
+      "label": "设置中心",
+      "businessObject": "后台设置 OS 设置中枢，聚合系统参数、编号规则、SLA、Webhook、邮件与通知配置。",
+      "image2": {
+        "path": "/mock/workspace-preview/asset-kit-v8/system-hub/subpages/flow-platform-subpage-02-settings-command-center-v1.png",
+        "width": 2560,
+        "height": 1600,
+        "status": "complete",
+        "note": "设置中心 Stitch 对齐产品图，纳入 Future Settings OS 统一导航、页内筛选、保存草稿和提交校验矩阵。"
+      },
+      "stitch": {
+        "path": "/mock/workspace-preview/asset-kit-v8/system-hub/subpages/stitch-flow-platform-subpage-02-settings-command-center-v1.png",
+        "screenId": "4763815b635c48f89ef4a6be77bf535a",
+        "sessionId": "11462082228439399504",
+        "width": 2560,
+        "height": 1600,
+        "status": "ready",
+        "localExport": "public/mock/workspace-preview/asset-kit-v8/system-hub/subpages/future-settings-os-settings-command-center.html",
+        "note": "设置中心 Stitch 复刻稿已接入当前可交互 Workbench；以 IMAGE2 v2 和本地真人模拟为验收基准，后续只做逐页精修。"
+      },
+      "promptFile": ".stitch/prompts/flow-platform-settings-command-center-subpage.md",
+      "interaction": [
+        "页内搜索/筛选",
+        "详情预览",
+        "新建配置",
+        "保存草稿",
+        "提交校验",
+        "查看发布审计"
+      ],
+      "acceptance": [
+        "设置中心必须在当前页完成搜索、详情、保存和提交，不能复用通用占位模板",
+        "设置中心保存草稿、提交校验和查看发布审计必须可真人模拟并写入当前页操作反馈",
+        "设置中心必须共享 Future Settings OS 顶部固定导航和左侧分类导航，不打开新页面或新标签"
+      ]
+    },
+    {
+      "id": "flow-platform-subpage-03-runtime-monitor-v1",
+      "menuId": "system-runtime-monitor",
+      "label": "运行监测",
+      "businessObject": "后台设置运行状态、执行链路和异常事件监测。",
+      "image2": {
+        "path": "/mock/workspace-preview/asset-kit-v8/system-hub/subpages/flow-platform-subpage-03-runtime-monitor-v1.png",
+        "width": 2560,
+        "height": 1600,
+        "status": "complete",
+        "note": "运行监测 Stitch 对齐产品图，纳入 Future Settings OS 统一导航、页内筛选、保存草稿和提交校验矩阵。"
+      },
+      "stitch": {
+        "path": "/mock/workspace-preview/asset-kit-v8/system-hub/subpages/stitch-flow-platform-subpage-03-runtime-monitor-v1.png",
+        "screenId": "3671ef51db5b435d9a3950685538aa17",
+        "sessionId": "11462082228439399504",
+        "width": 2560,
+        "height": 1600,
+        "status": "ready",
+        "localExport": "public/mock/workspace-preview/asset-kit-v8/system-hub/subpages/future-settings-os-runtime-monitor.html",
+        "note": "运行监测 Stitch 复刻稿已接入当前可交互 Workbench；以 IMAGE2 v2 和本地真人模拟为验收基准，后续只做逐页精修。"
+      },
+      "promptFile": ".stitch/prompts/flow-platform-runtime-monitor-subpage.md",
+      "interaction": [
+        "页内搜索/筛选",
+        "详情预览",
+        "新建配置",
+        "保存草稿",
+        "提交校验",
+        "查看发布审计"
+      ],
+      "acceptance": [
+        "运行监测必须在当前页完成搜索、详情、保存和提交，不能复用通用占位模板",
+        "运行监测保存草稿、提交校验和查看发布审计必须可真人模拟并写入当前页操作反馈",
+        "运行监测必须共享 Future Settings OS 顶部固定导航和左侧分类导航，不打开新页面或新标签"
+      ]
+    },
+    {
+      "id": "flow-platform-subpage-02-flow-designer-v2",
+      "menuId": "system-flow-designer",
+      "label": "流程设计器",
+      "businessObject": "流程大画布、节点库、节点属性、连线、保存节点、保存草稿、提交校验、发布流程",
+      "image2": {
+        "path": "/mock/workspace-preview/asset-kit-v8/system-hub/subpages/flow-platform-subpage-02-flow-designer-v2.png",
+        "width": 1568,
+        "height": 1003,
+        "status": "complete",
+        "note": "流程设计器专属 IMAGE2 产品图，强调节点库、超大画布、节点属性配置、保存草稿和提交校验。"
+      },
+      "stitch": {
+        "path": "/mock/workspace-preview/asset-kit-v8/system-hub/subpages/stitch-flow-platform-subpage-02-flow-designer-v2.png",
+        "screenId": "3606481564d94c16aa217cd6f46f0307",
+        "sessionId": "1942813447426744915",
+        "width": 512,
+        "height": 410,
+        "status": "ready",
+        "localExport": ".stitch/exports/9943060219435296513-1942813447426744915",
+        "note": "流程设计器 Stitch 复刻稿已接入当前可交互 Workbench；以 IMAGE2 v2 和本地真人模拟为验收基准，后续只做逐页精修。"
+      },
+      "promptFile": ".stitch/prompts/system-hub-flow-designer-subpage.md",
+      "interaction": [
+        "新建流程图",
+        "拖拽环节节点",
+        "编辑节点属性",
+        "撤销重做",
+        "整理主链",
+        "保存节点",
+        "保存草稿",
+        "提交校验",
+        "发布流程"
+      ],
+      "acceptance": [
+        "流程设计器必须是大画布建模工作台",
+        "节点库、画布、属性配置必须同屏",
+        "新建保存提交链路必须可真人模拟",
+        "顶部导航、左侧导航和节点库不允许出现搜索框",
+        "新建流程图、拖拽节点、配置节点属性、保存草稿和提交校验必须可真人模拟并写入当前页建模操作反馈，不得复用通用占位模板"
+      ]
+    },
+    {
+      "id": "flow-platform-subpage-03-form-config-v2",
+      "menuId": "system-form-config",
+      "label": "表单配置",
+      "businessObject": "表单模板、字段、桌面/H5 布局、校验规则、版本发布",
+      "image2": {
+        "path": "/mock/workspace-preview/asset-kit-v8/system-hub/subpages/flow-platform-subpage-03-form-config-v2.png",
+        "width": 1586,
+        "height": 992,
+        "status": "complete",
+        "note": "v2 表单配置专属 IMAGE2 产品图，统一当前五个顶部入口；顶部和左侧导航不放搜索，页面内展示表单对象搜索、字段表、桌面/H5 双端布局、字段属性、发布检查、保存草稿和提交校验。"
+      },
+      "stitch": {
+        "path": "/mock/workspace-preview/asset-kit-v8/system-hub/subpages/stitch-flow-platform-subpage-03-form-config-v1.png",
+        "screenId": "ee3e66fc6ab94f388e5c237baf8c1c93",
+        "sessionId": "17998030261086433480",
+        "width": 512,
+        "height": 410,
+        "status": "ready",
+        "localExport": ".stitch/exports/9943060219435296513-17998030261086433480",
+        "note": "表单配置 Stitch 复刻稿已接入当前可交互 Workbench；以 IMAGE2 v2 和本地真人模拟为验收基准，后续只做逐页精修。"
+      },
+      "promptFile": ".stitch/prompts/system-hub-form-config-subpage.md",
+      "interaction": [
+        "表单搜索",
+        "新增字段",
+        "字段布局编辑",
+        "桌面/H5 显示配置",
+        "保存草稿",
+        "提交校验"
+      ],
+      "acceptance": [
+        "表单配置必须展示字段表和布局配置",
+        "桌面与 H5 字段差异必须可见",
+        "保存提交链路必须可验证",
+        "新建表单、新增字段、桌面/H5 布局编辑、保存草稿和提交校验必须可真人模拟并写入当前页操作反馈",
+        "表单对象、字段列表、桌面预览、钉钉 H5 预览和字段属性必须同屏联动，不得复用通用占位模板"
+      ]
+    },
+    {
+      "id": "flow-platform-subpage-04-form-storage-v2",
+      "menuId": "system-form-storage",
+      "label": "表单存储",
+      "businessObject": "表单定义版本、实例数据、归档策略、存储路径、取证查询",
+      "image2": {
+        "path": "/mock/workspace-preview/asset-kit-v8/system-hub/subpages/flow-platform-subpage-04-form-storage-v2.png",
+        "width": 1586,
+        "height": 992,
+        "status": "complete",
+        "note": "表单存储 v2 IMAGE2 产品图，强调字段存储映射、归档预演、右侧属性配置、发布校验，以及导航区无搜索、页面内搜索。"
+      },
+      "stitch": {
+        "path": "/mock/workspace-preview/asset-kit-v8/system-hub/subpages/stitch-flow-platform-subpage-04-form-storage-v1.png",
+        "screenId": "fd06b52f39e94e40a7ecb4a2203c02eb",
+        "sessionId": "16500348567003741211",
+        "width": 512,
+        "height": 410,
+        "status": "ready",
+        "localExport": ".stitch/exports/9943060219435296513-16500348567003741211",
+        "note": "表单存储 Stitch 复刻稿已接入当前可交互 Workbench；以 IMAGE2 v2 和本地真人模拟为验收基准，后续只做逐页精修。"
+      },
+      "promptFile": ".stitch/prompts/system-hub-form-storage-subpage.md",
+      "interaction": [
+        "存储策略搜索",
+        "配置归档周期",
+        "查询表单实例",
+        "取证下载",
+        "保存草稿",
+        "提交校验"
+      ],
+      "acceptance": [
+        "表单存储必须体现定义版本和实例归档",
+        "取证查询入口必须在页面内容区",
+        "归档策略必须可保存提交",
+        "新建存储方案、配置归档周期、查询表单实例、取证下载、保存草稿和提交校验必须可真人模拟并写入当前页操作反馈",
+        "字段存储映射、存储模型预览、归档预演和属性配置必须同屏联动，不得打开通用占位模板"
+      ]
+    },
+    {
+      "id": "flow-platform-subpage-05-approval-rules-v2",
+      "menuId": "system-approval-rules",
+      "label": "审批规则",
+      "businessObject": "重复处理人跳过、离职交接、代理审批、节点权限、发布影响",
+      "image2": {
+        "path": "/mock/workspace-preview/asset-kit-v8/system-hub/subpages/flow-platform-subpage-05-approval-rules-v2.png",
+        "width": 1586,
+        "height": 992,
+        "status": "complete",
+        "note": "审批规则 v2 IMAGE2 产品图，强调命中模拟、规则执行编排、优先级队列、发布门禁矩阵、属性配置，以及导航区无搜索。"
+      },
+      "stitch": {
+        "path": "/mock/workspace-preview/asset-kit-v8/system-hub/subpages/stitch-flow-platform-subpage-05-approval-rules-v1.png",
+        "screenId": "b2f3d655d19740c19c5ae2c8e80356fe",
+        "sessionId": "15154519221123045515",
+        "width": 512,
+        "height": 410,
+        "status": "ready",
+        "localExport": ".stitch/exports/9943060219435296513-15154519221123045515",
+        "note": "审批规则 Stitch 复刻稿已接入当前可交互 Workbench；以 IMAGE2 v2 和本地真人模拟为验收基准，后续只做逐页精修。"
+      },
+      "promptFile": ".stitch/prompts/system-hub-approval-rules-subpage.md",
+      "interaction": [
+        "规则搜索",
+        "配置跳过规则",
+        "配置代理审批",
+        "影响预览",
+        "保存草稿",
+        "提交校验"
+      ],
+      "acceptance": [
+        "审批规则必须体现重复处理人和离职交接规则",
+        "影响预览必须可见",
+        "规则发布前必须提交校验",
+        "新建规则、配置跳过规则、配置代理审批、影响预览、保存草稿和提交校验必须可真人模拟并写入当前页操作反馈",
+        "规则输入、命中模拟、执行编排、优先级队列和发布门禁必须同屏联动，不得复用通用占位模板"
+      ]
+    },
+    {
+      "id": "flow-platform-subpage-06-todo-fields-v2",
+      "menuId": "system-todo-fields",
+      "label": "待办字段配置",
+      "businessObject": "待办列表字段、桌面显示、钉钉 H5 显示、排序筛选、字段来源",
+      "image2": {
+        "path": "/mock/workspace-preview/asset-kit-v8/system-hub/subpages/flow-platform-subpage-06-todo-fields-v2.png",
+        "width": 1586,
+        "height": 992,
+        "status": "complete",
+        "note": "待办字段配置 v2 IMAGE2 产品图，强化方案搜索、字段清单、桌面/H5 同屏预览、字段属性和发布校验；搜索下沉到页面内容区。"
+      },
+      "stitch": {
+        "path": "/mock/workspace-preview/asset-kit-v8/system-hub/subpages/stitch-flow-platform-subpage-06-todo-fields-v1.png",
+        "screenId": "380aab3ef83a4fe7be945030d8911ebc",
+        "sessionId": "16585887342294871553",
+        "width": 512,
+        "height": 410,
+        "status": "ready",
+        "localExport": ".stitch/exports/9943060219435296513-16585887342294871553",
+        "note": "待办字段配置 Stitch 复刻稿已接入当前可交互 Workbench；以 IMAGE2 v2 和本地真人模拟为验收基准，后续只做逐页精修。"
+      },
+      "promptFile": ".stitch/prompts/system-hub-todo-fields-subpage.md",
+      "interaction": [
+        "字段搜索",
+        "配置桌面显示",
+        "配置 H5 显示",
+        "排序宽度调整",
+        "保存草稿",
+        "提交校验"
+      ],
+      "acceptance": [
+        "待办字段必须支持字段显示配置",
+        "桌面/H5 字段差异必须可见",
+        "页面内字段搜索不可放在导航层",
+        "新建方案、新增字段、桌面/H5 显示配置、保存草稿和提交校验必须可真人模拟并写入当前页操作反馈",
+        "待办字段清单、桌面待办预览、钉钉 H5 待办预览和字段属性必须同屏联动，不得复用通用占位模板"
+      ]
+    },
+    {
+      "id": "flow-platform-subpage-07-sla-config-v2",
+      "menuId": "system-sla-config",
+      "label": "SLA 配置",
+      "businessObject": "审批时限、超时提醒、升级规则、通知渠道、日历规则",
+      "image2": {
+        "path": "/mock/workspace-preview/asset-kit-v8/system-hub/subpages/flow-platform-subpage-07-sla-config-v2.png",
+        "width": 1586,
+        "height": 992,
+        "status": "complete",
+        "note": "SLA 配置 v2 IMAGE2 产品图，强化规则明细表、超时升级路径、当前超时模拟队列、通知渠道矩阵、发布门禁和右侧属性配置。"
+      },
+      "stitch": {
+        "path": "/mock/workspace-preview/asset-kit-v8/system-hub/subpages/stitch-flow-platform-subpage-07-sla-config-v1.png",
+        "screenId": "b707201bdc764a8c9640143da085083a",
+        "sessionId": "5257993793628535483",
+        "width": 512,
+        "height": 410,
+        "status": "ready",
+        "localExport": ".stitch/exports/9943060219435296513-5257993793628535483",
+        "note": "SLA 配置 Stitch 复刻稿已接入当前可交互 Workbench；以 IMAGE2 v2 和本地真人模拟为验收基准，后续只做逐页精修。"
+      },
+      "promptFile": ".stitch/prompts/system-hub-sla-config-subpage.md",
+      "interaction": [
+        "SLA 规则搜索",
+        "配置超时阈值",
+        "配置升级路径",
+        "通知联动",
+        "保存草稿",
+        "提交校验"
+      ],
+      "acceptance": [
+        "SLA 配置必须体现超时提醒和升级规则",
+        "通知渠道联动必须可见",
+        "规则必须支持保存草稿和提交校验",
+        "新建 SLA、配置超时阈值、配置升级路径、模拟升级、保存草稿和提交校验必须可真人模拟并写入当前页操作反馈",
+        "SLA 规则表、超时升级路径、通知渠道矩阵和发布门禁必须同屏联动，不得复用通用占位模板"
+      ]
+    },
+    {
       "id": "org-permission-subpage-01-user-management-v2",
       "menuId": "system-user-management",
       "label": "用户管理",
@@ -172,6 +523,90 @@
       ]
     },
     {
+      "id": "org-permission-subpage-06-dept-org-v2",
+      "menuId": "system-dept-org",
+      "label": "部门组织",
+      "businessObject": "部门树、父级路径、成本中心、部门负责人、EHR/钉钉/ERP 同步、审批影响、工作交接规则",
+      "image2": {
+        "path": "/mock/workspace-preview/asset-kit-v8/system-hub/subpages/org-permission-subpage-06-dept-org-v2.png",
+        "width": 1586,
+        "height": 992,
+        "status": "complete",
+        "note": "v2 专用部门组织产品图，补齐完整系统运营中枢壳层，突出页面内搜索筛选、组织架构树、部门列表、负责人/成本中心、同步差异、审批影响链路和交接影响。"
+      },
+      "stitch": {
+        "path": "/mock/workspace-preview/asset-kit-v8/system-hub/subpages/stitch-org-permission-subpage-06-dept-org-v1.png",
+        "screenId": "394265d3e46449ff8adffc1c10daeedd",
+        "sessionId": "17374262791068265828",
+        "width": 512,
+        "height": 410,
+        "status": "ready",
+        "localExport": ".stitch/exports/9943060219435296513-17374262791068265828",
+        "note": "部门组织 Stitch 复刻稿已接入当前可交互 Workbench；以 IMAGE2 v2 和本地真人模拟为验收基准，后续只做逐页精修。"
+      },
+      "promptFile": ".stitch/prompts/org-permission-dept-org-subpage.md",
+      "interaction": [
+        "部门搜索",
+        "状态筛选",
+        "组织树选择",
+        "负责人变更",
+        "页内变更记录",
+        "同步差异确认",
+        "审批影响预览",
+        "保存草稿",
+        "提交校验"
+      ],
+      "acceptance": [
+        "部门组织必须显示组织树和部门数据表，不能只是通用配置列表",
+        "搜索入口必须支持部门、编码、负责人、成本中心和同步来源",
+        "右侧详情必须同屏展示父级路径、成本中心、负责人、同步策略、审批影响和交接规则",
+        "负责人变更和停用等表格操作必须可真人模拟并写入本页变更与同步记录",
+        "部门搜索、负责人变更、停用确认、保存草稿和提交校验必须可真人模拟并写入当前页变更与同步记录，不得复用通用占位模板"
+      ]
+    },
+    {
+      "id": "org-permission-subpage-07-post-management-v2",
+      "menuId": "system-post-management",
+      "label": "岗位管理",
+      "businessObject": "岗位编码、职责范围、审批解析、兜底岗位、角色联动、数据权限联动、交接策略、审计策略",
+      "image2": {
+        "path": "/mock/workspace-preview/asset-kit-v8/system-hub/subpages/org-permission-subpage-07-post-management-v2.png",
+        "width": 1585,
+        "height": 992,
+        "status": "complete",
+        "note": "v2 专用岗位管理产品图，采用完整系统运营中枢壳层；顶部和左侧导航不放搜索，只在页面内提供岗位搜索，突出岗位分类、岗位列表、详情配置、审批解析模拟和发布门禁。"
+      },
+      "stitch": {
+        "path": "/mock/workspace-preview/asset-kit-v8/system-hub/subpages/stitch-org-permission-subpage-07-post-management-v1.png",
+        "screenId": "686fe3b03b5646adbc18e86aa835349d",
+        "sessionId": "919712572753607260",
+        "width": 512,
+        "height": 410,
+        "status": "ready",
+        "localExport": ".stitch/exports/9943060219435296513-919712572753607260",
+        "note": "岗位管理 Stitch 复刻稿已接入当前可交互 Workbench；以 IMAGE2 v2 和本地真人模拟为验收基准，后续只做逐页精修。"
+      },
+      "promptFile": ".stitch/prompts/org-permission-post-management-subpage.md",
+      "interaction": [
+        "岗位搜索",
+        "状态/引用筛选",
+        "岗位分类选择",
+        "审批解析模拟",
+        "影响预览",
+        "页内影响留痕",
+        "查看审计",
+        "角色与数据权限联动",
+        "保存草稿",
+        "提交校验"
+      ],
+      "acceptance": [
+        "岗位管理必须显示岗位分类、岗位数据表和审批解析模拟",
+        "搜索入口必须支持岗位、编码、职责、流程节点和角色包",
+        "右侧详情必须同屏展示职责、审批解析、兜底岗位、角色联动、数据权限联动、交接策略和审计策略",
+        "影响预览和查看审计必须可真人模拟并写入本页岗位影响与审计记录，不得打开通用占位模板"
+      ]
+    },
+    {
       "id": "org-permission-subpage-04-data-permissions-v2",
       "menuId": "system-data-permissions",
       "label": "数据权限",
@@ -255,87 +690,40 @@
       ]
     },
     {
-      "id": "org-permission-subpage-06-dept-org-v2",
-      "menuId": "system-dept-org",
-      "label": "部门组织",
-      "businessObject": "部门树、父级路径、成本中心、部门负责人、EHR/钉钉/ERP 同步、审批影响、工作交接规则",
+      "id": "org-permission-subpage-08-tenant-management-v1",
+      "menuId": "system-tenant-management",
+      "label": "租户管理",
+      "businessObject": "租户契约、环境隔离、发布门禁和配置归属管理。",
       "image2": {
-        "path": "/mock/workspace-preview/asset-kit-v8/system-hub/subpages/org-permission-subpage-06-dept-org-v2.png",
-        "width": 1586,
-        "height": 992,
+        "path": "/mock/workspace-preview/asset-kit-v8/system-hub/subpages/org-permission-subpage-08-tenant-management-v1.png",
+        "width": 2560,
+        "height": 1600,
         "status": "complete",
-        "note": "v2 专用部门组织产品图，补齐完整系统运营中枢壳层，突出页面内搜索筛选、组织架构树、部门列表、负责人/成本中心、同步差异、审批影响链路和交接影响。"
+        "note": "租户管理 Stitch 对齐产品图，纳入 Future Settings OS 统一导航、页内筛选、保存草稿和提交校验矩阵。"
       },
       "stitch": {
-        "path": "/mock/workspace-preview/asset-kit-v8/system-hub/subpages/stitch-org-permission-subpage-06-dept-org-v1.png",
-        "screenId": "394265d3e46449ff8adffc1c10daeedd",
-        "sessionId": "17374262791068265828",
-        "width": 512,
-        "height": 410,
+        "path": "/mock/workspace-preview/asset-kit-v8/system-hub/subpages/stitch-org-permission-subpage-08-tenant-management-v1.png",
+        "screenId": "local-stitch-html",
+        "sessionId": "11462082228439399504",
+        "width": 2560,
+        "height": 1600,
         "status": "ready",
-        "localExport": ".stitch/exports/9943060219435296513-17374262791068265828",
-        "note": "部门组织 Stitch 复刻稿已接入当前可交互 Workbench；以 IMAGE2 v2 和本地真人模拟为验收基准，后续只做逐页精修。"
+        "localExport": "public/mock/workspace-preview/asset-kit-v8/system-hub/subpages/future-settings-os-tenant-management.html",
+        "note": "租户管理 Stitch 复刻稿已接入当前可交互 Workbench；以 IMAGE2 v2 和本地真人模拟为验收基准，后续只做逐页精修。"
       },
-      "promptFile": ".stitch/prompts/org-permission-dept-org-subpage.md",
+      "promptFile": ".stitch/prompts/org-permission-tenant-management-subpage.md",
       "interaction": [
-        "部门搜索",
-        "状态筛选",
-        "组织树选择",
-        "负责人变更",
-        "页内变更记录",
-        "同步差异确认",
-        "审批影响预览",
+        "页内搜索/筛选",
+        "详情预览",
+        "新建配置",
         "保存草稿",
-        "提交校验"
+        "提交校验",
+        "查看发布审计"
       ],
       "acceptance": [
-        "部门组织必须显示组织树和部门数据表，不能只是通用配置列表",
-        "搜索入口必须支持部门、编码、负责人、成本中心和同步来源",
-        "右侧详情必须同屏展示父级路径、成本中心、负责人、同步策略、审批影响和交接规则",
-        "负责人变更和停用等表格操作必须可真人模拟并写入本页变更与同步记录",
-        "部门搜索、负责人变更、停用确认、保存草稿和提交校验必须可真人模拟并写入当前页变更与同步记录，不得复用通用占位模板"
-      ]
-    },
-    {
-      "id": "org-permission-subpage-07-post-management-v2",
-      "menuId": "system-post-management",
-      "label": "岗位管理",
-      "businessObject": "岗位编码、职责范围、审批解析、兜底岗位、角色联动、数据权限联动、交接策略、审计策略",
-      "image2": {
-        "path": "/mock/workspace-preview/asset-kit-v8/system-hub/subpages/org-permission-subpage-07-post-management-v2.png",
-        "width": 1585,
-        "height": 992,
-        "status": "complete",
-        "note": "v2 专用岗位管理产品图，采用完整系统运营中枢壳层；顶部和左侧导航不放搜索，只在页面内提供岗位搜索，突出岗位分类、岗位列表、详情配置、审批解析模拟和发布门禁。"
-      },
-      "stitch": {
-        "path": "/mock/workspace-preview/asset-kit-v8/system-hub/subpages/stitch-org-permission-subpage-07-post-management-v1.png",
-        "screenId": "686fe3b03b5646adbc18e86aa835349d",
-        "sessionId": "919712572753607260",
-        "width": 512,
-        "height": 410,
-        "status": "ready",
-        "localExport": ".stitch/exports/9943060219435296513-919712572753607260",
-        "note": "岗位管理 Stitch 复刻稿已接入当前可交互 Workbench；以 IMAGE2 v2 和本地真人模拟为验收基准，后续只做逐页精修。"
-      },
-      "promptFile": ".stitch/prompts/org-permission-post-management-subpage.md",
-      "interaction": [
-        "岗位搜索",
-        "状态/引用筛选",
-        "岗位分类选择",
-        "审批解析模拟",
-        "影响预览",
-        "页内影响留痕",
-        "查看审计",
-        "角色与数据权限联动",
-        "保存草稿",
-        "提交校验"
-      ],
-      "acceptance": [
-        "岗位管理必须显示岗位分类、岗位数据表和审批解析模拟",
-        "搜索入口必须支持岗位、编码、职责、流程节点和角色包",
-        "右侧详情必须同屏展示职责、审批解析、兜底岗位、角色联动、数据权限联动、交接策略和审计策略",
-        "影响预览和查看审计必须可真人模拟并写入本页岗位影响与审计记录，不得打开通用占位模板"
+        "租户管理必须在当前页完成搜索、详情、保存和提交，不能复用通用占位模板",
+        "租户管理保存草稿、提交校验和查看发布审计必须可真人模拟并写入当前页操作反馈",
+        "租户管理必须共享 Future Settings OS 顶部固定导航和左侧分类导航，不打开新页面或新标签"
       ]
     },
     {
@@ -1417,283 +1805,80 @@
       ]
     },
     {
-      "id": "flow-platform-subpage-01-flow-definition-v2",
-      "menuId": "system-flow-definition",
-      "label": "流程定义",
-      "businessObject": "流程模板、版本基线、绑定表单、节点顺序、发布检查、ERP 归档集成",
+      "id": "system-params-subpage-07-doc-center-v1",
+      "menuId": "system-doc-center",
+      "label": "文档中心",
+      "businessObject": "后台设置操作说明、配置手册和审计说明。",
       "image2": {
-        "path": "/mock/workspace-preview/asset-kit-v8/system-hub/subpages/flow-platform-subpage-01-flow-definition-v2.png",
-        "width": 1586,
-        "height": 992,
+        "path": "/mock/workspace-preview/asset-kit-v8/system-hub/subpages/system-params-subpage-07-doc-center-v1.png",
+        "width": 2560,
+        "height": 1600,
         "status": "complete",
-        "note": "v2 流程定义专属 IMAGE2 产品图，统一当前五个顶部入口；顶部和左侧导航不放搜索，只在页面内容区提供流程搜索，强调表格主导、草稿编辑、右侧详情、保存草稿和提交校验。"
+        "note": "文档中心 Stitch 对齐产品图，纳入 Future Settings OS 统一导航、页内筛选、保存草稿和提交校验矩阵。"
       },
       "stitch": {
-        "path": "/mock/workspace-preview/asset-kit-v8/system-hub/subpages/stitch-flow-platform-subpage-01-flow-definition-v1.png",
-        "screenId": "fd0d0c5511904a7bbb2831dd8934934c",
-        "sessionId": "12530500457949857258",
-        "width": 512,
-        "height": 469,
+        "path": "/mock/workspace-preview/asset-kit-v8/system-hub/subpages/stitch-system-params-subpage-07-doc-center-v1.png",
+        "screenId": "local-stitch-html",
+        "sessionId": "11462082228439399504",
+        "width": 2560,
+        "height": 1600,
         "status": "ready",
-        "localExport": ".stitch/exports/9943060219435296513-12530500457949857258",
-        "note": "流程定义 Stitch 复刻稿已接入当前可交互 Workbench；以 IMAGE2 v2 和本地真人模拟为验收基准，后续只做逐页精修。"
+        "localExport": "public/mock/workspace-preview/asset-kit-v8/system-hub/subpages/future-settings-os-doc-center.html",
+        "note": "文档中心 Stitch 复刻稿已接入当前可交互 Workbench；以 IMAGE2 v2 和本地真人模拟为验收基准，后续只做逐页精修。"
       },
-      "promptFile": ".stitch/prompts/system-hub-flow-definition-subpage.md",
+      "promptFile": ".stitch/prompts/system-params-doc-center-subpage.md",
       "interaction": [
-        "页面内流程搜索",
-        "流程表格选择",
-        "右侧详情联动",
-        "流程草稿编辑",
+        "页内搜索/筛选",
+        "详情预览",
+        "新建配置",
         "保存草稿",
         "提交校验",
-        "发布检查"
+        "查看发布审计"
       ],
       "acceptance": [
-        "流程定义必须表格主导并显示右侧详情",
-        "草稿编辑和发布检查必须同屏可见",
-        "搜索只能出现在流程定义表格筛选栏",
-        "新建流程、流程草稿编辑、保存草稿、提交校验和发布检查必须可真人模拟并写入当前页操作反馈",
-        "流程表格、右侧详情、草稿编辑和发布检查必须同屏联动，不得复用通用配置占位模板"
+        "文档中心必须在当前页完成搜索、详情、保存和提交，不能复用通用占位模板",
+        "文档中心保存草稿、提交校验和查看发布审计必须可真人模拟并写入当前页操作反馈",
+        "文档中心必须共享 Future Settings OS 顶部固定导航和左侧分类导航，不打开新页面或新标签"
       ]
     },
     {
-      "id": "flow-platform-subpage-02-flow-designer-v2",
-      "menuId": "system-flow-designer",
-      "label": "流程设计器",
-      "businessObject": "流程大画布、节点库、节点属性、连线、保存节点、保存草稿、提交校验、发布流程",
+      "id": "system-params-subpage-08-tech-support-v1",
+      "menuId": "system-tech-support",
+      "label": "技术支持",
+      "businessObject": "诊断追踪、支持工单和配置问题排查。",
       "image2": {
-        "path": "/mock/workspace-preview/asset-kit-v8/system-hub/subpages/flow-platform-subpage-02-flow-designer-v2.png",
-        "width": 1568,
-        "height": 1003,
+        "path": "/mock/workspace-preview/asset-kit-v8/system-hub/subpages/system-params-subpage-08-tech-support-v1.png",
+        "width": 2560,
+        "height": 1600,
         "status": "complete",
-        "note": "流程设计器专属 IMAGE2 产品图，强调节点库、超大画布、节点属性配置、保存草稿和提交校验。"
+        "note": "技术支持 Stitch 对齐产品图，纳入 Future Settings OS 统一导航、页内筛选、保存草稿和提交校验矩阵。"
       },
       "stitch": {
-        "path": "/mock/workspace-preview/asset-kit-v8/system-hub/subpages/stitch-flow-platform-subpage-02-flow-designer-v2.png",
-        "screenId": "3606481564d94c16aa217cd6f46f0307",
-        "sessionId": "1942813447426744915",
-        "width": 512,
-        "height": 410,
+        "path": "/mock/workspace-preview/asset-kit-v8/system-hub/subpages/stitch-system-params-subpage-08-tech-support-v1.png",
+        "screenId": "local-stitch-html",
+        "sessionId": "11462082228439399504",
+        "width": 2560,
+        "height": 1600,
         "status": "ready",
-        "localExport": ".stitch/exports/9943060219435296513-1942813447426744915",
-        "note": "流程设计器 Stitch 复刻稿已接入当前可交互 Workbench；以 IMAGE2 v2 和本地真人模拟为验收基准，后续只做逐页精修。"
+        "localExport": "public/mock/workspace-preview/asset-kit-v8/system-hub/subpages/future-settings-os-tech-support.html",
+        "note": "技术支持 Stitch 复刻稿已接入当前可交互 Workbench；以 IMAGE2 v2 和本地真人模拟为验收基准，后续只做逐页精修。"
       },
-      "promptFile": ".stitch/prompts/system-hub-flow-designer-subpage.md",
+      "promptFile": ".stitch/prompts/system-params-tech-support-subpage.md",
       "interaction": [
-        "新建流程图",
-        "拖拽环节节点",
-        "编辑节点属性",
-        "撤销重做",
-        "整理主链",
-        "保存节点",
+        "页内搜索/筛选",
+        "详情预览",
+        "新建配置",
         "保存草稿",
         "提交校验",
-        "发布流程"
+        "查看发布审计"
       ],
       "acceptance": [
-        "流程设计器必须是大画布建模工作台",
-        "节点库、画布、属性配置必须同屏",
-        "新建保存提交链路必须可真人模拟",
-        "顶部导航、左侧导航和节点库不允许出现搜索框",
-        "新建流程图、拖拽节点、配置节点属性、保存草稿和提交校验必须可真人模拟并写入当前页建模操作反馈，不得复用通用占位模板"
-      ]
-    },
-    {
-      "id": "flow-platform-subpage-03-form-config-v2",
-      "menuId": "system-form-config",
-      "label": "表单配置",
-      "businessObject": "表单模板、字段、桌面/H5 布局、校验规则、版本发布",
-      "image2": {
-        "path": "/mock/workspace-preview/asset-kit-v8/system-hub/subpages/flow-platform-subpage-03-form-config-v2.png",
-        "width": 1586,
-        "height": 992,
-        "status": "complete",
-        "note": "v2 表单配置专属 IMAGE2 产品图，统一当前五个顶部入口；顶部和左侧导航不放搜索，页面内展示表单对象搜索、字段表、桌面/H5 双端布局、字段属性、发布检查、保存草稿和提交校验。"
-      },
-      "stitch": {
-        "path": "/mock/workspace-preview/asset-kit-v8/system-hub/subpages/stitch-flow-platform-subpage-03-form-config-v1.png",
-        "screenId": "ee3e66fc6ab94f388e5c237baf8c1c93",
-        "sessionId": "17998030261086433480",
-        "width": 512,
-        "height": 410,
-        "status": "ready",
-        "localExport": ".stitch/exports/9943060219435296513-17998030261086433480",
-        "note": "表单配置 Stitch 复刻稿已接入当前可交互 Workbench；以 IMAGE2 v2 和本地真人模拟为验收基准，后续只做逐页精修。"
-      },
-      "promptFile": ".stitch/prompts/system-hub-form-config-subpage.md",
-      "interaction": [
-        "表单搜索",
-        "新增字段",
-        "字段布局编辑",
-        "桌面/H5 显示配置",
-        "保存草稿",
-        "提交校验"
-      ],
-      "acceptance": [
-        "表单配置必须展示字段表和布局配置",
-        "桌面与 H5 字段差异必须可见",
-        "保存提交链路必须可验证",
-        "新建表单、新增字段、桌面/H5 布局编辑、保存草稿和提交校验必须可真人模拟并写入当前页操作反馈",
-        "表单对象、字段列表、桌面预览、钉钉 H5 预览和字段属性必须同屏联动，不得复用通用占位模板"
-      ]
-    },
-    {
-      "id": "flow-platform-subpage-04-form-storage-v2",
-      "menuId": "system-form-storage",
-      "label": "表单存储",
-      "businessObject": "表单定义版本、实例数据、归档策略、存储路径、取证查询",
-      "image2": {
-        "path": "/mock/workspace-preview/asset-kit-v8/system-hub/subpages/flow-platform-subpage-04-form-storage-v2.png",
-        "width": 1586,
-        "height": 992,
-        "status": "complete",
-        "note": "表单存储 v2 IMAGE2 产品图，强调字段存储映射、归档预演、右侧属性配置、发布校验，以及导航区无搜索、页面内搜索。"
-      },
-      "stitch": {
-        "path": "/mock/workspace-preview/asset-kit-v8/system-hub/subpages/stitch-flow-platform-subpage-04-form-storage-v1.png",
-        "screenId": "fd06b52f39e94e40a7ecb4a2203c02eb",
-        "sessionId": "16500348567003741211",
-        "width": 512,
-        "height": 410,
-        "status": "ready",
-        "localExport": ".stitch/exports/9943060219435296513-16500348567003741211",
-        "note": "表单存储 Stitch 复刻稿已接入当前可交互 Workbench；以 IMAGE2 v2 和本地真人模拟为验收基准，后续只做逐页精修。"
-      },
-      "promptFile": ".stitch/prompts/system-hub-form-storage-subpage.md",
-      "interaction": [
-        "存储策略搜索",
-        "配置归档周期",
-        "查询表单实例",
-        "取证下载",
-        "保存草稿",
-        "提交校验"
-      ],
-      "acceptance": [
-        "表单存储必须体现定义版本和实例归档",
-        "取证查询入口必须在页面内容区",
-        "归档策略必须可保存提交",
-        "新建存储方案、配置归档周期、查询表单实例、取证下载、保存草稿和提交校验必须可真人模拟并写入当前页操作反馈",
-        "字段存储映射、存储模型预览、归档预演和属性配置必须同屏联动，不得打开通用占位模板"
-      ]
-    },
-    {
-      "id": "flow-platform-subpage-05-approval-rules-v2",
-      "menuId": "system-approval-rules",
-      "label": "审批规则",
-      "businessObject": "重复处理人跳过、离职交接、代理审批、节点权限、发布影响",
-      "image2": {
-        "path": "/mock/workspace-preview/asset-kit-v8/system-hub/subpages/flow-platform-subpage-05-approval-rules-v2.png",
-        "width": 1586,
-        "height": 992,
-        "status": "complete",
-        "note": "审批规则 v2 IMAGE2 产品图，强调命中模拟、规则执行编排、优先级队列、发布门禁矩阵、属性配置，以及导航区无搜索。"
-      },
-      "stitch": {
-        "path": "/mock/workspace-preview/asset-kit-v8/system-hub/subpages/stitch-flow-platform-subpage-05-approval-rules-v1.png",
-        "screenId": "b2f3d655d19740c19c5ae2c8e80356fe",
-        "sessionId": "15154519221123045515",
-        "width": 512,
-        "height": 410,
-        "status": "ready",
-        "localExport": ".stitch/exports/9943060219435296513-15154519221123045515",
-        "note": "审批规则 Stitch 复刻稿已接入当前可交互 Workbench；以 IMAGE2 v2 和本地真人模拟为验收基准，后续只做逐页精修。"
-      },
-      "promptFile": ".stitch/prompts/system-hub-approval-rules-subpage.md",
-      "interaction": [
-        "规则搜索",
-        "配置跳过规则",
-        "配置代理审批",
-        "影响预览",
-        "保存草稿",
-        "提交校验"
-      ],
-      "acceptance": [
-        "审批规则必须体现重复处理人和离职交接规则",
-        "影响预览必须可见",
-        "规则发布前必须提交校验",
-        "新建规则、配置跳过规则、配置代理审批、影响预览、保存草稿和提交校验必须可真人模拟并写入当前页操作反馈",
-        "规则输入、命中模拟、执行编排、优先级队列和发布门禁必须同屏联动，不得复用通用占位模板"
-      ]
-    },
-    {
-      "id": "flow-platform-subpage-06-todo-fields-v2",
-      "menuId": "system-todo-fields",
-      "label": "待办字段配置",
-      "businessObject": "待办列表字段、桌面显示、钉钉 H5 显示、排序筛选、字段来源",
-      "image2": {
-        "path": "/mock/workspace-preview/asset-kit-v8/system-hub/subpages/flow-platform-subpage-06-todo-fields-v2.png",
-        "width": 1586,
-        "height": 992,
-        "status": "complete",
-        "note": "待办字段配置 v2 IMAGE2 产品图，强化方案搜索、字段清单、桌面/H5 同屏预览、字段属性和发布校验；搜索下沉到页面内容区。"
-      },
-      "stitch": {
-        "path": "/mock/workspace-preview/asset-kit-v8/system-hub/subpages/stitch-flow-platform-subpage-06-todo-fields-v1.png",
-        "screenId": "380aab3ef83a4fe7be945030d8911ebc",
-        "sessionId": "16585887342294871553",
-        "width": 512,
-        "height": 410,
-        "status": "ready",
-        "localExport": ".stitch/exports/9943060219435296513-16585887342294871553",
-        "note": "待办字段配置 Stitch 复刻稿已接入当前可交互 Workbench；以 IMAGE2 v2 和本地真人模拟为验收基准，后续只做逐页精修。"
-      },
-      "promptFile": ".stitch/prompts/system-hub-todo-fields-subpage.md",
-      "interaction": [
-        "字段搜索",
-        "配置桌面显示",
-        "配置 H5 显示",
-        "排序宽度调整",
-        "保存草稿",
-        "提交校验"
-      ],
-      "acceptance": [
-        "待办字段必须支持字段显示配置",
-        "桌面/H5 字段差异必须可见",
-        "页面内字段搜索不可放在导航层",
-        "新建方案、新增字段、桌面/H5 显示配置、保存草稿和提交校验必须可真人模拟并写入当前页操作反馈",
-        "待办字段清单、桌面待办预览、钉钉 H5 待办预览和字段属性必须同屏联动，不得复用通用占位模板"
-      ]
-    },
-    {
-      "id": "flow-platform-subpage-07-sla-config-v2",
-      "menuId": "system-sla-config",
-      "label": "SLA 配置",
-      "businessObject": "审批时限、超时提醒、升级规则、通知渠道、日历规则",
-      "image2": {
-        "path": "/mock/workspace-preview/asset-kit-v8/system-hub/subpages/flow-platform-subpage-07-sla-config-v2.png",
-        "width": 1586,
-        "height": 992,
-        "status": "complete",
-        "note": "SLA 配置 v2 IMAGE2 产品图，强化规则明细表、超时升级路径、当前超时模拟队列、通知渠道矩阵、发布门禁和右侧属性配置。"
-      },
-      "stitch": {
-        "path": "/mock/workspace-preview/asset-kit-v8/system-hub/subpages/stitch-flow-platform-subpage-07-sla-config-v1.png",
-        "screenId": "b707201bdc764a8c9640143da085083a",
-        "sessionId": "5257993793628535483",
-        "width": 512,
-        "height": 410,
-        "status": "ready",
-        "localExport": ".stitch/exports/9943060219435296513-5257993793628535483",
-        "note": "SLA 配置 Stitch 复刻稿已接入当前可交互 Workbench；以 IMAGE2 v2 和本地真人模拟为验收基准，后续只做逐页精修。"
-      },
-      "promptFile": ".stitch/prompts/system-hub-sla-config-subpage.md",
-      "interaction": [
-        "SLA 规则搜索",
-        "配置超时阈值",
-        "配置升级路径",
-        "通知联动",
-        "保存草稿",
-        "提交校验"
-      ],
-      "acceptance": [
-        "SLA 配置必须体现超时提醒和升级规则",
-        "通知渠道联动必须可见",
-        "规则必须支持保存草稿和提交校验",
-        "新建 SLA、配置超时阈值、配置升级路径、模拟升级、保存草稿和提交校验必须可真人模拟并写入当前页操作反馈",
-        "SLA 规则表、超时升级路径、通知渠道矩阵和发布门禁必须同屏联动，不得复用通用占位模板"
+        "技术支持必须在当前页完成搜索、详情、保存和提交，不能复用通用占位模板",
+        "技术支持保存草稿、提交校验和查看发布审计必须可真人模拟并写入当前页操作反馈",
+        "技术支持必须共享 Future Settings OS 顶部固定导航和左侧分类导航，不打开新页面或新标签"
       ]
     }
   ],
   "updatedAt": "2026-06-19",
-  "coverageNote": "系统运营中枢已形成 1 个导航控制台 + 39 个系统配置菜单的子页面资产矩阵，覆盖流程平台 7 项、组织权限 7 项、基础资料 6 项、集成配置 5 项、消息与通知 8 项、系统参数 6 项；每个菜单均有 IMAGE2 v2 产品图、Stitch 复刻稿、专属页面实现、页内搜索/筛选、详情编辑、新建/保存/提交 smoke 覆盖。顶部业务视角和左侧导航不放搜索，搜索下沉到对应专属页；Stitch 复刻稿已接入页面矩阵，后续以 IMAGE2 v2 和真人模拟结果继续逐页精修。"
+  "coverageNote": "系统运营中枢已形成 1 个导航控制台 + 44 个系统配置菜单的子页面资产矩阵，覆盖流程平台 9 项、组织权限 8 项、基础资料 6 项、集成配置 5 项、消息与通知 8 项、系统参数 8 项；每个菜单均有 IMAGE2 v2 产品图、Stitch 复刻稿、专属页面实现、页内搜索/筛选、详情编辑、新建/保存/提交 smoke 覆盖。顶部业务视角和左侧导航不放搜索，搜索下沉到对应专属页；Stitch 复刻稿已接入页面矩阵，后续以 IMAGE2 v2 和真人模拟结果继续逐页精修。"
 }

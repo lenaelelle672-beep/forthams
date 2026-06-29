@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>通知模板编辑 | 系统设置中心</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+                "on-error-container": "#93000a",
+                "surface-container-high": "#e5e8ec",
+                "tertiary": "#9f3e00",
+                "secondary-container": "#ccddff",
+                "on-background": "#181c1f",
+                "tertiary-fixed": "#ffdbcc",
+                "surface-container-low": "#f1f4f8",
+                "on-tertiary-container": "#fffdff",
+                "on-tertiary": "#ffffff",
+                "on-secondary-fixed": "#091c35",
+                "on-primary-fixed-variant": "#00419c",
+                "status-amber": "#F59E0B",
+                "status-cyan": "#00A8D8",
+                "on-secondary-container": "#51617e",
+                "inverse-surface": "#2d3134",
+                "tertiary-container": "#c75000",
+                "primary-container": "#1d6ef2",
+                "surface-tint": "#0057cc",
+                "on-secondary-fixed-variant": "#374762",
+                "status-green": "#16A34A",
+                "on-primary": "#ffffff",
+                "on-error": "#ffffff",
+                "status-red": "#DC2626",
+                "background": "#f7fafe",
+                "secondary-fixed": "#d5e3ff",
+                "on-surface": "#181c1f",
+                "surface-dim": "#d7dade",
+                "status-purple": "#7C3AED",
+                "outline": "#727786",
+                "secondary": "#4e5f7b",
+                "surface-container-lowest": "#ffffff",
+                "primary": "#0056c9",
+                "on-primary-container": "#fffdff",
+                "outline-variant": "#c2c6d7",
+                "surface-bright": "#f7fafe",
+                "primary-fixed-dim": "#b0c6ff",
+                "inverse-primary": "#b0c6ff",
+                "text-primary": "#0F172A",
+                "text-secondary": "#64748B",
+                "inverse-on-surface": "#eef1f5",
+                "border-subtle": "#D7E2F0",
+                "tertiary-fixed-dim": "#ffb695",
+                "secondary-fixed-dim": "#b6c7e8",
+                "primary-fixed": "#d9e2ff",
+                "on-secondary": "#ffffff",
+                "error": "#ba1a1a",
+                "surface-variant": "#e0e3e7",
+                "error-container": "#ffdad6",
+                "on-tertiary-fixed": "#351000",
+                "surface": "#f7fafe",
+                "on-tertiary-fixed-variant": "#7b2f00",
+                "on-surface-variant": "#424654",
+                "surface-container": "#ebeef2",
+                "surface-container-highest": "#e0e3e7",
+                "on-primary-fixed": "#001945"
+        },
+        "borderRadius": {
+                "DEFAULT": "0.125rem",
+                "lg": "0.25rem",
+                "xl": "0.5rem",
+                "full": "0.75rem"
+        },
+        "spacing": {
+                "topbar-height": "56px",
+                "grid-gutter": "12px",
+                "card-padding": "16px",
+                "inspector-width": "320px",
+                "sidebar-width": "240px",
+                "container-gap": "20px"
+        },
+        "fontFamily": {
+                "status-label": [
+                        "Inter"
+                ],
+                "body-md": [
+                        "Inter"
+                ],
+                "code-meta": [
+                        "JetBrains Mono"
+                ],
+                "body-sm": [
+                        "Inter"
+                ],
+                "section-header": [
+                        "Inter"
+                ],
+                "page-title": [
+                        "Inter"
+                ]
+        },
+        "fontSize": {
+                "status-label": [
+                        "11px",
+                        {
+                                "lineHeight": "16px",
+                                "fontWeight": "700"
+                        }
+                ],
+                "body-md": [
+                        "13px",
+                        {
+                                "lineHeight": "20px",
+                                "fontWeight": "500"
+                        }
+                ],
+                "code-meta": [
+                        "11px",
+                        {
+                                "lineHeight": "16px",
+                                "fontWeight": "400"
+                        }
+                ],
+                "body-sm": [
+                        "12px",
+                        {
+                                "lineHeight": "18px",
+                                "fontWeight": "500"
+                        }
+                ],
+                "section-header": [
+                        "14px",
+                        {
+                                "lineHeight": "20px",
+                                "fontWeight": "700"
+                        }
+                ],
+                "page-title": [
+                        "24px",
+                        {
+                                "lineHeight": "32px",
+                                "letterSpacing": "-0.02em",
+                                "fontWeight": "700"
+                        }
+                ]
+        }
+},
+    },
+  }
+</script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .variable-chip {
+            @apply px-1.5 py-0.5 rounded bg-primary-fixed/30 text-primary font-code-meta text-[10px] border border-primary/20 inline-flex items-center;
+        }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+        .phone-frame {
+            width: 280px;
+            height: 560px;
+            border: 8px solid #2d3134;
+            border-radius: 24px;
+            position: relative;
+            background: #ffffff;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md overflow-hidden">
+<!-- Top Navigation Bar -->
+<header class="flex justify-between items-center px-grid-gutter w-full fixed top-0 z-50 bg-[#051424] h-[56px] border-b border-primary">
+<div class="flex items-center gap-6 text-white">
+<a class="flex items-center justify-center p-1 hover:bg-white/10 rounded transition-colors" href="?screenId=88cb2ed000cb48aaaa3e37947a38ff7b" title="导航中心">
+<span class="material-symbols-outlined text-white">apps</span>
+</a>
+<a class="flex items-center gap-2 hover:opacity-80 transition-opacity" href="http://localhost:5173/fixed-assets/workbench?menu=system-flow-definition" title="返回业务工作台">
+<span class="material-symbols-outlined text-white text-sm">arrow_back</span>
+</a>
+<h1 class="text-section-header font-page-title text-white tracking-tighter flex items-center gap-2">
+<span>UNIVIEW</span>
+<span class="text-white/30">|</span>
+<span>系统设置中心</span></h1>
+<nav class="flex gap-4 ml-4">
+<a class="text-white/70 hover:text-white transition-colors font-body-md" href="#">流程平台</a>
+<a class="text-white/70 hover:text-white transition-colors font-body-md" href="#">组织权限</a>
+<a class="text-white/70 hover:text-white transition-colors font-body-md" href="#">基础资料</a>
+<a class="text-white/70 hover:text-white transition-colors font-body-md" href="#">集成配置</a>
+<a class="text-white border-b-2 border-primary pb-1 font-body-md" href="#">消息与通知</a>
+<a class="text-white/70 hover:text-white transition-colors font-body-md" href="#">系统参数</a>
+</nav>
+</div>
+<div class="flex items-center gap-4 text-white/70">
+<div class="flex items-center bg-white/10 px-3 py-1 rounded border border-white/10">
+<span class="material-symbols-outlined text-sm mr-2 text-white">search</span>
+<input class="bg-transparent border-none outline-none text-body-sm w-48 text-white placeholder-white/50" placeholder="Search templates..." type="text"/>
+</div>
+<span class="material-symbols-outlined cursor-pointer hover:text-white">notifications</span>
+<span class="material-symbols-outlined cursor-pointer hover:text-white">history</span>
+<img class="w-7 h-7 rounded-full bg-primary-fixed/20 border border-white/20" data-alt="A professional minimalist avatar of a system administrator, clean vector style with blue and white color palette to match the enterprise OS theme." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAwlauQvJy8vVcWOZxtoY2sOHqjNxTrBu60I-0i1ZWbHYzT2LyWrC3AoS5yguwmelSlXT-jj8diskSiNr9qlDQX98URxpB-I08X2GteP88BOK8kn24zWEHPfh6ET_ZyXbLlQAQ18SuH9Px43BUtel_G1Ffz3WyyzPkzY536LsaCGmrNLdpSqylTjnXqkvzPFULCb_iEc9iUBuzBmKfi9TVLriDEut1RI_GL3tzNqRdgQ_zgVSLGu9pf24MmlmPIJXoFRqyneBxOEXVx" title="运营管理员"/>
+</div>
+</header>
+<!-- Side Navigation Bar -->
+<aside class="fixed left-0 top-[56px] w-[240px] h-[calc(100vh-56px)] bg-surface-container-lowest border-r border-border-subtle flex flex-col z-40">
+<div class="p-4 border-b border-border-subtle">
+<div class="flex items-center gap-2 mb-1">
+<span class="material-symbols-outlined text-primary">notifications</span>
+<span class="font-section-header text-section-header text-on-surface">消息与通知</span>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto py-2"><div class="px-2 py-1">
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container-high transition-transform active:scale-95 rounded" href="#">
+<span class="material-symbols-outlined text-[18px]">router</span>
+<span class="text-body-sm">邮件网关配置</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container-high transition-transform active:scale-95 rounded" href="#">
+<span class="material-symbols-outlined text-[18px]">forward_to_inbox</span>
+<span class="text-body-sm">流程邮件配置</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container-high transition-transform active:scale-95 rounded" href="#">
+<span class="material-symbols-outlined text-[18px]">mail</span>
+<span class="text-body-sm">邮件模板</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container-high transition-transform active:scale-95 rounded" href="#">
+<span class="material-symbols-outlined text-[18px]">receipt_long</span>
+<span class="text-body-sm">邮件日志</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-primary font-bold border-r-2 border-primary bg-primary/5 transition-transform active:scale-95 rounded-l" href="#">
+<span class="material-symbols-outlined text-[18px]">design_services</span>
+<span class="text-body-sm">通知模板</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container-high transition-transform active:scale-95 rounded" href="#">
+<span class="material-symbols-outlined text-[18px]">hub</span>
+<span class="text-body-sm">通知渠道</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container-high transition-transform active:scale-95 rounded" href="#">
+<span class="material-symbols-outlined text-[18px]">settings_suggest</span>
+<span class="text-body-sm">通知偏好</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container-high transition-transform active:scale-95 rounded" href="#">
+<span class="material-symbols-outlined text-[18px]">toggle_on</span>
+<span class="text-body-sm">流程通知开关</span>
+</a>
+</div></div>
+</aside>
+<!-- Main Workspace -->
+<main class="ml-[240px] mt-[56px] h-[calc(100vh-56px-48px)] flex flex-col p-container-gap overflow-hidden w-full">
+<!-- Editor Header -->
+<div class="flex justify-between items-end mb-4">
+<div>
+<div class="flex items-center gap-2 text-secondary mb-1">
+<span class="text-body-sm hover:text-primary cursor-pointer">系统设置中心</span>
+<span class="text-xs text-border-subtle">/</span>
+<span class="text-body-sm hover:text-primary cursor-pointer">消息与通知</span>
+<span class="text-xs text-border-subtle">/</span>
+<span class="text-body-sm text-text-primary">通知模板</span>
+</div>
+<h2 class="text-page-title font-page-title text-text-primary">通知模板编辑</h2>
+</div>
+<div class="flex gap-2">
+<button class="flex items-center gap-2 px-4 py-2 bg-surface-container-highest border border-border-subtle text-on-surface text-body-sm rounded hover:bg-surface-dim transition-colors">
+<span class="material-symbols-outlined text-sm">history_edu</span>
+                    版本对比
+                </button>
+<button class="flex items-center gap-2 px-4 py-2 bg-primary text-on-primary text-body-sm rounded hover:shadow-lg transition-all">
+<span class="material-symbols-outlined text-sm">save</span>
+                    暂存并发布
+                </button>
+</div>
+</div>
+<div class="flex-1 flex gap-container-gap overflow-hidden">
+<!-- Central Editor Zone -->
+<div class="flex-1 flex flex-col gap-4 overflow-hidden">
+<!-- Channel Selector -->
+<div class="flex gap-2 p-1 bg-surface-container-lowest rounded-lg w-fit border border-border-subtle">
+<button class="flex items-center gap-2 px-4 py-1.5 bg-white shadow-sm border border-border-subtle rounded text-primary font-bold text-body-sm">
+<span class="material-symbols-outlined text-lg">chat_bubble</span>
+                        钉钉
+                    </button>
+<button class="flex items-center gap-2 px-4 py-1.5 text-on-surface-variant hover:bg-surface-container-high transition-colors rounded text-body-sm">
+<span class="material-symbols-outlined text-lg">group_work</span>
+                        企业微信
+                    </button>
+<button class="flex items-center gap-2 px-4 py-1.5 text-on-surface-variant hover:bg-surface-container-high transition-colors rounded text-body-sm">
+<span class="material-symbols-outlined text-lg">mail</span>
+                        邮件 (SMTP)
+                    </button>
+<button class="flex items-center gap-2 px-4 py-1.5 text-on-surface-variant hover:bg-surface-container-high transition-colors rounded text-body-sm">
+<span class="material-symbols-outlined text-lg">sms</span>
+                        短信网关
+                    </button>
+<button class="flex items-center gap-2 px-4 py-1.5 text-on-surface-variant hover:bg-surface-container-high transition-colors rounded text-body-sm">
+<span class="material-symbols-outlined text-lg">webhook</span>
+                        Webhook
+                    </button>
+</div>
+<!-- Editor Canvas -->
+<div class="flex-1 bg-white border border-border-subtle rounded-xl flex flex-col overflow-hidden">
+<!-- Toolbar -->
+<div class="h-10 border-b border-border-subtle bg-surface-container-lowest flex items-center px-4 justify-between">
+<div class="flex gap-4 items-center">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-lg p-1 hover:bg-surface-container rounded cursor-pointer">format_bold</span>
+<span class="material-symbols-outlined text-lg p-1 hover:bg-surface-container rounded cursor-pointer">format_italic</span>
+<span class="material-symbols-outlined text-lg p-1 hover:bg-surface-container rounded cursor-pointer">link</span>
+</div>
+<div class="w-px h-4 bg-border-subtle"></div>
+<div class="flex items-center gap-1">
+<span class="text-body-sm text-secondary mr-2">变量:</span>
+<button class="variable-chip hover:bg-primary-fixed/50 transition-colors cursor-pointer">{user_name}</button>
+<button class="variable-chip hover:bg-primary-fixed/50 transition-colors cursor-pointer">{alert_id}</button>
+<button class="variable-chip hover:bg-primary-fixed/50 transition-colors cursor-pointer">{timestamp}</button>
+<span class="material-symbols-outlined text-sm text-primary p-1 hover:bg-surface-container rounded cursor-pointer">add_circle</span>
+</div>
+</div>
+<div class="text-code-meta text-on-surface-variant">支持 Markdown</div>
+</div>
+<!-- Editor Body -->
+<div class="flex-1 p-6 font-code-meta text-[14px] overflow-y-auto scrollbar-hide focus-within:ring-1 ring-primary/20 transition-all">
+<div class="text-secondary opacity-50 mb-4 select-none"># 钉钉通知内容</div>
+<div class="space-y-4">
+<p class="text-on-surface">## 系统关键警报: <span class="text-primary font-bold">{alert_type}</span></p>
+<p class="text-on-surface">核心节点监控在 <span class="text-primary font-bold">{event_time}</span> 检测到高优先级事件。</p>
+<p class="text-on-surface">&gt; **描述:** 系统在 <span class="text-primary font-bold">{module_name}</span> 模块遇到未处理的异常。需要立即干预以防止数据丢失在 <span class="text-status-amber font-bold underline decoration-dotted bg-status-amber/10 px-1">{cluster_region}</span> 区域。</p>
+<p class="text-on-surface">**详细信息:**</p>
+<p class="text-on-surface">- 警报 ID: <span class="text-primary font-bold">{alert_id}</span></p>
+<p class="text-on-surface">- 严重级别: <span class="text-status-red font-bold">EMERGENCY</span></p>
+<p class="text-on-surface">- 触发用户: <span class="text-primary font-bold">{operator_id}</span></p>
+<br/>
+<p class="text-on-surface text-secondary italic">请点击下方操作按钮访问恢复终端。</p>
+</div>
+</div>
+</div>
+<!-- Validation & Previews -->
+<div class="h-48 flex gap-4 overflow-hidden">
+<!-- Variable Validator -->
+<div class="w-1/2 bg-white border border-border-subtle rounded-xl flex flex-col shadow-sm">
+<div class="p-3 border-b border-border-subtle flex justify-between items-center bg-surface-container-lowest">
+<span class="font-section-header text-section-header">场景变量验证</span>
+<span class="text-status-amber flex items-center gap-1 font-bold text-xs">
+<span class="material-symbols-outlined text-sm">warning</span>
+                                1 缺失
+                            </span>
+</div>
+<div class="flex-1 overflow-y-auto p-3 space-y-2 scrollbar-hide">
+<div class="flex justify-between items-center p-2 rounded bg-status-green/5 border border-status-green/20">
+<span class="text-body-sm font-code-meta">user_name</span>
+<span class="text-status-green text-[10px] font-bold">已找到: "System.Admin"</span>
+</div>
+<div class="flex justify-between items-center p-2 rounded bg-status-green/5 border border-status-green/20">
+<span class="text-body-sm font-code-meta">alert_id</span>
+<span class="text-status-green text-[10px] font-bold">已找到: "ALE-9921"</span>
+</div>
+<div class="flex justify-between items-center p-2 rounded bg-status-amber/5 border border-status-amber/30">
+<span class="text-body-sm font-code-meta">cluster_region</span>
+<span class="text-status-amber text-[10px] font-bold">缺失: Null Pointer</span>
+</div>
+</div>
+</div>
+<!-- Layout Preview Tools -->
+<div class="w-1/2 bg-white border border-border-subtle rounded-xl p-3 flex flex-col shadow-sm">
+<div class="flex justify-between items-center mb-2">
+<span class="font-section-header text-section-header">实时预览选择</span>
+<div class="flex bg-surface-container-low rounded p-0.5">
+<button class="px-2 py-1 bg-white shadow-sm rounded border border-border-subtle">
+<span class="material-symbols-outlined text-lg">smartphone</span>
+</button>
+<button class="px-2 py-1 text-on-surface-variant hover:bg-surface-container-high rounded transition-colors">
+<span class="material-symbols-outlined text-lg">desktop_windows</span>
+</button>
+</div>
+</div>
+<div class="flex-1 bg-surface-container-low rounded border border-border-subtle/50 flex flex-col items-center justify-center relative group">
+<span class="material-symbols-outlined text-secondary opacity-30 text-3xl">visibility</span>
+<span class="text-body-sm text-secondary mt-2">活动: 钉钉 (移动端)</span>
+<!-- Hover state for interaction hint -->
+<div class="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity cursor-pointer">
+<button class="px-3 py-1.5 bg-white border border-primary text-primary rounded-full text-xs font-bold shadow-sm">展开预览</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Visual Preview Panel (Fixed Right) -->
+<div class="w-[340px] flex flex-col gap-4">
+<div class="flex-1 bg-white border border-border-subtle rounded-xl p-6 flex flex-col items-center justify-center overflow-hidden shadow-sm">
+<div class="text-section-header font-section-header mb-6 w-full text-left">移动端预览</div>
+<div class="phone-frame shadow-2xl flex flex-col">
+<div class="h-6 bg-transparent flex justify-between items-center px-4 pt-1">
+<span class="text-[10px] font-bold">9:41</span>
+<div class="flex gap-1">
+<div class="w-3 h-3 rounded-full bg-on-surface-variant/20"></div>
+<div class="w-3 h-3 rounded-full bg-on-surface-variant/20"></div>
+</div>
+</div>
+<div class="p-3">
+<div class="bg-white border border-border-subtle shadow-lg rounded-xl overflow-hidden animate-pulse-slow">
+<div class="px-3 py-2 bg-surface-container-low border-b border-border-subtle flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-5 h-5 bg-[#0089FF] rounded flex items-center justify-center">
+<span class="material-symbols-outlined text-[12px] text-white" style="font-variation-settings: 'FILL' 1;">bolt</span>
+</div>
+<span class="text-[11px] font-bold text-on-surface">钉钉通知</span>
+</div>
+<span class="text-[9px] text-secondary">刚刚</span>
+</div>
+<div class="p-3">
+<h4 class="text-body-sm font-bold text-on-surface mb-1">系统关键警报</h4>
+<p class="text-[11px] text-on-surface-variant leading-relaxed">
+                                        核心节点监控在 14:02:11 检测到高优先级事件。
+                                    </p>
+<div class="mt-2 p-2 bg-error-container/10 border-l-2 border-status-red rounded-r">
+<p class="text-[10px] font-bold text-status-red">警报_ID: ALE-9921</p>
+<p class="text-[10px] text-on-surface-variant mt-1 italic">区域: (缺失值)</p>
+</div>
+<button class="mt-3 w-full py-2 bg-primary text-on-primary text-[11px] font-bold rounded">访问终端</button>
+</div>
+</div>
+</div>
+<div class="flex-1 bg-surface-container-lowest/50"></div>
+</div>
+</div>
+<!-- Helper Component -->
+<div class="bg-primary text-white p-4 rounded-xl shadow-md border border-primary">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-white">psychology</span>
+<div>
+<div class="font-bold text-body-md mb-1">AI 模板助手</div>
+<p class="text-body-sm opacity-90 leading-snug">
+                                我注意到 <code class="bg-white/20 px-1 rounded">cluster_region</code> 是此场景的必需项，但目前未映射。
+                                <span class="underline cursor-pointer font-bold">使用地理位置自动修复？</span>
+</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Action Bar (Contextual) -->
+<footer class="fixed bottom-0 left-[240px] right-0 flex justify-center items-center gap-8 py-2 z-50 bg-white border-t border-border-subtle shadow-[0_-2px_10px_rgba(0,0,0,0.02)] h-12">
+<div class="flex items-center gap-2 text-primary font-bold bg-primary/10 rounded-full px-4 py-1 animate-pulse">
+<span class="material-symbols-outlined text-sm">edit_note</span>
+<span class="font-status-label text-status-label">草稿 (未保存更改)</span>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant opacity-60">
+<span class="material-symbols-outlined text-sm">rule</span>
+<span class="font-status-label text-status-label">技术审核</span>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant opacity-60">
+<span class="material-symbols-outlined text-sm">verified</span>
+<span class="font-status-label text-status-label">安全检查</span>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant opacity-60">
+<span class="material-symbols-outlined text-sm">rocket_launch</span>
+<span class="font-status-label text-status-label">发布</span>
+</div>
+</footer>
+<script>
+        // Simple micro-interactions for the prototype
+        document.querySelectorAll('button, .cursor-pointer').forEach(el => {
+            el.addEventListener('mousedown', () => el.style.transform = 'scale(0.95)');
+            el.addEventListener('mouseup', () => el.style.transform = 'scale(1)');
+            el.addEventListener('mouseleave', () => el.style.transform = 'scale(1)');
+        });
+
+        // Add visual feedback for the warning state
+        const warningElement = document.querySelector('.text-status-amber');
+        setInterval(() => {
+            warningElement.classList.toggle('opacity-50');
+        }, 800);
+    </script>
+</body></html>

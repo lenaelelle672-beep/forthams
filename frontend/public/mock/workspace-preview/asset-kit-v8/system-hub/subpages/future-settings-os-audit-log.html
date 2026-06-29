@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+
+<html class="light" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>UNIVIEW - 系统设置中心 - 审计日志</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&amp;family=JetBrains+Mono:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Shared Style Guidance Mapping -->
+<style>
+        :root {
+            --topbar-height: 56px;
+            --sidebar-width: 196px;
+            --inspector-width: 320px;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F5F8FC; /* Canvas #F5F8FC */
+            color: #181c1f;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .code-font {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .diff-added { background-color: rgba(22, 163, 74, 0.1); color: #16A34A; }
+        .diff-removed { background-color: rgba(220, 38, 38, 0.1); color: #DC2626; }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid #D7E2F0;
+        }
+        /* Custom Scrollbar for OS Feel */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f4f8; }
+        ::-webkit-scrollbar-thumb { background: #d7dade; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #c2c6d7; }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "surface-variant": "#e0e3e7",
+                        "tertiary": "#9f3e00",
+                        "status-amber": "#F59E0B",
+                        "on-surface": "#181c1f",
+                        "on-tertiary": "#ffffff",
+                        "background": "#F5F8FC",
+                        "surface-container-high": "#e5e8ec",
+                        "surface-container": "#ebeef2",
+                        "status-purple": "#7C3AED",
+                        "surface-bright": "#f7fafe",
+                        "surface-container-low": "#f1f4f8",
+                        "secondary-fixed-dim": "#b6c7e8",
+                        "inverse-on-surface": "#eef1f5",
+                        "surface-dim": "#d7dade",
+                        "border-subtle": "#D7E2F0",
+                        "error-container": "#ffdad6",
+                        "on-primary-container": "#fffdff",
+                        "on-tertiary-container": "#fffdff",
+                        "text-primary": "#0F172A",
+                        "on-secondary-fixed": "#091c35",
+                        "secondary": "#4e5f7b",
+                        "error": "#ba1a1a",
+                        "on-primary-fixed-variant": "#00419c",
+                        "secondary-container": "#ccddff",
+                        "on-tertiary-fixed-variant": "#7b2f00",
+                        "on-primary-fixed": "#001945",
+                        "tertiary-container": "#c75000",
+                        "status-cyan": "#00A8D8",
+                        "on-error-container": "#93000a",
+                        "surface": "#f7fafe",
+                        "on-tertiary-fixed": "#351000",
+                        "surface-tint": "#0057cc",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-fixed": "#d5e3ff",
+                        "on-secondary": "#ffffff",
+                        "text-secondary": "#64748B",
+                        "status-red": "#DC2626",
+                        "primary": "#1D6EF2", /* Future Blue #1D6EF2 */
+                        "on-background": "#181c1f",
+                        "on-primary": "#ffffff",
+                        "surface-container-highest": "#e0e3e7",
+                        "primary-fixed-dim": "#b0c6ff",
+                        "outline-variant": "#c2c6d7",
+                        "tertiary-fixed": "#ffdbcc",
+                        "inverse-surface": "#2d3134",
+                        "primary-container": "#1d6ef2",
+                        "tertiary-fixed-dim": "#ffb695",
+                        "on-secondary-fixed-variant": "#374762",
+                        "primary-fixed": "#d9e2ff",
+                        "outline": "#727786",
+                        "on-surface-variant": "#424654",
+                        "on-secondary-container": "#51617e",
+                        "on-error": "#ffffff",
+                        "status-green": "#16A34A",
+                        "inverse-primary": "#b0c6ff",
+                        "top-nav-bg": "#051424" /* Top Nav bg color */
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    spacing: {
+                        "topbar-height": "56px",
+                        "sidebar-width": "196px",
+                        "card-padding": "16px",
+                        "container-gap": "20px",
+                        "inspector-width": "320px",
+                        "grid-gutter": "12px"
+                    },
+                    fontSize: {
+                        "status-label": ["11px", {"lineHeight": "16px", "fontWeight": "700"}],
+                        "page-title": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-sm": ["12px", {"lineHeight": "18px", "fontWeight": "500"}],
+                        "body-md": ["13px", {"lineHeight": "20px", "fontWeight": "500"}],
+                        "code-meta": ["11px", {"lineHeight": "16px", "fontWeight": "400"}],
+                        "section-header": ["14px", {"lineHeight": "20px", "fontWeight": "700"}]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="overflow-hidden">
+<!-- TopNavBar (Shared Component) -->
+<header class="bg-top-nav-bg flex justify-between items-center px-6 w-full fixed top-0 z-50 h-[56px] border-b-2 border-primary"><div class="flex items-center gap-6"><div class="flex items-center gap-4"><span class="text-[18px] font-bold text-white tracking-wide">UNIVIEW</span><span class="text-outline-variant">|</span><span class="text-[14px] font-medium text-white">系统设置中心</span></div><nav class="hidden md:flex gap-8 ml-8"><a class="text-outline-variant hover:text-white transition-colors text-body-md" href="#">流程平台</a><a class="text-outline-variant hover:text-white transition-colors text-body-md" href="#">组织权限</a><a class="text-outline-variant hover:text-white transition-colors text-body-md" href="#">基础资料</a><a class="text-outline-variant hover:text-white transition-colors text-body-md" href="#">集成配置</a><a class="text-outline-variant hover:text-white transition-colors text-body-md" href="#">消息与通知</a><a class="text-white border-b-2 border-primary pb-1 text-body-md" href="#">系统参数</a></nav></div><div class="flex items-center gap-6"><div class="flex items-center gap-4 text-outline-variant text-body-sm"><span class="cursor-pointer hover:text-white">返回业务工作台</span></div><div class="flex items-center gap-2 text-white"><span class="material-symbols-outlined text-[20px]">account_circle</span><span class="text-body-sm">运营管理员</span></div></div></header>
+<!-- SideNavBar (Shared Component) -->
+<aside class="fixed left-0 top-[56px] w-[240px] h-screen bg-white border-r border-border-subtle flex flex-col z-40"><div class="p-4 border-b border-border-subtle"><div class="flex items-center gap-2 text-on-surface font-bold"><span class="material-symbols-outlined text-[20px]">settings</span><span>系统参数</span></div></div><nav class="flex-1 py-4 overflow-y-auto"><ul class="space-y-1"><li><a class="flex items-center gap-3 px-6 py-2.5 text-on-surface-variant hover:bg-surface-container-low transition-colors" href="#"><span class="material-symbols-outlined text-[20px]">tune</span><span class="text-body-md">基础参数</span></a></li><li><a class="flex items-center gap-3 px-6 py-2.5 text-on-surface-variant hover:bg-surface-container-low transition-colors" href="#"><span class="material-symbols-outlined text-[20px]">security</span><span class="text-body-md">安全策略</span></a></li><li><a class="flex items-center gap-3 px-6 py-2.5 text-on-surface-variant hover:bg-surface-container-low transition-colors" href="#"><span class="material-symbols-outlined text-[20px]">folder_open</span><span class="text-body-md">文件存储配置</span></a></li><li><a class="flex items-center gap-3 px-6 py-2.5 text-on-surface-variant hover:bg-surface-container-low transition-colors" href="#"><span class="material-symbols-outlined text-[20px]">import_export</span><span class="text-body-md">导入导出配置</span></a></li><li><a class="flex items-center gap-3 px-6 py-2.5 text-on-surface-variant hover:bg-surface-container-low transition-colors" href="#"><span class="material-symbols-outlined text-[20px]">memory</span><span class="text-body-md">缓存管理</span></a></li><li><a class="flex items-center gap-3 px-6 py-2.5 text-primary font-bold bg-primary/10 border-r-4 border-primary transition-colors" href="#"><span class="material-symbols-outlined text-[20px]">history</span><span class="text-body-md">操作审计</span></a></li><li><a class="flex items-center gap-3 px-6 py-2.5 text-on-surface-variant hover:bg-surface-container-low transition-colors" href="#"><span class="material-symbols-outlined text-[20px]">description</span><span class="text-body-md">文档中心</span></a></li><li><a class="flex items-center gap-3 px-6 py-2.5 text-on-surface-variant hover:bg-surface-container-low transition-colors" href="#"><span class="material-symbols-outlined text-[20px]">support_agent</span><span class="text-body-md">技术支持</span></a></li></ul></nav></aside>
+<!-- Main Workspace -->
+<main class="fixed left-[240px] top-[56px] right-[320px] bottom-0 overflow-y-auto bg-background p-6">
+<!-- Breadcrumb & Title -->
+<div class="flex items-center justify-between mb-6">
+<div>
+<nav class="flex items-center gap-2 mb-2 text-body-sm font-body-sm text-text-secondary">
+<span>系统设置中心</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span>系统参数</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="text-text-primary font-medium">审计日志中心</span>
+</nav>
+<h1 class="font-page-title text-page-title text-text-primary flex items-center gap-3">操作审计 <span class="text-[10px] px-2 py-0.5 bg-status-green/10 text-status-green border border-status-green/20 rounded uppercase tracking-tighter">Live Monitor</span></h1>
+</div>
+<div class="flex gap-2">
+<button class="flex items-center gap-2 px-3 py-1.5 border border-border-subtle bg-white text-body-sm font-body-sm hover:bg-surface-container transition-colors rounded">
+<span class="material-symbols-outlined text-[18px]">download</span> 导出原始记录
+                </button>
+<button class="flex items-center gap-2 px-3 py-1.5 border border-border-subtle bg-white text-body-sm font-body-sm hover:bg-surface-container transition-colors rounded">
+<span class="material-symbols-outlined text-[18px]">analytics</span> 变更回读
+                </button>
+</div>
+</div>
+<!-- High Performance Advanced Search Bar -->
+<section class="bg-white border border-border-subtle rounded-xl p-4 mb-6 shadow-sm">
+<div class="grid grid-cols-12 gap-4">
+<div class="col-span-3">
+<label class="block text-[11px] font-bold text-outline-variant uppercase mb-1">操作人 / 实体 ID</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-2 top-1/2 -translate-y-1/2 text-[18px] text-outline">person_search</span>
+<input class="w-full pl-9 pr-3 py-1.5 bg-surface-container-low border-transparent focus:border-primary focus:ring-0 text-body-md font-body-md rounded" placeholder="Administrator..." type="text"/>
+</div>
+</div>
+<div class="col-span-2">
+<label class="block text-[11px] font-bold text-outline-variant uppercase mb-1">功能模块</label>
+<select class="w-full px-3 py-1.5 bg-surface-container-low border-transparent focus:border-primary focus:ring-0 text-body-md font-body-md rounded">
+<option>所有模块</option>
+<option>权限中心 (Auth)</option>
+<option>资产编排 (Asset)</option>
+<option>网络拓扑 (Network)</option>
+</select>
+</div>
+<div class="col-span-2">
+<label class="block text-[11px] font-bold text-outline-variant uppercase mb-1">风险等级</label>
+<div class="flex items-center h-8 gap-2">
+<button class="w-full py-1.5 border border-status-amber text-status-amber text-[10px] font-bold rounded hover:bg-status-amber/10 transition-colors">HIGH</button>
+<button class="w-full py-1.5 border border-outline-variant text-outline text-[10px] font-bold rounded hover:bg-surface-container transition-colors">MEDIUM</button>
+</div>
+</div>
+<div class="col-span-3">
+<label class="block text-[11px] font-bold text-outline-variant uppercase mb-1">TraceID / RequestID</label>
+<input class="w-full px-3 py-1.5 bg-surface-container-low border-transparent focus:border-primary focus:ring-0 text-body-md font-body-md rounded code-font" placeholder="TX-990-21..." type="text"/>
+</div>
+<div class="col-span-2 flex items-end">
+<button class="w-full h-[34px] bg-primary text-white font-bold text-body-md rounded hover:opacity-90 flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[18px]">manage_search</span> 检索
+                    </button>
+</div>
+</div>
+</section>
+<!-- Audit Feed (The Immersive Table) -->
+<section class="space-y-4">
+<!-- Log Item 1: High Risk Configuration Change -->
+<div class="bg-white border border-border-subtle rounded-xl overflow-hidden shadow-sm transition-all hover:border-primary">
+<div class="p-4 border-b border-border-subtle bg-surface-container-lowest flex items-center justify-between">
+<div class="flex items-center gap-4">
+<span class="px-2 py-0.5 bg-status-red text-white text-[10px] font-bold rounded">CRITICAL</span>
+<div class="flex flex-col">
+<span class="font-section-header text-section-header text-text-primary">IAM_POLICY_MODIFICATION</span>
+<span class="text-code-meta font-code-meta text-outline-variant">TRACE: 88fa-9b22-ee01</span>
+</div>
+</div>
+<div class="flex items-center gap-6 text-right">
+<div>
+<p class="text-body-sm font-body-sm text-text-secondary">Administrator (ID: 009)</p>
+<p class="text-code-meta font-code-meta text-outline-variant">2023-11-24 14:22:01.442</p>
+</div>
+<button class="flex items-center gap-1 text-primary hover:underline font-bold text-body-sm">
+<span class="material-symbols-outlined text-[16px]">history_edu</span> 快照回读
+                        </button>
+</div>
+</div>
+<div class="grid grid-cols-2 divide-x divide-border-subtle">
+<!-- Original -->
+<div class="p-4 bg-surface-container-low/30">
+<h4 class="text-[10px] font-bold text-outline-variant uppercase mb-3 flex items-center gap-2">
+<span class="material-symbols-outlined text-[14px]">history</span> 原始报文 (Payload)
+                        </h4>
+<pre class="code-font text-[11px] leading-relaxed overflow-x-auto">{
+  "role": "SuperAdmin",
+  "permissions": [
+    "READ_ALL",
+    <span class="diff-removed line-through">"WRITE_GLOBAL",</span>
+    "MANAGE_USERS"
+  ],
+  "status": "active"
+}
+                        </pre>
+</div>
+<!-- Changed -->
+<div class="p-4 bg-white">
+<h4 class="text-[10px] font-bold text-outline-variant uppercase mb-3 flex items-center gap-2">
+<span class="material-symbols-outlined text-[14px]">edit_square</span> 变更后报文 (Updated)
+                        </h4>
+<pre class="code-font text-[11px] leading-relaxed overflow-x-auto">{
+  "role": "SuperAdmin",
+  "permissions": [
+    "READ_ALL",
+    <span class="diff-added">"WRITE_GLOBAL_RESTRICTED",</span>
+    "MANAGE_USERS"
+  ],
+  "status": "active"
+}
+                        </pre>
+</div>
+</div>
+<div class="px-4 py-2 bg-surface-container-low flex justify-between items-center">
+<div class="flex gap-4">
+<span class="text-[10px] text-text-secondary flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">cloud_done</span> 接口: /api/v2/iam/roles/patch</span>
+<span class="text-[10px] text-text-secondary flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">terminal</span> 源IP: 192.168.1.104</span>
+</div>
+<button class="text-[10px] font-bold text-primary uppercase hover:opacity-80">查看完整上下文</button>
+</div>
+</div>
+<!-- Log Item 2: Standard Module Interaction -->
+<div class="bg-white border border-border-subtle rounded-xl overflow-hidden shadow-sm transition-all hover:border-primary">
+<div class="p-4 border-b border-border-subtle bg-surface-container-lowest flex items-center justify-between">
+<div class="flex items-center gap-4">
+<span class="px-2 py-0.5 bg-status-cyan text-white text-[10px] font-bold rounded">INFO</span>
+<div class="flex flex-col">
+<span class="font-section-header text-section-header text-text-primary">ASSET_SCAN_INITIATED</span>
+<span class="text-code-meta font-code-meta text-outline-variant">TRACE: a31b-4f90-8822</span>
+</div>
+</div>
+<div class="flex items-center gap-6 text-right">
+<div>
+<p class="text-body-sm font-body-sm text-text-secondary">System Task (ID: CRON_01)</p>
+<p class="text-code-meta font-code-meta text-outline-variant">2023-11-24 14:15:00.000</p>
+</div>
+<button class="flex items-center gap-1 text-primary hover:underline font-bold text-body-sm">
+<span class="material-symbols-outlined text-[16px]">history_edu</span> 快照回读
+                        </button>
+</div>
+</div>
+<div class="p-4">
+<p class="text-body-md text-on-surface-variant italic mb-4">"Initiated automated vulnerability scan for Region [Asia-North-1]. Identified 412 active endpoints."</p>
+<div class="bg-surface-container-low rounded p-3 border border-border-subtle">
+<div class="flex justify-between items-center mb-2">
+<span class="text-[10px] font-bold text-outline-variant">SCAN_PARAMETERS_DOCK</span>
+<span class="text-code-meta text-status-green">SUCCESS_READY</span>
+</div>
+<div class="grid grid-cols-3 gap-4 text-center">
+<div><p class="text-[10px] text-outline">Target Zone</p><p class="text-body-sm font-bold">AS-N1-A</p></div>
+<div><p class="text-[10px] text-outline">Depth</p><p class="text-body-sm font-bold">Recursive</p></div>
+<div><p class="text-[10px] text-outline">Intensity</p><p class="text-body-sm font-bold">Profile-2</p></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Log Item 3: Warning Risk -->
+<div class="bg-white border border-border-subtle rounded-xl overflow-hidden shadow-sm transition-all hover:border-primary border-l-4 border-l-status-amber">
+<div class="p-4 border-b border-border-subtle bg-surface-container-lowest flex items-center justify-between">
+<div class="flex items-center gap-4">
+<span class="px-2 py-0.5 bg-status-amber text-white text-[10px] font-bold rounded">WARNING</span>
+<div class="flex flex-col">
+<span class="font-section-header text-section-header text-text-primary">FAILED_LOGIN_ATTEMPT</span>
+<span class="text-code-meta font-code-meta text-outline-variant">TRACE: null-req-ff01</span>
+</div>
+</div>
+<div class="flex items-center gap-6 text-right">
+<div>
+<p class="text-body-sm font-body-sm text-text-secondary">Unknown Entity</p>
+<p class="text-code-meta font-code-meta text-outline-variant">2023-11-24 14:12:33.109</p>
+</div>
+<button class="flex items-center gap-1 text-primary hover:underline font-bold text-body-sm">
+<span class="material-symbols-outlined text-[16px]">block</span> 阻断源
+                        </button>
+</div>
+</div>
+<div class="p-4 bg-error-container/20">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-error mt-0.5">warning</span>
+<div class="flex-1">
+<p class="text-body-md font-bold text-error mb-1">Multiple unauthorized access attempts detected from unauthorized subnet [14.1.22.4].</p>
+<div class="text-code-meta text-on-surface-variant bg-white/50 p-2 border border-error/20 rounded">
+                                User: "root" | AuthMethod: "Password" | FailReason: "AuthServiceTimeout"
+                            </div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Inspector Panel (Shared Component Contextual Right) -->
+<aside class="fixed left-0 top-[56px] w-[240px] h-screen bg-white border-r border-border-subtle flex flex-col z-40"><div class="p-4 border-b border-border-subtle"><div class="flex items-center gap-2 text-on-surface font-bold"><span class="material-symbols-outlined text-[20px]">settings</span><span>系统参数</span></div></div><nav class="flex-1 py-4 overflow-y-auto"><ul class="space-y-1"><li><a class="flex items-center gap-3 px-6 py-2.5 text-on-surface-variant hover:bg-surface-container-low transition-colors" href="#"><span class="material-symbols-outlined text-[20px]">tune</span><span class="text-body-md">基础参数</span></a></li><li><a class="flex items-center gap-3 px-6 py-2.5 text-on-surface-variant hover:bg-surface-container-low transition-colors" href="#"><span class="material-symbols-outlined text-[20px]">security</span><span class="text-body-md">安全策略</span></a></li><li><a class="flex items-center gap-3 px-6 py-2.5 text-on-surface-variant hover:bg-surface-container-low transition-colors" href="#"><span class="material-symbols-outlined text-[20px]">folder_open</span><span class="text-body-md">文件存储配置</span></a></li><li><a class="flex items-center gap-3 px-6 py-2.5 text-on-surface-variant hover:bg-surface-container-low transition-colors" href="#"><span class="material-symbols-outlined text-[20px]">import_export</span><span class="text-body-md">导入导出配置</span></a></li><li><a class="flex items-center gap-3 px-6 py-2.5 text-on-surface-variant hover:bg-surface-container-low transition-colors" href="#"><span class="material-symbols-outlined text-[20px]">memory</span><span class="text-body-md">缓存管理</span></a></li><li><a class="flex items-center gap-3 px-6 py-2.5 text-primary font-bold bg-primary/10 border-r-4 border-primary transition-colors" href="#"><span class="material-symbols-outlined text-[20px]">history</span><span class="text-body-md">操作审计</span></a></li><li><a class="flex items-center gap-3 px-6 py-2.5 text-on-surface-variant hover:bg-surface-container-low transition-colors" href="#"><span class="material-symbols-outlined text-[20px]">description</span><span class="text-body-md">文档中心</span></a></li><li><a class="flex items-center gap-3 px-6 py-2.5 text-on-surface-variant hover:bg-surface-container-low transition-colors" href="#"><span class="material-symbols-outlined text-[20px]">support_agent</span><span class="text-body-md">技术支持</span></a></li></ul></nav></aside>
+<!-- Micro-interaction Script -->
+<script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Hover effect for audit cards to increase elevation sense
+            const cards = document.querySelectorAll('.bg-white.border.rounded-xl');
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', () => {
+                    card.classList.add('shadow-md');
+                });
+                card.addEventListener('mouseleave', () => {
+                    card.classList.remove('shadow-md');
+                });
+            });
+        });
+    </script>
+</body></html>

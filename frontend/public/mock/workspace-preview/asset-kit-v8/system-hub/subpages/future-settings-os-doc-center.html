@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Future Settings OS - 文档与配置手册</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "tertiary-fixed-dim": "#ddb7ff",
+                      "on-secondary-fixed-variant": "#004d65",
+                      "on-secondary-fixed": "#001f2a",
+                      "on-primary-container": "#fffdff",
+                      "on-tertiary-container": "#fffdff",
+                      "tertiary-fixed": "#f0dbff",
+                      "inverse-surface": "#d4e4fa",
+                      "primary-container": "#1d6ef2",
+                      "outline-variant": "#424654",
+                      "error-container": "#93000a",
+                      "secondary": "#6bd2ff",
+                      "error": "#ffb4ab",
+                      "outline": "#8c90a0",
+                      "primary-fixed": "#d9e2ff",
+                      "tertiary-container": "#9c49eb",
+                      "on-primary-fixed": "#001945",
+                      "on-error": "#690005",
+                      "on-secondary-container": "#00384a",
+                      "on-primary-fixed-variant": "#00419c",
+                      "secondary-container": "#00a8d8",
+                      "on-tertiary-fixed-variant": "#6900b3",
+                      "on-surface-variant": "#c2c6d7",
+                      "on-tertiary-fixed": "#2c0051",
+                      "inverse-primary": "#0057cc",
+                      "surface": "#051424",
+                      "on-error-container": "#ffdad6",
+                      "on-tertiary": "#490080",
+                      "background": "#051424",
+                      "surface-container-lowest": "#010f1f",
+                      "secondary-fixed": "#bfe9ff",
+                      "on-surface": "#d4e4fa",
+                      "on-secondary": "#003547",
+                      "surface-variant": "#273647",
+                      "surface-tint": "#b0c6ff",
+                      "tertiary": "#ddb7ff",
+                      "surface-container-high": "#1c2b3c",
+                      "surface-container": "#122131",
+                      "surface-container-low": "#0d1c2d",
+                      "secondary-fixed-dim": "#6bd2ff",
+                      "on-primary": "#002c6f",
+                      "on-background": "#d4e4fa",
+                      "surface-bright": "#2c3a4c",
+                      "primary": "#b0c6ff",
+                      "surface-container-highest": "#273647",
+                      "surface-dim": "#051424",
+                      "primary-fixed-dim": "#b0c6ff",
+                      "inverse-on-surface": "#233143"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "xs": "4px",
+                      "margin-mobile": "16px",
+                      "md": "16px",
+                      "xxl": "64px",
+                      "margin-desktop": "48px",
+                      "xl": "40px",
+                      "sm": "8px",
+                      "lg": "24px",
+                      "gutter": "24px",
+                      "unit": "4px"
+              },
+              "fontFamily": {
+                      "headline-lg-mobile": [
+                              "Geist"
+                      ],
+                      "headline-lg": [
+                              "Geist"
+                      ],
+                      "label-md": [
+                              "Geist"
+                      ],
+                      "display-lg": [
+                              "Geist"
+                      ],
+                      "body-md": [
+                              "Geist"
+                      ],
+                      "body-lg": [
+                              "Geist"
+                      ],
+                      "title-md": [
+                              "Geist"
+                      ],
+                      "mono-code": [
+                              "JetBrains Mono"
+                      ]
+              },
+              "fontSize": {
+                      "headline-lg-mobile": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "label-md": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "display-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "56px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-lg": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "title-md": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "mono-code": [
+                              "13px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+    </script>
+<style>
+        body {
+            background-color: #051424; /* surface_obsidian base */
+            color: #d4e4fa;
+        }
+        /* Hide scrollbar for cleaner look */
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #010f1f;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #273647;
+            border-radius: 2px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #424654;
+        }
+
+        .glass-panel {
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .status-dot.active {
+            background-color: #4ade80;
+            box-shadow: 0 0 8px rgba(74, 222, 128, 0.4);
+        }
+        .status-dot.review {
+            background-color: #fbbf24;
+            box-shadow: 0 0 8px rgba(251, 191, 36, 0.4);
+        }
+        .status-dot.draft {
+            background-color: #c084fc;
+            box-shadow: 0 0 8px rgba(192, 132, 252, 0.4);
+        }
+    </style>
+</head>
+<body class="antialiased overflow-hidden selection:bg-primary-container selection:text-on-primary-container h-screen flex flex-col font-body-md text-body-md">
+<!-- TopNavBar -->
+<header class="fixed top-0 left-0 w-full z-50 flex items-center justify-between px-gutter h-14 bg-[#051424] border-b border-[#1D6EF2]"><div class="flex items-center gap-8"><div class="font-bold text-lg text-white tracking-tight">UNIVIEW | 系统设置中心</div><nav class="flex gap-6 h-full items-center"><a class="text-sm text-outline-variant hover:text-white transition-colors" href="#">流程平台</a><a class="text-sm text-outline-variant hover:text-white transition-colors" href="#">组织权限</a><a class="text-sm text-outline-variant hover:text-white transition-colors" href="#">基础资料</a><a class="text-sm text-outline-variant hover:text-white transition-colors" href="#">集成配置</a><a class="text-sm text-outline-variant hover:text-white transition-colors" href="#">消息与通知</a><a class="text-sm text-primary font-bold border-b-2 border-primary pb-1" href="#">系统参数</a></nav></div><div class="flex items-center gap-6"><button class="text-sm text-outline-variant hover:text-white flex items-center gap-1"><span class="material-symbols-outlined text-lg">arrow_back</span> 返回业务工作台</button><div class="flex items-center gap-2"><div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center text-xs font-bold">运</div><span class="text-sm text-on-surface">运营管理员</span></div></div></header>
+<!-- Main Layout Grid -->
+<div class="flex flex-1 pt-14 h-full w-full">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-14 w-[240px] h-[calc(100vh-3.5rem)] flex flex-col bg-surface-container-lowest border-r border-outline-variant/30 z-40"><nav class="flex-1 flex flex-col py-4 overflow-y-auto"><a class="flex items-center gap-3 px-6 py-3 text-on-surface-variant hover:bg-surface-container-low transition-colors" href="#"><span class="material-symbols-outlined text-xl">settings</span> 基础参数</a><a class="flex items-center gap-3 px-6 py-3 text-on-surface-variant hover:bg-surface-container-low transition-colors" href="#"><span class="material-symbols-outlined text-xl">security</span> 安全策略</a><a class="flex items-center gap-3 px-6 py-3 text-on-surface-variant hover:bg-surface-container-low transition-colors" href="#"><span class="material-symbols-outlined text-xl">folder_open</span> 文件存储配置</a><a class="flex items-center gap-3 px-6 py-3 text-on-surface-variant hover:bg-surface-container-low transition-colors" href="#"><span class="material-symbols-outlined text-xl">import_export</span> 导入导出配置</a><a class="flex items-center gap-3 px-6 py-3 text-on-surface-variant hover:bg-surface-container-low transition-colors" href="#"><span class="material-symbols-outlined text-xl">memory</span> 缓存管理</a><a class="flex items-center gap-3 px-6 py-3 text-on-surface-variant hover:bg-surface-container-low transition-colors" href="#"><span class="material-symbols-outlined text-xl">history_edu</span> 操作审计</a><a class="flex items-center gap-3 px-6 py-3 text-primary font-bold bg-primary/10 border-r-4 border-primary transition-colors" href="#"><span class="material-symbols-outlined text-xl">description</span> 文档中心</a><a class="flex items-center gap-3 px-6 py-3 text-on-surface-variant hover:bg-surface-container-low transition-colors mt-auto" href="#"><span class="material-symbols-outlined text-xl">contact_support</span> 技术支持</a></nav></aside>
+<!-- Center Workspace -->
+<main class="ml-[240px] flex-1 flex flex-col h-full bg-background pr-[400px]">
+<!-- Workspace Header / Tools -->
+<div class="sticky top-0 z-30 bg-background/95 glass-panel border-b border-surface-container-high px-gutter py-4">
+<div class="flex items-center justify-between mb-4">
+<h1 class="font-headline-lg text-headline-lg text-on-surface">文档与配置手册</h1>
+<div class="flex gap-3">
+<button class="px-4 py-2 border border-surface-container-high text-primary hover:bg-surface-container-high rounded-md flex items-center gap-2 transition-colors font-label-md text-label-md">
+<span class="material-symbols-outlined text-sm">download</span> 导出列表
+                        </button>
+<button class="px-4 py-2 bg-primary-container text-on-primary-container hover:bg-inverse-primary rounded-md flex items-center gap-2 transition-colors font-label-md text-label-md">
+<span class="material-symbols-outlined text-sm">note_add</span> 新建文档
+                        </button>
+</div>
+</div>
+<!-- Filters & Search Row -->
+<div class="flex items-center gap-4 text-sm">
+<!-- Search -->
+<div class="relative flex-1 max-w-md">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="w-full bg-surface-container-low border-b-2 border-transparent focus:border-primary px-10 py-2 rounded-t-md text-on-surface placeholder:text-outline-variant outline-none transition-colors" placeholder="搜索文档编号、名称或内容..." type="text"/>
+</div>
+<!-- Filter Segments -->
+<div class="flex bg-surface-container-low rounded-md p-1 border border-surface-container-high">
+<button class="px-3 py-1 rounded bg-surface-variant text-on-surface font-medium text-xs">全部状态</button>
+<button class="px-3 py-1 rounded text-outline hover:text-on-surface hover:bg-surface-container-highest transition-colors text-xs flex items-center gap-1">
+<span class="status-dot active w-2 h-2"></span> 活跃
+                        </button>
+<button class="px-3 py-1 rounded text-outline hover:text-on-surface hover:bg-surface-container-highest transition-colors text-xs flex items-center gap-1">
+<span class="status-dot review w-2 h-2"></span> 审核中
+                        </button>
+<button class="px-3 py-1 rounded text-outline hover:text-on-surface hover:bg-surface-container-highest transition-colors text-xs flex items-center gap-1">
+<span class="status-dot draft w-2 h-2"></span> 草稿
+                        </button>
+</div>
+<div class="flex gap-2">
+<select class="bg-surface-container-low border-b-2 border-transparent focus:border-primary px-3 py-1.5 rounded-t-md text-on-surface outline-none text-xs appearance-none pr-8 relative">
+<option>所有模块 (All Modules)</option>
+<option>Webhook 配置</option>
+<option>SLA 策略</option>
+<option>编号规则 (Numbering)</option>
+</select>
+<select class="bg-surface-container-low border-b-2 border-transparent focus:border-primary px-3 py-1.5 rounded-t-md text-on-surface outline-none text-xs appearance-none pr-8">
+<option>最近更新时间</option>
+<option>创建时间</option>
+</select>
+</div>
+</div>
+</div>
+<!-- Data Table / Grid -->
+<div class="flex-1 overflow-y-auto px-gutter py-4">
+<!-- Table Header -->
+<div class="grid grid-cols-12 gap-4 pb-2 border-b border-surface-container-high text-outline font-label-md text-label-md uppercase tracking-wider mb-2">
+<div class="col-span-1 pl-2">状态</div>
+<div class="col-span-3">文档标识 / 模块</div>
+<div class="col-span-4">文档名称</div>
+<div class="col-span-2">版本 / 负责人</div>
+<div class="col-span-2 text-right pr-4">最后更新</div>
+</div>
+<!-- Rows -->
+<div class="flex flex-col gap-1">
+<!-- Row 1 -->
+<div class="grid grid-cols-12 gap-4 items-center py-3 border-b border-surface-container-high/50 hover:bg-surface-container-high/30 transition-colors group cursor-pointer relative">
+<div class="absolute inset-y-0 left-0 w-1 bg-transparent group-hover:bg-primary transition-colors"></div>
+<div class="col-span-1 pl-4 flex items-center">
+<span class="status-dot active"></span>
+</div>
+<div class="col-span-3 flex flex-col">
+<span class="font-mono-code text-mono-code text-on-surface">DOC-WH-001</span>
+<span class="text-xs text-secondary-container">Webhook 配置</span>
+</div>
+<div class="col-span-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-outline text-sm">description</span>
+<span class="text-on-surface font-medium truncate">全局 Webhook 分发协议标准 V2</span>
+</div>
+<div class="col-span-2 flex flex-col">
+<span class="text-sm text-on-surface">v2.4.1</span>
+<span class="text-xs text-outline">System_Admin</span>
+</div>
+<div class="col-span-2 text-right pr-4 flex flex-col">
+<span class="text-sm text-on-surface">2023-10-24</span>
+<span class="text-xs text-outline">14:32:00</span>
+</div>
+</div>
+<!-- Row 2 -->
+<div class="grid grid-cols-12 gap-4 items-center py-3 border-b border-surface-container-high/50 hover:bg-surface-container-high/30 transition-colors group cursor-pointer relative bg-surface-container-low/20">
+<div class="absolute inset-y-0 left-0 w-1 bg-primary"></div>
+<div class="col-span-1 pl-4 flex items-center">
+<span class="status-dot review"></span>
+</div>
+<div class="col-span-3 flex flex-col">
+<span class="font-mono-code text-mono-code text-on-surface">DOC-SLA-042</span>
+<span class="text-xs text-tertiary-container">SLA 策略</span>
+</div>
+<div class="col-span-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-outline text-sm">rule</span>
+<span class="text-on-surface font-medium truncate text-primary-fixed-dim">P1 级故障响应时间 SLA 调整方案</span>
+</div>
+<div class="col-span-2 flex flex-col">
+<span class="text-sm text-on-surface">v1.2.0-rc</span>
+<span class="text-xs text-outline">Ops_Team</span>
+</div>
+<div class="col-span-2 text-right pr-4 flex flex-col">
+<span class="text-sm text-on-surface">2023-10-24</span>
+<span class="text-xs text-outline">09:15:22</span>
+</div>
+</div>
+<!-- Row 3 -->
+<div class="grid grid-cols-12 gap-4 items-center py-3 border-b border-surface-container-high/50 hover:bg-surface-container-high/30 transition-colors group cursor-pointer relative">
+<div class="absolute inset-y-0 left-0 w-1 bg-transparent group-hover:bg-primary transition-colors"></div>
+<div class="col-span-1 pl-4 flex items-center">
+<span class="status-dot active"></span>
+</div>
+<div class="col-span-3 flex flex-col">
+<span class="font-mono-code text-mono-code text-on-surface">DOC-NUM-005</span>
+<span class="text-xs text-secondary-container">编号规则</span>
+</div>
+<div class="col-span-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-outline text-sm">format_list_numbered</span>
+<span class="text-on-surface font-medium truncate">工单自动编号生成矩阵</span>
+</div>
+<div class="col-span-2 flex flex-col">
+<span class="text-sm text-on-surface">v3.0.0</span>
+<span class="text-xs text-outline">Config_Mgr</span>
+</div>
+<div class="col-span-2 text-right pr-4 flex flex-col">
+<span class="text-sm text-on-surface">2023-10-22</span>
+<span class="text-xs text-outline">16:45:10</span>
+</div>
+</div>
+<!-- Row 4 -->
+<div class="grid grid-cols-12 gap-4 items-center py-3 border-b border-surface-container-high/50 hover:bg-surface-container-high/30 transition-colors group cursor-pointer relative">
+<div class="absolute inset-y-0 left-0 w-1 bg-transparent group-hover:bg-primary transition-colors"></div>
+<div class="col-span-1 pl-4 flex items-center">
+<span class="status-dot draft"></span>
+</div>
+<div class="col-span-3 flex flex-col">
+<span class="font-mono-code text-mono-code text-on-surface">DOC-SEC-012</span>
+<span class="text-xs text-error">权限矩阵 (Permission Matrix)</span>
+</div>
+<div class="col-span-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-outline text-sm">lock</span>
+<span class="text-on-surface font-medium truncate">跨租户 API 访问权限审批流草案</span>
+</div>
+<div class="col-span-2 flex flex-col">
+<span class="text-sm text-on-surface">v0.9.1-draft</span>
+<span class="text-xs text-outline">Sec_Ops</span>
+</div>
+<div class="col-span-2 text-right pr-4 flex flex-col">
+<span class="text-sm text-on-surface">2023-10-21</span>
+<span class="text-xs text-outline">11:20:05</span>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Right Inspector (Glassmorphism) -->
+<aside class="fixed right-0 top-14 w-[400px] h-[calc(100vh-3.5rem)] bg-surface-container-high/80 glass-panel border-l border-surface-container z-40 flex flex-col overflow-y-auto">
+<!-- Inspector Header -->
+<div class="p-6 border-b border-surface-container border-opacity-50">
+<div class="flex items-center justify-between mb-2">
+<span class="px-2 py-1 bg-tertiary-container/20 text-tertiary font-mono-code text-[11px] rounded uppercase tracking-widest border border-tertiary-container/30">Review Mode</span>
+<button class="text-outline hover:text-on-surface">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<h2 class="font-title-md text-title-md text-on-surface mb-1 leading-tight">P1 级故障响应时间 SLA 调整方案</h2>
+<div class="font-mono-code text-mono-code text-outline text-xs">DOC-SLA-042 | v1.2.0-rc</div>
+</div>
+<!-- Inspector Content -->
+<div class="p-6 flex flex-col gap-8 flex-1">
+<!-- Doc Summary -->
+<section>
+<h3 class="text-xs font-semibold text-outline-variant uppercase tracking-widest mb-3 flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">subject</span> Doc Summary
+                    </h3>
+<p class="text-sm text-on-surface-variant leading-relaxed">
+                        本提案旨在将系统级 P1 故障的自动响应 SLA 从 15 分钟缩短至 5 分钟。涉及底层监控阈值的调整以及自动分配算法权重的更新。
+                    </p>
+</section>
+<!-- Linked Config Items -->
+<section>
+<h3 class="text-xs font-semibold text-outline-variant uppercase tracking-widest mb-3 flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">link</span> Linked Config Items
+                    </h3>
+<div class="flex flex-col gap-2">
+<a class="flex items-center justify-between p-3 bg-surface-container-low border border-surface-container hover:border-primary/50 rounded-md transition-colors group" href="#">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-secondary-container">rule</span>
+<div class="flex flex-col">
+<span class="text-sm text-on-surface font-medium group-hover:text-primary transition-colors">SLA_Policy_P1_Global</span>
+<span class="text-xs text-outline">SLA 模块</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-primary">open_in_new</span>
+</a>
+<a class="flex items-center justify-between p-3 bg-surface-container-low border border-surface-container hover:border-primary/50 rounded-md transition-colors group" href="#">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-tertiary-container">campaign</span>
+<div class="flex flex-col">
+<span class="text-sm text-on-surface font-medium group-hover:text-primary transition-colors">Alert_Route_Critical</span>
+<span class="text-xs text-outline">Webhook 模块</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-primary">open_in_new</span>
+</a>
+</div>
+</section>
+<!-- Impact Range -->
+<section>
+<h3 class="text-xs font-semibold text-outline-variant uppercase tracking-widest mb-3 flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">radar</span> Deployment Impact Range
+                    </h3>
+<div class="bg-surface-container-lowest p-4 rounded-md border border-error-container/30">
+<div class="flex items-center justify-between mb-4">
+<span class="text-sm font-medium text-error">High Impact (Global)</span>
+<span class="text-xs text-outline">Affects 12 Nodes</span>
+</div>
+<!-- Progress bar representation -->
+<div class="w-full h-1.5 bg-surface-variant rounded-full overflow-hidden mb-2">
+<div class="h-full bg-error w-3/4"></div>
+</div>
+<div class="flex justify-between text-[10px] text-outline font-mono-code uppercase">
+<span>Local</span>
+<span>Regional</span>
+<span class="text-error">Global</span>
+</div>
+</div>
+</section>
+<!-- Recent Reviewers -->
+<section class="mt-auto pt-6 border-t border-surface-container border-opacity-50">
+<h3 class="text-xs font-semibold text-outline-variant uppercase tracking-widest mb-3">Pending Approvals (2/3)</h3>
+<div class="flex items-center gap-2">
+<div class="h-8 w-8 rounded-full bg-surface-variant overflow-hidden border border-green-500 relative group cursor-pointer">
+<img class="w-full h-full object-cover" data-alt="A small, stylized profile avatar of a female engineer with short hair, cyberpunk neon aesthetic, dark background, professional and highly detailed." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBa88LYiNExsCOMCYKC-oN4PRIOXEMkoNapGD-5tdly6ZbwRj8KqGsEWSeJQ7xXiaRrpPIbfbUSeqy3uppEC7qMWFh9-ck3YoEMv9mtpCm5ekA-gb-Y7UfOhIaYMVWs8xyhxIw98Cl_ZMjtGXAL9We18XepKTXNQNFvwQl8N-iSZX0pYCu0pp-LYO-ubksK4hyzX6Vt1VylYiYr1_hGBxclLuKugU_SkaZQxxrw6k_XgP8xJSm_5cZEW-4Z3r-6Iob4Pe286qgJ-rhk"/>
+<div class="absolute inset-0 bg-green-500/20"></div>
+<span class="material-symbols-outlined absolute bottom-0 right-0 text-[10px] text-green-500 bg-surface rounded-full">check_circle</span>
+</div>
+<div class="h-8 w-8 rounded-full bg-surface-variant overflow-hidden border border-green-500 relative group cursor-pointer">
+<img class="w-full h-full object-cover" data-alt="A small, stylized profile avatar of a male system administrator with glasses, neon blue lighting, dark background, professional and high fidelity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAavPWAyheV5t5FGA7QiFWeT953p2FZfkDnfiiEJye81NvWDLPrsN6iK0ODX6figDyHS_1QIZAspl2-U4F2asFYhGYZPelsKgf09TUYWuMo8M4XEuTkWkpJpO6-FNOjNTv0tVvaTjkXT7m4LsTpAggrfp7VJPxePvzCrLBHCnx2Ce6mhOLH8U5VTWUxtBDA63hGOCICcNZRSZ5S_HrR0brYH5ToAv0MicJpnh_ZoXQzWAj1lM4xT2aci7erJmzI37e4Jh8ECRwEA6r8"/>
+<div class="absolute inset-0 bg-green-500/20"></div>
+<span class="material-symbols-outlined absolute bottom-0 right-0 text-[10px] text-green-500 bg-surface rounded-full">check_circle</span>
+</div>
+<div class="h-8 w-8 rounded-full bg-surface-variant overflow-hidden border border-amber-500 border-dashed relative group cursor-pointer opacity-50">
+<div class="w-full h-full flex items-center justify-center text-outline text-xs font-mono-code">CTO</div>
+<span class="material-symbols-outlined absolute bottom-0 right-0 text-[10px] text-amber-500 bg-surface rounded-full">pending</span>
+</div>
+</div>
+</section>
+</div>
+<!-- Inspector Actions -->
+<div class="p-4 bg-surface-container-low border-t border-surface-container flex gap-3">
+<button class="flex-1 py-2 border border-error/50 text-error hover:bg-error-container/20 rounded-md transition-colors font-label-md text-label-md">
+                    驳回 (Reject)
+                </button>
+<button class="flex-1 py-2 bg-primary-container text-on-primary-container hover:bg-inverse-primary rounded-md transition-colors font-label-md text-label-md shadow-[0_0_12px_rgba(29,110,242,0.3)]">
+                    批准 (Approve)
+                </button>
+</div>
+</aside>
+</div>
+</body></html>

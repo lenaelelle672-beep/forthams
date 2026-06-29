@@ -21,6 +21,8 @@ import {
   BarChart3,
   Bell,
   Box,
+  BriefcaseBusiness,
+  Building2,
   CalendarDays,
   ChevronDown,
   ChevronRight,
@@ -52,6 +54,7 @@ import {
   Shield,
   ShieldCheck,
   Smartphone,
+  ScrollText,
   SlidersHorizontal,
   TrendingUp,
   Type,
@@ -339,7 +342,9 @@ type SystemSubpageDesignAsset = {
 
 const systemSubpageDesignAssetsByGroup: Record<string, SystemSubpageDesignAsset[]> = {
   流程平台: [
-    { label: '流程定义', menuId: 'system-flow-definition', image2: 'flow-platform-subpage-01-flow-definition-v2', stitch: 'stitch-flow-platform-subpage-01-flow-definition-v1' },
+    { label: '导航控制台', menuId: 'system-flow-definition', image2: 'flow-platform-subpage-01-flow-definition-v2', stitch: 'stitch-flow-platform-subpage-01-flow-definition-v1' },
+    { label: '设置中心', menuId: 'system-settings-command-center', image2: 'flow-platform-subpage-02-settings-command-center-v1', stitch: 'stitch-flow-platform-subpage-02-settings-command-center-v1' },
+    { label: '运行监测', menuId: 'system-runtime-monitor', image2: 'flow-platform-subpage-03-runtime-monitor-v1', stitch: 'stitch-flow-platform-subpage-03-runtime-monitor-v1' },
     { label: '流程设计器', menuId: 'system-flow-designer', image2: 'flow-platform-subpage-02-flow-designer-v2', stitch: 'stitch-flow-platform-subpage-02-flow-designer-v2' },
     { label: '表单配置', menuId: 'system-form-config', image2: 'flow-platform-subpage-03-form-config-v2', stitch: 'stitch-flow-platform-subpage-03-form-config-v1' },
     { label: '表单存储', menuId: 'system-form-storage', image2: 'flow-platform-subpage-04-form-storage-v2', stitch: 'stitch-flow-platform-subpage-04-form-storage-v1' },
@@ -355,6 +360,7 @@ const systemSubpageDesignAssetsByGroup: Record<string, SystemSubpageDesignAsset[
     { label: '工作交接', menuId: 'system-handover', image2: 'org-permission-subpage-05-handover-v2', stitch: 'stitch-org-permission-subpage-05-handover-v1' },
     { label: '部门组织', menuId: 'system-dept-org', image2: 'org-permission-subpage-06-dept-org-v2', stitch: 'stitch-org-permission-subpage-06-dept-org-v1' },
     { label: '岗位管理', menuId: 'system-post-management', image2: 'org-permission-subpage-07-post-management-v2', stitch: 'stitch-org-permission-subpage-07-post-management-v1' },
+    { label: '租户管理', menuId: 'system-tenant-management', image2: 'org-permission-subpage-08-tenant-management-v1', stitch: 'stitch-org-permission-subpage-08-tenant-management-v1' },
   ],
   基础资料: [
     { label: '资产分类', menuId: 'system-asset-category', image2: 'master-data-subpage-01-asset-category-v2', stitch: 'stitch-master-data-subpage-01-asset-category-v2' },
@@ -388,6 +394,8 @@ const systemSubpageDesignAssetsByGroup: Record<string, SystemSubpageDesignAsset[
     { label: '导入导出配置', menuId: 'system-import-export', image2: 'system-params-subpage-04-import-export-v2', stitch: 'stitch-system-params-subpage-04-import-export-v1' },
     { label: '缓存管理', menuId: 'system-cache-management', image2: 'system-params-subpage-05-cache-management-v2', stitch: 'stitch-system-params-subpage-05-cache-management-v1' },
     { label: '操作审计', menuId: 'system-audit-log', image2: 'system-params-subpage-06-audit-log-v2', stitch: 'stitch-system-params-subpage-06-audit-log-v1' },
+    { label: '文档中心', menuId: 'system-doc-center', image2: 'system-params-subpage-07-doc-center-v1', stitch: 'stitch-system-params-subpage-07-doc-center-v1' },
+    { label: '技术支持', menuId: 'system-tech-support', image2: 'system-params-subpage-08-tech-support-v1', stitch: 'stitch-system-params-subpage-08-tech-support-v1' },
   ],
 };
 const securityPostureThumb = moduleAsset('module-security-posture');
@@ -474,7 +482,9 @@ const createSystemMenuItem = (
 const systemDefaultMenuId = 'system-flow-definition';
 
 const systemMenuItems: WorkspaceMenuItem[] = [
-  createSystemMenuItem('system-flow-definition', '流程平台', '流程定义', FileText, '资产、CIP、合同/PO 变更等流程的启停、版本和发布状态。'),
+  createSystemMenuItem('system-flow-definition', '流程平台', '导航控制台', FileText, '系统运营中枢第一层入口，聚合常用后台设置、发布检查和运维导航。'),
+  createSystemMenuItem('system-settings-command-center', '流程平台', '设置中心', LayoutDashboard, '后台设置 OS 设置中枢，聚合系统参数、编号规则、SLA、Webhook、邮件与通知配置。'),
+  createSystemMenuItem('system-runtime-monitor', '流程平台', '运行监测', Activity, '后台设置运行状态、执行链路和异常事件监测。'),
   createSystemMenuItem('system-flow-designer', '流程平台', '流程设计器', SlidersHorizontal, '简单串行流程、节点、条件、跳过规则和外部推送节点。'),
   createSystemMenuItem('system-form-config', '流程平台', '表单配置', ClipboardList, '表单字段、校验、桌面布局和 H5 布局配置。'),
   createSystemMenuItem('system-form-storage', '流程平台', '表单存储', Archive, '表单定义版本和表单实例数据的存储、归档、查询。'),
@@ -488,6 +498,7 @@ const systemMenuItems: WorkspaceMenuItem[] = [
   createSystemMenuItem('system-post-management', '组织权限', '岗位管理', PackageCheck, '岗位、职责和审批岗位规则。'),
   createSystemMenuItem('system-data-permissions', '组织权限', '数据权限', Database, '按组织、位置、资产类别和项目范围授权。'),
   createSystemMenuItem('system-handover', '组织权限', '工作交接', RefreshCw, '离职、调岗、代理、资产责任人和流程待办转交。'),
+  createSystemMenuItem('system-tenant-management', '组织权限', '租户管理', Building2, '租户契约、环境隔离、发布门禁和配置归属管理。'),
   createSystemMenuItem('system-asset-category', '基础资料', '资产分类', Layers, '资产大类、小类、折旧和盘点策略关联。'),
   createSystemMenuItem('system-numbering-rules', '基础资料', '编号规则', FileText, '资产编号规则、预览、冲突处理和序列策略。'),
   createSystemMenuItem('system-location-management', '基础资料', '位置管理', MapPin, '园区、楼栋、房间、仓库和机房。'),
@@ -513,21 +524,55 @@ const systemMenuItems: WorkspaceMenuItem[] = [
   createSystemMenuItem('system-import-export', '系统参数', '导入导出配置', Download, '模板、字段校验、导入队列和导出权限配置。'),
   createSystemMenuItem('system-cache-management', '系统参数', '缓存管理', RefreshCw, '基础数据缓存、刷新策略和异常恢复。'),
   createSystemMenuItem('system-audit-log', '系统参数', '操作审计', Activity, '关键配置、权限、集成和流程操作审计。'),
+  createSystemMenuItem('system-doc-center', '系统参数', '文档中心', ScrollText, '后台设置操作说明、配置手册和审计说明。'),
+  createSystemMenuItem('system-tech-support', '系统参数', '技术支持', BriefcaseBusiness, '诊断追踪、支持工单和配置问题排查。'),
 ];
 
 const systemSubpageHtmlByMenuId: Record<string, string> = {
-  'system-asset-category': 'stitch-master-data-subpage-01-asset-category-v6-100score.html',
-  'system-numbering-rules': 'stitch-master-data-subpage-02-numbering-rules-v2-100score.html',
-  'system-location-management': 'stitch-master-data-subpage-03-location-management-v2-100score.html',
-  'system-vendor-management': 'stitch-master-data-subpage-04-vendor-management-v2-100score.html',
-  'system-custom-fields': 'stitch-master-data-subpage-05-custom-fields-v2-100score.html',
-  'system-custom-field-sets': 'stitch-master-data-subpage-06-custom-field-sets-v2-100score.html',
-  'system-base-params': 'stitch-system-params-subpage-01-base-params-v2-100score.html',
-  'system-security-policy': 'stitch-system-params-subpage-02-security-policy-v2-100score.html',
-  'system-file-storage': 'stitch-system-params-subpage-03-file-storage-v2-100score.html',
-  'system-import-export': 'stitch-system-params-subpage-04-import-export-v2-100score.html',
-  'system-cache-management': 'stitch-system-params-subpage-05-cache-management-v3-image2-100score.html',
-  'system-audit-log': 'stitch-system-params-subpage-06-audit-log-v2-100score.html',
+  'system-flow-definition': 'future-settings-os-navigation-center.html',
+  'system-settings-command-center': 'future-settings-os-settings-command-center.html',
+  'system-runtime-monitor': 'future-settings-os-runtime-monitor.html',
+  'system-flow-designer': 'future-settings-os-flow-designer.html',
+  'system-form-config': 'future-settings-os-form-config.html',
+  'system-form-storage': 'future-settings-os-form-storage.html',
+  'system-approval-rules': 'future-settings-os-approval-rules.html',
+  'system-todo-fields': 'future-settings-os-todo-fields.html',
+  'system-sla-config': 'future-settings-os-sla-config.html',
+  'system-user-management': 'future-settings-os-user-management.html',
+  'system-role-permissions': 'future-settings-os-role-permissions.html',
+  'system-menu-permissions': 'future-settings-os-menu-permissions.html',
+  'system-dept-org': 'future-settings-os-dept-org.html',
+  'system-post-management': 'future-settings-os-post-management.html',
+  'system-data-permissions': 'future-settings-os-data-permissions.html',
+  'system-handover': 'future-settings-os-handover.html',
+  'system-tenant-management': 'future-settings-os-tenant-management.html',
+  'system-asset-category': 'future-settings-os-asset-category.html',
+  'system-numbering-rules': 'future-settings-os-numbering-rules.html',
+  'system-location-management': 'future-settings-os-location-management.html',
+  'system-vendor-management': 'future-settings-os-vendor-management.html',
+  'system-custom-fields': 'future-settings-os-custom-fields.html',
+  'system-custom-field-sets': 'future-settings-os-custom-field-sets.html',
+  'system-external-systems': 'future-settings-os-external-systems.html',
+  'system-interfaces': 'future-settings-os-interfaces.html',
+  'system-field-mapping': 'future-settings-os-field-mapping.html',
+  'system-sync-rules': 'future-settings-os-sync-rules.html',
+  'system-webhook-config': 'future-settings-os-webhook-config.html',
+  'system-mail-gateway': 'future-settings-os-mail-gateway.html',
+  'system-workflow-mail': 'future-settings-os-workflow-mail.html',
+  'system-mail-templates': 'future-settings-os-mail-templates.html',
+  'system-mail-logs': 'future-settings-os-mail-logs.html',
+  'system-notification-templates': 'future-settings-os-notification-templates.html',
+  'system-notification-channels': 'future-settings-os-notification-channels.html',
+  'system-notification-preferences': 'future-settings-os-notification-preferences.html',
+  'system-workflow-notification-switch': 'future-settings-os-workflow-notification-switch.html',
+  'system-base-params': 'future-settings-os-base-params.html',
+  'system-security-policy': 'future-settings-os-security-policy.html',
+  'system-file-storage': 'future-settings-os-file-storage.html',
+  'system-import-export': 'future-settings-os-import-export.html',
+  'system-cache-management': 'future-settings-os-cache-management.html',
+  'system-audit-log': 'future-settings-os-audit-log.html',
+  'system-doc-center': 'future-settings-os-doc-center.html',
+  'system-tech-support': 'future-settings-os-tech-support.html',
 };
 
 const systemFrameNavigationTargets: Record<string, string> = {
@@ -549,14 +594,28 @@ const systemFrameNavigationTargets: Record<string, string> = {
   资产作业台: '/fixed-assets/workbench/assets?menu=orders',
   概览中心: '/fixed-assets/workbench?menu=home',
   系统运营中枢: '/fixed-assets/workbench?menu=system-flow-definition',
-  系统设置: '/fixed-assets/workbench?menu=system-flow-definition',
-  设置中心: '/fixed-assets/workbench?menu=system-flow-definition',
-  系统概览: '/fixed-assets/workbench?menu=system-flow-definition',
+  后台导航: '/fixed-assets/workbench?menu=system-flow-definition',
+  导航中心: '/fixed-assets/workbench?menu=system-flow-definition',
+  导航控制台: '/fixed-assets/workbench?menu=system-flow-definition',
+  返回业务工作台: '/fixed-assets/workbench?menu=home',
+  控制面板: '/fixed-assets/workbench?menu=system-settings-command-center',
+  运行监测: '/fixed-assets/workbench?menu=system-runtime-monitor',
+  系统设置: '/fixed-assets/workbench?menu=system-settings-command-center',
+  设置中心: '/fixed-assets/workbench?menu=system-settings-command-center',
+  系统概览: '/fixed-assets/workbench?menu=system-settings-command-center',
   组织与权限: '/fixed-assets/workbench?menu=system-user-management',
   组织权限: '/fixed-assets/workbench?menu=system-user-management',
   用户与角色: '/fixed-assets/workbench?menu=system-user-management',
+  权限与角色: '/fixed-assets/workbench?menu=system-role-permissions',
   角色管理: '/fixed-assets/workbench?menu=system-role-permissions',
   组织管理: '/fixed-assets/workbench?menu=system-dept-org',
+  用户管理: '/fixed-assets/workbench?menu=system-user-management',
+  角色与权限: '/fixed-assets/workbench?menu=system-role-permissions',
+  菜单配置: '/fixed-assets/workbench?menu=system-menu-permissions',
+  部门与岗位: '/fixed-assets/workbench?menu=system-dept-org',
+  自定义字段: '/fixed-assets/workbench?menu=system-custom-fields',
+  租户管理: '/fixed-assets/workbench?menu=system-tenant-management',
+  租户契约管理: '/fixed-assets/workbench?menu=system-tenant-management',
   基础数据: '/fixed-assets/workbench?menu=system-asset-category',
   基础资料: '/fixed-assets/workbench?menu=system-asset-category',
   编码规则: '/fixed-assets/workbench?menu=system-numbering-rules',
@@ -564,19 +623,25 @@ const systemFrameNavigationTargets: Record<string, string> = {
   字典管理: '/fixed-assets/workbench?menu=system-base-params',
   计量单位: '/fixed-assets/workbench?menu=system-base-params',
   资产状态: '/fixed-assets/workbench?menu=system-base-params',
-  流程平台: '/fixed-assets/workbench?menu=system-flow-definition',
+  流程中心: '/fixed-assets/workbench?menu=system-settings-command-center',
+  流程平台: '/fixed-assets/workbench?menu=system-settings-command-center',
   表单管理: '/fixed-assets/workbench?menu=system-form-config',
-  流程配置: '/fixed-assets/workbench?menu=system-flow-definition',
-  流程监控: '/fixed-assets/workbench?menu=system-flow-definition',
+  流程配置: '/fixed-assets/workbench?menu=system-settings-command-center',
+  流程监控: '/fixed-assets/workbench?menu=system-runtime-monitor',
   流程设计: '/fixed-assets/workbench?menu=system-flow-designer',
   流程授权: '/fixed-assets/workbench?menu=system-approval-rules',
   流程日志: '/fixed-assets/workbench?menu=system-audit-log',
   流程与规则: '/fixed-assets/workbench?menu=system-approval-rules',
   集成配置: '/fixed-assets/workbench?menu=system-external-systems',
   配置集成: '/fixed-assets/workbench?menu=system-external-systems',
+  三方集成: '/fixed-assets/workbench?menu=system-external-systems',
+  集成中枢: '/fixed-assets/workbench?menu=system-external-systems',
   外部系统档案: '/fixed-assets/workbench?menu=system-external-systems',
   消息与通知: '/fixed-assets/workbench?menu=system-mail-gateway',
   消息通知: '/fixed-assets/workbench?menu=system-mail-gateway',
+  通知中枢: '/fixed-assets/workbench?menu=system-notification-preferences',
+  邮件中枢: '/fixed-assets/workbench?menu=system-workflow-mail',
+  Webhook: '/fixed-assets/workbench?menu=system-webhook-config',
   通知策略: '/fixed-assets/workbench?menu=system-workflow-notification-switch',
   通知记录: '/fixed-assets/workbench?menu=system-mail-logs',
   消息日志: '/fixed-assets/workbench?menu=system-mail-logs',
@@ -586,6 +651,7 @@ const systemFrameNavigationTargets: Record<string, string> = {
   全局参数: '/fixed-assets/workbench?menu=system-base-params',
   存储参数: '/fixed-assets/workbench?menu=system-file-storage',
   安全扫描配置: '/fixed-assets/workbench?menu=system-security-policy',
+  安全门禁: '/fixed-assets/workbench?menu=system-security-policy',
   安全管理: '/fixed-assets/workbench?menu=system-security-policy',
   安全与审计: '/fixed-assets/workbench?menu=system-security-policy',
   脱敏规则: '/fixed-assets/workbench?menu=system-security-policy',
@@ -602,6 +668,49 @@ const systemFrameNavigationTargets: Record<string, string> = {
   系统监控: '/fixed-assets/workbench?menu=system-cache-management',
   系统运维: '/fixed-assets/workbench?menu=system-cache-management',
   集群配置: '/fixed-assets/workbench?menu=system-cache-management',
+  文档中心: '/fixed-assets/workbench?menu=system-doc-center',
+  技术支持: '/fixed-assets/workbench?menu=system-tech-support',
+  Dashboard: '/fixed-assets/workbench?menu=system-settings-command-center',
+  Overview: '/fixed-assets/workbench?menu=system-settings-command-center',
+  Topology: '/fixed-assets/workbench?menu=system-external-systems',
+  Infrastructure: '/fixed-assets/workbench?menu=system-external-systems',
+  'Audit Log': '/fixed-assets/workbench?menu=system-audit-log',
+  Modules: '/fixed-assets/workbench?menu=system-settings-command-center',
+  Intelligence: '/fixed-assets/workbench?menu=system-runtime-monitor',
+  Terminal: '/fixed-assets/workbench?menu=system-tech-support',
+  'System Params': '/fixed-assets/workbench?menu=system-base-params',
+  Webhooks: '/fixed-assets/workbench?menu=system-webhook-config',
+  'Security Gates': '/fixed-assets/workbench?menu=system-security-policy',
+  Integrations: '/fixed-assets/workbench?menu=system-external-systems',
+  'Audit Trail': '/fixed-assets/workbench?menu=system-audit-log',
+  Documentation: '/fixed-assets/workbench?menu=system-doc-center',
+  Support: '/fixed-assets/workbench?menu=system-tech-support',
+  'Command Center': '/fixed-assets/workbench?menu=system-settings-command-center',
+  'Control Tower': '/fixed-assets/workbench?menu=system-runtime-monitor',
+  Assets: '/fixed-assets/workbench/assets?menu=asset',
+  Analytics: '/fixed-assets/workbench/analytics?menu=energy',
+  General: '/fixed-assets/workbench?menu=system-base-params',
+  Security: '/fixed-assets/workbench?menu=system-security-policy',
+  Automation: '/fixed-assets/workbench?menu=system-workflow-notification-switch',
+  Workflows: '/fixed-assets/workbench?menu=system-settings-command-center',
+  Compliance: '/fixed-assets/workbench?menu=system-audit-log',
+  Logs: '/fixed-assets/workbench?menu=system-audit-log',
+  Editor: '/fixed-assets/workbench?menu=system-notification-templates',
+  'User Mgmt': '/fixed-assets/workbench?menu=system-user-management',
+  Permissions: '/fixed-assets/workbench?menu=system-role-permissions',
+  'Custom Fields': '/fixed-assets/workbench?menu=system-custom-fields',
+  'Org Structure': '/fixed-assets/workbench?menu=system-dept-org',
+  参数字典: '/fixed-assets/workbench?menu=system-base-params',
+  快照比对: '/fixed-assets/workbench?menu=system-base-params',
+  渠道探针: '/fixed-assets/workbench?menu=system-notification-channels',
+  连接测试: '/fixed-assets/workbench?menu=system-webhook-config',
+  原子触发器: '/fixed-assets/workbench?menu=system-workflow-notification-switch',
+  'API 回调': '/fixed-assets/workbench?menu=system-webhook-config',
+  检测到变动: '/fixed-assets/workbench?menu=system-webhook-config',
+  断号重连: '/fixed-assets/workbench?menu=system-numbering-rules',
+  时效策略: '/fixed-assets/workbench?menu=system-sla-config',
+  待挂载: '/fixed-assets/workbench?menu=system-tenant-management',
+  配置同步中: '/fixed-assets/workbench?menu=system-external-systems',
   导入记录: '/fixed-assets/workbench?menu=system-import-export',
   下载模板: '/fixed-assets/workbench?menu=system-import-export',
   ...Object.fromEntries(systemMenuItems.map((item) => [item.label, `/fixed-assets/workbench?menu=${item.id}`])),
@@ -619,6 +728,11 @@ const systemFrameNavigationTargetEntries = Object.entries(systemFrameNavigationT
   target,
 ] as const);
 
+const systemFrameNavigationFuzzyTargetEntries = systemFrameNavigationTargetEntries
+  .filter(([targetLabel]) => targetLabel.length >= 3)
+  .map(([targetLabel, target]) => [targetLabel, targetLabel.toLowerCase(), target] as const)
+  .sort(([leftLabel], [rightLabel]) => rightLabel.length - leftLabel.length);
+
 const getSystemFrameNavigationTarget = (label?: string | null) => {
   if (!label) {
     return undefined;
@@ -626,7 +740,7 @@ const getSystemFrameNavigationTarget = (label?: string | null) => {
 
   const normalizedLabel = normalizeSystemFrameNavigationLabel(label);
   const labelWithoutTrailingCount = normalizedLabel.replace(/[（(]?\d+[条项个类页]?[\)）]?$/g, '');
-  const candidates = [normalizedLabel, labelWithoutTrailingCount];
+  const candidates = Array.from(new Set([normalizedLabel, labelWithoutTrailingCount].filter((candidate) => candidate.length > 0)));
 
   for (const candidate of candidates) {
     const entry = systemFrameNavigationTargetEntries.find(([targetLabel]) => targetLabel === candidate);
@@ -636,12 +750,45 @@ const getSystemFrameNavigationTarget = (label?: string | null) => {
     }
   }
 
+  for (const candidate of candidates) {
+    const lowerCandidate = candidate.toLowerCase();
+    const entry = systemFrameNavigationFuzzyTargetEntries.find(
+      ([targetLabel, lowerTargetLabel]) => candidate.length === targetLabel.length && lowerCandidate === lowerTargetLabel,
+    );
+
+    if (entry) {
+      return entry[2];
+    }
+  }
+
+  for (const candidate of candidates) {
+    const lowerCandidate = candidate.toLowerCase();
+    const entry = systemFrameNavigationFuzzyTargetEntries.find(
+      ([targetLabel, lowerTargetLabel]) => candidate.length > targetLabel.length && lowerCandidate.endsWith(lowerTargetLabel),
+    );
+
+    if (entry) {
+      return entry[2];
+    }
+  }
+
+  for (const candidate of candidates) {
+    const lowerCandidate = candidate.toLowerCase();
+    const entry = systemFrameNavigationFuzzyTargetEntries.find(
+      ([targetLabel, lowerTargetLabel]) => candidate.length > targetLabel.length && lowerCandidate.includes(lowerTargetLabel),
+    );
+
+    if (entry) {
+      return entry[2];
+    }
+  }
+
   return undefined;
 };
 
 const getSystemSubpageHtmlSrc = (menuId: string) => {
   const fileName = systemSubpageHtmlByMenuId[menuId];
-  return fileName ? systemHubSubpageHtml(fileName) : undefined;
+  return fileName ? `${systemHubSubpageHtml(fileName)}?v=20260629-future-settings-os-stitch-mcp` : undefined;
 };
 
 const systemMenuGroups = systemMenuItems.reduce<Array<{ group: string; items: WorkspaceMenuItem[] }>>((groups, item) => {
@@ -39952,14 +40099,19 @@ function WorkspaceScreenPreview({
 
 function WorkbenchSystemHtmlFrame({
   item,
+  onNavigate,
   src,
 }: {
   item: WorkspaceMenuItem;
+  onNavigate: (target: string) => void;
   src: string;
 }) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const navigationObserverRef = useRef<MutationObserver | null>(null);
-  const useNativeStitchShell = false;
+  const useNativeStitchShell = src.includes('future-settings-os-') || src.includes('stitch-mcp-settings-') || src.includes('stitch-next-settings-');
+  const showNativeSystemTopbar = false;
+  const showUnifiedSystemTopbar = !useNativeStitchShell;
+  const showUnifiedSystemSidebar = !useNativeStitchShell;
   const activeSystemGroup = systemMenuGroups.find((group) => group.items.some((groupItem) => groupItem.id === item.id)) ?? systemMenuGroups[0];
 
   useEffect(() => {
@@ -39969,6 +40121,33 @@ function WorkbenchSystemHtmlFrame({
     };
   }, [src]);
 
+  useEffect(() => {
+    const handleFrameMessage = (event: MessageEvent) => {
+      const frameWindow = iframeRef.current?.contentWindow;
+
+      if (!frameWindow || event.source !== frameWindow || event.origin !== window.location.origin) {
+        return;
+      }
+
+      const payload = event.data as { type?: unknown; target?: unknown } | null;
+      const target = typeof payload?.target === 'string' ? payload.target : undefined;
+
+      if (payload?.type !== 'workspace-system-frame-navigate' || !target || target === '#') {
+        return;
+      }
+
+      if (!target.startsWith('/fixed-assets/') && !target.startsWith('/bigscreen-3d')) {
+        return;
+      }
+
+      frameWindow.postMessage({ type: 'workspace-system-frame-navigate-ack', target }, event.origin);
+      onNavigate(target);
+    };
+
+    window.addEventListener('message', handleFrameMessage);
+    return () => window.removeEventListener('message', handleFrameMessage);
+  }, [onNavigate]);
+
   const installFrameNavigation = useCallback(() => {
     const frameDocument = iframeRef.current?.contentDocument;
 
@@ -39977,16 +40156,742 @@ function WorkbenchSystemHtmlFrame({
     }
 
     const frameWindow = frameDocument.defaultView;
-    frameDocument.documentElement.dataset.workspaceMenu = item.id;
+    const root = frameDocument.documentElement;
+    root.dataset.workspaceMenu = item.id;
 
-    if (useNativeStitchShell) {
-      navigationObserverRef.current?.disconnect();
-      navigationObserverRef.current = null;
-      frameDocument.documentElement.classList.remove('workspace-system-content-only');
-      frameDocument.documentElement.dataset.systemFrameNavigationObserved = 'false';
+    const getFrameElementLabel = (element?: Element | null) =>
+      [
+        (element as HTMLElement | null)?.dataset?.navLabel,
+        element?.getAttribute('aria-label'),
+        element?.getAttribute('title'),
+        element?.textContent,
+      ]
+        .find((value): value is string => Boolean(value?.trim()))
+        ?.trim();
+
+    const setNavigationElementTarget = (element: HTMLElement, target: string, label: string) => {
+      element.dataset.systemFrameNavigationTarget = target;
+      element.dataset.systemFrameNavigationBehavior = 'workspace-spa';
+      element.dataset.systemFrameNavigationLabel = normalizeSystemFrameNavigationLabel(label);
+      element.dataset.navLabel = label;
+      element.style.setProperty('cursor', 'pointer');
+
+      if (element.tagName.toLowerCase() === 'a') {
+        const link = element as HTMLAnchorElement;
+        link.href = target;
+        link.removeAttribute('target');
+      }
+    };
+
+    const rewriteFrameLinks = () => {
+      frameDocument.querySelectorAll<HTMLAnchorElement>('a').forEach((link) => {
+        const label = getFrameElementLabel(link) ?? '';
+        const target = getSystemFrameNavigationTarget(label);
+
+        if (!target) {
+          return;
+        }
+
+        const normalizedLabel = normalizeSystemFrameNavigationLabel(label);
+        const setLinkAttribute = (name: string, value: string) => {
+          if (link.getAttribute(name) !== value) {
+            link.setAttribute(name, value);
+          }
+        };
+
+        setNavigationElementTarget(link, target, normalizedLabel);
+        link.onclick = (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          onNavigate(target);
+          return false;
+        };
+
+        if (normalizedLabel) {
+          setLinkAttribute('data-system-frame-navigation-label', normalizedLabel);
+        }
+      });
+    };
+
+    const placeNativeNavigationCenter = () => {
+      const primaryLabels = ['流程平台', '组织权限', '基础资料', '集成配置', '消息与通知', '系统参数'];
+      const activePrimaryLabel = item.id === systemDefaultMenuId ? '导航中心' : activeSystemGroup.group;
+      const topShell = Array.from(frameDocument.querySelectorAll<HTMLElement>('header, nav')).find((candidate) => {
+        const openClass = candidate.className.toString();
+        const inlineStyle = candidate.getAttribute('style') ?? '';
+        const fixedTop = (openClass.includes('fixed') || inlineStyle.includes('fixed')) && openClass.includes('top-0');
+        const text = candidate.textContent ?? '';
+        const hasBrand = text.includes('UNIVIEW') || text.includes('系统设置中心');
+        const primaryCount = primaryLabels.filter((label) => text.includes(label)).length;
+        const isTopNavigation = fixedTop || ['header', 'nav'].includes(candidate.tagName.toLowerCase());
+
+        return isTopNavigation && hasBrand && primaryCount >= 4;
+      });
+
+      if (!topShell) {
+        return;
+      }
+
+      const styleId = 'workspace-native-system-topbar-navigation-style';
+      if (!frameDocument.getElementById(styleId)) {
+        const style = frameDocument.createElement('style');
+        style.id = styleId;
+        style.textContent = `
+          .workspace-stitch-primary-nav-item,
+          .workspace-stitch-nav-center-left {
+            height: 100% !important;
+            min-height: 44px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            padding: 0 14px !important;
+            color: #d7e2f0 !important;
+            -webkit-text-fill-color: #d7e2f0 !important;
+            font-size: 14px !important;
+            font-weight: 650 !important;
+            line-height: 1 !important;
+            white-space: nowrap !important;
+            text-decoration: none !important;
+            border-bottom: 2px solid transparent !important;
+            border-radius: 0 !important;
+            background: transparent !important;
+            flex: 0 0 auto !important;
+          }
+
+          .workspace-stitch-primary-nav-item:hover,
+          .workspace-stitch-nav-center-left:hover {
+            color: #ffffff !important;
+            -webkit-text-fill-color: #ffffff !important;
+            background: rgba(215, 226, 240, 0.12) !important;
+            border-bottom-color: rgba(105, 177, 255, 0.72) !important;
+          }
+
+          .workspace-stitch-primary-nav-item.is-active,
+          .workspace-stitch-nav-center-left.is-active {
+            color: #ffffff !important;
+            -webkit-text-fill-color: #ffffff !important;
+            font-weight: 760 !important;
+            background: rgba(29, 110, 242, 0.18) !important;
+            border-bottom-color: #1d6ef2 !important;
+          }
+
+          .workspace-stitch-topbar-brand {
+            height: 100% !important;
+            width: 226px !important;
+            min-width: 226px !important;
+            max-width: 226px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 7px !important;
+            padding: 0 14px !important;
+            box-sizing: border-box !important;
+            color: #ffffff !important;
+            -webkit-text-fill-color: #ffffff !important;
+            background: #051424 !important;
+            border-right: 1px solid rgba(215, 226, 240, 0.16) !important;
+            font-size: 15px !important;
+            line-height: 1 !important;
+            font-weight: 800 !important;
+            white-space: nowrap !important;
+            text-decoration: none !important;
+            letter-spacing: 0 !important;
+            flex: 0 0 226px !important;
+          }
+
+          .workspace-stitch-topbar-brand strong {
+            display: inline-flex !important;
+            align-items: center !important;
+            color: #ffffff !important;
+            -webkit-text-fill-color: #ffffff !important;
+            font-size: 15px !important;
+            font-weight: 850 !important;
+            line-height: 1 !important;
+            letter-spacing: 0 !important;
+          }
+
+          .workspace-stitch-topbar-brand span {
+            display: inline-flex !important;
+            align-items: center !important;
+            color: #ffffff !important;
+            -webkit-text-fill-color: #ffffff !important;
+            font-size: 14px !important;
+            font-weight: 760 !important;
+            line-height: 1 !important;
+            letter-spacing: 0 !important;
+          }
+
+          .workspace-stitch-topbar-brand-divider {
+            opacity: 0.72 !important;
+            font-weight: 500 !important;
+          }
+
+          .workspace-stitch-topbar-actions {
+            height: 100% !important;
+            margin-left: auto !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 14px !important;
+            flex: 0 0 auto !important;
+            color: #d7e2f0 !important;
+            -webkit-text-fill-color: #d7e2f0 !important;
+          }
+
+          .workspace-stitch-topbar-return {
+            height: 36px !important;
+            min-height: 36px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 7px !important;
+            padding: 0 !important;
+            border: 0 !important;
+            border-radius: 0 !important;
+            background: transparent !important;
+            color: #d7e2f0 !important;
+            -webkit-text-fill-color: #d7e2f0 !important;
+            font-size: 13px !important;
+            font-weight: 650 !important;
+            line-height: 1 !important;
+            white-space: nowrap !important;
+            text-decoration: none !important;
+          }
+
+          .workspace-stitch-topbar-return:hover {
+            color: #ffffff !important;
+            -webkit-text-fill-color: #ffffff !important;
+          }
+
+          .workspace-stitch-topbar-return-icon {
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            width: 14px !important;
+            min-width: 14px !important;
+            height: 14px !important;
+            font-size: 15px !important;
+            line-height: 1 !important;
+          }
+
+          .workspace-stitch-topbar-divider {
+            width: 1px !important;
+            height: 24px !important;
+            flex: 0 0 auto !important;
+            background: rgba(215, 226, 240, 0.26) !important;
+          }
+
+          .workspace-stitch-topbar-admin {
+            height: 36px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 9px !important;
+            color: #ffffff !important;
+            -webkit-text-fill-color: #ffffff !important;
+            font-size: 13px !important;
+            font-weight: 700 !important;
+            white-space: nowrap !important;
+          }
+
+          .workspace-stitch-topbar-avatar {
+            width: 24px !important;
+            height: 24px !important;
+            border-radius: 999px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            background: #1d6ef2 !important;
+            color: #ffffff !important;
+            -webkit-text-fill-color: #ffffff !important;
+            font-size: 12px !important;
+            font-weight: 800 !important;
+            line-height: 1 !important;
+          }
+        `;
+        frameDocument.head.appendChild(style);
+      }
+
+      topShell.classList.add('workspace-stitch-native-topbar');
+      topShell.style.setProperty('position', 'fixed', 'important');
+      topShell.style.setProperty('top', '0', 'important');
+      topShell.style.setProperty('right', '0', 'important');
+      topShell.style.setProperty('left', '0', 'important');
+      topShell.style.setProperty('z-index', '90', 'important');
+      topShell.style.setProperty('width', '100%', 'important');
+      topShell.style.setProperty('height', '56px', 'important');
+      topShell.style.setProperty('min-height', '56px', 'important');
+      topShell.style.setProperty('padding', '0 22px 0 0', 'important');
+      topShell.style.setProperty('box-sizing', 'border-box', 'important');
+      topShell.style.setProperty('display', 'flex', 'important');
+      topShell.style.setProperty('align-items', 'center', 'important');
+      topShell.style.setProperty('gap', '0', 'important');
+      topShell.style.setProperty('overflow', 'hidden', 'important');
+      topShell.style.setProperty('background', '#051424', 'important');
+      topShell.style.setProperty('border-bottom', '1px solid #1d6ef2', 'important');
+      topShell.style.setProperty('box-shadow', '0 10px 24px rgba(15, 23, 42, 0.18)', 'important');
+
+      const applyTopbarNavStyle = (element: HTMLElement, label: string) => {
+        const normalizedLabel = normalizeSystemFrameNavigationLabel(label);
+        const isActive = normalizedLabel === activePrimaryLabel;
+
+        element.classList.add(normalizedLabel === '导航中心' ? 'workspace-stitch-nav-center-left' : 'workspace-stitch-primary-nav-item');
+        element.classList.toggle('is-active', isActive);
+        element.setAttribute('aria-current', isActive ? 'page' : 'false');
+        element.style.setProperty('height', '100%', 'important');
+        element.style.setProperty('min-height', '44px', 'important');
+        element.style.setProperty('display', 'inline-flex', 'important');
+        element.style.setProperty('align-items', 'center', 'important');
+        element.style.setProperty('justify-content', 'center', 'important');
+        element.style.setProperty('padding', '0 14px', 'important');
+        element.style.setProperty('color', isActive ? '#ffffff' : '#d7e2f0', 'important');
+        element.style.setProperty('-webkit-text-fill-color', isActive ? '#ffffff' : '#d7e2f0', 'important');
+        element.style.setProperty('font-size', '14px', 'important');
+        element.style.setProperty('font-weight', isActive ? '760' : '650', 'important');
+        element.style.setProperty('white-space', 'nowrap', 'important');
+        element.style.setProperty('text-decoration', 'none', 'important');
+        element.style.setProperty('border-bottom', `2px solid ${isActive ? '#1d6ef2' : 'transparent'}`, 'important');
+        element.style.setProperty('background', isActive ? 'rgba(29, 110, 242, 0.18)' : 'transparent', 'important');
+        element.style.setProperty('flex', '0 0 auto', 'important');
+      };
+      const applyTopbarActionStyle = (element: HTMLElement) => {
+        element.style.setProperty('height', '36px', 'important');
+        element.style.setProperty('min-height', '36px', 'important');
+        element.style.setProperty('display', 'inline-flex', 'important');
+        element.style.setProperty('align-items', 'center', 'important');
+        element.style.setProperty('justify-content', 'center', 'important');
+        element.style.setProperty('gap', '6px', 'important');
+        element.style.setProperty('padding', '0 12px', 'important');
+        element.style.setProperty('border-radius', '6px', 'important');
+        element.style.setProperty('color', '#d7e2f0', 'important');
+        element.style.setProperty('-webkit-text-fill-color', '#d7e2f0', 'important');
+        element.style.setProperty('font-size', '13px', 'important');
+        element.style.setProperty('font-weight', '650', 'important');
+        element.style.setProperty('line-height', '1', 'important');
+        element.style.setProperty('white-space', 'nowrap', 'important');
+        element.style.setProperty('text-decoration', 'none', 'important');
+        element.style.setProperty('background', 'transparent', 'important');
+        element.style.setProperty('border', '1px solid transparent', 'important');
+        element.style.setProperty('flex', '0 0 auto', 'important');
+      };
+
+      const target = systemFrameNavigationTargets.导航中心;
+      let navCenter = topShell.querySelector<HTMLAnchorElement>('.workspace-stitch-nav-center-left');
+
+      if (!navCenter) {
+        navCenter = frameDocument.createElement('a');
+        navCenter.className = 'workspace-stitch-nav-center-left';
+        navCenter.textContent = '导航中心';
+        navCenter.setAttribute('aria-label', '导航中心');
+        navCenter.setAttribute(
+          'style',
+          [
+            'height:100%',
+            'display:inline-flex',
+            'align-items:center',
+            'padding:0 14px',
+            'margin:0 8px 0 0',
+            'color:#ffffff',
+            'font-size:14px',
+            'font-weight:700',
+            'border-bottom:2px solid #1D6EF2',
+            'background:rgba(29,110,242,0.18)',
+            'text-decoration:none',
+            'white-space:nowrap',
+            'flex:0 0 auto',
+          ].join(';'),
+        );
+      }
+
+      setNavigationElementTarget(navCenter, target, '导航中心');
+      applyTopbarNavStyle(navCenter, '导航中心');
+
+      Array.from(topShell.querySelectorAll<HTMLElement>('nav, div')).forEach((candidate) => {
+        const text = candidate.textContent ?? '';
+        const primaryCount = primaryLabels.filter((label) => text.includes(label)).length;
+
+        if (primaryCount < 4) {
+          return;
+        }
+
+        candidate.classList.remove('hidden');
+        candidate.style.setProperty('display', 'inline-flex', 'important');
+        candidate.style.setProperty('align-items', 'center', 'important');
+        candidate.style.setProperty('gap', candidate.style.gap || '12px', 'important');
+        candidate.style.setProperty('overflow-x', 'auto', 'important');
+        candidate.style.setProperty('overflow-y', 'hidden', 'important');
+        candidate.style.setProperty('white-space', 'nowrap', 'important');
+        candidate.style.setProperty('scrollbar-width', 'none', 'important');
+        candidate.style.setProperty('min-width', '0', 'important');
+        candidate.style.setProperty('flex', '1 1 auto', 'important');
+      });
+
+      const getDirectTopbarChild = (element?: HTMLElement | null) => {
+        let current = element;
+
+        while (current?.parentElement && current.parentElement !== topShell) {
+          current = current.parentElement;
+        }
+
+        return current?.parentElement === topShell ? current : null;
+      };
+      const primaryNavElement = Array.from(topShell.querySelectorAll<HTMLElement>('nav, div'))
+        .filter((candidate) => {
+          const text = candidate.textContent ?? '';
+
+          return primaryLabels.filter((label) => text.includes(label)).length >= 4;
+        })
+        .sort((left, right) => (left.textContent ?? '').length - (right.textContent ?? '').length)[0];
+      const primaryAnchor = getDirectTopbarChild(primaryNavElement);
+      let topbarBrand = topShell.querySelector<HTMLElement>('.workspace-stitch-topbar-brand');
+
+      if (!topbarBrand) {
+        topbarBrand = frameDocument.createElement('div');
+      }
+
+      topbarBrand.className = 'workspace-stitch-topbar-brand';
+      topbarBrand.setAttribute('aria-label', 'UNIVIEW 系统设置中心');
+      topbarBrand.replaceChildren();
+
+      const brandName = frameDocument.createElement('strong');
+      brandName.textContent = 'UNIVIEW';
+      const brandDivider = frameDocument.createElement('span');
+      brandDivider.className = 'workspace-stitch-topbar-brand-divider';
+      brandDivider.setAttribute('aria-hidden', 'true');
+      brandDivider.textContent = '|';
+      const brandTitle = frameDocument.createElement('span');
+      brandTitle.textContent = '系统设置中心';
+      topbarBrand.append(brandName, brandDivider, brandTitle);
+
+      if (topbarBrand.parentElement !== topShell || topbarBrand.nextElementSibling !== navCenter) {
+        topShell.insertBefore(topbarBrand, primaryAnchor ?? topShell.firstChild);
+      }
+
+      if (navCenter.parentElement !== topShell || navCenter.previousElementSibling !== topbarBrand) {
+        topShell.insertBefore(navCenter, topbarBrand.nextSibling);
+      }
+
+      Array.from(topShell.querySelectorAll<HTMLElement>('a, div, span, strong, h1')).forEach((candidate) => {
+        if (candidate === topbarBrand || topbarBrand.contains(candidate) || candidate === navCenter || navCenter.contains(candidate)) {
+          return;
+        }
+
+        const text = candidate.textContent ?? '';
+        const hasLegacyBrand = text.includes('UNIVIEW') || text.includes('系统设置中心');
+        const primaryCount = primaryLabels.filter((label) => text.includes(label)).length;
+
+        if (!hasLegacyBrand || primaryCount >= 2) {
+          return;
+        }
+
+        candidate.style.setProperty('display', 'none', 'important');
+        candidate.setAttribute('aria-hidden', 'true');
+      });
+
+      const styledPrimaryControls = new Set<HTMLElement>();
+      Array.from(topShell.querySelectorAll<HTMLElement>('a, button, [role="button"], span')).forEach((candidate) => {
+        const label = normalizeSystemFrameNavigationLabel(getFrameElementLabel(candidate) ?? '');
+
+        if (!primaryLabels.includes(label)) {
+          return;
+        }
+
+        const control = candidate.closest<HTMLElement>('a, button, [role="button"]') ?? candidate;
+
+        if (styledPrimaryControls.has(control) || control === navCenter || control.contains(navCenter)) {
+          return;
+        }
+
+        styledPrimaryControls.add(control);
+        applyTopbarNavStyle(control, label);
+        setNavigationElementTarget(control, systemFrameNavigationTargets[label] ?? `/fixed-assets/workbench?menu=${activeSystemGroup.items[0].id}`, label);
+      });
+
+      Array.from(topShell.querySelectorAll<HTMLElement>('a, button, [role="button"], span')).forEach((candidate) => {
+        if (candidate === navCenter || candidate.contains(navCenter) || navCenter.contains(candidate)) {
+          return;
+        }
+
+        const label = normalizeSystemFrameNavigationLabel(getFrameElementLabel(candidate) ?? '');
+
+        if (label !== '导航中心') {
+          return;
+        }
+
+        const oldControl = candidate.closest<HTMLElement>('a, button, [role="button"]') ?? candidate;
+
+        if (oldControl === navCenter || oldControl.contains(navCenter)) {
+          return;
+        }
+
+        oldControl.style.setProperty('display', 'none', 'important');
+        oldControl.setAttribute('aria-hidden', 'true');
+      });
+
+      const actionGroupClass = 'workspace-stitch-topbar-actions';
+      Array.from(topShell.children).forEach((child) => {
+        const element = child as HTMLElement;
+
+        if (element.classList.contains(actionGroupClass) || element.contains(navCenter)) {
+          return;
+        }
+
+        const text = (element.textContent ?? '').replace(/\s+/g, '');
+        const hasBrandOrPrimary =
+          text.includes('UNIVIEW') ||
+          text.includes('系统设置中心') ||
+          primaryLabels.some((label) => text.includes(label));
+        const hasLegacyAction =
+          text.includes('返回业务工作台') ||
+          text.includes('运营管理员') ||
+          text.includes('apps') ||
+          text.includes('laptop_mac') ||
+          text.includes('exit_to_app') ||
+          text.includes('keyboard_return');
+
+        if (hasLegacyAction && !hasBrandOrPrimary) {
+          element.style.setProperty('display', 'none', 'important');
+          element.setAttribute('aria-hidden', 'true');
+        }
+      });
+
+      let actionGroup = topShell.querySelector<HTMLDivElement>(`.${actionGroupClass}`);
+
+      if (!actionGroup) {
+        actionGroup = frameDocument.createElement('div');
+      }
+
+      actionGroup.className = actionGroupClass;
+      actionGroup.setAttribute('aria-label', '系统设置操作');
+      actionGroup.replaceChildren();
+
+      const returnControl = frameDocument.createElement('a');
+      returnControl.className = 'workspace-stitch-topbar-return';
+      returnControl.href = systemFrameNavigationTargets.返回业务工作台;
+      returnControl.setAttribute('aria-label', '返回业务工作台');
+      const returnIcon = frameDocument.createElement('span');
+      returnIcon.className = 'workspace-stitch-topbar-return-icon';
+      returnIcon.setAttribute('aria-hidden', 'true');
+      returnIcon.textContent = '←';
+      const returnLabel = frameDocument.createElement('span');
+      returnLabel.textContent = '返回业务工作台';
+      returnControl.append(returnIcon, returnLabel);
+      applyTopbarActionStyle(returnControl);
+      returnControl.style.setProperty('padding', '0', 'important');
+      returnControl.style.setProperty('border', '0', 'important');
+      returnControl.style.setProperty('border-radius', '0', 'important');
+      setNavigationElementTarget(returnControl, systemFrameNavigationTargets.返回业务工作台, '返回业务工作台');
+
+      const divider = frameDocument.createElement('span');
+      divider.className = 'workspace-stitch-topbar-divider';
+      divider.setAttribute('aria-hidden', 'true');
+
+      const adminControl = frameDocument.createElement('div');
+      adminControl.className = 'workspace-stitch-topbar-admin';
+      adminControl.setAttribute('aria-label', '运营管理员');
+      const avatar = frameDocument.createElement('span');
+      avatar.className = 'workspace-stitch-topbar-avatar';
+      avatar.setAttribute('aria-hidden', 'true');
+      avatar.textContent = 'A';
+      const adminLabel = frameDocument.createElement('span');
+      adminLabel.textContent = '运营管理员';
+      adminControl.append(avatar, adminLabel);
+      actionGroup.append(returnControl, divider, adminControl);
+
+      if (actionGroup.parentElement !== topShell) {
+        topShell.appendChild(actionGroup);
+      }
+
+      Array.from(topShell.querySelectorAll<HTMLElement>('a, button, [role="button"], .material-symbols-outlined, .material-icons, .material-icons-outlined')).forEach(
+        (candidate) => {
+          if (candidate.closest(`.${actionGroupClass}`)) {
+            return;
+          }
+
+          const compactText = (candidate.textContent ?? '').replace(/\s+/g, '');
+
+          if (!compactText.includes('arrow_back')) {
+            return;
+          }
+
+          const isIconGlyph = candidate.matches('.material-symbols-outlined, .material-icons, .material-icons-outlined');
+          const control = candidate.closest<HTMLElement>('a, button, [role="button"]') ?? candidate;
+          const controlText = (control.textContent ?? '').replace(/\s+/g, '');
+
+          if (!isIconGlyph && controlText.includes('返回业务工作台')) {
+            return;
+          }
+
+          const hiddenElement = isIconGlyph ? candidate : control;
+          hiddenElement.style.setProperty('display', 'none', 'important');
+          hiddenElement.style.setProperty('pointer-events', 'none', 'important');
+          hiddenElement.setAttribute('aria-hidden', 'true');
+          hiddenElement.setAttribute('tabindex', '-1');
+        },
+      );
+    };
+
+    const normalizeNativeSidebar = () => {
+      if (item.id === systemDefaultMenuId || !frameDocument.body) {
+        root.classList.remove('workspace-has-native-sidebar');
+        frameDocument.querySelector<HTMLElement>('.workspace-native-system-sidebar')?.remove();
+        return;
+      }
+
+      root.classList.add('workspace-has-native-sidebar');
+      const sidebarItems =
+        activeSystemGroup.group === '流程平台'
+          ? activeSystemGroup.items.filter((groupItem) => groupItem.id !== systemDefaultMenuId)
+          : activeSystemGroup.items;
+      const existingNormalizedSidebar = frameDocument.querySelector<HTMLElement>('.workspace-native-system-sidebar');
+      const sidebarCandidate =
+        existingNormalizedSidebar ??
+        Array.from(frameDocument.querySelectorAll<HTMLElement>('aside, nav')).find((candidate) => {
+          if (candidate.closest('.workspace-stitch-native-topbar') || candidate.matches('.right-panel, [data-purpose*="right"], [data-purpose*="detail"]')) {
+            return false;
+          }
+
+          const text = candidate.textContent ?? '';
+          const matchingItems = sidebarItems.filter((groupItem) => text.includes(groupItem.label)).length;
+
+          return matchingItems >= 2 || text.includes('导航控制台') || candidate.className.toString().includes('sidebar') || candidate.className.toString().includes('side');
+        }) ??
+        frameDocument.createElement('aside');
+
+      sidebarCandidate.className = `${sidebarCandidate.className
+        .toString()
+        .replace(/\bhidden\b/g, '')
+        .trim()} workspace-native-system-sidebar`.trim();
+      sidebarCandidate.setAttribute('aria-label', `${activeSystemGroup.group}设置`);
+      sidebarCandidate.style.setProperty('display', 'flex', 'important');
+      sidebarCandidate.replaceChildren();
+
+      const title = frameDocument.createElement('a');
+      title.className = 'workspace-native-system-sidebar-title';
+      const titleTarget = `/fixed-assets/workbench?menu=${sidebarItems[0]?.id ?? activeSystemGroup.items[0].id}`;
+      title.href = titleTarget;
+      title.innerHTML = `<span>${activeSystemGroup.group}设置</span><small>${sidebarItems.length} 个配置页</small>`;
+      setNavigationElementTarget(title, titleTarget, activeSystemGroup.group);
+      sidebarCandidate.appendChild(title);
+
+      const list = frameDocument.createElement('div');
+      list.className = 'workspace-native-system-sidebar-list';
+      sidebarItems.forEach((groupItem) => {
+        const link = frameDocument.createElement('a');
+        const linkTarget = `/fixed-assets/workbench?menu=${groupItem.id}`;
+        link.className = `workspace-native-system-sidebar-link${groupItem.id === item.id ? ' is-active' : ''}`;
+        link.href = linkTarget;
+        link.innerHTML = `<span>${groupItem.label}</span>`;
+        link.setAttribute('aria-current', groupItem.id === item.id ? 'page' : 'false');
+        setNavigationElementTarget(link, linkTarget, groupItem.label);
+        list.appendChild(link);
+      });
+      sidebarCandidate.appendChild(list);
+
+      if (!sidebarCandidate.parentElement) {
+        frameDocument.body.insertBefore(sidebarCandidate, frameDocument.body.firstChild);
+      }
+    };
+
+    const installFrameClickHandler = () => {
+      if (root.dataset.systemFrameClickObserved === 'true') {
+        return;
+      }
+
+      root.dataset.systemFrameClickObserved = 'true';
+      frameDocument.addEventListener('click', (event) => {
+        const clickedElement = event.target as Element | null;
+        const navigationElement = clickedElement?.closest<HTMLElement>(
+          'a, button, [role="button"], [data-nav-label], [data-system-frame-navigation-target], [data-system-frame-navigation-label], [title]',
+        );
+        const link = navigationElement?.closest<HTMLAnchorElement>('a[href]');
+        const label = getFrameElementLabel(navigationElement);
+        const target =
+          navigationElement?.dataset.systemFrameNavigationTarget ||
+          link?.dataset.systemFrameNavigationTarget ||
+          getSystemFrameNavigationTarget(label) ||
+          link?.getAttribute('href');
+
+        if (!target || target === '#') {
+          return;
+        }
+
+        const isWorkspaceTarget = target.startsWith('/fixed-assets/') || target.startsWith('/bigscreen-3d');
+
+        if (!isWorkspaceTarget) {
+          return;
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+        onNavigate(target);
+      }, true);
+    };
+
+    const resetNativeFrameShell = () => {
+      root.classList.remove(
+        'workspace-system-content-only',
+        'workspace-native-system-content-only',
+        'workspace-navigation-center-content-only',
+        'workspace-material-icons-fallback',
+      );
+      delete root.dataset.workspaceMaterialIconsFallbackObserved;
       frameDocument.getElementById('workspace-system-content-only-style')?.remove();
-      return;
-    }
+      frameDocument.getElementById('workspace-native-system-content-only-style')?.remove();
+      frameDocument.getElementById('workspace-navigation-center-content-only-style')?.remove();
+    };
+
+    const updateMaterialIconsFallback = () => {
+      const frameFonts = frameDocument.fonts as FontFaceSet | undefined;
+      const hasIconNodes = Boolean(
+        frameDocument.querySelector('.material-symbols-outlined, .material-icons, .material-icons-outlined')
+      );
+
+      if (!hasIconNodes || !frameDocument.body) {
+        root.classList.remove('workspace-material-icons-fallback');
+        return;
+      }
+
+      const isMaterialSymbolsReady = (() => {
+        try {
+          if (typeof frameFonts?.check === 'function' && !frameFonts.check('20px "Material Symbols Outlined"')) {
+            return false;
+          }
+        } catch {
+          return false;
+        }
+
+        root.classList.remove('workspace-material-icons-fallback');
+
+        const probe = frameDocument.createElement('span');
+        probe.textContent = 'search';
+        probe.style.cssText = [
+          'position:absolute',
+          'left:-9999px',
+          'top:-9999px',
+          'visibility:hidden',
+          'font-family:"Material Symbols Outlined"',
+          'font-size:20px',
+          'font-weight:400',
+          'font-style:normal',
+          'line-height:1',
+          'letter-spacing:normal',
+          'white-space:nowrap',
+        ].join(';');
+
+        frameDocument.body.appendChild(probe);
+        const probeWidth = probe.getBoundingClientRect().width;
+        probe.remove();
+
+        return probeWidth > 0 && probeWidth <= 26;
+      })();
+
+      root.classList.toggle('workspace-material-icons-fallback', !isMaterialSymbolsReady);
+
+      if (!frameFonts?.ready || frameDocument.documentElement.dataset.workspaceMaterialIconsFallbackObserved === 'true') {
+        return;
+      }
+
+      frameDocument.documentElement.dataset.workspaceMaterialIconsFallbackObserved = 'true';
+      void frameFonts.ready.then(updateMaterialIconsFallback).catch(updateMaterialIconsFallback);
+    };
 
     const sanitizeFrameShell = () => {
       const styleId = 'workspace-system-content-only-style';
@@ -40011,6 +40916,38 @@ function WorkbenchSystemHtmlFrame({
           html.workspace-system-content-only body {
             display: block !important;
             padding: 0 !important;
+          }
+
+          html.workspace-material-icons-fallback .material-symbols-outlined,
+          html.workspace-material-icons-fallback .material-icons,
+          html.workspace-material-icons-fallback .material-icons-outlined {
+            position: relative !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            width: 1em !important;
+            min-width: 1em !important;
+            max-width: 1em !important;
+            height: 1em !important;
+            line-height: 1 !important;
+            overflow: hidden !important;
+            white-space: nowrap !important;
+            color: transparent !important;
+            -webkit-text-fill-color: transparent !important;
+            text-indent: -9999px !important;
+            text-shadow: none !important;
+            vertical-align: -0.125em !important;
+          }
+
+          html.workspace-material-icons-fallback .material-symbols-outlined::before,
+          html.workspace-material-icons-fallback .material-icons::before,
+          html.workspace-material-icons-fallback .material-icons-outlined::before {
+            content: "" !important;
+            position: absolute !important;
+            inset: 0.25em !important;
+            border-radius: 999px !important;
+            background: linear-gradient(135deg, #1d5fe8, #69b1ff) !important;
+            box-shadow: 0 0 0 0.08em rgba(29, 95, 232, 0.14) !important;
           }
 
           html.workspace-system-content-only body > header,
@@ -40733,6 +41670,7 @@ function WorkbenchSystemHtmlFrame({
       }
 
       frameDocument.documentElement.classList.add('workspace-system-content-only');
+      updateMaterialIconsFallback();
 
       const internalNavigationTerms = [
         '系统运营中枢',
@@ -40820,12 +41758,253 @@ function WorkbenchSystemHtmlFrame({
         )
         .forEach(hideInternalNavigationNode);
     };
+
+    const sanitizeNativeSystemShell = () => {
+      const styleId = 'workspace-native-system-content-only-style';
+      let style = frameDocument.getElementById(styleId) as HTMLStyleElement | null;
+
+      if (!style) {
+        style = frameDocument.createElement('style');
+        style.id = styleId;
+        style.textContent = `
+          html.workspace-native-system-content-only,
+          html.workspace-native-system-content-only body {
+            width: 100% !important;
+            min-width: 0 !important;
+            height: 100% !important;
+            min-height: 100% !important;
+            margin: 0 !important;
+            overflow: auto !important;
+            background: #f5f8fc !important;
+          }
+
+          html.workspace-native-system-content-only body > header,
+          html.workspace-native-system-content-only body > nav:first-child,
+          html.workspace-native-system-content-only body > nav[class*="top-0"],
+          html.workspace-native-system-content-only body > div > header:first-child,
+          html.workspace-native-system-content-only body > div > nav:first-child,
+          html.workspace-native-system-content-only body > div > nav[class*="top-0"] {
+            display: none !important;
+          }
+
+          html.workspace-native-system-content-only body > header.workspace-stitch-native-topbar,
+          html.workspace-native-system-content-only body > div > header.workspace-stitch-native-topbar,
+          html.workspace-native-system-content-only body > nav.workspace-stitch-native-topbar,
+          html.workspace-native-system-content-only body > div > nav.workspace-stitch-native-topbar {
+            display: flex !important;
+          }
+
+          html.workspace-native-system-content-only body .workspace-native-system-sidebar {
+            position: fixed !important;
+            z-index: 80 !important;
+            top: 56px !important;
+            bottom: 0 !important;
+            left: 0 !important;
+            width: 240px !important;
+            min-width: 240px !important;
+            max-width: 240px !important;
+            height: calc(100vh - 56px) !important;
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 12px !important;
+            padding: 18px 14px !important;
+            box-sizing: border-box !important;
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
+            background: #f7faff !important;
+            border-right: 1px solid #dbe5f1 !important;
+            box-shadow: 10px 0 24px rgba(20, 44, 76, 0.06) !important;
+          }
+
+          html.workspace-native-system-content-only body .workspace-native-system-sidebar-title {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 4px !important;
+            padding: 12px 12px !important;
+            border-radius: 8px !important;
+            color: #10243c !important;
+            -webkit-text-fill-color: #10243c !important;
+            text-decoration: none !important;
+            background: #ffffff !important;
+            border: 1px solid #dbe5f1 !important;
+            box-shadow: 0 8px 18px rgba(20, 44, 76, 0.045) !important;
+          }
+
+          html.workspace-native-system-content-only body .workspace-native-system-sidebar-title span {
+            font-size: 15px !important;
+            font-weight: 800 !important;
+            line-height: 1.2 !important;
+          }
+
+          html.workspace-native-system-content-only body .workspace-native-system-sidebar-title small {
+            color: #64748b !important;
+            -webkit-text-fill-color: #64748b !important;
+            font-size: 12px !important;
+            font-weight: 650 !important;
+          }
+
+          html.workspace-native-system-content-only body .workspace-native-system-sidebar-list {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 6px !important;
+          }
+
+          html.workspace-native-system-content-only body .workspace-native-system-sidebar-link {
+            display: flex !important;
+            align-items: center !important;
+            min-height: 38px !important;
+            padding: 0 12px !important;
+            border-radius: 8px !important;
+            color: #334155 !important;
+            -webkit-text-fill-color: #334155 !important;
+            font-size: 13px !important;
+            font-weight: 700 !important;
+            line-height: 1.2 !important;
+            text-decoration: none !important;
+            border: 1px solid transparent !important;
+            background: transparent !important;
+          }
+
+          html.workspace-native-system-content-only body .workspace-native-system-sidebar-link:hover {
+            color: #0f3f9f !important;
+            -webkit-text-fill-color: #0f3f9f !important;
+            background: #eef5ff !important;
+            border-color: #c9ddff !important;
+          }
+
+          html.workspace-native-system-content-only body .workspace-native-system-sidebar-link.is-active {
+            color: #ffffff !important;
+            -webkit-text-fill-color: #ffffff !important;
+            background: linear-gradient(135deg, #1d5fe8, #1d6ef2) !important;
+            border-color: #1d5fe8 !important;
+            box-shadow: 0 10px 20px rgba(29, 95, 232, 0.2) !important;
+          }
+
+          html.workspace-native-system-content-only.workspace-has-native-sidebar body > div,
+          html.workspace-native-system-content-only.workspace-has-native-sidebar body > #root,
+          html.workspace-native-system-content-only.workspace-has-native-sidebar body > #app,
+          html.workspace-native-system-content-only.workspace-has-native-sidebar body .flex.flex-1.w-full {
+            width: 100% !important;
+            max-width: 100% !important;
+            min-width: 0 !important;
+            box-sizing: border-box !important;
+          }
+
+          html.workspace-native-system-content-only body > aside[class*="top-topbar-height"],
+          html.workspace-native-system-content-only body > div > aside[class*="top-topbar-height"],
+          html.workspace-native-system-content-only body aside[class*="top-topbar-height"] {
+            top: 0 !important;
+            height: 100vh !important;
+            max-height: 100vh !important;
+          }
+
+          html.workspace-native-system-content-only body > main[class*="mt-topbar-height"],
+          html.workspace-native-system-content-only body > div > main[class*="mt-topbar-height"],
+          html.workspace-native-system-content-only body main[class*="mt-topbar-height"] {
+            margin-top: 0 !important;
+            height: 100vh !important;
+            max-height: 100vh !important;
+          }
+
+          html.workspace-native-system-content-only.workspace-material-icons-fallback .material-symbols-outlined,
+          html.workspace-native-system-content-only.workspace-material-icons-fallback .material-icons,
+          html.workspace-native-system-content-only.workspace-material-icons-fallback .material-icons-outlined {
+            position: relative !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            width: 1em !important;
+            min-width: 1em !important;
+            max-width: 1em !important;
+            height: 1em !important;
+            line-height: 1 !important;
+            overflow: hidden !important;
+            white-space: nowrap !important;
+            color: transparent !important;
+            -webkit-text-fill-color: transparent !important;
+            text-indent: -9999px !important;
+            text-shadow: none !important;
+            vertical-align: -0.125em !important;
+          }
+
+          html.workspace-native-system-content-only.workspace-material-icons-fallback .material-symbols-outlined::before,
+          html.workspace-native-system-content-only.workspace-material-icons-fallback .material-icons::before,
+          html.workspace-native-system-content-only.workspace-material-icons-fallback .material-icons-outlined::before {
+            content: "" !important;
+            position: absolute !important;
+            inset: 0.25em !important;
+            border-radius: 999px !important;
+            background: linear-gradient(135deg, #1d5fe8, #69b1ff) !important;
+            box-shadow: 0 0 0 0.08em rgba(29, 95, 232, 0.14) !important;
+          }
+
+          html.workspace-native-system-content-only.workspace-has-native-sidebar body > main,
+          html.workspace-native-system-content-only.workspace-has-native-sidebar body main {
+            min-height: calc(100vh - 56px) !important;
+            margin-top: 56px !important;
+            margin-left: 240px !important;
+            width: calc(100% - 240px) !important;
+            max-width: calc(100% - 240px) !important;
+            box-sizing: border-box !important;
+          }
+
+          html.workspace-native-system-content-only:not(.workspace-has-native-sidebar) body > main,
+          html.workspace-native-system-content-only:not(.workspace-has-native-sidebar) body main {
+            min-height: calc(100vh - 56px) !important;
+            margin-top: 56px !important;
+            margin-left: 0 !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+          }
+
+          html.workspace-native-system-content-only.workspace-has-native-sidebar body .app-body {
+            grid-template-columns: 240px minmax(0, 1fr) minmax(280px, 400px) !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            min-width: 0 !important;
+          }
+
+          html.workspace-native-system-content-only.workspace-has-native-sidebar body .app-body > main {
+            grid-column: 2 !important;
+            margin-left: 0 !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            min-width: 0 !important;
+          }
+        `;
+        frameDocument.head.appendChild(style);
+      }
+
+      root.classList.add('workspace-native-system-content-only');
+    };
+
     const rewriteFrameNavigation = () => {
+      if (useNativeStitchShell) {
+        resetNativeFrameShell();
+        sanitizeNativeSystemShell();
+        placeNativeNavigationCenter();
+        normalizeNativeSidebar();
+        updateMaterialIconsFallback();
+        rewriteFrameLinks();
+        installFrameClickHandler();
+        return;
+      }
+
       sanitizeFrameShell();
+      rewriteFrameLinks();
+      installFrameClickHandler();
     };
 
     rewriteFrameNavigation();
     frameWindow?.requestAnimationFrame(rewriteFrameNavigation);
+
+    if (useNativeStitchShell) {
+      navigationObserverRef.current?.disconnect();
+      navigationObserverRef.current = null;
+      frameDocument.documentElement.dataset.systemFrameNavigationObserved = 'native-static';
+      return;
+    }
 
     if (frameDocument.documentElement.dataset.systemFrameNavigationObserved === 'true') {
       return;
@@ -40841,101 +42020,130 @@ function WorkbenchSystemHtmlFrame({
       frameDocument.documentElement.dataset.systemFrameNavigationObserved = 'true';
       navigationObserverRef.current.observe(frameDocument.body, {
         attributes: true,
-        attributeFilter: ['href', 'target'],
+        attributeFilter: ['href', 'target', 'data-nav-label'],
         childList: true,
         subtree: true,
       });
     }
-  }, [item.id, useNativeStitchShell]);
+  }, [item.id, onNavigate, src, useNativeStitchShell]);
 
   useEffect(() => {
     installFrameNavigation();
 
     const firstFrame = window.requestAnimationFrame(installFrameNavigation);
+    const delayedFrame = window.setTimeout(installFrameNavigation, useNativeStitchShell ? 700 : 250);
     const interval = window.setInterval(installFrameNavigation, 250);
     const timeout = window.setTimeout(() => {
       window.clearInterval(interval);
-    }, 2500);
+    }, useNativeStitchShell ? 3500 : 2500);
 
     return () => {
       window.cancelAnimationFrame(firstFrame);
+      window.clearTimeout(delayedFrame);
       window.clearInterval(interval);
       window.clearTimeout(timeout);
     };
-  }, [installFrameNavigation, src]);
+  }, [installFrameNavigation, src, useNativeStitchShell]);
+
+  const handleShellLinkClick = (event: ReactMouseEvent<HTMLAnchorElement>) => {
+    const target = event.currentTarget.getAttribute('href');
+
+    if (!target || target === '#') {
+      return;
+    }
+
+    event.preventDefault();
+    onNavigate(target);
+  };
 
   return (
     <main
-      className={`workspace-system-html-frame-shell${useNativeStitchShell ? ' is-native-stitch-shell' : ''}`}
+      className={`workspace-system-html-frame-shell${useNativeStitchShell ? ' is-native-stitch-shell' : ''}${showNativeSystemTopbar ? ' has-native-topbar' : ''}`}
       aria-label={`${item.label}系统设置复刻页`}
     >
       <div className="workspace-system-html-frame-stage">
         <div className="workspace-system-html-frame-canvas" aria-label={`${item.label}完整系统设置页面`}>
-          {!useNativeStitchShell && (
-            <section className="workspace-system-nav-overlay" aria-label="系统运营中枢统一导航">
+          {showUnifiedSystemTopbar && (
+            <section className={`workspace-system-nav-overlay${showUnifiedSystemSidebar ? '' : ' is-topbar-only'}`} aria-label="系统运营中枢统一导航">
               <header className="workspace-system-nav-topbar">
-                <a className="workspace-system-nav-brand" href="/fixed-assets/workbench?menu=home">
+                <a className="workspace-system-nav-brand" href="/fixed-assets/workbench?menu=home" onClick={handleShellLinkClick}>
                   <strong>UNIVIEW</strong>
                   <span>系统设置中心</span>
                 </a>
                 <nav className="workspace-system-nav-tabs" aria-label="系统设置分组导航">
                   {systemMenuGroups.map((group) => {
-                    const isActiveGroup = group.items.some((groupItem) => groupItem.id === item.id);
+                    const isActiveGroup = item.id !== systemDefaultMenuId && group.items.some((groupItem) => groupItem.id === item.id);
 
                     return (
                       <a
                         key={group.group}
                         className={isActiveGroup ? 'is-active' : ''}
                         href={`/fixed-assets/workbench?menu=${group.items[0].id}`}
+                        onClick={handleShellLinkClick}
                       >
                         {group.group}
                       </a>
                     );
                   })}
                 </nav>
-                <a className="workspace-system-nav-return" href="/fixed-assets/workbench?menu=home">
+                <a
+                  className={`workspace-system-nav-return workspace-system-nav-center${item.id === systemDefaultMenuId ? ' is-active' : ''}`}
+                  href="/fixed-assets/workbench?menu=system-flow-definition"
+                  onClick={handleShellLinkClick}
+                >
+                  导航中心
+                </a>
+                <a className="workspace-system-nav-return" href="/fixed-assets/workbench?menu=home" onClick={handleShellLinkClick}>
                   返回业务工作台
                 </a>
                 <div className="workspace-system-nav-user" aria-hidden="true">
                   <span>运营管理员</span>
                 </div>
               </header>
-              <aside className="workspace-system-nav-side" aria-label="系统设置导航">
-                <a className="workspace-system-nav-home" href={`/fixed-assets/workbench?menu=${activeSystemGroup.items[0].id}`}>
-                  <span>{activeSystemGroup.group}</span>
-                  <small>{activeSystemGroup.items.length} 个配置页</small>
-                </a>
-                <div className="workspace-system-nav-group-list">
-                  <section className="workspace-system-nav-group" key={activeSystemGroup.group}>
-                    <a
-                      className="workspace-system-nav-group-title is-open"
-                      href={`/fixed-assets/workbench?menu=${activeSystemGroup.items[0].id}`}
-                    >
-                      <span>{activeSystemGroup.group}</span>
-                      <small>{activeSystemGroup.items.length}</small>
-                    </a>
-                    <div className="workspace-system-nav-items">
-                      {activeSystemGroup.items.map((groupItem) => {
-                        const GroupIcon = groupItem.icon;
+              {showUnifiedSystemSidebar && (
+                <aside className="workspace-system-nav-side" aria-label="系统设置导航">
+                  <a
+                    className="workspace-system-nav-home"
+                    href={`/fixed-assets/workbench?menu=${activeSystemGroup.items[0].id}`}
+                    onClick={handleShellLinkClick}
+                  >
+                    <span>{activeSystemGroup.group}</span>
+                    <small>{activeSystemGroup.items.length} 个配置页</small>
+                  </a>
+                  <div className="workspace-system-nav-group-list">
+                    <section className="workspace-system-nav-group" key={activeSystemGroup.group}>
+                      <a
+                        className="workspace-system-nav-group-title is-open"
+                        href={`/fixed-assets/workbench?menu=${activeSystemGroup.items[0].id}`}
+                        onClick={handleShellLinkClick}
+                      >
+                        <span>{activeSystemGroup.group}</span>
+                        <small>{activeSystemGroup.items.length}</small>
+                      </a>
+                      <div className="workspace-system-nav-items">
+                        {activeSystemGroup.items.map((groupItem) => {
+                          const GroupIcon = groupItem.icon;
 
-                        return (
-                          <a
-                            key={groupItem.id}
-                            className={groupItem.id === item.id ? 'is-active' : ''}
-                            href={`/fixed-assets/workbench?menu=${groupItem.id}`}
-                          >
-                            <GroupIcon aria-hidden="true" />
-                            <span>{groupItem.label}</span>
-                          </a>
-                        );
-                      })}
-                    </div>
-                  </section>
-                </div>
-              </aside>
+                          return (
+                            <a
+                              key={groupItem.id}
+                              className={groupItem.id === item.id ? 'is-active' : ''}
+                              href={`/fixed-assets/workbench?menu=${groupItem.id}`}
+                              onClick={handleShellLinkClick}
+                            >
+                              <GroupIcon aria-hidden="true" />
+                              <span>{groupItem.label}</span>
+                            </a>
+                          );
+                        })}
+                      </div>
+                    </section>
+                  </div>
+                </aside>
+              )}
             </section>
           )}
-          {!useNativeStitchShell && (
+          {showUnifiedSystemSidebar && (
             <div className="workspace-topbar-title workspace-system-frame-title" aria-label={`${item.label}页面标题`}>
               <span>{activeSystemGroup.group}</span>
               <strong>{item.label}</strong>
@@ -40948,6 +42156,7 @@ function WorkbenchSystemHtmlFrame({
             className={`workspace-system-html-frame${useNativeStitchShell ? ' is-native-stitch-shell' : ''}`}
             title={`${item.label}系统设置复刻页`}
             src={src}
+            loading="eager"
             onLoad={installFrameNavigation}
           />
         </div>
@@ -41045,6 +42254,23 @@ export default function WorkspacePreviewPage() {
     setExpandedSystemGroups(new Set());
     navigate(buildWorkbenchPath('overview', systemDefaultMenuId));
   };
+
+  const handleSystemFrameNavigate = useCallback((target: string) => {
+    const nextUrl = new URL(target, window.location.origin);
+    const nextMenuId = nextUrl.searchParams.get('menu');
+    const nextPath = `${nextUrl.pathname}${nextUrl.search}${nextUrl.hash}`;
+
+    setRoutePreview(null);
+    setScreenPreview(null);
+
+    if (nextUrl.pathname.startsWith(workbenchBasePath) && isSystemMenuId(nextMenuId)) {
+      setActivePage('overview');
+      setActiveMenu(nextMenuId);
+      setExpandedSystemGroups(new Set());
+    }
+
+    navigate(nextPath);
+  }, [navigate]);
 
   const activeContext = menuContextById[activeItem.id] ?? menuContextById.home;
   const activePageTab = pageTabs.find((tab) => tab.id === activePage);
@@ -41258,7 +42484,7 @@ export default function WorkspacePreviewPage() {
         aria-label="B端工作台预览"
       >
         {isSystemHtmlMode && systemHtmlSrc ? (
-          <WorkbenchSystemHtmlFrame item={activeItem} src={systemHtmlSrc} />
+          <WorkbenchSystemHtmlFrame item={activeItem} onNavigate={handleSystemFrameNavigate} src={systemHtmlSrc} />
         ) : (
           <>
         <aside className="workspace-side">
