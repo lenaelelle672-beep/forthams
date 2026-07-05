@@ -15,6 +15,7 @@ export const workbenchV3IntegrationMenus: WorkbenchV3MenuItem[] = [
   { id: 'system-interfaces', label: '接口管理', description: '接口目录、方法、路径摘要与配置校验', status: '已接入真组件' },
   { id: 'system-field-mapping', label: '字段映射', description: '源字段、目标字段、转换白名单与预览', status: '已接入真组件' },
   { id: 'system-sync-rules', label: '同步规则', description: 'dry-run、单条日志重试与只读队列摘要', status: '已接入真组件' },
+  { id: 'system-webhook-config', label: 'Webhook 配置', description: 'config-only 校验、敏感字段脱敏与租户隔离', status: '已接入真组件' },
 ];
 
 function readMenuFromLocation() {
@@ -44,7 +45,7 @@ export default function WorkbenchV3Page() {
       <header className="rounded-3xl border border-blue-100 bg-white p-6 shadow-sm">
         <p className="text-xs font-semibold uppercase tracking-[0.28em] text-blue-600">Workbench V3</p>
         <h1 className="mt-2 text-2xl font-semibold">系统集成 V3 工作台</h1>
-        <p className="mt-2 text-sm text-slate-500">三项菜单只通过 V3 registry、module metadata、专属页面与专属 API 访问。</p>
+        <p className="mt-2 text-sm text-slate-500">四项菜单只通过 V3 registry、module metadata、专属页面与专属 API 访问。</p>
       </header>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[260px_minmax(0,1fr)]">

@@ -69,6 +69,57 @@ CREATE TABLE IF NOT EXISTS sys_permission (
     INDEX idx_permission_code (permission_code)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+CREATE TABLE IF NOT EXISTS sys_role_permission (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    role_id BIGINT NOT NULL,
+    permission_id BIGINT NOT NULL,
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uk_role_permission (role_id, permission_id),
+    INDEX idx_role_permission_role (role_id),
+    INDEX idx_role_permission_permission (permission_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS system_alert (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    tenant_id VARCHAR(64) NOT NULL,
+    alert_type VARCHAR(64),
+    alert_level VARCHAR(32),
+    title VARCHAR(256),
+    content TEXT,
+    status VARCHAR(32) DEFAULT 'OPEN',
+    `read` TINYINT DEFAULT 0,
+    read_at DATETIME,
+    read_by BIGINT,
+    closed_at DATETIME,
+    closed_by BIGINT,
+    create_by BIGINT,
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+    update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    deleted TINYINT DEFAULT 0,
+    INDEX idx_system_alert_tenant_status (tenant_id, status),
+    INDEX idx_system_alert_tenant_read (tenant_id, `read`),
+    INDEX idx_system_alert_level (tenant_id, alert_level)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS system_webhook_config (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    tenant_id VARCHAR(64) NOT NULL,
+    config_name VARCHAR(128) NOT NULL,
+    event_type VARCHAR(64) NOT NULL,
+    target_url VARCHAR(1024) NOT NULL,
+    enabled TINYINT DEFAULT 1,
+    status VARCHAR(32) DEFAULT 'ENABLED',
+    signing_strategy VARCHAR(32) DEFAULT 'NONE',
+    secret_configured TINYINT DEFAULT 0,
+    signature_configured TINYINT DEFAULT 0,
+    masked_header_names TEXT,
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+    update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    deleted TINYINT DEFAULT 0,
+    INDEX idx_system_webhook_config_tenant_status (tenant_id, status),
+    INDEX idx_system_webhook_config_tenant_event (tenant_id, event_type)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 CREATE TABLE IF NOT EXISTS asset_category (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     category_name VARCHAR(128) NOT NULL,
@@ -412,6 +463,29 @@ VALUES
     (1, '超级管理员', 'SUPER_ADMIN', '系统超级管理员', 1, 1),
     (2, '普通用户', 'USER', '普通业务用户', 2, 1)
 ON DUPLICATE KEY UPDATE role_name = VALUES(role_name);
+
+INSERT INTO sys_permission (permission_name, permission_code, description, status)
+VALUES
+    ('系统集成查询', 'system:integration:query', '系统集成配置查询权限', 1),
+    ('系统集成编辑', 'system:integration:edit', '系统集成配置编辑权限', 1),
+    ('系统集成删除', 'system:integration:delete', '系统集成配置删除权限', 1),
+    ('系统集成校验', 'system:integration:test', '系统集成配置校验权限', 1)
+ON DUPLICATE KEY UPDATE
+    permission_name = VALUES(permission_name),
+    description = VALUES(description),
+    status = VALUES(status);
+
+INSERT INTO sys_role_permission (role_id, permission_id)
+SELECT r.id, p.id
+FROM sys_role r
+INNER JOIN sys_permission p ON p.permission_code IN (
+    'system:integration:query',
+    'system:integration:edit',
+    'system:integration:delete',
+    'system:integration:test'
+)
+WHERE r.role_code = 'SUPER_ADMIN'
+ON DUPLICATE KEY UPDATE role_id = VALUES(role_id);
 
 INSERT INTO sys_user (id, username, password, real_name, email, phone, status, dept_id)
 VALUES

@@ -8,6 +8,7 @@ export const systemRealPageRegistry: Record<string, SystemRealPageEntry> = {
   'system-interfaces': lazy(() => import('../../system/SystemInterfacesWorkbenchPage')),
   'system-field-mapping': lazy(() => import('../../system/SystemFieldMappingsWorkbenchPage')),
   'system-sync-rules': lazy(() => import('../../system/SystemSyncRulesWorkbenchPage')),
+  'system-webhook-config': lazy(() => import('../../system/SystemWebhookConfigWorkbenchPage')),
 };
 
 export function isSystemRealPageMenuId(menuId: string | undefined): boolean {

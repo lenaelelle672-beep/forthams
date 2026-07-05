@@ -51,6 +51,9 @@ const WorkflowDesigner = withSuspense(
 const WorkflowCenter = withSuspense(
   lazy(() => import("./pages/WorkflowCenter").then((module) => ({ default: module.WorkflowCenter }))),
 );
+const WorkbenchV3 = withSuspense(
+  lazy(() => import("../pages/workbench-v3/WorkbenchV3Page")),
+);
 
 function PageLoadingFallback() {
   return createElement(
@@ -125,6 +128,7 @@ export const router = createBrowserRouter([
           { path: "approval", Component: Approval },
           { path: "analytics", Component: Analytics },
           { path: "settings", Component: Settings },
+          { path: "fixed-assets/workbenchv3", Component: WorkbenchV3 },
           { path: "workflows", Component: WorkflowCenter },
           { path: "workflow-designer", Component: WorkflowDesigner },
         ],
