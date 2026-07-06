@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>执行监控 · 后台设置 OS</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary": "#0056c9",
+                        "surface-container-high": "#e5e8ec",
+                        "on-surface-variant": "#424654",
+                        "on-error": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "surface-dim": "#d7dade",
+                        "border-subtle": "#D7E2F0",
+                        "surface-variant": "#e0e3e7",
+                        "inverse-primary": "#b0c6ff",
+                        "text-primary": "#0F172A",
+                        "tertiary": "#9f3e00",
+                        "outline-variant": "#c2c6d7",
+                        "on-secondary": "#ffffff",
+                        "on-surface": "#181c1f",
+                        "status-purple": "#7C3AED",
+                        "on-tertiary-fixed": "#351000",
+                        "inverse-surface": "#2d3134",
+                        "on-secondary-fixed-variant": "#374762",
+                        "tertiary-fixed": "#ffdbcc",
+                        "primary-fixed": "#d9e2ff",
+                        "status-green": "#16A34A",
+                        "surface-tint": "#0057cc",
+                        "on-secondary-fixed": "#091c35",
+                        "status-cyan": "#00A8D8",
+                        "tertiary-fixed-dim": "#ffb695",
+                        "status-red": "#DC2626",
+                        "surface-container-highest": "#e0e3e7",
+                        "surface-bright": "#f7fafe",
+                        "on-tertiary-fixed-variant": "#7b2f00",
+                        "on-primary-container": "#fffdff",
+                        "error-container": "#ffdad6",
+                        "on-tertiary-container": "#fffdff",
+                        "primary-fixed-dim": "#b0c6ff",
+                        "tertiary-container": "#c75000",
+                        "text-secondary": "#64748B",
+                        "outline": "#727786",
+                        "secondary": "#4e5f7b",
+                        "secondary-container": "#ccddff",
+                        "on-background": "#181c1f",
+                        "secondary-fixed": "#d5e3ff",
+                        "on-error-container": "#93000a",
+                        "background": "#f7fafe",
+                        "on-secondary-container": "#51617e",
+                        "secondary-fixed-dim": "#b6c7e8",
+                        "surface-container-low": "#f1f4f8",
+                        "on-tertiary": "#ffffff",
+                        "on-primary-fixed": "#001945",
+                        "error": "#ba1a1a",
+                        "on-primary-fixed-variant": "#00419c",
+                        "surface-container": "#ebeef2",
+                        "surface": "#f7fafe",
+                        "inverse-on-surface": "#eef1f5",
+                        "status-amber": "#F59E0B",
+                        "primary-container": "#1d6ef2",
+                        "surface-container-lowest": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "container-gap": "20px",
+                        "topbar-height": "48px",
+                        "card-padding": "16px",
+                        "grid-gutter": "12px",
+                        "sidebar-width": "196px",
+                        "inspector-width": "320px"
+                    },
+                    "fontFamily": {
+                        "section-header": ["Inter"],
+                        "page-title": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "status-label": ["Inter"],
+                        "code-meta": ["JetBrains Mono"]
+                    },
+                    "fontSize": {
+                        "section-header": ["14px", {"lineHeight": "20px", "fontWeight": "700"}],
+                        "page-title": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-md": ["13px", {"lineHeight": "20px", "fontWeight": "500"}],
+                        "body-sm": ["12px", {"lineHeight": "18px", "fontWeight": "500"}],
+                        "status-label": ["11px", {"lineHeight": "16px", "fontWeight": "700"}],
+                        "code-meta": ["11px", {"lineHeight": "16px", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body {
+            background-color: #f7fafe;
+            color: #0F172A;
+        }
+        .monitor-table-row:hover {
+            background-color: rgba(0, 86, 201, 0.04);
+        }
+        .action-chip {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .action-chip:active {
+            transform: scale(0.95);
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #D7E2F0;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #c2c6d7;
+        }
+    </style>
+</head>
+<body class="font-body-md text-body-md overflow-hidden">
+<!-- TopNavBar -->
+<header class="bg-background dark:bg-background border-b border-border-subtle dark:border-outline-variant flex justify-between items-center w-full px-container-gap h-topbar-height fixed top-0 z-50">
+<div class="flex items-center gap-8">
+<span class="font-page-title text-page-title font-bold text-primary dark:text-primary-fixed">工作流引擎</span>
+<div class="relative group">
+<span class="absolute inset-y-0 left-3 flex items-center text-text-secondary">
+<span class="material-symbols-outlined text-[18px]">search</span>
+</span>
+<input class="bg-surface-container-low border-none rounded-lg pl-10 pr-4 py-1.5 w-64 font-code-meta text-code-meta focus:ring-1 focus:ring-primary transition-all placeholder:text-text-secondary" placeholder="搜索实例ID..." type="text"/>
+</div>
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-text-secondary hover:text-text-primary transition-colors font-body-md text-body-md" href="#">工作流定义</a>
+<a class="text-text-secondary hover:text-text-primary transition-colors font-body-md text-body-md" href="#">可视化设计</a>
+<a class="text-primary border-b-2 border-primary pb-1 font-bold font-body-md text-body-md" href="#">执行监控</a>
+<a class="text-text-secondary hover:text-text-primary transition-colors font-body-md text-body-md" href="#">触发器配置</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="bg-primary text-on-primary px-4 py-1.5 rounded font-bold hover:opacity-90 active:opacity-80 transition-all text-body-sm">立即运行</button>
+<div class="flex items-center gap-2 text-text-secondary">
+<button class="p-2 hover:bg-surface-container-low rounded-full transition-all"><span class="material-symbols-outlined">settings</span></button>
+<button class="p-2 hover:bg-surface-container-low rounded-full transition-all relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-status-red rounded-full"></span>
+</button>
+<button class="p-2 hover:bg-surface-container-low rounded-full transition-all"><span class="material-symbols-outlined">account_circle</span></button>
+</div>
+</div>
+</header>
+<!-- Sidebar Navigation -->
+<aside class="fixed left-0 top-topbar-height h-[calc(100vh-topbar-height)] w-sidebar-width bg-surface-container-low dark:bg-surface-dim border-r border-border-subtle dark:border-outline-variant flex flex-col p-4 z-40">
+<div class="mb-6 flex items-center gap-3 px-2">
+<div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-[18px]">hub</span>
+</div>
+<div>
+<div class="font-section-header text-section-header text-on-surface">系统状态</div>
+<div class="text-[10px] text-status-green flex items-center gap-1">
+<span class="w-1.5 h-1.5 bg-status-green rounded-full animate-pulse"></span>
+                    运行中 99.9%
+                </div>
+</div>
+</div>
+<nav class="space-y-1 flex-1">
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-variant rounded-lg transition-colors group" href="#">
+<span class="material-symbols-outlined text-[20px]">dashboard</span>
+<span>仪表盘</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-variant rounded-lg transition-colors group" href="#">
+<span class="material-symbols-outlined text-[20px]">account_tree</span>
+<span>流程库</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 bg-primary-container text-on-primary-container font-bold rounded-lg transition-colors group" href="#">
+<span class="material-symbols-outlined text-[20px]">terminal</span>
+<span>执行监控</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-variant rounded-lg transition-colors group" href="#">
+<span class="material-symbols-outlined text-[20px]">settings_input_component</span>
+<span>节点设置</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-variant rounded-lg transition-colors group" href="#">
+<span class="material-symbols-outlined text-[20px]">verified_user</span>
+<span>安全审计</span>
+</a>
+</nav>
+<div class="mt-auto pt-4 border-t border-border-subtle space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-variant rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">help</span>
+<span>文档中心</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-variant rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">headset_mic</span>
+<span>联系支持</span>
+</a>
+<button class="w-full mt-4 bg-primary-container text-white py-2 rounded-lg font-bold text-body-sm shadow-sm active:scale-95 duration-100">
+                新建流程
+            </button>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-sidebar-width mt-topbar-height h-[calc(100vh-topbar-height-40px)] overflow-y-auto px-container-gap py-6">
+<!-- Header KPI Section -->
+<div class="grid grid-cols-4 gap-grid-gutter mb-8">
+<div class="bg-white border border-border-subtle p-card-padding flex flex-col relative overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-primary"></div>
+<span class="text-text-secondary text-body-sm mb-1">活跃实例</span>
+<span class="text-[28px] font-bold text-text-primary">1,284</span>
+<span class="text-[10px] text-status-green mt-1 font-bold">+12% vs 昨同期</span>
+</div>
+<div class="bg-white border border-border-subtle p-card-padding flex flex-col relative overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-status-red"></div>
+<span class="text-text-secondary text-body-sm mb-1">阻塞节点</span>
+<span class="text-[28px] font-bold text-text-primary">3</span>
+<span class="text-[10px] text-status-red mt-1 font-bold">需紧急干预</span>
+</div>
+<div class="bg-white border border-border-subtle p-card-padding flex flex-col relative overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-status-cyan"></div>
+<span class="text-text-secondary text-body-sm mb-1">平均耗时</span>
+<span class="text-[28px] font-bold text-text-primary">42s</span>
+<span class="text-[10px] text-text-secondary mt-1 font-code-meta">P95: 114s</span>
+</div>
+<div class="bg-white border border-border-subtle p-card-padding flex flex-col relative overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-status-amber"></div>
+<span class="text-text-secondary text-body-sm mb-1">系统负载</span>
+<span class="text-[28px] font-bold text-text-primary">64%</span>
+<div class="w-full h-1 bg-surface-container-high rounded-full mt-2">
+<div class="h-full bg-status-amber rounded-full" style="width: 64%"></div>
+</div>
+</div>
+</div>
+<!-- Monitoring List (No Background Card) -->
+<section class="min-w-full">
+<div class="flex justify-between items-end mb-4 px-2">
+<div>
+<h1 class="font-page-title text-page-title text-text-primary">执行监控</h1>
+<p class="text-text-secondary text-body-sm">实时追踪全局流程链路，快速处理系统异常</p>
+</div>
+<div class="flex items-center gap-2">
+<button class="flex items-center gap-1 px-3 py-1.5 border border-border-subtle bg-white text-body-sm rounded hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-[16px]">filter_list</span>
+                        筛选
+                    </button>
+<button class="flex items-center gap-1 px-3 py-1.5 border border-border-subtle bg-white text-body-sm rounded hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-[16px]">download</span>
+                        导出报告
+                    </button>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead class="bg-surface-container text-on-surface-variant font-section-header text-section-header border-b border-border-subtle">
+<tr>
+<th class="py-3 px-4 font-bold">实例ID</th>
+<th class="py-3 px-4 font-bold">所属流程</th>
+<th class="py-3 px-4 font-bold">当前节点</th>
+<th class="py-3 px-4 font-bold">执行人</th>
+<th class="py-3 px-4 font-bold">状态</th>
+<th class="py-3 px-4 font-bold">开始时间</th>
+<th class="py-3 px-4 font-bold">已运行时长</th>
+<th class="py-3 px-4 font-bold text-right">操作干预</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-border-subtle bg-transparent">
+<!-- Row 1: 运行中 -->
+<tr class="monitor-table-row transition-colors group">
+<td class="py-4 px-4 font-code-meta text-primary font-bold">#INS-99281</td>
+<td class="py-4 px-4 text-text-primary">资产入库自动化流水线</td>
+<td class="py-4 px-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[16px]">database</span>
+                                    数据库同步
+                                </div>
+</td>
+<td class="py-4 px-4">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-secondary-container flex items-center justify-center text-[10px] font-bold">SA</div>
+                                    系统管理员
+                                </div>
+</td>
+<td class="py-4 px-4">
+<span class="px-2 py-0.5 rounded-full bg-status-green/10 text-status-green text-status-label border border-status-green/20">运行中</span>
+</td>
+<td class="py-4 px-4 text-text-secondary font-code-meta">2024-05-20 14:22:01</td>
+<td class="py-4 px-4 text-text-primary font-bold">12m 45s</td>
+<td class="py-4 px-4 text-right">
+<div class="flex justify-end gap-2">
+<button class="action-chip p-1.5 hover:bg-primary/10 text-primary rounded-lg transition-all" title="干预"><span class="material-symbols-outlined">edit_note</span></button>
+<button class="action-chip p-1.5 hover:bg-status-amber/10 text-status-amber rounded-lg transition-all" title="挂起"><span class="material-symbols-outlined">pause_circle</span></button>
+<button class="action-chip p-1.5 hover:bg-status-red/10 text-status-red rounded-lg transition-all" title="终止"><span class="material-symbols-outlined">cancel</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 2: 阻塞 -->
+<tr class="monitor-table-row transition-colors group">
+<td class="py-4 px-4 font-code-meta text-primary font-bold">#INS-99275</td>
+<td class="py-4 px-4 text-text-primary">年度安全合规审计回溯</td>
+<td class="py-4 px-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-status-red text-[16px]">verified_user</span>
+                                    合规性校验
+                                </div>
+</td>
+<td class="py-4 px-4">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-tertiary-fixed text-on-tertiary-fixed flex items-center justify-center text-[10px] font-bold">LY</div>
+                                    李洋
+                                </div>
+</td>
+<td class="py-4 px-4">
+<span class="px-2 py-0.5 rounded-full bg-status-red/10 text-status-red text-status-label border border-status-red/20">阻塞</span>
+</td>
+<td class="py-4 px-4 text-text-secondary font-code-meta">2024-05-20 12:05:44</td>
+<td class="py-4 px-4 text-status-red font-bold">2h 29m</td>
+<td class="py-4 px-4 text-right">
+<div class="flex justify-end gap-2">
+<button class="action-chip p-1.5 hover:bg-primary/10 text-primary rounded-lg transition-all" title="干预"><span class="material-symbols-outlined">bolt</span></button>
+<button class="action-chip p-1.5 hover:bg-status-amber/10 text-status-amber rounded-lg transition-all" title="挂起"><span class="material-symbols-outlined">pause_circle</span></button>
+<button class="action-chip p-1.5 hover:bg-status-red/10 text-status-red rounded-lg transition-all" title="终止"><span class="material-symbols-outlined">cancel</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 3: Processing -->
+<tr class="monitor-table-row transition-colors group">
+<td class="py-4 px-4 font-code-meta text-primary font-bold">#INS-99301</td>
+<td class="py-4 px-4 text-text-primary">基础设施扩容触发器</td>
+<td class="py-4 px-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-status-cyan text-[16px]">cloud_sync</span>
+                                    节点镜像分发
+                                </div>
+</td>
+<td class="py-4 px-4">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-secondary-container flex items-center justify-center text-[10px] font-bold">AI</div>
+                                    AI 助手
+                                </div>
+</td>
+<td class="py-4 px-4">
+<span class="px-2 py-0.5 rounded-full bg-status-cyan/10 text-status-cyan text-status-label border border-status-cyan/20">处理中</span>
+</td>
+<td class="py-4 px-4 text-text-secondary font-code-meta">2024-05-20 14:34:12</td>
+<td class="py-4 px-4 text-text-primary font-bold">45s</td>
+<td class="py-4 px-4 text-right">
+<div class="flex justify-end gap-2">
+<button class="action-chip p-1.5 hover:bg-primary/10 text-primary rounded-lg transition-all" title="干预"><span class="material-symbols-outlined">edit_note</span></button>
+<button class="action-chip p-1.5 hover:bg-status-amber/10 text-status-amber rounded-lg transition-all" title="挂起"><span class="material-symbols-outlined">pause_circle</span></button>
+<button class="action-chip p-1.5 hover:bg-status-red/10 text-status-red rounded-lg transition-all" title="终止"><span class="material-symbols-outlined">cancel</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="monitor-table-row transition-colors group">
+<td class="py-4 px-4 font-code-meta text-primary font-bold">#INS-99295</td>
+<td class="py-4 px-4 text-text-primary">核心配置库快照</td>
+<td class="py-4 px-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[16px]">camera</span>
+                                    生成差分补丁
+                                </div>
+</td>
+<td class="py-4 px-4">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-secondary-container flex items-center justify-center text-[10px] font-bold">SA</div>
+                                    系统管理员
+                                </div>
+</td>
+<td class="py-4 px-4">
+<span class="px-2 py-0.5 rounded-full bg-status-green/10 text-status-green text-status-label border border-status-green/20">运行中</span>
+</td>
+<td class="py-4 px-4 text-text-secondary font-code-meta">2024-05-20 14:30:00</td>
+<td class="py-4 px-4 text-text-primary font-bold">4m 57s</td>
+<td class="py-4 px-4 text-right">
+<div class="flex justify-end gap-2">
+<button class="action-chip p-1.5 hover:bg-primary/10 text-primary rounded-lg transition-all" title="干预"><span class="material-symbols-outlined">edit_note</span></button>
+<button class="action-chip p-1.5 hover:bg-status-amber/10 text-status-amber rounded-lg transition-all" title="挂起"><span class="material-symbols-outlined">pause_circle</span></button>
+<button class="action-chip p-1.5 hover:bg-status-red/10 text-status-red rounded-lg transition-all" title="终止"><span class="material-symbols-outlined">cancel</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 5 -->
+<tr class="monitor-table-row transition-colors group">
+<td class="py-4 px-4 font-code-meta text-primary font-bold">#INS-99152</td>
+<td class="py-4 px-4 text-text-primary">边缘节点健康度自愈</td>
+<td class="py-4 px-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-status-amber text-[16px]">cached</span>
+                                    等待资源释放
+                                </div>
+</td>
+<td class="py-4 px-4">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-secondary-container flex items-center justify-center text-[10px] font-bold">AI</div>
+                                    AI 助手
+                                </div>
+</td>
+<td class="py-4 px-4">
+<span class="px-2 py-0.5 rounded-full bg-status-amber/10 text-status-amber text-status-label border border-status-amber/20">挂起</span>
+</td>
+<td class="py-4 px-4 text-text-secondary font-code-meta">2024-05-20 09:12:33</td>
+<td class="py-4 px-4 text-text-primary font-bold">5h 22m</td>
+<td class="py-4 px-4 text-right">
+<div class="flex justify-end gap-2">
+<button class="action-chip p-1.5 hover:bg-status-green/10 text-status-green rounded-lg transition-all" title="继续"><span class="material-symbols-outlined">play_circle</span></button>
+<button class="action-chip p-1.5 hover:bg-primary/10 text-primary rounded-lg transition-all" title="干预"><span class="material-symbols-outlined">edit_note</span></button>
+<button class="action-chip p-1.5 hover:bg-status-red/10 text-status-red rounded-lg transition-all" title="终止"><span class="material-symbols-outlined">cancel</span></button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Empty space for "No background card" effect -->
+<div class="h-32"></div>
+</section>
+</main>
+<!-- Contextual Inspector (Right Panel) -->
+<aside class="fixed right-0 top-topbar-height h-[calc(100vh-topbar-height-40px)] w-inspector-width bg-white border-l border-border-subtle shadow-[-8px_0_15px_-10px_rgba(0,86,201,0.1)] p-card-padding flex flex-col z-30 translate-x-0 transition-transform">
+<div class="flex justify-between items-center mb-6">
+<span class="font-section-header text-section-header">实例详情检视</span>
+<button class="text-text-secondary hover:text-text-primary"><span class="material-symbols-outlined text-[20px]">close</span></button>
+</div>
+<div class="flex-1 space-y-6 overflow-y-auto pr-1">
+<!-- Summary -->
+<div class="space-y-3">
+<div class="bg-surface-container-low p-3 rounded border border-border-subtle">
+<div class="text-[10px] text-text-secondary uppercase tracking-wider font-bold mb-1">正在检视</div>
+<div class="font-code-meta text-primary font-bold text-body-md">#INS-99275</div>
+<div class="text-status-red text-body-sm flex items-center gap-1 mt-1 font-bold">
+<span class="material-symbols-outlined text-[14px]">warning</span>
+                        合规性校验失败：缺少授权文件
+                    </div>
+</div>
+</div>
+<!-- 拓扑 Minimal -->
+<div>
+<div class="font-section-header text-section-header mb-3">执行拓扑</div>
+<div class="relative pl-6 space-y-6 border-l-2 border-border-subtle ml-2">
+<div class="relative">
+<div class="absolute -left-[31px] top-0 w-4 h-4 bg-status-green rounded-full border-4 border-white shadow-sm"></div>
+<div class="text-body-sm font-bold text-text-primary">启动实例</div>
+<div class="text-[10px] text-text-secondary">2024-05-20 12:05:44</div>
+</div>
+<div class="relative">
+<div class="absolute -left-[31px] top-0 w-4 h-4 bg-status-green rounded-full border-4 border-white shadow-sm"></div>
+<div class="text-body-sm font-bold text-text-primary">元数据读取</div>
+<div class="text-[10px] text-text-secondary">耗时 1.2s</div>
+</div>
+<div class="relative">
+<div class="absolute -left-[31px] top-0 w-4 h-4 bg-status-red rounded-full border-4 border-white shadow-sm animate-pulse"></div>
+<div class="text-body-sm font-bold text-status-red">合规性校验</div>
+<div class="text-[10px] text-status-red font-bold">当前节点（错误）</div>
+</div>
+<div class="relative opacity-40">
+<div class="absolute -left-[31px] top-0 w-4 h-4 border-2 border-border-subtle bg-white rounded-full"></div>
+<div class="text-body-sm font-bold text-text-secondary">生成审计报告</div>
+<div class="text-[10px] text-text-secondary">待执行</div>
+</div>
+</div>
+</div>
+<!-- AI 帮助er -->
+<div class="bg-surface-container-low p-4 rounded-xl border border-primary/20">
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-primary text-[18px]">psychology</span>
+<span class="font-bold text-primary text-body-sm">AI 故障建议</span>
+</div>
+<p class="text-body-sm text-on-surface-variant leading-relaxed">
+                    检测到节点 <code class="bg-white px-1 rounded font-code-meta">合规_Gate_01</code> 无法访问受保护的元数据库。建议手动上传 <span class="underline decoration-dotted cursor-help">RSA-772 证书</span> 或执行跳过逻辑以维持流水线运行。
+                </p>
+<div class="mt-3 flex gap-2">
+<button class="flex-1 bg-primary text-white py-1.5 rounded font-bold text-[11px] hover:opacity-90">修复并重试</button>
+<button class="flex-1 border border-border-subtle bg-white text-text-primary py-1.5 rounded font-bold text-[11px] hover:bg-surface-container-high">忽略继续</button>
+</div>
+</div>
+</div>
+<div class="pt-4 border-t border-border-subtle mt-4">
+<button class="w-full border border-status-red text-status-red py-2 rounded font-bold text-body-sm hover:bg-status-red/5">紧急终止全部关联进程</button>
+</div>
+</aside>
+<!-- Footer Pipeline 状态 -->
+<footer class="fixed bottom-0 w-full flex justify-between items-center px-container-gap py-2 z-50 bg-surface-bright dark:bg-inverse-surface border-t border-border-subtle dark:border-outline-variant font-code-meta text-code-meta">
+<div class="flex items-center gap-6">
+<span class="font-status-label text-status-label text-primary font-bold">后台设置 OS © 2024</span>
+<div class="flex items-center gap-3 text-text-secondary">
+<span class="flex items-center gap-1"><span class="w-1.5 h-1.5 bg-status-green rounded-full"></span> 流水线就绪</span>
+<span class="flex items-center gap-1"><span class="w-1.5 h-1.5 bg-status-cyan rounded-full"></span> 缓存命中率 94%</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">terminal</span> API v2.4.0-stable</span>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2">
+<span class="text-text-secondary">发布流水线:</span>
+<span class="text-status-green font-bold">草稿</span>
+<span class="text-text-secondary">→</span>
+<span class="text-status-green font-bold">影响分析</span>
+<span class="text-text-secondary">→</span>
+<span class="text-status-green font-bold">审核</span>
+<span class="text-text-secondary">→</span>
+<span class="text-text-secondary">发布</span>
+</div>
+<div class="h-4 w-[1px] bg-border-subtle"></div>
+<div class="flex gap-4">
+<a class="text-text-secondary hover:text-primary transition-colors cursor-pointer" href="#">隐私政策</a>
+<a class="text-text-secondary hover:text-primary transition-colors cursor-pointer" href="#">服务条款</a>
+</div>
+</div>
+</footer>
+<script>
+        // Simple micro-interaction for rows
+        document.querySelectorAll('.monitor-table-row').forEach(row => {
+            row.addEventListener('click', () => {
+                // 高light row logic could go here
+                console.log('Inspecting instance:', row.cells[0].innerText);
+            });
+        });
+
+        // 新增 a pulsing effect to the CPU load
+        const loadBar = document.querySelector('.bg-status-amber.rounded-full');
+        setInterval(() => {
+            const randomVar = 60 + Math.random() * 10;
+            loadBar.style.width = randomVar + '%';
+        }, 3000);
+    </script>
+</body></html>

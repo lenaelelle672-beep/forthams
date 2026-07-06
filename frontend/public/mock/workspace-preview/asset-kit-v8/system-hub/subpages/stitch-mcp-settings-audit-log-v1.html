@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+
+<html class="light" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>系统审计中枢 | 后台设置 OS</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "status-cyan": "#00A8D8",
+                        "on-secondary-container": "#51617e",
+                        "inverse-surface": "#2d3134",
+                        "outline": "#727786",
+                        "on-surface": "#181c1f",
+                        "inverse-on-surface": "#eef1f5",
+                        "on-secondary-fixed": "#091c35",
+                        "surface-container-high": "#e5e8ec",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-bright": "#f7fafe",
+                        "status-green": "#16A34A",
+                        "text-primary": "#0F172A",
+                        "primary-fixed-dim": "#b0c6ff",
+                        "surface-container-highest": "#e0e3e7",
+                        "primary-fixed": "#d9e2ff",
+                        "primary-container": "#1d6ef2",
+                        "on-error-container": "#93000a",
+                        "secondary": "#4e5f7b",
+                        "on-secondary": "#ffffff",
+                        "tertiary-fixed-dim": "#ffb695",
+                        "on-error": "#ffffff",
+                        "status-purple": "#7C3AED",
+                        "surface-dim": "#d7dade",
+                        "tertiary": "#9f3e00",
+                        "on-tertiary": "#ffffff",
+                        "on-primary-fixed": "#001945",
+                        "status-amber": "#F59E0B",
+                        "border-subtle": "#D7E2F0",
+                        "outline-variant": "#c2c6d7",
+                        "on-tertiary-container": "#fffdff",
+                        "primary": "#0056c9",
+                        "on-primary-fixed-variant": "#00419c",
+                        "on-surface-variant": "#424654",
+                        "on-primary-container": "#fffdff",
+                        "secondary-fixed-dim": "#b6c7e8",
+                        "on-tertiary-fixed": "#351000",
+                        "error": "#ba1a1a",
+                        "tertiary-fixed": "#ffdbcc",
+                        "on-primary": "#ffffff",
+                        "surface-container": "#ebeef2",
+                        "secondary-fixed": "#d5e3ff",
+                        "surface-tint": "#0057cc",
+                        "error-container": "#ffdad6",
+                        "inverse-primary": "#b0c6ff",
+                        "surface": "#f7fafe",
+                        "secondary-container": "#ccddff",
+                        "on-secondary-fixed-variant": "#374762",
+                        "text-secondary": "#64748B",
+                        "on-background": "#181c1f",
+                        "status-red": "#DC2626",
+                        "surface-variant": "#e0e3e7",
+                        "on-tertiary-fixed-variant": "#7b2f00",
+                        "tertiary-container": "#c75000",
+                        "surface-container-low": "#f1f4f8",
+                        "background": "#f7fafe"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "grid-gutter": "12px",
+                        "container-gap": "20px",
+                        "topbar-height": "48px",
+                        "sidebar-width": "196px",
+                        "inspector-width": "320px",
+                        "card-padding": "16px"
+                    },
+                    "fontFamily": {
+                        "body-sm": ["Inter"],
+                        "body-md": ["Inter"],
+                        "status-label": ["Inter"],
+                        "page-title": ["Inter"],
+                        "code-meta": ["JetBrains Mono"],
+                        "section-header": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-sm": ["12px", {"lineHeight": "18px", "fontWeight": "500"}],
+                        "body-md": ["13px", {"lineHeight": "20px", "fontWeight": "500"}],
+                        "status-label": ["11px", {"lineHeight": "16px", "fontWeight": "700"}],
+                        "page-title": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "code-meta": ["11px", {"lineHeight": "16px", "fontWeight": "400"}],
+                        "section-header": ["14px", {"lineHeight": "20px", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+            font-size: 1.25rem;
+        }
+        .glass-panel {
+            background: rgba(24, 28, 31, 0.85);
+            backdrop-filter: blur(12px);
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 2px;
+        }
+        .audit-row:hover {
+            background-color: #f1f4f8;
+        }
+    </style>
+</head>
+<body class="bg-background font-body-md text-on-surface overflow-hidden">
+<!-- TopNavBar -->
+<header class="fixed top-0 left-0 w-full z-50 flex items-center justify-between px-container-gap h-topbar-height bg-on-surface dark:bg-inverse-surface">
+<div class="flex items-center gap-8">
+<span class="font-page-title text-page-title text-surface-lowest dark:text-surface-bright tracking-tight">后台设置 OS</span>
+<nav class="hidden md:flex items-center gap-6">
+<a class="font-body-md text-body-md text-surface-variant dark:text-outline-variant hover:text-primary-fixed transition-colors duration-200" href="#">指挥中心</a>
+<a class="font-body-md text-body-md text-surface-variant dark:text-outline-variant hover:text-primary-fixed transition-colors duration-200" href="#">控制塔</a>
+<a class="font-body-md text-body-md text-surface-variant dark:text-outline-variant hover:text-primary-fixed transition-colors duration-200" href="#">资产业务</a>
+<a class="font-body-md text-body-md text-surface-variant dark:text-outline-variant hover:text-primary-fixed transition-colors duration-200" href="#">数据分析</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-surface-variant dark:text-outline-variant hover:text-white"><span class="material-symbols-outlined">notifications</span></button>
+<button class="text-surface-variant dark:text-outline-variant hover:text-white"><span class="material-symbols-outlined">settings</span></button>
+<button class="text-surface-variant dark:text-outline-variant hover:text-white"><span class="material-symbols-outlined">help</span></button>
+<div class="w-8 h-8 rounded-full bg-surface-container-high border border-outline-variant overflow-hidden">
+<img alt="User Profile Avatar" data-alt="A professional user profile avatar for a system administrator, clean and modern minimalist style in high-key lighting, soft blue and gray tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuACGHLmoT_QX8bXLFMItKHFZPO2F3va-ohhMXRTWCtphdAN6YPXUKeFohokAjSZhP6EUX7nYRKeOtqdS2uSkXeSCiF3PcskfjeicrOOjQx1q8awSHvaZjMinp4qppgLipuOVMOQX9MHIFY24vlq_KeHXyytPrBqIwW4qjsH2ULrLELTh2OiaJSHLOkR-KHeAeA7YXCMg3ahT5jgX476FFVfvR0WNtL66d7GBlPZry2R_AOIW8E9OvyIthNnFK4Bz_WArTi7Bt2YcIjh"/>
+</div>
+</div>
+</header>
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-topbar-height w-sidebar-width h-[calc(100vh-topbar-height)] flex flex-col p-4 bg-surface-container-lowest dark:bg-surface-dim border-r border-border-subtle dark:border-outline-variant">
+<div class="flex items-center gap-3 mb-8 px-2">
+<div class="w-8 h-8 rounded bg-status-green/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-status-green" style="font-variation-settings: 'FILL' 1;">sensors</span>
+</div>
+<div>
+<p class="font-section-header text-section-header text-on-surface">系统节点 01</p>
+<p class="text-[10px] text-status-green font-bold uppercase tracking-widest">健康</p>
+</div>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant dark:text-outline hover:bg-surface-container-low rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined">tune</span>
+<span class="font-body-sm text-body-sm">通用</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant dark:text-outline hover:bg-surface-container-low rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined">shield</span>
+<span class="font-body-sm text-body-sm">安全</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant dark:text-outline hover:bg-surface-container-low rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined">hub</span>
+<span class="font-body-sm text-body-sm">集成配置</span>
+</a>
+<!-- 启用 Tab: 审计日志 (Semantic match for '合规' or custom) -->
+<a class="flex items-center gap-3 px-3 py-2 text-primary font-bold bg-secondary-container dark:bg-on-secondary-fixed-variant/30 rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">fact_check</span>
+<span class="font-body-sm text-body-sm">审计日志</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant dark:text-outline hover:bg-surface-container-low rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined">robot_2</span>
+<span class="font-body-sm text-body-sm">自动化</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant dark:text-outline hover:bg-surface-container-low rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined">account_tree</span>
+<span class="font-body-sm text-body-sm">流程管理</span>
+</a>
+</nav>
+<div class="mt-auto border-t border-border-subtle pt-4 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:text-on-surface transition-all" href="#">
+<span class="material-symbols-outlined">list_alt</span>
+<span class="font-body-sm text-body-sm">日志</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:text-on-surface transition-all" href="#">
+<span class="material-symbols-outlined">contact_support</span>
+<span class="font-body-sm text-body-sm">支持</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="fixed left-sidebar-width top-topbar-height right-0 bottom-16 bg-surface-bright overflow-hidden flex">
+<div class="flex-1 flex flex-col p-8 h-full">
+<!-- Header Section -->
+<div class="mb-8 max-w-4xl">
+<h1 class="font-page-title text-page-title text-text-primary mb-2">审计日志 · 系统审计中枢</h1>
+<p class="text-text-secondary font-body-md max-w-2xl">记录全局系统变量、编号规则及 Webhook 的变更历史，支持版本回滚与 JSON 差异深度对比。</p>
+</div>
+<!-- Toolbar -->
+<div class="flex items-center justify-between mb-6 gap-4">
+<div class="flex items-center gap-3 flex-1">
+<div class="relative w-full max-w-md">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-sm">search</span>
+<input class="w-full bg-white border border-border-subtle rounded-lg pl-10 pr-4 py-2 font-code-meta text-code-meta focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all" placeholder="搜索 by actor, module or ID..." type="text"/>
+</div>
+<button class="px-4 py-2 bg-white border border-border-subtle rounded-lg flex items-center gap-2 hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-sm">filter_alt</span>
+<span class="font-body-sm text-body-sm">筛选器</span>
+</button>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 border border-border-subtle rounded-lg hover:bg-surface-container-low"><span class="material-symbols-outlined">refresh</span></button>
+<button class="p-2 border border-border-subtle rounded-lg hover:bg-surface-container-low"><span class="material-symbols-outlined">download</span></button>
+<button class="bg-primary text-white px-4 py-2 rounded-lg font-body-sm text-body-sm flex items-center gap-2 hover:bg-primary-container transition-colors">
+<span class="material-symbols-outlined">history</span>
+                        查看全局历史
+                    </button>
+</div>
+</div>
+<!-- 高-Density Data Grid -->
+<div class="flex-1 bg-white border border-border-subtle rounded-xl overflow-hidden flex flex-col shadow-sm">
+<div class="grid grid-cols-[1.5fr,1fr,1.5fr,1.5fr,1fr,2.5fr,0.5fr] gap-4 px-6 py-3 bg-surface-container-low border-b border-border-subtle">
+<div class="font-status-label text-status-label text-outline uppercase tracking-wider">时间戳</div>
+<div class="font-status-label text-status-label text-outline uppercase tracking-wider">操作者</div>
+<div class="font-status-label text-status-label text-outline uppercase tracking-wider">模块</div>
+<div class="font-status-label text-status-label text-outline uppercase tracking-wider">动作类型</div>
+<div class="font-status-label text-status-label text-outline uppercase tracking-wider">结果</div>
+<div class="font-status-label text-status-label text-outline uppercase tracking-wider">详情</div>
+<div class="text-right"></div>
+</div>
+<div class="flex-1 overflow-y-auto custom-scrollbar">
+<!-- 审计 Entries -->
+<div class="grid grid-cols-[1.5fr,1fr,1.5fr,1.5fr,1fr,2.5fr,0.5fr] gap-4 px-6 py-4 border-b border-border-subtle audit-row cursor-pointer transition-colors" onclick="toggleInspector()">
+<div class="font-code-meta text-code-meta text-on-surface">2024-05-24 14:32:01.442</div>
+<div class="flex items-center gap-2">
+<div class="w-5 h-5 rounded-full bg-secondary-container text-[10px] flex items-center justify-center font-bold">JD</div>
+<span class="font-body-sm text-body-sm">admin_jdoe</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-status-cyan"></span>
+<span class="font-body-sm text-body-sm">全局系统变量</span>
+</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">更新重试策略</div>
+<div><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-status-green/10 text-status-green uppercase tracking-tight">成功</span></div>
+<div class="font-code-meta text-code-meta text-outline truncate">将 service_node_zeta 的 retry_policy 从 3 调整为 5</div>
+<div class="text-right"><span class="material-symbols-outlined text-outline text-sm">chevron_right</span></div>
+</div>
+<div class="grid grid-cols-[1.5fr,1fr,1.5fr,1.5fr,1fr,2.5fr,0.5fr] gap-4 px-6 py-4 border-b border-border-subtle audit-row cursor-pointer transition-colors bg-primary/5">
+<div class="font-code-meta text-code-meta text-on-surface">2024-05-24 14:15:22.109</div>
+<div class="flex items-center gap-2">
+<div class="w-5 h-5 rounded-full bg-primary-container text-white text-[10px] flex items-center justify-center font-bold">AI</div>
+<span class="font-body-sm text-body-sm">auto_optim_bot</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-status-purple"></span>
+<span class="font-body-sm text-body-sm">Webhook 引擎</span>
+</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">配置回退</div>
+<div><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-status-red/10 text-status-red uppercase tracking-tight">回滚</span></div>
+<div class="font-code-meta text-code-meta text-outline truncate">生产环境握手失败后自动触发回滚</div>
+<div class="text-right"><span class="material-symbols-outlined text-primary text-sm">chevron_right</span></div>
+</div>
+<div class="grid grid-cols-[1.5fr,1fr,1.5fr,1.5fr,1fr,2.5fr,0.5fr] gap-4 px-6 py-4 border-b border-border-subtle audit-row cursor-pointer transition-colors">
+<div class="font-code-meta text-code-meta text-on-surface">2024-05-24 13:58:10.001</div>
+<div class="flex items-center gap-2">
+<div class="w-5 h-5 rounded-full bg-secondary-container text-[10px] flex items-center justify-center font-bold">SM</div>
+<span class="font-body-sm text-body-sm">sys_manager_1</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-status-amber"></span>
+<span class="font-body-sm text-body-sm">编号规则</span>
+</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">新前缀映射</div>
+<div><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-status-green/10 text-status-green uppercase tracking-tight">成功</span></div>
+<div class="font-code-meta text-code-meta text-outline truncate">已新增 'ARK-' 前缀，适用于全部物流类资产</div>
+<div class="text-right"><span class="material-symbols-outlined text-outline text-sm">chevron_right</span></div>
+</div>
+<!-- Repeated data for high-density look -->
+<div class="grid grid-cols-[1.5fr,1fr,1.5fr,1.5fr,1fr,2.5fr,0.5fr] gap-4 px-6 py-4 border-b border-border-subtle audit-row cursor-pointer transition-colors opacity-60">
+<div class="font-code-meta text-code-meta text-on-surface">2024-05-24 13:20:45.882</div>
+<div class="flex items-center gap-2">
+<div class="w-5 h-5 rounded-full bg-secondary-container text-[10px] flex items-center justify-center font-bold">AS</div>
+<span class="font-body-sm text-body-sm">admin_smith</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-status-cyan"></span>
+<span class="font-body-sm text-body-sm">全局系统变量</span>
+</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">超时调整</div>
+<div><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-status-green/10 text-status-green uppercase tracking-tight">成功</span></div>
+<div class="font-code-meta text-code-meta text-outline truncate">将全局 API 超时时间提升到 30000ms</div>
+<div class="text-right"><span class="material-symbols-outlined text-outline text-sm">chevron_right</span></div>
+</div>
+</div>
+</div>
+</div>
+<!-- 审计 Inspector (Glassmorphism Panel) -->
+<div class="w-[480px] h-full glass-panel fixed right-0 top-topbar-height z-40 transform translate-x-full transition-transform duration-300 ease-in-out p-6 text-white flex flex-col" id="inspector">
+<div class="flex items-center justify-between mb-8">
+<div>
+<h3 class="font-section-header text-section-header text-primary-fixed">审计 详情</h3>
+<p class="text-xs text-outline-variant font-code-meta">UUID: 8a2f-911c-7720-ef02</p>
+</div>
+<button class="p-2 hover:bg-white/10 rounded-lg transition-colors" onclick="toggleInspector()">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<div class="space-y-6 flex-1 overflow-y-auto custom-scrollbar pr-2">
+<!-- Metadata Section -->
+<div class="bg-white/5 border border-white/10 rounded-lg p-4">
+<div class="grid grid-cols-2 gap-4">
+<div>
+<p class="text-[10px] uppercase text-outline-variant font-bold mb-1">操作者身份</p>
+<p class="font-body-sm">admin_jdoe (根权限)</p>
+</div>
+<div>
+<p class="text-[10px] uppercase text-outline-variant font-bold mb-1">IP 地址</p>
+<p class="font-code-meta text-xs">192.168.1.104</p>
+</div>
+<div>
+<p class="text-[10px] uppercase text-outline-variant font-bold mb-1">动作</p>
+<p class="font-body-sm text-status-cyan">写入变量</p>
+</div>
+<div>
+<p class="text-[10px] uppercase text-outline-variant font-bold mb-1">影响分析评分</p>
+<p class="font-body-sm">低（非破坏性）</p>
+</div>
+</div>
+</div>
+<!-- JSON Diff Section -->
+<div>
+<p class="text-xs uppercase text-outline-variant font-bold mb-3 flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">compare_arrows</span>
+                        JSON 差异：配置变更
+                    </p>
+<div class="bg-inverse-surface rounded-lg font-code-meta text-[12px] p-4 border border-white/10 shadow-inner leading-relaxed">
+<div class="text-gray-400">{</div>
+<div class="pl-4 text-gray-400">"service": "node_zeta",</div>
+<div class="pl-4 text-gray-400">"policy": {</div>
+<div class="pl-8 bg-red-900/30 text-red-300 line-through">"retry_policy": 3,</div>
+<div class="pl-8 bg-green-900/30 text-green-300">"retry_policy": 5,</div>
+<div class="pl-8 text-gray-400">"backoff": "exponential",</div>
+<div class="pl-8 bg-blue-900/30 text-blue-200">"modified_at": "2024-05-24T14:32:01Z"</div>
+<div class="pl-4 text-gray-400">}</div>
+<div class="text-gray-400">}</div>
+</div>
+</div>
+<!-- 拓扑 预览 Placeholder -->
+<div class="relative rounded-xl border border-white/10 overflow-hidden h-40 group">
+<div class="absolute inset-0 bg-cover bg-center" data-alt="A futuristic network topology map showing interconnected nodes in a dark blueprint style, glowing blue lines connecting geometric clusters, high-tech interface aesthetic." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDu1SBu6dc5GppdgUCVMMQ-HzjapvTbD_QRSjXKzkwLZ6f7xWaWKxCRcDhiAnG7Ae4FngCE88dWSX6ZaAaRCG7aBdkx16vciWV1yep9TxBA8IXFc4eliFAiS4t4Jl8cVs0djRlPOd3EeoxwDr_pjkT0bJyGHWwueVXspMzHe_udMHCOrShVrb3iAdgqEowCRRtvz8sy_bOjnWwHiPNbB5yRKRTFbNXgfab6usWpIoHno7W4RzxAy9cdFmeESyKZKlwA741k6TpTeccy')"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+<div class="absolute bottom-4 left-4">
+<p class="text-xs font-bold text-white mb-0.5">影响拓扑</p>
+<p class="text-[10px] text-primary-fixed-dim">Cluster A-1, A-2, A-4</p>
+</div>
+</div>
+</div>
+<!-- Footer 动作 -->
+<div class="mt-8 pt-6 border-t border-white/10 flex gap-3">
+<button class="flex-1 py-2.5 bg-status-red text-white font-bold text-xs rounded-lg flex items-center justify-center gap-2 hover:bg-red-700 transition-colors">
+<span class="material-symbols-outlined text-sm">undo</span>
+                    回滚版本
+                </button>
+<button class="flex-1 py-2.5 border border-white/20 text-white font-bold text-xs rounded-lg flex items-center justify-center gap-2 hover:bg-white/10 transition-colors">
+<span class="material-symbols-outlined text-sm">content_copy</span>
+                    复制原始 JSON
+                </button>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (状态 Pipeline) -->
+<footer class="fixed bottom-0 left-sidebar-width right-0 z-40 flex justify-between items-center px-8 py-3 bg-surface-container-high/95 backdrop-blur-md border-t border-border-subtle dark:border-outline-variant h-16">
+<div class="flex items-center gap-12">
+<div class="flex items-center gap-2 text-primary font-bold">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-status-label text-status-label uppercase tracking-wider">当前阶段：稳定</span>
+</div>
+<!-- Pipeline Visualization -->
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-2">
+<div class="w-2.5 h-2.5 rounded-full bg-status-green"></div>
+<span class="text-[10px] font-bold text-outline uppercase tracking-tight">预发环境</span>
+</div>
+<div class="w-12 h-[1px] bg-outline-variant"></div>
+<div class="flex items-center gap-2">
+<div class="w-2.5 h-2.5 rounded-full border-2 border-primary"></div>
+<span class="text-[10px] font-bold text-primary uppercase tracking-tight">生产环境</span>
+</div>
+<div class="w-12 h-[1px] bg-outline-variant"></div>
+<div class="flex items-center gap-2">
+<div class="w-2.5 h-2.5 rounded-full border-2 border-dotted border-outline-variant"></div>
+<span class="text-[10px] font-bold text-outline-variant uppercase tracking-tight">DR-Sync</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2 text-outline">
+<span class="material-symbols-outlined text-sm">database</span>
+<span class="font-code-meta text-code-meta">同步延迟: 12ms</span>
+</div>
+<div class="flex items-center gap-2 text-outline">
+<span class="material-symbols-outlined text-sm">query_stats</span>
+<span class="font-code-meta text-code-meta">日志: 1,429,002</span>
+</div>
+</div>
+</footer>
+<script>
+        function toggleInspector() {
+            const inspector = document.getElementById('inspector');
+            inspector.classList.toggle('translate-x-full');
+        }
+
+        // Initialize with first row selection visual (optional auto-open)
+        document.addEventListener('DOMContentLoaded', () => {
+            // Placeholder for interactions
+        });
+    </script>
+</body></html>

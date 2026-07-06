@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>通知偏好配置台</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+<style data-purpose="layout">
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: #f0f2f5;
+      margin: 0;
+      padding: 0;
+      width: 1586px;
+      height: 992px;
+      overflow: hidden; /* Fixed viewport requirement */
+    }
+    .main-layout {
+      display: flex;
+      height: calc(100vh - 56px); /* 56px is header height */
+    }
+    .sidebar {
+      width: 190px;
+      background-color: #001529;
+      color: rgba(255, 255, 255, 0.65);
+      overflow-y: auto;
+    }
+    .content-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background-color: #f0f2f5;
+      padding: 16px;
+    }
+  </style>
+<style data-purpose="custom-components">
+    /* Header */
+    .top-header {
+      height: 56px;
+      background-color: #001529;
+      color: white;
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      justify-content: space-between;
+    }
+    .header-menu-item {
+      padding: 0 16px;
+      height: 56px;
+      line-height: 56px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .header-menu-item.active {
+      background-color: #1890ff;
+      color: white;
+    }
+    
+    /* Sidebar */
+    .sidebar-menu-item {
+      padding: 12px 16px 12px 24px;
+      cursor: pointer;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+    }
+    .sidebar-menu-item:hover {
+      color: white;
+    }
+    .sidebar-menu-item.active-group {
+      color: white;
+      background-color: #000c17;
+    }
+    .sidebar-sub-item {
+      padding: 10px 16px 10px 48px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .sidebar-sub-item:hover {
+      color: white;
+    }
+    .sidebar-sub-item.active {
+      background-color: #1890ff;
+      color: white;
+    }
+
+    /* Cards & Panels */
+    .panel-card {
+      background: white;
+      border-radius: 4px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+      border: 1px solid #f0f0f0;
+      display: flex;
+      flex-direction: column;
+    }
+    .panel-header {
+      padding: 12px 16px;
+      border-bottom: 1px solid #f0f0f0;
+      font-weight: 500;
+      font-size: 14px;
+      color: #333;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .panel-body {
+      padding: 16px;
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    /* Tables */
+    .custom-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .custom-table th {
+      background-color: #fafafa;
+      padding: 10px 8px;
+      text-align: left;
+      font-weight: 500;
+      color: #666;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .custom-table td {
+      padding: 10px 8px;
+      border-bottom: 1px solid #f0f0f0;
+      color: #333;
+    }
+
+    /* Tags & Badges */
+    .status-tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 2px;
+      font-size: 12px;
+      border: 1px solid transparent;
+    }
+    .status-tag.success { background: #f6ffed; border-color: #b7eb8f; color: #52c41a; }
+    .status-tag.error { background: #fff2f0; border-color: #ffccc7; color: #f5222d; }
+    .status-tag.warning { background: #fffbe6; border-color: #ffe58f; color: #faad14; }
+    .status-tag.default { background: #fafafa; border-color: #d9d9d9; color: #666; }
+
+    /* Form Elements */
+    .form-label {
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 4px;
+    }
+    .form-control {
+      width: 100%;
+      padding: 4px 11px;
+      font-size: 13px;
+      border: 1px solid #d9d9d9;
+      border-radius: 2px;
+      line-height: 1.5;
+    }
+    
+    /* Scrollbars */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #d9d9d9; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #bfbfbf; }
+  </style>
+</head>
+<body>
+<!-- BEGIN: MainHeader -->
+<header class="top-header">
+<div class="flex items-center gap-6">
+<div class="font-semibold text-lg tracking-wide flex items-center gap-2">
+<i class="fa-solid fa-cube text-blue-500"></i> UNIVIEW 固定资产管理系统
+      </div>
+<nav class="flex h-full">
+<div class="header-menu-item"><i class="fa-solid fa-desktop mr-1"></i> 资产管理</div>
+<div class="header-menu-item"><i class="fa-solid fa-cart-shopping mr-1"></i> 采购管理</div>
+<div class="header-menu-item"><i class="fa-solid fa-building mr-1"></i> 租赁管理</div>
+<div class="header-menu-item"><i class="fa-solid fa-wrench mr-1"></i> 运维管理</div>
+<div class="header-menu-item"><i class="fa-solid fa-clipboard-check mr-1"></i> 盘点管理</div>
+<div class="header-menu-item"><i class="fa-solid fa-chart-bar mr-1"></i> 报表中心</div>
+<div class="header-menu-item active"><i class="fa-solid fa-network-wired mr-1"></i> 系统运营中枢</div>
+<div class="header-menu-item"><i class="fa-solid fa-gear mr-1"></i> 设置中心</div>
+</nav>
+</div>
+<div class="flex items-center gap-4 text-sm">
+<div class="relative cursor-pointer">
+<i class="fa-regular fa-bell text-lg"></i>
+<span class="absolute -top-1 -right-2 bg-red-500 text-white text-[10px] px-1 rounded-full">12</span>
+</div>
+<i class="fa-regular fa-circle-question text-lg cursor-pointer"></i>
+<i class="fa-solid fa-grip text-lg cursor-pointer"></i>
+<div class="flex items-center gap-2 cursor-pointer">
+<div class="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-xs">管</div>
+<span>管理员</span>
+<i class="fa-solid fa-chevron-down text-xs"></i>
+</div>
+</div>
+</header>
+<!-- END: MainHeader -->
+<div class="main-layout">
+<!-- BEGIN: Sidebar -->
+<aside class="sidebar">
+<div class="sidebar-menu-item">
+<i class="fa-solid fa-tv w-5 text-center mr-2"></i> 系统监控 <i class="fa-solid fa-chevron-down ml-auto text-xs"></i>
+</div>
+<div class="sidebar-menu-item">
+<i class="fa-regular fa-user w-5 text-center mr-2"></i> 组织与权限 <i class="fa-solid fa-chevron-down ml-auto text-xs"></i>
+</div>
+<div class="sidebar-menu-item">
+<i class="fa-solid fa-database w-5 text-center mr-2"></i> 基础数据 <i class="fa-solid fa-chevron-down ml-auto text-xs"></i>
+</div>
+<div class="sidebar-menu-item">
+<i class="fa-solid fa-sitemap w-5 text-center mr-2"></i> 流程与规则 <i class="fa-solid fa-chevron-down ml-auto text-xs"></i>
+</div>
+<div class="sidebar-menu-item active-group">
+<i class="fa-solid fa-gear w-5 text-center mr-2"></i> 系统配置 <i class="fa-solid fa-chevron-up ml-auto text-xs"></i>
+</div>
+<div class="bg-[#000c17] pb-2">
+<div class="sidebar-sub-item">全局参数</div>
+<div class="sidebar-sub-item">业务参数</div>
+<div class="sidebar-sub-item">编码规则</div>
+<div class="sidebar-sub-item">集成配置</div>
+<div class="px-4 py-2 flex items-center text-sm text-white cursor-pointer mt-1">
+<i class="fa-regular fa-envelope w-5 text-center mr-2"></i> 消息与通知 <i class="fa-solid fa-chevron-up ml-auto text-xs"></i>
+</div>
+<div>
+<div class="sidebar-sub-item">通知模板</div>
+<div class="sidebar-sub-item">通知策略</div>
+<div class="sidebar-sub-item">通知渠道</div>
+<div class="sidebar-sub-item active">通知偏好</div>
+<div class="sidebar-sub-item">通知记录</div>
+</div>
+</div>
+<div class="sidebar-menu-item">
+<i class="fa-solid fa-shield-halved w-5 text-center mr-2"></i> 安全管理 <i class="fa-solid fa-chevron-down ml-auto text-xs"></i>
+</div>
+<div class="sidebar-menu-item">
+<i class="fa-solid fa-file-lines w-5 text-center mr-2"></i> 日志审计 <i class="fa-solid fa-chevron-down ml-auto text-xs"></i>
+</div>
+<div class="sidebar-menu-item">
+<i class="fa-solid fa-toolbox w-5 text-center mr-2"></i> 系统工具 <i class="fa-solid fa-chevron-down ml-auto text-xs"></i>
+</div>
+</aside>
+<!-- END: Sidebar -->
+<!-- BEGIN: Main Content -->
+<main class="content-area">
+<!-- Page Header -->
+<div class="flex justify-between items-center mb-4">
+<h1 class="text-xl font-bold text-gray-800">通知偏好配置台</h1>
+<div class="flex gap-2">
+<button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded text-sm flex items-center gap-1">
+<i class="fa-solid fa-plus"></i> 新建偏好规则
+          </button>
+<button class="bg-white border border-gray-300 px-4 py-1.5 rounded text-sm text-gray-700 hover:text-blue-600 hover:border-blue-600 flex items-center gap-1">
+<i class="fa-regular fa-floppy-disk"></i> 保存草稿
+          </button>
+<button class="bg-white border border-gray-300 px-4 py-1.5 rounded text-sm text-gray-700 hover:text-blue-600 hover:border-blue-600 flex items-center gap-1">
+<i class="fa-regular fa-circle-check"></i> 提交校验
+          </button>
+<button class="bg-white border border-gray-300 px-4 py-1.5 rounded text-sm text-gray-700 hover:text-blue-600 hover:border-blue-600 flex items-center gap-1">
+<i class="fa-regular fa-eye"></i> 偏好预览
+          </button>
+</div>
+</div>
+<!-- Status Bar -->
+<div class="bg-white p-3 rounded border border-gray-200 mb-4 flex gap-8 text-sm items-center">
+<div class="flex items-center gap-2">
+<span class="text-gray-500">配置状态：</span>
+<span class="status-tag success flex items-center gap-1"><i class="fa-solid fa-check"></i> 已载入</span>
+<span class="text-gray-500 text-xs ml-2">当前版本：v3.2（草稿）</span>
+</div>
+<div class="w-px h-4 bg-gray-300"></div>
+<div class="flex items-center gap-2">
+<span class="text-gray-500">校验状态：</span>
+<span class="status-tag success flex items-center gap-1"><i class="fa-solid fa-check"></i> 通过</span>
+<span class="text-gray-500 text-xs ml-2">18 项全部通过</span>
+</div>
+<div class="w-px h-4 bg-gray-300"></div>
+<div class="flex items-center gap-2">
+<span class="text-gray-500">预览对象：</span>
+<span class="font-medium">用户</span>
+<span class="font-medium">张三（资产管理员）</span>
+<a class="text-blue-500 text-xs ml-2 hover:underline" href="#">切换对象</a>
+</div>
+</div>
+<!-- Main Workspace Top Row (y=174 to 700) -->
+<div class="flex gap-4 mb-4" style="height: 526px;">
+<!-- Left: 偏好规则树 -->
+<div class="panel-card w-[260px] flex-shrink-0">
+<div class="panel-header">偏好规则树</div>
+<div class="panel-body p-0 flex flex-col">
+<!-- Tabs -->
+<div class="flex border-b border-gray-200 text-sm text-center">
+<div class="flex-1 py-2 text-blue-600 border-b-2 border-blue-600 font-medium">角色</div>
+<div class="flex-1 py-2 text-gray-600 hover:text-blue-600 cursor-pointer">用户</div>
+<div class="flex-1 py-2 text-gray-600 hover:text-blue-600 cursor-pointer">组织</div>
+<div class="flex-1 py-2 text-gray-600 hover:text-blue-600 cursor-pointer">默认策略</div>
+</div>
+<!-- Search -->
+<div class="p-3 border-b border-gray-200">
+<div class="relative">
+<i class="fa-solid fa-magnifying-glass absolute left-3 top-2 text-gray-400 text-xs"></i>
+<input class="form-control pl-8 text-xs h-8" placeholder="搜索偏好规则" type="text"/>
+</div>
+</div>
+<!-- Tree List -->
+<div class="flex-1 overflow-y-auto p-3 space-y-2">
+<!-- Card 1 (Active) -->
+<div class="relative pl-4">
+<i class="fa-regular fa-circle-dot absolute left-0 top-3 text-gray-300 text-[10px]"></i>
+<div class="border border-blue-500 bg-blue-50 rounded p-3 text-sm relative">
+<div class="font-medium text-blue-700 mb-1">资产管理员偏好</div>
+<div class="text-xs text-gray-500 mb-1">继承：默认策略</div>
+<div class="flex items-center gap-2 text-xs">
+<span class="text-gray-500">状态：</span><span class="status-tag success text-[10px] px-1 py-0">启用</span>
+</div>
+<span class="absolute top-2 right-2 text-blue-500 text-xs">当前编辑</span>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="relative pl-4">
+<i class="fa-regular fa-circle-dot absolute left-0 top-3 text-gray-300 text-[10px]"></i>
+<div class="border border-gray-200 rounded p-3 text-sm hover:border-blue-300 cursor-pointer relative group">
+<div class="font-medium text-gray-800 mb-1">财务会计偏好</div>
+<div class="text-xs text-gray-500 mb-1">继承：默认策略</div>
+<div class="flex items-center gap-2 text-xs">
+<span class="text-gray-500">状态：</span><span class="status-tag success text-[10px] px-1 py-0">启用</span>
+</div>
+<i class="fa-solid fa-chevron-right absolute right-3 top-1/2 -translate-y-1/2 text-gray-300 group-hover:text-blue-400 text-xs"></i>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="relative pl-4">
+<i class="fa-regular fa-circle-dot absolute left-0 top-3 text-gray-300 text-[10px]"></i>
+<div class="border border-gray-200 rounded p-3 text-sm hover:border-blue-300 cursor-pointer relative group">
+<div class="font-medium text-gray-800 mb-1">IT 设备管理员偏好</div>
+<div class="text-xs text-gray-500 mb-1">继承：资产管理员偏好</div>
+<div class="flex items-center gap-2 text-xs">
+<span class="text-gray-500">状态：</span><span class="status-tag success text-[10px] px-1 py-0">启用</span>
+</div>
+<i class="fa-solid fa-chevron-right absolute right-3 top-1/2 -translate-y-1/2 text-gray-300 group-hover:text-blue-400 text-xs"></i>
+</div>
+</div>
+<!-- Card 4 -->
+<div class="relative pl-4">
+<i class="fa-regular fa-circle-dot absolute left-0 top-3 text-gray-300 text-[10px]"></i>
+<div class="border border-gray-200 rounded p-3 text-sm hover:border-blue-300 cursor-pointer relative group">
+<div class="font-medium text-gray-800 mb-1">风险告警强制触达</div>
+<div class="text-xs text-gray-500 mb-1">继承：默认策略</div>
+<div class="flex items-center gap-2 text-xs">
+<span class="text-gray-500">状态：</span><span class="status-tag success text-[10px] px-1 py-0">启用</span>
+</div>
+<span class="absolute top-2 right-2 text-red-500 bg-red-50 px-1 border border-red-100 rounded text-[10px]">强制策略</span>
+</div>
+</div>
+<!-- Card 5 -->
+<div class="relative pl-4">
+<i class="fa-regular fa-circle-dot absolute left-0 top-3 text-gray-300 text-[10px]"></i>
+<div class="border border-gray-200 rounded p-3 text-sm hover:border-blue-300 cursor-pointer relative group">
+<div class="font-medium text-gray-800 mb-1">报表摘要通知</div>
+<div class="text-xs text-gray-500 mb-1">继承：默认策略</div>
+<div class="flex items-center gap-2 text-xs">
+<span class="text-gray-500">状态：</span><span class="status-tag success text-[10px] px-1 py-0">启用</span>
+</div>
+<i class="fa-solid fa-chevron-right absolute right-3 top-1/2 -translate-y-1/2 text-gray-300 group-hover:text-blue-400 text-xs"></i>
+</div>
+</div>
+</div>
+<!-- Tree Footer -->
+<div class="p-2 border-t border-gray-200 text-xs text-gray-500 flex justify-between items-center bg-gray-50">
+<span>共 5 条</span>
+<span class="text-blue-500 cursor-pointer">展开全部 <i class="fa-solid fa-chevron-down ml-1 text-[10px]"></i></span>
+</div>
+<div class="p-2 flex gap-4 text-[10px] text-gray-500 bg-gray-50 border-t border-gray-200">
+<span><i class="fa-solid fa-circle-check text-green-500 mr-1"></i>可关闭</span>
+<span><i class="fa-solid fa-lock text-red-500 mr-1"></i>不可关闭</span>
+<span><span class="inline-block w-2 border-b border-gray-400 mr-1 mb-1"></span>不适用</span>
+</div>
+</div>
+</div>
+<!-- Center: 通知偏好明细 -->
+<div class="panel-card flex-1 min-w-0">
+<div class="panel-header">
+<span>通知偏好明细 <span class="text-gray-500 text-xs font-normal ml-2">（资产管理员偏好）</span></span>
+</div>
+<div class="panel-body p-0 flex flex-col">
+<div class="flex-1 overflow-auto">
+<table class="custom-table whitespace-nowrap">
+<thead>
+<tr>
+<th class="pl-4">通知场景</th>
+<th>适用对象</th>
+<th>强制规则</th>
+<th>渠道策略</th>
+<th>摘要/静默</th>
+<th>覆盖来源</th>
+<th>状态</th>
+</tr>
+</thead>
+<tbody>
+<!-- Row 1 -->
+<tr>
+<td class="pl-4">入账提醒</td>
+<td>资产管理员</td>
+<td>普通可关闭</td>
+<td>
+<div class="flex gap-1 items-center">
+<div class="w-4 h-4 bg-blue-500 rounded flex items-center justify-center text-white text-[10px]"><i class="fa-solid fa-check"></i></div>
+<div class="w-4 h-4 bg-blue-500 rounded flex items-center justify-center text-white text-[10px]"><i class="fa-solid fa-check"></i></div>
+<div class="w-4 h-4 border border-gray-300 rounded flex items-center justify-center text-gray-300 text-[10px]"><i class="fa-regular fa-envelope"></i></div>
+</div>
+</td>
+<td>即时</td>
+<td>继承：默认策略</td>
+<td><span class="status-tag success">正常</span></td>
+</tr>
+<!-- Row 2 -->
+<tr>
+<td class="pl-4">盘点异常</td>
+<td>资产管理员</td>
+<td><span class="text-red-500 border border-red-200 bg-red-50 px-1 rounded text-[10px] flex items-center inline-flex gap-1"><i class="fa-solid fa-lock text-[10px]"></i> 强制不可关闭</span></td>
+<td>
+<div class="flex gap-1 items-center">
+<div class="w-4 h-4 bg-blue-500 rounded flex items-center justify-center text-white text-[10px]"><i class="fa-solid fa-check"></i></div>
+<div class="w-4 h-4 bg-blue-500 rounded flex items-center justify-center text-white text-[10px]"><i class="fa-solid fa-check"></i></div>
+<div class="w-4 h-4 border border-gray-300 rounded bg-gray-50"></div>
+</div>
+</td>
+<td>即时</td>
+<td>继承：默认策略</td>
+<td><span class="status-tag success">正常</span></td>
+</tr>
+<!-- Row 3 -->
+<tr>
+<td class="pl-4">CIP 转固</td>
+<td>资产管理员</td>
+<td><span class="text-red-500 border border-red-200 bg-red-50 px-1 rounded text-[10px] flex items-center inline-flex gap-1"><i class="fa-solid fa-lock text-[10px]"></i> 强制不可关闭</span></td>
+<td>
+<div class="flex gap-1 items-center">
+<div class="w-4 h-4 bg-blue-500 rounded flex items-center justify-center text-white text-[10px]"><i class="fa-solid fa-check"></i></div>
+<div class="w-4 h-4 bg-blue-500 rounded flex items-center justify-center text-white text-[10px]"><i class="fa-solid fa-check"></i></div>
+<div class="w-4 h-4 bg-blue-500 rounded flex items-center justify-center text-white text-[10px]"><i class="fa-solid fa-check"></i></div>
+</div>
+</td>
+<td>即时</td>
+<td><div class="leading-tight">继承：<br/><span class="text-xs text-gray-500">风险告警强制触达</span></div></td>
+<td><span class="status-tag success">正常</span></td>
+</tr>
+<!-- Row 4 -->
+<tr>
+<td class="pl-4">风险预警</td>
+<td>资产管理员</td>
+<td><span class="text-red-500 border border-red-200 bg-red-50 px-1 rounded text-[10px] flex items-center inline-flex gap-1"><i class="fa-solid fa-lock text-[10px]"></i> 强制不可关闭</span></td>
+<td>
+<div class="flex gap-1 items-center">
+<div class="w-4 h-4 bg-blue-500 rounded flex items-center justify-center text-white text-[10px]"><i class="fa-solid fa-check"></i></div>
+<div class="w-4 h-4 bg-blue-500 rounded flex items-center justify-center text-white text-[10px]"><i class="fa-solid fa-check"></i></div>
+<div class="w-4 h-4 bg-blue-500 rounded flex items-center justify-center text-white text-[10px]"><i class="fa-solid fa-check"></i></div>
+</div>
+</td>
+<td>即时</td>
+<td><div class="leading-tight">继承：<br/><span class="text-xs text-gray-500">风险告警强制触达</span></div></td>
+<td><span class="status-tag success">正常</span></td>
+</tr>
+<!-- Row 5 -->
+<tr>
+<td class="pl-4">报表摘要</td>
+<td>资产管理员</td>
+<td>普通可关闭</td>
+<td>
+<div class="flex gap-1 items-center">
+<div class="w-4 h-4 bg-blue-500 rounded flex items-center justify-center text-white text-[10px]"><i class="fa-solid fa-check"></i></div>
+<div class="w-4 h-4 bg-blue-500 rounded flex items-center justify-center text-white text-[10px]"><i class="fa-solid fa-check"></i></div>
+<div class="w-4 h-4 border border-gray-300 rounded bg-gray-50"></div>
+</div>
+</td>
+<td><div class="leading-tight">每日 08:30<br/>汇总</div></td>
+<td><span class="text-orange-500 border border-orange-200 bg-orange-50 px-2 py-0.5 rounded text-xs cursor-pointer">覆盖冲突（2）</span></td>
+<td><span class="status-tag warning text-orange-500 border-orange-200 bg-orange-50">冲突</span></td>
+</tr>
+<!-- Row 6 -->
+<tr>
+<td class="pl-4">维保提醒</td>
+<td>资产管理员</td>
+<td>普通可关闭</td>
+<td>
+<div class="flex gap-1 items-center">
+<div class="w-4 h-4 bg-blue-500 rounded flex items-center justify-center text-white text-[10px]"><i class="fa-solid fa-check"></i></div>
+<div class="w-4 h-4 bg-blue-500 rounded flex items-center justify-center text-white text-[10px]"><i class="fa-solid fa-check"></i></div>
+<div class="w-4 h-4 border border-gray-300 rounded bg-gray-50"></div>
+</div>
+</td>
+<td><div class="leading-tight">工作日<br/>09:00</div></td>
+<td><div class="leading-tight">继承：<br/><span class="text-xs text-gray-500">IT 设备管理员偏好</span></div></td>
+<td><span class="status-tag success">正常</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination -->
+<div class="p-3 border-t border-gray-200 flex justify-between items-center text-sm text-gray-500">
+<div>共 6 条</div>
+<div class="flex items-center gap-3">
+<select class="border border-gray-300 rounded px-2 py-1 text-xs outline-none">
+<option>10 条/页</option>
+</select>
+<div class="flex gap-1">
+<button class="w-7 h-7 border border-gray-300 rounded flex items-center justify-center text-gray-400 hover:border-blue-500 hover:text-blue-500"><i class="fa-solid fa-angle-left"></i></button>
+<button class="w-7 h-7 border border-blue-500 bg-blue-50 rounded flex items-center justify-center text-blue-600 font-medium">1</button>
+<button class="w-7 h-7 border border-gray-300 rounded flex items-center justify-center text-gray-400 hover:border-blue-500 hover:text-blue-500"><i class="fa-solid fa-angle-right"></i></button>
+</div>
+<div class="flex items-center gap-2">
+<span>前往</span>
+<input class="w-10 border border-gray-300 rounded text-center py-1 text-xs outline-none" type="text" value="1"/>
+<span>页</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right: 偏好属性编辑 -->
+<div class="panel-card w-[420px] flex-shrink-0">
+<div class="panel-header">偏好属性编辑</div>
+<div class="panel-body p-4 overflow-y-auto">
+<div class="grid grid-cols-2 gap-4 mb-4">
+<div>
+<label class="form-label block"><span class="text-red-500 mr-1">*</span>偏好名称</label>
+<div class="relative">
+<input class="form-control pr-10" type="text" value="资产管理员偏好"/>
+<span class="absolute right-2 top-1.5 text-gray-400 text-xs">6/50</span>
+</div>
+</div>
+<div>
+<label class="form-label block"><span class="text-red-500 mr-1">*</span>偏好编码</label>
+<input class="form-control bg-gray-50 cursor-not-allowed text-xs" readonly="" type="text" value="ROLE_ASSET_ADMIN_PREF"/>
+</div>
+<div>
+<label class="form-label block"><span class="text-red-500 mr-1">*</span>适用对象</label>
+<select class="form-control">
+<option>资产管理员</option>
+</select>
+</div>
+<div>
+<label class="form-label block">继承来源</label>
+<select class="form-control">
+<option>默认策略</option>
+</select>
+</div>
+</div>
+<div class="mb-4">
+<label class="form-label block mb-2">强制规则</label>
+<div class="flex gap-4 text-sm text-gray-700">
+<label class="flex items-center gap-1 cursor-pointer"><input checked="" class="text-blue-600 focus:ring-blue-500" name="force" type="radio"/> 普通 (可关闭)</label>
+<label class="flex items-center gap-1 cursor-pointer"><input class="text-blue-600 focus:ring-blue-500" name="force" type="radio"/> 强制 (不可关闭)</label>
+</div>
+</div>
+<div class="mb-4 border-b border-gray-100 pb-4">
+<label class="form-label block mb-2">渠道策略 <span class="text-gray-400 text-xs ml-2 font-normal">至少选择一种渠道</span></label>
+<div class="flex gap-4 text-sm text-gray-700">
+<label class="flex items-center gap-1 cursor-pointer"><input checked="" class="rounded text-blue-600 focus:ring-blue-500" type="checkbox"/> 站内消息</label>
+<label class="flex items-center gap-1 cursor-pointer"><input checked="" class="rounded text-blue-600 focus:ring-blue-500" type="checkbox"/> 钉钉 H5 工作通知</label>
+<label class="flex items-center gap-1 cursor-pointer"><input class="rounded text-blue-600 focus:ring-blue-500" type="checkbox"/> 邮件通知</label>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-4 mb-4">
+<div>
+<label class="form-label block">摘要频率</label>
+<select class="form-control">
+<option>即时</option>
+</select>
+</div>
+<div>
+<label class="form-label block">静默时段</label>
+<div class="relative">
+<input class="form-control pr-6" type="text" value="22:00 - 08:00"/>
+<i class="fa-regular fa-clock absolute right-2 top-2 text-gray-400 text-xs cursor-pointer"></i>
+<i class="fa-solid fa-xmark absolute right-7 top-2 text-gray-300 text-xs cursor-pointer hover:text-gray-500"></i>
+</div>
+</div>
+<div>
+<label class="form-label block">负责人</label>
+<div class="relative">
+<input class="form-control pr-6" type="text" value="张三 (资产管理员)"/>
+<i class="fa-regular fa-user absolute right-2 top-2 text-gray-400 text-xs"></i>
+</div>
+</div>
+<div>
+<label class="form-label block">启用</label>
+<div class="w-9 h-5 bg-blue-500 rounded-full relative cursor-pointer mt-1">
+<div class="w-4 h-4 bg-white rounded-full absolute right-0.5 top-0.5 shadow-sm"></div>
+</div>
+</div>
+</div>
+<div class="mt-2">
+<label class="form-label block font-medium text-gray-800 mb-2">继承预览</label>
+<div class="bg-gray-50 rounded p-4 border border-gray-200 flex items-center justify-between text-xs">
+<!-- Node 1 -->
+<div class="bg-white border border-gray-300 rounded p-2 text-center w-24 shadow-sm">
+<div class="font-medium text-gray-700">默认策略</div>
+<div class="text-gray-500 my-1 bg-gray-100 rounded px-1">v3.0</div>
+<div class="text-gray-400 scale-90 origin-center">即时 + 2 渠道</div>
+</div>
+<i class="fa-solid fa-arrow-right text-gray-300"></i>
+<!-- Node 2 (Center) -->
+<div class="bg-red-50 border border-red-200 rounded p-2 text-center w-28 shadow-sm relative">
+<div class="text-[10px] text-red-500 absolute -top-2.5 left-1/2 -translate-x-1/2 bg-white px-1 border border-red-100 rounded">角色策略</div>
+<div class="font-medium text-red-600 mt-1">资产管理员偏好</div>
+<div class="text-red-400 scale-90 origin-center mt-1">覆盖 4 项</div>
+</div>
+<i class="fa-solid fa-arrow-right text-gray-800"></i>
+<!-- Node 3 -->
+<div class="bg-white border border-blue-200 rounded p-2 text-center w-28 shadow-sm relative">
+<div class="text-[10px] text-blue-500 absolute -top-2.5 left-1/2 -translate-x-1/2 bg-white px-1 border border-blue-100 rounded">用户覆盖</div>
+<div class="font-medium text-gray-700 mt-1 truncate px-1" title="张三 (资产管理员)">张三 (资产管理员)</div>
+<div class="text-blue-400 scale-90 origin-center mt-1">覆盖 2 项</div>
+</div>
+<i class="fa-solid fa-arrow-right text-gray-300"></i>
+<!-- Final Node -->
+<div class="bg-white border border-gray-300 rounded p-2 text-center w-20 shadow-sm">
+<div class="font-medium text-gray-800 border-b border-gray-100 pb-1 mb-1">最终结果</div>
+<div class="text-gray-600 text-[10px]">6 场景生效</div>
+<div class="text-gray-600 text-[10px]">2 冲突待处理</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Workspace (y=710 to 956) -->
+<div class="flex gap-4 flex-1 min-h-0">
+<!-- Bottom Left: 摘要与静默策略 -->
+<div class="panel-card w-[35%] flex-shrink-0">
+<div class="panel-header">
+<span class="flex items-center gap-1">摘要与静默策略 <i class="fa-regular fa-circle-question text-gray-400 font-normal"></i></span>
+</div>
+<div class="panel-body p-0 flex flex-col relative pb-8">
+<div class="overflow-y-auto">
+<table class="custom-table whitespace-nowrap">
+<thead>
+<tr>
+<th class="pl-4">策略类型</th>
+<th>摘要频率</th>
+<th>静默时段</th>
+<th>生效范围</th>
+<th>状态</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="pl-4">即时通知</td>
+<td>即时推送</td>
+<td>无</td>
+<td>全部场景</td>
+<td><span class="status-tag success">启用</span></td>
+</tr>
+<tr>
+<td class="pl-4">日报摘要</td>
+<td>每日 08:30</td>
+<td>22:00-08:00</td>
+<td>报表摘要</td>
+<td><span class="status-tag success">启用</span></td>
+</tr>
+<tr>
+<td class="pl-4">周报摘要</td>
+<td>每周一 09:00</td>
+<td>22:00-08:00</td>
+<td>报表摘要</td>
+<td><span class="status-tag default">停用</span></td>
+</tr>
+<tr>
+<td class="pl-4">维保提醒</td>
+<td>工作日 09:00</td>
+<td>18:00-08:00</td>
+<td>维保提醒</td>
+<td><span class="status-tag success">启用</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="absolute bottom-3 left-4 text-xs text-gray-500 flex items-center gap-1">
+              静默按系统时间 (UTC+8) 生效 <i class="fa-regular fa-circle-question text-gray-400"></i>
+</div>
+</div>
+</div>
+<!-- Bottom Center: 冲突处理队列 -->
+<div class="panel-card flex-1 min-w-0">
+<div class="panel-header">
+<span>冲突处理队列</span>
+<span class="text-blue-500 font-normal text-xs cursor-pointer flex items-center gap-1 hover:underline"><i class="fa-solid fa-rotate-right"></i> 刷新</span>
+</div>
+<div class="panel-body p-0 flex flex-col">
+<div class="flex-1 overflow-y-auto">
+<table class="custom-table whitespace-nowrap">
+<thead>
+<tr>
+<th class="pl-4">冲突场景</th>
+<th>冲突类型</th>
+<th>覆盖来源</th>
+<th>处理建议</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="pl-4">报表摘要</td>
+<td>渠道冲突</td>
+<td>用户覆盖</td>
+<td>合并渠道</td>
+</tr>
+<tr>
+<td class="pl-4">报表摘要</td>
+<td>摘要频率冲突</td>
+<td>用户覆盖</td>
+<td>以用户为准</td>
+</tr>
+<tr>
+<td class="pl-4">维保提醒</td>
+<td>静默时段冲突</td>
+<td>角色策略</td>
+<td>以角色为准</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-3 border-t border-gray-100 text-xs text-gray-500">共 3 条</div>
+</div>
+</div>
+<!-- Bottom Right: 发布校验清单 -->
+<div class="panel-card w-[260px] flex-shrink-0">
+<div class="panel-header border-b-0 pb-2">
+            发布校验清单 <span class="text-gray-500 text-xs font-normal ml-1">（18 项）</span>
+</div>
+<div class="panel-body pt-0 px-4 pb-4 overflow-y-auto flex flex-col justify-between">
+<div class="space-y-3 text-sm">
+<div class="flex justify-between items-center">
+<div class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-green-500"></i> 继承关系完整性</div>
+<span class="text-green-500 text-xs">通过</span>
+</div>
+<div class="flex justify-between items-center">
+<div class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-green-500"></i> 渠道可用性校验</div>
+<span class="text-green-500 text-xs">通过</span>
+</div>
+<div class="flex justify-between items-center">
+<div class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-green-500"></i> 强制规则合规性</div>
+<span class="text-green-500 text-xs">通过</span>
+</div>
+<div class="flex justify-between items-center">
+<div class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-green-500"></i> 场景覆盖完整性</div>
+<span class="text-green-500 text-xs">通过</span>
+</div>
+<div class="flex justify-between items-center">
+<div class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-green-500"></i> 静默时段合法性</div>
+<span class="text-green-500 text-xs">通过</span>
+</div>
+<div class="flex justify-between items-center bg-orange-50 -mx-4 px-4 py-1 border-l-2 border-orange-500">
+<div class="flex items-center gap-2 text-orange-600"><i class="fa-solid fa-triangle-exclamation"></i> 用户覆盖 2 项需复核</div>
+<span class="text-orange-500 text-xs">需复核</span>
+</div>
+</div>
+<div class="text-center mt-4 pt-2 border-t border-gray-100">
+<a class="text-blue-500 text-xs hover:underline" href="#">查看全部校验详情</a>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- END: Main Content -->
+</div>
+</body></html>

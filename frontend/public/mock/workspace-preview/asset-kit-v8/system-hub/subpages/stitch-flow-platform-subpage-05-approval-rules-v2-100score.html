@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=1823, height=863, initial-scale=1.0" name="viewport"/>
+<title>UNIVIEW System Settings</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<style data-purpose="fonts">
+    body {
+      font-family: 'PingFang SC', 'Microsoft YaHei', 'Inter', sans-serif;
+    }
+  </style>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'navy-dark': '#001529',
+            'cyan-bright': '#00e5ff',
+            'sidebar-bg': '#f3f7fb',
+            'sidebar-active-bg': '#e6f0fa',
+            'sidebar-text-active': '#1677ff',
+            'sidebar-text-muted': '#666666',
+            'main-bg': '#f0f2f5',
+            'text-primary': '#333333',
+            'text-secondary': '#666666',
+            'text-muted': '#999999',
+            'btn-primary-bg': '#1677ff',
+            'btn-border': '#d9d9d9',
+            'success-bg': '#f6ffed',
+            'success-border': '#b7eb8f',
+            'success-text': '#52c41a'
+          },
+          boxShadow: {
+            'card': '0 2px 8px rgba(0,0,0,0.05)',
+          }
+        }
+      }
+    }
+  </script>
+<style data-purpose="custom-styles">
+    /* Global reset for exact dimensions */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      width: 1823px;
+      height: 863px;
+      overflow: hidden;
+      background-color: #f0f2f5;
+    }
+
+    /* Topbar glowing effects */
+    .topbar-shell {
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 28% -18%, rgba(33, 118, 196, 0.22) 0, rgba(33, 118, 196, 0) 36%),
+        radial-gradient(circle at 82% 16%, rgba(0, 229, 255, 0.14) 0, rgba(0, 229, 255, 0) 30%),
+        linear-gradient(180deg, #062344 0%, #031a34 58%, #02162c 100%) !important;
+      border-bottom-color: rgba(0, 229, 255, 0.86) !important;
+      box-shadow:
+        inset 0 -1px 0 rgba(255, 255, 255, 0.08),
+        inset 0 -18px 36px rgba(0, 0, 0, 0.16);
+    }
+
+    .topbar-shell::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,0.035) 0 1px, transparent 1px 80px),
+        linear-gradient(180deg, rgba(255,255,255,0.025) 0 1px, transparent 1px 70px);
+      opacity: 0.14;
+      pointer-events: none;
+    }
+
+    .topbar-shell::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -2px;
+      height: 4px;
+      background: linear-gradient(90deg, rgba(0,229,255,0.92), rgba(0,162,255,0.72) 58%, rgba(0,229,255,0.58));
+      box-shadow: 0 0 14px rgba(0, 229, 255, 0.64);
+      pointer-events: none;
+    }
+
+    .brand-lockup h1 {
+      text-shadow:
+        0 0 1px rgba(255, 255, 255, 0.85),
+        0 0 18px rgba(126, 192, 255, 0.28);
+    }
+
+    .brand-lockup span {
+      color: rgba(205, 219, 235, 0.9);
+      text-shadow: 0 0 16px rgba(96, 166, 255, 0.14);
+    }
+
+    .top-tab-active {
+      box-shadow: 0 0 10px rgba(0, 229, 255, 0.3) inset;
+      position: relative;
+    }
+    .top-tab-active::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 10%;
+      width: 80%;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, #00e5ff, transparent);
+      box-shadow: 0 0 8px #00e5ff;
+    }
+
+    /* Scheme 05: line-only L corner aligned to the left navigation bounds. */
+    .nav-line-corner {
+      position: absolute;
+      left: 0;
+      top: 154px;
+      width: 100%;
+      height: 94px;
+      z-index: 32;
+      pointer-events: none;
+    }
+
+    .nav-line-corner::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, rgba(0, 229, 255, 0.34), rgba(0, 229, 255, 0.76) 84%, rgba(0, 229, 255, 0.46));
+      box-shadow: 0 0 10px rgba(0, 229, 255, 0.42);
+    }
+
+    .nav-line-corner::after {
+      content: '';
+      position: absolute;
+      left: 536px;
+      top: 0;
+      width: 2px;
+      height: 94px;
+      background: linear-gradient(180deg, rgba(0, 229, 255, 0.72), rgba(190, 205, 222, 0.5));
+      box-shadow:
+        0 0 9px rgba(0, 229, 255, 0.38),
+        -5px 0 10px rgba(0, 24, 48, 0.08);
+    }
+
+    .nav-line-corner-accent {
+      position: absolute;
+      left: 520px;
+      top: 0;
+      width: 16px;
+      height: 18px;
+      border-top: 1px solid rgba(255, 255, 255, 0.3);
+      border-right: 1px solid rgba(255, 255, 255, 0.22);
+    }
+
+    /* Sidebar Gradient */
+    .sidebar-bg {
+      background: linear-gradient(180deg, #f8fbfd 0%, #ffffff 100%);
+    }
+  </style>
+</head>
+<body class="relative">
+<!-- BEGIN: Topbar -->
+<header class="topbar-shell absolute top-0 left-0 w-full h-[155px] bg-navy-dark border-b-2 border-cyan-bright z-20 flex items-center">
+<!-- Brand -->
+<div class="brand-lockup absolute left-[46px] top-[55px] flex items-center">
+<h1 class="text-white text-[48px] font-bold leading-none tracking-wide">UNIVIEW</h1>
+<div class="h-[41px] w-px bg-gray-600 mx-[24px] mt-1"></div>
+<span class="text-gray-300 text-[30px] mt-1">系统设置中心</span>
+</div>
+<!-- Navigation Tabs -->
+<nav class="absolute left-[630px] top-[42px] flex items-center h-[70px]">
+<!-- Active Tab -->
+<div class="h-full w-[174px] flex items-center justify-center rounded-lg border border-cyan-bright/30 top-tab-active cursor-pointer">
+<span class="text-white text-[30px] font-medium">流程平台</span>
+</div>
+<!-- Other Tabs -->
+<div class="ml-[64px] flex gap-[56px] text-gray-400 text-[28px]">
+<a class="hover:text-gray-200" href="#">组织权限</a>
+<a class="hover:text-gray-200" href="#">基础资料</a>
+<a class="hover:text-gray-200" href="#">集成配置</a>
+<a class="hover:text-gray-200" href="#">消息与通知</a>
+<a class="hover:text-gray-200" href="#">系统参数</a>
+</div>
+</nav>
+</header>
+<!-- END: Topbar -->
+<!-- BEGIN: Line-only navigation boundary -->
+<div class="nav-line-corner" aria-hidden="true">
+<span class="nav-line-corner-accent"></span>
+</div>
+<!-- END: Line-only navigation boundary -->
+<!-- BEGIN: Left Sidebar -->
+<aside class="absolute left-0 top-[148px] w-[532px] h-[715px] sidebar-bg border-r border-gray-200 z-10 flex flex-col pt-[68px] px-[46px]">
+<!-- Sidebar Header -->
+<div>
+<h2 class="text-text-primary text-[34px] font-bold">流程平台</h2>
+<p class="text-text-muted text-[24px] mt-[26px]">7 个配置项</p>
+</div>
+<!-- Divider -->
+<div class="w-[440px] h-px bg-gray-200 mt-[36px] mb-[36px]"></div>
+<!-- Menu List -->
+<nav class="flex flex-col gap-4">
+<!-- Active Item -->
+<a class="flex items-center justify-between px-4 py-4 -mx-4 rounded-lg hover:bg-sidebar-active-bg transition-colors" href="#">
+<div class="flex items-center gap-4 text-sidebar-text-active">
+<!-- Document Icon Placeholder -->
+<svg class="w-7 h-7" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span class="text-[28px]">流程平台</span>
+</div>
+<span class="bg-blue-100 text-blue-600 text-[20px] font-medium px-4 py-1 rounded-full">7</span>
+</a>
+<!-- Inactive Items -->
+<a class="flex items-center gap-4 px-4 py-4 -mx-4 text-text-secondary hover:bg-gray-100 rounded-lg transition-colors" href="#">
+<svg class="w-7 h-7" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span class="text-[28px]">流程定义</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-4 -mx-4 text-text-secondary hover:bg-gray-100 rounded-lg transition-colors" href="#">
+<!-- Settings/Sliders Icon -->
+<svg class="w-7 h-7" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span class="text-[28px]">流程设计器</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-4 -mx-4 text-text-secondary hover:bg-gray-100 rounded-lg transition-colors" href="#">
+<!-- Clipboard Icon -->
+<svg class="w-7 h-7" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span class="text-[28px]">表单配置</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-4 -mx-4 text-text-secondary hover:bg-gray-100 rounded-lg transition-colors" href="#">
+<!-- Box/Storage Icon -->
+<svg class="w-7 h-7" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span class="text-[28px]">表单存储</span>
+</a>
+</nav>
+</aside>
+<!-- END: Left Sidebar -->
+<!-- BEGIN: Main Workspace -->
+<main class="absolute left-[532px] top-[148px] w-[1291px] h-[715px] bg-main-bg p-[60px] flex flex-col gap-6 overflow-hidden">
+<!-- Hero Card -->
+<div class="bg-white rounded-[12px] shadow-card w-full h-[377px] p-[46px] flex flex-col">
+<!-- Breadcrumb -->
+<div class="text-text-muted text-[25px]">
+        系统运营中枢 / 流程平台 / <span class="text-text-primary">审批规则</span>
+</div>
+<!-- Title -->
+<h2 class="text-text-primary text-[42px] font-bold mt-[40px]">审批规则配置台</h2>
+<!-- Subtitle -->
+<p class="text-text-secondary text-[27px] mt-[30px]">
+        配置重要处理人跳过、离职交接承接、代理审批和节点权限规则，并支持命中模拟、保存草稿和发布校验。
+      </p>
+<!-- Action Buttons -->
+<div class="flex items-center gap-4 mt-[35px]">
+<!-- Primary Button -->
+<button class="bg-btn-primary-bg text-white h-[74px] w-[220px] rounded-lg text-[26px] font-medium flex items-center justify-center gap-2 hover:bg-blue-600 transition-colors">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 4v16m8-8H4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          新建规则
+        </button>
+<!-- Secondary Buttons -->
+<button class="bg-white border border-btn-border text-text-primary h-[74px] px-[32px] rounded-lg text-[26px] flex items-center justify-center gap-2 hover:bg-gray-50 transition-colors">
+<svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          保存草稿
+        </button>
+<button class="bg-white border border-btn-border text-text-primary h-[74px] px-[32px] rounded-lg text-[26px] flex items-center justify-center gap-2 hover:bg-gray-50 transition-colors">
+<svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          模拟命中
+        </button>
+<button class="bg-white border border-btn-border text-text-primary h-[74px] px-[32px] rounded-lg text-[26px] flex items-center justify-center gap-2 hover:bg-gray-50 transition-colors">
+<svg class="w-6 h-6 text-gray-700" fill="currentColor" viewbox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path clip-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" fill-rule="evenodd"></path></svg>
+          提交校验
+        </button>
+</div>
+</div>
+<!-- Success Banner -->
+<div class="w-full h-[94px] bg-success-bg border border-success-border rounded-[8px] flex items-center px-[40px] mt-[10px]">
+<div class="w-8 h-8 bg-success-text rounded-full flex items-center justify-center mr-4">
+<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"></path></svg>
+</div>
+<span class="text-text-primary text-[27px]">规则命中模拟已完成 · CIP 转固流程 / 财务审核 · 已生成审计链路</span>
+</div>
+<!-- Bottom Cards Grid (Partial visibility) -->
+<div class="flex gap-[30px] mt-[10px] flex-1">
+<!-- Card 1 -->
+<div class="bg-white rounded-[12px] shadow-card flex-1 p-[40px]">
+<h3 class="text-[28px] font-bold text-text-primary">规则集</h3>
+</div>
+<!-- Card 2 -->
+<div class="bg-white rounded-[12px] shadow-card flex-1 p-[40px] relative overflow-hidden">
+<h3 class="text-[24px] text-text-secondary absolute top-[40px] right-[40px]">规则总数</h3>
+<!-- decorative circles -->
+<div class="absolute -bottom-10 -left-10 w-32 h-32 bg-blue-50 rounded-full"></div>
+</div>
+<!-- Card 3 -->
+<div class="bg-white rounded-[12px] shadow-card flex-1 p-[40px] relative overflow-hidden">
+<h3 class="text-[24px] text-text-secondary absolute top-[40px] right-[40px]">启用规则</h3>
+<!-- decorative circles -->
+<div class="absolute -bottom-10 -left-10 w-32 h-32 bg-green-50 rounded-full"></div>
+</div>
+</div>
+</main>
+<!-- END: Main Workspace -->
+</body></html>

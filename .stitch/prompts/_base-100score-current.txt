@@ -1,0 +1,42 @@
+Edit the selected screen using the uploaded product screenshot as the only authority.
+
+This is a 100/100 pixel-fidelity transcription task, not a redesign task.
+
+## Scoring contract
+Your goal is a 100/100 visual match to the uploaded screenshot.
+Grade the result against the screenshot before finishing.
+Any visible mismatch loses points.
+
+Priority order:
+1. Exact geometry and panel positions.
+2. Exact visible text.
+3. Exact table/list/form widths, row density, and no unwanted wrapping.
+4. Exact right/side editor field count, order, density, and button position.
+5. Exact bottom/secondary panel alignment.
+6. Exact colors, borders, radius, typography, and icon style.
+
+Do not improve, simplify, reinterpret, modernize, normalize, or redesign the page.
+Do not use your own default admin template.
+Do not change business data.
+Do not hide required content behind scroll if the uploaded screenshot shows it.
+The uploaded screenshot is the only source of truth.
+
+## Fixed frame
+- Keep the same canvas size as the uploaded screenshot.
+- No page-level vertical scroll if the uploaded screenshot shows a full desktop viewport.
+- Preserve the screenshot top navigation, sidebar, content frame, panels, and density.
+
+## Required workflow behavior
+- This prompt must be used after `/GETSTITCH upload` creates a Stitch IMAGE/reference screen.
+- The selected uploaded screenshot screen is the source of truth.
+- If Stitch is unavailable, times out, rate-limits, or returns an incomplete result, wait and retry Stitch according to Stitch timing guidance.
+- Do not switch to hand-coded HTML, screenshot slicing, non-Stitch recreation, or any other fallback implementation unless the user explicitly asks for a non-Stitch fallback.
+
+## Final self-check before completion
+Only finish if these are true:
+- The page looks like a direct HTML transcription of the screenshot, not a recreated admin template.
+- All major blocks align with the screenshot.
+- All visible rows, fields, cards, checklist items, actions, and navigation labels from the screenshot are present.
+- No required text has been renamed.
+- No visible block has been moved to a different layout.
+

@@ -1,0 +1,357 @@
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { dirname, basename, extname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { describe, expect, it } from 'vitest';
+
+const workspacePage = readText('../pages/workspace-preview/WorkspacePreviewPage.tsx');
+const matrix = readText('../../../docs/workbench-platform-entry-matrix.md');
+const deliveryManifest = JSON.parse(
+  readText('../../public/mock/workspace-preview/stitch-suite/delivery-manifest.json'),
+) as DeliveryManifest;
+
+const currentDir = dirname(fileURLToPath(import.meta.url));
+const assetBase = '/mock/workspace-preview';
+
+describe('Workbench visual asset contract', () => {
+  it('keeps Workbench image helper references backed by real product assets', () => {
+    const referencedAssets = new Set<string>([
+      ...helperReferences('iconAsset', `${assetBase}/icons-v2`),
+      ...helperReferences('illustrationAsset', `${assetBase}/illustrations`),
+      ...helperReferences('moduleAsset', `${assetBase}/asset-kit-v4/modules`),
+      ...helperReferences('assetKitV4', `${assetBase}/asset-kit-v4`),
+      ...helperReferences('detailAsset', `${assetBase}/asset-kit-v5/details`),
+      ...helperReferences('moduleV6Asset', `${assetBase}/asset-kit-v6/modules`),
+      ...helperReferences('detailV6Asset', `${assetBase}/asset-kit-v6/details`),
+      ...helperReferences('stitchAsset', `${assetBase}/stitch-suite`),
+      `${assetBase}/scene/login5-stitch-factory-cn-v4.png`,
+      `${assetBase}/stitch-suite/login5-stitch-refresh.png`,
+      `${assetBase}/asset-kit-v4/module-thumbnail-sheet.png`,
+      `${assetBase}/asset-kit-v4/asset-kit-v4-preview.png`,
+    ]);
+
+    expect(referencedAssets.size).toBeGreaterThanOrEqual(45);
+    for (const assetPath of referencedAssets) {
+      expect(existsSync(toPublicFile(assetPath)), assetPath).toBe(true);
+    }
+  });
+
+  it('keeps IMAGE2 asset packages named and sized for their Workbench purpose', () => {
+    for (const assetPath of listAssets('/mock/workspace-preview/asset-kit-v4/modules')) {
+      expect(basename(assetPath)).toMatch(/^module-[a-z0-9-]+\.png$/);
+      expect(readImageSize(assetPath)).toMatchObject({ type: 'png' });
+      expect(readImageSize(assetPath).width).toBeGreaterThanOrEqual(512);
+      expect(readImageSize(assetPath).height).toBeGreaterThanOrEqual(512);
+    }
+
+    for (const assetPath of listAssets('/mock/workspace-preview/asset-kit-v5/details')) {
+      expect(basename(assetPath)).toMatch(/^[a-z0-9-]+-v1\.png$/);
+      const size = readImageSize(assetPath);
+      expect(size.type).toBe('png');
+      expect(size.width).toBeGreaterThanOrEqual(1024);
+      expect(size.height).toBeGreaterThanOrEqual(1024);
+      expect(Math.abs(size.width - size.height)).toBeLessThanOrEqual(4);
+    }
+
+    for (const assetPath of listAssets('/mock/workspace-preview/asset-kit-v6/modules')) {
+      expect(basename(assetPath)).toMatch(/^module-[a-z0-9-]+\.png$/);
+      const size = readImageSize(assetPath);
+      expect(size.type).toBe('png');
+      expect(size.width).toBeGreaterThanOrEqual(1024);
+      expect(size.height).toBeGreaterThanOrEqual(640);
+      expect(size.width).toBeGreaterThan(size.height);
+    }
+
+    for (const assetPath of listAssets('/mock/workspace-preview/asset-kit-v6/details')) {
+      expect(basename(assetPath)).toMatch(/^[a-z0-9-]+-v1\.png$/);
+      const size = readImageSize(assetPath);
+      expect(size.type).toBe('png');
+      expect(size.width).toBeGreaterThanOrEqual(1024);
+      expect(size.height).toBeGreaterThanOrEqual(1024);
+    }
+
+    expect(existsSync(toPublicFile('/mock/workspace-preview/asset-kit-v6/modules/module-flow-todo-console.png'))).toBe(true);
+    expect(existsSync(toPublicFile('/mock/workspace-preview/asset-kit-v6/modules/module-device-ops-console.png'))).toBe(true);
+    expect(existsSync(toPublicFile('/mock/workspace-preview/asset-kit-v6/modules/module-workorder-dispatch-console.png'))).toBe(true);
+    expect(existsSync(toPublicFile('/mock/workspace-preview/asset-kit-v6/modules/module-report-analysis-console.png'))).toBe(true);
+    expect(existsSync(toPublicFile('/mock/workspace-preview/asset-kit-v6/modules/module-alert-center-console.png'))).toBe(true);
+
+    const loginHero = readImageSize('/mock/workspace-preview/scene/login5-stitch-factory-cn-v4.png');
+    expect(loginHero.width).toBeGreaterThanOrEqual(1600);
+    expect(loginHero.height).toBeGreaterThanOrEqual(900);
+
+  });
+
+  it('keeps Stitch suite and manifest image references present without claiming fresh MCP generation', () => {
+    const manifestImagePaths = collectManifestImagePaths(deliveryManifest);
+    expect(manifestImagePaths).toContain('/mock/workspace-preview/stitch-suite/contact-sheet-cn-v2.png');
+    expect(manifestImagePaths).toContain('/mock/workspace-preview/asset-kit-v4/module-thumbnail-sheet.png');
+    expect(manifestImagePaths).toContain('/mock/workspace-preview/asset-kit-v5/details/work-order-flow-v1.png');
+
+    for (const assetPath of manifestImagePaths) {
+      expect(existsSync(toPublicFile(assetPath)), assetPath).toBe(true);
+    }
+
+    for (const assetPath of listAssets('/mock/workspace-preview/stitch-suite')) {
+      if (extname(assetPath) === '.json') {
+        continue;
+      }
+      const size = readImageSize(assetPath);
+      expect(size.width).toBeGreaterThanOrEqual(512);
+      expect(size.height).toBeGreaterThanOrEqual(256);
+    }
+
+    expect(matrix).toContain('## IMAGE2 / Stitch Asset Governance');
+    expect(matrix).toContain('Visual asset contract automation');
+    expect(matrix).toContain('Stitch MCP preflight on 2026-06-14 returned `Auth required`');
+  });
+
+  it('binds Stitch and IMAGE2 assets to the formal Workbench routes', () => {
+    const sections = deliveryManifest.connectedRoutes.workbenchSections;
+    const bindings = deliveryManifest.formalWorkbenchAssetMap;
+
+    expect(bindings).toHaveLength(4);
+    expect(bindings.map((item) => item.name).sort()).toEqual(Object.keys(sections).sort());
+
+    for (const binding of bindings) {
+      expect(binding.route).toBe(sections[binding.name]);
+      expect(binding.route).toMatch(/^\/fixed-assets\/workbench/);
+      expect(binding.route).not.toContain('/workspace-preview');
+      expect(binding.route).not.toContain('?menu=');
+      expect(binding.stitchScreen).toMatch(/^(overview|analytics|assets|security)$/);
+      expect(binding.businessUse.length).toBeGreaterThan(20);
+      expect(binding.sourcePolicy).toContain('formal Workbench route');
+
+      const assets = [
+        binding.primaryAsset,
+        binding.moduleAsset,
+        ...binding.detailAssets,
+      ];
+      for (const assetPath of assets) {
+        expect(assetPath).toMatch(/^\/mock\/workspace-preview\/.+\.(png|jpe?g)$/);
+        expect(existsSync(toPublicFile(assetPath)), `${binding.name}: ${assetPath}`).toBe(true);
+      }
+    }
+
+    expect(deliveryManifest.connectedRoutes.designBoard).toBe('/workspace-preview');
+    expect(deliveryManifest.connectedRoutes.designBoardDeepLink).toBe('/workspace-preview?tab=stitch');
+    expect(deliveryManifest.stitchIntegration.authEvidence.mcpToolListProjects).toContain('Auth required');
+  });
+
+  it('keeps generated Workbench menu Stitch pages visible in the design board source', () => {
+    const menuPages = [
+      ...deliveryManifest.workbenchP0PageAssetMap,
+      ...deliveryManifest.workbenchRound2PageAssetMap,
+    ];
+
+    expect(menuPages).toHaveLength(11);
+
+    const escapeRegex = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+    for (const item of menuPages) {
+      const stitchAssetKey = item.stitchScreenshot
+        .replace('/mock/workspace-preview/stitch-suite/', '')
+        .replace(/\.png$/, '');
+
+      expect(workspacePage).toMatch(
+        new RegExp(
+          [
+            `title: '${escapeRegex(item.name)}'`,
+            `imageSrc: stitchAsset\\('${escapeRegex(stitchAssetKey)}'\\)`,
+            `route: '${escapeRegex(item.route)}'`,
+            "linkLabel: '进入业务菜单'",
+          ].join('[\\s\\S]*?'),
+        ),
+      );
+    }
+
+    expect(workspacePage).toContain("route: '/fixed-assets/workbench'");
+    expect(workspacePage).toContain("route: '/fixed-assets/workbench/analytics'");
+    expect(workspacePage).toContain("route: '/fixed-assets/workbench/assets'");
+    expect(workspacePage).toContain("route: '/fixed-assets/workbench/security'");
+  });
+
+  it('binds Round 1 Workbench product pages to IMAGE2 v6 and Stitch page-level evidence', () => {
+    const p0Map = deliveryManifest.workbenchP0PageAssetMap;
+    const expectedNames = ['流程待办', '设备管理', '工单管理', '报表分析', '告警中心'];
+
+    expect(p0Map).toHaveLength(expectedNames.length);
+    expect(p0Map.map((item) => item.name)).toEqual(expectedNames);
+
+    for (const item of p0Map) {
+      expect(item.route).toMatch(/^\/fixed-assets\/workbench/);
+      expect(item.stitchScreen).toMatch(/^workbench-menu-(todo|device|orders|report|alert)-v1$/);
+      expect(item.stitchScreenshot).toMatch(/^\/mock\/workspace-preview\/stitch-suite\/workbench-p0\/workbench-menu-.+-v1\.png$/);
+      expect(item.image2ModuleAsset).toMatch(/^\/mock\/workspace-preview\/asset-kit-v6\/modules\/module-.+\.png$/);
+      expect(item.businessUse.length).toBeGreaterThan(20);
+      expect(existsSync(toPublicFile(item.stitchScreenshot)), `${item.name}: ${item.stitchScreenshot}`).toBe(true);
+      expect(existsSync(toPublicFile(item.image2ModuleAsset)), `${item.name}: ${item.image2ModuleAsset}`).toBe(true);
+
+      const stitchSize = readImageSize(item.stitchScreenshot);
+      const image2Size = readImageSize(item.image2ModuleAsset);
+      expect(stitchSize.width).toBeGreaterThanOrEqual(1024);
+      expect(stitchSize.height).toBeGreaterThanOrEqual(640);
+      expect(stitchSize).toMatchObject(image2Size);
+
+      for (const assetPath of item.detailAssets) {
+        expect(assetPath).toMatch(/^\/mock\/workspace-preview\/asset-kit-v6\/details\/.+-v1\.png$/);
+        expect(existsSync(toPublicFile(assetPath)), `${item.name}: ${assetPath}`).toBe(true);
+      }
+    }
+
+    expect(deliveryManifest.stitchAuthRetryPolicy.rule).toContain('every 10 minutes');
+    expect(deliveryManifest.stitchIntegration.authEvidence.workbenchP0BatchGenerate).toContain('five page-level screens');
+  });
+
+  it('binds Round 2 remaining Workbench menus to IMAGE2 v6 and Stitch page-level evidence', () => {
+    const round2Map = deliveryManifest.workbenchRound2PageAssetMap;
+    const expectedNames = ['运营首页', '资产总览', '备件管理', '数据监控', '组织策略', '基础维护'];
+
+    expect(round2Map).toHaveLength(expectedNames.length);
+    expect(round2Map.map((item) => item.name)).toEqual(expectedNames);
+
+    for (const item of round2Map) {
+      expect(item.route).toMatch(/^\/fixed-assets\/workbench/);
+      expect(item.stitchScreen).toMatch(/^workbench-menu-(home|asset|spares|energy|policy|settings)-v1$/);
+      expect(item.stitchScreenshot).toMatch(/^\/mock\/workspace-preview\/stitch-suite\/workbench-round2\/workbench-menu-.+-v1\.png$/);
+      expect(item.image2ModuleAsset).toMatch(/^\/mock\/workspace-preview\/asset-kit-v6\/modules\/module-.+\.png$/);
+      expect(item.secondLevelCapabilities.length).toBeGreaterThanOrEqual(3);
+      expect(item.businessUse.length).toBeGreaterThan(20);
+      expect(existsSync(toPublicFile(item.stitchScreenshot)), `${item.name}: ${item.stitchScreenshot}`).toBe(true);
+      expect(existsSync(toPublicFile(item.image2ModuleAsset)), `${item.name}: ${item.image2ModuleAsset}`).toBe(true);
+
+      const stitchSize = readImageSize(item.stitchScreenshot);
+      const image2Size = readImageSize(item.image2ModuleAsset);
+      expect(stitchSize.width).toBeGreaterThanOrEqual(1024);
+      expect(stitchSize.height).toBeGreaterThanOrEqual(640);
+      expect(stitchSize).toMatchObject(image2Size);
+    }
+
+    expect(deliveryManifest.stitchIntegration.authEvidence.workbenchRound2BatchGenerate).toContain('six formal page-level screens');
+  });
+});
+
+type WorkbenchAssetBinding = {
+  name: string;
+  route: string;
+  stitchScreen: string;
+  primaryAsset: string;
+  moduleAsset: string;
+  detailAssets: string[];
+  businessUse: string;
+  sourcePolicy: string;
+};
+
+type DeliveryManifest = {
+  connectedRoutes: {
+    designBoard: string;
+    designBoardDeepLink: string;
+    workbenchSections: Record<string, string>;
+  };
+  formalWorkbenchAssetMap: WorkbenchAssetBinding[];
+  workbenchP0PageAssetMap: Array<{
+    name: string;
+    route: string;
+    stitchScreen: string;
+    stitchScreenshot: string;
+    image2ModuleAsset: string;
+    detailAssets: string[];
+    businessUse: string;
+  }>;
+  workbenchRound2PageAssetMap: Array<{
+    name: string;
+    route: string;
+    stitchScreen: string;
+    stitchScreenshot: string;
+    image2ModuleAsset: string;
+    secondLevelCapabilities: string[];
+    businessUse: string;
+  }>;
+  stitchAuthRetryPolicy: {
+    rule: string;
+  };
+  stitchIntegration: {
+    authEvidence: {
+      mcpToolListProjects: string;
+      workbenchP0BatchGenerate: string;
+      workbenchRound2BatchGenerate: string;
+    };
+  };
+};
+
+function readText(relativePath: string) {
+  return readFileSync(new URL(relativePath, import.meta.url), 'utf8');
+}
+
+function helperReferences(helperName: string, basePath: string, suffix = '') {
+  const pattern = new RegExp(`${helperName}\\('([^']+)'\\)`, 'g');
+  const refs: string[] = [];
+  for (const match of workspacePage.matchAll(pattern)) {
+    refs.push(`${basePath}/${match[1]}${suffix}.png`);
+  }
+  return refs;
+}
+
+function listAssets(publicPath: string) {
+  const dir = toPublicFile(publicPath);
+  return readdirSync(dir)
+    .filter((file) => /\.(png|jpe?g|json)$/i.test(file))
+    .map((file) => `${publicPath}/${file}`);
+}
+
+function collectManifestImagePaths(value: unknown): string[] {
+  if (typeof value === 'string') {
+    const assetPath = value.split('?')[0];
+    return /^\/mock\/workspace-preview\/.+\.(png|jpe?g)$/i.test(assetPath) ? [assetPath] : [];
+  }
+
+  if (Array.isArray(value)) {
+    return value.flatMap(collectManifestImagePaths);
+  }
+
+  if (value && typeof value === 'object') {
+    return Object.values(value).flatMap(collectManifestImagePaths);
+  }
+
+  return [];
+}
+
+function toPublicFile(publicPath: string) {
+  const relativePath = publicPath.replace(/^\//, '');
+  return resolve(currentDir, '../../public', relativePath);
+}
+
+function readImageSize(publicPath: string) {
+  const buffer = readFileSync(toPublicFile(publicPath));
+  if (buffer[0] === 0x89 && buffer.toString('ascii', 1, 4) === 'PNG') {
+    return {
+      type: 'png',
+      width: buffer.readUInt32BE(16),
+      height: buffer.readUInt32BE(20),
+    };
+  }
+
+  if (buffer[0] === 0xff && buffer[1] === 0xd8) {
+    let offset = 2;
+    while (offset < buffer.length) {
+      if (buffer[offset] !== 0xff) {
+        offset += 1;
+        continue;
+      }
+
+      const marker = buffer[offset + 1];
+      const segmentLength = buffer.readUInt16BE(offset + 2);
+      const isStartOfFrame = marker >= 0xc0 && marker <= 0xcf && ![0xc4, 0xc8, 0xcc].includes(marker);
+      if (isStartOfFrame) {
+        return {
+          type: 'jpg',
+          width: buffer.readUInt16BE(offset + 7),
+          height: buffer.readUInt16BE(offset + 5),
+        };
+      }
+
+      offset += 2 + segmentLength;
+    }
+  }
+
+  throw new Error(`Unsupported image format: ${publicPath}`);
+}

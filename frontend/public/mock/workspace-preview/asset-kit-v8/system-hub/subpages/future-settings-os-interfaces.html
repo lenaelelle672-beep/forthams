@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+
+<html class="light" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>接口配置 - UNIVIEW | 系统设置中心</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary": "#ffffff",
+                        "tertiary-fixed-dim": "#ffb695",
+                        "border-subtle": "#D7E2F0",
+                        "on-tertiary-fixed-variant": "#7b2f00",
+                        "status-green": "#16A34A",
+                        "on-secondary-container": "#51617e",
+                        "error-container": "#ffdad6",
+                        "primary-fixed": "#d9e2ff",
+                        "primary-container": "#1d6ef2",
+                        "secondary-fixed": "#d5e3ff",
+                        "on-surface-variant": "#424654",
+                        "on-tertiary-fixed": "#351000",
+                        "on-error-container": "#93000a",
+                        "surface-container": "#ebeef2",
+                        "on-primary-container": "#fffdff",
+                        "inverse-primary": "#b0c6ff",
+                        "surface-tint": "#0057cc",
+                        "on-tertiary-container": "#fffdff",
+                        "surface-variant": "#e0e3e7",
+                        "status-purple": "#7C3AED",
+                        "outline-variant": "#c2c6d7",
+                        "on-primary-fixed": "#001945",
+                        "tertiary-container": "#c75000",
+                        "outline": "#727786",
+                        "surface": "#f7fafe",
+                        "on-primary-fixed-variant": "#00419c",
+                        "inverse-on-surface": "#eef1f5",
+                        "tertiary-fixed": "#ffdbcc",
+                        "surface-container-highest": "#e0e3e7",
+                        "on-secondary-fixed": "#091c35",
+                        "on-error": "#ffffff",
+                        "on-background": "#181c1f",
+                        "inverse-surface": "#2d3134",
+                        "surface-container-high": "#e5e8ec",
+                        "surface-container-low": "#f1f4f8",
+                        "surface-container-lowest": "#ffffff",
+                        "status-red": "#DC2626",
+                        "text-secondary": "#64748B",
+                        "primary-fixed-dim": "#b0c6ff",
+                        "surface-dim": "#d7dade",
+                        "secondary": "#4e5f7b",
+                        "on-secondary-fixed-variant": "#374762",
+                        "on-secondary": "#ffffff",
+                        "secondary-fixed-dim": "#b6c7e8",
+                        "status-cyan": "#00A8D8",
+                        "secondary-container": "#ccddff",
+                        "status-amber": "#F59E0B",
+                        "error": "#ba1a1a",
+                        "on-surface": "#181c1f",
+                        "background": "#f7fafe",
+                        "tertiary": "#9f3e00",
+                        "text-primary": "#0F172A",
+                        "surface-bright": "#f7fafe",
+                        "on-tertiary": "#ffffff",
+                        "primary": "#0056c9",
+                        "topbar-bg": "#051424",
+                        "topbar-border": "#1D6EF2"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "sidebar-width": "240px",
+                        "inspector-width": "320px",
+                        "topbar-height": "56px",
+                        "card-padding": "16px",
+                        "container-gap": "20px",
+                        "grid-gutter": "12px"
+                    },
+                    "fontFamily": {
+                        "code-meta": ["JetBrains Mono"],
+                        "status-label": ["Inter"],
+                        "section-header": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "body-md": ["Inter"],
+                        "page-title": ["Inter"]
+                    },
+                    "fontSize": {
+                        "code-meta": ["11px", { "lineHeight": "16px", "fontWeight": "400" }],
+                        "status-label": ["11px", { "lineHeight": "16px", "fontWeight": "700" }],
+                        "section-header": ["14px", { "lineHeight": "20px", "fontWeight": "700" }],
+                        "body-sm": ["12px", { "lineHeight": "18px", "fontWeight": "500" }],
+                        "body-md": ["13px", { "lineHeight": "20px", "fontWeight": "500" }],
+                        "page-title": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .glass-panel { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-left: 1px solid #D7E2F0; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-background text-on-surface w-full h-screen flex flex-col font-body-md">
+<!-- TopNavBar -->
+<nav class="flex justify-between items-center px-6 w-full fixed top-0 left-0 z-50 bg-topbar-bg border-b-2 border-topbar-border h-[56px]">
+<div class="flex items-center gap-8 h-full">
+<span class="text-lg font-bold text-white tracking-wide">UNIVIEW | 系统设置中心</span><div class="hidden md:flex h-full items-center gap-6">
+<a class="text-white/70 hover:text-white font-body-md transition-colors" href="#">流程平台</a>
+<a class="text-white/70 hover:text-white font-body-md transition-colors" href="#">组织权限</a>
+<a class="text-white/70 hover:text-white font-body-md transition-colors" href="#">基础资料</a>
+<a class="text-white font-bold font-body-md border-b-2 border-primary-fixed pt-0.5" href="#">集成配置</a>
+<a class="text-white/70 hover:text-white font-body-md transition-colors" href="#">消息与通知</a>
+<a class="text-white/70 hover:text-white font-body-md transition-colors" href="#">系统参数</a>
+</div>
+</div>
+<div class="flex items-center gap-6 text-white/80">
+
+<button class="hover:text-white transition-colors flex items-center gap-1 font-body-sm"><span class="material-symbols-outlined text-[18px]">arrow_back</span> 返回业务工作台</button>
+<div class="flex items-center gap-2">
+<img alt="Administrator profile" class="w-7 h-7 rounded-full border border-white/20 object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAjqqNaLMeV3CJjIje5wIqbcRaAr9Zl30LDZkSl8Fw4LH63lTBKiHr77Ry8qjbnLNEdYjxJ4ahELvqd0aGhnwZroOntbz-uFyCrmBqxySq6suZFZKTmlfGfrPrnKqxdVKvE6AdGR_npji0cz3gBkU4ixuw9m6f1e1UYOa7csjPwL5slt_3KH9-2d56yJ32lI4E1lKH6BcGdO4uAIJBRr12J0KoKZUBK2vBPBmkd2-FgF8u5gd-HB3qDclSJaB96sOT-keZ4mqhT9GHE"/>
+<span class="font-body-sm">运营管理员</span>
+</div>
+</div>
+</nav>
+<!-- Main Workspace -->
+<div class="flex pt-[56px] h-screen w-full overflow-hidden">
+<!-- SideNavBar -->
+<aside class="w-sidebar-width flex-shrink-0 flex flex-col z-40 bg-surface-container-lowest dark:bg-surface-dim border-r border-border-subtle h-full">
+<div class="flex-1 overflow-y-auto py-4 flex flex-col gap-1 px-3">
+<a class="flex items-center gap-3 px-3 py-2 rounded font-body-sm text-body-sm text-on-surface-variant hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-size: 18px;">cloud_sync</span>
+                    外部系统配置
+                </a>
+<a class="flex items-center gap-3 px-3 py-2 rounded font-body-sm text-body-sm text-primary font-bold bg-primary-fixed/20 transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-size: 18px; font-variation-settings: 'FILL' 1;">api</span>
+                    接口配置
+                </a>
+<a class="flex items-center gap-3 px-3 py-2 rounded font-body-sm text-body-sm text-on-surface-variant hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-size: 18px;">schema</span>
+                    字段映射
+                </a>
+<a class="flex items-center gap-3 px-3 py-2 rounded font-body-sm text-body-sm text-on-surface-variant hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-size: 18px;">sync_alt</span>
+                    同步规则
+                </a>
+<a class="flex items-center gap-3 px-3 py-2 rounded font-body-sm text-body-sm text-on-surface-variant hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-size: 18px;">webhook</span>
+                    Webhook 配置
+                </a>
+</div>
+</aside>
+<!-- Center Canvas -->
+<main class="flex-1 bg-surface h-full overflow-y-auto p-6 flex flex-col gap-6">
+<!-- Breadcrumbs -->
+<div class="flex items-center gap-2 text-text-secondary font-code-meta text-code-meta">
+<span>系统设置中心</span>
+<span class="material-symbols-outlined" style="font-size: 14px;">chevron_right</span>
+<span>集成配置</span>
+<span class="material-symbols-outlined" style="font-size: 14px;">chevron_right</span>
+<span class="text-primary font-medium">接口配置</span>
+</div>
+<!-- Header -->
+<div class="flex justify-between items-end">
+<div>
+<h1 class="font-page-title text-page-title text-text-primary mb-1">接口配置</h1>
+<p class="font-body-md text-body-md text-text-secondary">定义和管理系统间的 API 接口、超时阈值及风险等级。</p>
+</div>
+<div class="flex gap-3">
+<button class="px-4 py-2 border border-border-subtle bg-surface-container-lowest text-text-primary rounded font-body-sm text-body-sm hover:border-primary transition-colors">
+                        导出 JSON
+                    </button>
+<button class="px-4 py-2 bg-primary-container text-on-primary rounded font-body-sm text-body-sm hover:opacity-90 transition-opacity flex items-center gap-2">
+<span class="material-symbols-outlined" style="font-size: 16px;">add</span>
+                        新增接口
+                    </button>
+</div>
+</div>
+<!-- KPI Summary Row -->
+<div class="grid grid-cols-3 gap-6">
+<div class="bg-surface-container-lowest border border-border-subtle rounded p-card-padding flex flex-col relative overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-status-green"></div>
+<span class="font-code-meta text-code-meta text-text-secondary mb-1 uppercase tracking-wider">活跃接口</span>
+<span class="font-page-title text-page-title text-text-primary">42</span>
+</div>
+<div class="bg-surface-container-lowest border border-border-subtle rounded p-card-padding flex flex-col relative overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-status-amber"></div>
+<span class="font-code-meta text-code-meta text-text-secondary mb-1 uppercase tracking-wider">警告 / 高延迟</span>
+<span class="font-page-title text-page-title text-text-primary">3</span>
+</div>
+<div class="bg-surface-container-lowest border border-border-subtle rounded p-card-padding flex flex-col relative overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-status-red"></div>
+<span class="font-code-meta text-code-meta text-text-secondary mb-1 uppercase tracking-wider">严重故障</span>
+<span class="font-page-title text-page-title text-text-primary">0</span>
+</div>
+</div>
+<div class="flex flex-1 gap-6 min-h-0">
+<div class="flex-1 flex flex-col gap-4">
+<!-- Filter Bar -->
+<div class="bg-surface-container-lowest border border-border-subtle rounded p-3 flex justify-between items-center">
+<div class="flex gap-2">
+<span class="px-3 py-1 bg-primary-fixed/20 text-on-primary-fixed-variant rounded-full font-status-label text-status-label border border-primary-fixed-dim">全部 (45)</span>
+<span class="px-3 py-1 hover:bg-surface-container text-text-secondary rounded-full font-status-label text-status-label cursor-pointer transition-colors border border-transparent">内部 (30)</span>
+<span class="px-3 py-1 hover:bg-surface-container text-text-secondary rounded-full font-status-label text-status-label cursor-pointer transition-colors border border-transparent">外部 (15)</span>
+</div>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-2 top-1/2 -translate-y-1/2 text-outline-variant" style="font-size: 16px;">search</span>
+<input class="bg-surface text-on-surface font-code-meta text-code-meta rounded pl-8 pr-3 py-1 border border-border-subtle focus:border-primary w-48 outline-none" placeholder="按路径筛选..." type="text"/>
+</div>
+</div>
+<!-- API List -->
+<div class="bg-surface-container-lowest border border-border-subtle rounded overflow-y-auto flex-1">
+<table class="w-full text-left border-collapse">
+<thead class="sticky top-0 bg-surface-container-lowest z-10 shadow-sm">
+<tr class="bg-surface-container-low border-b border-border-subtle font-status-label text-status-label text-text-secondary uppercase">
+<th class="py-3 px-4 w-20">方法</th>
+<th class="py-3 px-4">接口路径</th>
+<th class="py-3 px-4 w-24">超时时间</th>
+<th class="py-3 px-4 w-28">风险等级</th>
+<th class="py-3 px-4 w-24">状态</th>
+</tr>
+</thead>
+<tbody class="font-body-sm text-body-sm">
+<!-- Row 1 Active -->
+<tr class="border-b border-border-subtle cursor-pointer bg-primary-fixed/10 border-l-2 border-l-primary hover:bg-primary-fixed/20">
+<td class="py-3 px-4">
+<span class="font-code-meta text-code-meta text-status-green font-bold bg-status-green/10 px-2 py-0.5 rounded">GET</span>
+</td>
+<td class="py-3 px-4 font-code-meta text-code-meta text-text-primary">/api/v1/assets/sync</td>
+<td class="py-3 px-4 text-text-secondary">3000ms</td>
+<td class="py-3 px-4">
+<span class="font-status-label text-status-label text-status-amber flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-status-amber"></span> 中
+                                        </span>
+</td>
+<td class="py-3 px-4">
+<span class="px-2 py-1 rounded bg-status-green/10 text-status-green font-status-label text-status-label border border-status-green/20">活跃</span>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="border-b border-border-subtle hover:bg-surface-bright cursor-pointer transition-colors">
+<td class="py-3 px-4">
+<span class="font-code-meta text-code-meta text-status-purple font-bold bg-status-purple/10 px-2 py-0.5 rounded">POST</span>
+</td>
+<td class="py-3 px-4 font-code-meta text-code-meta text-text-primary">/api/v2/telemetry/push</td>
+<td class="py-3 px-4 text-text-secondary">1500ms</td>
+<td class="py-3 px-4">
+<span class="font-status-label text-status-label text-status-red flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-status-red"></span> 高
+                                        </span>
+</td>
+<td class="py-3 px-4">
+<span class="px-2 py-1 rounded bg-status-green/10 text-status-green font-status-label text-status-label border border-status-green/20">活跃</span>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="border-b border-border-subtle hover:bg-surface-bright cursor-pointer transition-colors">
+<td class="py-3 px-4">
+<span class="font-code-meta text-code-meta text-status-cyan font-bold bg-status-cyan/10 px-2 py-0.5 rounded">PUT</span>
+</td>
+<td class="py-3 px-4 font-code-meta text-code-meta text-text-primary">/sys/config/overrides</td>
+<td class="py-3 px-4 text-text-secondary">5000ms</td>
+<td class="py-3 px-4">
+<span class="font-status-label text-status-label text-status-red flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-status-red"></span> 极高
+                                        </span>
+</td>
+<td class="py-3 px-4">
+<span class="px-2 py-1 rounded bg-status-amber/10 text-status-amber font-status-label text-status-label border border-status-amber/20">降级</span>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-surface-bright cursor-pointer transition-colors">
+<td class="py-3 px-4">
+<span class="font-code-meta text-code-meta text-outline font-bold bg-surface-container-high px-2 py-0.5 rounded">DEL</span>
+</td>
+<td class="py-3 px-4 font-code-meta text-code-meta text-text-primary opacity-60">/api/v1/legacy/flush</td>
+<td class="py-3 px-4 text-text-secondary opacity-60">10000ms</td>
+<td class="py-3 px-4">
+<span class="font-status-label text-status-label text-text-secondary flex items-center gap-1 opacity-60">
+<span class="w-1.5 h-1.5 rounded-full bg-outline"></span> 低
+                                        </span>
+</td>
+<td class="py-3 px-4">
+<span class="px-2 py-1 rounded bg-surface-container-high text-text-secondary font-status-label text-status-label border border-outline-variant">离线</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Right Panel: Endpoint Details -->
+<aside class="w-inspector-width flex-shrink-0 bg-surface-container-lowest border border-border-subtle rounded flex flex-col h-full shadow-sm">
+<div class="p-4 border-b border-border-subtle flex justify-between items-center">
+<h3 class="font-section-header text-section-header text-text-primary flex items-center gap-2">
+<span class="material-symbols-outlined" style="font-size: 18px;">api</span>
+                    接口详情
+                </h3>
+<button class="text-outline hover:text-text-primary transition-colors">
+<span class="material-symbols-outlined" style="font-size: 20px;">close</span>
+</button>
+</div>
+<div class="flex-1 overflow-y-auto p-4 flex flex-col gap-6 scrollbar-hide">
+<!-- Overview -->
+<section>
+<div class="flex items-center gap-2 mb-2">
+<span class="font-code-meta text-code-meta text-status-green font-bold bg-status-green/10 px-2 py-0.5 rounded">GET</span>
+<span class="font-status-label text-status-label text-status-green border border-status-green/30 px-2 rounded-full">活跃</span>
+</div>
+<p class="font-code-meta text-code-meta text-text-primary break-all bg-surface p-2 rounded border border-border-subtle">
+                        /api/v1/assets/sync
+                    </p>
+<p class="font-body-sm text-body-sm text-text-secondary mt-2">
+                        将核心资产元数据从旧版主机同步到活跃的 Redis 缓存中。
+                    </p>
+</section>
+<!-- Configuration Grid -->
+<section class="grid grid-cols-2 gap-4">
+<div>
+<span class="font-code-meta text-code-meta text-text-secondary block mb-1">超时时间</span>
+<span class="font-body-md text-body-md text-text-primary font-medium">3000ms</span>
+</div>
+<div>
+<span class="font-code-meta text-code-meta text-text-secondary block mb-1">重试次数</span>
+<span class="font-body-md text-body-md text-text-primary font-medium">3</span>
+</div>
+<div>
+<span class="font-code-meta text-code-meta text-text-secondary block mb-1">认证方式</span>
+<span class="font-body-md text-body-md text-text-primary font-medium">OAuth 2.0</span>
+</div>
+<div>
+<span class="font-code-meta text-code-meta text-text-secondary block mb-1">风险等级</span>
+<span class="font-status-label text-status-label text-status-amber">中</span>
+</div>
+</section>
+<!-- Topology Flow (Visual) -->
+<section>
+<h4 class="font-status-label text-status-label text-text-secondary uppercase mb-3 border-b border-border-subtle pb-1">数据流向拓扑</h4>
+<div class="flex items-center justify-between text-center bg-surface p-3 rounded border border-border-subtle">
+<div class="flex flex-col items-center">
+<span class="material-symbols-outlined text-primary mb-1">dns</span>
+<span class="font-code-meta text-code-meta text-xs">网关</span>
+</div>
+<div class="flex-1 h-px bg-border-subtle relative mx-2">
+<div class="absolute w-2 h-2 rounded-full bg-primary top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 border-2 border-surface"></div>
+</div>
+<div class="flex flex-col items-center">
+<span class="material-symbols-outlined text-status-cyan mb-1">memory</span>
+<span class="font-code-meta text-code-meta text-xs">缓存</span>
+</div>
+<div class="flex-1 h-px bg-border-subtle relative mx-2"></div>
+<div class="flex flex-col items-center opacity-50">
+<span class="material-symbols-outlined text-outline mb-1">storage</span>
+<span class="font-code-meta text-code-meta text-xs">旧系统</span>
+</div>
+</div>
+</section>
+<!-- AI Helper / Diagnostic -->
+<section class="bg-[#F5F8FC] p-3 rounded border border-secondary-fixed-dim">
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-primary" style="font-size: 16px;">auto_awesome</span>
+<h4 class="font-section-header text-section-header text-primary">系统洞察</h4>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+                        在 02:00 至 04:00 UTC 期间观察到延迟激增。建议在维护窗口期间将超时阈值提高到 <span class="font-code-meta font-bold">5000ms</span>，以防止连接断开。
+                    </p>
+</section>
+</div>
+<div class="p-4 border-t border-border-subtle bg-surface-container-lowest flex gap-3">
+<button class="flex-1 py-2 border border-border-subtle text-text-primary rounded font-body-sm text-body-sm hover:bg-surface-container transition-colors bg-transparent">
+                    测试连接
+                </button>
+<button class="flex-1 py-2 bg-primary-container text-on-primary rounded font-body-sm text-body-sm hover:opacity-90 transition-opacity">
+                    编辑配置
+                </button>
+</div>
+</aside>
+</div>
+</main>
+</div>
+</body></html>

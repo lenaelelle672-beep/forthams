@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+
+<html class="light" lang="zh"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>角色权限控制矩阵 - UNIVIEW</title>
+<!-- Fonts & Icons -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;family=JetBrains+Mono:wght@400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary-fixed-dim": "#b6c7e8",
+                    "inverse-primary": "#b0c6ff",
+                    "on-secondary-fixed-variant": "#374762",
+                    "text-secondary": "#64748B",
+                    "on-primary": "#ffffff",
+                    "surface-container-high": "#e5e8ec",
+                    "status-green": "#16A34A",
+                    "secondary-fixed": "#d5e3ff",
+                    "on-secondary": "#ffffff",
+                    "secondary": "#4e5f7b",
+                    "border-subtle": "#D7E2F0",
+                    "inverse-on-surface": "#eef1f5",
+                    "background": "#f7fafe",
+                    "status-purple": "#7C3AED",
+                    "on-secondary-fixed": "#091c35",
+                    "on-tertiary-fixed": "#351000",
+                    "status-cyan": "#00A8D8",
+                    "on-primary-fixed": "#001945",
+                    "secondary-container": "#ccddff",
+                    "on-tertiary-container": "#fffdff",
+                    "on-primary-fixed-variant": "#00419c",
+                    "surface-dim": "#d7dade",
+                    "primary-fixed": "#d9e2ff",
+                    "on-surface-variant": "#424654",
+                    "outline-variant": "#c2c6d7",
+                    "status-amber": "#F59E0B",
+                    "outline": "#727786",
+                    "error": "#ba1a1a",
+                    "on-primary-container": "#fffdff",
+                    "status-red": "#DC2626",
+                    "surface": "#f7fafe",
+                    "tertiary-fixed": "#ffdbcc",
+                    "surface-tint": "#0057cc",
+                    "error-container": "#ffdad6",
+                    "on-background": "#181c1f",
+                    "surface-bright": "#f7fafe",
+                    "on-tertiary-fixed-variant": "#7b2f00",
+                    "surface-container": "#ebeef2",
+                    "primary-fixed-dim": "#b0c6ff",
+                    "on-tertiary": "#ffffff",
+                    "primary-container": "#1d6ef2",
+                    "inverse-surface": "#2d3134",
+                    "surface-container-low": "#f1f4f8",
+                    "primary": "#0056c9",
+                    "on-error-container": "#93000a",
+                    "on-secondary-container": "#51617e",
+                    "surface-variant": "#e0e3e7",
+                    "on-surface": "#181c1f",
+                    "on-error": "#ffffff",
+                    "tertiary": "#9f3e00",
+                    "tertiary-container": "#c75000",
+                    "surface-container-lowest": "#ffffff",
+                    "tertiary-fixed-dim": "#ffb695",
+                    "text-primary": "#0F172A"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "grid-gutter": "12px",
+                    "topbar-height": "48px",
+                    "sidebar-width": "196px",
+                    "inspector-width": "320px",
+                    "card-padding": "16px",
+                    "container-gap": "20px"
+            },
+            "fontFamily": {
+                    "code-meta": ["JetBrains Mono"],
+                    "body-sm": ["Inter"],
+                    "status-label": ["Inter"],
+                    "page-title": ["Inter"],
+                    "section-header": ["Inter"],
+                    "body-md": ["Inter"]
+            },
+            "fontSize": {
+                    "code-meta": ["11px", {"lineHeight": "16px", "fontWeight": "400"}],
+                    "body-sm": ["12px", {"lineHeight": "18px", "fontWeight": "500"}],
+                    "status-label": ["11px", {"lineHeight": "16px", "fontWeight": "700"}],
+                    "page-title": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "section-header": ["14px", {"lineHeight": "20px", "fontWeight": "700"}],
+                    "body-md": ["13px", {"lineHeight": "20px", "fontWeight": "500"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; display: inline-block; vertical-align: middle; }
+
+        /* High density matrix table styling */
+        .matrix-table { border-collapse: separate; border-spacing: 0; }
+        .matrix-table th, .matrix-table td { border-right: 1px solid #D7E2F0; border-bottom: 1px solid #D7E2F0; }
+        .matrix-table th:last-child, .matrix-table td:last-child { border-right: none; }
+        .matrix-sticky-col { position: sticky; left: 0; background-color: #ffffff; z-index: 10; border-right: 2px solid #D7E2F0 !important; }
+
+        /* Checkbox styling */
+        .perm-check { appearance: none; width: 14px; height: 14px; border: 1px solid #D7E2F0; border-radius: 2px; transition: all 0.1s ease; cursor: pointer; position: relative; }
+        .perm-check:checked { background-color: #0056c9; border-color: #0056c9; }
+        .perm-check:checked::after { content: '✓'; position: absolute; color: white; font-size: 10px; top: -1px; left: 2px; }
+        .perm-check:hover { border-color: #0056c9; background-color: rgba(0, 86, 201, 0.05); }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f4f8; }
+        ::-webkit-scrollbar-thumb { background: #c2c6d7; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #727786; }
+    </style>
+</head>
+<body class="bg-background text-on-surface overflow-hidden">
+<!-- Top Header -->
+<header class="flex justify-between items-center px-4 w-full fixed top-0 left-0 z-50 h-[56px] bg-[#051424] border-b-[2px] border-[#1D6EF2]">
+<div class="flex items-center gap-6 h-full">
+<span class="text-[16px] font-bold text-white tracking-wide">UNIVIEW | 系统设置中心</span><nav class="hidden md:flex gap-2 h-full items-center ml-4">
+<a class="px-3 py-1 font-body-md text-white/70 hover:text-white transition-colors" href="#">流程平台</a>
+<a class="px-3 py-1 font-body-md text-white font-bold h-full flex items-center border-b-2 border-[#1D6EF2]" href="#">组织权限</a>
+<a class="px-3 py-1 font-body-md text-white/70 hover:text-white transition-colors" href="#">基础资料</a>
+<a class="px-3 py-1 font-body-md text-white/70 hover:text-white transition-colors" href="#">集成配置</a>
+<a class="px-3 py-1 font-body-md text-white/70 hover:text-white transition-colors" href="#">消息与通知</a>
+<a class="px-3 py-1 font-body-md text-white/70 hover:text-white transition-colors" href="#">系统参数</a>
+</nav>
+</div>
+<div class="flex items-center gap-6 text-white/80 text-[13px]">
+<div class="flex items-center gap-1 cursor-pointer hover:text-white transition-colors">
+<span class="material-symbols-outlined text-[18px]">apps</span>
+
+</div>
+<div class="flex items-center gap-1 cursor-pointer hover:text-white transition-colors">
+<span class="material-symbols-outlined text-[18px]">keyboard_return</span>
+<span>返回业务工作台</span>
+</div>
+<div class="flex items-center gap-2 cursor-pointer hover:text-white transition-colors ml-2">
+<div class="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-[18px]">person</span>
+</div>
+<span>运营管理员</span>
+</div>
+</div>
+</header>
+<!-- Sidebar -->
+<aside class="fixed left-0 top-[56px] w-[240px] h-[calc(100vh-56px)] bg-surface-container-lowest border-r border-border-subtle flex flex-col z-40">
+<nav class="flex-1 py-4">
+<a class="flex items-center gap-3 px-6 py-3 font-body-md text-on-surface-variant hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined text-[18px]">group</span> 用户管理
+        </a>
+<a class="flex items-center gap-3 px-6 py-3 font-body-md text-primary font-bold border-r-2 border-primary bg-primary-fixed/10" href="#">
+<span class="material-symbols-outlined text-[18px]">shield_person</span> 角色权限
+        </a>
+<a class="flex items-center gap-3 px-6 py-3 font-body-md text-on-surface-variant hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined text-[18px]">menu</span> 菜单权限
+        </a>
+<a class="flex items-center gap-3 px-6 py-3 font-body-md text-on-surface-variant hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined text-[18px]">account_tree</span> 部门组织
+        </a>
+<a class="flex items-center gap-3 px-6 py-3 font-body-md text-on-surface-variant hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined text-[18px]">badge</span> 岗位管理
+        </a>
+<a class="flex items-center gap-3 px-6 py-3 font-body-md text-on-surface-variant hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined text-[18px]">security</span> 数据权限
+        </a>
+<a class="flex items-center gap-3 px-6 py-3 font-body-md text-on-surface-variant hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined text-[18px]">swap_horiz</span> 工作交接
+        </a>
+<a class="flex items-center gap-3 px-6 py-3 font-body-md text-on-surface-variant hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined text-[18px]">domain</span> 租户管理
+        </a>
+</nav>
+</aside>
+<!-- Main Content -->
+<main class="ml-[240px] mt-[56px] h-[calc(100vh-56px-48px)] flex flex-col overflow-hidden">
+<!-- Command Center Header -->
+<div class="h-14 border-b border-border-subtle bg-white flex items-center justify-between px-6 sticky top-0 z-30">
+<div class="flex items-center gap-4">
+<h1 class="font-page-title text-section-header text-on-surface">角色权限控制矩阵</h1>
+<div class="h-4 w-[1px] bg-border-subtle"></div>
+<div class="flex gap-2">
+<span class="px-2 py-0.5 rounded bg-status-green/10 text-status-green font-code-meta text-[10px] uppercase">活动环境</span>
+<span class="px-2 py-0.5 rounded bg-primary-fixed/20 text-primary font-code-meta text-[10px] uppercase">L3 加密</span>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="relative">
+<span class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-[16px] text-outline">search</span>
+<input class="bg-surface-container-low border-none rounded h-8 pl-9 pr-3 font-code-meta text-body-sm w-48 focus:ring-1 focus:ring-primary" placeholder="过滤策略..." type="text"/>
+</div>
+<button class="h-8 px-4 flex items-center gap-2 bg-white border border-border-subtle text-on-surface font-body-sm text-body-sm hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-[18px]">file_download</span> 导出矩阵
+                </button>
+<button class="h-8 px-4 flex items-center gap-2 bg-primary text-on-primary font-body-sm text-body-sm hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined text-[18px]">add</span> 新建角色
+                </button>
+</div>
+</div>
+<!-- Permission Matrix Grid -->
+<div class="flex-1 overflow-auto bg-white">
+<table class="matrix-table w-full text-left min-w-max">
+<thead>
+<tr class="bg-surface-container-low">
+<th class="matrix-sticky-col p-4 font-section-header text-section-header w-[280px]">资源与操作</th>
+<th class="px-4 py-3 min-w-[120px]">
+<div class="flex flex-col">
+<span class="font-section-header text-section-header">超级管理员</span>
+<span class="font-code-meta text-outline">全局系统访问</span>
+</div>
+</th>
+<th class="px-4 py-3 min-w-[120px]">
+<div class="flex flex-col">
+<span class="font-section-header text-section-header">编辑者</span>
+<span class="font-code-meta text-outline">内容工作流</span>
+</div>
+</th>
+<th class="px-4 py-3 min-w-[120px]">
+<div class="flex flex-col">
+<span class="font-section-header text-section-header">安全审计</span>
+<span class="font-code-meta text-outline">仅合规性</span>
+</div>
+</th>
+<th class="px-4 py-3 min-w-[120px]">
+<div class="flex flex-col">
+<span class="font-section-header text-section-header">外部操作</span>
+<span class="font-code-meta text-outline">受限承包商</span>
+</div>
+</th>
+<th class="px-4 py-3 min-w-[120px]">
+<div class="flex flex-col">
+<span class="font-section-header text-section-header">只读</span>
+<span class="font-code-meta text-outline">全局查看者</span>
+</div>
+</th>
+<th class="px-4 py-3 min-w-[120px] bg-primary-fixed/5">
+<div class="flex flex-col">
+<span class="font-section-header text-primary">自定义节点_1</span>
+<span class="font-code-meta text-primary/60">边缘计算</span>
+</div>
+</th>
+</tr>
+</thead>
+<tbody class="font-body-sm text-body-sm">
+<!-- Section: CORE SYSTEMS -->
+<tr class="bg-surface-container-highest/30">
+<td class="matrix-sticky-col px-4 py-2 font-section-header text-outline text-[11px] uppercase tracking-wider bg-surface-container-highest/10" colspan="7">核心系统能力</td>
+</tr>
+<tr>
+<td class="matrix-sticky-col px-4 py-3 flex items-center gap-3">
+<span class="material-symbols-outlined text-outline text-[18px]">dns</span>
+<div class="flex flex-col">
+<span class="font-bold">系统基础设施</span>
+<span class="font-code-meta text-outline text-[10px]">core.infra.manage</span>
+</div>
+</td>
+<td class="text-center"><input checked="" class="perm-check" type="checkbox"/></td>
+<td class="text-center"><input class="perm-check" type="checkbox"/></td>
+<td class="text-center"><input class="perm-check" type="checkbox"/></td>
+<td class="text-center"><input class="perm-check" type="checkbox"/></td>
+<td class="text-center"><input class="perm-check" type="checkbox"/></td>
+<td class="text-center bg-primary-fixed/5"><input class="perm-check" type="checkbox"/></td>
+</tr>
+<tr>
+<td class="matrix-sticky-col px-4 py-3 flex items-center gap-3">
+<span class="material-symbols-outlined text-outline text-[18px]">database</span>
+<div class="flex flex-col">
+<span class="font-bold">数据库写入</span>
+<span class="font-code-meta text-outline text-[10px]">db.write.primary</span>
+</div>
+</td>
+<td class="text-center"><input checked="" class="perm-check" type="checkbox"/></td>
+<td class="text-center"><input checked="" class="perm-check" type="checkbox"/></td>
+<td class="text-center"><input class="perm-check" type="checkbox"/></td>
+<td class="text-center"><input class="perm-check" type="checkbox"/></td>
+<td class="text-center"><input class="perm-check" type="checkbox"/></td>
+<td class="text-center bg-primary-fixed/5"><input class="perm-check" type="checkbox"/></td>
+</tr>
+<!-- Section: SECURITY -->
+<tr class="bg-surface-container-highest/30">
+<td class="matrix-sticky-col px-4 py-2 font-section-header text-outline text-[11px] uppercase tracking-wider bg-surface-container-highest/10" colspan="7">安全与隐私</td>
+</tr>
+<tr>
+<td class="matrix-sticky-col px-4 py-3 flex items-center gap-3">
+<span class="material-symbols-outlined text-outline text-[18px]">key</span>
+<div class="flex flex-col">
+<span class="font-bold">密钥管理</span>
+<span class="font-code-meta text-outline text-[10px]">security.keys.rotate</span>
+</div>
+</td>
+<td class="text-center"><input checked="" class="perm-check" type="checkbox"/></td>
+<td class="text-center"><input class="perm-check" type="checkbox"/></td>
+<td class="text-center"><input checked="" class="perm-check" type="checkbox"/></td>
+<td class="text-center"><input class="perm-check" type="checkbox"/></td>
+<td class="text-center"><input class="perm-check" type="checkbox"/></td>
+<td class="text-center bg-primary-fixed/5"><input class="perm-check" type="checkbox"/></td>
+</tr>
+<tr>
+<td class="matrix-sticky-col px-4 py-3 flex items-center gap-3">
+<span class="material-symbols-outlined text-outline text-[18px]">policy</span>
+<div class="flex flex-col">
+<span class="font-bold">全局策略</span>
+<span class="font-code-meta text-outline text-[10px]">security.policy.edit</span>
+</div>
+</td>
+<td class="text-center"><input checked="" class="perm-check" type="checkbox"/></td>
+<td class="text-center"><input class="perm-check" type="checkbox"/></td>
+<td class="text-center"><input class="perm-check" type="checkbox"/></td>
+<td class="text-center"><input class="perm-check" type="checkbox"/></td>
+<td class="text-center"><input class="perm-check" type="checkbox"/></td>
+<td class="text-center bg-primary-fixed/5"><input class="perm-check" type="checkbox"/></td>
+</tr>
+<!-- Section: ASSET MANAGEMENT -->
+<tr class="bg-surface-container-highest/30">
+<td class="matrix-sticky-col px-4 py-2 font-section-header text-outline text-[11px] uppercase tracking-wider bg-surface-container-highest/10" colspan="7">资产生态系统</td>
+</tr>
+<tr>
+<td class="matrix-sticky-col px-4 py-3 flex items-center gap-3">
+<span class="material-symbols-outlined text-outline text-[18px]">package_2</span>
+<div class="flex flex-col">
+<span class="font-bold">模块配置</span>
+<span class="font-code-meta text-outline text-[10px]">assets.module.deploy</span>
+</div>
+</td>
+<td class="text-center"><input checked="" class="perm-check" type="checkbox"/></td>
+<td class="text-center"><input checked="" class="perm-check" type="checkbox"/></td>
+<td class="text-center"><input class="perm-check" type="checkbox"/></td>
+<td class="text-center"><input checked="" class="perm-check" type="checkbox"/></td>
+<td class="text-center"><input class="perm-check" type="checkbox"/></td>
+<td class="text-center bg-primary-fixed/5"><input checked="" class="perm-check" type="checkbox"/></td>
+</tr>
+<tr>
+<td class="matrix-sticky-col px-4 py-3 flex items-center gap-3">
+<span class="material-symbols-outlined text-outline text-[18px]">visibility</span>
+<div class="flex flex-col">
+<span class="font-bold">查看遥测</span>
+<span class="font-code-meta text-outline text-[10px]">assets.telemetry.read</span>
+</div>
+</td>
+<td class="text-center"><input checked="" class="perm-check" type="checkbox"/></td>
+<td class="text-center"><input checked="" class="perm-check" type="checkbox"/></td>
+<td class="text-center"><input checked="" class="perm-check" type="checkbox"/></td>
+<td class="text-center"><input checked="" class="perm-check" type="checkbox"/></td>
+<td class="text-center"><input checked="" class="perm-check" type="checkbox"/></td>
+<td class="text-center bg-primary-fixed/5"><input checked="" class="perm-check" type="checkbox"/></td>
+</tr>
+<tr>
+<td class="matrix-sticky-col px-4 py-3 flex items-center gap-3">
+<span class="material-symbols-outlined text-outline text-[18px]">analytics</span>
+<div class="flex flex-col">
+<span class="font-bold">影响分析</span>
+<span class="font-code-meta text-outline text-[10px]">assets.analysis.run</span>
+</div>
+</td>
+<td class="text-center"><input checked="" class="perm-check" type="checkbox"/></td>
+<td class="text-center"><input checked="" class="perm-check" type="checkbox"/></td>
+<td class="text-center"><input class="perm-check" type="checkbox"/></td>
+<td class="text-center"><input class="perm-check" type="checkbox"/></td>
+<td class="text-center"><input class="perm-check" type="checkbox"/></td>
+<td class="text-center bg-primary-fixed/5"><input class="perm-check" type="checkbox"/></td>
+</tr>
+</tbody>
+</table>
+</div>
+</main>
+<!-- BottomNavBar -->
+<footer class="fixed bottom-0 left-[240px] right-0 h-[48px] bg-surface-container-low border-t border-border-subtle flex justify-center items-center gap-8 py-2 z-50">
+<div class="flex items-center gap-8 px-6">
+<div class="flex items-center gap-2 text-primary font-bold bg-primary-fixed rounded-full px-4 py-1">
+<span class="material-symbols-outlined text-[18px]">edit_note</span>
+<span class="font-status-label text-status-label">草稿</span>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant opacity-60">
+<span class="material-symbols-outlined text-[18px]">rule</span>
+<span class="font-status-label text-status-label">技术评审</span>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant opacity-60">
+<span class="material-symbols-outlined text-[18px]">verified</span>
+<span class="font-status-label text-status-label">安全检查</span>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant opacity-60">
+<span class="material-symbols-outlined text-[18px]">rocket_launch</span>
+<span class="font-status-label text-status-label">发布</span>
+</div>
+</div>
+<div class="ml-auto flex items-center gap-4 pr-6">
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-status-amber animate-pulse"></div>
+<span class="font-code-meta text-status-amber">2 个待评审</span>
+</div>
+<button class="bg-status-purple text-on-primary px-3 py-1 rounded font-status-label text-status-label uppercase tracking-wider hover:opacity-90 transition-opacity">
+                开始发布流
+            </button>
+</div>
+</footer>
+<!-- Interactive Micro-Interactions -->
+<script>
+        document.querySelectorAll('.perm-check').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const row = this.closest('tr');
+                if (this.checked) {
+                    this.parentElement.classList.add('bg-primary/5');
+                    setTimeout(() => this.parentElement.classList.remove('bg-primary/5'), 300);
+                }
+            });
+        });
+
+        // Simulating search filtering
+        const searchInput = document.querySelector('input[placeholder="过滤策略..."]');
+        searchInput.addEventListener('input', function(e) {
+            const term = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('tbody tr:not(.bg-surface-container-highest\\/30)');
+            rows.forEach(row => {
+                const text = row.querySelector('.matrix-sticky-col').textContent.toLowerCase();
+                row.style.display = text.includes(term) ? '' : 'none';
+            });
+        });
+    </script>
+</body></html>

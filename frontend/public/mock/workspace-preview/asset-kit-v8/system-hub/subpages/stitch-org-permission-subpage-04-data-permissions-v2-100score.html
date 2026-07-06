@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>数据权限范围配置 - UNIVIEW</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            uniview: {
+              navy: '#061b38',
+              blue: '#2d7cf7',
+              bg: '#f0f2f5',
+              border: '#d7e2ef',
+              text: '#333333',
+              muted: '#8c92a4'
+            }
+          },
+          fontSize: {
+            'xxs': '0.65rem'
+          }
+        }
+      }
+    }
+  </script>
+<style data-purpose="custom-scrollbars">
+    /* Custom Scrollbar for inner panels if content overflows (though goal is no scroll on document) */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+    body {
+      overflow: hidden; /* Prevent document scroll per request */
+      background-color: #f0f2f5;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    }
+  </style>
+</head>
+<body class="w-[1586px] h-[992px] flex flex-col m-0 p-0 text-sm text-uniview-text bg-white">
+<!-- BEGIN: TopBar -->
+<header class="h-[60px] bg-uniview-navy flex items-center justify-between px-4 text-white shrink-0">
+<div class="flex items-center gap-6 h-full">
+<div class="text-xl font-bold tracking-wider mr-4">UNIVIEW</div>
+<nav class="flex h-full text-sm">
+<a class="flex items-center gap-2 px-4 h-full text-gray-300 hover:text-white" href="#"><i class="fa-solid fa-chart-pie"></i>资产运营总览</a>
+<a class="flex items-center gap-2 px-4 h-full text-gray-300 hover:text-white" href="#"><i class="fa-solid fa-desktop"></i>数据监控中心</a>
+<a class="flex items-center gap-2 px-4 h-full text-gray-300 hover:text-white" href="#"><i class="fa-solid fa-wrench"></i>资产运维中心</a>
+<a class="flex items-center gap-2 px-4 h-full text-gray-300 hover:text-white" href="#"><i class="fa-solid fa-shield-halved"></i>风险预警中心</a>
+<a class="flex items-center gap-2 px-4 h-full bg-blue-600 text-white font-medium" href="#"><i class="fa-solid fa-gear"></i>系统运营中枢</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-gray-300 hover:text-white"><i class="fa-solid fa-magnifying-glass"></i></button>
+<div class="relative">
+<button class="text-gray-300 hover:text-white"><i class="fa-regular fa-bell"></i></button>
+<span class="absolute -top-1 -right-1 bg-red-500 text-white text-xxs px-1 rounded-full">12</span>
+</div>
+<button class="text-gray-300 hover:text-white"><i class="fa-regular fa-circle-question"></i></button>
+<div class="flex items-center gap-2 cursor-pointer">
+<img alt="User" class="w-6 h-6 rounded-full bg-gray-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCfr2Din7sDPjYVX_7rS86abKvzAOZ3X8f_LlVf4ZWjIYLauEcFruUElbh2L74Z78qkRZIKYQTc3PjhvXYfnEbkWFv3Ip7oXgfjI7VRgRqxHtzC86L_V2JRstMeA4kkt6vRKAsz3w1dp4-EgIRazqeTJ6K547o8nxNmU_ITZQqgc_uOQl8HEUN7XxcLk3UFO2QJK78C7289dJ7Oi00fZ5imAgVGMBIGN3MUjWVe178m-5lZMIdPvqiLvSGSJ2N8XBghkNu37TmyzoE"/>
+<span class="text-sm">系统管理员</span>
+<i class="fa-solid fa-chevron-down text-xs text-gray-400"></i>
+</div>
+</div>
+</header>
+<!-- END: TopBar -->
+<div class="flex flex-1 overflow-hidden">
+<!-- BEGIN: LeftSidebar -->
+<aside class="w-[200px] bg-[#102442] text-gray-300 flex flex-col shrink-0">
+<div class="p-4 text-base font-medium text-white border-b border-gray-700">系统运营中枢</div>
+<nav class="flex-1 overflow-y-auto py-2 text-sm">
+<div class="px-4 py-2 hover:bg-[#1a3052] cursor-pointer flex items-center gap-2"><i class="fa-regular fa-clock w-4"></i>概览中心</div>
+<div class="mt-2">
+<div class="px-4 py-2 flex items-center justify-between hover:bg-[#1a3052] cursor-pointer text-white">
+<div class="flex items-center gap-2"><i class="fa-solid fa-sitemap w-4"></i>组织权限管理</div>
+<i class="fa-solid fa-chevron-up text-xs"></i>
+</div>
+<div class="flex flex-col">
+<a class="pl-10 pr-4 py-2 hover:bg-[#1a3052]" href="#">用户管理</a>
+<a class="pl-10 pr-4 py-2 hover:bg-[#1a3052]" href="#">角色权限</a>
+<a class="pl-10 pr-4 py-2 hover:bg-[#1a3052]" href="#">菜单权限</a>
+<a class="pl-10 pr-4 py-2 bg-blue-600 text-white font-medium relative" href="#">
+<i class="fa-solid fa-shield-check absolute left-4 top-1/2 -translate-y-1/2"></i>
+              数据权限
+            </a>
+<a class="pl-10 pr-4 py-2 hover:bg-[#1a3052]" href="#">部门组织</a>
+<a class="pl-10 pr-4 py-2 hover:bg-[#1a3052]" href="#">岗位管理</a>
+<a class="pl-10 pr-4 py-2 hover:bg-[#1a3052]" href="#">工作交接</a>
+</div>
+</div>
+<div class="px-4 py-2 flex items-center justify-between hover:bg-[#1a3052] cursor-pointer mt-2">
+<div class="flex items-center gap-2"><i class="fa-solid fa-sliders w-4"></i>系统配置管理</div>
+<i class="fa-solid fa-chevron-down text-xs"></i>
+</div>
+<div class="px-4 py-2 flex items-center justify-between hover:bg-[#1a3052] cursor-pointer">
+<div class="flex items-center gap-2"><i class="fa-regular fa-file-lines w-4"></i>安全审计中心</div>
+<i class="fa-solid fa-chevron-down text-xs"></i>
+</div>
+<div class="px-4 py-2 flex items-center justify-between hover:bg-[#1a3052] cursor-pointer">
+<div class="flex items-center gap-2"><i class="fa-solid fa-plug w-4"></i>集成对接管理</div>
+<i class="fa-solid fa-chevron-down text-xs"></i>
+</div>
+<div class="px-4 py-2 flex items-center justify-between hover:bg-[#1a3052] cursor-pointer">
+<div class="flex items-center gap-2"><i class="fa-solid fa-calendar-check w-4"></i>任务调度中心</div>
+<i class="fa-solid fa-chevron-down text-xs"></i>
+</div>
+<div class="px-4 py-2 flex items-center justify-between hover:bg-[#1a3052] cursor-pointer">
+<div class="flex items-center gap-2"><i class="fa-solid fa-toolbox w-4"></i>运维工具中心</div>
+<i class="fa-solid fa-chevron-down text-xs"></i>
+</div>
+</nav>
+<div class="p-4 border-t border-gray-700 text-center cursor-pointer hover:text-white">
+<i class="fa-solid fa-bars-staggered"></i>
+</div>
+</aside>
+<!-- END: LeftSidebar -->
+<!-- BEGIN: MainContent -->
+<main class="flex-1 flex flex-col overflow-hidden bg-[#f4f7f9] relative">
+<!-- Background pattern/color for the main area to match design -->
+<div class="absolute inset-0 bg-white shadow-[inset_0_0_20px_rgba(0,0,0,0.02)] pointer-events-none"></div>
+<div class="relative z-10 flex-1 flex flex-col p-4 gap-4 h-full overflow-hidden">
+<!-- Header -->
+<div class="flex items-center justify-between bg-white p-4 rounded shadow-sm shrink-0 border border-uniview-border">
+<div class="flex items-center gap-2">
+<h1 class="text-lg font-bold">数据权限范围配置</h1>
+<i class="fa-regular fa-circle-question text-gray-400 text-sm"></i>
+</div>
+<div class="flex gap-2">
+<button class="px-4 py-1.5 border border-gray-300 rounded text-gray-700 hover:bg-gray-50 bg-white">新建数据权限</button>
+<button class="px-4 py-1.5 border border-gray-300 rounded text-gray-700 hover:bg-gray-50 bg-white">越权校验</button>
+<button class="px-4 py-1.5 border border-gray-300 rounded text-gray-700 hover:bg-gray-50 bg-white">保存草稿</button>
+<button class="px-4 py-1.5 bg-blue-500 text-white rounded hover:bg-blue-600">提交校验</button>
+</div>
+</div>
+<!-- Filter Bar -->
+<div class="bg-white p-3 rounded shadow-sm flex items-center gap-4 shrink-0 border border-uniview-border text-xs">
+<div class="relative flex-1 max-w-xs">
+<i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+<input class="w-full pl-8 pr-3 py-1.5 border border-gray-300 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-xs" placeholder="搜索规则、组织、位置、资产类别、CIP项目" type="text"/>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-gray-500">范围维度</span>
+<select class="border border-gray-300 rounded py-1.5 px-2 text-xs w-24">
+<option>全部</option>
+</select>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-gray-500">风险等级</span>
+<select class="border border-gray-300 rounded py-1.5 px-2 text-xs w-24">
+<option>全部</option>
+</select>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-gray-500">授权状态</span>
+<select class="border border-gray-300 rounded py-1.5 px-2 text-xs w-24">
+<option>全部</option>
+</select>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-gray-500">有效期</span>
+<div class="flex items-center border border-gray-300 rounded px-2 py-1.5 bg-white w-56">
+<input class="w-full border-none p-0 text-xs focus:ring-0 text-center text-gray-400" placeholder="开始日期" type="text"/>
+<span class="text-gray-400 px-1">~</span>
+<input class="w-full border-none p-0 text-xs focus:ring-0 text-center text-gray-400" placeholder="结束日期" type="text"/>
+<i class="fa-regular fa-calendar text-gray-400 ml-1"></i>
+</div>
+</div>
+<button class="ml-auto px-4 py-1.5 border border-gray-300 rounded text-gray-600 hover:bg-gray-50 bg-white">重置</button>
+</div>
+<!-- Main Workspace -->
+<div class="flex flex-1 gap-4 overflow-hidden">
+<!-- Column 1: List -->
+<div class="w-[280px] bg-white rounded shadow-sm border border-uniview-border flex flex-col shrink-0">
+<div class="p-3 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+<span class="font-medium text-sm">数据权限规则列表</span>
+<i class="fa-solid fa-arrow-down-up-across-line text-gray-400 text-xs cursor-pointer"></i>
+</div>
+<div class="flex-1 overflow-y-auto p-2 space-y-2">
+<!-- Card 1 -->
+<div class="p-3 border border-blue-400 rounded bg-blue-50/30 cursor-pointer relative shadow-sm">
+<div class="flex justify-between items-start mb-2">
+<span class="font-medium text-gray-800 text-sm">CIP 项目数据权限</span>
+<span class="text-blue-500 bg-blue-50 border border-blue-200 px-1.5 py-0.5 rounded text-[10px]">已发布</span>
+</div>
+<div class="text-xs text-gray-500 mb-1 flex items-center gap-2">
+                  风险等级: <span class="text-red-500 border border-red-200 px-1 rounded text-[10px]">高</span>
+</div>
+<div class="text-xs text-gray-400 flex justify-between items-center">
+                  最后更新: 2024-05-23 10:12
+                  <i class="fa-solid fa-ellipsis-vertical cursor-pointer px-1"></i>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="p-3 border border-gray-200 rounded hover:border-gray-300 cursor-pointer bg-white">
+<div class="flex justify-between items-start mb-2">
+<span class="font-medium text-gray-800 text-sm">A厂区资产范围</span>
+<span class="text-green-600 bg-green-50 border border-green-200 px-1.5 py-0.5 rounded text-[10px]">已发布</span>
+</div>
+<div class="text-xs text-gray-500 mb-1 flex items-center gap-2">
+                  风险等级: <span class="text-yellow-600 border border-yellow-200 px-1 rounded text-[10px]">中</span>
+</div>
+<div class="text-xs text-gray-400 flex justify-between items-center">
+                  最后更新: 2024-05-20 16:48
+                  <i class="fa-solid fa-ellipsis-vertical cursor-pointer px-1"></i>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="p-3 border border-gray-200 rounded hover:border-gray-300 cursor-pointer bg-white">
+<div class="flex justify-between items-start mb-2">
+<span class="font-medium text-gray-800 text-sm">全量导出临时授权</span>
+<span class="text-orange-500 bg-orange-50 border border-orange-200 px-1.5 py-0.5 rounded text-[10px]">草稿</span>
+</div>
+<div class="text-xs text-gray-500 mb-1 flex items-center gap-2">
+                  风险等级: <span class="text-red-500 border border-red-200 px-1 rounded text-[10px]">高</span>
+</div>
+<div class="text-xs text-gray-400 flex justify-between items-center">
+                  最后更新: 2024-05-19 09:31
+                  <i class="fa-solid fa-ellipsis-vertical cursor-pointer px-1"></i>
+</div>
+</div>
+<!-- Card 4 -->
+<div class="p-3 border border-gray-200 rounded hover:border-gray-300 cursor-pointer bg-white">
+<div class="flex justify-between items-start mb-2">
+<span class="font-medium text-gray-800 text-sm">机房服务器范围</span>
+<span class="text-green-600 bg-green-50 border border-green-200 px-1.5 py-0.5 rounded text-[10px]">已发布</span>
+</div>
+<div class="text-xs text-gray-500 mb-1 flex items-center gap-2">
+                  风险等级: <span class="text-yellow-600 border border-yellow-200 px-1 rounded text-[10px]">中</span>
+</div>
+<div class="text-xs text-gray-400 flex justify-between items-center">
+                  最后更新: 2024-05-18 14:22
+                  <i class="fa-solid fa-ellipsis-vertical cursor-pointer px-1"></i>
+</div>
+</div>
+</div>
+<div class="p-2 border-t border-gray-100 flex justify-between items-center text-xs text-gray-500 bg-gray-50/50">
+<div class="flex gap-1">
+<button class="w-6 h-6 border rounded bg-white flex items-center justify-center text-gray-300" disabled=""><i class="fa-solid fa-chevron-left text-[10px]"></i></button>
+<button class="w-6 h-6 border border-blue-500 bg-blue-500 text-white rounded flex items-center justify-center text-[10px]">1</button>
+<button class="w-6 h-6 border rounded bg-white flex items-center justify-center"><i class="fa-solid fa-chevron-right text-[10px]"></i></button>
+</div>
+<span>共 4 条</span>
+</div>
+</div>
+<!-- Center & Right Column Container -->
+<div class="flex-1 flex flex-col gap-4 overflow-hidden">
+<!-- Upper Section: Matrix & Form -->
+<div class="flex gap-4 h-[440px] shrink-0">
+<!-- Center Upper: Matrix -->
+<div class="flex-[3] bg-white rounded shadow-sm border border-uniview-border flex flex-col overflow-hidden">
+<div class="p-3 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+<div class="flex items-center gap-2">
+<span class="font-medium text-sm">组合范围矩阵</span>
+<i class="fa-regular fa-circle-question text-gray-400 text-xs"></i>
+</div>
+<div class="flex gap-2">
+<select class="border border-gray-300 rounded py-1 px-2 text-xs bg-white">
+<option>按维度视图</option>
+</select>
+<button class="border border-gray-300 rounded px-2 py-1 bg-white hover:bg-gray-50 text-gray-600"><i class="fa-solid fa-rotate-right text-xs"></i></button>
+</div>
+</div>
+<div class="flex-1 overflow-auto p-3">
+<table class="w-full text-xs text-left border-collapse min-w-[700px]">
+<thead>
+<tr class="bg-gray-50 text-gray-500 border-b border-gray-200">
+<th class="p-2 font-medium w-32">规则名称</th>
+<th class="p-2 font-medium">组织范围</th>
+<th class="p-2 font-medium">位置范围</th>
+<th class="p-2 font-medium">资产分类</th>
+<th class="p-2 font-medium">CIP项目</th>
+<th class="p-2 font-medium">敏感字段</th>
+<th class="p-2 font-medium w-24">有效期</th>
+<th class="p-2 font-medium">越权策略</th>
+<th class="p-2 font-medium">状态</th>
+<th class="p-2 font-medium">操作</th>
+</tr>
+</thead>
+<tbody class="text-gray-700">
+<!-- Row 1 Active -->
+<tr class="border-b border-gray-100 bg-blue-50/20 hover:bg-gray-50">
+<td class="p-2 text-blue-600 font-medium">CIP 项目数据权限</td>
+<td class="p-2"><span class="text-green-600 flex items-center gap-1"><i class="fa-regular fa-circle-check"></i> 3个组织</span></td>
+<td class="p-2"><span class="text-green-600 flex items-center gap-1"><i class="fa-regular fa-circle-check"></i> 5个位置</span></td>
+<td class="p-2"><span class="text-green-600 flex items-center gap-1"><i class="fa-regular fa-circle-check"></i> 6类</span></td>
+<td class="p-2"><span class="text-green-600 flex items-center gap-1"><i class="fa-regular fa-circle-check"></i> 8个项目</span></td>
+<td class="p-2"><span class="text-green-600 flex items-center gap-1"><i class="fa-regular fa-circle-check"></i> 12个字段</span></td>
+<td class="p-2 text-gray-500 leading-tight">2024-05-23<br/>~<br/>2025-05-22</td>
+<td class="p-2">阻断访问</td>
+<td class="p-2"><span class="text-green-600">已发布</span></td>
+<td class="p-2 text-blue-500">
+<a class="block hover:underline mb-1" href="#">编辑</a>
+<a class="block hover:underline flex items-center gap-1" href="#">更多 <i class="fa-solid fa-chevron-down text-[10px]"></i></a>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="border-b border-gray-100 hover:bg-gray-50">
+<td class="p-2">A厂区资产范围</td>
+<td class="p-2"><span class="text-green-600 flex items-center gap-1"><i class="fa-regular fa-circle-check"></i> 1个组织</span></td>
+<td class="p-2"><span class="text-green-600 flex items-center gap-1"><i class="fa-regular fa-circle-check"></i> 2个位置</span></td>
+<td class="p-2"><span class="text-green-600 flex items-center gap-1"><i class="fa-regular fa-circle-check"></i> 4类</span></td>
+<td class="p-2 text-center text-gray-400">-</td>
+<td class="p-2"><span class="text-green-600 flex items-center gap-1"><i class="fa-regular fa-circle-check"></i> 5个字段</span></td>
+<td class="p-2 text-gray-500 leading-tight">2024-04-01<br/>~<br/>2024-12-31</td>
+<td class="p-2">记录告警</td>
+<td class="p-2"><span class="text-green-600">已发布</span></td>
+<td class="p-2 text-blue-500">
+<a class="block hover:underline mb-1" href="#">编辑</a>
+<a class="block hover:underline flex items-center gap-1" href="#">更多 <i class="fa-solid fa-chevron-down text-[10px]"></i></a>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="border-b border-gray-100 hover:bg-gray-50">
+<td class="p-2">全量导出临时授权</td>
+<td class="p-2"><span class="text-green-600 flex items-center gap-1"><i class="fa-regular fa-circle-check"></i> 全部组织</span></td>
+<td class="p-2"><span class="text-green-600 flex items-center gap-1"><i class="fa-regular fa-circle-check"></i> 全部位置</span></td>
+<td class="p-2"><span class="text-green-600 flex items-center gap-1"><i class="fa-regular fa-circle-check"></i> 全部</span></td>
+<td class="p-2"><span class="text-green-600 flex items-center gap-1"><i class="fa-regular fa-circle-check"></i> 全部项目</span></td>
+<td class="p-2"><span class="text-green-600 flex items-center gap-1"><i class="fa-regular fa-circle-check"></i> 全部字段</span></td>
+<td class="p-2 text-gray-500 leading-tight">2024-05-19<br/>~<br/>2024-06-02</td>
+<td class="p-2">阻断访问</td>
+<td class="p-2"><span class="text-orange-500">草稿</span></td>
+<td class="p-2 text-blue-500">
+<a class="block hover:underline mb-1" href="#">编辑</a>
+<a class="block hover:underline flex items-center gap-1" href="#">更多 <i class="fa-solid fa-chevron-down text-[10px]"></i></a>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="border-b border-gray-100 hover:bg-gray-50">
+<td class="p-2">机房服务器范围</td>
+<td class="p-2"><span class="text-green-600 flex items-center gap-1"><i class="fa-regular fa-circle-check"></i> 2个组织</span></td>
+<td class="p-2"><span class="text-green-600 flex items-center gap-1"><i class="fa-regular fa-circle-check"></i> 3个位置</span></td>
+<td class="p-2"><span class="text-green-600 flex items-center gap-1"><i class="fa-regular fa-circle-check"></i> 2类</span></td>
+<td class="p-2 text-center text-gray-400">-</td>
+<td class="p-2"><span class="text-green-600 flex items-center gap-1"><i class="fa-regular fa-circle-check"></i> 8个字段</span></td>
+<td class="p-2 text-gray-500 leading-tight">2024-03-15<br/>~<br/>2024-09-15</td>
+<td class="p-2">记录告警</td>
+<td class="p-2"><span class="text-green-600">已发布</span></td>
+<td class="p-2 text-blue-500">
+<a class="block hover:underline mb-1" href="#">编辑</a>
+<a class="block hover:underline flex items-center gap-1" href="#">更多 <i class="fa-solid fa-chevron-down text-[10px]"></i></a>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Right Upper: Form -->
+<div class="flex-[2] bg-white rounded shadow-sm border border-uniview-border flex flex-col min-w-[340px]">
+<div class="p-3 border-b border-gray-100 flex items-center gap-2 bg-gray-50/50">
+<span class="font-medium text-sm">CIP 项目数据权限</span>
+<span class="text-blue-500 bg-blue-50 border border-blue-200 px-1.5 py-0.5 rounded text-[10px]">已发布</span>
+</div>
+<div class="flex-1 overflow-y-auto p-4 space-y-3 text-xs">
+<div class="flex items-center">
+<label class="w-24 text-gray-600 flex items-center">规则名称 <span class="text-red-500 ml-1">*</span></label>
+<input class="flex-1 border border-gray-300 rounded px-2 py-1.5 bg-gray-50 text-gray-700" type="text" value="CIP 项目数据权限"/>
+</div>
+<div class="flex items-center">
+<label class="w-24 text-gray-600 flex items-center">组织范围 <span class="text-red-500 ml-1">*</span></label>
+<div class="flex-1 border border-gray-300 rounded px-2 py-1.5 flex justify-between items-center cursor-pointer hover:border-blue-500 bg-white">
+<span>3 个组织</span>
+<div class="text-gray-400 flex gap-2"><i class="fa-solid fa-chevron-right text-[10px]"></i> <i class="fa-solid fa-sitemap"></i></div>
+</div>
+</div>
+<div class="flex items-center">
+<label class="w-24 text-gray-600 flex items-center">位置范围 <span class="text-red-500 ml-1">*</span></label>
+<div class="flex-1 border border-gray-300 rounded px-2 py-1.5 flex justify-between items-center cursor-pointer hover:border-blue-500 bg-white">
+<span>5 个位置</span>
+<div class="text-gray-400 flex gap-2"><i class="fa-solid fa-chevron-right text-[10px]"></i> <i class="fa-solid fa-location-dot"></i></div>
+</div>
+</div>
+<div class="flex items-center">
+<label class="w-24 text-gray-600 flex items-center">资产分类 <span class="text-red-500 ml-1">*</span></label>
+<div class="flex-1 border border-gray-300 rounded px-2 py-1.5 flex justify-between items-center cursor-pointer hover:border-blue-500 bg-white">
+<span>6 类资产分类</span>
+<div class="text-gray-400 flex gap-2"><i class="fa-solid fa-chevron-right text-[10px]"></i> <i class="fa-solid fa-tags"></i></div>
+</div>
+</div>
+<div class="flex items-center">
+<label class="w-24 text-gray-600 flex items-center">CIP项目 <span class="text-red-500 ml-1">*</span></label>
+<div class="flex-1 border border-gray-300 rounded px-2 py-1.5 flex justify-between items-center cursor-pointer hover:border-blue-500 bg-white">
+<span>8 个CIP项目</span>
+<div class="text-gray-400 flex gap-2"><i class="fa-solid fa-chevron-right text-[10px]"></i> <i class="fa-solid fa-briefcase"></i></div>
+</div>
+</div>
+<div class="flex items-center">
+<label class="w-24 text-gray-600 flex items-center">敏感字段 <span class="text-red-500 ml-1">*</span></label>
+<div class="flex-1 border border-gray-300 rounded px-2 py-1.5 flex justify-between items-center cursor-pointer hover:border-blue-500 bg-white">
+<span>12 个字段</span>
+<div class="text-gray-400 flex gap-2"><i class="fa-solid fa-chevron-right text-[10px]"></i> <i class="fa-regular fa-eye-slash"></i></div>
+</div>
+</div>
+<div class="flex items-center">
+<label class="w-24 text-gray-600 flex items-center">授权有效期 <span class="text-red-500 ml-1">*</span></label>
+<div class="flex-1 border border-gray-300 rounded px-2 py-1.5 flex justify-between items-center cursor-pointer bg-white">
+<span>2024-05-23 ~ 2025-05-22</span>
+<i class="fa-regular fa-calendar text-gray-400"></i>
+</div>
+</div>
+<div class="flex items-center">
+<label class="w-24 text-gray-600 flex items-center">越权策略 <span class="text-red-500 ml-1">*</span></label>
+<select class="flex-1 border border-gray-300 rounded px-2 py-1.5 bg-white focus:ring-blue-500 focus:border-blue-500">
+<option>阻断访问</option>
+</select>
+</div>
+<div class="flex items-center">
+<label class="w-24 text-gray-600 flex items-center">数据脱敏 <span class="text-red-500 ml-1">*</span></label>
+<select class="flex-1 border border-gray-300 rounded px-2 py-1.5 bg-white focus:ring-blue-500 focus:border-blue-500">
+<option>已启用 (脱敏模板: 默认模板)</option>
+</select>
+</div>
+<div class="flex items-center">
+<label class="w-24 text-gray-600">所有者</label>
+<div class="flex-1 border border-gray-300 rounded px-2 py-1.5 flex justify-between items-center bg-gray-50 text-gray-700">
+<span>张敏</span>
+<i class="fa-regular fa-user text-gray-400"></i>
+</div>
+</div>
+</div>
+<div class="p-3 border-t border-gray-100 flex gap-2 bg-gray-50/50 justify-center">
+<button class="px-4 py-1.5 bg-blue-500 text-white text-xs rounded hover:bg-blue-600">保存数据权限</button>
+<button class="px-4 py-1.5 border border-gray-300 text-gray-700 text-xs rounded hover:bg-gray-50 bg-white">运行越权校验</button>
+<button class="px-4 py-1.5 border border-gray-300 text-gray-700 text-xs rounded hover:bg-gray-50 bg-white">查看审计</button>
+</div>
+</div>
+</div>
+<!-- Lower Section: Simulation & Checklist -->
+<div class="flex gap-4 flex-1 min-h-[250px]">
+<!-- Center Lower: Simulation -->
+<div class="flex-[3] bg-white rounded shadow-sm border border-uniview-border flex flex-col p-4">
+<div class="flex items-center gap-2 mb-4">
+<span class="font-medium text-sm">访问模拟</span>
+<i class="fa-regular fa-circle-question text-gray-400 text-xs"></i>
+</div>
+<div class="flex items-center gap-4 mb-4 text-xs">
+<div class="flex items-center gap-2">
+<span class="text-gray-600">测试用户</span>
+<select class="border border-blue-300 rounded py-1.5 px-2 text-blue-600 bg-blue-50 w-24">
+<option>张敏 ×</option>
+</select>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-gray-600">角色</span>
+<select class="border border-gray-300 rounded py-1.5 px-2 text-gray-700 w-32 bg-white">
+<option>资产会计</option>
+</select>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-gray-600">请求范围</span>
+<select class="border border-gray-300 rounded py-1.5 px-2 text-gray-700 w-40 bg-white">
+<option>请求资产/CIP记录</option>
+</select>
+</div>
+<button class="px-4 py-1.5 bg-blue-500 text-white rounded hover:bg-blue-600 ml-2">开始模拟</button>
+</div>
+<div class="flex gap-4 mb-4">
+<!-- Result Card 1 -->
+<div class="flex-1 border border-green-200 bg-green-50/30 rounded p-3 relative flex flex-col">
+<div class="text-xs text-gray-600 mb-1">可见数据</div>
+<div class="text-2xl font-semibold text-green-600 mb-2">4,286 <span class="text-xs font-normal text-gray-500">条记录</span></div>
+<div class="text-[10px] text-gray-500 flex justify-between w-2/3 mb-1">
+<span>资产:</span><span class="text-gray-700">3,912</span>
+</div>
+<div class="text-[10px] text-gray-500 flex justify-between w-2/3 mb-4">
+<span>CIP 项目:</span><span class="text-gray-700">374</span>
+</div>
+<a class="text-blue-500 text-xs mt-auto flex items-center gap-1 hover:underline" href="#">查看明细 <i class="fa-solid fa-arrow-right text-[10px]"></i></a>
+</div>
+<!-- Result Card 2 -->
+<div class="flex-1 border border-red-200 bg-red-50/30 rounded p-3 relative flex flex-col">
+<div class="text-xs text-gray-600 mb-1">被拦截数据</div>
+<div class="text-2xl font-semibold text-red-500 mb-2">1,137 <span class="text-xs font-normal text-gray-500">条记录</span></div>
+<div class="text-[10px] text-gray-500 flex justify-between w-2/3 mb-1">
+<span>资产:</span><span class="text-gray-700">1,002</span>
+</div>
+<div class="text-[10px] text-gray-500 flex justify-between w-2/3 mb-4">
+<span>CIP 项目:</span><span class="text-gray-700">135</span>
+</div>
+<a class="text-blue-500 text-xs mt-auto flex items-center gap-1 hover:underline" href="#">查看明细 <i class="fa-solid fa-arrow-right text-[10px]"></i></a>
+</div>
+<!-- Result Card 3 -->
+<div class="flex-1 border border-yellow-200 bg-yellow-50/30 rounded p-3 relative flex flex-col">
+<div class="text-xs text-gray-600 mb-1">脱敏字段</div>
+<div class="text-2xl font-semibold text-yellow-600 mb-2">12 <span class="text-xs font-normal text-gray-500">个字段</span></div>
+<div class="text-[10px] text-gray-500 flex justify-between w-2/3 mb-1">
+<span>资产:</span><span class="text-gray-700">7 个字段</span>
+</div>
+<div class="text-[10px] text-gray-500 flex justify-between w-2/3 mb-4">
+<span>CIP 项目:</span><span class="text-gray-700">5 个字段</span>
+</div>
+<a class="text-blue-500 text-xs mt-auto flex items-center gap-1 hover:underline" href="#">查看明细 <i class="fa-solid fa-arrow-right text-[10px]"></i></a>
+</div>
+</div>
+<div class="mt-auto bg-blue-50/50 border border-blue-100 rounded p-2 text-xs text-blue-800 flex items-center gap-2">
+<i class="fa-solid fa-circle-info text-blue-500"></i>
+<span>策略生效: 阻断访问</span> | 
+                  <span>模拟时间: 2024-05-23 10:30:22</span> | 
+                  <span>数据源: 生产库 (实时)</span>
+</div>
+</div>
+<!-- Right Lower: Checklist -->
+<div class="flex-[2] bg-white rounded shadow-sm border border-uniview-border flex flex-col min-w-[340px]">
+<div class="p-3 border-b border-gray-100 flex items-center gap-2 bg-gray-50/50">
+<span class="font-medium text-sm">发布校验清单</span>
+<i class="fa-regular fa-circle-question text-gray-400 text-xs"></i>
+</div>
+<div class="flex-1 p-4 overflow-y-auto space-y-4">
+<div class="flex items-start gap-3">
+<i class="fa-solid fa-circle-check text-green-500 mt-0.5"></i>
+<div class="flex-1">
+<div class="flex justify-between items-center mb-0.5">
+<span class="text-sm font-medium text-gray-800">范围维度完整</span>
+<span class="text-green-600 text-xs">通过</span>
+</div>
+<div class="text-[10px] text-gray-500">组织、位置、资产分类、CIP项目、敏感字段已配置</div>
+</div>
+</div>
+<div class="flex items-start gap-3">
+<i class="fa-solid fa-circle-check text-green-500 mt-0.5"></i>
+<div class="flex-1">
+<div class="flex justify-between items-center mb-0.5">
+<span class="text-sm font-medium text-gray-800">敏感字段脱敏</span>
+<span class="text-green-600 text-xs">通过</span>
+</div>
+<div class="text-[10px] text-gray-500">已配置脱敏模板，包含 12 个敏感字段</div>
+</div>
+</div>
+<div class="flex items-start gap-3">
+<i class="fa-solid fa-circle-check text-green-500 mt-0.5"></i>
+<div class="flex-1">
+<div class="flex justify-between items-center mb-0.5">
+<span class="text-sm font-medium text-gray-800">临时授权有效期</span>
+<span class="text-green-600 text-xs">通过</span>
+</div>
+<div class="text-[10px] text-gray-500">有效期在预定义可接受范围内 (≤ 180 天)</div>
+</div>
+</div>
+<div class="flex items-start gap-3">
+<i class="fa-solid fa-circle-exclamation text-orange-500 mt-0.5"></i>
+<div class="flex-1">
+<div class="flex justify-between items-center mb-0.5">
+<span class="text-sm font-medium text-gray-800">安全管理员复核</span>
+<span class="text-orange-500 text-xs">待处理</span>
+</div>
+<div class="text-[10px] text-gray-500">需安全管理员复核后方可提交校验</div>
+</div>
+</div>
+</div>
+<div class="p-3 border-t border-gray-100 flex justify-center bg-gray-50/50">
+<button class="px-6 py-1.5 border border-gray-300 text-gray-700 text-xs rounded hover:bg-gray-50 bg-white">刷新校验</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- END: MainContent -->
+</div>
+</body></html>

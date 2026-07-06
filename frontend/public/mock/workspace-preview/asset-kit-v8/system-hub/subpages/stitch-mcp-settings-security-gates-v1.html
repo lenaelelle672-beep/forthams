@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>安全门禁与发布策略 - 后台设置 OS</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        @import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap');
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary": "#490080",
+                        "background": "#051424",
+                        "on-surface": "#d4e4fa",
+                        "outline": "#8c90a0",
+                        "on-secondary-fixed": "#001f2a",
+                        "secondary-fixed-dim": "#6bd2ff",
+                        "primary-fixed-dim": "#b0c6ff",
+                        "on-error-container": "#ffdad6",
+                        "on-error": "#690005",
+                        "error": "#ffb4ab",
+                        "error-container": "#93000a",
+                        "on-surface-variant": "#c2c6d7",
+                        "on-secondary-fixed-variant": "#004d65",
+                        "secondary-fixed": "#bfe9ff",
+                        "on-background": "#d4e4fa",
+                        "secondary": "#6bd2ff",
+                        "surface-variant": "#273647",
+                        "on-tertiary-container": "#fffdff",
+                        "tertiary-fixed-dim": "#ddb7ff",
+                        "on-secondary": "#003547",
+                        "on-tertiary-fixed": "#2c0051",
+                        "on-primary-fixed": "#001945",
+                        "surface-dim": "#051424",
+                        "primary-fixed": "#d9e2ff",
+                        "primary-container": "#1d6ef2",
+                        "secondary-container": "#00a8d8",
+                        "surface-bright": "#2c3a4c",
+                        "surface-container": "#122131",
+                        "surface-container-lowest": "#010f1f",
+                        "on-tertiary-fixed-variant": "#6900b3",
+                        "inverse-on-surface": "#233143",
+                        "tertiary-fixed": "#f0dbff",
+                        "inverse-primary": "#0057cc",
+                        "tertiary": "#ddb7ff",
+                        "on-primary-container": "#fffdff",
+                        "surface-tint": "#b0c6ff",
+                        "inverse-surface": "#d4e4fa",
+                        "surface-container-high": "#1c2b3c",
+                        "surface": "#051424",
+                        "on-secondary-container": "#00384a",
+                        "tertiary-container": "#9c49eb",
+                        "primary": "#b0c6ff",
+                        "on-primary": "#002c6f",
+                        "surface-container-low": "#0d1c2d",
+                        "surface-container-highest": "#273647",
+                        "outline-variant": "#424654",
+                        "on-primary-fixed-variant": "#00419c"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "unit": "4px",
+                        "margin-desktop": "48px",
+                        "gutter": "24px",
+                        "xxl": "64px",
+                        "xl": "40px",
+                        "lg": "24px",
+                        "sm": "8px",
+                        "xs": "4px",
+                        "md": "16px",
+                        "margin-mobile": "16px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Geist", "sans-serif"],
+                        "title-md": ["Geist", "sans-serif"],
+                        "display-lg": ["Geist", "sans-serif"],
+                        "headline-lg-mobile": ["Geist", "sans-serif"],
+                        "body-md": ["Geist", "sans-serif"],
+                        "body-lg": ["Geist", "sans-serif"],
+                        "mono-code": ["JetBrains Mono", "monospace"],
+                        "label-md": ["Geist", "sans-serif"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "title-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "mono-code": ["13px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        /* Custom scrollbar for immersive feel */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #273647;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #424654;
+        }
+        .glow-active {
+            box-shadow: 0 0 8px theme('colors.primary');
+        }
+        .glow-error {
+            box-shadow: 0 0 8px theme('colors.error');
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body-lg min-h-screen antialiased overflow-hidden selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopNavBar -->
+<header class="bg-surface-dim/80 backdrop-blur-3xl border-b border-surface-container-high fixed top-0 w-full z-50 flex justify-between items-center px-lg h-xxl">
+<div class="flex items-center gap-lg h-full">
+<span class="font-headline-lg text-headline-lg font-bold text-primary tracking-tight">后台设置 OS</span>
+<!-- 搜索 Bar on left -->
+<div class="relative ml-xl hidden md:flex items-center w-96">
+<span class="material-symbols-outlined absolute left-sm text-on-surface-variant text-[20px]" style="font-variation-settings: 'FILL' 0;">search</span>
+<input class="w-full bg-surface-container-low text-on-surface font-body-md pl-xl pr-sm py-sm border-0 border-b-2 border-transparent focus:border-primary focus:ring-0 transition-colors placeholder:text-on-surface-variant/50 outline-none" placeholder="全局 search..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<button class="w-10 h-10 flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors active:scale-95">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">settings</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors active:scale-95">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">notifications</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors active:scale-95">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">help</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-surface-container-highest border border-surface-container-high overflow-hidden ml-sm cursor-pointer hover:ring-2 ring-primary transition-all">
+<img alt="管理istrator Profile" class="w-full h-full object-cover" data-alt="A hyper-realistic close-up portrait of an administrator profile avatar. The avatar is abstract, featuring glowing geometric patterns in a deep sea blue and neon cyan color palette, consistent with a high-end futuristic operating system UI." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD7-6RfMjSzSoi5REf07cmwidSHlNyOAEexQS37vqXWSRLufhf_sL_1Wp5XhHpbZEd5LrvWihLuvh77Ert_vkJ8VtoUoWWn2bXZGKIaRGdac4lwHaLG52EdUGBQfiCk184ZBab9ftiUKQXog9y37FVFHinIgY-OS2Vv17YPPv_PgBp0j4TWO5_A6D0GyPWmHFwOfN9zC7TVbOwQAtxxOU6n7-q4JqLmmT7kJFuMxeGBOjW7MeSO9HA9a6rJ5qMf2FaECr3eqYbHBp22"/>
+</div>
+</div>
+</header>
+<!-- SideNavBar -->
+<nav class="bg-surface-container-low/90 backdrop-blur-2xl border-r border-surface-container-high fixed left-0 top-xxl bottom-0 w-xxl flex flex-col items-center py-lg z-40">
+<!-- Header area reserved for logic if needed, but tabs start here -->
+<div class="flex flex-col gap-sm w-full px-sm mt-md">
+<button class="group w-full h-12 flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all rounded-DEFAULT relative">
+<span class="material-symbols-outlined text-[24px]" style="font-variation-settings: 'FILL' 0;">dashboard</span>
+<span class="font-label-md text-[10px] mt-1 opacity-0 group-hover:opacity-100 absolute -bottom-4 whitespace-nowrap">指挥中心</span>
+</button>
+<button class="group w-full h-12 flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all rounded-DEFAULT relative">
+<span class="material-symbols-outlined text-[24px]" style="font-variation-settings: 'FILL' 0;">inventory_2</span>
+<span class="font-label-md text-[10px] mt-1 opacity-0 group-hover:opacity-100 absolute -bottom-4 whitespace-nowrap">资产业务</span>
+</button>
+<button class="group w-full h-12 flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all rounded-DEFAULT relative">
+<span class="material-symbols-outlined text-[24px]" style="font-variation-settings: 'FILL' 0;">gavel</span>
+<span class="font-label-md text-[10px] mt-1 opacity-0 group-hover:opacity-100 absolute -bottom-4 whitespace-nowrap">治理</span>
+</button>
+<!-- 启用 TAB -->
+<button class="group w-full h-12 flex flex-col items-center justify-center text-primary border-r-2 border-primary bg-primary-container/10 transition-all relative">
+<span class="material-symbols-outlined text-[24px]" style="font-variation-settings: 'FILL' 1;">shield</span>
+<span class="font-label-md text-[10px] mt-1 opacity-0 group-hover:opacity-100 absolute -bottom-4 whitespace-nowrap">安全</span>
+</button>
+<button class="group w-full h-12 flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all rounded-DEFAULT relative">
+<span class="material-symbols-outlined text-[24px]" style="font-variation-settings: 'FILL' 0;">analytics</span>
+<span class="font-label-md text-[10px] mt-1 opacity-0 group-hover:opacity-100 absolute -bottom-4 whitespace-nowrap">智能分析</span>
+</button>
+</div>
+<div class="mt-auto mb-sm w-full px-sm">
+<button class="w-full h-12 flex items-center justify-center text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all rounded-DEFAULT">
+<span class="material-symbols-outlined text-[24px]" style="font-variation-settings: 'FILL' 0;">logout</span>
+</button>
+</div>
+</nav>
+<!-- Main Layout Wrapper -->
+<main class="ml-xxl mt-xxl h-[calc(100vh-64px)] flex w-[calc(100%-64px)]">
+<!-- Center Area: Workbench -->
+<section class="flex-1 flex flex-col h-full bg-surface relative z-10 overflow-y-auto">
+<!-- Page Header -->
+<div class="px-margin-desktop py-xl border-b border-surface-container-high bg-surface-container-low/50 shrink-0">
+<div class="flex items-center gap-xs font-label-md text-on-surface-variant mb-md">
+<span>治理</span>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+<span>安全</span>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+<span class="text-primary">发布门禁</span>
+</div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface mb-xs">安全门禁与发布策略</h1>
+<p class="font-body-md text-on-surface-variant">定义登录准入、身份信任及生产变更风险管控规则</p>
+</div>
+<!-- Toolbar -->
+<div class="px-margin-desktop py-md flex items-center justify-between border-b border-surface-container-high shrink-0">
+<div class="relative w-[320px]">
+<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">filter_list</span>
+<input class="w-full bg-surface-container-low text-on-surface font-body-md pl-xl pr-sm py-[6px] border-0 border-b border-surface-container-high focus:border-primary focus:ring-0 transition-colors outline-none text-sm" placeholder="筛选 gate rules..." type="text"/>
+</div>
+<div class="flex gap-sm">
+<button class="px-md py-[6px] text-primary border border-surface-container-high hover:bg-surface-container-low transition-colors font-label-md rounded flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]">download</span> 导出
+                    </button>
+<button class="px-md py-[6px] bg-primary text-on-primary hover:bg-primary-fixed transition-colors font-label-md rounded flex items-center gap-xs shadow-[0_0_12px_rgba(176,198,255,0.2)]">
+<span class="material-symbols-outlined text-[16px]">add</span> 新建门禁
+                    </button>
+</div>
+</div>
+<!-- Content Matrix -->
+<div class="flex-1 overflow-x-auto pb-xl">
+<div class="min-w-[1200px]">
+<!-- Table Header -->
+<div class="grid grid-cols-12 gap-sm px-margin-desktop py-sm border-b border-surface-container-high text-on-surface-variant font-label-md bg-surface-container-lowest sticky top-0 z-20">
+<div class="col-span-3">门禁名称 (门禁名称)</div>
+<div class="col-span-2">执行级别 (执行级别)</div>
+<div class="col-span-3">目标范围 (目标范围)</div>
+<div class="col-span-2">当前状态 (当前状态)</div>
+<div class="col-span-1">最近修改</div>
+<div class="col-span-1 text-right">操作</div>
+</div>
+<!-- Group 1 -->
+<div class="px-margin-desktop py-md bg-surface-container-low/30 border-b border-surface-container-high font-label-md text-secondary tracking-widest uppercase mt-4">
+                        认证安全
+                    </div>
+<!-- Row 1 -->
+<div class="grid grid-cols-12 gap-sm px-margin-desktop py-md border-b border-surface-container-high hover:bg-surface-container-low/50 transition-colors items-center group cursor-pointer">
+<div class="col-span-3 flex items-center gap-sm">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">fingerprint</span>
+<span class="font-body-md font-medium text-on-surface">登录 MFA 要求</span>
+</div>
+<div class="col-span-2">
+<span class="inline-flex items-center px-2 py-1 rounded bg-error-container/20 border border-error-container text-error font-label-md text-[10px]">严格</span>
+</div>
+<div class="col-span-3 font-mono-code text-on-surface-variant truncate">全局.AllUsers.*</div>
+<div class="col-span-2 flex items-center gap-sm font-label-md">
+<div class="w-2 h-2 rounded-full bg-secondary shadow-[0_0_6px_theme('colors.secondary')]"></div>
+<span class="text-on-surface">运行中</span>
+</div>
+<div class="col-span-1 font-mono-code text-on-surface-variant text-[12px]">2 小时前</div>
+<div class="col-span-1 flex justify-end gap-sm opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="text-on-surface-variant hover:text-primary"><span class="material-symbols-outlined text-[18px]">edit</span></button>
+<button class="text-on-surface-variant hover:text-primary"><span class="material-symbols-outlined text-[18px]">more_vert</span></button>
+</div>
+</div>
+<!-- Row 2 -->
+<div class="grid grid-cols-12 gap-sm px-margin-desktop py-md border-b border-surface-container-high hover:bg-surface-container-low/50 transition-colors items-center group cursor-pointer">
+<div class="col-span-3 flex items-center gap-sm">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">router</span>
+<span class="font-body-md font-medium text-on-surface">IP 白名单强制器</span>
+</div>
+<div class="col-span-2">
+<span class="inline-flex items-center px-2 py-1 rounded bg-surface-variant border border-outline-variant text-on-surface-variant font-label-md text-[10px]">柔性</span>
+</div>
+<div class="col-span-3 font-mono-code text-on-surface-variant truncate">Net.Subnet.Corp.*</div>
+<div class="col-span-2 flex items-center gap-sm font-label-md">
+<div class="w-2 h-2 rounded-full bg-tertiary shadow-[0_0_6px_theme('colors.tertiary')]"></div>
+<span class="text-on-surface">需复核</span>
+</div>
+<div class="col-span-1 font-mono-code text-on-surface-variant text-[12px]">1 天前</div>
+<div class="col-span-1 flex justify-end gap-sm opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="text-on-surface-variant hover:text-primary"><span class="material-symbols-outlined text-[18px]">edit</span></button>
+<button class="text-on-surface-variant hover:text-primary"><span class="material-symbols-outlined text-[18px]">more_vert</span></button>
+</div>
+</div>
+<!-- Group 2 -->
+<div class="px-margin-desktop py-md bg-surface-container-low/30 border-b border-surface-container-high font-label-md text-secondary tracking-widest uppercase mt-lg">
+                        发布防护
+                    </div>
+<!-- Row 3 启用/INSPECTED -->
+<div class="grid grid-cols-12 gap-sm px-margin-desktop py-md border-b border-primary/30 bg-primary-container/5 items-center group cursor-pointer relative overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-primary glow-active"></div>
+<div class="col-span-3 flex items-center gap-sm pl-2">
+<span class="material-symbols-outlined text-primary">rule</span>
+<span class="font-body-md font-medium text-primary">影响分析绕过</span>
+</div>
+<div class="col-span-2">
+<span class="inline-flex items-center px-2 py-1 rounded bg-error-container/20 border border-error-container text-error font-label-md text-[10px]">严格</span>
+</div>
+<div class="col-span-3 font-mono-code text-primary-fixed-dim truncate">Prod.Cluster.核心.*</div>
+<div class="col-span-2 flex items-center gap-sm font-label-md">
+<div class="w-2 h-2 rounded-full bg-error glow-error"></div>
+<span class="text-error">阻塞</span>
+</div>
+<div class="col-span-1 font-mono-code text-on-surface-variant text-[12px]">5 分钟前</div>
+<div class="col-span-1 flex justify-end gap-sm">
+<button class="text-primary hover:text-primary-fixed"><span class="material-symbols-outlined text-[18px]">edit</span></button>
+</div>
+</div>
+<!-- Row 4 -->
+<div class="grid grid-cols-12 gap-sm px-margin-desktop py-md border-b border-surface-container-high hover:bg-surface-container-low/50 transition-colors items-center group cursor-pointer">
+<div class="col-span-3 flex items-center gap-sm">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">ac_unit</span>
+<span class="font-body-md font-medium text-on-surface">生产冻结窗口</span>
+</div>
+<div class="col-span-2">
+<span class="inline-flex items-center px-2 py-1 rounded bg-surface-variant border border-outline-variant text-on-surface-variant font-label-md text-[10px]">AUDIT</span>
+</div>
+<div class="col-span-3 font-mono-code text-on-surface-variant truncate">全局.Environment.Prod</div>
+<div class="col-span-2 flex items-center gap-sm font-label-md">
+<div class="w-2 h-2 rounded-full bg-primary shadow-[0_0_6px_theme('colors.primary')]"></div>
+<span class="text-on-surface">协议</span>
+</div>
+<div class="col-span-1 font-mono-code text-on-surface-variant text-[12px]">1 周前</div>
+<div class="col-span-1 flex justify-end gap-sm opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="text-on-surface-variant hover:text-primary"><span class="material-symbols-outlined text-[18px]">edit</span></button>
+<button class="text-on-surface-variant hover:text-primary"><span class="material-symbols-outlined text-[18px]">more_vert</span></button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Right Inspector (Glassmorphism) -->
+<aside class="w-[480px] bg-surface-dim/90 backdrop-blur-2xl border-l border-surface-container-high h-full overflow-y-auto shrink-0 relative z-20 flex flex-col shadow-[-20px_0_40px_rgba(0,0,0,0.5)]">
+<!-- Inspector Header -->
+<div class="px-xl py-lg border-b border-surface-container-high flex justify-between items-start sticky top-0 bg-surface-dim/90 backdrop-blur-md z-10">
+<div>
+<div class="flex items-center gap-sm mb-xs">
+<span class="w-2 h-2 rounded-full bg-error glow-error"></span>
+<span class="font-label-md text-error tracking-wider uppercase">状态: 阻塞</span>
+</div>
+<h2 class="font-title-md text-on-surface">影响分析绕过</h2>
+<p class="font-body-md text-on-surface-variant mt-1">影响分析豁免 (Prod.Cluster.核心)</p>
+</div>
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<div class="p-xl flex flex-col gap-xl">
+<!-- Section: Risk Explanation -->
+<section>
+<h3 class="font-label-md text-primary tracking-widest uppercase mb-md flex items-center gap-sm">
+<span class="material-symbols-outlined text-[16px]">warning</span>
+                        风险说明
+                    </h3>
+<p class="font-body-md text-on-surface-variant leading-relaxed">
+                        该门禁阻止绕过标准影响分析协议的未授权生产变更，降低核心集群故障风险。避免未经测试的配置进入核心环境。
+                    </p>
+</section>
+<!-- Section: AI 助手 Checklist -->
+<section class="p-md bg-surface-container-low border border-surface-container-high rounded">
+<h3 class="font-label-md text-secondary tracking-widest uppercase mb-sm flex items-center gap-sm">
+<span class="material-symbols-outlined text-[16px]">smart_toy</span>
+                        AI 助手检查单
+                    </h3>
+<ul class="space-y-sm font-body-md text-on-surface">
+<li class="flex items-start gap-sm">
+<span class="material-symbols-outlined text-secondary text-[18px] mt-[2px]">check_circle</span>
+<span>验证 CI/CD 流水线令牌有效性（已通过）。</span>
+</li>
+<li class="flex items-start gap-sm">
+<span class="material-symbols-outlined text-error text-[18px] mt-[2px]">error</span>
+<span class="text-error-container">检测发布清单中的未授权人工覆盖标记。</span>
+</li>
+<li class="flex items-start gap-sm">
+<span class="material-symbols-outlined text-on-surface-variant text-[18px] mt-[2px]">pending</span>
+<span class="text-on-surface-variant">清单哈希变更需要 SRE 负责人审批。</span>
+</li>
+</ul>
+</section>
+<!-- Section: Trigger 日志 -->
+<section>
+<h3 class="font-label-md text-primary tracking-widest uppercase mb-md flex items-center gap-sm">
+<span class="material-symbols-outlined text-[16px]">history</span>
+                        触发日志
+                    </h3>
+<div class="space-y-unit">
+<!-- Log item -->
+<div class="flex flex-col p-sm hover:bg-surface-container-low transition-colors border-l-2 border-error">
+<div class="flex justify-between font-mono-code text-[12px] text-on-surface-variant mb-1">
+<span>[BLOCKED] deploy-core-v2.1</span>
+<span>10:42:15 AM</span>
+</div>
+<span class="font-body-md text-on-surface text-sm">尝试绕过的用户： jenkins_sa. 缺少分析载荷。</span>
+</div>
+<!-- Log item -->
+<div class="flex flex-col p-sm hover:bg-surface-container-low transition-colors border-l-2 border-surface-container-high">
+<div class="flex justify-between font-mono-code text-[12px] text-on-surface-variant mb-1">
+<span>[PASSED] patch-auth-hotfix</span>
+<span>昨天</span>
+</div>
+<span class="font-body-md text-on-surface-variant text-sm">SRE-04 已授权紧急覆盖。</span>
+</div>
+</div>
+</section>
+<!-- Section: 回滚 策略 -->
+<section class="mt-auto pt-xl border-t border-surface-container-high">
+<h3 class="font-label-md text-on-surface-variant tracking-widest uppercase mb-md">
+                        回滚策略 (回滚 策略)
+                    </h3>
+<p class="font-body-md text-on-surface-variant mb-md text-sm">
+                        回滚该门禁配置会临时允许未经影响分析的部署，请谨慎操作。
+                    </p>
+<button class="w-full py-sm bg-transparent border border-error text-error hover:bg-error/10 transition-colors font-label-md rounded flex items-center justify-center gap-xs">
+<span class="material-symbols-outlined text-[18px]">history_toggle_off</span>
+                        强制覆盖门禁
+                    </button>
+</section>
+</div>
+</aside>
+</main>
+</body></html>

@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+
+<html class="light" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>后台设置 OS - 权限控制矩阵</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&amp;family=JetBrains+Mono:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind 配置 -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "status-cyan": "#00A8D8",
+                    "on-secondary-container": "#51617e",
+                    "inverse-surface": "#2d3134",
+                    "outline": "#727786",
+                    "on-surface": "#181c1f",
+                    "inverse-on-surface": "#eef1f5",
+                    "on-secondary-fixed": "#091c35",
+                    "surface-container-high": "#e5e8ec",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-bright": "#f7fafe",
+                    "status-green": "#16A34A",
+                    "text-primary": "#0F172A",
+                    "primary-fixed-dim": "#b0c6ff",
+                    "surface-container-highest": "#e0e3e7",
+                    "primary-fixed": "#d9e2ff",
+                    "primary-container": "#1d6ef2",
+                    "on-error-container": "#93000a",
+                    "secondary": "#4e5f7b",
+                    "on-secondary": "#ffffff",
+                    "tertiary-fixed-dim": "#ffb695",
+                    "on-error": "#ffffff",
+                    "status-purple": "#7C3AED",
+                    "surface-dim": "#d7dade",
+                    "tertiary": "#9f3e00",
+                    "on-tertiary": "#ffffff",
+                    "on-primary-fixed": "#001945",
+                    "status-amber": "#F59E0B",
+                    "border-subtle": "#D7E2F0",
+                    "outline-variant": "#c2c6d7",
+                    "on-tertiary-container": "#fffdff",
+                    "primary": "#0056c9",
+                    "on-primary-fixed-variant": "#00419c",
+                    "on-surface-variant": "#424654",
+                    "on-primary-container": "#fffdff",
+                    "secondary-fixed-dim": "#b6c7e8",
+                    "on-tertiary-fixed": "#351000",
+                    "error": "#ba1a1a",
+                    "tertiary-fixed": "#ffdbcc",
+                    "on-primary": "#ffffff",
+                    "surface-container": "#ebeef2",
+                    "secondary-container": "#ccddff",
+                    "on-secondary-fixed-variant": "#374762",
+                    "text-secondary": "#64748B",
+                    "on-background": "#181c1f",
+                    "status-red": "#DC2626",
+                    "surface-variant": "#e0e3e7",
+                    "on-tertiary-fixed-variant": "#7b2f00",
+                    "tertiary-container": "#c75000",
+                    "surface-container-low": "#f1f4f8",
+                    "background": "#f7fafe"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "grid-gutter": "12px",
+                    "container-gap": "20px",
+                    "topbar-height": "48px",
+                    "sidebar-width": "196px",
+                    "inspector-width": "320px",
+                    "card-padding": "16px"
+            },
+            "fontFamily": {
+                    "body-sm": ["Inter"],
+                    "body-md": ["Inter"],
+                    "status-label": ["Inter"],
+                    "page-title": ["Inter"],
+                    "code-meta": ["JetBrains Mono"],
+                    "section-header": ["Inter"]
+            },
+            "fontSize": {
+                    "body-sm": ["12px", {"lineHeight": "18px", "fontWeight": "500"}],
+                    "body-md": ["13px", {"lineHeight": "20px", "fontWeight": "500"}],
+                    "status-label": ["11px", {"lineHeight": "16px", "fontWeight": "700"}],
+                    "page-title": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "code-meta": ["11px", {"lineHeight": "16px", "fontWeight": "400"}],
+                    "section-header": ["14px", {"lineHeight": "20px", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .glass-panel { backdrop-filter: blur(8px); background: rgba(255, 255, 255, 0.85); }
+        .matrix-row:hover { background-color: rgba(215, 226, 240, 0.15); }
+        .pipeline-line { height: 1px; background: repeating-linear-gradient(to right, #D7E2F0 0, #D7E2F0 4px, transparent 4px, transparent 8px); }
+        .matrix-sticky-col { position: sticky; left: 0; z-index: 10; background: inherit; }
+    </style>
+</head>
+<body class="bg-background text-on-surface">
+<!-- TOP NAVIGATION SHELL -->
+<header class="fixed top-0 left-0 w-full z-50 flex items-center justify-between px-container-gap h-topbar-height bg-on-surface dark:bg-inverse-surface">
+<div class="flex items-center gap-8">
+<h1 class="font-page-title text-page-title text-surface-lowest dark:text-surface-bright tracking-tight">后台设置 OS</h1>
+<nav class="hidden md:flex items-center gap-6">
+<a class="font-body-md text-body-md text-surface-variant dark:text-outline-variant hover:text-primary-fixed" href="#">指挥中心</a>
+<a class="font-body-md text-body-md text-primary-fixed-dim border-b-2 border-primary-fixed-dim pb-1" href="#">控制塔</a>
+<a class="font-body-md text-body-md text-surface-variant dark:text-outline-variant hover:text-primary-fixed" href="#">资产业务</a>
+<a class="font-body-md text-body-md text-surface-variant dark:text-outline-variant hover:text-primary-fixed" href="#">数据分析</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative group">
+<span class="material-symbols-outlined text-outline-variant cursor-pointer hover:text-primary-fixed-dim">notifications</span>
+<span class="absolute top-0 right-0 w-2 h-2 bg-status-red rounded-full"></span>
+</div>
+<span class="material-symbols-outlined text-outline-variant cursor-pointer hover:text-primary-fixed-dim">settings</span>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant/30">
+<img class="w-full h-full object-cover" data-alt="Corporate headshot of a female technology administrator in a minimalist workspace, soft studio lighting, professional and calm atmosphere, high-end commercial aesthetic, dominant blue and white tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBVSkznISYm5C_DVE0JaoG9TumLeixAwmMFXOHLr_7M082QPTjpGCcYbHlyJsLPyzvB1jjyAYUlaDHeuQwAgt1FlwvSmi-B227qQoOqkUA379-OnxP36mdAidvT8v4kcMe5SmpWMaN23PmE-7jeTeJAA3-X_XzBQ_eZSqWj9MB3lnMpW_Ckur1waPqD66Pb4SU4cqr51GtVQoIhMBSwPgUvL1mASNdvAWtQwlp5fkYKyak6wvYegAvlK_y5usbv8HeM5j2yrqh-oALI"/>
+</div>
+</div>
+</header>
+<!-- SIDE NAVIGATION SHELL -->
+<aside class="fixed left-0 top-topbar-height w-sidebar-width h-[calc(100vh-topbar-height)] flex flex-col p-4 bg-surface-container-lowest dark:bg-surface-dim border-r border-border-subtle dark:border-outline-variant z-40">
+<div class="mb-6 flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-status-green animate-pulse"></div>
+<div>
+<div class="font-section-header text-section-header text-on-surface">系统节点 01</div>
+<div class="font-body-sm text-body-sm text-outline">健康</div>
+</div>
+</div>
+<nav class="flex-1 flex flex-col gap-1">
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant font-body-sm text-body-sm hover:bg-surface-container-low rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined">tune</span> 通用
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 text-primary font-bold bg-secondary-container rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined">shield</span> 安全
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant font-body-sm text-body-sm hover:bg-surface-container-low rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined">hub</span> 集成配置
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant font-body-sm text-body-sm hover:bg-surface-container-low rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined">robot_2</span> 自动化
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant font-body-sm text-body-sm hover:bg-surface-container-low rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined">account_tree</span> 流程管理
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant font-body-sm text-body-sm hover:bg-surface-container-low rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined">fact_check</span> 合规
+            </a>
+</nav>
+<div class="mt-auto pt-4 border-t border-border-subtle flex flex-col gap-1">
+<a class="flex items-center gap-3 px-3 py-2 text-outline font-body-sm text-body-sm hover:text-on-surface" href="#">
+<span class="material-symbols-outlined">list_alt</span> 日志
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 text-outline font-body-sm text-body-sm hover:text-on-surface" href="#">
+<span class="material-symbols-outlined">contact_support</span> 支持
+            </a>
+<button class="mt-4 w-full bg-primary-container text-on-primary-container py-2 rounded font-body-sm text-body-sm font-bold flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[18px]">add</span> 新建配置
+            </button>
+</div>
+</aside>
+<!-- MAIN WORKSPACE -->
+<main class="ml-sidebar-width mt-topbar-height p-container-gap pb-24 overflow-x-hidden transition-all duration-300">
+<!-- HEADER SECTION -->
+<header class="mb-8">
+<div class="flex justify-between items-start">
+<div>
+<h2 class="font-page-title text-page-title text-text-primary mb-1">角色管理 · 权限控制矩阵</h2>
+<p class="text-text-secondary font-body-md text-body-md max-w-2xl">定义角色、授权菜单及数据范围，确保系统访问权限的精确管控与安全隔离。</p>
+</div>
+<div class="flex gap-3">
+<button class="bg-surface-container-lowest border border-border-subtle text-on-surface px-4 py-2 rounded flex items-center gap-2 font-body-sm text-body-sm hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-[18px]">file_download</span> 导出
+                    </button>
+<button class="bg-surface-container-lowest border border-border-subtle text-on-surface px-4 py-2 rounded flex items-center gap-2 font-body-sm text-body-sm hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-[18px]">edit_square</span> 批量编辑
+                    </button>
+<button class="bg-primary-container text-on-primary-container px-4 py-2 rounded flex items-center gap-2 font-body-sm text-body-sm font-bold hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined text-[18px]">person_add</span> 新建角色
+                    </button>
+</div>
+</div>
+</header>
+<!-- SEARCH & FILTER -->
+<div class="mb-6 flex gap-4 items-center bg-surface-container-lowest p-4 border border-border-subtle rounded-lg">
+<div class="flex-1 flex items-center gap-3 bg-surface px-3 py-2 rounded border border-border-subtle focus-within:border-primary transition-colors">
+<span class="material-symbols-outlined text-outline">search</span>
+<input class="bg-transparent border-none focus:ring-0 w-full font-code-meta text-body-sm" placeholder="筛选 permissions or roles..." type="text"/>
+<span class="text-outline text-[10px] font-code-meta px-1 py-0.5 border border-outline-variant/30 rounded">CMD + K</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="font-body-sm text-body-sm text-text-secondary">环境：</span>
+<select class="bg-surface border border-border-subtle rounded font-body-sm text-body-sm py-1.5 px-3 focus:ring-primary focus:border-primary">
+<option>生产环境（稳定）</option>
+<option>预发环境</option>
+<option>开发沙箱</option>
+</select>
+</div>
+</div>
+<!-- PERMISSION MATRIX -->
+<div class="bg-surface-container-lowest border border-border-subtle rounded-lg overflow-hidden shadow-sm">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low">
+<th class="matrix-sticky-col p-4 border-b border-border-subtle min-w-[220px]">
+<div class="flex flex-col">
+<span class="font-section-header text-section-header text-on-surface">模块 &amp; 权限</span>
+<span class="font-code-meta text-code-meta text-outline">版本 4.2.1 修订版</span>
+</div>
+</th>
+<th class="p-4 border-b border-border-subtle min-w-[140px]">
+<div class="flex flex-col items-center gap-1">
+<span class="font-status-label text-status-label text-primary uppercase">超级管理员</span>
+<span class="font-code-meta text-[10px] text-outline">根权限</span>
+</div>
+</th>
+<th class="p-4 border-b border-border-subtle min-w-[140px]">
+<div class="flex flex-col items-center gap-1">
+<span class="font-status-label text-status-label text-on-surface uppercase">编辑者</span>
+<span class="font-code-meta text-[10px] text-outline">CONTENT_OPS</span>
+</div>
+</th>
+<th class="p-4 border-b border-border-subtle min-w-[140px]">
+<div class="flex flex-col items-center gap-1">
+<span class="font-status-label text-status-label text-on-surface uppercase">查看者</span>
+<span class="font-code-meta text-[10px] text-outline">READ_ONLY</span>
+</div>
+</th>
+<th class="p-4 border-b border-border-subtle min-w-[140px]">
+<div class="flex flex-col items-center gap-1">
+<span class="font-status-label text-status-label text-on-surface uppercase">审计员</span>
+<span class="font-code-meta text-[10px] text-outline">COMPLIANCE</span>
+</div>
+</th>
+<th class="p-4 border-b border-border-subtle min-w-[140px]">
+<div class="flex flex-col items-center gap-1">
+<span class="font-status-label text-status-label text-on-surface uppercase">开发/运维</span>
+<span class="font-code-meta text-[10px] text-outline">INFRA_STRUC</span>
+</div>
+</th>
+</tr>
+</thead>
+<tbody class="font-body-sm text-body-sm">
+<!-- 模块 Group -->
+<tr class="bg-surface-container-high/30">
+<td class="p-2 px-4 font-bold text-outline-variant bg-surface-container-low text-[10px] tracking-widest uppercase" colspan="6">系统核心操作</td>
+</tr>
+<!-- Row 1 -->
+<tr class="matrix-row group">
+<td class="matrix-sticky-col p-4 border-b border-border-subtle">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">dataset</span>
+<div class="flex flex-col">
+<span>用户管理</span>
+<code class="text-[10px] text-outline">sys.user.write</code>
+</div>
+</div>
+</td>
+<td class="p-4 border-b border-border-subtle text-center">
+<span class="material-symbols-outlined text-status-green" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</td>
+<td class="p-4 border-b border-border-subtle text-center">
+<span class="material-symbols-outlined text-outline-variant">remove_circle</span>
+</td>
+<td class="p-4 border-b border-border-subtle text-center">
+<span class="material-symbols-outlined text-outline-variant">remove_circle</span>
+</td>
+<td class="p-4 border-b border-border-subtle text-center">
+<span class="material-symbols-outlined text-outline-variant">remove_circle</span>
+</td>
+<td class="p-4 border-b border-border-subtle text-center">
+<span class="material-symbols-outlined text-status-amber">visibility</span>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="matrix-row group">
+<td class="matrix-sticky-col p-4 border-b border-border-subtle">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">cloud_sync</span>
+<div class="flex flex-col">
+<span>全局 配置</span>
+<code class="text-[10px] text-outline">sys.config.global</code>
+</div>
+</div>
+</td>
+<td class="p-4 border-b border-border-subtle text-center">
+<span class="material-symbols-outlined text-status-green" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</td>
+<td class="p-4 border-b border-border-subtle text-center">
+<span class="material-symbols-outlined text-status-green" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</td>
+<td class="p-4 border-b border-border-subtle text-center">
+<span class="material-symbols-outlined text-status-amber">visibility</span>
+</td>
+<td class="p-4 border-b border-border-subtle text-center">
+<span class="material-symbols-outlined text-status-amber">visibility</span>
+</td>
+<td class="p-4 border-b border-border-subtle text-center">
+<span class="material-symbols-outlined text-status-green" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</td>
+</tr>
+<!-- 模块 Group 2 -->
+<tr class="bg-surface-container-high/30">
+<td class="p-2 px-4 font-bold text-outline-variant bg-surface-container-low text-[10px] tracking-widest uppercase" colspan="6">资产控制面板</td>
+</tr>
+<!-- Row 3 -->
+<tr class="matrix-row group">
+<td class="matrix-sticky-col p-4 border-b border-border-subtle">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">inventory_2</span>
+<div class="flex flex-col">
+<span>实物资产台账</span>
+<code class="text-[10px] text-outline">asset.ledger.edit</code>
+</div>
+</div>
+</td>
+<td class="p-4 border-b border-border-subtle text-center">
+<span class="material-symbols-outlined text-status-green" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</td>
+<td class="p-4 border-b border-border-subtle text-center">
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-8 h-4 bg-outline-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</td>
+<td class="p-4 border-b border-border-subtle text-center">
+<span class="material-symbols-outlined text-status-amber">visibility</span>
+</td>
+<td class="p-4 border-b border-border-subtle text-center">
+<span class="material-symbols-outlined text-status-green" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</td>
+<td class="p-4 border-b border-border-subtle text-center">
+<span class="material-symbols-outlined text-outline-variant">remove_circle</span>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="matrix-row group">
+<td class="matrix-sticky-col p-4 border-b border-border-subtle">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">security</span>
+<div class="flex flex-col">
+<span>加密凭据库访问</span>
+<code class="text-[10px] text-outline">sec.vault.root</code>
+</div>
+</div>
+</td>
+<td class="p-4 border-b border-border-subtle text-center">
+<span class="material-symbols-outlined text-status-green" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</td>
+<td class="p-4 border-b border-border-subtle text-center">
+<span class="material-symbols-outlined text-status-red">lock</span>
+</td>
+<td class="p-4 border-b border-border-subtle text-center">
+<span class="material-symbols-outlined text-status-red">lock</span>
+</td>
+<td class="p-4 border-b border-border-subtle text-center">
+<span class="material-symbols-outlined text-status-red">lock</span>
+</td>
+<td class="p-4 border-b border-border-subtle text-center">
+<span class="material-symbols-outlined text-status-red">lock</span>
+</td>
+</tr>
+<!-- Row 5 -->
+<tr class="matrix-row group">
+<td class="matrix-sticky-col p-4 border-b border-border-subtle">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">history</span>
+<div class="flex flex-col">
+<span>审计日志流</span>
+<code class="text-[10px] text-outline">audit.log.view</code>
+</div>
+</div>
+</td>
+<td class="p-4 border-b border-border-subtle text-center">
+<span class="material-symbols-outlined text-status-green" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</td>
+<td class="p-4 border-b border-border-subtle text-center">
+<span class="material-symbols-outlined text-status-amber">visibility</span>
+</td>
+<td class="p-4 border-b border-border-subtle text-center">
+<span class="material-symbols-outlined text-status-amber">visibility</span>
+</td>
+<td class="p-4 border-b border-border-subtle text-center">
+<span class="material-symbols-outlined text-status-green" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</td>
+<td class="p-4 border-b border-border-subtle text-center">
+<span class="material-symbols-outlined text-status-amber">visibility</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- CONTEXTUAL 信息 CARD (Grid Alternative) -->
+<div class="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
+<div class="bg-surface-container-low border border-border-subtle p-card-padding rounded-lg">
+<div class="flex items-center justify-between mb-4">
+<span class="font-section-header text-section-header text-on-surface">最近变更</span>
+<span class="font-code-meta text-code-meta text-primary">实时事件流</span>
+</div>
+<ul class="space-y-4">
+<li class="flex gap-3">
+<div class="w-1 h-8 bg-status-amber rounded"></div>
+<div>
+<p class="font-body-sm text-body-sm">查看者 角色被修改，操作者 <span class="text-primary">管理_01</span></p>
+<span class="text-[10px] text-outline font-code-meta">2 分钟前 · sys.user.read</span>
+</div>
+</li>
+<li class="flex gap-3">
+<div class="w-1 h-8 bg-status-green rounded"></div>
+<div>
+<p class="font-body-sm text-body-sm">已新增权限 "ai.assist.use"</p>
+<span class="text-[10px] text-outline font-code-meta">45 分钟前 · 系统初始化</span>
+</div>
+</li>
+</ul>
+</div>
+<div class="bg-surface-container-low border border-border-subtle p-card-padding rounded-lg flex flex-col justify-center items-center text-center">
+<div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+<span class="material-symbols-outlined text-primary">security_update_good</span>
+</div>
+<h4 class="font-section-header text-section-header mb-1">矩阵健康度</h4>
+<p class="font-body-sm text-body-sm text-outline mb-4">冲突分析显示 0 条策略重叠。</p>
+<button class="text-primary font-bold font-body-sm text-body-sm hover:underline">运行深度审计</button>
+</div>
+<div class="bg-surface-container-low border border-border-subtle p-card-padding rounded-lg relative overflow-hidden group">
+<div class="absolute inset-0 opacity-10 pointer-events-none">
+<div class="w-full h-full bg-cover" data-alt="Abstract technical background with faint glowing grid lines and microchip circuitry patterns, minimalist light blue and grey tones, high-tech engineering aesthetic." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuABNP7LH1Ua3EZ2nHPgVyb9UmJh5JFo4wwOYyshIznPWU6x9ztsnzPhkVF2CyhuBNAMFHA881rPhUDLPlsATIE8o7IExf0jRr0pv9sRqTjmiYG7xc_4onP4VNKJPXr1Q0cgtAJLWtSWY57QLH7EpQ8Ex_e1e9WkdYykFRat73Qh8I0KwBsIw8cwz6DOHq_NfuDijlWi9R-VG7I8xTOOCxNrXDl_GpmvlRYaJDonqHqgbinD8kwe2Sq7fSfTaZ3gmirJ9IYilv8Pw5ZJ')"></div>
+</div>
+<div class="relative z-10">
+<h4 class="font-section-header text-section-header mb-2">AI 权限建议</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-4 leading-relaxed">基于当前节点使用率，审计员角色可能需要在 2024-Q3 合规窗口提升日志访问权限。</p>
+<button class="bg-primary text-white px-4 py-2 rounded text-[11px] font-bold uppercase tracking-wider">应用建议</button>
+</div>
+</div>
+</div>
+</main>
+<!-- BOTTOM RELEASE PIPELINE SHELL -->
+<footer class="fixed bottom-0 left-sidebar-width right-0 z-40 bg-surface-container-high/95 backdrop-blur-md border-t border-border-subtle flex justify-center items-center gap-12 px-8 h-16 shadow-sm">
+<div class="flex items-center gap-4">
+<div class="flex flex-col items-center gap-1 group">
+<div class="w-8 h-8 rounded-full border-2 border-primary bg-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-[18px]">edit_note</span>
+</div>
+<span class="font-status-label text-status-label uppercase tracking-wider text-primary font-bold">草稿</span>
+</div>
+<div class="w-16 pipeline-line opacity-50"></div>
+<div class="flex flex-col items-center gap-1 opacity-60 hover:opacity-100 transition-opacity">
+<div class="w-8 h-8 rounded-full border-2 border-outline flex items-center justify-center">
+<span class="material-symbols-outlined text-outline text-[18px]">analytics</span>
+</div>
+<span class="font-status-label text-status-label uppercase tracking-wider text-outline">影响分析</span>
+</div>
+<div class="w-16 pipeline-line opacity-20"></div>
+<div class="flex flex-col items-center gap-1 opacity-60">
+<div class="w-8 h-8 rounded-full border-2 border-outline flex items-center justify-center">
+<span class="material-symbols-outlined text-outline text-[18px]">rule</span>
+</div>
+<span class="font-status-label text-status-label uppercase tracking-wider text-outline">技术复核</span>
+</div>
+<div class="w-16 pipeline-line opacity-20"></div>
+<div class="flex flex-col items-center gap-1 opacity-60">
+<div class="w-8 h-8 rounded-full border-2 border-outline flex items-center justify-center">
+<span class="material-symbols-outlined text-outline text-[18px]">gpp_good</span>
+</div>
+<span class="font-status-label text-status-label uppercase tracking-wider text-outline">安全检查</span>
+</div>
+<div class="w-16 pipeline-line opacity-20"></div>
+<div class="flex flex-col items-center gap-1 opacity-40">
+<div class="w-8 h-8 rounded-full border-2 border-outline flex items-center justify-center">
+<span class="material-symbols-outlined text-outline text-[18px]">rocket_launch</span>
+</div>
+<span class="font-status-label text-status-label uppercase tracking-wider text-outline">发布</span>
+</div>
+</div>
+<div class="ml-auto flex items-center gap-4">
+<span class="font-code-meta text-code-meta text-on-surface-variant">变更： +12 / -4</span>
+<button class="bg-primary text-white px-6 py-2 rounded-full font-bold text-[12px] shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-transform">
+                已暂存待复核
+            </button>
+</div>
+</footer>
+<script>
+        // Micro-interactions for the matrix
+        document.querySelectorAll('.matrix-row').forEach(row => {
+            row.addEventListener('click', () => {
+                // 高light the row on click for better focus
+                document.querySelectorAll('.matrix-row').forEach(r => r.classList.remove('bg-primary/5'));
+                row.classList.add('bg-primary/5');
+            });
+        });
+
+        // Command K mockup
+        window.addEventListener('keydown', (e) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                e.preventDefault();
+                alert('Focusing system-wide search palette...');
+            }
+        });
+    </script>
+</body></html>

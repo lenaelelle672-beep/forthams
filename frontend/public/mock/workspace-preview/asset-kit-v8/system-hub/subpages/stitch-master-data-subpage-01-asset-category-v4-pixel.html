@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>企业资产管理系统 - 资产分类</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-surface": "#1a1c1c",
+                      "inverse-primary": "#afc6ff",
+                      "secondary-fixed": "#dae3f7",
+                      "on-error-container": "#93000a",
+                      "surface-variant": "#e2e2e2",
+                      "tertiary-fixed-dim": "#ffb695",
+                      "surface": "#f9f9f9",
+                      "on-secondary-fixed-variant": "#3e4758",
+                      "on-primary-fixed": "#001a43",
+                      "primary": "#0057c2",
+                      "tertiary": "#9e3d00",
+                      "on-tertiary-container": "#fffbff",
+                      "on-error": "#ffffff",
+                      "on-primary-fixed-variant": "#004398",
+                      "surface-tint": "#0059c7",
+                      "on-primary-container": "#fefcff",
+                      "error": "#ba1a1a",
+                      "tertiary-fixed": "#ffdbcc",
+                      "outline": "#727786",
+                      "background": "#f9f9f9",
+                      "on-secondary": "#ffffff",
+                      "tertiary-container": "#c64f00",
+                      "surface-bright": "#f9f9f9",
+                      "on-secondary-container": "#5a6374",
+                      "surface-container": "#eeeeee",
+                      "on-primary": "#ffffff",
+                      "primary-fixed": "#d9e2ff",
+                      "on-tertiary-fixed": "#351000",
+                      "secondary-fixed-dim": "#bec7db",
+                      "inverse-surface": "#2f3131",
+                      "surface-container-highest": "#e2e2e2",
+                      "outline-variant": "#c1c6d7",
+                      "on-surface-variant": "#414755",
+                      "error-container": "#ffdad6",
+                      "surface-dim": "#dadada",
+                      "primary-fixed-dim": "#afc6ff",
+                      "on-tertiary-fixed-variant": "#7c2e00",
+                      "primary-container": "#006ef2",
+                      "inverse-on-surface": "#f1f1f1",
+                      "on-tertiary": "#ffffff",
+                      "on-secondary-fixed": "#131c2a",
+                      "surface-container-lowest": "#ffffff",
+                      "secondary-container": "#d7e0f4",
+                      "on-background": "#1a1c1c",
+                      "surface-container-low": "#f3f3f3",
+                      "surface-container-high": "#e8e8e8",
+                      "secondary": "#565f70"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "header-height": "64px",
+                      "sm": "12px",
+                      "xl": "32px",
+                      "unit": "4px",
+                      "sidebar-width": "208px",
+                      "xs": "8px",
+                      "lg": "24px",
+                      "md": "16px"
+              },
+              "fontFamily": {
+                      "title-sm": [
+                              "\"Inter, PingFang SC, Microsoft YaHei, sans-serif\""
+                      ],
+                      "display-lg": [
+                              "\"Inter, PingFang SC, Microsoft YaHei, sans-serif\""
+                      ],
+                      "label-caps": [
+                              "\"Inter, PingFang SC, Microsoft YaHei, sans-serif\""
+                      ],
+                      "body-md": [
+                              "\"Noto Sans, PingFang SC, Microsoft YaHei, sans-serif\""
+                      ],
+                      "headline-md": [
+                              "\"Inter, PingFang SC, Microsoft YaHei, sans-serif\""
+                      ],
+                      "body-sm": [
+                              "\"Noto Sans, PingFang SC, Microsoft YaHei, sans-serif\""
+                      ]
+              },
+              "fontSize": {
+                      "title-sm": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "display-lg": [
+                              "30px",
+                              {
+                                      "lineHeight": "38px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "label-caps": [
+                              "12px",
+                              {
+                                      "lineHeight": "18px",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "22px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+        body {
+            background-color: #f5f7fb;
+            color: #1a1c1c;
+            font-family: "Noto Sans", "PingFang SC", "Microsoft YaHei", sans-serif;
+            font-size: 12px;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .ant-layout {
+            display: flex;
+            flex-direction: column;
+            width: 1586px;
+            height: 992px;
+            margin: 0 auto;
+            background: #f5f7fb;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .top-nav {
+            height: 50px;
+            background-color: #061b38;
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            color: white;
+            flex-shrink: 0;
+            z-index: 50;
+        }
+
+        .brand-logo {
+            font-size: 16px;
+            font-weight: 600;
+            margin-right: 48px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 32px;
+            height: 100%;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 0 4px;
+            color: rgba(255, 255, 255, 0.65);
+            cursor: pointer;
+            position: relative;
+            font-size: 14px;
+        }
+
+        .nav-item.active {
+            color: white;
+            font-weight: 500;
+        }
+
+        .nav-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: #1677ff;
+        }
+
+        .main-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 220px;
+            background: white;
+            border-right: 1px solid #d7e2ef;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .content-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 16px 24px;
+            overflow: hidden;
+        }
+
+        /* Side Menu Styles */
+        .menu-item {
+            padding: 0 16px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            color: #1a1c1c;
+        }
+        
+        .menu-group {
+            padding: 0 16px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            color: #1a1c1c;
+            justify-content: space-between;
+        }
+
+        .menu-item.active {
+            background-color: #e8f2ff;
+            color: #1677ff;
+            border-right: 3px solid #1677ff;
+        }
+
+        .menu-icon {
+            margin-right: 10px;
+            font-size: 16px;
+        }
+
+        /* Buttons */
+        .btn {
+            height: 32px;
+            padding: 4px 15px;
+            font-size: 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid transparent;
+        }
+
+        .btn-primary {
+            background: #1677ff;
+            color: white;
+        }
+
+        .btn-outline {
+            background: white;
+            border-color: #d9d9d9;
+            color: #1a1c1c;
+        }
+
+        .btn-outline:hover {
+            color: #1677ff;
+            border-color: #1677ff;
+        }
+
+        /* Form Controls */
+        .input-control {
+            height: 32px;
+            padding: 4px 11px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            width: 100%;
+            font-size: 12px;
+        }
+
+        .select-control {
+            height: 32px;
+            padding: 4px 11px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            width: 100%;
+            font-size: 12px;
+            background-color: white;
+        }
+
+        /* Tables */
+        .ant-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+
+        .ant-table th {
+            background: #fafafa;
+            padding: 8px 12px;
+            border-bottom: 1px solid #f0f0f0;
+            text-align: left;
+            font-weight: 500;
+            color: #1a1c1c;
+        }
+
+        .ant-table td {
+            padding: 8px 12px;
+            border-bottom: 1px solid #f0f0f0;
+            color: #1a1c1c;
+        }
+        
+        .ant-table tr:hover td {
+            background: #fafafa;
+        }
+
+        /* Scrollbars */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #d9d9d9;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #bfbfbf;
+        }
+        
+        /* Specific Layout areas */
+        .workbench-region {
+            display: flex;
+            gap: 16px;
+            height: 480px;
+            margin-top: 16px;
+        }
+        
+        .tree-col {
+            width: 196px;
+            background: white;
+            border: 1px solid #d7e2ef;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .table-col {
+            width: 724px;
+            background: white;
+            border: 1px solid #d7e2ef;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-col {
+            width: 384px;
+            background: white;
+            border: 1px solid #d7e2ef;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .panel-header {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f0f0f0;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        .lower-panels {
+            display: flex;
+            gap: 16px;
+            margin-top: 16px;
+            flex: 1;
+        }
+        
+        .impact-preview {
+            width: calc(196px + 724px + 16px);
+            background: white;
+            border: 1px solid #d7e2ef;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .publish-checklist {
+            width: 384px;
+            background: white;
+            border: 1px solid #d7e2ef;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-row {
+            display: flex;
+            margin-bottom: 12px;
+            align-items: center;
+        }
+
+        .form-label {
+            width: 120px;
+            text-align: right;
+            padding-right: 12px;
+            color: #1a1c1c;
+        }
+
+        .form-label.required::before {
+            content: '*';
+            color: #ff4d4f;
+            margin-right: 4px;
+        }
+
+        .form-content {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+<div class="ant-layout">
+<!-- Top Nav -->
+<header class="top-nav">
+<div class="brand-logo">
+                uniview | 固定资产管理系统
+            </div>
+<div class="nav-menu">
+<div class="nav-item">固定资产工作台</div>
+<div class="nav-item">资产全景视图</div>
+<div class="nav-item">大屏态势</div>
+<div class="nav-item">流程协同</div>
+<div class="nav-item active">系统运营中枢</div>
+</div>
+<div style="flex: 1"></div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-white/65 cursor-pointer text-[20px]">search</span>
+<span class="material-symbols-outlined text-white/65 cursor-pointer text-[20px]">notifications</span>
+<div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs">Admin</div>
+</div>
+</header>
+<!-- Main Content Architecture -->
+<div class="main-container">
+<!-- Left Sidebar -->
+<div class="sidebar">
+<div class="p-4 text-xs font-bold text-gray-500 uppercase tracking-wider">系统设置</div>
+<div class="menu-group">
+<div class="flex items-center">
+<span class="material-symbols-outlined menu-icon text-[18px]">folder</span>
+<span>基础资料</span>
+</div>
+<span class="material-symbols-outlined text-[16px]">expand_less</span>
+</div>
+<div class="menu-item active pl-10">
+                    资产分类
+                </div>
+<div class="menu-item pl-10">
+                    组织架构
+                </div>
+<div class="menu-item pl-10">
+                    人员信息
+                </div>
+<div class="menu-item pl-10">
+                    存放区域
+                </div>
+<div class="menu-group mt-2">
+<div class="flex items-center">
+<span class="material-symbols-outlined menu-icon text-[18px]">settings</span>
+<span>系统参数</span>
+</div>
+<span class="material-symbols-outlined text-[16px]">expand_more</span>
+</div>
+<div class="menu-group mt-2">
+<div class="flex items-center">
+<span class="material-symbols-outlined menu-icon text-[18px]">security</span>
+<span>权限管理</span>
+</div>
+<span class="material-symbols-outlined text-[16px]">expand_more</span>
+</div>
+</div>
+<!-- Content Area -->
+<div class="content-area">
+<!-- Header -->
+<div class="flex justify-between items-start mb-4">
+<div>
+<h1 class="text-[20px] font-bold text-[#1a1c1c] mb-1">资产分类策略配置台</h1>
+<p class="text-[12px] text-gray-500">维护资产大类、小类、折旧、编号前缀、盘点策略、标签策略和重点设备规则。</p>
+</div>
+<div class="flex gap-2">
+<button class="btn btn-outline">提交校验</button>
+<button class="btn btn-outline">保存草稿</button>
+<button class="btn btn-outline">影响预览</button>
+<button class="btn btn-outline">批量补类</button>
+<button class="btn btn-primary">+ 新建资产分类</button>
+</div>
+</div>
+<!-- Status Strip -->
+<div class="bg-white border border-[#d7e2ef] rounded p-2 mb-4 flex items-center text-[12px]">
+<div class="flex items-center mr-6 text-gray-600">
+<span class="material-symbols-outlined text-[14px] mr-1 text-green-500">check_circle</span>
+                        当前草稿已保存
+                    </div>
+<div class="flex items-center mr-6 text-gray-600">
+<span class="material-symbols-outlined text-[14px] mr-1 text-green-500">check_circle</span>
+                        编码唯一性通过
+                    </div>
+<div class="flex items-center text-orange-500">
+<span class="material-symbols-outlined text-[14px] mr-1">warning</span>
+                        待建资产池 23 条待补录
+                    </div>
+</div>
+<!-- Filter Bar -->
+<div class="bg-white border border-[#d7e2ef] rounded p-3 mb-0 grid grid-cols-8 gap-4 items-end">
+<div>
+<div class="mb-1 text-gray-500">分类名称</div>
+<input class="input-control" placeholder="请输入" type="text"/>
+</div>
+<div>
+<div class="mb-1 text-gray-500">分类编码</div>
+<input class="input-control" placeholder="请输入" type="text"/>
+</div>
+<div>
+<div class="mb-1 text-gray-500">状态</div>
+<select class="select-control">
+<option>全部</option>
+<option>启用</option>
+<option>停用</option>
+</select>
+</div>
+<div>
+<div class="mb-1 text-gray-500">折旧策略</div>
+<select class="select-control">
+<option>全部</option>
+</select>
+</div>
+<div>
+<div class="mb-1 text-gray-500">盘点策略</div>
+<select class="select-control">
+<option>全部</option>
+</select>
+</div>
+<div>
+<div class="mb-1 text-gray-500">标签策略</div>
+<select class="select-control">
+<option>全部</option>
+</select>
+</div>
+<div class="col-span-2 flex gap-2">
+<button class="btn btn-primary">查询</button>
+<button class="btn btn-outline">重置</button>
+</div>
+</div>
+<!-- Workbench Region -->
+<div class="workbench-region">
+<!-- Left Tree -->
+<div class="tree-col">
+<div class="panel-header">资产分类树</div>
+<div class="p-2 overflow-y-auto flex-1">
+<div class="flex items-center py-1 cursor-pointer">
+<span class="material-symbols-outlined text-[16px] text-gray-400 mr-1">expand_more</span>
+<span class="material-symbols-outlined text-[16px] text-yellow-500 mr-1">folder</span>
+<span>全部分类 (128)</span>
+</div>
+<div class="pl-4">
+<div class="flex items-center py-1 cursor-pointer">
+<span class="material-symbols-outlined text-[16px] text-gray-400 mr-1">expand_more</span>
+<span class="material-symbols-outlined text-[16px] text-yellow-500 mr-1">folder</span>
+<span>生产设备 (56)</span>
+</div>
+<div class="pl-6">
+<div class="flex items-center py-1 bg-[#e8f2ff] text-[#1677ff] rounded px-1 cursor-pointer">
+<span class="material-symbols-outlined text-[16px] mr-1 opacity-0">arrow_right</span>
+<span class="material-symbols-outlined text-[16px] mr-1">description</span>
+<span>贴片机 (8)</span>
+</div>
+<div class="flex items-center py-1 px-1 cursor-pointer hover:bg-gray-50">
+<span class="material-symbols-outlined text-[16px] text-gray-400 mr-1 opacity-0">arrow_right</span>
+<span class="material-symbols-outlined text-[16px] text-gray-400 mr-1">description</span>
+<span>回流焊炉 (6)</span>
+</div>
+<div class="flex items-center py-1 px-1 cursor-pointer hover:bg-gray-50">
+<span class="material-symbols-outlined text-[16px] text-gray-400 mr-1 opacity-0">arrow_right</span>
+<span class="material-symbols-outlined text-[16px] text-gray-400 mr-1">description</span>
+<span>检测设备 (12)</span>
+</div>
+</div>
+<div class="flex items-center py-1 cursor-pointer mt-1">
+<span class="material-symbols-outlined text-[16px] text-gray-400 mr-1">chevron_right</span>
+<span class="material-symbols-outlined text-[16px] text-yellow-500 mr-1">folder</span>
+<span>IT设备 (28)</span>
+</div>
+<div class="flex items-center py-1 cursor-pointer mt-1">
+<span class="material-symbols-outlined text-[16px] text-gray-400 mr-1">chevron_right</span>
+<span class="material-symbols-outlined text-[16px] text-yellow-500 mr-1">folder</span>
+<span>办公家具 (16)</span>
+</div>
+<div class="flex items-center py-1 cursor-pointer mt-1">
+<span class="material-symbols-outlined text-[16px] text-gray-400 mr-1">chevron_right</span>
+<span class="material-symbols-outlined text-[16px] text-yellow-500 mr-1">folder</span>
+<span>研发仪器 (20)</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Center Table -->
+<div class="table-col">
+<div class="panel-header flex justify-between items-center">
+<span>分类明细表</span>
+<div class="flex gap-2">
+<span class="material-symbols-outlined text-[16px] text-gray-400 cursor-pointer">settings</span>
+<span class="material-symbols-outlined text-[16px] text-gray-400 cursor-pointer">download</span>
+</div>
+</div>
+<div class="overflow-y-auto flex-1">
+<table class="ant-table">
+<thead>
+<tr>
+<th>分类名称</th>
+<th>分类编码</th>
+<th>上级分类</th>
+<th>折旧年限(年)</th>
+<th>编号前缀</th>
+<th>盘点策略</th>
+<th>标签策略</th>
+<th>状态</th>
+<th>操作</th>
+</tr>
+</thead>
+<tbody>
+<tr class="bg-[#f0f5ff]">
+<td>贴片机</td>
+<td>SE-SMT-001</td>
+<td>生产设备</td>
+<td>10</td>
+<td>SMT-</td>
+<td>年度全盘</td>
+<td>RFID大标签</td>
+<td><span class="text-green-500">●</span> 启用</td>
+<td><a class="text-[#1677ff] mr-2" href="#">编辑</a><a class="text-gray-400" href="#">禁用</a></td>
+</tr>
+<tr>
+<td>回流焊炉</td>
+<td>SE-RFH-001</td>
+<td>生产设备</td>
+<td>10</td>
+<td>RFH-</td>
+<td>年度全盘</td>
+<td>RFID大标签</td>
+<td><span class="text-green-500">●</span> 启用</td>
+<td><a class="text-[#1677ff] mr-2" href="#">编辑</a><a class="text-gray-400" href="#">禁用</a></td>
+</tr>
+<tr>
+<td>AOI检测仪</td>
+<td>TE-AOI-001</td>
+<td>检测设备</td>
+<td>5</td>
+<td>AOI-</td>
+<td>半年度抽盘</td>
+<td>二维码小标签</td>
+<td><span class="text-green-500">●</span> 启用</td>
+<td><a class="text-[#1677ff] mr-2" href="#">编辑</a><a class="text-gray-400" href="#">禁用</a></td>
+</tr>
+<tr>
+<td>笔记本电脑</td>
+<td>IT-NB-001</td>
+<td>IT设备</td>
+<td>3</td>
+<td>NB-</td>
+<td>员工自盘</td>
+<td>二维码小标签</td>
+<td><span class="text-green-500">●</span> 启用</td>
+<td><a class="text-[#1677ff] mr-2" href="#">编辑</a><a class="text-gray-400" href="#">禁用</a></td>
+</tr>
+<tr>
+<td>服务器</td>
+<td>IT-SV-001</td>
+<td>IT设备</td>
+<td>5</td>
+<td>SV-</td>
+<td>季度全盘</td>
+<td>RFID抗金属标签</td>
+<td><span class="text-green-500">●</span> 启用</td>
+<td><a class="text-[#1677ff] mr-2" href="#">编辑</a><a class="text-gray-400" href="#">禁用</a></td>
+</tr>
+<tr>
+<td>激光切割机</td>
+<td>JG-JGJ-001</td>
+<td>加工设备</td>
+<td>10</td>
+<td>JGJ-</td>
+<td>年度全盘</td>
+<td>RFID大标签</td>
+<td><span class="text-green-500">●</span> 启用</td>
+<td><a class="text-[#1677ff] mr-2" href="#">编辑</a><a class="text-gray-400" href="#">禁用</a></td>
+</tr>
+<tr>
+<td>洗手器</td>
+<td>BG-XSQ-001</td>
+<td>办公设备</td>
+<td>3</td>
+<td>XSQ-</td>
+<td>不盘点</td>
+<td>不贴标</td>
+<td><span class="text-red-500">●</span> 停用</td>
+<td><a class="text-[#1677ff] mr-2" href="#">编辑</a><a class="text-[#1677ff]" href="#">启用</a></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Right Form -->
+<div class="form-col">
+<div class="panel-header flex justify-between items-center">
+<span>分类属性编辑区</span>
+<span class="text-[#1677ff] cursor-pointer text-xs">重置</span>
+</div>
+<div class="p-4 overflow-y-auto flex-1">
+<div class="form-row">
+<div class="form-label required">分类名称</div>
+<div class="form-content">
+<input class="input-control" type="text" value="贴片机"/>
+</div>
+</div>
+<div class="form-row">
+<div class="form-label required">分类编码</div>
+<div class="form-content">
+<input class="input-control bg-gray-50" disabled="" type="text" value="SE-SMT-001"/>
+</div>
+</div>
+<div class="form-row">
+<div class="form-label required">上级分类</div>
+<div class="form-content">
+<select class="select-control">
+<option>生产设备</option>
+</select>
+</div>
+</div>
+<div class="form-row">
+<div class="form-label required">折旧年限(年)</div>
+<div class="form-content">
+<input class="input-control" type="number" value="10"/>
+</div>
+</div>
+<div class="form-row">
+<div class="form-label required">编号前缀</div>
+<div class="form-content">
+<input class="input-control" type="text" value="SMT-"/>
+</div>
+</div>
+<div class="form-row">
+<div class="form-label required">盘点策略</div>
+<div class="form-content">
+<select class="select-control">
+<option>年度全盘</option>
+</select>
+</div>
+</div>
+<div class="form-row">
+<div class="form-label required">标签策略</div>
+<div class="form-content">
+<select class="select-control">
+<option>RFID大标签</option>
+</select>
+</div>
+</div>
+<div class="form-row">
+<div class="form-label required">折旧策略</div>
+<div class="form-content">
+<select class="select-control">
+<option>直线法(无残值)</option>
+</select>
+</div>
+</div>
+<div class="form-row">
+<div class="form-label">重点设备规则</div>
+<div class="form-content flex items-center">
+<label class="flex items-center gap-1 cursor-pointer">
+<input checked="" class="rounded border-gray-300 text-[#1677ff] focus:ring-[#1677ff]" type="checkbox"/>
+<span>启用重点管理</span>
+</label>
+</div>
+</div>
+<div class="form-row">
+<div class="form-label">MES/MAC绑定策略</div>
+<div class="form-content">
+<select class="select-control">
+<option>强制绑定</option>
+</select>
+</div>
+</div>
+<div class="form-row">
+<div class="form-label">CIP转固默认分类</div>
+<div class="form-content flex items-center">
+<label class="flex items-center gap-1 cursor-pointer">
+<input checked="" class="border-gray-300 text-[#1677ff] focus:ring-[#1677ff]" name="cip" type="radio"/>
+<span>是</span>
+</label>
+<label class="flex items-center gap-1 ml-4 cursor-pointer">
+<input class="border-gray-300 text-[#1677ff] focus:ring-[#1677ff]" name="cip" type="radio"/>
+<span>否</span>
+</label>
+</div>
+</div>
+<div class="form-row">
+<div class="form-label">审计策略</div>
+<div class="form-content">
+<select class="select-control">
+<option>需审计</option>
+</select>
+</div>
+</div>
+<div class="form-row">
+<div class="form-label required">负责人</div>
+<div class="form-content">
+<div class="relative">
+<input class="input-control pr-8" type="text" value="设备工程部"/>
+<span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-[16px] text-gray-400 cursor-pointer">person_search</span>
+</div>
+</div>
+</div>
+<div class="mt-4 flex justify-end gap-2 border-t border-gray-100 pt-4">
+<button class="btn btn-outline">取消</button>
+<button class="btn btn-primary">保存修改</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Lower Panels -->
+<div class="lower-panels">
+<!-- Impact Preview -->
+<div class="impact-preview">
+<div class="panel-header">影响预览 (针对 "贴片机" 分类修改)</div>
+<div class="p-4 grid grid-cols-5 gap-4">
+<div class="bg-blue-50 border border-blue-100 p-3 rounded">
+<div class="text-gray-500 mb-1">编号规则引用</div>
+<div class="text-[18px] font-bold text-[#1a1c1c]">12 <span class="text-xs font-normal text-gray-500">处模块</span></div>
+</div>
+<div class="bg-orange-50 border border-orange-100 p-3 rounded">
+<div class="text-gray-500 mb-1">待建资产池</div>
+<div class="text-[18px] font-bold text-[#1a1c1c]">23 <span class="text-xs font-normal text-gray-500">条记录</span></div>
+</div>
+<div class="bg-gray-50 border border-gray-200 p-3 rounded">
+<div class="text-gray-500 mb-1">盘点策略</div>
+<div class="text-[14px] font-bold text-[#1a1c1c] truncate">年度全盘</div>
+</div>
+<div class="bg-gray-50 border border-gray-200 p-3 rounded">
+<div class="text-gray-500 mb-1">折旧衔接</div>
+<div class="text-[14px] font-bold text-[#1a1c1c] truncate">无变化</div>
+</div>
+<div class="bg-gray-50 border border-gray-200 p-3 rounded">
+<div class="text-gray-500 mb-1">MES/MAC绑定</div>
+<div class="text-[14px] font-bold text-[#1a1c1c] truncate">影响 45 台设备</div>
+</div>
+</div>
+</div>
+<!-- Publish Checklist -->
+<div class="publish-checklist">
+<div class="panel-header">提交校验清单</div>
+<div class="p-4 flex-1">
+<div class="flex items-center justify-between mb-2 pb-2 border-b border-gray-50">
+<span>编码唯一性</span>
+<span class="material-symbols-outlined text-[16px] text-green-500">check_circle</span>
+</div>
+<div class="flex items-center justify-between mb-2 pb-2 border-b border-gray-50">
+<span>上级关系有效</span>
+<span class="material-symbols-outlined text-[16px] text-green-500">check_circle</span>
+</div>
+<div class="flex items-center justify-between mb-2 pb-2 border-b border-gray-50">
+<span>必填项完整</span>
+<span class="material-symbols-outlined text-[16px] text-green-500">check_circle</span>
+</div>
+<div class="flex items-center justify-between mb-2 pb-2 border-b border-gray-50">
+<span>折旧年限合规</span>
+<span class="material-symbols-outlined text-[16px] text-green-500">check_circle</span>
+</div>
+<div class="flex items-center justify-between mb-2 pb-2 border-b border-gray-50">
+<span>前缀无冲突</span>
+<span class="material-symbols-outlined text-[16px] text-green-500">check_circle</span>
+</div>
+<div class="flex items-center justify-between mb-4">
+<span>关联字典存在</span>
+<span class="material-symbols-outlined text-[16px] text-green-500">check_circle</span>
+</div>
+<div class="bg-orange-50 border border-orange-200 text-orange-600 p-2 rounded text-[12px] flex items-start mt-auto">
+<span class="material-symbols-outlined text-[14px] mr-1 mt-0.5">warning</span>
+<span>23 条待建资产将按新分类重新预览</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body></html>

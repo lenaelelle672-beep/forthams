@@ -1,0 +1,50 @@
+const commonLocale = {
+  actions: {
+    save: 'Save',
+    cancel: 'Cancel',
+    confirm: 'Confirm',
+    delete: 'Delete',
+    edit: 'Edit',
+    create: 'Create',
+    submit: 'Submit',
+    reset: 'Reset',
+    search: 'Search',
+    export: 'Export',
+    import: 'Import',
+    upload: 'Upload',
+    download: 'Download',
+    refresh: 'Refresh',
+    back: 'Back',
+    close: 'Close',
+    detail: 'Details',
+    batchConfirm: 'Batch Confirm',
+  },
+  status: {
+    enabled: 'Enabled',
+    disabled: 'Disabled',
+    active: 'Active',
+    inactive: 'Inactive',
+    all: 'All',
+  },
+  messages: {
+    saveSuccess: 'Saved successfully',
+    deleteSuccess: 'Deleted successfully',
+    deleteConfirm: 'Are you sure you want to delete? This action cannot be undone.',
+    operationFailed: 'Operation failed, please retry',
+    loadFailed: 'Failed to load data, please retry',
+    noPermission: 'You do not have permission to perform this action',
+    loading: 'Loading…',
+  },
+  table: {
+    noData: 'No data',
+    selectedCount: '{count} item(s) selected',
+    totalPages: 'Total Pages',
+  },
+  placeholder: {
+    input: 'Please enter',
+    select: 'Please select',
+    keyword: 'Search keywords…',
+  },
+};
+
+export default commonLocale;

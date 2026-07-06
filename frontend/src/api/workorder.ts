@@ -247,6 +247,80 @@ export type ApprovalErrorCodeType = (typeof ApprovalErrorCode)[keyof typeof Appr
 // ---------------------------------------------------------------------------
 
 const BASE_URL = '/api/orders';
+const WORKORDER_BASE_URL = '/workorders';
+
+export interface WorkOrderListQueryCompat {
+  page?: number;
+  pageSize?: number;
+  keyword?: string;
+  status?: string;
+  [key: string]: unknown;
+}
+
+export interface WorkOrderPageData<T> {
+  records: T[];
+  total: number;
+  size: number;
+  current: number;
+  pages?: number;
+}
+
+export async function getWorkOrderList(
+  query: WorkOrderListQueryCompat = {},
+): Promise<WorkOrderPageData<WorkOrderListItem>> {
+  const { page = 1, pageSize = 10, ...rest } = query;
+  const response = await http.get<
+    WorkOrderPageData<WorkOrderListItem> | { data: WorkOrderPageData<WorkOrderListItem> }
+  >('/workorders', {
+    params: {
+      page,
+      pageSize,
+      ...rest,
+    },
+  });
+  const payload = response.data;
+  return 'records' in payload ? payload : payload.data;
+}
+
+export type WorkOrder = WorkOrderDetail & Record<string, unknown>;
+
+export async function createWorkOrder(data: Record<string, unknown>) {
+  const response = await http.post(WORKORDER_BASE_URL, data);
+  return response.data;
+}
+
+export async function updateWorkOrder(orderId: string | number, data: Record<string, unknown>) {
+  const response = await http.put(`${WORKORDER_BASE_URL}/${encodeURIComponent(String(orderId))}`, data);
+  return response.data;
+}
+
+export async function deleteWorkOrder(orderId: string | number) {
+  const response = await http.delete(`${WORKORDER_BASE_URL}/${encodeURIComponent(String(orderId))}`);
+  return response.data;
+}
+
+export async function submitWorkOrder(orderId: string | number) {
+  const response = await http.post(`${WORKORDER_BASE_URL}/${encodeURIComponent(String(orderId))}/submit`);
+  return response.data;
+}
+
+export async function cancelWorkOrder(orderId: string | number, data: Record<string, unknown> = {}) {
+  const response = await http.post(`${WORKORDER_BASE_URL}/${encodeURIComponent(String(orderId))}/operate`, {
+    operation: 'cancel',
+    ...data,
+  });
+  return response.data;
+}
+
+export async function holdWorkOrder(orderId: string | number, data: Record<string, unknown>) {
+  const response = await http.post(`${WORKORDER_BASE_URL}/${encodeURIComponent(String(orderId))}/hold`, data);
+  return response.data;
+}
+
+export async function resumeWorkOrder(orderId: string | number, data: Record<string, unknown> = {}) {
+  const response = await http.post(`${WORKORDER_BASE_URL}/${encodeURIComponent(String(orderId))}/resume`, data);
+  return response.data;
+}
 
 /**
  * 获取待审批工单列表
@@ -289,8 +363,8 @@ export async function getPendingApprovals(
  * @returns 工单详情
  * @throws {BusinessErrorResponse} 工单不存在时返回 404
  */
-export async function getWorkOrderDetail(orderId: string): Promise<WorkOrderDetail> {
-  const response = await http.get<WorkOrderDetail>(`${BASE_URL}/${encodeURIComponent(orderId)}`);
+export async function getWorkOrderDetail(orderId: string | number): Promise<WorkOrderDetail> {
+  const response = await http.get<WorkOrderDetail>(`${WORKORDER_BASE_URL}/${encodeURIComponent(String(orderId))}`);
   return response.data;
 }
 
@@ -310,11 +384,11 @@ export async function getWorkOrderDetail(orderId: string): Promise<WorkOrderDeta
  * @throws {BusinessErrorResponse} 乐观锁冲突时返回 409 OPTIMISTIC_LOCK_CONFLICT
  */
 export async function approveWorkOrder(
-  orderId: string,
-  data: ApproveRequest,
+  orderId: string | number,
+  data: Partial<ApproveRequest> & Record<string, unknown> = {},
 ): Promise<ApprovalResponse> {
   const response = await http.post<ApprovalResponse>(
-    `${BASE_URL}/${encodeURIComponent(orderId)}/approve`,
+    `${WORKORDER_BASE_URL}/${encodeURIComponent(String(orderId))}/approve`,
     data,
   );
   return response.data;
@@ -339,13 +413,37 @@ export async function approveWorkOrder(
  * @throws {BusinessErrorResponse} 乐观锁冲突时返回 409 OPTIMISTIC_LOCK_CONFLICT
  */
 export async function rejectWorkOrder(
-  orderId: string,
-  data: RejectRequest,
+  orderId: string | number,
+  data: Partial<RejectRequest> & Record<string, unknown> = {},
 ): Promise<ApprovalResponse> {
   const response = await http.post<ApprovalResponse>(
-    `${BASE_URL}/${encodeURIComponent(orderId)}/reject`,
+    `${WORKORDER_BASE_URL}/${encodeURIComponent(String(orderId))}/reject`,
     data,
   );
+  return response.data;
+}
+
+export async function submitForAcceptance(
+  orderId: string | number,
+  data: { comment?: string } = {},
+) {
+  const response = await http.post(`/workorders/${encodeURIComponent(String(orderId))}/submit-acceptance`, data);
+  return response.data;
+}
+
+export async function acceptWorkOrder(
+  orderId: string | number,
+  data: { comment?: string } = {},
+) {
+  const response = await http.post(`/workorders/${encodeURIComponent(String(orderId))}/accept`, data);
+  return response.data;
+}
+
+export async function rejectAcceptance(
+  orderId: string | number,
+  data: { comment?: string } = {},
+) {
+  const response = await http.post(`/workorders/${encodeURIComponent(String(orderId))}/reject-acceptance`, data);
   return response.data;
 }
 
@@ -490,3 +588,100 @@ export function validateRejectionReason(
   }
   return { valid: true };
 }
+
+function resolveOrderId(input: unknown): string | number {
+  if (typeof input === 'object' && input !== null) {
+    const source = input as Record<string, unknown>;
+    return (source.orderId ?? source.workOrderId ?? source.id ?? '') as string | number;
+  }
+  return input as string | number;
+}
+
+function resolveActionPayload(input: unknown, data?: unknown): Record<string, unknown> {
+  if (data !== undefined) {
+    return typeof data === 'string' ? { rejectionReason: data } : (data as Record<string, unknown>);
+  }
+
+  if (typeof input === 'object' && input !== null) {
+    const { orderId, workOrderId, id, ...rest } = input as Record<string, unknown>;
+    return rest;
+  }
+
+  return {};
+}
+
+export const workOrderApi = {
+  list: getWorkOrderList,
+  getWorkOrders: getWorkOrderList,
+  getById: getWorkOrderDetail,
+  getWorkOrderById: getWorkOrderDetail,
+  getWorkOrderDetail,
+  create: createWorkOrder,
+  createWorkOrder,
+  update: updateWorkOrder,
+  updateWorkOrder,
+  delete: deleteWorkOrder,
+  deleteWorkOrder,
+  submit(input: unknown) {
+    const orderId = resolveOrderId(input);
+    return orderId ? submitWorkOrder(orderId) : createWorkOrder(input as Record<string, unknown>);
+  },
+  submitWorkOrder,
+  approve(input: unknown, data?: unknown) {
+    return approveWorkOrder(resolveOrderId(input), resolveActionPayload(input, data));
+  },
+  approveWorkOrder(input: unknown, data?: unknown) {
+    return approveWorkOrder(resolveOrderId(input), resolveActionPayload(input, data));
+  },
+  reject(input: unknown, data?: unknown) {
+    return rejectWorkOrder(resolveOrderId(input), resolveActionPayload(input, data));
+  },
+  rejectWorkOrder(input: unknown, data?: unknown) {
+    return rejectWorkOrder(resolveOrderId(input), resolveActionPayload(input, data));
+  },
+  cancel: cancelWorkOrder,
+  cancelWorkOrder,
+  close(orderId: string | number) {
+    return http.post(`${WORKORDER_BASE_URL}/${encodeURIComponent(String(orderId))}/close`).then((response) => response.data);
+  },
+  hold: holdWorkOrder,
+  holdWorkOrder,
+  resume: resumeWorkOrder,
+  resumeWorkOrder,
+  submitForAcceptance,
+  accept: acceptWorkOrder,
+  acceptWorkOrder,
+  rejectAcceptance,
+  getPendingApprovals,
+  getApprovalRecords,
+  getApprovalHistory(orderId: string | number) {
+    return getApprovalRecords(String(orderId));
+  },
+  getHistory(orderId: string | number) {
+    return getApprovalRecords(String(orderId));
+  },
+  getAuditLog(orderId: string | number) {
+    return http.get(`${WORKORDER_BASE_URL}/${encodeURIComponent(String(orderId))}/audit-log`).then((response) => response.data);
+  },
+  getApprovalChain(orderId: string | number) {
+    return http.get(`${WORKORDER_BASE_URL}/${encodeURIComponent(String(orderId))}/approval-chain`).then((response) => response.data);
+  },
+  delegate(orderId: string | number, data: Record<string, unknown>) {
+    return http.post(`${WORKORDER_BASE_URL}/${encodeURIComponent(String(orderId))}/delegate`, data).then((response) => response.data);
+  },
+  transfer(orderId: string | number, data: Record<string, unknown>) {
+    return http.post(`${WORKORDER_BASE_URL}/${encodeURIComponent(String(orderId))}/transfer`, data).then((response) => response.data);
+  },
+  returnToApplicant(orderId: string | number, data: Record<string, unknown>) {
+    return http.post(`${WORKORDER_BASE_URL}/${encodeURIComponent(String(orderId))}/return`, data).then((response) => response.data);
+  },
+  batchApprove(data: Record<string, unknown>) {
+    return http.post(`${WORKORDER_BASE_URL}/batch-approve`, data).then((response) => response.data);
+  },
+  saveDraft(data: Record<string, unknown>) {
+    return http.post(`${WORKORDER_BASE_URL}/drafts`, data).then((response) => response.data);
+  },
+  submitApproval(orderId: string | number, data: Record<string, unknown>) {
+    return approveWorkOrder(orderId, data);
+  },
+};

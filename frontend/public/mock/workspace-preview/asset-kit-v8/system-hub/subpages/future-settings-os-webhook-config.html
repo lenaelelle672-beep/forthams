@@ -1,0 +1,368 @@
+<html class="light" lang="zh-CN"><head></head><body class="bg-background font-body-md text-on-surface min-h-screen overflow-hidden">```html
+
+
+
+    <meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Webhook 配置 · 系统设置中心</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #D7E2F0;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #c2c6d7;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "status-red": "#DC2626",
+                      "tertiary-fixed-dim": "#ffb695",
+                      "tertiary": "#9f3e00",
+                      "primary-fixed": "#d9e2ff",
+                      "surface": "#f7fafe",
+                      "border-subtle": "#D7E2F0",
+                      "text-primary": "#0F172A",
+                      "text-secondary": "#64748B",
+                      "status-purple": "#7C3AED",
+                      "surface-container-high": "#e5e8ec",
+                      "status-amber": "#F59E0B",
+                      "on-secondary-fixed-variant": "#374762",
+                      "on-surface": "#181c1f",
+                      "surface-tint": "#0057cc",
+                      "status-cyan": "#00A8D8",
+                      "error-container": "#ffdad6",
+                      "on-tertiary-container": "#fffdff",
+                      "primary": "#0056c9",
+                      "on-tertiary": "#ffffff",
+                      "primary-container": "#1d6ef2",
+                      "on-secondary-container": "#51617e",
+                      "surface-container-highest": "#e0e3e7",
+                      "on-secondary-fixed": "#091c35",
+                      "on-surface-variant": "#424654",
+                      "on-tertiary-fixed": "#351000",
+                      "on-primary-fixed-variant": "#00419c",
+                      "on-primary": "#ffffff",
+                      "on-error-container": "#93000a",
+                      "on-background": "#181c1f",
+                      "secondary-fixed": "#d5e3ff",
+                      "outline": "#727786",
+                      "primary-fixed-dim": "#b0c6ff",
+                      "status-green": "#16A34A",
+                      "outline-variant": "#c2c6d7",
+                      "on-tertiary-fixed-variant": "#7b2f00",
+                      "error": "#ba1a1a",
+                      "surface-variant": "#e0e3e7",
+                      "inverse-on-surface": "#eef1f5",
+                      "secondary": "#4e5f7b",
+                      "tertiary-container": "#c75000",
+                      "on-error": "#ffffff",
+                      "surface-bright": "#f7fafe",
+                      "tertiary-fixed": "#ffdbcc",
+                      "secondary-container": "#ccddff",
+                      "surface-dim": "#d7dade",
+                      "surface-container-low": "#f1f4f8",
+                      "inverse-surface": "#2d3134",
+                      "inverse-primary": "#b0c6ff",
+                      "background": "#f7fafe",
+                      "surface-container-lowest": "#ffffff",
+                      "on-secondary": "#ffffff",
+                      "surface-container": "#ebeef2",
+                      "on-primary-fixed": "#001945",
+                      "on-primary-container": "#fffdff",
+                      "secondary-fixed-dim": "#b6c7e8",
+                      "header-bg": "#051424"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "sidebar-width": "240px",
+                      "inspector-width": "320px",
+                      "card-padding": "16px",
+                      "grid-gutter": "12px",
+                      "topbar-height": "56px",
+                      "container-gap": "20px"
+              },
+              "fontFamily": {
+                      "status-label": ["Inter"],
+                      "page-title": ["Inter"],
+                      "body-sm": ["Inter"],
+                      "body-md": ["Inter"],
+                      "section-header": ["Inter"],
+                      "code-meta": ["JetBrains Mono"]
+              },
+              "fontSize": {
+                      "status-label": ["11px", {"lineHeight": "16px", "fontWeight": "700"}],
+                      "page-title": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "body-sm": ["12px", {"lineHeight": "18px", "fontWeight": "500"}],
+                      "body-md": ["13px", {"lineHeight": "20px", "fontWeight": "500"}],
+                      "section-header": ["14px", {"lineHeight": "20px", "fontWeight": "700"}],
+                      "code-meta": ["11px", {"lineHeight": "16px", "fontWeight": "400"}]
+              }
+            },
+          },
+        }
+    </script>
+<!-- TopNavBar -->
+<header class="fixed top-0 left-0 w-full z-50 flex items-center justify-between px-6 h-[56px] bg-[#051424] text-white border-b-2 border-[#1D6EF2]">
+<div class="flex items-center gap-8 h-full">
+<div class="flex items-center gap-3">
+<h1 class="font-section-header text-base tracking-wide flex items-center gap-2">
+<span>UNIVIEW</span>
+<span class="text-white/30">|</span>
+<span class="font-medium text-[15px]">系统设置中心</span></h1>
+</div>
+<nav class="hidden lg:flex items-center gap-1 ml-4 h-full">
+<a class="px-4 py-4 text-sm font-medium text-white/70 hover:text-white transition-colors h-full flex items-center relative group" href="#">
+                流程平台
+                <div class="absolute bottom-0 left-0 w-full h-[2px] bg-[#1D6EF2] scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></div>
+</a>
+<a class="px-4 py-4 text-sm font-medium text-white/70 hover:text-white transition-colors h-full flex items-center relative group" href="#">
+                组织权限
+                <div class="absolute bottom-0 left-0 w-full h-[2px] bg-[#1D6EF2] scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></div>
+</a>
+<a class="px-4 py-4 text-sm font-medium text-white/70 hover:text-white transition-colors h-full flex items-center relative group" href="#">
+                基础资料
+                <div class="absolute bottom-0 left-0 w-full h-[2px] bg-[#1D6EF2] scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></div>
+</a>
+<a class="px-4 py-4 text-sm font-medium text-white h-full flex items-center relative" href="#">
+                集成配置
+                <div class="absolute bottom-0 left-0 w-full h-[2px] bg-[#1D6EF2]"></div>
+</a>
+<a class="px-4 py-4 text-sm font-medium text-white/70 hover:text-white transition-colors h-full flex items-center relative group" href="#">
+                消息与通知
+                <div class="absolute bottom-0 left-0 w-full h-[2px] bg-[#1D6EF2] scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></div>
+</a>
+<a class="px-4 py-4 text-sm font-medium text-white/70 hover:text-white transition-colors h-full flex items-center relative group" href="#">
+                系统参数
+                <div class="absolute bottom-0 left-0 w-full h-[2px] bg-[#1D6EF2] scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></div>
+</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+
+<button class="text-white/70 hover:text-white transition-colors flex items-center gap-1.5 text-sm" title="返回业务工作台">
+<span class="material-symbols-outlined text-[20px]">keyboard_return</span>
+<span class="hidden md:inline">返回业务工作台</span>
+</button>
+<div class="flex items-center gap-2 cursor-pointer ml-2">
+<div class="w-7 h-7 rounded-full overflow-hidden border border-white/20 bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="User Avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAA-16NN2gc6S_VNWdVuMbxp5YCr9G0RHSsJOeEftIOqquHIeS9tQ5mzP9WrI3klVdt9WR9tEFYIas_66XUI1wdUU8HwAQykUK6AG_lhdCi9Cs8qYCg-TPUm3cW6ruziWw6L9zLTJrzLUARu6dLW4VfP-JJx9j5LtQZ-81QWureCBM4XGmSo8CN-P9mLVZnpkzkBmR30vEzwBuT06ACMRd4VuXHMpnCPCpBYT-noM9liGWUgxB5JZpTRa-DGqoIh5JC7vumsr41yC86"/>
+</div>
+<span class="text-sm text-white/90 hidden md:inline">运营管理员</span>
+<span class="material-symbols-outlined text-white/70 text-[18px]">arrow_drop_down</span>
+</div>
+</div>
+</header>
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-[56px] w-[240px] h-[calc(100vh-56px)] flex flex-col bg-white border-r border-border-subtle shadow-sm z-40">
+<div class="p-4 border-b border-border-subtle">
+<p class="font-section-header text-sm text-text-primary">集成配置</p>
+</div>
+<div class="flex-1 overflow-y-auto py-3 px-3 space-y-1">
+<nav class="space-y-0.5">
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container-low rounded-md transition-all duration-150 group" href="#">
+<span class="material-symbols-outlined text-[18px] text-outline group-hover:text-primary transition-colors">dns</span>
+<span class="font-body-sm text-[13px]">外部系统配置</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container-low rounded-md transition-all duration-150 group" href="#">
+<span class="material-symbols-outlined text-[18px] text-outline group-hover:text-primary transition-colors">api</span>
+<span class="font-body-sm text-[13px]">接口配置</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container-low rounded-md transition-all duration-150 group" href="#">
+<span class="material-symbols-outlined text-[18px] text-outline group-hover:text-primary transition-colors">transform</span>
+<span class="font-body-sm text-[13px]">字段映射</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container-low rounded-md transition-all duration-150 group" href="#">
+<span class="material-symbols-outlined text-[18px] text-outline group-hover:text-primary transition-colors">sync_alt</span>
+<span class="font-body-sm text-[13px]">同步规则</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-[#1D6EF2] font-medium bg-[#1D6EF2]/10 rounded-md transition-all duration-150" href="#">
+<span class="material-symbols-outlined text-[18px] text-[#1D6EF2]">webhook</span>
+<span class="font-body-sm text-[13px]">Webhook 配置</span>
+</a>
+</nav>
+</div>
+</aside>
+<!-- Main Workspace -->
+<main class="ml-[240px] mt-[56px] h-[calc(100vh-56px)] overflow-y-auto bg-background flex flex-col">
+<!-- Breadcrumbs -->
+<div class="px-8 py-3 bg-white border-b border-border-subtle flex items-center gap-2 text-sm text-text-secondary">
+<a class="hover:text-primary transition-colors" href="#">系统设置中心</a>
+<span class="text-outline-variant">/</span>
+<a class="hover:text-primary transition-colors" href="#">集成配置</a>
+<span class="text-outline-variant">/</span>
+<span class="text-text-primary font-medium">Webhook 配置</span>
+</div>
+<div class="flex-1 p-8">
+<div class="w-full max-w-[1400px] mx-auto space-y-6">
+<!-- Page Header -->
+<header class="flex flex-col gap-2 mb-6">
+<div class="flex items-center justify-between">
+<h2 class="text-2xl font-semibold text-text-primary tracking-tight">Webhook 配置</h2>
+<button class="px-4 py-2 bg-[#1D6EF2] text-white rounded-md font-medium text-sm hover:bg-primary-container transition-colors shadow-sm flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px]">add</span>
+<span>新建 Webhook</span>
+</button>
+</div>
+<p class="text-[13px] text-text-secondary max-w-3xl">集成第三方事件订阅与外部系统回调，支持签名校验与失败重放。设置事件触发时向目标系统发送实时通知。</p>
+</header>
+<!-- Grid Layout -->
+<div class="grid grid-cols-12 gap-6">
+<!-- Webhook List Section -->
+<section class="col-span-12 lg:col-span-8 space-y-6">
+<div class="bg-white border border-border-subtle rounded-xl shadow-sm overflow-hidden">
+<div class="px-5 py-4 border-b border-border-subtle flex justify-between items-center bg-surface-container-lowest">
+<h3 class="font-semibold text-[15px] text-text-primary">活跃 Webhooks</h3>
+<div class="flex items-center gap-2 px-2.5 py-1 bg-status-green/10 rounded-full">
+<span class="w-2 h-2 rounded-full bg-status-green animate-pulse"></span>
+<span class="text-[11px] font-bold text-status-green uppercase tracking-wide">System Operational</span>
+</div>
+</div>
+<div class="divide-y divide-border-subtle">
+<!-- Webhook Item 1 -->
+<div class="p-5 flex items-center justify-between hover:bg-surface-container-lowest transition-colors">
+<div class="flex flex-col gap-1.5">
+<div class="flex items-center gap-3">
+<span class="font-semibold text-[14px] text-text-primary">Asset Lifecycle Monitor</span>
+<span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-[#1D6EF2]/10 text-[#1D6EF2] uppercase">ASSET_CREATED</span>
+</div>
+<code class="text-[12px] font-code-meta text-text-secondary bg-surface-container-low px-2 py-1 rounded">https://api.external-system.io/v1/ingest/future-os-events</code>
+</div>
+<div class="flex items-center gap-8">
+<div class="text-right flex flex-col items-end">
+<p class="text-[11px] font-semibold text-text-secondary uppercase tracking-wide mb-0.5">Health Status</p>
+<div class="flex items-center gap-1.5 text-status-green">
+<span class="material-symbols-outlined text-[16px]">check_circle</span>
+<p class="text-[13px] font-semibold">Healthy (200 OK)</p>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<button class="w-8 h-8 rounded flex items-center justify-center text-outline hover:text-[#1D6EF2] hover:bg-[#1D6EF2]/5 transition-colors border border-transparent hover:border-[#1D6EF2]/20"><span class="material-symbols-outlined text-[18px]">edit</span></button>
+<button class="w-8 h-8 rounded flex items-center justify-center text-outline hover:text-status-red hover:bg-status-red/5 transition-colors border border-transparent hover:border-status-red/20"><span class="material-symbols-outlined text-[18px]">delete</span></button>
+</div>
+</div>
+</div>
+<!-- Webhook Item 2 -->
+<div class="p-5 flex items-center justify-between hover:bg-surface-container-lowest transition-colors">
+<div class="flex flex-col gap-1.5">
+<div class="flex items-center gap-3">
+<span class="font-semibold text-[14px] text-text-primary">SLA Violation Alert</span>
+<span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-status-red/10 text-status-red uppercase">SLA_BREACHED</span>
+</div>
+<code class="text-[12px] font-code-meta text-text-secondary bg-surface-container-low px-2 py-1 rounded">https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXX</code>
+</div>
+<div class="flex items-center gap-8">
+<div class="text-right flex flex-col items-end">
+<p class="text-[11px] font-semibold text-text-secondary uppercase tracking-wide mb-0.5">Health Status</p>
+<div class="flex items-center gap-1.5 text-status-red">
+<span class="material-symbols-outlined text-[16px]">error</span>
+<p class="text-[13px] font-semibold">Failed (Timeout)</p>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<button class="w-8 h-8 rounded flex items-center justify-center text-outline hover:text-[#1D6EF2] hover:bg-[#1D6EF2]/5 transition-colors border border-transparent hover:border-[#1D6EF2]/20"><span class="material-symbols-outlined text-[18px]">edit</span></button>
+<button class="w-8 h-8 rounded flex items-center justify-center text-outline hover:text-status-red hover:bg-status-red/5 transition-colors border border-transparent hover:border-status-red/20"><span class="material-symbols-outlined text-[18px]">delete</span></button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Terminal Interaction Section -->
+<div class="bg-[#1e1e1e] rounded-xl overflow-hidden shadow-lg border border-border-subtle">
+<div class="px-4 py-2.5 bg-[#2d2d2d] flex items-center justify-between border-b border-white/10">
+<div class="flex gap-2">
+<div class="w-3 h-3 rounded-full bg-[#ff5f56]"></div>
+<div class="w-3 h-3 rounded-full bg-[#ffbd2e]"></div>
+<div class="w-3 h-3 rounded-full bg-[#27c93f]"></div>
+</div>
+<span class="font-code-meta text-[11px] text-white/50 uppercase tracking-widest font-semibold">Test Connection Output</span>
+<span class="material-symbols-outlined text-white/50 text-[16px]">terminal</span>
+</div>
+<div class="p-5 font-code-meta text-[13px] leading-relaxed space-y-1.5 h-[280px] overflow-y-auto bg-[#1e1e1e] text-[#d4d4d4]">
+<div class="text-[#4caf50]">[INFO] Initializing Webhook Diagnostic for: Asset Lifecycle Monitor</div>
+<div class="text-[#d4d4d4]"><span class="text-[#569cd6]">-&gt;</span> Resolving DNS: api.external-system.io... <span class="text-[#4caf50]">Success [34.201.12.8]</span></div>
+<div class="text-[#d4d4d4]"><span class="text-[#569cd6]">-&gt;</span> Establishing TLS 1.3 Handshake... <span class="text-[#4caf50]">Verified</span></div>
+<div class="text-[#d4d4d4]"><span class="text-[#569cd6]">-&gt;</span> Preparing Payload (Type: ASSET_CREATED)...</div>
+<div class="pl-4 text-[#ce9178] opacity-80">
+                                {<br/>
+                                  "event_id": "evt_9a2b8c",<br/>
+                                  "timestamp": "2023-10-27T14:22:01Z",<br/>
+                                  "payload": { "asset_id": "ASSET_099", "status": "active" }<br/>
+                                }
+                            </div>
+<div class="text-[#d4d4d4]"><span class="text-[#569cd6]">-&gt;</span> Computing HMAC-SHA256 Signature... <span class="text-[#4ec9b0]">Done</span></div>
+<div class="text-[#d4d4d4]"><span class="text-[#569cd6]">-&gt;</span> Transmitting POST Request...</div>
+<div class="text-[#4caf50] bg-[#4caf50]/10 p-2.5 border border-[#4caf50]/20 rounded mt-3">
+                                [SUCCESS] HTTP 200 OK - Callback confirmed in 142ms.
+                            </div>
+</div>
+<div class="px-5 py-3 bg-[#252526] border-t border-white/10 flex justify-end gap-3">
+<button class="px-4 py-1.5 rounded bg-white/5 text-white/80 font-medium text-[13px] hover:bg-white/10 transition-all border border-white/10">Clear Logs</button>
+<button class="px-4 py-1.5 rounded bg-[#1D6EF2] text-white font-medium text-[13px] hover:bg-primary-container transition-all flex items-center gap-1.5 shadow-sm" onclick="simulateTest()">
+<span class="material-symbols-outlined text-[16px]">play_arrow</span> Run Diagnostic
+                            </button>
+</div>
+</div>
+</section>
+<!-- Security Section -->
+<aside class="col-span-12 lg:col-span-4 space-y-6">
+<div class="bg-white border border-border-subtle rounded-xl p-5 shadow-sm">
+<div class="flex items-center gap-2.5 mb-5 pb-4 border-b border-border-subtle">
+<div class="w-8 h-8 rounded bg-[#1D6EF2]/10 flex items-center justify-center text-[#1D6EF2]">
+<span class="material-symbols-outlined text-[18px]">security</span>
+</div>
+<h3 class="font-semibold text-[15px] text-text-primary">Security Configuration</h3>
+</div>
+<div class="space-y-5">
+<div>
+<label class="block text-[12px] font-semibold text-text-secondary uppercase mb-2">Signature Key</label>
+<div class="relative group">
+<input class="w-full bg-surface-container-low border border-border-subtle rounded-md px-3 py-2.5 font-code-meta text-[13px] text-text-primary focus:ring-1 focus:ring-[#1D6EF2] focus:border-[#1D6EF2] outline-none transition-shadow" readonly="" type="password" value="sk_live_51Mxxxxxxxxxxxxxxxxxx"/>
+<button class="absolute right-3 top-1/2 -translate-y-1/2 text-outline hover:text-[#1D6EF2] transition-colors">
+<span class="material-symbols-outlined text-[18px]">visibility</span>
+</button>
+</div>
+<p class="mt-2 text-[12px] text-text-secondary leading-tight">Each event is signed with this secret in the <code class="bg-surface-container-low px-1 py-0.5 rounded text-text-primary">X-FutureOS-Signature</code> header.</p>
+</div>
+<div>
+<label class="block text-[12px] font-semibold text-text-secondary uppercase mb-2">Verification Algorithm</label>
+<div class="relative">
+<select class="w-full bg-surface-container-low border border-border-subtle rounded-md px-3 py-2.5 text-[13px] text-text-primary focus:ring-1 focus:ring-[#1D6EF2] focus:border-[#1D6EF2] outline-none appearance-none cursor-pointer pr-8">
+<option>HMAC-SHA256 (Recommended)</option>
+<option>HMAC-SHA512</option>
+<option>RSA-PKCS1v1.5</option>
+<option>ED25519</option>
+</select>
+<span class="material-symbols-outlined absolute right-2.5 top-1/2 -translate-y-1/2 text-outline pointer-events-none text-[20px]">arrow_drop_down</span>
+</div>
+</div>
+<div class="pt-5 mt-5 border-t border-border-subtle">
+<div class="flex items-center justify-between mb-1.5">
+<span class="text-[13px] font-medium text-text-primary">IP Whitelisting</span>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+</label></div></div></div></div></aside></div></div></div></main></body></html>

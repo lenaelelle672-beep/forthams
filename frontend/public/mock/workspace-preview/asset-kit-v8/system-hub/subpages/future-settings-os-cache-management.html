@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+
+<html class="light" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>缓存管理 - UNIVIEW</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "error": "#ba1a1a",
+                      "on-secondary-fixed-variant": "#374762",
+                      "status-green": "#16A34A",
+                      "on-surface": "#181c1f",
+                      "on-error-container": "#93000a",
+                      "secondary-fixed-dim": "#b6c7e8",
+                      "primary-fixed-dim": "#b0c6ff",
+                      "secondary-fixed": "#d5e3ff",
+                      "tertiary-fixed-dim": "#ffb695",
+                      "surface-variant": "#e0e3e7",
+                      "on-tertiary-fixed-variant": "#7b2f00",
+                      "surface-container": "#ebeef2",
+                      "status-purple": "#7C3AED",
+                      "tertiary": "#9f3e00",
+                      "on-primary-container": "#fffdff",
+                      "tertiary-fixed": "#ffdbcc",
+                      "primary-fixed": "#d9e2ff",
+                      "surface-dim": "#d7dade",
+                      "on-primary-fixed": "#001945",
+                      "on-tertiary-fixed": "#351000",
+                      "surface-bright": "#f7fafe",
+                      "surface-container-low": "#f1f4f8",
+                      "on-primary": "#ffffff",
+                      "on-primary-fixed-variant": "#00419c",
+                      "on-secondary-container": "#51617e",
+                      "surface-container-high": "#e5e8ec",
+                      "inverse-surface": "#2d3134",
+                      "status-amber": "#F59E0B",
+                      "error-container": "#ffdad6",
+                      "on-surface-variant": "#424654",
+                      "status-cyan": "#00A8D8",
+                      "outline": "#727786",
+                      "on-secondary-fixed": "#091c35",
+                      "on-tertiary": "#ffffff",
+                      "background": "#f7fafe",
+                      "on-error": "#ffffff",
+                      "on-secondary": "#ffffff",
+                      "border-subtle": "#D7E2F0",
+                      "text-secondary": "#64748B",
+                      "secondary": "#4e5f7b",
+                      "on-background": "#181c1f",
+                      "on-tertiary-container": "#fffdff",
+                      "surface-container-lowest": "#ffffff",
+                      "inverse-on-surface": "#eef1f5",
+                      "inverse-primary": "#b0c6ff",
+                      "primary-container": "#1d6ef2",
+                      "secondary-container": "#ccddff",
+                      "surface-container-highest": "#e0e3e7",
+                      "primary": "#0056c9",
+                      "outline-variant": "#c2c6d7",
+                      "surface": "#f7fafe",
+                      "surface-tint": "#0057cc",
+                      "text-primary": "#0F172A",
+                      "tertiary-container": "#c75000",
+                      "status-red": "#DC2626"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "topbar-height": "48px",
+                      "grid-gutter": "12px",
+                      "sidebar-width": "196px",
+                      "inspector-width": "320px",
+                      "container-gap": "20px",
+                      "card-padding": "16px"
+              },
+              "fontFamily": {
+                      "status-label": [
+                              "Inter"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "page-title": [
+                              "Inter"
+                      ],
+                      "body-sm": [
+                              "Inter"
+                      ],
+                      "code-meta": [
+                              "JetBrains Mono"
+                      ],
+                      "section-header": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "status-label": [
+                              "11px",
+                              {
+                                      "lineHeight": "16px",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-md": [
+                              "13px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "page-title": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "18px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "code-meta": [
+                              "11px",
+                              {
+                                      "lineHeight": "16px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "section-header": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "700"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+    </script>
+<style>
+        body { background-color: #F5F8FC; }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-left: 1px solid #D7E2F0;
+        }
+        .inspector-shadow {
+            box-shadow: -8px 0 24px rgba(29, 110, 242, 0.08);
+        }
+        /* Hide scrollbar for clean look */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #c2c6d7; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #727786; }
+    </style>
+</head>
+<body class="text-on-surface font-body-md min-h-screen overflow-x-hidden flex flex-col">
+<!-- TopNavBar -->
+<header class="fixed top-0 left-0 w-full z-50 h-[56px] bg-[#051424] border-b border-[#1D6EF2] flex justify-between items-center px-6">
+<div class="flex items-center gap-8">
+<div class="font-page-title text-[20px] font-black text-white tracking-tight">UNIVIEW <span class="mx-2 opacity-30">|</span> <span class="text-[16px] font-medium">系统设置中心</span></div>
+<nav class="hidden md:flex gap-6 h-full items-center">
+<a class="text-secondary-fixed-dim font-medium hover:text-primary-fixed transition-colors" href="#">流程平台</a>
+<a class="text-secondary-fixed-dim font-medium hover:text-primary-fixed transition-colors" href="#">组织权限</a>
+<a class="text-secondary-fixed-dim font-medium hover:text-primary-fixed transition-colors" href="#">基础资料</a>
+<a class="text-secondary-fixed-dim font-medium hover:text-primary-fixed transition-colors" href="#">集成配置</a>
+<a class="text-secondary-fixed-dim font-medium hover:text-primary-fixed transition-colors" href="#">消息与通知</a>
+<a class="text-primary-fixed border-b-2 border-primary-fixed pb-1 font-bold" href="#">系统参数</a>
+</nav>
+</div>
+<div class="flex items-center gap-6">
+
+<button class="text-secondary-fixed-dim font-body-md text-body-md hover:text-primary-fixed">返回业务工作台</button>
+<div class="flex items-center gap-2 text-primary-fixed">
+<span class="material-symbols-outlined text-[20px]">account_circle</span>
+<span class="text-body-md">运营管理员</span>
+</div>
+</div>
+</header>
+<div class="flex flex-1 pt-[56px]">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-full flex flex-col p-4 gap-2 bg-surface-container-lowest dark:bg-inverse-surface docked left-0 w-[240px] h-screen pt-[56px] border-r border-outline-variant dark:border-outline z-40"><div class="px-4 py-4 mb-2">
+<h2 class="font-section-header text-section-header font-bold text-on-surface">系统参数</h2>
+<div class="font-code-meta text-code-meta text-text-secondary mt-1 tracking-wider uppercase">SYSTEM PARAMETERS</div>
+</div>
+<nav class="flex-1 flex flex-col gap-1 overflow-y-auto">
+<a class="flex items-center gap-3 px-4 py-2.5 text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">settings</span>
+<span class="font-body-sm text-body-sm">基础参数</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2.5 text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">security</span>
+<span class="font-body-sm text-body-sm">安全策略</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2.5 text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">folder_managed</span>
+<span class="font-body-sm text-body-sm">文件存储配置</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2.5 text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">swap_horiz</span>
+<span class="font-body-sm text-body-sm">导入导出配置</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2.5 bg-primary-container text-on-primary-container font-bold rounded-lg translate-x-1 transition-transform" href="#">
+<span class="material-symbols-outlined text-[20px]">memory</span>
+<span class="font-body-sm text-body-sm">缓存管理</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2.5 text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">history_edu</span>
+<span class="font-body-sm text-body-sm">操作审计</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2.5 text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">description</span>
+<span class="font-body-sm text-body-sm">文档中心</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2.5 text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">support_agent</span>
+<span class="font-body-sm text-body-sm">技术支持</span>
+</a>
+</nav>
+<div class="mt-auto flex flex-col gap-1 border-t border-border-subtle pt-2">
+<a class="flex items-center gap-3 px-4 py-2.5 text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">settings</span>
+<span class="font-body-sm text-body-sm">设置</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2.5 text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">help</span>
+<span class="font-body-sm text-body-sm">帮助</span>
+</a>
+</div></aside>
+<!-- Main Content Area -->
+<main class="flex-1 ml-[240px] flex mr-[320px]">
+<div class="flex-1 px-8 py-6 max-w-6xl mx-auto flex flex-col gap-6">
+<!-- Breadcrumbs & Header -->
+<div class="flex flex-col gap-2">
+<div class="flex items-center gap-2 font-code-meta text-code-meta text-text-secondary">
+<span>系统设置中心</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span>系统参数</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="text-on-surface font-medium">缓存管理</span>
+</div>
+<div class="flex justify-between items-end mt-2 border-b border-border-subtle pb-6">
+<div>
+<h1 class="font-page-title text-page-title text-text-primary">缓存管理 <span class="font-code-meta text-code-meta text-text-secondary ml-2 font-normal">(Cache Management)</span></h1>
+<p class="font-body-sm text-body-sm text-text-secondary mt-2 max-w-2xl">管理全局 Redis 分布式缓存，配置逐出策略与实时监控阈值。</p>
+</div>
+<div class="flex items-center gap-3">
+<button class="flex items-center gap-2 px-4 py-2 rounded border border-border-subtle bg-transparent text-secondary hover:bg-surface-container-low transition-colors font-body-sm text-body-sm font-medium">
+<span class="material-symbols-outlined text-[18px]">refresh</span>
+                                刷新指标
+                            </button>
+<button class="flex items-center gap-2 px-4 py-2 rounded border border-border-subtle bg-transparent text-secondary hover:bg-surface-container-low transition-colors font-body-sm text-body-sm font-medium">
+<span class="material-symbols-outlined text-[18px]">schedule</span>
+                                预热计划
+                            </button>
+<button class="flex items-center gap-2 px-4 py-2 rounded bg-error text-white hover:bg-on-error-container transition-colors font-body-sm text-body-sm font-medium shadow-sm">
+<span class="material-symbols-outlined text-[18px]">delete_forever</span>
+                                全量清除 (Purge)
+                            </button>
+</div>
+</div>
+</div>
+<!-- KPI Cards (Real-time Metrics) -->
+<div class="grid grid-cols-3 gap-grid-gutter">
+<!-- KPI 1 -->
+<div class="bg-white border border-border-subtle p-card-padding relative overflow-hidden flex flex-col justify-between h-[100px]">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-status-green"></div>
+<div class="font-body-sm text-body-sm text-text-secondary uppercase tracking-wider flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">analytics</span> 缓存命中率
+                        </div>
+<div class="flex items-baseline gap-2">
+<span class="font-page-title text-page-title text-text-primary">94.2</span>
+<span class="font-body-sm text-body-sm text-status-green font-medium">+1.2%</span>
+</div>
+</div>
+<!-- KPI 2 -->
+<div class="bg-white border border-border-subtle p-card-padding relative overflow-hidden flex flex-col justify-between h-[100px]">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-status-amber"></div>
+<div class="font-body-sm text-body-sm text-text-secondary uppercase tracking-wider flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">memory</span> 内存占用 (MB)
+                        </div>
+<div class="flex items-baseline gap-2">
+<span class="font-page-title text-page-title text-text-primary">4,096</span>
+<span class="font-body-sm text-body-sm text-text-secondary">/ 8,192 MB</span>
+</div>
+<div class="w-full bg-surface-container h-1 mt-2">
+<div class="bg-status-amber h-1 w-1/2"></div>
+</div>
+</div>
+<!-- KPI 3 -->
+<div class="bg-white border border-border-subtle p-card-padding relative overflow-hidden flex flex-col justify-between h-[100px]">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-primary"></div>
+<div class="font-body-sm text-body-sm text-text-secondary uppercase tracking-wider flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">cable</span> 活跃连接数
+                        </div>
+<div class="flex items-baseline gap-2">
+<span class="font-page-title text-page-title text-text-primary">1,204</span>
+<span class="font-body-sm text-body-sm text-text-secondary">Conns</span>
+</div>
+</div>
+</div>
+<!-- Config Sections (Grid) -->
+<div class="grid grid-cols-2 gap-container-gap">
+<!-- Engine Config -->
+<div class="flex flex-col gap-4">
+<h3 class="font-section-header text-section-header border-b border-border-subtle pb-2 flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-primary">dns</span>
+                            引擎配置
+                        </h3>
+<div class="flex flex-col gap-0 border border-border-subtle bg-white">
+<div class="flex items-center justify-between p-3 border-b border-border-subtle">
+<span class="font-body-md text-body-md text-text-primary">集群模式</span>
+<div class="flex items-center gap-2 bg-status-green/10 text-status-green px-2 py-1 rounded font-status-label text-status-label">
+<span class="w-2 h-2 rounded-full bg-status-green"></span> ENABLED
+                                </div>
+</div>
+<div class="flex items-center justify-between p-3 border-b border-border-subtle">
+<span class="font-body-md text-body-md text-text-primary">同步延迟</span>
+<div class="flex items-center gap-2">
+<span class="font-code-meta text-code-meta bg-surface-container px-2 py-1 rounded">100ms</span>
+<button class="text-primary hover:text-primary-container"><span class="material-symbols-outlined text-[16px]">edit</span></button>
+</div>
+</div>
+<div class="flex items-center justify-between p-3">
+<span class="font-body-md text-body-md text-text-primary">连接池上限</span>
+<div class="flex items-center gap-2">
+<span class="font-code-meta text-code-meta bg-surface-container px-2 py-1 rounded">5000</span>
+<button class="text-primary hover:text-primary-container"><span class="material-symbols-outlined text-[16px]">edit</span></button>
+</div>
+</div>
+</div>
+</div>
+<!-- Eviction & Rules -->
+<div class="flex flex-col gap-4">
+<h3 class="font-section-header text-section-header border-b border-border-subtle pb-2 flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-primary">rule</span>
+                            策略与规则
+                        </h3>
+<div class="flex flex-col gap-0 border border-border-subtle bg-white">
+<div class="flex items-center justify-between p-3 border-b border-border-subtle bg-surface-bright">
+<div>
+<div class="font-body-md text-body-md text-text-primary">逐出策略 (Eviction)</div>
+<div class="font-body-sm text-body-sm text-text-secondary mt-0.5">内存满时的淘汰机制</div>
+</div>
+<div class="flex border border-border-subtle rounded overflow-hidden">
+<button class="px-3 py-1 font-code-meta text-code-meta bg-primary text-white">LRU</button>
+<button class="px-3 py-1 font-code-meta text-code-meta bg-white text-text-secondary border-l border-border-subtle hover:bg-surface-container-low">LFU</button>
+<button class="px-3 py-1 font-code-meta text-code-meta bg-white text-text-secondary border-l border-border-subtle hover:bg-surface-container-low">FIFO</button>
+</div>
+</div>
+<div class="flex items-center justify-between p-3 border-b border-border-subtle">
+<span class="font-body-md text-body-md text-text-primary">默认 TTL 设置</span>
+<div class="flex items-center gap-2">
+<input class="w-20 font-code-meta text-code-meta border-border-subtle rounded px-2 py-1 text-right focus:ring-primary focus:border-primary" type="text" value="3600s"/>
+</div>
+</div>
+<div class="flex items-center justify-between p-3">
+<div>
+<div class="font-body-md text-body-md text-text-primary">空值缓存开关</div>
+<div class="font-body-sm text-body-sm text-text-secondary mt-0.5">防止缓存穿透</div>
+</div>
+<!-- Toggle Switch -->
+<button class="w-10 h-5 bg-primary rounded-full relative transition-colors focus:outline-none">
+<span class="absolute right-1 top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform"></span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Key Tool Area -->
+<div class="mt-4 border border-border-subtle bg-white flex flex-col">
+<div class="p-4 border-b border-border-subtle bg-surface-bright flex justify-between items-center">
+<h3 class="font-section-header text-section-header flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-primary">key</span>
+                            键名工具区 (Key Inspector)
+                        </h3>
+</div>
+<div class="p-4 flex flex-col gap-4">
+<div class="flex gap-2">
+<div class="flex-1 relative">
+<span class="material-symbols-outlined absolute left-3 top-2.5 text-text-secondary text-[18px]">search</span>
+<input class="w-full pl-9 pr-4 py-2 border border-border-subtle rounded font-code-meta text-code-meta focus:ring-primary focus:border-primary shadow-inner" placeholder="输入 Prefix 或精确 Key 搜索... (e.g., user:session:*)" type="text"/>
+</div>
+<button class="bg-surface-container text-text-primary px-4 py-2 rounded font-body-md text-body-md font-medium border border-border-subtle hover:bg-surface-container-high transition-colors">
+                                扫描匹配
+                            </button>
+</div>
+<!-- Search Results / Empty State Placeholder -->
+<div class="border border-dashed border-outline-variant bg-surface-container-low rounded p-8 flex flex-col items-center justify-center text-text-secondary min-h-[120px]">
+<span class="material-symbols-outlined text-[32px] mb-2 opacity-50">data_object</span>
+<p class="font-body-sm text-body-sm">输入 Key 前缀进行扫描，支持精确清除与 TTL 修改。</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Right Inspector Panel -->
+<aside class="fixed right-0 top-[56px] w-[320px] h-[calc(100vh-56px)] glass-panel inspector-shadow z-30 flex flex-col"><div class="px-4 py-4 mb-2">
+<h2 class="font-section-header text-section-header font-bold text-on-surface">系统参数</h2>
+<div class="font-code-meta text-code-meta text-text-secondary mt-1 tracking-wider uppercase">SYSTEM PARAMETERS</div>
+</div>
+<nav class="flex-1 flex flex-col gap-1 overflow-y-auto">
+<a class="flex items-center gap-3 px-4 py-2.5 text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">settings</span>
+<span class="font-body-sm text-body-sm">基础参数</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2.5 text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">security</span>
+<span class="font-body-sm text-body-sm">安全策略</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2.5 text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">folder_managed</span>
+<span class="font-body-sm text-body-sm">文件存储配置</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2.5 text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">swap_horiz</span>
+<span class="font-body-sm text-body-sm">导入导出配置</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2.5 bg-primary-container text-on-primary-container font-bold rounded-lg translate-x-1 transition-transform" href="#">
+<span class="material-symbols-outlined text-[20px]">memory</span>
+<span class="font-body-sm text-body-sm">缓存管理</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2.5 text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">history_edu</span>
+<span class="font-body-sm text-body-sm">操作审计</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2.5 text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">description</span>
+<span class="font-body-sm text-body-sm">文档中心</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2.5 text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">support_agent</span>
+<span class="font-body-sm text-body-sm">技术支持</span>
+</a>
+</nav>
+<div class="mt-auto flex flex-col gap-1 border-t border-border-subtle pt-2">
+<a class="flex items-center gap-3 px-4 py-2.5 text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">settings</span>
+<span class="font-body-sm text-body-sm">设置</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2.5 text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">help</span>
+<span class="font-body-sm text-body-sm">帮助</span>
+</a>
+</div></aside>
+</div>
+</body></html>

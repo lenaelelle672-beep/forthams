@@ -3,6 +3,7 @@ import axios, {
   InternalAxiosRequestConfig,
   AxiosResponse,
 } from 'axios';
+import { clearAuthStorage, getToken } from '@/utils/auth';
 
 /**
  * 基础数据模型 - TypeScript Interfaces
@@ -82,10 +83,25 @@ const http: AxiosInstance = axios.create({
   timeout: 15000,
 });
 
+type ResultEnvelope<T = unknown> = {
+  code: number;
+  message?: string;
+  data: T;
+};
+
+function isResultEnvelope(value: unknown): value is ResultEnvelope {
+  return Boolean(
+    value &&
+    typeof value === 'object' &&
+    'code' in value &&
+    'data' in value,
+  );
+}
+
 // 请求拦截器：注入认证 Token（符合 SPEC 权限控制规范）
 http.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    const token = localStorage.getItem('auth_token');
+    const token = getToken();
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -96,19 +112,48 @@ http.interceptors.request.use(
 
 // 响应拦截器：统一错误处理与数据解包，简化业务代码调用逻辑
 http.interceptors.response.use(
-  (response: AxiosResponse) => response.data,
+  (response: AxiosResponse) => {
+    const payload = response.data;
+
+    if (isResultEnvelope(payload)) {
+      if (payload.code !== 200) {
+        throw new Error(payload.message || '请求失败');
+      }
+
+      return payload.data;
+    }
+
+    return payload;
+  },
   (error) => {
     const status = error.response?.status;
-    console.error(`[HTTP Error] ${status}:`, error.response?.data || error.message);
+    if (status === 403) {
+      console.warn(`[HTTP Warning] ${status}:`, error.response?.data || error.message);
+    } else {
+      console.error(`[HTTP Error] ${status}:`, error.response?.data || error.message);
+    }
 
     if (status === 401) {
-      localStorage.removeItem('auth_token');
-      window.location.href = '/login';
+      clearAuthStorage();
+      localStorage.removeItem('ams_auth_token');
+      localStorage.removeItem('ams_auth_user');
+
+      const requestUrl = error.config?.url ?? '';
+      if (!requestUrl.includes('/auth/login')) {
+        window.location.href = '/login';
+      }
     } else if (status && status >= 500) {
       console.error('Server error, please try again later.');
     }
 
-    return Promise.reject(error);
+    const message = error.response?.data?.message || error.message || '请求失败';
+    const nextError = new Error(message) as Error & {
+      status?: number;
+      response?: typeof error.response;
+    };
+    nextError.status = status;
+    nextError.response = error.response;
+    return Promise.reject(nextError);
   }
 );
 

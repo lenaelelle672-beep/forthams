@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="zh"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>UNIVIEW - 流程通知开关</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-fixed-dim": "#b0c6ff",
+                        "background": "#051424",
+                        "surface-dim": "#051424",
+                        "surface-container-highest": "#273647",
+                        "surface-container-high": "#1c2b3c",
+                        "on-error-container": "#ffdad6",
+                        "inverse-on-surface": "#233143",
+                        "error-container": "#93000a",
+                        "secondary-container": "#00a8d8",
+                        "surface-bright": "#2c3a4c",
+                        "secondary": "#6bd2ff",
+                        "on-secondary-container": "#00384a",
+                        "surface-container": "#122131",
+                        "secondary-fixed-dim": "#6bd2ff",
+                        "surface-container-lowest": "#010f1f",
+                        "primary-fixed": "#d9e2ff",
+                        "tertiary-container": "#9c49eb",
+                        "tertiary": "#ddb7ff",
+                        "outline": "#8c90a0",
+                        "on-secondary-fixed-variant": "#004d65",
+                        "surface-tint": "#b0c6ff",
+                        "surface-variant": "#273647",
+                        "on-primary-fixed": "#001945",
+                        "outline-variant": "#424654",
+                        "on-secondary-fixed": "#001f2a",
+                        "surface": "#051424",
+                        "secondary-fixed": "#bfe9ff",
+                        "on-background": "#d4e4fa",
+                        "tertiary-fixed-dim": "#ddb7ff",
+                        "on-error": "#690005",
+                        "on-tertiary-fixed-variant": "#6900b3",
+                        "on-secondary": "#003547",
+                        "on-surface-variant": "#c2c6d7",
+                        "on-surface": "#d4e4fa",
+                        "error": "#ffb4ab",
+                        "on-primary": "#002c6f",
+                        "inverse-primary": "#0057cc",
+                        "primary-container": "#1d6ef2",
+                        "surface-container-low": "#0d1c2d",
+                        "on-tertiary": "#490080",
+                        "on-primary-container": "#fffdff",
+                        "inverse-surface": "#d4e4fa",
+                        "tertiary-fixed": "#f0dbff",
+                        "on-tertiary-fixed": "#2c0051",
+                        "on-tertiary-container": "#fffdff",
+                        "on-primary-fixed-variant": "#00419c",
+                        "primary": "#b0c6ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "xs": "4px",
+                        "gutter": "24px",
+                        "xl": "40px",
+                        "margin-desktop": "48px",
+                        "lg": "24px",
+                        "sm": "8px",
+                        "margin-mobile": "16px",
+                        "md": "16px",
+                        "unit": "4px",
+                        "xxl": "64px",
+                        "topbar-height": "56px",
+                        "sidebar-width": "240px",
+                        "container-gap": "24px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Geist"],
+                        "body-lg": ["Geist"],
+                        "display-lg": ["Geist"],
+                        "body-md": ["Geist"],
+                        "headline-lg-mobile": ["Geist"],
+                        "title-md": ["Geist"],
+                        "label-md": ["Geist"],
+                        "mono-code": ["JetBrains Mono"],
+                        "page-title": ["Geist"],
+                        "section-header": ["Geist"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "title-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                        "mono-code": ["13px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "page-title": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+                        "section-header": ["14px", { "lineHeight": "20px", "letterSpacing": "0.1em", "fontWeight": "700", "textTransform": "uppercase" }]
+                    }
+                },
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: #051424;
+            color: #d4e4fa;
+        }
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #b0c6ff;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #b0c6ff;
+        }
+        .toggle-checkbox:checked + .toggle-label:after {
+            transform: translateX(100%);
+            border-color: white;
+        }
+        .glow-dot {
+            box-shadow: 0 0 8px #b0c6ff;
+        }
+    </style>
+</head>
+<body class="font-body-md text-body-md antialiased overflow-x-hidden selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopNavBar -->
+<header class="fixed top-0 left-0 w-full z-50 flex items-center justify-between px-container-gap h-topbar-height bg-[#051424] border-b flat no shadows border-primary-fixed-dim">
+<div class="flex items-center gap-6">
+<span class="font-title-md text-title-md text-surface-lowest dark:text-surface-bright tracking-tight flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">view_in_ar</span>
+            UNIVIEW | 系统设置中心
+        </span><nav class="hidden md:flex items-center gap-6 ml-8"><a class="text-surface-variant dark:text-outline-variant hover:text-primary-fixed hover:bg-on-secondary-fixed-variant/20 transition-colors duration-200 ease-in-out px-2 py-1 rounded-sm" href="#">流程平台</a><a class="text-surface-variant dark:text-outline-variant hover:text-primary-fixed hover:bg-on-secondary-fixed-variant/20 transition-colors duration-200 ease-in-out px-2 py-1 rounded-sm" href="#">组织权限</a><a class="text-surface-variant dark:text-outline-variant hover:text-primary-fixed hover:bg-on-secondary-fixed-variant/20 transition-colors duration-200 ease-in-out px-2 py-1 rounded-sm" href="#">基础资料</a><a class="text-surface-variant dark:text-outline-variant hover:text-primary-fixed hover:bg-on-secondary-fixed-variant/20 transition-colors duration-200 ease-in-out px-2 py-1 rounded-sm" href="#">集成配置</a><a class="text-primary-fixed-dim border-b-2 border-primary-fixed-dim pb-1 hover:text-primary-fixed hover:bg-on-secondary-fixed-variant/20 transition-colors duration-200 ease-in-out px-2 rounded-sm" href="#">消息与通知</a><a class="text-surface-variant dark:text-outline-variant hover:text-primary-fixed hover:bg-on-secondary-fixed-variant/20 transition-colors duration-200 ease-in-out px-2 py-1 rounded-sm" href="#">系统参数</a></nav>
+</div>
+<div class="flex items-center gap-4">
+
+<button class="text-on-surface-variant dark:text-outline hover:text-primary-fixed hover:bg-on-secondary-fixed-variant/20 transition-colors duration-200 ease-in-out p-1 rounded-sm flex items-center gap-1 text-sm">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 0;">keyboard_return</span>
+            返回业务工作台
+        </button>
+<div class="flex items-center gap-2 ml-4 pl-4 border-l border-surface-container-high">
+<div class="w-8 h-8 rounded-full bg-surface-container-high border border-outline-variant flex items-center justify-center overflow-hidden">
+<span class="material-symbols-outlined text-primary text-[20px]">admin_panel_settings</span>
+</div>
+<span class="text-sm text-on-surface">运营管理员</span>
+</div>
+</div>
+</header>
+<div class="flex h-screen pt-topbar-height">
+<!-- SideNavBar -->
+<nav class="hidden md:flex w-sidebar-width h-full flex-col p-4 bg-surface-container-lowest border-r border-surface-container-high flat no shadows shrink-0"><div class="flex-1 flex flex-col gap-1 overflow-y-auto"><a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant dark:text-outline hover:text-on-surface hover:bg-surface-container-low dark:hover:bg-surface-container-highest rounded-lg transition-all duration-150" href="#"><span class="material-symbols-outlined text-[20px]">settings_ethernet</span><span>邮件网关配置</span></a><a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant dark:text-outline hover:text-on-surface hover:bg-surface-container-low dark:hover:bg-surface-container-highest rounded-lg transition-all duration-150" href="#"><span class="material-symbols-outlined text-[20px]">mail_lock</span><span>流程邮件配置</span></a><a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant dark:text-outline hover:text-on-surface hover:bg-surface-container-low dark:hover:bg-surface-container-highest rounded-lg transition-all duration-150" href="#"><span class="material-symbols-outlined text-[20px]">mail</span><span>邮件模板</span></a><a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant dark:text-outline hover:text-on-surface hover:bg-surface-container-low dark:hover:bg-surface-container-highest rounded-lg transition-all duration-150" href="#"><span class="material-symbols-outlined text-[20px]">history</span><span>邮件日志</span></a><a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant dark:text-outline hover:text-on-surface hover:bg-surface-container-low dark:hover:bg-surface-container-highest rounded-lg transition-all duration-150" href="#"><span class="material-symbols-outlined text-[20px]">description</span><span>通知模板</span></a><a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant dark:text-outline hover:text-on-surface hover:bg-surface-container-low dark:hover:bg-surface-container-highest rounded-lg transition-all duration-150" href="#"><span class="material-symbols-outlined text-[20px]">hub</span><span>通知渠道</span></a><a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant dark:text-outline hover:text-on-surface hover:bg-surface-container-low dark:hover:bg-surface-container-highest rounded-lg transition-all duration-150" href="#"><span class="material-symbols-outlined text-[20px]">settings_suggest</span><span>通知偏好</span></a><a class="flex items-center gap-3 px-3 py-2 text-primary font-bold bg-secondary-container dark:bg-on-secondary-fixed-variant/30 rounded-lg transition-all duration-150" href="#"><span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">toggle_on</span><span>流程通知开关</span></a></div></nav>
+<!-- Main Content Canvas -->
+<main class="flex-1 overflow-y-auto">
+<div class="w-full h-full flex flex-col">
+<!-- Header Section -->
+<div class="px-margin-desktop py-xl border-b border-surface-container-high bg-surface-container-lowest shrink-0">
+<div class="flex items-center gap-2 text-label-md font-label-md text-outline mb-4">
+<span>系统设置中心</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span>消息与通知</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="text-primary-fixed-dim">流程通知开关</span>
+</div>
+<div class="flex justify-between items-end">
+<div>
+<h1 class="font-display-lg text-display-lg text-on-surface mb-2">流程通知开关</h1>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-2xl">
+                             配置固定资产管理系统核心流程的通知分发策略。管理邮件、钉钉、企微等渠道的触发规则。
+                         </p>
+</div>
+<div class="flex gap-4">
+<button class="px-4 py-2 border border-surface-container-high bg-surface-container-lowest text-primary hover:bg-surface-container-low rounded font-label-md text-label-md flex items-center gap-2 transition-colors">
+<span class="material-symbols-outlined text-[18px]">history</span> 策略审计
+                         </button>
+<button class="px-4 py-2 bg-error-container/20 border border-error-container text-error hover:bg-error-container/40 rounded font-label-md text-label-md flex items-center gap-2 transition-colors">
+<span class="material-symbols-outlined text-[18px]">power_off</span> 全局熔断
+                         </button>
+</div>
+</div>
+</div>
+<div class="flex flex-col xl:flex-row flex-1 overflow-hidden">
+<!-- Matrix Strategy Grid -->
+<div class="flex-1 border-r border-surface-container-high bg-surface-dim overflow-y-auto">
+<div class="overflow-x-auto min-w-[800px]">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr>
+<th class="p-6 border-b border-surface-container-high font-title-md text-title-md text-on-surface w-[300px]">业务流程节点</th>
+<th class="p-6 border-b border-surface-container-high text-center"><div class="flex flex-col items-center gap-2"><span class="material-symbols-outlined text-outline">mail</span><span class="font-label-md text-label-md text-on-surface-variant">邮件</span></div></th>
+<th class="p-6 border-b border-surface-container-high text-center"><div class="flex flex-col items-center gap-2"><span class="material-symbols-outlined text-secondary">forum</span><span class="font-label-md text-label-md text-on-surface-variant">钉钉</span></div></th>
+<th class="p-6 border-b border-surface-container-high text-center"><div class="flex flex-col items-center gap-2"><span class="material-symbols-outlined text-[#0082EF]">chat</span><span class="font-label-md text-label-md text-on-surface-variant">企微</span></div></th>
+<th class="p-6 border-b border-surface-container-high text-center"><div class="flex flex-col items-center gap-2"><span class="material-symbols-outlined text-tertiary">webhook</span><span class="font-label-md text-label-md text-on-surface-variant">Webhook</span></div></th>
+<th class="p-6 border-b border-surface-container-high text-center"><div class="flex flex-col items-center gap-2"><span class="material-symbols-outlined text-primary-fixed-dim">notifications</span><span class="font-label-md text-label-md text-on-surface-variant">站内信</span></div></th>
+</tr>
+</thead>
+<tbody>
+<!-- Row 1 -->
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="p-6 border-b border-surface-container-high/50">
+<div class="font-body-md text-body-md text-on-surface font-medium">资产领用申请</div>
+<div class="font-label-md text-label-md text-outline mt-1">触发时机: 员工发起领用单</div>
+</td>
+<td class="p-6 border-b border-surface-container-high/50 text-center">
+<label class="relative inline-block w-10 h-6 cursor-pointer">
+<input checked="" class="sr-only toggle-checkbox" type="checkbox"/>
+<div class="w-10 h-6 bg-surface-container-high rounded-full border border-outline-variant toggle-label transition-colors"></div>
+<div class="absolute left-1 top-1 bg-on-surface w-4 h-4 rounded-full transition-transform transform translate-x-4"></div>
+</label>
+</td>
+<td class="p-6 border-b border-surface-container-high/50 text-center">
+<label class="relative inline-block w-10 h-6 cursor-pointer">
+<input checked="" class="sr-only toggle-checkbox" type="checkbox"/>
+<div class="w-10 h-6 bg-surface-container-high rounded-full border border-outline-variant toggle-label transition-colors"></div>
+<div class="absolute left-1 top-1 bg-on-surface w-4 h-4 rounded-full transition-transform transform translate-x-4"></div>
+</label>
+</td>
+<td class="p-6 border-b border-surface-container-high/50 text-center">
+<label class="relative inline-block w-10 h-6 cursor-pointer">
+<input class="sr-only toggle-checkbox" type="checkbox"/>
+<div class="w-10 h-6 bg-surface-container-high rounded-full border border-outline-variant toggle-label transition-colors"></div>
+<div class="absolute left-1 top-1 bg-outline w-4 h-4 rounded-full transition-transform"></div>
+</label>
+</td>
+<td class="p-6 border-b border-surface-container-high/50 text-center">
+<label class="relative inline-block w-10 h-6 cursor-pointer">
+<input class="sr-only toggle-checkbox" type="checkbox"/>
+<div class="w-10 h-6 bg-surface-container-high rounded-full border border-outline-variant toggle-label transition-colors"></div>
+<div class="absolute left-1 top-1 bg-outline w-4 h-4 rounded-full transition-transform"></div>
+</label>
+</td>
+<td class="p-6 border-b border-surface-container-high/50 text-center">
+<label class="relative inline-block w-10 h-6 cursor-pointer">
+<input checked="" class="sr-only toggle-checkbox" type="checkbox"/>
+<div class="w-10 h-6 bg-surface-container-high rounded-full border border-outline-variant toggle-label transition-colors"></div>
+<div class="absolute left-1 top-1 bg-on-surface w-4 h-4 rounded-full transition-transform transform translate-x-4"></div>
+</label>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Impact Analysis Sidebar -->
+<div class="w-full xl:w-[400px] bg-surface-container-lowest p-6 flex flex-col gap-6 shrink-0 border-l border-surface-container-high">
+<h3 class="font-title-md text-title-md text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary">analytics</span> 实时影响分析
+                    </h3>
+<div class="p-6 border border-surface-container-high rounded-xl bg-surface-dim relative overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent pointer-events-none"></div>
+<div class="font-label-md text-label-md text-outline mb-2">预计日推送总增量</div>
+<div class="font-display-lg text-display-lg text-primary-fixed-dim flex items-baseline gap-2">
+                            +1,245 <span class="font-label-md text-label-md text-secondary">msg/day</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

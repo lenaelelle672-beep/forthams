@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Future Settings OS · 全量页面导航中心</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                "primary-container": "#1d6ef2",
+                "inverse-surface": "#2d3134",
+                "on-tertiary": "#ffffff",
+                "surface-bright": "#f7fafe",
+                "on-tertiary-fixed-variant": "#7b2f00",
+                "surface-container": "#ebeef2",
+                "primary-fixed-dim": "#b0c6ff",
+                "on-background": "#181c1f",
+                "surface-tint": "#0057cc",
+                "error-container": "#ffdad6",
+                "status-red": "#DC2626",
+                "tertiary-fixed": "#ffdbcc",
+                "surface": "#f7fafe",
+                "error": "#ba1a1a",
+                "on-primary-container": "#fffdff",
+                "text-primary": "#0F172A",
+                "tertiary-container": "#c75000",
+                "surface-container-lowest": "#ffffff",
+                "tertiary-fixed-dim": "#ffb695",
+                "tertiary": "#9f3e00",
+                "on-error": "#ffffff",
+                "surface-variant": "#e0e3e7",
+                "on-surface": "#181c1f",
+                "on-secondary-container": "#51617e",
+                "on-error-container": "#93000a",
+                "primary": "#0056c9",
+                "surface-container-low": "#f1f4f8",
+                "inverse-on-surface": "#eef1f5",
+                "secondary": "#4e5f7b",
+                "border-subtle": "#D7E2F0",
+                "surface-container-high": "#e5e8ec",
+                "status-green": "#16A34A",
+                "secondary-fixed": "#d5e3ff",
+                "on-secondary": "#ffffff",
+                "on-primary": "#ffffff",
+                "text-secondary": "#64748B",
+                "on-secondary-fixed-variant": "#374762",
+                "secondary-fixed-dim": "#b6c7e8",
+                "inverse-primary": "#b0c6ff",
+                "surface-container-highest": "#e0e3e7",
+                "status-amber": "#F59E0B",
+                "outline": "#727786",
+                "outline-variant": "#c2c6d7",
+                "on-surface-variant": "#424654",
+                "primary-fixed": "#d9e2ff",
+                "surface-dim": "#d7dade",
+                "on-tertiary-container": "#fffdff",
+                "on-primary-fixed-variant": "#00419c",
+                "on-primary-fixed": "#001945",
+                "secondary-container": "#ccddff",
+                "on-tertiary-fixed": "#351000",
+                "status-cyan": "#00A8D8",
+                "background": "#f7fafe",
+                "status-purple": "#7C3AED",
+                "on-secondary-fixed": "#091c35"
+            },
+            "borderRadius": {
+                "DEFAULT": "0.125rem",
+                "lg": "0.25rem",
+                "xl": "0.5rem",
+                "full": "0.75rem"
+            },
+            "spacing": {
+                "container-gap": "20px",
+                "sidebar-width": "196px",
+                "inspector-width": "320px",
+                "card-padding": "16px",
+                "topbar-height": "48px",
+                "grid-gutter": "12px"
+            },
+            "fontFamily": {
+                "sans": ["Inter", "PingFang SC", "sans-serif"],
+                "mono": ["JetBrains Mono", "monospace"]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        body {
+            background-color: #f7fafe;
+            color: #181c1f;
+            -webkit-font-smoothing: antialiased;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+            font-size: 20px;
+        }
+        .nav-card {
+            background: #ffffff;
+            border: 1px solid #D7E2F0;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        .nav-card:hover {
+            border-color: #1d6ef2;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(29, 110, 242, 0.08);
+        }
+        .nav-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 3px;
+            height: 100%;
+            background: transparent;
+            transition: background 0.2s;
+        }
+        .nav-card:hover::after {
+            background: #1d6ef2;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #D7E2F0;
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #c2c6d7;
+        }
+    </style>
+</head>
+<body class="overflow-hidden h-screen flex flex-col font-sans">
+<!-- 顶部导航栏 -->
+<header class="bg-white/80 backdrop-blur-md border-b border-border-subtle flex justify-between items-center px-6 w-full h-14 z-50 sticky top-0">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-3">
+<span class="font-bold text-lg tracking-tight text-primary">Future Settings OS</span>
+<span class="text-outline-variant">|</span>
+<span class="text-text-secondary font-medium text-sm">全量页面导航中心</span>
+</div>
+<div class="hidden lg:flex items-center bg-surface-container-low rounded-full px-4 py-1.5 gap-3 border border-transparent focus-within:border-primary/30 focus-within:bg-white transition-all">
+<span class="material-symbols-outlined text-text-secondary text-sm">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm w-72 placeholder:text-text-secondary/50" placeholder="搜索组件、模块或屏幕 ID..." type="text"/>
+<div class="bg-white border border-border-subtle px-1.5 py-0.5 rounded text-[10px] text-text-secondary font-mono">⌘ K</div>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2">
+<span class="text-[10px] text-text-secondary font-mono tracking-wider uppercase">屏幕总数：</span>
+<span class="text-xs font-bold text-primary px-2 py-0.5 bg-primary/10 rounded-full">100+</span>
+</div>
+<div class="flex items-center gap-4 border-l border-border-subtle pl-6">
+<span class="material-symbols-outlined text-text-secondary cursor-pointer hover:text-primary transition-colors">notifications</span>
+<div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center text-xs font-bold text-on-primary">AD</div>
+</div>
+</div>
+</header>
+<!-- 主滚动内容 -->
+<main class="flex-1 overflow-y-auto p-6 md:p-8 custom-scrollbar">
+<div class="max-w-[1600px] mx-auto space-y-12 pb-16">
+<!-- 区块：核心设置 -->
+<section>
+<div class="flex items-center gap-3 mb-6">
+<span class="material-symbols-outlined text-primary bg-primary/10 p-1.5 rounded">settings_suggest</span>
+<h2 class="text-lg font-bold tracking-tight text-text-primary">核心设置</h2>
+<div class="h-[1px] flex-1 bg-border-subtle ml-2"></div>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+<a class="nav-card p-4 flex flex-col justify-between group" data-nav-label="系统参数" href="/fixed-assets/workbench?menu=system-base-params">
+<div>
+<div class="flex items-start justify-between mb-3">
+<span class="material-symbols-outlined text-text-secondary group-hover:text-primary transition-colors">display_settings</span>
+<span class="text-[9px] font-mono text-text-secondary uppercase bg-surface-container-low px-1.5 py-0.5 rounded">已启用</span>
+</div>
+<h3 class="font-semibold text-[13px] text-text-primary group-hover:text-primary transition-colors">系统参数 · 全宽沉浸版</h3>
+</div>
+<code class="mt-4 text-[10px] font-mono text-text-secondary/70 bg-surface-container-low px-2 py-1 rounded border border-border-subtle/50">{{DATA:SCREEN:SCREEN_146}}</code>
+</a>
+<a class="nav-card p-4 flex flex-col justify-between group" data-nav-label="编码规则" href="/fixed-assets/workbench?menu=system-numbering-rules">
+<div>
+<div class="flex items-start justify-between mb-3">
+<span class="material-symbols-outlined text-text-secondary group-hover:text-primary transition-colors">rule</span>
+<span class="text-[9px] font-mono text-text-secondary uppercase bg-surface-container-low px-1.5 py-0.5 rounded">沉浸版</span>
+</div>
+<h3 class="font-semibold text-[13px] text-text-primary group-hover:text-primary transition-colors">编号规则 · 极致沉浸版</h3>
+</div>
+<code class="mt-4 text-[10px] font-mono text-text-secondary/70 bg-surface-container-low px-2 py-1 rounded border border-border-subtle/50">{{DATA:SCREEN:SCREEN_105}}</code>
+</a>
+<a class="nav-card p-4 flex flex-col justify-between group" data-nav-label="SLA 配置" href="/fixed-assets/workbench?menu=system-sla-config">
+<div>
+<div class="flex items-start justify-between mb-3">
+<span class="material-symbols-outlined text-text-secondary group-hover:text-primary transition-colors">timer</span>
+<span class="text-[9px] font-mono text-text-secondary uppercase bg-surface-container-low px-1.5 py-0.5 rounded">配置</span>
+</div>
+<h3 class="font-semibold text-[13px] text-text-primary group-hover:text-primary transition-colors">SLA 配置 · 全宽沉浸版</h3>
+</div>
+<code class="mt-4 text-[10px] font-mono text-text-secondary/70 bg-surface-container-low px-2 py-1 rounded border border-border-subtle/50">{{DATA:SCREEN:SCREEN_139}}</code>
+</a>
+<a class="nav-card p-4 flex flex-col justify-between group" data-nav-label="Webhook" href="/fixed-assets/workbench?menu=system-webhook-config">
+<div>
+<div class="flex items-start justify-between mb-3">
+<span class="material-symbols-outlined text-text-secondary group-hover:text-primary transition-colors">webhook</span>
+<span class="text-[9px] font-mono text-text-secondary uppercase bg-surface-container-low px-1.5 py-0.5 rounded">Webhook</span>
+</div>
+<h3 class="font-semibold text-[13px] text-text-primary group-hover:text-primary transition-colors">Webhook 配置 · 全宽沉浸版</h3>
+</div>
+<code class="mt-4 text-[10px] font-mono text-text-secondary/70 bg-surface-container-low px-2 py-1 rounded border border-border-subtle/50">{{DATA:SCREEN:SCREEN_115}}</code>
+</a>
+<a class="nav-card p-4 flex flex-col justify-between group" data-nav-label="通知渠道" href="/fixed-assets/workbench?menu=system-notification-channels">
+<div>
+<div class="flex items-start justify-between mb-3">
+<span class="material-symbols-outlined text-text-secondary group-hover:text-primary transition-colors">campaign</span>
+<span class="text-[9px] font-mono text-text-secondary uppercase bg-surface-container-low px-1.5 py-0.5 rounded">渠道</span>
+</div>
+<h3 class="font-semibold text-[13px] text-text-primary group-hover:text-primary transition-colors">通知渠道 · 全宽沉浸版</h3>
+</div>
+<code class="mt-4 text-[10px] font-mono text-text-secondary/70 bg-surface-container-low px-2 py-1 rounded border border-border-subtle/50">{{DATA:SCREEN:SCREEN_116}}</code>
+</a>
+</div>
+</section>
+<!-- 区块：流程平台 -->
+<section>
+<div class="flex items-center gap-3 mb-6">
+<span class="material-symbols-outlined text-status-purple bg-status-purple/10 p-1.5 rounded">account_tree</span>
+<h2 class="text-lg font-bold tracking-tight text-text-primary">流程平台</h2>
+<div class="h-[1px] flex-1 bg-border-subtle ml-2"></div>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+<a class="nav-card p-4 flex flex-col justify-between group" data-nav-label="流程设计" href="/fixed-assets/workbench?menu=system-flow-designer">
+<div>
+<div class="flex items-start justify-between mb-3">
+<span class="material-symbols-outlined text-text-secondary group-hover:text-status-purple transition-colors">draw</span>
+<span class="text-[9px] font-mono text-text-secondary uppercase bg-surface-container-low px-1.5 py-0.5 rounded">专业设计</span>
+</div>
+<h3 class="font-semibold text-[13px] text-text-primary group-hover:text-primary transition-colors leading-snug">可视化流程设计 · 极致全宽生产级精修版</h3>
+</div>
+<code class="mt-4 text-[10px] font-mono text-text-secondary/70 bg-surface-container-low px-2 py-1 rounded border border-border-subtle/50">{{DATA:SCREEN:SCREEN_83}}</code>
+</a>
+<a class="nav-card p-4 flex flex-col justify-between group" data-nav-label="流程平台" href="/fixed-assets/workbench?menu=system-flow-definition">
+<div>
+<div class="flex items-start justify-between mb-3">
+<span class="material-symbols-outlined text-text-secondary group-hover:text-status-purple transition-colors">history</span>
+<span class="text-[9px] font-mono text-text-secondary uppercase bg-surface-container-low px-1.5 py-0.5 rounded">版本管理</span>
+</div>
+<h3 class="font-semibold text-[13px] text-text-primary group-hover:text-primary transition-colors leading-snug">流程版本管理 · 状态回读与回溯中心</h3>
+</div>
+<code class="mt-4 text-[10px] font-mono text-text-secondary/70 bg-surface-container-low px-2 py-1 rounded border border-border-subtle/50">{{DATA:SCREEN:SCREEN_62}}</code>
+</a>
+<a class="nav-card p-4 flex flex-col justify-between group" data-nav-label="表单管理" href="/fixed-assets/workbench?menu=system-form-config">
+<div>
+<div class="flex items-start justify-between mb-3">
+<span class="material-symbols-outlined text-text-secondary group-hover:text-status-purple transition-colors">splitscreen</span>
+<span class="text-[9px] font-mono text-text-secondary uppercase bg-surface-container-low px-1.5 py-0.5 rounded">表单逻辑</span>
+</div>
+<h3 class="font-semibold text-[13px] text-text-primary group-hover:text-primary transition-colors">环节表单逻辑 · 深度细化配置版</h3>
+</div>
+<code class="mt-4 text-[10px] font-mono text-text-secondary/70 bg-surface-container-low px-2 py-1 rounded border border-border-subtle/50">{{DATA:SCREEN:SCREEN_110}}</code>
+</a>
+<a class="nav-card p-4 flex flex-col justify-between group" data-nav-label="流程与规则" href="/fixed-assets/workbench?menu=system-approval-rules">
+<div>
+<div class="flex items-start justify-between mb-3">
+<span class="material-symbols-outlined text-text-secondary group-hover:text-status-purple transition-colors">alt_route</span>
+<span class="text-[9px] font-mono text-text-secondary uppercase bg-surface-container-low px-1.5 py-0.5 rounded">决策矩阵</span>
+</div>
+<h3 class="font-semibold text-[13px] text-text-primary group-hover:text-primary transition-colors">审批流 · 动态分支决策矩阵</h3>
+</div>
+<code class="mt-4 text-[10px] font-mono text-text-secondary/70 bg-surface-container-low px-2 py-1 rounded border border-border-subtle/50">{{DATA:SCREEN:SCREEN_12}}</code>
+</a>
+</div>
+</section>
+<!-- 区块：业务监控与看板 -->
+<section>
+<div class="flex items-center gap-3 mb-6">
+<span class="material-symbols-outlined text-status-cyan bg-status-cyan/10 p-1.5 rounded">monitoring</span>
+<h2 class="text-lg font-bold tracking-tight text-text-primary">业务监控与看板</h2>
+<div class="h-[1px] flex-1 bg-border-subtle ml-2"></div>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+<a class="nav-card p-4 flex flex-col justify-between group" data-nav-label="运行监测" href="/fixed-assets/workbench?menu=system-runtime-monitor">
+<div>
+<div class="flex items-start justify-between mb-3">
+<span class="material-symbols-outlined text-text-secondary group-hover:text-status-cyan transition-colors">analytics</span>
+<span class="text-[9px] font-mono text-text-secondary uppercase bg-surface-container-low px-1.5 py-0.5 rounded">实时链路</span>
+</div>
+<h3 class="font-semibold text-[13px] text-text-primary group-hover:text-primary transition-colors">业务执行看板 · 全域链路追踪精修版</h3>
+</div>
+<code class="mt-4 text-[10px] font-mono text-text-secondary/70 bg-surface-container-low px-2 py-1 rounded border border-border-subtle/50">{{DATA:SCREEN:SCREEN_155}}</code>
+</a>
+<a class="nav-card p-4 flex flex-col justify-between group" data-nav-label="运行监测" href="/fixed-assets/workbench?menu=system-runtime-monitor">
+<div>
+<div class="flex items-start justify-between mb-3">
+<span class="material-symbols-outlined text-text-secondary group-hover:text-status-cyan transition-colors">view_quilt</span>
+<span class="text-[9px] font-mono text-text-secondary uppercase bg-surface-container-low px-1.5 py-0.5 rounded">实例监控</span>
+</div>
+<h3 class="font-semibold text-[13px] text-text-primary group-hover:text-primary transition-colors">业务执行看板 · 流程实例监控</h3>
+</div>
+<code class="mt-4 text-[10px] font-mono text-text-secondary/70 bg-surface-container-low px-2 py-1 rounded border border-border-subtle/50">{{DATA:SCREEN:SCREEN_112}}</code>
+</a>
+<a class="nav-card p-4 flex flex-col justify-between group" data-nav-label="技术支持" href="/fixed-assets/workbench?menu=system-tech-support">
+<div>
+<div class="flex items-start justify-between mb-3">
+<span class="material-symbols-outlined text-text-secondary group-hover:text-status-cyan transition-colors">troubleshoot</span>
+<span class="text-[9px] font-mono text-text-secondary uppercase bg-surface-container-low px-1.5 py-0.5 rounded">实时诊断</span>
+</div>
+<h3 class="font-semibold text-[13px] text-text-primary group-hover:text-primary transition-colors">脚本引擎执行轨迹 · 实时诊断中枢</h3>
+</div>
+<code class="mt-4 text-[10px] font-mono text-text-secondary/70 bg-surface-container-low px-2 py-1 rounded border border-border-subtle/50">{{DATA:SCREEN:SCREEN_61}}</code>
+</a>
+<a class="nav-card p-4 flex flex-col justify-between group" data-nav-label="集成中枢" href="/fixed-assets/workbench?menu=system-external-systems">
+<div>
+<div class="flex items-start justify-between mb-3">
+<span class="material-symbols-outlined text-text-secondary group-hover:text-status-cyan transition-colors">hub</span>
+<span class="text-[9px] font-mono text-text-secondary uppercase bg-surface-container-low px-1.5 py-0.5 rounded">总线追踪</span>
+</div>
+<h3 class="font-semibold text-[13px] text-text-primary group-hover:text-primary transition-colors">全局事件总线 · 路由链路追踪</h3>
+</div>
+<code class="mt-4 text-[10px] font-mono text-text-secondary/70 bg-surface-container-low px-2 py-1 rounded border border-border-subtle/50">{{DATA:SCREEN:SCREEN_162}}</code>
+</a>
+</div>
+</section>
+<!-- 区块：系统管理 -->
+<section>
+<div class="flex items-center gap-3 mb-6">
+<span class="material-symbols-outlined text-status-amber bg-status-amber/10 p-1.5 rounded">admin_panel_settings</span>
+<h2 class="text-lg font-bold tracking-tight text-text-primary">系统管理</h2>
+<div class="h-[1px] flex-1 bg-border-subtle ml-2"></div>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+<a class="nav-card p-4 flex flex-col justify-between group" data-nav-label="用户管理" href="/fixed-assets/workbench?menu=system-user-management">
+<div>
+<div class="flex items-start justify-between mb-3">
+<span class="material-symbols-outlined text-text-secondary group-hover:text-status-amber transition-colors">manage_accounts</span>
+<span class="text-[9px] font-mono text-text-secondary uppercase bg-surface-container-low px-1.5 py-0.5 rounded">用户</span>
+</div>
+<h3 class="font-semibold text-[13px] text-text-primary group-hover:text-primary transition-colors">用户管理 · 全宽沉浸版</h3>
+</div>
+<code class="mt-4 text-[10px] font-mono text-text-secondary/70 bg-surface-container-low px-2 py-1 rounded border border-border-subtle/50">{{DATA:SCREEN:SCREEN_101}}</code>
+</a>
+<a class="nav-card p-4 flex flex-col justify-between group" data-nav-label="角色管理" href="/fixed-assets/workbench?menu=system-role-permissions">
+<div>
+<div class="flex items-start justify-between mb-3">
+<span class="material-symbols-outlined text-text-secondary group-hover:text-status-amber transition-colors">lock_person</span>
+<span class="text-[9px] font-mono text-text-secondary uppercase bg-surface-container-low px-1.5 py-0.5 rounded">权限矩阵</span>
+</div>
+<h3 class="font-semibold text-[13px] text-text-primary group-hover:text-primary transition-colors">角色管理 · 权限控制矩阵</h3>
+</div>
+<code class="mt-4 text-[10px] font-mono text-text-secondary/70 bg-surface-container-low px-2 py-1 rounded border border-border-subtle/50">{{DATA:SCREEN:SCREEN_97}}</code>
+</a>
+<a class="nav-card p-4 flex flex-col justify-between group" data-nav-label="组织管理" href="/fixed-assets/workbench?menu=system-dept-org">
+<div>
+<div class="flex items-start justify-between mb-3">
+<span class="material-symbols-outlined text-text-secondary group-hover:text-status-amber transition-colors">corporate_fare</span>
+<span class="text-[9px] font-mono text-text-secondary uppercase bg-surface-container-low px-1.5 py-0.5 rounded">组织中枢</span>
+</div>
+<h3 class="font-semibold text-[13px] text-text-primary group-hover:text-primary transition-colors">组织架构 · 权限与岗位中枢</h3>
+</div>
+<code class="mt-4 text-[10px] font-mono text-text-secondary/70 bg-surface-container-low px-2 py-1 rounded border border-border-subtle/50">{{DATA:SCREEN:SCREEN_37}}</code>
+</a>
+<a class="nav-card p-4 flex flex-col justify-between group" data-nav-label="审计日志" href="/fixed-assets/workbench?menu=system-audit-log">
+<div>
+<div class="flex items-start justify-between mb-3">
+<span class="material-symbols-outlined text-text-secondary group-hover:text-status-amber transition-colors">assignment_turned_in</span>
+<span class="text-[9px] font-mono text-text-secondary uppercase bg-surface-container-low px-1.5 py-0.5 rounded">审计</span>
+</div>
+<h3 class="font-semibold text-[13px] text-text-primary group-hover:text-primary transition-colors">审计日志 · 全量行为追溯中心</h3>
+</div>
+<code class="mt-4 text-[10px] font-mono text-text-secondary/70 bg-surface-container-low px-2 py-1 rounded border border-border-subtle/50">{{DATA:SCREEN:SCREEN_124}}</code>
+</a>
+</div>
+</section>
+<!-- 区块：深色模式预览 -->
+<section>
+<div class="flex items-center gap-3 mb-6">
+<span class="material-symbols-outlined text-on-surface bg-inverse-surface/10 p-1.5 rounded">dark_mode</span>
+<h2 class="text-lg font-bold tracking-tight text-text-primary">深色模式预览</h2>
+<div class="h-[1px] flex-1 bg-border-subtle ml-2"></div>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+<a class="nav-card p-4 flex flex-col justify-between group border-l-4 border-l-primary" data-nav-label="流程设计" href="/fixed-assets/workbench?menu=system-flow-designer">
+<div>
+<div class="flex items-start justify-between mb-3">
+<span class="material-symbols-outlined text-text-secondary group-hover:text-primary transition-colors">palette</span>
+<span class="text-[9px] font-mono text-text-secondary uppercase bg-surface-container-low px-1.5 py-0.5 rounded">深色专业</span>
+</div>
+<h3 class="font-semibold text-[13px] text-text-primary group-hover:text-primary transition-colors leading-snug">可视化流程设计 · 深色全宽沉浸增强版</h3>
+</div>
+<code class="mt-4 text-[10px] font-mono text-text-secondary/70 bg-surface-container-low px-2 py-1 rounded border border-border-subtle/50">{{DATA:SCREEN:SCREEN_136}}</code>
+</a>
+<a class="nav-card p-4 flex flex-col justify-between group" data-nav-label="设置中心" href="/fixed-assets/workbench?menu=system-settings-command-center">
+<div>
+<div class="flex items-start justify-between mb-3">
+<span class="material-symbols-outlined text-text-secondary group-hover:text-primary transition-colors">nights_stay</span>
+<span class="text-[9px] font-mono text-text-secondary uppercase bg-surface-container-low px-1.5 py-0.5 rounded">深海模式</span>
+</div>
+<h3 class="font-semibold text-[13px] text-text-primary group-hover:text-primary transition-colors">Future Settings OS · 深色全宽沉浸版</h3>
+</div>
+<code class="mt-4 text-[10px] font-mono text-text-secondary/70 bg-surface-container-low px-2 py-1 rounded border border-border-subtle/50">{{DATA:SCREEN:SCREEN_137}}</code>
+</a>
+</div>
+</section>
+<!-- 区块：交付与演示 -->
+<section>
+<div class="flex items-center gap-3 mb-6">
+<span class="material-symbols-outlined text-status-green bg-status-green/10 p-1.5 rounded">handshake</span>
+<h2 class="text-lg font-bold tracking-tight text-text-primary">交付与演示</h2>
+<div class="h-[1px] flex-1 bg-border-subtle ml-2"></div>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+<a class="nav-card p-4 flex flex-col justify-between group" data-nav-label="导航控制台" href="/fixed-assets/workbench?menu=system-flow-definition">
+<div>
+<div class="flex items-start justify-between mb-3">
+<span class="material-symbols-outlined text-text-secondary group-hover:text-status-green transition-colors">explore</span>
+<span class="text-[9px] font-mono text-text-secondary uppercase bg-surface-container-low px-1.5 py-0.5 rounded">演示引导</span>
+</div>
+<h3 class="font-semibold text-[13px] text-text-primary group-hover:text-primary transition-colors">Future Settings OS · 演示引导中枢</h3>
+</div>
+<code class="mt-4 text-[10px] font-mono text-text-secondary/70 bg-surface-container-low px-2 py-1 rounded border border-border-subtle/50">{{DATA:SCREEN:SCREEN_73}}</code>
+</a>
+<a class="nav-card p-4 flex flex-col justify-between group" data-nav-label="文档中心" href="/fixed-assets/workbench?menu=system-doc-center">
+<div>
+<div class="flex items-start justify-between mb-3">
+<span class="material-symbols-outlined text-text-secondary group-hover:text-status-green transition-colors">description</span>
+<span class="text-[9px] font-mono text-text-secondary uppercase bg-surface-container-low px-1.5 py-0.5 rounded">文档</span>
+</div>
+<h3 class="font-semibold text-[13px] text-text-primary group-hover:text-primary transition-colors">Future Settings OS 项目交接清单</h3>
+</div>
+<code class="mt-4 text-[10px] font-mono text-text-secondary/70 bg-surface-container-low px-2 py-1 rounded border border-border-subtle/50">{{DATA:DOCUMENT:DOCUMENT_63}}</code>
+</a>
+</div>
+</section>
+</div>
+</main>
+<!-- 底部状态栏 -->
+<footer class="h-8 border-t border-border-subtle bg-white flex items-center justify-between px-6 z-50">
+<div class="flex items-center gap-4 text-[10px] font-mono text-text-secondary uppercase tracking-widest">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 bg-status-green rounded-full animate-pulse shadow-[0_0_8px_rgba(22,163,74,0.4)]"></span>
+<span>系统在线</span>
+</div>
+<span class="text-border-subtle">|</span>
+<span>环境：生产</span>
+<span class="text-border-subtle">|</span>
+<span>版本：2.4.0-Stable</span>
+</div>
+<div class="flex items-center gap-4 text-[10px] font-mono text-text-secondary uppercase">
+<span>区域：亚太</span>
+<span class="text-border-subtle">|</span>
+<span>延迟：14ms</span>
+</div>
+</footer>
+<script>
+  (() => {
+    let confirmedTarget = '';
+
+    window.addEventListener('message', (event) => {
+      if (event.origin === window.location.origin && event.data?.type === 'workspace-system-frame-navigate-ack') {
+        confirmedTarget = event.data.target || '';
+      }
+    });
+
+    document.addEventListener('click', (event) => {
+      const source = event.target instanceof Element ? event.target : event.target?.parentElement;
+      const link = source?.closest?.('a[href]');
+      const target = link?.getAttribute('href');
+
+      if (!target || target === '#' || (!target.startsWith('/fixed-assets/') && !target.startsWith('/bigscreen-3d'))) {
+        return;
+      }
+
+      if (window.parent && window.parent !== window) {
+        event.preventDefault();
+        event.stopPropagation();
+        window.parent.postMessage(
+          { type: 'workspace-system-frame-navigate', target },
+          window.location.origin
+        );
+        window.setTimeout(() => {
+          if (confirmedTarget !== target && window.top) {
+            window.top.location.href = target;
+          }
+        }, 240);
+      }
+    }, true);
+  })();
+</script>
+</body></html>

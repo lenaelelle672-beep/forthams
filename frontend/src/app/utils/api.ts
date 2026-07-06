@@ -18,7 +18,9 @@ export function getStoredToken() {
     return null;
   }
 
-  return window.localStorage.getItem(TOKEN_STORAGE_KEY);
+  return window.localStorage.getItem(TOKEN_STORAGE_KEY) ||
+    window.sessionStorage.getItem("auth_token") ||
+    window.localStorage.getItem("auth_token");
 }
 
 export function clearAuthStorage() {
@@ -28,6 +30,10 @@ export function clearAuthStorage() {
 
   window.localStorage.removeItem(TOKEN_STORAGE_KEY);
   window.localStorage.removeItem(USER_STORAGE_KEY);
+  window.sessionStorage.removeItem("auth_token");
+  window.sessionStorage.removeItem("user_info");
+  window.localStorage.removeItem("auth_token");
+  window.localStorage.removeItem("user_info");
 }
 
 export function redirectToLogin() {
@@ -40,7 +46,7 @@ export function redirectToLogin() {
   }
 }
 
-const apiClient = axios.create({
+export const apiClient = axios.create({
   baseURL: "/api",
   timeout: 10000,
 });

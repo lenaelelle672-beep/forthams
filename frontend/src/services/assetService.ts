@@ -251,4 +251,55 @@ export class AssetService {
   }
 }
 
+export const assetService = {
+  list: getAssetList,
+  getById: getAssetDetail,
+  getAssetById(assetId: string) {
+    return apiClient.get(`/api/assets/${assetId}`);
+  },
+  create: createAsset,
+  insert: createAsset,
+  update: updateAsset,
+  delete: deleteAsset,
+  remove: deleteAsset,
+  transfer: transferAsset,
+  getAuditHistory: getAssetAuditLogs,
+  export: exportAssets,
+  findAll() {
+    return apiClient.get('/api/assets');
+  },
+  getGraphifyNodes(assetId: string) {
+    return apiClient.get(`/api/assets/${assetId}/graphify/nodes`);
+  },
+  getGraphifyEdges(assetId: string) {
+    return apiClient.get(`/api/assets/${assetId}/graphify/edges`);
+  },
+  getCategoryTree() {
+    return apiClient.get('/api/categories/tree');
+  },
+  getLocationCascade() {
+    return apiClient.get('/api/locations/cascade');
+  },
+  importParse(data: FormData) {
+    return apiClient.post('/api/assets/import/parse', data);
+  },
+  importCommit(parseId: string, rows: unknown[]) {
+    return apiClient.post(`/api/assets/import/${parseId}/commit`, { rows });
+  },
+  importTemplate(format: string = 'xlsx') {
+    return apiClient.get('/api/assets/import/template', { params: { format } });
+  },
+  importAssets(file: File) {
+    const data = new FormData();
+    data.append('file', file);
+    return apiClient.post('/api/assets/import', data);
+  },
+  getImportProgress(taskId: string) {
+    return apiClient.get(`/api/assets/import/${taskId}/progress`);
+  },
+  cancelImport(taskId: string) {
+    return apiClient.post(`/api/assets/import/${taskId}/cancel`);
+  },
+};
+
 export default AssetService;

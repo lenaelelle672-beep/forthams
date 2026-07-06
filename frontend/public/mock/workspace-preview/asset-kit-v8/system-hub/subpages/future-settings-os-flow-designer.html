@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+
+<html class="h-full" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>流程设计器 - Future Settings OS</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;family=JetBrains+Mono:wght@400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "status-cyan": "#00A8D8",
+                        "primary-fixed": "#d9e2ff",
+                        "surface-container": "#ebeef2",
+                        "secondary-fixed-dim": "#b6c7e8",
+                        "secondary-fixed": "#d5e3ff",
+                        "on-primary-fixed": "#001945",
+                        "tertiary-container": "#c75000",
+                        "tertiary": "#9f3e00",
+                        "outline": "#727786",
+                        "on-secondary-fixed-variant": "#374762",
+                        "on-error-container": "#93000a",
+                        "inverse-on-surface": "#eef1f5",
+                        "surface-container-highest": "#e0e3e7",
+                        "primary-fixed-dim": "#b0c6ff",
+                        "background": "#f7fafe",
+                        "status-green": "#16A34A",
+                        "secondary": "#4e5f7b",
+                        "status-purple": "#7C3AED",
+                        "surface-bright": "#f7fafe",
+                        "on-primary-container": "#fffdff",
+                        "primary-container": "#1d6ef2",
+                        "surface-container-low": "#f1f4f8",
+                        "error": "#ba1a1a",
+                        "inverse-primary": "#b0c6ff",
+                        "border-subtle": "#D7E2F0",
+                        "on-tertiary-fixed": "#351000",
+                        "on-primary-fixed-variant": "#00419c",
+                        "on-secondary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "surface": "#f7fafe",
+                        "surface-variant": "#e0e3e7",
+                        "text-secondary": "#64748B",
+                        "outline-variant": "#c2c6d7",
+                        "on-secondary-fixed": "#091c35",
+                        "surface-tint": "#0057cc",
+                        "surface-container-high": "#e5e8ec",
+                        "error-container": "#ffdad6",
+                        "surface-dim": "#d7dade",
+                        "status-red": "#DC2626",
+                        "on-secondary-container": "#51617e",
+                        "secondary-container": "#ccddff",
+                        "inverse-surface": "#2d3134",
+                        "on-tertiary": "#ffffff",
+                        "on-surface": "#181c1f",
+                        "on-primary": "#ffffff",
+                        "status-amber": "#F59E0B",
+                        "primary": "#0056c9",
+                        "tertiary-fixed": "#ffdbcc",
+                        "on-tertiary-container": "#fffdff",
+                        "on-tertiary-fixed-variant": "#7b2f00",
+                        "tertiary-fixed-dim": "#ffb695",
+                        "on-background": "#181c1f",
+                        "text-primary": "#0F172A",
+                        "on-surface-variant": "#424654"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "topbar-height": "48px",
+                        "sidebar-width": "196px",
+                        "grid-gutter": "12px",
+                        "inspector-width": "320px",
+                        "container-gap": "20px",
+                        "card-padding": "16px"
+                    },
+                    "fontFamily": {
+                        "body-sm": ["Inter"],
+                        "code-meta": ["JetBrains Mono"],
+                        "section-header": ["Inter"],
+                        "page-title": ["Inter"],
+                        "status-label": ["Inter"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-sm": ["12px", { "lineHeight": "18px", "fontWeight": "500" }],
+                        "code-meta": ["11px", { "lineHeight": "16px", "fontWeight": "400" }],
+                        "section-header": ["14px", { "lineHeight": "20px", "fontWeight": "700" }],
+                        "page-title": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "status-label": ["11px", { "lineHeight": "16px", "fontWeight": "700" }],
+                        "body-md": ["13px", { "lineHeight": "20px", "fontWeight": "500" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 3px;
+        }
+        /* Overrides for specific Shell Requirements */
+        .shell-topbar { height: 56px; background-color: #051424; border-bottom: 2px solid #1D6EF2; }
+        .shell-sidebar { top: 56px; width: 240px; }
+        .shell-main { margin-top: 56px; margin-left: 240px; }
+    </style>
+</head>
+<body class="bg-background text-text-primary h-full overflow-hidden flex flex-col font-body-sm">
+<!-- Top Nav -->
+<header class="fixed top-0 left-0 w-full shell-topbar z-50 flex items-center justify-between px-6">
+<div class="flex items-center gap-8 h-full">
+<div class="font-page-title text-page-title text-white tracking-tight flex items-center gap-2">
+<span class="material-symbols-outlined text-white" style="font-variation-settings: 'FILL' 1;">settings</span>
+                UNIVIEW | 系统设置中心
+            </div><nav class="hidden md:flex h-full items-center gap-6">
+<a class="h-full flex items-center text-white border-b-2 border-primary-container font-bold px-2 relative top-[2px]" href="#">流程平台</a>
+<a class="h-full flex items-center text-slate-300 hover:text-white transition-colors px-2" href="#">组织权限</a>
+<a class="h-full flex items-center text-slate-300 hover:text-white transition-colors px-2" href="#">基础资料</a>
+<a class="h-full flex items-center text-slate-300 hover:text-white transition-colors px-2" href="#">集成配置</a>
+<a class="h-full flex items-center text-slate-300 hover:text-white transition-colors px-2" href="#">消息与通知</a>
+<a class="h-full flex items-center text-slate-300 hover:text-white transition-colors px-2" href="#">系统参数</a>
+</nav>
+</div>
+<div class="flex items-center gap-4 text-slate-300">
+
+<div class="w-px h-4 bg-slate-600"></div>
+<button class="hover:text-white transition-colors font-body-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">keyboard_return</span> 返回业务工作台
+            </button>
+<div class="w-px h-4 bg-slate-600"></div>
+<div class="flex items-center gap-2 cursor-pointer hover:text-white transition-colors">
+<img class="w-6 h-6 rounded-full object-cover" data-alt="A small, professional corporate avatar of an administrator, modern light mode aesthetic, crisp high quality, subtle blue undertones, formal business attire, neutral background, centered composition, soft studio lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6SS9q7oOSG4xj3kNgOABlNYqFy13HKLUWMIN_HBWIwVJjFr0kUzZyP9bJVT-XYgb60gZl-ox3AFIbvEqLyW6T3s9Up96q5_q6YYAeqMeO_zoOAq6vtn93UAMiX8uDp_1WUdyAKqVppndbMLboSZL_K2W64Yvnn9kADuMld_l4laQAP9XRuLMrk0WYBw4hATCg0_ElQG611o27MMFZUDAqB6uhLFUpO8o3jjoDDjqI6zYPRBwXP6XDlOlVpvOdRJ4QVV4l4grQyVen"/>
+<span class="font-body-sm">运营管理员</span>
+<span class="material-symbols-outlined text-[16px]">arrow_drop_down</span>
+</div>
+</div>
+</header>
+<!-- Sidebar -->
+<aside class="fixed left-0 shell-sidebar bottom-0 bg-surface-container-lowest border-r border-border-subtle z-40 flex flex-col py-4 custom-scrollbar overflow-y-auto">
+<nav class="flex-1 flex flex-col gap-1 px-3">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded text-text-secondary hover:bg-surface-container-low transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">dashboard</span>
+<span class="font-body-md text-body-md">导航控制台</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded text-text-secondary hover:bg-surface-container-low transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">settings_applications</span>
+<span class="font-body-md text-body-md">设置中心</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded text-text-secondary hover:bg-surface-container-low transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">monitor_heart</span>
+<span class="font-body-md text-body-md">运行监测</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded bg-primary-fixed/30 text-primary-fixed-variant font-bold border-l-4 border-primary" href="#">
+<span class="material-symbols-outlined text-[20px]">schema</span>
+<span class="font-body-md text-body-md">流程设计器</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded text-text-secondary hover:bg-surface-container-low transition-colors ml-4 border-l border-border-subtle" href="#">
+<span class="material-symbols-outlined text-[18px]">fact_check</span>
+<span class="font-body-sm text-body-sm">表单配置</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded text-text-secondary hover:bg-surface-container-low transition-colors ml-4 border-l border-border-subtle" href="#">
+<span class="material-symbols-outlined text-[18px]">database</span>
+<span class="font-body-sm text-body-sm">表单存储</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded text-text-secondary hover:bg-surface-container-low transition-colors ml-4 border-l border-border-subtle" href="#">
+<span class="material-symbols-outlined text-[18px]">rule_settings</span>
+<span class="font-body-sm text-body-sm">审批规则</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded text-text-secondary hover:bg-surface-container-low transition-colors ml-4 border-l border-border-subtle" href="#">
+<span class="material-symbols-outlined text-[18px]">edit_attributes</span>
+<span class="font-body-sm text-body-sm">待办字段配置</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded text-text-secondary hover:bg-surface-container-low transition-colors ml-4 border-l border-border-subtle" href="#">
+<span class="material-symbols-outlined text-[18px]">timer</span>
+<span class="font-body-sm text-body-sm">SLA 配置</span>
+</a>
+</nav>
+</aside>
+<!-- Main Content Area -->
+<main class="shell-main flex-1 flex flex-col h-full bg-surface-container-low relative">
+<!-- Workflow Canvas Toolbar -->
+<div class="h-12 bg-surface-container-lowest border-b border-border-subtle flex items-center justify-between px-4 shrink-0">
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2">
+<span class="font-section-header text-section-header text-on-surface">采购审批流程_V2.1</span>
+<span class="font-status-label text-status-label text-status-green bg-status-green/10 px-2 py-0.5 rounded uppercase tracking-wider">已发布</span>
+</div>
+<div class="w-px h-4 bg-border-subtle"></div>
+<div class="flex items-center gap-1">
+<button class="p-1.5 text-text-secondary hover:bg-surface-container rounded transition-colors" title="撤销"><span class="material-symbols-outlined text-[18px]">undo</span></button>
+<button class="p-1.5 text-text-secondary hover:bg-surface-container rounded transition-colors" title="重做"><span class="material-symbols-outlined text-[18px]">redo</span></button>
+<div class="w-px h-3 bg-border-subtle mx-1"></div>
+<button class="p-1.5 text-text-secondary hover:bg-surface-container rounded transition-colors" title="放大"><span class="material-symbols-outlined text-[18px]">zoom_in</span></button>
+<button class="p-1.5 text-text-secondary hover:bg-surface-container rounded transition-colors" title="缩小"><span class="material-symbols-outlined text-[18px]">zoom_out</span></button>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<button class="px-3 py-1.5 border border-border-subtle rounded text-text-primary hover:bg-surface-container transition-colors font-body-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">visibility</span> 预览
+                </button>
+<button class="px-3 py-1.5 border border-border-subtle rounded text-text-primary hover:bg-surface-container transition-colors font-body-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">save</span> 保存草稿
+                </button>
+<button class="px-4 py-1.5 bg-primary-container text-white rounded hover:bg-surface-tint transition-colors font-body-sm flex items-center gap-1 shadow-sm">
+<span class="material-symbols-outlined text-[16px]">publish</span> 发布
+                </button>
+</div>
+</div>
+<div class="flex-1 flex overflow-hidden relative">
+<!-- Canvas Area (Mockup) -->
+<div class="flex-1 overflow-auto p-8 relative custom-scrollbar bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]">
+<!-- Start Node -->
+<div class="absolute top-[50px] left-[300px] w-48 bg-surface-container-lowest border border-border-subtle rounded shadow-sm flex flex-col items-center">
+<div class="w-full h-1 bg-status-green rounded-t"></div>
+<div class="p-3 text-center w-full">
+<span class="material-symbols-outlined text-status-green mb-1">play_circle</span>
+<div class="font-body-md text-body-md font-bold">流程开始</div>
+</div>
+</div>
+<!-- Connector -->
+<svg class="absolute top-[130px] left-[395px] w-[2px] h-[50px]" preserveaspectratio="none">
+<line stroke="#c2c6d7" stroke-dasharray="4" stroke-width="2" x1="1" x2="1" y1="0" y2="50"></line>
+</svg>
+<!-- Approval Node 1 (Active) -->
+<div class="absolute top-[180px] left-[300px] w-48 bg-surface-container-lowest border-2 border-primary rounded shadow-md flex flex-col z-10 cursor-pointer relative">
+<div class="absolute -right-3 -top-3 w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center shadow">
+<span class="material-symbols-outlined text-[14px]">check</span>
+</div>
+<div class="flex items-center gap-2 px-3 py-2 border-b border-border-subtle bg-primary/5">
+<span class="material-symbols-outlined text-primary text-[18px]">person</span>
+<span class="font-body-md text-body-md font-bold text-primary">部门主管审批</span>
+</div>
+<div class="p-3 text-text-secondary">
+<div class="flex items-center justify-between mb-1">
+<span>处理人</span>
+<span class="text-text-primary">发起人主管</span>
+</div>
+<div class="flex items-center justify-between">
+<span>审批方式</span>
+<span class="text-text-primary">单签</span>
+</div>
+</div>
+</div>
+<!-- Connector -->
+<svg class="absolute top-[280px] left-[395px] w-[2px] h-[50px]" preserveaspectratio="none">
+<line stroke="#c2c6d7" stroke-width="2" x1="1" x2="1" y1="0" y2="50"></line>
+</svg>
+<!-- Condition Node -->
+<div class="absolute top-[330px] left-[340px] w-32 h-16 bg-surface-container-lowest border border-border-subtle rounded shadow-sm flex items-center justify-center transform -skew-x-12">
+<span class="transform skew-x-12 font-body-sm font-bold text-status-amber">金额条件判断</span>
+</div>
+<div class="absolute top-[345px] left-[468px] text-text-secondary text-[10px] bg-background px-1 border border-border-subtle rounded">&gt; 10000</div>
+<div class="absolute top-[395px] left-[400px] text-text-secondary text-[10px] bg-background px-1 border border-border-subtle rounded">&lt;= 10000</div>
+</div>
+<!-- Inspector Panel -->
+<div class="w-[320px] bg-surface-container-lowest border-l border-border-subtle flex flex-col shrink-0 z-20 shadow-[-4px_0_15px_rgba(29,110,242,0.05)]">
+<div class="h-12 border-b border-border-subtle flex items-center px-4 shrink-0 bg-surface-container-low/50">
+<span class="material-symbols-outlined text-primary mr-2">tune</span>
+<h2 class="font-section-header text-section-header text-text-primary flex-1">环节属性配置</h2>
+</div>
+<div class="flex-1 overflow-y-auto custom-scrollbar">
+<!-- Tabs -->
+<div class="flex border-b border-border-subtle">
+<button class="flex-1 py-2 text-primary font-bold border-b-2 border-primary text-center font-body-sm">基本设置</button>
+<button class="flex-1 py-2 text-text-secondary hover:text-text-primary text-center font-body-sm transition-colors">处理人</button>
+<button class="flex-1 py-2 text-text-secondary hover:text-text-primary text-center font-body-sm transition-colors">高级设置</button>
+</div>
+<div class="p-4 flex flex-col gap-5">
+<!-- Form Field -->
+<div class="flex flex-col gap-1.5">
+<label class="font-body-sm text-text-primary font-bold">节点名称 <span class="text-status-red">*</span></label>
+<input class="w-full h-8 px-2 border border-border-subtle rounded font-body-sm text-text-primary focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" type="text" value="部门主管审批"/>
+</div>
+<!-- Form Field -->
+<div class="flex flex-col gap-1.5">
+<label class="font-body-sm text-text-primary font-bold">节点标识 (ID)</label>
+<input class="w-full h-8 px-2 border border-border-subtle rounded font-code-meta text-text-secondary bg-surface-container-low cursor-not-allowed" disabled="" type="text" value="Activity_0k9d8j"/>
+</div>
+<div class="h-px bg-border-subtle my-1"></div>
+<!-- Form Field Select -->
+<div class="flex flex-col gap-1.5">
+<label class="font-body-sm text-text-primary font-bold">审批方式</label>
+<div class="relative">
+<select class="w-full h-8 px-2 border border-border-subtle rounded font-body-sm text-text-primary focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all appearance-none bg-white">
+<option value="single">单签 (一人通过即通过)</option>
+<option value="all">会签 (需所有人通过)</option>
+<option value="ratio">比例签 (按通过比例)</option>
+</select>
+<span class="material-symbols-outlined absolute right-2 top-1.5 text-[18px] text-text-secondary pointer-events-none">expand_more</span>
+</div>
+</div>
+<!-- Toggles -->
+<div class="flex flex-col gap-3 mt-2">
+<label class="font-body-sm text-text-primary font-bold mb-1">节点操作权限</label>
+<div class="flex items-center justify-between">
+<span class="text-text-secondary font-body-sm">允许加签</span>
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox" value=""/>
+<div class="w-9 h-5 bg-border-subtle rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-text-secondary font-body-sm">允许退回</span>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox" value=""/>
+<div class="w-9 h-5 bg-border-subtle rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-text-secondary font-body-sm">允许转办</span>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox" value=""/>
+<div class="w-9 h-5 bg-border-subtle rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

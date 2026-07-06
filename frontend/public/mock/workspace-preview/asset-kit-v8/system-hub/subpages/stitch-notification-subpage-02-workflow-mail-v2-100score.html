@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=1586, height=992" name="viewport"/>
+<title>UNIVIEW 固定资产管理系统 - 流程邮件配置台</title>
+<!-- Load Tailwind CSS v3 -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'brand-navy': '#001529',
+            'brand-navy-light': '#002140',
+            'brand-blue': '#1677ff',
+            'bg-gray': '#f5f7fa',
+            'border-gray': '#e8e8e8',
+            'text-main': '#333333',
+            'text-secondary': '#666666',
+            'text-muted': '#999999',
+            'success-green': '#52c41a',
+            'warning-orange': '#faad14'
+          }
+        }
+      }
+    }
+  </script>
+<style data-purpose="layout">
+    body, html {
+      width: 1586px;
+      height: 992px;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: #f5f7fa;
+    }
+    .absolute-container {
+      position: relative;
+      width: 1586px;
+      height: 992px;
+    }
+  </style>
+<style data-purpose="components">
+    .table-header { background-color: #fafafa; border-bottom: 1px solid #f0f0f0; }
+    .table-row { border-bottom: 1px solid #f0f0f0; transition: background 0.3s; }
+    .table-row:hover { background-color: #f0f7ff; }
+    .status-tag { padding: 2px 8px; border-radius: 4px; font-size: 12px; }
+    .tag-published { background-color: #f6ffed; border: 1px solid #b7eb8f; color: #52c41a; }
+    .tag-draft { background-color: #fff7e6; border: 1px solid #ffd591; color: #faad14; }
+    .input-field { border: 1px solid #d9d9d9; border-radius: 4px; padding: 4px 12px; height: 32px; width: 100%; font-size: 14px; }
+    .btn-primary { background-color: #1677ff; color: #fff; padding: 6px 16px; border-radius: 4px; font-size: 14px; }
+    .btn-secondary { border: 1px solid #d9d9d9; background: #fff; padding: 6px 16px; border-radius: 4px; font-size: 14px; }
+    .sidebar-item-active { background-color: #1677ff; color: #fff !important; }
+    .nav-item-active { background-color: #002140; position: relative; }
+    .nav-item-active::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: #1677ff; }
+  </style>
+</head>
+<body>
+<div class="absolute-container">
+<!-- BEGIN: Top Navigation -->
+<header class="absolute top-0 left-0 w-full h-[56px] bg-brand-navy flex items-center px-4 z-50 text-white border-b border-white/10">
+<div class="flex items-center gap-2 mr-10" data-purpose="logo">
+<div class="w-8 h-8 bg-white/20 rounded flex items-center justify-center">
+<div class="w-4 h-4 border-2 border-white rotate-45"></div>
+</div>
+<span class="text-lg font-bold">UNIVIEW | 固定资产管理系统</span>
+</div>
+<nav class="flex h-full items-center">
+<div class="px-4 h-full flex items-center gap-2 text-white/70 hover:text-white cursor-pointer"><span class="w-4 h-4 border border-white/70 rounded-sm"></span>资产运营总览</div>
+<div class="px-4 h-full flex items-center gap-2 text-white/70 hover:text-white cursor-pointer"><span class="w-4 h-4 border border-white/70 rounded-sm"></span>数据监控中心</div>
+<div class="px-4 h-full flex items-center gap-2 text-white/70 hover:text-white cursor-pointer"><span class="w-4 h-4 border border-white/70 rounded-sm"></span>资产运维中心</div>
+<div class="px-4 h-full flex items-center gap-2 text-white/70 hover:text-white cursor-pointer"><span class="w-4 h-4 border border-white/70 rounded-sm"></span>风险预警中心</div>
+<div class="px-4 h-full flex items-center gap-2 nav-item-active cursor-pointer"><span class="w-4 h-4 border border-white rounded-sm"></span>系统运营中枢</div>
+</nav>
+<div class="ml-auto flex items-center gap-6">
+<div class="relative">
+<svg class="w-6 h-6 text-white/70" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span class="absolute -top-1 -right-1 bg-red-500 text-[10px] px-1 rounded-full">12</span>
+</div>
+<svg class="w-6 h-6 text-white/70" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<svg class="w-6 h-6 text-white/70" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 rounded-full bg-gray-400 flex items-center justify-center overflow-hidden">
+<svg class="w-6 h-6 text-white" fill="currentColor" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" fill-rule="evenodd"></path></svg>
+</div>
+<span class="text-sm">超级管理员</span>
+<svg class="w-4 h-4 text-white/70" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+</div>
+</header>
+<!-- END: Top Navigation -->
+<!-- BEGIN: Sidebar -->
+<aside class="absolute top-[56px] left-0 w-[212px] h-[936px] bg-brand-navy border-r border-white/10 text-white/70">
+<div class="py-4 px-4 text-lg font-medium text-white mb-4">系统运营中枢</div>
+<nav class="space-y-1">
+<div class="px-6 py-3 flex items-center justify-between cursor-pointer hover:bg-white/5">
+<div class="flex items-center gap-3"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>流程平台</div>
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div class="px-6 py-3 flex items-center justify-between cursor-pointer hover:bg-white/5">
+<div class="flex items-center gap-3"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>组织权限</div>
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div class="px-6 py-3 flex items-center justify-between cursor-pointer hover:bg-white/5">
+<div class="flex items-center gap-3"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>基础资料</div>
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div class="px-6 py-3 flex items-center justify-between cursor-pointer hover:bg-white/5">
+<div class="flex items-center gap-3"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>集成配置</div>
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div class="px-6 py-3 flex items-center justify-between cursor-pointer text-white">
+<div class="flex items-center gap-3"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>消息与通知</div>
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div class="bg-brand-navy-light py-2">
+<div class="px-12 py-2 text-sm cursor-pointer hover:text-white">邮件网关配置</div>
+<div class="px-12 py-2 text-sm sidebar-item-active">流程邮件配置</div>
+<div class="px-12 py-2 text-sm cursor-pointer hover:text-white">邮件模板</div>
+<div class="px-12 py-2 text-sm cursor-pointer hover:text-white">邮件日志</div>
+<div class="px-12 py-2 text-sm cursor-pointer hover:text-white">通知模板</div>
+<div class="px-12 py-2 text-sm cursor-pointer hover:text-white">通知渠道</div>
+<div class="px-12 py-2 text-sm cursor-pointer hover:text-white">通知偏好</div>
+<div class="px-12 py-2 text-sm cursor-pointer hover:text-white">流程通知开关</div>
+</div>
+<div class="px-6 py-3 flex items-center justify-between cursor-pointer hover:bg-white/5">
+<div class="flex items-center gap-3"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>系统参数</div>
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+</nav>
+<div class="absolute bottom-4 left-0 w-full flex justify-center cursor-pointer">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 6h16M4 12h16m-7 6h7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+</aside>
+<!-- END: Sidebar -->
+<!-- BEGIN: Main Content -->
+<main class="absolute top-[56px] left-[212px] w-[1374px] h-[936px] bg-bg-gray overflow-hidden">
+<!-- BEGIN: Content Header -->
+<section class="h-[64px] flex items-center px-6 justify-between border-b border-gray-200 bg-white">
+<h1 class="text-xl font-bold text-gray-800">流程邮件配置台</h1>
+<div class="flex gap-2">
+<button class="btn-primary flex items-center gap-2"><span class="text-xl">+</span> 新建规则</button>
+<button class="btn-secondary flex items-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>复制规则</button>
+<button class="btn-secondary flex items-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>发送预演</button>
+<button class="btn-secondary flex items-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>保存草稿</button>
+<button class="btn-secondary flex items-center gap-2 text-brand-blue border-brand-blue"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>提交校验</button>
+</div>
+</section>
+<!-- END: Content Header -->
+<!-- BEGIN: Search Bar -->
+<section class="p-4 bg-white border-b border-gray-200 flex items-center gap-6">
+<div class="relative w-[240px]">
+<input class="input-field pl-8" placeholder="搜索流程 / 节点 / 模板 / 收件人" type="text"/>
+<svg class="absolute left-2 top-2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-sm text-gray-600">流程类型</span>
+<select class="input-field w-[120px]"><option>全部</option></select>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-sm text-gray-600">邮件模板</span>
+<select class="input-field w-[120px]"><option>全部</option></select>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-sm text-gray-600">发送状态</span>
+<select class="input-field w-[120px]"><option>全部</option></select>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-sm text-gray-600">校验状态</span>
+<select class="input-field w-[120px]"><option>全部</option></select>
+</div>
+</section>
+<!-- END: Search Bar -->
+<!-- BEGIN: Middle Row -->
+<div class="flex gap-4 p-4 h-[442px]">
+<!-- LEFT: Table -->
+<div class="flex-1 bg-white border border-gray-200 rounded p-4 flex flex-col" data-purpose="rule-list">
+<div class="text-sm font-bold mb-4">流程邮件规则</div>
+<div class="flex-1 overflow-hidden">
+<table class="w-full text-xs">
+<thead>
+<tr class="table-header text-gray-500 font-medium">
+<th class="p-2 text-left">流程</th>
+<th class="p-2 text-left">节点事件</th>
+<th class="p-2 text-left">邮件模板</th>
+<th class="p-2 text-left">引用网关</th>
+<th class="p-2 text-left">收件人规则</th>
+<th class="p-2 text-left">静默条件</th>
+<th class="p-2 text-left">状态</th>
+<th class="p-2 text-left">操作</th>
+</tr>
+</thead>
+<tbody>
+<tr class="table-row bg-blue-50/50">
+<td class="p-2 flex items-center gap-2"><input checked="" type="radio"/> CIP 转固流程</td>
+<td class="p-2">转固完成</td>
+<td class="p-2">CIP 转固通知</td>
+<td class="p-2">MAIL-GW-001</td>
+<td class="p-2">固定资产管理员</td>
+<td class="p-2">无</td>
+<td class="p-2"><span class="status-tag tag-published">已发布</span></td>
+<td class="p-2 text-brand-blue cursor-pointer">编辑 复制 ...</td>
+</tr>
+<tr class="table-row">
+<td class="p-2 flex items-center gap-2"><input type="radio"/> 资产入账流程</td>
+<td class="p-2">入账完成</td>
+<td class="p-2">入账完成通知</td>
+<td class="p-2">MAIL-GW-001</td>
+<td class="p-2">资产使用部门负责人</td>
+<td class="p-2">无</td>
+<td class="p-2"><span class="status-tag tag-published">已发布</span></td>
+<td class="p-2 text-brand-blue cursor-pointer">编辑 复制 ...</td>
+</tr>
+<tr class="table-row">
+<td class="p-2 flex items-center gap-2"><input type="radio"/> 资产处置流程</td>
+<td class="p-2">处置完成</td>
+<td class="p-2">处置完成通知</td>
+<td class="p-2">MAIL-GW-001</td>
+<td class="p-2">资产处置审批人</td>
+<td class="p-2">金额&gt;5000</td>
+<td class="p-2"><span class="status-tag tag-draft">草稿</span></td>
+<td class="p-2 text-brand-blue cursor-pointer">编辑 复制 ...</td>
+</tr>
+<tr class="table-row">
+<td class="p-2 flex items-center gap-2"><input type="radio"/> 隐患扣款流程</td>
+<td class="p-2">扣款完成</td>
+<td class="p-2">扣款提醒</td>
+<td class="p-2">MAIL-GW-002</td>
+<td class="p-2">财务部会计</td>
+<td class="p-2">节假日静默</td>
+<td class="p-2"><span class="status-tag tag-published">已发布</span></td>
+<td class="p-2 text-brand-blue cursor-pointer">编辑 复制 ...</td>
+</tr>
+<tr class="table-row">
+<td class="p-2 flex items-center gap-2"><input type="radio"/> SLA 超时升级</td>
+<td class="p-2">超时升级</td>
+<td class="p-2">SLA升级通知</td>
+<td class="p-2">MAIL-GW-001</td>
+<td class="p-2">运维责任人</td>
+<td class="p-2">超时&gt;24小时</td>
+<td class="p-2"><span class="status-tag tag-published">已发布</span></td>
+<td class="p-2 text-brand-blue cursor-pointer">编辑 复制 ...</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="mt-2 flex items-center justify-between text-xs text-gray-500">
+<span>共 5 条</span>
+<div class="flex items-center gap-2">
+<span class="px-2 py-1 border rounded cursor-pointer">&lt;</span>
+<span class="px-2 py-1 bg-brand-blue text-white rounded cursor-pointer">1</span>
+<span class="px-2 py-1 border rounded cursor-pointer">&gt;</span>
+<select class="border rounded px-1"><option>20 条/页</option></select>
+</div>
+</div>
+</div>
+<!-- CENTER: Detail Info -->
+<div class="w-[440px] bg-white border border-gray-200 rounded p-4 flex flex-col" data-purpose="rule-detail">
+<div class="flex items-center justify-between mb-4">
+<h2 class="font-bold flex items-center gap-2">CIP 转固流程邮件规则 <span class="status-tag tag-published">已发布</span></h2>
+</div>
+<!-- Workflow Graph -->
+<div class="flex items-center gap-2 mb-6 border border-gray-100 p-2 rounded bg-gray-50/50">
+<div class="flex flex-col items-center gap-1">
+<div class="w-8 h-8 rounded-full bg-success-green flex items-center justify-center text-white text-xs">●</div>
+<span class="text-[10px]">提交</span>
+<div class="flex gap-1"><span class="w-4 h-2 bg-brand-blue rounded-full"></span><span class="w-4 h-2 bg-gray-200 rounded-full"></span><span class="w-4 h-2 bg-gray-200 rounded-full"></span></div>
+</div>
+<div class="h-px w-6 bg-gray-300"></div>
+<div class="flex flex-col items-center gap-1">
+<div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-brand-blue text-xs"><svg class="w-4 h-4" fill="currentColor" viewbox="0 0 20 20"><path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"></path></svg></div>
+<span class="text-[10px]">资产管理员审批</span>
+<div class="flex gap-1"><span class="w-4 h-2 bg-brand-blue rounded-full"></span><span class="w-4 h-2 bg-brand-blue rounded-full"></span><span class="w-4 h-2 bg-brand-blue rounded-full"></span></div>
+</div>
+<div class="h-px w-6 bg-gray-300"></div>
+<div class="flex flex-col items-center gap-1">
+<div class="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center text-warning-orange text-xs"><svg class="w-4 h-4" fill="currentColor" viewbox="0 0 20 20"><path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"></path></svg></div>
+<span class="text-[10px]">财务复核</span>
+<div class="flex gap-1"><span class="w-4 h-2 bg-brand-blue rounded-full"></span><span class="w-4 h-2 bg-gray-200 rounded-full"></span><span class="w-4 h-2 bg-gray-200 rounded-full"></span></div>
+</div>
+<div class="h-px w-6 bg-gray-300"></div>
+<div class="flex flex-col items-center gap-1">
+<div class="w-8 h-8 rounded-full bg-success-green flex items-center justify-center text-white text-xs">✔</div>
+<span class="text-[10px]">转固完成</span>
+<div class="flex gap-1"><span class="w-4 h-2 bg-brand-blue rounded-full"></span><span class="w-4 h-2 bg-brand-blue rounded-full"></span><span class="w-4 h-2 bg-gray-200 rounded-full"></span></div>
+</div>
+</div>
+<!-- Detail List -->
+<div class="space-y-3 text-xs">
+<div class="flex justify-between border-b border-gray-50 pb-2">
+<span class="text-gray-500">邮件模板</span>
+<span class="text-gray-800">CIP 转固完成通知 (模板ID: TMP-CIP-001)</span>
+<span class="text-brand-blue cursor-pointer">查看</span>
+</div>
+<div class="flex justify-between border-b border-gray-50 pb-2">
+<span class="text-gray-500">邮件网关</span>
+<span class="text-gray-800">MAIL-GW-001 (smtp.uniview.com:587) <span class="bg-green-100 text-green-600 px-1 rounded ml-1">健康</span></span>
+</div>
+<div class="flex justify-between border-b border-gray-50 pb-2">
+<span class="text-gray-500">收件人规则</span>
+<span class="text-gray-800">流程发起人主管; 资产归属部门负责人; 固定资产管理员</span>
+<span class="text-brand-blue cursor-pointer">查看</span>
+</div>
+<div class="flex justify-between border-b border-gray-50 pb-2">
+<span class="text-gray-500">抄送规则</span>
+<span class="text-gray-800">固定资产管理员; 财务资产会计</span>
+<span class="text-brand-blue cursor-pointer">编辑</span>
+</div>
+<div class="flex justify-between border-b border-gray-50 pb-2">
+<span class="text-gray-500">静默条件</span>
+<span class="text-gray-800">节假日静默 (国家法定节假日 08:00-20:00 不发送)</span>
+<span class="text-brand-blue cursor-pointer">编辑</span>
+</div>
+<div class="flex justify-between border-b border-gray-50 pb-2">
+<span class="text-gray-500">失败重试</span>
+<span class="text-gray-800">3 次，间隔 10 分钟</span>
+</div>
+<div class="flex justify-between border-b border-gray-50 pb-2">
+<span class="text-gray-500">附件策略</span>
+<span class="text-gray-800">自动生成转固单 PDF 附件</span>
+</div>
+<div class="flex justify-between">
+<span class="text-gray-500">审计要求</span>
+<span class="text-gray-800">记录成功与失败详情</span>
+</div>
+</div>
+</div>
+<!-- RIGHT: Property Form -->
+<div class="w-[340px] bg-white border border-gray-200 rounded p-4 flex flex-col" data-purpose="field-maintenance">
+<div class="text-sm font-bold mb-4">规则字段维护</div>
+<div class="space-y-3 flex-1">
+<div>
+<label class="text-xs text-gray-600 mb-1 block"><span class="text-red-500">*</span> 规则名称</label>
+<input class="input-field" type="text" value="CIP 转固流程-转固完成通知"/>
+</div>
+<div>
+<label class="text-xs text-gray-600 mb-1 block"><span class="text-red-500">*</span> 流程类型</label>
+<select class="input-field"><option>固定资产流程</option></select>
+</div>
+<div>
+<label class="text-xs text-gray-600 mb-1 block"><span class="text-red-500">*</span> 节点事件</label>
+<select class="input-field"><option>转固完成</option></select>
+</div>
+<div>
+<label class="text-xs text-gray-600 mb-1 block"><span class="text-red-500">*</span> 邮件模板</label>
+<div class="flex gap-1">
+<div class="input-field flex items-center justify-between text-gray-400">CIP 转固完成通知 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></div>
+<button class="text-brand-blue text-xs whitespace-nowrap">选择</button>
+</div>
+</div>
+<div>
+<label class="text-xs text-gray-600 mb-1 block"><span class="text-red-500">*</span> 邮件网关</label>
+<div class="flex gap-1">
+<select class="input-field"><option>MAIL-GW-001</option></select>
+<button class="text-brand-blue text-xs whitespace-nowrap">选择</button>
+</div>
+</div>
+<div>
+<label class="text-xs text-gray-600 mb-1 block"><span class="text-red-500">*</span> 收件人规则</label>
+<div class="flex gap-1">
+<select class="input-field"><option>自定义规则</option></select>
+<button class="text-brand-blue text-xs whitespace-nowrap">编辑</button>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-xs text-gray-600">抄送规则</span>
+<div class="flex items-center gap-2">
+<span class="text-xs text-gray-400">固定资产管理员; 财务资产会计</span>
+<span class="text-brand-blue text-xs cursor-pointer">编辑</span>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-xs text-gray-600">静默条件</span>
+<div class="flex items-center gap-2">
+<span class="text-xs text-gray-400">节假日静默 (08:00-20:00)</span>
+<span class="text-brand-blue text-xs cursor-pointer">编辑</span>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-xs text-gray-600">状态</span>
+<span class="status-tag tag-published">已发布</span>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-xs text-gray-600">启用</span>
+<div class="w-10 h-5 bg-brand-blue rounded-full relative cursor-pointer"><div class="absolute right-1 top-1 w-3 h-3 bg-white rounded-full"></div></div>
+</div>
+</div>
+<div class="mt-4 flex gap-2">
+<button class="btn-secondary flex-1">保存草稿</button>
+<button class="btn-secondary flex-1">发送预演</button>
+<button class="btn-primary flex-1">提交校验</button>
+</div>
+</div>
+</div>
+<!-- END: Middle Row -->
+<!-- BEGIN: Bottom Row -->
+<div class="flex gap-4 px-4 h-[282px] mt-6">
+<!-- Preview Card -->
+<div class="w-[300px] bg-white border border-gray-200 rounded p-4 flex flex-col" data-purpose="preview-card">
+<div class="flex items-center justify-between mb-3">
+<span class="font-bold text-sm">邮件预览</span>
+<span class="text-brand-blue text-xs cursor-pointer">预览完整邮件</span>
+</div>
+<div class="bg-gray-50 rounded p-3 text-[11px] flex-1 overflow-hidden space-y-2">
+<div class="flex gap-2">
+<span class="text-gray-400">主题</span>
+<span class="text-gray-800">【UNIVIEW】资产转固已完成（${asset_code}）</span>
+</div>
+<div class="flex gap-2 h-full">
+<span class="text-gray-400">正文</span>
+<div class="text-gray-800 italic">
+                尊敬的 ${receiver_name}, <br/>
+                您好！ <br/>
+                资产 ${asset_name} (${asset_code}) 的转固流程已完成，资产已成功转入固定资产台账，转固日期：${capitalization_date}。<br/>
+                请登录系统查看详情。<br/><br/>
+                如有问题，请联系固定资产管理员。<br/>
+                —— UNIVIEW 固定资产管理系统
+              </div>
+</div>
+</div>
+</div>
+<!-- Mapping Card -->
+<div class="w-[280px] bg-white border border-gray-200 rounded p-4 flex flex-col" data-purpose="variable-mapping">
+<div class="text-sm font-bold mb-3">变量映射</div>
+<div class="space-y-2 flex-1 text-xs">
+<div class="flex items-center justify-between bg-gray-50 px-2 py-1 rounded">
+<span class="text-brand-blue">${receiver_name}</span>
+<span class="text-gray-400">→</span>
+<span class="text-gray-600">收件人姓名</span>
+</div>
+<div class="flex items-center justify-between bg-gray-50 px-2 py-1 rounded">
+<span class="text-brand-blue">${asset_name}</span>
+<span class="text-gray-400">→</span>
+<span class="text-gray-600">资产名称</span>
+</div>
+<div class="flex items-center justify-between bg-gray-50 px-2 py-1 rounded">
+<span class="text-brand-blue">${asset_code}</span>
+<span class="text-gray-400">→</span>
+<span class="text-gray-600">资产编码</span>
+</div>
+<div class="flex items-center justify-between bg-gray-50 px-2 py-1 rounded">
+<span class="text-brand-blue">${capitalization_date}</span>
+<span class="text-gray-400">→</span>
+<span class="text-gray-600">转固日期</span>
+</div>
+<div class="flex items-center justify-between bg-gray-50 px-2 py-1 rounded">
+<span class="text-brand-blue">${project_code}</span>
+<span class="text-gray-400">→</span>
+<span class="text-gray-600">项目编码</span>
+</div>
+</div>
+<div class="mt-4 flex justify-between text-xs text-brand-blue cursor-pointer">
+<span class="flex items-center gap-1">+ 添加变量映射</span>
+<span>管理变量</span>
+</div>
+</div>
+<!-- Audit/Pre-run Card -->
+<div class="flex-1 bg-white border border-gray-200 rounded p-4 flex flex-col" data-purpose="validation-panel">
+<div class="text-sm font-bold mb-3">发送预演与发布校验</div>
+<div class="flex gap-4 h-full">
+<div class="w-1/4 flex flex-col gap-2">
+<div class="text-xs text-gray-500 mb-1">发送预演（节点：转固完成）</div>
+<div class="text-xs bg-white border rounded p-2 flex flex-col gap-2">
+<div class="text-gray-400">收件人示例 3 人</div>
+<div class="flex items-center justify-between border-b pb-1">
+<div>张三（资产归属部门负责人）<br/><span class="text-[10px]">zhangsan@uniview.com</span></div>
+<svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div class="flex items-center justify-between border-b pb-1">
+<div>李四（流程发起人主管）<br/><span class="text-[10px]">lisi@uniview.com</span></div>
+<svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div class="flex items-center justify-between">
+<div>王五（固定资产管理员）<br/><span class="text-[10px]">wangwu@uniview.com</span></div>
+<svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+</div>
+<button class="btn-secondary w-full text-xs py-1 mt-auto">重新预演</button>
+</div>
+<div class="w-1/4">
+<div class="text-xs text-gray-500 mb-2">渲染结果</div>
+<div class="space-y-3 text-xs">
+<div class="flex items-center gap-2">主题渲染 <span class="text-success-green">● 正常</span></div>
+<div class="flex items-center gap-2">正文渲染 <span class="text-success-green">● 正常</span></div>
+<div class="flex items-center gap-2">附件生成 <span class="text-success-green">● 转固单.pdf (256KB)</span></div>
+</div>
+<div class="mt-6">
+<div class="text-xs text-gray-500 mb-1">缺失变量 <span class="text-black font-bold">0</span> 个</div>
+<div class="text-[10px] text-gray-400">全部变量已正确映射</div>
+</div>
+</div>
+<div class="w-1/4">
+<div class="text-xs text-gray-500 mb-2">网关与校验</div>
+<div class="space-y-3 text-xs">
+<div class="flex items-center justify-between"><span>网关连通性</span> <span class="text-success-green">● 正常</span></div>
+<div class="flex items-center justify-between"><span>认证状态</span> <span class="text-success-green">● 通过</span></div>
+<div class="flex items-center justify-between"><span>TLS 安全</span> <span class="text-success-green">● 正常 (TLS 1.2)</span></div>
+<div class="flex items-center justify-between"><span>策略校验</span> <span class="text-success-green">● 通过</span></div>
+<div class="flex items-center justify-between"><span>审计记录</span> <span class="text-success-green">● 已记录</span></div>
+</div>
+</div>
+<div class="w-1/4 border-l pl-4">
+<div class="text-xs text-gray-500 mb-3">最近审计记录</div>
+<div class="space-y-4 text-xs">
+<div>
+<div class="text-gray-800">2025-05-20 10:15 <span class="ml-2 text-gray-400">发布校验通过</span></div>
+<div class="text-gray-400">操作者：超级管理员</div>
+</div>
+<div>
+<div class="text-gray-800">2025-05-20 09:58 <span class="ml-2 text-gray-400">发送预演成功</span></div>
+<div class="text-gray-400">操作者：超级管理员</div>
+</div>
+<div>
+<div class="text-gray-800">2025-05-20 09:42 <span class="ml-2 text-gray-400">保存草稿</span></div>
+<div class="text-gray-400">操作者：超级管理员</div>
+</div>
+</div>
+<div class="mt-auto text-brand-blue text-xs cursor-pointer">查看完整日志</div>
+</div>
+</div>
+</div>
+</div>
+<!-- END: Bottom Row -->
+</main>
+<!-- END: Main Content -->
+</div>
+</body></html>

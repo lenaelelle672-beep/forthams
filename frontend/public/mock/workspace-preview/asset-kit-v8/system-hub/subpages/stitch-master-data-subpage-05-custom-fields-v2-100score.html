@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>自定义字段治理台 - 固定资产管理系统</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
+<style data-purpose="custom-fonts">
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      margin: 0;
+      padding: 0;
+      width: 1586px;
+      height: 992px;
+      overflow: hidden;
+      background-color: #f3f4f6;
+    }
+    
+    /* Custom Scrollbar for compact look if needed, though instructions say no internal scrollbars, applying minimal styling just in case */
+    ::-webkit-scrollbar {
+      width: 0px;
+      height: 0px;
+      display: none;
+    }
+  </style>
+<style data-purpose="component-styles">
+    .top-nav { background-color: #1e3a8a; } /* Dark blue */
+    .nav-item-active { background-color: #1d4ed8; color: white; border-bottom: 2px solid #3b82f6; }
+    .nav-item-inactive { color: #93c5fd; }
+    .nav-item-inactive:hover { color: white; }
+    
+    .sidebar-active { background-color: #e0f2fe; color: #0284c7; font-weight: 500; }
+    .sidebar-inactive { color: #4b5563; }
+    .sidebar-inactive:hover { background-color: #f3f4f6; }
+    
+    .status-badge-published { background-color: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+    .status-badge-draft { background-color: #fef08a; color: #854d0e; border: 1px solid #fde047; }
+    
+    .table-header { background-color: #f9fafb; color: #6b7280; font-weight: 500; font-size: 12px; }
+    .table-row { border-bottom: 1px solid #e5e7eb; }
+    .table-cell { padding: 8px 12px; font-size: 12px; color: #374151; white-space: nowrap; }
+    
+    .prop-label { font-size: 11px; color: #6b7280; width: 80px; flex-shrink: 0; line-height: 1; }
+    .prop-input { font-size: 11px; color: #374151; padding: 2px 6px; border: 1px solid #d1d5db; border-radius: 4px; flex-grow: 1; height: 22px; background-color: white; line-height: 1; }
+    .prop-select { font-size: 11px; color: #374151; padding: 2px 6px; border: 1px solid #d1d5db; border-radius: 4px; flex-grow: 1; height: 22px; background-color: white; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236B7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 6px center; background-size: 10px; padding-right: 20px; line-height: 1; }
+    .prop-row { display: flex; align-items: center; margin-bottom: 4px; }
+    .prop-required-star { color: #ef4444; margin-left: 2px; }
+
+    .btn-primary { background-color: #3b82f6; color: white; border: 1px solid #2563eb; }
+    .btn-secondary { background-color: white; color: #3b82f6; border: 1px solid #bfdbfe; }
+    
+    .panel-header { font-size: 14px; font-weight: 600; color: #1f2937; margin-bottom: 8px; }
+    
+    .risk-card { background-color: #fff7ed; border: 1px solid #ffedd5; border-radius: 4px; padding: 8px; }
+    .risk-item { font-size: 11px; color: #9a3412; display: flex; align-items: flex-start; margin-bottom: 4px; line-height: 1.2; }
+    .risk-icon { color: #f97316; margin-right: 4px; margin-top: 1px; font-size: 10px; }
+    
+    .gate-item { display: flex; justify-content: space-between; font-size: 11px; color: #374151; margin-bottom: 4px; line-height: 1.2; }
+    .gate-pass { color: #16a34a; }
+    .gate-wait { color: #f59e0b; }
+    
+    .preview-input { width: 100%; border: 1px solid #d1d5db; border-radius: 4px; padding: 6px 8px; font-size: 12px; color: #9ca3af; background-color: #f9fafb; margin-top: 4px; }
+    .preview-input-filled { color: #374151; background-color: white; }
+    .preview-label { font-size: 12px; color: #374151; }
+  </style>
+</head>
+<body class="flex flex-col">
+<!-- BEGIN: TopShell -->
+<header class="top-nav h-12 flex items-center justify-between px-4 shrink-0 text-sm">
+<div class="flex items-center space-x-6 h-full">
+<div class="flex items-center text-white font-semibold text-base space-x-2">
+<i class="fa-solid fa-cube"></i>
+<span>固定资产管理系统</span>
+</div>
+<nav class="flex h-full">
+<a class="nav-item-inactive flex items-center px-4 h-full" href="#">资产作业台</a>
+<a class="nav-item-inactive flex items-center px-4 h-full" href="#">资产管理中枢</a>
+<a class="nav-item-inactive flex items-center px-4 h-full" href="#">风险预警中心</a>
+<a class="nav-item-inactive flex items-center px-4 h-full" href="#">数据分析中心</a>
+<a class="nav-item-active flex items-center px-4 h-full" href="#">系统运营中枢</a>
+</nav>
+</div>
+<div class="flex items-center space-x-4 text-white">
+<div class="relative">
+<i class="fa-regular fa-bell"></i>
+<span class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] rounded-full h-3 w-3 flex items-center justify-center">12</span>
+</div>
+<i class="fa-regular fa-circle-question"></i>
+<div class="flex items-center space-x-2">
+<div class="w-6 h-6 bg-gray-300 rounded-full flex items-center justify-center text-gray-600">
+<i class="fa-solid fa-user"></i>
+</div>
+<span>管理员</span>
+<i class="fa-solid fa-chevron-down text-xs"></i>
+</div>
+</div>
+</header>
+<!-- END: TopShell -->
+<main class="flex flex-1 overflow-hidden">
+<!-- BEGIN: LeftSidebar (x=0..235) -->
+<aside class="w-[235px] bg-white border-r border-gray-200 flex flex-col shrink-0">
+<div class="p-4 flex items-center justify-between border-b border-gray-100">
+<span class="font-semibold text-gray-800">系统运营中枢</span>
+<i class="fa-solid fa-angles-left text-gray-400 text-xs cursor-pointer"></i>
+</div>
+<div class="flex-1 py-2 overflow-hidden flex flex-col space-y-1 text-sm">
+<div class="px-4 py-2 sidebar-inactive flex items-center space-x-2 cursor-pointer">
+<i class="fa-solid fa-layer-group w-4 text-center"></i><span>流程平台</span>
+</div>
+<div class="px-4 py-2 sidebar-inactive flex items-center justify-between cursor-pointer">
+<div class="flex items-center space-x-2"><i class="fa-regular fa-user w-4 text-center"></i><span>组织权限</span></div>
+<i class="fa-solid fa-chevron-right text-xs text-gray-400"></i>
+</div>
+<div class="px-4 py-2 sidebar-inactive flex items-center justify-between cursor-pointer">
+<div class="flex items-center space-x-2 text-blue-500"><i class="fa-regular fa-folder-open w-4 text-center"></i><span>基础资料</span></div>
+<i class="fa-solid fa-chevron-down text-xs text-blue-500"></i>
+</div>
+<div class="pl-10 pr-4 py-1.5 sidebar-inactive text-sm cursor-pointer">资产分类</div>
+<div class="pl-10 pr-4 py-1.5 sidebar-inactive text-sm cursor-pointer">位置管理</div>
+<div class="pl-10 pr-4 py-1.5 sidebar-inactive text-sm cursor-pointer">资产编码规则</div>
+<div class="pl-10 pr-4 py-1.5 sidebar-inactive text-sm cursor-pointer">计量单位</div>
+<div class="pl-10 pr-4 py-1.5 sidebar-inactive text-sm cursor-pointer">资产状态</div>
+<div class="pl-10 pr-4 py-1.5 sidebar-inactive text-sm cursor-pointer">字典管理</div>
+<div class="pl-10 pr-4 py-1.5 sidebar-inactive text-sm cursor-pointer">供应商管理</div>
+<div class="pl-10 pr-4 py-1.5 sidebar-active text-sm cursor-pointer border-r-2 border-blue-500">自定义字段</div>
+<div class="px-4 py-2 sidebar-inactive flex items-center justify-between cursor-pointer mt-2">
+<div class="flex items-center space-x-2"><i class="fa-solid fa-link w-4 text-center"></i><span>集成配置</span></div>
+<i class="fa-solid fa-chevron-right text-xs text-gray-400"></i>
+</div>
+<div class="px-4 py-2 sidebar-inactive flex items-center justify-between cursor-pointer">
+<div class="flex items-center space-x-2"><i class="fa-regular fa-bell w-4 text-center"></i><span>消息与通知</span></div>
+<i class="fa-solid fa-chevron-right text-xs text-gray-400"></i>
+</div>
+<div class="px-4 py-2 sidebar-inactive flex items-center justify-between cursor-pointer">
+<div class="flex items-center space-x-2"><i class="fa-solid fa-gear w-4 text-center"></i><span>系统参数</span></div>
+<i class="fa-solid fa-chevron-right text-xs text-gray-400"></i>
+</div>
+</div>
+</aside>
+<!-- END: LeftSidebar -->
+<!-- BEGIN: BusinessObjects (x=235..380) -->
+<div class="w-[145px] bg-white border-r border-gray-200 flex flex-col shrink-0">
+<div class="p-3 border-b border-gray-100 flex items-center justify-between">
+<span class="font-medium text-gray-700 text-sm">业务对象</span>
+<i class="fa-solid fa-gear text-gray-400 text-xs cursor-pointer"></i>
+</div>
+<div class="flex-1 overflow-hidden p-2 space-y-2">
+<!-- Asset Ledger -->
+<div class="p-2 border border-gray-200 rounded cursor-pointer hover:border-blue-400 hover:shadow-sm">
+<div class="flex items-center space-x-2 mb-1">
+<div class="bg-blue-100 text-blue-500 w-6 h-6 flex items-center justify-center rounded"><i class="fa-regular fa-file-lines text-xs"></i></div>
+<span class="text-sm font-medium text-gray-800">资产台账</span>
+</div>
+<div class="flex items-center justify-between text-xs">
+<span class="text-gray-500">48 字段</span>
+<span class="status-badge-published px-1 rounded text-[10px]">已发布</span>
+</div>
+</div>
+<!-- Pending Pool -->
+<div class="p-2 border border-gray-200 rounded cursor-pointer hover:border-blue-400 hover:shadow-sm">
+<div class="flex items-center space-x-2 mb-1">
+<div class="bg-yellow-100 text-yellow-600 w-6 h-6 flex items-center justify-center rounded"><i class="fa-solid fa-boxes-stacked text-xs"></i></div>
+<span class="text-sm font-medium text-gray-800">待建资产池</span>
+</div>
+<div class="flex items-center justify-between text-xs">
+<span class="text-gray-500">22 字段</span>
+<span class="status-badge-published px-1 rounded text-[10px]">已发布</span>
+</div>
+</div>
+<!-- CIP Project -->
+<div class="p-2 border border-blue-500 bg-blue-50 rounded cursor-pointer shadow-sm relative">
+<div class="absolute -left-[1px] top-2 bottom-2 w-[2px] bg-blue-500"></div>
+<div class="flex items-center space-x-2 mb-1">
+<div class="bg-blue-500 text-white w-6 h-6 flex items-center justify-center rounded"><i class="fa-solid fa-layer-group text-xs"></i></div>
+<span class="text-sm font-medium text-gray-800">CIP 项目</span>
+</div>
+<div class="flex items-center justify-between text-xs">
+<span class="text-gray-500">16 字段</span>
+<span class="status-badge-published px-1 rounded text-[10px]">已发布</span>
+</div>
+</div>
+<!-- Capitalization Application -->
+<div class="p-2 border border-gray-200 rounded cursor-pointer hover:border-blue-400 hover:shadow-sm">
+<div class="flex items-center space-x-2 mb-1">
+<div class="bg-green-100 text-green-600 w-6 h-6 flex items-center justify-center rounded"><i class="fa-regular fa-file-alt text-xs"></i></div>
+<span class="text-sm font-medium text-gray-800">转固申请</span>
+</div>
+<div class="flex items-center justify-between text-xs">
+<span class="text-gray-500">12 字段</span>
+<span class="status-badge-published px-1 rounded text-[10px]">已发布</span>
+</div>
+</div>
+<!-- Inventory Task -->
+<div class="p-2 border border-gray-200 rounded cursor-pointer hover:border-blue-400 hover:shadow-sm">
+<div class="flex items-center space-x-2 mb-1">
+<div class="bg-blue-100 text-blue-600 w-6 h-6 flex items-center justify-center rounded"><i class="fa-solid fa-clipboard-check text-xs"></i></div>
+<span class="text-sm font-medium text-gray-800">盘点任务</span>
+</div>
+<div class="flex items-center justify-between text-xs">
+<span class="text-gray-500">18 字段</span>
+<span class="status-badge-published px-1 rounded text-[10px]">已发布</span>
+</div>
+</div>
+<!-- Maintenance Order -->
+<div class="p-2 border border-gray-200 rounded cursor-pointer hover:border-blue-400 hover:shadow-sm">
+<div class="flex items-center space-x-2 mb-1">
+<div class="bg-blue-100 text-blue-600 w-6 h-6 flex items-center justify-center rounded"><i class="fa-solid fa-wrench text-xs"></i></div>
+<span class="text-sm font-medium text-gray-800">维保工单</span>
+</div>
+<div class="flex items-center justify-between text-xs">
+<span class="text-gray-500">15 字段</span>
+<span class="status-badge-draft px-1 rounded text-[10px]">草稿</span>
+</div>
+</div>
+<!-- Supplier Profile -->
+<div class="p-2 border border-gray-200 rounded cursor-pointer hover:border-blue-400 hover:shadow-sm">
+<div class="flex items-center space-x-2 mb-1">
+<div class="bg-blue-100 text-blue-600 w-6 h-6 flex items-center justify-center rounded"><i class="fa-solid fa-user-tie text-xs"></i></div>
+<span class="text-sm font-medium text-gray-800">供应商档案</span>
+</div>
+<div class="flex items-center justify-between text-xs">
+<span class="text-gray-500">20 字段</span>
+<span class="status-badge-published px-1 rounded text-[10px]">已发布</span>
+</div>
+</div>
+<div class="pt-2 text-center">
+<button class="text-blue-500 text-xs font-medium bg-white hover:bg-gray-50 border border-dashed border-gray-300 w-full py-1.5 rounded flex items-center justify-center">
+<i class="fa-solid fa-plus mr-1"></i> 新建业务对象
+          </button>
+</div>
+</div>
+</div>
+<!-- END: BusinessObjects -->
+<!-- BEGIN: MainWorkspace (x=380..1286) -->
+<div class="flex-1 flex flex-col min-w-[906px] bg-white border-r border-gray-200 p-4 space-y-4">
+<!-- Header Area -->
+<div class="flex justify-between items-start">
+<div>
+<h1 class="text-xl font-semibold text-gray-900 mb-1">自定义字段治理台</h1>
+<p class="text-xs text-gray-500 w-[500px] leading-tight">统一维护资产、待建资产池、CIP、盘点、维保和流程型表单字段，控制类型、必填、字典、布局、导入导出、集成映射和历史影响。</p>
+</div>
+<div class="flex space-x-2">
+<button class="btn-primary px-4 py-1.5 rounded text-sm font-medium">新建字段</button>
+<button class="btn-secondary px-4 py-1.5 rounded text-sm font-medium">保存草稿</button>
+<button class="btn-secondary px-4 py-1.5 rounded text-sm font-medium">提交校验</button>
+<button class="btn-secondary px-4 py-1.5 rounded text-sm font-medium">影响校验</button>
+<button class="btn-secondary px-4 py-1.5 rounded text-sm font-medium">导入字段</button>
+</div>
+</div>
+<!-- Status Bar -->
+<div class="bg-gray-50 border border-gray-200 rounded px-4 py-2 flex items-center space-x-6 text-sm">
+<div class="flex items-center text-green-600"><i class="fa-solid fa-circle-check mr-2"></i> 草稿已保存 10:08</div>
+<div class="flex items-center text-orange-500"><i class="fa-solid fa-triangle-exclamation mr-2"></i> 历史影响待确认 1 项</div>
+<div class="flex items-center text-blue-600"><i class="fa-solid fa-user-group mr-2"></i> 发布影响 12 个表单</div>
+<div class="flex items-center text-orange-500"><i class="fa-solid fa-mobile-screen mr-2"></i> H5 布局待同步 2 项</div>
+</div>
+<!-- Toolbar -->
+<div class="flex justify-between items-center bg-white">
+<div class="flex items-center space-x-2">
+<div class="relative w-64">
+<i class="fa-solid fa-search absolute left-3 top-2 text-gray-400 text-xs"></i>
+<input class="w-full pl-8 pr-3 py-1.5 text-xs border border-gray-300 rounded focus:outline-none focus:border-blue-500" placeholder="搜索字段名称 / 编码 / 业务对象 / 字典 / 集成映射" type="text"/>
+</div>
+<div class="flex space-x-1">
+<button class="px-3 py-1 text-xs border border-blue-200 bg-blue-50 text-blue-600 rounded">全部字段</button>
+<button class="px-3 py-1 text-xs border border-gray-200 bg-white text-gray-600 rounded hover:bg-gray-50">必填</button>
+<button class="px-3 py-1 text-xs border border-gray-200 bg-white text-gray-600 rounded hover:bg-gray-50">桌面显示</button>
+<button class="px-3 py-1 text-xs border border-gray-200 bg-white text-gray-600 rounded hover:bg-gray-50">H5显示</button>
+<button class="px-3 py-1 text-xs border border-orange-200 bg-orange-50 text-orange-600 rounded">待校验</button>
+<button class="px-3 py-1 text-xs border border-gray-200 bg-white text-gray-600 rounded hover:bg-gray-50">停用</button>
+</div>
+</div>
+<div class="flex space-x-2 text-gray-500">
+<button class="w-7 h-7 border border-gray-200 rounded flex items-center justify-center hover:bg-gray-50"><i class="fa-solid fa-filter text-xs"></i></button>
+<button class="w-7 h-7 border border-gray-200 rounded flex items-center justify-center hover:bg-gray-50"><i class="fa-solid fa-rotate-right text-xs"></i></button>
+<button class="w-7 h-7 border border-gray-200 rounded flex items-center justify-center hover:bg-gray-50"><i class="fa-solid fa-list-ul text-xs"></i></button>
+<button class="w-7 h-7 border border-gray-200 rounded flex items-center justify-center hover:bg-gray-50"><i class="fa-solid fa-gear text-xs"></i></button>
+</div>
+</div>
+<!-- Data Table -->
+<div class="border border-gray-200 rounded flex-1 flex flex-col overflow-hidden">
+<table class="min-w-full text-left">
+<thead class="table-header">
+<tr>
+<th class="py-2 px-4 w-10 border-b border-gray-200"><input class="rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-3 w-3" type="checkbox"/></th>
+<th class="py-2 px-2 border-b border-gray-200">字段名称</th>
+<th class="py-2 px-2 border-b border-gray-200">字段编码</th>
+<th class="py-2 px-2 border-b border-gray-200">业务对象</th>
+<th class="py-2 px-2 border-b border-gray-200">字段类型</th>
+<th class="py-2 px-2 border-b border-gray-200">必填策略</th>
+<th class="py-2 px-2 border-b border-gray-200">字典来源</th>
+<th class="py-2 px-2 border-b border-gray-200">桌面布局</th>
+<th class="py-2 px-2 border-b border-gray-200">H5布局</th>
+<th class="py-2 px-2 border-b border-gray-200">集成映射</th>
+<th class="py-2 px-2 border-b border-gray-200">状态</th>
+<th class="py-2 px-2 border-b border-gray-200 text-right pr-4">操作</th>
+</tr>
+</thead>
+<tbody class="bg-white">
+<tr class="table-row bg-blue-50 border-l-2 border-l-blue-500">
+<td class="py-2 px-4"><input checked="" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-3 w-3" type="checkbox"/></td>
+<td class="table-cell font-medium">转固批次号</td>
+<td class="table-cell">cip_cap_batch_no</td>
+<td class="table-cell">CIP 项目</td>
+<td class="table-cell">文本 / 唯一编码</td>
+<td class="table-cell">业务必填</td>
+<td class="table-cell text-gray-400">—</td>
+<td class="table-cell">资产卡片-基础信息</td>
+<td class="table-cell">H5-基础信息</td>
+<td class="table-cell">ERP.CIP_BATCH_NO</td>
+<td class="table-cell"><span class="status-badge-published px-1.5 py-0.5 rounded text-[10px]">已发布</span></td>
+<td class="table-cell text-right pr-4 space-x-1">
+<a class="text-blue-600 hover:underline" href="#">编辑</a>
+<a class="text-blue-600 hover:underline" href="#">影响</a>
+<a class="text-blue-600 hover:underline" href="#">停用</a>
+</td>
+</tr>
+<tr class="table-row hover:bg-gray-50">
+<td class="py-2 px-4"><input class="rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-3 w-3" type="checkbox"/></td>
+<td class="table-cell">设备序列号</td>
+<td class="table-cell">device_serial_no</td>
+<td class="table-cell">资产台账</td>
+<td class="table-cell">文本</td>
+<td class="table-cell">建议必填</td>
+<td class="table-cell">设备序列号</td>
+<td class="table-cell">资产卡片-基础信息</td>
+<td class="table-cell">H5-资产信息</td>
+<td class="table-cell">ERP.SERIAL_NO</td>
+<td class="table-cell"><span class="status-badge-published px-1.5 py-0.5 rounded text-[10px]">已发布</span></td>
+<td class="table-cell text-right pr-4 space-x-1">
+<a class="text-blue-600 hover:underline" href="#">编辑</a>
+<a class="text-blue-600 hover:underline" href="#">影响</a>
+<a class="text-blue-600 hover:underline" href="#">停用</a>
+</td>
+</tr>
+<tr class="table-row hover:bg-gray-50">
+<td class="py-2 px-4"><input class="rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-3 w-3" type="checkbox"/></td>
+<td class="table-cell">MAC地址</td>
+<td class="table-cell">mac_address</td>
+<td class="table-cell">资产台账</td>
+<td class="table-cell">文本</td>
+<td class="table-cell">可选</td>
+<td class="table-cell text-gray-400">—</td>
+<td class="table-cell">资产卡片-网络信息</td>
+<td class="table-cell">H5-资产信息</td>
+<td class="table-cell">ERP.MAC_ADDR</td>
+<td class="table-cell"><span class="status-badge-published px-1.5 py-0.5 rounded text-[10px]">已发布</span></td>
+<td class="table-cell text-right pr-4 space-x-1">
+<a class="text-blue-600 hover:underline" href="#">编辑</a>
+<a class="text-blue-600 hover:underline" href="#">影响</a>
+<a class="text-blue-600 hover:underline" href="#">停用</a>
+</td>
+</tr>
+<tr class="table-row hover:bg-gray-50">
+<td class="py-2 px-4"><input class="rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-3 w-3" type="checkbox"/></td>
+<td class="table-cell">保修到期日</td>
+<td class="table-cell">warranty_expire_date</td>
+<td class="table-cell">资产台账</td>
+<td class="table-cell">日期</td>
+<td class="table-cell">业务必填</td>
+<td class="table-cell text-gray-400">—</td>
+<td class="table-cell">资产卡片-维修信息</td>
+<td class="table-cell">H5-维修信息</td>
+<td class="table-cell">ERP.WARRANTY_END</td>
+<td class="table-cell"><span class="status-badge-published px-1.5 py-0.5 rounded text-[10px]">已发布</span></td>
+<td class="table-cell text-right pr-4 space-x-1">
+<a class="text-blue-600 hover:underline" href="#">编辑</a>
+<a class="text-blue-600 hover:underline" href="#">影响</a>
+<a class="text-blue-600 hover:underline" href="#">停用</a>
+</td>
+</tr>
+<tr class="table-row hover:bg-gray-50">
+<td class="py-2 px-4"><input class="rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-3 w-3" type="checkbox"/></td>
+<td class="table-cell">发票号</td>
+<td class="table-cell">invoice_no</td>
+<td class="table-cell">资产台账</td>
+<td class="table-cell">文本</td>
+<td class="table-cell">建议必填</td>
+<td class="table-cell">发票号字典</td>
+<td class="table-cell">资产卡片-财务信息</td>
+<td class="table-cell">H5-财务信息</td>
+<td class="table-cell">ERP.INVOICE_NO</td>
+<td class="table-cell"><span class="status-badge-published px-1.5 py-0.5 rounded text-[10px]">已发布</span></td>
+<td class="table-cell text-right pr-4 space-x-1">
+<a class="text-blue-600 hover:underline" href="#">编辑</a>
+<a class="text-blue-600 hover:underline" href="#">影响</a>
+<a class="text-blue-600 hover:underline" href="#">停用</a>
+</td>
+</tr>
+</tbody>
+</table>
+<!-- Pagination -->
+<div class="mt-auto border-t border-gray-200 bg-white px-4 py-2 flex items-center justify-between text-xs">
+<span class="text-gray-500">共 5 条</span>
+<div class="flex items-center space-x-2">
+<select class="border border-gray-300 rounded px-2 py-1 text-gray-700 bg-white">
+<option>20 条/页</option>
+</select>
+<button class="w-6 h-6 flex items-center justify-center border border-gray-300 rounded text-gray-400 bg-gray-50" disabled=""><i class="fa-solid fa-chevron-left"></i></button>
+<button class="w-6 h-6 flex items-center justify-center border border-blue-500 bg-blue-500 text-white rounded">1</button>
+<button class="w-6 h-6 flex items-center justify-center border border-gray-300 rounded text-gray-600 hover:bg-gray-50"><i class="fa-solid fa-chevron-right"></i></button>
+<span class="text-gray-500 ml-2">前往</span>
+<input class="w-8 text-center border border-gray-300 rounded px-1 py-1" type="text" value="1"/>
+<span class="text-gray-500">页</span>
+</div>
+</div>
+</div>
+<!-- Bottom Diagnostic Panels -->
+<div class="flex space-x-4 h-64 shrink-0">
+<!-- Desktop Preview -->
+<div class="flex-1 border border-gray-200 rounded p-4 bg-white flex flex-col">
+<div class="panel-header">桌面表单预览 <span class="text-gray-400 font-normal text-xs">(资产卡片-基础信息)</span></div>
+<div class="space-y-3 flex-1 overflow-hidden pt-2">
+<div>
+<div class="preview-label">资产名称</div>
+<input class="preview-input" placeholder="请输入资产名称" type="text"/>
+</div>
+<div>
+<div class="preview-label">转固批次号 <span class="text-red-500">*</span></div>
+<input class="preview-input preview-input-filled" readonly="" type="text" value="2025-CIP-0901"/>
+</div>
+<div>
+<div class="preview-label">设备序列号</div>
+<input class="preview-input preview-input-filled" readonly="" type="text" value="SN20250901001"/>
+</div>
+<div>
+<div class="preview-label">MAC地址</div>
+<input class="preview-input preview-input-filled" readonly="" type="text" value="00:1A:89:2B:3C:4D"/>
+</div>
+<div>
+<div class="preview-label">保修到期日 <span class="text-red-500">*</span></div>
+<div class="relative">
+<input class="preview-input preview-input-filled pr-8" readonly="" type="text" value="2027-09-01"/>
+<i class="fa-regular fa-calendar absolute right-2 top-2 text-gray-400 text-xs"></i>
+</div>
+</div>
+</div>
+</div>
+<!-- H5 Preview -->
+<div class="flex-1 border border-gray-200 rounded p-4 bg-white flex flex-col">
+<div class="panel-header">钉钉H5预览 <span class="text-gray-400 font-normal text-xs">(资产信息)</span></div>
+<div class="space-y-3 flex-1 overflow-hidden pt-2 w-3/4 mx-auto border border-gray-100 rounded bg-gray-50 p-2">
+<div>
+<div class="preview-label">资产名称</div>
+<input class="preview-input" placeholder="请输入资产名称" type="text"/>
+</div>
+<div>
+<div class="preview-label">转固批次号 <span class="text-red-500">*</span></div>
+<input class="preview-input preview-input-filled" readonly="" type="text" value="2025-CIP-0901"/>
+</div>
+<div>
+<div class="preview-label">设备序列号</div>
+<input class="preview-input preview-input-filled" readonly="" type="text" value="SN20250901001"/>
+</div>
+<div>
+<div class="preview-label">MAC地址</div>
+<input class="preview-input preview-input-filled" readonly="" type="text" value="00:1A:89:2B:3C:4D"/>
+</div>
+<div>
+<div class="preview-label">保修到期日 <span class="text-red-500">*</span></div>
+<div class="relative">
+<input class="preview-input preview-input-filled pr-8" readonly="" type="text" value="2027-09-01"/>
+<i class="fa-regular fa-calendar absolute right-2 top-2 text-gray-400 text-xs"></i>
+</div>
+</div>
+</div>
+</div>
+<!-- Import/Export Matrix -->
+<div class="flex-1 border border-gray-200 rounded p-4 bg-white flex flex-col">
+<div class="flex justify-between items-center mb-2">
+<div class="panel-header mb-0">导入导出模板</div>
+<a class="text-blue-600 text-xs hover:underline" href="#">下载模板</a>
+</div>
+<table class="w-full text-left text-xs text-gray-600 mb-2">
+<thead>
+<tr class="border-b border-gray-100">
+<th class="pb-1 font-medium">列名</th>
+<th class="pb-1 font-medium">字段编码</th>
+<th class="pb-1 font-medium">必填</th>
+<th class="pb-1 font-medium">示例</th>
+</tr>
+</thead>
+<tbody>
+<tr class="border-b border-gray-50">
+<td class="py-1">转固批次号</td><td class="py-1">cip_cap_batch_no</td><td class="py-1">是</td><td class="py-1">2025-CIP-0901</td>
+</tr>
+<tr class="border-b border-gray-50">
+<td class="py-1">设备序列号</td><td class="py-1">device_serial_no</td><td class="py-1">否</td><td class="py-1">SN20250901001</td>
+</tr>
+<tr class="border-b border-gray-50">
+<td class="py-1">MAC地址</td><td class="py-1">mac_address</td><td class="py-1">否</td><td class="py-1">00:1A:89:2B:3C:4D</td>
+</tr>
+<tr class="border-b border-gray-50">
+<td class="py-1">保修到期日</td><td class="py-1">warranty_expire_date</td><td class="py-1">是</td><td class="py-1">2027-09-01</td>
+</tr>
+<tr class="border-b border-gray-50">
+<td class="py-1">发票号</td><td class="py-1">invoice_no</td><td class="py-1">是</td><td class="py-1">INV-2025-0901</td>
+</tr>
+</tbody>
+</table>
+<div class="mt-auto flex justify-between items-center text-xs">
+<a class="text-blue-600 hover:underline" href="#">导入记录</a>
+<div class="text-gray-500">最近导入: 2025-05-15 09:58:21 <a class="text-blue-600 hover:underline ml-1" href="#">查看详情</a></div>
+</div>
+</div>
+<!-- Field Impact Matrix -->
+<div class="flex-1 border border-gray-200 rounded p-4 bg-white flex flex-col">
+<div class="panel-header mb-2">字段影响矩阵</div>
+<table class="w-full text-left text-xs text-gray-600 mb-2">
+<thead>
+<tr class="border-b border-gray-100">
+<th class="pb-1 font-medium">影响对象</th>
+<th class="pb-1 font-medium">使用数</th>
+<th class="pb-1 font-medium">影响类型</th>
+<th class="pb-1 font-medium">状态</th>
+</tr>
+</thead>
+<tbody>
+<tr class="border-b border-gray-50">
+<td class="py-1.5">CIP 转固表单</td><td class="py-1.5">8</td><td class="py-1.5">表单字段</td><td class="py-1.5 text-green-600">已发布</td>
+</tr>
+<tr class="border-b border-gray-50">
+<td class="py-1.5">资产卡片</td><td class="py-1.5">12</td><td class="py-1.5">表单字段</td><td class="py-1.5 text-green-600">已发布</td>
+</tr>
+<tr class="border-b border-gray-50">
+<td class="py-1.5">导入模板</td><td class="py-1.5">3</td><td class="py-1.5">导入列</td><td class="py-1.5 text-green-600">已发布</td>
+</tr>
+<tr class="border-b border-gray-50">
+<td class="py-1.5">ERP 映射</td><td class="py-1.5">5</td><td class="py-1.5">集成映射</td><td class="py-1.5 text-green-600">已发布</td>
+</tr>
+<tr class="border-b border-gray-50">
+<td class="py-1.5">历史实例</td><td class="py-1.5">236</td><td class="py-1.5">实例数据</td><td class="py-1.5 text-orange-500 font-medium">待确认</td>
+</tr>
+</tbody>
+</table>
+<div class="mt-auto">
+<a class="text-blue-600 text-xs hover:underline" href="#">查看全部影响 12 项</a>
+</div>
+</div>
+</div>
+</div>
+<!-- END: MainWorkspace -->
+<!-- BEGIN: RightPropertyRail (x=1286..1586) -->
+<aside class="w-[300px] bg-white flex flex-col shrink-0 border-l border-gray-200">
+<!-- Properties Header -->
+<div class="h-12 border-b border-gray-200 flex items-center justify-between px-4 shrink-0">
+<span class="font-semibold text-gray-800 text-sm">字段属性</span>
+<i class="fa-solid fa-chevron-up text-gray-400 text-xs cursor-pointer"></i>
+</div>
+<!-- Properties Form (y <= 620 area) -->
+<div class="p-3 flex-col space-y-1 h-[570px] shrink-0">
+<div class="prop-row h-[24px]">
+<label class="prop-label">字段名称<span class="prop-required-star">*</span></label>
+<input class="prop-input" type="text" value="转固批次号"/>
+</div>
+<div class="prop-row h-[24px]">
+<label class="prop-label">字段编码<span class="prop-required-star">*</span></label>
+<input class="prop-input bg-gray-50 text-gray-500" type="text" value="cip_cap_batch_no"/>
+</div>
+<div class="prop-row h-[24px]">
+<label class="prop-label">业务对象<span class="prop-required-star">*</span></label>
+<select class="prop-select bg-gray-50 text-gray-500">
+<option>CIP 项目</option>
+</select>
+</div>
+<div class="prop-row h-[24px]">
+<label class="prop-label">字段类型<span class="prop-required-star">*</span></label>
+<select class="prop-select bg-gray-50 text-gray-500">
+<option>文本 / 唯一编码</option>
+</select>
+</div>
+<div class="prop-row h-[24px]">
+<label class="prop-label">默认值</label>
+<input class="prop-input" placeholder="请输入默认值" type="text"/>
+</div>
+<div class="prop-row h-[24px]">
+<label class="prop-label">必填策略<span class="prop-required-star">*</span></label>
+<select class="prop-select">
+<option>业务必填</option>
+</select>
+</div>
+<div class="prop-row h-[24px]">
+<label class="prop-label">字典来源</label>
+<input class="prop-input text-gray-400 bg-gray-50 text-center" readonly="" type="text" value="—"/>
+</div>
+<div class="prop-row h-[24px]">
+<label class="prop-label">校验表达式</label>
+<input class="prop-input font-mono text-[10px]" type="text" value="^[A-Z0-9-]{1,20}$"/>
+</div>
+<div class="prop-row h-[24px]">
+<label class="prop-label">桌面布局绑定<span class="prop-required-star">*</span></label>
+<select class="prop-select">
+<option>资产卡片-基础信息</option>
+</select>
+</div>
+<div class="prop-row h-[24px]">
+<label class="prop-label">H5 布局绑定<span class="prop-required-star">*</span></label>
+<select class="prop-select">
+<option>H5-基础信息</option>
+</select>
+</div>
+<div class="prop-row h-[24px]">
+<label class="prop-label">导入导出绑定<span class="prop-required-star">*</span></label>
+<select class="prop-select">
+<option>导入模板-第1列</option>
+</select>
+</div>
+<div class="prop-row h-[24px]">
+<label class="prop-label">集成映射<span class="prop-required-star">*</span></label>
+<select class="prop-select">
+<option>ERP.CIP_BATCH_NO</option>
+</select>
+</div>
+<div class="prop-row h-[24px]">
+<label class="prop-label">权限策略</label>
+<select class="prop-select">
+<option>按业务对象控制</option>
+</select>
+</div>
+<div class="prop-row h-[24px]">
+<label class="prop-label">历史影响</label>
+<div class="prop-input flex items-center justify-between bg-blue-50 border-blue-200">
+<a class="text-blue-600 hover:underline" href="#">查看 236 条实例</a>
+</div>
+</div>
+<div class="prop-row h-[24px]">
+<label class="prop-label">审计策略</label>
+<select class="prop-select">
+<option>标准审计策略</option>
+</select>
+</div>
+</div>
+<!-- Bottom Diagnostic Panels (y > 620 area) -->
+<div class="flex-1 bg-gray-50 p-3 border-t border-gray-200 flex flex-col space-y-3 overflow-hidden">
+<!-- Risk Card -->
+<div class="risk-card shrink-0">
+<div class="font-medium text-orange-800 text-xs mb-1.5">风险提示</div>
+<div class="risk-item">
+<i class="fa-solid fa-circle-exclamation risk-icon"></i>
+<span>发布后历史实例保持原字段版本</span>
+</div>
+<div class="risk-item">
+<i class="fa-solid fa-circle-exclamation risk-icon"></i>
+<span>ERP 回执冻结不允许无痕修改</span>
+</div>
+<div class="risk-item">
+<i class="fa-solid fa-circle-exclamation risk-icon"></i>
+<span>H5 与桌面布局需同步</span>
+</div>
+</div>
+<!-- Release Gate -->
+<div class="bg-white border border-gray-200 rounded p-3 flex-1 flex flex-col shrink-0">
+<div class="text-xs font-semibold text-gray-800 mb-2 border-b border-gray-100 pb-1">发布门禁 <span class="text-gray-400 font-normal">(7/8 通过)</span></div>
+<div class="space-y-1.5 flex-1 flex flex-col justify-between">
+<div class="gate-item">
+<span class="flex items-center"><i class="fa-solid fa-circle-check text-green-500 mr-1.5 text-[10px]"></i>编码唯一</span>
+<span class="gate-pass">通过</span>
+</div>
+<div class="gate-item">
+<span class="flex items-center"><i class="fa-solid fa-circle-check text-green-500 mr-1.5 text-[10px]"></i>类型合法</span>
+<span class="gate-pass">通过</span>
+</div>
+<div class="gate-item">
+<span class="flex items-center"><i class="fa-solid fa-circle-check text-green-500 mr-1.5 text-[10px]"></i>必填策略</span>
+<span class="gate-pass">通过</span>
+</div>
+<div class="gate-item">
+<span class="flex items-center"><i class="fa-solid fa-circle-check text-green-500 mr-1.5 text-[10px]"></i>字典来源</span>
+<span class="gate-pass">通过</span>
+</div>
+<div class="gate-item">
+<span class="flex items-center"><i class="fa-solid fa-circle-check text-green-500 mr-1.5 text-[10px]"></i>布局绑定</span>
+<span class="gate-pass">通过</span>
+</div>
+<div class="gate-item">
+<span class="flex items-center"><i class="fa-solid fa-circle-check text-green-500 mr-1.5 text-[10px]"></i>导入导出</span>
+<span class="gate-pass">通过</span>
+</div>
+<div class="gate-item">
+<span class="flex items-center"><i class="fa-solid fa-circle-check text-green-500 mr-1.5 text-[10px]"></i>集成映射</span>
+<span class="gate-pass">通过</span>
+</div>
+<div class="gate-item pt-1 border-t border-dashed border-gray-200">
+<span class="flex items-center font-medium text-orange-600"><i class="fa-solid fa-circle-exclamation text-orange-500 mr-1.5 text-[10px]"></i>历史影响</span>
+<span class="gate-wait font-medium">待确认</span>
+</div>
+</div>
+</div>
+</div>
+</aside>
+<!-- END: RightPropertyRail -->
+</main>
+</body></html>

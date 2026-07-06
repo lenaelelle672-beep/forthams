@@ -43,6 +43,44 @@ export function downloadBlob(blob: Blob, filename: string): void {
   URL.revokeObjectURL(url);
 }
 
+type CsvCell = string | number | boolean | Date | null | undefined;
+
+function escapeCsvCell(value: CsvCell): string {
+  if (value === null || value === undefined) {
+    return '';
+  }
+
+  const text = value instanceof Date ? value.toISOString() : String(value);
+  return /[",\r\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
+}
+
+/**
+ * 下载二维数组 CSV，保留空行作为分隔行。
+ */
+export function downloadCsvRows(rows: CsvCell[][], filename: string): void {
+  const csv = rows.map((row) => row.map(escapeCsvCell).join(',')).join('\r\n');
+  const blob = new Blob([`\uFEFF${csv}`], { type: 'text/csv;charset=utf-8' });
+
+  downloadBlob(blob, filename);
+}
+
+/**
+ * 下载对象数组 CSV，使用首行记录的字段顺序生成表头。
+ */
+export function downloadCsvRecords(records: Record<string, CsvCell>[], filename: string): void {
+  const headers = records.length > 0 ? Object.keys(records[0]) : [];
+  const rows = [headers, ...records.map((record) => headers.map((header) => record[header]))];
+
+  downloadCsvRows(rows, filename);
+}
+
+/**
+ * 兼容历史导出页面的命名，语义等同于下载 Blob 流。
+ */
+export function downloadFileStream(blob: Blob, filename: string): void {
+  downloadBlob(blob, filename);
+}
+
 /**
  * 生成导出文件名，格式为：资产台账_YYYYMMDD_HHmmss.xlsx
  *

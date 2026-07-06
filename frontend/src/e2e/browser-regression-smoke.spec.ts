@@ -1,0 +1,878 @@
+import { expect, test, type Page, type Route } from '@playwright/test';
+
+const authUser = {
+  userId: 1,
+  username: 'admin',
+  realName: '系统管理员',
+  roles: ['SUPER_ADMIN', 'ADMIN'],
+};
+
+
+let submitCount = 0;
+let workflowDraftSaveCount = 0;
+type WorkflowDraftScenario = 'success' | 'failure';
+type ApprovalScenario = 'default' | 'empty' | 'forbidden' | 'approved' | 'detail-error';
+type ReportsScenario = 'default' | 'empty' | 'forbidden';
+let workflowDraftScenario: WorkflowDraftScenario = 'success';
+let approvalScenario: ApprovalScenario = 'default';
+let reportsScenario: ReportsScenario = 'default';
+
+const inventoryTask = {
+  id: 1,
+  taskId: 'INV-001',
+  taskNo: 'INV-001',
+  taskName: '2026年5月RFID盘点',
+  inventoryType: 'RFID',
+  status: 'IN_PROGRESS',
+  deptIds: null,
+  startDate: '2026-05-01',
+  endDate: '2026-05-31',
+  location: '总部库位',
+  scope: '全部资产',
+  totalCount: 2,
+  matchedCount: 0,
+  lossCount: 0,
+  executorId: 1,
+  createBy: 1,
+  createTime: '2026-05-01T00:00:00',
+  updateTime: '2026-05-30T00:00:00',
+};
+
+let inventoryAssets = [
+  { assetId: 'AST-RFID-001', assetCode: 'RFID-001', assetName: 'RFID手持终端', confirmed: false, actualStatus: 'normal' },
+  { assetId: 'AST-RFID-002', assetCode: 'RFID-002', assetName: '电子标签打印机', confirmed: false, actualStatus: 'normal' },
+];
+
+test.describe('浏览器回归 smoke', () => {
+  test.beforeEach(async ({ page }) => {
+    workflowDraftScenario = 'success';
+    approvalScenario = 'default';
+    reportsScenario = 'default';
+    workflowDraftSaveCount = 0;
+    await page.route('**/api/**', mockApi);
+    await seedAuthenticatedSession(page);
+  });
+
+  test('/compensation 赔偿入口可访问且无运行时错误', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+
+    await page.goto('/compensation');
+    await page.waitForLoadState('networkidle');
+
+    await expect(page.getByText('资产赔偿申请').first()).toBeVisible({ timeout: 10_000 });
+    await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflows 草稿后端保存失败时只提示本地草稿未同步', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    workflowDraftScenario = 'failure';
+
+    await page.goto('/workflows');
+    await page.waitForLoadState('networkidle');
+
+    await page.getByRole('button', { name: /新建流程/ }).click();
+    await page.getByRole('button', { name: /^资产转移流程$/ }).click();
+
+    await expect(page).toHaveURL(/\/workflows$/);
+    await expect(page.getByText(/"资产转移流程"初始化失败：工作流草稿保存失败/)).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText(/页面仍展示本地草稿状态/)).not.toBeVisible();
+    await expect(page.getByText(/"资产转移流程"草稿已创建/)).not.toBeVisible();
+    expect(workflowDraftSaveCount).toBe(1);
+    await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
+    expect(errors.filter((error) => !error.includes('[HTTP 5xx] 服务端错误: 500 工作流草稿保存失败'))).toEqual([]);
+  });
+
+  test('/bigscreen-3d 无 WebGL 时展示安全降级且不加载 3D chunk', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    const requested3DChunks: string[] = [];
+    page.on('request', (request) => {
+      const url = request.url();
+      if (url.includes('BigScreen3DCanvas')) {
+        requested3DChunks.push(url);
+      }
+    });
+    await disableWebGL(page);
+
+    await page.goto('/bigscreen-3d', { waitUntil: 'domcontentloaded' });
+
+    await expect(page.getByText('3D 地图已切换为安全降级模式').first()).toBeVisible({ timeout: 10_000 });
+    expect(requested3DChunks).toEqual([]);
+    await expect(page.locator('.ams3d-map-layer canvas')).toHaveCount(0);
+    await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
+    expect(errors.filter((error) => !/WebGL|webgl|Canvas|React will try to recreate/.test(error))).toEqual([]);
+  });
+
+  test('/inventory 智能报告入口在无任务时保持禁用态', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+
+    await page.goto('/inventory');
+    await page.waitForLoadState('networkidle');
+
+    await expect(page.getByRole('heading', { name: '盘点管理', exact: true })).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByRole('heading', { name: '暂无盘点任务' })).toBeVisible();
+    await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
+    expect(errors).toEqual([]);
+  });
+
+
+  test('/inventory/scan RFID 扫码、批量确认和防重复提交路径可运行', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+
+    await page.goto('/inventory/scan/INV-001');
+    await page.waitForLoadState('networkidle');
+
+    await expect(page.getByRole('heading', { name: '2026年5月RFID盘点' })).toBeVisible({ timeout: 10_000 });
+    await page.getByRole('button', { name: '开始扫描' }).click();
+    await expect(page.getByText('● 当前扫描中...')).toBeVisible();
+    await expect(page.getByText(/RFID 扫描器 RFID-01 已连接/)).toBeVisible();
+
+    await page.getByRole('button', { name: /批量确认 \(2\)/ }).click();
+    await expect(page.getByText(/批量确认 2 条资产/)).toBeVisible();
+    await expect(page.getByRole('button', { name: /批量确认 \(0\)/ })).toBeDisabled({ timeout: 10_000 });
+
+    const submitButton = page.getByRole('button', { name: '提交盘点' });
+    await expect(submitButton).toBeEnabled();
+    await submitButton.dblclick();
+    await expect(page.getByText(/提交盘点任务，等待核准/)).toBeVisible();
+    expect(await page.locator('text=提交盘点任务，等待核准').count()).toBe(1);
+    await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
+    expect(errors).toEqual([]);
+  });
+
+  test('/locations 在移动视口可作为 GIS/位置基础路径访问', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.setViewportSize({ width: 390, height: 844 });
+
+    await page.goto('/locations');
+    await page.waitForLoadState('networkidle');
+
+    await expect(page.getByRole('heading', { name: /位置|库位/ }).first()).toBeVisible({ timeout: 10_000 });
+    await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
+    expect(errors).toEqual([]);
+  });
+
+  test('/idle 闲置资产管理页面可访问且无运行时错误', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+
+    await page.goto('/idle');
+    await page.waitForLoadState('networkidle');
+
+    await expect(page.getByText('闲置资产管理').first()).toBeVisible({ timeout: 10_000 });
+    await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflows 新建模板流程会保存草稿并进入设计器', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+
+    await page.goto('/workflows');
+    await page.waitForLoadState('networkidle');
+
+    await expect(page.getByRole('heading', { name: '业务流程管理' })).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText('资产转移流程').first()).toBeVisible();
+
+    await page.getByRole('button', { name: /新建流程/ }).click();
+    await page.getByRole('button', { name: /^资产转移流程$/ }).click();
+
+    await expect(page).toHaveURL(/\/workflow-designer\?businessType=ASSET_TRANSFER$/);
+    await expect(page.getByText('资产转移流程').first()).toBeVisible({ timeout: 10_000 });
+    expect(workflowDraftSaveCount).toBe(1);
+    await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflows 仅查询权限账号进入只读模式', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+
+    await page.goto('/');
+    await page.evaluate((user) => {
+      window.localStorage.setItem('auth_token', 'browser-regression-smoke-token');
+      window.localStorage.setItem('user_info', JSON.stringify(user));
+      window.sessionStorage.setItem('auth_token', 'browser-regression-smoke-token');
+      window.sessionStorage.setItem('user_info', JSON.stringify(user));
+    }, {
+      userId: 2,
+      username: 'readonly',
+      realName: '只读用户',
+      roles: ['USER'],
+      permissions: ['workflow:definition:query'],
+    });
+
+    await page.goto('/workflows');
+    await page.waitForLoadState('networkidle');
+
+    await expect(page.getByText('当前账号只有流程查看权限，无法新建、发布或编辑流程。')).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByRole('button', { name: /新建流程/ })).toBeDisabled();
+    await expect(page.getByRole('button', { name: /打开设计器/ })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: /发布流程|重新发布|停用流程|创建并发布默认流程/ })).toHaveCount(0);
+    expect(workflowDraftSaveCount).toBe(0);
+    await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-designer 仅查询权限账号直达时由路由守卫拦截且不保存', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+
+    await page.goto('/');
+    await page.evaluate((user) => {
+      window.localStorage.setItem('auth_token', 'browser-regression-smoke-token');
+      window.localStorage.setItem('user_info', JSON.stringify(user));
+      window.sessionStorage.setItem('auth_token', 'browser-regression-smoke-token');
+      window.sessionStorage.setItem('user_info', JSON.stringify(user));
+    }, {
+      userId: 2,
+      username: 'readonly',
+      realName: '只读用户',
+      roles: ['USER'],
+      permissions: ['workflow:definition:query'],
+    });
+
+    await page.goto('/workflow-designer?businessType=ASSET_TRANSFER');
+    await page.waitForLoadState('networkidle');
+
+    await expect(page.getByRole('heading', { name: '无访问权限' })).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText('您没有访问此页面的权限。')).toBeVisible();
+    await expect(page.getByText('请联系管理员获取相应角色权限后再尝试访问。')).toBeVisible();
+    await expect(page.getByRole('button', { name: /只读模式|发布流程|保存草稿/ })).toHaveCount(0);
+    expect(workflowDraftSaveCount).toBe(0);
+    await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
+    expect(errors).toEqual([]);
+  });
+
+  test('模块验收 smoke：资产、处置、报表和工单详情路径可交互', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+
+    await page.goto('/assets');
+    await page.waitForLoadState('networkidle');
+    await expect(page.getByRole('heading', { name: '资产台账', exact: true })).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText('模块验收笔记本')).toBeVisible();
+    await expect(page.getByText('共 1 条资产 · 本页 1 条')).toBeVisible();
+
+    await page.goto('/disposals');
+    await page.waitForLoadState('networkidle');
+    await expect(page.getByRole('heading', { name: '资产处置管理' })).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText('暂无资产清退记录')).toBeVisible();
+    await page.getByRole('button', { name: /工单管理/ }).click();
+    await expect(page.getByText('模块验收维修工单').first()).toBeVisible({ timeout: 10_000 });
+
+    await page.goto('/workorders/1');
+    await page.waitForLoadState('networkidle');
+    await expect(page.getByRole('heading', { name: '模块验收维修工单' })).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText('等待审批')).toBeVisible();
+
+    await page.goto('/reports');
+    await page.waitForLoadState('networkidle');
+    await expect(page.getByRole('heading', { name: '报表中心' })).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText('资产汇总表')).toBeVisible();
+
+    await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
+    expect(errors).toEqual([]);
+  });
+
+  test('/approvals 空态与权限拒绝态可解释且不崩溃', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+
+    approvalScenario = 'empty';
+    await page.goto('/approvals');
+    await page.waitForLoadState('networkidle');
+    await expect(page.getByRole('heading', { name: '审批中心' })).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByRole('heading', { name: '暂无审批数据' })).toBeVisible();
+    await expect(page.getByText('当前没有可显示的数据')).toBeVisible();
+    await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
+
+    approvalScenario = 'forbidden';
+    await page.reload();
+    await page.waitForLoadState('networkidle');
+    await expect(page.getByText('加载审批数据失败')).toBeVisible({ timeout: 10_000 });
+    await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
+    expect(errors).toEqual([]);
+  });
+
+  test('/approvals/:id 只有当前节点审批人可见审批操作', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+
+    await page.goto('/approvals/1');
+    await page.waitForLoadState('networkidle');
+    await expect(page.getByText('APP-MODULE-001').first()).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByRole('button', { name: '审批通过' })).toBeVisible();
+    await expect(page.getByRole('button', { name: '驳回申请' })).toBeVisible();
+    const currentApproverActionArea = page.getByTestId('approval-action-area-current-assignee');
+    await expect(currentApproverActionArea).toBeVisible();
+    await test.info().attach('approval-action-area-current-assignee', {
+      body: await currentApproverActionArea.screenshot(),
+      contentType: 'image/png',
+    });
+
+    await page.goto('/');
+    await page.evaluate((user) => {
+      window.localStorage.setItem('auth_token', 'browser-regression-smoke-token');
+      window.localStorage.setItem('user_info', JSON.stringify(user));
+      window.sessionStorage.setItem('auth_token', 'browser-regression-smoke-token');
+      window.sessionStorage.setItem('user_info', JSON.stringify(user));
+    }, {
+      userId: 2,
+      username: 'observer',
+      realName: '旁观用户',
+      roles: ['USER'],
+      permissions: ['approval:process:query'],
+    });
+
+    await page.goto('/approvals/1');
+    await page.waitForLoadState('networkidle');
+    await expect(page.getByText('当前账号无需处理此节点')).toBeVisible({ timeout: 10_000 });
+    const observerNoCurrentStepArea = page.getByTestId('approval-action-area-no-current-step');
+    await expect(observerNoCurrentStepArea).toBeVisible();
+    await test.info().attach('approval-action-area-observer-no-permission-no-current-step', {
+      body: await observerNoCurrentStepArea.screenshot(),
+      contentType: 'image/png',
+    });
+    await expect(page.getByRole('button', { name: /审批通过|approve/i })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: /驳回申请|reject/i })).toHaveCount(0);
+    await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
+    expect(errors).toEqual([]);
+  });
+
+  test('/approvals/:id 终态与详情服务失败展示稳定证据', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+
+    approvalScenario = 'approved';
+    await page.goto('/approvals/1');
+    await page.waitForLoadState('networkidle');
+    await expect(page.getByText('APP-MODULE-001').first()).toBeVisible({ timeout: 10_000 });
+    const terminalActionArea = page.getByTestId('approval-action-area-terminal');
+    await expect(terminalActionArea).toBeVisible();
+    await expect(page.getByRole('button', { name: /审批通过|approve/i })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: /驳回申请|reject/i })).toHaveCount(0);
+    await test.info().attach('approval-action-area-terminal', {
+      body: await terminalActionArea.screenshot(),
+      contentType: 'image/png',
+    });
+    const originalTerminalViewport = page.viewportSize() ?? { width: 1280, height: 720 };
+    await page.setViewportSize({ width: 390, height: 844 });
+    try {
+      await terminalActionArea.scrollIntoViewIfNeeded();
+      await expect(terminalActionArea).toBeVisible();
+      await test.info().attach('approval-action-area-terminal-mobile', {
+        body: await terminalActionArea.screenshot(),
+        contentType: 'image/png',
+      });
+    } finally {
+      await page.setViewportSize(originalTerminalViewport);
+    }
+
+    approvalScenario = 'detail-error';
+    await page.goto('/approvals/1');
+    await page.waitForLoadState('networkidle');
+    const detailLoadError = page.getByTestId('approval-detail-load-error');
+    await expect(detailLoadError).toBeVisible({ timeout: 10_000 });
+    await expect(detailLoadError).toContainText('审批详情加载失败');
+    await expect(page.getByRole('button', { name: /审批通过|approve/i })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: /驳回申请|reject/i })).toHaveCount(0);
+    await test.info().attach('approval-detail-load-error', {
+      body: await detailLoadError.screenshot(),
+      contentType: 'image/png',
+    });
+    await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
+    expect(errors.filter((error) => !error.includes('[HTTP 5xx] 服务端错误: 500 审批详情服务异常'))).toEqual([]);
+  });
+
+  test('/reports 空态与权限拒绝态可解释且不崩溃', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+
+    reportsScenario = 'empty';
+    await page.goto('/reports');
+    await page.waitForLoadState('networkidle');
+    await expect(page.getByRole('heading', { name: '报表中心' })).toBeVisible({ timeout: 10_000 });
+    await page.getByRole('button', { name: /资产分类统计/ }).click();
+    await expect(page.getByText('暂无图表数据')).toBeVisible({ timeout: 10_000 });
+    await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
+
+    reportsScenario = 'forbidden';
+    await page.reload();
+    await page.waitForLoadState('networkidle');
+    await expect(page.getByText('数据加载失败').first()).toBeVisible({ timeout: 10_000 });
+    await expect(page.locator('body')).not.toContainText('Unexpected Application Error');
+    expect(errors).toEqual([]);
+  });
+});
+
+async function seedAuthenticatedSession(page: Page) {
+  await page.addInitScript(({ user }) => {
+    window.localStorage.setItem('ams_auth_token', 'browser-regression-smoke-token');
+    window.localStorage.setItem('ams_auth_user', JSON.stringify(user));
+    window.localStorage.setItem('auth_token', 'browser-regression-smoke-token');
+    window.localStorage.setItem('user_info', JSON.stringify(user));
+  }, { user: authUser });
+}
+
+async function disableWebGL(page: Page) {
+  await page.addInitScript(() => {
+    const originalGetContext = HTMLCanvasElement.prototype.getContext;
+    HTMLCanvasElement.prototype.getContext = function getContext(type: string, ...args: unknown[]) {
+      if (type === 'webgl' || type === 'webgl2' || type === 'experimental-webgl') {
+        return null;
+      }
+      return originalGetContext.call(this, type, ...args as []);
+    } as typeof HTMLCanvasElement.prototype.getContext;
+  });
+}
+
+function collectBrowserErrors(page: Page) {
+  const errors: string[] = [];
+
+  page.on('console', (message) => {
+    if (message.type() === 'error') {
+      const text = message.text();
+      if (!text.includes('Failed to load resource') && !text.startsWith('Warning:')) {
+        errors.push(text);
+      }
+    }
+  });
+
+  page.on('pageerror', (error) => {
+    errors.push(error.message);
+  });
+
+  return errors;
+}
+
+async function mockApi(route: Route) {
+  const url = new URL(route.request().url());
+  if (!url.pathname.startsWith('/api/')) {
+    return route.continue();
+  }
+
+  const path = url.pathname.replace(/^\/api/, '');
+
+  if (path === '/approvals/pending/count') {
+    return fulfill(route, 0);
+  }
+
+  if (path === '/approvals/stats') {
+    return fulfill(route, []);
+  }
+
+  if (path === '/user-management/list') {
+    return fulfill(route, paged([
+      { id: 1, realName: '当前审批人', username: 'approver', status: 1 },
+      { id: 2, realName: '旁观用户', username: 'observer', status: 1 },
+    ]));
+  }
+
+  if (path.startsWith('/approvals')) {
+    if (approvalScenario === 'forbidden') {
+      return fulfillError(route, 403, '权限不足，无法访问审批数据');
+    }
+
+    if (path === '/approvals/1') {
+      if (approvalScenario === 'detail-error') {
+        return fulfillError(route, 500, '审批详情服务异常');
+      }
+      return fulfill(route, approvalDetail(approvalScenario === 'approved' ? 'APPROVED' : 'PENDING'));
+    }
+
+    if (approvalScenario === 'empty') {
+      return fulfill(route, paged([]));
+    }
+
+    return fulfill(route, paged([
+      {
+        id: 1,
+        processNo: 'APP-MODULE-001',
+        processType: 'WORK_ORDER',
+        title: '模块验收审批单',
+        applicantName: '系统管理员',
+        status: 'PENDING',
+        createTime: '2026-05-31T09:00:00',
+        version: 1,
+      },
+    ]));
+  }
+
+  if (path === '/bigscreen/stats') {
+    return fulfill(route, {
+      totalAssets: 128,
+      inUseAssets: 96,
+      idleAssets: 18,
+      scrapAssets: 5,
+      totalValue: 860000,
+      netValue: 620000,
+      pendingApprovals: 3,
+      pendingWorkOrders: 2,
+      inventoryProgress: 70,
+      criticalAlerts: 1,
+    });
+  }
+
+  if (path === '/dashboard/stats') {
+    return fulfill(route, {
+      totalAssets: 128,
+      inUseAssets: 96,
+      idleAssets: 18,
+      scrapAssets: 5,
+      totalValue: 860000,
+      netValue: 620000,
+      pendingApprovals: 3,
+      pendingWorkOrders: 2,
+      inventoryProgress: 0,
+      criticalAlerts: 1,
+    });
+  }
+
+  if (path === '/categories/tree') {
+    return fulfill(route, [
+      { id: 1, categoryName: '电子设备', children: [] },
+    ]);
+  }
+
+  if (path === '/retirement/statistics') {
+    return fulfill(route, {
+      thisMonthCount: 0,
+      pendingCount: 0,
+      approvedCount: 0,
+      completedCount: 0,
+    });
+  }
+
+  if (path === '/retirement/list') {
+    return fulfill(route, paged([]));
+  }
+
+  if (path === '/compensation') {
+    return fulfill(route, paged([]));
+  }
+
+  if (path === '/workorders/1') {
+    return fulfill(route, {
+      workOrder: {
+        id: 1,
+        orderNo: 'WO-MODULE-001',
+        title: '模块验收维修工单',
+        description: '模块验收 smoke 使用的工单详情数据',
+        status: 'APPROVING_LEVEL_1',
+        priority: 'NORMAL',
+        applicantName: '系统管理员',
+        departmentName: '研发部',
+        createdAt: '2026-05-31T09:00:00',
+        version: 1,
+      },
+      approvalRecords: [
+        {
+          id: 1,
+          approvalLevel: 'LEVEL_1',
+          operatorName: '一级审批人',
+          action: 'PENDING',
+          comment: '等待审批',
+          operatedAt: '2026-05-31T09:05:00',
+        },
+      ],
+    });
+  }
+
+  if (path === '/workorders') {
+    return fulfill(route, paged([
+      {
+        id: 1,
+        orderNo: 'WO-MODULE-001',
+        title: '模块验收维修工单',
+        assetName: '模块验收笔记本',
+        assetNo: 'AST-MODULE-001',
+        applicantName: '系统管理员',
+        createdAt: '2026-05-31T09:00:00',
+        status: 'APPROVING_LEVEL_1',
+        priority: 'NORMAL',
+      },
+    ]));
+  }
+
+  if (path.startsWith('/reports')) {
+    if (reportsScenario === 'forbidden') {
+      return fulfillError(route, 403, '权限不足，无法访问报表数据');
+    }
+
+    if (path === '/reports/summary') {
+      return fulfill(route, reportsScenario === 'empty'
+        ? { totalAssets: 0, activeAssets: 0, pendingApproval: 0, recentlyRetired: 0 }
+        : { totalAssets: 128, activeAssets: 96, pendingApproval: 3, recentlyRetired: 4 });
+    }
+
+    if (path === '/reports/by-category') {
+      return fulfill(route, reportsScenario === 'empty' ? [] : [
+        { categoryName: '电子设备', assetCount: 64, totalValue: 420000 },
+        { categoryName: '办公家具', assetCount: 24, totalValue: 90000 },
+      ]);
+    }
+
+    if (path === '/reports/trend') {
+      return fulfill(route, reportsScenario === 'empty' ? [] : [
+        { month: '2026-04', assetCount: 120, totalValue: 780000 },
+        { month: '2026-05', assetCount: 128, totalValue: 860000 },
+      ]);
+    }
+
+    if (path === '/reports/depreciation-stats' || path === '/reports/maintenance-stats' || path === '/reports/retirement-stats') {
+      return fulfill(route, reportsScenario === 'empty' ? [] : [
+        { month: '4月', value: 12 },
+        { month: '5月', value: 18 },
+      ]);
+    }
+  }
+
+  if (path === '/workorders/status-distribution' || path === '/workorders/dept-pending') {
+    return fulfill(route, [
+      { name: '待审批', value: 2 },
+      { name: '已完成', value: 5 },
+    ]);
+  }
+
+  if (path === '/workflows') {
+    return fulfill(route, [
+      {
+        id: 1,
+        businessType: 'ASSET_TRANSFER',
+        name: '资产转移流程',
+        description: '资产调拨审批流程',
+        definition: workflowDefinition(),
+        status: 'DRAFT',
+        version: 1,
+        updateTime: '2026-06-09T07:30:00',
+      },
+    ]);
+  }
+
+  if (path === '/workflows/ASSET_TRANSFER/draft' && route.request().method() === 'PUT') {
+    workflowDraftSaveCount += 1;
+    if (workflowDraftScenario === 'failure') {
+      return fulfillError(route, 500, '工作流草稿保存失败');
+    }
+    return fulfill(route, {
+      id: 1,
+      businessType: 'ASSET_TRANSFER',
+      name: '资产转移流程',
+      description: '资产调拨审批流程',
+      definition: workflowDefinition(),
+      status: 'DRAFT',
+      version: 1,
+      updateTime: '2026-06-09T07:30:00',
+    });
+  }
+
+  if (path === '/workflows/ASSET_TRANSFER') {
+    return fulfill(route, {
+      id: 1,
+      businessType: 'ASSET_TRANSFER',
+      name: '资产转移流程',
+      description: '资产调拨审批流程',
+      definition: workflowDefinition(),
+      status: 'DRAFT',
+      version: 1,
+      updateTime: '2026-06-09T07:30:00',
+    });
+  }
+
+  if (path === '/roles/all') {
+    return fulfill(route, [{ id: 1, roleCode: 'ASSET_MANAGER', roleName: '资产管理员' }]);
+  }
+
+  if (path === '/users/search') {
+    return fulfill(route, [{ id: 1, username: 'admin', realName: '系统管理员' }]);
+  }
+
+  if (path.startsWith('/assets')) {
+    return fulfill(route, paged([
+      {
+        id: 1,
+        assetNo: 'AST-MODULE-001',
+        assetName: '模块验收笔记本',
+        categoryName: '电子设备',
+        brand: 'ThinkPad X1',
+        deptId: 1,
+        deptName: '研发部',
+        userName: '系统管理员',
+        location: 'A座',
+        originalValue: 12000,
+        currentValue: 8600,
+        status: 'IN_USE',
+      },
+    ]));
+  }
+
+  if (path.startsWith('/depts')) {
+    return fulfill(route, [{ id: 1, name: '研发部', deptName: '研发部', parentId: 0 }]);
+  }
+
+  if (path === '/inventory/tasks') {
+    return fulfill(route, paged([]));
+  }
+
+  if (path === '/inventory/tasks/INV-001') {
+    return fulfill(route, {
+      task: inventoryTask,
+      details: [],
+    });
+  }
+
+  if (path === '/inventory/tasks/INV-001/assets') {
+    return fulfill(route, paged(inventoryAssets));
+  }
+
+  if (path === '/inventory/tasks/INV-001/summary') {
+    return fulfill(route, {
+      surplusCount: 0,
+      deficitCount: 0,
+      surplusItems: [],
+      deficitItems: [],
+    });
+  }
+
+  if (path === '/inventory/tasks/INV-001/details') {
+    return fulfill(route, []);
+  }
+
+  if (path === '/inventory/tasks/INV-001/assets/batch-confirm' && route.request().method() === 'POST') {
+    inventoryAssets = inventoryAssets.map((asset) => ({ ...asset, confirmed: true, confirmedAt: '2026-05-30T10:00:00' }));
+    return fulfill(route, null);
+  }
+
+  if (path === '/inventory/tasks/INV-001/submit' && route.request().method() === 'POST') {
+    submitCount += 1;
+    return fulfill(route, { submitCount });
+  }
+
+  if (path.includes('/inventory/tasks/') && path.endsWith('/details')) {
+    return fulfill(route, []);
+  }
+
+  if (path.startsWith('/inventory/tasks')) {
+    return fulfill(route, {});
+  }
+
+  if (path.startsWith('/locations')) {
+    return fulfill(route, paged([{ id: 1, name: '总部库位', locationName: '总部库位', address: '研发中心 3F' }]));
+  }
+
+  if (path.startsWith('/idle-assets')) {
+    return fulfill(route, [
+      { id: 1, assetId: 'AST-101', assetName: '闲置办公桌', status: 'PENDING', idleDays: 45, originalDept: '研发部', category: '家具' },
+      { id: 2, assetId: 'AST-102', assetName: '旧显示器', status: 'PUBLISHED', idleDays: 60, originalDept: '行政部', category: '电子设备' },
+    ]);
+  }
+
+  return fulfill(route, {});
+}
+
+function paged<T>(records: T[]) {
+  return {
+    records,
+    total: records.length,
+    size: 10,
+    current: 1,
+    pages: 1,
+  };
+}
+
+function approvalDetail(status: 'PENDING' | 'APPROVED' = 'PENDING') {
+  return {
+    process: {
+      id: 1,
+      processNo: 'APP-MODULE-001',
+      processType: 'WORK_ORDER',
+      businessId: 1,
+      businessData: JSON.stringify({ title: '模块验收审批单', reason: '浏览器回归验证' }),
+      applicantId: 1,
+      applicantName: '系统管理员',
+      status,
+      currentStep: 1,
+      createTime: '2026-05-31T09:00:00',
+      version: 1,
+    },
+    records: status === 'APPROVED' ? [
+      {
+        id: 1,
+        stepNo: 1,
+        approverId: 1,
+        approveResult: 'APPROVED',
+        approveOpinion: '审批通过',
+        approveTime: '2026-05-31T09:10:00',
+      },
+    ] : [],
+    workflowRuntimePath: [
+      {
+        stepNo: 1,
+        nodeId: 'approval-1',
+        nodeCode: 'APP-USER',
+        label: '当前审批人确认',
+        approverType: 'user',
+        approverId: '1',
+        approvalMode: 'sequence',
+      },
+    ],
+    workflowResultAction: '完成审批',
+  };
+}
+
+function workflowDefinition() {
+  return {
+    nodes: [
+      {
+        id: 'start',
+        type: 'start',
+        position: { x: 0, y: 0 },
+        data: {
+          type: 'start',
+          label: '开始',
+          description: '流程开始',
+          nodeCode: 'START',
+          triggerType: '表单提交',
+        },
+      },
+      {
+        id: 'approval-1',
+        type: 'approval',
+        position: { x: 240, y: 0 },
+        data: {
+          type: 'approval',
+          label: '资产管理员审批',
+          description: '资产管理员审批',
+          nodeCode: 'APPROVAL_1',
+          approverType: 'role',
+          approverRole: 'ASSET_MANAGER',
+          approvalMode: 'sequence',
+        },
+      },
+      {
+        id: 'end',
+        type: 'end',
+        position: { x: 480, y: 0 },
+        data: {
+          type: 'end',
+          label: '结束',
+          description: '流程结束',
+          nodeCode: 'END',
+          resultAction: '完成审批',
+        },
+      },
+    ],
+    edges: [
+      { id: 'e-start-approval', source: 'start', target: 'approval-1' },
+      { id: 'e-approval-end', source: 'approval-1', target: 'end' },
+    ],
+  };
+}
+
+async function fulfill(route: Route, data: unknown) {
+  await route.fulfill({
+    status: 200,
+    contentType: 'application/json',
+    body: JSON.stringify({ code: 200, message: 'OK', data }),
+  });
+}
+
+async function fulfillError(route: Route, status: number, message: string) {
+  await route.fulfill({
+    status,
+    contentType: 'application/json',
+    body: JSON.stringify({ code: status, message, data: null }),
+  });
+}

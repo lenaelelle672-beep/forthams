@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+
+<html class="light" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Future Settings OS - Tenant Contract Management</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "status-cyan": "#00A8D8",
+                    "on-secondary-container": "#51617e",
+                    "inverse-surface": "#2d3134",
+                    "outline": "#727786",
+                    "on-surface": "#181c1f",
+                    "inverse-on-surface": "#eef1f5",
+                    "on-secondary-fixed": "#091c35",
+                    "surface-container-high": "#e5e8ec",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-bright": "#f7fafe",
+                    "status-green": "#16A34A",
+                    "text-primary": "#0F172A",
+                    "primary-fixed-dim": "#b0c6ff",
+                    "surface-container-highest": "#e0e3e7",
+                    "primary-fixed": "#d9e2ff",
+                    "primary-container": "#1d6ef2",
+                    "on-error-container": "#93000a",
+                    "secondary": "#4e5f7b",
+                    "on-secondary": "#ffffff",
+                    "tertiary-fixed-dim": "#ffb695",
+                    "on-error": "#ffffff",
+                    "status-purple": "#7C3AED",
+                    "surface-dim": "#d7dade",
+                    "tertiary": "#9f3e00",
+                    "on-tertiary": "#ffffff",
+                    "on-primary-fixed": "#001945",
+                    "status-amber": "#F59E0B",
+                    "border-subtle": "#D7E2F0",
+                    "outline-variant": "#c2c6d7",
+                    "on-tertiary-container": "#fffdff",
+                    "primary": "#1D6EF2",
+                    "on-primary-fixed-variant": "#00419c",
+                    "on-surface-variant": "#424654",
+                    "on-primary-container": "#fffdff",
+                    "secondary-fixed-dim": "#b6c7e8",
+                    "on-tertiary-fixed": "#351000",
+                    "error": "#ba1a1a",
+                    "tertiary-fixed": "#ffdbcc",
+                    "on-primary": "#ffffff",
+                    "surface-container": "#ebeef2",
+                    "secondary-fixed": "#d5e3ff",
+                    "surface-tint": "#0057cc",
+                    "error-container": "#ffdad6",
+                    "inverse-primary": "#b0c6ff",
+                    "surface": "#f5f8fc",
+                    "secondary-container": "#ccddff",
+                    "on-secondary-fixed-variant": "#374762",
+                    "text-secondary": "#64748B",
+                    "on-background": "#181c1f",
+                    "status-red": "#DC2626",
+                    "surface-variant": "#e0e3e7",
+                    "on-tertiary-fixed-variant": "#7b2f00",
+                    "tertiary-container": "#c75000",
+                    "surface-container-low": "#f1f4f8",
+                    "background": "#f5f8fc"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "grid-gutter": "12px",
+                    "container-gap": "20px",
+                    "topbar-height": "56px",
+                    "sidebar-width": "240px",
+                    "inspector-width": "320px",
+                    "card-padding": "16px"
+            },
+            "fontFamily": {
+                    "body-sm": ["Inter"],
+                    "body-md": ["Inter"],
+                    "status-label": ["Inter"],
+                    "page-title": ["Inter"],
+                    "code-meta": ["JetBrains Mono"],
+                    "section-header": ["Inter"]
+            },
+            "fontSize": {
+                    "body-sm": ["12px", {"lineHeight": "18px", "fontWeight": "500"}],
+                    "body-md": ["13px", {"lineHeight": "20px", "fontWeight": "500"}],
+                    "status-label": ["11px", {"lineHeight": "16px", "fontWeight": "700"}],
+                    "page-title": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "code-meta": ["11px", {"lineHeight": "16px", "fontWeight": "400"}],
+                    "section-header": ["14px", {"lineHeight": "20px", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .topology-grid {
+            background-image:
+                radial-gradient(circle at 2px 2px, rgba(29, 110, 242, 0.05) 1px, transparent 0);
+            background-size: 24px 24px;
+        }
+        .contract-gradient {
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.05) 0%, rgba(0, 168, 216, 0.05) 100%);
+        }
+        .node-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.05); }
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface selection:bg-primary-fixed selection:text-on-primary-fixed overflow-hidden">
+<!-- TopNavBar -->
+<header class="fixed top-0 left-0 w-full z-50 flex items-center justify-between px-6 h-[56px] bg-[#051424] border-b border-[#1D6EF2]">
+<div class="flex items-center gap-6">
+<div class="flex items-center justify-center w-8 h-8 rounded hover:bg-white/10 text-white/70 hover:text-white transition-colors cursor-pointer" onclick="window.parent.postMessage({ type: 'NAVIGATE', payload: { screenId: '88cb2ed000cb48aaaa3e37947a38ff7b' } }, '*')">
+<span class="material-symbols-outlined text-[20px]">apps</span>
+</div>
+<a class="font-page-title text-[16px] text-white tracking-tight flex items-center gap-2 hover:opacity-80 transition-opacity" href="#">
+<span>UNIVIEW | 系统设置中心</span></a>
+<nav class="hidden md:flex gap-2 ml-8">
+<a class="px-3 py-1.5 rounded font-body-md text-white/70 hover:text-white hover:bg-white/10 transition-all" href="#">流程平台</a>
+<a class="px-3 py-1.5 rounded font-body-md text-[#1D6EF2] bg-[#1D6EF2]/10 transition-all" href="#">组织权限</a>
+<a class="px-3 py-1.5 rounded font-body-md text-white/70 hover:text-white hover:bg-white/10 transition-all" href="#">基础资料</a>
+<a class="px-3 py-1.5 rounded font-body-md text-white/70 hover:text-white hover:bg-white/10 transition-all" href="#">集成配置</a>
+<a class="px-3 py-1.5 rounded font-body-md text-white/70 hover:text-white hover:bg-white/10 transition-all" href="#">消息与通知</a>
+<a class="px-3 py-1.5 rounded font-body-md text-white/70 hover:text-white hover:bg-white/10 transition-all" href="#">系统参数</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+
+<button class="flex items-center gap-1.5 text-white/70 hover:text-white transition-colors font-body-sm">
+<span class="material-symbols-outlined text-[18px]">arrow_back</span>
+    返回业务工作台
+</button>
+<div class="flex items-center gap-2 text-white/70 font-body-sm ml-2 pl-2 border-l border-white/20">
+<div class="w-8 h-8 rounded-full bg-surface-container overflow-hidden border border-outline-variant/30">
+<img class="w-full h-full object-cover" data-alt="A professional close-up studio portrait of a high-level system architect with a neutral expression. The lighting is sophisticated and directional, highlighting the contours of the face against a clean, minimal tech-focused office background. The overall aesthetic is polished, modern, and trustworthy, fitting a premium OS environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDJyaWsjSi4VDwF6O1Su036UOMxija3awV3lWawQS5oJmB0hcTELPu_0jUIpuQTCV_cLt9XVFKbB5H8zyqu5dAXxa2w5QIHKwpJeLJ1k-OtpyCNpeyxw8KsF1DcDRaK_ZcbZgvN7SoIskCKhMEfUlNuhr9JEU-pvCRqbcI4clUI5fL4QkJlOuKIoECUhxaMvKEcHcp3BTNMpkoTaqyM5_vCNCJ8W8cpCfVS-TmZL1x_pKn75UwYzdVVeJfpLu8z6n4K3sjH5QuzgDOG"/>
+</div>
+<span>运营管理员</span>
+</div>
+</div>
+</header>
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-[56px] w-[240px] h-[calc(100vh-56px)] flex flex-col py-4 bg-white border-r border-border-subtle">
+<div class="mb-4 px-6">
+<span class="text-on-surface-variant font-section-header text-section-header">组织权限</span>
+</div>
+<nav class="flex-1 flex flex-col gap-1 px-3">
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined text-[20px]">person</span>
+<span class="font-body-md text-body-md">用户管理</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined text-[20px]">manage_accounts</span>
+<span class="font-body-md text-body-md">角色权限</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined text-[20px]">menu_open</span>
+<span class="font-body-md text-body-md">菜单权限</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined text-[20px]">corporate_fare</span>
+<span class="font-body-md text-body-md">部门组织</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined text-[20px]">badge</span>
+<span class="font-body-md text-body-md">岗位管理</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined text-[20px]">security</span>
+<span class="font-body-md text-body-md">数据权限</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container-low rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined text-[20px]">swap_horiz</span>
+<span class="font-body-md text-body-md">工作交接</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-primary font-bold bg-primary/10 rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined text-[20px]">group_work</span>
+<span class="font-body-md text-body-md">租户管理</span>
+</a>
+</nav>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-[240px] mt-[56px] h-[calc(100vh-56px-64px)] overflow-y-auto bg-[#F5F8FC] flex flex-col relative">
+<!-- Immersive Header Section -->
+<section class="px-8 pt-6 pb-6 bg-white border-b border-border-subtle shrink-0">
+<div class="flex items-center gap-2 text-text-secondary font-body-sm mb-4">
+<span>系统设置中心</span>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+<span>组织权限</span>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+<span class="text-text-primary font-bold">租户契约</span>
+</div>
+<div class="flex justify-between items-end">
+<div>
+<h2 class="font-page-title text-page-title text-text-primary mb-1">租户契约 · 全宽沉浸版</h2>
+<p class="font-body-md text-text-secondary">管理多租户服务契约、配额水位与 API 路由健康。</p>
+</div>
+<div class="flex gap-3">
+<div class="px-3 py-1.5 bg-surface-container-low border border-border-subtle rounded flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-status-cyan animate-pulse"></span>
+<span class="font-code-meta text-code-meta text-primary">Active Contracts: 124</span>
+</div>
+<div class="px-3 py-1.5 bg-surface-container-low border border-border-subtle rounded flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-status-purple"></span>
+<span class="font-code-meta text-code-meta text-status-purple">Pending Review: 8</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Contract Topology Map (Central Visual) -->
+<section class="flex-1 min-h-[400px] relative overflow-hidden topology-grid">
+<!-- Topology SVG Overlay (Conceptual Lines) -->
+<div class="absolute inset-0 pointer-events-none opacity-40">
+<svg height="100%" preserveaspectratio="none" viewbox="0 0 1000 400" width="100%">
+<path d="M150,200 Q400,50 650,150" fill="none" stroke="#00A8D8" stroke-dasharray="4,4" stroke-width="1"></path>
+<path d="M150,200 Q400,350 650,250" fill="none" stroke="#7C3AED" stroke-dasharray="4,4" stroke-width="1"></path>
+<path d="M150,200 L650,200" fill="none" stroke="#D7E2F0" stroke-width="1"></path>
+</svg>
+</div>
+<div class="absolute inset-0 flex items-center justify-around px-20">
+<!-- Gateway Node -->
+<div class="relative group cursor-pointer">
+<div class="w-32 h-32 rounded-xl bg-white border-2 border-primary shadow-xl flex flex-col items-center justify-center p-4 transition-transform hover:scale-105 z-10 relative">
+<span class="material-symbols-outlined text-[40px] text-primary mb-2">dns</span>
+<span class="font-section-header text-section-header">API Gateway</span>
+<span class="font-code-meta text-[10px] text-text-secondary">Global Node 0</span>
+</div>
+<div class="absolute -inset-4 bg-primary/5 rounded-full node-pulse"></div>
+</div>
+<!-- Contract Connectors & Data Points -->
+<div class="flex flex-col gap-12">
+<!-- Service 1 -->
+<div class="flex items-center gap-6 translate-x-12">
+<div class="h-px w-24 bg-gradient-to-r from-primary to-status-cyan"></div>
+<div class="p-4 bg-white border border-status-cyan rounded-lg shadow-sm w-56 hover:border-status-cyan transition-all">
+<div class="flex justify-between items-start mb-2">
+<span class="font-section-header text-body-sm text-status-cyan">FinancialCore-AS</span>
+<span class="material-symbols-outlined text-status-cyan text-[16px]">verified</span>
+</div>
+<div class="space-y-2">
+<div class="w-full bg-surface-container rounded-full h-1">
+<div class="bg-status-cyan h-1 rounded-full" style="width: 72%"></div>
+</div>
+<div class="flex justify-between font-code-meta text-[9px] text-on-surface-variant">
+<span>Quota Usage: 72%</span>
+<span>Latency: 45ms</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Service 2 -->
+<div class="flex items-center gap-6">
+<div class="h-px w-32 bg-gradient-to-r from-primary to-status-purple"></div>
+<div class="p-4 bg-white border border-status-purple rounded-lg shadow-sm w-56 hover:border-status-purple transition-all">
+<div class="flex justify-between items-start mb-2">
+<span class="font-section-header text-body-sm text-status-purple">LogisticsSync_v2</span>
+<span class="material-symbols-outlined text-status-purple text-[16px]">pending</span>
+</div>
+<div class="space-y-2">
+<div class="w-full bg-surface-container rounded-full h-1">
+<div class="bg-status-purple h-1 rounded-full" style="width: 34%"></div>
+</div>
+<div class="flex justify-between font-code-meta text-[9px] text-on-surface-variant">
+<span>Quota Usage: 34%</span>
+<span>Latency: 112ms</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- End Node Group -->
+<div class="flex flex-col gap-4">
+<div class="w-16 h-16 rounded-lg bg-surface-container-high border border-border-subtle flex items-center justify-center opacity-60 bg-white">
+<span class="material-symbols-outlined text-outline">storage</span>
+</div>
+<div class="w-16 h-16 rounded-lg bg-surface-container-high border border-border-subtle flex items-center justify-center opacity-60 bg-white">
+<span class="material-symbols-outlined text-outline">cloud_queue</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Data Table Section -->
+<section class="px-8 pt-8 pb-12 bg-white">
+<div class="flex justify-between items-center mb-6">
+<h3 class="font-section-header text-section-header">契约注册表</h3>
+<div class="flex items-center gap-2 border border-border-subtle rounded px-3 py-1">
+<span class="material-symbols-outlined text-[18px] text-outline">search</span>
+<input class="border-none focus:ring-0 bg-transparent font-body-sm text-body-sm w-48" placeholder="搜索租户..." type="text"/>
+</div>
+</div>
+<div class="w-full overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b border-border-subtle">
+<th class="pb-3 font-status-label text-status-label text-text-secondary tracking-wider">租户身份</th>
+<th class="pb-3 font-status-label text-status-label text-text-secondary tracking-wider">契约类型</th>
+<th class="pb-3 font-status-label text-status-label text-text-secondary tracking-wider">配额健康度</th>
+<th class="pb-3 font-status-label text-status-label text-text-secondary tracking-wider">验证状态</th>
+<th class="pb-3 font-status-label text-status-label text-text-secondary tracking-wider text-right">操作</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-border-subtle/50">
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-status-cyan/10 flex items-center justify-center text-status-cyan font-bold">A</div>
+<div>
+<div class="font-body-md text-body-md text-text-primary">Apex Dynamics</div>
+<div class="font-code-meta text-[10px] text-text-secondary">UUID: 88-AF-32-11</div>
+</div>
+</div>
+</td>
+<td class="py-4">
+<span class="font-body-sm text-body-sm px-2 py-0.5 bg-surface-container rounded border border-border-subtle">SLA-Tier-1</span>
+</td>
+<td class="py-4 w-64">
+<div class="flex items-center gap-3">
+<div class="flex-1 h-2 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-status-green" style="width: 45%"></div>
+</div>
+<span class="font-code-meta text-code-meta text-text-primary">45%</span>
+</div>
+</td>
+<td class="py-4">
+<div class="flex items-center gap-1.5 text-status-green">
+<span class="material-symbols-outlined text-[16px]">check_circle</span>
+<span class="font-status-label text-status-label uppercase">已验证</span>
+</div>
+</td>
+<td class="py-4 text-right">
+<button class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">more_vert</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-status-purple/10 flex items-center justify-center text-status-purple font-bold">L</div>
+<div>
+<div class="font-body-md text-body-md text-text-primary">Logistics Inc.</div>
+<div class="font-code-meta text-[10px] text-text-secondary">UUID: 44-CC-12-89</div>
+</div>
+</div>
+</td>
+<td class="py-4">
+<span class="font-body-sm text-body-sm px-2 py-0.5 bg-surface-container rounded border border-border-subtle">Enterprise-B</span>
+</td>
+<td class="py-4 w-64">
+<div class="flex items-center gap-3">
+<div class="flex-1 h-2 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-status-purple" style="width: 88%"></div>
+</div>
+<span class="font-code-meta text-code-meta text-text-primary">88%</span>
+</div>
+</td>
+<td class="py-4">
+<div class="flex items-center gap-1.5 text-status-purple">
+<span class="material-symbols-outlined text-[16px]">hourglass_empty</span>
+<span class="font-status-label text-status-label uppercase">审核中</span>
+</div>
+</td>
+<td class="py-4 text-right">
+<button class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">more_vert</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-status-red/10 flex items-center justify-center text-status-red font-bold">V</div>
+<div>
+<div class="font-body-md text-body-md text-text-primary">Vertex Solutions</div>
+<div class="font-code-meta text-[10px] text-text-secondary">UUID: 12-BB-99-00</div>
+</div>
+</div>
+</td>
+<td class="py-4">
+<span class="font-body-sm text-body-sm px-2 py-0.5 bg-surface-container rounded border border-border-subtle">Dev-Sandbox</span>
+</td>
+<td class="py-4 w-64">
+<div class="flex items-center gap-3">
+<div class="flex-1 h-2 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-status-red" style="width: 95%"></div>
+</div>
+<span class="font-code-meta text-code-meta text-text-primary">95%</span>
+</div>
+</td>
+<td class="py-4">
+<div class="flex items-center gap-1.5 text-status-red">
+<span class="material-symbols-outlined text-[16px]">block</span>
+<span class="font-status-label text-status-label uppercase">已拦截</span>
+</div>
+</td>
+<td class="py-4 text-right">
+<button class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">more_vert</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</main>
+<!-- BottomNavBar (Release Pipeline) -->
+<nav class="fixed bottom-0 left-[240px] right-0 z-40 flex justify-center items-center gap-12 px-8 py-3 bg-surface-container-high/95 backdrop-blur-md border-t border-border-subtle h-16">
+<div class="flex items-center gap-3 text-outline transition-transform hover:scale-105 cursor-pointer">
+<span class="material-symbols-outlined text-[20px]">edit_note</span>
+<span class="font-status-label text-status-label uppercase tracking-wider">草稿</span>
+</div>
+<div class="w-12 h-px bg-border-subtle"></div>
+<div class="flex items-center gap-3 text-outline transition-transform hover:scale-105 cursor-pointer">
+<span class="material-symbols-outlined text-[20px]">analytics</span>
+<span class="font-status-label text-status-label uppercase tracking-wider">影响分析</span>
+</div>
+<div class="w-12 h-px bg-border-subtle"></div>
+<div class="flex items-center gap-3 text-primary font-bold transition-transform hover:scale-105 cursor-pointer">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">rule</span>
+<span class="font-status-label text-status-label uppercase tracking-wider">技术审查</span>
+</div>
+<div class="absolute right-8 flex gap-2">
+<button class="px-4 py-2 bg-white border border-border-subtle text-on-surface rounded font-body-sm hover:bg-surface-container transition-colors">回滚</button>
+<button class="px-6 py-2 bg-primary text-white rounded shadow-lg font-body-sm flex items-center gap-2 hover:bg-primary/90 transition-colors">
+                部署契约
+                <span class="material-symbols-outlined text-[18px]">rocket_launch</span>
+</button>
+</div>
+</nav>
+<!-- Contextual Inspector (Hidden but implied by layout rules) -->
+<!-- We focus on central immersive view as requested -->
+<script>
+        // Micro-interaction: Update progress bar on hover
+        document.querySelectorAll('tr').forEach(row => {
+            row.addEventListener('mouseenter', () => {
+                const bar = row.querySelector('.h-full');
+                if(bar) bar.style.filter = 'brightness(1.1)';
+            });
+            row.addEventListener('mouseleave', () => {
+                const bar = row.querySelector('.h-full');
+                if(bar) bar.style.filter = 'none';
+            });
+        });
+
+        // Toggle Active State logic for bottom nav
+        const bottomNavItems = document.querySelectorAll('nav.fixed.bottom-0 > div[class*="flex"]');
+        bottomNavItems.forEach(item => {
+            item.addEventListener('click', () => {
+                bottomNavItems.forEach(i => i.classList.remove('text-primary', 'font-bold'));
+                bottomNavItems.forEach(i => i.classList.add('text-outline'));
+                item.classList.remove('text-outline');
+                item.classList.add('text-primary', 'font-bold');
+            });
+        });
+    </script>
+</body></html>

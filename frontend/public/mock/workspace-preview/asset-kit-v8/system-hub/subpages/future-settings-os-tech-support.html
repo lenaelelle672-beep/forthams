@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Future Settings OS - Technical Support &amp; Diagnostics</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "primary-fixed": "#d9e2ff",
+                      "on-primary-fixed-variant": "#00419c",
+                      "inverse-surface": "#d4e4fa",
+                      "on-primary-fixed": "#001945",
+                      "surface-container-lowest": "#010f1f",
+                      "surface-bright": "#2c3a4c",
+                      "tertiary-fixed-dim": "#ddb7ff",
+                      "tertiary-fixed": "#f0dbff",
+                      "outline-variant": "#424654",
+                      "on-secondary-container": "#00384a",
+                      "background": "#051424",
+                      "tertiary": "#ddb7ff",
+                      "on-tertiary-fixed-variant": "#6900b3",
+                      "error": "#ffb4ab",
+                      "surface-container-highest": "#273647",
+                      "on-secondary-fixed-variant": "#004d65",
+                      "surface-container": "#122131",
+                      "on-primary": "#002c6f",
+                      "inverse-primary": "#0057cc",
+                      "on-surface-variant": "#c2c6d7",
+                      "on-secondary-fixed": "#001f2a",
+                      "surface-variant": "#273647",
+                      "surface": "#051424",
+                      "on-error-container": "#ffdad6",
+                      "secondary": "#6bd2ff",
+                      "on-tertiary": "#490080",
+                      "tertiary-container": "#9c49eb",
+                      "secondary-fixed": "#bfe9ff",
+                      "primary": "#b0c6ff",
+                      "on-background": "#d4e4fa",
+                      "on-primary-container": "#fffdff",
+                      "surface-dim": "#051424",
+                      "secondary-container": "#00a8d8",
+                      "on-secondary": "#003547",
+                      "on-tertiary-fixed": "#2c0051",
+                      "on-error": "#690005",
+                      "primary-fixed-dim": "#b0c6ff",
+                      "surface-container-high": "#1c2b3c",
+                      "on-surface": "#d4e4fa",
+                      "surface-tint": "#b0c6ff",
+                      "secondary-fixed-dim": "#6bd2ff",
+                      "error-container": "#93000a",
+                      "outline": "#8c90a0",
+                      "on-tertiary-container": "#fffdff",
+                      "surface-container-low": "#0d1c2d",
+                      "inverse-on-surface": "#233143",
+                      "primary-container": "#1d6ef2",
+                      "success": "#16A34A",
+                      "warning": "#F59E0B",
+                      "danger": "#DC2626"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "md": "16px",
+                      "xxl": "64px",
+                      "margin-desktop": "48px",
+                      "gutter": "24px",
+                      "xl": "40px",
+                      "unit": "4px",
+                      "sm": "8px",
+                      "xs": "4px",
+                      "lg": "24px",
+                      "margin-mobile": "16px",
+                      "topbar-height": "56px",
+                      "sidebar-width": "280px",
+                      "inspector-width": "400px"
+              },
+              "fontFamily": {
+                      "body-lg": [
+                              "Geist"
+                      ],
+                      "mono-code": [
+                              "JetBrains Mono"
+                      ],
+                      "title-md": [
+                              "Geist"
+                      ],
+                      "body-md": [
+                              "Geist"
+                      ],
+                      "label-md": [
+                              "Geist"
+                      ],
+                      "headline-lg-mobile": [
+                              "Geist"
+                      ],
+                      "headline-lg": [
+                              "Geist"
+                      ],
+                      "display-lg": [
+                              "Geist"
+                      ]
+              },
+              "fontSize": {
+                      "body-lg": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "mono-code": [
+                              "13px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "title-md": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-md": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "headline-lg-mobile": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "display-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "56px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+        body {
+            background-color: theme('colors.surface-container-lowest');
+            color: theme('colors.on-surface');
+            font-family: 'Geist', sans-serif;
+            overflow: hidden;
+        }
+        /* Custom scrollbar for terminal/lists */
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: theme('colors.outline-variant');
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: theme('colors.outline');
+        }
+
+        .glass-panel {
+            background: theme('colors.surface-container-high' / 95%);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-left: 1px solid theme('colors.outline-variant');
+        }
+
+        .pulse-dot {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .5; }
+        }
+
+        .terminal-bg {
+            background: theme('colors.surface-container-low');
+            border-top: 1px solid theme('colors.outline-variant');
+            border-bottom: 1px solid theme('colors.outline-variant');
+        }
+    </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col">
+<!-- TopNavBar -->
+<header class="fixed top-0 left-0 w-full z-50 flex items-center justify-between px-gutter h-[56px] bg-[#051424] border-b border-[#1D6EF2]">
+<div class="flex items-center gap-gutter">
+<div class="flex items-center">
+<a class="font-title-md text-title-md tracking-tight flex items-center gap-3" href="#">
+<span class="material-symbols-outlined text-primary-container" style="font-variation-settings: 'FILL' 1;">apps</span>
+<span class="text-on-surface font-semibold text-lg flex items-center gap-2">UNIVIEW <span class="text-outline-variant font-normal">|</span> 系统设置中心</span></a>
+</div>
+<nav class="hidden md:flex items-center gap-sm ml-8">
+<a class="px-md py-sm rounded-DEFAULT text-outline-variant hover:text-primary-fixed transition-colors font-body-md text-body-md" href="#">流程平台</a>
+<a class="px-md py-sm rounded-DEFAULT text-outline-variant hover:text-primary-fixed transition-colors font-body-md text-body-md" href="#">组织权限</a>
+<a class="px-md py-sm rounded-DEFAULT text-outline-variant hover:text-primary-fixed transition-colors font-body-md text-body-md" href="#">基础资料</a>
+<a class="px-md py-sm rounded-DEFAULT text-outline-variant hover:text-primary-fixed transition-colors font-body-md text-body-md" href="#">集成配置</a>
+<a class="px-md py-sm rounded-DEFAULT text-outline-variant hover:text-primary-fixed transition-colors font-body-md text-body-md" href="#">消息与通知</a>
+<a class="px-md py-sm rounded-DEFAULT text-primary-fixed-dim border-b-2 border-primary-fixed-dim pb-1 font-body-md text-body-md" href="#">系统参数</a>
+</nav>
+</div>
+<div class="flex items-center gap-md">
+
+<a class="text-outline-variant hover:text-primary-fixed text-body-sm" href="#">返回业务工作台</a>
+<div class="flex items-center gap-2 ml-4">
+<span class="text-on-surface text-body-sm">运营管理员</span>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant">
+<img alt="User Profile Avatar" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuABl6qkwxUvC-ZNqbZnB_drVnqRSJB94FPhIrd8wI72MjIN64N3Lnkgodn2mOUk9RGXpCzk9Ww19scoSjtbf8GKuVdl-LSxEpolRa_9yYj9mXSLP4kez560TEZ26r7WiwJ8wWUv1NbYCTB-dM7aOxsF36q7ua6vmgZ5BL8aeotc3YVIRCSNOgzX893jNu_e3ef8wnF7w5HBdh1G0cinbIu5cFo8wU5gXruTFHkn10N_00CVgBSg2KnOGg699wxGN96-GgikOsr2NKJs"/>
+</div>
+</div>
+</div>
+</header>
+<div class="flex flex-1 pt-topbar-height h-screen w-full">
+<!-- SideNavBar -->
+<nav class="fixed left-0 top-[56px] w-[240px] h-[calc(100vh-56px)] flex flex-col p-4 bg-surface-dim border-r border-outline-variant z-40">
+<div class="flex flex-col gap-1 flex-1 font-body-sm text-body-sm">
+<a class="px-sm py-2 rounded-lg text-outline hover:text-on-surface hover:bg-surface-container-highest transition-all duration-150 flex items-center gap-md" href="#"><span class="material-symbols-outlined">tune</span> 基础参数</a>
+<a class="px-sm py-2 rounded-lg text-outline hover:text-on-surface hover:bg-surface-container-highest transition-all duration-150 flex items-center gap-md" href="#"><span class="material-symbols-outlined">shield</span> 安全策略</a>
+<a class="px-sm py-2 rounded-lg text-outline hover:text-on-surface hover:bg-surface-container-highest transition-all duration-150 flex items-center gap-md" href="#"><span class="material-symbols-outlined">folder</span> 文件存储配置</a>
+<a class="px-sm py-2 rounded-lg text-outline hover:text-on-surface hover:bg-surface-container-highest transition-all duration-150 flex items-center gap-md" href="#"><span class="material-symbols-outlined">import_export</span> 导入导出配置</a>
+<a class="px-sm py-2 rounded-lg text-outline hover:text-on-surface hover:bg-surface-container-highest transition-all duration-150 flex items-center gap-md" href="#"><span class="material-symbols-outlined">memory</span> 缓存管理</a>
+<a class="px-sm py-2 rounded-lg text-outline hover:text-on-surface hover:bg-surface-container-highest transition-all duration-150 flex items-center gap-md" href="#"><span class="material-symbols-outlined">fact_check</span> 操作审计</a>
+<a class="px-sm py-2 rounded-lg text-outline hover:text-on-surface hover:bg-surface-container-highest transition-all duration-150 flex items-center gap-md" href="#"><span class="material-symbols-outlined">description</span> 文档中心</a>
+<a class="px-sm py-2 rounded-lg text-primary font-bold bg-on-secondary-fixed-variant/30 transition-all duration-150 flex items-center gap-md" href="#"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">support_agent</span> 技术支持</a>
+</div>
+</nav>
+<!-- Central Configuration Workspace (Main Content) -->
+<main class="ml-[240px] mr-inspector-width flex-1 h-full overflow-y-auto flex flex-col relative bg-surface-container-lowest">
+<!-- Quick Action Bar -->
+<div class="w-full py-3 flex flex-col px-gutter border-b border-outline-variant bg-surface-dim sticky top-0 z-10 gap-3">
+<div class="flex items-center text-label-md font-label-md text-outline-variant gap-2 mt-1">
+<span>系统设置中心</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span>系统参数</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="text-on-surface">技术支持与实时诊断</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="font-title-md text-title-md text-on-surface">技术支持</div>
+<div class="flex items-center gap-sm">
+<button class="px-md py-1 border border-outline-variant text-on-surface-variant font-label-md text-label-md uppercase tracking-wider rounded-DEFAULT hover:border-primary-container hover:text-primary-container transition-colors flex items-center gap-2 bg-surface-container-low">
+<span class="material-symbols-outlined" style="font-size: 16px;">download</span> Export Package
+                        </button>
+<button class="px-md py-1 border border-outline-variant text-on-surface-variant font-label-md text-label-md uppercase tracking-wider rounded-DEFAULT hover:border-primary-container hover:text-primary-container transition-colors flex items-center gap-2 bg-surface-container-low">
+<span class="material-symbols-outlined" style="font-size: 16px;">electrical_services</span> Test Webhook
+                        </button>
+<button class="px-md py-1 bg-primary-container text-on-primary-container font-label-md text-label-md uppercase tracking-wider rounded-DEFAULT hover:bg-inverse-primary transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined" style="font-size: 16px;">refresh</span> Refresh Status
+                        </button>
+</div>
+</div>
+</div>
+<!-- Content Area -->
+<div class="p-gutter flex flex-col gap-xxl pb-xxl">
+<!-- System Health Checklist -->
+<section>
+<h2 class="font-title-md text-title-md text-on-surface-variant mb-md uppercase tracking-wider text-[11px]">System Health Checklist</h2>
+<div class="w-full flex flex-col border border-outline-variant rounded-lg bg-surface-container-low overflow-hidden">
+<div class="flex items-center justify-between p-sm px-md border-b border-outline-variant hover:bg-surface-container-high transition-colors group">
+<div class="flex items-center gap-md">
+<span class="w-2 h-2 rounded-full bg-success"></span>
+<span class="font-mono-code text-mono-code text-on-surface">API Gateway Latency</span>
+</div>
+<div class="flex items-center gap-md">
+<span class="font-mono-code text-mono-code text-outline">42ms</span>
+<span class="material-symbols-outlined text-outline group-hover:text-primary-container cursor-pointer" style="font-size: 18px;">chevron_right</span>
+</div>
+</div>
+<div class="flex items-center justify-between p-sm px-md border-b border-outline-variant hover:bg-surface-container-high transition-colors group bg-surface-container-highest/20">
+<div class="flex items-center gap-md">
+<span class="w-2 h-2 rounded-full bg-warning pulse-dot"></span>
+<span class="font-mono-code text-mono-code text-warning">Database Connection Pool</span>
+</div>
+<div class="flex items-center gap-md">
+<span class="font-mono-code text-mono-code text-warning">85% Utilization</span>
+<span class="material-symbols-outlined text-outline group-hover:text-primary-container cursor-pointer" style="font-size: 18px;">chevron_right</span>
+</div>
+</div>
+<div class="flex items-center justify-between p-sm px-md border-b border-outline-variant hover:bg-surface-container-high transition-colors group">
+<div class="flex items-center gap-md">
+<span class="w-2 h-2 rounded-full bg-success"></span>
+<span class="font-mono-code text-mono-code text-on-surface">Authentication Service</span>
+</div>
+<div class="flex items-center gap-md">
+<span class="font-mono-code text-mono-code text-outline">Nominal</span>
+<span class="material-symbols-outlined text-outline group-hover:text-primary-container cursor-pointer" style="font-size: 18px;">chevron_right</span>
+</div>
+</div>
+<div class="flex items-center justify-between p-sm px-md border-b border-outline-variant hover:bg-surface-container-high transition-colors group bg-surface-container-highest/20">
+<div class="flex items-center gap-md">
+<span class="w-2 h-2 rounded-full bg-danger pulse-dot shadow-[0_0_8px_theme('colors.danger')]"></span>
+<span class="font-mono-code text-mono-code text-danger">Webhook Delivery Queue</span>
+</div>
+<div class="flex items-center gap-md">
+<span class="font-mono-code text-mono-code text-danger">Backed up (1.2k)</span>
+<span class="material-symbols-outlined text-primary-container cursor-pointer" style="font-size: 18px;">chevron_right</span>
+</div>
+</div>
+<div class="flex items-center justify-between p-sm px-md hover:bg-surface-container-high transition-colors group">
+<div class="flex items-center gap-md">
+<span class="w-2 h-2 rounded-full bg-success"></span>
+<span class="font-mono-code text-mono-code text-on-surface">Storage Volume I/O</span>
+</div>
+<div class="flex items-center gap-md">
+<span class="font-mono-code text-mono-code text-outline">320 IOPS</span>
+<span class="material-symbols-outlined text-outline group-hover:text-primary-container cursor-pointer" style="font-size: 18px;">chevron_right</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Real-time Terminal Log View -->
+<section class="flex flex-col h-[400px]">
+<div class="flex items-center justify-between mb-sm">
+<h2 class="font-title-md text-title-md text-on-surface-variant uppercase tracking-wider text-[11px]">Runtime Diagnostics Console</h2>
+<div class="flex gap-2">
+<span class="px-2 py-0.5 rounded bg-surface-container-highest text-outline font-mono-code text-[10px] border border-outline-variant">AUTO-SCROLL ON</span>
+<span class="px-2 py-0.5 rounded bg-surface-container-highest text-outline font-mono-code text-[10px] border border-outline-variant flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-success"></span> LIVE</span>
+</div>
+</div>
+<div class="terminal-bg flex-1 p-md overflow-y-auto font-mono-code text-mono-code text-on-surface-variant relative shadow-inner">
+<div class="opacity-50 absolute inset-0 pointer-events-none" style="background-image: radial-gradient(circle at center, transparent 0%, theme('colors.surface-container-lowest') 100%);"></div>
+<div class="relative z-10 flex flex-col gap-1">
+<div><span class="text-outline">[14:32:01.042]</span> <span class="text-secondary">INFO</span>  [metricsd] Memory utilization at 42.1% (node-alpha)</div>
+<div><span class="text-outline">[14:32:02.115]</span> <span class="text-secondary">INFO</span>  [auth-svc] Token validation successful for user_id=9921</div>
+<div><span class="text-outline">[14:32:03.551]</span> <span class="text-warning">WARN</span>  [db-pool] Connection wait time exceeded 500ms (742ms)</div>
+<div><span class="text-outline">[14:32:04.992]</span> <span class="text-secondary">INFO</span>  [webhook-tx] Processing batch queue_id=batch_881a</div>
+<div class="text-danger bg-danger/10 p-1 border-l-2 border-danger"><span class="text-outline">[14:32:05.101]</span> <span class="font-bold">ERROR</span> [webhook-tx] Connection refused on target endpoint https://api.client.net/v2/events (timeout=5000ms)</div>
+<div class="text-danger opacity-80 pl-8">-&gt; Stack trace: internal/modules/cjs/loader.js:963:15</div>
+<div class="text-danger opacity-80 pl-8">-&gt; at Module._compile (internal/modules/cjs/loader.js:1063:27)</div>
+<div><span class="text-outline">[14:32:05.105]</span> <span class="text-warning">WARN</span>  [webhook-tx] Queuing payload for retry (attempt 1/5)</div>
+<div><span class="text-outline">[14:32:06.220]</span> <span class="text-secondary">INFO</span>  [metricsd] CPU load average: 1.24, 1.35, 1.15</div>
+<div><span class="text-outline">[14:32:07.442]</span> <span class="text-secondary">INFO</span>  [api-gw] Route /v1/status (GET) 200 OK - 12ms</div>
+<div class="text-primary-fixed-dim animate-pulse mt-2">_</div>
+</div>
+</div>
+</section>
+<!-- Active Support Ticket Table -->
+<section>
+<h2 class="font-title-md text-title-md text-on-surface-variant mb-md uppercase tracking-wider text-[11px]">Active Support Escalations</h2>
+<div class="w-full border border-outline-variant bg-surface-container-low">
+<div class="grid grid-cols-12 gap-4 p-sm px-md border-b border-outline-variant bg-surface-container-highest/50 font-label-md text-label-md text-outline-variant uppercase tracking-wider">
+<div class="col-span-2">Ticket ID</div>
+<div class="col-span-3">Status</div>
+<div class="col-span-2">Priority</div>
+<div class="col-span-3">Last Update</div>
+<div class="col-span-2 text-right">Action</div>
+</div>
+<div class="flex flex-col">
+<div class="grid grid-cols-12 gap-4 items-center p-sm px-md border-b border-outline-variant hover:bg-surface-container-high transition-colors font-body-md text-body-md">
+<div class="col-span-2 font-mono-code text-on-surface">INC-8492</div>
+<div class="col-span-3 flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-warning"></span>
+<span class="text-warning">Investigating</span>
+</div>
+<div class="col-span-2">
+<span class="px-2 py-0.5 rounded border border-warning/50 text-warning bg-warning/10 text-[10px] uppercase font-bold">High</span>
+</div>
+<div class="col-span-3 text-outline">10m ago (System)</div>
+<div class="col-span-2 text-right">
+<button class="text-primary-container hover:text-primary-fixed transition-colors text-sm border-b border-transparent hover:border-primary-fixed pb-0.5">View Trace</button>
+</div>
+</div>
+<div class="grid grid-cols-12 gap-4 items-center p-sm px-md border-b border-outline-variant hover:bg-surface-container-high transition-colors font-body-md text-body-md bg-surface-container-highest/10">
+<div class="col-span-2 font-mono-code text-primary-fixed shadow-[0_0_8px_theme('colors.primary-fixed')_inset] rounded px-1 -ml-1 inline-block w-max bg-primary-fixed/10">INC-8493</div>
+<div class="col-span-3 flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-danger pulse-dot"></span>
+<span class="text-danger font-bold">Critical Outage</span>
+</div>
+<div class="col-span-2">
+<span class="px-2 py-0.5 rounded border border-danger/50 text-danger bg-danger/10 text-[10px] uppercase font-bold">P0 - Blocker</span>
+</div>
+<div class="col-span-3 text-outline">2m ago (SRE-Bot)</div>
+<div class="col-span-2 text-right">
+<button class="px-3 py-1 bg-primary-container/20 text-primary-container border border-primary-container/50 rounded hover:bg-primary-container hover:text-on-primary-container transition-colors text-sm">Escalate</button>
+</div>
+</div>
+<div class="grid grid-cols-12 gap-4 items-center p-sm px-md hover:bg-surface-container-high transition-colors font-body-md text-body-md">
+<div class="col-span-2 font-mono-code text-on-surface">INC-8491</div>
+<div class="col-span-3 flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-success"></span>
+<span class="text-success">Resolved (Monitoring)</span>
+</div>
+<div class="col-span-2">
+<span class="px-2 py-0.5 rounded border border-outline/50 text-outline bg-outline/10 text-[10px] uppercase">Low</span>
+</div>
+<div class="col-span-3 text-outline">4h ago (Jane D.)</div>
+<div class="col-span-2 text-right">
+<button class="text-outline-variant hover:text-on-surface transition-colors text-sm">Archive</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- Right Glassmorphism Inspector -->
+<aside class="fixed right-0 top-topbar-height w-inspector-width h-[calc(100vh-topbar-height)] glass-panel z-40 flex flex-col shadow-[-4px_0_24px_rgba(0,0,0,0.5)]">
+<div class="p-lg border-b border-outline-variant/50">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-title-md text-title-md text-primary-fixed">Diagnostic Details</h3>
+<button class="text-outline-variant hover:text-on-surface">
+<span class="material-symbols-outlined" style="font-size: 20px;">close_fullscreen</span>
+</button>
+</div>
+<div class="font-mono-code text-mono-code text-outline flex items-center gap-2">
+                    Selected Anomaly: <span class="text-danger border-b border-danger/30">Webhook Delivery Queue</span>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto p-lg flex flex-col gap-xl">
+<!-- Root Cause Analysis -->
+<div>
+<h4 class="font-label-md text-label-md text-outline-variant uppercase tracking-wider mb-sm flex items-center gap-2">
+<span class="material-symbols-outlined" style="font-size: 16px;">troubleshoot</span> Root Cause Analysis
+                    </h4>
+<div class="p-md bg-surface-container-lowest/50 border border-outline-variant/50 rounded text-body-sm font-body-sm text-on-surface-variant leading-relaxed">
+                        Automated diagnostics indicate a high probability of network timeout originating from client endpoint <code class="bg-surface-container text-secondary px-1 py-0.5 rounded font-mono-code text-[11px]">api.client.net</code>.
+                        Queue backlog increased by 450% in the last 15 minutes. Internal processing nodes are healthy.
+                    </div>
+</div>
+<!-- Impacted Modules -->
+<div>
+<h4 class="font-label-md text-label-md text-outline-variant uppercase tracking-wider mb-sm flex items-center gap-2">
+<span class="material-symbols-outlined" style="font-size: 16px;">schema</span> Impacted Modules
+                    </h4>
+<div class="flex flex-col gap-2">
+<a class="p-sm bg-surface-container-lowest/30 border border-outline-variant/30 rounded flex justify-between items-center hover:border-primary-container/50 transition-colors group" href="#">
+<span class="font-mono-code text-mono-code text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-outline" style="font-size: 14px;">call_made</span> Webhook Egress Node A
+                            </span>
+<span class="text-danger text-[10px] uppercase font-bold">Stalled</span>
+</a>
+<a class="p-sm bg-surface-container-lowest/30 border border-outline-variant/30 rounded flex justify-between items-center hover:border-primary-container/50 transition-colors group" href="#">
+<span class="font-mono-code text-mono-code text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-outline" style="font-size: 14px;">database</span> Event Storage Buffer
+                            </span>
+<span class="text-warning text-[10px] uppercase font-bold">85% Cap</span>
+</a>
+</div>
+</div>
+<!-- Suggested Remediation -->
+<div>
+<h4 class="font-label-md text-label-md text-outline-variant uppercase tracking-wider mb-sm flex items-center gap-2">
+<span class="material-symbols-outlined" style="font-size: 16px;">build_circle</span> Suggested Remediation
+                    </h4>
+<ul class="flex flex-col gap-2 font-body-sm text-body-sm text-on-surface-variant">
+<li class="flex gap-3 items-start">
+<span class="text-primary-container mt-0.5"><span class="material-symbols-outlined" style="font-size: 16px;">check_circle</span></span>
+<span>Temporarily route traffic to fallback endpoint (Config ID: FB-291)</span>
+</li>
+<li class="flex gap-3 items-start">
+<span class="text-primary-container mt-0.5"><span class="material-symbols-outlined" style="font-size: 16px;">check_circle</span></span>
+<span>Increase timeout threshold on egress node to 10000ms.</span>
+</li>
+<li class="flex gap-3 items-start opacity-50">
+<span class="text-outline mt-0.5"><span class="material-symbols-outlined" style="font-size: 16px;">radio_button_unchecked</span></span>
+<span>Flush dead-letter queue (Requires L2 Approval).</span>
+</li>
+</ul>
+</div>
+<!-- Spacer -->
+<div class="flex-1"></div>
+<!-- Escalation Path -->
+<div class="border-t border-outline-variant/50 pt-lg">
+<h4 class="font-label-md text-label-md text-outline-variant uppercase tracking-wider mb-sm">Escalation Path</h4>
+<div class="flex gap-2">
+<button class="flex-1 py-2 bg-surface-container-highest border border-outline-variant rounded hover:border-primary-container hover:text-primary-container transition-colors font-body-sm text-body-sm text-on-surface flex items-center justify-center gap-2">
+<span class="material-symbols-outlined" style="font-size: 16px;">chat</span> Notify SRE
+                        </button>
+<button class="flex-1 py-2 bg-danger/20 border border-danger text-danger rounded hover:bg-danger hover:text-inverse-surface transition-colors font-body-sm text-body-sm font-bold flex items-center justify-center gap-2 shadow-[0_0_12px_theme('colors.danger')_inset]">
+<span class="material-symbols-outlined" style="font-size: 16px;">warning</span> PagerDuty
+                        </button>
+</div>
+</div>
+</div>
+</aside>
+</div>
+</body></html>

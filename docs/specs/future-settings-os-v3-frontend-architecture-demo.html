@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>V3 后端系统页面前端架构选型演示</title>
+  <style>
+    :root {
+      --bg: #f5f9ff;
+      --panel: rgba(255, 255, 255, 0.82);
+      --text: #102033;
+      --muted: #66778f;
+      --line: rgba(80, 124, 180, 0.18);
+      --blue: #246bfe;
+      --cyan: #22c7e8;
+      --amber: #f59e0b;
+      --red: #ef4444;
+      --shadow: 0 24px 70px rgba(35, 82, 130, 0.16);
+      --radius: 24px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      background:
+        radial-gradient(circle at 12% 4%, rgba(36, 107, 254, 0.18), transparent 34%),
+        radial-gradient(circle at 84% 12%, rgba(34, 199, 232, 0.18), transparent 32%),
+        linear-gradient(135deg, #f7fbff 0%, #eff6ff 52%, #f8fbff 100%);
+    }
+    button { font: inherit; }
+    .app { display: grid; grid-template-columns: 268px minmax(0, 1fr) 360px; min-height: 100vh; }
+    .sidebar, .inspector {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow: auto;
+      padding: 24px;
+      background: rgba(255, 255, 255, 0.62);
+      backdrop-filter: blur(24px);
+      border-color: var(--line);
+    }
+    .sidebar { border-right: 1px solid var(--line); }
+    .inspector { border-left: 1px solid var(--line); }
+    .brand { display: flex; gap: 12px; align-items: center; margin-bottom: 24px; }
+    .logo {
+      width: 44px; height: 44px; border-radius: 16px;
+      background: linear-gradient(135deg, var(--blue), var(--cyan));
+      color: #fff; display: grid; place-items: center; font-weight: 900;
+      box-shadow: 0 12px 30px rgba(36, 107, 254, 0.28);
+    }
+    .brand h1 { margin: 0; font-size: 18px; line-height: 1.2; }
+    .brand p { margin: 4px 0 0; color: var(--muted); font-size: 12px; }
+    .nav-title { color: var(--muted); font-size: 12px; margin: 22px 0 10px; letter-spacing: .08em; }
+    .nav-btn {
+      width: 100%; text-align: left; border: 0; cursor: pointer;
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 14px; margin: 7px 0; border-radius: 16px;
+      background: transparent; color: #304159;
+    }
+    .nav-btn.active, .nav-btn:hover { background: linear-gradient(135deg, rgba(36, 107, 254, 0.12), rgba(34, 199, 232, 0.1)); color: var(--blue); }
+    .dot { width: 9px; height: 9px; border-radius: 999px; background: currentColor; box-shadow: 0 0 0 4px rgba(36, 107, 254, .08); }
+    .main { padding: 30px; overflow: hidden; }
+    .hero {
+      padding: 30px;
+      border: 1px solid var(--line);
+      background: linear-gradient(135deg, rgba(255,255,255,.94), rgba(238,246,255,.76));
+      border-radius: 32px;
+      box-shadow: var(--shadow);
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(280px, .8fr);
+      gap: 24px;
+    }
+    .kicker { color: var(--blue); font-weight: 800; letter-spacing: .08em; font-size: 13px; }
+    h2 { font-size: 32px; margin: 10px 0 12px; line-height: 1.18; }
+    .hero p { color: var(--muted); line-height: 1.8; margin: 0; }
+    .verdict {
+      border-radius: 24px;
+      background: linear-gradient(150deg, #12356b, #236dff 60%, #22c7e8);
+      color: #fff;
+      padding: 22px;
+      position: relative;
+      overflow: hidden;
+    }
+    .verdict::after { content: ""; position: absolute; inset: auto -30px -55px auto; width: 160px; height: 160px; border-radius: 999px; background: rgba(255,255,255,.16); }
+    .score-big { font-size: 48px; font-weight: 900; margin: 8px 0; }
+    .badge-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+    .badge { padding: 7px 10px; border-radius: 999px; background: rgba(255,255,255,.16); font-size: 12px; }
+    .pill { display: inline-flex; align-items: center; border-radius: 999px; padding: 5px 9px; font-size: 12px; background: #edf5ff; color: var(--blue); }
+    .section { margin-top: 24px; }
+    .section-head { display: flex; align-items: end; justify-content: space-between; gap: 16px; margin-bottom: 14px; }
+    .section h3 { margin: 0; font-size: 22px; }
+    .section small { color: var(--muted); }
+    .cards, .ia-grid, .risk-grid, .pattern-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+    .card, .domain, .risk, .pattern-card, .inspect-box {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      padding: 18px;
+      box-shadow: 0 14px 34px rgba(44, 92, 140, .08);
+    }
+    .card { min-height: 172px; cursor: pointer; transition: .18s ease; }
+    .card:hover, .card.active { transform: translateY(-2px); border-color: rgba(36,107,254,.44); box-shadow: 0 20px 46px rgba(36,107,254,.14); }
+    .card h4, .domain h4, .risk h4, .pattern-card h4 { margin: 0 0 10px; }
+    .card p, .risk p, .pattern-card p { margin: 0; color: var(--muted); line-height: 1.65; font-size: 13px; }
+    .score-line { display: flex; align-items: center; gap: 10px; margin: 12px 0; }
+    .bar { flex: 1; height: 9px; border-radius: 999px; background: #e6eef8; overflow: hidden; }
+    .fill { height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--blue), var(--cyan)); }
+    .matrix { width: 100%; border-collapse: collapse; overflow: hidden; border-radius: 18px; background: #fff; box-shadow: 0 14px 34px rgba(44,92,140,.08); }
+    .matrix th, .matrix td { padding: 12px 14px; border-bottom: 1px solid var(--line); text-align: left; font-size: 13px; }
+    .matrix th { color: #315079; background: rgba(232, 242, 255, .85); font-size: 12px; }
+    .matrix tr:last-child td { border-bottom: 0; }
+    .rank { font-weight: 900; color: var(--blue); }
+    .domain { cursor: pointer; }
+    .domain.active { outline: 2px solid rgba(36,107,254,.28); background: #fff; }
+    .domain h4 { display: flex; justify-content: space-between; gap: 10px; }
+    .domain ul, .pattern-card ul, .inspect-list { margin: 0; padding-left: 18px; color: var(--muted); font-size: 13px; line-height: 1.7; }
+    .timeline { display: grid; grid-template-columns: repeat(6, minmax(120px, 1fr)); gap: 10px; overflow: auto; padding-bottom: 2px; }
+    .phase { border: 1px solid var(--line); border-radius: 18px; background: var(--panel); padding: 14px; min-height: 148px; }
+    .phase strong { color: var(--blue); }
+    .phase p { color: var(--muted); font-size: 12px; line-height: 1.65; }
+    .risk { border-color: rgba(245,158,11,.26); background: rgba(255,250,235,.78); }
+    .risk.high { border-color: rgba(239,68,68,.26); background: rgba(255,241,242,.78); }
+    .pattern-card.primary { border-color: rgba(36,107,254,.34); background: linear-gradient(135deg, rgba(255,255,255,.94), rgba(236,246,255,.78)); }
+    .pattern-tag { float: right; padding: 5px 8px; border-radius: 999px; background: #eef6ff; color: var(--blue); font-size: 11px; font-weight: 800; }
+    .inspector h3 { margin: 10px 0 6px; }
+    .inspector .muted { color: var(--muted); line-height: 1.7; font-size: 13px; }
+    .status { display: inline-flex; gap: 6px; align-items: center; padding: 7px 10px; border-radius: 999px; background: #ecfdf5; color: #047857; font-size: 12px; font-weight: 700; }
+    .footer-note { color: var(--muted); font-size: 12px; line-height: 1.7; margin: 18px 0 0; }
+    @media (max-width: 1180px) {
+      .app { grid-template-columns: 230px minmax(0, 1fr); }
+      .inspector { position: relative; height: auto; grid-column: 1 / -1; border-left: 0; border-top: 1px solid var(--line); }
+      .hero { grid-template-columns: 1fr; }
+      .cards, .ia-grid, .risk-grid, .pattern-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 760px) {
+      .app { display: block; }
+      .sidebar { position: relative; height: auto; }
+      .main { padding: 18px; }
+      .cards, .ia-grid, .risk-grid, .pattern-grid { grid-template-columns: 1fr; }
+      h2 { font-size: 26px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="logo">V3</div>
+        <div>
+          <h1>架构选型控制台</h1>
+          <p>自包含 HTML 演示 · 无外部资源</p>
+        </div>
+      </div>
+      <div class="nav-title">候选架构切换</div>
+      <button class="nav-btn active" data-candidate="v3"><span class="dot"></span>V3 React/Vite OS</button>
+      <button class="nav-btn" data-candidate="tanstack"><span class="dot"></span>TanStack Start</button>
+      <button class="nav-btn" data-candidate="next"><span class="dot"></span>Next.js App Router</button>
+      <button class="nav-btn" data-candidate="micro"><span class="dot"></span>微前端 / 模块联邦</button>
+      <button class="nav-btn" data-candidate="astro"><span class="dot"></span>Astro / Svelte / Qwik</button>
+      <div class="nav-title">六域 IA</div>
+      <button class="nav-btn domain-short active" data-domain="org"><span class="dot"></span>组织权限</button>
+      <button class="nav-btn domain-short" data-domain="base"><span class="dot"></span>基础资料</button>
+      <button class="nav-btn domain-short" data-domain="integration"><span class="dot"></span>集成配置</button>
+      <button class="nav-btn domain-short" data-domain="message"><span class="dot"></span>消息与通知</button>
+      <button class="nav-btn domain-short" data-domain="system"><span class="dot"></span>系统参数</button>
+      <button class="nav-btn domain-short" data-domain="process"><span class="dot"></span>流程平台</button>
+    </aside>
+
+    <main class="main">
+      <section class="hero">
+        <div>
+          <div class="kicker">最终裁决</div>
+          <h2>主推 V3 增强型 React/Vite 后台操作系统架构</h2>
+          <p>保留当前 Vite SPA + React 18 资产，优先补齐资源 registry、权限元数据、敏感字段、审计动作、URL 状态、数据缓存、Inspector 与六域 IA。TanStack Start 作为长期演进方向，Next.js 作为绿地强备选。</p>
+          <div class="badge-row">
+            <span class="pill">44 项 / 6 组 IA</span>
+            <span class="pill">SystemPageHost</span>
+            <span class="pill">Inspector</span>
+            <span class="pill">权限与审计协议</span>
+          </div>
+        </div>
+        <div class="verdict">
+          <div>当前推荐指数</div>
+          <div class="score-big" id="heroScore">88.6</div>
+          <div id="heroTitle">V3 增强型 React/Vite 后台操作系统架构</div>
+          <div class="badge-row">
+            <span class="badge" id="heroStatus">当前主推</span>
+            <span class="badge">先治理平台协议</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <div><h3>候选架构评分矩阵</h3><small>点击卡片可切换右侧 Inspector</small></div>
+          <span class="status">权重总计 100</span>
+        </div>
+        <div class="cards" id="candidateCards"></div>
+      </section>
+
+      <section class="section">
+        <div class="section-head"><h3>排名与裁决</h3><small>评分结合 V3 本地约束和外部研究</small></div>
+        <table class="matrix" aria-label="架构评分矩阵">
+          <thead>
+            <tr><th>排名</th><th>架构</th><th>总分</th><th>当前裁决</th><th>核心原因</th></tr>
+          </thead>
+          <tbody id="matrixBody"></tbody>
+        </table>
+      </section>
+
+      <section class="section">
+        <div class="section-head"><h3>成熟项目 / 模式借鉴地图</h3><small>抽取可迁移的后台架构模式</small></div>
+        <div class="pattern-grid">
+          <article class="pattern-card primary"><h4>Linear <span class="pattern-tag">协作对象</span></h4><p>高密度对象管理、命令中心、低噪音状态反馈和右侧上下文。</p><ul><li>借鉴到权限变更、流程任务、通知偏好和审计详情的 Inspector、Diff、回滚与操作来源解释。</li></ul></article>
+          <article class="pattern-card primary"><h4>Vercel <span class="pattern-tag">平台控制台</span></h4><p>多租户、项目、环境、部署状态、失败重试和平台级可观测叙事清晰。</p><ul><li>借鉴到租户切换、集成连接测试、同步任务、系统参数风险态和失败重试体验。</li></ul></article>
+          <article class="pattern-card"><h4>Camunda <span class="pattern-tag">流程分层</span></h4><p>Console、Web Modeler、Operate、Tasklist 分离，设计、运维和办理角色边界明确。</p><ul><li>流程平台 9 项应拆成流程门户、设计中心、运行监控和任务办理。</li></ul></article>
+          <article class="pattern-card"><h4>Flowable <span class="pattern-tag">多应用解耦</span></h4><p>Task、Admin、Control、Modeler 多应用分工。</p><ul><li>借鉴到流程模型、实例控制、管理员治理和普通办理入口的权限隔离。</li></ul></article>
+          <article class="pattern-card"><h4>ProcessMaker <span class="pattern-tag">低代码资产</span></h4><p>Launchpad、Designer、Screens、Cases 区分入口、流程设计、表单屏幕和业务案例。</p><ul><li>借鉴到表单中心、流程发起门户和 Case/Record 详情页的资产版本治理。</li></ul></article>
+          <article class="pattern-card"><h4>Appian / ServiceNow <span class="pattern-tag">Record 优先</span></h4><p>以业务对象、Record 和数据织网组织复杂后台体验。</p><ul><li>借鉴到对象关系、流程实例、审计视图和高危配置的统一呈现。</li></ul></article>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-head"><h3>六域 IA 落地地图</h3><small>点击域卡片查看 Inspector 详情</small></div>
+        <div class="ia-grid" id="domainGrid"></div>
+      </section>
+
+      <section class="section">
+        <div class="section-head"><h3>阶段化落地路线</h3><small>先治理协议，再做框架 POC</small></div>
+        <div class="timeline">
+          <div class="phase"><strong>P0 协议冻结</strong><p>冻结资源、权限、安全、URL、数据、Inspector、测试合同。</p></div>
+          <div class="phase"><strong>P1 44 项 Registry</strong><p>覆盖六域 menu、route、component、fallback、domain 与状态。</p></div>
+          <div class="phase"><strong>P2 权限与安全</strong><p>补 route/menu/button/API、tenantScope、sensitiveFields、dangerOps。</p></div>
+          <div class="phase"><strong>P3 URL 与数据</strong><p>规范 search params、Query key、失效策略、错误与审计反馈。</p></div>
+          <div class="phase"><strong>P4 六域迁移</strong><p>按域迁移真实页面；流程平台按门户、设计、表单、监控分层。</p></div>
+          <div class="phase"><strong>P5 架构 POC</strong><p>隔离验证 TanStack Start；必要时验证 Next.js 绿地壳。</p></div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-head"><h3>风险提示</h3><small>主推方案仍需治理，不能退化为继续硬编码</small></div>
+        <div class="risk-grid">
+          <div class="risk high"><h4>Registry 缺口</h4><p>如果不补 44 项资源 registry 与权限元数据，V3 会继续停留在局部硬编码菜单。</p></div>
+          <div class="risk high"><h4>安全与敏感字段</h4><p>邮件网关、Webhook、文件存储、缓存、诊断包等必须有掩码、二次确认、审计和脱敏导出。</p></div>
+          <div class="risk"><h4>TanStack Start RC</h4><p>长期方向不等于立即迁移；需等待 1.0、版本锁定与隔离 POC 证据。</p></div>
+          <div class="risk"><h4>Next.js 绿地反超</h4><p>若未来强依赖 SSR/RSC/BFF 或 Vercel 型平台化部署，需要重新评估 Next.js。</p></div>
+          <div class="risk"><h4>微前端过早</h4><p>团队边界未稳定前引入微前端会放大路由、权限、主题、依赖与测试治理成本。</p></div>
+          <div class="risk"><h4>流程平台复杂度</h4><p>流程平台不能按普通 CRUD 处理，需单独分门户、设计中心、表单中心、运行监控和 Case/Record。</p></div>
+        </div>
+      </section>
+
+      <p class="footer-note">本 HTML 为自包含研究演示：未加载外部字体、图片、脚本或样式；未接入业务前端运行时；仅用于展示选型裁决、评分矩阵、架构切换、六域 IA、Inspector 与风险提示。</p>
+    </main>
+
+    <aside class="inspector" aria-live="polite">
+      <span class="status">Inspector</span>
+      <h3 id="inspectTitle">V3 增强型 React/Vite</h3>
+      <p class="muted" id="inspectSummary">当前主推：保留 React/Vite 基线，升级为后台操作系统壳。</p>
+      <div class="inspect-box"><h4>为什么适配</h4><ul class="inspect-list" id="inspectFit"></ul></div>
+      <div class="inspect-box"><h4>风险与处理</h4><ul class="inspect-list" id="inspectRisk"></ul></div>
+      <div class="inspect-box"><h4>当前六域焦点</h4><p class="muted" id="domainDetail">组织权限：用户、角色、菜单、部门、岗位、数据权限、交接、租户。</p></div>
+      <div class="inspect-box"><h4>评分维度</h4><ul class="inspect-list"><li>D1 V3 适配 18%</li><li>D2 复杂交互 16%</li><li>D3 成熟生态 14%</li><li>D4 人性化 12%</li><li>D5 安全审计 12%</li><li>D6 渐进收敛 10%</li><li>D7 性能维护 8%</li><li>D8 测试验证 6%</li><li>D9 设计表达 4%</li></ul></div>
+    </aside>
+  </div>
+
+  <script>
+    const candidates = {
+      v3: { title: 'V3 增强型 React/Vite 后台操作系统架构', short: 'V3 React/Vite OS', score: 88.6, rank: 1, status: '当前主推', summary: '保留当前 Vite SPA + React 18 基线，补齐资源 registry、权限元数据、敏感字段、安全审计、URL 状态、数据缓存、Inspector 与六域 IA。', fit: ['最大化复用现有 React/Vite/React Router/React Query/Tailwind/Radix/AntD/XYFlow/ECharts 资产', '直接解决 44 项 IA、SystemPageHost、Inspector、多轨收敛和权限元数据缺口', '可渐进吸收 TanStack Router-first 思想而不立即重写'], risk: ['平台层会变厚，必须用 registry 覆盖率和合同测试约束', '若只扩硬编码菜单，会丢失本方案价值', '流程平台需分层治理，不能混成普通 CRUD'] },
+      tanstack: { title: 'TanStack Start / Router-first React', short: 'TanStack Start', score: 85.4, rank: 2, status: '长期演进方向', summary: 'URL 状态、类型化路由、loader/serverFn 与 Query/Table/Form 协同非常适合后台，但当前不立即整体迁移。', fit: ['search params 一等公民，适合筛选、分页、tab、深链和选中状态', '与 React Query/Table/Form 组合天然适合高密度后台', '可作为未来全栈后台壳的隔离 POC'], risk: ['Start 仍处 RC，需要等待 1.0 与版本锁定', '权限、敏感字段和审计协议仍需自建', '不应绕过当前 V3 registry 建设'] },
+      next: { title: 'Next.js App Router + RSC + Streaming', short: 'Next.js App Router', score: 79.8, rank: 3, status: '绿地强备选', summary: '成熟度和生态最强，适合新后台壳、SSR/RSC/BFF 与服务端权限裁剪；当前仓库直接迁移成本高。', fit: ['生态成熟，shadcn/ui、Tailwind 和 Vercel Dashboard 参考充分', 'RSC/Streaming 有利于服务端数据裁剪与渐进加载', '适合未来新平台控制台或绿地重构'], risk: ['会重塑 Vite SPA、React Router、测试和部署契约', 'SystemPageHost/Inspector 需要重建', '短期容易绕开当前多轨收敛问题'] },
+      micro: { title: '微前端 / 模块联邦后台壳', short: '微前端 / 模块联邦', score: 72.4, rank: 4, status: '组织级备选', summary: '适合六域团队独立发布、运行时隔离和插件化，但当前过早引入会放大治理成本。', fit: ['可支持流程平台、组织权限、集成配置等域独立演进', '适合未来插件市场或多团队发布', '可在 registry 协议稳定后作为部署隔离层'], risk: ['主题、路由、权限、依赖版本和错误边界治理复杂', '当前核心缺口是平台协议，不是发布隔离', '会增加测试矩阵和运维观测成本'] },
+      astro: { title: 'Astro / Svelte / Qwik 性能路线', short: 'Astro / Svelte / Qwik', score: 65.6, rank: 5, status: '局部借鉴', summary: 'Astro 适合文档与帮助，Svelte/Qwik 提供性能理念；但不作为完整后台主应用。', fit: ['Astro Islands 可用于文档中心、技术支持和静态说明', 'Svelte 细粒度响应性可作为交互体验参考', 'Qwik resumability 可作为性能观察方向'], risk: ['跨框架迁移削弱 React 真组件资产复用', '复杂权限矩阵、流程画布和运行监控证据不足', '多框架会增加治理负担'] }
+    };
+    const matrix = [
+      candidates.v3,
+      candidates.tanstack,
+      candidates.next,
+      candidates.micro,
+      { title: 'SvelteKit + Svelte 5', short: 'SvelteKit', score: 66.2, rank: 5, status: '性能参考', summary: '性能强但跨框架成本高' },
+      { title: 'Astro Islands + Server Islands', short: 'Astro Islands', score: 65.6, rank: 6, status: '文档/帮助路线', summary: '适合静态与轻动态模块' },
+      { title: 'Qwik Resumability', short: 'Qwik', score: 61.2, rank: 7, status: '技术观察', summary: '后台长期案例不足' }
+    ];
+    const domains = {
+      org: { name: '组织权限', count: 8, detail: '用户、角色、菜单、部门、岗位、数据权限、交接、租户；需要授权矩阵、影响分析、数据范围、租户提示和审计摘要。' },
+      base: { name: '基础资料', count: 6, detail: '资产分类、编号规则、位置、供应商、自定义字段、字段集；需要引用保护、schema 版本、编号预览、导入导出和历史兼容。' },
+      integration: { name: '集成配置', count: 5, detail: '外部系统、接口管理、字段映射、同步规则、Webhook；需要连接测试、凭据掩码、表达式安全、同步任务和投递日志。' },
+      message: { name: '消息与通知', count: 8, detail: '邮件网关、流程邮件、模板、日志、渠道、偏好、开关；需要变量白名单、安全预览、渠道测试和发送决策链。' },
+      system: { name: '系统参数', count: 8, detail: '基础参数、安全策略、文件存储、导入导出、缓存、审计、文档、技术支持；需要高危确认、脱敏导出和诊断包。' },
+      process: { name: '流程平台', count: 9, detail: '流程门户、设计中心、表单中心、运行监控、Case/Record；需要画布、节点属性、表单版本、SLA、异常重试和运行审计。' }
+    };
+    let activeCandidate = 'v3';
+    let activeDomain = 'org';
+    function renderCandidates() {
+      const wrap = document.getElementById('candidateCards');
+      wrap.innerHTML = Object.entries(candidates).map(([key, item]) => `
+        <article class="card ${key === activeCandidate ? 'active' : ''}" data-candidate="${key}">
+          <h4>${item.short}</h4>
+          <p>${item.summary}</p>
+          <div class="score-line"><strong>${item.score}</strong><div class="bar"><div class="fill" style="width:${item.score}%"></div></div></div>
+          <span class="pill">${item.status}</span>
+        </article>`).join('');
+      wrap.querySelectorAll('.card').forEach(card => card.addEventListener('click', () => setCandidate(card.dataset.candidate)));
+    }
+    function renderMatrix() {
+      document.getElementById('matrixBody').innerHTML = matrix.map(item => `
+        <tr><td class="rank">${item.rank}</td><td>${item.title}</td><td>${item.score}</td><td><span class="pill">${item.status}</span></td><td>${item.summary}</td></tr>`).join('');
+    }
+    function renderDomains() {
+      const grid = document.getElementById('domainGrid');
+      grid.innerHTML = Object.entries(domains).map(([key, item]) => `
+        <article class="domain ${key === activeDomain ? 'active' : ''}" data-domain="${key}">
+          <h4>${item.name}<span class="pill">${item.count} 项</span></h4>
+          <ul><li>${item.detail}</li></ul>
+        </article>`).join('');
+      grid.querySelectorAll('.domain').forEach(card => card.addEventListener('click', () => setDomain(card.dataset.domain)));
+    }
+    function setCandidate(key) {
+      activeCandidate = key;
+      const item = candidates[key];
+      document.getElementById('heroScore').textContent = item.score;
+      document.getElementById('heroTitle').textContent = item.title;
+      document.getElementById('heroStatus').textContent = item.status;
+      document.getElementById('inspectTitle').textContent = item.short;
+      document.getElementById('inspectSummary').textContent = item.summary;
+      document.getElementById('inspectFit').innerHTML = item.fit.map(text => `<li>${text}</li>`).join('');
+      document.getElementById('inspectRisk').innerHTML = item.risk.map(text => `<li>${text}</li>`).join('');
+      document.querySelectorAll('[data-candidate]').forEach(el => el.classList.toggle('active', el.dataset.candidate === key));
+      renderCandidates();
+    }
+    function setDomain(key) {
+      activeDomain = key;
+      document.getElementById('domainDetail').textContent = domains[key].detail;
+      document.querySelectorAll('[data-domain]').forEach(el => el.classList.toggle('active', el.dataset.domain === key));
+      renderDomains();
+    }
+    renderCandidates();
+    renderMatrix();
+    renderDomains();
+    setCandidate('v3');
+  </script>
+</body>
+</html>

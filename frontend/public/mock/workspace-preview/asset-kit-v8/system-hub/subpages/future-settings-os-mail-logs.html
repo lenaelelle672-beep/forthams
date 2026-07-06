@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+
+<html class="light" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>UNIVIEW | 邮件日志</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-dim": "#ccdbf2",
+                        "secondary": "#712ae2",
+                        "primary-fixed": "#d9e2ff",
+                        "primary-container": "#1d6ef2",
+                        "on-secondary-container": "#fffbff",
+                        "error-container": "#ffdad6",
+                        "primary-fixed-dim": "#b0c6ff",
+                        "on-tertiary-fixed-variant": "#7b2f00",
+                        "on-secondary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "secondary-fixed": "#eaddff",
+                        "on-surface-variant": "#424654",
+                        "on-secondary-fixed-variant": "#5a00c6",
+                        "on-tertiary-fixed": "#351000",
+                        "on-secondary-fixed": "#25005a",
+                        "on-error": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-low": "#eef4ff",
+                        "inverse-surface": "#233143",
+                        "tertiary-fixed-dim": "#ffb695",
+                        "on-background": "#0e1c2d",
+                        "surface-container-high": "#dbe9ff",
+                        "surface": "#f8f9ff",
+                        "on-primary-fixed-variant": "#00419c",
+                        "inverse-on-surface": "#eaf1ff",
+                        "primary": "#0056c9",
+                        "surface-bright": "#f8f9ff",
+                        "tertiary-fixed": "#ffdbcc",
+                        "surface-container-highest": "#d5e4fa",
+                        "on-tertiary": "#ffffff",
+                        "surface-tint": "#0057cc",
+                        "secondary-container": "#8a4cfc",
+                        "on-tertiary-container": "#fffdff",
+                        "secondary-fixed-dim": "#d2bbff",
+                        "surface-container": "#e5eeff",
+                        "inverse-primary": "#b0c6ff",
+                        "on-primary-container": "#fffdff",
+                        "on-surface": "#0e1c2d",
+                        "background": "#f8f9ff",
+                        "tertiary": "#9f3e00",
+                        "tertiary-container": "#c75000",
+                        "outline": "#727786",
+                        "outline-variant": "#c2c6d7",
+                        "error": "#ba1a1a",
+                        "surface-variant": "#d5e4fa",
+                        "on-primary-fixed": "#001945"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "stack_sm": "8px",
+                        "stack_md": "16px",
+                        "inspector_width": "320px",
+                        "sidebar_width": "240px",
+                        "gutter": "16px",
+                        "topbar_height": "56px",
+                        "container_padding": "24px"
+                    },
+                    "fontFamily": {
+                        "title-sm": ["Geist"],
+                        "body-md": ["Geist"],
+                        "headline-md": ["Geist"],
+                        "mono-code": ["JetBrains Mono"],
+                        "display-lg": ["Geist"],
+                        "body-sm": ["Geist"],
+                        "label-caps": ["Geist"]
+                    },
+                    "fontSize": {
+                        "title-sm": ["18px", { "lineHeight": "24px", "fontWeight": "500" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "mono-code": ["13px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "display-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "body-sm": ["13px", { "lineHeight": "18px", "fontWeight": "400" }],
+                        "label-caps": ["11px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { background-color: #f8f9ff; color: #0e1c2d; font-family: 'Geist', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20; font-size: 20px; }
+        .icon-fill { font-variation-settings: 'FILL' 1; }
+        .log-table th { font-weight: 500; font-size: 13px; color: #424654; text-align: left; padding: 12px 16px; border-bottom: 1px solid #E2E8F0; }
+        .log-table td { font-size: 13px; color: #0e1c2d; padding: 12px 16px; border-bottom: 1px solid #F1F5F9; vertical-align: top; }
+        .log-table tr:hover { background-color: #F1F5F9; cursor: pointer; transition: background-color 0.2s; }
+        .log-table tr.active { background-color: #EFF6FF; }
+
+        /* Custom Scrollbar for high density data */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
+    </style>
+</head>
+<body class="antialiased h-screen overflow-hidden flex flex-col">
+<!-- TopNavBar -->
+<header class="fixed top-0 left-0 w-full z-50 h-[56px] bg-[#051424] flex justify-between items-center px-gutter border-b border-[#1D6EF2] text-primary">
+<div class="flex items-center gap-6">
+<h1 class="font-display-lg text-display-lg font-bold text-on-primary tracking-tight" style="font-size: 20px; line-height: 28px;">UNIVIEW | 系统设置中心</h1>
+</div><nav class="hidden md:flex gap-6 items-end h-full pt-1">
+<a class="text-outline-variant font-body-md text-body-md hover:text-primary-fixed-dim transition-colors cursor-pointer transition-all duration-200" href="#">流程平台</a>
+<a class="text-outline-variant font-body-md text-body-md hover:text-primary-fixed-dim transition-colors cursor-pointer transition-all duration-200" href="#">组织权限</a>
+<a class="text-outline-variant font-body-md text-body-md hover:text-primary-fixed-dim transition-colors cursor-pointer transition-all duration-200" href="#">基础资料</a>
+<a class="text-outline-variant font-body-md text-body-md hover:text-primary-fixed-dim transition-colors cursor-pointer transition-all duration-200" href="#">集成配置</a>
+<a class="text-primary-fixed font-body-md text-body-md font-bold border-b-2 border-primary-fixed pb-[15px] hover:text-primary-fixed-dim transition-colors cursor-pointer transition-all duration-200" href="#">消息与通知</a>
+<a class="text-outline-variant font-body-md text-body-md hover:text-primary-fixed-dim transition-colors cursor-pointer transition-all duration-200" href="#">系统参数</a>
+</nav>
+<div class="flex items-center gap-4">
+
+<span class="text-outline-variant font-body-sm text-body-sm hover:text-primary-fixed-dim transition-colors cursor-pointer">返回业务工作台</span>
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center overflow-hidden border border-outline-variant cursor-pointer">
+<img alt="运营管理员" class="w-full h-full object-cover" data-alt="A professional headshot of a corporate IT administrator in a high-tech control room environment. Soft, cool blue lighting highlights their face against a background of blurred monitor screens. The style is modern, realistic, and highly detailed, representing a sleek enterprise systems user profile image." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDL5VLah6KKd1201p7dcvPPne7jc-de4ojfhnqDTOLLxxv895bS0MLAUTDC_5l3IcB7CfAHhMl-B7C8eplR3nlP3EtPFvBZZ0bbOxZwTjoV7rH2MvwZcllx84At7YF634PqkPKTFN9eKBlNFzpZRD9P_QAbwtthc33mDCqi64iBF6pnDGBMqLXi-clbmSKiHvZWEjuubXonGV0AQUvqBSCyyN84QlueoCjCKWrzAED1Q9es91gTBRcpB8I4Iu2SFgR1WBzd1sNPDUoF"/>
+</div>
+</div>
+</div>
+</header>
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-[56px] w-[240px] h-[calc(100vh-56px)] bg-[#FFFFFF] border-r border-outline-variant flex flex-col py-stack_md z-40">
+<div class="px-6 mb-6">
+<h2 class="font-title-sm text-title-sm font-bold text-on-surface">消息与通知</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">通知系统配置</p>
+</div>
+<nav class="flex-1 overflow-y-auto">
+<ul class="flex flex-col">
+<li>
+<a class="flex items-center gap-3 px-6 py-3 font-body-md text-body-md text-on-surface-variant hover:bg-surface-container-high transition-colors active:scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="settings_input_component">settings_input_component</span>
+                        邮件网关配置
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-6 py-3 font-body-md text-body-md text-on-surface-variant hover:bg-surface-container-high transition-colors active:scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="mail">mail</span>
+                        流程邮件配置
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-6 py-3 font-body-md text-body-md text-on-surface-variant hover:bg-surface-container-high transition-colors active:scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="description">description</span>
+                        邮件模板
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-6 py-3 font-body-md text-body-md border-l-4 border-primary bg-primary-fixed/20 text-primary font-bold hover:bg-surface-container-high transition-colors active:scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined icon-fill" data-icon="history" data-weight="fill">history</span>
+                        邮件日志
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-6 py-3 font-body-md text-body-md text-on-surface-variant hover:bg-surface-container-high transition-colors active:scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="notifications_active">notifications_active</span>
+                        通知模板
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-6 py-3 font-body-md text-body-md text-on-surface-variant hover:bg-surface-container-high transition-colors active:scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="settings_ethernet">settings_ethernet</span>
+                        通知渠道
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-6 py-3 font-body-md text-body-md text-on-surface-variant hover:bg-surface-container-high transition-colors active:scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="tune">tune</span>
+                        通知偏好
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-6 py-3 font-body-md text-body-md text-on-surface-variant hover:bg-surface-container-high transition-colors active:scale-95 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="toggle_on">toggle_on</span>
+                        流程通知开关
+                    </a>
+</li>
+</ul>
+</nav>
+</aside>
+<!-- Main Content Area -->
+<main class="mt-[56px] ml-[240px] flex h-[calc(100vh-56px)] overflow-hidden">
+<!-- Canvas -->
+<div class="flex-1 flex flex-col min-w-0 p-container_padding overflow-hidden">
+<!-- Toolbar -->
+<div class="flex justify-between items-center mb-4 shrink-0">
+<div class="flex items-center gap-4">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline" data-icon="search" style="font-size: 18px;">search</span>
+<input class="w-64 pl-9 pr-3 py-1.5 bg-surface-container-lowest border border-outline-variant rounded focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none font-body-sm text-body-sm text-on-surface transition-shadow shadow-[0_1px_3px_rgba(0,0,0,0.05)]" placeholder="搜索收件人或主题..." type="text"/>
+</div>
+<div class="flex gap-2">
+<button class="px-3 py-1.5 bg-surface-container-lowest border border-outline-variant rounded font-body-sm text-body-sm text-on-surface-variant hover:bg-surface-container-high transition-colors flex items-center gap-1 shadow-[0_1px_3px_rgba(0,0,0,0.05)]">
+<span class="material-symbols-outlined" data-icon="filter_list" style="font-size: 16px;">filter_list</span>
+                            状态筛选
+                        </button>
+<button class="px-3 py-1.5 bg-surface-container-lowest border border-outline-variant rounded font-body-sm text-body-sm text-on-surface-variant hover:bg-surface-container-high transition-colors flex items-center gap-1 shadow-[0_1px_3px_rgba(0,0,0,0.05)]">
+<span class="material-symbols-outlined" data-icon="date_range" style="font-size: 16px;">date_range</span>
+                            时间范围
+                        </button>
+</div>
+</div>
+<div>
+<button class="px-4 py-1.5 bg-primary text-on-primary rounded font-body-sm text-body-sm hover:bg-on-primary-fixed-variant transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined" data-icon="refresh" style="font-size: 16px;">refresh</span>
+                        刷新列表
+                    </button>
+</div>
+</div>
+<!-- Log Table Card -->
+<div class="flex-1 bg-surface-container-lowest border border-[#E2E8F0] rounded-lg shadow-[0_1px_3px_rgba(0,0,0,0.05)] flex flex-col overflow-hidden">
+<div class="overflow-y-auto flex-1">
+<table class="w-full log-table whitespace-nowrap">
+<thead class="sticky top-0 bg-surface-container-lowest z-10 shadow-sm">
+<tr>
+<th class="w-48 font-body-sm">Timestamp</th>
+<th class="w-32 font-body-sm">Msg ID</th>
+<th class="font-body-sm">Recipient</th>
+<th class="w-1/4 font-body-sm">Subject</th>
+<th class="w-32 font-body-sm">Process</th>
+<th class="w-32 font-body-sm">Gateway Latency</th>
+<th class="w-24 font-body-sm">Status</th>
+<th class="w-32 font-body-sm text-right">Action</th>
+</tr>
+</thead>
+<tbody class="font-mono-code text-mono-code">
+<tr class="active" onclick="document.getElementById('inspector').classList.remove('hidden')">
+<td class="text-on-surface-variant">2023-10-27 14:32:01.452</td>
+<td class="text-outline">#MSG-8829</td>
+<td>admin@uniview.sys</td>
+<td class="truncate max-w-xs text-on-surface">系统告警：CPU使用率超出阈值节点A4</td>
+<td class="text-on-surface-variant">System Alert</td>
+<td class="text-on-surface-variant">120ms</td>
+<td>
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-error/10 text-error border border-error/20">Failed</span>
+</td>
+<td class="text-right">
+<button class="text-primary hover:text-on-primary-fixed-variant font-body-sm">详情</button>
+</td>
+</tr>
+<tr>
+<td class="text-on-surface-variant">2023-10-27 14:30:15.110</td>
+<td class="text-outline">#MSG-8828</td>
+<td>user.data@corp.com</td>
+<td class="truncate max-w-xs text-on-surface">您的月度审计报告已生成 [自动发送]</td>
+<td class="text-on-surface-variant">Audit Report</td>
+<td class="text-on-surface-variant">45ms</td>
+<td>
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-[#10B981]/10 text-[#059669] border border-[#10B981]/20">Success</span>
+</td>
+<td class="text-right">
+<button class="text-primary hover:text-on-primary-fixed-variant font-body-sm">详情</button>
+</td>
+</tr>
+<tr>
+<td class="text-on-surface-variant">2023-10-27 14:28:44.902</td>
+<td class="text-outline">#MSG-8827</td>
+<td>hr-dept@uniview.sys</td>
+<td class="truncate max-w-xs text-on-surface">新员工入职流程审批提醒 - 张三</td>
+<td class="text-on-surface-variant">HR Onboarding</td>
+<td class="text-on-surface-variant">-</td>
+<td>
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-primary/10 text-primary border border-primary/20">Running</span>
+</td>
+<td class="text-right">
+<button class="text-primary hover:text-on-primary-fixed-variant font-body-sm">详情</button>
+</td>
+</tr>
+<tr>
+<td class="text-on-surface-variant">2023-10-27 14:15:00.000</td>
+<td class="text-outline">#MSG-8826</td>
+<td>dev-ops@corp.com</td>
+<td class="truncate max-w-xs text-on-surface">Nightly Build #4402 Status Report</td>
+<td class="text-on-surface-variant">CI/CD Pipeline</td>
+<td class="text-on-surface-variant">68ms</td>
+<td>
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-[#10B981]/10 text-[#059669] border border-[#10B981]/20">Success</span>
+</td>
+<td class="text-right">
+<button class="text-primary hover:text-on-primary-fixed-variant font-body-sm">详情</button>
+</td>
+</tr>
+<tr>
+<td class="text-on-surface-variant">2023-10-27 13:50:22.331</td>
+<td class="text-outline">#MSG-8825</td>
+<td>billing@external.vendor</td>
+<td class="truncate max-w-xs text-on-surface">Invoice INV-2023-10 For Review</td>
+<td class="text-on-surface-variant">Finance Approval</td>
+<td class="text-on-surface-variant">510ms</td>
+<td>
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-[#F59E0B]/10 text-[#D97706] border border-[#F59E0B]/20">Deferred</span>
+</td>
+<td class="text-right">
+<button class="text-primary hover:text-on-primary-fixed-variant font-body-sm">详情</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination Footer -->
+<div class="border-t border-[#E2E8F0] px-4 py-3 bg-surface-container-lowest flex items-center justify-between shrink-0">
+<span class="font-body-sm text-body-sm text-on-surface-variant">显示 1 到 5 条，共 2,491 条记录</span>
+<div class="flex gap-1">
+<button class="p-1 rounded text-outline hover:bg-surface-container-high transition-colors disabled:opacity-50"><span class="material-symbols-outlined" data-icon="chevron_left">chevron_left</span></button>
+<button class="px-2 py-1 min-w-[28px] rounded bg-primary/10 text-primary font-body-sm text-body-sm">1</button>
+<button class="px-2 py-1 min-w-[28px] rounded hover:bg-surface-container-high text-on-surface-variant font-body-sm text-body-sm">2</button>
+<button class="px-2 py-1 min-w-[28px] rounded hover:bg-surface-container-high text-on-surface-variant font-body-sm text-body-sm">3</button>
+<span class="px-2 py-1 text-outline">...</span>
+<button class="p-1 rounded text-outline hover:bg-surface-container-high transition-colors"><span class="material-symbols-outlined" data-icon="chevron_right">chevron_right</span></button>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Inspector -->
+<aside class="w-[320px] bg-surface-container-lowest border-l border-[#E2E8F0] shadow-[-4px_0_15px_rgba(0,0,0,0.02)] flex flex-col z-20 shrink-0" id="inspector">
+<div class="h-[56px] px-4 flex items-center justify-between border-b border-[#E2E8F0] shrink-0">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-outline-variant" data-icon="troubleshoot">troubleshoot</span>
+<h3 class="font-title-sm text-title-sm font-bold text-on-surface">Diagnostic Inspector</h3>
+</div>
+<button class="p-1 rounded text-outline hover:bg-surface-container-high hover:text-on-surface transition-colors" onclick="document.getElementById('inspector').classList.add('hidden')">
+<span class="material-symbols-outlined" data-icon="close">close</span>
+</button>
+</div>
+<div class="flex-1 overflow-y-auto p-4 flex flex-col gap-6">
+<!-- Meta Info -->
+<div>
+<div class="flex items-center justify-between mb-2">
+<span class="font-label-caps text-label-caps text-outline uppercase">Message ID</span>
+<span class="font-mono-code text-mono-code text-on-surface font-medium">#MSG-8829</span>
+</div>
+<div class="flex items-center justify-between mb-2">
+<span class="font-label-caps text-label-caps text-outline uppercase">Status</span>
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-error/10 text-error border border-error/20">Delivery Failed</span>
+</div>
+<div class="flex items-center justify-between">
+<span class="font-label-caps text-label-caps text-outline uppercase">Template</span>
+<a class="font-body-sm text-body-sm text-primary hover:underline" href="#">SysAlert_v2.1</a>
+</div>
+</div>
+<hr class="border-[#E2E8F0]"/>
+<!-- Transmission Path -->
+<div>
+<h4 class="font-title-sm text-[14px] font-medium text-on-surface mb-3">Transmission Path</h4>
+<div class="relative pl-3 space-y-4 before:absolute before:inset-y-0 before:left-[15px] before:w-px before:bg-[#E2E8F0] before:-z-10">
+<div class="relative flex gap-3">
+<div class="w-[8px] h-[8px] mt-1.5 rounded-full bg-[#10B981] ring-4 ring-surface-container-lowest shrink-0 z-10"></div>
+<div>
+<p class="font-body-sm text-body-sm font-medium text-on-surface">Local Spool</p>
+<p class="font-mono-code text-[11px] text-outline mt-0.5">14:32:01.452 - Queued locally</p>
+</div>
+</div>
+<div class="relative flex gap-3">
+<div class="w-[8px] h-[8px] mt-1.5 rounded-full bg-[#10B981] ring-4 ring-surface-container-lowest shrink-0 z-10"></div>
+<div>
+<p class="font-body-sm text-body-sm font-medium text-on-surface">Relay Node (sys-relay-02)</p>
+<p class="font-mono-code text-[11px] text-outline mt-0.5">14:32:01.880 - Handshake OK</p>
+</div>
+</div>
+<div class="relative flex gap-3">
+<div class="w-[8px] h-[8px] mt-1.5 rounded-full bg-error ring-4 ring-surface-container-lowest shrink-0 z-10"></div>
+<div>
+<p class="font-body-sm text-body-sm font-medium text-error">External Gateway</p>
+<p class="font-mono-code text-[11px] text-outline mt-0.5">14:32:02.105 - Connection Refused</p>
+</div>
+</div>
+</div>
+</div>
+<hr class="border-[#E2E8F0]"/>
+<!-- Error Headers -->
+<div>
+<h4 class="font-title-sm text-[14px] font-medium text-error mb-2 flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]" data-icon="error">error</span>
+                        SMTP Error Trace
+                    </h4>
+<div class="bg-surface p-3 rounded border border-[#E2E8F0] overflow-x-auto">
+<pre class="font-mono-code text-[11px] leading-[16px] text-on-surface-variant">554 5.7.1 Service unavailable; Client host [192.168.10.44] blocked using Barracuda Reputation; http://bbl.barracudacentral.com/q.cgi?ip=192.168.10.44
+Traceback (most recent call last):
+  File "smtplib.py", line 888, in sendmail
+SMTPDataError: (554, b'5.7.1 Service unavailable')</pre>
+</div>
+</div>
+</div>
+<!-- Footer Actions -->
+<div class="p-4 border-t border-[#E2E8F0] bg-surface-container-lowest shrink-0">
+<button class="w-full py-2 bg-white border border-primary text-primary rounded font-body-sm text-body-sm font-medium hover:bg-primary/5 transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined" data-icon="replay" style="font-size: 18px;">replay</span>
+                    Manual Retry
+                </button>
+<p class="text-center font-body-sm text-[11px] text-outline mt-2">Next auto-retry in 14m 22s</p>
+</div>
+</aside>
+</main>
+</body></html>

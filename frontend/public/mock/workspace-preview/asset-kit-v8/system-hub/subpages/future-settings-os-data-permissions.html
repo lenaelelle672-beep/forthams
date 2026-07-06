@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+
+<html class="light" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>数据权限 - 组织权限 - 系统设置中心</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-fixed-dim": "#ffb695",
+                        "on-secondary-fixed-variant": "#374762",
+                        "tertiary-fixed": "#ffdbcc",
+                        "inverse-surface": "#2d3134",
+                        "primary-container": "#1d6ef2",
+                        "outline-variant": "#c2c6d7",
+                        "outline": "#727786",
+                        "primary-fixed": "#d9e2ff",
+                        "status-green": "#16A34A",
+                        "on-error": "#ffffff",
+                        "on-secondary-container": "#51617e",
+                        "on-surface-variant": "#424654",
+                        "inverse-primary": "#b0c6ff",
+                        "text-secondary": "#64748B",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-fixed": "#d5e3ff",
+                        "on-secondary": "#ffffff",
+                        "surface-tint": "#0057cc",
+                        "status-red": "#DC2626",
+                        "on-primary": "#ffffff",
+                        "on-background": "#181c1f",
+                        "primary": "#0056c9",
+                        "surface-container-highest": "#e0e3e7",
+                        "primary-fixed-dim": "#b0c6ff",
+                        "text-primary": "#0F172A",
+                        "on-secondary-fixed": "#091c35",
+                        "on-primary-container": "#fffdff",
+                        "on-tertiary-container": "#fffdff",
+                        "border-subtle": "#D7E2F0",
+                        "error-container": "#ffdad6",
+                        "secondary": "#4e5f7b",
+                        "error": "#ba1a1a",
+                        "tertiary-container": "#c75000",
+                        "on-primary-fixed": "#001945",
+                        "on-primary-fixed-variant": "#00419c",
+                        "secondary-container": "#ccddff",
+                        "on-tertiary-fixed-variant": "#7b2f00",
+                        "on-tertiary-fixed": "#351000",
+                        "surface": "#f7fafe",
+                        "status-cyan": "#00A8D8",
+                        "on-error-container": "#93000a",
+                        "on-tertiary": "#ffffff",
+                        "background": "#f7fafe",
+                        "status-amber": "#F59E0B",
+                        "on-surface": "#181c1f",
+                        "surface-variant": "#e0e3e7",
+                        "tertiary": "#9f3e00",
+                        "status-purple": "#7C3AED",
+                        "surface-container-high": "#e5e8ec",
+                        "surface-container": "#ebeef2",
+                        "surface-container-low": "#f1f4f8",
+                        "secondary-fixed-dim": "#b6c7e8",
+                        "surface-bright": "#f7fafe",
+                        "surface-dim": "#d7dade",
+                        "inverse-on-surface": "#eef1f5"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "grid-gutter": "12px",
+                        "container-gap": "20px",
+                        "inspector-width": "320px",
+                        "sidebar-width": "240px",
+                        "card-padding": "16px",
+                        "topbar-height": "56px"
+                    },
+                    "fontFamily": {
+                        "status-label": ["Inter"],
+                        "page-title": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "body-md": ["Inter"],
+                        "code-meta": ["JetBrains Mono"],
+                        "section-header": ["Inter"]
+                    },
+                    "fontSize": {
+                        "status-label": ["11px", { "lineHeight": "16px", "fontWeight": "700" }],
+                        "page-title": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-sm": ["12px", { "lineHeight": "18px", "fontWeight": "500" }],
+                        "body-md": ["13px", { "lineHeight": "20px", "fontWeight": "500" }],
+                        "code-meta": ["11px", { "lineHeight": "16px", "fontWeight": "400" }],
+                        "section-header": ["14px", { "lineHeight": "20px", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1;
+        }
+
+        /* Custom scrollbar for webkit */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background-color: theme('colors.outline-variant');
+            border-radius: theme('borderRadius.full');
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background-color: theme('colors.outline');
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen overflow-hidden flex flex-col antialiased">
+<!-- TopNavBar -->
+<header class="flex justify-between items-center px-6 w-full h-topbar-height bg-[#051424] border-b-[3px] border-[#1D6EF2] fixed top-0 z-50 text-white">
+<div class="flex items-center gap-8 h-full">
+<div class="font-page-title text-[18px] font-bold flex items-center gap-2">
+                UNIVIEW | 系统设置中心
+            </div><nav class="hidden md:flex h-full items-center gap-1">
+<a class="h-full px-4 flex items-center text-white/70 hover:text-white transition-colors cursor-pointer text-sm" href="#">流程平台</a>
+<a class="h-full px-4 flex items-center text-white font-medium bg-white/10 cursor-pointer text-sm" href="#">组织权限</a>
+<a class="h-full px-4 flex items-center text-white/70 hover:text-white transition-colors cursor-pointer text-sm" href="#">基础资料</a>
+<a class="h-full px-4 flex items-center text-white/70 hover:text-white transition-colors cursor-pointer text-sm" href="#">集成配置</a>
+<a class="h-full px-4 flex items-center text-white/70 hover:text-white transition-colors cursor-pointer text-sm" href="#">消息与通知</a>
+<a class="h-full px-4 flex items-center text-white/70 hover:text-white transition-colors cursor-pointer text-sm" href="#">系统参数</a>
+</nav>
+</div>
+<div class="flex items-center gap-6">
+
+<button class="text-white/70 hover:text-white transition-colors flex items-center gap-1 text-sm">
+<span class="material-symbols-outlined text-[18px]">desktop_windows</span>
+                返回业务工作台
+            </button>
+<div class="flex items-center gap-2 text-sm text-white cursor-pointer pl-4 border-l border-white/20">
+<div class="w-7 h-7 rounded-full bg-primary flex items-center justify-center text-xs">
+                    运
+                </div>
+<span>运营管理员</span>
+<span class="material-symbols-outlined text-[16px] text-white/70">expand_more</span>
+</div>
+</div>
+</header>
+<div class="flex flex-1 pt-topbar-height h-screen">
+<!-- SideNavBar -->
+<aside class="flex flex-col w-sidebar-width fixed left-0 top-topbar-height bottom-0 z-40 bg-surface-container-lowest border-r border-border-subtle shadow-sm">
+<nav class="flex-1 py-4 overflow-y-auto">
+<a class="flex items-center gap-3 px-6 py-3 text-text-primary hover:bg-surface-container-low transition-all cursor-pointer" href="#">
+<span class="font-body-md">用户管理</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-text-primary hover:bg-surface-container-low transition-all cursor-pointer" href="#">
+<span class="font-body-md">角色权限</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-text-primary hover:bg-surface-container-low transition-all cursor-pointer" href="#">
+<span class="font-body-md">菜单权限</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-text-primary hover:bg-surface-container-low transition-all cursor-pointer" href="#">
+<span class="font-body-md">部门组织</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-text-primary hover:bg-surface-container-low transition-all cursor-pointer" href="#">
+<span class="font-body-md">岗位管理</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-primary bg-surface-container-low font-medium border-l-4 border-primary cursor-pointer transition-all" href="#">
+<span class="font-body-md">数据权限</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-text-primary hover:bg-surface-container-low transition-all cursor-pointer" href="#">
+<span class="font-body-md">工作交接</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-3 text-text-primary hover:bg-surface-container-low transition-all cursor-pointer" href="#">
+<span class="font-body-md">租户管理</span>
+</a>
+</nav>
+</aside>
+<!-- Command & Workspace (Central) -->
+<main class="flex-1 ml-sidebar-width mr-inspector-width bg-background h-full overflow-y-auto">
+<div class="p-container-gap max-w-[1000px] mx-auto pb-24">
+<!-- Breadcrumbs & Header -->
+<div class="mb-6">
+<nav aria-label="Breadcrumb" class="flex text-text-secondary font-body-sm text-body-sm mb-2">
+<ol class="inline-flex items-center space-x-1 md:space-x-2">
+<li class="inline-flex items-center">
+<a class="hover:text-primary transition-colors" href="#">系统设置中心</a>
+</li>
+<li>
+<div class="flex items-center">
+<span class="material-symbols-outlined text-[14px] mx-1">chevron_right</span>
+<a class="hover:text-primary transition-colors" href="#">组织权限</a>
+</div>
+</li>
+<li aria-current="page">
+<div class="flex items-center">
+<span class="material-symbols-outlined text-[14px] mx-1">chevron_right</span>
+<span class="text-text-primary font-medium">数据权限</span>
+</div>
+</li>
+</ol>
+</nav>
+<div class="flex justify-between items-end">
+<div>
+<h1 class="font-page-title text-page-title text-text-primary">数据权限配置</h1>
+<p class="text-text-secondary mt-1">配置行级与列级数据过滤规则，确保资源隔离与安全访问。</p>
+</div>
+<div class="flex gap-2">
+<button class="px-4 py-2 border border-border-subtle rounded-md text-text-primary bg-surface-container-lowest hover:bg-surface-container-low transition-colors flex items-center gap-2 font-body-md">
+<span class="material-symbols-outlined text-[18px]">history</span>
+                                历史记录
+                            </button>
+<button class="px-4 py-2 bg-primary text-on-primary rounded-md hover:bg-primary/90 transition-colors flex items-center gap-2 font-body-md font-medium">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                                新建规则
+                            </button>
+</div>
+</div>
+</div>
+<!-- Filters & Search Bar -->
+<div class="bg-surface-container-lowest border border-border-subtle p-3 rounded-lg flex items-center gap-4 mb-6 shadow-sm">
+<div class="flex-1 flex items-center px-3 bg-surface-container-low rounded-md border border-transparent focus-within:border-primary transition-colors">
+<span class="material-symbols-outlined text-text-secondary">search</span>
+<input class="w-full bg-transparent border-none focus:ring-0 font-code-meta text-text-primary placeholder:text-text-secondary py-2 text-[13px]" placeholder="搜索资源名称、规则标识..." type="text"/>
+</div>
+<div class="flex items-center gap-2">
+<span class="font-body-sm text-text-secondary">资源类型:</span>
+<select class="bg-surface-container-lowest border border-border-subtle rounded-md py-1.5 pl-3 pr-8 font-body-sm text-text-primary focus:ring-primary focus:border-primary">
+<option>全部类型</option>
+<option>资产目录 (Assets)</option>
+<option>工单分类 (Tickets)</option>
+<option>设备数据 (Devices)</option>
+</select>
+</div>
+</div>
+<!-- Rules Bento Grid -->
+<div class="grid grid-cols-1 xl:grid-cols-2 gap-grid-gutter mb-6">
+<!-- Rule Card 1 (Active) -->
+<div class="bg-surface-container-lowest border border-primary rounded-lg p-card-padding flex flex-col cursor-pointer hover:shadow-md transition-shadow relative overflow-hidden group">
+<div class="absolute top-0 right-0 w-16 h-16 bg-primary/5 rounded-bl-full -z-10 group-hover:bg-primary/10 transition-colors"></div>
+<div class="flex justify-between items-start mb-3">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">folder_managed</span>
+<h3 class="font-section-header text-section-header text-text-primary">区域资产可见性</h3>
+</div>
+<span class="inline-flex items-center gap-1 bg-status-green/10 text-status-green border border-status-green/20 px-2 py-0.5 rounded-full font-status-label text-status-label">
+<span class="w-1.5 h-1.5 rounded-full bg-status-green"></span>
+                                已启用
+                            </span>
+</div>
+<div class="font-code-meta text-code-meta text-text-secondary mb-4 bg-surface-container-low p-2 rounded border border-border-subtle inline-block self-start">
+                            RESOURCE: ASSET_CATALOG
+                        </div>
+<div class="space-y-2 mb-6 flex-1">
+<div class="flex items-center justify-between text-body-sm border-b border-border-subtle pb-2">
+<span class="text-text-secondary">过滤类型</span>
+<span class="text-text-primary font-medium flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">table_rows</span> 行级过滤
+                                </span>
+</div>
+<div class="flex items-center justify-between text-body-sm border-b border-border-subtle pb-2">
+<span class="text-text-secondary">条件表达式</span>
+<span class="text-text-primary font-code-meta bg-surface-container px-1.5 rounded">region_id = ${user.region}</span>
+</div>
+</div>
+<div class="flex gap-2 mt-auto">
+<button class="flex-1 py-1.5 border border-border-subtle rounded text-text-primary hover:bg-surface-container transition-colors font-body-sm">编辑</button>
+<button class="flex-1 py-1.5 border border-border-subtle rounded text-text-primary hover:bg-surface-container transition-colors font-body-sm">复制</button>
+</div>
+</div>
+<!-- Rule Card 2 (Review) -->
+<div class="bg-surface-container-lowest border border-status-amber rounded-lg p-card-padding flex flex-col cursor-pointer hover:shadow-md transition-shadow">
+<div class="flex justify-between items-start mb-3">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-status-amber">receipt_long</span>
+<h3 class="font-section-header text-section-header text-text-primary">敏感工单脱敏</h3>
+</div>
+<span class="inline-flex items-center gap-1 bg-status-amber/10 text-status-amber border border-status-amber/20 px-2 py-0.5 rounded-full font-status-label text-status-label">
+<span class="w-1.5 h-1.5 rounded-full bg-status-amber"></span>
+                                待审核
+                            </span>
+</div>
+<div class="font-code-meta text-code-meta text-text-secondary mb-4 bg-surface-container-low p-2 rounded border border-border-subtle inline-block self-start">
+                            RESOURCE: TICKET_CATEGORY
+                        </div>
+<div class="space-y-2 mb-6 flex-1">
+<div class="flex items-center justify-between text-body-sm border-b border-border-subtle pb-2">
+<span class="text-text-secondary">过滤类型</span>
+<span class="text-text-primary font-medium flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">view_column</span> 列级过滤
+                                </span>
+</div>
+<div class="flex items-center justify-between text-body-sm border-b border-border-subtle pb-2">
+<span class="text-text-secondary">脱敏字段</span>
+<span class="text-text-primary font-code-meta">client_phone, budget</span>
+</div>
+</div>
+<div class="flex gap-2 mt-auto">
+<button class="flex-1 py-1.5 border border-status-amber/50 bg-status-amber/5 rounded text-status-amber hover:bg-status-amber/10 transition-colors font-body-sm font-medium">审核</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Inspector (Contextual Right Panel) -->
+<aside class="w-inspector-width fixed right-0 top-topbar-height bottom-0 z-40 bg-surface-container-lowest border-l border-border-subtle shadow-[rgba(29,110,242,0.05)_-8px_0_15px] flex flex-col">
+<div class="p-4 border-b border-border-subtle flex justify-between items-center bg-surface-bright">
+<div class="flex items-center gap-2 text-text-primary font-section-header text-section-header">
+<span class="material-symbols-outlined">info</span>
+                    规则详情
+                </div>
+<button class="text-text-secondary hover:text-text-primary transition-colors">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</div>
+<div class="flex-1 overflow-y-auto p-4 space-y-6">
+<!-- Overview Section -->
+<section>
+<h4 class="font-status-label text-status-label text-text-secondary uppercase mb-3 tracking-wider">概览信息</h4>
+<div class="space-y-3">
+<div>
+<div class="text-body-sm text-text-secondary mb-1">规则标识</div>
+<div class="font-code-meta text-code-meta bg-surface-container-low border border-border-subtle p-2 rounded text-text-primary">rule_asset_region_isolation</div>
+</div>
+<div>
+<div class="text-body-sm text-text-secondary mb-1">最后更新</div>
+<div class="text-body-sm text-text-primary">2023-10-25 14:32:01 <span class="text-text-secondary ml-1">by Admin</span></div>
+</div>
+</div>
+</section>
+<!-- Affected Roles Section -->
+<section>
+<h4 class="font-status-label text-status-label text-text-secondary uppercase mb-3 tracking-wider flex justify-between items-center">
+                        授权范围预览
+                        <span class="bg-surface-container text-text-primary px-1.5 py-0.5 rounded text-[10px]">3 个角色</span>
+</h4>
+<ul class="space-y-2">
+<li class="flex items-center gap-2 p-2 border border-border-subtle rounded bg-surface-container-lowest">
+<span class="material-symbols-outlined text-primary text-[18px]">person</span>
+<span class="font-body-sm text-text-primary flex-1">区域运维工程师</span>
+<span class="material-symbols-outlined text-status-green text-[16px]">check_circle</span>
+</li>
+<li class="flex items-center gap-2 p-2 border border-border-subtle rounded bg-surface-container-lowest">
+<span class="material-symbols-outlined text-primary text-[18px]">person</span>
+<span class="font-body-sm text-text-primary flex-1">本地资产管理员</span>
+<span class="material-symbols-outlined text-status-green text-[16px]">check_circle</span>
+</li>
+<li class="flex items-center gap-2 p-2 border border-border-subtle rounded bg-surface-container-lowest opacity-60">
+<span class="material-symbols-outlined text-text-secondary text-[18px]">person_off</span>
+<span class="font-body-sm text-text-secondary flex-1 line-through">全局观察员</span>
+<span class="material-symbols-outlined text-status-red text-[16px]">block</span>
+</li>
+</ul>
+</section>
+<!-- AI Helper Section -->
+<section class="bg-surface p-3 rounded-lg border border-primary/20">
+<h4 class="font-status-label text-status-label text-primary uppercase mb-2 tracking-wider flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">smart_toy</span>
+                        AI 影响分析
+                    </h4>
+<p class="font-body-sm text-body-sm text-text-primary mb-2">
+                        当前表达式 <code class="font-code-meta bg-white px-1 border border-border-subtle rounded">region_id = ${user.region}</code> 将限制用户仅能查看其所在区域的资产。
+                    </p>
+<div class="text-[11px] text-text-secondary bg-white p-2 rounded border border-border-subtle border-dashed">
+                        警告: "全局观察员" 角色由于缺乏 region 属性，将无法查看到任何数据。建议为该角色配置例外规则。
+                    </div>
+</section>
+</div>
+<div class="p-4 border-t border-border-subtle bg-surface-container-lowest">
+<button class="w-full py-2 bg-primary text-on-primary rounded-md hover:bg-primary/90 transition-colors font-body-md font-medium">
+                    编辑当前规则
+                </button>
+</div>
+</aside>
+</div>
+</body></html>

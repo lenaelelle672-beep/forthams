@@ -396,3 +396,23 @@ export async function submitTask(
 
 /** Compatibility alias for older inventory API contract. */
 export const submitForApproval = submitTask;
+
+export async function approveTask(taskId: string): Promise<InventoryTask> {
+  const response: AxiosResponse<InventoryTask> =
+    await http.post(`${INVENTORY_TASKS_BASE}/${taskId}/approve`);
+  return response.data;
+}
+
+export const inventoryService = {
+  getTask: getInventoryTaskDetail,
+  getTaskDetails: getInventoryTaskDetail,
+  getTasks: getInventoryTasks,
+  createTask: createInventoryTask,
+  updateTaskStatus,
+  getTaskAssets,
+  confirmAsset,
+  batchConfirmAssets,
+  getTaskSummary,
+  submitTask,
+  approveTask,
+};

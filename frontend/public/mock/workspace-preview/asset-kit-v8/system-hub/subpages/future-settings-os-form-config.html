@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>UNIVIEW | 系统设置中心 - 表单配置</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;family=JetBrains+Mono:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "status-cyan": "#00A8D8",
+                        "primary-fixed": "#d9e2ff",
+                        "surface-container": "#ebeef2",
+                        "secondary-fixed-dim": "#b6c7e8",
+                        "secondary-fixed": "#d5e3ff",
+                        "on-primary-fixed": "#001945",
+                        "tertiary-container": "#c75000",
+                        "tertiary": "#9f3e00",
+                        "outline": "#727786",
+                        "on-secondary-fixed-variant": "#374762",
+                        "on-error-container": "#93000a",
+                        "inverse-on-surface": "#eef1f5",
+                        "surface-container-highest": "#e0e3e7",
+                        "primary-fixed-dim": "#b0c6ff",
+                        "background": "#f7fafe",
+                        "status-green": "#16A34A",
+                        "secondary": "#4e5f7b",
+                        "status-purple": "#7C3AED",
+                        "surface-bright": "#f7fafe",
+                        "on-primary-container": "#fffdff",
+                        "primary-container": "#1d6ef2",
+                        "surface-container-low": "#f1f4f8",
+                        "error": "#ba1a1a",
+                        "inverse-primary": "#b0c6ff",
+                        "border-subtle": "#D7E2F0",
+                        "on-tertiary-fixed": "#351000",
+                        "on-primary-fixed-variant": "#00419c",
+                        "on-secondary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "surface": "#f7fafe",
+                        "surface-variant": "#e0e3e7",
+                        "text-secondary": "#64748B",
+                        "outline-variant": "#c2c6d7",
+                        "on-secondary-fixed": "#091c35",
+                        "surface-tint": "#0057cc",
+                        "surface-container-high": "#e5e8ec",
+                        "error-container": "#ffdad6",
+                        "surface-dim": "#d7dade",
+                        "status-red": "#DC2626",
+                        "on-secondary-container": "#51617e",
+                        "secondary-container": "#ccddff",
+                        "inverse-surface": "#2d3134",
+                        "on-tertiary": "#ffffff",
+                        "on-surface": "#181c1f",
+                        "on-primary": "#ffffff",
+                        "status-amber": "#F59E0B",
+                        "primary": "#0056c9",
+                        "tertiary-fixed": "#ffdbcc",
+                        "on-tertiary-container": "#fffdff",
+                        "on-tertiary-fixed-variant": "#7b2f00",
+                        "tertiary-fixed-dim": "#ffb695",
+                        "on-background": "#181c1f",
+                        "text-primary": "#0F172A",
+                        "on-surface-variant": "#424654"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "topbar-height": "48px",
+                        "sidebar-width": "196px",
+                        "grid-gutter": "12px",
+                        "inspector-width": "320px",
+                        "container-gap": "20px",
+                        "card-padding": "16px"
+                    },
+                    "fontFamily": {
+                        "body-sm": ["Inter"],
+                        "code-meta": ["JetBrains Mono"],
+                        "section-header": ["Inter"],
+                        "page-title": ["Inter"],
+                        "status-label": ["Inter"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-sm": ["12px", { "lineHeight": "18px", "fontWeight": "500" }],
+                        "code-meta": ["11px", { "lineHeight": "16px", "fontWeight": "400" }],
+                        "section-header": ["14px", { "lineHeight": "20px", "fontWeight": "700" }],
+                        "page-title": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "status-label": ["11px", { "lineHeight": "16px", "fontWeight": "700" }],
+                        "body-md": ["13px", { "lineHeight": "20px", "fontWeight": "500" }]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        /* Custom scrollbar for webkit */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f4f8;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c2c6d7;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #727786;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md h-screen overflow-hidden flex flex-col">
+<!-- Top Navigation -->
+<header class="fixed top-0 left-0 w-full h-[56px] bg-[#051424] border-b-[2px] border-primary-container z-50 flex items-center justify-between px-6">
+<div class="flex items-center h-full">
+<span class="text-white font-page-title text-[18px] mr-8 tracking-wide">UNIVIEW | 系统设置中心</span><nav class="flex h-full">
+<!-- Navigation Links -->
+<a class="h-full flex items-center px-4 text-white border-b-4 border-primary-container font-bold bg-white/10" href="#">流程平台</a>
+<a class="h-full flex items-center px-4 text-gray-400 hover:text-white hover:bg-white/5 transition-colors" href="#">组织权限</a>
+<a class="h-full flex items-center px-4 text-gray-400 hover:text-white hover:bg-white/5 transition-colors" href="#">基础资料</a>
+<a class="h-full flex items-center px-4 text-gray-400 hover:text-white hover:bg-white/5 transition-colors" href="#">集成配置</a>
+<a class="h-full flex items-center px-4 text-gray-400 hover:text-white hover:bg-white/5 transition-colors" href="#">消息与通知</a>
+<a class="h-full flex items-center px-4 text-gray-400 hover:text-white hover:bg-white/5 transition-colors" href="#">系统参数</a>
+</nav>
+</div>
+<div class="flex items-center gap-4 text-gray-300 font-body-sm">
+
+<div class="w-px h-4 bg-gray-600"></div>
+<button class="flex items-center gap-1 hover:text-white transition-colors">
+<span class="material-symbols-outlined text-[18px]">arrow_back</span>
+<span>返回业务工作台</span>
+</button>
+<div class="w-px h-4 bg-gray-600"></div>
+<button class="flex items-center gap-2 hover:text-white transition-colors">
+<div class="w-6 h-6 rounded-full bg-primary-container flex items-center justify-center text-white text-[12px] font-bold">运</div>
+<span>运营管理员</span>
+<span class="material-symbols-outlined text-[16px]">expand_more</span>
+</button>
+</div>
+</header>
+<!-- Main Workspace -->
+<div class="flex flex-1 mt-[56px] overflow-hidden">
+<!-- Sidebar -->
+<aside class="fixed left-0 top-[56px] bottom-0 w-[240px] bg-surface-container-lowest border-r border-border-subtle flex flex-col z-40 overflow-y-auto shadow-[4px_0_12px_rgba(0,0,0,0.02)]">
+<div class="p-4 border-b border-border-subtle">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[18px]">search</span>
+<input class="w-full pl-9 pr-3 py-1.5 bg-surface-container-low border border-outline-variant rounded text-body-sm focus:border-primary-container focus:ring-1 focus:ring-primary-container focus:outline-none transition-all placeholder:text-outline font-code-meta" placeholder="Search menu..." type="text"/>
+</div>
+</div>
+<nav class="flex-1 py-2 flex flex-col gap-1 px-2">
+<a class="flex items-center gap-3 px-3 py-2 rounded-md text-text-secondary hover:bg-surface-container-low transition-colors group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-primary">dashboard</span>
+<span class="font-body-sm">导航控制台</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-md text-text-secondary hover:bg-surface-container-low transition-colors group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-primary">settings_applications</span>
+<span class="font-body-sm">设置中心</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-md text-text-secondary hover:bg-surface-container-low transition-colors group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-primary">monitoring</span>
+<span class="font-body-sm">运行监测</span>
+</a>
+<div class="h-px bg-border-subtle mx-2 my-2"></div>
+<div class="px-3 py-1 text-[11px] font-bold text-outline uppercase tracking-wider mb-1">Process Core</div>
+<a class="flex items-center gap-3 px-3 py-2 rounded-md text-text-secondary hover:bg-surface-container-low transition-colors group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-primary">account_tree</span>
+<span class="font-body-sm">流程设计器</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-md text-primary bg-primary-fixed border-l-2 border-primary group relative overflow-hidden" href="#">
+<div class="absolute inset-0 bg-primary/5"></div>
+<span class="material-symbols-outlined text-[20px] relative z-10">dynamic_form</span>
+<span class="font-body-sm font-bold relative z-10">表单配置</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-md text-text-secondary hover:bg-surface-container-low transition-colors group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-primary">dns</span>
+<span class="font-body-sm">表单存储</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-md text-text-secondary hover:bg-surface-container-low transition-colors group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-primary">rule</span>
+<span class="font-body-sm">审批规则</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-md text-text-secondary hover:bg-surface-container-low transition-colors group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-primary">edit_attributes</span>
+<span class="font-body-sm">待办字段配置</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-md text-text-secondary hover:bg-surface-container-low transition-colors group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-primary">timer</span>
+<span class="font-body-sm">SLA 配置</span>
+</a>
+</nav>
+<div class="p-4 border-t border-border-subtle bg-surface-container-low mt-auto">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-status-green">check_circle</span>
+<div class="flex flex-col">
+<span class="font-status-label text-on-surface">System Status</span>
+<span class="font-code-meta text-text-secondary">All nodes operational</span>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 ml-[240px] h-full overflow-y-auto bg-surface relative">
+<div class="max-w-[1200px] mx-auto p-6 flex flex-col gap-6">
+<!-- Page Header -->
+<div class="flex items-center justify-between pb-4 border-b border-border-subtle">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded bg-primary-fixed flex items-center justify-center border border-primary-fixed-dim">
+<span class="material-symbols-outlined text-primary">dynamic_form</span>
+</div>
+<div>
+<h1 class="font-section-header text-text-primary text-[18px]">表单字段权限配置</h1>
+<p class="font-code-meta text-text-secondary">Matrix ID: FRM-PRM-2023-A9</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<button class="px-4 py-2 border border-border-subtle bg-surface-container-lowest text-text-primary rounded-md font-body-sm hover:bg-surface-container-low transition-colors flex items-center gap-2 shadow-sm">
+<span class="material-symbols-outlined text-[16px]">history</span>
+                            版本历史
+                        </button>
+<button class="px-4 py-2 bg-primary-container text-white rounded-md font-body-sm font-bold hover:bg-primary transition-colors flex items-center gap-2 shadow-sm">
+<span class="material-symbols-outlined text-[16px]">save</span>
+                            保存配置
+                        </button>
+</div>
+</div>
+<!-- Matrix Control Panel -->
+<div class="bg-surface-container-lowest border border-border-subtle rounded-lg p-4 shadow-sm flex items-center justify-between">
+<div class="flex items-center gap-6">
+<div class="flex flex-col gap-1">
+<span class="font-status-label text-outline uppercase tracking-wider">Target Form</span>
+<div class="flex items-center gap-2">
+<span class="font-body-md font-bold text-on-surface">采购申请单表单 V2.4</span>
+<span class="material-symbols-outlined text-[16px] text-primary cursor-pointer hover:opacity-80">edit</span>
+</div>
+</div>
+<div class="w-px h-8 bg-border-subtle"></div>
+<div class="flex flex-col gap-1">
+<span class="font-status-label text-outline uppercase tracking-wider">Configuration Mode</span>
+<div class="flex items-center bg-surface-container-low rounded-md p-0.5 border border-outline-variant">
+<button class="px-3 py-1 bg-surface-container-lowest rounded shadow-sm text-text-primary font-body-sm font-bold">节点模式</button>
+<button class="px-3 py-1 text-text-secondary font-body-sm hover:text-text-primary transition-colors">角色模式</button>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2 text-text-secondary font-body-sm">
+<span class="w-3 h-3 rounded-sm bg-status-green opacity-20 border border-status-green"></span>
+<span>可写(W)</span>
+</div>
+<div class="flex items-center gap-2 text-text-secondary font-body-sm">
+<span class="w-3 h-3 rounded-sm bg-status-cyan opacity-20 border border-status-cyan"></span>
+<span>只读(R)</span>
+</div>
+<div class="flex items-center gap-2 text-text-secondary font-body-sm">
+<span class="w-3 h-3 rounded-sm bg-surface-container-highest border border-outline-variant"></span>
+<span>隐藏(H)</span>
+</div>
+</div>
+</div>
+<!-- Main Data Matrix -->
+<div class="bg-surface-container-lowest border border-border-subtle rounded-lg shadow-sm overflow-hidden flex flex-col h-[600px]">
+<!-- Table Header (Sticky) -->
+<div class="bg-surface-container-low border-b border-border-subtle grid grid-cols-[200px_repeat(4,_minmax(120px,_1fr))] sticky top-0 z-10">
+<div class="p-3 border-r border-border-subtle flex items-center justify-between font-section-header text-text-primary">
+<span>表单字段 (12)</span>
+<span class="material-symbols-outlined text-[16px] text-outline cursor-pointer hover:text-primary">filter_list</span>
+</div>
+<div class="p-3 border-r border-border-subtle flex flex-col justify-center items-center gap-1 group cursor-pointer hover:bg-surface-container transition-colors">
+<span class="font-body-sm font-bold text-on-surface">提单节点</span>
+<span class="font-code-meta text-status-cyan bg-status-cyan/10 px-2 py-0.5 rounded-full">NODE-01</span>
+</div>
+<div class="p-3 border-r border-border-subtle flex flex-col justify-center items-center gap-1 group cursor-pointer hover:bg-surface-container transition-colors">
+<span class="font-body-sm font-bold text-on-surface">部门主管审批</span>
+<span class="font-code-meta text-status-amber bg-status-amber/10 px-2 py-0.5 rounded-full">NODE-02</span>
+</div>
+<div class="p-3 border-r border-border-subtle flex flex-col justify-center items-center gap-1 group cursor-pointer hover:bg-surface-container transition-colors">
+<span class="font-body-sm font-bold text-on-surface">财务中心复核</span>
+<span class="font-code-meta text-status-purple bg-status-purple/10 px-2 py-0.5 rounded-full">NODE-03</span>
+</div>
+<div class="p-3 flex flex-col justify-center items-center gap-1 group cursor-pointer hover:bg-surface-container transition-colors">
+<span class="font-body-sm font-bold text-on-surface">归档节点</span>
+<span class="font-code-meta text-status-green bg-status-green/10 px-2 py-0.5 rounded-full">NODE-99</span>
+</div>
+</div>
+<!-- Table Body -->
+<div class="overflow-y-auto flex-1 font-body-sm text-text-primary">
+<!-- Group Header -->
+<div class="bg-surface-variant/30 px-3 py-2 border-b border-border-subtle font-section-header text-text-primary flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">folder_open</span>
+                            基础信息区
+                        </div>
+<!-- Rows -->
+<div class="grid grid-cols-[200px_repeat(4,_minmax(120px,_1fr))] border-b border-border-subtle hover:bg-surface-container-lowest transition-colors group">
+<div class="p-3 border-r border-border-subtle flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px] text-outline">text_fields</span>
+<span class="truncate" title="申请人姓名">申请人姓名</span>
+</div>
+<div class="p-2 border-r border-border-subtle flex items-center justify-center">
+<select class="w-full bg-status-green/10 border-status-green/30 text-status-green font-bold rounded text-center text-body-sm h-8 focus:ring-0 focus:border-status-green cursor-pointer">
+<option selected="" value="W">可写</option>
+<option value="R">只读</option>
+<option value="H">隐藏</option>
+</select>
+</div>
+<div class="p-2 border-r border-border-subtle flex items-center justify-center">
+<select class="w-full bg-status-cyan/10 border-status-cyan/30 text-status-cyan font-bold rounded text-center text-body-sm h-8 focus:ring-0 focus:border-status-cyan cursor-pointer">
+<option value="W">可写</option>
+<option selected="" value="R">只读</option>
+<option value="H">隐藏</option>
+</select>
+</div>
+<div class="p-2 border-r border-border-subtle flex items-center justify-center">
+<select class="w-full bg-status-cyan/10 border-status-cyan/30 text-status-cyan font-bold rounded text-center text-body-sm h-8 focus:ring-0 focus:border-status-cyan cursor-pointer">
+<option value="W">可写</option>
+<option selected="" value="R">只读</option>
+<option value="H">隐藏</option>
+</select>
+</div>
+<div class="p-2 flex items-center justify-center">
+<select class="w-full bg-status-cyan/10 border-status-cyan/30 text-status-cyan font-bold rounded text-center text-body-sm h-8 focus:ring-0 focus:border-status-cyan cursor-pointer">
+<option value="W">可写</option>
+<option selected="" value="R">只读</option>
+<option value="H">隐藏</option>
+</select>
+</div>
+</div>
+<div class="grid grid-cols-[200px_repeat(4,_minmax(120px,_1fr))] border-b border-border-subtle hover:bg-surface-container-lowest transition-colors group">
+<div class="p-3 border-r border-border-subtle flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px] text-outline">apartment</span>
+<span class="truncate" title="申请部门">申请部门</span>
+</div>
+<div class="p-2 border-r border-border-subtle flex items-center justify-center">
+<select class="w-full bg-status-green/10 border-status-green/30 text-status-green font-bold rounded text-center text-body-sm h-8 focus:ring-0 focus:border-status-green cursor-pointer">
+<option selected="" value="W">可写</option>
+<option value="R">只读</option>
+<option value="H">隐藏</option>
+</select>
+</div>
+<div class="p-2 border-r border-border-subtle flex items-center justify-center">
+<select class="w-full bg-status-cyan/10 border-status-cyan/30 text-status-cyan font-bold rounded text-center text-body-sm h-8 focus:ring-0 focus:border-status-cyan cursor-pointer">
+<option value="W">可写</option>
+<option selected="" value="R">只读</option>
+<option value="H">隐藏</option>
+</select>
+</div>
+<div class="p-2 border-r border-border-subtle flex items-center justify-center">
+<select class="w-full bg-status-cyan/10 border-status-cyan/30 text-status-cyan font-bold rounded text-center text-body-sm h-8 focus:ring-0 focus:border-status-cyan cursor-pointer">
+<option value="W">可写</option>
+<option selected="" value="R">只读</option>
+<option value="H">隐藏</option>
+</select>
+</div>
+<div class="p-2 flex items-center justify-center">
+<select class="w-full bg-status-cyan/10 border-status-cyan/30 text-status-cyan font-bold rounded text-center text-body-sm h-8 focus:ring-0 focus:border-status-cyan cursor-pointer">
+<option value="W">可写</option>
+<option selected="" value="R">只读</option>
+<option value="H">隐藏</option>
+</select>
+</div>
+</div>
+<!-- Group Header -->
+<div class="bg-surface-variant/30 px-3 py-2 border-b border-border-subtle font-section-header text-text-primary flex items-center gap-2 mt-2">
+<span class="material-symbols-outlined text-[16px]">request_quote</span>
+                            业务明细区
+                        </div>
+<div class="grid grid-cols-[200px_repeat(4,_minmax(120px,_1fr))] border-b border-border-subtle hover:bg-surface-container-lowest transition-colors group">
+<div class="p-3 border-r border-border-subtle flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px] text-outline">table_rows</span>
+<span class="truncate" title="采购明细表">采购明细表</span>
+</div>
+<div class="p-2 border-r border-border-subtle flex items-center justify-center">
+<select class="w-full bg-status-green/10 border-status-green/30 text-status-green font-bold rounded text-center text-body-sm h-8 focus:ring-0 focus:border-status-green cursor-pointer">
+<option selected="" value="W">可写</option>
+<option value="R">只读</option>
+<option value="H">隐藏</option>
+</select>
+</div>
+<div class="p-2 border-r border-border-subtle flex items-center justify-center">
+<select class="w-full bg-surface-container-highest border-outline-variant text-text-secondary font-bold rounded text-center text-body-sm h-8 focus:ring-0 focus:border-outline cursor-pointer">
+<option value="W">可写</option>
+<option value="R">只读</option>
+<option selected="" value="H">隐藏</option>
+</select>
+</div>
+<div class="p-2 border-r border-border-subtle flex items-center justify-center">
+<select class="w-full bg-status-green/10 border-status-green/30 text-status-green font-bold rounded text-center text-body-sm h-8 focus:ring-0 focus:border-status-green cursor-pointer">
+<option selected="" value="W">可写</option>
+<option value="R">只读</option>
+<option value="H">隐藏</option>
+</select>
+</div>
+<div class="p-2 flex items-center justify-center">
+<select class="w-full bg-status-cyan/10 border-status-cyan/30 text-status-cyan font-bold rounded text-center text-body-sm h-8 focus:ring-0 focus:border-status-cyan cursor-pointer">
+<option value="W">可写</option>
+<option selected="" value="R">只读</option>
+<option value="H">隐藏</option>
+</select>
+</div>
+</div>
+</div>
+<!-- Table Footer / Summary -->
+<div class="bg-surface-container border-t border-border-subtle p-3 text-right font-code-meta text-text-secondary flex justify-between items-center">
+<span>Total Fields: 12 (Shown 3)</span>
+<div class="flex gap-4">
+<span><strong class="text-status-green">W:</strong> 5</span>
+<span><strong class="text-status-cyan">R:</strong> 6</span>
+<span><strong class="text-outline">H:</strong> 1</span>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

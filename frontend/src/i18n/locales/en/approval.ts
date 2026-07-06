@@ -1,0 +1,65 @@
+const approvalLocale = {
+  title: 'Approval Management',
+  pageTitle: 'Approval List',
+  detailTitle: 'Approval Details',
+  stats: {
+    pending: 'Pending',
+    approved: 'Approved',
+    rejected: 'Rejected',
+    total: 'Total',
+    processTypes: 'Process Types',
+  },
+  columns: {
+    title: 'Title',
+    type: 'Type',
+    applicant: 'Applicant',
+    status: 'Status',
+    createdAt: 'Submitted At',
+    completedAt: 'Completed At',
+    actions: 'Actions',
+  },
+  statusOptions: {
+    PENDING: 'Pending',
+    APPROVED: 'Approved',
+    REJECTED: 'Rejected',
+    CANCELLED: 'Cancelled',
+  },
+  statusBadge: {
+    PENDING: 'Pending',
+    APPROVED: 'Approved',
+    REJECTED: 'Rejected',
+    CANCELLED: 'Cancelled',
+  },
+  actions: {
+    approve: 'Approve',
+    reject: 'Reject',
+    recall: 'Recall',
+    view: 'View',
+    create: 'New Approval',
+  },
+  detail: {
+    timeline: 'Timeline',
+    approver: 'Approver',
+    comment: 'Comment',
+    commentPlaceholder: 'Enter comment…',
+    decision: 'Decision',
+    attachments: 'Attachments',
+  },
+  messages: {
+    approveSuccess: 'Approved successfully',
+    rejectSuccess: 'Rejected',
+    recallSuccess: 'Recalled',
+    approveFailed: 'Approval operation failed',
+    loadFailed: 'Failed to load approval data',
+    pendingCount: '{count} pending',
+  },
+  processTypes: {
+    PURCHASE: 'Purchase Approval',
+    REPAIR: 'Repair Approval',
+    DISPOSAL: 'Disposal Approval',
+    BORROW: 'Borrow Approval',
+    OTHER: 'Other Approval',
+  },
+};
+
+export default approvalLocale;

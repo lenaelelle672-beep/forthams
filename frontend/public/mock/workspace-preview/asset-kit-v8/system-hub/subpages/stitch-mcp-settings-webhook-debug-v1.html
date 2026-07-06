@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+
+<html class="light" lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Webhook 诊断与集成日志 - 后台设置 OS</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "text-secondary": "#64748B",
+                        "outline": "#727786",
+                        "secondary": "#4e5f7b",
+                        "tertiary-container": "#c75000",
+                        "secondary-container": "#ccddff",
+                        "on-background": "#181c1f",
+                        "secondary-fixed": "#d5e3ff",
+                        "on-error-container": "#93000a",
+                        "error-container": "#ffdad6",
+                        "on-tertiary-container": "#fffdff",
+                        "primary-fixed-dim": "#b0c6ff",
+                        "surface-container": "#ebeef2",
+                        "surface": "#f7fafe",
+                        "inverse-on-surface": "#eef1f5",
+                        "on-primary-fixed-variant": "#00419c",
+                        "status-amber": "#F59E0B",
+                        "primary-container": "#1d6ef2",
+                        "surface-container-lowest": "#ffffff",
+                        "background": "#f7fafe",
+                        "on-secondary-container": "#51617e",
+                        "secondary-fixed-dim": "#b6c7e8",
+                        "surface-container-low": "#f1f4f8",
+                        "on-primary-fixed": "#001945",
+                        "error": "#ba1a1a",
+                        "on-tertiary": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "on-surface-variant": "#424654",
+                        "on-error": "#ffffff",
+                        "surface-dim": "#d7dade",
+                        "border-subtle": "#D7E2F0",
+                        "surface-variant": "#e0e3e7",
+                        "inverse-primary": "#b0c6ff",
+                        "tertiary": "#9f3e00",
+                        "outline-variant": "#c2c6d7",
+                        "on-secondary": "#ffffff",
+                        "text-primary": "#0F172A",
+                        "primary": "#0056c9",
+                        "surface-container-high": "#e5e8ec",
+                        "status-green": "#16A34A",
+                        "surface-tint": "#0057cc",
+                        "status-cyan": "#00A8D8",
+                        "tertiary-fixed-dim": "#ffb695",
+                        "on-secondary-fixed": "#091c35",
+                        "surface-container-highest": "#e0e3e7",
+                        "status-red": "#DC2626",
+                        "on-tertiary-fixed-variant": "#7b2f00",
+                        "on-primary-container": "#fffdff",
+                        "surface-bright": "#f7fafe",
+                        "on-surface": "#181c1f",
+                        "status-purple": "#7C3AED",
+                        "on-tertiary-fixed": "#351000",
+                        "inverse-surface": "#2d3134",
+                        "tertiary-fixed": "#ffdbcc",
+                        "primary-fixed": "#d9e2ff",
+                        "on-secondary-fixed-variant": "#374762"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "sidebar-width": "196px",
+                        "inspector-width": "380px",
+                        "grid-gutter": "12px",
+                        "topbar-height": "48px",
+                        "card-padding": "16px",
+                        "container-gap": "20px"
+                    },
+                    "fontFamily": {
+                        "section-header": ["Inter"],
+                        "page-title": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "status-label": ["Inter"],
+                        "code-meta": ["JetBrains Mono"]
+                    },
+                    "fontSize": {
+                        "section-header": ["14px", {"lineHeight": "20px", "fontWeight": "700"}],
+                        "page-title": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-md": ["13px", {"lineHeight": "20px", "fontWeight": "500"}],
+                        "body-sm": ["12px", {"lineHeight": "18px", "fontWeight": "500"}],
+                        "status-label": ["11px", {"lineHeight": "16px", "fontWeight": "700"}],
+                        "code-meta": ["11px", {"lineHeight": "16px", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+            font-size: 1.25rem;
+        }
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(12px);
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 2px; }
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb { background: #475569; }
+        
+        @keyframes pulse-soft {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+        .animate-pulse-soft { animation: pulse-soft 2s infinite ease-in-out; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body-md selection:bg-primary-fixed-dim selection:text-on-primary-fixed overflow-hidden">
+<!-- TopNavBar -->
+<header class="fixed top-0 left-0 w-full z-50 flex items-center justify-between px-container-gap h-topbar-height bg-on-surface dark:bg-inverse-surface">
+<div class="flex items-center gap-8">
+<h1 class="font-page-title text-page-title text-surface-lowest dark:text-surface-bright tracking-tight">后台设置 OS</h1>
+<nav class="hidden md:flex items-center gap-6">
+<a class="font-body-md text-body-md text-surface-variant dark:text-outline-variant hover:text-primary-fixed hover:bg-on-secondary-fixed-variant/20 px-3 py-1 rounded transition-colors duration-200" href="#">指挥中心</a>
+<a class="font-body-md text-body-md text-primary-fixed-dim border-b-2 border-primary-fixed-dim pb-1" href="#">控制塔</a>
+<a class="font-body-md text-body-md text-surface-variant dark:text-outline-variant hover:text-primary-fixed hover:bg-on-secondary-fixed-variant/20 px-3 py-1 rounded transition-colors duration-200" href="#">资产业务</a>
+<a class="font-body-md text-body-md text-surface-variant dark:text-outline-variant hover:text-primary-fixed hover:bg-on-secondary-fixed-variant/20 px-3 py-1 rounded transition-colors duration-200" href="#">数据分析</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative group">
+<input class="bg-surface-container-highest/10 border-none rounded-lg text-body-sm font-code-meta text-surface-lowest w-64 px-4 py-1.5 focus:ring-1 focus:ring-primary-fixed" placeholder="搜索 Command..." type="text"/>
+<span class="material-symbols-outlined absolute right-3 top-1.5 text-outline-variant text-sm">search</span>
+</div>
+<div class="flex gap-2">
+<button class="p-1.5 rounded-full hover:bg-white/10 text-surface-variant transition-colors"><span class="material-symbols-outlined">notifications</span></button>
+<button class="p-1.5 rounded-full hover:bg-white/10 text-surface-variant transition-colors"><span class="material-symbols-outlined">settings</span></button>
+<button class="p-1.5 rounded-full hover:bg-white/10 text-surface-variant transition-colors"><span class="material-symbols-outlined">help</span></button>
+</div>
+<div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center overflow-hidden border border-outline-variant">
+<img alt="User Profile Avatar" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC_b2nh6c0jb8RnDwee9kjar52A_nDrS1JnkrpnMlSJDzpft1HDgn06WQWqGzUaOxcrJgEHj1m8hz2TYFERDpBZTzq6yzmM4YyvZa6oA0EuzJS2b0tQnB5dadiebS8wP8jIsY2FaXafRmAxvr01PfwgFvykfO2rpNs0mcJi7rWQWoMqEn9NFeAqvcjMs_WeDc1MMhlnO8_p_elC9kSj-j4OBwWf5htlAzXTbu4Mn8oNNcfj_KZ25x7c18P9_I48z9tl7GrpbNtpphY8"/>
+</div>
+</div>
+</header>
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-topbar-height w-sidebar-width h-[calc(100vh-topbar-height)] flex flex-col p-4 bg-surface-container-lowest dark:bg-surface-dim border-r border-border-subtle dark:border-outline-variant">
+<div class="mb-6 flex items-center gap-3 px-2">
+<div class="w-8 h-8 rounded-lg bg-status-green/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-status-green" style="font-variation-settings: 'FILL' 1;">cloud_done</span>
+</div>
+<div>
+<p class="font-section-header text-section-header text-on-surface">系统节点 01</p>
+<p class="text-[10px] text-status-green font-bold uppercase tracking-widest">健康</p>
+</div>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant dark:text-outline hover:text-on-surface hover:bg-surface-container-low dark:hover:bg-surface-container-highest rounded-lg transition-all duration-150" href="#">
+<span class="material-symbols-outlined">tune</span>
+<span class="font-body-sm text-body-sm">通用</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant dark:text-outline hover:text-on-surface hover:bg-surface-container-low dark:hover:bg-surface-container-highest rounded-lg transition-all duration-150" href="#">
+<span class="material-symbols-outlined">shield</span>
+<span class="font-body-sm text-body-sm">安全</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-primary font-bold bg-secondary-container dark:bg-on-secondary-fixed-variant/30 rounded-lg" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">hub</span>
+<span class="font-body-sm text-body-sm">集成配置</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant dark:text-outline hover:text-on-surface hover:bg-surface-container-low dark:hover:bg-surface-container-highest rounded-lg transition-all duration-150" href="#">
+<span class="material-symbols-outlined">robot_2</span>
+<span class="font-body-sm text-body-sm">自动化</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant dark:text-outline hover:text-on-surface hover:bg-surface-container-low dark:hover:bg-surface-container-highest rounded-lg transition-all duration-150" href="#">
+<span class="material-symbols-outlined">account_tree</span>
+<span class="font-body-sm text-body-sm">流程管理</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant dark:text-outline hover:text-on-surface hover:bg-surface-container-low dark:hover:bg-surface-container-highest rounded-lg transition-all duration-150" href="#">
+<span class="material-symbols-outlined">fact_check</span>
+<span class="font-body-sm text-body-sm">合规</span>
+</a>
+</nav>
+<div class="pt-4 border-t border-border-subtle mt-4">
+<button class="w-full flex items-center justify-center gap-2 py-2 bg-primary text-on-primary rounded-lg font-section-header transition-all hover:brightness-110 mb-4">
+<span class="material-symbols-outlined text-sm">add</span>
+                新建配置
+            </button>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:text-on-surface rounded-lg" href="#">
+<span class="material-symbols-outlined">list_alt</span>
+<span class="font-body-sm text-body-sm">日志</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:text-on-surface rounded-lg" href="#">
+<span class="material-symbols-outlined">contact_support</span>
+<span class="font-body-sm text-body-sm">支持</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-sidebar-width mt-topbar-height h-[calc(100vh-topbar-height-64px)] p-6 overflow-hidden relative bg-surface">
+<div class="max-w-[1400px] mx-auto h-full flex flex-col gap-6">
+<!-- Page Header -->
+<div class="flex justify-between items-end">
+<div>
+<div class="flex items-center gap-2 text-text-secondary mb-1">
+<span class="font-code-meta text-code-meta">系统</span>
+<span class="material-symbols-outlined text-xs">chevron_right</span>
+<span class="font-code-meta text-code-meta">集成配置</span>
+</div>
+<h2 class="font-page-title text-page-title text-text-primary">Webhook 诊断与集成日志</h2>
+</div>
+<div class="flex gap-3">
+<button class="px-4 py-2 bg-surface-container-lowest border border-border-subtle rounded flex items-center gap-2 hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined">filter_list</span>
+<span class="font-section-header">筛选过滤器</span>
+</button>
+<button class="px-4 py-2 bg-primary-container text-on-primary-container rounded flex items-center gap-2 hover:brightness-110 transition-all shadow-sm">
+<span class="material-symbols-outlined">refresh</span>
+<span class="font-section-header">刷新控制台</span>
+</button>
+</div>
+</div>
+<!-- 终端 Area -->
+<div class="flex-1 grid grid-cols-12 gap-6 min-h-0">
+<!-- 实时 Event Log Panel -->
+<div class="col-span-8 bg-surface-container-lowest border border-border-subtle rounded-xl flex flex-col overflow-hidden">
+<div class="p-4 border-b border-border-subtle bg-surface-container-low flex justify-between items-center">
+<div class="flex items-center gap-3">
+<span class="w-2 h-2 rounded-full bg-status-green animate-pulse-soft"></span>
+<span class="font-section-header text-on-surface">实时事件流 (实时事件流)</span>
+</div>
+<div class="flex gap-2 text-xs font-code-meta text-outline">
+<span>总计: 12,482</span>
+<span class="text-status-red">失败: 12</span>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto custom-scrollbar p-0">
+<table class="w-full text-left border-collapse">
+<thead class="sticky top-0 bg-surface-container-lowest z-10 shadow-sm">
+<tr class="text-on-surface-variant font-code-meta text-[11px] uppercase tracking-wider">
+<th class="px-4 py-3 border-b border-border-subtle font-bold">时间戳</th>
+<th class="px-4 py-3 border-b border-border-subtle font-bold">状态</th>
+<th class="px-4 py-3 border-b border-border-subtle font-bold">方法/路径</th>
+<th class="px-4 py-3 border-b border-border-subtle font-bold">请求 ID</th>
+<th class="px-4 py-3 border-b border-border-subtle font-bold text-right">延迟</th>
+</tr>
+</thead>
+<tbody class="font-code-meta text-body-sm">
+<!-- Log Entry 1: Clickable to show Inspector -->
+<tr class="group hover:bg-primary/5 cursor-pointer border-b border-border-subtle/50 transition-colors" onclick="toggleInspector()">
+<td class="px-4 py-3 text-text-secondary">2023-11-24 14:22:01</td>
+<td class="px-4 py-3">
+<span class="px-2 py-0.5 rounded-full bg-status-green/10 text-status-green text-[10px] font-bold">200 正常</span>
+</td>
+<td class="px-4 py-3 font-medium text-on-surface">POST /v1/events/order_created</td>
+<td class="px-4 py-3 text-outline truncate max-w-[120px]">req_a72b_f812x</td>
+<td class="px-4 py-3 text-right text-text-secondary">42ms</td>
+</tr>
+<tr class="group hover:bg-primary/5 cursor-pointer border-b border-border-subtle/50 transition-colors">
+<td class="px-4 py-3 text-text-secondary">2023-11-24 14:21:58</td>
+<td class="px-4 py-3">
+<span class="px-2 py-0.5 rounded-full bg-status-amber/10 text-status-amber text-[10px] font-bold">408 TIMEOUT</span>
+</td>
+<td class="px-4 py-3 font-medium text-on-surface">POST /v1/sync/inventory</td>
+<td class="px-4 py-3 text-outline truncate max-w-[120px]">req_b11c_m923k</td>
+<td class="px-4 py-3 text-right text-status-amber font-bold">5002ms</td>
+</tr>
+<tr class="group hover:bg-primary/5 cursor-pointer border-b border-border-subtle/50 transition-colors bg-status-red/5">
+<td class="px-4 py-3 text-text-secondary">2023-11-24 14:21:45</td>
+<td class="px-4 py-3">
+<span class="px-2 py-0.5 rounded-full bg-status-red/10 text-status-red text-[10px] font-bold">401 INVALID</span>
+</td>
+<td class="px-4 py-3 font-medium text-on-surface">POST /v1/auth/callback</td>
+<td class="px-4 py-3 text-outline truncate max-w-[120px]">req_x99d_z001v</td>
+<td class="px-4 py-3 text-right text-text-secondary">12ms</td>
+</tr>
+<tr class="group hover:bg-primary/5 cursor-pointer border-b border-border-subtle/50 transition-colors">
+<td class="px-4 py-3 text-text-secondary">2023-11-24 14:21:30</td>
+<td class="px-4 py-3">
+<span class="px-2 py-0.5 rounded-full bg-status-green/10 text-status-green text-[10px] font-bold">200 正常</span>
+</td>
+<td class="px-4 py-3 font-medium text-on-surface">POST /v1/events/user_updated</td>
+<td class="px-4 py-3 text-outline truncate max-w-[120px]">req_c44e_p772j</td>
+<td class="px-4 py-3 text-right text-text-secondary">38ms</td>
+</tr>
+<tr class="group hover:bg-primary/5 cursor-pointer border-b border-border-subtle/50 transition-colors">
+<td class="px-4 py-3 text-text-secondary">2023-11-24 14:21:12</td>
+<td class="px-4 py-3">
+<span class="px-2 py-0.5 rounded-full bg-status-green/10 text-status-green text-[10px] font-bold">200 正常</span>
+</td>
+<td class="px-4 py-3 font-medium text-on-surface">POST /v1/webhook/receiver</td>
+<td class="px-4 py-3 text-outline truncate max-w-[120px]">req_l55f_t318q</td>
+<td class="px-4 py-3 text-right text-text-secondary">29ms</td>
+</tr>
+<!-- Filler rows for visual density -->
+<script>
+                                    for(let i=0; i<15; i++) {
+                                        document.write(`
+                                            <tr class="group hover:bg-primary/5 cursor-pointer border-b border-border-subtle/50 transition-colors">
+                                                <td class="px-4 py-3 text-text-secondary">2023-11-24 14:20:${String(Math.floor(Math.random()*60)).padStart(2,'0')}</td>
+                                                <td class="px-4 py-3"><span class="px-2 py-0.5 rounded-full bg-status-green/10 text-status-green text-[10px] font-bold">200 正常</span></td>
+                                                <td class="px-4 py-3 font-medium text-on-surface">POST /v1/events/batch_sync</td>
+                                                <td class="px-4 py-3 text-outline truncate max-w-[120px]">req_id_${Math.random().toString(36).substr(2, 8)}</td>
+                                                <td class="px-4 py-3 text-right text-text-secondary">${Math.floor(Math.random()*100)}ms</td>
+                                            </tr>
+                                        `);
+                                    }
+                                </script>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Right Stats Panel -->
+<div class="col-span-4 flex flex-col gap-6 min-h-0">
+<div class="bg-surface-container-lowest border border-border-subtle rounded-xl p-4 flex flex-col gap-4">
+<h3 class="font-section-header text-section-header text-on-surface">连接拓扑分析</h3>
+<div class="relative h-48 bg-surface-container rounded-lg flex items-center justify-center overflow-hidden border border-outline-variant/30">
+<!-- Visual placeholder for flow -->
+<div class="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-primary via-transparent to-transparent"></div>
+<div class="z-10 flex items-center gap-12">
+<div class="flex flex-col items-center gap-2">
+<div class="w-12 h-12 bg-on-surface rounded-full flex items-center justify-center text-surface-lowest shadow-lg">
+<span class="material-symbols-outlined">dns</span>
+</div>
+<span class="text-[10px] font-code-meta uppercase">来源</span>
+</div>
+<div class="h-[2px] w-16 bg-gradient-to-r from-primary to-status-green relative">
+<div class="absolute top-1/2 left-0 w-2 h-2 bg-status-green rounded-full -translate-y-1/2 animate-[ping_1.5s_infinite]"></div>
+</div>
+<div class="flex flex-col items-center gap-2">
+<div class="w-12 h-12 bg-surface-container-highest border border-border-subtle rounded-full flex items-center justify-center text-primary shadow-lg">
+<span class="material-symbols-outlined">hub</span>
+</div>
+<span class="text-[10px] font-code-meta uppercase">端点</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Health KPIs -->
+<div class="grid grid-cols-2 gap-4">
+<div class="bg-surface-container-lowest border border-border-subtle rounded-xl p-4 relative overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-status-green"></div>
+<p class="text-text-secondary text-[11px] font-section-header uppercase tracking-wider">可用性 (24h)</p>
+<p class="text-2xl font-page-title text-on-surface mt-1">99.98%</p>
+</div>
+<div class="bg-surface-container-lowest border border-border-subtle rounded-xl p-4 relative overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-status-amber"></div>
+<p class="text-text-secondary text-[11px] font-section-header uppercase tracking-wider">重试队列</p>
+<p class="text-2xl font-page-title text-on-surface mt-1">14</p>
+</div>
+</div>
+<!-- Quick 预览 Section -->
+<div class="flex-1 bg-surface-container-lowest border border-border-subtle rounded-xl p-4 flex flex-col min-h-0 overflow-hidden">
+<h3 class="font-section-header text-section-header text-on-surface mb-3">待处理审计队列</h3>
+<div class="flex-1 overflow-y-auto custom-scrollbar space-y-2">
+<div class="p-3 bg-surface-container-low rounded-lg border border-border-subtle flex flex-col gap-1">
+<div class="flex justify-between items-center">
+<span class="text-[10px] font-code-meta text-primary">需要审计</span>
+<span class="text-[10px] text-text-secondary">2 分钟前</span>
+</div>
+<p class="text-body-sm font-bold text-on-surface truncate">签名不匹配: /v1/auth</p>
+<div class="flex gap-2 mt-1">
+<button class="text-[10px] font-bold text-primary hover:underline">查看差异</button>
+<button class="text-[10px] font-bold text-status-green hover:underline">手动放行</button>
+</div>
+</div>
+<div class="p-3 bg-surface-container-low rounded-lg border border-border-subtle flex flex-col gap-1">
+<div class="flex justify-between items-center">
+<span class="text-[10px] font-code-meta text-status-amber">重试耗尽</span>
+<span class="text-[10px] text-text-secondary">15 分钟前</span>
+</div>
+<p class="text-body-sm font-bold text-on-surface truncate">订单同步失败: #88219</p>
+<div class="flex gap-2 mt-1">
+<button class="text-[10px] font-bold text-primary hover:underline">死信队列</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Deep Inspector Overlay (Glassmorphism) -->
+<div class="fixed inset-y-0 right-0 w-inspector-width glass-panel z-50 transform translate-x-full transition-transform duration-300 shadow-2xl flex flex-col" id="deepInspector">
+<div class="p-5 border-b border-white/10 flex justify-between items-center bg-white/5">
+<div>
+<h3 class="text-status-cyan font-page-title text-lg flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">search_check</span>
+                        节点检查器
+                    </h3>
+<p class="text-white/60 text-[10px] font-code-meta">请求 ID: req_a72b_f812x</p>
+</div>
+<button class="p-1 hover:bg-white/10 rounded transition-colors text-white/70" onclick="toggleInspector()">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<div class="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-6">
+<!-- Collapsible Sections -->
+<section>
+<div class="flex items-center justify-between text-white/90 font-bold text-sm mb-3">
+<span class="flex items-center gap-2"><span class="material-symbols-outlined text-sm text-status-cyan">terminal</span> JSON 差异</span>
+<span class="material-symbols-outlined text-xs text-white/40">expand_less</span>
+</div>
+<div class="bg-black/40 rounded-lg p-4 font-code-meta text-[11px] leading-relaxed border border-white/5">
+<div class="flex gap-4">
+<div class="flex-1">
+<p class="text-white/40 mb-2 font-bold uppercase tracking-widest text-[9px]">原始值</p>
+<code class="text-white/80 block">
+                                    {<br/>
+                                      "id": "ord_101",<br/>
+                                      "status": "pending"<br/>
+                                    }
+                                </code>
+</div>
+<div class="flex-1">
+<p class="text-status-green mb-2 font-bold uppercase tracking-widest text-[9px]">已修改（+）</p>
+<code class="text-status-green block">
+                                    {<br/>
+                                      "id": "ord_101",<br/>
+                                      "status": "active"<br/>
+                                    }
+                                </code>
+</div>
+</div>
+</div>
+</section>
+<section>
+<div class="flex items-center justify-between text-white/90 font-bold text-sm mb-3">
+<span class="flex items-center gap-2"><span class="material-symbols-outlined text-sm text-status-cyan">key</span> 请求头</span>
+</div>
+<div class="bg-black/20 rounded-lg border border-white/5 divide-y divide-white/5 text-[11px] font-code-meta">
+<div class="p-2 flex justify-between"><span class="text-white/50">Content-Type</span><span class="text-white/90">application/json</span></div>
+<div class="p-2 flex justify-between"><span class="text-white/50">X-签名</span><span class="text-status-amber">sha256=4f3a...</span></div>
+<div class="p-2 flex justify-between"><span class="text-white/50">User-Agent</span><span class="text-white/90">Webhook-Adapter/2.0</span></div>
+</div>
+</section>
+<section>
+<div class="flex items-center justify-between text-white/90 font-bold text-sm mb-3">
+<span class="flex items-center gap-2"><span class="material-symbols-outlined text-sm text-status-cyan">verified_user</span> 载荷签名校验</span>
+</div>
+<div class="p-4 rounded-lg bg-status-green/10 border border-status-green/30 flex items-start gap-3">
+<span class="material-symbols-outlined text-status-green" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<div>
+<p class="text-status-green font-bold text-xs">签名已验证</p>
+<p class="text-white/60 text-[10px] mt-1">使用的密钥: OS_根节点_SEC_V3. 验证延迟: 1.2ms.</p>
+</div>
+</div>
+</section>
+<section>
+<div class="flex items-center justify-between text-white/90 font-bold text-sm mb-3">
+<span class="flex items-center gap-2"><span class="material-symbols-outlined text-sm text-status-cyan">replay</span> 重试逻辑策略</span>
+</div>
+<div class="bg-black/20 rounded-lg p-4 border border-white/5">
+<p class="text-white/90 text-xs font-bold mb-3">指数退避策略 (指数退避)</p>
+<div class="flex gap-2 h-1 mb-4">
+<div class="flex-1 bg-status-green rounded-full"></div>
+<div class="flex-1 bg-status-green rounded-full"></div>
+<div class="flex-1 bg-white/10 rounded-full"></div>
+<div class="flex-1 bg-white/10 rounded-full"></div>
+<div class="flex-1 bg-white/10 rounded-full"></div>
+</div>
+<div class="flex justify-between text-[10px] font-code-meta text-white/40">
+<span>已重试 2/5</span>
+<span>下一次重试: 45s 后</span>
+</div>
+</div>
+</section>
+</div>
+<div class="p-5 border-t border-white/10 bg-black/40 flex gap-3">
+<button class="flex-1 py-2 bg-white/10 text-white font-section-header rounded hover:bg-white/20 transition-all">重放请求</button>
+<button class="flex-1 py-2 bg-primary text-white font-section-header rounded hover:brightness-110 transition-all">确认发布</button>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (发布流水线) -->
+<footer class="fixed bottom-0 left-sidebar-width right-0 z-40 flex justify-center items-center gap-12 px-8 py-3 bg-surface-container-high/95 backdrop-blur-md border-t border-border-subtle dark:border-outline-variant shadow-sm h-16">
+<div class="flex items-center gap-12">
+<div class="flex items-center gap-2 text-outline dark:text-outline-variant font-status-label text-status-label uppercase tracking-wider">
+<span class="material-symbols-outlined text-sm">edit_note</span>
+<span>草稿</span>
+</div>
+<div class="w-12 h-px bg-outline-variant"></div>
+<div class="flex items-center gap-2 text-primary dark:text-primary-container font-bold font-status-label text-status-label uppercase tracking-wider">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">analytics</span>
+<span>影响分析</span>
+</div>
+<div class="w-12 h-px bg-outline-variant"></div>
+<div class="flex items-center gap-2 text-outline dark:text-outline-variant font-status-label text-status-label uppercase tracking-wider">
+<span class="material-symbols-outlined text-sm">rule</span>
+<span>技术复核</span>
+</div>
+<div class="w-12 h-px bg-outline-variant"></div>
+<div class="flex items-center gap-2 text-outline dark:text-outline-variant font-status-label text-status-label uppercase tracking-wider">
+<span class="material-symbols-outlined text-sm">verified</span>
+<span>安全检查</span>
+</div>
+<div class="w-12 h-px bg-outline-variant"></div>
+<div class="flex items-center gap-2 text-outline dark:text-outline-variant font-status-label text-status-label uppercase tracking-wider opacity-50">
+<span class="material-symbols-outlined text-sm">publish</span>
+<span>发布</span>
+</div>
+</div>
+</footer>
+<script>
+        function toggleInspector() {
+            const inspector = document.getElementById('deepInspector');
+            if (inspector.classList.contains('translate-x-full')) {
+                inspector.classList.remove('translate-x-full');
+                inspector.classList.add('translate-x-0');
+            } else {
+                inspector.classList.remove('translate-x-0');
+                inspector.classList.add('translate-x-full');
+            }
+        }
+        
+        // Simulating live feed updates
+        setInterval(() => {
+            const tbody = document.querySelector('tbody');
+            const rows = tbody.querySelectorAll('tr');
+            if(rows.length > 30) rows[rows.length - 1].remove();
+        }, 10000);
+    </script>
+</body></html>

@@ -1,0 +1,227 @@
+/**
+ * @file api/asset.ts
+ * @description 资产管理 API — 全项目唯一资产接口定义
+ *
+ * 所有调用走 utils/http.ts 统一实例。
+ * 对应后端：AssetController (/assets)、AssetCategoryController (/categories)
+ */
+
+import http from '@/utils/http';
+import type { PaginatedResponse } from '@/types/common';
+import type {
+  Asset,
+  AssetListItem,
+  AssetListQuery,
+  AssetCategory,
+  CreateAssetRequest,
+  UpdateAssetRequest,
+  DashboardStats,
+  AssetValueTrend,
+  DeptAssetDistribution,
+  DepreciationScheduleItem,
+  AssetAttachment,
+  RelationVO,
+  RelationTreeNode,
+  AddRelationRequest,
+  AssetParentChild,
+} from '@/types/asset';
+
+// ── 资产 CRUD ─────────────────────────────────────────────────────────────────
+
+/** 获取资产列表（分页） */
+export const getAssetList = (params?: AssetListQuery) =>
+  http.get<PaginatedResponse<AssetListItem>>('/assets', { params });
+
+/** 获取资产详情 */
+export const getAssetById = (id: number) =>
+  http.get<Asset>(`/assets/${id}`);
+
+/** 新建资产 */
+export const createAsset = (data: CreateAssetRequest) =>
+  http.post<Asset>('/assets', data);
+
+/** 更新资产 */
+export const updateAsset = ({ id, ...data }: UpdateAssetRequest) =>
+  http.put<Asset>(`/assets/${id}`, data);
+
+/** 删除资产 */
+export const deleteAsset = (id: number) =>
+  http.delete<void>(`/assets/${id}`);
+
+// ── 资产批量操作 ──────────────────────────────────────────────────────────────
+
+/** 获取导入模板 */
+export const getImportTemplate = () =>
+  http.get('/assets/import/template', { responseType: 'blob' });
+
+/** 解析导入文件（第一步：预览） */
+export const parseImportFile = (file: File) => {
+  const formData = new FormData();
+  formData.append('file', file);
+  return http.post<{ parseId: string; rows: unknown[] }>(
+    '/assets/import/parse',
+    formData,
+    { headers: { 'Content-Type': 'multipart/form-data' } },
+  );
+};
+
+/** 确认提交导入（第二步：写入） */
+export const commitImport = (parseId: string, rows: unknown[]) =>
+  http.post<{ importedCount: number; failedCount: number }>(
+    '/assets/import/commit',
+    { parseId, rows },
+  );
+
+/** 导出资产列表 */
+export const exportAssets = (
+  filters: Pick<AssetListQuery, 'categoryId' | 'status' | 'deptId' | 'keyword'>,
+) =>
+  http.post('/assets/export', filters, { responseType: 'blob' });
+
+// ── 资产分类 ──────────────────────────────────────────────────────────────────
+
+/** 获取分类树 */
+export const getCategoryTree = () =>
+  http.get<AssetCategory[]>('/categories/tree');
+
+/** 新建分类 */
+export const createCategory = (data: { categoryName: string; parentId?: number | null }) =>
+  http.post<AssetCategory>('/categories', data);
+
+/** 更新分类 */
+export const updateCategory = (id: number, data: Partial<AssetCategory>) =>
+  http.put<AssetCategory>(`/categories/${id}`, data);
+
+/** 删除分类 */
+export const deleteCategory = (id: number) =>
+  http.delete<void>(`/categories/${id}`);
+
+// ── 折旧排期 ──────────────────────────────────────────────────────────────────
+
+/** 获取资产折旧排期 */
+export const getDepreciationSchedule = (assetId: number) =>
+  http.get<DepreciationScheduleItem[]>(
+    `/assets/${assetId}/depreciation-schedule`,
+  );
+
+// ── 仪表板统计 ────────────────────────────────────────────────────────────────
+
+/** 获取仪表板核心统计 */
+export const getDashboardStats = () =>
+  http.get<DashboardStats>('/dashboard/stats');
+
+/** 获取资产价值趋势（days: 最近多少天，默认 30） */
+export const getAssetValueTrends = (days = 30) =>
+  http.get<AssetValueTrend[]>('/dashboard/trends', {
+    params: { days },
+  });
+
+/** 获取部门资产分布 */
+export const getDeptDistribution = () =>
+  http.get<DeptAssetDistribution[]>('/dashboard/dept-distribution');
+
+/** 获取维保统计 */
+export const getMaintenanceStats = () =>
+  http.get<Record<string, unknown>>('/dashboard/maintenance-stats');
+
+/** 获取待审批数量 */
+export const getPendingApprovalsCount = () =>
+  http.get<number>('/dashboard/pending-approvals');
+
+// ── 资产附件 ────────────────────────────────────────────────────────────────
+
+/** 获取资产附件列表 */
+export const getAssetAttachments = (assetId: number) =>
+  http.get<AssetAttachment[]>(`/assets/${assetId}/attachments`);
+
+/** 上传资产附件（注意：不设置 Content-Type，浏览器自动添加 boundary） */
+export const uploadAssetAttachment = (assetId: number, file: File) => {
+  const formData = new FormData();
+  formData.append('file', file);
+  return http.post<AssetAttachment>(`/assets/${assetId}/attachments`, formData);
+};
+
+/** 删除资产附件 */
+export const deleteAssetAttachment = (assetId: number, attachmentId: number) =>
+  http.delete<void>(`/assets/${assetId}/attachments/${attachmentId}`);
+
+// ── 父子关系 ────────────────────────────────────────────────────────────────
+
+/** 获取子资产列表 */
+export const getAssetChildren = (id: number) =>
+  http.get<Asset[]>(`/assets/${id}/children`);
+
+/** 获取资产树 */
+export const getAssetTree = (id: number) =>
+  http.get<Asset>(`/assets/${id}/tree`);
+
+/** 获取父资产信息 */
+export const getAssetParent = (id: number) =>
+  http.get<Asset>(`/assets/${id}/parent`);
+
+/** 设置父资产 */
+export const setAssetParent = (id: number, parentAssetId: number, relationType?: string) =>
+  http.put<void>(`/assets/${id}/parent`, null, { params: { parentAssetId, relationType } });
+
+/** 移除父资产关系 */
+export const removeAssetParent = (id: number) =>
+  http.delete<void>(`/assets/${id}/parent`);
+
+// ── 资产父子关系 ──────────────────────────────────────────────────────────
+
+/** 获取子资产关联列表 */
+export const getRelations = (assetId: number) =>
+  http.get<RelationVO[]>(`/assets/${assetId}/relations`);
+
+/** 添加父子关系 */
+export const addRelation = (assetId: number, data: AddRelationRequest) =>
+  http.post<AssetParentChild>(`/assets/${assetId}/relations`, data);
+
+/** 删除父子关系 */
+export const removeRelation = (assetId: number, relationId: number) =>
+  http.delete<void>(`/assets/${assetId}/relations/${relationId}`);
+
+/** 获取父子关系树 */
+export const getRelationTree = (assetId: number) =>
+  http.get<RelationTreeNode[]>(`/assets/${assetId}/relations/tree`);
+
+// ── ABC 分类管理 ────────────────────────────────────────────────────────────────
+
+/** 计算 ABC 分类 */
+export const calculateABCClassification = (categoryId?: number) =>
+  http.post<Asset[]>('/assets/abc-classification/calculate', null, {
+    params: categoryId !== undefined ? { categoryId } : {},
+  });
+
+// ── 资产履历 ────────────────────────────────────────────────────────────────
+
+/** 资产履历事件类型 */
+export type AssetHistoryEventType =
+  | 'CHANGE_LOG'
+  | 'WORK_ORDER'
+  | 'MAINTENANCE'
+  | 'ASSIGNMENT'
+  | 'BORROW'
+  | 'INSPECTION'
+  | 'RETIREMENT'
+  | 'INVENTORY'
+  | 'INTAKE';
+
+/** 资产履历事件 */
+export interface AssetHistoryEvent {
+  eventType: AssetHistoryEventType;
+  eventTime: string;
+  title: string;
+  description: string;
+  operatorName: string;
+  refId: number | null;
+  refType: string | null;
+  linkUrl: string | null;
+  level: 'INFO' | 'WARNING' | 'ERROR';
+}
+
+/** 获取资产完整履历 */
+export const getAssetHistory = (assetId: number, eventTypes?: AssetHistoryEventType[]) =>
+  http.get<AssetHistoryEvent[]>(`/assets/${assetId}/history`, {
+    params: eventTypes ? { eventTypes } : {},
+  });

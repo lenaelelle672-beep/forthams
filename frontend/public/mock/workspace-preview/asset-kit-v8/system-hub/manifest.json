@@ -1,0 +1,338 @@
+{
+  "package": "asset-kit-v8/system-hub",
+  "createdAt": "2026-06-17",
+  "ownerPage": "/fixed-assets/workbench?menu=system-flow-definition",
+  "sourceWorkflow": "image_gen built-in image generation plus Stitch CLI OAuth generation; copied generated outputs into project assets",
+  "assets": [
+    {
+      "id": "system-hub-overview-v2",
+      "path": "/mock/workspace-preview/asset-kit-v8/system-hub/system-hub-overview-v2.png",
+      "file": "system-hub-overview-v2.png",
+      "dimensions": {
+        "width": 1586,
+        "height": 992
+      },
+      "purpose": "系统运营中枢整体 v2 产品图，作为系统配置后台、缺失页面组件和后续 Stitch 复刻的视觉基准。",
+      "promptSummary": "UNIVIEW 固定资产管理系统的系统运营中枢 v2，顶部五个独立视角入口、左侧分组系统配置导航、配置待办表格、运行审计侧栏与子页面 IMAGE2/Stitch 矩阵；非制造大屏、非营销页。",
+      "frontendUsage": [
+        "WorkbenchSystemPage 产品图与 Stitch 计划卡片"
+      ],
+      "stitchStatus": "pending-auth-refresh",
+      "stitchProjectId": "9943060219435296513",
+      "stitchSessionId": "11037980306810822804",
+      "stitchScreenId": "e66a447a847742bc8337d7c9e1d5fed6",
+      "notes": [
+        "当前为系统运营中枢整体 v2 图，不替代单个配置模块的后续细化图。",
+        "Stitch MCP 当前 Auth required，后续认证恢复后以 v2 IMAGE2 继续复刻。"
+      ]
+    },
+    {
+      "id": "flow-platform-v2",
+      "path": "/mock/workspace-preview/asset-kit-v8/system-hub/flow-platform-v2.png",
+      "file": "flow-platform-v2.png",
+      "dimensions": {
+        "width": 1625,
+        "height": 968
+      },
+      "purpose": "流程平台分组 IMAGE2 v2 产品图，承接流程定义、流程设计器、表单配置、表单存储、审批规则、待办字段配置和 SLA 配置页面。",
+      "promptSummary": "系统运营中枢 - 流程平台配置总览；左侧七个流程平台模块、中央流程资产清单、流程设计器预览、节点属性、发布门禁、真人测试状态和最近流程变更。",
+      "frontendUsage": [
+        "WorkbenchSystemPage 流程平台产品图与 Stitch 计划卡片"
+      ],
+      "stitchStatus": "pending-auth-refresh",
+      "notes": [
+        "IMAGE2 v2 已接入 WorkbenchSystemPage 和设计稿总览卡片。",
+        "旧版 stitch-flow-platform-v1 仍保留为候选对照；Stitch MCP 当前 Auth required，认证恢复后需按 v2 重新复刻。"
+      ],
+      "stitchAssetId": "stitch-flow-platform-v1",
+      "stitchProjectId": "9943060219435296513",
+      "stitchSessionId": "6790519575306752454",
+      "stitchScreenId": "3b0f1f04d8de4d1aab923940b8dcb2ba",
+      "localExport": ".stitch/exports/9943060219435296513-6790519575306752454"
+    },
+    {
+      "id": "org-permission-v2",
+      "path": "/mock/workspace-preview/asset-kit-v8/system-hub/org-permission-v2.png",
+      "file": "org-permission-v2.png",
+      "dimensions": {
+        "width": 1586,
+        "height": 992
+      },
+      "purpose": "组织权限分组 IMAGE2 v2 产品图，承接用户管理、角色权限、菜单权限、数据权限、工作交接、部门组织和岗位管理页面。",
+      "promptSummary": "系统运营中枢 - 组织权限 v2；以用户/角色/菜单/数据/交接/部门/岗位模块为主线，展示角色权限矩阵、数据范围模拟、交接扫描、EHR 同步和权限发布审计闸口。",
+      "frontendUsage": [
+        "WorkbenchSystemPage 组织权限产品图与 Stitch 计划卡片",
+        "设计稿总览 - 组织权限系统稿卡片"
+      ],
+      "stitchStatus": "pending-auth-refresh",
+      "notes": [
+        "IMAGE2 v2 已接入 WorkbenchSystemPage 和设计稿总览卡片。",
+        "旧版 stitch-org-permission-v1 仍保留为候选对照；Stitch MCP 当前 Auth required，认证恢复后需按 v2 重新复刻。"
+      ],
+      "stitchAssetId": "stitch-org-permission-v1",
+      "stitchProjectId": "9943060219435296513",
+      "stitchSessionId": "7184146929821785733",
+      "stitchScreenId": "1dc28c302c76434a90580facb399a225",
+      "localExport": ".stitch/exports/9943060219435296513-7184146929821785733"
+    },
+    {
+      "id": "master-data-v2",
+      "path": "/mock/workspace-preview/asset-kit-v8/system-hub/master-data-v2.png",
+      "file": "master-data-v2.png",
+      "dimensions": {
+        "width": 1536,
+        "height": 1024
+      },
+      "purpose": "基础资料分组 IMAGE2 v2 产品图，承接资产分类、编号规则、位置管理、供应商管理、自定义字段和字段集配置页面。",
+      "promptSummary": "系统运营中枢 - 基础资料 v2；以资产分类树与规则表、编号预览、位置树、供应商交易反查、自定义字段、字段集配置、发布门禁和主数据变更审计为主线。",
+      "frontendUsage": [
+        "WorkbenchSystemPage 基础资料产品图与 Stitch 计划卡片",
+        "设计稿总览 - 基础资料系统稿卡片"
+      ],
+      "stitchStatus": "pending-auth-refresh",
+      "notes": [
+        "IMAGE2 v2 已接入 WorkbenchSystemPage 和设计稿总览卡片。",
+        "基础资料按主数据维护台处理，覆盖 CIP 分类、MES 绑定属性和供应商交易反查。",
+        "旧版 stitch-master-data-v1 仍保留为候选对照；Stitch MCP 当前 Auth required，认证恢复后需按 v2 重新复刻。"
+      ],
+      "stitchAssetId": "stitch-master-data-v1",
+      "stitchProjectId": "9943060219435296513",
+      "stitchSessionId": "16611687891759642920",
+      "stitchScreenId": "8ee718af4d3e4aadb0a6ebc88f5876ee",
+      "localExport": ".stitch/exports/9943060219435296513-16611687891759642920"
+    },
+    {
+      "id": "integration-config-v2",
+      "path": "/mock/workspace-preview/asset-kit-v8/system-hub/integration-config-v2.png",
+      "file": "integration-config-v2.png",
+      "dimensions": {
+        "width": 1586,
+        "height": 992
+      },
+      "purpose": "集成配置分组 IMAGE2 v2 产品图，承接外部系统配置、接口配置、字段映射、同步规则和 Webhook 配置页面。",
+      "promptSummary": "系统运营中枢 - 集成配置 v2；以 MES、ERP、EHR、PO/合同、Webhook 和未来数据源为接入对象，展示连接测试、字段映射矩阵、同步规则、运行日志和发布闸口。",
+      "frontendUsage": [
+        "WorkbenchSystemPage 集成配置产品图与 Stitch 计划卡片",
+        "设计稿总览 - 集成配置系统稿卡片"
+      ],
+      "stitchStatus": "pending-auth-refresh",
+      "notes": [
+        "IMAGE2 v2 已接入 WorkbenchSystemPage 和设计稿总览卡片。",
+        "MES 作为多个外部数据源之一，不做制造管控大屏。",
+        "旧版 stitch-integration-config-v1 仍保留为候选对照；Stitch MCP 当前 Auth required，认证恢复后需按 v2 重新复刻。"
+      ],
+      "stitchAssetId": "stitch-integration-config-v1",
+      "stitchProjectId": "9943060219435296513",
+      "stitchSessionId": "8987723327970831776",
+      "stitchScreenId": "9b461b01249e495a861067697ef70a80",
+      "localExport": ".stitch/exports/9943060219435296513-8987723327970831776"
+    },
+    {
+      "id": "notification-config-v2",
+      "path": "/mock/workspace-preview/asset-kit-v8/system-hub/notification-config-v2.png",
+      "file": "notification-config-v2.png",
+      "dimensions": {
+        "width": 1586,
+        "height": 992
+      },
+      "purpose": "消息与通知分组 IMAGE2 v2 产品图，承接邮件网关、流程邮件、邮件模板、邮件日志、通知模板、通知渠道、通知偏好和工作流通知开关页面。",
+      "promptSummary": "系统运营中枢 - 消息与通知 v2；以邮件网关、模板路由、通知渠道、日志追踪、重试队列、偏好和工作流通知开关为主线，展示测试发送、保存草稿、提交校验和发布闸口。",
+      "frontendUsage": [
+        "WorkbenchSystemPage 消息与通知产品图与 Stitch 计划卡片",
+        "设计稿总览 - 消息通知系统稿卡片"
+      ],
+      "stitchStatus": "pending-auth-refresh",
+      "notes": [
+        "IMAGE2 v2 已接入 WorkbenchSystemPage 和设计稿总览卡片。",
+        "页面搜索保留在消息与通知专属页内，不恢复全局导航搜索。",
+        "旧版 stitch-notification-config-v1 仍保留为候选对照；Stitch MCP 当前 Auth required，认证恢复后需按 v2 重新复刻。"
+      ],
+      "stitchAssetId": "stitch-notification-config-v1",
+      "stitchProjectId": "9943060219435296513",
+      "stitchSessionId": "7654025559738889773",
+      "stitchScreenId": "d00ffffa4b0941b7a76bce4accb897ca",
+      "localExport": ".stitch/exports/9943060219435296513-7654025559738889773"
+    },
+    {
+      "id": "system-params-v2",
+      "path": "/mock/workspace-preview/asset-kit-v8/system-hub/system-params-v2.png",
+      "file": "system-params-v2.png",
+      "dimensions": {
+        "width": 1536,
+        "height": 1024
+      },
+      "purpose": "系统参数分组 IMAGE2 v2 产品图，承接基础参数、安全策略、文件存储、导入导出、缓存管理和操作审计页面。",
+      "promptSummary": "系统运营中枢 - 系统参数 v2；以参数表、当前参数编辑、安全策略、文件存储、导入导出模板、缓存管理、发布门禁和操作审计为主线，强调页面内搜索、保存草稿、提交校验和发布配置。",
+      "frontendUsage": [
+        "WorkbenchSystemPage 系统参数产品图与 Stitch 计划卡片",
+        "设计稿总览 - 系统参数系统稿卡片"
+      ],
+      "stitchStatus": "pending-auth-refresh",
+      "notes": [
+        "IMAGE2 v2 已接入 WorkbenchSystemPage 和设计稿总览卡片。",
+        "页面搜索保留在系统参数专属页内，不恢复全局导航搜索。",
+        "旧版 stitch-system-params-v1 仍保留为候选对照；Stitch MCP 当前 Auth required，认证恢复后需按 v2 重新复刻。"
+      ],
+      "stitchAssetId": "stitch-system-params-v1",
+      "stitchProjectId": "9943060219435296513",
+      "stitchSessionId": "10205998938140541503",
+      "stitchScreenId": "c4cf28d06a304c70be1066d97fe381e5",
+      "localExport": ".stitch/exports/9943060219435296513-10205998938140541503"
+    },
+    {
+      "id": "stitch-flow-platform-v1",
+      "path": "/mock/workspace-preview/asset-kit-v8/system-hub/stitch-flow-platform-v1.png",
+      "file": "stitch-flow-platform-v1.png",
+      "dimensions": {
+        "width": 512,
+        "height": 508
+      },
+      "purpose": "流程平台分组的 Stitch 复刻截图，承接流程定义、流程设计器、表单配置、待办字段配置和 SLA 配置页面的视觉复刻。",
+      "promptSummary": "Stitch 复刻 flow-platform-v1：流程平台页面、流程定义表格、CIP 转固流程详情、节点结构、表单字段、SLA 和发布校验。",
+      "frontendUsage": [
+        "WorkbenchSystemPage 流程平台 Stitch 复刻图"
+      ],
+      "stitchStatus": "complete",
+      "stitchProjectId": "9943060219435296513",
+      "stitchSessionId": "6790519575306752454",
+      "stitchScreenId": "3b0f1f04d8de4d1aab923940b8dcb2ba",
+      "localExport": ".stitch/exports/9943060219435296513-6790519575306752454",
+      "notes": [
+        "通过项目内 Stitch CLI 的 OAuth 通道生成；MCP list_projects 仍返回 Auth required。"
+      ]
+    },
+    {
+      "id": "stitch-org-permission-v1",
+      "path": "/mock/workspace-preview/asset-kit-v8/system-hub/stitch-org-permission-v1.png",
+      "file": "stitch-org-permission-v1.png",
+      "dimensions": {
+        "width": 512,
+        "height": 410
+      },
+      "purpose": "组织权限分组的 Stitch 复刻截图，承接用户、角色、菜单、数据权限和工作交接页面的视觉复刻。",
+      "promptSummary": "Stitch 复刻 org-permission-v1：用户管理表格、钉钉/EHR 绑定、角色包、数据范围、待交接任务和操作记录。",
+      "frontendUsage": [
+        "WorkbenchSystemPage 组织权限 Stitch 复刻图"
+      ],
+      "stitchStatus": "complete",
+      "stitchProjectId": "9943060219435296513",
+      "stitchSessionId": "7184146929821785733",
+      "stitchScreenId": "1dc28c302c76434a90580facb399a225",
+      "localExport": ".stitch/exports/9943060219435296513-7184146929821785733",
+      "notes": [
+        "通过项目内 Stitch CLI 的 OAuth 通道生成；MCP list_projects 仍返回 Auth required。"
+      ]
+    },
+    {
+      "id": "stitch-master-data-v1",
+      "path": "/mock/workspace-preview/asset-kit-v8/system-hub/stitch-master-data-v1.png",
+      "file": "stitch-master-data-v1.png",
+      "dimensions": {
+        "width": 512,
+        "height": 410
+      },
+      "purpose": "基础资料分组的 Stitch 复刻截图，承接资产分类、编号规则、位置、供应商和字段集页面的视觉复刻。",
+      "promptSummary": "Stitch 复刻 master-data-v1：资产分类规则表格、折旧策略、盘点策略、编号预览、字段集和责任审计。",
+      "frontendUsage": [
+        "WorkbenchSystemPage 基础资料 Stitch 复刻图"
+      ],
+      "stitchStatus": "complete",
+      "stitchProjectId": "9943060219435296513",
+      "stitchSessionId": "16611687891759642920",
+      "stitchScreenId": "8ee718af4d3e4aadb0a6ebc88f5876ee",
+      "localExport": ".stitch/exports/9943060219435296513-16611687891759642920",
+      "notes": [
+        "通过项目内 Stitch CLI 的 OAuth 通道生成；MCP list_projects 仍返回 Auth required。"
+      ]
+    },
+    {
+      "id": "stitch-integration-config-v1",
+      "path": "/mock/workspace-preview/asset-kit-v8/system-hub/stitch-integration-config-v1.png",
+      "file": "stitch-integration-config-v1.png",
+      "dimensions": {
+        "width": 512,
+        "height": 435
+      },
+      "purpose": "集成配置分组的 Stitch 复刻截图，承接外部系统、接口、字段映射、同步规则和 Webhook 页面。",
+      "promptSummary": "Stitch 复刻 integration-config-v1：MES、ERP、EHR、PO/合同和未来数据源列表，右侧连接、字段映射、同步规则和运行日志。",
+      "frontendUsage": [
+        "WorkbenchSystemPage 集成配置 Stitch 复刻图"
+      ],
+      "stitchStatus": "complete",
+      "stitchProjectId": "9943060219435296513",
+      "stitchSessionId": "8987723327970831776",
+      "stitchScreenId": "9b461b01249e495a861067697ef70a80",
+      "localExport": ".stitch/exports/9943060219435296513-8987723327970831776",
+      "notes": [
+        "通过项目内 Stitch CLI 的 OAuth 通道生成；MCP list_projects 仍返回 Auth required。"
+      ]
+    },
+    {
+      "id": "stitch-notification-config-v1",
+      "path": "/mock/workspace-preview/asset-kit-v8/system-hub/stitch-notification-config-v1.png",
+      "file": "stitch-notification-config-v1.png",
+      "dimensions": {
+        "width": 512,
+        "height": 410
+      },
+      "purpose": "消息与通知分组的 Stitch 复刻截图，承接邮件网关、流程邮件、邮件模板、邮件日志和通知渠道页面。",
+      "promptSummary": "Stitch 复刻 notification-config-v1：邮件网关配置表、SMTP 详情、测试连接、重试策略和最近发送日志。",
+      "frontendUsage": [
+        "WorkbenchSystemPage 消息与通知 Stitch 复刻图"
+      ],
+      "stitchStatus": "complete",
+      "stitchProjectId": "9943060219435296513",
+      "stitchSessionId": "7654025559738889773",
+      "stitchScreenId": "d00ffffa4b0941b7a76bce4accb897ca",
+      "localExport": ".stitch/exports/9943060219435296513-7654025559738889773",
+      "notes": [
+        "通过项目内 Stitch CLI 的 OAuth 通道生成；MCP list_projects 仍返回 Auth required。"
+      ]
+    },
+    {
+      "id": "stitch-system-params-v1",
+      "path": "/mock/workspace-preview/asset-kit-v8/system-hub/stitch-system-params-v1.png",
+      "file": "stitch-system-params-v1.png",
+      "dimensions": {
+        "width": 512,
+        "height": 410
+      },
+      "purpose": "系统参数分组的 Stitch 复刻截图，承接基础参数、安全策略、文件存储、导入导出、缓存和操作审计页面。",
+      "promptSummary": "Stitch 复刻 system-params-v1：系统参数表格、文件存储配置、安全策略、回滚版本、变更治理和审计证据。",
+      "frontendUsage": [
+        "WorkbenchSystemPage 系统参数 Stitch 复刻图"
+      ],
+      "stitchStatus": "complete",
+      "stitchProjectId": "9943060219435296513",
+      "stitchSessionId": "10205998938140541503",
+      "stitchScreenId": "c4cf28d06a304c70be1066d97fe381e5",
+      "localExport": ".stitch/exports/9943060219435296513-10205998938140541503",
+      "notes": [
+        "通过项目内 Stitch CLI 的 OAuth 通道生成；MCP list_projects 仍返回 Auth required。"
+      ]
+    },
+    {
+      "id": "stitch-system-hub-overview-v1",
+      "path": "/mock/workspace-preview/asset-kit-v8/system-hub/stitch-system-hub-overview-v1.png",
+      "file": "stitch-system-hub-overview-v1.png",
+      "dimensions": {
+        "width": 512,
+        "height": 410
+      },
+      "purpose": "Stitch 复刻后的系统运营中枢屏幕截图，用于对比 IMAGE2 产品图和后续前端视觉细化。",
+      "promptSummary": "基于系统运营中枢的桌面后台结构生成：顶部固定资产平台导航、左侧系统配置导航、中央系统配置表格、右侧配置详情面板。",
+      "frontendUsage": [
+        "视觉对比与后续样式推广参考"
+      ],
+      "stitchStatus": "complete",
+      "stitchProjectId": "9943060219435296513",
+      "stitchSessionId": "11037980306810822804",
+      "stitchScreenId": "e66a447a847742bc8337d7c9e1d5fed6",
+      "localExport": ".stitch/exports/9943060219435296513-11037980306810822804",
+      "notes": [
+        "MCP list_projects 当前返回 Auth required，本次通过项目内 Stitch CLI 的 OAuth 通道生成。",
+        "本地导出包含 generate-result.json、suite-design.json、screen-01.json、screen-01.html、screen-01.png。"
+      ]
+    }
+  ]
+}

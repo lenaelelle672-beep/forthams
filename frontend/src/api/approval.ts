@@ -246,6 +246,87 @@ export async function getWorkOrderDetail(
   return data;
 }
 
+export interface ApprovalItem {
+  id: string | number;
+  title?: string;
+  status?: string;
+  type?: string;
+  applicantName?: string;
+  createdAt?: string;
+  [key: string]: unknown;
+}
+
+export interface ProcessTypeStat {
+  type: string;
+  label?: string;
+  count: number;
+  [key: string]: unknown;
+}
+
+export async function getApprovalList(params?: Record<string, unknown>) {
+  const { data } = await http.get<ApprovalItem[] | { records?: ApprovalItem[]; total?: number }>(
+    '/approvals',
+    { params },
+  );
+  return data;
+}
+
+export async function getPendingCount() {
+  const { data } = await http.get<number | { count?: number }>('/approvals/pending-count');
+  return typeof data === 'number' ? data : data.count ?? 0;
+}
+
+export async function getProcessStats() {
+  const { data } = await http.get<ProcessTypeStat[]>('/approvals/process-stats');
+  return data;
+}
+
+export async function getApprovalDetail(id: string | number) {
+  const { data } = await http.get<ApprovalItem>(`/approvals/${encodeURIComponent(String(id))}`);
+  return data;
+}
+
+export async function approveItem(id: string | number, data: Record<string, unknown> = {}) {
+  const response = await http.post(`/approvals/${encodeURIComponent(String(id))}/approve`, data);
+  return response.data;
+}
+
+export async function rejectItem(id: string | number, data: Record<string, unknown> = {}) {
+  const response = await http.post(`/approvals/${encodeURIComponent(String(id))}/reject`, data);
+  return response.data;
+}
+
+export async function submitApproval(data: Record<string, unknown>) {
+  const response = await http.post('/approvals', data);
+  return response.data;
+}
+
+export const approvalApi = {
+  getPendingList: getPendingApprovals,
+  getPendingOrders: getPendingApprovals,
+  fetchPendingApprovals: getPendingApprovals,
+  getDetail: getWorkOrderDetail,
+  getOrderDetail: getWorkOrderDetail,
+  fetchApprovalDetail: getWorkOrderDetail,
+  getRecords: getApprovalRecords,
+  approve(request: Record<string, unknown>) {
+    const orderId = request.orderId ?? request.id;
+    return approveOrder(Number(orderId), request as unknown as ApproveRequest);
+  },
+  approveOrder,
+  reject(request: Record<string, unknown>) {
+    const orderId = request.orderId ?? request.id;
+    return rejectOrder(Number(orderId), request as unknown as RejectRequest);
+  },
+  rejectOrder,
+  cancel(orderId: string | number, version?: number) {
+    return http.post(`/api/orders/${encodeURIComponent(String(orderId))}/cancel`, { version }).then((response) => response.data);
+  },
+  cancelOrder(orderId: string | number, data: Record<string, unknown> = {}) {
+    return http.post(`/api/orders/${encodeURIComponent(String(orderId))}/cancel`, data).then((response) => response.data);
+  },
+};
+
 // ---------------------------------------------------------------------------
 // Re-exports for backward compatibility
 // ---------------------------------------------------------------------------

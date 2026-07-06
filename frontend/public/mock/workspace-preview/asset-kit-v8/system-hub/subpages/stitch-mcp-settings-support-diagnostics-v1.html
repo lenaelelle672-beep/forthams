@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>后台设置 OS - 技术支持与诊断</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "primary-fixed": "#d9e2ff",
+                      "on-primary-fixed-variant": "#00419c",
+                      "inverse-surface": "#d4e4fa",
+                      "on-primary-fixed": "#001945",
+                      "surface-container-lowest": "#010f1f",
+                      "surface-bright": "#2c3a4c",
+                      "tertiary-fixed-dim": "#ddb7ff",
+                      "tertiary-fixed": "#f0dbff",
+                      "outline-variant": "#424654",
+                      "on-secondary-container": "#00384a",
+                      "background": "#051424",
+                      "tertiary": "#ddb7ff",
+                      "on-tertiary-fixed-variant": "#6900b3",
+                      "error": "#ffb4ab",
+                      "surface-container-highest": "#273647",
+                      "on-secondary-fixed-variant": "#004d65",
+                      "surface-container": "#122131",
+                      "on-primary": "#002c6f",
+                      "inverse-primary": "#0057cc",
+                      "on-surface-variant": "#c2c6d7",
+                      "on-secondary-fixed": "#001f2a",
+                      "surface-variant": "#273647",
+                      "surface": "#051424",
+                      "on-error-container": "#ffdad6",
+                      "secondary": "#6bd2ff",
+                      "on-tertiary": "#490080",
+                      "tertiary-container": "#9c49eb",
+                      "secondary-fixed": "#bfe9ff",
+                      "primary": "#b0c6ff",
+                      "on-background": "#d4e4fa",
+                      "on-primary-container": "#fffdff",
+                      "surface-dim": "#051424",
+                      "secondary-container": "#00a8d8",
+                      "on-secondary": "#003547",
+                      "on-tertiary-fixed": "#2c0051",
+                      "on-error": "#690005",
+                      "primary-fixed-dim": "#b0c6ff",
+                      "surface-container-high": "#1c2b3c",
+                      "on-surface": "#d4e4fa",
+                      "surface-tint": "#b0c6ff",
+                      "secondary-fixed-dim": "#6bd2ff",
+                      "error-container": "#93000a",
+                      "outline": "#8c90a0",
+                      "on-tertiary-container": "#fffdff",
+                      "surface-container-low": "#0d1c2d",
+                      "inverse-on-surface": "#233143",
+                      "primary-container": "#1d6ef2",
+                      "success": "#16A34A",
+                      "warning": "#F59E0B",
+                      "danger": "#DC2626"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "md": "16px",
+                      "xxl": "64px",
+                      "margin-desktop": "48px",
+                      "gutter": "24px",
+                      "xl": "40px",
+                      "unit": "4px",
+                      "sm": "8px",
+                      "xs": "4px",
+                      "lg": "24px",
+                      "margin-mobile": "16px",
+                      "topbar-height": "64px",
+                      "sidebar-width": "280px",
+                      "inspector-width": "400px"
+              },
+              "fontFamily": {
+                      "body-lg": [
+                              "Geist"
+                      ],
+                      "mono-code": [
+                              "JetBrains Mono"
+                      ],
+                      "title-md": [
+                              "Geist"
+                      ],
+                      "body-md": [
+                              "Geist"
+                      ],
+                      "label-md": [
+                              "Geist"
+                      ],
+                      "headline-lg-mobile": [
+                              "Geist"
+                      ],
+                      "headline-lg": [
+                              "Geist"
+                      ],
+                      "display-lg": [
+                              "Geist"
+                      ]
+              },
+              "fontSize": {
+                      "body-lg": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "mono-code": [
+                              "13px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "title-md": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-md": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "headline-lg-mobile": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "display-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "56px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+        body {
+            background-color: theme('colors.surface-container-lowest');
+            color: theme('colors.on-surface');
+            font-family: 'Geist', sans-serif;
+            overflow: hidden;
+        }
+        /* Custom scrollbar for terminal/lists */
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: theme('colors.outline-variant');
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: theme('colors.outline');
+        }
+        
+        .glass-panel {
+            background: theme('colors.surface-container-high' / 95%);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-left: 1px solid theme('colors.outline-variant');
+        }
+        
+        .pulse-dot {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .5; }
+        }
+        
+        .terminal-bg {
+            background: theme('colors.surface-container-low');
+            border-top: 1px solid theme('colors.outline-variant');
+            border-bottom: 1px solid theme('colors.outline-variant');
+        }
+    </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col">
+<!-- TopNavBar -->
+<header class="fixed top-0 left-0 w-full z-50 flex items-center justify-between px-gutter h-topbar-height bg-inverse-surface border-b border-outline-variant flat no shadows">
+<div class="flex items-center gap-gutter">
+<div class="font-headline-lg text-headline-lg text-surface-bright tracking-tight flex items-center gap-2">
+<span class="material-symbols-outlined text-primary-container" style="font-variation-settings: 'FILL' 1;">terminal</span>
+                后台设置 OS
+            </div>
+<nav class="hidden md:flex items-center gap-sm">
+<a class="px-md py-sm rounded-DEFAULT text-outline-variant hover:text-primary-fixed hover:bg-on-secondary-fixed-variant/20 transition-colors duration-200 ease-in-out font-body-md text-body-md flex items-center gap-2" href="#">
+                    指挥中心
+                </a>
+<a class="px-md py-sm rounded-DEFAULT text-outline-variant hover:text-primary-fixed hover:bg-on-secondary-fixed-variant/20 transition-colors duration-200 ease-in-out font-body-md text-body-md flex items-center gap-2" href="#">
+                    控制塔
+                </a>
+<a class="px-md py-sm rounded-DEFAULT text-outline-variant hover:text-primary-fixed hover:bg-on-secondary-fixed-variant/20 transition-colors duration-200 ease-in-out font-body-md text-body-md flex items-center gap-2" href="#">
+                    资产业务
+                </a>
+<a class="px-md py-sm rounded-DEFAULT text-outline-variant hover:text-primary-fixed hover:bg-on-secondary-fixed-variant/20 transition-colors duration-200 ease-in-out font-body-md text-body-md flex items-center gap-2" href="#">
+                    数据分析
+                </a>
+<a class="px-md py-sm rounded-DEFAULT text-primary-fixed-dim border-b-2 border-primary-fixed-dim pb-1 font-body-md text-body-md flex items-center gap-2" href="#">
+                    技术支持与诊断
+                </a>
+</nav>
+</div>
+<div class="flex items-center gap-md">
+<button class="p-2 text-outline-variant hover:text-primary-fixed transition-colors duration-200 ease-in-out relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-danger rounded-full border border-inverse-surface"></span>
+</button>
+<button class="p-2 text-outline-variant hover:text-primary-fixed transition-colors duration-200 ease-in-out">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<button class="p-2 text-outline-variant hover:text-primary-fixed transition-colors duration-200 ease-in-out">
+<span class="material-symbols-outlined">help</span>
+</button>
+<div class="w-8 h-8 rounded-full overflow-hidden ml-sm border border-outline-variant cursor-pointer">
+<img alt="User Profile Avatar" class="w-full h-full object-cover" data-alt="A highly detailed close-up of a futuristic user profile avatar, rendered in high contrast deep blues and silvers, representing a system administrator in a high-tech control room environment, professional, sleek, and minimalist." src="https://lh3.googleusercontent.com/aida-public/AB6AXuABl6qkwxUvC-ZNqbZnB_drVnqRSJB94FPhIrd8wI72MjIN64N3Lnkgodn2mOUk9RGXpCzk9Ww19scoSjtbf8GKuVdl-LSxEpolRa_9yYj9mXSLP4kez560TEZ26r7WiwJ8wWUv1NbYCTB-dM7aOxsF36q7ua6vmgZ5BL8aeotc3YVIRCSNOgzX893jNu_e3ef8wnF7w5HBdh1G0cinbIu5cFo8wU5gXruTFHkn10N_00CVgBSg2KnOGg699wxGN96-GgikOsr2NKJs"/>
+</div>
+</div>
+</header>
+<div class="flex flex-1 pt-topbar-height h-screen w-full">
+<!-- SideNavBar -->
+<nav class="fixed left-0 top-topbar-height w-sidebar-width h-[calc(100vh-topbar-height)] flex flex-col p-4 bg-surface-dim border-r border-outline-variant flat no shadows z-40">
+<div class="mb-lg px-2 flex items-center gap-md">
+<div class="w-10 h-10 rounded-lg bg-surface-container-highest flex items-center justify-center border border-outline-variant">
+<span class="material-symbols-outlined text-success">dns</span>
+</div>
+<div>
+<div class="font-title-md text-title-md text-on-surface">系统节点 01</div>
+<div class="font-label-md text-label-md text-success flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-success pulse-dot"></span> 健康
+                    </div>
+</div>
+</div>
+<button class="w-full py-2 mb-md bg-primary-container text-on-primary-container font-body-md text-body-md rounded-DEFAULT hover:bg-inverse-primary transition-all duration-150 flex items-center justify-center gap-2">
+<span class="material-symbols-outlined" style="font-size: 18px;">add</span> 新建配置
+            </button>
+<div class="flex flex-col gap-1 flex-1 font-body-sm text-body-sm">
+<a class="px-sm py-2 rounded-lg text-outline hover:text-on-surface hover:bg-surface-container-highest transition-all duration-150 flex items-center gap-md" href="#">
+<span class="material-symbols-outlined">tune</span> 通用
+                </a>
+<a class="px-sm py-2 rounded-lg text-outline hover:text-on-surface hover:bg-surface-container-highest transition-all duration-150 flex items-center gap-md" href="#">
+<span class="material-symbols-outlined">shield</span> 安全
+                </a>
+<a class="px-sm py-2 rounded-lg text-outline hover:text-on-surface hover:bg-surface-container-highest transition-all duration-150 flex items-center gap-md" href="#">
+<span class="material-symbols-outlined">hub</span> 集成配置
+                </a>
+<a class="px-sm py-2 rounded-lg text-outline hover:text-on-surface hover:bg-surface-container-highest transition-all duration-150 flex items-center gap-md" href="#">
+<span class="material-symbols-outlined">robot_2</span> 自动化
+                </a>
+<a class="px-sm py-2 rounded-lg text-outline hover:text-on-surface hover:bg-surface-container-highest transition-all duration-150 flex items-center gap-md" href="#">
+<span class="material-symbols-outlined">account_tree</span> 流程管理
+                </a>
+<a class="px-sm py-2 rounded-lg text-outline hover:text-on-surface hover:bg-surface-container-highest transition-all duration-150 flex items-center gap-md" href="#">
+<span class="material-symbols-outlined">fact_check</span> 合规
+                </a>
+</div>
+<div class="mt-auto flex flex-col gap-1 border-t border-outline-variant pt-4 font-body-sm text-body-sm text-primary-fixed">
+<a class="px-sm py-2 rounded-lg text-primary font-bold bg-on-secondary-fixed-variant/30 transition-all duration-150 flex items-center gap-md" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">list_alt</span> 支持
+                </a>
+<a class="px-sm py-2 rounded-lg text-outline hover:text-on-surface hover:bg-surface-container-highest transition-all duration-150 flex items-center gap-md" href="#">
+<span class="material-symbols-outlined">contact_support</span> 日志
+                </a>
+</div>
+</nav>
+<!-- Central 配置 Workspace (Main Content) -->
+<main class="ml-sidebar-width mr-inspector-width flex-1 h-full overflow-y-auto flex flex-col relative bg-surface-container-lowest">
+<!-- Quick 动作 Bar -->
+<div class="w-full h-16 flex items-center justify-between px-gutter border-b border-outline-variant bg-surface-dim sticky top-0 z-10">
+<div class="font-title-md text-title-md text-on-surface">诊断看板</div>
+<div class="flex items-center gap-sm">
+<button class="px-md py-1 border border-outline-variant text-on-surface-variant font-label-md text-label-md uppercase tracking-wider rounded-DEFAULT hover:border-primary-container hover:text-primary-container transition-colors flex items-center gap-2 bg-surface-container-low">
+<span class="material-symbols-outlined" style="font-size: 16px;">download</span> 导出诊断包
+                    </button>
+<button class="px-md py-1 border border-outline-variant text-on-surface-variant font-label-md text-label-md uppercase tracking-wider rounded-DEFAULT hover:border-primary-container hover:text-primary-container transition-colors flex items-center gap-2 bg-surface-container-low">
+<span class="material-symbols-outlined" style="font-size: 16px;">electrical_services</span> 测试 Webhook
+                    </button>
+<button class="px-md py-1 bg-primary-container text-on-primary-container font-label-md text-label-md uppercase tracking-wider rounded-DEFAULT hover:bg-inverse-primary transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined" style="font-size: 16px;">refresh</span> 刷新状态
+                    </button>
+</div>
+</div>
+<!-- Content Area -->
+<div class="p-gutter flex flex-col gap-xxl pb-xxl">
+<!-- 系统健康检查清单 -->
+<section>
+<h2 class="font-title-md text-title-md text-on-surface-variant mb-md uppercase tracking-wider text-[11px]">系统健康检查清单</h2>
+<div class="w-full flex flex-col border border-outline-variant rounded-lg bg-surface-container-low overflow-hidden">
+<div class="flex items-center justify-between p-sm px-md border-b border-outline-variant hover:bg-surface-container-high transition-colors group">
+<div class="flex items-center gap-md">
+<span class="w-2 h-2 rounded-full bg-success"></span>
+<span class="font-mono-code text-mono-code text-on-surface">API 网关延迟</span>
+</div>
+<div class="flex items-center gap-md">
+<span class="font-mono-code text-mono-code text-outline">42ms</span>
+<span class="material-symbols-outlined text-outline group-hover:text-primary-container cursor-pointer" style="font-size: 18px;">chevron_right</span>
+</div>
+</div>
+<div class="flex items-center justify-between p-sm px-md border-b border-outline-variant hover:bg-surface-container-high transition-colors group bg-surface-container-highest/20">
+<div class="flex items-center gap-md">
+<span class="w-2 h-2 rounded-full bg-warning pulse-dot"></span>
+<span class="font-mono-code text-mono-code text-warning">数据库连接池</span>
+</div>
+<div class="flex items-center gap-md">
+<span class="font-mono-code text-mono-code text-warning">85% 使用率</span>
+<span class="material-symbols-outlined text-outline group-hover:text-primary-container cursor-pointer" style="font-size: 18px;">chevron_right</span>
+</div>
+</div>
+<div class="flex items-center justify-between p-sm px-md border-b border-outline-variant hover:bg-surface-container-high transition-colors group">
+<div class="flex items-center gap-md">
+<span class="w-2 h-2 rounded-full bg-success"></span>
+<span class="font-mono-code text-mono-code text-on-surface">认证服务</span>
+</div>
+<div class="flex items-center gap-md">
+<span class="font-mono-code text-mono-code text-outline">正常</span>
+<span class="material-symbols-outlined text-outline group-hover:text-primary-container cursor-pointer" style="font-size: 18px;">chevron_right</span>
+</div>
+</div>
+<div class="flex items-center justify-between p-sm px-md border-b border-outline-variant hover:bg-surface-container-high transition-colors group bg-surface-container-highest/20">
+<div class="flex items-center gap-md">
+<span class="w-2 h-2 rounded-full bg-danger pulse-dot shadow-[0_0_8px_theme('colors.danger')]"></span>
+<span class="font-mono-code text-mono-code text-danger">Webhook 投递队列</span>
+</div>
+<div class="flex items-center gap-md">
+<span class="font-mono-code text-mono-code text-danger">积压 (1.2k)</span>
+<span class="material-symbols-outlined text-primary-container cursor-pointer" style="font-size: 18px;">chevron_right</span>
+</div>
+</div>
+<div class="flex items-center justify-between p-sm px-md hover:bg-surface-container-high transition-colors group">
+<div class="flex items-center gap-md">
+<span class="w-2 h-2 rounded-full bg-success"></span>
+<span class="font-mono-code text-mono-code text-on-surface">存储卷 I/O</span>
+</div>
+<div class="flex items-center gap-md">
+<span class="font-mono-code text-mono-code text-outline">320 IOPS</span>
+<span class="material-symbols-outlined text-outline group-hover:text-primary-container cursor-pointer" style="font-size: 18px;">chevron_right</span>
+</div>
+</div>
+</div>
+</section>
+<!-- 实时 终端 Log View -->
+<section class="flex flex-col h-[400px]">
+<div class="flex items-center justify-between mb-sm">
+<h2 class="font-title-md text-title-md text-on-surface-variant uppercase tracking-wider text-[11px]">运行时诊断控制台</h2>
+<div class="flex gap-2">
+<span class="px-2 py-0.5 rounded bg-surface-container-highest text-outline font-mono-code text-[10px] border border-outline-variant">自动滚动开启</span>
+<span class="px-2 py-0.5 rounded bg-surface-container-highest text-outline font-mono-code text-[10px] border border-outline-variant flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-success"></span> 实时</span>
+</div>
+</div>
+<div class="terminal-bg flex-1 p-md overflow-y-auto font-mono-code text-mono-code text-on-surface-variant relative shadow-inner">
+<div class="opacity-50 absolute inset-0 pointer-events-none" style="background-image: radial-gradient(circle at center, transparent 0%, theme('colors.surface-container-lowest') 100%);"></div>
+<div class="relative z-10 flex flex-col gap-1">
+<div><span class="text-outline">[14:32:01.042]</span> <span class="text-secondary">信息</span>  [metricsd] 内存使用率 at 42.1% (node-alpha)</div>
+<div><span class="text-outline">[14:32:02.115]</span> <span class="text-secondary">信息</span>  [auth-svc] 令牌校验成功，用户： user_id=9921</div>
+<div><span class="text-outline">[14:32:03.551]</span> <span class="text-warning">警告</span>  [db-pool] 连接等待时间超限 500ms (742ms)</div>
+<div><span class="text-outline">[14:32:04.992]</span> <span class="text-secondary">信息</span>  [webhook-tx] 处理批次 queue_id=batch_881a</div>
+<div class="text-danger bg-danger/10 p-1 border-l-2 border-danger"><span class="text-outline">[14:32:05.101]</span> <span class="font-bold">错误</span> [webhook-tx] 目标端点连接被拒绝 https://api.client.net/v2/events (timeout=5000ms)</div>
+<div class="text-danger opacity-80 pl-8">-&gt; 堆栈追踪: internal/modules/cjs/loader.js:963:15</div>
+<div class="text-danger opacity-80 pl-8">-&gt; at 模块._compile (internal/modules/cjs/loader.js:1063:27)</div>
+<div><span class="text-outline">[14:32:05.105]</span> <span class="text-warning">警告</span>  [webhook-tx] 载荷已进入重试队列 (attempt 1/5)</div>
+<div><span class="text-outline">[14:32:06.220]</span> <span class="text-secondary">信息</span>  [metricsd] CPU 平均负载: 1.24, 1.35, 1.15</div>
+<div><span class="text-outline">[14:32:07.442]</span> <span class="text-secondary">信息</span>  [api-gw] 路由 /v1/status (GET) 200 正常 - 12ms</div>
+<div class="text-primary-fixed-dim animate-pulse mt-2">_</div>
+</div>
+</div>
+</section>
+<!-- 启用 支持 Ticket Table -->
+<section>
+<h2 class="font-title-md text-title-md text-on-surface-variant mb-md uppercase tracking-wider text-[11px]">启用支持升级</h2>
+<div class="w-full border border-outline-variant bg-surface-container-low">
+<div class="grid grid-cols-12 gap-4 p-sm px-md border-b border-outline-variant bg-surface-container-highest/50 font-label-md text-label-md text-outline-variant uppercase tracking-wider">
+<div class="col-span-2">工单 ID</div>
+<div class="col-span-3">状态</div>
+<div class="col-span-2">优先级</div>
+<div class="col-span-3">最后更新</div>
+<div class="col-span-2 text-right">动作</div>
+</div>
+<div class="flex flex-col">
+<div class="grid grid-cols-12 gap-4 items-center p-sm px-md border-b border-outline-variant hover:bg-surface-container-high transition-colors font-body-md text-body-md">
+<div class="col-span-2 font-mono-code text-on-surface">INC-8492</div>
+<div class="col-span-3 flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-warning"></span>
+<span class="text-warning">调查中</span>
+</div>
+<div class="col-span-2">
+<span class="px-2 py-0.5 rounded border border-warning/50 text-warning bg-warning/10 text-[10px] uppercase font-bold">高</span>
+</div>
+<div class="col-span-3 text-outline">10 分钟前（系统）</div>
+<div class="col-span-2 text-right">
+<button class="text-primary-container hover:text-primary-fixed transition-colors text-sm border-b border-transparent hover:border-primary-fixed pb-0.5">查看追踪</button>
+</div>
+</div>
+<div class="grid grid-cols-12 gap-4 items-center p-sm px-md border-b border-outline-variant hover:bg-surface-container-high transition-colors font-body-md text-body-md bg-surface-container-highest/10">
+<div class="col-span-2 font-mono-code text-primary-fixed shadow-[0_0_8px_theme('colors.primary-fixed')_inset] rounded px-1 -ml-1 inline-block w-max bg-primary-fixed/10">INC-8493</div>
+<div class="col-span-3 flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-danger pulse-dot"></span>
+<span class="text-danger font-bold">关键中断</span>
+</div>
+<div class="col-span-2">
+<span class="px-2 py-0.5 rounded border border-danger/50 text-danger bg-danger/10 text-[10px] uppercase font-bold">P0 - 阻塞</span>
+</div>
+<div class="col-span-3 text-outline">2 分钟前（SRE 机器人）</div>
+<div class="col-span-2 text-right">
+<button class="px-3 py-1 bg-primary-container/20 text-primary-container border border-primary-container/50 rounded hover:bg-primary-container hover:text-on-primary-container transition-colors text-sm">升级处理</button>
+</div>
+</div>
+<div class="grid grid-cols-12 gap-4 items-center p-sm px-md hover:bg-surface-container-high transition-colors font-body-md text-body-md">
+<div class="col-span-2 font-mono-code text-on-surface">INC-8491</div>
+<div class="col-span-3 flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-success"></span>
+<span class="text-success">已解决（监控中）</span>
+</div>
+<div class="col-span-2">
+<span class="px-2 py-0.5 rounded border border-outline/50 text-outline bg-outline/10 text-[10px] uppercase">低</span>
+</div>
+<div class="col-span-3 text-outline">4 小时前（Jane D.）</div>
+<div class="col-span-2 text-right">
+<button class="text-outline-variant hover:text-on-surface transition-colors text-sm">归档</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- Right Glassmorphism Inspector -->
+<aside class="fixed right-0 top-topbar-height w-inspector-width h-[calc(100vh-topbar-height)] glass-panel z-40 flex flex-col shadow-[-4px_0_24px_rgba(0,0,0,0.5)]">
+<div class="p-lg border-b border-outline-variant/50">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-title-md text-title-md text-primary-fixed">诊断详情</h3>
+<button class="text-outline-variant hover:text-on-surface">
+<span class="material-symbols-outlined" style="font-size: 20px;">close_fullscreen</span>
+</button>
+</div>
+<div class="font-mono-code text-mono-code text-outline flex items-center gap-2">
+                    选中异常： <span class="text-danger border-b border-danger/30">Webhook 投递队列</span>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto p-lg flex flex-col gap-xl">
+<!-- 根因分析 -->
+<div>
+<h4 class="font-label-md text-label-md text-outline-variant uppercase tracking-wider mb-sm flex items-center gap-2">
+<span class="material-symbols-outlined" style="font-size: 16px;">troubleshoot</span> 根因分析
+                    </h4>
+<div class="p-md bg-surface-container-lowest/50 border border-outline-variant/50 rounded text-body-sm font-body-sm text-on-surface-variant leading-relaxed">
+                        自动诊断显示，客户端端点出现网络超时的概率较高： <code class="bg-surface-container text-secondary px-1 py-0.5 rounded font-mono-code text-[11px]">api.client.net</code>. 
+                        过去 15 分钟队列积压增长 450%，内部处理节点健康。
+                    </div>
+</div>
+<!-- 影响分析ed 模块 -->
+<div>
+<h4 class="font-label-md text-label-md text-outline-variant uppercase tracking-wider mb-sm flex items-center gap-2">
+<span class="material-symbols-outlined" style="font-size: 16px;">schema</span> 影响分析ed 模块
+                    </h4>
+<div class="flex flex-col gap-2">
+<a class="p-sm bg-surface-container-lowest/30 border border-outline-variant/30 rounded flex justify-between items-center hover:border-primary-container/50 transition-colors group" href="#">
+<span class="font-mono-code text-mono-code text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-outline" style="font-size: 14px;">call_made</span> Webhook 出站节点 A
+                            </span>
+<span class="text-danger text-[10px] uppercase font-bold">停滞</span>
+</a>
+<a class="p-sm bg-surface-container-lowest/30 border border-outline-variant/30 rounded flex justify-between items-center hover:border-primary-container/50 transition-colors group" href="#">
+<span class="font-mono-code text-mono-code text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-outline" style="font-size: 14px;">database</span> 事件存储缓冲区
+                            </span>
+<span class="text-warning text-[10px] uppercase font-bold">85% 容量</span>
+</a>
+</div>
+</div>
+<!-- 建议修复 -->
+<div>
+<h4 class="font-label-md text-label-md text-outline-variant uppercase tracking-wider mb-sm flex items-center gap-2">
+<span class="material-symbols-outlined" style="font-size: 16px;">build_circle</span> 建议修复
+                    </h4>
+<ul class="flex flex-col gap-2 font-body-sm text-body-sm text-on-surface-variant">
+<li class="flex gap-3 items-start">
+<span class="text-primary-container mt-0.5"><span class="material-symbols-outlined" style="font-size: 16px;">check_circle</span></span>
+<span>临时将流量路由到兜底端点（配置 ID：FB-291）</span>
+</li>
+<li class="flex gap-3 items-start">
+<span class="text-primary-container mt-0.5"><span class="material-symbols-outlined" style="font-size: 16px;">check_circle</span></span>
+<span>将出站节点超时阈值提高到 10000ms。</span>
+</li>
+<li class="flex gap-3 items-start opacity-50">
+<span class="text-outline mt-0.5"><span class="material-symbols-outlined" style="font-size: 16px;">radio_button_unchecked</span></span>
+<span>清空死信队列（需要 L2 审批）。</span>
+</li>
+</ul>
+</div>
+<!-- Spacer -->
+<div class="flex-1"></div>
+<!-- 升级路径 -->
+<div class="border-t border-outline-variant/50 pt-lg">
+<h4 class="font-label-md text-label-md text-outline-variant uppercase tracking-wider mb-sm">升级路径</h4>
+<div class="flex gap-2">
+<button class="flex-1 py-2 bg-surface-container-highest border border-outline-variant rounded hover:border-primary-container hover:text-primary-container transition-colors font-body-sm text-body-sm text-on-surface flex items-center justify-center gap-2">
+<span class="material-symbols-outlined" style="font-size: 16px;">chat</span> 通知 SRE
+                        </button>
+<button class="flex-1 py-2 bg-danger/20 border border-danger text-danger rounded hover:bg-danger hover:text-inverse-surface transition-colors font-body-sm text-body-sm font-bold flex items-center justify-center gap-2 shadow-[0_0_12px_theme('colors.danger')_inset]">
+<span class="material-symbols-outlined" style="font-size: 16px;">warning</span> 值班平台通知
+                        </button>
+</div>
+</div>
+</div>
+</aside>
+</div>
+</body></html>

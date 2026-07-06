@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>资产分类策略配置台</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<style data-purpose="custom-styles">
+    body {
+      font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      background-color: #f5f7fb;
+      color: #333;
+    }
+    
+    /* Custom Scrollbar for better look */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #a8a8a8;
+    }
+
+    .border-panel {
+      border: 1px solid #d7e2ef;
+    }
+    
+    .table-header th {
+      background-color: #fafafa;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .table-row td {
+      border-bottom: 1px solid #f0f0f0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 120px; /* Helps with truncation if needed */
+    }
+    
+    .input-compact {
+      height: 32px;
+      font-size: 13px;
+    }
+    
+    .btn-compact {
+      height: 32px;
+      padding: 0 15px;
+      font-size: 13px;
+    }
+  </style>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#1677ff',
+            'primary-hover': '#4096ff',
+            navy: '#061b38',
+            'navy-active': '#0a2a57',
+            success: '#52c41a',
+            warning: '#faad14',
+            danger: '#ff4d4f',
+            border: '#d7e2ef',
+            'panel-bg': '#ffffff',
+            'page-bg': '#f5f7fb',
+            'text-main': 'rgba(0, 0, 0, 0.88)',
+            'text-secondary': 'rgba(0, 0, 0, 0.45)',
+          },
+          fontSize: {
+            'xs': '12px',
+            'sm': '13px',
+            'base': '14px',
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="flex flex-col h-[992px] w-[1586px] overflow-hidden text-sm mx-auto bg-white border border-gray-300 shadow-xl">
+<!-- BEGIN: TopBar -->
+<header class="h-[50px] bg-navy text-white flex items-center justify-between px-4 shrink-0">
+<div class="flex items-center h-full">
+<div class="text-base font-bold tracking-wide mr-8 flex items-center gap-2">
+<span>uniview</span>
+<span class="text-gray-400 font-light">|</span>
+<span>固定资产管理系统</span>
+</div>
+<nav class="flex h-full">
+<a class="px-5 h-full flex items-center hover:bg-white/10 text-gray-300 transition-colors" href="#">固定资产工作台</a>
+<a class="px-5 h-full flex items-center hover:bg-white/10 text-gray-300 transition-colors" href="#">资产全景视图</a>
+<a class="px-5 h-full flex items-center hover:bg-white/10 text-gray-300 transition-colors" href="#">大屏态势</a>
+<a class="px-5 h-full flex items-center hover:bg-white/10 text-gray-300 transition-colors" href="#">流程协同</a>
+<a class="px-5 h-full flex items-center bg-navy-active text-white font-medium border-b-2 border-primary" href="#">系统运营中枢</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="relative hover:text-primary transition-colors">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span class="absolute -top-1 -right-1 bg-danger text-white text-[10px] px-1 rounded-full border border-navy">12</span>
+</button>
+<button class="hover:text-primary transition-colors">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+<button class="hover:text-primary transition-colors">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+<div class="flex items-center gap-2 cursor-pointer hover:text-gray-300">
+<div class="w-6 h-6 bg-gray-300 rounded-full flex items-center justify-center text-gray-600">
+<svg class="w-4 h-4" fill="currentColor" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" fill-rule="evenodd"></path></svg>
+</div>
+<span class="text-sm">系统管理员</span>
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+</div>
+</header>
+<!-- END: TopBar -->
+<div class="flex flex-1 overflow-hidden">
+<!-- BEGIN: Sidebar -->
+<aside class="w-[220px] bg-panel-bg border-r border-border shrink-0 flex flex-col">
+<div class="p-4 py-3 border-b border-gray-100 font-medium text-gray-700">系统设置</div>
+<nav class="flex-1 overflow-y-auto py-2">
+<div class="px-4 py-2 hover:bg-gray-50 cursor-pointer flex items-center gap-2 text-gray-700">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          组织与权限
+        </div>
+<div class="px-4 py-2 hover:bg-gray-50 cursor-pointer flex items-center gap-2 text-gray-700">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          用户与角色
+        </div>
+<!-- Active Group -->
+<div>
+<div class="px-4 py-2 cursor-pointer flex items-center justify-between text-primary font-medium">
+<div class="flex items-center gap-2">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+              基础资料
+            </div>
+<svg class="w-4 h-4 transform rotate-180" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div class="pl-10 pr-2 py-1">
+<div class="bg-blue-50 text-primary py-1.5 px-3 rounded cursor-pointer">资产分类</div>
+<div class="py-1.5 px-3 hover:bg-gray-50 cursor-pointer text-gray-600">编号规则</div>
+<div class="py-1.5 px-3 hover:bg-gray-50 cursor-pointer text-gray-600">位置管理</div>
+<div class="py-1.5 px-3 hover:bg-gray-50 cursor-pointer text-gray-600">供应商管理</div>
+<div class="py-1.5 px-3 hover:bg-gray-50 cursor-pointer text-gray-600">自定义字段</div>
+<div class="py-1.5 px-3 hover:bg-gray-50 cursor-pointer text-gray-600">自定义字段集</div>
+</div>
+</div>
+<div class="px-4 py-2 hover:bg-gray-50 cursor-pointer flex items-center justify-between text-gray-700">
+<div class="flex items-center gap-2">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+            流程配置
+          </div>
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div class="px-4 py-2 hover:bg-gray-50 cursor-pointer flex items-center justify-between text-gray-700">
+<div class="flex items-center gap-2">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+            集成配置
+          </div>
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div class="px-4 py-2 hover:bg-gray-50 cursor-pointer flex items-center justify-between text-gray-700">
+<div class="flex items-center gap-2">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+            安全与审计
+          </div>
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div class="px-4 py-2 hover:bg-gray-50 cursor-pointer flex items-center justify-between text-gray-700">
+<div class="flex items-center gap-2">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+            系统运维
+          </div>
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+</nav>
+</aside>
+<!-- END: Sidebar -->
+<!-- BEGIN: MainContent -->
+<main class="flex-1 bg-page-bg flex flex-col p-[20px] overflow-hidden gap-4">
+<!-- Top Action Bar -->
+<div class="flex justify-between items-start">
+<div>
+<h1 class="text-xl font-medium text-gray-800">资产分类策略配置台</h1>
+<p class="text-gray-500 mt-1 text-sm">维护资产大类、小类、折旧、编号前缀、盘点策略、标签策略和重点设备规则。</p>
+</div>
+<div class="flex gap-2">
+<button class="bg-primary hover:bg-primary-hover text-white btn-compact rounded flex items-center gap-1 shadow-sm">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 4v16m8-8H4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+            新建资产分类
+          </button>
+<button class="bg-white border border-gray-300 hover:border-primary hover:text-primary text-gray-700 btn-compact rounded flex items-center gap-1 shadow-sm">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+            批量补类
+          </button>
+<button class="bg-white border border-gray-300 hover:border-primary hover:text-primary text-gray-700 btn-compact rounded flex items-center gap-1 shadow-sm">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+            影响预览
+          </button>
+<div class="w-px h-8 bg-gray-300 mx-1 self-center"></div>
+<button class="bg-white border border-primary text-primary hover:bg-blue-50 btn-compact rounded flex items-center gap-1 shadow-sm">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+            保存草稿
+          </button>
+<button class="bg-primary hover:bg-primary-hover text-white btn-compact rounded flex items-center gap-1 shadow-sm">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+            提交校验
+          </button>
+</div>
+</div>
+<!-- Status Strip -->
+<div class="bg-white border-panel rounded-md p-3 flex items-center gap-6 shadow-sm shrink-0">
+<div class="flex items-center gap-2 text-gray-700">
+<svg class="w-4 h-4 text-success" fill="currentColor" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" fill-rule="evenodd"></path></svg>
+          当前草稿已保存
+        </div>
+<div class="flex items-center gap-2 text-gray-700">
+<svg class="w-4 h-4 text-success" fill="currentColor" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" fill-rule="evenodd"></path></svg>
+          编码唯一性通过
+        </div>
+<div class="flex items-center gap-2 text-warning font-medium">
+<svg class="w-4 h-4" fill="currentColor" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" fill-rule="evenodd"></path></svg>
+          待建资产池 23 条待补类
+        </div>
+</div>
+<!-- Main Layout -->
+<div class="flex-1 overflow-hidden flex flex-col gap-[10px]">
+<!-- Top Half: Workbench -->
+<div class="flex flex-1 gap-[10px] shrink-0 min-h-0">
+<!-- Left Column: Tree -->
+<div class="w-[196px] bg-white border-panel rounded-md flex flex-col shadow-sm shrink-0">
+<div class="p-3 border-b border-gray-100 flex justify-between items-center font-medium">
+              资产分类树
+              <svg class="w-4 h-4 text-gray-400 cursor-pointer" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M5 15l7-7 7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div class="flex-1 overflow-y-auto p-2 text-sm text-gray-700">
+<div class="flex items-center py-1">
+<svg class="w-4 h-4 mr-1 text-gray-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<svg class="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                全部分类 <span class="text-gray-400 ml-1">128</span>
+</div>
+<div class="pl-5">
+<!-- 生产设备 -->
+<div class="flex items-center py-1">
+<svg class="w-4 h-4 mr-1 text-gray-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<svg class="w-4 h-4 mr-2 text-primary" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                  生产设备 <span class="text-gray-400 ml-1">56</span>
+</div>
+<div class="pl-5">
+<div class="flex items-center py-1 bg-blue-50 text-primary rounded cursor-pointer px-1">
+<svg class="w-4 h-4 mr-1 text-transparent" fill="none" stroke="currentColor" viewbox="0 0 24 24"></svg>
+<svg class="w-4 h-4 mr-2 text-primary" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                    贴片机 <span class="text-blue-300 ml-1">8</span>
+</div>
+<div class="flex items-center py-1 hover:bg-gray-50 cursor-pointer px-1">
+<svg class="w-4 h-4 mr-1 text-transparent" fill="none" stroke="currentColor" viewbox="0 0 24 24"></svg>
+<svg class="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                    回流焊炉 <span class="text-gray-400 ml-1">6</span>
+</div>
+<div class="flex items-center py-1">
+<svg class="w-4 h-4 mr-1 text-gray-400 transform -rotate-90" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<svg class="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                    检测设备 <span class="text-gray-400 ml-1">12</span>
+</div>
+</div>
+<!-- IT设备 -->
+<div class="flex items-center py-1">
+<svg class="w-4 h-4 mr-1 text-gray-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<svg class="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                  IT设备 <span class="text-gray-400 ml-1">28</span>
+</div>
+<div class="pl-5">
+<div class="flex items-center py-1 hover:bg-gray-50 cursor-pointer px-1">
+<svg class="w-4 h-4 mr-1 text-transparent" fill="none" stroke="currentColor" viewbox="0 0 24 24"></svg>
+<svg class="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                    笔记本 <span class="text-gray-400 ml-1">12</span>
+</div>
+<div class="flex items-center py-1 hover:bg-gray-50 cursor-pointer px-1">
+<svg class="w-4 h-4 mr-1 text-transparent" fill="none" stroke="currentColor" viewbox="0 0 24 24"></svg>
+<svg class="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                    服务器 <span class="text-gray-400 ml-1">8</span>
+</div>
+</div>
+<div class="flex items-center py-1 hover:bg-gray-50 cursor-pointer px-1">
+<svg class="w-4 h-4 mr-1 text-transparent" fill="none" stroke="currentColor" viewbox="0 0 24 24"></svg>
+<svg class="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                  工装夹具 <span class="text-gray-400 ml-1">18</span>
+</div>
+<div class="flex items-center py-1 hover:bg-gray-50 cursor-pointer px-1">
+<svg class="w-4 h-4 mr-1 text-transparent" fill="none" stroke="currentColor" viewbox="0 0 24 24"></svg>
+<svg class="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                  办公设备 <span class="text-gray-400 ml-1">14</span>
+</div>
+</div>
+</div>
+<div class="p-2 border-t border-gray-100 flex justify-center">
+<button class="text-primary hover:text-primary-hover text-sm px-4 py-1 border border-primary rounded hover:bg-blue-50">展开全部</button>
+</div>
+</div>
+<!-- Center Column: Table & Filters -->
+<div class="w-[724px] bg-white border-panel rounded-md flex flex-col shadow-sm overflow-hidden shrink-0">
+<!-- Filters -->
+<div class="p-3 border-b border-gray-100 flex flex-nowrap gap-3 items-center bg-white shrink-0 overflow-x-auto">
+<div class="flex items-center gap-2 shrink-0">
+<span class="text-gray-600 whitespace-nowrap">分类名称</span>
+<input class="input-compact border-gray-300 rounded w-24 focus:border-primary focus:ring-primary" placeholder="请输入" type="text"/>
+</div>
+<div class="flex items-center gap-2 shrink-0">
+<span class="text-gray-600 whitespace-nowrap">分类编码</span>
+<input class="input-compact border-gray-300 rounded w-24 focus:border-primary focus:ring-primary" placeholder="请输入" type="text"/>
+</div>
+<div class="flex items-center gap-2 shrink-0">
+<span class="text-gray-600 whitespace-nowrap">状态</span>
+<select class="input-compact border-gray-300 rounded w-20 text-gray-600 focus:border-primary focus:ring-primary py-0">
+<option>请选择</option>
+</select>
+</div>
+<div class="flex items-center gap-2 shrink-0">
+<span class="text-gray-600 whitespace-nowrap">折旧策略</span>
+<select class="input-compact border-gray-300 rounded w-20 text-gray-600 focus:border-primary focus:ring-primary py-0">
+<option>请选择</option>
+</select>
+</div>
+<div class="flex items-center gap-2 shrink-0">
+<span class="text-gray-600 whitespace-nowrap">盘点策略</span>
+<select class="input-compact border-gray-300 rounded w-20 text-gray-600 focus:border-primary focus:ring-primary py-0">
+<option>请选择</option>
+</select>
+</div>
+<div class="flex items-center gap-2 shrink-0">
+<span class="text-gray-600 whitespace-nowrap">标签策略</span>
+<select class="input-compact border-gray-300 rounded w-20 text-gray-600 focus:border-primary focus:ring-primary py-0">
+<option>请选择</option>
+</select>
+</div>
+<div class="flex gap-2 ml-auto shrink-0">
+<button class="bg-primary hover:bg-primary-hover text-white btn-compact rounded shadow-sm">查询</button>
+<button class="bg-white border border-gray-300 hover:border-primary hover:text-primary text-gray-700 btn-compact rounded shadow-sm">重置</button>
+</div>
+</div>
+<!-- Table -->
+<div class="flex-1 overflow-auto">
+<table class="w-full text-left border-collapse text-[12px]">
+<thead class="table-header sticky top-0 bg-gray-50 z-10">
+<tr>
+<th class="py-2 px-3 font-medium text-gray-700 whitespace-nowrap">分类名称</th>
+<th class="py-2 px-3 font-medium text-gray-700 whitespace-nowrap">分类编码</th>
+<th class="py-2 px-3 font-medium text-gray-700 whitespace-nowrap">上级分类</th>
+<th class="py-2 px-3 font-medium text-gray-700 whitespace-nowrap text-center">折旧年限(年)</th>
+<th class="py-2 px-3 font-medium text-gray-700 whitespace-nowrap">编号前缀</th>
+<th class="py-2 px-3 font-medium text-gray-700 whitespace-nowrap">盘点策略</th>
+<th class="py-2 px-3 font-medium text-gray-700 whitespace-nowrap">标签策略</th>
+<th class="py-2 px-3 font-medium text-gray-700 whitespace-nowrap">状态</th>
+<th class="py-2 px-3 font-medium text-gray-700 whitespace-nowrap text-right">操作</th>
+</tr>
+</thead>
+<tbody class="table-row">
+<tr class="hover:bg-blue-50/50 bg-blue-50/30 h-[40px]">
+<td class="px-3 text-gray-800" title="生产设备/贴片机">生产设备/贴片机</td>
+<td class="px-3 text-gray-600" title="SE-SMT-001">SE-SMT-001</td>
+<td class="px-3 text-gray-600" title="生产设备">生产设备</td>
+<td class="px-3 text-gray-600 text-center" title="8">8</td>
+<td class="px-3 text-gray-600" title="SESMT">SESMT</td>
+<td class="px-3 text-gray-600" title="月度盘点">月度盘点</td>
+<td class="px-3 text-gray-600" title="设备类标签">设备类标签</td>
+<td class="px-3"><span class="flex items-center gap-1 text-gray-600"><span class="w-1.5 h-1.5 rounded-full bg-success"></span>启用</span></td>
+<td class="px-3 text-right whitespace-nowrap">
+<a class="text-primary hover:underline mr-1" href="#">编辑</a>
+<a class="text-primary hover:underline mr-1" href="#">影响</a>
+<a class="text-primary hover:underline" href="#">停用</a>
+</td>
+</tr>
+<tr class="hover:bg-gray-50 h-[40px]">
+<td class="px-3 text-gray-800" title="生产设备/回流焊炉">生产设备/回流焊炉</td>
+<td class="px-3 text-gray-600" title="SE-RFH-001">SE-RFH-001</td>
+<td class="px-3 text-gray-600" title="生产设备">生产设备</td>
+<td class="px-3 text-gray-600 text-center" title="10">10</td>
+<td class="px-3 text-gray-600" title="SERFH">SERFH</td>
+<td class="px-3 text-gray-600" title="季度盘点">季度盘点</td>
+<td class="px-3 text-gray-600" title="设备类标签">设备类标签</td>
+<td class="px-3"><span class="flex items-center gap-1 text-gray-600"><span class="w-1.5 h-1.5 rounded-full bg-success"></span>启用</span></td>
+<td class="px-3 text-right whitespace-nowrap">
+<a class="text-primary hover:underline mr-1" href="#">编辑</a>
+<a class="text-primary hover:underline mr-1" href="#">影响</a>
+<a class="text-primary hover:underline" href="#">停用</a>
+</td>
+</tr>
+<tr class="hover:bg-gray-50 h-[40px]">
+<td class="px-3 text-gray-800" title="检测设备/AOI">检测设备/AOI</td>
+<td class="px-3 text-gray-600" title="TE-AOI-001">TE-AOI-001</td>
+<td class="px-3 text-gray-600" title="检测设备">检测设备</td>
+<td class="px-3 text-gray-600 text-center" title="7">7</td>
+<td class="px-3 text-gray-600" title="TEAOI">TEAOI</td>
+<td class="px-3 text-gray-600" title="月度盘点">月度盘点</td>
+<td class="px-3 text-gray-600" title="检测类标签">检测类标签</td>
+<td class="px-3"><span class="flex items-center gap-1 text-gray-600"><span class="w-1.5 h-1.5 rounded-full bg-success"></span>启用</span></td>
+<td class="px-3 text-right whitespace-nowrap">
+<a class="text-primary hover:underline mr-1" href="#">编辑</a>
+<a class="text-primary hover:underline mr-1" href="#">影响</a>
+<a class="text-primary hover:underline" href="#">停用</a>
+</td>
+</tr>
+<tr class="hover:bg-gray-50 h-[40px]">
+<td class="px-3 text-gray-800" title="IT设备/笔记本">IT设备/笔记本</td>
+<td class="px-3 text-gray-600" title="IT-NB-001">IT-NB-001</td>
+<td class="px-3 text-gray-600" title="IT设备">IT设备</td>
+<td class="px-3 text-gray-600 text-center" title="3">3</td>
+<td class="px-3 text-gray-600" title="ITNB">ITNB</td>
+<td class="px-3 text-gray-600" title="季度盘点">季度盘点</td>
+<td class="px-3 text-gray-600" title="IT类标签">IT类标签</td>
+<td class="px-3"><span class="flex items-center gap-1 text-gray-600"><span class="w-1.5 h-1.5 rounded-full bg-success"></span>启用</span></td>
+<td class="px-3 text-right whitespace-nowrap">
+<a class="text-primary hover:underline mr-1" href="#">编辑</a>
+<a class="text-primary hover:underline mr-1" href="#">影响</a>
+<a class="text-primary hover:underline" href="#">停用</a>
+</td>
+</tr>
+<tr class="hover:bg-gray-50 h-[40px]">
+<td class="px-3 text-gray-800" title="IT设备/服务器">IT设备/服务器</td>
+<td class="px-3 text-gray-600" title="IT-SV-001">IT-SV-001</td>
+<td class="px-3 text-gray-600" title="IT设备">IT设备</td>
+<td class="px-3 text-gray-600 text-center" title="5">5</td>
+<td class="px-3 text-gray-600" title="ITSV">ITSV</td>
+<td class="px-3 text-gray-600" title="季度盘点">季度盘点</td>
+<td class="px-3 text-gray-600" title="IT类标签">IT类标签</td>
+<td class="px-3"><span class="flex items-center gap-1 text-gray-600"><span class="w-1.5 h-1.5 rounded-full bg-success"></span>启用</span></td>
+<td class="px-3 text-right whitespace-nowrap">
+<a class="text-primary hover:underline mr-1" href="#">编辑</a>
+<a class="text-primary hover:underline mr-1" href="#">影响</a>
+<a class="text-primary hover:underline" href="#">停用</a>
+</td>
+</tr>
+<tr class="hover:bg-gray-50 h-[40px]">
+<td class="px-3 text-gray-800" title="工装夹具/治具">工装夹具/治具</td>
+<td class="px-3 text-gray-600" title="JG-JGJ-001">JG-JGJ-001</td>
+<td class="px-3 text-gray-600" title="工装夹具">工装夹具</td>
+<td class="px-3 text-gray-600 text-center" title="5">5</td>
+<td class="px-3 text-gray-600" title="JGJG">JGJG</td>
+<td class="px-3 text-gray-600" title="半年度盘点">半年度盘点</td>
+<td class="px-3 text-gray-600" title="工装类标签">工装类标签</td>
+<td class="px-3"><span class="flex items-center gap-1 text-gray-600"><span class="w-1.5 h-1.5 rounded-full bg-success"></span>启用</span></td>
+<td class="px-3 text-right whitespace-nowrap">
+<a class="text-primary hover:underline mr-1" href="#">编辑</a>
+<a class="text-primary hover:underline mr-1" href="#">影响</a>
+<a class="text-primary hover:underline" href="#">停用</a>
+</td>
+</tr>
+<tr class="hover:bg-gray-50 h-[40px]">
+<td class="px-3 text-gray-800" title="办公设备/显示器">办公设备/显示器</td>
+<td class="px-3 text-gray-600" title="BG-XSQ-001">BG-XSQ-001</td>
+<td class="px-3 text-gray-600" title="办公设备">办公设备</td>
+<td class="px-3 text-gray-600 text-center" title="3">3</td>
+<td class="px-3 text-gray-600" title="BGXSQ">BGXSQ</td>
+<td class="px-3 text-gray-600" title="年度盘点">年度盘点</td>
+<td class="px-3 text-gray-600" title="办公类标签">办公类标签</td>
+<td class="px-3"><span class="flex items-center gap-1 text-gray-600"><span class="w-1.5 h-1.5 rounded-full bg-success"></span>启用</span></td>
+<td class="px-3 text-right whitespace-nowrap">
+<a class="text-primary hover:underline mr-1" href="#">编辑</a>
+<a class="text-primary hover:underline mr-1" href="#">影响</a>
+<a class="text-primary hover:underline" href="#">停用</a>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination -->
+<div class="p-3 border-t border-gray-100 flex justify-end items-center gap-3 text-sm text-gray-600 bg-white">
+<span>共 7 条</span>
+<button class="text-gray-400 hover:text-gray-600" disabled="">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M15 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+<div class="bg-primary text-white w-6 h-6 flex items-center justify-center rounded">1</div>
+<button class="text-gray-400 hover:text-gray-600" disabled="">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+<select class="input-compact border-gray-300 rounded text-gray-600 py-0 focus:border-primary focus:ring-primary w-20">
+<option>10条/页</option>
+</select>
+</div>
+</div>
+<!-- Right Column: Edit Form -->
+<div class="w-[384px] bg-white border-panel rounded-md flex flex-col shadow-sm shrink-0">
+<div class="p-3 border-b border-gray-100 font-medium">分类属性编辑区</div>
+<div class="flex-1 overflow-y-auto p-4 flex flex-col gap-3">
+<div class="flex items-center">
+<label class="w-28 text-gray-600 text-right pr-3 shrink-0"><span class="text-danger mr-1">*</span>分类名称</label>
+<input class="input-compact border-gray-300 rounded flex-1 focus:border-primary focus:ring-primary bg-gray-50" readonly="" type="text" value="生产设备/贴片机"/>
+</div>
+<div class="flex items-center">
+<label class="w-28 text-gray-600 text-right pr-3 shrink-0"><span class="text-danger mr-1">*</span>分类编码</label>
+<input class="input-compact border-gray-300 rounded flex-1 focus:border-primary focus:ring-primary bg-gray-50" readonly="" type="text" value="SE-SMT-001"/>
+</div>
+<div class="flex items-center">
+<label class="w-28 text-gray-600 text-right pr-3 shrink-0"><span class="text-danger mr-1">*</span>上级分类</label>
+<select class="input-compact border-gray-300 rounded flex-1 focus:border-primary focus:ring-primary py-0">
+<option>生产设备</option>
+</select>
+</div>
+<div class="flex items-center">
+<label class="w-28 text-gray-600 text-right pr-3 shrink-0"><span class="text-danger mr-1">*</span>折旧年限(年)</label>
+<input class="input-compact border-gray-300 rounded flex-1 focus:border-primary focus:ring-primary" type="text" value="8"/>
+</div>
+<div class="flex items-center">
+<label class="w-28 text-gray-600 text-right pr-3 shrink-0"><span class="text-danger mr-1">*</span>编号前缀</label>
+<input class="input-compact border-gray-300 rounded flex-1 focus:border-primary focus:ring-primary bg-gray-50" readonly="" type="text" value="SESMT"/>
+</div>
+<div class="flex items-center">
+<label class="w-28 text-gray-600 text-right pr-3 shrink-0"><span class="text-danger mr-1">*</span>盘点策略</label>
+<select class="input-compact border-gray-300 rounded flex-1 focus:border-primary focus:ring-primary py-0">
+<option>月度盘点</option>
+</select>
+</div>
+<div class="flex items-center">
+<label class="w-28 text-gray-600 text-right pr-3 shrink-0"><span class="text-danger mr-1">*</span>标签策略</label>
+<select class="input-compact border-gray-300 rounded flex-1 focus:border-primary focus:ring-primary py-0">
+<option>设备类标签</option>
+</select>
+</div>
+<div class="flex items-center">
+<label class="w-28 text-gray-600 text-right pr-3 shrink-0"><span class="text-danger mr-1">*</span>折旧策略</label>
+<select class="input-compact border-gray-300 rounded flex-1 focus:border-primary focus:ring-primary py-0">
+<option>直线法</option>
+</select>
+</div>
+<div class="flex items-center">
+<label class="w-28 text-gray-600 text-right pr-3 shrink-0">重点设备规则</label>
+<select class="input-compact border-gray-300 rounded flex-1 focus:border-primary focus:ring-primary py-0">
+<option>关键设备 (价值&gt;10万)</option>
+</select>
+</div>
+<div class="flex items-center">
+<label class="w-28 text-gray-600 text-right pr-3 shrink-0">MES/MAC绑定策略</label>
+<select class="input-compact border-gray-300 rounded flex-1 focus:border-primary focus:ring-primary py-0 text-xs">
+<option>生产设备强制绑定MES</option>
+</select>
+</div>
+<div class="flex items-center">
+<label class="w-28 text-gray-600 text-right pr-3 shrink-0">CIP转固默认分类</label>
+<select class="input-compact border-gray-300 rounded flex-1 focus:border-primary focus:ring-primary py-0">
+<option>生产设备/贴片机</option>
+</select>
+</div>
+<div class="flex items-center">
+<label class="w-28 text-gray-600 text-right pr-3 shrink-0">审计策略</label>
+<select class="input-compact border-gray-300 rounded flex-1 focus:border-primary focus:ring-primary py-0">
+<option>资产变更全审计</option>
+</select>
+</div>
+<div class="flex items-center">
+<label class="w-28 text-gray-600 text-right pr-3 shrink-0"><span class="text-danger mr-1">*</span>负责人</label>
+<select class="input-compact border-gray-300 rounded flex-1 focus:border-primary focus:ring-primary py-0">
+<option>设备管理员</option>
+</select>
+</div>
+</div>
+<div class="p-3 border-t border-gray-100 flex gap-2 justify-center bg-gray-50 shrink-0">
+<button class="bg-white border border-primary text-primary hover:bg-blue-50 btn-compact rounded flex-1 shadow-sm">保存草稿</button>
+<button class="bg-primary hover:bg-primary-hover text-white btn-compact rounded flex-1 shadow-sm">提交校验</button>
+<button class="bg-white border border-gray-300 hover:border-primary hover:text-primary text-gray-700 btn-compact rounded flex-1 shadow-sm">预览影响</button>
+</div>
+</div>
+</div>
+<!-- Bottom Row -->
+<div class="flex gap-[10px] shrink-0">
+<!-- Impact Preview Cards -->
+<div class="w-[930px] bg-transparent flex flex-col gap-2 shrink-0">
+<div class="text-gray-800 font-medium flex items-center gap-2">
+              影响预览 <span class="text-gray-400 text-xs font-normal">（基于当前编辑）</span>
+</div>
+<div class="flex gap-[10px] h-full pb-2">
+<!-- Card 1 -->
+<div class="flex-1 bg-white border-panel rounded-md p-4 flex flex-col shadow-sm relative overflow-hidden group hover:border-primary transition-colors cursor-pointer">
+<div class="flex items-center gap-2 mb-2">
+<div class="w-6 h-6 rounded bg-blue-50 text-primary flex items-center justify-center">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<span class="font-medium text-gray-800">编号规则引用</span>
+</div>
+<div class="text-xs text-gray-500 mb-3">影响 <span class="text-primary font-medium">2</span> 条编号规则</div>
+<div class="text-xs text-gray-600 mb-1">关联规则</div>
+<div class="text-xs text-gray-500 flex justify-between mb-1">
+<span>SE</span>
+<span>生产设备编号规则</span>
+</div>
+<div class="text-xs text-gray-500 flex justify-between">
+<span>SMT</span>
+<span>贴片机专用规则</span>
+</div>
+<div class="mt-auto text-center border-t border-gray-100 pt-2 text-primary text-xs opacity-0 group-hover:opacity-100 transition-opacity">查看详情</div>
+</div>
+<!-- Card 2 -->
+<div class="flex-1 bg-white border-panel rounded-md p-4 flex flex-col shadow-sm relative overflow-hidden group hover:border-primary transition-colors cursor-pointer">
+<div class="flex items-center gap-2 mb-2">
+<div class="w-6 h-6 rounded bg-blue-50 text-primary flex items-center justify-center">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<span class="font-medium text-gray-800">待建资产池</span>
+</div>
+<div class="text-xs text-gray-500 mb-3">影响 <span class="text-warning font-medium">23</span> 条待建资产</div>
+<div class="text-xs text-gray-600 mb-1">待建资产</div>
+<div class="text-xs text-gray-500 flex justify-between mb-1">
+<span>贴片机（待建）</span>
+<span>12</span>
+</div>
+<div class="text-xs text-gray-500 flex justify-between">
+<span>贴片机-备品（待建）</span>
+<span>11</span>
+</div>
+<div class="mt-auto text-center border-t border-gray-100 pt-2 text-primary text-xs opacity-0 group-hover:opacity-100 transition-opacity">查看详情</div>
+</div>
+<!-- Card 3 -->
+<div class="flex-1 bg-white border-panel rounded-md p-4 flex flex-col shadow-sm relative overflow-hidden group hover:border-primary transition-colors cursor-pointer">
+<div class="flex items-center gap-2 mb-2">
+<div class="w-6 h-6 rounded bg-blue-50 text-primary flex items-center justify-center">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<span class="font-medium text-gray-800">盘点策略</span>
+</div>
+<div class="text-xs text-gray-500 mb-3">影响 <span class="text-primary font-medium">1</span> 条盘点计划</div>
+<div class="text-xs text-gray-600 mb-1">关联计划</div>
+<div class="text-xs text-gray-500">
+                  生产设备月度盘点计划
+                </div>
+<div class="mt-auto text-center border-t border-gray-100 pt-2 text-primary text-xs opacity-0 group-hover:opacity-100 transition-opacity">查看详情</div>
+</div>
+<!-- Card 4 -->
+<div class="flex-1 bg-white border-panel rounded-md p-4 flex flex-col shadow-sm relative overflow-hidden group hover:border-primary transition-colors cursor-pointer">
+<div class="flex items-center gap-2 mb-2">
+<div class="w-6 h-6 rounded bg-blue-50 text-primary flex items-center justify-center">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<span class="font-medium text-gray-800">折旧衔接</span>
+</div>
+<div class="text-xs text-gray-500 mb-3">影响 <span class="text-primary font-medium">1</span> 条折旧策略</div>
+<div class="text-xs text-gray-600 mb-1">关联策略</div>
+<div class="text-xs text-gray-500">
+                  生产设备折旧（直线法）
+                </div>
+<div class="mt-auto text-center border-t border-gray-100 pt-2 text-primary text-xs opacity-0 group-hover:opacity-100 transition-opacity">查看详情</div>
+</div>
+<!-- Card 5 -->
+<div class="flex-1 bg-white border-panel rounded-md p-4 flex flex-col shadow-sm relative overflow-hidden group hover:border-primary transition-colors cursor-pointer">
+<div class="flex items-center gap-2 mb-2">
+<div class="w-6 h-6 rounded bg-blue-50 text-primary flex items-center justify-center">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<span class="font-medium text-gray-800">MES/MAC绑定</span>
+</div>
+<div class="text-xs text-gray-500 mb-3">影响 <span class="text-primary font-medium">1</span> 条绑定策略</div>
+<div class="text-xs text-gray-600 mb-1">关联策略</div>
+<div class="text-xs text-gray-500">
+                  生产设备强制绑定MES
+                </div>
+<div class="mt-auto text-center border-t border-gray-100 pt-2 text-primary text-xs opacity-0 group-hover:opacity-100 transition-opacity">查看详情</div>
+</div>
+</div>
+</div>
+<!-- Checklist -->
+<div class="w-[384px] bg-white border-panel rounded-md flex flex-col shadow-sm shrink-0 mt-6">
+<div class="p-3 border-b border-gray-100 font-medium flex justify-between items-center bg-gray-50">
+              发布检查清单
+            </div>
+<div class="p-4 flex flex-col gap-2 flex-1">
+<div class="flex items-center justify-between text-xs">
+<div class="flex items-center gap-2 text-gray-700">
+<svg class="w-4 h-4 text-success" fill="currentColor" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" fill-rule="evenodd"></path></svg>
+                  编码唯一性
+                </div>
+<span class="text-success">通过</span>
+</div>
+<div class="flex items-center justify-between text-xs">
+<div class="flex items-center gap-2 text-gray-700">
+<svg class="w-4 h-4 text-success" fill="currentColor" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" fill-rule="evenodd"></path></svg>
+                  上级关系有效
+                </div>
+<span class="text-success">通过</span>
+</div>
+<div class="flex items-center justify-between text-xs">
+<div class="flex items-center gap-2 text-gray-700">
+<svg class="w-4 h-4 text-success" fill="currentColor" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" fill-rule="evenodd"></path></svg>
+                  编号规则已绑定
+                </div>
+<span class="text-success">通过</span>
+</div>
+<div class="flex items-center justify-between text-xs">
+<div class="flex items-center gap-2 text-gray-700">
+<svg class="w-4 h-4 text-success" fill="currentColor" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" fill-rule="evenodd"></path></svg>
+                  折旧策略完整
+                </div>
+<span class="text-success">通过</span>
+</div>
+<div class="flex items-center justify-between text-xs">
+<div class="flex items-center gap-2 text-gray-700">
+<svg class="w-4 h-4 text-success" fill="currentColor" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" fill-rule="evenodd"></path></svg>
+                  盘点策略已配置
+                </div>
+<span class="text-success">通过</span>
+</div>
+<div class="flex items-center justify-between text-xs mb-2">
+<div class="flex items-center gap-2 text-gray-700">
+<svg class="w-4 h-4 text-success" fill="currentColor" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" fill-rule="evenodd"></path></svg>
+                  权限影响已确认
+                </div>
+<span class="text-success">通过</span>
+</div>
+<div class="bg-orange-50 border border-orange-200 text-warning p-2 rounded text-xs flex items-start gap-2 mt-auto">
+<svg class="w-4 h-4 shrink-0 mt-0.5" fill="currentColor" viewbox="0 0 20 20"><path clip-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" fill-rule="evenodd"></path></svg>
+<span>23 条待建资产将按新分类重新预览</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- END: MainContent -->
+</div>
+</body></html>

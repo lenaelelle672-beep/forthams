@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>系统设置中心 - 同步规则</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "status-red": "#DC2626",
+                        "tertiary-fixed-dim": "#ffb695",
+                        "tertiary": "#9f3e00",
+                        "primary-fixed": "#d9e2ff",
+                        "surface": "#f7fafe",
+                        "border-subtle": "#D7E2F0",
+                        "text-primary": "#0F172A",
+                        "text-secondary": "#64748B",
+                        "status-purple": "#7C3AED",
+                        "surface-container-high": "#e5e8ec",
+                        "status-amber": "#F59E0B",
+                        "on-secondary-fixed-variant": "#374762",
+                        "on-surface": "#181c1f",
+                        "surface-tint": "#0057cc",
+                        "status-cyan": "#00A8D8",
+                        "error-container": "#ffdad6",
+                        "on-tertiary-container": "#fffdff",
+                        "primary": "#0056c9",
+                        "on-tertiary": "#ffffff",
+                        "primary-container": "#1d6ef2",
+                        "on-secondary-container": "#51617e",
+                        "surface-container-highest": "#e0e3e7",
+                        "on-secondary-fixed": "#091c35",
+                        "on-surface-variant": "#424654",
+                        "on-tertiary-fixed": "#351000",
+                        "on-primary-fixed-variant": "#00419c",
+                        "on-primary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "on-background": "#181c1f",
+                        "secondary-fixed": "#d5e3ff",
+                        "outline": "#727786",
+                        "primary-fixed-dim": "#b0c6ff",
+                        "status-green": "#16A34A",
+                        "outline-variant": "#c2c6d7",
+                        "on-tertiary-fixed-variant": "#7b2f00",
+                        "error": "#ba1a1a",
+                        "surface-variant": "#e0e3e7",
+                        "inverse-on-surface": "#eef1f5",
+                        "secondary": "#4e5f7b",
+                        "tertiary-container": "#c75000",
+                        "on-error": "#ffffff",
+                        "surface-bright": "#f7fafe",
+                        "tertiary-fixed": "#ffdbcc",
+                        "secondary-container": "#ccddff",
+                        "surface-dim": "#d7dade",
+                        "surface-container-low": "#f1f4f8",
+                        "inverse-surface": "#2d3134",
+                        "inverse-primary": "#b0c6ff",
+                        "background": "#f7fafe",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "surface-container": "#ebeef2",
+                        "on-primary-fixed": "#001945",
+                        "on-primary-container": "#fffdff",
+                        "secondary-fixed-dim": "#b6c7e8"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    spacing: {
+                        "topbar-height": "56px",
+                        "inspector-width": "320px",
+                        "container-gap": "20px",
+                        "card-padding": "16px",
+                        "sidebar-width": "240px",
+                        "grid-gutter": "12px"
+                    },
+                    fontFamily: {
+                        "body-md": ["Inter"],
+                        "section-header": ["Inter"],
+                        "status-label": ["Inter"],
+                        "code-meta": ["JetBrains Mono"],
+                        "body-sm": ["Inter"],
+                        "page-title": ["Inter"]
+                    },
+                    fontSize: {
+                        "body-md": ["13px", { "lineHeight": "20px", "fontWeight": "500" }],
+                        "section-header": ["14px", { "lineHeight": "20px", "fontWeight": "700" }],
+                        "status-label": ["11px", { "lineHeight": "16px", "fontWeight": "700" }],
+                        "code-meta": ["11px", { "lineHeight": "16px", "fontWeight": "400" }],
+                        "body-sm": ["12px", { "lineHeight": "18px", "fontWeight": "500" }],
+                        "page-title": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&amp;family=Inter:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #f7fafe; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .inspector-shadow { box-shadow: -8px 0 24px rgba(29, 110, 242, 0.15); }
+    </style>
+</head>
+<body class="bg-background text-on-surface h-screen overflow-hidden flex flex-col">
+<!-- TopNavBar -->
+<header class="fixed top-0 left-0 w-full z-50 h-topbar-height flex justify-between items-center px-6" style="background-color: #051424; border-bottom: 2px solid #1D6EF2;">
+<div class="flex items-center gap-8 h-full">
+<span class="text-white font-bold text-[16px] tracking-wide">UNIVIEW | 系统设置中心</span><nav class="hidden md:flex h-full items-center gap-6">
+<a class="text-gray-400 font-body-md text-body-md hover:text-white transition-colors h-full flex items-center" href="#">流程平台</a>
+<a class="text-gray-400 font-body-md text-body-md hover:text-white transition-colors h-full flex items-center" href="#">组织权限</a>
+<a class="text-gray-400 font-body-md text-body-md hover:text-white transition-colors h-full flex items-center" href="#">基础资料</a>
+<a class="text-white font-body-md text-body-md font-bold h-full flex items-center" href="#">集成配置</a>
+<a class="text-gray-400 font-body-md text-body-md hover:text-white transition-colors h-full flex items-center" href="#">消息与通知</a>
+<a class="text-gray-400 font-body-md text-body-md hover:text-white transition-colors h-full flex items-center" href="#">系统参数</a>
+</nav>
+</div>
+<div class="flex items-center gap-4 text-gray-400">
+
+<button class="hover:text-white transition-colors flex items-center gap-1 font-body-sm text-body-sm"><span class="material-symbols-outlined text-[18px]">arrow_back</span> 返回业务工作台</button>
+<div class="flex items-center gap-2 text-white font-body-sm text-body-sm ml-2">
+<div class="w-6 h-6 rounded-full bg-surface-variant overflow-hidden flex items-center justify-center">
+<img alt="Administrator profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBM8QCa3lWKA7du2baU1YYEJitjYLcYNsAg-dIUXKPBp2zocX3mLqJRQncVJ-2iVAPDerwzTX6bMLJStOMILnquHmg3_fdhlW_ma0-dHKzUSFMEIXWT5uk6Jdn8Y_VLs2bE8BAOtoo4MCtT5IMkd-hzDJfF6dG-OY4O8n7OkR8mz4AaeZlkVHPHDd9yVobrKGvdEtrnZmHVncdhrFNxYA8_DZ3mFSw485DCj90-aL2Y6f0SzSMdhPqQFxqV9l00xaw3xy5eaoGbXJJY"/>
+</div>
+<span>运营管理员</span>
+</div>
+</div>
+</header>
+<div class="flex flex-1 pt-topbar-height overflow-hidden">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-topbar-height w-sidebar-width flex flex-col z-40 bg-surface-container-lowest border-r border-border-subtle h-[calc(100vh-56px)]">
+<nav class="flex-1 py-4 flex flex-col gap-1 px-2 overflow-y-auto">
+<a class="flex items-center gap-3 px-3 py-2 rounded-DEFAULT text-on-surface-variant font-body-sm text-body-sm hover:bg-surface-container-high transition-colors group" href="#">
+<span>外部系统配置</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-DEFAULT text-on-surface-variant font-body-sm text-body-sm hover:bg-surface-container-high transition-colors group" href="#">
+<span>接口配置</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-DEFAULT text-on-surface-variant font-body-sm text-body-sm hover:bg-surface-container-high transition-colors group" href="#">
+<span>字段映射</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-DEFAULT text-primary font-bold border-r-2 border-primary bg-primary-fixed/10 font-body-sm text-body-sm hover:bg-surface-container-high transition-colors" href="#">
+<span>同步规则</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-DEFAULT text-on-surface-variant font-body-sm text-body-sm hover:bg-surface-container-high transition-colors group" href="#">
+<span>Webhook 配置</span>
+</a>
+</nav>
+</aside>
+<!-- Main Workspace -->
+<main class="flex-1 ml-sidebar-width flex h-full overflow-hidden">
+<!-- Central Command Canvas -->
+<div class="flex-1 flex flex-col overflow-y-auto px-8 py-6 relative">
+<div class="max-w-5xl mx-auto w-full flex flex-col gap-container-gap pb-20">
+<!-- Breadcrumbs & Header -->
+<div class="flex flex-col gap-2 mb-4">
+<div class="flex items-center gap-2 font-body-sm text-body-sm text-on-surface-variant">
+<span class="hover:text-primary cursor-pointer transition-colors">系统设置中心</span>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+<span class="hover:text-primary cursor-pointer transition-colors">集成配置</span>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+<span class="text-on-surface font-bold">同步规则</span>
+</div>
+<h1 class="font-page-title text-page-title text-on-surface">数据同步策略</h1>
+</div>
+<!-- Config Bento Grid -->
+<div class="grid grid-cols-3 gap-grid-gutter">
+<!-- Strategy Config Card -->
+<div class="col-span-2 bg-surface-container-lowest border border-border-subtle rounded-xl p-card-padding flex flex-col gap-4 relative overflow-hidden group">
+<div class="absolute top-0 left-0 w-1 h-full bg-primary-container"></div>
+<div class="flex justify-between items-start">
+<div>
+<h2 class="font-section-header text-section-header text-on-surface mb-1">同步策略</h2>
+<p class="font-code-meta text-code-meta text-on-surface-variant">/api/v2/config/strategy</p>
+</div>
+<span class="bg-primary-fixed/20 text-primary-fixed-variant font-status-label text-status-label px-2 py-1 rounded">已激活</span>
+</div>
+<div class="flex gap-4">
+<label class="flex items-center gap-2 cursor-pointer p-3 border border-border-subtle rounded-DEFAULT flex-1 hover:border-primary transition-colors bg-surface-container-low">
+<input class="text-primary-container focus:ring-primary-container" name="sync_type" type="radio"/>
+<div class="flex flex-col">
+<span class="font-body-md text-body-md font-bold text-on-surface">全量同步</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">替换所有目标数据</span>
+</div>
+</label>
+<label class="flex items-center gap-2 cursor-pointer p-3 border border-primary rounded-DEFAULT flex-1 bg-primary-fixed/10 relative">
+<div class="absolute -top-2 -right-2 bg-primary-container text-on-primary rounded-full w-5 h-5 flex items-center justify-center"><span class="material-symbols-outlined text-[12px]" style="font-variation-settings: 'FILL' 1;">check</span></div>
+<input checked="" class="text-primary-container focus:ring-primary-container" name="sync_type" type="radio"/>
+<div class="flex flex-col">
+<span class="font-body-md text-body-md font-bold text-on-surface">增量同步</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">仅更新变更的字段</span>
+</div>
+</label>
+</div>
+</div>
+<!-- Crontab Card -->
+<div class="col-span-1 bg-surface-container-lowest border border-border-subtle rounded-xl p-card-padding flex flex-col gap-4">
+<div>
+<h2 class="font-section-header text-section-header text-on-surface mb-1">执行计划 (Crontab)</h2>
+<p class="font-code-meta text-code-meta text-on-surface-variant">时区: UTC</p>
+</div>
+<div class="flex-1 flex flex-col justify-center">
+<div class="relative">
+<input class="w-full bg-surface border border-border-subtle rounded-DEFAULT px-3 py-2 font-code-meta text-code-meta text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none text-center tracking-widest bg-surface-container-high" type="text" value="0 * * * *"/>
+</div>
+<div class="mt-2 text-center font-body-sm text-body-sm text-status-cyan">每小时的第0分钟执行</div>
+</div>
+<button class="w-full py-1.5 border border-border-subtle text-on-surface-variant font-body-sm text-body-sm rounded-DEFAULT hover:bg-surface-container transition-colors">验证表达式</button>
+</div>
+</div>
+<!-- Conflict Resolution -->
+<div class="bg-surface-container-lowest border border-border-subtle rounded-xl p-card-padding flex flex-col gap-4">
+<div class="flex justify-between items-center border-b border-border-subtle pb-3">
+<h2 class="font-section-header text-section-header text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-status-amber">warning</span>
+                                冲突解决逻辑
+                            </h2>
+<span class="font-code-meta text-code-meta text-on-surface-variant bg-surface px-2 py-1 border border-border-subtle rounded">全局设置</span>
+</div>
+<div class="grid grid-cols-3 gap-4">
+<div class="border border-border-subtle rounded-lg p-3 hover:border-primary cursor-pointer transition-colors opacity-60">
+<div class="flex justify-between items-center mb-2">
+<span class="font-body-md text-body-md font-bold text-on-surface">强制覆盖</span>
+<span class="material-symbols-outlined text-outline">file_copy</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">无论时间戳如何，源数据始终覆盖目标数据。</p>
+</div>
+<div class="border border-border-subtle rounded-lg p-3 hover:border-primary cursor-pointer transition-colors opacity-60">
+<div class="flex justify-between items-center mb-2">
+<span class="font-body-md text-body-md font-bold text-on-surface">跳过忽略</span>
+<span class="material-symbols-outlined text-outline">block</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">如果在同步过程中检测到冲突，则跳过该记录。</p>
+</div>
+<div class="border border-primary bg-primary-fixed/5 rounded-lg p-3 cursor-pointer relative shadow-sm">
+<div class="absolute top-2 right-2 flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+</div>
+<div class="flex justify-between items-center mb-2">
+<span class="font-body-md text-body-md font-bold text-primary">需要审批</span>
+<span class="material-symbols-outlined text-primary">fact_check</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">对冲突记录停止同步并路由到管理员队列。</p>
+</div>
+</div>
+</div>
+<!-- High Density Task Log -->
+<div class="bg-surface-container-lowest border border-border-subtle rounded-xl flex flex-col">
+<div class="p-4 border-b border-border-subtle flex justify-between items-center">
+<h2 class="font-section-header text-section-header text-on-surface">任务轨迹日志</h2>
+<div class="flex gap-2">
+<button class="p-1 border border-border-subtle rounded text-outline hover:text-primary transition-colors"><span class="material-symbols-outlined text-[18px]">filter_list</span></button>
+<button class="p-1 border border-border-subtle rounded text-outline hover:text-primary transition-colors"><span class="material-symbols-outlined text-[18px]">refresh</span></button>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface border-b border-border-subtle font-code-meta text-code-meta text-on-surface-variant uppercase">
+<th class="p-3 font-normal">任务 ID</th>
+<th class="p-3 font-normal">时间戳</th>
+<th class="p-3 font-normal">类型</th>
+<th class="p-3 font-normal">已处理记录数</th>
+<th class="p-3 font-normal">状态</th>
+<th class="p-3 font-normal text-right">操作</th>
+</tr>
+</thead>
+<tbody class="font-body-sm text-body-sm text-on-surface">
+<tr class="border-b border-border-subtle hover:bg-surface-container-lowest transition-colors group cursor-pointer">
+<td class="p-3 font-code-meta text-primary">TRX-8992-A</td>
+<td class="p-3 text-on-surface-variant">2023-10-27 14:00:01</td>
+<td class="p-3">增量同步</td>
+<td class="p-3">1,024 / 1,024</td>
+<td class="p-3">
+<span class="inline-flex items-center gap-1 text-status-green font-status-label text-status-label">
+<span class="w-1.5 h-1.5 rounded-full bg-status-green"></span> 成功
+                                            </span>
+</td>
+<td class="p-3 text-right">
+<button class="text-outline group-hover:text-primary transition-colors" onclick="document.getElementById('inspector-panel').classList.remove('translate-x-full')">详情</button>
+</td>
+</tr>
+<tr class="border-b border-border-subtle hover:bg-surface-container-lowest transition-colors group cursor-pointer bg-error-container/10 border-l-2 border-l-status-red">
+<td class="p-3 font-code-meta text-primary">TRX-8991-F</td>
+<td class="p-3 text-on-surface-variant">2023-10-27 13:00:05</td>
+<td class="p-3">全量同步</td>
+<td class="p-3 text-on-surface-variant">450 / 5,000</td>
+<td class="p-3">
+<span class="inline-flex items-center gap-1 text-status-red font-status-label text-status-label">
+<span class="w-1.5 h-1.5 rounded-full bg-status-red"></span> 失败
+                                            </span>
+</td>
+<td class="p-3 text-right">
+<button class="text-outline group-hover:text-primary transition-colors">详情</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-lowest transition-colors group cursor-pointer">
+<td class="p-3 font-code-meta text-primary">TRX-8990-I</td>
+<td class="p-3 text-on-surface-variant">2023-10-27 12:00:02</td>
+<td class="p-3">增量同步</td>
+<td class="p-3">12 / 12</td>
+<td class="p-3">
+<span class="inline-flex items-center gap-1 text-status-green font-status-label text-status-label">
+<span class="w-1.5 h-1.5 rounded-full bg-status-green"></span> 成功
+                                            </span>
+</td>
+<td class="p-3 text-right">
+<button class="text-outline group-hover:text-primary transition-colors">详情</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+<!-- Contextual Inspector (Slide-out panel simulation) -->
+<aside class="w-inspector-width bg-surface-container-lowest border-l border-border-subtle flex flex-col inspector-shadow z-30 transition-transform duration-300 transform translate-x-full fixed right-0 top-topbar-height h-[calc(100vh-56px)]" id="inspector-panel">
+<div class="p-4 border-b border-border-subtle flex justify-between items-center bg-surface">
+<div>
+<div class="font-section-header text-section-header text-on-surface">执行诊断</div>
+<div class="font-code-meta text-code-meta text-status-green">TRX-8992-A (成功)</div>
+</div>
+<button class="text-outline hover:text-on-surface transition-colors p-1" onclick="document.getElementById('inspector-panel').classList.add('translate-x-full')">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<div class="flex-1 overflow-y-auto p-4 flex flex-col gap-6">
+<!-- Overview -->
+<div class="flex flex-col gap-2">
+<h3 class="font-body-sm text-body-sm font-bold text-on-surface-variant uppercase tracking-wider">指标</h3>
+<div class="grid grid-cols-2 gap-2">
+<div class="bg-surface border border-border-subtle p-2 rounded">
+<div class="font-code-meta text-code-meta text-on-surface-variant">耗时</div>
+<div class="font-body-md text-body-md text-on-surface font-bold">1.24s</div>
+</div>
+<div class="bg-surface border border-border-subtle p-2 rounded">
+<div class="font-code-meta text-code-meta text-on-surface-variant">吞吐量</div>
+<div class="font-body-md text-body-md text-on-surface font-bold">825/s</div>
+</div>
+<div class="bg-surface border border-border-subtle p-2 rounded col-span-2">
+<div class="font-code-meta text-code-meta text-on-surface-variant">数据量</div>
+<div class="font-body-md text-body-md text-on-surface font-bold">已传输 2.4 MB</div>
+</div>
+</div>
+</div>
+<!-- Topology -->
+<div class="flex flex-col gap-2">
+<h3 class="font-body-sm text-body-sm font-bold text-on-surface-variant uppercase tracking-wider">拓扑流程</h3>
+<div class="border border-border-subtle rounded p-3 flex flex-col gap-3 relative">
+<div class="absolute left-6 top-6 bottom-6 w-px bg-border-subtle z-0"></div>
+<div class="flex items-center gap-3 relative z-10">
+<div class="w-6 h-6 rounded-full bg-status-green text-on-primary flex items-center justify-center"><span class="material-symbols-outlined text-[14px]">check</span></div>
+<div class="flex-1 bg-surface border border-border-subtle rounded px-2 py-1">
+<span class="font-code-meta text-code-meta text-on-surface">提取 (源 DB)</span>
+</div>
+</div>
+<div class="flex items-center gap-3 relative z-10">
+<div class="w-6 h-6 rounded-full bg-status-green text-on-primary flex items-center justify-center"><span class="material-symbols-outlined text-[14px]">check</span></div>
+<div class="flex-1 bg-surface border border-border-subtle rounded px-2 py-1">
+<span class="font-code-meta text-code-meta text-on-surface">转换 (映射规则)</span>
+</div>
+</div>
+<div class="flex items-center gap-3 relative z-10">
+<div class="w-6 h-6 rounded-full bg-status-green text-on-primary flex items-center justify-center"><span class="material-symbols-outlined text-[14px]">check</span></div>
+<div class="flex-1 bg-surface border border-border-subtle rounded px-2 py-1">
+<span class="font-code-meta text-code-meta text-on-surface">加载 (目标 API)</span>
+</div>
+</div>
+</div>
+</div>
+<!-- AI Helper -->
+<div class="bg-primary-fixed/20 border border-primary-fixed-dim rounded p-3 flex gap-3">
+<span class="material-symbols-outlined text-primary-container mt-0.5">smart_toy</span>
+<div>
+<div class="font-body-sm text-body-sm font-bold text-primary-container mb-1">AI 洞察</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">同步正常完成。与30天移动平均线相比，增量模式显示记录存在异常激增。建议检查源数据完整性。</p>
+</div>
+</div>
+</div>
+<div class="p-4 border-t border-border-subtle bg-surface">
+<button class="w-full bg-surface text-on-surface border border-border-subtle font-body-sm text-body-sm py-2 rounded-DEFAULT hover:bg-surface-container transition-colors font-bold">下载原始日志</button>
+</div>
+</aside>
+</main>
+</div>
+<script>
+        // Demo interaction to open inspector on load for visual completion
+        setTimeout(() => {
+            document.getElementById('inspector-panel').classList.remove('translate-x-full');
+        }, 500);
+    </script>
+</body></html>

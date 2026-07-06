@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SLA 配置 - Future Settings OS</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "status-cyan": "#00A8D8",
+                      "primary-fixed": "#d9e2ff",
+                      "surface-container": "#ebeef2",
+                      "secondary-fixed-dim": "#b6c7e8",
+                      "secondary-fixed": "#d5e3ff",
+                      "on-primary-fixed": "#001945",
+                      "tertiary-container": "#c75000",
+                      "tertiary": "#9f3e00",
+                      "outline": "#727786",
+                      "on-secondary-fixed-variant": "#374762",
+                      "on-error-container": "#93000a",
+                      "inverse-on-surface": "#eef1f5",
+                      "surface-container-highest": "#e0e3e7",
+                      "primary-fixed-dim": "#b0c6ff",
+                      "background": "#f7fafe",
+                      "status-green": "#16A34A",
+                      "secondary": "#4e5f7b",
+                      "status-purple": "#7C3AED",
+                      "surface-bright": "#f7fafe",
+                      "on-primary-container": "#fffdff",
+                      "primary-container": "#1d6ef2",
+                      "surface-container-low": "#f1f4f8",
+                      "error": "#ba1a1a",
+                      "inverse-primary": "#b0c6ff",
+                      "border-subtle": "#D7E2F0",
+                      "on-tertiary-fixed": "#351000",
+                      "on-primary-fixed-variant": "#00419c",
+                      "on-secondary": "#ffffff",
+                      "on-error": "#ffffff",
+                      "surface-container-lowest": "#ffffff",
+                      "surface": "#f7fafe",
+                      "surface-variant": "#e0e3e7",
+                      "text-secondary": "#64748B",
+                      "outline-variant": "#c2c6d7",
+                      "on-secondary-fixed": "#091c35",
+                      "surface-tint": "#0057cc",
+                      "surface-container-high": "#e5e8ec",
+                      "error-container": "#ffdad6",
+                      "surface-dim": "#d7dade",
+                      "status-red": "#DC2626",
+                      "on-secondary-container": "#51617e",
+                      "secondary-container": "#ccddff",
+                      "inverse-surface": "#2d3134",
+                      "on-tertiary": "#ffffff",
+                      "on-surface": "#181c1f",
+                      "on-primary": "#ffffff",
+                      "status-amber": "#F59E0B",
+                      "primary": "#0056c9",
+                      "tertiary-fixed": "#ffdbcc",
+                      "on-tertiary-container": "#fffdff",
+                      "on-tertiary-fixed-variant": "#7b2f00",
+                      "tertiary-fixed-dim": "#ffb695",
+                      "on-background": "#181c1f",
+                      "text-primary": "#0F172A",
+                      "on-surface-variant": "#424654"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "topbar-height": "48px",
+                      "sidebar-width": "196px",
+                      "grid-gutter": "12px",
+                      "inspector-width": "320px",
+                      "container-gap": "20px",
+                      "card-padding": "16px"
+              },
+              "fontFamily": {
+                      "body-sm": [
+                              "Inter"
+                      ],
+                      "code-meta": [
+                              "JetBrains Mono"
+                      ],
+                      "section-header": [
+                              "Inter"
+                      ],
+                      "page-title": [
+                              "Inter"
+                      ],
+                      "status-label": [
+                              "Inter"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "body-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "18px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "code-meta": [
+                              "11px",
+                              {
+                                      "lineHeight": "16px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "section-header": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "page-title": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "status-label": [
+                              "11px",
+                              {
+                                      "lineHeight": "16px",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-md": [
+                              "13px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "500"
+                              }
+                      ]
+              }
+            }
+          }
+        };
+      </script>
+<style>
+          .material-symbols-outlined {
+            font-variation-settings:
+            'FILL' 1,
+            'wght' 400,
+            'GRAD' 0,
+            'opsz' 24
+          }
+      </style>
+</head>
+<body class="bg-background text-on-surface h-screen overflow-hidden flex flex-col font-body-sm text-body-sm">
+<!-- Top Navigation -->
+<header class="fixed top-0 w-full h-[56px] z-50 flex justify-between items-center px-6 border-b-2" style="background-color: #051424; border-bottom-color: #1D6EF2;">
+<div class="flex items-center gap-8 h-full">
+<h1 class="text-white font-bold text-lg tracking-wide">UNIVIEW | 系统设置中心</h1>
+<nav class="hidden md:flex h-full items-end gap-6 text-sm">
+<a class="h-full flex items-center border-b-2 border-primary-container text-primary-fixed font-bold px-1 transition-colors" href="#">流程平台</a><a class="h-full flex items-center border-b-2 border-transparent text-gray-400 hover:text-white px-1 transition-colors" href="#">组织权限</a>
+<a class="h-full flex items-center border-b-2 border-transparent text-gray-400 hover:text-white px-1 transition-colors" href="#">基础资料</a>
+<a class="h-full flex items-center border-b-2 border-transparent text-gray-400 hover:text-white px-1 transition-colors" href="#">集成配置</a>
+<a class="h-full flex items-center border-b-2 border-transparent text-gray-400 hover:text-white px-1 transition-colors" href="#">消息与通知</a>
+<a class="h-full flex items-center border-b-2 border-transparent text-gray-400 hover:text-white px-1 transition-colors" href="#">系统参数</a>
+</nav>
+</div>
+<div class="flex items-center gap-4 text-gray-400 text-sm">
+
+<button class="hover:text-white flex items-center gap-1 transition-colors"><span class="material-symbols-outlined text-[18px]">undo</span>返回业务工作台</button>
+<div class="flex items-center gap-2 border-l border-gray-600 pl-4 ml-2">
+<div class="w-7 h-7 rounded-full bg-surface-variant flex items-center justify-center text-on-surface font-bold text-xs">运营</div>
+<span class="text-white">运营管理员</span>
+<span class="material-symbols-outlined text-[18px]">expand_more</span>
+</div>
+</div>
+</header>
+<div class="flex flex-1 mt-[56px] overflow-hidden h-[calc(100vh-56px)]">
+<!-- Sidebar Navigation -->
+<aside class="w-[240px] bg-surface-container-lowest border-r border-border-subtle flex flex-col h-full flex-shrink-0 z-40 overflow-y-auto">
+<div class="p-4 border-b border-border-subtle">
+<div class="font-section-header text-section-header text-on-surface mb-1">流程平台</div>
+<div class="font-code-meta text-code-meta text-text-secondary">Process Platform</div>
+</div>
+<nav class="flex-1 py-2 flex flex-col gap-1 px-2">
+<a class="flex items-center gap-3 px-3 py-2 rounded text-text-secondary hover:bg-surface-container-low transition-all" href="#">
+<span class="material-symbols-outlined text-[18px]">dashboard</span>导航控制台
+                 </a>
+<a class="flex items-center gap-3 px-3 py-2 rounded text-text-secondary hover:bg-surface-container-low transition-all" href="#">
+<span class="material-symbols-outlined text-[18px]">settings</span>设置中心
+                 </a>
+<a class="flex items-center gap-3 px-3 py-2 rounded text-text-secondary hover:bg-surface-container-low transition-all" href="#">
+<span class="material-symbols-outlined text-[18px]">monitor_heart</span>运行监测
+                 </a>
+<div class="mt-4 mb-2 px-3 font-status-label text-status-label text-outline uppercase">核心配置</div>
+<a class="flex items-center gap-3 px-3 py-2 rounded text-text-secondary hover:bg-surface-container-low transition-all" href="#">
+<span class="material-symbols-outlined text-[18px]">account_tree</span>流程设计器
+                 </a>
+<a class="flex items-center gap-3 px-3 py-2 rounded text-text-secondary hover:bg-surface-container-low transition-all" href="#">
+<span class="material-symbols-outlined text-[18px]">design_services</span>表单配置
+                 </a>
+<a class="flex items-center gap-3 px-3 py-2 rounded text-text-secondary hover:bg-surface-container-low transition-all" href="#">
+<span class="material-symbols-outlined text-[18px]">storage</span>表单存储
+                 </a>
+<a class="flex items-center gap-3 px-3 py-2 rounded text-text-secondary hover:bg-surface-container-low transition-all" href="#">
+<span class="material-symbols-outlined text-[18px]">rule</span>审批规则
+                 </a>
+<a class="flex items-center gap-3 px-3 py-2 rounded text-text-secondary hover:bg-surface-container-low transition-all" href="#">
+<span class="material-symbols-outlined text-[18px]">checklist</span>待办字段配置
+                 </a>
+<a class="flex items-center gap-3 px-3 py-2 rounded bg-surface-container text-primary font-bold border-r-2 border-primary transition-all" href="#">
+<span class="material-symbols-outlined text-[18px]">schedule</span>SLA 配置
+                 </a>
+</nav>
+</aside>
+<!-- Main Workspace -->
+<main class="flex-1 flex flex-col h-full overflow-hidden bg-surface relative">
+<!-- Page Header -->
+<div class="px-8 py-6 border-b border-border-subtle bg-surface-container-lowest flex justify-between items-center">
+<div>
+<h2 class="font-page-title text-page-title text-text-primary">SLA 配置</h2>
+<p class="font-body-sm text-body-sm text-text-secondary mt-1">配置服务级别协议(SLA)及响应基准，定义流程节点的超时规则及预警策略。</p>
+</div>
+<div class="flex gap-3">
+<button class="px-4 py-2 border border-border-subtle bg-transparent text-primary hover:bg-surface-container-low rounded-DEFAULT font-body-sm text-body-sm flex items-center gap-2 transition-colors">
+<span class="material-symbols-outlined text-[18px]">history</span>配置历史
+                    </button>
+<button class="px-4 py-2 bg-[#1D6EF2] text-white hover:bg-surface-tint rounded-DEFAULT font-body-sm text-body-sm flex items-center gap-2 transition-colors">
+<span class="material-symbols-outlined text-[18px]">add</span>新建策略
+                    </button>
+</div>
+</div>
+<!-- Content Area -->
+<div class="flex-1 overflow-y-auto p-8 flex gap-6">
+<!-- Left Column (Grid/Matrix) -->
+<div class="flex-1 flex flex-col gap-6">
+<!-- Search & Filter Bar -->
+<div class="flex gap-4 items-center bg-surface-container-lowest p-4 rounded-lg border border-border-subtle">
+<div class="relative flex-1 max-w-md">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[18px]">search</span>
+<input class="w-full pl-9 pr-4 py-2 border border-border-subtle rounded-DEFAULT bg-surface text-on-surface focus:outline-none focus:border-primary font-code-meta text-code-meta shadow-inner" placeholder="搜索策略名称、适用流程..." type="text"/>
+</div>
+<div class="h-6 w-px bg-border-subtle mx-2"></div>
+<select class="border border-border-subtle rounded-DEFAULT bg-surface text-on-surface px-4 py-2 focus:outline-none focus:border-primary font-body-sm text-body-sm">
+<option>所有状态</option>
+<option>已启用</option>
+<option>已禁用</option>
+</select>
+<select class="border border-border-subtle rounded-DEFAULT bg-surface text-on-surface px-4 py-2 focus:outline-none focus:border-primary font-body-sm text-body-sm">
+<option>优先级级别</option>
+<option>P1 - 紧急</option>
+<option>P2 - 高</option>
+<option>P3 - 中</option>
+</select>
+</div>
+<!-- SLA Strategy List -->
+<div class="bg-surface-container-lowest border border-border-subtle rounded-lg flex flex-col">
+<div class="px-6 py-4 border-b border-border-subtle flex justify-between items-center bg-surface-container-low/50 rounded-t-lg">
+<h3 class="font-section-header text-section-header text-on-surface">响应与处理基准策略</h3>
+<span class="bg-primary/10 text-primary-container px-2 py-1 rounded font-status-label text-status-label">共 12 项</span>
+</div>
+<!-- Table Header -->
+<div class="grid grid-cols-12 gap-4 px-6 py-3 border-b border-border-subtle bg-surface-container-lowest font-body-sm text-body-sm text-text-secondary uppercase tracking-wider">
+<div class="col-span-3">策略名称</div>
+<div class="col-span-2">适用优先级</div>
+<div class="col-span-2">响应时效</div>
+<div class="col-span-2">处理时效</div>
+<div class="col-span-2">状态</div>
+<div class="col-span-1 text-right">操作</div>
+</div>
+<!-- List Items -->
+<div class="flex flex-col">
+<!-- Item 1 (Active) -->
+<div class="grid grid-cols-12 gap-4 px-6 py-4 border-b border-border-subtle bg-primary/5 hover:bg-primary/10 transition-colors items-center relative">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-primary"></div>
+<div class="col-span-3 flex flex-col">
+<span class="font-body-sm text-body-sm font-semibold text-text-primary">核心系统故障响应</span>
+<span class="font-code-meta text-code-meta text-outline mt-1">SLA-REQ-001</span>
+</div>
+<div class="col-span-2 flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-status-red"></span>
+<span class="font-body-sm text-body-sm text-on-surface">P1 紧急</span>
+</div>
+<div class="col-span-2 font-code-meta text-code-meta text-on-surface">15 分钟</div>
+<div class="col-span-2 font-code-meta text-code-meta text-on-surface">2 小时</div>
+<div class="col-span-2">
+<span class="px-2 py-1 bg-status-green/10 text-status-green border border-status-green/20 rounded font-status-label text-status-label">已启用</span>
+</div>
+<div class="col-span-1 flex justify-end gap-2 text-text-secondary">
+<button class="hover:text-primary transition-colors"><span class="material-symbols-outlined text-[18px]">edit</span></button>
+</div>
+</div>
+<!-- Item 2 -->
+<div class="grid grid-cols-12 gap-4 px-6 py-4 border-b border-border-subtle bg-surface-container-lowest hover:bg-surface-container-low transition-colors items-center">
+<div class="col-span-3 flex flex-col">
+<span class="font-body-sm text-body-sm font-semibold text-text-primary">普通业务审批基准</span>
+<span class="font-code-meta text-code-meta text-outline mt-1">SLA-APP-012</span>
+</div>
+<div class="col-span-2 flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-status-amber"></span>
+<span class="font-body-sm text-body-sm text-on-surface">P3 中等</span>
+</div>
+<div class="col-span-2 font-code-meta text-code-meta text-on-surface">4 小时</div>
+<div class="col-span-2 font-code-meta text-code-meta text-on-surface">24 小时</div>
+<div class="col-span-2">
+<span class="px-2 py-1 bg-status-green/10 text-status-green border border-status-green/20 rounded font-status-label text-status-label">已启用</span>
+</div>
+<div class="col-span-1 flex justify-end gap-2 text-text-secondary">
+<button class="hover:text-primary transition-colors"><span class="material-symbols-outlined text-[18px]">edit</span></button>
+</div>
+</div>
+<!-- Item 3 -->
+<div class="grid grid-cols-12 gap-4 px-6 py-4 border-b border-border-subtle bg-surface-container-lowest hover:bg-surface-container-low transition-colors items-center opacity-70">
+<div class="col-span-3 flex flex-col">
+<span class="font-body-sm text-body-sm font-semibold text-text-primary line-through text-outline">测试环境部署基准</span>
+<span class="font-code-meta text-code-meta text-outline mt-1">SLA-DEP-004</span>
+</div>
+<div class="col-span-2 flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-outline"></span>
+<span class="font-body-sm text-body-sm text-outline">P4 低</span>
+</div>
+<div class="col-span-2 font-code-meta text-code-meta text-outline">24 小时</div>
+<div class="col-span-2 font-code-meta text-code-meta text-outline">72 小时</div>
+<div class="col-span-2">
+<span class="px-2 py-1 bg-surface-container text-outline border border-border-subtle rounded font-status-label text-status-label">已停用</span>
+</div>
+<div class="col-span-1 flex justify-end gap-2 text-text-secondary">
+<button class="hover:text-primary transition-colors"><span class="material-symbols-outlined text-[18px]">visibility</span></button>
+</div>
+</div>
+</div>
+</div>
+<!-- SLA Calendar/Workday Config -->
+<div class="bg-surface-container-lowest border border-border-subtle rounded-lg p-6">
+<div class="flex justify-between items-center mb-6">
+<h3 class="font-section-header text-section-header text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">calendar_month</span> 工作日历及排班
+                            </h3>
+<button class="text-primary font-body-sm text-body-sm hover:underline">管理全局日历</button>
+</div>
+<div class="grid grid-cols-3 gap-4">
+<div class="border border-border-subtle rounded p-4 bg-surface flex flex-col gap-2">
+<div class="text-text-secondary font-code-meta text-code-meta uppercase">当前适用日历</div>
+<div class="font-body-sm text-body-sm font-bold text-on-surface">标准中国法定工作日</div>
+<div class="text-status-green flex items-center gap-1 font-body-sm text-body-sm mt-2">
+<span class="material-symbols-outlined text-[16px]">check_circle</span> 覆盖 2024 年节假日
+                                </div>
+</div>
+<div class="border border-border-subtle rounded p-4 bg-surface flex flex-col gap-2">
+<div class="text-text-secondary font-code-meta text-code-meta uppercase">默认工作时间</div>
+<div class="font-code-meta text-code-meta font-bold text-on-surface text-lg">09:00 - 18:00</div>
+<div class="text-outline font-body-sm text-body-sm mt-2">GMT+8 (北京时间)</div>
+</div>
+<div class="border border-border-subtle border-dashed rounded p-4 flex items-center justify-center text-text-secondary hover:bg-surface-container-low hover:text-primary cursor-pointer transition-colors bg-surface-bright">
+<div class="flex flex-col items-center gap-2">
+<span class="material-symbols-outlined">add_circle</span>
+<span class="font-body-sm text-body-sm">添加特殊排班规则</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Inspector Panel (Fixed 320px) -->
+<aside class="w-[320px] bg-surface-container-lowest border border-border-subtle rounded-lg shadow-sm flex flex-col overflow-hidden flex-shrink-0" style="box-shadow: 0 4px 20px rgba(0, 86, 201, 0.08);">
+<!-- Inspector Header -->
+<div class="p-4 border-b border-border-subtle bg-surface-container-lowest flex justify-between items-center">
+<div class="font-section-header text-section-header text-on-surface">策略检查器</div>
+<span class="material-symbols-outlined text-outline cursor-pointer hover:text-primary">close</span>
+</div>
+<div class="flex-1 overflow-y-auto">
+<!-- Overview Section -->
+<div class="p-4 border-b border-border-subtle">
+<div class="flex justify-between items-start mb-2">
+<h4 class="font-body-sm text-body-sm font-bold text-on-surface">核心系统故障响应</h4>
+<span class="px-2 py-0.5 bg-status-red/10 text-status-red border border-status-red/20 rounded text-[10px] font-bold">P1</span>
+</div>
+<div class="font-code-meta text-code-meta text-outline mb-4">ID: SLA-REQ-001</div>
+<div class="space-y-3">
+<div class="flex justify-between items-center border-b border-border-subtle border-dashed pb-2">
+<span class="text-text-secondary font-body-sm text-body-sm">适用流程数</span>
+<span class="font-code-meta text-code-meta font-bold">14</span>
+</div>
+<div class="flex justify-between items-center border-b border-border-subtle border-dashed pb-2">
+<span class="text-text-secondary font-body-sm text-body-sm">计时方式</span>
+<span class="font-body-sm text-body-sm">仅工作时间</span>
+</div>
+<div class="flex justify-between items-center border-b border-border-subtle border-dashed pb-2">
+<span class="text-text-secondary font-body-sm text-body-sm">上次修改</span>
+<span class="font-code-meta text-code-meta">2023-10-24 14:30</span>
+</div>
+</div>
+</div>
+<!-- Timer Gates -->
+<div class="p-4 border-b border-border-subtle bg-surface-bright">
+<h5 class="font-status-label text-status-label text-outline uppercase mb-4">时效网关定义</h5>
+<!-- Node 1 -->
+<div class="relative pl-6 mb-6">
+<div class="absolute left-[7px] top-1 bottom-[-24px] w-0.5 bg-primary"></div>
+<div class="absolute left-0 top-1 w-4 h-4 rounded-full border-2 border-primary bg-surface-container-lowest z-10"></div>
+<div class="font-body-sm text-body-sm font-bold text-on-surface mb-1">响应时效 (T1)</div>
+<div class="bg-surface border border-border-subtle rounded p-3 mt-2">
+<div class="font-code-meta text-code-meta font-bold text-lg text-primary mb-1">15m</div>
+<div class="text-[11px] text-text-secondary">接单或首次回复超时阈值</div>
+</div>
+</div>
+<!-- Node 2 -->
+<div class="relative pl-6">
+<div class="absolute left-0 top-1 w-4 h-4 rounded-full border-2 border-status-amber bg-surface-container-lowest z-10"></div>
+<div class="font-body-sm text-body-sm font-bold text-on-surface mb-1">处理时效 (T2)</div>
+<div class="bg-surface border border-border-subtle rounded p-3 mt-2">
+<div class="font-code-meta text-code-meta font-bold text-lg text-status-amber mb-1">2h 0m</div>
+<div class="text-[11px] text-text-secondary">流程流转至闭环超时阈值</div>
+</div>
+</div>
+</div>
+<!-- Escalation Path (Topology) -->
+<div class="p-4 border-b border-border-subtle">
+<div class="flex justify-between items-center mb-4">
+<h5 class="font-status-label text-status-label text-outline uppercase">超时升级策略</h5>
+<button class="text-primary hover:underline text-[11px]">编辑拓扑</button>
+</div>
+<div class="bg-surface-container-low border border-border-subtle rounded p-3 space-y-2">
+<div class="flex items-center gap-2 text-status-amber font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-[16px]">warning</span> 距离超时 15m
+                                </div>
+<div class="pl-6 border-l-2 border-border-subtle ml-2 py-1 text-text-secondary text-[11px]">
+                                    发送系统通知 -&gt; 当前处理人
+                                </div>
+<div class="flex items-center gap-2 text-status-red font-body-sm text-body-sm mt-2">
+<span class="material-symbols-outlined text-[16px]">error</span> 已超时 (T+0)
+                                </div>
+<div class="pl-6 border-l-2 border-border-subtle ml-2 py-1 text-text-secondary text-[11px]">
+                                    抄送通知 -&gt; 部门主管 (Level 1)
+                                </div>
+</div>
+</div>
+<!-- AI Helper -->
+<div class="p-4 bg-background h-full">
+<div class="flex items-center gap-2 mb-3">
+<span class="material-symbols-outlined text-primary-container text-[18px]">smart_toy</span>
+<h5 class="font-status-label text-status-label text-primary-container uppercase">系统优化建议</h5>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+                                基于历史数据，当前P1级别流程的平均实际处理时间为 <span class="font-code-meta font-bold text-status-amber">2h 45m</span>，存在 <span class="font-bold text-status-red">35%</span> 的超时率风险。建议审查处理时效网关或调整适用范围。
+                            </p>
+</div>
+</div>
+</aside>
+</div>
+</main>
+</div>
+</body></html>

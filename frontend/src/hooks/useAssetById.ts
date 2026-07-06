@@ -59,4 +59,29 @@ export function useAssetById(
   });
 }
 
+export function useAssets() {
+  return useQuery({
+    queryKey: ['assets', 'compat-list'],
+    queryFn: async (): Promise<Asset[]> => {
+      const response = await assetService.findAll();
+      const payload = response.data as Asset[] | { records?: Asset[]; data?: Asset[] | { records?: Asset[] } };
+
+      if (Array.isArray(payload)) {
+        return payload;
+      }
+
+      if (Array.isArray(payload.records)) {
+        return payload.records;
+      }
+
+      if (Array.isArray(payload.data)) {
+        return payload.data;
+      }
+
+      return payload.data?.records ?? [];
+    },
+    staleTime: 300000,
+  });
+}
+
 export default useAssetById;

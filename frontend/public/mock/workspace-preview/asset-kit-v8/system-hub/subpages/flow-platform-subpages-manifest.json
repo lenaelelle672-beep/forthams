@@ -1,0 +1,147 @@
+{
+  "package": "asset-kit-v8/system-hub/subpages",
+  "createdAt": "2026-06-18",
+  "group": "流程平台",
+  "designPrinciple": "系统运营中枢是后台操作中心，优先保证配置效率、信息密度和少跳转；流程设计器采用大画布优先，节点库、流程画布、节点配置同屏或窄屏堆叠。",
+  "sourceWorkflow": "IMAGE2 生成子页面产品图，Stitch 生成候选复刻稿；最终页面实现以 IMAGE2 v2 和可用性验证为准。",
+  "stitchProjectId": "9943060219435296513",
+  "subpages": [
+    {
+      "id": "flow-platform-subpage-01-flow-definition-v1",
+      "menuId": "system-flow-definition",
+      "label": "流程定义",
+      "image2": {
+        "path": "/mock/workspace-preview/asset-kit-v8/system-hub/subpages/flow-platform-subpage-01-flow-definition-v1.png",
+        "width": 1585,
+        "height": 992,
+        "status": "complete"
+      },
+      "stitch": {
+        "status": "rejected",
+        "note": "批处理被旧产品套件上下文污染，导出为顶部视角旧屏，未接入。"
+      },
+      "interaction": ["新建流程", "保存草稿", "提交校验", "发布检查", "右侧详情联动"]
+    },
+    {
+      "id": "flow-platform-subpage-02-flow-designer-v2",
+      "menuId": "system-flow-designer",
+      "label": "流程设计器",
+      "image2": {
+        "path": "/mock/workspace-preview/asset-kit-v8/system-hub/subpages/flow-platform-subpage-02-flow-designer-v2.png",
+        "width": 1568,
+        "height": 1003,
+        "status": "complete",
+        "note": "当前准绳：大画布、左侧拖拽节点库、右侧节点配置、底部操作日志。"
+      },
+      "stitch": {
+        "path": "/mock/workspace-preview/asset-kit-v8/system-hub/subpages/stitch-flow-platform-subpage-02-flow-designer-v1.png",
+        "screenId": "35a28501f8ad4c74b37072ec7da5b88b",
+        "width": 512,
+        "height": 410,
+        "status": "candidate",
+        "note": "已修正为中文固定资产流程设计器，但画布利用率不如 IMAGE2 v2；作为结构参考，不作为最终准绳。"
+      },
+      "interaction": ["新建流程图", "拖拽环节节点", "移动画布节点", "配置节点信息", "保存节点配置", "保存草稿", "提交校验"]
+    },
+    {
+      "id": "flow-platform-subpage-03-form-config-v1",
+      "menuId": "system-form-config",
+      "label": "表单配置",
+      "image2": {
+        "path": "/mock/workspace-preview/asset-kit-v8/system-hub/subpages/flow-platform-subpage-03-form-config-v1.png",
+        "width": 1586,
+        "height": 992,
+        "status": "complete"
+      },
+      "stitch": {
+        "path": "/mock/workspace-preview/asset-kit-v8/system-hub/subpages/stitch-flow-platform-subpage-03-form-config-v1.png",
+        "screenId": "a70facbc2bdd4dd1b1dc3d637df5f2bc",
+        "width": 512,
+        "height": 410,
+        "status": "candidate",
+        "note": "首轮生成为空白顶部稿，已通过 Stitch edit 修正为中文三栏表单配置后台；作为候选复刻稿。"
+      },
+      "interaction": ["字段配置", "校验配置", "桌面/H5 布局", "保存表单", "提交发布"]
+    },
+    {
+      "id": "flow-platform-subpage-04-form-storage-v1",
+      "menuId": "system-form-storage",
+      "label": "表单存储",
+      "image2": {
+        "path": "/mock/workspace-preview/asset-kit-v8/system-hub/subpages/flow-platform-subpage-04-form-storage-v1.png",
+        "width": 1586,
+        "height": 992,
+        "status": "complete"
+      },
+      "stitch": {
+        "path": "/mock/workspace-preview/asset-kit-v8/system-hub/subpages/stitch-flow-platform-subpage-04-form-storage-v1.png",
+        "screenId": "1c17ab03d4a94432b39e7d3ee5180ef8",
+        "width": 512,
+        "height": 410,
+        "status": "candidate",
+        "note": "已通过 Stitch edit 中文化，保留策略列表、归档预演、实例查询、右侧策略属性配置。"
+      },
+      "interaction": ["定义版本", "实例数据", "归档查询", "存储策略", "审计追踪"]
+    },
+    {
+      "id": "flow-platform-subpage-05-approval-rules-v1",
+      "menuId": "system-approval-rules",
+      "label": "审批规则",
+      "image2": {
+        "path": "/mock/workspace-preview/asset-kit-v8/system-hub/subpages/flow-platform-subpage-05-approval-rules-v1.png",
+        "width": 1586,
+        "height": 992,
+        "status": "complete"
+      },
+      "stitch": {
+        "path": "/mock/workspace-preview/asset-kit-v8/system-hub/subpages/stitch-flow-platform-subpage-05-approval-rules-v1.png",
+        "screenId": "d3102e68c5a34dd9bba7207b6baa4462",
+        "width": 512,
+        "height": 410,
+        "status": "candidate",
+        "note": "已通过 Stitch edit 中文化主体结构，保留规则列表、命中路径、优先级队列、发布门禁和属性配置；少量表达式字段仍作为技术值保留。"
+      },
+      "interaction": ["重复处理人跳过", "离职交接", "代理规则", "节点权限", "规则发布"]
+    },
+    {
+      "id": "flow-platform-subpage-06-todo-fields-v1",
+      "menuId": "system-todo-fields",
+      "label": "待办字段配置",
+      "image2": {
+        "path": "/mock/workspace-preview/asset-kit-v8/system-hub/subpages/flow-platform-subpage-06-todo-fields-v1.png",
+        "width": 1587,
+        "height": 991,
+        "status": "complete"
+      },
+      "stitch": {
+        "path": "/mock/workspace-preview/asset-kit-v8/system-hub/subpages/stitch-flow-platform-subpage-06-todo-fields-v1.png",
+        "screenId": "24e5d568972d493aafee3c28de6a4680",
+        "width": 512,
+        "height": 410,
+        "status": "candidate",
+        "note": "已通过 Stitch edit 中文化主体结构，保留字段方案、字段表格、桌面待办预览、钉钉 H5 预览和右侧字段属性配置。"
+      },
+      "interaction": ["待办显示字段", "字段排序", "筛选字段", "H5 字段", "保存发布"]
+    },
+    {
+      "id": "flow-platform-subpage-07-sla-config-v1",
+      "menuId": "system-sla-config",
+      "label": "SLA 配置",
+      "image2": {
+        "path": "/mock/workspace-preview/asset-kit-v8/system-hub/subpages/flow-platform-subpage-07-sla-config-v1.png",
+        "width": 1586,
+        "height": 992,
+        "status": "complete"
+      },
+      "stitch": {
+        "path": "/mock/workspace-preview/asset-kit-v8/system-hub/subpages/stitch-flow-platform-subpage-07-sla-config-v1.png",
+        "screenId": "cae06f182eb742bbb8aa1aba6347d8f0",
+        "width": 512,
+        "height": 410,
+        "status": "candidate",
+        "note": "首轮生成为空白顶部稿，已通过 Stitch edit 修正为 SLA 三栏后台，保留规则列表、升级路径、通知渠道、发布门禁和属性配置。"
+      },
+      "interaction": ["审批时限", "超时提醒", "升级规则", "工作日历", "规则发布"]
+    }
+  ]
+}
