@@ -5,10 +5,12 @@
  * API Endpoints:
  *   GET    /system/channel-configs       — 分页查询
  *   GET    /system/channel-configs/{id}   — 详情
- *   POST   /system/channel-configs        — 创建
- *   PUT    /system/channel-configs/{id}   — 更新
- *   DELETE /system/channel-configs/{id}   — 删除
- *   POST   /system/channel-configs/{channelType}/test — 发送测试
+ *   GET    /system/channel-configs/meta  — 只读元数据
+ *   POST   /system/channel-configs/preview — 无持久化、无发送预览
+ *   POST   /system/channel-configs        — 旧兼容创建 helper
+ *   PUT    /system/channel-configs/{id}   — 旧兼容更新 helper
+ *   DELETE /system/channel-configs/{id}   — 旧兼容删除 helper
+ *   POST   /system/channel-configs/{channelType}/test — 旧兼容测试 helper，Workbench V3 不调用
  */
 
 import http from '@/utils/http';
@@ -47,8 +49,65 @@ export interface UpdateChannelConfigRequest {
 export interface PageResponse<T> {
   records: T[];
   total: number;
-  page: number;
-  pageSize: number;
+  page?: number;
+  pageSize?: number;
+  current?: number;
+  size?: number;
+  pages?: number;
+  tenantScoped?: boolean;
+  readonlyBoundary?: string;
+}
+
+export interface ChannelConfigMetaOption {
+  value: string;
+  label: string;
+}
+
+export interface ChannelConfigMeta {
+  channelTypes: ChannelConfigMetaOption[];
+  statuses: ChannelConfigMetaOption[];
+  previewPolicy: {
+    tenantScoped: boolean;
+    noPersistence: boolean;
+    noSend: boolean;
+    runtimeEffect: boolean;
+    forbiddenOperations?: string[];
+    rejectedInputFields?: string[];
+  };
+  tenantScoped: boolean;
+  readOnly: boolean;
+  noPersistencePreview: boolean;
+  noSend: boolean;
+  runtimeEffect: boolean;
+  readonlyBoundary: string;
+  nonGoals: string[];
+}
+
+export interface ChannelConfigPreviewRequest {
+  channelType?: string;
+  configName?: string;
+  webhookUrlConfigured?: boolean;
+  signatureConfigured?: boolean;
+  enabled?: number;
+  sampleEndpoint?: string;
+}
+
+export interface ChannelConfigPreviewResponse {
+  channelType?: string;
+  configName?: string;
+  configured: boolean;
+  webhookUrlConfigured: boolean;
+  webhookUrlMasked: string;
+  signatureConfigured: boolean;
+  enabled: number;
+  sampleEndpointAccepted: boolean;
+  previewAccepted: boolean;
+  rejectedInputs: Array<{ field: string; reason: string }>;
+  tenantScoped: boolean;
+  noPersistence: boolean;
+  noSend: boolean;
+  runtimeEffect: boolean;
+  readonlyBoundary: string;
 }
 
 export const channelConfigApi = {
@@ -60,6 +119,16 @@ export const channelConfigApi = {
   /** 详情 */
   getById(id: number) {
     return http.get<ChannelConfig>(`/system/channel-configs/${id}`);
+  },
+
+  /** 只读元数据 */
+  meta() {
+    return http.get<ChannelConfigMeta>('/system/channel-configs/meta');
+  },
+
+  /** 无持久化、无发送、无外联预览 */
+  preview(data: ChannelConfigPreviewRequest) {
+    return http.post<ChannelConfigPreviewResponse>('/system/channel-configs/preview', data);
   },
 
   /** 创建 */

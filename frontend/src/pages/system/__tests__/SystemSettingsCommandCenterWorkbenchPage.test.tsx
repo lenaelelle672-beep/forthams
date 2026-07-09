@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import SystemSettingsCommandCenterWorkbenchPage from '../SystemSettingsCommandCenterWorkbenchPage';
 import { listWorkflowDefinitions } from '../../../api/workflowDefinitions';
-import { getWorkflowRuntimePendingCount, listWorkflowRuntime } from '../../../api/workflowRuntime';
+import { getWorkflowRuntimePendingCount, getWorkflowRuntimeSlaSummary, listWorkflowRuntime, listWorkflowRuntimeSlaTimeoutRecords } from '../../../api/workflowRuntime';
 
 vi.mock('../../../api/workflowDefinitions', () => ({
   listWorkflowDefinitions: vi.fn(),
@@ -11,18 +11,40 @@ vi.mock('../../../api/workflowDefinitions', () => ({
 
 vi.mock('../../../api/workflowRuntime', () => ({
   getWorkflowRuntimePendingCount: vi.fn(),
+  getWorkflowRuntimeSlaSummary: vi.fn(),
   listWorkflowRuntime: vi.fn(),
+  listWorkflowRuntimeSlaTimeoutRecords: vi.fn(),
 }));
 
 const mockedDefinitions = vi.mocked(listWorkflowDefinitions);
 const mockedRuntime = vi.mocked(listWorkflowRuntime);
 const mockedPendingCount = vi.mocked(getWorkflowRuntimePendingCount);
+const mockedSlaSummary = vi.mocked(getWorkflowRuntimeSlaSummary);
+const mockedSlaTimeoutRecords = vi.mocked(listWorkflowRuntimeSlaTimeoutRecords);
 const configuredState = ['P', 'UBLISHED'].join('');
 const pendingState = ['PEND', 'ING'].join('');
 const completedState = ['APPROV', 'ED'].join('');
 
 describe('SystemSettingsCommandCenterWorkbenchPage', () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockedSlaSummary.mockResolvedValue({
+      totalConfigs: 1,
+      activeConfigs: 1,
+      overdueCount: 2,
+      warningCount: 3,
+      criticalCount: 1,
+      timeoutRecordCount: 1,
+      riskCounts: { HIGH: 1 },
+      nodeDurationSummary: ['MANAGER_REVIEW 超时 120 分钟'],
+      abnormalTraceSummary: ['实例 PR***01 存在SLA异常轨迹'],
+      recentTimeoutRecords: [],
+      exportMaskingNotice: '导出仅返回 masked/summary 字段，不包含 storage key。',
+      readOnly: true,
+      tenantScoped: true,
+    });
+    mockedSlaTimeoutRecords.mockResolvedValue([{ id: 10, processKey: 'ASSET_TRANSFER', nodeKey: 'MANAGER_REVIEW', maskedBusinessSummary: '业务摘要已脱敏', riskLevel: 'HIGH', timeoutMinutes: 120, masked: true }]);
+  });
 
   it('只读聚合流程模板、运行实例、待处理数量与健康摘要', async () => {
     mockedDefinitions.mockResolvedValueOnce([
@@ -47,10 +69,15 @@ describe('SystemSettingsCommandCenterWorkbenchPage', () => {
     expect(screen.getAllByText('ASSET_TRANSFER').length).toBeGreaterThan(0);
     expect(screen.getByText('APR-001')).toBeInTheDocument();
     expect(screen.getByText('4')).toBeInTheDocument();
-    expect(screen.getByText(/只读聚合 \/workflows、\/approvals\/list、\/approvals\/pending\/count/)).toBeInTheDocument();
+    expect(screen.getByText(/只读聚合 \/workflows、\/approvals\/list、\/approvals\/pending\/count、\/sla-config\/runtime-summary/)).toBeInTheDocument();
     expect(screen.getByText(/不支持发起\/审批\/重试\/终止\/发布\/编辑，不代表流程控制闭环/)).toBeInTheDocument();
-    expect(screen.getByText(/覆盖最多 15\/44，仍非 44 项全量覆盖/)).toBeInTheDocument();
+    expect(screen.getByText(/SLA 只读联动已纳入流程平台 9\/9/)).toBeInTheDocument();
+    expect(screen.getByText(/仍非 44 项全量覆盖，不代表 Workbench V3 全量完成/)).toBeInTheDocument();
+    expect(screen.getByText('SLA 超时记录')).toBeInTheDocument();
+    expect(screen.getByText(/业务摘要已脱敏/)).toBeInTheDocument();
+    expect(screen.getByText(/MANAGER_REVIEW 超时 120 分钟/)).toBeInTheDocument();
     expect(mockedRuntime).toHaveBeenCalledWith({ page: 1, pageSize: 50, status: undefined, processType: '' });
+    expect(mockedSlaTimeoutRecords).toHaveBeenCalledWith({ status: 'OPEN' });
   });
 
   it('支持搜索、模板状态筛选、实例状态筛选与重新加载', async () => {

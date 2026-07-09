@@ -1,6 +1,6 @@
 // Fix: react-router-dom types
 declare module 'react-router-dom' {
-  import * as RRD from 'react-router-dom';
+  import * as RRD from 'react-router';
   export const useParams: typeof RRD.useParams;
   export const useNavigate: typeof RRD.useNavigate;
   export const useLocation: typeof RRD.useLocation;

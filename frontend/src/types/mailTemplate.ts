@@ -20,6 +20,8 @@ export interface MailTemplate {
   createTime?: string;
   updateBy?: string;
   updateTime?: string;
+  tenantScoped?: boolean;
+  readonlyBoundary?: string;
 }
 
 /** 创建邮件模板请求 */
@@ -50,20 +52,39 @@ export interface MailLog {
   id: number;
   tenantId?: string;
   templateCode?: string;
-  mailFrom?: string;
-  mailTo: string;
-  mailCc?: string;
-  mailBcc?: string;
-  subject?: string;
-  content?: string;
+  maskedMailFrom?: string;
+  maskedMailTo?: string;
+  maskedMailCc?: string;
+  maskedMailBcc?: string;
+  maskedSubject?: string;
+  maskedBodySummary?: string;
   sendStatus: string;
-  errorMessage?: string;
+  diagnosticSummary?: string;
   retryCount?: number;
   maxRetry?: number;
   bizType?: string;
   bizId?: number;
   sendTime?: string;
   createTime?: string;
+  updateTime?: string;
+  redacted?: boolean;
+  tenantScoped?: boolean;
+  readOnly?: boolean;
+  readonlyBoundary?: string;
+  redactionPolicy?: string[];
+  nonGoals?: string[];
+  /** @deprecated 仅为旧 settings 页兼容；Workbench V3 只能使用 maskedMailTo。 */
+  mailTo?: string;
+  /** @deprecated 仅为旧 settings 页兼容；Workbench V3 只能使用 maskedMailCc。 */
+  mailCc?: string;
+  /** @deprecated 仅为旧 settings 页兼容；Workbench V3 只能使用 maskedMailBcc。 */
+  mailBcc?: string;
+  /** @deprecated 仅为旧 settings 页兼容；Workbench V3 只能使用 maskedSubject。 */
+  subject?: string;
+  /** @deprecated 仅为旧 settings 页兼容；Workbench V3 只能使用 contentSummary。 */
+  content?: string;
+  /** @deprecated 仅为旧 settings 页兼容；Workbench V3 只能使用 diagnosticSummary。 */
+  errorMessage?: string;
 }
 
 /** 分页响应 */
@@ -73,6 +94,72 @@ export interface PageResponse<T> {
   size: number;
   current: number;
   pages: number;
+  tenantScoped?: boolean;
+  readonlyBoundary?: string;
+  redacted?: boolean;
+  readOnly?: boolean;
+  redactionPolicy?: string[];
+}
+
+export interface MailLogMeta {
+  sendStatuses: MailTemplateMetaOption[];
+  bizTypes: MailTemplateMetaOption[];
+  templateCodes: MailTemplateMetaOption[];
+  redactionPolicy: string[];
+  nonGoals: string[];
+  redacted?: boolean;
+  tenantScoped?: boolean;
+  readOnly?: boolean;
+  collectionGuaranteed?: boolean;
+  readonlyBoundary?: string;
+}
+
+export interface MailTemplateMetaOption {
+  value: string;
+  label: string;
+}
+
+export interface MailTemplatePreviewVariablePolicy {
+  htmlEscaped: boolean;
+  whitelistOnly: boolean;
+  nonPersistent: boolean;
+  sensitiveVariableNames: string[];
+  examples?: string[];
+}
+
+export interface MailTemplateMeta {
+  categories: MailTemplateMetaOption[];
+  contentTypes: MailTemplateMetaOption[];
+  statuses: MailTemplateMetaOption[];
+  previewVariablePolicy: MailTemplatePreviewVariablePolicy;
+  tenantScoped?: boolean;
+  readonlyBoundary?: string;
+  nonGoals?: string[];
+}
+
+export interface MailTemplatePreviewRequest {
+  templateId?: number;
+  templateCode?: string;
+  subjectTemplate?: string;
+  contentTemplate?: string;
+  variables: Record<string, string>;
+}
+
+export interface RejectedPreviewVariable {
+  name: string;
+  reason: string;
+}
+
+export interface MailTemplatePreviewResponse {
+  renderedSubject: string;
+  renderedContent: string;
+  missingVariables: string[];
+  rejectedVariables: RejectedPreviewVariable[];
+  usedVariables: string[];
+  nonPersistent: true;
+  htmlEscaped?: boolean;
+  tenantScoped?: boolean;
+  readonlyBoundary?: string;
 }
 
 /** 模板分类选项 */

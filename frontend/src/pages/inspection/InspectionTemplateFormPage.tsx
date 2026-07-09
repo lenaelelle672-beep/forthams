@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router';
 import { Form, Input, Select, InputNumber, Button, message, Card, Space } from 'antd';
 import type { FormInstance } from 'antd/es/form';
 import { ArrowLeftOutlined, SaveOutlined } from '@ant-design/icons';

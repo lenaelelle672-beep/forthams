@@ -21,11 +21,15 @@ import {
   getCustomFieldAll,
   getCustomFieldDetail,
   getCustomFieldList,
+  getCustomFieldMeta,
   getCustomFieldsetAll,
   getCustomFieldsetDetail,
   getCustomFieldsetList,
+  getCustomFieldsetMeta,
   getFieldsetByCategory,
   getFieldsetFields,
+  previewCustomFields,
+  previewCustomFieldsets,
   saveAssetCustomFields,
   updateCustomField,
   updateCustomFieldset,
@@ -52,6 +56,15 @@ describe('api/customField', () => {
     mockedHttp.get.mockResolvedValueOnce({ id: 7 });
     await getCustomFieldDetail(7);
     expect(mockedHttp.get).toHaveBeenCalledWith('/system/custom-fields/7');
+
+    mockedHttp.get.mockResolvedValueOnce({ noPersistencePreview: true, runtimeEffect: false });
+    await getCustomFieldMeta();
+    expect(mockedHttp.get).toHaveBeenCalledWith('/system/custom-fields/meta');
+
+    const previewPayload = { values: { warranty_expiry: '2026-12-31' } };
+    mockedHttp.post.mockResolvedValueOnce({ valid: true, noPersistence: true, runtimeEffect: false });
+    await previewCustomFields(previewPayload);
+    expect(mockedHttp.post).toHaveBeenCalledWith('/system/custom-fields/preview', previewPayload);
 
     const payload = { fieldName: 'warranty_expiry', fieldLabel: '保修到期', fieldType: 'DATE' };
     mockedHttp.post.mockResolvedValueOnce({ id: 8, ...payload });
@@ -81,6 +94,15 @@ describe('api/customField', () => {
     mockedHttp.get.mockResolvedValueOnce({ id: 3 });
     await getCustomFieldsetDetail(3);
     expect(mockedHttp.get).toHaveBeenCalledWith('/system/custom-fieldsets/3');
+
+    mockedHttp.get.mockResolvedValueOnce({ noPersistencePreview: true, runtimeEffect: false });
+    await getCustomFieldsetMeta();
+    expect(mockedHttp.get).toHaveBeenCalledWith('/system/custom-fieldsets/meta');
+
+    const previewFieldsetPayload = { fieldsetId: 3, fieldIds: [1, 2], categoryId: 12 };
+    mockedHttp.post.mockResolvedValueOnce({ valid: true, noPersistence: true, runtimeEffect: false });
+    await previewCustomFieldsets(previewFieldsetPayload);
+    expect(mockedHttp.post).toHaveBeenCalledWith('/system/custom-fieldsets/preview', previewFieldsetPayload);
 
     const fieldset = { name: 'IT 设备字段集', description: 'IT 设备扩展字段', status: 1 };
     mockedHttp.post.mockResolvedValueOnce({ id: 3, ...fieldset });

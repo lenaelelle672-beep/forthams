@@ -12,7 +12,7 @@
  */
 
 import React, { useMemo } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { useRetirementPermissions } from '@/app/composables/useApprovalPermission';
 import RetirementListPage from './RetirementListPage';

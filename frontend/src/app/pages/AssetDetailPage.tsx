@@ -13,7 +13,7 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router';
 import { Card, Row, Col, Descriptions, Tag, Spin, message, Button, Timeline, Empty, Tabs, Divider } from 'antd';
 import { ArrowLeftOutlined, AuditOutlined, HistoryOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import { useAssetById } from '../hooks/useAssetById';

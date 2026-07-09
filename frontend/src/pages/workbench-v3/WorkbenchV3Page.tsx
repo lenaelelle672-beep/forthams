@@ -1,7 +1,8 @@
-import { Suspense, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router';
+import { useMemo, useState } from 'react';
 import { getSystemRealPage, isSystemRealPageMenuId } from '../workspace-preview/system-hub/systemRealPageRegistry';
 import { systemModuleRegistry } from '../workspace-preview/system-hub/systemModuleRegistry';
+import SystemPageHost from './SystemPageHost';
+import { SystemInspectorSlotProvider } from './SystemInspectorSlotProvider';
 
 type WorkbenchV3MenuItem = {
   id: string;
@@ -21,26 +22,46 @@ type WorkbenchV3NavigationGroup = {
   items: WorkbenchV3NavigationItem[];
 };
 
-const defaultWorkbenchV3MenuId = 'system-interfaces';
+const defaultWorkbenchV3MenuId = 'system-user-management';
 
-const unsupportedV3MenuLabels: Record<string, string> = {
-  'system-mail-gateway': '邮件网关配置',
-};
+const unsupportedV3MenuLabels: Record<string, string> = {};
 
 export const workbenchV3IntegrationMenus: WorkbenchV3MenuItem[] = [
   { id: 'system-interfaces', label: '接口管理', description: '接口目录、方法、路径摘要与配置校验', status: '已接入真组件' },
   { id: 'system-field-mapping', label: '字段映射', description: '源字段、目标字段、转换白名单与预览', status: '已接入真组件' },
   { id: 'system-sync-rules', label: '同步规则', description: 'dry-run、单条日志重试与只读队列摘要', status: '已接入真组件' },
   { id: 'system-webhook-config', label: 'Webhook 配置', description: 'config-only 校验、敏感字段脱敏与租户隔离', status: '已接入真组件' },
+  { id: 'system-external-systems', label: '外部系统', description: '目录状态、认证掩码与 config-only 校验', status: '已接入真组件' },
+  { id: 'system-base-params', label: '基础参数', description: 'SYSTEM 参数目录、影响预演与缓存刷新降级结果', status: '已接入真组件' },
+  { id: 'system-security-policy', label: '安全策略', description: 'SECURITY 配置态、脱敏预览与 no-direct-effect 审计摘要', status: '已接入真组件' },
+  { id: 'system-audit-log', label: '审计日志', description: 'GET-only 审计日志、脱敏详情、趋势分布与导出限制提示', status: '已接入真组件' },
+  { id: 'system-mail-gateway', label: '邮件网关配置', description: '邮件网关 metadata-only catalog、脱敏详情与 no-send/no-network preview', status: '已接入真组件' },
+  { id: 'system-mail-templates', label: '邮件模板', description: '邮件模板 catalog、变量白名单与无持久化 safe preview', status: '已接入真组件' },
+  { id: 'system-mail-logs', label: '邮件日志', description: '邮件日志只读 catalog、脱敏详情、业务查询与 meta 边界', status: '已接入真组件' },
+  { id: 'system-notification-templates', label: '通知模板', description: '模板 catalog、变量白名单与无持久化 safe preview', status: '已接入真组件' },
+  { id: 'system-notification-channels', label: '通知渠道', description: '通知渠道只读 catalog、脱敏详情与 no-send 预览', status: '已接入真组件' },
+  { id: 'system-notification-preferences', label: '通知偏好', description: '偏好只读 catalog、分类详情、免打扰诊断与无持久化预览', status: '已接入真组件' },
+  { id: 'system-workflow-notification-switch', label: '流程通知开关', description: '通知开关只读 catalog、业务类型查询与 no-send/no-runtime-effect 预览', status: '已接入真组件' },
   { id: 'system-cache-management', label: '缓存管理', description: '应用内命名空间、可观测空态与白名单刷新', status: '已接入真组件' },
   { id: 'system-file-storage', label: '文件存储', description: '附件元数据、业务类型筛选与只读边界', status: '已接入真组件' },
   { id: 'system-asset-category', label: '资产分类', description: '分类树、关键词查询与只读列表', status: '已接入真组件' },
+  { id: 'system-numbering-rules', label: '编号规则', description: '编号规则只读 catalog、详情与无序号预留预览', status: '已接入真组件' },
+  { id: 'system-custom-fields', label: '自定义字段', description: '字段定义只读目录与无持久化校验预览', status: '已接入真组件' },
+  { id: 'system-custom-field-sets', label: '字段集', description: '字段集只读目录、字段明细、分类诊断与无持久化预览', status: '已接入真组件' },
   { id: 'system-vendor-management', label: '供应商管理', description: '供应商只读列表、关键词搜索与状态筛选', status: '已接入真组件' },
   { id: 'system-location-management', label: '位置管理', description: '位置只读列表、根位置摘要与状态筛选', status: '已接入真组件' },
   { id: 'system-user-management', label: '用户管理', description: '用户只读列表、关键词搜索与状态筛选', status: '已接入真组件' },
   { id: 'system-dept-org', label: '部门组织', description: '部门树列表、根部门摘要与状态筛选', status: '已接入真组件' },
   { id: 'system-role-permissions', label: '角色权限', description: '角色-权限绑定目录、权限库存与风险提示', status: '已接入真组件' },
+  { id: 'system-menu-permissions', label: '菜单权限', description: '权限编码库存按域聚合的菜单权限只读覆盖视图', status: '已接入真组件' },
+  { id: 'system-post-management', label: '岗位管理', description: '岗位 metadata-only catalog、详情与 no-persistence/no-assignment/no-permission-effect preview', status: '已接入真组件' },
   { id: 'system-flow-definition', label: '流程定义', description: '流程模板目录、业务类型搜索与节点摘要', status: '已接入真组件' },
+  { id: 'system-flow-designer', label: '流程设计器', description: '草稿保存、图结构校验、发布与版本恢复', status: '已接入真组件' },
+  { id: 'system-form-config', label: '表单配置', description: '表单定义、schema 安全过滤、发布停用与版本恢复', status: '已接入真组件' },
+  { id: 'system-form-storage', label: '表单存储', description: '实例字段值、附件引用、归档删除留痕与导出脱敏', status: '已接入真组件' },
+  { id: 'system-approval-rules', label: '审批规则', description: '规则白名单、模拟命中、冲突检测与启停审计', status: '已接入真组件' },
+  { id: 'system-todo-fields', label: '待办字段配置', description: '字段可见性、稳定排序、角色覆盖、默认恢复与预览脱敏', status: '已接入真组件' },
+  { id: 'system-sla-config', label: 'SLA 配置', description: '策略计算、提醒阈值、超时记录、脱敏导出与只读运行摘要', status: '已接入真组件' },
   { id: 'system-runtime-monitor', label: '运行监控', description: '审批实例列表、待处理数量与流程类型筛选', status: '已接入真组件' },
   { id: 'system-settings-command-center', label: '流程控制台', description: '流程模板、运行实例、待处理数量与只读健康摘要', status: '已接入真组件' },
 ];
@@ -143,7 +164,6 @@ function readMenuFromLocation() {
 }
 
 export default function WorkbenchV3Page() {
-  const navigate = useNavigate();
   const [activeMenu, setActiveMenu] = useState(readMenuFromLocation);
   const activeItem = useMemo(
     () => workbenchV3IntegrationMenus.find((item) => item.id === activeMenu),
@@ -153,7 +173,6 @@ export default function WorkbenchV3Page() {
     () => workbenchV3MenuGroups.find((group) => group.items.some((item) => item.id === activeMenu)) ?? workbenchV3MenuGroups[0],
     [activeMenu],
   );
-  const isUnsupportedMenu = !activeItem;
   const activeMenuLabel = activeItem?.label ?? workbenchV3MenuLabelById.get(activeMenu) ?? unsupportedV3MenuLabels[activeMenu] ?? activeMenu;
   const RealPage = activeItem && isSystemRealPageMenuId(activeItem.id) ? getSystemRealPage(activeItem.id) : undefined;
 
@@ -165,11 +184,12 @@ export default function WorkbenchV3Page() {
   };
 
   return (
+    <SystemInspectorSlotProvider activeMenu={activeMenu} activeMenuLabel={activeMenuLabel}>
     <div className="min-h-screen bg-slate-50 text-slate-950">
       <main className="p-6">
       <section className="rounded-3xl border border-blue-100 bg-white p-6 shadow-sm">
         <h1 className="text-2xl font-semibold">系统管理 V3 工作台</h1>
-        <p className="mt-2 text-sm text-slate-500">十五项菜单只通过 V3 registry、module metadata、专属页面与专属 API 访问，仍非 44 项全量覆盖。</p>
+        <p className="mt-2 text-sm text-slate-500">三十七项菜单只通过 V3 registry、module metadata、专属页面与专属 API 访问；system-post-management 已接入岗位 metadata-only 只读目录与 dry-run preview；仍非 44 项全量覆盖，仍不是 Workbench V3 全量完成，组织权限组未全组完成，基础资料组未全组完成，消息与通知组未全组完成，邮件子系统未全组完成。</p>
       </section>
 
       <nav className="mt-4 rounded-3xl border border-slate-200 bg-white p-4 shadow-sm" aria-label="Workbench V3 六域顶部导航">
@@ -243,25 +263,7 @@ export default function WorkbenchV3Page() {
             </span>
           </div>
 
-          <Suspense fallback={<div className="text-sm text-slate-500">正在加载 V3 页面...</div>}>
-            {RealPage ? (
-              <RealPage embeddedInWorkbench />
-            ) : isUnsupportedMenu ? (
-              <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-900">
-                <div className="font-semibold">该菜单尚未接入 Workbench V3 真组件</div>
-                <p className="mt-2 text-amber-800">
-                  {activeMenu} 仍在 V2 Workbench 设计/预览体系中，V3 六域导航会保留，但不会把未接入页面误报为已完成。
-                </p>
-                <button
-                  type="button"
-                  className="mt-4 rounded-lg bg-amber-600 px-4 py-2 text-white transition-colors hover:bg-amber-700"
-                  onClick={() => navigate(`/fixed-assets/workbench?menu=${activeMenu}`)}
-                >
-                  打开 V2 工作台入口
-                </button>
-              </div>
-            ) : null}
-          </Suspense>
+          <SystemPageHost activeMenu={activeMenu} activeMenuLabel={activeMenuLabel} RealPage={RealPage} />
         </section>
       </div>
 
@@ -270,5 +272,6 @@ export default function WorkbenchV3Page() {
       </footer>
       </main>
     </div>
+    </SystemInspectorSlotProvider>
   );
 }

@@ -11,7 +11,7 @@
  * 权限守卫由父级路由或全局 permission guard 统一拦截，
  * 无盘点权限用户将被重定向至 403 页面。
  */
-import type { RouteObject } from 'react-router-dom';
+import type { RouteObject } from 'react-router';
 import { lazy, Suspense } from 'react';
 import { Spin } from 'antd';
 

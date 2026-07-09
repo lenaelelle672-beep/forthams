@@ -79,6 +79,7 @@ describe('api/workflow', () => {
     await workflowApi.updateStatus('ASSET_TRANSFER', 'DISABLED');
 
     expect(mockedHttp.post).toHaveBeenNthCalledWith(1, '/workflows/ASSET_TRANSFER/publish', {
+      confirmed: true,
       publishNote: '发布稳定版本',
       impactScope: '后续新发起审批',
       rollbackPlan: '回滚到上一版本',
@@ -149,6 +150,7 @@ describe('api/workflow', () => {
     expect(mockedHttp.get).toHaveBeenNthCalledWith(1, '/workflows/ASSET_TRANSFER/versions');
     expect(mockedHttp.get).toHaveBeenNthCalledWith(2, '/workflows/ASSET_TRANSFER/versions/1');
     expect(mockedHttp.post).toHaveBeenCalledWith('/workflows/ASSET_TRANSFER/versions/1/rollback', {
+      confirmed: true,
       reason: '恢复稳定版本',
       impactScope: '后续新发起审批',
       rollbackPlan: '必要时回滚到 v2',

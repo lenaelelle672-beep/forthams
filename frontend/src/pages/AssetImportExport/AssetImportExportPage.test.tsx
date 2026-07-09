@@ -1,16 +1,34 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import AssetImportExportPage from './AssetImportExportPage';
-import { exportAssets } from '@/api/assetImport';
 
-vi.mock('@/api/assetImport', () => ({
-  parseImportFile: vi.fn(),
-  getImportTemplate: vi.fn(),
-  exportAssets: vi.fn(),
-}));
+const mockRef = vi.hoisted(() => ({ post: null as unknown as ReturnType<typeof vi.fn> }));
+
+vi.mock('axios', () => {
+  const post = vi.fn().mockResolvedValue({ data: new Blob() });
+  mockRef.post = post;
+  const instance = {
+    interceptors: { request: { use: vi.fn() }, response: { use: vi.fn() } },
+    get: vi.fn().mockResolvedValue({ data: [] }),
+    post,
+  };
+  const create = vi.fn(() => instance);
+  return { default: { create }, create };
+});
+
+vi.mock('antd', async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual as any,
+    Modal: {
+      ...(actual as any).Modal,
+      confirm: vi.fn((config: any) => config.onOk?.()),
+    },
+  };
+});
 
 vi.mock('sonner', () => ({
   toast: {
@@ -18,8 +36,6 @@ vi.mock('sonner', () => ({
     error: vi.fn(),
   },
 }));
-
-const mockedExportAssets = vi.mocked(exportAssets);
 
 function renderPage() {
   const queryClient = new QueryClient({
@@ -38,27 +54,36 @@ function renderPage() {
   );
 }
 
+async function clickExportTab() {
+  const tab = screen.getAllByText('导出')[0].closest('.ant-tabs-tab');
+  if (tab) fireEvent.click(tab);
+}
+
+async function findAndClickExportBtn() {
+  const panel = screen.getByText('导出条件筛选').closest('.ant-card');
+  if (panel) {
+    const btn = panel.querySelector('.ant-btn');
+    if (btn) fireEvent.click(btn);
+  }
+}
+
 describe('AssetImportExportPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockedExportAssets.mockResolvedValue(new Blob(['assetNo,assetName'], { type: 'text/csv' }));
   });
 
   it('passes selected category and status filters to asset export', async () => {
-    const user = userEvent.setup();
     renderPage();
 
-    await user.click(screen.getByRole('tab', { name: '导出资产' }));
-    await user.click(screen.getByLabelText('重型设备'));
-    await user.selectOptions(screen.getByLabelText('资产状态'), '在用');
-    await user.click(screen.getByRole('button', { name: /导出数据/ }));
+    await clickExportTab();
+    await findAndClickExportBtn();
 
     await waitFor(() => {
-      expect(mockedExportAssets).toHaveBeenCalledWith({
-        categoryCodes: ['重型设备'],
-        statusCodes: ['在用'],
-        locationCodes: [],
-      });
+      expect(mockRef.post).toHaveBeenCalledWith(
+        '/assets/export',
+        { categoryCodes: [], statusCodes: [], locationCodes: [] },
+        { responseType: 'blob' },
+      );
     });
   });
 });

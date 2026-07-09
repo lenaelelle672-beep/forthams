@@ -11,7 +11,7 @@
  */
 
 import React, { useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { AlertTriangle, Clock, ChevronRight } from 'lucide-react';
 
 // ============== 类型定义 ==============

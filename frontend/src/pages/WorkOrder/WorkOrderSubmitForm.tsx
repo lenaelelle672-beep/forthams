@@ -18,7 +18,7 @@
  */
 
 import React, { useState, useCallback, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { workOrderApi } from '../../api/workorder';
 import type { WorkOrder, WorkOrderCreateDTO, WorkOrderStatus, User } from '../../types/workorder.types';
 import { useWorkOrderPermission } from '../../composables/useWorkOrderPermission';

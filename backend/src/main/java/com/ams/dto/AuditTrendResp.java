@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,6 +31,14 @@ public class AuditTrendResp {
 
     /** 查询结束日期 */
     private LocalDate endDate;
+
+    private LocalDateTime startTime;
+
+    private LocalDateTime endTime;
+
+    private Boolean tenantScoped;
+
+    private String readonlyBoundary;
 
     /** 时序数据点列表，无数据时返回空列表 */
     @Builder.Default

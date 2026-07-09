@@ -12,7 +12,7 @@
  *   列表接口严格校验当前用户角色，不同角色仅可见对应审批级别的工单。
  */
 
-import { lazy, type RouteObject } from 'react-router-dom';
+import { lazy, type RouteObject } from 'react-router';
 import type { ReactNode } from 'react';
 
 // ---------------------------------------------------------------------------

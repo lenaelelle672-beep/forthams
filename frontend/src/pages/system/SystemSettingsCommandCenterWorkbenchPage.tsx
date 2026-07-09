@@ -2,9 +2,13 @@ import { FormEvent, useEffect, useMemo, useState } from 'react';
 import { listWorkflowDefinitions, type WorkflowDefinitionRecord } from '../../api/workflowDefinitions';
 import {
   getWorkflowRuntimePendingCount,
+  getWorkflowRuntimeSlaSummary,
+  listWorkflowRuntimeSlaTimeoutRecords,
   listWorkflowRuntime,
   type WorkflowRuntimePage,
   type WorkflowRuntimeProcess,
+  type WorkflowRuntimeSlaSummary,
+  type WorkflowRuntimeSlaTimeoutRecord,
 } from '../../api/workflowRuntime';
 
 type SystemSettingsCommandCenterWorkbenchPageProps = {
@@ -25,6 +29,24 @@ const RUNTIME_STATUS = {
 
 function emptyRuntimePage(): WorkflowRuntimePage {
   return { records: [], total: 0, size: 50, current: 1, pages: 0 };
+}
+
+function emptySlaSummary(): WorkflowRuntimeSlaSummary {
+  return {
+    totalConfigs: 0,
+    activeConfigs: 0,
+    overdueCount: 0,
+    warningCount: 0,
+    criticalCount: 0,
+    timeoutRecordCount: 0,
+    riskCounts: {},
+    nodeDurationSummary: [],
+    abnormalTraceSummary: [],
+    recentTimeoutRecords: [],
+    exportMaskingNotice: 'SLA 导出仅返回脱敏摘要。',
+    readOnly: true,
+    tenantScoped: true,
+  };
 }
 
 function normalize(value: string | null | undefined) {
@@ -114,6 +136,8 @@ export default function SystemSettingsCommandCenterWorkbenchPage({
   const [definitions, setDefinitions] = useState<WorkflowDefinitionRecord[]>([]);
   const [runtimePage, setRuntimePage] = useState<WorkflowRuntimePage>(emptyRuntimePage);
   const [pendingCount, setPendingCount] = useState(0);
+  const [slaSummary, setSlaSummary] = useState<WorkflowRuntimeSlaSummary>(emptySlaSummary);
+  const [slaTimeoutRecords, setSlaTimeoutRecords] = useState<WorkflowRuntimeSlaTimeoutRecord[]>([]);
   const [keywordInput, setKeywordInput] = useState('');
   const [activeKeyword, setActiveKeyword] = useState('');
   const [definitionStatusFilter, setDefinitionStatusFilter] = useState<DefinitionStatusFilter>('all');
@@ -125,18 +149,24 @@ export default function SystemSettingsCommandCenterWorkbenchPage({
     setLoading(true);
     setError(null);
     try {
-      const [nextDefinitions, nextRuntimePage, nextPendingCount] = await Promise.all([
+      const [nextDefinitions, nextRuntimePage, nextPendingCount, nextSlaSummary, nextSlaTimeoutRecords] = await Promise.all([
         listWorkflowDefinitions(),
         listWorkflowRuntime({ page: 1, pageSize: 50, status: backendRuntimeStatus(runtimeStatus), processType: keyword }),
         getWorkflowRuntimePendingCount(),
+        getWorkflowRuntimeSlaSummary(),
+        listWorkflowRuntimeSlaTimeoutRecords({ status: 'OPEN' }),
       ]);
       setDefinitions(nextDefinitions);
       setRuntimePage(nextRuntimePage);
       setPendingCount(nextPendingCount);
+      setSlaSummary(nextSlaSummary);
+      setSlaTimeoutRecords(nextSlaTimeoutRecords);
     } catch {
       setDefinitions([]);
       setRuntimePage(emptyRuntimePage());
       setPendingCount(0);
+      setSlaSummary(emptySlaSummary());
+      setSlaTimeoutRecords([]);
       setError('流程控制台只读聚合加载失败，敏感细节已脱敏');
     } finally {
       setLoading(false);
@@ -209,7 +239,7 @@ export default function SystemSettingsCommandCenterWorkbenchPage({
         <div>
           <h3 className="text-lg font-semibold">流程控制台</h3>
           <p className="mt-1 text-sm text-slate-500">
-            只读聚合 /workflows、/approvals/list、/approvals/pending/count，展示流程模板、运行实例、待处理数量与运行健康摘要。
+            只读聚合 /workflows、/approvals/list、/approvals/pending/count、/sla-config/runtime-summary 与 /sla-config/timeout-records，展示流程模板、运行实例、SLA 风险摘要与超时记录。
           </p>
         </div>
         <button
@@ -226,7 +256,7 @@ export default function SystemSettingsCommandCenterWorkbenchPage({
         只读风险提示：不支持发起/审批/重试/终止/发布/编辑，不代表流程控制闭环；本页仅复用既有只读查询结果。
       </div>
 
-      <div className="grid gap-3 md:grid-cols-4">
+      <div className="grid gap-3 md:grid-cols-4 xl:grid-cols-6">
         <div className="rounded-2xl border border-slate-200 p-4">
           <p className="text-xs text-slate-500">流程模板总数</p>
           <p className="mt-2 text-2xl font-semibold text-slate-900">{definitions.length}</p>
@@ -242,6 +272,14 @@ export default function SystemSettingsCommandCenterWorkbenchPage({
         <div className="rounded-2xl border border-slate-200 p-4">
           <p className="text-xs text-slate-500">运行实例总数</p>
           <p className="mt-2 text-2xl font-semibold text-slate-900">{runtimePage.total ?? 0}</p>
+        </div>
+        <div className="rounded-2xl border border-slate-200 p-4">
+          <p className="text-xs text-slate-500">SLA 风险</p>
+          <p className="mt-2 text-2xl font-semibold text-red-600">{slaSummary.overdueCount ?? 0}</p>
+        </div>
+        <div className="rounded-2xl border border-slate-200 p-4">
+          <p className="text-xs text-slate-500">SLA 策略</p>
+          <p className="mt-2 text-2xl font-semibold text-slate-900">{slaSummary.activeConfigs ?? 0}/{slaSummary.totalConfigs ?? 0}</p>
         </div>
       </div>
 
@@ -361,6 +399,24 @@ export default function SystemSettingsCommandCenterWorkbenchPage({
               </table>
             </div>
           </div>
+
+          <div className="rounded-2xl border border-slate-200 p-4">
+            <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+              <h4 className="font-semibold">SLA 超时记录</h4>
+              <span className="text-xs text-slate-500">脱敏展示 {slaTimeoutRecords.length} 条</span>
+            </div>
+            {slaTimeoutRecords.length === 0 ? (
+              <div className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm text-slate-500">暂无 SLA 超时记录。</div>
+            ) : null}
+            <div className="space-y-2">
+              {slaTimeoutRecords.slice(0, 5).map((record) => (
+                <div key={record.id} className="rounded-xl border border-slate-100 px-3 py-2 text-sm text-slate-600">
+                  <p className="font-medium text-slate-800">{record.processKey ?? '-'} / {record.nodeKey ?? '-'}</p>
+                  <p className="text-xs text-slate-500">{record.maskedBusinessSummary ?? '业务摘要已脱敏'} · {record.riskLevel ?? 'UNKNOWN'} · {record.timeoutMinutes ?? 0} 分钟</p>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
 
         <aside className="space-y-4">
@@ -381,12 +437,24 @@ export default function SystemSettingsCommandCenterWorkbenchPage({
               </div>
               <div>
                 <dt className="text-xs text-slate-400">数据来源</dt>
-                <dd>/workflows、/approvals/list、/approvals/pending/count</dd>
+                <dd>/workflows、/approvals/list、/approvals/pending/count、/sla-config/runtime-summary、/sla-config/timeout-records</dd>
+              </div>
+              <div>
+                <dt className="text-xs text-slate-400">SLA 节点耗时</dt>
+                <dd>{(slaSummary.nodeDurationSummary ?? []).slice(0, 2).join('；') || '暂无异常耗时'}</dd>
+              </div>
+              <div>
+                <dt className="text-xs text-slate-400">SLA 异常轨迹</dt>
+                <dd>{(slaSummary.abnormalTraceSummary ?? []).slice(0, 2).join('；') || '暂无异常轨迹'}</dd>
+              </div>
+              <div>
+                <dt className="text-xs text-slate-400">脱敏导出提示</dt>
+                <dd>{slaSummary.exportMaskingNotice ?? '导出仅返回 masked/summary 字段。'}</dd>
               </div>
             </dl>
           </div>
           <div className="rounded-2xl border border-blue-100 bg-blue-50 p-4 text-sm text-blue-800">
-            本批仅新增 system-settings-command-center 一个 Workbench V3 真菜单，覆盖最多 15/44，仍非 44 项全量覆盖。
+            SLA 只读联动已纳入流程平台 9/9；不支持发起/审批/重试/终止/发布/编辑；仍非 44 项全量覆盖，不代表 Workbench V3 全量完成。
           </div>
         </aside>
       </div>

@@ -28,6 +28,9 @@ const frontendPackageJson = JSON.parse(readText('../../package.json')) as {
 };
 const router = readText('../router/index.tsx');
 const routePermissions = readText('../utils/routePermissions.ts');
+const workbenchV3Page = readText('../pages/workbench-v3/WorkbenchV3Page.tsx');
+const systemPageHost = readText('../pages/workbench-v3/SystemPageHost.tsx');
+const systemInspectorSlotProvider = readText('../pages/workbench-v3/SystemInspectorSlotProvider.tsx');
 const schema = readText('../../../backend/src/main/resources/schema.sql');
 const migration = readText('../../../backend/src/main/resources/migration/V2_84__workbench_platform_menu_entry.sql');
 const matrix = readText('../../../docs/workbench-platform-entry-matrix.md');
@@ -142,6 +145,49 @@ function repositoryFile(relativePath: string) {
 }
 
 describe('Workbench platform entry contract', () => {
+  it('keeps Workbench V3 runtime isolated from the legacy workbench default path', () => {
+    expect(workbenchV3Page).toContain("const defaultWorkbenchV3MenuId = 'system-user-management'");
+    expect(workbenchV3Page).toContain("import SystemPageHost from './SystemPageHost'");
+    expect(workbenchV3Page).toContain("import { SystemInspectorSlotProvider } from './SystemInspectorSlotProvider'");
+    expect(systemPageHost).toContain('data-system-page-host="workbench-v3"');
+    expect(systemPageHost).toContain('V3 本地建设中占位');
+    expect(systemInspectorSlotProvider).toContain("runtime: 'workbench-v3'");
+    expect(workbenchV3Page).toContain("id: 'system-form-config'");
+    expect(workbenchV3Page).toContain("id: 'system-form-storage'");
+    expect(workbenchV3Page).toContain("id: 'system-approval-rules'");
+    expect(workbenchV3Page).toContain("id: 'system-todo-fields'");
+    expect(workbenchV3Page).toContain("id: 'system-sla-config'");
+    expect(workbenchV3Page).toContain("id: 'system-external-systems'");
+    expect(workbenchV3Page).toContain("id: 'system-base-params'");
+    expect(workbenchV3Page).toContain("id: 'system-security-policy'");
+    expect(workbenchV3Page).toContain("id: 'system-audit-log'");
+    expect(workbenchV3Page).toContain("id: 'system-mail-gateway'");
+    expect(workbenchV3Page).toContain("id: 'system-mail-templates'");
+    expect(workbenchV3Page).toContain("id: 'system-mail-logs'");
+    expect(workbenchV3Page).toContain("id: 'system-notification-templates'");
+    expect(workbenchV3Page).toContain("id: 'system-notification-channels'");
+    expect(workbenchV3Page).toContain("id: 'system-notification-preferences'");
+    expect(workbenchV3Page).toContain("id: 'system-workflow-notification-switch'");
+    expect(workbenchV3Page).toContain("id: 'system-numbering-rules'");
+    expect(workbenchV3Page).toContain("id: 'system-custom-fields'");
+    expect(workbenchV3Page).toContain("id: 'system-custom-field-sets'");
+    expect(workbenchV3Page).toContain('三十七项菜单');
+    expect(workbenchV3Page).toContain('system-post-management 已接入岗位 metadata-only 只读目录与 dry-run preview');
+    expect(workbenchV3Page).toContain('仍不是 Workbench V3 全量完成');
+    expect(workbenchV3Page).toContain('组织权限组未全组完成');
+    expect(workbenchV3Page).toContain('基础资料组未全组完成');
+    expect(workbenchV3Page).toContain('消息与通知组未全组完成');
+    expect(workbenchV3Page).toContain('邮件子系统未全组完成');
+    expect(workbenchV3Page).not.toContain('system-menu-permissions 仍保持 blocked');
+    expect(workbenchV3Page).not.toContain('Day6 pending reviewer gate');
+    expect(workbenchV3Page).not.toContain('accepted coverage 仍为 8/9');
+    expect(workbenchV3Page).not.toContain('PASS 后最多 9/9');
+    expect(workbenchV3Page).not.toContain('44/44');
+    expect(workbenchV3Page).not.toContain('/fixed-assets/workbench?menu=');
+    expect(routePermissions).toContain("{ prefix: '/fixed-assets/workbench', any: ['dashboard:query', 'asset:ledger:query'] }");
+    expect(routePermissions).not.toContain('/fixed-assets/workbenchv3');
+  });
+
   it('keeps Workbench ahead of the legacy dashboard in the desktop shell', () => {
     expect(appLayout).toContain("path: '/fixed-assets/workbench?menu=home'");
     expect(appLayout).toContain("label: '资产运营中枢'");

@@ -3,6 +3,7 @@ import type { PageData } from '@/types/common';
 
 export interface CustomFieldItem {
   id: number;
+  tenantId?: string;
   fieldName: string;
   fieldLabel: string;
   fieldType: string;
@@ -14,15 +15,133 @@ export interface CustomFieldItem {
   status: number;
   createdAt: string;
   updatedAt: string;
+  tenantScoped?: boolean;
+  readonlyBoundary?: string;
+}
+
+export interface CustomFieldMeta {
+  fieldTypes: Array<{ value: string; label: string }>;
+  statuses: Array<{ value: string; label: string }>;
+  previewPolicy?: {
+    noPersistence: boolean;
+    tenantScoped: boolean;
+    safeDisplay: boolean;
+    encryptedSampleEcho: boolean;
+    regexSafetyBounded: boolean;
+    supportedTypes?: string[];
+    rejectedEffects?: string[];
+  };
+  readOnly: boolean;
+  tenantScoped: boolean;
+  noPersistencePreview: boolean;
+  fieldsetsDeferred: boolean;
+  assetValuesDeferred: boolean;
+  runtimeEffect: boolean;
+  readonlyBoundary?: string;
+  nonGoals?: string[];
+}
+
+export interface CustomFieldPreviewRequest {
+  values: Record<string, string | number | boolean | null | undefined>;
+  fieldIds?: number[];
+  fieldNames?: string[];
+}
+
+export interface CustomFieldPreviewResponse {
+  valid: boolean;
+  missing: Array<{ fieldId?: number; fieldName: string; fieldLabel: string; reason: string }>;
+  rejected: Array<{ fieldId?: number; fieldName: string; fieldLabel: string; reason: string }>;
+  errors: string[];
+  usedFields: Array<{
+    fieldId: number;
+    fieldName: string;
+    fieldLabel: string;
+    fieldType: string;
+    required: boolean;
+    encrypted: boolean;
+    validationPattern?: string;
+    options?: string[];
+  }>;
+  tenantScoped: boolean;
+  noPersistence: boolean;
+  runtimeEffect: boolean;
+  readonlyBoundary?: string;
 }
 
 export interface CustomFieldsetItem {
   id: number;
+  tenantId?: string;
   name: string;
   description?: string;
+  categoryId?: number;
+  sortOrder?: number;
+  fieldCount?: number;
   status: number;
-  createdAt: string;
-  updatedAt: string;
+  createdAt?: string;
+  updatedAt?: string;
+  createTime?: string;
+  updateTime?: string;
+  tenantScoped?: boolean;
+  noPersistence?: boolean;
+  runtimeEffect?: boolean;
+  readonlyBoundary?: string;
+}
+
+export interface CustomFieldsetMeta {
+  statuses: Array<{ value: string; label: string }>;
+  previewPolicy?: {
+    tenantScoped: boolean;
+    noPersistence: boolean;
+    runtimeEffect: boolean;
+    validatesFieldIds: boolean;
+    validatesCategoryId: boolean;
+    rejectedEffects?: string[];
+  };
+  allowedRoutes?: string[];
+  readOnly: boolean;
+  tenantScoped: boolean;
+  noPersistencePreview: boolean;
+  runtimeEffect: boolean;
+  categoryBindingDeferred: boolean;
+  assignmentMutationDeferred: boolean;
+  readonlyBoundary?: string;
+  deferredEffects?: string[];
+  nonGoals?: string[];
+}
+
+export interface CustomFieldsetPreviewRequest {
+  fieldsetId?: number;
+  fieldIds?: number[];
+  categoryId?: number;
+}
+
+export interface CustomFieldsetPreviewFieldIssue {
+  fieldId?: number;
+  fieldName?: string;
+  fieldLabel?: string;
+  reason: string;
+}
+
+export interface CustomFieldsetPreviewUsedField {
+  fieldId: number;
+  fieldName: string;
+  fieldLabel: string;
+  fieldType: string;
+  required: boolean;
+  encrypted: boolean;
+}
+
+export interface CustomFieldsetPreviewResponse {
+  valid: boolean;
+  missingFields: CustomFieldsetPreviewFieldIssue[];
+  rejectedFields: CustomFieldsetPreviewFieldIssue[];
+  usedFields: CustomFieldsetPreviewUsedField[];
+  wouldBindCategory: boolean;
+  tenantScoped: boolean;
+  noPersistence: boolean;
+  runtimeEffect: boolean;
+  readonlyBoundary?: string;
+  errors: string[];
 }
 
 export const FIELD_TYPES = [
@@ -45,6 +164,12 @@ export const getCustomFieldAll = () =>
 export const getCustomFieldDetail = (id: number) =>
   http.get<CustomFieldItem>(`/system/custom-fields/${id}`);
 
+export const getCustomFieldMeta = () =>
+  http.get<CustomFieldMeta>('/system/custom-fields/meta');
+
+export const previewCustomFields = (data: CustomFieldPreviewRequest) =>
+  http.post<CustomFieldPreviewResponse>('/system/custom-fields/preview', data);
+
 export const createCustomField = (data: Partial<CustomFieldItem>) =>
   http.post<CustomFieldItem>('/system/custom-fields', data);
 
@@ -62,6 +187,12 @@ export const getCustomFieldsetAll = () =>
 
 export const getCustomFieldsetDetail = (id: number) =>
   http.get<CustomFieldsetItem>(`/system/custom-fieldsets/${id}`);
+
+export const getCustomFieldsetMeta = () =>
+  http.get<CustomFieldsetMeta>('/system/custom-fieldsets/meta');
+
+export const previewCustomFieldsets = (data: CustomFieldsetPreviewRequest) =>
+  http.post<CustomFieldsetPreviewResponse>('/system/custom-fieldsets/preview', data);
 
 export const createCustomFieldset = (data: { name: string; description?: string; status?: number }) =>
   http.post<CustomFieldsetItem>('/system/custom-fieldsets', data);

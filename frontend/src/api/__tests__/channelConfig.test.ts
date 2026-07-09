@@ -42,13 +42,53 @@ describe('api/channelConfig', () => {
       updatedAt: '2026-01-01',
     };
 
-    mockedHttp.get.mockResolvedValueOnce(listResponse).mockResolvedValueOnce(detailResponse);
-    mockedHttp.post.mockResolvedValueOnce(detailResponse).mockResolvedValueOnce('ok');
+    const metaResponse = {
+      channelTypes: [{ value: 'DINGTALK', label: '钉钉' }],
+      statuses: [{ value: '1', label: '启用' }],
+      previewPolicy: { tenantScoped: true, noPersistence: true, noSend: true, runtimeEffect: false },
+      tenantScoped: true,
+      readOnly: true,
+      noPersistencePreview: true,
+      noSend: true,
+      runtimeEffect: false,
+      readonlyBoundary: '只读通知渠道目录',
+      nonGoals: ['不发送测试消息'],
+    };
+    const previewPayload = {
+      channelType: 'DINGTALK',
+      configName: '运维群',
+      webhookUrlConfigured: true,
+      signatureConfigured: false,
+      enabled: 1,
+      sampleEndpoint: '/robot/send',
+    };
+    const previewResponse = {
+      channelType: 'DINGTALK',
+      configName: '运维群',
+      configured: true,
+      webhookUrlConfigured: true,
+      webhookUrlMasked: '已配置（脱敏）',
+      signatureConfigured: false,
+      enabled: 1,
+      sampleEndpointAccepted: true,
+      previewAccepted: true,
+      rejectedInputs: [],
+      tenantScoped: true,
+      noPersistence: true,
+      noSend: true,
+      runtimeEffect: false,
+      readonlyBoundary: '只读通知渠道目录',
+    };
+
+    mockedHttp.get.mockResolvedValueOnce(listResponse).mockResolvedValueOnce(detailResponse).mockResolvedValueOnce(metaResponse);
+    mockedHttp.post.mockResolvedValueOnce(previewResponse).mockResolvedValueOnce(detailResponse).mockResolvedValueOnce('ok');
     mockedHttp.put.mockResolvedValueOnce(detailResponse);
     mockedHttp.delete.mockResolvedValueOnce(undefined);
 
     await expect(channelConfigApi.list(params)).resolves.toBe(listResponse);
     await expect(channelConfigApi.getById(7)).resolves.toBe(detailResponse);
+    await expect(channelConfigApi.meta()).resolves.toBe(metaResponse);
+    await expect(channelConfigApi.preview(previewPayload)).resolves.toBe(previewResponse);
     await expect(channelConfigApi.create(payload)).resolves.toBe(detailResponse);
     await expect(channelConfigApi.update(7, payload)).resolves.toBe(detailResponse);
     await expect(channelConfigApi.delete(7)).resolves.toBeUndefined();
@@ -56,9 +96,11 @@ describe('api/channelConfig', () => {
 
     expect(mockedHttp.get).toHaveBeenNthCalledWith(1, '/system/channel-configs', { params });
     expect(mockedHttp.get).toHaveBeenNthCalledWith(2, '/system/channel-configs/7');
-    expect(mockedHttp.post).toHaveBeenNthCalledWith(1, '/system/channel-configs', payload);
+    expect(mockedHttp.get).toHaveBeenNthCalledWith(3, '/system/channel-configs/meta');
+    expect(mockedHttp.post).toHaveBeenNthCalledWith(1, '/system/channel-configs/preview', previewPayload);
+    expect(mockedHttp.post).toHaveBeenNthCalledWith(2, '/system/channel-configs', payload);
     expect(mockedHttp.put).toHaveBeenCalledWith('/system/channel-configs/7', payload);
     expect(mockedHttp.delete).toHaveBeenCalledWith('/system/channel-configs/7');
-    expect(mockedHttp.post).toHaveBeenNthCalledWith(2, '/system/channel-configs/DINGTALK/test');
+    expect(mockedHttp.post).toHaveBeenNthCalledWith(3, '/system/channel-configs/DINGTALK/test');
   });
 });

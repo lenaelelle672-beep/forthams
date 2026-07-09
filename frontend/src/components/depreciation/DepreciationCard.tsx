@@ -458,4 +458,3 @@ export type {
   DepreciationApiResponse,
   DepreciationCardProps,
 };
-export { formatCurrency, formatPercentage, transformApiResponse, fetchDepreciationData };

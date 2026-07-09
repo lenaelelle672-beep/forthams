@@ -24,7 +24,7 @@ import {
   HomeOutlined,
   AuditOutlined,
 } from '@ant-design/icons';
-import { useNavigate, useParams, Navigate } from 'react-router-dom';
+import { useNavigate, useParams, Navigate } from 'react-router';
 
 // 组件导入 — 子组件定义在 src/components/inventory/ 下
 import TaskList from '@/components/inventory/TaskList';

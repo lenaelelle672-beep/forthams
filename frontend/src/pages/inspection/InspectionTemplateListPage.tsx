@@ -4,7 +4,7 @@ import { Table, Button, Space, Tag, Input, Select, message, Modal } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined, PoweroffOutlined, CopyOutlined } from '@ant-design/icons';
 import { inspectionTemplateApi } from '@/api/inspection';
 import { InspectionTemplate, InspectionTypeEnum } from '@/types/inspection';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
 const { Search } = Input;
 const { Option } = Select;

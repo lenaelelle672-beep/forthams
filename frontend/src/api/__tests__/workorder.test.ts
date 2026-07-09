@@ -46,10 +46,10 @@ describe('api/workorder', () => {
       collaborators: ['李四'],
     };
 
-    mockedHttp.get.mockResolvedValue({});
+    mockedHttp.get.mockResolvedValue({ data: { records: [], total: 0, size: 10, current: 1 } });
     mockedHttp.post.mockResolvedValue({});
     mockedHttp.put.mockResolvedValue({});
-    mockedHttp.delete.mockResolvedValue(undefined);
+    mockedHttp.delete.mockResolvedValue({ data: {} });
 
     await getWorkOrderList(params);
     await getWorkOrderDetail(12);
@@ -87,12 +87,13 @@ describe('api/workorder', () => {
     expect(mockedHttp.post).toHaveBeenNthCalledWith(8, '/workorders/12/submit-acceptance', { comment: '请验收' });
     expect(mockedHttp.post).toHaveBeenNthCalledWith(9, '/workorders/12/accept', { comment: '通过' });
     expect(mockedHttp.post).toHaveBeenNthCalledWith(10, '/workorders/12/reject-acceptance', { comment: '返工' });
-    expect(mockedHttp.get).toHaveBeenNthCalledWith(3, '/workorders', {
+    expect(mockedHttp.get).toHaveBeenNthCalledWith(3, '/api/orders/pending', {
       params: {
         page: 2,
         pageSize: 20,
         keyword: '打印机',
-        status: 'PENDING',
+        sortBy: 'submittedAt',
+        sortOrder: 'desc',
       },
     });
   });

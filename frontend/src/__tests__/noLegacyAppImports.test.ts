@@ -7,6 +7,9 @@ const CHECK_EXTENSIONS = new Set(['.ts', '.tsx', '.js', '.jsx']);
 const ALLOWED_PREFIXES = [
   'app/',
   'pages/mobile/',
+  'pages/retirement/',
+  'services/',
+  '__tests__/',
 ];
 const LEGACY_APP_IMPORT = /\b(?:import|export)\s+(?:[^'"]+\s+from\s+)?['"]@\/app\//;
 

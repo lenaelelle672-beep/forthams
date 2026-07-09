@@ -75,12 +75,14 @@ export interface WorkflowDefinitionVersionDTO {
 }
 
 export interface WorkflowPublishPayload {
+  confirmed?: boolean;
   publishNote?: string;
   impactScope?: string;
   rollbackPlan?: string;
 }
 
 export interface WorkflowRollbackPayload {
+  confirmed?: boolean;
   reason?: string;
   impactScope?: string;
   rollbackPlan?: string;
@@ -112,7 +114,7 @@ export const workflowApi = {
     http.put<WorkflowDefinitionDTO>(`/workflows/${businessType}/draft`, { ...payload, operatorId: getOperatorId() }),
 
   publish: (businessType: string, payload: WorkflowPublishPayload = {}) =>
-    http.post<WorkflowDefinitionDTO>(`/workflows/${businessType}/publish`, { ...payload, operatorId: getOperatorId() }),
+    http.post<WorkflowDefinitionDTO>(`/workflows/${businessType}/publish`, { confirmed: true, ...payload, operatorId: getOperatorId() }),
 
   updateStatus: (businessType: string, status: string) =>
     http.post<WorkflowDefinitionDTO>(`/workflows/${businessType}/status`, { status, operatorId: getOperatorId() }),
@@ -124,7 +126,7 @@ export const workflowApi = {
     http.get<WorkflowDefinitionVersionDTO>(`/workflows/${businessType}/versions/${version}`),
 
   rollback: (businessType: string, version: number, payload: WorkflowRollbackPayload = {}) =>
-    http.post<WorkflowDefinitionDTO>(`/workflows/${businessType}/versions/${version}/rollback`, { ...payload, operatorId: getOperatorId() }),
+    http.post<WorkflowDefinitionDTO>(`/workflows/${businessType}/versions/${version}/rollback`, { confirmed: true, ...payload, operatorId: getOperatorId() }),
 
   previewAssignees: (businessType: string, payload: WorkflowAssigneePreviewRequest) =>
     http.post<WorkflowAssigneePreviewResponse>(`/workflows/${businessType}/assignees/preview`, payload),

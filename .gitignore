@@ -62,3 +62,25 @@ spec.md
 # 其他临时垃圾
 2/
 New File: backend/
+
+# Agent/tooling 工作区产物（非项目源码）
+.gsd/
+.claw/
+.stitch/
+stitch-output/
+.gai2/
+.omc/
+.superpowers/
+.skills/
+.qoder/
+.gitnexus/
+checkpoints/
+.gai2/
+
+# 前端实验/技能目录（独立 node_modules，不应入库）
+frontend-skill-lab/
+
+# 运行时截图、诊断导出、pid
+*.pid
+cache-management-v3-*.png
+frontend/system-visual-audit/

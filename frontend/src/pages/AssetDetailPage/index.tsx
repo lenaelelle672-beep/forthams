@@ -15,7 +15,7 @@
  */
 
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router';
 import { Card, Spin, message, Empty, Tabs, Descriptions, Tag, Timeline, Avatar, Button } from 'antd';
 import { 
   ArrowLeftOutlined, 

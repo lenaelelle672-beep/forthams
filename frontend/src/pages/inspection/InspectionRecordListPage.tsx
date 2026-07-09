@@ -4,7 +4,7 @@ import { Table, Button, Space, Tag, Input, Select, DatePicker, Row, Col, Card, S
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { inspectionApi } from '@/api/inspection';
 import { Inspection, InspectionTypeEnum, InspectionResultEnum, InspectionRecord } from '@/types/inspection';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import dayjs from 'dayjs';
 import type Dayjs from 'dayjs';
 

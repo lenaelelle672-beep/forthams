@@ -207,6 +207,23 @@ class TenantIsolationIntegrationTest {
                 )
                 """);
 
+        jdbcTemplate.execute("""
+                CREATE TABLE sys_permission (
+                    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                    permission_code VARCHAR(128) NOT NULL UNIQUE,
+                    permission_name VARCHAR(256),
+                    status TINYINT DEFAULT 1,
+                    deleted TINYINT DEFAULT 0
+                )
+                """);
+        jdbcTemplate.execute("""
+                CREATE TABLE sys_role_permission (
+                    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                    role_id BIGINT NOT NULL,
+                    permission_id BIGINT NOT NULL
+                )
+                """);
+
         jdbcTemplate.update("""
                 INSERT INTO sys_user (id, username, password, real_name, status, deleted)
                 VALUES (?, ?, ?, ?, 1, 0)

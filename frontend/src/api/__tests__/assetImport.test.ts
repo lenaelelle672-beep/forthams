@@ -1,16 +1,16 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('@/utils/http', () => ({
+vi.mock('axios', () => ({
   default: {
     get: vi.fn(),
     post: vi.fn(),
   },
 }));
 
-import http from '@/utils/http';
+import axios from 'axios';
 import { exportAssets, getImportTemplate, parseImportFile, commitImport } from '@/api/assetImport';
 
-const mockedHttp = vi.mocked(http);
+const mockedAxios = vi.mocked(axios);
 
 describe('api/assetImport', () => {
   beforeEach(() => {
@@ -30,29 +30,29 @@ describe('api/assetImport', () => {
       purchaseDate: '2026-06-09',
       originalValue: 1000,
     };
-    mockedHttp.get.mockResolvedValue(new Blob());
-    mockedHttp.post.mockResolvedValue({});
+    mockedAxios.get.mockResolvedValue({ data: new Blob() });
+    mockedAxios.post.mockResolvedValue({ data: {} });
 
     await getImportTemplate();
     await parseImportFile(file);
     await commitImport('parse-1', [row]);
     await exportAssets({ categoryCodes: ['3'], statusCodes: ['IDLE', 'IN_USE'], locationCodes: [] });
 
-    expect(mockedHttp.get).toHaveBeenCalledWith('/assets/import/template', { responseType: 'blob' });
-    expect(mockedHttp.post).toHaveBeenNthCalledWith(
+    expect(mockedAxios.get).toHaveBeenCalledWith('/api/v1/assets/import/template', { responseType: 'blob' });
+    expect(mockedAxios.post).toHaveBeenNthCalledWith(
       1,
-      '/assets/import/parse',
+      '/api/v1/assets/import/parse',
       expect.any(FormData),
       expect.objectContaining({ headers: { 'Content-Type': 'multipart/form-data' } }),
     );
-    expect(mockedHttp.post).toHaveBeenNthCalledWith(2, '/assets/import/commit', {
+    expect(mockedAxios.post).toHaveBeenNthCalledWith(2, '/api/v1/assets/import/commit', {
       parseId: 'parse-1',
       rows: [row],
     });
-    expect(mockedHttp.post).toHaveBeenNthCalledWith(
+    expect(mockedAxios.post).toHaveBeenNthCalledWith(
       3,
-      '/assets/export',
-      { categoryId: 3, status: 'IDLE,IN_USE', keyword: undefined },
+      '/api/v1/assets/export',
+      { categoryCodes: ['3'], statusCodes: ['IDLE', 'IN_USE'], locationCodes: [] },
       { responseType: 'blob' },
     );
   });

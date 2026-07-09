@@ -33,7 +33,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { workOrderApi } from '../../api/workOrderApi';
 import { userApi } from '../../api/userApi';
 import type { WorkOrder, WorkOrderPriority, WorkOrderFormData } from '../../types/workOrder.types';

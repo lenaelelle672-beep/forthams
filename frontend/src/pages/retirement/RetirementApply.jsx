@@ -23,7 +23,7 @@ import {
   Spin,
   Alert,
 } from 'antd';
-import { useHistory, useParams } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router';
 import { useRetirementApp, useAssetRetirementFlow } from '@/hooks/useRetirementApp';
 import { formatDate, statusTagColor } from '@/utils/formatters';
 import styles from './RetirementApply.module.css';

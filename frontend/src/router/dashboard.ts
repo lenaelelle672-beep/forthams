@@ -8,7 +8,7 @@
  */
 
 import { createElement, lazy, Suspense, type ReactNode } from 'react';
-import { Navigate, type RouteObject } from 'react-router-dom';
+import { Navigate, type RouteObject } from 'react-router';
 
 // ---------------------------------------------------------------------------
 // Lazy-loaded modules (code-split for performance)

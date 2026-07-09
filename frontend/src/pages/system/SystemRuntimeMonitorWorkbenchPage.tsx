@@ -1,9 +1,13 @@
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 import {
   getWorkflowRuntimePendingCount,
+  getWorkflowRuntimeSlaSummary,
+  listWorkflowRuntimeSlaTimeoutRecords,
   listWorkflowRuntime,
   type WorkflowRuntimePage,
   type WorkflowRuntimeProcess,
+  type WorkflowRuntimeSlaSummary,
+  type WorkflowRuntimeSlaTimeoutRecord,
 } from '../../api/workflowRuntime';
 
 type SystemRuntimeMonitorWorkbenchPageProps = {
@@ -50,12 +54,32 @@ function emptyRuntimePage(): WorkflowRuntimePage {
   return { records: [], total: 0, size: 50, current: 1, pages: 0 };
 }
 
+function emptySlaSummary(): WorkflowRuntimeSlaSummary {
+  return {
+    totalConfigs: 0,
+    activeConfigs: 0,
+    overdueCount: 0,
+    warningCount: 0,
+    criticalCount: 0,
+    timeoutRecordCount: 0,
+    riskCounts: {},
+    nodeDurationSummary: [],
+    abnormalTraceSummary: [],
+    recentTimeoutRecords: [],
+    exportMaskingNotice: 'SLA 导出仅展示脱敏摘要。',
+    readOnly: true,
+    tenantScoped: true,
+  };
+}
+
 export default function SystemRuntimeMonitorWorkbenchPage({
   embeddedInWorkbench = false,
   canView = true,
 }: SystemRuntimeMonitorWorkbenchPageProps) {
   const [runtimePage, setRuntimePage] = useState<WorkflowRuntimePage>(emptyRuntimePage);
   const [pendingCount, setPendingCount] = useState(0);
+  const [slaSummary, setSlaSummary] = useState<WorkflowRuntimeSlaSummary>(emptySlaSummary);
+  const [slaTimeoutRecords, setSlaTimeoutRecords] = useState<WorkflowRuntimeSlaTimeoutRecord[]>([]);
   const [processTypeInput, setProcessTypeInput] = useState('');
   const [activeProcessType, setActiveProcessType] = useState('');
   const [statusFilter, setStatusFilter] = useState<RuntimeStatusFilter>('all');
@@ -66,15 +90,21 @@ export default function SystemRuntimeMonitorWorkbenchPage({
     setLoading(true);
     setError(null);
     try {
-      const [nextPage, nextPendingCount] = await Promise.all([
+      const [nextPage, nextPendingCount, nextSlaSummary, nextSlaTimeoutRecords] = await Promise.all([
         listWorkflowRuntime({ page: 1, pageSize: 50, status: backendStatus(status), processType }),
         getWorkflowRuntimePendingCount(),
+        getWorkflowRuntimeSlaSummary(),
+        listWorkflowRuntimeSlaTimeoutRecords({ status: 'OPEN' }),
       ]);
       setRuntimePage(nextPage);
       setPendingCount(nextPendingCount);
+      setSlaSummary(nextSlaSummary);
+      setSlaTimeoutRecords(nextSlaTimeoutRecords);
     } catch {
       setRuntimePage(emptyRuntimePage());
       setPendingCount(0);
+      setSlaSummary(emptySlaSummary());
+      setSlaTimeoutRecords([]);
       setError('运行监控加载失败，敏感细节已脱敏');
     } finally {
       setLoading(false);
@@ -90,6 +120,8 @@ export default function SystemRuntimeMonitorWorkbenchPage({
   }, [canView]);
 
   const records = useMemo<WorkflowRuntimeProcess[]>(() => runtimePage.records ?? [], [runtimePage.records]);
+  const nodeDurationSummary = slaSummary.nodeDurationSummary ?? [];
+  const abnormalTraceSummary = slaSummary.abnormalTraceSummary ?? [];
 
   const handleSearch = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -122,7 +154,7 @@ export default function SystemRuntimeMonitorWorkbenchPage({
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h3 className="text-lg font-semibold">运行监控</h3>
-          <p className="mt-1 text-sm text-slate-500">只读展示 /approvals/list 与 /approvals/pending/count 返回的审批实例列表和待处理数量。</p>
+          <p className="mt-1 text-sm text-slate-500">只读展示 /approvals/list、/approvals/pending/count、/sla-config/runtime-summary 与 /sla-config/timeout-records 返回的审批实例、SLA 风险摘要和超时记录。</p>
         </div>
         <button
           className="rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-700 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
@@ -134,7 +166,7 @@ export default function SystemRuntimeMonitorWorkbenchPage({
         </button>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-3">
+      <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-6">
         <div className="rounded-2xl border border-slate-200 p-4">
           <p className="text-xs text-slate-500">待处理数量</p>
           <p className="mt-2 text-2xl font-semibold text-slate-900">{pendingCount}</p>
@@ -147,6 +179,22 @@ export default function SystemRuntimeMonitorWorkbenchPage({
           <p className="text-xs text-slate-500">总实例</p>
           <p className="mt-2 text-2xl font-semibold text-slate-900">{runtimePage.total ?? 0}</p>
         </div>
+        <div className="rounded-2xl border border-slate-200 p-4">
+          <p className="text-xs text-slate-500">SLA 超时</p>
+          <p className="mt-2 text-2xl font-semibold text-red-600">{slaSummary.overdueCount ?? 0}</p>
+        </div>
+        <div className="rounded-2xl border border-slate-200 p-4">
+          <p className="text-xs text-slate-500">SLA 预警</p>
+          <p className="mt-2 text-2xl font-semibold text-amber-600">{slaSummary.warningCount ?? 0}</p>
+        </div>
+        <div className="rounded-2xl border border-slate-200 p-4">
+          <p className="text-xs text-slate-500">高风险轨迹</p>
+          <p className="mt-2 text-2xl font-semibold text-slate-900">{slaSummary.criticalCount ?? 0}</p>
+        </div>
+      </div>
+
+      <div className="rounded-2xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm text-blue-800">
+        SLA 只读边界：节点耗时、异常轨迹、超时记录和导出提示均来自 SLA 摘要接口；本页不提供通过、驳回、重试、终止或业务状态修改动作。
       </div>
 
       <form className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_180px_auto]" onSubmit={handleSearch}>
@@ -217,6 +265,36 @@ export default function SystemRuntimeMonitorWorkbenchPage({
               ))}
             </tbody>
           </table>
+        </div>
+      </div>
+
+      <div className="grid gap-4 xl:grid-cols-3">
+        <div className="rounded-2xl border border-slate-200 p-4">
+          <h4 className="mb-3 font-semibold">SLA 节点耗时</h4>
+          {nodeDurationSummary.length === 0 ? <p className="text-sm text-slate-500">暂无节点耗时异常。</p> : null}
+          <ul className="space-y-2 text-sm text-slate-600">
+            {nodeDurationSummary.map((item) => <li key={item} className="rounded-xl bg-slate-50 px-3 py-2">{item}</li>)}
+          </ul>
+        </div>
+        <div className="rounded-2xl border border-slate-200 p-4">
+          <h4 className="mb-3 font-semibold">SLA 异常轨迹</h4>
+          {abnormalTraceSummary.length === 0 ? <p className="text-sm text-slate-500">暂无异常轨迹。</p> : null}
+          <ul className="space-y-2 text-sm text-slate-600">
+            {abnormalTraceSummary.map((item) => <li key={item} className="rounded-xl bg-slate-50 px-3 py-2">{item}</li>)}
+          </ul>
+        </div>
+        <div className="rounded-2xl border border-slate-200 p-4">
+          <h4 className="mb-3 font-semibold">超时记录与脱敏导出提示</h4>
+          <p className="text-sm text-slate-500">{slaSummary.exportMaskingNotice ?? '导出仅返回 masked/summary 字段。'}</p>
+          <div className="mt-3 space-y-2">
+            {slaTimeoutRecords.length === 0 ? <p className="text-sm text-slate-500">暂无超时记录。</p> : null}
+            {slaTimeoutRecords.slice(0, 3).map((record) => (
+              <div key={record.id} className="rounded-xl border border-slate-100 px-3 py-2 text-sm text-slate-600">
+                <p className="font-medium">{record.processKey ?? '-'} / {record.nodeKey ?? '-'}</p>
+                <p className="text-xs text-slate-500">{record.maskedBusinessSummary ?? '业务摘要已脱敏'} · {record.riskLevel ?? 'UNKNOWN'} · {record.timeoutMinutes ?? 0} 分钟</p>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>

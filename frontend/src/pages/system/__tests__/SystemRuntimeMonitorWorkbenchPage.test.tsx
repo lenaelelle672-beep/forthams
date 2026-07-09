@@ -2,20 +2,42 @@ import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import SystemRuntimeMonitorWorkbenchPage from '../SystemRuntimeMonitorWorkbenchPage';
-import { getWorkflowRuntimePendingCount, listWorkflowRuntime } from '../../../api/workflowRuntime';
+import { getWorkflowRuntimePendingCount, getWorkflowRuntimeSlaSummary, listWorkflowRuntime, listWorkflowRuntimeSlaTimeoutRecords } from '../../../api/workflowRuntime';
 
 vi.mock('../../../api/workflowRuntime', () => ({
   getWorkflowRuntimePendingCount: vi.fn(),
+  getWorkflowRuntimeSlaSummary: vi.fn(),
   listWorkflowRuntime: vi.fn(),
+  listWorkflowRuntimeSlaTimeoutRecords: vi.fn(),
 }));
 
 const mockedList = vi.mocked(listWorkflowRuntime);
 const mockedPendingCount = vi.mocked(getWorkflowRuntimePendingCount);
+const mockedSlaSummary = vi.mocked(getWorkflowRuntimeSlaSummary);
+const mockedSlaTimeoutRecords = vi.mocked(listWorkflowRuntimeSlaTimeoutRecords);
 const pendingState = ['PEND', 'ING'].join('');
 const completedState = ['APPROV', 'ED'].join('');
 
 describe('SystemRuntimeMonitorWorkbenchPage', () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockedSlaSummary.mockResolvedValue({
+      totalConfigs: 1,
+      activeConfigs: 1,
+      overdueCount: 2,
+      warningCount: 3,
+      criticalCount: 1,
+      timeoutRecordCount: 1,
+      riskCounts: { HIGH: 1 },
+      nodeDurationSummary: ['MANAGER_REVIEW 超时 120 分钟'],
+      abnormalTraceSummary: ['实例 PR***01 存在SLA异常轨迹'],
+      recentTimeoutRecords: [],
+      exportMaskingNotice: '导出仅返回 masked/summary 字段，不包含 storage key。',
+      readOnly: true,
+      tenantScoped: true,
+    });
+    mockedSlaTimeoutRecords.mockResolvedValue([{ id: 10, processKey: 'ASSET_APPROVAL', nodeKey: 'MANAGER_REVIEW', maskedBusinessSummary: '业务摘要已脱敏', riskLevel: 'HIGH', timeoutMinutes: 120, masked: true }]);
+  });
 
   it('加载并展示审批实例列表与待处理数量', async () => {
     mockedList.mockResolvedValueOnce({
@@ -34,6 +56,10 @@ describe('SystemRuntimeMonitorWorkbenchPage', () => {
     expect(screen.getByText('APR-001')).toBeInTheDocument();
     expect(screen.getByText('RETIREMENT')).toBeInTheDocument();
     expect(screen.getByText('5')).toBeInTheDocument();
+    expect(screen.getByText('SLA 节点耗时')).toBeInTheDocument();
+    expect(screen.getByText('MANAGER_REVIEW 超时 120 分钟')).toBeInTheDocument();
+    expect(screen.getByText(/业务摘要已脱敏/)).toBeInTheDocument();
+    expect(mockedSlaTimeoutRecords).toHaveBeenCalledWith({ status: 'OPEN' });
   });
 
   it('支持状态、流程类型筛选与重新加载', async () => {
@@ -66,7 +92,7 @@ describe('SystemRuntimeMonitorWorkbenchPage', () => {
     render(<SystemRuntimeMonitorWorkbenchPage />);
 
     expect(await screen.findByText('暂无审批实例。')).toBeInTheDocument();
-    const forbiddenButtons = ['通' + '过', '驳' + '回', '创建' + '审批', '处' + '理'];
+    const forbiddenButtons = ['通' + '过', '驳' + '回', '创建' + '审批', '处' + '理', '重试', '终止'];
     for (const label of forbiddenButtons) {
       expect(screen.queryByRole('button', { name: label })).not.toBeInTheDocument();
     }

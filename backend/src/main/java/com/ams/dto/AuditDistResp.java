@@ -20,6 +20,10 @@ public class AuditDistResp {
      */
     private Long totalOperations;
 
+    private Boolean tenantScoped;
+
+    private String readonlyBoundary;
+
     /**
      * 按操作类型聚合的分布列表，按 count 降序排列。
      * 无数据时返回空列表 []。

@@ -5,6 +5,7 @@ import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /**
  * 审计仪表板查询参数 DTO。
@@ -23,6 +24,20 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Builder
 public class AuditDashboardQueryDTO {
+
+    @Builder.Default
+    private Integer page = 1;
+
+    @Builder.Default
+    private Integer size = 20;
+
+    private Integer pageSize;
+
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    private LocalDateTime startTime;
+
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    private LocalDateTime endTime;
 
     /**
      * 查询开始日期。
@@ -45,5 +60,23 @@ public class AuditDashboardQueryDTO {
      */
     @Builder.Default
     private String granularity = "daily";
+
+    private String operationType;
+
+    private String actionType;
+
+    private Long operatorId;
+
+    private String operatorName;
+
+    private String resourceType;
+
+    private String resourceId;
+
+    private String keyword;
+
+    private String search;
+
+    private Integer limit;
 
 }

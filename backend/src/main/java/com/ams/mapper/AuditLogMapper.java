@@ -1,8 +1,8 @@
 package com.ams.mapper;
 
+import com.ams.dto.AuditDistResp;
+import com.ams.dto.AuditTrendResp;
 import com.ams.dto.OperatorRankingVO;
-import com.ams.dto.TrendVO;
-import com.ams.dto.TypeDistributionVO;
 import com.ams.entity.GeneralAuditEntry;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
@@ -11,143 +11,115 @@ import org.apache.ibatis.annotations.Select;
 import java.time.LocalDateTime;
 import java.util.List;
 
-/**
- * Audit log MyBatis-Plus Mapper.
- *
- * <p>Provides CRUD operations via {@link BaseMapper} and custom aggregation
- * queries consumed by {@code AuditDashboardService} to power the audit
- * dashboard visualisation endpoints.</p>
- *
- * <h3>Aggregation methods</h3>
- * <ul>
- *   <li>{@link #countByDay} – daily time-bucket trend</li>
- *   <li>{@link #countByHour} – hourly time-bucket trend (≤ 3-day range)</li>
- *   <li>{@link #countByOperationType} – operation-type distribution</li>
- *   <li>{@link #countByOperator} – top-N operator activity ranking</li>
- * </ul>
- *
- * <p>All time parameters are interpreted as <strong>UTC</strong>. The underlying
- * queries rely on the composite index on {@code (timestamp, operation_type,
- * operator_id)} to satisfy the P95 &lt; 2000 ms performance constraint.</p>
- */
 public interface AuditLogMapper extends BaseMapper<GeneralAuditEntry> {
 
-    // ------------------------------------------------------------------ //
-    //  Time-trend aggregation (day granularity)                           //
-    // ------------------------------------------------------------------ //
+    String FILTER_SQL = "<if test='startTime != null'> AND timestamp &gt;= #{startTime} </if>"
+            + "<if test='endTime != null'> AND timestamp &lt; #{endTime} </if>"
+            + "<if test='operationType != null'> AND (operation_type = #{operationType} OR action = #{operationType}) </if>"
+            + "<if test='operatorId != null'> AND operator_id = #{operatorId} </if>"
+            + "<if test='operatorName != null'> AND operator_name LIKE CONCAT('%', #{operatorName}, '%') </if>"
+            + "<if test='resourceType != null'> AND resource_type = #{resourceType} </if>"
+            + "<if test='resourceId != null'> AND resource_id = #{resourceId} </if>"
+            + "<if test='keyword != null'> AND (description LIKE CONCAT('%', #{keyword}, '%')"
+            + " OR operator_name LIKE CONCAT('%', #{keyword}, '%')"
+            + " OR resource_type LIKE CONCAT('%', #{keyword}, '%')"
+            + " OR operation_type LIKE CONCAT('%', #{keyword}, '%')) </if>";
 
-    /**
-     * Aggregate audit log counts bucketed by <strong>day</strong> within the
-     * given time range.
-     *
-     * <p>Each row in the result represents one calendar day (UTC). Days with
-     * zero events are <em>not</em> returned – the service layer is responsible
-     * for filling gaps when rendering a continuous chart.</p>
-     *
-     * @param startTime      range start (inclusive, UTC)
-     * @param endTime        range end (exclusive, UTC)
-     * @param operationType  optional filter; when {@code null} all types are included
-     * @return day-bucketed trend data ordered chronologically
-     */
     @Select("<script>"
-            + "SELECT DATE_FORMAT(timestamp, '%Y-%m-%d') AS time_bucket, "
-            + "       COUNT(*) AS count "
+            + "SELECT id, tenant_id, trace_id, timestamp, action, operation_type, operator_id, operator_name, "
+            + "resource_type, resource_id, description, http_method, request_uri, ip_address, user_agent, "
+            + "before_record, after_record, raw_payload, error_message, error_stack, status, created_at "
             + "FROM general_audit_entry "
-            + "WHERE timestamp &gt;= #{startTime} "
-            + "  AND timestamp &lt;  #{endTime} "
-            + "<if test='operationType != null'>"
-            + "  AND operation_type = #{operationType} "
-            + "</if>"
-            + "GROUP BY DATE_FORMAT(timestamp, '%Y-%m-%d') "
-            + "ORDER BY time_bucket ASC"
+            + "WHERE tenant_id = #{tenantId} "
+            + FILTER_SQL
+            + "ORDER BY timestamp DESC, id DESC "
+            + "LIMIT #{limit} OFFSET #{offset}"
             + "</script>")
-    List<TrendVO> countByDay(@Param("startTime") LocalDateTime startTime,
-                             @Param("endTime") LocalDateTime endTime,
-                             @Param("operationType") String operationType);
+    List<GeneralAuditEntry> selectPageRecords(@Param("tenantId") String tenantId,
+                                              @Param("startTime") LocalDateTime startTime,
+                                              @Param("endTime") LocalDateTime endTime,
+                                              @Param("operationType") String operationType,
+                                              @Param("operatorId") Long operatorId,
+                                              @Param("operatorName") String operatorName,
+                                              @Param("resourceType") String resourceType,
+                                              @Param("resourceId") String resourceId,
+                                              @Param("keyword") String keyword,
+                                              @Param("limit") int limit,
+                                              @Param("offset") int offset);
 
-    // ------------------------------------------------------------------ //
-    //  Time-trend aggregation (hour granularity)                          //
-    // ------------------------------------------------------------------ //
-
-    /**
-     * Aggregate audit log counts bucketed by <strong>hour</strong> within the
-     * given time range.
-     *
-     * <p>Should only be invoked when the query span is ≤ 3 days (enforced at
-     * the service/controller layer). The {@code time_bucket} format is
-     * {@code yyyy-MM-dd'T'HH:00:00} to align with ISO-8601 expectations.</p>
-     *
-     * @param startTime      range start (inclusive, UTC)
-     * @param endTime        range end (exclusive, UTC)
-     * @param operationType  optional filter; when {@code null} all types are included
-     * @return hour-bucketed trend data ordered chronologically
-     */
     @Select("<script>"
-            + "SELECT DATE_FORMAT(timestamp, '%Y-%m-%dT%H:00:00') AS time_bucket, "
-            + "       COUNT(*) AS count "
-            + "FROM general_audit_entry "
-            + "WHERE timestamp &gt;= #{startTime} "
-            + "  AND timestamp &lt;  #{endTime} "
-            + "<if test='operationType != null'>"
-            + "  AND operation_type = #{operationType} "
-            + "</if>"
-            + "GROUP BY DATE_FORMAT(timestamp, '%Y-%m-%dT%H:00:00') "
-            + "ORDER BY time_bucket ASC"
+            + "SELECT COUNT(*) FROM general_audit_entry WHERE tenant_id = #{tenantId} "
+            + FILTER_SQL
             + "</script>")
-    List<TrendVO> countByHour(@Param("startTime") LocalDateTime startTime,
-                              @Param("endTime") LocalDateTime endTime,
-                              @Param("operationType") String operationType);
+    long countRecords(@Param("tenantId") String tenantId,
+                      @Param("startTime") LocalDateTime startTime,
+                      @Param("endTime") LocalDateTime endTime,
+                      @Param("operationType") String operationType,
+                      @Param("operatorId") Long operatorId,
+                      @Param("operatorName") String operatorName,
+                      @Param("resourceType") String resourceType,
+                      @Param("resourceId") String resourceId,
+                      @Param("keyword") String keyword);
 
-    // ------------------------------------------------------------------ //
-    //  Operation-type distribution aggregation                            //
-    // ------------------------------------------------------------------ //
+    @Select("SELECT id, tenant_id, trace_id, timestamp, action, operation_type, operator_id, operator_name, "
+            + "resource_type, resource_id, description, http_method, request_uri, ip_address, user_agent, "
+            + "before_record, after_record, raw_payload, error_message, error_stack, status, created_at "
+            + "FROM general_audit_entry WHERE tenant_id = #{tenantId} AND id = #{id} LIMIT 1")
+    GeneralAuditEntry selectDetail(@Param("tenantId") String tenantId, @Param("id") Long id);
 
-    /**
-     * Aggregate audit log counts grouped by {@code operation_type} within the
-     * given time range.
-     *
-     * <p>Results are sorted by count descending so that the most frequent
-     * operation types appear first – convenient for pie/bar chart rendering.</p>
-     *
-     * @param startTime  range start (inclusive, UTC)
-     * @param endTime    range end (exclusive, UTC)
-     * @return per-type distribution data
-     */
-    @Select("SELECT operation_type AS operationType, "
-            + "       COUNT(*) AS count "
+    @Select("<script>"
+            + "SELECT DATE_FORMAT(timestamp, '%Y-%m-%d') AS date, COUNT(*) AS count "
             + "FROM general_audit_entry "
-            + "WHERE timestamp &gt;= #{startTime} "
-            + "  AND timestamp &lt;  #{endTime} "
-            + "GROUP BY operation_type "
-            + "ORDER BY count DESC")
-    List<TypeDistributionVO> countByOperationType(@Param("startTime") LocalDateTime startTime,
-                                                  @Param("endTime") LocalDateTime endTime);
+            + "WHERE tenant_id = #{tenantId} AND timestamp &gt;= #{startTime} AND timestamp &lt; #{endTime} "
+            + "<if test='operationType != null'> AND (operation_type = #{operationType} OR action = #{operationType}) </if>"
+            + "GROUP BY DATE_FORMAT(timestamp, '%Y-%m-%d') ORDER BY date ASC"
+            + "</script>")
+    List<AuditTrendResp.DataPoint> countByDay(@Param("tenantId") String tenantId,
+                                              @Param("startTime") LocalDateTime startTime,
+                                              @Param("endTime") LocalDateTime endTime,
+                                              @Param("operationType") String operationType);
 
-    // ------------------------------------------------------------------ //
-    //  Operator activity ranking aggregation                              //
-    // ------------------------------------------------------------------ //
-
-    /**
-     * Aggregate audit log counts grouped by {@code operator_id}, returning only
-     * the top {@code limit} most active operators.
-     *
-     * <p>The service layer caps {@code limit} at 10 (the default and maximum)
-     * to prevent unbounded result sets.</p>
-     *
-     * @param startTime  range start (inclusive, UTC)
-     * @param endTime    range end (exclusive, UTC)
-     * @param limit      maximum number of operators to return (≤ 10)
-     * @return operator ranking data sorted by count descending
-     */
-    @Select("SELECT operator_id AS operatorId, "
-            + "       COUNT(*) AS count "
+    @Select("<script>"
+            + "SELECT DATE_FORMAT(timestamp, '%Y-%m-%dT%H:00:00') AS date, COUNT(*) AS count "
             + "FROM general_audit_entry "
-            + "WHERE timestamp &gt;= #{startTime} "
-            + "  AND timestamp &lt;  #{endTime} "
-            + "GROUP BY operator_id "
-            + "ORDER BY count DESC "
-            + "LIMIT #{limit}")
-    List<OperatorRankingVO> countByOperator(@Param("startTime") LocalDateTime startTime,
+            + "WHERE tenant_id = #{tenantId} AND timestamp &gt;= #{startTime} AND timestamp &lt; #{endTime} "
+            + "<if test='operationType != null'> AND (operation_type = #{operationType} OR action = #{operationType}) </if>"
+            + "GROUP BY DATE_FORMAT(timestamp, '%Y-%m-%dT%H:00:00') ORDER BY date ASC"
+            + "</script>")
+    List<AuditTrendResp.DataPoint> countByHour(@Param("tenantId") String tenantId,
+                                               @Param("startTime") LocalDateTime startTime,
+                                               @Param("endTime") LocalDateTime endTime,
+                                               @Param("operationType") String operationType);
+
+    @Select("SELECT COALESCE(operation_type, action, 'UNKNOWN') AS actionType, COUNT(*) AS count "
+            + "FROM general_audit_entry "
+            + "WHERE tenant_id = #{tenantId} AND timestamp >= #{startTime} AND timestamp < #{endTime} "
+            + "GROUP BY COALESCE(operation_type, action, 'UNKNOWN') ORDER BY count DESC")
+    List<AuditDistResp.DistributionItem> countByOperationType(@Param("tenantId") String tenantId,
+                                                              @Param("startTime") LocalDateTime startTime,
+                                                              @Param("endTime") LocalDateTime endTime);
+
+    @Select("SELECT operator_id AS operatorId, COALESCE(operator_name, '未知用户') AS operatorName, COUNT(*) AS count "
+            + "FROM general_audit_entry "
+            + "WHERE tenant_id = #{tenantId} AND timestamp >= #{startTime} AND timestamp < #{endTime} "
+            + "GROUP BY operator_id, operator_name ORDER BY count DESC LIMIT #{limit}")
+    List<OperatorRankingVO> countByOperator(@Param("tenantId") String tenantId,
+                                            @Param("startTime") LocalDateTime startTime,
                                             @Param("endTime") LocalDateTime endTime,
                                             @Param("limit") int limit);
+
+    @Select("SELECT DISTINCT COALESCE(operation_type, action) FROM general_audit_entry "
+            + "WHERE tenant_id = #{tenantId} AND COALESCE(operation_type, action) IS NOT NULL "
+            + "ORDER BY COALESCE(operation_type, action) LIMIT #{limit}")
+    List<String> listOperationTypes(@Param("tenantId") String tenantId, @Param("limit") int limit);
+
+    @Select("SELECT DISTINCT resource_type FROM general_audit_entry "
+            + "WHERE tenant_id = #{tenantId} AND resource_type IS NOT NULL AND resource_type <> '' "
+            + "ORDER BY resource_type LIMIT #{limit}")
+    List<String> listResourceTypes(@Param("tenantId") String tenantId, @Param("limit") int limit);
+
+    @Select("SELECT DISTINCT COALESCE(operator_name, '未知用户') FROM general_audit_entry "
+            + "WHERE tenant_id = #{tenantId} AND operator_name IS NOT NULL AND operator_name <> '' "
+            + "ORDER BY operator_name LIMIT #{limit}")
+    List<String> listOperators(@Param("tenantId") String tenantId, @Param("limit") int limit);
 }

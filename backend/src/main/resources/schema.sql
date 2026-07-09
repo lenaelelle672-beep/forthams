@@ -496,3 +496,31 @@ INSERT INTO sys_user_role (id, user_id, role_id)
 VALUES
     (1, 1, 1)
 ON DUPLICATE KEY UPDATE user_id = VALUES(user_id);
+
+-- Workbench platform menu entry
+INSERT INTO sys_menu (id, menu_name, parent_id, sort_order, menu_type, perms, icon, visible, status)
+VALUES
+    (310, '资产运营中枢', 185, 1, 'C', 'dashboard:query', 'shield-check', 1, 1),
+    (311, '资产运营中枢查询', 310, 1, 'F', 'dashboard:query', NULL, 1, 1)
+ON DUPLICATE KEY UPDATE menu_name = VALUES(menu_name);
+
+UPDATE sys_menu
+SET path = CASE id
+    WHEN 310 THEN 'fixed-assets/workbench'
+    ELSE path
+END,
+query_param = CASE id
+    WHEN 310 THEN 'menu=home'
+    ELSE query_param
+END,
+component = CASE id
+    WHEN 310 THEN 'workspace-preview/WorkspacePreviewPage'
+    ELSE component
+END
+WHERE id = 310;
+
+INSERT INTO sys_role_menu (role_id, menu_id)
+VALUES
+    (1, 310),
+    (1, 311)
+ON DUPLICATE KEY UPDATE menu_id = VALUES(menu_id);

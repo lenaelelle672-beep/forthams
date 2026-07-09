@@ -26,7 +26,7 @@ import {
   ReloadOutlined,
   ExpandOutlined
 } from '@ant-design/icons';
-import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router';
 
 // 类型导入
 import type { 

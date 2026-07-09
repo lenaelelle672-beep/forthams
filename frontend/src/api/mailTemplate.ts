@@ -6,12 +6,15 @@
  *   GET    /mail-templates/list          — 分页查询模板
  *   GET    /mail-templates/{id}          — 模板详情
  *   GET    /mail-templates/code/{code}   — 按编码查询
+ *   GET    /mail-templates/meta          — 模板元数据
+ *   POST   /mail-templates/preview       — 无持久化安全预览
  *   POST   /mail-templates               — 创建模板
  *   PUT    /mail-templates/{id}          — 更新模板
  *   DELETE /mail-templates/{id}          — 删除模板
  *   GET    /mail-logs/list               — 分页查询日志
  *   GET    /mail-logs/{id}               — 日志详情
  *   GET    /mail-logs/biz                — 按业务查询
+ *   GET    /mail-logs/meta               — 日志筛选元数据
  *   POST   /mail-logs/{id}/retry         — 重试发送
  */
 
@@ -21,7 +24,11 @@ import type {
   CreateMailTemplateRequest,
   UpdateMailTemplateRequest,
   MailLog,
+  MailLogMeta,
   PageResponse,
+  MailTemplateMeta,
+  MailTemplatePreviewRequest,
+  MailTemplatePreviewResponse,
 } from '@/types/mailTemplate';
 
 export const mailTemplateApi = {
@@ -38,6 +45,16 @@ export const mailTemplateApi = {
   /** 按编码查询 */
   getByCode(code: string) {
     return http.get<MailTemplate>(`/mail-templates/code/${code}`);
+  },
+
+  /** 模板 catalog 元数据 */
+  meta() {
+    return http.get<MailTemplateMeta>('/mail-templates/meta');
+  },
+
+  /** 无持久化安全预览 */
+  preview(data: MailTemplatePreviewRequest) {
+    return http.post<MailTemplatePreviewResponse>('/mail-templates/preview', data);
   },
 
   /** 创建模板 */
@@ -70,6 +87,11 @@ export const mailLogApi = {
   /** 按业务查询 */
   getByBiz(bizType: string, bizId: number) {
     return http.get<MailLog[]>('/mail-logs/biz', { params: { bizType, bizId } });
+  },
+
+  /** 日志只读元数据 */
+  meta() {
+    return http.get<MailLogMeta>('/mail-logs/meta');
   },
 
   /** 重试发送 */
