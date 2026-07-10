@@ -1,8 +1,7 @@
 import { useState, useMemo } from 'react';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { toast } from 'sonner';
+import { useQuery } from '@tanstack/react-query';
 import {
-  Plus, Pencil, Trash2, Search, Settings,
+  Search, Settings,
   Type, Hash, Calendar, List, ToggleLeft, Link, Mail, Regex, Eye,
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
@@ -11,12 +10,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { DataTable, type Column } from '@/components/ui/DataTable';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
-import { Select, SelectItem } from '@/components/ui/Select';
 import {
-  createCustomField,
-  deleteCustomField,
   getCustomFieldList,
-  updateCustomField,
   type CustomFieldItem,
 } from '@/api/customField';
 
@@ -63,21 +58,12 @@ function parseOptions(raw?: string | null): string[] {
   try { return JSON.parse(raw); } catch { return []; }
 }
 
-const EMPTY_FORM = {
-  fieldName: '', fieldLabel: '', fieldType: 'TEXT', fieldOptions: '',
-  validationPattern: '', fieldOrder: 0, required: 0, encrypted: 0, status: 1,
-};
-
 /* ── Page Component ────────────────────────────────────────────────────── */
 
 export default function CustomFieldsPage() {
-  const qc = useQueryClient();
   const pageSize = 100;
   const [keyword, setKeyword] = useState('');
   const [typeFilter, setTypeFilter] = useState('ALL');
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [editing, setEditing] = useState<CustomFieldItem | null>(null);
-  const [form, setForm] = useState({ ...EMPTY_FORM });
   const [preview, setPreview] = useState<CustomFieldItem | null>(null);
 
   const { data, isLoading } = useQuery({
@@ -86,42 +72,6 @@ export default function CustomFieldsPage() {
   });
 
   const fields = data?.records ?? [];
-
-  const closeDialog = () => {
-    setDialogOpen(false);
-    setEditing(null);
-  };
-
-  const invalidateFields = () => qc.invalidateQueries({ queryKey: ['customFields'] });
-
-  const createMut = useMutation({
-    mutationFn: createCustomField,
-    onSuccess: () => {
-      toast.success('字段创建成功');
-      invalidateFields();
-      closeDialog();
-    },
-    onError: () => toast.error('字段创建失败'),
-  });
-
-  const updateMut = useMutation({
-    mutationFn: ({ id, ...payload }: { id: number } & Partial<CustomFieldItem>) => updateCustomField(id, payload),
-    onSuccess: () => {
-      toast.success('字段更新成功');
-      invalidateFields();
-      closeDialog();
-    },
-    onError: () => toast.error('字段更新失败'),
-  });
-
-  const deleteMut = useMutation({
-    mutationFn: deleteCustomField,
-    onSuccess: () => {
-      toast.success('字段已删除');
-      invalidateFields();
-    },
-    onError: () => toast.error('删除失败'),
-  });
 
   /* filtered data */
   const filtered = useMemo(() => {
@@ -139,37 +89,6 @@ export default function CustomFieldsPage() {
     fields.forEach((f) => { map[f.fieldType] = (map[f.fieldType] ?? 0) + 1; });
     return map;
   }, [fields]);
-
-  /* CRUD */
-  function openCreate() {
-    setEditing(null);
-    setForm({ ...EMPTY_FORM });
-    setDialogOpen(true);
-  }
-
-  function openEdit(row: CustomFieldItem) {
-    setEditing(row);
-    setForm({
-      fieldName: row.fieldName, fieldLabel: row.fieldLabel, fieldType: row.fieldType,
-      fieldOptions: row.fieldOptions ?? '', validationPattern: row.validationPattern ?? '',
-      fieldOrder: row.fieldOrder, required: row.required, encrypted: row.encrypted, status: row.status,
-    });
-    setDialogOpen(true);
-  }
-
-  function handleSave() {
-    if (!form.fieldName.trim() || !form.fieldLabel.trim()) { toast.error('字段名和显示名不能为空'); return; }
-    if (form.fieldType === 'DROPDOWN' && !form.fieldOptions.trim()) { toast.error('下拉类型需要填写选项（JSON 数组）'); return; }
-    if (editing) {
-      updateMut.mutate({ id: editing.id, ...form });
-    } else {
-      createMut.mutate(form);
-    }
-  }
-
-  function handleDelete(id: number) {
-    deleteMut.mutate(id);
-  }
 
   /* columns */
   const columns: Column<CustomFieldItem>[] = [
@@ -213,12 +132,10 @@ export default function CustomFieldsPage() {
       ),
     },
     {
-      key: 'actions', title: '操作', width: 120,
+      key: 'actions', title: '操作', width: 80,
       render: (_: unknown, r: CustomFieldItem) => (
         <div className="flex items-center gap-0.5">
           <Button variant="ghost" size="icon" onClick={() => setPreview(r)} title="预览"><Eye className="h-3.5 w-3.5" /></Button>
-          <Button variant="ghost" size="icon" onClick={() => openEdit(r)} title="编辑"><Pencil className="h-3.5 w-3.5" /></Button>
-          <Button variant="ghost" size="icon" onClick={() => handleDelete(r.id)} title="删除"><Trash2 className="h-3.5 w-3.5 text-red-500" /></Button>
         </div>
       ),
     },
@@ -238,9 +155,8 @@ export default function CustomFieldsPage() {
               <Settings className="h-5 w-5 text-[#1d4ed8]" />
               <h1 className="text-xl font-bold text-[#0f172a]">自定义字段管理</h1>
             </div>
-            <p className="mt-1 text-sm text-[#64748b]">管理系统扩展字段定义，支持多种数据类型与校验规则</p>
+            <p className="mt-1 text-sm text-[#64748b]">管理系统扩展字段定义（只读视图，编辑请在 V3 工作台自定义字段页操作）</p>
           </div>
-          <Button onClick={openCreate}><Plus className="h-4 w-4" />新增字段</Button>
         </div>
 
         {/* Stat overview */}
@@ -301,87 +217,6 @@ export default function CustomFieldsPage() {
             emptyText="没有找到匹配的字段"
           />
         </Card>
-
-        {/* ── Form Dialog ──────────────────────────────────────────── */}
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogContent className="max-w-xl">
-            <DialogHeader>
-              <DialogTitle>{editing ? '编辑字段' : '新增字段'}</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-5 px-6 py-4">
-              {/* Basic info */}
-              <fieldset className="space-y-3">
-                <legend className="text-xs font-semibold uppercase tracking-wider text-[#94a3b8]">基本信息</legend>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-sm font-medium text-[#374151]">字段名 <span className="text-red-400">*</span></label>
-                    <Input value={form.fieldName} onChange={(e) => setForm({ ...form, fieldName: e.target.value })} placeholder="英文标识，如 purchase_channel" />
-                  </div>
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-sm font-medium text-[#374151]">显示名 <span className="text-red-400">*</span></label>
-                    <Input value={form.fieldLabel} onChange={(e) => setForm({ ...form, fieldLabel: e.target.value })} placeholder="中文显示名" />
-                  </div>
-                </div>
-              </fieldset>
-
-              {/* Type & validation */}
-              <fieldset className="space-y-3">
-                <legend className="text-xs font-semibold uppercase tracking-wider text-[#94a3b8]">类型与校验</legend>
-                <div className="grid grid-cols-2 gap-3">
-                  <Select value={form.fieldType} onValueChange={(v) => setForm({ ...form, fieldType: v })} label="字段类型">
-                    {FIELD_TYPES.map((t) => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}
-                  </Select>
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-sm font-medium text-[#374151]">排序号</label>
-                    <Input type="number" value={form.fieldOrder} onChange={(e) => setForm({ ...form, fieldOrder: Number(e.target.value) })} />
-                  </div>
-                </div>
-                {form.fieldType === 'DROPDOWN' && (
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-sm font-medium text-[#374151]">选项 (JSON 数组)</label>
-                    <Input value={form.fieldOptions} onChange={(e) => setForm({ ...form, fieldOptions: e.target.value })} placeholder='["选项1","选项2"]' />
-                    {form.fieldOptions && (
-                      <div className="flex flex-wrap gap-1 pt-1">
-                        {parseOptions(form.fieldOptions).map((o, i) => (
-                          <span key={i} className="rounded-full bg-purple-50 px-2 py-0.5 text-xs text-purple-600">{o}</span>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )}
-                {form.fieldType === 'REGEX' && (
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-sm font-medium text-[#374151]">正则表达式</label>
-                    <Input value={form.validationPattern} onChange={(e) => setForm({ ...form, validationPattern: e.target.value })} placeholder="^[A-Z].*" className="font-mono text-xs" />
-                  </div>
-                )}
-              </fieldset>
-
-              {/* Flags */}
-              <fieldset className="space-y-3">
-                <legend className="text-xs font-semibold uppercase tracking-wider text-[#94a3b8]">属性</legend>
-                <div className="grid grid-cols-3 gap-3">
-                  <Select value={String(form.required)} onValueChange={(v) => setForm({ ...form, required: Number(v) })} label="必填">
-                    <SelectItem value="0">否</SelectItem><SelectItem value="1">是</SelectItem>
-                  </Select>
-                  <Select value={String(form.encrypted)} onValueChange={(v) => setForm({ ...form, encrypted: Number(v) })} label="加密">
-                    <SelectItem value="0">否</SelectItem><SelectItem value="1">是</SelectItem>
-                  </Select>
-                  <Select value={String(form.status)} onValueChange={(v) => setForm({ ...form, status: Number(v) })} label="状态">
-                    <SelectItem value="1">启用</SelectItem><SelectItem value="0">停用</SelectItem>
-                  </Select>
-                </div>
-              </fieldset>
-
-              <div className="flex justify-end gap-2 border-t border-[#e5e7eb] pt-4">
-                <Button variant="outline" onClick={closeDialog}>取消</Button>
-                <Button onClick={handleSave} disabled={createMut.isPending || updateMut.isPending}>
-                  {editing ? '保存修改' : '创建字段'}
-                </Button>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
 
         {/* ── Preview Dialog ───────────────────────────────────────── */}
         <Dialog open={!!preview} onOpenChange={(o) => { if (!o) setPreview(null); }}>

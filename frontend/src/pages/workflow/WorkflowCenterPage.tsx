@@ -16,7 +16,6 @@ import {
   RefreshCw,
   RotateCcw,
   Search,
-  Trash2,
   Workflow,
   X,
   XCircle,
@@ -175,18 +174,11 @@ export default function WorkflowCenterPage() {
   const [msg, setMsg] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [showNewDropdown, setShowNewDropdown] = useState(false);
-  const [showCustomDialog, setShowCustomDialog] = useState(false);
-  const [customName, setCustomName] = useState('');
-  const [customCode, setCustomCode] = useState('');
-  const [customDesc, setCustomDesc] = useState('');
-  const [creating, setCreating] = useState(false);
   const [activeFilter, setActiveFilter] = useState<WorkflowFilter>('all');
   const [query, setQuery] = useState('');
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [selectedBusinessType, setSelectedBusinessType] = useState<string | null>(null);
-  const [deleteTarget, setDeleteTarget] = useState<{ businessType: string; name: string } | null>(null);
-  const [deleting, setDeleting] = useState(false);
   const [detailVersions, setDetailVersions] = useState<WorkflowDefinitionVersionDTO[]>([]);
   const [detailAvailability, setDetailAvailability] = useState<WorkflowStartAvailability | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
@@ -427,23 +419,6 @@ export default function WorkflowCenterPage() {
     }
   };
 
-  const handleDelete = async () => {
-    if (!deleteTarget) return;
-    setDeleting(true);
-    try {
-      setErr(null);
-      await workflowApi.delete(deleteTarget.businessType);
-      setMsg(`「${deleteTarget.name}」已删除`);
-      setDeleteTarget(null);
-      await load();
-    } catch (e) {
-      setErr(e instanceof Error ? e.message : '删除失败');
-      setDeleteTarget(null);
-    } finally {
-      setDeleting(false);
-    }
-  };
-
   return (
     <div className="min-h-full bg-[var(--app-background)] px-4 py-5 sm:px-6 lg:px-8">
       <div className="mx-auto flex w-full max-w-[1480px] flex-col gap-5">
@@ -497,140 +472,12 @@ export default function WorkflowCenterPage() {
                         {f.name}
                       </button>
                     ))}
-                    <div className="my-1 border-t border-gray-100" />
-                    <button
-                      type="button"
-                      className="flex w-full items-center gap-3 px-3 py-2 text-sm font-medium text-blue-600 transition-colors hover:bg-blue-50"
-                      onClick={() => { setShowNewDropdown(false); setShowCustomDialog(true); }}
-                    >
-                      <Plus className="h-4 w-4" />
-                      自定义流程
-                    </button>
                   </div>
                 )}
               </div>
             </div>
           </div>
         </section>
-
-        <Dialog open={showCustomDialog} onOpenChange={(open) => {
-          if (!open) {
-            setShowCustomDialog(false);
-            setCustomName('');
-            setCustomCode('');
-            setCustomDesc('');
-          }
-        }}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>创建自定义流程</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4 px-6 py-4">
-              <div className="space-y-1.5">
-                <label className="text-sm font-medium text-gray-700">流程编码 *</label>
-                <input
-                  className="flex h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
-                  placeholder="至少2个字符，如 MY_APPROVAL"
-                  value={customCode}
-                  onChange={(e) => setCustomCode(e.target.value.replace(/[^a-zA-Z0-9_]/g, ''))}
-                />
-                <p className="text-[11px] text-gray-400">创建后不可修改，将作为流程的唯一标识</p>
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-sm font-medium text-gray-700">流程名称</label>
-                <input
-                  className="flex h-10 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
-                  placeholder="可输入中文，如我的审批流程"
-                  value={customName}
-                  onChange={(e) => setCustomName(e.target.value)}
-                />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-sm font-medium text-gray-700">流程描述</label>
-                <textarea
-                  rows={2}
-                  className="flex w-full resize-none rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100"
-                  placeholder="请描述流程用途（可选）"
-                  value={customDesc}
-                  onChange={(e) => setCustomDesc(e.target.value)}
-                />
-              </div>
-            </div>
-            <DialogFooter>
-              <button
-                type="button"
-                className="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-                onClick={() => setShowCustomDialog(false)}
-              >
-                取消
-              </button>
-              <button
-                type="button"
-                disabled={creating || customCode.trim().length < 2}
-                className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
-                onClick={async () => {
-                  if (!customCode.trim() || !canEditWorkflow) return;
-                  setCreating(true);
-                  try {
-                    setErr(null);
-                    const bt = `CUSTOM_${customCode.trim().toUpperCase()}`;
-                    const result = await workflowApi.createCustomWorkflow(bt, customName.trim() || customCode.trim(), customDesc.trim());
-                    setMsg(`自定义流程「${result.name}」创建成功`);
-                    setShowCustomDialog(false);
-                    setCustomName('');
-                    setCustomCode('');
-                    setCustomDesc('');
-                    await load();
-                    navigate(`/workflow-designer?businessType=${result.businessType}`);
-                  } catch (e) {
-                    setErr(e instanceof Error ? e.message : '创建失败');
-                  } finally {
-                    setCreating(false);
-                  }
-                }}
-              >
-                {creating ? '创建中...' : '确认创建'}
-              </button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-
-        <Dialog open={!!deleteTarget} onOpenChange={(open) => { if (!open && !deleting) setDeleteTarget(null); }}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>确认删除</DialogTitle>
-            </DialogHeader>
-            <div className="px-6 py-4">
-              <div className="mb-4 flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-50">
-                  <Trash2 className="h-5 w-5 text-red-600" />
-                </div>
-                <p className="text-sm font-medium text-gray-900">此操作不可撤销</p>
-              </div>
-              <p className="text-sm text-gray-600">
-                即将删除流程「<span className="font-medium text-gray-900">{deleteTarget?.name}</span>」，删除后无法恢复。
-              </p>
-            </div>
-            <DialogFooter>
-              <button
-                type="button"
-                disabled={deleting}
-                className="flex-1 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
-                onClick={() => setDeleteTarget(null)}
-              >
-                取消
-              </button>
-              <button
-                type="button"
-                disabled={deleting}
-                className="flex-1 rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-red-700 disabled:opacity-50"
-                onClick={handleDelete}
-              >
-                {deleting ? '删除中...' : '确认删除'}
-              </button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
 
         <Dialog open={!!rollbackTarget} onOpenChange={(open) => {
           if (!open && !rollingBack) {
@@ -1261,16 +1108,6 @@ export default function WorkflowCenterPage() {
                               className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-50"
                             >
                               {isDisabled ? '启用流程' : '停用流程'}
-                            </button>
-                          )}
-                          {canEditWorkflow && (isDisabled || isDraft) && flow.isCustom && (
-                            <button
-                              type="button"
-                              onClick={() => setDeleteTarget({ businessType: flow.businessType, name: flow.name })}
-                              className="inline-flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-100"
-                            >
-                              <Trash2 className="h-3.5 w-3.5" />
-                              删除
                             </button>
                           )}
                         </>
