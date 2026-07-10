@@ -5,7 +5,7 @@ import SystemPageHost from '../SystemPageHost';
 describe('SystemPageHost 建设中占位页', () => {
   it('待接入菜单展示后端就绪状态徽章与建设计划', () => {
     render(
-      <SystemPageHost activeMenu="system-data-permissions" activeMenuLabel="数据权限" />,
+      <SystemPageHost activeMenu="system-import-export" activeMenuLabel="导入导出" />,
     );
     // 后端状态徽章
     expect(screen.getByText('后端部分就绪')).toBeInTheDocument();
@@ -14,7 +14,7 @@ describe('SystemPageHost 建设中占位页', () => {
     // 后端现状与建设计划区块存在
     expect(screen.getByText(/后端现状/)).toBeInTheDocument();
     expect(screen.getByText(/建设计划/)).toBeInTheDocument();
-    expect(screen.getByText(/RolePermissionCatalogController/)).toBeInTheDocument();
+    expect(screen.getByText(/AssetImportExportService/)).toBeInTheDocument();
   });
 
   it('后端零实现的菜单展示红色徽章', () => {

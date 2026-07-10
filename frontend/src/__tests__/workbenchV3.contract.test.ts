@@ -11,16 +11,15 @@ const moduleSource = readText('../pages/workspace-preview/system-hub/systemModul
 const appRoutesSource = readText('../app/routes.ts');
 
 describe('Workbench V3 菜单权限批次合同', () => {
-  it('三十八项菜单全部处于已接入真组件状态，且仍非 44 项全量完成', () => {
-    for (const menuId of ['system-interfaces', 'system-field-mapping', 'system-sync-rules', 'system-webhook-config', 'system-external-systems', 'system-base-params', 'system-security-policy', 'system-audit-log', 'system-mail-gateway', 'system-mail-templates', 'system-mail-logs', 'system-notification-templates', 'system-notification-channels', 'system-notification-preferences', 'system-workflow-notification-switch', 'system-cache-management', 'system-file-storage', 'system-asset-category', 'system-numbering-rules', 'system-custom-fields', 'system-custom-field-sets', 'system-vendor-management', 'system-location-management', 'system-user-management', 'system-dept-org', 'system-role-permissions', 'system-menu-permissions', 'system-post-management', 'system-tenant-management', 'system-flow-definition', 'system-flow-designer', 'system-form-config', 'system-form-storage', 'system-approval-rules', 'system-todo-fields', 'system-sla-config', 'system-runtime-monitor', 'system-settings-command-center']) {
+  it('三十九项菜单全部处于已接入真组件状态，且仍非 44 项全量完成', () => {
+    for (const menuId of ['system-interfaces', 'system-field-mapping', 'system-sync-rules', 'system-webhook-config', 'system-external-systems', 'system-base-params', 'system-security-policy', 'system-audit-log', 'system-mail-gateway', 'system-mail-templates', 'system-mail-logs', 'system-notification-templates', 'system-notification-channels', 'system-notification-preferences', 'system-workflow-notification-switch', 'system-cache-management', 'system-file-storage', 'system-asset-category', 'system-numbering-rules', 'system-custom-fields', 'system-custom-field-sets', 'system-vendor-management', 'system-location-management', 'system-user-management', 'system-dept-org', 'system-role-permissions', 'system-menu-permissions', 'system-post-management', 'system-tenant-management', 'system-data-permissions', 'system-flow-definition', 'system-flow-designer', 'system-form-config', 'system-form-storage', 'system-approval-rules', 'system-todo-fields', 'system-sla-config', 'system-runtime-monitor', 'system-settings-command-center']) {
       expect(workbenchV3Page).toContain(`id: '${menuId}'`);
     }
-    expect(workbenchV3Page.match(/\{ id: 'system-[^']+'.+status: '已接入真组件' \}/g)).toHaveLength(38);
-    expect(workbenchV3Page).toContain('三十八项菜单');
-    expect(workbenchV3Page).toContain('system-tenant-management 已接入租户主数据只读 catalog');
+    expect(workbenchV3Page.match(/\{ id: 'system-[^']+'.+status: '已接入真组件' \}/g)).toHaveLength(39);
+    expect(workbenchV3Page).toContain('三十九项菜单');
+    expect(workbenchV3Page).toContain('system-data-permissions 已接入角色数据范围只读 catalog');
     expect(workbenchV3Page).toContain('仍非 44 项全量覆盖');
     expect(workbenchV3Page).toContain('仍不是 Workbench V3 全量完成');
-    expect(workbenchV3Page).toContain('组织权限组未全组完成');
     expect(workbenchV3Page).toContain('基础资料组未全组完成');
     expect(workbenchV3Page).toContain('消息与通知组未全组完成');
     expect(workbenchV3Page).toContain('邮件子系统未全组完成');
@@ -104,6 +103,7 @@ describe('Workbench V3 菜单权限批次合同', () => {
     expect(registrySource).toContain("'system-menu-permissions': lazy(() => import('../../system/SystemMenuPermissionsWorkbenchPage'))");
     expect(registrySource).toContain("'system-post-management': lazy(() => import('../../system/SystemPostManagementWorkbenchPage'))");
     expect(registrySource).toContain("'system-tenant-management': lazy(() => import('../../system/SystemTenantManagementWorkbenchPage'))");
+    expect(registrySource).toContain("'system-data-permissions': lazy(() => import('../../system/SystemDataPermissionsWorkbenchPage'))");
     expect(registrySource).toContain("'system-flow-definition': lazy(() => import('../../system/SystemFlowDefinitionWorkbenchPage'))");
     expect(registrySource).toContain("'system-flow-designer': lazy(() => import('../../system/SystemFlowDesignerWorkbenchPage'))");
     expect(registrySource).toContain("'system-form-config': lazy(() => import('../../system/SystemFormConfigWorkbenchPage'))");
@@ -116,7 +116,7 @@ describe('Workbench V3 菜单权限批次合同', () => {
   });
 
   it('菜单权限新增模块具备 module metadata 与只读权限元数据', () => {
-    for (const moduleExport of ['SYSTEM_INTERFACES_MODULE', 'SYSTEM_FIELD_MAPPING_MODULE', 'SYSTEM_SYNC_RULES_MODULE', 'SYSTEM_WEBHOOK_CONFIG_MODULE', 'SYSTEM_EXTERNAL_SYSTEMS_MODULE', 'SYSTEM_BASE_PARAMS_MODULE', 'SYSTEM_SECURITY_POLICY_MODULE', 'SYSTEM_AUDIT_LOG_MODULE', 'SYSTEM_MAIL_GATEWAY_MODULE', 'SYSTEM_MAIL_TEMPLATES_MODULE', 'SYSTEM_MAIL_LOGS_MODULE', 'SYSTEM_NOTIFICATION_TEMPLATES_MODULE', 'SYSTEM_NOTIFICATION_CHANNELS_MODULE', 'SYSTEM_NOTIFICATION_PREFERENCES_MODULE', 'SYSTEM_WORKFLOW_NOTIFICATION_SWITCH_MODULE', 'SYSTEM_CACHE_MANAGEMENT_MODULE', 'SYSTEM_FILE_STORAGE_MODULE', 'SYSTEM_ASSET_CATEGORY_MODULE', 'SYSTEM_NUMBERING_RULES_MODULE', 'SYSTEM_CUSTOM_FIELDS_MODULE', 'SYSTEM_CUSTOM_FIELD_SETS_MODULE', 'SYSTEM_VENDOR_MANAGEMENT_MODULE', 'SYSTEM_LOCATION_MANAGEMENT_MODULE', 'SYSTEM_USER_MANAGEMENT_MODULE', 'SYSTEM_DEPT_ORG_MODULE', 'SYSTEM_ROLE_PERMISSIONS_MODULE', 'SYSTEM_MENU_PERMISSIONS_MODULE', 'SYSTEM_POST_MANAGEMENT_MODULE', 'SYSTEM_TENANT_MANAGEMENT_MODULE', 'SYSTEM_FLOW_DEFINITION_MODULE', 'SYSTEM_FLOW_DESIGNER_MODULE', 'SYSTEM_FORM_CONFIG_MODULE', 'SYSTEM_FORM_STORAGE_MODULE', 'SYSTEM_APPROVAL_RULES_MODULE', 'SYSTEM_TODO_FIELDS_MODULE', 'SYSTEM_SLA_CONFIG_MODULE', 'SYSTEM_RUNTIME_MONITOR_MODULE', 'SYSTEM_SETTINGS_COMMAND_CENTER_MODULE']) {
+    for (const moduleExport of ['SYSTEM_INTERFACES_MODULE', 'SYSTEM_FIELD_MAPPING_MODULE', 'SYSTEM_SYNC_RULES_MODULE', 'SYSTEM_WEBHOOK_CONFIG_MODULE', 'SYSTEM_EXTERNAL_SYSTEMS_MODULE', 'SYSTEM_BASE_PARAMS_MODULE', 'SYSTEM_SECURITY_POLICY_MODULE', 'SYSTEM_AUDIT_LOG_MODULE', 'SYSTEM_MAIL_GATEWAY_MODULE', 'SYSTEM_MAIL_TEMPLATES_MODULE', 'SYSTEM_MAIL_LOGS_MODULE', 'SYSTEM_NOTIFICATION_TEMPLATES_MODULE', 'SYSTEM_NOTIFICATION_CHANNELS_MODULE', 'SYSTEM_NOTIFICATION_PREFERENCES_MODULE', 'SYSTEM_WORKFLOW_NOTIFICATION_SWITCH_MODULE', 'SYSTEM_CACHE_MANAGEMENT_MODULE', 'SYSTEM_FILE_STORAGE_MODULE', 'SYSTEM_ASSET_CATEGORY_MODULE', 'SYSTEM_NUMBERING_RULES_MODULE', 'SYSTEM_CUSTOM_FIELDS_MODULE', 'SYSTEM_CUSTOM_FIELD_SETS_MODULE', 'SYSTEM_VENDOR_MANAGEMENT_MODULE', 'SYSTEM_LOCATION_MANAGEMENT_MODULE', 'SYSTEM_USER_MANAGEMENT_MODULE', 'SYSTEM_DEPT_ORG_MODULE', 'SYSTEM_ROLE_PERMISSIONS_MODULE', 'SYSTEM_MENU_PERMISSIONS_MODULE', 'SYSTEM_POST_MANAGEMENT_MODULE', 'SYSTEM_TENANT_MANAGEMENT_MODULE', 'SYSTEM_DATA_PERMISSIONS_MODULE', 'SYSTEM_FLOW_DEFINITION_MODULE', 'SYSTEM_FLOW_DESIGNER_MODULE', 'SYSTEM_FORM_CONFIG_MODULE', 'SYSTEM_FORM_STORAGE_MODULE', 'SYSTEM_APPROVAL_RULES_MODULE', 'SYSTEM_TODO_FIELDS_MODULE', 'SYSTEM_SLA_CONFIG_MODULE', 'SYSTEM_RUNTIME_MONITOR_MODULE', 'SYSTEM_SETTINGS_COMMAND_CENTER_MODULE']) {
       expect(moduleSource).toContain(`export const ${moduleExport} =`);
       expect(moduleSource).toMatch(new RegExp(`\\b${moduleExport},`));
     }
@@ -170,6 +170,7 @@ describe('Workbench V3 菜单权限批次合同', () => {
     expect(moduleSource).toContain("preview: ['system:post:preview']");
     expect(moduleSource).toContain('menuId: SYSTEM_TENANT_MANAGEMENT_MENU_ID');
     expect(moduleSource).toContain("viewPermissions: ['system:tenant:query', 'system:tenant:read', 'system:tenant:meta']");
+    expect(moduleSource).toContain('menuId: SYSTEM_DATA_PERMISSIONS_MENU_ID');
     expect(moduleSource).toContain("viewPermissions: ['system:flow:query']");
     expect(moduleSource).toContain("edit: ['workflow:designer:edit']");
     expect(moduleSource).toContain("publish: ['workflow:designer:publish']");

@@ -16,6 +16,8 @@ public class Role implements Serializable {
     private String roleName;
     private String roleCode;
     private String description;
+    /** 数据权限范围：ALL/DEPT/DEPT_AND_SUB/SELF/CUSTOM */
+    private String dataScope;
     private Integer status;
 
     @TableField(fill = FieldFill.INSERT)

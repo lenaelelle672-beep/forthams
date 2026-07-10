@@ -24,12 +24,6 @@ export interface PendingMenuStatus {
 }
 
 export const pendingMenuStatus: Record<string, PendingMenuStatus> = {
-  'system-data-permissions': {
-    backend: 'partial',
-    backendNote: '已有 RolePermissionCatalogController（角色-权限绑定目录），但数据权限规则（dataScope/规则引擎）的 entity/service/controller 尚未建设，sys_role 表无 data_scope 字段。',
-    phase: 'P1',
-    plan: '新建 data_permission_rule 表 + DataPermissionRule entity/service/controller（只收紧、CUSTOM 边界），前端接入只读规则目录与投影预览。',
-  },
   'system-handover': {
     backend: 'none',
     backendNote: '后端零实现。仅 TenantContext 同名，与离职交接无关。',

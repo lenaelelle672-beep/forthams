@@ -43,6 +43,7 @@ export const systemRealPageRegistry: Record<string, SystemRealPageEntry> = {
   'system-runtime-monitor': lazy(() => import('../../system/SystemRuntimeMonitorWorkbenchPage')),
   'system-settings-command-center': lazy(() => import('../../system/SystemSettingsCommandCenterWorkbenchPage')),
   'system-tenant-management': lazy(() => import('../../system/SystemTenantManagementWorkbenchPage')),
+  'system-data-permissions': lazy(() => import('../../system/SystemDataPermissionsWorkbenchPage')),
 };
 
 export function isSystemRealPageMenuId(menuId: string | undefined): boolean {
