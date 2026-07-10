@@ -108,6 +108,7 @@ describe('V3 registry 与编号规则闭环边界', () => {
     expect(registrySource).toMatch(/^\s*'system-role-permissions'\s*:/m);
     expect(registrySource).toMatch(/^\s*'system-menu-permissions'\s*:/m);
     expect(registrySource).toMatch(/^\s*'system-post-management'\s*:/m);
+    expect(registrySource).toMatch(/^\s*'system-tenant-management'\s*:/m);
     expect(registrySource).toMatch(/^\s*'system-flow-definition'\s*:/m);
     expect(registrySource).toMatch(/^\s*'system-flow-designer'\s*:/m);
     expect(registrySource).toMatch(/^\s*'system-form-config'\s*:/m);
@@ -142,6 +143,7 @@ describe('V3 registry 与编号规则闭环边界', () => {
     expect(registrySource).toContain("'system-role-permissions': lazy(() => import('../../system/SystemRolePermissionsWorkbenchPage'))");
     expect(registrySource).toContain("'system-menu-permissions': lazy(() => import('../../system/SystemMenuPermissionsWorkbenchPage'))");
     expect(registrySource).toContain("'system-post-management': lazy(() => import('../../system/SystemPostManagementWorkbenchPage'))");
+    expect(registrySource).toContain("'system-tenant-management': lazy(() => import('../../system/SystemTenantManagementWorkbenchPage'))");
     expect(registrySource).toContain("'system-flow-definition': lazy(() => import('../../system/SystemFlowDefinitionWorkbenchPage'))");
     expect(registrySource).toContain("'system-flow-designer': lazy(() => import('../../system/SystemFlowDesignerWorkbenchPage'))");
     expect(registrySource).toContain("'system-form-config': lazy(() => import('../../system/SystemFormConfigWorkbenchPage'))");
@@ -151,18 +153,18 @@ describe('V3 registry 与编号规则闭环边界', () => {
     expect(registrySource).toContain("'system-sla-config': lazy(() => import('../../system/SystemSlaConfigWorkbenchPage'))");
     expect(registrySource).toContain("'system-runtime-monitor': lazy(() => import('../../system/SystemRuntimeMonitorWorkbenchPage'))");
     expect(registrySource).toContain("'system-settings-command-center': lazy(() => import('../../system/SystemSettingsCommandCenterWorkbenchPage'))");
-    expect(registeredPageCount).toBe(37);
+    expect(registeredPageCount).toBe(38);
     expect(registeredPageCount).not.toBe(44);
     expect(registrySource).not.toContain('IntegrationConfigWorkbenchPage');
   });
 
-  it('module registry 三十七项均指向 workbenchv3 且仍非全量', () => {
+  it('module registry 三十八项均指向 workbenchv3 且仍非全量', () => {
     const registeredMenuCount = (moduleSource.match(/menuId: SYSTEM_/g) ?? []).length;
-    for (const menuId of ['system-interfaces', 'system-field-mapping', 'system-sync-rules', 'system-webhook-config', 'system-external-systems', 'system-base-params', 'system-security-policy', 'system-audit-log', 'system-mail-gateway', 'system-mail-templates', 'system-mail-logs', 'system-notification-templates', 'system-notification-channels', 'system-notification-preferences', 'system-workflow-notification-switch', 'system-cache-management', 'system-file-storage', 'system-asset-category', 'system-numbering-rules', 'system-custom-fields', 'system-custom-field-sets', 'system-vendor-management', 'system-location-management', 'system-user-management', 'system-dept-org', 'system-role-permissions', 'system-menu-permissions', 'system-post-management', 'system-flow-definition', 'system-flow-designer', 'system-form-config', 'system-form-storage', 'system-approval-rules', 'system-todo-fields', 'system-sla-config', 'system-runtime-monitor', 'system-settings-command-center']) {
+    for (const menuId of ['system-interfaces', 'system-field-mapping', 'system-sync-rules', 'system-webhook-config', 'system-external-systems', 'system-base-params', 'system-security-policy', 'system-audit-log', 'system-mail-gateway', 'system-mail-templates', 'system-mail-logs', 'system-notification-templates', 'system-notification-channels', 'system-notification-preferences', 'system-workflow-notification-switch', 'system-cache-management', 'system-file-storage', 'system-asset-category', 'system-numbering-rules', 'system-custom-fields', 'system-custom-field-sets', 'system-vendor-management', 'system-location-management', 'system-user-management', 'system-dept-org', 'system-role-permissions', 'system-menu-permissions', 'system-post-management', 'system-tenant-management', 'system-flow-definition', 'system-flow-designer', 'system-form-config', 'system-form-storage', 'system-approval-rules', 'system-todo-fields', 'system-sla-config', 'system-runtime-monitor', 'system-settings-command-center']) {
       expect(moduleSource).toContain(`workbenchPath: '/fixed-assets/workbenchv3?menu=${menuId}'`);
       expect(moduleSource).toContain(`legacyRoute: '/fixed-assets/workbenchv3?menu=${menuId}'`);
     }
-    expect(registeredMenuCount).toBe(37);
+    expect(registeredMenuCount).toBe(38);
     expect(registeredMenuCount).not.toBe(44);
     expect(moduleSource).toContain('SYSTEM_SECURITY_POLICY_MODULE');
     expect(moduleSource).toContain('SYSTEM_AUDIT_LOG_MODULE');

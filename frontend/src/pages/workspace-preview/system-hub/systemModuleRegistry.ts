@@ -42,6 +42,7 @@ export const SYSTEM_DEPT_ORG_MENU_ID = 'system-dept-org';
 export const SYSTEM_ROLE_PERMISSIONS_MENU_ID = 'system-role-permissions';
 export const SYSTEM_MENU_PERMISSIONS_MENU_ID = 'system-menu-permissions';
 export const SYSTEM_POST_MANAGEMENT_MENU_ID = 'system-post-management';
+export const SYSTEM_TENANT_MANAGEMENT_MENU_ID = 'system-tenant-management';
 export const SYSTEM_FLOW_DEFINITION_MENU_ID = 'system-flow-definition';
 export const SYSTEM_FLOW_DESIGNER_MENU_ID = 'system-flow-designer';
 export const SYSTEM_FORM_CONFIG_MENU_ID = 'system-form-config';
@@ -446,6 +447,18 @@ export const SYSTEM_POST_MANAGEMENT_MODULE = {
   },
 } as const satisfies SystemModuleRegistryItem;
 
+export const SYSTEM_TENANT_MANAGEMENT_MODULE = {
+  menuId: SYSTEM_TENANT_MANAGEMENT_MENU_ID,
+  label: '租户管理',
+  navGroup: '组织权限',
+  workbenchPath: '/fixed-assets/workbenchv3?menu=system-tenant-management',
+  legacyRoute: '/fixed-assets/workbenchv3?menu=system-tenant-management',
+  permissionMeta: {
+    viewPermissions: ['system:tenant:query', 'system:tenant:read', 'system:tenant:meta'],
+    actionPermissions: {},
+  },
+} as const satisfies SystemModuleRegistryItem;
+
 export const SYSTEM_FLOW_DEFINITION_MODULE = {
   menuId: SYSTEM_FLOW_DEFINITION_MENU_ID,
   label: '流程定义',
@@ -616,6 +629,7 @@ export const systemModuleRegistry = [
   SYSTEM_ROLE_PERMISSIONS_MODULE,
   SYSTEM_MENU_PERMISSIONS_MODULE,
   SYSTEM_POST_MANAGEMENT_MODULE,
+  SYSTEM_TENANT_MANAGEMENT_MODULE,
   SYSTEM_FLOW_DEFINITION_MODULE,
   SYSTEM_FLOW_DESIGNER_MODULE,
   SYSTEM_FORM_CONFIG_MODULE,

@@ -1,173 +1,63 @@
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
-import { PageHeader } from '@/components/ui/PageHeader';
-import { PageTransition, ErrorState, EmptyState, SkeletonTable } from '@/components/ui';
-import { ErrorBoundary } from '@/components/ErrorBoundary';
-import { Modal, Tag, message } from 'antd';
-import {
-  activateTenant,
-  createTenant,
-  listTenants,
-  suspendTenant,
-  updateTenant,
-  type TenantPayload as TenantForm,
-  type TenantRecord,
-} from '@/api/tenant';
+import { useEffect, useState } from 'react';
+import { Card } from '@/components/ui/Card';
+import { listTenants, type TenantRecord } from '@/api/tenant';
 
-const planColors: Record<string, string> = {
-  FREE: 'default', BASIC: 'blue', PRO: 'green', ENTERPRISE: 'gold'
-};
-
-const defaultForm: TenantForm = { id: '', name: '', plan: 'FREE', maxUsers: 100, maxAssets: 1000, contactName: '', contactPhone: '', contactEmail: '' };
-
-const toForm = (t: TenantRecord): TenantForm => ({
-  id: t.id || '',
-  name: t.name || '',
-  plan: t.plan || 'FREE',
-  maxUsers: t.maxUsers ?? 100,
-  maxAssets: t.maxAssets ?? 1000,
-  contactName: t.contactName || '',
-  contactPhone: t.contactPhone || '',
-  contactEmail: t.contactEmail || '',
-});
-
-function TenantManagementContent() {
+/**
+ * 租户管理页（遗留路由入口，只读降级版）。
+ *
+ * 已降级为只读：原页面调用 create/update/suspend/activate 等写接口，但后端
+ * SysTenantController 按 V3 只读 catalog 设计只提供 list/current/detail/meta。
+ * 完整只读租户管理请使用 V3 工作台的 SystemTenantManagementWorkbenchPage。
+ */
+export default function TenantManagementPage() {
   const [tenants, setTenants] = useState<TenantRecord[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [editingItem, setEditingItem] = useState<TenantRecord | null>(null);
-  const [form, setForm] = useState<TenantForm>(defaultForm);
+  const [loading, setLoading] = useState(true);
 
-  const fetchData = async () => {
-    setLoading(true);
-    try {
-      const data = await listTenants({ pageSize: 100 });
-      setTenants(data?.records || []);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : '获取租户列表失败');
-      message.error('获取租户列表失败');
-    }
-    setLoading(false);
-  };
-
-  useEffect(() => { fetchData(); }, []);
-
-  const handleSave = async () => {
-    try {
-      if (editingItem) {
-        await updateTenant(editingItem.id, form);
-      } else {
-        await createTenant(form);
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      try {
+        const data = await listTenants({ pageSize: 100 });
+        if (active) setTenants(data?.records ?? []);
+      } catch {
+        if (active) setTenants([]);
+      } finally {
+        if (active) setLoading(false);
       }
-      message.success('保存成功');
-      setModalVisible(false);
-      fetchData();
-    } catch { message.error('保存失败'); }
-  };
-
-  const handleToggleStatus = async (id: string, action: 'suspend' | 'activate') => {
-    try {
-      if (action === 'suspend') {
-        await suspendTenant(id);
-      } else {
-        await activateTenant(id);
-      }
-      message.success('操作成功');
-      fetchData();
-    } catch { message.error('操作失败'); }
-  };
-
-  if (error) {
-    return (
-      <PageTransition>
-        <ErrorState title="加载失败" description={error} onRetry={fetchData} />
-      </PageTransition>
-    );
-  }
+    })();
+    return () => { active = false; };
+  }, []);
 
   return (
-    <PageTransition>
-      <div className="p-6 space-y-4">
-        <PageHeader title="租户管理" subtitle="多租户 SaaS 管理" />
-        <Card>
-          <CardHeader>
-            <div className="flex justify-between">
-              <CardTitle>租户列表 ({tenants.length})</CardTitle>
-              <Button onClick={() => { setEditingItem(null); setForm(defaultForm); setModalVisible(true); }}>
-                新建租户
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            {loading ? (
-              <SkeletonTable rows={5} cols={7} />
-            ) : tenants.length === 0 ? (
-              <EmptyState title="暂无租户" description="点击「新建租户」添加第一个租户" className="py-8" />
-            ) : (
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b bg-gray-50">
-                  <th className="px-4 py-3 text-left">ID</th>
-                  <th className="px-4 py-3 text-left">名称</th>
-                  <th className="px-4 py-3 text-left">套餐</th>
-                  <th className="px-4 py-3 text-left">状态</th>
-                  <th className="px-4 py-3 text-left">用户上限</th>
-                  <th className="px-4 py-3 text-left">联系人</th>
-                  <th className="px-4 py-3 text-left">操作</th>
-                </tr>
-              </thead>
-              <tbody>
-                {tenants.map((t: TenantRecord) => (
-                  <tr key={t.id} className="border-b hover:bg-gray-50">
-                    <td className="px-4 py-3 font-mono">{t.id}</td>
-                    <td className="px-4 py-3">{t.name}</td>
-                    <td className="px-4 py-3"><Tag color={planColors[t.plan]}>{t.plan}</Tag></td>
-                    <td className="px-4 py-3">
-                      <Tag color={t.status === 'ACTIVE' ? 'green' : 'red'}>{t.status}</Tag>
-                    </td>
-                    <td className="px-4 py-3">{t.maxUsers}</td>
-                    <td className="px-4 py-3">{t.contactName || '-'}</td>
-                    <td className="px-4 py-3">
-                      <div className="flex gap-2">
-                        <Button size="sm" variant="outline" onClick={() => { setEditingItem(t); setForm(toForm(t)); setModalVisible(true); }}>编辑</Button>
-                        {t.status === 'ACTIVE' ? (
-                          <Button size="sm" variant="outline" onClick={() => handleToggleStatus(t.id, 'suspend')}>暂停</Button>
-                        ) : (
-                          <Button size="sm" onClick={() => handleToggleStatus(t.id, 'activate')}>激活</Button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            )}
-          </CardContent>
-        </Card>
-
-        <Modal title={editingItem ? '编辑租户' : '新建租户'} open={modalVisible} onOk={handleSave} onCancel={() => setModalVisible(false)}>
-          <div className="space-y-4">
-            {!editingItem && <Input placeholder="租户ID (如 dept:42)" value={form.id} onChange={e => setForm(f => ({ ...f, id: e.target.value }))} />}
-            <Input placeholder="租户名称" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
-            <Input placeholder="联系人" value={form.contactName} onChange={e => setForm(f => ({ ...f, contactName: e.target.value }))} />
-            <Input placeholder="联系电话" value={form.contactPhone} onChange={e => setForm(f => ({ ...f, contactPhone: e.target.value }))} />
-            <Input placeholder="联系邮箱" value={form.contactEmail} onChange={e => setForm(f => ({ ...f, contactEmail: e.target.value }))} />
-          </div>
-        </Modal>
-      </div>
-    </PageTransition>
+    <Card className="p-4">
+      <h1 className="text-xl font-semibold">租户管理</h1>
+      <p className="mt-1 text-sm text-slate-500">只读视图，编辑请在 V3 工作台租户管理页操作。</p>
+      {loading ? (
+        <p className="mt-4 text-sm text-slate-500">加载中...</p>
+      ) : tenants.length === 0 ? (
+        <p className="mt-4 text-sm text-slate-500">暂无租户。</p>
+      ) : (
+        <table className="mt-4 min-w-full text-left text-sm">
+          <thead className="text-xs text-slate-500">
+            <tr>
+              <th className="py-2 pr-3">租户标识</th>
+              <th className="py-2 pr-3">名称</th>
+              <th className="py-2 pr-3">套餐</th>
+              <th className="py-2 pr-3">状态</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-100">
+            {tenants.map((t) => (
+              <tr key={t.id}>
+                <td className="py-2 pr-3 font-medium text-slate-800">{t.id}</td>
+                <td className="py-2 pr-3 text-slate-600">{t.name}</td>
+                <td className="py-2 pr-3 text-slate-500">{t.plan}</td>
+                <td className="py-2 pr-3 text-slate-500">{t.status}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </Card>
   );
-};
-
-const TenantManagementPage: React.FC = () => {
-  return (
-    <ErrorBoundary>
-      <TenantManagementContent />
-    </ErrorBoundary>
-  );
-};
-
-export default TenantManagementPage;
+}

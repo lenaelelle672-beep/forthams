@@ -3,56 +3,56 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 vi.mock('@/utils/http', () => ({
   default: {
     get: vi.fn(),
-    post: vi.fn(),
-    put: vi.fn(),
   },
 }));
 
 import http from '@/utils/http';
 import {
-  activateTenant,
-  createTenant,
   getCurrentTenant,
+  getTenantDetail,
+  getTenantMeta,
   listTenants,
-  suspendTenant,
-  updateTenant,
 } from '@/api/tenant';
 
 const mockedHttp = vi.mocked(http);
 
-describe('api/tenant', () => {
+describe('api/tenant（只读 catalog）', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it('uses unified tenant paths and relies on the shared http unwrapping contract', async () => {
-    const payload = {
-      id: 'dept:1',
-      name: '默认租户',
-      plan: 'PRO',
-      maxUsers: 100,
-      maxAssets: 1000,
-      contactName: 'Admin',
-      contactPhone: '13800000000',
-      contactEmail: 'admin@example.com',
-    };
+  it('listTenants 调用 /tenants 并透传查询参数', async () => {
+    mockedHttp.get.mockResolvedValue({ records: [], total: 0 });
 
-    mockedHttp.get.mockResolvedValue({});
-    mockedHttp.post.mockResolvedValue({});
-    mockedHttp.put.mockResolvedValue(undefined);
+    await listTenants({ page: 1, pageSize: 20, keyword: 'T00', status: 'ACTIVE' });
 
-    await listTenants({ pageSize: 100 });
-    await getCurrentTenant();
-    await createTenant(payload);
-    await updateTenant('dept:1', payload);
-    await suspendTenant('dept:1');
-    await activateTenant('dept:1');
+    expect(mockedHttp.get).toHaveBeenCalledWith('/tenants', {
+      params: { page: 1, pageSize: 20, keyword: 'T00', status: 'ACTIVE' },
+    });
+  });
 
-    expect(mockedHttp.get).toHaveBeenCalledWith('/tenants', { params: { pageSize: 100 } });
+  it('getCurrentTenant 调用 /tenants/current', async () => {
+    mockedHttp.get.mockResolvedValue({ id: 'T001', name: '默认租户' });
+
+    const result = await getCurrentTenant();
+
     expect(mockedHttp.get).toHaveBeenCalledWith('/tenants/current');
-    expect(mockedHttp.post).toHaveBeenCalledWith('/tenants', payload);
-    expect(mockedHttp.put).toHaveBeenNthCalledWith(1, '/tenants/dept:1', payload);
-    expect(mockedHttp.put).toHaveBeenNthCalledWith(2, '/tenants/dept:1/suspend');
-    expect(mockedHttp.put).toHaveBeenNthCalledWith(3, '/tenants/dept:1/activate');
+    expect(result.id).toBe('T001');
+  });
+
+  it('getTenantDetail 调用 /tenants/{id}', async () => {
+    mockedHttp.get.mockResolvedValue({ id: 'T002' });
+
+    await getTenantDetail('T002');
+
+    expect(mockedHttp.get).toHaveBeenCalledWith('/tenants/T002');
+  });
+
+  it('getTenantMeta 调用 /tenants/meta', async () => {
+    mockedHttp.get.mockResolvedValue({ plans: ['STANDARD'], statuses: ['ACTIVE'], readOnlyNotice: '只读' });
+
+    await getTenantMeta();
+
+    expect(mockedHttp.get).toHaveBeenCalledWith('/tenants/meta');
   });
 });

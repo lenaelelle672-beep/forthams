@@ -1,6 +1,9 @@
 /**
  * @file api/tenant.ts
- * @description 租户管理 API
+ * @description 租户管理 API（V3 只读 catalog）
+ *
+ * 后端 SysTenantController 提供只读端点：list / current / detail / meta。
+ * 新建、编辑、停用、启用等写操作不在 V3 只读边界内，已移除。
  */
 
 import http from '@/utils/http';
@@ -15,18 +18,9 @@ export interface TenantRecord {
   contactName?: string;
   contactPhone?: string;
   contactEmail?: string;
+  createdAt?: string;
+  updatedAt?: string;
   [key: string]: unknown;
-}
-
-export interface TenantPayload {
-  id: string;
-  name: string;
-  plan: string;
-  maxUsers: number;
-  maxAssets: number;
-  contactName: string;
-  contactPhone: string;
-  contactEmail: string;
 }
 
 export interface TenantList {
@@ -34,20 +28,28 @@ export interface TenantList {
   total: number;
 }
 
-export const listTenants = (params?: { page?: number; pageSize?: number; keyword?: string }) =>
+export interface TenantMeta {
+  plans: string[];
+  statuses: string[];
+  readOnlyNotice: string;
+}
+
+export interface TenantQuery {
+  page?: number;
+  pageSize?: number;
+  keyword?: string;
+  status?: string;
+}
+
+export const listTenants = (params?: TenantQuery) =>
   http.get<TenantList>('/tenants', { params });
 
 export const getCurrentTenant = () =>
   http.get<TenantRecord>('/tenants/current');
 
-export const createTenant = (data: TenantPayload) =>
-  http.post<TenantRecord>('/tenants', data);
+export const getTenantDetail = (id: string) =>
+  http.get<TenantRecord>(`/tenants/${id}`);
 
-export const updateTenant = (id: string, data: TenantPayload) =>
-  http.put<TenantRecord>(`/tenants/${id}`, data);
+export const getTenantMeta = () =>
+  http.get<TenantMeta>('/tenants/meta');
 
-export const suspendTenant = (id: string) =>
-  http.put<void>(`/tenants/${id}/suspend`);
-
-export const activateTenant = (id: string) =>
-  http.put<void>(`/tenants/${id}/activate`);

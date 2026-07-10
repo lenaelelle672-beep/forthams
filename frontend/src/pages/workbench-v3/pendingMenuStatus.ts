@@ -36,12 +36,6 @@ export const pendingMenuStatus: Record<string, PendingMenuStatus> = {
     phase: 'P1',
     plan: '新建 handover 表 + 对象摘要 schema，明确 PENDING/IN_PROGRESS/COMPLETED/CANCELLED 状态机与真实资产/工单/审批对象转移的事务边界。',
   },
-  'system-tenant-management': {
-    backend: 'partial',
-    backendNote: '已有 TenantContext（上下文工具）与 TenantSecurityAudit（安全审计），但无 TenantController/Service 提供租户 CRUD、停用拦截管理界面。',
-    phase: 'P1',
-    plan: '补 TenantController（租户目录、停用/启用、跨租户阻断校验），复用既有租户隔离 fail-closed 机制。',
-  },
   'system-workflow-mail': {
     backend: 'none',
     backendNote: '后端零实现。无 WorkflowMail/BpmMailConfig 相关类，存在零业务调用风险。',

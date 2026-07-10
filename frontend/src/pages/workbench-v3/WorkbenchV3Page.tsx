@@ -55,6 +55,7 @@ export const workbenchV3IntegrationMenus: WorkbenchV3MenuItem[] = [
   { id: 'system-role-permissions', label: '角色权限', description: '角色-权限绑定目录、权限库存与风险提示', status: '已接入真组件' },
   { id: 'system-menu-permissions', label: '菜单权限', description: '权限编码库存按域聚合的菜单权限只读覆盖视图', status: '已接入真组件' },
   { id: 'system-post-management', label: '岗位管理', description: '岗位 metadata-only catalog、详情与 no-persistence/no-assignment/no-permission-effect preview', status: '已接入真组件' },
+  { id: 'system-tenant-management', label: '租户管理', description: '租户主数据只读 catalog、套餐状态与联系人摘要', status: '已接入真组件' },
   { id: 'system-flow-definition', label: '流程定义', description: '流程模板目录、业务类型搜索与节点摘要', status: '已接入真组件' },
   { id: 'system-flow-designer', label: '流程设计器', description: '草稿保存、图结构校验、发布与版本恢复', status: '已接入真组件' },
   { id: 'system-form-config', label: '表单配置', description: '表单定义、schema 安全过滤、发布停用与版本恢复', status: '已接入真组件' },
@@ -189,7 +190,7 @@ export default function WorkbenchV3Page() {
       <main className="p-6">
       <section className="rounded-3xl border border-blue-100 bg-white p-6 shadow-sm">
         <h1 className="text-2xl font-semibold">系统管理 V3 工作台</h1>
-        <p className="mt-2 text-sm text-slate-500">三十七项菜单只通过 V3 registry、module metadata、专属页面与专属 API 访问；system-post-management 已接入岗位 metadata-only 只读目录与 dry-run preview；仍非 44 项全量覆盖，仍不是 Workbench V3 全量完成，组织权限组未全组完成，基础资料组未全组完成，消息与通知组未全组完成，邮件子系统未全组完成。</p>
+        <p className="mt-2 text-sm text-slate-500">三十八项菜单只通过 V3 registry、module metadata、专属页面与专属 API 访问；system-tenant-management 已接入租户主数据只读 catalog；仍非 44 项全量覆盖，仍不是 Workbench V3 全量完成，组织权限组未全组完成，基础资料组未全组完成，消息与通知组未全组完成，邮件子系统未全组完成。</p>
       </section>
 
       <nav className="mt-4 rounded-3xl border border-slate-200 bg-white p-4 shadow-sm" aria-label="Workbench V3 六域顶部导航">
