@@ -171,8 +171,8 @@ describe('Workbench platform entry contract', () => {
     expect(workbenchV3Page).toContain("id: 'system-numbering-rules'");
     expect(workbenchV3Page).toContain("id: 'system-custom-fields'");
     expect(workbenchV3Page).toContain("id: 'system-custom-field-sets'");
-    expect(workbenchV3Page).toContain('三十九项菜单');
-    expect(workbenchV3Page).toContain('system-data-permissions 已接入角色数据范围只读 catalog');
+    expect(workbenchV3Page).toContain('四十项菜单');
+    expect(workbenchV3Page).toContain('system-import-export 已接入导入导出任务历史只读 catalog');
     expect(workbenchV3Page).toContain('仍不是 Workbench V3 全量完成');
     expect(workbenchV3Page).toContain('基础资料组未全组完成');
     expect(workbenchV3Page).toContain('消息与通知组未全组完成');

@@ -36,12 +36,6 @@ export const pendingMenuStatus: Record<string, PendingMenuStatus> = {
     phase: 'P2',
     plan: '校准流程节点邮件触发服务，接入流程平台发送决策链与模板渲染，补发送审计。',
   },
-  'system-import-export': {
-    backend: 'partial',
-    backendNote: '已有 AssetImportExportService（资产专用导入导出，位于孤立 com.assetmanage 包），但无通用 ImportExportController/ImportTask/ExportTask。',
-    phase: 'P1',
-    plan: '泛化为按业务对象的通用异步导入导出任务，补错误报告与导出脱敏。',
-  },
   'system-doc-center': {
     backend: 'none',
     backendNote: '后端零实现。',

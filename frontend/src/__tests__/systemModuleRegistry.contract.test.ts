@@ -74,7 +74,7 @@ import {
 } from '../pages/workspace-preview/system-hub/systemModuleRegistry';
 
 describe('systemModuleRegistry 菜单权限合同', () => {
-  it('新增 system-data-permissions 后为三十九个真实 V3 模块，仍非 44 项全量', () => {
+  it('新增 system-data-permissions 后为四十个真实 V3 模块，仍非 44 项全量', () => {
     expect(systemModuleRegistry.map((module) => module.menuId)).toEqual([
       'system-interfaces',
       'system-field-mapping',
@@ -106,6 +106,7 @@ describe('systemModuleRegistry 菜单权限合同', () => {
       'system-post-management',
       'system-tenant-management',
       'system-data-permissions',
+      'system-import-export',
       'system-flow-definition',
       'system-flow-designer',
       'system-form-config',
@@ -116,7 +117,7 @@ describe('systemModuleRegistry 菜单权限合同', () => {
       'system-runtime-monitor',
       'system-settings-command-center',
     ]);
-    expect(systemModuleRegistry).toHaveLength(39);
+    expect(systemModuleRegistry).toHaveLength(40);
     expect(systemModuleRegistry).not.toHaveLength(44);
     expect(SYSTEM_WEBHOOK_CONFIG_MENU_ID).toBe('system-webhook-config');
     expect(getSystemModuleByMenuId('system-webhook-config')).toBe(SYSTEM_WEBHOOK_CONFIG_MODULE);
