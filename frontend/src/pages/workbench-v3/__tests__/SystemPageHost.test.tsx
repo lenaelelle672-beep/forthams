@@ -5,12 +5,12 @@ import SystemPageHost from '../SystemPageHost';
 describe('SystemPageHost 建设中占位页', () => {
   it('待接入菜单展示后端就绪状态徽章与建设计划', () => {
     render(
-      <SystemPageHost activeMenu="system-handover" activeMenuLabel="交接管理" />,
+      <SystemPageHost activeMenu="system-workflow-mail" activeMenuLabel="流程邮件" />,
     );
-    // 后端状态徽章（handover 是后端零实现）
+    // 后端状态徽章（workflow-mail 是后端零实现）
     expect(screen.getByText('后端零实现')).toBeInTheDocument();
     // 计划阶段徽章
-    expect(screen.getByText('计划 P1')).toBeInTheDocument();
+    expect(screen.getByText('计划 P2')).toBeInTheDocument();
     // 后端现状与建设计划区块存在
     expect(screen.getByText(/后端现状/)).toBeInTheDocument();
     expect(screen.getByText(/建设计划/)).toBeInTheDocument();
@@ -18,7 +18,7 @@ describe('SystemPageHost 建设中占位页', () => {
 
   it('后端零实现的菜单展示红色徽章', () => {
     render(
-      <SystemPageHost activeMenu="system-handover" activeMenuLabel="交接管理" />,
+      <SystemPageHost activeMenu="system-workflow-mail" activeMenuLabel="流程邮件" />,
     );
     expect(screen.getByText('后端零实现')).toBeInTheDocument();
   });

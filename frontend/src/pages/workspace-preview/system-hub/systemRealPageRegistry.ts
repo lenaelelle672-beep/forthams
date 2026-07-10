@@ -45,6 +45,7 @@ export const systemRealPageRegistry: Record<string, SystemRealPageEntry> = {
   'system-tenant-management': lazy(() => import('../../system/SystemTenantManagementWorkbenchPage')),
   'system-data-permissions': lazy(() => import('../../system/SystemDataPermissionsWorkbenchPage')),
   'system-import-export': lazy(() => import('../../system/SystemImportExportWorkbenchPage')),
+  'system-handover': lazy(() => import('../../system/SystemHandoverWorkbenchPage')),
 };
 
 export function isSystemRealPageMenuId(menuId: string | undefined): boolean {

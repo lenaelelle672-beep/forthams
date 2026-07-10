@@ -45,6 +45,7 @@ export const SYSTEM_POST_MANAGEMENT_MENU_ID = 'system-post-management';
 export const SYSTEM_TENANT_MANAGEMENT_MENU_ID = 'system-tenant-management';
 export const SYSTEM_DATA_PERMISSIONS_MENU_ID = 'system-data-permissions';
 export const SYSTEM_IMPORT_EXPORT_MENU_ID = 'system-import-export';
+export const SYSTEM_HANDOVER_MENU_ID = 'system-handover';
 export const SYSTEM_FLOW_DEFINITION_MENU_ID = 'system-flow-definition';
 export const SYSTEM_FLOW_DESIGNER_MENU_ID = 'system-flow-designer';
 export const SYSTEM_FORM_CONFIG_MENU_ID = 'system-form-config';
@@ -485,6 +486,18 @@ export const SYSTEM_IMPORT_EXPORT_MODULE = {
   },
 } as const satisfies SystemModuleRegistryItem;
 
+export const SYSTEM_HANDOVER_MODULE = {
+  menuId: SYSTEM_HANDOVER_MENU_ID,
+  label: '交接管理',
+  navGroup: '组织权限',
+  workbenchPath: '/fixed-assets/workbenchv3?menu=system-handover',
+  legacyRoute: '/fixed-assets/workbenchv3?menu=system-handover',
+  permissionMeta: {
+    viewPermissions: ['system:handover:query', 'system:handover:read'],
+    actionPermissions: {},
+  },
+} as const satisfies SystemModuleRegistryItem;
+
 export const SYSTEM_FLOW_DEFINITION_MODULE = {
   menuId: SYSTEM_FLOW_DEFINITION_MENU_ID,
   label: '流程定义',
@@ -658,6 +671,7 @@ export const systemModuleRegistry = [
   SYSTEM_TENANT_MANAGEMENT_MODULE,
   SYSTEM_DATA_PERMISSIONS_MODULE,
   SYSTEM_IMPORT_EXPORT_MODULE,
+  SYSTEM_HANDOVER_MODULE,
   SYSTEM_FLOW_DEFINITION_MODULE,
   SYSTEM_FLOW_DESIGNER_MODULE,
   SYSTEM_FORM_CONFIG_MODULE,

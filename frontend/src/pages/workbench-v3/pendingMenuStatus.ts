@@ -24,12 +24,6 @@ export interface PendingMenuStatus {
 }
 
 export const pendingMenuStatus: Record<string, PendingMenuStatus> = {
-  'system-handover': {
-    backend: 'none',
-    backendNote: '后端零实现。仅 TenantContext 同名，与离职交接无关。',
-    phase: 'P1',
-    plan: '新建 handover 表 + 对象摘要 schema，明确 PENDING/IN_PROGRESS/COMPLETED/CANCELLED 状态机与真实资产/工单/审批对象转移的事务边界。',
-  },
   'system-workflow-mail': {
     backend: 'none',
     backendNote: '后端零实现。无 WorkflowMail/BpmMailConfig 相关类，存在零业务调用风险。',
