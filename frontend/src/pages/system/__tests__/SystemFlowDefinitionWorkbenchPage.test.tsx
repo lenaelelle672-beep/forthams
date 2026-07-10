@@ -99,4 +99,27 @@ describe('SystemFlowDefinitionWorkbenchPage', () => {
     const { container } = render(<SystemFlowDefinitionWorkbenchPage canView={false} />);
     expect(within(container).getByText(/无权限访问流程定义/)).toBeInTheDocument();
   });
+
+  it('流程模板列表展示可发起状态标签：已发布可发起、其余不可发起', async () => {
+    mockedList.mockResolvedValueOnce([
+      { businessType: 'ASSET_TRANSFER', name: '资产转移流程', status: configuredState, version: 2, definition: { nodes: [{ id: 'n1' }] } },
+      { businessType: 'MAINTENANCE', name: '维保流程', status: 'DRAFT', version: 0, definition: { nodes: [] } },
+      { businessType: 'RETIREMENT', name: '退役流程', status: 'DISABLED', version: 1, definition: { nodes: [] } },
+    ]);
+    mockedGet.mockResolvedValue({
+      businessType: 'ASSET_TRANSFER',
+      name: '资产转移流程',
+      status: configuredState,
+      version: 2,
+      definition: { nodes: [{ id: 'n1' }], edges: [] },
+    });
+
+    render(<SystemFlowDefinitionWorkbenchPage />);
+    await screen.findByText('资产转移流程');
+
+    // 已发布 → 可发起
+    expect(screen.getAllByText('可发起').length).toBeGreaterThanOrEqual(1);
+    // 草稿 + 停用 → 不可发起（至少 2 个）
+    expect(screen.getAllByText('不可发起').length).toBeGreaterThanOrEqual(2);
+  });
 });

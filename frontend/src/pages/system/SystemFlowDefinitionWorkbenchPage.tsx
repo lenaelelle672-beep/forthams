@@ -15,9 +15,15 @@ type FlowStatusFilter = 'all' | 'configured' | 'unconfigured' | 'disabled';
 
 const FLOW_UNCONFIGURED_STATUS = 'UNCONFIGURED';
 const FLOW_DISABLED_STATUS = 'DISABLED';
+const FLOW_PUBLISHED_STATUS = 'PUBLISHED';
 
 function statusValue(status: string | null | undefined) {
   return String(status ?? '').trim().toUpperCase();
+}
+
+/** 已发布流程可发起；未配置/草稿/停用一律阻断。与后端 /workflow-runtime/{bt}/start-availability 的判定一致。 */
+function canStart(status: string | null | undefined) {
+  return statusValue(status) === FLOW_PUBLISHED_STATUS;
 }
 
 function statusLabel(status: string | null | undefined) {
@@ -223,17 +229,25 @@ export default function SystemFlowDefinitionWorkbenchPage({
                   <th className="py-2 pr-3">名称</th>
                   <th className="py-2 pr-3">版本</th>
                   <th className="py-2 pr-3">状态</th>
+                  <th className="py-2 pr-3">可发起</th>
                   <th className="py-2 pr-3">节点</th>
                   <th className="py-2 pr-3">摘要</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {visibleDefinitions.map((definition) => (
+                {visibleDefinitions.map((definition) => {
+                  const startable = canStart(definition.status);
+                  return (
                   <tr key={definition.businessType}>
                     <td className="py-2 pr-3 font-medium text-slate-800">{definition.businessType}</td>
                     <td className="py-2 pr-3 text-slate-600">{definition.name}</td>
                     <td className="py-2 pr-3 text-slate-500">v{definition.version ?? 0}</td>
                     <td className="py-2 pr-3 text-slate-500">{statusLabel(definition.status)}</td>
+                    <td className="py-2 pr-3">
+                      <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${startable ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500'}`}>
+                        {startable ? '可发起' : '不可发起'}
+                      </span>
+                    </td>
                     <td className="py-2 pr-3 text-slate-500">{nodeCount(definition.definition)} 个</td>
                     <td className="py-2 pr-3">
                       <button
@@ -246,7 +260,8 @@ export default function SystemFlowDefinitionWorkbenchPage({
                       </button>
                     </td>
                   </tr>
-                ))}
+                  );
+                })}
               </tbody>
             </table>
           </div>
