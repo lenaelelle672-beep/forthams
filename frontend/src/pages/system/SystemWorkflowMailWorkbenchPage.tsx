@@ -1,0 +1,212 @@
+import { FormEvent, useEffect, useMemo, useState } from 'react';
+import {
+  listWorkflowMailConfigs,
+  getWorkflowMailMeta,
+  type WorkflowMailConfigRecord,
+  type WorkflowMailMeta,
+  type WorkflowMailQuery,
+} from '../../api/workflowMail';
+
+type SystemWorkflowMailWorkbenchPageProps = {
+  embeddedInWorkbench?: boolean;
+  canView?: boolean;
+};
+
+type EnabledFilter = 'all' | 'enabled' | 'disabled';
+
+function emptyMeta(): WorkflowMailMeta {
+  return { triggerEvents: [], recipientScopes: [], readOnlyNotice: '流程邮件配置为只读 catalog。' };
+}
+
+function matchesKeyword(record: WorkflowMailConfigRecord, keyword: string) {
+  if (!keyword) return true;
+  const normalized = keyword.toLowerCase();
+  return [record.businessType, record.nodeKey, record.nodeName ?? '', record.templateCode ?? '']
+    .join(' ')
+    .toLowerCase()
+    .includes(normalized);
+}
+
+export default function SystemWorkflowMailWorkbenchPage({
+  embeddedInWorkbench = false,
+  canView = true,
+}: SystemWorkflowMailWorkbenchPageProps) {
+  const [records, setRecords] = useState<WorkflowMailConfigRecord[]>([]);
+  const [total, setTotal] = useState(0);
+  const [meta, setMeta] = useState<WorkflowMailMeta>(emptyMeta);
+  const [keyword, setKeyword] = useState('');
+  const [businessType, setBusinessType] = useState('');
+  const [enabledFilter, setEnabledFilter] = useState<EnabledFilter>('all');
+  const [loading, setLoading] = useState(canView);
+  const [error, setError] = useState<string | null>(null);
+
+  const loadConfigs = async (query: WorkflowMailQuery = {}) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const [data, nextMeta] = await Promise.all([
+        listWorkflowMailConfigs({ page: 1, pageSize: 50, ...query }),
+        getWorkflowMailMeta(),
+      ]);
+      setRecords(data?.records ?? []);
+      setTotal(data?.total ?? 0);
+      setMeta(nextMeta ?? emptyMeta());
+    } catch {
+      setRecords([]);
+      setTotal(0);
+      setMeta(emptyMeta());
+      setError('流程邮件配置加载失败，敏感细节已脱敏');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!canView) {
+      setLoading(false);
+      return;
+    }
+    void loadConfigs();
+  }, [canView]);
+
+  const visibleRecords = useMemo(
+    () => records.filter((r) => {
+      if (enabledFilter === 'enabled' && !r.enabled) return false;
+      if (enabledFilter === 'disabled' && r.enabled) return false;
+      return matchesKeyword(r, keyword);
+    }),
+    [records, enabledFilter, keyword],
+  );
+
+  const enabledCount = useMemo(() => records.filter((r) => r.enabled).length, [records]);
+
+  const handleSearch = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const query: WorkflowMailQuery = {};
+    if (businessType.trim()) query.businessType = businessType.trim();
+    if (enabledFilter === 'enabled') query.enabled = 1;
+    if (enabledFilter === 'disabled') query.enabled = 0;
+    void loadConfigs(query);
+  };
+
+  if (!canView) {
+    return (
+      <section className="space-y-4" data-embedded={embeddedInWorkbench}>
+        <div role="alert" className="rounded-2xl bg-amber-50 px-4 py-3 text-sm text-amber-700">
+          无权限访问流程邮件配置，请确认 mail:workflow:query 权限。
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section className="space-y-5" data-embedded={embeddedInWorkbench}>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h3 className="text-lg font-semibold">流程邮件</h3>
+          <p className="mt-1 text-sm text-slate-500">只读展示流程节点邮件配置、触发事件、模板与收件人范围。</p>
+        </div>
+        <button
+          className="rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-700 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
+          disabled={loading}
+          type="button"
+          onClick={() => void loadConfigs()}
+        >
+          重新加载
+        </button>
+      </div>
+
+      <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+        只读边界：本页仅展示流程节点邮件配置；新增、编辑、删除、测试发送等写操作不在 V3 只读 catalog 范围内。真实邮件发送未接入流程平台，存在零业务调用风险。
+      </div>
+
+      <div className="grid gap-3 sm:grid-cols-3">
+        <div className="rounded-2xl border border-slate-200 p-4">
+          <p className="text-xs text-slate-500">配置总数</p>
+          <p className="mt-2 text-2xl font-semibold text-slate-900">{total}</p>
+        </div>
+        <div className="rounded-2xl border border-slate-200 p-4">
+          <p className="text-xs text-slate-500">已启用</p>
+          <p className="mt-2 text-2xl font-semibold text-emerald-600">{enabledCount}</p>
+        </div>
+        <div className="rounded-2xl border border-slate-200 p-4">
+          <p className="text-xs text-slate-500">当前过滤结果</p>
+          <p className="mt-2 text-2xl font-semibold text-slate-900">{visibleRecords.length}</p>
+        </div>
+      </div>
+
+      <form className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_160px_160px_auto]" onSubmit={handleSearch}>
+        <input
+          className="rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-400"
+          placeholder="按业务类型、节点或模板搜索"
+          value={keyword}
+          onChange={(event) => setKeyword(event.target.value)}
+        />
+        <input
+          className="rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-400"
+          placeholder="业务类型精确筛选"
+          value={businessType}
+          onChange={(event) => setBusinessType(event.target.value)}
+        />
+        <select
+          className="rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-400"
+          value={enabledFilter}
+          onChange={(event) => setEnabledFilter(event.target.value as EnabledFilter)}
+        >
+          <option value="all">全部</option>
+          <option value="enabled">已启用</option>
+          <option value="disabled">已停用</option>
+        </select>
+        <button className="rounded-xl bg-slate-900 px-4 py-2 text-sm text-white disabled:cursor-not-allowed disabled:bg-slate-300" disabled={loading} type="submit">搜索</button>
+      </form>
+
+      {error ? <div role="alert" className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div> : null}
+      {loading ? <div className="text-sm text-slate-500">配置加载中...</div> : null}
+      {!loading && !error && visibleRecords.length === 0 ? (
+        <div className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm text-slate-500">暂无流程邮件配置记录。</div>
+      ) : null}
+
+      <div className="rounded-2xl border border-slate-200 p-4">
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+          <h4 className="font-semibold">流程节点邮件配置</h4>
+          <span className="text-xs text-slate-500">显示 {visibleRecords.length} / {records.length} 条</span>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="min-w-full text-left text-sm">
+            <thead className="text-xs text-slate-500">
+              <tr>
+                <th className="py-2 pr-3">业务类型</th>
+                <th className="py-2 pr-3">节点</th>
+                <th className="py-2 pr-3">触发事件</th>
+                <th className="py-2 pr-3">模板</th>
+                <th className="py-2 pr-3">收件人</th>
+                <th className="py-2 pr-3">状态</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {visibleRecords.map((record) => (
+                <tr key={record.id}>
+                  <td className="py-2 pr-3 font-medium text-slate-800">{record.businessType}</td>
+                  <td className="py-2 pr-3 text-slate-600">{record.nodeName ?? record.nodeKey}</td>
+                  <td className="py-2 pr-3 text-slate-500">{record.triggerEventLabel}</td>
+                  <td className="py-2 pr-3 text-slate-500">{record.templateCode ?? '-'}</td>
+                  <td className="py-2 pr-3 text-slate-500">{record.recipientScopeLabel}</td>
+                  <td className="py-2 pr-3">
+                    <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${record.enabled ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500'}`}>
+                      {record.enabled ? '已启用' : '已停用'}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
+        <p className="text-xs text-slate-400">只读提示</p>
+        <p className="mt-1">{meta.readOnlyNotice}</p>
+      </div>
+    </section>
+  );
+}

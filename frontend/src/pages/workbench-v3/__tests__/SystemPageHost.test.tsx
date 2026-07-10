@@ -5,9 +5,9 @@ import SystemPageHost from '../SystemPageHost';
 describe('SystemPageHost 建设中占位页', () => {
   it('待接入菜单展示后端就绪状态徽章与建设计划', () => {
     render(
-      <SystemPageHost activeMenu="system-workflow-mail" activeMenuLabel="流程邮件" />,
+      <SystemPageHost activeMenu="system-doc-center" activeMenuLabel="文档中心" />,
     );
-    // 后端状态徽章（workflow-mail 是后端零实现）
+    // 后端状态徽章（doc-center 是后端零实现）
     expect(screen.getByText('后端零实现')).toBeInTheDocument();
     // 计划阶段徽章
     expect(screen.getByText('计划 P2')).toBeInTheDocument();
@@ -18,7 +18,7 @@ describe('SystemPageHost 建设中占位页', () => {
 
   it('后端零实现的菜单展示红色徽章', () => {
     render(
-      <SystemPageHost activeMenu="system-workflow-mail" activeMenuLabel="流程邮件" />,
+      <SystemPageHost activeMenu="system-doc-center" activeMenuLabel="文档中心" />,
     );
     expect(screen.getByText('后端零实现')).toBeInTheDocument();
   });

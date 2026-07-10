@@ -24,12 +24,6 @@ export interface PendingMenuStatus {
 }
 
 export const pendingMenuStatus: Record<string, PendingMenuStatus> = {
-  'system-workflow-mail': {
-    backend: 'none',
-    backendNote: '后端零实现。无 WorkflowMail/BpmMailConfig 相关类，存在零业务调用风险。',
-    phase: 'P2',
-    plan: '校准流程节点邮件触发服务，接入流程平台发送决策链与模板渲染，补发送审计。',
-  },
   'system-doc-center': {
     backend: 'none',
     backendNote: '后端零实现。',
