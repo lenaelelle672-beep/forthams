@@ -23,20 +23,7 @@ export interface PendingMenuStatus {
   plan: string;
 }
 
-export const pendingMenuStatus: Record<string, PendingMenuStatus> = {
-  'system-doc-center': {
-    backend: 'none',
-    backendNote: '后端零实现。',
-    phase: 'P2',
-    plan: '待定：内部文档中心还是外部知识库。需用户决策后设计 DocArticle/DocVersion + 附件安全。',
-  },
-  'system-tech-support': {
-    backend: 'none',
-    backendNote: '后端零实现。',
-    phase: 'P2',
-    plan: '设计 SupportTicket + 诊断包（强制脱敏，禁止导出敏感配置原值）与支持工单流转。',
-  },
-};
+export const pendingMenuStatus: Record<string, PendingMenuStatus> = {};
 
 export function getPendingMenuStatus(menuId: string): PendingMenuStatus | undefined {
   return pendingMenuStatus[menuId];

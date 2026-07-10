@@ -60,6 +60,8 @@ export const workbenchV3IntegrationMenus: WorkbenchV3MenuItem[] = [
   { id: 'system-import-export', label: '导入导出', description: '任务历史只读 catalog、脱敏错误摘要与导入导出行数上限', status: '已接入真组件' },
   { id: 'system-handover', label: '交接管理', description: '交接任务摘要只读 catalog、状态记录与未闭环风险提示', status: '已接入真组件' },
   { id: 'system-workflow-mail', label: '流程邮件', description: '流程节点邮件配置只读 catalog、触发事件与零业务调用风险提示', status: '已接入真组件' },
+  { id: 'system-doc-center', label: '文档中心', description: '文档目录只读 catalog、分类版本状态与附件计数', status: '已接入真组件' },
+  { id: 'system-tech-support', label: '技术支持', description: '技术支持工单只读 catalog、优先级状态与诊断包脱敏标记', status: '已接入真组件' },
   { id: 'system-flow-definition', label: '流程定义', description: '流程模板目录、业务类型搜索与节点摘要', status: '已接入真组件' },
   { id: 'system-flow-designer', label: '流程设计器', description: '草稿保存、图结构校验、发布与版本恢复', status: '已接入真组件' },
   { id: 'system-form-config', label: '表单配置', description: '表单定义、schema 安全过滤、发布停用与版本恢复', status: '已接入真组件' },
@@ -194,7 +196,7 @@ export default function WorkbenchV3Page() {
       <main className="p-6">
       <section className="rounded-3xl border border-blue-100 bg-white p-6 shadow-sm">
         <h1 className="text-2xl font-semibold">系统管理 V3 工作台</h1>
-        <p className="mt-2 text-sm text-slate-500">四十二项菜单只通过 V3 registry、module metadata、专属页面与专属 API 访问；system-workflow-mail 已接入流程节点邮件配置只读 catalog；仍非 44 项全量覆盖，仍不是 Workbench V3 全量完成，组织权限组已完成，基础资料组已完成，消息与通知组已完成，系统参数组未全组完成。</p>
+        <p className="mt-2 text-sm text-slate-500">四十四项菜单全部通过 V3 registry、module metadata、专属页面与专属 API 访问；system-tech-support 已接入技术支持工单只读 catalog；已达成 44 项全量覆盖，流程平台 9/9、组织权限组 8/8、基础资料组 6/6、集成配置组 5/5、消息与通知组 8/8、系统参数组 8/8 全部完成；仍需后续权限专项与真实写操作能力补强。</p>
       </section>
 
       <nav className="mt-4 rounded-3xl border border-slate-200 bg-white p-4 shadow-sm" aria-label="Workbench V3 六域顶部导航">

@@ -171,12 +171,12 @@ describe('Workbench platform entry contract', () => {
     expect(workbenchV3Page).toContain("id: 'system-numbering-rules'");
     expect(workbenchV3Page).toContain("id: 'system-custom-fields'");
     expect(workbenchV3Page).toContain("id: 'system-custom-field-sets'");
-    expect(workbenchV3Page).toContain('四十二项菜单');
-    expect(workbenchV3Page).toContain('system-workflow-mail 已接入流程节点邮件配置只读 catalog');
-    expect(workbenchV3Page).toContain('仍不是 Workbench V3 全量完成');
-    expect(workbenchV3Page).toContain('基础资料组已完成');
-    expect(workbenchV3Page).toContain('消息与通知组已完成');
-    expect(workbenchV3Page).toContain('系统参数组未全组完成');
+    expect(workbenchV3Page).toContain('四十四项菜单');
+    expect(workbenchV3Page).toContain('system-tech-support 已接入技术支持工单只读 catalog');
+    expect(workbenchV3Page).toContain('已达成 44 项全量覆盖');
+    expect(workbenchV3Page).toContain('基础资料组 6/6');
+    expect(workbenchV3Page).toContain('消息与通知组 8/8');
+    expect(workbenchV3Page).toContain('系统参数组 8/8 全部完成');
     expect(workbenchV3Page).not.toContain('system-menu-permissions 仍保持 blocked');
     expect(workbenchV3Page).not.toContain('Day6 pending reviewer gate');
     expect(workbenchV3Page).not.toContain('accepted coverage 仍为 8/9');
