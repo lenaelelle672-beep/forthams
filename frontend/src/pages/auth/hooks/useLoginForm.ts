@@ -4,7 +4,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { useNavigate, useSearchParams } from 'react-router';
+import { useNavigate, useSearchParams, useLocation } from 'react-router';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
@@ -14,6 +14,7 @@ import { loginSchema, type LoginFormValues } from '../loginConfig';
 
 export function useLoginForm() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   const { login } = useAuth();
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -55,7 +56,9 @@ export function useLoginForm() {
       } else {
         localStorage.removeItem('remembered_username');
       }
-      navigate('/fixed-assets/workbench?menu=home', { replace: true });
+      // 优先返回用户原本要访问的页面（ProtectedRoute 传入的 state.from）
+      const from = (location.state as { from?: string } | null)?.from;
+      navigate(from || '/fixed-assets/workbench?menu=home', { replace: true });
     },
     onError: (err: any) => {
       const msg = err?.message || '网络错误，请检查网络后重试';

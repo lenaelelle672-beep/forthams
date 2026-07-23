@@ -104,6 +104,12 @@ public class ApprovalService {
             throw new BusinessException("当前流程不可审批");
         }
 
+        // 自审批检查：审批人不能审批自己发起的请求（职责分离）
+        Object applicantId = BeanUtil.getProperty(process, "applicantId");
+        if (applicantId != null && approverId != null && approverId.equals(applicantId)) {
+            throw new BusinessException("不能审批自己发起的流程");
+        }
+
         ApprovalRecord record = new ApprovalRecord();
         BeanUtil.setProperty(record, "processId", processId);
         BeanUtil.setProperty(record, "tenantId", tenantId);

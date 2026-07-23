@@ -33,7 +33,6 @@ vi.mock('../../src/utils/http', () => ({
 }));
 
 import http from '../../src/utils/http';
-import type { AxiosResponse } from 'axios';
 import * as inventoryApi from '../../src/api/inventory';
 
 // Typed mock references
@@ -45,9 +44,14 @@ const mockedPatch = vi.mocked(http.patch);
 // Helpers
 // ---------------------------------------------------------------------------
 
-/** Shorthand to build a fake AxiosResponse whose `.data` is the given value. */
-function axiosOk<T>(data: T): AxiosResponse<T> {
-  return { data, status: 200, statusText: 'OK', headers: {}, config: {} as any };
+/**
+ * The shared http wrapper (utils/http.ts) has a response interceptor that
+ * unwraps Result<T> and returns `payload.data` directly, so callers receive
+ * the bare payload — never an AxiosResponse. Mocks therefore resolve to the
+ * unwrapped value itself. This helper is kept as a no-op for readability.
+ */
+function axiosOk<T>(data: T): T {
+  return data;
 }
 
 // ---------------------------------------------------------------------------

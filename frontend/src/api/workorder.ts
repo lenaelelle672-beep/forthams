@@ -269,7 +269,7 @@ export async function getWorkOrderList(
   query: WorkOrderListQueryCompat = {},
 ): Promise<WorkOrderPageData<WorkOrderListItem>> {
   const { page = 1, pageSize = 10, ...rest } = query;
-  const response = await http.get<
+  const payload = await http.get<
     WorkOrderPageData<WorkOrderListItem> | { data: WorkOrderPageData<WorkOrderListItem> }
   >('/workorders', {
     params: {
@@ -278,48 +278,40 @@ export async function getWorkOrderList(
       ...rest,
     },
   });
-  const payload = response.data;
   return 'records' in payload ? payload : payload.data;
 }
 
 export type WorkOrder = WorkOrderDetail & Record<string, unknown>;
 
 export async function createWorkOrder(data: Record<string, unknown>) {
-  const response = await http.post(WORKORDER_BASE_URL, data);
-  return response.data;
+  return http.post(WORKORDER_BASE_URL, data);
 }
 
 export async function updateWorkOrder(orderId: string | number, data: Record<string, unknown>) {
-  const response = await http.put(`${WORKORDER_BASE_URL}/${encodeURIComponent(String(orderId))}`, data);
-  return response.data;
+  return http.put(`${WORKORDER_BASE_URL}/${encodeURIComponent(String(orderId))}`, data);
 }
 
 export async function deleteWorkOrder(orderId: string | number) {
-  const response = await http.delete(`${WORKORDER_BASE_URL}/${encodeURIComponent(String(orderId))}`);
-  return response.data;
+  return http.delete(`${WORKORDER_BASE_URL}/${encodeURIComponent(String(orderId))}`);
 }
 
 export async function submitWorkOrder(orderId: string | number) {
-  const response = await http.post(`${WORKORDER_BASE_URL}/${encodeURIComponent(String(orderId))}/submit`);
-  return response.data;
+  return http.post(`${WORKORDER_BASE_URL}/${encodeURIComponent(String(orderId))}/submit`);
 }
 
 export async function cancelWorkOrder(orderId: string | number, data: Record<string, unknown> = {}) {
-  const response = await http.post(`${WORKORDER_BASE_URL}/${encodeURIComponent(String(orderId))}/operate`, {
+  return http.post(`${WORKORDER_BASE_URL}/${encodeURIComponent(String(orderId))}/operate`, {
     operation: 'cancel',
     ...data,
   });
-  return response.data;
 }
 
 export async function holdWorkOrder(orderId: string | number, data: Record<string, unknown>) {
-  const response = await http.post(`${WORKORDER_BASE_URL}/${encodeURIComponent(String(orderId))}/hold`, data);
-  return response.data;
+  return http.post(`${WORKORDER_BASE_URL}/${encodeURIComponent(String(orderId))}/hold`, data);
 }
 
 export async function resumeWorkOrder(orderId: string | number, data: Record<string, unknown> = {}) {
-  const response = await http.post(`${WORKORDER_BASE_URL}/${encodeURIComponent(String(orderId))}/resume`, data);
-  return response.data;
+  return http.post(`${WORKORDER_BASE_URL}/${encodeURIComponent(String(orderId))}/resume`, data);
 }
 
 /**
@@ -352,8 +344,7 @@ export async function getPendingApprovals(
     params.status = status;
   }
 
-  const response = await http.get<PaginatedResponse<WorkOrderListItem>>(`${BASE_URL}/pending`, { params });
-  return response.data;
+  return http.get<PaginatedResponse<WorkOrderListItem>>(`${BASE_URL}/pending`, { params });
 }
 
 /**
@@ -364,8 +355,7 @@ export async function getPendingApprovals(
  * @throws {BusinessErrorResponse} 工单不存在时返回 404
  */
 export async function getWorkOrderDetail(orderId: string | number): Promise<WorkOrderDetail> {
-  const response = await http.get<WorkOrderDetail>(`${WORKORDER_BASE_URL}/${encodeURIComponent(String(orderId))}`);
-  return response.data;
+  return http.get<WorkOrderDetail>(`${WORKORDER_BASE_URL}/${encodeURIComponent(String(orderId))}`);
 }
 
 /**
@@ -387,11 +377,10 @@ export async function approveWorkOrder(
   orderId: string | number,
   data: Partial<ApproveRequest> & Record<string, unknown> = {},
 ): Promise<ApprovalResponse> {
-  const response = await http.post<ApprovalResponse>(
+  return http.post<ApprovalResponse>(
     `${WORKORDER_BASE_URL}/${encodeURIComponent(String(orderId))}/approve`,
     data,
   );
-  return response.data;
 }
 
 /**
@@ -416,35 +405,31 @@ export async function rejectWorkOrder(
   orderId: string | number,
   data: Partial<RejectRequest> & Record<string, unknown> = {},
 ): Promise<ApprovalResponse> {
-  const response = await http.post<ApprovalResponse>(
+  return http.post<ApprovalResponse>(
     `${WORKORDER_BASE_URL}/${encodeURIComponent(String(orderId))}/reject`,
     data,
   );
-  return response.data;
 }
 
 export async function submitForAcceptance(
   orderId: string | number,
   data: { comment?: string } = {},
 ) {
-  const response = await http.post(`/workorders/${encodeURIComponent(String(orderId))}/submit-acceptance`, data);
-  return response.data;
+  return http.post(`/workorders/${encodeURIComponent(String(orderId))}/submit-acceptance`, data);
 }
 
 export async function acceptWorkOrder(
   orderId: string | number,
   data: { comment?: string } = {},
 ) {
-  const response = await http.post(`/workorders/${encodeURIComponent(String(orderId))}/accept`, data);
-  return response.data;
+  return http.post(`/workorders/${encodeURIComponent(String(orderId))}/accept`, data);
 }
 
 export async function rejectAcceptance(
   orderId: string | number,
   data: { comment?: string } = {},
 ) {
-  const response = await http.post(`/workorders/${encodeURIComponent(String(orderId))}/reject-acceptance`, data);
-  return response.data;
+  return http.post(`/workorders/${encodeURIComponent(String(orderId))}/reject-acceptance`, data);
 }
 
 /**
@@ -456,10 +441,9 @@ export async function rejectAcceptance(
  * @returns 审批记录列表
  */
 export async function getApprovalRecords(orderId: string): Promise<ApprovalRecord[]> {
-  const response = await http.get<ApprovalRecord[]>(
+  return http.get<ApprovalRecord[]>(
     `${BASE_URL}/${encodeURIComponent(orderId)}/approval-records`,
   );
-  return response.data;
 }
 
 /**
@@ -474,10 +458,9 @@ export async function getApprovalRecords(orderId: string): Promise<ApprovalRecor
 export async function pollWorkOrderStatus(
   orderId: string,
 ): Promise<{ id: string; status: OrderStatus; version: number }> {
-  const response = await http.get<{ id: string; status: OrderStatus; version: number }>(
+  return http.get<{ id: string; status: OrderStatus; version: number }>(
     `${BASE_URL}/${encodeURIComponent(orderId)}/status`,
   );
-  return response.data;
 }
 
 /**
@@ -489,12 +472,12 @@ export async function pollWorkOrderStatus(
 export async function batchPollWorkOrderStatus(
   orderIds: string[],
 ): Promise<Map<string, { status: OrderStatus; version: number }>> {
-  const response = await http.post<{ id: string; status: OrderStatus; version: number }[]>(
+  const items = await http.post<{ id: string; status: OrderStatus; version: number }[]>(
     `${BASE_URL}/batch-status`,
     { orderIds },
   );
   const map = new Map<string, { status: OrderStatus; version: number }>();
-  for (const item of response.data) {
+  for (const item of items) {
     map.set(item.id, { status: item.status, version: item.version });
   }
   return map;
@@ -642,7 +625,7 @@ export const workOrderApi = {
   cancel: cancelWorkOrder,
   cancelWorkOrder,
   close(orderId: string | number) {
-    return http.post(`${WORKORDER_BASE_URL}/${encodeURIComponent(String(orderId))}/close`).then((response) => response.data);
+    return http.post(`${WORKORDER_BASE_URL}/${encodeURIComponent(String(orderId))}/close`);
   },
   hold: holdWorkOrder,
   holdWorkOrder,
@@ -661,25 +644,25 @@ export const workOrderApi = {
     return getApprovalRecords(String(orderId));
   },
   getAuditLog(orderId: string | number) {
-    return http.get(`${WORKORDER_BASE_URL}/${encodeURIComponent(String(orderId))}/audit-log`).then((response) => response.data);
+    return http.get(`${WORKORDER_BASE_URL}/${encodeURIComponent(String(orderId))}/audit-log`);
   },
   getApprovalChain(orderId: string | number) {
-    return http.get(`${WORKORDER_BASE_URL}/${encodeURIComponent(String(orderId))}/approval-chain`).then((response) => response.data);
+    return http.get(`${WORKORDER_BASE_URL}/${encodeURIComponent(String(orderId))}/approval-chain`);
   },
   delegate(orderId: string | number, data: Record<string, unknown>) {
-    return http.post(`${WORKORDER_BASE_URL}/${encodeURIComponent(String(orderId))}/delegate`, data).then((response) => response.data);
+    return http.post(`${WORKORDER_BASE_URL}/${encodeURIComponent(String(orderId))}/delegate`, data);
   },
   transfer(orderId: string | number, data: Record<string, unknown>) {
-    return http.post(`${WORKORDER_BASE_URL}/${encodeURIComponent(String(orderId))}/transfer`, data).then((response) => response.data);
+    return http.post(`${WORKORDER_BASE_URL}/${encodeURIComponent(String(orderId))}/transfer`, data);
   },
   returnToApplicant(orderId: string | number, data: Record<string, unknown>) {
-    return http.post(`${WORKORDER_BASE_URL}/${encodeURIComponent(String(orderId))}/return`, data).then((response) => response.data);
+    return http.post(`${WORKORDER_BASE_URL}/${encodeURIComponent(String(orderId))}/return`, data);
   },
   batchApprove(data: Record<string, unknown>) {
-    return http.post(`${WORKORDER_BASE_URL}/batch-approve`, data).then((response) => response.data);
+    return http.post(`${WORKORDER_BASE_URL}/batch-approve`, data);
   },
   saveDraft(data: Record<string, unknown>) {
-    return http.post(`${WORKORDER_BASE_URL}/drafts`, data).then((response) => response.data);
+    return http.post(`${WORKORDER_BASE_URL}/drafts`, data);
   },
   submitApproval(orderId: string | number, data: Record<string, unknown>) {
     return approveWorkOrder(orderId, data);

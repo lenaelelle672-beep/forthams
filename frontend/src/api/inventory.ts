@@ -8,7 +8,6 @@
  */
 
 import http from '@/utils/http';
-import type { AxiosResponse } from 'axios';
 
 // ============================================================
 // 类型定义
@@ -215,9 +214,7 @@ const INVENTORY_TASKS_BASE = '/api/v1/inventory/tasks';
 export async function getInventoryTasks(
   query: TaskListQuery = {},
 ): Promise<PaginatedResponse<InventoryTask>> {
-  const response: AxiosResponse<PaginatedResponse<InventoryTask>> =
-    await http.get(INVENTORY_TASKS_BASE, { params: query });
-  return response.data;
+  return http.get(INVENTORY_TASKS_BASE, { params: query });
 }
 
 /**
@@ -233,9 +230,7 @@ export async function getInventoryTasks(
 export async function createInventoryTask(
   payload: CreateTaskPayload,
 ): Promise<InventoryTask> {
-  const response: AxiosResponse<InventoryTask> =
-    await http.post(INVENTORY_TASKS_BASE, payload);
-  return response.data;
+  return http.post(INVENTORY_TASKS_BASE, payload);
 }
 
 /**
@@ -251,9 +246,7 @@ export async function createInventoryTask(
 export async function getInventoryTaskDetail(
   taskId: string,
 ): Promise<InventoryTask> {
-  const response: AxiosResponse<InventoryTask> =
-    await http.get(`${INVENTORY_TASKS_BASE}/${taskId}`);
-  return response.data;
+  return http.get(`${INVENTORY_TASKS_BASE}/${taskId}`);
 }
 
 /**
@@ -271,9 +264,7 @@ export async function updateTaskStatus(
   payload: UpdateTaskStatusPayload | TaskStatus,
 ): Promise<InventoryTask> {
   const body = typeof payload === 'string' ? { status: payload } : payload;
-  const response: AxiosResponse<InventoryTask> =
-    await http.patch(`${INVENTORY_TASKS_BASE}/${taskId}/status`, body);
-  return response.data;
+  return http.patch(`${INVENTORY_TASKS_BASE}/${taskId}/status`, body);
 }
 
 // ============================================================
@@ -295,9 +286,7 @@ export async function getTaskAssets(
   taskId: string,
   query: AssetListQuery = {},
 ): Promise<PaginatedResponse<InventoryAsset>> {
-  const response: AxiosResponse<PaginatedResponse<InventoryAsset>> =
-    await http.get(`${INVENTORY_TASKS_BASE}/${taskId}/assets`, { params: query });
-  return response.data;
+  return http.get(`${INVENTORY_TASKS_BASE}/${taskId}/assets`, { params: query });
 }
 
 /** Compatibility alias for older inventory API contract. */
@@ -321,12 +310,10 @@ export async function confirmAsset(
   assetId: string,
   payload: ConfirmPayload,
 ): Promise<InventoryAsset> {
-  const response: AxiosResponse<InventoryAsset> =
-    await http.patch(
-      `${INVENTORY_TASKS_BASE}/${taskId}/assets/${assetId}/confirm`,
-      payload,
-    );
-  return response.data;
+  return http.patch(
+    `${INVENTORY_TASKS_BASE}/${taskId}/assets/${assetId}/confirm`,
+    payload,
+  );
 }
 
 /**
@@ -367,9 +354,7 @@ export async function batchConfirmAssets(
 export async function getTaskSummary(
   taskId: string,
 ): Promise<InventorySummary> {
-  const response: AxiosResponse<InventorySummary> =
-    await http.get(`${INVENTORY_TASKS_BASE}/${taskId}/summary`);
-  return response.data;
+  return http.get(`${INVENTORY_TASKS_BASE}/${taskId}/summary`);
 }
 
 /** Compatibility alias for older inventory API contract. */
@@ -389,18 +374,14 @@ export const getInventorySummary = getTaskSummary;
 export async function submitTask(
   taskId: string,
 ): Promise<InventoryTask> {
-  const response: AxiosResponse<InventoryTask> =
-    await http.post(`${INVENTORY_TASKS_BASE}/${taskId}/submit`);
-  return response.data;
+  return http.post(`${INVENTORY_TASKS_BASE}/${taskId}/submit`);
 }
 
 /** Compatibility alias for older inventory API contract. */
 export const submitForApproval = submitTask;
 
 export async function approveTask(taskId: string): Promise<InventoryTask> {
-  const response: AxiosResponse<InventoryTask> =
-    await http.post(`${INVENTORY_TASKS_BASE}/${taskId}/approve`);
-  return response.data;
+  return http.post(`${INVENTORY_TASKS_BASE}/${taskId}/approve`);
 }
 
 export const inventoryService = {

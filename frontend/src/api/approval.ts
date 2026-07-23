@@ -163,11 +163,10 @@ export async function approveOrder(
   orderId: number,
   params: ApproveRequest,
 ): Promise<WorkOrderDetailResponse> {
-  const { data } = await http.post<WorkOrderDetailResponse>(
+  return http.post<WorkOrderDetailResponse>(
     `/api/orders/${orderId}/approve`,
     params,
   );
-  return data;
 }
 
 /**
@@ -185,11 +184,10 @@ export async function rejectOrder(
   orderId: number,
   params: RejectRequest,
 ): Promise<WorkOrderDetailResponse> {
-  const { data } = await http.post<WorkOrderDetailResponse>(
+  return http.post<WorkOrderDetailResponse>(
     `/api/orders/${orderId}/reject`,
     params,
   );
-  return data;
 }
 
 /**
@@ -205,11 +203,10 @@ export async function rejectOrder(
 export async function getPendingApprovals(
   params?: PendingApprovalListParams,
 ): Promise<PendingApprovalListResponse> {
-  const { data } = await http.get<PendingApprovalListResponse>(
+  return http.get<PendingApprovalListResponse>(
     '/api/orders/pending',
     { params },
   );
-  return data;
 }
 
 /**
@@ -223,10 +220,9 @@ export async function getPendingApprovals(
 export async function getApprovalRecords(
   orderId: number,
 ): Promise<ApprovalRecordResponse[]> {
-  const { data } = await http.get<ApprovalRecordResponse[]>(
+  return http.get<ApprovalRecordResponse[]>(
     `/api/orders/${orderId}/approval-records`,
   );
-  return data;
 }
 
 /**
@@ -240,10 +236,9 @@ export async function getApprovalRecords(
 export async function getWorkOrderDetail(
   orderId: number,
 ): Promise<WorkOrderDetailResponse> {
-  const { data } = await http.get<WorkOrderDetailResponse>(
+  return http.get<WorkOrderDetailResponse>(
     `/api/orders/${orderId}`,
   );
-  return data;
 }
 
 export interface ApprovalItem {
@@ -264,41 +259,35 @@ export interface ProcessTypeStat {
 }
 
 export async function getApprovalList(params?: Record<string, unknown>) {
-  const { data } = await http.get<ApprovalItem[] | { records?: ApprovalItem[]; total?: number }>(
+  return http.get<ApprovalItem[] | { records?: ApprovalItem[]; total?: number }>(
     '/approvals',
     { params },
   );
-  return data;
 }
 
 export async function getPendingCount() {
-  const { data } = await http.get<number | { count?: number }>('/approvals/pending-count');
+  const data = await http.get<number | { count?: number }>('/approvals/pending-count');
   return typeof data === 'number' ? data : data.count ?? 0;
 }
 
 export async function getProcessStats() {
-  const { data } = await http.get<ProcessTypeStat[]>('/approvals/process-stats');
-  return data;
+  return http.get<ProcessTypeStat[]>('/approvals/process-stats');
 }
 
 export async function getApprovalDetail(id: string | number) {
-  const { data } = await http.get<ApprovalItem>(`/approvals/${encodeURIComponent(String(id))}`);
-  return data;
+  return http.get<ApprovalItem>(`/approvals/${encodeURIComponent(String(id))}`);
 }
 
 export async function approveItem(id: string | number, data: Record<string, unknown> = {}) {
-  const response = await http.post(`/approvals/${encodeURIComponent(String(id))}/approve`, data);
-  return response.data;
+  return http.post(`/approvals/${encodeURIComponent(String(id))}/approve`, data);
 }
 
 export async function rejectItem(id: string | number, data: Record<string, unknown> = {}) {
-  const response = await http.post(`/approvals/${encodeURIComponent(String(id))}/reject`, data);
-  return response.data;
+  return http.post(`/approvals/${encodeURIComponent(String(id))}/reject`, data);
 }
 
 export async function submitApproval(data: Record<string, unknown>) {
-  const response = await http.post('/approvals', data);
-  return response.data;
+  return http.post('/approvals', data);
 }
 
 export const approvalApi = {
@@ -320,10 +309,10 @@ export const approvalApi = {
   },
   rejectOrder,
   cancel(orderId: string | number, version?: number) {
-    return http.post(`/api/orders/${encodeURIComponent(String(orderId))}/cancel`, { version }).then((response) => response.data);
+    return http.post(`/api/orders/${encodeURIComponent(String(orderId))}/cancel`, { version });
   },
   cancelOrder(orderId: string | number, data: Record<string, unknown> = {}) {
-    return http.post(`/api/orders/${encodeURIComponent(String(orderId))}/cancel`, data).then((response) => response.data);
+    return http.post(`/api/orders/${encodeURIComponent(String(orderId))}/cancel`, data);
   },
 };
 

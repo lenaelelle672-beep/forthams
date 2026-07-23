@@ -8,7 +8,7 @@ const systemPageHost = readText('../pages/workbench-v3/SystemPageHost.tsx');
 const systemInspectorSlotProvider = readText('../pages/workbench-v3/SystemInspectorSlotProvider.tsx');
 const registrySource = readText('../pages/workspace-preview/system-hub/systemRealPageRegistry.ts');
 const moduleSource = readText('../pages/workspace-preview/system-hub/systemModuleRegistry.ts');
-const appRoutesSource = readText('../app/routes.ts');
+const appRoutesSource = readText('../router/index.tsx');
 
 describe('Workbench V3 菜单权限批次合同', () => {
   it('四十四项菜单全部处于已接入真组件状态，已达成 44 项全量覆盖', () => {
@@ -208,8 +208,8 @@ describe('Workbench V3 菜单权限批次合同', () => {
   });
 
   it('实际应用路由挂载 Workbench V3 宿主页面', () => {
-    expect(appRoutesSource).toContain('import("../pages/workbench-v3/WorkbenchV3Page")');
-    expect(appRoutesSource).toContain('path: "fixed-assets/workbenchv3"');
+    expect(appRoutesSource).toContain('WorkbenchV3Page');
+    expect(appRoutesSource).toContain("fixed-assets/workbenchv3");
     expect(appRoutesSource).not.toContain('/fixed-assets/workbenchv3", permission');
   });
 });

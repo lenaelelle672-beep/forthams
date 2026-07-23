@@ -23,6 +23,7 @@ class AssetStatusTest {
     void terminalStatusesShouldNotLeaveTerminalState() {
         assertFalse(AssetStatus.RETIRED.canTransitionTo(AssetStatus.IN_USE));
         assertFalse(AssetStatus.SCRAPPED.canTransitionTo(AssetStatus.IDLE));
-        assertTrue(AssetStatus.RETIRED.canTransitionTo(AssetStatus.RETIRED));
+        // 终端状态自转换也不允许（防止通过自转换修改终态资产的其他字段）
+        assertFalse(AssetStatus.RETIRED.canTransitionTo(AssetStatus.RETIRED));
     }
 }

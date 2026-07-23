@@ -25,11 +25,13 @@ public enum AssetStatus {
         if (nextStatus == null) {
             return false;
         }
-        if (this == nextStatus) {
-            return true;
-        }
+        // 终端状态（RETIRED/SCRAPPED/CLEARED）不可再转换，即使是自转换
+        // 此前 self-transition 检查在 terminal 检查之前，允许 SCRAPPED→SCRAPPED 绕过终端锁
         if (terminal) {
             return false;
+        }
+        if (this == nextStatus) {
+            return true;
         }
 
         return switch (this) {
