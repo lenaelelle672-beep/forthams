@@ -53,7 +53,7 @@ class ApprovalControllerTest {
                         .contextPath("/api")
                         .header("Authorization", "Bearer test-token")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"title\":\"Approval\",\"applicantId\":1}"))
+                        .content("{\"processType\":\"ASSET_APPROVAL\",\"title\":\"Approval\",\"applicantId\":1}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200));
 

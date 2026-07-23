@@ -5,7 +5,9 @@ import com.ams.dto.DeptCreateDTO;
 import com.ams.dto.DeptUpdateDTO;
 import com.ams.entity.Dept;
 import com.ams.service.DeptService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +15,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/depts")
 @RequiredArgsConstructor
+@Validated
 public class DeptController {
     private final DeptService deptService;
 
@@ -32,7 +35,7 @@ public class DeptController {
     }
 
     @PostMapping
-    public Result<Dept> create(@RequestBody DeptCreateDTO dto) {
+    public Result<Dept> create(@Valid @RequestBody DeptCreateDTO dto) {
         return Result.success(deptService.createDept(dto));
     }
 

@@ -56,13 +56,22 @@ export class ErrorBoundary extends Component<Props, State> {
               {error.stack}
             </pre>
           )}
-          <button
-            onClick={this.reset}
-            className="mt-5 flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 rounded-lg transition-colors"
-          >
-            <RefreshCw className="w-4 h-4" />
-            重试
-          </button>
+          <div className="mt-5 flex items-center gap-3">
+            <button
+              onClick={this.reset}
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 rounded-lg transition-colors"
+            >
+              <RefreshCw className="w-4 h-4" />
+              重试
+            </button>
+            <button
+              onClick={() => window.location.href = '/'}
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors"
+            >
+              返回首页
+            </button>
+          </div>
+          <p className="mt-3 text-xs text-slate-400">如反复出错，请刷新页面或联系管理员</p>
         </div>
       );
     }

@@ -1,6 +1,7 @@
 package com.ams.common;
 
 import com.ams.common.exception.BusinessException;
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
@@ -52,6 +53,20 @@ public class GlobalExceptionHandler {
                 .map(FieldError::getDefaultMessage)
                 .collect(Collectors.joining(", "));
         log.error("Bind exception: {}", errors);
+        return Result.error(400, errors);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Result<Void> handleConstraintViolationException(ConstraintViolationException e) {
+        String errors = e.getConstraintViolations().stream()
+                .map(v -> {
+                    String path = v.getPropertyPath().toString();
+                    int idx = path.lastIndexOf('.');
+                    return (idx >= 0 ? path.substring(idx + 1) : path) + ": " + v.getMessage();
+                })
+                .collect(Collectors.joining(", "));
+        log.error("Constraint violation: {}", errors);
         return Result.error(400, errors);
     }
 

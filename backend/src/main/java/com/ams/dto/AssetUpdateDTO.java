@@ -1,6 +1,7 @@
 package com.ams.dto;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -8,6 +9,7 @@ import java.time.LocalDate;
 @Data
 public class AssetUpdateDTO {
     @JsonAlias({"name", "assetName"})
+    @NotBlank
     private String assetName;
     @JsonAlias({"category", "categoryId"})
     private Long categoryId;
@@ -26,7 +28,10 @@ public class AssetUpdateDTO {
     private Long deptId;
     @JsonAlias({"user", "userId"})
     private Long userId;
+    private Long locationId;
     private String location;
+    private BigDecimal locationLat;
+    private BigDecimal locationLng;
     private String rfidTag;
     private Integer isImportant;
     private String description;

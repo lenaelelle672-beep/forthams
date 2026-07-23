@@ -8,7 +8,9 @@ import com.ams.utils.JwtUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ams.common.Result;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -16,6 +18,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/approvals")
 @RequiredArgsConstructor
+@Validated
 public class ApprovalController {
 
     private final ApprovalService approvalService;
@@ -36,7 +39,7 @@ public class ApprovalController {
     }
 
     @PostMapping
-    public Result<ApprovalProcess> create(@RequestBody ApprovalCreateDTO dto, HttpServletRequest request) {
+    public Result<ApprovalProcess> create(@Valid @RequestBody ApprovalCreateDTO dto, HttpServletRequest request) {
         dto.setApplicantId(getCurrentUserId(request));
         return Result.success(approvalService.createProcess(dto));
     }
