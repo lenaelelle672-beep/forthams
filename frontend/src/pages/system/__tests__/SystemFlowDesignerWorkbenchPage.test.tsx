@@ -72,7 +72,7 @@ describe('SystemFlowDesignerWorkbenchPage', () => {
   });
 
   it('校验图结构成功后展示通过提示', async () => {
-    mockedApi.validateGraph.mockResolvedValueOnce({ valid: true, errors: [] });
+    mockedApi.validateGraph.mockResolvedValueOnce({ valid: true, errors: [], warnings: [], nodeCount: 3, edgeCount: 2 });
     render(<SystemFlowDesignerWorkbenchPage canView />);
     await screen.findByText(/资产转移流程/);
 
@@ -93,6 +93,22 @@ describe('SystemFlowDesignerWorkbenchPage', () => {
 
   it('无权限态展示只读拦截提示', () => {
     render(<SystemFlowDesignerWorkbenchPage canView={false} />);
-    expect(screen.getByRole('alert')).toBeTruthy();
+    expect(screen.getByRole('alert')).toHaveTextContent(/无权限|system:flow:query|workflow:designer/);
+  });
+
+  it('加载失败展示脱敏错误提示', async () => {
+    mockedApi.getDesigner.mockRejectedValueOnce(new Error('token=raw-secret'));
+    render(<SystemFlowDesignerWorkbenchPage canView />);
+    await waitFor(() => expect(screen.getByText(/敏感细节已脱敏/)).toBeInTheDocument());
+    expect(screen.queryByText(/raw-secret/)).not.toBeInTheDocument();
+  });
+
+  it('校验失败展示错误提示', async () => {
+    mockedApi.validateGraph.mockResolvedValueOnce({ valid: false, errors: ['节点未连接'], warnings: [], nodeCount: 1, edgeCount: 0 });
+    render(<SystemFlowDesignerWorkbenchPage canView />);
+    await screen.findByText(/资产转移流程/);
+
+    await userEvent.click(screen.getByRole('button', { name: '图结构校验' }));
+    await waitFor(() => expect(screen.getByText(/校验未通过/)).toBeInTheDocument());
   });
 });
