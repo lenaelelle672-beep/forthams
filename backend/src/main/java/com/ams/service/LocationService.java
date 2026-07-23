@@ -4,6 +4,7 @@ import com.ams.entity.Location;
 import com.ams.mapper.LocationMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -17,14 +18,17 @@ public class LocationService {
         return locationMapper.findById(id);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public void insert(Location location) {
         locationMapper.insert(location);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public void update(Location location) {
         locationMapper.update(location);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public void deleteById(Long id) {
         locationMapper.deleteById(id);
     }

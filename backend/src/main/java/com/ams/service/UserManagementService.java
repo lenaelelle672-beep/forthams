@@ -142,6 +142,9 @@ public class UserManagementService {
     @Transactional(rollbackFor = Exception.class)
     public void deleteUser(Long id) {
         getUserEntityOrThrow(id);
+        // 清理 user_role 映射，避免软删除用户后留下孤儿角色绑定
+        userRoleMapper.delete(new com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<UserRole>()
+                .eq("user_id", id));
         userMapper.deleteById(id);
     }
 
