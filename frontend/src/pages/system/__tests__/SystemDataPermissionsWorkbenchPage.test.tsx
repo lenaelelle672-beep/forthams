@@ -64,4 +64,15 @@ describe('SystemDataPermissionsWorkbenchPage', () => {
     render(<SystemDataPermissionsWorkbenchPage canView={false} />);
     expect(screen.getByText(/无权限访问数据权限/)).toBeInTheDocument();
   });
+
+  it('空态展示暂无提示', async () => {
+    mockedApi.mockResolvedValueOnce({
+      roles: [],
+      summary: { roleCount: 0, allScopeCount: 0, restrictedScopeCount: 0, customScopeCount: 0 },
+      riskTips: [],
+      readOnlyNotice: '只读',
+    });
+    render(<SystemDataPermissionsWorkbenchPage canView />);
+    await waitFor(() => expect(screen.getByText('暂无符合条件的角色数据范围。')).toBeInTheDocument());
+  });
 });

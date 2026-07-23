@@ -62,4 +62,10 @@ describe('SystemTenantManagementWorkbenchPage', () => {
     render(<SystemTenantManagementWorkbenchPage canView={false} />);
     expect(screen.getByText(/无权限访问租户管理/)).toBeInTheDocument();
   });
+
+  it('空态展示暂无提示', async () => {
+    mockedList.mockResolvedValueOnce({ records: [], total: 0 });
+    render(<SystemTenantManagementWorkbenchPage canView />);
+    await waitFor(() => expect(screen.getByText('暂无符合条件的租户。')).toBeInTheDocument());
+  });
 });

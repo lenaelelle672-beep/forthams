@@ -10,8 +10,11 @@ import com.ams.dto.WorkflowDefinitionSaveDTO;
 import com.ams.dto.WorkflowDefinitionVersionDTO;
 import com.ams.dto.WorkflowStatusUpdateDTO;
 import com.ams.dto.WorkflowAssigneePreviewDTO;
+import com.ams.entity.GeneralAuditEntry;
+import com.ams.service.AuditService;
 import com.ams.service.WorkflowAssigneePreviewService;
 import com.ams.service.WorkflowDefinitionService;
+import com.ams.utils.AuditHelper;
 import com.ams.utils.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -40,10 +43,13 @@ public class WorkflowDefinitionController {
     private static final String PERMISSION_PUBLISH = "workflow:designer:publish";
     private static final String PERMISSION_ROLLBACK = "workflow:designer:rollback";
     private static final String ROLE_SUPER_ADMIN = "ROLE_SUPER_ADMIN";
+    private static final String RESOURCE_TYPE = "WORKFLOW_DEFINITION";
 
     private final WorkflowDefinitionService workflowDefinitionService;
     private final WorkflowAssigneePreviewService workflowAssigneePreviewService;
     private final JwtUtil jwtUtil;
+    private final AuditService auditService;
+    private final AuditHelper auditHelper;
 
     @GetMapping
     public Result<List<WorkflowDefinitionDTO>> list(HttpServletRequest request) {
@@ -106,7 +112,17 @@ public class WorkflowDefinitionController {
             HttpServletRequest request) {
         FlowDesignerOperationDTO operation = dto == null ? new FlowDesignerOperationDTO() : dto;
         operation.setOperatorId(requirePermission(request, PERMISSION_PUBLISH));
-        return Result.success(workflowDefinitionService.publish(businessType, operation));
+        GeneralAuditEntry audit = auditHelper.buildEntry(request, "WORKFLOW_PUBLISH", "publish_workflow",
+                RESOURCE_TYPE, businessType, "发布流程定义: " + businessType, "SUCCESS");
+        try {
+            return Result.success(workflowDefinitionService.publish(businessType, operation));
+        } catch (RuntimeException ex) {
+            audit.setStatus("FAILURE");
+            audit.setErrorMessage(truncate(ex.getMessage(), 1024));
+            throw ex;
+        } finally {
+            auditService.save(audit);
+        }
     }
 
     @GetMapping("/{businessType}/versions")
@@ -134,7 +150,17 @@ public class WorkflowDefinitionController {
             HttpServletRequest request) {
         FlowDesignerOperationDTO operation = dto == null ? new FlowDesignerOperationDTO() : dto;
         operation.setOperatorId(requirePermission(request, PERMISSION_ROLLBACK));
-        return Result.success(workflowDefinitionService.rollback(businessType, version, operation));
+        GeneralAuditEntry audit = auditHelper.buildEntry(request, "WORKFLOW_ROLLBACK", "rollback_workflow",
+                RESOURCE_TYPE, businessType + ":v" + version, "回滚流程定义: " + businessType + " 到版本 " + version, "SUCCESS");
+        try {
+            return Result.success(workflowDefinitionService.rollback(businessType, version, operation));
+        } catch (RuntimeException ex) {
+            audit.setStatus("FAILURE");
+            audit.setErrorMessage(truncate(ex.getMessage(), 1024));
+            throw ex;
+        } finally {
+            auditService.save(audit);
+        }
     }
 
     @PostMapping("/{businessType}/status")
@@ -177,5 +203,12 @@ public class WorkflowDefinitionController {
             throw new AccessDeniedException("缺少流程设计器权限");
         }
         return userId;
+    }
+
+    private String truncate(String value, int maxLength) {
+        if (value == null) {
+            return null;
+        }
+        return value.length() <= maxLength ? value : value.substring(0, maxLength);
     }
 }

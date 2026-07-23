@@ -4,7 +4,9 @@ import com.ams.common.GlobalExceptionHandler;
 import com.ams.dto.FlowDesignerOperationDTO;
 import com.ams.dto.FlowDesignerValidationResultDTO;
 import com.ams.dto.WorkflowDefinitionDTO;
+import com.ams.service.AuditService;
 import com.ams.service.WorkflowDefinitionService;
+import com.ams.utils.AuditHelper;
 import com.ams.utils.JwtUtil;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -48,11 +50,15 @@ class WorkflowDefinitionControllerTest {
     @Mock
     private JwtUtil jwtUtil;
 
+    @Mock
+    private AuditService auditService;
+
     private MockMvc mockMvc;
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(new WorkflowDefinitionController(workflowDefinitionService, workflowAssigneePreviewService, jwtUtil))
+        AuditHelper auditHelper = new AuditHelper(jwtUtil);
+        mockMvc = MockMvcBuilders.standaloneSetup(new WorkflowDefinitionController(workflowDefinitionService, workflowAssigneePreviewService, jwtUtil, auditService, auditHelper))
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .build();
     }

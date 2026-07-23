@@ -5,6 +5,8 @@ import com.ams.dto.AuditTrendResp;
 import com.ams.dto.OperatorRankingVO;
 import com.ams.entity.GeneralAuditEntry;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
@@ -12,6 +14,19 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface AuditLogMapper extends BaseMapper<GeneralAuditEntry> {
+
+    String INSERT_COLUMNS = "tenant_id, trace_id, timestamp, action, operation_type, operator_id, operator_name, "
+            + "resource_type, resource_id, description, http_method, request_uri, ip_address, user_agent, "
+            + "before_record, after_record, raw_payload, error_message, error_stack, status, created_at";
+
+    @Insert("INSERT INTO general_audit_entry (" + INSERT_COLUMNS + ") VALUES ("
+            + "#{tenantId}, #{traceId}, #{timestamp}, #{action}, #{operationType}, #{operatorId}, #{operatorName}, "
+            + "#{resourceType}, #{resourceId}, #{description}, #{httpMethod}, #{requestUri}, #{ipAddress}, #{userAgent}, "
+            + "#{beforeRecord}, #{afterRecord}, #{rawPayload}, #{errorMessage}, #{errorStack}, #{status}, "
+            + "COALESCE(#{createdAt}, CURRENT_TIMESTAMP))")
+    @Options(useGeneratedKeys = true, keyProperty = "id")
+    int insertAuditEntry(GeneralAuditEntry entry);
+
 
     String FILTER_SQL = "<if test='startTime != null'> AND timestamp &gt;= #{startTime} </if>"
             + "<if test='endTime != null'> AND timestamp &lt; #{endTime} </if>"
