@@ -155,13 +155,17 @@ export default function SystemTechSupportWorkbenchPage({
       </div>
 
       <form className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_160px_160px_auto]" onSubmit={handleSearch}>
+        <label className="sr-only" htmlFor="tech-support-keyword">工单关键词</label>
         <input
+          id="tech-support-keyword"
           className="rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-400"
           placeholder="按标题、摘要或提单人搜索"
           value={keyword}
           onChange={(event) => setKeyword(event.target.value)}
         />
+        <label className="sr-only" htmlFor="tech-support-status-filter">工单状态筛选</label>
         <select
+          id="tech-support-status-filter"
           className="rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-400"
           value={statusFilter}
           onChange={(event) => setStatusFilter(event.target.value as StatusFilter)}
@@ -172,7 +176,9 @@ export default function SystemTechSupportWorkbenchPage({
           <option value="RESOLVED">已解决</option>
           <option value="CLOSED">已关闭</option>
         </select>
+        <label className="sr-only" htmlFor="tech-support-priority-filter">工单优先级筛选</label>
         <select
+          id="tech-support-priority-filter"
           className="rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-400"
           value={priorityFilter}
           onChange={(event) => setPriorityFilter(event.target.value as PriorityFilter)}

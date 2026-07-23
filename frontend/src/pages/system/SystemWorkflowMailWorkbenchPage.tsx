@@ -136,19 +136,25 @@ export default function SystemWorkflowMailWorkbenchPage({
       </div>
 
       <form className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_160px_160px_auto]" onSubmit={handleSearch}>
+        <label className="sr-only" htmlFor="workflow-mail-keyword">邮件配置关键词</label>
         <input
+          id="workflow-mail-keyword"
           className="rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-400"
           placeholder="按业务类型、节点或模板搜索"
           value={keyword}
           onChange={(event) => setKeyword(event.target.value)}
         />
+        <label className="sr-only" htmlFor="workflow-mail-business-type">业务类型</label>
         <input
+          id="workflow-mail-business-type"
           className="rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-400"
           placeholder="业务类型精确筛选"
           value={businessType}
           onChange={(event) => setBusinessType(event.target.value)}
         />
+        <label className="sr-only" htmlFor="workflow-mail-enabled-filter">启用状态筛选</label>
         <select
+          id="workflow-mail-enabled-filter"
           className="rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-400"
           value={enabledFilter}
           onChange={(event) => setEnabledFilter(event.target.value as EnabledFilter)}

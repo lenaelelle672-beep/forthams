@@ -138,13 +138,17 @@ export default function SystemDataPermissionsWorkbenchPage({
       ) : null}
 
       <form className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_180px]" onSubmit={(e) => { e.preventDefault(); }}>
+        <label className="sr-only" htmlFor="data-permissions-keyword">角色关键词</label>
         <input
+          id="data-permissions-keyword"
           className="rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-400"
           placeholder="按角色名称或编码搜索"
           value={keyword}
           onChange={(event) => setKeyword(event.target.value)}
         />
+        <label className="sr-only" htmlFor="data-permissions-scope-filter">数据范围筛选</label>
         <select
+          id="data-permissions-scope-filter"
           className="rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-400"
           value={scopeFilter}
           onChange={(event) => setScopeFilter(event.target.value as ScopeFilter)}

@@ -158,13 +158,17 @@ export default function SystemImportExportWorkbenchPage({
       </div>
 
       <form className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_160px_160px_auto]" onSubmit={handleSearch}>
+        <label className="sr-only" htmlFor="import-export-keyword">任务关键词</label>
         <input
+          id="import-export-keyword"
           className="rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-400"
           placeholder="按业务对象或操作人搜索"
           value={keyword}
           onChange={(event) => setKeyword(event.target.value)}
         />
+        <label className="sr-only" htmlFor="import-export-type-filter">任务类型筛选</label>
         <select
+          id="import-export-type-filter"
           className="rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-400"
           value={typeFilter}
           onChange={(event) => setTypeFilter(event.target.value as TypeFilter)}
@@ -173,7 +177,9 @@ export default function SystemImportExportWorkbenchPage({
           <option value="IMPORT">导入</option>
           <option value="EXPORT">导出</option>
         </select>
+        <label className="sr-only" htmlFor="import-export-status-filter">任务状态筛选</label>
         <select
+          id="import-export-status-filter"
           className="rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-400"
           value={statusFilter}
           onChange={(event) => setStatusFilter(event.target.value as StatusFilter)}

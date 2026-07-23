@@ -8,7 +8,7 @@ export const SYSTEM_FIELD_MAPPINGS_ACTION_PERMISSIONS = {
   preview: 'system:integration:test',
 } as const;
 
-export default function SystemFieldMappingsWorkbenchPage({ embeddedInWorkbench = false }: { embeddedInWorkbench?: boolean }) {
+export default function SystemFieldMappingsWorkbenchPage({ embeddedInWorkbench = false, canView = true }: { embeddedInWorkbench?: boolean; canView?: boolean }) {
   const [items, setItems] = useState<SystemFieldMappingRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -39,6 +39,16 @@ export default function SystemFieldMappingsWorkbenchPage({ embeddedInWorkbench =
     });
     setPreview(result.transformedValue);
   };
+
+  if (!canView) {
+    return (
+      <section className="space-y-4" data-embedded={embeddedInWorkbench}>
+        <div role="alert" className="rounded-2xl bg-amber-50 px-4 py-3 text-sm text-amber-700">
+          无权限访问字段映射，请确认 system:integration:query 权限。
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="space-y-4" data-embedded={embeddedInWorkbench}>

@@ -25,11 +25,21 @@ public class VendorController {
 
     @PostMapping
     public Result<Vendor> create(@RequestBody Vendor vendor) {
+        // 防止 mass assignment：清除客户端不应设置的字段
+        vendor.setId(null);
+        vendor.setDeleted(0);
+        vendor.setCreateTime(null);
+        vendor.setUpdateTime(null);
         return Result.success(vendorService.createVendor(vendor));
     }
 
     @PutMapping("/{id}")
     public Result<Vendor> update(@PathVariable Long id, @RequestBody Vendor vendor) {
+        // 防止 mass assignment：清除客户端不应设置的字段，强制使用路径 id
+        vendor.setId(id);
+        vendor.setDeleted(0);
+        vendor.setCreateTime(null);
+        vendor.setUpdateTime(null);
         return Result.success(vendorService.updateVendor(id, vendor));
     }
 

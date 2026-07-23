@@ -8,7 +8,7 @@ export const SYSTEM_INTERFACES_ACTION_PERMISSIONS = {
   configCheck: 'system:integration:test',
 } as const;
 
-export default function SystemInterfacesWorkbenchPage({ embeddedInWorkbench = false }: { embeddedInWorkbench?: boolean }) {
+export default function SystemInterfacesWorkbenchPage({ embeddedInWorkbench = false, canView = true }: { embeddedInWorkbench?: boolean; canView?: boolean }) {
   const [items, setItems] = useState<SystemInterfaceRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -39,6 +39,16 @@ export default function SystemInterfacesWorkbenchPage({ embeddedInWorkbench = fa
     const result = await testSystemInterfaceConfig(id);
     setNotice(result.message);
   };
+
+  if (!canView) {
+    return (
+      <section className="space-y-4" data-embedded={embeddedInWorkbench}>
+        <div role="alert" className="rounded-2xl bg-amber-50 px-4 py-3 text-sm text-amber-700">
+          无权限访问接口管理，请确认 system:integration:query 权限。
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="space-y-4" data-embedded={embeddedInWorkbench}>

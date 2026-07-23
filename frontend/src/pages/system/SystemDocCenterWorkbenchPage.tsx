@@ -141,19 +141,25 @@ export default function SystemDocCenterWorkbenchPage({
       </div>
 
       <form className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_160px_160px_auto]" onSubmit={handleSearch}>
+        <label className="sr-only" htmlFor="doc-center-keyword">文档关键词</label>
         <input
+          id="doc-center-keyword"
           className="rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-400"
           placeholder="按标题、摘要或作者搜索"
           value={keyword}
           onChange={(event) => setKeyword(event.target.value)}
         />
+        <label className="sr-only" htmlFor="doc-center-category">文档分类</label>
         <input
+          id="doc-center-category"
           className="rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-400"
           placeholder="分类精确筛选"
           value={category}
           onChange={(event) => setCategory(event.target.value)}
         />
+        <label className="sr-only" htmlFor="doc-center-status-filter">文档状态筛选</label>
         <select
+          id="doc-center-status-filter"
           className="rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-400"
           value={statusFilter}
           onChange={(event) => setStatusFilter(event.target.value as StatusFilter)}

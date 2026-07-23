@@ -143,13 +143,17 @@ export default function SystemHandoverWorkbenchPage({
       </div>
 
       <form className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_180px_auto]" onSubmit={handleSearch}>
+        <label className="sr-only" htmlFor="handover-keyword">交接任务关键词</label>
         <input
+          id="handover-keyword"
           className="rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-400"
           placeholder="按标题、交接人或接收人搜索"
           value={keyword}
           onChange={(event) => setKeyword(event.target.value)}
         />
+        <label className="sr-only" htmlFor="handover-status-filter">交接状态筛选</label>
         <select
+          id="handover-status-filter"
           className="rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-400"
           value={statusFilter}
           onChange={(event) => setStatusFilter(event.target.value as StatusFilter)}

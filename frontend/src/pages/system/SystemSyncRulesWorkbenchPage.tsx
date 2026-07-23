@@ -16,7 +16,7 @@ export const SYSTEM_SYNC_RULES_ACTION_PERMISSIONS = {
   retryLog: 'system:integration:edit',
 } as const;
 
-export default function SystemSyncRulesWorkbenchPage({ embeddedInWorkbench = false }: { embeddedInWorkbench?: boolean }) {
+export default function SystemSyncRulesWorkbenchPage({ embeddedInWorkbench = false, canView = true }: { embeddedInWorkbench?: boolean; canView?: boolean }) {
   const [items, setItems] = useState<SystemSyncRuleRecord[]>([]);
   const [summary, setSummary] = useState<SystemSyncQueueSummary | null>(null);
   const [loading, setLoading] = useState(true);
@@ -49,6 +49,16 @@ export default function SystemSyncRulesWorkbenchPage({ embeddedInWorkbench = fal
     await retrySystemSyncLog(1);
     setNotice('单条日志重试请求已提交，真实重试由后端 fail-closed 控制');
   };
+
+  if (!canView) {
+    return (
+      <section className="space-y-4" data-embedded={embeddedInWorkbench}>
+        <div role="alert" className="rounded-2xl bg-amber-50 px-4 py-3 text-sm text-amber-700">
+          无权限访问同步规则，请确认 system:integration:query 权限。
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="space-y-4" data-embedded={embeddedInWorkbench}>
