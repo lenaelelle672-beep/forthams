@@ -133,12 +133,12 @@ class SlaConfigControllerTest {
 
         grant("workflow:sla:enable");
         mockMvc.perform(post("/sla-config/7/enable").header("Authorization", "Bearer token").contentType(MediaType.APPLICATION_JSON).content("{\"confirmed\":true,\"operatorId\":99,\"reason\":\"错人\"}"))
-                .andExpect(status().isOk())
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value(500));
 
         grant("workflow:sla:test");
         mockMvc.perform(post("/sla-config/simulate").header("Authorization", "Bearer token").contentType(MediaType.APPLICATION_JSON).content("{\"processKey\":\"ASSET_APPROVAL\",\"nodeKey\":\"MANAGER_REVIEW\",\"operatorId\":42,\"reason\":\"缺确认\"}"))
-                .andExpect(status().isOk())
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value(500));
 
         verifyNoInteractions(slaConfigService);
@@ -159,7 +159,7 @@ class SlaConfigControllerTest {
                 .andExpect(jsonPath("$.code").value(403));
 
         mockMvc.perform(post("/sla-config/export").header("Authorization", "Bearer token").contentType(MediaType.APPLICATION_JSON).content("{\"confirmed\":true,\"operatorId\":99}"))
-                .andExpect(status().isOk())
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value(500));
     }
 

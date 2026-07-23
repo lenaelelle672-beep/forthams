@@ -23,8 +23,8 @@ public class SysTenantService {
     private final SysTenantMapper sysTenantMapper;
 
     public SysTenantDTO.PageResult list(String keyword, String status, int page, int pageSize) {
-        int safePage = Math.max(page, 1);
-        int safePageSize = pageSize <= 0 ? 20 : Math.min(pageSize, 200);
+        int safePage = Math.min(Math.max(page, 1), 10000);
+        int safePageSize = pageSize <= 0 ? 20 : Math.min(pageSize, 100);
         int offset = (safePage - 1) * safePageSize;
 
         long total = sysTenantMapper.count(trim(keyword), trim(status));

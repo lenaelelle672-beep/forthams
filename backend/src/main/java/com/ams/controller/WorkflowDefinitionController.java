@@ -9,6 +9,8 @@ import com.ams.dto.WorkflowDefinitionDTO;
 import com.ams.dto.WorkflowDefinitionSaveDTO;
 import com.ams.dto.WorkflowDefinitionVersionDTO;
 import com.ams.dto.WorkflowStatusUpdateDTO;
+import com.ams.dto.WorkflowAssigneePreviewDTO;
+import com.ams.service.WorkflowAssigneePreviewService;
 import com.ams.service.WorkflowDefinitionService;
 import com.ams.utils.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
@@ -40,6 +42,7 @@ public class WorkflowDefinitionController {
     private static final String ROLE_SUPER_ADMIN = "ROLE_SUPER_ADMIN";
 
     private final WorkflowDefinitionService workflowDefinitionService;
+    private final WorkflowAssigneePreviewService workflowAssigneePreviewService;
     private final JwtUtil jwtUtil;
 
     @GetMapping
@@ -85,6 +88,15 @@ public class WorkflowDefinitionController {
             HttpServletRequest request) {
         requirePermission(request, PERMISSION_EDIT);
         return Result.success(workflowDefinitionService.validateDesignerGraph(dto));
+    }
+
+    @PostMapping("/{businessType}/assignees/preview")
+    public Result<WorkflowAssigneePreviewDTO.Response> previewAssignees(
+            @PathVariable String businessType,
+            @RequestBody(required = false) WorkflowAssigneePreviewDTO.Request dto,
+            HttpServletRequest request) {
+        requirePermission(request, PERMISSION_QUERY);
+        return Result.success(workflowAssigneePreviewService.preview(businessType, dto));
     }
 
     @PostMapping("/{businessType}/publish")

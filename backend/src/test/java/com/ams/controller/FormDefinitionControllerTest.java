@@ -189,35 +189,35 @@ class FormDefinitionControllerTest {
                         .header("Authorization", "Bearer token")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"confirmed\":true,\"reason\":\"发布\",\"impactScope\":\"后续\",\"rollbackPlan\":\"恢复\"}"))
-                .andExpect(status().isOk())
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value(500));
 
         mockMvc.perform(post("/form-definitions/ASSET_FORM/publish")
                         .header("Authorization", "Bearer token")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"confirmed\":false,\"operatorId\":42,\"reason\":\"发布\",\"impactScope\":\"后续\",\"rollbackPlan\":\"恢复\"}"))
-                .andExpect(status().isOk())
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value(500));
 
         mockMvc.perform(post("/form-definitions/ASSET_FORM/publish")
                         .header("Authorization", "Bearer token")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"confirmed\":true,\"operatorId\":42,\"impactScope\":\"后续\",\"rollbackPlan\":\"恢复\"}"))
-                .andExpect(status().isOk())
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value(500));
 
         mockMvc.perform(post("/form-definitions/ASSET_FORM/publish")
                         .header("Authorization", "Bearer token")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"confirmed\":true,\"operatorId\":42,\"reason\":\"发布\",\"rollbackPlan\":\"恢复\"}"))
-                .andExpect(status().isOk())
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value(500));
 
         mockMvc.perform(post("/form-definitions/ASSET_FORM/publish")
                         .header("Authorization", "Bearer token")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"confirmed\":true,\"operatorId\":42,\"reason\":\"发布\",\"impactScope\":\"后续\"}"))
-                .andExpect(status().isOk())
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value(500));
 
         verifyNoInteractions(formDefinitionService);

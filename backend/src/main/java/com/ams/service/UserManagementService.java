@@ -17,6 +17,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
+
 @Service
 public class UserManagementService {
 
@@ -79,7 +81,7 @@ public class UserManagementService {
         BeanUtil.setProperty(user, "username", getStrProp(dto, "username"));
         String rawPassword = getStrProp(dto, "password");
         BeanUtil.setProperty(user, "password", passwordEncoder.encode(
-                rawPassword == null || rawPassword.isBlank() ? "123456" : rawPassword));
+                rawPassword == null || rawPassword.isBlank() ? generateTempPassword() : rawPassword));
         BeanUtil.setProperty(user, "realName", getStrProp(dto, "realName"));
         BeanUtil.setProperty(user, "email", getStrProp(dto, "email"));
         BeanUtil.setProperty(user, "phone", getStrProp(dto, "phone"));
@@ -117,10 +119,17 @@ public class UserManagementService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void resetPassword(Long id) {
+    public String resetPassword(Long id) {
         User user = getUserEntityOrThrow(id);
-        BeanUtil.setProperty(user, "password", passwordEncoder.encode("123456"));
+        String tempPassword = generateTempPassword();
+        BeanUtil.setProperty(user, "password", passwordEncoder.encode(tempPassword));
         userMapper.updateById(user);
+        return tempPassword;
+    }
+
+    /** 生成随机临时密码（替代此前的硬编码 123456）。管理员应一次性传达给用户并要求首登修改。 */
+    private String generateTempPassword() {
+        return UUID.randomUUID().toString().replace("-", "").substring(0, 12);
     }
 
     @Transactional(rollbackFor = Exception.class)

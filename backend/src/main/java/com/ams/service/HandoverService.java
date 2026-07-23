@@ -27,7 +27,7 @@ public class HandoverService {
 
     public HandoverDTO.PageResult list(String status, String keyword, int page, int pageSize) {
         String tenantId = TenantContext.requireTenantId();
-        int safePage = Math.max(page, 1);
+        int safePage = Math.min(Math.max(page, 1), 10000);
         int safePageSize = pageSize <= 0 ? 20 : Math.min(pageSize, 100);
         int offset = (safePage - 1) * safePageSize;
 

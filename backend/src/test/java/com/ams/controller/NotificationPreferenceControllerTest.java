@@ -75,7 +75,7 @@ class NotificationPreferenceControllerTest {
                 .andExpect(jsonPath("$.data.runtimeEffect").value(false));
 
         mockMvc.perform(get("/notification-preferences/batch"))
-                .andExpect(status().isOk())
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value(500));
 
         verify(notificationPreferenceService).list();

@@ -3,14 +3,20 @@ package com.ams.controller;
 import com.ams.common.GlobalExceptionHandler;
 import com.ams.dto.ImportExportTaskDTO;
 import com.ams.service.ImportExportTaskService;
+import com.ams.utils.JwtUtil;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static org.mockito.Mockito.when;
@@ -24,17 +30,27 @@ class ImportExportTaskControllerTest {
     @Mock
     private ImportExportTaskService importExportTaskService;
 
+    @Mock
+    private JwtUtil jwtUtil;
+
     private MockMvc mockMvc;
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(new ImportExportTaskController(importExportTaskService))
+        mockMvc = MockMvcBuilders.standaloneSetup(new ImportExportTaskController(importExportTaskService, jwtUtil))
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .build();
+        when(jwtUtil.getUserIdFromToken("token")).thenReturn(42L);
+    }
+
+    @AfterEach
+    void tearDown() {
+        SecurityContextHolder.clearContext();
     }
 
     @Test
     void listShouldReturnTaskHistory() throws Exception {
+        grant("system:import-export:query");
         ImportExportTaskDTO.PageResult page = new ImportExportTaskDTO.PageResult();
         page.setTotal(1);
         ImportExportTaskDTO task = new ImportExportTaskDTO();
@@ -46,7 +62,7 @@ class ImportExportTaskControllerTest {
         page.setRecords(List.of(task));
         when(importExportTaskService.list(null, null, null, 1, 20)).thenReturn(page);
 
-        mockMvc.perform(get("/system/import-export/tasks"))
+        mockMvc.perform(get("/system/import-export/tasks").header("Authorization", "Bearer token"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data.total").value(1))
@@ -56,6 +72,7 @@ class ImportExportTaskControllerTest {
 
     @Test
     void detailShouldReturnTaskById() throws Exception {
+        grant("system:import-export:query");
         ImportExportTaskDTO task = new ImportExportTaskDTO();
         task.setId(5L);
         task.setTaskType("EXPORT");
@@ -64,7 +81,7 @@ class ImportExportTaskControllerTest {
         task.setErrorSummary("分类不存在（已脱敏）");
         when(importExportTaskService.detail(5L)).thenReturn(task);
 
-        mockMvc.perform(get("/system/import-export/tasks/5"))
+        mockMvc.perform(get("/system/import-export/tasks/5").header("Authorization", "Bearer token"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.id").value(5))
                 .andExpect(jsonPath("$.data.taskType").value("EXPORT"))
@@ -73,14 +90,23 @@ class ImportExportTaskControllerTest {
 
     @Test
     void metaShouldReturnReadOnlyNotice() throws Exception {
+        grant("system:import-export:query");
         ImportExportTaskDTO.Meta meta = new ImportExportTaskDTO.Meta();
         meta.setSupportedObjects(List.of("asset"));
         meta.setImportRowLimit(5000);
         meta.setReadOnlyNotice("只读");
         when(importExportTaskService.meta()).thenReturn(meta);
 
-        mockMvc.perform(get("/system/import-export/meta"))
+        mockMvc.perform(get("/system/import-export/meta").header("Authorization", "Bearer token"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.importRowLimit").value(5000));
+    }
+
+    private void grant(String... authorities) {
+        SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(
+                "admin",
+                "n/a",
+                Arrays.stream(authorities).map(SimpleGrantedAuthority::new).toList()
+        ));
     }
 }

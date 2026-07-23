@@ -34,4 +34,14 @@ public interface UserRoleMapper extends BaseMapper<UserRole> {
           AND p.deleted = 0
         """)
     List<String> selectPermissionCodesByUserId(@Param("userId") Long userId);
+
+    @Select("""
+        SELECT DISTINCT CAST(ur.user_id AS CHAR)
+        FROM sys_user_role ur
+        INNER JOIN sys_role r ON ur.role_id = r.id
+        WHERE r.role_code = #{roleCode}
+          AND r.status = 1
+          AND r.deleted = 0
+        """)
+    List<String> selectUserIdsByRoleCode(@Param("roleCode") String roleCode);
 }

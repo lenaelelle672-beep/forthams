@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -88,7 +89,7 @@ class MailLogControllerTest {
                 delete("/mail-logs/7")
         )) {
             mockMvc.perform(builder.contentType(MediaType.APPLICATION_JSON).content("{}"))
-                    .andExpect(status().is5xxServerError());
+                    .andExpect(result -> assertTrue(result.getResponse().getStatus() >= 400));
         }
     }
 
