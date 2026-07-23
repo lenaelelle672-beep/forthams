@@ -9,7 +9,19 @@
  */
 
 import type { AuditLog, GraphifyNode, GraphifyEdge, AuditLogResponse } from '../types/audit.types';
-import type { AssetAuditLog } from '../pages/AssetDetailPage/types/audit.types';
+
+/**
+ * Minimal local stand-in for the legacy AssetAuditLog shape.
+ * Kept inline so this module no longer depends on the deleted
+ * pages/AssetDetailPage directory.
+ */
+interface AssetAuditLog {
+  id?: string | number;
+  actionType?: string;
+  description?: string;
+  operator?: string;
+  timestamp?: string;
+}
 
 // ============================================================================
 // Type Definitions
