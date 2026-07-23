@@ -9,6 +9,7 @@
   "scripts": {
     "build": "vite build",
     "dev": "vite",
+    "typecheck": "tsc --noEmit",
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",

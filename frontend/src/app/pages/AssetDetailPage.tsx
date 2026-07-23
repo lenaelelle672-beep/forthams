@@ -403,7 +403,7 @@ const AssetDetailPage: React.FC = () => {
             <span>
               资产不存在或加载失败
               {assetError && <p className="error-detail">{assetError.message}</p>}
-            </>
+            </span>
           }
         >
           <Button type="primary" onClick={() => refetchAsset()}>

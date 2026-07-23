@@ -419,7 +419,7 @@ const RetirementApplicationPage: React.FC = () => {
               <Form.Item
                 name="reason"
                 label="报废原因"
-                rules={[{ required: true, message: '请选择报废原因' }}
+                rules={[{ required: true, message: '请选择报废原因' }]}
               >
                 <Select
                   placeholder="请选择报废原因"
