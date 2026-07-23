@@ -4,7 +4,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router';
+import { useNavigate, useSearchParams } from 'react-router';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
@@ -14,6 +14,7 @@ import { loginSchema, type LoginFormValues } from '../loginConfig';
 
 export function useLoginForm() {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { login } = useAuth();
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [rememberMe, setRememberMe] = useState(false);
@@ -22,6 +23,17 @@ export function useLoginForm() {
     resolver: zodResolver(loginSchema),
     defaultValues: { username: '', password: '' },
   });
+
+  // Surface a session-expired notice when redirected here by the http 401
+  // interceptor (?expired=1). Consume the param so it does not persist across
+  // subsequent login attempts.
+  useEffect(() => {
+    if (searchParams.get('expired') === '1') {
+      setErrorMsg('您的会话已过期，请重新登录');
+      searchParams.delete('expired');
+      setSearchParams(searchParams, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
 
   // Restore remembered username
   useEffect(() => {

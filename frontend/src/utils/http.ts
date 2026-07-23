@@ -98,6 +98,22 @@ function isResultEnvelope(value: unknown): value is ResultEnvelope {
   );
 }
 
+// Axios executes request interceptors in reverse registration order. Register
+// this first so it runs after the credential injector and keeps public login
+// and registration requests free of stale Authorization headers.
+http.interceptors.request.use(
+  (config: InternalAxiosRequestConfig) => {
+    const requestUrl = config.url ?? '';
+    const isPublicAuthRequest =
+      requestUrl.includes('/auth/login') || requestUrl.includes('/auth/register');
+    if (isPublicAuthRequest && config.headers) {
+      config.headers.delete('Authorization');
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
 // 请求拦截器：注入认证 Token（符合 SPEC 权限控制规范）
 http.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
@@ -138,15 +154,30 @@ http.interceptors.response.use(
       localStorage.removeItem('ams_auth_token');
       localStorage.removeItem('ams_auth_user');
 
+      // Avoid redirect loops: if the failing request is the login call itself,
+      // or we are already on /login (e.g. token refresh race), just reject.
       const requestUrl = error.config?.url ?? '';
-      if (!requestUrl.includes('/auth/login')) {
-        window.location.href = '/login';
+      const isLoginRequest = requestUrl.includes('/auth/login');
+      const isOnLoginPage =
+        typeof window !== 'undefined' && window.location.pathname === '/login';
+
+      if (!isLoginRequest && !isOnLoginPage) {
+        // Hard redirect is still required here (outside React tree, inside an
+        // axios interceptor), but we carry ?expired=1 so the login page can
+        // surface a "session expired" notice instead of silently reloading.
+        window.location.href = '/login?expired=1';
       }
     } else if (status && status >= 500) {
       console.error('Server error, please try again later.');
     }
 
-    const message = error.response?.data?.message || error.message || '请求失败';
+    // 403 has no backend message → give callers a clear, displayable reason so
+    // UI can catch and surface it (we intentionally avoid a global Toaster
+    // here; callers decide how to present permission errors).
+    const message =
+      status === 403
+        ? error.response?.data?.message || '没有权限执行此操作'
+        : error.response?.data?.message || error.message || '请求失败';
     const nextError = new Error(message) as Error & {
       status?: number;
       response?: typeof error.response;
