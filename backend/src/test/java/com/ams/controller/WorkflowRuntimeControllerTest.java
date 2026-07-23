@@ -32,13 +32,16 @@ class WorkflowRuntimeControllerTest {
     private WorkflowDefinitionService workflowDefinitionService;
 
     @Mock
+    private com.ams.service.WorkflowAssigneePreviewService workflowAssigneePreviewService;
+
+    @Mock
     private JwtUtil jwtUtil;
 
     private MockMvc mockMvc;
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(new WorkflowRuntimeController(workflowDefinitionService, jwtUtil))
+        mockMvc = MockMvcBuilders.standaloneSetup(new WorkflowRuntimeController(workflowDefinitionService, workflowAssigneePreviewService, jwtUtil))
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .build();
     }

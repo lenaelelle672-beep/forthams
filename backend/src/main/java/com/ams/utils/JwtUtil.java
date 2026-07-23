@@ -15,11 +15,31 @@ import java.util.Map;
 @Component
 public class JwtUtil {
 
+    /**
+     * JWT 签名密钥。必须通过 JWT_SECRET 环境变量设置（至少 256 位/32 字节）。
+     * 此前 application.yml 有公开默认值，任何读代码的人都能伪造 token。
+     * 现 fail-fast：如果密钥是已知的公开默认值或为空，启动时抛异常。
+     */
     @Value("${jwt.secret}")
     private String secret;
 
     @Value("${jwt.expiration}")
     private Long expiration;
+
+    private static final java.util.Set<String> KNOWN_INSECURE_DEFAULTS = java.util.Set.of(
+            "ams-secret-key-for-jwt-token-generation-must-be-at-least-256-bits-long",
+            "AMS_SECRET_KEY_FOR_JWT_TOKEN_GENERATION_2024_VERY_LONG_SECRET"
+    );
+
+    @jakarta.annotation.PostConstruct
+    void validateSecret() {
+        if (secret == null || secret.isBlank()) {
+            throw new IllegalStateException("JWT_SECRET 未设置：必须通过环境变量配置 JWT 签名密钥");
+        }
+        if (KNOWN_INSECURE_DEFAULTS.contains(secret)) {
+            throw new IllegalStateException("JWT_SECRET 使用了公开默认值，存在认证伪造风险：必须设置自定义 JWT_SECRET 环境变量");
+        }
+    }
 
     private SecretKey getSigningKey() {
         return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));

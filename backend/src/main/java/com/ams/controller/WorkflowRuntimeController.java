@@ -1,8 +1,10 @@
 package com.ams.controller;
 
 import com.ams.common.Result;
+import com.ams.dto.WorkflowAssigneePreviewDTO;
 import com.ams.dto.WorkflowDefinitionDTO;
 import com.ams.dto.WorkflowStartAvailabilityDTO;
+import com.ams.service.WorkflowAssigneePreviewService;
 import com.ams.service.WorkflowDefinitionService;
 import com.ams.utils.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,6 +16,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -38,6 +42,7 @@ public class WorkflowRuntimeController {
     private static final String STATUS_DISABLED = "DISABLED";
 
     private final WorkflowDefinitionService workflowDefinitionService;
+    private final WorkflowAssigneePreviewService workflowAssigneePreviewService;
     private final JwtUtil jwtUtil;
 
     @GetMapping("/{businessType}/start-availability")
@@ -46,6 +51,21 @@ public class WorkflowRuntimeController {
         requirePermission(request, PERMISSION_QUERY);
         WorkflowDefinitionDTO definition = workflowDefinitionService.getDefinition(businessType);
         return Result.success(resolveAvailability(businessType, definition));
+    }
+
+    @PostMapping("/{businessType}/assignees/preview")
+    public Result<WorkflowAssigneePreviewDTO.Response> previewRuntimeAssignees(
+            @PathVariable String businessType,
+            @RequestBody(required = false) WorkflowAssigneePreviewDTO.Request dto,
+            HttpServletRequest request) {
+        requirePermission(request, PERMISSION_QUERY);
+        // 运行时预览使用当前已发布定义，合并客户端传入的 businessData
+        WorkflowDefinitionDTO definition = workflowDefinitionService.getDefinition(businessType);
+        WorkflowAssigneePreviewDTO.Request previewRequest = dto == null ? new WorkflowAssigneePreviewDTO.Request() : dto;
+        if (previewRequest.getDefinition() == null) {
+            previewRequest.setDefinition(definition.getDefinition());
+        }
+        return Result.success(workflowAssigneePreviewService.preview(businessType, previewRequest));
     }
 
     private WorkflowStartAvailabilityDTO resolveAvailability(String businessType, WorkflowDefinitionDTO definition) {
