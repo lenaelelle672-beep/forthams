@@ -54,7 +54,7 @@ mybatis-plus:
   type-aliases-package: com.ams.entity
   configuration:
     map-underscore-to-camel-case: true
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    log-impl: org.apache.ibatis.logging.nologging.NoLoggingImpl
   global-config:
     db-config:
       logic-delete-field: deleted
@@ -80,11 +80,11 @@ jwt:
 logging:
   level:
     root: INFO
-    com.ams: DEBUG
-    com.ams.mapper: DEBUG
+    com.ams: INFO
+    com.ams.mapper: INFO
     org.springframework.web: INFO
-    org.hibernate.SQL: DEBUG
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    org.hibernate.SQL: INFO
+    org.hibernate.type.descriptor.sql.BasicBinder: INFO
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{50} - %msg%n"
   file:

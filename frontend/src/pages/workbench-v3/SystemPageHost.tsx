@@ -1,7 +1,33 @@
-import { Suspense } from 'react';
+import { Suspense, Component, type ReactNode } from 'react';
 import type { SystemRealPageEntry } from '../workspace-preview/system-hub/systemRealPageRegistry';
 import { useSystemInspectorSlot } from './SystemInspectorSlotProvider';
 import { getPendingMenuStatus } from './pendingMenuStatus';
+
+/** 隔离 V3 子页面崩溃，避免单个页面加载失败影响整个工作台。 */
+class V3PageErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean }> {
+  state = { hasError: false };
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="rounded-2xl border border-red-200 bg-red-50 p-5 text-sm text-red-900">
+          <div className="font-semibold">该 V3 页面渲染失败</div>
+          <p className="mt-2 text-red-800">页面加载遇到错误，不影响工作台其他菜单。请刷新页面或稍后重试。</p>
+          <button
+            type="button"
+            className="mt-3 rounded-lg border border-red-300 px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-100"
+            onClick={() => this.setState({ hasError: false })}
+          >
+            重试
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 type SystemPageHostProps = {
   activeMenu: string;
@@ -30,6 +56,7 @@ export default function SystemPageHost({
       data-active-menu={activeMenu}
       data-inspector-menu={inspectorSlot?.activeMenu ?? activeMenu}
     >
+      <V3PageErrorBoundary>
       <Suspense fallback={<div className="text-sm text-slate-500">正在加载 V3 页面...</div>}>
         {RealPage ? (
           <RealPage embeddedInWorkbench />
@@ -65,6 +92,7 @@ export default function SystemPageHost({
           </div>
         )}
       </Suspense>
+      </V3PageErrorBoundary>
     </div>
   );
 }
