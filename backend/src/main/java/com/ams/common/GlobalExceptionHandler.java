@@ -57,8 +57,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AccessDeniedException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
-    public Result<Void> handleAccessDeniedException(AccessDeniedException e) {
-        log.warn("Access denied: {}", e.getMessage());
+    public Result<Void> handleAccessDeniedException(AccessDeniedException e, jakarta.servlet.http.HttpServletRequest request) {
+        String tenantId = com.ams.context.TenantContext.getTenantId();
+        log.warn("Access denied: {} | uri={} method={} tenant={} reason={}",
+                request.getRemoteAddr(), request.getRequestURI(), request.getMethod(),
+                tenantId, e.getMessage());
         return Result.error(403, "访问被拒绝");
     }
 
