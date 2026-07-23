@@ -112,6 +112,13 @@ function ProtectedRoute() {
     }
   }, [location.pathname, navigate]);
 
+  // 路由切换时滚动到顶部（修复长页面切换后停留在滚动位置的 UX 问题）
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      window.scrollTo(0, 0);
+    }
+  }, [location.pathname]);
+
   if (loading) {
     return <PageLoader />;
   }
