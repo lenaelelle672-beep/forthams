@@ -400,6 +400,9 @@ const router = createBrowserRouter([
       { path: 'fixed-assets/workbenchv3', element: S(WorkbenchV3Page) },
       // 流程定义 2 灰度入口：Stitch 整页预览，不切换正式 /workflows
       { path: 'workflows-v2', element: S(WorkflowDefinitionV2Page) },
+      // catch-all：非 AppLayout 下的未匹配路由也导向 404
+      { path: '404', element: <div className="flex items-center justify-center min-h-screen text-xl text-[#94a3b8]">404 — 页面不存在</div> },
+      { path: '*', element: <Navigate to="/404" replace /> },
       {
         element: S(AppLayout),
         children: [
