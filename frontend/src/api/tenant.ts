@@ -6,7 +6,7 @@
  * 新建、编辑、停用、启用等写操作不在 V3 只读边界内，已移除。
  */
 
-import http from '@/utils/http';
+import { api } from '../app/utils/api';
 
 export interface TenantRecord {
   id: string;
@@ -42,14 +42,14 @@ export interface TenantQuery {
 }
 
 export const listTenants = (params?: TenantQuery) =>
-  http.get<TenantList>('/tenants', { params });
+  api.get<TenantList>('/tenants', { params });
 
 export const getCurrentTenant = () =>
-  http.get<TenantRecord>('/tenants/current');
+  api.get<TenantRecord>('/tenants/current');
 
 export const getTenantDetail = (id: string) =>
-  http.get<TenantRecord>(`/tenants/${id}`);
+  api.get<TenantRecord>(`/tenants/${id}`);
 
 export const getTenantMeta = () =>
-  http.get<TenantMeta>('/tenants/meta');
+  api.get<TenantMeta>('/tenants/meta');
 

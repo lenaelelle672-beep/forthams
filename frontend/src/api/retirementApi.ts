@@ -10,7 +10,7 @@
  * @version SWARM-2026-Q2-002 Iteration 4
  */
 
-import { request } from '@/utils/http';
+import http from '@/utils/http';
 import type { 
   RetirementApplication, 
   RetirementRequest, 
@@ -108,7 +108,7 @@ export interface LifecycleQueryParams {
 export async function submitRetirementApplication(
   params: RetirementApplyParams
 ): Promise<RetirementApplication> {
-  const response = await request.post<RetirementApplication>(
+  const response = await http.post<RetirementApplication>(
     '/v1/retirement/apply',
     params
   );
@@ -125,7 +125,7 @@ export async function submitRetirementApplication(
 export async function getRetirementApplication(
   applicationId: string
 ): Promise<RetirementApplication> {
-  const response = await request.get<RetirementApplication>(
+  const response = await http.get<RetirementApplication>(
     `/v1/retirement/${applicationId}`
   );
   return response.data;
@@ -142,7 +142,7 @@ export async function listMyRetirementApplications(
   status?: RetirementStatus
 ): Promise<RetirementApplication[]> {
   const params = status ? { status } : {};
-  const response = await request.get<RetirementApplication[]>(
+  const response = await http.get<RetirementApplication[]>(
     '/v1/retirement/my-applications',
     { params }
   );
@@ -163,7 +163,7 @@ export async function updateRetirementApplication(
   applicationId: string,
   params: RetirementUpdateParams
 ): Promise<RetirementApplication> {
-  const response = await request.put<RetirementApplication>(
+  const response = await http.put<RetirementApplication>(
     `/v1/retirement/${applicationId}`,
     params
   );
@@ -179,7 +179,7 @@ export async function updateRetirementApplication(
 export async function cancelRetirementApplication(
   applicationId: string
 ): Promise<void> {
-  await request.delete(`/v1/retirement/${applicationId}`);
+  await http.delete(`/v1/retirement/${applicationId}`);
 }
 
 /**
@@ -193,7 +193,7 @@ export async function getPendingApprovals(
   include_types?: ('retirement' | 'workorder' | 'transfer')[]
 ): Promise<ApprovalTask[]> {
   const params = include_types ? { include_types } : {};
-  const response = await request.get<ApprovalTask[]>(
+  const response = await http.get<ApprovalTask[]>(
     '/approvals/pending',
     { params }
   );
@@ -220,7 +220,7 @@ export async function processApproval(
   next_approver?: string;
   completed_at?: string;
 }> {
-  const response = await request.post<{
+  const response = await http.post<{
     status: 'completed' | 'pending_next_level';
     next_approver?: string;
     completed_at?: string;
@@ -235,7 +235,7 @@ export async function processApproval(
  * @returns 任务详情（含审批历史）
  */
 export async function getApprovalTask(taskId: string): Promise<ApprovalTask> {
-  const response = await request.get<ApprovalTask>(
+  const response = await http.get<ApprovalTask>(
     `/approvals/tasks/${taskId}`
   );
   return response.data;
@@ -254,7 +254,7 @@ export async function delegateApprovalTask(
   targetUserId: string,
   reason?: string
 ): Promise<void> {
-  await request.post(`/approvals/${taskId}/delegate`, {
+  await http.post(`/approvals/${taskId}/delegate`, {
     target_user_id: targetUserId,
     reason
   });
@@ -288,7 +288,7 @@ export async function getAssetLifecycle(
   timeline: LifecycleEvent[];
   total: number;
 }> {
-  const response = await request.get<{
+  const response = await http.get<{
     asset_id: string;
     timeline: LifecycleEvent[];
     total: number;
@@ -314,7 +314,7 @@ export async function getAssetLifecycle(
 export async function getAssetRetirementHistory(
   assetId: string
 ): Promise<RetirementApplication[]> {
-  const response = await request.get<RetirementApplication[]>(
+  const response = await http.get<RetirementApplication[]>(
     `/v1/retirement/asset/${assetId}`
   );
   return response.data;
@@ -335,7 +335,7 @@ export async function getApprovalChainConfig(): Promise<{
     role_code?: string;
   }>;
 }> {
-  const response = await request.get<{
+  const response = await http.get<{
     levels: Array<{
       level: number;
       name: string;
@@ -366,7 +366,7 @@ export async function getRetirementStatistics(params: {
   total_residual_value: number;
   by_type: Record<string, number>;
 }> {
-  const response = await request.get<{
+  const response = await http.get<{
     total_count: number;
     approved_count: number;
     rejected_count: number;
