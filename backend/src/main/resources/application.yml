@@ -81,6 +81,16 @@ logging:
   level:
     root: INFO
     com.ams: DEBUG
+    com.ams.mapper: DEBUG
     org.springframework.web: INFO
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{50} - %msg%n"
+  file:
+    name: logs/ams.log
+
+# ========== MyBatis-Plus 补充（从 application.properties 合并，消除双文件冲突） ==========
+# cache-enabled 和 id-type 原仅在 .properties 中定义，合并后 .properties 可安全精简
+mybatis-plus.configuration.cache-enabled: false
+mybatis-plus.global-config.db-config.id-type: auto
