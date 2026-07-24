@@ -489,8 +489,16 @@ public class SystemConfigService {
         if ("BOOLEAN".equals(type) && !Set.of("true", "false").contains(clean.toLowerCase(Locale.ROOT))) {
             throw new BusinessException("系统参数布尔值格式不合法");
         }
-        if ("JSON".equals(type) && !(clean.startsWith("{") || clean.startsWith("["))) {
-            throw new BusinessException("系统参数 JSON 格式不合法");
+        if ("JSON".equals(type)) {
+            if (!(clean.startsWith("{") || clean.startsWith("["))) {
+                throw new BusinessException("系统参数 JSON 格式不合法");
+            }
+            // 实际解析 JSON 验证格式（此前只检查前缀，畸形 JSON 如 {not json 会通过）
+            try {
+                new com.fasterxml.jackson.databind.ObjectMapper().readTree(clean);
+            } catch (Exception e) {
+                throw new BusinessException("系统参数 JSON 解析失败：" + e.getMessage());
+            }
         }
     }
 

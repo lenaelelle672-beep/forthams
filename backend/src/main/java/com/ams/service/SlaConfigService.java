@@ -392,7 +392,7 @@ public class SlaConfigService {
         return matchesScope(config.getProcessKey(), processKey, "GLOBAL", "ALL")
                 && matchesScope(config.getBusinessType(), businessType, "GLOBAL", "ALL")
                 && matchesScope(config.getNodeKey(), nodeKey, "ALL", "*")
-                && matchesScope(config.getPriority(), priority, "ALL", "NORMAL");
+                && matchesScope(config.getPriority(), priority, "ALL");
     }
 
     private boolean matchesScope(String configured, String actual, String... wildcardValues) {
