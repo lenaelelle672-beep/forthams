@@ -154,11 +154,13 @@ public class AssetLifecycleService {
                         .orderByDesc(AssetChangeLog::getCreateTime)
                         .last("limit 1"));
         if (changeLog == null) {
-            return AssetStatus.IN_USE;
+            // 找不到退役提交日志时默认 IDLE（而非 IN_USE）
+            // IN_USE 意味着有人在使用，IDLE 是更安全的中性状态
+            return AssetStatus.IDLE;
         }
         String status = extractStatus(changeLog.getOldValue());
         if (status == null || status.isBlank()) {
-            return AssetStatus.IN_USE;
+            return AssetStatus.IDLE;
         }
         return AssetStatus.fromName(status);
     }
