@@ -20,6 +20,8 @@ export interface ImportExportTaskRecord {
 export interface ImportExportTaskList {
   records: ImportExportTaskRecord[];
   total: number;
+  current?: number;
+  pages?: number;
 }
 
 export interface ImportExportMeta {

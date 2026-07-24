@@ -37,20 +37,31 @@ export default function SystemWorkflowMailWorkbenchPage({
   const [keyword, setKeyword] = useState('');
   const [businessType, setBusinessType] = useState('');
   const [enabledFilter, setEnabledFilter] = useState<EnabledFilter>('all');
+  const [page, setPage] = useState(1);
+  const [pageSize] = useState(20);
   const [loading, setLoading] = useState(canView);
   const [error, setError] = useState<string | null>(null);
 
-  const loadConfigs = async (query: WorkflowMailQuery = {}) => {
+  const buildQuery = (): WorkflowMailQuery => {
+    const query: WorkflowMailQuery = {};
+    if (businessType.trim()) query.businessType = businessType.trim();
+    if (enabledFilter === 'enabled') query.enabled = 1;
+    if (enabledFilter === 'disabled') query.enabled = 0;
+    return query;
+  };
+
+  const loadConfigs = async (query: WorkflowMailQuery = buildQuery(), nextPage: number = page) => {
     setLoading(true);
     setError(null);
     try {
       const [data, nextMeta] = await Promise.all([
-        listWorkflowMailConfigs({ page: 1, pageSize: 50, ...query }),
+        listWorkflowMailConfigs({ page: nextPage, pageSize, ...query }),
         getWorkflowMailMeta(),
       ]);
       setRecords(data?.records ?? []);
       setTotal(data?.total ?? 0);
       setMeta(nextMeta ?? emptyMeta());
+      setPage(nextPage);
     } catch {
       setRecords([]);
       setTotal(0);
@@ -71,7 +82,7 @@ export default function SystemWorkflowMailWorkbenchPage({
     setError(null);
 
     Promise.all([
-      listWorkflowMailConfigs({ page: 1, pageSize: 50 }),
+      listWorkflowMailConfigs({ page, pageSize }),
       getWorkflowMailMeta(),
     ])
       .then(([data, nextMeta]) => {
@@ -99,7 +110,7 @@ export default function SystemWorkflowMailWorkbenchPage({
     return () => {
       ignored = true;
     };
-  }, [canView]);
+  }, [canView, page, pageSize]);
 
   const visibleRecords = useMemo(
     () => records.filter((r) => {
@@ -112,13 +123,21 @@ export default function SystemWorkflowMailWorkbenchPage({
 
   const enabledCount = useMemo(() => records.filter((r) => r.enabled).length, [records]);
 
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+
   const handleSearch = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const query: WorkflowMailQuery = {};
-    if (businessType.trim()) query.businessType = businessType.trim();
-    if (enabledFilter === 'enabled') query.enabled = 1;
-    if (enabledFilter === 'disabled') query.enabled = 0;
-    void loadConfigs(query);
+    void loadConfigs(buildQuery(), 1);
+  };
+
+  const handlePrevPage = () => {
+    if (page <= 1 || loading) return;
+    void loadConfigs(buildQuery(), page - 1);
+  };
+
+  const handleNextPage = () => {
+    if (page >= totalPages || loading) return;
+    void loadConfigs(buildQuery(), page + 1);
   };
 
   if (!canView) {
@@ -240,6 +259,25 @@ export default function SystemWorkflowMailWorkbenchPage({
               ))}
             </tbody>
           </table>
+        </div>
+        <div className="mt-3 flex items-center justify-center gap-4 text-sm text-slate-600">
+          <button
+            type="button"
+            className="rounded-xl border border-slate-200 px-3 py-1.5 text-slate-700 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
+            disabled={page <= 1 || loading}
+            onClick={handlePrevPage}
+          >
+            上一页
+          </button>
+          <span>第 {page} / {totalPages} 页</span>
+          <button
+            type="button"
+            className="rounded-xl border border-slate-200 px-3 py-1.5 text-slate-700 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
+            disabled={page >= totalPages || loading}
+            onClick={handleNextPage}
+          >
+            下一页
+          </button>
         </div>
       </div>
 

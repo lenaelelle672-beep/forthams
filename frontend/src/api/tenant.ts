@@ -26,6 +26,8 @@ export interface TenantRecord {
 export interface TenantList {
   records: TenantRecord[];
   total: number;
+  current?: number;
+  pages?: number;
 }
 
 export interface TenantMeta {

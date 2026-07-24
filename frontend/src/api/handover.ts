@@ -21,6 +21,8 @@ export interface HandoverRecord {
 export interface HandoverList {
   records: HandoverRecord[];
   total: number;
+  current?: number;
+  pages?: number;
 }
 
 export interface HandoverMeta {

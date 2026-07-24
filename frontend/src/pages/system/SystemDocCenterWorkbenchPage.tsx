@@ -47,20 +47,30 @@ export default function SystemDocCenterWorkbenchPage({
   const [keyword, setKeyword] = useState('');
   const [category, setCategory] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
+  const [page, setPage] = useState(1);
+  const [pageSize] = useState(20);
   const [loading, setLoading] = useState(canView);
   const [error, setError] = useState<string | null>(null);
 
-  const loadArticles = async (query: DocArticleQuery = {}) => {
+  const buildQuery = (): DocArticleQuery => {
+    const query: DocArticleQuery = {};
+    if (category.trim()) query.category = category.trim();
+    if (statusFilter !== 'all') query.status = statusFilter;
+    return query;
+  };
+
+  const loadArticles = async (query: DocArticleQuery = buildQuery(), nextPage: number = page) => {
     setLoading(true);
     setError(null);
     try {
       const [data, nextMeta] = await Promise.all([
-        listDocArticles({ page: 1, pageSize: 50, ...query }),
+        listDocArticles({ page: nextPage, pageSize, ...query }),
         getDocCenterMeta(),
       ]);
       setRecords(data?.records ?? []);
       setTotal(data?.total ?? 0);
       setMeta(nextMeta ?? emptyMeta());
+      setPage(nextPage);
     } catch {
       setRecords([]);
       setTotal(0);
@@ -81,7 +91,7 @@ export default function SystemDocCenterWorkbenchPage({
     setError(null);
 
     Promise.all([
-      listDocArticles({ page: 1, pageSize: 50 }),
+      listDocArticles({ page, pageSize }),
       getDocCenterMeta(),
     ])
       .then(([data, nextMeta]) => {
@@ -109,7 +119,7 @@ export default function SystemDocCenterWorkbenchPage({
     return () => {
       ignored = true;
     };
-  }, [canView]);
+  }, [canView, page, pageSize]);
 
   const visibleRecords = useMemo(
     () => records.filter((r) => matchesStatus(r, statusFilter) && matchesKeyword(r, keyword)),
@@ -118,12 +128,21 @@ export default function SystemDocCenterWorkbenchPage({
 
   const publishedCount = useMemo(() => records.filter((r) => String(r.status ?? '').toUpperCase() === 'PUBLISHED').length, [records]);
 
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+
   const handleSearch = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const query: DocArticleQuery = {};
-    if (category.trim()) query.category = category.trim();
-    if (statusFilter !== 'all') query.status = statusFilter;
-    void loadArticles(query);
+    void loadArticles(buildQuery(), 1);
+  };
+
+  const handlePrevPage = () => {
+    if (page <= 1 || loading) return;
+    void loadArticles(buildQuery(), page - 1);
+  };
+
+  const handleNextPage = () => {
+    if (page >= totalPages || loading) return;
+    void loadArticles(buildQuery(), page + 1);
   };
 
   if (!canView) {
@@ -248,6 +267,25 @@ export default function SystemDocCenterWorkbenchPage({
               ))}
             </tbody>
           </table>
+        </div>
+        <div className="mt-3 flex items-center justify-center gap-4 text-sm text-slate-600">
+          <button
+            type="button"
+            className="rounded-xl border border-slate-200 px-3 py-1.5 text-slate-700 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
+            disabled={page <= 1 || loading}
+            onClick={handlePrevPage}
+          >
+            上一页
+          </button>
+          <span>第 {page} / {totalPages} 页</span>
+          <button
+            type="button"
+            className="rounded-xl border border-slate-200 px-3 py-1.5 text-slate-700 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
+            disabled={page >= totalPages || loading}
+            onClick={handleNextPage}
+          >
+            下一页
+          </button>
         </div>
       </div>
 

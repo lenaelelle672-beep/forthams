@@ -19,6 +19,8 @@ export interface DocArticleRecord {
 export interface DocArticleList {
   records: DocArticleRecord[];
   total: number;
+  current?: number;
+  pages?: number;
 }
 
 export interface DocCenterMeta {

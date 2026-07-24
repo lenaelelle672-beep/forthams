@@ -48,6 +48,8 @@ export default function SystemDataPermissionsWorkbenchPage({
   const [catalog, setCatalog] = useState<DataPermissionCatalog>(emptyCatalog);
   const [keyword, setKeyword] = useState('');
   const [scopeFilter, setScopeFilter] = useState<ScopeFilter>('all');
+  const [page, setPage] = useState(1);
+  const [pageSize] = useState(20);
   const [loading, setLoading] = useState(canView);
   const [error, setError] = useState<string | null>(null);
 
@@ -101,6 +103,18 @@ export default function SystemDataPermissionsWorkbenchPage({
   const visibleRoles = useMemo(
     () => catalog.roles.filter((r) => matchesScope(r, scopeFilter) && matchesKeyword(r, keyword)),
     [catalog.roles, scopeFilter, keyword],
+  );
+
+  // 筛选条件变化时回到第一页
+  useEffect(() => {
+    setPage(1);
+  }, [keyword, scopeFilter, catalog.roles]);
+
+  const totalPages = Math.max(1, Math.ceil(visibleRoles.length / pageSize));
+  const safePage = Math.min(page, totalPages);
+  const pagedRoles = useMemo(
+    () => visibleRoles.slice((safePage - 1) * pageSize, safePage * pageSize),
+    [visibleRoles, safePage, pageSize],
   );
 
   if (!canView) {
@@ -209,7 +223,7 @@ export default function SystemDataPermissionsWorkbenchPage({
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {visibleRoles.map((role) => (
+              {pagedRoles.map((role) => (
                 <tr key={role.roleId}>
                   <td className="py-2 pr-3 font-medium text-slate-800">{role.roleCode}</td>
                   <td className="py-2 pr-3 text-slate-600">{role.roleName}</td>
@@ -223,6 +237,25 @@ export default function SystemDataPermissionsWorkbenchPage({
               ))}
             </tbody>
           </table>
+        </div>
+        <div className="mt-3 flex items-center justify-center gap-4 text-sm text-slate-600">
+          <button
+            type="button"
+            className="rounded-xl border border-slate-200 px-3 py-1.5 text-slate-700 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
+            disabled={safePage <= 1}
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+          >
+            上一页
+          </button>
+          <span>第 {safePage} / {totalPages} 页</span>
+          <button
+            type="button"
+            className="rounded-xl border border-slate-200 px-3 py-1.5 text-slate-700 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
+            disabled={safePage >= totalPages}
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+          >
+            下一页
+          </button>
         </div>
       </div>
 

@@ -50,20 +50,29 @@ export default function SystemHandoverWorkbenchPage({
   const [meta, setMeta] = useState<HandoverMeta>(emptyMeta);
   const [keyword, setKeyword] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
+  const [page, setPage] = useState(1);
+  const [pageSize] = useState(20);
   const [loading, setLoading] = useState(canView);
   const [error, setError] = useState<string | null>(null);
 
-  const loadRecords = async (query: HandoverQuery = {}) => {
+  const buildQuery = (): HandoverQuery => {
+    const query: HandoverQuery = {};
+    if (statusFilter !== 'all') query.status = statusFilter;
+    return query;
+  };
+
+  const loadRecords = async (query: HandoverQuery = buildQuery(), nextPage: number = page) => {
     setLoading(true);
     setError(null);
     try {
       const [data, nextMeta] = await Promise.all([
-        listHandoverTasks({ page: 1, pageSize: 50, ...query }),
+        listHandoverTasks({ page: nextPage, pageSize, ...query }),
         getHandoverMeta(),
       ]);
       setRecords(data?.records ?? []);
       setTotal(data?.total ?? 0);
       setMeta(nextMeta ?? emptyMeta());
+      setPage(nextPage);
     } catch {
       setRecords([]);
       setTotal(0);
@@ -84,7 +93,7 @@ export default function SystemHandoverWorkbenchPage({
     setError(null);
 
     Promise.all([
-      listHandoverTasks({ page: 1, pageSize: 50 }),
+      listHandoverTasks({ page, pageSize }),
       getHandoverMeta(),
     ])
       .then(([data, nextMeta]) => {
@@ -112,7 +121,7 @@ export default function SystemHandoverWorkbenchPage({
     return () => {
       ignored = true;
     };
-  }, [canView]);
+  }, [canView, page, pageSize]);
 
   const visibleRecords = useMemo(
     () => records.filter((r) => matchesStatus(r, statusFilter) && matchesKeyword(r, keyword)),
@@ -121,11 +130,21 @@ export default function SystemHandoverWorkbenchPage({
 
   const pendingCount = useMemo(() => records.filter((r) => ['PENDING', 'IN_PROGRESS'].includes(String(r.status ?? '').toUpperCase())).length, [records]);
 
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+
   const handleSearch = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const query: HandoverQuery = {};
-    if (statusFilter !== 'all') query.status = statusFilter;
-    void loadRecords(query);
+    void loadRecords(buildQuery(), 1);
+  };
+
+  const handlePrevPage = () => {
+    if (page <= 1 || loading) return;
+    void loadRecords(buildQuery(), page - 1);
+  };
+
+  const handleNextPage = () => {
+    if (page >= totalPages || loading) return;
+    void loadRecords(buildQuery(), page + 1);
   };
 
   if (!canView) {
@@ -249,6 +268,25 @@ export default function SystemHandoverWorkbenchPage({
               ))}
             </tbody>
           </table>
+        </div>
+        <div className="mt-3 flex items-center justify-center gap-4 text-sm text-slate-600">
+          <button
+            type="button"
+            className="rounded-xl border border-slate-200 px-3 py-1.5 text-slate-700 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
+            disabled={page <= 1 || loading}
+            onClick={handlePrevPage}
+          >
+            上一页
+          </button>
+          <span>第 {page} / {totalPages} 页</span>
+          <button
+            type="button"
+            className="rounded-xl border border-slate-200 px-3 py-1.5 text-slate-700 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
+            disabled={page >= totalPages || loading}
+            onClick={handleNextPage}
+          >
+            下一页
+          </button>
         </div>
       </div>
 

@@ -59,20 +59,23 @@ export default function SystemTenantManagementWorkbenchPage({
   const [keywordInput, setKeywordInput] = useState('');
   const [activeKeyword, setActiveKeyword] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
+  const [page, setPage] = useState(1);
+  const [pageSize] = useState(20);
   const [loading, setLoading] = useState(canView);
   const [error, setError] = useState<string | null>(null);
 
-  const loadTenants = async (query: TenantQuery = {}) => {
+  const loadTenants = async (query: TenantQuery = {}, nextPage: number = page) => {
     setLoading(true);
     setError(null);
     try {
       const [data, nextMeta] = await Promise.all([
-        listTenants({ page: 1, pageSize: 100, ...query }),
+        listTenants({ page: nextPage, pageSize, ...query }),
         getTenantMeta(),
       ]);
       setTenants(data?.records ?? []);
       setTotal(data?.total ?? 0);
       setMeta(nextMeta ?? emptyMeta());
+      setPage(nextPage);
     } catch {
       setTenants([]);
       setTotal(0);
@@ -93,7 +96,7 @@ export default function SystemTenantManagementWorkbenchPage({
     setError(null);
 
     Promise.all([
-      listTenants({ page: 1, pageSize: 100 }),
+      listTenants({ page, pageSize }),
       getTenantMeta(),
     ])
       .then(([data, nextMeta]) => {
@@ -121,7 +124,7 @@ export default function SystemTenantManagementWorkbenchPage({
     return () => {
       ignored = true;
     };
-  }, [canView]);
+  }, [canView, page, pageSize]);
 
   const visibleTenants = useMemo(
     () => tenants.filter((t) => matchesStatus(t.status, statusFilter) && matchesKeyword(t, activeKeyword)),
@@ -130,15 +133,27 @@ export default function SystemTenantManagementWorkbenchPage({
 
   const activeCount = useMemo(() => tenants.filter((t) => t.status !== 'SUSPENDED').length, [tenants]);
 
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+
   const handleSearch = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const nextKeyword = keywordInput.trim();
     setActiveKeyword(nextKeyword);
-    void loadTenants(nextKeyword ? { keyword: nextKeyword } : {});
+    void loadTenants(nextKeyword ? { keyword: nextKeyword } : {}, 1);
   };
 
   const handleReload = () => {
-    void loadTenants(activeKeyword ? { keyword: activeKeyword } : {});
+    void loadTenants(activeKeyword ? { keyword: activeKeyword } : {}, 1);
+  };
+
+  const handlePrevPage = () => {
+    if (page <= 1 || loading) return;
+    void loadTenants(activeKeyword ? { keyword: activeKeyword } : {}, page - 1);
+  };
+
+  const handleNextPage = () => {
+    if (page >= totalPages || loading) return;
+    void loadTenants(activeKeyword ? { keyword: activeKeyword } : {}, page + 1);
   };
 
   if (!canView) {
@@ -260,6 +275,25 @@ export default function SystemTenantManagementWorkbenchPage({
               ))}
             </tbody>
           </table>
+        </div>
+        <div className="mt-3 flex items-center justify-center gap-4 text-sm text-slate-600">
+          <button
+            type="button"
+            className="rounded-xl border border-slate-200 px-3 py-1.5 text-slate-700 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
+            disabled={page <= 1 || loading}
+            onClick={handlePrevPage}
+          >
+            上一页
+          </button>
+          <span>第 {page} / {totalPages} 页</span>
+          <button
+            type="button"
+            className="rounded-xl border border-slate-200 px-3 py-1.5 text-slate-700 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
+            disabled={page >= totalPages || loading}
+            onClick={handleNextPage}
+          >
+            下一页
+          </button>
         </div>
       </div>
 

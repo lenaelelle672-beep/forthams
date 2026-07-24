@@ -18,6 +18,8 @@ export interface WorkflowMailConfigRecord {
 export interface WorkflowMailConfigList {
   records: WorkflowMailConfigRecord[];
   total: number;
+  current?: number;
+  pages?: number;
 }
 
 export interface WorkflowMailMeta {

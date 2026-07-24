@@ -20,6 +20,8 @@ export interface SupportTicketRecord {
 export interface SupportTicketList {
   records: SupportTicketRecord[];
   total: number;
+  current?: number;
+  pages?: number;
 }
 
 export interface TechSupportMeta {

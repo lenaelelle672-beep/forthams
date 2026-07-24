@@ -64,20 +64,30 @@ export default function SystemImportExportWorkbenchPage({
   const [keyword, setKeyword] = useState('');
   const [typeFilter, setTypeFilter] = useState<TypeFilter>('all');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
+  const [page, setPage] = useState(1);
+  const [pageSize] = useState(20);
   const [loading, setLoading] = useState(canView);
   const [error, setError] = useState<string | null>(null);
 
-  const loadTasks = async (query: ImportExportQuery = {}) => {
+  const buildQuery = (): ImportExportQuery => {
+    const query: ImportExportQuery = {};
+    if (typeFilter !== 'all') query.taskType = typeFilter;
+    if (statusFilter !== 'all') query.status = statusFilter;
+    return query;
+  };
+
+  const loadTasks = async (query: ImportExportQuery = buildQuery(), nextPage: number = page) => {
     setLoading(true);
     setError(null);
     try {
       const [data, nextMeta] = await Promise.all([
-        listImportExportTasks({ page: 1, pageSize: 50, ...query }),
+        listImportExportTasks({ page: nextPage, pageSize, ...query }),
         getImportExportMeta(),
       ]);
       setTasks(data?.records ?? []);
       setTotal(data?.total ?? 0);
       setMeta(nextMeta ?? emptyMeta());
+      setPage(nextPage);
     } catch {
       setTasks([]);
       setTotal(0);
@@ -98,7 +108,7 @@ export default function SystemImportExportWorkbenchPage({
     setError(null);
 
     Promise.all([
-      listImportExportTasks({ page: 1, pageSize: 50 }),
+      listImportExportTasks({ page, pageSize }),
       getImportExportMeta(),
     ])
       .then(([data, nextMeta]) => {
@@ -126,7 +136,7 @@ export default function SystemImportExportWorkbenchPage({
     return () => {
       ignored = true;
     };
-  }, [canView]);
+  }, [canView, page, pageSize]);
 
   const visibleTasks = useMemo(
     () => tasks.filter((t) => matchesType(t, typeFilter) && matchesStatus(t, statusFilter) && matchesKeyword(t, keyword)),
@@ -135,12 +145,21 @@ export default function SystemImportExportWorkbenchPage({
 
   const failedCount = useMemo(() => tasks.filter((t) => String(t.status ?? '').toUpperCase() === 'FAILED').length, [tasks]);
 
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+
   const handleSearch = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const query: ImportExportQuery = {};
-    if (typeFilter !== 'all') query.taskType = typeFilter;
-    if (statusFilter !== 'all') query.status = statusFilter;
-    void loadTasks(query);
+    void loadTasks(buildQuery(), 1);
+  };
+
+  const handlePrevPage = () => {
+    if (page <= 1 || loading) return;
+    void loadTasks(buildQuery(), page - 1);
+  };
+
+  const handleNextPage = () => {
+    if (page >= totalPages || loading) return;
+    void loadTasks(buildQuery(), page + 1);
   };
 
   if (!canView) {
@@ -280,6 +299,25 @@ export default function SystemImportExportWorkbenchPage({
               ))}
             </tbody>
           </table>
+        </div>
+        <div className="mt-3 flex items-center justify-center gap-4 text-sm text-slate-600">
+          <button
+            type="button"
+            className="rounded-xl border border-slate-200 px-3 py-1.5 text-slate-700 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
+            disabled={page <= 1 || loading}
+            onClick={handlePrevPage}
+          >
+            上一页
+          </button>
+          <span>第 {page} / {totalPages} 页</span>
+          <button
+            type="button"
+            className="rounded-xl border border-slate-200 px-3 py-1.5 text-slate-700 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
+            disabled={page >= totalPages || loading}
+            onClick={handleNextPage}
+          >
+            下一页
+          </button>
         </div>
       </div>
 
