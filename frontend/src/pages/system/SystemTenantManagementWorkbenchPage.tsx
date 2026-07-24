@@ -88,7 +88,39 @@ export default function SystemTenantManagementWorkbenchPage({
       setLoading(false);
       return;
     }
-    void loadTenants();
+    let ignored = false;
+    setLoading(true);
+    setError(null);
+
+    Promise.all([
+      listTenants({ page: 1, pageSize: 100 }),
+      getTenantMeta(),
+    ])
+      .then(([data, nextMeta]) => {
+        if (ignored) {
+          return;
+        }
+        setTenants(data?.records ?? []);
+        setTotal(data?.total ?? 0);
+        setMeta(nextMeta ?? emptyMeta());
+      })
+      .catch(() => {
+        if (!ignored) {
+          setTenants([]);
+          setTotal(0);
+          setMeta(emptyMeta());
+          setError('租户管理只读 catalog 加载失败，敏感细节已脱敏');
+        }
+      })
+      .finally(() => {
+        if (!ignored) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      ignored = true;
+    };
   }, [canView]);
 
   const visibleTenants = useMemo(

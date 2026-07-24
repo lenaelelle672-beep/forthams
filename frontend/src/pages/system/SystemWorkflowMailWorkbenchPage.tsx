@@ -66,7 +66,39 @@ export default function SystemWorkflowMailWorkbenchPage({
       setLoading(false);
       return;
     }
-    void loadConfigs();
+    let ignored = false;
+    setLoading(true);
+    setError(null);
+
+    Promise.all([
+      listWorkflowMailConfigs({ page: 1, pageSize: 50 }),
+      getWorkflowMailMeta(),
+    ])
+      .then(([data, nextMeta]) => {
+        if (ignored) {
+          return;
+        }
+        setRecords(data?.records ?? []);
+        setTotal(data?.total ?? 0);
+        setMeta(nextMeta ?? emptyMeta());
+      })
+      .catch(() => {
+        if (!ignored) {
+          setRecords([]);
+          setTotal(0);
+          setMeta(emptyMeta());
+          setError('流程邮件配置加载失败，敏感细节已脱敏');
+        }
+      })
+      .finally(() => {
+        if (!ignored) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      ignored = true;
+    };
   }, [canView]);
 
   const visibleRecords = useMemo(

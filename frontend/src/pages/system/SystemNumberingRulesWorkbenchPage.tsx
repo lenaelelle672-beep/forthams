@@ -29,6 +29,7 @@ export default function SystemNumberingRulesWorkbenchPage({
   const [previewResult, setPreviewResult] = useState<NumberingRulePreviewResponse | null>(null);
   const [loading, setLoading] = useState(canView);
   const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     if (!canView) {
@@ -89,6 +90,7 @@ export default function SystemNumberingRulesWorkbenchPage({
     if (!selectedRuleKey) {
       return;
     }
+    setSubmitting(true);
     try {
       setError(null);
       const detailResult = await numberingRulesApi.detail(selectedRuleKey);
@@ -97,11 +99,14 @@ export default function SystemNumberingRulesWorkbenchPage({
       setPreviewResult(null);
     } catch {
       setError('编号规则详情读取失败，错误详情已脱敏');
+    } finally {
+      setSubmitting(false);
     }
   };
 
   const runPreview = async (submitEvent: FormEvent<HTMLFormElement>) => {
     submitEvent.preventDefault();
+    setSubmitting(true);
     try {
       setError(null);
       setPreviewResult(await numberingRulesApi.preview({
@@ -112,6 +117,8 @@ export default function SystemNumberingRulesWorkbenchPage({
       }));
     } catch {
       setError('无持久化、无缓存刷新、无序号预留的编号预览失败，错误详情已脱敏');
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -188,7 +195,7 @@ export default function SystemNumberingRulesWorkbenchPage({
               >
                 {(rules.length === 0 ? [{ ruleKey: 'numbering.rule.asset', name: '资产编号规则' }] : rules).map((item) => <option key={item.ruleKey} value={item.ruleKey}>{item.name}</option>)}
               </select>
-              <button type="submit" className="rounded-xl border border-slate-200 px-3 py-2 text-sm">读取规则详情</button>
+              <button type="submit" disabled={submitting} className="rounded-xl border border-slate-200 px-3 py-2 text-sm">读取规则详情</button>
             </div>
           </form>
 
@@ -203,7 +210,7 @@ export default function SystemNumberingRulesWorkbenchPage({
             <input id="numbering-rule-sample-at" className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm" value={sampleAt} onChange={(eventValue) => setSampleAt(eventValue.target.value)} />
             <label className="block text-sm font-medium text-slate-700" htmlFor="numbering-rule-sample-sequence">样例序号</label>
             <input id="numbering-rule-sample-sequence" className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm" value={sampleSequence} onChange={(eventValue) => setSampleSequence(eventValue.target.value)} />
-            <button type="submit" className="rounded-xl bg-blue-600 px-4 py-2 text-sm text-white">运行无持久化编号预览</button>
+            <button type="submit" disabled={submitting} className="rounded-xl bg-blue-600 px-4 py-2 text-sm text-white">运行无持久化编号预览</button>
           </form>
 
           {previewResult ? (

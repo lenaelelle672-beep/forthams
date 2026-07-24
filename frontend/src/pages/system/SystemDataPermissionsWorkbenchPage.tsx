@@ -70,7 +70,32 @@ export default function SystemDataPermissionsWorkbenchPage({
       setLoading(false);
       return;
     }
-    void loadCatalog();
+    let ignored = false;
+    setLoading(true);
+    setError(null);
+
+    getDataPermissionCatalog()
+      .then((next) => {
+        if (ignored) {
+          return;
+        }
+        setCatalog(next ?? emptyCatalog());
+      })
+      .catch(() => {
+        if (!ignored) {
+          setCatalog(emptyCatalog());
+          setError('数据权限只读 catalog 加载失败，敏感细节已脱敏');
+        }
+      })
+      .finally(() => {
+        if (!ignored) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      ignored = true;
+    };
   }, [canView]);
 
   const visibleRoles = useMemo(

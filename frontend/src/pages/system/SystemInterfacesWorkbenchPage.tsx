@@ -13,6 +13,7 @@ export default function SystemInterfacesWorkbenchPage({ embeddedInWorkbench = fa
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [checkingId, setCheckingId] = useState<number | null>(null);
 
   useEffect(() => {
     let mounted = true;
@@ -36,8 +37,13 @@ export default function SystemInterfacesWorkbenchPage({ embeddedInWorkbench = fa
   }, []);
 
   const handleConfigCheck = async (id: number) => {
-    const result = await testSystemInterfaceConfig(id);
-    setNotice(result.message);
+    setCheckingId(id);
+    try {
+      const result = await testSystemInterfaceConfig(id);
+      setNotice(result.message);
+    } finally {
+      setCheckingId(null);
+    }
   };
 
   if (!canView) {
@@ -68,7 +74,7 @@ export default function SystemInterfacesWorkbenchPage({ embeddedInWorkbench = fa
                 <h4 className="font-semibold">{item.interfaceName}</h4>
                 <p className="text-sm text-slate-500">{item.method} {item.path}</p>
               </div>
-              <button className="rounded-xl bg-blue-600 px-3 py-2 text-sm text-white" type="button" onClick={() => handleConfigCheck(item.id)}>
+              <button className="rounded-xl bg-blue-600 px-3 py-2 text-sm text-white" type="button" disabled={checkingId === item.id} onClick={() => handleConfigCheck(item.id)}>
                 配置校验
               </button>
             </div>

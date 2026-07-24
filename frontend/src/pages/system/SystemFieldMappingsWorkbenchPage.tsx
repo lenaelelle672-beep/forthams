@@ -13,6 +13,7 @@ export default function SystemFieldMappingsWorkbenchPage({ embeddedInWorkbench =
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -31,13 +32,18 @@ export default function SystemFieldMappingsWorkbenchPage({ embeddedInWorkbench =
   }, []);
 
   const handlePreview = async () => {
-    const result = await previewSystemFieldMapping({
-      sourceField: 'name',
-      targetField: 'assetName',
-      sampleValue: '  Laptop  ',
-      transformExpression: 'trim(value)',
-    });
-    setPreview(result.transformedValue);
+    setSubmitting(true);
+    try {
+      const result = await previewSystemFieldMapping({
+        sourceField: 'name',
+        targetField: 'assetName',
+        sampleValue: '  Laptop  ',
+        transformExpression: 'trim(value)',
+      });
+      setPreview(result.transformedValue);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   if (!canView) {
@@ -58,7 +64,7 @@ export default function SystemFieldMappingsWorkbenchPage({ embeddedInWorkbench =
       </div>
       {error ? <div role="alert" className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div> : null}
       {loading ? <div className="text-sm text-slate-500">加载中...</div> : null}
-      <button className="rounded-xl bg-blue-600 px-3 py-2 text-sm text-white" type="button" onClick={handlePreview}>预览转换</button>
+      <button className="rounded-xl bg-blue-600 px-3 py-2 text-sm text-white" type="button" disabled={submitting} onClick={handlePreview}>预览转换</button>
       {preview ? <div className="rounded-2xl bg-blue-50 px-4 py-3 text-sm text-blue-700">预览结果：{preview}</div> : null}
       {!loading && items.length === 0 ? <div className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm text-slate-500">暂无字段映射。</div> : null}
       <div className="grid gap-3">

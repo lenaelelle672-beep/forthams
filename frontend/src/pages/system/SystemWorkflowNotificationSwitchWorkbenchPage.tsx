@@ -36,6 +36,7 @@ export default function SystemWorkflowNotificationSwitchWorkbenchPage({
   const [previewResult, setPreviewResult] = useState<NotificationBizSwitchPreviewResponse | null>(null);
   const [loading, setLoading] = useState(canView);
   const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     if (!canView) {
@@ -99,17 +100,21 @@ export default function SystemWorkflowNotificationSwitchWorkbenchPage({
     if (!bizType) {
       return;
     }
+    setSubmitting(true);
     try {
       setError(null);
       setBizTypeSwitches(await notificationSwitchApi.getByBizType(bizType));
       setPreviewResult(null);
     } catch {
       setError('业务类型通知开关读取失败，错误详情已脱敏');
+    } finally {
+      setSubmitting(false);
     }
   };
 
   const runPreview = async (submitEvent: FormEvent<HTMLFormElement>) => {
     submitEvent.preventDefault();
+    setSubmitting(true);
     try {
       setError(null);
       setPreviewResult(await notificationSwitchApi.preview({
@@ -120,6 +125,8 @@ export default function SystemWorkflowNotificationSwitchWorkbenchPage({
       }));
     } catch {
       setError('无持久化、无发送、无流程运行时影响预览失败，错误详情已脱敏');
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -198,7 +205,7 @@ export default function SystemWorkflowNotificationSwitchWorkbenchPage({
                 <option value="">请选择业务类型</option>
                 {bizTypeOptions.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}
               </select>
-              <button type="submit" className="rounded-xl border border-slate-200 px-3 py-2 text-sm">读取业务类型</button>
+              <button type="submit" disabled={submitting} className="rounded-xl border border-slate-200 px-3 py-2 text-sm">读取业务类型</button>
             </div>
           </form>
 
@@ -220,7 +227,7 @@ export default function SystemWorkflowNotificationSwitchWorkbenchPage({
               <option value={1}>启用样例</option>
               <option value={0}>停用样例</option>
             </select>
-            <button type="submit" className="rounded-xl bg-blue-600 px-4 py-2 text-sm text-white">运行无持久化通知开关预览</button>
+            <button type="submit" disabled={submitting} className="rounded-xl bg-blue-600 px-4 py-2 text-sm text-white">运行无持久化通知开关预览</button>
           </form>
 
           {previewResult ? (

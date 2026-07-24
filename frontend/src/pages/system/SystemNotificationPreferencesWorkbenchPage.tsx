@@ -37,6 +37,7 @@ export default function SystemNotificationPreferencesWorkbenchPage({
   const [previewResult, setPreviewResult] = useState<NotificationPreferencePreviewResponse | null>(null);
   const [loading, setLoading] = useState(canView);
   const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     if (!canView) {
@@ -97,6 +98,7 @@ export default function SystemNotificationPreferencesWorkbenchPage({
     if (!selectedCategory) {
       return;
     }
+    setSubmitting(true);
     try {
       setError(null);
       const detail = await notificationPreferenceApi.getByCategory(selectedCategory);
@@ -106,11 +108,14 @@ export default function SystemNotificationPreferencesWorkbenchPage({
       setPreviewResult(null);
     } catch {
       setError('通知偏好分类读取失败，保留字、未知分类或错误详情已脱敏');
+    } finally {
+      setSubmitting(false);
     }
   };
 
   const runPreview = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setSubmitting(true);
     try {
       setError(null);
       setPreviewResult(await notificationPreferenceApi.preview({
@@ -122,6 +127,8 @@ export default function SystemNotificationPreferencesWorkbenchPage({
       }));
     } catch {
       setError('无持久化偏好决策预览失败，错误详情已脱敏');
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -198,7 +205,7 @@ export default function SystemNotificationPreferencesWorkbenchPage({
                 <option value="">请选择分类</option>
                 {categoryOptions.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}
               </select>
-              <button type="submit" className="rounded-xl border border-slate-200 px-3 py-2 text-sm">读取分类</button>
+              <button type="submit" disabled={submitting} className="rounded-xl border border-slate-200 px-3 py-2 text-sm">读取分类</button>
             </div>
           </form>
 
@@ -221,7 +228,7 @@ export default function SystemNotificationPreferencesWorkbenchPage({
                 <input id="notification-preference-quiet-end" className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm" value={quietEnd} onChange={(event) => setQuietEnd(event.target.value)} />
               </label>
             </div>
-            <button type="submit" className="rounded-xl bg-blue-600 px-4 py-2 text-sm text-white">运行无持久化偏好预览</button>
+            <button type="submit" disabled={submitting} className="rounded-xl bg-blue-600 px-4 py-2 text-sm text-white">运行无持久化偏好预览</button>
           </form>
 
           {previewResult ? (

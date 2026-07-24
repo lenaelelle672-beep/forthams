@@ -76,7 +76,39 @@ export default function SystemDocCenterWorkbenchPage({
       setLoading(false);
       return;
     }
-    void loadArticles();
+    let ignored = false;
+    setLoading(true);
+    setError(null);
+
+    Promise.all([
+      listDocArticles({ page: 1, pageSize: 50 }),
+      getDocCenterMeta(),
+    ])
+      .then(([data, nextMeta]) => {
+        if (ignored) {
+          return;
+        }
+        setRecords(data?.records ?? []);
+        setTotal(data?.total ?? 0);
+        setMeta(nextMeta ?? emptyMeta());
+      })
+      .catch(() => {
+        if (!ignored) {
+          setRecords([]);
+          setTotal(0);
+          setMeta(emptyMeta());
+          setError('文档中心加载失败，敏感细节已脱敏');
+        }
+      })
+      .finally(() => {
+        if (!ignored) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      ignored = true;
+    };
   }, [canView]);
 
   const visibleRecords = useMemo(

@@ -39,6 +39,7 @@ export default function SystemNotificationChannelsWorkbenchPage({
   const [previewResult, setPreviewResult] = useState<ChannelConfigPreviewResponse | null>(null);
   const [loading, setLoading] = useState(canView);
   const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     if (!canView) {
@@ -104,6 +105,7 @@ export default function SystemNotificationChannelsWorkbenchPage({
     if (!selectedId) {
       return;
     }
+    setSubmitting(true);
     try {
       setError(null);
       const detail = await channelConfigApi.getById(selectedId);
@@ -116,11 +118,14 @@ export default function SystemNotificationChannelsWorkbenchPage({
       setPreviewResult(null);
     } catch {
       setError('通知渠道详情读取失败，错误详情已脱敏');
+    } finally {
+      setSubmitting(false);
     }
   };
 
   const runPreview = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setSubmitting(true);
     try {
       setError(null);
       setPreviewResult(await channelConfigApi.preview({
@@ -133,6 +138,8 @@ export default function SystemNotificationChannelsWorkbenchPage({
       }));
     } catch {
       setError('无持久化、无发送渠道预览失败，错误详情已脱敏');
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -214,7 +221,7 @@ export default function SystemNotificationChannelsWorkbenchPage({
                 <option value="">请选择配置</option>
                 {configs.map((config) => <option key={config.id} value={config.id}>{config.configName}</option>)}
               </select>
-              <button type="submit" className="rounded-xl border border-slate-200 px-3 py-2 text-sm">读取详情</button>
+              <button type="submit" disabled={submitting} className="rounded-xl border border-slate-200 px-3 py-2 text-sm">读取详情</button>
             </div>
           </form>
 
@@ -236,7 +243,7 @@ export default function SystemNotificationChannelsWorkbenchPage({
               <label className="flex items-center gap-2"><input type="checkbox" checked={signatureConfigured} onChange={(event) => setSignatureConfigured(event.target.checked)} />签名已配置</label>
               <label className="flex items-center gap-2"><input type="checkbox" checked={enabled} onChange={(event) => setEnabled(event.target.checked)} />启用状态</label>
             </div>
-            <button type="submit" className="rounded-xl bg-blue-600 px-4 py-2 text-sm text-white">运行无持久化渠道预览</button>
+            <button type="submit" disabled={submitting} className="rounded-xl bg-blue-600 px-4 py-2 text-sm text-white">运行无持久化渠道预览</button>
           </form>
 
           {previewResult ? (

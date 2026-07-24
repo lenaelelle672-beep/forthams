@@ -79,7 +79,39 @@ export default function SystemHandoverWorkbenchPage({
       setLoading(false);
       return;
     }
-    void loadRecords();
+    let ignored = false;
+    setLoading(true);
+    setError(null);
+
+    Promise.all([
+      listHandoverTasks({ page: 1, pageSize: 50 }),
+      getHandoverMeta(),
+    ])
+      .then(([data, nextMeta]) => {
+        if (ignored) {
+          return;
+        }
+        setRecords(data?.records ?? []);
+        setTotal(data?.total ?? 0);
+        setMeta(nextMeta ?? emptyMeta());
+      })
+      .catch(() => {
+        if (!ignored) {
+          setRecords([]);
+          setTotal(0);
+          setMeta(emptyMeta());
+          setError('交接任务加载失败，敏感细节已脱敏');
+        }
+      })
+      .finally(() => {
+        if (!ignored) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      ignored = true;
+    };
   }, [canView]);
 
   const visibleRecords = useMemo(
