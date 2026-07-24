@@ -66,6 +66,6 @@ describe('SystemTenantManagementWorkbenchPage', () => {
   it('空态展示暂无提示', async () => {
     mockedList.mockResolvedValueOnce({ records: [], total: 0 });
     render(<SystemTenantManagementWorkbenchPage canView />);
-    await waitFor(() => expect(screen.getByText('暂无符合条件的租户。')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText('暂无租户数据。')).toBeInTheDocument());
   });
 });

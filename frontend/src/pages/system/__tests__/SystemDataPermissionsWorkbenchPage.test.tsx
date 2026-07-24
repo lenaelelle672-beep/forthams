@@ -73,6 +73,6 @@ describe('SystemDataPermissionsWorkbenchPage', () => {
       readOnlyNotice: '只读',
     });
     render(<SystemDataPermissionsWorkbenchPage canView />);
-    await waitFor(() => expect(screen.getByText('暂无符合条件的角色数据范围。')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText('暂无角色数据范围。')).toBeInTheDocument());
   });
 });

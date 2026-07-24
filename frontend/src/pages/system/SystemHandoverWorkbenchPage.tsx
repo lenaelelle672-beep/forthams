@@ -106,6 +106,8 @@ export default function SystemHandoverWorkbenchPage({
     );
   }
 
+  const emptyMessage = records.length === 0 ? '暂无交接任务数据。' : '没有符合条件的交接任务。';
+
   return (
     <section className="space-y-5" data-embedded={embeddedInWorkbench}>
       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -176,7 +178,7 @@ export default function SystemHandoverWorkbenchPage({
       {error ? <div role="alert" className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div> : null}
       {loading ? <div className="text-sm text-slate-500">交接任务加载中...</div> : null}
       {!loading && !error && visibleRecords.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm text-slate-500">暂无交接任务记录。</div>
+        <div className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm text-slate-500">{emptyMessage}</div>
       ) : null}
 
       <div className="rounded-2xl border border-slate-200 p-4">
