@@ -95,7 +95,6 @@ export default function StocktakingTaskPage() {
   const handleScanResult = (decodedText: string) => {
     stopScanner();
     // 这里可以解析扫码结果并预填数量
-    console.log('扫码结果:', decodedText);
     alert(`扫码成功: ${decodedText}`);
   };
 
