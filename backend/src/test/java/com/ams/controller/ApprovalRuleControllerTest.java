@@ -130,7 +130,7 @@ class ApprovalRuleControllerTest {
         grant("workflow:approval-rule:create");
         mockMvc.perform(post("/approval-rules").header("Authorization", "Bearer token").contentType(MediaType.APPLICATION_JSON).content(saveJson(99L)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.code").value(500));
+                .andExpect(jsonPath("$.code").value(400));
 
         verifyNoInteractions(approvalRuleService);
     }
@@ -151,7 +151,7 @@ class ApprovalRuleControllerTest {
 
         mockMvc.perform(post("/approval-rules/7/disable").header("Authorization", "Bearer token").contentType(MediaType.APPLICATION_JSON).content("{\"confirmed\":true,\"operatorId\":99}"))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.code").value(500));
+                .andExpect(jsonPath("$.code").value(400));
     }
 
     private ApprovalRuleDTO rule(String status) {

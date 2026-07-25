@@ -86,7 +86,7 @@ class ChannelConfigControllerTest {
 
         mockMvc.perform(get("/system/channel-configs/99"))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.code").value(500));
+                .andExpect(jsonPath("$.code").value(400));
 
         verify(channelConfigService).list(any());
         verify(channelConfigService).detail(7L);

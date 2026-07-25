@@ -112,11 +112,11 @@ class TodoFieldConfigControllerTest {
         grant("workflow:todo-field:update");
         mockMvc.perform(put("/todo-fields").header("Authorization", "Bearer token").contentType(MediaType.APPLICATION_JSON).content(saveJson(99L)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.code").value(500));
+                .andExpect(jsonPath("$.code").value(400));
 
         mockMvc.perform(put("/todo-fields/sort-order").header("Authorization", "Bearer token").contentType(MediaType.APPLICATION_JSON).content("{\"confirmed\":false,\"operatorId\":42,\"reason\":\"排序\",\"fields\":[]}"))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.code").value(500));
+                .andExpect(jsonPath("$.code").value(400));
 
         verifyNoInteractions(todoFieldConfigService);
     }
@@ -136,7 +136,7 @@ class TodoFieldConfigControllerTest {
 
         mockMvc.perform(post("/todo-fields/reset-defaults").header("Authorization", "Bearer token").contentType(MediaType.APPLICATION_JSON).content("{\"confirmed\":true,\"operatorId\":88}"))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.code").value(500));
+                .andExpect(jsonPath("$.code").value(400));
     }
 
     private TodoFieldConfigDTO field(String key, boolean sensitive) {

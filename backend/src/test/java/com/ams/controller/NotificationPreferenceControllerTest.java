@@ -76,7 +76,7 @@ class NotificationPreferenceControllerTest {
 
         mockMvc.perform(get("/notification-preferences/batch"))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.code").value(500));
+                .andExpect(jsonPath("$.code").value(400));
 
         verify(notificationPreferenceService).list();
         verify(notificationPreferenceService).getByCategory("system");
