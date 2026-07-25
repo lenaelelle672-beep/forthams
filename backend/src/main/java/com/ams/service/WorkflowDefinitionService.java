@@ -89,9 +89,10 @@ public class WorkflowDefinitionService {
             definition.setBusinessType(businessType);
             definition.setStatus("DRAFT");
             definition.setVersion(0);
-        } else if ("PUBLISHED".equals(definition.getStatus())) {
-            definition.setStatus("DRAFT");
         }
+        // 注意：不再将 PUBLISHED 降级为 DRAFT（BUG 1.3 修复）
+        // 编辑草稿不应影响已发布版本的线上可用性
+        // 已发布流程保存草稿后仍保持 PUBLISHED，直到显式重新发布才更新版本
 
         definition.setName(firstPresent(dto.getName(), template.name()));
         definition.setDescription(firstPresent(dto.getDescription(), template.description()));
