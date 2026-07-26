@@ -20,7 +20,6 @@ import java.util.Objects;
  * </ul>
  *
  * @see com.ams.service.ApprovalService
- * @see com.ams.enums.OrderStatus
  */
 public class ApprovalNotificationEvent {
 

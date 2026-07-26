@@ -115,6 +115,14 @@ public class ApprovalService {
         BeanUtil.setProperty(record, "tenantId", tenantId);
         Integer currentStep = parseInteger(BeanUtil.getProperty(process, "currentStep"), 1);
         int finalStep = resolveFinalStep(process);
+
+        // BUG 2.3 修复：先验证 result 再 insert，避免坏顺序依赖事务回滚
+        boolean isApproved = "APPROVED".equals(result);
+        boolean isRejected = "REJECTED".equals(result);
+        if (!isApproved && !isRejected) {
+            throw new BusinessException("审批结果无效");
+        }
+
         BeanUtil.setProperty(record, "stepNo", currentStep);
         BeanUtil.setProperty(record, "approverId", approverId);
         BeanUtil.setProperty(record, "approveResult", result);
@@ -122,16 +130,14 @@ public class ApprovalService {
         BeanUtil.setProperty(record, "approveTime", LocalDateTime.now());
         approvalRecordMapper.insert(record);
 
-        if ("REJECTED".equals(result)) {
+        if (isRejected) {
             BeanUtil.setProperty(process, "status", "REJECTED");
-        } else if ("APPROVED".equals(result)) {
+        } else if (isApproved) {
             if (currentStep >= finalStep) {
                 BeanUtil.setProperty(process, "status", "APPROVED");
             } else {
                 BeanUtil.setProperty(process, "currentStep", currentStep + 1);
             }
-        } else {
-            throw new BusinessException("审批结果无效");
         }
 
         approvalProcessMapper.updateById(process);
