@@ -179,11 +179,16 @@ public class WorkflowDefinitionService {
         }
         WorkflowDefinitionVersion sourceVersion = requireVersion(tenantId, businessType, version);
 
+        // BUG 1.4 修复：rollback 到当前版本无意义（创建 spurious 版本记录）
+        if (version.equals(definition.getVersion())) {
+            throw new BusinessException("回滚版本与当前版本相同，无需回滚");
+        }
+
         definition.setName(sourceVersion.getName());
         definition.setDescription(sourceVersion.getDescription());
         definition.setDefinitionJson(sourceVersion.getDefinitionJson());
         definition.setStatus("PUBLISHED");
-        definition.setVersion((definition.getVersion() == null ? 0 : definition.getVersion()) + 1);
+        definition.setVersion(Math.incrementExact(definition.getVersion() == null ? 0 : definition.getVersion()));
         definition.setPublishedBy(operatorId);
         definition.setPublishedAt(LocalDateTime.now());
         definition.setUpdatedBy(operatorId);
