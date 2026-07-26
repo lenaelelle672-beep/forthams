@@ -137,7 +137,9 @@ public class WorkflowDefinitionService {
         }
 
         validateDefinition(definition);
-        Integer nextVersion = (definition.getVersion() == null ? 0 : definition.getVersion()) + 1;
+        // BUG 1.1 修复：用 Math.incrementExact 防止 Integer 溢出（+1 超过 Integer.MAX_VALUE 时抛异常而非静默包装为负数）
+        int currentVersion = definition.getVersion() == null ? 0 : definition.getVersion();
+        Integer nextVersion = Math.incrementExact(currentVersion);
         definition.setStatus("PUBLISHED");
         definition.setVersion(nextVersion);
         definition.setPublishedBy(operatorId);
