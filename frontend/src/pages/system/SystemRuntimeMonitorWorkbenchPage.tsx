@@ -18,9 +18,9 @@ type SystemRuntimeMonitorWorkbenchPageProps = {
 type RuntimeStatusFilter = 'all' | 'pending' | 'completed' | 'returned';
 
 const RUNTIME_STATUS = {
-  pending: ['PEND', 'ING'].join(''),
-  completed: ['APPROV', 'ED'].join(''),
-  returned: ['REJ', 'ECTED'].join(''),
+  pending: 'PENDING',
+  completed: 'APPROVED',
+  returned: 'REJECTED',
 } as const;
 
 function backendStatus(filter: RuntimeStatusFilter) {

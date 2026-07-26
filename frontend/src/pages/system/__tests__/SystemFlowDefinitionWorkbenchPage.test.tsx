@@ -11,7 +11,7 @@ vi.mock('../../../api/workflowDefinitions', () => ({
 
 const mockedList = vi.mocked(listWorkflowDefinitions);
 const mockedGet = vi.mocked(getWorkflowDefinition);
-const configuredState = ['P', 'UBLISHED'].join('');
+const configuredState = 'PUBLISHED';
 
 describe('SystemFlowDefinitionWorkbenchPage', () => {
   beforeEach(() => vi.clearAllMocks());

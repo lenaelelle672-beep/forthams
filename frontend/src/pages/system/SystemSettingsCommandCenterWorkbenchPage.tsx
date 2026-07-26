@@ -22,9 +22,9 @@ type RuntimeStatusFilter = 'all' | 'pending' | 'completed' | 'returned';
 const FLOW_UNCONFIGURED_STATUS = 'UNCONFIGURED';
 const FLOW_DISABLED_STATUS = 'DISABLED';
 const RUNTIME_STATUS = {
-  pending: ['PEND', 'ING'].join(''),
-  completed: ['APPROV', 'ED'].join(''),
-  returned: ['REJ', 'ECTED'].join(''),
+  pending: 'PENDING',
+  completed: 'APPROVED',
+  returned: 'REJECTED',
 } as const;
 
 function emptyRuntimePage(): WorkflowRuntimePage {

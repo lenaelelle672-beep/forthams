@@ -15,8 +15,8 @@ const mockedList = vi.mocked(listWorkflowRuntime);
 const mockedPendingCount = vi.mocked(getWorkflowRuntimePendingCount);
 const mockedSlaSummary = vi.mocked(getWorkflowRuntimeSlaSummary);
 const mockedSlaTimeoutRecords = vi.mocked(listWorkflowRuntimeSlaTimeoutRecords);
-const pendingState = ['PEND', 'ING'].join('');
-const completedState = ['APPROV', 'ED'].join('');
+const pendingState = 'PENDING';
+const completedState = 'APPROVED';
 
 describe('SystemRuntimeMonitorWorkbenchPage', () => {
   beforeEach(() => {

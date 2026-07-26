@@ -162,14 +162,21 @@ public class ApprovalService {
             return pendingList;
         }
 
-        Set<Long> processedIds = myRecords.stream()
-            .map(item -> parseLong(BeanUtil.getProperty(item, "processId"), null))
-            .filter(id -> id != null)
-            .collect(Collectors.toSet());
+        // BUG 2.4 修复：只排除审批人在"当前步骤"已处理过的流程，
+        // 而非排除所有历史记录（此前驳回后重新提交的流程不再出现）
         return pendingList.stream()
             .filter(item -> {
-                Long id = parseLong(BeanUtil.getProperty(item, "id"), null);
-                return id == null || !processedIds.contains(id);
+                Long processId = parseLong(BeanUtil.getProperty(item, "id"), null);
+                if (processId == null) return true;
+                Integer currentStep = parseInteger(BeanUtil.getProperty(item, "currentStep"), 1);
+                // 检查审批人是否在当前步骤已处理过
+                boolean alreadyProcessedAtCurrentStep = myRecords.stream()
+                    .anyMatch(rec -> {
+                        Long recProcessId = parseLong(BeanUtil.getProperty(rec, "processId"), null);
+                        Integer recStepNo = parseInteger(BeanUtil.getProperty(rec, "stepNo"), null);
+                        return processId.equals(recProcessId) && currentStep.equals(recStepNo);
+                    });
+                return !alreadyProcessedAtCurrentStep;
             })
             .collect(Collectors.toList());
     }
