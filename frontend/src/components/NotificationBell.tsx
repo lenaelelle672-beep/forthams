@@ -129,12 +129,16 @@ export const NotificationBell: React.FC<NotificationBellProps> = ({
     setUnreadCount(unread);
   }, [notifications]);
 
-  // Initial fetch and periodic refresh
+  // Initial fetch and periodic refresh（页面不可见时暂停轮询，节省后台 CPU/电池）
   useEffect(() => {
     fetchNotifications();
-    
+
     if (refreshInterval > 0) {
-      const intervalId = setInterval(fetchNotifications, refreshInterval);
+      const intervalId = setInterval(() => {
+        if (document.visibilityState === 'visible') {
+          fetchNotifications();
+        }
+      }, refreshInterval);
       return () => clearInterval(intervalId);
     }
   }, [fetchNotifications, refreshInterval]);
