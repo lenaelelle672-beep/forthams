@@ -7,6 +7,7 @@ import com.ams.dto.InventoryScanDTO;
 import com.ams.dto.InventoryTaskCreateDTO;
 import com.ams.entity.InventoryDetail;
 import com.ams.entity.InventoryTask;
+import com.ams.enums.InventoryStatus;
 import com.ams.mapper.InventoryDetailMapper;
 import com.ams.mapper.InventoryTaskMapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -36,7 +37,7 @@ public class InventoryService {
         LambdaQueryWrapper<InventoryTask> wrapper = new LambdaQueryWrapper<InventoryTask>()
                 .eq(InventoryTask::getTenantId, tenantId);
         if (status != null && !status.isEmpty()) {
-            wrapper.eq(InventoryTask::getStatus, status);
+            wrapper.eq(InventoryTask::getStatus, InventoryStatus.fromName(status).name());
         }
         wrapper.orderByDesc(InventoryTask::getCreateTime);
 
@@ -62,7 +63,7 @@ public class InventoryService {
 
         task.setTaskNo(generateTaskNo());
         if (task.getStatus() == null || task.getStatus().isEmpty()) {
-            task.setStatus("PENDING");
+            task.setStatus(InventoryStatus.DRAFT.name());
         }
         if (task.getScannedCount() == null) {
             task.setScannedCount(0);
@@ -84,7 +85,7 @@ public class InventoryService {
     @Transactional(rollbackFor = Exception.class)
     public InventoryTask updateTaskStatus(Long id, String status) {
         InventoryTask task = getTaskEntityById(id);
-        task.setStatus(status);
+        task.setStatus(InventoryStatus.fromName(status).name());
         inventoryTaskMapper.updateById(task);
         return task;
     }
