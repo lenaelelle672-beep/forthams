@@ -5,7 +5,24 @@
  * @description 仪表板趋势图表组件，支持资产数量趋势可视化
  */
 import React, { useEffect, useRef, useMemo } from 'react';
-import * as echarts from 'echarts';
+import * as echarts from 'echarts/core';
+import { LineChart } from 'echarts/charts';
+import {
+  TitleComponent,
+  TooltipComponent,
+  GridComponent,
+} from 'echarts/components';
+import { CanvasRenderer } from 'echarts/renderers';
+import type { EChartsOption } from 'echarts';
+
+// 注册 ECharts 组件 (tree-shaken)
+echarts.use([
+  LineChart,
+  TitleComponent,
+  TooltipComponent,
+  GridComponent,
+  CanvasRenderer,
+]);
 
 export interface TrendChartData {
   /** X轴标签（时间序列） */
@@ -67,7 +84,7 @@ const TrendChart: React.FC<TrendChartProps> = ({
   }, [data?.values]);
 
   // ECharts 配置
-  const chartOptions: echarts.EChartsOption = useMemo(() => ({
+  const chartOptions: EChartsOption = useMemo(() => ({
     title: {
       text: title,
       left: 'left',

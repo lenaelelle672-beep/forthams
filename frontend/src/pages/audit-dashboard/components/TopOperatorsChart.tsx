@@ -1,6 +1,12 @@
 import React, { useMemo } from 'react';
 import ReactECharts from 'echarts-for-react';
-import * as echarts from 'echarts';
+import * as echarts from 'echarts/core';
+import { BarChart } from 'echarts/charts';
+import { GridComponent, TooltipComponent } from 'echarts/components';
+import { CanvasRenderer } from 'echarts/renderers';
+
+// 注册 ECharts 组件 (tree-shaken)
+echarts.use([BarChart, GridComponent, TooltipComponent, CanvasRenderer]);
 import { Card, Spin, Empty, Button, Typography } from 'antd';
 import { ReloadOutlined } from '@ant-design/icons';
 import { useTopOperators } from '../hooks/useTopOperators';

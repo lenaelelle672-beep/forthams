@@ -189,7 +189,25 @@ import { ref, reactive, computed, onMounted, onUnmounted, watch, nextTick } from
 import { useRouter } from 'vue-router';
 import { message } from 'ant-design-vue';
 import type { TableProps } from 'ant-design-vue';
-import * as echarts from 'echarts';
+import * as echarts from 'echarts/core';
+import { LineChart, PieChart } from 'echarts/charts';
+import {
+  GridComponent,
+  TooltipComponent,
+  LegendComponent,
+} from 'echarts/components';
+import { CanvasRenderer } from 'echarts/renderers';
+import type { EChartsOption } from 'echarts';
+
+// 注册 ECharts 组件 (tree-shaken)
+echarts.use([
+  LineChart,
+  PieChart,
+  GridComponent,
+  TooltipComponent,
+  LegendComponent,
+  CanvasRenderer,
+]);
 import {
   DatabaseOutlined,
   PlusCircleOutlined,
@@ -429,7 +447,7 @@ function renderTypeChart() {
     typeChart = echarts.init(typeChartRef.value);
   }
 
-  const option: echarts.EChartsOption = {
+  const option: EChartsOption = {
     tooltip: {
       trigger: 'item',
       formatter: '{b}: {c} ({d}%)'
@@ -483,7 +501,7 @@ function renderStatusChart() {
     statusChart = echarts.init(statusChartRef.value);
   }
 
-  const option: echarts.EChartsOption = {
+  const option: EChartsOption = {
     tooltip: {
       trigger: 'item',
       formatter: '{b}: {c} ({d}%)'
@@ -538,7 +556,7 @@ function renderTrendChart() {
     trendChart = echarts.init(trendChartRef.value);
   }
 
-  const option: echarts.EChartsOption = {
+  const option: EChartsOption = {
     tooltip: {
       trigger: 'axis',
       axisPointer: {

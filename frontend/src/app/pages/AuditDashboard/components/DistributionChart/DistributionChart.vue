@@ -46,7 +46,24 @@
  * 图表数据通过 props 传入，支持加载状态、错误处理和重试机制。
  */
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
-import * as echarts from 'echarts';
+import * as echarts from 'echarts/core';
+import { PieChart } from 'echarts/charts';
+import {
+  TitleComponent,
+  TooltipComponent,
+  LegendComponent,
+} from 'echarts/components';
+import { CanvasRenderer } from 'echarts/renderers';
+import type { EChartsOption } from 'echarts';
+
+// 注册 ECharts 组件 (tree-shaken)
+echarts.use([
+  PieChart,
+  TitleComponent,
+  TooltipComponent,
+  LegendComponent,
+  CanvasRenderer,
+]);
 
 // ============================================================
 // Types & Interfaces
@@ -258,7 +275,7 @@ function initChart(): void {
 function updateChart(): void {
   if (!chartInstance) return;
 
-  const option: echarts.EChartsOption = {
+  const option: EChartsOption = {
     title: chartTitle.value,
     tooltip: {
       trigger: 'item',

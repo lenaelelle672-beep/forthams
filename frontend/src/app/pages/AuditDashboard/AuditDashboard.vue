@@ -157,7 +157,25 @@
  */
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import * as echarts from 'echarts';
+import * as echarts from 'echarts/core';
+import { LineChart, PieChart } from 'echarts/charts';
+import {
+  GridComponent,
+  TooltipComponent,
+  LegendComponent,
+} from 'echarts/components';
+import { CanvasRenderer } from 'echarts/renderers';
+import type { EChartsOption } from 'echarts';
+
+// 注册 ECharts 组件 (tree-shaken)
+echarts.use([
+  LineChart,
+  PieChart,
+  GridComponent,
+  TooltipComponent,
+  LegendComponent,
+  CanvasRenderer,
+]);
 
 // Hooks
 import { useAuditDashboard } from '../hooks/useAuditDashboard';
@@ -241,8 +259,8 @@ function initTrendChart(): void {
   if (!trendChartRef.value) return;
   
   trendChartInstance = echarts.init(trendChartRef.value);
-  
-  const option: echarts.EChartsOption = {
+
+  const option: EChartsOption = {
     tooltip: {
       trigger: 'axis',
       axisPointer: {
@@ -292,8 +310,8 @@ function initDistributionChart(): void {
   if (!distributionChartRef.value) return;
   
   distributionChartInstance = echarts.init(distributionChartRef.value);
-  
-  const option: echarts.EChartsOption = {
+
+  const option: EChartsOption = {
     tooltip: {
       trigger: 'item',
       formatter: '{b}: {c} ({d}%)'

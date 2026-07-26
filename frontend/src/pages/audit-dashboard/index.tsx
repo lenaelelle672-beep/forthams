@@ -42,7 +42,19 @@ import {
   HistoryOutlined,
 } from '@ant-design/icons';
 import ReactECharts from 'echarts-for-react';
-import * as echarts from 'echarts';
+import * as echarts from 'echarts/core';
+import { LineChart, BarChart } from 'echarts/charts';
+import { GridComponent, TooltipComponent } from 'echarts/components';
+import { CanvasRenderer } from 'echarts/renderers';
+
+// 注册 ECharts 组件 (tree-shaken)
+echarts.use([
+  LineChart,
+  BarChart,
+  GridComponent,
+  TooltipComponent,
+  CanvasRenderer,
+]);
 import dayjs, { type Dayjs } from 'dayjs';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 

@@ -9,7 +9,24 @@
  */
 
 import React, { useEffect, useRef } from 'react';
-import * as echarts from 'echarts';
+import * as echarts from 'echarts/core';
+import { PieChart } from 'echarts/charts';
+import {
+  TitleComponent,
+  TooltipComponent,
+  LegendComponent,
+} from 'echarts/components';
+import { CanvasRenderer } from 'echarts/renderers';
+import type { EChartsOption } from 'echarts';
+
+// 注册 ECharts 组件 (tree-shaken)
+echarts.use([
+  PieChart,
+  TitleComponent,
+  TooltipComponent,
+  LegendComponent,
+  CanvasRenderer,
+]);
 
 // ============================================================
 // Type Definitions
@@ -142,7 +159,7 @@ const RiskPieChart: React.FC<RiskPieChartProps> = ({
    * 构建 ECharts 配置选项
    * @performance O(n) 时间复杂度，n 为 data 数组长度
    */
-  const buildChartOption = (): echarts.EChartsOption => {
+  const buildChartOption = (): EChartsOption => {
     // 准备饼图数据
     const pieData = data.map((item) => ({
       name: item.label || RISK_LEVEL_LABELS[item.level],
