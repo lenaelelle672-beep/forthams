@@ -8,7 +8,6 @@
  * @since SWARM-059
  */
 
-import React from "react";
 import {
   Pencil,
   Trash2,

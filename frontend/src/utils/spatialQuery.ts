@@ -107,7 +107,7 @@ export function buildSearchString(query: Partial<SpatialTimeQuery>): URLSearchPa
 export function mergeSearch(
   current: URLSearchParams,
   patch: Partial<SpatialTimeQuery>,
-  options: { replace?: boolean } = { replace: true },
+  _options: { replace?: boolean } = { replace: true },
 ): string {
   const next = new URLSearchParams(current.toString());
   for (const k of [...NUMERIC_KEYS, ...STRING_KEYS] as string[]) {

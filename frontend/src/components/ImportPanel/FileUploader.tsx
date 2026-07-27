@@ -26,7 +26,7 @@
  * - remarks (可选, 最大500字符)
  */
 
-import React, { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Upload, FileText, X, AlertCircle, CheckCircle, Download, Loader2 } from 'lucide-react';
 import { Button } from '../ui/button';
@@ -264,7 +264,7 @@ export function FileUploader({
    * @returns Promise
    */
   const simulateUpload = async (
-    formData: FormData,
+    _formData: FormData,
     onProgress: (progress: number) => void,
     signal: AbortSignal
   ): Promise<{ data: ImportResult }> => {

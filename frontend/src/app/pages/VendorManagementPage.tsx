@@ -16,7 +16,7 @@
  * @since SWARM-046
  */
 
-import React, { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { Search, Plus, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import {

@@ -29,7 +29,6 @@ import {
 import {
   EyeOutlined,
   AuditOutlined,
-  FilterOutlined,
   ReloadOutlined,
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
@@ -131,7 +130,7 @@ export const AuditTable: React.FC<AuditTableProps> = ({
   });
 
   // 使用 @Auditable 字段可视化 hook
-  const { getAuditableHighlight, getHighlightBadge } = useAuditableFields();
+  const { getAuditableHighlight } = useAuditableFields();
 
   // 通知父组件加载状态变化
   React.useEffect(() => {

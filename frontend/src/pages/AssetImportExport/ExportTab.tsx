@@ -110,23 +110,6 @@ const LOCATION_OPTIONS: { label: string; value: string }[] = [
  * @param blob  - The binary Blob to download.
  * @param filename - The suggested filename for the save dialog.
  */
-function downloadBlob(blob: Blob, filename: string): void {
-  const objectUrl: string = URL.createObjectURL(blob);
-  const anchor: HTMLAnchorElement = document.createElement('a');
-  anchor.href = objectUrl;
-  anchor.download = filename;
-  anchor.style.display = 'none';
-  document.body.appendChild(anchor);
-  anchor.click();
-
-  // Cleanup DOM element immediately
-  document.body.removeChild(anchor);
-
-  // Revoke object URL after a short delay to ensure the download has started
-  setTimeout(() => {
-    URL.revokeObjectURL(objectUrl);
-  }, 200);
-}
 
 /**
  * Extract filename from Content-Disposition header.

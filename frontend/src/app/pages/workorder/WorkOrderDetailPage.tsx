@@ -30,7 +30,6 @@ import {
   Send,
   Play,
   CheckCircle,
-  XCircle,
   RefreshCw,
   Loader2,
   AlertCircle,
@@ -49,7 +48,6 @@ import {
   isSubmittableStatus,
   isCancellableStatus,
   type WorkOrderRecord,
-  type WorkOrderDTO,
 } from "../../services/workOrderService";
 
 // ---------------------------------------------------------------------------

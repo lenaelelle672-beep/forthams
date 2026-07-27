@@ -29,7 +29,7 @@ const TABS = [
 export default function MobileLayout() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, logout } = useAuth();
+  const { logout } = useAuth();
 
   const getTitle = () => {
     const path = location.pathname;

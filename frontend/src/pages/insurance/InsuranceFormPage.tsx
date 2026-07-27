@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import React, { useEffect } from 'react';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { useParams, useNavigate } from 'react-router';
 import { insuranceApi } from '../../api/insurance';
 import type { Insurance, InsuranceTypeEnum, InsuranceStatusEnum } from '../../types/insurance';
@@ -10,7 +10,6 @@ import dayjs from 'dayjs';
 const InsuranceFormPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const [form] = Form.useForm();
   const isEdit = !!id;
 

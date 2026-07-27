@@ -533,9 +533,6 @@ const AssetImportExportPage: React.FC = () => {
   };
 
   /** 判断某行是否仍存在剩余错误 */
-  const hasRemainingErrors = (rowNumber: number): boolean => {
-    return errorsMap.has(rowNumber);
-  };
 
   // ---------- 表格列定义 ----------
 
@@ -609,7 +606,6 @@ const AssetImportExportPage: React.FC = () => {
       render: (_: unknown, record: AssetRow) => {
         const originallyFailed = originalErrorRowNumbers.has(record.rowNumber);
         const wasEdited = editedRowNumbers.has(record.rowNumber);
-        const stillHasErrors = hasRemainingErrors(record.rowNumber);
 
         if (!originallyFailed) {
           // 从未有过错误 → 绿色「校验通过」

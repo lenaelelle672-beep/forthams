@@ -81,12 +81,6 @@ function toCategoryItems(
  * @param dateStr - ISO 格式的到期日期
  * @returns 剩余天数（负数表示已过期）
  */
-function daysUntil(dateStr: string): number {
-  const target = new Date(dateStr);
-  const now = new Date();
-  const diffMs = target.getTime() - now.getTime();
-  return Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-}
 
 /**
  * 判断紧急程度
@@ -94,11 +88,6 @@ function daysUntil(dateStr: string): number {
  * @param remainingDays - 剩余天数
  * @returns 紧急程度标签
  */
-function getUrgency(remainingDays: number): ExpirationAlert['urgency'] {
-  if (remainingDays <= 7) return 'urgent';
-  if (remainingDays <= 30) return 'warning';
-  return 'normal';
-}
 
 /**
  * useDashboardData Hook

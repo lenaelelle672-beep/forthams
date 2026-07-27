@@ -197,7 +197,6 @@ const AssetAttributeGroup: React.FC<AssetAttributeGroupProps> = ({
   financialInfo,
   operationInfo,
   auditInfo,
-  readOnly = false,
   className,
   style,
 }) => {

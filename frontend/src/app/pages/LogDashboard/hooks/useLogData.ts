@@ -11,9 +11,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { dashboardService } from '@app/services/dashboardService';
 import { depreciationService } from '@app/services/depreciationService';
-import type { DashboardStats } from '@app/types/audit.types';
 import type { DepreciationRecord, DepreciationMethod } from '@app/types/depreciation.types';
 
 /** 折旧计算结果数据结构 */
@@ -205,8 +203,8 @@ export function useLogData(params: LogDataQueryParams = {}): UseLogDataReturn {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [totalCount, setTotalCount] = useState<number>(0);
-  const [currentPage, setCurrentPage] = useState<number>(params.page || 1);
-  const [pageSize, setPageSize] = useState<number>(params.pageSize || 20);
+  const [currentPage, _setCurrentPage] = useState<number>(params.page || 1);
+  const [pageSize, _setPageSize] = useState<number>(params.pageSize || 20);
 
   /**
    * 从折旧记录计算进度和预警状态

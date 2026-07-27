@@ -1,5 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { useNavigate } from 'react-router';
+import React, { useState, useCallback, useMemo } from 'react';
 import { 
   Card, 
   Table, 
@@ -14,28 +13,22 @@ import {
   message, 
   Tooltip,
   Empty,
-  Spin,
-  Badge
 } from 'antd';
 import { 
   PlusOutlined, 
   EyeOutlined, 
   CheckCircleOutlined, 
   CloseCircleOutlined,
-  ClockCircleOutlined,
-  EditOutlined,
-  DeleteOutlined,
   SearchOutlined,
   ReloadOutlined,
-  ExclamationCircleOutlined
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import dayjs from 'dayjs';
 import { useRetirementRequests, useRetirementById } from '@/hooks/useRetirement';
 import { useAssets } from '@/hooks/useAssets';
+import type { Asset } from '@/types/asset';
 import { useAuth } from '@/hooks/useAuth';
 import { StatusBadge } from '@/components/retirement/StatusBadge';
-import { ProgressTracker } from '@/components/retirement/ProgressTracker';
 import { ApprovalChain } from '@/components/retirement/ApprovalChain';
 import type { 
   RetirementRequest, 
@@ -65,7 +58,6 @@ import styles from './index.module.css';
  * @see {@link https://spec.internal/swarm-002|完整规格说明}
  */
 const RetirementListPage: React.FC = () => {
-  const navigate = useNavigate();
   const { user } = useAuth();
   
   // 状态管理
@@ -88,12 +80,12 @@ const RetirementListPage: React.FC = () => {
   });
   
   const { data: assets } = useAssets({ status: 'ACTIVE' });
-  const { data: selectedRequest, isLoading: isLoadingDetail } = useRetirementById(selectedRequestId || '');
+  const { data: selectedRequest, isLoading: _isLoadingDetail } = useRetirementById(selectedRequestId || '');
   
   // 过滤可选资产（排除已退役的）
   const availableAssets = useMemo(() => {
     if (!assets?.data) return [];
-    return assets.data.filter(asset => asset.status !== 'RETIRED');
+    return assets.data.filter((asset: Asset) => asset.status !== 'RETIRED');
   }, [assets]);
 
   // 根据用户角色和请求状态确定可执行的操作
@@ -107,7 +99,7 @@ const RetirementListPage: React.FC = () => {
     }
     
     // 审批链检查
-    const pendingStep = approval_chain?.steps?.find(step => step.status === 'PENDING');
+    const pendingStep = approval_chain?.steps?.find((step: ApprovalStep) => step.status === 'PENDING');
     if (pendingStep && user?.id === pendingStep.approver_id) {
       actions.push(TransitionActionEnum.APPROVE_L1);
       actions.push(TransitionActionEnum.REJECT);
@@ -130,13 +122,13 @@ const RetirementListPage: React.FC = () => {
     const data = retirementRequests.data;
     return {
       total: data.length,
-      draft: data.filter(r => r.current_status === RetirementStatusEnum.DRAFT).length,
-      pending: data.filter(r => 
-        r.current_status.includes('PENDING') || 
+      draft: data.filter((r: RetirementRequest) => r.current_status === RetirementStatusEnum.DRAFT).length,
+      pending: data.filter((r: RetirementRequest) =>
+        r.current_status.includes('PENDING') ||
         r.current_status === RetirementStatusEnum.SUBMITTED
       ).length,
-      approved: data.filter(r => r.current_status === RetirementStatusEnum.APPROVED).length,
-      rejected: data.filter(r => r.current_status === RetirementStatusEnum.REJECTED).length
+      approved: data.filter((r: RetirementRequest) => r.current_status === RetirementStatusEnum.APPROVED).length,
+      rejected: data.filter((r: RetirementRequest) => r.current_status === RetirementStatusEnum.REJECTED).length
     };
   }, [retirementRequests]);
 
@@ -221,26 +213,6 @@ const RetirementListPage: React.FC = () => {
   const handleViewDetail = useCallback((requestId: string) => {
     setSelectedRequestId(requestId);
     setIsDetailModalOpen(true);
-  }, []);
-
-  // ATB-005-01: 查询当前进度
-  // GET /retirements/{id}/progress 返回当前审批节点
-  const getProgressInfo = useCallback(async (requestId: string) => {
-    try {
-      const response = await fetch(`/api/retirements/${requestId}/progress`);
-      if (response.ok) {
-        const data = await response.json();
-        return {
-          current_step: data.current_step,
-          total_steps: data.total_steps,
-          pending_approvers: data.pending_approvers,
-          progress_status: data.progress_status
-        };
-      }
-    } catch (error) {
-      console.error('获取进度信息失败', error);
-    }
-    return null;
   }, []);
 
   // 表格列定义
@@ -458,7 +430,7 @@ const RetirementListPage: React.FC = () => {
           {/* 资产信息 */}
           <Card title="关联资产" className={styles.detailCard}>
             <div className={styles.assetList}>
-              {selectedRequest.assets?.map((asset, index) => (
+              {selectedRequest.assets?.map((asset: any, index: number) => (
                 <div key={index} className={styles.assetItem}>
                   <div className={styles.assetInfo}>
                     <span className={styles.assetName}>{asset.name}</span>
@@ -487,7 +459,7 @@ const RetirementListPage: React.FC = () => {
           {/* GET /retirements/{id}/history 包含状态变更条目 */}
           <Card title="变更历史" className={styles.detailCard}>
             <div className={styles.historyList}>
-              {selectedRequest.history?.map((entry, index) => (
+              {selectedRequest.history?.map((entry: any, index: number) => (
                 <div key={index} className={styles.historyItem}>
                   <div className={styles.historyTime}>
                     {dayjs(entry.timestamp).format('YYYY-MM-DD HH:mm')}
@@ -661,7 +633,7 @@ const RetirementListPage: React.FC = () => {
               onChange={setSelectedAssetIds}
               maxCount={10}
             >
-              {availableAssets.map(asset => (
+              {availableAssets.map((asset: Asset) => (
                 <Select.Option key={asset.asset_id} value={asset.asset_id}>
                   <div className={styles.assetOption}>
                     <span>{asset.name}</span>

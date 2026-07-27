@@ -92,8 +92,6 @@ export const AssetSummaryCard: React.FC<AssetSummaryCardProps> = ({
   /**
    * 判断是否需要货币格式化
    */
-  const isCurrency =
-    typeof value === 'string' && (value.includes('¥') || value.startsWith('CNY'));
 
   /**
    * 对原始数值进行格式化

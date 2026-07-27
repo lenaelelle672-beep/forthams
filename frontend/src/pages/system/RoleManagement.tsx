@@ -486,7 +486,7 @@ function DeptAssignDialog({
   roleName: string;
 }) {
   const queryClient = useQueryClient();
-  const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [selectedIds] = useState<number[]>([]);
   const [deptList, setDeptList] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -513,11 +513,6 @@ function DeptAssignDialog({
   });
 
   /** 切换部门选中状态，保持原有单个部门独立勾选语义 */
-  const toggleId = useCallback((id: number) => {
-    setSelectedIds((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
-    );
-  }, []);
 
 
   const selectedCount = selectedIds.length;

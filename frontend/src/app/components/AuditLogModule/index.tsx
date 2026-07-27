@@ -225,9 +225,9 @@ export const AuditLogModule: React.FC<AuditLogModuleProps> = ({
   const tableDataSource = useMemo(() => {
     if (!auditLogData?.data) return [];
     
-    return auditLogData.data.map(log => ({
+    return auditLogData.data.map((log: any) => ({
       ...log,
-      changes: log.changes?.map(change => ({
+      changes: log.changes?.map((change: any) => ({
         ...change,
         ...getAuditableHighlight(change),
       })),
@@ -285,13 +285,13 @@ export const AuditLogModule: React.FC<AuditLogModuleProps> = ({
           total: auditLogData?.pagination?.total ?? 0,
           showSizeChanger: true,
           showQuickJumper: true,
-          showTotal: (total, range) => 
+          showTotal: (total: number, range: [number, number]) =>
             `第 ${range[0]}-${range[1]} 条，共 ${total} 条`,
         }}
         onChange={(
-          paginationConfig,
-          filters,
-          sorterConfig
+          paginationConfig: any,
+
+          sorterConfig: any
         ) => {
           if (paginationConfig.current && paginationConfig.pageSize) {
             handlePageChange(

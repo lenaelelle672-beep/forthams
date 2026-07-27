@@ -8,10 +8,10 @@
  * - POST /asset-health/batch                       → 批量计算
  */
 
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
-  AlertTriangle, Heart, Activity, RefreshCw, Search,
+  AlertTriangle, Heart, Activity, RefreshCw,
   ChevronDown, ChevronUp, X, Zap,
 } from 'lucide-react';
 import { getAssetHealth, getUnhealthyAssets, batchAssetHealth } from '@/api/assetHealth';

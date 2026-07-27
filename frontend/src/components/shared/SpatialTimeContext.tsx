@@ -11,7 +11,6 @@ import React, { createContext, useCallback, useContext, useMemo } from 'react';
 import { useSearchParams } from 'react-router';
 import {
   parseSpatialTime,
-  mergeSearch,
   type SpatialTimeQuery,
 } from '@/utils/spatialQuery';
 

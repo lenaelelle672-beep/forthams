@@ -17,7 +17,6 @@ import {
   ChevronDown,
   Plus,
   Trash2,
-  Loader2,
   GitBranch,
   FileQuestion,
 } from 'lucide-react';
@@ -119,7 +118,7 @@ function TreeNode({ node, assetId, readOnly, onDelete }: {
 /**
  * 平铺列表模式下的关系项组件。
  */
-function RelationItem({ item, assetId, readOnly, onDelete }: {
+function RelationItem({ item, readOnly, onDelete }: {
   item: RelationVO;
   assetId: number;
   readOnly?: boolean;

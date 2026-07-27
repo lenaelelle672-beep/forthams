@@ -19,7 +19,6 @@ import {
   AlertCircle,
   Send,
   RotateCcw,
-  RefreshCw,
   Calendar,
   User,
   Building2,
@@ -75,7 +74,6 @@ import type {
   ApprovalRecord,
   AssetBasicInfo,
 } from './types/retirement.types';
-import type { User as AuthUser } from '@/types';
 
 /** 状态配置映射 */
 const STATUS_CONFIG: Record<
@@ -471,9 +469,6 @@ export const RetirementDetail: React.FC<RetirementDetailProps> = ({
 
   const statusConfig = STATUS_CONFIG[application.status];
   const currentStatusIndex = getCurrentStatusIndex(application.status);
-  const isPendingApproval = application.status === 'PENDING_APPROVAL';
-  const isDraft = application.status === 'DRAFT';
-  const isApproved = application.status === 'APPROVED';
 
   return (
     <div className="container mx-auto py-6 space-y-6">

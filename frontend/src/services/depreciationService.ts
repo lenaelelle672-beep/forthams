@@ -9,7 +9,6 @@
  */
 
 import http from '@/utils/http';
-import type { Asset } from '@/types/asset.types';
 
 // ============================================================
 // 类型定义

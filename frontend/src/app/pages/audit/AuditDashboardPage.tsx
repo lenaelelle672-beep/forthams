@@ -193,7 +193,6 @@ const MODULE_OPTIONS: ModuleOption[] = [
  * @performance 数据加载 O(n)，渲染受 React.memo 保护
  */
 const AuditDashboardPage: React.FC<AuditDashboardPageProps> = ({
-  authToken,
 }) => {
   const {
     filters,

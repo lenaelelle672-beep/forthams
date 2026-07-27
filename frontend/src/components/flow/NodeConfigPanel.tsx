@@ -23,7 +23,7 @@ interface Props {
 export function NodeConfigPanel({ selectedNode, edges, approverRoles = [], roleDetails = [], onUpdateNode, onDeleteNode }: Props) {
   const [userQ, setUserQ] = useState('');
   const [userResults, setUserResults] = useState<UserRecord[]>([]);
-  const [userLoading, setUserLoading] = useState(false);
+  const [_userLoading, setUserLoading] = useState(false);
   const [showUserDrop, setShowUserDrop] = useState(false);
 
   const approverType: 'role' | 'user' = useMemo(() => {

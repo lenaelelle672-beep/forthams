@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import {
   AreaChart, Area, ResponsiveContainer, XAxis, YAxis, Tooltip,
-  PieChart, Pie, Cell, BarChart, Bar, LineChart, Line,
+  PieChart, Pie, Cell, LineChart, Line,
 } from 'recharts';
 import {
   ArrowLeft, Edit, Trash2, Info, TrendingDown,

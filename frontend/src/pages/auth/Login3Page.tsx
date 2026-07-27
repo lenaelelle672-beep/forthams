@@ -35,7 +35,7 @@ const PRODUCTS = [
 const TRAIL_BLUE = '#0ea5e9';
 
 /** 飞行产品 — 径向无方框 + 粒子散落 */
-function MeteorProduct({ name, img, size, delay, speed, sy0, ey, angle, depth }: typeof PRODUCTS[number]) {
+function MeteorProduct({ img, size, delay, speed, sy0, ey, angle, depth }: typeof PRODUCTS[number]) {
   const texture = useLoader(THREE.TextureLoader, img);
   const groupRef = useRef<THREE.Group>(null);
   const glowRef = useRef<THREE.Mesh>(null);
@@ -189,42 +189,6 @@ function MeteorProduct({ name, img, size, delay, speed, sy0, ey, angle, depth }:
 /* ════════════════════════════════════════════════════════════════════════════════
    科幻环境
    ════════════════════════════════════════════════════════════════════════════════ */
-
-/** 赛博朋克脉冲地面 */
-function CyberGrid() {
-  const mat = useRef<THREE.ShaderMaterial>(null);
-  const u = useMemo(() => ({ uTime: { value: 0 }, uColor: { value: new THREE.Color('#0e7490') } }), []);
-  useFrame(({ clock }) => { if (mat.current) mat.current.uniforms.uTime.value = clock.getElapsedTime(); });
-  return (
-    <mesh rotation-x={-Math.PI / 2} position={[0, -5, 0]}>
-      <planeGeometry args={[200, 200]} />
-      <shaderMaterial ref={mat} transparent depthWrite={false} side={THREE.DoubleSide} uniforms={u}
-        vertexShader={`varying vec3 vW;void main(){vW=(modelMatrix*vec4(position,1.)).xyz;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`}
-        fragmentShader={`
-          varying vec3 vW;uniform float uTime;uniform vec3 uColor;
-          float g(vec2 p,float s){vec2 a=abs(fract(p/s-.5)-.5)*s;return 1.-smoothstep(0.,.035,min(a.x,a.y));}
-          void main(){
-            float d=length(vW.xz),f=1.-smoothstep(2.,45.,d);
-            float v=(g(vW.xz,1.)*.2+g(vW.xz,5.)*.38)*f;
-            float p=sin(d*.3-uTime*.9)*.5+.5;p*=exp(-d*.035);
-            float l=smoothstep(.44,.5,p)*smoothstep(.56,.5,p);
-            vec3 c=uColor*(v+l*.28*f);
-            gl_FragColor=vec4(c,(v*.55+l*.2*f));
-          }`}
-      />
-    </mesh>
-  );
-}
-
-/** 反射地面 */
-function ReflectiveFloor() {
-  return (
-    <mesh rotation-x={-Math.PI / 2} position={[0, -5.01, 0]}>
-      <planeGeometry args={[200, 200]} />
-      <meshStandardMaterial color="#020617" metalness={0.95} roughness={0.25} />
-    </mesh>
-  );
-}
 
 /** 垂直光柱 */
 function LightBeams() {

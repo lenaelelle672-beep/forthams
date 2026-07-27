@@ -3,7 +3,7 @@
  * @description 资产图片画廊组件 — 支持图片网格预览、点击放大、无图空态
  */
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useAssetAttachments } from '@/hooks/asset/useAssetAttachments';
 import type { AssetAttachment } from '@/types/asset';
 
@@ -19,19 +19,8 @@ function isImage(attachment: AssetAttachment): boolean {
     || /\.(jpg|jpeg|png|gif|webp|svg|bmp|ico)$/i.test(attachment.fileName);
 }
 
-function formatFileSize(bytes: number): string {
-  if (!bytes || bytes <= 0) return '未知';
-  const units = ['B', 'KB', 'MB', 'GB'];
-  let size = bytes;
-  let unitIndex = 0;
-  while (size >= 1024 && unitIndex < units.length - 1) {
-    size /= 1024;
-    unitIndex++;
-  }
-  return `${size.toFixed(1)} ${units[unitIndex]}`;
-}
 
-export default function AssetGallery({ assetId, readOnly }: AssetGalleryProps) {
+export default function AssetGallery({ assetId }: AssetGalleryProps) {
   const { data: attachments, isLoading } = useAssetAttachments(assetId);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 

@@ -41,7 +41,6 @@ export default function RankingTable({ data, sortBy }: RankingTableProps) {
         </thead>
         <tbody>
           {data.map((item, index) => {
-            const rankColors = ['text-yellow-500', 'text-gray-400', 'text-amber-600', 'text-gray-500', 'text-gray-500'];
             const medal = index < 3 ? ['🥇', '🥈', '🥉'][index] : null;
             return (
               <tr key={item.assetId} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">

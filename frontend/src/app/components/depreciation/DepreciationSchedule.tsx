@@ -14,7 +14,7 @@
  */
 
 import React, { useState, useMemo, useCallback } from 'react';
-import { Table, Card, DatePicker, Select, Button, Tag, Space, Tooltip, Empty } from 'antd';
+import { Table, Card, Select, Button, Tag, Space, Tooltip, Empty } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { 
   DownloadOutlined, 
@@ -32,7 +32,6 @@ import type {
   DepreciationScheduleFilters 
 } from '@/types/depreciation.types';
 
-const { RangePicker } = DatePicker;
 
 /**
  * 折旧方法显示映射
@@ -198,7 +197,6 @@ const DepreciationSchedule: React.FC<DepreciationScheduleProps> = ({
   className,
   style,
   defaultFilters,
-  onAssetNavigate,
   onExport,
 }) => {
   // 状态管理
@@ -237,10 +235,10 @@ const DepreciationSchedule: React.FC<DepreciationScheduleProps> = ({
   const summary = useMemo<DepreciationSummary | null>(() => {
     if (assetId && assetSchedule) {
       return {
-        totalDepreciation: assetSchedule.reduce((sum, r) => sum + r.monthlyDepreciation, 0),
+        totalDepreciation: assetSchedule.reduce((sum: number, r: DepreciationRecord) => sum + r.monthlyDepreciation, 0),
         assetCount: 1,
-        averageDepreciation: assetSchedule.length > 0 
-          ? assetSchedule.reduce((sum, r) => sum + r.monthlyDepreciation, 0) / assetSchedule.length 
+        averageDepreciation: assetSchedule.length > 0
+          ? assetSchedule.reduce((sum: number, r: DepreciationRecord) => sum + r.monthlyDepreciation, 0) / assetSchedule.length
           : 0,
         details: assetSchedule,
       };
@@ -258,7 +256,7 @@ const DepreciationSchedule: React.FC<DepreciationScheduleProps> = ({
 
   // 筛选条件变化处理
   const handleFilterChange = useCallback((key: keyof DepreciationScheduleFilters, value: any) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
+    setFilters((prev: DepreciationScheduleFilters) => ({ ...prev, [key]: value }));
   }, []);
 
   // 重置筛选
@@ -279,7 +277,7 @@ const DepreciationSchedule: React.FC<DepreciationScheduleProps> = ({
     setIsExporting(true);
     try {
       const dataToExport = selectedRowKeys.length > 0
-        ? tableData.filter(r => selectedRowKeys.includes(r.id))
+        ? tableData.filter((r: DepreciationRecord) => selectedRowKeys.includes(r.id))
         : tableData;
       
       if (onExport) {
@@ -287,7 +285,7 @@ const DepreciationSchedule: React.FC<DepreciationScheduleProps> = ({
       } else {
         // 默认导出逻辑：CSV 格式
         const headers = ['期间', '资产编号', '资产名称', '折旧方法', '原值', '月折旧额', '累计折旧', '账面净值'];
-        const rows = dataToExport.map(r => [
+        const rows = dataToExport.map((r: DepreciationRecord) => [
           r.period,
           r.asset?.assetCode || '',
           r.asset?.assetName || '',
@@ -520,7 +518,7 @@ const DepreciationSchedule: React.FC<DepreciationScheduleProps> = ({
         <div data-testid="depreciation-list" className="mt-4">
           <div className="text-gray-600 font-medium mb-2">折旧明细列表</div>
           <ul className="list-disc pl-5">
-            {assetSchedule.slice(0, 12).map((record) => (
+            {assetSchedule.slice(0, 12).map((record: DepreciationRecord) => (
               <li key={record.id} className="text-sm py-1">
                 {record.period}: 月折旧额 ¥{record.monthlyDepreciation.toFixed(2)}, 
                 累计折旧 ¥{record.accumulatedDepreciation.toFixed(2)}, 

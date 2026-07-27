@@ -141,9 +141,7 @@ const ApprovalChain: React.FC<ApprovalChainProps> = React.memo(({
   approvalSteps,
   currentStatus,
   requesterName,
-  requesterId,
   assetValue,
-  currentUserId,
   showEnhancedApproval = true,
   className
 }) => {

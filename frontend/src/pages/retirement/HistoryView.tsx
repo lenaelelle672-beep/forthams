@@ -65,9 +65,6 @@ const initialState: HistoryViewState = {
  * @param date - 日期对象
  * @returns 格式化后的日期字符串 YYYY-MM-DD
  */
-const formatDateString = (date: Date): string => {
-  return date.toISOString().split('T')[0];
-};
 
 /**
  * HistoryView 组件 - 报废历史查询页面

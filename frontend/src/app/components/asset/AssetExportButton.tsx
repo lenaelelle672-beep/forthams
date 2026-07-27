@@ -8,7 +8,6 @@
  * @since SWARM-031
  */
 
-import React from 'react';
 import { Download, Loader2 } from 'lucide-react';
 import { useAssetImportExport } from '../../hooks/useAssetImportExport';
 import type { AssetExportParams } from '../../hooks/useAssetImportExport';

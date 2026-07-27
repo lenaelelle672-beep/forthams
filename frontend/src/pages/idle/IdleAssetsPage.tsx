@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Archive, Send, CheckCircle, Clock, X, AlertCircle } from 'lucide-react';
@@ -403,7 +403,7 @@ export default function IdleAssetsPage() {
 
           {/* Stat bar */}
           <div className="grid grid-cols-2 divide-x divide-slate-100 border-t border-slate-100 sm:grid-cols-4">
-            {stats.map(({ label, value, icon: Icon, gradient, bg }) => (
+            {stats.map(({ label, value, icon: Icon, gradient }) => (
               <div key={label} className="flex items-center gap-3.5 px-5 py-4">
                 <div
                   className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ${gradient} shadow-sm`}

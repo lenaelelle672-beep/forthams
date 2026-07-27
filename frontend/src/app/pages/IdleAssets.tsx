@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Archive, Plus, Send, CheckCircle, Clock } from "lucide-react";
+import { Archive, Send, CheckCircle, Clock } from "lucide-react";
 import { idleAssetService } from "../services/idleAssetService";
 
 export function IdleAssets() {

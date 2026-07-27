@@ -13,9 +13,7 @@ import { useNavigate } from 'react-router';
 import http from '@/utils/http';
 import {
   ScanLine,
-  Package,
   CheckCircle2,
-  XCircle,
   Search,
 } from 'lucide-react';
 

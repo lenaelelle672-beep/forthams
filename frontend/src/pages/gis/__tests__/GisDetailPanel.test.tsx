@@ -1,6 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import React from 'react';
 import GisDetailPanel from '../components/GisDetailPanel';
 import type { GisAsset } from '@/services/gisService';
 

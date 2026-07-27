@@ -3,8 +3,8 @@ import { useParams, useNavigate, useSearchParams } from 'react-router';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { safetyApi } from '../../api/safety';
 import type { SafetyChecklistItem, SafetyChecklistExecution, SafetyChecklistResult, SysAttachment } from '../../types/safety';
-import { Alert, Card, Form, Button, Radio, Input, InputNumber, Upload, Space, message, Spin, Steps, Tag, Divider } from 'antd';
-import { UploadOutlined, CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
+import { Alert, Card, Form, Button, Radio, Input, InputNumber, Upload, Space, message, Spin, Tag } from 'antd';
+import { UploadOutlined } from '@ant-design/icons';
 import type { UploadFile, UploadProps } from 'antd/es/upload/interface';
 
 type WorkbenchSafetyPrefill = {
@@ -58,7 +58,7 @@ const SafetyChecklistExecutionPage: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [form] = Form.useForm();
-  const [currentStep, setCurrentStep] = useState(0);
+  const [_currentStep, _setCurrentStep] = useState(0);
   const workbenchPrefill = useMemo(() => getWorkbenchSafetyPrefill(searchParams), [searchParams]);
 
   // If no executionId, it's a new execution from template
@@ -79,13 +79,13 @@ const SafetyChecklistExecutionPage: React.FC = () => {
     enabled: !!templateIdParam
   });
 
-  const { data: execution, isLoading: executionLoading } = useQuery({
+  const { data: execution, isLoading: _executionLoading } = useQuery({
     queryKey: ['safetyExecution', executionId],
     queryFn: () => safetyApi.getExecution(Number(executionId)),
     enabled: !!executionId && executionId !== 'new'
   });
 
-  const { data: existingResults, refetch: refetchResults } = useQuery({
+  const { data: existingResults, refetch: _refetchResults } = useQuery({
     queryKey: ['safetyResults', executionId],
     queryFn: () => safetyApi.getResults(Number(executionId)),
     enabled: !!executionId && executionId !== 'new'
@@ -117,7 +117,7 @@ const SafetyChecklistExecutionPage: React.FC = () => {
   const uploadPhotoMutation = useMutation({
     mutationFn: ({ resultId, file }: { resultId: number; file: File }) =>
       safetyApi.uploadPhoto(Number(executionId), resultId, file, 1), // uploadBy=1 实际应从当前用户获取
-    onSuccess: (data: any) => {
+    onSuccess: (_data: any) => {
       message.success('照片上传成功');
       // 刷新照片列表
       if (executionId && executionId !== 'new') {
@@ -160,7 +160,7 @@ const SafetyChecklistExecutionPage: React.FC = () => {
   const checklistItems = (items as SafetyChecklistItem[]) || [];
   const executionData = execution as SafetyChecklistExecution | undefined;
   const savedResults = (existingResults as SafetyChecklistResult[]) || [];
-  const [uploadedPhotos, setUploadedPhotos] = useState<Map<number, SysAttachment[]>>(new Map());
+  const [, setUploadedPhotos] = useState<Map<number, SysAttachment[]>>(new Map());
 
   // 加载已上传的照片
   useEffect(() => {
@@ -228,35 +228,11 @@ const SafetyChecklistExecutionPage: React.FC = () => {
     completeMutation.mutate();
   };
 
-  // 获取或创建检查项结果
-  const getOrCreateResult = (itemId: number): number => {
-    const existingResult = savedResults.find(r => r.itemId === itemId);
-    if (existingResult && existingResult.id) {
-      return existingResult.id;
-    }
-    // 如果结果不存在，返回一个临时 ID（负数表示临时）
-    // 提交时，后端会创建实际的结果记录
-    return -itemId;
-  };
 
-  const handlePhotoUpload = async (itemId: number, file: File) => {
-    const resultId = getOrCreateResult(itemId);
-    if (resultId < 0) {
-      message.error('请先保存检查结果后再上传照片');
-      return;
-    }
-    uploadPhotoMutation.mutate({ resultId, file });
-  };
-
-  const handlePhotoDelete = (photoId: number) => {
-    deletePhotoMutation.mutate(photoId);
-  };
 
   const renderItemControl = (item: SafetyChecklistItem) => {
     const isRequired = item.required === 1;
     const rules = isRequired ? [{ required: true, message: `请填写 ${item.itemName}` }] : [];
-    const resultId = getOrCreateResult(item.id);
-    const photos = resultId > 0 ? (uploadedPhotos.get(resultId) || []) : [];
 
     switch (item.itemType) {
       case 'PASS_FAIL':

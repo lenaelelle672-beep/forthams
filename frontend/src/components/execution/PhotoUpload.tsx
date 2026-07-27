@@ -17,7 +17,7 @@ interface PhotoUploadProps {
   onPhotosChange?: (urls: string[]) => void;
 }
 
-export default function PhotoUpload({ workOrderId, existingPhotos = [], onPhotosChange }: PhotoUploadProps) {
+export default function PhotoUpload({ existingPhotos = [], onPhotosChange }: PhotoUploadProps) {
   const [photos, setPhotos] = useState<string[]>(existingPhotos);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);

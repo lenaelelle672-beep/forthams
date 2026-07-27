@@ -158,13 +158,13 @@ export interface InventoryState {
 // Store implementation
 // ---------------------------------------------------------------------------
 
-export const useInventoryStore = create<any>((set, get) => ({
+export const useInventoryStore = create<any>((set: any, get: any) => ({
   ...createInitialState(),
 
   // ---- Filters ----
 
   /** 设置状态筛选条件并重置页码到第一页 */
-  setStatusFilter: (filter) =>
+  setStatusFilter: (filter: StatusFilter) =>
     set({
       statusFilter: filter,
       currentPage: 1,
@@ -172,16 +172,16 @@ export const useInventoryStore = create<any>((set, get) => ({
     }),
 
   /** 设置当前页码 */
-  setCurrentPage: (page) =>
+  setCurrentPage: (page: number) =>
     set({
       currentPage: Math.max(1, page),
       pagination: { ...get().pagination, currentPage: Math.max(1, page) },
     }),
 
-  setPage: (page) => get().setCurrentPage(page),
+  setPage: (page: number) => get().setCurrentPage(page),
 
   /** 设置每页条数并重置页码到第一页 */
-  setPageSize: (size) =>
+  setPageSize: (size: number) =>
     set({
       pageSize: size,
       currentPage: 1,
@@ -189,7 +189,7 @@ export const useInventoryStore = create<any>((set, get) => ({
     }),
 
   /** 设置分页总数（由 API 响应更新） */
-  setPaginationTotal: (total) =>
+  setPaginationTotal: (total: number) =>
     set({ pagination: { ...get().pagination, total } }),
 
   /** 重置筛选条件为默认值 */
@@ -211,7 +211,7 @@ export const useInventoryStore = create<any>((set, get) => ({
    * 设置当前选中的任务 ID。
    * 切换任务时自动清空资产批量选择和编辑行状态，避免残留脏数据。
    */
-  setSelectedTaskId: (id) =>
+  setSelectedTaskId: (id: string | null) =>
     set({
       selectedTaskId: id,
       selectedAssetIds: [],
@@ -224,12 +224,12 @@ export const useInventoryStore = create<any>((set, get) => ({
    * 切换单个资产的选中状态。
    * 如果当前已选数量达到 BATCH_CONFIRM_LIMIT (100) 则忽略新增操作。
    */
-  toggleAssetSelection: (assetId) => {
+  toggleAssetSelection: (assetId: string) => {
     const current = get().selectedAssetIds;
     const isSelected = current.includes(assetId);
 
     if (isSelected) {
-      set({ selectedAssetIds: current.filter((id) => id !== assetId) });
+      set({ selectedAssetIds: current.filter((id: string) => id !== assetId) });
     } else {
       if (current.length >= BATCH_CONFIRM_LIMIT) {
         return;
@@ -242,12 +242,12 @@ export const useInventoryStore = create<any>((set, get) => ({
    * 全选指定资产列表。
    * 受 BATCH_CONFIRM_LIMIT 限制，超出部分自动截断（交互约束 7）。
    */
-  selectAllAssets: (allAssetIds) => {
+  selectAllAssets: (allAssetIds: string[]) => {
     const capped = allAssetIds.slice(0, BATCH_CONFIRM_LIMIT);
     set({ selectedAssetIds: capped });
   },
 
-  setSelectedAssetIds: (assetIds) =>
+  setSelectedAssetIds: (assetIds: string[]) =>
     set({ selectedAssetIds: assetIds.slice(0, BATCH_CONFIRM_LIMIT) }),
 
   /** 清空所有已选资产 */
@@ -261,7 +261,7 @@ export const useInventoryStore = create<any>((set, get) => ({
    * 批量添加资产到已选列表。
    * 受 BATCH_CONFIRM_LIMIT 限制，只添加未超限的部分。
    */
-  addToSelection: (assetIds) => {
+  addToSelection: (assetIds: string[]) => {
     const current = get().selectedAssetIds;
     const currentSet = new Set(current);
     const remaining = BATCH_CONFIRM_LIMIT - current.length;
@@ -280,11 +280,11 @@ export const useInventoryStore = create<any>((set, get) => ({
   },
 
   /** 从已选列表批量移除资产 */
-  removeFromSelection: (assetIds) => {
+  removeFromSelection: (assetIds: string[]) => {
     const removeSet = new Set(assetIds);
     set({
       selectedAssetIds: get().selectedAssetIds.filter(
-        (id) => !removeSet.has(id),
+        (id: string) => !removeSet.has(id),
       ),
     });
   },
@@ -292,29 +292,29 @@ export const useInventoryStore = create<any>((set, get) => ({
   // ---- UI toggles ----
 
   /** 切换新建任务弹窗可见性 */
-  setCreateModalOpen: (open) => set({ createModalOpen: open, isCreateModalOpen: open }),
+  setCreateModalOpen: (open: boolean) => set({ createModalOpen: open, isCreateModalOpen: open }),
 
   openCreateModal: () => set({ createModalOpen: true, isCreateModalOpen: true }),
 
   closeCreateModal: () => set({ createModalOpen: false, isCreateModalOpen: false }),
 
-  setSubmitting: (isSubmitting) => set({ isSubmitting }),
+  setSubmitting: (isSubmitting: boolean) => set({ isSubmitting }),
 
-  setLoading: (loading) => set({ loading }),
+  setLoading: (loading: boolean) => set({ loading }),
 
-  setError: (error) => set({ error }),
+  setError: (error: string | null) => set({ error }),
 
   /** 切换批量确认对话框可见性 */
-  setBatchConfirmDialogOpen: (open) => set({ batchConfirmDialogOpen: open }),
+  setBatchConfirmDialogOpen: (open: boolean) => set({ batchConfirmDialogOpen: open }),
 
   /** 切换提交核准确认对话框可见性 */
-  setSubmitConfirmDialogOpen: (open) =>
+  setSubmitConfirmDialogOpen: (open: boolean) =>
     set({ submitConfirmDialogOpen: open }),
 
   // ---- Editing ----
 
   /** 设置当前正在编辑的资产行 ID */
-  setEditingRowId: (id) => set({ editingRowId: id }),
+  setEditingRowId: (id: string | null) => set({ editingRowId: id }),
 
   // ---- Reset ----
 
@@ -328,18 +328,18 @@ export const useInventoryStore = create<any>((set, get) => ({
     error: scopeType === 'all' || scopeIds.length > 0 ? null : '请选择盘点范围',
   }),
 
-  validateTaskName: (name) => {
+  validateTaskName: (name: string) => {
     const trimmed = name.trim();
     if (!trimmed) return { valid: false, error: '任务名称不能为空' };
     if (trimmed.length > 50) return { valid: false, error: '任务名称不能超过50字符' };
     return { valid: true, error: null };
   },
 
-  calculateProgress: (counted, total) => calculateProgress(counted, total),
+  calculateProgress: (counted: number, total: number) => calculateProgress(counted, total),
 
-  isTaskReadOnly: (status) => status === 'completed' || status === 'submitted',
+  isTaskReadOnly: (status: InventoryTaskStatus) => status === 'completed' || status === 'submitted',
 
-  validateRemark: (remark) =>
+  validateRemark: (remark: string) =>
     remark.length > 200
       ? { valid: false, error: '备注不能超过200字符' }
       : { valid: true, error: null },

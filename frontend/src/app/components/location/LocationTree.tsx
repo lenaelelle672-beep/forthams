@@ -9,7 +9,7 @@
  * @since SWARM-048
  */
 
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   ChevronRight,
   ChevronDown,

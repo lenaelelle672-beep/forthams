@@ -20,7 +20,7 @@
 import React, { useMemo, useCallback, useState } from 'react';
 import { Table, Tag, Button, Space, Typography, Tooltip, Card, Spin, Alert, Empty } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
-import { ReloadOutlined, EyeOutlined, FilterOutlined } from '@ant-design/icons';
+import { ReloadOutlined, EyeOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 
 import { useAuditLogs } from '@/hooks/useAuditLogs';
@@ -137,7 +137,6 @@ export const AuditLogList: React.FC<AuditLogListProps> = ({
   className = '',
   maxHeight,
   enableRealtime = false,
-  onNewLogReceived,
 }) => {
   // 组件状态管理
   const [state, setState] = useState<AuditLogListState>({
@@ -361,7 +360,7 @@ export const AuditLogList: React.FC<AuditLogListProps> = ({
       showTotal: (total: number, range: [number, number]) =>
         `显示 ${range[0]}-${range[1]} 条，共 ${total} 条记录`,
       pageSizeOptions: ['10', '20', '50'],
-      onChange: (page: number, size: number) => {
+      onChange: (_page: number, _size: number) => {
         // 实际分页逻辑通过 React Query 重新获取数据
         setFilterValues((prev) => ({ ...prev }));
       },

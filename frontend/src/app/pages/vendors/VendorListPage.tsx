@@ -8,7 +8,7 @@
  * @since SWARM-022
  */
 
-import React, { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import {
   Search,
   Plus,

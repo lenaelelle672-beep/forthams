@@ -1,4 +1,4 @@
-import { X, MapPin, User, Calendar, DollarSign, Package, FileText, History } from "lucide-react";
+import { X, FileText, History } from "lucide-react";
 import { getAssetStatusMeta } from "../constants/assetStatus";
 
 interface AssetDetailModalProps {

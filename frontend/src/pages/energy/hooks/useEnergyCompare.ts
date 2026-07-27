@@ -26,7 +26,7 @@ export interface UseEnergyCompareOptions {
 function derivePreviousRange(
   start: string,
   end: string,
-  groupBy: 'DAY' | 'WEEK' | 'MONTH' | 'YEAR',
+  _groupBy: 'DAY' | 'WEEK' | 'MONTH' | 'YEAR',
 ): { previousStart: string; previousEnd: string } {
   const startDate = new Date(start);
   const endDate = new Date(end);

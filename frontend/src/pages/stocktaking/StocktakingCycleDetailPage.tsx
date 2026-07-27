@@ -1,13 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import {
   ArrowLeft,
   Play,
   Pause,
   Check,
-  X,
-  List,
-  AlertCircle,
   FileText,
 } from 'lucide-react';
 import { usePdfExport } from '@/hooks/usePdfExport';

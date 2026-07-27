@@ -29,8 +29,8 @@ import {
   Legend,
   ReferenceArea,
 } from 'recharts';
-import { Spin, Alert, Empty, DatePicker, Select, Button } from 'antd';
-import dayjs, { Dayjs } from 'dayjs';
+import { Spin, Alert, Empty, Select, Button } from 'antd';
+import dayjs from 'dayjs';
 
 // ============================================================
 // 类型定义
@@ -188,7 +188,7 @@ interface ChartTooltipProps {
 /**
  * 自定义图表提示组件
  */
-function CustomTooltip({ active, payload, label }: ChartTooltipProps) {
+function CustomTooltip({ active, payload }: ChartTooltipProps) {
   if (!active || !payload || !payload.length) {
     return null;
   }

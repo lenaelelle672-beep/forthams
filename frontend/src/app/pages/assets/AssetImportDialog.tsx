@@ -26,7 +26,6 @@ import {
   parseImportFile,
   commitImport,
   validateImportFile,
-  type ImportResult,
   type ImportErrorItem,
 } from '../../services/importExportApi';
 import type { ImportParseResponse, ImportParseError } from '../../services/assetService';

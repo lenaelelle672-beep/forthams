@@ -13,7 +13,6 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { 
-  TicketStatus, 
   WorkOrderStatus, 
   ApprovalAction, 
   WorkOrder 
@@ -76,11 +75,6 @@ const STATUS_LABELS: Record<WorkOrderStatus, string> = {
 };
 
 /** 审批操作类型 */
-const ACTION_LABELS: Record<ApprovalAction, string> = {
-  [ApprovalAction.APPROVE]: '通过',
-  [ApprovalAction.REJECT]: '驳回',
-  [ApprovalAction.ARCHIVE]: '归档',
-};
 
 // ============================================================================
 // 工具函数
@@ -174,7 +168,6 @@ export const ApprovalPanel: React.FC<ApprovalPanelProps> = React.memo(({
   const { 
     canApprove, 
     canReject,
-    checkPermission 
   } = useApprovalPermission();
 
   const currentUserId = useMemo(() => getCurrentUser(), []);
@@ -207,7 +200,7 @@ export const ApprovalPanel: React.FC<ApprovalPanelProps> = React.memo(({
    * 加载工单状态变更历史
    * @param ticketId 工单ID
    */
-  const loadStatusHistory = useCallback(async (ticketId: string) => {
+  const loadStatusHistory = useCallback(async (_ticketId: string) => {
     // 模拟从后端获取状态历史
     const mockHistory: StatusHistoryItem[] = [
       {
@@ -517,7 +510,7 @@ export const ApprovalPanel: React.FC<ApprovalPanelProps> = React.memo(({
               <div className="status-history-panel">
                 <h3 className="section-title">状态变更历史</h3>
                 <div className="status-timeline" data-testid="status-timeline">
-                  {statusHistory.map((item, index) => (
+                  {statusHistory.map((item, _index) => (
                     <div key={item.id} className="timeline-item">
                       <div className="timeline-dot" />
                       <div className="timeline-content">

@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { TreeSelect, Spin, message } from 'antd';
-import type { TreeSelectProps } from 'antd';
 import type { DefaultOptionType } from 'antd/es/select';
 import http from '../../../utils/http';
 

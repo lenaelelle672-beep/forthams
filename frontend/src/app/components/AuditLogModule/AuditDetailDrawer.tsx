@@ -44,7 +44,6 @@ import type { AuditLog, FieldChange } from '../../types/audit.types';
 import styles from './AuditDetailDrawer.module.css';
 
 const { Text, Title, Paragraph } = Typography;
-const { Panel } = Collapse;
 
 /**
  * 操作类型到图标和颜色的映射

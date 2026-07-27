@@ -13,7 +13,7 @@
  * @since SWARM-048
  */
 
-import React, { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Plus, RefreshCw, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import LocationTree from "../components/location/LocationTree";

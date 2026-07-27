@@ -11,9 +11,8 @@
  * @SWARM-502 资产报废/退役流程
  */
 
-import React, { useMemo } from 'react';
+import React from 'react';
 import { Routes, Route, Navigate } from 'react-router';
-import { useTranslation } from 'react-i18next';
 import { useRetirementPermissions } from '@/app/composables/useApprovalPermission';
 import RetirementListPage from './RetirementListPage';
 import RetirementDetailPage from './RetirementDetailPage';
@@ -188,66 +187,21 @@ export function getNextStatus(
  * ```
  */
 const RetirementRouter: React.FC = () => {
-  const { t } = useTranslation();
   const { 
     canViewList, 
     canCreate, 
     canApprove,
-    canExecute 
   } = useRetirementPermissions();
 
   /**
    * 路由配置
    * 根据用户权限动态生成路由
    */
-  const routeConfig = useMemo(() => ({
-    list: {
-      path: '/retirement',
-      component: RetirementListPage,
-      requiredPermissions: ['retirement:view'],
-    },
-    detail: {
-      path: '/retirement/:id',
-      component: RetirementDetailPage,
-      requiredPermissions: ['retirement:view'],
-    },
-    create: {
-      path: '/retirement/create/:assetId?',
-      component: RetirementDetailPage,
-      requiredPermissions: ['retirement:create'],
-    },
-    approval: {
-      path: '/retirement/:id/approval',
-      component: RetirementApprovalPage,
-      requiredPermissions: ['retirement:approve'],
-    },
-  }), []);
 
   /**
    * 状态机帮助函数
    * 用于在组件中执行状态转换
    */
-  const stateMachineHelpers = useMemo(() => ({
-    isDraft: (status: RetirementStatus) => status === RetirementStatus.DRAFT,
-    isPending: (status: RetirementStatus) => status === RetirementStatus.PENDING_APPROVAL,
-    isApproved: (status: RetirementStatus) => status === RetirementStatus.APPROVED,
-    isRetired: (status: RetirementStatus) => status === RetirementStatus.RETIRED,
-    isCancelled: (status: RetirementStatus) => status === RetirementStatus.CANCELLED,
-    isRejected: (status: RetirementStatus) => status === RetirementStatus.REJECTED,
-    
-    /** 是否可以提交 */
-    canSubmit: (status: RetirementStatus) => canTransition(status, RetirementEvent.SUBMIT),
-    /** 是否可以批准 */
-    canApprove: (status: RetirementStatus) => canTransition(status, RetirementEvent.APPROVE),
-    /** 是否可以驳回 */
-    canReject: (status: RetirementStatus) => canTransition(status, RetirementEvent.REJECT),
-    /** 是否可以撤回 */
-    canWithdraw: (status: RetirementStatus) => canTransition(status, RetirementEvent.WITHDRAW),
-    /** 是否可以执行退役 */
-    canExecuteRetirement: (status: RetirementStatus) => canTransition(status, RetirementEvent.EXECUTE),
-    /** 是否可以修订重提 */
-    canRevise: (status: RetirementStatus) => canTransition(status, RetirementEvent.REVISE),
-  }), []);
 
   return (
     <Routes>

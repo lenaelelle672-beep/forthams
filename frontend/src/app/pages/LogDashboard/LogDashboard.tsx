@@ -8,7 +8,7 @@
  * @date 2024-01-15
  */
 
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { 
   LineChart, 
   Line, 

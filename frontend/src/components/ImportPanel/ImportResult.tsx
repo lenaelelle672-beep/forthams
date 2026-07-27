@@ -116,7 +116,6 @@ export const ImportResult: React.FC<ImportResultProps> = ({
   progress,
   reportUrl,
   onDownloadReport,
-  onStatusChange,
   className = '',
 }) => {
   // -------------------------------------------------------------------------

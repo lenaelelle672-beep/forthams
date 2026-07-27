@@ -91,9 +91,6 @@ const DisposalConfirmationStep: React.FC<DisposalConfirmationStepProps> = ({
   reason,
   retirementType,
   estimatedResidualValue,
-  onConfirm,
-  onBack,
-  submitting = false,
   errorMessage,
   'data-testid': testId,
 }) => {

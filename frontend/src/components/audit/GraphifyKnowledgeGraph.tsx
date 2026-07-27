@@ -22,16 +22,12 @@
 import React, { useRef, useCallback, useState, useEffect } from 'react';
 import ForceGraph2D, { ForceGraphMethods } from 'react-force-graph-2d';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
-import { Skeleton } from '@/components/ui/Skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/Alert';
 import { AlertCircle, Loader2, ZoomIn, ZoomOut, Maximize2 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import {
-  Tooltip,
-  TooltipContent,
   TooltipProvider,
-  TooltipTrigger,
 } from '@/components/ui/Tooltip';
 import './GraphifyKnowledgeGraph.css';
 
@@ -147,7 +143,6 @@ const GraphifyKnowledgeGraph: React.FC<GraphifyKnowledgeGraphProps> = ({
   width = 600,
   height = 400,
   onNodeClick,
-  onEdgeClick,
   title = '知识图谱',
   showControls = true,
   enableAnimation = true,

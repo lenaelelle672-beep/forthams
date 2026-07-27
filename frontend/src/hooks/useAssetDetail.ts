@@ -127,7 +127,7 @@ export function useAssetDetail(options: UseAssetDetailOptions) {
    * 获取已标记 @Auditable 的审计日志（包含字段变更）
    */
   const auditableAuditLogs = computed(() => {
-    return auditLogs.value.filter(log => 
+    return auditLogs.value.filter((log: any) =>
       log.changes && log.changes.length > 0
     );
   });
@@ -312,7 +312,7 @@ export function useAssetDetail(options: UseAssetDetailOptions) {
    * @returns AuditLog[]
    */
   function getAuditLogsByOperation(operationType: string): AuditLog[] {
-    return auditLogs.value.filter(log => log.operation === operationType);
+    return auditLogs.value.filter((log: any) => log.operation === operationType);
   }
 
   /**
@@ -322,12 +322,12 @@ export function useAssetDetail(options: UseAssetDetailOptions) {
    * @returns 变更字段列表
    */
   function getAuditableFieldChanges(auditLogId: string): Array<{ field: string; oldValue: any; newValue: any }> {
-    const log = auditLogs.value.find(l => l.id === auditLogId);
+    const log = auditLogs.value.find((l: any) => l.id === auditLogId);
     if (!log || !log.changes) {
       return [];
     }
-    
-    return log.changes.filter(change => change.isAuditable === true);
+
+    return log.changes.filter((change: any) => change.isAuditable === true);
   }
 
   /**
@@ -378,7 +378,7 @@ export function useAssetDetail(options: UseAssetDetailOptions) {
    */
   watch(
     () => options.assetId,
-    (newAssetId, oldAssetId) => {
+    (newAssetId: string, oldAssetId: string) => {
       if (newAssetId && newAssetId !== oldAssetId) {
         clearState();
         loadAssetDetail();

@@ -747,7 +747,7 @@ const AssetTable: React.FC<AssetTableProps> = ({
           type: 'checkbox',
           selectedRowKeys,
           onChange: (keys) => setSelectedRowKeys(keys),
-          getCheckboxProps: (record) => ({
+          getCheckboxProps: (_record) => ({
             disabled: !editable,
           }),
         }}

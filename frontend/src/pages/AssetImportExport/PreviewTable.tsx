@@ -20,7 +20,6 @@ import {
   SendOutlined,
   UndoOutlined,
 } from '@ant-design/icons';
-import { FixedSizeList as FixedList } from 'react-window';
 
 // ---------------------------------------------------------------------------
 // Types

@@ -416,7 +416,6 @@ export function WorkOrderDetailPage() {
       setNotice("工单已提交审批，状态已变更为待审批");
       await refetch();
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "提交失败";
       setNotice(null);
       // Error is set by the hook indirectly; show inline
     } finally {

@@ -32,7 +32,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { getInventoryTasks, createInventoryTask } from '@/api/inventory';
 import type { InventoryTaskStatus, CreateTaskPayload, InventoryTask } from '@/types/inventory';
 import type { PageData } from '@/types/common';
-import { Card, CardContent } from '@/components/ui/Card';
+import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { DataTable, type Column } from '@/components/ui/DataTable';
 import {

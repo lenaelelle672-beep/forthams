@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router';
 import { toast } from 'sonner';
 import { useApprovalStore } from '@/store/approvalStore';
@@ -15,7 +15,6 @@ import {
   type ApprovalHistoryItem
 } from '@/pages/WorkOrder/types/workOrder';
 import { useApprovalPermission } from '@/composables/useApprovalPermission';
-import { workOrderApi } from '@/pages/WorkOrder/api/workOrderApi';
 
 /**
  * 工单审批详情页组件
@@ -48,7 +47,7 @@ export function ApprovalDetailPage() {
     clearError
   } = useApprovalStore();
 
-  const { canApprove, hasApprovalRole } = useApprovalPermission();
+  const { hasApprovalRole } = useApprovalPermission();
   
   // 组件内部状态
   const [approvalComment, setApprovalComment] = useState('');

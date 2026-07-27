@@ -376,7 +376,7 @@ export default function WorkOrderFormPage() {
       }
       return createWorkOrder(payload);
     },
-    onSuccess: (res: unknown) => {
+    onSuccess: (_res: unknown) => {
       qc.invalidateQueries({ queryKey: ['workorders'] });
       toast.success(isEdit ? t('workorder:messages.updateSuccess') : t('workorder:messages.createSuccess'));
       navigate('/workorders');

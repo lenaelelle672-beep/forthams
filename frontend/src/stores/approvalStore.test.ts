@@ -147,7 +147,7 @@ describe('approvalStore', () => {
 
       const state = useApprovalStore.getState();
       expect(state.orders).toHaveLength(2);
-      expect(state.orders.every((o) => o.status === 'APPROVING_LEVEL_1')).toBe(true);
+      expect(state.orders.every((o: ApprovalOrder) => o.status === 'APPROVING_LEVEL_1')).toBe(true);
       expect(state.pagination.total).toBe(2);
       expect(state.isLoading).toBe(false);
 
@@ -272,7 +272,7 @@ describe('approvalStore', () => {
 
       const state = useApprovalStore.getState();
       // The approved order should be removed from the pending list
-      expect(state.orders.find((o) => o.id === 'order-001')).toBeUndefined();
+      expect(state.orders.find((o: ApprovalOrder) => o.id === 'order-001')).toBeUndefined();
       expect(state.isActionLoading).toBe(false);
       expect(state.actionError).toBeNull();
     });
@@ -301,7 +301,7 @@ describe('approvalStore', () => {
       await useApprovalStore.getState().approveOrder('order-002', 2);
 
       const state = useApprovalStore.getState();
-      expect(state.orders.find((o) => o.id === 'order-002')).toBeUndefined();
+      expect(state.orders.find((o: ApprovalOrder) => o.id === 'order-002')).toBeUndefined();
       expect(state.isActionLoading).toBe(false);
     });
 
@@ -368,7 +368,7 @@ describe('approvalStore', () => {
 
       const state = useApprovalStore.getState();
       // Rejected order should be removed from the pending list
-      expect(state.orders.find((o) => o.id === 'order-001')).toBeUndefined();
+      expect(state.orders.find((o: ApprovalOrder) => o.id === 'order-001')).toBeUndefined();
       expect(state.actionError).toBeNull();
       expect(spyReject).toHaveBeenCalledWith(
         'order-001',
@@ -400,7 +400,7 @@ describe('approvalStore', () => {
       await useApprovalStore.getState().rejectOrder('order-003', '资产信息不符', 2);
 
       const state = useApprovalStore.getState();
-      expect(state.orders.find((o) => o.id === 'order-003')).toBeUndefined();
+      expect(state.orders.find((o: ApprovalOrder) => o.id === 'order-003')).toBeUndefined();
     });
 
     it('should set actionError when rejectionReason is empty (frontend validation)', async () => {
@@ -475,7 +475,7 @@ describe('approvalStore', () => {
       const state = useApprovalStore.getState();
       expect(state.actionError).toContain('400');
       // Order should remain in the list since rejection failed
-      expect(state.orders.find((o) => o.id === 'order-001')).toBeDefined();
+      expect(state.orders.find((o: ApprovalOrder) => o.id === 'order-001')).toBeDefined();
     });
   });
 
@@ -505,8 +505,8 @@ describe('approvalStore', () => {
       const state = useApprovalStore.getState();
       expect(state.actionError).toContain('INVALID_STATE_TRANSITION');
       // Order should remain unchanged
-      expect(state.orders.find((o) => o.id === 'order-pending')).toBeDefined();
-      expect(state.orders.find((o) => o.id === 'order-pending')!.status).toBe('PENDING');
+      expect(state.orders.find((o: ApprovalOrder) => o.id === 'order-pending')).toBeDefined();
+      expect(state.orders.find((o: ApprovalOrder) => o.id === 'order-pending')!.status).toBe('PENDING');
     });
 
     it('should handle 409 Conflict for cross-level approval attempt', async () => {
@@ -530,7 +530,7 @@ describe('approvalStore', () => {
 
       const state = useApprovalStore.getState();
       expect(state.actionError).toContain('INVALID_STATE_TRANSITION');
-      expect(state.orders.find((o) => o.id === 'order-001')).toBeDefined();
+      expect(state.orders.find((o: ApprovalOrder) => o.id === 'order-001')).toBeDefined();
     });
 
     it('should handle 409 Conflict for rejecting an already APPROVED order', async () => {
@@ -581,7 +581,7 @@ describe('approvalStore', () => {
       const state = useApprovalStore.getState();
       expect(state.actionError).toContain('VERSION_CONFLICT');
       // Order should still be in the list with its current version
-      expect(state.orders.find((o) => o.id === 'order-001')).toBeDefined();
+      expect(state.orders.find((o: ApprovalOrder) => o.id === 'order-001')).toBeDefined();
     });
 
     it('should handle 409 Conflict on concurrent reject attempt', async () => {
@@ -811,7 +811,7 @@ describe('approvalStore', () => {
       await useApprovalStore.getState().fetchPendingOrders('DEPT_MANAGER');
 
       const state = useApprovalStore.getState();
-      expect(state.orders.every((o) => o.status !== 'CANCELLED')).toBe(true);
+      expect(state.orders.every((o: ApprovalOrder) => o.status !== 'CANCELLED')).toBe(true);
     });
   });
 

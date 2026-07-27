@@ -108,7 +108,6 @@ export const AuditTable: React.FC<AuditTableProps> = ({
 
   /** 当前页码（从 1 开始） */
   const currentPage = useMemo(() => {
-    const size = params.size ?? DEFAULT_PAGE_SIZE;
     return Math.min(Math.max(1, (params.page ?? 1)), totalPages);
   }, [params.page, params.size, totalPages]);
 

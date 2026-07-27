@@ -127,7 +127,7 @@ export default function AssetTransferFormPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const qc = useQueryClient();
-  const [currentStep, setCurrentStep] = useState(0);
+  const [currentStep, _setCurrentStep] = useState(0);
   const [selectedAssets, setSelectedAssets] = useState<SelectedAsset[]>([]);
   const [appliedPreselectKey, setAppliedPreselectKey] = useState<string | null>(null);
   const [draftSavedAt] = useState(new Date().toLocaleTimeString('zh-CN', { hour12: false }));

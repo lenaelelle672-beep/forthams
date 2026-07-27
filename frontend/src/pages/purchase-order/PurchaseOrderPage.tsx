@@ -35,7 +35,6 @@ import {
   type PurchaseOrderItem,
   type CreatePurchaseOrderRequest,
   type PurchaseOrderListQuery,
-  type PurchaseOrderStats,
 } from '@/api/purchaseOrder';
 import { getVendorList } from '@/api/vendor';
 import type { Vendor } from '@/types/common';
@@ -471,7 +470,6 @@ export default function PurchaseOrderPage() {
 
   const orders: PurchaseOrder[] = listData?.records ?? [];
   const total = listData?.total ?? 0;
-  const totalPages = listData?.pages ?? Math.ceil(total / PAGE_SIZE);
   const vendors: Vendor[] = vendorsData?.records ?? [];
   const stats = statsData ?? { totalOrders: 0, pendingApproval: 0, approved: 0 };
 

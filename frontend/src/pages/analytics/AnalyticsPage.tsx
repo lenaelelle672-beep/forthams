@@ -58,7 +58,6 @@ import {
   type ReportSummary,
   type CategoryReport,
 } from '@/api/stats';
-import type { ApiResponse } from '@/types/common';
 import type { DashboardStats, AssetValueTrend, DeptAssetDistribution } from '@/types/asset';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { Select, SelectItem } from '@/components/ui/Select';
@@ -160,7 +159,7 @@ export default function AnalyticsPage() {
   });
 
   /** 维保统计 */
-  const { data: maintenanceRes, isLoading: maintenanceLoading } = useQuery({
+  const { data: maintenanceRes, isLoading: _maintenanceLoading } = useQuery({
     queryKey: ['dashboard', 'maintenance-stats'],
     queryFn: getMaintenanceStats,
     staleTime: 1000 * 60 * 15,

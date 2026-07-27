@@ -9,7 +9,6 @@ import {
   uploadAssetAttachment,
   deleteAssetAttachment,
 } from '@/api/asset';
-import type { AssetAttachment } from '@/types/asset';
 import { toast } from 'sonner';
 
 export const attachmentKeys = {

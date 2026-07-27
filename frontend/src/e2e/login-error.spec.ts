@@ -1,4 +1,4 @@
-import { expect, test, type Page, type Route } from '@playwright/test';
+import { expect, test, type Route } from '@playwright/test';
 
 /**
  * 登录错误密码测试（独立文件，与 auth.setup.ts 解耦）
@@ -85,21 +85,6 @@ test('多次登录失败后页面状态正常', async ({ page }) => {
 // ---------------------------------------------------------------------------
 // Helper：收集浏览器运行时错误
 // ---------------------------------------------------------------------------
-function collectBrowserErrors(page: Page) {
-  const errors: string[] = [];
-
-  page.on('console', (message) => {
-    if (message.type() === 'error') {
-      errors.push(message.text());
-    }
-  });
-
-  page.on('pageerror', (error) => {
-    errors.push(error.message);
-  });
-
-  return errors;
-}
 
 // ---------------------------------------------------------------------------
 // Mock API：登录相关接口

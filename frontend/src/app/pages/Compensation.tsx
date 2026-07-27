@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { DollarSign, Plus, AlertCircle, CheckCircle, Clock, FileText } from "lucide-react";
+import { DollarSign, Plus, CheckCircle, Clock, FileText } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import { compensationService } from "../services/compensationService";
 

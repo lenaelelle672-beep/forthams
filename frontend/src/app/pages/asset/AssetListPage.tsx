@@ -8,7 +8,7 @@
  * @since SWARM-025 → 三栏重构
  */
 
-import React, { useState, useCallback, useEffect, useMemo } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import { useSearchParams, useNavigate } from 'react-router';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { Loader2, Inbox, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -60,7 +60,7 @@ export default function AssetListPage() {
   const [viewMode, setViewMode] = useState<'table' | 'card'>('table');
 
   /* ── 分类面板折叠 ── */
-  const [categoryCollapsed, setCategoryCollapsed] = useState(
+  const [_categoryCollapsed, setCategoryCollapsed] = useState(
     () => localStorage.getItem(PANEL_COLLAPSED_KEY) === 'true'
   );
 

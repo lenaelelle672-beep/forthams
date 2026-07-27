@@ -13,8 +13,8 @@ import {
   ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianGrid,
 } from 'recharts';
 import {
-  Layout, Save, Eye, Table2, BarChart3, PieChart as PieChartIcon,
-  TrendingUp, GripVertical, X, Plus, Trash2,
+  Save, Eye, Table2, BarChart3, PieChart as PieChartIcon,
+  TrendingUp, GripVertical, X,
 } from 'lucide-react';
 import { createSavedReport } from '@/api/savedReport';
 import { getAssetList } from '@/api/asset';

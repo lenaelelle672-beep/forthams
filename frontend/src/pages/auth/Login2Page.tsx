@@ -18,15 +18,6 @@ import { LoginFormFields, DemoAccounts, SsoButton } from './components';
    ════════════════════════════════════════════════════════════════════════════════ */
 
 // ── 常量 ────────────────────────────────────────────────────────────────────────
-const PALETTE = [
-  '#22d3ee', // cyan
-  '#60a5fa', // blue
-  '#a78bfa', // violet
-  '#34d399', // emerald
-  '#fbbf24', // amber
-  '#f472b6', // pink
-  '#38bdf8', // sky
-];
 
 const STREAM_COUNT = 8;
 const PARTICLES_PER_STREAM = 15;
@@ -115,7 +106,7 @@ const PRODUCTS = [
 ];
 
 /** 产品广告牌 — 真实渲染图 + 全息光环底座 (复刻自 Login3) */
-function ProductBillboard({ name, img, color, orbit, height, angle, speed }: typeof PRODUCTS[number]) {
+function ProductBillboard({ img, color, orbit, height, angle, speed }: typeof PRODUCTS[number]) {
   const texture = useLoader(THREE.TextureLoader, img);
   const groupRef = useRef<THREE.Group>(null);
   const ringRef = useRef<THREE.Mesh>(null);
@@ -484,7 +475,6 @@ function DataStreams() {
     const tmpColor = new THREE.Color();
 
     for (let i = 0; i < total; i++) {
-      const i3 = i * 3;
       let y = posAttr.getY(i) + speeds[i] * 0.014;
       if (y > 6) y = -6;
       posAttr.setY(i, y);

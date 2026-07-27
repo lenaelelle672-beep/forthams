@@ -19,7 +19,7 @@ const STATUS_MAP: Record<string, { label: string; color: string }> = {
 
 export default function ScheduledReportConfigPage() {
   const qc = useQueryClient();
-  const [pageNum, setPageNum] = useState(1);
+  const [pageNum, _setPageNum] = useState(1);
   const pageSize = 10;
 
   const { data, isLoading } = useQuery({
@@ -28,7 +28,6 @@ export default function ScheduledReportConfigPage() {
   });
 
   const reports = (data as any)?.records ?? [];
-  const total = (data as any)?.total ?? 0;
 
   const deleteMutation = useMutation({
     mutationFn: (id: number) => deleteScheduledReport(id),

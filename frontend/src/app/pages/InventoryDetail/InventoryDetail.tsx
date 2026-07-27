@@ -24,7 +24,6 @@ import {
 } from 'antd';
 import {
   CheckCircleOutlined,
-  ExclamationCircleOutlined,
   QuestionCircleOutlined,
   ArrowLeftOutlined,
   SearchOutlined,
@@ -32,7 +31,6 @@ import {
   FileProtectOutlined,
   WarningOutlined,
   SendOutlined,
-  InboxOutlined,
   PlusCircleOutlined,
   MinusCircleOutlined,
 } from '@ant-design/icons';
@@ -127,7 +125,7 @@ const mockApi = {
     };
   },
 
-  fetchAssets: async (taskId: string): Promise<IAssetItem[]> => {
+  fetchAssets: async (_taskId: string): Promise<IAssetItem[]> => {
     await new Promise((r) => setTimeout(r, 1000));
     const names = ['服务器', '笔记本电脑', '打印机', '测试仪', '网络交换机'];
     const categories = ['IT设备', '办公家具', '生产工具'];
@@ -163,21 +161,21 @@ const mockApi = {
   },
 
   updateAssetStatus: async (
-    assetId: string,
-    status: AssetCountStatus,
-    actualQuantity: number | null,
-    remark?: string,
+    _assetId: string,
+    _status: AssetCountStatus,
+    _actualQuantity: number | null,
+    _remark?: string,
   ) => {
     await new Promise((r) => setTimeout(r, 200));
     return true;
   },
 
-  batchConfirm: async (assetIds: string[], status: AssetCountStatus) => {
+  batchConfirm: async (_assetIds: string[], _status: AssetCountStatus) => {
     await new Promise((r) => setTimeout(r, 400));
     return true;
   },
 
-  submitApproval: async (taskId: string) => {
+  submitApproval: async (_taskId: string) => {
     await new Promise((r) => setTimeout(r, 1500));
     return true;
   },
@@ -232,14 +230,6 @@ const StatusDropdown: React.FC<{
 );
 
 /** Tag that renders inventory status with colour and icon. */
-const StatusTag: React.FC<{ status: AssetCountStatus }> = ({ status }) => {
-  const cfg = STATUS_CONFIG[status];
-  return (
-    <Tag icon={cfg.icon} color={cfg.color}>
-      {cfg.label}
-    </Tag>
-  );
-};
 
 // ─── Progress Dashboard (Top) ──────────────────────────────────────────────
 

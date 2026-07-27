@@ -7,7 +7,7 @@
  * @module components/CategoryPanel
  */
 
-import React, { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   ChevronRight,
   ChevronDown,

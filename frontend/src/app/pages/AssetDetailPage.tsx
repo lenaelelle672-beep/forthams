@@ -20,9 +20,7 @@ import { useAssetById } from '../hooks/useAssetById';
 import { useAuditLogs } from '../hooks/useAuditLogs';
 import { GraphifyNodeFactory } from '../components/flow/CustomNodes';
 import type { GraphifyNodeData, GraphifyNodeType } from '../types/flow';
-import type { AssetResponse } from '../types/asset.types';
 import type { AuditLogResponse, AuditChange } from '../types/audit.types';
-import { auditService } from '../services/auditService';
 
 /**
  * 资产状态颜色映射

@@ -10,7 +10,7 @@
  * @requires @AMS/AuditService
  */
 
-import { ref, onMounted, onUnmounted, computed } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import type { Ref } from 'vue';
 
 /**

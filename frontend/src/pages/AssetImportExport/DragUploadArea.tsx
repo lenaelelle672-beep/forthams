@@ -18,8 +18,6 @@ import React, {
   useState,
   useCallback,
   useRef,
-  useEffect,
-  useMemo,
   type DragEvent,
   type ChangeEvent,
 } from 'react';
@@ -29,7 +27,6 @@ import {
   Download,
   AlertCircle,
   CheckCircle2,
-  X,
   RotateCcw,
   Loader2,
   Filter,
@@ -298,7 +295,6 @@ function VirtualList({
           )}
           {visibleRows.map((row) => {
             const cellKeyPrefix = row.id;
-            const errorCount = Object.keys(row.errors).length;
             return (
               <tr
                 key={row.id}
@@ -329,7 +325,7 @@ function VirtualList({
                           autoFocus
                           className="w-full border border-primary rounded px-1 py-0.5 text-sm bg-background"
                           value={editValue}
-                          onChange={(e) => {
+                          onChange={(_e) => {
                             /* editValue is lifted — see onEditCommit */
                           }}
                           onBlur={() => onEditCommit(row.id, col.key, editValue)}
@@ -460,10 +456,6 @@ export default function DragUploadArea() {
 
   /* ---------- Derived ---------- */
   /** 错误行数量 */
-  const errorCount = useMemo(
-    () => parsedRows.filter((r) => !r.isValid).length,
-    [parsedRows],
-  );
 
   /** 是否需要虚拟列表 */
   const needsVirtualization = parsedRows.length > VIRTUALIZATION_THRESHOLD;
@@ -642,7 +634,6 @@ export default function DragUploadArea() {
         body: JSON.stringify({ rows: parsedRows }),
       });
       if (!response.ok) throw new Error(`提交失败: HTTP ${response.status}`);
-      const result = await response.json();
       toast.success(`资产导入成功！共处理 ${parsedRows.length} 条记录`);
       setPhase('success');
     } catch (err: any) {
@@ -1010,7 +1001,6 @@ export default function DragUploadArea() {
                 </thead>
                 <tbody>
                   {parsedRows.map((row) => {
-                    const errCount = Object.keys(row.errors).length;
                     return (
                       <tr
                         key={row.id}

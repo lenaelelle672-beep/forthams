@@ -263,7 +263,6 @@ export default function ApprovalListPage() {
 
   const records: ApprovalItem[] = data?.records ?? [];
   const total: number = data?.total ?? 0;
-  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   const handleTabChange = (tab: ApprovalTab) => {
     setActiveTab(tab);

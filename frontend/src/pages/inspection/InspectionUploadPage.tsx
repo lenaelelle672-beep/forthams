@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { inspectionApi } from '@/api/inspection';
 import { Card, Upload, Button, message, Spin, Space, Row, Col, Breadcrumb, Typography, Progress, Alert } from 'antd';
-import { ArrowLeftOutlined, UploadOutlined, DeleteOutlined, CheckCircleOutlined, LoadingOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, UploadOutlined, DeleteOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import { Image } from 'antd';
 import type { UploadProps, UploadFile } from 'antd';
 
@@ -70,7 +70,7 @@ const InspectionUploadPage: React.FC = () => {
       return true;
     },
     customRequest: async (options) => {
-      const { file, onSuccess, onError, onProgress } = options;
+      const { file, onSuccess, onError } = options;
       setUploading(true);
       setUploadProgress(0);
 

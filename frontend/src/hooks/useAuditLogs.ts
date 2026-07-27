@@ -2,7 +2,6 @@ import { ref, computed } from 'vue';
 import type { Ref } from 'vue';
 import type { AuditLog } from '@/types/audit.types';
 import type { GraphifyNode } from '@/components/audit/GraphifyKnowledgeGraph';
-import { useAuditLog } from './useAuditLog';
 
 /**
  * useAuditLogs 组合式函数
@@ -406,9 +405,9 @@ export function useAuditLogs(
 
   // 内部方法：模拟获取审计日志
   async function fetchAuditLogs(
-    assetId: string,
-    page: number,
-    pageSize: number
+    _assetId: string,
+    _page: number,
+    _pageSize: number
   ): Promise<{ data: AuditLog[]; total: number }> {
     // 实际项目中应替换为真实的API调用
     // 这里使用模拟数据
@@ -423,7 +422,7 @@ export function useAuditLogs(
   }
 
   // 内部方法：获取全部审计日志
-  async function fetchAllAuditLogs(assetId: string): Promise<AuditLog[]> {
+  async function fetchAllAuditLogs(_assetId: string): Promise<AuditLog[]> {
     // 实际项目中应替换为真实的API调用
     return new Promise(resolve => {
       setTimeout(() => {

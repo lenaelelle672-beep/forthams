@@ -27,9 +27,7 @@ import {
   message,
   Spin,
 } from 'antd';
-import { ExclamationCircleOutlined } from '@ant-design/icons';
 import DisposalConfirmationStep from './DisposalConfirmationStep';
-import type { DisposalConfirmationStepProps } from './DisposalConfirmationStep';
 
 /**
  * 内部步骤类型
@@ -152,7 +150,6 @@ const DisposalRequestModal: React.FC<DisposalRequestModalProps> = ({
   assetId,
   assetNo,
   assetName,
-  assetStatus,
   'data-testid': testId,
 }) => {
   /** 内部步骤状态 */
@@ -275,7 +272,6 @@ const DisposalRequestModal: React.FC<DisposalRequestModalProps> = ({
       }
 
       // 提交成功
-      const result = await response.json();
       resetState();
       message.success('报废申请提交成功，等待审批');
       onSuccess?.();

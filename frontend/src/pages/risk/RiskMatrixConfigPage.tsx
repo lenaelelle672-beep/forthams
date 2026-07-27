@@ -1,8 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Card,
-  CardHeader,
-  CardTitle,
   CardContent
 } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -30,7 +28,7 @@ import type { RiskMatrix, MatrixDimensionItem, MatrixLevelMapping } from '@/type
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 const RiskMatrixConfigPage: React.FC = () => {
-  const [page, setPage] = useState(1);
+  const [page, _setPage] = useState(1);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingMatrix, setEditingMatrix] = useState<RiskMatrix | null>(null);
   const [formData, setFormData] = useState<Partial<RiskMatrix>>({

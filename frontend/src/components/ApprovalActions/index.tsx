@@ -77,7 +77,7 @@ export const ApprovalActions: React.FC<ApprovalActionsProps> = ({
   const [loading, setLoading] = useState<'approve' | 'reject' | null>(null);
 
   // Zustand store actions
-  const { approveWorkOrder, rejectWorkOrder, getApprovalHistory } = useApprovalStore();
+  const { approveWorkOrder, rejectWorkOrder } = useApprovalStore();
 
   // ==================== Validation Rules ====================
   

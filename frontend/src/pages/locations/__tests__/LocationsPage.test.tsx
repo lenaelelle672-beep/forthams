@@ -13,10 +13,9 @@ vi.mock('@/api/base', () => ({
 
 vi.mock('sonner', () => ({ toast: { success: vi.fn(), error: vi.fn() } }));
 
-import { getLocationTree, createLocation, deleteLocation } from '@/api/base';
+import { getLocationTree, createLocation } from '@/api/base';
 const mockedGetTree = vi.mocked(getLocationTree);
 const mockedCreate = vi.mocked(createLocation);
-const mockedDelete = vi.mocked(deleteLocation);
 
 import LocationsPage from '../LocationsPage';
 

@@ -12,7 +12,6 @@ import { Skeleton } from '@/components/ui/Skeleton';
 import { toast } from 'sonner';
 import {
   Upload,
-  X,
   File,
   Image,
   FileText,

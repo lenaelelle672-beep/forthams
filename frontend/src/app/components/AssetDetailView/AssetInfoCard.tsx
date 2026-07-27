@@ -29,7 +29,6 @@ import {
 } from '@ant-design/icons';
 
 const { Text, Title } = Typography;
-const { AntDesign } = Skeleton;
 
 export interface Asset {
   /** 资产唯一标识 (UUID 格式) */

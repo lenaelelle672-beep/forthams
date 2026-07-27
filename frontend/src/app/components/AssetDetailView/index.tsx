@@ -22,7 +22,6 @@ import {
   HistoryOutlined, 
   FieldTimeOutlined,
   UserOutlined,
-  FilterOutlined,
   ReloadOutlined,
   ExpandOutlined
 } from '@ant-design/icons';
@@ -38,7 +37,6 @@ import type {
 import type { AssetDetailForGraphify } from '@/app/types/flow';
 
 // 服务导入
-import { getAssetAuditLogs } from '@/mocks/assetDetail.mock';
 import auditService from '@/app/services/auditService';
 
 // 子组件导入
@@ -648,7 +646,6 @@ interface AuditLogPanelProps {
  * @returns 审计日志面板组件
  */
 export const AuditLogPanel: React.FC<AuditLogPanelProps> = ({
-  assetId,
   auditLogs,
   pagination,
   loading,

@@ -114,22 +114,7 @@ interface KpiData {
 // Mock Data - Phase 1 骨架交付使用
 // ============================================================================
 
-const MOCK_TREND_DATA = [
-  { date: '2025-01-13', count: 156 },
-  { date: '2025-01-14', count: 203 },
-  { date: '2025-01-15', count: 178 },
-  { date: '2025-01-16', count: 245 },
-  { date: '2025-01-17', count: 189 },
-  { date: '2025-01-18', count: 167 },
-  { date: '2025-01-19', count: 221 },
-];
 
-const MOCK_ACTION_TYPE_DATA = [
-  { name: 'QUERY', value: 45, color: '#1890ff' },
-  { name: 'UPDATE', value: 30, color: '#52c41a' },
-  { name: 'CREATE', value: 15, color: '#faad14' },
-  { name: 'DELETE', value: 10, color: '#f5222d' },
-];
 
 const MOCK_AUDIT_RECORDS: AuditRecord[] = [
   {
@@ -282,9 +267,6 @@ const getActionTypeColor = (actionType: string): string => {
 };
 
 /** 获取状态对应的颜色 */
-const getStatusColor = (status: string): 'success' | 'error' => {
-  return status === 'SUCCESS' ? 'success' : 'error';
-};
 
 // ============================================================================
 // API Service
@@ -532,7 +514,7 @@ const ActionTypePie: React.FC<ActionTypePieProps> = ({ data, loading }) => {
               formatter={(value: number) => [`${value} 次`, '操作量']}
             />
             <Legend
-              formatter={(value, entry: any) => {
+              formatter={(value, _entry: any) => {
                 const item = data.find(d => d.name === value);
                 const percent = item ? ((item.value / total) * 100).toFixed(1) : '0';
                 return `${value} (${percent}%)`;

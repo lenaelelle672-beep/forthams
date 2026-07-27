@@ -14,7 +14,7 @@
  * @see frontend/src/app/api/workOrders.ts
  */
 
-import React, { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { WorkOrderActionDialog } from "../components/WorkOrderActionDialog";
 import { api } from "../utils/api";
 

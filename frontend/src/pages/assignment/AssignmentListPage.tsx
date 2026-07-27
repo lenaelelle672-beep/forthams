@@ -3,14 +3,13 @@
  * @description 领用归还列表页
  */
 
-import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router';
 import {
   Plus, Search, Eye, Filter,
   ClipboardList, Clock, CheckCircle2, RotateCcw,
-  RefreshCw, Download,
 } from 'lucide-react';
-import { useAssignments, useDeleteAssignment } from '@/hooks/assignment/useAssignments';
+import { useAssignments } from '@/hooks/assignment/useAssignments';
 import {
   AssignmentStatus,
   ASSIGNMENT_STATUS_CONFIG,
@@ -62,7 +61,6 @@ export default function AssignmentListPage() {
   const [typeFilter, setTypeFilter] = useState('');
 
   const { data: pageRes, isLoading } = useAssignments(query);
-  const deleteMutation = useDeleteAssignment();
 
   const pageData = pageRes as unknown as { records?: AssetAssignment[]; total?: number } | undefined;
   const records = pageData?.records ?? [];

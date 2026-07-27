@@ -443,8 +443,6 @@ const isPreviewPage = (value?: string | null): value is PreviewPage =>
 const buildPreviewPath = (page: PreviewPage) =>
   page === 'overview' ? '/workspace-preview' : `/workspace-preview?tab=${page}`;
 
-const buildWorkbenchPagePath = (page: WorkbenchPage) =>
-  buildWorkbenchPath(page, getDefaultMenuIdForPage(page, true));
 
 const menuItems: WorkspaceMenuItem[] = [
   { id: 'home', label: '运营首页', icon: Home, page: 'overview' },
@@ -8785,11 +8783,6 @@ function WorkbenchFormConfigProductPage({
   const requiredCount = fields.filter((field) => field.required).length;
   const desktopGroups = Array.from(new Set(fields.map((field) => field.desktopGroup || '未分组')));
   const visibleDesktopGroups = Array.from(new Set(visibleFields.map((field) => field.desktopGroup || '未分组')));
-  const desktopDesignerGroups = desktopGroups.map((group, index) => ({
-    group,
-    tone: (['blue', 'cyan', 'green', 'orange'] as SystemHubTone[])[index % 4],
-    fields: fields.filter((field) => (field.desktopGroup || '未分组') === group),
-  }));
   const visibleDesktopDesignerGroups = visibleDesktopGroups.map((group, index) => ({
     group,
     tone: (['blue', 'cyan', 'green', 'orange'] as SystemHubTone[])[index % 4],
@@ -14686,7 +14679,7 @@ function WorkbenchMasterDataConfigurator({
   const entries = entryMap[item.id] ?? profile.entries;
   const [selectedEntryId, setSelectedEntryId] = useState(profile.entries[0].id);
   const selectedEntry = entries.find((entry) => entry.id === selectedEntryId) ?? entries[0] ?? profile.entries[0];
-  const [auditSearchQuery, setAuditSearchQuery] = useState('');
+  const [_auditSearchQuery, _setAuditSearchQuery] = useState('');
   const [assetCategoryTaskSearchQuery, setAssetCategoryTaskSearchQuery] = useState('');
   const [assetCategoryOperationRows, setAssetCategoryOperationRows] = useState<Array<{
     batch: string;
@@ -17637,7 +17630,6 @@ function WorkbenchOrganizationPermissionConfigurator({
       }),
     [dataDetailMap, dataEntries, dataRiskFilter, normalizedDataSearchQuery],
   );
-  const userActiveCount = userEntries.filter((entry) => entry.enabled).length;
   const roleSensitiveCount = roleEntries.filter((entry) => /复核|敏感|后台/.test(`${entry.status} ${entry.policy}`)).length;
   const menuButtonCount = menuEntries.filter((entry) => /按钮|BTN/.test(`${entry.name} ${entry.code} ${entry.scope}`)).length;
   const menuHighRiskCount = menuEntries.filter((entry) => /复核|后台|发布|导出/.test(`${entry.status} ${entry.policy}`)).length;
@@ -17653,7 +17645,6 @@ function WorkbenchOrganizationPermissionConfigurator({
     { label: '权限回收', tone: 'danger', note: '会联动角色包、数据范围和 H5 待办入口' },
     { label: '导出', tone: 'normal', note: '导出当前筛选结果和身份链路' },
   ];
-  const userBatchPreviewNames = filteredUserEntries.slice(0, 3).map((entry) => entry.name).join('、') || '无命中用户';
   const userBatchRiskSummary =
     filteredUserEntries.length === 0
       ? '当前筛选无命中，批量操作已禁用。'
@@ -23543,7 +23534,6 @@ function WorkbenchSystemParameterConfigurator({
 
 function WorkbenchAuditLogConfigurator({
   item,
-  onOpenAction,
 }: {
   item: WorkspaceMenuItem;
   onOpenAction: (
@@ -25687,7 +25677,6 @@ function WorkbenchMailGatewayConfigurator({
   records,
   selectedRecord,
   onSelectRecord,
-  onOpenAction,
 }: {
   item: WorkspaceMenuItem;
   records: SystemHubRecord[];
@@ -30144,106 +30133,12 @@ type WorkbenchCommandDetailAction = {
   primary?: boolean;
 };
 
-type WorkbenchCommandPageConfig = {
-  id: string;
-  className: string;
-  title: string;
-  subtitle: string;
-  source: string;
-  icon: LucideIcon;
-  summaryCards: readonly WorkbenchCommandSummaryCard[];
-  stages: readonly WorkbenchCommandStage[];
-  rows: readonly WorkbenchCommandRow[];
-  detailTabs: readonly string[];
-  totalLabel: string;
-  searchPlaceholder: string;
-  stageLabel: string;
-  filterLabel: string;
-  listLabel: string;
-  detailLabel: string;
-  detailTabsLabel: string;
-  detailActionsLabel: string;
-  flowLabel: string;
-  flowSteps: readonly string[];
-  toolbarActions: readonly WorkbenchCommandAction[];
-  rowAction: WorkbenchCommandDetailAction;
-  detailActions: readonly WorkbenchCommandDetailAction[];
-  detailRoute: (row: WorkbenchCommandRow) => string;
-  detailDescription: (row: WorkbenchCommandRow) => string;
-  metricRoute: (label: string) => string;
-  stageRoute: (label: string) => string;
-};
-
-const workbenchHomeSummaryCards = [
-  { label: '资产总数', value: '6,842', delta: '建账总量', icon: Layers, tone: 'blue' },
-  { label: '资产健康度', value: '86', delta: '平台均值', icon: Gauge, tone: 'cyan' },
-  { label: '故障设备', value: '36', delta: '需处置', icon: AlertTriangle, tone: 'red' },
-  { label: '在保资产价值', value: '¥3,820万', delta: '净值', icon: Database, tone: 'green' },
-  { label: '当月维保费用', value: '¥46万', delta: '本月', icon: Wrench, tone: 'orange' },
-  { label: '安全评分', value: '92', delta: '较上周 +4', icon: ShieldCheck, tone: 'violet' },
-] as const;
-
 const workbenchHomeStages = [
   { label: '聚合', value: '12', note: '业务模块', tone: 'blue' },
   { label: '研判', value: '36', note: '风险事件', tone: 'orange' },
   { label: '派发', value: '24', note: '待派工', tone: 'cyan' },
   { label: '追踪', value: '91.8%', note: '闭环率', tone: 'green' },
   { label: '复盘', value: '14', note: '订阅报表', tone: 'violet' },
-] as const;
-
-const workbenchHomeRows = [
-  {
-    id: 'OPS-20240614-001',
-    type: '维保预警',
-    entity: '数控车床 CN-301',
-    location: '机加车间 / CNC 区域 A线',
-    title: '主轴振动异常，建议今日派发预测维保',
-    score: '91',
-    status: '待派工',
-    timing: '1.2h',
-    owner: '张三丰',
-    contextLabel: '工单/告警联动',
-    tone: 'red',
-  },
-  {
-    id: 'OPS-20240614-002',
-    type: '流程待办',
-    entity: '资产调拨审批',
-    location: '制造一部 -> 制造二部',
-    title: 'CN-301 跨车间调拨等待负责人审批',
-    score: 'P1',
-    status: '待审批',
-    timing: '2.0h',
-    owner: '张经理',
-    contextLabel: '审批中心',
-    tone: 'orange',
-  },
-  {
-    id: 'OPS-20240614-003',
-    type: '数据刷新',
-    entity: 'MES 批次同步',
-    location: 'A 区 / MES',
-    title: '产线与设备采集数据已同步，3 条异常待确认',
-    score: '98.6%',
-    status: '正常',
-    timing: '95ms',
-    owner: '平台运维',
-    contextLabel: '数据监控',
-    tone: 'green',
-  },
-  {
-    id: 'OPS-20240614-004',
-    type: '报表订阅',
-    entity: '资产价值月报',
-    location: '经营分析',
-    title: '资产价值趋势和部门统计已生成，待订阅确认',
-    score: '14',
-    status: '待确认',
-    timing: '今日',
-    owner: '财务部',
-    contextLabel: '报表分析',
-    tone: 'blue',
-  },
 ] as const;
 
 const workbenchHomeDetailTabs = ['运营信息', '待办联动', '维保预警', '数据刷新', '报表复盘'] as const;
@@ -30675,11 +30570,6 @@ const workbenchEnergyStateCards = [
   { label: '无权限态', value: '数据重试受限', note: '缺少 dashboard:query 时只能查看摘要并发起权限申请' },
 ] as const;
 
-const workbenchEnergyServiceCards = [
-  { label: '数据源', value: '全部', note: '当前视图', tone: 'blue' },
-  { label: '状态', value: '全部', note: '事件状态', tone: 'green' },
-  { label: '时间', value: '今日', note: '2026-06-14', tone: 'orange' },
-] as const;
 
 const workbenchEnergyTrendPoints = '0,94 72,72 144,76 216,48 288,54 360,34 432,42 504,24';
 
@@ -30705,11 +30595,6 @@ const workbenchEnergyPipelineNodes: Array<{
   { label: '应用服务层', status: '正常', delay: '延迟 0.7s', note: '服务 8 项', icon: Box },
 ] as const;
 
-const workbenchEnergyExceptionRank = [
-  { label: 'GW-A01 采集延迟', value: '18', note: 'P95 2.1s', tone: 'orange' },
-  { label: '告警事件待确认', value: '12', note: '待联动工单', tone: 'red' },
-  { label: 'MES 回写重试', value: '7', note: '自动补偿中', tone: 'blue' },
-] as const;
 
 const workbenchPolicySummaryCards = [
   { label: '风险规则', value: '68', delta: '启用 54　停用 14', icon: ShieldCheck, tone: 'blue' },
@@ -30717,14 +30602,6 @@ const workbenchPolicySummaryCards = [
   { label: '审批边界', value: '46', delta: '覆盖部门 23', icon: ClipboardList, tone: 'purple' },
   { label: '策略命中（近7天）', value: '238', delta: '较上周 ↑ 18%', icon: Layers, tone: 'green' },
   { label: '高风险待复核', value: '23', delta: '较昨日 ↑ 6', icon: AlertTriangle, tone: 'orange' },
-] as const;
-
-const workbenchPolicyStages = [
-  { label: '定义', value: '68', note: '风险规则', tone: 'blue' },
-  { label: '授权', value: '128', note: '角色策略', tone: 'cyan' },
-  { label: '命中', value: '238', note: '近 7 天', tone: 'orange' },
-  { label: '审批', value: '46', note: '边界规则', tone: 'green' },
-  { label: '复盘', value: '23', note: '高危规则', tone: 'red' },
 ] as const;
 
 const workbenchPolicyRows = [
@@ -30989,343 +30866,10 @@ const workbenchSettingsSummaryCards = [
   { label: '关联资产', value: '12,856', delta: '较昨日 +156', icon: Database, tone: 'cyan' },
 ] as const;
 
-const workbenchSettingsStages = [
-  { label: '分类', value: '256', note: '资产/备件', tone: 'blue' },
-  { label: '位置', value: '86', note: '厂区点位', tone: 'cyan' },
-  { label: '供应商', value: '128', note: '资质维护', tone: 'orange' },
-  { label: '编号', value: '18', note: '规则启用', tone: 'green' },
-  { label: '集成', value: '7', note: 'MES/IoT', tone: 'red' },
-] as const;
 
-const workbenchSettingsRows = [
-  {
-    id: 'CFG-CAT-ASSET',
-    type: '资产分类',
-    entity: '生产设备分类',
-    location: '基础数据',
-    title: '生产设备、动力设备、物流设备分类结构维护',
-    score: '256',
-    status: '启用',
-    timing: '今日',
-    owner: '系统管理员',
-    contextLabel: '资产台账',
-    tone: 'blue',
-  },
-  {
-    id: 'CFG-LOC-CNC-A',
-    type: '位置管理',
-    entity: 'CNC 区域 A线',
-    location: '机加车间',
-    title: '设备点位、巡检路线和资产归属位置维护',
-    score: '86',
-    status: '启用',
-    timing: '10:24',
-    owner: '运维主管',
-    contextLabel: '巡检路线',
-    tone: 'green',
-  },
-  {
-    id: 'CFG-VDR-SPARE',
-    type: '供应商',
-    entity: 'UNIVIEW 备件仓',
-    location: '备件管理',
-    title: '备件供应商资质和 ETA 规则待复核',
-    score: '12',
-    status: '待复核',
-    timing: '本周',
-    owner: '采购员',
-    contextLabel: '备件采购',
-    tone: 'orange',
-  },
-  {
-    id: 'CFG-INT-MES',
-    type: '集成源',
-    entity: 'MES 同步账号',
-    location: '数据监控',
-    title: 'MES/IoT 集成账号与同步频率配置',
-    score: '98.6%',
-    status: '正常',
-    timing: '95ms',
-    owner: '平台运维',
-    contextLabel: '数据链路',
-    tone: 'cyan',
-  },
-] as const;
 
-const workbenchSettingsDetailTabs = ['维护信息', '分类位置', '供应商', '编号规则', '集成源'] as const;
 
-const buildWorkbenchCommandConfig = (
-  id: string,
-  routeBase: string,
-  title: string,
-  subtitle: string,
-  source: string,
-  icon: LucideIcon,
-  className: string,
-  summaryCards: readonly WorkbenchCommandSummaryCard[],
-  stages: readonly WorkbenchCommandStage[],
-  rows: readonly WorkbenchCommandRow[],
-  detailTabs: readonly string[],
-  toolbarActions: readonly WorkbenchCommandAction[],
-  rowAction: WorkbenchCommandDetailAction,
-  detailActions: readonly WorkbenchCommandDetailAction[],
-): WorkbenchCommandPageConfig => ({
-  id,
-  className,
-  title,
-  subtitle,
-  source,
-  icon,
-  summaryCards,
-  stages,
-  rows,
-  detailTabs,
-  totalLabel: `共 ${rows.length * 18} 条`,
-  searchPlaceholder: `搜索${title}编号 / 名称 / 上下文 / 责任人`,
-  stageLabel: `${title}流程阶段`,
-  filterLabel: `${title}查询筛选栏`,
-  listLabel: `${title}列表`,
-  detailLabel: `${title}详情抽屉`,
-  detailTabsLabel: `${title}详情标签`,
-  detailActionsLabel: `${title}详情操作`,
-  flowLabel: `${title}流转`,
-  flowSteps: ['聚合', '研判', '处理', '复核', '闭环'],
-  toolbarActions,
-  rowAction,
-  detailActions,
-  detailRoute: (row) => `${routeBase}/${encodeURIComponent(row.id)}?source=workbench&menu=${id}`,
-  detailDescription: (row) => `打开 ${row.entity}，带入 ${title} 来源、状态 ${row.status} 和上下文 ${row.contextLabel}。`,
-  metricRoute: (label) => `${routeBase}?source=workbench&metric=${encodeURIComponent(label)}`,
-  stageRoute: (label) => `${routeBase}?source=workbench&stage=${encodeURIComponent(label)}`,
-});
 
-const workbenchHomeConfig = buildWorkbenchCommandConfig(
-  'home',
-  '/fixed-assets/workbench',
-  '运营首页',
-  'KPI 下钻 · 待办联动 · 维保预警',
-  '运营首页页面',
-  Home,
-  'workspace-home-page',
-  workbenchHomeSummaryCards,
-  workbenchHomeStages,
-  workbenchHomeRows,
-  workbenchHomeDetailTabs,
-  [
-    { label: '处理流程待办', actionIndex: 0, icon: ClipboardList },
-    { label: '新建预测工单', actionIndex: 1, icon: Wrench, primary: true },
-    { label: '查看经营报表', actionIndex: 2, icon: BarChart3 },
-  ],
-  {
-    label: '处理',
-    title: '处理运营事项',
-    route: (row) => `/approvals/${encodeURIComponent(row.id)}/process?source=workbench`,
-    description: (row) => `处理 ${row.title}，保留运营首页上下文和责任人 ${row.owner}。`,
-    primaryLabel: '进入处理',
-    icon: ClipboardList,
-  },
-  [
-    {
-      label: '处理待办',
-      title: '处理流程待办',
-      route: (row) => `/approvals/${encodeURIComponent(row.id)}/process?source=workbench`,
-      description: (row) => `处理 ${row.id}，带入 KPI、待办和 SLA 上下文。`,
-      primaryLabel: '进入待办',
-      icon: ClipboardList,
-    },
-    {
-      label: '创建工单',
-      title: '新建预测工单',
-      route: (row) =>
-        buildWorkOrderPrefillPath({
-          source: 'quick-action',
-          title: `${row.entity} 运营预警工单`,
-          assetName: row.entity,
-          assetLocation: row.location,
-          riskState: row.status,
-          riskScore: 91,
-          priority: 'HIGH',
-          dueDate: '2026-06-16',
-          description: `来自 Workbench 运营首页：${row.title}`,
-        }),
-      description: (row) => `为 ${row.entity} 创建预测维保工单。`,
-      primaryLabel: '创建工单',
-      icon: Wrench,
-      primary: true,
-    },
-    {
-      label: '查看报表',
-      title: '查看经营报表',
-      route: () => '/reports?source=workbench&view=operations-home',
-      description: () => '进入报表分析，承接运营首页中的资产健康、价值趋势和部门统计。',
-      primaryLabel: '进入报表',
-      icon: BarChart3,
-    },
-  ],
-);
-
-const workbenchEnergyConfig = buildWorkbenchCommandConfig(
-  'energy',
-  '/energy',
-  '数据监控',
-  '数据链路 · 采集事件 · 指标服务',
-  '数据监控页面',
-  Activity,
-  'workspace-energy-page',
-  workbenchEnergySummaryCards,
-  workbenchEnergyStages,
-  workbenchEnergyRows,
-  workbenchEnergyDetailTabs,
-  [
-    { label: '查看链路拓扑', actionIndex: 0, icon: Activity },
-    { label: '订阅 / 导出', actionIndex: 1, icon: Bell },
-    { label: '刷新数据链路', actionIndex: 2, icon: Zap, primary: true },
-  ],
-  {
-    label: '处理',
-    title: '处理数据事件',
-    route: (row) => `/energy?source=workbench&scope=data-monitoring&event=${encodeURIComponent(row.id)}`,
-    description: (row) => `处理 ${row.entity}，保留链路、事件和重试上下文。`,
-    primaryLabel: '进入事件',
-    icon: Zap,
-  },
-  [
-    {
-      label: '忽略',
-      title: '忽略数据事件',
-      route: (row) => `/energy?source=workbench&scope=data-monitoring&event=${encodeURIComponent(row.id)}&ignore=true`,
-      description: (row) => `忽略 ${row.entity} 的当前事件，保留审计记录和 Workbench 来源。`,
-      primaryLabel: '确认忽略',
-      icon: X,
-    },
-    {
-      label: '重试采集',
-      title: '重试采集任务',
-      route: (row) => `/energy?source=workbench&scope=data-monitoring&event=${encodeURIComponent(row.id)}&retry=true`,
-      description: (row) => `重试 ${row.entity}，保留事件和采集任务上下文。`,
-      primaryLabel: '重试采集',
-      icon: Zap,
-      primary: true,
-    },
-    {
-      label: '创建工单',
-      title: '创建数据事件工单',
-      route: (row) =>
-        `/workorders/new?source=workbench&from=data-monitoring&event=${encodeURIComponent(row.id)}&priority=${encodeURIComponent(row.score)}`,
-      description: (row) => `为 ${row.entity} 创建数据事件处理工单，带入影响范围和处理建议。`,
-      primaryLabel: '创建工单',
-      icon: ClipboardList,
-    },
-  ],
-);
-
-const workbenchPolicyConfig = buildWorkbenchCommandConfig(
-  'policy',
-  '/risk-matrix',
-  '组织策略',
-  '风险规则 · 角色策略 · 审批边界',
-  '组织策略页面',
-  ShieldCheck,
-  'workspace-policy-page',
-  workbenchPolicySummaryCards,
-  workbenchPolicyStages,
-  workbenchPolicyRows,
-  workbenchPolicyDetailTabs,
-  [
-    { label: '查看策略规则', actionIndex: 0, icon: ShieldCheck },
-    { label: '复核高危规则', actionIndex: 1, icon: AlertTriangle },
-    { label: '新建风险评估', actionIndex: 2, icon: Shield, primary: true },
-  ],
-  {
-    label: '复核',
-    title: '复核策略规则',
-    route: (row) => `/risk-matrix?source=workbench&scope=policy&rule=${encodeURIComponent(row.id)}`,
-    description: (row) => `复核 ${row.entity}，保留角色策略和审批边界上下文。`,
-    primaryLabel: '进入复核',
-    icon: ShieldCheck,
-  },
-  [
-    {
-      label: '规则详情',
-      title: '查看策略规则',
-      route: (row) => `/risk-matrix?source=workbench&scope=policy&rule=${encodeURIComponent(row.id)}`,
-      description: (row) => `查看 ${row.entity} 的阈值、命中记录和审批边界。`,
-      primaryLabel: '进入规则',
-      icon: ShieldCheck,
-    },
-    {
-      label: '权限申请',
-      title: '申请策略权限',
-      route: (row) => `/approvals/new?source=workbench&type=policy&rule=${encodeURIComponent(row.id)}`,
-      description: (row) => `为 ${row.entity} 发起策略权限申请。`,
-      primaryLabel: '发起申请',
-      icon: ClipboardList,
-    },
-    {
-      label: '新建评估',
-      title: '新建风险评估',
-      route: () => '/risk-assessments/new?source=workbench&scope=policy',
-      description: () => '进入风险评估新建页，预填组织策略和审批边界上下文。',
-      primaryLabel: '新建评估',
-      icon: Shield,
-      primary: true,
-    },
-  ],
-);
-
-const workbenchSettingsConfig = buildWorkbenchCommandConfig(
-  'settings',
-  '/settings/sysconfig',
-  '基础维护',
-  '分类位置 · 供应商 · 集成配置',
-  '基础维护页面',
-  Settings,
-  'workspace-settings-page',
-  workbenchSettingsSummaryCards,
-  workbenchSettingsStages,
-  workbenchSettingsRows,
-  workbenchSettingsDetailTabs,
-  [
-    { label: '打开基础维护', actionIndex: 0, icon: Settings },
-    { label: '维护资产分类', actionIndex: 2, icon: Layers, primary: true },
-    { label: '维护供应商', actionIndex: 3, icon: UserCircle },
-  ],
-  {
-    label: '维护',
-    title: '维护基础配置',
-    route: (row) => `/settings/sysconfig?source=workbench&config=${encodeURIComponent(row.id)}`,
-    description: (row) => `维护 ${row.entity}，保留分类、位置、供应商和集成配置上下文。`,
-    primaryLabel: '进入维护',
-    icon: Settings,
-  },
-  [
-    {
-      label: '系统配置',
-      title: '打开基础维护',
-      route: (row) => `/settings/sysconfig?source=workbench&config=${encodeURIComponent(row.id)}`,
-      description: (row) => `打开 ${row.entity} 的系统配置详情。`,
-      primaryLabel: '进入配置',
-      icon: Settings,
-    },
-    {
-      label: '资产分类',
-      title: '维护资产分类',
-      route: () => '/categories?source=workbench',
-      description: () => '进入资产分类维护页，承接基础维护下的分类二级能力。',
-      primaryLabel: '进入分类',
-      icon: Layers,
-      primary: true,
-    },
-    {
-      label: '供应商',
-      title: '维护供应商',
-      route: () => '/vendors?source=workbench',
-      description: () => '进入供应商维护页，承接基础维护下的供应商二级能力。',
-      primaryLabel: '进入供应商',
-      icon: UserCircle,
-    },
-  ],
-);
 
 const workbenchSettingsDomains = [
   {
@@ -31663,355 +31207,6 @@ const workbenchSettingsHealthCards = [
   { label: '待处理变更', value: '3 项', note: '需执行或审批', tone: 'red' },
 ] as const;
 
-function WorkbenchCommandPage({
-  item,
-  context,
-  meta,
-  onPreviewAction,
-  config,
-}: WorkbenchMenuPageProps & { config: WorkbenchCommandPageConfig }) {
-  const [selectedRowId, setSelectedRowId] = useState(config.rows[0].id);
-  const [detailTab, setDetailTab] = useState(config.detailTabs[0]);
-  const [detailOpen, setDetailOpen] = useState(true);
-  const selectedRow = config.rows.find((row) => row.id === selectedRowId) ?? config.rows[0];
-  const PageIcon = config.icon;
-
-  const openCommandPreview = (
-    title: string,
-    routeTarget: string,
-    description: string,
-    primaryLabel: string,
-    icon: LucideIcon = config.icon,
-  ) => {
-    onPreviewAction({
-      title,
-      source: config.source,
-      routeTarget,
-      description,
-      primaryLabel,
-      icon,
-      visual: meta.imageSrc,
-      stats: context.stats,
-    });
-  };
-
-  const runToolbarAction = (action: WorkbenchCommandAction) => {
-    if (action.actionIndex !== undefined && meta.actions[action.actionIndex]) {
-      onPreviewAction(meta.actions[action.actionIndex]);
-      return;
-    }
-
-    openCommandPreview(
-      action.title ?? action.label,
-      action.routeTarget ?? config.metricRoute(action.label),
-      action.description ?? `进入${config.title}的${action.label}能力，保留 Workbench 来源和当前筛选上下文。`,
-      action.primaryLabel ?? action.label,
-      action.icon,
-    );
-  };
-
-  const openRow = (row: WorkbenchCommandRow) => {
-    setSelectedRowId(row.id);
-    setDetailOpen(true);
-    openCommandPreview(
-      `打开${config.title}详情`,
-      config.detailRoute(row),
-      config.detailDescription(row),
-      '打开详情',
-      config.icon,
-    );
-  };
-
-  const runDetailAction = (action: WorkbenchCommandDetailAction, row: WorkbenchCommandRow) => {
-    openCommandPreview(
-      action.title,
-      action.route(row),
-      action.description(row),
-      action.primaryLabel,
-      action.icon,
-    );
-  };
-
-  return (
-    <section className={`workspace-orders-page ${config.className}`} aria-label={`${item.label}真实产品页`}>
-      <div className="workspace-orders-main">
-        <section className="workspace-orders-shell" aria-label={`${config.title}产品页主体`}>
-          <header className="workspace-orders-header">
-            <div className="workspace-orders-title">
-              <span className="workspace-orders-icon"><PageIcon /></span>
-              <div>
-                <h2>{config.title}</h2>
-                <p>{config.subtitle}</p>
-              </div>
-            </div>
-            <div className="workspace-orders-toolbar" aria-label={`${config.title}顶部操作`}>
-              {config.toolbarActions.map((action) => {
-                const ActionIcon = action.icon;
-                return (
-                  <button
-                    key={action.label}
-                    type="button"
-                    className={action.primary ? 'is-primary' : 'is-secondary'}
-                    onClick={() => runToolbarAction(action)}
-                  >
-                    <ActionIcon />
-                    {action.label}
-                  </button>
-                );
-              })}
-            </div>
-          </header>
-
-          <div className="workspace-orders-kpis" aria-label={`${config.title}核心指标`}>
-            {config.summaryCards.map((card) => {
-              const CardIcon = card.icon;
-              return (
-                <button
-                  key={card.label}
-                  type="button"
-                  className={`is-${card.tone}`}
-                  onClick={() =>
-                    openCommandPreview(
-                      `${card.label}${config.title}`,
-                      config.metricRoute(card.label),
-                      `按 ${card.label} 下钻${config.title}，保留当前厂区、角色和 Workbench 来源。`,
-                      '查看详情',
-                      CardIcon,
-                    )
-                  }
-                >
-                  <CardIcon />
-                  <span>{card.label}</span>
-                  <strong>{card.value}</strong>
-                  <small>{card.delta}</small>
-                </button>
-              );
-            })}
-          </div>
-
-          <div className="workspace-orders-stage-row" aria-label={config.stageLabel}>
-            {config.stages.map((stage) => (
-              <button
-                key={stage.label}
-                type="button"
-                className={`is-${stage.tone}`}
-                onClick={() =>
-                  openCommandPreview(
-                    `${stage.label}${config.title}`,
-                    config.stageRoute(stage.label),
-                    `按 ${stage.label} 阶段查看${config.title}的业务队列和处理状态。`,
-                    '查看阶段',
-                    ArrowRight,
-                  )
-                }
-              >
-                <span>{stage.label}</span>
-                <strong>{stage.value}</strong>
-                <small>{stage.note}</small>
-              </button>
-            ))}
-          </div>
-
-          <div className="workspace-orders-filterbar" aria-label={config.filterLabel}>
-            <label>
-              <Search />
-              <input readOnly value={config.searchPlaceholder} aria-label={`${config.title}搜索`} />
-            </label>
-            {['范围 全部', '状态 全部', '责任人 全部', '优先级 全部'].map((filter) => (
-              <button key={filter} type="button" onClick={() => runToolbarAction(config.toolbarActions[0])}>
-                {filter}
-                <ArrowRight />
-              </button>
-            ))}
-            <button
-              type="button"
-              className="is-date"
-              onClick={() =>
-                openCommandPreview(
-                  `${config.title}时间筛选`,
-                  `${config.metricRoute('today')}&date=today`,
-                  `查看今日${config.title}数据，保留当前上下文。`,
-                  '查看今日',
-                  CalendarDays,
-                )
-              }
-            >
-              处理时间
-              <CalendarDays />
-            </button>
-            <button type="button" className="is-reset" onClick={() => runToolbarAction(config.toolbarActions[0])}>
-              重置
-            </button>
-          </div>
-
-          <div className="workspace-orders-table" aria-label={config.listLabel}>
-            <div className="workspace-orders-table-head">
-              <span><input type="checkbox" aria-label={`选择全部${config.title}`} readOnly /></span>
-              <span>编号</span>
-              <span>类型</span>
-              <span>对象信息</span>
-              <span>业务事项</span>
-              <span>评分</span>
-              <span>状态</span>
-              <span>时效</span>
-              <span>责任人</span>
-              <span>上下文</span>
-              <span>操作</span>
-            </div>
-            {config.rows.map((row) => (
-              <div
-                key={row.id}
-                className={`workspace-orders-table-row is-${row.tone} ${row.id === selectedRow.id ? 'is-selected' : ''}`}
-              >
-                <span><input type="checkbox" aria-label={`选择${row.id}`} readOnly /></span>
-                <button type="button" className="is-link" onClick={() => openRow(row)}>{row.id}</button>
-                <span><em>{row.type}</em></span>
-                <span>
-                  <strong>{row.entity}</strong>
-                  <small>{row.location}</small>
-                </span>
-                <button type="button" className="is-title" onClick={() => openRow(row)}>{row.title}</button>
-                <span><b>{row.score}</b></span>
-                <span><i>{row.status}</i></span>
-                <span>{row.timing}</span>
-                <span>{row.owner}</span>
-                <span><em className="is-spare">{row.contextLabel}</em></span>
-                <span>
-                  <button
-                    type="button"
-                    className="is-process"
-                    onClick={() => {
-                      setSelectedRowId(row.id);
-                      setDetailOpen(true);
-                      runDetailAction(config.rowAction, row);
-                    }}
-                  >
-                    {config.rowAction.label}
-                  </button>
-                  <button type="button" className="is-more" aria-label={`${row.id}更多操作`} onClick={() => openRow(row)}>
-                    ···
-                  </button>
-                </span>
-              </div>
-            ))}
-          </div>
-
-          <footer className="workspace-orders-pagination" aria-label={`${config.title}分页`}>
-            <span>{config.totalLabel}</span>
-            <button type="button">10条/页</button>
-            <button type="button" disabled>‹</button>
-            {[1, 2, 3, 4].map((pageNo) => (
-              <button key={pageNo} type="button" className={pageNo === 1 ? 'is-current' : ''}>{pageNo}</button>
-            ))}
-            <button type="button">›</button>
-          </footer>
-        </section>
-      </div>
-
-      <aside className="workspace-orders-detail" aria-label={config.detailLabel}>
-        {detailOpen ? (
-          <>
-            <header className="workspace-orders-detail-head">
-              <strong>{config.title}详情</strong>
-              <button type="button" aria-label={`关闭${config.title}详情`} onClick={() => setDetailOpen(false)}>
-                <X />
-              </button>
-            </header>
-            <section className="workspace-orders-detail-card" aria-label={`当前${config.title}信息`}>
-              <div>
-                <b>{selectedRow.score}</b>
-                <span>
-                  <strong>{selectedRow.id}</strong>
-                  <small>{selectedRow.status}</small>
-                </span>
-              </div>
-              <h3>{selectedRow.title}</h3>
-              <dl>
-                <div><dt>类型</dt><dd>{selectedRow.type}</dd></div>
-                <div><dt>评分</dt><dd>{selectedRow.score}</dd></div>
-                <div><dt>对象</dt><dd>{selectedRow.entity}</dd></div>
-                <div><dt>位置</dt><dd>{selectedRow.location}</dd></div>
-                <div><dt>责任人</dt><dd>{selectedRow.owner}</dd></div>
-                <div><dt>时效</dt><dd>{selectedRow.timing}</dd></div>
-                <div><dt>上下文</dt><dd>{selectedRow.contextLabel}</dd></div>
-                <div><dt>状态</dt><dd>{selectedRow.status}</dd></div>
-              </dl>
-            </section>
-
-            <section className="workspace-orders-flow" aria-label={config.flowLabel}>
-              {config.flowSteps.map((step, index) => (
-                <span key={step} className={index < 2 ? 'is-done' : index === 2 ? 'is-active' : ''}>
-                  <CheckCircle2 />
-                  <strong>{step}</strong>
-                  <small>{index < 2 ? '已完成' : index === 2 ? '进行中' : '待流转'}</small>
-                </span>
-              ))}
-            </section>
-
-            <nav className="workspace-orders-tabs" aria-label={config.detailTabsLabel}>
-              {config.detailTabs.map((tab) => (
-                <button
-                  key={tab}
-                  type="button"
-                  className={tab === detailTab ? 'is-active' : ''}
-                  onClick={() => setDetailTab(tab)}
-                >
-                  {tab}
-                </button>
-              ))}
-            </nav>
-
-            <section className="workspace-orders-tab-panel" aria-label={`${detailTab}内容`}>
-              <article>
-                <span>业务摘要</span>
-                <p>{selectedRow.title}，当前状态为 {selectedRow.status}，上下文为 {selectedRow.contextLabel}。</p>
-              </article>
-              <article>
-                <span>预填上下文</span>
-                <ul>
-                  <li>{selectedRow.entity} <b>已带入</b></li>
-                  <li>{selectedRow.location} <b>已定位</b></li>
-                  <li>{selectedRow.owner} <b className="is-warning">需确认</b></li>
-                </ul>
-              </article>
-              <article>
-                <span>处理建议</span>
-                <p>按当前角色权限进入真实业务页处理，Workbench 只承接入口、上下文和预览反馈。</p>
-              </article>
-              <article>
-                <span>关联记录</span>
-                <ul>
-                  <li>WO-20240614-0012 <small>工单联动</small></li>
-                  <li>RPT-ASSET-VALUE-001 <small>报表追踪</small></li>
-                  <li>ALM-20240614-0012 <small>告警复盘</small></li>
-                </ul>
-              </article>
-            </section>
-
-            <footer className="workspace-orders-detail-actions" aria-label={config.detailActionsLabel}>
-              {config.detailActions.map((action) => (
-                <button
-                  key={action.label}
-                  type="button"
-                  className={action.primary ? 'is-primary' : ''}
-                  onClick={() => runDetailAction(action, selectedRow)}
-                >
-                  {action.label}
-                </button>
-              ))}
-            </footer>
-          </>
-        ) : (
-          <button type="button" className="workspace-orders-detail-empty" onClick={() => setDetailOpen(true)}>
-            <PageIcon />
-            <strong>选择左侧{config.title}事项打开详情</strong>
-            <span>详情抽屉会展示上下文、流转、处理建议和关联记录。</span>
-          </button>
-        )}
-      </aside>
-    </section>
-  );
-}
 
 function WorkbenchHomePage({
   item,
@@ -35647,13 +34842,6 @@ const workbenchReportSummaryCards = [
   { label: '资产数量', value: '12,856 台', delta: '较上期 ↑ 1.56%', icon: PieChart, tone: 'violet' },
 ] as const;
 
-const workbenchReportStages = [
-  { label: '模板', value: '26', note: '资产/维保/安全', tone: 'blue' },
-  { label: '计算', value: '98.6%', note: '数据源健康', tone: 'green' },
-  { label: '分析', value: '12', note: '部门统计', tone: 'cyan' },
-  { label: '导出', value: '312', note: '本月任务', tone: 'orange' },
-  { label: '订阅', value: '14', note: '自动推送', tone: 'violet' },
-] as const;
 
 const workbenchReportRows = [
   {
@@ -37286,7 +36474,7 @@ function WorkbenchReportPage({
   meta,
   onPreviewAction,
 }: WorkbenchMenuPageProps) {
-  const [selectedReportId, setSelectedReportId] = useState<(typeof workbenchReportRows)[number]['id']>(workbenchReportRows[0].id);
+  const [selectedReportId] = useState<(typeof workbenchReportRows)[number]['id']>(workbenchReportRows[0].id);
   const [detailTab, setDetailTab] = useState<(typeof workbenchReportDetailTabs)[number]>('审计追溯');
   const [detailOpen, setDetailOpen] = useState(true);
   const selectedReport =
@@ -37313,17 +36501,6 @@ function WorkbenchReportPage({
     });
   };
 
-  const openReport = (report: (typeof workbenchReportRows)[number]) => {
-    setSelectedReportId(report.id);
-    setDetailOpen(true);
-    openReportPreview(
-      '打开报表详情',
-      `/reports/${report.id}?source=workbench&menu=report`,
-      `打开 ${report.name}，带入模板、时间范围、数据源和导出审计上下文。`,
-      '打开详情',
-      FileText,
-    );
-  };
 
   return (
     <section className="workspace-orders-page workspace-report-page" aria-label={`${item.label}真实产品页`}>

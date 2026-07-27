@@ -187,11 +187,6 @@ function formatDate(date: Date): string {
  * @param endDate - 结束日期
  * @returns 月数差
  */
-function calculateMonthsDiff(startDate: Date, endDate: Date): number {
-  const yearsDiff = endDate.getFullYear() - startDate.getFullYear();
-  const monthsDiff = endDate.getMonth() - startDate.getMonth();
-  return yearsDiff * 12 + monthsDiff;
-}
 
 /**
  * 资产折旧计算 Hook
@@ -252,9 +247,6 @@ export function useDepreciation(
     result: DepreciationResult,
     asset?: Partial<Pick<Asset, 'purchase_price' | 'purchase_date' | 'useful_life_years' | 'salvage_value'>>
   ): DepreciationDetails => {
-    const now = new Date();
-    const referenceDateObj = new Date(result.reference_date);
-    const purchaseDate = asset?.purchase_date ? new Date(asset.purchase_date) : referenceDateObj;
     const totalMonths = (asset?.useful_life_years || 10) * 12;
     const monthsUsed = result.periods_elapsed;
     const remainingMonths = Math.max(0, totalMonths - monthsUsed);

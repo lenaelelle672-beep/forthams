@@ -4,7 +4,6 @@
  * 支持：错误标题、描述、重试按钮
  */
 
-import * as React from 'react';
 import { AlertCircle, RefreshCw } from 'lucide-react';
 import { cn } from '@/utils/cn';
 import { Button } from './Button';

@@ -9,7 +9,7 @@ import { useNavigate } from 'react-router';
 import { toast } from 'sonner';
 import {
   Plus, Search, RefreshCw, Eye, Pencil, Trash2,
-  Shield, ShieldCheck, ShieldX, ShieldOff, DollarSign, Filter, X,
+  Shield, ShieldCheck, ShieldX, DollarSign, Filter, X,
 } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -73,11 +73,6 @@ const InsuranceListPage: React.FC = () => {
   const list: Insurance[] = (data as any)?.list || [];
   const total: number = (data as any)?.total || 0;
 
-  const statusCounts = useMemo(() => {
-    const counts: Record<string, number> = {};
-    list.forEach((r) => { counts[r.status] = (counts[r.status] || 0) + 1; });
-    return counts;
-  }, [list]);
 
   const statCards = useMemo(() => {
     const totalPremium = list.reduce((sum, r) => sum + (r.premium || 0), 0);

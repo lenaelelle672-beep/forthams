@@ -13,7 +13,6 @@ import {
   Search,
   Trash2,
   Users,
-  ChevronUp,
   Network,
   Phone,
   Mail,
@@ -191,7 +190,7 @@ export default function DeptManagement() {
   const [expandedIds, setExpandedIds] = useState<Set<number>>(new Set());
   const [showForm, setShowForm] = useState(false);
   const [editingDept, setEditingDept] = useState<Department | null>(null);
-  const [editingDepth, setEditingDepth] = useState(0);
+  const [_editingDepth, setEditingDepth] = useState(0);
   const [deleteTarget, setDeleteTarget] = useState<Department | null>(null);
   const [form, setForm] = useState<DeptForm>(emptyForm);
 

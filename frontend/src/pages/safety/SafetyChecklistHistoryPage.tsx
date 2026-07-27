@@ -10,10 +10,9 @@ import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { safetyApi } from '../../api/safety';
 import {
-  Eye, ClipboardList, PlayCircle, CheckCircle2, XCircle, Clock, Loader2,
+  Eye, ClipboardList, PlayCircle, CheckCircle2, XCircle, Loader2,
 } from 'lucide-react';
 
-import { PageHeader } from '@/components/ui/PageHeader';
 import { Button } from '@/components/ui/Button';
 import { Card, CardHeader, CardTitle } from '@/components/ui/Card';
 import { DataTable, type Column } from '@/components/ui/DataTable';
@@ -41,12 +40,6 @@ const STATUS_FILTER_OPTIONS = [
   { value: 'COMPLETED',   label: '已完成' },
 ] as const;
 
-const ITEM_TYPE_LABELS: Record<string, string> = {
-  PASS_FAIL: '通过/不通过',
-  READING:   '读数',
-  PHOTO:     '拍照',
-  TEXT:      '文本',
-};
 
 // ─── StatusBadge ─────────────────────────────────────────────────────────────
 

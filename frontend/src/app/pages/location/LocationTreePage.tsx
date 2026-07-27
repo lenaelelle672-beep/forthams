@@ -13,7 +13,7 @@
  * @since SWARM-072
  */
 
-import React, { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router";
 import {
   Plus,
@@ -216,7 +216,7 @@ function TreeNode({
   /*  放置目标（Drop Target）                                          */
   /* ---------------------------------------------------------------- */
 
-  const [{ isOver, dropPosition }, dropRef] = useDrop({
+  const [{ isOver }, dropRef] = useDrop({
     accept: LOCATION_NODE,
     canDrop: (dragItem: DragItem) => {
       // 不能拖放到自己
@@ -252,7 +252,7 @@ function TreeNode({
 
   /** 根据鼠标 Y 坐标判断放置位置 */
   function getDropPosition(
-    clientOffset: { x: number; y: number },
+    _clientOffset: { x: number; y: number },
   ): "before" | "after" | "inside" {
     // 简化逻辑：如果节点有子节点且已展开，优先 inside
     // 否则基于鼠标相对位置

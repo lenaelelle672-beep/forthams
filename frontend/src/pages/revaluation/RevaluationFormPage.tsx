@@ -97,7 +97,7 @@ export default function RevaluationFormPage() {
       approveRevaluation(Number(viewId!), {
         status,
       }),
-    onSuccess: (res, status) => {
+    onSuccess: (_res, status) => {
       toast.success(status === 'APPROVED' ? '审批通过' : '审批拒绝');
       navigate('/revaluations');
     },

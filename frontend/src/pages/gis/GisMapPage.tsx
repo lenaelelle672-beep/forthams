@@ -41,7 +41,7 @@ import type { GisAsset } from '@/services/gisService';
 import { updateAssetLocation } from '@/services/gisService';
 import { getAssetList } from '@/api/asset';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { MapPin, CheckCircle2, AlertTriangle, Maximize2, RotateCcw, Crosshair, X, Search, Plus, Info, Link2, MapPinned } from 'lucide-react';
+import { MapPin, CheckCircle2, Maximize2, RotateCcw, Crosshair, X, Search, Plus, Info, Link2, MapPinned } from 'lucide-react';
 
 // ── 常量 ──────────────────────────────────────────────────────────────────────
 const STATUS_MARKER_COLORS: Record<string, string> = {
@@ -50,9 +50,6 @@ const STATUS_MARKER_COLORS: Record<string, string> = {
   MAINTENANCE: '#3b82f6',
   SCRAPPED: '#ef4444',
   PENDING: '#f97316',
-};
-const STATUS_LETTER: Record<string, string> = {
-  IN_USE: 'U', IDLE: 'I', MAINTENANCE: 'M', SCRAPPED: 'S', PENDING: 'P',
 };
 const STATUS_LABEL: Record<string, string> = {
   IN_USE: '在用', IDLE: '闲置', MAINTENANCE: '维修中', SCRAPPED: '已报废', PENDING: '待处理',

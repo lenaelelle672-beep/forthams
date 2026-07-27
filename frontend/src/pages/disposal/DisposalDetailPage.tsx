@@ -80,12 +80,6 @@ function ApprovalTimeline({ steps }: { steps: ApprovalStep[] }) {
     <div className="relative space-y-8 before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-[2px] before:bg-[#c2c6d5]">
       {steps.map((step, idx) => {
         /** 连接线颜色：如果当前步骤是 rejected，则到该步骤的线段变红 */
-        const lineColor =
-          step.status === 'rejected'
-            ? 'bg-red-400'
-            : step.status === 'done'
-              ? 'bg-green-400'
-              : 'bg-[#c2c6d5]';
 
         return (
           <div key={`${step.label}-${idx}`} className={`relative flex items-start ${step.status === 'pending' ? 'opacity-50' : ''}`}>

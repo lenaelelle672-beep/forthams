@@ -11,7 +11,6 @@
  */
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { useNavigate } from 'react-router';
 import {
   Table,
   Button,
@@ -43,7 +42,6 @@ import {
   SearchOutlined,
   FilterOutlined,
   ClockCircleOutlined,
-  ExclamationCircleOutlined,
   DeleteOutlined,
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
@@ -143,8 +141,7 @@ export const RetirementApprovalList: React.FC = () => {
   const [approvalForm] = Form.useForm<ApprovalFormValues>();
   
   // ==================== Hooks ====================
-  const navigate = useNavigate();
-  const { canApprove, canView, userInfo } = useApprovalPermission();
+  const { canApprove, canView } = useApprovalPermission();
   const { bindApprovalContext, unbindApprovalContext } = useApprovalBinding();
 
   // ==================== 数据加载 ====================

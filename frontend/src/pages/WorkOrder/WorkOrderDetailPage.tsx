@@ -14,7 +14,7 @@ import {
   PauseCircle, PlayCircle, ClipboardCheck, Activity,
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { getWorkOrderDetail, approveWorkOrder, rejectWorkOrder, holdWorkOrder, resumeWorkOrder, submitForAcceptance, acceptWorkOrder, rejectAcceptance } from '@/api/workorder';
+import { getWorkOrderDetail, approveWorkOrder, rejectWorkOrder, holdWorkOrder, resumeWorkOrder } from '@/api/workorder';
 import type { WorkOrderDetailResponse } from '@/types/workorder';
 import type { WorkOrder } from '@/types/workorder.types';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
@@ -25,7 +25,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Skeleton } from '@/components/ui/Skeleton';
 import TimeLogForm from '@/components/execution/TimeLogForm';
 import StepChecklist from '@/components/execution/StepChecklist';
-import ProgressBar from '@/components/execution/ProgressBar';
 import PhotoUpload from '@/components/execution/PhotoUpload';
 import SparePartUsageForm from '@/components/spare-parts/SparePartUsageForm';
 import AcceptanceDialog from '@/components/acceptance/AcceptanceDialog';

@@ -38,7 +38,7 @@ vi.mock('../components/FloorPlanCanvas', () => ({
 }));
 
 vi.mock('../components/FloorPlanCreateDialog', () => ({
-  FloorPlanCreateDialog: ({ open, onOpenChange, onCreated }: any) =>
+  FloorPlanCreateDialog: ({ open }: any) =>
     open ? React.createElement('div', { 'data-testid': 'create-dialog' }, '新建对话框') : null,
 }));
 

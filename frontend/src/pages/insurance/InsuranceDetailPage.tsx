@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useParams, useNavigate } from 'react-router';
 import { insuranceApi, claimApi } from '../../api/insurance';
 import type { Insurance, InsuranceClaim } from '../../types/insurance';
-import { Card, Descriptions, Button, Table, Space, message, Badge } from 'antd';
+import { Card, Descriptions, Button, Table, Space, Badge } from 'antd';
 import { ArrowLeftOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 

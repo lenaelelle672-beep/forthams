@@ -4,7 +4,6 @@
  * 支持多场景变体（default/asset/approval/inventory），含进入动画
  */
 
-import * as React from 'react';
 import { motion } from 'motion/react';
 import type { LucideIcon } from 'lucide-react';
 import { Inbox, Package, ClipboardCheck, ScanLine } from 'lucide-react';

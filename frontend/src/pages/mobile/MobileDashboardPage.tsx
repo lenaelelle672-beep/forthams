@@ -6,7 +6,7 @@
 import { useNavigate } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/app/context/AuthContext';
-import { PageTransition, ErrorState, EmptyState, SkeletonCard } from '@/components/ui';
+import { PageTransition, ErrorState, SkeletonCard } from '@/components/ui';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import http from '@/utils/http';
 import {
@@ -74,7 +74,7 @@ function MobileDashboardContent() {
     staleTime: 1000 * 60 * 2,
   });
 
-  const { data: workOrders, isLoading: woLoading, isError: woError } = useQuery({
+  const { data: workOrders, isLoading: woLoading, isError: _woError } = useQuery({
     queryKey: ['mobile', 'work-orders'],
     queryFn: async () => {
       const res = await http.get<{ records: WorkOrderItem[] }>('/mobile/work-orders', { params: { page: 1, pageSize: 5 } });
@@ -83,7 +83,7 @@ function MobileDashboardContent() {
     staleTime: 1000 * 60 * 2,
   });
 
-  const { data: notifications, isLoading: notifLoading, isError: notifError } = useQuery({
+  const { data: notifications, isLoading: notifLoading, isError: _notifError } = useQuery({
     queryKey: ['mobile', 'notifications'],
     queryFn: async () => {
       return http.get<NotificationItem[]>('/mobile/notifications');
@@ -101,7 +101,6 @@ function MobileDashboardContent() {
     );
   }
 
-  const isLoading = dashLoading || woLoading || notifLoading;
 
   return (
     <PageTransition>

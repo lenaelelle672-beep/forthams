@@ -11,7 +11,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Save, Loader2, Circle, CheckCircle, CircleDot, Info, MapPin, DollarSign, FileText, Paperclip, GitBranch } from 'lucide-react';
+import { ArrowLeft, Save, Circle, CheckCircle, CircleDot, Info, MapPin, DollarSign, FileText, Paperclip, GitBranch } from 'lucide-react';
 import { useAssetDetail, useCreateAsset, useUpdateAsset, useCategoryTree } from '@/hooks/asset/useAssets';
 import { getDeptList } from '@/api/base';
 import AssetAttachmentUpload from '@/components/asset/AssetAttachmentUpload';

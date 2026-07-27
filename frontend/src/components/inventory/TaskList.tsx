@@ -14,7 +14,6 @@
 
 import React, { useState, useCallback } from 'react';
 import {
-  Card,
   List,
   Tag,
   Button,

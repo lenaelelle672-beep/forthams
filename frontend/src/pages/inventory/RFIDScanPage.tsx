@@ -11,7 +11,7 @@
  *   - getTaskSummary(taskId)       → 盘盈盘亏差异汇总
  */
 
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams } from 'react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
@@ -29,10 +29,6 @@ import {
   CheckCheck,
   Loader2,
   Activity,
-  AlertCircle,
-  RefreshCw,
-  XCircle,
-  Copy,
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { inventoryService } from '@/api/inventory';
@@ -43,6 +39,7 @@ import {
   submitTask,
   getTaskSummary,
 } from '@/api/inventory';
+import type { InventoryAsset } from '@/api/inventory';
 import type { ActualStatus } from '@/types/inventory';
 
 /** Scan result status for individual tag reads */
@@ -237,7 +234,7 @@ export default function RFIDScanPage() {
   // ── 派生数据 ────────────────────────────────────────────────────────────────
   const assets = assetsResponse?.records ?? [];
   const summary = summaryResponse;
-  const unconfirmedAssets = assets.filter((a) => !a.confirmed);
+  const unconfirmedAssets = assets.filter((a: InventoryAsset) => !a.confirmed);
 
   const task = taskDetail?.task
     ? {
@@ -258,7 +255,7 @@ export default function RFIDScanPage() {
     : null;
 
   const recentScans = assets.length > 0
-    ? assets.slice(0, 5).map((a) => ({
+    ? assets.slice(0, 5).map((a: InventoryAsset) => ({
         id: a.assetId,
         assetNo: a.assetCode,
         name: a.assetName,
@@ -268,7 +265,7 @@ export default function RFIDScanPage() {
         assetId: a.assetId,
       }))
     : detailRecords && detailRecords.length > 0
-      ? detailRecords.slice(0, 5).map((r) => ({
+      ? detailRecords.slice(0, 5).map((r: any) => ({
           id: String(r.id),
           assetNo: String(r.assetId),
           name: r.rfidTag ?? '未知资产',
@@ -280,14 +277,14 @@ export default function RFIDScanPage() {
       : [];
 
   const discrepancies = [
-    ...(summary?.surplusItems ?? []).map((item, i) => ({
+    ...(summary?.surplusItems ?? []).map((item: any, i: number) => ({
       id: `surplus-${i}`,
       assetNo: item.assetCode,
       name: item.assetName,
       type: '盘盈' as const,
       detail: item.reason ?? '盘盈资产',
     })),
-    ...(summary?.deficitItems ?? []).map((item, i) => ({
+    ...(summary?.deficitItems ?? []).map((item: any, i: number) => ({
       id: `deficit-${i}`,
       assetNo: item.assetCode,
       name: item.assetName,
@@ -351,7 +348,7 @@ export default function RFIDScanPage() {
   const handleBatchConfirm = () => {
     if (unconfirmedAssets.length === 0) return;
     batchConfirmMutation.mutate({
-      assetIds: unconfirmedAssets.map((a) => a.assetId),
+      assetIds: unconfirmedAssets.map((a: InventoryAsset) => a.assetId),
       actualStatus: 'normal',
     });
     const now = new Date().toLocaleTimeString('zh-CN', { hour12: false });

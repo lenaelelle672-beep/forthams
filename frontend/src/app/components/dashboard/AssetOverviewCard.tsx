@@ -117,8 +117,6 @@ export const AssetOverviewCard: React.FC<AssetOverviewCardProps> = ({
   }
 
   /** 判断是否为货币类数值 */
-  const isCurrency =
-    typeof value === 'string' && (value.includes('¥') || value.startsWith('CNY'));
 
   const displayValue =
     typeof value === 'number'

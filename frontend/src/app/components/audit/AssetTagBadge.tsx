@@ -42,9 +42,7 @@ import {
   CloseCircleOutlined, 
   CheckCircleOutlined, 
   ExclamationCircleOutlined,
-  ClockCircleOutlined,
   InfoCircleOutlined,
-  TagOutlined
 } from '@ant-design/icons';
 import type { TagProps } from 'antd';
 

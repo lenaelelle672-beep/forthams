@@ -71,7 +71,7 @@ const ApprovalTimeline: React.FC<{
 
   return (
     <div className={styles.timeline}>
-      {records.map((record, index) => (
+      {records.map((record, _index) => (
         <div 
           key={record.id} 
           className={`${styles.timelineItem} ${styles[`timelineItem${record.decision}`]}`}

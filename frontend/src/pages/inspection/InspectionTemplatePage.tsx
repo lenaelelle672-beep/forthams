@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { inspectionTemplateApi } from '@/api/inspection';
 import type { InspectionTemplate } from '@/types/inspection';
-import { Card, Button, Table, Badge, Input, Select, Space, message, Modal, Form, InputNumber, Tag, Popconfirm } from 'antd';
+import { Card, Button, Table, Badge, Input, Select, Space, message, Modal, Form, InputNumber, Popconfirm } from 'antd';
 import { PlusOutlined, SearchOutlined, ReloadOutlined, EditOutlined, DeleteOutlined, CopyOutlined } from '@ant-design/icons';
 import TextArea from 'antd/es/input/TextArea';
 

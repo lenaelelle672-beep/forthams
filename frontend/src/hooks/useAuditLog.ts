@@ -384,7 +384,7 @@ export function validateGraphifyNodes(
   }
 
   // ATB-ML-002: Optimize large array processing - use every instead of forEach
-  return nodes.every((node, index) => {
+  return nodes.every((node, _index) => {
     // ATB-EX-002: Check for valid object
     if (!node || typeof node !== 'object') {
       return false;
@@ -519,11 +519,11 @@ export function useAuditLog(
   assetId: string,
   initialFilter?: AuditLogFilter
 ) {
-  const [logs, setLogs] = useState<AuditLogEntry[]>([]);
+  const [logs, _setLogs] = useState<AuditLogEntry[]>([]);
   const [nodes, setNodes] = useState<GraphifyNode[]>([]);
   const [edges, setEdges] = useState<GraphifyEdge[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [loading, _setLoading] = useState(false);
+  const [error, _setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<AuditLogFilter>(initialFilter || {});
 
   /**

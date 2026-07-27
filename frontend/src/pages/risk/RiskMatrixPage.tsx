@@ -12,10 +12,9 @@ import { riskApi } from '../../api/risk';
 import { useNavigate } from 'react-router';
 import { toast } from 'sonner';
 import {
-  Plus, Pencil, Trash2, Eye, X, Grid3X3, ShieldAlert, AlertTriangle, CheckCircle,
+  Plus, Pencil, Trash2, Eye, Grid3X3, ShieldAlert, AlertTriangle, CheckCircle,
 } from 'lucide-react';
 
-import { PageHeader } from '@/components/ui/PageHeader';
 import { Button } from '@/components/ui/Button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { DataTable, type Column } from '@/components/ui/DataTable';

@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import {
   Search, Upload, Download, Plus, FileText,
-  X, Loader2, Package, TrendingUp, AlertTriangle, Wrench,
+  X, Loader2, Package, TrendingUp, Wrench,
   Filter, RefreshCw, Eye, Pencil, BarChart3, ChevronDown,
 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -15,15 +15,12 @@ import type { AssetListQuery, AssetListItem, DashboardStats } from '@/types/asse
 import type { PageData, Department } from '@/types/common';
 import { getDeptList } from '@/api/base';
 import { getDashboardStats } from '@/api/asset';
-import { Card, CardContent } from '@/components/ui/Card';
+import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
 import { DataTable, type Column } from '@/components/ui/DataTable';
 import { StatusBadge } from '@/components/ui/Badge';
 import http from '@/utils/http';
 
-const STATUS_OPTIONS = [
-];
 
 const STATUS_OPTIONS_DEF = [
   { key: AssetStatus.IN_USE,             dot: 'bg-emerald-400', text: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-200' },

@@ -22,14 +22,10 @@ import { PageTransition, ErrorState, EmptyState, SkeletonCard } from '@/componen
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { TimeRangeSelector } from '@/components/shared/TimeRangeSelector';
 import { LocationCascader } from '@/components/shared/LocationCascader';
-import { MetricKpiCard } from '@/components/shared/MetricKpiCard';
 import { useSpatialTime } from '@/components/shared/SpatialTimeContext';
 import { useEnergyDashboard } from './hooks/useEnergyDashboard';
 import type { EnergyDashboardData } from '@/services/energyService';
 import { useEnergyAnomalies } from './hooks/useEnergyAnomalies';
-import { useEnergyCompare } from './hooks/useEnergyCompare';
-import { useEnergyAnomaliesAuthority } from './hooks/useEnergyAnomaliesAuthority';
-import { useEnergyRanking } from './hooks/useEnergyRanking';
 import {
   Zap, Droplets, Flame, Activity, TrendingUp, TrendingDown,
   AlertTriangle, Lightbulb, BarChart3, RefreshCw,
@@ -118,15 +114,6 @@ const EnergyDashboardPage: React.FC = () => {
   }, [data]);
 
   // 同环比 — 前端 useMemo 兜底（B5 后端权威化推迟到下一轮）
-  const trendChange = useMemo<number | null>(() => {
-    if (!effectiveData?.trend) return null;
-    const vals = Object.values(effectiveData.trend).map((v) => Number(v));
-    if (vals.length < 2) return null;
-    const last = vals[vals.length - 1];
-    const prev = vals[vals.length - 2];
-    if (prev === 0) return null;
-    return ((last - prev) / prev) * 100;
-  }, [effectiveData]);
 
   const anomalies = useEnergyAnomalies(
     effectiveData?.trend

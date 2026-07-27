@@ -2,13 +2,11 @@ import { useNavigate } from 'react-router';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   BarChart3, CheckCircle2, Package, Clock,
-  TrendingUp, TrendingDown, ChevronRight, Plus,
-  Download, RefreshCw, Bell, Cog, Wrench,
-  Server, FlaskConical, ArrowUpRight,
+  Download, RefreshCw, Bell, Wrench,
 } from 'lucide-react';
 import {
   AreaChart, Area, PieChart, Pie, Cell,
-  XAxis, YAxis, Tooltip, Legend, ResponsiveContainer,
+  XAxis, YAxis, Tooltip, ResponsiveContainer,
 } from 'recharts';
 import {
   getDashboardStats,

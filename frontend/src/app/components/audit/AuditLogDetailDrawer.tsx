@@ -155,7 +155,6 @@ const formatDateTime = (dateString: string): string => {
  */
 const FieldChangeRow: React.FC<{ fieldChange: FieldChange; index: number }> = ({
   fieldChange,
-  index,
 }) => {
   const { fieldName, oldValue, newValue, isAuditable } = fieldChange;
 

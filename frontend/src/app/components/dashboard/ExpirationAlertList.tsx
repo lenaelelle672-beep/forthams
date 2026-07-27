@@ -22,8 +22,6 @@ import { AlertTriangle, Clock, FileWarning } from 'lucide-react';
 import type { ExpirationAlert } from '../../hooks/useDashboardData';
 import {
   formatDateLabel,
-  formatApprovalDate,
-  getApprovalLabel,
 } from '../../pages/DashboardPage';
 import styles from './DashboardPage.module.css';
 

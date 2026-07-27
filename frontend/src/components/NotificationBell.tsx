@@ -384,7 +384,7 @@ export const useNotificationBell = () => {
   const [unreadCount, setUnreadCount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
 
-  const fetchNotifications = useCallback(async (userId: string) => {
+  const fetchNotifications = useCallback(async (_userId: string) => {
     setIsLoading(true);
     try {
       // TODO: Implement actual API call
@@ -418,7 +418,7 @@ export const useNotificationBell = () => {
     }
   }, []);
 
-  const markAllAsRead = useCallback(async (userId: string) => {
+  const markAllAsRead = useCallback(async (_userId: string) => {
     try {
       // TODO: Implement actual API call
       // await notificationService.markAllAsRead(userId);

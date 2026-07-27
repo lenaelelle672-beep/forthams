@@ -16,7 +16,6 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Select, SelectItem } from '@/components/ui/Select';
 import { DataTable, type Column } from '@/components/ui/DataTable';
-import { Progress } from '@/components/ui/Progress';
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription,
 } from '@/components/ui/Dialog';

@@ -669,7 +669,6 @@ export default function VendorsPage() {
                   <>
                     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                       {vendors.map(vendor => {
-                        const statusCfg = getVendorStatusConfig(vendor.status);
                         return (
                           <Card
                             key={vendor.id}

@@ -3,11 +3,10 @@
  * @description 借用管理详情页
  */
 
-import React from 'react';
 import { useParams, useNavigate } from 'react-router';
 import { ArrowLeft, CheckCircle, XCircle, Send, ClipboardCheck, Undo2, AlertTriangle } from 'lucide-react';
 import { useBorrowDetail, useSubmitBorrow, useApproveBorrow, useRejectBorrow, useBorrowAsset, useReturnBorrow, useCancelBorrow } from '@/hooks/borrow/useBorrows';
-import { BorrowStatus, BORROW_STATUS_CONFIG } from '@/types/borrow';
+import { BorrowStatus } from '@/types/borrow';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { StatusBadge } from '@/components/ui/Badge';

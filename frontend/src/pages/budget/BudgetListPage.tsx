@@ -4,12 +4,11 @@
  *
  * UI 风格：现代设计系统（对标 DisposalListPage / InventoryTasksPage）
  */
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
 import {
-  Wallet, Plus, AlertTriangle, TrendingUp, Eye,
-  Clock, CheckCircle, XCircle, BarChart3, Search, X,
+  Wallet, Plus, AlertTriangle, TrendingUp, Eye, BarChart3, Search, X,
   DollarSign, PiggyBank, Receipt, Percent,
 } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
@@ -29,10 +28,6 @@ function getTypeLabel(type?: string): string {
   return map[type ?? ''] ?? (type ?? '-');
 }
 
-function getStatusLabel(status?: string): string {
-  const map: Record<string, string> = { DRAFT: '草稿', APPROVED: '已审批', CLOSED: '已关闭' };
-  return map[status ?? ''] ?? (status ?? '-');
-}
 
 // ── 状态样式配置 ─────────────────────────────────────────────────────────────────
 const STATUS_CONFIG: Record<string, { label: string; dot: string; text: string; bg: string; border: string; ring: string }> = {

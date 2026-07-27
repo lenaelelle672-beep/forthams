@@ -23,7 +23,7 @@ export default function MentionInput({
   onKeyEnter,
 }: MentionInputProps) {
   const textRef = useRef<HTMLTextAreaElement>(null);
-  const [isFocused, setIsFocused] = useState(false);
+  const [_isFocused, setIsFocused] = useState(false);
 
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {

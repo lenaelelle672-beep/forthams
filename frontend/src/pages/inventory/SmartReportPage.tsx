@@ -510,7 +510,7 @@ export default function SmartReportPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {discrepancyItems.map((item, idx) => {
+                    {discrepancyItems.map((item, _idx) => {
                       const badge = DISCREPANCY_BADGE[item.type];
                       return (
                         <tr

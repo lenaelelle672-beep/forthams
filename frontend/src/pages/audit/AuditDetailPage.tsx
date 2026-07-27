@@ -16,7 +16,6 @@ import { Button } from '@/components/ui/Button';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { getAuditLogDetail } from '@/api/audit';
 import type { AuditLog } from '@/api/audit';
-import type { ApiResponse } from '@/types/common';
 import { Skeleton } from '@/components/ui/Skeleton';
 
 interface TimelineEntry {

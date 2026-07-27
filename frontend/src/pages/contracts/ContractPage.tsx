@@ -17,7 +17,6 @@ import { Input } from '@/components/ui/Input';
 import { Select, SelectItem } from '@/components/ui/Select';
 import { DataTable, type Column } from '@/components/ui/DataTable';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/Tabs';
-import { Badge } from '@/components/ui/Badge';
 import { Alert } from '@/components/ui/Alert';
 import { ErrorState, EmptyState } from '@/components/ui';
 import { ErrorBoundary } from '@/components/ErrorBoundary';

@@ -9,7 +9,7 @@
  * @since SWARM-034
  */
 
-import React, { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { useNavigate } from "react-router";
 import {
   Search,

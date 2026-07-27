@@ -6,7 +6,7 @@
  * UI 全部按新 Design System 重写。
  */
 
-import React, { useState, useCallback, useRef, useMemo } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
@@ -21,7 +21,6 @@ import {
   CheckCircle2,
   Layers,
 } from 'lucide-react';
-import { toast } from 'sonner';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { DataTable, type Column } from '@/components/ui/DataTable';
@@ -201,7 +200,6 @@ export default function DepreciationListPage() {
   const [batchConfirm,  setBatchConfirm]  = useState(false);
   const [error,         setError]         = useState<string | null>(null);
 
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // ── useQuery 数据加载 ──────────────────────────────────────────────────────
 
@@ -257,7 +255,7 @@ export default function DepreciationListPage() {
   const isAllSelected = dataSource.length > 0 && selectedIds.length === dataSource.length;
 
   const toggleAll = () => {
-    setSelectedIds(isAllSelected ? [] : dataSource.map(r => r.id));
+    setSelectedIds(isAllSelected ? [] : dataSource.map((r: DepreciationScheduleItem) => r.id));
   };
 
   const toggleRow = (id: number) => {
@@ -271,9 +269,9 @@ export default function DepreciationListPage() {
   const handleBatchCalculate = useCallback(async () => {
     if (selectedIds.length === 0) return;
 
-    const terminalRows = dataSource.filter(r => selectedIds.includes(r.id) && isTerminal(r.assetStatus));
+    const terminalRows = dataSource.filter((r: DepreciationScheduleItem) => selectedIds.includes(r.id) && isTerminal(r.assetStatus));
     if (terminalRows.length > 0) {
-      const nos = terminalRows.map(r => r.assetNo).join(', ');
+      const nos = terminalRows.map((r: DepreciationScheduleItem) => r.assetNo).join(', ');
       setError(`以下资产已报废/退役，不可计算折旧: ${nos}`);
       setBatchConfirm(false);
       return;
@@ -283,7 +281,7 @@ export default function DepreciationListPage() {
     setError(null);
     try {
       const assetIds = Array.from(new Set(
-        dataSource.filter(r => selectedIds.includes(r.id)).map(r => r.assetId)
+        dataSource.filter((r: DepreciationScheduleItem) => selectedIds.includes(r.id)).map((r: DepreciationScheduleItem) => r.assetId)
       ));
       await batchCalculateDepreciation({ assetIds });
       setSelectedIds([]);
@@ -299,13 +297,13 @@ export default function DepreciationListPage() {
 
   // ── 统计 ─────────────────────────────────────────────────────────────────
 
-  const totalDepreciation = dataSource.reduce((sum, r) => sum + toNumber(r.depreciationAmount), 0);
-  const pendingCount      = dataSource.filter(r => !isTerminal(r.assetStatus)).length;
-  const completedCount    = dataSource.filter(r => isTerminal(r.assetStatus)).length;
-  const straightCount     = dataSource.filter(r => r.depreciationMethod === 'STRAIGHT_LINE' || r.depreciationMethod === 'straight_line').length;
-  const doubleCount       = dataSource.filter(r => r.depreciationMethod === 'DOUBLE_DECLINING' || r.depreciationMethod === 'double_declining').length;
-  const sydCount          = dataSource.filter(r => r.depreciationMethod === 'SYD' || r.depreciationMethod === 'syd').length;
-  const uopCount          = dataSource.filter(r => r.depreciationMethod === 'UOP' || r.depreciationMethod === 'uop').length;
+  const totalDepreciation = dataSource.reduce((sum: number, r: DepreciationScheduleItem) => sum + toNumber(r.depreciationAmount), 0);
+  const pendingCount      = dataSource.filter((r: DepreciationScheduleItem) => !isTerminal(r.assetStatus)).length;
+  const completedCount    = dataSource.filter((r: DepreciationScheduleItem) => isTerminal(r.assetStatus)).length;
+  const straightCount     = dataSource.filter((r: DepreciationScheduleItem) => r.depreciationMethod === 'STRAIGHT_LINE' || r.depreciationMethod === 'straight_line').length;
+  const doubleCount       = dataSource.filter((r: DepreciationScheduleItem) => r.depreciationMethod === 'DOUBLE_DECLINING' || r.depreciationMethod === 'double_declining').length;
+  const sydCount          = dataSource.filter((r: DepreciationScheduleItem) => r.depreciationMethod === 'SYD' || r.depreciationMethod === 'syd').length;
+  const uopCount          = dataSource.filter((r: DepreciationScheduleItem) => r.depreciationMethod === 'UOP' || r.depreciationMethod === 'uop').length;
 
   // ── Stat cards ───────────────────────────────────────────────────────────
 
@@ -503,10 +501,10 @@ export default function DepreciationListPage() {
 
   // ── Footer summary row ──────────────────────────────────────────────────
 
-  const summaryOriginal = dataSource.reduce((s, r) => s + computeOriginalValue(r.netValue, r.accumulatedDepreciation), 0);
+  const summaryOriginal = dataSource.reduce((s: number, r: DepreciationScheduleItem) => s + computeOriginalValue(r.netValue, r.accumulatedDepreciation), 0);
   const summaryDepreciation = totalDepreciation;
-  const summaryAccumulated = dataSource.reduce((s, r) => s + toNumber(r.accumulatedDepreciation), 0);
-  const summaryNet = dataSource.reduce((s, r) => s + toNumber(r.netValue), 0);
+  const summaryAccumulated = dataSource.reduce((s: number, r: DepreciationScheduleItem) => s + toNumber(r.accumulatedDepreciation), 0);
+  const summaryNet = dataSource.reduce((s: number, r: DepreciationScheduleItem) => s + toNumber(r.netValue), 0);
 
   // ── 渲染 ─────────────────────────────────────────────────────────────────
 

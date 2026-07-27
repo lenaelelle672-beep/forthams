@@ -8,7 +8,7 @@
  * - 键盘快捷键逻辑测试
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { z } from 'zod';
 
 // ── 搜索词校验模式 ───────────────────────────────────────────────────────

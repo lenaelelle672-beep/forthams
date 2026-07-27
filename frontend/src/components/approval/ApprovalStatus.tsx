@@ -18,13 +18,12 @@
  */
 
 import React, { useState, useCallback, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
 import { Button, Card, Tag, Timeline, Empty, Spin, message, Space, Typography } from 'antd';
 import { CheckCircleOutlined, CloseCircleOutlined, UndoOutlined, LoadingOutlined, HistoryOutlined } from '@ant-design/icons';
 import { workOrderApi } from '../../pages/WorkOrder/api/workOrderApi';
 import type { WorkOrder, ApprovalRecord, ApprovalStatus as ApprovalStatusType } from '../../pages/WorkOrder/types/workOrder';
 
-const { Text, Title } = Typography;
+const { Text } = Typography;
 
 interface ApprovalStatusProps {
   /** 工单 ID */
@@ -96,7 +95,6 @@ export const ApprovalStatus: React.FC<ApprovalStatusProps> = ({
   approvalHistory: initialHistory = [],
   loading: externalLoading = false,
 }) => {
-  const { t } = useTranslation();
   
   // 组件内部状态
   const [approvalHistory, setApprovalHistory] = useState<ApprovalRecord[]>(initialHistory);

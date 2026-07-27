@@ -4,13 +4,13 @@
  *
  * UI 风格：现代设计系统（对标 DisposalListPage / InventoryTasksPage）
  */
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
 import {
   TrendingUp, Plus, Search, Eye, X,
-  Clock, CheckCircle, XCircle, BarChart3,
-  Package, ArrowDownRight, ArrowUpRight, FileCheck,
+  Clock, CheckCircle, XCircle,
+  Package, ArrowDownRight, ArrowUpRight,
 } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -22,10 +22,6 @@ import type { AssetRevaluation } from '@/types/revaluation';
 function formatAmount(n: number | undefined | null): string {
   if (n == null) return '-';
   return `¥${n.toLocaleString('zh-CN', { minimumFractionDigits: 2 })}`;
-}
-function formatDate(d: string | undefined | null): string {
-  if (!d) return '-';
-  try { return new Date(d).toLocaleDateString('zh-CN'); } catch { return d; }
 }
 
 function getTypeLabel(type?: string): string {

@@ -100,19 +100,19 @@ export const useWorkOrderStore = defineStore('workOrder', () => {
   // -------------------------------------------------------------------------
 
   const activeWorkOrder = computed<WorkOrder | null>(() =>
-    workOrders.value.find((wo) => wo.id === activeWorkOrderId.value) ?? null
+    workOrders.value.find((wo: WorkOrder) => wo.id === activeWorkOrderId.value) ?? null
   );
 
   const draftWorkOrders = computed<WorkOrder[]>(() =>
-    workOrders.value.filter((wo) => wo.current_state === 'DRAFT')
+    workOrders.value.filter((wo: WorkOrder) => wo.current_state === 'DRAFT')
   );
 
   const pendingWorkOrders = computed<WorkOrder[]>(() =>
-    workOrders.value.filter((wo) => wo.current_state === 'PENDING')
+    workOrders.value.filter((wo: WorkOrder) => wo.current_state === 'PENDING')
   );
 
   const closedWorkOrders = computed<WorkOrder[]>(() =>
-    workOrders.value.filter((wo) => wo.current_state === 'CLOSED')
+    workOrders.value.filter((wo: WorkOrder) => wo.current_state === 'CLOSED')
   );
 
   const isLoading = computed<boolean>(() => loading.value);
@@ -130,7 +130,7 @@ export const useWorkOrderStore = defineStore('workOrder', () => {
    * 判断指定工单是否处于终态
    */
   function isTerminalState(workOrderId: string): boolean {
-    const wo = workOrders.value.find((w) => w.id === workOrderId);
+    const wo = workOrders.value.find((w: WorkOrder) => w.id === workOrderId);
     return wo ? TERMINAL_STATES.includes(wo.current_state) : false;
   }
 
@@ -138,7 +138,7 @@ export const useWorkOrderStore = defineStore('workOrder', () => {
    * 获取当前用户对指定工单可执行的动作列表
    */
   function getAvailableActions(workOrderId: string): WorkOrderEvent[] {
-    const wo = workOrders.value.find((w) => w.id === workOrderId);
+    const wo = workOrders.value.find((w: WorkOrder) => w.id === workOrderId);
     if (!wo || TERMINAL_STATES.includes(wo.current_state)) {
       return [];
     }
@@ -196,7 +196,7 @@ export const useWorkOrderStore = defineStore('workOrder', () => {
     workOrderId: string,
     payload: Partial<WorkOrderCreatePayload>
   ): Promise<void> {
-    const wo = workOrders.value.find((w) => w.id === workOrderId);
+    const wo = workOrders.value.find((w: WorkOrder) => w.id === workOrderId);
     if (!wo) {
       throw new Error('工单不存在');
     }
@@ -207,7 +207,7 @@ export const useWorkOrderStore = defineStore('workOrder', () => {
     error.value = null;
     try {
       const updated = await workOrderApi.update(workOrderId, payload);
-      const index = workOrders.value.findIndex((w) => w.id === workOrderId);
+      const index = workOrders.value.findIndex((w: WorkOrder) => w.id === workOrderId);
       if (index !== -1) {
         workOrders.value[index] = updated;
       }
@@ -235,7 +235,7 @@ export const useWorkOrderStore = defineStore('workOrder', () => {
     event: WorkOrderEvent,
     extra?: Record<string, unknown>
   ): Promise<WorkOrderTransitionResult> {
-    const wo = workOrders.value.find((w) => w.id === workOrderId);
+    const wo = workOrders.value.find((w: WorkOrder) => w.id === workOrderId);
     if (!wo) {
       throw new Error('工单不存在');
     }
@@ -280,7 +280,7 @@ export const useWorkOrderStore = defineStore('workOrder', () => {
       }
 
       // 同步前端状态
-      const index = workOrders.value.findIndex((w) => w.id === workOrderId);
+      const index = workOrders.value.findIndex((w: WorkOrder) => w.id === workOrderId);
       if (index !== -1) {
         workOrders.value[index] = {
           ...workOrders.value[index],
@@ -339,7 +339,7 @@ export const useWorkOrderStore = defineStore('workOrder', () => {
     error.value = null;
     try {
       const wo = await workOrderApi.getById(workOrderId);
-      const index = workOrders.value.findIndex((w) => w.id === workOrderId);
+      const index = workOrders.value.findIndex((w: WorkOrder) => w.id === workOrderId);
       if (index !== -1) {
         workOrders.value[index] = wo;
       } else {

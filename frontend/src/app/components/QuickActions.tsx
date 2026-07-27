@@ -1,4 +1,4 @@
-import { Plus, Upload, Download, Radio, Send, Wrench, ClipboardCheck } from "lucide-react";
+import { Plus, Download, Radio, Send, Wrench, ClipboardCheck } from "lucide-react";
 import { useNavigate } from "react-router";
 
 export function QuickActions() {

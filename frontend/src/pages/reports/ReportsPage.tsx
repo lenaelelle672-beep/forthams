@@ -89,16 +89,6 @@ const ALL_REPORTS: ReportCardData[] = [
 ];
 
 // ── 颜色常量（对齐 Design System） ─────────────────────────────────────────────
-const COLORS = {
-  blue: '#3b82f6',
-  green: '#10b981',
-  amber: '#f59e0b',
-  red: '#ef4444',
-  purple: '#8b5cf6',
-  cyan: '#06b6d4',
-  pink: '#ec4899',
-  gray: '#64748b',
-};
 
 /** 格式化日期为 YYYYMMDD 字符串 */
 function formatDate(date: Date): string {

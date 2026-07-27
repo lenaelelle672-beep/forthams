@@ -26,7 +26,6 @@ import {
   ChevronDown,
   Shield,
   Warehouse,
-  AlertTriangle,
   FileText,
   Users,
   MapPin,
@@ -40,7 +39,6 @@ import {
   Wrench,
   Calendar,
   User,
-  Activity,
   HelpCircle,
 } from 'lucide-react';
 

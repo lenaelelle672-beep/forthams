@@ -23,7 +23,7 @@ function resolveFaultCodeList(payload: unknown): FaultCode[] {
   return Array.isArray(data) ? data : [];
 }
 
-export default function FaultCodeSelector({ value, onChange, disabled }: FaultCodeSelectorProps) {
+export default function FaultCodeSelector({ onChange, disabled }: FaultCodeSelectorProps) {
   const [level1Id, setLevel1Id] = useState<number | undefined>();
   const [level2Id, setLevel2Id] = useState<number | undefined>();
   const [level3Id, setLevel3Id] = useState<number | undefined>();

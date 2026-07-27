@@ -12,7 +12,7 @@
  * @requires react
  */
 
-import React, { useState, useCallback, useEffect, useRef } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { DatePicker, Select, Input, Button, Space, Typography } from 'antd';
 import { SearchOutlined, ReloadOutlined } from '@ant-design/icons';
 import dayjs, { Dayjs } from 'dayjs';
@@ -116,7 +116,6 @@ const FilterBar: React.FC<FilterBarProps> = ({
    * 
    * @ref debounceTimerRef
    */
-  const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   /**
    * Sync debounced operator ID to parent when it changes.

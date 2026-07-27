@@ -292,7 +292,7 @@ export const useApprovalStore = create<ApprovalState>((set, get) => ({
         approvalApi.getRecords(orderId),
       ]);
 
-      set((s) => ({
+      set((_s) => ({
         detail: {
           detail: detailRes,
           records: recordsRes ?? [],
@@ -311,13 +311,13 @@ export const useApprovalStore = create<ApprovalState>((set, get) => ({
   },
 
   clearDetail: () => {
-    set((s) => ({
+    set((_s) => ({
       detail: { detail: null, records: [], loading: false, error: null },
     }));
   },
 
   approve: async (orderId: string, version: number): Promise<boolean> => {
-    set((s) => ({ action: { loading: true, error: null } }));
+    set((_s) => ({ action: { loading: true, error: null } }));
 
     try {
       const request: ApproveRequest = { orderId, version };
@@ -326,11 +326,11 @@ export const useApprovalStore = create<ApprovalState>((set, get) => ({
       // On success, refresh the pending list so the approved item disappears.
       await get().fetchPendingList();
 
-      set((s) => ({ action: { loading: false, error: null } }));
+      set((_s) => ({ action: { loading: false, error: null } }));
       return true;
     } catch (err) {
       const message = classifyError(err);
-      set((s) => ({ action: { loading: false, error: message } }));
+      set((_s) => ({ action: { loading: false, error: message } }));
       return false;
     }
   },
@@ -343,11 +343,11 @@ export const useApprovalStore = create<ApprovalState>((set, get) => ({
     // Client-side validation first (spec: rejectionReason is required, max 500 chars).
     const validationError = validateRejectionReason(rejectionReason);
     if (validationError) {
-      set((s) => ({ action: { loading: false, error: validationError } }));
+      set((_s) => ({ action: { loading: false, error: validationError } }));
       return false;
     }
 
-    set((s) => ({ action: { loading: true, error: null } }));
+    set((_s) => ({ action: { loading: true, error: null } }));
 
     try {
       const request: RejectRequest = {
@@ -360,17 +360,17 @@ export const useApprovalStore = create<ApprovalState>((set, get) => ({
       // On success, refresh the pending list so the rejected item disappears.
       await get().fetchPendingList();
 
-      set((s) => ({ action: { loading: false, error: null } }));
+      set((_s) => ({ action: { loading: false, error: null } }));
       return true;
     } catch (err) {
       const message = classifyError(err);
-      set((s) => ({ action: { loading: false, error: message } }));
+      set((_s) => ({ action: { loading: false, error: message } }));
       return false;
     }
   },
 
   cancel: async (orderId: string, version: number): Promise<boolean> => {
-    set((s) => ({ action: { loading: true, error: null } }));
+    set((_s) => ({ action: { loading: true, error: null } }));
 
     try {
       await approvalApi.cancel(orderId, version);
@@ -378,11 +378,11 @@ export const useApprovalStore = create<ApprovalState>((set, get) => ({
       // Refresh pending list after cancellation.
       await get().fetchPendingList();
 
-      set((s) => ({ action: { loading: false, error: null } }));
+      set((_s) => ({ action: { loading: false, error: null } }));
       return true;
     } catch (err) {
       const message = classifyError(err);
-      set((s) => ({ action: { loading: false, error: message } }));
+      set((_s) => ({ action: { loading: false, error: message } }));
       return false;
     }
   },

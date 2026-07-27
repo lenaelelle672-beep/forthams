@@ -133,8 +133,8 @@ const auditApi = {
   fetchTrends: async (
     granularity: Granularity,
     start: string,
-    end: string,
-    signal?: AbortSignal,
+    _end: string,
+    _signal?: AbortSignal,
   ): Promise<TrendResponse> => {
     const unit = granularity === 'day' ? 'day' : granularity === 'week' ? 'week' : 'month';
     const count = granularity === 'day' ? 30 : 12;
@@ -147,9 +147,9 @@ const auditApi = {
 
   /** GET /api/audit-logs/stats/by-type?start=&end= */
   fetchTypeDistribution: async (
-    start: string,
-    end: string,
-    signal?: AbortSignal,
+    _start: string,
+    _end: string,
+    _signal?: AbortSignal,
   ): Promise<TypeDistributionResponse> => {
     const types = ['CREATE', 'UPDATE', 'DELETE', 'LOGIN', 'EXPORT', 'CONFIG_CHANGE'];
     return {
@@ -159,9 +159,9 @@ const auditApi = {
 
   /** GET /api/audit-logs/stats/top-operators?limit=10&start=&end= */
   fetchTopOperators: async (
-    start: string,
-    end: string,
-    signal?: AbortSignal,
+    _start: string,
+    _end: string,
+    _signal?: AbortSignal,
   ): Promise<TopOperatorsResponse> => {
     const names = [
       'admin',
@@ -190,7 +190,7 @@ const auditApi = {
       start?: string;
       end?: string;
     },
-    signal?: AbortSignal,
+    _signal?: AbortSignal,
   ): Promise<PaginatedResponse<AuditLog>> => {
     const total = 124;
     const offset = (params.page - 1) * params.size;

@@ -115,8 +115,6 @@ export const DashboardStatCard: React.FC<DashboardStatCardProps> = ({
     );
   }
 
-  const isCurrency =
-    typeof value === 'string' && (value.includes('¥') || value.startsWith('CNY'));
 
   const displayValue =
     typeof value === 'number'

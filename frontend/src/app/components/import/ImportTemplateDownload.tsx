@@ -8,7 +8,7 @@
  * @since SWARM-019
  */
 
-import React, { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { Download, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { apiClient } from '../../utils/api';

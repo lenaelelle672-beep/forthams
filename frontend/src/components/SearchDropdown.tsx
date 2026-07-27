@@ -153,7 +153,7 @@ export default function SearchDropdown() {
               <div className="px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-[#94a3b8]">
                 {TYPE_LABELS[type] || type}
               </div>
-              {items.map((item, idx) => {
+              {items.map((item, _idx) => {
                 const globalIdx = results.indexOf(item);
                 const Icon = TYPE_ICONS[item.type] || Search;
                 return (

@@ -10,7 +10,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card, Spin, Empty, Pagination, DatePicker, Select, Button, message } from 'antd';
-import { FilterOutlined, ReloadOutlined } from '@ant-design/icons';
+import { ReloadOutlined } from '@ant-design/icons';
 import { TrendChart } from './components/TrendChart';
 import { OperationTypeChart } from './components/OperationTypeChart';
 import { useAuditLogs, AuditLogFilter } from '../../hooks/useAuditLogs';

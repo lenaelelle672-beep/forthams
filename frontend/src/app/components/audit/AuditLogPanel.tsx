@@ -17,13 +17,12 @@
  */
 
 import React, { useState, useCallback, useMemo } from 'react';
-import { Card, Table, Tag, Button, Space, Empty, Spin, message, Drawer } from 'antd';
+import { Card, Table, Tag, Button, Space, Empty, Spin, message } from 'antd';
 import { 
   HistoryOutlined, 
   FilterOutlined, 
   EyeOutlined, 
   ReloadOutlined,
-  ExpandOutlined
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import dayjs from 'dayjs';

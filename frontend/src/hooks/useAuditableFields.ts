@@ -31,7 +31,7 @@
  * @version 1.0.0
  */
 
-import { ref, computed, watch, onMounted, onUnmounted, type Ref, type ComputedRef } from 'vue';
+import { ref, computed, onMounted, onUnmounted, type Ref, type ComputedRef } from 'vue';
 import type { AuditableFieldMetadata, AuditEvent, AuditBindingConfig } from '../types/audit.types';
 import { auditService } from '../services/auditService';
 
@@ -599,7 +599,7 @@ export function useAuditableFields(
 
           updateBinding(fieldId, { status: 'loading' });
 
-          const [metadata, events, graphifyMatches] = await Promise.all([
+          const [_metadata, events, graphifyMatches] = await Promise.all([
             getCachedMetadata(fieldId, config.entityType),
             fetchFieldEvents(fieldId),
             fetchGraphifyNodes(fieldId, binding.fieldName),

@@ -8,7 +8,7 @@
  * @since SWARM-043
  */
 
-import React, { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { AlertCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import type { ImportParseError } from '../../services/assetService';
 

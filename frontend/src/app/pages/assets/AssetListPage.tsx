@@ -11,7 +11,7 @@
  * @since SWARM-049
  */
 
-import React, { useState, useCallback, useEffect, useMemo } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router';
 import {
   Plus,

@@ -13,7 +13,7 @@
  * @module pages/vendor/VendorFormPage
  */
 
-import React, { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useNavigate, useParams } from "react-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -52,7 +52,6 @@ export default function VendorFormPage() {
     handleSubmit,
     reset,
     formState: { errors, isSubmitting },
-    setError,
   } = useForm<VendorFormValues>({
     resolver: zodResolver(vendorSchema),
     defaultValues: {

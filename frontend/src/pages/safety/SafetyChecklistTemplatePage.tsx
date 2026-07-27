@@ -13,10 +13,9 @@ import type { SafetyChecklistTemplate, SafetyChecklistItem } from '../../types/s
 import { useNavigate } from 'react-router';
 import { toast } from 'sonner';
 import {
-  Plus, Pencil, Trash2, Play, FileText, CheckCircle, Archive, X,
+  Plus, Pencil, Trash2, Play, FileText, CheckCircle, Archive,
 } from 'lucide-react';
 
-import { PageHeader } from '@/components/ui/PageHeader';
 import { Button } from '@/components/ui/Button';
 import { Card, CardHeader, CardTitle } from '@/components/ui/Card';
 import { DataTable, type Column } from '@/components/ui/DataTable';

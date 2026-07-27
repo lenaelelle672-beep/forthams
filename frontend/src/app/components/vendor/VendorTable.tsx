@@ -8,7 +8,6 @@
  * @since SWARM-046
  */
 
-import React from "react";
 import { Pencil, Trash2, Loader2 } from "lucide-react";
 import type { Vendor } from "../../services/vendorApi";
 

@@ -37,7 +37,6 @@ import type { ColumnsType } from 'antd/es/table';
 import {
   CheckCircleOutlined,
   ExclamationCircleOutlined,
-  DownOutlined,
 } from '@ant-design/icons';
 import { StatusDropdown } from '../StatusDropdown';
 

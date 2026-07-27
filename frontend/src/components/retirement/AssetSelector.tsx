@@ -132,7 +132,7 @@ export const AssetSelector: React.FC<AssetSelectorProps> = ({
   /**
    * Handle click outside to close dropdown
    */
-  const handleBlur = useCallback((e: React.FocusEvent) => {
+  const handleBlur = useCallback((_e: React.FocusEvent) => {
     // Delay to allow click events on dropdown items
     setTimeout(() => {
       setIsOpen(false);

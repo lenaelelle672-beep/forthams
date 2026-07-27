@@ -1,5 +1,4 @@
 import http from '@/utils/http';
-import type { ApiResponse } from '@/types/common';
 
 export type MaintenanceType = 'preventive' | 'corrective' | 'emergency' | 'routine';
 

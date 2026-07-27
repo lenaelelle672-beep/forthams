@@ -237,7 +237,6 @@ export default function AuditDashboardPage() {
     return `${trendPath} L800,200 L0,200 Z`;
   }, [trendPath, trendPoints.length]);
 
-  const svgCircle = 2 * Math.PI * 16;
   const distCumulative = useMemo(() => {
     let cum = 0;
     return distEntries.map((d) => {

@@ -671,7 +671,7 @@ export default function MaintenancePage() {
       key: 'nextMaintenanceDate',
       title: '下次维保',
       width: 160,
-      render: (v, row) => {
+      render: (v, _row) => {
         const dateStr = v ? String(v) : null;
         if (!dateStr) return <span className="text-xs text-[#64748b]">—</span>;
         const daysLeft = daysUntilNext(dateStr);

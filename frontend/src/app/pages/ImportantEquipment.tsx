@@ -14,7 +14,7 @@ const usageTrend = [
 ];
 
 export function ImportantEquipment() {
-  const [selectedEquipment, setSelectedEquipment] = useState<string | null>(null);
+  const [_selectedEquipment, _setSelectedEquipment] = useState<string | null>(null);
   const [detailItem, setDetailItem] = useState<any | null>(null);
 
   const [showMaintenanceModal, setShowMaintenanceModal] = useState(false);

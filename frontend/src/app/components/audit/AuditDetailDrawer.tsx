@@ -42,7 +42,7 @@ import type { DescriptionsProps } from 'antd';
 import { useAuditableFields } from '../../hooks/useAuditableFields';
 import type { AuditLog, FieldChange } from '../types/audit.types';
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 /**
  * 操作类型与图标的映射关系

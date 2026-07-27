@@ -35,29 +35,8 @@ interface LocationFormData {
 
 // ─── 工具：在树中更新节点 ────────────────────────────────────────────────────
 
-function updateNodeInTree(tree: LocationNode[], id: number, data: Partial<LocationNode>): LocationNode[] {
-  return tree.map(node => {
-    if (node.id === id) return { ...node, ...data };
-    if (node.children?.length) return { ...node, children: updateNodeInTree(node.children, id, data) };
-    return node;
-  });
-}
 
-function deleteNodeFromTree(tree: LocationNode[], id: number): LocationNode[] {
-  return tree
-    .filter(node => node.id !== id)
-    .map(node => node.children?.length ? { ...node, children: deleteNodeFromTree(node.children, id) } : node);
-}
 
-function addChildToTree(tree: LocationNode[], parentId: number, newNode: LocationNode): LocationNode[] {
-  return tree.map(node => {
-    if (node.id === parentId) {
-      return { ...node, children: [...(node.children ?? []), newNode] };
-    }
-    if (node.children?.length) return { ...node, children: addChildToTree(node.children, parentId, newNode) };
-    return node;
-  });
-}
 
 // ─── Stats helpers ───────────────────────────────────────────────────────────
 

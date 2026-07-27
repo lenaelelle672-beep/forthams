@@ -8,7 +8,7 @@
  * @requires types/audit.types
  */
 
-import { ref, computed, watch, type Ref, type ComputedRef } from 'vue';
+import { ref, computed, type Ref, type ComputedRef } from 'vue';
 import type { 
   FieldChange, 
   ChangeSeverity, 
@@ -73,7 +73,7 @@ export function getFieldConfig(fieldName: string): AuditableFieldConfig | undefi
  * ```
  */
 export function calculateChangeSeverity(
-  fieldName: string,
+  _fieldName: string,
   oldValue: string | null,
   newValue: string | null
 ): ChangeSeverity {
@@ -181,10 +181,6 @@ export function convertChangesToGraphifyNodes(
     assetId: string;
   }> = [];
 
-  const centerX = 400;
-  const centerY = 300;
-  const radius = 150;
-
   // 添加资产根节点
   nodes.push({
     id: `asset-${assetId}`,
@@ -206,9 +202,6 @@ export function convertChangesToGraphifyNodes(
       change.newValue
     );
 
-    const angle = (2 * Math.PI * index) / Math.max(changes.length, 1);
-    const x = centerX + radius * Math.cos(angle);
-    const y = centerY + radius * Math.sin(angle);
 
     nodes.push({
       id: `change-${index}-${change.fieldName}`,

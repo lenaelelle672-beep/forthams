@@ -19,7 +19,7 @@ import { SearchOutlined, ReloadOutlined, EyeOutlined, CheckOutlined, CloseOutlin
 import type { ColumnsType } from 'antd/es/table';
 import type { WorkOrder, WorkOrderStatus, WorkOrderType, WorkOrderQuery } from '../../types/workorder.types';
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 const { Option } = Select;
 
 /**

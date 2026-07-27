@@ -115,7 +115,6 @@ const categoryBands = [
 ];
 
 const forecastLines = [24, 31, 28, 38, 45, 41, 55, 62, 58, 72, 68, 84];
-const valueBars = [32, 48, 71, 64, 88];
 const deviceStats = [
   { label: '办公终端', value: 112, unit: '台', sub: '在线', subValue: 98, icon: <Database size={30} /> },
   { label: '智能仓储', value: 36, unit: '组', sub: '库位', subValue: 420, icon: <Warehouse size={30} /> },
@@ -440,11 +439,6 @@ const CSS = `
 @keyframes ams3d-scroll-y { 0%, 16% { transform: translateY(0); } 100% { transform: translateY(-50%); } }
 `;
 
-function formatNumber(value: number | string | undefined | null) {
-  const n = Number(value);
-  if (!Number.isFinite(n)) return '--';
-  return new Intl.NumberFormat('zh-CN').format(n);
-}
 
 function formatWan(value: number) {
   return `${(value / 10000).toFixed(1)}万`;
@@ -531,19 +525,6 @@ function LinePreview() {
   );
 }
 
-function ValueColumns() {
-  return (
-    <div className="ams3d-column-bars">
-      {valueBars.map((value, index) => (
-        <div key={value} className="ams3d-column">
-          <span className="ams3d-column-value">{value}</span>
-          <div className="ams3d-column-bar" style={{ '--height': `${Math.max(34, value)}%` } as StyleVars} />
-          <span>{['50', '100', '500', '1000', '1000+'][index]}</span>
-        </div>
-      ))}
-    </div>
-  );
-}
 
 function DeviceGrid() {
   return (

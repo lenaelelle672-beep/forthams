@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Cascader, message } from 'antd';
 import type { DefaultOptionType } from 'antd/es/cascader';
 import { http } from '@/utils/http';
@@ -57,41 +57,6 @@ const LocationCascader: React.FC<LocationCascaderProps> = ({
    * 每项包含 value、label 及可选的 children。
    * 兼容 { data: [...] } 包装格式和直接数组返回。
    */
-  const fetchCascadeData = useCallback(async () => {
-    if (loaded) return;
-
-    setLoading(true);
-    try {
-      const response = await http.get('/api/v1/asset-locations/cascade');
-
-      // 兼容多种响应格式：{ data: [...] } 或直接返回数组
-      const rawData = response.data?.data ?? response.data ?? [];
-      const cascadeOptions = Array.isArray(rawData) ? rawData : [];
-
-      setOptions(cascadeOptions);
-      setLoaded(true);
-    } catch (error: unknown) {
-      console.error('[LocationCascader] 获取位置级联数据失败:', error);
-
-      // 区分 401 Token 过期与其他错误
-      if (
-        typeof error === 'object' &&
-        error !== null &&
-        'response' in error
-      ) {
-        const axiosError = error as { response?: { status?: number } };
-        if (axiosError.response?.status === 401) {
-          message.error('登录已过期，请重新登录');
-          return;
-        }
-      }
-
-      message.error('获取位置数据失败，请稍后重试');
-      setOptions([]);
-    } finally {
-      setLoading(false);
-    }
-  }, [loaded]);
 
   /** 组件挂载时获取级联数据，卸载时避免设置 state */
   useEffect(() => {

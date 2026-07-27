@@ -16,7 +16,7 @@
  * @see ATB-008 防重复提交
  */
 
-import React, { useMemo, useState, useCallback } from 'react';
+import { useMemo, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router';
 import {
   Button,
@@ -47,9 +47,7 @@ import DifferenceSummaryPanel from './DifferenceSummaryPanel';
 // --- React Query hooks（spec Layer 2）---
 import {
   useTaskDetail,
-  useAssets,
   useSummary,
-  useConfirmMutation,
   useBatchConfirmMutation,
   useSubmitMutation,
 } from '../../hooks/useInventory';
@@ -136,12 +134,11 @@ export default function TaskDetailPage() {
   } = useTaskDetail(taskId);
 
   const {
-    data: summary,
+    data: _summary,
     isLoading: summaryLoading,
   } = useSummary(taskId);
 
   // --- React Query 变更 mutations ---
-  const confirmMutation = useConfirmMutation(taskId);
   const batchConfirmMutation = useBatchConfirmMutation(taskId);
   const submitMutation = useSubmitMutation(taskId);
 
@@ -163,10 +160,6 @@ export default function TaskDetailPage() {
     return calcProgress(task.countedAssets, task.totalAssets);
   }, [task]);
 
-  const uncounted = useMemo(() => {
-    if (!task) return 0;
-    return task.totalAssets - task.countedAssets;
-  }, [task]);
 
   // --- 批量确认处理 ---
   /**

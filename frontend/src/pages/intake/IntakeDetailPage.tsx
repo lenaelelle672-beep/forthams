@@ -7,12 +7,11 @@ import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router';
 import { ArrowLeft, CheckCircle, XCircle, Send, ClipboardCheck } from 'lucide-react';
 import { useIntakeOrderDetail, useSubmitIntakeOrder, useAcceptIntakeOrder, useRejectIntakeOrder, useCancelIntakeOrder, useInspectIntakeOrder } from '@/hooks/intake/useIntakeOrders';
-import { IntakeStatus, INTAKE_STATUS_CONFIG, type IntakeOrder, type IntakeCheckItem } from '@/types/intake';
+import { IntakeStatus, type IntakeOrder, type IntakeCheckItem } from '@/types/intake';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { StatusBadge } from '@/components/ui/Badge';
 import { Skeleton } from '@/components/ui/Skeleton';
-import { toast } from 'sonner';
 
 export default function IntakeDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -95,7 +94,6 @@ export default function IntakeDetailPage() {
     );
   }
 
-  const statusConfig = INTAKE_STATUS_CONFIG[order.status as IntakeStatus];
 
   return (
     <div className="p-6 space-y-6">

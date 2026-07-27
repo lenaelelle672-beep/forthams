@@ -5,12 +5,10 @@ import {
   ReloadOutlined,
   FilterOutlined,
   CalendarOutlined,
-  UserOutlined,
   ApiOutlined,
 } from '@ant-design/icons';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
-import { useTranslation } from 'react-i18next';
 import './AuditLogFilter.less';
 
 const { RangePicker } = DatePicker;
@@ -97,7 +95,6 @@ const AuditLogFilter: React.FC<AuditLogFilterProps> = ({
   onSearch,
   onReset,
 }) => {
-  const { t } = useTranslation();
 
   // 解析配置，设置默认值
   const {
@@ -115,7 +112,7 @@ const AuditLogFilter: React.FC<AuditLogFilterProps> = ({
   // 组件内部状态
   const [form] = Form.useForm();
   const [localLoading, setLocalLoading] = useState(false);
-  const [debouncedValues, setDebouncedValues] = useState<AuditFilterValues | null>(null);
+  const [_debouncedValues, setDebouncedValues] = useState<AuditFilterValues | null>(null);
 
   // 初始化默认值
   useEffect(() => {

@@ -8,7 +8,6 @@
  * @since SWARM-059
  */
 
-import React from "react";
 import { X, Loader2 } from "lucide-react";
 import type { LocationFormData, ILocationTreeNode } from "../../types/location";
 

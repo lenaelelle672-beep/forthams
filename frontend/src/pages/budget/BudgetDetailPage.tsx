@@ -2,18 +2,16 @@
  * @file pages/budget/BudgetDetailPage.tsx
  * @description 预算详情页面
  */
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Wallet, ArrowLeft, Edit, Trash2, FileQuestion } from 'lucide-react';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { ArrowLeft, Edit, Trash2, FileQuestion } from 'lucide-react';
 import { toast } from 'sonner';
-import { PageHeader } from '@/components/ui/PageHeader';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { getBudgetDetail, deleteBudget } from '@/api/budget';
-import type { Budget } from '@/types/budget';
 
 function formatAmount(n?: number): string {
   if (n == null) return '-';
@@ -39,7 +37,6 @@ function getStatusLabel(status?: string): string {
 export default function BudgetDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const { data: budget, isLoading, error } = useQuery({

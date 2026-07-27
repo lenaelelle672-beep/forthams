@@ -5,9 +5,8 @@
 
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useNavigate } from 'react-router';
 import { toast } from 'sonner';
-import { CheckCircle, XCircle, RotateCcw, Send } from 'lucide-react';
+import { CheckCircle, RotateCcw, Send } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/Dialog';
 import { submitForAcceptance, acceptWorkOrder, rejectAcceptance } from '@/api/workorder';
@@ -24,7 +23,6 @@ interface AcceptanceDialogProps {
 
 export default function AcceptanceDialog({ workOrderId, mode, open, onOpenChange, onSuccess }: AcceptanceDialogProps) {
   const queryClient = useQueryClient();
-  const navigate = useNavigate();
   const [comment, setComment] = useState('');
 
   const config = {

@@ -10,7 +10,7 @@ import { Badge } from '@/components/ui/Badge';
 import {
   getCustomFieldsetList,
   getFieldsetFields,
-  type CustomFieldsetItem, type CustomFieldItem,
+  type CustomFieldsetItem
 } from '@/api/customField';
 
 export default function CustomFieldsetsPage() {

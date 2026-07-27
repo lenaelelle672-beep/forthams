@@ -92,7 +92,6 @@ const AuditLogFilterBar: React.FC<AuditLogFilterBarProps> = ({
   filters,
   onUpdateFilters,
   onResetFilters,
-  pagination,
   onSetPagination,
   actionTypeOptions,
   moduleOptions = [],

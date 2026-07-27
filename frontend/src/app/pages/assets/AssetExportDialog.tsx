@@ -8,7 +8,7 @@
  * @since SWARM-056
  */
 
-import React, { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { Download, Loader2, AlertCircle, CheckCircle } from 'lucide-react';
 import { exportAssets, type ExportQueryParams } from '../../services/importExportApi';
 import { formatStatusLabel } from '../../constants/assetStatus';

@@ -28,6 +28,7 @@ import {
 import { useAssetImportExport } from '../../hooks/useAssetImportExport';
 import type { ImportPhase, ImportError } from '../../hooks/useAssetImportExport';
 import type { ImportParsedRow } from '../../services/assetService';
+import type { AssetRow, RowError } from '@/pages/AssetImportExport/types';
 
 /* ------------------------------------------------------------------ */
 /*  Props 类型                                                         */
@@ -118,7 +119,7 @@ export function ImportFileDialog({ className }: ImportFileDialogProps) {
   /** 错误行号集合 */
   const errorRowNumbers = useMemo(() => {
     if (!parseResult) return new Set<number>();
-    return new Set(parseResult.errors.map((e) => e.rowNumber));
+    return new Set(parseResult.errors.map((e: RowError) => e.rowNumber));
   }, [parseResult]);
 
   /** 行号到错误的映射 */
@@ -137,7 +138,7 @@ export function ImportFileDialog({ className }: ImportFileDialogProps) {
   /** 合并修正后的行数据 */
   const displayRows = useMemo(() => {
     if (!parseResult) return [];
-    return parseResult.rows.map((row) => correctedRows.get(row.rowNumber) ?? row);
+    return parseResult.rows.map((row: AssetRow) => correctedRows.get(row.rowNumber) ?? row);
   }, [parseResult, correctedRows]);
 
   /** 预览表格分页数据 */
@@ -152,7 +153,7 @@ export function ImportFileDialog({ className }: ImportFileDialogProps) {
   /** 是否有可提交的有效行（至少有一行没有错误） */
   const hasAnyValidRow = useMemo(() => {
     if (!parseResult) return false;
-    return displayRows.some((row) => !errorRowNumbers.has(row.rowNumber));
+    return displayRows.some((row: AssetRow) => !errorRowNumbers.has(row.rowNumber));
   }, [parseResult, displayRows, errorRowNumbers]);
 
   /* ---------------------------------------------------------------- */
@@ -253,7 +254,7 @@ export function ImportFileDialog({ className }: ImportFileDialogProps) {
     (rowNumber: number, field: keyof ImportParsedRow, value: string | number) => {
       setCorrectedRows((prev) => {
         const next = new Map(prev);
-        const original = parseResult?.rows.find((r) => r.rowNumber === rowNumber);
+        const original = parseResult?.rows.find((r: AssetRow) => r.rowNumber === rowNumber);
         const existing = next.get(rowNumber);
         const base = existing ?? original;
         if (base) {
@@ -272,7 +273,7 @@ export function ImportFileDialog({ className }: ImportFileDialogProps) {
     if (!parseResult?.parseId) return;
 
     // 合并用户修正的行数据
-    const corrected = parseResult.rows.map((row) => {
+    const corrected = parseResult.rows.map((row: AssetRow) => {
       const fixed = correctedRows.get(row.rowNumber);
       return fixed ?? row;
     });
@@ -447,7 +448,7 @@ export function ImportFileDialog({ className }: ImportFileDialogProps) {
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-red-50">
-                    {parseResult.errors.map((err, idx) => (
+                    {parseResult.errors.map((err: RowError, idx: number) => (
                       <tr key={`${err.rowNumber}-${err.field}-${idx}`}>
                         <td className="px-4 py-2 text-sm text-gray-900 font-mono">{err.rowNumber}</td>
                         <td className="px-4 py-2 text-sm text-gray-700 font-mono">{err.field}</td>
@@ -476,7 +477,7 @@ export function ImportFileDialog({ className }: ImportFileDialogProps) {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-[#1e3a5f]">
-                {previewPageData.map((row) => {
+                {previewPageData.map((row: AssetRow) => {
                   const hasError = errorRowNumbers.has(row.rowNumber);
                   const rowErrors = errorByRow.get(row.rowNumber);
                   const nameHasError = rowErrors?.has('name');

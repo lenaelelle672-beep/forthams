@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router';
-import { Camera, QrCode, Save, AlertCircle, Check, X } from 'lucide-react';
+import { Camera, Save, AlertCircle, Check, X } from 'lucide-react';
 import {
   adjustStocktakingTask,
   getStocktakingTask,
@@ -73,7 +73,7 @@ export default function StocktakingTaskPage() {
         (decodedText) => {
           handleScanResult(decodedText);
         },
-        (errorMessage) => {
+        (_errorMessage: unknown) => {
           // 忽略扫描过程中的错误
         }
       );

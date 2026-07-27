@@ -12,7 +12,7 @@
  */
 
 import { http, HttpResponse, delay } from 'msw';
-import { WorkOrder, WorkOrderStatus, WorkOrderOperation } from '../types/workorder.types';
+import { WorkOrder, WorkOrderStatus } from '../types/workorder.types';
 
 /** 工单操作类型枚举 */
 export type OperationType = 'submit' | 'approve' | 'reject' | 'return' | 'resubmit' | 'cancel';

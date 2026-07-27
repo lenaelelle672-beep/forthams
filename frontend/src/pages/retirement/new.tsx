@@ -18,11 +18,10 @@
  * - HC-001: 报废请求提交后不可直接进入 DISPOSED 状态
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -81,7 +80,6 @@ const MAX_REASON_LENGTH = 500;
 const HIGH_VALUE_THRESHOLD = 50000;
 
 /** 中等价值资产阈值 */
-const MEDIUM_VALUE_THRESHOLD = 10000;
 
 /** 单次请求最大资产数量 - SC-002 */
 const MAX_ASSETS_COUNT = 10;
@@ -107,11 +105,6 @@ const STATUS_TRANSITIONS: Record<RetirementStatus, RetirementStatus[]> = {
  * @param value - 资产价值
  * @returns 价值等级
  */
-function calculateValueTier(value: number): AssetValueTier {
-  if (value > HIGH_VALUE_THRESHOLD) return 'HIGH';
-  if (value >= MEDIUM_VALUE_THRESHOLD) return 'MEDIUM';
-  return 'LOW';
-}
 
 /**
  * 验证报废请求是否可以提交

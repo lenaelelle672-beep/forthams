@@ -12,7 +12,7 @@
  * @since SWARM-065
  */
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { ImportFileDialog } from '../../components/assets/ImportFileDialog';
 import { ExportConfigDialog } from '../../components/assets/ExportConfigDialog';
 

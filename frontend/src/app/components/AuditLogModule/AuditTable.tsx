@@ -101,7 +101,6 @@ export const AuditTable: React.FC<AuditTableProps> = ({
   onRowClick,
   onDetailClick,
   onPageChange,
-  onSort,
   className,
 }) => {
   const { getAuditableHighlight } = useAuditableFields();

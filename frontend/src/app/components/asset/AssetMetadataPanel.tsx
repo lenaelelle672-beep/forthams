@@ -36,7 +36,7 @@ import { AuditTable } from '../audit/AuditTable';
 import { AuditDetailDrawer } from '../audit/AuditDetailDrawer';
 import type { AuditLog, AuditFilterParams, FieldChange } from '../../types/audit.types';
 
-const { Text, Title } = Typography;
+const { Text } = Typography;
 
 /**
  * 资产状态枚举
@@ -118,16 +118,6 @@ const operationIconMap: Record<OperationType, React.ReactNode> = {
  * @param operation - 操作类型
  * @returns 标签颜色
  */
-const getOperationColor = (operation: string): string => {
-  const colorMap: Record<string, string> = {
-    [OperationType.CREATE]: 'green',
-    [OperationType.UPDATE]: 'blue',
-    [OperationType.DELETE]: 'red',
-    [OperationType.VIEW]: 'default',
-    [OperationType.EXPORT]: 'purple'
-  };
-  return colorMap[operation] || 'default';
-};
 
 /**
  * 格式化日期时间

@@ -9,7 +9,7 @@ import {
   Plus, Search, Eye, AlertTriangle, Handshake, Clock,
   AlertCircle, FileCheck, Filter, RefreshCw, Download,
 } from 'lucide-react';
-import { useBorrows, useDeleteBorrow } from '@/hooks/borrow/useBorrows';
+import { useBorrows } from '@/hooks/borrow/useBorrows';
 import { BorrowStatus, BORROW_STATUS_CONFIG, type AssetBorrow, type BorrowListQuery } from '@/types/borrow';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';

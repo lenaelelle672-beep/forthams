@@ -36,7 +36,6 @@ import {
   getPriorityLabel,
   isSubmittableStatus,
   isDeletableStatus,
-  isCancellableStatus,
   type WorkOrderRecord,
 } from "../../services/workOrderService";
 

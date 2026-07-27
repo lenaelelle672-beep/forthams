@@ -14,13 +14,12 @@
  */
 
 import { useState, useMemo } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
 import {
   ArrowRightLeft, LogOut, Trash2, DollarSign, Plus, Search,
-  Eye, Clock, CheckCircle, XCircle, AlertCircle, ClipboardList,
-  TrendingUp, BarChart3, Package, X, Download, RefreshCw,
+  Eye, Clock, CheckCircle, AlertCircle, ClipboardList,
+  TrendingUp, BarChart3, Package, X,
 } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -146,7 +145,6 @@ function workorderToRow(w: WorkOrderListItem): RowData {
 
 export default function DisposalListPage() {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState<TabId>('CLEARANCE');
   const [statusFilter, setStatusFilter] = useState<DisposalStatus | ''>('');
   const [keyword, setKeyword] = useState('');
@@ -154,7 +152,6 @@ export default function DisposalListPage() {
   const pageSize = 10;
 
   const currentTab = TABS.find(t => t.id === activeTab)!;
-  const CurrentTabIcon = currentTab.icon;
   const isCompensationTab = activeTab === 'COMPENSATION';
   const isWorkOrderTab = activeTab === 'WORK_ORDER';
   const isDisposalTab = !isCompensationTab && !isWorkOrderTab;
@@ -204,7 +201,7 @@ export default function DisposalListPage() {
   ], [stats]);
 
   // ── 处置列表（TRANSFER / CLEARANCE / SCRAP）─────────────────────────────
-  const { data: disposalRes, isLoading: disposalLoading, isFetching: disposalFetching } = useQuery({
+  const { data: disposalRes, isLoading: disposalLoading } = useQuery({
     queryKey: ['disposals', isDisposalTab ? activeTab : 'inactive', statusFilter, page, keyword],
     queryFn: () =>
       getDisposalList({
@@ -273,7 +270,6 @@ export default function DisposalListPage() {
     return (disposalRes as PageData<Disposal> | undefined)?.total ?? 0;
   }, [isCompensationTab, isWorkOrderTab, disposalRes, compensationRes, workorderRes]);
 
-  const totalPages = Math.ceil(total / pageSize) || 1;
   const loading = isCompensationTab ? compensationLoading : isWorkOrderTab ? workorderLoading : disposalLoading;
 
   // ── 筛选状态 ──────────────────────────────────────────────────────────────
@@ -319,24 +315,8 @@ export default function DisposalListPage() {
   const clearAllFilters = () => { setKeyword(''); setStatusFilter(''); setPage(1); };
 
   // ── 刷新状态 ─────────────────────────────────────────────────────────────
-  const isFetching = disposalFetching;
 
   // ── CSV 导出 ─────────────────────────────────────────────────────────────
-  const handleExportCSV = () => {
-    if (records.length === 0) return;
-    const headers = ['处置单号', '资产信息', '资产编号', '申请人', '申请日期', '状态', '原因'];
-    const csvRows = records.map(r => [
-      r.disposalNo, r.assetName, r.assetNo, r.applicant, r.applyDate, r.currentStatus, r.reason,
-    ].map(v => `"${String(v ?? '').replace(/"/g, '""')}"`).join(','));
-    const csvContent = '\uFEFF' + [headers.join(','), ...csvRows].join('\n');
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `处置记录_${new Date().toISOString().slice(0, 10)}.csv`;
-    link.click();
-    URL.revokeObjectURL(url);
-  };
 
   // ── Tab 切换时重置筛选 ────────────────────────────────────────────────────
   const handleTabChange = (id: TabId) => {

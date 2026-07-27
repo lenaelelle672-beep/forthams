@@ -12,13 +12,12 @@
  * @version 1.0.0
  */
 
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback } from 'react';
 import { DatePicker, Select, Button, Space, Tag } from 'antd';
 import { FilterOutlined, ReloadOutlined } from '@ant-design/icons';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 
-import { useAuditData } from '../../AuditDashboard/hooks/useAuditData';
 import type { AuditLog, OperationType } from '../../types/audit.types';
 
 const { RangePicker } = DatePicker;
@@ -157,21 +156,12 @@ export const FilterControls: React.FC<FilterControlsProps> = ({
    * @param operationType - 操作类型
    * @returns boolean
    */
-  const isHighRiskOperation = useCallback((operationType: string): boolean => {
-    return HIGH_RISK_OPERATIONS.includes(operationType as OperationType);
-  }, []);
 
   /**
    * 获取高风险操作标签颜色
    * @param operationType - 操作类型
    * @returns string 标签颜色
    */
-  const getRiskTagColor = useCallback((operationType: string): string => {
-    if (isHighRiskOperation(operationType)) {
-      return 'red';
-    }
-    return 'default';
-  }, [isHighRiskOperation]);
 
   return (
     <div className={`filter-controls ${className}`} data-testid="filter-controls">

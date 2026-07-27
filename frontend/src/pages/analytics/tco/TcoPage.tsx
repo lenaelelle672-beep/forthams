@@ -2,15 +2,14 @@
  * @file pages/analytics/tco/TcoPage.tsx
  * @description TCO 全生命周期成本总览页
  */
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
-  LineChart, Line, PieChart, Pie, Cell, Legend,
+  LineChart, Line, PieChart, Pie, Cell,
 } from 'recharts';
-import { BarChart3, Search } from 'lucide-react';
+import { BarChart3 } from 'lucide-react';
 import { PageHeader } from '@/components/ui/PageHeader';
-import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
 import { getAssetTco, getDepartmentTco, getCategoryTco, getTcoTrend } from '@/api/tco';
 

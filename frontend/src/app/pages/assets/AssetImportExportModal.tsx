@@ -281,7 +281,7 @@ export default function AssetImportExportModal() {
 
     try {
       // 合并用户修正的行数据
-      const corrected = parseResult.rows.map((row) => {
+      const corrected = parseResult.rows.map((row: any) => {
         const fixed = correctedRows.get(row.rowNumber);
         return fixed ?? row;
       });
@@ -314,7 +314,7 @@ export default function AssetImportExportModal() {
     (rowNumber: number, field: keyof ImportParsedRow, value: string | number) => {
       setCorrectedRows((prev) => {
         const next = new Map(prev);
-        const original = parseResult?.rows.find((r) => r.rowNumber === rowNumber);
+        const original = parseResult?.rows.find((r: any) => r.rowNumber === rowNumber);
         const existing = next.get(rowNumber);
         const base = existing ?? original;
         if (base) {
@@ -460,7 +460,7 @@ export default function AssetImportExportModal() {
   /** 错误行号集合 */
   const errorRowNumbers = useMemo(() => {
     if (!parseResult) return new Set<number>();
-    return new Set(parseResult.errors.map((e) => e.rowNumber));
+    return new Set(parseResult.errors.map((e: any) => e.rowNumber));
   }, [parseResult]);
 
   /** 行号到错误的映射 */
@@ -479,7 +479,7 @@ export default function AssetImportExportModal() {
   /** 合并修正后的行数据 */
   const displayRows = useMemo(() => {
     if (!parseResult) return [];
-    return parseResult.rows.map((row) => correctedRows.get(row.rowNumber) ?? row);
+    return parseResult.rows.map((row: any) => correctedRows.get(row.rowNumber) ?? row);
   }, [parseResult, correctedRows]);
 
   /** 预览表格分页数据 */
@@ -494,7 +494,7 @@ export default function AssetImportExportModal() {
   /** 是否有可修正的错误行 */
   const hasAnyValidRow = useMemo(() => {
     if (!parseResult) return false;
-    return displayRows.some((row) => !errorRowNumbers.has(row.rowNumber));
+    return displayRows.some((row: any) => !errorRowNumbers.has(row.rowNumber));
   }, [parseResult, displayRows, errorRowNumbers]);
 
   /* ---------------------------------------------------------------- */
@@ -745,7 +745,7 @@ export default function AssetImportExportModal() {
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-[#1e3a5f]">
-                    {previewPageData.map((row) => {
+                    {previewPageData.map((row: any) => {
                       const hasError = errorRowNumbers.has(row.rowNumber);
                       const rowErrors = errorByRow.get(row.rowNumber);
                       const nameHasError = rowErrors?.has('name');

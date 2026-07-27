@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { ArrowLeft, Info, ListChecks, Wrench, Search, Plus, AlertTriangle, ShieldCheck } from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
+import { Card, CardTitle, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { getAssetList } from '@/api/asset';

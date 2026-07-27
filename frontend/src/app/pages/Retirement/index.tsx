@@ -59,7 +59,7 @@ const STATUS_TAG_MAP: Record<RetirementStatus, { color: string; text: string }> 
 export const RetirementPage: React.FC = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isHistoryVisible, setIsHistoryVisible] = useState(false);
-  const [selectedAssetId, setSelectedAssetId] = useState<string | null>(null);
+  const [_selectedAssetId, setSelectedAssetId] = useState<string | null>(null);
   const [historyRecords, setHistoryRecords] = useState<RetirementHistoryRecord[]>([]);
   const [form] = Form.useForm<RetirementFormValues>();
 

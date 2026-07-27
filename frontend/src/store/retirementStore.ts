@@ -7,14 +7,13 @@
 
 import { defineStore } from 'pinia';
 import type { Ref, ComputedRef } from 'vue';
-import { computed, ref, watch } from 'vue';
+import { computed, ref } from 'vue';
 import type {
   RetirementApplication,
   RetirementHistory,
   ApprovalStep,
   AssetStatus,
 } from '@/types/retirement.types';
-import type { User } from '@/types/approval.types';
 import {
   createRetirementApplication,
   fetchRetirementApplication,

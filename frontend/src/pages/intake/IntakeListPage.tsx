@@ -3,7 +3,7 @@
  * @description 入库验收列表页
  */
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { Plus, Search, Eye, Trash2, ClipboardCheck } from 'lucide-react';
 import { useIntakeOrders, useDeleteIntakeOrder } from '@/hooks/intake/useIntakeOrders';
@@ -13,7 +13,6 @@ import { Button } from '@/components/ui/Button';
 import { StatusBadge } from '@/components/ui/Badge';
 import { DataTable, type Column } from '@/components/ui/DataTable';
 import { Input } from '@/components/ui/Input';
-import { toast } from 'sonner';
 
 export default function IntakeListPage() {
   const navigate = useNavigate();
