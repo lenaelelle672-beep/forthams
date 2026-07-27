@@ -109,3 +109,5 @@ frontend/system-visual-audit/
 file-storage-*.json
 system-flow-definition-runtime-metrics.json
 flow-definition-console.txt
+system-file-storage-*.json
+flow-definition-console.txt
