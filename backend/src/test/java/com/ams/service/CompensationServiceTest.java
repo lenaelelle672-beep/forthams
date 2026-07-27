@@ -95,7 +95,7 @@ class CompensationServiceTest {
         assertEquals("T001", compensation.getTenantId());
         assertEquals(12L, compensation.getAssetId());
         assertEquals(42L, compensation.getResponsibleUserId());
-        assertTrue(compensation.getCompensationNo().matches("CMP-\\d{8}-001"));
+        assertTrue(compensation.getCompensationNo().matches("CMP-\\d{8}-001\\d{4}"));
     }
 
     @Test

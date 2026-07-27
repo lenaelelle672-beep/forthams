@@ -140,7 +140,9 @@ public class CompensationService {
                 .likeRight("compensation_no", prefix)
         );
         long sequence = (count == null ? 0 : count) + 1;
-        return prefix + String.format("%03d", sequence);
+        // 加随机后缀防止并发 createCompensation 产生相同编号（count+1 在并发下不安全）
+        String randomSuffix = String.format("%04d", java.util.concurrent.ThreadLocalRandom.current().nextInt(10000));
+        return prefix + String.format("%03d", sequence) + randomSuffix;
     }
 
     private BigDecimal firstPositive(BigDecimal primary, BigDecimal fallback) {
