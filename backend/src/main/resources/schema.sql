@@ -152,6 +152,9 @@ CREATE TABLE IF NOT EXISTS asset (
     dept_id BIGINT,
     user_id BIGINT,
     location VARCHAR(256),
+    location_id BIGINT,
+    location_lat DECIMAL(10,7),
+    location_lng DECIMAL(10,7),
     rfid_tag VARCHAR(128) UNIQUE,
     is_important TINYINT DEFAULT 0,
     description TEXT,
@@ -163,7 +166,8 @@ CREATE TABLE IF NOT EXISTS asset (
     UNIQUE KEY uk_asset_tenant_asset_no (tenant_id, asset_no),
     INDEX idx_asset_no (asset_no),
     INDEX idx_asset_tenant (tenant_id),
-    INDEX idx_asset_category (category_id)
+    INDEX idx_asset_category (category_id),
+    INDEX idx_asset_location_coordinates (location_lat, location_lng)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS asset_change_log (

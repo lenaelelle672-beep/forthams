@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @TableName("location")
@@ -15,7 +16,7 @@ public class Location {
     @TableId(type = IdType.AUTO)
     private Long id;
 
-    @TableField("location_name")
+    @TableField("name")
     private String name;
 
     private String locationCode;
@@ -34,4 +35,7 @@ public class Location {
     private LocalDateTime updateTime;
 
     private Integer deleted;
+
+    @TableField(exist = false)
+    private List<Location> children;
 }
