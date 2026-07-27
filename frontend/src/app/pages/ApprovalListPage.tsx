@@ -230,13 +230,13 @@ function ApprovalListPageInner() {
 
     // Status tab filter
     if (activeTab !== "ALL") {
-      items = items.filter((item) => item.status === activeTab);
+      items = items.filter((item: any) => item.status === activeTab);
     }
 
     // Keyword filter
     const keyword = searchInput.trim().toLowerCase();
     if (keyword) {
-      items = items.filter((item) => {
+      items = items.filter((item: any) => {
         const no = item.processNo?.toLowerCase() ?? "";
         const type = item.type?.toLowerCase() ?? "";
         const id = String(item.id);

@@ -295,7 +295,7 @@ export function AssetBatchImportDialog({
                       </tr>
                     </thead>
                     <tbody>
-                      {importResult.details.map((item, idx) => (
+                      {importResult.details.map((item: any, idx: number) => (
                         <tr key={idx} className="border-b border-gray-200">
                           <td className="py-1.5 text-gray-500">{item.row ?? '-'}</td>
                           <td className="py-1.5 text-gray-900">{item.assetName ?? '-'}</td>

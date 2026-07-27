@@ -217,7 +217,7 @@ export const AuditTable: React.FC<AuditTableProps> = ({
 
     return (
       <Space direction="vertical" size="small" style={{ width: '100%' }}>
-        {highlighted.map((change, index) => (
+        {highlighted.map((change: any, index: number) => (
           <div key={index} className={`audit-change-item ${change.highlight ? 'auditable-highlight' : ''}`}>
             <Tag color={change.highlight ? 'orange' : 'default'}>
               {change.field}

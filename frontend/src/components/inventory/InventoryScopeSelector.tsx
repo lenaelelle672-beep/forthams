@@ -112,7 +112,7 @@ const InventoryScopeSelector: React.FC<InventoryScopeSelectorProps> = React.memo
      * 并统一标注节点类型后通过 onChange 向上传递。
      */
     const handleCheck: TreeProps['onCheck'] = useCallback(
-      (checkedKeys, info) => {
+      (checkedKeys: any, info: any) => {
         if (!onChange) return;
 
         // Ant Design onCheck 的 checkedKeys 可能是 Key[] 或 { checked: Key[], halfChecked: Key[] }

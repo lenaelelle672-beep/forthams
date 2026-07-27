@@ -613,7 +613,7 @@ const AssetDetailPage: React.FC = () => {
 
     return (
       <div className="space-y-2 mt-3 pt-3 border-t" data-testid="change-list">
-        {log.changes.map((change, index) => (
+        {log.changes.map((change: any, index: number) => (
           <div 
             key={`${change.field}-${index}`} 
             className="grid grid-cols-3 gap-2 text-sm items-center"

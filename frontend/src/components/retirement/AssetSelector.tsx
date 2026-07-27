@@ -79,7 +79,7 @@ export const AssetSelector: React.FC<AssetSelectorProps> = ({
   // Filter assets to show only IN_USE status (BC-003)
   const eligibleAssets = useMemo(() => {
     if (!assets) return [];
-    return assets.filter((asset) => asset.status === 'IN_USE');
+    return assets.filter((asset: any) => asset.status === 'IN_USE');
   }, [assets]);
   
   // Filter by search term
@@ -88,7 +88,7 @@ export const AssetSelector: React.FC<AssetSelectorProps> = ({
     
     const term = searchTerm.toLowerCase();
     return eligibleAssets.filter(
-      (asset) =>
+      (asset: any) =>
         asset.assetCode.toLowerCase().includes(term) ||
         asset.name.toLowerCase().includes(term) ||
         (asset.categoryName && asset.categoryName.toLowerCase().includes(term))
@@ -98,7 +98,7 @@ export const AssetSelector: React.FC<AssetSelectorProps> = ({
   // Find selected asset details
   const selectedAsset = useMemo(() => {
     if (!value || !assets) return null;
-    return assets.find((asset) => asset.id === value);
+    return assets.find((asset: any) => asset.id === value);
   }, [value, assets]);
   
   /**

@@ -203,7 +203,7 @@ export function filterAlertsByUrgency(alerts: MaintenanceAlert[]): {
 export function transformCategoryForChart(
   distribution: CategoryDistribution
 ): Array<{ name: string; value: number }> {
-  return distribution.map(item => ({
+  return distribution.map((item: CategoryDistribution) => ({
     name: item.categoryName,
     value: item.count
   }));

@@ -301,7 +301,7 @@ export const AuditTable: React.FC<AuditTableProps> = ({
    */
   const rowClassName = (record: AuditLog): string => {
     const hasAuditableChanges = record.changes?.some(
-      (change) => change.auditable === true
+      (change: any) => change.auditable === true
     );
     return hasAuditableChanges ? styles.auditableRow : '';
   };
@@ -328,7 +328,7 @@ export const AuditTable: React.FC<AuditTableProps> = ({
               <div className={styles.detailSection}>
                 <Text strong>完整变更明细</Text>
                 <div className={styles.changesList}>
-                  {record.changes?.map((change, index) => {
+                  {record.changes?.map((change: any, index: number) => {
                     const highlight = getAuditableHighlight(record.changes || [])[index];
                     return (
                       <div 

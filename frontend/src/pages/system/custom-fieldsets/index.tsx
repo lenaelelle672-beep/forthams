@@ -10,7 +10,8 @@ import { Badge } from '@/components/ui/Badge';
 import {
   getCustomFieldsetList,
   getFieldsetFields,
-  type CustomFieldsetItem
+  type CustomFieldsetItem,
+  type CustomFieldItem
 } from '@/api/customField';
 
 export default function CustomFieldsetsPage() {
@@ -101,7 +102,7 @@ export default function CustomFieldsetsPage() {
               {(fieldsetFields ?? []).length === 0 ? (
                 <p className="py-6 text-center text-sm text-slate-400">该字段集暂无字段</p>
               ) : (
-                fieldsetFields?.map(field => (
+                fieldsetFields?.map((field: CustomFieldItem) => (
                   <div key={field.id} className="flex items-center gap-2 p-2 rounded hover:bg-slate-50">
                     <span className="text-sm">{field.fieldLabel}</span>
                     <span className="text-xs text-slate-400">({field.fieldName})</span>

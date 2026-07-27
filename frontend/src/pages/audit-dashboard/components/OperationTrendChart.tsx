@@ -28,8 +28,8 @@ const GRANULARITY_LABELS: Record<Granularity, string> = {
  * @see ATB-02 – 操作趋势折线图渲染与粒度切换
  */
 const OperationTrendChart: React.FC = () => {
-  const granularity = useAuditDashboardStore((s) => s.granularity);
-  const setGranularity = useAuditDashboardStore((s) => s.setGranularity);
+  const granularity = useAuditDashboardStore((s: any) => s.granularity);
+  const setGranularity = useAuditDashboardStore((s: any) => s.setGranularity);
 
   const { data, loading, error, refetch } = useAuditTrends();
 

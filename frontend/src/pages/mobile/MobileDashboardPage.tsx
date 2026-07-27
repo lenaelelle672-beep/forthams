@@ -227,7 +227,7 @@ function MobileDashboardContent() {
             暂无待办事项
           </div>
         ) : (
-          workOrders.map((wo) => {
+          workOrders.map((wo: any) => {
             const s = getStatusStyle(wo.status);
             return (
               <div
@@ -279,7 +279,7 @@ function MobileDashboardContent() {
             暂无通知
           </div>
         ) : (
-          notifications.slice(0, 3).map((n) => (
+          notifications.slice(0, 3).map((n: any) => (
             <div
               key={n.id}
               style={{

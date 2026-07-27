@@ -555,7 +555,7 @@ export default function DeptManagement() {
                     )}
                   </div>
                 ) : (
-                  filteredTree.map((node) => (
+                  filteredTree.map((node: Department) => (
                     <DeptTreeNode
                       key={node.id}
                       node={node}

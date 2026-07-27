@@ -219,7 +219,7 @@ export const AuditLogPanel: React.FC<AuditLogPanelProps> = ({
     }
 
     const highlightedChanges = getAuditableHighlight(changes);
-    const summaryItems = highlightedChanges.slice(0, 3).map((change, index) => {
+    const summaryItems = highlightedChanges.slice(0, 3).map((change: any, index: number) => {
       const isHighlighted = 'highlight' in change && change.highlight;
       return (
         <span 

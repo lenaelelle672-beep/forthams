@@ -102,12 +102,12 @@ export const LogDashboard: React.FC = () => {
     key: K,
     value: LogFilters[K]
   ) => {
-    setFilters(prev => ({
+    setFilters((prev: any) => ({
       ...prev,
       [key]: value,
     }));
     // 重置分页到第一页
-    setPagination(prev => ({ ...prev, page: 1 }));
+    setPagination((prev: { page: number; pageSize: number }) => ({ ...prev, page: 1 }));
   }, []);
 
   /**
@@ -122,7 +122,7 @@ export const LogDashboard: React.FC = () => {
         console.warn('时间跨度不能超过 90 天');
         return;
       }
-      setFilters(prev => ({
+      setFilters((prev: any) => ({
         ...prev,
         startTime: dates[0],
         endTime: dates[1],
@@ -136,7 +136,7 @@ export const LogDashboard: React.FC = () => {
   const handlePresetRange = useCallback((days: number) => {
     const end = dayjs();
     const start = dayjs().subtract(days, 'day');
-    setFilters(prev => ({
+    setFilters((prev: any) => ({
       ...prev,
       startTime: start,
       endTime: end,

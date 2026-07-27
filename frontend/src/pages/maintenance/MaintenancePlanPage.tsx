@@ -20,6 +20,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Select, SelectItem } from '@/components/ui/Select';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/Tooltip';
 import { maintenancePlanApi } from '@/api/maintenancePlan';
+import type { MaintenancePlan } from '@/types/maintenancePlan';
 import { getAssetList } from '@/api/asset';
 import type { AssetListItem } from '@/types/asset';
 import {
@@ -558,9 +559,9 @@ export default function MaintenancePlanPage() {
 
   // ── 风险统计 ──
   const riskStats = useMemo(() => {
-    const overdue = records.filter(p => computeDueRisk(p.nextDueDate, p.status) === 'overdue').length;
-    const urgent = records.filter(p => computeDueRisk(p.nextDueDate, p.status) === 'urgent').length;
-    const warning = records.filter(p => computeDueRisk(p.nextDueDate, p.status) === 'warning').length;
+    const overdue = records.filter((p: MaintenancePlan) => computeDueRisk(p.nextDueDate, p.status) === 'overdue').length;
+    const urgent = records.filter((p: MaintenancePlan) => computeDueRisk(p.nextDueDate, p.status) === 'urgent').length;
+    const warning = records.filter((p: MaintenancePlan) => computeDueRisk(p.nextDueDate, p.status) === 'warning').length;
     return { overdue, urgent, warning };
   }, [records]);
 
@@ -910,7 +911,7 @@ export default function MaintenancePlanPage() {
                   <div className="py-12 text-center text-slate-400 text-sm">暂无维保计划</div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {records.map(p => {
+                    {records.map((p: MaintenancePlan) => {
                       const risk = computeDueRisk(p.nextDueDate, p.status);
                       const riskBadge = RISK_BADGE[risk];
                       const cardAsset = assetMap.get(p.assetId);

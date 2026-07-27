@@ -425,7 +425,7 @@ export default function LocationsPage() {
               </div>
             ) : (
               <div className="py-1">
-                {tree.map(node => (
+                {tree.map((node: LocationNode) => (
                   <TreeNodeRow
                     key={node.id}
                     node={node}

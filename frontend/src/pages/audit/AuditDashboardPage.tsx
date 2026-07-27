@@ -126,7 +126,7 @@ export default function AuditDashboardPage() {
   const totalCount = stats?.totalCount ?? 0;
   const rawTrendData = stats?.trendData ?? [];
   const trendData = useMemo(() => {
-    const byDate = new Map(rawTrendData.map((p) => [p.date.slice(0, 10), p.count]));
+    const byDate = new Map(rawTrendData.map((p: any) => [p.date.slice(0, 10), p.count]));
     const end = new Date(endTime);
     return Array.from({ length: 7 }, (_, index) => {
       const day = new Date(end);
@@ -139,7 +139,7 @@ export default function AuditDashboardPage() {
   const rawTopOperators = stats?.topOperators ?? [];
   const topOperators = useMemo(() => {
     const merged = new Map<string, number>();
-    rawTopOperators.forEach((item) => {
+    rawTopOperators.forEach((item: any) => {
       const name = item.operatorName || '未知用户';
       merged.set(name, (merged.get(name) ?? 0) + item.count);
     });

@@ -135,7 +135,7 @@ export default function AssignmentFormPage() {
                 disabled={isEdit}
               >
                 <option value="">请选择资产</option>
-                {assets.map((a) => (
+                {assets.map((a: any) => (
                   <option key={a.id} value={a.id}>{a.assetNo} - {a.assetName}</option>
                 ))}
               </select>

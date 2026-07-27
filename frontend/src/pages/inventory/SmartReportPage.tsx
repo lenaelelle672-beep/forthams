@@ -247,7 +247,7 @@ export default function SmartReportPage() {
 
     // 从 summary 的盘亏/盘盈明细构建
     if (summary) {
-      summary.deficitItems.forEach((d) => {
+      summary.deficitItems.forEach((d: any) => {
         items.push({
           id: d.assetCode,
           name: d.assetName,
@@ -256,7 +256,7 @@ export default function SmartReportPage() {
           type: '盘亏',
         });
       });
-      summary.surplusItems.forEach((d) => {
+      summary.surplusItems.forEach((d: any) => {
         items.push({
           id: d.assetCode,
           name: d.assetName,

@@ -894,7 +894,7 @@ export const AuditLogPanel: React.FC<AuditLogPanelProps> = ({
                 <h4 className="mt-4 mb-2 font-medium">变更明细</h4>
                 {selectedLog.changes && selectedLog.changes.length > 0 ? (
                   <div className="changes-list">
-                    {selectedLog.changes.map((change, idx) => (
+                    {selectedLog.changes.map((change: any, idx: number) => (
                       <div 
                         key={idx}
                         className={`p-3 mb-2 rounded ${

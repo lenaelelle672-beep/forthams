@@ -229,7 +229,7 @@ const ScopeSelector: React.FC<ScopeSelectorProps> = ({ value, onChange }) => {
    * @param checkedKeys - Ant Design Tree 返回的已勾选 key 集合
    */
   const handleTreeCheck: TreeProps['onCheck'] = useCallback(
-    (checkedKeys) => {
+    (checkedKeys: any) => {
       const keys = Array.isArray(checkedKeys)
         ? checkedKeys
         : checkedKeys.checked;

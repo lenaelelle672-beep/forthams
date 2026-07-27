@@ -505,7 +505,7 @@ export const AuditLogPanel: React.FC<AuditLogPanelProps> = ({
 
         {log.changes && log.changes.length > 0 ? (
           <Timeline className="audit-changes-timeline">
-            {log.changes.map((change, index) => (
+            {log.changes.map((change: any, index: number) => (
               <Timeline.Item
                 key={index}
                 color={change.auditable ? 'orange' : 'blue'}

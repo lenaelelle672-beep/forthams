@@ -183,7 +183,7 @@ export default function PostManagement() {
 
   const records = data?.records ?? [];
   const totalPosts = data?.total ?? 0;
-  const activePosts = records.filter((item) => Number(item.status) === 1).length;
+  const activePosts = records.filter((item: PostItem) => Number(item.status) === 1).length;
   const inactivePosts = records.length - activePosts;
 
   const handleNew = () => {

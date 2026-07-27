@@ -48,7 +48,7 @@ export const useRetirementStore = defineStore('retirement', () => {
 
   // --- Getters ---
   const myApplications: ComputedRef<RetirementApplication[]> = computed(() =>
-    state.value.applications.filter((app) => app.applicant.id === authStore.user?.id)
+    state.value.applications.filter((app: RetirementApplication) => app.applicant.id === authStore.user?.id)
   );
 
   const isPendingApproval: ComputedRef<boolean> = computed(
@@ -61,7 +61,7 @@ export const useRetirementStore = defineStore('retirement', () => {
       authStore.user?.role === 'admin' &&
       state.value.current.status === 'pending' &&
       state.value.approvals.some(
-        (step) => step.approverId === authStore.user?.id && !step.done
+        (step: ApprovalStep) => step.approverId === authStore.user?.id && !step.done
       )
     );
   });
@@ -98,7 +98,7 @@ export const useRetirementStore = defineStore('retirement', () => {
     try {
       const app = await fetchRetirementApplication(applicationId);
       state.value.current = app;
-      state.value.applications = state.value.applications.filter((a) => a.id !== applicationId);
+      state.value.applications = state.value.applications.filter((a: RetirementApplication) => a.id !== applicationId);
       state.value.applications.push(app);
       await loadHistory(app.assetId);
       return app;

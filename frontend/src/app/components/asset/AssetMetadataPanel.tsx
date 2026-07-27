@@ -192,7 +192,7 @@ export const AssetMetadataPanel: React.FC<AssetMetadataPanelProps> = ({
     showTotal: (total: number, range: [number, number]) => 
       `第 ${range[0]} - ${range[1]} 条，共 ${total} 条`,
     onChange: (page: number, pageSize: number) => {
-      setFilterParams(prev => ({ ...prev, page, pageSize }));
+      setFilterParams((prev: AuditFilterParams) => ({ ...prev, page, pageSize }));
     }
   }), [filterParams, auditLogsData?.pagination?.total]);
 
@@ -202,7 +202,7 @@ export const AssetMetadataPanel: React.FC<AssetMetadataPanelProps> = ({
    * @param newFilters - 新的筛选参数
    */
   const handleFilterChange = useCallback((newFilters: AuditFilterParams) => {
-    setFilterParams(prev => ({ ...prev, ...newFilters, page: 1 }));
+    setFilterParams((prev: AuditFilterParams) => ({ ...prev, ...newFilters, page: 1 }));
   }, []);
 
   /**
@@ -219,7 +219,7 @@ export const AssetMetadataPanel: React.FC<AssetMetadataPanelProps> = ({
    */
   const handleAuditLogClick = useCallback((auditLog: AuditLog) => {
     // 对变更字段进行 @Auditable 高亮处理
-    const highlightedChanges = auditLog.changes?.map(change => {
+    const highlightedChanges = auditLog.changes?.map((change: any) => {
       const highlighted = getAuditableHighlight([change]);
       return highlighted[0] || change;
     });

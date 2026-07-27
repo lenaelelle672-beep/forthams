@@ -774,7 +774,7 @@ export const RetirementDetail: React.FC<RetirementDetailProps> = ({
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
-                  {application.attachments.map((attachment, index) => (
+                  {application.attachments.map((attachment: any, index: number) => (
                     <div
                       key={index}
                       className="flex items-center justify-between p-3 border rounded-lg"

@@ -83,7 +83,7 @@ export const OperationLogDashboard: React.FC<OperationLogDashboardProps> = ({
     // Group by date and aggregate counts
     const dateMap = new Map<string, AuditTrendData>();
     
-    logsData.items.forEach((log) => {
+    logsData.items.forEach((log: any) => {
       const dateKey = log.created_at?.split('T')[0] || 'unknown';
       const existing = dateMap.get(dateKey) || { date: dateKey, count: 0 };
       existing.count += 1;
@@ -99,7 +99,7 @@ export const OperationLogDashboard: React.FC<OperationLogDashboardProps> = ({
     if (!logsData?.items) return [];
     const typeMap = new Map<string, number>();
     
-    logsData.items.forEach((log) => {
+    logsData.items.forEach((log: any) => {
       const type = log.action_type || 'UNKNOWN';
       typeMap.set(type, (typeMap.get(type) || 0) + 1);
     });

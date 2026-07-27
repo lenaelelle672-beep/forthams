@@ -301,7 +301,7 @@ const GisMapPage: React.FC = () => {
       setLinkAssetSearch('');
     } catch {
       // 如果后端 API 尚未就绪，回退到本地模式
-      const selectedAsset = linkableAssets.find(a => a.id === linkAssetId);
+      const selectedAsset = linkableAssets.find((a: any) => a.id === linkAssetId);
       if (selectedAsset) {
         const localAsset: GisAsset = {
           id: selectedAsset.id,
@@ -572,7 +572,7 @@ const GisMapPage: React.FC = () => {
                         暂无可关联的资产
                       </div>
                     ) : (
-                      linkableAssets.map((a) => (
+                      linkableAssets.map((a: any) => (
                         <button
                           key={a.id}
                           type="button"

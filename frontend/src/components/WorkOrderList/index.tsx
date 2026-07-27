@@ -209,14 +209,14 @@ export const WorkOrderList: React.FC<WorkOrderListProps> = ({
    * 处理状态筛选变化
    */
   const handleStatusChange = (value: WorkOrderStatus | undefined) => {
-    setQueryParams(prev => ({ ...prev, status: value, page: 1 }));
+    setQueryParams((prev: WorkOrderQuery) => ({ ...prev, status: value, page: 1 }));
   };
 
   /**
    * 处理类型筛选变化
    */
   const handleTypeChange = (value: WorkOrderType | undefined) => {
-    setQueryParams(prev => ({ ...prev, type: value, page: 1 }));
+    setQueryParams((prev: WorkOrderQuery) => ({ ...prev, type: value, page: 1 }));
   };
 
   /**
@@ -224,7 +224,7 @@ export const WorkOrderList: React.FC<WorkOrderListProps> = ({
    */
   const handleSearch = (value: string) => {
     setSearchKeyword(value);
-    setQueryParams(prev => ({ ...prev, page: 1 }));
+    setQueryParams((prev: WorkOrderQuery) => ({ ...prev, page: 1 }));
   };
 
   /**

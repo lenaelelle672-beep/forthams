@@ -58,7 +58,7 @@ export default function MobileNotificationsPage() {
   }
 
   const notifications = data ?? [];
-  const unreadCount = notifications.filter((item) => item.isRead === 0 || item.isRead === false).length;
+  const unreadCount = notifications.filter((item: any) => item.isRead === 0 || item.isRead === false).length;
 
   return (
     <PageTransition>
@@ -105,7 +105,7 @@ export default function MobileNotificationsPage() {
           <EmptyState title="暂无未读通知" description="新的消息会显示在这里" />
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {notifications.map((item) => (
+            {notifications.map((item: any) => (
               <button
                 key={item.id}
                 type="button"

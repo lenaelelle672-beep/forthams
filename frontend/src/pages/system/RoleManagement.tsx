@@ -370,7 +370,7 @@ function MenuAssignDialog({
   /** 弹窗打开时默认展开所有一级节点，不重置已勾选内容 */
   React.useEffect(() => {
     if (open && menuTree) {
-      setExpandedIds(new Set(menuTree.map((m) => m.id)));
+      setExpandedIds(new Set(menuTree.map((m: MenuItem) => m.id)));
     }
   }, [open, menuTree]);
 
@@ -429,7 +429,7 @@ function MenuAssignDialog({
                 加载中...
               </div>
             ) : menuTree && menuTree.length > 0 ? (
-              menuTree.map((item) => (
+              menuTree.map((item: MenuItem) => (
                 <TreeNode
                   key={item.id}
                   item={item}

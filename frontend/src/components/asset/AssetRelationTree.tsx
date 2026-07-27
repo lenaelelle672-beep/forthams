@@ -6,7 +6,7 @@
 import React, { useState } from 'react';
 import { useAssetRelations, useRemoveRelation, useAddRelation, useRelationTree } from '@/hooks/asset/useAssetRelations';
 import { useAssets } from '@/hooks/useAssetById';
-import type { RelationVO, RelationTreeNode, AddRelationRequest } from '@/types/asset';
+import type { Asset, RelationVO, RelationTreeNode, AddRelationRequest } from '@/types/asset';
 import { AssetRelationType, ASSET_RELATION_TYPE_LABELS } from '@/types/asset';
 import { Button } from '@/components/ui/Button';
 import { CardHeader, CardTitle } from '@/components/ui/Card';
@@ -200,8 +200,8 @@ function AddRelationForm({ assetId, onClose }: { assetId: number; onClose: () =>
           >
             <option value="">请选择子资产</option>
             {(allAssets ?? [])
-              .filter((a) => a.id !== assetId)
-              .map((a) => (
+              .filter((a: Asset) => a.id !== assetId)
+              .map((a: Asset) => (
                 <option key={a.id} value={a.id}>
                   {a.assetNo} - {a.assetName}
                 </option>
@@ -346,7 +346,7 @@ export default function AssetRelationTree({ assetId, readOnly = false }: AssetRe
         <>
           {treeData && treeData.length > 0 ? (
             <div className="space-y-1">
-              {treeData.map((node) => (
+              {treeData.map((node: RelationTreeNode) => (
                 <TreeNode
                   key={node.relationId}
                   node={node}
@@ -371,7 +371,7 @@ export default function AssetRelationTree({ assetId, readOnly = false }: AssetRe
         <>
           {relations && relations.length > 0 ? (
             <div className="space-y-2">
-              {relations.map((item) => (
+              {relations.map((item: RelationVO) => (
                 <RelationItem
                   key={item.relationId}
                   item={item}

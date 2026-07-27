@@ -253,7 +253,7 @@ export default function SystemFormConfigWorkbenchPage({
     setError(null);
     try {
       const nextDefinitions = await formDefinitionsApi.listDefinitions();
-      const nextKey = nextDefinitions.find((definition) => definition.formKey === formKey)?.formKey ?? nextDefinitions[0]?.formKey ?? formKey;
+      const nextKey = nextDefinitions.find((definition: FormDefinitionDTO) => definition.formKey === formKey)?.formKey ?? nextDefinitions[0]?.formKey ?? formKey;
       setDefinitions(nextDefinitions);
       setSelectedFormKey(nextKey);
 

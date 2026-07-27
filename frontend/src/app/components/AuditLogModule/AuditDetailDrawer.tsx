@@ -241,7 +241,7 @@ export const AuditDetailDrawer: React.FC<AuditDetailDrawerProps> = ({
   /**
    * 处理折叠面板变化
    */
-  const handleCollapseChange: CollapseProps['onChange'] = useCallback((keys) => {
+  const handleCollapseChange: CollapseProps['onChange'] = useCallback((keys: React.Key[]) => {
     setActiveKeys(keys as string[]);
   }, []);
 
@@ -330,7 +330,7 @@ export const AuditDetailDrawer: React.FC<AuditDetailDrawerProps> = ({
           <div className={styles.changesSummary}>
             <Title level={5} className={styles.sectionTitle}>变更摘要</Title>
             <div className={styles.fieldChangesGrid}>
-              {auditLog.changes.map((change, index) => (
+              {auditLog.changes.map((change: any, index: number) => (
                 <FieldChangeItem key={`${change.field}-${index}`} change={change} />
               ))}
             </div>

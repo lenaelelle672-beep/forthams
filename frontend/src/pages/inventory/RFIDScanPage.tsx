@@ -616,7 +616,7 @@ export default function RFIDScanPage() {
                 </div>
               </div>
               <div className="divide-y divide-[#f1f5f9]">
-                {recentScans.map((scan) => (
+                {recentScans.map((scan: any) => (
                   <div
                     key={scan.id}
                     className={(`px-5 py-3.5 flex items-center justify-between transition-all cursor-pointer ${

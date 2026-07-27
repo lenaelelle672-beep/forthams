@@ -447,7 +447,7 @@ function UpcomingAlert() {
         </span>
       </div>
       <div className="px-5 py-3 space-y-2">
-        {upcoming.slice(0, 5).map(item => (
+        {upcoming.slice(0, 5).map((item: any) => (
           <div key={item.id} className="flex items-center gap-3 text-sm text-amber-800">
             <Calendar className="w-3.5 h-3.5 flex-shrink-0" />
             <span>资产 {item.assetId}</span>

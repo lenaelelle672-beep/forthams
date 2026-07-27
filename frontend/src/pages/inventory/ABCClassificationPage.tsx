@@ -82,7 +82,7 @@ const ABCClassificationPage: React.FC = () => {
     ];
 
     // 准备资产列表数据
-    const assetData = assets.map(asset => [
+    const assetData = assets.map((asset: any) => [
       asset.assetNo,
       asset.assetName,
       asset.abcClassification || '未分类',

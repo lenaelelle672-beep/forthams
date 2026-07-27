@@ -119,8 +119,8 @@ export default function TaskDetailPage() {
   const navigate = useNavigate();
 
   // --- Zustand 客户端状态 ---
-  const selectedAssetIds = useInventoryStore((s) => s.selectedAssetIds);
-  const clearSelected = useInventoryStore((s) => s.clearSelected);
+  const selectedAssetIds = useInventoryStore((s: any) => s.selectedAssetIds);
+  const clearSelected = useInventoryStore((s: any) => s.clearSelected);
 
   // --- 本地 UI 状态 ---
   const [batchDialogOpen, setBatchDialogOpen] = useState(false);

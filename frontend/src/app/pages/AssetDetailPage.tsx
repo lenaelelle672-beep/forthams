@@ -171,7 +171,7 @@ const AssetDetailPage: React.FC = () => {
           {/* 变更详情展示 */}
           {item.changes && item.changes.length > 0 && (
             <div className="audit-changes" data-testid="auditable-field-tracker">
-              {item.changes.map((change, idx) => (
+              {item.changes.map((change: any, idx: number) => (
                 <div
                   key={idx}
                   className={`audit-change-row ${change.isAuditable ? 'audit-highlight' : ''}`}

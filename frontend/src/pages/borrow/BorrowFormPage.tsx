@@ -76,7 +76,7 @@ export default function BorrowFormPage() {
               <select className="w-full px-3 py-2 text-sm border border-[#e5e7eb] rounded-lg bg-white"
                 value={assetId} onChange={(e) => setAssetId(e.target.value ? Number(e.target.value) : '')} disabled={isEdit}>
                 <option value="">请选择资产</option>
-                {assets.map((a) => (
+                {assets.map((a: any) => (
                   <option key={a.id} value={a.id}>{a.assetNo} - {a.assetName}</option>
                 ))}
               </select>

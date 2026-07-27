@@ -29,7 +29,7 @@ function futureDateStr(daysFromNow = 30): string {
 // Helper to find a field error by path
 function findFieldError(result: any, field: string) {
   if (result.success) return undefined;
-  return result.error.issues.find(i => i.path[0] === field);
+  return result.error.issues.find((i: any) => i.path[0] === field);
 }
 
 describe('IdleAssetsPage publish validation', () => {

@@ -213,7 +213,7 @@ export default function MobileAssetListPage() {
           <>
             <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 4 }}>共 {data?.total || 0} 条</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {records.map((asset) => {
+              {records.map((asset: any) => {
                 const s = getStatusStyle(asset.status);
                 return (
                   <button

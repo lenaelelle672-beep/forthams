@@ -76,7 +76,7 @@ export default function CustomFieldsPage() {
   /* filtered data */
   const filtered = useMemo(() => {
     const kw = keyword.trim().toLowerCase();
-    return fields.filter((f) => {
+    return fields.filter((f: CustomFieldItem) => {
       if (typeFilter !== 'ALL' && f.fieldType !== typeFilter) return false;
       if (kw && !f.fieldName.toLowerCase().includes(kw) && !f.fieldLabel.toLowerCase().includes(kw)) return false;
       return true;
@@ -86,7 +86,7 @@ export default function CustomFieldsPage() {
   /* stat counts */
   const statCounts = useMemo(() => {
     const map: Record<string, number> = {};
-    fields.forEach((f) => { map[f.fieldType] = (map[f.fieldType] ?? 0) + 1; });
+    fields.forEach((f: CustomFieldItem) => { map[f.fieldType] = (map[f.fieldType] ?? 0) + 1; });
     return map;
   }, [fields]);
 

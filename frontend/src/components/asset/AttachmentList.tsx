@@ -104,7 +104,7 @@ export default function AttachmentList({ assetId, readOnly }: AttachmentListProp
 
   return (
     <div className="space-y-2">
-      {nonImageAttachments.map((att) => (
+      {nonImageAttachments.map((att: any) => (
         <div
           key={att.id}
           className="flex items-center justify-between p-3 rounded-lg border border-[#e5e7eb] bg-white hover:border-[#dbe1ff] hover:shadow-sm transition-all group"

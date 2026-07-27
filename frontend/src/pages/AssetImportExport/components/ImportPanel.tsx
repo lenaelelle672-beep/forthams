@@ -252,7 +252,7 @@ const ImportPanel: React.FC = () => {
       setClearedErrors(new Set());
 
       try {
-        const response = await parseFile(file, (progressEvent) => {
+        const response = await parseFile(file, (progressEvent: any) => {
           if (progressEvent.total) {
             const percent = Math.round(
               (progressEvent.loaded / progressEvent.total) * 100,

@@ -701,7 +701,7 @@ export default function InventoryDetailPage() {
               </div>
               {summary?.surplusItems && summary.surplusItems.length > 0 ? (
                 <ul className="mt-1 space-y-1">
-                  {summary.surplusItems.slice(0, 3).map((item) => (
+                  {summary.surplusItems.slice(0, 3).map((item: any) => (
                     <li key={item.assetCode} className="text-[11px] text-amber-600 flex items-center gap-1.5">
                       <span className="w-1 h-1 rounded-full bg-amber-400" />
                       {item.assetName}
@@ -729,7 +729,7 @@ export default function InventoryDetailPage() {
               </div>
               {summary?.deficitItems && summary.deficitItems.length > 0 ? (
                 <ul className="mt-1 space-y-1">
-                  {summary.deficitItems.slice(0, 3).map((item) => (
+                  {summary.deficitItems.slice(0, 3).map((item: any) => (
                     <li key={item.assetCode} className="text-[11px] text-red-600 flex items-center gap-1.5">
                       <span className="w-1 h-1 rounded-full bg-red-400" />
                       {item.assetName}

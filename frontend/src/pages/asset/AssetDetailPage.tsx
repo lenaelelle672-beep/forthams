@@ -579,7 +579,7 @@ export default function AssetDetailPage() {
                           <div className="space-y-2 mt-4 pt-4 border-t border-[#e5e7eb] dark:border-gray-700">
                             <span className="text-xs font-bold text-[#64748b] dark:text-gray-400 uppercase tracking-wide">字段变更</span>
                             <div className="grid grid-cols-1 gap-2">
-                              {log.changes.map((change, idx) => (
+                              {log.changes.map((change: any, idx: number) => (
                                 <div key={idx} className="bg-white dark:bg-gray-800 rounded-lg px-3 py-2 border border-[#e5e7eb] dark:border-gray-700 flex items-center gap-3 text-xs">
                                   <span className="font-bold text-[#334155] dark:text-gray-300 min-w-fit">{change.fieldLabel || change.field}:</span>
                                   <span className="text-red-600 dark:text-red-400 font-medium bg-red-50 px-2 py-0.5 rounded border border-red-100">{change.oldValue || '空'}</span>

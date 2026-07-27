@@ -22,8 +22,8 @@ import { Input } from '@/components/ui/Input';
 import { DataTable, type Column } from '@/components/ui/DataTable';
 import { Dialog, DialogContent, DialogClose } from '@/components/ui/Dialog';
 import { getDeptTree } from '@/api/base';
-import { getAllRoles } from '@/api/role';
-import { assignUserPosts, getAllPosts } from '@/api/post';
+import { getAllRoles, type RoleItem } from '@/api/role';
+import { assignUserPosts, getAllPosts, type PostItem } from '@/api/post';
 import type { Department } from '@/types/common';
 import {
   createUser,
@@ -266,7 +266,7 @@ export default function UserManagement() {
   }
 
   /* ── Status counts for quick-filter pills ── */
-  const activeOnPage = users.filter((u) => u.status === 1).length;
+  const activeOnPage = users.filter((u: UserItem) => u.status === 1).length;
   const disabledOnPage = users.length - activeOnPage;
 
   /* ── Stat bar definitions ── */
@@ -608,7 +608,7 @@ export default function UserManagement() {
               <div className="rounded-xl border border-slate-200 p-4">
                 <p className="mb-3 text-sm font-semibold text-slate-700">{t('user:assign.roleLabel')}</p>
                 <div className="max-h-48 space-y-2 overflow-y-auto">
-                  {roles.map((role) => (
+                  {roles.map((role: RoleItem) => (
                     <label key={role.id} className="flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 hover:bg-slate-50">
                       <input type="checkbox" checked={form.roleIds.has(role.id)} onChange={() => setForm((p) => ({ ...p, roleIds: toggleSetValue(p.roleIds, role.id) }))} />
                       <span className="text-sm text-slate-900">{role.roleName}</span>
@@ -621,7 +621,7 @@ export default function UserManagement() {
               <div className="rounded-xl border border-slate-200 p-4">
                 <p className="mb-3 text-sm font-semibold text-slate-700">{t('user:assign.postLabel')}</p>
                 <div className="max-h-48 space-y-2 overflow-y-auto">
-                  {posts.map((post) => (
+                  {posts.map((post: PostItem) => (
                     <label key={post.id} className="flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 hover:bg-slate-50">
                       <input type="checkbox" checked={form.postIds.has(post.id)} onChange={() => setForm((p) => ({ ...p, postIds: toggleSetValue(p.postIds, post.id) }))} />
                       <span className="text-sm text-slate-900">{post.postName}</span>

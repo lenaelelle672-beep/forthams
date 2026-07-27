@@ -166,7 +166,7 @@ describe('approvalService', () => {
         params: { role: 'DEPARTMENT_MANAGER' },
       });
       expect(result.items).toHaveLength(2);
-      expect(result.items.every((i) => i.status === 'APPROVING_LEVEL_1')).toBe(true);
+      expect(result.items.every((i: PendingApprovalItem) => i.status === 'APPROVING_LEVEL_1')).toBe(true);
       expect(result.total).toBe(2);
     });
 
@@ -898,7 +898,7 @@ describe('approvalService', () => {
 
       const result = await approvalService.getPendingApprovals('ASSET_MANAGER');
 
-      const hasLevel1 = result.items.some((i) => i.status === 'APPROVING_LEVEL_1');
+      const hasLevel1 = result.items.some((i: PendingApprovalItem) => i.status === 'APPROVING_LEVEL_1');
       expect(hasLevel1).toBe(false);
     });
 
@@ -912,7 +912,7 @@ describe('approvalService', () => {
 
       const result = await approvalService.getPendingApprovals('DEPARTMENT_MANAGER');
 
-      const hasLevel2 = result.items.some((i) => i.status === 'APPROVING_LEVEL_2');
+      const hasLevel2 = result.items.some((i: PendingApprovalItem) => i.status === 'APPROVING_LEVEL_2');
       expect(hasLevel2).toBe(false);
     });
   });

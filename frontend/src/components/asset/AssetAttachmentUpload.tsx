@@ -234,7 +234,7 @@ export default function AssetAttachmentUpload({ assetId, readOnly = false }: Ass
       {/* ── 附件列表 ── */}
       {attachments && attachments.length > 0 ? (
         <div className="space-y-2">
-          {attachments.map((att) => (
+          {attachments.map((att: any) => (
             <div
               key={att.id}
               className="flex items-center gap-3 p-3 rounded-lg border border-[#e5e7eb] bg-white hover:border-[#dbe1ff] hover:shadow-sm transition-all group"

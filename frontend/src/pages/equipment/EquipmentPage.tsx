@@ -258,7 +258,7 @@ export default function EquipmentPage() {
   });
 
   // ── 维保记录表格数据（从 API 获取） ──────────────────────────────────────────
-  const maintenanceRecords = rawRecords.slice(0, 20).map((r) => ({
+  const maintenanceRecords = rawRecords.slice(0, 20).map((r: any) => ({
     id: r.id,
     assetId: String(r.assetId),
     equipment: String((r as unknown as Record<string, unknown>).equipmentName ?? (r as unknown as Record<string, unknown>).assetName ?? r.assetId),

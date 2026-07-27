@@ -342,7 +342,7 @@ export function useAuditableFields(
         return [];
       }
 
-      return nodes.map(node => ({
+      return nodes.map((node: any) => ({
         nodeId: node.id,
         fieldName,
         confidence: node.confidence || 0.5,
@@ -399,7 +399,7 @@ export function useAuditableFields(
     const unsubscribe = auditService.subscribeToFieldUpdates(
       config.assetId,
       fieldId,
-      (event) => {
+      (event: any) => {
         callback(event);
       }
     );
@@ -678,7 +678,7 @@ export function useAuditableFields(
   function exportAuditTrail(): AuditEvent[] {
     const allEvents: AuditEvent[] = [];
     
-    fieldBindings.value.forEach(binding => {
+    fieldBindings.value.forEach((binding: any) => {
       allEvents.push(...binding.events);
     });
 

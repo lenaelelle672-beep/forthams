@@ -207,7 +207,7 @@ export const AuditDashboard: React.FC = () => {
 
     auditApi
       .fetchMeta()
-      .then((meta) => {
+      .then((meta: any) => {
         if (meta?.actionTypes) {
           setActionTypes(meta.actionTypes);
         }
@@ -341,7 +341,7 @@ export const AuditDashboard: React.FC = () => {
    */
   const handleFilterChange = useCallback(
     (newFilter: Partial<AuditLogFilter>) => {
-      setFilter((prev) => ({ ...prev, ...newFilter }));
+      setFilter((prev: AuditLogFilter) => ({ ...prev, ...newFilter }));
       setValidationError('');
     },
     []

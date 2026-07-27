@@ -659,7 +659,7 @@ export default function AssetTransferFormPage() {
                 <div className="space-y-2">
                   <p className="text-sm font-medium text-emerald-700">已解析处理人</p>
                   <div className="space-y-2">
-                    {assigneePreview.nodes.map((node) => {
+                    {assigneePreview.nodes.map((node: any) => {
                       const assigneeCount = node.assigneeCount ?? (Array.isArray(node.assignees) ? node.assignees.length : 0);
                       return (
                         <div

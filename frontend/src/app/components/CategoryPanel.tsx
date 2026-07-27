@@ -105,7 +105,7 @@ function TreeNode({
 
       {/* 递归子节点 */}
       {hasChildren && isExpanded &&
-        node.children!.map((child) => (
+        node.children!.map((child: CategoryTreeNode) => (
           <TreeNode
             key={child.code}
             node={child}

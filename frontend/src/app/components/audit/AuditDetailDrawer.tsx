@@ -233,7 +233,7 @@ export const AuditDetailDrawer: React.FC<AuditDetailDrawerProps> = ({
    */
   const auditableChangesCount = useMemo(() => {
     if (!auditLog?.changes) return 0;
-    return auditLog.changes.filter(c => c.auditable).length;
+    return auditLog.changes.filter((c: any) => c.auditable).length;
   }, [auditLog?.changes]);
 
   /**
@@ -329,7 +329,7 @@ export const AuditDetailDrawer: React.FC<AuditDetailDrawerProps> = ({
             >
               {auditLog.changes && auditLog.changes.length > 0 ? (
                 <Timeline mode="left" style={{ marginTop: 16 }}>
-                  {auditLog.changes.map((change, index) => (
+                  {auditLog.changes.map((change: any, index: number) => (
                     <FieldChangeRow
                       key={`change-${index}`}
                       change={change}

@@ -70,7 +70,7 @@ export default function StocktakingTaskPage() {
       await scanner.start(
         { facingMode: 'environment' },
         { fps: 10, qrbox: { width: 250, height: 250 } },
-        (decodedText) => {
+        (decodedText: string) => {
           handleScanResult(decodedText);
         },
         (_errorMessage: unknown) => {

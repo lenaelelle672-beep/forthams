@@ -155,11 +155,11 @@ const AssetTable: React.FC<AssetTableProps> = ({
   // Zustand store — 批量选中集合
   // =========================================================================
 
-  const selectedAssetKeys = useInventoryStore((s) => s.selectedAssetKeys);
+  const selectedAssetKeys = useInventoryStore((s: any) => s.selectedAssetKeys);
   const setSelectedAssetKeys = useInventoryStore(
-    (s) => s.setSelectedAssetKeys,
+    (s: any) => s.setSelectedAssetKeys,
   );
-  const clearSelection = useInventoryStore((s) => s.clearSelection);
+  const clearSelection = useInventoryStore((s: any) => s.clearSelection);
 
   // =========================================================================
   // React Query — 数据获取与变更

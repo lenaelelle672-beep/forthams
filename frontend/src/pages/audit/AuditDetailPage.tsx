@@ -83,7 +83,7 @@ export default function AuditDetailPage() {
     const entries: TimelineEntry[] = [];
 
     // Build an entry for each field change
-    changes.forEach((change, index) => {
+    changes.forEach((change: any, index: number) => {
       const fieldDisplay = change.fieldLabel || change.field;
       const isLast = index === changes.length - 1;
       entries.push({
@@ -116,7 +116,7 @@ export default function AuditDetailPage() {
     tenantId: log.tenantId ?? '—',
   };
 
-  const relatedChanges = (log.changes || []).map((c) => ({
+  const relatedChanges = (log.changes || []).map((c: any) => ({
     assetCode: log.resourceId || '—',
     assetName: log.description?.split('(')[0] || '—',
     field: c.fieldLabel || c.field,
@@ -287,7 +287,7 @@ export default function AuditDetailPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#e5e7eb]">
-                  {relatedChanges.map((row, i) => (
+                  {relatedChanges.map((row: any, i: number) => (
                     <tr
                       key={i}
                       className="hover:bg-[#f1f3ff] transition-colors"

@@ -269,7 +269,7 @@ export function useLogData(params: LogDataQueryParams = {}): UseLogDataReturn {
       });
 
       // 处理折旧记录，添加预警状态
-      const processedRecords: DepreciationResult[] = response.records.map((record) => 
+      const processedRecords: DepreciationResult[] = response.records.map((record: any) =>
         processDepreciationRecord(record, record.acquisitionDate)
       );
 

@@ -362,7 +362,7 @@ export const AuditLogList: React.FC<AuditLogListProps> = ({
       pageSizeOptions: ['10', '20', '50'],
       onChange: (_page: number, _size: number) => {
         // 实际分页逻辑通过 React Query 重新获取数据
-        setFilterValues((prev) => ({ ...prev }));
+        setFilterValues((prev: any) => ({ ...prev }));
       },
     };
   }, [auditLogsResponse, pageSize]);

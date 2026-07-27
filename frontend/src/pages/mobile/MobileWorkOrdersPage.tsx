@@ -115,7 +115,7 @@ export default function MobileWorkOrdersPage() {
           <EmptyState title="暂无待办工单" description="当前没有需要处理的工单" />
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {records.map((wo) => {
+            {records.map((wo: any) => {
               const status = getStatusStyle(wo.status);
               const priority = getPriorityStyle(wo.priority);
               return (

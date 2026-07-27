@@ -280,7 +280,7 @@ export function Approval() {
                     <div className="mt-4 pt-4 border-t border-gray-200">
                       <h5 className="text-sm font-medium text-gray-900 mb-2">审批历史</h5>
                       <div className="space-y-2">
-                        {approval.approvalHistory.map((history, index) => (
+                        {approval.approvalHistory.map((history: any, index: number) => (
                           <div key={index} className="flex items-start gap-3 text-sm">
                             {history.result === '已通过' ? (
                               <CheckCircle className="w-4 h-4 text-green-600 mt-0.5" />

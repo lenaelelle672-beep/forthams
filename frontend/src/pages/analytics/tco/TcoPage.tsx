@@ -169,7 +169,7 @@ export default function TcoPage() {
             <h3 className="text-base font-bold mb-4">部门 TCO 排行</h3>
             {deptTco && deptTco.length > 0 ? (
               <ResponsiveContainer width="100%" height={250}>
-                <BarChart data={deptTco.map(d => ({ name: d.assetName, cost: d.totalCost }))}>
+                <BarChart data={deptTco.map((d: any) => ({ name: d.assetName, cost: d.totalCost }))}>
                   <XAxis dataKey="name" tick={{ fontSize: 10 }} />
                   <YAxis tick={{ fontSize: 11 }} />
                   <Tooltip formatter={(v: number) => formatAmount(v)} />
@@ -190,7 +190,7 @@ export default function TcoPage() {
             <h3 className="text-base font-bold mb-4">分类 TCO 排行</h3>
             {catTco && catTco.length > 0 ? (
               <ResponsiveContainer width="100%" height={250}>
-                <BarChart data={catTco.map(d => ({ name: d.assetName, cost: d.totalCost }))}>
+                <BarChart data={catTco.map((d: any) => ({ name: d.assetName, cost: d.totalCost }))}>
                   <XAxis dataKey="name" tick={{ fontSize: 10 }} />
                   <YAxis tick={{ fontSize: 11 }} />
                   <Tooltip formatter={(v: number) => formatAmount(v)} />

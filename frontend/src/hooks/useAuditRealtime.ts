@@ -441,7 +441,7 @@ export function useAuditRealtime(config: RealtimeConfig = {}): UseAuditRealtimeR
    * @param log - 审计日志条目
    */
   function addPendingChange(log: AuditLogEntry): void {
-    if (!pendingChanges.value.find(l => l.id === log.id)) {
+    if (!pendingChanges.value.find((l: AuditLogEntry) => l.id === log.id)) {
       pendingChanges.value = [...pendingChanges.value, log];
     }
   }

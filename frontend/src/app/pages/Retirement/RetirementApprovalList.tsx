@@ -647,7 +647,7 @@ export const RetirementApprovalList: React.FC = () => {
             <>
               <Divider orientation="left">审批历史</Divider>
               <div className={styles.approvalHistory}>
-                {currentApplication.approvalHistory.map((record, index) => (
+                {currentApplication.approvalHistory.map((record: any, index: number) => (
                   <div key={record.id || index} className={styles.historyItem}>
                     <Badge status={record.action === 'APPROVE' ? 'success' : 'error'} />
                     <Text>

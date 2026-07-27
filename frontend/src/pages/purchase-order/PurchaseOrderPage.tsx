@@ -359,7 +359,7 @@ function OrderDetailSheet({ open, orderId, onClose }: OrderDetailSheetProps) {
                     <tbody>
                       {items.length === 0 ? (
                         <tr><td colSpan={5} className="px-3 py-6 text-center text-slate-400 text-sm">暂无明细</td></tr>
-                      ) : items.map((item, i) => (
+                      ) : items.map((item: any, i: number) => (
                         <tr key={i} className="border-b border-slate-100 last:border-b-0">
                           <td className="px-3 py-2 text-[#374151]">{item.assetName}</td>
                           <td className="px-3 py-2 text-[#64748b]">{item.specification || '\u2014'}</td>

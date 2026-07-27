@@ -202,7 +202,7 @@ export default function CategoryManagerPage() {
     if (!allCategories) return 0;
     let level = 0;
     let current = category.parentId;
-    const catMap = new Map(allCategories.map((c) => [c.id, c]));
+    const catMap = new Map(allCategories.map((c: AssetCategoryEntity) => [c.id, c]));
     while (current) {
       level++;
       const parent = catMap.get(current);
@@ -353,7 +353,7 @@ export default function CategoryManagerPage() {
                 </td>
               </tr>
             ) : (
-              records.map((category) => {
+              records.map((category: AssetCategoryEntity) => {
                 const indent = getIndentLevel(category);
                 return (
                   <tr key={category.id} className="hover:bg-gray-50 transition-colors">

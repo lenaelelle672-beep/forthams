@@ -50,7 +50,7 @@ export default function AssetGallery({ assetId }: AssetGalleryProps) {
   return (
     <>
       <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-3">
-        {images.map((img, index) => (
+        {images.map((img: any, index: number) => (
           <button
             key={img.id}
             type="button"

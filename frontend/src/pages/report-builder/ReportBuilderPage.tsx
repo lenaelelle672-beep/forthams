@@ -76,7 +76,7 @@ async function loadPreviewRows(reportType: string, selectedFields: ReportField[]
     case 'ASSET':
       return loadAssetPreviewRows(selectedFields);
     case 'FINANCIAL':
-      return (await getDepreciationStats()).slice(0, 8).map((item) => projectPreviewRow({
+      return (await getDepreciationStats()).slice(0, 8).map((item: any) => projectPreviewRow({
         name: item.month,
         depreciationAmount: item.value,
         maintenanceCost: 0,
@@ -84,7 +84,7 @@ async function loadPreviewRows(reportType: string, selectedFields: ReportField[]
         totalCost: item.value,
       }, selectedFields));
     case 'MAINTENANCE':
-      return (await getMaintenanceStats()).slice(0, 8).map((item) => projectPreviewRow({
+      return (await getMaintenanceStats()).slice(0, 8).map((item: any) => projectPreviewRow({
         name: item.month,
         workOrderCount: 0,
         maintenanceCount: item.value,
@@ -93,7 +93,7 @@ async function loadPreviewRows(reportType: string, selectedFields: ReportField[]
         mttr: null,
       }, selectedFields));
     case 'INVENTORY':
-      return (await getReportByCategory()).slice(0, 8).map((item) => projectPreviewRow({
+      return (await getReportByCategory()).slice(0, 8).map((item: any) => projectPreviewRow({
         name: item.categoryName,
         categoryName: item.categoryName,
         assetCount: item.assetCount,
@@ -106,7 +106,7 @@ async function loadPreviewRows(reportType: string, selectedFields: ReportField[]
 
 async function loadAssetPreviewRows(selectedFields: ReportField[]): Promise<PreviewRow[]> {
   const page = await getAssetList({ page: 1, pageSize: 8 });
-  return (page.records ?? []).map((asset) => projectPreviewRow(assetPreviewRow(asset), selectedFields));
+  return (page.records ?? []).map((asset: AssetListItem) => projectPreviewRow(assetPreviewRow(asset), selectedFields));
 }
 
 function assetPreviewRow(asset: AssetListItem): PreviewRow {

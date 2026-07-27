@@ -386,7 +386,7 @@ const RetirementApplicationPage: React.FC = () => {
                   allowClear
                   disabled={!!applicationId}
                   onChange={(value) => setSelectedAsset(value)}
-                  options={assets.map(asset => ({
+                  options={assets.map((asset: any) => ({
                     value: asset.id,
                     label: `${asset.assetCode} - ${asset.name}`,
                     status: asset.status

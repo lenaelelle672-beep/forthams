@@ -88,8 +88,8 @@ export default function UserProfilePage() {
   const displayName = profile.realName || profile.username || t('profile.systemAdmin');
   const initial = displayName[0].toUpperCase();
   const roleNames =
-    profile.roles?.map((r) => getRoleLabel(r.roleCode)) ??
-    user?.roles?.map((r) => getRoleLabel(r)) ??
+    profile.roles?.map((r: any) => getRoleLabel(r.roleCode)) ??
+    user?.roles?.map((r: string) => getRoleLabel(r)) ??
     [];
   const statusCfg = getStatusLabel(profile.status ?? 0);
 
@@ -107,7 +107,7 @@ export default function UserProfilePage() {
                 <div className="min-w-0">
                   <h1 className="text-2xl font-bold text-white">{displayName}</h1>
                   <div className="mt-2 flex flex-wrap items-center gap-2">
-                    {roleNames.map((r) => (
+                    {roleNames.map((r: string) => (
                       <span
                         key={r}
                         className="inline-flex items-center gap-1 rounded-full bg-white/20 px-2.5 py-0.5 text-xs font-semibold text-white backdrop-blur-sm"
@@ -199,7 +199,7 @@ export default function UserProfilePage() {
             <CardContent>
               <div className="flex flex-wrap gap-2">
                 {(profile.roles ?? []).length > 0
-                  ? profile.roles!.map((r) => (
+                  ? profile.roles!.map((r: any) => (
                       <span
                         key={r.roleCode}
                         className="inline-flex items-center gap-1.5 rounded-lg border border-violet-200 bg-violet-50 px-3 py-1.5 text-sm font-semibold text-violet-700"

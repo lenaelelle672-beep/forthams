@@ -184,7 +184,7 @@ export const ApprovalPanel: React.FC<ApprovalPanelProps> = React.memo(({
   /** 根据ticketId加载工单详情 */
   useEffect(() => {
     if (ticketId) {
-      const ticket = pendingTickets.find(t => t.id === ticketId);
+      const ticket = pendingTickets.find((t: any) => t.id === ticketId);
       setSelectedTicket(ticket || null);
       if (ticket) {
         loadStatusHistory(ticketId);
@@ -388,7 +388,7 @@ export const ApprovalPanel: React.FC<ApprovalPanelProps> = React.memo(({
                 暂无待审批工单
               </div>
             ) : (
-              pendingTickets.map(ticket => (
+              pendingTickets.map((ticket: any) => (
                 <div
                   key={ticket.id}
                   className={`ticket-item ${selectedTicket?.id === ticket.id ? 'selected' : ''}`}
