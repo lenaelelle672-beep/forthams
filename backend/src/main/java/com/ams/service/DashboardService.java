@@ -16,6 +16,8 @@ import com.ams.mapper.MaintenanceRecordMapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -24,6 +26,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class DashboardService {
 
@@ -67,30 +70,38 @@ public class DashboardService {
         return stats;
     }
 
+    /**
+     * 返回最近 {@code days} 天的资产价值趋势。
+     * <p>
+     * <b>注意：当前为「快照视图」而非历史视图。</b> 数据库目前没有 value-history 价值历史表，
+     * 因此这里复用的是当前资产快照的原值/现值，所有日期会呈现同一总值（即价值不变的水平线）。
+     * 真正的历史趋势需要新增 value-history 表并按日聚合，待该表落地后再切换实现。
+     * <p>
+     * 性能：原值/现值在循环外只计算一次（O(assets)），随后按天填充，避免 O(days * assets) 的重复扫描。
+     */
     public List<AssetValueTrendDTO> getValueTrends(Integer days) {
         List<AssetValueTrendDTO> trends = new ArrayList<>();
         LocalDate today = LocalDate.now();
         List<Asset> allAssets = getCurrentTenantAssets();
-        
+
+        // 总值/净值按当前快照计算一次，所有日期共用同一份结果（见方法注释）。
+        BigDecimal totalValue = allAssets.stream()
+                .map(Asset::getOriginalValue)
+                .filter(Objects::nonNull)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal currentValueSum = allAssets.stream()
+                .map(Asset::getCurrentValue)
+                .filter(Objects::nonNull)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
         for (int i = days - 1; i >= 0; i--) {
             AssetValueTrendDTO trend = new AssetValueTrendDTO();
-            LocalDate date = today.minusDays(i);
-            trend.setDate(date);
-            
-            BigDecimal totalValue = allAssets.stream()
-                    .map(Asset::getOriginalValue)
-                    .filter(Objects::nonNull)
-                    .reduce(BigDecimal.ZERO, BigDecimal::add);
-            BigDecimal currentValueSum = allAssets.stream()
-                    .map(Asset::getCurrentValue)
-                    .filter(Objects::nonNull)
-                    .reduce(BigDecimal.ZERO, BigDecimal::add);
-            
+            trend.setDate(today.minusDays(i));
             trend.setTotalValue(totalValue);
             trend.setNetValue(currentValueSum);
             trends.add(trend);
         }
-        
+
         return trends;
     }
 
@@ -105,7 +116,12 @@ public class DashboardService {
             return Collections.emptyList();
         }
 
-        Map<Long, String> deptNameMap = deptMapper.selectBatchIds(deptCountMap.keySet()).stream()
+        // 注意：sys_dept 表为全局共享部门字典，无 tenant_id 列（见 schema.sql / Dept 实体），
+        // 因此这里不能按 tenant_id 过滤。租户隔离已由上游 getCurrentTenantAssets() 保证 ——
+        // 此处只解析当前租户资产所引用到的部门 ID 的名称。改用 QueryWrapper.in 而非
+        // selectBatchIds，使过滤条件显式且便于后续如新增 tenant_id 列时直接追加 .eq。
+        Map<Long, String> deptNameMap = deptMapper.selectList(
+                        new QueryWrapper<Dept>().in("id", deptCountMap.keySet())).stream()
                 .collect(Collectors.toMap(Dept::getId, Dept::getName));
 
         return deptCountMap.entrySet().stream()
@@ -160,10 +176,14 @@ public class DashboardService {
         stats.put("totalMaintenanceCount", totalMaintenanceCount);
         stats.put("avgMaintenanceCost", avgMaintenanceCost);
         stats.put("monthlyMaintenanceCount", monthlyMaintenanceCount);
-        } catch (Exception e) {
-            stats.put("totalMaintenanceCount", 0);
-            stats.put("avgMaintenanceCost", 0);
-            stats.put("monthlyMaintenanceCount", 0);
+        } catch (DataAccessException | NumberFormatException e) {
+            // 仅捕获可预期的 DB 访问异常与 AVG 结果数值转换异常，避免吞掉 NPE/编程错误等。
+            // 失败时记录告警，便于定位；返回值类型与成功路径保持一致（Long / BigDecimal），
+            // 而非原先的 Integer 0，避免下游因类型不一致出现 ClassCastException。
+            log.warn("Maintenance stats query failed", e);
+            stats.put("totalMaintenanceCount", 0L);
+            stats.put("avgMaintenanceCost", BigDecimal.ZERO);
+            stats.put("monthlyMaintenanceCount", 0L);
         }
         return stats;
     }

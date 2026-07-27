@@ -71,6 +71,13 @@ spring.flyway.baseline-on-migrate: true
 spring.flyway.baseline-version: 0
 spring.flyway.table: flyway_schema_history
 
+# ========== 应用自定义配置 ==========
+app:
+  # CORS 允许的来源（逗号分隔）。dev 默认 localhost，staging/prod 可通过环境变量
+  # APP_CORS_ALLOWED_ORIGINS 或此处的占位符覆盖。
+  cors:
+    allowed-origins: ${APP_CORS_ALLOWED_ORIGINS:http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000}
+
 # ========== JWT ==========
 jwt:
   secret: ${JWT_SECRET:ams-secret-key-for-jwt-token-generation-must-be-at-least-256-bits-long}
