@@ -4,9 +4,9 @@ import {
   getTenantMeta,
   type TenantRecord,
   type TenantMeta,
-  type TenantQuery,
 } from '../../api/tenant';
 import { CatalogPagination } from '../../components/ui/CatalogPagination';
+import { useCatalogPage } from '../../hooks/useCatalogPage';
 
 type SystemTenantManagementWorkbenchPageProps = {
   embeddedInWorkbench?: boolean;
@@ -54,78 +54,45 @@ export default function SystemTenantManagementWorkbenchPage({
   embeddedInWorkbench = false,
   canView = true,
 }: SystemTenantManagementWorkbenchPageProps) {
-  const [tenants, setTenants] = useState<TenantRecord[]>([]);
   const [meta, setMeta] = useState<TenantMeta>(emptyMeta);
-  const [total, setTotal] = useState(0);
   const [keywordInput, setKeywordInput] = useState('');
   const [activeKeyword, setActiveKeyword] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
-  const [page, setPage] = useState(1);
-  const [pageSize] = useState(20);
-  const [loading, setLoading] = useState(canView);
-  const [error, setError] = useState<string | null>(null);
 
-  const loadTenants = async (query: TenantQuery = {}, nextPage: number = page) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const [data, nextMeta] = await Promise.all([
-        listTenants({ page: nextPage, pageSize, ...query }),
-        getTenantMeta(),
-      ]);
-      setTenants(data?.records ?? []);
-      setTotal(data?.total ?? 0);
-      setMeta(nextMeta ?? emptyMeta());
-      setPage(nextPage);
-    } catch {
-      setTenants([]);
-      setTotal(0);
-      setMeta(emptyMeta());
-      setError('租户管理只读 catalog 加载失败，敏感细节已脱敏');
-    } finally {
-      setLoading(false);
-    }
-  };
+  // List state, pagination, and the stale-response guard are delegated to the
+  // generic catalog hook. The keyword query flows through `search`; the status
+  // filter remains client-side. Meta is fetched alongside, outside the hook.
+  const {
+    records: tenants,
+    total,
+    loading,
+    error,
+    page,
+    totalPages,
+    setPage,
+    reload,
+    search,
+  } = useCatalogPage<TenantRecord>({
+    listFn: (q) => listTenants({ page: q.page, pageSize: q.pageSize, ...q }),
+    canView,
+  });
 
+  // Meta is owned by the page, not the catalog hook. Fetch it once on mount
+  // (guarded by `canView`) and never let a meta failure mask the list error.
   useEffect(() => {
-    if (!canView) {
-      setLoading(false);
-      return;
-    }
+    if (!canView) return;
     let ignored = false;
-    setLoading(true);
-    setError(null);
-
-    Promise.all([
-      listTenants({ page, pageSize }),
-      getTenantMeta(),
-    ])
-      .then(([data, nextMeta]) => {
-        if (ignored) {
-          return;
-        }
-        setTenants(data?.records ?? []);
-        setTotal(data?.total ?? 0);
-        setMeta(nextMeta ?? emptyMeta());
+    getTenantMeta()
+      .then((nextMeta) => {
+        if (!ignored) setMeta(nextMeta ?? emptyMeta());
       })
       .catch(() => {
-        if (!ignored) {
-          setTenants([]);
-          setTotal(0);
-          setMeta(emptyMeta());
-          setError('租户管理只读 catalog 加载失败，敏感细节已脱敏');
-        }
-      })
-      .finally(() => {
-        if (!ignored) {
-          setLoading(false);
-        }
+        if (!ignored) setMeta(emptyMeta());
       });
-
     return () => {
       ignored = true;
     };
-  }, [canView, page, pageSize]);
+  }, [canView]);
 
   const visibleTenants = useMemo(
     () => tenants.filter((t) => matchesStatus(t.status, statusFilter) && matchesKeyword(t, activeKeyword)),
@@ -134,27 +101,11 @@ export default function SystemTenantManagementWorkbenchPage({
 
   const activeCount = useMemo(() => tenants.filter((t) => t.status !== 'SUSPENDED').length, [tenants]);
 
-  const totalPages = Math.max(1, Math.ceil(total / pageSize));
-
   const handleSearch = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const nextKeyword = keywordInput.trim();
     setActiveKeyword(nextKeyword);
-    void loadTenants(nextKeyword ? { keyword: nextKeyword } : {}, 1);
-  };
-
-  const handleReload = () => {
-    void loadTenants(activeKeyword ? { keyword: activeKeyword } : {}, 1);
-  };
-
-  const handlePrevPage = () => {
-    if (page <= 1 || loading) return;
-    void loadTenants(activeKeyword ? { keyword: activeKeyword } : {}, page - 1);
-  };
-
-  const handleNextPage = () => {
-    if (page >= totalPages || loading) return;
-    void loadTenants(activeKeyword ? { keyword: activeKeyword } : {}, page + 1);
+    search(nextKeyword ? { keyword: nextKeyword } : {});
   };
 
   if (!canView) {
@@ -180,7 +131,7 @@ export default function SystemTenantManagementWorkbenchPage({
           className="rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-700 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
           disabled={loading}
           type="button"
-          onClick={handleReload}
+          onClick={reload}
         >
           重新加载
         </button>
@@ -281,8 +232,8 @@ export default function SystemTenantManagementWorkbenchPage({
           page={page}
           totalPages={totalPages}
           loading={loading}
-          onPrev={handlePrevPage}
-          onNext={handleNextPage}
+          onPrev={() => setPage(page - 1)}
+          onNext={() => setPage(page + 1)}
         />
       </div>
 
