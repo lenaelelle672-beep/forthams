@@ -122,6 +122,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
 
     if (typeof window !== "undefined") {
+      clearAuthStorage();
+    }
+
+    if (typeof window !== "undefined") {
       window.sessionStorage.setItem(TOKEN_STORAGE_KEY, response.token);
       window.sessionStorage.setItem(USER_STORAGE_KEY, JSON.stringify(nextUser));
     }
