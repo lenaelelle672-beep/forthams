@@ -16,3 +16,37 @@ declare module 'react-router-dom' {
 declare module '../../locales/zh-CN/inventory' {
   export function t(key: string, params?: Record<string, unknown>): string;
 }
+
+// Fix: react-three-fiber JSX intrinsic elements (mesh, group, points, etc.)
+// These are provided by @react-three/fiber at runtime but tsc doesn't see them
+// without the ThreeElements namespace augmentation.
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      mesh: any;
+      group: any;
+      points: any;
+      pointLight: any;
+      ambientLight: any;
+      directionalLight: any;
+      meshBasicMaterial: any;
+      meshStandardMaterial: any;
+      shaderMaterial: any;
+      planeGeometry: any;
+      boxGeometry: any;
+      sphereGeometry: any;
+      bufferGeometry: any;
+      bufferAttribute: any;
+      cylinderGeometry: any;
+      ringGeometry: any;
+      circleGeometry: any;
+      lineSegments: any;
+      lineBasicMaterial: any;
+      orthographicCamera: any;
+      perspectiveCamera: any;
+      fog: any;
+      color: any;
+      primitive: any;
+    }
+  }
+}
