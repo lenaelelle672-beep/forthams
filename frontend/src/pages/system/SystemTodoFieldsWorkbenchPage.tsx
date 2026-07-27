@@ -187,16 +187,16 @@ export default function SystemTodoFieldsWorkbenchPage({
             <h4 className="font-semibold">字段列表</h4>
             <span className="rounded-full bg-slate-100 px-2 py-1 text-xs text-slate-500">{visibleCount}/{fields.length} 可见</span>
           </div>
-          {loading ? <p className="text-sm text-slate-500">待办字段加载中...</p> : null}
+          {loading ? <p role="status" aria-live="polite" className="text-sm text-slate-500">待办字段加载中...</p> : null}
           {!loading && fields.length === 0 ? <p className="text-sm text-slate-500">暂无待办字段配置。</p> : null}
           <div className="space-y-2">
             {fields.map((field) => (
               <div key={field.fieldKey} className="rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-600">
                 <div className="flex items-center justify-between gap-2">
                   <span className="font-medium">{field.fieldLabel ?? field.fieldKey}</span>
-                  <span className="text-xs text-slate-400">#{field.sortOrder}</span>
+                  <span className="text-xs text-slate-500">#{field.sortOrder}</span>
                 </div>
-                <p className="mt-1 text-xs text-slate-400">{field.fieldKey} · {field.visible ? '可见' : '隐藏'} · {field.source ?? 'inherited'}{field.sensitive ? ' · 敏感' : ''}</p>
+                <p className="mt-1 text-xs text-slate-500">{field.fieldKey} · {field.visible ? '可见' : '隐藏'} · {field.source ?? 'inherited'}{field.sensitive ? ' · 敏感' : ''}</p>
               </div>
             ))}
           </div>
@@ -216,8 +216,8 @@ export default function SystemTodoFieldsWorkbenchPage({
               </select>
             </div>
             <dl className="mt-4 grid gap-3 text-sm text-slate-600 sm:grid-cols-2">
-              <div><dt className="text-xs text-slate-400">预览可见字段</dt><dd>{preview?.totalVisible ?? 0} 个</dd></div>
-              <div><dt className="text-xs text-slate-400">敏感字段脱敏</dt><dd>{maskedSummary}</dd></div>
+              <div><dt className="text-xs text-slate-500">预览可见字段</dt><dd>{preview?.totalVisible ?? 0} 个</dd></div>
+              <div><dt className="text-xs text-slate-500">敏感字段脱敏</dt><dd>{maskedSummary}</dd></div>
             </dl>
             <div className="mt-3 space-y-2">
               {(preview?.visibleFields ?? []).map((field) => (

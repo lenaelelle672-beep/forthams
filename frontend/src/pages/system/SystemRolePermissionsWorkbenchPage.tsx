@@ -150,19 +150,19 @@ export default function SystemRolePermissionsWorkbenchPage({
 
       <div className="grid gap-3 md:grid-cols-4">
         <div className="rounded-2xl border border-slate-200 p-4">
-          <p className="text-xs text-slate-400">角色数量</p>
+          <p className="text-xs text-slate-500">角色数量</p>
           <p className="mt-1 text-2xl font-semibold">{catalog.summary.roleCount}</p>
         </div>
         <div className="rounded-2xl border border-slate-200 p-4">
-          <p className="text-xs text-slate-400">权限库存</p>
+          <p className="text-xs text-slate-500">权限库存</p>
           <p className="mt-1 text-2xl font-semibold">{catalog.summary.permissionInventoryCount} 项</p>
         </div>
         <div className="rounded-2xl border border-slate-200 p-4">
-          <p className="text-xs text-slate-400">角色-权限绑定数量</p>
+          <p className="text-xs text-slate-500">角色-权限绑定数量</p>
           <p className="mt-1 text-2xl font-semibold">{catalog.summary.rolePermissionBindingCount}</p>
         </div>
         <div className="rounded-2xl border border-slate-200 p-4">
-          <p className="text-xs text-slate-400">未绑定权限</p>
+          <p className="text-xs text-slate-500">未绑定权限</p>
           <p className="mt-1 text-2xl font-semibold">{catalog.summary.unboundPermissionCount}</p>
         </div>
       </div>
@@ -197,7 +197,7 @@ export default function SystemRolePermissionsWorkbenchPage({
       </form>
 
       {error ? <div role="alert" className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div> : null}
-      {loading ? <div className="text-sm text-slate-500">角色权限目录加载中...</div> : null}
+      {loading ? <div role="status" aria-live="polite" className="text-sm text-slate-500">角色权限目录加载中...</div> : null}
       {!loading && !error && visibleRoles.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm text-slate-500">{emptyMessage}</div>
       ) : null}
@@ -212,11 +212,11 @@ export default function SystemRolePermissionsWorkbenchPage({
             <table className="min-w-full text-left text-sm">
               <thead className="text-xs text-slate-500">
                 <tr>
-                  <th className="py-2 pr-3">角色编码</th>
-                  <th className="py-2 pr-3">角色名称</th>
-                  <th className="py-2 pr-3">状态</th>
-                  <th className="py-2 pr-3">已绑定权限数量</th>
-                  <th className="py-2 pr-3">绑定权限</th>
+                  <th scope="col" className="py-2 pr-3">角色编码</th>
+                  <th scope="col" className="py-2 pr-3">角色名称</th>
+                  <th scope="col" className="py-2 pr-3">状态</th>
+                  <th scope="col" className="py-2 pr-3">已绑定权限数量</th>
+                  <th scope="col" className="py-2 pr-3">绑定权限</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">

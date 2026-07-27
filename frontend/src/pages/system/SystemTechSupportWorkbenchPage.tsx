@@ -246,7 +246,7 @@ export default function SystemTechSupportWorkbenchPage({
       </form>
 
       {error ? <div role="alert" className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div> : null}
-      {loading ? <div className="text-sm text-slate-500">工单加载中...</div> : null}
+      {loading ? <div role="status" aria-live="polite" className="text-sm text-slate-500">工单加载中...</div> : null}
       {!loading && !error && visibleRecords.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm text-slate-500">{emptyMessage}</div>
       ) : null}
@@ -260,13 +260,13 @@ export default function SystemTechSupportWorkbenchPage({
           <table className="min-w-full text-left text-sm">
             <thead className="text-xs text-slate-500">
               <tr>
-                <th className="py-2 pr-3">标题</th>
-                <th className="py-2 pr-3">优先级</th>
-                <th className="py-2 pr-3">提单人</th>
-                <th className="py-2 pr-3">处理人</th>
-                <th className="py-2 pr-3">诊断包</th>
-                <th className="py-2 pr-3">状态</th>
-                <th className="py-2 pr-3">时间</th>
+                <th scope="col" className="py-2 pr-3">标题</th>
+                <th scope="col" className="py-2 pr-3">优先级</th>
+                <th scope="col" className="py-2 pr-3">提单人</th>
+                <th scope="col" className="py-2 pr-3">处理人</th>
+                <th scope="col" className="py-2 pr-3">诊断包</th>
+                <th scope="col" className="py-2 pr-3">状态</th>
+                <th scope="col" className="py-2 pr-3">时间</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -288,7 +288,7 @@ export default function SystemTechSupportWorkbenchPage({
                       {record.statusLabel}
                     </span>
                   </td>
-                  <td className="py-2 pr-3 text-xs text-slate-400">{record.updatedAt ?? record.createdAt ?? '-'}</td>
+                  <td className="py-2 pr-3 text-xs text-slate-500">{record.updatedAt ?? record.createdAt ?? '-'}</td>
                 </tr>
               ))}
             </tbody>
@@ -316,7 +316,7 @@ export default function SystemTechSupportWorkbenchPage({
       </div>
 
       <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
-        <p className="text-xs text-slate-400">只读提示</p>
+        <p className="text-xs text-slate-500">只读提示</p>
         <p className="mt-1">{meta.readOnlyNotice}</p>
       </div>
     </section>

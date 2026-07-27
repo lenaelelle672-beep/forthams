@@ -326,7 +326,7 @@ export default function SystemSettingsCommandCenterWorkbenchPage({
       </form>
 
       {error ? <div role="alert" className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div> : null}
-      {loading ? <div className="text-sm text-slate-500">流程控制台只读聚合加载中...</div> : null}
+      {loading ? <div role="status" aria-live="polite" className="text-sm text-slate-500">流程控制台只读聚合加载中...</div> : null}
 
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_320px]">
         <div className="space-y-4">
@@ -342,11 +342,11 @@ export default function SystemSettingsCommandCenterWorkbenchPage({
               <table className="min-w-full text-left text-sm">
                 <thead className="text-xs text-slate-500">
                   <tr>
-                    <th className="py-2 pr-3">业务类型</th>
-                    <th className="py-2 pr-3">名称</th>
-                    <th className="py-2 pr-3">状态</th>
-                    <th className="py-2 pr-3">版本</th>
-                    <th className="py-2 pr-3">节点</th>
+                    <th scope="col" className="py-2 pr-3">业务类型</th>
+                    <th scope="col" className="py-2 pr-3">名称</th>
+                    <th scope="col" className="py-2 pr-3">状态</th>
+                    <th scope="col" className="py-2 pr-3">版本</th>
+                    <th scope="col" className="py-2 pr-3">节点</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
@@ -376,12 +376,12 @@ export default function SystemSettingsCommandCenterWorkbenchPage({
               <table className="min-w-full text-left text-sm">
                 <thead className="text-xs text-slate-500">
                   <tr>
-                    <th className="py-2 pr-3">实例编号</th>
-                    <th className="py-2 pr-3">流程类型</th>
-                    <th className="py-2 pr-3">业务 ID</th>
-                    <th className="py-2 pr-3">当前步骤</th>
-                    <th className="py-2 pr-3">状态</th>
-                    <th className="py-2 pr-3">更新时间</th>
+                    <th scope="col" className="py-2 pr-3">实例编号</th>
+                    <th scope="col" className="py-2 pr-3">流程类型</th>
+                    <th scope="col" className="py-2 pr-3">业务 ID</th>
+                    <th scope="col" className="py-2 pr-3">当前步骤</th>
+                    <th scope="col" className="py-2 pr-3">状态</th>
+                    <th scope="col" className="py-2 pr-3">更新时间</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
@@ -424,31 +424,31 @@ export default function SystemSettingsCommandCenterWorkbenchPage({
             <h4 className="mb-3 font-semibold">运行健康摘要</h4>
             <dl className="space-y-2 text-sm text-slate-600">
               <div>
-                <dt className="text-xs text-slate-400">健康提示</dt>
+                <dt className="text-xs text-slate-500">健康提示</dt>
                 <dd>{healthSummary}</dd>
               </div>
               <div>
-                <dt className="text-xs text-slate-400">模板配置率</dt>
+                <dt className="text-xs text-slate-500">模板配置率</dt>
                 <dd>{configuredDefinitions} / {definitions.length}</dd>
               </div>
               <div>
-                <dt className="text-xs text-slate-400">流程类型覆盖</dt>
+                <dt className="text-xs text-slate-500">流程类型覆盖</dt>
                 <dd>{runtimeTypeCount} 类</dd>
               </div>
               <div>
-                <dt className="text-xs text-slate-400">数据来源</dt>
+                <dt className="text-xs text-slate-500">数据来源</dt>
                 <dd>/workflows、/approvals/list、/approvals/pending/count、/sla-config/runtime-summary、/sla-config/timeout-records</dd>
               </div>
               <div>
-                <dt className="text-xs text-slate-400">SLA 节点耗时</dt>
+                <dt className="text-xs text-slate-500">SLA 节点耗时</dt>
                 <dd>{(slaSummary.nodeDurationSummary ?? []).slice(0, 2).join('；') || '暂无异常耗时'}</dd>
               </div>
               <div>
-                <dt className="text-xs text-slate-400">SLA 异常轨迹</dt>
+                <dt className="text-xs text-slate-500">SLA 异常轨迹</dt>
                 <dd>{(slaSummary.abnormalTraceSummary ?? []).slice(0, 2).join('；') || '暂无异常轨迹'}</dd>
               </div>
               <div>
-                <dt className="text-xs text-slate-400">脱敏导出提示</dt>
+                <dt className="text-xs text-slate-500">脱敏导出提示</dt>
                 <dd>{slaSummary.exportMaskingNotice ?? '导出仅返回 masked/summary 字段。'}</dd>
               </div>
             </dl>

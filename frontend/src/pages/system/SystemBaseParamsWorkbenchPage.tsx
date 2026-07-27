@@ -273,7 +273,7 @@ export default function SystemBaseParamsWorkbenchPage({
                 重新加载
               </button>
             </div>
-            {loading ? <div className="mt-4 text-sm text-slate-500">基础参数加载中...</div> : null}
+            {loading ? <div role="status" aria-live="polite" className="mt-4 text-sm text-slate-500">基础参数加载中...</div> : null}
             {!loading && records.length === 0 ? (
               <div className="mt-4 rounded-2xl border border-dashed border-slate-200 p-6 text-sm text-slate-500">暂无 SYSTEM 基础参数，请通过 V3 新增。</div>
             ) : null}

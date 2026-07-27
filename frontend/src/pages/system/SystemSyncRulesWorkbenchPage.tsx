@@ -68,7 +68,7 @@ export default function SystemSyncRulesWorkbenchPage({ embeddedInWorkbench = fal
       </div>
       {notice ? <div className="rounded-2xl bg-blue-50 px-4 py-3 text-sm text-blue-700">{notice}</div> : null}
       {error ? <div role="alert" className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div> : null}
-      {loading ? <div className="text-sm text-slate-500">加载中...</div> : null}
+      {loading ? <div role="status" aria-live="polite" className="text-sm text-slate-500">加载中...</div> : null}
       {summary ? (
         <div className="rounded-2xl border border-slate-200 p-4 text-sm text-slate-600">
           <strong>只读队列摘要</strong>：待处理 {summary.pending}，运行中 {summary.running}，失败 {summary.failed}；队列消费已禁用。
@@ -86,7 +86,7 @@ export default function SystemSyncRulesWorkbenchPage({ embeddedInWorkbench = fal
               </div>
               <button className="rounded-xl bg-blue-600 px-3 py-2 text-sm text-white" type="button" onClick={() => handleDryRun(item.id)}>dry-run</button>
             </div>
-            <p className="mt-2 text-xs text-slate-400">真实执行与真实重试已禁用，队列只读。</p>
+            <p className="mt-2 text-xs text-slate-500">真实执行与真实重试已禁用，队列只读。</p>
           </article>
         ))}
       </div>

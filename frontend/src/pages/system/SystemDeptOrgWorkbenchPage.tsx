@@ -177,7 +177,7 @@ export default function SystemDeptOrgWorkbenchPage({
       </form>
 
       {error ? <div role="alert" className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div> : null}
-      {loading ? <div className="text-sm text-slate-500">部门组织加载中...</div> : null}
+      {loading ? <div role="status" aria-live="polite" className="text-sm text-slate-500">部门组织加载中...</div> : null}
       {!loading && !error && visibleDepts.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm text-slate-500">{emptyMessage}</div>
       ) : null}
@@ -192,12 +192,12 @@ export default function SystemDeptOrgWorkbenchPage({
             <table className="min-w-full text-left text-sm">
               <thead className="text-xs text-slate-500">
                 <tr>
-                  <th className="py-2 pr-3">名称</th>
-                  <th className="py-2 pr-3">编码</th>
-                  <th className="py-2 pr-3">父级 ID</th>
-                  <th className="py-2 pr-3">排序</th>
-                  <th className="py-2 pr-3">负责人</th>
-                  <th className="py-2 pr-3">状态</th>
+                  <th scope="col" className="py-2 pr-3">名称</th>
+                  <th scope="col" className="py-2 pr-3">编码</th>
+                  <th scope="col" className="py-2 pr-3">父级 ID</th>
+                  <th scope="col" className="py-2 pr-3">排序</th>
+                  <th scope="col" className="py-2 pr-3">负责人</th>
+                  <th scope="col" className="py-2 pr-3">状态</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">

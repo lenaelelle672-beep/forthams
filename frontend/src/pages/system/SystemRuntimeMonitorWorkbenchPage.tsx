@@ -228,7 +228,7 @@ export default function SystemRuntimeMonitorWorkbenchPage({
       </form>
 
       {error ? <div role="alert" className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div> : null}
-      {loading ? <div className="text-sm text-slate-500">运行监控加载中...</div> : null}
+      {loading ? <div role="status" aria-live="polite" className="text-sm text-slate-500">运行监控加载中...</div> : null}
       {!loading && !error && records.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm text-slate-500">暂无审批实例。</div>
       ) : null}
@@ -242,13 +242,13 @@ export default function SystemRuntimeMonitorWorkbenchPage({
           <table className="min-w-full text-left text-sm">
             <thead className="text-xs text-slate-500">
               <tr>
-                <th className="py-2 pr-3">流程编号</th>
-                <th className="py-2 pr-3">流程类型</th>
-                <th className="py-2 pr-3">业务 ID</th>
-                <th className="py-2 pr-3">当前步骤</th>
-                <th className="py-2 pr-3">状态</th>
-                <th className="py-2 pr-3">申请人</th>
-                <th className="py-2 pr-3">发起时间</th>
+                <th scope="col" className="py-2 pr-3">流程编号</th>
+                <th scope="col" className="py-2 pr-3">流程类型</th>
+                <th scope="col" className="py-2 pr-3">业务 ID</th>
+                <th scope="col" className="py-2 pr-3">当前步骤</th>
+                <th scope="col" className="py-2 pr-3">状态</th>
+                <th scope="col" className="py-2 pr-3">申请人</th>
+                <th scope="col" className="py-2 pr-3">发起时间</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">

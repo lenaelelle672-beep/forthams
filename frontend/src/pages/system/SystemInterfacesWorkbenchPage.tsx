@@ -64,7 +64,7 @@ export default function SystemInterfacesWorkbenchPage({ embeddedInWorkbench = fa
       </div>
       {notice ? <div className="rounded-2xl bg-blue-50 px-4 py-3 text-sm text-blue-700">{notice}</div> : null}
       {error ? <div role="alert" className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div> : null}
-      {loading ? <div className="text-sm text-slate-500">加载中...</div> : null}
+      {loading ? <div role="status" aria-live="polite" className="text-sm text-slate-500">加载中...</div> : null}
       {!loading && items.length === 0 ? <div className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm text-slate-500">暂无接口，请通过 V3 接口创建。</div> : null}
       <div className="grid gap-3">
         {items.map((item) => (
@@ -78,7 +78,7 @@ export default function SystemInterfacesWorkbenchPage({ embeddedInWorkbench = fa
                 配置校验
               </button>
             </div>
-            <p className="mt-2 text-xs text-slate-400">敏感配置：{item.configMasked ? '已脱敏' : '未返回原值'}</p>
+            <p className="mt-2 text-xs text-slate-500">敏感配置：{item.configMasked ? '已脱敏' : '未返回原值'}</p>
           </article>
         ))}
       </div>

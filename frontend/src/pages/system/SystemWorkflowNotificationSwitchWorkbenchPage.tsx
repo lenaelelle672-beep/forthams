@@ -157,7 +157,7 @@ export default function SystemWorkflowNotificationSwitchWorkbenchPage({
       </div>
 
       {error ? <div role="alert" className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div> : null}
-      {loading ? <div className="text-sm text-slate-500">流程通知开关只读目录加载中...</div> : null}
+      {loading ? <div role="status" aria-live="polite" className="text-sm text-slate-500">流程通知开关只读目录加载中...</div> : null}
 
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_420px]">
         <section className="rounded-2xl border border-slate-200 p-4" aria-label="流程通知开关只读列表">

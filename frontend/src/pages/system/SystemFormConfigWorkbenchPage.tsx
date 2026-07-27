@@ -173,7 +173,7 @@ function FieldPreview({ field, compact = false }: { field: FormDefinitionField; 
     <div className={compact ? 'rounded-xl border border-slate-200 bg-white px-3 py-2' : 'rounded-2xl border border-slate-200 bg-white p-4'}>
       <div className="flex items-center justify-between gap-2">
         <span className="text-sm font-medium text-slate-700">{field.label}</span>
-        <span className="text-xs text-slate-400">{field.required ? '必填' : '选填'}</span>
+        <span className="text-xs text-slate-500">{field.required ? '必填' : '选填'}</span>
       </div>
       <div className="mt-2 rounded-lg border border-dashed border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-500">
         {field.type === 'select' || field.type === 'radio'
@@ -184,7 +184,7 @@ function FieldPreview({ field, compact = false }: { field: FormDefinitionField; 
               ? '上传附件占位'
               : value}
       </div>
-      {field.helpText ? <p className="mt-2 text-xs text-slate-400">{field.helpText}</p> : null}
+      {field.helpText ? <p className="mt-2 text-xs text-slate-500">{field.helpText}</p> : null}
     </div>
   );
 }
@@ -609,7 +609,7 @@ export default function SystemFormConfigWorkbenchPage({
                     }}
                   >
                     <span className="text-sm font-medium text-slate-800">{section.label}</span>
-                    <span className="text-xs text-slate-400">{section.fields.length} 字段</span>
+                    <span className="text-xs text-slate-500">{section.fields.length} 字段</span>
                   </button>
                   <div className="mt-2 space-y-2">
                     {section.fields.map((field) => {
@@ -627,7 +627,7 @@ export default function SystemFormConfigWorkbenchPage({
                           }}
                         >
                           <span className="block font-medium">{field.label}</span>
-                          <span className="text-xs text-slate-400">{field.fieldKey} · {field.type}</span>
+                          <span className="text-xs text-slate-500">{field.fieldKey} · {field.type}</span>
                         </button>
                       );
                     })}
@@ -644,7 +644,7 @@ export default function SystemFormConfigWorkbenchPage({
             <div className="flex items-center justify-between gap-3">
               <div>
                 <h5 className="font-semibold text-slate-800">桌面预览</h5>
-                <p className="text-xs text-slate-400">双列布局模拟 PC 工作台表单。</p>
+                <p className="text-xs text-slate-500">双列布局模拟 PC 工作台表单。</p>
               </div>
               <span className="rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-500">{countSections(schema)} 分组 / {countFields(schema)} 字段</span>
             </div>
@@ -653,7 +653,7 @@ export default function SystemFormConfigWorkbenchPage({
                 <section key={section.sectionKey} className="space-y-3">
                   <div>
                     <h6 className="font-medium text-slate-800">{section.label}</h6>
-                    {section.description ? <p className="text-xs text-slate-400">{section.description}</p> : null}
+                    {section.description ? <p className="text-xs text-slate-500">{section.description}</p> : null}
                   </div>
                   <div className="grid gap-3 md:grid-cols-2">
                     {section.fields.map((field) => <FieldPreview key={field.fieldKey} field={field} />)}
@@ -666,7 +666,7 @@ export default function SystemFormConfigWorkbenchPage({
               <div className="mb-3 flex items-center justify-between gap-2">
                 <div>
                   <h5 className="font-semibold">钉钉 H5 预览</h5>
-                  <p className="text-xs text-slate-400">单列移动端布局，敏感字段默认遮罩。</p>
+                  <p className="text-xs text-slate-500">单列移动端布局，敏感字段默认遮罩。</p>
                 </div>
                 <span className="rounded-full bg-white/10 px-3 py-1 text-xs">H5</span>
               </div>
@@ -769,9 +769,9 @@ export default function SystemFormConfigWorkbenchPage({
         <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
           <h4 className="mb-3 font-semibold">当前定义</h4>
           <dl className="space-y-2 text-sm text-slate-600">
-            <div><dt className="text-xs text-slate-400">状态 / 版本</dt><dd>{selectedDefinition?.status ?? 'UNCONFIGURED'} / v{selectedDefinition?.version ?? 0}</dd></div>
-            <div><dt className="text-xs text-slate-400">章节 / 字段</dt><dd>{countSections(schema)} / {countFields(schema)}</dd></div>
-            <div><dt className="text-xs text-slate-400">最后更新时间</dt><dd>{selectedDefinition?.updateTime ?? '-'}</dd></div>
+            <div><dt className="text-xs text-slate-500">状态 / 版本</dt><dd>{selectedDefinition?.status ?? 'UNCONFIGURED'} / v{selectedDefinition?.version ?? 0}</dd></div>
+            <div><dt className="text-xs text-slate-500">章节 / 字段</dt><dd>{countSections(schema)} / {countFields(schema)}</dd></div>
+            <div><dt className="text-xs text-slate-500">最后更新时间</dt><dd>{selectedDefinition?.updateTime ?? '-'}</dd></div>
           </dl>
         </div>
         <div className="rounded-2xl border border-slate-200 p-4">
@@ -806,7 +806,7 @@ export default function SystemFormConfigWorkbenchPage({
 
       {message ? <div className="rounded-2xl bg-green-50 px-4 py-3 text-sm text-green-700">{message}</div> : null}
       {error ? <div role="alert" className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div> : null}
-      {loading ? <div className="text-sm text-slate-500">表单配置加载中...</div> : null}
+      {loading ? <div role="status" aria-live="polite" className="text-sm text-slate-500">表单配置加载中...</div> : null}
     </section>
   );
 }

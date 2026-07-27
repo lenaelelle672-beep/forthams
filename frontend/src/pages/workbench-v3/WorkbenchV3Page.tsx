@@ -217,7 +217,7 @@ export default function WorkbenchV3Page() {
                 onClick={() => selectMenu(group.items[0].id)}
               >
                 <span className="block text-sm font-semibold">{group.label}</span>
-                <span className={`mt-1 block text-xs ${isActiveGroup ? 'text-blue-100' : 'text-slate-400'}`}>
+                <span className={`mt-1 block text-xs ${isActiveGroup ? 'text-blue-100' : 'text-slate-500'}`}>
                   {integratedCount}/{group.items.length} 已接入
                 </span>
               </button>
@@ -230,7 +230,7 @@ export default function WorkbenchV3Page() {
       <div className="mt-6 grid gap-6 lg:grid-cols-[260px_minmax(0,1fr)]">
         <aside className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm" aria-label="Workbench V3 子项导航">
           <div className="border-b border-slate-100 pb-3">
-            <p className="text-xs font-medium uppercase tracking-[0.2em] text-slate-400">当前分组</p>
+            <p className="text-xs font-medium uppercase tracking-[0.2em] text-slate-500">当前分组</p>
             <h2 className="mt-1 text-base font-semibold text-slate-900">{activeGroup.label}</h2>
           </div>
 

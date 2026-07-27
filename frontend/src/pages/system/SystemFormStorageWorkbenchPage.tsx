@@ -264,7 +264,7 @@ export default function SystemFormStorageWorkbenchPage({
             <h4 className="font-semibold">实例列表</h4>
             <span className="rounded-full bg-slate-100 px-2 py-1 text-xs text-slate-500">{records.length} 条</span>
           </div>
-          {loading ? <p className="text-sm text-slate-500">表单存储加载中...</p> : null}
+          {loading ? <p role="status" aria-live="polite" className="text-sm text-slate-500">表单存储加载中...</p> : null}
           {!loading && records.length === 0 ? <p className="text-sm text-slate-500">暂无表单实例。</p> : null}
           <div className="space-y-2">
             {records.map((record) => (
@@ -295,11 +295,11 @@ export default function SystemFormStorageWorkbenchPage({
             </div>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
               <div className="rounded-xl bg-slate-50 p-3 text-sm text-slate-600">
-                <p className="text-xs text-slate-400">字段摘要</p>
+                <p className="text-xs text-slate-500">字段摘要</p>
                 <p className="mt-1">{selectedRecord?.fieldSummary ?? '字段摘要为空'}</p>
               </div>
               <div className="rounded-xl bg-slate-50 p-3 text-sm text-slate-600">
-                <p className="text-xs text-slate-400">附件摘要</p>
+                <p className="text-xs text-slate-500">附件摘要</p>
                 <p className="mt-1">{selectedRecord?.attachmentSummary ?? '附件引用为空'}</p>
               </div>
             </div>
@@ -322,7 +322,7 @@ export default function SystemFormStorageWorkbenchPage({
                   {visibleAttachments.map((attachment) => (
                     <div key={attachment.id ?? attachment.referenceKey} className="rounded-xl border border-slate-100 px-3 py-2">
                       <p>{attachment.fileName} · {attachment.contentType ?? '未知类型'} · {attachment.fileSize ?? 0} bytes</p>
-                      <p className="text-xs text-slate-400">{attachment.maskedUrl ?? 'url 已脱敏'} / {attachment.maskedStorageKey ?? 'storageKey 已脱敏'}</p>
+                      <p className="text-xs text-slate-500">{attachment.maskedUrl ?? 'url 已脱敏'} / {attachment.maskedStorageKey ?? 'storageKey 已脱敏'}</p>
                     </div>
                   ))}
                 </div>
@@ -342,8 +342,8 @@ export default function SystemFormStorageWorkbenchPage({
               <button className="rounded-xl bg-blue-600 px-4 py-2 text-sm text-white disabled:bg-slate-300" disabled={saving} type="button" onClick={exportMasked}>导出脱敏快照</button>
             </div>
             <dl className="mt-4 grid gap-3 text-sm text-slate-600 sm:grid-cols-2">
-              <div><dt className="text-xs text-slate-400">归档留痕</dt><dd>{selectedRecord?.archiveReason ?? '尚未归档'}</dd></div>
-              <div><dt className="text-xs text-slate-400">删除留痕</dt><dd>{selectedRecord?.deleteReason ?? '尚未删除'}</dd></div>
+              <div><dt className="text-xs text-slate-500">归档留痕</dt><dd>{selectedRecord?.archiveReason ?? '尚未归档'}</dd></div>
+              <div><dt className="text-xs text-slate-500">删除留痕</dt><dd>{selectedRecord?.deleteReason ?? '尚未删除'}</dd></div>
             </dl>
           </div>
 
@@ -353,7 +353,7 @@ export default function SystemFormStorageWorkbenchPage({
               <div className="space-y-2 text-sm text-slate-600">
                 <p>导出编号：{exportSnapshot.exportId}</p>
                 <p>记录 {exportSnapshot.total} 条，字段 {exportSnapshot.maskedFields.length} 个，附件 {exportSnapshot.maskedAttachments.length} 个。</p>
-                <p className="text-xs text-slate-400">仅包含 querySummary、maskedFields、maskedAttachments 与审计证据。</p>
+                <p className="text-xs text-slate-500">仅包含 querySummary、maskedFields、maskedAttachments 与审计证据。</p>
               </div>
             ) : <p className="text-sm text-slate-500">尚未生成导出快照。</p>}
           </div>

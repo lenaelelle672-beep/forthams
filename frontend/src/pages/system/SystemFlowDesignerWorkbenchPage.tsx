@@ -524,9 +524,9 @@ export default function SystemFlowDesignerWorkbenchPage({
           <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
             <h4 className="mb-3 font-semibold">当前定义</h4>
             <dl className="space-y-2 text-sm text-slate-600">
-              <div><dt className="text-xs text-slate-400">状态 / 版本</dt><dd>{selectedDefinition?.status ?? 'UNCONFIGURED'} / v{selectedDefinition?.version ?? 0}</dd></div>
-              <div><dt className="text-xs text-slate-400">节点 / 连线</dt><dd>{nodes.length} / {edges.length}</dd></div>
-              <div><dt className="text-xs text-slate-400">最后更新时间</dt><dd>{selectedDefinition?.updateTime ?? '-'}</dd></div>
+              <div><dt className="text-xs text-slate-500">状态 / 版本</dt><dd>{selectedDefinition?.status ?? 'UNCONFIGURED'} / v{selectedDefinition?.version ?? 0}</dd></div>
+              <div><dt className="text-xs text-slate-500">节点 / 连线</dt><dd>{nodes.length} / {edges.length}</dd></div>
+              <div><dt className="text-xs text-slate-500">最后更新时间</dt><dd>{selectedDefinition?.updateTime ?? '-'}</dd></div>
             </dl>
           </div>
           <div className="rounded-2xl border border-slate-200 p-4">
@@ -555,7 +555,7 @@ export default function SystemFlowDesignerWorkbenchPage({
 
       {message ? <div className="rounded-2xl bg-green-50 px-4 py-3 text-sm text-green-700">{message}</div> : null}
       {error ? <div role="alert" className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div> : null}
-      {loading ? <div className="text-sm text-slate-500">流程设计器加载中...</div> : null}
+      {loading ? <div role="status" aria-live="polite" className="text-sm text-slate-500">流程设计器加载中...</div> : null}
     </section>
   );
 }

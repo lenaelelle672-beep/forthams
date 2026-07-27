@@ -210,7 +210,7 @@ export default function SystemFlowDefinitionWorkbenchPage({
       </form>
 
       {error ? <div role="alert" className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div> : null}
-      {loading ? <div className="text-sm text-slate-500">流程定义加载中...</div> : null}
+      {loading ? <div role="status" aria-live="polite" className="text-sm text-slate-500">流程定义加载中...</div> : null}
       {!loading && !error && visibleDefinitions.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm text-slate-500">{emptyMessage}</div>
       ) : null}
@@ -225,13 +225,13 @@ export default function SystemFlowDefinitionWorkbenchPage({
             <table className="min-w-full text-left text-sm">
               <thead className="text-xs text-slate-500">
                 <tr>
-                  <th className="py-2 pr-3">业务类型</th>
-                  <th className="py-2 pr-3">名称</th>
-                  <th className="py-2 pr-3">版本</th>
-                  <th className="py-2 pr-3">状态</th>
-                  <th className="py-2 pr-3">可发起</th>
-                  <th className="py-2 pr-3">节点</th>
-                  <th className="py-2 pr-3">摘要</th>
+                  <th scope="col" className="py-2 pr-3">业务类型</th>
+                  <th scope="col" className="py-2 pr-3">名称</th>
+                  <th scope="col" className="py-2 pr-3">版本</th>
+                  <th scope="col" className="py-2 pr-3">状态</th>
+                  <th scope="col" className="py-2 pr-3">可发起</th>
+                  <th scope="col" className="py-2 pr-3">节点</th>
+                  <th scope="col" className="py-2 pr-3">摘要</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -269,23 +269,23 @@ export default function SystemFlowDefinitionWorkbenchPage({
 
         <aside className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
           <h4 className="mb-3 font-semibold">详情摘要</h4>
-          {detailLoading ? <p className="text-sm text-slate-500">流程详情加载中...</p> : null}
+          {detailLoading ? <p role="status" aria-live="polite" className="text-sm text-slate-500">流程详情加载中...</p> : null}
           {!detailLoading && selectedDefinition ? (
             <dl className="space-y-2 text-sm text-slate-600">
               <div>
-                <dt className="text-xs text-slate-400">业务类型</dt>
+                <dt className="text-xs text-slate-500">业务类型</dt>
                 <dd className="font-medium text-slate-800">{selectedDefinition.businessType}</dd>
               </div>
               <div>
-                <dt className="text-xs text-slate-400">说明</dt>
+                <dt className="text-xs text-slate-500">说明</dt>
                 <dd>{selectedDefinition.description ?? '-'}</dd>
               </div>
               <div>
-                <dt className="text-xs text-slate-400">节点 / 连线</dt>
+                <dt className="text-xs text-slate-500">节点 / 连线</dt>
                 <dd>{nodeCount(selectedDefinition.definition)} / {edgeCount(selectedDefinition.definition)}</dd>
               </div>
               <div>
-                <dt className="text-xs text-slate-400">最后更新时间</dt>
+                <dt className="text-xs text-slate-500">最后更新时间</dt>
                 <dd>{selectedDefinition.updateTime ?? '-'}</dd>
               </div>
             </dl>

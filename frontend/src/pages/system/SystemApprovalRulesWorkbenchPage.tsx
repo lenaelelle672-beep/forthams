@@ -224,7 +224,7 @@ export default function SystemApprovalRulesWorkbenchPage({
             <h4 className="font-semibold">规则列表</h4>
             <span className="rounded-full bg-slate-100 px-2 py-1 text-xs text-slate-500">{rules.length} 条</span>
           </div>
-          {loading ? <p className="text-sm text-slate-500">审批规则加载中...</p> : null}
+          {loading ? <p role="status" aria-live="polite" className="text-sm text-slate-500">审批规则加载中...</p> : null}
           {!loading && rules.length === 0 ? <p className="text-sm text-slate-500">暂无审批规则。</p> : null}
           <div className="space-y-2">
             {rules.map((rule) => (
@@ -246,10 +246,10 @@ export default function SystemApprovalRulesWorkbenchPage({
               <span className="rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-600">{statusLabel(selectedRule?.status)}</span>
             </div>
             <dl className="mt-4 grid gap-3 text-sm text-slate-600 sm:grid-cols-2">
-              <div><dt className="text-xs text-slate-400">条件摘要</dt><dd>{selectedRule?.conditionSummary ?? '暂无条件摘要'}</dd></div>
-              <div><dt className="text-xs text-slate-400">候选处理人</dt><dd>{selectedRule?.approverSummary ?? '候选处理人摘要已脱敏'}</dd></div>
-              <div><dt className="text-xs text-slate-400">启用审计</dt><dd>{selectedRule?.enabledAt ?? '尚未启用'}</dd></div>
-              <div><dt className="text-xs text-slate-400">停用审计</dt><dd>{selectedRule?.disabledReason ?? '尚未停用'}</dd></div>
+              <div><dt className="text-xs text-slate-500">条件摘要</dt><dd>{selectedRule?.conditionSummary ?? '暂无条件摘要'}</dd></div>
+              <div><dt className="text-xs text-slate-500">候选处理人</dt><dd>{selectedRule?.approverSummary ?? '候选处理人摘要已脱敏'}</dd></div>
+              <div><dt className="text-xs text-slate-500">启用审计</dt><dd>{selectedRule?.enabledAt ?? '尚未启用'}</dd></div>
+              <div><dt className="text-xs text-slate-500">停用审计</dt><dd>{selectedRule?.disabledReason ?? '尚未停用'}</dd></div>
             </dl>
           </div>
 
@@ -269,7 +269,7 @@ export default function SystemApprovalRulesWorkbenchPage({
             <div className="rounded-2xl border border-slate-200 p-4">
               <h4 className="mb-2 font-semibold">模拟结果</h4>
               <p className="text-sm text-slate-600">命中规则：{matchedSummary}</p>
-              <p className="mt-2 text-xs text-slate-400">{simulation?.safeExplanation ?? '尚未运行模拟。'}</p>
+              <p className="mt-2 text-xs text-slate-500">{simulation?.safeExplanation ?? '尚未运行模拟。'}</p>
             </div>
             <div className="rounded-2xl border border-slate-200 p-4">
               <h4 className="mb-2 font-semibold">冲突检测</h4>

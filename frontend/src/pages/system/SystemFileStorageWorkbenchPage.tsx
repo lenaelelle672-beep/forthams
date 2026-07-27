@@ -191,19 +191,19 @@ export default function SystemFileStorageWorkbenchPage({
 
       <div className="grid gap-3 md:grid-cols-4">
         <div className="rounded-2xl border border-slate-200 p-4">
-          <p className="text-xs text-slate-400">附件总数</p>
+          <p className="text-xs text-slate-500">附件总数</p>
           <p className="mt-1 text-2xl font-semibold">{catalog.summary.totalAttachmentCount}</p>
         </div>
         <div className="rounded-2xl border border-slate-200 p-4">
-          <p className="text-xs text-slate-400">总容量</p>
+          <p className="text-xs text-slate-500">总容量</p>
           <p className="mt-1 text-2xl font-semibold">{formatFileSize(catalog.summary.totalFileSize)}</p>
         </div>
         <div className="rounded-2xl border border-slate-200 p-4">
-          <p className="text-xs text-slate-400">业务类型</p>
+          <p className="text-xs text-slate-500">业务类型</p>
           <p className="mt-1 text-2xl font-semibold">{catalog.summary.businessTypeCount}</p>
         </div>
         <div className="rounded-2xl border border-slate-200 p-4">
-          <p className="text-xs text-slate-400">文件类型</p>
+          <p className="text-xs text-slate-500">文件类型</p>
           <p className="mt-1 text-2xl font-semibold">{catalog.summary.fileTypeCount}</p>
         </div>
       </div>
@@ -251,7 +251,7 @@ export default function SystemFileStorageWorkbenchPage({
       </form>
 
       {error ? <div role="alert" className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div> : null}
-      {loading ? <div className="text-sm text-slate-500">附件元数据加载中...</div> : null}
+      {loading ? <div role="status" aria-live="polite" className="text-sm text-slate-500">附件元数据加载中...</div> : null}
       {!loading && !error && visibleAttachments.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm text-slate-500">{emptyMessage}</div>
       ) : null}
@@ -265,13 +265,13 @@ export default function SystemFileStorageWorkbenchPage({
           <table className="min-w-full text-left text-sm">
             <thead className="text-xs text-slate-500">
               <tr>
-                <th className="py-2 pr-3">文件名</th>
-                <th className="py-2 pr-3">业务类型</th>
-                <th className="py-2 pr-3">业务 ID</th>
-                <th className="py-2 pr-3">类型</th>
-                <th className="py-2 pr-3">大小</th>
-                <th className="py-2 pr-3">上传人</th>
-                <th className="py-2 pr-3">创建时间</th>
+                <th scope="col" className="py-2 pr-3">文件名</th>
+                <th scope="col" className="py-2 pr-3">业务类型</th>
+                <th scope="col" className="py-2 pr-3">业务 ID</th>
+                <th scope="col" className="py-2 pr-3">类型</th>
+                <th scope="col" className="py-2 pr-3">大小</th>
+                <th scope="col" className="py-2 pr-3">上传人</th>
+                <th scope="col" className="py-2 pr-3">创建时间</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">

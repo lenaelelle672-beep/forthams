@@ -202,7 +202,7 @@ export default function SystemDataPermissionsWorkbenchPage({
       </form>
 
       {error ? <div role="alert" className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div> : null}
-      {loading ? <div className="text-sm text-slate-500">数据权限加载中...</div> : null}
+      {loading ? <div role="status" aria-live="polite" className="text-sm text-slate-500">数据权限加载中...</div> : null}
       {!loading && !error && visibleRoles.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm text-slate-500">{emptyMessage}</div>
       ) : null}
@@ -216,10 +216,10 @@ export default function SystemDataPermissionsWorkbenchPage({
           <table className="min-w-full text-left text-sm">
             <thead className="text-xs text-slate-500">
               <tr>
-                <th className="py-2 pr-3">角色编码</th>
-                <th className="py-2 pr-3">角色名称</th>
-                <th className="py-2 pr-3">数据范围</th>
-                <th className="py-2 pr-3">风险说明</th>
+                <th scope="col" className="py-2 pr-3">角色编码</th>
+                <th scope="col" className="py-2 pr-3">角色名称</th>
+                <th scope="col" className="py-2 pr-3">数据范围</th>
+                <th scope="col" className="py-2 pr-3">风险说明</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -260,7 +260,7 @@ export default function SystemDataPermissionsWorkbenchPage({
       </div>
 
       <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
-        <p className="text-xs text-slate-400">只读提示</p>
+        <p className="text-xs text-slate-500">只读提示</p>
         <p className="mt-1">{catalog.readOnlyNotice}</p>
       </div>
     </section>

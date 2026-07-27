@@ -198,7 +198,7 @@ export default function SystemSecurityPolicyWorkbenchPage({
               <h4 className="font-semibold">SECURITY 配置态</h4>
               <span className="rounded-full bg-blue-50 px-2 py-1 text-xs text-blue-700">configuration-state</span>
             </div>
-            {loading ? <div className="mt-4 text-sm text-slate-500">安全策略加载中...</div> : null}
+            {loading ? <div role="status" aria-live="polite" className="mt-4 text-sm text-slate-500">安全策略加载中...</div> : null}
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
               {SECURITY_POLICY_HINTS.map((hint) => (
                 <button

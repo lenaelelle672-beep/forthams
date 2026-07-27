@@ -248,7 +248,7 @@ export default function SystemSlaConfigWorkbenchPage({
             <h4 className="font-semibold">策略列表</h4>
             <span className="rounded-full bg-slate-100 px-2 py-1 text-xs text-slate-500">{configs.length} 条</span>
           </div>
-          {loading ? <p className="text-sm text-slate-500">SLA 配置加载中...</p> : null}
+          {loading ? <p role="status" aria-live="polite" className="text-sm text-slate-500">SLA 配置加载中...</p> : null}
           {!loading && configs.length === 0 ? <p className="text-sm text-slate-500">暂无 SLA 策略。</p> : null}
           <div className="space-y-2">
             {configs.map((config) => (
@@ -270,10 +270,10 @@ export default function SystemSlaConfigWorkbenchPage({
               <span className="rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-600">{statusLabel(selectedConfig)}</span>
             </div>
             <dl className="mt-4 grid gap-3 text-sm text-slate-600 sm:grid-cols-2">
-              <div><dt className="text-xs text-slate-400">响应/解决</dt><dd>{selectedConfig ? `${selectedConfig.responseHours}h / ${selectedConfig.resolveHours}h` : '-'}</dd></div>
-              <div><dt className="text-xs text-slate-400">提醒/升级阈值</dt><dd>{selectedConfig ? `${selectedConfig.warningRatio} / ${selectedConfig.escalationRatio ?? 0.9}` : '-'}</dd></div>
-              <div><dt className="text-xs text-slate-400">通知目标</dt><dd>{selectedConfig?.notificationTargetSummary ?? '通知目标已脱敏'}</dd></div>
-              <div><dt className="text-xs text-slate-400">审计摘要</dt><dd>{selectedConfig?.auditSummary ?? '暂无审计摘要'}</dd></div>
+              <div><dt className="text-xs text-slate-500">响应/解决</dt><dd>{selectedConfig ? `${selectedConfig.responseHours}h / ${selectedConfig.resolveHours}h` : '-'}</dd></div>
+              <div><dt className="text-xs text-slate-500">提醒/升级阈值</dt><dd>{selectedConfig ? `${selectedConfig.warningRatio} / ${selectedConfig.escalationRatio ?? 0.9}` : '-'}</dd></div>
+              <div><dt className="text-xs text-slate-500">通知目标</dt><dd>{selectedConfig?.notificationTargetSummary ?? '通知目标已脱敏'}</dd></div>
+              <div><dt className="text-xs text-slate-500">审计摘要</dt><dd>{selectedConfig?.auditSummary ?? '暂无审计摘要'}</dd></div>
             </dl>
           </div>
 
@@ -292,13 +292,13 @@ export default function SystemSlaConfigWorkbenchPage({
             <div className="rounded-2xl border border-slate-200 p-4">
               <h4 className="mb-2 font-semibold">模拟结果</h4>
               <p className="text-sm text-slate-600">命中策略：{simulation?.matchedConfigId ?? '暂无'}</p>
-              <p className="mt-2 text-xs text-slate-400">{simulation?.policySummary ?? '尚未运行模拟。'}</p>
-              <p className="mt-2 text-xs text-slate-400">{simulation?.variablePreviewMasked ?? '变量值仅展示遮罩摘要。'}</p>
+              <p className="mt-2 text-xs text-slate-500">{simulation?.policySummary ?? '尚未运行模拟。'}</p>
+              <p className="mt-2 text-xs text-slate-500">{simulation?.variablePreviewMasked ?? '变量值仅展示遮罩摘要。'}</p>
             </div>
             <div className="rounded-2xl border border-slate-200 p-4">
               <h4 className="mb-2 font-semibold">脱敏导出</h4>
               <p className="text-sm text-slate-600">{exportResult?.contentSummary ?? summary.exportMaskingNotice ?? '导出仅返回 masked/summary 字段。'}</p>
-              <p className="mt-2 text-xs text-slate-400">{exportResult?.fieldMaskingPolicy ?? '不返回联系方式、变量原文、附件路径或 storage key。'}</p>
+              <p className="mt-2 text-xs text-slate-500">{exportResult?.fieldMaskingPolicy ?? '不返回联系方式、变量原文、附件路径或 storage key。'}</p>
             </div>
           </div>
         </div>

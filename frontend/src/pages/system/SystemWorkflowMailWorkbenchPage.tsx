@@ -220,7 +220,7 @@ export default function SystemWorkflowMailWorkbenchPage({
       </form>
 
       {error ? <div role="alert" className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div> : null}
-      {loading ? <div className="text-sm text-slate-500">配置加载中...</div> : null}
+      {loading ? <div role="status" aria-live="polite" className="text-sm text-slate-500">配置加载中...</div> : null}
       {!loading && !error && visibleRecords.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm text-slate-500">{emptyMessage}</div>
       ) : null}
@@ -234,12 +234,12 @@ export default function SystemWorkflowMailWorkbenchPage({
           <table className="min-w-full text-left text-sm">
             <thead className="text-xs text-slate-500">
               <tr>
-                <th className="py-2 pr-3">业务类型</th>
-                <th className="py-2 pr-3">节点</th>
-                <th className="py-2 pr-3">触发事件</th>
-                <th className="py-2 pr-3">模板</th>
-                <th className="py-2 pr-3">收件人</th>
-                <th className="py-2 pr-3">状态</th>
+                <th scope="col" className="py-2 pr-3">业务类型</th>
+                <th scope="col" className="py-2 pr-3">节点</th>
+                <th scope="col" className="py-2 pr-3">触发事件</th>
+                <th scope="col" className="py-2 pr-3">模板</th>
+                <th scope="col" className="py-2 pr-3">收件人</th>
+                <th scope="col" className="py-2 pr-3">状态</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -282,7 +282,7 @@ export default function SystemWorkflowMailWorkbenchPage({
       </div>
 
       <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
-        <p className="text-xs text-slate-400">只读提示</p>
+        <p className="text-xs text-slate-500">只读提示</p>
         <p className="mt-1">{meta.readOnlyNotice}</p>
       </div>
     </section>

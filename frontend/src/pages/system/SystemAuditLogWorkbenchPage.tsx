@@ -185,13 +185,13 @@ export default function SystemAuditLogWorkbenchPage({
       </form>
 
       {error ? <div role="alert" className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div> : null}
-      {loading ? <div className="text-sm text-slate-500">审计日志加载中...</div> : null}
+      {loading ? <div role="status" aria-live="polite" className="text-sm text-slate-500">审计日志加载中...</div> : null}
 
       <div className="grid gap-3 md:grid-cols-4">
-        <div className="rounded-2xl border border-slate-200 p-4"><p className="text-xs text-slate-400">命中日志</p><p className="mt-1 text-2xl font-semibold">{page.total}</p></div>
-        <div className="rounded-2xl border border-slate-200 p-4"><p className="text-xs text-slate-400">统计总数</p><p className="mt-1 text-2xl font-semibold">{stats?.totalCount ?? 0}</p></div>
-        <div className="rounded-2xl border border-slate-200 p-4"><p className="text-xs text-slate-400">操作类型</p><p className="mt-1 text-2xl font-semibold">{distribution?.distribution.length ?? 0}</p></div>
-        <div className="rounded-2xl border border-slate-200 p-4"><p className="text-xs text-slate-400">操作人排行</p><p className="mt-1 text-2xl font-semibold">{ranking.length}</p></div>
+        <div className="rounded-2xl border border-slate-200 p-4"><p className="text-xs text-slate-500">命中日志</p><p className="mt-1 text-2xl font-semibold">{page.total}</p></div>
+        <div className="rounded-2xl border border-slate-200 p-4"><p className="text-xs text-slate-500">统计总数</p><p className="mt-1 text-2xl font-semibold">{stats?.totalCount ?? 0}</p></div>
+        <div className="rounded-2xl border border-slate-200 p-4"><p className="text-xs text-slate-500">操作类型</p><p className="mt-1 text-2xl font-semibold">{distribution?.distribution.length ?? 0}</p></div>
+        <div className="rounded-2xl border border-slate-200 p-4"><p className="text-xs text-slate-500">操作人排行</p><p className="mt-1 text-2xl font-semibold">{ranking.length}</p></div>
       </div>
 
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_360px]">
@@ -229,7 +229,7 @@ export default function SystemAuditLogWorkbenchPage({
               <p>错误摘要：{detail.errorSummary ?? '无'}</p>
             </div>
           ) : <p className="text-sm text-slate-500">请选择一条审计日志查看脱敏详情。</p>}
-          <button type="button" disabled className="rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-400">
+          <button type="button" disabled className="rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-500">
             导出脱敏快照（禁用，不生成文件）
           </button>
         </aside>
