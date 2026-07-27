@@ -73,6 +73,7 @@ export default function CustomFieldsetsPage() {
           value={keyword}
           onChange={(e) => { setKeyword(e.target.value); setPage(1); }}
           className="max-w-xs"
+          aria-label="搜索字段集"
         />
       </div>
 

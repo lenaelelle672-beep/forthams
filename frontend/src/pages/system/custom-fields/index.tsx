@@ -194,6 +194,7 @@ export default function CustomFieldsPage() {
               value={keyword}
               onChange={(e) => setKeyword(e.target.value)}
               className="max-w-xs"
+              aria-label="搜索自定义字段"
             />
             {typeFilter !== 'ALL' && (
               <button
@@ -227,7 +228,10 @@ export default function CustomFieldsPage() {
             {preview && (
               <div className="space-y-4 px-6 py-4">
                 <div className="rounded-lg border border-[#e5e7eb] bg-[#f8fafc] p-4">
-                  <label className="mb-1.5 block text-sm font-medium text-[#374151]">
+                  <label
+                    htmlFor={preview.fieldType === 'DROPDOWN' ? 'preview-field-select' : undefined}
+                    className="mb-1.5 block text-sm font-medium text-[#374151]"
+                  >
                     {preview.fieldLabel}
                     {preview.required === 1 && <span className="ml-1 text-red-500">*</span>}
                   </label>
@@ -235,7 +239,7 @@ export default function CustomFieldsPage() {
                   {preview.fieldType === 'NUMBER' && <Input type="number" placeholder={`请输入${preview.fieldLabel}`} />}
                   {preview.fieldType === 'DATE' && <Input type="date" />}
                   {preview.fieldType === 'DROPDOWN' && (
-                    <select className="h-9 w-full rounded-lg border border-[#e5e7eb] bg-white px-3 text-sm">
+                    <select id="preview-field-select" className="h-9 w-full rounded-lg border border-[#e5e7eb] bg-white px-3 text-sm">
                       <option value="">请选择{preview.fieldLabel}</option>
                       {parseOptions(preview.fieldOptions).map((o, i) => <option key={i} value={o}>{o}</option>)}
                     </select>
