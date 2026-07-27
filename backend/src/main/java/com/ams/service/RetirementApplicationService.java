@@ -273,6 +273,31 @@ public class RetirementApplicationService {
         return normalizeApprovalSteps(getApplicationById(id).getTotalApprovalSteps());
     }
 
+    /**
+     * Update the retirement application's review status when the approval process
+     * advances to an intermediate step (not yet terminal). Mirrors the approval
+     * process's currentStep onto the application and marks it APPROVING so that
+     * the application's status reflects intermediate approval progress instead of
+     * staying in PENDING through all intermediate steps.
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void updateReviewStatus(Long applicationId, String status, Integer currentStep) {
+        RetirementApplication application = getApplicationById(applicationId);
+        // Only advance out of PENDING; never regress a terminal/already-APPROVING state.
+        if (!"PENDING".equals(application.getStatus())) {
+            return;
+        }
+        if (status == null || status.isBlank()) {
+            return;
+        }
+        String normalized = status.trim().toUpperCase();
+        application.setStatus(normalized);
+        if (currentStep != null && currentStep > 0) {
+            application.setCurrentApprovalStep(currentStep);
+        }
+        retirementApplicationMapper.updateById(application);
+    }
+
     public List<RetirementApplication> getAssetRetirementHistory(Long assetId) {
         Asset asset = loadAssetForCurrentTenant(assetId, "getAssetRetirementHistory");
         LambdaQueryWrapper<RetirementApplication> wrapper = new LambdaQueryWrapper<>();

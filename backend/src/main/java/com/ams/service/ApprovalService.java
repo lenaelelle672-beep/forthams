@@ -268,6 +268,11 @@ public class ApprovalService {
                 retirementApplicationService.rejectApplication(process.getBusinessId(), approverId, opinion);
             } else if ("APPROVED".equals(process.getStatus())) {
                 retirementApplicationService.approveApplication(process.getBusinessId(), approverId);
+            } else if ("APPROVED".equals(result) && "PENDING".equals(process.getStatus())) {
+                // Intermediate step advanced but process not yet terminal — mark the
+                // retirement application as APPROVING so its status reflects progress.
+                Integer advancedStep = parseInteger(BeanUtil.getProperty(process, "currentStep"), null);
+                retirementApplicationService.updateReviewStatus(process.getBusinessId(), "APPROVING", advancedStep);
             }
         } else if ("WORK_ORDER".equals(process.getProcessType())) {
             if ("REJECTED".equals(result)) {

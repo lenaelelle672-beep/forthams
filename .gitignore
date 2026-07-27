@@ -5,10 +5,19 @@
 *.ipr
 *.iws
 .DS_Store
+.classpath
+.project
+.factorypath
+.settings/
+
+# Node（根目录 + frontend）
+node_modules/
+/package-lock.json
 
 # Frontend
-frontend/node_modules/
 frontend/dist/
+frontend/.next/
+frontend/.auth/
 frontend/test-results/
 frontend/playwright-report/
 frontend/coverage/
@@ -23,6 +32,12 @@ backend/mvnw
 backend/mvnw.cmd
 backend/.idea/
 backend/*.iml
+backend/uploads/
+
+# Environment（保留 .env.example）
+.env
+.env.*
+!.env.example
 
 # Logs
 *.log
@@ -36,9 +51,15 @@ logs/
 .DS_Store
 Thumbs.db
 
-# Temp
+# Temp / backup
 *.tmp
 *.temp
+*.bak
+*.bak*
+*.old
+*~
+tmp/
+.tmp/
 .aider*
 
 # Python
@@ -61,7 +82,6 @@ spec.md
 
 # 其他临时垃圾
 2/
-New File: backend/
 
 # Agent/tooling 工作区产物（非项目源码）
 .gsd/
@@ -75,12 +95,17 @@ stitch-output/
 .qoder/
 .gitnexus/
 checkpoints/
-.gai2/
 
-# 前端实验/技能目录（独立 node_modules，不应入库）
+# 前端实验/技能目录
 frontend-skill-lab/
 
 # 运行时截图、诊断导出、pid
 *.pid
-cache-management-v3-*.png
 frontend/system-visual-audit/
+
+# 根目录调试截图/JSON（审计/调试产物）
+*.png
+*.webp
+file-storage-*.json
+system-flow-definition-runtime-metrics.json
+flow-definition-console.txt
