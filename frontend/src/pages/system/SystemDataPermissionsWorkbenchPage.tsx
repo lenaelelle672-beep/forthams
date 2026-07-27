@@ -4,6 +4,7 @@ import {
   type DataPermissionCatalog,
   type RoleDataScope,
 } from '../../api/dataPermissions';
+import { CatalogPagination } from '../../components/ui/CatalogPagination';
 
 type SystemDataPermissionsWorkbenchPageProps = {
   embeddedInWorkbench?: boolean;
@@ -116,6 +117,14 @@ export default function SystemDataPermissionsWorkbenchPage({
     () => visibleRoles.slice((safePage - 1) * pageSize, safePage * pageSize),
     [visibleRoles, safePage, pageSize],
   );
+
+  const handlePrevPage = () => {
+    setPage((p) => Math.max(1, p - 1));
+  };
+
+  const handleNextPage = () => {
+    setPage((p) => Math.min(totalPages, p + 1));
+  };
 
   if (!canView) {
     return (
@@ -238,25 +247,13 @@ export default function SystemDataPermissionsWorkbenchPage({
             </tbody>
           </table>
         </div>
-        <div className="mt-3 flex items-center justify-center gap-4 text-sm text-slate-600">
-          <button
-            type="button"
-            className="rounded-xl border border-slate-200 px-3 py-1.5 text-slate-700 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
-            disabled={safePage <= 1}
-            onClick={() => setPage((p) => Math.max(1, p - 1))}
-          >
-            上一页
-          </button>
-          <span>第 {safePage} / {totalPages} 页</span>
-          <button
-            type="button"
-            className="rounded-xl border border-slate-200 px-3 py-1.5 text-slate-700 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
-            disabled={safePage >= totalPages}
-            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-          >
-            下一页
-          </button>
-        </div>
+        <CatalogPagination
+          page={safePage}
+          totalPages={totalPages}
+          loading={loading}
+          onPrev={handlePrevPage}
+          onNext={handleNextPage}
+        />
       </div>
 
       <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">

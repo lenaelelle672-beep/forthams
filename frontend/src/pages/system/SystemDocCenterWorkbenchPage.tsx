@@ -6,6 +6,7 @@ import {
   type DocCenterMeta,
   type DocArticleQuery,
 } from '../../api/docCenter';
+import { CatalogPagination } from '../../components/ui/CatalogPagination';
 
 type SystemDocCenterWorkbenchPageProps = {
   embeddedInWorkbench?: boolean;
@@ -268,25 +269,13 @@ export default function SystemDocCenterWorkbenchPage({
             </tbody>
           </table>
         </div>
-        <div className="mt-3 flex items-center justify-center gap-4 text-sm text-slate-600">
-          <button
-            type="button"
-            className="rounded-xl border border-slate-200 px-3 py-1.5 text-slate-700 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
-            disabled={page <= 1 || loading}
-            onClick={handlePrevPage}
-          >
-            上一页
-          </button>
-          <span>第 {page} / {totalPages} 页</span>
-          <button
-            type="button"
-            className="rounded-xl border border-slate-200 px-3 py-1.5 text-slate-700 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
-            disabled={page >= totalPages || loading}
-            onClick={handleNextPage}
-          >
-            下一页
-          </button>
-        </div>
+        <CatalogPagination
+          page={page}
+          totalPages={totalPages}
+          loading={loading}
+          onPrev={handlePrevPage}
+          onNext={handleNextPage}
+        />
       </div>
 
       <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
