@@ -128,6 +128,31 @@ export interface AuditLog {
   tenant_id?: string;
   /** 扩展元数据 (键值对，存储操作上下文) */
   metadata?: Record<string, unknown>;
+  /** 关联资产 ID (变更涉及的目标资产) */
+  assetId?: string;
+  /** 操作类型 (CREATE/UPDATE/DELETE 等，用于业务展示) */
+  operation?: string;
+  /** 字段变更明细列表 (来自 before/after 记录解析) */
+  changes?: AuditLogFieldChange[];
+}
+
+/**
+ * 审计日志字段变更明细接口。
+ * 对应审计日志中单条字段的 before/after 变更记录。
+ */
+export interface AuditLogFieldChange {
+  /** 字段名称 */
+  fieldName: string;
+  /** 字段显示名称 (人类可读标签) */
+  displayName?: string;
+  /** 变更前的值 */
+  oldValue?: string;
+  /** 变更后的值 */
+  newValue?: string;
+  /** 该字段是否标记为 @Auditable */
+  auditable?: boolean;
+  /** 字段数据类型 (用于格式化展示) */
+  fieldType?: string;
 }
 
 /**

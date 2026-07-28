@@ -52,6 +52,12 @@ export interface GraphifyNode {
   description?: string;
   /** 关联资产ID */
   assetId?: string;
+  /** 节点显示标签 (验证/格式化场景使用) */
+  label?: string;
+  /** 力导向布局运行时注入的 X 坐标 */
+  x?: number;
+  /** 力导向布局运行时注入的 Y 坐标 */
+  y?: number;
 }
 
 export interface GraphifyEdge {

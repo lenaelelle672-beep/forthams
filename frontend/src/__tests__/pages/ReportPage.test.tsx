@@ -42,7 +42,12 @@ vi.mock('../../utils/http', () => ({
 import http from '../../utils/http';
 import { getReportSummary, getReportByCategory } from '../../api/stats';
 
-const mockedHttp = vi.mocked(http);
+const mockedHttp = {
+  get: vi.mocked(http.get),
+  post: vi.mocked(http.post),
+  put: vi.mocked(http.put),
+  delete: vi.mocked(http.delete),
+};
 
 describe('ReportPage — API 调用测试', () => {
   beforeEach(() => {

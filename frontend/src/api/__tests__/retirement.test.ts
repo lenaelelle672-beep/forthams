@@ -4,6 +4,8 @@ vi.mock('@/utils/http', () => ({
   default: {
     get: vi.fn(),
     post: vi.fn(),
+    put: vi.fn(),
+    delete: vi.fn(),
   },
 }));
 
@@ -18,7 +20,12 @@ import {
   withdrawRetirement,
 } from '@/api/retirement';
 
-const mockedHttp = vi.mocked(http);
+const mockedHttp = {
+  get: vi.mocked(http.get),
+  post: vi.mocked(http.post),
+  put: vi.mocked(http.put),
+  delete: vi.mocked(http.delete),
+};
 
 describe('api/retirement', () => {
   beforeEach(() => {

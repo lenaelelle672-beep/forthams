@@ -3,6 +3,9 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 vi.mock('@/utils/http', () => ({
   default: {
     get: vi.fn(),
+    post: vi.fn(),
+    put: vi.fn(),
+    delete: vi.fn(),
   },
 }));
 
@@ -18,7 +21,12 @@ import {
   getAuditTrends,
 } from '@/api/audit';
 
-const mockedHttp = vi.mocked(http);
+const mockedHttp = {
+  get: vi.mocked(http.get),
+  post: vi.mocked(http.post),
+  put: vi.mocked(http.put),
+  delete: vi.mocked(http.delete),
+};
 
 describe('api/audit', () => {
   beforeEach(() => vi.clearAllMocks());

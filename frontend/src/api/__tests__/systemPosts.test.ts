@@ -5,13 +5,20 @@ vi.mock('@/utils/http', () => ({
   default: {
     get: vi.fn(),
     post: vi.fn(),
+    put: vi.fn(),
+    delete: vi.fn(),
   },
 }));
 
 import http from '@/utils/http';
 import { systemPostApi } from '@/api/systemPosts';
 
-const mockedHttp = vi.mocked(http);
+const mockedHttp = {
+  get: vi.mocked(http.get),
+  post: vi.mocked(http.post),
+  put: vi.mocked(http.put),
+  delete: vi.mocked(http.delete),
+};
 const wrapperSource = readFileSync('src/api/systemPosts.ts', 'utf8');
 
 describe('api/systemPosts', () => {

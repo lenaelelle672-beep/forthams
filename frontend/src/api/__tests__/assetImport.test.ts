@@ -4,13 +4,20 @@ vi.mock('axios', () => ({
   default: {
     get: vi.fn(),
     post: vi.fn(),
+    put: vi.fn(),
+    delete: vi.fn(),
   },
 }));
 
 import axios from 'axios';
 import { exportAssets, getImportTemplate, parseImportFile, commitImport } from '@/api/assetImport';
 
-const mockedAxios = vi.mocked(axios);
+const mockedAxios = {
+  get: vi.mocked(axios.get),
+  post: vi.mocked(axios.post),
+  put: vi.mocked(axios.put),
+  delete: vi.mocked(axios.delete),
+};
 
 describe('api/assetImport', () => {
   beforeEach(() => {

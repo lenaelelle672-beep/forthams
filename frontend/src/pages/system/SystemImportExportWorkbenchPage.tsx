@@ -4,9 +4,9 @@ import {
   getImportExportMeta,
   type ImportExportTaskRecord,
   type ImportExportMeta,
-  type ImportExportQuery,
 } from '../../api/importExport';
 import { CatalogPagination } from '../../components/ui/CatalogPagination';
+import { useCatalogPage } from '../../hooks/useCatalogPage';
 
 type SystemImportExportWorkbenchPageProps = {
   embeddedInWorkbench?: boolean;
@@ -59,108 +59,59 @@ export default function SystemImportExportWorkbenchPage({
   embeddedInWorkbench = false,
   canView = true,
 }: SystemImportExportWorkbenchPageProps) {
-  const [tasks, setTasks] = useState<ImportExportTaskRecord[]>([]);
-  const [total, setTotal] = useState(0);
   const [meta, setMeta] = useState<ImportExportMeta>(emptyMeta);
-  const [keyword, setKeyword] = useState('');
+  const [keywordInput, setKeywordInput] = useState('');
+  const [activeKeyword, setActiveKeyword] = useState('');
   const [typeFilter, setTypeFilter] = useState<TypeFilter>('all');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
-  const [page, setPage] = useState(1);
-  const [pageSize] = useState(20);
-  const [loading, setLoading] = useState(canView);
-  const [error, setError] = useState<string | null>(null);
 
-  const buildQuery = (): ImportExportQuery => {
-    const query: ImportExportQuery = {};
-    if (typeFilter !== 'all') query.taskType = typeFilter;
-    if (statusFilter !== 'all') query.status = statusFilter;
-    return query;
-  };
+  // List state, pagination, and the stale-response guard are delegated to the
+  // generic catalog hook. The keyword query flows through `search`; type/status
+  // filters remain client-side. Meta is fetched alongside, outside the hook.
+  const {
+    records: tasks,
+    total,
+    loading,
+    error,
+    page,
+    totalPages,
+    setPage,
+    reload,
+    search,
+  } = useCatalogPage<ImportExportTaskRecord>({
+    listFn: (q) => listImportExportTasks({ page: q.page, pageSize: q.pageSize, ...q }),
+    canView,
+  });
 
-  const loadTasks = async (query: ImportExportQuery = buildQuery(), nextPage: number = page) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const [data, nextMeta] = await Promise.all([
-        listImportExportTasks({ page: nextPage, pageSize, ...query }),
-        getImportExportMeta(),
-      ]);
-      setTasks(data?.records ?? []);
-      setTotal(data?.total ?? 0);
-      setMeta(nextMeta ?? emptyMeta());
-      setPage(nextPage);
-    } catch {
-      setTasks([]);
-      setTotal(0);
-      setMeta(emptyMeta());
-      setError('导入导出任务加载失败，敏感细节已脱敏');
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  // Meta is owned by the page, not the catalog hook. Fetch it once on mount
+  // (guarded by `canView`) and never let a meta failure mask the list error.
   useEffect(() => {
-    if (!canView) {
-      setLoading(false);
-      return;
-    }
+    if (!canView) return;
     let ignored = false;
-    setLoading(true);
-    setError(null);
-
-    Promise.all([
-      listImportExportTasks({ page, pageSize }),
-      getImportExportMeta(),
-    ])
-      .then(([data, nextMeta]) => {
-        if (ignored) {
-          return;
-        }
-        setTasks(data?.records ?? []);
-        setTotal(data?.total ?? 0);
-        setMeta(nextMeta ?? emptyMeta());
+    getImportExportMeta()
+      .then((nextMeta) => {
+        if (!ignored) setMeta(nextMeta ?? emptyMeta());
       })
       .catch(() => {
-        if (!ignored) {
-          setTasks([]);
-          setTotal(0);
-          setMeta(emptyMeta());
-          setError('导入导出任务加载失败，敏感细节已脱敏');
-        }
-      })
-      .finally(() => {
-        if (!ignored) {
-          setLoading(false);
-        }
+        if (!ignored) setMeta(emptyMeta());
       });
-
     return () => {
       ignored = true;
     };
-  }, [canView, page, pageSize]);
+  }, [canView]);
 
   const visibleTasks = useMemo(
-    () => tasks.filter((t) => matchesType(t, typeFilter) && matchesStatus(t, statusFilter) && matchesKeyword(t, keyword)),
-    [tasks, typeFilter, statusFilter, keyword],
+    () => tasks.filter((t) => matchesType(t, typeFilter) && matchesStatus(t, statusFilter) && matchesKeyword(t, activeKeyword)),
+    [tasks, typeFilter, statusFilter, activeKeyword],
   );
 
   const failedCount = useMemo(() => tasks.filter((t) => String(t.status ?? '').toUpperCase() === 'FAILED').length, [tasks]);
 
-  const totalPages = Math.max(1, Math.ceil(total / pageSize));
-
   const handleSearch = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    void loadTasks(buildQuery(), 1);
-  };
-
-  const handlePrevPage = () => {
-    if (page <= 1 || loading) return;
-    void loadTasks(buildQuery(), page - 1);
-  };
-
-  const handleNextPage = () => {
-    if (page >= totalPages || loading) return;
-    void loadTasks(buildQuery(), page + 1);
+    const nextKeyword = keywordInput.trim();
+    setActiveKeyword(nextKeyword);
+    search(nextKeyword ? { keyword: nextKeyword } : {});
   };
 
   if (!canView) {
@@ -186,7 +137,7 @@ export default function SystemImportExportWorkbenchPage({
           className="rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-700 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
           disabled={loading}
           type="button"
-          onClick={() => void loadTasks()}
+          onClick={reload}
         >
           重新加载
         </button>
@@ -217,8 +168,8 @@ export default function SystemImportExportWorkbenchPage({
           id="import-export-keyword"
           className="rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-400"
           placeholder="按业务对象或操作人搜索"
-          value={keyword}
-          onChange={(event) => setKeyword(event.target.value)}
+          value={keywordInput}
+          onChange={(event) => setKeywordInput(event.target.value)}
         />
         <label className="sr-only" htmlFor="import-export-type-filter">任务类型筛选</label>
         <select
@@ -305,8 +256,8 @@ export default function SystemImportExportWorkbenchPage({
           page={page}
           totalPages={totalPages}
           loading={loading}
-          onPrev={handlePrevPage}
-          onNext={handleNextPage}
+          onPrev={() => setPage(page - 1)}
+          onNext={() => setPage(page + 1)}
         />
       </div>
 

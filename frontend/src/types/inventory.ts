@@ -90,12 +90,18 @@ export interface InventoryTask {
  * 用于资产清单表格（逐条 / 批量确认）。
  */
 export interface InventoryAsset {
+  /** 资产记录唯一标识（后端主键，与 assetCode 关联） */
+  id?: string;
   /** 资产 ID */
   assetId: string;
   /** 资产编号 */
   assetCode: string;
   /** 资产名称 */
   assetName: string;
+  /** 分类名称（冗余展示） */
+  categoryName?: string;
+  /** 位置路径展示（如：总部/研发中心/3F） */
+  locationPath?: string;
   /** 账面状态 */
   bookStatus: string;
   /** 实盘状态；未盘时为 null */

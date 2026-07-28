@@ -48,7 +48,12 @@ vi.mock('../utils/http', () => ({
 
 import http from '../utils/http';
 
-const mockedHttp = vi.mocked(http);
+const mockedHttp = {
+  get: vi.mocked(http.get),
+  post: vi.mocked(http.post),
+  put: vi.mocked(http.put),
+  delete: vi.mocked(http.delete),
+};
 
 // ---------------------------------------------------------------------------
 // Fixtures & helpers

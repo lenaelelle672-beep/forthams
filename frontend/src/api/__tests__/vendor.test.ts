@@ -18,7 +18,12 @@ import {
   updateVendor,
 } from '@/api/vendor';
 
-const mockedHttp = vi.mocked(http);
+const mockedHttp = {
+  get: vi.mocked(http.get),
+  post: vi.mocked(http.post),
+  put: vi.mocked(http.put),
+  delete: vi.mocked(http.delete),
+};
 
 describe('api/vendor', () => {
   beforeEach(() => {

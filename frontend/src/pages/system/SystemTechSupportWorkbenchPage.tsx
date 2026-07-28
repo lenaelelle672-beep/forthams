@@ -4,9 +4,9 @@ import {
   getTechSupportMeta,
   type SupportTicketRecord,
   type TechSupportMeta,
-  type SupportTicketQuery,
 } from '../../api/techSupport';
 import { CatalogPagination } from '../../components/ui/CatalogPagination';
+import { useCatalogPage } from '../../hooks/useCatalogPage';
 
 type SystemTechSupportWorkbenchPageProps = {
   embeddedInWorkbench?: boolean;

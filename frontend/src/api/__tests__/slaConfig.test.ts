@@ -5,6 +5,7 @@ vi.mock('@/utils/http', () => ({
     get: vi.fn(),
     put: vi.fn(),
     post: vi.fn(),
+    delete: vi.fn(),
   },
 }));
 
@@ -21,7 +22,12 @@ import {
   updateSlaConfig,
 } from '@/api/slaConfig';
 
-const mockedHttp = vi.mocked(http);
+const mockedHttp = {
+  get: vi.mocked(http.get),
+  post: vi.mocked(http.post),
+  put: vi.mocked(http.put),
+  delete: vi.mocked(http.delete),
+};
 
 describe('api/slaConfig', () => {
   beforeEach(() => {

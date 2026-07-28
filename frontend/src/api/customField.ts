@@ -180,13 +180,13 @@ export const deleteCustomField = (id: number) =>
   http.delete<void>(`/system/custom-fields/${id}`);
 
 export const getCustomFieldsetList = (page: number, pageSize: number, keyword?: string) =>
-  http.get<PageData<CustomFieldsetItem>>('/system/custom-fieldsets', { params: { page, pageSize, keyword } });
+  http.get<PageData<CustomFieldsetItem>>('/system/custom-fieldsets', { params: { page, pageSize, keyword } }) as unknown as Promise<PageData<CustomFieldsetItem>>;
 
 export const getCustomFieldsetAll = () =>
-  http.get<CustomFieldsetItem[]>('/system/custom-fieldsets/all');
+  http.get<CustomFieldsetItem[]>('/system/custom-fieldsets/all') as unknown as Promise<CustomFieldsetItem[]>;
 
 export const getCustomFieldsetDetail = (id: number) =>
-  http.get<CustomFieldsetItem>(`/system/custom-fieldsets/${id}`);
+  http.get<CustomFieldsetItem>(`/system/custom-fieldsets/${id}`) as unknown as Promise<CustomFieldsetItem>;
 
 export const getCustomFieldsetMeta = () =>
   http.get<CustomFieldsetMeta>('/system/custom-fieldsets/meta');

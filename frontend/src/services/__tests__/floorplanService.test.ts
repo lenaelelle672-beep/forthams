@@ -4,7 +4,12 @@ vi.mock('@/utils/http', () => ({ default: { get: vi.fn(), post: vi.fn(), put: vi
 
 import http from '@/utils/http';
 import floorplanService from '../floorplanService';
-const mockedHttp = vi.mocked(http);
+const mockedHttp = {
+  get: vi.mocked(http.get),
+  post: vi.mocked(http.post),
+  put: vi.mocked(http.put),
+  delete: vi.mocked(http.delete),
+};
 
 describe('floorplanService', () => {
   beforeEach(() => { vi.clearAllMocks(); });

@@ -5,13 +5,19 @@ vi.mock('@/utils/http', () => ({
     get: vi.fn(),
     post: vi.fn(),
     put: vi.fn(),
+    delete: vi.fn(),
   },
 }));
 
 import http from '@/utils/http';
 import { approvalRulesApi } from '@/api/approvalRules';
 
-const mockedHttp = vi.mocked(http);
+const mockedHttp = {
+  get: vi.mocked(http.get),
+  post: vi.mocked(http.post),
+  put: vi.mocked(http.put),
+  delete: vi.mocked(http.delete),
+};
 
 describe('api/approvalRules', () => {
   beforeEach(() => {

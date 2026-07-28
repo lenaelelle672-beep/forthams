@@ -1,10 +1,15 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-vi.mock('@/utils/http', () => ({ default: { get: vi.fn(), put: vi.fn() } }));
+vi.mock('@/utils/http', () => ({ default: { get: vi.fn(), post: vi.fn(), put: vi.fn(), delete: vi.fn() } }));
 
 import http from '@/utils/http';
 import gisService from '../gisService';
-const mockedHttp = vi.mocked(http);
+const mockedHttp = {
+  get: vi.mocked(http.get),
+  post: vi.mocked(http.post),
+  put: vi.mocked(http.put),
+  delete: vi.mocked(http.delete),
+};
 
 describe('gisService', () => {
   beforeEach(() => { vi.clearAllMocks(); });
