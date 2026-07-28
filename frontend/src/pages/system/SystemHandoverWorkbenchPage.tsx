@@ -4,9 +4,9 @@ import {
   getHandoverMeta,
   type HandoverRecord,
   type HandoverMeta,
-  type HandoverQuery,
 } from '../../api/handover';
 import { CatalogPagination } from '../../components/ui/CatalogPagination';
+import { useCatalogPage } from '../../hooks/useCatalogPage';
 
 type SystemHandoverWorkbenchPageProps = {
   embeddedInWorkbench?: boolean;
@@ -46,106 +46,61 @@ export default function SystemHandoverWorkbenchPage({
   embeddedInWorkbench = false,
   canView = true,
 }: SystemHandoverWorkbenchPageProps) {
-  const [records, setRecords] = useState<HandoverRecord[]>([]);
-  const [total, setTotal] = useState(0);
   const [meta, setMeta] = useState<HandoverMeta>(emptyMeta);
-  const [keyword, setKeyword] = useState('');
+  const [keywordInput, setKeywordInput] = useState('');
+  const [activeKeyword, setActiveKeyword] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
-  const [page, setPage] = useState(1);
-  const [pageSize] = useState(20);
-  const [loading, setLoading] = useState(canView);
-  const [error, setError] = useState<string | null>(null);
 
-  const buildQuery = (): HandoverQuery => {
-    const query: HandoverQuery = {};
-    if (statusFilter !== 'all') query.status = statusFilter;
-    return query;
-  };
+  // List state, pagination, and the stale-response guard are delegated to the
+  // generic catalog hook. The keyword query flows through `search`; the status
+  // filter remains client-side. Meta is fetched alongside, outside the hook.
+  const {
+    records,
+    total,
+    loading,
+    error,
+    page,
+    totalPages,
+    setPage,
+    reload,
+    search,
+  } = useCatalogPage<HandoverRecord>({
+    listFn: (q) => listHandoverTasks({ page: q.page, pageSize: q.pageSize, ...q }),
+    canView,
+  });
 
-  const loadRecords = async (query: HandoverQuery = buildQuery(), nextPage: number = page) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const [data, nextMeta] = await Promise.all([
-        listHandoverTasks({ page: nextPage, pageSize, ...query }),
-        getHandoverMeta(),
-      ]);
-      setRecords(data?.records ?? []);
-      setTotal(data?.total ?? 0);
-      setMeta(nextMeta ?? emptyMeta());
-      setPage(nextPage);
-    } catch {
-      setRecords([]);
-      setTotal(0);
-      setMeta(emptyMeta());
-      setError('交接任务加载失败，敏感细节已脱敏');
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  // Meta is owned by the page, not the catalog hook. Fetch it once on mount
+  // (guarded by `canView`) and never let a meta failure mask the list error.
   useEffect(() => {
-    if (!canView) {
-      setLoading(false);
-      return;
-    }
+    if (!canView) return;
     let ignored = false;
-    setLoading(true);
-    setError(null);
-
-    Promise.all([
-      listHandoverTasks({ page, pageSize }),
-      getHandoverMeta(),
-    ])
-      .then(([data, nextMeta]) => {
-        if (ignored) {
-          return;
-        }
-        setRecords(data?.records ?? []);
-        setTotal(data?.total ?? 0);
-        setMeta(nextMeta ?? emptyMeta());
+    getHandoverMeta()
+      .then((nextMeta) => {
+        if (!ignored) setMeta(nextMeta ?? emptyMeta());
       })
       .catch(() => {
-        if (!ignored) {
-          setRecords([]);
-          setTotal(0);
-          setMeta(emptyMeta());
-          setError('交接任务加载失败，敏感细节已脱敏');
-        }
-      })
-      .finally(() => {
-        if (!ignored) {
-          setLoading(false);
-        }
+        if (!ignored) setMeta(emptyMeta());
       });
-
     return () => {
       ignored = true;
     };
-  }, [canView, page, pageSize]);
+  }, [canView]);
 
   const visibleRecords = useMemo(
-    () => records.filter((r) => matchesStatus(r, statusFilter) && matchesKeyword(r, keyword)),
-    [records, statusFilter, keyword],
+    () => records.filter((r) => matchesStatus(r, statusFilter) && matchesKeyword(r, activeKeyword)),
+    [records, statusFilter, activeKeyword],
   );
 
-  const pendingCount = useMemo(() => records.filter((r) => ['PENDING', 'IN_PROGRESS'].includes(String(r.status ?? '').toUpperCase())).length, [records]);
-
-  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const pendingCount = useMemo(
+    () => records.filter((r) => ['PENDING', 'IN_PROGRESS'].includes(String(r.status ?? '').toUpperCase())).length,
+    [records],
+  );
 
   const handleSearch = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    void loadRecords(buildQuery(), 1);
-  };
-
-  const handlePrevPage = () => {
-    if (page <= 1 || loading) return;
-    void loadRecords(buildQuery(), page - 1);
-  };
-
-  const handleNextPage = () => {
-    if (page >= totalPages || loading) return;
-    void loadRecords(buildQuery(), page + 1);
+    const nextKeyword = keywordInput.trim();
+    setActiveKeyword(nextKeyword);
+    search(nextKeyword ? { keyword: nextKeyword } : {});
   };
 
   if (!canView) {
@@ -171,7 +126,7 @@ export default function SystemHandoverWorkbenchPage({
           className="rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-700 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
           disabled={loading}
           type="button"
-          onClick={() => void loadRecords()}
+          onClick={reload}
         >
           重新加载
         </button>
@@ -202,8 +157,8 @@ export default function SystemHandoverWorkbenchPage({
           id="handover-keyword"
           className="rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-400"
           placeholder="按标题、交接人或接收人搜索"
-          value={keyword}
-          onChange={(event) => setKeyword(event.target.value)}
+          value={keywordInput}
+          onChange={(event) => setKeywordInput(event.target.value)}
         />
         <label className="sr-only" htmlFor="handover-status-filter">交接状态筛选</label>
         <select
@@ -274,8 +229,8 @@ export default function SystemHandoverWorkbenchPage({
           page={page}
           totalPages={totalPages}
           loading={loading}
-          onPrev={handlePrevPage}
-          onNext={handleNextPage}
+          onPrev={() => setPage(page - 1)}
+          onNext={() => setPage(page + 1)}
         />
       </div>
 
