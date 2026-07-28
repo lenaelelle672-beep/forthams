@@ -13,7 +13,13 @@ vi.mock('@/utils/http', () => ({
 import http from '@/utils/http';
 import { approveTask, batchConfirmAssets, confirmAsset, submitTask, updateTaskStatus } from '@/api/inventory';
 
-const mockedHttp = vi.mocked(http);
+const mockedHttp = {
+  get: vi.mocked(http.get),
+  post: vi.mocked(http.post),
+  put: vi.mocked(http.put),
+  patch: vi.mocked(http.patch),
+  delete: vi.mocked(http.delete),
+};
 
 describe('api/inventory', () => {
   beforeEach(() => {

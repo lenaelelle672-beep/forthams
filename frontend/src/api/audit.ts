@@ -28,6 +28,13 @@ export interface AuditLog {
   tenantScoped?: boolean;
   masked?: boolean;
   readonlyBoundary?: string;
+  changes?: Array<{
+    field?: string;
+    oldValue?: string;
+    newValue?: string;
+    auditable?: boolean;
+    [key: string]: unknown;
+  }>;
 }
 
 export interface AuditListQuery {
