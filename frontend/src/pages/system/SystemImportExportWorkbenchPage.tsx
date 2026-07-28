@@ -79,7 +79,7 @@ export default function SystemImportExportWorkbenchPage({
     reload,
     search,
   } = useCatalogPage<ImportExportTaskRecord>({
-    listFn: (q) => listImportExportTasks({ page: q.page, pageSize: q.pageSize, ...q }),
+    listFn: (q) => listImportExportTasks({ ...q, page: q.page, pageSize: q.pageSize }),
     canView,
   });
 

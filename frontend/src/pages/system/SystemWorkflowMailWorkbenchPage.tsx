@@ -52,7 +52,7 @@ export default function SystemWorkflowMailWorkbenchPage({
     reload,
     search,
   } = useCatalogPage<WorkflowMailConfigRecord>({
-    listFn: (q) => listWorkflowMailConfigs({ page: q.page, pageSize: q.pageSize, ...q }),
+    listFn: (q) => listWorkflowMailConfigs({ ...q, page: q.page, pageSize: q.pageSize }),
     canView,
   });
 

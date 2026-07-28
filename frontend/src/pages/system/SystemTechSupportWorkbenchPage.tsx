@@ -76,7 +76,7 @@ export default function SystemTechSupportWorkbenchPage({
     reload,
     search,
   } = useCatalogPage<SupportTicketRecord>({
-    listFn: (q) => listSupportTickets({ page: q.page, pageSize: q.pageSize, ...q }),
+    listFn: (q) => listSupportTickets({ ...q, page: q.page, pageSize: q.pageSize }),
     canView,
   });
 
