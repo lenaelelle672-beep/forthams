@@ -4,9 +4,9 @@ import {
   getWorkflowMailMeta,
   type WorkflowMailConfigRecord,
   type WorkflowMailMeta,
-  type WorkflowMailQuery,
 } from '../../api/workflowMail';
 import { CatalogPagination } from '../../components/ui/CatalogPagination';
+import { useCatalogPage } from '../../hooks/useCatalogPage';
 
 type SystemWorkflowMailWorkbenchPageProps = {
   embeddedInWorkbench?: boolean;
@@ -32,113 +32,67 @@ export default function SystemWorkflowMailWorkbenchPage({
   embeddedInWorkbench = false,
   canView = true,
 }: SystemWorkflowMailWorkbenchPageProps) {
-  const [records, setRecords] = useState<WorkflowMailConfigRecord[]>([]);
-  const [total, setTotal] = useState(0);
   const [meta, setMeta] = useState<WorkflowMailMeta>(emptyMeta);
-  const [keyword, setKeyword] = useState('');
+  const [keywordInput, setKeywordInput] = useState('');
+  const [activeKeyword, setActiveKeyword] = useState('');
   const [businessType, setBusinessType] = useState('');
   const [enabledFilter, setEnabledFilter] = useState<EnabledFilter>('all');
-  const [page, setPage] = useState(1);
-  const [pageSize] = useState(20);
-  const [loading, setLoading] = useState(canView);
-  const [error, setError] = useState<string | null>(null);
 
-  const buildQuery = (): WorkflowMailQuery => {
-    const query: WorkflowMailQuery = {};
-    if (businessType.trim()) query.businessType = businessType.trim();
-    if (enabledFilter === 'enabled') query.enabled = 1;
-    if (enabledFilter === 'disabled') query.enabled = 0;
-    return query;
-  };
+  // List state, pagination, and the stale-response guard are delegated to the
+  // generic catalog hook. Keyword + businessType flow through `search`; the
+  // enabled filter remains client-side. Meta is fetched alongside, outside the hook.
+  const {
+    records,
+    total,
+    loading,
+    error,
+    page,
+    totalPages,
+    setPage,
+    reload,
+    search,
+  } = useCatalogPage<WorkflowMailConfigRecord>({
+    listFn: (q) => listWorkflowMailConfigs({ page: q.page, pageSize: q.pageSize, ...q }),
+    canView,
+  });
 
-  const loadConfigs = async (query: WorkflowMailQuery = buildQuery(), nextPage: number = page) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const [data, nextMeta] = await Promise.all([
-        listWorkflowMailConfigs({ page: nextPage, pageSize, ...query }),
-        getWorkflowMailMeta(),
-      ]);
-      setRecords(data?.records ?? []);
-      setTotal(data?.total ?? 0);
-      setMeta(nextMeta ?? emptyMeta());
-      setPage(nextPage);
-    } catch {
-      setRecords([]);
-      setTotal(0);
-      setMeta(emptyMeta());
-      setError('流程邮件配置加载失败，敏感细节已脱敏');
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  // Meta is owned by the page, not the catalog hook. Fetch it once on mount
+  // (guarded by `canView`) and never let a meta failure mask the list error.
   useEffect(() => {
-    if (!canView) {
-      setLoading(false);
-      return;
-    }
+    if (!canView) return;
     let ignored = false;
-    setLoading(true);
-    setError(null);
-
-    Promise.all([
-      listWorkflowMailConfigs({ page, pageSize }),
-      getWorkflowMailMeta(),
-    ])
-      .then(([data, nextMeta]) => {
-        if (ignored) {
-          return;
-        }
-        setRecords(data?.records ?? []);
-        setTotal(data?.total ?? 0);
-        setMeta(nextMeta ?? emptyMeta());
+    getWorkflowMailMeta()
+      .then((nextMeta) => {
+        if (!ignored) setMeta(nextMeta ?? emptyMeta());
       })
       .catch(() => {
-        if (!ignored) {
-          setRecords([]);
-          setTotal(0);
-          setMeta(emptyMeta());
-          setError('流程邮件配置加载失败，敏感细节已脱敏');
-        }
-      })
-      .finally(() => {
-        if (!ignored) {
-          setLoading(false);
-        }
+        if (!ignored) setMeta(emptyMeta());
       });
-
     return () => {
       ignored = true;
     };
-  }, [canView, page, pageSize]);
+  }, [canView]);
 
   const visibleRecords = useMemo(
     () => records.filter((r) => {
       if (enabledFilter === 'enabled' && !r.enabled) return false;
       if (enabledFilter === 'disabled' && r.enabled) return false;
-      return matchesKeyword(r, keyword);
+      return matchesKeyword(r, activeKeyword);
     }),
-    [records, enabledFilter, keyword],
+    [records, enabledFilter, activeKeyword],
   );
 
   const enabledCount = useMemo(() => records.filter((r) => r.enabled).length, [records]);
 
-  const totalPages = Math.max(1, Math.ceil(total / pageSize));
-
   const handleSearch = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    void loadConfigs(buildQuery(), 1);
-  };
-
-  const handlePrevPage = () => {
-    if (page <= 1 || loading) return;
-    void loadConfigs(buildQuery(), page - 1);
-  };
-
-  const handleNextPage = () => {
-    if (page >= totalPages || loading) return;
-    void loadConfigs(buildQuery(), page + 1);
+    const nextKeyword = keywordInput.trim();
+    const nextBusinessType = businessType.trim();
+    setActiveKeyword(nextKeyword);
+    const query: Record<string, unknown> = {};
+    if (nextKeyword) query.keyword = nextKeyword;
+    if (nextBusinessType) query.businessType = nextBusinessType;
+    search(query);
   };
 
   if (!canView) {
@@ -164,7 +118,7 @@ export default function SystemWorkflowMailWorkbenchPage({
           className="rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-700 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
           disabled={loading}
           type="button"
-          onClick={() => void loadConfigs()}
+          onClick={reload}
         >
           重新加载
         </button>
@@ -195,8 +149,8 @@ export default function SystemWorkflowMailWorkbenchPage({
           id="workflow-mail-keyword"
           className="rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-400"
           placeholder="按业务类型、节点或模板搜索"
-          value={keyword}
-          onChange={(event) => setKeyword(event.target.value)}
+          value={keywordInput}
+          onChange={(event) => setKeywordInput(event.target.value)}
         />
         <label className="sr-only" htmlFor="workflow-mail-business-type">业务类型</label>
         <input
@@ -265,8 +219,8 @@ export default function SystemWorkflowMailWorkbenchPage({
           page={page}
           totalPages={totalPages}
           loading={loading}
-          onPrev={handlePrevPage}
-          onNext={handleNextPage}
+          onPrev={() => setPage(page - 1)}
+          onNext={() => setPage(page + 1)}
         />
       </div>
 

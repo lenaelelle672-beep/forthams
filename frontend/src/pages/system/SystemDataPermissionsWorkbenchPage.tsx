@@ -1,10 +1,11 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   getDataPermissionCatalog,
   type DataPermissionCatalog,
   type RoleDataScope,
 } from '../../api/dataPermissions';
 import { CatalogPagination } from '../../components/ui/CatalogPagination';
+import { useCatalogPage } from '../../hooks/useCatalogPage';
 
 type SystemDataPermissionsWorkbenchPageProps = {
   embeddedInWorkbench?: boolean;
@@ -46,84 +47,64 @@ export default function SystemDataPermissionsWorkbenchPage({
   embeddedInWorkbench = false,
   canView = true,
 }: SystemDataPermissionsWorkbenchPageProps) {
-  const [catalog, setCatalog] = useState<DataPermissionCatalog>(emptyCatalog);
+  // The data-permissions catalog is a single endpoint that returns roles plus
+  // summary/riskTips/readOnlyNotice. The catalog hook drives loading/error and
+  // owns the roles list; pagination is client-side because the endpoint returns
+  // the full role set in one shot. The non-list fields are surfaced through a
+  // ref that `listFn` populates, mirrored into state for rendering.
+  const catalogMetaRef = useRef<DataPermissionCatalog>(emptyCatalog());
+  const [catalogMeta, setCatalogMeta] = useState<DataPermissionCatalog>(emptyCatalog());
+
   const [keyword, setKeyword] = useState('');
   const [scopeFilter, setScopeFilter] = useState<ScopeFilter>('all');
-  const [page, setPage] = useState(1);
-  const [pageSize] = useState(20);
-  const [loading, setLoading] = useState(canView);
-  const [error, setError] = useState<string | null>(null);
 
-  const loadCatalog = async () => {
-    setLoading(true);
-    setError(null);
-    try {
+  const {
+    records: roles,
+    loading,
+    error,
+    page,
+    setPage,
+    reload,
+  } = useCatalogPage<RoleDataScope>({
+    listFn: async () => {
       const next = await getDataPermissionCatalog();
-      setCatalog(next ?? emptyCatalog());
-    } catch {
-      setCatalog(emptyCatalog());
-      setError('数据权限只读 catalog 加载失败，敏感细节已脱敏');
-    } finally {
-      setLoading(false);
-    }
-  };
+      const safe = next ?? emptyCatalog();
+      catalogMetaRef.current = safe;
+      return { records: safe.roles ?? [], total: (safe.roles ?? []).length };
+    },
+    canView,
+  });
 
+  // Mirror the latest catalog meta (summary / riskTips / readOnlyNotice) into
+  // state whenever a fresh role set arrives from the hook.
   useEffect(() => {
-    if (!canView) {
-      setLoading(false);
-      return;
-    }
-    let ignored = false;
-    setLoading(true);
-    setError(null);
-
-    getDataPermissionCatalog()
-      .then((next) => {
-        if (ignored) {
-          return;
-        }
-        setCatalog(next ?? emptyCatalog());
-      })
-      .catch(() => {
-        if (!ignored) {
-          setCatalog(emptyCatalog());
-          setError('数据权限只读 catalog 加载失败，敏感细节已脱敏');
-        }
-      })
-      .finally(() => {
-        if (!ignored) {
-          setLoading(false);
-        }
-      });
-
-    return () => {
-      ignored = true;
-    };
-  }, [canView]);
+    setCatalogMeta(catalogMetaRef.current);
+  }, [roles]);
 
   const visibleRoles = useMemo(
-    () => catalog.roles.filter((r) => matchesScope(r, scopeFilter) && matchesKeyword(r, keyword)),
-    [catalog.roles, scopeFilter, keyword],
+    () => roles.filter((r) => matchesScope(r, scopeFilter) && matchesKeyword(r, keyword)),
+    [roles, scopeFilter, keyword],
   );
 
-  // 筛选条件变化时回到第一页
+  // Reset to the first page whenever the filter or the underlying role set
+  // changes so the user never lands on an out-of-range page.
   useEffect(() => {
     setPage(1);
-  }, [keyword, scopeFilter, catalog.roles]);
+  }, [keyword, scopeFilter, roles, setPage]);
 
-  const totalPages = Math.max(1, Math.ceil(visibleRoles.length / pageSize));
+  const totalPages = Math.max(1, Math.ceil(visibleRoles.length / 20));
   const safePage = Math.min(page, totalPages);
   const pagedRoles = useMemo(
-    () => visibleRoles.slice((safePage - 1) * pageSize, safePage * pageSize),
-    [visibleRoles, safePage, pageSize],
+    () => visibleRoles.slice((safePage - 1) * 20, safePage * 20),
+    [visibleRoles, safePage],
   );
 
   const handlePrevPage = () => {
-    setPage((p) => Math.max(1, p - 1));
+    setPage(Math.max(1, page - 1));
   };
 
   const handleNextPage = () => {
-    setPage((p) => Math.min(totalPages, p + 1));
+    setPage(Math.min(totalPages, page + 1));
   };
 
   if (!canView) {
@@ -136,7 +117,7 @@ export default function SystemDataPermissionsWorkbenchPage({
     );
   }
 
-  const emptyMessage = catalog.roles.length === 0 ? '暂无角色数据范围。' : '没有符合条件的角色数据范围。';
+  const emptyMessage = roles.length === 0 ? '暂无角色数据范围。' : '没有符合条件的角色数据范围。';
 
   return (
     <section className="space-y-5" data-embedded={embeddedInWorkbench}>
@@ -149,7 +130,7 @@ export default function SystemDataPermissionsWorkbenchPage({
           className="rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-700 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
           disabled={loading}
           type="button"
-          onClick={loadCatalog}
+          onClick={reload}
         >
           重新加载
         </button>
@@ -162,27 +143,27 @@ export default function SystemDataPermissionsWorkbenchPage({
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-2xl border border-slate-200 p-4">
           <p className="text-xs text-slate-500">角色总数</p>
-          <p className="mt-2 text-2xl font-semibold text-slate-900">{catalog.summary.roleCount}</p>
+          <p className="mt-2 text-2xl font-semibold text-slate-900">{catalogMeta.summary.roleCount}</p>
         </div>
         <div className="rounded-2xl border border-slate-200 p-4">
           <p className="text-xs text-slate-500">全部数据（ALL）</p>
-          <p className="mt-2 text-2xl font-semibold text-red-600">{catalog.summary.allScopeCount}</p>
+          <p className="mt-2 text-2xl font-semibold text-red-600">{catalogMeta.summary.allScopeCount}</p>
         </div>
         <div className="rounded-2xl border border-slate-200 p-4">
           <p className="text-xs text-slate-500">已收紧范围</p>
-          <p className="mt-2 text-2xl font-semibold text-emerald-600">{catalog.summary.restrictedScopeCount}</p>
+          <p className="mt-2 text-2xl font-semibold text-emerald-600">{catalogMeta.summary.restrictedScopeCount}</p>
         </div>
         <div className="rounded-2xl border border-slate-200 p-4">
           <p className="text-xs text-slate-500">自定义（CUSTOM）</p>
-          <p className="mt-2 text-2xl font-semibold text-amber-600">{catalog.summary.customScopeCount}</p>
+          <p className="mt-2 text-2xl font-semibold text-amber-600">{catalogMeta.summary.customScopeCount}</p>
         </div>
       </div>
 
-      {(catalog.riskTips ?? []).length > 0 ? (
+      {(catalogMeta.riskTips ?? []).length > 0 ? (
         <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
           <p className="font-semibold">风险提示</p>
           <ul className="mt-1 list-inside list-disc space-y-1">
-            {catalog.riskTips.map((tip) => <li key={tip}>{tip}</li>)}
+            {catalogMeta.riskTips.map((tip) => <li key={tip}>{tip}</li>)}
           </ul>
         </div>
       ) : null}
@@ -219,7 +200,7 @@ export default function SystemDataPermissionsWorkbenchPage({
       <div className="rounded-2xl border border-slate-200 p-4">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
           <h4 className="font-semibold">角色数据范围</h4>
-          <span className="text-xs text-slate-500">显示 {visibleRoles.length} / {catalog.roles.length} 条</span>
+          <span className="text-xs text-slate-500">显示 {visibleRoles.length} / {roles.length} 条</span>
         </div>
         <div className="overflow-x-auto">
           <table className="min-w-full text-left text-sm">
@@ -258,7 +239,7 @@ export default function SystemDataPermissionsWorkbenchPage({
 
       <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
         <p className="text-xs text-slate-500">只读提示</p>
-        <p className="mt-1">{catalog.readOnlyNotice}</p>
+        <p className="mt-1">{catalogMeta.readOnlyNotice}</p>
       </div>
     </section>
   );
