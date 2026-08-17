@@ -8,8 +8,25 @@ import {
   type StocktakingTask,
 } from '@/api/stocktaking';
 
-// 动态导入 html5-qrcode（仅在需要时加载）
-const Html5Qrcode = typeof window !== 'undefined' ? require('html5-qrcode').Html5Qrcode : null;
+type Html5QrcodeCtor = new (elementId: string) => {
+  start: (
+    camera: { facingMode: string },
+    config: { fps: number; qrbox: { width: number; height: number } },
+    onSuccess: (decodedText: string) => void,
+    onError: (errorMessage: unknown) => void,
+  ) => Promise<void>;
+  stop: () => Promise<void>;
+};
+
+async function loadHtml5Qrcode(): Promise<Html5QrcodeCtor | null> {
+  try {
+    const moduleName = 'html5-qrcode';
+    const loaded = await import(/* @vite-ignore */ moduleName) as { Html5Qrcode?: Html5QrcodeCtor };
+    return loaded.Html5Qrcode ?? null;
+  } catch {
+    return null;
+  }
+}
 
 export default function StocktakingTaskPage() {
   const { taskId } = useParams();
@@ -58,6 +75,7 @@ export default function StocktakingTaskPage() {
     setIsScanning(true);
     setCameraError(null);
 
+    const Html5Qrcode = await loadHtml5Qrcode();
     if (!Html5Qrcode) {
       setCameraError('扫码器库加载失败，请使用手动输入模式');
       return;
